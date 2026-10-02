@@ -13,7 +13,35 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 High edge contact discriminator (latest completed step)
+### October 2 contact reference and native candidate availability (latest completed step)
+
+Test-only1f684a8 is pushed on engineering/profile. MSVC Debug/Release dielectric
+each1/1 PASS2.45/2.74s. Fresh current-source
+[branch CI](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36950835736)
+and [PR CI](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36950830217)
+SUCCESS: GCC56, Clang56, MSVC62, Vulkan CPU-host15, Android build/Java/lint/package.
+This is not physical RT/device evidence.
+
+New isolated source6ed11ed, complete pushed evidenceafde28d089b8a21f6b9f05506783e93c39edab96,
+adds one non-confirming query only at watched pixel456,304. It exposes both native
+triangles without changing transport. Both native RTX runs exit0/honest RT;
+actual-path fields,41 counters and nonpayload rows match retained controls exactly.
+Native exit/floor t differ by3 float steps on pipeline and1 on compute, with
+opposite nearest ordering. Exact-t equality is insufficient; these observations
+are NOT a universal epsilon/error bound or driver-bug proof. Strict max20 backend
+gate still fails. Normal renderer/Shipping remains unchanged, no promotion.
+See [the durable contact record](evidence/2026-10-02-backend-pixel-witness/high-edge-contact.md#completed-contact-reference-and-candidate-availability).
+
+Next: conservative qualification from both actual triangles; world code/normal
+alone lacks authored plane position. Review the smallest immutable metadata seam,
+prove air-gap/interior-obstruction/TIR rejection before runtime change. Do not
+repeat completed captures/controls/matrices or unchanged shader compilation; no
+epsilon sweep, budget increase, floor omission or new general-purpose framework.
+High/physical/cost/device gates remain open. Isolated cache returned Mobile/Shipping;
+actual retained executable remains High observer; normal configuration never changed.
+Audio/haptic manual revalidation:NO, unchanged semantic inputs. No publication.
+
+### October 2 High edge contact discriminator (preceding completed step)
 
 Isolated source48702729ab7ccc0bddda91517da9b42bc6efa5e2 and complete pushed
 evidence741c755ebd15fc6ebb560a1f57cbb9e4bff96796 stay on codex/horde-rtx-corrections;

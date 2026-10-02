@@ -40,10 +40,52 @@ Both PNGs/manifests/build/process logs are retained there. Actual CPU OBJ hashes
 are verified; unchanged exports remain in the original raw directories rather
 than duplicating195MB. Raw observer root:C:/Dev/tmp/horde-high-edge-witness-20261002.
 
-Next unfinished step: independent contact reference, then smallest explicit
+Next unfinished step at this earlier checkpoint: independent contact reference, then smallest explicit
 same-contact terminal/exit policy preserving opaque receiver and physical
 transport. Do not repeat completed captures, sweep epsilon/precision, raise
 traversal/cost budgets, omit the floor or promote either buggy baseline.
 Keep High row43, Mobile finale, other High failures and physical/device gates
 separate/open. No phone use while disconnected; no merge/release/publication.
 Audio/haptic manual revalidation required:NO (shader-only, semantics unchanged).
+
+## Completed contact reference and candidate availability
+
+Engineering test1f684a8 independently retains the real exit AND opaque receiver.
+The authored planes coincide exactly in double precision using float operands;
+the exit transmits into the floor and a below-floor spawn loses that receiver.
+Exit Fresnel/energy and ordinary open-volume rejection remain checked. Debug/
+Release dielectric each1/1 PASS2.45/2.74s. Fresh current-source branch36950835736
+and PR36950830217 CI SUCCESS (GCC56/Clang56/MSVC62/Vulkan CPU-host15/Android).
+
+New isolated source6ed11ed4247159ad13d2e753c0b62618a7a69901, pushed complete
+evidenceafde28d089b8a21f6b9f05506783e93c39edab96, adds ONE non-confirming hardware
+query only at watched pixel after visit4. Shipping is untouched; no new transport
+decision, counter, geometry/material, mask, buffer/ABI or traversal budget.
+Pipeline/compute two changed modules compile/validate;14 others remain exact.
+Real app build PASS, provider1/1 PASS1.80s; both native RTX runs exit0/honest RT.
+
+Each backend enumerates exactly two actual candidates: exit9/8/107 and
+receiver0/486/1. All actual-path fields match the earlier observer; all41 numeric
+counters and nonpayload rows1-539 match clean controls exactly. Strict backend
+gate remains FAIL max20/32 pixels over3. Native raw distances differ, not tie:
+pipeline exit0.3171132206916809/floor0.3171133100986481 (+3 float steps);
+compute exit0.3171132504940033/floor0.3171132206916809 (-1). Nearest selection is
+consistent with each query's reported values. This is NOT an equal-t driver-bug
+proof, a universal error allowance or permission for an empirical epsilon.
+Exact-distance equality alone is ruled out as the contact qualifier.
+
+Durable isolated [full record](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/afde28d089b8a21f6b9f05506783e93c39edab96/docs/evidence/2026-10-02-backend-pixel-witness/high-edge-observer.md#completed-candidate-availability--not-an-exact-distance-tie),
+[actual candidates](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/afde28d089b8a21f6b9f05506783e93c39edab96/docs/evidence/2026-10-02-backend-pixel-witness/high-contact-candidates/decoded.json),
+[stability receipt](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/afde28d089b8a21f6b9f05506783e93c39edab96/docs/evidence/2026-10-02-backend-pixel-witness/high-contact-candidates/stability.json).
+Both PNGs/manifests and process/build/test logs retained there. Unchanged CPU
+OBJ exports remain in C:/Dev/tmp/horde-high-contact-candidates-20261002 (195MB
+not duplicated). Isolated cache Mobile/Shipping; actual executable still High
+observer. Normal runtime/configuration unchanged. No Android/performance claim.
+
+Next unfinished step: qualify contact from both actual triangles, preserving
+exit Fresnel/Snell/TIR and the opaque receiver. World surface code/normal alone
+has no authored plane position; review the smallest immutable metadata seam,
+then prove air-gap/interior-obstruction/TIR rejection before runtime integration.
+No more captures of the completed availability pair/controls, epsilon sweep,
+budget increase, floor omission or observer promotion. All physical/cost/other
+pixel/device gates remain open. Audio/haptic manual revalidation:NO.
