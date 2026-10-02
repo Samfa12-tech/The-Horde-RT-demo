@@ -1,0 +1,26 @@
+UpdateCTestConfiguration  from :C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/DartConfiguration.tcl
+UpdateCTestConfiguration  from :C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 28
+    Start 28: horde_rt_dielectric_math_tests
+
+28: Test command: "C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-debug\Debug\horde_rt_dielectric_math_tests.exe"
+28: Working Directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/presets/windows-x64-debug
+28: Test timeout computed to be: 1500
+28: Integer contact grid: 24576 checks, 6640 exact contacts admitted.
+28: Dielectric math tests passed.
+1/1 Test #28: horde_rt_dielectric_math_tests ...   Passed    3.51 sec
+
+The following tests passed:
+	horde_rt_dielectric_math_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   3.53 sec

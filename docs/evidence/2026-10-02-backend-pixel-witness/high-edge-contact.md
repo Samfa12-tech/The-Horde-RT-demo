@@ -89,3 +89,65 @@ then prove air-gap/interior-obstruction/TIR rejection before runtime integration
 No more captures of the completed availability pair/controls, epsilon sweep,
 budget increase, floor omission or observer promotion. All physical/cost/other
 pixel/device gates remain open. Audio/haptic manual revalidation:NO.
+
+## Completed conservative contact qualification (CPU only)
+
+Source441a8f581e191193978325f4feb8e364ed399dcc on engineering/profile is the
+reviewed cherry-pick of isolated675a32c65bc4a9c9b13c0655446ba724cd146e48.
+`DielectricContactGeometry.h` is consumed only by the dielectric CPU test, not
+the production renderer. The recorded source floor486 and box bottom8 qualify
+without comparing their native ray distances or choosing an empirical epsilon.
+
+The initial test failed because its nextafter air-gap fixture did NOT retain
+the same rounded world coordinate. Splitting its assertions showed the qualifier
+already rejected the gap. That erroneous fixture assumption is not evidence of
+a transport defect. Separate +/-2^-20 gaps at coordinate64 now demonstrate
+rounded-away gaps/interior obstructions and remain rejected.
+
+The provisional FMA/TwoSum implementation was discarded before integration:
+ordinary GLSL Fma does not establish the required exact fused-operation proof
+([Khronos floating-point rules](https://docs.vulkan.org/spec/latest/appendices/spirvenv.html#spirvenv-floating-point-operations)).
+The replacement is deliberately restricted integer binary32 arithmetic: one
+power-of-two product operand, same-sign nonzero product/receiver, exponent gap
+at most2, exact significand alignment/difference and no nonzero discarded bits.
+Unsupported products/transforms/planes remain uncertified; no shader FMA,
+float64/int64 feature, rounding-mode assumption, FTZ-sensitive arithmetic, clamp
+or spatial tolerance is introduced. This is a mathematical CPU contract, not
+evidence of an executed GPU implementation or its cost.
+
+Independent review also identified unproven wide-range double-determinant
+winding and degenerate exits. Source winding now requires an in-plane axis edge
+and uses only exact coordinate ordering. Duplicate/collinear exits, wrong winding,
+nonplanar/slanted triangles, shear/collapsed rows and invalid operands fail closed.
+Signed-zero/difference, discarded-bit, cyclic/all-axis and post-Snell TIR cases
+are covered. The finite reference grid executes24,576 checks in both multiplier
+orders, with6,640 exact contacts admitted; the rest reject. The narrow double
+oracle is exact for this grid, NOT for arbitrary admitted operand exponents.
+Final focused independent review found no further concrete arithmetic/winding bug.
+
+Fresh source441a8f5 branch CI36954600096 and PR CI36954595930 are running;
+GCC, Clang, Android Debug/Java/lint/package and Vulkan CPU-host jobs succeeded
+in each. MSVC remains pending completion, so neither full workflow is declared
+green yet. Their source/run identities, not an old-job rerun, own this evidence.
+
+Fresh isolated MSVC Debug/Release each1/1 PASS3.12/3.02s. Fresh integrated source
+Debug/Release each1/1 PASS3.51/2.63s, with identical grid totals. Curated logs are
+in [contact-qualification](contact-qualification/). No native captures, shader
+rebuilds or phone operations: runtime/shader source and artifacts are unchanged.
+The max20 High backend gate, other edge pixels, physical contact handling,
+certified recoveries, frozen-cost admission and device gates remain OPEN.
+Plane equality alone is NOT complete contact admission: exact matched-volume
+candidate identity, actual hardware footprints, opposed geometric normals and
+post-refraction outgoing side still require runtime checks. TIR never consumes
+the receiver or closes the volume merely because planes coincide.
+
+Next unfinished step: an immutable world-triangle plane certificate through the
+existing binding6 buffer. The smallest reviewed representation is three uints
+(12-byte std430/CPU record: existing unchanged code, plane-coordinate bits,
+axis/winding validity). It adds8 bytes per actual world triangle, no descriptor
+or resource-lifetime change. Validate actual source geometry before setting the
+certificate; never infer it from the normal code alone. Generate/check the shared
+ABI and update every old scalar-buffer consumer together; verify actual SPIR-V
+stride/offsets and affected host/native compatibility before any contact policy.
+No general framework or prototype promotion. Normal configuration unchanged;
+owner audio/haptic manual revalidation:NO (CPU-only contract).

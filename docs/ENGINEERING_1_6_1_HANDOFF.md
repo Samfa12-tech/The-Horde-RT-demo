@@ -13,7 +13,34 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 contact reference and native candidate availability (latest completed step)
+### October 2 conservative contact qualifier (latest completed step)
+
+CPU-only441a8f581e191193978325f4feb8e364ed399dcc is integrated/pushed to
+engineering/profile (isolated source675a32c). Exact integer binary32 proof admits
+the recorded authored exit/floor contact and rejects genuine air gaps/interior
+obstructions, including gaps erased by a rounded world coordinate. No empirical
+ray-distance epsilon, GPU FMA assumption or new hardware feature. Source winding
+uses provable axis-edge coordinate ordering; unsupported/degenerate geometry
+stays uncertified. Independent focused review found no further concrete bug.
+Integrated Debug/Release dielectric each1/1 PASS3.51/2.63s;24,576 reference checks,
+6,640 admitted, both multiplier orders. Runtime/shader bytes/configuration are
+unchanged; no native matrix/rebuild/phone use. The initial invalid rounded-gap
+fixture assumption and discarded FMA proposal are recorded, not buried.
+Fresh source441a8f5 branch36954600096 and PR36954595930: GCC/Clang/Android/
+Vulkan CPU-host jobs succeed; MSVC still running, full CI not yet declared green.
+See [one durable record](evidence/2026-10-02-backend-pixel-witness/high-edge-contact.md#completed-conservative-contact-qualification-cpu-only).
+
+Next unfinished step:12-byte immutable world surface record through existing
+binding6 (unchanged code, source-certified plane bits, axis/winding validity),
++8 bytes per world triangle. Update/check CPU/GLSL ABI, all consumers, actual
+SPIR-V stride and relevant host/native compatibility before runtime policy.
+Plane equality is not full admission: hardware candidates/footprints, exact open
+volume identity, opposed normals and post-Snell side/TIR checks remain required.
+All High/physical/cost/device gates remain open. Do not repeat completed tests or
+captures without an explicit changed-artifact/validity gap. No phone operations
+while disconnected. Audio/haptic manual revalidation:NO, CPU-only contract.
+
+### October 2 contact reference and native candidate availability (preceding completed step)
 
 Test-only1f684a8 is pushed on engineering/profile. MSVC Debug/Release dielectric
 each1/1 PASS2.45/2.74s. Fresh current-source
