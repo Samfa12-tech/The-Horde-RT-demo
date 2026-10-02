@@ -1,0 +1,8 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  Building Custom Rule C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/CMakeLists.txt
+  RtSceneAbiTests.cpp
+  RtStaticMeshSlot.cpp
+  RtTextureArrays.cpp
+  Generating Code...
+  horde_rt_scene_abi_tests.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-rtx-corrections\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_rt_scene_abi_tests.exe

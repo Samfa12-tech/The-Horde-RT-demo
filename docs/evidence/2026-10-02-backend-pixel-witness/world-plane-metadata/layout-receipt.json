@@ -1,0 +1,263 @@
+{
+  "schema": 1,
+  "sourceBase": "28b1b5980c2fb446df6f2ecf79414398213628a9",
+  "unadmitted": true,
+  "modules": [
+    {
+      "key": "diagnostic_high_generic_dielectric",
+      "spirvSha256": "c0f66e1124a120f901541245194457e9518b14398b5938b1737667ad08f25edf",
+      "bytes": 280016,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 41,
+      "diagnosticsBinding": true,
+      "worldPlaneObserver": true,
+      "validated": true
+    },
+    {
+      "key": "diagnostic_high_opaque_fast",
+      "spirvSha256": "16d0ef63835536601d48a8c8680659fda048e644cf109896bba94ac6c13e3f0c",
+      "bytes": 506048,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 5,
+      "diagnosticsBinding": true,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "spirvSha256": "875e7d25a97bf6bc1c0169fbf127d09a516e5d332ceb6126dd8df93cc7151bc2",
+      "bytes": 252972,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 41,
+      "diagnosticsBinding": true,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "spirvSha256": "16d0ef63835536601d48a8c8680659fda048e644cf109896bba94ac6c13e3f0c",
+      "bytes": 506048,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 5,
+      "diagnosticsBinding": true,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "shipping_high_generic_dielectric",
+      "spirvSha256": "18ec3cf01907bdbc5c8eebe17fd31c0b8da1d62d94ad24dbec677cca0215535b",
+      "bytes": 244144,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 0,
+      "diagnosticsBinding": false,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "shipping_high_opaque_fast",
+      "spirvSha256": "cacc3a83cc34f0c667e2f2bfec2260c0fd4c8e8733748344dbb43e4d0c032e2c",
+      "bytes": 501812,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 0,
+      "diagnosticsBinding": false,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "spirvSha256": "653e585e449bbb053f80a68ac3a4b17424cbb8dc8e162227fe5b24fdee916341",
+      "bytes": 244144,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 0,
+      "diagnosticsBinding": false,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "spirvSha256": "cacc3a83cc34f0c667e2f2bfec2260c0fd4c8e8733748344dbb43e4d0c032e2c",
+      "bytes": 501812,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 0,
+      "diagnosticsBinding": false,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+      "spirvSha256": "2b2ccdb2a8a780db46d815951c65f961f3f52f025cab636534dab7f7b9ad4633",
+      "bytes": 280252,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 41,
+      "diagnosticsBinding": true,
+      "worldPlaneObserver": true,
+      "validated": true
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_opaque_fast",
+      "spirvSha256": "85f08f90f110ae4752b1b7cd625de361524c29649d61b2e81655b551031d2b2a",
+      "bytes": 506308,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 5,
+      "diagnosticsBinding": true,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+      "spirvSha256": "1b91509579a6612f4c83392def8ea99da40517990aa37f1dbec0bae79aa10b64",
+      "bytes": 253208,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 41,
+      "diagnosticsBinding": true,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+      "spirvSha256": "85f08f90f110ae4752b1b7cd625de361524c29649d61b2e81655b551031d2b2a",
+      "bytes": 506308,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 5,
+      "diagnosticsBinding": true,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "rayquery_compute_shipping_high_generic_dielectric",
+      "spirvSha256": "57ab926923062445da1ba1e14b215d807961d9502bb92e07f45797194156b9a9",
+      "bytes": 244380,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 0,
+      "diagnosticsBinding": false,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "rayquery_compute_shipping_high_opaque_fast",
+      "spirvSha256": "0ede4214d95aa8a8af9c462b2d3e65aa5b72dcb52ad0c58f57bca24a25599cd7",
+      "bytes": 502072,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 0,
+      "diagnosticsBinding": false,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "spirvSha256": "0c83a2fb2ce4dddb3953e028e651267bf5f6530b5bb782bd288e4773f7eab9f1",
+      "bytes": 244380,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 0,
+      "diagnosticsBinding": false,
+      "worldPlaneObserver": false,
+      "validated": true
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "spirvSha256": "0ede4214d95aa8a8af9c462b2d3e65aa5b72dcb52ad0c58f57bca24a25599cd7",
+      "bytes": 502072,
+      "offsets": [
+        0,
+        4,
+        8
+      ],
+      "stride": 12,
+      "binding": 6,
+      "atomicInstructions": 0,
+      "diagnosticsBinding": false,
+      "worldPlaneObserver": false,
+      "validated": true
+    }
+  ]
+}

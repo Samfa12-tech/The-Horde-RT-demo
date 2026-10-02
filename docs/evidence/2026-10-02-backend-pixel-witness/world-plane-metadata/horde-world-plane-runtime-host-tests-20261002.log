@@ -1,0 +1,15 @@
+Test project C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/build/presets/windows-x64-debug
+    Start 15: horde_rt_pipeline_variant_provider_tests
+1/5 Test #15: horde_rt_pipeline_variant_provider_tests ...   Passed    1.74 sec
+    Start 33: horde_rt_scene_abi_tests
+2/5 Test #33: horde_rt_scene_abi_tests ...................   Passed    0.01 sec
+    Start 36: horde_rt_scene_abi_generator_tests
+3/5 Test #36: horde_rt_scene_abi_generator_tests .........   Passed    0.58 sec
+    Start 84: horde_rt_scene_resource_inventory_tests
+4/5 Test #84: horde_rt_scene_resource_inventory_tests ....   Passed    4.49 sec
+    Start 93: horde_rt_character_render_slot_smoke
+5/5 Test #93: horde_rt_character_render_slot_smoke .......   Passed    4.26 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  11.10 sec

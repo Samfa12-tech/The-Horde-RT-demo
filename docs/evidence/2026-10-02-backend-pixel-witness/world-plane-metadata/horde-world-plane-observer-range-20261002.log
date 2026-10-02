@@ -1,0 +1,4 @@
+C:\Dev\tmp\horde-world-plane-observer-range-20261002\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 280016 bytes; functions=69; calls=254; ray-query sites=3; dependency SHA-256=ce763c24b9747c8db792ca15b9efe3c7f4cd5b695573be004c709d117446e932
+RayQuery compute variant rayquery_compute_diagnostic_high_generic_dielectric: bytes=280252; functions=69; calls=254; ray-query sites=3; atomics=41; SPIR-V SHA-256=2b2ccdb2a8a780db46d815951c65f961f3f52f025cab636534dab7f7b9ad4633
+UNADMITTED OBSERVER: compiled two changed modules; retained all fourteen other artifacts/provenance, with no fresh-compilation claim.

@@ -13,7 +13,25 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 conservative contact qualifier (latest completed step)
+### October 2 source-plane metadata compatibility (latest isolated step)
+
+Isolated source53624d8 / pushed receipt92de20055de7ede684b6b5a6255c93fe2d1e6212
+adds12-byte source-certified world-triangle metadata at existing binding6, no
+contact-policy change. Debug/Release ABI/generator2/2 each and focused Debug5/5
+PASS; all16 actual SPIR-V layouts/validation PASS; all8 Shipping zero diagnostic
+atomics/binding22/observer. High own-controls2/2 byte-exact outside payload row,
+12 prior groups/41 counters unchanged; Mobile26/26 byte-exact. Existing High
+max20/32pixels and Mobile finale max6/onepixel backend gates/cost admission remain
+OPEN. Requested world payload868*12=10416 bytes (+6944), not a memory-bandwidth
+or performance result. Normal renderer/shaders/ABI unchanged; do not promote the
+observer. [Receipt and exact unfinished step](evidence/2026-10-02-backend-pixel-witness/world-plane-metadata.md).
+Next: isolated GLSL uint32 qualifier + candidate identity/footprint/opposed-normal/
+post-Snell/TIR gates before admission. Do not repeat the completed matrix or
+restart accepted player/music work. No phone use while disconnected; audio/haptic
+manual revalidation required:NO. Last production-source CI remains441a8f5 green;
+this evidence-only update does not relabel it as validation of isolated runtime.
+
+### October 2 conservative contact qualifier (preceding completed step)
 
 CPU-only441a8f581e191193978325f4feb8e364ed399dcc is integrated/pushed to
 engineering/profile (isolated source675a32c). Exact integer binary32 proof admits
