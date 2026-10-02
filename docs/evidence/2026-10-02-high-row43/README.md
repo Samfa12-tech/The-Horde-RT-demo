@@ -299,3 +299,34 @@ If its sign enclosure still straddles zero, stop this float32 expression route;
 do not start an epsilon, precision-qualifier or expression search. Even a positive
 feasibility result would require a separately reviewed Vulkan-valid numerical
 bound and affected native/cost acceptance before any runtime candidate.
+
+## Relative-world expression: completed NO-GO
+
+Exactly that one predeclared expression was evaluated using the retained inputs:
+`M*(b-a), M*(c-a), (origin-translation)-M*a`. Both determinant and signed-v
+intervals contain their exact rational references. The v intervals are tighter
+than the absolute-world version but still straddle zero:
+
+| Retained ray | Signed-v numerator interval | Strict outside sign proved |
+| --- | --- | --- |
+| Pipeline | [-1.30385160446167e-8, +1.82189978659153e-8] | NO |
+| Compute | [-1.1117663234472275e-8, +2.019805833697319e-8] | NO |
+
+[Complete receipt](relative-world-interval.json). This is ideal directed
+binary32 feasibility, not shader execution, Vulkan rounding-mode admission or
+a ray-query error bound. No runtime candidate follows. The optional flag leaves
+the preceding `--source-world` JSON identical after newline canonicalization
+(retained LF, current Windows stdout CRLF: raw hashes differ) and rejects use without
+`--source-world` with argparse exit2. Reproduce only if inputs/analysis change:
+
+```powershell
+python docs/evidence/2026-09-30-glass-spawn/derived-normal-bias/row43/analysis/compare_row43.py assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb --source-world --relative-world
+```
+
+Decision: stop this float32-expression route. Do not repeat either feasibility
+check or the rejected precision/backface proposals; no epsilon tuning, guessed
+edge rejection, new exact-arithmetic framework or changed image gate. Row43 is
+still OPEN, not physically repaired. Independent useful work now is clean,
+observer-free shader-cost/image admission of the already demonstrated source-
+certified contact policy. That is separate from repairing row43 or other backend
+outliers, and cannot promote the isolated renderer automatically.

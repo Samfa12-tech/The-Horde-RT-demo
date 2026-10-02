@@ -1,0 +1,357 @@
+{
+  "investigationOnly": true,
+  "glbSha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+  "triangles": 72,
+  "backends": {
+    "pipeline": {
+      "pixel": [
+        524,
+        552
+      ],
+      "firstHit": {
+        "primitive": 63,
+        "t": 0.6298525929450989,
+        "entering": false,
+        "bary": [
+          0.13649806380271912,
+          3.486895217008623e-09
+        ]
+      },
+      "capturedTriangleMaxAbsVertexError": 0.0,
+      "nativeHitTMinusDoublePlaneTForReturnedPrimitive": 4.3978005903611006e-08,
+      "worldQueryOrigin": [
+        -10.649999618530273,
+        0.699999988079071,
+        -15.199999809265137
+      ],
+      "worldQueryDirection": [
+        -0.8330438733100891,
+        -0.523387610912323,
+        0.17917372286319733
+      ],
+      "objectOrigin": [
+        0.29004669189453125,
+        -0.01810014247894287,
+        1.5681824684143066
+      ],
+      "objectDirection": [
+        -0.4049122929573059,
+        -0.4991641342639923,
+        -2.1799464225769043
+      ],
+      "objectDirectionLength": 2.272726381073909,
+      "component": 4,
+      "componentOutwardPlaneDistances": [
+        {
+          "primitive": 24,
+          "signedDistance": -0.6254056069990858
+        },
+        {
+          "primitive": 25,
+          "signedDistance": 1.3096092016455132
+        },
+        {
+          "primitive": 26,
+          "signedDistance": 0.4404031919983637
+        },
+        {
+          "primitive": 27,
+          "signedDistance": -1.3166091854425905
+        },
+        {
+          "primitive": 28,
+          "signedDistance": -0.6593998670578003
+        },
+        {
+          "primitive": 29,
+          "signedDistance": 0.3143998384475708
+        }
+      ],
+      "maximumOutwardPlaneDistance": 1.3096092016455132,
+      "nearestValidUploadedFloatTriangleHit": {
+        "t": 0.8082919771786382,
+        "u": 0.15041076396175546,
+        "v": 0.10776465397122104,
+        "insideTriangle": true,
+        "entering": true,
+        "component": 1,
+        "primitive": 9
+      },
+      "nearestValidSameComponentHits": [],
+      "sameComponentEdgeCandidates": [
+        {
+          "t": 0.6265038184286528,
+          "u": 0.8817295432838214,
+          "v": -0.004845223680938842,
+          "insideTriangle": false,
+          "entering": true,
+          "component": 4,
+          "primitive": 61
+        },
+        {
+          "t": 0.629852548967093,
+          "u": 0.13649819957825862,
+          "v": -1.0472011617346364e-07,
+          "insideTriangle": false,
+          "entering": false,
+          "component": 4,
+          "primitive": 63
+        },
+        {
+          "t": 0.6298526213449753,
+          "u": 0.13651999760887,
+          "v": 0.8635016158993406,
+          "insideTriangle": false,
+          "entering": true,
+          "component": 4,
+          "primitive": 65
+        }
+      ],
+      "sourceWorldWitness": {
+        "file": "native-path.json",
+        "sha256": "a53a7719c4c98636e12efcc0eca493adee90f41a4e90e3e8e972112e294e73e4",
+        "decodedPngSha256": "9d68aef8110e5f64319690973dbcafa6f3178204a5bec89e2c978fefb845be1c"
+      },
+      "sourceWorldExactReference": {
+        "arithmetic": "exact rational operations on finite captured/uploaded binary32 inputs",
+        "geometry": "source triangle plus captured 3x4 objectToWorld; no rounded worldToObject ray",
+        "scope": "mathematical source-world reference, not native hardware error bounds or runtime filtering",
+        "corner63": {
+          "primitive": 63,
+          "determinant": -0.011364936122493844,
+          "uNumerator": -0.001551460446325167,
+          "vNumerator": 2.5312937498721623e-09,
+          "t": 0.629852868500183,
+          "u": 0.1365129050971494,
+          "v": -2.2272837458911408e-07,
+          "insideTriangle": false,
+          "entering": false,
+          "exactVNumeratorSign": 1,
+          "exactVNumeratorBits": 133,
+          "exactVDenominatorBits": 162
+        },
+        "entry9": {
+          "primitive": 9,
+          "determinant": 0.011364936122493844,
+          "uNumerator": 0.0017092429981518994,
+          "vNumerator": 0.00122490293427697,
+          "t": 0.8082922814899058,
+          "u": 0.15039618170566849,
+          "v": 0.10777913057096758,
+          "insideTriangle": true,
+          "entering": true,
+          "exactVNumeratorSign": 1,
+          "exactVNumeratorBits": 152,
+          "exactVDenominatorBits": 162
+        },
+        "nearestValidPrimitive": 9,
+        "straightforwardBinary32Interval": {
+          "arithmetic": "ideal directed binary32 endpoints; feasibility only, no GPU arithmetic assumption",
+          "determinant": [
+            -0.011365211568772793,
+            -0.011364670470356941
+          ],
+          "vNumerator": [
+            -6.947084330022335e-07,
+            6.83183316141367e-07
+          ],
+          "containsExactReference": true,
+          "outsideVProved": false
+        },
+        "relativeWorldBinary32Interval": {
+          "arithmetic": "ideal directed binary32 endpoints; feasibility only, no GPU arithmetic assumption",
+          "expression": "M*(b-a), M*(c-a), (origin-translation)-M*a",
+          "determinant": [
+            -0.011364942416548729,
+            -0.011364929378032684
+          ],
+          "vNumerator": [
+            -1.30385160446167e-08,
+            1.82189978659153e-08
+          ],
+          "containsExactReference": true,
+          "outsideVProved": false
+        }
+      }
+    },
+    "compute": {
+      "pixel": [
+        524,
+        552
+      ],
+      "firstHit": {
+        "primitive": 9,
+        "t": 0.8082919716835022,
+        "entering": true,
+        "bary": [
+          0.15041092038154602,
+          0.10776440054178238
+        ]
+      },
+      "capturedTriangleMaxAbsVertexError": 0.0,
+      "nativeHitTMinusDoublePlaneTForReturnedPrimitive": 8.010690299986578e-08,
+      "worldQueryOrigin": [
+        -10.649999618530273,
+        0.699999988079071,
+        -15.199999809265137
+      ],
+      "worldQueryDirection": [
+        -0.8330439329147339,
+        -0.523387610912323,
+        0.17917373776435852
+      ],
+      "objectOrigin": [
+        0.29004669189453125,
+        -0.01810014247894287,
+        1.5681824684143066
+      ],
+      "objectDirection": [
+        -0.4049123227596283,
+        -0.4991641044616699,
+        -2.1799466609954834
+      ],
+      "objectDirectionLength": 2.272726608523554,
+      "component": 4,
+      "componentOutwardPlaneDistances": [
+        {
+          "primitive": 24,
+          "signedDistance": -0.6254056069990858
+        },
+        {
+          "primitive": 25,
+          "signedDistance": 1.3096092016455132
+        },
+        {
+          "primitive": 26,
+          "signedDistance": 0.4404031919983637
+        },
+        {
+          "primitive": 27,
+          "signedDistance": -1.3166091854425905
+        },
+        {
+          "primitive": 28,
+          "signedDistance": -0.6593998670578003
+        },
+        {
+          "primitive": 29,
+          "signedDistance": 0.3143998384475708
+        }
+      ],
+      "maximumOutwardPlaneDistance": 1.3096092016455132,
+      "nearestValidUploadedFloatTriangleHit": {
+        "t": 0.8082918915765992,
+        "u": 0.15041069797315793,
+        "v": 0.10776452628318753,
+        "insideTriangle": true,
+        "entering": true,
+        "component": 1,
+        "primitive": 9
+      },
+      "nearestValidSameComponentHits": [],
+      "sameComponentEdgeCandidates": [
+        {
+          "t": 0.626503752078861,
+          "u": 0.8817296422543005,
+          "v": -0.004845373798906767,
+          "insideTriangle": false,
+          "entering": true,
+          "component": 4,
+          "primitive": 61
+        },
+        {
+          "t": 0.6298524822626543,
+          "u": 0.13649840191950546,
+          "v": -2.5564048068856777e-07,
+          "insideTriangle": false,
+          "entering": false,
+          "component": 4,
+          "primitive": 63
+        },
+        {
+          "t": 0.6298526589499849,
+          "u": 0.13655161480881983,
+          "v": 0.8635011476282726,
+          "insideTriangle": false,
+          "entering": true,
+          "component": 4,
+          "primitive": 65
+        }
+      ],
+      "sourceWorldWitness": {
+        "file": "compute-native-path.json",
+        "sha256": "02c28b64908823baa3d12d31baa63e16e28629488a2ad2973a45873b0621fb5a",
+        "decodedPngSha256": "e0cbf7fd2f3246c84c4e03e26ea8e2d7b8cdcb4af6c9f8f5b1fdd60340a24a0e"
+      },
+      "sourceWorldExactReference": {
+        "arithmetic": "exact rational operations on finite captured/uploaded binary32 inputs",
+        "geometry": "source triangle plus captured 3x4 objectToWorld; no rounded worldToObject ray",
+        "scope": "mathematical source-world reference, not native hardware error bounds or runtime filtering",
+        "corner63": {
+          "primitive": 63,
+          "determinant": -0.011364936817141728,
+          "uNumerator": -0.0015514616828856717,
+          "vNumerator": 4.089591048911324e-09,
+          "t": 0.629852830002304,
+          "u": 0.1365130055580778,
+          "v": -3.5984283192344683e-07,
+          "insideTriangle": false,
+          "entering": false,
+          "exactVNumeratorSign": 1,
+          "exactVNumeratorBits": 134,
+          "exactVDenominatorBits": 162
+        },
+        "entry9": {
+          "primitive": 9,
+          "determinant": 0.011364936817141728,
+          "uNumerator": 0.0017092436372035912,
+          "vNumerator": 0.0012249004747983034,
+          "t": 0.8082922320854496,
+          "u": 0.15039622874326408,
+          "v": 0.10777890757393273,
+          "insideTriangle": true,
+          "entering": true,
+          "exactVNumeratorSign": 1,
+          "exactVNumeratorBits": 152,
+          "exactVDenominatorBits": 162
+        },
+        "nearestValidPrimitive": 9,
+        "straightforwardBinary32Interval": {
+          "arithmetic": "ideal directed binary32 endpoints; feasibility only, no GPU arithmetic assumption",
+          "determinant": [
+            -0.011365212500095367,
+            -0.011364670470356941
+          ],
+          "vNumerator": [
+            -6.927875801920891e-07,
+            6.851041689515114e-07
+          ],
+          "containsExactReference": true,
+          "outsideVProved": false
+        },
+        "relativeWorldBinary32Interval": {
+          "arithmetic": "ideal directed binary32 endpoints; feasibility only, no GPU arithmetic assumption",
+          "expression": "M*(b-a), M*(c-a), (origin-translation)-M*a",
+          "determinant": [
+            -0.011364942416548729,
+            -0.011364930309355259
+          ],
+          "vNumerator": [
+            -1.1117663234472275e-08,
+            2.019805833697319e-08
+          ],
+          "containsExactReference": true,
+          "outsideVProved": false
+        }
+      }
+    }
+  },
+  "rayComparison": {
+    "samePixel": true,
+    "sameCapturedWorldCameraOrigin": true,
+    "worldCameraDirectionMaxAbsDelta": 5.960464477539063e-08,
+    "objectOriginMaxAbsDelta": 0.0,
+    "objectDirectionMaxAbsDelta": 2.384185791015625e-07,
+    "matrixMaxAbsDelta": 0.0
+  }
+}
