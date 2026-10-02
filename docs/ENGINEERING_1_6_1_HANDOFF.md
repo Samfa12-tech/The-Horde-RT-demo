@@ -13,7 +13,30 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 primary-origin exclusion prototype (latest host-only step)
+### October 2 clean contact-policy static admission (latest compile-only step)
+
+Isolated e43c11c compile-only High/Shipping probes2/2 compile/optimize/SPIR-V
+validate PASS; actual pipeline280344B, compute280580B,78functions/235calls/
+2querysites/0atomics/no binding22/no observer. No embed/catalog/runtime write.
+Frozen pipeline gate FAIL8 metrics; byte ceiling243852 unchanged. Retained
+unadmitted source-plane control244144B means clean contact adds36200B (+14.83%),
+not a frame-time/register/occupancy or measured performance claim. Prior
+Diagnostic cost failure is not solely observer overhead. Stop gate obeyed:
+no native run/build, promotion or repeat of completed matrices. App38ee2658
+unchanged; cache Mobile/Shipping. [Finite completed record/next step](evidence/2026-10-02-backend-pixel-witness/contact-shipping-admission.md).
+Only reviewed report/receipts enter engineering, not experimental launchers,
+shader flag, script, ABI, resources or embedded modules. Next independent
+discriminator: existing held-high worst backend pixel521,444 (max53), use existing
+observer with exactly one held-high capture per RTX backend to distinguish actual
+primary/transport identity. No framework, tolerance change, expression/epsilon
+search or blanket edge rejection. Source8299c55 push36968313024/PR36968317396
+both SUCCESS, all5 jobs; inspected push logs confirm GCC56/Clang56/MSVC62/
+Vulkan-host15 and Android Debug/Java/lint/package PASS. These validate current
+CPU test source, not the isolated renderer or a later candidate.
+Phone unavailable to this project; no polling/use. Audio/haptic revalidation:NO.
+Goal ACTIVE/incomplete; no release/publication.
+
+### October 2 primary-origin exclusion prototype (preceding host-only step)
 
 CPU-only outside-near-segment proof is complete but candidate-rejection proposal
 is NO-GO: an exact cube edge-touch can return a valid backface from a certified
