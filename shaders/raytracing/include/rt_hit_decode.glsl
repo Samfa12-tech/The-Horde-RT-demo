@@ -258,7 +258,7 @@ void materialForPrimitive(int primitive,
         return;
     }
 
-    uint code = worldSurfaces.codes[primitive];
+    uint code = worldSurfaces.values[primitive].code;
     uint normalCode = (code >> 8u) & 0xffu;
     material = int(code & 0xffu);
     normal = normalForSurfaceCode(code);
@@ -419,7 +419,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         int candidatePrimitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
         bool candidateIsWater = candidateInstance == kWaterfallInstance ||
             (candidateInstance == 0 &&
-             int(worldSurfaces.codes[candidatePrimitive] & 0xffu) == kMaterialWater);
+             int(worldSurfaces.values[candidatePrimitive].code & 0xffu) == kMaterialWater);
         bool candidateIsPlayerNearFace = false;
         if (ignorePlayerNearFace &&
             rtInstances.values[candidateInstance].geometryRole == kRtGeometryRolePlayerWorldBody)

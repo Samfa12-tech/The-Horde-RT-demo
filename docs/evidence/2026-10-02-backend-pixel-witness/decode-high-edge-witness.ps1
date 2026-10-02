@@ -53,6 +53,10 @@ $records = foreach ($backend in @('pipeline', 'compute')) {
                     direction=Vector $image 288; maximum=Field $image 291;
                     exit=ContactCandidate $image 292; receiver=ContactCandidate $image 312}
             } else { $null })
+            worldPlaneMetadata=$(if ((Field $image 332) -eq 9876) {
+                [ordered]@{coordinate=Field $image 333; flags=Field $image 334;
+                    triangleCount=Field $image 335}
+            } else { $null })
             visits=@(for($visit=0;$visit -lt $count;++$visit) {
                 $offset=64+24*$visit
                 [ordered]@{visit=$visit; hit=Field $image $offset; instance=Field $image ($offset+1);

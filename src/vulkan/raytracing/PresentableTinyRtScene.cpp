@@ -9,6 +9,7 @@
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
 #include "vulkan/raytracing/RtLanternGeometryProfile.h"
+#include "vulkan/raytracing/RtWorldSurfaceMetadata.h"
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
 
 #include <algorithm>
@@ -2737,6 +2738,39 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
 
+    // Existing binding 6 retains one record per actual world BLAS triangle.
+    // Source certification is setup-only; no new dynamic buffer or ray query.
+    std::vector<RtWorldSurfaceGpu> worldSurfaceRecords;
+    worldSurfaceRecords.reserve(worldSurfaceCodes.size());
+    for (std::size_t primitive = 0u; primitive < worldSurfaceCodes.size(); ++primitive)
+    {
+        std::array<Vec3, 3u> triangle{};
+        for (std::size_t corner = 0u; corner < triangle.size(); ++corner)
+        {
+            const auto index = indices[primitive * 3u + corner];
+            if (index >= vertices.size())
+            {
+                diagnostic = "World surface metadata references an invalid source vertex.";
+                return false;
+            }
+            const auto& position = vertices[index].position;
+            triangle[corner] = {position[0], position[1], position[2]};
+        }
+        Vec3 authoredNormal{};
+        switch ((worldSurfaceCodes[primitive] >> 8u) & 0xffu)
+        {
+        case SurfaceUp: authoredNormal.y = 1.0f; break;
+        case SurfaceDown: authoredNormal.y = -1.0f; break;
+        case SurfaceRight: authoredNormal.x = 1.0f; break;
+        case SurfaceLeft: authoredNormal.x = -1.0f; break;
+        case SurfaceForward: authoredNormal.z = 1.0f; break;
+        case SurfaceBack: authoredNormal.z = -1.0f; break;
+        default: break; // Slanted/gallery or unknown normals are uncertified.
+        }
+        worldSurfaceRecords.push_back(
+            MakeWorldSurfaceRecord(worldSurfaceCodes[primitive], triangle, authoredNormal));
+    }
+
     const std::uint32_t waterfallFirstVertex = static_cast<std::uint32_t>(vertices.size());
     const std::uint32_t waterfallIndexOffset = static_cast<std::uint32_t>(indices.size());
     vertices.insert(vertices.end(), waterfallVertices.begin(), waterfallVertices.end());
@@ -2898,7 +2932,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const VkMemoryPropertyFlags uploadMemory = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
     const VkDeviceSize vertexBufferSize = sizeof(Vertex) * vertices.size();
     const VkDeviceSize indexBufferSize = sizeof(std::uint32_t) * indices.size();
-    const VkDeviceSize worldSurfaceBufferSize = sizeof(std::uint32_t) * worldSurfaceCodes.size();
+    const VkDeviceSize worldSurfaceBufferSize = sizeof(RtWorldSurfaceGpu) * worldSurfaceRecords.size();
     if (!CreateBuffer(vertexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, vertexBuffer_, diagnostic) ||
         !CreateBuffer(indexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, indexBuffer_, diagnostic) ||
         !CreateBuffer(sizeof(transform), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, transformBuffer_, diagnostic) ||
@@ -2921,7 +2955,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                      "held light", diagnostic) ||
         !WriteBuffer(fireEmitterBuffer_, initialFireEmitters.data(), sizeof(initialFireEmitters),
                      "fire emitters", diagnostic) ||
-        !WriteBuffer(worldSurfaceBuffer_, worldSurfaceCodes.data(), worldSurfaceBufferSize,
+        !WriteBuffer(worldSurfaceBuffer_, worldSurfaceRecords.data(), worldSurfaceBufferSize,
                      "world surface metadata", diagnostic))
     {
         return false;
@@ -4250,7 +4284,7 @@ bool PresentableTinyRtScene::WriteBundleDescriptors(RtPipelineBundle& bundle,
     worldSurfaceBufferInfo.range = worldSurfaceBuffer_.size;
     VkWriteDescriptorSet worldSurfaceWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
     worldSurfaceWrite.dstSet = descriptorSet;
-    worldSurfaceWrite.dstBinding = 6u;
+    worldSurfaceWrite.dstBinding = kRtBindingWorldSurfaces;
     worldSurfaceWrite.descriptorCount = 1u;
     worldSurfaceWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     worldSurfaceWrite.pBufferInfo = &worldSurfaceBufferInfo;

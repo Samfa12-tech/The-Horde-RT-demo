@@ -10,6 +10,7 @@
     "activeFireEmitters": 2
   },
   "bindings": {
+    "worldSurfaces": 6,
     "instanceMetadata": 11,
     "primitiveMetadata": 12,
     "materials": 13,
@@ -26,6 +27,7 @@
     "viewmodelVertices": 24
   },
   "geometryRoles": { "static": 0, "playerWorldBody": 1, "playerViewmodel": 2 },
+  "worldSurfaceContact": { "axisMask": 3, "negativeWinding": 4 },
   "playerInstances": { "worldBody": 4, "viewmodel": 20, "viewmodelPrimaryMask": 64, "bodyRemainderPrimaryMask": 128 },
   "instanceFlags": {
     "staticPbr": 1,
@@ -49,6 +51,14 @@
     "certifiedRectangularVolume": 4096
   },
   "records": [
+    {
+      "name": "RtWorldSurfaceGpu", "alignment": 4, "size": 12,
+      "fields": [
+        { "name": "code", "type": "uint", "offset": 0, "comment": "Existing material/normal code, unchanged." },
+        { "name": "planeCoordinateBits", "type": "uint", "offset": 4, "comment": "Binary32 authored plane; meaningful only with a nonzero certified axis." },
+        { "name": "contactPlaneFlags", "type": "uint", "offset": 8, "comment": "Low two bits: axis+1, zero uncertified. Bit 2: negative outward winding." }
+      ]
+    },
     {
       "name": "StaticRtVertex", "alignment": 16, "size": 64,
       "fields": [

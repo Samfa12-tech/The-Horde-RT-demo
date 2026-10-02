@@ -14,6 +14,7 @@ vec4 investigationInterfaces[54]; // Nine existing interface-loop visits, 24 flo
 int investigationInterfaceCount = 0;
 bool investigationContactObserved = false;
 vec4 investigationContact[13]; // Header/ray + nearest exit and opaque candidate.
+uvec2 investigationContactWorldPlane;
 
 int backendWitnessRow()
 {
@@ -62,6 +63,7 @@ void backendWitnessContactCandidates(vec3 origin, vec3 direction, float minimum,
 {
     if (backendWitnessRow() < 0) return;
     investigationContactObserved = true;
+    investigationContactWorldPlane = uvec2(0u);
     for (int index = 0; index < 13; ++index)
         investigationContact[index] = vec4(0.0);
     investigationContact[0].x = 1.0;
@@ -141,6 +143,12 @@ void backendWitnessContactCandidates(vec3 origin, vec3 direction, float minimum,
         }
         if (slot >= 0)
         {
+            if (slot == 8)
+            {
+                investigationContactWorldPlane = instance == 0 ?
+                    uvec2(worldSurfaces.values[primitive].planeCoordinateBits,
+                          worldSurfaces.values[primitive].contactPlaneFlags) : uvec2(0u);
+            }
             investigationContact[slot] = vec4(1.0, float(instance), float(primitive), float(material));
             investigationContact[slot + 1] = vec4(distance, float(geometry), front ? 1.0 : 0.0, float(flags));
             investigationContact[slot + 2] = vec4(bary, transmission, dot(direction, normal));
@@ -196,8 +204,15 @@ void backendWitness(HitInfo primary, vec3 direction, vec3 origin,
                 investigationInterfaces[visit][axis]);
     backendWitnessFloat(0, 280, investigationContactObserved ? 1.0 : 0.0);
     if (investigationContactObserved)
+    {
         for (int index = 0; index < 13; ++index)
             for (int axis = 0; axis < 4; ++axis)
                 backendWitnessFloat(0, 280 + index * 4 + axis,
                     investigationContact[index][axis]);
+        // Explicit marker: retained pre-metadata payloads have no such fields.
+        backendWitnessFloat(0, 332, 9876.0);
+        backendWitnessFloat(0, 333, uintBitsToFloat(investigationContactWorldPlane.x));
+        backendWitnessFloat(0, 334, float(investigationContactWorldPlane.y));
+        backendWitnessFloat(0, 335, float(worldSurfaces.values.length()));
+    }
 }

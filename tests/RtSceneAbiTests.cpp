@@ -2,6 +2,7 @@
 #include "vulkan/raytracing/RtSceneAbi.generated.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "vulkan/raytracing/RtTextureArrays.h"
+#include "vulkan/raytracing/RtWorldSurfaceMetadata.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -239,6 +240,63 @@ void TestGeneratedConstants()
           "material flag enum agrees with hand-checked literals");
 }
 
+void TestWorldSurfacePlaneMetadata()
+{
+    using namespace horde::vulkan::raytracing;
+    Check(sizeof(RtWorldSurfaceGpu) == 12u && alignof(RtWorldSurfaceGpu) == 4u &&
+              offsetof(RtWorldSurfaceGpu, code) == 0u &&
+              offsetof(RtWorldSurfaceGpu, planeCoordinateBits) == 4u &&
+              offsetof(RtWorldSurfaceGpu, contactPlaneFlags) == 8u,
+          "world-surface std430 record has offsets 0/4/8 and 12-byte array stride");
+    Check(kRtBindingWorldSurfaces == 6u && kRtWorldSurfaceContactAxisMask == 3u &&
+              kRtWorldSurfaceContactNegativeWinding == 4u,
+          "world-surface binding and axis/winding flags are shared ABI constants");
+    // Actual floor primitive486. Preserve the code without packing flags into it.
+    const std::array<Vec3, 3u> floor{{
+        {-28.5f, -0.95f, -13.6f}, {-8.5f, -0.95f, -13.6f}, {-8.5f, -0.95f, -16.8f}}};
+    const auto record = MakeWorldSurfaceRecord(1u, floor, {0.0f, 1.0f, 0.0f});
+    Check(record.code == 1u && record.planeCoordinateBits == 0xbf733333u &&
+              record.contactPlaneFlags == 2u,
+          "actual upward floor has exact authored binary32 plane and Y-axis certificate");
+    auto reversed = floor;
+    std::swap(reversed[1], reversed[2]);
+    const auto down = MakeWorldSurfaceRecord(257u, reversed, {0.0f, -1.0f, 0.0f});
+    Check(down.code == 257u && down.planeCoordinateBits == record.planeCoordinateBits &&
+              down.contactPlaneFlags == 6u,
+          "opposite source winding is certified only with matching authored outward sign");
+    const std::array<RtWorldSurfaceGpu, 2u> records{{record, down}};
+    const auto words = std::bit_cast<std::array<std::uint32_t, 6u>>(records);
+    Check(words == std::array<std::uint32_t, 6u>{{1u, 0xbf733333u, 2u, 257u, 0xbf733333u, 6u}},
+          "two CPU records have the exact six uint words consumed by std430");
+
+    const auto uncertified = [](const RtWorldSurfaceGpu& value) {
+        return value.code == 0xf1234567u && value.planeCoordinateBits == 0u &&
+            value.contactPlaneFlags == 0u;
+    };
+    auto nonplanar = floor;
+    nonplanar[2].y = std::nextafter(nonplanar[2].y, 0.0f);
+    auto unsupported = floor;
+    unsupported[0].x = std::numeric_limits<float>::infinity();
+    Check(uncertified(MakeWorldSurfaceRecord(0xf1234567u, floor, {0.0f, -1.0f, 0.0f})) &&
+              uncertified(MakeWorldSurfaceRecord(0xf1234567u, floor, {})) &&
+              uncertified(MakeWorldSurfaceRecord(0xf1234567u, {floor[0], floor[0], floor[0]}, {0.0f, 1.0f, 0.0f})) &&
+              uncertified(MakeWorldSurfaceRecord(0xf1234567u, nonplanar, {0.0f, 1.0f, 0.0f})) &&
+              uncertified(MakeWorldSurfaceRecord(0xf1234567u, unsupported, {0.0f, 1.0f, 0.0f})),
+          "invalid winding, missing normal, degenerate/nonplanar/unsupported source keeps code but no certificate");
+    auto triangle = floor;
+    Vec3 normal{0.0f, 1.0f, 0.0f};
+    for (std::uint32_t rotation = 0u; rotation < 3u; ++rotation)
+    {
+        const auto axisRecord = MakeWorldSurfaceRecord(1u, triangle, normal);
+        Check((axisRecord.contactPlaneFlags & kRtWorldSurfaceContactAxisMask) ==
+                  ((1u + rotation) % 3u) + 1u &&
+                  axisRecord.planeCoordinateBits == 0xbf733333u,
+              "axis flags follow all three cyclic source orientations");
+        for (auto& vertex : triangle) vertex = {vertex.z, vertex.x, vertex.y};
+        normal = {normal.z, normal.x, normal.y};
+    }
+}
+
 void TestGenericRegistrationAndMeasurements()
 {
     using namespace horde::vulkan::raytracing;
@@ -403,6 +461,7 @@ int main()
 {
     TestAbiLayout();
     TestGeneratedConstants();
+    TestWorldSurfacePlaneMetadata();
     TestGenericRegistrationAndMeasurements();
     TestExplicitTextureGroups();
     TestNamedCapacityFailures();

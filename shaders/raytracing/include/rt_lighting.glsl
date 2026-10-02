@@ -131,7 +131,7 @@ ShadowHit traceNearestShadowHit(vec3 origin, vec3 direction,
         bool transparentWorldPane = candidateInstance == kWaterfallInstance;
         if (candidateInstance == 0)
         {
-            int material = int(worldSurfaces.codes[candidatePrimitive] & 0xffu);
+            int material = int(worldSurfaces.values[candidatePrimitive].code & 0xffu);
             transparentWorldPane = material == kMaterialClearGlass ||
                                    material == kMaterialWater;
         }
@@ -664,7 +664,7 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
         bool transparentWorldPane = int(instance) == kWaterfallInstance;
         if (instance == 0u)
         {
-            int material = int(worldSurfaces.codes[primitive] & 0xffu);
+            int material = int(worldSurfaces.values[primitive].code & 0xffu);
             transparentWorldPane = material == kMaterialClearGlass ||
                                    material == kMaterialWater;
         }
@@ -858,7 +858,7 @@ float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
         bool transparentWorldPane = instance == kWaterfallInstance;
         if (instance == 0)
         {
-            int material = int(worldSurfaces.codes[primitive] & 0xffu);
+            int material = int(worldSurfaces.values[primitive].code & 0xffu);
             transparentWorldPane = material == kMaterialClearGlass ||
                                    material == kMaterialWater;
         }

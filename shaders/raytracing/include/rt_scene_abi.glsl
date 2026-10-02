@@ -13,10 +13,6 @@ layout(std430, set = 0, binding = 2) readonly buffer SkeletonVertices
 layout(set = 0, binding = 3) uniform sampler2DArray materialDiffuse;
 layout(set = 0, binding = 4) uniform sampler2DArray materialNormal;
 layout(set = 0, binding = 5) uniform sampler2DArray materialArm;
-layout(std430, set = 0, binding = 6) readonly buffer WorldSurfaceCodes
-{
-    uint codes[];
-} worldSurfaces;
 
 struct LichVertex
 {

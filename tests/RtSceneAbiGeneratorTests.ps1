@@ -46,6 +46,16 @@ try {
     }
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
+    $worldRecord = @($definition.records | Where-Object name -eq 'RtWorldSurfaceGpu')
+    if ($definition.bindings.worldSurfaces -ne 6 -or $worldRecord.Count -ne 1 -or
+        $worldRecord[0].size -ne 12 -or $worldRecord[0].alignment -ne 4 -or
+        (@($worldRecord[0].fields.offset) -join ',') -cne '0,4,8' -or
+        $generatedGlsl -notmatch 'struct RtWorldSurfaceGpu\s*\{[^}]*uint code;[^}]*uint planeCoordinateBits;[^}]*uint contactPlaneFlags;' -or
+        $generatedGlsl -notmatch 'binding = 6\) readonly buffer RtWorldSurfaceBuffer\s*\{\s*RtWorldSurfaceGpu values\[\];\s*\} worldSurfaces;' -or
+        $generatedGlsl -notmatch 'kRtWorldSurfaceContactAxisMask = 3u;' -or
+        $generatedGlsl -notmatch 'kRtWorldSurfaceContactNegativeWinding = 4u;') {
+        throw "World-surface plane metadata must retain binding 6 and the 12-byte three-uint layout."
+    }
     if ($definition.schema -ne 1 -or $definition.bindings.dielectricDiagnostics -ne 22) {
         throw "RT scene ABI schema/binding-22 contract changed."
     }

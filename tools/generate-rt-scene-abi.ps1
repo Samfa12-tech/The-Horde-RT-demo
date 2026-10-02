@@ -31,6 +31,7 @@ $i = $definition.instanceFlags
 $m = $definition.materialFlags
 $g = $definition.geometryRoles
 $p = $definition.playerInstances
+$w = $definition.worldSurfaceContact
 $records = @($definition.records)
 if ($records.Count -eq 0) { throw "RT scene ABI definition must declare record layouts." }
 
@@ -121,6 +122,9 @@ inline constexpr std::uint32_t kRtTextureLayerCapacity = $($c.textureLayers)u;
 inline constexpr std::uint32_t kRtFireEmitterCapacity = $($c.fireEmitters)u;
 inline constexpr std::uint32_t kRtActiveFireEmitterCapacity = $($c.activeFireEmitters)u;
 
+inline constexpr std::uint32_t kRtBindingWorldSurfaces = $($b.worldSurfaces)u;
+inline constexpr std::uint32_t kRtWorldSurfaceContactAxisMask = $($w.axisMask)u;
+inline constexpr std::uint32_t kRtWorldSurfaceContactNegativeWinding = $($w.negativeWinding)u;
 inline constexpr std::uint32_t kRtBindingInstanceMetadata = $($b.instanceMetadata)u;
 inline constexpr std::uint32_t kRtBindingPrimitiveMetadata = $($b.primitiveMetadata)u;
 inline constexpr std::uint32_t kRtBindingMaterials = $($b.materials)u;
@@ -194,6 +198,8 @@ const uint kRtGeometryRolePlayerWorldBody = $($g.playerWorldBody)u;
 const uint kRtGeometryRolePlayerViewmodel = $($g.playerViewmodel)u;
 const uint kPlayerViewmodelPrimaryMask = $($p.viewmodelPrimaryMask)u;
 const uint kPlayerBodyRemainderPrimaryMask = $($p.bodyRemainderPrimaryMask)u;
+const uint kRtWorldSurfaceContactAxisMask = $($w.axisMask)u;
+const uint kRtWorldSurfaceContactNegativeWinding = $($w.negativeWinding)u;
 
 const uint kRtInstanceFlagStaticPbr = $($i.staticPbr)u;
 const uint kRtInstanceFlagEmissive = $($i.emissive)u;
@@ -214,6 +220,10 @@ const uint kRtMaterialFlagCertifiedRectangularVolume = $($m.certifiedRectangular
 const uint kRtMaterialFlagBodyRemainderPrimaryVisible = $($m.bodyRemainderPrimaryVisible)u;
 
 $glslRecords
+layout(std430, set = 0, binding = $($b.worldSurfaces)) readonly buffer RtWorldSurfaceBuffer
+{
+    RtWorldSurfaceGpu values[];
+} worldSurfaces;
 layout(std430, set = 0, binding = $($b.instanceMetadata)) readonly buffer RtInstanceMetadataBuffer
 {
     RtInstanceMetadata values[];
