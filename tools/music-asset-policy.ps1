@@ -267,7 +267,7 @@ function Copy-HordeMusicRuntimeAssets {
     if ($actualSorted -cne $expectedSorted) {
         throw 'Staged Horde music tree is not the exact manifest-plus-sixteen-WAV roster.'
     }
-    if ((Get-ChildItem -LiteralPath $musicDestination -Recurse -Force | Where-Object { ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 }).Count -ne 0) {
+    if (@(Get-ChildItem -LiteralPath $musicDestination -Recurse -Force | Where-Object { ($_.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 }).Count -ne 0) {
         throw 'Staged Horde music tree contains a symlink or reparse point.'
     }
     return ,$manifest

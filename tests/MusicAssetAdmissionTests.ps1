@@ -117,7 +117,10 @@ try {
         $manifest = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
         Assert-True ($manifest.assetId -ceq 'what-the-dark-keeps') 'Unexpected admitted music asset ID.'
     }
-    Test-AssetPolicy -Label 'explicit seventeen-file runtime roster and staged byte verification' -Action {
+    Test-AssetPolicy -Label 'strict-mode seventeen-file runtime roster and staged byte verification' -Action {
+        # Release/version tools enable strict mode before calling this helper.
+        # A clean stage has zero reparse points and must not dereference null.
+        Set-StrictMode -Version Latest
         $paths = @(Get-HordeMusicRuntimeFiles -RepositoryRoot $repoRoot)
         Assert-True ($paths.Count -eq 17) "Runtime roster count was $($paths.Count), expected 17."
         $assets = Join-Path (Join-Path $scratchRoot 'stage-positive') 'assets'

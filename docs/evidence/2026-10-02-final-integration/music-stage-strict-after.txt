@@ -1,0 +1,16 @@
+PASS: canonical source/runtime admission and manifest pin
+PASS: strict-mode seventeen-file runtime roster and staged byte verification
+PASS: positive Windows-style staged ZIP and Android-style APK validation
+PASS negative: independent source-byte mutation
+PASS negative: independent PCM sample-byte mutation
+PASS negative: manifest-content repin attempt
+PASS negative: one-shot looping-policy mutation
+PASS negative: missing runtime wave
+PASS negative: extra runtime file
+PASS negative: archive source-entry rejection
+PASS negative: archive missing-entry rejection
+PASS negative: archive duplicate-entry rejection
+PASS negative: archive same-count duplicate-entry rejection
+PASS negative: archive corrupted PCM rejection
+Music asset admission tests: 14 passed, 0 failed.
+Independent copies and ZIP fixtures retained under: C:\Users\sam_s\AppData\Local\Temp\Horde-MusicAssetAdmission-d097623b12f04788936a7ba278332147
