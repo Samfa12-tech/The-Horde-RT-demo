@@ -21,6 +21,9 @@ outside origin. New regression and independent review preserve that negative.
 Reference is tests/fixtures/PrimaryBoundaryPlanePrototype.h, not renderer code;
 no runtime/metadata/ABI/shader/asset/player/music change. Fresh affected Debug1/1
 PASS3.31s and Release1/1 PASS2.89s. [Single record/next step](evidence/2026-10-02-high-row43/README.md#primary-origin-exclusion-prototype-no-go-for-candidate-rejection).
+Reviewed CPU-only integration9dbba78/e209f92 matches isolated test/fixture/helper
+blobs; documentation conflicts preserve prior receipts. Fresh engineering
+Debug1/1 PASS3.00s, Release1/1 PASS2.79s. No isolated runtime code is integrated.
 Do NOT wire blanket backface rejection into runtime. The ONE relative-world
 binary32 interval feasibility check is also complete/NO-GO: both signed-v bounds
 still straddle0. Default JSON is unchanged after LF/CRLF normalization; invalid flag pairing

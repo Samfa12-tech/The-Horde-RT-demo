@@ -344,3 +344,17 @@ still OPEN, not physically repaired. Independent useful work now is clean,
 observer-free shader-cost/image admission of the already demonstrated source-
 certified contact policy. That is separate from repairing row43 or other backend
 outliers, and cannot promote the isolated renderer automatically.
+
+### Reviewed exclusion/relative-world engineering integration
+
+CPU-only commits cf1775d/2b75978 are integrated as9dbba78/e209f92. The two
+documentation conflicts were resolved by retaining both the previous exact-
+reference integration evidence and the new bounded negative results. Test,
+investigation fixture and analysis blobs match the isolated source. No isolated
+shader/ABI/resource/observer code is integrated. Fresh affected engineering
+Debug1/1 PASS3.00s and Release1/1 PASS2.79s:
+[Debug](checks/guard-integrated-debug-test.log),
+[Release](checks/guard-integrated-release-test.log).
+Current-source CI must use the new pushed head; preceding3be7034 CI success is
+retained separately, not reused as proof of these edits. Unrelated16 S24 raw
+scratch files remain untouched. Runtime/assets/player/music are unchanged.
