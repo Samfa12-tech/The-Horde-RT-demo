@@ -13,7 +13,30 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 clean RTX candidate (current unfinished step)
+### October 2 High edge contact discriminator (latest completed step)
+
+Isolated source48702729ab7ccc0bddda91517da9b42bc6efa5e2 and complete pushed
+evidence741c755ebd15fc6ebb560a1f57cbb9e4bff96796 stay on codex/horde-rtx-corrections;
+no source/module integration into engineering. One High/glass-edge-fresnel image
+per native RTX5050 backend, both exit0/honest RT. Two changed observer modules
+compile/validate; all14 others unchanged; real Debug app/provider1/1 pass. All
+nonpayload rows1-539 and41 counters match retained clean controls exactly.
+The max20 backend gate still fails without changed tolerance. At pixel456,304,
+primary/reflection data agree, but visit5 at y=-0.95/t0.3171285 selects glass9/8/107
+versus floor0/486/1. Compute absorbs its still-open volume by certified reason1;
+pipeline exits below the same floor and misses into sky. Neither is automatically
+the physical reference; copying brighter baseline pixels could preserve a leak.
+See [finite record and actual fields](evidence/2026-10-02-backend-pixel-witness/high-edge-contact.md).
+This proves one contact-selection divergence, not all edges or a driver error bound.
+Next: independent contact reference and smallest explicit same-contact ownership
+policy preserving the opaque receiver and physical exit/terminal transport.
+No repeated observer pair/controls, epsilon sweep, budget increase, floor omission
+or new framework. High/backend/cost/physical/device gates remain open. Normal
+renderer/configuration unchanged; isolated cache returned Mobile/Shipping. No
+phone operations while disconnected; no main merge/release/publication. Audio/
+haptic manual revalidation:NO (shader-only observer, semantic inputs unchanged).
+
+### October 2 clean RTX candidate (preceding completed step)
 
 Clean isolated branch `codex/horde-rtx-corrections` is pushed at
 `9d4d1f408154e2405adcf3606c3c8451f6e16f49`. Source4e951c2 corrects outward
@@ -49,11 +72,8 @@ recapture. Actual module identities/CompiledOut diagnostics and scene/geometry/
 visibility/grips verified. This is not Release or performance evidence. Independent
 Shipping backend gate still FAILS only at finale770,526 max6.
 
-Next step: localize one retained High edge discrepancy456,304 (22,17,17 /2,2,3,
-max20), using existing native observer facilities and only necessary probe/source
-reads. If fields are missing, at most one bounded image per backend with
-non-payload stability/diagnostics preserved. No new framework, precision/epsilon
-sweep, repeated controls/Mobile/High/Shipping matrices or shader compilation.
+That finite localization is now completed above. Do not repeat its two images,
+controls/Mobile/High/Shipping matrices or unchanged shader compilation.
 Isolated Debug cache now Mobile/Shipping; Diagnostic binaries retained. Normal
 default untouched. Keep boundary/cost/High physical/device gates separate. S26 remains
 owner-disconnected; no polling/install or repeated owner requests. No main merge,
