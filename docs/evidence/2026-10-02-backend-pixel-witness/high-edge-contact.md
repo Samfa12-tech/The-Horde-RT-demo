@@ -125,10 +125,13 @@ orders, with6,640 exact contacts admitted; the rest reject. The narrow double
 oracle is exact for this grid, NOT for arbitrary admitted operand exponents.
 Final focused independent review found no further concrete arithmetic/winding bug.
 
-Fresh source441a8f5 branch CI36954600096 and PR CI36954595930 are running;
-GCC, Clang, Android Debug/Java/lint/package and Vulkan CPU-host jobs succeeded
-in each. MSVC remains pending completion, so neither full workflow is declared
-green yet. Their source/run identities, not an old-job rerun, own this evidence.
+Fresh source441a8f5 [branch CI36954595930](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36954595930)
+and [PR CI36954600096](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36954600096)
+both SUCCESS. Actual logs inspected: GCC56, Clang56, MSVC62 and Vulkan CPU-host15
+pass in each, including the dielectric test in all three compiler lanes. Android
+Debug/Java/lint/package jobs pass. These source/run identities, not an old-job
+rerun, own this evidence. Receipt-only later commits do not invalidate unchanged
+source441 evidence or require repeating these checks.
 
 Fresh isolated MSVC Debug/Release each1/1 PASS3.12/3.02s. Fresh integrated source
 Debug/Release each1/1 PASS3.51/2.63s, with identical grid totals. Curated logs are

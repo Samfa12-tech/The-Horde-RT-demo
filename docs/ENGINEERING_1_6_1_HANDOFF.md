@@ -26,8 +26,10 @@ Integrated Debug/Release dielectric each1/1 PASS3.51/2.63s;24,576 reference chec
 6,640 admitted, both multiplier orders. Runtime/shader bytes/configuration are
 unchanged; no native matrix/rebuild/phone use. The initial invalid rounded-gap
 fixture assumption and discarded FMA proposal are recorded, not buried.
-Fresh source441a8f5 branch36954600096 and PR36954595930: GCC/Clang/Android/
-Vulkan CPU-host jobs succeed; MSVC still running, full CI not yet declared green.
+Fresh source441a8f5 branch36954595930 and PR36954600096 both SUCCESS; actual logs
+show GCC56/Clang56/MSVC62/Vulkan CPU-host15, including dielectric on all three
+compilers. Android Debug/Java/lint/package succeeds. Later receipt-only commits
+do not invalidate this unchanged-source evidence; no CI-receipt/compaction loop.
 See [one durable record](evidence/2026-10-02-backend-pixel-witness/high-edge-contact.md#completed-conservative-contact-qualification-cpu-only).
 
 Next unfinished step:12-byte immutable world surface record through existing
