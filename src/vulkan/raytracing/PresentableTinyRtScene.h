@@ -322,6 +322,16 @@ public:
     {
         return pipelineBundle_.DiagnosticAvailability();
     }
+    [[nodiscard]] std::string_view SelectedDielectricQualityName() const noexcept
+    {
+        if (!pipelineBundle_.HasSelection()) return {};
+        switch (pipelineBundle_.Request().quality)
+        {
+        case DielectricQuality::Mobile: return "Mobile";
+        case DielectricQuality::High: return "High";
+        default: return {};
+        }
+    }
     std::string_view SelectedOpaqueFastKey() const
     {
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT

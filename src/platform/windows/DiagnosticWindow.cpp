@@ -70,7 +70,6 @@
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
-#include "vulkan/raytracing/RtPipelineVariantProvider.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtDeviceEnablePlan.h"
@@ -1857,10 +1856,7 @@ horde::platform::windows::WindowsPlaytestReportContext CapturePlaytestReportCont
     values.rawModel = "Windows desktop";
     values.renderScale = context.renderScale;
     values.rtPresented = context.capabilitySnapshot != nullptr && context.capabilitySnapshot->rtScene.presented;
-    const auto& compiledRequest = horde::vulkan::raytracing::RtPipelineVariantProvider::Compiled(
-        context.executionBackend).request();
-    values.quality = compiledRequest.quality ==
-            horde::vulkan::raytracing::DielectricQuality::High ? "High" : "Mobile";
+    values.quality = context.rtScene.SelectedDielectricQualityName();
 
     if (context.physicalDevice == VK_NULL_HANDLE) return report;
     VkPhysicalDeviceProperties properties{};

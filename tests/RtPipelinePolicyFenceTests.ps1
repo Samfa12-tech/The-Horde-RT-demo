@@ -176,6 +176,7 @@ foreach ($hostSource in @($windowsHost, $androidHost)) {
     Assert-True $hostSource.Contains('DiagnosticsAvailability()') 'A platform host must publish diagnostic availability beside legacy scalars.'
     Assert-True $hostSource.Contains('SelectedPipelineBundleIdentity()') 'A platform host must persist the full selected pair identity.'
     Assert-True $hostSource.Contains('SelectedPipelineBundleDisplayIdentity()') 'A platform host must display the short selected pair identity.'
+    Assert-True $hostSource.Contains('SelectedDielectricQualityName()') 'A platform host must report selected scene dielectric quality.'
     Assert-True (-not $hostSource.Contains('SelectedGenericDielectricSha256()).substr')) 'A platform host must not collapse pair identity to the generic-dielectric hash.'
 }
 foreach ($toolSource in @($foundationRunner, $androidRunner, $androidComparison)) {

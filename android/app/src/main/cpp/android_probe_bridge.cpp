@@ -53,7 +53,6 @@
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
-#include "vulkan/raytracing/RtPipelineVariantProvider.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtDeviceEnablePlan.h"
 #include "telemetry/RtBenchmarkEvidenceRun.h"
@@ -702,8 +701,7 @@ horde::reporting::OwnedPlaytestReportContext PlaytestContextOnRenderOwner(const 
     return {"Horde Lantern RT", HORDE_RT_PACKAGE_VERSION,
         HORDE_RT_BUILD_ID, "Android", "", context.capabilities.identity.gpuName,
         horde::vulkan::ToString(context.capabilities.rtScene.executionBackend),
-        horde::vulkan::raytracing::RtPipelineVariantProvider::Compiled(context.executionBackend)
-            .request().quality == horde::vulkan::raytracing::DielectricQuality::Mobile ? "Mobile" : "High",
+        std::string(context.rtScene.SelectedDielectricQualityName()),
         context.renderScale, context.capabilities.performance.internalRenderWidth,
         context.capabilities.performance.internalRenderHeight, context.capabilities.rtScene.presented};
 }

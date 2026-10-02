@@ -15,6 +15,8 @@ struct PresentableTinyRtScenePreflightTestAccess {
     struct Ledger {
         std::size_t resolverCalls = 0u;
         std::size_t ownershipCalls = 0u;
+        bool selectedDuringOwnership = false;
+        std::string_view qualityDuringOwnership{};
     };
 
     struct ResolverFixture {
@@ -40,11 +42,13 @@ struct PresentableTinyRtScenePreflightTestAccess {
                 state.request, state.candidates, preflight, failureKey);
         };
         api.continueAfterPreflight = [](
-            void* user, PresentableTinyRtScene&, VkFormat, const std::string&,
+            void* user, PresentableTinyRtScene& scene, VkFormat, const std::string&,
             const std::string&, const std::string&, const std::string&,
             const std::string&, const std::string&, std::string&) {
             auto& state = *static_cast<ResolverFixture*>(user);
             ++state.ledger->ownershipCalls;
+            state.ledger->selectedDuringOwnership = !scene.SelectedDielectricQualityName().empty();
+            state.ledger->qualityDuringOwnership = scene.SelectedDielectricQualityName();
             return false;
         };
         const auto poison = [](std::uintptr_t value) {
@@ -58,6 +62,11 @@ struct PresentableTinyRtScenePreflightTestAccess {
             reinterpret_cast<VkCommandPool>(poison(5u)),
             VkExtent2D{1u, 1u}, VK_FORMAT_B8G8R8A8_UNORM,
             {}, {}, {}, {}, diagnostic, {}, {}, api);
+    }
+
+    static void ResetSelectedBundle(PresentableTinyRtScene& scene)
+    {
+        scene.pipelineBundle_.Reset();
     }
 };
 
@@ -94,6 +103,9 @@ bool RejectsBeforeOwnership(
 int main()
 {
     bool ok = true;
+    PresentableTinyRtScene observedScene;
+    ok &= Require(observedScene.SelectedDielectricQualityName().empty(),
+                  "unselected scene must report no dielectric quality");
     const auto& provider = RtPipelineVariantProvider::Compiled();
     const auto opaque = provider.ResolveExact(
         {provider.request().instrumentation, provider.request().quality,
@@ -104,6 +116,21 @@ int main()
     ok &= Require(opaque.has_value() && generic.has_value(),
                   "scene preflight tests require the genuine compiled provider pair");
     if (!opaque || !generic) { return 1; }
+
+    PresentableTinyRtScenePreflightTestAccess::Ledger observationLedger{};
+    std::string observationDiagnostic;
+    const bool observationInitialised = PresentableTinyRtScenePreflightTestAccess::Initialise(
+        observedScene, provider.request(), std::array{*opaque, *generic},
+        observationLedger, observationDiagnostic);
+    const std::string_view expectedQuality = provider.request().quality == DielectricQuality::Mobile
+        ? "Mobile" : "High";
+    ok &= Require(!observationInitialised && observationLedger.selectedDuringOwnership &&
+                      observationLedger.qualityDuringOwnership == expectedQuality &&
+                      observedScene.SelectedDielectricQualityName() == expectedQuality,
+                  "scene quality observation must reflect the adopted preflight during and after the ownership seam");
+    PresentableTinyRtScenePreflightTestAccess::ResetSelectedBundle(observedScene);
+    ok &= Require(observedScene.SelectedDielectricQualityName().empty(),
+                  "reset scene bundle must report no dielectric quality");
 
     const std::array genuinePair{*opaque, *generic};
     const std::string opaqueKey(opaque->canonicalKey);
