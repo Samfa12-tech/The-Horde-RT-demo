@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "candidateSource": "4f8023ee7afeab503fcce54292610bdf7b7f539a",
+  "executableSha256": "38ee265855c877cdf69c811aa77c801f04587c11ea84cdf3a831121deedbdd44",
+  "nativeCandidateOwnership": true,
+  "gpuMathMask": 1023,
+  "allCurrentCountersBackendEqual": true,
+  "ordinaryPixelToleranceUnchanged": true,
+  "shippingAdmitted": false,
+  "performanceEvidence": false,
+  "androidEvidence": false,
+  "rawGeometryRetainedAt": "C:/Dev/tmp/horde-axis-contact-20261002",
+  "curatedObjOmissionExplicit": true
+}

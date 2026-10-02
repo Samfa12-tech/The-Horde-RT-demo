@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "sourceCommit": "4f8023ee7afeab503fcce54292610bdf7b7f539a",
+  "executableSha256": "38ee265855c877cdf69c811aa77c801f04587c11ea84cdf3a831121deedbdd44",
+  "instrumentation": "Diagnostic",
+  "quality": "High",
+  "payloadRows": 0,
+  "existingNormalBinary": false,
+  "investigationOnly": true,
+  "performanceEvidence": false,
+  "runs": [
+    {
+      "backend": "pipeline",
+      "checkpoint": "lantern-held-high",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-axis-contact-20261002\\native-held\\pipeline\\lantern-held-high",
+        "--development-checkpoint",
+        "lantern-held-high"
+      ]
+    },
+    {
+      "backend": "pipeline",
+      "checkpoint": "lantern-held-low",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-axis-contact-20261002\\native-held\\pipeline\\lantern-held-low",
+        "--development-checkpoint",
+        "lantern-held-low"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "lantern-held-high",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-axis-contact-20261002\\native-held\\compute\\lantern-held-high",
+        "--require-rayquery-compute",
+        "--development-checkpoint",
+        "lantern-held-high"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "lantern-held-low",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-axis-contact-20261002\\native-held\\compute\\lantern-held-low",
+        "--require-rayquery-compute",
+        "--development-checkpoint",
+        "lantern-held-low"
+      ]
+    }
+  ]
+}

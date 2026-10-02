@@ -13,7 +13,32 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 world-plane metadata compatibility (latest isolated step)
+### October 2 native contact-policy result (latest isolated step)
+
+Source4f8023ee7afeab503fcce54292610bdf7b7f539a stays on codex/horde-rtx-corrections;
+normal renderer/Shipping/player/music unchanged. Actual High Diagnostic Debug
+exe38ee2658: all6 native RTX5050 Laptop captures exit0/honest RT. Real exit then
+post-Snell receiver ownership closes edge fixture: unchanged gate max20/32 over3
+->max3/zero over3; watched456,304 both4,6,8, native glass9/8 then floor0/486 with
+volume CLOSED, GPU math1023, current41 counters backend-equal. Certified reason1
+recoveries566/568 ->0; TIR13842/13843 ->14497, not suppressed. Exact uint32 plane/
+opposed-winding/native-interior/same-volume/closed+rectangular/post-Snell gates;
+TIR cannot consume the receiver. Review tie fixes and negatives retained.
+Held high/low own-controls stay within3/2 pipeline, compute byte-exact outside
+labelled payload; unchanged existing backend failures max53/6 and14/5 stay OPEN.
+Shader2/2 compile/optimise/validate PASS; Debug/Release math1/1 each3.20/2.57s,
+provider1/1 PASS1.99s, app build PASS. Final325272/325508bytes/41atomics;
+other14 artifacts/provenance unchanged. Cost admission FAIL, no frozen maximum
+raised, no Shipping/performance/Android claim or normal promotion. Cache restored
+Mobile/Shipping; retained executable still High Diagnostic, not falsely Shipping.
+[Single record and next step](evidence/2026-10-02-backend-pixel-witness/axis-contact-policy.md).
+Finite matrix COMPLETE: do not repeat it, controls, CPU tests or unchanged modules
+after resumption. Next bounded remaining High/backend/physical failure from the
+existing held11 coordinates/row43/isolated-lantern evidence; not another contact
+or epsilon sweep. Phone is currently used by another project per owner: no polling,
+installing or repeated coordination. Audio/haptic manual revalidation:NO.
+
+### October 2 world-plane metadata compatibility (preceding completed step)
 
 Isolated source53624d83dd984a4cc479755dae2886623e7069bb carries a12-byte
 source-certified world triangle record at existing binding6; no contact policy.

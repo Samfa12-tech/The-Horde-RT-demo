@@ -2,8 +2,9 @@
 
 Isolated `codex/horde-rtx-corrections` only. Normal engineering renderer,
 Shipping artifacts, player assets, music and Mobile quality profile unchanged.
-Owner reconnected the phone during this slice; no installation or device claim
-from this isolated offline work. Finish its native correctness gate first.
+Owner briefly reconnected then assigned the phone to another project. Currently
+unavailable: do not poll/install or renegotiate after compaction. No installation
+or device claim from this isolated offline work.
 
 ## Hypothesis and ownership
 
@@ -72,6 +73,59 @@ Initial stage root `C:/Dev/tmp/horde-axis-contact-20261002/shaders-1`, stage log
 Other14 artifacts unchanged. Existing frozen cost admission remains OPEN/FAIL;
 do not raise its maxima to admit this prototype.
 
+## Completed native result
+
+Candidate4f8023ee7afeab503fcce54292610bdf7b7f539a; actual High Diagnostic Debug
+executable38ee265855c877cdf69c811aa77c801f04587c11ea84cdf3a831121deedbdd44.
+Pipeline SPIR-Vf663fe89a91fca8601d3665cb544818b8d823b01d41ec94df96ca8f443b9380e;
+compute e0751a1a537b860d6b6606c5bd4135c50eeb3b79cba0cd57a10fc1cc57293594.
+Complete stats/provenance: [frozen cost status](axis-contact-policy/frozen-cost-status.json).
+Pipeline/compute native runs all6 exit0, honest RT on NVIDIA RTX5050 Laptop.
+No Android or matched Shipping/performance claim.
+
+The edge fixture PASSES unchanged max3/fraction0.001: max3, onepixel over1,
+zero over3; old max20/32 over3. Watched456,304 is4,6,8 on BOTH backends rather
+than old22,17,17/2,2,3. Actual visit5 is glass9/8 with volume open; visit6 is
+the saved floor0/486 at zero additional distance with volume CLOSED. Both GPU
+math masks1023 pass all10 finite checks (including third-blocker tie precedence).
+Actual outgoing direction enters the receiver half-space. Existing interface
+ceiling, real Fresnel/refraction, rough direction and Beer path distance retained.
+All current41 counters match between backends. Certified reason1 recoveries
+566/568 ->0; TIR counts13842/13843 ->14497 (real TIR retained, not suppressed).
+Other recorded counters unchanged. This closes the demonstrated contact-order
+defect in this fixture, not arbitrary intersecting media or broad glass acceptance.
+
+Old-control differences1155/1156 pixels over3, max20, are retained—not labelled
+blanket regressions or forced back to the known sky-leak/early-absorption pixels.
+Visual inspection of exact PNGs shows the spurious bright contact strip removed;
+the source/native-path evidence establishes the corrected receiver for the
+watched point. This does not independently certify every changed pixel's
+physical radiance or replace the remaining physical fixtures/live gates.
+
+Held-high/held-low images stay within tolerance against EACH own control:
+pipeline max3/2, compute byte-exact outside the explicit payload row. Geometry
+hashes, instance masks, grip, scene, static allocation and honest presentation
+contracts pass. Transport/shadow overflow and certified recovery remain0 in
+those four fixtures. Existing held backend gates still FAIL: high max53/6 over3,
+low max14/5 over3 (controls already fail at the same maxima/counts). Comparator
+exit1 is intentionally retained. No tolerance relaxed or player tuning reopened.
+
+Receipts/images/logs: [axis-contact-policy](axis-contact-policy/). Raw OBJ geometry
+retained at `C:/Dev/tmp/horde-axis-contact-20261002/native-edge` and `native-held`;
+curation omits the duplicate OBJ payloads explicitly, retaining their manifest
+hashes. Strict comparisons used the original raw OBJ files, not curated folders.
+Only the known witness row0 is excluded; candidate marker12345 is verified before
+doing so. Pixel tolerances unchanged. No repeated control capture, full metadata
+matrix, Mobile route or unchanged shader compilation.
+
+Isolated configure cache restored Mobile/Shipping (actual configure PASS, log
+retained). The retained executable is STILL the actual High Diagnostic candidate
+above, not a Shipping binary. No pointless rebuild to relabel it. Independent
+review confirms final fallback preserves a third confirmed blocker on exact ties.
+Pipeline frozen cost remains FAIL across9 metrics; no maximum changed. This
+prototype is not eligible for production promotion merely because the edge
+fixture passes. Zero counter failures in other fixtures do not waive image gates.
+
 ## Next unfinished step
 
 Initial High Diagnostic Windows app build PASS (`native-configure.log`,
@@ -93,7 +147,13 @@ delta+45256 bytes/module vs metadata observer. Other14 artifacts unchanged;
 frozen budget SHA unchanged. Prior stages and logs retained as invalidated
 intermediate candidates, not silently relabelled as final artifacts.
 
-Commit the unadmitted prototype, bind exact executable/module identities, then run the
-finite native matrix above. Do not repeat unchanged tests or metadata gates.
+The finite native matrix above is COMPLETE. Do not repeat it, its controls,
+successful CPU tests or unchanged module compilation after resumption. Preserve
+the contact fix and negative cost history. Next: bound the next remaining
+High/backend/physical failure from existing evidence (held11 coordinates and
+the separately recorded High row43/isolated-lantern budget cases), rather than
+another contact/epsilon sweep. Production promotion needs clean uninstrumented
+cost/image/physical gates; this observer candidate is not that admission.
+Final-candidate device/report/lifecycle work is independent of that admission.
 Audio/haptic manual revalidation required: NO (visual RT transport only; accepted
 listener/event/audio inputs unchanged).

@@ -1,0 +1,48 @@
+[
+  {
+    "backend": "pipeline",
+    "changes": [
+      {
+        "section": "dielectricReasonDiagnostics",
+        "field": "primaryTirCount",
+        "old": 13842,
+        "candidate": 14497
+      },
+      {
+        "section": "dielectricReasonDiagnostics",
+        "field": "primaryCertifiedClosedVolumeRecoveryCount",
+        "old": 566,
+        "candidate": 0
+      },
+      {
+        "section": "dielectricReasonDiagnostics",
+        "field": "certifiedClosedVolumeRecoveryReasonMask",
+        "old": 1,
+        "candidate": 0
+      }
+    ]
+  },
+  {
+    "backend": "compute",
+    "changes": [
+      {
+        "section": "dielectricReasonDiagnostics",
+        "field": "primaryTirCount",
+        "old": 13843,
+        "candidate": 14497
+      },
+      {
+        "section": "dielectricReasonDiagnostics",
+        "field": "primaryCertifiedClosedVolumeRecoveryCount",
+        "old": 568,
+        "candidate": 0
+      },
+      {
+        "section": "dielectricReasonDiagnostics",
+        "field": "certifiedClosedVolumeRecoveryReasonMask",
+        "old": 1,
+        "candidate": 0
+      }
+    ]
+  }
+]

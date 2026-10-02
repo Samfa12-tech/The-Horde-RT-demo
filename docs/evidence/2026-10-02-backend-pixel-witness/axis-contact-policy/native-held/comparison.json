@@ -1,0 +1,694 @@
+{
+  "schema": 1,
+  "controlSource": "7357f884a2c85e9f37d19fb7a5497c73764d30e9",
+  "runReceipt": {
+    "schema": 1,
+    "sourceCommit": "4f8023ee7afeab503fcce54292610bdf7b7f539a",
+    "executableSha256": "38ee265855c877cdf69c811aa77c801f04587c11ea84cdf3a831121deedbdd44",
+    "instrumentation": "Diagnostic",
+    "quality": "High",
+    "payloadRows": 0,
+    "existingNormalBinary": false,
+    "investigationOnly": true,
+    "performanceEvidence": false,
+    "runs": [
+      {
+        "backend": "pipeline",
+        "checkpoint": "lantern-held-high",
+        "exitCode": 0,
+        "arguments": [
+          "--capture-showcase",
+          "C:\\Dev\\tmp\\horde-axis-contact-20261002\\native-held\\pipeline\\lantern-held-high",
+          "--development-checkpoint",
+          "lantern-held-high"
+        ]
+      },
+      {
+        "backend": "pipeline",
+        "checkpoint": "lantern-held-low",
+        "exitCode": 0,
+        "arguments": [
+          "--capture-showcase",
+          "C:\\Dev\\tmp\\horde-axis-contact-20261002\\native-held\\pipeline\\lantern-held-low",
+          "--development-checkpoint",
+          "lantern-held-low"
+        ]
+      },
+      {
+        "backend": "compute",
+        "checkpoint": "lantern-held-high",
+        "exitCode": 0,
+        "arguments": [
+          "--capture-showcase",
+          "C:\\Dev\\tmp\\horde-axis-contact-20261002\\native-held\\compute\\lantern-held-high",
+          "--require-rayquery-compute",
+          "--development-checkpoint",
+          "lantern-held-high"
+        ]
+      },
+      {
+        "backend": "compute",
+        "checkpoint": "lantern-held-low",
+        "exitCode": 0,
+        "arguments": [
+          "--capture-showcase",
+          "C:\\Dev\\tmp\\horde-axis-contact-20261002\\native-held\\compute\\lantern-held-low",
+          "--require-rayquery-compute",
+          "--development-checkpoint",
+          "lantern-held-low"
+        ]
+      }
+    ]
+  },
+  "payloadRows": 1,
+  "pixelTolerance": {
+    "maximumChannelDifference": 3,
+    "maximumFractionOverOne": 0.001
+  },
+  "performanceEvidence": false,
+  "shippingDiagnosticMatrix": false,
+  "comparisons": [
+    {
+      "label": "candidate-backend-parity/lantern-held-high",
+      "passed": false,
+      "leftManifestSha256": "2593791e8f8c382528a87e7dfb40d8c15d2dbd5073e82327524781c77c5cd480",
+      "rightManifestSha256": "a3e9c0ee47111a0e4874e2982f4bc6ee0f4a0ae4eb75e77443dc425edd8a5f07",
+      "records": [
+        {
+          "checkpoint": "lantern-held-high",
+          "file": "116-lantern-held-high.png",
+          "leftSha256": "e11f4e7c604f792402ae8430e4058ee18f3d600ade1cc264b63f0e6c5551c98c",
+          "rightSha256": "c1211bc809ec1e4516ad01c5d2061b7a356a88e36c4ea546e61f22c538b727f9",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 46309,
+            "rewardRing": 386,
+            "rewardBody": 14370
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 46309,
+            "rewardRing": 386,
+            "rewardBody": 14370
+          },
+          "comparison": {
+            "maximumChannelDifference": 53,
+            "pixelsDifferentByMoreThanOne": 9,
+            "differentFraction": 1.7393320964749537E-05,
+            "unchangedGate": false,
+            "outlierCount": 6,
+            "firstOutliers": [
+              {
+                "x": 569,
+                "y": 346,
+                "maximumChannelDifference": 24,
+                "leftRgb": [
+                  30,
+                  17,
+                  10
+                ],
+                "rightRgb": [
+                  6,
+                  7,
+                  8
+                ]
+              },
+              {
+                "x": 439,
+                "y": 393,
+                "maximumChannelDifference": 4,
+                "leftRgb": [
+                  38,
+                  20,
+                  7
+                ],
+                "rightRgb": [
+                  42,
+                  22,
+                  8
+                ]
+              },
+              {
+                "x": 402,
+                "y": 404,
+                "maximumChannelDifference": 10,
+                "leftRgb": [
+                  39,
+                  17,
+                  5
+                ],
+                "rightRgb": [
+                  49,
+                  22,
+                  6
+                ]
+              },
+              {
+                "x": 400,
+                "y": 406,
+                "maximumChannelDifference": 4,
+                "leftRgb": [
+                  20,
+                  8,
+                  3
+                ],
+                "rightRgb": [
+                  16,
+                  6,
+                  3
+                ]
+              },
+              {
+                "x": 452,
+                "y": 412,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  28,
+                  11,
+                  3
+                ],
+                "rightRgb": [
+                  33,
+                  14,
+                  4
+                ]
+              },
+              {
+                "x": 521,
+                "y": 444,
+                "maximumChannelDifference": 53,
+                "leftRgb": [
+                  4,
+                  5,
+                  5
+                ],
+                "rightRgb": [
+                  57,
+                  29,
+                  10
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "pipeline-old-control-differences/lantern-held-high",
+      "passed": true,
+      "leftManifestSha256": "79a59b4c11311a85e768c9f43bea25228eeeab461d11b46829914f53f848d144",
+      "rightManifestSha256": "2593791e8f8c382528a87e7dfb40d8c15d2dbd5073e82327524781c77c5cd480",
+      "records": [
+        {
+          "checkpoint": "lantern-held-high",
+          "file": "116-lantern-held-high.png",
+          "leftSha256": "fb82d0dcf3e6f75e2eaa77b490fbd6e74f1b60d06bc671c8cdf023fae542c9fa",
+          "rightSha256": "e11f4e7c604f792402ae8430e4058ee18f3d600ade1cc264b63f0e6c5551c98c",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 46309,
+            "rewardRing": 386,
+            "rewardBody": 14370
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 46309,
+            "rewardRing": 386,
+            "rewardBody": 14370
+          },
+          "comparison": {
+            "maximumChannelDifference": 3,
+            "pixelsDifferentByMoreThanOne": 2,
+            "differentFraction": 3.865182436611008E-06,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        }
+      ]
+    },
+    {
+      "label": "normal-control-backend-parity/lantern-held-high",
+      "passed": false,
+      "leftManifestSha256": "79a59b4c11311a85e768c9f43bea25228eeeab461d11b46829914f53f848d144",
+      "rightManifestSha256": "dc10703c4e82b841666e983aab729091f7ccddb431eedb042b0b045bfead1da2",
+      "records": [
+        {
+          "checkpoint": "lantern-held-high",
+          "file": "116-lantern-held-high.png",
+          "leftSha256": "fb82d0dcf3e6f75e2eaa77b490fbd6e74f1b60d06bc671c8cdf023fae542c9fa",
+          "rightSha256": "ad3c78fbf4a92ec7dc03471ec11c8c56a4205f9289494fe4ad50ee0d19d8464f",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 46309,
+            "rewardRing": 386,
+            "rewardBody": 14370
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 46309,
+            "rewardRing": 386,
+            "rewardBody": 14370
+          },
+          "comparison": {
+            "maximumChannelDifference": 53,
+            "pixelsDifferentByMoreThanOne": 9,
+            "differentFraction": 1.7393320964749537E-05,
+            "unchangedGate": false,
+            "outlierCount": 6,
+            "firstOutliers": [
+              {
+                "x": 569,
+                "y": 346,
+                "maximumChannelDifference": 24,
+                "leftRgb": [
+                  30,
+                  17,
+                  10
+                ],
+                "rightRgb": [
+                  6,
+                  7,
+                  8
+                ]
+              },
+              {
+                "x": 439,
+                "y": 393,
+                "maximumChannelDifference": 4,
+                "leftRgb": [
+                  38,
+                  20,
+                  7
+                ],
+                "rightRgb": [
+                  42,
+                  22,
+                  8
+                ]
+              },
+              {
+                "x": 402,
+                "y": 404,
+                "maximumChannelDifference": 10,
+                "leftRgb": [
+                  39,
+                  17,
+                  5
+                ],
+                "rightRgb": [
+                  49,
+                  22,
+                  6
+                ]
+              },
+              {
+                "x": 400,
+                "y": 406,
+                "maximumChannelDifference": 4,
+                "leftRgb": [
+                  20,
+                  8,
+                  3
+                ],
+                "rightRgb": [
+                  16,
+                  6,
+                  3
+                ]
+              },
+              {
+                "x": 452,
+                "y": 412,
+                "maximumChannelDifference": 5,
+                "leftRgb": [
+                  28,
+                  11,
+                  3
+                ],
+                "rightRgb": [
+                  33,
+                  14,
+                  4
+                ]
+              },
+              {
+                "x": 521,
+                "y": 444,
+                "maximumChannelDifference": 53,
+                "leftRgb": [
+                  4,
+                  5,
+                  5
+                ],
+                "rightRgb": [
+                  57,
+                  29,
+                  10
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "compute-old-control-differences/lantern-held-high",
+      "passed": true,
+      "leftManifestSha256": "dc10703c4e82b841666e983aab729091f7ccddb431eedb042b0b045bfead1da2",
+      "rightManifestSha256": "a3e9c0ee47111a0e4874e2982f4bc6ee0f4a0ae4eb75e77443dc425edd8a5f07",
+      "records": [
+        {
+          "checkpoint": "lantern-held-high",
+          "file": "116-lantern-held-high.png",
+          "leftSha256": "ad3c78fbf4a92ec7dc03471ec11c8c56a4205f9289494fe4ad50ee0d19d8464f",
+          "rightSha256": "c1211bc809ec1e4516ad01c5d2061b7a356a88e36c4ea546e61f22c538b727f9",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 46309,
+            "rewardRing": 386,
+            "rewardBody": 14370
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 46309,
+            "rewardRing": 386,
+            "rewardBody": 14370
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        }
+      ]
+    },
+    {
+      "label": "candidate-backend-parity/lantern-held-low",
+      "passed": false,
+      "leftManifestSha256": "02996466cf0fa456b93c4f1af6713bb42fd756b3983f5bb744ca7f1e6e71cbe5",
+      "rightManifestSha256": "e914c87557760e0b71976d2e09d2b782c41c8abf0ee37daeafa7fed6fc2a108a",
+      "records": [
+        {
+          "checkpoint": "lantern-held-low",
+          "file": "117-lantern-held-low.png",
+          "leftSha256": "b36fcf688c8b0702b9d3bd0957a036cf000f2eba3a06b5a90a3468eb9d75a2dc",
+          "rightSha256": "ff11b7295ca9fa590b353e4566731f257ec4f2003897519dc9bc0d791fa374cd",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 23209,
+            "rewardRing": 387,
+            "rewardBody": 7593
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 23209,
+            "rewardRing": 387,
+            "rewardBody": 7593
+          },
+          "comparison": {
+            "maximumChannelDifference": 14,
+            "pixelsDifferentByMoreThanOne": 6,
+            "differentFraction": 1.1595547309833024E-05,
+            "unchangedGate": false,
+            "outlierCount": 5,
+            "firstOutliers": [
+              {
+                "x": 847,
+                "y": 436,
+                "maximumChannelDifference": 14,
+                "leftRgb": [
+                  15,
+                  4,
+                  1
+                ],
+                "rightRgb": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "x": 674,
+                "y": 455,
+                "maximumChannelDifference": 4,
+                "leftRgb": [
+                  38,
+                  18,
+                  7
+                ],
+                "rightRgb": [
+                  34,
+                  16,
+                  6
+                ]
+              },
+              {
+                "x": 879,
+                "y": 494,
+                "maximumChannelDifference": 11,
+                "leftRgb": [
+                  12,
+                  4,
+                  1
+                ],
+                "rightRgb": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "x": 428,
+                "y": 530,
+                "maximumChannelDifference": 4,
+                "leftRgb": [
+                  67,
+                  33,
+                  8
+                ],
+                "rightRgb": [
+                  63,
+                  30,
+                  7
+                ]
+              },
+              {
+                "x": 440,
+                "y": 532,
+                "maximumChannelDifference": 7,
+                "leftRgb": [
+                  51,
+                  22,
+                  4
+                ],
+                "rightRgb": [
+                  44,
+                  18,
+                  4
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "pipeline-old-control-differences/lantern-held-low",
+      "passed": true,
+      "leftManifestSha256": "8f21419c723c19f0e431946ca3d21500ae930add112a3eef0801dbb7bd08791b",
+      "rightManifestSha256": "02996466cf0fa456b93c4f1af6713bb42fd756b3983f5bb744ca7f1e6e71cbe5",
+      "records": [
+        {
+          "checkpoint": "lantern-held-low",
+          "file": "117-lantern-held-low.png",
+          "leftSha256": "7f67e3a9c2cc1e6c1be44651a823ca64705b3a6ebace9ee71e2da6cf136d9570",
+          "rightSha256": "b36fcf688c8b0702b9d3bd0957a036cf000f2eba3a06b5a90a3468eb9d75a2dc",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 23209,
+            "rewardRing": 387,
+            "rewardBody": 7593
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 23209,
+            "rewardRing": 387,
+            "rewardBody": 7593
+          },
+          "comparison": {
+            "maximumChannelDifference": 2,
+            "pixelsDifferentByMoreThanOne": 1,
+            "differentFraction": 1.932591218305504E-06,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        }
+      ]
+    },
+    {
+      "label": "normal-control-backend-parity/lantern-held-low",
+      "passed": false,
+      "leftManifestSha256": "8f21419c723c19f0e431946ca3d21500ae930add112a3eef0801dbb7bd08791b",
+      "rightManifestSha256": "3289605c91b1ec1b2149f9d0a84b3ede34b3777f564c96e42964d701334c333c",
+      "records": [
+        {
+          "checkpoint": "lantern-held-low",
+          "file": "117-lantern-held-low.png",
+          "leftSha256": "7f67e3a9c2cc1e6c1be44651a823ca64705b3a6ebace9ee71e2da6cf136d9570",
+          "rightSha256": "68d2d10ab4c14f3ce7749dd48ac0eea6d3e14c94b2081229c171b52fc4d974d4",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 23209,
+            "rewardRing": 387,
+            "rewardBody": 7593
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 23209,
+            "rewardRing": 387,
+            "rewardBody": 7593
+          },
+          "comparison": {
+            "maximumChannelDifference": 14,
+            "pixelsDifferentByMoreThanOne": 7,
+            "differentFraction": 1.3528138528138528E-05,
+            "unchangedGate": false,
+            "outlierCount": 5,
+            "firstOutliers": [
+              {
+                "x": 847,
+                "y": 436,
+                "maximumChannelDifference": 14,
+                "leftRgb": [
+                  15,
+                  4,
+                  1
+                ],
+                "rightRgb": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "x": 674,
+                "y": 455,
+                "maximumChannelDifference": 4,
+                "leftRgb": [
+                  38,
+                  18,
+                  7
+                ],
+                "rightRgb": [
+                  34,
+                  16,
+                  6
+                ]
+              },
+              {
+                "x": 879,
+                "y": 494,
+                "maximumChannelDifference": 11,
+                "leftRgb": [
+                  12,
+                  4,
+                  1
+                ],
+                "rightRgb": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "x": 428,
+                "y": 530,
+                "maximumChannelDifference": 4,
+                "leftRgb": [
+                  67,
+                  33,
+                  8
+                ],
+                "rightRgb": [
+                  63,
+                  30,
+                  7
+                ]
+              },
+              {
+                "x": 440,
+                "y": 532,
+                "maximumChannelDifference": 7,
+                "leftRgb": [
+                  51,
+                  22,
+                  4
+                ],
+                "rightRgb": [
+                  44,
+                  18,
+                  4
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "label": "compute-old-control-differences/lantern-held-low",
+      "passed": true,
+      "leftManifestSha256": "3289605c91b1ec1b2149f9d0a84b3ede34b3777f564c96e42964d701334c333c",
+      "rightManifestSha256": "e914c87557760e0b71976d2e09d2b782c41c8abf0ee37daeafa7fed6fc2a108a",
+      "records": [
+        {
+          "checkpoint": "lantern-held-low",
+          "file": "117-lantern-held-low.png",
+          "leftSha256": "68d2d10ab4c14f3ce7749dd48ac0eea6d3e14c94b2081229c171b52fc4d974d4",
+          "rightSha256": "ff11b7295ca9fa590b353e4566731f257ec4f2003897519dc9bc0d791fa374cd",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 23209,
+            "rewardRing": 387,
+            "rewardBody": 7593
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 6791,
+            "player": 23209,
+            "rewardRing": 387,
+            "rewardBody": 7593
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        }
+      ]
+    }
+  ]
+}

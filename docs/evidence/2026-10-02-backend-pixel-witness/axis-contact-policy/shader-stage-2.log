@@ -1,0 +1,4 @@
+C:\Dev\tmp\horde-axis-contact-20261002\shaders-2\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 322880 bytes; functions=84; calls=313; ray-query sites=3; dependency SHA-256=d9a1fadabc049cc8965c9aeecf6b49993d60b42e4dd7ff29e128d5e6dfb66845
+RayQuery compute variant rayquery_compute_diagnostic_high_generic_dielectric: bytes=323116; functions=84; calls=313; ray-query sites=3; atomics=41; SPIR-V SHA-256=6f9e253430f769dc8c04ec333ff6987f98895b5fe0e7661aa9310dc2dee193c6
+UNADMITTED OBSERVER: compiled two changed modules; retained all fourteen other artifacts/provenance, with no fresh-compilation claim.

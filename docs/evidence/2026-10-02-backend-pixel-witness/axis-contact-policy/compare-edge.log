@@ -1,0 +1,4 @@
+candidate-backend-parity/glass-edge-fresnel/glass-edge-fresnel: max=3, fraction=1.932591218305504E-06, gate=True, outliers=0
+pipeline-old-control-differences/glass-edge-fresnel/glass-edge-fresnel: max=20, fraction=0.002232142857142857, gate=False, outliers=1155
+normal-control-backend-parity/glass-edge-fresnel/glass-edge-fresnel: max=20, fraction=6.377551020408164E-05, gate=False, outliers=32
+compute-old-control-differences/glass-edge-fresnel/glass-edge-fresnel: max=20, fraction=0.0022340754483611627, gate=False, outliers=1156

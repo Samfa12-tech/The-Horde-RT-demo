@@ -1,6 +1,11 @@
 # Six retained Mobile RTX backend pixels
 
-Latest bounded continuation: [High edge contact discriminator](high-edge-observer.md).
+Latest bounded continuation: [native contact-policy result](axis-contact-policy.md).
+The edge fixture now passes unchanged backend tolerance (max3/zero over3);
+held high/low and frozen-cost admission remain open. Normal Shipping unchanged.
+The finite current matrix is complete; do not repeat its controls/captures.
+
+Preceding completed discriminator: [High edge contact discriminator](high-edge-observer.md).
 The one image per backend is complete, reproducing all nonpayload pixels and41
 counters exactly. Pixel456,304 selects coincident glass exit versus opaque floor;
 both resulting transport paths need contact ownership, not baseline pixel copying.
