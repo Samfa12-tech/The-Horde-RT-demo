@@ -1,6 +1,19 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-10-01
+Last updated: 2026-10-02
+
+## October 2, 2026 - owner audio and S24 screenshot acceptance
+
+Owner reports "audio is good" and "s24 is good (i see it in the screenshots)".
+Evidence type: owner-reported listening acceptance of the current development
+audio and owner review of retained SM-S928B screenshots. This accepts their
+audible character/current playback and S24 visual appearance, including the
+previously restored player/enemy presentation; no new artifact hash is supplied
+with this feedback. Reuse the exact Debug receipts under the October2 bounded
+TLAS refresh entry for automated provenance, without relabelling this verdict as
+a live hands-on S24 test, Shipping performance, external audio-focus loss/return,
+S25 certification or final release-candidate approval. No device/code change or
+new listening request is needed solely to record the verdict.
 
 ## October 1: primary-opacity trial image/performance containment
 

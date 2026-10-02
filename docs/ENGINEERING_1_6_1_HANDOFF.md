@@ -13,6 +13,17 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
+### October 2 owner audio and S24 appearance acceptance
+
+Owner reports "audio is good" and "s24 is good (i see it in the screenshots)".
+Accept the current audio sound and S24 screenshot appearance; do not ask for
+those verdicts again or reopen music/player tuning. This is owner-reported
+listening and screenshot review, not a new measured audio-focus interruption,
+live S24 touch/transition test or final Shipping artifact pass. External focus
+loss/recovery and the exact final-candidate automated device rows remain distinct.
+[Device classification](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#october-2-2026---owner-audio-and-s24-screenshot-acceptance).
+No runtime/device change for this acceptance; manual audio/haptic revalidation:NO.
+
 ### October 2 release-focused gate reassessment (latest owner direction)
 
 Owner directs practical release/gameplay priority and stops significant sub-pixel
