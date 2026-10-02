@@ -2,7 +2,26 @@
 
 Last updated: 2026-10-02
 
-## October 2: one S26 report delivered; rapid resume ANR remains open
+## October 2: S26 cancellable background surface startup
+
+Exact local SM-S948B/Android16/Adreno840 driver512.842.19, Debug candidate APK
+SHA256 `d5cea1487b58f29a146a1195cd807cce5441f845ac705a16aeabdd5065add4be`,
+installed/pulled back identically. Serial lifecycle owner replaces UI-thread
+pipeline initialization; native-window and stale-generation ownership are explicit.
+Home cancels initial generation1 before any presentation; replacement3 and two
+ready-resume cycles5/7 honestly present1080x2235/RayTracingPipeline. Own fresh UI
+hierarchies during initialization, unchangedPID10077 and no new owned ANR.
+Activity resume wait8–11ms; native ready still13.119/13.795s, interrupted replacement
+23.666s. This repairs UI blocking, not compile latency or gameplay FPS.
+[Finite evidence](evidence/2026-10-02-s26-surface-session/README.md).
+
+No data clear, stable-app/volume/font change or further report email. All4 native
+Debug ABIs,76 Java unit tests, lint and focused3/3 host checks pass. Existing
+route/final Shipping matrix still pending; no new S24/S25 acceptance. Prior ANR
+below remains retained control evidence. Manual audio/haptic:NO: intended readiness
+and semantic inputs/assets/playback unchanged; distinct external focus row open.
+
+## October 2: one S26 report delivered; rapid resume ANR reproduced
 
 Exact local SM-S948B, retained Debug APKe9fd31e7/native source00af842 above/below.
 One owner-approved additional in-game report passes real hosted Cloudflare

@@ -225,6 +225,7 @@ public class MainActivity extends Activity {
     private boolean resumed;
     private boolean surfaceAvailable;
     private boolean surfaceStarted;
+    private long surfaceRequestGeneration;
     private boolean menuVisible = true;
     private boolean diagnosticsVisible;
     private boolean diagnosticsErrorState;
@@ -379,17 +380,17 @@ public class MainActivity extends Activity {
             showMainMenu(false);
         });
         attackButton.setOnClickListener(view -> {
-            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
             ProbeBridge.requestAttack();
         });
         interactButton.setOnClickListener(view -> {
             if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
-                    endingOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
+                    endingOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
             ProbeBridge.requestInteract();
         });
         toggleHeldLightPoseButton.setOnClickListener(view -> {
             if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
-                    endingOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
+                    endingOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
             ProbeBridge.requestToggleHeldLightPose();
         });
         parryButton.setOnClickListener(view -> {
@@ -397,7 +398,7 @@ public class MainActivity extends Activity {
                 parryRequestedOnTouchDown = false;
                 return;
             }
-            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getRuntimeState() != 1) return;
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
             ProbeBridge.requestParry();
         });
         parryButton.setOnTouchListener((view, event) -> {
@@ -405,7 +406,7 @@ public class MainActivity extends Activity {
                 case MotionEvent.ACTION_DOWN:
                     parryRequestedOnTouchDown = true;
                     view.setPressed(true);
-                    if (!menuVisible && !diagnosticsVisible && !deathOverlayVisible && ProbeBridge.getRuntimeState() == 1) {
+                    if (!menuVisible && !diagnosticsVisible && !deathOverlayVisible && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1) {
                         ProbeBridge.requestParry();
                     }
                     return true;
@@ -528,11 +529,12 @@ public class MainActivity extends Activity {
     }
 
     private void startSurfaceIfReady() {
-        if (!resumed || !surfaceAvailable || surfaceStarted || currentSurface == null) return;
+        if (!resumed || !surfaceAvailable || surfaceRequestGeneration != 0 || currentSurface == null) return;
         try {
-            surfaceStarted = ProbeBridge.startDiagnosticSurface(currentSurface, getFilesDir().getAbsolutePath());
+            surfaceRequestGeneration = ProbeBridge.startDiagnosticSurface(currentSurface, getFilesDir().getAbsolutePath());
+            surfaceStarted = false; // Accepted/pending is distinct from an RT-presented frame.
             setGameplayPaused(menuVisible || diagnosticsVisible);
-            if (!surfaceStarted) {
+            if (surfaceRequestGeneration == 0) {
                 reportTextView.append("\n\nRenderer surface failed to start.");
                 showDiagnostics(true);
             }
@@ -545,14 +547,15 @@ public class MainActivity extends Activity {
     private void stopSurface() {
         setBenchmarkStatusExpanded(false);
         if (musicPlayback != null) musicPlayback.setSuspended(true);
-        if (!surfaceStarted) return;
-        ProbeBridge.stopDiagnosticSurface();
+        final long generation = surfaceRequestGeneration;
+        surfaceRequestGeneration = 0;
         surfaceStarted = false;
+        if (generation != 0) ProbeBridge.stopDiagnosticSurface(generation); // Cancels pending starts too; no join.
     }
 
     private void configureTouchControls() {
         surfaceView.setOnTouchListener((view, event) -> {
-            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getRuntimeState() != 1) return true;
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return true;
             final int action = event.getActionMasked();
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
                 final int index = event.getActionIndex();
@@ -671,7 +674,7 @@ public class MainActivity extends Activity {
 
     private void startBenchmark() {
         playSound("ui_select", 0.18f);
-        if (ProbeBridge.getRuntimeState() != 1 || !(benchmarkAutomationId == null
+        if (ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1 || !(benchmarkAutomationId == null
                 ? ProbeBridge.requestBenchmark()
                 : ProbeBridge.requestBenchmarkWithIdAndWorkload(
                         benchmarkAutomationId, benchmarkAutomationWorkload))) {
@@ -1569,10 +1572,10 @@ public class MainActivity extends Activity {
         menuScrim.setVisibility(View.GONE);
         final boolean showHud = preferences.getBoolean("show_hud", true);
         menuButton.setVisibility(showHud ? View.VISIBLE : View.GONE);
-        attackButton.setVisibility(showHud && ProbeBridge.getRuntimeState() == 1 &&
+        attackButton.setVisibility(showHud && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1 &&
                 lastPlayerLifePhase == PLAYER_ALIVE
                 ? View.VISIBLE : View.GONE);
-        parryButton.setVisibility(showHud && ProbeBridge.getRuntimeState() == 1 &&
+        parryButton.setVisibility(showHud && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1 &&
                 lastPlayerLifePhase == PLAYER_ALIVE
                 ? View.VISIBLE : View.GONE);
         rtStatus.setVisibility(showHud ? View.VISIBLE : View.GONE);
@@ -1693,7 +1696,7 @@ public class MainActivity extends Activity {
 
     private void setGameplayPaused(boolean paused) {
         if (musicPlayback != null) musicPlayback.setSuspended(paused || !resumed ||
-                !surfaceStarted || ProbeBridge.getRuntimeState() != 1);
+                !surfaceStarted || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1);
         ProbeBridge.setSimulationPaused(paused); // Existing JNI mailbox authority unchanged.
     }
 
@@ -2266,7 +2269,8 @@ public class MainActivity extends Activity {
                             BENCHMARK_AUTOMATION_TIMEOUT_MS) {
                     finishBenchmarkAutomation(3);
                 }
-                final int state = ProbeBridge.getRuntimeState();
+                final int state = ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);
+                surfaceStarted = resumed && surfaceAvailable && surfaceRequestGeneration != 0 && state == 1;
                 if (musicPlayback != null) musicPlayback.setSuspended(!resumed || !surfaceStarted ||
                         state != 1 || menuVisible || diagnosticsVisible);
                 if (state == 1) {
@@ -2703,7 +2707,7 @@ public class MainActivity extends Activity {
             @Override
             public void onReceive(final Context context, final Intent intent) {
                 if (intent == null || !DEBUG_RETRY_ACTION.equals(intent.getAction())) return;
-                if (ProbeBridge.getRuntimeState() != 1 ||
+                if (ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1 ||
                         ProbeBridge.getPlayerLifePhase() != PLAYER_DEAD) {
                     Log.w(TAG, "Rejected debug encounter-retry broadcast outside Dead state.");
                     return;

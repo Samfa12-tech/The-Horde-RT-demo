@@ -16,8 +16,10 @@ in actual Debug evidence. Exact Shipping/owner acceptance remains separate.
 S26 report preparation/real game-only preview/READY lifecycle and live FPS-counter
 update/cancel/reset pass. The one additional Android email is approved, sent once
 and independently confirmed in the inbox. A subsequent rapid Home/resume ANR in
-UI-thread Vulkan pipeline startup is the next release-critical implementation
-step. Do not repeat accepted Android/Windows emails or settled route checks.
+UI-thread Vulkan pipeline startup is now repaired with a serial off-UI owner;
+the exact S26 interrupted-start and two rapid resumes pass without a new ANR.
+The affected route and final-candidate matrix remain open. Do not repeat accepted
+Android/Windows emails or completed focused lifecycle rows.
 
 ## Release-focused remaining gates — October2 owner direction
 
@@ -30,7 +32,7 @@ The full agreed feature scope is retained; no merge/publication is authorised.
 
 | Priority | Remaining gate | Smallest useful completion evidence |
 | --- | --- | --- |
-| 1 — real correctness and gameplay | Final production route must load/present, retain S24 hands/two-enemy visibility, accepted player/grips and stable lifecycle. World-box normals pass Debug/Release3/3, six RTX captures and S26 run17002813/13/four captures/settled Home-resume. Subsequent rapid report-form resume hits a real UI-thread pipeline-creation ANR. | Close that bounded lifecycle failure and final-candidate checks. Reuse the [normal correction evidence](evidence/2026-10-02-world-box-normals/README.md), not isolated UV/contact candidates. Do not whole-merge the experimental renderer or reopen accepted player tuning. |
+| 1 — real correctness and gameplay | Final production route must load/present, retain S24 hands/two-enemy visibility, accepted player/grips and stable lifecycle. World-box normal gates pass. The demonstrated UI-thread resume ANR is repaired: exact S26 pending cancellation/two rapid resumes pass, same process/current RT. | Finish the [affected surface-owner route](evidence/2026-10-02-s26-surface-session/README.md) and final-candidate checks. Reuse the [normal correction evidence](evidence/2026-10-02-world-box-normals/README.md), not isolated UV/contact candidates. Do not whole-merge the experimental renderer or reopen accepted player tuning. |
 | 1 — practical performance acceptance | Last warm Shipping/Mobile S26 cycle medians are81–86ms opening and112–123ms held/reveal at75%, not the33.3ms target. Pane removal helped greatly but did not establish comfortable30FPS. | Use existing results, then one final-candidate warm ordinary/lantern/live check with tails/thermal/pacing limits stated. Owner accepts actual playability or makes an explicit profile/product decision. No further unpromising micro-optimisation campaign. |
 | 2 — finished reporting experience | Android hosted verification/one approved exchange and independent inbox note/context/PNG receipt now PASS. Full-game Windows remote-form prepare/cancel/readback remains incomplete after helper addressing failures; local JSON stays fallback. | Reuse the [single Android receipt](evidence/2026-10-02-s26-report-send/README.md); close the bounded Windows interaction without repeating unchanged failed helpers. No second backend, extra email or new export-helper investigation. |
 | 2 — remaining change-triggered checks | Owner accepts current audio and S24 screenshot appearance on October2. External-audio focus interruption/recovery is not explicitly confirmed; final-candidate S24 live/Shipping coverage remains separate. | Reuse these verdicts, accepted "Music sounds perfect now", cue/loop evidence and arm acceptance. No repeated auditions or S24 screenshot acceptance question. Complete only the distinct unfinished focus/lifecycle/device rows. |

@@ -13,6 +13,7 @@
 #include <ctime>
 #include <fstream>
 #include <limits>
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <sstream>
@@ -46,6 +47,7 @@
 #include "gameplay/simulation/InputMailbox.h"
 #include "platform/android/AndroidRtLabState.h"
 #include "platform/android/AndroidMusicPlayback.h"
+#include "platform/android/SurfaceSessionMailbox.h"
 #include "update/GitHubReleaseUpdater.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
@@ -147,6 +149,7 @@ constexpr auto kDefaultPlayerPresentationRoute =
 
 struct SwapchainContext
 {
+    std::uint64_t surfaceGeneration = 0u;
     ANativeWindow* window = nullptr;
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -226,10 +229,20 @@ struct SwapchainContext
 SwapchainContext gSwapchainContext{};
 std::atomic<bool> gSwapchainRunning{false};
 std::thread gSwapchainThread;
-std::mutex gSwapchainMutex;
+struct NativeWindowRelease
+{
+    void operator()(ANativeWindow* window) const { if (window) ANativeWindow_release(window); }
+};
+struct SurfaceStartRequest
+{
+    std::unique_ptr<ANativeWindow, NativeWindowRelease> window;
+    std::string reportDirectory;
+};
+horde::platform::android::SurfaceSessionMailbox<SurfaceStartRequest> gSurfaceSessions;
 std::mutex gReportMutex;
 std::string gLatestTextReport;
 std::string gLatestJsonReport;
+std::uint64_t gLatestReportSurfaceGeneration = 0u; // guarded by gReportMutex; zero is probe-only.
 horde::reporting::OwnedPlaytestReportContext gLatestPlaytestContext;
 // One consented foreground capture; only the render owner accesses rtScene.
 // JNI transfers owned pixels/context, never a live renderer pointer. Cancellation
@@ -280,7 +293,6 @@ horde::telemetry::RtLifecycleSeeds gPreservedRtEvidenceSeeds = [] {
     return seeds;
 }();
 std::mutex gRtEvidenceSeedMutex;
-std::atomic<int> gRuntimeState{0}; // 0 starting/stopped, 1 honestly presented RT, 2 unsupported, 3 render error.
 std::atomic<float> gRequestedRenderScale{kDefaultAndroidRtRenderScale};
 std::atomic<int> gRequestedWaterQuality{1};
 std::atomic<bool> gRequestedGpuFrameTimingEnabled{true};
@@ -631,18 +643,23 @@ void PublishReportSnapshot(const horde::vulkan::DeviceCapabilities& capabilities
     std::lock_guard<std::mutex> lock(gReportMutex);
     gLatestTextReport = text;
     gLatestJsonReport = json;
+    gLatestReportSurfaceGeneration = 0u;
     gLatestPlaytestContext = {}; // A probe is not a live renderer/context snapshot.
 }
 
 std::string LatestTextReport()
 {
     std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gLatestReportSurfaceGeneration != 0u && !gSurfaceSessions.IsCurrent(gLatestReportSurfaceGeneration))
+        return "RT surface stopped or starting. No current surface report is available.";
     return gLatestTextReport;
 }
 
 std::string LatestJsonReport()
 {
     std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gLatestReportSurfaceGeneration != 0u && !gSurfaceSessions.IsCurrent(gLatestReportSurfaceGeneration))
+        return R"({"rtScene":{"presented":false,"status":"Surface stopped or starting"}})";
     return gLatestJsonReport;
 }
 
@@ -694,6 +711,7 @@ horde::reporting::OwnedPlaytestReportContext PlaytestContextOnRenderOwner(const 
 void PublishRuntimeReports(const SwapchainContext& context,
     const horde::telemetry::RtLifecyclePublishedState* finalPublication = nullptr)
 {
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return;
     const auto publication = finalPublication ? *finalPublication
         : context.rtFrameEvidence.PublishedStateByValue();
     const auto* evidence = finalPublication ||
@@ -703,8 +721,10 @@ void PublishRuntimeReports(const SwapchainContext& context,
     const std::string json = horde::vulkan::BuildCapabilityJsonReport(context.capabilities, evidence, finalPublication == nullptr);
     {
         std::lock_guard<std::mutex> lock(gReportMutex);
+        if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return;
         gLatestTextReport = text;
         gLatestJsonReport = json;
+        gLatestReportSurfaceGeneration = context.surfaceGeneration;
         // Publish the narrow allowlist from this render-thread-owned snapshot;
         // report preparation never reads the live scene or private diagnostic JSON.
         gLatestPlaytestContext = PlaytestContextOnRenderOwner(context);
@@ -2509,6 +2529,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         ? 0u
         : static_cast<std::uint64_t>(frameStartCount);
     rtFramePresented = false;
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return false;
     if (context.commandBuffers.empty())
     {
         return false;
@@ -2530,6 +2551,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         VK_TRUE, UINT64_MAX);
     fenceScope.Complete(1u, 0u, 1u);
     const auto fenceDone = std::chrono::steady_clock::now();
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration))
+    {
+        if (evidenceFrame) context.rtFrameEvidence.AbortFrame();
+        return false;
+    }
     if (waitResult != VK_SUCCESS)
     {
         if (evidenceFrame)
@@ -2578,6 +2604,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         VK_NULL_HANDLE,
         &imageIndex);
     acquireScope.Complete(1u, 0u, 1u);
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration))
+    {
+        if (evidenceFrame) context.rtFrameEvidence.AbortFrame();
+        return false;
+    }
 
     if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR || acquireResult == VK_SUBOPTIMAL_KHR)
     {
@@ -3272,13 +3303,14 @@ void SwapchainRenderLoop()
     const bool initiallyPaused = SynchronizeLifecyclePauseOnOwnerThread();
     if (!InitialiseRtEvidenceOnOwnerThread(gSwapchainContext, initiallyPaused))
     {
-        gRuntimeState.store(3, std::memory_order_release);
+        gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
         gSwapchainRunning.store(false, std::memory_order_release);
         __android_log_print(
             ANDROID_LOG_ERROR, kTag,
             "Invalid RT evidence ownership configuration on render owner thread.");
     }
-    while (gSwapchainRunning.load(std::memory_order_acquire))
+    while (gSwapchainRunning.load(std::memory_order_acquire) &&
+           gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration))
     {
         const bool measurementPaused = SynchronizeLifecyclePauseOnOwnerThread();
         if (gSwapchainContext.rtFrameEvidenceInitialised)
@@ -3303,7 +3335,7 @@ void SwapchainRenderLoop()
             CancelActiveInAppBenchmark(gSwapchainContext);
             if (!evidenceCompleted)
             {
-                gRuntimeState.store(3, std::memory_order_release);
+                gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
                 __android_log_print(ANDROID_LOG_ERROR, kTag, "Cannot resize RT output before owned GPU work completes.");
                 break;
             }
@@ -3332,7 +3364,7 @@ void SwapchainRenderLoop()
             gSwapchainContext.timingFrameCount = 0u;
             gSwapchainContext.timingFenceMs = gSwapchainContext.timingRecordMs = 0.0;
             gSwapchainContext.timingPresentMs = gSwapchainContext.timingTotalMs = 0.0;
-            gRuntimeState.store(0, std::memory_order_release);
+            gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 0);
             std::string resizeDiagnostic;
             const VkExtent2D requestedExtent = ScaledRenderExtent(
                 gSwapchainContext.swapchainExtent, requestedRenderScale);
@@ -3345,7 +3377,7 @@ void SwapchainRenderLoop()
                 {
                     CancelActiveInAppBenchmark(gSwapchainContext);
                 }
-                gRuntimeState.store(3, std::memory_order_release);
+                gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
                 __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to apply requested RT render scale: %s", resizeDiagnostic.c_str());
                 break;
             }
@@ -3365,11 +3397,13 @@ void SwapchainRenderLoop()
         bool rtFramePresented = false;
         if (!RenderFrame(gSwapchainContext, rtFramePresented))
         {
+            if (!gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration)) break;
             FailInAppBenchmarkAfterRenderFailure(gSwapchainContext);
-            gRuntimeState.store(3, std::memory_order_release);
+            gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
             __android_log_print(ANDROID_LOG_ERROR, kTag, "Diagnostic surface render loop ended unexpectedly.");
             break;
         }
+        if (!gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration)) break;
         if (rtFramePresented && !gSwapchainContext.capabilities.rtScene.presented)
         {
             gSwapchainContext.capabilities.rtScene.presented = true;
@@ -3385,10 +3419,12 @@ void SwapchainRenderLoop()
             presentationDiagnostics.erase(std::remove(presentationDiagnostics.begin(), presentationDiagnostics.end(),
                                                        "Internal render resolution: not measured yet."),
                                           presentationDiagnostics.end());
-            gRuntimeState.store(1, std::memory_order_release);
+            if (!gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 1)) break;
 
             PublishRuntimeReports(gSwapchainContext);
             __android_log_print(ANDROID_LOG_INFO, kTag, "RT frame reached Android swapchain presentation.");
+            __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_SURFACE_PRESENTED generation=%llu",
+                static_cast<unsigned long long>(gSwapchainContext.surfaceGeneration));
         }
         CaptureConsentedPlaytestFrameOnRenderOwner(gSwapchainContext, rtFramePresented, measurementPaused);
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
@@ -3420,7 +3456,8 @@ void SwapchainRenderLoop()
 
 bool StartSurfaceInternal(ANativeWindow* window,
                           horde::vulkan::DeviceCapabilities capabilities,
-                          const std::string& reportDirectory)
+                          const std::string& reportDirectory,
+                          const std::uint64_t generation)
 {
     if (window == nullptr)
     {
@@ -3437,6 +3474,13 @@ bool StartSurfaceInternal(ANativeWindow* window,
 
     SwapchainContext context;
     context.window = window;
+    context.surfaceGeneration = generation;
+    struct Cleanup
+    {
+        SwapchainContext& context;
+        bool transferred = false;
+        ~Cleanup() { if (!transferred && context.window) DestroySwapchainContext(context); }
+    } cleanup{context};
     context.capabilities = capabilities;
     context.reportDirectory = reportDirectory;
     context.renderScale = std::clamp(gRequestedRenderScale.load(std::memory_order_acquire), 0.50f, 1.0f);
@@ -3447,34 +3491,38 @@ bool StartSurfaceInternal(ANativeWindow* window,
                         kTag,
                         "HORDE_GPU_TIMING mode=%s rt_rendering=unchanged",
                         context.gpuFrameTimingEnabled ? "enabled" : "disabled");
-    gRuntimeState.store(0, std::memory_order_release);
+    if (!gSurfaceSessions.IsCurrent(generation)) return false;
+    // Refresh the probe snapshot off the UI thread even on later startup failure;
+    // this does not certify an RT-presented frame.
+    PublishRuntimeReports(context);
     ClearPlatformGameplayEvents();
     {
         std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
         PublishInputLocked();
     }
 
-    if (!CreateInstance(context.instance))
+    if (!CreateInstance(context.instance) || !gSurfaceSessions.IsCurrent(generation))
     {
         DestroySwapchainContext(context);
         return false;
     }
 
-    if (!CreateSurface(context.instance, context.window, context.surface))
+    if (!CreateSurface(context.instance, context.window, context.surface) || !gSurfaceSessions.IsCurrent(generation))
     {
         DestroySwapchainContext(context);
         return false;
     }
 
     context.physicalDevice = FindMatchingPhysicalDevice(context.instance, capabilities, context.surface);
-    if (context.physicalDevice == VK_NULL_HANDLE)
+    if (context.physicalDevice == VK_NULL_HANDLE || !gSurfaceSessions.IsCurrent(generation))
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "No matching physical device found for Android diagnostic surface.");
         DestroySwapchainContext(context);
         return false;
     }
 
-    if (!FindGraphicsAndPresentQueueFamily(context.physicalDevice, context.surface, context.graphicsQueueFamilyIndex))
+    if (!FindGraphicsAndPresentQueueFamily(context.physicalDevice, context.surface, context.graphicsQueueFamilyIndex) ||
+        !gSurfaceSessions.IsCurrent(generation))
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Could not find graphics+compute+present queue family on Android.");
         DestroySwapchainContext(context);
@@ -3492,40 +3540,47 @@ bool StartSurfaceInternal(ANativeWindow* window,
         __android_log_print(
             ANDROID_LOG_ERROR, kTag,
             "Required hardware RayQuery compute backend is unavailable; no alternate backend will be selected.");
-        gRuntimeState.store(2, std::memory_order_release);
+        gSurfaceSessions.Publish(generation, 2);
         DestroySwapchainContext(context);
         return false;
     }
     context.useRtPath = context.executionBackend != horde::vulkan::RtExecutionBackend::Unsupported;
-    gRuntimeState.store(context.useRtPath ? 0 : 2, std::memory_order_release);
+    gSurfaceSessions.Publish(generation, context.useRtPath ? 0 : 2);
 
-    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, context.executionBackend, context.device, context.graphicsQueue))
+    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, context.executionBackend, context.device, context.graphicsQueue) ||
+        !gSurfaceSessions.IsCurrent(generation))
     {
         DestroySwapchainContext(context);
         return false;
     }
 
-    if (!CreateSwapchain(context))
+    if (!CreateSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))
     {
         DestroySwapchainContext(context);
         return false;
     }
-    if (!InitialiseRtSceneForSwapchain(context))
+    if (!InitialiseRtSceneForSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))
     {
         DestroySwapchainContext(context);
         return false;
     }
 
     gSwapchainContext = std::move(context);
+    cleanup.transferred = true;
     gSwapchainRunning.store(true, std::memory_order_release);
-    gSwapchainThread = std::thread(SwapchainRenderLoop);
+    try { gSwapchainThread = std::thread(SwapchainRenderLoop); }
+    catch (...)
+    {
+        gSwapchainRunning.store(false, std::memory_order_release);
+        DestroySwapchainContext(gSwapchainContext);
+        throw;
+    }
 
     return true;
 }
 
 void StopSurfaceInternal()
 {
-    gRuntimeState.store(0, std::memory_order_release);
     if (gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
     {
         gInAppBenchmarkStatus.store(3, std::memory_order_release);
@@ -3543,6 +3598,65 @@ void StopSurfaceInternal()
     // gameplay cue (including ChestUnlocked) into the next Activity surface.
     ClearPlatformGameplayEvents();
     PublishSimulationUiState();
+}
+
+// Process-lifetime serial lifecycle owner. It joins the previous render owner
+// before touching Vulkan for another generation; gameplay remains on that
+// existing render owner. Activity callbacks never wait for driver work or joins.
+class NativeSurfaceOwner
+{
+public:
+    NativeSurfaceOwner() : thread_([this] { Run(); }) {}
+    ~NativeSurfaceOwner()
+    {
+        gSurfaceSessions.Close();
+        thread_.join();
+    }
+private:
+    void Run()
+    {
+        while (auto action = gSurfaceSessions.Take())
+        {
+            StopSurfaceInternal();
+            if (!action->request || !gSurfaceSessions.IsCurrent(action->generation)) continue;
+            auto& request = *action->request;
+            try
+            {
+                const auto capabilities = RunProbe();
+                if (!gSurfaceSessions.IsCurrent(action->generation)) continue;
+                if (!EnsureDirectoryExists(request.reportDirectory))
+                {
+                    gSurfaceSessions.Publish(action->generation, 3);
+                    continue;
+                }
+                if (!StartSurfaceInternal(request.window.release(), capabilities,
+                                          request.reportDirectory, action->generation))
+                {
+                    if (gSurfaceSessions.State(action->generation) == 0)
+                        gSurfaceSessions.Publish(action->generation, 3);
+                    continue;
+                }
+                __android_log_print(ANDROID_LOG_INFO, kTag,
+                    "HORDE_SURFACE_STARTED generation=%llu", static_cast<unsigned long long>(action->generation));
+            }
+            catch (const std::exception& error)
+            {
+                StopSurfaceInternal();
+                gSurfaceSessions.Publish(action->generation, 3);
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Native surface startup failed: %s", error.what());
+            }
+        }
+        StopSurfaceInternal();
+    }
+    std::thread thread_;
+};
+
+NativeSurfaceOwner& SurfaceOwner()
+{
+    // Constructed after the globals and destroyed before them. This join is
+    // library/process teardown only, never Activity.onPause/onDestroy.
+    static NativeSurfaceOwner owner;
+    return owner;
 }
 
 } // namespace
@@ -3730,7 +3844,9 @@ static jbyteArray PrepareAndroidPlaytestReport(JNIEnv* env,
         {
             if (!includeScreenshot) {
                 std::lock_guard<std::mutex> lock(gReportMutex);
-                context = gLatestPlaytestContext;
+                if (gLatestReportSurfaceGeneration != 0u &&
+                    gSurfaceSessions.IsCurrent(gLatestReportSurfaceGeneration))
+                    context = gLatestPlaytestContext;
             }
             if (read(rawModel, kPlaytestReportMaxContextStringBytes, context.rawModel) != PlaytestReportStatus::Ready ||
                 context.internalWidth == 0u || context.internalHeight == 0u)
@@ -3791,7 +3907,7 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestPlaytestCapture(JNIEnv*, jclass, jboolean screenshotConsent)
 {
     if (screenshotConsent != JNI_TRUE || !gSwapchainRunning.load(std::memory_order_acquire) ||
-        gRuntimeState.load(std::memory_order_acquire) != 1) return 0;
+        gSurfaceSessions.State() != 1) return 0;
     std::lock_guard<std::mutex> lock(gReportMutex);
     if (gPlaytestCapture.state != PlaytestCaptureRequest::State::Empty ||
         gPlaytestCaptureNextToken == static_cast<std::uint64_t>(std::numeric_limits<jlong>::max())) return 0;
@@ -3889,7 +4005,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_writeReports(JNIEnv* env, jclass, js
     return JNI_TRUE;
 }
 
-extern "C" JNIEXPORT jboolean JNICALL
+extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, jclass, jobject surface, jstring baseDirectory)
 {
     if (surface == nullptr)
@@ -3914,47 +4030,42 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, 
     env->ReleaseStringUTFChars(baseDirectory, baseDirectoryUtf);
 
     const std::string reportDirectory = BuildReportDirectory(baseDirectoryValue);
-    if (!EnsureDirectoryExists(reportDirectory))
-    {
-        __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to create report directory: %s", reportDirectory.c_str());
-        return JNI_FALSE;
-    }
-
-    ANativeWindow* window = ANativeWindow_fromSurface(env, surface);
+    // Acquire the native reference before enqueueing; never retain a Java Surface
+    // or JNIEnv across threads. Pending replacements release their own reference.
+    std::unique_ptr<ANativeWindow, NativeWindowRelease> window(ANativeWindow_fromSurface(env, surface));
     if (!window)
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to resolve ANativeWindow.");
         return JNI_FALSE;
     }
 
-    std::lock_guard<std::mutex> lock(gSwapchainMutex);
-    const horde::vulkan::DeviceCapabilities capabilities = RunProbe();
-
-    // Write updated report from shared probe source.
-    const std::string textReport = BuildDisplayText(capabilities);
-    const std::string jsonReport = horde::vulkan::BuildCapabilityJsonReport(capabilities);
-    PublishReportSnapshot(capabilities);
-    if (!WriteTextFile(reportDirectory + '/' + kTextReportFilename, textReport) ||
-        !WriteTextFile(reportDirectory + '/' + kJsonReportFilename, jsonReport))
+    try
     {
-        ANativeWindow_release(window);
-        return JNI_FALSE;
+        (void)SurfaceOwner();
+        const auto generation = gSurfaceSessions.Start({std::move(window), reportDirectory});
+        __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_SURFACE_REQUEST generation=%llu",
+                            static_cast<unsigned long long>(generation));
+        return static_cast<jlong>(generation); // Accepted request, NOT presented/ready.
     }
-
-    if (!StartSurfaceInternal(window, capabilities, reportDirectory))
+    catch (const std::exception& error)
     {
-        return JNI_FALSE;
+        __android_log_print(ANDROID_LOG_ERROR, kTag, "Could not request native surface: %s", error.what());
+        return 0;
     }
-
-    __android_log_print(ANDROID_LOG_INFO, kTag, "Started Android diagnostic surface rendering loop.");
-    return JNI_TRUE;
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_stopDiagnosticSurface(JNIEnv*, jclass)
+Java_com_samfa12_hordelanternrt_ProbeBridge_stopDiagnosticSurface(JNIEnv*, jclass, jlong generation)
 {
-    std::lock_guard<std::mutex> lock(gSwapchainMutex);
-    StopSurfaceInternal();
+    if (generation > 0 && gSurfaceSessions.Stop(static_cast<std::uint64_t>(generation)))
+        __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_SURFACE_CANCEL generation=%llu",
+                            static_cast<unsigned long long>(generation));
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getSurfaceRuntimeState(JNIEnv*, jclass, jlong generation)
+{
+    return static_cast<jint>(gSurfaceSessions.State(static_cast<std::uint64_t>(generation)));
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -4054,7 +4165,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getContextualControlState(JNIEnv*, j
 extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_retryEncounter(JNIEnv*, jclass)
 {
-    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+    if (gSurfaceSessions.State() != 1 ||
         gPlayerLifePhase.load(std::memory_order_acquire) !=
             static_cast<int>(horde::gameplay::PlayerLifePhase::Dead))
     {
@@ -4246,7 +4357,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugCaptureCheckpoint(JNIEnv
 {
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
     DebugCheckpointSelection selection;
-    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+    if (gSurfaceSessions.State() != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1 ||
         !ResolveDebugCheckpoint(static_cast<std::int32_t>(checkpointId), selection))
     {
@@ -4275,7 +4386,7 @@ extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmark(JNIEnv*, jclass)
 {
     std::lock_guard<std::mutex> lock(gReportMutex);
-    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+    if (gSurfaceSessions.State() != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
     {
         return JNI_FALSE;
@@ -4304,7 +4415,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithId(
                 (c >= '0' && c <= '9') || c == '-' || c == '_';
         })) return JNI_FALSE;
     std::lock_guard<std::mutex> lock(gReportMutex);
-    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+    if (gSurfaceSessions.State() != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
     gRequestedBenchmarkRunId = id;
     gRequestedBenchmarkWorkload = horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
@@ -4344,7 +4455,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithIdAndWorkload(
         return JNI_FALSE;
     }
     std::lock_guard<std::mutex> lock(gReportMutex);
-    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+    if (gSurfaceSessions.State() != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
     gRequestedBenchmarkRunId = id;
     gRequestedBenchmarkWorkload = workload;
@@ -4384,7 +4495,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getBenchmarkReport(JNIEnv* env, jcla
 extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getRuntimeState(JNIEnv*, jclass)
 {
-    return static_cast<jint>(gRuntimeState.load(std::memory_order_acquire));
+    return static_cast<jint>(gSurfaceSessions.State());
 }
 
 extern "C" JNIEXPORT jlong JNICALL

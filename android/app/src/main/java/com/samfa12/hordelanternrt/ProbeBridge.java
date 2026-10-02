@@ -29,8 +29,10 @@ public final class ProbeBridge {
                                                              byte[] responseBodyUtf8);
     public static native boolean writeReports(String baseDirectory);
 
-    public static native boolean startDiagnosticSurface(android.view.Surface surface, String baseDirectory);
-    public static native void stopDiagnosticSurface();
+    /** Returns an accepted request token, not renderer readiness; zero is failure. */
+    public static native long startDiagnosticSurface(android.view.Surface surface, String baseDirectory);
+    public static native void stopDiagnosticSurface(long generation);
+    public static native int getSurfaceRuntimeState(long generation);
     public static native void setViewControls(float yaw, float pitch, float torchLightStrength, float moveStrafe, float moveForward);
     public static native void requestAttack();
     public static native void requestParry();

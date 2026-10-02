@@ -13,7 +13,32 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 single Android report delivered; startup ANR is next
+### October 2 off-UI surface owner repairs the demonstrated ANR
+
+The bounded native lifecycle owner and generation-scoped Java/JNI readiness/stop
+are now implemented. Existing render/simulation ownership, shaders, assets,
+player geometry, quality, audio sources and gains are unchanged. Pending starts
+cancel immediately; the serial lifecycle owner joins/cleans old work off UI,
+then starts the latest request. Native-window refs release once. Packed epoch/
+state rejects stale readiness; report getters/context reject a stale snapshot.
+Independent review's probe-refresh/stale-report issues are addressed.
+
+Fresh focused Debug3/3 host contracts, all4 Android Debug ABIs,76/76 Java tests
+and lint (42 warnings,0 errors) pass. Exact S26 APKd5cea148 installs/pulls
+identically. Interrupted generation1 never presents;3/5/7 present honestly with
+unchangedPID10077, fresh UI roots during initialization and no new owned ANR.
+Activity resume wait8–11ms, but native ready still takes13.119/13.795s; cancelled
+startup plus replacement23.666s. This fixes UI blocking, not gameplay FPS or
+compile time. [Finite record](evidence/2026-10-02-s26-surface-session/README.md).
+
+Next unfinished row is one affected existing-runner replay/capture/lifecycle on
+this retained artifact, then final-candidate integration gates/Windows report
+interaction. No repeat email, accepted player/music tuning or parity campaign.
+All unrelated S24 scratch preserved. Audio/haptic manual revalidation:NO for
+unchanged semantic inputs/assets/playback and intended RT-ready gating; distinct
+external focus recovery remains open. Goal ACTIVE; no release/publication.
+
+### October 2 single Android report delivered; startup ANR reproduced
 
 Owner explicitly authorises the one additional email; approval is now consumed.
 Actual S26 in-game preparation/real RT preview, hosted Cloudflare verification
