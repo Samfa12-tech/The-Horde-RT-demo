@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "model": "SM-S948B",
+  "package": "com.samfa12.hordelanternrt.debug",
+  "versionName": "1.6.1-debug",
+  "versionCode": 9,
+  "apkSha256": "315b1c9f4ba99f397f1aa638fd0b19f251a7dd1877c3d9fff6680587feda3f04",
+  "installedApkPullbackMatched": true,
+  "signing": "development-only",
+  "ownerListening": {
+    "A": "accepted",
+    "D": "accepted",
+    "confirmation": "i listened to both, theyre both perfect"
+  },
+  "evidence": [
+    {
+      "path": "A-live-ui.xml",
+      "sha256": "d97cbe52f75673cd87253ea1074676b9230685ab9a1c0d25165c98d0dbe9d0fe"
+    },
+    {
+      "path": "D-live-ui.xml",
+      "sha256": "d97cbe52f75673cd87253ea1074676b9230685ab9a1c0d25165c98d0dbe9d0fe"
+    },
+    {
+      "path": "device-music.log",
+      "sha256": "74e14805e052a8b15d8303ca1793f105bd1a8c479a1e707e1912712db0047b83"
+    }
+  ],
+  "limits": [
+    "Clock log does not expose cue identity or establish audible transition quality.",
+    "Affected transitions and song wrap have native sample-oracle evidence, not a full linear-song phone playback claim.",
+    "Separate production 1.6.0 launch excluded from this candidate evidence.",
+    "No new renderer, sustained performance, S24 or S25 acceptance."
+  ]
+}

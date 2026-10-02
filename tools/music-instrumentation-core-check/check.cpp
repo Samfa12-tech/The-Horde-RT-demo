@@ -13,6 +13,7 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace
@@ -48,7 +49,7 @@ struct Bank
             const auto& asset = kMusicPcmAssets[index];
             auto body = repo / "assets" / asset.bodyPath;
             auto tail = repo / "assets" / asset.tailPath;
-            if (variant != "reference" && variant != "bank" &&
+            if (variant != "reference" && variant != "bank" && variant != "drone" &&
                 (asset.cue == MusicCue::A || asset.cue == MusicCue::E))
             {
                 const std::string cue = asset.cue == MusicCue::A ? "A" : "E";
@@ -281,6 +282,52 @@ void CheckRemainingBank(const Bank& bank)
     }
     std::cout << "],\"status\":\"PASS-native-offline; listening-and-device-acceptance-open\"}\n";
 }
+
+void CheckDroneEdit(const Bank& bank)
+{
+    std::cout << "{\"variant\":\"drone\",\"pcmBytes\":" << bank.bytes << ",\"loops\":[";
+    bool first = true;
+    for (const auto cue : {MusicCue::A, MusicCue::D})
+    {
+        const auto metrics = CheckLoops(bank, cue);
+        if (!first) std::cout << ',';
+        first = false;
+        std::cout << "{\"cue\":\"" << CueName(cue)
+                  << "\",\"periods\":20,\"maximumError\":" << metrics.maximumError
+                  << ",\"peak\":" << metrics.peak << '}';
+    }
+    std::cout << "],\"transitions\":[";
+    first = true;
+    // Actual affected cue edges, plus A<->D in the preserved canonical song
+    // and H->A wrap. The game itself is adaptive, not a linear song player.
+    for (const auto edge : {std::pair{MusicCue::A, MusicCue::B},
+             std::pair{MusicCue::B, MusicCue::A}, std::pair{MusicCue::C, MusicCue::D},
+             std::pair{MusicCue::D, MusicCue::E}, std::pair{MusicCue::E, MusicCue::D},
+             std::pair{MusicCue::H, MusicCue::A}, std::pair{MusicCue::A, MusicCue::D},
+             std::pair{MusicCue::D, MusicCue::A}})
+        for (const auto phase : {48'000u, 575'999u})
+        {
+            // A completed one-shot uses natural tail handoff, checked below;
+            // it must not be asserted to fade in a new cue from silence.
+            if (edge.first == MusicCue::C && phase >= kMusicPcmAssets[3].bodyFrames) continue;
+            const auto metrics = CheckTransition(bank, edge.first, edge.second, phase);
+            if (!first) std::cout << ',';
+            first = false;
+            std::cout << "{\"from\":\"" << CueName(edge.first) << "\",\"to\":\""
+                      << CueName(edge.second) << "\",\"exitFrame\":" << phase
+                      << ",\"maximumError\":" << metrics.maximumError << '}';
+        }
+    std::cout << "],\"naturalCD\":[";
+    first = true;
+    for (const auto offset : {0u, 24'000u, 144'000u})
+    {
+        const auto metrics = CheckNaturalHandoff(bank, MusicCue::C, MusicCue::D, offset);
+        if (!first) std::cout << ',';
+        first = false;
+        std::cout << "{\"tailOffset\":" << offset << ",\"maximumError\":" << metrics.maximumError << '}';
+    }
+    std::cout << "],\"status\":\"PASS-native-offline; packaged-listening-open\"}\n";
+}
 } // namespace
 
 int main(const int argc, char** argv)
@@ -289,10 +336,16 @@ int main(const int argc, char** argv)
     {
         Require(argc == 4, "usage: check <repository> <audition-evidence-directory> <variant>");
         const std::string variant = argv[3];
-        Require(variant == "reference" || variant == "whistle" || variant == "reed" || variant == "owner-combo" || variant == "bank",
+        Require(variant == "reference" || variant == "whistle" || variant == "reed" || variant == "owner-combo" || variant == "bank" || variant == "drone",
                 "unknown variant");
         Bank bank;
         bank.Load(argv[1], argv[2], variant);
+        if (variant == "drone")
+        {
+            std::cout << std::setprecision(9);
+            CheckDroneEdit(bank);
+            return 0;
+        }
         if (variant == "bank")
         {
             std::cout << std::setprecision(9);

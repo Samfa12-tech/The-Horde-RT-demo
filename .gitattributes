@@ -218,3 +218,6 @@ docs/evidence/2026-10-02-tlas-instance-refresh/** -text whitespace=-trailing-spa
 
 # Scoped Android music-focus/lifecycle evidence, preserving raw receipt bytes.
 docs/evidence/2026-10-02-music-focus/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Preserve hashed A/D source, render and device receipts byte-for-byte.
+docs/evidence/2026-10-03-music-drone/** -text whitespace=cr-at-eol

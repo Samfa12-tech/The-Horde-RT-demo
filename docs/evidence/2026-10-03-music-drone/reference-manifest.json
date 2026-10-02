@@ -10,13 +10,13 @@
   "sources": [
     {
       "path": "source/What_the_Dark_Keeps_Pocket_Chordsmith.json",
-      "bytes": 72783,
-      "sha256": "3ab832e08807d3745fca172b0bb6b95ccbbe37face4e60077027d6d35b55c9a0"
+      "bytes": 72393,
+      "sha256": "f5d4bbc8068ae2865216304efc22337ac190ca5b7732e02a9ed5e9062b7b92f4"
     },
     {
       "path": "source/What_the_Dark_Keeps_PCS1.txt",
-      "bytes": 94574,
-      "sha256": "fc7dab9a0e187740f352b440e92e55b922c663019bfe8df0896b1c617aea570d"
+      "bytes": 94054,
+      "sha256": "747e5a9a21f41f0fc587fe55572b03a6196cd25cece17283775dd03130164dab"
     }
   ],
   "render": {
@@ -24,8 +24,8 @@
     "version": "v68",
     "sourceCommit": "2b87d7b",
     "htmlSha256": "b266814fff749bd4d7be9d8725e4d7becc2d944122bc2a302602457fa9b6e2cf",
-    "evidenceManifest": "docs/evidence/2026-10-03-music-drone/SHA256SUMS.json",
-    "processing": "Owner-authorised removal only of Melody3 step15 held phrases in A/D. A/D bodies and tails rendered with retained v68 actual app voices/live FX; twelve unaffected WAVs retained byte-exact. All remaining events, timing, voices, FX, cue mapping, lengths and PCM playback unchanged."
+    "evidenceManifest": "docs/evidence/2026-10-01-music-whistle-bank/SHA256SUMS.json",
+    "processing": "Owner-selected whistle-lead instrumentation; retained v68 actual app voices/live FX. Accepted A/E PCM reused with identical active-cue source projection; B/C/D/F/G/H rendered once. No notes/timing changes, normalization or PCM playback change."
   },
   "format": {
     "encoding": "PCM16_LE",
@@ -44,13 +44,13 @@
         "path": "runtime/A-body.wav",
         "frames": 576000,
         "bytes": 2304044,
-        "sha256": "8c6201afb7129775ded6696c5819f4e592202d1b0f33f755b9d4f408f2e81556"
+        "sha256": "a58cacd493bd4604cf1d51096cf03092e35c993a079c10af7fcec3debc093277"
       },
       "tail": {
         "path": "runtime/A-tail.wav",
         "frames": 144000,
         "bytes": 576044,
-        "sha256": "a7459fc656b1520be5fad2b9e11cec314d62cdf0164abdb2fda53d619d7b962c"
+        "sha256": "4fea7b227dee6b81f09fd54f202bfea33a76a2419fa07c1ec37a0d2f8d14e4e1"
       }
     },
     {
@@ -92,13 +92,13 @@
         "path": "runtime/D-body.wav",
         "frames": 576000,
         "bytes": 2304044,
-        "sha256": "4398311b5870e614ffe611950264e370cf819f8d323aafe291816f38e36bf4c6"
+        "sha256": "22274bc3c17713c275b48232130299a443eb56c7cf871a5f3389e5c83c5a8d64"
       },
       "tail": {
         "path": "runtime/D-tail.wav",
         "frames": 144000,
         "bytes": 576044,
-        "sha256": "14550157b1a3fbf44f3d1a4dda424223475a7a0a9975b0361687bb2031f7ec50"
+        "sha256": "d7a934809ab1024da19dc1b86c370b692d8400e0431897f7455936cd8959c3aa"
       }
     },
     {

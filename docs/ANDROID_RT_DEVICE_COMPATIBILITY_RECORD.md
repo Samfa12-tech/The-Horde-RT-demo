@@ -2,6 +2,29 @@
 
 Last updated: 2026-10-03
 
+## October3: scoped A/D music derivative on exact S26
+
+Only two held Melody3 phrases removed; retained v68 app render route, four changed
+WAVs/twelve byte-exact, unchanged PCM20,160,000 bytes and playback code. Fresh
+four-ABI Debug build/package passes. APK315b1c9f4ba99f397f1aa638fd0b19f251a7dd1877c3d9fff6680587feda3f04
+installs/pulls byte-identically on SM-S948B as `com.samfa12.hordelanternrt.debug`,
+1.6.1-debug/code9. Accidental first launch of the separate1.6.0 production app was
+closed and excluded from candidate evidence; production installation is retained.
+
+After existing checkpoint setup, ordinary live A state supplies five12s consumed
+periods; post-torch-failure state supplies eight further periods, zero underruns,
+11.997–12.003s consecutive intervals. UI shows native RT active/vitality3. Individual
+cue enums/transition audibility are not exposed by this clock log; source director
+semantics and offline sample oracle are distinct evidence. Owner reports "It sounds
+great" in D, then "i listened to both, theyre both perfect": A/D packaged listening
+accepted. Affected transitions/song wrap pass the scoped native sample oracle;
+no separately observed full linear-song phone playback is claimed.
+No new shader/performance/SFX/haptic/device-
+family claim, no full linear songSequence playback inferred from adaptive cues.
+[Finite source/package/native/device record](evidence/2026-10-03-music-drone/README.md).
+Audio/haptic manual revalidation:YES for changed music only; owner A/D PASS.
+S24/S25 unchanged.
+
 ## October 3: resource candidate compiled; S26 control completes, phone released
 
 Current source3d26ad6 retains independent modelled player ownership, adds coherent

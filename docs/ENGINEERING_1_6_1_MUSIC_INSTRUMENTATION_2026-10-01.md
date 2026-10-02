@@ -1,5 +1,12 @@
 # What the Dark Keeps - bounded instrumentation audition
 
+October3 current derivative: owner requests removal only of the Melody3 held
+phrases at step15 in A/D. Short step0 notes/all other events remain; four WAVs
+regenerated with the same retained v68 route, twelve retained byte-exact. New
+manifest672f2321. [Finite delta and packaged check](evidence/2026-10-03-music-drone/README.md)
+records completed scoped checks and owner A/D listening acceptance ("both perfect");
+historical audition/acceptance below is preserved.
+
 Status: owner selected **whistle-lead** after both comparisons. Full-bank
 instrumentation admitted locally; objective source/PCM/Core/package checks pass.
 Exact-S26 rate/crackle/timbre listening accepted; twenty-period cueH device clock

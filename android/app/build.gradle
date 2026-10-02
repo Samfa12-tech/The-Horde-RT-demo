@@ -248,7 +248,7 @@ tasks.register('verifyMusicRuntimeAssets') {
     inputs.dir new File(hordeMusicRoot, 'runtime')
     doLast {
         def digest = { File input -> MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() }
-        if (digest(hordeMusicManifest) != 'ea7adbc1c248fc37d705239e6bcd529fbf10206ffb77165051658bce4e438c3e') {
+        if (digest(hordeMusicManifest) != '672f2321b2fb429cffe9d61119103a1aa3565f355391a162497f741eec9d6e29') {
             throw new GradleException('Music manifest differs from the reviewed Horde admission pin.')
         }
         def manifest = new JsonSlurper().parse(hordeMusicManifest, 'UTF-8')
