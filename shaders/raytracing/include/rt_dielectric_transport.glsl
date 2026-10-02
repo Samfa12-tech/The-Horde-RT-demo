@@ -687,6 +687,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             nextOrigin, transmissionDirection, 10000.0, 0x23u,
             dielectricQueryMinimum(currentHit), false, false);
 #ifdef HORDE_HIGH_EDGE_WITNESS
+        if (interfaceIndex == 4 && volumeOpen)
+            backendWitnessContactCandidates(nextOrigin, transmissionDirection,
+                dielectricQueryMinimum(currentHit), volumeInstance, volumeMaterial);
         investigationQueryOrigin = nextOrigin;
         investigationQueryMinimum = dielectricQueryMinimum(currentHit);
         investigationSpawnEpsilon = epsilon;

@@ -114,3 +114,33 @@ and frozen-cost gates remain open. No performance or Android acceptance claim.
 Audio/haptic manual revalidation required:NO; shader-only observer leaves
 gameplay/audio semantic inputs unchanged. Normal engineering is untouched;
 isolated configuration returns to Mobile/Shipping after the completed capture.
+
+## Contact reference and finite candidate-availability follow-up
+
+Test-only commit c6e0685 (engineering cherry-pick1f684a8) preserves both real
+surfaces. The independently evaluated double planes coincide exactly using the
+authored float operands. Each recorded ray reaches them at its own raw distance;
+native HitInfo.t also includes its previous spawn advance. The actual exit
+refracts into the floor, whereas its recorded below-floor spawn loses that
+receiver. Exit Fresnel/energy and ordinary open-volume rejection remain checked.
+MSVC Debug/Release dielectric CTests each1/1 PASS2.45/2.74s; no runtime change.
+
+Next concrete gap: can hardware enumeration retain BOTH native candidates,
+without closest-hit commitment discarding a tie? The Khronos
+[ray traversal contract](https://docs.vulkan.org/spec/latest/chapters/raytraversal.html)
+permits an equal-distance confirmed candidate to replace or lose to the current
+closest hit. An observation query forces NoOpaque and never confirms, retaining
+only the nearest actual matching exit and opaque candidate in fixed storage.
+One extra query at pixel456,304 after visit4 copies the original continuation
+origin/direction/minimum/mask0x23/max10000. No new transport decision/counter,
+surface approximation, budget or production policy. This is NOT performance
+evidence and does not establish a universal proximity tolerance/contact rule.
+
+Finite new matrix: one High/Diagnostic edge image per backend, only two changed
+modules compiled/validated. Existing controls and completed discriminator are
+reused. Payload extends from field280 through331, still wholly within row0.
+Require the existing watched path/RGB, nonpayload image and all41 counters to
+match their retained controls; perturbation makes the new evidence inconclusive.
+Decode actual candidate t/identity/barycentrics/front-face/geometric normal and
+surface position. Do not automatically promote this collector or integrate the
+observer branch. Next unfinished step: compile and run this finite field-gap pair.

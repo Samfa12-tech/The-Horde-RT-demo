@@ -7,6 +7,15 @@ function Field($Image, [int]$Index) {
     [BitConverter]::ToSingle([byte[]]@($a.R, $a.G, $a.B, $b.R), 0)
 }
 function Vector($Image, [int]$Index) { @(0..2 | ForEach-Object {Field $Image ($Index + $_)}) }
+function ContactCandidate($Image, [int]$Index) {
+    [ordered]@{hit=Field $Image $Index; instance=Field $Image ($Index+1);
+        primitive=Field $Image ($Index+2); material=Field $Image ($Index+3);
+        rawT=Field $Image ($Index+4); geometry=Field $Image ($Index+5);
+        frontFace=Field $Image ($Index+6); flags=Field $Image ($Index+7);
+        bary=@(Field $Image ($Index+8); Field $Image ($Index+9));
+        transmission=Field $Image ($Index+10); signedAlignment=Field $Image ($Index+11);
+        surfacePosition=Vector $Image ($Index+12); geometricNormal=Vector $Image ($Index+16)}
+}
 $records = foreach ($backend in @('pipeline', 'compute')) {
     $root = Join-Path $CaptureRoot "$backend/glass-edge-fresnel"
     $manifest = Get-Content (Join-Path $root 'capture-manifest.json') -Raw | ConvertFrom-Json
@@ -35,6 +44,15 @@ $records = foreach ($backend in @('pipeline', 'compute')) {
             transmitted=Vector $image 54; throughput=Vector $image 57
             termination=[ordered]@{resolved=Field $image 60; overflow=Field $image 61;
                 volumeOpen=Field $image 62; tirSinceTransition=Field $image 63}
+            # Absent in the retained first observer: do not infer candidate
+            # fields there. New availability probes are explicitly labelled.
+            contactProbe=$(if ((Field $image 280) -eq 1) {
+                [ordered]@{observed=$true; candidates=Field $image 281;
+                    matchingExitCandidates=Field $image 282; opaqueCandidates=Field $image 283;
+                    origin=Vector $image 284; minimum=Field $image 287;
+                    direction=Vector $image 288; maximum=Field $image 291;
+                    exit=ContactCandidate $image 292; receiver=ContactCandidate $image 312}
+            } else { $null })
             visits=@(for($visit=0;$visit -lt $count;++$visit) {
                 $offset=64+24*$visit
                 [ordered]@{visit=$visit; hit=Field $image $offset; instance=Field $image ($offset+1);
