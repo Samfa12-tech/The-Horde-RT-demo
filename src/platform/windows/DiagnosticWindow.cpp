@@ -2,6 +2,7 @@
 #include "platform/windows/WindowsMusicPlayback.h"
 #include "platform/windows/WindowsPlaytestReport.h"
 #include "platform/windows/WindowsRemotePlaytestReport.h"
+#include "audio/SfxVolume.h"
 
 #include <algorithm>
 #include <array>
@@ -109,7 +110,8 @@ constexpr int kSettingsButtonId = 107;
 constexpr int kDiagnosticsButtonId = 108;
 constexpr int kExitButtonId = 109;
 constexpr int kSettingsTitleId = 110;
-constexpr int kSfxButtonId = 111;
+constexpr int kSfxVolumeLabelId = 165;
+constexpr int kSfxVolumeSliderId = 166;
 constexpr int kSensitivityButtonId = 112;
 constexpr int kFullscreenButtonId = 113;
 constexpr int kSettingsBackButtonId = 114;
@@ -166,7 +168,6 @@ constexpr int kReportProblemButtonId = 164;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
 constexpr int kMenuExitId = 2003;
-constexpr int kMenuSfxId = 2010;
 constexpr int kMenuSensitivityLowId = 2011;
 constexpr int kMenuSensitivityNormalId = 2012;
 constexpr int kMenuSensitivityHighId = 2013;
@@ -314,7 +315,7 @@ struct VulkanSurfaceContext
     bool developerOverlayVisible = false;
     ULONGLONG lastDeveloperOverlayTick = 0u;
 #endif
-    bool sfxEnabled = true;
+    int sfxVolumePercent = 100;
     int musicVolumePercent = 70;
     std::unique_ptr<horde::platform::windows::WindowsMusicPlayback> musicPlayback;
     std::uint64_t musicResetToken = 0u;
@@ -687,7 +688,12 @@ void LoadSettings(VulkanSurfaceContext& context)
     const std::string path = SettingsPath().string();
     // Progress is deliberately loaded independently from ordinary display/audio settings.
     context.rtLabUnlocked = GetPrivateProfileIntA("progress", "rtLabUnlocked", 0, path.c_str()) != 0;
-    context.sfxEnabled = GetPrivateProfileIntA("audio", "sfx", 1, path.c_str()) != 0;
+    const bool legacySfxEnabled = GetPrivateProfileIntA("audio", "sfx", 1, path.c_str()) != 0;
+    const int configuredSfxVolume = static_cast<int>(
+        GetPrivateProfileIntA("audio", "sfxVolume",
+                              horde::audio::kSfxVolumeSettingMissing, path.c_str()));
+    context.sfxVolumePercent = horde::audio::ResolveSfxVolumePercent(
+        configuredSfxVolume, legacySfxEnabled);
     context.musicVolumePercent = std::clamp(
         static_cast<int>(GetPrivateProfileIntA("audio", "musicVolume", 70, path.c_str())), 0, 100);
     const int sensitivity = std::clamp(static_cast<int>(GetPrivateProfileIntA("controls", "lookSensitivity", 100, path.c_str())), 60, 150);
@@ -787,7 +793,11 @@ void SaveRtLabProgress(const VulkanSurfaceContext& context)
 void SaveSettings(const VulkanSurfaceContext& context)
 {
     const std::string path = SettingsPath().string();
-    WritePrivateProfileStringA("audio", "sfx", context.sfxEnabled ? "1" : "0", path.c_str());
+    const std::string sfxVolume = std::to_string(
+        horde::audio::ClampSfxVolumePercent(context.sfxVolumePercent));
+    WritePrivateProfileStringA("audio", "sfxVolume", sfxVolume.c_str(), path.c_str());
+    WritePrivateProfileStringA("audio", "sfx",
+                               context.sfxVolumePercent > 0 ? "1" : "0", path.c_str());
     const std::string musicVolume = std::to_string(context.musicVolumePercent);
     WritePrivateProfileStringA("audio", "musicVolume", musicVolume.c_str(), path.c_str());
     const std::string sensitivity = std::to_string(static_cast<int>(std::round(context.mouseSensitivity * 100.0f)));
@@ -814,21 +824,21 @@ void LogWindowsAudio(const std::string& message)
     }
 }
 
-bool PlayXAudioFile(const std::filesystem::path& path, float leftGain, float rightGain);
+bool PlayXAudioFile(const std::filesystem::path& path,
+                    float leftGain,
+                    float rightGain,
+                    int sfxVolumePercent);
 
 void PlaySoundEffect(const VulkanSurfaceContext& context, const char* filename)
 {
-    if (!context.sfxEnabled)
+    if (context.sfxVolumePercent <= 0)
     {
         return;
     }
     const std::filesystem::path path = ResolveAssetRoot() / "audio/filmcow" / filename;
     if (std::filesystem::exists(path))
     {
-        if (!PlayXAudioFile(path, 1.0f, 1.0f))
-        {
-            PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
-        }
+        (void)PlayXAudioFile(path, 1.0f, 1.0f, context.sfxVolumePercent);
     }
     else
     {
@@ -836,19 +846,18 @@ void PlaySoundEffect(const VulkanSurfaceContext& context, const char* filename)
     }
 }
 
-void PlayAmbientSoundEffect(const VulkanSurfaceContext& context, const char* filename)
+void PlayAmbientSoundEffect(const VulkanSurfaceContext& context,
+                            const char* filename,
+                            const float cueGain = 1.0f)
 {
-    if (!context.sfxEnabled)
+    if (context.sfxVolumePercent <= 0)
     {
         return;
     }
     const std::filesystem::path path = ResolveAssetRoot() / "audio/filmcow" / filename;
     if (std::filesystem::exists(path))
     {
-        if (!PlayXAudioFile(path, 1.0f, 1.0f))
-        {
-            PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
-        }
+        (void)PlayXAudioFile(path, cueGain, cueGain, context.sfxVolumePercent);
     }
     else
     {
@@ -922,6 +931,24 @@ public:
                 ++it;
             }
         }
+    }
+
+    bool SetMasterVolumePercent(const int percent)
+    {
+        if (masteringVoice_ == nullptr)
+        {
+            LogFailureOnce("XAudio2 mastering voice unavailable while applying SFX volume");
+            return false;
+        }
+        const HRESULT result = masteringVoice_->SetVolume(
+            horde::audio::SfxVolumeLinearGain(percent));
+        if (FAILED(result))
+        {
+            LogFailureOnce("mastering voice SetVolume failed, HRESULT=" +
+                           std::to_string(static_cast<long>(result)));
+            return false;
+        }
+        return true;
     }
 
     bool StartOrUpdateLoop(const std::string_view key,
@@ -1008,7 +1035,7 @@ public:
     {
         if (engine_ == nullptr || masteringVoice_ == nullptr)
         {
-            LogFailureOnce("XAudio2 unavailable; falling back for " + path.string());
+            LogFailureOnce("XAudio2 unavailable; SFX was not played: " + path.string());
             return false;
         }
         const std::shared_ptr<const LoadedWave> wave = Load(path);
@@ -1234,18 +1261,28 @@ PositionalAudioEngine& SpatialAudioEngine()
     return engine;
 }
 
-bool PlayXAudioFile(const std::filesystem::path& path, float leftGain, float rightGain)
+bool PlayXAudioFile(const std::filesystem::path& path,
+                    float leftGain,
+                    float rightGain,
+                    const int sfxVolumePercent)
 {
-    return SpatialAudioEngine().Play(path,
-                                     std::clamp(leftGain, 0.0f, 1.0f),
-                                     std::clamp(rightGain, 0.0f, 1.0f));
+    PositionalAudioEngine& engine = SpatialAudioEngine();
+    if (!engine.SetMasterVolumePercent(sfxVolumePercent)) return false;
+    return engine.Play(path,
+                       std::clamp(leftGain, 0.0f, 1.0f),
+                       std::clamp(rightGain, 0.0f, 1.0f));
 }
 
 void UpdateWaterfallAmbience(const VulkanSurfaceContext& context)
 {
     constexpr std::string_view loopKey = "waterfall";
     PositionalAudioEngine& engine = SpatialAudioEngine();
-    if (!context.sfxEnabled || context.simulationPaused)
+    if (!engine.SetMasterVolumePercent(context.sfxVolumePercent))
+    {
+        engine.StopLoop(loopKey);
+        return;
+    }
+    if (context.sfxVolumePercent <= 0 || context.simulationPaused)
     {
         engine.StopLoop(loopKey);
         return;
@@ -1271,7 +1308,7 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
                                const horde::gameplay::simulation::GameplayEvent& event,
                                const char* collection = "filmcow")
 {
-    if (!context.sfxEnabled)
+    if (context.sfxVolumePercent <= 0)
     {
         return;
     }
@@ -1285,10 +1322,7 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
     const std::filesystem::path path = ResolveAssetRoot() / "audio" / collection / filename;
     if (std::filesystem::exists(path))
     {
-        if (!PlayXAudioFile(path, gains.left, gains.right))
-        {
-            PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
-        }
+        (void)PlayXAudioFile(path, gains.left, gains.right, context.sfxVolumePercent);
     }
     else
     {
@@ -1327,7 +1361,7 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         {
             const char* clip = (context.playerFootstepVariant++ & 1) == 0
                 ? "player_step_1.wav" : "player_step_2.wav";
-            PlayAmbientSoundEffect(context, clip);
+            PlayAmbientSoundEffect(context, clip, horde::audio::kPlayerFootstepCueGain);
             break;
         }
         case GameplayEventType::PlayerSwing:
@@ -1411,9 +1445,14 @@ void SetControlVisible(HWND window, const int id, const bool visible)
 
 void UpdateSettingsLabels(VulkanSurfaceContext& context)
 {
-    if (HWND sfx = GetDlgItem(context.windowHandle, kSfxButtonId))
+    if (HWND label = GetDlgItem(context.windowHandle, kSfxVolumeLabelId))
     {
-        SetWindowTextA(sfx, context.sfxEnabled ? "SOUND EFFECTS: ON" : "SOUND EFFECTS: OFF");
+        const std::string text = "SFX VOLUME: " + std::to_string(context.sfxVolumePercent) + "%";
+        SetWindowTextA(label, text.c_str());
+    }
+    if (HWND slider = GetDlgItem(context.windowHandle, kSfxVolumeSliderId))
+    {
+        SendMessageA(slider, TBM_SETPOS, TRUE, static_cast<LPARAM>(context.sfxVolumePercent));
     }
     if (HWND sensitivity = GetDlgItem(context.windowHandle, kSensitivityButtonId))
     {
@@ -1455,7 +1494,6 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
     HMENU menu = GetMenu(context.windowHandle);
     if (menu)
     {
-        CheckMenuItem(menu, kMenuSfxId, MF_BYCOMMAND | (context.sfxEnabled ? MF_CHECKED : MF_UNCHECKED));
         CheckMenuItem(menu, kMenuFullscreenId, MF_BYCOMMAND | (context.fullscreen ? MF_CHECKED : MF_UNCHECKED));
         CheckMenuRadioItem(menu, kMenuSensitivityLowId, kMenuSensitivityHighId,
                            context.mouseSensitivity < 0.8f ? kMenuSensitivityLowId :
@@ -1675,7 +1713,8 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     const bool rtLabAccess = context.rtLabUnlocked || context.rtLabDebugInjection;
     SetControlVisible(context.windowHandle, kRtLabButtonId,
                       pauseVisible && rtLabAccess && !context.deathOverlayVisible);
-    for (const int id : {kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
+    for (const int id : {kSettingsTitleId, kSfxVolumeLabelId, kSfxVolumeSliderId,
+                          kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
                           kRenderScaleSliderId, kMusicVolumeLabelId, kMusicVolumeSliderId,
                           kFullscreenButtonId, kSettingsBackButtonId})
     {
@@ -2613,8 +2652,9 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
     constexpr std::array<int, 37u> controlIds{{
         kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId, kReportProblemButtonId,
         kRtLabButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId,
-        kExitButtonId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId,
-        kRenderScaleSliderId, kMusicVolumeSliderId, kFullscreenButtonId, kSettingsBackButtonId,
+        kExitButtonId, kSensitivityButtonId, kWaterQualityButtonId,
+        kRenderScaleSliderId, kSfxVolumeSliderId, kMusicVolumeSliderId,
+        kFullscreenButtonId, kSettingsBackButtonId,
         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
         kRtLabWaterfallSliderId, kRtLabRoofSliderId, kRtLabDawnSliderId,
         kRtLabFogSliderId, kRtLabFireStrengthSliderId, kRtLabFireTurbulenceSliderId,
@@ -2757,11 +2797,14 @@ bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool inc
     case kRtLabHueSliderId: range = horde::platform::windows::RtLabControlRange::HueDegrees; break;
     default: rtLabSlider = false; break;
     }
-    if (!rtLabSlider && id != kRenderScaleSliderId) return false;
+    if (!rtLabSlider && id != kRenderScaleSliderId && id != kSfxVolumeSliderId &&
+        id != kMusicVolumeSliderId) return false;
     const int current = static_cast<int>(SendMessageA(focused, TBM_GETPOS, 0, 0));
     const int next = rtLabSlider
         ? horde::platform::windows::StepRtLabControl(current, increase, range)
-        : horde::platform::windows::StepControllerSlider(current, increase);
+        : (id == kRenderScaleSliderId
+               ? horde::platform::windows::StepControllerSlider(current, increase)
+               : horde::platform::windows::StepControllerAudioVolume(current, increase));
     if (next != current)
     {
         SendMessageA(focused, TBM_SETPOS, TRUE, next);
@@ -5016,7 +5059,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.renderScale = 1.0f;
         context.outputExposure = 0.62f;
         context.waterQuality = horde::vulkan::raytracing::WaterQuality::High;
-        context.sfxEnabled = false;
+        context.sfxVolumePercent = 0;
         context.simulationPaused = true;
         context.pauseMenuVisible = false;
     }
@@ -5474,7 +5517,8 @@ void ApplyDpiScaledFonts(HWND window)
                          kControlsButtonId, kSettingsButtonId, kReportProblemButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
                          kMoreBySamfa12ButtonId, kExitButtonId, kBenchmarkTitleId,
                          kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
-                         kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
+                         kSettingsTitleId, kSfxVolumeLabelId, kSfxVolumeSliderId,
+                         kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
                          kRenderScaleSliderId, kMusicVolumeLabelId, kMusicVolumeSliderId,
                          kFullscreenButtonId, kSettingsBackButtonId,
                          kRtLabTitleId, kRtLabTelemetryId, kRtLabWaterfallLabelId, kRtLabWaterfallSliderId,
@@ -5658,11 +5702,11 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
 
     const int labelHeight = ScaleForDpi(window, 26);
     const int sliderHeight = ScaleForDpi(window, 38);
-    const int settingsTotal = titleHeight + 5 * buttonHeight + 2 * labelHeight + 2 * sliderHeight + 7 * gap;
+    const int settingsTotal = titleHeight + 4 * buttonHeight + 3 * labelHeight + 3 * sliderHeight + 7 * gap;
     y = std::max(ScaleForDpi(window, 54), (height - settingsTotal) / 2);
     if (HWND title = GetDlgItem(window, kSettingsTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
     y += titleAdvance;
-    for (const int id : {kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId})
+    for (const int id : {kSensitivityButtonId, kWaterQualityButtonId})
     {
         if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
         y += buttonHeight + gap;
@@ -5670,6 +5714,10 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     if (HWND label = GetDlgItem(window, kRenderScaleLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
     y += labelHeight;
     if (HWND slider = GetDlgItem(window, kRenderScaleSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, sliderHeight, TRUE);
+    y += sliderHeight + gap;
+    if (HWND label = GetDlgItem(window, kSfxVolumeLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
+    y += labelHeight;
+    if (HWND slider = GetDlgItem(window, kSfxVolumeSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, sliderHeight, TRUE);
     y += sliderHeight + gap;
     if (HWND label = GetDlgItem(window, kMusicVolumeLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
     y += labelHeight;
@@ -5890,7 +5938,7 @@ void OpenSettings(VulkanSurfaceContext& context)
     context.benchmarkReportVisible = false;
     ApplyOverlayState(context);
     PlaySoundEffect(context, "ui_select.wav");
-    SetFocus(GetDlgItem(context.windowHandle, kSfxButtonId));
+    SetFocus(GetDlgItem(context.windowHandle, kSfxVolumeSliderId));
 }
 
 LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -5961,6 +6009,18 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_HSCROLL:
+        if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kSfxVolumeSliderId))
+        {
+            sceneContext->sfxVolumePercent = horde::audio::ClampSfxVolumePercent(
+                static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)));
+            (void)SpatialAudioEngine().SetMasterVolumePercent(sceneContext->sfxVolumePercent);
+            UpdateSettingsLabels(*sceneContext);
+            if (LOWORD(wParam) != TB_THUMBTRACK)
+            {
+                SaveSettings(*sceneContext);
+            }
+            return 0;
+        }
         if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kMusicVolumeSliderId))
         {
             sceneContext->musicVolumePercent = std::clamp(
@@ -6130,13 +6190,6 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 ToggleDeveloperOverlay(*sceneContext);
                 return 0;
 #endif
-            case kSfxButtonId:
-            case kMenuSfxId:
-                sceneContext->sfxEnabled = !sceneContext->sfxEnabled;
-                SaveSettings(*sceneContext);
-                UpdateSettingsLabels(*sceneContext);
-                PlaySoundEffect(*sceneContext, "ui_select.wav");
-                return 0;
             case kSensitivityButtonId:
                 sceneContext->mouseSensitivity = sceneContext->mouseSensitivity < 0.8f ? 1.0f :
                                                  (sceneContext->mouseSensitivity < 1.2f ? 1.35f : 0.70f);
@@ -6386,7 +6439,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             {
                 const char* clip = (sceneContext->playerFootstepVariant++ & 1) == 0
                     ? "player_step_1.wav" : "player_step_2.wav";
-                PlayAmbientSoundEffect(*sceneContext, clip);
+                PlayAmbientSoundEffect(*sceneContext, clip, horde::audio::kPlayerFootstepCueGain);
                 return 0;
             }
             if (wParam == VK_F11 && (lParam & (1ll << 30)) == 0)
@@ -6623,7 +6676,6 @@ HMENU CreateApplicationMenu()
     AppendMenuA(bar, MF_POPUP, reinterpret_cast<UINT_PTR>(demo), "&Demo");
 
     HMENU settings = CreatePopupMenu();
-    AppendMenuA(settings, MF_STRING | MF_CHECKED, kMenuSfxId, "Sound &effects");
     HMENU sensitivity = CreatePopupMenu();
     AppendMenuA(sensitivity, MF_STRING, kMenuSensitivityLowId, "Low");
     AppendMenuA(sensitivity, MF_STRING | MF_CHECKED, kMenuSensitivityNormalId, "Normal");
@@ -6864,7 +6916,6 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kBenchmarkSaveButtonId, "SAVE AS...");
     createButton(kBenchmarkBackButtonId, "BACK TO MENU");
     createStatic(kSettingsTitleId, "SETTINGS  |  SAVED BESIDE THE DEMO", SS_CENTER | SS_CENTERIMAGE);
-    createButton(kSfxButtonId, "SOUND EFFECTS: ON");
     createButton(kSensitivityButtonId, "LOOK SENSITIVITY: NORMAL");
     createButton(kWaterQualityButtonId, "RT WATER: HIGH");
     createStatic(kRenderScaleLabelId, "RENDER RESOLUTION: 100%", SS_CENTER | SS_CENTERIMAGE);
@@ -6876,6 +6927,15 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     SendMessageA(renderScaleSlider, TBM_SETRANGE, TRUE, MAKELPARAM(50, 100));
     SendMessageA(renderScaleSlider, TBM_SETTICFREQ, 10, 0);
     SendMessageA(renderScaleSlider, TBM_SETPOS, TRUE, 100);
+    createStatic(kSfxVolumeLabelId, "SFX VOLUME: 100%", SS_CENTER | SS_CENTERIMAGE);
+    HWND sfxVolumeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
+                                            WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,
+                                            0, 0, 100, 38, hWnd,
+                                            reinterpret_cast<HMENU>(static_cast<INT_PTR>(kSfxVolumeSliderId)), instance, nullptr);
+    InstallControllerFocusOutline(sfxVolumeSlider);
+    SendMessageA(sfxVolumeSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 100));
+    SendMessageA(sfxVolumeSlider, TBM_SETTICFREQ, 10, 0);
+    SendMessageA(sfxVolumeSlider, TBM_SETPOS, TRUE, 100);
     createStatic(kMusicVolumeLabelId, "MUSIC VOLUME: 70%", SS_CENTER | SS_CENTERIMAGE);
     HWND musicVolumeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
                                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,

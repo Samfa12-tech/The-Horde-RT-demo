@@ -13,6 +13,33 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
+### October 2 independent SFX volume / quieter steps
+
+Windows now has a separate persisted0–100 SFX slider instead of the primary
+toggle. Legacy enabled/disabled settings migrate to100/0 without changing
+other baseline cue gains; music volume remains independent. SFX master gain
+covers active centered/positional/loop voices and has no unscaled fallback.
+Player footsteps alone reduce to0.45 cue gain on Windows and Android; Android's
+existing slider/default70/spatial inputs are retained. Both Windows audio
+controller sliders reach0; render resolution retains its own50 minimum.
+Debug/Release game builds and selected7/7 CTests each pass; Android builds both
+variants,76/76 Java tests and lint42 warnings/0 errors pass. Native objects reuse
+unchanged code; changed Java/assets are freshly staged. Both APK package checks
+pass, not installed. [Finite record](evidence/2026-10-02-sfx-volume/README.md).
+Audio/haptic manual revalidation:YES for requested SFX balance/control changes,
+not another soundtrack audition or unrelated haptic retuning.
+
+Owner cannot recall whether the prior music silence was in active gameplay or
+menus. Do not label it a proven focus bug. Native silent startup/focus-return
+regression passes in Debug and Release; the actual fresh-launch observation is
+still open. Preserve the accepted score, Core and playback architecture.
+Next: exact Windows control/balance/startup check; changed phone cuff/gain
+acceptance remains open. No phone use, main merge or publication in this run.
+
+Fresh push36997618575 and PR36997623634 for cuff checkpoint8b4433e both PASS
+GCC/Clang/MSVC, focused Vulkan CPU-host and Android lanes. This certifies that
+checkpoint's stated CI scope, not the later SFX changes or physical RT devices.
+
 ### October 2 off-UI surface owner repairs the demonstrated ANR
 
 Latest integration checkpoint: runtime22d6633 over5fc5545. Initial Host

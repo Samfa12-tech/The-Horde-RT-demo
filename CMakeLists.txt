@@ -608,6 +608,10 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_music_director_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_music_director_tests COMMAND horde_rt_music_director_tests)
 
+    add_executable(horde_rt_sfx_volume_tests tests/SfxVolumeTests.cpp)
+    target_include_directories(horde_rt_sfx_volume_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_sfx_volume_tests COMMAND horde_rt_sfx_volume_tests)
+
     add_executable(horde_rt_music_pcm_stream_tests tests/MusicPcmStreamTests.cpp)
     target_include_directories(horde_rt_music_pcm_stream_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_music_pcm_stream_tests PRIVATE horde_gameplay_simulation)

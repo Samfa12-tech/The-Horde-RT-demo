@@ -224,6 +224,24 @@ int main()
             root / "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java");
         const std::string androidBridgeSource =
             ReadTextFile(root / "android/app/src/main/cpp/android_probe_bridge.cpp");
+        check(windowsSource.find("masteringVoice_->SetVolume(") != std::string::npos &&
+              windowsSource.find("SfxVolumeLinearGain(percent)") != std::string::npos &&
+              windowsSource.find("engine.SetMasterVolumePercent(sfxVolumePercent)") != std::string::npos &&
+              windowsSource.find("engine.SetMasterVolumePercent(context.sfxVolumePercent)") != std::string::npos &&
+              windowsSource.find("PlaySoundA(") == std::string::npos,
+              "Windows centered/positional/loop SFX must use independent master gain without an unscaled fallback");
+        check(windowsSource.find("PlayAmbientSoundEffect(context, clip, horde::audio::kPlayerFootstepCueGain)") !=
+                  std::string::npos &&
+              windowsSource.find("GetPrivateProfileIntA(\"audio\", \"sfxVolume\"") != std::string::npos &&
+              windowsSource.find("WritePrivateProfileStringA(\"audio\", \"sfxVolume\"") != std::string::npos &&
+              windowsSource.find("kSfxVolumeSliderId") != std::string::npos &&
+              windowsSource.find("kSfxButtonId") == std::string::npos,
+              "Windows must persist a separate SFX slider and quiet player footsteps without another primary toggle");
+        check(androidSource.find("\"player_step_1\" : \"player_step_2\", 0.45f, stereoGains)") !=
+                  std::string::npos &&
+              androidSource.find("addSlider(panel, getString(R.string.sfx_volume)") != std::string::npos &&
+              androidSource.find("preferences.edit().putInt(\"sfx_volume\", value).apply()") != std::string::npos,
+              "Android must preserve its independent SFX slider and quieter steps with unchanged event-time stereo gains");
         check(windowsSource.find("case GameplayEventType::EnemyDefeated:") != std::string::npos &&
               windowsSource.find("context.delayedFeedback.Enqueue(") != std::string::npos &&
               windowsSource.find("PlayPositionalSoundEffect(context, \"enemy_fall.wav\"") != std::string::npos &&

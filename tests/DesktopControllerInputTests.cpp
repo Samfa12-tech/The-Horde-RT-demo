@@ -290,6 +290,12 @@ int main()
     Require(StepControllerSlider(50, false) == 50 &&
             StepControllerSlider(100, true) == 100,
             "controller slider steps must respect the 50-100 percent bounds");
+    Require(horde::platform::windows::StepControllerAudioVolume(40, false) == 30 &&
+            horde::platform::windows::StepControllerAudioVolume(40, true) == 50 &&
+            horde::platform::windows::StepControllerAudioVolume(10, false) == 0 &&
+            horde::platform::windows::StepControllerAudioVolume(0, false) == 0 &&
+            horde::platform::windows::StepControllerAudioVolume(100, true) == 100,
+            "both audio sliders must step by ten and reach mute, not inherit render-scale bounds");
     const auto confirm = MapLegacyControllerMenuEdges(
         0x001u, 0u, 65535u, 65535u, capturedBackbone);
     Require(confirm.confirm && !confirm.cancel && !confirm.togglePause,

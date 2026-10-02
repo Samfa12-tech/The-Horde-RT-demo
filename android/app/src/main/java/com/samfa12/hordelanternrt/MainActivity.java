@@ -2419,7 +2419,7 @@ public class MainActivity extends Activity {
                     switch (eventType) {
                         case PLATFORM_EVENT_PLAYER_FOOTSTEP:
                             playSpatialSound((playerStepVariant++ & 1) == 0 ?
-                                    "player_step_1" : "player_step_2", 0.62f, stereoGains);
+                                    "player_step_1" : "player_step_2", 0.45f, stereoGains);
                             break;
                         case PLATFORM_EVENT_PLAYER_SWING:
                             if (isDebuggableApp()) {

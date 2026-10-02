@@ -259,6 +259,12 @@ inline int StepControllerSlider(const int percentage, const bool increase)
     return std::clamp(percentage + (increase ? step : -step), minimum, maximum);
 }
 
+inline int StepControllerAudioVolume(const int percentage, const bool increase)
+{
+    const int bounded = std::clamp(percentage, 0, 100);
+    return std::clamp(bounded + (increase ? 10 : -10), 0, 100);
+}
+
 inline ControllerMenuEdges MapLegacyControllerMenuEdges(
     const std::uint32_t currentButtons,
     const std::uint32_t previousButtons,

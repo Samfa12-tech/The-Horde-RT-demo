@@ -52,7 +52,7 @@ The preferred backend uses Vulkan acceleration structures, an RT pipeline and sh
 - A player-facing two-pass `Run benchmark` course ends in a selectable, copyable, exportable text report and automatically archives JSON evidence.
 - A `More by Samfa12` menu button opens https://samfa12.com/ in the system browser.
 - Persisted 50-100% RT render-resolution scale, defaulting to 100%.
-- Android SFX volume and compact-HUD settings; Windows SFX, sensitivity, display-mode, and render-scale settings.
+- Separate persisted SFX/music volume sliders on Android and Windows; Android compact-HUD and Windows sensitivity, display-mode, and render-scale settings.
 - Collision-safe starting chamber and material gallery, a leashed skeleton encounter, and a three-turn moving-shadow corridor.
 - A roof-water drench that gutters and drops the lantern, clear RT reflection/refraction, a rounded catchment and drain-connected runnel, blue skylight chamber, four coloured-light bays, wet stone, fog, and a single-bounce hero mirror.
 - Low depth-clipped blue-grey ritual mist in the lich room, bounded to preserve the enemy, sword, and opening-roof sightlines.
