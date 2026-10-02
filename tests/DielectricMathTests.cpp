@@ -1,5 +1,6 @@
 #include "vulkan/raytracing/DielectricMath.h"
 #include "vulkan/raytracing/DielectricContactGeometry.h"
+#include "fixtures/PrimaryBoundaryPlanePrototype.h"
 
 #include <array>
 #include <bit>
@@ -562,8 +563,93 @@ void TestRecordedTriangleSurfacePointKeepsMicrometreExit()
           "the captured triangle surface point retains a real micrometre-scale adjacent exit above the unchanged query minimum");
 }
 
+void TestPrimaryBoundaryNearSegmentProof()
+{
+    using namespace horde::vulkan::raytracing::investigation;
+    const RtPrimaryBoundaryBounds bounds{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, true};
+    const std::array<float, 12u> identity{{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0}};
+    const std::array<float, 3u> direction{{1.0f, 0.0f, 0.0f}};
+    const auto lower = BuildPrimaryBoundaryPlane(bounds, identity, {-2.0f, 0.0f, 0.0f});
+    const auto upper = BuildPrimaryBoundaryPlane(bounds, identity, {2.0f, 0.0f, 0.0f});
+    Check(lower.axisPlusOne == 1u && lower.negativeHalfSpace && lower.coordinate < -1.004f &&
+              upper.axisPlusOne == 1u && !upper.negativeHalfSpace && upper.coordinate > 1.004f,
+          "qualification planes enclose source bounds and the complete unchanged near interval outward");
+    Check(PrimaryBoundaryNearSegmentOutside(lower, {-2.0f, 0.0f, 0.0f}, direction, 0.002f) &&
+              PrimaryBoundaryNearSegmentOutside(upper, {2.0f, 0.0f, 0.0f}, direction, 0.002f),
+          "a separated primary origin certifies either exterior half-space without changing the ray");
+    Check(!PrimaryBoundaryNearSegmentOutside(lower, {-1.001f, 0.0f, 0.0f}, direction, 0.002f) &&
+              !PrimaryBoundaryNearSegmentOutside(upper, {0.0f, 0.0f, 0.0f}, direction, 0.002f) &&
+              !PrimaryBoundaryNearSegmentOutside(upper, {upper.coordinate, 0.0f, 0.0f}, direction, 0.002f),
+          "clipped entries, inside/nested origins and touching bounds cannot certify primary exit rejection");
+    Check(!PrimaryBoundaryNearSegmentOutside(upper, {2.0f, 0.0f, 0.0f}, {3.0f, 0.0f, 0.0f}, 0.002f) &&
+              !PrimaryBoundaryNearSegmentOutside(upper, {2.0f, 0.0f, 0.0f}, direction, 0.003f) &&
+              !PrimaryBoundaryNearSegmentOutside({}, {2.0f, 0.0f, 0.0f}, direction, 0.002f),
+          "unsupported ray bounds and absent certificates remain native fallbacks");
+    auto reflected = identity;
+    reflected[0] = -1.0f;
+    auto singular = identity;
+    singular[5] = 0.0f;
+    auto nonfinite = identity;
+    nonfinite[3] = std::numeric_limits<float>::infinity();
+    auto overflowing = identity;
+    overflowing[0] = std::numeric_limits<float>::max();
+    overflowing[5] = std::numeric_limits<float>::max();
+    overflowing[10] = std::numeric_limits<float>::max();
+    const float largest = std::numeric_limits<float>::max();
+    Check(BuildPrimaryBoundaryPlane(bounds, reflected, {2.0f, 0.0f, 0.0f}).axisPlusOne == 0u &&
+              BuildPrimaryBoundaryPlane(bounds, singular, {2.0f, 0.0f, 0.0f}).axisPlusOne == 0u &&
+              BuildPrimaryBoundaryPlane(bounds, nonfinite, {2.0f, 0.0f, 0.0f}).axisPlusOne == 0u,
+          "unknown winding parity, singular and nonfinite transforms cannot certify a boundary plane");
+    Check(BuildPrimaryBoundaryPlane({{-largest, -largest, -largest}, {largest, largest, largest}, true},
+                                    overflowing, {0.0f, 0.0f, 0.0f}).axisPlusOne == 0u,
+          "finite inputs exceeding the representable GPU plane domain fall back before narrowing");
+    // The nominal CPU camera selects an axis only. The actual bobbed shader
+    // origin may cross back inside and must then retain ordinary traversal.
+    Check(!PrimaryBoundaryNearSegmentOutside(lower, {-0.99f, 0.0f, 0.0f}, direction, 0.002f),
+          "actual shader origin, not a nominal camera flag, controls near-segment qualification");
+}
+
+void TestOutsideOriginKeepsExactBoundaryTouch()
+{
+    using namespace horde::vulkan::raytracing::investigation;
+    const RtPrimaryBoundaryBounds bounds{{-1, -1, -1}, {1, 1, 1}, true};
+    const std::array<float, 12u> identity{{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0}};
+    const std::array<float, 3u> origin{{-2, 0, 0}};
+    const float component = std::sqrt(0.5f);
+    const std::array<float, 3u> direction{{component, component, 0}};
+    const auto plane = BuildPrimaryBoundaryPlane(bounds, identity, origin);
+    Check(PrimaryBoundaryNearSegmentOutside(plane, origin, direction, 0.002f),
+          "an exact corner-touch ray still has a certified exterior near segment");
+
+    // Equal binary32 x/y direction components give equal exact slab times.
+    // The ray touches (-1,1,0): left entry and top exit coincide, with no
+    // positive-length interval inside the cube. Outward top winding is +Y.
+    const std::array<Vec3, 3u> top{{{-1, 1, -1}, {-1, 1, 1}, {1, 1, 1}}};
+    const Vec3 point{-1, 1, 0};
+    const float u = 0.5f, v = 0.0f;
+    const Vec3 reconstructed{
+        top[0].x * (1-u-v) + top[1].x*u + top[2].x*v,
+        top[0].y * (1-u-v) + top[1].y*u + top[2].y*v,
+        top[0].z * (1-u-v) + top[1].z*u + top[2].z*v};
+    const double entryTime = (-1.0-double(origin[0]))/double(direction[0]);
+    const double exitTime = (1.0-double(origin[1]))/double(direction[1]);
+    const auto topOrientation = OrientInterface({component, component, 0}, {0, 1, 0});
+    Check(reconstructed.x == point.x && reconstructed.y == point.y &&
+              reconstructed.z == point.z && u >= 0 && v >= 0 && u+v <= 1 &&
+              entryTime == exitTime && entryTime > 0.002 && !topOrientation.entering,
+          "a native backface may be a genuine closed-volume edge touch despite an outside origin");
+    Check(SchlickFresnel(component, 1.0f, 1.5f) > 0.0f,
+          "a valid edge surface cannot be silently erased on the assumption that zero interior length means no reflection");
+    // No traversal promise supplies the simultaneous front face. This test is
+    // a NO-GO witness for blanket backface rejection, not an alternative tracer
+    // or a new optical policy for corner ownership.
+}
+
 void TestRecordedRow43OutsideOriginCornerRejectsFirstExit()
 {
+    using horde::vulkan::raytracing::investigation::BuildPrimaryBoundaryPlane;
+    using horde::vulkan::raytracing::investigation::PrimaryBoundaryNearSegmentOutside;
+    using horde::vulkan::raytracing::investigation::RtPrimaryBoundaryBounds;
     // Investigation witnesses are retained under
     // docs/evidence/2026-09-30-glass-spawn/derived-normal-bias/row43/:
     // native-path.json decodes 11-finale-roof.png, SHA-256
@@ -718,6 +804,16 @@ void TestRecordedRow43OutsideOriginCornerRejectsFirstExit()
     }};
     const std::array<double, 2u> exactWorldExitV{{-2.2272837458911408e-7, -3.5984283192344683e-7}};
     const std::array<double, 2u> exactWorldEntryT{{0.8082922814899058, 0.8082922320854496}};
+    const RtPrimaryBoundaryBounds cornerBounds{
+        {-0.22f, -0.70f, -0.22f}, {0.22f, -0.30f, 0.22f}, true};
+    std::array<float, 12u> rowMajorTransform{};
+    for (std::size_t row = 0u; row < 3u; ++row)
+        for (std::size_t column = 0u; column < 4u; ++column)
+            rowMajorTransform[row * 4u + column] = static_cast<float>(objectToWorld[column][row]);
+    const auto primaryPlane = BuildPrimaryBoundaryPlane(cornerBounds, rowMajorTransform,
+        {-10.649999618530273f, 0.699999988079071f, -15.199999809265137f});
+    Check(primaryPlane.axisPlusOne != 0u,
+          "recorded positive-winding held-lantern transform admits a bounded source-box qualification plane");
     for (std::size_t backend = 0u; backend < worldDirections.size(); ++backend)
     {
         const ReferenceHit worldExit = referenceDoubleHit(
@@ -731,6 +827,12 @@ void TestRecordedRow43OutsideOriginCornerRejectsFirstExit()
         Check(worldEntry.determinant > 0.0 && worldEntry.insideTriangle &&
                   worldEntry.t > worldExit.t && std::abs(worldEntry.t - exactWorldEntryT[backend]) < 1.0e-12,
               "each actual world ray preserves the genuine primitive9 entry under the source transform");
+        std::array<float, 3u> direction{};
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+            direction[axis] = static_cast<float>(worldDirections[backend][axis]);
+        Check(PrimaryBoundaryNearSegmentOutside(primaryPlane,
+                  {-10.649999618530273f, 0.699999988079071f, -15.199999809265137f}, direction, 0.002f),
+              "both recorded world-ray near segments are outside the conservative component enclosure");
     }
     // The independent TestRecordedTriangleSurfacePointKeepsMicrometreExit
     // covers a distinct valid short exit; this row43 assertion rejects an
@@ -1190,6 +1292,8 @@ int main()
     TestGenericShadowOriginKeepsMillimetreClearance();
     TestClosedPaneEntryNearEdgeKeepsExitReachable();
     TestRecordedTriangleSurfacePointKeepsMicrometreExit();
+    TestPrimaryBoundaryNearSegmentProof();
+    TestOutsideOriginKeepsExactBoundaryTouch();
     TestRecordedRow43OutsideOriginCornerRejectsFirstExit();
     TestRecordedHighGlassFloorContactKeepsBothSurfaces();
     TestConservativeGeometricContactQualification();
