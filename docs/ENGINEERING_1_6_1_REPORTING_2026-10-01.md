@@ -16,9 +16,11 @@ repeat. [Single delivery receipt](evidence/2026-10-02-s26-report-send/README.md)
 The subsequent rapid-resume ANR is independently traced to UI-thread Vulkan
 pipeline startup and repaired at242e573; it is not evidence of HTTP/music
 causation. [Separate lifecycle record](evidence/2026-10-02-s26-surface-session/README.md).
-Full-game Windows preparation/preview/cancel remains open after the native
-helper addressing limitation; separate passing injected UI tests are not that
-interaction. Earlier preparation-only and approval-pending statements below
+Owner subsequently confirms the actual Windows full-game preparation/preview/
+context/cancel sequence works on Debug executable242ac2aa and supplies the READY
+form/game-only preview screenshot. [Owner acceptance](evidence/2026-10-02-windows-report-ui/README.md)
+closes the native-helper-limited interaction row, not a second email delivery.
+Earlier preparation-only, helper-limited and approval-pending statements below
 describe their historical checkpoint, not the current delivery state.
 
 Exact S26 Debug preparation/lifecycle admission now passes on retained APK
