@@ -39,7 +39,7 @@ inline constexpr std::array<RtPipelineCatalogRecord, 2> kSelectedRtPipelineCatal
 #elif HORDE_RT_SELECTED_INSTRUMENTATION == 1 && HORDE_RT_SELECTED_DIELECTRIC_QUALITY == 1
 inline constexpr std::array<RtPipelineCatalogRecord, 2> kSelectedRtPipelineCatalog{
     RtPipelineCatalogRecord{{RtInstrumentation::Diagnostic, DielectricQuality::High, RtMaterialStrategy::OpaqueFast}, "diagnostic_high_opaque_fast", "src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc", "16d0ef63835536601d48a8c8680659fda048e644cf109896bba94ac6c13e3f0c", "aa66f631084ecedbd14e15213296eaadb0978fc3d2a8940a974157da3f392a24", 126512, 5, true},
-    RtPipelineCatalogRecord{{RtInstrumentation::Diagnostic, DielectricQuality::High, RtMaterialStrategy::GenericDielectric}, "diagnostic_high_generic_dielectric", "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc", "c0f66e1124a120f901541245194457e9518b14398b5938b1737667ad08f25edf", "fb4dcd37c80d798c790665f14ccc1aa5d3e3a0f861adb3679e4c86899d035e1c", 70004, 41, true}};
+    RtPipelineCatalogRecord{{RtInstrumentation::Diagnostic, DielectricQuality::High, RtMaterialStrategy::GenericDielectric}, "diagnostic_high_generic_dielectric", "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc", "f663fe89a91fca8601d3665cb544818b8d823b01d41ec94df96ca8f443b9380e", "8fc9a68544673fb7518c09a8f7ea7aea4b1abd5ab87df73a7ba01b68ddbbe734", 81318, 41, true}};
 #else
 #error "Unsupported exact RT raygen bundle policy."
 #endif

@@ -2,8 +2,13 @@ param([Parameter(Mandatory)][string]$CandidateRoot,
       [Parameter(Mandatory)][string]$ControlPipelineDirectory,
       [string]$ControlComputeDirectory,
       [Parameter(Mandatory)][string]$OutputPath,[switch]$HighFixtures,[switch]$ShippingParity,[switch]$EdgeWitness,
-      [string]$ControlSourceCommit)
+      [string]$ControlSourceCommit,[switch]$RemainingHighFixtures,[switch]$ObserverPayload)
 $ErrorActionPreference = 'Stop'
+if($RemainingHighFixtures -and (-not $HighFixtures -or $EdgeWitness -or $ShippingParity)) {
+    throw 'Remaining High comparison is the two held-lantern Diagnostic fixtures only.'
+}
+if($ObserverPayload -and (-not $HighFixtures -or $ShippingParity)) { throw 'Witness payload is High Diagnostic only.' }
+$payloadRows = if($EdgeWitness -or $ObserverPayload){1}else{0}
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $controlCommit = 'd9be81e77493d7e5c9af01604f865d0d3ef11e48'
 if($EdgeWitness) {
@@ -24,6 +29,12 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 public static class HordeCleanCandidatePixels {
+    public static bool HasWitness(string path) {
+        using(var image=new Bitmap(path)) {
+            var a=image.GetPixel(0,0); var b=image.GetPixel(1,0);
+            return BitConverter.ToSingle(new byte[]{a.R,a.G,a.B,b.R},0)==12345f;
+        }
+    }
     public static object Read(string left, string right, int skipRows=0) {
         using(var a=new Bitmap(left)) using(var b=new Bitmap(right)) {
             if(a.Width!=960 || a.Height!=540 || a.Size!=b.Size)
@@ -75,6 +86,9 @@ function Read-Run([string]$Directory,[string]$Backend,[bool]$Candidate,[string]$
             $p.honestlyPresentedRtFrame -and $p.pixelFormat -ceq 'RGBA8' -and
             $p.outputRedBlueSwapAppliedAndNormalised) "Capture presentation mismatch: $Directory/$i"
         Require ((Get-FileHash (Join-Path $Directory $p.file)).Hash.ToLowerInvariant() -ceq $p.pngSha256) "PNG hash mismatch: $Directory/$i"
+        if($Candidate -and $payloadRows -eq 1) {
+            Require ([HordeCleanCandidatePixels]::HasWitness((Join-Path $Directory $p.file))) "Missing labelled observer payload: $Directory/$i"
+        }
         foreach($name in @('viewmodelGeometry','playerWorldBodyGeometry')) {
             $g=$p.$name
             Require ($g.available -and $g.space -ceq 'model' -and $g.source -ceq 'cpu-upload' -and
@@ -101,7 +115,7 @@ function Compare-Runs($Left,$Right,[string]$Label) {
         }
         [ordered]@{checkpoint=$p.checkpoint;file=$p.file;leftSha256=$p.pngSha256;rightSha256=$q.pngSha256;
             leftPrimaryPixels=$p.visibility.primaryPixels;rightPrimaryPixels=$q.visibility.primaryPixels;
-            comparison=[HordeCleanCandidatePixels]::Read((Join-Path $Left.directory $p.file),(Join-Path $Right.directory $q.file),$(if($EdgeWitness){1}else{0}))}
+            comparison=[HordeCleanCandidatePixels]::Read((Join-Path $Left.directory $p.file),(Join-Path $Right.directory $q.file),$payloadRows)}
     }
     [ordered]@{label=$Label;passed=(@($rows|Where-Object {-not $_.comparison.unchangedGate}).Count -eq 0);
         leftManifestSha256=(Get-FileHash (Join-Path $Left.directory 'capture-manifest.json')).Hash.ToLowerInvariant();
@@ -121,6 +135,7 @@ if($ShippingParity) {
 } elseif($HighFixtures) {
     $comparisons=@(foreach($checkpoint in @('glass-edge-fresnel','lantern-held-high','lantern-held-low')) {
         if($EdgeWitness -and $checkpoint -cne 'glass-edge-fresnel'){continue}
+        if($RemainingHighFixtures -and $checkpoint -ceq 'glass-edge-fresnel'){continue}
         $expected=@($checkpoint)
         $pipeline=Read-Run (Join-Path $CandidateRoot "pipeline/$checkpoint") 'RayTracingPipeline' $true
         $compute=Read-Run (Join-Path $CandidateRoot "compute/$checkpoint") 'RayQueryCompute' $true
@@ -144,7 +159,7 @@ if($ShippingParity) {
         (Compare-Runs $controlCompute $compute 'compute-old-control-differences'))
 }
 [ordered]@{schema=1;controlSource=$controlCommit;runReceipt=Get-Content (Join-Path $CandidateRoot 'run-receipt.json') -Raw|ConvertFrom-Json;
-    payloadRows=$(if($EdgeWitness){1}else{0});pixelTolerance=[ordered]@{maximumChannelDifference=3;maximumFractionOverOne=0.001};
+    payloadRows=$payloadRows;pixelTolerance=[ordered]@{maximumChannelDifference=3;maximumFractionOverOne=0.001};
     performanceEvidence=$false;shippingDiagnosticMatrix=[bool]$ShippingParity;comparisons=$comparisons}|
     ConvertTo-Json -Depth 14|Set-Content -LiteralPath $OutputPath -Encoding utf8NoBOM
 foreach($comparison in $comparisons) {

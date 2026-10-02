@@ -1,5 +1,8 @@
-param([Parameter(Mandatory)][string]$OutputRoot,[switch]$HighFixtures,[switch]$ControlHighComputeOnly,[switch]$Shipping,[switch]$EdgeWitness)
+param([Parameter(Mandatory)][string]$OutputRoot,[switch]$HighFixtures,[switch]$ControlHighComputeOnly,[switch]$Shipping,[switch]$EdgeWitness,[switch]$RemainingHighFixtures)
 $ErrorActionPreference = 'Stop'
+if($RemainingHighFixtures -and (-not $HighFixtures -or $EdgeWitness -or $ControlHighComputeOnly -or $Shipping)) {
+    throw 'Remaining High fixtures are the two held-lantern Diagnostic candidate fixtures only.'
+}
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 if($EdgeWitness -and (-not $HighFixtures -or $Shipping -or $ControlHighComputeOnly)) {
     throw 'The isolated edge witness is High Diagnostic candidate only.'
@@ -29,6 +32,7 @@ $matrix = foreach ($backend in @('pipeline', 'compute')) {
     if ($HighFixtures) {
         foreach ($checkpoint in @('glass-edge-fresnel','lantern-held-high','lantern-held-low')) {
             if($EdgeWitness -and $checkpoint -cne 'glass-edge-fresnel'){continue}
+            if($RemainingHighFixtures -and $checkpoint -ceq 'glass-edge-fresnel'){continue}
             [pscustomobject]@{backend=$backend;checkpoint=$checkpoint;directory="$backend/$checkpoint";label="$backend-$checkpoint"}
         }
     } else {

@@ -15,6 +15,46 @@ int investigationInterfaceCount = 0;
 bool investigationContactObserved = false;
 vec4 investigationContact[13]; // Header/ray + nearest exit and opaque candidate.
 uvec2 investigationContactWorldPlane;
+#ifdef HORDE_EXACT_AXIS_CONTACT
+bool investigationContactConsumed = false;
+ContactReceiver investigationConsumedReceiver;
+vec3 investigationContactOutgoing;
+
+uint contactMathWitness()
+{
+    // Finite GPU checks of the actual port, including rounded-away gaps. These
+    // supplement CPU reference tests; they are not image/driver certification.
+    uint result = 0u;
+    ContactReceiver floor = ContactReceiver(true, 486, floatBitsToUint(-0.95), 2u);
+    vec3 a = vec3(-0.5), b = vec3(0.5, -0.5, -0.5), c = vec3(0.5, -0.5, 0.5);
+    mat4x3 transform = mat4x3(vec3(0.2, 0.0, 0.0), vec3(0.0, 1.25, 0.0),
+        vec3(0.0, 0.0, 0.85), vec3(-9.06, -0.325, -15.2464));
+    if (contactOpposedPlane(a, b, c, transform, floor)) result |= 1u;
+    transform[3].y = uintBitsToFloat(floatBitsToUint(-0.325) - 1u);
+    if (!contactOpposedPlane(a, b, c, transform, floor)) result |= 2u;
+    if (!contactExactAffine(128.0, 0.5, exp2(-20.0), 64.0) &&
+        !contactExactAffine(128.0, 0.5, -exp2(-20.0), 64.0)) result |= 4u;
+    if (contactExactAffine(1.0, 1.0, -0.5, 0.5) &&
+        contactExactAffine(-1.0, 1.0, 0.5, -0.5)) result |= 8u;
+    if (!contactExactAffine(1.25, 0.75, 0.0, 0.9375)) result |= 16u;
+    if (contactInteriorBary(vec2(0.7147344, 0.20536497)) &&
+        !contactInteriorBary(vec2(0.0, 0.5)) && !contactInteriorBary(vec2(0.5))) result |= 32u;
+    if (contactOutgoingIntoReceiver(floor, vec3(0.65, -0.18, 0.738)) &&
+        !contactOutgoingIntoReceiver(floor, vec3(0.0, 1.0, 0.0)) &&
+        !contactOutgoingIntoReceiver(floor, vec3(1.0, 0.0, 0.0))) result |= 64u;
+    transform[3].y = -0.325;
+    transform[2].x = 0.125;
+    if (!contactOpposedPlane(a, b, c, transform, floor)) result |= 128u;
+    transform[2].x = 0.0;
+    if (!contactOpposedPlane(a, c, b, transform, floor)) result |= 256u;
+    if (contactFallbackWorldWins(true, true, 0.317, 0.317) &&
+        !contactFallbackWorldWins(true, false, 0.317, 0.317) &&
+        contactFallbackWorldWins(false, false, 10000.0, 10000.0) &&
+        contactFallbackWorldWins(true, false, 0.318, 0.317) &&
+        !contactFallbackWorldWins(true, true, 0.316, 0.317)) result |= 512u;
+    return result;
+}
+#endif
 
 int backendWitnessRow()
 {
@@ -215,4 +255,16 @@ void backendWitness(HitInfo primary, vec3 direction, vec3 origin,
         backendWitnessFloat(0, 334, float(investigationContactWorldPlane.y));
         backendWitnessFloat(0, 335, float(worldSurfaces.values.length()));
     }
+#ifdef HORDE_EXACT_AXIS_CONTACT
+    backendWitnessFloat(0, 336, 4321.0);
+    backendWitnessFloat(0, 337, investigationContactConsumed ? 1.0 : 0.0);
+    if (investigationContactConsumed)
+    {
+        backendWitnessFloat(0, 338, float(investigationConsumedReceiver.primitive));
+        backendWitnessFloat(0, 339, uintBitsToFloat(investigationConsumedReceiver.coordinateBits));
+        backendWitnessFloat(0, 340, float(investigationConsumedReceiver.flags));
+        backendWitnessVector(341, investigationContactOutgoing);
+    }
+    backendWitnessFloat(0, 344, float(contactMathWitness()));
+#endif
 }

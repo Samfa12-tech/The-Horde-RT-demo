@@ -1,6 +1,11 @@
 // One per-pixel implementation; launchers supply only stage and pixel builtins.
 #include "rt_scene_abi.glsl"
 #include "rt_diagnostics.glsl"
+#if HORDE_RT_VARIANT_INSTRUMENTATION == HORDE_RT_INSTRUMENTATION_DIAGNOSTIC && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_HIGH && HORDE_RT_VARIANT_MATERIAL == HORDE_RT_MATERIAL_GENERIC_DIELECTRIC
+// Isolated, unadmitted contact-policy prototype. Normal Shipping is untouched.
+#define HORDE_EXACT_AXIS_CONTACT
+#include "../experimental/axis_contact_geometry.glsl"
+#endif
 #include "rt_lighting.glsl"
 #if HORDE_RT_VARIANT_INSTRUMENTATION == HORDE_RT_INSTRUMENTATION_DIAGNOSTIC && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_HIGH && HORDE_RT_VARIANT_MATERIAL == HORDE_RT_MATERIAL_GENERIC_DIELECTRIC
 #define HORDE_HIGH_EDGE_WITNESS

@@ -504,6 +504,10 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
 #endif
     bool volumeOpen = false;
     bool volumeCertified = false;
+#ifdef HORDE_EXACT_AXIS_CONTACT
+    bool volumeRectangular = false;
+    ContactReceiver pendingReceiver = noContactReceiver();
+#endif
     uint volumeInstance = 0u;
     uint volumeMaterial = 0u;
     float volumeIor = 1.0;
@@ -621,6 +625,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
             ? transmissionDirection
             : refract(transmissionDirection, orientedNormal,
                       incidentIor / max(transmittedIor, 1.0));
+#ifdef HORDE_EXACT_AXIS_CONTACT
+        bool exitedContact = false;
+#endif
 
         if (!thinWall && dot(idealTransmission, idealTransmission) < 0.25)
         {
@@ -649,6 +656,10 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 volumeCertified =
                     (currentHit.materialFlags &
                      kRtMaterialFlagCertifiedClosedVolume) != 0u;
+#ifdef HORDE_EXACT_AXIS_CONTACT
+                volumeRectangular =
+                    (currentHit.materialFlags & kRtMaterialFlagCertifiedRectangularVolume) != 0u;
+#endif
                 volumeInstance = currentHit.instance;
                 volumeMaterial = uint(currentHit.material);
                 volumeIor = currentHit.ior;
@@ -665,6 +676,12 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                     overflowed = true;
                     break;
                 }
+#ifdef HORDE_EXACT_AXIS_CONTACT
+                // Only a real matching, non-TIR exit can transfer receiver
+                // ownership. TIR above never closes/consumes this contact.
+                exitedContact = volumeCertified && volumeRectangular && pendingReceiver.valid;
+                volumeRectangular = false;
+#endif
                 volumeOpen = false;
                 volumeCertified = false;
             }
@@ -678,14 +695,41 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 (1.0 - fresnel);
         }
 
+#ifdef HORDE_EXACT_AXIS_CONTACT
+        if (exitedContact && contactOutgoingIntoReceiver(pendingReceiver, transmissionDirection))
+        {
+#ifdef HORDE_HIGH_EDGE_WITNESS
+            if (backendWitnessRow() >= 0)
+            {
+                investigationContactConsumed = true;
+                investigationConsumedReceiver = pendingReceiver;
+                investigationContactOutgoing = transmissionDirection;
+            }
+            investigationQueryOrigin = currentHit.position;
+            investigationQueryMinimum = 0.0;
+            investigationSpawnEpsilon = 0.0;
+#endif
+            currentHit = contactReceiverHit(pendingReceiver, currentHit);
+            pendingReceiver = noContactReceiver();
+            continue;
+        }
+#endif
         float epsilon = dielectricSpawnEpsilon(currentHit, totalDistance);
         vec3 nextOrigin = advanceDielectricRayOrigin(
             dielectricSpawnPoint(currentHit), outwardNormal, transmissionDirection, epsilon);
         float advancedDistance = max(
             dot(nextOrigin - currentHit.position, transmissionDirection), 0.0);
+#ifdef HORDE_EXACT_AXIS_CONTACT
+        HitInfo nextHit = traceSceneContact(
+            nextOrigin, transmissionDirection, 10000.0, 0x23u,
+            dielectricQueryMinimum(currentHit), false, false,
+            volumeOpen && volumeCertified && volumeRectangular,
+            uvec2(volumeInstance, volumeMaterial), pendingReceiver);
+#else
         HitInfo nextHit = traceScene(
             nextOrigin, transmissionDirection, 10000.0, 0x23u,
             dielectricQueryMinimum(currentHit), false, false);
+#endif
 #ifdef HORDE_HIGH_EDGE_WITNESS
         if (interfaceIndex == 4 && volumeOpen)
             backendWitnessContactCandidates(nextOrigin, transmissionDirection,

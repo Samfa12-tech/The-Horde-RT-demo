@@ -169,4 +169,57 @@ inline bool MatchesAxisContactPlane(const AxisContactPlane& receiver,
         localPlane, exitTransformRow[3], receiver.coordinate);
 }
 
+inline bool MatchesOpposedAxisContactPlane(const AxisContactPlane& receiver,
+    const std::array<Vec3, 3u>& exitTriangle,
+    const std::array<std::array<float, 4u>, 3u>& transformRows)
+{
+    if (receiver.axis >= 3u) return false;
+    std::array<std::uint32_t, 3u> localAxes{3u, 3u, 3u};
+    int determinantSign = 1;
+    for (std::uint32_t row = 0u; row < 3u; ++row)
+    {
+        if (!contact_detail::EligibleOperand(transformRows[row][3])) return false;
+        for (std::uint32_t column = 0u; column < 3u; ++column)
+        {
+            const float value = transformRows[row][column];
+            if (!contact_detail::EligibleOperand(value)) return false;
+            if (value == 0.0f) continue;
+            if (localAxes[row] != 3u) return false;
+            localAxes[row] = column;
+            determinantSign *= value < 0.0f ? -1 : 1;
+        }
+        if (localAxes[row] == 3u) return false;
+    }
+    for (std::uint32_t row = 0u; row < 3u; ++row)
+        for (std::uint32_t other = row + 1u; other < 3u; ++other)
+        {
+            if (localAxes[row] == localAxes[other]) return false;
+            if (localAxes[row] > localAxes[other]) determinantSign = -determinantSign;
+        }
+    if (!MatchesAxisContactPlane(receiver, exitTriangle, transformRows[receiver.axis])) return false;
+    const auto localAxis = localAxes[receiver.axis];
+    const int winding = contact_detail::AxisTriangleWinding(exitTriangle, localAxis);
+    const int scaleSign = transformRows[receiver.axis][localAxis] < 0.0f ? -1 : 1;
+    return winding * determinantSign * scaleSign == -static_cast<int>(receiver.outwardSign);
+}
+
+inline bool NativeContactInterior(float baryX, float baryY)
+{
+    return std::isfinite(baryX) && std::isfinite(baryY) &&
+        baryX > 0.0f && baryY > 0.0f && baryX + baryY < 1.0f;
+}
+
+inline bool OutgoingIntoContactReceiver(const AxisContactPlane& receiver, const Vec3& direction)
+{
+    return receiver.axis < 3u && (receiver.outwardSign == 1.0f || receiver.outwardSign == -1.0f) &&
+        contact_detail::Component(direction, receiver.axis) * receiver.outwardSign < 0.0f;
+}
+
+inline bool ContactFallbackWorldWins(bool selectedHit, bool selectedIsDeferredExit,
+                                    float selectedT, float worldT)
+{
+    return !selectedHit || worldT < selectedT ||
+        (selectedIsDeferredExit && worldT == selectedT);
+}
+
 } // namespace horde::vulkan::raytracing

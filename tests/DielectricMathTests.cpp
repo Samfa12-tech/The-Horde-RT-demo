@@ -898,6 +898,104 @@ void TestConservativeGeometricContactQualification()
           "geometric coincidence does not consume an opaque receiver or pop the volume during TIR");
 }
 
+void TestOpposedNativeContactAdmission()
+{
+    using namespace horde::vulkan::raytracing;
+    const std::array<Vec3, 3u> bottom{{
+        {-0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, 0.5f}}};
+    using Rows = std::array<std::array<float, 4u>, 3u>;
+    const Rows actual{{{0.2f, 0.0f, 0.0f, -9.06f},
+                       {0.0f, 1.25f, 0.0f, -0.325f},
+                       {0.0f, 0.0f, 0.85f, -15.2464f}}};
+    const AxisContactPlane floor{1u, -0.95f, 1.0f};
+    Check(MatchesOpposedAxisContactPlane(floor, bottom, actual),
+          "recorded native glass exit has exactly the receiver plane and opposed winding");
+    auto shear = actual;
+    shear[0][2] = 0.125f;
+    Check(!MatchesOpposedAxisContactPlane(floor, bottom, shear),
+          "shear outside the plane row cannot bypass full transformed-winding qualification");
+    auto collapsed = actual;
+    collapsed[0][0] = 0.0f;
+    Check(!MatchesOpposedAxisContactPlane(floor, bottom, collapsed),
+          "collapsed linear transforms remain uncertified");
+    auto reversed = bottom;
+    std::swap(reversed[1], reversed[2]);
+    Check(!MatchesOpposedAxisContactPlane(floor, reversed, actual),
+          "plane coincidence with a nonopposed exit winding is not a contact");
+    auto gap = actual;
+    gap[1][3] = std::nextafter(gap[1][3], 0.0f);
+    Check(!MatchesOpposedAxisContactPlane(floor, bottom, gap),
+          "full transform qualifier still rejects the real one-step air gap");
+
+    // Independent transformed cross-product reference. Dyadic fixture inputs
+    // make these double transforms/differences exact; all48 signed axis maps.
+    std::array<std::uint32_t, 3u> permutation{0u, 1u, 2u};
+    unsigned cases = 0;
+    do
+    {
+        for (unsigned signs = 0; signs < 8u; ++signs)
+        {
+            Rows rows{};
+            std::uint32_t receiverAxis = 3u;
+            for (std::uint32_t row = 0u; row < 3u; ++row)
+            {
+                const float scale = std::ldexp((signs & (1u << row)) != 0u ? -1.0f : 1.0f, row);
+                rows[row][permutation[row]] = scale;
+                if (permutation[row] == 1u)
+                {
+                    receiverAxis = row;
+                    rows[row][3] = -0.25f * scale;
+                }
+            }
+            std::array<std::array<double, 3u>, 3u> points{};
+            for (unsigned vertex = 0; vertex < 3u; ++vertex)
+                for (unsigned row = 0; row < 3u; ++row)
+                    points[vertex][row] = rows[row][3] +
+                        static_cast<double>(rows[row][permutation[row]]) *
+                        contact_detail::Component(bottom[vertex], permutation[row]);
+            const auto u = (receiverAxis + 1u) % 3u;
+            const auto v = (receiverAxis + 2u) % 3u;
+            const double cross = (points[1][u] - points[0][u]) * (points[2][v] - points[0][v]) -
+                (points[1][v] - points[0][v]) * (points[2][u] - points[0][u]);
+            const AxisContactPlane receiver{receiverAxis,
+                static_cast<float>(points[0][receiverAxis]), cross < 0.0 ? 1.0f : -1.0f};
+            Check(MatchesOpposedAxisContactPlane(receiver, bottom, rows) &&
+                      !MatchesOpposedAxisContactPlane(
+                          {receiver.axis, receiver.coordinate, -receiver.outwardSign}, bottom, rows),
+                  "signed permutation parity agrees with independent exact transformed winding");
+            ++cases;
+        }
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+    Check(cases == 48u, "all48 signed axis permutations were tested");
+    Check(NativeContactInterior(0.7147344f, 0.20536497f) &&
+              NativeContactInterior(0.4051459f, 0.56905514f) &&
+              !NativeContactInterior(0.0f, 0.5f) && !NativeContactInterior(0.5f, 0.5f) &&
+              !NativeContactInterior(-0.01f, 0.5f) && !NativeContactInterior(0.6f, 0.5f) &&
+              !NativeContactInterior(std::numeric_limits<float>::quiet_NaN(), 0.5f) &&
+              !NativeContactInterior(0.5f, std::numeric_limits<float>::infinity()),
+          "actual native interiors qualify, but edges/out-of-range/nonfinite barycentrics do not");
+    DielectricStack<4u> stack;
+    stack.Enter(9u, 107u, 1.52f);
+    const Vec3 incident{0.42783222f, -0.7623293f, 0.4856065f};
+    const auto exit = OrientInterface(incident, {0.0f, -1.0f, 0.0f});
+    Vec3 outgoing{};
+    const bool transmits = RefractDirection(incident, exit.normal, 1.52f, 1.0f, outgoing);
+    if (transmits) stack.Exit(9u, 107u);
+    Check(transmits && stack.Depth() == 0u && OutgoingIntoContactReceiver(floor, outgoing) &&
+              ResolveDielectricTerminal(stack.Depth(), DielectricTerminalKind::Opaque) ==
+                  DielectricTerminalResolution::ShadeTerminal,
+          "real non-TIR exit closes the medium before the contact receiver can be shaded");
+    Check(!OutgoingIntoContactReceiver(floor, {0.0f, 1.0f, 0.0f}) &&
+              !OutgoingIntoContactReceiver(floor, {1.0f, 0.0f, 0.0f}),
+          "away/tangent outgoing directions cannot consume the contact receiver");
+    Check(ContactFallbackWorldWins(true, true, 0.317f, 0.317f) &&
+              !ContactFallbackWorldWins(true, false, 0.317f, 0.317f) &&
+              ContactFallbackWorldWins(false, false, 10000.0f, 10000.0f) &&
+              ContactFallbackWorldWins(true, false, 0.318f, 0.317f) &&
+              !ContactFallbackWorldWins(true, true, 0.316f, 0.317f),
+          "rejected exact exit/receiver ties keep the opaque hit without masking another confirmed blocker");
+}
+
 void TestBoundedTirAndWaterTerminationContracts()
 {
     Check(ResolveDielectricInterfaceBudget(1u, 8u) ==
@@ -1044,6 +1142,7 @@ int main()
     TestRecordedRow43OutsideOriginCornerRejectsFirstExit();
     TestRecordedHighGlassFloorContactKeepsBothSurfaces();
     TestConservativeGeometricContactQualification();
+    TestOpposedNativeContactAdmission();
     TestRoughClosedVolumeTransmissionReachesPairedBoundary();
     TestBoundedTirAndWaterTerminationContracts();
     TestSelfHitClassificationUsesBoundedEpsilon();

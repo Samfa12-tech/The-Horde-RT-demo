@@ -57,6 +57,11 @@ $records = foreach ($backend in @('pipeline', 'compute')) {
                 [ordered]@{coordinate=Field $image 333; flags=Field $image 334;
                     triangleCount=Field $image 335}
             } else { $null })
+            contactPolicy=$(if ((Field $image 336) -eq 4321) {
+                [ordered]@{consumed=Field $image 337; receiverPrimitive=Field $image 338;
+                    coordinate=Field $image 339; flags=Field $image 340;
+                    outgoing=Vector $image 341; gpuMathMask=Field $image 344}
+            } else { $null })
             visits=@(for($visit=0;$visit -lt $count;++$visit) {
                 $offset=64+24*$visit
                 [ordered]@{visit=$visit; hit=Field $image $offset; instance=Field $image ($offset+1);

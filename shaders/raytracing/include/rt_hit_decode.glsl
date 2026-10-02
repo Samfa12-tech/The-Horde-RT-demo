@@ -373,9 +373,76 @@ void loadPbrTriangle(RtInstanceMetadata instance, uint i0, uint i1, uint i2,
     }
 }
 
+#ifdef HORDE_EXACT_AXIS_CONTACT
+struct ContactIntersection
+{
+    bool hit;
+    float t;
+    int primitive;
+    int instance;
+    uint geometry;
+    vec2 bary;
+    mat4x3 objectToWorld;
+    mat4x3 worldToObject;
+};
+
+bool contactExitTriangle(int instance, int primitive, uint geometry, uvec2 volume,
+                         bool frontFace, vec2 bary, out vec3 a, out vec3 b, out vec3 c)
+{
+    a = b = c = vec3(0.0);
+    if (uint(instance) != volume.x || frontFace) return false;
+    RtInstanceMetadata metadata = rtInstances.values[instance];
+    if ((metadata.flags & kRtInstanceFlagStaticPbr) == 0u ||
+        metadata.geometryRole != kRtGeometryRoleStatic || geometry >= metadata.primitiveCount) return false;
+    RtPrimitiveMetadata part = rtPrimitives.values[metadata.primitiveBase + geometry];
+    if (primitive < 0 || uint(primitive) >= part.indexCount / 3u ||
+        100u + part.materialIndex != volume.y) return false;
+    RtMaterialGpu material = rtMaterials.values[part.materialIndex];
+    const uint required = kRtMaterialFlagTransmission | kRtMaterialFlagCertifiedClosedVolume |
+                          kRtMaterialFlagCertifiedRectangularVolume;
+    if ((material.materialFlags.x & required) != required ||
+        (material.materialFlags.x & kRtMaterialFlagThinWall) != 0u ||
+        material.metallicRoughnessOcclusionTransmission.w <= 0.0) return false;
+    uint index = part.indexOffset + uint(primitive) * 3u;
+    a = rtStaticVertices.values[part.vertexOffset + rtStaticIndices.values[index]].position.xyz;
+    b = rtStaticVertices.values[part.vertexOffset + rtStaticIndices.values[index + 1u]].position.xyz;
+    c = rtStaticVertices.values[part.vertexOffset + rtStaticIndices.values[index + 2u]].position.xyz;
+    return true;
+}
+
+ContactReceiver contactWorldCandidate(int instance, int primitive, uint geometry,
+    bool frontFace, vec2 bary, mat4x3 transform, vec3 direction)
+{
+    ContactReceiver receiver = noContactReceiver();
+    if (instance != 0 || geometry != 0u || primitive < 0 ||
+        uint(primitive) >= uint(worldSurfaces.values.length()) || !frontFace ||
+        !contactIdentityTransform(transform)) return receiver;
+    RtWorldSurfaceGpu surface = worldSurfaces.values[primitive];
+    int material = int(surface.code & 0xffu);
+    if (material == kMaterialWater || material == kMaterialClearGlass ||
+        (surface.contactPlaneFlags & kRtWorldSurfaceContactAxisMask) == 0u ||
+        (surface.contactPlaneFlags & ~(kRtWorldSurfaceContactAxisMask |
+                                      kRtWorldSurfaceContactNegativeWinding)) != 0u) return receiver;
+    receiver = ContactReceiver(true, primitive, surface.planeCoordinateBits, surface.contactPlaneFlags);
+    if (!contactOutgoingIntoReceiver(receiver, direction)) return noContactReceiver();
+    return receiver;
+}
+
+bool contactSamePlane(ContactReceiver a, ContactReceiver b)
+{
+    return a.valid && b.valid && a.coordinateBits == b.coordinateBits && a.flags == b.flags;
+}
+
+// Only the continuation of an open, certified rectangular volume enables this
+// query organisation. Both hits remain actual hardware triangle candidates.
+HitInfo traceSceneContact(vec3 origin, vec3 direction, float maxDistance, uint mask,
+                   float minimumDistance, bool ignoreWater, bool ignorePlayerNearFace,
+                   bool contactEnabled, uvec2 volume, out ContactReceiver receiver)
+#else
 HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                    float minimumDistance, bool ignoreWater,
                    bool ignorePlayerNearFace)
+#endif
 {
     HitInfo h;
     h.hit = false;
@@ -406,10 +473,87 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
     rayQueryEXT query;
     uint rayFlags = (ignoreWater || ignorePlayerNearFace)
         ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;
+#ifdef HORDE_EXACT_AXIS_CONTACT
+    receiver = noContactReceiver();
+    ContactReceiver nearestWorld = noContactReceiver();
+    float nearestWorldT = maxDistance;
+    float secondWorldT = maxDistance;
+    bool worldAmbiguous = false;
+    bool exitAmbiguous = false;
+    bool nearestWorldInterior = false;
+    bool exitInterior = false;
+    ContactIntersection exitHit;
+    exitHit.hit = false;
+    exitHit.t = maxDistance;
+    vec3 exitA = vec3(0.0), exitB = vec3(0.0), exitC = vec3(0.0);
+    if (contactEnabled) rayFlags = gl_RayFlagsNoOpaqueEXT;
+#endif
     rayQueryInitializeEXT(query, topLevelAS, rayFlags, mask, origin,
                           max(minimumDistance, 0.0), direction, maxDistance);
     while (rayQueryProceedEXT(query))
     {
+#ifdef HORDE_EXACT_AXIS_CONTACT
+        if (contactEnabled && rayQueryGetIntersectionTypeEXT(query, false) ==
+            gl_RayQueryCandidateIntersectionTriangleEXT)
+        {
+            int candidateInstance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, false));
+            int candidatePrimitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, false);
+            uint geometry = rayQueryGetIntersectionGeometryIndexEXT(query, false);
+            float distance = rayQueryGetIntersectionTEXT(query, false);
+            vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, false);
+            bool frontFace = rayQueryGetIntersectionFrontFaceEXT(query, false);
+            mat4x3 transform = rayQueryGetIntersectionObjectToWorldEXT(query, false);
+            vec3 a, b, c;
+            if (contactExitTriangle(candidateInstance, candidatePrimitive, geometry,
+                                    volume, frontFace, bary, a, b, c))
+            {
+                if (exitHit.hit && (exitHit.primitive != candidatePrimitive || exitHit.geometry != geometry))
+                    exitAmbiguous = true;
+                if (!exitHit.hit || distance < exitHit.t)
+                {
+                    exitHit.hit = true; exitHit.t = distance;
+                    exitHit.primitive = candidatePrimitive; exitHit.instance = candidateInstance;
+                    exitHit.geometry = geometry; exitHit.bary = bary;
+                    exitHit.objectToWorld = transform;
+                    exitHit.worldToObject = rayQueryGetIntersectionWorldToObjectEXT(query, false);
+                    exitA = a; exitB = b; exitC = c;
+                    exitInterior = contactInteriorBary(bary);
+                }
+                else if (!contactInteriorBary(bary)) exitInterior = false;
+                // Confirming either member now could remove the other member
+                // because hardware raw-t ordering is not source-plane ordering.
+                continue;
+            }
+            ContactReceiver world = contactWorldCandidate(candidateInstance, candidatePrimitive,
+                geometry, frontFace, bary, transform, direction);
+            if (world.valid)
+            {
+                if (nearestWorld.valid && world.primitive == nearestWorld.primitive)
+                {
+                    nearestWorldInterior = nearestWorldInterior && contactInteriorBary(bary);
+                    continue;
+                }
+                bool samePlane = contactSamePlane(world, nearestWorld);
+                if (!nearestWorld.valid || distance < nearestWorldT)
+                {
+                    secondWorldT = min(secondWorldT, nearestWorldT);
+                    worldAmbiguous = samePlane;
+                    nearestWorld = world; nearestWorldT = distance;
+                    nearestWorldInterior = contactInteriorBary(bary);
+                }
+                else
+                {
+                    secondWorldT = min(secondWorldT, distance);
+                    worldAmbiguous = worldAmbiguous || samePlane;
+                }
+                continue;
+            }
+            // All other native candidates retain closest-hit traversal. An
+            // ordinary blocker cannot be passed merely to find a contact pair.
+            rayQueryConfirmIntersectionEXT(query);
+            continue;
+        }
+#endif
         if ((!ignoreWater && !ignorePlayerNearFace) ||
             rayQueryGetIntersectionTypeEXT(query, false) != gl_RayQueryCandidateIntersectionTriangleEXT)
         {
@@ -448,15 +592,66 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         }
     }
 
+#ifdef HORDE_EXACT_AXIS_CONTACT
+    ContactIntersection selected;
+    selected.hit = rayQueryGetIntersectionTypeEXT(query, true) != gl_RayQueryCommittedIntersectionNoneEXT;
+    selected.t = maxDistance;
+    if (selected.hit)
+    {
+        selected.t = rayQueryGetIntersectionTEXT(query, true);
+        selected.primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, true);
+        selected.instance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, true));
+        selected.geometry = rayQueryGetIntersectionGeometryIndexEXT(query, true);
+        selected.bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
+        selected.objectToWorld = rayQueryGetIntersectionObjectToWorldEXT(query, true);
+        selected.worldToObject = rayQueryGetIntersectionWorldToObjectEXT(query, true);
+    }
+    bool pair = contactEnabled && exitHit.hit && nearestWorld.valid &&
+        exitInterior && nearestWorldInterior && !exitAmbiguous && !worldAmbiguous &&
+        min(selected.t, secondWorldT) > max(exitHit.t, nearestWorldT) &&
+        contactOpposedPlane(exitA, exitB, exitC, exitHit.objectToWorld, nearestWorld);
+    if (pair)
+    {
+        selected = exitHit;
+        receiver = nearestWorld;
+    }
+    else
+    {
+        // Rejected/unsupported/ambiguous pairs use the nearest ACTUAL hit, not
+        // a manufactured exit. Existing unclosed-volume diagnostics stay honest.
+        bool selectedIsDeferredExit = false;
+        if (exitHit.hit && (!selected.hit || exitHit.t < selected.t))
+        {
+            selected = exitHit;
+            selectedIsDeferredExit = true;
+        }
+        // A rejected pair must not silently give its glass exit ownership of
+        // an exact raw-t tie and then offset past the real opaque receiver.
+        // Opaque tie precedence retains the existing conservative open-volume
+        // diagnostic; this is NOT the successful contact-consumption exception.
+        if (nearestWorld.valid && contactFallbackWorldWins(
+            selected.hit, selectedIsDeferredExit, selected.t, nearestWorldT))
+        {
+            selected.hit = true; selected.t = nearestWorldT;
+            selected.primitive = nearestWorld.primitive; selected.instance = 0;
+            selected.geometry = 0u;
+            // World decode does not use barycentrics or these matrices.
+        }
+    }
+#define RT_HIT_FIELD(name, expression) selected.name
+    if (selected.hit)
+#else
+#define RT_HIT_FIELD(name, expression) expression
     if (rayQueryGetIntersectionTypeEXT(query, true) != gl_RayQueryCommittedIntersectionNoneEXT)
+#endif
     {
         h.hit = true;
-        h.t = rayQueryGetIntersectionTEXT(query, true);
-        h.primitive = rayQueryGetIntersectionPrimitiveIndexEXT(query, true);
-        h.instance = int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, true));
+        h.t = RT_HIT_FIELD(t, rayQueryGetIntersectionTEXT(query, true));
+        h.primitive = RT_HIT_FIELD(primitive, rayQueryGetIntersectionPrimitiveIndexEXT(query, true));
+        h.instance = RT_HIT_FIELD(instance, int(rayQueryGetIntersectionInstanceCustomIndexEXT(query, true)));
         h.position = origin + direction * h.t;
         RtInstanceMetadata instanceMetadata = rtInstances.values[h.instance];
-        uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, true);
+        uint geometryIndex = RT_HIT_FIELD(geometry, rayQueryGetIntersectionGeometryIndexEXT(query, true));
         if ((instanceMetadata.flags & kRtInstanceFlagStaticPbr) != 0u)
         {
             if (geometryIndex < instanceMetadata.primitiveCount)
@@ -467,7 +662,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 uint i0 = primitiveMetadata.vertexOffset + rtStaticIndices.values[triangleIndex];
                 uint i1 = primitiveMetadata.vertexOffset + rtStaticIndices.values[triangleIndex + 1u];
                 uint i2 = primitiveMetadata.vertexOffset + rtStaticIndices.values[triangleIndex + 2u];
-                vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
+                vec2 bary = RT_HIT_FIELD(bary, rayQueryGetIntersectionBarycentricsEXT(query, true));
                 vec3 weights = vec3(1.0 - bary.x - bary.y, bary.x, bary.y);
                 StaticRtVertex v0, v1, v2;
                 loadPbrTriangle(instanceMetadata, i0, i1, i2, v0, v1, v2);
@@ -476,7 +671,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 // consequently the geometry selected by its reflection ray.
                 precise vec2 uv = v0.uv0.xy * weights.x + v1.uv0.xy * weights.y +
                                   v2.uv0.xy * weights.z;
-                mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
+                mat3 objectToWorld = mat3(RT_HIT_FIELD(objectToWorld, rayQueryGetIntersectionObjectToWorldEXT(query, true)));
                 mat3 normalToWorld = transpose(inverse(objectToWorld));
                 vec3 localNormal = normalize(v0.normal.xyz * weights.x +
                                              v1.normal.xyz * weights.y +
@@ -557,15 +752,15 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                         (bary.x * (v1.position.xyz - v0.position.xyz) +
                          bary.y * (v2.position.xyz - v0.position.xyz));
                     precise vec3 surfacePosition = objectToWorld * localPosition +
-                        rayQueryGetIntersectionObjectToWorldEXT(query, true)[3];
+                        RT_HIT_FIELD(objectToWorld, rayQueryGetIntersectionObjectToWorldEXT(query, true))[3];
                     h.position = surfacePosition;
                     h.dielectricSpawnPosition = surfacePosition;
                     if ((h.materialFlags & kRtMaterialFlagCertifiedRectangularVolume) != 0u)
                         h.dielectricSpawnGuarded = guardedRectangularDielectricSpawn(
                             v0.position.xyz, v1.position.xyz, v2.position.xyz, bary,
                             localPosition, surfacePosition, h.geometricNormal,
-                            rayQueryGetIntersectionObjectToWorldEXT(query, true),
-                            rayQueryGetIntersectionWorldToObjectEXT(query, true),
+                            RT_HIT_FIELD(objectToWorld, rayQueryGetIntersectionObjectToWorldEXT(query, true)),
+                            RT_HIT_FIELD(worldToObject, rayQueryGetIntersectionWorldToObjectEXT(query, true)),
                             staticMaterial.iorThicknessAttenuationDistance.w,
                             staticMaterial.attenuationColor.w,
                             h.dielectricSpawnPosition, h.dielectricSpawnMinimumNormalBias);
@@ -602,7 +797,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         if (h.instance == 2 || h.instance == 18)
         {
             const int firstVertex = h.primitive * 3;
-            const vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
+            const vec2 bary = RT_HIT_FIELD(bary, rayQueryGetIntersectionBarycentricsEXT(query, true));
             const float w0 = 1.0 - bary.x - bary.y;
             bool lichInstance = h.instance == 2 && controls.enemyKind > 0.5;
             bool secondSkeletonPose = h.instance == 18;
@@ -617,7 +812,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                     : normalize(skeleton.vertices[firstVertex].normal.xyz * w0
                         + skeleton.vertices[firstVertex + 1].normal.xyz * bary.x
                         + skeleton.vertices[firstVertex + 2].normal.xyz * bary.y));
-            const mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
+            const mat3 objectToWorld = mat3(RT_HIT_FIELD(objectToWorld, rayQueryGetIntersectionObjectToWorldEXT(query, true)));
             h.normal = normalize(objectToWorld * localNormal);
             vec3 edgeA = lichInstance
                 ? lich.vertices[firstVertex + 1].position.xyz - lich.vertices[firstVertex].position.xyz
@@ -654,3 +849,32 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
     }
     return h;
 }
+#undef RT_HIT_FIELD
+
+#ifdef HORDE_EXACT_AXIS_CONTACT
+HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
+                   float minimumDistance, bool ignoreWater, bool ignorePlayerNearFace)
+{
+    ContactReceiver unused;
+    return traceSceneContact(origin, direction, maxDistance, mask, minimumDistance,
+        ignoreWater, ignorePlayerNearFace, false, uvec2(0u), unused);
+}
+
+HitInfo contactReceiverHit(ContactReceiver receiver, HitInfo exitHit)
+{
+    // This receiver is a saved native triangle, not an extra ray or guessed
+    // receiver. Source-plane coincidence gives zero additional path length.
+    HitInfo h = exitHit;
+    h.instance = 0; h.primitive = receiver.primitive; h.t = 0.0;
+    uint axis = (receiver.flags & kRtWorldSurfaceContactAxisMask) - 1u;
+    h.position[axis] = uintBitsToFloat(receiver.coordinateBits);
+    h.transmission = 0.0; h.materialFlags = 0u;
+    h.roughness = 1.0; h.ior = 1.5; h.thickness = 0.0;
+    h.attenuationDistance = 0.0; h.attenuationColor = vec3(1.0);
+    h.dielectricSpawnPosition = h.position; h.dielectricSpawnGuarded = false;
+    h.dielectricSpawnMinimumNormalBias = 0.0;
+    materialForPrimitive(h.primitive, h.instance, h.position, h.material,
+        h.normal, h.geometricNormal, h.base, h.metallic, h.reflectivity, h.emissive);
+    return h;
+}
+#endif

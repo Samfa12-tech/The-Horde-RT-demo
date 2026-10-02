@@ -24,7 +24,7 @@ inline constexpr std::array<RtPipelineCatalogRecord, 2> kSelectedRtRayQueryCatal
 #elif HORDE_RT_SELECTED_INSTRUMENTATION == 1 && HORDE_RT_SELECTED_DIELECTRIC_QUALITY == 1
 inline constexpr std::array<RtPipelineCatalogRecord, 2> kSelectedRtRayQueryCatalog{
     RtPipelineCatalogRecord{{RtInstrumentation::Diagnostic, DielectricQuality::High, RtMaterialStrategy::OpaqueFast, RtExecutionBackend::RayQueryCompute}, "rayquery_compute_diagnostic_high_opaque_fast", "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc", "85f08f90f110ae4752b1b7cd625de361524c29649d61b2e81655b551031d2b2a", "27383feb90abc14feccd58bac35b944b59eafdccd453a3f0fb712cea0a7fbeb7", 126577, 5, true},
-    RtPipelineCatalogRecord{{RtInstrumentation::Diagnostic, DielectricQuality::High, RtMaterialStrategy::GenericDielectric, RtExecutionBackend::RayQueryCompute}, "rayquery_compute_diagnostic_high_generic_dielectric", "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc", "2b2ccdb2a8a780db46d815951c65f961f3f52f025cab636534dab7f7b9ad4633", "b3b94dced8c6cc8ed4f333a338bf565ad773f0297def7a2de56a7c538e03f6e8", 70063, 41, true}};
+    RtPipelineCatalogRecord{{RtInstrumentation::Diagnostic, DielectricQuality::High, RtMaterialStrategy::GenericDielectric, RtExecutionBackend::RayQueryCompute}, "rayquery_compute_diagnostic_high_generic_dielectric", "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc", "e0751a1a537b860d6b6606c5bd4135c50eeb3b79cba0cd57a10fc1cc57293594", "787044a529408dd7f9aa9649aa18fad2cee98cbf92fded80cc68210292c4271f", 81377, 41, true}};
 #else
 #error "Unsupported exact RT RayQuery compute bundle policy."
 #endif
