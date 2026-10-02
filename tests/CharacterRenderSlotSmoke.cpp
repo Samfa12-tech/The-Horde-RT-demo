@@ -698,6 +698,27 @@ int main()
                       sceneSource.find("secondSkeletonWrite.pBufferInfo = &secondSkeletonBufferInfo;") !=
                           std::string::npos,
                       "CPU descriptor writes no longer bind the second skeleton GPU vertex buffer at binding 10");
+        // Bind the emitted vertices and metadata, not a duplicate normal table.
+        // These windings point outside the closed box (-Z,+Z,-X,+X,+Y,-Y).
+        const std::size_t worldBoxBegin = sceneSource.find("const auto addWorldBox =");
+        const std::size_t worldBoxEnd = sceneSource.find("const auto addBox =", worldBoxBegin);
+        ok &= Require(worldBoxBegin != std::string::npos && worldBoxEnd != std::string::npos,
+                      "world box authoring seam is missing");
+        if (worldBoxBegin != std::string::npos && worldBoxEnd != std::string::npos)
+        {
+            const std::string boxSource = sceneSource.substr(worldBoxBegin, worldBoxEnd - worldBoxBegin);
+            constexpr std::array<const char*, 6u> outwardFaces{{
+                "{{minX, minY, minZ}}, {{minX, maxY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, minY, minZ}}, material, SurfaceBack",
+                "{{maxX, minY, maxZ}}, {{maxX, maxY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, minY, maxZ}}, material, SurfaceForward",
+                "{{minX, minY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, maxY, minZ}}, {{minX, minY, minZ}}, material, SurfaceLeft",
+                "{{maxX, minY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, maxY, maxZ}}, {{maxX, minY, maxZ}}, material, SurfaceRight",
+                "{{minX, maxY, minZ}}, {{minX, maxY, maxZ}}, {{maxX, maxY, maxZ}}, {{maxX, maxY, minZ}}, material, SurfaceUp",
+                "{{minX, minY, maxZ}}, {{minX, minY, minZ}}, {{maxX, minY, minZ}}, {{maxX, minY, maxZ}}, material, SurfaceDown",
+            }};
+            for (const char* face : outwardFaces)
+                ok &= Require(boxSource.find(face) != std::string::npos,
+                              "closed world-box normal must agree with outward face winding");
+        }
         constexpr std::array<const char*, 11u> cpuMaterialAbi{{
             "SurfaceDryStone = 0u", "SurfaceWetCobble = 1u", "SurfaceMossyStone = 2u",
             "SurfaceDampGround = 3u", "SurfaceAgedMetal = 4u", "SurfaceFlame = 5u",
