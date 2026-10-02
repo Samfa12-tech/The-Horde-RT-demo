@@ -186,3 +186,90 @@ Exact logs: [Debug](checks/corner-regression-debug.log),
 [Release](checks/corner-regression-release.log). No new native capture, phone
 run or arithmetic keyword trial was needed for this test-only change.
 High row43 and the broader physical/backend gate remain open.
+
+## Completed source-world reference and bounded float32 feasibility check
+
+The preceding object-ray reference was not sufficient to prove the mathematical
+source-world miss: applying a rounded worldToObject changes the ray. The existing
+`analysis/compare_row43.py --source-world` now independently checks each captured
+world ray against all72 actual uploaded triangles under the captured float32
+objectToWorld. Fraction arithmetic preserves every binary32 input, product and
+sum exactly; no intermediate transformed vertex is rounded to float32. Input
+JSON file hashes are recorded separately from their decoded PNG hashes. The
+canonical GLB hash and native-source vertex agreement remain checked. This uses
+retained witnesses, not new native captures or a replacement asset.
+
+| Exact mathematical source-world reference | Pipeline ray | Compute ray |
+| --- | --- | --- |
+| Primitive63 signed normalized v | -2.2272837458911408e-7 | -3.5984283192344683e-7 |
+| Primitive63 lies inside triangle | NO | NO |
+| Primitive9 is a real entering hit | YES | YES |
+| Nearest valid uploaded triangle | 9 | 9 |
+| Primitive9 exact-reference t | 0.8082922814899058 | 0.8082922320854496 |
+
+This closes the source-world-reference ambiguity for this witness. It does NOT
+fix production traversal or establish a universal hardware error bound. The two
+world directions remain distinct. Native bary/t values are not overwritten.
+
+A finite feasibility check also encloses the straightforward world-triangle
+expression using ideal outward-rounded binary32 arithmetic. Exact determinant
+and v numerator are inside their enclosures. Even this idealised expression
+cannot prove the outside-v sign: pipeline interval[-6.947084330022335e-7,
+6.83183316141367e-7], compute[-6.927875801920891e-7,6.851041689515114e-7]. Both
+straddle zero. This is a **NO-GO for this straightforward float32 predicate**, not
+a Vulkan rounding guarantee or proof that all conservative predicates fail.
+Do not convert uncertainty into rejection, choose an empirical epsilon, require
+float64 on phones, or start another `precise` keyword search.
+
+[Exact arithmetic/enclosure receipt](source-world-exact-reference.json) records
+the finite results. Invocation from the repo root:
+
+```powershell
+python docs/evidence/2026-09-30-glass-spawn/derived-normal-bias/row43/analysis/compare_row43.py assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb --source-world
+```
+
+The C++ regression now also checks the two actual world rays and transformed
+triangles63/9 against this independent reference; it does not claim to enumerate
+all72 triangles. Fresh Debug1/1 PASS3.21s and Release1/1 PASS2.74s; exact logs:
+[Debug](checks/source-world-debug.log), [Release](checks/source-world-release.log).
+The valid micrometre-exit test remains in the same selected CTest and passes.
+Read-only independent review found no concrete arithmetic/sign bug. An initial
+ad-hoc PowerShell cross-product probe failed from comma-expression parsing;
+the repaired probe was superseded by this exact-rational check, not native proof.
+
+No renderer/shader/ABI/material/asset/player/music change, extra native query,
+traversal-budget change or diagnostic suppression. Existing controls, precision
+NO-GO, contact matrix and14 unchanged shader artifacts were not repeated.
+Audio/haptic manual revalidation required:NO (host/reference checks only).
+
+Next unfinished step: assess a different, source-certified primary-origin/
+near-segment exclusion guard using existing per-frame instance metadata before
+any runtime patch. It must preserve camera-inside and clipped-entry cases,
+outward-winding/transform semantics, secondary rays and uncertain fallbacks.
+Source-world bounds alone are not a licence to discard all exits. A runtime
+candidate still needs actual native/image/cost acceptance; High row43 remains
+OPEN. No phone work while it belongs to another project; no release/publication.
+
+Independent review finds this alternative physically defensible ONLY if every
+eligible boundary is closed/outward and the complete excluded[0,tmin] segment is
+proved disjoint from conservative source-world bounds. A per-instance bit cannot
+represent differing per-pixel directions without a stronger direction-independent
+proof. Preserve per-volume inside/nested cases, negative-transform winding,
+nonfinite/singular/unsupported transforms and touching/uncertain fallback. Live
+primary origin includes shader camera bob (rt_frame.glsl), so certifying only
+the nominal CPU camera position is insufficient. Existing per-frame metadata
+upload is a potential ownership seam, not yet an implemented/admitted fix.
+
+### Reviewed CPU-only engineering integration
+
+Isolated source/evidence7db20555631d318c3082ed6a5a1f5451315cc352 is pushed and
+remote-verified. Only its CPU test, analysis helper and receipts are integrated;
+their test/helper blobs match exactly (83020f6f /9f489421). No isolated runtime
+shader, ABI, resource, observer or player change enters engineering. Fresh
+integrated Debug1/1 PASS3.35s and Release1/1 PASS2.96s:
+[Debug](checks/source-world-integrated-debug.log),
+[Release](checks/source-world-integrated-release.log).
+Preceding engineering checkpoint16a046f current-source push36963091614 and
+PR36963096743 both SUCCESS (GCC, Clang, MSVC, focused Vulkan CPU-host, Android
+Debug/Java/lint/package). Those runs validate16a046f, not this new test edit or
+isolated High runtime. New source validation must use its own fresh runs.

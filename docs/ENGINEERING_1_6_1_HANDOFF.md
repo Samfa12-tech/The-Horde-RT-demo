@@ -13,7 +13,28 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 native contact-policy result (latest completed step)
+### October 2 row43 exact source-world reference (latest CPU-only step)
+
+Isolated7db20555631d318c3082ed6a5a1f5451315cc352 is pushed/remote-verified;
+only reviewed CPU regression/helper/evidence integrated, test/helper blobs
+83020f6f/9f489421 match. Exact rational operations on actual captured world rays
+and all72 source-transformed uploaded triangles prove tri63 outside for both
+rays (v=-2.2272837458911408e-7 /-3.5984283192344683e-7), nearest valid entering
+tri9. This closes the rounded-object-ray ambiguity, NOT production traversal.
+Straightforward ideal outward-rounded float32 predicate cannot certify the
+outside sign (both numerator intervals straddle zero): retain NO-GO, no guessed
+epsilon/hardware bound/backface discard. Fresh integrated Debug1/1 PASS3.35s,
+Release1/1 PASS2.96s. Renderer/shader/ABI/assets/player/music unchanged.
+[Finite record/results/next step](evidence/2026-10-02-high-row43/README.md#completed-source-world-reference-and-bounded-float32-feasibility-check).
+Next: source-certified closed-volume primary-origin/near-segment exclusion
+proof before runtime work: camera bob, per-pixel direction/tmin bounds,
+camera-inside/clipped-entry/nested cases, transform winding and conservative
+unknown fallback. Existing frame metadata upload is only a candidate seam.
+High row43/native/cost gates remain OPEN. No repeated captures/precision/contact
+matrix or unchanged shader builds. Phone used by another project: no polling,
+install or recoordination. Audio/haptic revalidation:NO, goal still ACTIVE.
+
+### October 2 native contact-policy result (preceding completed step)
 
 Isolated candidate4f8023e / pushed receipt3691517f1d27a885f9252536e7de39ee793c9ea8
 closes the demonstrated exit/floor contact: actual six RTX5050 Laptop captures
@@ -26,8 +47,11 @@ compile/optimise/SPIR-V validate; sizes325272/325508bytes/41 atomics, cost admis
 FAIL unchanged maxima. No production shader/ABI promotion, performance/phone claim.
 CPU-only contracts integrated4ee22869df06e87229e2cc31fe8bce63c4bf8e56; fresh
 Debug/Release dielectric1/1 each PASS3.17/2.61s, blobs match reviewed candidate.
-Normal renderer/resources/player/music unchanged. Current-source CI pending,
-not inherited from441a8f5. [Pinned evidence and exact next step](evidence/2026-10-02-backend-pixel-witness/axis-contact-policy.md).
+Normal renderer/resources/player/music unchanged. Current-source16a046f CI
+push36963091614 /PR36963096743 now SUCCESS: GCC/Clang/MSVC, focused Vulkan
+CPU-host, Android Debug/Java/lint/package. Not inherited from441a8f5, physical
+RT evidence or validation of the new row43 test edit above.
+[Pinned evidence and exact next step](evidence/2026-10-02-backend-pixel-witness/axis-contact-policy.md).
 Finite matrix COMPLETE: do not repeat completed controls/tests/shaders after
 resumption. Next bounded remaining High/backend/physical failure from existing
 held11 coordinates/row43/isolated-lantern evidence, not another contact/epsilon
