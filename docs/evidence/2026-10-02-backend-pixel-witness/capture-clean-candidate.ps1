@@ -1,6 +1,9 @@
-param([Parameter(Mandatory)][string]$OutputRoot,[switch]$HighFixtures,[switch]$ControlHighComputeOnly,[switch]$Shipping)
+param([Parameter(Mandatory)][string]$OutputRoot,[switch]$HighFixtures,[switch]$ControlHighComputeOnly,[switch]$Shipping,[switch]$EdgeWitness)
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+if($EdgeWitness -and (-not $HighFixtures -or $Shipping -or $ControlHighComputeOnly)) {
+    throw 'The isolated edge witness is High Diagnostic candidate only.'
+}
 if ((& git -C $repoRoot branch --show-current) -cne 'codex/horde-rtx-corrections') {
     throw 'Run only in the isolated clean-corrections worktree.'
 }
@@ -25,6 +28,7 @@ $matrix = foreach ($backend in @('pipeline', 'compute')) {
     if($ControlHighComputeOnly -and $backend -cne 'compute'){continue}
     if ($HighFixtures) {
         foreach ($checkpoint in @('glass-edge-fresnel','lantern-held-high','lantern-held-low')) {
+            if($EdgeWitness -and $checkpoint -cne 'glass-edge-fresnel'){continue}
             [pscustomobject]@{backend=$backend;checkpoint=$checkpoint;directory="$backend/$checkpoint";label="$backend-$checkpoint"}
         }
     } else {
@@ -71,7 +75,7 @@ $runs = foreach ($row in $matrix) {
     [ordered]@{ backend = $backend; checkpoint = $row.checkpoint; exitCode = $exitCode; arguments = @($start.ArgumentList) }
 }
 [ordered]@{ schema = 1; sourceCommit = $source; executableSha256 = $exeHash;
-    instrumentation = $instrumentation; quality = $quality; payloadRows = 0;
+    instrumentation = $instrumentation; quality = $quality; payloadRows = $(if($EdgeWitness){1}else{0});
     existingNormalBinary = [bool]$ControlHighComputeOnly;
     investigationOnly = $true; performanceEvidence = $false; runs = @($runs) } |
     ConvertTo-Json -Depth 6 | Set-Content (Join-Path $root 'run-receipt.json')

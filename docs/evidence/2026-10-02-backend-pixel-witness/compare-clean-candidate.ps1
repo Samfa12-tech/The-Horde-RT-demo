@@ -1,10 +1,14 @@
 param([Parameter(Mandatory)][string]$CandidateRoot,
       [Parameter(Mandatory)][string]$ControlPipelineDirectory,
       [string]$ControlComputeDirectory,
-      [Parameter(Mandatory)][string]$OutputPath,[switch]$HighFixtures,[switch]$ShippingParity)
+      [Parameter(Mandatory)][string]$OutputPath,[switch]$HighFixtures,[switch]$ShippingParity,[switch]$EdgeWitness)
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $controlCommit = 'd9be81e77493d7e5c9af01604f865d0d3ef11e48'
+if($EdgeWitness) {
+    if(-not $HighFixtures -or $ShippingParity){throw 'Edge witness is High Diagnostic only.'}
+    $controlCommit='b041ea832b0b7fc1882bbf4239c695cc70fbcd45'
+}
 $expected = @('opening','skeleton','worst-bend','lantern-drop','skylight','yellow',
               'blue','red','green','mirror','lich','finale-roof','two-enemy-combat')
 $fixtureIds = @{'glass-edge-fresnel'=113;'lantern-held-high'=116;'lantern-held-low'=117}
@@ -15,13 +19,13 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 public static class HordeCleanCandidatePixels {
-    public static object Read(string left, string right) {
+    public static object Read(string left, string right, int skipRows=0) {
         using(var a=new Bitmap(left)) using(var b=new Bitmap(right)) {
             if(a.Width!=960 || a.Height!=540 || a.Size!=b.Size)
                 throw new InvalidOperationException("Unexpected finite capture extent.");
             int maximum=0,count=0,outlierCount=0;
             var outliers=new List<object>();
-            for(int y=0;y<a.Height;y++) for(int x=0;x<a.Width;x++) {
+            for(int y=skipRows;y<a.Height;y++) for(int x=0;x<a.Width;x++) {
                 var p=a.GetPixel(x,y); var q=b.GetPixel(x,y);
                 int d=Math.Max(Math.Abs(p.R-q.R),Math.Max(Math.Abs(p.G-q.G),Math.Abs(p.B-q.B)));
                 maximum=Math.Max(maximum,d); if(d>1)count++;
@@ -32,7 +36,7 @@ public static class HordeCleanCandidatePixels {
                         rightRgb=new[]{(int)q.R,(int)q.G,(int)q.B}});
                 }
             }
-            double fraction=(double)count/(960*540);
+            double fraction=(double)count/(960*(540-skipRows));
             return new {maximumChannelDifference=maximum,pixelsDifferentByMoreThanOne=count,
                 differentFraction=fraction,unchangedGate=maximum<=3 && fraction<=.001,
                 outlierCount,firstOutliers=outliers};
@@ -92,7 +96,7 @@ function Compare-Runs($Left,$Right,[string]$Label) {
         }
         [ordered]@{checkpoint=$p.checkpoint;file=$p.file;leftSha256=$p.pngSha256;rightSha256=$q.pngSha256;
             leftPrimaryPixels=$p.visibility.primaryPixels;rightPrimaryPixels=$q.visibility.primaryPixels;
-            comparison=[HordeCleanCandidatePixels]::Read((Join-Path $Left.directory $p.file),(Join-Path $Right.directory $q.file))}
+            comparison=[HordeCleanCandidatePixels]::Read((Join-Path $Left.directory $p.file),(Join-Path $Right.directory $q.file),$(if($EdgeWitness){1}else{0}))}
     }
     [ordered]@{label=$Label;passed=(@($rows|Where-Object {-not $_.comparison.unchangedGate}).Count -eq 0);
         leftManifestSha256=(Get-FileHash (Join-Path $Left.directory 'capture-manifest.json')).Hash.ToLowerInvariant();
@@ -111,6 +115,7 @@ if($ShippingParity) {
         (Compare-Runs $pipeline $compute 'shipping-backend-parity'))
 } elseif($HighFixtures) {
     $comparisons=@(foreach($checkpoint in @('glass-edge-fresnel','lantern-held-high','lantern-held-low')) {
+        if($EdgeWitness -and $checkpoint -cne 'glass-edge-fresnel'){continue}
         $expected=@($checkpoint)
         $pipeline=Read-Run (Join-Path $CandidateRoot "pipeline/$checkpoint") 'RayTracingPipeline' $true
         $compute=Read-Run (Join-Path $CandidateRoot "compute/$checkpoint") 'RayQueryCompute' $true
@@ -134,7 +139,7 @@ if($ShippingParity) {
         (Compare-Runs $controlCompute $compute 'compute-old-control-differences'))
 }
 [ordered]@{schema=1;controlSource=$controlCommit;runReceipt=Get-Content (Join-Path $CandidateRoot 'run-receipt.json') -Raw|ConvertFrom-Json;
-    payloadRows=0;pixelTolerance=[ordered]@{maximumChannelDifference=3;maximumFractionOverOne=0.001};
+    payloadRows=$(if($EdgeWitness){1}else{0});pixelTolerance=[ordered]@{maximumChannelDifference=3;maximumFractionOverOne=0.001};
     performanceEvidence=$false;shippingDiagnosticMatrix=[bool]$ShippingParity;comparisons=$comparisons}|
     ConvertTo-Json -Depth 14|Set-Content -LiteralPath $OutputPath -Encoding utf8NoBOM
 foreach($comparison in $comparisons) {

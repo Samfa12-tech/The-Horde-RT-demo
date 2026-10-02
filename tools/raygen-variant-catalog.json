@@ -53,7 +53,7 @@
       "strategy": "GenericRetained",
       "shippingAllowed": false,
       "artifactPath": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
-      "dependencySha256": "efef4797d7b889df7de2a177847e299f260d111fda56e2764090970c5100633d",
+      "dependencySha256": "269116e917e2c46551e33d6d87f5ef66bbafb04822d0258a46fab5ecb43456be",
       "dependencies": [
         {
           "path": "shaders/raytracing/minimal.rgen",
@@ -61,7 +61,7 @@
         },
         {
           "path": "shaders/raytracing/include/rt_frame.glsl",
-          "sha256": "b00beb8ed59360d9aa4c2befd22af165b0a0305784d8556a7812de4979d942ed"
+          "sha256": "9c906cdeb51b59fa8edfc44422987f6b8a2545eec12eeeb3e726da223516e31b"
         },
         {
           "path": "shaders/raytracing/include/rt_scene_abi.glsl",
@@ -92,12 +92,16 @@
           "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
         },
         {
+          "path": "shaders/raytracing/experimental/high_edge_witness.glsl",
+          "sha256": "b65c0870b5bed86ccb24e2ee6bd33db3c87804236daeae76b6e1b969342f8410"
+        },
+        {
           "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
           "sha256": "f8490daf84691cb658af8520a6f5353771118117a6668174bb33dbb105a59fe0"
         },
         {
           "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
-          "sha256": "bb4884116d6002b89be5e64c671731b1a33d7a3444eb1b77ddbaca737784b7c2"
+          "sha256": "d00e9a305101932b4ca5a75405290f144d41fa105ef534969f55bc42982c3531"
         },
         {
           "path": "shaders/raytracing/include/rt_atmosphere.glsl",
@@ -108,16 +112,16 @@
           "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
         }
       ],
-      "includeSha256": "8c4e6d2bbdfd9bae59b967062535990dbaf01965b57f2c490a61df30cf5a9dbf",
-      "spirvSha256": "4c5e0936e8f69bbaf61eb34306d4c890681c8c829a70b103c6ab570ee35fb2c9",
-      "bytes": 252764,
-      "words": 63191,
-      "instructions": 14962,
-      "branchOperations": 830,
-      "loops": 15,
-      "selectionMerges": 353,
-      "functions": 63,
-      "functionCalls": 199,
+      "includeSha256": "e1544ecfc79830ed7d1bc510a38099e2d9de51d0341b1889af9e50048b3da165",
+      "spirvSha256": "1de465a4ea9e3956d3a85d6511fa79527f388d63460426561b0cad3db683e764",
+      "bytes": 267504,
+      "words": 66876,
+      "instructions": 15848,
+      "branchOperations": 859,
+      "loops": 19,
+      "selectionMerges": 359,
+      "functions": 68,
+      "functionCalls": 243,
       "rayQueryInitializations": 2,
       "atomicInstructions": 41,
       "hasDiagnosticsBinding": true,

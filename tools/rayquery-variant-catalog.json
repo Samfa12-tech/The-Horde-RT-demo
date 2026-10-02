@@ -115,71 +115,75 @@
       "stage": "comp",
       "executionModel": "GLCompute",
       "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
-      "dependencySha256": "3fa018db476c7029d826ea6b53a1de5143215870dafbfc0837c7aa0b998a9101",
+      "dependencySha256": "50c66caf024d5dca2769f2c6d8b1914c1d63f9386c2297b0edfb46c9be437baa",
       "dependencies": [
         {
-          "path": "shaders/raytracing/minimal.comp",
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/minimal.comp",
           "sha256": "0aa2731c6a80f3cc015cc23cc85e161970375c383d59fd807c636f981f1ee1a5"
         },
         {
-          "path": "shaders/raytracing/include/rt_variant_config.glsl",
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_variant_config.glsl",
           "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
         },
         {
-          "path": "shaders/raytracing/include/rt_frame.glsl",
-          "sha256": "b00beb8ed59360d9aa4c2befd22af165b0a0305784d8556a7812de4979d942ed"
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_frame.glsl",
+          "sha256": "9c906cdeb51b59fa8edfc44422987f6b8a2545eec12eeeb3e726da223516e31b"
         },
         {
-          "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_scene_abi.glsl",
           "sha256": "bd1c9662c04967f1bc65cfb9c408fc31bbb7e6dc1606d1c0bcd4a9112604dc62"
         },
         {
-          "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_scene_abi.generated.glsl",
           "sha256": "c44875baf74ef0601f1bdfee5510eacf6c3750e90ba3052e6958b5ecb2cc9e95"
         },
         {
-          "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_diagnostics.glsl",
           "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
         },
         {
-          "path": "shaders/raytracing/include/rt_lighting.glsl",
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_lighting.glsl",
           "sha256": "0b901ab5ac3fdfce3f07bf49b461ff266f2008ba24ede4b7c538adbf6e72ee66"
         },
         {
-          "path": "shaders/raytracing/include/rt_fire.glsl",
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_fire.glsl",
           "sha256": "2d61dd1e9bc0b677c3a6e693ce0a0fdb5307dd885686713b0d9e41b4ad334c44"
         },
         {
-          "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_hit_decode.glsl",
           "sha256": "48a01806fb42bcaf6f186a1498d3b5f7a0b60854e2acb97835754e333fe5afcb"
         },
         {
-          "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_dielectric_spawn.glsl",
           "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
         },
         {
-          "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/experimental/high_edge_witness.glsl",
+          "sha256": "b65c0870b5bed86ccb24e2ee6bd33db3c87804236daeae76b6e1b969342f8410"
+        },
+        {
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_dielectric_common.glsl",
           "sha256": "f8490daf84691cb658af8520a6f5353771118117a6668174bb33dbb105a59fe0"
         },
         {
-          "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
-          "sha256": "bb4884116d6002b89be5e64c671731b1a33d7a3444eb1b77ddbaca737784b7c2"
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_dielectric_transport.glsl",
+          "sha256": "d00e9a305101932b4ca5a75405290f144d41fa105ef534969f55bc42982c3531"
         },
         {
-          "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+          "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_atmosphere.glsl",
           "sha256": "560d2e426460a0890c2dbf9537595e063649874186d60b653ba9e00a2b363861"
         }
       ],
-      "includeSha256": "9b145b24f6c0f5ddf225c647b7e3730a1767443007a467a77809b9f175e8f69e",
-      "spirvSha256": "1abc870b7bdd73fbefbe2f76a29461b04fa93dc78ecb67fb5fcc8f9ce4ead764",
-      "bytes": 253000,
-      "words": 63250,
-      "instructions": 14977,
-      "branchOperations": 831,
-      "loops": 15,
-      "selectionMerges": 354,
-      "functions": 63,
-      "functionCalls": 199,
+      "includeSha256": "6ab91ec848fc42851cfb055444c4efee5066b4fc1ce3d8949682138d29417b82",
+      "spirvSha256": "87c59f4a9d1ca86960b94db06ec56dbba7b828728430350b90e83ab2eae3d6ad",
+      "bytes": 267740,
+      "words": 66935,
+      "instructions": 15863,
+      "branchOperations": 860,
+      "loops": 19,
+      "selectionMerges": 360,
+      "functions": 68,
+      "functionCalls": 243,
       "rayQueryInitializations": 2,
       "atomicInstructions": 41,
       "hasDiagnosticsBinding": true,

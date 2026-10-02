@@ -487,6 +487,21 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         reflectionDirection, min(reflectedLocalDistance, 12.0), true);
     reflected = reflected * reflectedFire.a + reflectedFire.rgb;
 
+#ifdef HORDE_HIGH_EDGE_WITNESS
+    if (backendWitnessRow() >= 0)
+    {
+        investigationFirstFresnel = firstFresnel;
+        investigationReflectionDirection = reflectionDirection;
+        investigationReflectionOrigin = advanceDielectricRayOrigin(
+            dielectricSpawnPoint(firstHit), firstOutward,
+            reflectionDirection, reflectionEpsilon);
+        investigationReflectionHit = reflectedHit;
+        investigationReflected = reflected;
+    }
+    vec3 investigationQueryOrigin = investigationPrimaryOrigin;
+    float investigationQueryMinimum = 0.002;
+    float investigationSpawnEpsilon = 0.0;
+#endif
     bool volumeOpen = false;
     bool volumeCertified = false;
     uint volumeInstance = 0u;
@@ -507,6 +522,10 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     for (int interfaceIndex = 0; interfaceIndex <= HORDE_RT_DIELECTRIC_INTERFACE_CEILING;
          ++interfaceIndex)
     {
+#ifdef HORDE_HIGH_EDGE_WITNESS
+        backendWitnessInterface(currentHit, volumeOpen, transmissionDirection,
+            investigationQueryOrigin, investigationQueryMinimum, investigationSpawnEpsilon);
+#endif
         if (interfaceIndex > 0 && volumeOpen)
         {
             throughput *= dielectricBeerLambert(
@@ -667,6 +686,11 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         HitInfo nextHit = traceScene(
             nextOrigin, transmissionDirection, 10000.0, 0x23u,
             dielectricQueryMinimum(currentHit), false, false);
+#ifdef HORDE_HIGH_EDGE_WITNESS
+        investigationQueryOrigin = nextOrigin;
+        investigationQueryMinimum = dielectricQueryMinimum(currentHit);
+        investigationSpawnEpsilon = epsilon;
+#endif
         nextHit.t += advancedDistance;
         totalDistance += nextHit.t;
         currentHit = nextHit;
@@ -694,5 +718,14 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         transmitted = dielectricOverflowFallback(
             transmissionDirection, throughput);
     }
+#ifdef HORDE_HIGH_EDGE_WITNESS
+    if (backendWitnessRow() >= 0)
+    {
+        investigationTransmitted = transmitted;
+        investigationThroughput = throughput;
+        investigationTermination = vec4(terminalResolved ? 1.0 : 0.0,
+            overflowed ? 1.0 : 0.0, volumeOpen ? 1.0 : 0.0, float(tirSinceTransition));
+    }
+#endif
     return reflected * firstFresnel + transmitted;
 }

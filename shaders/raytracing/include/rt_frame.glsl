@@ -2,6 +2,10 @@
 #include "rt_scene_abi.glsl"
 #include "rt_diagnostics.glsl"
 #include "rt_lighting.glsl"
+#if HORDE_RT_VARIANT_INSTRUMENTATION == HORDE_RT_INSTRUMENTATION_DIAGNOSTIC && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_HIGH && HORDE_RT_VARIANT_MATERIAL == HORDE_RT_MATERIAL_GENERIC_DIELECTRIC
+#define HORDE_HIGH_EDGE_WITNESS
+#include "../experimental/high_edge_witness.glsl"
+#endif
 #include "rt_dielectric_common.glsl"
 #include "rt_dielectric_transport.glsl"
 #include "rt_atmosphere.glsl"
@@ -56,7 +60,13 @@ void main()
         else if (primary.instance == 8)
             RT_DIAG_ADD(primaryRewardBodyPixelCount, 1u);
     }
+#ifdef HORDE_HIGH_EDGE_WITNESS
+    investigationPrimaryOrigin = origin;
+#endif
     vec3 color = shadePrimary(primary, rayDirection);
+#ifdef HORDE_HIGH_EDGE_WITNESS
+    vec3 investigationSurfaceColor = color;
+#endif
     vec4 fireVolume = integrateFireEmitters(
         origin, rayDirection, primary.hit ? primary.t : 10000.0, false);
     color = color * fireVolume.a + fireVolume.rgb;
@@ -69,6 +79,11 @@ void main()
     color = color * (0.62 + 0.38 * vignette);
     color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
     color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
+#ifdef HORDE_HIGH_EDGE_WITNESS
+    backendWitness(primary, rayDirection, origin, investigationSurfaceColor, color);
+    // All normal rays/counters execute; omit only final writes in reserved row0.
+    if (HORDE_RT_PIXEL_ID.y == 0u) return;
+#endif
     // The RT storage image is RGBA, while common Android/Windows swapchains are BGRA and receive a raw image copy.
     if (controls.outputRedBlueSwap > 0.5)
     {
