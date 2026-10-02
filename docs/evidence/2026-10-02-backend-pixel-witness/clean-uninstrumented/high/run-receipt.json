@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "sourceCommit": "7357f884a2c85e9f37d19fb7a5497c73764d30e9",
+  "executableSha256": "265b21c06b201a57116100e3c92716fa1173fa7f56cf04cf202b0d6e44c864d9",
+  "instrumentation": "Diagnostic",
+  "quality": "High",
+  "payloadRows": 0,
+  "investigationOnly": true,
+  "performanceEvidence": false,
+  "runs": [
+    {
+      "backend": "pipeline",
+      "checkpoint": "glass-edge-fresnel",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-high-diagnostic\\pipeline\\glass-edge-fresnel",
+        "--development-checkpoint",
+        "glass-edge-fresnel"
+      ]
+    },
+    {
+      "backend": "pipeline",
+      "checkpoint": "lantern-held-high",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-high-diagnostic\\pipeline\\lantern-held-high",
+        "--development-checkpoint",
+        "lantern-held-high"
+      ]
+    },
+    {
+      "backend": "pipeline",
+      "checkpoint": "lantern-held-low",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-high-diagnostic\\pipeline\\lantern-held-low",
+        "--development-checkpoint",
+        "lantern-held-low"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "glass-edge-fresnel",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-high-diagnostic\\compute\\glass-edge-fresnel",
+        "--require-rayquery-compute",
+        "--development-checkpoint",
+        "glass-edge-fresnel"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "lantern-held-high",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-high-diagnostic\\compute\\lantern-held-high",
+        "--require-rayquery-compute",
+        "--development-checkpoint",
+        "lantern-held-high"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "lantern-held-low",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-high-diagnostic\\compute\\lantern-held-low",
+        "--require-rayquery-compute",
+        "--development-checkpoint",
+        "lantern-held-low"
+      ]
+    }
+  ]
+}

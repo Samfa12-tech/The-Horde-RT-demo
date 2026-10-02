@@ -1,0 +1,12 @@
+candidate-backend-parity/glass-edge-fresnel/glass-edge-fresnel: max=20, fraction=6.36574074074074E-05, gate=False, outliers=32
+pipeline-old-control-differences/glass-edge-fresnel/glass-edge-fresnel: max=2, fraction=7.523148148148149E-05, gate=True, outliers=0
+normal-control-backend-parity/glass-edge-fresnel/glass-edge-fresnel: max=20, fraction=6.36574074074074E-05, gate=False, outliers=32
+compute-old-control-differences/glass-edge-fresnel/glass-edge-fresnel: max=2, fraction=7.523148148148149E-05, gate=True, outliers=0
+candidate-backend-parity/lantern-held-high/lantern-held-high: max=53, fraction=1.736111111111111E-05, gate=False, outliers=6
+pipeline-old-control-differences/lantern-held-high/lantern-held-high: max=94, fraction=0.0006423611111111111, gate=False, outliers=210
+normal-control-backend-parity/lantern-held-high/lantern-held-high: max=53, fraction=1.736111111111111E-05, gate=False, outliers=6
+compute-old-control-differences/lantern-held-high/lantern-held-high: max=94, fraction=0.0006423611111111111, gate=False, outliers=210
+candidate-backend-parity/lantern-held-low/lantern-held-low: max=14, fraction=1.3503086419753087E-05, gate=False, outliers=5
+pipeline-old-control-differences/lantern-held-low/lantern-held-low: max=94, fraction=0.0005208333333333333, gate=False, outliers=129
+normal-control-backend-parity/lantern-held-low/lantern-held-low: max=14, fraction=1.3503086419753087E-05, gate=False, outliers=5
+compute-old-control-differences/lantern-held-low/lantern-held-low: max=94, fraction=0.0005208333333333333, gate=False, outliers=129

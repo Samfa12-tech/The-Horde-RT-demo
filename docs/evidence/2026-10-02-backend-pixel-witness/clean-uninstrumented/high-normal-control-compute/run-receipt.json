@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "sourceCommit": "d9be81e77493d7e5c9af01604f865d0d3ef11e48",
+  "executableSha256": "3526bc9d5727cf91f21785e91740bce55de0ea61ab5def68ec5174a68eb73a19",
+  "instrumentation": "Diagnostic",
+  "quality": "High",
+  "payloadRows": 0,
+  "existingNormalBinary": true,
+  "investigationOnly": true,
+  "performanceEvidence": false,
+  "runs": [
+    {
+      "backend": "compute",
+      "checkpoint": "glass-edge-fresnel",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\missing-normal-high-compute\\compute\\glass-edge-fresnel",
+        "--require-rayquery-compute",
+        "--development-checkpoint",
+        "glass-edge-fresnel"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "lantern-held-high",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\missing-normal-high-compute\\compute\\lantern-held-high",
+        "--require-rayquery-compute",
+        "--development-checkpoint",
+        "lantern-held-high"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "lantern-held-low",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\missing-normal-high-compute\\compute\\lantern-held-low",
+        "--require-rayquery-compute",
+        "--development-checkpoint",
+        "lantern-held-low"
+      ]
+    }
+  ]
+}

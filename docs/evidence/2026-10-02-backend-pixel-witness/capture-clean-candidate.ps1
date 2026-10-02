@@ -1,4 +1,4 @@
-param([Parameter(Mandatory)][string]$OutputRoot,[switch]$HighFixtures)
+param([Parameter(Mandatory)][string]$OutputRoot,[switch]$HighFixtures,[switch]$ControlHighComputeOnly)
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 if ((& git -C $repoRoot branch --show-current) -cne 'codex/horde-rtx-corrections') {
@@ -6,11 +6,22 @@ if ((& git -C $repoRoot branch --show-current) -cne 'codex/horde-rtx-corrections
 }
 $source = (& git -C $repoRoot rev-parse HEAD).Trim()
 $exe = Join-Path $repoRoot 'build/presets/windows-x64-debug/Debug/HordeLanternRT.exe'
+if($ControlHighComputeOnly) {
+    if(-not $HighFixtures){throw 'The missing-control row is only the three High compute fixtures.'}
+    $normalRoot='C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo'
+    $source=(& git -C $normalRoot rev-parse HEAD).Trim()
+    $exe=Join-Path $normalRoot 'build/presets/windows-x64-debug/Debug/HordeLanternRT.exe'
+    if((Get-FileHash -LiteralPath $exe).Hash.ToLowerInvariant() -cne
+        '3526bc9d5727cf91f21785e91740bce55de0ea61ab5def68ec5174a68eb73a19') {
+        throw 'Existing normal High executable changed; do not silently rebuild or substitute it.'
+    }
+}
 $exeHash = (Get-FileHash -LiteralPath $exe).Hash.ToLowerInvariant()
 $root = [IO.Path]::GetFullPath($OutputRoot)
 if (Test-Path -LiteralPath $root) { throw 'Use a new output root; do not overwrite or repeat retained captures.' }
 New-Item -ItemType Directory -Path $root | Out-Null
 $matrix = foreach ($backend in @('pipeline', 'compute')) {
+    if($ControlHighComputeOnly -and $backend -cne 'compute'){continue}
     if ($HighFixtures) {
         foreach ($checkpoint in @('glass-edge-fresnel','lantern-held-high','lantern-held-low')) {
             [pscustomobject]@{backend=$backend;checkpoint=$checkpoint;directory="$backend/$checkpoint";label="$backend-$checkpoint"}
@@ -59,6 +70,7 @@ $runs = foreach ($row in $matrix) {
 }
 [ordered]@{ schema = 1; sourceCommit = $source; executableSha256 = $exeHash;
     instrumentation = 'Diagnostic'; quality = $quality; payloadRows = 0;
+    existingNormalBinary = [bool]$ControlHighComputeOnly;
     investigationOnly = $true; performanceEvidence = $false; runs = @($runs) } |
     ConvertTo-Json -Depth 6 | Set-Content (Join-Path $root 'run-receipt.json')
 Write-Output "Completed finite clean capture pair: $source / $exeHash"

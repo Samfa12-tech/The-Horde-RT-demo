@@ -1,12 +1,14 @@
 param([Parameter(Mandatory)][string]$CandidateRoot,
       [Parameter(Mandatory)][string]$ControlPipelineDirectory,
-      [Parameter(Mandatory)][string]$ControlComputeDirectory,
-      [Parameter(Mandatory)][string]$OutputPath)
+      [string]$ControlComputeDirectory,
+      [Parameter(Mandatory)][string]$OutputPath,[switch]$HighFixtures)
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $controlCommit = 'd9be81e77493d7e5c9af01604f865d0d3ef11e48'
 $expected = @('opening','skeleton','worst-bend','lantern-drop','skylight','yellow',
               'blue','red','green','mirror','lich','finale-roof','two-enemy-combat')
+$fixtureIds = @{'glass-edge-fresnel'=113;'lantern-held-high'=116;'lantern-held-low'=117}
+$quality = if($HighFixtures){'High'}else{'Mobile'}
 Add-Type -AssemblyName System.Drawing
 Add-Type -ReferencedAssemblies System.Drawing.Common,System.Drawing.Primitives,System.Private.Windows.GdiPlus,System.Private.Windows.Core,System.Collections -TypeDefinition @'
 using System;
@@ -46,7 +48,7 @@ function Read-Run([string]$Directory,[string]$Backend,[bool]$Candidate) {
         $m.source -ceq 'rt-storage-image' -and $m.sceneOnly -and -not $m.overlaysIncluded -and
         $m.settlingFrames -eq 12 -and $m.fixedAnimationTimeSeconds -eq 0 -and
         $m.buildId -ceq '1.6.1' -and $m.playerMountProfile -ceq 'AnatomicalBody' -and
-        $m.executionBackend -ceq $Backend -and $m.captures.Count -eq 13 -and
+        $m.executionBackend -ceq $Backend -and $m.captures.Count -eq $expected.Count -and
         ($m.captures.checkpoint -join ',') -ceq ($expected -join ',')) "Run identity mismatch: $Directory"
     $catalogName=if($Backend -ceq 'RayTracingPipeline'){'raygen'}else{'rayquery'}
     $catalog=if($Candidate){Get-Content (Join-Path $repoRoot "tools/$catalogName-variant-catalog.json") -Raw|ConvertFrom-Json}
@@ -55,11 +57,12 @@ function Read-Run([string]$Directory,[string]$Backend,[bool]$Candidate) {
         $selected=$m.selectedRtPipelineBundle.$member
         $row=@($catalog.variants|Where-Object key -CEQ $selected.key)
         Require ($row.Count -eq 1 -and $row[0].instrumentation -ceq 'Diagnostic' -and
-            $row[0].quality -ceq 'Mobile' -and $row[0].spirvSha256 -ceq $selected.sha256) "Selected module mismatch: $Directory/$member"
+            $row[0].quality -ceq $quality -and $row[0].spirvSha256 -ceq $selected.sha256) "Selected module mismatch: $Directory/$member"
     }
-    for($i=0;$i -lt 13;$i++) {
+    for($i=0;$i -lt $expected.Count;$i++) {
         $p=$m.captures[$i]
-        Require ($p.id -eq $i -and $p.width -eq 960 -and $p.height -eq 540 -and
+        $expectedId = if($HighFixtures){$fixtureIds[$expected[$i]]}else{$i}
+        Require ($p.id -eq $expectedId -and $p.width -eq 960 -and $p.height -eq 540 -and
             $p.honestlyPresentedRtFrame -and $p.pixelFormat -ceq 'RGBA8' -and
             $p.outputRedBlueSwapAppliedAndNormalised) "Capture presentation mismatch: $Directory/$i"
         Require ((Get-FileHash (Join-Path $Directory $p.file)).Hash.ToLowerInvariant() -ceq $p.pngSha256) "PNG hash mismatch: $Directory/$i"
@@ -78,7 +81,7 @@ function Compare-Runs($Left,$Right,[string]$Label) {
         'primitiveMetadataBytes','textureBytes','descriptorCount','blasBytes','swordBlasBytes','torchBlasBytes','productionPropBlasBytes')) {
         Require ($a.staticRtAsset.$name -ceq $b.staticRtAsset.$name) "Static allocation mismatch: $Label/$name"
     }
-    $rows=for($i=0;$i -lt 13;$i++) {
+    $rows=for($i=0;$i -lt $expected.Count;$i++) {
         $p=$a.captures[$i]; $q=$b.captures[$i]
         foreach($name in @('checkpoint','file','preset','zone','camera','requestedCamera','state',
             'viewmodelGeometry','playerWorldBodyGeometry')) {
@@ -96,13 +99,30 @@ function Compare-Runs($Left,$Right,[string]$Label) {
         rightManifestSha256=(Get-FileHash (Join-Path $Right.directory 'capture-manifest.json')).Hash.ToLowerInvariant();
         records=@($rows)}
 }
-$pipeline=Read-Run (Join-Path $CandidateRoot 'pipeline') 'RayTracingPipeline' $true
-$compute=Read-Run (Join-Path $CandidateRoot 'compute') 'RayQueryCompute' $true
-$controlPipeline=Read-Run $ControlPipelineDirectory 'RayTracingPipeline' $false
-$controlCompute=Read-Run $ControlComputeDirectory 'RayQueryCompute' $false
-$comparisons=@((Compare-Runs $pipeline $compute 'candidate-backend-parity'),
-    (Compare-Runs $controlPipeline $pipeline 'pipeline-old-control-differences'),
-    (Compare-Runs $controlCompute $compute 'compute-old-control-differences'))
+if($HighFixtures) {
+    $comparisons=@(foreach($checkpoint in @('glass-edge-fresnel','lantern-held-high','lantern-held-low')) {
+        $expected=@($checkpoint)
+        $pipeline=Read-Run (Join-Path $CandidateRoot "pipeline/$checkpoint") 'RayTracingPipeline' $true
+        $compute=Read-Run (Join-Path $CandidateRoot "compute/$checkpoint") 'RayQueryCompute' $true
+        $controlPipeline=Read-Run (Join-Path $ControlPipelineDirectory $checkpoint) 'RayTracingPipeline' $false
+        Compare-Runs $pipeline $compute "candidate-backend-parity/$checkpoint"
+        Compare-Runs $controlPipeline $pipeline "pipeline-old-control-differences/$checkpoint"
+        if(-not [string]::IsNullOrWhiteSpace($ControlComputeDirectory)) {
+            $controlCompute=Read-Run (Join-Path $ControlComputeDirectory "compute/$checkpoint") 'RayQueryCompute' $false
+            Compare-Runs $controlPipeline $controlCompute "normal-control-backend-parity/$checkpoint"
+            Compare-Runs $controlCompute $compute "compute-old-control-differences/$checkpoint"
+        }
+    })
+} else {
+    Require (-not [string]::IsNullOrWhiteSpace($ControlComputeDirectory)) 'Mobile comparison requires its retained compute control.'
+    $pipeline=Read-Run (Join-Path $CandidateRoot 'pipeline') 'RayTracingPipeline' $true
+    $compute=Read-Run (Join-Path $CandidateRoot 'compute') 'RayQueryCompute' $true
+    $controlPipeline=Read-Run $ControlPipelineDirectory 'RayTracingPipeline' $false
+    $controlCompute=Read-Run $ControlComputeDirectory 'RayQueryCompute' $false
+    $comparisons=@((Compare-Runs $pipeline $compute 'candidate-backend-parity'),
+        (Compare-Runs $controlPipeline $pipeline 'pipeline-old-control-differences'),
+        (Compare-Runs $controlCompute $compute 'compute-old-control-differences'))
+}
 [ordered]@{schema=1;controlSource=$controlCommit;runReceipt=Get-Content (Join-Path $CandidateRoot 'run-receipt.json') -Raw|ConvertFrom-Json;
     payloadRows=0;pixelTolerance=[ordered]@{maximumChannelDifference=3;maximumFractionOverOne=0.001};
     performanceEvidence=$false;comparisons=$comparisons}|
@@ -116,4 +136,6 @@ foreach($comparison in $comparisons) {
 }
 # Old controls contain demonstrated rendering defects. Differences are retained,
 # not automatically labelled regressions or forced back to those old pixels.
-if(-not $comparisons[0].passed){throw "Clean backend image gate failed; retain $OutputPath"}
+if(@($comparisons|Where-Object {$_.label.StartsWith('candidate-backend-parity') -and -not $_.passed}).Count -gt 0){
+    throw "Clean backend image gate failed; retain $OutputPath"
+}

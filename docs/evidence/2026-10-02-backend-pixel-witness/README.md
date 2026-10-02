@@ -283,11 +283,61 @@ lighting and reflected visibility. Lead inspected old/new opening and candidate
 blue/finale images. This inspection and mathematical winding agreement do not
 replace phone/High/live acceptance or independently prove every changed pixel.
 
-Next unfinished step: the three affected clean High fixtures on both RTX
-backends, with existing High controls reused. Their build is underway; no run
-is claimed yet. Keep the known boundary, frozen-cost gate and separate High
-row43 physical false candidate open. Shipping/Diagnostic equivalence is a
-separate matrix, not certified by this backend pair. Normal engineering code/
-configuration remains unchanged; this isolated candidate is not promoted.
+The planned three High fixtures are now completed below; do not repeat them.
+Keep the known boundary, frozen-cost gate and separate High row43 physical false
+candidate open. Shipping/Diagnostic equivalence is a separate matrix, not
+certified by this backend pair. Normal engineering code/configuration remains
+unchanged; this isolated candidate is not promoted.
 S26 checks stay parked; no phone poll/install, owner re-request, main merge,
 release or publication. Audio/haptic manual revalidation required:NO.
+
+### Clean High fixtures: failures reproduced in normal controls
+
+The real High/Diagnostic application builds without recompiling the16 unchanged
+modules. Existing normal pipeline controls are reused. Exactly one new capture
+for each of `glass-edge-fresnel`, `lantern-held-high`, `lantern-held-low` on each
+RTX backend exits0 with complete honest RT presentation, unchanged960x540/100%,
+12 settling frames and time0. Source7357f88 has the same renderer/modules as
+8a75627; executable SHA256
+`265b21c06b201a57116100e3c92716fa1173fa7f56cf04cf202b0d6e44c864d9`.
+Actual module/camera/state/allocation/CPU geometry/visibility/grip checks pass.
+
+**High backend image gate FAIL:** respective maxima20/53/14 and32/6/5 pixels
+over3. Failure fractions are6.36574074074074e-5 /1.736111111111111e-5 /
+1.3503086419753087e-5, below the fraction ceiling but still failing the unchanged
+maximum3 rule. Zero transport/stack/open/interface/volume/mismatch/shadow failure
+counters are not substituted for image acceptance. Edge retains566 pipeline /
+568 compute reason1 certified recoveries; held-high/low retain533/236 same-medium
+secondary terminals and149/94 TIR terminations. Physical interpretation and
+live-motion gates remain open. No counter suppression or tolerance change.
+
+The missing evidence was a matching normal **compute** fixture control; the
+retained pipeline controls already existed and are not repeated. Reuse the
+existing normal High executable SHA256
+`3526bc9d5727cf91f21785e91740bce55de0ea61ab5def68ec5174a68eb73a19`
+without any build/source/configuration change. Exactly three new compute-control
+captures fill that gap, exit0, and match normal catalog/scene/geometry identity.
+Normal checkout d9be81e is recorded separately from candidate source7357f88.
+[Reconciled comparison](clean-uninstrumented/clean-high-control-reconciled.json)
+proves all43 over3 coordinates **and both RGB triples at each point** equal the
+normal pair; counts/fractions/maxima also agree. These demonstrated High backend
+failures predate the normals/UV candidate; they are not candidate regressions.
+This conclusion is bounded to the three fixtures, not every High pose/device.
+
+Glass-edge candidate versus its respective normal controls passes max2.
+Held-high/low old-control image comparisons deliberately remain FAIL (max94,
+210/129 pixels over3) after corrected box-normal/UV shading. The corrections
+do not certify every changed pixel merely by restoring old images. Lead inspects
+candidate edge/held-high images. Pipeline counter comparison preserves the sole
+held changes: finite shadow-endpoint count3902→3899 and3694→3691; other recorded
+values agree. Full images/manifests/logs and both run receipts are retained here;
+unchanged CPU OBJ exports remain in the raw directories identified above.
+
+Next unfinished step: a bounded clean **Mobile Shipping/Diagnostic** image
+comparison on each backend, consuming the already-generated Shipping modules.
+Do not rerun the complete Mobile/High Diagnostic matrices or rebuild shaders.
+Keep investigation cost/promotion and normal High edge/row43 physical failures
+distinct; no new primary-precision keyword/epsilon sweep. The isolated Debug
+build cache is currently High/Diagnostic; the normal worktree/default remains
+untouched. No matched Shipping performance or phone claim. Audio/haptic manual
+revalidation required:NO; semantic playback/haptic inputs remain unchanged.

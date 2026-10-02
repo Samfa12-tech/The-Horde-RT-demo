@@ -35,13 +35,26 @@ Scene/module/asset-allocation/actual CPU geometry/visibility/grip provenance pas
 The first LFS-pointer host failure and local-cache hydration/pass are preserved.
 See the [single experiment record](evidence/2026-10-02-backend-pixel-witness/README.md#clean-uninstrumented-candidate-mobile-matrix-completed).
 
-Next step: complete the underway clean High build, then exactly three existing
-High fixtures (`glass-edge-fresnel`, `lantern-held-high`, `lantern-held-low`) on
-each RTX backend. Reuse retained controls, do not repeat the completed Mobile
-matrix or shader compilation. Keep High row43, boundary/cost admission and
-Shipping/Diagnostic parity distinct/open. S26 owner-disconnected; no polling or
-repeated owner requests. No main merge, release or publication. Audio/haptic
-manual revalidation required:NO: arithmetic-only, feedback semantics unchanged.
+The clean High build and six affected fixture captures also complete (source
+7357f88, same runtime8a75627). All three High backend pairs FAIL unchanged
+max3/.001 (max20/53/14;32/6/5 pixels over3). Reusing the existing normal High
+binary, only three previously missing compute controls are captured; no normal
+source/configuration change or rebuild. All43 over3 coordinates and both RGB
+triples exactly match the retained-pipeline/new-normal-compute control pairs:
+these bounded High failures predate this candidate. Zero failure counters do
+not close them. Reason1 recoveries566/568 and TIR/secondary terminals remain
+open for physical interpretation; separate High row43 is not fixed or rerun.
+Held old-control image changes (max94) remain explicit differences, not blanket
+passes. Existing pipeline controls and completed native matrices are not repeated.
+
+Next step: clean Mobile Shipping/Diagnostic image comparison on each backend,
+using the already-generated modules and retained Diagnostic captures. Isolated
+Debug cache currently High/Diagnostic; normal worktree/default unchanged.
+Do not rerun the completed Mobile/High Diagnostic matrices or shader compilation.
+Keep High row43/edges, boundary/cost admission and Shipping/Diagnostic parity
+distinct/open. S26 owner-disconnected; no polling or repeated owner requests.
+No main merge, release or publication. Audio/haptic manual revalidation required:
+NO, arithmetic-only with unchanged feedback semantics.
 
 ### October 2 ordered PBR UV result (preceding completed investigation)
 
