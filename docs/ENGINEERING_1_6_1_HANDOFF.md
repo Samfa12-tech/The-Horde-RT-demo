@@ -41,11 +41,21 @@ terminals and separate row43 remain open. Old-control shading changes remain
 explicit differences, not blanket passes. Exact source/artifacts/finite matrices:
 [single record](evidence/2026-10-02-backend-pixel-witness/README.md#clean-uninstrumented-rtx-admission).
 
-Next step: bounded clean Mobile Shipping/Diagnostic image comparison on each
-backend, using the already-generated modules and retained Diagnostic captures.
-Do not repeat completed controls, Mobile/High Diagnostic matrices or shader
-compilation. Isolated Debug cache currently High/Diagnostic; normal default is
-untouched. Keep boundary/cost/High physical/device gates separate. S26 remains
+Clean Mobile Shipping/Diagnostic parity is subsequently complete at isolated
+evidenceb041ea8 (same runtime8a75627):26/26 unchanged image gates PASS, pipeline
+max0–1/fraction over1=0, compute all max0. Real Debug app with Shipping shader
+policy builds/captures both backends; no shader recompilation or Diagnostic
+recapture. Actual module identities/CompiledOut diagnostics and scene/geometry/
+visibility/grips verified. This is not Release or performance evidence. Independent
+Shipping backend gate still FAILS only at finale770,526 max6.
+
+Next step: localize one retained High edge discrepancy456,304 (22,17,17 /2,2,3,
+max20), using existing native observer facilities and only necessary probe/source
+reads. If fields are missing, at most one bounded image per backend with
+non-payload stability/diagnostics preserved. No new framework, precision/epsilon
+sweep, repeated controls/Mobile/High/Shipping matrices or shader compilation.
+Isolated Debug cache now Mobile/Shipping; Diagnostic binaries retained. Normal
+default untouched. Keep boundary/cost/High physical/device gates separate. S26 remains
 owner-disconnected; no polling/install or repeated owner requests. No main merge,
 release or publication. Audio/haptic manual revalidation required:NO for this
 arithmetic/capture slice; pre-existing focused owner checks are unchanged.

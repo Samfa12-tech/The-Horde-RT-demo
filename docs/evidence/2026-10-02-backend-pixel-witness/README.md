@@ -267,10 +267,22 @@ physical acceptance; reason1 recoveries566/568, TIR/secondary termination and
 separate High row43 remain open. Full counter differences and negative gates
 are retained; no tolerance, geometry/material or diagnostic changes to pass them.
 
-Next unfinished step: clean Mobile Shipping/Diagnostic image comparison on each
-backend, reusing generated modules and Diagnostic captures. Do not repeat the
-completed native matrices, controls, shader compilation or qualifier search.
-Boundary/cost/High physics/device gates remain open. Normal engineering/defaults
-are unchanged; no phone action, main merge, release or publication. S26 stays
-parked until owner reconnects. Audio/haptic manual revalidation required:NO for
-this slice; previously requested owner checks unchanged.
+That next instrumentation matrix is subsequently completed at isolated
+[evidenceb041ea8](https://github.com/Samfa12-tech/The-Horde-RT-demo/tree/b041ea8/docs/evidence/2026-10-02-backend-pixel-witness):
+clean Mobile Shipping/Diagnostic **26/26 PASS** unchanged max3/.001, pipeline
+max0–1/fraction over1=0, compute all max0. Real Debug app/Shipping shader-policy
+build and both full13 captures pass, consuming retained generated modules and
+Diagnostic controls. Actual selected module/CompiledOut diagnostics, scene/static
+allocations/CPU geometry/visibility/grips verify; no new shader compilation or
+Diagnostic recapture. This is not Release/performance/phone acceptance. Independent
+Shipping backend parity remains12/13 / overall FAIL at known finale770,526 max6.
+
+Next unfinished step: localize one retained High edge pixel456,304 (22,17,17 /
+2,2,3, max20) using existing native observer facilities. Read only necessary
+probe/source; if fields are missing, at most one image per backend with original
+non-payload stability/diagnostics preserved. No repeated completed matrices or
+controls, new framework, precision/epsilon sweep or false conclusion from zero
+failure counters. Boundary/cost/High row43/recovery/TIR/live/device gates stay
+open. Normal engineering/defaults unchanged; no phone action, main merge, release
+or publication. S26 parked until owner reconnects. Audio/haptic manual revalidation
+required:NO for this slice; previously requested owner checks unchanged.
