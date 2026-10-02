@@ -47,12 +47,24 @@ open for physical interpretation; separate High row43 is not fixed or rerun.
 Held old-control image changes (max94) remain explicit differences, not blanket
 passes. Existing pipeline controls and completed native matrices are not repeated.
 
-Next step: clean Mobile Shipping/Diagnostic image comparison on each backend,
-using the already-generated modules and retained Diagnostic captures. Isolated
-Debug cache currently High/Diagnostic; normal worktree/default unchanged.
-Do not rerun the completed Mobile/High Diagnostic matrices or shader compilation.
-Keep High row43/edges, boundary/cost admission and Shipping/Diagnostic parity
-distinct/open. S26 owner-disconnected; no polling or repeated owner requests.
+Clean Mobile Shipping/Diagnostic comparison is now complete:26/26 image pairs
+PASS unchanged max3/.001, pipeline max0–1/fraction over1=0 and compute all max0.
+Source9d4d1f4 uses the same runtime8a75627; a real Debug app with Shipping shader
+policy builds/captures both backends without recompiling shaders. This is not
+Release/performance evidence. Actual Shipping selection/disabled diagnostics,
+scene/static allocations/CPU geometry/masks/grips match retained Diagnostic
+captures. Independent Shipping backend parity remains12/13 / overall FAIL at
+known finale770,526 max6. No failed gate is waived by instrumentation parity.
+
+Next step: localize one retained High edge pixel456,304 (22,17,17 /2,2,3, max20)
+using existing native observer facilities, only necessary probe/source reads and
+at most one image per backend if fields are missing. Preserve non-payload image
+stability and diagnostics; no new telemetry framework/precision/epsilon sweep.
+Do not rerun completed Mobile/High/Shipping controls/matrices or shader compilation.
+Isolated Debug cache now Mobile/Shipping; frozen Diagnostic binaries retained.
+Normal worktree/default unchanged. Keep High row43/edges, boundary/cost admission
+and physical/device gates separate/open. S26 owner-disconnected; no polling or
+repeated owner requests.
 No main merge, release or publication. Audio/haptic manual revalidation required:
 NO, arithmetic-only with unchanged feedback semantics.
 

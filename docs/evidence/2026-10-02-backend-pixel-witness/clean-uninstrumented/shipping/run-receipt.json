@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "sourceCommit": "9d4d1f408154e2405adcf3606c3c8451f6e16f49",
+  "executableSha256": "9a79dc6d2a8929ac784c2045bcf523653ad175a91e5ac520c760a77847314570",
+  "instrumentation": "Shipping",
+  "quality": "Mobile",
+  "payloadRows": 0,
+  "existingNormalBinary": false,
+  "investigationOnly": true,
+  "performanceEvidence": false,
+  "runs": [
+    {
+      "backend": "pipeline",
+      "checkpoint": null,
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-mobile-shipping\\pipeline"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": null,
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-mobile-shipping\\compute",
+        "--require-rayquery-compute"
+      ]
+    }
+  ]
+}

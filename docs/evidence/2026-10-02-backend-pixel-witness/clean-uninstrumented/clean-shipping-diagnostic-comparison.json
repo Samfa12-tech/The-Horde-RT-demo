@@ -1,0 +1,1177 @@
+{
+  "schema": 1,
+  "controlSource": "d9be81e77493d7e5c9af01604f865d0d3ef11e48",
+  "runReceipt": {
+    "schema": 1,
+    "sourceCommit": "9d4d1f408154e2405adcf3606c3c8451f6e16f49",
+    "executableSha256": "9a79dc6d2a8929ac784c2045bcf523653ad175a91e5ac520c760a77847314570",
+    "instrumentation": "Shipping",
+    "quality": "Mobile",
+    "payloadRows": 0,
+    "existingNormalBinary": false,
+    "investigationOnly": true,
+    "performanceEvidence": false,
+    "runs": [
+      {
+        "backend": "pipeline",
+        "checkpoint": null,
+        "exitCode": 0,
+        "arguments": [
+          "--capture-showcase",
+          "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-mobile-shipping\\pipeline"
+        ]
+      },
+      {
+        "backend": "compute",
+        "checkpoint": null,
+        "exitCode": 0,
+        "arguments": [
+          "--capture-showcase",
+          "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-mobile-shipping\\compute",
+          "--require-rayquery-compute"
+        ]
+      }
+    ]
+  },
+  "payloadRows": 0,
+  "pixelTolerance": {
+    "maximumChannelDifference": 3,
+    "maximumFractionOverOne": 0.001
+  },
+  "performanceEvidence": false,
+  "shippingDiagnosticMatrix": true,
+  "comparisons": [
+    {
+      "label": "shipping-diagnostic-parity/pipeline",
+      "passed": true,
+      "leftManifestSha256": "c828525af062f25be0249068ce1dc225905ca0f51edcde42ccd8d044f84b5433",
+      "rightManifestSha256": "972534528bb15d2c52e05a99903dbd34ac866a152b01c7cca0d7e282d171ecff",
+      "records": [
+        {
+          "checkpoint": "opening",
+          "file": "00-opening.png",
+          "leftSha256": "5067c62c201e1b95a4f8dc962a883536f122a0f9a48c857c82a779793a36ff36",
+          "rightSha256": "565ac121458903b8d52d7c4576173cc430c672fffa2b7e230a7974ae3d247120",
+          "leftPrimaryPixels": {
+            "torch": 13636,
+            "sword": 6797,
+            "player": 10670,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "skeleton",
+          "file": "01-skeleton.png",
+          "leftSha256": "20e7261d9bd0750b267902bd3372591f2b93224c61abca360f0bb9613a1ecebf",
+          "rightSha256": "20e7261d9bd0750b267902bd3372591f2b93224c61abca360f0bb9613a1ecebf",
+          "leftPrimaryPixels": {
+            "torch": 13652,
+            "sword": 6798,
+            "player": 10695,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "worst-bend",
+          "file": "02-worst-bend.png",
+          "leftSha256": "86b8494910f7614298dec46444fd095f371b720f5bd9ea8d433dfaf25b7e7568",
+          "rightSha256": "7f7dd2ad41ec2c4f4f06b001082ce87a663006dc669a3524f714bf7e5b8dd6bc",
+          "leftPrimaryPixels": {
+            "torch": 13639,
+            "sword": 6797,
+            "player": 10677,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "lantern-drop",
+          "file": "03-lantern-drop.png",
+          "leftSha256": "18423dfb572aa08fb370fffe3942ddc54af18b1cc15267bddb3dcd403d8552e0",
+          "rightSha256": "26763f3e29bd0871f9d3b91e7cb4a005380d497d49941d6ffb5a228f6749a9f8",
+          "leftPrimaryPixels": {
+            "torch": 9419,
+            "sword": 2741,
+            "player": 10002,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "skylight",
+          "file": "04-skylight.png",
+          "leftSha256": "5bd554bfb2594fe2cc7e2f6acef5e9a453cd2767b8ba41209a51477ba06dde68",
+          "rightSha256": "5bd554bfb2594fe2cc7e2f6acef5e9a453cd2767b8ba41209a51477ba06dde68",
+          "leftPrimaryPixels": {
+            "torch": 425,
+            "sword": 6794,
+            "player": 3856,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "yellow",
+          "file": "05-yellow.png",
+          "leftSha256": "7cde2152497d33453c742bd51036c9b80466c06efa8a037daa52cef5685cd058",
+          "rightSha256": "7cde2152497d33453c742bd51036c9b80466c06efa8a037daa52cef5685cd058",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6798,
+            "player": 3852,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "blue",
+          "file": "06-blue.png",
+          "leftSha256": "df9e0d819f6a07ece090f32923f3569a43f3dbc1528b225a0b443d593c00b7ef",
+          "rightSha256": "df9e0d819f6a07ece090f32923f3569a43f3dbc1528b225a0b443d593c00b7ef",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6798,
+            "player": 3852,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "red",
+          "file": "07-red.png",
+          "leftSha256": "7c1d31554a20ad420ed9470626f601cebf67da1687145e38b5ffb0a86546893f",
+          "rightSha256": "e5275b14a946057f22c9f07ac1a3ebbf563bbd764b89e3ba9a97c9e9dd43a1a9",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6798,
+            "player": 3852,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "green",
+          "file": "08-green.png",
+          "leftSha256": "a9a8df01260a0c69c7396ccf6b4c63ac6e6b326026f286d2929eb744d56ff95b",
+          "rightSha256": "a9a8df01260a0c69c7396ccf6b4c63ac6e6b326026f286d2929eb744d56ff95b",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6798,
+            "player": 3852,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "mirror",
+          "file": "09-mirror.png",
+          "leftSha256": "75b717698ddb7438cb2cb814f5b779b9d8b0320ace3c187c619be31eb9f8e7c7",
+          "rightSha256": "75b717698ddb7438cb2cb814f5b779b9d8b0320ace3c187c619be31eb9f8e7c7",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6798,
+            "player": 3852,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "lich",
+          "file": "10-lich.png",
+          "leftSha256": "c2a7d1c60423458a2e6c669ec43639e5325ae45dd7bd9afffbe7d76bec9f1379",
+          "rightSha256": "c2a7d1c60423458a2e6c669ec43639e5325ae45dd7bd9afffbe7d76bec9f1379",
+          "leftPrimaryPixels": {
+            "torch": 13,
+            "sword": 7482,
+            "player": 2692,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "finale-roof",
+          "file": "11-finale-roof.png",
+          "leftSha256": "4e7d8c901c800c6f1ed99215cb5093a7142b88c767041185820b1976050b8b43",
+          "rightSha256": "86ce58a52fed7b80850c76c45aa8e1cca3f3d2e9507a2a3e4cf0d96560db3de8",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6806,
+            "player": 57218,
+            "rewardRing": 419,
+            "rewardBody": 13925
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "two-enemy-combat",
+          "file": "12-two-enemy-combat.png",
+          "leftSha256": "a2b5a998a7f1f0aa2a6be439f685e312a06966361a30804929a24cc1b3cc12a9",
+          "rightSha256": "2afadcdc5aad3274d8d1ae8792ac52fcfa00028fed57ede6e6c180041fdc7742",
+          "leftPrimaryPixels": {
+            "torch": 13652,
+            "sword": 6798,
+            "player": 10695,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        }
+      ]
+    },
+    {
+      "label": "shipping-diagnostic-parity/compute",
+      "passed": true,
+      "leftManifestSha256": "0439c6e297d9ccac0734ba1bc01cb61132afdf56586ae096fc6d37283069ff05",
+      "rightManifestSha256": "9b88ea51fa0dc765daa8c63e260541258b2301a0c4cf9863fa6766af5cffa77c",
+      "records": [
+        {
+          "checkpoint": "opening",
+          "file": "00-opening.png",
+          "leftSha256": "b116ee461756bfc5a6b2d6c24c2d1b0522a132e11112a505e255d3da6e68fdce",
+          "rightSha256": "b116ee461756bfc5a6b2d6c24c2d1b0522a132e11112a505e255d3da6e68fdce",
+          "leftPrimaryPixels": {
+            "torch": 13636,
+            "sword": 6797,
+            "player": 10670,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "skeleton",
+          "file": "01-skeleton.png",
+          "leftSha256": "895c1815389744efd01c26d0a7690a3612dcb3fc4f9c39b1f262a2e4610065a3",
+          "rightSha256": "895c1815389744efd01c26d0a7690a3612dcb3fc4f9c39b1f262a2e4610065a3",
+          "leftPrimaryPixels": {
+            "torch": 13652,
+            "sword": 6798,
+            "player": 10695,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "worst-bend",
+          "file": "02-worst-bend.png",
+          "leftSha256": "0e59956a7d755264fd2012260a2a4a1669c8520c92a4d645f85607a33d8f9a7a",
+          "rightSha256": "0e59956a7d755264fd2012260a2a4a1669c8520c92a4d645f85607a33d8f9a7a",
+          "leftPrimaryPixels": {
+            "torch": 13639,
+            "sword": 6797,
+            "player": 10677,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "lantern-drop",
+          "file": "03-lantern-drop.png",
+          "leftSha256": "6bf0901f1013f3b7da82d01999f5a0fc68de689903faa135cfc1f78f3962eecc",
+          "rightSha256": "6bf0901f1013f3b7da82d01999f5a0fc68de689903faa135cfc1f78f3962eecc",
+          "leftPrimaryPixels": {
+            "torch": 9419,
+            "sword": 2741,
+            "player": 10002,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "skylight",
+          "file": "04-skylight.png",
+          "leftSha256": "716369beb33785ca3432def1c58436afca29c63491495679e2a6cf450c0a6b6c",
+          "rightSha256": "716369beb33785ca3432def1c58436afca29c63491495679e2a6cf450c0a6b6c",
+          "leftPrimaryPixels": {
+            "torch": 425,
+            "sword": 6794,
+            "player": 3856,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "yellow",
+          "file": "05-yellow.png",
+          "leftSha256": "6139435dc2db53d4199d19fcc4cd4d46839440433cff07fcc146f794e9682cf4",
+          "rightSha256": "6139435dc2db53d4199d19fcc4cd4d46839440433cff07fcc146f794e9682cf4",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6798,
+            "player": 3852,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "blue",
+          "file": "06-blue.png",
+          "leftSha256": "30a64b8ef750ee5e13a06e6013f3da149cdd9400bac2ee82133e1d93d3869270",
+          "rightSha256": "30a64b8ef750ee5e13a06e6013f3da149cdd9400bac2ee82133e1d93d3869270",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6798,
+            "player": 3852,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "red",
+          "file": "07-red.png",
+          "leftSha256": "75c9709a468060669e42e79c75de15e8ed80b96981dea1726ab5357b474b08ae",
+          "rightSha256": "75c9709a468060669e42e79c75de15e8ed80b96981dea1726ab5357b474b08ae",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6798,
+            "player": 3852,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "green",
+          "file": "08-green.png",
+          "leftSha256": "c8c4dc89e84662ec193bf856f4b908105c3d93ec484bdca50326608fa78dfbe0",
+          "rightSha256": "c8c4dc89e84662ec193bf856f4b908105c3d93ec484bdca50326608fa78dfbe0",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6798,
+            "player": 3852,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "mirror",
+          "file": "09-mirror.png",
+          "leftSha256": "5cc55382f13518bef89b29a09d1089b6c219ba8c14f452c6653f86dc83f657b1",
+          "rightSha256": "5cc55382f13518bef89b29a09d1089b6c219ba8c14f452c6653f86dc83f657b1",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6798,
+            "player": 3852,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "lich",
+          "file": "10-lich.png",
+          "leftSha256": "f73f58bf1e394c4371b06bd5a8c8b1699cc9193e0d3c44aa39521ace0dd42b73",
+          "rightSha256": "f73f58bf1e394c4371b06bd5a8c8b1699cc9193e0d3c44aa39521ace0dd42b73",
+          "leftPrimaryPixels": {
+            "torch": 13,
+            "sword": 7482,
+            "player": 2692,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "finale-roof",
+          "file": "11-finale-roof.png",
+          "leftSha256": "6b41b18ce05ccc4e003a194aaf2dd88fdfdc86bfe000f4c584e43e4a93fecf34",
+          "rightSha256": "6b41b18ce05ccc4e003a194aaf2dd88fdfdc86bfe000f4c584e43e4a93fecf34",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 6806,
+            "player": 57218,
+            "rewardRing": 419,
+            "rewardBody": 13925
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "two-enemy-combat",
+          "file": "12-two-enemy-combat.png",
+          "leftSha256": "1eee7be280a047fb62f18a210fb4e3ed59bad3c711d6856978394c8cda35066f",
+          "rightSha256": "1eee7be280a047fb62f18a210fb4e3ed59bad3c711d6856978394c8cda35066f",
+          "leftPrimaryPixels": {
+            "torch": 13652,
+            "sword": 6798,
+            "player": 10695,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 0,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        }
+      ]
+    },
+    {
+      "label": "shipping-backend-parity",
+      "passed": false,
+      "leftManifestSha256": "972534528bb15d2c52e05a99903dbd34ac866a152b01c7cca0d7e282d171ecff",
+      "rightManifestSha256": "9b88ea51fa0dc765daa8c63e260541258b2301a0c4cf9863fa6766af5cffa77c",
+      "records": [
+        {
+          "checkpoint": "opening",
+          "file": "00-opening.png",
+          "leftSha256": "565ac121458903b8d52d7c4576173cc430c672fffa2b7e230a7974ae3d247120",
+          "rightSha256": "b116ee461756bfc5a6b2d6c24c2d1b0522a132e11112a505e255d3da6e68fdce",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "skeleton",
+          "file": "01-skeleton.png",
+          "leftSha256": "20e7261d9bd0750b267902bd3372591f2b93224c61abca360f0bb9613a1ecebf",
+          "rightSha256": "895c1815389744efd01c26d0a7690a3612dcb3fc4f9c39b1f262a2e4610065a3",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "worst-bend",
+          "file": "02-worst-bend.png",
+          "leftSha256": "7f7dd2ad41ec2c4f4f06b001082ce87a663006dc669a3524f714bf7e5b8dd6bc",
+          "rightSha256": "0e59956a7d755264fd2012260a2a4a1669c8520c92a4d645f85607a33d8f9a7a",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "lantern-drop",
+          "file": "03-lantern-drop.png",
+          "leftSha256": "26763f3e29bd0871f9d3b91e7cb4a005380d497d49941d6ffb5a228f6749a9f8",
+          "rightSha256": "6bf0901f1013f3b7da82d01999f5a0fc68de689903faa135cfc1f78f3962eecc",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 3,
+            "pixelsDifferentByMoreThanOne": 5,
+            "differentFraction": 9.645061728395062E-06,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "skylight",
+          "file": "04-skylight.png",
+          "leftSha256": "5bd554bfb2594fe2cc7e2f6acef5e9a453cd2767b8ba41209a51477ba06dde68",
+          "rightSha256": "716369beb33785ca3432def1c58436afca29c63491495679e2a6cf450c0a6b6c",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "yellow",
+          "file": "05-yellow.png",
+          "leftSha256": "7cde2152497d33453c742bd51036c9b80466c06efa8a037daa52cef5685cd058",
+          "rightSha256": "6139435dc2db53d4199d19fcc4cd4d46839440433cff07fcc146f794e9682cf4",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "blue",
+          "file": "06-blue.png",
+          "leftSha256": "df9e0d819f6a07ece090f32923f3569a43f3dbc1528b225a0b443d593c00b7ef",
+          "rightSha256": "30a64b8ef750ee5e13a06e6013f3da149cdd9400bac2ee82133e1d93d3869270",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "red",
+          "file": "07-red.png",
+          "leftSha256": "e5275b14a946057f22c9f07ac1a3ebbf563bbd764b89e3ba9a97c9e9dd43a1a9",
+          "rightSha256": "75c9709a468060669e42e79c75de15e8ed80b96981dea1726ab5357b474b08ae",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "green",
+          "file": "08-green.png",
+          "leftSha256": "a9a8df01260a0c69c7396ccf6b4c63ac6e6b326026f286d2929eb744d56ff95b",
+          "rightSha256": "c8c4dc89e84662ec193bf856f4b908105c3d93ec484bdca50326608fa78dfbe0",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "mirror",
+          "file": "09-mirror.png",
+          "leftSha256": "75b717698ddb7438cb2cb814f5b779b9d8b0320ace3c187c619be31eb9f8e7c7",
+          "rightSha256": "5cc55382f13518bef89b29a09d1089b6c219ba8c14f452c6653f86dc83f657b1",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "lich",
+          "file": "10-lich.png",
+          "leftSha256": "c2a7d1c60423458a2e6c669ec43639e5325ae45dd7bd9afffbe7d76bec9f1379",
+          "rightSha256": "f73f58bf1e394c4371b06bd5a8c8b1699cc9193e0d3c44aa39521ace0dd42b73",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        },
+        {
+          "checkpoint": "finale-roof",
+          "file": "11-finale-roof.png",
+          "leftSha256": "86ce58a52fed7b80850c76c45aa8e1cca3f3d2e9507a2a3e4cf0d96560db3de8",
+          "rightSha256": "6b41b18ce05ccc4e003a194aaf2dd88fdfdc86bfe000f4c584e43e4a93fecf34",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 6,
+            "pixelsDifferentByMoreThanOne": 3,
+            "differentFraction": 5.787037037037037E-06,
+            "unchangedGate": false,
+            "outlierCount": 1,
+            "firstOutliers": [
+              {
+                "x": 770,
+                "y": 526,
+                "maximumChannelDifference": 6,
+                "leftRgb": [
+                  18,
+                  21,
+                  25
+                ],
+                "rightRgb": [
+                  13,
+                  15,
+                  20
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "checkpoint": "two-enemy-combat",
+          "file": "12-two-enemy-combat.png",
+          "leftSha256": "2afadcdc5aad3274d8d1ae8792ac52fcfa00028fed57ede6e6c180041fdc7742",
+          "rightSha256": "1eee7be280a047fb62f18a210fb4e3ed59bad3c711d6856978394c8cda35066f",
+          "leftPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "rightPrimaryPixels": {
+            "torch": 0,
+            "sword": 0,
+            "player": 0,
+            "rewardRing": 0,
+            "rewardBody": 0
+          },
+          "comparison": {
+            "maximumChannelDifference": 1,
+            "pixelsDifferentByMoreThanOne": 0,
+            "differentFraction": 0.0,
+            "unchangedGate": true,
+            "outlierCount": 0,
+            "firstOutliers": []
+          }
+        }
+      ]
+    }
+  ]
+}

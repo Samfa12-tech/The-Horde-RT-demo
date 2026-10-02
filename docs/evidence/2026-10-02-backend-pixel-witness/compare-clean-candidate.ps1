@@ -1,7 +1,7 @@
 param([Parameter(Mandatory)][string]$CandidateRoot,
       [Parameter(Mandatory)][string]$ControlPipelineDirectory,
       [string]$ControlComputeDirectory,
-      [Parameter(Mandatory)][string]$OutputPath,[switch]$HighFixtures)
+      [Parameter(Mandatory)][string]$OutputPath,[switch]$HighFixtures,[switch]$ShippingParity)
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $controlCommit = 'd9be81e77493d7e5c9af01604f865d0d3ef11e48'
@@ -42,7 +42,7 @@ public static class HordeCleanCandidatePixels {
 '@
 function Require([bool]$Condition,[string]$Message) { if(-not $Condition){throw $Message} }
 function Equal-Json($Left,$Right) { ($Left|ConvertTo-Json -Depth 14 -Compress) -ceq ($Right|ConvertTo-Json -Depth 14 -Compress) }
-function Read-Run([string]$Directory,[string]$Backend,[bool]$Candidate) {
+function Read-Run([string]$Directory,[string]$Backend,[bool]$Candidate,[string]$Instrumentation='Diagnostic') {
     $m=Get-Content (Join-Path $Directory 'capture-manifest.json') -Raw|ConvertFrom-Json
     Require ($m.schemaVersion -eq 1 -and $m.complete -and $null -eq $m.error -and
         $m.source -ceq 'rt-storage-image' -and $m.sceneOnly -and -not $m.overlaysIncluded -and
@@ -56,7 +56,7 @@ function Read-Run([string]$Directory,[string]$Backend,[bool]$Candidate) {
     foreach($member in @('opaqueFast','genericDielectric')) {
         $selected=$m.selectedRtPipelineBundle.$member
         $row=@($catalog.variants|Where-Object key -CEQ $selected.key)
-        Require ($row.Count -eq 1 -and $row[0].instrumentation -ceq 'Diagnostic' -and
+        Require ($row.Count -eq 1 -and $row[0].instrumentation -ceq $Instrumentation -and
             $row[0].quality -ceq $quality -and $row[0].spirvSha256 -ceq $selected.sha256) "Selected module mismatch: $Directory/$member"
     }
     for($i=0;$i -lt $expected.Count;$i++) {
@@ -99,7 +99,17 @@ function Compare-Runs($Left,$Right,[string]$Label) {
         rightManifestSha256=(Get-FileHash (Join-Path $Right.directory 'capture-manifest.json')).Hash.ToLowerInvariant();
         records=@($rows)}
 }
-if($HighFixtures) {
+if($ShippingParity) {
+    Require (-not $HighFixtures) 'This finite instrumentation matrix is Mobile only.'
+    Require (-not [string]::IsNullOrWhiteSpace($ControlComputeDirectory)) 'Shipping parity requires retained Diagnostic images on both backends.'
+    $pipeline=Read-Run (Join-Path $CandidateRoot 'pipeline') 'RayTracingPipeline' $true 'Shipping'
+    $compute=Read-Run (Join-Path $CandidateRoot 'compute') 'RayQueryCompute' $true 'Shipping'
+    $diagnosticPipeline=Read-Run $ControlPipelineDirectory 'RayTracingPipeline' $true
+    $diagnosticCompute=Read-Run $ControlComputeDirectory 'RayQueryCompute' $true
+    $comparisons=@((Compare-Runs $diagnosticPipeline $pipeline 'shipping-diagnostic-parity/pipeline'),
+        (Compare-Runs $diagnosticCompute $compute 'shipping-diagnostic-parity/compute'),
+        (Compare-Runs $pipeline $compute 'shipping-backend-parity'))
+} elseif($HighFixtures) {
     $comparisons=@(foreach($checkpoint in @('glass-edge-fresnel','lantern-held-high','lantern-held-low')) {
         $expected=@($checkpoint)
         $pipeline=Read-Run (Join-Path $CandidateRoot "pipeline/$checkpoint") 'RayTracingPipeline' $true
@@ -125,7 +135,7 @@ if($HighFixtures) {
 }
 [ordered]@{schema=1;controlSource=$controlCommit;runReceipt=Get-Content (Join-Path $CandidateRoot 'run-receipt.json') -Raw|ConvertFrom-Json;
     payloadRows=0;pixelTolerance=[ordered]@{maximumChannelDifference=3;maximumFractionOverOne=0.001};
-    performanceEvidence=$false;comparisons=$comparisons}|
+    performanceEvidence=$false;shippingDiagnosticMatrix=[bool]$ShippingParity;comparisons=$comparisons}|
     ConvertTo-Json -Depth 14|Set-Content -LiteralPath $OutputPath -Encoding utf8NoBOM
 foreach($comparison in $comparisons) {
     foreach($row in $comparison.records) {
@@ -136,6 +146,10 @@ foreach($comparison in $comparisons) {
 }
 # Old controls contain demonstrated rendering defects. Differences are retained,
 # not automatically labelled regressions or forced back to those old pixels.
-if(@($comparisons|Where-Object {$_.label.StartsWith('candidate-backend-parity') -and -not $_.passed}).Count -gt 0){
+# ShippingParity exits on instrumentation equivalence only. Its independently
+# labelled Shipping backend comparison may still fail and is retained in full.
+if(@($comparisons|Where-Object {
+    ($_.label.StartsWith('candidate-backend-parity') -or $_.label.StartsWith('shipping-diagnostic-parity')) -and -not $_.passed
+}).Count -gt 0){
     throw "Clean backend image gate failed; retain $OutputPath"
 }

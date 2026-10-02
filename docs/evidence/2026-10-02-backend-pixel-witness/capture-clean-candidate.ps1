@@ -1,4 +1,4 @@
-param([Parameter(Mandatory)][string]$OutputRoot,[switch]$HighFixtures,[switch]$ControlHighComputeOnly)
+param([Parameter(Mandatory)][string]$OutputRoot,[switch]$HighFixtures,[switch]$ControlHighComputeOnly,[switch]$Shipping)
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 if ((& git -C $repoRoot branch --show-current) -cne 'codex/horde-rtx-corrections') {
@@ -7,6 +7,7 @@ if ((& git -C $repoRoot branch --show-current) -cne 'codex/horde-rtx-corrections
 $source = (& git -C $repoRoot rev-parse HEAD).Trim()
 $exe = Join-Path $repoRoot 'build/presets/windows-x64-debug/Debug/HordeLanternRT.exe'
 if($ControlHighComputeOnly) {
+    if($Shipping){throw 'The retained normal control is Diagnostic, not Shipping.'}
     if(-not $HighFixtures){throw 'The missing-control row is only the three High compute fixtures.'}
     $normalRoot='C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo'
     $source=(& git -C $normalRoot rev-parse HEAD).Trim()
@@ -31,6 +32,7 @@ $matrix = foreach ($backend in @('pipeline', 'compute')) {
     }
 }
 $quality = if($HighFixtures){'High'}else{'Mobile'}
+$instrumentation = if($Shipping){'Shipping'}else{'Diagnostic'}
 $runs = foreach ($row in $matrix) {
     $backend = $row.backend
     $destination = Join-Path $root $row.directory
@@ -63,13 +65,13 @@ $runs = foreach ($row in $matrix) {
     if ($exitCode -ne 0) { throw "Capture $backend failed with exit $exitCode; preserve its logs." }
     $manifest = Get-Content (Join-Path $destination 'capture-manifest.json') -Raw|ConvertFrom-Json
     if(-not $manifest.complete -or $null -ne $manifest.error -or
-        $manifest.selectedRtPipelineBundle.genericDielectric.key -notmatch "diagnostic_$($quality.ToLowerInvariant())_generic_dielectric$") {
+        $manifest.selectedRtPipelineBundle.genericDielectric.key -notmatch "$($instrumentation.ToLowerInvariant())_$($quality.ToLowerInvariant())_generic_dielectric$") {
         throw "Unexpected completed module/quality: $($row.label)"
     }
     [ordered]@{ backend = $backend; checkpoint = $row.checkpoint; exitCode = $exitCode; arguments = @($start.ArgumentList) }
 }
 [ordered]@{ schema = 1; sourceCommit = $source; executableSha256 = $exeHash;
-    instrumentation = 'Diagnostic'; quality = $quality; payloadRows = 0;
+    instrumentation = $instrumentation; quality = $quality; payloadRows = 0;
     existingNormalBinary = [bool]$ControlHighComputeOnly;
     investigationOnly = $true; performanceEvidence = $false; runs = @($runs) } |
     ConvertTo-Json -Depth 6 | Set-Content (Join-Path $root 'run-receipt.json')

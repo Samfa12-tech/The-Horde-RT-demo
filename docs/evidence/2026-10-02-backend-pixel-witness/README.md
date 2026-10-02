@@ -333,11 +333,45 @@ held changes: finite shadow-endpoint count3902→3899 and3694→3691; other reco
 values agree. Full images/manifests/logs and both run receipts are retained here;
 unchanged CPU OBJ exports remain in the raw directories identified above.
 
-Next unfinished step: a bounded clean **Mobile Shipping/Diagnostic** image
-comparison on each backend, consuming the already-generated Shipping modules.
-Do not rerun the complete Mobile/High Diagnostic matrices or rebuild shaders.
+That next instrumentation comparison is completed below; do not repeat it.
 Keep investigation cost/promotion and normal High edge/row43 physical failures
-distinct; no new primary-precision keyword/epsilon sweep. The isolated Debug
-build cache is currently High/Diagnostic; the normal worktree/default remains
-untouched. No matched Shipping performance or phone claim. Audio/haptic manual
-revalidation required:NO; semantic playback/haptic inputs remain unchanged.
+distinct; no new primary-precision keyword/epsilon sweep. Normal worktree/default
+remains untouched. No matched Shipping performance or phone claim. Audio/haptic
+manual revalidation required:NO; semantic playback/haptic inputs remain unchanged.
+
+### Clean Mobile Shipping/Diagnostic image gate: completed PASS
+
+Source `9d4d1f408154e2405adcf3606c3c8451f6e16f49` has unchanged candidate runtime
+8a75627. One real MSVC **Debug executable with Shipping/Mobile shader policy**
+build passes, consuming the retained generated modules, not recompiling them.
+Executable SHA256
+`9a79dc6d2a8929ac784c2045bcf523653ad175a91e5ac520c760a77847314570`.
+This is not a Release/performance build. Two finite full13 RTX captures exit0;
+actual Shipping module identities, honest RT presentation, camera/state/static
+allocation/actual CPU geometry/instance masks/grips match the retained clean
+Diagnostic captures. Shipping diagnostics explicitly say `CompiledOut` /
+available:false; zero unavailable counters are not physical passes. The already
+verified eight actual Shipping modules have zero atomics/no diagnostics binding.
+
+[Instrumentation image comparison](clean-uninstrumented/clean-shipping-diagnostic-comparison.json):
+**26/26 PASS**, unchanged max3/.001, every pixel. Pipeline maximum0–1 and fraction
+over1=0; compute13/13 maximum0. Both lossless image sets/manifests, exact run
+receipt and build/run logs are retained. Diagnostic controls are not rerun.
+No timing/performance claim, tolerance change, diagnostic suppression or reduced
+rendering. The independent Shipping backend pair remains12/13 PASS / overall
+FAIL at the same finale770,526 max6. Its explicit failed record is not swallowed
+by the instrumentation-only command's successful exit.
+
+Next unfinished step: localize **one** retained High glass-edge discrepancy,
+pixel456,304 (pipeline22,17,17 / compute2,2,3; max20), using existing native
+observer facilities before proposing another shader change. Review only the
+needed probe/source; if actual fields are missing, at most one bounded image
+per backend, with original non-payload image stability and diagnostics preserved.
+Do not repeat completed High/Mobile/Shipping controls/matrices, add a telemetry
+framework, sweep precision/epsilon or infer its cause from zero failure counters.
+Keep separate row43 and the other High recovery/TIR/live gates open. Frozen
+byte/instruction admission still FAILS; no ceiling change or candidate promotion.
+Isolated Debug cache is now Mobile/Shipping; frozen Mobile/High Diagnostic
+executables remain in the raw root. Normal engineering/defaults are unchanged.
+Phone/device and matched Release performance gates remain parked; no main merge,
+release or publication. Audio/haptic manual revalidation required:NO.
