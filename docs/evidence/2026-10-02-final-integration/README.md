@@ -28,7 +28,7 @@ not a duplicate experiment. No music re-render or new email.
 | --- | --- |
 | Foundation Host current-source run183151 | FAIL retained: shader freshness/negative safety pass, fresh Debug build and92/97 CTests pass in858.90s. Five failures below. Runner stops before Release/captures/Android/package stages; they are not passes. |
 | Fresh push/PR compiler coverage for runtime checkpoint | PASS: checkpointde33420 push36985252002 and PR36985258071 SUCCESS; GCC/Clang/MSVC, focused Vulkan CPU-host and Android jobs all green. Not hardware/performance proof or validation of subsequent fixes. |
-| Windows Debug native RTX capture continuation | PASS command/manifest: all13 checkpoints captured, Diagnostic/High pipeline pair,960x540 on RTX5050. Opening/drop/mirror/two-enemy images inspected; not universal physical correctness or Release/performance acceptance. Owner subsequently reports a resting right-hand attachment issue on the laptop; bounded investigation remains open. |
+| Windows Debug native RTX capture continuation | PASS command/manifest: all13 checkpoints captured, Diagnostic/High pipeline pair,960x540 on RTX5050. Opening/drop/mirror/two-enemy images inspected; not universal physical correctness or Release/performance acceptance. Subsequent right-cuff defect is repaired and owner accepted in the separate finite cuff record below. |
 | Android selected-quality continuation | PASS fresh Debug/unsigned Release build, all4 ABIs and Release lint42 warnings/0 errors. Unchanged Java76/76 result is reused (unit task UP-TO-DATE), not a fresh execution. No install/device claim. |
 | Windows Release build/CTest continuation | Fresh build PASS; single CTest run96/97 PASS748.55s. Newly added strict-mode music staging regression67 catches the packaging defect before its fix; targeted14/14 script cases pass aftere39ac0a. Original failure retained, no single-run97/97 claim. |
 | Final retained Windows Shipping RT application | PARTIAL: packaged218ab102 honestly presents via pipeline/High, but unattended route cancels before measurement (0 frames); not a live-route/performance pass. Compute/live-lantern rows not started after this cancellation. Release capture automation correctly rejects with exit2/no output. |
@@ -134,11 +134,16 @@ finds that application absent; it was not terminated by Codex. This reopens only
 the right cuff finding; [bounded investigation](../2026-10-02-right-cuff/README.md)
 preserves the admitted assets and shared gameplay authority.
 
-Next unfinished step: validate the narrow right-cuff candidate without promoting
-unaccepted assets; then finish only the still-open Windows
-Shipping live/backend rows with a specific cancellation discriminator. No new
-phone use in this run. All original Debug failures have bounded passing rechecks,
-not a new single-run97/97 Debug claim.
+Subsequent bounded [right-cuff repair](../2026-10-02-right-cuff/README.md) is
+integrated and Windows owner accepted; [SFX control/balance](../2026-10-02-sfx-volume/README.md)
+and [Windows startup/focus repair](../2026-10-02-windows-music-startup/README.md)
+are also owner accepted on their exact recorded candidates. Do not restart those
+checks or relabel older captured/packaged artifacts as containing the changes.
+
+Next unfinished step: finish only the still-open Windows Shipping live/backend
+rows with a specific cancellation discriminator, plus remaining exact-device
+final-candidate gates. No new phone use in this run. All original Debug failures
+have bounded passing rechecks, not a new single-run97/97 Debug claim.
 No repetition of the92 passing Debug rows or prior phone experiments.
 Audio/haptic manual revalidation required:NO for unchanged assets, gains,
 gameplay feedback and playback inputs. No merge, release or publication.

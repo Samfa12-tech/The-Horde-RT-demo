@@ -101,8 +101,12 @@ Owner answers the exact-candidate initial-play/menu/refocus question:
 "yep - it works as it should now". Windows startup/focus acceptance is CLOSED.
 SFX is also accepted; no repeat SFX or instrumentation review.
 
-**Next unfinished step:** push this coherent fix and obtain current CI, then
-continue remaining 1.6.1 final-candidate/device gates from the existing handoff.
+Implementation5e20f10 is pushed/verified on both engineering branches; fresh
+push37001774114 and PR37001780006 are SUCCESS. [Exact CI receipt](CI.md) records
+compiler/Android results and the verified integration merge parents.
+
+**Next unfinished step:** continue only remaining 1.6.1 Windows Shipping
+live/backend and exact-device final-candidate gates from the existing handoff.
 Audio/haptic manual revalidation required: **YES**, Windows music focus behavior
 only, completed and owner accepted. Future unrelated changes return to the normal
 change-trigger rule. No phone use, publication or main merge.

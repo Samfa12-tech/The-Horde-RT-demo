@@ -51,12 +51,15 @@ now" for initial-play/menu/refocus; bounded candidate log and honest RTX
 presentation report are retained. This Windows interaction is CLOSED. No phone
 use, main merge, publication or performance claim. Audio/haptic manual
 revalidation:YES for Windows music focus only, completed/accepted; SFX and
-soundtrack instrumentation already accepted. Next: push/current CI for this
-repair, then resume the existing final-candidate/device gates, not this audition.
+soundtrack instrumentation already accepted. Next: existing Windows Shipping
+live/backend and exact-device final-candidate gates, not this audition.
 
-Fresh push36999882401 and PR36999888956 for90b3d3a both PASS GCC/Clang/MSVC,
-focused Vulkan CPU-host and Android lanes. This certifies the cuff/SFX/startup
-observation checkpoint, not the subsequent focus repair or physical RT devices.
+Repair5e20f10 is pushed/verified on both branches. Fresh push37001774114 and
+PR37001780006 both SUCCESS: GCC59/59, Clang59/59, MSVC65/65, focused Vulkan
+CPU-host15/15 and Android4-ABI Debug/Java76/76/lint/package PASS in each.
+[CI receipt](evidence/2026-10-02-windows-music-startup/CI.md) verifies PR merge
+2c170c75 parents against current mainbda1b99a/source5e20f10. This is current
+compile/integration evidence, not hardware RT or phone performance acceptance.
 
 ### October 2 off-UI surface owner repairs the demonstrated ANR
 
