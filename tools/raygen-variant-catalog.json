@@ -53,7 +53,7 @@
       "strategy": "GenericRetained",
       "shippingAllowed": false,
       "artifactPath": "src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
-      "dependencySha256": "269116e917e2c46551e33d6d87f5ef66bbafb04822d0258a46fab5ecb43456be",
+      "dependencySha256": "0b740ef88fcd647f883e42482eb9295495bf4a7e722bcd441b3c346fc896a761",
       "dependencies": [
         {
           "path": "shaders/raytracing/minimal.rgen",
@@ -93,7 +93,7 @@
         },
         {
           "path": "shaders/raytracing/experimental/high_edge_witness.glsl",
-          "sha256": "b65c0870b5bed86ccb24e2ee6bd33db3c87804236daeae76b6e1b969342f8410"
+          "sha256": "da75ef2c02fa24cf1bdcc3184fc9315a9e04945d08d584f6a38cddb0ed2727a6"
         },
         {
           "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
@@ -101,7 +101,7 @@
         },
         {
           "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
-          "sha256": "d00e9a305101932b4ca5a75405290f144d41fa105ef534969f55bc42982c3531"
+          "sha256": "6a7dc93fece7867b084a84a22b32f65a6e8f62274ad11f34093d3c632fc5b3f7"
         },
         {
           "path": "shaders/raytracing/include/rt_atmosphere.glsl",
@@ -112,17 +112,17 @@
           "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
         }
       ],
-      "includeSha256": "e1544ecfc79830ed7d1bc510a38099e2d9de51d0341b1889af9e50048b3da165",
-      "spirvSha256": "1de465a4ea9e3956d3a85d6511fa79527f388d63460426561b0cad3db683e764",
-      "bytes": 267504,
-      "words": 66876,
-      "instructions": 15848,
-      "branchOperations": 859,
-      "loops": 19,
-      "selectionMerges": 359,
-      "functions": 68,
-      "functionCalls": 243,
-      "rayQueryInitializations": 2,
+      "includeSha256": "1e7a1fd9e2914b9603e89b523903066e476be7bf1e5cedc46bd9d5a936ef4a5d",
+      "spirvSha256": "53e02764f0dca5ade3ec2f744c8c0a5ebd8e41eca8ab9af93630b5913747c257",
+      "bytes": 278408,
+      "words": 69602,
+      "instructions": 16521,
+      "branchOperations": 909,
+      "loops": 23,
+      "selectionMerges": 374,
+      "functions": 69,
+      "functionCalls": 250,
+      "rayQueryInitializations": 3,
       "atomicInstructions": 41,
       "hasDiagnosticsBinding": true,
       "driverSafeFullyInlined": false,

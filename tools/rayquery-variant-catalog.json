@@ -115,7 +115,7 @@
       "stage": "comp",
       "executionModel": "GLCompute",
       "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
-      "dependencySha256": "50c66caf024d5dca2769f2c6d8b1914c1d63f9386c2297b0edfb46c9be437baa",
+      "dependencySha256": "0b262e43832b83165c7e7728f8145309d80669d40e717558a0158e98b2ff701a",
       "dependencies": [
         {
           "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/minimal.comp",
@@ -159,7 +159,7 @@
         },
         {
           "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/experimental/high_edge_witness.glsl",
-          "sha256": "b65c0870b5bed86ccb24e2ee6bd33db3c87804236daeae76b6e1b969342f8410"
+          "sha256": "da75ef2c02fa24cf1bdcc3184fc9315a9e04945d08d584f6a38cddb0ed2727a6"
         },
         {
           "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_dielectric_common.glsl",
@@ -167,24 +167,24 @@
         },
         {
           "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_dielectric_transport.glsl",
-          "sha256": "d00e9a305101932b4ca5a75405290f144d41fa105ef534969f55bc42982c3531"
+          "sha256": "6a7dc93fece7867b084a84a22b32f65a6e8f62274ad11f34093d3c632fc5b3f7"
         },
         {
           "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_atmosphere.glsl",
           "sha256": "560d2e426460a0890c2dbf9537595e063649874186d60b653ba9e00a2b363861"
         }
       ],
-      "includeSha256": "6ab91ec848fc42851cfb055444c4efee5066b4fc1ce3d8949682138d29417b82",
-      "spirvSha256": "87c59f4a9d1ca86960b94db06ec56dbba7b828728430350b90e83ab2eae3d6ad",
-      "bytes": 267740,
-      "words": 66935,
-      "instructions": 15863,
-      "branchOperations": 860,
-      "loops": 19,
-      "selectionMerges": 360,
-      "functions": 68,
-      "functionCalls": 243,
-      "rayQueryInitializations": 2,
+      "includeSha256": "17b62ebb8f15145e80d34e60055b9766daea0c73c1dd464945614cb084d98405",
+      "spirvSha256": "2d21bd8e496463eeb56f87e5cefe76af1e2949ec60f9ef8a8acb0a33f4a358be",
+      "bytes": 278644,
+      "words": 69661,
+      "instructions": 16536,
+      "branchOperations": 910,
+      "loops": 23,
+      "selectionMerges": 375,
+      "functions": 69,
+      "functionCalls": 250,
+      "rayQueryInitializations": 3,
       "atomicInstructions": 41,
       "hasDiagnosticsBinding": true,
       "compiler": {

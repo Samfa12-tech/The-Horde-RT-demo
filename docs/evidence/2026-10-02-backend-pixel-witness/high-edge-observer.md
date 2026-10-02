@@ -143,4 +143,16 @@ Require the existing watched path/RGB, nonpayload image and all41 counters to
 match their retained controls; perturbation makes the new evidence inconclusive.
 Decode actual candidate t/identity/barycentrics/front-face/geometric normal and
 surface position. Do not automatically promote this collector or integrate the
-observer branch. Next unfinished step: compile and run this finite field-gap pair.
+observer branch.
+
+New modules compiled/optimised/disassembled/validated: pipeline278408 bytes,
+SHA-25653e02764f0dca5ade3ec2f744c8c0a5ebd8e41eca8ab9af93630b5913747c257;
+compute278644 bytes,
+SHA-2562d21bd8e496463eeb56f87e5cefe76af1e2949ec60f9ef8a8acb0a33f4a358be.
+Both retain41 atomics. All14 other module hashes and frozen budget hash
+f2ff4be07c08536d140ea395fb24d1e3d502882449a84fc245df121e2ad89f4d remain exact.
+Generated adapter check PASS; MSVC Debug/High application build PASS; refreshed
+provider CTest1/1 PASS1.80s. Actual executable SHA-256
+42f856a87ca3eea9b7c803bbcdf004694d7c0dcad6eb4404f7e95e509299fb2e.
+Logs/artifacts: C:/Dev/tmp/horde-high-contact-candidates-*-20261002.
+Next unfinished step: run this finite field-gap pair, decode and check stability.
