@@ -13,6 +13,26 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
+### October 2 production-only world-box normal correction
+
+Six closed-world-box face codes now agree with their existing outward winding;
+only the reviewed metadata portion of isolated4e951c2 is admitted, plus focused
+CPU/GLSL ABI guards. New regression first fails all six old faces, then affected
+Debug/Release each3/3 pass; both actual Windows applications build. Six bounded
+High/Diagnostic RTX5050 Laptop captures exit0/honest RT, unchanged shaders/assets/
+player geometry, zero overflow/unclosed/stack/interface/volume/mismatch failures
+in these views. Real lighting differences against inward-normal controls are
+retained (strict comparisons FAIL), not forced back or called numerical parity.
+Known held backend outliers max53/14 remain FAIL/parked. Separate physical edge/
+contact/row43 cases stay OPEN. No UV/contact instrumentation, budget change,
+player tuning, memory rewrite or performance claim.
+[Single finite record/artifact receipts](evidence/2026-10-02-world-box-normals/README.md).
+All4 Android Debug ABIs/build PASS37s, APKe9fd31e7 retained, not installed.
+Owner took the S26 away: no phone polling/install until reconnection. Next
+independent work is reporting/final-candidate closeout; exact affected Android
+route waits for the phone. Completed host/RTX rows must not be repeated merely
+after compaction. Audio/haptic manual revalidation:NO (renderer metadata only).
+
 ### October 2 owner audio and S24 appearance acceptance
 
 Owner reports "audio is good" and "s24 is good (i see it in the screenshots)".
@@ -42,7 +62,7 @@ warm S26 Shipping cycle medians81–86ms opening/112–123ms heavy need honest f
 playability disposition; Debug counter numbers are not new Shipping evidence.
 
 Separate real defects from parity: outward closed-world-box metadata fix4e951c2
-remains isolated and merits narrow production review; demonstrated High contact
+is subsequently integrated narrowly above; demonstrated High contact
 receiver/bright-strip and row43 false-candidate issues remain physical OPEN,
 not waived. The cost-failing contact/UV candidates are not automatically promoted.
 No safe bounded fix -> explicit High limitation/owner disposition, not an unlimited
