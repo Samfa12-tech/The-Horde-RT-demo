@@ -25,11 +25,14 @@ automatic Shipping promotion, new optimization loop, phone use or performance
 claim. A static pass would still require affected actual native/image/physical
 and cost evidence; it does not close the other remaining correctness gates.
 
-Reproducible wrapper: `stage-contact-shipping-admission.ps1 -OutputRoot NEW`.
+Reproducible wrapper (isolated source only):
+[stage-contact-shipping-admission.ps1](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/e43c11c0365756f8b21efbfbdca33ac0f4a17071/docs/evidence/2026-10-02-backend-pixel-witness/stage-contact-shipping-admission.ps1)
+`-OutputRoot NEW`. The normal engineering copy contains evidence only, not these
+experimental launchers, flag gate or staging script.
 Actual outputs must record source/dependencies, module hashes, statistics and
 zero atomics/no binding22/no fixed-pixel observer. Intermediate SPIR-V and logs
-are local evidence, not runtime registration. Next unfinished step: one compile/
-validation run, then record the gate outcome. Audio/haptic revalidation:NO.
+are local evidence, not runtime registration. Initial finite compile/validation
+step is now complete as recorded below; do not repeat it. Audio/haptic:NO.
 
 ## Completed result: NO-GO for static production admission
 
