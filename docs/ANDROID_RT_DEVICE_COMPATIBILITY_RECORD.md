@@ -1,6 +1,33 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-10-02
+Last updated: 2026-10-03
+
+## October 3: resource candidate compiled; S26 control completes, phone released
+
+Current source3d26ad6 retains independent modelled player ownership, adds coherent
+dynamic lifetime mappings and a local/coherent immutable placement preference.
+Four-ABI development benchmark build passes; APK5f05a13102a6bf2205cb9af38124139469dd7605a40e3e99217570d835b7c70e
+has exact asset admission, development signature and byte-matched ARM64 library
+b836454af1d4a0d51b7958d816b14d31073a08d83ecb45505188ccdef344cd71. Actual four-module
+Shipping/Mobile SPIR-V validates with zero diagnostic atomics/no binding22.
+These are build/package checks, not device performance or visual acceptance.
+
+The owner releases S26 from Briarhold; ADB confirms exact SM-S948B. The retained
+Shipping/Mobile control5c555528 completes the route without app-data clearing:
+1,838 presented/CPU-accepted/GPU-valid frames, zero rejected/cancelled/outstanding.
+Native-cycle median58.197ms/p95 77.9315ms; opening160-frame median75.9852ms;
+GPU route median47.8816ms. Sampled thermal status0, GPU thermal power0–1,
+battery27.2–34.1C including startup/warm-up. These are control results, not a
+candidate improvement or30FPS claim. RAM/PSI boundaries are not frame-aligned;
+bandwidth/cache/stall counters remain uncollected gaps.
+
+Candidate5f05a131 installation/pullback passes, but the held-high run is interrupted
+at owner scheduling request. Wrapper and benchmark are stopped; S26 released to
+Briarhold, no further phone access until available again. Candidate presentation/
+timings/memory/lifecycle admission remain pending, not inferred from host success.
+The scheduling gap must be recorded before resuming matched comparisons. Do not repeat
+completed October1 comparisons. [Finite current matrix](evidence/2026-10-03-final-s26-resources/README.md).
+SM-S928B final-candidate validation and exact S25 remain separate open boundaries.
 
 ## October 2: current-source host/package validation, no new device run
 
