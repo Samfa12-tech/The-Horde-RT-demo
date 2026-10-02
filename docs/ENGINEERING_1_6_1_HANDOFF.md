@@ -13,7 +13,29 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 source-plane metadata compatibility (latest isolated step)
+### October 2 native contact-policy result (latest completed step)
+
+Isolated candidate4f8023e / pushed receipt3691517f1d27a885f9252536e7de39ee793c9ea8
+closes the demonstrated exit/floor contact: actual six RTX5050 Laptop captures
+exit0/honest RT; edge unchanged backend gate max20/32 over3 ->max3/zero over3.
+Watched456,304 both4,6,8, glass9/8 then floor0/486 with volume CLOSED; GPU math
+1023, current41 counters equal. Certified reason1 recovery566/568 ->0; real TIR
+retained. Held high/low own-controls within3/2 pipeline, compute byte-exact outside
+verified payload; existing backend failures max53/6 and14/5 stay OPEN. Two modules
+compile/optimise/SPIR-V validate; sizes325272/325508bytes/41 atomics, cost admission
+FAIL unchanged maxima. No production shader/ABI promotion, performance/phone claim.
+CPU-only contracts integrated4ee22869df06e87229e2cc31fe8bce63c4bf8e56; fresh
+Debug/Release dielectric1/1 each PASS3.17/2.61s, blobs match reviewed candidate.
+Normal renderer/resources/player/music unchanged. Current-source CI pending,
+not inherited from441a8f5. [Pinned evidence and exact next step](evidence/2026-10-02-backend-pixel-witness/axis-contact-policy.md).
+Finite matrix COMPLETE: do not repeat completed controls/tests/shaders after
+resumption. Next bounded remaining High/backend/physical failure from existing
+held11 coordinates/row43/isolated-lantern evidence, not another contact/epsilon
+sweep. Phone now used by another project per owner: no polling/install or repeated
+coordination. Audio/haptic manual revalidation required:NO. Goal remains active;
+no main merge/release/publication or pause/quota guard restored.
+
+### October 2 source-plane metadata compatibility (preceding completed step)
 
 Isolated source53624d8 / pushed receipt92de20055de7ede684b6b5a6255c93fe2d1e6212
 adds12-byte source-certified world-triangle metadata at existing binding6, no
