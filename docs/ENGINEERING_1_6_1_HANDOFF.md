@@ -13,7 +13,25 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 High contact candidate availability (latest completed step)
+### October 2 conservative contact qualifier (latest completed step)
+
+CPU-only675a32c is integrated as441a8f5; engineering/profile durable checkpoint
+bb2b87817ee0e6e508d013af12031c860f2a10fd is pushed/remote-verified. Integrated
+Debug/Release dielectric each1/1 PASS3.51/2.63s;24,576 exact finite-grid checks,
+6,640 admitted. Integer binary32 proof replaces the unpromoted FMA proposal;
+provable axis-edge winding rejects unsupported/degenerate geometry. Review found
+no remaining concrete arithmetic/winding bug. Runtime/shader/config unchanged.
+[Completed proof, failure history and exact next step](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/bb2b87817ee0e6e508d013af12031c860f2a10fd/docs/evidence/2026-10-02-backend-pixel-witness/high-edge-contact.md#completed-conservative-contact-qualification-cpu-only).
+Next:12-byte source-certified world-triangle plane record through existing
+binding6, shared ABI/consumer/SPIR-V stride/host/native compatibility checks,
+before contact policy. Candidate identity/footprints/opposed normals/post-Snell
+side/TIR checks remain required; plane equality alone is not admission. Do not
+repeat completed CPU/native tests, controls or unchanged shaders. Fresh source441
+branch36954600096/PR36954595930 GCC/Clang/Android/Vulkan-host succeed; MSVC still
+running at this receipt, full CI not yet green. High/cost/physical/device open.
+No phone use while disconnected; owner audio/haptic check:NO (CPU-only).
+
+### October 2 High contact candidate availability (preceding completed step)
 
 Test-only c6e0685 is integrated/pushed to engineering as1f684a8; Debug/Release
 dielectric each1/1 PASS2.45/2.74s. Fresh current-source CI36950835736 and
