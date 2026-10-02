@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "sourceCommit": "8a75627f5555da5c1afb53990ba8a5e2575d8074",
+  "executableSha256": "4033d2abd324df7bb523f0f207fba61daa227928cfc591b5dba904d2177d7010",
+  "instrumentation": "Diagnostic",
+  "quality": "Mobile",
+  "payloadRows": 0,
+  "investigationOnly": true,
+  "performanceEvidence": false,
+  "runs": [
+    {
+      "backend": "pipeline",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-mobile-diagnostic\\pipeline"
+      ]
+    },
+    {
+      "backend": "compute",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-clean-rtx-corrections-20261002\\native-mobile-diagnostic\\compute",
+        "--require-rayquery-compute"
+      ]
+    }
+  ]
+}

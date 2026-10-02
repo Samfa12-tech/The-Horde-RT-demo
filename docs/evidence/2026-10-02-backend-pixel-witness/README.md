@@ -232,3 +232,62 @@ light-region helper; exact cost/full affected RTX/High/device admission remains
 required. Reuse completed finite evidence; no new precision sweep or audit restart.
 Owner-disconnected S26 checks stay parked until reconnection. Audio/haptic manual
 revalidation required:NO: arithmetic/diagnostics only, feedback inputs unchanged.
+
+## Clean uninstrumented candidate: Mobile matrix completed
+
+Isolated `codex/horde-rtx-corrections` starts at normal engineering receipt
+`d9be81e77493d7e5c9af01604f865d0d3ef11e48`. Outward world-box normals are the
+separate commit `4e951c221da063f300d5c0c7a9813d8dd2d26cde`; ordered PBR UV source,
+its guard and the16 actually regenerated artifacts are
+`8a75627f5555da5c1afb53990ba8a5e2575d8074`. No observer/payload rows, restricted
+capture roster, closed-light-region helper or accepted player/asset edits.
+
+The first host failure was a133-byte skeleton LFS pointer, not a renderer result.
+`git lfs checkout` hydrates the existing local-cache bytes; skeleton size31,568,152
+and SHA256 `340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db`
+match its retained pointer. The unchanged normals test then passes1/1 (1.17s).
+After the UV guard, real MSVC Debug application/affected host builds pass;
+fresh affected Debug/Release each1/1 passes4.01/1.92s. Preserve the initial failure
+and corrected receipts separately in [checks](clean-uninstrumented/checks).
+
+All16 real modules compile/optimise/disassemble/validate; all actual embedded
+word counts/SHA256s agree with their catalogs. All8 Shipping modules have zero
+atomics/no diagnostics binding. [Decoded-word comparison](clean-uninstrumented/clean-module-word-comparison.json)
+against d9 proves every module is word-identical after removing **only**
+OpDecorate NoContraction. Generic adds7 decorations/84bytes; Opaque42/504bytes.
+These are SPIR-V arithmetic constraints, not native instruction/register or
+performance measurements. **Frozen byte/instruction admission FAIL**, unchanged
+budget SHA256 `f2ff4be07c08536d140ea395fb24d1e3d502882449a84fc245df121e2ad89f4d`.
+No unchanged shader was recompiled just to check its ceiling; no budget raised.
+
+One new full13 capture per RTX backend uses Diagnostic/Mobile,960x540/100%,
+normal12 settling frames/time0 and every pixel, including rows0–4. Both exit0
+with complete honest RT presentation. Executable SHA256
+`4033d2abd324df7bb523f0f207fba61daa227928cfc591b5dba904d2177d7010`;
+[run receipt](clean-uninstrumented/run-receipt.json). The strict comparison checks
+module hashes, device/settings, camera/state, static allocations and actual CPU
+geometry hashes/visibility/grips against retained normal controls, without
+recapturing them. All retained aggregate/reason failure counters remain zero;
+that is not full-glass High correctness. Full images/manifests are archived;
+unchanged CPU OBJ exports remain at
+`C:/Dev/tmp/horde-clean-rtx-corrections-20261002/native-mobile-diagnostic`, verified
+by their manifests rather than duplicated as another195MB archive.
+
+[Unchanged max3/.001 full-image gate](clean-uninstrumented/clean-full-image-comparison.json):
+**12/13 PASS; full parity FAIL**. All four reflection outliers are closed without
+the observer; blue/red and combat max1, lantern-drop max3. The sole >3 pixel is
+the known excluded closed-light-region case: finale770,526 pipeline18,21,25 /
+compute13,15,20, max6. No new >3 pixel. Old-control changes are retained as
+failures, not relabelled passes; corrected box-face normals change wall/bracket
+lighting and reflected visibility. Lead inspected old/new opening and candidate
+blue/finale images. This inspection and mathematical winding agreement do not
+replace phone/High/live acceptance or independently prove every changed pixel.
+
+Next unfinished step: the three affected clean High fixtures on both RTX
+backends, with existing High controls reused. Their build is underway; no run
+is claimed yet. Keep the known boundary, frozen-cost gate and separate High
+row43 physical false candidate open. Shipping/Diagnostic equivalence is a
+separate matrix, not certified by this backend pair. Normal engineering code/
+configuration remains unchanged; this isolated candidate is not promoted.
+S26 checks stay parked; no phone poll/install, owner re-request, main merge,
+release or publication. Audio/haptic manual revalidation required:NO.

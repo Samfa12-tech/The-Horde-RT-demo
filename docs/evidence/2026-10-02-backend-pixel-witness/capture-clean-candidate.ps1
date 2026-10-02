@@ -1,0 +1,64 @@
+param([Parameter(Mandatory)][string]$OutputRoot,[switch]$HighFixtures)
+$ErrorActionPreference = 'Stop'
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+if ((& git -C $repoRoot branch --show-current) -cne 'codex/horde-rtx-corrections') {
+    throw 'Run only in the isolated clean-corrections worktree.'
+}
+$source = (& git -C $repoRoot rev-parse HEAD).Trim()
+$exe = Join-Path $repoRoot 'build/presets/windows-x64-debug/Debug/HordeLanternRT.exe'
+$exeHash = (Get-FileHash -LiteralPath $exe).Hash.ToLowerInvariant()
+$root = [IO.Path]::GetFullPath($OutputRoot)
+if (Test-Path -LiteralPath $root) { throw 'Use a new output root; do not overwrite or repeat retained captures.' }
+New-Item -ItemType Directory -Path $root | Out-Null
+$matrix = foreach ($backend in @('pipeline', 'compute')) {
+    if ($HighFixtures) {
+        foreach ($checkpoint in @('glass-edge-fresnel','lantern-held-high','lantern-held-low')) {
+            [pscustomobject]@{backend=$backend;checkpoint=$checkpoint;directory="$backend/$checkpoint";label="$backend-$checkpoint"}
+        }
+    } else {
+        [pscustomobject]@{backend=$backend;checkpoint=$null;directory=$backend;label=$backend}
+    }
+}
+$quality = if($HighFixtures){'High'}else{'Mobile'}
+$runs = foreach ($row in $matrix) {
+    $backend = $row.backend
+    $destination = Join-Path $root $row.directory
+    $start = [Diagnostics.ProcessStartInfo]::new($exe)
+    $start.WorkingDirectory = $repoRoot
+    $start.UseShellExecute = $false
+    $start.CreateNoWindow = $true
+    $start.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
+    $start.RedirectStandardOutput = $true
+    $start.RedirectStandardError = $true
+    $start.ArgumentList.Add('--capture-showcase')
+    $start.ArgumentList.Add($destination)
+    if ($backend -ceq 'compute') { $start.ArgumentList.Add('--require-rayquery-compute') }
+    if ($null -ne $row.checkpoint) {
+        $start.ArgumentList.Add('--development-checkpoint')
+        $start.ArgumentList.Add($row.checkpoint)
+    }
+    $process = [Diagnostics.Process]::Start($start)
+    $stdout = $process.StandardOutput.ReadToEndAsync()
+    $stderr = $process.StandardError.ReadToEndAsync()
+    if (-not $process.WaitForExit(60000)) {
+        $process.Kill($true)
+        $process.WaitForExit()
+        throw "Owned $backend capture exceeded its finite 60-second limit."
+    }
+    $stdout.GetAwaiter().GetResult() | Set-Content (Join-Path $root "$($row.label)-stdout.log")
+    $stderr.GetAwaiter().GetResult() | Set-Content (Join-Path $root "$($row.label)-stderr.log")
+    $exitCode = $process.ExitCode
+    $process.Dispose()
+    if ($exitCode -ne 0) { throw "Capture $backend failed with exit $exitCode; preserve its logs." }
+    $manifest = Get-Content (Join-Path $destination 'capture-manifest.json') -Raw|ConvertFrom-Json
+    if(-not $manifest.complete -or $null -ne $manifest.error -or
+        $manifest.selectedRtPipelineBundle.genericDielectric.key -notmatch "diagnostic_$($quality.ToLowerInvariant())_generic_dielectric$") {
+        throw "Unexpected completed module/quality: $($row.label)"
+    }
+    [ordered]@{ backend = $backend; checkpoint = $row.checkpoint; exitCode = $exitCode; arguments = @($start.ArgumentList) }
+}
+[ordered]@{ schema = 1; sourceCommit = $source; executableSha256 = $exeHash;
+    instrumentation = 'Diagnostic'; quality = $quality; payloadRows = 0;
+    investigationOnly = $true; performanceEvidence = $false; runs = @($runs) } |
+    ConvertTo-Json -Depth 6 | Set-Content (Join-Path $root 'run-receipt.json')
+Write-Output "Completed finite clean capture pair: $source / $exeHash"

@@ -13,7 +13,37 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 ordered PBR UV result (current unfinished step)
+### October 2 clean uninstrumented admission (current unfinished step)
+
+Normal engineering remains d9be81e, renderer/configuration unchanged. New isolated
+`codex/horde-rtx-corrections` contains only outward world-box normals4e951c2 and
+ordered PBR UV8a75627 plus required generated artifacts. No witness branch merge,
+payload rows, capture filtering, closed-region helper or accepted player tuning.
+Real Debug app build and affected Debug/Release each1/1 pass (4.01/1.92s).
+All16 actual embedded modules match catalogs and compile/validate; all8 Shipping
+modules have zero atomics/no binding22. Their decoded words otherwise match d9
+exactly after removing only new NoContraction decorations. Frozen admission
+still FAILS (+84bytes/7 decorations Generic; +504/42 Opaque); budgets unchanged,
+no native-cost/performance claim or production promotion.
+
+Finite full13 Diagnostic/Mobile RTX captures are complete on both backends,
+every pixel/no reserved rows:12/13 pass unchanged max3/.001. Four reflection
+outliers close in the clean build. Only known finale770,526 boundary remains
+(max6); the cost-failing region helper was intentionally excluded. Old-control
+changes remain explicitly retained differences, not blanket regression passes.
+Scene/module/asset-allocation/actual CPU geometry/visibility/grip provenance passes.
+The first LFS-pointer host failure and local-cache hydration/pass are preserved.
+See the [single experiment record](evidence/2026-10-02-backend-pixel-witness/README.md#clean-uninstrumented-candidate-mobile-matrix-completed).
+
+Next step: complete the underway clean High build, then exactly three existing
+High fixtures (`glass-edge-fresnel`, `lantern-held-high`, `lantern-held-low`) on
+each RTX backend. Reuse retained controls, do not repeat the completed Mobile
+matrix or shader compilation. Keep High row43, boundary/cost admission and
+Shipping/Diagnostic parity distinct/open. S26 owner-disconnected; no polling or
+repeated owner requests. No main merge, release or publication. Audio/haptic
+manual revalidation required:NO: arithmetic-only, feedback semantics unchanged.
+
+### October 2 ordered PBR UV result (preceding completed investigation)
 
 Isolated candidate `877f567` / pushed complete evidence `dc11e89` closes the four
 remaining Mobile RTX reflection outliers. Completed115-field probes reproduce

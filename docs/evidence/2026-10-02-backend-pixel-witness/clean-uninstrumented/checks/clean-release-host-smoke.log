@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/build/presets/windows-x64-release
+Test project C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/build/presets/windows-x64-release
+    Start 93: horde_rt_character_render_slot_smoke
+1/1 Test #93: horde_rt_character_render_slot_smoke ...   Passed    1.92 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.93 sec

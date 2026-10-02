@@ -1,0 +1,26 @@
+C:\Dev\tmp\horde-clean-rtx-corrections-20261002\modules\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 252764 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=efef4797d7b889df7de2a177847e299f260d111fda56e2764090970c5100633d
+C:\Dev\tmp\horde-clean-rtx-corrections-20261002\modules\diagnostic_high_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_high_opaque_fast: 505752 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=5eb667753f271080fd1abba2860c39c5776d8fa33c1005c95f7714ebb50b97ff
+C:\Dev\tmp\horde-clean-rtx-corrections-20261002\modules\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_generic_dielectric: 252764 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=a25d8907b491ee6a3f1656db3dd4e916da9e05603e40053f7299a27f6cade9c3
+C:\Dev\tmp\horde-clean-rtx-corrections-20261002\modules\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_opaque_fast: 505752 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=d0ab80fc379c6c86e99c0d54da8420d8c22fdd8d26fd177c96cc4acfbe977372
+C:\Dev\tmp\horde-clean-rtx-corrections-20261002\modules\shipping_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_high_generic_dielectric: 243936 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=2d234f93ffe04aebed80c72654ad03b8459fd51a15cafbc6861e08b3fc5b1f31
+C:\Dev\tmp\horde-clean-rtx-corrections-20261002\modules\shipping_high_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_high_opaque_fast: 501516 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=c7fa8ee3328737d4548f48fe3df778afc0d61604371e0049177f41c138e23d3b
+C:\Dev\tmp\horde-clean-rtx-corrections-20261002\modules\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 243936 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=aa66a784e7dedafa9895d0ba1320fa5ba06a3c0a4ab1446a8d0b8ed828269fa3
+C:\Dev\tmp\horde-clean-rtx-corrections-20261002\modules\shipping_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_mobile_opaque_fast: 501516 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=741e1b954d2299d61b5003bf6422d3fd6cf93102557d42e35b41a481033eeadd
+RayQuery compute variant rayquery_compute_diagnostic_high_generic_dielectric: bytes=253000; functions=63; calls=199; ray-query sites=2; atomics=41; SPIR-V SHA-256=1abc870b7bdd73fbefbe2f76a29461b04fa93dc78ecb67fb5fcc8f9ce4ead764
+RayQuery compute variant rayquery_compute_diagnostic_high_opaque_fast: bytes=506012; functions=1; calls=0; ray-query sites=23; atomics=5; SPIR-V SHA-256=62c2bc43bb6bee994e61d50cc2c5c3937d770f0be5a3cb8c91006086e48d8d31
+RayQuery compute variant rayquery_compute_diagnostic_mobile_generic_dielectric: bytes=253000; functions=63; calls=199; ray-query sites=2; atomics=41; SPIR-V SHA-256=538059c2c800d4039258eef48c6de8a127e8e6cb3121d8548df4236b8d6b952f
+RayQuery compute variant rayquery_compute_diagnostic_mobile_opaque_fast: bytes=506012; functions=1; calls=0; ray-query sites=23; atomics=5; SPIR-V SHA-256=62c2bc43bb6bee994e61d50cc2c5c3937d770f0be5a3cb8c91006086e48d8d31
+RayQuery compute variant rayquery_compute_shipping_high_generic_dielectric: bytes=244172; functions=63; calls=199; ray-query sites=2; atomics=0; SPIR-V SHA-256=881fe1ca92b3b50d0b2887ded843a2badb096b2e7c6c6aa7beebdba11b942cac
+RayQuery compute variant rayquery_compute_shipping_high_opaque_fast: bytes=501776; functions=1; calls=0; ray-query sites=23; atomics=0; SPIR-V SHA-256=bd42ff2d2217606b279afd96140533010ca4a95a01fe9cdd3bc33e3f8283a8b7
+RayQuery compute variant rayquery_compute_shipping_mobile_generic_dielectric: bytes=244172; functions=63; calls=199; ray-query sites=2; atomics=0; SPIR-V SHA-256=d90d93f70dde4e7734baf66e445e90cde9b1c3e88398e11a8714aa8768aa3ae6
+RayQuery compute variant rayquery_compute_shipping_mobile_opaque_fast: bytes=501776; functions=1; calls=0; ray-query sites=23; atomics=0; SPIR-V SHA-256=bd42ff2d2217606b279afd96140533010ca4a95a01fe9cdd3bc33e3f8283a8b7
+Frozen eight RayQuery compute artifacts, provenance catalog, and generated adapter.
+INVESTIGATION ONLY: clean candidate staged; no frozen-cost admission or production promotion.

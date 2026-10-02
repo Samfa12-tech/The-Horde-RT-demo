@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "control": "d9be81e77493d7e5c9af01604f865d0d3ef11e48",
+  "candidate": "8a75627f5555da5c1afb53990ba8a5e2575d8074",
+  "method": "Decode actual embedded words; remove only OpDecorate NoContraction (opcode71, decoration42), retain headers and every other instruction unchanged",
+  "modules": [
+    {
+      "key": "diagnostic_high_generic_dielectric",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 75,
+      "controlNoContraction": 68,
+      "decorationDelta": 7
+    },
+    {
+      "key": "diagnostic_high_opaque_fast",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 42,
+      "controlNoContraction": 0,
+      "decorationDelta": 42
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 75,
+      "controlNoContraction": 68,
+      "decorationDelta": 7
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 42,
+      "controlNoContraction": 0,
+      "decorationDelta": 42
+    },
+    {
+      "key": "shipping_high_generic_dielectric",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 75,
+      "controlNoContraction": 68,
+      "decorationDelta": 7
+    },
+    {
+      "key": "shipping_high_opaque_fast",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 42,
+      "controlNoContraction": 0,
+      "decorationDelta": 42
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 75,
+      "controlNoContraction": 68,
+      "decorationDelta": 7
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 42,
+      "controlNoContraction": 0,
+      "decorationDelta": 42
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 75,
+      "controlNoContraction": 68,
+      "decorationDelta": 7
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_opaque_fast",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 42,
+      "controlNoContraction": 0,
+      "decorationDelta": 42
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 75,
+      "controlNoContraction": 68,
+      "decorationDelta": 7
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 42,
+      "controlNoContraction": 0,
+      "decorationDelta": 42
+    },
+    {
+      "key": "rayquery_compute_shipping_high_generic_dielectric",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 75,
+      "controlNoContraction": 68,
+      "decorationDelta": 7
+    },
+    {
+      "key": "rayquery_compute_shipping_high_opaque_fast",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 42,
+      "controlNoContraction": 0,
+      "decorationDelta": 42
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 75,
+      "controlNoContraction": 68,
+      "decorationDelta": 7
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "otherWordsExactlyEqual": true,
+      "candidateNoContraction": 42,
+      "controlNoContraction": 0,
+      "decorationDelta": 42
+    }
+  ]
+}
