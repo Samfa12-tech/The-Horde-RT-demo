@@ -43,7 +43,7 @@ not evidence if primary shading does not enter the production dielectric route.
 
 Two changed modules compiled, optimised, disassembled and passed actual
 SPIR-V validation. Pipeline267504 bytes SHA-256
-1de465a4ea9e3956d3a85d6511fa79527f388d63460426561b0cad3db681e0ad67;
+1de465a4ea9e3956d3a85d6511fa79527f388d63460426561b0cad3db683e764;
 compute267740 bytes SHA-256
 87c59f4a9d1ca86960b94db06ec56dbba7b828728430350b90e83ab2eae3d6ad.
 Both retain41 diagnostic atomics. All14 other module hashes are unchanged.
