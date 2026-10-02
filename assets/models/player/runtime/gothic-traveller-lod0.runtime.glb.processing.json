@@ -1,13 +1,15 @@
 {
   "schema": 1,
   "runtime": "gothic-traveller-lod0.runtime.glb",
-  "runtimeSha256": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb",
+  "runtimeSha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
   "manifest": "asset.manifest.json",
   "manifestSha256": "556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141",
   "exportThreads": 1,
   "blenderBuild": "5.2.0 LTS",
-  "provenance": "Accepted segmented-seam world runtime promoted from docs/evidence/2026-09-27-segmented-seams; exact source and processing evidence retained there.",
-  "acceptanceEvidence": "docs/evidence/2026-09-27-segmented-seams/README.md",
+  "provenance": "Existing accepted segmented-seam world runtime with guarded local right cuff fitting; all non-gauntlet surfaces and the left hand are exact. No grip, roll, IK, source asset or licence change.",
+  "acceptanceEvidence": "docs/evidence/2026-10-02-right-cuff/README.md",
+  "previousAcceptedRuntimeSha256": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb",
+  "rightCuffFitEvidence": "docs/evidence/2026-10-02-right-cuff/fitted-cuff-processing.json",
   "vertices": 34304,
   "triangles": 27815,
   "primitiveSemantics": {
@@ -18,5 +20,5 @@
     "BodyRemainderPrimaryVisible": 11632
   },
   "role": "WorldBody",
-  "status": "Owner-accepted production runtime asset; exact GLB and paired manifest hashes recorded."
+  "status": "Engineering runtime: Windows owner accepts the local cuff fit through movement; affected exact-device validation remains open. All previous unrelated player acceptance is retained."
 }

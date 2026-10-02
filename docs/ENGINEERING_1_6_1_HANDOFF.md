@@ -51,10 +51,22 @@ The separate Shipping218ab102 live-review stage opened as PID29916 and presented
 hardware RT. Its last report is paused/tick0, and it is now closed (not terminated
 by Codex). The owner subsequently answers the requested rest/walk/attack/parry
 review: "Join looks natural through movement". This closes the Windows live
-cuff check; integrate this exact local pair into engineering and validate affected
-contracts. Exact-device change-triggered acceptance remains open; no phone use
+cuff check (a later note explicitly says the hand looks good). Exact paired C
+assets/receipts are integrated into engineering; five affected native contracts
+pass and the strengthened cuff receipt test passes separately. Historical A
+controls remain retained; no other player surfaces, grip or IK change.
+Exact-device change-triggered acceptance remains open; prepare the changed build, no phone use
 in this run. Do not reopen automatically or repeat the contrasts after compaction.
 [Finite cuff record](evidence/2026-10-02-right-cuff/README.md).
+
+New owner audio additions: Windows music starts only after alt-tab/refocus; source
+already initializes foreground state and handles activation, so the cause is
+not proven. Establish initial external-suspension/focus evidence, not a score/
+voice rerender. Owner requests an independent SFX slider (Windows currently only
+has a toggle; Android already has a separate persisted slider) and quieter stone
+footsteps relative to other SFX. Finish this bounded audio work separately from
+the cuff commit. Audio/haptic manual revalidation:YES for playback/focus/gain
+changes; limited to startup/refocus and balance, not a new soundtrack audition.
 
 The bounded native lifecycle owner and generation-scoped Java/JNI readiness/stop
 are now implemented. Existing render/simulation ownership, shaders, assets,

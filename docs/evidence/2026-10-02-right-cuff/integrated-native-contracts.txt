@@ -1,0 +1,16 @@
+Internal ctest changing into directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+Test project C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+    Start  3: horde_rt_player_manifest_agreement_tests
+1/5 Test  #3: horde_rt_player_manifest_agreement_tests ....   Passed    1.20 sec
+    Start 90: horde_rt_skinned_character_smoke
+2/5 Test #90: horde_rt_skinned_character_smoke ............   Passed   27.63 sec
+    Start 91: horde_rt_player_skinned_semantic_fixtures
+3/5 Test #91: horde_rt_player_skinned_semantic_fixtures ...   Passed    3.26 sec
+    Start 92: horde_rt_player_viewmodel_admission
+4/5 Test #92: horde_rt_player_viewmodel_admission .........   Passed    0.55 sec
+    Start 93: horde_rt_player_viewmodel_pose_fixtures
+5/5 Test #93: horde_rt_player_viewmodel_pose_fixtures .....   Passed    3.04 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  35.70 sec

@@ -11,7 +11,7 @@
     "Right": 2.530727415391778
   },
   "pairedWorldRuntime": "world-seam-reconciled.runtime.glb",
-  "pairedWorldSha256": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb",
+  "pairedWorldSha256": "46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f",
   "pairedWorldRepositoryPath": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
   "pairedWorldManifest": "asset.manifest.json",
   "pairedWorldManifestSha256": "556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141",
@@ -33,6 +33,15 @@
   },
   "sleeveEnvelopeFit": {},
   "sleeveClosure": {},
+  "rightGauntletCuffFit": {
+    "terminalCentreMetres": [-0.3787563282260007, -0.098989745544176, 1.2826306862775232],
+    "forearmAxisTargetMetres": [-0.3718932759022755, -0.10458965893242309, 1.2331749408985948],
+    "radialCorrectionMetres": 0.05024272353425374,
+    "wristToCuffBlendMetres": 0.058429212896267124,
+    "proximalVertices": 2023,
+    "distalHandVerticesPreserved": 3587,
+    "construction": "Bind-space proximal cuff fit and Hand/ForeArm articulation; no topology or grip change"
+  },
   "sleeveSeamReconciliation": {
     "viewSleeveBoundaryEdges": 278,
     "matchedWorldSeamEdges": 278,
@@ -72,7 +81,7 @@
     "preservesOriginalHeadMask": true
   },
   "runtime": "gothic-traveller-viewmodel.runtime.glb",
-  "runtimeSha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b",
+  "runtimeSha256": "eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488",
   "primitiveSemantics": {
     "ViewmodelSleeves": 5532,
     "ViewmodelGauntlets": 8838
@@ -81,6 +90,8 @@
   "ownership": "Primary-only modelled geometry; world body owns secondary visibility",
   "animationAuthority": "Same authored rig, Idle/Walking NLA tracks and named grip bones as world reference",
   "licence": "Derivative of existing licensed Meshy player/gauntlet inputs; see ASSET_LICENSES.md",
-  "acceptanceEvidence": "docs/evidence/2026-09-27-segmented-seams/phone/README.md",
-  "status": "Owner-accepted production runtime asset; exact GLB and paired world hashes recorded."
+  "acceptanceEvidence": "docs/evidence/2026-10-02-right-cuff/README.md",
+  "previousAcceptedRuntimeSha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b",
+  "previousAcceptanceEvidence": "docs/evidence/2026-09-27-segmented-seams/phone/README.md",
+  "status": "Engineering runtime: Windows owner accepts the local cuff fit through movement; affected exact-device validation remains open. All previous unrelated player acceptance is retained."
 }

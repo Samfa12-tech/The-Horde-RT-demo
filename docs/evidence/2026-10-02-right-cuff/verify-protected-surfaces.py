@@ -10,9 +10,9 @@ from pathlib import Path
 import struct
 
 
-CONTROL_VIEW = Path(r"C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\assets\models\player\viewmodel\runtime\gothic-traveller-viewmodel.runtime.glb")
+CONTROL_VIEW = Path(r"C:\Dev\tmp\horde-right-cuff-rt-20261002-a\assets\models\player\viewmodel\runtime\gothic-traveller-viewmodel.runtime.glb")
 CANDIDATE_VIEW = Path(r"C:\Dev\tmp\horde-right-cuff-fit-20261002-guarded\gothic-traveller-viewmodel.runtime.glb")
-CONTROL_WORLD = Path(r"C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\assets\models\player\runtime\gothic-traveller-lod0.runtime.glb")
+CONTROL_WORLD = Path(r"C:\Dev\tmp\horde-right-cuff-rt-20261002-a\assets\models\player\runtime\gothic-traveller-lod0.runtime.glb")
 CANDIDATE_WORLD = Path(r"C:\Dev\tmp\horde-right-cuff-fit-20261002-guarded\world-seam-reconciled.runtime.glb")
 
 
@@ -95,7 +95,17 @@ def load(path):
 
 def compare_pair(label, control_path, candidate_path):
     control, candidate = load(control_path), load(candidate_path)
+    expected = {
+        'view': ('6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b',
+                 'eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488'),
+        'world': ('f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb',
+                  '46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f'),
+    }
+    if (control['sha256'], candidate['sha256']) != expected[label]:
+        raise ValueError('Retained control/candidate identity lost; do not compare new production to itself')
     ca, cb = control['surfaces'], candidate['surfaces']
+    if set(ca) != set(cb):
+        raise ValueError('Semantic primitive roster changed')
     result = {
         'controlSha256': control['sha256'],
         'candidateSha256': candidate['sha256'],

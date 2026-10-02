@@ -2,10 +2,12 @@
 param(
     [Parameter(Mandatory = $true)][string]$OutputDirectory,
     [string]$BlenderExecutable = 'blender',
-    [string]$AcceptedPairDirectory = ''
+    [string]$AcceptedPairDirectory = '',
+    [switch]$FitRightCuff
 )
 
 $ErrorActionPreference = 'Stop'
+if ($FitRightCuff -and -not $AcceptedPairDirectory) { throw '-FitRightCuff requires a paired world/view reference.' }
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $outputRoot = [IO.Path]::GetFullPath($OutputDirectory)
 if (Test-Path -LiteralPath $outputRoot) { throw 'Choose a new validation directory; existing outputs are never overwritten.' }
@@ -39,7 +41,9 @@ if ($AcceptedPairDirectory) {
     $recipe = @('--gauntlet-source-hand', 'Right', '--grip-roll-degrees', '105', '145',
         '--blend-elbows', '--gauntlet-scale', '.099', '--reconcile-sleeve-seams',
         '--body-remainder', '--retain-upper-torso', '--reconcile-segmented-seams')
+    if ($FitRightCuff) { $recipe += '--fit-right-cuff' }
     foreach ($path in @($processor,
+            (Join-Path $PSScriptRoot 'player_gauntlet_geometry.py'),
             (Join-Path $PSScriptRoot 'player_body_partition.py'),
             (Join-Path $PSScriptRoot 'player_sleeve_seams.py'),
             (Join-Path $PSScriptRoot 'player_segmented_seams_blender.py'),
@@ -94,6 +98,7 @@ $report = [ordered]@{
     byteRepeatable = $repeatable
     matchesAcceptedReference = $matchesReference
     acceptedPairReference = $pairReference
+    fitRightCuff = [bool]$FitRightCuff
     scope = 'Offline regeneration only. Does not replace runtime assets or establish new visual/device acceptance.'
 }
 $report | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $outputRoot 'regeneration.json') -Encoding utf8

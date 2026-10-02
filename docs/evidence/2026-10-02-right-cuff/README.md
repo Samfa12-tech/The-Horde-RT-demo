@@ -107,9 +107,18 @@ it. The paused report alone does not establish a live-motion test. Do not
 reopen automatically after resumption or relabel paused timing as gameplay FPS.
 The owner subsequently answers the explicit rest/walk/attack/parry review:
 "Join looks natural through movement". This closes the requested Windows live
-cuff review, not a phone check or all renderer acceptance. Current next step:
-integrate the exact paired C assets/processing receipts into the engineering
-build and validate affected contracts; prepare the changed phone build while
+cuff review, not a phone check or all renderer acceptance. A further owner note
+confirms "the hand looks good now". The exact paired C assets are now integrated
+into the engineering runtime with truthful processing receipts and pinned
+manifest tests. Five affected native contracts pass (35.70s): manifests, skinned
+smoke, semantic fixtures, paired admission and pose fixtures. The strengthened
+cuff receipt test separately passes after its addition. [Result](integrated-native-contracts.txt).
+The comparison tool now points to the retained original control and pins both
+hashes: rerun once only to check control validity after canonical asset replacement,
+not a new contrast. Historical A remains in Git/LFS and that control stage.
+Offline pair regeneration can opt into the exact recipe with `-FitRightCuff`;
+its default still reproduces the older pair. Parser validation passes; no new
+Blender generation. Current next step: prepare the changed phone build while
 exact-device owner acceptance remains open. No further
 weight/roll search or repeated captures without a specific validity gap.
 

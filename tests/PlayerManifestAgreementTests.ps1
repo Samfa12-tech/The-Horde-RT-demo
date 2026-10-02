@@ -5,9 +5,9 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $runtime = Join-Path $repoRoot 'assets/models/player/runtime'
 $viewRuntime = Join-Path $repoRoot 'assets/models/player/viewmodel/runtime'
-$worldHash = 'f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb'
+$worldHash = '46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54f'
 $worldManifestHash = '556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141'
-$viewHash = '6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b'
+$viewHash = 'eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488'
 
 $worldExpected = @{
     BodyPrimaryVisible = $true
@@ -110,6 +110,14 @@ if ($viewReceipt.runtimeSha256 -cne $viewHash -or (Get-Sha256 $viewPath) -cne $v
     throw 'Accepted viewmodel must match its own hash, preserved base-rig authority and paired world hashes/paths.'
 }
 $viewParts = @($viewReceipt.primitiveSemantics.PSObject.Properties)
+if ($viewReceipt.gauntletSourceHandedness -cne 'Right' -or
+    $viewReceipt.gauntletScale -ne 0.099 -or
+    $viewReceipt.rightGauntletCuffFit.proximalVertices -ne 2023 -or
+    $viewReceipt.rightGauntletCuffFit.distalHandVerticesPreserved -ne 3587 -or
+    $viewReceipt.rightGauntletCuffFit.radialCorrectionMetres -le 0 -or
+    $viewReceipt.rightGauntletCuffFit.radialCorrectionMetres -gt 0.08) {
+    throw 'Right cuff receipt must preserve handedness, scale and the guarded local fit/distal hand roster.'
+}
 if ($viewParts.Count -ne 2 -or ($viewParts.Value | Measure-Object -Sum).Sum -ne 14370) {
     throw 'Viewmodel processing receipt must account for exactly the two accepted viewmodel regions.'
 }
