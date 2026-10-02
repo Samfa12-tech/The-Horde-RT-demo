@@ -684,6 +684,79 @@ void TestRecordedRow43OutsideOriginCornerRejectsFirstExit()
     // outside triangle candidate without introducing a spatial epsilon.
 }
 
+void TestRecordedHighGlassFloorContactKeepsBothSurfaces()
+{
+    // Native source4870272, pixel456,304. Both lossless witnesses and their
+    // float32 fields are retained in high-edge/decoded.json under
+    // docs/evidence/2026-10-02-backend-pixel-witness/. This double-precision
+    // plane reference is test-only, not an analytic production ray substitute.
+    struct ContactRay
+    {
+        Vec3 origin;
+        Vec3 direction;
+        double expectedRawDistance;
+    };
+    const std::array<ContactRay, 2u> rays{{
+        {{-9.151651f, -0.70825523f, -15.574968f},
+         {0.42783222f, -0.7623293f, 0.4856065f}, 0.3171133038196251},
+        {{-9.151651f, -0.7082553f, -15.574968f},
+         {0.4278322f, -0.7623293f, 0.4856064f}, 0.31711322563209343},
+    }};
+    // Unit-box bottom -0.5 under the actual fixture Y transform. The route
+    // floor is -0.95f. These authored float operands produce exactly the
+    // same double plane; do not introduce a proximity epsilon to join them.
+    const double glassBottom = static_cast<double>(-0.5f) * 1.25f +
+                               static_cast<double>(-0.325f);
+    const double floorPlane = static_cast<double>(-0.95f);
+    Check(glassBottom == floorPlane,
+          "the authored closed-glass bottom and opaque route floor are exactly coplanar");
+    for (const ContactRay& ray : rays)
+    {
+        const double exitDistance = (glassBottom - ray.origin.y) / ray.direction.y;
+        const double receiverDistance = (floorPlane - ray.origin.y) / ray.direction.y;
+        const double x = ray.origin.x + static_cast<double>(ray.direction.x) * exitDistance;
+        const double z = ray.origin.z + static_cast<double>(ray.direction.z) * exitDistance;
+        Check(exitDistance == receiverDistance && exitDistance > 0.0 &&
+                  std::abs(exitDistance - ray.expectedRawDistance) < 1.0e-14,
+              "each captured backend ray reaches the real exit and opaque receiver at its own identical raw distance");
+        Check(x > -9.20 && x < -9.00 && z > -15.575 && z < -14.825 &&
+                  x > -28.50 && x < -8.50 && z > -16.80 && z < -13.60,
+              "the contact lies strictly inside both glass bottom and authored route-floor footprints");
+        // Native HitInfo.t also includes the preceding normal advance. It is
+        // not the raw plane-intersection distance asserted above.
+        const auto exit = OrientInterface(ray.direction, Vec3{0.0f, -1.0f, 0.0f});
+        Vec3 transmitted{};
+        Check(!exit.entering && RefractDirection(ray.direction, exit.normal,
+                                                1.52f, 1.0f, transmitted),
+              "this recorded glass bottom is a genuine transmitting exit, not TIR");
+        Check(transmitted.y < 0.0f,
+              "post-exit transmission enters the opaque floor's lower half-space");
+        const float cosine = -ray.direction.y;
+        const auto partition = horde::vulkan::raytracing::PartitionDielectricEnergy(
+            EffectiveDielectricFresnel(cosine, 1.52f, 1.0f, 0.12f), 0.94f);
+        Check(partition.reflection > 0.0f && partition.transmission > 0.0f &&
+                  partition.reflection + partition.transmission <= 1.0f,
+              "contact keeps the exit Fresnel partition instead of replacing transport with blanket absorption");
+        DielectricStack<4u> stack;
+        Check(stack.Enter(9u, 107u, 1.52f).accepted &&
+                  ResolveDielectricTerminal(stack.Depth(), DielectricTerminalKind::Opaque) ==
+                      DielectricTerminalResolution::FailUnclosedVolume,
+              "an opaque tie winner alone cannot certify or silently pop the open glass volume");
+        Check(stack.Exit(9u, 107u).accepted &&
+                  ResolveDielectricTerminal(stack.Depth(), DielectricTerminalKind::Opaque) ==
+                      DielectricTerminalResolution::ShadeTerminal,
+              "only the actual paired glass exit admits shading the retained opaque receiver");
+    }
+    const Vec3 escapedOrigin{-9.015981f, -0.9500308f, -15.420976f};
+    const Vec3 escapedDirection{0.6500254f, -0.17963497f, 0.7383753f};
+    const double lostReceiverDistance = (floorPlane - escapedOrigin.y) / escapedDirection.y;
+    Check(lostReceiverDistance < 0.0,
+          "the recorded post-exit spawn moves below the coincident floor and puts its receiver behind the ray");
+    // A runtime correction must keep actual floor0/486/1 with the exit9/8/107
+    // at the same event. This reference neither chooses a backend's RGB nor
+    // relaxes ordinary open-volume failure, query bounds or image tolerances.
+}
+
 void TestBoundedTirAndWaterTerminationContracts()
 {
     Check(ResolveDielectricInterfaceBudget(1u, 8u) ==
@@ -828,6 +901,7 @@ int main()
     TestClosedPaneEntryNearEdgeKeepsExitReachable();
     TestRecordedTriangleSurfacePointKeepsMicrometreExit();
     TestRecordedRow43OutsideOriginCornerRejectsFirstExit();
+    TestRecordedHighGlassFloorContactKeepsBothSurfaces();
     TestRoughClosedVolumeTransmissionReachesPairedBoundary();
     TestBoundedTirAndWaterTerminationContracts();
     TestSelfHitClassificationUsesBoundedEpsilon();
