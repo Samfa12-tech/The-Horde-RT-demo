@@ -12,7 +12,11 @@ parser.add_argument("glb", type=pathlib.Path)
 parser.add_argument("--witness-root", type=pathlib.Path, default=pathlib.Path(__file__).resolve().parent.parent)
 parser.add_argument("--source-world", action="store_true",
                     help="Also check exact dyadic source transforms against each captured world ray; no GPU predicate.")
+parser.add_argument("--relative-world", action="store_true",
+                    help="One bounded relative-world interval feasibility check; requires --source-world.")
 args = parser.parse_args()
+if args.relative_world and not args.source_world:
+    parser.error("--relative-world requires --source-world")
 ROOT = args.witness_root
 GLB = args.glb
 FILES = {"pipeline": ROOT / "native-path.json", "compute": ROOT / "compute-native-path.json"}
@@ -169,7 +173,7 @@ def source_world_check(record):
     outside_proved = ((det_interval[1] < 0 and v_interval[0] > 0) or
                       (det_interval[0] > 0 and v_interval[1] < 0))
 
-    return {"arithmetic": "exact rational operations on finite captured/uploaded binary32 inputs",
+    result = {"arithmetic": "exact rational operations on finite captured/uploaded binary32 inputs",
             "geometry": "source triangle plus captured 3x4 objectToWorld; no rounded worldToObject ray",
             "scope": "mathematical source-world reference, not native hardware error bounds or runtime filtering",
             "corner63": receipt(corner), "entry9": receipt(entry),
@@ -178,6 +182,36 @@ def source_world_check(record):
                 "arithmetic": "ideal directed binary32 endpoints; feasibility only, no GPU arithmetic assumption",
                 "determinant": list(map(float, det_interval)), "vNumerator": list(map(float, v_interval)),
                 "containsExactReference": True, "outsideVProved": outside_proved}}
+
+    if args.relative_world:
+        # Predeclared alternative, not an expression/epsilon search: translate
+        # the ray first and transform source edges directly, avoiding subtracting
+        # two absolute world vertices. This is exactly the same geometric input.
+        local = [tuple((x, x) for x in map(exact_f32, v)) for v in triangles[63]]
+        def linear(vector):
+            return tuple(add(add(multiply(imatrix[0][row], vector[0]),
+                                 multiply(imatrix[1][row], vector[1])),
+                             multiply(imatrix[2][row], vector[2])) for row in range(3))
+        relative_edges = [linear(tuple(subtract(y, x) for x, y in zip(local[0], vertex)))
+                          for vertex in local[1:]]
+        transformed_a = linear(local[0])
+        relative_s = tuple(subtract(subtract((x, x), imatrix[3][row]), transformed_a[row])
+                           for row, x in enumerate(origin))
+        relative_det = interval_dot(relative_edges[0], interval_cross(d, relative_edges[1]))
+        relative_v = interval_dot(d, interval_cross(relative_s, relative_edges[0]))
+        contains = (relative_det[0] <= corner["determinant"] <= relative_det[1] and
+                    relative_v[0] <= corner["vNumerator"] <= relative_v[1])
+        if not contains:
+            raise RuntimeError("Relative-world binary32 interval missed exact rational reference")
+        relative_outside = ((relative_det[1] < 0 and relative_v[0] > 0) or
+                            (relative_det[0] > 0 and relative_v[1] < 0))
+        result["relativeWorldBinary32Interval"] = {
+            "arithmetic": "ideal directed binary32 endpoints; feasibility only, no GPU arithmetic assumption",
+            "expression": "M*(b-a), M*(c-a), (origin-translation)-M*a",
+            "determinant": list(map(float, relative_det)), "vNumerator": list(map(float, relative_v)),
+            "containsExactReference": contains, "outsideVProved": relative_outside,
+        }
+    return result
 
 
 results = {"investigationOnly": True, "glbSha256": sha, "triangles": len(triangles), "backends": {}}

@@ -21,10 +21,13 @@ outside origin. New regression and independent review preserve that negative.
 Reference is tests/fixtures/PrimaryBoundaryPlanePrototype.h, not renderer code;
 no runtime/metadata/ABI/shader/asset/player/music change. Fresh affected Debug1/1
 PASS3.31s and Release1/1 PASS2.89s. [Single record/next step](evidence/2026-10-02-high-row43/README.md#primary-origin-exclusion-prototype-no-go-for-candidate-rejection).
-Do NOT wire blanket backface rejection into runtime. Next bounded step is ONE
-relative-world binary32 interval feasibility check on retained rays, preserving
-strict source-footprint proof and uncertain/grazing fallback; stop this expression
-route if inconclusive. No completed native/precision tests or shader rebuilding
+Do NOT wire blanket backface rejection into runtime. The ONE relative-world
+binary32 interval feasibility check is also complete/NO-GO: both signed-v bounds
+still straddle0. Default JSON is unchanged after LF/CRLF normalization; invalid flag pairing
+rejects with exit2. Stop this float32-expression route, no repeated checks/search.
+Next independent step: clean observer-free cost/image admission of the already
+demonstrated contact policy, without promoting it or claiming row43 fixed.
+No completed native/precision tests or shader rebuilding
 without changed source/validity reason. High row43 and native/cost acceptance OPEN.
 Current engineering3be7034 push36965399586/PR36965402744 CI both SUCCESS, all five
 compiler/Vulkan-host/Android jobs; completed metadata retained outside repo at
