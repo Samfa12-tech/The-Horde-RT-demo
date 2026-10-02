@@ -27,11 +27,15 @@ Known held backend outliers max53/14 remain FAIL/parked. Separate physical edge/
 contact/row43 cases stay OPEN. No UV/contact instrumentation, budget change,
 player tuning, memory rewrite or performance claim.
 [Single finite record/artifact receipts](evidence/2026-10-02-world-box-normals/README.md).
-All4 Android Debug ABIs/build PASS37s, APKe9fd31e7 retained, not installed.
-Owner took the S26 away: no phone polling/install until reconnection. Next
-independent work is reporting/final-candidate closeout; exact affected Android
-route waits for the phone. Completed host/RTX rows must not be repeated merely
-after compaction. Audio/haptic manual revalidation:NO (renderer metadata only).
+All4 Android Debug ABIs/build PASS37s. Retained APKe9fd31e7 now installs/pulls
+identically on the reconnected S26; run170028 exits0 with13/13 replay, four
+inspected opening/combat/lantern captures and honest RT after Home/resume.
+Initial120s replay timeout10/13 is retained; one supported300s retry completes.
+Current00af842 push36974679165/PR36974684105 both SUCCESS. No Shipping timing or
+new S24/S25 acceptance. A later report-form rapid resume causes a separate ANR
+during UI-thread pipeline creation; retain that lifecycle gate OPEN, despite the
+settled runner row passing. Next is reporting/lifecycle closeout, not repeated
+host/RTX/phone or parity work. Audio/haptic revalidation:NO (metadata only).
 
 ### October 2 owner audio and S24 appearance acceptance
 

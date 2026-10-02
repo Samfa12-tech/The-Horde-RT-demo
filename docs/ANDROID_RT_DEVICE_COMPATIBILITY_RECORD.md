@@ -2,6 +2,23 @@
 
 Last updated: 2026-10-02
 
+## October 2: production world-box normals — affected S26 route
+
+Exact local SM-S948B / Android16 / Adreno840 / driver512.842.19,
+normal engineering00af842, retained Debug APK
+`e9fd31e7c9aee83a13d0a91f25e2b61497eb986940032dbb534e13d9787f4774`.
+Only Debug package updated; installed pullback matches. Strict ASTC and actual
+RayTracingPipeline/Diagnostic/Mobile75%1080x2235/OpaqueFast presentation pass.
+Run170028 exits0:13/13 replay waypoints, four inspected opening/combat/lantern
+captures, modelled-viewmodel/60Hz skinning/grip/primary-ownership checks, and
+honest RT after Home/resume. First120s replay reaches10/13 before timeout;
+the single supported300s retry completes, not a fabricated first-attempt pass.
+[Finite source/artifact/phone record](evidence/2026-10-02-world-box-normals/README.md).
+No Shipping/performance/equivalence or S24/S25 claim; all prior evidence remains.
+The subsequent rapid report-form resume ANR is a separate open lifecycle result,
+not waived by this settled runner row. Audio/haptic manual revalidation:NO;
+surface-normal metadata does not change playback or semantic feedback inputs.
+
 ## October 2, 2026 - owner audio and S24 screenshot acceptance
 
 Owner reports "audio is good" and "s24 is good (i see it in the screenshots)".

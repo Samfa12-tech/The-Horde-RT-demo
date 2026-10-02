@@ -23,7 +23,7 @@ geometry, skinning and primary/secondary ownership are untouched.
 | Native Windows RTX images | COMPLETE, bounded: six candidate High/Diagnostic captures exit0, honest RT, RTX5050 Laptop; torch opening and held-high/low on pipeline + compute. Lead inspected the opening and both held views. No image-equivalence claim against erroneous old normals. |
 | Shader/asset containment | COMPLETE: no shader, asset, shared gameplay or platform diff. Own-backend candidate/control module pairs are identical; uploaded world-body/viewmodel geometry SHA pairs match in all seven comparisons. No shader rebuild. |
 | Android build preparation | COMPLETE: all four Debug native ABIs and assembleDebug PASS37s. APK retained; not installed and not a phone presentation pass. |
-| Exact Android affected route | OPEN: owner took the S26 away on October2; do not poll/install until available. |
+| Exact Android affected route | COMPLETE, bounded Debug: S26 run170028 passes13/13 replay, four authored captures and honest RT after Home/resume. Exact APK install/pullback agrees. First120s replay timeout retained. Not Shipping performance or final-candidate acceptance. |
 
 Raw build/test/capture logs retained at `C:/Dev/tmp/horde-world-box-normals-20261002/`.
 Keep exact binary/source hashes with new images; the historical isolated shader
@@ -80,6 +80,35 @@ passes. Image-analysis stdout contained a Pillow deprecation warning; the raw
 output is retained outside Git, the unchanged JSON body was recovered without
 re-running captures. No failing test or image metric was removed.
 
-Next unfinished step: exact Android affected route when owner reconnects the phone;
-otherwise continue reporting/final-candidate work. Do not repeat completed host/
-RTX rows or resume UV/sub-pixel sweeps without a specific new validity problem.
+## Exact-phone continuation (owner reconnected)
+
+Retained APK `e9fd31e7...` was rehashed and installed only to the S26 Debug package;
+no rebuild or app-data clear. First finite Replay attempt `run-20261002-165649`
+exceeded the default120s deadline after10/13 waypoints in red-torch-bay, with
+honest RT and no scoped crash marker. No capture/lifecycle row had yet run.
+`timeout-state.json` and `timeout-logcat.txt` preserve that incomplete attempt.
+This is not a route pass or a Shipping performance trial.
+
+The one retry `run-20261002-170028` uses the existing supported300s deadline,
+SkipBuild/SkipInstall, the same exact APK and75% scale. It exits0:13/13 waypoints
+reach finale, four captures reach their12-frame/honest-presentation markers,
+Home/resume recreates the surface and honestly presents RT. Strict ASTC,
+RayTracingPipeline, Diagnostic/Mobile/OpaqueFast,1080x2235, modelled-viewmodel,
+60Hz skinning, dedicated nonduplicating primary ownership and exact grip checks
+pass. Source receipt records00af842/dirty (unrelated raw S24 evidence and later
+documentation); runtime input blob and retained APK above are unchanged.
+
+Lead inspected all four images: modelled hands/props persist, high/low open-aperture
+lantern lighting/shadows remain, and the combat fixture's two enemy bodies are
+partly visible at the lower edges of its close authored camera. Native state
+confirms two active enemies; this is not a new claim that both full silhouettes
+are in that camera. No frozen-image or pixel-equivalence/performance gate is
+manufactured. Timing CSV is empty because Mode Replay deliberately runs no
+benchmark. [Retained finite phone receipts](phone/run-20261002-170028/summary.json)
+and [initial timeout](phone/run-20261002-165649/timeout-state.json).
+
+Do not repeat completed host/RTX/phone rows or resume UV/sub-pixel sweeps without
+a specific validity problem. A later rapid Home/resume from the real report form
+hit an input-dispatch ANR during UI-thread Vulkan pipeline creation; that separate
+lifecycle failure is OPEN in the report continuation record, not concealed by
+this runner's successful settled Home/resume row.
