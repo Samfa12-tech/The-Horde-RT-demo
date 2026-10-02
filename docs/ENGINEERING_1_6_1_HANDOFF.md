@@ -36,6 +36,22 @@ exact-device/final-candidate disposition; never repeat this completed matrix
 without a specific validity problem. Audio/haptic manual revalidation:NO; only
 cancellation observations changed. No phone use, merge, signing or publication.
 
+Current development-signed Shipping/Mobile benchmark APK4d8677b7 is prepared,
+not installed, with four-ABI build, current paired cuff/gain assets, exact
+package admission and actual ARM64 four-module zero-atomic/no-binding22 SPIR-V
+validation PASS. Olderb9d69ff4 artifact is preserved; it predates required inputs.
+[Artifact and finite device matrix](evidence/2026-10-02-final-integration/android-device-candidate/README.md)
+owns paths/hashes/commands and remaining rows. Do not rebuild unchanged after
+compaction or relabel old phone acceptance. No phone operation in this run.
+
+Fresh172cbb9 PR37004890241 and push37004882762 both SUCCESS; PR merge19e5f19
+parents mainbda1b99a/source172cbb9 verified. Push's first SDK-download failure
+and64/65 Windows UI timeout are retained; one failed-jobs-only retry passes
+Android76/76 and MSVC65/65, without changing test bounds or claiming a timeout
+cause fix. PR passes all five lanes first attempt (GCC59,Clang59,MSVC65,
+Vulkan CPU-host15,Android76/four ABIs/lint/package).
+[Current CI receipt](evidence/2026-10-02-final-integration/windows-shipping-backends/CI.md).
+
 ### October 2 independent SFX volume / quieter steps
 
 Windows now has a separate persisted0–100 SFX slider instead of the primary

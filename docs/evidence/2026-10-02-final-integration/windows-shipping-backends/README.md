@@ -95,3 +95,10 @@ matrix or add a general telemetry framework. Exact-device final-candidate gates
 and the recorded High physical limitations remain open.
 Audio/haptic manual revalidation required:NO; cancellation observations do not
 alter accepted feedback/playback. No phone use, merge, signing, release or publication.
+
+Review note: the five literal emitted text reports contain `Run ID: ` with an
+empty ID and trailing space. The full staged whitespace check reports those
+five raw-output lines; they are preserved as evidence, not silently reformatted
+or hidden by a whitespace suppression. The separate authored C++/Markdown/exit
+receipt check passes. Benchmark identity also includes its unique filename and
+timestamp; no nonempty run ID is invented.

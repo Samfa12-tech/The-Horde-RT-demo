@@ -1,0 +1,37 @@
+CI source172cbb93c8e7a03e66a09520c7c4aaedb03c6d9f
+PR checkout19e5f19a095f532c06a716e43205f26f61f3ab6f
+Parents:bda1b99a62e1de883273dd21f267bcfc92bc5490 172cbb93c8e7a03e66a09520c7c4aaedb03c6d9f
+
+PR37004890241 first attempt, all5jobs SUCCESS:
+GCC110830729629:100% tests passed,0 tests failed out of59;77.24s
+Clang110830729656:100% tests passed,0 tests failed out of59;81.67s
+Vulkan110830729663:100% tests passed,0 tests failed out of15;8.11s
+MSVC110830729756:100% tests passed out of65;103.50s
+MSVC UI test53:Passed0.65s
+Android110830729427:BUILD SUCCESSFUL in2m21s
+Android Debug unit tests:76 total;0 failures;0 errors;0 skipped.
+Held-item/player runtime package entries and exact Meshy CC BY4.0 attribution passed.
+
+Push37004882762 first attempt failed:
+Android110830701347:SDK step,not compile
+Warning:Failed to download any source lists!
+Warning:IO exception while downloading manifest
+Warning:Failed to find package 'platforms;android-34'
+Process completed with exit code1.
+MSVC110830701481:64/65;one failed UI row
+native control message timed out;phase=note-only default and private-content checks
+controlId=106 message=0xc error=1460
+No proved timeout cause and no passing result claimed for that first row.
+
+Push37004882762 attempt2,failed-jobs-only:
+Android110833213563:BUILD SUCCESSFUL in3m10s
+Android Debug unit tests:76 total;0 failures;0 errors;0 skipped.
+Held-item/player runtime package entries and exact Meshy CC BY4.0 attribution passed.
+MSVC110833213746:UI test53 Passed0.62s
+100% tests passed out of65;105.92s
+GCC/Clang/Vulkan first-attempt passing jobs reused,not rerun.
+Workflow final status completed/conclusion success.
+
+This transcription selects exact outcome values and omits unrelated setup/license
+output; full generated job logs retained outside Git at C:/Dev/tmp/horde-172cbb9-ci.
+No physical-device,benchmark,FPS,presentation or owner-feel acceptance claim.
