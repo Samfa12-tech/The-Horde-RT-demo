@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "sourceCommit": "6ed11ed4247159ad13d2e753c0b62618a7a69901",
+  "executableSha256": "42f856a87ca3eea9b7c803bbcdf004694d7c0dcad6eb4404f7e95e509299fb2e",
+  "instrumentation": "Diagnostic",
+  "quality": "High",
+  "payloadRows": 1,
+  "existingNormalBinary": false,
+  "investigationOnly": true,
+  "performanceEvidence": false,
+  "runs": [
+    {
+      "backend": "pipeline",
+      "checkpoint": "glass-edge-fresnel",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-high-contact-candidates-20261002\\pipeline\\glass-edge-fresnel",
+        "--development-checkpoint",
+        "glass-edge-fresnel"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "glass-edge-fresnel",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-high-contact-candidates-20261002\\compute\\glass-edge-fresnel",
+        "--require-rayquery-compute",
+        "--development-checkpoint",
+        "glass-edge-fresnel"
+      ]
+    }
+  ]
+}

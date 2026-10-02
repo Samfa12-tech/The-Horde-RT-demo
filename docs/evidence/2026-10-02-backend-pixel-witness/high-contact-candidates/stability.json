@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "source": "6ed11ed4247159ad13d2e753c0b62618a7a69901",
+  "executableSha256": "42f856a87ca3eea9b7c803bbcdf004694d7c0dcad6eb4404f7e95e509299fb2e",
+  "candidateRawRoot": "C:/Dev/tmp/horde-high-contact-candidates-20261002",
+  "retainedActualCallObserver": "C:/Dev/tmp/horde-high-edge-witness-20261002",
+  "performanceEvidence": false,
+  "actualPathFieldsExact": ["actualRgb", "primary", "surface", "display", "firstFresnel", "reflection", "transmitted", "throughput", "termination", "visits"],
+  "checks": [
+    {"backend": "pipeline", "numericCountersExact": 41, "availabilityFieldsExact": true, "candidateCount": 2, "matchingExitCount": 1, "opaqueReceiverCount": 1, "signedReceiverMinusExitFloatSteps": 3, "rawDistanceEquality": false, "nonpayloadMaximumDifference": 0},
+    {"backend": "compute", "numericCountersExact": 41, "availabilityFieldsExact": true, "candidateCount": 2, "matchingExitCount": 1, "opaqueReceiverCount": 1, "signedReceiverMinusExitFloatSteps": -1, "rawDistanceEquality": false, "nonpayloadMaximumDifference": 0}
+  ],
+  "unchangedBackendGate": {"maximumTolerance": 3, "fractionTolerance": 0.001, "maximumDifference": 20, "pixelsOverThree": 32, "passed": false},
+  "contactQualification": "Open: observed float steps are not a geometric certificate or general error bound"
+}

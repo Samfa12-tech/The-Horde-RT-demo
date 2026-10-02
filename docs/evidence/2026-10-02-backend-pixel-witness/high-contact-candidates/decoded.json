@@ -1,0 +1,817 @@
+{
+  "schema": 1,
+  "pixel": [
+    456,
+    304
+  ],
+  "reservedRows": [
+    0
+  ],
+  "records": [
+    {
+      "backend": "pipeline",
+      "imageSha256": "c294723273c3075ac011627d13ed31ad09c040709c357fbf1b7177fb52ea8374",
+      "actualRgb": [
+        22,
+        17,
+        17
+      ],
+      "primary": {
+        "hit": 1.0,
+        "instance": 9.0,
+        "primitive": 10.0,
+        "material": 107.0,
+        "t": 2.2772326,
+        "geometricNormal": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "normal": [
+          0.59022194,
+          0.5193488,
+          0.61799246
+        ],
+        "base": [
+          0.82,
+          0.94,
+          1.0
+        ],
+        "roughness": 0.12,
+        "transmission": 0.94,
+        "flags": 5125.0,
+        "direction": [
+          -0.65070933,
+          -0.1756518,
+          -0.7387312
+        ],
+        "origin": [
+          -7.6,
+          0.7,
+          -13.25
+        ],
+        "position": [
+          -9.081817,
+          0.3,
+          -14.932264
+        ]
+      },
+      "surface": [
+        0.027531605,
+        0.020904487,
+        0.021313561
+      ],
+      "display": [
+        0.08790116,
+        0.06547045,
+        0.066903934
+      ],
+      "firstFresnel": 0.40573308,
+      "reflection": {
+        "direction": [
+          -0.65085185,
+          0.17571487,
+          -0.7385906
+        ],
+        "origin": [
+          -9.081817,
+          0.30002987,
+          -14.932264
+        ],
+        "hit": 1.0,
+        "instance": 0.0,
+        "primitive": 496.0,
+        "material": 2.0,
+        "accumulatedDistance": 4.806015,
+        "position": [
+          -10.727679,
+          0.7443746,
+          -16.8
+        ],
+        "radiance": [
+          0.008248353,
+          0.009480401,
+          0.011862218
+        ]
+      },
+      "transmitted": [
+        0.024184976,
+        0.017057974,
+        0.016500667
+      ],
+      "throughput": [
+        0.40133518,
+        0.4674542,
+        0.5023558
+      ],
+      "termination": {
+        "resolved": 1.0,
+        "overflow": 0.0,
+        "volumeOpen": 0.0,
+        "tirSinceTransition": 0.0
+      },
+      "contactProbe": {
+        "observed": true,
+        "candidates": 2.0,
+        "matchingExitCandidates": 1.0,
+        "opaqueCandidates": 1.0,
+        "origin": [
+          -9.151651,
+          -0.70825523,
+          -15.574968
+        ],
+        "minimum": 0.0,
+        "direction": [
+          0.42783222,
+          -0.7623293,
+          0.4856065
+        ],
+        "maximum": 10000.0,
+        "exit": {
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 8.0,
+          "material": 107.0,
+          "rawT": 0.31711322,
+          "geometry": 0.0,
+          "frontFace": 0.0,
+          "flags": 5125.0,
+          "bary": [
+            0.7147344,
+            0.20536497
+          ],
+          "transmission": 0.94,
+          "signedAlignment": 0.7623293,
+          "surfacePosition": [
+            -9.015981,
+            -0.95,
+            -15.420976
+          ],
+          "geometricNormal": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "receiver": {
+          "hit": 1.0,
+          "instance": 0.0,
+          "primitive": 486.0,
+          "material": 1.0,
+          "rawT": 0.3171133,
+          "geometry": 0.0,
+          "frontFace": 1.0,
+          "flags": 0.0,
+          "bary": [
+            0.4051459,
+            0.56905514
+          ],
+          "transmission": 0.0,
+          "signedAlignment": -0.7623293,
+          "surfacePosition": [
+            -9.01598,
+            -0.95,
+            -15.420976
+          ],
+          "geometricNormal": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      },
+      "visits": [
+        {
+          "visit": 0,
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 10.0,
+          "material": 107.0,
+          "t": 2.2772326,
+          "volumeOpen": 0.0,
+          "roughness": 0.12,
+          "ior": 1.52,
+          "position": [
+            -9.081817,
+            0.3,
+            -14.932264
+          ],
+          "transmission": 0.94,
+          "geometricNormal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "signedAlignment": -0.1756518,
+          "direction": [
+            -0.65070933,
+            -0.1756518,
+            -0.7387312
+          ],
+          "previousSpawnEpsilon": 0.0,
+          "queryOrigin": [
+            -7.6,
+            0.7,
+            -13.25
+          ],
+          "queryMinimum": 0.002
+        },
+        {
+          "visit": 1,
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 5.0,
+          "material": 107.0,
+          "t": 0.27608865,
+          "volumeOpen": 1.0,
+          "roughness": 0.12,
+          "ior": 1.52,
+          "position": [
+            -9.200001,
+            0.089628845,
+            -15.066436
+          ],
+          "transmission": 0.94,
+          "geometricNormal": [
+            -0.99999994,
+            0.0,
+            0.0
+          ],
+          "signedAlignment": 0.4280982,
+          "direction": [
+            -0.42809823,
+            -0.7619243,
+            -0.48600736
+          ],
+          "previousSpawnEpsilon": 2.9864528E-05,
+          "queryOrigin": [
+            -9.081817,
+            0.29997015,
+            -14.932264
+          ],
+          "queryMinimum": 0.0
+        },
+        {
+          "visit": 2,
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 6.0,
+          "material": 107.0,
+          "t": 0.4670017,
+          "volumeOpen": 1.0,
+          "roughness": 0.12,
+          "ior": 1.52,
+          "position": [
+            -9.0,
+            -0.26623353,
+            -15.293267
+          ],
+          "transmission": 0.94,
+          "geometricNormal": [
+            0.99999994,
+            0.0,
+            0.0
+          ],
+          "signedAlignment": 0.4282122,
+          "direction": [
+            0.42821223,
+            -0.7620363,
+            -0.48573136
+          ],
+          "previousSpawnEpsilon": 3.0132871E-05,
+          "queryOrigin": [
+            -9.19997,
+            0.089628845,
+            -15.066436
+          ],
+          "queryMinimum": 0.0
+        },
+        {
+          "visit": 3,
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 5.0,
+          "material": 107.0,
+          "t": 0.4671746,
+          "volumeOpen": 1.0,
+          "roughness": 0.12,
+          "ior": 1.52,
+          "position": [
+            -9.200001,
+            -0.6222553,
+            -15.5202055
+          ],
+          "transmission": 0.94,
+          "geometricNormal": [
+            -0.99999994,
+            0.0,
+            0.0
+          ],
+          "signedAlignment": 0.42805213,
+          "direction": [
+            -0.42805216,
+            -0.76209545,
+            -0.4857796
+          ],
+          "previousSpawnEpsilon": 3.0586536E-05,
+          "queryOrigin": [
+            -9.0000305,
+            -0.26623353,
+            -15.293267
+          ],
+          "queryMinimum": 0.0
+        },
+        {
+          "visit": 4,
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 0.0,
+          "material": 107.0,
+          "t": 0.11285419,
+          "volumeOpen": 1.0,
+          "roughness": 0.12,
+          "ior": 1.52,
+          "position": [
+            -9.151651,
+            -0.70825523,
+            -15.575
+          ],
+          "transmission": 0.94,
+          "geometricNormal": [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "signedAlignment": 0.4855899,
+          "direction": [
+            0.42819682,
+            -0.7621351,
+            -0.4855899
+          ],
+          "previousSpawnEpsilon": 3.104041E-05,
+          "queryOrigin": [
+            -9.199969,
+            -0.6222553,
+            -15.5202055
+          ],
+          "queryMinimum": 0.0
+        },
+        {
+          "visit": 5,
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 8.0,
+          "material": 107.0,
+          "t": 0.3171285,
+          "volumeOpen": 1.0,
+          "roughness": 0.12,
+          "ior": 1.52,
+          "position": [
+            -9.015981,
+            -0.95,
+            -15.420976
+          ],
+          "transmission": 0.94,
+          "geometricNormal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "signedAlignment": 0.7623293,
+          "direction": [
+            0.42783222,
+            -0.7623293,
+            0.4856065
+          ],
+          "previousSpawnEpsilon": 3.115E-05,
+          "queryOrigin": [
+            -9.151651,
+            -0.70825523,
+            -15.574968
+          ],
+          "queryMinimum": 0.0
+        },
+        {
+          "visit": 6,
+          "hit": 0.0,
+          "instance": 0.0,
+          "primitive": -1.0,
+          "material": -1.0,
+          "t": 10000.0,
+          "volumeOpen": 0.0,
+          "roughness": 1.0,
+          "ior": 1.5,
+          "position": [
+            6491.2383,
+            -1797.2998,
+            7368.332
+          ],
+          "transmission": 0.0,
+          "geometricNormal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "signedAlignment": -0.17963497,
+          "direction": [
+            0.6500254,
+            -0.17963497,
+            0.7383753
+          ],
+          "previousSpawnEpsilon": 3.084195E-05,
+          "queryOrigin": [
+            -9.015981,
+            -0.9500308,
+            -15.420976
+          ],
+          "queryMinimum": 0.0
+        }
+      ]
+    },
+    {
+      "backend": "compute",
+      "imageSha256": "5ebf8e15b86b1b70eef7164a55b668c36a34903005bf50aa49db164d1e731eef",
+      "actualRgb": [
+        2,
+        2,
+        3
+      ],
+      "primary": {
+        "hit": 1.0,
+        "instance": 9.0,
+        "primitive": 10.0,
+        "material": 107.0,
+        "t": 2.2772326,
+        "geometricNormal": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "normal": [
+          0.590222,
+          0.51934886,
+          0.6179925
+        ],
+        "base": [
+          0.82,
+          0.94,
+          1.0
+        ],
+        "roughness": 0.12,
+        "transmission": 0.94,
+        "flags": 5125.0,
+        "direction": [
+          -0.65070933,
+          -0.1756518,
+          -0.7387312
+        ],
+        "origin": [
+          -7.6,
+          0.7,
+          -13.25
+        ],
+        "position": [
+          -9.081817,
+          0.3,
+          -14.932264
+        ]
+      },
+      "surface": [
+        0.00334663,
+        0.0038465122,
+        0.0048128944
+      ],
+      "display": [
+        0.0066828583,
+        0.007840444,
+        0.010194179
+      ],
+      "firstFresnel": 0.40573308,
+      "reflection": {
+        "direction": [
+          -0.65085185,
+          0.17571487,
+          -0.7385906
+        ],
+        "origin": [
+          -9.081817,
+          0.30002987,
+          -14.932264
+        ],
+        "hit": 1.0,
+        "instance": 0.0,
+        "primitive": 496.0,
+        "material": 2.0,
+        "accumulatedDistance": 4.806015,
+        "position": [
+          -10.727679,
+          0.7443746,
+          -16.8
+        ],
+        "radiance": [
+          0.008248353,
+          0.009480401,
+          0.011862218
+        ]
+      },
+      "transmitted": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "throughput": [
+        0.44627768,
+        0.51980084,
+        0.55861086
+      ],
+      "termination": {
+        "resolved": 1.0,
+        "overflow": 0.0,
+        "volumeOpen": 1.0,
+        "tirSinceTransition": 4.0
+      },
+      "contactProbe": {
+        "observed": true,
+        "candidates": 2.0,
+        "matchingExitCandidates": 1.0,
+        "opaqueCandidates": 1.0,
+        "origin": [
+          -9.151651,
+          -0.7082553,
+          -15.574968
+        ],
+        "minimum": 0.0,
+        "direction": [
+          0.4278322,
+          -0.7623293,
+          0.4856064
+        ],
+        "maximum": 10000.0,
+        "exit": {
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 8.0,
+          "material": 107.0,
+          "rawT": 0.31711325,
+          "geometry": 0.0,
+          "frontFace": 0.0,
+          "flags": 5125.0,
+          "bary": [
+            0.7147344,
+            0.20536493
+          ],
+          "transmission": 0.94,
+          "signedAlignment": 0.7623293,
+          "surfacePosition": [
+            -9.015981,
+            -0.95,
+            -15.420976
+          ],
+          "geometricNormal": [
+            0.0,
+            -1.0,
+            0.0
+          ]
+        },
+        "receiver": {
+          "hit": 1.0,
+          "instance": 0.0,
+          "primitive": 486.0,
+          "material": 1.0,
+          "rawT": 0.31711322,
+          "geometry": 0.0,
+          "frontFace": 1.0,
+          "flags": 0.0,
+          "bary": [
+            0.40514588,
+            0.56905514
+          ],
+          "transmission": 0.0,
+          "signedAlignment": -0.7623293,
+          "surfacePosition": [
+            -9.01598,
+            -0.95,
+            -15.420976
+          ],
+          "geometricNormal": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        }
+      },
+      "visits": [
+        {
+          "visit": 0,
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 10.0,
+          "material": 107.0,
+          "t": 2.2772326,
+          "volumeOpen": 0.0,
+          "roughness": 0.12,
+          "ior": 1.52,
+          "position": [
+            -9.081817,
+            0.3,
+            -14.932264
+          ],
+          "transmission": 0.94,
+          "geometricNormal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "signedAlignment": -0.1756518,
+          "direction": [
+            -0.65070933,
+            -0.1756518,
+            -0.7387312
+          ],
+          "previousSpawnEpsilon": 0.0,
+          "queryOrigin": [
+            -7.6,
+            0.7,
+            -13.25
+          ],
+          "queryMinimum": 0.002
+        },
+        {
+          "visit": 1,
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 5.0,
+          "material": 107.0,
+          "t": 0.27608865,
+          "volumeOpen": 1.0,
+          "roughness": 0.12,
+          "ior": 1.52,
+          "position": [
+            -9.200001,
+            0.089628845,
+            -15.066436
+          ],
+          "transmission": 0.94,
+          "geometricNormal": [
+            -0.99999994,
+            0.0,
+            0.0
+          ],
+          "signedAlignment": 0.4280982,
+          "direction": [
+            -0.42809823,
+            -0.7619243,
+            -0.48600736
+          ],
+          "previousSpawnEpsilon": 2.9864528E-05,
+          "queryOrigin": [
+            -9.081817,
+            0.29997015,
+            -14.932264
+          ],
+          "queryMinimum": 0.0
+        },
+        {
+          "visit": 2,
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 6.0,
+          "material": 107.0,
+          "t": 0.46700174,
+          "volumeOpen": 1.0,
+          "roughness": 0.12,
+          "ior": 1.52,
+          "position": [
+            -9.0,
+            -0.26623353,
+            -15.293267
+          ],
+          "transmission": 0.94,
+          "geometricNormal": [
+            0.99999994,
+            0.0,
+            0.0
+          ],
+          "signedAlignment": 0.42821214,
+          "direction": [
+            0.42821217,
+            -0.76203626,
+            -0.4857313
+          ],
+          "previousSpawnEpsilon": 3.0132871E-05,
+          "queryOrigin": [
+            -9.19997,
+            0.089628845,
+            -15.066436
+          ],
+          "queryMinimum": 0.0
+        },
+        {
+          "visit": 3,
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 5.0,
+          "material": 107.0,
+          "t": 0.4671746,
+          "volumeOpen": 1.0,
+          "roughness": 0.12,
+          "ior": 1.52,
+          "position": [
+            -9.200001,
+            -0.6222553,
+            -15.5202055
+          ],
+          "transmission": 0.94,
+          "geometricNormal": [
+            -0.99999994,
+            0.0,
+            0.0
+          ],
+          "signedAlignment": 0.42805213,
+          "direction": [
+            -0.42805216,
+            -0.7620955,
+            -0.4857796
+          ],
+          "previousSpawnEpsilon": 3.0586536E-05,
+          "queryOrigin": [
+            -9.0000305,
+            -0.26623353,
+            -15.293267
+          ],
+          "queryMinimum": 0.0
+        },
+        {
+          "visit": 4,
+          "hit": 1.0,
+          "instance": 9.0,
+          "primitive": 0.0,
+          "material": 107.0,
+          "t": 0.1128542,
+          "volumeOpen": 1.0,
+          "roughness": 0.12,
+          "ior": 1.52,
+          "position": [
+            -9.151651,
+            -0.7082553,
+            -15.575
+          ],
+          "transmission": 0.94,
+          "geometricNormal": [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          "signedAlignment": 0.4855898,
+          "direction": [
+            0.4281968,
+            -0.7621351,
+            -0.4855898
+          ],
+          "previousSpawnEpsilon": 3.104041E-05,
+          "queryOrigin": [
+            -9.199969,
+            -0.6222553,
+            -15.5202055
+          ],
+          "queryMinimum": 0.0
+        },
+        {
+          "visit": 5,
+          "hit": 1.0,
+          "instance": 0.0,
+          "primitive": 486.0,
+          "material": 1.0,
+          "t": 0.3171285,
+          "volumeOpen": 1.0,
+          "roughness": 1.0,
+          "ior": 1.5,
+          "position": [
+            -9.01598,
+            -0.95,
+            -15.420976
+          ],
+          "transmission": 0.0,
+          "geometricNormal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "signedAlignment": -0.7623293,
+          "direction": [
+            0.4278322,
+            -0.7623293,
+            0.4856064
+          ],
+          "previousSpawnEpsilon": 3.115E-05,
+          "queryOrigin": [
+            -9.151651,
+            -0.7082553,
+            -15.574968
+          ],
+          "queryMinimum": 0.0
+        }
+      ]
+    }
+  ]
+}

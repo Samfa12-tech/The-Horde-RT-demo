@@ -13,7 +13,30 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 High edge discriminator (latest completed bounded step)
+### October 2 High contact candidate availability (latest completed step)
+
+Test-only c6e0685 is integrated/pushed to engineering as1f684a8; Debug/Release
+dielectric each1/1 PASS2.45/2.74s. Fresh current-source CI36950835736 and
+PR36950830217 SUCCESS (GCC56, Clang56, MSVC62, Vulkan CPU-host15, Android build/
+Java/lint/package), not physical RT/device evidence.
+Isolated candidate source6ed11ed retains both native triangles with one extra
+non-confirming query only at watched pixel456,304. Two real modules compile/
+validate, actual app build/provider1/1 pass. Both native runs exit0/honest RT;
+all actual-path fields,41 counters and nonpayload rows match retained controls
+exactly. Native exit/floor t differ by3 float steps on pipeline and1 on compute,
+with opposite nearest ordering. This rules out exact-t equality as a sufficient
+contact test, NOT a universal epsilon/error bound or driver-bug proof. Strict
+max20 backend gate still fails. Normal renderer/Shipping untouched, no promotion.
+Full latest record: [finite observer record](evidence/2026-10-02-backend-pixel-witness/high-edge-observer.md#completed-candidate-availability--not-an-exact-distance-tie).
+Next: conservative qualification from both actual triangles; world code/normal
+alone lacks authored plane position. Review smallest immutable metadata seam,
+prove air-gap/interior-obstruction/TIR rejection before runtime change. No repeated
+completed captures/controls, shader rebuilds, epsilon sweep or budget increase.
+High/physical/cost/device gates remain open; no phone use while disconnected.
+Isolated cache Mobile/Shipping; actual retained executable still High observer.
+Audio/haptic manual revalidation:NO, unchanged semantic inputs. No publication.
+
+### October 2 High edge discriminator (preceding completed bounded step)
 
 Source48702729ab7ccc0bddda91517da9b42bc6efa5e2 remains isolated on
 codex/horde-rtx-corrections. Exactly one High/glass-edge-fresnel image per backend;

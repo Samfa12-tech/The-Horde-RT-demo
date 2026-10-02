@@ -155,4 +155,50 @@ Generated adapter check PASS; MSVC Debug/High application build PASS; refreshed
 provider CTest1/1 PASS1.80s. Actual executable SHA-256
 42f856a87ca3eea9b7c803bbcdf004694d7c0dcad6eb4404f7e95e509299fb2e.
 Logs/artifacts: C:/Dev/tmp/horde-high-contact-candidates-*-20261002.
-Next unfinished step: run this finite field-gap pair, decode and check stability.
+## Completed candidate availability — not an exact-distance tie
+
+Source6ed11ed4247159ad13d2e753c0b62618a7a69901, executable above. Both native
+RTX5050 Laptop captures exit0/honestly present RT. New payload/images/manifests,
+[fields](high-contact-candidates/decoded.json),
+[comparison](high-contact-candidates/comparison.json), logs and
+[stability receipt](high-contact-candidates/stability.json) are retained.
+All ten actual-path field groups agree exactly with the first completed
+observer. All41 numeric counters and both availability groups match their
+respective clean controls. Nonpayload rows1-539 remain byte-exact (max0/fraction0).
+Backend image gate remains FAIL max20/32 pixels over3; no tolerance changes.
+
+Each copied continuation query enumerates exactly two triangle candidates:
+one matching exit9/8/107 and one opaque floor0/486/1. Both exit surface normals
+point down/frontFace0; both receivers point up/frontFace1. The reconstructed
+surface Y values agree at -0.95. Native raw distances are NOT equal:
+
+| Backend | Exit raw t | Receiver raw t | Receiver minus exit (float steps) |
+| --- | --- | --- | --- |
+| Pipeline | 0.3171132206916809 | 0.3171133100986481 | +3 |
+| Compute | 0.3171132504940033 | 0.3171132206916809 | -1 |
+
+Thus the current nearest-hit choices are consistent with each query's reported
+distances; this is not proof of an arbitrary equal-t commitment or driver bug.
+Authored surfaces coincide by the independent double reference, but native
+intersection rounding orders the exit/receiver differently. Exact t equality
+alone is ruled out. The observed1/3 steps are NOT a universal error bound or
+permission to add a proximity epsilon. This probe proves candidate availability,
+not contact admission, physics correctness or the other31 edge-pixel causes.
+
+Normal engineering receives only the CPU test and evidence. Never promote this
+observer/extra query or either buggy baseline. Frozen cost remains unadmitted;
+High/backend/physical/device gates remain open. No Android/performance claim.
+Isolated cache returned Mobile/Shipping; the actual retained executable is still
+the High Diagnostic observer (no pointless rebuild). Normal configuration never
+changed. Audio/haptic manual revalidation:NO, unchanged semantic inputs.
+
+Next unfinished step: a conservative geometric contact qualifier using BOTH
+actual triangles, preserving exit Fresnel/Snell/TIR and the opaque receiver.
+Qualification must distinguish true coplanar contact from an air gap/interior
+obstruction, not compare raw t with an empirical epsilon. Current static-PBR
+triangles can be loaded, but ordinary world surfaces expose only code/normal,
+not authored triangle position/plane. Review the smallest immutable geometry
+metadata seam needed for a real qualification; no general scheduling framework
+or analytic production traversal. Prove air-gap/obstruction/TIR rejection in CPU
+references before a runtime change. Do not repeat this completed pair, controls,
+Mobile/High matrices or unchanged shader compilation.
