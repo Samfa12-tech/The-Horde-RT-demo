@@ -13,7 +13,44 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 ordered PBR UV result (current unfinished step)
+### October 2 clean RTX candidate (current unfinished step)
+
+Clean isolated branch `codex/horde-rtx-corrections` is pushed at
+`9d4d1f408154e2405adcf3606c3c8451f6e16f49`. Source4e951c2 corrects outward
+world-box normals;8a75627 preserves authored PBR UV interpolation order, with
+only required regenerated modules. No observer, hidden/reserved image rows,
+capture filter, closed-region helper or accepted player/asset changes.
+Engineering renderer/modules/default configuration remain unchanged; receipts only.
+
+Fresh affected Debug/Release each1/1 passes4.01/1.92s and real Debug app builds
+pass. All16 actual modules compile/validate and embedded hashes match; decoded
+words otherwise exactly match normal d9 after removing only NoContraction
+decorations. All8 Shipping modules remain zero-atomic/no binding22. Frozen cost
+admission FAILS (+84bytes/7 decorations Generic; +504/42 Opaque), unchanged limits;
+no native instruction/register/performance claim or automatic promotion.
+
+Full13 clean Diagnostic/Mobile image pairs:12/13 pass unchanged max3/.001;
+only known finale770,526 boundary remains (max6). The reflection outliers are
+closed without the observer. Three affected High fixtures also complete on both
+RTX backends: all fail strict backend maximum (20/53/14;32/6/5 pixels over3).
+Only missing normal compute controls are newly captured with an existing binary,
+no rebuild or repeated pipeline controls. All43 over3 coordinates and both RGB
+triples exactly match normal pairs: these High failures predate the candidate.
+Zero failure counters do not certify High physics; reason1 recoveries/TIR/secondary
+terminals and separate row43 remain open. Old-control shading changes remain
+explicit differences, not blanket passes. Exact source/artifacts/finite matrices:
+[single record](evidence/2026-10-02-backend-pixel-witness/README.md#clean-uninstrumented-rtx-admission).
+
+Next step: bounded clean Mobile Shipping/Diagnostic image comparison on each
+backend, using the already-generated modules and retained Diagnostic captures.
+Do not repeat completed controls, Mobile/High Diagnostic matrices or shader
+compilation. Isolated Debug cache currently High/Diagnostic; normal default is
+untouched. Keep boundary/cost/High physical/device gates separate. S26 remains
+owner-disconnected; no polling/install or repeated owner requests. No main merge,
+release or publication. Audio/haptic manual revalidation required:NO for this
+arithmetic/capture slice; pre-existing focused owner checks are unchanged.
+
+### October 2 ordered PBR UV result (preceding completed investigation)
 
 Isolated candidate `877f567` / pushed complete evidence `dc11e89` closes the four
 remaining Mobile RTX reflection outliers. Completed115-field probes reproduce

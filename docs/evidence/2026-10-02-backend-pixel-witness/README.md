@@ -232,3 +232,45 @@ light-region helper; exact cost/full affected RTX/High/device admission remains
 required. Reuse completed finite evidence; no new precision sweep or audit restart.
 Owner-disconnected S26 checks stay parked until reconnection. Audio/haptic manual
 revalidation required:NO: arithmetic/diagnostics only, feedback inputs unchanged.
+
+## Clean uninstrumented RTX admission
+
+The preceding next step is completed on separate `codex/horde-rtx-corrections`;
+normal engineering still contains no candidate renderer/modules/configuration.
+Exact source4e951c2 (outward box normals) /8a75627 (authored PBR UV order) and
+[complete pushed evidence9d4d1f4](https://github.com/Samfa12-tech/The-Horde-RT-demo/tree/9d4d1f408154e2405adcf3606c3c8451f6e16f49/docs/evidence/2026-10-02-backend-pixel-witness)
+contain no observers, reserved pixels, restricted capture roster or closed-region
+helper. Accepted player/assets remain unchanged. No witness branch merge.
+
+Actual Debug app/High builds and affected Debug/Release each1/1 pass4.01/1.92s.
+All16 modules compile/optimise/disassemble/validate and actual embedded hashes
+agree. Decoded words otherwise exactly match normal d9 after removing only
+NoContraction decorations (Generic7/84bytes; Opaque42/504bytes). All8 Shipping
+modules remain zero-atomic/no binding22. Frozen byte/instruction admission FAILS;
+budget hash unchanged. These decorations are not measured native instructions,
+register pressure or performance. No budget waiver or production promotion.
+
+Full13 Diagnostic/Mobile960x540/time0/12-frame pairs cover **all** image rows:
+12/13 PASS unchanged max3/.001; reflection outliers close, only known finale
+770,526 room-boundary pixel remains max6. Scene/module/static-allocation/actual
+CPU geometry/visibility/grip provenance checks pass. All actual lossless images,
+manifests and logs are in the linked snapshot; the initial LFS-pointer failure,
+local-cache hydration and corrected test are preserved. Old-control shading
+changes remain explicit differences, not relabelled regression passes.
+
+Three High fixtures on both RTX backends FAIL strict parity, maxima20/53/14 and
+32/6/5 pixels over3. Newly fill only the missing normal compute-control rows
+using an existing executable, no build or repeated pipeline captures. Every one
+of the43 coordinates and both RGB triples exactly matches normal controls: these
+bounded High failures predate this candidate. Zero failure counters do not prove
+physical acceptance; reason1 recoveries566/568, TIR/secondary termination and
+separate High row43 remain open. Full counter differences and negative gates
+are retained; no tolerance, geometry/material or diagnostic changes to pass them.
+
+Next unfinished step: clean Mobile Shipping/Diagnostic image comparison on each
+backend, reusing generated modules and Diagnostic captures. Do not repeat the
+completed native matrices, controls, shader compilation or qualifier search.
+Boundary/cost/High physics/device gates remain open. Normal engineering/defaults
+are unchanged; no phone action, main merge, release or publication. S26 stays
+parked until owner reconnects. Audio/haptic manual revalidation required:NO for
+this slice; previously requested owner checks unchanged.
