@@ -1,0 +1,16 @@
+Internal ctest changing into directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+Test project C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+    Start 55: horde_rt_sfx_volume_tests
+1/5 Test #55: horde_rt_sfx_volume_tests .................   Passed    0.02 sec
+    Start 56: horde_rt_windows_music_focus_tests
+2/5 Test #56: horde_rt_windows_music_focus_tests ........   Passed    0.97 sec
+    Start 60: horde_rt_music_playback_session_tests
+3/5 Test #60: horde_rt_music_playback_session_tests .....   Passed    0.16 sec
+    Start 74: horde_rt_desktop_controller_input_tests
+4/5 Test #74: horde_rt_desktop_controller_input_tests ...   Passed    0.02 sec
+    Start 79: horde_rt_spatial_audio_smoke
+5/5 Test #79: horde_rt_spatial_audio_smoke ..............   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =   1.19 sec

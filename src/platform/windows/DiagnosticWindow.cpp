@@ -1,5 +1,6 @@
 #include "platform/windows/DiagnosticWindow.h"
 #include "platform/windows/WindowsMusicPlayback.h"
+#include "platform/windows/WindowsMusicFocus.h"
 #include "platform/windows/WindowsPlaytestReport.h"
 #include "platform/windows/WindowsRemotePlaytestReport.h"
 #include "audio/SfxVolume.h"
@@ -319,7 +320,6 @@ struct VulkanSurfaceContext
     int musicVolumePercent = 70;
     std::unique_ptr<horde::platform::windows::WindowsMusicPlayback> musicPlayback;
     std::uint64_t musicResetToken = 0u;
-    bool musicWindowActive = true;
     int musicLastLoggedGate = -1;
     bool fullscreen = false;
     bool forwardHeld = false;
@@ -1331,29 +1331,33 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
     }
 }
 
-void PublishMusicPlayback(VulkanSurfaceContext& context)
+void PublishMusicPlayback(VulkanSurfaceContext& context, const bool focusLossNotification = false)
 {
     if (context.musicPlayback)
     {
         // Copy before the existing SFX drain. No worker accesses GameSimulation.
         const auto& snapshot = context.simulation.Snapshot();
-        const bool suspended = !context.musicWindowActive || !context.controlsEnabled ||
-                               context.simulationPaused;
+        const bool gameForeground = GetForegroundWindow() == context.windowHandle;
+        const bool suspended = horde::platform::windows::WindowsMusicShouldSuspend(
+            gameForeground, context.controlsEnabled, context.simulationPaused, focusLossNotification);
         const bool accepted = context.musicPlayback->Publish(snapshot,
             context.simulation.Events().Events(), 1u, context.musicResetToken,
             suspended,
             context.musicVolumePercent);
-        // Observe existing gates only when they change. Do not repair focus or
-        // alter playback from an unproven owner observation. No foreign-window
-        // identity, frame-by-frame log, or screenshot is collected here.
-        const int gate = (context.musicWindowActive ? 1 : 0) |
+        // Bounded transition observations distinguish an explicit loss from a
+        // settled foreground handover. No foreign-window identity or frame log.
+        const bool active = gameForeground && !focusLossNotification;
+        const int gate = (active ? 1 : 0) |
                          (context.controlsEnabled ? 2 : 0) |
-                         (context.simulationPaused ? 4 : 0);
+                         (context.simulationPaused ? 4 : 0) |
+                         (focusLossNotification ? 8 : 0) |
+                         (gameForeground ? 16 : 0);
         if (gate != context.musicLastLoggedGate)
         {
             context.musicLastLoggedGate = gate;
-            LogWindowsAudio("Windows music gate: active=" + std::to_string(context.musicWindowActive) +
-                " foreground=" + std::to_string(GetForegroundWindow() == context.windowHandle) +
+            LogWindowsAudio("Windows music gate: active=" + std::to_string(active) +
+                " foreground=" + std::to_string(gameForeground) +
+                " focusLoss=" + std::to_string(focusLossNotification) +
                 " controls=" + std::to_string(context.controlsEnabled) +
                 " menuPaused=" + std::to_string(context.simulationPaused) +
                 " snapshotPaused=" + std::to_string(snapshot.paused) +
@@ -5187,7 +5191,6 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             {
                 LogWindowsAudio(std::string("Music could not initialize; RT/SFX unchanged: ") + error.what());
             }
-            context.musicWindowActive = GetForegroundWindow() == hWnd;
             ApplyOverlayState(context);
             if (!unattendedBenchmark)
                 horde::platform::windows::BeginGitHubReleaseUpdateCheck(
@@ -6612,12 +6615,17 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_ACTIVATEAPP:
         if (sceneContext)
         {
-            sceneContext->musicWindowActive = wParam != FALSE;
-            PublishMusicPlayback(*sceneContext);
+            PublishMusicPlayback(*sceneContext, wParam == FALSE);
         }
         if (sceneContext && wParam == FALSE && sceneContext->benchmark.IsRunning())
         {
             CancelBenchmark(*sceneContext, true);
+        }
+        break;
+    case WM_ACTIVATE:
+        if (sceneContext)
+        {
+            PublishMusicPlayback(*sceneContext, LOWORD(wParam) == WA_INACTIVE);
         }
         break;
     case WM_SIZE:

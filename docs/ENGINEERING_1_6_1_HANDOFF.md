@@ -26,24 +26,37 @@ Debug/Release game builds and selected7/7 CTests each pass; Android builds both
 variants,76/76 Java tests and lint42 warnings/0 errors pass. Native objects reuse
 unchanged code; changed Java/assets are freshly staged. Both APK package checks
 pass, not installed. [Finite record](evidence/2026-10-02-sfx-volume/README.md).
-Audio/haptic manual revalidation:YES for requested SFX balance/control changes,
-not another soundtrack audition or unrelated haptic retuning.
+Owner accepts Windows SFX balance/independent control on Shippingb5f6638d.
+Do not repeat that listening check. Phone changed cuff/gain acceptance remains
+separate. Audio/haptic manual revalidation:YES only for affected gain/focus
+behavior, not another soundtrack audition or unrelated haptic retuning.
 
-Owner cannot recall whether the prior music silence was in active gameplay or
-menus. Do not label it a proven focus bug. Native silent startup/focus-return
-regression passes in Debug and Release; the actual fresh-launch observation is
-still open. Existing Windows audio log now records only gate transitions,
-native-bank readiness and first actual consumption, without altering playback.
-The final Shippingb5f6638d candidate is prepared in the isolated audio-review
-stage; [startup finite record](evidence/2026-10-02-windows-music-startup/README.md)
-owns its hash, completed native checks and next single launch. Preserve the
-accepted score, Core and playback architecture.
-Next: exact Windows control/balance/startup check; changed phone cuff/gain
-acceptance remains open. No phone use, main merge or publication in this run.
+### October 2 demonstrated Windows startup music gate
 
-Fresh push36997618575 and PR36997623634 for cuff checkpoint8b4433e both PASS
-GCC/Clang/MSVC, focused Vulkan CPU-host and Android lanes. This certifies that
-checkpoint's stated CI scope, not the later SFX changes or physical RT devices.
+Owner now confirms silence through gameplay and repeated menus until refocus.
+The retained control log proves `active=0 foreground=1` despite ready audio,
+gameplay/menu publications and advancing ticks. This is a stale cached Windows
+activation gate, not missing PCM or score; notification-delivery cause is not
+claimed. Android is unchanged. Preserve the accepted score/Core/playback.
+
+Targeted repair samples actual game-foreground equality on each publication,
+removes `musicWindowActive` and honours immediate app/window loss. Debug/Shipping
+game builds and focused5/5 contracts each PASS (2.70s/1.19s), including all16 gate
+combinations. Native backend startup smoke is already completed; no rerun needed.
+Shipping243acc6b stage opened normally as PID25812 with accepted cuff assets;
+first actual output is16ms after initial gameplay, before any focus loss.
+[Single finite record](evidence/2026-10-02-windows-music-startup/README.md) owns
+hashes, control evidence and tests. Owner confirms "yep - it works as it should
+now" for initial-play/menu/refocus; bounded candidate log and honest RTX
+presentation report are retained. This Windows interaction is CLOSED. No phone
+use, main merge, publication or performance claim. Audio/haptic manual
+revalidation:YES for Windows music focus only, completed/accepted; SFX and
+soundtrack instrumentation already accepted. Next: push/current CI for this
+repair, then resume the existing final-candidate/device gates, not this audition.
+
+Fresh push36999882401 and PR36999888956 for90b3d3a both PASS GCC/Clang/MSVC,
+focused Vulkan CPU-host and Android lanes. This certifies the cuff/SFX/startup
+observation checkpoint, not the subsequent focus repair or physical RT devices.
 
 ### October 2 off-UI surface owner repairs the demonstrated ANR
 
@@ -91,14 +104,9 @@ Exact-device change-triggered acceptance remains open; prepare the changed build
 in this run. Do not reopen automatically or repeat the contrasts after compaction.
 [Finite cuff record](evidence/2026-10-02-right-cuff/README.md).
 
-New owner audio additions: Windows music starts only after alt-tab/refocus; source
-already initializes foreground state and handles activation, so the cause is
-not proven. Establish initial external-suspension/focus evidence, not a score/
-voice rerender. Owner requests an independent SFX slider (Windows currently only
-has a toggle; Android already has a separate persisted slider) and quieter stone
-footsteps relative to other SFX. Finish this bounded audio work separately from
-the cuff commit. Audio/haptic manual revalidation:YES for playback/focus/gain
-changes; limited to startup/refocus and balance, not a new soundtrack audition.
+The later bounded audio follow-up and demonstrated startup-gate repair are
+recorded above; this historical cuff slice does not require another contrast,
+IK pass or instrumentation audition.
 
 The bounded native lifecycle owner and generation-scoped Java/JNI readiness/stop
 are now implemented. Existing render/simulation ownership, shaders, assets,

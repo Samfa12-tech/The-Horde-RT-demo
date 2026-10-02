@@ -33,7 +33,8 @@ Retained MSVC build: `build/foundation-validation/20261002-183151`.
 | Selected contracts |SFX clamp/migration/gain, desktop controller, spatial feedback, MusicDirector, music session, simulation gameplay and timing. |
 | Android assembleDebug / unsigned assembleRelease / Java / lint |PASS,21s;47 executed/64 up-to-date tasks. Both Java variants freshly compile; native4-ABI CMake tasks reuse unchanged native outputs. Java test task executes:76 total,0 failures/errors/skips. Lint analysis executes; unchanged report has42 warnings/0 errors. [Build](android-build.txt). |
 | Debug and unsigned APK held-item/player package admission |Both PASS; exact current cuff/player entries and existing attribution admitted. No device installation. |
-| Listening/UI/device acceptance |OPEN; tests are not an audible balance, active-voice slider or physical-device pass. |
+| Windows listening/UI acceptance |Owner accepts SFX balance and independent control on the Shippingb5f6638d review build. No claim of a separate controller/persistence exercise. |
+| Android device acceptance |OPEN for changed gain/cuff; no installation in this run. |
 
 SFX-stage Windows executables (before any later startup-observation-only changes):
 Debug `e5f596ed081707115404c9cf1cb6f4738b933bd854e242af33636351c6cdc0a7`,
@@ -48,11 +49,13 @@ APK evidence remains tied to its older hash. No phone use in this run.
 
 ## Next unfinished step
 
-On the prepared Windows candidate: verify independent SFX/music settings,
-0/low/full SFX levels, persistence, and footstep/combat balance in normal play.
-No soundtrack retuning or unrelated haptic acceptance requested. Phone gain/cuff
-acceptance remains separately open when authorised device time becomes available.
+Owner reports "SFX is good" in the requested balance/independent-slider check.
+Do not repeat that accepted Windows listening check. The same run demonstrates
+the separate Windows music startup/focus defect; its finite record owns the
+targeted follow-up. Phone gain/cuff acceptance remains separately open when
+authorised device time becomes available.
 
 Audio/haptic manual revalidation required: **YES**, only for SFX gain/control
-behavior and the separately reported uncertain Windows startup/refocus music
-observation. Haptic routing itself is unchanged. No publication or main merge.
+behavior (Windows owner check now accepted) and the separately demonstrated
+Windows startup/refocus music defect. Haptic routing itself is unchanged.
+No publication or main merge.

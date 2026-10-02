@@ -1,0 +1,21 @@
+Windows music gate: active=0 foreground=0 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=0 wallMs=11892250
+XAudio2 ready; output channels=8, asset root=C:\Dev\tmp\horde-sfx-volume-review-20261002\assets
+Windows music admitted PCM bank and created XAudio2 master; wallMs=11892859
+Windows music gate: active=0 foreground=1 controls=1 menuPaused=0 snapshotPaused=1 accepted=1 volume=70 tick=0 wallMs=12235468
+first voice started: ui_back.wav, format=48000 Hz/16 bit mono
+first voice completed: ui_back.wav
+Windows music gate: active=0 foreground=1 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=408 wallMs=12242281
+Windows music gate: active=0 foreground=1 controls=1 menuPaused=0 snapshotPaused=1 accepted=1 volume=70 tick=408 wallMs=12248421
+Windows music gate: active=0 foreground=1 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=588 wallMs=12251437
+Windows music gate: active=1 foreground=1 controls=1 menuPaused=1 snapshotPaused=1 accepted=1 volume=70 tick=588 wallMs=12274984
+Windows music gate: active=1 foreground=1 controls=1 menuPaused=0 snapshotPaused=1 accepted=1 volume=70 tick=588 wallMs=12276218
+Windows music first device output: played=480 generated=1920 submitted=1920 volume=70 wallMs=12276234
+Windows music gate: active=1 foreground=1 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=697 wallMs=12278062
+Windows music gate: active=0 foreground=0 controls=1 menuPaused=1 snapshotPaused=1 accepted=1 volume=70 tick=697 wallMs=12278812
+Windows music gate: active=1 foreground=1 controls=1 menuPaused=1 snapshotPaused=1 accepted=1 volume=70 tick=697 wallMs=12335437
+Windows music gate: active=1 foreground=1 controls=1 menuPaused=0 snapshotPaused=1 accepted=1 volume=70 tick=697 wallMs=12343078
+Windows music gate: active=1 foreground=1 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=1309 wallMs=12353265
+Windows music gate: active=1 foreground=1 controls=1 menuPaused=0 snapshotPaused=1 accepted=1 volume=70 tick=1309 wallMs=12361625
+Windows music gate: active=0 foreground=0 controls=1 menuPaused=0 snapshotPaused=0 accepted=1 volume=70 tick=2627 wallMs=12383609
+Windows music gate: active=1 foreground=1 controls=1 menuPaused=0 snapshotPaused=0 accepted=1 volume=70 tick=2841 wallMs=12387171
+Windows music gate: active=0 foreground=0 controls=1 menuPaused=0 snapshotPaused=0 accepted=1 volume=70 tick=3045 wallMs=12390640
