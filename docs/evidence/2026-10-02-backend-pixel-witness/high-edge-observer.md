@@ -206,7 +206,7 @@ Mobile/High matrices or unchanged shader compilation.
 ## Completed CPU contact qualifier — next metadata seam
 
 The preceding CPU-proof step is now complete at675a32c, engineering441a8f5.
-[Single durable proof and integration receipt](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/bb2b87817ee0e6e508d013af12031c860f2a10fd/docs/evidence/2026-10-02-backend-pixel-witness/high-edge-contact.md#completed-conservative-contact-qualification-cpu-only)
+[Single durable proof and integration receipt](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/3d84e5489bd36b9a2f94cbf587a9d825299af7b5/docs/evidence/2026-10-02-backend-pixel-witness/high-edge-contact.md#completed-conservative-contact-qualification-cpu-only)
 owns the exact24,576-case/6,640-admitted results, air-gap/degenerate/TIR tests,
 rejected arithmetic proposal and bad fixture assumption, focused review, and
 integrated Debug/Release1/1 passes. No runtime/shader change or new native run.

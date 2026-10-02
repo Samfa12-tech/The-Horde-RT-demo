@@ -16,19 +16,20 @@ after coherent reviewed slices, preserving unrelated files and verifying remote 
 ### October 2 conservative contact qualifier (latest completed step)
 
 CPU-only675a32c is integrated as441a8f5; engineering/profile durable checkpoint
-bb2b87817ee0e6e508d013af12031c860f2a10fd is pushed/remote-verified. Integrated
+3d84e5489bd36b9a2f94cbf587a9d825299af7b5 is pushed/remote-verified. Integrated
 Debug/Release dielectric each1/1 PASS3.51/2.63s;24,576 exact finite-grid checks,
 6,640 admitted. Integer binary32 proof replaces the unpromoted FMA proposal;
 provable axis-edge winding rejects unsupported/degenerate geometry. Review found
 no remaining concrete arithmetic/winding bug. Runtime/shader/config unchanged.
-[Completed proof, failure history and exact next step](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/bb2b87817ee0e6e508d013af12031c860f2a10fd/docs/evidence/2026-10-02-backend-pixel-witness/high-edge-contact.md#completed-conservative-contact-qualification-cpu-only).
+[Completed proof, failure history and exact next step](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/3d84e5489bd36b9a2f94cbf587a9d825299af7b5/docs/evidence/2026-10-02-backend-pixel-witness/high-edge-contact.md#completed-conservative-contact-qualification-cpu-only).
 Next:12-byte source-certified world-triangle plane record through existing
 binding6, shared ABI/consumer/SPIR-V stride/host/native compatibility checks,
 before contact policy. Candidate identity/footprints/opposed normals/post-Snell
 side/TIR checks remain required; plane equality alone is not admission. Do not
 repeat completed CPU/native tests, controls or unchanged shaders. Fresh source441
-branch36954600096/PR36954595930 GCC/Clang/Android/Vulkan-host succeed; MSVC still
-running at this receipt, full CI not yet green. High/cost/physical/device open.
+branch36954595930/PR36954600096 both SUCCESS: actual GCC56/Clang56/MSVC62/
+Vulkan-host15 logs inspected, Android Debug/Java/lint/package succeeds. Receipt-
+only later changes do not require another CI-receipt loop. High/cost/physical/device open.
 No phone use while disconnected; owner audio/haptic check:NO (CPU-only).
 
 ### October 2 High contact candidate availability (preceding completed step)
