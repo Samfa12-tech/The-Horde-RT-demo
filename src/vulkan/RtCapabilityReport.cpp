@@ -65,6 +65,13 @@ std::string FormatVkPackedVersion(const std::uint32_t value)
     return std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(patch);
 }
 
+std::string FormatConformanceVersion(const DriverProperties& driver)
+{
+    const auto& v = driver.conformanceVersion;
+    return std::to_string(v[0]) + "." + std::to_string(v[1]) + "." +
+           std::to_string(v[2]) + "." + std::to_string(v[3]);
+}
+
 bool IsMeasured(const float value)
 {
     return value > 0.0f;
@@ -96,7 +103,13 @@ std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities,
     out << "GPU name: " << capabilities.identity.gpuName << '\n';
     out << "Vendor ID: " << capabilities.identity.vendorId << '\n';
     out << "Device ID: " << capabilities.identity.deviceId << '\n';
-    out << "Driver version: " << FormatVkPackedVersion(capabilities.identity.driverVersion) << '\n';
+    out << "Driver version: " << FormatDriverVersionText(capabilities.identity.driverVersion) << '\n';
+    const auto& driver = capabilities.identity.driverProperties;
+    out << "Driver properties available: " << YesNo(driver.available) << '\n';
+    out << "Driver ID: " << (driver.available ? std::to_string(driver.id) : "N/A") << '\n';
+    out << "Driver name: " << (driver.available ? driver.name : "N/A") << '\n';
+    out << "Driver info: " << (driver.available ? driver.info : "N/A") << '\n';
+    out << "Driver conformance version: " << (driver.available ? FormatConformanceVersion(driver) : "N/A") << '\n';
     out << "Vulkan API version: " << FormatVkPackedVersion(capabilities.identity.vulkanApiVersion) << '\n';
     out << "VK_KHR_acceleration_structure: " << YesNo(capabilities.extensions.accelerationStructure) << '\n';
     out << "VK_KHR_ray_tracing_pipeline: " << YesNo(capabilities.extensions.rayTracingPipeline) << '\n';
@@ -183,7 +196,15 @@ std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities,
     out << "  \"vendorId\": " << capabilities.identity.vendorId << ",\n";
     out << "  \"deviceId\": " << capabilities.identity.deviceId << ",\n";
     out << "  \"driverVersion\": " << capabilities.identity.driverVersion << ",\n";
-    out << "  \"driverVersionText\": \"" << FormatVkPackedVersion(capabilities.identity.driverVersion) << "\",\n";
+    out << "  \"driverVersionText\": \"" << FormatDriverVersionText(capabilities.identity.driverVersion) << "\",\n";
+    const auto& driver = capabilities.identity.driverProperties;
+    out << "  \"driverProperties\": {\n";
+    out << "    \"available\": " << (driver.available ? "true" : "false") << ",\n";
+    out << "    \"driverId\": " << (driver.available ? std::to_string(driver.id) : "null") << ",\n";
+    out << "    \"driverName\": " << (driver.available ? "\"" + JsonEscape(driver.name) + "\"" : "null") << ",\n";
+    out << "    \"driverInfo\": " << (driver.available ? "\"" + JsonEscape(driver.info) + "\"" : "null") << ",\n";
+    out << "    \"conformanceVersion\": " << (driver.available ? "\"" + FormatConformanceVersion(driver) + "\"" : "null") << '\n';
+    out << "  },\n";
     out << "  \"vulkanApiVersion\": " << capabilities.identity.vulkanApiVersion << ",\n";
     out << "  \"vulkanApiVersionText\": \"" << FormatVkPackedVersion(capabilities.identity.vulkanApiVersion) << "\",\n";
     out << "  \"extensions\": {\n";

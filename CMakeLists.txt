@@ -976,6 +976,11 @@ if(BUILD_TESTING)
         target_include_directories(horde_rt_showcase_benchmark_smoke PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_showcase_benchmark_smoke PRIVATE horde_rt_probe_core)
         add_test(NAME horde_rt_showcase_benchmark_smoke COMMAND horde_rt_showcase_benchmark_smoke)
+
+        add_executable(horde_rt_driver_capability_report_tests tests/DriverCapabilityReportTests.cpp)
+        target_include_directories(horde_rt_driver_capability_report_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_driver_capability_report_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_driver_capability_report_tests COMMAND horde_rt_driver_capability_report_tests)
     endif()
 endif()
 

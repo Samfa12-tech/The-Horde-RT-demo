@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -33,6 +34,15 @@ struct FeatureSupport
     bool bufferDeviceAddress = false;
 };
 
+struct DriverProperties
+{
+    bool available = false;
+    std::uint32_t id = 0;
+    std::string name;
+    std::string info;
+    std::array<std::uint8_t, 4> conformanceVersion{};
+};
+
 struct DeviceIdentity
 {
     std::string gpuName = "Unknown GPU";
@@ -40,6 +50,8 @@ struct DeviceIdentity
     std::uint32_t deviceId = 0;
     std::uint32_t driverVersion = 0;
     std::uint32_t vulkanApiVersion = 0;
+    // Additional diagnostic metadata, not part of physical-device selection.
+    DriverProperties driverProperties{};
 };
 
 struct GpuRtTimingSnapshot
@@ -89,6 +101,9 @@ struct DeviceCapabilities
 
 std::string ToString(RtMode mode);
 std::string ToString(RtExecutionBackend backend);
+// driverVersion is implementation-defined, not a packed Vulkan API version.
+// Preserve it losslessly; driverProperties.info supplies vendor-authored text.
+std::string FormatDriverVersionText(std::uint32_t rawVersion);
 // Selection is useful failure evidence, never proof of successful presentation.
 void BeginRtBackendSelection(RtSceneSnapshot& scene, RtExecutionBackend backend);
 

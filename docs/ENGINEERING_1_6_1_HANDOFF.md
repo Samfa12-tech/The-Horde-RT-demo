@@ -31,6 +31,27 @@ honest RT presentation and final-candidate stability are still gates. No shader,
 asset, rendering, performance or audio change is made by this deferral.
 Audio/haptic manual revalidation:NO. No merge, signing or publication.
 
+### October3 driver reporting F14 — implemented and locally validated
+
+Raw driverVersion is no longer decoded as a Vulkan API version. Guarded driver
+properties supply ID/name/info/conformance independently; unavailable fields are
+explicit null/N/A, and raw physical-device selection identity is unchanged.
+Debug/Release game/probe builds and affected4/4 CTests each pass; actual RTX5050
+query reports raw2559295488,driverInfo610.47 and API1.4.341 separately, exit0 and
+honest presented=false. Focused Vulkan CPU-host CI explicitly covers the fixture.
+[Finite record](evidence/2026-10-03-driver-identity/README.md) retains commands,
+results, limits and the new development-signed Shipping/Mobile APK5c555528.
+Four-ABI build/exact package admission and actual ARM64 four-module zero-atomic/
+no-binding22 SPIR-V validation pass; shaders/assets/rendering are unchanged.
+Older4d8677b7 is preserved, not relabelled this source. No phone use occurred.
+Next: current CI, missing sanitizer coverage and final device/live gates. Do not
+repeat completed tests or restart deferred glass work. Audio/haptic manual
+revalidation:NO; metadata only. No merge, signing recovery or publication.
+
+Currentc8cb355 push37006488780 and PR37006496856 both completed SUCCESS across
+all five lanes, verified live on October2. This is accepted evidence for that
+checkpoint, not the unpushed F14 or future sanitizer change.
+
 ### October 2 Windows Shipping backend continuation — completed
 
 Parent3281bce plus bounded Windows-only cancellation observations freshly builds

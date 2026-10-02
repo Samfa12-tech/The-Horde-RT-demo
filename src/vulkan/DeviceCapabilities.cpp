@@ -3,6 +3,11 @@
 namespace horde::vulkan
 {
 
+std::string FormatDriverVersionText(const std::uint32_t rawVersion)
+{
+    return "raw " + std::to_string(rawVersion) + " (vendor-specific)";
+}
+
 std::string ToString(const RtMode mode)
 {
     switch (mode)
