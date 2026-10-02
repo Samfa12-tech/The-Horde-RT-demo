@@ -5,10 +5,13 @@ import json
 import math
 import pathlib
 import struct
+from fractions import Fraction
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("glb", type=pathlib.Path)
 parser.add_argument("--witness-root", type=pathlib.Path, default=pathlib.Path(__file__).resolve().parent.parent)
+parser.add_argument("--source-world", action="store_true",
+                    help="Also check exact dyadic source transforms against each captured world ray; no GPU predicate.")
 args = parser.parse_args()
 ROOT = args.witness_root
 GLB = args.glb
@@ -70,6 +73,113 @@ def ray_hit(origin, direction, tri_index, tri):
             "entering": dot(outward, direction) < 0, "component": group}
 
 
+def source_world_check(record):
+    # JSON numbers must be exactly the recorded binary32 inputs, not arbitrary
+    # decimal approximations. Fraction then preserves every source product/sum.
+    def exact_f32(value):
+        rounded = struct.unpack("<f", struct.pack("<f", value))[0]
+        if rounded != value or not math.isfinite(value):
+            raise RuntimeError("Witness is not a finite exact binary32 value")
+        return Fraction.from_float(value)
+
+    origin = tuple(exact_f32(record["queryOrigin"+c]) for c in "xyz")
+    direction = tuple(exact_f32(record["queryDirection"+c]) for c in "xyz")
+    transform = [tuple(exact_f32(record["m"+str(i)+c]) for c in "xyz") for i in range(4)]
+
+    def world_vertex(vertex):
+        source = tuple(exact_f32(v) for v in vertex)
+        return tuple(sum(transform[col][row] * source[col] for col in range(3)) +
+                     transform[3][row] for row in range(3))
+
+    def exact_hit(index, triangle):
+        a, b, c = tuple(world_vertex(v) for v in triangle)
+        e1, e2 = sub(b, a), sub(c, a)
+        p = cross(direction, e2)
+        det = dot(e1, p)
+        if det == 0:
+            return None
+        s = sub(origin, a)
+        u = dot(s, p)
+        q = cross(s, e1)
+        v, t = dot(direction, q), dot(e2, q)
+        inside = (u >= 0 and v >= 0 and u+v <= det) if det > 0 else (
+            u <= 0 and v <= 0 and u+v >= det)
+        return {"primitive": index, "determinant": det, "uNumerator": u,
+                "vNumerator": v, "t": t/det, "u": u/det, "v": v/det,
+                "insideTriangle": inside, "entering": det > 0}
+
+    hits = [h for i, tri in enumerate(triangles) if (h := exact_hit(i, tri))]
+    valid = sorted((h for h in hits if h["insideTriangle"] and h["t"] > 0), key=lambda h: h["t"])
+    corner = next(h for h in hits if h["primitive"] == 63)
+    entry = next(h for h in hits if h["primitive"] == 9)
+    # Finite retained regression, not an epsilon or a general hardware bound.
+    if corner["determinant"] >= 0 or corner["vNumerator"] <= 0 or corner["insideTriangle"]:
+        raise RuntimeError("Source-world primitive63 outside-edge witness changed")
+    if not entry["insideTriangle"] or not entry["entering"] or valid[0]["primitive"] != 9:
+        raise RuntimeError("Source-world nearest valid primitive9 entry changed")
+
+    def receipt(hit):
+        return {key: float(value) if isinstance(value, Fraction) else value for key, value in hit.items()} | {
+            "exactVNumeratorSign": (hit["vNumerator"] > 0) - (hit["vNumerator"] < 0),
+            "exactVNumeratorBits": abs(hit["vNumerator"].numerator).bit_length(),
+            "exactVDenominatorBits": hit["vNumerator"].denominator.bit_length(),
+        }
+
+    # Test whether even ideal outward-rounded binary32 arithmetic could certify
+    # this sign via the straightforward world-triangle calculation. This is a
+    # reference feasibility check, NOT a Vulkan arithmetic guarantee/predicate.
+    def endpoint(value, lower):
+        rounded = struct.unpack("<f", struct.pack("<f", float(value)))[0]
+        bits = struct.unpack("<I", struct.pack("<f", rounded))[0]
+        if lower and Fraction.from_float(rounded) > value:
+            bits = 0x80000001 if rounded == 0 else bits + (1 if rounded < 0 else -1)
+        elif not lower and Fraction.from_float(rounded) < value:
+            bits = 1 if rounded == 0 else bits + (-1 if rounded < 0 else 1)
+        return Fraction.from_float(struct.unpack("<f", struct.pack("<I", bits))[0])
+
+    def enclose(low, high): return (endpoint(low, True), endpoint(high, False))
+    def add(a, b): return enclose(a[0]+b[0], a[1]+b[1])
+    def subtract(a, b): return enclose(a[0]-b[1], a[1]-b[0])
+    def multiply(a, b):
+        products = [x*y for x in a for y in b]
+        return enclose(min(products), max(products))
+    def interval_cross(a, b):
+        return tuple(subtract(multiply(a[j], b[k]), multiply(a[k], b[j]))
+                     for j, k in ((1, 2), (2, 0), (0, 1)))
+    def interval_dot(a, b):
+        return add(add(multiply(a[0], b[0]), multiply(a[1], b[1])), multiply(a[2], b[2]))
+
+    imatrix = [[(x, x) for x in column] for column in transform]
+    def interval_world_vertex(vertex):
+        source = tuple((x, x) for x in map(exact_f32, vertex))
+        return tuple(add(add(add(multiply(imatrix[0][row], source[0]),
+                                 multiply(imatrix[1][row], source[1])),
+                             multiply(imatrix[2][row], source[2])), imatrix[3][row]) for row in range(3))
+
+    a, b, c = tuple(interval_world_vertex(v) for v in triangles[63])
+    e1 = tuple(subtract(y, x) for x, y in zip(a, b))
+    e2 = tuple(subtract(y, x) for x, y in zip(a, c))
+    d = tuple((x, x) for x in direction)
+    s = tuple(subtract((x, x), y) for x, y in zip(origin, a))
+    det_interval = interval_dot(e1, interval_cross(d, e2))
+    v_interval = interval_dot(d, interval_cross(s, e1))
+    if not (det_interval[0] <= corner["determinant"] <= det_interval[1] and
+            v_interval[0] <= corner["vNumerator"] <= v_interval[1]):
+        raise RuntimeError("Binary32 interval missed exact rational reference")
+    outside_proved = ((det_interval[1] < 0 and v_interval[0] > 0) or
+                      (det_interval[0] > 0 and v_interval[1] < 0))
+
+    return {"arithmetic": "exact rational operations on finite captured/uploaded binary32 inputs",
+            "geometry": "source triangle plus captured 3x4 objectToWorld; no rounded worldToObject ray",
+            "scope": "mathematical source-world reference, not native hardware error bounds or runtime filtering",
+            "corner63": receipt(corner), "entry9": receipt(entry),
+            "nearestValidPrimitive": valid[0]["primitive"],
+            "straightforwardBinary32Interval": {
+                "arithmetic": "ideal directed binary32 endpoints; feasibility only, no GPU arithmetic assumption",
+                "determinant": list(map(float, det_interval)), "vNumerator": list(map(float, v_interval)),
+                "containsExactReference": True, "outsideVProved": outside_proved}}
+
+
 results = {"investigationOnly": True, "glbSha256": sha, "triangles": len(triangles), "backends": {}}
 records = {}
 for backend, filename in FILES.items():
@@ -121,6 +231,12 @@ for backend, filename in FILES.items():
         "nearestValidSameComponentHits": [h for h in comp_hits if h["insideTriangle"]][:4],
         "sameComponentEdgeCandidates": near_edges,
     }
+    if args.source_world:
+        results["backends"][backend]["sourceWorldWitness"] = {
+            "file": filename.name, "sha256": hashlib.sha256(filename.read_bytes()).hexdigest(),
+            "decodedPngSha256": witness["sha256"],
+        }
+        results["backends"][backend]["sourceWorldExactReference"] = source_world_check(r)
 
 delta = lambda a, b: max(abs(float(x)-float(y)) for x, y in zip(a, b))
 pipe = records["pipeline"]; compute = records["compute"]

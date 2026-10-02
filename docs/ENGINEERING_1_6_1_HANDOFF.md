@@ -13,7 +13,27 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 native contact-policy result (latest isolated step)
+### October 2 row43 source-world reference (latest host-only step)
+
+Exact rational operations on the retained uploaded/captured binary32 inputs
+confirm both actual world rays miss triangle63; v=-2.2272837458911408e-7 /
+-3.5984283192344683e-7. All72 source-transformed triangles give nearest valid
+entering triangle9 for each ray. This closes the rounded-object-ray ambiguity,
+NOT production traversal. New C++ world-ray/transform regression Debug1/1 PASS
+3.21s, Release1/1 PASS2.74s; independent arithmetic/sign review found no bug.
+Straightforward ideal outward-rounded float32 predicate is INCONCLUSIVE/NO-GO:
+both signed-v numerator intervals straddle zero. No guessed epsilon, universal
+hardware error bound, blanket backface discard or extra queries. Renderer/ABI/
+shader/player/music/assets unchanged; accepted6-frame contact matrix and
+precision candidate were NOT repeated. [Finite record/results/next step](evidence/2026-10-02-high-row43/README.md#completed-source-world-reference-and-bounded-float32-feasibility-check).
+Next: prove a narrow source-closed-volume primary-origin/near-segment exclusion
+guard before runtime work, including shader camera bob, ray tmin, per-pixel
+direction bounds, camera-inside/nested cases, outward/negative-transform winding
+and conservative unknown fallback. Existing frame metadata upload is only a
+candidate seam. High row43/native/cost acceptance remains OPEN. Phone belongs
+to another project; no polling/installing/recoordination. Audio/haptic check:NO.
+
+### October 2 native contact-policy result (preceding isolated step)
 
 Source4f8023ee7afeab503fcce54292610bdf7b7f539a stays on codex/horde-rtx-corrections;
 normal renderer/Shipping/player/music unchanged. Actual High Diagnostic Debug

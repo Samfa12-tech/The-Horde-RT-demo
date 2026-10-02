@@ -601,13 +601,13 @@ void TestRecordedRow43OutsideOriginCornerRejectsFirstExit()
         double t;
         bool insideTriangle;
     };
-    const auto referenceHit = [](const Vec3& rayOrigin, const Vec3& rayDirection,
-                                 const std::array<Vec3, 3u>& triangle) {
-        using DVec3 = std::array<double, 3u>;
-        const auto asDouble = [](const Vec3& value) -> DVec3 {
-            return {static_cast<double>(value.x), static_cast<double>(value.y),
-                    static_cast<double>(value.z)};
-        };
+    using DVec3 = std::array<double, 3u>;
+    const auto asDouble = [](const Vec3& value) -> DVec3 {
+        return {static_cast<double>(value.x), static_cast<double>(value.y),
+                static_cast<double>(value.z)};
+    };
+    const auto referenceDoubleHit = [](const DVec3& rayOrigin, const DVec3& rayDirection,
+                                       const std::array<DVec3, 3u>& triangle) {
         const auto subtract = [](const DVec3& left, const DVec3& right) -> DVec3 {
             return {left[0] - right[0], left[1] - right[1], left[2] - right[2]};
         };
@@ -619,11 +619,11 @@ void TestRecordedRow43OutsideOriginCornerRejectsFirstExit()
         const auto dot = [](const DVec3& left, const DVec3& right) {
             return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
         };
-        const DVec3 o = asDouble(rayOrigin);
-        const DVec3 d = asDouble(rayDirection);
-        const DVec3 a = asDouble(triangle[0]);
-        const DVec3 edge1 = subtract(asDouble(triangle[1]), a);
-        const DVec3 edge2 = subtract(asDouble(triangle[2]), a);
+        const DVec3 o = rayOrigin;
+        const DVec3 d = rayDirection;
+        const DVec3 a = triangle[0];
+        const DVec3 edge1 = subtract(triangle[1], a);
+        const DVec3 edge2 = subtract(triangle[2], a);
         const DVec3 p = cross(d, edge2);
         const double determinant = dot(edge1, p);
         const DVec3 fromA = subtract(o, a);
@@ -638,6 +638,11 @@ void TestRecordedRow43OutsideOriginCornerRejectsFirstExit()
                   signedUvSum >= determinant;
         return ReferenceHit{determinant, uNumerator, vNumerator, tNumerator,
                             tNumerator / determinant, insideTriangle};
+    };
+    const auto referenceHit = [&](const Vec3& rayOrigin, const Vec3& rayDirection,
+                                  const std::array<Vec3, 3u>& triangle) {
+        return referenceDoubleHit(asDouble(rayOrigin), asDouble(rayDirection),
+            {asDouble(triangle[0]), asDouble(triangle[1]), asDouble(triangle[2])});
     };
 
     const ReferenceHit exit = referenceHit(
@@ -681,6 +686,52 @@ void TestRecordedRow43OutsideOriginCornerRejectsFirstExit()
     Check(validEntryStack.Enter(8u, 115u, 1.52f).accepted &&
               validEntryStack.Depth() == 1u,
           "the valid primitive 9 entry is admitted as the paired volume's first boundary");
+
+    // The rounded object ray above is not the authored world-geometry proof.
+    // Check the actual captured world ray against the uploaded triangle and
+    // captured float32 objectToWorld, without rounding transformed vertices
+    // back to float32. The independent exact-rational analysis (all72 uploaded
+    // triangles, both rays) is retained under docs/evidence/2026-10-02-high-row43/
+    // source-world-exact-reference.json.
+    const std::array<DVec3, 4u> objectToWorld{{
+        asDouble({0.0006712007452733815f, -0.0019177242647856474f, -0.43999528884887695f}),
+        asDouble({-0.14535273611545563f, 0.41529321670532227f, -0.002031791489571333f}),
+        asDouble({0.4152977764606476f, 0.14535430073738098f, -3.080929733556559e-09f}),
+        asDouble({-11.30408763885498f, 0.48013100028038025f, -15.072416305541992f}),
+    }};
+    const auto worldTriangle = [&](const std::array<Vec3, 3u>& triangle) {
+        std::array<DVec3, 3u> transformed{};
+        for (std::size_t vertex = 0u; vertex < triangle.size(); ++vertex)
+        {
+            const DVec3 source = asDouble(triangle[vertex]);
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+                transformed[vertex][axis] = objectToWorld[0][axis] * source[0] +
+                    objectToWorld[1][axis] * source[1] + objectToWorld[2][axis] * source[2] +
+                    objectToWorld[3][axis];
+        }
+        return transformed;
+    };
+    const DVec3 worldOrigin = asDouble({-10.649999618530273f, 0.699999988079071f, -15.199999809265137f});
+    const std::array<DVec3, 2u> worldDirections{{
+        asDouble({-0.8330438733100891f, -0.523387610912323f, 0.17917372286319733f}),
+        asDouble({-0.8330439329147339f, -0.523387610912323f, 0.17917373776435852f}),
+    }};
+    const std::array<double, 2u> exactWorldExitV{{-2.2272837458911408e-7, -3.5984283192344683e-7}};
+    const std::array<double, 2u> exactWorldEntryT{{0.8082922814899058, 0.8082922320854496}};
+    for (std::size_t backend = 0u; backend < worldDirections.size(); ++backend)
+    {
+        const ReferenceHit worldExit = referenceDoubleHit(
+            worldOrigin, worldDirections[backend], worldTriangle(nativeExitTriangle));
+        const ReferenceHit worldEntry = referenceDoubleHit(
+            worldOrigin, worldDirections[backend], worldTriangle(capturedValidEntryTriangle));
+        Check(worldExit.determinant < 0.0 && worldExit.vNumerator > 0.0 &&
+                  !worldExit.insideTriangle && worldExit.t > 0.0 &&
+                  std::abs(worldExit.vNumerator / worldExit.determinant - exactWorldExitV[backend]) < 1.0e-14,
+              "each actual world ray also misses uploaded primitive63, independently of rounded object-ray arithmetic");
+        Check(worldEntry.determinant > 0.0 && worldEntry.insideTriangle &&
+                  worldEntry.t > worldExit.t && std::abs(worldEntry.t - exactWorldEntryT[backend]) < 1.0e-12,
+              "each actual world ray preserves the genuine primitive9 entry under the source transform");
+    }
     // The independent TestRecordedTriangleSurfacePointKeepsMicrometreExit
     // covers a distinct valid short exit; this row43 assertion rejects an
     // outside triangle candidate without introducing a spatial epsilon.
