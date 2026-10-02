@@ -13,7 +13,26 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 row43 source-world reference (latest host-only step)
+### October 2 primary-origin exclusion prototype (latest host-only step)
+
+CPU-only outside-near-segment proof is complete but candidate-rejection proposal
+is NO-GO: an exact cube edge-touch can return a valid backface from a certified
+outside origin. New regression and independent review preserve that negative.
+Reference is tests/fixtures/PrimaryBoundaryPlanePrototype.h, not renderer code;
+no runtime/metadata/ABI/shader/asset/player/music change. Fresh affected Debug1/1
+PASS3.31s and Release1/1 PASS2.89s. [Single record/next step](evidence/2026-10-02-high-row43/README.md#primary-origin-exclusion-prototype-no-go-for-candidate-rejection).
+Do NOT wire blanket backface rejection into runtime. Next bounded step is ONE
+relative-world binary32 interval feasibility check on retained rays, preserving
+strict source-footprint proof and uncertain/grazing fallback; stop this expression
+route if inconclusive. No completed native/precision tests or shader rebuilding
+without changed source/validity reason. High row43 and native/cost acceptance OPEN.
+Current engineering3be7034 push36965399586/PR36965402744 CI both SUCCESS, all five
+compiler/Vulkan-host/Android jobs; completed metadata retained outside repo at
+C:/Dev/tmp/horde-row43-source-world-20261002/ci-current-completed.json.
+Audio/haptic manual revalidation:NO. No release/publication or phone use while
+it belongs to another project.
+
+### October 2 row43 source-world reference (preceding host-only step)
 
 Exact rational operations on the retained uploaded/captured binary32 inputs
 confirm both actual world rays miss triangle63; v=-2.2272837458911408e-7 /

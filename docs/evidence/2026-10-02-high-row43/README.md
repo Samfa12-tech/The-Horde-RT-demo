@@ -259,3 +259,43 @@ nonfinite/singular/unsupported transforms and touching/uncertain fallback. Live
 primary origin includes shader camera bob (rt_frame.glsl), so certifying only
 the nominal CPU camera position is insufficient. Existing per-frame metadata
 upload is a potential ownership seam, not yet an implemented/admitted fix.
+
+## Primary-origin exclusion prototype: NO-GO for candidate rejection
+
+The bounded CPU prototype proves a useful but insufficient fact: conservative
+source-box/positive-transform bounds and the actual ray origin can establish
+that the excluded `[0,tmin]` segment is outside. It cannot prove that every later
+native back-facing candidate is spurious. A closed unit-cube ray from `(-2,0,0)`
+with equal positive x/y direction touches `(-1,1,0)`. The top-face backface is
+exactly on the boundary; its left-face entry has the same exact time, with no
+positive interior interval. Discarding the top candidate would lose a valid
+boundary surface if traversal did not also return the simultaneous front face.
+This is not an imposed new optical policy for corner ownership.
+
+`TestOutsideOriginKeepsExactBoundaryTouch` retains that counterexample alongside
+the finite row43 near-segment proof and unknown/inside/clipped/touching/nonfinite/
+reflected/singular/overflow negatives. The reference is deliberately confined to
+`tests/fixtures/PrimaryBoundaryPlanePrototype.h`; it is not renderer code or an
+actual-uploaded-geometry cache. Independent review agrees that outside origin
+plus backface alone cannot justify rejection. The handwritten row43 source box
+does not constitute runtime asset admission.
+
+Fresh affected checks: Debug1/1 PASS3.31s, Release1/1 PASS2.89s. Logs:
+[Debug build](checks/guard-no-go-debug-build.log),
+[Debug test](checks/guard-no-go-debug-test.log),
+[Release build](checks/guard-no-go-release-build.log),
+[Release test](checks/guard-no-go-release-test.log).
+No runtime, ABI, shader, geometry, material, traversal budget, image tolerance,
+diagnostic or resource change; no repeated native control/matrix/module rebuild.
+Audio/haptic manual revalidation required:NO (CPU/reference work only).
+
+Decision: do NOT wire the exclusion-plane proposal into runtime metadata or
+discard backfaces. Strict source-footprint invalidity is still required; edge,
+corner, tangent and numerically unresolved candidates retain native acceptance.
+Next finite feasibility step: evaluate ONE mathematically equivalent relative-
+world binary32 interval expression on the two existing captured rays, directly
+transforming local edges and subtracting translation before the source vertex.
+If its sign enclosure still straddles zero, stop this float32 expression route;
+do not start an epsilon, precision-qualifier or expression search. Even a positive
+feasibility result would require a separately reviewed Vulkan-valid numerical
+bound and affected native/cost acceptance before any runtime candidate.
