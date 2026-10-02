@@ -30,8 +30,10 @@ not a duplicate experiment. No music re-render or new email.
 | Fresh push/PR compiler coverage for runtime checkpoint | PASS: checkpointde33420 push36985252002 and PR36985258071 SUCCESS; GCC/Clang/MSVC, focused Vulkan CPU-host and Android jobs all green. Not hardware/performance proof or validation of subsequent fixes. |
 | Windows Debug native RTX capture continuation | PASS command/manifest: all13 checkpoints captured, Diagnostic/High pipeline pair,960x540 on RTX5050. Opening/drop/mirror/two-enemy images inspected; not universal physical correctness or Release/performance acceptance. Owner subsequently reports a resting right-hand attachment issue on the laptop; bounded investigation remains open. |
 | Android selected-quality continuation | PASS fresh Debug/unsigned Release build, all4 ABIs and Release lint42 warnings/0 errors. Unchanged Java76/76 result is reused (unit task UP-TO-DATE), not a fresh execution. No install/device claim. |
-| Windows Release build/CTest continuation | RUNNING once on runtime22d6633, retained build directory; separate build/CTest logs below. Original Debug92/97 result remains unchanged. |
-| Final retained Windows Shipping RT application | PENDING; Host Release capture rejection is not presentation. |
+| Windows Release build/CTest continuation | Fresh build PASS; single CTest run96/97 PASS748.55s. Newly added strict-mode music staging regression67 catches the packaging defect before its fix; targeted14/14 script cases pass aftere39ac0a. Original failure retained, no single-run97/97 claim. |
+| Final retained Windows Shipping RT application | PARTIAL: packaged218ab102 honestly presents via pipeline/High, but unattended route cancels before measurement (0 frames); not a live-route/performance pass. Compute/live-lantern rows not started after this cancellation. Release capture automation correctly rejects with exit2/no output. |
+| Current Android/Windows Shipping containment | PASS actual final binaries/APK, spirv-val/disassembly and adversarial controls. Four backend/pass modules per Shipping artifact have0 diagnostic atomics and no binding22. No device/backend-image equivalence claim. |
+| Unsigned/unpublishable validation packages | PASS after strict-mode staging repair: closed runtime/music inventories, source exclusion, version1.6.1/code9, embedded manifest/credits and Android16KiB APK/ELF alignment. No signing, distribution or licence-status change. |
 | Final retained Android Shipping ordinary/lantern/lifecycle/Settings resize | PENDING; reuse prior performance experiments; no new speculative optimisation. |
 | Full-game Windows report prepare/preview/cancel | PASS owner-confirmed requested sequence plus READY form/game-only preview screenshot on Debug242ac2aa. Separate later build is not relabelled owner-tested; [receipt](../2026-10-02-windows-report-ui/README.md). No new email. |
 | External music-focus interruption/recovery | OPEN distinct device/owner check; current sound already accepted. |
@@ -91,10 +93,52 @@ or installed S26d5cea148 artifacts. Release continuation observer logs:
 `C:/Dev/tmp/horde-final-integration-release-build-20261002.log` and
 `C:/Dev/tmp/horde-final-integration-release-ctest-20261002.log`.
 
-Next unfinished step: finish the running Release build/tests, then remaining
-Windows Shipping presentation/containment and validation-package rows using
-the retained build/run. All five original Debug failures have bounded passing
-rechecks, not a new single-run97/97 Debug claim.
+## Packaging and Shipping continuation — completed, negative rows retained
+
+Music staging under `version-contract.ps1` strict mode dereferenced the empty
+reparse-point result. Regression first reproduces13/14 PASS +1 failure, then
+e39ac0a wraps that unchanged filter in an array and passes14/14; the full Release
+run caught the same newly added regression before the helper fix landed.
+[Release receipt](release-ctest.txt), [before](music-stage-strict-before.txt),
+[after](music-stage-strict-after.txt). No audio bytes, manifest pins, playback,
+source distribution or gain change; no full suite repeated. Runtime22d6633 is
+unchanged by the packaging-only fix. The failed partial stage is preserved.
+
+The original bare Shipping executable attempt failed due to missing adjacent
+assets ([receipt](windows-bare-shipping-missing-assets.txt)); no RT pass claimed.
+The existing runner's four package functions and exact package/licence stage
+were invoked separately against retained binaries, not a new framework or
+restarted Host run. Corrected output uses `windows-stage-repair` / `-repair-`
+package names under the same ignored run. [Package receipt](validation-packages.txt):
+Windows ZIP SHA256 `ec5b59d133634f35272b12111d22c9e40a46422a3e36d9b3debaaed9d108c5b3`;
+unsigned APK retains50f6f626 above. Both are UNPUBLISHABLE validation artifacts.
+
+Actual Shipping SPIR-V receipts: [Windows](windows-shipping-containment.json),
+Android [Debug](android-containment-debug.json) / [Shipping](android-containment-release.json),
+with [Debug](android-containment-controls-debug.txt) /
+[Shipping](android-containment-controls-release.txt) negative controls.
+Strict ARM64 asset math passes for actual compiled [Debug](android-asset-math-debug.json)
+and [Release](android-asset-math-release.json) objects. No unchanged rebuild.
+
+Packaged pipeline route PID23444 exits1, reporting cancelled/0 measured frames;
+[benchmark receipt](windows-shipping-route-cancelled.json) and
+[honest RT presentation](windows-shipping-presented.json) remain distinct.
+Exact cancellation cause was not observed; do not infer focus/resize from source
+alone or repeat the same run unchanged. Scheduled live-lantern/compute rows were
+not executed after its failure. No performance conclusion from this attempt.
+
+At the owner's request, the same complete Shipping218ab102 package was opened
+normally as PID13176, no benchmark arguments. The owner supplied rest and motion
+crops and identifies glove/sleeve misalignment. Later read-only process inspection
+finds that application absent; it was not terminated by Codex. This reopens only
+the right cuff finding; [bounded investigation](../2026-10-02-right-cuff/README.md)
+preserves the admitted assets and shared gameplay authority.
+
+Next unfinished step: validate the narrow right-cuff candidate without promoting
+unaccepted assets; then finish only the still-open Windows
+Shipping live/backend rows with a specific cancellation discriminator. No new
+phone use in this run. All original Debug failures have bounded passing rechecks,
+not a new single-run97/97 Debug claim.
 No repetition of the92 passing Debug rows or prior phone experiments.
 Audio/haptic manual revalidation required:NO for unchanged assets, gains,
 gameplay feedback and playback inputs. No merge, release or publication.

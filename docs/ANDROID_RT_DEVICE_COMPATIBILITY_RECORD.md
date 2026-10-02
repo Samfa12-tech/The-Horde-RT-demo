@@ -2,6 +2,25 @@
 
 Last updated: 2026-10-02
 
+## October 2: current-source host/package validation, no new device run
+
+Runtime22d6633 observes report quality from the selected scene bundle. Fresh
+Android all4-ABI Debug/unsigned Release compile and lint42 warnings/0 errors pass;
+unchanged Java76/76 inputs reuse their prior passing result. APK SHA256 Debug
+`553ef9a3a38b5a7cba2d30554f8d3431b5e6fc86f875643e5dcc195be3f1f23d`,
+unsigned Shipping
+`50f6f6261fda475f2b124bb564b5a07d5a26868e56728c0471c07292eaeed28f`.
+Actual packaged ARM64 Shipping modules validate/disassemble, with0 diagnostic
+atomics/no binding22; adversarial controls and strict Debug/Release ARM64 asset
+math pass. Runtime inventories/credits/version1.6.1/code9 and16KiB alignment
+pass after packaging-only strict-mode repaire39ac0a; music bytes are unchanged.
+[Finite integration record](evidence/2026-10-02-final-integration/README.md).
+
+These are compile/package checks, not installation, presentation, live motion,
+Shipping performance or exact SM-S948B/SM-S928B/S25 acceptance. No phone operated
+after the earlier S26 handback. Audio/haptic manual revalidation:NO for these
+metadata/tooling-only changes. Existing device evidence below remains scoped.
+
 ## October 2: S26 cancellable background surface startup
 
 Exact local SM-S948B/Android16/Adreno840 driver512.842.19, Debug candidate APK

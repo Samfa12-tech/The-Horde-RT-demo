@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "passed": true,
+  "configuration": "Debug",
+  "nativeConfiguration": "Debug",
+  "compileDatabase": "C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\android\\app\\.cxx\\Debug\\582i6d4b\\arm64-v8a\\compile_commands.json",
+  "compilerPath": "C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe",
+  "compilerVersion": "Android (10552028, based on r487747d) clang version 17.0.2 (https://android.googlesource.com/toolchain/llvm-project d9f89f4d16663d5012e5c09495f3b30ece3d2362)\nTarget: x86_64-w64-windows-gnu\nThread model: posix\nInstalledDir: C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/bin",
+  "objdumpPath": "C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\llvm-objdump.exe",
+  "sources": [
+    {
+      "source": "C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\src\\scene\\assets\\GltfDocument.cpp",
+      "object": "C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\android\\app\\.cxx\\Debug\\582i6d4b\\arm64-v8a\\CMakeFiles\\horde_rt_probe_android.dir\\859d1b37232d81eae90d6cb7246869b1\\the_Horde_RT_Demo\\src\\scene\\assets\\GltfDocument.cpp.o",
+      "objectSha256": "491306bfbb1d38051165c24ac0a16b69d5f5e40ccf71376f39ac400ecf8a1bd1",
+      "compileCommand": "C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DHORDE_RT_BUILD_ID=\\\"1.6.1\\\" -DHORDE_RT_DEBUG_CHECKPOINTS=1 -DHORDE_RT_DISPLAY_VERSION=\\\"1.6.1\\\" -DHORDE_RT_PACKAGE_VERSION=\\\"1.6.1\\\" -DHORDE_RT_SELECTED_DIELECTRIC_QUALITY=0 -DHORDE_RT_SELECTED_INSTRUMENTATION=1 -Dhorde_rt_probe_android_EXPORTS -I\"C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/src\" -I\"C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/third_party\" -I\"C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/third_party/pocket-audio-core/native/include\" -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info  -fPIC -O2 -fno-fast-math -ffp-contract=off -o CMakeFiles\\horde_rt_probe_android.dir\\859d1b37232d81eae90d6cb7246869b1\\the_Horde_RT_Demo\\src\\scene\\assets\\GltfDocument.cpp.o -c \"C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\src\\scene\\assets\\GltfDocument.cpp\"",
+      "disassembly": "C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\reports\\final-integration-20261002\\run-20261002-183151\\asset-math-compiler-contract\\debug\\GltfDocument.arm64.disassembly.txt"
+    },
+    {
+      "source": "C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\src\\scene\\assets\\StaticMeshAsset.cpp",
+      "object": "C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\android\\app\\.cxx\\Debug\\582i6d4b\\arm64-v8a\\CMakeFiles\\horde_rt_probe_android.dir\\859d1b37232d81eae90d6cb7246869b1\\the_Horde_RT_Demo\\src\\scene\\assets\\StaticMeshAsset.cpp.o",
+      "objectSha256": "c16600d30820badfd9698defaf76a244c167fa753b2b93111d5173a97414cc36",
+      "compileCommand": "C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DHORDE_RT_BUILD_ID=\\\"1.6.1\\\" -DHORDE_RT_DEBUG_CHECKPOINTS=1 -DHORDE_RT_DISPLAY_VERSION=\\\"1.6.1\\\" -DHORDE_RT_PACKAGE_VERSION=\\\"1.6.1\\\" -DHORDE_RT_SELECTED_DIELECTRIC_QUALITY=0 -DHORDE_RT_SELECTED_INSTRUMENTATION=1 -Dhorde_rt_probe_android_EXPORTS -I\"C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/src\" -I\"C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/third_party\" -I\"C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/third_party/pocket-audio-core/native/include\" -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info  -fPIC -O2 -fno-fast-math -ffp-contract=off -o CMakeFiles\\horde_rt_probe_android.dir\\859d1b37232d81eae90d6cb7246869b1\\the_Horde_RT_Demo\\src\\scene\\assets\\StaticMeshAsset.cpp.o -c \"C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\src\\scene\\assets\\StaticMeshAsset.cpp\"",
+      "disassembly": "C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\reports\\final-integration-20261002\\run-20261002-183151\\asset-math-compiler-contract\\debug\\StaticMeshAsset.arm64.disassembly.txt"
+    }
+  ],
+  "symbols": [
+    {
+      "logicalName": "cgltf_node_transform_local",
+      "objectSymbol": "cgltf_node_transform_local",
+      "instructionCount": 62,
+      "separateMultiplyCount": 18,
+      "separateAddCount": 6,
+      "separateSubtractCount": 8,
+      "contractedInstructions": []
+    },
+    {
+      "logicalName": "cgltf_node_transform_world",
+      "objectSymbol": "cgltf_node_transform_world",
+      "instructionCount": 94,
+      "separateMultiplyCount": 24,
+      "separateAddCount": 18,
+      "separateSubtractCount": 0,
+      "contractedInstructions": []
+    },
+    {
+      "logicalName": "StaticMeshAsset::TransformPoint",
+      "objectSymbol": "horde::scene::assets::(anonymous namespace)::TransformPoint(std::__ndk1::array<float, 16ul> const&, float const*, float)",
+      "instructionCount": 30,
+      "separateMultiplyCount": 12,
+      "separateAddCount": 6,
+      "separateSubtractCount": 0,
+      "contractedInstructions": []
+    }
+  ],
+  "failures": []
+}
