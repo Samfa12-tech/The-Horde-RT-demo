@@ -13,7 +13,28 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 clean uninstrumented admission (current unfinished step)
+### October 2 High edge discriminator (latest completed bounded step)
+
+Source48702729ab7ccc0bddda91517da9b42bc6efa5e2 remains isolated on
+codex/horde-rtx-corrections. Exactly one High/glass-edge-fresnel image per backend;
+RTX5050 Laptop, actual hardware RT presentation, both exit0. Two changed modules
+compile/validate; other14 artifacts/provenance unchanged; app/provider1/1 pass.
+The one reserved payload row is explicit. All nonpayload rows and41 counters
+match their completed clean controls exactly. No matrices/controls repeated.
+Pixel456,304 reproduces22,17,17 /2,2,3: identical primary/reflection data, but
+visit5 at y=-0.95/t0.3171285 selects glass bottom exit in pipeline versus opaque
+floor in compute. Compute certified reason1 recovery absorbs transmission;
+pipeline exits and spawns below the same floor before missing into sky. Neither
+result is automatically the physical reference. See [finite actual-call record](evidence/2026-10-02-backend-pixel-witness/high-edge-observer.md).
+This proves the contact-selection divergence for one pixel, not all failures or
+a compiler/driver error bound. All High/backend/cost/physical/device gates stay open.
+Next: independent contact reference, then smallest explicit same-contact ownership
+policy preserving the opaque receiver and physical exit/terminal transport; no
+epsilon sweep, larger budget, floor omission, forced buggy pixels or new framework.
+Normal renderer untouched; no main merge/release/publication. No phone use while
+owner-disconnected; audio/haptic manual revalidation:NO (shader observer only).
+
+### October 2 clean uninstrumented admission (preceding completed step)
 
 Normal engineering remains d9be81e, renderer/configuration unchanged. New isolated
 `codex/horde-rtx-corrections` contains only outward world-box normals4e951c2 and
@@ -56,10 +77,8 @@ scene/static allocations/CPU geometry/masks/grips match retained Diagnostic
 captures. Independent Shipping backend parity remains12/13 / overall FAIL at
 known finale770,526 max6. No failed gate is waived by instrumentation parity.
 
-Next step: localize one retained High edge pixel456,304 (22,17,17 /2,2,3, max20)
-using existing native observer facilities, only necessary probe/source reads and
-at most one image per backend if fields are missing. Preserve non-payload image
-stability and diagnostics; no new telemetry framework/precision/epsilon sweep.
+That finite localization is completed above; do not repeat its two images.
+Preserve non-payload image stability and diagnostics; no new telemetry framework/precision/epsilon sweep.
 Do not rerun completed Mobile/High/Shipping controls/matrices or shader compilation.
 Isolated Debug cache now Mobile/Shipping; frozen Diagnostic binaries retained.
 Normal worktree/default unchanged. Keep High row43/edges, boundary/cost admission

@@ -55,6 +55,62 @@ the compute manifest argument. Neither was a shader failure. The already
 validated pipeline artifact was dependency-checked/reused after wrapper repairs;
 only the missing compute module was compiled. Logs remain in C:/Dev/tmp.
 
-Next unfinished step: execute the finite pair, decode fields and compare all
-nonpayload rows with the retained clean controls. Audio/haptic manual revalidation required:NO;
-shader-only observer leaves gameplay/audio semantic inputs unchanged.
+## Completed native discriminator — contact ownership, not a fix
+
+Exact source48702729ab7ccc0bddda91517da9b42bc6efa5e2, executable above.
+Both finite native RTX5050 Laptop runs exit0 and honestly present RT. The
+[comparison receipt](high-edge/comparison.json) checks camera/settings, module
+identity, actual CPU geometry, allocations, visibility/grips and PNG hashes.
+All nonpayload rows1-539 match their respective retained clean controls
+**byte-exactly**, maximum0/fraction0. All41 dielectric/reason counter values
+match the corresponding control too. No control or completed matrix was rerun.
+The paired backend image gate still FAILS max20 with32 pixels over3; unchanged
+tolerances. Both watched RGBs reproduce exactly. Payload images/manifests,
+process/build/negative wrapper logs, [actual fields](high-edge/decoded.json) and
+[run identity](high-edge/run-receipt.json) are retained alongside this record.
+Unchanged CPU OBJ exports remain in the raw path rather than duplicating195MB.
+
+Primary identity9/10/107, t2.2772326, direction, origin, position, geometric
+normal and first Fresnel0.40573308 agree exactly. Shading normal differs by one
+ULP, but the **actual reflection direction, query origin, hit0/496/2 and radiance
+agree exactly**. Reflection is not the demonstrated source of this pixel delta.
+Both paths enter the glass top, then visit side5, side6, side5 and back0 with
+four internal reflections; tiny direction differences occur along this chain.
+
+At visit5, both report t0.3171285 and world y=-0.95 at approximately
+(-9.01598,-0.95,-15.420976). Pipeline commits glass9/8/107, geometric normal
+(0,-1,0); compute commits opaque floor0/486/1, normal(0,1,0). Thus the **demonstrated
+divergence is the selection of coincident glass-exit/opaque-floor surfaces**,
+not a primary-ray, texture identity or reflection-radiance mismatch. This does
+not prove which driver/compiler mechanism selected the ties, nor any universal
+intersection-error bound. It is not evidence that other31 edge pixels or
+held-lantern failures share this cause.
+
+Pipeline refracts/exits, spawns at y=-0.9500308 below the floor, then misses the
+scene. It contributes transmitted radiance(0.024184976,0.017057974,0.016500667).
+Compute encounters the opaque floor with volume still open and executes existing
+certified reason1 recovery: transmission0, terminalResolved1, overflow0,
+volumeOpen1. Totals remain pipeline566/compute568 certified recoveries and
+TIR13842/13843. No diagnostic suppression or failure-counter change.
+Neither the dark recovery nor the brighter escaped-sky result is automatically
+the physical reference; forcing compute to reproduce pipeline pixels could
+preserve the floor leak instead of fixing transport.
+
+Current traceScene uses forced-opaque hardware commitment for these continuation
+calls, without an explicit same-contact medium/opaque ownership rule. Source
+fixture transform has Y scale1.25/translation-0.325; its bottom and the route
+floor meet at y=-0.95, consistent with the actual native fields. No geometry,
+material, mask or budget was altered to remove this contact.
+
+Next unfinished step: make a test-only independent contact reference for this
+recorded case, then design the smallest bounded same-contact terminal/exit
+policy that preserves physical transport **and the opaque receiver**. Review
+the policy before a runtime candidate; do not add an epsilon search, raise
+traversal budgets, skip the floor or promote either buggy baseline. This is a
+new demonstrated contact case, not a reason to repeat the completed observer
+pair or restart row43/Mobile/performance investigations. High/parity/physical
+and frozen-cost gates remain open. No performance or Android acceptance claim.
+
+Audio/haptic manual revalidation required:NO; shader-only observer leaves
+gameplay/audio semantic inputs unchanged. Normal engineering is untouched;
+isolated configuration returns to Mobile/Shipping after the completed capture.

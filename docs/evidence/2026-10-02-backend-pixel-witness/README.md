@@ -1,5 +1,11 @@
 # Six retained Mobile RTX backend pixels
 
+Latest bounded continuation: [High edge contact discriminator](high-edge-observer.md).
+The one image per backend is complete, reproducing all nonpayload pixels and41
+counters exactly. Pixel456,304 selects coincident glass exit versus opaque floor;
+both resulting transport paths need contact ownership, not baseline pixel copying.
+Do not repeat this pair. The clean Mobile/High/Shipping evidence below is retained.
+
 Finite investigation, not a renderer correction or performance experiment.
 Normal source/control03a6870f66dd9cb4bab62d2f521f4fd663368678; isolated source
 d64bea152e40d7083643a941be018f7f27d8aa99 on

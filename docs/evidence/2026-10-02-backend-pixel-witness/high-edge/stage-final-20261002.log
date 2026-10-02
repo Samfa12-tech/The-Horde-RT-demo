@@ -1,0 +1,3 @@
+Reusing completed pipeline compile/validation after wrapper metadata repair; dependencies unchanged.
+RayQuery compute variant rayquery_compute_diagnostic_high_generic_dielectric: bytes=267740; functions=68; calls=243; ray-query sites=2; atomics=41; SPIR-V SHA-256=87c59f4a9d1ca86960b94db06ec56dbba7b828728430350b90e83ab2eae3d6ad
+UNADMITTED OBSERVER: compiled two changed modules; retained all fourteen other artifacts/provenance, with no fresh-compilation claim.
