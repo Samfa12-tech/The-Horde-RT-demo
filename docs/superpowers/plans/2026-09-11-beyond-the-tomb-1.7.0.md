@@ -302,6 +302,8 @@ Suggested new authoring locations: `assets/source/beyond_the_tomb/` for retained
 
 ## 10. On-theme touch controls, HUD and menus
 
+**2 October 2026 milestone update:** The existing-demo HUD and menu refresh is now owned by [1.6.2 UI_REFRESH_1_6_2.md](../../UI_REFRESH_1_6_2.md). That proposal supersedes the timing of the base-theme work below and the existing-demo portion of WP7. Audit and reuse the accepted 1.6.2 result rather than rebuilding it or claiming existing translucency as new. This chapter retains traversal/companion context, dialogue/subtitle controls, chapter-end integration and genuinely new input/accessibility requirements. The earlier reference-board request does not require generating UI art already solved in 1.6.2.
+
 This is a mandatory workstream, not optional polish after the forest. The UI should belong to the same world as the lantern without compromising input, readability or accessibility.
 
 ### 10.1 Visual system
