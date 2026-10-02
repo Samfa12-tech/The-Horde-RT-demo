@@ -13,7 +13,35 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
-### October 2 S26 report preparation (latest device step)
+### October 2 release-focused gate reassessment (latest owner direction)
+
+Owner directs practical release/gameplay priority and stops significant sub-pixel
+parity work unless a genuine physical correctness defect is demonstrated.
+[Current ranked gates](ENGINEERING_1_6_1_PLAN.md#release-focused-remaining-gates--october2-owner-direction)
+supersede all older "next discriminator" instructions: do NOT start the521,444
+held-high witness or another precision/expression/cost sweep merely for matching
+RGB. Strict comparisons/tolerances and negative results remain unchanged.
+
+Priority: production correctness and actual playability, finished remote reporting,
+remaining already-requested owner/audio/S24 checks, then one exact final-candidate
+Windows/Android/CI/shader/package/lifecycle matrix. Reuse accepted player/music/
+Mobile-profile/performance evidence.30FPS is still the target, not an achieved
+claim or justification for more tiny speculative optimisations. Last matched
+warm S26 Shipping cycle medians81–86ms opening/112–123ms heavy need honest final
+playability disposition; Debug counter numbers are not new Shipping evidence.
+
+Separate real defects from parity: outward closed-world-box metadata fix4e951c2
+remains isolated and merits narrow production review; demonstrated High contact
+receiver/bright-strip and row43 false-candidate issues remain physical OPEN,
+not waived. The cost-failing contact/UV candidates are not automatically promoted.
+No safe bounded fix -> explicit High limitation/owner disposition, not an unlimited
+arithmetic programme. Ordinary unexplained pixel outliers are parked, not passed.
+Android verification/send still awaits the one additional email approval. Current
+18109e3 push36971152308/PR36971156153 both SUCCESS; final artifact matrix is separate.
+No code/device mutation for this reassessment; audio/haptic revalidation:NO.
+Goal ACTIVE/incomplete; no main merge, release, publication or licensing change.
+
+### October 2 S26 report preparation (preceding device step)
 
 Owner made the phone available again; continue unfinished device gates without
 repeating availability coordination or accepted performance/player/music work.

@@ -1,6 +1,6 @@
 # 1.6.1 engineering programme and release gates
 
-Updated 2026-10-02. Status: **in development; not ready for final comprehensive validation or release**.
+Updated 2026-10-02. Status: **implementation substantially complete; release-critical acceptance remains open**.
 
 This is the current next-step index for `codex/horde-1.6.1-engineering-pass`.
 The owner-authorised full repository audit remains in scope. The 2026-09-13
@@ -8,18 +8,67 @@ update adds S24/S25 compatibility, adaptive music and player reporting, changes
 the work order below, and defers the large validation matrix until the feature
 set is complete. It does not authorise publication or relax any RT requirement.
 
-Current checkpoint: bounded TLAS instance-definition refresh is integrated with
-fresh source/integration CI and separate S24/S26/RTX image/lifecycle evidence;
-S24 owner/live Shipping acceptance is still open. Android music focus is integrated
-with fresh five-lane source/PR CI; the external-audio owner check remains open.
-This is not a soundtrack or player rewrite. Read the
-[current handoff](ENGINEERING_1_6_1_HANDOFF.md) and its finite evidence records.
-Retain the completed negative performance trials; do not restart their sweeps.
-Current RTX High row43/tick646 replay reproduces the retained one-pipeline/
-zero-compute mismatch exactly. A single primary-precision candidate is preserved
-separately as **NO-GO**: unchanged failure/counters and both native candidate image
-gates fail; frozen cost admission also fails. Normal modules restored. No repeated
-keyword/controls or performance claim. See its [finite record](evidence/2026-10-02-high-row43/README.md).
+Current reviewed checkpoint `18109e3`: both fresh push36971152308 and
+PR36971156153 CI are SUCCESS. Modelled-player presentation, semantics, music bank/
+playback, shader policy and Mobile open-aperture selection are accepted; no restart.
+S24's discrete-definition TLAS refresh is integrated and restores hands/enemy hits
+in actual Debug evidence. Exact Shipping/owner acceptance remains separate.
+S26 report preparation/real game-only preview/READY lifecycle and live FPS-counter
+update/cancel/reset now pass. Android verification/send awaits the already-requested
+additional-email approval; accepted Windows email must not be repeated.
+
+## Release-focused remaining gates — October2 owner direction
+
+The owner directs that practical release/gameplay blockers take priority and
+significant sub-pixel parity work stop unless it addresses a genuine physical
+correctness defect. This section supersedes older "next pixel discriminator"
+instructions, including the proposed held-high521,444 witness. It changes work
+allocation/release triage, not ray transport, numerical tolerances or past results.
+The full agreed feature scope is retained; no merge/publication is authorised.
+
+| Priority | Remaining gate | Smallest useful completion evidence |
+| --- | --- | --- |
+| 1 — real correctness and gameplay | Final production route must load/present, retain S24 hands/two-enemy visibility, accepted player/grips and stable lifecycle. The independently proven inward world-box normal metadata remains only on isolated commit4e951c2; treat its outward-winding correction separately from UV/parity experiments. | Review/integrate only justified production fixes, then affected host/RTX/device checks. Do not whole-merge the experimental renderer or reopen accepted player tuning. |
+| 1 — practical performance acceptance | Last warm Shipping/Mobile S26 cycle medians are81–86ms opening and112–123ms held/reveal at75%, not the33.3ms target. Pane removal helped greatly but did not establish comfortable30FPS. | Use existing results, then one final-candidate warm ordinary/lantern/live check with tails/thermal/pacing limits stated. Owner accepts actual playability or makes an explicit profile/product decision. No further unpromising micro-optimisation campaign. |
+| 2 — finished reporting experience | Real Android WebView verification and one approved exchange, plus full-game Windows remote-form prepare/cancel/readback usability; local JSON remains fallback. | Complete the finite UI/device rows, respecting the pending one-email approval. Existing backend/inbox/consent/schema evidence is reused. No second backend, extra unsolicited email or repeated export-helper investigation. |
+| 2 — remaining change-triggered owner checks | External-audio focus interruption/recovery; final combat-warning/music balance; S24 live visibility acceptance. | Combine with a short real-play checklist. Preserve accepted "Music sounds perfect now", cue/loop evidence and arm acceptance. Do not repeat auditions, long-loop tests or already-requested questions. |
+| 3 — one coherent final candidate | Current source/artifact CI/host/tooling, Vulkan/SPIR-V freshness and diagnostic-free Shipping, deterministic contracts, assets/packages, Windows RTX and exact Android presentation/lifecycle/resize/update path. | Run the comprehensive matrix once the production changes are coherent; fix and rerun only invalidated checks. Include Shipping heavy-scene resize stress and bounded UI/FPS checks, not a new framework. Signing/publication require separate owner authority. |
+
+### Physical defects versus numerical parity
+
+- **Retain as genuine High correctness issues:** the demonstrated glass-exit/
+  opaque-receiver contact ordering loses the actual receiver/creates a bright
+  strip; the source-world row43 reference proves an invalid near-edge primary
+  candidate, not merely different RGB arithmetic. Their [native contact evidence](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/646f508/docs/evidence/2026-10-02-backend-pixel-witness/axis-contact-policy.md)
+  and [row43 record](evidence/2026-10-02-high-row43/README.md) stay open. The contact
+  prototype is not production-admitted; its clean Shipping static gate fails.
+  Only bounded work aimed at a demonstrated wrong path/visible artifact is
+  justified. If no safe bounded fix is available, report the exact High limitation
+  for owner disposition rather than silently waiving the physical gate or starting
+  another expression/epsilon/precision/budget sweep. Mathematical corner perfection
+  is not an unlimited engineering programme.
+- **Park as diagnostic investigation, not release-blocking equivalence:** isolated
+  RGB/UV-rounding/backend differences without demonstrated bad geometry/material/
+  transport or gameplay impact. Preserve failed strict comparisons and unchanged
+  tolerances; do not call them passed, physically explained or universal parity.
+  Do not build the next521,444 observer solely because it differs. Ordered-UV
+  precision and the failed staging/contact admission candidates stay isolated;
+  no shader-cost gate is raised and no diagnostic is suppressed.
+- **Already deliberately deferred:** physical Mobile lantern panes, further arm/
+  directional-walk/feet/pitch polish and pane/model alignment. **Availability-bound:**
+  S25's exact-device gate remains OPEN, not waived or certified from S24/S26;
+  any future publication decision must acknowledge that gap and restrict claims.
+  Unavailable GPU bandwidth/cache/stall counters and unmeasured counter overhead
+  are evidence gaps, not gameplay defects. The counter remains out of matched runs.
+- **Owner-controlled, not new engine work:** Hotstrike remains tracked and explicitly
+  non-blocking by owner decision; preserve provenance/licence/distribution. Signing
+  recovery and publication are not autonomously authorised.
+
+Next engineering work is the production-only correctness/feature closeout and
+final-candidate preparation above, **not** further parity instrumentation. Preserve
+completed positive/negative evidence; no unchanged artifact rebuild or repeated
+matrix without a specific validity change. Documentation-only reprioritisation
+requires no phone install, shader compilation or manual audio/haptic revalidation.
 
 ## Authority and recovered state
 
