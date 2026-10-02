@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "sourceCheckpoint": "00af842e942940eb0726dbbf698a14e8c1cc73ab",
+  "apkSha256": "e9fd31e7c9aee83a13d0a91f25e2b61497eb986940032dbb534e13d9787f4774",
+  "noteMarker": "ANDROID_ACCEPTANCE_20261002_01",
+  "reportId": "7e936d4d-5f1d-4956-a20a-0428e869719f",
+  "capturedAt": "2026-10-02T07:08:08Z",
+  "approvedAdditionalEmailCount": 1,
+  "verifyAndSendPressCount": 1,
+  "sameReportRetryCount": 0,
+  "nativeUiAcknowledgement": "QUEUED",
+  "acknowledgementBoundary": "Validated 202/accepted mapped by production controller; no raw HTTP trace or 200/sent claim",
+  "independentInboxConfirmation": {
+    "method": "Gmail exact-marker search followed by exact-message MIME read",
+    "matchingInboxMessages": 1,
+    "mailDate": "2026-10-02T07:08:47Z",
+    "noteAndContextMatch": true,
+    "attachment": {
+      "filename": "horde-lantern-rt-playtest.png",
+      "mimeType": "image/png",
+      "sizeBytes": 396183,
+      "remotePixelHashCompared": false,
+      "remotePixelsDecoded": false
+    }
+  },
+  "typedContext": {
+    "product": "Horde Lantern RT",
+    "version": "1.6.1",
+    "build": "1.6.1",
+    "platform": "Android",
+    "rawModel": "SM-S948B",
+    "gpu": "Adreno (TM) 840",
+    "backend": "RayTracingPipeline",
+    "quality": "Mobile",
+    "renderScale": 0.75,
+    "internalExtent": [1080, 2235],
+    "rtPresented": true
+  },
+  "laterRapidResume": "ANR during UI-thread native pipeline creation; separate failure, not a delivery regression"
+}

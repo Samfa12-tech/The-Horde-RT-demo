@@ -2,6 +2,28 @@
 
 Last updated: 2026-10-02
 
+## October 2: one S26 report delivered; rapid resume ANR remains open
+
+Exact local SM-S948B, retained Debug APKe9fd31e7/native source00af842 above/below.
+One owner-approved additional in-game report passes real hosted Cloudflare
+verification and native QUEUED acknowledgement. Exact-marker Gmail read finds
+one INBOX message with unchanged synthetic note, bounded typed Mobile75%/S26/RT
+context and396183B PNG attachment; no credentials, OS screenshot, private files,
+logs or serial in the submitted report. Pre-send game-only preview inspected;
+remote PNG pixel/hash equivalence is not claimed. No extra send/retry.
+[Finite delivery/lifecycle record](evidence/2026-10-02-s26-report-send/README.md).
+
+Separate rapid Home/resume from the accepted form FAILS: PID13046 terminates at
+17:10:58.936 with Android ANR/input-focus10000ms timeout. Exact owned main-thread
+trace is in Adreno LLVM/Vulkan pipeline creation called by synchronous native
+start from MainActivity.onResume. New PID16246 replaces it; null-root UI samples
+are excluded. This is a real lifecycle defect, not just helper failure or evidence
+that music/WebView/HTTP caused the block. Normal S26 settled runner resume above/
+below remains its own bounded pass. Close cancellable off-UI startup before final
+candidate lifecycle admission. No new S24/S25 or Shipping-performance claim.
+Phone left at Home; stable/data/font/volume unchanged. Manual audio/haptic:NO
+for evidence-only inspection; a future lifecycle fix must assess actual impact.
+
 ## October 2: production world-box normals — affected S26 route
 
 Exact local SM-S948B / Android16 / Adreno840 / driver512.842.19,

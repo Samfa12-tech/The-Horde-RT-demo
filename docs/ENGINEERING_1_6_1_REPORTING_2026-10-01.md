@@ -75,6 +75,25 @@ question or substitute fake verification. No completed measurement/player/music
 investigations reopen.
 Audio/haptic manual revalidation required:NO (reporting-only, unchanged feedback).
 
+## October2 latest actual delivery and remaining UI/lifecycle gates
+
+The owner-approved single Android acceptance report now completes real native
+preparation/RT preview, hosted verification and QUEUED acknowledgement. Exact
+Gmail message read confirms synthetic note, typed S26/Mobile75% context and
+396183B PNG attachment; one email only. [Finite receipt and limits](evidence/2026-10-02-s26-report-send/README.md).
+This consumes the additional-email approval and supersedes older pending-send
+instructions. Do not repeat the accepted Windows fixture or this Android email.
+No new backend, client secret or mailbox/provider change.
+
+A subsequent rapid Home/resume hits a demonstrated UI-thread native Vulkan
+pipeline-creation ANR, independently of successful report delivery. Close
+cancellable startup ownership and affected device lifecycle before final admission;
+do not interpret null-root screenshots as a pass or simply increase a deadline.
+Actual full-game Windows form entry/default options/Gameplay selection are observed,
+but the helper cannot address Impact after a fresh retry. [Bounded Windows attempt](evidence/2026-10-02-windows-report-ui/README.md)
+does not close actual prepare/cancel/readback. Existing injected form tests and
+single-fixture inbox acceptance are reused, not replayed.
+
 ## Historical implemented local boundary
 
 The shared schema1 builder is now used by native Android and Windows forms,

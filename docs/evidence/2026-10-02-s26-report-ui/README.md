@@ -2,6 +2,11 @@
 
 Single finite continuation record, October 2. This is actual Debug UI/readback
 evidence, not Shipping performance, another music audition or backend delivery.
+**Later continuation:** owner approved the one additional email; actual Android
+verification/queued acknowledgement and independent inbox note/context/PNG
+receipt now pass. A subsequent rapid resume hits a real native-startup ANR.
+[Current delivery/lifecycle record](../2026-10-02-s26-report-send/README.md)
+supersedes the pending-approval/next-send instructions below. Do NOT resend.
 Normal engineering source checkpoint `5ea481d1b891d57a3d951485bbe781b454f0719b`;
 unchanged retained Android child-document candidate `23ac884` supplies the APK.
 
@@ -46,11 +51,10 @@ OS screenshots here document the form; they are **not** report attachment data.
 
 ## Next unfinished step
 
-If explicitly approved, prepare one fresh synthetic image/context report and
-complete real Android WebView verification and one exchange. Record the actual
-ACK without equating queued202 with delivered200/email. Otherwise retain this
-preparation-only admission and keep verification/delivery open. Do not repeat the
-completed preparation rows or rebuild this unchanged APK.
+The approved single Android exchange is complete in the later record above.
+Next is the demonstrated rapid-resume native-startup ANR, not another email,
+preparation-row repetition or unchanged artifact rebuild. The original
+preparation-only evidence and its exact older APK remain historical facts.
 
 Capture-pending/verification/in-flight lifecycle races retain host-test coverage;
 this run certifies only the READY Home/resume row. S24 report UI/verification and

@@ -1,0 +1,10 @@
+ACTIVITY MANAGER PROCESS EXIT INFO (dumpsys activity exit-info)
+Last Timestamp of Persistence Into Persistent Storage: 2026-10-02 16:53:23.971
+  package: com.samfa12.hordelanternrt.debug
+    Historical Process Exit for uid=10358
+        ApplicationExitInfo #0:
+          timestamp=2026-10-02 17:10:58.936 pid=13046 realUid=10358 packageUid=10358 definingUid=10358 user=0
+          process=com.samfa12.hordelanternrt.debug reason=6 (ANR) subreason=41 (INPUT DISPATCHING TIMEOUT ANR) status=0
+          importance=400 pss=0.00 rss=721MB description=bg anr: Input dispatching timed out (3e01f57 com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity is not responding. Waited 10000ms for FocusEvent(hasFocus=true)). state=71 bytes trace=/data/system/procexitstore/anr_2026-10-02-17-10-58-819.gz
+        ApplicationExitInfo #1:
+          timestamp=2026-10-02 17:04:52.644 pid=8392 realUid=10358 packageUid=10358 definingUid=10358 user=0

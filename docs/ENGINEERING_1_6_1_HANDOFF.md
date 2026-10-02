@@ -13,6 +13,44 @@ handoffs. Preserve the full scope, selected model and effort, and normal service
 limits; do not redeem credits or publish without authorization. Keep GitHub current
 after coherent reviewed slices, preserving unrelated files and verifying remote SHA.
 
+### October 2 single Android report delivered; startup ANR is next
+
+Owner explicitly authorises the one additional email; approval is now consumed.
+Actual S26 in-game preparation/real RT preview, hosted Cloudflare verification
+and202/accepted QUEUED UI pass on retained normal APKe9fd31e7/source00af842.
+One exact-marker inbox read independently confirms synthetic note, bounded typed
+S26/Mobile75% context and396183B PNG attachment. No extra send/retry, Windows
+fixture repeat, secret/log/OS screenshot submission or backend change.
+[Single finite receipt](evidence/2026-10-02-s26-report-send/README.md).
+
+Rapid Home/resume after submission FAILS: exact owned Android ANR at17:10:58.936,
+PID13046, focus dispatch10000ms. Main stack is `onResume -> startSurfaceIfReady ->
+startDiagnosticSurface -> CreateBundleStrategyPipeline -> Adreno LLVM/Vulkan`.
+Not music/HTTP/WebView causation; UI-thread pipeline startup is source/trace
+demonstrated. Direct system-trace read denied; exact timestamp/tag DropBox entry
+retrieves owned main stack. Null-root helper samples are excluded, new PID16246
+means no same-process lifecycle pass. Phone left at Home, no report resent.
+
+**Next unfinished engineering step:** bounded off-UI native-surface startup with
+single serial ownership, immediately invalidated generations, pending-start
+cancellation, exactly-once ANativeWindow release, stale completion rejection and
+unchanged render/gameplay authority. Do not merely move the blocking wait into
+onPause/stop or allow concurrent Vulkan owners. Add CPU ownership/cancellation
+tests, then affected exact-phone rapid resume/interrupted startup checks; no new
+email is needed. Do not restart completed route/report/performance/player/music/
+parity investigations. Full-game Windows form is [separately incomplete](evidence/2026-10-02-windows-report-ui/README.md):
+actual entry/default opt-ins/Gameplay selection observed; helper cannot address
+Impact after a fresh retry, so no actual prepare/cancel/readback pass claimed.
+
+Before the final matrix, the Host runner may temporarily edit a tracked shader
+include for a negative freshness gate (finally restores it) and clean generated
+Android build outputs. It reuses, does not re-render, the music bank. Full mode
+adds Debug device rows, not installed Shipping heavy-scene Settings resize or
+Windows Release RTX. Current runtime00af842 push/PR CI are both SUCCESS; these
+new evidence-only commits still need their scoped push. All unrelated S24 scratch
+preserved. Audio/haptic manual revalidation:NO for this evidence-only slice;
+future startup/lifecycle changes require their own impact assessment. GoalACTIVE.
+
 ### October 2 production-only world-box normal correction
 
 Six closed-world-box face codes now agree with their existing outward winding;
