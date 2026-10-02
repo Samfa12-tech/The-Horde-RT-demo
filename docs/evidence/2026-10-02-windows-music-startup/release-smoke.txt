@@ -1,0 +1,7 @@
+Windows music admitted PCM bank and created XAudio2 master; wallMs=11605234
+Externally suspended startup: ready, stopped, no generated/played frames
+Windows music first device output: played=480 generated=1920 submitted=1920 volume=0 wallMs=11605390
+Native48k output advanced at gain0: generated=2400 submitted=2400 played=960
+Pause retained queue; device clock frozen through two150ms intervals at=960
+Resume then retry: epoch=2 generated=2400 submitted=2400 played=960
+PASS: output clock/pause/resume/retry/join; silent smoke is not owner listening

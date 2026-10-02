@@ -32,7 +32,12 @@ not another soundtrack audition or unrelated haptic retuning.
 Owner cannot recall whether the prior music silence was in active gameplay or
 menus. Do not label it a proven focus bug. Native silent startup/focus-return
 regression passes in Debug and Release; the actual fresh-launch observation is
-still open. Preserve the accepted score, Core and playback architecture.
+still open. Existing Windows audio log now records only gate transitions,
+native-bank readiness and first actual consumption, without altering playback.
+The final Shippingb5f6638d candidate is prepared in the isolated audio-review
+stage; [startup finite record](evidence/2026-10-02-windows-music-startup/README.md)
+owns its hash, completed native checks and next single launch. Preserve the
+accepted score, Core and playback architecture.
 Next: exact Windows control/balance/startup check; changed phone cuff/gain
 acceptance remains open. No phone use, main merge or publication in this run.
 

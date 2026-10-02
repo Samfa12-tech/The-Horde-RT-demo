@@ -469,6 +469,9 @@ private:
                 return;
             }
 
+            Log("Windows music admitted PCM bank and created XAudio2 master; wallMs=" +
+                std::to_string(GetTickCount64()));
+            bool firstOutputLogged = false;
             bool epochInitialized = false;
             std::uint64_t activeEpoch = 0u;
             while (!stopRequested_.load(std::memory_order_acquire) &&
@@ -550,6 +553,16 @@ private:
                     if (!ApplyVolume() || !FillQueue(input)) break;
                 }
                 UpdateCounters();
+                if (!firstOutputLogged && samplesPlayed_.load(std::memory_order_acquire) != 0u)
+                {
+                    firstOutputLogged = true;
+                    Log("Windows music first device output: played=" +
+                        std::to_string(samplesPlayed_.load(std::memory_order_acquire)) +
+                        " generated=" + std::to_string(generatedFrames_.load(std::memory_order_acquire)) +
+                        " submitted=" + std::to_string(submittedFrames_.load(std::memory_order_acquire)) +
+                        " volume=" + std::to_string(appliedVolumePercent_) +
+                        " wallMs=" + std::to_string(GetTickCount64()));
+                }
                 PublishStatus();
             }
         }

@@ -320,6 +320,7 @@ struct VulkanSurfaceContext
     std::unique_ptr<horde::platform::windows::WindowsMusicPlayback> musicPlayback;
     std::uint64_t musicResetToken = 0u;
     bool musicWindowActive = true;
+    int musicLastLoggedGate = -1;
     bool fullscreen = false;
     bool forwardHeld = false;
     bool backwardHeld = false;
@@ -1335,10 +1336,32 @@ void PublishMusicPlayback(VulkanSurfaceContext& context)
     if (context.musicPlayback)
     {
         // Copy before the existing SFX drain. No worker accesses GameSimulation.
-        (void)context.musicPlayback->Publish(context.simulation.Snapshot(),
+        const auto& snapshot = context.simulation.Snapshot();
+        const bool suspended = !context.musicWindowActive || !context.controlsEnabled ||
+                               context.simulationPaused;
+        const bool accepted = context.musicPlayback->Publish(snapshot,
             context.simulation.Events().Events(), 1u, context.musicResetToken,
-            !context.musicWindowActive || !context.controlsEnabled || context.simulationPaused,
+            suspended,
             context.musicVolumePercent);
+        // Observe existing gates only when they change. Do not repair focus or
+        // alter playback from an unproven owner observation. No foreign-window
+        // identity, frame-by-frame log, or screenshot is collected here.
+        const int gate = (context.musicWindowActive ? 1 : 0) |
+                         (context.controlsEnabled ? 2 : 0) |
+                         (context.simulationPaused ? 4 : 0);
+        if (gate != context.musicLastLoggedGate)
+        {
+            context.musicLastLoggedGate = gate;
+            LogWindowsAudio("Windows music gate: active=" + std::to_string(context.musicWindowActive) +
+                " foreground=" + std::to_string(GetForegroundWindow() == context.windowHandle) +
+                " controls=" + std::to_string(context.controlsEnabled) +
+                " menuPaused=" + std::to_string(context.simulationPaused) +
+                " snapshotPaused=" + std::to_string(snapshot.paused) +
+                " accepted=" + std::to_string(accepted) +
+                " volume=" + std::to_string(context.musicVolumePercent) +
+                " tick=" + std::to_string(snapshot.tickIndex) +
+                " wallMs=" + std::to_string(GetTickCount64()));
+        }
     }
 }
 

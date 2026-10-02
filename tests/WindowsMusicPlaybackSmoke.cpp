@@ -60,6 +60,18 @@ int wmain(const int argc, wchar_t** argv)
     }
     WindowsMusicPlayback playback(std::filesystem::path(argv[1]), &LogMessage);
     SimulationSnapshot snapshot{};
+    // Start while the application is externally unfocused, not gameplay-paused.
+    // Initialization must not start/advance audio until a focus-return publication.
+    snapshot.tickIndex = 0u;
+    if (!playback.Publish(snapshot, {}, 1u, 0u, true, 0)) return 16;
+    if (!WaitFor(playback, [](const auto& status)
+        { return status.assetsReady && status.backendReady && !status.disabled; },
+        std::chrono::seconds(5))) return 17;
+    std::this_thread::sleep_for(std::chrono::milliseconds(150));
+    const auto unfocused = playback.GetStatus();
+    if (!Check(!unfocused.backendPlaying && unfocused.samplesPlayed == 0u &&
+               unfocused.generatedFrames == 0u, "unfocused startup advanced the music clock")) return 18;
+    std::cout << "Externally suspended startup: ready, stopped, no generated/played frames\n";
     snapshot.tickIndex = 1u;
     if (!playback.Publish(snapshot, {}, 1u, 0u, false, 0)) return 3;
     if (!WaitFor(playback, [](const auto& status)
