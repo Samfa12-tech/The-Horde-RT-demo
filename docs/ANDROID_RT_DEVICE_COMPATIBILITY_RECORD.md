@@ -1387,6 +1387,17 @@ open; host tests do not replace these. S24 report UI and S25 stay unverified.
 [Exact finite receipts](evidence/2026-10-02-s26-report-ui/README.md).
 Audio/haptic manual revalidation required:NO (reporting/readback only).
 
+## October 2, 2026 - SM-S948B benchmark counter interaction
+
+Exact retained Debug35776e1c; no new APK or renderer change. Actual native menu
+Run benchmark shows changing three-line RT-loop FPS/mean-ms/last-frame-count
+readings in a short interrupted route prefix. Back returns to paused menu with
+no counter. One short restart shows8frames, not the previous60-frame window,
+then Back/Home. [Finite screenshots/receipts](evidence/2026-10-01-benchmark-fps/s26-20261002/README.md).
+This is UI/display/reset evidence only, not matched sustained Shipping performance
+or counter-overhead measurement. S24/S25 counter interaction is not certified.
+Audio/haptic manual revalidation required:NO (unchanged counter/feedback).
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

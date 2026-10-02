@@ -1,6 +1,10 @@
 # Finite live benchmark-counter admission
 
 Single continuation record; no new renderer, music, gameplay or timing framework.
+October2: the S26 interaction rows below are now completed on retained APK
+`35776e1cb18d2089211a807e3c0f7a24bb15b31b248154684ed1a523125b9b10`,
+installed/pulled back exactly for the reporting checks. No new build. Counter
+source2cb19de is unchanged. Earlier artifact/menu observations below are historical.
 Counter source2cb19de is already built into the accepted report-ui Debug candidate
 8CB976891E5719ECEB7FD809EC91AAC939FF3EC58EB2D6DF44F15B5526F4FF87.
 Installed exact SM-S948B base.apk SHA-256 is freshly checked and matches. Version
@@ -12,10 +16,10 @@ it does not rebuild this unchanged source artifact or establish new performance.
 
 | Row | Exact action | Current result |
 | --- | --- | --- |
-| S26 start | Open existing Debug app, native paused-menu Run benchmark, not an automation run-ID intent | Existing process11880/menu confirmed; initial am-start wait timed out and first UI dump had null root, same-process retry yielded current menu. Benchmark NOT started |
-| S26 update | One bounded90s-or-less route prefix; two numeric rolling readings and last-frame count, screenshot for layout | Not run |
-| S26 cancel | Back/cancel; prove report/menu no longer shows live counter | Not run |
-| S26 restart | One short fresh interactive restart; prove rolling window resets, cancel and return Home | Not run |
+| S26 start | Open existing Debug app, native paused-menu Run benchmark, not an automation run-ID intent | PASS: actual menu button starts interactive route, process11843; no run-ID intent |
+| S26 update | One bounded90s-or-less route prefix; two numeric rolling readings and last-frame count, screenshot for layout | PASS: waypoint1/13 opening12.1FPS/82.3ms/60frames, then3/13 shadow14.9FPS/67.0ms/60frames; readable three-line header, long waypoint ellipsized |
+| S26 cancel | Back/cancel; prove report/menu no longer shows live counter | PASS: Back returns to paused menu; fresh hierarchy contains no RT-loop counter |
+| S26 restart | One short fresh interactive restart; prove rolling window resets, cancel and return Home | PASS: fresh waypoint0/13 opening12.8FPS/78.2ms/**8**frames, not inherited60; Back returns to menu, then Home |
 | Windows interactive | Actual owned Windows process; three-line counter and cancellation/completion | Not run |
 | Observer overhead | Matched on/off measurements with unchanged paths/quality and thermal context | Open; no saving/overhead claim from HUD values |
 
@@ -31,7 +35,13 @@ No performance target or optimisation is inferred from Debug counter readings.
 
 Audio/haptic manual revalidation:NO; no semantic playback/source/assets change.
 
-Owner performance steering now defers this usability slice in favour of at most
-one or two materially promising performance trials. No benchmark was started;
-existing paused menu was observed, then Home. Do not replay launch after compaction
-or turn the counter checks into more performance-investigation infrastructure.
+The formerly higher-priority bounded performance trials have completed separately;
+this resumes only the unfinished usability checks. Two interrupted interactive
+prefixes are not comparable sustained Shipping runs and do not update the accepted
+performance conclusions. A benchmark-time UIAutomator attempt could not obtain
+idle; no stale hierarchy is accepted. Actual screenshots are the display evidence.
+No new audio/haptic acceptance is requested. Game is paused/Home afterward.
+
+Receipts: [S26 October2](s26-20261002/README.md). Do not repeat these completed
+phone rows after compaction. **Next unfinished step: Windows interactive display**;
+matched on/off overhead remains open and is separate from display correctness.

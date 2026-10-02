@@ -30,6 +30,11 @@ renderer/player/music change. Audio/haptic manual revalidation:NO.
 Next: approved single Android verification/exchange, or retain that gate open and
 continue independent unfinished checks. The completed static contact-policy
 NO-GO below remains valid; no promotion or completed-test repetition.
+Independent S26 FPS-counter rows now pass: changing12.1/14.9FPS readings, Back
+cancellation and fresh restart8frame window versus prior60, then Home. These are
+Debug display checks, not another performance trial. [Finite record](evidence/2026-10-01-benchmark-fps/LIVE_STATUS.md)
+names Windows interactive display as the next unfinished counter row; overhead
+is still unmeasured. Do not repeat the phone prefix after compaction.
 
 ### October 2 clean contact-policy static admission (preceding compile-only step)
 
