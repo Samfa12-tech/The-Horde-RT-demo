@@ -11,6 +11,11 @@ The treasure is physically real and desirable, not a bait-and-switch metaphor. M
 Themes: greed versus enough; protection becoming control; the living inheriting the debts of the dead; belonging while seeking fortune. Darkness and danger need warmth, humour and human stakes in contrast.
 Light is causal gameplay through the real RT engine. Enemy placement needs a reason: duty, territory, captivity, hunger or another readable cause, rather than arbitrary combat filler. Mindless monsters still belong in an ecology.
 
+## Reusing Briarhold models
+**Owner suggestion, 3 October 2026:** Treat existing Briarhold models as the first source to assess for suitable Horde characters, creatures and props before producing replacements; broad reuse is an opportunity, not a commitment that most models will fit. Follow [the roadmap's asset-reuse policy](ROADMAP.md#reuse-suitable-briarhold-assets).
+Preserve Horde's distinct character identities, roles and historical-gothic visual fit: a shared model does not import Briarhold lore or make its character the same person. Adapt silhouette, clothing, materials and authored performance where needed. Before any transfer or shipping, verify provenance/reuse rights and attribution, retain source/runtime records and hashes, and validate scale, rig/animation semantics, native RT import and measured mobile memory, skinning and rendering cost. Existing Briarhold validation does not establish Horde compatibility or performance.
+The Briarhold Bellkeeper is a **provisional model candidate** for the Drowned Abbey Bellkeeper below. Inspect its actual source/model against the drowned armoured guardian brief and required boss actions before selecting it. No asset inspection, transfer, adaptation or runtime validation is delivered by this planning note; the final model remains open.
+
 ## Campaign structure
 Tomb prologue → rope rescue and moonlit forest → village arrival and first small expedition → Abbey and Foundry in either order → Glass Court after both → treasury and authored final confrontation → playable return/epilogue.
 The three themed dungeons are additional to the existing tomb. The finale is a compact culmination, not a commitment to a fourth full dungeon. One satisfying ending is the agreed target; do not implement an alternate keeper ending.
