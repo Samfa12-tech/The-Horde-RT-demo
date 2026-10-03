@@ -1543,6 +1543,36 @@ This is UI/display/reset evidence only, not matched sustained Shipping performan
 or counter-overhead measurement. S24/S25 counter interaction is not certified.
 Audio/haptic manual revalidation required:NO (unchanged counter/feedback).
 
+## October 3, 2026 — SM-S948B finite resource/current-bank continuation
+
+Exact **SM-S948B** only. The [finite resource matrix](evidence/2026-10-03-final-s26-resources/README.md)
+retains control aa2000b / APK5c555528 and resource candidate3d26ad6 / APK5f05a131:
+all six reports complete with exact presented/CPU/GPU denominators at75%, real
+RayTracingPipeline and Mobile open-aperture quality. Held-high candidate93.6585ms
+versus control93.6380ms has no meaningful gain. Interrupted ordering/thermal
+variance prevent a route speedup claim; standalone warm reveal121.2535ms is not
+a matched comparison. RAM/Graphics allocation/PSI observations are separate from
+uncollected GPU bandwidth/cache/stall counters. No30FPS or sustained pass.
+
+Current music/source ec13876 uses new Shipping/Mobile-shader Debug-shell APK
+6eab75f8d829c8756a5c45f222f77104954b4010d24f7a9d479893d6e480f85a,
+installed/pulled identically,1.6.1-debug/code9. Actual native RT image/motion,
+heavy-scene75→100→75→50→75 output-only resize and Home/resume pass. Resize
+native idle+resize46–131ms; same-process resume readiness14.6s, not instant.
+State/held lantern survive. Fresh Debug/unsigned Release current-bank package
+and actual ARM64 Shipping SPIR-V validation pass. Release APK is not installed
+or signed; these checks are not Shipping performance or new subjective approval.
+[Exact interaction receipt](evidence/2026-10-03-final-s26-interactive/README.md).
+
+Owner accepted current A/D music on normal Debug315b1c9f as “both perfect”;
+[scoped source/audio/device record](evidence/2026-10-03-music-drone/README.md).
+Normal current Debug restored without clearing preferences, then stopped to
+release the phone. Existing S24 acceptance is retained, final changed artifact
+unavailable; exact S25 remains unverified. Distinct external audio-focus and
+changed-footstep/subjective cuff follow-ups are still separate owner checks.
+Audio/haptic manual revalidation required:NO for resource/interaction work;
+changed A/D music YES, now owner PASS. No new SFX/haptic change in this slice.
+
 ## Research sources
 
 - [Android NDK stable APIs - Vulkan runtime capability guidance](https://developer.android.com/ndk/guides/stable_apis)

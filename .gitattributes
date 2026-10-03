@@ -221,3 +221,8 @@ docs/evidence/2026-10-02-music-focus/** -text whitespace=-trailing-space,-blank-
 
 # Preserve hashed A/D source, render and device receipts byte-for-byte.
 docs/evidence/2026-10-03-music-drone/** -text whitespace=cr-at-eol
+
+# Frozen finite closeout receipts and raw Android memory/lifecycle evidence.
+docs/evidence/2026-10-03-final-s26-resources/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-03-final-s26-interactive/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-03-windows-music-package/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
