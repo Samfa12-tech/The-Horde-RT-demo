@@ -227,3 +227,6 @@ docs/evidence/2026-10-03-final-s26-resources/** -text whitespace=-trailing-space
 docs/evidence/2026-10-03-final-s26-interactive/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 docs/evidence/2026-10-03-windows-music-package/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 docs/evidence/2026-10-03-windows-live-closeout/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+# Preserve exact signed-release receipts, including verbatim readelf output.
+docs/evidence/2026-10-03-signed-freeze/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-03-signed-s26/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
