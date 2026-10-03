@@ -49,6 +49,48 @@ Prefer glTF/GLB for models unless a better Vulkan-friendly pipeline is chosen la
 
 ## Texture direction
 
+### Material normals and real-world texture scale (1.6.2)
+
+Author large forms, silhouettes, contact edges and actual occluders as geometry.
+Medium relief may use geometry and provenance-recorded high-to-low normal baking;
+fine surface detail uses normal maps. Blender/Meshy sources retain their source,
+licence and bake settings. Bake surface detail only, never scene lighting, shadows
+or reflections. Normal maps do not move physical ray intersections or silhouettes.
+
+Static PBR and the production skinned world body/viewmodel use the same material
+records and shading. glTF `normalTexture.scale` is a finite signed XY multiplier,
+default 1, followed by normalization in lighting. Linear normal maps use glTF/OpenGL
++Y orientation; tangent W must be exactly +1 or -1. A mapped primitive requires
+authored tangents: bake/export them before import. Unmapped primitives may omit
+tangents and receive a finite perpendicular basis. Reflected/negative-determinant
+nodes must be baked with corrected winding/normals before export; do not silently
+repair them in runtime. UV0 is the supported texture coordinate set; bake alternate
+sets and texture transforms into UV0 before export.
+
+Optional named `materialOverrides` entries provide `normalScale` and
+`textureScale: [u, v]`. Normal scale preserves finite signed values (zero flattens
+the mapped normal); each positive UV multiplier must be within [1/1024, 1024].
+Missing entries retain imported normal scale and UV multipliers [1, 1]. UV scaling
+applies to base color, normal, ORM and emissive together, without new texture layers
+or samples. Keep atlas-based characters/props at [1, 1] unless deliberately reauthored.
+For repeating surfaces specify metres and desired repeats/metre in the authoring
+record; stretching object geometry does not establish believable texture scale.
+For example, a four-metre surface with UV span 1 and two repeats/metre needs an
+authored UV span 8 or an explicit multiplier 8. Confirm size under moving light.
+
+Dungeon world-projected materials retain 0.42 repeats/metre and a separate 0.34
+normal blend by default. That blend is not equivalent to glTF XY scale 0.34; the
+shared ABI records signed normal strength, two UV multipliers and blend separately.
+Authored dungeon metadata indexes the same material buffer through the upper
+surface-code bits; lower material/normal codes continue to own projection and
+texture layer. No normal/detail texture is added by this core extension.
+
+glTF occlusion affects unresolved ambient illumination only. Keep base color pure;
+direct torch/local/moon lighting and actual RT-tested visibility do not receive an
+AO multiplier. Roughness/metallic channels remain independent. This 1.6.2 policy
+correction changes existing directly lit appearances and requires matched owner
+image acceptance; do not compensate with an exposure/light-strength retune.
+
 Use high-quality PBR textures from the beginning of visual work:
 
 - Albedo/base colour.

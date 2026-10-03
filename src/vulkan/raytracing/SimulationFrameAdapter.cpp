@@ -1,30 +1,71 @@
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 
+#include <algorithm>
+
 namespace horde::vulkan::raytracing
 {
+
+RtSceneFrameInputs BuildGraphicsPreviewFrameInputs(
+    const horde::graphics::GraphicsPreviewSession& session,
+    const float outputExposure, const WaterQuality waterQuality,
+    const FireEmitterQuality fireDetail, const RtSceneTuning& tuning)
+{
+    const auto preview = session.Snapshot();
+    RtSceneFrameInputs frame{};
+    frame.tickIndex = preview.tick;
+    frame.cameraX = preview.camera.x;
+    frame.cameraZ = preview.camera.z;
+    frame.cameraYaw = preview.camera.yaw;
+    frame.cameraPitch = preview.camera.pitch;
+    frame.walkTime = static_cast<float>(preview.timeSeconds);
+    frame.outputExposure = outputExposure;
+    frame.waterQuality = waterQuality;
+    frame.fireDetail = fireDetail;
+    frame.previewMotion = preview.motionTest;
+    frame.torchLightStrength = 1.8f;
+    frame.tuning = ClampRtSceneTuning(tuning);
+    frame.lich.staffLightStrength = 0.0f;
+    frame.roster.selectedEnemy = horde::gameplay::EnemyKind::Skeleton;
+    frame.roster.renderedEnemies[0] = horde::gameplay::EnemyKind::Skeleton;
+    frame.roster.renderedEnemyCount = 1u;
+    frame.skeletonEnemyCount = 1u;
+    auto& skeleton = frame.skeletonEnemies[0];
+    skeleton.id = horde::gameplay::simulation::EntityId::SkeletonA;
+    skeleton.x = preview.skeleton.x;
+    skeleton.z = preview.skeleton.z;
+    skeleton.facingRadians = preview.skeleton.facing;
+    skeleton.animationTime = preview.skeleton.animationTime;
+    skeleton.animation = horde::gameplay::EnemyAnimation::Idle;
+    skeleton.action = horde::gameplay::EnemyCombatAction::Locomotion;
+    frame.fireEmitterCount = preview.fireEmitters.size();
+    std::copy(preview.fireEmitters.begin(), preview.fireEmitters.end(), frame.fireEmitters.begin());
+    return frame;
+}
 
 RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
     const float outputExposure,
     const WaterQuality waterQuality)
 {
-    return BuildRtSceneFrameInputs(simulation, outputExposure, waterQuality, RtSceneTuning{});
+    return BuildRtSceneFrameInputs(simulation, outputExposure, waterQuality, RtSceneTuning{}, std::nullopt);
 }
 
 RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
     const float outputExposure,
     const RtSceneTuning& tuning,
-    const WaterQuality waterQuality)
+    const WaterQuality waterQuality,
+    const std::optional<FireEmitterQuality> fireDetail)
 {
-    return BuildRtSceneFrameInputs(simulation, outputExposure, waterQuality, tuning);
+    return BuildRtSceneFrameInputs(simulation, outputExposure, waterQuality, tuning, fireDetail);
 }
 
 RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
     const float outputExposure,
     const WaterQuality waterQuality,
-    const RtSceneTuning& tuning)
+    const RtSceneTuning& tuning,
+    const std::optional<FireEmitterQuality> fireDetail)
 {
     RtSceneFrameInputs frame;
     frame.playerRenderRoute = kProductionPlayerRenderRoute;
@@ -38,6 +79,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.walkAmount = simulation.walkAmount;
     frame.outputExposure = outputExposure;
     frame.waterQuality = waterQuality;
+    frame.fireDetail = fireDetail;
     frame.tuning = ClampRtSceneTuning(tuning);
     frame.combat = simulation.swordCombat;
     frame.playerCombat = simulation.playerCombat;

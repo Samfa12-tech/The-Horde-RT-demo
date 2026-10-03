@@ -16,6 +16,14 @@ enum class RtWorkloadPreset : std::uint32_t
     Max = 2u,
 };
 
+// Mirrors the shared shader policy. Secondary transport retains its bounded
+// one-sample budget; this count describes contributing primary receivers.
+constexpr std::uint32_t ResolvePrimaryAreaShadowSamples(
+    const RtWorkloadPreset preset, const bool compiledHighQuality)
+{
+    return preset == RtWorkloadPreset::Max ? (compiledHighQuality ? 4u : 2u) : 1u;
+}
+
 enum class RtLightGroup : std::uint32_t
 {
     Torch = 0u,

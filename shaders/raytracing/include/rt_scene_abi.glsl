@@ -96,6 +96,7 @@ struct HitInfo
     vec3 normal;
     vec3 geometricNormal;
     vec3 base;
+    float occlusion;
     float metallic;
     float reflectivity;
     float roughness;

@@ -14,7 +14,9 @@ $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 . (Join-Path $PSScriptRoot "music-asset-policy.ps1")
 . (Join-Path $PSScriptRoot "third-party-notice-policy.ps1")
+. (Join-Path $PSScriptRoot "horde-1.6.2-asset-policy.ps1")
 $null = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
+$null = Assert-Horde162Assets -RepositoryRoot $repoRoot
 . (Join-Path $PSScriptRoot "version-contract.ps1")
 $sourceIdentity = Get-HordeSourceIdentity -RepoRoot $repoRoot
 $outputRootFull = [IO.Path]::GetFullPath($OutputRoot)
@@ -309,9 +311,7 @@ function Write-ValidationPackage {
     $audioDestination = Join-Path $windowsStage "assets\audio\filmcow"
     New-Item -ItemType Directory -Force -Path $audioDestination | Out-Null
     Copy-Item -Path (Join-Path $repoRoot "assets\audio\filmcow\*.wav") -Destination $audioDestination
-    $pixabayAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
-    New-Item -ItemType Directory -Force -Path $pixabayAudioDestination | Out-Null
-    Copy-Item -Path (Join-Path $repoRoot "assets\audio\pixabay\*.wav") -Destination $pixabayAudioDestination
+    $null = Copy-Horde162RuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets") -Platform Windows
     $null = Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets")
     Compress-Archive -Path (Join-Path $windowsStage "*") -DestinationPath $windowsZip -CompressionLevel Optimal
     Copy-Item -LiteralPath $AndroidApk -Destination $androidValidationApk
@@ -371,6 +371,7 @@ function Test-ValidationPackages {
         "assets/audio/pixabay/chest_open.wav",
         "assets/audio/pixabay/torch_extinguish.wav"))
     $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip
+    $null = Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
     Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".android.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
@@ -410,11 +411,13 @@ function Test-ValidationPackages {
         "assets/ASSET_LICENSES.md",
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
         "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
-        "assets/audio/pixabay/waterfall_loop.wav",
+        "assets/audio/pixabay/waterfall_core_loop.wav",
+        "assets/audio/pixabay/waterfall-core.manifest.json",
         "assets/audio/pixabay/chest_unlock.wav",
         "assets/audio/pixabay/chest_open.wav",
         "assets/audio/pixabay/torch_extinguish.wav"))
     $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $androidValidationApk
+    $null = Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $androidValidationApk -Platform Android
     Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $androidValidationApk -Platform Android
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".windows.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {

@@ -28,6 +28,7 @@ add_library(horde_rt_probe_android
     SHARED
     android_probe_bridge.cpp
     android_music_playback.cpp
+    android_ambience_playback.cpp
     "${HORDE_RT_REPO_ROOT}/src/ui/DiagnosticOverlay.cpp"
     ${HORDE_RT_ANDROID_CORE_SOURCES}
 )

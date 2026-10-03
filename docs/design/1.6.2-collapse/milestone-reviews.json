@@ -1,0 +1,31 @@
+{
+  "schema": "game-room.milestone-reviews.v1",
+  "roomId": "horde-collapse-162",
+  "function": {
+    "status": "approved",
+    "approvedBy": "owner",
+    "approvedAt": "2026-10-03T07:16:56.9331644+00:00",
+    "evidence": [
+      "layout-contact-sheet.png",
+      "opening-contact-sheet.png"
+    ],
+    "strangestElement": "The stairs must remain partially readable through upper rubble cavities without a live gap or flat visible cap.",
+    "notes": "Owner manually opened both existing layout/opening contact sheets and explicitly approved their layout/reference on 3 October 2026. Final composition may begin; Form and runtime gates remain pending. Review images stay private."
+  },
+  "form": {
+    "status": "pending",
+    "approvedBy": "",
+    "approvedAt": "",
+    "evidence": [],
+    "strangestElement": "",
+    "notes": ""
+  },
+  "runtime": {
+    "status": "pending",
+    "approvedBy": "",
+    "approvedAt": "",
+    "evidence": [],
+    "strangestElement": "",
+    "notes": ""
+  }
+}

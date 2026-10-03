@@ -5,6 +5,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     telemetry/RtEvidencePublication.cpp
     telemetry/RtBenchmarkEvidenceRun.cpp
     telemetry/RtBenchmarkEvidenceReport.cpp
+    audio/AmbiencePcmLoop.cpp
     audio/MusicDirector.cpp
     audio/MusicPcmStream.cpp
     audio/MusicPcmWave.cpp

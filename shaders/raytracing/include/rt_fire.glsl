@@ -121,21 +121,45 @@ vec4 integrateOneFireEmitter(RtFireEmitterGpu emitter,
         if (stepIndex >= volumeSteps) break;
         float distanceAlongRay = nearDistance + (float(stepIndex) + 0.5) * stepLength;
         vec3 local = localOrigin + localDirection * distanceAlongRay;
-        float heightFraction = clamp((local.y + height * 0.16) / (height * 1.16), 0.0, 1.0);
+        // Periodic upper tongues curl and separate even while their attachment
+        // is stationary. The base/core stays anchored to the shared Flame
+        // socket; primary, glass and reflection paths integrate this same field.
+        // This changes shape inside the existing bound, without more samples.
+        float cycle = emitter.animation.x * 6.28318530718;
+        float seedPhase = fireHash01(emitter.identity.y, 19u) * 6.28318530718;
+        float pulse = sin(cycle * 2.0 + seedPhase);
+        float liveHeight = height * (0.88 + 0.10 * pulse);
+        float heightFraction = clamp((local.y + liveHeight * 0.16) /
+                                     (liveHeight * 1.16), 0.0, 1.0);
         vec2 centreLine = emitter.animation.zw * heightFraction;
         float domainNoise = fireValueNoise(
             emitter.identity.y,
             local.y * 8.5 + emitter.animation.x * 7.0 +
                 dot(local.xz, vec2(4.1, -3.7)));
         float turbulence = emitter.smokeEmbers.z;
+        float tipBlend = smoothstep(0.18, 0.90, heightFraction);
         centreLine += vec2(domainNoise, -domainNoise * 0.73) *
             radius * (0.12 + 0.20 * turbulence) * heightFraction;
-        float taper = mix(1.0, 0.12, pow(heightFraction, 0.72));
-        float localRadius = max(radius * taper, emitter.shape.z * 0.55);
+        centreLine += vec2(sin(cycle * 3.0 + heightFraction * 6.0 + seedPhase),
+                          cos(cycle * 2.0 - heightFraction * 5.0 + seedPhase)) *
+            radius * 0.34 * tipBlend;
+        float taper = mix(1.0, 0.055, pow(heightFraction, 0.72));
+        float localRadius = max(radius * taper,
+                               emitter.shape.z * mix(0.55, 0.10, tipBlend));
         float radial = length(local.xz - centreLine) / max(localRadius, 0.001);
         float body = (1.0 - smoothstep(0.22, 1.0, radial)) *
-                     smoothstep(-0.16, 0.05, local.y / height) *
-                     (1.0 - smoothstep(0.72, 1.03, local.y / height));
+                     smoothstep(-0.16, 0.05, local.y / liveHeight) *
+                     (1.0 - smoothstep(0.72, 1.03, local.y / liveHeight));
+        // A restrained second tongue breaks the single smooth spindle. Its
+        // shoulder rises/falls against the main tongue instead of translating
+        // the whole emitter or adding a disconnected floating flame.
+        vec2 fork = centreLine + radius * tipBlend *
+            vec2(0.44 * cos(cycle + seedPhase), 0.34 * sin(cycle + seedPhase));
+        float forkRadial = length(local.xz - fork) / max(localRadius * 0.58, 0.001);
+        float forkBody = (1.0 - smoothstep(0.20, 1.0, forkRadial)) *
+            smoothstep(0.28, 0.50, heightFraction) *
+            (1.0 - smoothstep(0.66 + 0.07 * pulse, 0.93, heightFraction));
+        body = max(body, forkBody * 0.62);
         float breakup = clamp(0.76 + domainNoise * (0.18 + turbulence * 0.10), 0.22, 1.0);
         float density = body * breakup;
         float core = (1.0 - smoothstep(0.0, max(emitter.shape.z, 0.005),

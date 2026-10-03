@@ -1,6 +1,6 @@
 # Android Vulkan RT App
 
-The `android/` module is the supported phone path for Horde Lantern RT. It owns the Java activity and lifecycle/JNI bridge while compiling the shared renderer and scene sources from `src/`.
+The `android/` module is the supported phone path for Horde Lantern RT. It owns the Java activity and lifecycle/JNI bridge while compiling the shared renderer and scene sources from `src/`. Current development is 1.6.2 / versionCode 10; published 1.6.1 and its acceptance evidence remain separate.
 
 ## Current implementation
 
@@ -15,7 +15,7 @@ The `android/` module is the supported phone path for Horde Lantern RT. It owns 
 - Optional Vulkan timestamp queries report a separate GPU RT command-buffer interval without changing CPU benchmark pass/fail
 - One frame in flight while the held-prop TLAS uses a host-written instance buffer
 - Portrait-first branded entry/pause/settings/controls/diagnostics/credits UI; touch movement/look plus `SWING` and `PARRY`; a bounded two-skeleton opening encounter followed by a singular lich route; layered articulated body/head with a smoothed walk gait, roof-water drench and lantern drop, rounded catchment/drain runnel, coloured bays, mirror, low ritual mist, sliding-roof dawn reveal, and Continue/Begin Again/Quit ending; a persistent post-lich RT Lab with route-local tuning; strict ASTC assets; and phone-safe ray-query shading inside `vkCmdTraceRaysKHR`
-- Persisted SFX volume, look sensitivity, compact HUD, 50-100% RT render scale, and `High / Mobile / Off` RT-water quality; seventeen FilmCow clips play through SoundPool and the positional DRAGON-STUDIO/Pixabay waterfall loop uses a lifecycle-paused MediaPlayer
+- Persisted independent SFX/music volume, look sensitivity, interface preferences and shared Graphics Apply/Revert/Keep recovery; 50-100% RT render scale and independent water/fire choices. The compact production RT preview owns its timeline while gameplay is paused. FilmCow cues retain their existing mappings; new Keeper cues and a Core-backed positional waterfall worker have separate owner listening gates.
 - The in-app Credits & Licences panel carries Poly Haven, FilmCow, DRAGON-STUDIO/Pixabay, Hotstrike Studio, Meshy, and generated-icon provenance with the APK
 - Native libraries use a static C++ runtime plus 16 KiB ELF alignment; the packaging gate verifies 16 KiB APK/ELF alignment and rejects an r26 `libc++_shared.so`
 - Unsupported devices retain explicit diagnostics instead of a fake rendering fallback

@@ -224,6 +224,17 @@ int main()
             root / "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java");
         const std::string androidBridgeSource =
             ReadTextFile(root / "android/app/src/main/cpp/android_probe_bridge.cpp");
+        const std::string ambienceWorker = ReadTextFile(
+            root / "android/app/src/main/java/com/samfa12/hordelanternrt/HordeAmbiencePlayback.java");
+        const std::string ambienceGate = ReadTextFile(
+            root / "android/app/src/main/java/com/samfa12/hordelanternrt/AmbienceOutputGate.java");
+        const std::string ambienceCore = ReadTextFile(root / "src/audio/AmbiencePcmLoop.cpp");
+        const auto section = [](const std::string& source, const char* begin, const char* end) {
+            const auto start = source.find(begin);
+            const auto stop = start == std::string::npos ? std::string::npos : source.find(end, start);
+            return start == std::string::npos || stop == std::string::npos
+                ? std::string{} : source.substr(start, stop - start);
+        };
         check(windowsSource.find("masteringVoice_->SetVolume(") != std::string::npos &&
               windowsSource.find("SfxVolumeLinearGain(percent)") != std::string::npos &&
               windowsSource.find("engine.SetMasterVolumePercent(sfxVolumePercent)") != std::string::npos &&
@@ -244,12 +255,20 @@ int main()
               "Android must preserve its independent SFX slider and quieter steps with unchanged event-time stereo gains");
         check(windowsSource.find("case GameplayEventType::EnemyDefeated:") != std::string::npos &&
               windowsSource.find("context.delayedFeedback.Enqueue(") != std::string::npos &&
-              windowsSource.find("PlayPositionalSoundEffect(context, \"enemy_fall.wav\"") != std::string::npos &&
+              windowsSource.find("context.delayedFeedback.DrainDue(GetTickCount64()") != std::string::npos &&
+              windowsSource.find("PlayPositionalSoundEffect(context, \"skeleton_falling_bones.wav\", 0.36f, event, \"pixabay\")") != std::string::npos &&
+              windowsSource.find("GetTickCount64() + horde::gameplay::kEnemyImpactFallDelayMilliseconds") != std::string::npos &&
+              section(windowsSource, "void ResetRoute(", "bool ApplyPlayerRetryCheckpoint(")
+                  .find("context.delayedFeedback.Clear();") != std::string::npos &&
+              section(windowsSource, "bool ApplyPlayerRetryCheckpoint(", "const char* PresentModeName(")
+                  .find("context.delayedFeedback.Clear();") != std::string::npos &&
               windowsSource.find("PlayPositionalSoundEffect(context, \"sword_hit_1.wav\"") != std::string::npos,
-              "Windows must retain positional skeleton hit and delayed fall mappings");
+              "Windows must retain positional sword impact, ordered licensed bones fall, 140 ms scheduling and reset/retry cancellation");
         check(androidSource.find("case PLATFORM_EVENT_ENEMY_DEFEATED:") != std::string::npos &&
               androidSource.find("ENEMY_IMPACT_FALL_DELAY_MILLISECONDS") != std::string::npos &&
-              androidSource.find("feedbackGeneration == delayedGameplayFeedbackGeneration") != std::string::npos,
+              androidSource.find("ENEMY_IMPACT_FALL_DELAY_MILLISECONDS = 140L") != std::string::npos &&
+              androidSource.find("feedbackGeneration == delayedGameplayFeedbackGeneration") != std::string::npos &&
+              androidSource.find("playSpatialSound(\"skeleton_falling_bones\", 0.24f, stereoGains)") != std::string::npos,
               "Android must retain the authored fall delay and cancel stale lifecycle feedback");
         check(androidBridgeSource.find("BoundedTransportQueue<") != std::string::npos &&
               androidBridgeSource.find("gPlatformGameplayEvents.Push(") != std::string::npos &&
@@ -304,12 +323,50 @@ int main()
               windowsSource.find("StartOrUpdateLoop") != std::string::npos &&
               windowsSource.find("StopLoop") != std::string::npos,
               "Windows waterfall ambience must be a controllable positional loop");
-        check(androidSource.find("waterfall_loop.wav") != std::string::npos &&
-              androidSource.find("setLooping(true)") != std::string::npos &&
-              androidSource.find("waterfallPlayer.pause()") != std::string::npos &&
-              androidSource.find("if (!waterfallPlayer.isPlaying()) waterfallPlayer.start();") != std::string::npos &&
-              androidBridgeSource.find("getWaterfallStereoGains") != std::string::npos,
-              "Android waterfall ambience must loop only while audible and consume native positional gains");
+        const auto waterfallUpdate = section(androidSource, "private void updateWaterfallLoop()", "private void loadSound(");
+        const auto androidPause = section(androidSource, "protected void onPause()", "protected void onDestroy()");
+        check(androidSource.find("new HordeAmbiencePlayback(this, this::isMusicAudioFocusGranted)") != std::string::npos &&
+              waterfallUpdate.find("resumed && surfaceStarted && !menuVisible && !diagnosticsVisible") != std::string::npos &&
+              waterfallUpdate.find("!benchmarkRunning && preferences.getBoolean(\"sfx_enabled\", true)") != std::string::npos &&
+              waterfallUpdate.find("ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1") != std::string::npos &&
+              waterfallUpdate.find("ProbeBridge.getWaterfallStereoGains()") != std::string::npos &&
+              waterfallUpdate.find("preferences.getInt(\"sfx_volume\", 70) / 100.0f") != std::string::npos &&
+              waterfallUpdate.find("clamp(userGain * leftScale, 0.0f, 1.0f)") != std::string::npos &&
+              waterfallUpdate.find("clamp(userGain * rightScale, 0.0f, 1.0f)") != std::string::npos &&
+              androidBridgeSource.find("getWaterfallStereoGains") != std::string::npos &&
+              androidSource.find("waterfallPlayer") == std::string::npos,
+              "Android waterfall must consume native positional gains times independent SFX volume only on the resumed ready gameplay surface");
+        check(androidSource.find("waterfallPlayback.setControl(true, 0.0f, 0.0f, delayedGameplayFeedbackGeneration)") != std::string::npos &&
+              section(androidSource, "private void setGameplayPaused(boolean paused)", "private void showDiagnostics(")
+                  .find("if (paused) suspendAndResetWaterfall();") != std::string::npos &&
+              section(androidSource, "private void resetRoute()", "private void retryEncounter()")
+                  .find("++delayedGameplayFeedbackGeneration;") != std::string::npos &&
+              section(androidSource, "private void resetRoute()", "private void retryEncounter()")
+                  .find("suspendAndResetWaterfall();") != std::string::npos &&
+              section(androidSource, "private void retryEncounter()", "private void restartAfterDeath()")
+                  .find("++delayedGameplayFeedbackGeneration;") != std::string::npos &&
+              section(androidSource, "private void retryEncounter()", "private void restartAfterDeath()")
+                  .find("suspendAndResetWaterfall();") != std::string::npos &&
+              androidPause.find("++delayedGameplayFeedbackGeneration;") != std::string::npos &&
+              androidPause.find("suspendAndResetWaterfall();") != std::string::npos &&
+              androidSource.find("waterfallPlayback.close(); waterfallPlayback = null;") != std::string::npos,
+              "Android menu pause must retain its epoch while reset/retry/background suspend a new epoch and destroy retains worker cleanup ownership");
+        const auto reconcile = section(ambienceWorker, "// Native polling can race", "if (!playing)");
+        const auto workerLoop = section(ambienceWorker, "while (true)", "} catch (Exception | LinkageError | OutOfMemoryError error)");
+        check(ambienceCore.find("pocket_audio::DecodePcmWave(bytes, kWaterfallCoreFrames, samples_)") != std::string::npos &&
+              ambienceCore.find(".tail = {}, .looping = true") != std::string::npos &&
+              ambienceCore.find("std::make_unique<pocket_audio::PcmLoopStream>(clips_, 0u)") != std::string::npos &&
+              ambienceCore.find("core_->Reset();") != std::string::npos &&
+              ambienceCore.find("core_->Render(output)") != std::string::npos &&
+              !workerLoop.empty() && workerLoop.find("nativeCreate(") == std::string::npos &&
+              ambienceWorker.find("queue.reset(); playing = false;") != std::string::npos &&
+              reconcile.find("synchronized (lock)") != std::string::npos &&
+              reconcile.find("outputGate.reconcile(pause, suspended, focusGranted.getAsBoolean()") != std::string::npos &&
+              ambienceGate.find("!nativeSuspended && !liveSuspended && focusGranted && nativeEpoch == liveEpoch") != std::string::npos &&
+              ambienceWorker.find("!suspended && focusGranted.getAsBoolean() && generation == epoch") != std::string::npos &&
+              ambienceWorker.find("output.write(pcm, queue.offset(), writable, AudioTrack.WRITE_NON_BLOCKING)") != std::string::npos &&
+              ambienceWorker.find("queue.accepted(written)") != std::string::npos,
+              "Android waterfall must use one admitted Core cursor, retain partial nonblocking writes and reconcile live pause/focus/epoch before restarting or accepting old PCM");
     }
 
     PlayerFootstepCadence footsteps;

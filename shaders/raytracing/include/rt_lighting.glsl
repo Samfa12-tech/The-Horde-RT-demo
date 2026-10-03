@@ -45,11 +45,22 @@ vec3 tunedLightColor(vec3 authoredColor, int group)
 
 vec3 skyColor(vec3 d)
 {
+    // The same real ray direction samples the panorama for primary misses,
+    // glass transmission and reflected misses. It adds no scene light or
+    // visibility shortcut. sRGB texture views return linear colour here.
+    d = normalize(d);
+    const float pi = 3.141592653589793;
+    vec2 environmentUv = vec2(0.5 + atan(d.z, d.x) / (2.0 * pi),
+                              acos(clamp(d.y, -1.0, 1.0)) / pi);
+    // Raygen/compute have no implicit derivatives. Use a bounded common LOD
+    // from actual render extent, retaining mip0 at ordinary demo resolutions.
+    vec2 texelRatio = vec2(textureSize(rtEnvironmentTexture, 0)) /
+                     max(vec2(HORDE_RT_PIXEL_EXTENT.xy), vec2(1.0));
+    float environmentLod = max(0.0, log2(max(texelRatio.x, texelRatio.y)));
+    vec3 sky = textureLod(rtEnvironmentTexture, environmentUv, environmentLod).rgb;
     float moonAlignment = max(dot(d, kMoonDirection), 0.0);
     float moonDisc = smoothstep(0.99945, 0.99988, moonAlignment);
     float moonHalo = pow(moonAlignment, 96.0);
-    float horizon = smoothstep(-0.22, 0.45, d.y);
-    vec3 sky = mix(vec3(0.015, 0.018, 0.024), vec3(0.04, 0.065, 0.105), horizon);
     sky += vec3(0.52, 0.62, 0.82) * moonDisc;
     sky += vec3(0.10, 0.14, 0.23) * moonHalo;
     sky += vec3(0.045, 0.018, 0.008) * smoothstep(-0.35, 0.15, -d.y);
@@ -933,6 +944,22 @@ mat4 transparentTransmittanceBatch(vec3 origins[kShadowSampleCapacity],
 }
 
 void activeLocalLight(out vec3 position, out vec3 color, out float strength);
+#if defined(HORDE_RT_VARIANT_QUALITY) && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_HIGH
+bool highMaxAreaShadows()
+{
+    return controls.workloadPreset >= 1.5;
+}
+#endif
+
+int areaShadowSampleIndex()
+{
+#if defined(HORDE_RT_VARIANT_QUALITY) && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_HIGH
+    return highMaxAreaShadows() ? 0 : int((HORDE_RT_PIXEL_ID.x + HORDE_RT_PIXEL_ID.y) & 1u);
+#else
+    return int((HORDE_RT_PIXEL_ID.x + HORDE_RT_PIXEL_ID.y) & 1u);
+#endif
+}
+
 vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility,
                                bool allowAnalyticSpecular);
 
@@ -956,7 +983,7 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
     }
     if (!lightAwareMirror)
     {
-        return h.base * (0.11 + 0.16 * max(dot(h.normal, kMoonDirection), 0.0));
+        return h.base * h.occlusion * (0.11 + 0.16 * max(dot(h.normal, kMoonDirection), 0.0));
     }
 
     // A mirror bounce must share the scene's current darkness. The former
@@ -988,13 +1015,13 @@ vec3 bounceSample(HitInfo h, vec3 incoming, bool lightAwareMirror)
     if (!genericTransmissionActive)
     {
         authoredDirect = h.base *
-            (0.008 + localLightColor * diffuse * attenuation * lightVisibility *
+            (0.008 * h.occlusion + localLightColor * diffuse * attenuation * lightVisibility *
              localLightStrength * 2.25);
     }
     else
     {
         authoredDirect = h.base *
-            (0.008 + localLightColor * lightTransmittance * diffuse * attenuation *
+            (0.008 * h.occlusion + localLightColor * lightTransmittance * diffuse * attenuation *
              localLightStrength * 2.25);
     }
     return authoredDirect + fireEmitterDirectLighting(h, incoming, false, false);
@@ -1037,9 +1064,15 @@ void activeLocalLight(out vec3 position, out vec3 color, out float strength)
 vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility,
                                bool allowAnalyticSpecular)
 {
+#if defined(HORDE_RT_VARIANT_QUALITY) && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_HIGH
+    const vec3 areaOffsets[4] = vec3[4](vec3(-0.075, 0.03, -0.045),
+        vec3(0.070, 0.10, 0.060), vec3(-0.075, 0.10, 0.060),
+        vec3(0.070, 0.03, -0.045));
+#else
     const vec3 areaOffsets[2] = vec3[2](vec3(-0.075, 0.03, -0.045),
-                                        vec3(0.070, 0.10, 0.060));
-    int sampleIndex = int((HORDE_RT_PIXEL_ID.x + HORDE_RT_PIXEL_ID.y) & 1u);
+                                      vec3(0.070, 0.10, 0.060));
+#endif
+    int sampleIndex = areaShadowSampleIndex();
     float reflective = max(h.metallic, h.reflectivity);
     bool genericTransmissionActive = genericTransmissionEnabled();
     vec3 result = vec3(0.0);
@@ -1073,6 +1106,25 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
         vec3 lightTransmittance = sceneShadowTransmittanceMask(
             offsetRayOrigin(h, sampleDirection), sampleDirection,
             sampleDistance - 0.02, 0x35u);
+#if defined(HORDE_RT_VARIANT_QUALITY) && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_HIGH
+        if (dualVisibility && highMaxAreaShadows())
+        {
+            // Four real finite-segment queries at every contributing pixel.
+            // The first query above is sample zero; retain the authored extent
+            // and centre-light BRDF/attenuation without a temporal approximation.
+            for (int areaSample = 1; areaSample < 4; ++areaSample)
+            {
+                vec3 areaVector = lightPosition + areaOffsets[areaSample] - h.position;
+                float areaDistance = length(areaVector);
+                vec3 areaDirection = areaVector / max(areaDistance, 0.001);
+                lightTransmittance += sceneShadowTransmittanceMask(
+                    offsetRayOrigin(h, areaDirection), areaDirection,
+                    areaDistance - 0.02, 0x35u);
+            }
+            lightTransmittance *= 0.25;
+        }
+        else
+#endif
         if (dualVisibility)
         {
             vec3 otherVector = lightPosition + areaOffsets[1 - sampleIndex] - h.position;
@@ -1152,7 +1204,7 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     vec3 localDirection = localVector / max(localDistance, 0.001);
     const vec3 areaOffsets[2] = vec3[2](vec3(-0.075, 0.03, -0.045),
                                         vec3(0.070, 0.10, 0.060));
-    int sampleIndex = int((HORDE_RT_PIXEL_ID.x + HORDE_RT_PIXEL_ID.y) & 1u);
+    int sampleIndex = areaShadowSampleIndex();
     vec3 sampleVector = localPosition + areaOffsets[sampleIndex] - h.position;
     float sampleDistance = length(sampleVector);
     vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
@@ -1217,6 +1269,23 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
         ? 0.5 * (transmittanceSamples[2].xyz * skyGain +
                  transmittanceSamples[3].xyz * otherSkyGain)
         : transmittanceSamples[2].xyz * skyGain;
+#if defined(HORDE_RT_VARIANT_QUALITY) && HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_HIGH
+    if (dualVisibility && highMaxAreaShadows() && localContributes)
+    {
+        const vec3 extraOffsets[2] = vec3[2](vec3(-0.075, 0.10, 0.060),
+                                            vec3(0.070, 0.03, -0.045));
+        localTransmittance *= 0.5;
+        for (int areaSample = 0; areaSample < 2; ++areaSample)
+        {
+            vec3 areaVector = localPosition + extraOffsets[areaSample] - h.position;
+            float areaDistance = length(areaVector);
+            vec3 areaDirection = areaVector / max(areaDistance, 0.001);
+            localTransmittance += 0.25 * sceneShadowTransmittanceMask(
+                offsetRayOrigin(h, areaDirection), areaDirection,
+                areaDistance - 0.02, 0x35u);
+        }
+    }
+#endif
     localVisibility = !genericTransmissionActive
         ? localTransmittance.x
         : dot(localTransmittance, vec3(0.2126, 0.7152, 0.0722));
@@ -1227,7 +1296,9 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool dualVisibility,
     float skyFresnel = pow(1.0 - max(dot(h.normal, -rayDirection), 0.0), 5.0);
     vec3 cold = tunedLightColor(vec3(0.15, 0.20, 0.28), kLightSkylight);
 
-    vec3 color = h.base * vec3(0.025, 0.028, 0.032);
+    // glTF AO describes unresolved ambient occlusion, not direct-light shadowing.
+    // Local/moon/fire and RT-tested bounce visibility remain authoritative.
+    vec3 color = h.base * h.occlusion * vec3(0.025, 0.028, 0.032);
     color += fireEmitterDirectLighting(
         h, rayDirection, dualVisibility, allowAnalyticFireSpecular);
     if (!genericTransmissionActive)

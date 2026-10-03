@@ -274,7 +274,8 @@ private:
             Disable(HResultMessage("CreateSourceVoice", result));
             return false;
         }
-        const float volume = static_cast<float>(requestedVolumePercent_.load(std::memory_order_acquire)) / 100.0f;
+        const float revealGain = session_ ? session_->Selection().revealGain : 1.0f;
+        const float volume = static_cast<float>(requestedVolumePercent_.load(std::memory_order_acquire)) / 100.0f * revealGain;
         const HRESULT volumeResult = sourceVoice_->SetVolume(volume);
         if (FAILED(volumeResult))
         {
@@ -325,14 +326,16 @@ private:
     {
         if (sourceVoice_ == nullptr) return true;
         const int percent = requestedVolumePercent_.load(std::memory_order_acquire);
-        if (percent == appliedVolumePercent_) return true;
-        const HRESULT result = sourceVoice_->SetVolume(static_cast<float>(percent) / 100.0f);
+        const float revealGain = session_ ? session_->Selection().revealGain : 1.0f;
+        if (percent == appliedVolumePercent_ && revealGain == appliedRevealGain_) return true;
+        const HRESULT result = sourceVoice_->SetVolume(static_cast<float>(percent) / 100.0f * revealGain);
         if (FAILED(result))
         {
             Disable(HResultMessage("SetVolume", result));
             return false;
         }
         appliedVolumePercent_ = percent;
+        appliedRevealGain_ = revealGain;
         return true;
     }
 
@@ -595,6 +598,7 @@ private:
     std::thread worker_;
     std::atomic<int> requestedVolumePercent_{70};
     int appliedVolumePercent_ = -1;
+    float appliedRevealGain_ = -1.0f;
     std::atomic<bool> workerRunning_{false};
     std::atomic<bool> assetsReady_{false};
     std::atomic<bool> backendReady_{false};

@@ -133,7 +133,7 @@ VkTransformMatrixKHR LichInstanceTransform(const horde::gameplay::LichSnapshot& 
     const float activeZ = lich.z - std::cos(lich.facingRadians) * hitRecoil * 0.18f;
     const float yawCos = std::cos(lich.facingRadians);
     const float yawSin = std::sin(lich.facingRadians);
-    const float lean = -0.17f * hitRecoil;
+    const float lean = lich.presentationTiltRadians - 0.17f * hitRecoil;
     const float leanCos = std::cos(lean);
     const float leanSin = std::sin(lean);
     return {{
@@ -184,6 +184,11 @@ CharacterFramePlan EvaluateCharacterFramePlan(
         destination.clip = SkeletonClipForAction(source.action, source.animation);
         destination.time = SkeletonTimeForAction(
             source.action, source.animation, source.actionTime, source.animationTime, skeletonDeadClipDuration);
+        if (source.action == horde::gameplay::EnemyCombatAction::Locomotion &&
+            source.animation == horde::gameplay::EnemyAnimation::Idle)
+        {
+            destination.time += source.idlePhaseSeconds;
+        }
         destination.transform = SkeletonInstanceTransform(source);
         destination.poseBucket = static_cast<std::uint32_t>(plan.skeletonPoseBucketCount);
         for (std::size_t previousIndex = 0u; previousIndex < skeletonIndex; ++previousIndex)
@@ -215,7 +220,8 @@ bool CharacterPoseNeedsRefresh(const int requestedClip,
 
 bool CharacterRenderSlot::LoadAssets(const std::string& skeletonAssetPath,
                                      const std::string& lichAssetPath,
-                                     std::string& diagnostic)
+                                     std::string& diagnostic,
+                                     const bool skeletonOnly)
 {
     if (!skeletonModel_.LoadCombatClips(skeletonAssetPath, diagnostic))
     {
@@ -226,6 +232,15 @@ bool CharacterRenderSlot::LoadAssets(const std::string& skeletonAssetPath,
     {
         diagnostic = "The skeleton Dead clip has no usable duration.";
         return false;
+    }
+    skeletonOnly_ = skeletonOnly;
+    if (skeletonOnly_)
+    {
+        lichModel_ = {};
+        std::vector<horde::scene::TexturedSkinnedRtVertex>{}.swap(lichSkinnedVertices_);
+        std::vector<horde::scene::SkinnedRtVertex>{}.swap(skeletonSkinnedVertices_[1]);
+        diagnostic.clear();
+        return true;
     }
     return lichModel_.LoadClips(
         lichAssetPath, horde::scene::LichPlaceholderClipSet(), diagnostic);
@@ -238,6 +253,11 @@ bool CharacterRenderSlot::PrepareInitialGeometry(std::string& diagnostic)
     {
         if (diagnostic.empty()) diagnostic = "Skeleton produced no skinned vertices.";
         return false;
+    }
+    if (skeletonOnly_)
+    {
+        diagnostic.clear();
+        return true;
     }
     skeletonSkinnedVertices_[1] = skeletonSkinnedVertices_[0];
     if (!lichModel_.SkinTextured(horde::scene::SkinnedClip::Idle, 0.0f, lichSkinnedVertices_, diagnostic) ||
@@ -280,6 +300,12 @@ bool CharacterRenderSlot::CacheFramePlan(
     const horde::gameplay::LichSnapshot& lich,
     std::string& diagnostic)
 {
+    if (skeletonOnly_ && (skeletonCount > 1u ||
+        roster.selectedEnemy != horde::gameplay::EnemyKind::Skeleton))
+    {
+        diagnostic = "Skeleton-only CharacterRenderSlot admits one skeleton and no lich.";
+        return false;
+    }
     if (skeletonCount > kMaximumActiveSkeletons)
     {
         diagnostic = "CharacterRenderSlot supports at most two active skeletons; the frame exceeded that limit.";

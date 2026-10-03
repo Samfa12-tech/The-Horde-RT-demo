@@ -1,0 +1,55 @@
+{
+  "schema": "game-room.room-final-report.v1",
+  "roomId": "horde-collapse-162",
+  "gates": {
+    "function": true,
+    "form": false,
+    "runtime": false
+  },
+  "formChecks": {
+    "floorPlanParity": false,
+    "primaryArrival": false,
+    "symmetry": false,
+    "shell": false,
+    "manifold": false,
+    "booleans": false,
+    "collisions": false,
+    "support": false,
+    "attachmentOrientation": false,
+    "ceilingAttachmentOrientation": false,
+    "seatingOrientation": false,
+    "focalDistribution": false,
+    "heroClearance": false,
+    "colonnades": false,
+    "screenClearance": false,
+    "scale": false,
+    "camera": false,
+    "ceilingCoverage": false,
+    "environmentCoverage": false,
+    "provenance": false
+  },
+  "reviewRenders": {
+    "corners": [],
+    "ceiling": [],
+    "environment": {}
+  },
+  "runtimeChecks": {
+    "vlow": false,
+    "textureTiers": false,
+    "lightmap": false,
+    "lightingManifest": false,
+    "performance": false,
+    "browserCapture": "",
+    "errors": []
+  },
+  "postmortem": {
+    "observations": [],
+    "corrections": [],
+    "remainingRisks": [
+      "Final Form approval and native RT acceptance pending",
+      "Generic validator provider/browser/lightmap fields are inapplicable; free assets/native RT project contract governs",
+      "Phone allocated; collapse sustained mobile cost remains unmeasured"
+    ]
+  },
+  "proposedLessons": []
+}

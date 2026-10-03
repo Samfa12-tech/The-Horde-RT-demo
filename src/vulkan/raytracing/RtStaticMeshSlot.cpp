@@ -1,6 +1,7 @@
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 #include <map>
 #include <unordered_map>
@@ -30,6 +31,8 @@ RtMaterialGpu ConvertMaterial(const horde::scene::assets::StaticMaterial& source
         source.attenuationColor[0], source.attenuationColor[1],
         source.attenuationColor[2], source.numericalSpawnGeometryError}};
     result.textureLayers = textureLayers;
+    result.normalScaleUvScaleBlend = {{
+        source.normalScale, source.textureScale[0], source.textureScale[1], 1.0f}};
     result.materialFlags[0] = source.flags;
     if (source.baseColorTexture >= 0)
         result.materialFlags[0] |= static_cast<std::uint32_t>(RtMaterialFlag::BaseColorTexture);
@@ -343,6 +346,15 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                     !routeTexture(2u, sourceMaterial.ormTexture, "ORM", layers[2]) ||
                     !routeTexture(3u, sourceMaterial.emissiveTexture, "emissive", layers[3]))
                     return false;
+            }
+            if (!std::isfinite(sourceMaterial.normalScale) ||
+                std::any_of(sourceMaterial.textureScale.begin(), sourceMaterial.textureScale.end(),
+                    [](float value) {
+                        return !std::isfinite(value) || value < 1.0f / 1024.0f || value > 1024.0f;
+                    }))
+            {
+                diagnostic = "RtStaticMeshSlot material normal/texture scale is outside the finite authoring contract.";
+                return false;
             }
             materials_.push_back(ConvertMaterial(sourceMaterial, layers));
         }

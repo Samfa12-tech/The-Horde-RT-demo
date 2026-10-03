@@ -106,7 +106,7 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         else if (firstHit.instance == 8u || reflectedHit.instance == 8u)
             RT_DIAG_ADD(productionPaneSecondaryDifferentMediumCount, 1u);
         reflected = skyColor(reflectionDirection) * 0.18 +
-            (reflectedHit.hit ? reflectedHit.base * 0.12 : vec3(0.0));
+            (reflectedHit.hit ? reflectedHit.base * reflectedHit.occlusion * 0.12 : vec3(0.0));
     }
     else
     {
@@ -475,7 +475,7 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
                 1u);
         }
         reflected = skyColor(reflectionDirection) * 0.18 +
-            (reflectedHit.hit ? reflectedHit.base * 0.12 : vec3(0.0));
+            (reflectedHit.hit ? reflectedHit.base * reflectedHit.occlusion * 0.12 : vec3(0.0));
     }
     else
     {

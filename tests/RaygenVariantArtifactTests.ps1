@@ -493,11 +493,11 @@ try {
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
-    # Compatibility pins restore the measured September 30 control traversal;
+    # Compatibility pins identify the admitted 1.6.2 material/environment ABI and shading;
     # the independent fresh compiler check below still validates source identity.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'f4170abbf7f68364d7eeb5d9d01baeed0efacb2fc6db7ab4d1f4c0075dddacd4') `
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'c44a6da3763ad2b288977e805a8708d4a909ebbf6a827782673a2d7af8124dbb') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq 'a3b32262260a25e31fbc880f851baabc5df14bbbb7995fd532e5696afd3e06bb') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '242c203c5b5d1f1660b66cca61824dfd810772d78e285cd747e6347b104052d7') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -535,8 +535,25 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     Assert-FrozenCatalogShape -Catalog $catalog
     Assert-True ((@($catalog.variants | ForEach-Object key | Sort-Object) -join ',') -eq ((@($expectedKeys | Sort-Object)) -join ',')) `
         'Catalog keys must remain the exact approved set without duplicates or reordering.'
-    Assert-True ((@($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' } | Group-Object spirvSha256 | Where-Object Count -eq 2).Count -eq 2)) `
-        'Distinct OpaqueFast artifact paths must permit their reviewed equal raw SPIR-V pairs.'
+    # 1.6.2 High/Max area-shadow sampling specializes OpaqueFast lighting as
+    # well as dielectric lighting. The former equal Mobile/High word pairs are
+    # no longer the admitted snapshot; keep exact reviewed raw-word witnesses.
+    $opaqueWordPins = @{
+        diagnostic_high_opaque_fast = 'da199c3582fab3c3be8ab6fbccf473582e39c5650941524a035054fcd6d0793c'
+        diagnostic_mobile_opaque_fast = '4550106dea8950a90c21dcf49f53dc1c02e36f0ca223e229569b9edf0a262901'
+        shipping_high_opaque_fast = 'a1e88cedb1124aa48f98a6fbe65f573bcc15e96e364e307d1369e9d1c8cba547'
+        shipping_mobile_opaque_fast = '9f278247a969ae90d5cbc5a028d8711861a92f526d3cd1156107b54f55bd784a'
+    }
+    foreach ($row in @($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' })) {
+        Assert-True ($row.spirvSha256 -ceq $opaqueWordPins[$row.key]) `
+            "Reviewed OpaqueFast 1.6.2 raw SPIR-V snapshot changed: $($row.key)"
+    }
+    # Equal raw-word hashes are still a valid catalog shape when two explicit
+    # variant keys/paths compile identically; freshness is checked separately.
+    $equalWordCatalog = Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
+    $equalOpaqueRows = @($equalWordCatalog.variants | Where-Object { $_.material -eq 'OpaqueFast' })
+    $equalOpaqueRows[1].spirvSha256 = $equalOpaqueRows[0].spirvSha256
+    Assert-FrozenCatalogShape -Catalog $equalWordCatalog
     Assert-Throws {
         $unknownFieldCatalog = Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
         $unknownFieldCatalog.variants[0] | Add-Member -NotePropertyName unexpected -NotePropertyValue 'reject'
@@ -709,13 +726,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
-        '03526a113daed58e6b9dc3565e7a0837c2040acdb685339dcd48b9d7219de658') `
+        'fd789de47b4fb20915ba4bea1527d974cf2c5a468ea720288fa9ebb5d9970a9e') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
-        'dcf51ae9a3a19689d7b71bf0e15cc0a00c07947d1417657301b196926b21665b') `
+        'f1ef45cc61cacf0bfb1b50a99f0a4bf78ad7934e8dde22b131eede1c4dbb0b83') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `
         'Temporary artifact compilation modified the worktree.'

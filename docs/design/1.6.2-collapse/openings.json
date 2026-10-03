@@ -1,0 +1,23 @@
+{
+  "schema": "game-room.opening-schedule.v1",
+  "roomId": "horde-collapse-162",
+  "primaryArrival": {
+    "openingId": "blocked-old-entry",
+    "exception": "Owner-directed unusable former entrance. Existing live 1.8m forward doorway is preserved and is outside this art slice."
+  },
+  "openings": [
+    {
+      "id": "blocked-old-entry",
+      "kind": "door",
+      "wall": "original rear cap z3.4",
+      "widthMeters": 2.8,
+      "heightMeters": 2.1,
+      "thresholdMeters": -0.95,
+      "depthMeters": 2.95,
+      "destination": "Impassable rubble before five ascending steps and recessed sealed backing z6.35",
+      "mask": "plans/blocked-opening-mask.png",
+      "cutter": "plans/blocked-opening-cutter.json",
+      "approved": false
+    }
+  ]
+}

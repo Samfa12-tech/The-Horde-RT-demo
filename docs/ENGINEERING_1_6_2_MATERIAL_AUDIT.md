@@ -62,3 +62,25 @@ Checked actual main source, planning Phase3/roadmap sections, engine/validation 
 Next action: lead completes Phase1, fixes shared interfaces/ownership, then assigns M1/M2 implementation. M3/preview indexing and M4 image correction follow with explicit integration review. Shadow and temporal prototype admission wait for settings/timing interfaces and coordinated GPU evidence.
 
 Audio/haptic manual revalidation required: NO - source/documentation audit only; semantic inputs and runtime are unchanged. Owner visual and exact-device material/shadow acceptance remain open.
+
+## Implementation checkpoint (Phase 1 released for material work)
+
+M1/M2 are implemented in the working tree over the baseline above: imported normal scale, named UV/normal overrides, explicit128-byte ABI, stable unmapped tangent fallback, strict authored handedness and UV0/transform diagnostics. Existing static/ABI fixtures were extended; texture aliasing checks now require independent factors. M3 shader metadata decoding is implemented with legacy defaults; scene record registration belongs to `audit_alignment`/lead. M4 AO is a separate visible correction: pure albedo, ambient-only AO in ordinary/secondary floors and dielectric approximate ambient fallback; direct lights, emissions and RT-tested bounce visibility are unchanged. No exposure/light-strength parameters were retuned.
+
+Completed CPU/source checks:
+- `tools/generate-rt-scene-abi.ps1` and `-Check`: PASS; definition identity `4be8372dcbf091d04fc3b4c61b33fd4bac531dcb0b79d71211ee798d720d47ba`.
+- `tests/RtSceneAbiGeneratorTests.ps1`: PASS, including layout/freshness/negative-staleness.
+- One temporary compile of `minimal.comp` Shipping/High/Generic with `glslangValidator -V --target-env vulkan1.2` and variant instrumentation0/quality1/material1, then `spirv-val --target-env vulkan1.2`: PASS. Temporary SPIR-V SHA256 `e8a7b5fe7448890c241b8cf851177e7cf34de4f73612c1861fa4a9033a3016af`. This is syntax/validation evidence only, not the shipped compiler strategy/catalog or hardware presentation.
+- Scoped `git diff --check`: PASS. No compiled catalog/embedded shader writes, GPU use, phone use or commit.
+
+Next action: lead allocates targeted build ownership or runs `horde_rt_static_gltf_asset_tests` and `horde_rt_scene_abi_tests`; fix any resulting regression, then regenerate/check the complete production shader matrix once shared sources settle. Final material/normal/AO image and sustained-cost evidence remain open. Required owner AO acceptance is separate from existing default strength/tiling preservation. No new runtime texture/sample count or asset licence is introduced.
+
+## Validated material handoff and subsequent bounded work
+
+Existing Debug static glTF and scene ABI targets built successfully; affected CTests PASS2/2 in5.23s. Initial MSBuild attempts failed inherited duplicate PATH/Path keys; case-insensitive ProcessStartInfo environment normalization fixed the infrastructure failure without source or credential changes. Durable native invocation helper is outside the repository at ../invoke-native.ps1. Build ownership was released after these checks.
+
+Actual shipped GLB JSON inspection found authored normalTexture.scale0.55 in ChestWood/BlackIron for chest base/lid and BlackIron for reward lantern body/ring. Correctly carrying these values changes their prior ignored-strength appearance; do not call this default image equivalence. Those six material usages need matched normal-correction acceptance alongside separately tracked AO acceptance. Dungeon blend0.34/UV0.42 and assets authored at default1 retain their defaults.
+
+Scene owner integrated all imported records plus five authored world records, with explicit32-material capacity checks and upper16 surface-code indexing for showcase and preview. Both normal-code decoders mask8bits. Later shadow/DRS/temporal foundations and live decisions are recorded in [ENGINEERING_1_6_2_TEMPORAL_DECISIONS.md](ENGINEERING_1_6_2_TEMPORAL_DECISIONS.md). Native material/ABI fixtures, production shader catalog and exact runtime image checks must be repeated only when their dependent source changes; the shadow source change is such a reason for the next integration build.
+
+Additional root-requested M3 authoring: guarded world material records now modulate shared textured albedo with baseColorFactor.rgb, with white fallback when no authored record exists. All existing five records must explicitly initialize white; scene owner owns this CPU initialization and any extra opaque foliage record. This permits geometry-only leaves to use a reused texture category with authored colour and normalScale0, without a new surface type or per-leaf shading. The earlier temporary shadow SPIR-V hashes predate this tiny tint decode change; final catalog compilation is still the authoritative next source check.

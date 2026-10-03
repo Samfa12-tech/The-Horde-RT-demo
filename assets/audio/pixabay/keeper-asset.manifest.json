@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "target": "1.6.2",
+  "license": "Pixabay Content License; no CC0 claim",
+  "licenseSummary": "https://pixabay.com/service/license-summary/",
+  "licenseTerms": "https://pixabay.com/service/terms/",
+  "verifiedAt": "2026-10-03",
+  "sourcePolicy": "Owner originals retained locally and excluded from public Git and packages. Runtime cues integrated in game only; no standalone sound distribution.",
+  "processing": "FFmpeg9 decode to monoPCM16/48k; edge<-60dBFS windows trimmed with25ms reserve;2ms/10ms endpoint ramps; idle excerpt max1.25s; no gain normalization.",
+  "assets": [
+    {
+      "id": "skeleton_falling_bones",
+      "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-falling-bones-87568/",
+      "artist": "spookymodem (Freesound)",
+      "sourceSha256": "f00c6f4efc3d6c66a236812eb140225415e7573d18fc97dd3a1f6cd071fecca7",
+      "sourceBytes": 58560,
+      "runtimePath": "skeleton_falling_bones.wav",
+      "sha256": "66ee82dcab110f14ff7685eb60fa3b0caed32765c6b07f8b654433cd5c97efc9",
+      "bytes": 193964,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 96960,
+      "durationSeconds": 2.02,
+      "peakDbfs": -0.11635087129852337,
+      "decodedTrimFrames": [
+        31920,
+        128880
+      ],
+      "endpointRampsFrames": [
+        96,
+        480
+      ],
+      "gainChangeDb": 0,
+      "trigger": "existing delayed EnemyDefeated fall; replaces enemy_fall, never stacks",
+      "listeningAcceptance": "pending owner exact-candidate audition"
+    },
+    {
+      "id": "skeleton_rattling_bones",
+      "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-rattling-bones-105394/",
+      "artist": "spookymodem (Freesound)",
+      "sourceSha256": "68262eda1e18233f606ee140557f2009bd1ca3a26f76bfc0b49a421f2ec28d70",
+      "sourceBytes": 110400,
+      "runtimePath": "skeleton_idle_rattle.wav",
+      "sha256": "8ac138628c744ab3a3df130abb415b11803145063932b4e6956414d010b504ea",
+      "bytes": 120044,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 60000,
+      "durationSeconds": 1.25,
+      "peakDbfs": -17.2290554753526,
+      "decodedTrimFrames": [
+        6000,
+        66000
+      ],
+      "endpointRampsFrames": [
+        96,
+        480
+      ],
+      "gainChangeDb": 0,
+      "trigger": "sparse SkeletonIncidental; authoritative eligibility and cooldown",
+      "listeningAcceptance": "pending owner exact-candidate audition"
+    },
+    {
+      "id": "lich_i_sense_you",
+      "sourceUrl": "https://pixabay.com/sound-effects/people-lich-demonic-voice-i-sense-you-490452/",
+      "artist": "PhatPhrogStudio",
+      "sourceSha256": "09708962b7eb56de215b8b585aeb7793082c58f1fa07924cd9d4b5e1012a19f0",
+      "sourceBytes": 86935,
+      "runtimePath": "keeper_i_sense_you.wav",
+      "sha256": "b476d7c672cbfce30a38c02f31978d0024f16c658ce2fd8cb716cbf91a994418",
+      "bytes": 248684,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 124320,
+      "durationSeconds": 2.59,
+      "peakDbfs": -2.4502242393883806,
+      "decodedTrimFrames": [
+        1200,
+        125520
+      ],
+      "endpointRampsFrames": [
+        96,
+        480
+      ],
+      "gainChangeDb": 0,
+      "trigger": "KeeperRevealStarted; first entry only",
+      "listeningAcceptance": "pending owner exact-candidate audition"
+    },
+    {
+      "id": "lich_come_closer",
+      "sourceUrl": "https://pixabay.com/sound-effects/horror-lich-demonic-voice-come-closer-502312/",
+      "artist": "PhatPhrogStudio",
+      "sourceSha256": "bee57edcc14830e0a4771c9525e19238f2dfc5ff7be153c7b5ac1f1375a0c5e3",
+      "sourceBytes": 91951,
+      "runtimePath": "keeper_come_closer.wav",
+      "sha256": "7a79e79aa4ebee4920d11f28f9ca140ac1e22b3c5cec2352ee159e0ba117a719",
+      "bytes": 275418,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 137687,
+      "durationSeconds": 2.8684791666666665,
+      "peakDbfs": -3.9033147016373353,
+      "decodedTrimFrames": [
+        240,
+        137927
+      ],
+      "endpointRampsFrames": [
+        96,
+        480
+      ],
+      "gainChangeDb": 0,
+      "trigger": "KeeperWarning; first reveal only",
+      "listeningAcceptance": "pending owner exact-candidate audition"
+    }
+  ]
+}

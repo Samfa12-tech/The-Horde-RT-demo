@@ -172,6 +172,16 @@ bool waterStreamExit(vec3 entryPoint, vec3 insideDirection,
     return true;
 }
 
+vec3 scaledTangentNormal(vec3 sampledNormal, float strength)
+{
+    // Equivalent direction to XY multiplication, with no overflow for finite
+    // signed glTF strengths. Preserve default sample length for dungeon blending.
+    float divisor = max(1.0, abs(strength));
+    vec3 scaled = vec3(sampledNormal.xy * (strength / divisor),
+                       sampledNormal.z / divisor);
+    return dot(scaled, scaled) > 1e-20 ? scaled : vec3(0.0, 0.0, 1.0);
+}
+
 void materialForPrimitive(int primitive,
                           int instance,
                           vec3 p,
@@ -181,8 +191,10 @@ void materialForPrimitive(int primitive,
                           out vec3 base,
                           out float metallic,
                           out float reflectivity,
+                          out float occlusion,
                           out float emissive)
 {
+    occlusion = 1.0;
     material = -1;
     if (instance == kWaterfallInstance)
     {
@@ -270,6 +282,17 @@ void materialForPrimitive(int primitive,
 
     if (material >= kMaterialDryStone && material <= kMaterialAgedMetal)
     {
+        // Upper surface-code bits carry material-record index+1. Zero retains
+        // the accepted authored defaults while a scene without records migrates.
+        vec4 normalUvBlend = vec4(1.0, 0.42, 0.42, 0.34);
+        vec3 materialBaseColor = vec3(1.0);
+        uint materialRecord = code >> 16u;
+        if (materialRecord > 0u && materialRecord <= kRtMaterialCapacity &&
+            materialRecord <= uint(rtMaterials.values.length()))
+        {
+            normalUvBlend = rtMaterials.values[materialRecord - 1u].normalScaleUvScaleBlend;
+            materialBaseColor = rtMaterials.values[materialRecord - 1u].baseColorFactor.rgb;
+        }
         float layer = float(material);
         float puddle = material == kMaterialWetCobble && normalCode == 0u ? puddleMask(p) : 0.0;
         vec2 uv;
@@ -277,11 +300,11 @@ void materialForPrimitive(int primitive,
         if (normalCode == 6u)
         {
             galleryBitangent = normalize(cross(geometricNormal, vec3(0.0, 0.0, 1.0)));
-            uv = vec2(p.z, dot(p, galleryBitangent)) * 0.42;
+            uv = vec2(p.z, dot(p, galleryBitangent)) * normalUvBlend.yz;
         }
         else
         {
-            uv = abs(normal.y) > 0.5 ? p.xz * 0.42 : (abs(normal.x) > 0.5 ? p.zy * 0.42 : p.xy * 0.42);
+            uv = (abs(normal.y) > 0.5 ? p.xz : (abs(normal.x) > 0.5 ? p.zy : p.xy)) * normalUvBlend.yz;
         }
         vec4 albedo = texture(materialDiffuse, vec3(uv, layer));
         vec3 arm = texture(materialArm, vec3(uv, layer)).rgb;
@@ -290,10 +313,13 @@ void materialForPrimitive(int primitive,
             albedo = mix(albedo, texture(materialDiffuse, vec3(uv * 0.72, float(kMaterialDampGround))), puddle * 0.65);
             arm.g = mix(arm.g, 0.08, puddle);
         }
-        base = albedo.rgb * mix(0.62, 1.0, arm.r);
+        base = albedo.rgb * materialBaseColor;
+        occlusion = mix(0.62, 1.0, arm.r);
         metallic = arm.b;
         reflectivity = clamp(1.0 - arm.g, 0.05, 0.96);
-        vec3 tangentNormal = texture(materialNormal, vec3(uv, layer)).xyz * 2.0 - 1.0;
+        vec3 tangentNormal = scaledTangentNormal(
+            texture(materialNormal, vec3(uv, layer)).xyz * 2.0 - 1.0,
+            normalUvBlend.x);
         vec3 mapped;
         if (normalCode == 6u)
         {
@@ -306,7 +332,7 @@ void materialForPrimitive(int primitive,
                 : (abs(normal.x) > 0.5 ? vec3(tangentNormal.z * sign(normal.x), tangentNormal.y, tangentNormal.x)
                                            : vec3(tangentNormal.x, tangentNormal.y, tangentNormal.z * sign(normal.z)));
         }
-        normal = normalize(mix(normal, mapped, 0.34));
+        normal = normalize(mix(normal, mapped, normalUvBlend.w));
     }
     else if (material == kMaterialFlame)
     {
@@ -387,6 +413,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
     h.normal = vec3(0.0, 1.0, 0.0);
     h.geometricNormal = h.normal;
     h.base = vec3(0.0);
+    h.occlusion = 1.0;
     h.metallic = 0.0;
     h.reflectivity = 0.0;
     h.roughness = 1.0;
@@ -501,14 +528,19 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                                       (localTangent.w < 0.0 ? -1.0 : 1.0);
                 RtMaterialGpu staticMaterial =
                     rtMaterials.values[primitiveMetadata.materialIndex];
+                uv *= staticMaterial.normalScaleUvScaleBlend.yz;
                 vec3 sampledNormal = (staticMaterial.materialFlags.x &
                     kRtMaterialFlagNormalTexture) != 0u
                     ? texture(rtNormalTextures,
                         vec3(uv, float(staticMaterial.textureLayers.y))).xyz * 2.0 - 1.0
                     : vec3(0.0, 0.0, 1.0);
-                h.normal = normalize(worldTangent * sampledNormal.x +
-                                     worldBitangent * sampledNormal.y +
-                                     worldNormal * sampledNormal.z);
+                sampledNormal = scaledTangentNormal(
+                    sampledNormal, staticMaterial.normalScaleUvScaleBlend.x);
+                vec3 mappedNormal = worldTangent * sampledNormal.x +
+                                      worldBitangent * sampledNormal.y +
+                                      worldNormal * sampledNormal.z;
+                h.normal = normalize(mix(worldNormal, mappedNormal,
+                    staticMaterial.normalScaleUvScaleBlend.w));
                 if (dot(h.normal, h.geometricNormal) < 0.0)
                     h.normal = -h.normal;
                 vec4 baseSample = (staticMaterial.materialFlags.x &
@@ -527,8 +559,9 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                         vec3(uv, float(staticMaterial.textureLayers.w))).rgb
                     : vec3(1.0);
                 h.material = 100 + int(primitiveMetadata.materialIndex);
-                h.base = baseSample.rgb * staticMaterial.baseColorFactor.rgb *
-                         mix(1.0, orm.r, staticMaterial.metallicRoughnessOcclusionTransmission.z);
+                h.base = baseSample.rgb * staticMaterial.baseColorFactor.rgb;
+                h.occlusion = mix(1.0, orm.r,
+                    staticMaterial.metallicRoughnessOcclusionTransmission.z);
                 h.metallic = clamp(orm.b *
                     staticMaterial.metallicRoughnessOcclusionTransmission.x, 0.0, 1.0);
                 float roughness = clamp(orm.g *
@@ -594,7 +627,7 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
         {
             materialForPrimitive(h.primitive, h.instance, h.position, h.material,
                                  h.normal, h.geometricNormal, h.base, h.metallic,
-                                 h.reflectivity, h.emissive);
+                                 h.reflectivity, h.occlusion, h.emissive);
         }
         if (h.instance == 2 || h.instance == 18)
         {

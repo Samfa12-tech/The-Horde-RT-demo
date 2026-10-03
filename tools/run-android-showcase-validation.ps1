@@ -17,6 +17,7 @@ param(
     [switch]$StagedPrimaryInvestigation,
     [string]$StagedPrimaryManifest = "",
     [string]$ApkPath = "",
+    [string]$ArtifactSourceRoot = "",
     [ValidateNotNullOrEmpty()]
     [string]$DeviceSerial = "R5GL219SZGK",
     [ValidateNotNullOrEmpty()]
@@ -30,6 +31,10 @@ $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $androidRoot = Join-Path $repoRoot "android"
 if ($ApkPath -and -not $SkipBuild) { throw 'An explicit immutable ApkPath requires SkipBuild.' }
+if ($ArtifactSourceRoot -and (-not $SkipBuild -or -not $ApkPath)) {
+    throw 'ArtifactSourceRoot requires SkipBuild and an explicit immutable ApkPath.'
+}
+$artifactRepositoryRoot = if ($ArtifactSourceRoot) { [IO.Path]::GetFullPath($ArtifactSourceRoot) } else { $repoRoot }
 $apk = ""
 . (Join-Path $PSScriptRoot 'AndroidStagedPrimaryAdmission.ps1')
 $validationTarget = Resolve-AndroidShowcaseValidationTarget -StagedPrimary ([bool]$StagedPrimaryInvestigation) `
@@ -38,17 +43,27 @@ $validationTarget = Resolve-AndroidShowcaseValidationTarget -StagedPrimary ([boo
 $packageName = $validationTarget.package
 $activityName = "$packageName/com.samfa12.hordelanternrt.MainActivity"
 $adb = Join-Path $env:LOCALAPPDATA "Android\Sdk\platform-tools\adb.exe"
-$runId = Get-Date -Format "yyyyMMdd-HHmmss"
+$runId = (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '-' + [Guid]::NewGuid().ToString('N').Substring(0,8)
 $outputDirectory = [IO.Path]::GetFullPath((Join-Path $OutputRoot "run-$runId"))
+$repositoryPrefix = $repoRoot.TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar
+$privateReportsPrefix = [IO.Path]::GetFullPath((Join-Path $repoRoot 'reports')).TrimEnd('\','/') + [IO.Path]::DirectorySeparatorChar
+if ($outputDirectory.StartsWith($repositoryPrefix, [StringComparison]::OrdinalIgnoreCase) -and
+    -not $outputDirectory.StartsWith($privateReportsPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'Raw device logs/screenshots must stay in ignored reports or outside the source repository.'
+}
+$runLogStart = ''; $operationLogStart = ''; $lastLogProcessId = ''
+$observedLogProcessIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 $gpuTimingEnabled = $GpuTiming -eq "Enabled"
 $gpuTimingLabel = $GpuTiming.ToLowerInvariant()
 $gpuTimingArgument = $(if ($gpuTimingEnabled) { "true" } else { "false" })
 $reference60FpsMs = 1000.0 / 60.0
 $reference50FpsMs = 20.0
 $reference30FpsMs = 1000.0 / 30.0
-$sourceCommit = (& git -C $repoRoot rev-parse HEAD 2>&1 | Out-String).Trim()
+$sourceCommit = (& git -C $artifactRepositoryRoot rev-parse HEAD 2>&1 | Out-String).Trim()
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceCommit)) { throw "Could not resolve the source Git commit." }
-$sourceDirty = -not [string]::IsNullOrWhiteSpace((& git -C $repoRoot status --porcelain 2>&1 | Out-String).Trim())
+$sourceDirty = -not [string]::IsNullOrWhiteSpace((& git -C $artifactRepositoryRoot status --porcelain 2>&1 | Out-String).Trim())
+$runnerSourceCommit = (& git -C $repoRoot rev-parse HEAD 2>&1 | Out-String).Trim()
+if ($LASTEXITCODE -ne 0) { throw 'Could not resolve the validation runner source commit.' }
 $checkpointZones = @{
     "opening" = "opening"
     "skeleton" = "skeleton-room"
@@ -149,6 +164,7 @@ $warnings = [System.Collections.Generic.List[string]]::new()
 $selectedRtPipelineBundle = $null
 $selectedRtPipelineBundleSerialized = $null
 $initialWakefulness = ""
+$automationSessionStarted = $false
 $lifecycleEvidence = [ordered]@{
     requested = [bool]$Capture
     homeResumePassed = $false
@@ -167,8 +183,52 @@ function Invoke-AdbText {
     return $output
 }
 
+function Get-ExpectedShowcaseInstanceCapacity {
+    param([string]$RepositoryRoot)
+    $abi = Get-Content -LiteralPath (Join-Path $RepositoryRoot 'src/vulkan/raytracing/RtSceneAbi.def') -Raw | ConvertFrom-Json
+    if ($abi.schema -ne 1 -or
+        ($abi.capacities.instanceMetadata -isnot [int] -and $abi.capacities.instanceMetadata -isnot [long]) -or
+        $abi.capacities.instanceMetadata -lt 1 -or $abi.capacities.instanceMetadata -gt 256) {
+        throw 'The checkout has no valid generated showcase instance capacity.'
+    }
+    return [int]$abi.capacities.instanceMetadata
+}
+
+function New-ScopedLogcatArguments {
+    param([string]$StartTimestamp, [string]$ProcessId)
+    if ($StartTimestamp -cnotmatch '^\d+\.\d{9}$' -or $ProcessId -cnotmatch '^[1-9]\d*$') {
+        throw 'Logcat requires a precise device-time lower bound and one actual app PID.'
+    }
+    return @('logcat', '-d', '-b', 'main', '-b', 'crash', '-v', 'threadtime', '-T', $StartTimestamp,
+        "--pid=$ProcessId", '-s', 'HordeRtProbeBridge', 'HordeLanternAudio', 'AndroidRuntime', 'libc')
+}
+
+function Start-ScopedLogWindow {
+    param([switch]$NewRun)
+    # Device clock avoids host/device clock skew and a decimal point prevents
+    # logcat interpreting -T as a line count. No global buffers are cleared.
+    $stamp = (Invoke-AdbText @('shell', 'date', '+%s.%N')).Trim()
+    if ($stamp -cnotmatch '^\d+\.\d{9}$') { throw 'Device date did not supply a precise logcat timestamp.' }
+    $script:operationLogStart = $stamp
+    if ($NewRun) {
+        $script:runLogStart = $stamp; $script:lastLogProcessId = ''
+        $script:observedLogProcessIds.Clear()
+    }
+}
+
 function Get-ScopedLogcat {
-    return Invoke-AdbText @("logcat", "-d", "-v", "threadtime", "-s", "HordeRtProbeBridge", "HordeLanternAudio", "AndroidRuntime")
+    param([switch]$WholeRun)
+    $liveProcessId = (Invoke-AdbText @('shell', 'pidof', $packageName) -AllowFailure).Trim()
+    if ($liveProcessId -cmatch '^[1-9]\d*$') {
+        $script:lastLogProcessId = $liveProcessId
+        $null = $script:observedLogProcessIds.Add($liveProcessId)
+    } elseif ($liveProcessId) { throw 'The validation app has an ambiguous PID; no other process logs will be collected.' }
+    if (-not $script:lastLogProcessId) { return '' } # Startup may not have created its process yet.
+    $stamp = if ($WholeRun) { $script:runLogStart } else { $script:operationLogStart }
+    $processIds = if ($WholeRun) { @($script:observedLogProcessIds) } else { @($script:lastLogProcessId) }
+    return (@(foreach ($processId in $processIds) {
+        Invoke-AdbText (New-ScopedLogcatArguments -StartTimestamp $stamp -ProcessId $processId)
+    }) -join "`n")
 }
 
 function Wait-ForLogPattern {
@@ -299,6 +359,7 @@ function Save-Screenshot {
 function Send-AutomationIntent {
     param([string]$Checkpoint, [int]$RequestedScale, [switch]$Replay, [switch]$CaptureOnly,
           [int]$RtWorkload = -1)
+    Start-ScopedLogWindow
     $arguments = @("shell", "am", "start", "--activity-single-top", "-n", $activityName,
                    "--ei", "horde.debug.scale", "$RequestedScale",
                    "--ez", "horde.debug.autostart", "true",
@@ -333,7 +394,7 @@ function Test-CheckpointPlayerOwnership {
 function Invoke-CaptureCheckpoint {
     param([string]$Checkpoint, [int]$RequestedScale, [int]$Index)
     if (-not $checkpointZones.ContainsKey($Checkpoint)) { throw "Unknown capture checkpoint '$Checkpoint'." }
-    Write-Host "Capturing deterministic scene-only checkpoint $Checkpoint at $RequestedScale%..."
+    Write-Host "Capturing private deterministic native-display checkpoint $Checkpoint at $RequestedScale%..."
     Send-AutomationIntent -Checkpoint $Checkpoint -RequestedScale $RequestedScale -CaptureOnly
     $escapedName = [regex]::Escape($Checkpoint)
     $log = Wait-ForLogPattern -Pattern "HORDE_CAPTURE_READY generation=\d+ checkpoint=$escapedName scale=$RequestedScale stable_frames=12 presented=1" -Description "$Checkpoint capture-ready marker"
@@ -397,8 +458,8 @@ function Invoke-CaptureCheckpoint {
         -not (Test-CheckpointPlayerOwnership $Checkpoint $state))) {
         $failures.Add("$Checkpoint lacks the requested anatomical gameplay profile or nonduplicating primary ownership.")
     }
-    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 21) {
-        $failures.Add("$Checkpoint reported $($state.tlasInstanceCount) TLAS instances instead of the generated capacity 21 (RtSceneAbi.def instanceMetadata=21).")
+    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne $expectedShowcaseInstanceCapacity) {
+        $failures.Add("$Checkpoint reported $($state.tlasInstanceCount) TLAS instances instead of this checkout's generated capacity $expectedShowcaseInstanceCapacity.")
     }
     $image = Save-Screenshot ("capture-{0:d2}-{1}-{2}" -f $Index, $Checkpoint, $RequestedScale)
     $captureRecords.Add([PSCustomObject]@{
@@ -426,7 +487,9 @@ function Invoke-CaptureCheckpoint {
         playerSkinCpuAverageMs = $state.playerSkinCpuAverageMs
         playerMaxSocketErrorM = $state.playerMaxSocketErrorM
         tlasInstanceCount = $state.tlasInstanceCount
-        sceneOnly = $true
+        sceneOnly = $false
+        nativeDisplayCapture = $true
+        privateEvidence = $true
         overlaysHidden = @("menu", "touch-actions", "HUD", "diagnostics", "developer-overlay")
         png = $image
         nativeStateFile = [IO.Path]::GetFileName($statePath)
@@ -435,6 +498,7 @@ function Invoke-CaptureCheckpoint {
 
 function Invoke-HomeResumeLifecycleCheck {
     Write-Host "Checking Android Home/resume surface recreation..."
+    Start-ScopedLogWindow
     $beforeLog = Get-ScopedLogcat
     $presentationPattern = "RT frame reached Android swapchain presentation"
     $presentationCountBefore = [regex]::Matches($beforeLog, $presentationPattern).Count
@@ -458,6 +522,7 @@ function Invoke-HomeResumeLifecycleCheck {
 
 function Start-AutomationSession {
     param([int]$RequestedScale)
+    Start-ScopedLogWindow
     Invoke-AdbText @("shell", "am", "start", "-n", $activityName,
                      "--ei", "horde.debug.scale", "$RequestedScale",
                      "--ez", "horde.debug.autostart", "true",
@@ -471,7 +536,6 @@ function Invoke-CheckpointBenchmark {
         throw "Unknown checkpoint '$Checkpoint'."
     }
     Write-Host "Benchmarking $Checkpoint at $RequestedScale% with GPU timing $gpuTimingLabel ($RtLabProfile)..."
-    if ($RtWorkload -ge 0) { Invoke-AdbText @("logcat", "-c") | Out-Null }
     Send-AutomationIntent -Checkpoint $Checkpoint -RequestedScale $RequestedScale -RtWorkload $RtWorkload
     $escapedName = [regex]::Escape($Checkpoint)
     $log = Wait-ForLogPattern -Pattern "HORDE_BENCH complete generation=\d+ checkpoint=$escapedName scale=$RequestedScale windows=3" -Description "$Checkpoint benchmark completion"
@@ -561,8 +625,8 @@ function Invoke-CheckpointBenchmark {
         -not (Test-CheckpointPlayerOwnership $Checkpoint $state))) {
         $failures.Add("$Checkpoint benchmark lacks the requested anatomical gameplay profile or nonduplicating primary ownership.")
     }
-    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne 21) {
-        $failures.Add("$Checkpoint benchmark reported $($state.tlasInstanceCount) TLAS instances instead of the generated capacity 21 (RtSceneAbi.def instanceMetadata=21).")
+    if ($Checkpoint.StartsWith("player-") -and [int]$state.tlasInstanceCount -ne $expectedShowcaseInstanceCapacity) {
+        $failures.Add("$Checkpoint benchmark reported $($state.tlasInstanceCount) TLAS instances instead of this checkout's generated capacity $expectedShowcaseInstanceCapacity.")
     }
     if ($RtWorkload -ge 0 -and [int]$state.rtLab.workloadPreset -ne $RtWorkload) {
         $failures.Add("$Checkpoint $RtLabProfile state reported workload $($state.rtLab.workloadPreset) instead of $RtWorkload.")
@@ -583,6 +647,7 @@ function Invoke-CheckpointBenchmark {
     if ([int]$state.benchmarkWindowsCompleted -ne 3) { $failures.Add("$Checkpoint native state completed $($state.benchmarkWindowsCompleted) timing windows.") }
 }
 
+$expectedShowcaseInstanceCapacity = Get-ExpectedShowcaseInstanceCapacity -RepositoryRoot $artifactRepositoryRoot
 if (-not (Test-Path -LiteralPath $adb)) { throw "adb not found: $adb" }
 New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
 
@@ -605,7 +670,7 @@ try {
     $osBuildFingerprint = Invoke-AdbText @("shell", "getprop", "ro.build.fingerprint")
     $displaySize = Invoke-AdbText @("shell", "wm", "size")
     $displayDensity = Invoke-AdbText @("shell", "wm", "density")
-    $deviceBuild = Invoke-AdbText @("shell", "getprop")
+    $deviceBuild = @("model=$deviceModel", "android=$androidVersion", "api=$apiLevel", "build=$osBuildFingerprint") -join "`n"
     $packageBeforeInstall = Invoke-AdbText @("shell", "dumpsys", "package", $packageName) -AllowFailure
     $thermalBefore = Invoke-AdbText @("shell", "dumpsys", "thermalservice") -AllowFailure
     $batteryBefore = Invoke-AdbText @("shell", "dumpsys", "battery") -AllowFailure
@@ -651,8 +716,9 @@ try {
         throw "Installed base APK SHA-256 $installedApkHash does not match local debug APK $apkHash."
     }
 
-    Invoke-AdbText @("logcat", "-c") | Out-Null
+    $automationSessionStarted = $true
     Invoke-AdbText @("shell", "am", "force-stop", $packageName) | Out-Null
+    Start-ScopedLogWindow -NewRun
     Start-AutomationSession -RequestedScale $Scale
     $startupLog = Wait-ForLogPattern -Pattern "RT frame reached Android swapchain presentation" -Description "honest RT presentation"
     if ($startupLog -notmatch "HORDE_GPU_TIMING mode=$gpuTimingLabel rt_rendering=unchanged") {
@@ -718,6 +784,10 @@ try {
             installedApkSha256 = $installedApkHash
             sourceCommit = $sourceCommit
             sourceDirty = $sourceDirty
+            runnerSourceCommit = $runnerSourceCommit
+            artifactSourceRootExplicit = [bool]$ArtifactSourceRoot
+            privateEvidence = $true
+            expectedShowcaseInstanceCapacity = $expectedShowcaseInstanceCapacity
             selectedRtPipelineBundle = $script:selectedRtPipelineBundle
             checkpointCount = $captureRecords.Count
             checkpoints = @($captureRecords)
@@ -749,7 +819,7 @@ try {
         }
     }
 
-    $finalLog = Get-ScopedLogcat
+    $finalLog = Get-ScopedLogcat -WholeRun
     $finalLog | Set-Content -LiteralPath (Join-Path $outputDirectory "logcat.txt") -Encoding utf8
     $crashPattern = "FATAL EXCEPTION|Fatal signal|renderer initialisation failed|Diagnostic surface render loop ended unexpectedly|Failed to apply requested RT render scale"
     if ($finalLog -match $crashPattern) { $failures.Add("Current logcat contains a fatal/runtime renderer failure marker.") }
@@ -772,6 +842,11 @@ try {
     $timingRows | Export-Csv -LiteralPath (Join-Path $outputDirectory "timing.csv") -NoTypeInformation
     $metadata = [ordered]@{
         schema = 8
+        privateEvidence = $true
+        evidenceScope = 'Actual validation app PID(s), selected tags, precise device-time run lower bound; raw display screenshots require private owner review.'
+        logDeviceTimeStart = $runLogStart
+        logProcessIds = @($observedLogProcessIds)
+        expectedShowcaseInstanceCapacity = $expectedShowcaseInstanceCapacity
         runId = $runId
         mode = $Mode
         scale = $Scale
@@ -797,6 +872,8 @@ try {
         installedApkSha256 = $installedApkHash
         sourceCommit = $sourceCommit
         sourceDirty = $sourceDirty
+        runnerSourceCommit = $runnerSourceCommit
+        artifactSourceRootExplicit = [bool]$ArtifactSourceRoot
         selectedRtPipelineBundle = $script:selectedRtPipelineBundle
         captureRequested = [bool]$Capture
         captureCheckpointCount = $captureRecords.Count
@@ -849,9 +926,11 @@ try {
     if ($failures.Count) { throw "Validation failed: $($failures -join ' ')" }
     Write-Host "Android showcase validation passed: $outputDirectory"
 } finally {
-    try { Invoke-AdbText @("shell", "am", "force-stop", $packageName) -AllowFailure | Out-Null } catch {}
+    if ($automationSessionStarted) {
+        try { Invoke-AdbText @("shell", "am", "force-stop", $packageName) -AllowFailure | Out-Null } catch {}
+    }
     try {
-        if ($initialWakefulness -match "mWakefulness=Asleep") {
+        if ($automationSessionStarted -and $initialWakefulness -match "mWakefulness=Asleep") {
             $currentPower = Invoke-AdbText @("shell", "dumpsys", "power") -AllowFailure
             if ($currentPower -match "mWakefulness=Awake") {
                 Invoke-AdbText @("shell", "input", "keyevent", "26") -AllowFailure | Out-Null

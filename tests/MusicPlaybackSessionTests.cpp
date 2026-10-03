@@ -218,6 +218,60 @@ void TestLoopsPauseAndReset(const Clips& clips)
     Check(session.Render(input, std::span(actual).first(3u)) == MusicPcmStatus::InvalidOutput,
           "odd output span is rejected before advancing");
 }
+
+void TestRevealGainPublication(const Clips& clips)
+{
+    MusicPlaybackInbox inbox;
+    MusicPlaybackSession session(clips.clips);
+    SimulationSnapshot snapshot;
+    snapshot.tickIndex = 120u;
+    snapshot.lich.revealPhase = KeeperRevealPhase::Awakening;
+    snapshot.lich.revealElapsedSeconds = 2.0f;
+    inbox.Publish(snapshot, {}, 1u, 0u, false);
+    auto packet = inbox.Take();
+    Check(session.Observe(packet) == MusicPcmStatus::Ok &&
+          std::abs(session.Selection().revealGain - 0.72f) < 0.0001f,
+          "worker session forwards the shared reveal output gain");
+    MusicPcmStream reference(clips.clips);
+    Check(reference.SetSelection({.cue=MusicCue::D, .looping=true, .revision=1u}) == MusicPcmStatus::Ok,
+          "gain reference selects canonical exploration PCM");
+    std::array<float, 64u> actual{}, expected{};
+    Check(session.Render(packet, actual) == MusicPcmStatus::Ok &&
+          reference.Render(expected) == MusicPcmStatus::Ok && actual == expected,
+          "output envelope leaves canonical Core PCM and stored sample gain unchanged");
+    snapshot.tickIndex = 240u;
+    snapshot.lich.revealElapsedSeconds = 4.0f;
+    inbox.Publish(snapshot, {}, 1u, 0u, false);
+    snapshot.tickIndex = 300u;
+    snapshot.lich.revealElapsedSeconds = 5.0f;
+    inbox.Publish(snapshot, {}, 1u, 0u, false);
+    snapshot.tickIndex = 250u;
+    snapshot.lich.revealElapsedSeconds = 2.0f;
+    Check(!inbox.Publish(snapshot, {}, 1u, 0u, false),
+          "stale snapshot cannot roll back a coalesced reveal gain");
+    packet = inbox.Take();
+    Check(session.Observe(packet) == MusicPcmStatus::Ok && packet.snapshot.tickIndex == 300u &&
+          session.Selection().revealGain > 0.72f && session.Selection().revealGain < 1.0f,
+          "latest coalesced fixed-step reveal time supplies device output gain");
+    const float gainBeforePause = session.Selection().revealGain;
+    snapshot = packet.snapshot;
+    ++snapshot.tickIndex;
+    snapshot.lich.revealElapsedSeconds = 5.9f;
+    inbox.Publish(snapshot, {}, 1u, 0u, true);
+    packet = inbox.Take();
+    const auto framesBeforePause = session.GeneratedFrames();
+    Check(session.Render(packet, actual) == MusicPcmStatus::Suspended &&
+          session.Selection().revealGain == gainBeforePause &&
+          session.GeneratedFrames() == framesBeforePause,
+          "suspended session freezes both the output envelope and Core clock");
+    snapshot = {};
+    ++snapshot.retryGeneration;
+    inbox.Publish(snapshot, {}, 1u, 0u, false);
+    packet = inbox.Take();
+    Check(session.Observe(packet) == MusicPcmStatus::Ok &&
+          session.Selection().revealGain == 1.0f && session.GeneratedFrames() == 0u,
+          "restart clears stale duck and queued stream epoch at the same ownership boundary");
+}
 } // namespace
 
 int main()
@@ -227,5 +281,6 @@ int main()
     TestInboxOverflowAndCoherence();
     TestPreciseOneShots(clips);
     TestLoopsPauseAndReset(clips);
+    TestRevealGainPublication(clips);
     return passed ? 0 : 1;
 }

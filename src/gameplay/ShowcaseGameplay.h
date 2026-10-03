@@ -446,15 +446,22 @@ private:
     {
         for (auto& encounter : snapshot_.encounters)
         {
-            encounter.status = EncounterStatus::Inactive;
+            if (encounter.status != EncounterStatus::Dead)
+            {
+                encounter.status = EncounterStatus::Inactive;
+            }
         }
         EnemyEncounterSnapshot* selected = Find(kind);
         if (selected == nullptr)
         {
             return;
         }
-        selected->status = EncounterStatus::Active;
-        ++selected->resetGeneration;
+        if (selected->status != EncounterStatus::Dead)
+        {
+            selected->status = EncounterStatus::Active;
+        }
+        // Selection is visibility ownership, not an encounter-attempt reset.
+        if (selected->resetGeneration == 0u) ++selected->resetGeneration;
         snapshot_.selectedEnemy = kind;
         snapshot_.renderedEnemyCount = 1;
         snapshot_.renderedEnemies.fill(EnemyKind::None);
@@ -473,11 +480,36 @@ enum class LichPhase
     Dead,
 };
 
+enum class KeeperRevealPhase : std::uint8_t
+{
+    Dormant,
+    Awakening,
+    Warning,
+    Ready,
+    RetryRecognition,
+    Combat,
+    Defeated,
+};
+
+constexpr bool IsKeeperRevealing(KeeperRevealPhase phase)
+{
+    return phase == KeeperRevealPhase::Awakening ||
+           phase == KeeperRevealPhase::Warning ||
+           phase == KeeperRevealPhase::Ready ||
+           phase == KeeperRevealPhase::RetryRecognition;
+}
+
 using FinaleEndingPhase = horde::gameplay::interactions::FinaleEndingPhase;
 
 struct LichSnapshot
 {
     LichPhase phase = LichPhase::Dormant;
+    KeeperRevealPhase revealPhase = KeeperRevealPhase::Dormant;
+    float revealElapsedSeconds = 0.0f;
+    float presentationTiltRadians = 0.0f;
+    float titleOpacity = 0.0f;
+    bool revealStarted = false;
+    bool revealComplete = false;
     float x = -32.2f;
     float y = -0.77f;
     float z = -13.1f;
@@ -499,8 +531,11 @@ struct LichSnapshot
 class LichEncounter
 {
 public:
+    LichEncounter() { Reset(); }
+
     const LichSnapshot& Update(float deltaSeconds, float playerX, float playerZ,
-                               bool staffHasLineOfSight, bool finaleActive)
+                               bool staffHasLineOfSight, bool finaleActive,
+                               bool revealMayStart = true)
     {
         deltaSeconds = std::clamp(deltaSeconds, 0.0f, 0.05f);
         snapshot_.damagePulse = false;
@@ -521,13 +556,31 @@ public:
             const float deathDelta = std::min(deltaSeconds, deathTimeRemaining);
             snapshot_.phaseTime = std::min(kDeathAnimationDuration, snapshot_.phaseTime + deathDelta);
             snapshot_.animationTime = snapshot_.phaseTime;
+            if (!legacyCapture_)
+            {
+                snapshot_.y = deathStartY_ + (kBaseY - deathStartY_) *
+                    SmoothStep(snapshot_.phaseTime / 0.85f);
+            }
             snapshot_.deathAnimationComplete =
                 snapshot_.phaseTime + 0.00001f >= kDeathAnimationDuration;
             snapshot_.staffLightStrength = 0.0f;
             return snapshot_;
         }
 
-        if (!finaleActive)
+        if (!snapshot_.revealStarted && finaleActive && revealMayStart && deltaSeconds > 0.0f)
+        {
+            snapshot_.revealStarted = true;
+            snapshot_.revealPhase = KeeperRevealPhase::Awakening;
+        }
+        if (IsKeeperRevealing(snapshot_.revealPhase))
+        {
+            AdvanceReveal(deltaSeconds, playerX, playerZ);
+            // Combat gets its complete first tick after the authored boundary.
+            // No reveal remainder can silently spend a charge wind-up.
+            return snapshot_;
+        }
+
+        if (!finaleActive || !snapshot_.revealComplete)
         {
             snapshot_.phase = LichPhase::Dormant;
             snapshot_.phaseTime = 0.0f;
@@ -540,15 +593,22 @@ public:
             snapshot_.phaseTime = 0.0f;
         }
         snapshot_.animationTime += deltaSeconds;
+        combatTime_ += deltaSeconds;
         snapshot_.phaseTime += deltaSeconds;
-        snapshot_.y = kBaseY + kHoverAmplitude * std::sin(snapshot_.animationTime * kHoverRadiansPerSecond);
+        snapshot_.y = kBaseY + (legacyCapture_ ? 0.0f : kRevealRise) +
+            kHoverAmplitude * (legacyCapture_ ? 1.0f : SmoothStep(combatTime_ / 0.5f)) *
+            std::sin((legacyCapture_ ? snapshot_.animationTime : combatTime_) * kHoverRadiansPerSecond);
 
         const float toPlayerX = playerX - snapshot_.x;
         const float toPlayerZ = playerZ - snapshot_.z;
         const float distance = std::sqrt(toPlayerX * toPlayerX + toPlayerZ * toPlayerZ);
         if (distance > 0.0001f)
         {
-            snapshot_.facingRadians = std::atan2(toPlayerX, toPlayerZ);
+            const float targetFacing = std::atan2(toPlayerX, toPlayerZ);
+            if (legacyCapture_)
+                snapshot_.facingRadians = targetFacing;
+            else
+                TurnToward(targetFacing, deltaSeconds, 1.65f);
             MaintainRange(deltaSeconds, toPlayerX, toPlayerZ, distance,
                           MovementScaleForPhase(snapshot_.phase));
         }
@@ -597,7 +657,7 @@ public:
 
     bool TryAcceptPlayerHit(float playerX, float playerZ)
     {
-        if (snapshot_.phase == LichPhase::Dormant || snapshot_.phase == LichPhase::Dead ||
+        if (!snapshot_.revealComplete || snapshot_.phase == LichPhase::Dormant || snapshot_.phase == LichPhase::Dead ||
             snapshot_.health <= 0 || snapshot_.hitCooldownRemaining > 0.00001f)
         {
             return false;
@@ -625,8 +685,42 @@ public:
     void Reset()
     {
         snapshot_ = {};
+        snapshot_.x = kKeeperStagingPosition.x;
+        snapshot_.z = kKeeperStagingPosition.z;
+        snapshot_.facingRadians = 1.57079632679f;
+        snapshot_.presentationTiltRadians = kRestingTilt;
         hitPulseTime_ = 0.0f;
         hitRecoilTime_ = 0.0f;
+        combatTime_ = 0.0f;
+        legacyCapture_ = false;
+    }
+
+    // Authored deterministic captures deliberately bypass the live reveal and
+    // retain their original actor position/hover/timing. This is an import,
+    // never a simulation fast-forward that could emit gameplay feedback.
+    void ImportCombatCheckpoint()
+    {
+        Reset();
+        snapshot_.x = -32.2f;
+        snapshot_.y = kBaseY;
+        snapshot_.z = -13.1f;
+        snapshot_.facingRadians = 0.0f;
+        snapshot_.presentationTiltRadians = 0.0f;
+        snapshot_.phase = LichPhase::MaintainingRange;
+        snapshot_.revealPhase = KeeperRevealPhase::Combat;
+        snapshot_.revealElapsedSeconds = kRevealDuration;
+        snapshot_.revealStarted = true;
+        snapshot_.revealComplete = true;
+        legacyCapture_ = true;
+    }
+
+    void BeginRetryRecognition()
+    {
+        Reset();
+        snapshot_.revealStarted = true;
+        snapshot_.revealPhase = KeeperRevealPhase::RetryRecognition;
+        snapshot_.y = kBaseY + kRevealRise;
+        snapshot_.presentationTiltRadians = 0.0f;
     }
 
     const LichSnapshot& Snapshot() const { return snapshot_; }
@@ -647,11 +741,78 @@ public:
     static constexpr float kHitRecoilDuration = 0.38f;
     static constexpr float kStaffLightStart = 0.55f;
     static constexpr float kStaffLightPeak = 2.20f;
+    static constexpr float kRevealDuration = 6.0f;
+    static constexpr float kRetryRecognitionDuration = 1.0f;
+    static constexpr float kRevealRise = 0.25f;
 
 private:
+    static float SmoothStep(float value)
+    {
+        value = std::clamp(value, 0.0f, 1.0f);
+        return value * value * (3.0f - 2.0f * value);
+    }
+
+    void TurnToward(float target, float deltaSeconds, float radiansPerSecond)
+    {
+        const float difference = std::remainder(target - snapshot_.facingRadians, 6.28318530718f);
+        snapshot_.facingRadians += std::clamp(difference,
+            -deltaSeconds * radiansPerSecond, deltaSeconds * radiansPerSecond);
+    }
+
+    void AdvanceReveal(float deltaSeconds, float playerX, float playerZ)
+    {
+        const bool retry = snapshot_.revealPhase == KeeperRevealPhase::RetryRecognition;
+        const float duration = retry ? kRetryRecognitionDuration : kRevealDuration;
+        snapshot_.revealElapsedSeconds = std::min(duration, snapshot_.revealElapsedSeconds + deltaSeconds);
+        const float elapsed = snapshot_.revealElapsedSeconds;
+        snapshot_.staffLightStrength = 0.0f;
+        snapshot_.phaseTime = 0.0f;
+        snapshot_.damagePulse = false;
+        if (retry)
+        {
+            snapshot_.animationTime += deltaSeconds;
+            snapshot_.titleOpacity = 0.0f;
+        }
+        else
+        {
+            if (elapsed > 0.65f) snapshot_.animationTime += deltaSeconds;
+            snapshot_.y = kBaseY + kRevealRise * SmoothStep((elapsed - 1.0f) / 2.0f);
+            const float warning = SmoothStep((elapsed - 3.0f) / 0.65f) *
+                (1.0f - SmoothStep((elapsed - 4.5f) / 1.5f));
+            snapshot_.presentationTiltRadians =
+                kRestingTilt * (1.0f - SmoothStep((elapsed - 0.65f) / 1.35f)) - 0.10f * warning;
+            snapshot_.titleOpacity = SmoothStep((elapsed - 3.0f) / 0.3f) *
+                (1.0f - SmoothStep((elapsed - 4.5f) / 0.5f));
+            snapshot_.revealPhase = elapsed >= 4.5f ? KeeperRevealPhase::Ready :
+                elapsed >= 3.0f ? KeeperRevealPhase::Warning : KeeperRevealPhase::Awakening;
+        }
+        if (retry || elapsed >= 3.0f)
+        {
+            const float dx = playerX - snapshot_.x;
+            const float dz = playerZ - snapshot_.z;
+            if (std::hypot(dx, dz) > 0.0001f)
+                TurnToward(std::atan2(dx, dz), deltaSeconds, 0.85f);
+        }
+        if (elapsed + 0.00001f >= duration)
+        {
+            snapshot_.revealElapsedSeconds = duration;
+            snapshot_.revealComplete = true;
+            snapshot_.revealPhase = KeeperRevealPhase::Combat;
+            snapshot_.phase = LichPhase::MaintainingRange;
+            snapshot_.presentationTiltRadians = 0.0f;
+            snapshot_.titleOpacity = 0.0f;
+            snapshot_.y = kBaseY + kRevealRise;
+            combatTime_ = 0.0f;
+        }
+    }
+
     void BeginDeath()
     {
+        deathStartY_ = snapshot_.y;
         snapshot_.phase = LichPhase::Dead;
+        snapshot_.revealPhase = KeeperRevealPhase::Defeated;
+        snapshot_.presentationTiltRadians = 0.0f;
+        snapshot_.titleOpacity = 0.0f;
         snapshot_.phaseTime = 0.0f;
         snapshot_.animationTime = 0.0f;
         snapshot_.staffLightStrength = 0.0f;
@@ -706,6 +867,7 @@ private:
     }
 
     static constexpr float kBaseY = -0.77f;
+    static constexpr float kRestingTilt = -0.16f;
     static constexpr float kHoverAmplitude = 0.06f;
     static constexpr float kHoverRadiansPerSecond = 1.65f;
     static constexpr float kMoveSpeed = 0.55f;
@@ -719,6 +881,9 @@ private:
     LichSnapshot snapshot_{};
     float hitPulseTime_ = 0.0f;
     float hitRecoilTime_ = 0.0f;
+    float combatTime_ = 0.0f;
+    float deathStartY_ = kBaseY;
+    bool legacyCapture_ = false;
 };
 
 } // namespace horde::gameplay

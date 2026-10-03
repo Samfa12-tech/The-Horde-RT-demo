@@ -1,4 +1,5 @@
 #include "vulkan/VulkanContext.h"
+#include "vulkan/PresentCompletion.h"
 
 #include "vulkan/raytracing/RayTracingRequirements.h"
 
@@ -285,6 +286,13 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
     capabilities.features.rayTracingPipeline = rayTracingPipelineFeatures.rayTracingPipeline == VK_TRUE;
     capabilities.features.rayQuery = rayQueryFeatures.rayQuery == VK_TRUE;
     capabilities.features.bufferDeviceAddress = bufferDeviceAddressFeatures.bufferDeviceAddress == VK_TRUE;
+    const auto presentation = QueryPresentDeviceSupport(physicalDevice, instance_);
+    capabilities.diagnostics.push_back(std::string("Optional VK_KHR_swapchain_maintenance1 advertised: ") +
+        (presentation.khr ? "yes" : "no"));
+    capabilities.diagnostics.push_back(std::string("Optional VK_EXT_swapchain_maintenance1 advertised: ") +
+        (presentation.ext ? "yes" : "no"));
+    capabilities.diagnostics.push_back(std::string("Optional swapchainMaintenance1 feature: ") +
+        (presentation.feature ? "yes" : "no") + "; query only, not logical-device enablement.");
 
     capabilities.rtMode = raytracing::EvaluateRtMode(
         capabilities.extensions, capabilities.features, capabilities.identity.vulkanApiVersion);

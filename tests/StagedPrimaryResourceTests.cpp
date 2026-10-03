@@ -272,7 +272,7 @@ std::optional<RtDescriptorIoContract> TryMakeRtDescriptorIoContract(RtInstrument
         return std::nullopt;
     RtDescriptorIoContract contract{};
     contract.instrumentation = instrumentation;
-    contract.bindingCount = instrumentation == RtInstrumentation::Shipping ? 24u : 25u;
+    contract.bindingCount = instrumentation == RtInstrumentation::Shipping ? 25u : 26u;
     contract.storageBufferDescriptorCount = 13u;
     return contract;
 }

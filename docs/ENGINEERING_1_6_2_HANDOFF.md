@@ -13,21 +13,31 @@ Read this first after compaction. Current source and explicit owner instructions
 - No other local or remote 1.6.2 implementation branch/PR found at intake; PR16 is planning only.
 
 ## Current next action
-Integrate/review Phase1 audits, finish A4 Windows output-only resize, compile targeted host checks. Do not start new graphics implementation before the five audit corrections are checked. Audits/design for later phases may proceed independently.
+
+**Current device status:** owner withdrew phone allocation after authorized identity verification, before any install/test. No device test process is active. Do not queue phone operations or infer permission from reconnect; explicit renewed allocation is required. Continue host/asset/CI work.
+Current Pipeline8, Compute8 and compatibility modules are source-bound and regenerated, including128B materials and environment binding25. Reviewed finite budgets retain exact Shipping invariants. Full integrated Windows Debug build PASS. Full CTest initial105/113 PASS; all eight failures were subsequently corrected and affected checks passed, preserving negative logs. Corrections cover development-version docs/policy fixtures, exact changed shader snapshots, provider-policy separation, a deterministic cancellation witness and Core ambience source predicates. New optional dispatch/present-completion and character/cancellation follow-up3/3 PASS; version/preview5/5 PASS; shader manifest/artifact/fence each PASS with unchanged-worktree guards intact.
+
+Lead owns GPU and phone. Actual compact-preview Pipeline9/9 and Compute9/9 presented through genuine RT with zero synchronization-validation errors on RTX5050 Laptop GPU. Exact exeSHA2567c09f079495cd2112fa0016b664bd85d909aa58bcc0041fa0a153ab3a65d0e34; ignored reports/1.6.2-preview-{pipeline,compute}-integration. Inspected overview/materials/glass/water/mirror images; Water initially missed its pool, so shared Water-only camera/frustum fixtures changed afterward and require rebuild/recapture. Optional instance-dispatched maintenance query subsequently fixed API24 linking; Windows rebuild and CPU tests PASS, affected physical recheck remains. Captures do not prove UI, pacing, listening or final visual acceptance.
+
+Android all4 native ABIs,111 tests/19classes PASS, lint0errors46warnings, Debug APK and actual cgltf/closed runtime asset admission PASS. APK112117867bytes SHA256060c12d07eb0291858159207a2eb9964db352086444d6bf383de35abe0970f16, separate .debug package,1.6.2-debug/code10. Receipt outside repo ../candidate-android-receipt.json. Fresh immutable released-source Diagnostic/Mobile Debug baseline built from clean a397757, all4ABIs, APK110434875bytes SHA2569d3fa47f4b2491e7d1cece984261d175314ad0cfd86353fd2010e50576b3ce47; ../baseline-release-source-provenance.json. No phone installation yet. Current camera change requires refreshed candidate before matched device runs. Backup commit/push requested explicitly; prepare coherent commit now, then draft PR/current six-check CI and Windows Release lane. VERSION1.6.2/map10 is development identity, not release authority.
+
+Sam explicitly allocated the connected phone for development install/validation. Authorization resolved; read-only ADB confirms SM-S948B/Android16/currentuser0, battery28.6C/41%. Production app is installed; separate .debug package is absent, so preserve production saves/settings. Phone tests remain lead-only; no data clear. Baseline owner is auditing a documented exact1.6.1 Diagnostic Debug APK for matched comparison. Native Goal activation was requested but no supported action is exposed: Goal mode is NOT enabled; concise /goal command provided to Sam.
+
+Collapse Function/layout/reference approval explicitly received after owner manually inspected BOTH existing contact sheets on3October2026. Final Blender composition may proceed; separate Form approval still blocks runtime export, and runtime acceptance remains. Layout/opening images saved privately in Library; identities retained outside repo, never in public source. Laptop client links showed 'unable to load file'; manual opening worked. No feedback/log export requested. Leaf normals fixture PASS. Core ten-wrap exact sample fixture and all15 Java queue/gate cases PASS. Optional maintenance1 implemented/host tested both platforms; physical validation and formal unextended retirement gap remain explicit. Interactive Windows Computer Use unavailable (required node_repl absent); no native UI pass claimed. Final candidate/PR/release and owner/device acceptance remain in progress.
 
 ## Slice ledger
 | Slice | Owner | State | Next action/dependency |
 |---|---|---|---|
-| P0 baseline/intake | lead | implementing | Complete current controls/assets inventory and exact Windows baseline capture |
-| A1 present semaphore | audit_sync | implementing | Review per-image lifetime patch; targeted platform builds and lifecycle checks |
-| A2 scratch/SBT | audit_alignment | implementing | Review padded aligned allocation and all build/update paths; boundary/fault tests |
-| A3 notices | audit_notice_report | implementing | Bundle exact cgltf licence in Windows/APK; package-byte tests; lead integrates Windows credits |
-| A4 Windows resize | lead | not started | Switch compatible scale transactions to ResizeOutput after A1 releases platform files |
-| A5 report boundaries | audit_notice_report | implementing | Bearer token boundary fixtures; no live submissions |
-| P2 graphics/preview | graphics_design (audit) | not started | Concrete shared configuration/isolated preview design; then implementation |
-| P3 material/temporal/shadows | material_audit (audit) | not started | Exact normal/tangent/tiling audit and bounded feasibility decisions |
-| P4 audio/reveal | audio_reveal_audit (audit) | not started | Verify owner sound inventory, waveform/loop facts and reveal state interfaces |
-| P4 scenes/UI/fire/clearance | lead | not started | Actual screenshots inspected; native baseline + layout/contact sheet before gated composition |
+| P0 baseline/intake | lead | host captured | Audit commit007b5253; all13 real RTX checkpoints presented, sync-negative witness retained |
+| A1 present semaphore | audit_sync | implemented/host built | Per-image reuse fixed; formal unextended shutdown caveat explicitly open |
+| A2 scratch/SBT | audit_alignment | host checked | Aligned padded AS/SBT; affected boundary/resource tests passed |
+| A3 notices | audit_notice_report | staging checked | Exact full cgltf notice included; final APK/ZIP byte admission pending |
+| A4 Windows resize | lead | host checked | Output-only transactional resize; live matched resize measurements pending |
+| A5 report boundaries | audit_notice_report | host checked | Word boundaries/local positive-negative fixtures pass; no live report sent |
+| P2 graphics/preview | graphics_design + Android/scene owners | integrating | Shared transaction reducer and actual compact profile; native/platform checks and RT preview pending |
+| P3 material/temporal/shadows | material_audit | material2/2 PASS | Shared128B ABI/scale/tangents/tiling/AO; bounded High+Max shadow and dormant DRS/motion feasibility underway |
+| P4 audio/reveal | audio_reveal_audit | integrating | Deterministic reveal/music D->E/idle poses; targeted tests, gain/voice/incidental admission pending |
+| P4 scenes/UI/fire/clearance | lead + audit_sync | implementing/gated | Actual screenshots inspected; shared overhead poses and final torch sockets; fire shape; layout approval pending |
 | P5 integrated candidate | lead | not started | Combined reviewed branch, exact evidence and current CI |
 
 ## Evidence and decisions
@@ -35,12 +45,12 @@ Integrate/review Phase1 audits, finish A4 Windows output-only resize, compile ta
 - Screenshot observations: rear cap is flat masonry behind spawn; torch top is near the lintel/low overhead brick on approach; shaft has an abrupt rectangular sky opening above pale vertical structures. Exact scene anchors must be resolved from code/runtime.
 - Attachment downloader failed creating its local directory (Access denied); direct temporary download succeeded. This intake blocker is resolved.
 - SDK discovery: VS2022 BuildTools CMake 3.31.6, Vulkan SDK1.4.350.0, Android SDK/NDK26.1.10909125, JDK21 installed. Local environment helper outside repository: `../environment.ps1`.
-- Initial sandboxed CMake failed in existing MSBuildTemp with UnauthorizedAccessException. Elevated standard configure is running; this is an environment failure, not a compiler regression.
+- Initial sandboxed CMake failed in existing MSBuildTemp with UnauthorizedAccessException; elevated standard configure/build succeeded. Later duplicate PATH/Path native environment failures were resolved by outside-repository `../invoke-native.ps1` using a case-insensitive environment rebuild. Do not reclassify either as a C++ regression.
 - Git LFS status can write common `.git/lfs/tmp` outside writable root. Use scoped read-only diffs or authorized elevated Git for integration; do not disable LFS and accidentally stage runtime asset rewrites.
 - Rejected scope expansion: mandatory maintenance1 capability changes for A1. Use bounded per-image ownership and existing drain, disclose formal unextended present-completion limitation and physical validation gap.
 
 ## Device and acceptance ownership
-- Phone is with Sam and NOT allocated. Do not install/test/clear data. Continue host work.
+- Phone allocated explicitly by Sam on3October2026; exact SM-S948B/Android16 authorized. Lead performs scoped development installation/validation, preserves saves/settings and never clears data; coordinate thermal recovery and release test processes afterward.
 - No existing Horde/Blender/Vulkan GPU task observed during intake. Reserve RTX use only for bounded coordinated lead runs; child agents do CPU/source work.
 - Required owner gates: collapse layout/Form before final gated composition, final scene/UI/fire/keeper motion acceptance, applicable changed-audio/haptic listening.
 - Audio/haptic manual revalidation required: NO for Phase1 safety/notice/report/resize changes; YES when cue/event/playback/reveal audio changes are integrated.
@@ -64,3 +74,22 @@ Run from isolated source. Load `../environment.ps1` for local SDK paths. Use tar
 - A4 output-only resize retains BLAS/assets/descriptors unrelated to output, restores saved selection on allocation failure, logs `idle_and_resize_ms` independently. Live repeated resizing still pending.
 - Phase2/3/4 source audits complete: see GRAPHICS_DESIGN, MATERIAL_AUDIT and AUDIO_REVEAL_AUDIT. Their proposals are not runtime/device passes.
 - Next action: pin this audit slice, use its exact Windows Debug binary for pre-polish RTX views/sync checks, then implement shared graphics/config, compact preview, material normal/scale/AO and deterministic keeper reveal with separate file ownership.
+
+## Integration checkpoint - current exact evidence
+- Pinned audit commit: `007b5253d13b31fb9554d924f6633bbf253dd161`. Its Windows Debug exe SHA-256 `8875EEAD6E3DD58A74CE0E84D476DFA4F088BDEDCE176591198547EAA215D509`.
+- Native Pipeline capture on NVIDIA GeForce RTX5050 Laptop GPU:13/13 RT-produced checkpoints,960x540,100%,DiagnosticHigh. Manifest and PNG/OBJ/logs in ignored `reports/1.6.2-audit-baseline`. Opening/skylight PNGs visually inspected. This is an audit runtime, not current integrated-source evidence.
+- Synchronization validation FAILED with10 layout-transition WRITE_AFTER_READ reports. Acquire wait is TRANSFER; the shared swapchain barrier's earlier source stage failed to chain it. Scene owner changed source stage to TRANSFER. Repeat only after rebuilding this changed source, retain negative logs.
+- Material Debug targeted build and CTests PASS2/2: static glTF import and scene ABI; generated ABI freshness/negative-staleness tests PASS; one temporary High/Generic Shipping compute SPIR-V compile/validation PASS. Full production shader catalog regeneration remains pending.
+- Graphics settings standalone C++20 /W4 PASS; compact preview standalone fixture PASS. Shared CMake now registers settings/preview/performance targets and portable Threads link.
+- Android focused unit tests, Java/resource compilation PASS for GraphicsPreferences, render-scale preferences, report lifecycle and contextual control layout. New preview/title changes landed afterward and require a fresh run/native compile. No APK/phone validation claimed.
+- Keeper CPU gameplay/music fixtures PASS2/2 after correcting a new assertion to existing opening attacker-token policy. Full affected seven-fixture run awaits coherent scene build. New reveal events are silent until selected audio is admitted.
+- Free source inspection: official Poly Haven Boulder01 metadata/download hashes verified; downloaded glTF has66122 triangles (source-page124K is not this file's topology). Study copy welded coincident seam vertices and reduced to2200 triangles. Originals in isolated `../source-art/collapse`; no runtime export yet.
+- Concrete layout/reference package `docs/design/1.6.2-collapse/` and reproducible Blender/Pillow study scripts prepared. Function approval requested, still pending. Generic room validator run: fails pending approval and hardcoded Meshy budget fields; no paid budget/generation has been fabricated. Horde's free/native-RT contracts override those inapplicable provider/browser/lightmap assumptions.
+- Root changed shared fire volume shape inside its existing support/sample budget to remove static-spindle reading; native motion, reflection/glass coherence and cost still require captures.
+
+## Ownership and next checks
+- Native Debug build: Windows graphics owner after scene stability. Android Gradle: Android owner. Lead alone reserves GPU/captures and final catalog publication.
+- Scene owner: compact production profile, narrow static/character admission, world material records and final rendered torch socket coherence.
+- Clearance owner: HeldItemKinematics, neutral overhead geometry header, socket fixtures; no platform/scene-file edits.
+- Material owner: shader lighting/dielectric policy, RtSceneTuning, dormant DRS/motion feasibility; no platform/CMake edits.
+- Reveal owner: simulation/route/events/snapshots, CharacterRenderSlot, MusicDirector and focused fixtures. All original dirty work remains preserved.

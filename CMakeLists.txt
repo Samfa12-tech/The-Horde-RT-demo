@@ -37,6 +37,35 @@ endif()
 include(cmake/HordeRtPocketAudioCore.cmake)
 horde_rt_add_pocket_audio_core("${CMAKE_CURRENT_SOURCE_DIR}" "${BUILD_TESTING}")
 if(BUILD_TESTING)
+    add_executable(horde_rt_graphics_settings_tests tests/GraphicsSettingsTests.cpp)
+    target_include_directories(horde_rt_graphics_settings_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_graphics_settings_tests COMMAND horde_rt_graphics_settings_tests)
+
+    add_executable(horde_rt_graphics_preview_tests
+        tests/GraphicsPreviewTests.cpp
+        src/gameplay/effects/FireEmitterState.cpp
+        src/gameplay/items/HeldItemState.cpp)
+    target_include_directories(horde_rt_graphics_preview_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_graphics_preview_tests COMMAND horde_rt_graphics_preview_tests)
+
+    add_executable(horde_rt_graphics_preview_performance_tests tests/GraphicsPreviewPerformanceTests.cpp)
+    target_include_directories(horde_rt_graphics_preview_performance_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_graphics_preview_performance_tests COMMAND horde_rt_graphics_preview_performance_tests)
+
+    add_executable(horde_rt_texture_layer_subset_tests tests/RtTextureLayerSubsetTests.cpp)
+    target_include_directories(horde_rt_texture_layer_subset_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_texture_layer_subset_tests COMMAND horde_rt_texture_layer_subset_tests)
+
+    add_executable(horde_rt_shaft_dressing_geometry_tests tests/ShaftDressingGeometryTests.cpp)
+    target_include_directories(horde_rt_shaft_dressing_geometry_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_shaft_dressing_geometry_tests COMMAND horde_rt_shaft_dressing_geometry_tests)
+
+    if(WIN32)
+        add_executable(horde_rt_graphics_windows_persistence_tests tests/GraphicsWindowsPersistenceTests.cpp)
+        target_include_directories(horde_rt_graphics_windows_persistence_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        add_test(NAME horde_rt_graphics_windows_persistence_tests COMMAND horde_rt_graphics_windows_persistence_tests)
+    endif()
+
     add_executable(horde_rt_device_address_layout_tests tests/RtDeviceAddressLayoutTests.cpp)
     target_include_directories(horde_rt_device_address_layout_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_device_address_layout_tests COMMAND horde_rt_device_address_layout_tests)
@@ -69,9 +98,10 @@ set(HORDE_RT_SOURCE_FILES)
 foreach(source IN LISTS HORDE_RT_CORE_RELATIVE_SOURCES)
     list(APPEND HORDE_RT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/${source}")
 endforeach()
-list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/(MusicDirector|MusicPcmStream|MusicPcmWave|MusicPcmAssetBank|MusicPlaybackSession)|reporting/(PlaytestReport|PlaytestSubmission)|gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
+list(FILTER HORDE_RT_SOURCE_FILES EXCLUDE REGEX "/(audio/(AmbiencePcmLoop|MusicDirector|MusicPcmStream|MusicPcmWave|MusicPcmAssetBank|MusicPlaybackSession)|reporting/(PlaytestReport|PlaytestSubmission)|gameplay/(simulation/GameSimulation|animation/(PlayerAnimationState|PlayerIkTargets)|effects/FireEmitterState|interactions/(InteractionState|ChestRewardSequence|FinaleSequence)|items/(HeldItemState|HeldItemKinematics|HeldLightState|LanternPendulum)))\\.cpp$")
 
 add_library(horde_gameplay_simulation STATIC
+    src/audio/AmbiencePcmLoop.cpp
     src/audio/MusicDirector.cpp
     src/audio/MusicPcmStream.cpp
     src/audio/MusicPcmWave.cpp
@@ -98,6 +128,17 @@ target_include_directories(horde_gameplay_simulation
 target_compile_features(horde_gameplay_simulation PUBLIC cxx_std_20)
 target_link_libraries(horde_gameplay_simulation PUBLIC pocket_audio_native_pcm)
 
+if(BUILD_TESTING)
+    add_executable(horde_rt_held_item_clearance_tests tests/HeldItemClearanceTests.cpp)
+    target_link_libraries(horde_rt_held_item_clearance_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_held_item_clearance_tests COMMAND horde_rt_held_item_clearance_tests)
+
+    add_executable(horde_rt_ambience_pcm_loop_tests tests/AmbiencePcmLoopTests.cpp)
+    target_link_libraries(horde_rt_ambience_pcm_loop_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_ambience_pcm_loop_tests COMMAND horde_rt_ambience_pcm_loop_tests)
+    set_tests_properties(horde_rt_ambience_pcm_loop_tests PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+endif()
+
 if(HORDE_RT_BUILD_VULKAN_TARGETS)
     find_package(Vulkan REQUIRED)
     message(STATUS "Vulkan SDK found: ${Vulkan_VERSION}")
@@ -117,6 +158,16 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS)
     horde_rt_attach_raygen_artifacts(horde_rt_probe_core)
     horde_rt_apply_raygen_policy(horde_rt_probe_core Windows)
     horde_rt_attach_staged_primary(horde_rt_probe_core "${CMAKE_CURRENT_SOURCE_DIR}")
+    if(BUILD_TESTING)
+        add_executable(horde_rt_present_completion_tests tests/PresentCompletionTests.cpp)
+        target_include_directories(horde_rt_present_completion_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_present_completion_tests PRIVATE Vulkan::Vulkan)
+        add_test(NAME horde_rt_present_completion_tests COMMAND horde_rt_present_completion_tests)
+
+        add_executable(horde_rt_graphics_preview_frame_adapter_tests tests/GraphicsPreviewFrameAdapterTests.cpp)
+        target_link_libraries(horde_rt_graphics_preview_frame_adapter_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_graphics_preview_frame_adapter_tests COMMAND horde_rt_graphics_preview_frame_adapter_tests)
+    endif()
 endif()
 
 if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE)
@@ -205,6 +256,7 @@ endif()
 
 if(BUILD_TESTING)
     find_package(Threads REQUIRED)
+    target_link_libraries(horde_rt_graphics_settings_tests PRIVATE Threads::Threads)
     add_executable(horde_rt_staged_primary_contract_tests tests/StagedPrimaryContractTests.cpp)
     target_include_directories(horde_rt_staged_primary_contract_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_staged_primary_contract_tests COMMAND horde_rt_staged_primary_contract_tests)
@@ -730,6 +782,13 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_music_asset_admission_tests
         COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
             ${CMAKE_CURRENT_SOURCE_DIR}/tests/MusicAssetAdmissionTests.ps1)
+    add_test(NAME horde_rt_horde_162_asset_policy_tests
+        COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/Horde162AssetPolicyTests.ps1)
+    add_test(NAME horde_rt_android_showcase_witness_policy_tests
+        COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/AndroidShowcaseWitnessPolicyTests.ps1)
+    set_tests_properties(horde_rt_android_showcase_witness_policy_tests PROPERTIES TIMEOUT 30)
     add_test(NAME horde_rt_pocket_audio_core_pin_tests
         COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
             ${CMAKE_CURRENT_SOURCE_DIR}/tests/PocketAudioCorePinTests.ps1

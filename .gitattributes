@@ -12,6 +12,13 @@ docs/evidence/2026-10-02-backend-pixel-witness/**/*.log whitespace=-trailing-spa
 *.rgba filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
 
+# 1.6.2 game-integrated owner-supplied cue derivatives; originals stay local.
+assets/audio/pixabay/keeper_i_sense_you.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/pixabay/keeper_come_closer.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/pixabay/skeleton_idle_rattle.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/pixabay/skeleton_falling_bones.wav filter=lfs diff=lfs merge=lfs -text
+assets/audio/pixabay/waterfall_core_loop.wav filter=lfs diff=lfs merge=lfs -text
+
 # Exact native ray witnesses and their temporary packaged diagnostic module.
 docs/evidence/2026-10-01-isolated-glass-rays/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-01-isolated-glass-rays/*.rgba.gz filter=lfs diff=lfs merge=lfs -text

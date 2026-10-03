@@ -2,6 +2,16 @@
 
 Last updated: 2026-10-03
 
+## October3: 1.6.2 allocated-device intake (no new RT pass yet)
+
+Evidence class: **local read-only ADB identity/availability**, not installation,
+RT presentation, performance or owner acceptance. Sam explicitly allocated the
+connected phone for scoped development validation. ADB authorization resolved;
+raw model **SM-S948B**, Android16, current user0, battery28.6C/41% at intake.
+The production package is present and the separate `.debug` development package
+is absent. Preserve production saves/settings; no app-data clearing is authorized.
+Current candidate APK/device RT/lifecycle/listening evidence remains pending.
+
 ## October3: final signed1.6.1 production update — exact S26 smoke
 
 Evidence class: **local exact signed-APK installation/pullback, RT presentation,

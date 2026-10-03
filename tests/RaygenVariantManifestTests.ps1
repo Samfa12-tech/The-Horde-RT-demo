@@ -18,6 +18,7 @@ $diagnosticConsumerPaths = @(
 )
 $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ('horde-raygen-variants-' + [guid]::NewGuid().ToString('N'))
 $worktreeStatusBefore = (& git -C $repoRoot status --porcelain) -join "`n"
+if ($LASTEXITCODE -ne 0) { throw 'Unable to inspect worktree before temporary variant compilation.' }
 
 function Assert-True {
     param([bool]$Condition, [string]$Message)
@@ -169,8 +170,8 @@ try {
     $legacyHashBefore = Get-RawFileHash $legacyIncludePath
     # Restored measured control compatibility artifacts; matrix mode must not
     # mutate them, and the artifact suite independently checks fresh compilation.
-    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq 'f4170abbf7f68364d7eeb5d9d01baeed0efacb2fc6db7ab4d1f4c0075dddacd4') 'Generic include hash changed before matrix compilation.'
-    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq 'a3b32262260a25e31fbc880f851baabc5df14bbbb7995fd532e5696afd3e06bb') 'Legacy include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq 'c44a6da3763ad2b288977e805a8708d4a909ebbf6a827782673a2d7af8124dbb') 'Generic include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq '242c203c5b5d1f1660b66cca61824dfd810772d78e285cd747e6347b104052d7') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)
@@ -351,7 +352,10 @@ try {
     $crlfStats = Get-Content -LiteralPath (Join-Path $crlfOutput 'shipping_mobile_generic_dielectric\raygen-stats.json') -Raw | ConvertFrom-Json
     Assert-True ($lfStats.dependencySha256 -eq $crlfStats.dependencySha256 -and
         $lfStats.compiledSpirvSha256 -eq $crlfStats.compiledSpirvSha256) 'LF/CRLF variant compilation must retain identical dependency and SPIR-V hashes.'
-    Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) 'Temporary variant compilation modified the worktree.'
+    $worktreeStatusAfter = (& git -C $repoRoot status --porcelain) -join "`n"
+    Assert-True ($LASTEXITCODE -eq 0) 'Unable to inspect worktree after temporary variant compilation.'
+    $statusChanges = Compare-Object ($worktreeStatusBefore -split "`n") ($worktreeStatusAfter -split "`n") | Out-String
+    Assert-True ($worktreeStatusAfter -ceq $worktreeStatusBefore) "Temporary variant compilation modified the worktree. Status differences: $statusChanges"
     Write-Output 'Raygen variant manifest and temporary compiler matrix passed.'
 }
 finally {

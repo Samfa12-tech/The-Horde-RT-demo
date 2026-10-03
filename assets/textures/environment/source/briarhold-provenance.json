@@ -1,0 +1,22 @@
+{
+  "asset": "briarhold-storm-sky-1k.webp",
+  "createdAt": "2026-08-09T06:25:00+10:00",
+  "generator": {
+    "provider": "OpenAI built-in image generation",
+    "mode": "generate",
+    "useCase": "runtime-environment",
+    "prompt": "Create a wide cinematic panoramic night sky texture for a serious dark-folkloric first-person fortress game. Dense layered storm clouds with deep blue-green and charcoal tones, subtle cool moonlit edges, faint ground-hugging mist near the lower horizon, sparse tiny stars only in small cloud gaps. No moon, no landscape, no buildings, no trees, no creatures, no lightning, no text, no symbols. Designed as an equirectangular 2:1 sky-dome texture with the left and right edges matching in tone and cloud density, horizon centered vertically, detailed but dark enough to preserve gameplay silhouettes."
+  },
+  "source": {
+    "path": "assets/world/source/briarhold-storm-sky-imagegen-v1.png",
+    "sha256": "83c297f7373e52feee50a881d5291f8e99faab8556fbce4c041c4b63b497dd8b"
+  },
+  "runtime": {
+    "path": "assets/world/briarhold-storm-sky-1k.webp",
+    "sha256": "58dc7c09547d7ed560c75d97038556b908b50ffecd12873601b5ca9bfc814824",
+    "dimensions": [1024, 512],
+    "format": "WebP RGB",
+    "derivative": "Resampled to a 2:1 1024 by 512 runtime panorama and encoded at WebP quality 84."
+  },
+  "rights": "Project-owned generated asset."
+}

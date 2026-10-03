@@ -79,6 +79,7 @@
     <string name="menu">MENU</string>
     <string name="rt_starting">VULKAN RT STARTING…</string>
     <string name="rt_active">NATIVE VULKAN RT ACTIVE</string>
+    <string name="rt_active_compact">RT</string>
     <string name="rt_unsupported">HARDWARE RT UNSUPPORTED</string>
     <string name="rt_error">RT RENDERER ERROR</string>
     <string name="hardware_requirement">Vulkan hardware RT required. No fallback.</string>
@@ -169,4 +170,20 @@
     <string-array name="playtest_impacts">
         <item>Blocks progress</item><item>Major friction</item><item>Minor friction</item><item>Polish</item>
     </string-array>
+    <string name="graphics_settings">Graphics</string>
+    <string name="graphics_help">Edit a draft, then Apply. Keep confirms only after an RT frame presents. Unconfirmed settings restore after 15 visible seconds or when backgrounded. Cost: not yet measured for this candidate.</string>
+    <string name="graphics_water_help">Off omits water appearance; geometry allocations remain. Mobile uses reduced reflected detail. High adds a reflected scene query. Cost: not yet measured.</string>
+    <string name="graphics_fire_help">Mobile: 4 main volume steps and 4 reflected steps. High: 10 main and 8 reflected steps. Authoritative lights and gameplay remain unchanged. Cost: not yet measured.</string>
+    <string name="graphics_baseline">Reset draft to accepted 1.6.1 baseline</string>
+    <string name="graphics_apply">Apply draft</string>
+    <string name="graphics_keep">Keep and save settings</string>
+    <string name="graphics_revert">Revert to confirmed settings</string>
+    <string name="graphics_storage_failed">Could not save recovery metadata. Settings were not applied.</string>
+    <string name="graphics_not_ready">RT surface is not ready. Confirmed settings remain saved.</string>
+    <string name="graphics_optics_mobile">Optics: Mobile build. Lantern panes are omitted from geometry. Physical panes require a High build; this is not a runtime toggle.</string>
+    <string name="graphics_optics_high">Optics: High build. Physical lantern panes are retained. Optical profile is fixed by this build.</string>
+    <string name="reset_non_graphics">Reset Audio / Controls / Interface</string>
+    <string name="keeper_reveal_title">THE FOURTH KEEPER</string>
+    <string name="graphics_restored">Confirmed graphics settings restored after an interrupted change.</string>
+    <string name="graphics_save_failed">Graphics could not be saved. Restoring the previous confirmed settings.</string>
 </resources>

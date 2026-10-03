@@ -894,6 +894,8 @@ void TestSharedTextureSourceRouting()
     auto viewmodel = makeAsset({
         makeMaterial("ViewmodelSleeves", 7, 101, {{true, true, true, true}}, 2.0f),
         makeMaterial("ViewmodelGauntlets", 9, 102, {{true, true, true, true}}, 2.1f)});
+    viewmodel.materials[0].normalScale = -0.5f;
+    viewmodel.materials[0].textureScale = {{2.0f, 0.5f}};
     const StaticRtAssetRegistration worldRegistration{
         0u, 1u, 0u, 0u, &world};
     const StaticRtAssetRegistration viewmodelDefaultRegistration{
@@ -932,6 +934,11 @@ void TestSharedTextureSourceRouting()
               aliasedSlot.Vertices().size() == world.vertices.size() + viewmodel.vertices.size() &&
               aliasedSlot.InstanceMetadata()[1u].primitiveBase == world.primitives.size(),
           "aliased consumer retains independent material factors and geometry metadata");
+    Check(aliasedSlot.Materials()[2u].normalScaleUvScaleBlend ==
+              std::array<float, 4u>{{-0.5f, 2.0f, 0.5f, 1.0f}} &&
+          aliasedSlot.Materials()[0u].normalScaleUvScaleBlend ==
+              std::array<float, 4u>{{1.0f, 1.0f, 1.0f, 1.0f}},
+          "world/viewmodel texture aliasing preserves independently authored normal/UV factors");
 
     const auto expectFailure = [&](std::vector<StaticRtAssetRegistration> registrations,
                                    std::string_view fragment, std::string_view label) {
@@ -1197,6 +1204,125 @@ void TestAcceptedStaticGlbContract(const horde::scene::assets::AssetManifest& ma
                   material.ormTexture == 0 && material.emissiveTexture == 0,
               "four runtime texture categories receive deterministic layers");
     }
+}
+
+void TestMaterialNormalAndTextureAuthoring(const std::filesystem::path& temporaryRoot,
+                                          const horde::scene::assets::AssetManifest& manifest)
+{
+    using namespace horde::scene::assets;
+    StaticMeshAsset asset;
+    std::string diagnostic;
+    Check(StaticMeshAsset::Load(kFixtureRoot / "valid-multi.glb", manifest, asset, diagnostic) &&
+              asset.materials[0].normalScale == 1.0f &&
+              asset.materials[0].textureScale == std::array<float, 2u>{{1.0f, 1.0f}},
+          "missing normal scale and texture authoring preserve the baseline defaults");
+    for (const float scale : {0.0f, 0.5f, 1.0f, 2.0f, -0.5f})
+    {
+        const auto path = RewriteGlb(temporaryRoot, "normal-scale.glb",
+            "\"normalTexture\":{\"index\":0}",
+            "\"normalTexture\":{\"index\":0,\"scale\":" + std::to_string(scale) + "}");
+        Check(StaticMeshAsset::Load(path, manifest, asset, diagnostic) &&
+                  asset.materials[0].normalScale == scale,
+              std::string("glTF finite signed normal scale survives import: ") + diagnostic);
+    }
+    const auto invalidScale = RewriteGlb(temporaryRoot, "normal-scale-overflow.glb",
+        "\"normalTexture\":{\"index\":0}",
+        "\"normalTexture\":{\"index\":0,\"scale\":1e40}");
+    ExpectAssetFailure(invalidScale, manifest,
+                       "Static GLB material 0 contains a non-finite PBR factor.");
+    const auto nonzeroUv = RewriteGlb(temporaryRoot, "normal-uv1.glb",
+        "\"normalTexture\":{\"index\":0}",
+        "\"normalTexture\":{\"index\":0,\"texCoord\":1}");
+    ExpectAssetFailure(nonzeroUv, manifest,
+        "Static GLB material 0 requires unsupported texture coordinates/transform; bake textures to TEXCOORD_0.");
+    const auto transformedUv = RewriteGlb(temporaryRoot, "normal-transform.glb",
+        "\"normalTexture\":{\"index\":0}",
+        "\"normalTexture\":{\"index\":0,\"extensions\":{\"KHR_texture_transform\":{\"scale\":[2,2]}}}");
+    ExpectAssetFailure(transformedUv, manifest,
+        "Static GLB material 0 requires unsupported texture coordinates/transform; bake textures to TEXCOORD_0.");
+
+    const auto overridePath = RewriteManifest(temporaryRoot, "surface-authoring.manifest.json",
+        "\"roughnessFactor\": 0.18", "\"roughnessFactor\": 0.18, \"normalScale\": -2, \"textureScale\": [2,0.5]");
+    AssetManifest authored;
+    Check(AssetManifest::Load(overridePath, authored, diagnostic) &&
+              authored.materialOverrides[0].hasNormalScale &&
+              authored.materialOverrides[0].hasTextureScale,
+          std::string("material authoring sidecar parses explicit presence: ") + diagnostic);
+    Check(StaticMeshAsset::Load(kFixtureRoot / "valid-multi.glb", authored, asset, diagnostic) &&
+              asset.materials[0].normalScale == -2.0f &&
+              asset.materials[0].textureScale == std::array<float, 2u>{{2.0f, 0.5f}},
+          "named sidecar overrides reach material factors without adding texture layers");
+    for (const std::string_view value : {"[0,1]", "[-1,1]", "[1025,1]", "[1e40,1]", "[1]", "[1,1,1]"})
+    {
+        const auto path = RewriteManifest(temporaryRoot, "bad-texture-scale.manifest.json",
+            "\"roughnessFactor\": 0.18",
+            "\"roughnessFactor\": 0.18, \"textureScale\": " + std::string(value));
+        AssetManifest invalid;
+        Check(!AssetManifest::Load(path, invalid, diagnostic),
+              "invalid UV authoring sizes/ranges reject the manifest");
+    }
+    const auto invalidOverride = RewriteManifest(temporaryRoot, "bad-normal-scale.manifest.json",
+        "\"roughnessFactor\": 0.18", "\"roughnessFactor\": 0.18, \"normalScale\": 1e40");
+    Check(!AssetManifest::Load(invalidOverride, authored, diagnostic),
+          "normal strength cannot overflow float storage through sidecar parsing");
+
+    // The fixture shares each accessor across two meshes. Changing its normal
+    // tests both imported primitives, including the former +/-X fallback failure.
+    for (const std::array<float, 3u> normal : {
+             std::array<float, 3u>{{1,0,0}}, std::array<float, 3u>{{-1,0,0}},
+             std::array<float, 3u>{{0,1,0}}, std::array<float, 3u>{{0,-1,0}},
+             std::array<float, 3u>{{0,0,1}}, std::array<float, 3u>{{0,0,-1}}})
+    {
+        auto parts = ReadGlbParts();
+        const auto mapOffset = parts.json.find("\"normalTexture\":{\"index\":0},");
+        parts.json.erase(mapOffset, std::string_view("\"normalTexture\":{\"index\":0},").size());
+        for (std::size_t offset = parts.json.find("\"TANGENT\":2,"); offset != std::string::npos;
+             offset = parts.json.find("\"TANGENT\":2,"))
+            parts.json.erase(offset, std::string_view("\"TANGENT\":2,").size());
+        for (std::size_t vertex = 0u; vertex < 4u; ++vertex)
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+                WriteFloat(parts.binary, 48u + vertex * 12u + axis * 4u, normal[axis]);
+        const auto path = temporaryRoot / "unmapped-no-tangent.glb";
+        WriteGlb(path, std::move(parts.json), std::move(parts.binary));
+        const bool loaded = StaticMeshAsset::Load(path, manifest, asset, diagnostic);
+        Check(loaded, std::string("unmapped principal normal has stable tangent fallback: ") + diagnostic);
+        if (!loaded) continue;
+        Check(asset.materials[0].normalTexture == -1 && asset.materials[0].normalScale == 1.0f,
+              "absent normal maps retain explicit absence and default strength");
+        for (const auto& vertex : asset.vertices)
+        {
+            float dot = 0.0f, length = 0.0f;
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+            {
+                dot += vertex.normal[axis] * vertex.tangent[axis];
+                length += vertex.tangent[axis] * vertex.tangent[axis];
+            }
+            Check(NearlyEqual(dot, 0.0f) && NearlyEqual(length, 1.0f) && vertex.tangent[3] == 1.0f,
+                  "unmapped tangent is finite/unit/perpendicular with defined handedness");
+        }
+    }
+    for (const float sign : {-1.0f, 1.0f, 0.0f, 0.5f})
+    {
+        auto parts = ReadGlbParts();
+        for (std::size_t vertex = 0u; vertex < 4u; ++vertex)
+            WriteFloat(parts.binary, 96u + vertex * 16u + 12u, sign);
+        const auto path = temporaryRoot / "tangent-sign.glb";
+        WriteGlb(path, std::move(parts.json), std::move(parts.binary));
+        const bool loaded = StaticMeshAsset::Load(path, manifest, asset, diagnostic);
+        if (sign == -1.0f || sign == 1.0f)
+            Check(loaded && asset.vertices[0].tangent[3] == sign,
+                  "both authored tangent handedness signs survive node baking");
+        else
+            Check(!loaded && diagnostic == "Static GLB primitive 0 tangent handedness must be -1 or 1.",
+                  "undefined tangent handedness is rejected rather than silently normalized");
+    }
+    auto degenerate = ReadGlbParts();
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+        WriteFloat(degenerate.binary, 96u + axis * 4u, 0.0f);
+    const auto degeneratePath = temporaryRoot / "degenerate-tangent.glb";
+    WriteGlb(degeneratePath, std::move(degenerate.json), std::move(degenerate.binary));
+    ExpectAssetFailure(degeneratePath, manifest,
+                       "Static GLB primitive 0 has a degenerate tangent after node transform.");
 }
 
 void TestThickDielectricTopology(const std::filesystem::path& temporaryRoot,
@@ -1628,6 +1754,7 @@ void TestLanternGeometryQualityProfile()
                a.metallicFactor == b.metallicFactor &&
                a.roughnessFactor == b.roughnessFactor &&
                a.occlusionStrength == b.occlusionStrength &&
+               a.normalScale == b.normalScale && a.textureScale == b.textureScale &&
                a.transmissionFactor == b.transmissionFactor && a.ior == b.ior &&
                a.thicknessFactor == b.thicknessFactor &&
                a.attenuationDistance == b.attenuationDistance &&
@@ -2113,6 +2240,7 @@ int main(int argc, char** argv)
     else
     {
         TestAcceptedStaticGlbContract(manifest);
+        TestMaterialNormalAndTextureAuthoring(temporaryRoot, manifest);
         TestUnsupportedAlphaMaterialIsRejected(temporaryRoot, manifest);
         TestTransmissionDefaultThinWallSemantics(temporaryRoot, manifest);
         TestThickDielectricTopology(temporaryRoot, manifest);

@@ -1,0 +1,9 @@
+# 1.6.2 package admission checkpoint
+
+The shared `tools/horde-1.6.2-asset-policy.ps1` validates actual runtime WAV/KTX bytes, format and canonical manifest semantics, then enforces a closed platform roster in stages and ZIP/APK archives. It accepts Debug APKs without a release/signing requirement. Windows retains its admitted full waterfall loop; Android admits only the stereo core loop and its manifest. Both admit the four Keeper/skeleton cues, three existing Pixabay cues, Keeper manifest, their own 512x256 environment variant and shared environment manifest. Source images and the other platform's texture/audio are rejected.
+
+`package-alpha.ps1` and `run-foundation-validation.ps1` now copy the explicit Windows roster and validate both platform archives. No packaging, signing, foundation run or device action was invoked for this slice. All CI LFS fetch/checkout rosters include the five new WAVs and both runtime environment variants; source PNGs remain excluded. Canonical assets are validated against pinned runtime sizes/hashes, while manifest bytes compare with the current checkout to preserve line-ending portability.
+
+Evidence: the five affected PowerShell scripts parse successfully, and `tests/Horde162AssetPolicyTests.ps1` passes 18 positive/negative cases, including missing/corrupt assets and manifests, duplicate entries, foreign source/audio and the other platform's payload. One CMake fixture registration was added without configuring or building the native tree. Android owner will apply the same read-only helper to its final Debug APK; the lead owns final Debug ZIP packaging and acceptance. Existing music and complete third-party notice policies remain separate required checks.
+
+Next action: final Debug ZIP/APK byte admission after the lead's exact candidate rebuild. Audio listening, visual review, actual RT/device evidence and release gates are not inferred from package admission.

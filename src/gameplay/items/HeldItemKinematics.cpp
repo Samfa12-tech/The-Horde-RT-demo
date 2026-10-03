@@ -1,6 +1,7 @@
 #include "gameplay/items/HeldItemKinematics.h"
 
 #include "gameplay/CorridorCollision.h"
+#include "scene/ShowcaseOverheadGeometry.h"
 
 #include <algorithm>
 #include <cmath>
@@ -111,6 +112,63 @@ float MapContinuousCarryDepth(const float forwardClearance,
     return minimumClearance + (openDepth - minimumClearance) * normalized;
 }
 
+float DistanceToOverheadFootprint(const horde::scene::OverheadVolume& volume,
+                                 const float x, const float z)
+{
+    bool positive = false;
+    bool negative = false;
+    float minimumSquared = 1.0e9f;
+    for (std::size_t edge = 0u; edge < volume.footprint.size(); ++edge)
+    {
+        const auto& start = volume.footprint[edge];
+        const auto& end = volume.footprint[(edge + 1u) % volume.footprint.size()];
+        const float dx = end[0] - start[0];
+        const float dz = end[1] - start[1];
+        const float side = dx * (z - start[1]) - dz * (x - start[0]);
+        positive |= side > 0.0f;
+        negative |= side < 0.0f;
+        const float lengthSquared = dx * dx + dz * dz;
+        const float fraction = lengthSquared > 0.0f
+            ? std::clamp(((x - start[0]) * dx + (z - start[1]) * dz) /
+                             lengthSquared, 0.0f, 1.0f)
+            : 0.0f;
+        const float separationX = x - start[0] - fraction * dx;
+        const float separationZ = z - start[1] - fraction * dz;
+        minimumSquared = std::min(minimumSquared,
+            separationX * separationX + separationZ * separationZ);
+    }
+    return positive && negative ? std::sqrt(minimumSquared) : 0.0f;
+}
+
+float TorchOverheadLowering(const Vec3& gripWorld, const Vec3& viewUp,
+                           const Vec3& viewForward)
+{
+    // A world-down response leaves the complete horizontal envelope unchanged.
+    // Include the long tilted torch as well as its cage and animated fire;
+    // testing only the camera or flame pivot misses an approaching lintel.
+    const float radius = kHeldTorchEnvelopeRadius +
+        kHeldTorchEnvelopeTopFromGrip * std::hypot(viewUp[0], viewUp[2]);
+    const float highestY = gripWorld[1] +
+        kHeldTorchEnvelopeTopFromGrip * viewUp[1] +
+        kHeldTorchEnvelopeRadius * std::abs(viewForward[1]);
+    constexpr float anticipationDistance = 0.65f;
+    float lowering = 0.0f;
+    const auto include = [&](const horde::scene::OverheadVolume& volume) {
+        const float required = std::max(0.0f,
+            highestY + kHeldTorchOverheadGap - volume.bottomY);
+        if (required == 0.0f) return;
+        const float distance = std::max(0.0f,
+            DistanceToOverheadFootprint(volume, gripWorld[0], gripWorld[2]) - radius);
+        const float response = std::clamp(1.0f - distance / anticipationDistance,
+                                          0.0f, 1.0f);
+        const float smoothResponse = response * response * (3.0f - 2.0f * response);
+        lowering = std::max(lowering, required * smoothResponse);
+    };
+    for (const auto& volume : horde::scene::kShowcaseLowOverheadVolumes) include(volume);
+    for (const auto& volume : horde::scene::kShowcaseCeilingPatches) include(volume);
+    return lowering;
+}
+
 } // namespace
 
 float ComputeRewardLanternForwardClearance(const float cameraX,
@@ -165,7 +223,8 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
 HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    const float swordSwingRadians,
                                    const float heldPropDepth,
-                                   const bool bulkyLeftHandCarry)
+                                   const bool bulkyLeftHandCarry,
+                                   const float idleTimeSeconds)
 {
     float parryBlend = 0.0f;
     switch (playerCombat.action)
@@ -200,7 +259,12 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
     // prop offset: this same grip pose drives the sword hand/arm IK and item.
     // Vertical/depth travel, combat timing and the free-torch arc are unchanged.
     const float cutInward = bulkyLeftHandCarry ? 0.18f : 0.78f;
-    const Vec3 restHand{{0.18f, -0.44f, swordGripDepth}};
+    // Move the shared rest target by only millimetres. Existing smooth
+    // windup/recovery and parry envelopes blend from/to this target; active
+    // cut/guard positions, angles, timers and gameplay hit tests stay authored.
+    const float breath = std::sin((std::isfinite(idleTimeSeconds) ? idleTimeSeconds : 0.0f) * 1.45f);
+    const Vec3 restHand{{0.18f, -0.44f + 0.004f * breath,
+                        swordGripDepth + 0.002f * breath}};
     const Vec3 downwardWindupHand{{bulkyLeftHandCarry ? 0.18f : 0.08f, -0.17f,
                                    std::max(0.56f, swordGripDepth - 0.01f)}};
     const Vec3 downwardImpactHand{{bulkyLeftHandCarry ? 0.17f : 0.02f, -0.70f,
@@ -514,7 +578,8 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         }
     }
     const HeldSwordPose sword = EvaluateHeldSwordPose(
-        input.playerCombat, input.swordSwingRadians, swordPropDepth, rewardLantern);
+        input.playerCombat, input.swordSwingRadians, swordPropDepth, rewardLantern,
+        input.walkTime);
 
     HeldItemKinematicsState result;
     // Props move the hand effector only. Keep the calibrated clavicle/shoulder
@@ -559,6 +624,25 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         // parry motion; no renderer-only prop or frozen-capture correction.
         result.leftHandLocal[1] += 0.10f;
         result.rightHandLocal[1] += 0.10f;
+    }
+    if (!rewardLantern && input.torchFailure.heldByPlayer)
+    {
+        const Vec3 worldUp{{0.0f, 1.0f, 0.0f}};
+        const float pitch = std::clamp(input.cameraPitchRadians, -0.32f, 0.28f);
+        const Vec3 viewForward = Normalize({{forwardX, -0.05f + pitch, forwardZ}});
+        const Vec3 viewRight = Normalize(Cross(viewForward, worldUp));
+        const Vec3 viewUp = Normalize(Cross(viewRight, viewForward));
+        const Vec3 gripWorld = Add(
+            Vec3{{input.cameraX, kShowcaseEyeWorldY, input.cameraZ}},
+            Add(Scale(viewRight, result.leftHandLocal[0]),
+                Add(Scale(viewUp, result.leftHandLocal[1]),
+                    Scale(viewForward, result.leftHandLocal[2]))));
+        result.torchOverheadLowering = TorchOverheadLowering(gripWorld, viewUp, viewForward);
+        // Inverse view projection of world down: both IK and socket composition
+        // consume this same hand target. Do not tilt/fade the flame or detach its
+        // light to obtain clearance. Lowered/falling/reward paths remain owned.
+        result.leftHandLocal[1] -= result.torchOverheadLowering * viewUp[1];
+        result.leftHandLocal[2] -= result.torchOverheadLowering * viewForward[1];
     }
     const float leftGripRollCos = std::cos(kLeftGripRollRadians);
     const float leftGripRollSin = std::sin(kLeftGripRollRadians);

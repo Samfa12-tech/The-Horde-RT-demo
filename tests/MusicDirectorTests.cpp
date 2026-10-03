@@ -453,12 +453,130 @@ void TestIrregularUpdateEquivalence()
           "irregular update cadence matches the same elapsed audio clock");
 }
 
+void TestKeeperRevealMusic()
+{
+    MusicDirector director;
+    GameSimulation simulation;
+    simulation.ApplyShowcaseCheckpoint(8);
+    InputSnapshot input;
+    input.hasAuthoritativePlayerPose = true;
+    input.authoritativePlayerX = kKeeperRetryPosition.x;
+    input.authoritativePlayerZ = kKeeperRetryPosition.z;
+    input.yawRadians = -1.57079632679f;
+    MusicSelection selection;
+    for (int tick = 0; tick < 359; ++tick)
+    {
+        simulation.StepFixed(input);
+        selection = director.Update(simulation.Snapshot(), simulation.Events().Events(),
+                                    static_cast<double>(tick) / 60.0, 1u);
+        Check(selection.cue == MusicCue::D && selection.looping,
+              "actual keeper awakening/warning stays on post-torch D until combat is safe");
+        simulation.ClearEvents();
+    }
+    input.paused = true;
+    simulation.AdvanceFrame(input, 30.0);
+    selection = director.Update(simulation.Snapshot(), {}, 40.0, 1u);
+    Check(selection.suspended && selection.cue == MusicCue::D,
+          "pause preserves the reveal music bed without beginning combat");
+    input.paused = false;
+    simulation.StepFixed(input);
+    selection = director.Update(simulation.Snapshot(), simulation.Events().Events(), 40.0, 1u);
+    Check(selection.cue == MusicCue::E && selection.discontinuity &&
+          Near(selection.positionSeconds, 0.0),
+          "the six-second ready boundary selects the existing combat cue through its normal transition");
+    simulation.ClearEvents();
+    simulation.RetryEncounter();
+    selection = director.Update(simulation.Snapshot(), {}, 41.0, 1u);
+    Check(selection.cue == MusicCue::D && selection.discontinuity,
+          "a retry resets stale combat music and keeps its recognition beat on D");
+    for (int tick = 0; tick < 59; ++tick)
+    {
+        simulation.StepFixed(input);
+        selection = director.Update(simulation.Snapshot(), simulation.Events().Events(),
+                                    41.0 + static_cast<double>(tick + 1) / 60.0, 1u);
+        Check(selection.cue == MusicCue::D, "recognition cannot start E early");
+        simulation.ClearEvents();
+    }
+    simulation.StepFixed(input);
+    selection = director.Update(simulation.Snapshot(), simulation.Events().Events(), 42.0, 1u);
+    Check(selection.cue == MusicCue::E && selection.discontinuity && Near(selection.positionSeconds, 0.0),
+          "the one-second retry enters the same supported E transition exactly once");
+    input.commands.routeReset = 1u;
+    simulation.StepFixed(input);
+    selection = director.Update(simulation.Snapshot(), {}, 43.0, 1u);
+    MusicDirector freshDirector;
+    const auto freshReset = freshDirector.Update(simulation.Snapshot(), {}, 43.0, 2u);
+    // Reset's required zero-delta finalization may already acquire the opening
+    // skeleton attacker token. Preserve the accepted A/B resolver policy for
+    // that authoritative state rather than inventing a forced exploration bed.
+    Check(selection.cue == freshReset.cue && selection.cue != MusicCue::D &&
+          selection.cue != MusicCue::E && Near(selection.positionSeconds, freshReset.positionSeconds),
+          "full route reset matches fresh opening state without stale keeper cue or clock ownership");
+}
+
+void TestRevealGainEnvelope()
+{
+    MusicDirector director;
+    SimulationSnapshot snapshot{};
+    snapshot.lich.revealPhase = KeeperRevealPhase::Awakening;
+    auto result = director.Update(snapshot, {}, 0.0, 1u);
+    Check(Near(result.revealGain, 1.0), "awakening begins at independent unity music gain");
+    float previousGain = result.revealGain;
+    for (int frame = 1; frame <= 360; ++frame)
+    {
+        snapshot.lich.revealElapsedSeconds = static_cast<float>(frame) / 60.0f;
+        result = director.Update(snapshot, {}, static_cast<double>(frame) / 60.0, 1u);
+        Check(std::isfinite(result.revealGain) && result.revealGain >= 0.7199f &&
+              result.revealGain <= 1.0001f && std::abs(result.revealGain - previousGain) < 0.01f,
+              "six-second gain is bounded and continuous without cue or stored-volume mutation");
+        if (frame == 45 || frame == 270)
+            Check(Near(result.revealGain, 0.72), "gentle duck holds through the warning");
+        previousGain = result.revealGain;
+    }
+    Check(Near(result.revealGain, 1.0), "full reveal restores unity at combat handoff");
+    snapshot.lich.revealElapsedSeconds = 2.0f;
+    result = director.Update(snapshot, {}, 7.0, 1u);
+    const float pausedGain = result.revealGain;
+    snapshot.paused = true;
+    snapshot.lich.revealElapsedSeconds = 5.9f;
+    result = director.Update(snapshot, {}, 1000.0, 1u);
+    Check(Near(result.revealGain, pausedGain), "paused reveal gain does not accumulate wall-clock recovery");
+    snapshot.paused = false;
+    result = director.Update(snapshot, {}, 1001.0, 1u, true);
+    Check(Near(result.revealGain, pausedGain), "background output suspension freezes the envelope");
+    snapshot.lich.revealPhase = KeeperRevealPhase::RetryRecognition;
+    ++snapshot.retryGeneration;
+    snapshot.lich.revealElapsedSeconds = 0.0f;
+    result = director.Update(snapshot, {}, 1002.0, 1u);
+    Check(Near(result.revealGain, 1.0), "retry reset discards the old duck at its safe beginning");
+    snapshot.lich.revealElapsedSeconds = 0.5f;
+    result = director.Update(snapshot, {}, 1002.5, 1u);
+    Check(Near(result.revealGain, 0.82), "recognition uses a restrained independent duck");
+    snapshot.lich.revealElapsedSeconds = 1.0f;
+    result = director.Update(snapshot, {}, 1003.0, 1u);
+    Check(Near(result.revealGain, 1.0), "retry returns to unity before E");
+    snapshot.lich.revealElapsedSeconds = std::numeric_limits<float>::quiet_NaN();
+    result = director.Update(snapshot, {}, std::numeric_limits<double>::quiet_NaN(), 1u);
+    Check(Near(result.revealGain, 1.0), "invalid reveal clocks cannot publish nonfinite gain");
+    snapshot.lich.revealElapsedSeconds = 0.5f;
+    snapshot.finale.lichDefeated = true;
+    result = director.Update(snapshot, {}, 1004.0, 1u);
+    Check(result.cue == MusicCue::F && Near(result.revealGain, 1.0),
+          "reward music owns unity even if an obsolete reveal field survives");
+    snapshot = {};
+    ++snapshot.lastConsumedRouteResetSequence;
+    result = director.Update(snapshot, {}, 1005.0, 1u);
+    Check(Near(result.revealGain, 1.0), "route reset restores independent gain for the new attempt");
+}
+
 } // namespace
 
 int main()
 {
     TestOpeningEngagementAndPersistentBeds();
     TestLichAndRewardPriority();
+    TestKeeperRevealMusic();
+    TestRevealGainEnvelope();
     TestTorchFailureAndOneShotDeduplication();
     TestResetAndQueueLifetimes();
     TestProductionTorchSequence();

@@ -111,6 +111,9 @@ private:
     PlayerVitals playerVitals_{};
     TravelFootstepCadence playerFootsteps_{};
     std::array<PlayerFootstepCadence, kSkeletonEnemyCapacity> enemyFootsteps_{};
+    std::array<double, kSkeletonEnemyCapacity> skeletonIncidentalIdleSeconds_{};
+    std::array<double, kSkeletonEnemyCapacity> skeletonIncidentalNextSeconds_{{12.0, 18.0}};
+    double skeletonIncidentalSpacingSeconds_ = 0.0;
     CombatSnapshot combatSnapshot_{};
     TorchFailureSnapshot torchFailureSnapshot_{};
     horde::gameplay::items::HeldItemStates heldItems_ =
@@ -162,6 +165,9 @@ private:
     float dodgeCooldownRemainingSeconds_ = 0.0f;
     bool finaleCompletionEmitted_ = false;
     bool lanternPendulumResetPending_ = true;
+    bool skeletonIdlePhasesEnabled_ = true;
+    bool lichAttackEligible_ = false;
+    std::uint64_t lichRevealAttackSequenceFloor_ = 0u;
 };
 
 } // namespace horde::gameplay::simulation

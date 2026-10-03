@@ -5,6 +5,8 @@
 
 #include <array>
 #include <atomic>
+#include <bit>
+#include <cmath>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -119,7 +121,7 @@ Java_com_samfa12_hordelanternrt_HordeMusicPlayback_nativePoll(
     {
         if (musicPublicationFailed.load(std::memory_order_acquire)) return JNI_FALSE;
         auto* music = Get(handle);
-        if (!music || !music->session || !control || env->GetArrayLength(control) != 4)
+        if (!music || !music->session || !control || env->GetArrayLength(control) != 5)
             return JNI_FALSE;
         music->input = inbox.Take(); // Mutex is outside Core Render and JNI array access.
         music->input.externallySuspended = music->input.externallySuspended || suspended == JNI_TRUE;
@@ -129,11 +131,18 @@ Java_com_samfa12_hordelanternrt_HordeMusicPlayback_nativePoll(
             if (status != MusicPcmStatus::Ok && status != MusicPcmStatus::Suspended) return JNI_FALSE;
             music->input.eventCount = 0u; // Newly copied edges already observed exactly once.
         }
-        const std::array<jlong, 4u> state{
+        const float revealGain = music->session->Selection().revealGain;
+        if (!std::isfinite(revealGain) || revealGain < 0.0f || revealGain > 1.0f)
+            return JNI_FALSE;
+        // One worker-owned tuple transports gain with its observed epoch,
+        // suspension and content cursor. No JNI float side channel can expose
+        // a gain from a different gameplay publication.
+        const std::array<jlong, 5u> state{
             music->input.available ? 1 : 0,
             static_cast<jlong>(music->input.restartEpoch),
             (music->input.externallySuspended || music->input.snapshot.paused) ? 1 : 0,
-            static_cast<jlong>(music->session->GeneratedFrames())};
+            static_cast<jlong>(music->session->GeneratedFrames()),
+            static_cast<jlong>(std::bit_cast<std::uint32_t>(revealGain))};
         env->SetLongArrayRegion(control, 0, static_cast<jsize>(state.size()), state.data());
         return env->ExceptionCheck() ? JNI_FALSE : JNI_TRUE;
     }

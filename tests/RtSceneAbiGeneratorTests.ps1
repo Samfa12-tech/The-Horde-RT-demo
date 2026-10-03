@@ -46,8 +46,10 @@ try {
     }
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
-    if ($definition.schema -ne 1 -or $definition.bindings.dielectricDiagnostics -ne 22) {
-        throw "RT scene ABI schema/binding-22 contract changed."
+    if ($definition.schema -ne 1 -or $definition.bindings.dielectricDiagnostics -ne 22 -or
+        $definition.bindings.environmentTexture -ne 25 -or
+        $generatedGlsl -notmatch 'binding = 25\) uniform sampler2D rtEnvironmentTexture;') {
+        throw "RT scene ABI schema/binding22/environment25 contract changed."
     }
     $diagnosticRecord = @($definition.records | Where-Object name -eq 'RtDielectricDiagnostics')
     if ($diagnosticRecord.Count -ne 1 -or $diagnosticRecord[0].size -ne 176 -or

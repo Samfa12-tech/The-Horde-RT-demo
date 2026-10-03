@@ -23,7 +23,8 @@
     "fireEmitters": 21,
     "dielectricDiagnostics": 22,
     "worldPlayerVertices": 23,
-    "viewmodelVertices": 24
+    "viewmodelVertices": 24,
+    "environmentTexture": 25
   },
   "geometryRoles": { "static": 0, "playerWorldBody": 1, "playerViewmodel": 2 },
   "playerInstances": { "worldBody": 4, "viewmodel": 20, "viewmodelPrimaryMask": 64, "bodyRemainderPrimaryMask": 128 },
@@ -127,7 +128,7 @@
       ]
     },
     {
-      "name": "RtMaterialGpu", "alignment": 16, "size": 112,
+      "name": "RtMaterialGpu", "alignment": 16, "size": 128,
       "fields": [
         { "name": "baseColorFactor", "type": "float4", "offset": 0 },
         { "name": "emissiveFactorStrength", "type": "float4", "offset": 16 },
@@ -135,7 +136,8 @@
         { "name": "iorThicknessAttenuationDistance", "type": "float4", "offset": 48, "comment": "xyz: authored IOR/thickness/attenuation distance; w: loader-derived numerical spawn minimum width (zero without certificate)." },
         { "name": "attenuationColor", "type": "float4", "offset": 64, "comment": "rgb: authored attenuation color; w: loader-derived numerical spawn geometry error, rounded upward." },
         { "name": "textureLayers", "type": "uint4", "offset": 80 },
-        { "name": "materialFlags", "type": "uint4", "offset": 96 }
+        { "name": "materialFlags", "type": "uint4", "offset": 96 },
+        { "name": "normalScaleUvScaleBlend", "type": "float4", "offset": 112, "comment": "x: finite signed tangent-normal XY multiplier; yz: positive UV multipliers; w: normal blend. Imported defaults (1,1,1,1), dungeon defaults (1,0.42,0.42,0.34)." }
       ]
     },
     {

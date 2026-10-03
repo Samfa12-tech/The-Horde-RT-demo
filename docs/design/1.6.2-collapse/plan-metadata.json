@@ -1,0 +1,27 @@
+{
+  "schema": "game-room.plan-metadata.v1",
+  "roomId": "horde-collapse-162",
+  "style": "monochrome-engineering",
+  "projectionSource": "actual-meshes",
+  "layers": [
+    "lower-room",
+    "reflected-ceiling"
+  ],
+  "semanticLabelsOutsideImage": true,
+  "aiInspirationIncluded": false,
+  "aiInspirationReason": "",
+  "coverage": [
+    "room-outline",
+    "cutouts",
+    "openings",
+    "exterior-apron",
+    "main-sign",
+    "ingress-props",
+    "floor-markers",
+    "barriers",
+    "columns",
+    "circulation",
+    "placed-features"
+  ],
+  "coverageNotes": "Only original interior/rear remnant is in scope. Exterior apron/main sign/floor markers/new columns not applicable; no exterior level or captions. Plans project evaluated proposed rock/masonry study meshes. Reserve overlays are collision/encounter envelopes, not proxy prop silhouettes."
+}

@@ -163,6 +163,21 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static void AdmitPreviewInventoryFixture(PresentableTinyRtScene& scene)
+    {
+        // Synthetic admitted owner: public topology getters intentionally
+        // require readiness. No device is bound, so this fixture never invokes
+        // Vulkan; allocation inventory remains independently observable.
+        scene.ready_ = true;
+        scene.sceneProfile_ = RtSceneProfile::GraphicsPreview;
+        scene.tlasInstanceCount_ = 7u;
+        scene.tlas_.handle = FakeHandle<VkAccelerationStructureKHR>(0x987u);
+        scene.environmentTexture_.memory = FakeHandle<VkDeviceMemory>(0x988u);
+        scene.environmentTexture_.allocationSize = 768u;
+        scene.environmentTexture_.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+        scene.environmentTexture_.mipLevels = 10u;
+    }
+
     static void MarkTlasDefinitions(PresentableTinyRtScene& scene)
     {
         scene.tlasInstanceDefinitionsValid_ = true;
@@ -1030,6 +1045,37 @@ int main()
                   "new/rejected recording must discard a prior unsubmitted definition change");
     ok &= Require(notReadyStages.Abort(),
                   "not-ready record observation attempt did not abort");
+
+    PresentableTinyRtScene previewInventoryScene;
+    PresentableTinyRtSceneObservationTestAccess::AdmitPreviewInventoryFixture(previewInventoryScene);
+    const auto previewInventory = previewInventoryScene.ResourceInventory();
+    ok &= Require(previewInventory.tlasInstanceCount == 7u &&
+                      previewInventory.topLevelAccelerationStructureCount == 1u &&
+                      previewInventory.bufferCount == 0u && previewInventory.memoryAllocationCount == 1u &&
+                      previewInventory.deviceLocalBytes == 768u && previewInventory.hostVisibleBytes == 0u,
+                  "preview evidence must use admitted topology and actual environment allocation");
+    PresentableTinyRtScene movedPreview(std::move(previewInventoryScene));
+    ok &= Require(movedPreview.IsReady() &&
+                      movedPreview.Profile() == RtSceneProfile::GraphicsPreview && movedPreview.TlasInstanceCount() == 7u &&
+                      movedPreview.ResourceInventory().tlasInstanceCount == previewInventory.tlasInstanceCount &&
+                      movedPreview.ResourceInventory().memoryAllocationCount == previewInventory.memoryAllocationCount &&
+                      movedPreview.ResourceInventory().deviceLocalBytes == previewInventory.deviceLocalBytes &&
+                      !previewInventoryScene.IsReady() && previewInventoryScene.TlasInstanceCount() == 0u &&
+                      previewInventoryScene.ResourceInventory().topLevelAccelerationStructureCount == 0u &&
+                      previewInventoryScene.ResourceInventory().memoryAllocationCount == 0u,
+                  "preview topology and panorama allocation must move to exactly one owner");
+    PresentableTinyRtScene assignedPreview;
+    assignedPreview = std::move(movedPreview);
+    ok &= Require(assignedPreview.IsReady() &&
+                      assignedPreview.Profile() == RtSceneProfile::GraphicsPreview &&
+                      assignedPreview.TlasInstanceCount() == 7u &&
+                      assignedPreview.ResourceInventory().tlasInstanceCount == previewInventory.tlasInstanceCount &&
+                      assignedPreview.ResourceInventory().memoryAllocationCount == previewInventory.memoryAllocationCount &&
+                      assignedPreview.ResourceInventory().deviceLocalBytes == previewInventory.deviceLocalBytes &&
+                      !movedPreview.IsReady() && movedPreview.TlasInstanceCount() == 0u &&
+                      movedPreview.ResourceInventory().topLevelAccelerationStructureCount == 0u &&
+                      movedPreview.ResourceInventory().memoryAllocationCount == 0u,
+                  "preview move assignment must retain one ready topology and panorama allocation owner");
 
     PresentableTinyRtScene scene;
     PresentableTinyRtSceneObservationTestAccess::Populate(scene);

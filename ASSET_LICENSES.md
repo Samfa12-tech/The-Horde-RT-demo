@@ -145,3 +145,76 @@ MIT licence. The complete copyright, permission notice and disclaimer from
 credits identify the loader and the notice location. Package admission verifies
 the complete notice bytes; this corrects future candidate packaging and does
 not alter frozen 1.6.1 artifacts.
+
+## 1.6.2 keeper and skeleton runtime cues
+
+The owner supplied four local Pixabay MP3s. Their original bytes remain local,
+outside public Git and distributed packages. The integrated game uses only the
+mono PCM16/48k runtime derivatives listed with exact source/runtime hashes,
+frames, edge trims, endpoint ramps and event mappings in
+`assets/audio/pixabay/keeper-asset.manifest.json`. These are under the
+[Pixabay Content License](https://pixabay.com/service/license-summary/) and
+[full terms](https://pixabay.com/service/terms/), verified3October2026; they are
+not represented as CC0. Attribution is voluntary. Do not redistribute these
+files as a standalone audio library.
+
+- Falling Bones and Rattling Bones by spookymodem (Freesound), uploaded through
+  freesound_community, via Pixabay. Runtime: `skeleton_falling_bones.wav` and
+  `skeleton_idle_rattle.wav`.
+- Lich Demonic Voice - I Sense You! and Come Closer! by PhatPhrogStudio, via
+  Pixabay. Runtime: `keeper_i_sense_you.wav` and `keeper_come_closer.wav`.
+
+`tools/prepare-keeper-audio.py` preserves source hashes, converts format, trims
+only quiet edge windows with a25ms reserve and adds short endpoint ramps. The
+idle excerpt is bounded to1.25s. No gain normalization or music instrumentation
+change is applied. Exact-candidate owner listening remains pending.
+
+## 1.6.2 native night environment and authored shaft foliage
+
+The night-storm panorama is an existing project-owned generated Briarhold asset,
+created9August2026 with OpenAI built-in image generation; no new generation or
+paid service was used. Its original provenance and source PNG are retained in
+`assets/textures/environment/source/`. Source SHA-256:
+`83c297f7373e52feee50a881d5291f8e99faab8556fbce4c041c4b63b497dd8b`.
+The inspected1024x512 WebP intermediary hash is
+`58dc7c09547d7ed560c75d97038556b908b50ffecd12873601b5ca9bfc814824`.
+
+`tools/prepare-horde-environment.py` produces mipmapped512x256 RGBA8-sRGB Windows
+and ASTC6x6-sRGB Android KTX2 files. Exact derivative hashes/formats/bytes are in
+`assets/textures/environment/runtime/asset.manifest.json`. Package only runtime
+tiers and their provenance, never source art. This is direction-based native RT
+miss/reflection radiance, not baked scene illumination.
+
+The bounded hanging sprigs are project-authored opaque leaf/stem geometry,
+reusing the admitted moss material through generic material tint/normal controls.
+There is no new third-party foliage texture, alpha card or generation licence.
+
+## 1.6.2 collapse reference study (not yet runtime-admitted)
+
+[Poly Haven Boulder01](https://polyhaven.com/a/boulder_01) by Rico Cilliers is
+[CC0](https://polyhaven.com/license), verified3October2026. The owner-selected
+1K glTF source and dependencies were downloaded and matched upstream byte/MD5
+metadata; SHA-256 receipts are retained in the isolated source-art workspace.
+The downloaded mesh has66122triangles, independently counted in Blender5.2;
+the source page's124K claim is not this download's topology. An unmodified source
+copy is preserved. A2200triangle welded/decimated study and project-authored
+broken dressed stone/lintel appear in `docs/design/1.6.2-collapse/` for the
+required owner layout/reference review. Final Form/runtime export is pending;
+these studies are excluded from shipping assets.
+
+## 1.6.2 Android Core-compatible waterfall derivative
+
+The existing admitted Pixabay waterfall source remains unchanged. The Windows
+runtime retains its full21.323479s mono loop. Android's canonical native PCM Core
+accepts stereo48k PCM16 bodies of at most12s; `tools/prepare-core-waterfall-loop.py`
+produces an11.5s dual-mono derivative without modifying Core or its pinned code.
+A750ms head crossfade uses the real continuation after the selected body to join
+the wrap without an added discontinuity. No silence, gain normalization or
+resampling is introduced. Exact source/derivative hashes, frames, processing and
+the shorter repetition tradeoff are recorded in
+`assets/audio/pixabay/waterfall-core.manifest.json`.
+
+The existing Pixabay licence/provenance applies to this integrated derivative;
+it is excluded from Windows runtime packaging. Exact-candidate repeated-loop
+listening and Android output/lifecycle acceptance remain pending. The change is
+not evidence that the former MediaPlayer issue was reproduced or diagnosed.

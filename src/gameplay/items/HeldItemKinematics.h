@@ -22,6 +22,13 @@ inline constexpr float kClaimedRewardLanternScale = 0.44f;
 
 inline constexpr float kSwordGripRollRadians = 1.3962634f;
 
+// Production torch: Grip->Flame +.525 m, visible fire .34 m. Reserve
+// another .06 m for the animated tip and .15 m for cage/fire lateral travel.
+// Enlarging the authored fire requires re-admitting this shared envelope.
+inline constexpr float kHeldTorchEnvelopeTopFromGrip = 0.925f;
+inline constexpr float kHeldTorchEnvelopeRadius = 0.15f;
+inline constexpr float kHeldTorchOverheadGap = 0.03f;
+
 // Shared pose authority, not a renderer-only offset. The anatomical profile is
 // opt-in until the modelled body/viewmodel route passes live owner acceptance.
 enum class PlayerMountProfile : std::uint8_t { LegacyViewRelative, AnatomicalBody };
@@ -70,6 +77,8 @@ struct HeldItemKinematicsState
     float swordForwardRadians = 0.0f;
     float parryBlend = 0.0f;
     float successJolt = 0.0f;
+    // World-down translation of the shared hand target, never a light offset.
+    float torchOverheadLowering = 0.0f;
 };
 
 struct HeldItemFixedStepInput
@@ -118,7 +127,8 @@ struct FirstPersonSafeFrame
 HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    float swordSwingRadians,
                                    float heldPropDepth,
-                                   bool bulkyLeftHandCarry = false);
+                                   bool bulkyLeftHandCarry = false,
+                                   float idleTimeSeconds = 0.0f);
 
 std::array<float, 3u> EvaluateSwordBladeAxisInView(float inwardRadians,
                                                    float forwardRadians);

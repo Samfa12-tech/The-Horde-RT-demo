@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
@@ -56,6 +57,12 @@ inline constexpr std::array<RoutePosition, 4> kTorchBayCenters{{
 }};
 inline constexpr RoutePosition kTransmissionThresholdCenter{-29.5f, -15.2f};
 inline constexpr RoutePosition kFinaleCenter{-33.7f, -15.2f};
+// Keeper presentation stays on the entrance-to-reward axis. The live retry is
+// on the arrival side; historical capture checkpoint positions stay separate.
+inline constexpr RoutePosition kKeeperStagingPosition{-34.70f, -15.20f};
+inline constexpr RoutePosition kKeeperRetryPosition{-31.20f, -15.20f};
+inline constexpr RouteRect kKeeperArrivalThreshold{-31.65f, -30.50f, -16.55f, -13.85f};
+inline constexpr float kKeeperPresentationCollisionRadius = 0.65f;
 // The reward is staged against the rear wall of the lich/finale room, clear of
 // the combat centre and with a walkable 1.30 m interaction stand-off to its
 // east. The production chest's audited 1.02 x 0.654 m base is rotated by
@@ -142,6 +149,38 @@ inline void ResolveMovementAgainstRect(const RouteRect& rect,
     }
 }
 
+// A small staged actor needs the same swept clearance on a walk or dodge.
+// Stop at the first contact, retaining the tangent component of ordinary
+// movement; the route/chest solver still owns the outer walkable envelope.
+inline void ResolveMovementAgainstCircle(RoutePosition centre, float radius,
+                                         float previousX, float previousZ,
+                                         float& proposedX, float& proposedZ)
+{
+    const float moveX = proposedX - previousX;
+    const float moveZ = proposedZ - previousZ;
+    const float offsetX = previousX - centre.x;
+    const float offsetZ = previousZ - centre.z;
+    const float lengthSquared = moveX * moveX + moveZ * moveZ;
+    if (lengthSquared < 0.00000001f) return;
+    const float closest = std::clamp(-(offsetX * moveX + offsetZ * moveZ) / lengthSquared, 0.0f, 1.0f);
+    const float closeX = offsetX + closest * moveX;
+    const float closeZ = offsetZ + closest * moveZ;
+    if (closeX * closeX + closeZ * closeZ >= radius * radius) return;
+    const float along = offsetX * moveX + offsetZ * moveZ;
+    const float discriminant = along * along - lengthSquared *
+        (offsetX * offsetX + offsetZ * offsetZ - radius * radius);
+    const float contact = std::clamp((-along - std::sqrt(std::max(0.0f, discriminant))) / lengthSquared, 0.0f, 1.0f);
+    const float hitX = previousX + contact * moveX;
+    const float hitZ = previousZ + contact * moveZ;
+    const float normalX = (hitX - centre.x) / radius;
+    const float normalZ = (hitZ - centre.z) / radius;
+    const float remainingX = (1.0f - contact) * moveX;
+    const float remainingZ = (1.0f - contact) * moveZ;
+    const float inward = std::min(0.0f, remainingX * normalX + remainingZ * normalZ);
+    proposedX = hitX + remainingX - inward * normalX;
+    proposedZ = hitZ + remainingZ - inward * normalZ;
+}
+
 constexpr ShowcaseZone QueryShowcaseZone(float x, float z)
 {
     if (Contains({-1.85f, 1.85f, -3.25f, 3.4f}, x, z))
@@ -188,6 +227,14 @@ constexpr ShowcaseZone QueryShowcaseZone(float x, float z)
         return ShowcaseZone::Finale;
     }
     return ShowcaseZone::Outside;
+}
+
+constexpr bool HasReachedKeeperArrivalThreshold(float x, float z)
+{
+    // Testing the arrival plane also handles one fixed step crossing the whole
+    // shallow trigger strip. Only the actual finale room can satisfy it.
+    return x <= kKeeperArrivalThreshold.maxX &&
+           QueryShowcaseZone(x, z) == ShowcaseZone::Finale;
 }
 
 constexpr const char* ShowcaseZoneName(ShowcaseZone zone)

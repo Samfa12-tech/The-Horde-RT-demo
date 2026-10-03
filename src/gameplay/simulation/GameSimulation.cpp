@@ -313,6 +313,7 @@ void GameSimulation::ResetRoute()
                                      kMinimumPitch,
                                      kMaximumPitch);
     swordCombat_.Reset(kSkeletonEnemyCapacity);
+    skeletonIdlePhasesEnabled_ = true;
     combatSnapshot_ = swordCombat_.Update(0.0f,
                                            playerX_,
                                            playerZ_,
@@ -466,6 +467,20 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     enemyDirector_ = state.enemyDirector;
     activeEnemyKind_ = state.activeEnemyKind;
     lichEncounter_ = state.lichEncounter;
+    if (isRetry && checkpoint->preset == ShowcaseCheckpointPreset::LichActive)
+    {
+        playerX_ = kKeeperRetryPosition.x;
+        playerZ_ = kKeeperRetryPosition.z;
+        playerYawRadians_ = -1.57079632679f;
+        playerPitchRadians_ = 0.0f;
+        lichEncounter_.BeginRetryRecognition();
+    }
+    skeletonIdlePhasesEnabled_ = isRetry;
+    skeletonIncidentalIdleSeconds_.fill(0.0f);
+    skeletonIncidentalNextSeconds_ = {{12.0f, 18.0f}};
+    skeletonIncidentalSpacingSeconds_ = 0.0f;
+    lichAttackEligible_ = false;
+    lichRevealAttackSequenceFloor_ = latestAttackSequence_;
     chestRewardSequence_ = state.chestRewardSequence;
     finaleSequence_ = state.finaleSequence;
     interactionState_ = state.interactionState;
@@ -745,6 +760,14 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
                         config_.movementSpeedMetresPerSecond * deltaSeconds;
         }
         ResolveCorridorPlayerCollision(previousX, previousZ, playerX_, playerZ_);
+        const LichSnapshot& keeper = lichEncounter_.Snapshot();
+        if (!keeper.revealComplete && keeper.phase != LichPhase::Dead)
+        {
+            ResolveMovementAgainstCircle({keeper.x, keeper.z},
+                kKeeperPresentationCollisionRadius + kPlayerCollisionRadius,
+                previousX, previousZ, playerX_, playerZ_);
+            ResolveCorridorPlayerCollision(previousX, previousZ, playerX_, playerZ_);
+        }
     }
 
     const float travelled = std::hypot(playerX_ - previousX, playerZ_ - previousZ);
@@ -772,17 +795,11 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     if (selectedEnemy != activeEnemyKind_)
     {
         activeEnemyKind_ = selectedEnemy;
-        playerVitals_.ResetForEncounter();
+        if (!lichEncounter_.Snapshot().revealStarted)
+            playerVitals_.ResetForEncounter();
         retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
-        if (activeEnemyKind_ == EnemyKind::Skeleton)
-        {
-            // The opening enemies persist across route selection changes. Only
-            // an explicit retry, route reset, or checkpoint import respawns them.
-        }
-        else if (activeEnemyKind_ == EnemyKind::Lich)
-        {
-            lichEncounter_.Reset();
-        }
+        // Opening enemies and the keeper persist through route selection.
+        // Only explicit reset/retry/checkpoint import may initialise them.
     }
 
     const bool parryAvailable = swordCombat_.CanAcceptParry();
@@ -800,6 +817,19 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             const PlayerAttackCut acceptedCut = swordCombat_.RequestAttack();
             if (acceptedCut != PlayerAttackCut::None)
             {
+                if (acceptedCut == PlayerAttackCut::DownwardCut)
+                {
+                    lichAttackEligible_ = lichEncounter_.Snapshot().revealComplete &&
+                        lastConsumedAttackSequence_ > lichRevealAttackSequenceFloor_;
+                }
+                else
+                {
+                    // A reveal-time downward cut cannot turn into a free hit
+                    // through a queued continuation after the combat boundary.
+                    lichAttackEligible_ = lichAttackEligible_ &&
+                        lichEncounter_.Snapshot().revealComplete &&
+                        lastConsumedAttackSequence_ > lichRevealAttackSequenceFloor_;
+                }
                 playerActionAccepted = true;
                 Emit(GameplayEventType::PlayerSwing,
                      EntityId::Player,
@@ -827,6 +857,8 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                                            playerZ_,
                                            playerYawRadians_);
     EntityId skeletonDamageSource = EntityId::Invalid;
+    skeletonIncidentalSpacingSeconds_ = std::max(
+        0.0, skeletonIncidentalSpacingSeconds_ - deltaSeconds);
     for (std::size_t index = 0u; index < combatSnapshot_.combatantCount; ++index)
     {
         const SkeletonCombatantSnapshot& previous = previousSkeletons[index];
@@ -877,6 +909,26 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                  current.x,
                  current.z);
         }
+        const bool incidentalEligible = skeletonIdlePhasesEnabled_ &&
+            activeEnemyKind_ == EnemyKind::Skeleton && current.health > 0 &&
+            current.action == EnemyCombatAction::Locomotion &&
+            current.animation == EnemyAnimation::Idle;
+        if (incidentalEligible)
+        {
+            // Sparse semantic cues share simulation/lifecycle ownership with
+            // combat. Idle accumulation never changes walking/contact clocks.
+            skeletonIncidentalIdleSeconds_[index] += deltaSeconds;
+            if (skeletonIncidentalSpacingSeconds_ <= 0.000001 &&
+                skeletonIncidentalIdleSeconds_[index] + 0.000001 >=
+                    skeletonIncidentalNextSeconds_[index])
+            {
+                Emit(GameplayEventType::SkeletonIncidental, entity,
+                     EntityId::Invalid, current.x, current.z, 0.30f);
+                skeletonIncidentalNextSeconds_[index] =
+                    skeletonIncidentalIdleSeconds_[index] + 28.0f;
+                skeletonIncidentalSpacingSeconds_ = 6.0f;
+            }
+        }
     }
     if (activeEnemyKind_ == EnemyKind::Skeleton && combatSnapshot_.encounterComplete)
     {
@@ -884,19 +936,44 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     }
 
     const bool finaleActive = QueryShowcaseZone(playerX_, playerZ_) == ShowcaseZone::Finale;
-    const LichPhase previousLichPhase = lichEncounter_.Snapshot().phase;
+    const LichSnapshot previousLich = lichEncounter_.Snapshot();
+    const LichPhase previousLichPhase = previousLich.phase;
+    if (!previousLich.revealComplete)
+    {
+        lichAttackEligible_ = false;
+        lichRevealAttackSequenceFloor_ = latestAttackSequence_;
+    }
     const bool lineOfSight = !IsRouteAudioObstructed(playerX_,
                                                       playerZ_,
                                                       lichEncounter_.Snapshot().x,
                                                       lichEncounter_.Snapshot().z);
     const LichSnapshot& lich = lichEncounter_.Update(
-        activeEnemyKind_ == EnemyKind::Lich ? deltaSeconds : 0.0f,
+        activeEnemyKind_ == EnemyKind::Lich || IsKeeperRevealing(previousLich.revealPhase) ||
+            previousLich.phase == LichPhase::Dead ? deltaSeconds : 0.0f,
         playerX_,
         playerZ_,
         lineOfSight,
-        activeEnemyKind_ == EnemyKind::Lich && finaleActive);
+        activeEnemyKind_ == EnemyKind::Lich && finaleActive,
+        torchFailureSnapshot_.phase == TorchFailurePhase::Settled &&
+            HasReachedKeeperArrivalThreshold(playerX_, playerZ_));
 
-    if (activeEnemyKind_ == EnemyKind::Lich && combatSnapshot_.playerAttackPulse &&
+    if (!previousLich.revealStarted && lich.revealStarted)
+    {
+        Emit(GameplayEventType::KeeperRevealStarted, EntityId::Lich, EntityId::Player, lich.x, lich.z);
+    }
+    if (previousLich.revealPhase == KeeperRevealPhase::Awakening &&
+        (lich.revealPhase == KeeperRevealPhase::Warning || lich.revealPhase == KeeperRevealPhase::Ready))
+    {
+        Emit(GameplayEventType::KeeperWarning, EntityId::Lich, EntityId::Player, lich.x, lich.z);
+    }
+    if (!previousLich.revealComplete && lich.revealComplete)
+    {
+        lichAttackEligible_ = false;
+        lichRevealAttackSequenceFloor_ = latestAttackSequence_;
+        Emit(GameplayEventType::KeeperCombatReady, EntityId::Lich, EntityId::Player, lich.x, lich.z);
+    }
+
+    if (activeEnemyKind_ == EnemyKind::Lich && lichAttackEligible_ && combatSnapshot_.playerAttackPulse &&
         SwordCombat::IsPlayerTargetInRangeCone(playerX_,
                                                 playerZ_,
                                                 playerYawRadians_,
@@ -945,7 +1022,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     const bool playerDamagePulse =
         (activeEnemyKind_ == EnemyKind::Skeleton && skeletonDamageSource != EntityId::Invalid) ||
         (activeEnemyKind_ == EnemyKind::Lich && lichEncounter_.Snapshot().damagePulse);
-    if (input.damageEnabled && playerDamagePulse)
+    const bool keeperRevealInvulnerable = IsKeeperRevealing(previousLich.revealPhase) ||
+        IsKeeperRevealing(lich.revealPhase);
+    if (input.damageEnabled && playerDamagePulse && !keeperRevealInvulnerable)
     {
         const PlayerDamageResult damageResult = playerVitals_.TryApplyDamage();
         if (damageResult == PlayerDamageResult::Damaged)
@@ -1038,6 +1117,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         target.z = source.z;
         target.facingRadians = source.facingRadians;
         target.animationTime = source.animationTime;
+        target.idlePhaseSeconds = skeletonIdlePhasesEnabled_ && index == 1u ? 0.73f : 0.0f;
         target.damageFlash = source.damageFlash;
         target.health = source.health;
         target.animation = source.animation;

@@ -48,10 +48,11 @@ int main()
     ok &= Require(shipping.has_value() && diagnostic.has_value(),
                   "both instrumentation plans must exist");
     if (shipping && diagnostic) {
-        ok &= Require(shipping->bindingCount == 24u &&
+        ok &= Require(shipping->bindingCount == 25u &&
                           shipping->storageBufferDescriptorCount == 13u &&
-                          shipping->descriptorWriteCount == 24u,
-                      "Shipping must use the exact 0-21,23-24/13-storage/24-write plan");
+                          shipping->combinedImageSamplerDescriptorCount == 10u &&
+                          shipping->descriptorWriteCount == 25u,
+                      "Shipping must use the exact 0-21,23-25/13-storage/10-sampler/25-write plan");
         ok &= Require(shipping->diagnosticAvailability ==
                               RtDiagnosticAvailability::CompiledOut &&
                           !shipping->diagnosticIo.allocateBuffer &&
@@ -61,10 +62,11 @@ int main()
                           !shipping->diagnosticIo.zeroReset &&
                           !shipping->diagnosticIo.shaderWriteBarrier,
                       "Shipping must compile every diagnostic resource and IO action out");
-        ok &= Require(diagnostic->bindingCount == 25u &&
+        ok &= Require(diagnostic->bindingCount == 26u &&
                           diagnostic->storageBufferDescriptorCount == 14u &&
-                          diagnostic->descriptorWriteCount == 25u,
-                      "Diagnostic must use the exact 0-24/14-storage/25-write plan");
+                          diagnostic->combinedImageSamplerDescriptorCount == 10u &&
+                          diagnostic->descriptorWriteCount == 26u,
+                      "Diagnostic must use the exact 0-25/14-storage/10-sampler/26-write plan");
         ok &= Require(diagnostic->diagnosticAvailability ==
                               RtDiagnosticAvailability::Available &&
                           diagnostic->diagnosticIo.allocateBuffer &&
@@ -74,17 +76,17 @@ int main()
                           diagnostic->diagnosticIo.zeroReset &&
                           diagnostic->diagnosticIo.shaderWriteBarrier,
                       "Diagnostic must retain the exact counter IO route");
-        constexpr std::array<std::uint32_t, 24u> expectedShipping{
+        constexpr std::array<std::uint32_t, 25u> expectedShipping{
             0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u,
-            12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 23u, 24u,
+            12u, 13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 23u, 24u, 25u,
         };
         for (std::size_t index = 0u; index < expectedShipping.size(); ++index) {
             ok &= Require(shipping->bindings[index].binding == expectedShipping[index],
-                          "Shipping bindings must preserve the non-contiguous 0-21,23-24 roster");
+                          "Shipping bindings must preserve the non-contiguous 0-21,23-25 roster");
         }
         for (std::uint32_t index = 0u; index < diagnostic->bindingCount; ++index) {
             ok &= Require(diagnostic->bindings[index].binding == index,
-                          "Diagnostic bindings must use the contiguous 0-24 interface");
+                          "Diagnostic bindings must use the contiguous 0-25 interface");
         }
         ok &= Require(shipping->bindings[22u].kind ==
                           RtDescriptorResourceKind::StorageBuffer &&
@@ -93,6 +95,21 @@ int main()
                           diagnostic->bindings[22u].kind ==
                           RtDescriptorResourceKind::StorageBuffer,
                       "bindings 22, 23 and 24 must remain storage-buffer ABI entries");
+        ok &= Require(shipping->bindings[24u].binding == kRtBindingEnvironmentTexture &&
+                      shipping->bindings[24u].kind == RtDescriptorResourceKind::CombinedImageSampler &&
+                      diagnostic->bindings[25u].kind == RtDescriptorResourceKind::CombinedImageSampler,
+                      "environment25 is one combined image sampler in both instrumentation contracts");
+        const RtSampledDescriptorLimits exactLimits{10u,10u,10u,10u};
+        ok &= Require(ValidateRtSampledDescriptorLimits(*shipping,exactLimits) &&
+                      ValidateRtSampledDescriptorLimits(*diagnostic,exactLimits),
+                      "both descriptor plans fit the exact ten sampler/image boundary");
+        for (const auto limits : {RtSampledDescriptorLimits{9u,10u,10u,10u},
+                                  RtSampledDescriptorLimits{10u,9u,10u,10u},
+                                  RtSampledDescriptorLimits{10u,10u,9u,10u},
+                                  RtSampledDescriptorLimits{10u,10u,10u,9u}})
+            ok &= Require(!ValidateRtSampledDescriptorLimits(*shipping,limits) &&
+                          !ValidateRtSampledDescriptorLimits(*diagnostic,limits),
+                          "one deficient stage/set sampler/image limit rejects environment admission");
     }
     ok &= Require(!TryMakeRtDescriptorIoContract(static_cast<RtInstrumentation>(99)).has_value(),
                   "invalid instrumentation must not inherit a nearby descriptor plan");

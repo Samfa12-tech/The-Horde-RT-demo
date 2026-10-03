@@ -2,9 +2,15 @@
 
 #include "gameplay/simulation/SimulationSnapshot.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "graphics/GraphicsPreviewSession.h"
 
 namespace horde::vulkan::raytracing
 {
+
+RtSceneFrameInputs BuildGraphicsPreviewFrameInputs(
+    const horde::graphics::GraphicsPreviewSession& session,
+    float outputExposure, WaterQuality waterQuality,
+    FireEmitterQuality fireDetail, const RtSceneTuning& tuning = {});
 
 // Preserve the established renderer and shader boundary while making the
 // shared simulation the sole gameplay authority on every platform.
@@ -17,12 +23,14 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
     float outputExposure,
     const RtSceneTuning& tuning,
-    WaterQuality waterQuality = WaterQuality::High);
+    WaterQuality waterQuality = WaterQuality::High,
+    std::optional<FireEmitterQuality> fireDetail = std::nullopt);
 
 RtSceneFrameInputs BuildRtSceneFrameInputs(
     const horde::gameplay::simulation::SimulationSnapshot& simulation,
     float outputExposure,
     WaterQuality waterQuality,
-    const RtSceneTuning& tuning);
+    const RtSceneTuning& tuning,
+    std::optional<FireEmitterQuality> fireDetail = std::nullopt);
 
 } // namespace horde::vulkan::raytracing

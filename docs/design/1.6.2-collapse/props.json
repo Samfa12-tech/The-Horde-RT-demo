@@ -1,0 +1,97 @@
+{
+  "schema": "game-room.prop-manifest.v1",
+  "roomId": "horde-collapse-162",
+  "generation": {
+    "provider": "free-reuse-and-authored-blender",
+    "apiModel": null,
+    "hardCreditCeiling": 0,
+    "maxChargedAttemptsPerAsset": 0,
+    "notes": "No Meshy or paid image generation is requested/authorized. Generic skill validator Meshy-specific fields intentionally not fabricated."
+  },
+  "assets": [
+    {
+      "id": "boulder-study",
+      "class": "reusable",
+      "function": "Static collapsed entry obstruction",
+      "description": "Poly Haven Boulder01 CC0 study, reduced copy of verified download",
+      "dimensionsMeters": [
+        1.65,
+        1.48,
+        1.18
+      ],
+      "targetPolycount": 2200,
+      "intendedInstances": 3,
+      "attachmentFace": "floor",
+      "semanticFront": "negative-z",
+      "rejectionCriteria": [
+        "Intrudes spawn/gallery or forward encounter",
+        "Unsealed visible sky/light leak",
+        "Weak mobile silhouette or expensive unconsolidated instances"
+      ],
+      "image": {
+        "prompt": "Isolated neutral whole-prop geometry reference; no generated imagery.",
+        "generator": "Blender5.2 evaluated study geometry",
+        "source": "images/boulder-study.png",
+        "approved": true,
+        "approvedBy": "owner"
+      },
+      "attempts": []
+    },
+    {
+      "id": "broken-dressed-stone-study",
+      "class": "reusable",
+      "function": "Static collapsed entry obstruction",
+      "description": "Project-authored broken dressed stone, existing admitted dungeon PBR",
+      "dimensionsMeters": [
+        0.65,
+        0.38,
+        0.42
+      ],
+      "targetPolycount": 100,
+      "intendedInstances": 3,
+      "attachmentFace": "floor",
+      "semanticFront": "negative-z",
+      "rejectionCriteria": [
+        "Intrudes spawn/gallery or forward encounter",
+        "Unsealed visible sky/light leak",
+        "Weak mobile silhouette or expensive unconsolidated instances"
+      ],
+      "image": {
+        "prompt": "Isolated neutral whole-prop geometry reference; no generated imagery.",
+        "generator": "Blender5.2 evaluated study geometry",
+        "source": "images/broken-dressed-stone-study.png",
+        "approved": true,
+        "approvedBy": "owner"
+      },
+      "attempts": []
+    },
+    {
+      "id": "broken-lintel-study",
+      "class": "reusable",
+      "function": "Static collapsed entry obstruction",
+      "description": "Project-authored sheared broken lintel, existing admitted dungeon PBR",
+      "dimensionsMeters": [
+        1.65,
+        0.42,
+        0.38
+      ],
+      "targetPolycount": 100,
+      "intendedInstances": 1,
+      "attachmentFace": "floor",
+      "semanticFront": "negative-z",
+      "rejectionCriteria": [
+        "Intrudes spawn/gallery or forward encounter",
+        "Unsealed visible sky/light leak",
+        "Weak mobile silhouette or expensive unconsolidated instances"
+      ],
+      "image": {
+        "prompt": "Isolated neutral whole-prop geometry reference; no generated imagery.",
+        "generator": "Blender5.2 evaluated study geometry",
+        "source": "images/broken-lintel-study.png",
+        "approved": true,
+        "approvedBy": "owner"
+      },
+      "attempts": []
+    }
+  ]
+}
