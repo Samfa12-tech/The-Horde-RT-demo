@@ -1,7 +1,7 @@
 # Horde Lantern RT — Campaign and Engine Roadmap
 
 **Owner:** Sam Small / Samfa12  
-**Planning update:** 2 October 2026  
+**Planning update:** 3 October 2026  
 **Status:** Owner-approved direction; future milestones are provisional, not implemented or release promises.
 
 ## Authority and navigation
@@ -9,6 +9,10 @@
 This is the canonical forward-looking campaign roadmap. Use it alongside [AGENTS.md](../AGENTS.md) and [PROJECT_DECISIONS.md](../PROJECT_DECISIONS.md), which retain the engineering, safety and validated-baseline rules. The [Phase Plan](PHASE_PLAN.md) preserves the historical implementation sequence; dated audits and validation reports remain evidence of their own snapshots. This roadmap does not rewrite that history or certify newer runtime behaviour.
 
 The [README](../README.md) identifies the published package and its evidence. A future version label here does not change the application version, prove a feature exists, authorise publication or supersede an unfinished engineering pass.
+
+## Current execution handoff — 3 October 2026
+
+1.6.1 is released and merged, and the owner has confirmed goal completion. The post-release source/recorded-evidence audit is complete; its corrective actions and the three new owner screenshot reports are consolidated in [the 1.6.2 executable goal and acceptance plan](IMPLEMENTATION_GOAL_1_6_2.md). That document now owns sequencing, required versus optional scope, durable checkpoints and implementation acceptance. This update bank remains supporting detail; older prospective start-gate wording below must not restart completed 1.6.1 work or the audit. No merge, paid assets or release is authorised by this planning change.
 
 ## Direction approved by the owner
 
@@ -22,7 +26,7 @@ The defining design pillar is **light as gameplay, powered by the actual ray-tra
 
 | Milestone | Direction | Status / start condition |
 |---|---|---|
-| 1.6.1 engineering baseline | Finish the current engineering programme and its validation. | Complete, accept, merge and release 1.6.1 before starting 1.6.2 implementation. Preserve the active engineering pass. |
+| 1.6.1 engineering baseline | Finish the current engineering programme and its validation. | Released and merged; owner confirmed goal complete on 3 October 2026. Preserve frozen artifacts and accepted evidence. |
 | 1.6.2 — Engine readiness and demo polish | Full post-release audit; clear graphics settings and measured reduced-effects options; temporal/upscaling readiness, material foundations, hands-first themed UI and dungeon polish. | Planned after completed, accepted, merged and released 1.6.1 and before 1.7 gameplay expansion; sequence and acceptance below. |
 | 1.7.0 — Beyond the Tomb | Existing dungeon becomes prologue; physical rope rescue, companion, moonlit woodland, dialogue, world-zone ownership, checkpoints and chapter-specific UI using the accepted 1.6.2 theme. | Scoped planning handoff exists. Start after 1.6.2 is implemented, validated and accepted; then complete and obtain owner acceptance of the agreed 1.7 scope. |
 | 1.8.0 — Village Hub | Continue from the forest to a small village with a few explorable interiors, a hero tavern and a small NPC cast. Reveal more of the wider Horde and establish the hub. | Pencilled in. Begin only after 1.7 is made, tested and accepted; use its actual performance and system evidence to finalise scope. |
@@ -46,7 +50,7 @@ This section is the grouped 1.6.2 update bank. Priorities establish dependencies
 
 | Order | Workstream | Dependency and completion decision |
 |---|---|---|
-| P0 | Full post-release 1.6.1 audit | Begin after the agreed goal is complete and the accepted candidate is merged and released. Reconcile delivered work and remaining gaps before finalising implementation scope. |
+| P0 | Post-release audit corrections | Source/recorded-evidence audit complete. Implement and validate semaphore lifetime, scratch alignment, licence notice, Windows resize and report-filter corrections per IMPLEMENTATION_GOAL_1_6_2.md. |
 | P1 | Graphics menu and measured reduced-effects choices | Use the audited settings/renderer map and measured baseline. Ship validated choices with explicit visual tradeoffs. |
 | P1 | Temporal inputs, resolution and upscaling | Audit existing resolution behaviour first; shared temporal inputs/history correctness precede temporal adapters. Capability, licence and performance evidence decides integration or deferral. |
 | P1 | Material depth foundation | Audit the released material/import paths; complete core normal/scale work. Optional detail/height experiments retain separate acceptance rules. |
@@ -208,8 +212,9 @@ Bring the existing-demo themed HUD/menu refresh forward from 1.7 into 1.6.2. Fol
 ### Existing-demo polish: visuals, enemies and audio
 
 - **Fire, especially the reward lantern:** investigate the owner's report that the flame reads as a static coloured tapered spindle. Inspect it in motion before attributing a cause; improve shape, animation and readability through the shared world-space fire system while keeping emissive geometry, volume, direct light, glass and reflections coherent. Check held, raised, swinging and stationary views on phone and Windows.
+- **Deeper underground shaft (owner report 3696c1a2-5fb3-4476-aaeb-456a130837d8):** extend the pictured overhead opening's shaft/enclosure and walls, with restrained hanging vines/plants, so sky is not exposed too soon. Resolve geometry and dimensions from the actual released scene, preserve physical occlusion/finale lighting, and validate native RT foliage and mobile cost. See the exact sanitized report/acceptance in IMPLEMENTATION_GOAL_1_6_2.md.
 - **Visible exterior sky/skybox:** give existing openings a convincing visible environment through the native RT path. Evaluate Briarhold's sky assets before creating replacements, checking provenance, projection, seams, colour space and suitability for Horde's existing lighting/exposure. A direction-sampled miss environment is valid; preserve physical roof/geometry occlusion and consistent relevant reflected/transmitted views. Do not add a fake background quad or raster fallback. Preserve the existing finale's accepted timing and light progression; 1.7 owns its deliberate moonlit rescue change.
-- **Collapsed entrance behind spawn:** replace the plain-wall reading with a visibly collapsed former passage: grounded boulders, matching broken masonry, damaged opening and sealed backing. Follow the [asset shortlist, Blender preparation and ready-to-use Codex handoff](COLLAPSED_ENTRY_1_6_2.md). Preserve spawn, gallery, forward route and torch clearance; begin with verified free CC0 sources rather than paid generation.
+- **Collapsed entrance behind spawn:** replace the plain-wall reading with a visibly collapsed former passage: grounded boulders, matching broken masonry, damaged opening, stairs receding into darkness behind the blockage, and recessed sealed backing. Follow the [asset shortlist, Blender preparation and ready-to-use Codex handoff](COLLAPSED_ENTRY_1_6_2.md). Preserve spawn, gallery, forward route and torch clearance; begin with verified free CC0 sources rather than paid generation.
 - **Entryway/skeleton-area props:** identify the flat-looking objects from the actual scene/captures, then improve or replace their geometry/materials as appropriate. Do not guess their identity or assume a particular asset is the cause. Retain collision, route readability and measured RT budgets.
 - **Held torch/light coherence and sword idle motion:** the owner reports the torch bobbing at rest while light/shadows appear not to follow, and requests more natural sword idle breathing. This is not runtime-reproduced here. Source inspection at [9931cf18](https://github.com/Samfa12-tech/The-Horde-RT-demo/tree/9931cf18fc36369ca6efbe2b785d15f877bf6d31) already propagates a small idle sway into the simulation emitter: [HeldItemKinematics](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/9931cf18fc36369ca6efbe2b785d15f877bf6d31/src/gameplay/items/HeldItemKinematics.cpp) composes torch/flame/light sockets together, while the renderer has a later final-grip item recomposition and a distinct emitter upload. Reconcile actual source paths and final visible torch/flame/light socket agreement in the released baseline rather than assuming absent light animation. Reproduce the exact live build through idle, movement, look, clearance, drop and reward-lantern transitions. Keep flame and light attached to the same stable authored source; preserve genuine moving RT shadows, with no independent cosmetic light oscillation. Evaluate subtle sword breathing through the shared hand/item pose, blending cleanly into attack/parry without changing hit tests, timing, grip/IK or clearance. Do not add camera bob; a bounded strength/speed/off comfort option is only a candidate if useful and must keep prop/emitter motion coherent. Validate matched PC/phone motion with steady/moving camera, shadow contact, pause/resume and no phase pops, flicker or drift; record cost. The source inspection is not evidence that a visible desynchronisation has been reproduced.
 - **Held torch versus low roofs:** reproduce the reported clipping and investigate both visible equipment clearance and physical geometry/collision. Use the shared held-item/retraction contract, including overhead clearance; verify torch, flame, light, hands and shadows agree through movement and look angles rather than hiding the problem with an overlay.

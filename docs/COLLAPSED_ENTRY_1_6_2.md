@@ -2,6 +2,12 @@
 
 **Owner request: 2 October 2026.** The wall behind the initial player position should read as the passage they entered through, now collapsed. Retreat is impossible; the usable route is forward into the dungeon. This is a future 1.6.2 demo-polish slice after completed, accepted, merged and released 1.6.1.
 
+## 3 October owner screenshot refinement
+
+Release 1.6.1 report **43425e1d-de82-40d4-bd33-daf1ebf5318c** confirms the flat rear-wall appearance. The required composition now explicitly includes **stairs receding into darkness behind the rock/brick/debris blockage**. These stairs communicate the lost entry route; they do not create a traversable return or expand the playable dungeon. Recess the sealed backing beyond the visible stair remnant and preserve all spawn, route and containment requirements below. Inspect the original authorised screenshot before placement; exact coordinates/dimensions must come from the actual scene. [Sanitized intake](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/16#issuecomment-5965622959); [unified execution goal](IMPLEMENTATION_GOAL_1_6_2.md).
+
+The companion low-roof report **3e461f78-f619-46de-a6ac-5fd4bc115970** requires shared torch clearance/retraction at the pictured brick opening, while **3696c1a2-5fb3-4476-aaeb-456a130837d8** requires a deeper overhead shaft with hanging vegetation. They are separate scene requirements, not extra objects to cram into this collapse. Coordinate all three through the unified goal.
+
 ## Locked scene intent
 
 Create a static aftermath, not a new falling-rock cutscene, destruction simulator or physics puzzle. Keep the silent protagonist. A player who turns around should understand the blocked route from geometry alone, without a caption or new voice line.
