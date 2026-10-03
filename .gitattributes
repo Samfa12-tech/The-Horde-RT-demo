@@ -230,3 +230,4 @@ docs/evidence/2026-10-03-windows-live-closeout/** -text whitespace=-trailing-spa
 # Preserve exact signed-release receipts, including verbatim readelf output.
 docs/evidence/2026-10-03-signed-freeze/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 docs/evidence/2026-10-03-signed-s26/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-03-release-publication/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol

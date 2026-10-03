@@ -2,9 +2,20 @@
 
 Updated 2026-10-03. Branch: `codex/horde-1.6.1-engineering-pass`.
 Engineering work has resumed by explicit owner instruction; the goal is not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
-and [latest lantern evidence](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
+and [current finite release evidence](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md).
 
 ## Current closeout checkpoint — October 3
+
+Owner explicitly confirms publication green for go and requests Butler/itch
+publication, non-draft GitHub Release, normal main integration and scoped local
+cleanup. Final metadata-only package source is `a397757`; Windows ZIP `3e1cdca7`,
+unchanged signed Android `bc5c7ce3`, manifest `c3aa1f3c`. Original freeze is
+preserved; exactly README/release notes/licence status changed in Windows, with
+executable/all69 assets unchanged. No phone or listening operation is queued.
+Next: push reviewed publisher/receipt changes, obtain current-head CI, run the
+canonical final preflight, publish exact artifacts, verify remote bytes/metadata,
+then update released facts/guards and merge. Later paragraphs preserve earlier
+checkpoints, not the current publication authority.
 
 Owner now confirms the requested footstep/SFX, cuff and music checks are green,
 accepts performance **as measured** for1.6.1, and defers the final S24 matrix:

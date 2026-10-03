@@ -1,6 +1,7 @@
 # Showcase Alpha1.6.1 — signed, frozen, unpublished candidate
 
-Package source checkpoint: `0c7db23beb5af1fd83b9a4d7cdf950386f6e0eea`.
+Initial package source checkpoint: `0c7db23beb5af1fd83b9a4d7cdf950386f6e0eea`.
+Final metadata-only package checkpoint: `a397757249871b6b64fe5b77fc14f24e8cfcbb2b`.
 Package version1.6.1; Android versionCode 9. October3,2026.
 Runtime implementation remains `3d26ad64a3db1e1e1b7965587a72fd114189bdf6`;
 current music/assets are from `ec13876069b4049b524c5198734c0bbbabbd039c`.
@@ -8,15 +9,39 @@ The only subsequent Gradle change is the reviewed music-manifest admission pin;
 current-package metadata is committed at the package source checkpoint.
 
 Owner explicitly confirmed signing backup/recovery and authorised production
-signing and artifact freezing after green CI. This does not authorise merge,
-release/tag creation or publication. Owner-only checklist boxes are not marked
+signing and artifact freezing after green CI. At that checkpoint this did not
+authorise publication; the owner subsequently explicitly confirmed publication
+green for go and requested normal main integration and scoped cleanup.
+Owner-only checklist boxes are not marked
 by Codex. No signing secret or recovery material is included in this evidence.
 
 ## Immutable artifacts
 
+The owner subsequently explicitly confirmed publication green for go. The
+final distribution-neutral package below changes **only** README, release notes
+and licence status metadata. Executable and all69 assets are byte-identical to
+the initial freeze; signed Android is unchanged. No binary rebuild, resigning,
+phone operation or repeated audio check. This is a separately frozen artifact,
+not a mutation or relabelling of the original freeze.
+
+Final local directory: `releases/candidates/1.6.1-metadata-freeze-20261003-a397757/`.
+
+| Artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| Horde-Lantern-RT-Alpha-1.6.1-Windows-x64.zip | 116,163,245 | `3e1cdca75d78e02dbc3bb48553b1db68b6b4bf3e459a784e2be5473ad198c2cf` |
+| Horde-Lantern-RT-Alpha-1.6.1-Android.apk | 108,261,409 | `bc5c7ce3c755c16ec39e2c16fa9eae01c31983c7393e645f881c5bcc9e6a346c` |
+| SHA256SUMS.txt | 220 | `c3aa1f3c240903973973b4fbec2e54b08a67d1bf742228d9cba186f99730c78b` |
+
+The canonical provenance now selects this final directory/source/hash set.
+The initial provenance snapshot remains in the initial evidence receipt.
+Publication/merge is authorised, but no upload or merge is claimed until verified.
+
+### Initial freeze — retained unchanged
+
 Local directory: `releases/candidates/1.6.1-freeze-20261003-0c7db23/`.
 Do not rebuild, rezip, resign, append files inside the ZIP or regenerate the
-manifest after freezing. A later authorised publisher must consume these bytes.
+manifest after freezing. This historical freeze is retained, not selected for
+publication; the separately frozen metadata-only package above is selected.
 
 | Artifact | Bytes | SHA-256 |
 | --- | ---: | --- |
@@ -24,8 +49,8 @@ manifest after freezing. A later authorised publisher must consume these bytes.
 | Horde-Lantern-RT-Alpha-1.6.1-Android.apk | 108,261,409 | `bc5c7ce3c755c16ec39e2c16fa9eae01c31983c7393e645f881c5bcc9e6a346c` |
 | SHA256SUMS.txt | 220 | `efff07ebe93454c3be6f76c1736f3c8869feb13474b8854f8d80991a24a1666e` |
 
-The [canonical provenance](../release-provenance/horde-lantern-rt-alpha-1.6.1.json)
-pins the source, files, sizes, hashes and documentation. Artifacts remain local,
+The [initial provenance](evidence/2026-10-03-signed-freeze/provenance-at-initial-freeze.json)
+pins this original source, files, sizes, hashes and documentation. Artifacts remain local,
 ignored and unpublished; committing a receipt is not remote binary backup.
 
 ## Package construction and current checks
@@ -117,10 +142,11 @@ are separate evidence, not a full diagnostics UI pass. No performance matrix,
 email or accepted listening test was repeated. The exact Android compatibility
 record is updated; Horde is stopped and phone released.
 
-Merge and publication remain withheld. At a separately authorised launch, publish
-a non-draft GitHub Release `v1.6.1` as well as the chosen distribution channels:
+Publication and subsequent normal main integration are now explicitly authorised.
+The next unfinished step is fresh current-head CI and final-metadata preflight,
+then exact Butler uploads and a non-draft GitHub Release `v1.6.1`:
 installed1.6.0 selects it in the passing fixture, but itch alone cannot trigger
 the existing updater. The action opens a download page, not an automatic install.
 The real future update prompt remains post-publication evidence, not a preflight
-pass. Signed-update smoke is now separately proven; explicit publication
-authority still must not be inferred from a structural provenance preflight.
+pass. Signed-update smoke is now separately proven; structural provenance
+preflight and owner publication authority remain distinct checks.

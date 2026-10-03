@@ -7,7 +7,7 @@ No merge, publication or tag was performed during freezing. The subsequent
 [exact signed S26 smoke](../2026-10-03-signed-s26/README.md) is complete.
 
 The [release validation](../../SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md)
-and [canonical provenance](../../../release-provenance/horde-lantern-rt-alpha-1.6.1.json)
+and [initial provenance snapshot](provenance-at-initial-freeze.json)
 pin exact frozen artifacts, construction, checked contracts and device gaps.
 Local frozen artifact directory is
 `releases/candidates/1.6.1-freeze-20261003-0c7db23/`.
