@@ -2,7 +2,99 @@
 
 Last updated: 2026-10-03
 
-## Current dfd5a8f1: unchanged alias artifacts and local statistics evidence
+## Current95eb0807: fresh native admission and physical death recovery
+
+Evidence class: **exact changed-native development APK admission and bounded
+sequential physical recovery**, not signed release, atomic native packet,
+owner audio/feel or sustained-performance acceptance. Actual SM-S948B/Android16.
+Source `95eb08070354d4b3b775e6d2368cca8688f9cfe6` has all six jobs individually
+completed/success in [CI37155231702](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37155231702).
+A later docs/tools commit needs its own CI.
+
+Current Debug APK SHA256
+`3d133d10fb7bf30276c96e03df04709c69da4dc405132d6e0bf309ea789b128f`
+is127,987,050B; current isolated ShippingMobile benchmark
+`269ac11a129cf66b8f170bceb3b5b77670aa567480faec4764e5ab0322367790`
+is115,453,365B. Both update-only installed pullbacks match; original schema2
+Debug preferences remain byte-identical, production/data preserved. All eight
+native ELFs changed: fresh architecture/load/ZIP16KiB/strip/policy admission
+passes, with no whole-native copy-forward. All32 selected-module matches retain
+exact unchanged shader bytes; fresh ARM64 eight-module SDK validation/disassembly
+passes, Shipping has no binding22/atomics. Each APK has81 closed assets/notices
+and full cgltf.140tests/24classes pass with zero failures/errors/skips, including
+DeathRecovery; lint0errors/46warnings. Build1m46s/112tasks/43executed/69cached,
+collected387-runtime/24-test/eight-command banks pass. Admission SHA256
+`804120f4e8e55c9191b7545780a458a8f9fc32eb6490626a020022e8f455e3b7`.
+
+Current benchmark269ac11a physically cold-enters at vitality3; observed combat
+death -> Restart restores3, second death -> Retry restores3 and menu reset restores3.
+Root-reported Home/Resume has native surface cancellation/destruction/recreation/
+presentation (generations1/3) and fresh UI3. Closed66-file audit SHA256
+`e972280e988877542b1beebfb5e410c3216050e7bd53bd460c5ac964be486768`
+verifies sequential UI/log outcomes and Alive acknowledgment, not an atomic
+packet or audio/feel acceptance. That subset lacks a Home command receipt and
+post-final-Menu tree/native paused packet. Benchmark75% retention is root context; no
+Benchmark preference XML exists in this subset. Debug update-only preferences
+are independently byte-identical. The death report concerned an automated test. Earlier cold
+vitality3 at2s and death at30s near the idle skeleton was separate from the
+confirmed pre-existing Restart discard bug; stationary dead50/40 observations
+are excluded from matched-throughput evidence. See [death recovery](ENGINEERING_1_6_2_DEATH_RECOVERY.md).
+
+Separate final-state audit SHA256
+`cb3f0d24ba7185647694e78363a4b327fdb2d4d3bf5b3b519bc8a33e630d518c`
+seals20 unchanged files. Actual Apply/Keep restores75/Mobile/Mobile/GlassOn/30;
+a cold benchmark process shows matching requested/effective original values.
+Fresh Debug Restart restores vitality3, followed by an owned Menu action and
+actual main-menu tree; native generation1 presents RT at75%. Debug preferences
+directly verify schema2/original tuple/pending=false; retained pendingGlass=false
+is inactive. This fresh Debug tree does not fill the earlier Benchmark subset's
+missing tree. Evidence remains sequential, without atomic native paused-state
+proof or Benchmark preference XML; exact APK identity inherits the previous
+installed-pullback seal.
+
+Historical Debug1f95 GlassOff -> ordinary Revert On is closed by111-file audit
+`2c5b8945ac3638d83cba2b97d871d4a455afdc5211d68dfd0f24a60955c4e7f7`:
+settled sequential requested/effective Off/On, no confirmed Off save, final
+schema2/pending=false/original75/Mobile/Mobile/GlassOn/30. This is not current
+APK optical image validation, atomic ACK or reboot durability.
+
+Historical benchmarke339's Pipeline/Mobile50% course completes1,838 CPU/GPU-valid
+rows with zero exceptions,720x1490 internal/1440x2980 output. CPU cycle median
+37.585808ms and GPU RT median26.934999ms are separate scopes; battery41.9 -> 42.8C,
+USB power/cooling unknown and uncollected native thermal describe one ordered
+warm run, without causal/sustained saving or thermal parity. Historical40%
+preview17.1 successful presents/s, CPU58.42/GPU55.39ms at576x1192/output1440x2980
+is neither full-game nor scanout evidence. Its course observer never started
+and was stopped. Current269's first40 preparation failed before Preview touch,
+with75% unchanged/no course; preserve that negative separately from later success.
+
+Current269 experimental40% and33% courses are complete. Each has1,838 valid owning
+CPU/GPU rows,13 waypoints per lap/26 visits over two laps and zero rejected,
+cancelled,outstanding or unavailable samples.40 CPU cycle median/p95 is
+28.634323/37.904479ms, GPU RT18.486874/26.648437ms;33 CPU24.065652/30.603333ms,
+GPU13.728281/19.448125ms. Quality audit SHA256
+`bf46ad55dbff5412eab54242bad0be74adfbd056d08855edc98540572e5679bc`
+seals47 checks/362 stable files,13 CPU-stage denominators/10 zone joins and exact
+selected modules across all four ABIs/current APK/pullback; per-course linkage
+uses uninterrupted context, not atomic APK attestation. See [bounded mobile
+quality measurements](ENGINEERING_1_6_2_MOBILE_QUALITY_MEASUREMENTS.md) for extents,
+preview workloads and battery context. Single ordered USB-powered runs with
+unknown cooling/uncollected native thermal prove neither thermal parity, causal
+saving nor sustained ordinary-game performance. Ordinary minimum50/default75
+remain unchanged.
+
+Current Windows6394 Debug checkpointC passes both backends, one capture each,
+exit0/sync validation/zero markers; this is not four new motion cases. Geometry/
+shader content is unchanged. Historical820's56 captures and owner's watched
+torch lowering/no-clipping Yes remain narrowly historical content acceptance.
+Both validation apps are stopped with original75/Mobile/Mobile/GlassOn/30 restored.
+Phone allocation is paused until Sam explicitly reallocates it, even if connected;
+remaining phone checks await reallocation. Fresh broader settings/lifecycle/optical, Windows statistics, remaining native
+owner/audio/haptic and sustained-performance gates remain open; fixed75%
+sustained30FPS and S24/S25 support are unverified. Remote Send remains blocked.
+Earlier build/UI/export/pending statuses below retain their historical identities.
+
+## Historical pre-reset dfd5a8f1: alias artifacts and local statistics evidence
 
 Evidence class: **exact isolated development-APK identity, original-tuple
 Apply/Keep and physical local-statistics export**, not new Replay or complete
