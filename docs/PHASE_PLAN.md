@@ -1,6 +1,6 @@
 # Phase Plan
 
-> This file records the implementation sequence. Earlier “next” and “deferred” statements are preserved as dated history; the rebuilt player, vitality/retry loop, complete dawn ending, two-skeleton/parry slice, bounded waterfall/mist/controller slice, corrected general water lighting, cross-platform RT Lab, and Fire/PBR/reward-lantern programme are published through Showcase Alpha 1.6.0. Current authority and open evidence boundaries are indexed by `DOCUMENTATION_CHECKPOINT_2026-07-17.md`.
+> This file preserves the historical implementation sequence through published1.6.0; earlier “next” and “deferred” statements describe their dated snapshots. Current1.6.1 engineering, completed signing/S26 smoke, owner deferrals and release-operation boundaries are indexed by the [current handoff](ENGINEERING_1_6_1_HANDOFF.md) and [release receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md), not the historical July documentation checkpoint.
 
 ## Phase 0 - Vulkan RT capability proof: complete
 

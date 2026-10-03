@@ -3,6 +3,11 @@
 Runtime3d26ad64a3db1e1e1b7965587a72fd114189bdf6; no release/signing/publication.
 This is the finding/report closeout, not a repeated audit or a new validation framework.
 
+Subsequent owner-authorised [signed freeze](../2026-10-03-signed-freeze/README.md)
+and [exact signed S26 update/lifecycle smoke](../2026-10-03-signed-s26/README.md)
+are complete. Those newer receipts supersede this earlier snapshot's pending
+signing/device directions, not its retained failures or evidence boundaries.
+
 Current score/assets/source checkpoint `ec13876069b4049b524c5198734c0bbbabbd039c`:
 fresh push[37077929433](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37077929433)
 and PR[37077935253](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37077935253)

@@ -9,7 +9,7 @@ Android version code: `9`
 Updated October 3. This is an unpublished engineering candidate, not a GitHub
 Release or itch upload. The owner confirmed signing backups/recovery and
 authorised production signing and artifact freezing on October3 after green CI.
-Exact frozen artifact identity and remaining signed-device checks are recorded
+Exact frozen artifact identity and completed signed S26 update/lifecycle checks are recorded
 separately in the release validation; merge and publication remain withheld.
 Implementation and acceptance below refer to their retained exact builds;
 earlier owner/device passes do not certify every subsequent candidate.
@@ -89,7 +89,8 @@ carry current evidence and next unfinished steps; do not restart completed tests
   counter stays off in performance runs. Owner audio acceptance is not a new
   externally instrumented OS focus trace. No repeated audition/email is queued.
 - Owner confirmed backups/recovery and authorised signing/freezing only;
-  signed-device evidence and publication authority remain separate. Actual1.6.0→public1.6.1 update dialog can only be
+  exact signed S26 update/settings/RT/ASTC/Home-resume smoke now passes. S24/S25
+  limits and publication authority remain separate. Actual1.6.0→public1.6.1 update dialog can only be
   observed after authorised GitHub publication; selection fixture passes.
   Compiler/mocked tests are not physical RT, sustained pacing or owner-feel proof.
 

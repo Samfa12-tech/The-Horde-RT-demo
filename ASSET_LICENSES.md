@@ -52,7 +52,7 @@ Android runtime derivatives for the five CC0 rows are strict KTX2 arrays using A
 
 Poly Haven's asset license states that its assets are CC0 and may be used commercially without required attribution: https://polyhaven.com/license. Attribution is retained here as project provenance.
 
-## Supplied adaptive score (1.6.1 runtime assets admitted; playback pending)
+## Supplied adaptive score (1.6.1 runtime assets and playback accepted)
 
 `What the Dark Keeps`, supplied in `What_the_Dark_Keeps_Horde_RT_Music_Pack.zip`
 SHA-256 `e28e5936189919fed25f6208dd7a8b97172eb5f7d25f69732cc7339c45f386fa`.
@@ -62,8 +62,9 @@ PCS1 under `assets/audio/music/what-the-dark-keeps/source/` remains the revisabl
 source of truth and is excluded from game packages, as is the supplied preview.
 Only the hash-pinned manifest and sixteen measured stereo48kHz PCM16 body/tail
 derivatives under that asset's `runtime/` enter Windows/Android packages.
-Playback, native-clock/seam/mix and owner listening gates remain open; asset
-admission is not their acceptance. This grant does not relicense Pocket Chordsmith/Pocket Audio source,
+Current native-clock/loop/transition and owner listening checks are accepted;
+see the [finite current A/D delta receipt](docs/evidence/2026-10-03-music-drone/README.md).
+Asset admission alone is not listening acceptance. This grant does not relicense Pocket Chordsmith/Pocket Audio source,
 change existing asset licence statements or authorise production publication.
 See [music integration checkpoint](docs/ENGINEERING_1_6_1_MUSIC_2026-09-30.md).
 The sixteen A-H PCM body/tail prototypes under
@@ -90,7 +91,9 @@ JSON/PCS1 and sixteen runtime derivatives now carry that palette: retained v68
 actual app voices/live FX, unchanged notes/cue timing, accepted A/E PCM reused,
 six remaining cues rendered once. Sparse authored bell accents remain in C/G.
 No preview normalization is applied to runtime. Rights remain **Horde-only**;
-this is not public distribution, platform-listening or release acceptance. See
+that bank's historical receipt alone is not public distribution or later exact-
+artifact acceptance. Subsequent owner listening and scoped A/D-only held-drone
+removal are recorded separately in the current receipt above. See
 `docs/evidence/2026-10-01-music-whistle-bank/README.md` for exact provenance.
 
 ## Windows report-verification SDK (1.6.1 development)

@@ -1,6 +1,16 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-08-31
+Last updated: 2026-10-03
+
+Current engineering state: accepted 1.6.1/code 9 within the documented limits;
+owner-authorised signing/freezing and exact signed S26 update/lifecycle smoke
+are complete, publication/merge withheld. The [current handoff](docs/ENGINEERING_1_6_1_HANDOFF.md),
+[finding disposition](docs/ENGINEERING_1_6_1_FINDING_STATUS.md) and
+[release receipt](docs/SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md)
+supersede historical next-step directions below. S24 is working but not fully
+tested; S25 is unverified. Performance is accepted as measured, not 30 FPS at75%.
+The full graphics-options menu is planned for 1.6.2. Remaining High glass defects
+are future investigation, not passing. Do not restart accepted player/audio work.
 
 ## Identity and release state
 
@@ -16,7 +26,7 @@ Last updated: 2026-08-31
 - Signed Android APK SHA-256: `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`.
 - Windows ZIP SHA-256: `7b0dcf24b4a47771a9c3a27cbc52e3899c87781109afcef20f7a9a8472411d77`.
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
-- The release JKS and a local-only password note live together outside Git with restricted ACLs. An independent owner backup is still required.
+- The release JKS and a local-only password note remain outside Git. The owner confirmed independent backup/recovery and authorised1.6.1 signing/freezing on October3; Codex does not mark owner-only checklist boxes or archive recovery material.
 - Release proof: `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
 - Published Fire/PBR/reward-lantern runtime lineage: feature runtime commit `a04dcb9`, final validation/provenance commit `41e9c6c`, and release source commit `57c81b6`. The exact accepted `SM-S948B` Debug APK is SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`. Final clean Host and 75%/100% exact-device runs pass, but instrumented feature medians are slow and Mobile dielectric budget terminals remain an explicit risk. The signed public APK has package/publication evidence only because no device was connected at publication. Evidence: `docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md`, `docs/TASK_9_OWNER_CANDIDATE_VALIDATION_2026-08-30.md`, and `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
 
@@ -29,7 +39,7 @@ Last updated: 2026-08-31
 
 ## Current renderer
 
-- Android and Windows build BLAS/TLAS, RT pipeline/SBT, dispatch `vkCmdTraceRaysKHR`, write an RT storage image, and present it through the swapchain.
+- The preferred Android/Windows backend builds BLAS/TLAS and RT pipeline/SBT, dispatches `vkCmdTraceRaysKHR`, writes an RT storage image and presents through the swapchain. The authorised real RayQueryCompute backend uses the same hardware acceleration structures/shading and RT-produced presentation without pipeline/SBT requirements; it is not a software/fake-RT fallback.
 - `rtScene.presented` becomes true only after an RT-produced frame reaches successful presentation.
 - The phone-safe path uses `rayQueryEXT` in raygen for primary, visibility, and bounded bounce/transmission work with pipeline recursion depth 1.
 - A recursive depth-2 closest-hit experiment compiled but failed during phone pipeline creation. Do not restore it without proving capability and pipeline creation on the phone.
@@ -49,7 +59,7 @@ Last updated: 2026-08-31
 - The complete route is two-skeleton encounter -> three-turn moving-shadow corridor -> roof-water drench/original torch failure at historical `lantern-drop` -> rounded catchment and drain runoff -> blue skylight -> yellow/blue/red/green bays -> open framed threshold -> light-aware hero mirror -> misted staff-lit lich -> opening roof -> returning dawn -> epilogue.
 - The rejected stained pane is not present. The water slice is a narrow architectural feature with no fluid simulation, collision, or movement slowdown.
 - The held and dropped torch are imported PBR RT geometry. Visible flame, coloured direct light, and reflection contribution share one emitter and all reach zero after the authored fall; the old fullscreen overlay must not return.
-- A reusable skinned-player loader/render slot, animation layers, bone sockets, IK targets, and CPU skin/refit backend are retained for development. Owner review keeps block arms player-facing for sword, torch, and reward lantern until the hands/gauntlets are accepted in every scenario. Shadow/reflection arm appearance is deferred to the next update.
+- Normal1.6.1 production uses accepted dedicated modelled RT PlayerViewmodel sleeves/arms/gauntlets and separate PlayerWorldBody geometry/GPU ownership, with shared gameplay animation/IK/grip authority. Block-arm/full-body-primary comparisons are diagnostic-only. Cuff, inner-bicep, normal look-down and mirror presence are accepted; directional locomotion/feet/steeper pitch remain future work.
 - Player vitality is three points with a one-second damage lockout, short fatal hold, encounter retry, route restart, and platform-native death overlays.
 - The imported PBR sword uses an edge-forward rest pose and authoritative downward/upward two-press combo. The lich still requires three accepted hits with a two-second lockout. Its death begins a separate exact two-second chest-unlock countdown; at the boundary one latch event and a warm overhead RT guidance light identify the collision-bearing Gothic chest. Shared interaction opens it, exposes the reward lantern, and claims it before the roof/dawn epilogue continues.
 - The reward lantern has raise/lower state, a hand/grip socket, closed glass geometry, warm internal light, and deterministic acceleration-driven pendulum/torsion motion. Sword, torch, and lantern share held-item composition and wall retraction.

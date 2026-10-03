@@ -6,8 +6,8 @@ that pending device gates passed. See the current handoff for exact artifacts.
 
 | Audit finding | Current disposition / evidence boundary |
 | --- | --- |
-| F01 red host/CI baseline |Resolved baseline and bounded fixture repairs. Checkpoint91dacfd push37081411743/PR37081416178 six-lane workflows green. New updater-test/docs checkpoint requires its own fresh CI; no runtime change. Initial failures retained, not a single97/97 Windows claim. |
-| F02 release/version identity |Resolved1.6.1/code9 development consistency and immutable1.6.0 negative gates. Signing/publication remain owner-controlled. |
+| F01 red host/CI baseline |Resolved baseline and bounded fixture repairs. Current package source0c7db23 push37084760313/PR37084764357 both six-lane green; prior93e6400/91dacfd green retained. Final receipt/tooling commit gets its own CI, not an old-job rerun. Initial failures retained, not a single97/97 Windows claim. |
+| F02 release/version identity |Resolved1.6.1/code9 consistency and immutable1.6.0 negative gates; owner backup/recovery confirmation, authorised stable-key signing/frozen bytes and new exact signed S26 update smoke pass. Merge/publication remain withheld. |
 | F03 procedural first-person arms |Resolved dedicated RT Viewmodel/WorldBody with shared gameplay pose authority; accepted production integration and newer Windows right cuff. Current-bank S26 live image/motion check passes; owner now confirms cuff green. No new tuning. |
 | F04 primitive semantic mismatch |Resolved processor/GLB/manifest/loader/atlas/native contracts; actual skinned/semantic fixtures run in Vulkan-host CI, not just portable builds. |
 | F05 diagnostics in Shipping |Resolved in actual extracted Windows/Android SPIR-V: zero diagnostic atomics/no binding22. Diagnostic ownership/readback stays separate. |
@@ -48,8 +48,12 @@ CPU/GPU rows, counter update/cancel/restart/completion and bounded live images.
 Observer overhead remains unmeasured, not a performance claim. Installed1.6.0
 update selection has an explicit passing1.6.1 fixture; actual public update prompt
 can only be observed after separately authorised non-draft GitHub publication.
-Remaining release-operation gates are owner-only signing/recovery, final signed/
-frozen artifact disposition and publication authority. Deferred evidence is not
+Owner confirms backup/recovery; final signed/frozen artifacts and actual S26
+production update smoke now pass. [Release receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md)
+pins exact identity. Bounded version-source preflight tooling repair, focused
+fixture/CTest1/1 and actual canonical preflight now pass; final receipt/docs
+checkpoint still needs its own CI. Merge/publication authority is still withheld.
+Deferred evidence is not
 relabelled passed. These are not reasons to restart accepted investigations.
 Independent closeout work continues; the goal is not paused. Do not restart prior audits,
 glass investigation, accepted arms/music or completed host matrix.

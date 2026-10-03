@@ -29,11 +29,29 @@ The action opens a download page, not an automatic installer. No publication.
 
 Owner has now confirmed backups/recovery and authorised production signing and
 freezing after current-head green CI. Both93e6400 runs37083785643/37083790750
-completed successfully in all six lanes. Preserve the established certificate
-and use the local-only signing handoff in process memory. Owner checklist boxes
-remain owner-controlled. Exact signed/frozen artifacts and signed-device checks
-are the next bounded step; merge/publication remain withheld.
-Existing unsigned/unpublishable artifacts are not silently promoted.
+and package-source0c7db23 runs37084760313/37084764357 completed successfully in all
+six lanes. [Frozen receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md)
+pins new WindowsZIP94cb88d8, stable-certificate signed AndroidAPKbc5c7ce3 and
+manifest hashes; unchanged binaries/assets admitted, generated Windows validation
+content excluded. Owner checklist boxes remain owner-controlled; no secrets in
+repo. Final signed S26 production-ID update/pullback/settings/RT/ASTC/Home-resume
+smoke now passes by actual new evidence. Horde stopped, phone released; no new
+phone/listening/performance check queued. S24/S25/High glass remain explicitly
+deferred/unverified within owner disposition. Merge/publication remain withheld.
+The final local release-provenance preflight initially exposed stale literal-
+version assumptions. The bounded tooling fix preserves historical1.6.0/code8
+anchored guards and validates generated VERSION/map plus actual CMake/Gradle
+authority wiring for1.6.1. Focused fixture/CTest1/1 and the real canonical
+preflight now pass, including live tag/release-absence checks. Its structural
+publicationReady flag is not owner publication authority or hardware proof.
+Do not rebuild frozen artifacts. Final receipt/docs checkpoint needs its own CI.
+Owner asks for current README/docs, normal main integration and scoped local
+cleanup after release. Publication remains separately awaiting clarification.
+The original frozen Windows ZIP retains the preceding metadata snapshot;
+if publishing, construct a separately receipted metadata-only final ZIP with
+current package docs/licences, unchanged executable/all69 assets and unchanged
+signed Android bytes. Preserve the original read-only freeze/hash; do not
+silently mutate or relabel it. No phone/audio rerun is needed for prose alone.
 Do not mark signing checks passed, exact S24 fully tested or S25 supported.
 
 Newest bounded owner request: remove only held Melody3 notes in A/D. Implemented

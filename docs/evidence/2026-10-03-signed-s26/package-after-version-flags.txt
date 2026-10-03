@@ -1,0 +1,3 @@
+    versionCode=9 minSdk=24 targetSdk=34
+    versionName=1.6.1
+    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]

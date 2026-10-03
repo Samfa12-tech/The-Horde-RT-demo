@@ -1,6 +1,6 @@
 # 1.6.1 engineering programme and release gates
 
-Updated 2026-10-03. Status: **engineering candidate accepted within documented limits; release operations remain unauthorised**.
+Updated 2026-10-03. Status: **engineering candidate accepted within documented limits; authorised signing/freezing and signed S26 smoke complete; publication/merge withheld**.
 
 This is the current next-step index for `codex/horde-1.6.1-engineering-pass`.
 The owner-authorised full repository audit remains in scope. The 2026-09-13
@@ -47,11 +47,15 @@ remains unmeasured, separate from correctness, and off in performance runs.
 No more phone or micro-optimisation work is queued. Existing failure/negative
 evidence,30FPS shortfall and owner-deferred High glass defects stay explicit.
 
-Next release operations require owner-only signing/recovery confirmation,
-exact signed/frozen artifact disposition and separate publication authority.
+Owner has since confirmed independent signing backup/recovery and authorised
+production signing/freezing. Source0c7db23 has green push/PR CI; the stable-key
+Android APK, Windows ZIP and exact signed S26 update/settings/RT/ASTC/Home-resume
+smoke now pass. See the [current release receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md).
+The phone is released. Only the bounded release preflight/current documentation
+checkpoint remains locally; publication/merge still require separate authority.
 The installed1.6.0 updater already checks GitHub; a published non-draft
 `v1.6.1` GitHub Release is needed at authorised launch. Itch alone cannot trigger
-that prompt. No merge/signing/publication is authorised by this closeout.
+that prompt. No merge/publication is authorised by this closeout.
 
 ## Previous release-focused gates — October2 owner direction
 

@@ -2,6 +2,38 @@
 
 Last updated: 2026-10-03
 
+## October3: final signed1.6.1 production update — exact S26 smoke
+
+Evidence class: **local exact signed-APK installation/pullback, RT presentation,
+bounded live image and lifecycle smoke**, not sustained performance or a new
+owner listening acceptance. ADB confirms raw model **SM-S948B**. Production app
+was1.6.0/code8 before `install -r`, then1.6.1/code9; no app-data clear/downgrade.
+Pulled installed APK matches the frozen signed artifact byte-for-byte:
+`bc5c7ce3c755c16ec39e2c16fa9eae01c31983c7393e645f881c5bcc9e6a346c`.
+The established certificate and non-debuggable production identity pass package
+checks. Before/after Settings show retained SFX70%, look sensitivity100%, render
+resolution76% and Mobile water; the new separate Music control shows70%.
+76% is the preserved user choice, not a new default or a75% benchmark.
+
+Actual live image shows modelled hands/torch/sword and two skeletons; HUD reports
+native Vulkan RT active/vitality3. Native logs confirm strict ASTC and successful
+swapchain presentation at1094x2265→1440x2980. Initial ready time11.353s; same-PID
+Home/resume presentation at12.730/17.317/13.370s across the observed replacement
+generations. Controlled paused-resume returns to active scene with vitality3.
+The first unpaused inspection interval later reaches gameplay death; restart and
+controlled paused-resume are retained, not an invented uninterrupted combat pass.
+Early pre-update UI-root absence and a diagnostics idle-dump failure are retained
+automation limitations; no complete diagnostics interaction claim is made.
+
+Horde was force-stopped after the smoke and no PID remains. No command installed,
+cleared or downgraded the separate Debug app. The phone is released; no further
+phone test is queued for1.6.1. [Signed freeze/release record](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md)
+and [finite exact-device evidence](evidence/2026-10-03-signed-s26/README.md).
+Audio/haptic manual revalidation required:NO: signed content is byte-identical
+to the owner-accepted bank/playback/events; no new audible change.
+S24 remains **working but not fully tested**, final matrix owner-deferred;
+exact S25 remains unverified. No S26 result certifies either device.
+
 ## October3: owner closes subjective checks and accepts measured performance
 
 Owner confirms requested footstep/SFX, cuff and music checks are green, and
