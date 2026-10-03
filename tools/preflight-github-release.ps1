@@ -241,9 +241,85 @@ function Read-FixtureSourceSurfaces {
     if ([string]::IsNullOrWhiteSpace($Path)) { return $null }
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "Fixture source surfaces not found: $Path" }
     try { $surfaces = Get-Content -LiteralPath $Path -Raw -Encoding utf8 | ConvertFrom-Json } catch { throw 'Fixture source surfaces must be valid JSON.' }
-    Assert-ExactObjectKeys -Object $surfaces -Expected @('cmake', 'gradle', 'notes') -Context 'fixture source surfaces'
-    foreach ($name in @('cmake', 'gradle', 'notes')) { if ($surfaces.$name -isnot [string]) { throw "fixture source surfaces.$name must be a string." } }
+    Assert-ExactObjectKeys -Object $surfaces -Expected @('version', 'versionCodeMap', 'cmake', 'cmakeVersionModule', 'gradle', 'notes', 'lookupFailurePath') -Context 'fixture source surfaces'
+    foreach ($name in @('version', 'versionCodeMap', 'cmake', 'cmakeVersionModule', 'gradle', 'notes', 'lookupFailurePath')) {
+        if ($surfaces.$name -isnot [string]) { throw "fixture source surfaces.$name must be a string." }
+    }
+    if ($surfaces.lookupFailurePath -notin @('', 'VERSION', 'version-code-map.json', 'CMakeLists.txt', 'cmake/HordeRtVersion.cmake', 'android/app/build.gradle', 'release-notes')) {
+        throw 'fixture source surfaces.lookupFailurePath is not a recognized source path.'
+    }
     return $surfaces
+}
+
+function Test-SourceReleaseWiring {
+    param(
+        [string]$CMakeLists,
+        [string]$CMakeVersionModule,
+        [string]$Gradle
+    )
+
+    $includeMatch = [regex]::Match($CMakeLists, '(?m)^[ \t]*include\(cmake/HordeRtVersion\.cmake\)[ \t]*\r?$')
+    $projectMatch = [regex]::Match($CMakeLists, '(?s)project\(\s*HordeLanternRT\s+VERSION\s+\$\{HORDE_RT_PACKAGE_VERSION\}')
+    $cmakeWiringValid = $includeMatch.Success -and $projectMatch.Success -and
+        $includeMatch.Index -lt $projectMatch.Index -and
+        [regex]::IsMatch($CMakeVersionModule, '(?m)^set\(_horde_rt_version_file "\$\{HORDE_RT_REPO_ROOT\}/VERSION"\)\r?$') -and
+        [regex]::IsMatch($CMakeVersionModule, '(?m)^file\(STRINGS "\$\{_horde_rt_version_file\}" _horde_rt_version_lines ENCODING UTF-8\)\r?$') -and
+        [regex]::IsMatch($CMakeVersionModule, '(?m)^list\(GET _horde_rt_version_lines 0 HORDE_RT_PACKAGE_VERSION\)\r?$') -and
+        [regex]::IsMatch($CMakeVersionModule, '(?m)^set\(_horde_rt_version_code_map_file "\$\{HORDE_RT_REPO_ROOT\}/version-code-map\.json"\)\r?$') -and
+        [regex]::IsMatch($CMakeVersionModule, '(?m)^file\(READ "\$\{_horde_rt_version_code_map_file\}" _horde_rt_version_code_map\)\r?$') -and
+        [regex]::IsMatch($CMakeVersionModule, '(?s)string\(JSON HORDE_RT_ANDROID_VERSION_CODE ERROR_VARIABLE .*?GET\s+"\$\{_horde_rt_version_code_map\}"\s+androidVersionCodes\s+"\$\{HORDE_RT_PACKAGE_VERSION\}"\)')
+
+    $gradleWiringValid =
+        [regex]::IsMatch($Gradle, "(?m)^def hordeVersionFile = rootProject\.file\('../VERSION'\)\r?$") -and
+        [regex]::IsMatch($Gradle, "(?m)^def hordeVersionCodeMapFile = rootProject\.file\('../version-code-map\.json'\)\r?$") -and
+        [regex]::IsMatch($Gradle, "(?m)^def hordeVersionRaw = readHordeUtf8Authority\(hordeVersionFile, 'VERSION'\)\r?$") -and
+        [regex]::IsMatch($Gradle, '(?m)^def hordeVersionMatcher = hordeVersionRaw =~') -and
+        [regex]::IsMatch($Gradle, '(?m)^def hordeVersionName = hordeVersionMatcher\.group\(1\)\r?$') -and
+        [regex]::IsMatch($Gradle, "(?m)^def hordeVersionCodeMapRaw = readHordeUtf8Authority\(hordeVersionCodeMapFile, 'Android version-code map'\)\r?$") -and
+        [regex]::IsMatch($Gradle, '(?m)^def hordeVersionCodeMap = new JsonSlurper\(\)\.parseText\(hordeVersionCodeMapRaw\)\r?$') -and
+        [regex]::IsMatch($Gradle, '(?m)^def hordeVersionCode = hordeVersionCodeMap\?\.androidVersionCodes\?\[\(hordeVersionName\)\]\r?$') -and
+        [regex]::IsMatch($Gradle, '(?m)^\s*versionCode hordeVersionCode\.intValue\(\)\s*$') -and
+        [regex]::IsMatch($Gradle, '(?m)^\s*versionName hordeVersionName\s*$')
+
+    return $cmakeWiringValid -and $gradleWiringValid
+}
+
+function Test-SourceReleaseIdentity {
+    param(
+        [string]$VersionText,
+        [string]$VersionCodeMapText,
+        [string]$ExpectedVersion,
+        [long]$ExpectedVersionCode
+    )
+
+    if (-not [regex]::IsMatch($VersionText, '\A((?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))(?:\r?\n)?\z')) {
+        return $false
+    }
+    $sourceVersion = [regex]::Match($VersionText, '\A((?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))').Groups[1].Value
+    if ($sourceVersion -cne $ExpectedVersion) { return $false }
+
+    try { $versionCodeMap = $VersionCodeMapText | ConvertFrom-Json -ErrorAction Stop } catch { return $false }
+    if ($versionCodeMap -isnot [PSCustomObject] -or $null -eq $versionCodeMap.androidVersionCodes -or
+        $versionCodeMap.androidVersionCodes -isnot [PSCustomObject]) { return $false }
+    $activeAssignmentPattern = '"' + [regex]::Escape($sourceVersion) + '"\s*:'
+    if ([regex]::Matches($VersionCodeMapText, $activeAssignmentPattern).Count -ne 1) { return $false }
+    $entry = $versionCodeMap.androidVersionCodes.PSObject.Properties[$sourceVersion]
+    if ($null -eq $entry -or ($entry.Value -isnot [int] -and $entry.Value -isnot [long]) -or
+        $entry.Value -lt 1 -or $entry.Value -gt [int]::MaxValue) { return $false }
+    return [long]$entry.Value -eq $ExpectedVersionCode
+}
+
+function Test-LegacySourceReleaseWiring {
+    param([string]$CMakeLists, [string]$Gradle, [string]$ExpectedVersion, [long]$ExpectedVersionCode)
+
+    $cmakeValid = [regex]::IsMatch($CMakeLists, '(?m)^[ \t]*VERSION[ \t]+' + [regex]::Escape($ExpectedVersion) + '[ \t]*\r?$')
+    $gradleVersionCode = [regex]::IsMatch($Gradle, '(?m)^[ \t]*versionCode[ \t]+' + [regex]::Escape([string]$ExpectedVersionCode) + '[ \t]*\r?$')
+    $escapedVersion = [regex]::Escape($ExpectedVersion)
+    $singleQuotedNamePattern = '(?m)^[ \t]*versionName[ \t]+' + [char]39 + $escapedVersion + [char]39 + '[ \t]*\r?$'
+    $doubleQuotedNamePattern = '(?m)^[ \t]*versionName[ \t]+"' + $escapedVersion + '"[ \t]*\r?$'
+    $gradleVersionName = [regex]::IsMatch($Gradle, $singleQuotedNamePattern) -or [regex]::IsMatch($Gradle, $doubleQuotedNamePattern)
+    $gradleValid = $gradleVersionCode -and $gradleVersionName
+    return $cmakeValid -and $gradleValid
 }
 
 function Read-FixtureSourceState {
@@ -321,23 +397,47 @@ if ($null -ne $record) {
             else { Add-Check 'source.commit' 'fail' 'exact source commit is not reachable from HEAD' }
         } else { Add-Check 'source.commit' 'fail' 'exact source commit is missing or is not a commit object' }
 
+        $legacySourceRecord = $record.Version -ceq '1.6.0' -and $record.AndroidVersionCode -eq 8
         if ($null -ne $fixtureSourceSurfaces) {
-            $sourceCmake = [PSCustomObject]@{ exitCode = 0; output = $fixtureSourceSurfaces.cmake }
-            $sourceGradle = [PSCustomObject]@{ exitCode = 0; output = $fixtureSourceSurfaces.gradle }
-            $sourceNotes = [PSCustomObject]@{ exitCode = 0; output = $fixtureSourceSurfaces.notes }
-        } else {
+            $sourceVersion = [PSCustomObject]@{ exitCode = $(if ($fixtureSourceSurfaces.lookupFailurePath -eq 'VERSION') { 1 } else { 0 }); output = $fixtureSourceSurfaces.version }
+            $sourceVersionCodeMap = [PSCustomObject]@{ exitCode = $(if ($fixtureSourceSurfaces.lookupFailurePath -eq 'version-code-map.json') { 1 } else { 0 }); output = $fixtureSourceSurfaces.versionCodeMap }
+            $sourceCmake = [PSCustomObject]@{ exitCode = $(if ($fixtureSourceSurfaces.lookupFailurePath -eq 'CMakeLists.txt') { 1 } else { 0 }); output = $fixtureSourceSurfaces.cmake }
+            $sourceCmakeVersionModule = [PSCustomObject]@{ exitCode = $(if ($fixtureSourceSurfaces.lookupFailurePath -eq 'cmake/HordeRtVersion.cmake') { 1 } else { 0 }); output = $fixtureSourceSurfaces.cmakeVersionModule }
+            $sourceGradle = [PSCustomObject]@{ exitCode = $(if ($fixtureSourceSurfaces.lookupFailurePath -eq 'android/app/build.gradle') { 1 } else { 0 }); output = $fixtureSourceSurfaces.gradle }
+            $sourceNotes = [PSCustomObject]@{ exitCode = $(if ($fixtureSourceSurfaces.lookupFailurePath -eq 'release-notes') { 1 } else { 0 }); output = $fixtureSourceSurfaces.notes }
+        } elseif ($legacySourceRecord) {
             $sourceCmake = Invoke-GitText -Arguments @('show', ($record.SourceCommit + ':CMakeLists.txt'))
             $sourceGradle = Invoke-GitText -Arguments @('show', ($record.SourceCommit + ':android/app/build.gradle'))
             $sourceNotes = Invoke-GitText -Arguments @('show', ($record.SourceCommit + ':' + $record.ReleaseNotesPath))
+            $sourceVersion = [PSCustomObject]@{ exitCode = 0; output = '' }
+            $sourceVersionCodeMap = [PSCustomObject]@{ exitCode = 0; output = '' }
+            $sourceCmakeVersionModule = [PSCustomObject]@{ exitCode = 0; output = '' }
+        } else {
+            $sourceVersion = Invoke-GitText -Arguments @('show', ($record.SourceCommit + ':VERSION'))
+            $sourceVersionCodeMap = Invoke-GitText -Arguments @('show', ($record.SourceCommit + ':version-code-map.json'))
+            $sourceCmake = Invoke-GitText -Arguments @('show', ($record.SourceCommit + ':CMakeLists.txt'))
+            $sourceCmakeVersionModule = Invoke-GitText -Arguments @('show', ($record.SourceCommit + ':cmake/HordeRtVersion.cmake'))
+            $sourceGradle = Invoke-GitText -Arguments @('show', ($record.SourceCommit + ':android/app/build.gradle'))
+            $sourceNotes = Invoke-GitText -Arguments @('show', ($record.SourceCommit + ':' + $record.ReleaseNotesPath))
         }
-        $sourceSurfaceValid = $sourceCmake.exitCode -eq 0 -and $sourceGradle.exitCode -eq 0 -and $sourceNotes.exitCode -eq 0 -and
-            [regex]::IsMatch($sourceCmake.output, ('(?m)^[ \t]*VERSION[ \t]+' + [regex]::Escape($record.Version) + '[ \t]*\r?$')) -and
-            [regex]::IsMatch($sourceGradle.output, ('(?m)^[ \t]*versionCode[ \t]+' + $record.AndroidVersionCode + '[ \t]*\r?$')) -and
-            [regex]::IsMatch($sourceGradle.output, ("(?m)^[ \t]*versionName[ \t]+['`"]" + [regex]::Escape($record.Version) + "['`"][ \t]*\r?$")) -and
-            [regex]::IsMatch($sourceNotes.output, ('(?m)^Package version: ' + [regex]::Escape('`' + $record.Version + '`') + '[ \t]*\r?$')) -and
+        if ($legacySourceRecord) {
+            $sourceLookupValid = $sourceCmake.exitCode -eq 0 -and $sourceGradle.exitCode -eq 0 -and $sourceNotes.exitCode -eq 0
+            $sourceIdentityValid = $true
+            $sourceWiringValid = Test-LegacySourceReleaseWiring -CMakeLists $sourceCmake.output -Gradle $sourceGradle.output `
+                -ExpectedVersion $record.Version -ExpectedVersionCode $record.AndroidVersionCode
+        } else {
+            $sourceLookupValid = $sourceVersion.exitCode -eq 0 -and $sourceVersionCodeMap.exitCode -eq 0 -and
+                $sourceCmake.exitCode -eq 0 -and $sourceCmakeVersionModule.exitCode -eq 0 -and
+                $sourceGradle.exitCode -eq 0 -and $sourceNotes.exitCode -eq 0
+            $sourceIdentityValid = Test-SourceReleaseIdentity -VersionText $sourceVersion.output -VersionCodeMapText $sourceVersionCodeMap.output `
+                -ExpectedVersion $record.Version -ExpectedVersionCode $record.AndroidVersionCode
+            $sourceWiringValid = Test-SourceReleaseWiring -CMakeLists $sourceCmake.output -CMakeVersionModule $sourceCmakeVersionModule.output -Gradle $sourceGradle.output
+        }
+        $sourceNotesValid = [regex]::IsMatch($sourceNotes.output, ('(?m)^Package version: ' + [regex]::Escape('`' + $record.Version + '`') + '[ \t]*\r?$')) -and
             [regex]::IsMatch($sourceNotes.output, ('(?m)^Android version code: ' + [regex]::Escape('`' + $record.AndroidVersionCode + '`') + '[ \t]*\r?$'))
-        if ($sourceSurfaceValid) { Add-Check 'source.release-surfaces' 'pass' 'source-time CMake, Gradle, and release notes match 1.6.0/code 8' }
-        else { Add-Check 'source.release-surfaces' 'fail' 'source-time version, Android code, or release-note marker disagrees with the record' }
+        $sourceSurfaceValid = $sourceLookupValid -and $sourceIdentityValid -and $sourceWiringValid -and $sourceNotesValid
+        if ($sourceSurfaceValid) { Add-Check 'source.release-surfaces' 'pass' "source-time CMake, Gradle, and release notes match $($record.Version)/code $($record.AndroidVersionCode)" }
+        else { Add-Check 'source.release-surfaces' 'fail' "source lookup=$sourceLookupValid, version/map identity=$sourceIdentityValid, CMake/Gradle wiring=$sourceWiringValid, release-note markers=$sourceNotesValid" }
 
         $validationPath = Join-Path $repoRoot $record.ValidationPath
         $notesPath = Join-Path $repoRoot $record.ReleaseNotesPath
