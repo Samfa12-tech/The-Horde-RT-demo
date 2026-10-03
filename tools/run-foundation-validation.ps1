@@ -538,13 +538,25 @@ try {
                 & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.6.0" -VersionCode 9
             } 'immutable'
             Assert-ExpectedFailure {
-                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.6.1" -VersionCode 8
+                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.6.1" -VersionCode 9
+            } 'immutable'
+            . (Join-Path $PSScriptRoot "release-version-policy.ps1")
+            Assert-ExpectedFailure {
+                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "contract-mismatch" -VersionCode $script:HordeLatestPublishedVersionCode
             } 'greater than'
             Assert-ExpectedFailure {
-                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.6.1" -VersionCode 10
+                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "contract-mismatch" -VersionCode ($script:HordeLatestPublishedVersionCode + 1)
             } 'active root contract'
-            . (Join-Path $PSScriptRoot "release-version-policy.ps1")
-            Assert-HordeReleaseVersionIsMutable -Version $script:sourcePackageVersion -VersionCode $script:sourceVersionCode
+            # Validation packages are explicitly unpublishable. Published source
+            # remains valid to test, but production packaging must stay locked.
+            if (Test-HordeReleaseVersionIsPublished -Version $script:sourcePackageVersion) {
+                Assert-ExpectedFailure {
+                    Assert-HordeReleaseVersionIsMutable -Version $script:sourcePackageVersion -VersionCode $script:sourceVersionCode
+                } 'immutable'
+                Assert-HordeSourceIdentityMatches -Version $script:sourcePackageVersion -VersionCode $script:sourceVersionCode | Out-Null
+            } else {
+                Assert-HordeReleaseVersionIsMutable -Version $script:sourcePackageVersion -VersionCode $script:sourceVersionCode
+            }
             Assert-ExpectedFailure {
                 & (Join-Path $PSScriptRoot "push-alpha-to-itch.ps1") -Version "1.6.0" `
                     -VersionCode 9 `

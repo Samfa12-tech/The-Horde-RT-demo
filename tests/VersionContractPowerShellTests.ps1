@@ -78,4 +78,31 @@ try {
     }
 }
 
-Write-Output "PowerShell version-contract tests passed."
+. (Join-Path $PSScriptRoot "..\tools\release-version-policy.ps1")
+
+function Assert-PolicyFailure {
+    param([scriptblock]$Action, [string]$Expected)
+
+    $failureMessage = $null
+    try { & $Action | Out-Null } catch { $failureMessage = $_.Exception.Message }
+    if ($null -eq $failureMessage -or $failureMessage -notmatch [regex]::Escape($Expected)) {
+        throw "Expected release-policy rejection '$Expected', received '$failureMessage'."
+    }
+}
+
+foreach ($publishedVersion in @('1.6.0', '1.6.1', '1.6.1-alpha.1', '1.6.1+rebuild', '1.6.1.preview')) {
+    if (-not (Test-HordeReleaseVersionIsPublished -Version $publishedVersion)) {
+        throw "Published line was not classified as immutable: $publishedVersion"
+    }
+    Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version $publishedVersion -VersionCode 10 } 'immutable'
+}
+if (Test-HordeReleaseVersionIsPublished -Version '1.6.2') { throw 'An unpublished version was classified as published.' }
+Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version '1.6.2' -VersionCode 9 } 'greater than'
+Assert-PolicyFailure { Assert-HordeReleaseVersionIsMutable -Version '1.6.2' -VersionCode 10 } 'active root contract'
+# These real entry points must reject before build, key access/prompt, Butler
+# lookup, or output cleanup. Deliberately missing paths must never be reached.
+Assert-PolicyFailure { & (Join-Path $PSScriptRoot '..\tools\package-alpha.ps1') -Version '1.6.1' -VersionCode 9 } 'immutable'
+Assert-PolicyFailure { & (Join-Path $PSScriptRoot '..\tools\package-signed-alpha.ps1') -Version '1.6.1' -VersionCode 9 -KeyStorePath (Join-Path $fixtureRoot 'missing.jks') } 'immutable'
+Assert-PolicyFailure { & (Join-Path $PSScriptRoot '..\tools\push-alpha-to-itch.ps1') -Version '1.6.1' -VersionCode 9 -ButlerPath (Join-Path $fixtureRoot 'missing-butler.exe') } 'immutable'
+
+Write-Output "PowerShell version-contract and published-release policy tests passed."
