@@ -239,7 +239,13 @@ int main()
         std::string readme;
         passed &= ReadFile(sourceRoot / relativeReadme, readme);
         passed &= Require(Contains(readme, version), "current README surface must name the active version: " + relativeReadme.string());
-        passed &= Require(Contains(readme, "1.6.0"), "current README surface must preserve the latest published release: " + relativeReadme.string());
+        // Portable package guidance is distribution-neutral. Historical release
+        // evidence belongs in the repository README, not every package README.
+        if (relativeReadme == fs::path("README.md"))
+        {
+            passed &= Require(Contains(readme, "1.6.0"),
+                "repository README must retain historical 1.6.0 release evidence");
+        }
     }
 
     std::string releasePolicy;
