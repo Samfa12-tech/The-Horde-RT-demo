@@ -6,15 +6,15 @@ that pending device gates passed. See the current handoff for exact artifacts.
 
 | Audit finding | Current disposition / evidence boundary |
 | --- | --- |
-| F01 red host/CI baseline |Resolved baseline and bounded fixture repairs. Current ec13876 push37077929433/PR37077935253 six-lane workflows green. Initial failures retained, not a single97/97 Windows claim. |
+| F01 red host/CI baseline |Resolved baseline and bounded fixture repairs. Checkpoint91dacfd push37081411743/PR37081416178 six-lane workflows green. New updater-test/docs checkpoint requires its own fresh CI; no runtime change. Initial failures retained, not a single97/97 Windows claim. |
 | F02 release/version identity |Resolved1.6.1/code9 development consistency and immutable1.6.0 negative gates. Signing/publication remain owner-controlled. |
-| F03 procedural first-person arms |Resolved dedicated RT Viewmodel/WorldBody with shared gameplay pose authority; accepted production integration and newer Windows right cuff. Current-bank S26 live image/motion check passes; subjective changed-cuff phone follow-up remains distinct. No new tuning. |
+| F03 procedural first-person arms |Resolved dedicated RT Viewmodel/WorldBody with shared gameplay pose authority; accepted production integration and newer Windows right cuff. Current-bank S26 live image/motion check passes; owner now confirms cuff green. No new tuning. |
 | F04 primitive semantic mismatch |Resolved processor/GLB/manifest/loader/atlas/native contracts; actual skinned/semantic fixtures run in Vulkan-host CI, not just portable builds. |
 | F05 diagnostics in Shipping |Resolved in actual extracted Windows/Android SPIR-V: zero diagnostic atomics/no binding22. Diagnostic ownership/readback stays separate. |
 | F06 measurement foundation |Resolved exact fence/submission/build/workload identity and finite Shipping harness. No new telemetry framework. Runtime evidence is not sustained playability. |
 | F07 Mobile/High specialization |Resolved fixed quality/strategy pairs across Pipeline/real hardware Compute. Mobile intentionally omits actual lantern panes; High physical path retained. |
 | F08 static/dynamic resources |Resolved bounded coherent lifetime mapping36f99c2 and compatible device-local/coherent immutable preference3d26ad6 with current CI, native Windows captures, six complete S26 measurement reports and current-bank scale/lifecycle checks. Direct host upload supersedes redundant staging where supported. Heavy pair shows no meaningful speedup; no false device-local/OOM/performance claim. Generic staging/per-buffer heap export remain future-platform gaps. |
-| F09 frame concurrency/pacing |Deliberately superseded speculative multi-frame work: retain one frame in flight for1.6.1 and binding host-written ownership. Completed warm measurements do not meet30FPS at75%; actual-playability acceptance remains an owner decision. Multi-frame overlap remains measured future work, not implemented. |
+| F09 frame concurrency/pacing |Deliberately superseded speculative multi-frame work: retain one frame in flight for1.6.1 and binding host-written ownership. Completed warm measurements do not meet30FPS at75%; owner explicitly accepts performance as-is for1.6.1. Full graphics-options menu planned1.6.2. Multi-frame overlap remains measured future work, not implemented. |
 | F10 cross-platform CI |Resolved additive GCC/Clang/MSVC, Vulkan CPU-host player/resource fixtures, Android four-ABI build/Java/lint and finite Clang ASan/UBSan. Shader validation remains exact-artifact Windows/Android evidence, not claimed hardware CI. Current-source results tracked separately. |
 | F11 monolithic architecture |Bounded seams extracted: variants/bundles, resource/lifetime owners, frame evidence, player roles and shared reporting/audio. Deliberately no gratuitous renderer/platform rewrite. |
 | F12 behavior-sensitive tests |Resolved affected semantic, IK, topology/seams, physical math, resource failures, input/timing, version, PCM/focus, reporting consent/retry/cancellation and platform contracts. Host tests never replace live/device/owner evidence. |
@@ -25,8 +25,9 @@ that pending device gates passed. See the current handoff for exact artifacts.
 Additional owner scope: music/canonical PCS/Core playback and independent music/
 SFX controls are implemented and owner accepted; Cloudflare in-game delivery and
 Windows consent/preview/cancel are owner accepted. No further audition/email is
-required solely by resource changes. Changed phone footstep balance and a distinct
-external audio-focus interruption remain narrow outstanding checks.
+required solely by resource changes. Owner now confirms the requested footstep,
+cuff and music checks green. This is owner-reported acceptance, not a new physical
+focus-source trace or exact signed-package certification; no repeat check queued.
 
 High contact/near-edge defects are owner-deferred future investigation, not fixed.
 Directional walk/feet/steeper pitch/pane alignment are also future work. The final
@@ -35,14 +36,20 @@ standalone warm reveal121.2535ms at75% are not30FPS. Opening90.7014ms is separat
 from the route aggregate. Interrupted order and thermals preclude a gain claim.
 RAM/Graphics allocation samples are not GPU traffic/cache/stall counters; those
 counters remain unavailable/uncollected gaps. S24 accepted prior evidence is not
-the current artifact; S25 remains explicitly unverified.
+the current artifact. Owner disposition: S24 **working but not fully tested**;
+final-candidate matrix deferred, S25 explicitly unverified.
 
 No further resource comparison or renderer interaction run is queued. Exact
 current-bank S26 Shipping-path Debug-shell motion, Settings scale and Home/resume
 are recorded in [the interaction receipt](evidence/2026-10-03-final-s26-interactive/README.md);
-normal Debug restored and phone released. Remaining narrow gates are external
-audio-focus/changed footsteps and subjective cuff follow-up, foreground Windows
-Compute, current final S24 artifact and owner acceptance of the measured pacing
-shortfall. They are not reasons to restart accepted investigations.
+normal Debug restored and phone released. [Foreground Windows Compute/counter](evidence/2026-10-03-windows-live-closeout/README.md)
+now passes exact Shipping/High current-bank package:1838 completed presented/
+CPU/GPU rows, counter update/cancel/restart/completion and bounded live images.
+Observer overhead remains unmeasured, not a performance claim. Installed1.6.0
+update selection has an explicit passing1.6.1 fixture; actual public update prompt
+can only be observed after separately authorised non-draft GitHub publication.
+Remaining release-operation gates are owner-only signing/recovery, final signed/
+frozen artifact disposition and publication authority. Deferred evidence is not
+relabelled passed. These are not reasons to restart accepted investigations.
 Independent closeout work continues; the goal is not paused. Do not restart prior audits,
 glass investigation, accepted arms/music or completed host matrix.

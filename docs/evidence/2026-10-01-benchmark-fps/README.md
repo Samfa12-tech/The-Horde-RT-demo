@@ -2,8 +2,10 @@
 
 Current continuation: the [finite live record](LIVE_STATUS.md) supersedes the
 October1 no-device statement below. Exact S26 update/cancel/restart/reset display
-rows pass on the retained October2 Debug APK. Windows interactive display and
-matched observer overhead remain open; the counter stays off in unattended runs.
+rows pass on the retained October2 Debug APK. Windows interactive display passes
+on the exact October3 Shipping/High Compute package. Matched observer overhead
+is unmeasured; the counter stays off in unattended runs. Historical no-run claims
+below refer to the original October1 slice, not the completed live matrix.
 
 Small shared counter within `ShowcaseBenchmarkRun`, no new telemetry framework.
 Interactive Windows/Android benchmarks opt in. It displays the mean of the last

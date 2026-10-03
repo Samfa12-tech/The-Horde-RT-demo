@@ -1,6 +1,6 @@
 # 1.6.1 engineering programme and release gates
 
-Updated 2026-10-02. Status: **implementation substantially complete; release-critical acceptance remains open**.
+Updated 2026-10-03. Status: **engineering candidate accepted within documented limits; release operations remain unauthorised**.
 
 This is the current next-step index for `codex/horde-1.6.1-engineering-pass`.
 The owner-authorised full repository audit remains in scope. The 2026-09-13
@@ -32,7 +32,28 @@ bounded right-cuff repair, independent SFX balance and startup music focus are
 owner-confirmed. No accepted player/audio tuning reopened.
 Do not repeat accepted Android/Windows emails or completed focused lifecycle rows.
 
-## Release-focused remaining gates — October2 owner direction
+## Current disposition — October3 owner closeout
+
+Owner confirms footstep/SFX, cuff and music checks green, accepts performance
+as measured for1.6.1 and defers final S24 coverage as **working but not fully
+tested**. Exact S25 remains unverified. The graphics-options menu is1.6.2 work.
+These verdicts supersede the subjective/performance/device next steps in the
+October2 table below; they are not new benchmark/hash/focus-source traces.
+
+Foreground Shipping/High Windows Compute and interactive benchmark display/
+cancel/restart/completion now pass in the [finite current-package receipt](evidence/2026-10-03-windows-live-closeout/README.md).
+All1838 measured rows present and have valid CPU/GPU evidence. Counter overhead
+remains unmeasured, separate from correctness, and off in performance runs.
+No more phone or micro-optimisation work is queued. Existing failure/negative
+evidence,30FPS shortfall and owner-deferred High glass defects stay explicit.
+
+Next release operations require owner-only signing/recovery confirmation,
+exact signed/frozen artifact disposition and separate publication authority.
+The installed1.6.0 updater already checks GitHub; a published non-draft
+`v1.6.1` GitHub Release is needed at authorised launch. Itch alone cannot trigger
+that prompt. No merge/signing/publication is authorised by this closeout.
+
+## Previous release-focused gates — October2 owner direction
 
 The owner directs that practical release/gameplay blockers take priority and
 significant sub-pixel parity work stop unless it addresses a genuine physical

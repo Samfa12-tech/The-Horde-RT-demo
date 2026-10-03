@@ -10,6 +10,19 @@ Owner update: 2026-09-13. The [1.6.1 engineering programme](docs/ENGINEERING_1_6
 4. Run targeted checks during implementation. Only after the full feature set is complete, run the comprehensive Windows/Android/device/release candidate matrix and fix regressions.
 5. Request the owner's release decision; no automatic publishing. Later campaign milestones remain outside this engineering pass.
 
+## 1.6.2 graphics options — owner decision, October3
+
+Owner accepts the measured1.6.1 performance as-is and plans a full graphics-options
+menu for1.6.2. Keep existing controls/default75% and authored Mobile/High profiles
+unchanged in1.6.1. Future choices should expose their real RT cost/quality tradeoffs
+clearly; this does not authorise silent quality cuts, fake RT, a renderer rewrite
+or another1.6.1 micro-optimisation campaign. Sustained30FPS at75% remains a target,
+not an achieved result. Reuse retained negative and thermal-context evidence.
+
+Owner defers final S24 coverage as **working but not fully tested**; exact S25
+remains unverified. Future device validation must use the exact candidate/device,
+not infer acceptance from S26/RTX or rewrite historical results.
+
 ## Later animation work - not a 1.6.1 acceptance blocker
 
 Owner mirror playtest on 2026-09-27 accepts the current appearance, but notes

@@ -6,6 +6,32 @@ and [latest lantern evidence](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md)
 
 ## Current closeout checkpoint — October 3
 
+Owner now confirms the requested footstep/SFX, cuff and music checks are green,
+accepts performance **as measured** for1.6.1, and defers the final S24 matrix:
+**working but not fully tested**. This is owner acceptance, not a new artifact
+hash, external-focus trace or30FPS result. S25 remains unverified. The full
+graphics-options menu is planned for1.6.2; do not continue micro-optimisations,
+reopen accepted player/audio work or reclaim a phone to repeat these checks.
+
+Foreground Windows Shipping/High Compute and interactive counter admission now
+pass on exact executable11e0a59b/current-player ZIPd2984666: actual scene/hands/
+two enemies inspected, cancellation/menu and restart/completion verified,
+1838/1838 presented CPU/GPU rows with no outstanding/failure. [Finite receipt](evidence/2026-10-03-windows-live-closeout/README.md)
+retains unique reports and original game-only image. Matched observer overhead
+is unmeasured, not a gameplay blocker or a gain claim; counter stays off in
+performance experiments. Own game process was quit. No phone operation.
+
+Updater fixture `5e28da3` verifies installed1.6.0 selects published `v1.6.1`
+prereleases; Release CTest1/1 passes. Released1.6.0 already checks at startup.
+Current public GitHub metadata has only `v0.1.3-alpha.1`: future authorised
+publication must include a non-draft GitHub Release `v1.6.1`, not itch alone.
+The action opens a download page, not an automatic installer. No publication.
+
+Remaining release-operation boundary: exact signed/frozen release artifacts,
+owner-only signing/recovery confirmation and explicit release/publication
+authority. Existing unsigned/unpublishable artifacts are not silently promoted.
+Do not mark signing checks passed, exact S24 fully tested or S25 supported.
+
 Newest bounded owner request: remove only held Melody3 notes in A/D. Implemented
 and regenerated with retained v68 app voices/FX; complete score/event differential,
 native A/D loops/transitions, package hashes and exact-S26 consumed clock pass.
@@ -16,8 +42,8 @@ comparisons remain bound to their unchanged bank. Listening used the correct
 1.6.1-debug package; first accidental production1.6.0 launch excluded.
 
 Music/source checkpoint `ec13876` is pushed on both engineering/profile branches;
-renderer/resource runtime remains `3d26ad6`. Fresh current-source push37077929433
-and PR37077935253 both pass all six CI lanes: Vulkan CPU-host
+renderer/resource runtime remains `3d26ad6`. Documentation checkpoint91dacfd
+push37081411743 and PR37081416178 both pass all six CI lanes: Vulkan CPU-host
 17/17 includes actual skinned semantics and mapping/placement failures; selected
 Clang ASan/UBSan15 named fixtures pass. No new hardware proof is inferred from CI.
 The [finding disposition](ENGINEERING_1_6_1_FINDING_STATUS.md) is the compact
@@ -40,11 +66,9 @@ Resume takes about14.6s; state survives, not instant readiness. Current unsigned
 Release and Debug packages pass exact bank/SPIR-V admission; Release native ELF
 is unchanged from resource measurement. Normal current-bank Debug315b1c9f restored,
 saved preferences retained and Horde stopped; phone released. Do not repeat these
-checks or rerun resource benchmarks. External audio-focus/changed phone footsteps,
-subjective changed-cuff follow-up, current S24 artifact and foreground Windows
-Compute remain separate narrow gates. Pacing acceptance needs an owner decision:
-the current75% workloads do not meet30FPS, and no further micro-optimization is
-justified by these negative results.
+checks or rerun resource benchmarks. The newer owner acceptance and Windows
+receipt above close the former subjective/pacing/foreground gates. The current75%
+workloads still do not meet30FPS; final S24 coverage is explicitly deferred.
 
 Current README/release notes are reconciled with actual modelled player,
 quality profiles, music/reporting, resources and six CI lanes. Current Windows

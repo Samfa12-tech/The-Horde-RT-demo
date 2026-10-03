@@ -22,8 +22,8 @@ evidence remain recorded separately and are not replaced by this candidate.
   gameplay animation/IK/grip authority. Normal production block arms are retired;
   diagnostic comparisons remain explicit. Player primitive/atlas/loader/skinning
   contracts agree; normal gameplay look-down and mirror presence are accepted.
-  The latest bounded right-cuff repair is laptop-owner accepted; changed phone
-  cuff acceptance remains separate.
+  The latest bounded right-cuff repair is laptop-owner accepted; the owner also
+  now confirms the phone cuff check green.
 - Fixed Shipping/Diagnostic and Mobile/High shader variants, with separate
   opaque-fast/generic strategies and actual extracted Shipping SPIR-V checks
   showing no diagnostic atomics/readback binding. Pipeline and RayQueryCompute
@@ -65,25 +65,30 @@ evidence remain recorded separately and are not replaced by this candidate.
   benchmark RT-loop FPS/ms is explicitly distinct from display Hz and disabled
   in unattended performance experiments.
 
-## Acceptance still required
+## Accepted candidate and remaining release-operation boundaries
 
-The candidate is not yet release-ready. The [finding disposition](ENGINEERING_1_6_1_FINDING_STATUS.md)
+The candidate is not a signed/public release. The [finding disposition](ENGINEERING_1_6_1_FINDING_STATUS.md)
 and [finite integration matrix](evidence/2026-10-02-final-integration/README.md)
 carry current evidence and next unfinished steps; do not restart completed tests.
 
 - S26's finite resource/control and current-bank live/scale/lifecycle checks are
   complete. Heavy pair shows no meaningful gain; the current75% workloads remain
-  above33.333ms. Changed cuff/footstep subjective follow-up and actual playable
-  pacing acceptance remain separate:30FPS is the target, not an achieved claim.
+  above33.333ms. Owner confirms cuff, footsteps/SFX and music green and accepts
+  measured performance as-is for1.6.1:30FPS is the target, not an achieved claim.
+  Full graphics-options menu is planned for1.6.2; no further micro-optimisation.
   RAM pressure is separate from uncollected GPU bandwidth/cache/stall counters.
-- Final S24 Shipping/live evidence remains separate from its accepted development
-  images; exact S25 is unverified. S26 or RTX results cannot certify either device.
-- Distinct external-audio interruption/recovery and Windows interactive FPS
-  display/observer-overhead checks remain open. Accepted music/listening/report
-  delivery are not re-requested solely because resource ownership changed.
-- Finish foreground/live Windows Compute visual acceptance and final exact-source/
-  artifact disposition. Compiler or mocked resource tests are not physical RT,
-  sustained performance or owner-feel proof.
+- Owner defers final S24 Shipping/live coverage: **working but not fully tested**.
+  Prior accepted development images are not final-artifact certification; exact
+  S25 is unverified. S26 or RTX results cannot certify either device.
+- Foreground Windows Shipping/High Compute and interactive FPS/cancel/restart/
+  completion pass on the current-player/music package,1838 complete presented
+  CPU/GPU rows. Matched observer overhead is unmeasured, not a speedup claim;
+  counter stays off in performance runs. Owner audio acceptance is not a new
+  externally instrumented OS focus trace. No repeated audition/email is queued.
+- Final signed/frozen artifacts, owner-only signing recovery and publication
+  authority remain separate. Actual1.6.0→public1.6.1 update dialog can only be
+  observed after authorised GitHub publication; selection fixture passes.
+  Compiler/mocked tests are not physical RT, sustained pacing or owner-feel proof.
 
 Numerical sub-pixel parity and the remaining High glass defects are explicitly
 [future work](../FUTURE_WORK.md#future-glass-investigation--owner-deferral-2026-10-03).

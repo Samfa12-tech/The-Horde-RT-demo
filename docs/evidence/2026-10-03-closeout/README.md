@@ -9,6 +9,15 @@ and PR[37077935253](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/ru
 both SUCCESS across all six lanes. Renderer runtime is unchanged. A/D owner
 listening is accepted as “both perfect”; no new full-bank audition required.
 
+Newer checkpoint91dacfd push37081411743/PR37081416178 also pass all six lanes.
+Owner now closes cuff/footsteps/music checks, accepts measured performance as-is
+and defers final S24 coverage as **working but not fully tested**. Full graphics
+options are planned1.6.2; exact S25 remains unverified. [Foreground Windows](../2026-10-03-windows-live-closeout/README.md)
+closes live Shipping/High Compute/counter/cancel/restart/completion on the current
+package with1838 valid presented CPU/GPU rows. No30FPS/observer-overhead gain claim.
+Updater fixture5e28da3 passes the explicit installed1.6.0→published1.6.1 case;
+its CI is distinct from older accepted runtime CI. No release/tag created.
+
 - [Finding dispositions](../../ENGINEERING_1_6_1_FINDING_STATUS.md) retain all15 audit
   findings and superseded/open/owner boundaries.
 - [Complete reachable history](commits-through-d068d88.txt):325 full hashes through
@@ -51,4 +60,6 @@ and root README now describe actual player/profile/audio/report/resource ownersh
 not the old procedural-arm/13-test foundation. Historical release evidence remains
 untouched. Docs-only changes need link/claim/diff checks, not a rebuild or audition.
 Audio/haptic manual revalidation required:NO for this documentation/resource gate;
-the separately outstanding changed phone footstep/external-focus checks remain open.
+the requested changed phone owner checks are now accepted. The approval supplies
+no new artifact hash or instrumented external-focus trace; do not invent either.
+No further phone work is queued. Signing/frozen-release/publication remain separate.

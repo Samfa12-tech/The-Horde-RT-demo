@@ -20,8 +20,8 @@ it does not rebuild this unchanged source artifact or establish new performance.
 | S26 update | One bounded90s-or-less route prefix; two numeric rolling readings and last-frame count, screenshot for layout | PASS: waypoint1/13 opening12.1FPS/82.3ms/60frames, then3/13 shadow14.9FPS/67.0ms/60frames; readable three-line header, long waypoint ellipsized |
 | S26 cancel | Back/cancel; prove report/menu no longer shows live counter | PASS: Back returns to paused menu; fresh hierarchy contains no RT-loop counter |
 | S26 restart | One short fresh interactive restart; prove rolling window resets, cancel and return Home | PASS: fresh waypoint0/13 opening12.8FPS/78.2ms/**8**frames, not inherited60; Back returns to menu, then Home |
-| Windows interactive | Actual owned Windows process; three-line counter and cancellation/completion | Not run |
-| Observer overhead | Matched on/off measurements with unchanged paths/quality and thermal context | Open; no saving/overhead claim from HUD values |
+| Windows interactive | Actual owned Windows process; three-line counter and cancellation/completion | PASS October3: current Shipping/High required Compute, changing three-line display, Escape/menu, restart and full1838-frame completion. [Exact receipt](../2026-10-03-windows-live-closeout/README.md). Sub60 restart reset not separately captured. |
+| Observer overhead | Matched on/off measurements with unchanged paths/quality and thermal context | Unmeasured gap; no saving/overhead claim from HUD values. Owner accepts measured performance as-is; no additional1.6.1 campaign queued. Counter stays off in matched runs. |
 
 This is HUD interaction admission, **not** a completed full-route performance run.
 Do not rerun accepted report exports, matrix, music bank/listening, or rebuild the
@@ -43,5 +43,5 @@ idle; no stale hierarchy is accepted. Actual screenshots are the display evidenc
 No new audio/haptic acceptance is requested. Game is paused/Home afterward.
 
 Receipts: [S26 October2](s26-20261002/README.md). Do not repeat these completed
-phone rows after compaction. **Next unfinished step: Windows interactive display**;
-matched on/off overhead remains open and is separate from display correctness.
+phone rows after compaction. Windows interactive display is now completed;
+matched on/off overhead remains unmeasured and separate from display correctness.

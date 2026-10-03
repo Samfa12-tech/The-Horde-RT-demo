@@ -152,8 +152,12 @@ cancellation observation did not reproduce the original failure, so predicates
 remain unchanged. Raw runs/exit receipts and background/acquire-tail limitations
 are in the [finite backend record](windows-shipping-backends/README.md).
 
-Next unfinished step: foreground/live Windows Compute visual acceptance and
-remaining exact-device final-candidate gates, not another unattended matrix.
+October3 superseding disposition: [foreground Windows Compute/counter](../2026-10-03-windows-live-closeout/README.md)
+now passes on the current-player/current-music Shipping/High package,1838 complete
+presented CPU/GPU rows. Owner confirms cuff/footsteps/music green and accepts
+measured performance as-is; final S24 coverage is explicitly deferred as working
+but not fully tested, exact S25 remains unverified. No repeated matrix is queued.
+Next: owner-only signing/recovery and signed/frozen artifact/publication decision.
 No new phone use in this run. All original Debug failures
 have bounded passing rechecks, not a new single-run97/97 Debug claim.
 No repetition of the92 passing Debug rows or prior phone experiments.

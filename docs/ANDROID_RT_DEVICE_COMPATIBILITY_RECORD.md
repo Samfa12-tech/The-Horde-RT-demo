@@ -2,6 +2,23 @@
 
 Last updated: 2026-10-03
 
+## October3: owner closes subjective checks and accepts measured performance
+
+Owner confirms requested footstep/SFX, cuff and music checks are green, and
+explicitly accepts1.6.1 performance as-is. Evidence class: **owner-reported
+acceptance**, not a new APK hash, audio-service interruption trace or benchmark.
+Retain exact SM-S948B artifacts/results below; do not infer30FPS, improved pacing
+or a signed final package. Full graphics-options menu is planned for1.6.2.
+
+Owner explicitly defers the final **SM-S928B / Galaxy S24 Ultra** matrix and
+chooses the status **working but not fully tested**. Prior real Compute
+presentation, restored hands/enemies, screenshots and lifecycle evidence remain
+valid within their recorded artifact scopes; the latest final Shipping artifact
+is not newly certified. Exact S25 remains unverified. No device was operated for
+this record; no new listening or phone reacquisition is queued.
+Audio/haptic manual revalidation required:NO for this documentation-only update;
+the requested changed-audio owner checks are now accepted, not repeated.
+
 ## October3: scoped A/D music derivative on exact S26
 
 Only two held Melody3 phrases removed; retained v68 app render route, four changed
