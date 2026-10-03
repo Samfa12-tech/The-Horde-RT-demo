@@ -90,6 +90,8 @@ jobs:
             'MainActivityPlaytestReportLifecycleTest' = 7
             'GraphicsPreferencesTest' = 5
             'GraphicsMenuLifecycleTest' = 3
+            'GraphicsPreviewComparisonTest' = 5
+            'GraphicsPreviewCompactLayoutTest' = 3
             'RenderScalePreferenceTest' = 3
             'MusicOutputGainTest' = 5
             'AmbienceOutputQueueTest' = 8
@@ -112,7 +114,7 @@ jobs:
             $skipped += [int]$suite.testsuite.skipped
           }
           Write-Output "Android Debug unit tests: $tests total; $failures failures; $errors errors; $skipped skipped."
-          if ($tests -lt 111 -or $failures -ne 0 -or $errors -ne 0 -or $skipped -ne 0) {
+          if ($tests -lt 119 -or $failures -ne 0 -or $errors -ne 0 -or $skipped -ne 0) {
             throw 'Android Java contract tests did not pass completely.'
           }
           $apk = ./tools/resolve-android-apk.ps1 -AndroidRoot (Join-Path $PWD android) -Variant debug

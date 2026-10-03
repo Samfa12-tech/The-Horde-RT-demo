@@ -2,6 +2,52 @@
 
 Last updated: 2026-10-03
 
+## October3: 1.6.2 Compute compatibility and compact native preview
+
+Evidence class: **local exact development-APK identity, actual hardware RT,
+bounded lifecycle and native UI interaction**, not signed release, sustained
+performance, final integrated collapse or owner visual/listening acceptance.
+Actual **SM-S948B / Android16 / Adreno(TM)840**, raw driver2150932499/API4210983.
+Production data and package were preserved; only user0's separate Debug package
+was updated, without clearing app data or changing system text size.
+
+The exact preceding torch APK `b4e063afed5ea46be1467870a0d96adbb1a7e731e6bda8f978c2d4401f45e8ee`
+passed required **RayQueryCompute** startup, opening, three actual captures and
+Home/resume with newly presented hardware RT and the Compute backend retained.
+The runner checked executionBackend and successful presentation in actual native
+reports rather than treating advertised support as execution. Optional **EXT
+swapchain maintenance1 presentation fences were enabled**. Warm36.1C start and
+41.1C endpoint mean this is compatibility evidence, not baseline timing evidence.
+Private summary schema9 SHA256 `6da4d397694de3b0e7622dd2d17737e52f52f668ba4e5bb7ad511d98807c29dd`.
+
+Current Java-only compact preview APK
+`a4388e81fa03ac9fa16989da74fd13eefca7ed844522ad3d4e597bb206b9ef2a`
+matches the installed APK pullback exactly. Its four native libraries match the
+preceding torch APK byte-for-byte. Host119tests/21classes, lint0errors/51warnings,
+closed asset/full cgltf notice and four-ABI16KiB ELF admission passed. Source
+identity is861d0e0 plus the sealed Java inputs, not an unqualified clean commit.
+
+Actual fontScale1.7 controls leave about80% of the RT image unobstructed and retain
+native large text/minimum targets. Water Before/After changes only water
+Mobile/High, retaining75% resolution, Mobile fire and30Hz preview cap; Details
+shows distinct requested/effective values after actual RT presentation. Before
+and Revert restore the confirmed selection without saving the draft. The Water
+pool still falls behind the bottom strip in portrait; a follow-up Image/Controls
+toggle is being implemented. Latest owner steering replaces Before/After with
+live setting choices and an always-visible preview FPS reading; this tested
+Before/After APK is historical UI evidence. Apply/Keep persistence, further
+lifecycle and final owner acceptance remain open. Automatic approval review
+blocked an Apply tap; no blocked tap was executed. Owner then explicitly allowed
+testing Apply/Keep only with the unchanged original75%/Mobile-water/Mobile-fire/
+30Hz tuple after verifying those values. Raw screenshots/reports/preferences
+remain private outside Git.
+
+These feature-enabled results do not validate the unextended presentation
+teardown fallback. Owner chose to retain compatibility with that limitation
+explicitly open; S24/S25 feature support must not be inferred from hardware RT.
+Audio/haptic manual revalidation required:YES for the already changed cues and
+Core waterfall route; the preview UI itself adds no audio change.
+
 ## October3: exact torch-correction candidate, first matched75% comparison
 
 Evidence class: **local exact development-APK pullback and bounded actual RT
