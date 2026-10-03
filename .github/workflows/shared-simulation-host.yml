@@ -43,7 +43,7 @@ jobs:
       - name: Fetch only Android runtime LFS payloads
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb,assets/models/player/runtime/*.runtime.glb,assets/models/player/viewmodel/runtime/*.runtime.glb,assets/models/props/runtime/*.runtime.glb,assets/models/props/runtime/*/*.runtime.glb,assets/models/weapons/runtime/*.runtime.glb,assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2,assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb"
+          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb,assets/models/player/runtime/*.runtime.glb,assets/models/player/viewmodel/runtime/*.runtime.glb,assets/models/props/runtime/*.runtime.glb,assets/models/props/runtime/*/*.runtime.glb,assets/models/weapons/runtime/*.runtime.glb,assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2,assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb"
           && git lfs checkout
           "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb"
           "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb"
@@ -56,6 +56,7 @@ jobs:
           "assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2"
           "assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2"
           "assets/textures/props/runtime/*.android.ktx2"
+          "assets/textures/props/runtime/*.windows.ktx2"
           "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
           "assets/audio/pixabay/keeper_i_sense_you.wav"
           "assets/audio/pixabay/keeper_come_closer.wav"
@@ -154,7 +155,7 @@ jobs:
       - name: Fetch portable-test GLB and music PCM assets
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb"
+          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2"
           && git lfs checkout
           "assets/models/player/runtime/*.glb"
           "assets/models/player/viewmodel/runtime/*.glb"
@@ -162,6 +163,8 @@ jobs:
           "assets/models/props/runtime/*/*.glb"
           "assets/models/weapons/runtime/*.glb"
           "assets/models/world/runtime/collapsed-entry/*.runtime.glb"
+          "assets/textures/props/runtime/*.android.ktx2"
+          "assets/textures/props/runtime/*.windows.ktx2"
           "tests/fixtures/*/*.glb"
           "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
           "assets/audio/pixabay/keeper_i_sense_you.wav"

@@ -493,11 +493,11 @@ try {
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
-    # Compatibility pins identify the admitted 1.6.2 material/environment ABI and shading;
+    # Compatibility pins identify the admitted 1.6.2 material/environment ABI22 and shading;
     # the independent fresh compiler check below still validates source identity.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'c44a6da3763ad2b288977e805a8708d4a909ebbf6a827782673a2d7af8124dbb') `
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq '9b6c182eae90109187afe94beae5a7fd1fe7572c02e07843c0e5dc94f3f2037c') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '242c203c5b5d1f1660b66cca61824dfd810772d78e285cd747e6347b104052d7') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '7ba2d68c4a550363cc88035b049e6971972224bf2c176f8f9bd01be6aa3802fc') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -537,12 +537,12 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         'Catalog keys must remain the exact approved set without duplicates or reordering.'
     # 1.6.2 High/Max area-shadow sampling specializes OpaqueFast lighting as
     # well as dielectric lighting. The former equal Mobile/High word pairs are
-    # no longer the admitted snapshot; keep exact reviewed raw-word witnesses.
+    # no longer the admitted snapshot; keep exact reviewed ABI22 raw-word witnesses.
     $opaqueWordPins = @{
-        diagnostic_high_opaque_fast = 'da199c3582fab3c3be8ab6fbccf473582e39c5650941524a035054fcd6d0793c'
-        diagnostic_mobile_opaque_fast = '4550106dea8950a90c21dcf49f53dc1c02e36f0ca223e229569b9edf0a262901'
-        shipping_high_opaque_fast = 'a1e88cedb1124aa48f98a6fbe65f573bcc15e96e364e307d1369e9d1c8cba547'
-        shipping_mobile_opaque_fast = '9f278247a969ae90d5cbc5a028d8711861a92f526d3cd1156107b54f55bd784a'
+        diagnostic_high_opaque_fast = 'b01a3bc577ae61b8e2999607620aeb3b0f336b442dff202f5279201ff0380157'
+        diagnostic_mobile_opaque_fast = '6607962e3684ebe385e28774b943487c2851a0d4c560306aa9fd4d3549c3b674'
+        shipping_high_opaque_fast = 'aa19eaaf31a9c5e5f3bbbb4710344ceb9f57c81cfc2e5e6616526a46d964f48c'
+        shipping_mobile_opaque_fast = 'cbbea6b92696ee710a34fa6d15a579a7b9c67a2f737716dea87861b6bd3f0cc5'
     }
     foreach ($row in @($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' })) {
         Assert-True ($row.spirvSha256 -ceq $opaqueWordPins[$row.key]) `
@@ -726,13 +726,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
-        'fd789de47b4fb20915ba4bea1527d974cf2c5a468ea720288fa9ebb5d9970a9e') `
+        'e54371e722073bc02705b40cd14f351a6aa3823f3190f466aaa75d94940bdbc8') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
-        'f1ef45cc61cacf0bfb1b50a99f0a4bf78ad7934e8dde22b131eede1c4dbb0b83') `
+        'de392e9fa3cc8f6e897e257a868c8576f1a5b3abc5401512509a563365327540') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `
         'Temporary artifact compilation modified the worktree.'

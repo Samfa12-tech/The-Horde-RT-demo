@@ -112,6 +112,8 @@ docs/evidence/2026-09-30-opening-lighting-isolation/**/*.patch whitespace=-trail
 
 # Exact accepted paired-manifest bytes are part of runtime admission/provenance.
 assets/models/player/runtime/asset.manifest.json -text whitespace=cr-at-eol
+assets/models/world/runtime/collapsed-entry/asset.manifest.json -text whitespace=cr-at-eol
+assets/textures/props/runtime/asset.manifest.json -text whitespace=cr-at-eol
 
 # Exact first-blocker trial and rejected optimisation/restoration evidence.
 docs/evidence/2026-09-30-first-blocker/** -text whitespace=cr-at-eol
