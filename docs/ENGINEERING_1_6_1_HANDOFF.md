@@ -27,9 +27,13 @@ Current public GitHub metadata has only `v0.1.3-alpha.1`: future authorised
 publication must include a non-draft GitHub Release `v1.6.1`, not itch alone.
 The action opens a download page, not an automatic installer. No publication.
 
-Remaining release-operation boundary: exact signed/frozen release artifacts,
-owner-only signing/recovery confirmation and explicit release/publication
-authority. Existing unsigned/unpublishable artifacts are not silently promoted.
+Owner has now confirmed backups/recovery and authorised production signing and
+freezing after current-head green CI. Both93e6400 runs37083785643/37083790750
+completed successfully in all six lanes. Preserve the established certificate
+and use the local-only signing handoff in process memory. Owner checklist boxes
+remain owner-controlled. Exact signed/frozen artifacts and signed-device checks
+are the next bounded step; merge/publication remain withheld.
+Existing unsigned/unpublishable artifacts are not silently promoted.
 Do not mark signing checks passed, exact S24 fully tested or S25 supported.
 
 Newest bounded owner request: remove only held Melody3 notes in A/D. Implemented
@@ -78,7 +82,8 @@ all69 asset entries byte-identical to source, not only the music/player subset.
 retains the superseded stale-player ZIP and final hash `d2984666...3df58b12`.
 Historical dated
 rows below retain their own source/artifact scope. Do not restart accepted glass,
-player/audio work or completed matrices. Signing/publication remain unauthorised.
+player/audio work or completed matrices. Signing/freezing is now authorised;
+merge/publication remain unauthorised.
 
 ## Owner's quota and backup instruction
 

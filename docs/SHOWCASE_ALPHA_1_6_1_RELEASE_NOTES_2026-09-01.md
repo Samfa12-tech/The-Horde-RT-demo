@@ -7,7 +7,10 @@ Android version code: `9`
 ## Status
 
 Updated October 3. This is an unpublished engineering candidate, not a GitHub
-Release or itch upload. There is no production-signed final1.6.1 artifact.
+Release or itch upload. The owner confirmed signing backups/recovery and
+authorised production signing and artifact freezing on October3 after green CI.
+Exact frozen artifact identity and remaining signed-device checks are recorded
+separately in the release validation; merge and publication remain withheld.
 Implementation and acceptance below refer to their retained exact builds;
 earlier owner/device passes do not certify every subsequent candidate.
 
@@ -67,7 +70,7 @@ evidence remain recorded separately and are not replaced by this candidate.
 
 ## Accepted candidate and remaining release-operation boundaries
 
-The candidate is not a signed/public release. The [finding disposition](ENGINEERING_1_6_1_FINDING_STATUS.md)
+The candidate is not a public release. The [finding disposition](ENGINEERING_1_6_1_FINDING_STATUS.md)
 and [finite integration matrix](evidence/2026-10-02-final-integration/README.md)
 carry current evidence and next unfinished steps; do not restart completed tests.
 
@@ -85,8 +88,8 @@ carry current evidence and next unfinished steps; do not restart completed tests
   CPU/GPU rows. Matched observer overhead is unmeasured, not a speedup claim;
   counter stays off in performance runs. Owner audio acceptance is not a new
   externally instrumented OS focus trace. No repeated audition/email is queued.
-- Final signed/frozen artifacts, owner-only signing recovery and publication
-  authority remain separate. Actual1.6.0→public1.6.1 update dialog can only be
+- Owner confirmed backups/recovery and authorised signing/freezing only;
+  signed-device evidence and publication authority remain separate. Actual1.6.0→public1.6.1 update dialog can only be
   observed after authorised GitHub publication; selection fixture passes.
   Compiler/mocked tests are not physical RT, sustained pacing or owner-feel proof.
 
@@ -95,8 +98,9 @@ Numerical sub-pixel parity and the remaining High glass defects are explicitly
 Failed evidence, unchanged tolerances and physical diagnostics are preserved.
 Hotstrike redistribution remains the owner-tracked licence issue and was explicitly
 declared nonblocking by the owner; no asset/licence/history/distribution change is
-made here. Signing recovery and publication remain owner-controlled. No merge,
-signing or publication is authorised by these notes.
+made here. Signing recovery and publication remain owner-controlled. The owner
+authorised signing/packaging separately; these notes do not authorise merge or
+publication.
 
 ## Implemented version contract
 
