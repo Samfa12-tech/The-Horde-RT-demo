@@ -3743,6 +3743,11 @@ public class MainActivity extends Activity {
             case "player-viewmodel-lantern-low-parry": return 144;
             case "player-viewmodel-lantern-low-look-down": return 145;
             case "player-viewmodel-lantern-high-look-up": return 146;
+            case "layout-c-wall-panel": return 147;
+            case "layout-d-entry-breach": return 148;
+            case "layout-a-waterfall-own-hole": return 149;
+            case "layout-b-large-skylight": return 150;
+            case "layout-e-finale-opening": return 151;
             default: return -1;
         }
     }
