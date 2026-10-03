@@ -273,7 +273,9 @@ struct VulkanSurfaceContext
     VkCommandPool commandPool = VK_NULL_HANDLE;
     std::vector<VkCommandBuffer> commandBuffers;
     std::vector<VkSemaphore> imageAvailableSemaphores;
+    // Present waits belong to swapchain images, not graphics fence slots.
     std::vector<VkSemaphore> renderFinishedSemaphores;
+    bool imageAcquirePending = false;
     std::vector<VkFence> inFlightFences;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
     horde::vulkan::GpuFrameTimer gpuFrameTimer;
@@ -359,6 +361,7 @@ struct VulkanSurfaceContext
     float outputExposure = 0.62f;
     float mouseSensitivity = 1.0f;
     float renderScale = 1.0f;
+    float appliedRenderScale = 1.0f;
     horde::vulkan::raytracing::WaterQuality waterQuality =
         horde::vulkan::raytracing::WaterQuality::High;
     bool renderScaleDirty = false;
@@ -3625,15 +3628,22 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
     }
 
     ctx.imageAvailableSemaphores.resize(kMaxFramesInFlight);
-    ctx.renderFinishedSemaphores.resize(kMaxFramesInFlight);
+    ctx.renderFinishedSemaphores.resize(ctx.swapchainImages.size(), VK_NULL_HANDLE);
     ctx.inFlightFences.resize(kMaxFramesInFlight);
     VkSemaphoreCreateInfo semaphoreCreateInfo{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
     VkFenceCreateInfo fenceCreateInfo{VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, nullptr, VK_FENCE_CREATE_SIGNALED_BIT};
     for (UINT i = 0u; i < kMaxFramesInFlight; ++i)
     {
         if (vkCreateSemaphore(ctx.device, &semaphoreCreateInfo, nullptr, &ctx.imageAvailableSemaphores[i]) != VK_SUCCESS ||
-            vkCreateSemaphore(ctx.device, &semaphoreCreateInfo, nullptr, &ctx.renderFinishedSemaphores[i]) != VK_SUCCESS ||
             vkCreateFence(ctx.device, &fenceCreateInfo, nullptr, &ctx.inFlightFences[i]) != VK_SUCCESS)
+        {
+            return false;
+        }
+    }
+
+    for (VkSemaphore& semaphore : ctx.renderFinishedSemaphores)
+    {
+        if (vkCreateSemaphore(ctx.device, &semaphoreCreateInfo, nullptr, &semaphore) != VK_SUCCESS)
         {
             return false;
         }
@@ -3716,6 +3726,23 @@ bool CompleteRtEvidenceAfterDeviceIdle(
     return completed;
 }
 
+bool ConsumePendingImageAcquire(VulkanSurfaceContext& ctx)
+{
+    if (!ctx.imageAcquirePending) return true;
+    // A successful acquire can outlive an aborted command recording. Consume
+    // its signal before the teardown idle so the acquire semaphore is no longer
+    // owned by WSI. This submission produces no frame or presentation evidence.
+    const VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+    VkSubmitInfo submitInfo{VK_STRUCTURE_TYPE_SUBMIT_INFO};
+    submitInfo.waitSemaphoreCount = 1u;
+    submitInfo.pWaitSemaphores = &ctx.imageAvailableSemaphores[ctx.currentFrame];
+    submitInfo.pWaitDstStageMask = &waitStage;
+    if (vkQueueSubmit(ctx.graphicsQueue, 1u, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+        return false;
+    ctx.imageAcquirePending = false;
+    return true;
+}
+
 bool ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
 {
     if (ctx.device == VK_NULL_HANDLE)
@@ -3724,8 +3751,12 @@ bool ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
         return true;
     }
 
+    if (!ConsumePendingImageAcquire(ctx)) return false;
+    // Unextended Vulkan has no present-completion fence at retirement. Retain
+    // the portable idle drain; per-image reuse below never relies on this idle.
     const VkResult idleResult = vkDeviceWaitIdle(ctx.device);
     const bool evidenceCompleted = CompleteRtEvidenceAfterDeviceIdle(ctx, idleResult);
+    if (idleResult != VK_SUCCESS) return false;
     ctx.benchmarkEvidence.Cancel();
     const bool evidenceRecreated = !ctx.rtFrameEvidenceInitialised ||
         ctx.rtFrameEvidence.Recreate(
@@ -3907,6 +3938,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
         ctx.gpuFrameTimer.Initialise(
             ctx.physicalDevice, ctx.device, ctx.graphicsQueueFamilyIndex, kMaxFramesInFlight);
     }
+    ctx.appliedRenderScale = ctx.renderScale;
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     if (ctx.stagedPassTimer.Status() == horde::vulkan::raytracing::experimental::StagedPrimaryTimingInitStatus::Uninitialised)
         ctx.stagedPassTimer.Initialise(ctx.physicalDevice, ctx.device, ctx.graphicsQueueFamilyIndex, kMaxFramesInFlight);
@@ -3996,6 +4028,8 @@ void DestroyRenderContext(VulkanSurfaceContext& ctx)
         return;
     }
 
+    if (!ConsumePendingImageAcquire(ctx))
+        std::cerr << "Failed to consume an acquired image semaphore before renderer shutdown.\n";
     const VkResult idleResult = vkDeviceWaitIdle(ctx.device);
     (void)CompleteRtEvidenceAfterDeviceIdle(ctx, idleResult);
     if (ctx.rtFrameEvidenceInitialised)
@@ -4150,7 +4184,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         &imageIndex);
     acquireScope.Complete(1u, 0u, 1u);
 
-    if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR || acquireResult == VK_SUBOPTIMAL_KHR)
+    ctx.imageAcquirePending = acquireResult == VK_SUCCESS || acquireResult == VK_SUBOPTIMAL_KHR;
+
+    if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR)
     {
         if (evidenceFrame)
         {
@@ -4158,7 +4194,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         }
         return RecreateSwapchain(ctx);
     }
-    if (acquireResult != VK_SUCCESS)
+    if (acquireResult != VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR)
     {
         if (evidenceFrame)
         {
@@ -4362,7 +4398,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         1u,
         &ctx.commandBuffers[imageIndex],
         1u,
-        &ctx.renderFinishedSemaphores[ctx.currentFrame]};
+        // Waiting on acquisition orders reuse after this image's previous
+        // presentation consumed its wait semaphore (Khronos Vulkan Guide).
+        &ctx.renderFinishedSemaphores[imageIndex]};
 
     horde::vulkan::raytracing::RtSceneStageScope submitScope(
         evidenceFrame ? &observation : nullptr,
@@ -4384,6 +4422,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         }
         return false;
     }
+    ctx.imageAcquirePending = false;
     if (useRtFrame) ctx.rtScene.NotifyFrameSubmitted();
     if (evidenceFrame)
     {
@@ -4413,7 +4452,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
         nullptr,
         1u,
-        &ctx.renderFinishedSemaphores[ctx.currentFrame],
+        &ctx.renderFinishedSemaphores[imageIndex],
         1u,
         &ctx.swapchain,
         &imageIndex,
@@ -4426,9 +4465,10 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     wholeFrameScope.Complete(1u, 0u, 1u);
 
     ctx.lastFramePresentation =
-            presentResult == VK_SUCCESS
+            presentResult == VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR
             ? horde::telemetry::RtPresentationOutcome::Presented
-            : (presentResult == VK_SUBOPTIMAL_KHR
+            : (presentResult == VK_SUBOPTIMAL_KHR ||
+               (presentResult == VK_SUCCESS && acquireResult == VK_SUBOPTIMAL_KHR)
                 ? horde::telemetry::RtPresentationOutcome::PresentedNeedsRecreate
                 : presentResult == VK_ERROR_OUT_OF_DATE_KHR
                 ? horde::telemetry::RtPresentationOutcome::NotPresentedNeedsRecreate
@@ -4438,9 +4478,10 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         (void)ctx.rtFrameEvidence.AttachPresentation(ctx.lastFramePresentation);
         ctx.rtFrameEvidence.FinalizeSubmittedFrame(observation);
     }
-    if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR)
+    if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR ||
+        (presentResult == VK_SUCCESS && acquireResult == VK_SUBOPTIMAL_KHR))
     {
-        rtFramePresented = useRtFrame && presentResult == VK_SUBOPTIMAL_KHR;
+        rtFramePresented = useRtFrame && (presentResult == VK_SUCCESS || presentResult == VK_SUBOPTIMAL_KHR);
         return RecreateSwapchain(ctx);
     }
     if (presentResult != VK_SUCCESS)
@@ -5308,12 +5349,19 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 
         if (context.renderScaleDirty && context.useRtPath)
         {
+            const auto resizeStart = std::chrono::steady_clock::now();
+            const float requestedRenderScale = context.renderScale;
             context.benchmarkEvidence.Cancel();
             context.renderScaleDirty = false;
             timingSamples.clear();
             const VkResult idleResult = vkDeviceWaitIdle(context.device);
             const bool evidenceCompleted =
                 CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+            if (idleResult != VK_SUCCESS || !evidenceCompleted)
+            {
+                renderFailed = true;
+                break;
+            }
             const bool evidenceRecreated = !context.rtFrameEvidenceInitialised ||
                 context.rtFrameEvidence.Recreate(
                     horde::telemetry::RtResourceResetReason::RenderScaleChange,
@@ -5325,24 +5373,51 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             context.gpuFrameTimingTotalMs = 0.0;
             context.gpuFrameTimingSampleCount = 0u;
             RefreshGpuTimingTelemetry(context);
-            context.rtScene.Destroy();
-            capabilities.rtScene.presented = false;
-            capabilities.rtScene.dispatchWidth = 0u;
-            capabilities.rtScene.dispatchHeight = 0u;
-            capabilities.performance.internalRenderWidth = 0u;
-            capabilities.performance.internalRenderHeight = 0u;
-            capabilities.performance.frameTimeMs = 0.0f;
-            capabilities.performance.fps = 0.0f;
             if (HWND hud = GetDlgItem(hWnd, kHudControlId))
             {
                 SetWindowTextA(hud, kHudApplyingScaleText);
             }
-            if (!evidenceCompleted || !evidenceRecreated ||
-                !InitialiseRtSceneForSwapchain(context))
+            if (!evidenceRecreated)
             {
                 renderFailed = true;
                 break;
             }
+            const VkExtent2D requestedExtent = ScaledRenderExtent(
+                context.swapchainExtent, requestedRenderScale);
+            std::string resizeDiagnostic;
+            if (!context.rtScene.ResizeOutputAfterDeviceIdle(requestedExtent, resizeDiagnostic))
+            {
+                // Allocation/preflight failure retains the old image and descriptor.
+                // Restore the saved selection so relaunch does not repeat an unusable choice.
+                context.renderScale = context.appliedRenderScale;
+                SaveSettings(context);
+                UpdateSettingsLabels(context);
+                std::cerr << "RT render scale was restored after resize failure: "
+                          << resizeDiagnostic << '\n';
+                if (!context.unattendedBenchmark) MessageBoxA(hWnd,
+                    ("The requested render resolution could not be applied. Your previous setting was restored.\n\n" +
+                     resizeDiagnostic).c_str(), "Horde Lantern RT - graphics", MB_OK | MB_ICONWARNING);
+            }
+            else
+            {
+                context.appliedRenderScale = requestedRenderScale;
+                capabilities.rtScene.presented = false;
+                capabilities.rtScene.dispatchWidth = 0u;
+                capabilities.rtScene.dispatchHeight = 0u;
+                capabilities.performance.internalRenderWidth = 0u;
+                capabilities.performance.internalRenderHeight = 0u;
+                capabilities.performance.frameTimeMs = 0.0f;
+                capabilities.performance.fps = 0.0f;
+            }
+            // RenderFrame resets/re-records each acquired command buffer before
+            // submission; no commands referencing the retired image are reused.
+            const double resizeMilliseconds = std::chrono::duration<double, std::milli>(
+                std::chrono::steady_clock::now() - resizeStart).count();
+            const auto effectiveExtent = context.rtScene.DispatchExtent();
+            std::cout << "HORDE_RT_SCALE_RESIZE scale=" << std::round(context.appliedRenderScale * 100.0f)
+                      << " extent=" << effectiveExtent.width << 'x' << effectiveExtent.height
+                      << " output_only=1 applied=" << resizeDiagnostic.empty()
+                      << " idle_and_resize_ms=" << resizeMilliseconds << '\n';
         }
 
         const bool benchmarkFrame = context.benchmark.IsRunning();
@@ -5901,6 +5976,8 @@ void ShowCredits(HWND window)
                 "Production Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
                 "Production Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex (CC BY 4.0).\n"
                 "Application icon created for this project with OpenAI image generation.\n\n"
+                "glTF loading: cgltf by Johannes Kuhlmann (MIT).\n"
+                "Full notice: THIRD_PARTY_NOTICES/cgltf-LICENSE.txt beside the demo.\n\n"
                 "See ASSET_LICENSES.md beside the demo for source links and full licence details.",
                 "Horde Lantern RT - credits and licences",
                 MB_OK | MB_ICONINFORMATION);

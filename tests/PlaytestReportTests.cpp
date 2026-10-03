@@ -153,6 +153,49 @@ void TestSensitiveContentRejected()
           "sensitive opted-in context is rejected before output");
 }
 
+void TestBearerCredentialBoundaries()
+{
+    constexpr std::string_view safeNotes[] = {
+        "The torchbearer is silent", "The TORCHBEARER is silent", "The standardbearer: silent",
+        "The torchbearer=quiet", "The bearer.", "The bearer, beside the stairs", "The bearer!",
+        "Bearer", "Bearer  ", "Bearer .", "Bearer ,", "bearerhood is unfamiliar",
+        "torchbearer Bearer.", "bearer_figure is silent", "2bearer is silent",
+        "bearer\xc3\xa9 is silent",
+    };
+    for (const auto note : safeNotes)
+    {
+        auto input = ValidInput();
+        input.note = note;
+        Check(PreparePlaytestReport(input).IsReady(),
+              "ordinary bearer words and punctuation are accepted");
+    }
+    constexpr std::string_view unsafeNotes[] = {
+        "Bearer abc123", "bEaReR abc123", "(Bearer abc123)", "Bearer\tabc123",
+        "Bearer\r\nabc123", "Bearer:abc123", "Bearer=abc123", "Bearer : abc123",
+        "Bearer a.b_c-12+/=", "torchbearer is silent; Bearer abc123", "torch-bearer abc123",
+        "\xe3\x80\x90" "Bearer abc123", // Unicode opening bracket retains credential protection.
+        "token=abc123", "secret:abc123", "password=abc123", "authorization:abc123",
+        "cookie=abc123", "api_key=abc123", "apikey:abc123", "credential=abc123",
+    };
+    for (const auto note : unsafeNotes)
+    {
+        auto input = ValidInput();
+        input.note = note;
+        const auto result = PreparePlaytestReport(input);
+        Check(result.status == PlaytestReportStatus::SensitiveContent && result.json.empty(),
+              "separate bearer credentials and other existing secret patterns remain rejected");
+    }
+    auto input = ValidInput();
+    input.includeBasicContext = true;
+    input.context = ValidContext();
+    input.context.build = "torchbearer build";
+    Check(PreparePlaytestReport(input).IsReady(), "context shares corrected bearer word boundaries");
+    input.context.build = "build (Bearer abc123)";
+    const auto result = PreparePlaytestReport(input);
+    Check(result.status == PlaytestReportStatus::InvalidContext && result.json.empty(),
+          "context retains bearer credential protection");
+}
+
 void TestRetryIdentityAndCancellation()
 {
     const auto prepared = PreparePlaytestReport(ValidInput());
@@ -234,6 +277,7 @@ int main()
     }
     TestRejectedIdentifiersTimesEnumsAndText();
     TestSensitiveContentRejected();
+    TestBearerCredentialBoundaries();
     TestRetryIdentityAndCancellation();
     return passed ? 0 : 1;
 }

@@ -176,7 +176,9 @@ struct SwapchainContext
     VkCommandPool commandPool = VK_NULL_HANDLE;
     std::vector<VkCommandBuffer> commandBuffers;
     VkSemaphore imageAvailableSemaphores[kMaxFramesInFlight] = {};
-    VkSemaphore renderFinishedSemaphores[kMaxFramesInFlight] = {};
+    // Present waits belong to swapchain images, not graphics fence slots.
+    std::vector<VkSemaphore> renderFinishedSemaphores;
+    bool imageAcquirePending = false;
     VkFence inFlightFences[kMaxFramesInFlight] = {};
     VkClearColorValue clearColor = {{0.12f, 0.04f, 0.18f, 1.0f}};
     horde::vulkan::DeviceCapabilities capabilities;
@@ -2027,13 +2029,21 @@ bool CreateSwapchain(SwapchainContext& context)
         return false;
     }
 
+    context.renderFinishedSemaphores.resize(context.swapchainImages.size(), VK_NULL_HANDLE);
     VkSemaphoreCreateInfo semaphoreCreateInfo{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
     VkFenceCreateInfo fenceCreateInfo{VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, nullptr, VK_FENCE_CREATE_SIGNALED_BIT};
     for (uint32_t i = 0u; i < kMaxFramesInFlight; ++i)
     {
         if (vkCreateSemaphore(context.device, &semaphoreCreateInfo, nullptr, &context.imageAvailableSemaphores[i]) != VK_SUCCESS ||
-            vkCreateSemaphore(context.device, &semaphoreCreateInfo, nullptr, &context.renderFinishedSemaphores[i]) != VK_SUCCESS ||
             vkCreateFence(context.device, &fenceCreateInfo, nullptr, &context.inFlightFences[i]) != VK_SUCCESS)
+        {
+            return false;
+        }
+    }
+
+    for (VkSemaphore& semaphore : context.renderFinishedSemaphores)
+    {
+        if (vkCreateSemaphore(context.device, &semaphoreCreateInfo, nullptr, &semaphore) != VK_SUCCESS)
         {
             return false;
         }
@@ -2083,6 +2093,23 @@ bool CompleteRtEvidenceAfterDeviceIdle(SwapchainContext& context, VkResult idleR
 horde::telemetry::RtSampleStatus CurrentInitialGpuEvidenceStatus(
     SwapchainContext& context);
 
+bool ConsumePendingImageAcquire(SwapchainContext& context)
+{
+    if (!context.imageAcquirePending) return true;
+    // Recording or a surface-generation change can abort after acquire. Consume
+    // its signal before the teardown idle so WSI no longer owns this semaphore.
+    // No command buffers or presentation evidence belong to this drain.
+    const VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+    VkSubmitInfo submitInfo{VK_STRUCTURE_TYPE_SUBMIT_INFO};
+    submitInfo.waitSemaphoreCount = 1u;
+    submitInfo.pWaitSemaphores = &context.imageAvailableSemaphores[context.currentFrame];
+    submitInfo.pWaitDstStageMask = &waitStage;
+    if (vkQueueSubmit(context.graphicsQueue, 1u, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+        return false;
+    context.imageAcquirePending = false;
+    return true;
+}
+
 bool ReleaseSwapchainResources(SwapchainContext& context)
 {
     if (context.device == VK_NULL_HANDLE)
@@ -2090,8 +2117,12 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
         return true;
     }
 
+    if (!ConsumePendingImageAcquire(context)) return false;
+    // Unextended Vulkan has no present-completion fence at retirement. Retain
+    // the portable idle drain; per-image reuse below never relies on this idle.
     const VkResult idleResult = vkDeviceWaitIdle(context.device);
     const bool evidenceCompleted = CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+    if (idleResult != VK_SUCCESS) return false;
     CancelActiveInAppBenchmark(context);
     const bool evidenceRecreated = !context.rtFrameEvidenceInitialised ||
         context.rtFrameEvidence.Recreate(
@@ -2173,6 +2204,8 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
             semaphore = VK_NULL_HANDLE;
         }
     }
+
+    context.renderFinishedSemaphores.clear();
 
     context.swapchainImageLayouts.clear();
     context.swapchainImages.clear();
@@ -2441,6 +2474,9 @@ void DestroySwapchainContext(SwapchainContext& context)
         return;
     }
 
+    if (!ConsumePendingImageAcquire(context))
+        __android_log_print(ANDROID_LOG_ERROR, kTag,
+                            "Failed to consume an acquired image semaphore before renderer shutdown.");
     const VkResult idleResult = vkDeviceWaitIdle(context.device);
     (void)CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
     CancelActiveInAppBenchmark(context);
@@ -2602,13 +2638,14 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         VK_NULL_HANDLE,
         &imageIndex);
     acquireScope.Complete(1u, 0u, 1u);
+    context.imageAcquirePending = acquireResult == VK_SUCCESS || acquireResult == VK_SUBOPTIMAL_KHR;
     if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration))
     {
         if (evidenceFrame) context.rtFrameEvidence.AbortFrame();
         return false;
     }
 
-    if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR || acquireResult == VK_SUBOPTIMAL_KHR)
+    if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR)
     {
         if (evidenceFrame)
         {
@@ -2616,7 +2653,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         }
         return RecreateSwapchain(context);
     }
-    if (acquireResult != VK_SUCCESS)
+    if (acquireResult != VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR)
     {
         if (evidenceFrame)
         {
@@ -3098,7 +3135,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         1u,
         &context.commandBuffers[imageIndex],
         1u,
-        &context.renderFinishedSemaphores[context.currentFrame]};
+        // Acquisition orders this image's previous present wait before reuse.
+        &context.renderFinishedSemaphores[imageIndex]};
 
     horde::vulkan::raytracing::RtSceneStageScope submitScope(
         evidenceFrame ? &observation : nullptr,
@@ -3124,6 +3162,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context, horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
         return false;
     }
+    context.imageAcquirePending = false;
     if (useRtFrame) context.rtScene.NotifyFrameSubmitted();
     if (evidenceFrame)
     {
@@ -3155,7 +3194,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     VkPresentInfoKHR presentInfo{};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     presentInfo.waitSemaphoreCount = 1u;
-    presentInfo.pWaitSemaphores = &context.renderFinishedSemaphores[context.currentFrame];
+    presentInfo.pWaitSemaphores = &context.renderFinishedSemaphores[imageIndex];
     presentInfo.swapchainCount = 1u;
     presentInfo.pSwapchains = &context.swapchain;
     presentInfo.pImageIndices = &imageIndex;
@@ -3169,9 +3208,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     if (evidenceFrame)
     {
         const horde::telemetry::RtPresentationOutcome outcome =
-            presentResult == VK_SUCCESS
+            presentResult == VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR
             ? horde::telemetry::RtPresentationOutcome::Presented
-            : (presentResult == VK_SUBOPTIMAL_KHR
+            : (presentResult == VK_SUBOPTIMAL_KHR ||
+               (presentResult == VK_SUCCESS && acquireResult == VK_SUBOPTIMAL_KHR)
                 ? horde::telemetry::RtPresentationOutcome::PresentedNeedsRecreate
                 : presentResult == VK_ERROR_OUT_OF_DATE_KHR
                 ? horde::telemetry::RtPresentationOutcome::NotPresentedNeedsRecreate
@@ -3179,9 +3219,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         (void)context.rtFrameEvidence.AttachPresentation(outcome);
         context.rtFrameEvidence.FinalizeSubmittedFrame(observation);
     }
-    if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR)
+    if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR ||
+        (presentResult == VK_SUCCESS && acquireResult == VK_SUBOPTIMAL_KHR))
     {
-        rtFramePresented = useRtFrame && presentResult == VK_SUBOPTIMAL_KHR;
+        rtFramePresented = useRtFrame && (presentResult == VK_SUCCESS || presentResult == VK_SUBOPTIMAL_KHR);
         if (inAppBenchmarkFrame)
         {
             const double interruptedFrameMs =

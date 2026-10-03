@@ -134,3 +134,14 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+## cgltf glTF loader
+
+The bundled loader in `third_party/cgltf/` is cgltf by Johannes Kuhlmann,
+MIT licence. The complete copyright, permission notice and disclaimer from
+`third_party/cgltf/LICENSE` are distributed byte-for-byte as
+`THIRD_PARTY_NOTICES/cgltf-LICENSE.txt` in Windows packages and
+`assets/THIRD_PARTY_NOTICES/cgltf-LICENSE.txt` in Android APKs. Both in-app
+credits identify the loader and the notice location. Package admission verifies
+the complete notice bytes; this corrects future candidate packaging and does
+not alter frozen 1.6.1 artifacts.

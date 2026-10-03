@@ -37,6 +37,10 @@ endif()
 include(cmake/HordeRtPocketAudioCore.cmake)
 horde_rt_add_pocket_audio_core("${CMAKE_CURRENT_SOURCE_DIR}" "${BUILD_TESTING}")
 if(BUILD_TESTING)
+    add_executable(horde_rt_device_address_layout_tests tests/RtDeviceAddressLayoutTests.cpp)
+    target_include_directories(horde_rt_device_address_layout_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_device_address_layout_tests COMMAND horde_rt_device_address_layout_tests)
+
     add_executable(horde_rt_player_primitive_contract_tests tests/PlayerPrimitiveContractTests.cpp)
     target_include_directories(horde_rt_player_primitive_contract_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_player_primitive_contract_tests COMMAND horde_rt_player_primitive_contract_tests)
@@ -44,6 +48,9 @@ if(BUILD_TESTING)
     # Resolve the runner before registering any PowerShell-backed fixture.  CTest
     # records this exact executable in its generated command line.
     find_program(HORDE_RT_POWERSHELL_EXECUTABLE NAMES pwsh powershell REQUIRED)
+    add_test(NAME horde_rt_third_party_notice_admission_tests
+        COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/ThirdPartyNoticeAdmissionTests.ps1)
     add_test(NAME horde_rt_raygen_artifact_ownership_tests
         COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
             ${CMAKE_CURRENT_SOURCE_DIR}/tests/RaygenArtifactOwnershipTests.ps1)

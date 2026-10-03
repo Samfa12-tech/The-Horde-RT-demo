@@ -13,6 +13,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 . (Join-Path $PSScriptRoot "music-asset-policy.ps1")
+. (Join-Path $PSScriptRoot "third-party-notice-policy.ps1")
 $null = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
 . (Join-Path $PSScriptRoot "version-contract.ps1")
 $sourceIdentity = Get-HordeSourceIdentity -RepoRoot $repoRoot
@@ -256,6 +257,7 @@ function Write-ValidationPackage {
     Copy-Item -LiteralPath $WindowsExe -Destination (Join-Path $windowsStage "HordeLanternRT.exe")
     Copy-Item -LiteralPath (Join-Path $repoRoot "release\windows\README.txt") -Destination (Join-Path $windowsStage "README.txt")
     Copy-Item -LiteralPath (Join-Path $repoRoot "ASSET_LICENSES.md") -Destination (Join-Path $windowsStage "ASSET_LICENSES.md")
+    Copy-HordeThirdPartyNotices -RepositoryRoot $repoRoot -PackageRoot $windowsStage
     $releaseNoteMatches = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot "docs") -Filter "*RELEASE_NOTES*.md" -File |
         Where-Object {
             $text = Get-Content -LiteralPath $_.FullName -Raw
@@ -369,6 +371,7 @@ function Test-ValidationPackages {
         "assets/audio/pixabay/chest_open.wav",
         "assets/audio/pixabay/torch_extinguish.wav"))
     $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip
+    Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".android.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Windows validation zip contains forbidden development static asset content: $forbidden"
@@ -412,6 +415,7 @@ function Test-ValidationPackages {
         "assets/audio/pixabay/chest_open.wav",
         "assets/audio/pixabay/torch_extinguish.wav"))
     $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $androidValidationApk
+    Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $androidValidationApk -Platform Android
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".windows.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Android validation APK contains forbidden development static asset content: $forbidden"

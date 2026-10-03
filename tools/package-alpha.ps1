@@ -36,6 +36,7 @@ function Find-LatestVersionedTool {
 
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 . (Join-Path $PSScriptRoot "music-asset-policy.ps1")
+. (Join-Path $PSScriptRoot "third-party-notice-policy.ps1")
 $null = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
 $outputFull = [IO.Path]::GetFullPath($OutputRoot)
 $allowedRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "releases\candidates"))
@@ -113,7 +114,7 @@ try {
 }
 $windowsBinaryText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($windowsExe))
 foreach ($creditMarker in @(
-    "credits and licences", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
+    "credits and licences", "cgltf by Johannes Kuhlmann", "THIRD_PARTY_NOTICES/cgltf-LICENSE.txt", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
     "Historical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex"
@@ -141,6 +142,7 @@ $releaseNotes = $releaseNoteMatches[0].FullName
 Copy-Item -LiteralPath $windowsExe -Destination (Join-Path $windowsStage "HordeLanternRT.exe")
 Copy-Item -LiteralPath (Join-Path $repoRoot "release\windows\README.txt") -Destination (Join-Path $windowsStage "README.txt")
 Copy-Item -LiteralPath (Join-Path $repoRoot "ASSET_LICENSES.md") -Destination (Join-Path $windowsStage "ASSET_LICENSES.md")
+Copy-HordeThirdPartyNotices -RepositoryRoot $repoRoot -PackageRoot $windowsStage
 Copy-Item -LiteralPath $releaseNotes -Destination (Join-Path $windowsStage "ALPHA_RELEASE_NOTES.md")
 
 $lichLicenceEvidence = @(
@@ -201,6 +203,7 @@ $windowsZip = Join-Path $outputFull "$baseName-Windows-x64.zip"
 if (Test-Path -LiteralPath $windowsZip) { Remove-Item -LiteralPath $windowsZip -Force }
 Compress-Archive -Path (Join-Path $windowsStage "*") -DestinationPath $windowsZip -CompressionLevel Optimal
 $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip
+Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
 
 Push-Location (Join-Path $repoRoot "android")
 try {
@@ -214,6 +217,7 @@ $debugApk = Join-Path $repoRoot "android\app\build\outputs\apk\debug\app-debug.a
 $debugCandidate = Join-Path $outputFull "$baseName-Android-preview-debug-signed.apk"
 Copy-Item -LiteralPath $debugApk -Destination $debugCandidate -Force
 $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $debugCandidate
+Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $debugCandidate -Platform Android
 
 $signedRelease = Join-Path $repoRoot "android\app\build\outputs\apk\release\app-release.apk"
 $unsignedRelease = Join-Path $repoRoot "android\app\build\outputs\apk\release\app-release-unsigned.apk"
@@ -231,6 +235,7 @@ if ($releaseSigningConfigured -and (Test-Path -LiteralPath $signedRelease)) {
     throw "No unsigned Android release APK was produced."
 }
 $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $androidCandidate
+Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $androidCandidate -Platform Android
 
 $androidSdkRoot = if (-not [string]::IsNullOrWhiteSpace($env:ANDROID_HOME)) {
     $env:ANDROID_HOME
@@ -245,7 +250,7 @@ $zipalign = Find-LatestVersionedTool -Root $androidBuildTools -RelativeToolPath 
 $androidResources = (& $aapt2 dump resources $androidCandidate 2>&1 | Out-String)
 if ($LASTEXITCODE -ne 0) { throw "Failed to inspect Android resources in $androidCandidate" }
 foreach ($creditMarker in @(
-    "string/credits_body", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
+    "string/credits_body", "cgltf by Johannes Kuhlmann", "THIRD_PARTY_NOTICES/cgltf-LICENSE.txt", "Hotstrike Studio", "FilmCow", "Meshy", "DRAGON-STUDIO", "Pixabay",
     "Production Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex",
     "Production medieval hand torch created with Meshy; runtime processing by Samfa12/Codex"
     "Historical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex"

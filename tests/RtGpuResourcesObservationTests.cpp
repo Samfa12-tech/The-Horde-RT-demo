@@ -51,9 +51,17 @@ struct FakeVulkanState
     VkResult allocateResult = VK_SUCCESS;
     std::uint32_t allocateCount = 0u;
     std::uint32_t selectedMemoryType = UINT32_MAX;
+    VkDeviceAddress address = 4097u;
+    VkDeviceSize createdBufferSize = 0u;
 };
 
 FakeVulkanState gVulkan;
+
+VKAPI_ATTR VkDeviceAddress VKAPI_CALL FakeBufferAddress(
+    VkDevice, const VkBufferDeviceAddressInfo*)
+{
+    return gVulkan.address;
+}
 
 struct TestClock
 {
@@ -90,8 +98,9 @@ VKAPI_ATTR void VKAPI_CALL vkGetPhysicalDeviceMemoryProperties(
 }
 
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateBuffer(
-    VkDevice, const VkBufferCreateInfo*, const VkAllocationCallbacks*, VkBuffer* buffer)
+    VkDevice, const VkBufferCreateInfo* info, const VkAllocationCallbacks*, VkBuffer* buffer)
 {
+    gVulkan.createdBufferSize = info->size;
     *buffer = FakeHandle<VkBuffer>(0x101u);
     return VK_SUCCESS;
 }
@@ -362,6 +371,72 @@ int main()
                       gVulkan.allocateCount == allocationsBeforeFailure + 1u &&
                       buffer.buffer == VK_NULL_HANDLE && buffer.memory == VK_NULL_HANDLE,
                   "preferred heap allocation failure must not be concealed by a fallback retry");
+
+    // Aligned AS/SBT allocation must retain real allocation evidence, and close
+    // failed address validation without publishing a buffer or retrying a heap.
+    gVulkan.allocateResult = VK_SUCCESS;
+    gVulkan.requirements.size = 512u;
+    resources.Bind(FakeHandle<VkPhysicalDevice>(0x11u), FakeHandle<VkDevice>(0x22u),
+                   nullptr, FakeBufferAddress);
+    ok &= Require(resources.CreateAlignedBuffer(96u, 256u,
+                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, host, buffer, diagnostic) &&
+                      gVulkan.createdBufferSize == 351u && buffer.size == 351u &&
+                      buffer.allocationSize == 512u && buffer.address == 4097u &&
+                      buffer.deviceAddressOffset == 255u && buffer.AlignedAddress() == 4352u &&
+                      buffer.memoryPropertyFlags == host,
+                  "aligned allocation must reserve worst-case padding and preserve raw allocation evidence");
+    const auto beforeAlignedUpload = gVulkan.mappedBytes;
+    ok &= Require(resources.WriteBufferRange(buffer, buffer.deviceAddressOffset,
+                      payload.data(), payload.size(), "aligned SBT fixture", diagnostic) &&
+                      gVulkan.mappedOffset == 255u &&
+                      std::memcmp(gVulkan.mappedBytes.data(), beforeAlignedUpload.data(), 255u) == 0 &&
+                      std::memcmp(gVulkan.mappedBytes.data() + 255u,
+                          payload.data(), payload.size()) == 0,
+                  "aligned uploads must write at the address offset and preserve leading padding");
+    horde::telemetry::RtResourceInventory alignedInventory{};
+    AccumulateRtGpuBuffer(alignedInventory, buffer);
+    ok &= Require(alignedInventory.bufferCount == 1u && alignedInventory.memoryAllocationCount == 1u &&
+                      alignedInventory.hostVisibleBytes == 512u && alignedInventory.deviceLocalBytes == 0u,
+                  "alignment padding must remain in real allocated-byte evidence");
+    RtGpuBuffer alignedMoved = std::exchange(buffer, RtGpuBuffer{});
+    ok &= Require(buffer.deviceAddressOffset == 0u && alignedMoved.deviceAddressOffset == 255u &&
+                      alignedMoved.AlignedAddress() == 4352u,
+                  "aligned offset must follow buffer ownership through move/reset");
+    resources.DestroyBuffer(alignedMoved);
+    const auto allocationsBeforeInvalidSize = gVulkan.allocateCount;
+    ok &= Require(!resources.CreateAlignedBuffer(UINT64_MAX, 256u,
+                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, host, buffer, diagnostic) &&
+                      !resources.CreateAlignedBuffer(96u, 0u,
+                          VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, host, buffer, diagnostic) &&
+                      gVulkan.allocateCount == allocationsBeforeInvalidSize &&
+                      buffer.buffer == VK_NULL_HANDLE,
+                  "invalid aligned allocation must fail before touching Vulkan");
+    for (const auto address : {VkDeviceAddress{0u}, VkDeviceAddress{UINT64_MAX - 15u}})
+    {
+        gVulkan.address = address;
+        const auto frees = gVulkan.freeMemoryCount;
+        const auto destroys = gVulkan.destroyBufferCount;
+        ok &= Require(!resources.CreateAlignedBuffer(96u, 256u,
+                          VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, host, buffer, diagnostic) &&
+                          buffer.buffer == VK_NULL_HANDLE && buffer.memory == VK_NULL_HANDLE &&
+                          buffer.address == 0u && buffer.deviceAddressOffset == 0u &&
+                          gVulkan.freeMemoryCount == frees + 1u &&
+                          gVulkan.destroyBufferCount == destroys + 1u,
+                      "bad aligned address must destroy/free exactly once without publishing ownership");
+    }
+    gVulkan.address = 4096u;
+    ok &= Require(resources.CreateAlignedBuffer(96u, 256u,
+                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, host, buffer, diagnostic) &&
+                      buffer.deviceAddressOffset == 0u && buffer.AlignedAddress() == buffer.address,
+                  "already aligned raw addresses require no offset");
+    resources.DestroyBuffer(buffer);
+    gVulkan.allocateResult = VK_ERROR_OUT_OF_DEVICE_MEMORY;
+    const auto allocationsBeforeAlignedFailure = gVulkan.allocateCount;
+    ok &= Require(!resources.CreateAlignedBuffer(96u, 256u,
+                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, host, buffer, diagnostic) &&
+                      gVulkan.allocateCount == allocationsBeforeAlignedFailure + 1u &&
+                      buffer.buffer == VK_NULL_HANDLE && buffer.memory == VK_NULL_HANDLE,
+                  "aligned allocation failure must propagate and clean without retry");
 
     return ok ? 0 : 1;
 }

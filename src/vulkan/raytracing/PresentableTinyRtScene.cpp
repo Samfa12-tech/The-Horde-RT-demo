@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/RtDeviceAddressLayout.h"
 #include "vulkan/raytracing/DynamicBlasSynchronization.h"
 #include "vulkan/raytracing/ChestGuidanceLight.h"
 
@@ -261,11 +262,6 @@ constexpr std::uint32_t kMinimalClosestHitShader[] = {
     0x00050036u, 0x00000002u, 0x00000004u, 0x00000000u, 0x00000003u, 0x000200f8u, 0x00000005u, 0x0003003eu,
     0x00000009u, 0x0000000eu, 0x000100fdu, 0x00010038u
 };
-
-std::uint32_t AlignUp(const std::uint32_t value, const std::uint32_t alignment)
-{
-    return alignment == 0u ? value : ((value + alignment - 1u) / alignment) * alignment;
-}
 
 void SetImageBarrier(VkCommandBuffer commandBuffer,
                      VkImage image,
@@ -623,6 +619,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     vkGetBufferDeviceAddressKHR_ = other.vkGetBufferDeviceAddressKHR_;
     gpuResources_.Bind(physicalDevice_, device_, vkDestroyAccelerationStructureKHR_, vkGetBufferDeviceAddressKHR_);
     pipelineBundle_.RebindDestroyContext(this, &gpuResources_);
+    scratchAddressAlignment_ = std::exchange(other.scratchAddressAlignment_, 0u);
     other.gpuResources_.Reset();
     ready_ = std::exchange(other.ready_, false);
 
@@ -1026,6 +1023,7 @@ void PresentableTinyRtScene::Destroy()
     scaledBlitSupported_ = false;
     ready_ = false;
     gpuResources_.Reset();
+    scratchAddressAlignment_ = 0u;
 }
 
 horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory() const noexcept
@@ -2211,8 +2209,41 @@ void PresentableTinyRtScene::DestroyAccelerationStructure(AccelerationStructure&
     gpuResources_.DestroyAccelerationStructure(accelerationStructure);
 }
 
+bool PresentableTinyRtScene::CreateScratchBuffer(const VkDeviceSize usableSize,
+                                                Buffer& out,
+                                                std::string& diagnostic) const
+{
+    return gpuResources_.CreateAlignedBuffer(
+        usableSize, scratchAddressAlignment_, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, out, diagnostic);
+}
+
 bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic)
 {
+    // Query for both RT backends; buffer memory alignment alone does not satisfy
+    // the scratch device-address requirement (VUID-pInfos-03710).
+    VkPhysicalDeviceAccelerationStructurePropertiesKHR asProperties{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_PROPERTIES_KHR};
+    VkPhysicalDeviceProperties2 properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
+    properties.pNext = &asProperties;
+    auto getProperties = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2>(
+        vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceProperties2"));
+    if (getProperties == nullptr)
+        getProperties = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2>(
+            vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceProperties2KHR"));
+    if (getProperties == nullptr)
+    {
+        diagnostic = "Vulkan properties2 entry point is unavailable for AS scratch alignment.";
+        return false;
+    }
+    getProperties(physicalDevice_, &properties);
+    scratchAddressAlignment_ = asProperties.minAccelerationStructureScratchOffsetAlignment;
+    if (!IsDeviceAddressAlignment(scratchAddressAlignment_))
+    {
+        diagnostic = "Device returned an invalid AS scratch address alignment.";
+        return false;
+    }
+
     struct Vertex
     {
         float position[3];
@@ -2980,12 +3011,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     }
 
     Buffer blasScratch;
-    if (!CreateBuffer(blasSizes.buildScratchSize,
-                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                      true,
-                      blasScratch,
-                      diagnostic))
+    if (!CreateScratchBuffer(blasSizes.buildScratchSize, blasScratch, diagnostic))
     {
         return false;
     }
@@ -2993,7 +3019,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     VkAccelerationStructureBuildRangeInfoKHR blasRange{};
     blasRange.primitiveCount = primitiveCount;
     blasBuildInfo.dstAccelerationStructure = blas_.handle;
-    blasBuildInfo.scratchData.deviceAddress = blasScratch.address;
+    blasBuildInfo.scratchData.deviceAddress = blasScratch.AlignedAddress();
     const VkAccelerationStructureBuildRangeInfoKHR* blasRanges[] = {&blasRange};
     struct BlasBuildData
     {
@@ -3052,17 +3078,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
     Buffer waterfallScratch;
-    if (!CreateBuffer(waterfallSizes.buildScratchSize,
-                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                      true,
-                      waterfallScratch,
-                      diagnostic))
+    if (!CreateScratchBuffer(waterfallSizes.buildScratchSize, waterfallScratch, diagnostic))
     {
         return false;
     }
     waterfallBuildInfo.dstAccelerationStructure = waterfallBlas_.handle;
-    waterfallBuildInfo.scratchData.deviceAddress = waterfallScratch.address;
+    waterfallBuildInfo.scratchData.deviceAddress = waterfallScratch.AlignedAddress();
     const VkAccelerationStructureBuildRangeInfoKHR* waterfallRanges[] = {&waterfallRange};
     BlasBuildData waterfallBuildData{this, &waterfallBuildInfo, waterfallRanges};
     if (!RunOneTimeCommands(buildBlas, &waterfallBuildData, diagnostic))
@@ -3108,17 +3129,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
     Buffer finaleRoofScratch;
-    if (!CreateBuffer(finaleRoofSizes.buildScratchSize,
-                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                      true,
-                      finaleRoofScratch,
-                      diagnostic))
+    if (!CreateScratchBuffer(finaleRoofSizes.buildScratchSize, finaleRoofScratch, diagnostic))
     {
         return false;
     }
     finaleRoofBuildInfo.dstAccelerationStructure = finaleRoofBlas_.handle;
-    finaleRoofBuildInfo.scratchData.deviceAddress = finaleRoofScratch.address;
+    finaleRoofBuildInfo.scratchData.deviceAddress = finaleRoofScratch.AlignedAddress();
     const VkAccelerationStructureBuildRangeInfoKHR* finaleRoofRanges[] = {&finaleRoofRange};
     BlasBuildData finaleRoofBuildData{this, &finaleRoofBuildInfo, finaleRoofRanges};
     if (!RunOneTimeCommands(buildBlas, &finaleRoofBuildData, diagnostic))
@@ -3234,13 +3250,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             return false;
         }
         Buffer scratch;
-        if (!CreateBuffer(sizes.buildScratchSize,
-                          VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                          true, scratch, diagnostic))
+        if (!CreateScratchBuffer(sizes.buildScratchSize, scratch, diagnostic))
             return false;
         buildInfo.dstAccelerationStructure = accelerationStructure.handle;
-        buildInfo.scratchData.deviceAddress = scratch.address;
+        buildInfo.scratchData.deviceAddress = scratch.AlignedAddress();
         std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> rangePointers;
         rangePointers.reserve(ranges.size());
         for (const auto& range : ranges) rangePointers.push_back(&range);
@@ -3324,17 +3337,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     }
 
     Buffer torchBlasScratch;
-    if (!CreateBuffer(torchBlasSizes.buildScratchSize,
-                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                      true,
-                      torchBlasScratch,
-                      diagnostic))
+    if (!CreateScratchBuffer(torchBlasSizes.buildScratchSize, torchBlasScratch, diagnostic))
     {
         return false;
     }
     torchBlasBuildInfo.dstAccelerationStructure = torchBlas_.handle;
-    torchBlasBuildInfo.scratchData.deviceAddress = torchBlasScratch.address;
+    torchBlasBuildInfo.scratchData.deviceAddress = torchBlasScratch.AlignedAddress();
     std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> torchBlasRangePointers;
     torchBlasRangePointers.reserve(torchRanges.size());
     for (const auto& range : torchRanges) torchBlasRangePointers.push_back(&range);
@@ -3405,17 +3413,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
     Buffer swordBlasScratch;
-    if (!CreateBuffer(swordBlasSizes.buildScratchSize,
-                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                      true,
-                      swordBlasScratch,
-                      diagnostic))
+    if (!CreateScratchBuffer(swordBlasSizes.buildScratchSize, swordBlasScratch, diagnostic))
     {
         return false;
     }
     swordBlasBuildInfo.dstAccelerationStructure = swordBlas_.handle;
-    swordBlasBuildInfo.scratchData.deviceAddress = swordBlasScratch.address;
+    swordBlasBuildInfo.scratchData.deviceAddress = swordBlasScratch.AlignedAddress();
     std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> swordBlasRangePointers;
     swordBlasRangePointers.reserve(swordRanges.size());
     for (const auto& range : swordRanges) swordBlasRangePointers.push_back(&range);
@@ -3485,17 +3488,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
     Buffer playerBodyBlasScratch;
-    if (!CreateBuffer(playerBodyBlasSizes.buildScratchSize,
-                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                      true,
-                      playerBodyBlasScratch,
-                      diagnostic))
+    if (!CreateScratchBuffer(playerBodyBlasSizes.buildScratchSize, playerBodyBlasScratch, diagnostic))
     {
         return false;
     }
     playerBodyBlasBuildInfo.dstAccelerationStructure = playerBodyBlas_.handle;
-    playerBodyBlasBuildInfo.scratchData.deviceAddress = playerBodyBlasScratch.address;
+    playerBodyBlasBuildInfo.scratchData.deviceAddress = playerBodyBlasScratch.AlignedAddress();
     const VkAccelerationStructureBuildRangeInfoKHR* playerBodyBlasRanges[] = {&playerBodyRange};
     BlasBuildData playerBodyBlasBuildData{this, &playerBodyBlasBuildInfo, playerBodyBlasRanges};
     if (!RunOneTimeCommands(buildBlas, &playerBodyBlasBuildData, diagnostic))
@@ -3538,17 +3536,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
     Buffer playerLimbBlasScratch;
-    if (!CreateBuffer(playerLimbBlasSizes.buildScratchSize,
-                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                      true,
-                      playerLimbBlasScratch,
-                      diagnostic))
+    if (!CreateScratchBuffer(playerLimbBlasSizes.buildScratchSize, playerLimbBlasScratch, diagnostic))
     {
         return false;
     }
     playerLimbBlasBuildInfo.dstAccelerationStructure = playerLimbBlas_.handle;
-    playerLimbBlasBuildInfo.scratchData.deviceAddress = playerLimbBlasScratch.address;
+    playerLimbBlasBuildInfo.scratchData.deviceAddress = playerLimbBlasScratch.AlignedAddress();
     const VkAccelerationStructureBuildRangeInfoKHR* playerLimbBlasRanges[] = {&playerLimbRange};
     BlasBuildData playerLimbBlasBuildData{this, &playerLimbBlasBuildInfo, playerLimbBlasRanges};
     if (!RunOneTimeCommands(buildBlas, &playerLimbBlasBuildData, diagnostic))
@@ -3602,14 +3595,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         diagnostic = "Failed to create skinned player BLAS.";
         return false;
     }
-    if (!CreateBuffer(std::max(skinnedPlayerSizes.buildScratchSize,
-                               skinnedPlayerSizes.updateScratchSize),
-                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true,
-                      playerScratch, diagnostic))
+    if (!CreateScratchBuffer(std::max(skinnedPlayerSizes.buildScratchSize,
+                               skinnedPlayerSizes.updateScratchSize), playerScratch, diagnostic))
         return false;
     skinnedPlayerBuildInfo.dstAccelerationStructure = playerBlas.handle;
-    skinnedPlayerBuildInfo.scratchData.deviceAddress = playerScratch.address;
+    skinnedPlayerBuildInfo.scratchData.deviceAddress = playerScratch.AlignedAddress();
     std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> skinnedPlayerRangePointers;
     skinnedPlayerRangePointers.reserve(skinnedPlayerRanges.size());
     for (const auto& range : skinnedPlayerRanges)
@@ -3715,19 +3705,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             diagnostic = "Failed to create animated skeleton pose BLAS.";
             return false;
         }
-        if (!CreateBuffer(std::max(skeletonSizes.buildScratchSize, skeletonSizes.updateScratchSize),
-                          VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                          VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                          true,
-                          skeletonGpu.updateScratch,
-                          diagnostic))
+        if (!CreateScratchBuffer(std::max(skeletonSizes.buildScratchSize, skeletonSizes.updateScratchSize), skeletonGpu.updateScratch, diagnostic))
         {
             return false;
         }
         VkAccelerationStructureBuildRangeInfoKHR skeletonRange{};
         skeletonRange.primitiveCount = skeletonPrimitiveCount;
         skeletonBuildInfo.dstAccelerationStructure = skeletonGpu.accelerationStructure.handle;
-        skeletonBuildInfo.scratchData.deviceAddress = skeletonGpu.updateScratch.address;
+        skeletonBuildInfo.scratchData.deviceAddress = skeletonGpu.updateScratch.AlignedAddress();
         const VkAccelerationStructureBuildRangeInfoKHR* skeletonRanges[] = {&skeletonRange};
         BlasBuildData skeletonBuildData{this, &skeletonBuildInfo, skeletonRanges};
         if (!RunOneTimeCommands(buildBlas, &skeletonBuildData, diagnostic)) return false;
@@ -3793,19 +3778,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         diagnostic = "Failed to create animated lich BLAS.";
         return false;
     }
-    if (!CreateBuffer(std::max(lichSizes.buildScratchSize, lichSizes.updateScratchSize),
-                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                      true,
-                      lichBlasUpdateScratch_,
-                      diagnostic))
+    if (!CreateScratchBuffer(std::max(lichSizes.buildScratchSize, lichSizes.updateScratchSize), lichBlasUpdateScratch_, diagnostic))
     {
         return false;
     }
     VkAccelerationStructureBuildRangeInfoKHR lichRange{};
     lichRange.primitiveCount = lichPrimitiveCount;
     lichBuildInfo.dstAccelerationStructure = lichBlas_.handle;
-    lichBuildInfo.scratchData.deviceAddress = lichBlasUpdateScratch_.address;
+    lichBuildInfo.scratchData.deviceAddress = lichBlasUpdateScratch_.AlignedAddress();
     const VkAccelerationStructureBuildRangeInfoKHR* lichRanges[] = {&lichRange};
     BlasBuildData lichBuildData{this, &lichBuildInfo, lichRanges};
     if (!RunOneTimeCommands(buildBlas, &lichBuildData, diagnostic)) return false;
@@ -3937,12 +3917,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
 
-    if (!CreateBuffer(std::max(tlasSizes.buildScratchSize, tlasSizes.updateScratchSize),
-                      VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                      VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                      true,
-                      tlasUpdateScratch_,
-                      diagnostic))
+    if (!CreateScratchBuffer(std::max(tlasSizes.buildScratchSize, tlasSizes.updateScratchSize), tlasUpdateScratch_, diagnostic))
     {
         return false;
     }
@@ -3950,7 +3925,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     VkAccelerationStructureBuildRangeInfoKHR tlasRange{};
     tlasRange.primitiveCount = instanceCount;
     tlasBuildInfo.dstAccelerationStructure = tlas_.handle;
-    tlasBuildInfo.scratchData.deviceAddress = tlasUpdateScratch_.address;
+    tlasBuildInfo.scratchData.deviceAddress = tlasUpdateScratch_.AlignedAddress();
     const VkAccelerationStructureBuildRangeInfoKHR* tlasRanges[] = {&tlasRange};
     BlasBuildData tlasBuildData{this, &tlasBuildInfo, tlasRanges};
     if (!RunOneTimeCommands(buildBlas, &tlasBuildData, diagnostic))
@@ -4481,18 +4456,28 @@ bool PresentableTinyRtScene::CreateBundleStrategySbt(
 
     constexpr std::uint32_t groupCount = 3u;
     const std::uint32_t handleSize = rtProperties.shaderGroupHandleSize;
-    const std::uint32_t handleAlignment = rtProperties.shaderGroupHandleAlignment;
     const std::uint32_t baseAlignment = rtProperties.shaderGroupBaseAlignment;
-    const std::uint32_t groupStride = AlignUp(handleSize, handleAlignment);
-    const std::uint32_t regionSize = AlignUp(groupStride, baseAlignment);
-    const std::uint32_t sbtSize = regionSize * groupCount;
+    RtShaderBindingTableLayout layout{};
+    if (!TryShaderBindingTableLayout(
+            handleSize, rtProperties.shaderGroupHandleAlignment, baseAlignment,
+            rtProperties.maxShaderGroupStride, layout) ||
+        layout.size > std::numeric_limits<std::size_t>::max() ||
+        static_cast<std::uint64_t>(handleSize) * groupCount >
+            std::numeric_limits<std::size_t>::max())
+    {
+        diagnostic = "Invalid or unsupported RT shader binding table alignment/stride/range.";
+        return false;
+    }
+    const VkDeviceSize groupStride = layout.stride;
+    const VkDeviceSize regionSize = layout.regionSpacing;
+    const VkDeviceSize sbtSize = layout.size;
 
     const char* label = strategy == RtMaterialStrategy::GenericDielectric
         ? "generic dielectric" : "opaque fast";
     const auto createTable = [&](VkPipeline sourcePipeline,
                                  Buffer& table) -> bool
     {
-        std::vector<std::uint8_t> handles(handleSize * groupCount);
+        std::vector<std::uint8_t> handles(static_cast<std::size_t>(handleSize) * groupCount);
         if (vkGetRayTracingShaderGroupHandlesKHR_(
                 device_, sourcePipeline, 0u, groupCount,
                 handles.size(), handles.data()) != VK_SUCCESS)
@@ -4501,31 +4486,32 @@ bool PresentableTinyRtScene::CreateBundleStrategySbt(
                 " RT shader group handles.";
             return false;
         }
-        if (!CreateBuffer(sbtSize,
+        if (!gpuResources_.CreateAlignedBuffer(sbtSize, baseAlignment,
                           VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR,
                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                               VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                          true, table, diagnostic))
+                          table, diagnostic))
             return false;
 
-        std::vector<std::uint8_t> sbtData(sbtSize, 0u);
+        std::vector<std::uint8_t> sbtData(static_cast<std::size_t>(sbtSize), 0u);
         for (std::uint32_t group = 0u; group < groupCount; ++group)
         {
             std::memcpy(sbtData.data() + (regionSize * group),
-                        handles.data() + (handleSize * group), handleSize);
+                        handles.data() + (static_cast<std::size_t>(handleSize) * group), handleSize);
         }
         const std::string tableLabel = std::string(label) + " RT shader binding table";
-        if (!WriteBuffer(table, sbtData.data(), sbtSize,
+        if (!gpuResources_.WriteBufferRange(table, table.deviceAddressOffset,
+                         sbtData.data(), sbtSize,
                          tableLabel.c_str(), diagnostic))
             return false;
 
-        regions[0].deviceAddress = table.address;
+        regions[0].deviceAddress = table.AlignedAddress();
         regions[0].stride = groupStride;
         regions[0].size = groupStride;
-        regions[1].deviceAddress = table.address + regionSize;
+        regions[1].deviceAddress = table.AlignedAddress() + regionSize;
         regions[1].stride = groupStride;
         regions[1].size = groupStride;
-        regions[2].deviceAddress = table.address + (regionSize * 2u);
+        regions[2].deviceAddress = table.AlignedAddress() + (regionSize * 2u);
         regions[2].stride = groupStride;
         regions[2].size = groupStride;
         regions[3] = {};
@@ -5492,7 +5478,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         playerUpdateInfo.geometryCount =
             static_cast<std::uint32_t>(playerGeometries.size());
         playerUpdateInfo.pGeometries = playerGeometries.data();
-        playerUpdateInfo.scratchData.deviceAddress = playerScratch.address;
+        playerUpdateInfo.scratchData.deviceAddress = playerScratch.AlignedAddress();
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &playerUpdateInfo,
                                              playerRangePointers.data());
     };
@@ -5518,7 +5504,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         skeletonUpdateInfo.dstAccelerationStructure = skeletonBucketGpu.accelerationStructure.handle;
         skeletonUpdateInfo.geometryCount = 1u;
         skeletonUpdateInfo.pGeometries = &skeletonGeometry;
-        skeletonUpdateInfo.scratchData.deviceAddress = skeletonBucketGpu.updateScratch.address;
+        skeletonUpdateInfo.scratchData.deviceAddress = skeletonBucketGpu.updateScratch.AlignedAddress();
         VkAccelerationStructureBuildRangeInfoKHR skeletonRange{};
         skeletonRange.primitiveCount = static_cast<std::uint32_t>(skeletonVertices.size() / 3u);
         const VkAccelerationStructureBuildRangeInfoKHR* skeletonRanges[] = {&skeletonRange};
@@ -5544,7 +5530,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lichUpdateInfo.dstAccelerationStructure = lichBlas_.handle;
         lichUpdateInfo.geometryCount = 1u;
         lichUpdateInfo.pGeometries = &lichGeometry;
-        lichUpdateInfo.scratchData.deviceAddress = lichBlasUpdateScratch_.address;
+        lichUpdateInfo.scratchData.deviceAddress = lichBlasUpdateScratch_.AlignedAddress();
         VkAccelerationStructureBuildRangeInfoKHR lichRange{};
         lichRange.primitiveCount = static_cast<std::uint32_t>(lichSkinnedVertices_.size() / 3u);
         const VkAccelerationStructureBuildRangeInfoKHR* lichRanges[] = {&lichRange};
@@ -5606,7 +5592,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     updateInfo.dstAccelerationStructure = tlas_.handle;
     updateInfo.geometryCount = 1u;
     updateInfo.pGeometries = &tlasGeometry;
-    updateInfo.scratchData.deviceAddress = tlasUpdateScratch_.address;
+    updateInfo.scratchData.deviceAddress = tlasUpdateScratch_.AlignedAddress();
 
     VkAccelerationStructureBuildRangeInfoKHR updateRange{};
     updateRange.primitiveCount = static_cast<std::uint32_t>(instances.size());

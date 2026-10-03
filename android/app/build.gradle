@@ -336,6 +336,11 @@ tasks.register('prepareRuntimeAssets', Sync) {
     from('../..') {
         include 'ASSET_LICENSES.md'
     }
+    from('../../third_party/cgltf') {
+        include 'LICENSE'
+        rename 'LICENSE', 'cgltf-LICENSE.txt'
+        into 'THIRD_PARTY_NOTICES'
+    }
     into runtimeAssetsDir
 }
 

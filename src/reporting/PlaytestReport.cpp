@@ -125,11 +125,28 @@ bool ContainsSensitivePattern(const std::string_view text)
         std::size_t at = lower.find(key);
         while (at != std::string::npos)
         {
-            std::size_t next = at + key.size();
+            const std::size_t keyEnd = at + key.size();
+            // Bearer is a credential scheme only as a separate word. In particular,
+            // torchbearer/standardbearer and bearer-prefixed identifiers are prose.
+            // Keep non-ASCII boundaries conservative: a credential after Unicode
+            // punctuation must still be rejected by this privacy filter.
+            const auto isWordByte = [](const unsigned char value) noexcept {
+                return (value >= 'a' && value <= 'z') || (value >= '0' && value <= '9') ||
+                       value == '_';
+            };
+            if (key == "bearer" &&
+                ((at > 0u && isWordByte(static_cast<unsigned char>(lower[at - 1u]))) ||
+                 (keyEnd < lower.size() && isWordByte(static_cast<unsigned char>(lower[keyEnd])))))
+            {
+                at = lower.find(key, at + 1u);
+                continue;
+            }
+            std::size_t next = keyEnd;
             while (next < lower.size() && (lower[next] == ' ' || lower[next] == '\t' ||
                 lower[next] == '\r' || lower[next] == '\n')) ++next;
             if (next < lower.size() && (lower[next] == '=' || lower[next] == ':')) return true;
-            if (key == "bearer" && next < lower.size() && lower[next] != ',' && lower[next] != '.') return true;
+            if (key == "bearer" && next > keyEnd && next < lower.size() &&
+                lower[next] != ',' && lower[next] != '.') return true;
             at = lower.find(key, at + 1u);
         }
     }

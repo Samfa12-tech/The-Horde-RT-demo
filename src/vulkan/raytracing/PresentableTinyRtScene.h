@@ -565,6 +565,8 @@ private:
     bool CreateStaticMeshResources(std::string& diagnostic);
     const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
+    bool CreateScratchBuffer(VkDeviceSize usableSize, Buffer& out,
+                             std::string& diagnostic) const;
     bool CreateSelectedPipelineBundle(std::string& diagnostic);
     [[nodiscard]] bool CapturePipelineEvidenceIdentity() noexcept;
     bool CreateBundleDescriptorSetLayout(const RtDescriptorIoContract& contract,
@@ -678,6 +680,7 @@ private:
     AccelerationStructure tlas_;
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
+    VkDeviceSize scratchAddressAlignment_ = 0u;
     CharacterRenderSlot characterSlot_;
     PlayerRenderSlot playerRenderSlot_;
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
