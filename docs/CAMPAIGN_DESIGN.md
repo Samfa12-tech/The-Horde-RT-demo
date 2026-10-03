@@ -1,6 +1,9 @@
 # The Horde — Campaign, Characters and Progression
 **Owner-approved creative direction: 30 September 2026.** Planning, not implemented content or release authority. Read with [ROADMAP.md](ROADMAP.md). This document supersedes older statements that the Horde's nature, dungeon order and final mystery are entirely undecided. Concrete encounters, scripts, balance and technical solutions still require scoped design and testing.
 
+## Dialogue authoring draft
+The [whole-campaign dialogue bank](CAMPAIGN_DIALOGUE_BANK.md) (3 October 2026) proposes scene-by-scene dialogue from the tomb through the playable return, with a tighter 1.7 opening, character voices, access/service exchanges, either-order dungeon returns, bounded barks and a fair-clue ledger. This document remains the creative authority; new connective scenes, wording and detailed ritual staging in the bank are drafts for review, not newly approved canon or voice-production scope.
+
 ## Identity and pillars
 A first-person historical-gothic dark-fantasy treasure-hunting adventure. Primary structural inspiration: Ocarina of Time. Distinctive places, learnable tools, environmental puzzles, secrets, memorable bosses and welcome returns to a useful village. Original characters, art and dialogue; no copied Zelda or Jak and Daxter assets, voices or scripts.
 The Horde began as a vast army. Passed-down accounts confuse that lost army with the treasure hoard it carried home. Both meanings can be true. Retain **The Horde** as the working title; no automatic rename.
