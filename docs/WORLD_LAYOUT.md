@@ -1,10 +1,14 @@
 # The Horde — Approved World Layout
 
-**Owner-approved geography: 3 October 2026.** Canonical planning reference for routes, landmarks and their relative positions. Read with [CAMPAIGN_DESIGN.md](CAMPAIGN_DESIGN.md), [ROADMAP.md](ROADMAP.md), the [1.7 plan](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md) and the [1.8 plan](superpowers/plans/2026-09-11-village-hub-1.8.0.md).
+**Sam-approved geometry: 4 October 2026.** Canonical planning reference for routes, landmarks and their relative positions. Read with [CAMPAIGN_DESIGN.md](CAMPAIGN_DESIGN.md), [ROADMAP.md](ROADMAP.md), the [1.7 plan](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md) and the [1.8 plan](superpowers/plans/2026-09-11-village-hub-1.8.0.md).
 
 The owner approved the overhead concept titled **The Horde — Proposed World Layout**. Its printed “Proposed” and “Concept for review” labels describe the image's creation stage; the topology is now approved. The artwork is **not to scale**. Exact distances, traversal times, slopes, building footprints, collision and camera compositions must be established through playable blockout testing. Do not treat illustrative perspective or decorative details as measured level geometry.
 
 This is a connected regional plan delivered through bounded areas and measured zone/residency transitions. It does not promise a continuous seamless open world or require every visible region to be resident and explorable at once.
+
+![The Horde - approved world layout, not to scale](design/world/the-horde-world-layout.png)
+
+*Original concept caption: "The Horde - Proposed World Layout". Sam approved its geometry on 4 October 2026; it remains not to scale. The approved names The Veyrlands, Bellwether and King Veyr are recorded in this document but are not yet printed on the image.*
 
 ## Approved names and local history
 
@@ -85,7 +89,7 @@ Preserve the separate later-created finale/rescue opening. Kit does not know abo
 
 Approved source image: **The Horde - Proposed World Layout.png**, PNG, 3,506,134 bytes. SHA-256: `c1ffd94e17fc12793519b6cd03fdbb93f41dc461c201e0bbcbb858d93fcfd95f`.
 
-The original image is retained in the owner's Library and was visually inspected for this documentation update. Repository PNGs require Git LFS. The image is **not yet committed here**: preserve the original bytes and upload through the repository's supported LFS route before adding an image link. Do not commit a dangling LFS pointer, bypass LFS or substitute a regenerated picture. This text is independently usable as the canonical topology contract.
+The original image is retained in the owner's Library. Sam supplied the local original `assets/the horde world layout map.png` and explicitly approved publication in public planning PR16. The exact supplied bytes were visually inspected and admitted at [docs/design/world/the-horde-world-layout.png](design/world/the-horde-world-layout.png) through the repository's PNG Git LFS policy. The verified file is 3,506,134 bytes with SHA-256 `c1ffd94e17fc12793519b6cd03fdbb93f41dc461c201e0bbcbb858d93fcfd95f` (also its LFS object ID). No image edits or regeneration were performed. This remains a documentation reference, separate from runtime assets; the topology above is the canonical contract.
 
 Before later implementation acceptance, verify:
 - Tomb and active churchyard remain separate; northwest arrival and fixed village position read clearly from the lookout

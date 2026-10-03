@@ -1,5 +1,13 @@
 # Asset Licenses
 
+## Approved world-layout planning reference
+
+- File: `docs/design/world/the-horde-world-layout.png` (PNG, 3,506,134 bytes; Git LFS).
+- Source: Sam supplied the unchanged local original `assets/the horde world layout map.png`; the original is retained in the owner's Library.
+- Publication permission: Sam explicitly approved adding this exact map to the public planning PR16. This records the owner's permission for that publication; no third-party licence is asserted.
+- SHA-256: `c1ffd94e17fc12793519b6cd03fdbb93f41dc461c201e0bbcbb858d93fcfd95f`.
+- Sam approved the geometry on 4 October 2026. The image's original "Proposed" caption is retained; it is not to scale. This is a documentation reference, not a packaged runtime asset. See [WORLD_LAYOUT.md](docs/WORLD_LAYOUT.md).
+
 ## Generic closed dielectric fixture
 
 - `assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb`
