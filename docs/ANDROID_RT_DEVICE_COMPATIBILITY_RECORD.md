@@ -2,7 +2,41 @@
 
 Last updated: 2026-10-03
 
-## Current restored eba2: exact admission and bounded feature Replay
+## Current df0c7335: Java-only preview alias fix and installed identity
+
+Evidence class: **exact isolated development-APK identity and bounded native
+UI attempt**, not new Replay, physical Keep success or owner acceptance.
+Source `df0c7335c17dd9b471fe05e9759264f381c3feb0` has all six jobs completed
+successfully in [CI37145068293](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37145068293).
+The peer-reviewed Java fix stops repeated enabled-state changes on the aliased
+preview Keep button; native rendering is unchanged.
+
+New Debug APK SHA256
+`1f95f44f5f2fd37642c11b96bcb2b00c11e1ed79aa4faf015997c13a7df780f8`
+and isolated ShippingMobile benchmark
+`e339da5869690227158aaa2cc4cd66a8f0a7bf34b8fb0b08eb78fe967d5260a0`
+both match actual update-only installed pullbacks on the allocated SM-S948B.
+Production and data remain preserved. Fresh admission directly proves all eight
+native ELFs and81 assets/notices identical to the prior47430943/8a1f77d6 APKs,
+original c299 and current stripped/closed-roster bytes. Only DEX content entries
+change; whole APK signatures/container identities differ. Architecture/load/
+ZIP16KiB and full cgltf checks pass. Matching original ARM64 selected-shader
+proof is copied forward after direct binary/receipt validation; no fresh SDK
+retest or other-ABI instruction proof is claimed. Actual139 tests/23classes,
+including five compact-preview tests with a production-button transition
+regression, pass with zero failures/errors/skips; lint0errors/46warnings.
+Build28s and collected387-input/23-fixture/eight-command bank pass.
+
+The new event-based Keep attempt times out without a fresh enabled Keep event
+or Keep tap. The original confirmed tuple and pending=false remain. This is
+not a Keep acceptance pass; the initially observed popup-idle cause remains
+unproven. Host tests establish the bounded alias enabled-state correction only.
+Final popup/confirmation/statistics/lifecycle and owner UI/audio/quality gates
+remain open; remote Send remains blocked. Windows820/e639/ZIP1ea artifacts are
+unchanged. The earlier completed Replay below belongs to Debug47430943, not
+this new Java APK; native byte identity does not certify new UI/lifecycle.
+
+## Prior restored eba2: exact admission and bounded feature Replay
 
 Evidence class: **exact isolated development APK, completed hardware-RT route
 and checkpoint presentation, bounded surface-lifecycle observation**. Actual
