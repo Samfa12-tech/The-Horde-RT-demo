@@ -6,6 +6,7 @@
 
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/simulation/InputMailbox.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 
@@ -829,6 +830,103 @@ int main()
           CountEvents(damageEvents.Events(), GameplayEventType::PlayerKilled) == 1u &&
           playerDamageEventsIdentifyTheirAttacker,
           "two entity-aware nonfatal hits must emit PlayerDamaged while the lethal hit emits only PlayerKilled");
+
+    // Reproduce Restart Route's actual ordering: the UI publishes reset and
+    // immediately resumes before the owner gets to consume the mailbox.
+    GameSimulation deadBeforeMenu = damageEvents;
+    for (int frame = 0; frame < 60; ++frame)
+        deadBeforeMenu.StepFixed(damageInput);
+    check(deadBeforeMenu.Snapshot().playerVitals.phase == PlayerLifePhase::Dead &&
+          deadBeforeMenu.Snapshot().playerVitals.vitality == 0,
+          "menu reset regression begins with a genuinely combat-killed player");
+    InputSnapshot menuWorldInput;
+    menuWorldInput.paused = true;
+    menuWorldInput.commands.attack = 4u;
+    menuWorldInput.commands.parry = 2u;
+    menuWorldInput.commands.dodge = 3u;
+    menuWorldInput.commands.interact = 5u;
+    menuWorldInput.commands.toggleHeldLightPose = 6u;
+    menuWorldInput.commands.routeReset = 1u;
+    InputMailbox menuMailbox;
+    menuMailbox.Publish(menuWorldInput);
+    InputSnapshot menuResume = menuWorldInput;
+    menuResume.paused = false;
+    menuMailbox.Publish(menuResume);
+    const auto coalescedMenu = menuMailbox.ConsumeLatest();
+    GameSimulation menuRestart = deadBeforeMenu;
+    menuRestart.SynchronizePausedInput(coalescedMenu.snapshot, coalescedMenu.publicationSequence,
+        PausedInputPolicy::PreserveWorldCommands);
+    menuRestart.SynchronizePausedInput(coalescedMenu.snapshot, coalescedMenu.publicationSequence,
+        PausedInputPolicy::PreserveWorldCommands);
+    check(menuRestart.Snapshot().playerVitals.phase == PlayerLifePhase::Dead &&
+          menuRestart.Snapshot().lastConsumedRouteResetSequence == 0u,
+          "menu synchronization neither executes nor acknowledges the retained reset prematurely");
+    menuRestart.StepFixed(coalescedMenu.snapshot, 0.0f, coalescedMenu.publicationSequence);
+    const auto restarted = menuRestart.Snapshot();
+    check(restarted.playerVitals.phase == PlayerLifePhase::Alive && restarted.playerVitals.vitality == 3 &&
+          restarted.lastConsumedRouteResetSequence == 1u && restarted.retryGeneration == 0u &&
+          NearlyEqual(restarted.playerX, kPlayerSpawn.x) && NearlyEqual(restarted.playerZ, kPlayerSpawn.z) &&
+          restarted.lastConsumedAttackSequence == 4u && restarted.lastConsumedParrySequence == 2u &&
+          restarted.lastConsumedDodgeSequence == 3u && restarted.lastConsumedInteractSequence == 5u &&
+          restarted.lastConsumedToggleHeldLightPoseSequence == 6u && menuRestart.Events().Empty(),
+          "reset then resume before owner consumption restores vitality once and discards all competing actions");
+    menuRestart.AdvanceFrame(coalescedMenu.snapshot, 0.0, coalescedMenu.publicationSequence);
+    check(menuRestart.Snapshot().lastConsumedRouteResetSequence == 1u &&
+          menuRestart.Snapshot().tickIndex == restarted.tickIndex && menuRestart.Events().Empty(),
+          "the same resumed publication cannot apply a reset twice or advance paused gameplay time");
+
+    GameSimulation menuRetry = deadBeforeMenu;
+    InputSnapshot retryMenu = menuWorldInput;
+    retryMenu.commands.routeReset = 0u;
+    retryMenu.commands.retry = 1u;
+    menuRetry.SynchronizePausedInput(retryMenu, 301u, PausedInputPolicy::PreserveWorldCommands);
+    menuRetry.AdvanceFrame(retryMenu, 0.0, 301u);
+    check(menuRetry.Snapshot().playerVitals.phase == PlayerLifePhase::Alive &&
+          menuRetry.Snapshot().playerVitals.vitality == 3 &&
+          menuRetry.Snapshot().lastConsumedRetrySequence == 1u &&
+          menuRetry.Snapshot().retryGeneration == 1u && menuRetry.Events().Empty(),
+          "paused death-menu retry remains responsive without a gameplay tick or competing actions");
+    menuRetry.SynchronizePausedInput(retryMenu, 301u, PausedInputPolicy::PreserveWorldCommands);
+    menuRetry.AdvanceFrame(retryMenu, 1.0, 301u);
+    check(menuRetry.Snapshot().retryGeneration == 1u && menuRetry.Snapshot().simulationTicksThisFrame == 0u &&
+          menuRetry.Snapshot().playerVitals.vitality == 3 && menuRetry.Events().Empty(),
+          "repeated menu synchronization never duplicates retry or enables paused damage");
+
+    GameSimulation stopOverridesMenu = deadBeforeMenu;
+    stopOverridesMenu.SynchronizePausedInput(menuWorldInput, 401u, PausedInputPolicy::PreserveWorldCommands);
+    stopOverridesMenu.SynchronizePausedInput(menuWorldInput, 402u); // New actual stop: default discards all.
+    stopOverridesMenu.AdvanceFrame(menuResume, 0.0, 403u);
+    check(stopOverridesMenu.Snapshot().playerVitals.phase == PlayerLifePhase::Dead &&
+          stopOverridesMenu.Snapshot().lastConsumedRouteResetSequence == 1u &&
+          stopOverridesMenu.Snapshot().retryGeneration == 0u && stopOverridesMenu.Events().Empty(),
+          "a newer genuine lifecycle stop discards an earlier menu reset without reviving the player");
+
+    GameSimulation menuAfterStop = deadBeforeMenu;
+    menuAfterStop.SynchronizePausedInput(menuWorldInput, 501u); // Retained lifecycle discard floor.
+    InputSnapshot newerMenuReset = menuWorldInput;
+    newerMenuReset.commands.routeReset = 2u;
+    menuAfterStop.SynchronizePausedInput(newerMenuReset, 502u, PausedInputPolicy::PreserveWorldCommands);
+    menuAfterStop.AdvanceFrame(newerMenuReset, 0.0, 502u);
+    check(menuAfterStop.Snapshot().playerVitals.phase == PlayerLifePhase::Alive &&
+          menuAfterStop.Snapshot().playerVitals.vitality == 3 &&
+          menuAfterStop.Snapshot().lastConsumedRouteResetSequence == 2u && menuAfterStop.Events().Empty(),
+          "a deliberate newer menu reset survives after older stopped edges were discarded");
+
+    GameSimulation menuTwoWorldCommands = deadBeforeMenu;
+    InputSnapshot bothWorld = menuWorldInput;
+    bothWorld.commands.retry = 1u;
+    menuTwoWorldCommands.SynchronizePausedInput(bothWorld, 601u, PausedInputPolicy::PreserveWorldCommands);
+    menuTwoWorldCommands.AdvanceFrame(bothWorld, 0.0, 601u);
+    check(menuTwoWorldCommands.Snapshot().lastConsumedRouteResetSequence == 1u &&
+          menuTwoWorldCommands.Snapshot().lastConsumedRetrySequence == 0u,
+          "preserved coalesced reset retains established priority over retry");
+    menuTwoWorldCommands.SynchronizePausedInput(bothWorld, 602u, PausedInputPolicy::PreserveWorldCommands);
+    menuTwoWorldCommands.AdvanceFrame(bothWorld, 0.0, 602u);
+    menuTwoWorldCommands.AdvanceFrame(bothWorld, 0.0, 602u);
+    check(menuTwoWorldCommands.Snapshot().lastConsumedRouteResetSequence == 1u &&
+          menuTwoWorldCommands.Snapshot().lastConsumedRetrySequence == 1u &&
+          menuTwoWorldCommands.Snapshot().retryGeneration == 1u && menuTwoWorldCommands.Events().Empty(),
+          "another menu barrier preserves already-ingested retry until it is applied exactly once");
 
     GameSimulation skeletonFeedback;
     InputSnapshot skeletonFeedbackInput;

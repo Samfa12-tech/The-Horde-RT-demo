@@ -236,7 +236,8 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
 }
 
 void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
-                                            const std::uint64_t inputPublicationSequence)
+                                            const std::uint64_t inputPublicationSequence,
+                                            const PausedInputPolicy policy)
 {
     lastInput_ = input;
     lastInput_.paused = true;
@@ -255,10 +256,22 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
                 lastConsumedParrySequence_);
     synchronize(input.commands.dodge, latestDodgeSequence_,
                 lastConsumedDodgeSequence_);
-    synchronize(input.commands.routeReset, latestRouteResetSequence_,
-                lastConsumedRouteResetSequence_);
-    synchronize(input.commands.retry, latestRetrySequence_,
-                lastConsumedRetrySequence_);
+    if (policy == PausedInputPolicy::PreserveWorldCommands)
+    {
+        pendingRouteResetCommands_ += SequenceDelta(input.commands.routeReset, latestRouteResetSequence_);
+        pendingRetryCommands_ += SequenceDelta(input.commands.retry, latestRetrySequence_);
+        latestRouteResetSequence_ = std::max(latestRouteResetSequence_, input.commands.routeReset);
+        latestRetrySequence_ = std::max(latestRetrySequence_, input.commands.retry);
+    }
+    else
+    {
+        synchronize(input.commands.routeReset, latestRouteResetSequence_,
+                    lastConsumedRouteResetSequence_);
+        synchronize(input.commands.retry, latestRetrySequence_,
+                    lastConsumedRetrySequence_);
+        pendingRouteResetCommands_ = 0u;
+        pendingRetryCommands_ = 0u;
+    }
     synchronize(input.commands.interact, latestInteractSequence_,
                 lastConsumedInteractSequence_);
     synchronize(input.commands.toggleHeldLightPose,
@@ -268,8 +281,6 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     pendingAttackCommands_ = 0u;
     pendingParryCommands_ = 0u;
     pendingDodgeCommands_ = 0u;
-    pendingRouteResetCommands_ = 0u;
-    pendingRetryCommands_ = 0u;
     pendingInteractCommands_ = 0u;
     pendingToggleHeldLightPoseCommands_ = 0u;
     pendingDodgeForward_ = 0.0f;

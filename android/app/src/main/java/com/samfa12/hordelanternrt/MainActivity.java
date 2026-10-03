@@ -3365,13 +3365,13 @@ public class MainActivity extends Activity {
     }
 
     private void restartAfterDeath() {
-        retryPending = false;
+        if (retryPending) return;
+        // Keep the death menu paused until the simulation owner acknowledges
+        // Alive, just as Retry Encounter does. An old Dead publication must
+        // not reopen the menu between the reset request and its application.
+        retryPending = true;
         resetRoute();
-        deathOverlayVisible = false;
-        lastPlayerLifePhase = PLAYER_ALIVE;
-        updateVitalityHud(3);
         firstMenu = false;
-        hideMenu();
     }
 
     private final Runnable runtimePoll = new Runnable() {

@@ -1299,7 +1299,7 @@ int main()
                           std::string::npos,
                       "Windows measurement pause must follow consolidated UI overlays, not authored capture freeze");
         const std::size_t androidPauseSyncBegin =
-            androidBridgeSource.find("bool SynchronizeLifecyclePauseOnOwnerThread(");
+            androidBridgeSource.find("bool SynchronizeLifecyclePauseOnOwnerThreadLocked(");
         const std::size_t androidPauseSyncEnd =
             androidBridgeSource.find("void ClearPlatformGameplayEvents(", androidPauseSyncBegin);
         const std::string androidPauseSync =
@@ -1320,6 +1320,10 @@ int main()
                 : std::string{};
         ok &= Require(!androidPauseSync.empty() &&
                       androidPauseSync.find("gLifecycleMeasurementPaused") != std::string::npos &&
+                      androidPauseSync.find("gLifecyclePauseAcknowledgedGeneration = generation;") != std::string::npos &&
+                      androidPauseSync.find("gGameSimulation.SynchronizePausedInput") != std::string::npos &&
+                      androidPauseSync.find("std::lock_guard<std::mutex> lock(gInputPublisherMutex);") != std::string::npos &&
+                      androidPauseSync.find("return SynchronizeLifecyclePauseOnOwnerThreadLocked();") != std::string::npos &&
                       androidBridgeSource.find(
                           "rtFrameEvidence.SetPaused(measurementPaused)") !=
                           std::string::npos &&
@@ -1407,7 +1411,9 @@ int main()
                       windowsResizeBody.find("context.graphicsBeforeApply.waterQuality") != std::string::npos &&
                       windowsResizeBody.find("context.fireDetail = context.graphicsBeforeApply.fireDetail;") != std::string::npos &&
                       windowsResizeBody.find("context.graphicsPreviewFrameCap = context.graphicsBeforeApply.previewFrameCap;") != std::string::npos &&
-                      windowsResizeBody.find("Acknowledge(GraphicsSnapshot(context, *context.graphicsCommand), false)") != std::string::npos &&
+                      windowsResizeBody.find("auto failure = GraphicsSnapshot(context, *context.graphicsCommand);") != std::string::npos &&
+                      windowsResizeBody.find("failure.reasons = horde::graphics::GraphicsReason::ResourceFailure;") != std::string::npos &&
+                      windowsResizeBody.find("Acknowledge(failure, false)") != std::string::npos &&
                       windowsResizeBody.find("context.graphicsCommand.reset();") != std::string::npos &&
                       windowsResizeBody.find("rtScene.Destroy") == std::string::npos &&
                       windowsResizeBody.find("InitialiseRtSceneForSwapchain") == std::string::npos &&
@@ -1508,7 +1514,7 @@ int main()
                       androidGraphicsPreferencesSource.find("integer(prefs, \"water_quality\", 1)") != std::string::npos &&
                       androidGraphicsPreferencesSource.find("baseline() { return new Values(75, 1, 0, 30); }") != std::string::npos,
                       "platform water-quality defaults changed (Windows/capture High, Android Mobile)");
-        ok &= Require(androidBridgeSource.find("else if (context.routeReplayActive)") !=
+        ok &= Require(androidBridgeSource.find("else if (!worldCommandsDeferred && context.routeReplayActive)") !=
                           std::string::npos &&
                       androidBridgeSource.find("context.routeReplayActive && !simulationPaused") ==
                           std::string::npos,

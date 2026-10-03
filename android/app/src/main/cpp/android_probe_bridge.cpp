@@ -322,6 +322,14 @@ horde::gameplay::simulation::InputSnapshot gLifecyclePausedInput =
 std::uint64_t gLifecyclePausedPublicationSequence = 0u;
 std::uint64_t gLifecyclePauseGeneration = 0u;
 std::uint64_t gLifecyclePauseAcknowledgedGeneration = 0u;
+horde::gameplay::simulation::PausedInputPolicy gLifecyclePausedPolicy =
+    horde::gameplay::simulation::PausedInputPolicy::DiscardAllCommands;
+// Keep a real stop/start's discard floor even if a later menu request replaces
+// the latest pause publication before the render owner observes either one.
+horde::gameplay::simulation::InputSnapshot gLifecycleDiscardInput = gInputPublisherState;
+std::uint64_t gLifecycleDiscardPublicationSequence = 0u;
+std::uint64_t gLifecycleDiscardGeneration = 0u;
+std::uint64_t gLifecycleDiscardAcknowledgedGeneration = 0u;
 bool gLifecycleUnpausePending = false;
 bool gLifecycleMeasurementPaused = true;
 horde::telemetry::RtLifecycleSeeds gPreservedRtEvidenceSeeds = [] {
@@ -434,39 +442,44 @@ std::uint64_t PublishInputLocked()
     return gInputMailbox.Publish(gInputPublisherState);
 }
 
-void RequestLifecyclePauseSynchronizationLocked(const bool resumeAfterAcknowledgement)
+void RequestLifecyclePauseSynchronizationLocked(const bool resumeAfterAcknowledgement,
+    const horde::gameplay::simulation::PausedInputPolicy policy =
+        horde::gameplay::simulation::PausedInputPolicy::DiscardAllCommands)
 {
     gInputPublisherState.paused = true;
     gLifecyclePausedPublicationSequence = PublishInputLocked();
     gLifecyclePausedInput = gInputPublisherState;
     ++gLifecyclePauseGeneration;
+    gLifecyclePausedPolicy = policy;
+    if (policy == horde::gameplay::simulation::PausedInputPolicy::DiscardAllCommands)
+    {
+        gLifecycleDiscardInput = gLifecyclePausedInput;
+        gLifecycleDiscardPublicationSequence = gLifecyclePausedPublicationSequence;
+        gLifecycleDiscardGeneration = gLifecyclePauseGeneration;
+    }
     gLifecycleUnpausePending = resumeAfterAcknowledgement;
     gLifecycleMeasurementPaused = true;
 }
 
-bool SynchronizeLifecyclePauseOnOwnerThread()
+// Caller holds the publication mutex. Synchronization never advances gameplay
+// time; this lets final world-command admission linearize against accepted Stop.
+bool SynchronizeLifecyclePauseOnOwnerThreadLocked()
 {
-    horde::gameplay::simulation::InputSnapshot pausedInput;
-    std::uint64_t publicationSequence = 0u;
-    std::uint64_t generation = 0u;
-    {
-        std::lock_guard<std::mutex> lock(gInputPublisherMutex);
-        if (gLifecyclePauseAcknowledgedGeneration >= gLifecyclePauseGeneration)
-            return gLifecycleMeasurementPaused;
-        pausedInput = gLifecyclePausedInput;
-        publicationSequence = gLifecyclePausedPublicationSequence;
-        generation = gLifecyclePauseGeneration;
-    }
+    if (gLifecyclePauseAcknowledgedGeneration >= gLifecyclePauseGeneration)
+        return gLifecycleMeasurementPaused;
+    const auto generation = gLifecyclePauseGeneration;
+    const auto discardGeneration = gLifecycleDiscardGeneration;
 
     // GameSimulation is owned by this render thread. No JNI callback mutates
     // it directly, including during lifecycle teardown/recreation.
-    gGameSimulation.SynchronizePausedInput(pausedInput, publicationSequence);
+    if (gLifecycleDiscardAcknowledgedGeneration < discardGeneration && discardGeneration < generation)
+        gGameSimulation.SynchronizePausedInput(gLifecycleDiscardInput, gLifecycleDiscardPublicationSequence);
+    gGameSimulation.SynchronizePausedInput(gLifecyclePausedInput, gLifecyclePausedPublicationSequence,
+        gLifecyclePausedPolicy);
 
-    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
-    gLifecyclePauseAcknowledgedGeneration = std::max(
-        gLifecyclePauseAcknowledgedGeneration, generation);
-    if (gLifecycleUnpausePending &&
-        gLifecyclePauseAcknowledgedGeneration >= gLifecyclePauseGeneration)
+    gLifecyclePauseAcknowledgedGeneration = generation;
+    gLifecycleDiscardAcknowledgedGeneration = discardGeneration;
+    if (gLifecycleUnpausePending)
     {
         gInputPublisherState.paused = false;
         PublishInputLocked();
@@ -474,6 +487,12 @@ bool SynchronizeLifecyclePauseOnOwnerThread()
         gLifecycleMeasurementPaused = false;
     }
     return gLifecycleMeasurementPaused;
+}
+
+bool SynchronizeLifecyclePauseOnOwnerThread()
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    return SynchronizeLifecyclePauseOnOwnerThreadLocked();
 }
 
 horde::telemetry::RtLifecycleSeeds LoadPreservedRtEvidenceSeeds()
@@ -2938,6 +2957,15 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 gCaptureCheckpointRequested.store(-1, std::memory_order_release);
             }
 
+            // Accepted Stop and world commands have one publication/admission
+            // order. Do not hold this mutex through normal ticks or GPU work.
+            std::unique_lock<std::mutex> worldCommandAdmission(gInputPublisherMutex);
+            (void)SynchronizeLifecyclePauseOnOwnerThreadLocked();
+            if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration))
+            {
+                if (evidenceFrame) context.rtFrameEvidence.AbortFrame();
+                return false;
+            }
             const horde::gameplay::simulation::PublishedInput publishedInput =
                 gInputMailbox.ConsumeLatest();
             horde::gameplay::simulation::InputSnapshot simulationInput = publishedInput.snapshot;
@@ -2987,21 +3015,22 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 {
                     break;
                 }
-                if (context.inAppBenchmark.IsRunning() && retryPending)
-                {
-                    break;
-                }
                 horde::vulkan::raytracing::RtSceneStageScope simulationScope(
                     evidenceFrame ? &observation : nullptr,
                     horde::telemetry::RtStage::SimulationStep);
                 gGameSimulation.StepFixed(simulationInput, 0.0f, publishedInput.publicationSequence);
                 simulationScope.Complete(1u);
             }
+            const auto& admittedCommands = gGameSimulation.Snapshot();
+            const bool worldCommandsDeferred =
+                admittedCommands.lastConsumedRouteResetSequence < simulationInput.commands.routeReset ||
+                admittedCommands.lastConsumedRetrySequence < simulationInput.commands.retry;
+            worldCommandAdmission.unlock();
 
             const bool simulationPaused = context.captureActive || simulationInput.paused;
             simulationInput.damageEnabled = !simulationPaused && !context.inAppBenchmark.IsRunning() &&
                 !context.routeReplayActive && !context.benchmarkSampling && !context.captureActive;
-            inAppBenchmarkFrame = context.inAppBenchmark.IsRunning();
+            inAppBenchmarkFrame = context.inAppBenchmark.IsRunning() && !worldCommandsDeferred;
             if (inAppBenchmarkFrame)
             {
                 context.frameDeltaSeconds = 1.0f / 60.0f;
@@ -3104,7 +3133,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     PublishBenchmarkProgress(context);
                 }
             }
-            else if (context.routeReplayActive)
+            else if (!worldCommandsDeferred && context.routeReplayActive)
             {
                 // Debug route replay owns an authoritative pose and fixed step. It
                 // must keep advancing even if a menu/death overlay published a
@@ -3151,7 +3180,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     context.routeReplayActive = false;
                 }
             }
-            else if (context.captureActive || context.benchmarkSampling)
+            else if (!worldCommandsDeferred && (context.captureActive || context.benchmarkSampling))
             {
                 // Debug checkpoint measurements and captures are frozen snapshots.
                 simulationInput.paused = true;
@@ -3166,7 +3195,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     publishedInput.publicationSequence);
                 simulationScope.Complete(1u);
             }
-            else if (!inAppBenchmarkFrame && !context.routeReplayActive)
+            else if (!worldCommandsDeferred && !inAppBenchmarkFrame && !context.routeReplayActive)
             {
                 simulationInput.hasAuthoritativePlayerPose = false;
                 horde::vulkan::raytracing::RtSceneStageScope simulationScope(
@@ -4543,7 +4572,12 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, 
     try
     {
         (void)SurfaceOwner();
-        const auto generation = gSurfaceSessions.Start({std::move(window), reportDirectory});
+        std::uint64_t generation = 0u;
+        {
+            std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+            RequestLifecyclePauseSynchronizationLocked(false);
+            generation = gSurfaceSessions.Start({std::move(window), reportDirectory});
+        }
         {
             std::lock_guard lock(gGraphicsMutex);
             gPreviewPerformance = {};
@@ -4563,9 +4597,13 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, 
 extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_stopDiagnosticSurface(JNIEnv*, jclass, jlong generation)
 {
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
     if (generation > 0 && gSurfaceSessions.Stop(static_cast<std::uint64_t>(generation)))
+    {
+        RequestLifecyclePauseSynchronizationLocked(false);
         __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_SURFACE_CANCEL generation=%llu",
                             static_cast<unsigned long long>(generation));
+    }
 }
 
 extern "C" JNIEXPORT jint JNICALL
@@ -4697,7 +4735,8 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setSimulationPaused(JNIEnv*, jclass, jboolean paused)
 {
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
-    RequestLifecyclePauseSynchronizationLocked(paused != JNI_TRUE);
+    RequestLifecyclePauseSynchronizationLocked(paused != JNI_TRUE,
+        horde::gameplay::simulation::PausedInputPolicy::PreserveWorldCommands);
 }
 
 namespace
