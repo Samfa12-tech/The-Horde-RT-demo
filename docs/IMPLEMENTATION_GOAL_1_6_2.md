@@ -83,7 +83,7 @@ All three report release 1.6.1 on SM-S948B / Adreno 840, RayTracingPipeline, Mob
 |---|---|---|
 | 43425e1d-de82-40d4-bd33-daf1ebf5318c | Remove/recess the flat rear spawn-wall appearance. Compose rocks, fallen matching bricks/masonry and debris as the impassable collapse, with **stairs visibly receding into darkness behind the blockage**. Surviving architecture must communicate the entry route that failed. | Still confirms the flat-wall appearance; [sanitized intake](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/16#issuecomment-5965622959). Stairs are a visual remnant, not a new traversable route. Preserve a recessed sealed backing, spawn/held-item envelope, gallery, encounter and forward route. No world/light leaks or climbable escape. |
 | 3e461f78-f619-46de-a6ac-5fd4bc115970 | Correct held-torch clipping while walking beneath the pictured low brick opening. | [Sanitized intake](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/16#issuecomment-5965632882). The screenshot locates the reported opening; motion clipping is owner-reported, not independently reproduced. Reproduce the approach and use shared overhead-clearance/retraction/pose rules. Torch mesh, flame, emitter, hands and real RT shadow must move coherently, with no hidden torch or independent light cheat. Test look angles, movement, attacks/transitions and nearby low roofs. |
-| 3696c1a2-5fb3-4476-aaeb-456a130837d8 | The rectangular overhead opening currently exposes sky too soon for the intended underground depth. Extend the shaft/enclosure and its walls, with hanging vines/plants, so the player reads a deeper subterranean space before the visible sky. | Same sanitized intake. Still shows an overhead rectangular opening and pale vertical structures; their exact identity, coordinates and final shaft dimensions are not established. Resolve from actual scene, preserve physical occlusion and finale light progression, avoid inventing a new outside level. Use restrained admitted foliage; validate alpha/material behaviour, ray cost, silhouettes and mobile memory. |
+| 3696c1a2-5fb3-4476-aaeb-456a130837d8 | Owner clarification: intended overgrowth comes from the small grated wall access panel just right outside the opening room. Retain that panel; leave the waterfall's own hole and vines untouched, distinct from the large skylight in the same room that receives bars. | The initial intake inferred an overhead/deeper-shaft target without established coordinates. The clarification supersedes that location inference; inspect the authorised screenshot and actual scene for the exact wall-panel anchor and remaining depth/enclosure detail. Do not remove/deepen every opening or change finale progression by inference. Use restrained admitted foliage; validate material/alpha behaviour, ray cost, silhouettes and mobile memory. |
 
 Other required polish:
 - Improve shared fire animation/shape, especially the lantern's static-spindle reading; inspect real motion, preserve flame/emission/direct-light/glass/reflection coherence.
@@ -96,13 +96,31 @@ Other required polish:
 
 Use existing/reused/free verified assets and Blender cleanup through the established pipeline. Record source/runtime hashes, licences, scale, topology/material/memory budgets and native RT validation. Paid generation requires separate approval. Honour mandatory layout/visual approval gates; continue independent engineering while awaiting them.
 
+### Final visual slice — after the current run, before 1.6.2 release
+
+**Owner addition and clarification, 3 October 2026:** Finish the current implementation run first. Then apply this narrow queued exception to the scope freeze, before the release decision. Do not interrupt/restart the active run or add other features. Record the slice separately in the handoff and revalidate the resulting candidate.
+
+Keep these four features distinct (owner confirmed, 3 October 2026):
+- **Small grated wall access panel just to the right outside the opening room:** retain this panel. This is the owner's intended location for the report's overgrowth and for Kit's later 1.7 voice contact. Place the requested growth here without sealing the readable panel; confirm its actual scene anchor from the authorised screenshot/scene.
+- **Entry-room skylight:** remove the authored skylight and close its opening with coherent ceiling geometry. This does not remove the nearby wall access panel.
+- **Waterfall's own hole:** retain its existing vines untouched; this is not the grid target.
+- **Separate large skylight in the waterfall room:** add a supported grid of iron bars over this opening. The grid should cast strong, readable real RT bar shadows and physically prevent player passage/rope escape through this otherwise obvious route.
+
+**Report reconciliation:** The owner clarified that the intended overgrowth in report **3696c1a2-5fb3-4476-aaeb-456a130837d8** belongs to the small grated wall panel, not the waterfall's own hole or the separate large skylight. This supersedes the earlier unverified location inference. Preserve the vines at the waterfall's own hole; do not treat the clarification as an instruction to strip them or to deepen/remove every opening. Confirm exact geometry and any still-unresolved depth/enclosure detail from the scene before a dependent edit.
+
+The distinct reward/finale ruin/roof opening and its accepted timing/light progression remain intact. In 1.7 that later-created opening enables Kit's rope rescue. Kit does not know about the lich: do not explain the delay as Kit deliberately waiting for the lich fight or knowing its outcome.
+
+Use real iron-grid geometry through the shared native RT/material path, with coherent visibility, shadows and reflected/transmitted views. Give it a physically impassable barrier consistent with the visible bars, without blocking the normal waterfall-room route. Preserve spawn/torch clearance and current combat/reward flow. Check the closed entry ceiling for gaps/light leaks and both retained grates for believable support/scale; measure affected RT cost. Capture all four features and regression-check the still-functioning finale on the exact candidate, including supported phone/Windows presentation and required owner visual review.
+
+**Milestone boundary:** Keep both skeletons in their current locations for 1.6.2. Moving those same two guards into the waterfall room is **1.7 only**. Kit's early small-wall-panel call is independent of that later encounter; no enemy relocation, Kit voice production or dialogue triggers belong in this final visual slice.
+
 ### Phase 5 — integrated candidate and handoff
 
 Run affected tests per AGENT_VALIDATION, then current aggregate CI against the final branch. Include shader compilation/staleness and extracted Shipping checks where changed; Windows Debug/Release and relevant CTests; Android ABI/build/lint/contracts; packaging/licence checks; focused sanitizers as applicable.
 
 Physical validation when allocated:
 - RTX target and exact S26, both supported RT backends where admitted; S24/S25 separately evidenced or explicitly unverified.
-- Continuous route, combat, torch clearance/bob, collapsed entry, deeper shaft, reveal/reward and waterfall/audio loops; still images alone do not validate these.
+- Continuous route, combat, torch clearance/bob, collapsed entry, retained small wall panel/overgrowth, reveal/reward and waterfall/audio loops; after the queued final visual slice, include the impassable iron-grid skylight in the waterfall room, the distinct waterfall hole with untouched vines, closed entry skylight and preserved finale opening. Still images alone do not validate these.
 - Multi-touch/menu/lifecycle/settings/preview transitions and safe recovery.
 - Matched baseline/candidate ordinary and lantern-heavy workloads, same resolution/settings/backend, repeated warm runs with thermals, CPU/GPU timing, pacing, allocations and available memory-pressure evidence. Do not infer bandwidth bottlenecks without counters. Retain negative results.
 - Owner visual review of the three requested scenes, UI, fire and lich reveal; manual listening/haptic checks for changed sound/event behaviour. Missing approval is an explicit gate, not a pass.
