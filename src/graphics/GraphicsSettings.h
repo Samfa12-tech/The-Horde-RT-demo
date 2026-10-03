@@ -10,8 +10,29 @@
 
 namespace horde::graphics
 {
-inline constexpr std::uint32_t kGraphicsSettingsSchema = 1u;
+inline constexpr std::uint32_t kGraphicsSettingsSchema = 2u;
 inline constexpr double kGraphicsConfirmationSeconds = 15.0;
+
+#ifndef HORDE_RT_MIN_RENDER_SCALE_PERCENT
+#define HORDE_RT_MIN_RENDER_SCALE_PERCENT 50
+#endif
+#if HORDE_RT_MIN_RENDER_SCALE_PERCENT != 50 && HORDE_RT_MIN_RENDER_SCALE_PERCENT != 33
+#error "Render scale admission must be ordinary 50 or explicit benchmark 33."
+#endif
+#if HORDE_RT_MIN_RENDER_SCALE_PERCENT == 33 && (!defined(HORDE_RT_BENCHMARK_SCALE_VALIDATION) || HORDE_RT_BENCHMARK_SCALE_VALIDATION != 1)
+#error "Sub-50 render scales require isolated benchmark admission."
+#endif
+inline constexpr int kMinimumGraphicsRenderScalePercent = HORDE_RT_MIN_RENDER_SCALE_PERCENT;
+inline constexpr bool ValidGraphicsRenderScalePercent(const int percent) noexcept
+{
+    return (percent >= 50 && percent <= 100) ||
+        (kMinimumGraphicsRenderScalePercent == 33 && (percent == 33 || percent == 40));
+}
+inline constexpr int ClampGraphicsRenderScalePercent(const int percent) noexcept
+{
+    const int bounded = std::clamp(percent, kMinimumGraphicsRenderScalePercent, 100);
+    return ValidGraphicsRenderScalePercent(bounded) ? bounded : 50;
+}
 
 enum class GraphicsPlatform : std::uint8_t { Android, Windows };
 // Values deliberately match the legacy persisted water setting.
@@ -28,12 +49,15 @@ struct GraphicsSettings
     WaterQuality waterQuality = WaterQuality::Mobile;
     FireDetail fireDetail = FireDetail::Mobile;
     int previewFrameCap = 30;
+    // Enables the physical glass supported by the immutable compiled profile.
+    // It cannot add High lantern panes to a Mobile build.
+    bool glassEnabled = true;
     bool operator==(const GraphicsSettings&) const = default;
 };
 
 inline bool ValidGraphicsSettings(const GraphicsSettings& settings) noexcept
 {
-    return settings.renderScalePercent >= 50 && settings.renderScalePercent <= 100 &&
+    return ValidGraphicsRenderScalePercent(settings.renderScalePercent) &&
         static_cast<unsigned>(settings.waterQuality) <= 2u &&
         static_cast<unsigned>(settings.fireDetail) <= 1u &&
         settings.previewFrameCap >= 15 && settings.previewFrameCap <= 60;
@@ -109,7 +133,7 @@ struct GraphicsExtent
 
 inline GraphicsExtent ScaledGraphicsExtent(const GraphicsExtent output, const int percent) noexcept
 {
-    if (output.width == 0u || output.height == 0u || percent < 50 || percent > 100) return {};
+    if (output.width == 0u || output.height == 0u || !ValidGraphicsRenderScalePercent(percent)) return {};
     // Positive round-to-nearest matches the production fixed-scale sizing,
     // with integer arithmetic avoiding float/32-bit multiplication overflow.
     const auto dimension = [percent](const std::uint32_t value) {
@@ -155,13 +179,13 @@ inline GraphicsResolution ResolveGraphicsSettings(const GraphicsSettings& reques
     return result;
 }
 
-// Physical panes follow the exact compiled shader/geometry profile; there is
-// intentionally no requested panes/optics toggle in GraphicsSettings.
+// Enabling glass preserves the exact compiled optical/geometry profile.
+// Disabling it removes physical glass from every ray path, independently of quality.
 inline std::string_view OpticalProfileHelp(const OpticalProfile profile) noexcept
 {
     return profile == OpticalProfile::Mobile ?
-        "Mobile optical build: lantern panes are absent from geometry. Full physical panes require a High build." :
-        "High optical build: physical lantern panes are retained. Optical profile is fixed by this build.";
+        "Mobile optical build: lantern panes are absent from geometry. Glass On enables other supported glass; full lantern panes require a High build." :
+        "High optical build: Glass On retains physical lantern panes. Optical profile is fixed by this build.";
 }
 inline constexpr std::string_view kGraphicsCostHelp = "Cost: not yet measured for this candidate.";
 
@@ -174,7 +198,7 @@ inline GraphicsSettings MigrateLegacyGraphicsSettings(const LegacyGraphicsSettin
                                                       const GraphicsPlatform platform) noexcept
 {
     auto result = BaselineGraphicsSettings(platform);
-    if (legacy.renderScalePercent) result.renderScalePercent = std::clamp(*legacy.renderScalePercent, 50, 100);
+    if (legacy.renderScalePercent) result.renderScalePercent = ClampGraphicsRenderScalePercent(*legacy.renderScalePercent);
     if (legacy.waterQuality) result.waterQuality = static_cast<WaterQuality>(std::clamp(*legacy.waterQuality, 0, 2));
     result.fireDetail = result.waterQuality == WaterQuality::High ? FireDetail::High : FireDetail::Mobile;
     return result;
@@ -199,15 +223,21 @@ inline GraphicsRecovery RecoverGraphicsSettings(const GraphicsPersistenceRecord&
                                                 const GraphicsPlatform platform) noexcept
 {
     GraphicsRecovery result;
-    if (record.schema != kGraphicsSettingsSchema || !ValidGraphicsSettings(record.confirmed))
+    const bool legacySchema = record.schema == 1u;
+    if ((!legacySchema && record.schema != kGraphicsSettingsSchema) || !ValidGraphicsSettings(record.confirmed))
     {
         result.startup = BaselineGraphicsSettings(platform);
         result.reasons = GraphicsReason::InvalidStoredSettings;
     }
-    else result.startup = record.confirmed;
+    else
+    {
+        result.startup = record.confirmed;
+        if (legacySchema) result.startup.glassEnabled = true;
+    }
     if (record.pending)
     {
         result.retainedRequested = record.pending;
+        if (legacySchema) result.retainedRequested->glassEnabled = true;
         result.reasons = result.reasons | GraphicsReason::InterruptedApply;
     }
     return result;
@@ -295,6 +325,7 @@ public:
             snapshot.effective.renderScalePercent != snapshot.requested.renderScalePercent ||
             snapshot.effective.waterQuality != snapshot.requested.waterQuality ||
             snapshot.effective.previewFrameCap != snapshot.requested.previewFrameCap ||
+            snapshot.effective.glassEnabled != snapshot.requested.glassEnabled ||
             (snapshot.effective.fireDetail != snapshot.requested.fireDetail && !explainedFire) ||
             (HasGraphicsReason(snapshot.reasons, GraphicsReason::FireFollowsWater) && !explainedFire) ||
             HasGraphicsReason(snapshot.reasons, GraphicsReason::InvalidSettings) ||

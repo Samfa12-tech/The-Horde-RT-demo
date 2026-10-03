@@ -629,6 +629,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     pipelineBundle_.RebindDestroyContext(this, &gpuResources_);
     scratchAddressAlignment_ = std::exchange(other.scratchAddressAlignment_, 0u);
     sceneProfile_ = std::exchange(other.sceneProfile_, RtSceneProfile::Showcase);
+    glassEnabled_ = std::exchange(other.glassEnabled_, true);
     sceneMaterials_ = std::move(other.sceneMaterials_);
     worldMaterialBase_ = std::exchange(other.worldMaterialBase_, 0u);
     tlasInstanceCount_ = std::exchange(other.tlasInstanceCount_, kTlasInstanceCount);
@@ -655,7 +656,8 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         const std::string& developmentStaticAssetDirectory,
                                         const std::string& productionAssetRoot,
                                         RtExecutionBackend executionBackend,
-                                        RtSceneProfile sceneProfile)
+                                        RtSceneProfile sceneProfile,
+                                        bool glassEnabled)
 {
     InitialiseOrchestrationApi api{};
     api.user = &executionBackend;
@@ -678,7 +680,7 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         instance, physicalDevice, device, queue, commandPool, dispatchExtent,
         presentationFormat, skeletonAssetPath, lichAssetPath,
         materialAssetDirectory, lichTextureDirectory, diagnostic,
-        developmentStaticAssetDirectory, productionAssetRoot, api, sceneProfile);
+        developmentStaticAssetDirectory, productionAssetRoot, api, sceneProfile, glassEnabled);
 }
 
 bool PresentableTinyRtScene::InitialiseWithOrchestration(
@@ -697,10 +699,12 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
     const std::string& developmentStaticAssetDirectory,
     const std::string& productionAssetRoot,
     const InitialiseOrchestrationApi& api,
-    const RtSceneProfile sceneProfile)
+    const RtSceneProfile sceneProfile,
+    const bool glassEnabled)
 {
     Destroy();
     sceneProfile_ = sceneProfile;
+    glassEnabled_ = glassEnabled;
     instance_ = instance;
     physicalDevice_ = physicalDevice;
     device_ = device;
@@ -879,6 +883,7 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
 
 void PresentableTinyRtScene::Destroy()
 {
+    glassEnabled_ = true;
     tlasBuiltInstances_ = {};
     tlasInstanceDefinitionsValid_ = false;
     tlasPendingInstances_ = {};
@@ -2171,7 +2176,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     // The selected immutable quality bundle owns the geometry profile too.
     // Mobile panes are absent from the BLAS, not hidden/skipped in a shader.
     if (!SelectLanternGeometryForQuality(
-            rewardLanternBodyAsset_, pipelineBundle_.Request().quality, diagnostic))
+            rewardLanternBodyAsset_, pipelineBundle_.Request().quality, diagnostic, glassEnabled_))
         return false;
     staticTextureDirectory_ = (root / "textures/props/runtime").string();
     const auto viewmodelDirectory = root / "models/player/viewmodel/runtime";
@@ -2269,7 +2274,7 @@ bool PresentableTinyRtScene::LoadPreviewStaticAssets(const std::string& producti
         !load("models/props/runtime/dielectric-fixture", "closed-glass-lod0.runtime.glb", productionDielectricFixtureAsset_) ||
         !load("models/props/runtime/reward-lantern-ring", "reward-lantern-ring-lod0.runtime.glb", rewardLanternRingAsset_) ||
         !load("models/props/runtime/reward-lantern-body", "reward-lantern-body-lod0.runtime.glb", rewardLanternBodyAsset_) ||
-        !SelectLanternGeometryForQuality(rewardLanternBodyAsset_, pipelineBundle_.Request().quality, diagnostic))
+        !SelectLanternGeometryForQuality(rewardLanternBodyAsset_, pipelineBundle_.Request().quality, diagnostic, glassEnabled_))
         return false;
     viewmodelAvailable_ = false;
     playerBodyRemainderAvailable_ = false;
@@ -2739,6 +2744,7 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
     instances[4] = instance(8u, rewardLanternBodyBlas_.address, previewTransforms_[2]);
     instances[5] = instance(9u, dielectricFixtureBlas_.address, previewTransforms_[3]);
     instances[6] = instance(19u, waterfallBlas_.address, previewTransforms_[4]);
+    ApplyGlassFixtureVisibility(std::span(instances).first(tlasInstanceCount_));
     if (!upload(instances.data(), tlasInstanceCount_ * sizeof(instances[0]),
                 VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
                 true, "preview TLAS instances", instanceBuffer_, true)) return false;
@@ -2959,7 +2965,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // One bounded thin clear pane closes the irregular roof breach. Primary
     // rays route through the glass material while visibility rays treat it as
     // non-occluding, preserving the physically open moon direction.
-    addWorldQuad({{-0.55f, 1.33f, -3.45f}}, {{-0.72f, 1.33f, -5.20f}}, {{0.62f, 1.33f, -5.05f}}, {{0.32f, 1.33f, -3.55f}}, SurfaceClearGlass, SurfaceDown);
+    if (glassEnabled_)
+        addWorldQuad({{-0.55f, 1.33f, -3.45f}}, {{-0.72f, 1.33f, -5.20f}}, {{0.62f, 1.33f, -5.05f}}, {{0.32f, 1.33f, -3.55f}}, SurfaceClearGlass, SurfaceDown);
     for (std::uint32_t i = 0u; i < 8u; ++i)
     {
         const float x = -1.05f + static_cast<float>(i % 4u) * 0.7f + (i >= 4u ? 0.18f : 0.0f);
@@ -4461,6 +4468,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[kCollapseInstanceIndex].instanceCustomIndex = kCollapseInstanceIndex;
     instances[kCollapseInstanceIndex].mask = 0x01u;
     instances[kCollapseInstanceIndex].accelerationStructureReference = collapseBlas_.address;
+    ApplyGlassFixtureVisibility(instances);
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
         return false;
@@ -5128,6 +5136,19 @@ bool PresentableTinyRtScene::CreateBundleStrategySbt(
     return true;
 }
 
+void PresentableTinyRtScene::ApplyGlassFixtureVisibility(
+    std::span<VkAccelerationStructureInstanceKHR> instances) const
+{
+    if (glassEnabled_ || dielectricFixtureBlas_.address == 0u) return;
+    // Keep the fixed instance/BLAS owner, but remove it from every ray mask.
+    // Reference identity avoids masking procedural arm custom-index9, which
+    // shares this historical index when the fixture is not being inspected.
+    for (auto& instance : instances)
+        if (instance.instanceCustomIndex == 9u &&
+            instance.accelerationStructureReference == dielectricFixtureBlas_.address)
+            instance.mask = 0u;
+}
+
 bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffer,
                                                    const RtSceneFrameInputs& frame,
                                                    std::string& diagnostic,
@@ -5152,6 +5173,7 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
     instances[6].transform.matrix[2][2] = waterScale.crossLane;
     instances[6].mask = frame.waterQuality == WaterQuality::Off ? 0u : 0x01u;
     instances[5].transform.matrix[0][0] = previewTransforms_[3][0] * tuning.glassDepthScale;
+    ApplyGlassFixtureVisibility(std::span(instances).first(tlasInstanceCount_));
     auto emitters = frame.fireEmitters;
     if (frame.fireEmitterCount != previewFireInputs_.size())
     {
@@ -5175,7 +5197,8 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
                                fireDetail, fire, diagnostic)) return false;
     const auto& lightTransform = previewFireInputs_[0].worldFromLight;
     const RtHeldLightGpu light{{lightTransform[12], lightTransform[13], lightTransform[14], frame.torchLightStrength}};
-    const auto metadata = staticMeshSlot_.InstanceMetadata();
+    auto metadata = staticMeshSlot_.InstanceMetadata();
+    if (!glassEnabled_) metadata[9u].flags = 0u;
     auto materials = sceneMaterials_;
     if (dielectricFixtureMaterialIndex_ >= materials.size())
     {
@@ -5306,7 +5329,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
 #endif
     const RtSceneTuning clampedTuning = ClampRtSceneTuning(frame.tuning);
     const bool glassFixtureVisible =
-        clampedTuning.glassFixtureVisible &&
+        glassEnabled_ && clampedTuning.glassFixtureVisible &&
         !clampedTuning.productionRewardPropsVisible;
     const bool productionInspection = clampedTuning.productionRewardPropsVisible &&
         frame.chestReward.phase ==
@@ -6147,6 +6170,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         framePipelineEvidenceValid_ = false;
         break;
     }
+    ApplyGlassFixtureVisibility(instances);
     if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
                      "held light", diagnostic, observation) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),

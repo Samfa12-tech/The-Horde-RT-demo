@@ -41,6 +41,14 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_graphics_settings_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_graphics_settings_tests COMMAND horde_rt_graphics_settings_tests)
 
+    foreach(scale_fixture IN ITEMS horde_rt_benchmark_scale_default_tests horde_rt_benchmark_scale_experimental_tests)
+        add_executable(${scale_fixture} tests/BenchmarkScaleAdmissionTests.cpp)
+        target_include_directories(${scale_fixture} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        add_test(NAME ${scale_fixture} COMMAND ${scale_fixture})
+    endforeach()
+    target_compile_definitions(horde_rt_benchmark_scale_experimental_tests PRIVATE
+        HORDE_RT_MIN_RENDER_SCALE_PERCENT=33 HORDE_RT_BENCHMARK_SCALE_VALIDATION=1)
+
     add_executable(horde_rt_graphics_preview_tests
         tests/GraphicsPreviewTests.cpp
         src/gameplay/effects/FireEmitterState.cpp
@@ -260,6 +268,20 @@ endif()
 if(BUILD_TESTING)
     find_package(Threads REQUIRED)
     target_link_libraries(horde_rt_graphics_settings_tests PRIVATE Threads::Threads)
+    target_link_libraries(horde_rt_benchmark_scale_default_tests PRIVATE Threads::Threads)
+    target_link_libraries(horde_rt_benchmark_scale_experimental_tests PRIVATE Threads::Threads)
+    add_executable(horde_rt_benchmark_summary_report_tests
+        tests/BenchmarkSummaryReportTests.cpp
+        src/telemetry/BenchmarkSummary.cpp
+        src/reporting/BenchmarkSummaryReport.cpp
+        src/reporting/PlaytestReport.cpp
+        src/gameplay/ShowcaseBenchmark.cpp
+        src/telemetry/RtBenchmarkEvidenceRun.cpp
+        src/telemetry/RtBenchmarkEvidenceReport.cpp
+        src/telemetry/RtPerformanceEvidence.cpp)
+    target_include_directories(horde_rt_benchmark_summary_report_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_benchmark_summary_report_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_benchmark_summary_report_tests COMMAND horde_rt_benchmark_summary_report_tests)
     add_executable(horde_rt_staged_primary_contract_tests tests/StagedPrimaryContractTests.cpp)
     target_include_directories(horde_rt_staged_primary_contract_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_staged_primary_contract_tests COMMAND horde_rt_staged_primary_contract_tests)
@@ -619,6 +641,13 @@ if(BUILD_TESTING)
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelinePolicyFenceTests.ps1
                 -CmakeExecutable ${CMAKE_COMMAND})
+        add_test(NAME horde_rt_benchmark_scale_policy_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/BenchmarkScalePolicyTests.ps1
+                -CmakeExecutable ${CMAKE_COMMAND})
+        add_test(NAME horde_rt_windows_glass_graphics_contract_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/WindowsGlassGraphicsContracts.ps1)
         add_test(NAME horde_rt_pipeline_policy_execution_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelinePolicyExecutionTests.ps1

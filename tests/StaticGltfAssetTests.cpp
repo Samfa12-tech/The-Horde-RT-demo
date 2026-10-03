@@ -1829,6 +1829,18 @@ void TestLanternGeometryQualityProfile()
     diagnostic.clear();
     Check(SelectLanternGeometryForQuality(mobile, DielectricQuality::Mobile, diagnostic),
           std::string("Mobile lantern profile selects successfully: ") + diagnostic);
+    StaticMeshAsset highOff = source;
+    Check(SelectLanternGeometryForQuality(highOff, DielectricQuality::High, diagnostic, false) &&
+              sameAsset(highOff, mobile),
+          "High glass Off removes only panes and preserves the exact Mobile open-aperture geometry/data");
+    StaticMeshAsset mobileOff = source;
+    Check(SelectLanternGeometryForQuality(mobileOff, DielectricQuality::Mobile, diagnostic, false) &&
+              sameAsset(mobileOff, mobile),
+          "Mobile glass Off retains the same physical open apertures without altering body or sockets");
+    const StaticMeshAsset filteredBefore = mobile;
+    Check(SelectLanternGeometryForQuality(mobile, DielectricQuality::High, diagnostic, true) &&
+              sameAsset(mobile, filteredBefore),
+          "High On no-op cannot revive panes in a previously filtered Mobile asset; rebuild reloads canonical source");
     const auto retainedSourcePrimitive = [glassIndex](const auto& primitive) {
         return primitive.materialIndex != glassIndex;
     };
@@ -1909,10 +1921,10 @@ void TestLanternGeometryQualityProfile()
           std::string("Mobile profile follows LanternGlass by name after material reordering: ") + diagnostic);
 
     const auto expectRejectedUnchanged = [&](StaticMeshAsset candidate, DielectricQuality quality,
-                                              std::string_view label) {
+                                              std::string_view label, bool glassEnabled = true) {
         const StaticMeshAsset before = candidate;
         diagnostic.clear();
-        const bool selected = SelectLanternGeometryForQuality(candidate, quality, diagnostic);
+        const bool selected = SelectLanternGeometryForQuality(candidate, quality, diagnostic, glassEnabled);
         Check(!selected && !diagnostic.empty() && sameAsset(candidate, before), label);
     };
     StaticMeshAsset missingMaterial = source;
@@ -1920,6 +1932,11 @@ void TestLanternGeometryQualityProfile()
         [](const auto& material) { return material.name == "LanternGlass"; });
     expectRejectedUnchanged(std::move(missingMaterial), DielectricQuality::Mobile,
                             "missing LanternGlass fails closed without mutation");
+    StaticMeshAsset offMissingMaterial = source;
+    std::erase_if(offMissingMaterial.materials,
+        [](const auto& material) { return material.name == "LanternGlass"; });
+    expectRejectedUnchanged(std::move(offMissingMaterial), DielectricQuality::High,
+                            "High Off rejects malformed pane identity without mutating unrelated geometry", false);
 
     StaticMeshAsset duplicateMaterial = source;
     duplicateMaterial.materials.push_back(*std::find_if(source.materials.begin(), source.materials.end(),
@@ -1959,6 +1976,8 @@ void TestLanternGeometryQualityProfile()
 
     expectRejectedUnchanged(source, static_cast<DielectricQuality>(255u),
                             "invalid quality fails closed without mutation");
+    expectRejectedUnchanged(source, static_cast<DielectricQuality>(255u),
+                            "Glass Off cannot bypass the compiled quality validity check", false);
 
     if (mobile.primitives.size() == expectedPrimitives.size() &&
         hasOnlyValidPrimitiveReferences(mobile))

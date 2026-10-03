@@ -53,7 +53,7 @@ struct DevelopmentCheckpoint
     bool stagesUnlockedChest = false;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 47u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 52u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -185,6 +185,15 @@ inline constexpr std::array<DevelopmentCheckpoint, 47u> kDevelopmentCheckpoints{
      -1.57079632679f, 0.28f,
      DevelopmentCombatPose::Rest, false, 1.0f, {{0.72f, 0.90f, 1.0f}}, 2.4f,
      true, false, DevelopmentRewardPose::HeldHigh},
+    // Source-anchored layout identity views; fresh checkpoint two keeps the
+    // ordinary held torch/player state for C/D/A/B without fixture overrides.
+    {147, "layout-c-wall-panel", 2, 2.55f, -10.00f, 3.14159265359f, 0.0f},
+    {148, "layout-d-entry-breach", 2, 0.0f, -2.55f, 0.0f, 0.28f},
+    // The legal upward view shows A's lower aperture and deep inner wall;
+    // its 5.6 m rim is beyond this camera's accepted pitch/FOV, unlike B.
+    {149, "layout-a-waterfall-own-hole", 2, -1.15f, -15.20f, -1.57079632679f, 0.28f},
+    {150, "layout-b-large-skylight", 2, -6.50f, -15.20f, 1.57079632679f, 0.28f},
+    {151, "layout-e-finale-opening", 11, -35.30f, -15.20f, 1.57079632679f, 0.28f},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)

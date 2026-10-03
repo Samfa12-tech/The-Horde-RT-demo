@@ -16,19 +16,22 @@ int main()
     };
     GraphicsPersistenceRecord record;
     record.confirmed = BaselineGraphicsSettings(GraphicsPlatform::Windows);
-    record.pending = GraphicsSettings{63, WaterQuality::Off, FireDetail::Mobile, 30};
+    record.pending = GraphicsSettings{63, WaterQuality::Off, FireDetail::Mobile, 30, false};
     check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "pending tuple saved atomically");
     const auto read = [&filename](const char* section, const char* key) {
         return GetPrivateProfileIntA(section, key, -1, filename.c_str());
     };
     check(read("graphics", "pending") == 1 && read("graphics", "pendingScale") == 63 &&
-          read("graphics", "confirmedScale") == 100, "interrupted candidate retains complete last-confirmed tuple");
+          read("graphics", "confirmedScale") == 100 && read("graphics", "pendingGlass") == 0 &&
+          read("graphics", "confirmedGlass") == 1 && read("graphics", "schema") == 2,
+          "interrupted five-field candidate retains complete last-confirmed tuple");
     check(read("audio", "volume") == 43 && read("controls", "sensitivity") == 135,
           "graphics transaction preserves unrelated INI sections");
     record.confirmed = *record.pending; record.pending.reset();
     check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "confirmation tuple saved atomically");
     check(read("graphics", "pending") == 0 && read("graphics", "confirmedScale") == 63 &&
-          read("graphics", "confirmedWater") == 0 && read("graphics", "confirmedFire") == 0,
+          read("graphics", "confirmedWater") == 0 && read("graphics", "confirmedFire") == 0 &&
+          read("graphics", "confirmedGlass") == 0,
           "confirmation clears marker and publishes complete requested tuple");
     check(!horde::platform::windows::SaveGraphicsPersistenceRecord(directory / "missing" / "settings.ini", record),
           "write failure is explicit");
@@ -39,10 +42,12 @@ int main()
     if (locked != INVALID_HANDLE_VALUE)
     {
         record.confirmed.renderScalePercent = 55;
+        record.confirmed.glassEnabled = true;
         check(!horde::platform::windows::SaveGraphicsPersistenceRecord(path, record),
               "failed atomic publication is explicit");
         CloseHandle(locked);
-        check(read("graphics", "confirmedScale") == 63 && read("audio", "volume") == 43,
+        check(read("graphics", "confirmedScale") == 63 && read("graphics", "confirmedGlass") == 0 &&
+              read("audio", "volume") == 43,
               "failed publication preserves the entire prior record and unrelated preferences");
     }
     std::filesystem::remove(path);

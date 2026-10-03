@@ -163,6 +163,49 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static bool CheckGlassVisibility(PresentableTinyRtScene& scene, bool enabled)
+    {
+        scene.glassEnabled_ = enabled;
+        scene.dielectricFixtureBlas_.address = 0xD1E1u;
+        std::array<VkAccelerationStructureInstanceKHR, 4u> instances{};
+        instances[0].instanceCustomIndex = 9u;
+        instances[0].accelerationStructureReference = scene.dielectricFixtureBlas_.address;
+        instances[0].mask = 0xFFu;
+        // The procedural arm can have the same custom index. Its own BLAS,
+        // lantern mixed body, and ordinary opaque world must remain admitted.
+        instances[1].instanceCustomIndex = 9u;
+        instances[1].accelerationStructureReference = 0xA2A2u;
+        instances[1].mask = 0x04u;
+        instances[2].instanceCustomIndex = 8u;
+        instances[2].accelerationStructureReference = 0x1A17u;
+        instances[2].mask = 0x01u;
+        instances[3].instanceCustomIndex = 0u;
+        instances[3].accelerationStructureReference = 0xB1A5u;
+        instances[3].mask = 0xFFu;
+        const auto before = instances;
+        for (const auto profile : {RtSceneProfile::Showcase, RtSceneProfile::GraphicsPreview})
+        {
+            scene.sceneProfile_ = profile;
+            instances = before;
+            scene.ApplyGlassFixtureVisibility(instances);
+            for (unsigned rayBit = 0u; rayBit < 8u; ++rayBit)
+                if (((instances[0].mask & (1u << rayBit)) != 0u) != enabled) return false;
+            if (instances[0].accelerationStructureReference != before[0].accelerationStructureReference ||
+                instances[0].instanceCustomIndex != 9u) return false;
+            for (std::size_t index = 1u; index < instances.size(); ++index)
+                if (instances[index].mask != before[index].mask ||
+                    instances[index].accelerationStructureReference != before[index].accelerationStructureReference)
+                    return false;
+            // A later frame/RT Lab can request all-ray visibility again; Off
+            // must enforce zero anew, retaining the immutable resource owner.
+            instances[0].mask = 0xFFu;
+            scene.ApplyGlassFixtureVisibility(instances);
+            if (instances[0].mask != (enabled ? 0xFFu : 0u)) return false;
+        }
+        scene.dielectricFixtureBlas_.address = 0u;
+        return true;
+    }
+
     static void AdmitPreviewInventoryFixture(PresentableTinyRtScene& scene)
     {
         // Synthetic admitted owner: public topology getters intentionally
@@ -1048,6 +1091,10 @@ int main()
                   "not-ready record observation attempt did not abort");
 
     PresentableTinyRtScene previewInventoryScene;
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckGlassVisibility(previewInventoryScene, true),
+                  "Glass On must preserve fixture, mixed lantern body and procedural arm ray admission");
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckGlassVisibility(previewInventoryScene, false),
+                  "Glass Off masks the fixture on all ray bits for either profile and repeated frame requests");
     PresentableTinyRtSceneObservationTestAccess::AdmitPreviewInventoryFixture(previewInventoryScene);
     const auto previewInventory = previewInventoryScene.ResourceInventory();
     ok &= Require(previewInventory.tlasInstanceCount == 7u &&
@@ -1056,7 +1103,7 @@ int main()
                       previewInventory.deviceLocalBytes == 768u && previewInventory.hostVisibleBytes == 0u,
                   "preview evidence must use admitted topology and actual environment allocation");
     PresentableTinyRtScene movedPreview(std::move(previewInventoryScene));
-    ok &= Require(movedPreview.IsReady() &&
+    ok &= Require(movedPreview.IsReady() && !movedPreview.GlassEnabled() && previewInventoryScene.GlassEnabled() &&
                       movedPreview.Profile() == RtSceneProfile::GraphicsPreview && movedPreview.TlasInstanceCount() == 7u &&
                       movedPreview.ResourceInventory().tlasInstanceCount == previewInventory.tlasInstanceCount &&
                       movedPreview.ResourceInventory().memoryAllocationCount == previewInventory.memoryAllocationCount &&
@@ -1067,7 +1114,7 @@ int main()
                   "preview topology and panorama allocation must move to exactly one owner");
     PresentableTinyRtScene assignedPreview;
     assignedPreview = std::move(movedPreview);
-    ok &= Require(assignedPreview.IsReady() &&
+    ok &= Require(assignedPreview.IsReady() && !assignedPreview.GlassEnabled() && movedPreview.GlassEnabled() &&
                       assignedPreview.Profile() == RtSceneProfile::GraphicsPreview &&
                       assignedPreview.TlasInstanceCount() == 7u &&
                       assignedPreview.ResourceInventory().tlasInstanceCount == previewInventory.tlasInstanceCount &&

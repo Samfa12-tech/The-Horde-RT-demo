@@ -56,6 +56,12 @@ if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
 def validationUnsigned = System.getenv('HORDE_VALIDATION_UNSIGNED') == '1'
 def hordeBenchmarkValidation = providers.gradleProperty('hordeBenchmarkValidation').orNull == 'true'
+def hordeBenchmarkMinRenderScaleProperty = providers.gradleProperty('hordeBenchmarkMinRenderScale').orNull
+if (hordeBenchmarkMinRenderScaleProperty != null &&
+    (!hordeBenchmarkValidation || hordeBenchmarkMinRenderScaleProperty != '33')) {
+    throw new GradleException('hordeBenchmarkMinRenderScale=33 requires explicit isolated Shipping/Mobile benchmark validation.')
+}
+def hordeBenchmarkMinRenderScale = hordeBenchmarkMinRenderScaleProperty == '33' ? 33 : 50
 def hordeStagedPrimaryDebugValidationProperty = providers.gradleProperty('hordeStagedPrimaryDebugValidation').orNull
 if (hordeStagedPrimaryDebugValidationProperty != null && !(hordeStagedPrimaryDebugValidationProperty in ['true', 'false'])) {
     throw new GradleException('hordeStagedPrimaryDebugValidation must be true or false.')
@@ -165,6 +171,11 @@ def hordeRtDebugStagedPrimaryArguments = hordeStagedPrimaryDebugValidation ? [
 // this overlay, and its separate application id prevents stale private-file assets.
 def viewmodelCandidatePath = providers.gradleProperty('hordeViewmodelCandidateDir').orNull
 def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).canonicalFile : null
+if (hordeBenchmarkMinRenderScale == 33 &&
+    (hordeStagedPrimaryShaderDirProperty != null || hordeStagedPrimaryDebugValidation ||
+     hordeStagedPrimaryTiming || viewmodelCandidate)) {
+    throw new GradleException('Experimental 33/40 percent scales require the unchanged Shipping/Mobile benchmark shaders and accepted player assets.')
+}
 if (hordeStagedPrimaryDebugValidation && viewmodelCandidate) {
     throw new GradleException('Staged execution investigation must preserve the accepted player assets, not a viewmodel asset overlay.')
 }
@@ -369,12 +380,14 @@ android {
         versionCode hordeVersionCode.intValue()
         versionName hordeVersionName
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
+        buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', '50'
         resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
         externalNativeBuild {
             cmake {
                 cppFlags '-std=c++20'
                 arguments '-DANDROID_STL=c++_static'
+                arguments '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=OFF', '-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=50'
             }
         }
     }
@@ -436,9 +449,12 @@ android {
                 debuggable false
                 jniDebuggable false
                 signingConfig signingConfigs.debug
+                buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', hordeBenchmarkMinRenderScale.toString()
                 externalNativeBuild {
                     cmake {
-                        arguments "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
+                        arguments '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=ON',
+                            "-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=${hordeBenchmarkMinRenderScale}",
+                            "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
                             "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}",
                             "-DHORDE_RT_STAGED_PRIMARY_TIMING=${hordeStagedPrimaryTiming ? 'ON' : 'OFF'}"
                     }
@@ -486,6 +502,7 @@ tasks.register('printHordeRtPolicyForTest') {
             ? (hordeRtNativePolicyArguments('Shipping') + hordeRtBenchmarkStagedPrimaryArguments).join('|')
             : 'unavailable; set hordeBenchmarkValidation=true'))
         println("benchmarkValidation=${hordeBenchmarkValidation}")
+        println("debugMinRenderScale=50|releaseMinRenderScale=50|benchmarkMinRenderScale=${hordeBenchmarkMinRenderScale}")
         println("stagedPrimaryDebugValidation=${hordeStagedPrimaryDebugValidation}")
         println("stagedPrimaryShaderDir=${hordeStagedPrimaryShaderDir ?: ''}")
     }

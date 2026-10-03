@@ -35,11 +35,13 @@ inline bool SaveGraphicsPersistenceRecord(const std::filesystem::path& settingsP
         success = write("pendingWater", static_cast<int>(record.pending->waterQuality)) && success;
         success = write("pendingFire", static_cast<int>(record.pending->fireDetail)) && success;
         success = write("pendingCap", record.pending->previewFrameCap) && success;
+        success = write("pendingGlass", record.pending->glassEnabled ? 1 : 0) && success;
     }
     success = write("confirmedScale", record.confirmed.renderScalePercent) && success;
     success = write("confirmedWater", static_cast<int>(record.confirmed.waterQuality)) && success;
     success = write("confirmedFire", static_cast<int>(record.confirmed.fireDetail)) && success;
     success = write("confirmedCap", record.confirmed.previewFrameCap) && success;
+    success = write("confirmedGlass", record.confirmed.glassEnabled ? 1 : 0) && success;
     // The special cache-flush call has no ordinary key-write success result.
     // Check the actual file flush separately before publishing the new tuple.
     (void)WritePrivateProfileStringA(nullptr, nullptr, nullptr, temporary.c_str());

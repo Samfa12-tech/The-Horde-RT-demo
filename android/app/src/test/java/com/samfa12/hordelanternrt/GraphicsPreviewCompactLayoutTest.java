@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.app.AlertDialog;
+import android.graphics.drawable.ColorDrawable;
 import android.util.TypedValue;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -83,8 +84,19 @@ public final class GraphicsPreviewCompactLayoutTest {
                 assertTrue(strip.getTop() >= size[1]*.65);
                 List<Button> buttons=new ArrayList<>(); List<HorizontalScrollView> rows=new ArrayList<>();
                 collect(strip,buttons,rows);
-                assertEquals(2,rows.size()); assertEquals(10,buttons.size());
-                String[] labels={"Resolution 75%","Water Mobile","Fire Mobile","Cap 30 Hz","View","Image","Details","Apply","Revert","Back"};
+                assertEquals(2,rows.size()); assertEquals(11,buttons.size());
+                for(HorizontalScrollView row:rows) {
+                    assertTrue(row.isHorizontalScrollBarEnabled()); assertFalse(row.isVerticalScrollBarEnabled());
+                    assertFalse("scroll affordance must stay visible",row.isScrollbarFadingEnabled());
+                    assertEquals(View.SCROLLBARS_OUTSIDE_INSET,row.getScrollBarStyle());
+                    assertTrue(row.getScrollBarSize()>=HordeUiTokens.dp(activity,4));
+                    assertTrue("bar occupies its own space below button targets",
+                            row.getHeight()-row.getChildAt(0).getBottom()>=HordeUiTokens.dp(activity,4));
+                    assertTrue("this portrait row really overflows",row.getChildAt(0).getWidth()>row.getWidth()-row.getPaddingLeft()-row.getPaddingRight());
+                    assertEquals(HordeUiTokens.BRASS,((ColorDrawable)row.getHorizontalScrollbarThumbDrawable()).getColor());
+                    assertEquals(HordeUiTokens.IRON,((ColorDrawable)row.getHorizontalScrollbarTrackDrawable()).getColor());
+                }
+                String[] labels={"Resolution 75%","Water Mobile","Fire Mobile","Cap 30 Hz","Glass On","View","Image","Details","Apply","Revert","Back"};
                 int minimum=HordeUiTokens.dp(activity,48);
                 for(int i=0;i<buttons.size();++i) {
                     Button button=buttons.get(i); assertEquals(labels[i],button.getText().toString());
@@ -98,9 +110,9 @@ public final class GraphicsPreviewCompactLayoutTest {
                 assertFalse(((Button)field(activity,"graphicsConfirm")).isEnabled());
                 Method menu=MainActivity.class.getDeclaredMethod("createGraphicsPreviewOptionMenu",Button.class,int.class);
                 menu.setAccessible(true);
-                int[][] values={{50,63,75,100},{0,1,2},{0,1},{15,30,60}};
-                int[] selected={75,1,0,30};
-                for(int choice=0;choice<4;++choice) {
+                int[][] values={{50,63,75,100},{0,1,2},{0,1},{15,30,60},{0,1}};
+                int[] selected={75,1,0,30,1};
+                for(int choice=0;choice<5;++choice) {
                     PopupMenu popup=(PopupMenu)menu.invoke(activity,buttons.get(choice),choice);
                     assertEquals(values[choice].length,popup.getMenu().size());
                     for(int i=0;i<values[choice].length;++i) {
@@ -136,6 +148,7 @@ public final class GraphicsPreviewCompactLayoutTest {
     @Test public void detailsIsCreatedOnlyOnRequestAndDismissReleasesGraphAndDialogReferences() throws Exception {
         MainActivity activity=Robolectric.buildActivity(MainActivity.class).get();
         FrameLayout scrim=new FrameLayout(activity); layout(scrim,360,640);
+        activity.setContentView(scrim);
         Field scrimField=MainActivity.class.getDeclaredField("menuScrim");
         scrimField.setAccessible(true); scrimField.set(activity,scrim);
         Method show=MainActivity.class.getDeclaredMethod("showGraphicsPreviewPage");
@@ -143,21 +156,35 @@ public final class GraphicsPreviewCompactLayoutTest {
         assertNull(field(activity,"graphicsDetailsDialog")); assertNull(field(activity,"graphicsGraph"));
         Field draft=MainActivity.class.getDeclaredField("graphicsDraft");
         draft.setAccessible(true); draft.set(activity,GraphicsPreferences.baseline());
-        Method menu=MainActivity.class.getDeclaredMethod("createGraphicsPreviewOptionMenu",Button.class,int.class);
+        Method menu=MainActivity.class.getDeclaredMethod("showGraphicsPreviewOptionMenu",Button.class,int.class);
         menu.setAccessible(true);
-        PopupMenu popup=(PopupMenu)menu.invoke(activity,((Button[])field(activity,"graphicsOptionButtons"))[0],0);
-        Field popupField=MainActivity.class.getDeclaredField("graphicsOptionsPopup");
-        popupField.setAccessible(true); popupField.set(activity,popup);
+        menu.invoke(activity,((Button[])field(activity,"graphicsOptionButtons"))[0],0);
+        PopupMenu popup=(PopupMenu)field(activity,"graphicsOptionsPopup"); assertNotNull(popup);
+        TextView status=(TextView)field(activity,"graphicsTelemetry");
+        String frozen=status.getText().toString();
+        Method update=MainActivity.class.getDeclaredMethod("setGraphicsPreviewStatus",String.class);
+        update.setAccessible(true); update.invoke(activity,"Preview FPS: 99.0");
+        assertEquals("native popup must freeze background status events",frozen,status.getText().toString());
+        popup.dismiss(); assertNull(field(activity,"graphicsOptionsPopup"));
+        assertTrue(Double.isNaN((double)field(activity,"graphicsDisplayedFps")));
+        update.invoke(activity,"Preview FPS: waiting for current RT");
+        assertEquals("Preview FPS: waiting for current RT",status.getText().toString());
+        // Opening another modal freezes its snapshot too; close restores guarded publication.
+        menu.invoke(activity,((Button[])field(activity,"graphicsOptionButtons"))[0],0);
         ((Button)field(activity,"graphicsDetailsButton")).performClick();
         AlertDialog dialog=(AlertDialog)field(activity,"graphicsDetailsDialog");
         assertNotNull(dialog); assertTrue(dialog.isShowing());
         assertNull(field(activity,"graphicsOptionsPopup"));
         assertNotNull(field(activity,"graphicsGraph")); assertNotNull(field(activity,"graphicsDetailsTelemetry"));
+        frozen=status.getText().toString(); update.invoke(activity,"Preview FPS: 100.0");
+        assertEquals(frozen,status.getText().toString());
         Method dismiss=MainActivity.class.getDeclaredMethod("dismissGraphicsPreviewDetails");
         dismiss.setAccessible(true); dismiss.invoke(activity);
         assertFalse(dialog.isShowing()); assertNull(field(activity,"graphicsDetailsDialog"));
         assertNull(field(activity,"graphicsDetailsTelemetry")); assertNull(field(activity,"graphicsDetailsPanel"));
         assertNull(field(activity,"graphicsGraph"));
+        update.invoke(activity,"Preview FPS: waiting for current RT");
+        assertEquals("Preview FPS: waiting for current RT",status.getText().toString());
     }
 
     @Test public void imageInspectionKeepsAccessibleRestoreTargetOwnsTouchesAndPreservesGraphicsState() throws Exception {
@@ -199,7 +226,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                 restore.performClick(); layout(root,360,640);
                 assertFalse((boolean)field(activity,"graphicsPreviewImageOnly"));
                 buttons.clear(); rows.clear(); collect(scrim,buttons,rows);
-                assertEquals(10,buttons.size()); assertEquals(2,rows.size()); assertEquals(42,serial.getLong(activity));
+                assertEquals(11,buttons.size()); assertEquals(2,rows.size()); assertEquals(42,serial.getLong(activity));
                 assertNull(field(activity,"graphicsDetailsDialog")); assertNull(field(activity,"graphicsGraph"));
             } finally { activity.getResources().updateConfiguration(original,activity.getResources().getDisplayMetrics()); }
         }

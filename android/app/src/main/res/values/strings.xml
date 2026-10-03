@@ -180,8 +180,8 @@
     <string name="graphics_revert">Revert to confirmed settings</string>
     <string name="graphics_storage_failed">Could not save recovery metadata. Settings were not applied.</string>
     <string name="graphics_not_ready">RT surface is not ready. Confirmed settings remain saved.</string>
-    <string name="graphics_optics_mobile">Optics: Mobile build. Lantern panes are omitted from geometry. Physical panes require a High build; this is not a runtime toggle.</string>
-    <string name="graphics_optics_high">Optics: High build. Physical lantern panes are retained. Optical profile is fixed by this build.</string>
+    <string name="graphics_optics_mobile">Optics: Mobile build. Lantern panes are absent. Glass On enables other glass supported by this build; full lantern panes require a High build.</string>
+    <string name="graphics_optics_high">Optics: High build. Glass On retains physical lantern panes; Off removes glass from every ray path. Optical profile is fixed by this build.</string>
     <string name="reset_non_graphics">Reset Audio / Controls / Interface</string>
     <string name="keeper_reveal_title">THE FOURTH KEEPER</string>
     <string name="graphics_restored">Confirmed graphics settings restored after an interrupted change.</string>

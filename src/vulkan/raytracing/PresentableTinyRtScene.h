@@ -180,12 +180,14 @@ public:
                     const std::string& developmentStaticAssetDirectory = {},
                     const std::string& productionAssetRoot = {},
                     RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline,
-                    RtSceneProfile sceneProfile = RtSceneProfile::Showcase);
+                    RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
+                    bool glassEnabled = true);
 
     void Destroy();
 
     bool IsReady() const { return ready_; }
     RtSceneProfile Profile() const { return sceneProfile_; }
+    bool GlassEnabled() const { return glassEnabled_; }
     bool ConfigurePreviewFireSockets(horde::graphics::GraphicsPreviewSession& session,
                                      std::string& diagnostic) const;
     RtExecutionBackend ExecutionBackend() const
@@ -574,7 +576,9 @@ private:
         const std::string& developmentStaticAssetDirectory,
         const std::string& productionAssetRoot,
         const InitialiseOrchestrationApi& api,
-        RtSceneProfile sceneProfile = RtSceneProfile::Showcase);
+        RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
+        bool glassEnabled = true);
+    void ApplyGlassFixtureVisibility(std::span<VkAccelerationStructureInstanceKHR> instances) const;
     bool ContinueInitialiseAfterPreflight(
         VkFormat presentationFormat,
         const std::string& skeletonAssetPath,
@@ -759,6 +763,7 @@ private:
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
     RtSceneProfile sceneProfile_ = RtSceneProfile::Showcase;
+    bool glassEnabled_ = true;
     std::vector<RtMaterialGpu> sceneMaterials_;
     std::uint32_t worldMaterialBase_ = 0u;
     std::uint32_t tlasInstanceCount_ = kTlasInstanceCount;

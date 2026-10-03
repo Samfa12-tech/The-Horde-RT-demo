@@ -1,4 +1,5 @@
 #include "reporting/PlaytestReport.h"
+#include "reporting/BenchmarkSummaryReport.h"
 #include "reporting/PlaytestSubmission.h"
 
 #include <algorithm>
@@ -464,6 +465,13 @@ bool PlaytestReportDelivery::BeginPayload(const std::string_view id, const std::
     if (!MakeAttempt(attempt)) return false;
     state_ = PlaytestReportDeliveryState::InFlight;
     return true;
+}
+
+bool PlaytestReportDelivery::BeginBenchmarkSummary(const PreparedBenchmarkSummaryReport& report,
+    PlaytestReportAttempt& attempt)
+{
+    return state_ == PlaytestReportDeliveryState::Idle && report.IsReady() &&
+        BeginPayload(report.ReportId(), report.Json(), kBenchmarkSummaryReportMaxBytes, attempt);
 }
 
 bool PlaytestReportDelivery::Retry(PlaytestReportAttempt& attempt)

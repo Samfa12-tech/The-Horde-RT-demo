@@ -337,11 +337,13 @@ horde::graphics::GraphicsCommand ReadRequestedGraphics()
 
 void PublishGraphicsApplied(const SwapchainContext& context, const bool success, const bool presented)
 {
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return;
     horde::graphics::GraphicsAppliedSnapshot snapshot;
     snapshot.serial = context.graphicsSerial;
     snapshot.lifecycleGeneration = context.surfaceGeneration;
     snapshot.requested = context.graphicsRequested;
     snapshot.effective = context.graphicsSettings;
+    snapshot.effective.glassEnabled = context.rtScene.GlassEnabled();
     snapshot.opticalProfile = context.rtScene.SelectedDielectricQualityName() == "High" ?
         horde::graphics::OpticalProfile::High : horde::graphics::OpticalProfile::Mobile;
     snapshot.backend = context.rtScene.ExecutionBackend() == horde::vulkan::RtExecutionBackend::RayTracingPipeline ?
@@ -357,6 +359,7 @@ void PublishGraphicsApplied(const SwapchainContext& context, const bool success,
         horde::graphics::GraphicsReason::ResourceFailure : horde::graphics::GraphicsReason::None);
     snapshot.rtPresented = presented;
     std::lock_guard lock(gGraphicsMutex);
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return;
     if ((gPreviewControls.generation == 0u || gPreviewControls.generation == snapshot.lifecycleGeneration) &&
         gPreviewControls.enabled != (snapshot.scene == horde::graphics::GraphicsScene::Preview))
         snapshot.rtPresented = false; // A previous profile cannot acknowledge a pending scene switch.
@@ -1889,7 +1892,8 @@ VkExtent2D ClampExtent(const VkSurfaceCapabilitiesKHR& capabilities, uint32_t de
 
 VkExtent2D ScaledRenderExtent(VkExtent2D presentationExtent, float renderScale)
 {
-    const int percent = std::clamp(static_cast<int>(std::lround(renderScale * 100.0f)), 50, 100);
+    const int percent = horde::graphics::ClampGraphicsRenderScalePercent(static_cast<int>(std::lround(
+        std::clamp(renderScale, 0.0f, 1.0f) * 100.0f)));
     const auto extent = horde::graphics::ScaledGraphicsExtent(
         {presentationExtent.width, presentationExtent.height}, percent);
     return {extent.width, extent.height};
@@ -2505,7 +2509,7 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     diagnostic,
                                     {},
                                     context.reportDirectory + "/..",
-                                    context.executionBackend, context.sceneProfile))
+                                    context.executionBackend, context.sceneProfile, context.graphicsSettings.glassEnabled))
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to initialise presentable RT scene: %s", diagnostic.c_str());
         return false;
@@ -3482,6 +3486,76 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     return true;
 }
 
+enum class GlassGeometryApplyResult { Applied, RolledBack, Fatal };
+
+GlassGeometryApplyResult ApplyGlassGeometryOnOwner(
+    SwapchainContext& context, const horde::graphics::GraphicsSettings requested)
+{
+    const auto previous = context.graphicsSettings;
+    const float previousScale = context.renderScale;
+    const auto drainAndReset = [&]() {
+        const VkResult idle = vkDeviceWaitIdle(context.device);
+        return CompleteRtEvidenceAfterDeviceIdle(context, idle) &&
+            vkResetCommandPool(context.device, context.commandPool, 0) == VK_SUCCESS;
+    };
+    if (!drainAndReset()) return GlassGeometryApplyResult::Fatal;
+    CancelActiveInAppBenchmark(context);
+    gSurfaceSessions.Publish(context.surfaceGeneration, 0);
+    context.capabilities.rtScene.presented = false;
+    PublishGraphicsApplied(context, true, false);
+    context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    context.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
+    if (context.rtFrameEvidenceInitialised && !context.rtFrameEvidence.Recreate(
+            horde::telemetry::RtResourceResetReason::DiagnosticResourceReplacement,
+            CurrentInitialGpuEvidenceStatus(context)))
+    {
+        (void)context.rtFrameEvidence.Destroy();
+        context.rtFrameEvidenceInitialised = false;
+    }
+    // One scene, same backend/provider/compiled optics. The fifth setting owns
+    // actual admitted geometry; a combined scale uses this one new extent.
+    context.rtScene.Destroy();
+    context.graphicsSettings = requested;
+    context.renderScale = requested.renderScalePercent / 100.0f;
+    const bool applied = InitialiseRtSceneForSwapchain(context) &&
+        context.rtScene.GlassEnabled() == requested.glassEnabled;
+    if (!applied)
+    {
+        // Initialization may have uploaded GPU resources before failing. Prove
+        // their real retirement too; never destroy/fallback after failed idle.
+        if (!drainAndReset()) return GlassGeometryApplyResult::Fatal;
+        context.rtScene.Destroy();
+        context.graphicsSettings = previous;
+        context.renderScale = previousScale;
+        if (!InitialiseRtSceneForSwapchain(context) || context.rtScene.GlassEnabled() != previous.glassEnabled)
+            return GlassGeometryApplyResult::Fatal;
+        context.graphicsReason = horde::graphics::GraphicsReason::ResourceFailure;
+    }
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return GlassGeometryApplyResult::Fatal;
+    context.capturePresentedFrames = 0u;
+    context.timingFrameCount = 0u;
+    context.timingFenceMs = context.timingRecordMs = context.timingPresentMs = context.timingTotalMs = 0.0;
+    context.gpuFrameTimingTotalMs = 0.0; context.gpuFrameTimingSampleCount = 0u;
+    context.previewGpuSamples = 0u;
+    RefreshGpuTimingTelemetry(context);
+    context.previewPerformance.BeginScope(++context.previewEpoch);
+    context.previewWarmFrames = kMaxFramesInFlight;
+    if (!applied)
+    {
+        PublishGraphicsApplied(context, false, false);
+        std::lock_guard lock(gGraphicsMutex);
+        if (gRequestedGraphics.serial == context.graphicsSerial)
+            gRequestedGraphics.requested = context.graphicsSettings;
+    }
+    __android_log_print(applied ? ANDROID_LOG_INFO : ANDROID_LOG_ERROR, kTag,
+        "HORDE_RT_GLASS_REBUILD requested=%d effective=%d scale=%.0f restored=%d presented=0",
+        requested.glassEnabled ? 1 : 0, context.rtScene.GlassEnabled() ? 1 : 0,
+        context.renderScale * 100.0f, applied ? 0 : 1);
+    return applied ? GlassGeometryApplyResult::Applied : GlassGeometryApplyResult::RolledBack;
+}
+
 bool ApplyPreviewProfileOnOwner(SwapchainContext& context, const PreviewControls controls)
 {
     const auto desired = controls.enabled ? horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview :
@@ -3589,7 +3663,19 @@ void SwapchainRenderLoop()
             context.graphicsReason = horde::graphics::GraphicsReason::None;
             const float requestedRenderScale = graphicsCommand.requested.renderScalePercent / 100.0f;
             bool applied = true;
-            if (context.useRtPath && std::abs(requestedRenderScale - context.renderScale) > 0.001f)
+            const bool glassChanged = graphicsCommand.requested.glassEnabled != context.rtScene.GlassEnabled();
+            if (context.useRtPath && glassChanged)
+            {
+                const auto result = ApplyGlassGeometryOnOwner(context, graphicsCommand.requested);
+                if (result == GlassGeometryApplyResult::Fatal)
+                {
+                    gSurfaceSessions.Publish(context.surfaceGeneration, 3);
+                    __android_log_print(ANDROID_LOG_ERROR, kTag, "Glass Apply could not prove/rebuild its actual GPU ownership.");
+                    break;
+                }
+                applied = result == GlassGeometryApplyResult::Applied;
+            }
+            else if (context.useRtPath && std::abs(requestedRenderScale - context.renderScale) > 0.001f)
             {
                 const auto resizeStart = std::chrono::steady_clock::now();
                 const VkResult idleResult = vkDeviceWaitIdle(context.device);
@@ -4537,10 +4623,10 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setSimulationPaused(JNIEnv*, jclass,
 
 namespace
 {
-horde::graphics::GraphicsSettings GraphicsTuple(const jint scale, const jint water, const jint fire, const jint cap)
+horde::graphics::GraphicsSettings GraphicsTuple(const jint scale, const jint water, const jint fire, const jint cap, const jboolean glass)
 {
     return {scale, static_cast<horde::graphics::WaterQuality>(water),
-        static_cast<horde::graphics::FireDetail>(fire), cap};
+        static_cast<horde::graphics::FireDetail>(fire), cap, glass == JNI_TRUE};
 }
 void PublishGraphicsCommandLocked(const horde::graphics::GraphicsCommand& command)
 {
@@ -4597,18 +4683,18 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getKeeperRevealTitleOpacity(JNIEnv*,
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_setGraphicsSettings(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap)
+Java_com_samfa12_hordelanternrt_ProbeBridge_setGraphicsSettings(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass)
 {
-    const auto settings = GraphicsTuple(scale, water, fire, cap);
+    const auto settings = GraphicsTuple(scale, water, fire, cap, glass);
     if (!horde::graphics::ValidGraphicsSettings(settings)) return;
     std::lock_guard lock(gGraphicsMutex);
     gRequestedGraphics = {++gGraphicsSerial, 0u, horde::graphics::GraphicsCommandKind::Revert, settings};
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_beginGraphicsEdit(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap)
+Java_com_samfa12_hordelanternrt_ProbeBridge_beginGraphicsEdit(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass)
 {
-    const auto settings = GraphicsTuple(scale, water, fire, cap);
+    const auto settings = GraphicsTuple(scale, water, fire, cap, glass);
     if (!horde::graphics::ValidGraphicsSettings(settings)) return;
     std::lock_guard lock(gGraphicsMutex);
     gGraphicsEdit.emplace(settings, gGraphicsSerial);
@@ -4616,11 +4702,11 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_beginGraphicsEdit(JNIEnv*, jclass, j
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_applyGraphicsSettings(
-    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jlong generation)
+    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jlong generation)
 {
     if (!gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation))) return 0;
     std::lock_guard lock(gGraphicsMutex);
-    if (!gGraphicsEdit || !gGraphicsEdit->Stage(GraphicsTuple(scale, water, fire, cap))) return 0;
+    if (!gGraphicsEdit || !gGraphicsEdit->Stage(GraphicsTuple(scale, water, fire, cap, glass))) return 0;
     const auto command = gGraphicsEdit->RequestApply(static_cast<std::uint64_t>(generation));
     if (!command) return 0;
     PublishGraphicsCommandLocked(*command);
@@ -4629,9 +4715,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_applyGraphicsSettings(
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_compareGraphicsPreview(
-    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jlong generation)
+    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jlong generation)
 {
-    const auto settings = GraphicsTuple(scale, water, fire, cap);
+    const auto settings = GraphicsTuple(scale, water, fire, cap, glass);
     if (!horde::graphics::ValidGraphicsSettings(settings) ||
         !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation))) return 0;
     std::lock_guard lock(gGraphicsMutex);
@@ -4696,7 +4782,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getGraphicsSnapshot(JNIEnv* env, jcl
         a.internalExtent.width, a.internalExtent.height, a.outputExtent.width, a.outputExtent.height,
         static_cast<jlong>(a.opticalProfile), static_cast<jlong>(a.backend), a.rtPresented ? 1 : 0,
         static_cast<jlong>(a.reasons), a.requested.renderScalePercent, static_cast<jlong>(a.requested.waterQuality),
-        static_cast<jlong>(a.requested.fireDetail), a.requested.previewFrameCap, static_cast<jlong>(a.scene)};
+        static_cast<jlong>(a.requested.fireDetail), a.requested.previewFrameCap, static_cast<jlong>(a.scene),
+        a.effective.glassEnabled ? 1 : 0, a.requested.glassEnabled ? 1 : 0};
     auto result = env->NewLongArray(static_cast<jsize>(std::size(values)));
     if (result) env->SetLongArrayRegion(result, 0, static_cast<jsize>(std::size(values)), values);
     return result;
@@ -4707,7 +4794,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setRenderScale(JNIEnv*, jclass, jflo
 {
     if (!std::isfinite(scale)) return;
     std::lock_guard lock(gGraphicsMutex);
-    gRequestedGraphics.requested.renderScalePercent = std::clamp(static_cast<int>(std::lround(scale * 100.0f)), 50, 100);
+    gRequestedGraphics.requested.renderScalePercent = horde::graphics::ClampGraphicsRenderScalePercent(
+        static_cast<int>(std::lround(std::clamp(scale, 0.0f, 1.0f) * 100.0f)));
     gRequestedGraphics.serial = ++gGraphicsSerial;
     gRequestedGraphics.lifecycleGeneration = 0u;
 }

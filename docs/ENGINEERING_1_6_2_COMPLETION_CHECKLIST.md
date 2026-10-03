@@ -2,6 +2,8 @@
 
 Owner froze new additions on 3 October. The accepted implementation goal and requests received before that freeze remain in scope. New ideas belong in the follow-up backlog. This checklist distinguishes completed source work, required validation, and bounded investigations; an investigation is not a promised performance gain.
 
+The later explicit narrow exception locks four separate features: keep waterfall-hole vines without a grid; grid the separate large waterfall-room skylight; retain and overgrow the right-outside-entry grated wall panel; close the inside-entry skylight. Preserve finale and enemy locations. Kit voice and enemy relocation remain 1.7. Native identity views precede these geometry edits.
+
 ## Required candidate completion, in priority order
 
 - Preserve the five source-audit corrections, genuine hardware RT, gameplay/player/audio contracts, exact asset provenance and released1.6.1 artifacts. Keep compatibility without maintenance1 with the owner-accepted teardown-proof limitation documented.
@@ -21,7 +23,7 @@ Owner froze new additions on 3 October. The accepted implementation goal and req
 
 ## Evidence and remaining gates
 
-- New native Debug motion artifact `0f712144e8d97d140fb3cd7f8742446a4610896a0352fa1b918103f120b0cbce`: changed CPU tests2/2 passed. Pipeline torch/rear, pictured shaft and Keeper first/retry all completed with owning successful RT evidence and zero synchronization validation errors. Compute checks are in progress. These captures are not sustained performance or owner acceptance.
+- New native Debug motion artifact `0f712144e8d97d140fb3cd7f8742446a4610896a0352fa1b918103f120b0cbce`: changed CPU tests2/2 passed. All eight Pipeline/Compute torch, shaft and Keeper first/retry runs completed: 118 captures and 4,684 joined ordinary-simulation/completed-RT rows, zero synchronization validation markers. These pre-final-slice captures are not sustained performance or owner acceptance.
 - PR18 backup29970 has fresh CI37120790248 all six jobs green. Later changes require fresh CI. Earlier failed checkout/witness and wrong-target/focus runs remain preserved as negative evidence.
 - Final exact S26/RTX comparisons, final native composition/UI/fire/motion acceptance and changed audio/haptic listening remain open. S24/S25 are unverified. Sustained30FPS at fixed75% on S26 is not currently established.
 - Preexisting shared initialization submitted-work cleanup after failed queue-idle remains a review limitation, separate from the accepted no-maintenance1 teardown gap. Do not claim error-path proof from successful-device runs.

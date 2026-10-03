@@ -141,6 +141,8 @@ void TestEffectiveAcknowledgement()
     auto snapshot = Presented(*command);
     snapshot.effective.previewFrameCap = 30;
     Check(!session.Acknowledge(snapshot, true), "old live preview cap cannot acknowledge a new requested cap");
+    snapshot = Presented(*command); snapshot.effective.glassEnabled = false;
+    Check(!session.Acknowledge(snapshot, true), "old or constrained glass geometry cannot acknowledge requested glass On");
     snapshot = Presented(*command); snapshot.effective.renderScalePercent = 100;
     Check(!session.Acknowledge(snapshot, true), "old scale cannot silently acknowledge requested scale");
     snapshot = Presented(*command); snapshot.effective.waterQuality = WaterQuality::High;
@@ -152,6 +154,57 @@ void TestEffectiveAcknowledgement()
     snapshot.reasons = GraphicsReason::FireFollowsWater;
     Check(session.Acknowledge(snapshot, true) && session.Confirm() && session.Committed() == requested,
           "explicit admitted legacy fire constraint preserves requested intent on confirmation");
+}
+void TestGlassMigrationAndTransactions()
+{
+    for (const auto platform : {GraphicsPlatform::Android, GraphicsPlatform::Windows})
+    {
+        Check(BaselineGraphicsSettings(platform).glassEnabled &&
+              ReducedEffectsGraphicsSettings(platform).glassEnabled &&
+              MigrateLegacyGraphicsSettings({63, 0}, platform).glassEnabled,
+              "all existing defaults and legacy appearance preserve glass On");
+        const GraphicsSettings oldConfirmed{63, WaterQuality::Off, FireDetail::High, 42, false};
+        const GraphicsSettings oldPending{92, WaterQuality::High, FireDetail::Mobile, 15, false};
+        const auto migrated = RecoverGraphicsSettings({1u, oldConfirmed, oldPending}, platform);
+        auto expectedConfirmed = oldConfirmed; expectedConfirmed.glassEnabled = true;
+        auto expectedPending = oldPending; expectedPending.glassEnabled = true;
+        Check(migrated.startup == expectedConfirmed && migrated.retainedRequested == expectedPending &&
+              HasGraphicsReason(migrated.reasons, GraphicsReason::InterruptedApply) &&
+              !HasGraphicsReason(migrated.reasons, GraphicsReason::InvalidStoredSettings),
+              "schema1 keeps every confirmed/pending quality and custom value, defaults only new glass field On");
+        const auto current = RecoverGraphicsSettings({kGraphicsSettingsSchema, oldConfirmed, oldPending}, platform);
+        Check(current.startup == oldConfirmed && current.retainedRequested == oldPending,
+              "schema2 preserves explicit Off through interrupted apply recovery");
+        auto off = BaselineGraphicsSettings(platform); off.glassEnabled = false;
+        Check(MatchGraphicsPreset(off, platform) == GraphicsPreset::Custom, "glass-only override is Custom");
+        const auto resolved = ResolveGraphicsSettings(off, {OpticalProfile::Mobile, GraphicsBackend::RayQueryCompute, true}, {800u, 600u});
+        Check(resolved.valid && resolved.effective == off && resolved.opticalProfile == OpticalProfile::Mobile,
+              "glass Off honors intent without claiming a different compiled optical quality");
+        GraphicsEditSession session(BaselineGraphicsSettings(platform));
+        Check(session.Stage(off), "glass-only candidate can be staged");
+        const auto apply = session.RequestApply(9u);
+        auto stale = Presented(*apply); stale.effective.glassEnabled = true;
+        Check(!session.Acknowledge(stale, true) && !session.Confirm(),
+              "previous On frame cannot confirm Off merely because dimensions match");
+        auto failed = Presented(*apply); failed.rtPresented = false;
+        Check(session.Acknowledge(failed, false) && session.Committed().glassEnabled && session.Persistence().pending == off,
+              "failed geometry replacement retains last confirmed and pending recovery intent");
+        const auto retry = session.RequestApply(9u);
+        Check(retry && session.Acknowledge(Presented(*retry), true), "actual Off presentation admits confirmation");
+        Check(!session.AdvanceConfirmation(99.0, false, 9u), "background does not expire glass confirmation");
+        const auto restore = session.AdvanceConfirmation(15.0, true, 9u);
+        Check(restore && restore->requested.glassEnabled && session.Persistence().pending == off,
+              "15 visible seconds requests physical On restore and retains marker until presented");
+        Check(session.Acknowledge(Presented(*restore), true) && !session.Persistence().pending && session.Draft().glassEnabled,
+              "actual restored On presentation clears pending marker");
+        Check(session.Stage(off), "Off can be staged after restore");
+        const auto kept = session.RequestApply(10u);
+        Check(kept && session.Acknowledge(Presented(*kept), true) && session.Confirm() &&
+              !session.Persistence().confirmed.glassEnabled && session.Persistence().schema == 2u,
+              "explicit Keep persists Off in schema2 only after current presentation");
+        Check(session.ResetDraft(platform) && session.Draft().glassEnabled && !session.Committed().glassEnabled,
+              "Reset restores On as draft without rewriting confirmed Off");
+    }
 }
 void TestCoherentPublication()
 {
@@ -185,6 +238,6 @@ void TestCoherentPublication()
 int main()
 {
     TestMigrationAndProfiles(); TestResolutionAndEffectiveValues(); TestApplyConfirmAndCancel();
-    TestFailureDeadlineAndRecovery(); TestEffectiveAcknowledgement(); TestCoherentPublication();
+    TestFailureDeadlineAndRecovery(); TestEffectiveAcknowledgement(); TestGlassMigrationAndTransactions(); TestCoherentPublication();
     return passed ? 0 : 1;
 }
