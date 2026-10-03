@@ -76,7 +76,9 @@ Do not remove a required feature merely to finish quickly. When a required subsy
 
 ### 4.1 Opening cave-in
 
-At the existing spawn, turning approximately 180 degrees reveals a collapsed entrance, not a dressed-up flat wall. Use broken stone, dirt, a fractured arch and limited fallen timber consistent with the tomb. Show a blocked passage continuing beyond it where composition permits. Rubble must occupy real space, meet the floor and have a simple matching collision boundary. Keep the opening encounter and forward route clear.
+**Owner clarification, 3 October 2026:** In 1.7, start the player at the existing spawn facing the collapsed entrance. The initial camera orientation establishes the blocked retreat before the player turns toward the forward route. This is paired with moving the same two skeletons into the waterfall room (Section 4.1a), leaving the opening safe to take in. Preserve immediate player control; no forced cinematic, automatic camera turn or input lock is required. This orientation change belongs to 1.7 only, not the active 1.6.2 runtime.
+
+The collapsed entrance must read as a real cave-in, not a dressed-up flat wall. Use broken stone, dirt, a fractured arch and limited fallen timber consistent with the tomb. Show a blocked passage continuing beyond it where composition permits. Rubble must occupy real space, meet the floor and have a simple matching collision boundary. Keep the opening space and forward route clear.
 
 Do not simulate the collapse live. It already happened. A few settling particles/stone sounds are optional; the geometry must communicate the event without them. A second exterior view of the blocked original doorway, visible from the upper clearing, can explain why the companion could not simply walk in.
 
@@ -511,9 +513,10 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 
 - [ ] Add failing progression tests: no rescue before lantern ownership; roof opens once; campaign night does not trigger the old ending overlay; RT Lab cannot steal or lose menu ownership.
 - [ ] Build the real cave-in, traversable shaft/rim, credible lid motion and exterior tomb dressing in Blender, then import and validate.
+- [ ] Set the 1.7 initial player/camera orientation toward the collapsed entrance, paired with the waterfall-room skeleton relocation. Verify a fresh start/restart shows the blocked retreat first and the player can freely turn toward the forward route without a forced camera sequence or input lock.
 - [ ] Implement campaign continuation and shared night environment. Preserve historical diagnostic behavior behind explicit mode boundaries.
 - [ ] Relocate the same two skeletons into the waterfall room; add failing tests for placement, aggro/leash, retry/reset and checkpoint restoration. Preserve attack/feedback semantics and two-guard count; verify waterfall navigation and the lich/reward route.
-- [ ] Capture spawn turned around, the small wall panel/overgrowth, waterfall encounter/grid, roof opening, view through the shaft and upper-rim clearance. Confirm the entry skylight is closed, the waterfall grid prevents passage, and the separate finale/rescue opening, combat and chest flow still work.
+- [ ] Capture the initial spawn view facing the collapse and the player-controlled turn toward the forward route, the small wall panel/overgrowth, waterfall encounter/grid, roof opening, view through the shaft and upper-rim clearance. Confirm the entry skylight is closed, the waterfall grid prevents passage, and the separate finale/rescue opening, combat and chest flow still work.
 
 **Gate:** The story geometry and night progression are coherent on the actual route. No floating dungeon/roof, empty void or reward bypass.
 
