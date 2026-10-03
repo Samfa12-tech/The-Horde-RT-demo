@@ -45,7 +45,7 @@ These are initial authoring targets, **not fixed minimums or measured capacity c
 | Tavern | The hero interior, primary social/story destination and recurring point of return. |
 | Cast | Approximately 4–7 named/present village characters including the companion where resident; total cast is not a promise that all are simultaneously visible or animated. |
 | Important conversations | One or two substantial NPC exchanges, with shorter contextual lines for others. Keep the speaking cast and voice production bounded. |
-| Time and weather | Continue the authored night from 1.7. No day/night or weather simulation. |
+| Time and weather | Continue the authored night from 1.7. Lich/lantern/tomb-exit progression does not cause dawn. Whether daylight ever enters the later game, and when or why, remains undecided. No day/night or weather simulation. |
 | Gameplay | Explore, interact, establish a safe return, gain bounded gear/training benefits, use treasure currency and begin area-access preparation. Magic, Tech and Constitution offer complementary routes. No village combat required. |
 
 Avoid a large empty square surrounded by decorative shells with no purpose. The few accessible interiors should reward entry through character, story or a useful interaction, not merely demonstrate that a door opens.

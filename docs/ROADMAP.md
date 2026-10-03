@@ -236,6 +236,24 @@ Review the combined candidate, not only successful isolated slices. Recheck affe
 
 The final record states what shipped, what was accepted or deferred, actual quality/performance limits and remaining validation gaps. Optional vendor adapters, detail normals and height experiments are not mandatory merely because they appear in this bank. No roadmap entry authorises signing, publication or moving to 1.7 before milestone acceptance.
 
+## Engine product and demo/game packaging proposal
+
+**Owner-approved strategic direction, 3 October 2026:** The engine is the core product; The Horde is the game used to build and test it. The existing dungeon is a compact RT showcase and repeatable regression workload. The growing game supplies concrete needs for zones/residency, characters, traversal/physics, audio and outdoor environments. Build reusable capabilities from those needs, not an unbounded generic-engine framework.
+
+**Proposal, not approved technical architecture:** maintain two application/build/content targets over shared engine modules: a bounded dungeon demo and the developing game. This could preserve a small showcase while letting the game grow from 1.7, without copying the renderer into diverging forks. Exact target names, module boundaries, repository layout, package/save identities, versioning and delivery policy require a scoped design decision. No repository creation, project split, engine extraction or new engineering goal is authorised here.
+
+Keep accepted legacy demo releases and their evidence immutable. A later explicitly scoped renderer-update demo could consume tested shared improvements and receive its own version, validation and release approval; it must not overwrite an old artifact or silently inherit campaign progression. Whether/when the demo stops receiving feature updates remains a product decision. Do not delay 1.7 for a speculative large engine reorganisation.
+
+## 1.7 addition — continuous night and real moonlight
+
+**Owner clarification, 3 October 2026:** Defeating the lich, claiming the lantern and leaving the tomb do not trigger daytime in 1.7. Preserve the separate later-created rescue opening, but decouple geometric opening/reward progression from dawn lighting. Rope rescue, reunion, forest and checkpoint restores remain at night. Whether daylight ever enters the later game, and when or why, is deliberately undecided.
+
+The visible moon must align with a genuine directional/finite-angular light source using hardware-RT scene visibility/transmittance; making a sky texture brighter does not implement moonlight or GI. Reuse one coherent night definition through the tomb opening and outside, with stable exposure and relevant secondary/volumetric paths. See [the 1.7 night and bounded lighting-research contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#82-night-environment).
+
+RTAO and RTGI are optional bounded research, not promised 1.7 features. Audit existing direct/ambient/indirect contributions first to avoid double occlusion or energy. Admit only measured improvements meeting explicit quality, frame-time, memory and sustained platform budgets on exact hardware; defer otherwise. Current phone viability is unmeasured, and future hardware is not a delivery assumption.
+
+This is future campaign planning. It does not change the accepted 1.6.2 dungeon-demo finale by implication, reopen the current run, alter the approved four opening features or geography, or authorise runtime work, merging or release.
+
 ## 1.7 addition — Kit at the prologue grate
 
 **Latest owner clarification, 3 October 2026:** Kit's first call comes through the **small grated wall access panel just to the right outside the opening room**, on an early safe approach. It is not the entry-room skylight, the waterfall's own hole or the separate large skylight in the waterfall room. In 1.7, move the same two skeletons into the waterfall room; the earlier wall-panel call does not wait for that encounter. The panel retains the intended overgrowth from report **3696c1a2-5fb3-4476-aaeb-456a130837d8**; the waterfall's own hole keeps its vines untouched, while the separate large skylight in that room gains an impassable iron grid in the queued post-run 1.6.2 visual slice. Skeleton relocation, voice/trigger and dialogue controls remain gated 1.7 work. Kit does not know about the lich. The later-created finale opening enables rope rescue; the waterfall grid prevents an obvious earlier escape without inventing a decision by Kit to wait for the fight.

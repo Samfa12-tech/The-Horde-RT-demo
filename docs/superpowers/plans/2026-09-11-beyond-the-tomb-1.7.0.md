@@ -20,6 +20,14 @@
 
 [WORLD_LAYOUT.md](../../WORLD_LAYOUT.md) now fixes the regional topology. The Keeper Tomb lies northwest in an abandoned burial ground beyond the woods; its forest path leads southeast to the **lookout**, which is the 1.7 chapter endpoint. Place a **low-detail distant village shell** below/beyond it in the fixed future 1.8 location. The land is The Veyrlands and this village is Bellwether (approved 3 October 2026). No playable village, interiors, NPC crowds or hub services enter 1.7. In 1.8 the same road continues into the village; do not create an enormous temporary wall across it or relocate the settlement later. The village's active churchyard is separate from the tomb burial ground. Exact distances and slopes remain playable-blockout decisions; this is bounded zone/area delivery, not a continuous open-world promise. Preserve all four separately approved dungeon-opening features and the later finale/rescue opening.
 
+## Owner clarification — night and engine direction, 3 October 2026
+
+The lich's defeat, lantern claim and tomb exit **must not trigger daytime in 1.7**. The opening, rope rescue, reunion and forest remain one authored night. Whether daylight ever enters the later game, and when or why, is undecided; neither a dawn reward nor a day/night cycle is promised.
+
+The engine is the core product; The Horde is the game used to build and test it. Keep the dungeon useful as a compact showcase/regression workload while the adventure exercises real requirements. A shared engine with two application/content targets is a **packaging proposal**, not an approved module/repository architecture or instruction to split projects. See [the roadmap proposal](../../ROADMAP.md#engine-product-and-demo-game-packaging-proposal). No generic engine framework or large extraction is added to 1.7.
+
+This direction changes the future campaign contract only. Preserve accepted 1.6.2 demo progression and frozen release artifacts unless a separately scoped change is approved.
+
 ## 1. Source authority and what was actually inspected
 
 The owner's latest instructions govern the new experience. Preserve `AGENTS.md` engineering/safety requirements and use the accepted 1.6.2 source as implementation authority. Historical documents remain evidence of their own versions, not proof of current implementation or performance.
@@ -104,7 +112,7 @@ The retained wall-panel overgrowth and queued final skylight changes are 1.6.2 e
 
 Preserve the accepted Lich/chest sequence, including the separate two-second chest unlock if it remains the accepted 1.6.2 behavior, the guidance cue and actual claim interaction. The player must own the lantern before rescue progression can complete.
 
-Replace the campaign's returning-dawn/ending-card transition with a moonlit opening. Use the same moon orientation, exposure policy and sky inside and outside. Opening stonework must have a believable place to move; do not lift an enormous roof through trees, terrain or the companion. Rework the lid/oculus and upper chamber geometry only as necessary for a traversable shaft.
+For the 1.7 campaign, replace the returning-dawn/ending-card transition with a moonlit opening. Lich defeat, lantern acquisition, roof opening, rescue completion and zone entry must never advance the environment to daylight. Decouple geometric opening/progression from time-of-day lighting: keep the later-created rescue aperture and reward ordering without carrying forward the demo's dawn effect. Use the same moon orientation, exposure policy and sky inside and outside. Opening stonework must have a believable place to move; do not lift an enormous roof through trees, terrain or the companion. Rework the lid/oculus and upper chamber geometry only as necessary for a traversable shaft.
 
 On opening, the player sees actual sky, rim stone, roots/branches and the companion above. Preserve the ability to look around. Use a short objective and positional voice to draw attention instead of forcing a long camera turn.
 
@@ -178,7 +186,7 @@ Define a consistent metres/up-axis/forward-axis convention and use Blender expor
 
 Separate `prologue reward completed`, `rescue available`, `forest entered` and `chapter endpoint reached`. Do not reuse one `finaleComplete` boolean for all of them. Enumerations exposed through JNI, captured state or saved data require deliberate migration, not ordinal renumbering.
 
-Campaign play uses the night continuation. Historical roof/dawn RT Lab controls may remain clearly labelled diagnostic/legacy controls, isolated from campaign progression. Retain RT Lab unlock access after the reward, preferably through pause; repeated finale polling must never replace the lab or a dialogue/menu surface. Update old ending/retry/checkpoint contracts explicitly while preserving historical evidence.
+Campaign play uses the night continuation. Treat roof/opening progress, reward ownership, rescue progress and environment state as separate contracts. Audit simulation state, frame adapters, shader dawn/aperture controls, mist/exposure and platform ending surfaces together; renaming a phase or hiding the ending card alone is insufficient. Historical roof/dawn RT Lab controls may remain clearly labelled diagnostic/legacy controls, isolated from campaign progression. Retain RT Lab unlock access after the reward, preferably through pause; repeated finale polling must never replace the lab or a dialogue/menu surface. Update old ending/retry/checkpoint contracts explicitly while preserving historical evidence.
 
 ## 6. Physical rope and traversal contract
 
@@ -288,9 +296,19 @@ Wind is gentle deformation of selected foliage/branches. Its RT geometry/bounds 
 
 Use one night environment definition for the dungeon opening, transition and forest: visible sky/miss environment, moon disk/direction, moon illumination and exposure. Sample the same environment for relevant reflected/transmitted paths. Separate image appearance from calibrated illumination when importing an LDR sky image; it does not become a physically calibrated HDR environment by relabelling it.
 
+The moon must be an actual direct-light source, using a shared directional emitter (with a finite angular disk where the chosen quality model supports it), aligned to the visible moon's world direction and angular extent. Calibrated radiance and real hardware-RT visibility/transmittance through roofs, the iron grid, trunks, foliage and characters determine illumination; define the outdoor shadow-ray reach from scene extent/residency rather than inheriting a short room-sized range. Use the same source for relevant surfaces, secondary paths and participating mist. A brighter moon painted into an LDR sky texture is not evidence of scene illumination, shadows or GI. Keep sky/environment radiance accounting explicit so the visible disk and sampled emitter do not double-count its energy.
+
 Image generation may supply a seamless sky reference or texture only after projection/seam/color checks. An analytic sky with restrained stars and moon is a valid starting implementation. Volumetric clouds, astronomy and time-of-day progression are not required. Do not paint one moon into the sky and light from a different direction.
 
 The forest must read as night, not daylight with a blue filter. Preserve dark depth, useful silhouettes and a clearly warm lantern. Use a stable exposure policy or bounded smooth adaptation with tests for pumping while raising the lantern or looking into the sky.
+
+### 8.2a Optional RTAO / RTGI investigation
+
+Research only; neither RTAO nor RTGI is required to ship 1.7, and neither is a promised implementation or phone capability. First inventory the accepted baseline's direct-light visibility, ambient floors, bounce/secondary-light approximations and any existing AO/GI. Decide which contribution a candidate replaces or extends. Do not multiply already shadowed direct light by an indiscriminate AO term, or layer duplicate indirect/ambient darkening or energy on top of the current path.
+
+Source inspection at planning head `bd8f9fd135ca78008174d98f2e6acb16486a1753` found `shadeOpaqueDirect` and `activeSkyLight` in `shaders/raytracing/include/rt_lighting.glsl`: shared RT shadow-transmittance queries, an ambient floor, bounded secondary-light helpers, a directional moon path with an 18-unit visibility distance, and a separate warm dawn-aperture path when the finale opens. `FinaleSequence.cpp` advances lantern claim through roof opening to `DawnRevealed`; `SimulationFrameAdapter.cpp` publishes roof/dawn controls, and `rt_atmosphere.glsl` uses dawn to fade lich mist. This is read-only source evidence on a planning branch, not a complete accepted-release lighting audit, a live render test, or proof that a production RTAO/RTGI feature already exists. Re-audit the actual accepted 1.6.2 implementation before design.
+
+Bound any later approved prototype to a small ray/distance/bounce budget and representative tomb, rescue and forest scenes. Test RTAO and RTGI independently before considering a combined mode. Compare fixed-baseline and candidate captures at identical build type, internal dimensions, exposure, scene, settings and device/driver. Inspect moving hands/Kit/foliage, lantern raises, disocclusion, noise, ghosting, light leaks and secondary glass/water views; temporal reconstruction requires valid motion/history rejection. Measure added GPU/CPU frame time where valid counters exist, memory, acceleration-structure work and sustained thermal/pacing cost on exact Android and Windows hardware. Set explicit acceptable cost/quality thresholds before admission; if gains do not justify measured cost, defer. An optional setting may ship only after capability checks, truthful UI and those gates. Missing phone evidence stays unknown: do not assume current phones cannot run it, or predict that a future generation will make it viable.
 
 ### 8.3 Actual participating mist
 
@@ -435,6 +453,8 @@ Mid-climb application termination still restores the lower safe checkpoint with 
 
 Re-audit the accepted baseline's session/retry and preferences code before choosing the adapter. Add only the persistence needed for this chapter, extending a verified campaign-save system if one exists. Use versioned, validated logical state and atomic replacement; a failed/interrupted write must not destroy the last valid record. Reject corrupt or unsupported newer saves gracefully with a clear recovery/other-slot choice and no silent overwrite. Define supported older-version migration and preserve a recoverable source until migration succeeds.
 
+Restore the authored night independently of reward/roof completion. Legacy dawn/finale fields must not re-enable daylight when loading a 1.7 save or supported migration; test lower rescue, grounded exit and later forest checkpoints.
+
 Store stable slot/checkpoint/zone IDs, safe player pose and recoverable health state, quest/prologue/forest progression, defeated encounters/reward claims, lantern and existing equipment ownership, Kit's narrative state, and relevant consumed dialogue/one-shot trigger flags as one consistent snapshot. Prevent duplicate rewards, lost equipment, resurrected tomb encounters or stale line/load callbacks on restore. Preserve existing inventory/equipment facts; this does not add the inventory/economy system excluded from 1.7. Runtime handles, renderer resources, transient attack inputs and OS audio state do not belong in saves.
 
 Keep settings (graphics, controls, audio, subtitles and accessibility) and the persistent RT Lab unlock separate from campaign slots. Loading, overwriting or starting a campaign must not reset those preferences. Android Home/resume should normally preserve and pause the current live session; process death uses durable recovery. Verify equivalent desktop exit/relaunch behaviour.
@@ -538,7 +558,7 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 **Consumes:** WP1 blockout/import route and WP2 ownership. **Produces:** A small representative forest test scene and an evidence-backed resource decision.
 
 - [ ] Assemble representative trees, the actual accepted lantern glass, one representative skinned actor and preliminary bounded fog/fireflies in the same camera view.
-- [ ] Add rendering checks for matching sky/moon direction, 3D tree silhouettes, nonzero-height lighting and cutout visibility if used.
+- [ ] Add rendering checks for matching sky/moon direction and actual emitter illumination, occluder-on/off shadow/transmittance checks at outdoor distances, 3D tree silhouettes, nonzero-height lighting and cutout visibility if used.
 - [ ] Profile combined resource/timing peaks and repeated zone resets on the phone and Windows. Record actual internals/preset/build/thermal context.
 - [ ] Settle residency, foliage representation and bounded atmosphere approach. Record sample/capacity changes with evidence rather than silently reducing the user's resolution.
 
@@ -548,7 +568,7 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 
 **Touches:** Spawn cave-in assets/collision, upper tomb geometry, `FinaleSequence`, campaign progress and platform ending/RT Lab routing.
 
-- [ ] Add failing progression tests: no rescue before lantern ownership; roof opens once; campaign night does not trigger the old ending overlay; RT Lab cannot steal or lose menu ownership.
+- [ ] Add failing progression tests: no rescue before lantern ownership; roof opens once; lich defeat, lantern claim, opening, exit and save restore retain night without a dawn-light/mist/exposure transition; campaign night does not trigger the old ending overlay; RT Lab cannot steal or lose menu ownership.
 - [ ] Build the real cave-in, traversable shaft/rim, credible lid motion and exterior tomb dressing in Blender, then import and validate.
 - [ ] Set the 1.7 initial player/camera orientation toward the collapsed entrance, paired with the waterfall-room skeleton relocation. Verify a fresh start/restart shows the blocked retreat first and the player can freely turn toward the forward route without a forced camera sequence or input lock.
 - [ ] Implement campaign continuation and shared night environment. Preserve historical diagnostic behavior behind explicit mode boundaries.
