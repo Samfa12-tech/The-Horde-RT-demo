@@ -346,6 +346,8 @@ Forest ambience includes quiet wind/foliage, distant animal/insect calls, rope m
 
 ## 9. Blender, Meshy and image-generation production workflow
 
+**Practical asset register:** [ASSET_PLAN_1_7.md](../../ASSET_PLAN_1_7.md) lists the reuse-first production inventory, verified Briarhold candidate paths, representative official Poly Haven sources, missing animation/UI/audio work, optional effects and admission/performance gates. Assess the masked Warden as Kit before generating a replacement; the older uncovered-face companion prompt and new-humanoid generation steps below apply only if a replacement is actually selected. Source candidates are not transferred, licensed for redistribution or runtime-validated by this plan. Keep the distant Bellwether shell separate from 1.8 interiors/cast and later campaign asset batches.
+
 ### 9.1 Who does what
 
 | Tool | Required appropriate use | Not an acceptable substitute |
