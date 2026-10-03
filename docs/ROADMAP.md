@@ -231,6 +231,12 @@ Review the combined candidate, not only successful isolated slices. Recheck affe
 
 The final record states what shipped, what was accepted or deferred, actual quality/performance limits and remaining validation gaps. Optional vendor adapters, detail normals and height experiments are not mandatory merely because they appear in this bank. No roadmap entry authorises signing, publication or moving to 1.7 before milestone acceptance.
 
+## 1.7 addition — Kit at the prologue grate
+
+**Owner direction, 3 October 2026:** Kit first calls down from the small skylight/grate after the skeleton encounter, as the player walks past, before the later rope rescue. Reuse the deeper shaft and hanging growth from report **3696c1a2-5fb3-4476-aaeb-456a130837d8**. The geometry remains in 1.6.2; this one-shot voice/trigger and its dialogue controls remain gated 1.7 work and do not expand the active 1.6.2 goal.
+
+Use directional world-space sound anchored above the grate, separate Dialogue/Music/SFX gains and a subtitle on/off option with readable top-safe-area placement on mobile. Preserve a silent player, movement/look, combat cue priority, intelligibility and safe checkpoint/re-entry behaviour. The owner's suggested line is provisional recording copy. [Scene, stable line ID and acceptance details](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#41a-kits-first-call-through-the-skylight).
+
 ## The hub-and-dungeon loop
 
 Proposed campaign structure:
