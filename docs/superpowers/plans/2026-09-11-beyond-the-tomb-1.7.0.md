@@ -208,6 +208,8 @@ Subtitles and temporary voice are valid development scaffolding, but **subtitles
 
 ### 7.3 Initial script and triggers
 
+**Whole-story authoring, 3 October 2026:** [CAMPAIGN_DIALOGUE_BANK.md](../../CAMPAIGN_DIALOGUE_BANK.md#4-opening-tomb-rescue-and-forest-17-focus) preserves these stable IDs and proposes tighter rescue/reunion wording plus sparse forest beats. Review those refinements before replacing the provisional defaults below; neither version is approved recording copy. The bank's later hub/dungeon/finale scenes do not expand 1.7, and first lantern speech is proposed for the later hub chapter. The silent raise event and trigger/infrastructure contracts here remain authoritative.
+
 These are provisional implementation script defaults, updated for the owner-approved silent protagonist. Kit provides conversational momentum without speaking the player's thoughts; leave room for quiet and player agency. Keep line IDs stable when the owner edits wording. Direction labels are not spoken.
 
 | Line ID | Speaker / delivery | Text | Trigger |
