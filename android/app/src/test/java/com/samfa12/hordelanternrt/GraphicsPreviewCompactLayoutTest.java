@@ -35,6 +35,17 @@ public final class GraphicsPreviewCompactLayoutTest {
     private static Object field(MainActivity activity, String name) throws Exception {
         Field field = MainActivity.class.getDeclaredField(name); field.setAccessible(true); return field.get(activity);
     }
+    private static void setField(MainActivity activity, String name, Object value) throws Exception {
+        Field field = MainActivity.class.getDeclaredField(name); field.setAccessible(true); field.set(activity,value);
+    }
+    private static final class TransitionButton extends Button {
+        int enabledTransitions;
+        TransitionButton(Context context) { super(context); }
+        @Override public void setEnabled(boolean enabled) {
+            if (isEnabled() != enabled) ++enabledTransitions;
+            super.setEnabled(enabled);
+        }
+    }
     private static void collect(View view, List<Button> buttons, List<HorizontalScrollView> rows) {
         if (view instanceof Button) buttons.add((Button)view);
         if (view instanceof HorizontalScrollView) rows.add((HorizontalScrollView)view);
@@ -124,6 +135,42 @@ public final class GraphicsPreviewCompactLayoutTest {
                 }
             } finally { activity.getResources().updateConfiguration(original,activity.getResources().getDisplayMetrics()); }
         }
+    }
+
+    @Test public void freshPreviewKeepDoesNotChurnEnabledStateAndRetainsAllReadinessGates() throws Exception {
+        MainActivity activity=Robolectric.buildActivity(MainActivity.class).get();
+        TransitionButton action=new TransitionButton(activity);
+        setField(activity,"graphicsApply",action); setField(activity,"graphicsConfirm",action);
+        setField(activity,"graphicsPreviewWanted",true);
+        Method update=MainActivity.class.getDeclaredMethod("updateGraphicsActionButtons",
+                boolean.class,int.class,boolean.class,boolean.class,boolean.class);
+        update.setAccessible(true);
+        action.setEnabled(true); action.enabledTransitions=0;
+        for(int poll=0;poll<12;++poll) update.invoke(activity,false,2,true,true,true);
+        assertTrue(action.isEnabled());
+        assertEquals("one shared current Keep must not disable/re-enable each poll",0,action.enabledTransitions);
+        update.invoke(activity,false,2,true,true,false); // Stale preview/presentation.
+        assertFalse(action.isEnabled()); assertEquals(1,action.enabledTransitions);
+        update.invoke(activity,false,2,true,false,true); // Current preview, wrong request ACK.
+        assertFalse(action.isEnabled()); assertEquals(1,action.enabledTransitions);
+        update.invoke(activity,false,2,true,true,true);
+        assertTrue(action.isEnabled()); assertEquals(2,action.enabledTransitions);
+        setField(activity,"graphicsLiveChoiceError","Choice failed");
+        update.invoke(activity,false,2,true,true,true); assertFalse(action.isEnabled());
+        setField(activity,"graphicsLiveChoiceError",null);
+        update.invoke(activity,false,1,true,true,true); assertFalse(action.isEnabled());
+        update.invoke(activity,false,4,true,true,true); assertFalse(action.isEnabled());
+        update.invoke(activity,false,0,false,true,true); assertTrue(action.isEnabled());
+
+        TransitionButton draft=new TransitionButton(activity);
+        setField(activity,"graphicsApply",draft); setField(activity,"graphicsPreviewWanted",false);
+        update.invoke(activity,false,0,false,false,false); // Draft surface not ready.
+        assertFalse(draft.isEnabled()); assertFalse(action.isEnabled());
+        update.invoke(activity,true,0,false,false,false); // Actual ready draft surface.
+        assertTrue(draft.isEnabled()); assertFalse(action.isEnabled());
+        update.invoke(activity,false,2,true,true,false); // Distinct ordinary Apply/Keep.
+        assertFalse(draft.isEnabled()); assertTrue(action.isEnabled());
+        update.invoke(activity,false,2,true,false,false); assertFalse(action.isEnabled());
     }
 
     @Test public void heightBudgetIncludesSafeAreaAndOversizeTextUsesNativeVerticalScrolling() {

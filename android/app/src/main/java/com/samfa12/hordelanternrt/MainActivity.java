@@ -2682,6 +2682,15 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void updateGraphicsActionButtons(boolean draftApplyReady, int state,
+            boolean busy, boolean ready, boolean previewReady) {
+        // Preview shares one Apply/Keep button. Give it only its final decision,
+        // rather than disabling and reenabling an acknowledged Keep each poll.
+        if (graphicsApply != graphicsConfirm) graphicsApply.setEnabled(draftApplyReady);
+        graphicsConfirm.setEnabled(graphicsPreviewWanted ? previewReady && graphicsLiveChoiceError == null &&
+                ((state == 2 && ready) || !busy) : state == 2 && ready);
+    }
+
     private final Runnable refreshGraphics = new Runnable() {
         @Override public void run() {
             if (!graphicsVisible && !graphicsRecovering && !graphicsSceneRestoring) return;
@@ -2735,10 +2744,11 @@ public class MainActivity extends Activity {
                     }
                     showGraphicsPage();
                 }
-                graphicsApply.setEnabled(!busy && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1);
                 final boolean previewReady = graphicsPreviewWanted && GraphicsPreviewOptions.presented(a,
                         surfaceRequestGeneration, graphicsRequestSerial, previewSelection());
-                graphicsConfirm.setEnabled(graphicsPreviewWanted ? previewReady && graphicsLiveChoiceError == null && ((state == 2 && ready) || !busy) : state == 2 && ready);
+                final boolean draftApplyReady = graphicsApply != graphicsConfirm && !busy &&
+                        ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
+                updateGraphicsActionButtons(draftApplyReady, state, busy, ready, previewReady);
                 if (graphicsPreviewWanted) {
                     for (int choice = 0; choice < graphicsOptionButtons.length; ++choice) {
                         final Button option = graphicsOptionButtons[choice];
