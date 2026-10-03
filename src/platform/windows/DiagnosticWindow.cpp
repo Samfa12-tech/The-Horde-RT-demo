@@ -456,6 +456,11 @@ struct VulkanSurfaceContext
     horde::gameplay::EnemyKind debugEnemyOverride = horde::gameplay::EnemyKind::None;
     uint32_t debugValidationPoint = 0u;
     horde::gameplay::ShowcaseBenchmarkRun benchmark;
+    horde::vulkan::raytracing::RtWorkloadPreset benchmarkRequestedRtPreset =
+        horde::vulkan::raytracing::RtWorkloadPreset::Authored;
+    horde::vulkan::raytracing::RtWorkloadPreset benchmarkEffectiveRtPresetAtStart =
+        horde::vulkan::raytracing::RtWorkloadPreset::Authored;
+    std::string benchmarkCompiledQualityAtStart;
     horde::telemetry::RtBenchmarkEvidenceRun benchmarkEvidence;
     std::optional<std::size_t> expectedBenchmarkFrame;
     std::string benchmarkReport;
@@ -2491,9 +2496,17 @@ void UpdateBenchmarkHud(VulkanSurfaceContext& context)
 void StartBenchmark(VulkanSurfaceContext& context,
                     const horde::gameplay::BenchmarkWorkload workload =
                         horde::gameplay::BenchmarkWorkload::ShowcaseRoute,
-                    const bool showLiveFps = true)
+                    const bool showLiveFps = true,
+                    const horde::vulkan::raytracing::RtWorkloadPreset rtWorkloadPreset =
+                        horde::vulkan::raytracing::RtWorkloadPreset::Authored)
 {
     ResetRoute(context);
+    // Route resets restore authored tuning; apply only the explicit existing
+    // preset afterwards, including the unattended Release path.
+    context.benchmarkRequestedRtPreset = rtWorkloadPreset;
+    context.rtSceneTuning.workloadPreset = rtWorkloadPreset;
+    context.benchmarkEffectiveRtPresetAtStart = context.rtSceneTuning.workloadPreset;
+    context.benchmarkCompiledQualityAtStart = context.rtScene.SelectedDielectricQualityName();
     context.benchmark.Start(horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps, workload, showLiveFps);
     (void)context.benchmarkEvidence.Start(
         horde::gameplay::ShowcaseBenchmarkRun::kMaximumFramesPerLap);
@@ -2580,6 +2593,13 @@ void CompleteBenchmark(VulkanSurfaceContext& context,
         BuildBenchmarkMetadata(context, capabilities);
     context.benchmarkReport = context.benchmark.BuildTextReport(metadata, &context.benchmarkEvidence);
     context.benchmarkJsonReport = context.benchmark.BuildJsonReport(metadata, &context.benchmarkEvidence);
+    const auto tuningJson = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        context.benchmarkRequestedRtPreset, context.benchmarkEffectiveRtPresetAtStart,
+        context.rtSceneTuning.workloadPreset, context.benchmarkCompiledQualityAtStart,
+        context.rtScene.SelectedDielectricQualityName());
+    context.benchmarkReport += "\nWindows RT workload policy: " + tuningJson + "\n";
+    if (const auto closingBrace = context.benchmarkJsonReport.rfind('}'); closingBrace != std::string::npos)
+        context.benchmarkJsonReport.insert(closingBrace, ",\n  \"windowsBenchmarkTuning\": " + tuningJson + "\n");
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.benchmarkJsonReport = horde::vulkan::raytracing::experimental::AttachStagedPrimaryProfile(
         std::move(context.benchmarkJsonReport),
@@ -3470,12 +3490,21 @@ void UpdateDesktopSceneControls(
 
     if (context.benchmark.IsRunning())
     {
+        if (context.rtSceneTuning.workloadPreset != context.benchmarkRequestedRtPreset ||
+            context.rtScene.SelectedDielectricQualityName() != context.benchmarkCompiledQualityAtStart)
+        {
+            LogBenchmarkCancellation(context, "rt-workload-policy-changed");
+            context.benchmark.Cancel();
+            context.benchmarkEvidence.Cancel();
+            return;
+        }
         context.frameDeltaSeconds = 1.0f / 60.0f;
         ClearDesktopInput(context);
         const horde::gameplay::ShowcaseBenchmarkAdvance advance = context.benchmark.Advance();
         if (advance.lapStarted)
         {
             ResetRoute(context, true);
+            context.rtSceneTuning.workloadPreset = context.benchmarkRequestedRtPreset;
             if (context.benchmark.CurrentLap() == context.benchmark.TotalLaps() &&
                 context.rtFrameEvidenceInitialised)
             {
@@ -5581,6 +5610,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const bool requireRayQueryCompute,
                                  const bool unattendedBenchmark,
                                  const horde::gameplay::BenchmarkWorkload benchmarkWorkload,
+                                 const horde::vulkan::raytracing::RtWorkloadPreset benchmarkRtWorkloadPreset,
                                  const bool anatomicalPlayerMount,
                                  const bool graphicsPreviewCapture,
                                  const bool outputResizeValidation)
@@ -5795,7 +5825,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             DestroyRenderContext(context);
             return 1;
         }
-        StartBenchmark(context, benchmarkWorkload, false); // Unattended evidence has no FPS observer.
+        StartBenchmark(context, benchmarkWorkload, false, benchmarkRtWorkloadPreset); // No FPS observer.
     }
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
     MSG message{};
@@ -7736,6 +7766,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const bool requireRayQueryCompute,
                         const bool unattendedBenchmark,
                         const horde::gameplay::BenchmarkWorkload benchmarkWorkload,
+                        const horde::vulkan::raytracing::RtWorkloadPreset benchmarkRtWorkloadPreset,
                         const bool anatomicalPlayerMount,
                         const bool graphicsPreviewCapture,
                         const bool outputResizeValidation)
@@ -8036,6 +8067,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     const int result = RunDiagnosticSwapchainWindow(
         hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
         developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark, benchmarkWorkload,
+        benchmarkRtWorkloadPreset,
         anatomicalPlayerMount, graphicsPreviewCapture, outputResizeValidation);
     if ((captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
@@ -8134,6 +8166,7 @@ int RunDiagnosticWindow(const int showCommand)
                                captureDirectory, developmentCheckpoint, launchOptions.portrait,
                                launchOptions.requireRayQueryCompute,
                                launchOptions.benchmark.requested, launchOptions.benchmark.workload,
+                               launchOptions.benchmark.rtWorkloadPreset,
                                launchOptions.anatomicalPlayerMount, launchOptions.graphicsPreview, launchOptions.outputResizeValidation);
 }
 

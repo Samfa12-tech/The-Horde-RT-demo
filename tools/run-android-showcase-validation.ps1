@@ -6,6 +6,7 @@ param(
     [string[]]$Checkpoints = @("opening", "two-enemy-combat", "worst-bend", "skylight", "green", "lich"),
     [ValidateSet("Enabled", "Disabled")]
     [string]$GpuTiming = "Enabled",
+    [switch]$RequireRayQueryCompute,
     [switch]$Include100,
     [switch]$Capture,
     [string[]]$CaptureSelection = @(),
@@ -42,6 +43,9 @@ $validationTarget = Resolve-AndroidShowcaseValidationTarget -StagedPrimary ([boo
     -ViewmodelDirectory $ViewmodelCandidateDirectory -AnatomicalMount ([bool]$AnatomicalPlayerMount)
 $packageName = $validationTarget.package
 $activityName = "$packageName/com.samfa12.hordelanternrt.MainActivity"
+if ($RequireRayQueryCompute -and $StagedPrimaryInvestigation) {
+    throw 'Required Compute cannot use the separate Pipeline-only staged-primary investigation.'
+}
 $adb = Join-Path $env:LOCALAPPDATA "Android\Sdk\platform-tools\adb.exe"
 $runId = (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '-' + [Guid]::NewGuid().ToString('N').Substring(0,8)
 $outputDirectory = [IO.Path]::GetFullPath((Join-Path $OutputRoot "run-$runId"))
@@ -163,6 +167,12 @@ $failures = [System.Collections.Generic.List[string]]::new()
 $warnings = [System.Collections.Generic.List[string]]::new()
 $selectedRtPipelineBundle = $null
 $selectedRtPipelineBundleSerialized = $null
+$requestedExecutionBackend = if ($RequireRayQueryCompute) { 'RayQueryCompute' } else { 'RayTracingPipeline' }
+$backendSelectionEvidence = [ordered]@{
+    requested = $requestedExecutionBackend; effective = $null; status = 'Pending'
+    requireRayQueryCompute = [bool]$RequireRayQueryCompute; currentUser = $null
+    observations = [Collections.Generic.List[object]]::new()
+}
 $initialWakefulness = ""
 $automationSessionStarted = $false
 $lifecycleEvidence = [ordered]@{
@@ -236,6 +246,11 @@ function Wait-ForLogPattern {
     $deadline = [DateTime]::UtcNow.AddSeconds($TimeoutSeconds)
     do {
         $log = Get-ScopedLogcat
+        if ($RequireRayQueryCompute -and $log -match 'Required hardware RayQuery compute backend is unavailable') {
+            $script:backendSelectionEvidence.status = 'Rejected'
+            Get-ShowcaseCapability -Destination (Join-Path $outputDirectory 'backend-rejected-capability.json') | Out-Null
+            throw 'Required hardware Compute is unavailable; no fallback evidence is accepted.'
+        }
         if ($log -match $Pattern) { return $log }
         Start-Sleep -Milliseconds 750
     } while ([DateTime]::UtcNow -lt $deadline)
@@ -301,8 +316,72 @@ function Get-ShowcaseState {
     } catch {
         throw "Native showcase state is not valid JSON: $Destination`n$($_.Exception.Message)"
     }
+    Register-ShowcaseBackendEvidence -Backend $state.executionBackend -Presented $state.presented `
+        -Bundle $state.selectedRtPipelineBundle -Context $Destination
     Register-SelectedRtPipelineBundle -Bundle $state.selectedRtPipelineBundle -Context $Destination
     return $state
+}
+
+function Get-ShowcaseBackendIntentArguments {
+    param([bool]$RequireCompute)
+    if ($RequireCompute) { return @('--user', '0', '--ez', 'horde_require_rayquery_compute', 'true') }
+    return @() # Preserve the ordinary Pipeline launch arguments.
+}
+
+function Assert-ShowcaseComputeUserZero {
+    param([bool]$RequireCompute, [string]$CurrentUser)
+    if ($RequireCompute -and $CurrentUser.Trim() -cne '0') {
+        throw 'Required Compute validation is scoped to verified current Android user 0.'
+    }
+}
+
+function Get-ShowcaseInstallArguments {
+    param([bool]$RequireCompute, [string]$LocalApk)
+    $arguments = @('install')
+    if ($RequireCompute) { $arguments += @('--user','0') }
+    return $arguments + @('-r','-t',$LocalApk)
+}
+
+function Assert-ShowcaseExecutionBackend {
+    param([string]$ExpectedBackend, [string]$Backend, $Presented, $Bundle = $null)
+    if ($ExpectedBackend -cnotin @('RayTracingPipeline','RayQueryCompute') -or
+        $Backend -cne $ExpectedBackend -or $Presented -isnot [bool] -or -not $Presented) {
+        throw "Requested backend '$ExpectedBackend' was not actually RT-presented (reported '$Backend', presented '$Presented')."
+    }
+    if ($null -ne $Bundle) {
+        foreach ($strategy in @('opaqueFast','genericDielectric')) {
+            $key = [string]$Bundle.$strategy.key
+            if ([string]::IsNullOrWhiteSpace($key) -or
+                ($key.StartsWith('rayquery_compute_', [StringComparison]::Ordinal) -ne ($Backend -ceq 'RayQueryCompute'))) {
+                throw 'Selected shader pair does not agree with the actual execution backend.'
+            }
+        }
+    }
+}
+
+function Register-ShowcaseBackendEvidence {
+    param([string]$Backend, $Presented, $Bundle = $null, [string]$Context)
+    $script:backendSelectionEvidence.effective = if ($Backend) { $Backend } else { $null }
+    try {
+        Assert-ShowcaseExecutionBackend -ExpectedBackend $requestedExecutionBackend -Backend $Backend -Presented $Presented -Bundle $Bundle
+        $script:backendSelectionEvidence.status = 'Accepted'
+    } catch {
+        $script:backendSelectionEvidence.status = 'Rejected'
+        throw
+    } finally {
+        $script:backendSelectionEvidence.observations.Add([pscustomobject]@{
+            context = [IO.Path]::GetFileName($Context); executionBackend = $Backend
+            presented = $Presented; status = $script:backendSelectionEvidence.status
+        })
+    }
+}
+
+function Get-ShowcaseCapability {
+    param([string]$Destination)
+    Save-PrivateFile -RemotePath 'files/reports/vulkan_capability_report.json' -Destination $Destination
+    $capability = Get-Content -LiteralPath $Destination -Raw | ConvertFrom-Json
+    Register-ShowcaseBackendEvidence -Backend $capability.executionBackend -Presented $capability.rtScene.presented -Context $Destination
+    return $capability
 }
 
 function Register-SelectedRtPipelineBundle {
@@ -365,6 +444,7 @@ function Send-AutomationIntent {
                    "--ez", "horde.debug.autostart", "true",
                    "--ez", "horde.debug.overlay", "false",
                    "--ez", "horde.debug.gpu_timing", $gpuTimingArgument)
+    $arguments += @(Get-ShowcaseBackendIntentArguments -RequireCompute ([bool]$RequireRayQueryCompute))
     if ($RtWorkload -ge 0) {
         $arguments += @("--ez", "horde.debug.rt_lab", "true",
                         "--ei", "horde.debug.rt_workload", "$RtWorkload")
@@ -476,6 +556,8 @@ function Invoke-CaptureCheckpoint {
         buildIdentity = $state.buildIdentity
         shaderIdentity = $state.shaderIdentity
         selectedRtPipelineBundle = $state.selectedRtPipelineBundle
+        requestedExecutionBackend = $requestedExecutionBackend
+        effectiveExecutionBackend = $state.executionBackend
         outputRedBlueSwap = [bool]$state.outputRedBlueSwap
         animationTime = $state.animationTime
         playerCombat = $state.playerCombat
@@ -504,7 +586,8 @@ function Invoke-HomeResumeLifecycleCheck {
     $presentationCountBefore = [regex]::Matches($beforeLog, $presentationPattern).Count
     Invoke-AdbText @("shell", "input", "keyevent", "3") | Out-Null
     Start-Sleep -Milliseconds 1200
-    Invoke-AdbText @("shell", "am", "start", "--activity-single-top", "-n", $activityName) | Out-Null
+    Invoke-AdbText (@("shell", "am", "start", "--activity-single-top", "-n", $activityName) +
+        @(Get-ShowcaseBackendIntentArguments -RequireCompute ([bool]$RequireRayQueryCompute))) | Out-Null
     $deadline = [DateTime]::UtcNow.AddSeconds($TimeoutSeconds)
     do {
         $resumeLog = Get-ScopedLogcat
@@ -514,6 +597,9 @@ function Invoke-HomeResumeLifecycleCheck {
     if ([regex]::Matches($resumeLog, $presentationPattern).Count -le $presentationCountBefore) {
         throw "Timed out waiting for honest RT presentation after Home/resume."
     }
+    $resumeCapability = Get-ShowcaseCapability -Destination (Join-Path $outputDirectory 'lifecycle-home-resume-capability.json')
+    $lifecycleEvidence.requestedExecutionBackend = $requestedExecutionBackend
+    $lifecycleEvidence.effectiveExecutionBackend = $resumeCapability.executionBackend
     $lifecycleEvidence.homeResumePassed = $true
     $lifecycleEvidence.honestPresentationAfterResume = $true
     $lifecycleEvidence.log = "lifecycle-home-resume-logcat.txt"
@@ -523,10 +609,11 @@ function Invoke-HomeResumeLifecycleCheck {
 function Start-AutomationSession {
     param([int]$RequestedScale)
     Start-ScopedLogWindow
-    Invoke-AdbText @("shell", "am", "start", "-n", $activityName,
+    Invoke-AdbText (@("shell", "am", "start", "-n", $activityName,
                      "--ei", "horde.debug.scale", "$RequestedScale",
                      "--ez", "horde.debug.autostart", "true",
-                     "--ez", "horde.debug.gpu_timing", $gpuTimingArgument) | Out-Null
+                     "--ez", "horde.debug.gpu_timing", $gpuTimingArgument) +
+        @(Get-ShowcaseBackendIntentArguments -RequireCompute ([bool]$RequireRayQueryCompute))) | Out-Null
 }
 
 function Invoke-CheckpointBenchmark {
@@ -600,6 +687,8 @@ function Invoke-CheckpointBenchmark {
         "$RtLabProfile-$Checkpoint-$RequestedScale-state.json"
     })
     $state = Get-ShowcaseState -Destination (Join-Path $outputDirectory $stateName)
+    $row | Add-Member -NotePropertyName requested_execution_backend -NotePropertyValue $requestedExecutionBackend
+    $row | Add-Member -NotePropertyName effective_execution_backend -NotePropertyValue $state.executionBackend
     if ($state.status -ne "complete") { $failures.Add("$Checkpoint native state status was '$($state.status)'.") }
     if ($state.checkpoint -ne $Checkpoint) { $failures.Add("$Checkpoint native state identified '$($state.checkpoint)'.") }
     if ($state.zone -ne $checkpointZones[$Checkpoint]) { $failures.Add("$Checkpoint native state reported zone '$($state.zone)'.") }
@@ -666,6 +755,11 @@ try {
         throw "Approved serial $DeviceSerial reported model '$($deviceModel.Trim())'; expected $ExpectedDeviceModel."
     }
     $androidVersion = Invoke-AdbText @("shell", "getprop", "ro.build.version.release")
+    if ($RequireRayQueryCompute) {
+        $currentUser = (Invoke-AdbText @('shell','am','get-current-user')).Trim()
+        Assert-ShowcaseComputeUserZero -RequireCompute $true -CurrentUser $currentUser
+        $backendSelectionEvidence.currentUser = 0
+    }
     $apiLevel = Invoke-AdbText @("shell", "getprop", "ro.build.version.sdk")
     $osBuildFingerprint = Invoke-AdbText @("shell", "getprop", "ro.build.fingerprint")
     $displaySize = Invoke-AdbText @("shell", "wm", "size")
@@ -710,7 +804,10 @@ try {
     # This runner targets the verified Debug package only. ABI-targeted Gradle
     # builds can be testOnly; explicitly allow that developer artifact, while
     # retaining app data and the pre-install package/hash checks.
-    if (-not $SkipInstall) { Invoke-AdbText @("install", "-r", "-t", $apk) | Set-Content -LiteralPath (Join-Path $outputDirectory "install.txt") }
+    if (-not $SkipInstall) {
+        Invoke-AdbText (Get-ShowcaseInstallArguments -RequireCompute ([bool]$RequireRayQueryCompute) -LocalApk $apk) |
+            Set-Content -LiteralPath (Join-Path $outputDirectory 'install.txt')
+    }
     $installedApkHash = Get-InstalledApkSha256
     if ($installedApkHash -ne $apkHash) {
         throw "Installed base APK SHA-256 $installedApkHash does not match local debug APK $apkHash."
@@ -721,6 +818,7 @@ try {
     Start-ScopedLogWindow -NewRun
     Start-AutomationSession -RequestedScale $Scale
     $startupLog = Wait-ForLogPattern -Pattern "RT frame reached Android swapchain presentation" -Description "honest RT presentation"
+    Get-ShowcaseCapability -Destination (Join-Path $outputDirectory 'startup-capability.json') | Out-Null
     if ($startupLog -notmatch "HORDE_GPU_TIMING mode=$gpuTimingLabel rt_rendering=unchanged") {
         throw "Renderer did not report the requested GPU timing mode '$gpuTimingLabel'."
     }
@@ -767,7 +865,7 @@ try {
         }
         Invoke-HomeResumeLifecycleCheck
         $captureManifest = [ordered]@{
-            schema = 2
+            schema = 3
             runId = $runId
             captureMode = "debug-only deterministic checkpoint intent plus ADB screencap"
             scale = $Scale
@@ -789,6 +887,7 @@ try {
             privateEvidence = $true
             expectedShowcaseInstanceCapacity = $expectedShowcaseInstanceCapacity
             selectedRtPipelineBundle = $script:selectedRtPipelineBundle
+            backendSelection = $backendSelectionEvidence
             checkpointCount = $captureRecords.Count
             checkpoints = @($captureRecords)
             lifecycle = $lifecycleEvidence
@@ -834,14 +933,14 @@ try {
 
     Save-PrivateFile -RemotePath "files/reports/vulkan_capability_report.txt" -Destination (Join-Path $outputDirectory "vulkan_capability_report.txt")
     $capabilityPath = Join-Path $outputDirectory "vulkan_capability_report.json"
-    Save-PrivateFile -RemotePath "files/reports/vulkan_capability_report.json" -Destination $capabilityPath
-    $capability = Get-Content -LiteralPath $capabilityPath -Raw | ConvertFrom-Json
+    $capability = Get-ShowcaseCapability -Destination $capabilityPath
+    $backendSelectionEvidence | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $outputDirectory 'backend-selection.json') -Encoding utf8
     Invoke-AdbText @("shell", "dumpsys", "package", $packageName) -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "package-after-install.txt") -Encoding utf8
     Invoke-AdbText @("shell", "dumpsys", "thermalservice") -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "thermal-after.txt") -Encoding utf8
     Invoke-AdbText @("shell", "dumpsys", "battery") -AllowFailure | Set-Content -LiteralPath (Join-Path $outputDirectory "battery-after.txt") -Encoding utf8
     $timingRows | Export-Csv -LiteralPath (Join-Path $outputDirectory "timing.csv") -NoTypeInformation
     $metadata = [ordered]@{
-        schema = 8
+        schema = 9
         privateEvidence = $true
         evidenceScope = 'Actual validation app PID(s), selected tags, precise device-time run lower bound; raw display screenshots require private owner review.'
         logDeviceTimeStart = $runLogStart
@@ -875,6 +974,7 @@ try {
         runnerSourceCommit = $runnerSourceCommit
         artifactSourceRootExplicit = [bool]$ArtifactSourceRoot
         selectedRtPipelineBundle = $script:selectedRtPipelineBundle
+        backendSelection = $backendSelectionEvidence
         captureRequested = [bool]$Capture
         captureCheckpointCount = $captureRecords.Count
         captureManifest = $(if ($Capture) { "capture-manifest.json" } else { $null })
@@ -904,6 +1004,7 @@ try {
         "# Android showcase automation run $runId"
         ""
         "- Mode: $Mode"
+        "- Execution backend: requested $requestedExecutionBackend, effective $($backendSelectionEvidence.effective), selection $($backendSelectionEvidence.status)"
         "- Device: $deviceModel (Android $androidVersion / API $apiLevel)"
         "- Debug APK SHA-256: ``$apkHash``"
         "- Installed base APK SHA-256: ``$installedApkHash`` (exact match)"
@@ -925,6 +1026,11 @@ try {
 
     if ($failures.Count) { throw "Validation failed: $($failures -join ' ')" }
     Write-Host "Android showcase validation passed: $outputDirectory"
+} catch {
+    if ($backendSelectionEvidence.status -ceq 'Pending') { $backendSelectionEvidence.status = 'NotVerified' }
+    $backendSelectionEvidence.failureReason = $_.Exception.Message
+    $backendSelectionEvidence | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $outputDirectory 'backend-selection.json') -Encoding utf8
+    throw
 } finally {
     if ($automationSessionStarted) {
         try { Invoke-AdbText @("shell", "am", "force-stop", $packageName) -AllowFailure | Out-Null } catch {}

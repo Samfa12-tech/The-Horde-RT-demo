@@ -18,6 +18,9 @@ int main()
     const std::array<std::wstring_view, 0> ordinary{};
     const auto absent = ParseWindowsBenchmarkLaunch(ordinary);
     check(!absent.requested && absent.error.empty(), "ordinary launch must remain interactive");
+    using horde::vulkan::raytracing::RtWorkloadPreset;
+    check(absent.rtWorkloadPreset == RtWorkloadPreset::Authored,
+          "ordinary launches keep the authored preset");
     const std::array<std::wstring_view, 3> benchmark{
         L"--benchmark-showcase", L"C:\\reports\\Horde α", L"--require-rayquery-compute"};
     const auto selected = ParseWindowsBenchmarkLaunch(benchmark);
@@ -65,5 +68,67 @@ int main()
     check(!ParseWindowsBenchmarkLaunch(unknownWorkload).error.empty(), "unknown workload must not silently run the route");
     const std::array<std::wstring_view, 6> duplicateWorkload{L"--benchmark-showcase", L"reports", L"--benchmark-workload", L"lantern-held-high-v1", L"--benchmark-workload", L"lantern-held-low-v1"};
     check(!ParseWindowsBenchmarkLaunch(duplicateWorkload).error.empty(), "duplicate workloads must fail");
+    for (const auto value : {L"authored", L"max"})
+    {
+        const std::array<std::wstring_view, 4> args{
+            L"--benchmark-rt-workload", value, L"--benchmark-showcase", L"reports"};
+        const auto launch = ParseWindowsBenchmarkLaunch(args);
+        check(launch.requested && launch.error.empty() &&
+                  launch.rtWorkloadPreset == (std::wstring_view(value) == L"max" ? RtWorkloadPreset::Max : RtWorkloadPreset::Authored) &&
+                  launch.workload == horde::gameplay::BenchmarkWorkload::ShowcaseRoute,
+              "explicit existing RT preset works before the launch flag without changing the gameplay workload");
+    }
+    const std::array<std::wstring_view, 6> selectedLantern{
+        L"--benchmark-showcase", L"reports", L"--benchmark-workload", L"lantern-held-high-v1", L"--benchmark-rt-workload", L"max"};
+    check(ParseWindowsBenchmarkLaunch(selectedLantern).error.empty() &&
+              ParseWindowsBenchmarkLaunch(selectedLantern).rtWorkloadPreset == RtWorkloadPreset::Max &&
+              ParseWindowsBenchmarkLaunch(selectedLantern).workload == horde::gameplay::BenchmarkWorkload::LanternHeldHigh,
+          "RT preset and versioned gameplay workload are independent selectors");
+    const std::array<std::wstring_view, 2> orphanRt{L"--benchmark-rt-workload", L"max"};
+    check(!ParseWindowsBenchmarkLaunch(orphanRt).error.empty(), "RT selector cannot silently alter an ordinary launch");
+    const std::array<std::wstring_view, 3> missingRt{L"--benchmark-showcase", L"reports", L"--benchmark-rt-workload"};
+    check(!ParseWindowsBenchmarkLaunch(missingRt).error.empty(), "missing RT selector value fails");
+    for (const auto value : {L"", L"lean", L"MAX", L"high", L"--require-rayquery-compute"})
+    {
+        const std::array<std::wstring_view, 4> args{L"--benchmark-showcase", L"reports", L"--benchmark-rt-workload", value};
+        check(!ParseWindowsBenchmarkLaunch(args).error.empty(), "unknown RT selector never silently runs authored");
+    }
+    const std::array<std::wstring_view, 6> duplicateRt{
+        L"--benchmark-showcase", L"reports", L"--benchmark-rt-workload", L"max", L"--benchmark-rt-workload", L"max"};
+    check(!ParseWindowsBenchmarkLaunch(duplicateRt).error.empty(), "even repeated identical RT selector values are ambiguous");
+    for (const auto conflicting : {L"--debug-rt-lab", L"--rt-lab-workload", L"--capture-graphics-preview", L"--validate-output-resize"})
+    {
+        const std::array<std::wstring_view, 4> args{L"--benchmark-showcase", L"reports", conflicting, L"max"};
+        check(!ParseWindowsBenchmarkLaunch(args).error.empty(), "normal benchmark rejects diagnostic/preview/resize injection");
+    }
+    const auto highMax = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Max, RtWorkloadPreset::Max, RtWorkloadPreset::Max, "High", "High");
+    check(highMax.find("\"policyStable\":true") != std::string::npos &&
+              highMax.find("\"primaryAreaShadowSamplesPerContributingReceiver\":4") != std::string::npos &&
+              highMax.find("contributing-primary-local-and-fire-area-lights") != std::string::npos &&
+              highMax.find("\"primarySkyVisibilitySamples\":2") != std::string::npos &&
+              highMax.find("whole-rt-workload-preset-not-isolated-shadow-cost") != std::string::npos &&
+              highMax.find("compiled-physical-policy-not-dynamic-query-counts") != std::string::npos,
+          "High Max evidence states physical four-sample policy and honest whole-preset cost");
+    const auto mobileMax = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Max, RtWorkloadPreset::Max, RtWorkloadPreset::Max, "Mobile", "Mobile");
+    check(mobileMax.find("\"primaryAreaShadowSamplesPerContributingReceiver\":2") != std::string::npos,
+          "Mobile Max remains its separate two-sample policy");
+    const auto authored = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "High", "High");
+    check(authored.find("\"primaryAreaShadowSamplesPerContributingReceiver\":1") != std::string::npos &&
+              authored.find("\"policyStable\":true") != std::string::npos,
+          "default Authored reports its unchanged one-sample primary policy");
+    const auto changedPreset = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Max, RtWorkloadPreset::Max, RtWorkloadPreset::Authored, "High", "High");
+    const auto changedQuality = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Max, RtWorkloadPreset::Max, RtWorkloadPreset::Max, "High", "Mobile");
+    const auto unavailable = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Max, RtWorkloadPreset::Max, RtWorkloadPreset::Max, "", "");
+    check(changedPreset.find("\"policyStable\":false") != std::string::npos &&
+              changedQuality.find("\"policyStable\":false") != std::string::npos &&
+              unavailable.find("\"policyStable\":false") != std::string::npos &&
+              unavailable.find("\"primaryAreaShadowSamplesPerContributingReceiver\":0") != std::string::npos,
+          "changed or unavailable actual shader policy never appears stable");
     return passed ? 0 : 1;
 }
