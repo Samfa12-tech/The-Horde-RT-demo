@@ -387,7 +387,7 @@ Required adjustable presentation: UI scale or compact/comfortable layout, HUD op
 
 ### 10.3 Menu coverage and accessibility
 
-Refresh entry/main, pause, settings, controls/help, death/retry, optional chapter-end, credits and RT Lab framing. Keep diagnostics/benchmark/share/update functionality available and truthful, even if their dense technical text remains minimally decorated. Preserve `More by Samfa12`, explicit update behavior, quit/back and error/unsupported screens. OS file pickers and other system-owned dialogs remain native.
+Refresh entry/main, pause, settings, controls/help, death/retry, optional chapter-end, credits and RT Lab framing. Include New Game, Save Game, Load Game and the proposed three-slot picker with occupied-slot confirmation and clear checkpoint-resume wording (Section 12). Keep diagnostics/benchmark/share/update functionality available and truthful, even if their dense technical text remains minimally decorated. Preserve `More by Samfa12`, explicit update behavior, quit/back and error/unsupported screens. OS file pickers and other system-owned dialogs remain native.
 
 Settings must expose separate **Music**, **SFX/Ambience** and **Dialogue** volume controls, plus existing graphics/render-scale and control settings. Reuse any final 1.6.1 music implementation instead of installing a second audio engine. Retain Android Back and desktop Escape/controller navigation, visible focus, slider semantics, scrolling and persistence. Confirm sliders change actual runtime gain/value rather than just the drawn thumb.
 
@@ -415,11 +415,29 @@ Every work package records `Audio/haptic manual revalidation required: YES/NO` w
 
 ## 12. Save, replay and recovery
 
-Add only the persistence required by this chapter. Use versioned, validated campaign state and atomic replacement, or extend the accepted baseline's save system if one exists. Preserve existing settings and do not confuse the persistent RT Lab-unlocked preference with complete campaign progress.
+**Owner request, 3 October 2026:** 1.7 needs player-facing Save/Load and a checkpoint respawn gate when leaving the tomb. **Three slots is the proposed default** (the owner said “probably 3”), not a final arbitrary-save policy or a requirement for cloud sync.
 
-Required durable checkpoints: safely in the reward room with the lantern claimed and rescue available; safely at the summit; and the forest endpoint. Save logical state/IDs, not raw Vulkan resources or OS audio handles. Retain health, lantern ownership and relevant dialogue flags. Do not serialize a fragile instantaneous rope configuration as the only recovery path.
+### 12.1 Save/Load and slot behaviour
 
-At a mid-climb termination, restart at the lower safe checkpoint with the lantern retained and a redeployed usable rope. At summit/endpoint restore, do not replay completed lines or re-award the lantern. Android Home/resume should normally preserve the current live state and pause correctly; process death uses durable checkpoints. Corrupt/newer saves produce a clear safe recovery choice without overwriting the only recoverable copy blindly.
+Provide **New Game**, **Save Game** and **Load Game** through the appropriate entry/pause menus on Android and Windows. Show three independent local campaign slots, with empty/occupied/unavailable state and a compact summary such as checkpoint/area and last-saved time. Load must restore the selected slot, not whichever campaign last ran. New Game starts a fresh campaign in a selected slot; it is not the same action as loading or retrying. Confirm before replacing an occupied slot, including New Game over existing progress; Cancel changes nothing. Loading from a live session must make loss of unsaved progress clear.
+
+Keep two concepts explicit: a **manual save** is a player request to store progress in a chosen slot; an **automatic checkpoint** is an authored safe recovery boundary used for death/retry and interruption. Proposed bounded default: each selected campaign slot owns its latest automatic recovery checkpoint; Save Game stores that safe checkpoint and clearly names the resume location. Automatic updates affect only the active campaign slot, never another slot. A deliberate load of an older save may revisit earlier progress; ordinary death after the tomb-exit gate must not do so. Whether manual saves later permit arbitrary safe-position snapshots, and whether manual snapshots need separate retention from autosaves, remains a design decision to settle before implementation. Do not promise exact-position saving during combat, dialogue or climbing.
+
+### 12.2 Tomb-exit checkpoint and death recovery
+
+Required durable boundaries remain: safely in the reward room with the lantern claimed and rescue available; the **tomb-exit/summit gate**; and the forest endpoint. The gate is a logical progression/respawn boundary, not a newly required physical doorway.
+
+Activate the exit gate only after the rescue ascent and mantle have finished, destination residency/collision are ready, and the player is grounded at an authored safe exterior location clear of the shaft edge. Commit the coherent checkpoint before treating the boundary as durably saved; indicate write failure truthfully and retain the prior valid checkpoint with a retry path. Never save a dangling, mid-climb or unloaded destination as the respawn position. Death/retry after successful activation restores at this exterior checkpoint (or a later valid one), with the tomb completion and lantern retained; it must not replay the tomb, lich/reward sequence or completed rescue.
+
+Mid-climb application termination still restores the lower safe checkpoint with the lantern retained and a redeployed usable rope. At the exterior restore, place Kit and the player in compatible grounded states. If the reunion/lantern lesson is still pending, resume it once and require its fresh raise action; if completed, do not replay it. Do not serialize a fragile instantaneous rope configuration as the only recovery path.
+
+### 12.3 Coherent state, storage and lifecycle
+
+Re-audit the accepted baseline's session/retry and preferences code before choosing the adapter. Add only the persistence needed for this chapter, extending a verified campaign-save system if one exists. Use versioned, validated logical state and atomic replacement; a failed/interrupted write must not destroy the last valid record. Reject corrupt or unsupported newer saves gracefully with a clear recovery/other-slot choice and no silent overwrite. Define supported older-version migration and preserve a recoverable source until migration succeeds.
+
+Store stable slot/checkpoint/zone IDs, safe player pose and recoverable health state, quest/prologue/forest progression, defeated encounters/reward claims, lantern and existing equipment ownership, Kit's narrative state, and relevant consumed dialogue/one-shot trigger flags as one consistent snapshot. Prevent duplicate rewards, lost equipment, resurrected tomb encounters or stale line/load callbacks on restore. Preserve existing inventory/equipment facts; this does not add the inventory/economy system excluded from 1.7. Runtime handles, renderer resources, transient attack inputs and OS audio state do not belong in saves.
+
+Keep settings (graphics, controls, audio, subtitles and accessibility) and the persistent RT Lab unlock separate from campaign slots. Loading, overwriting or starting a campaign must not reset those preferences. Android Home/resume should normally preserve and pause the current live session; process death uses durable recovery. Verify equivalent desktop exit/relaunch behaviour.
 
 Support repeatable Debug checkpoints for the new sequence, plus versioned deterministic replay. Existing scenario names/data remain historical evidence; append new fixtures and explicitly document intentional roof/dawn changes rather than rewriting old screenshots or silently accepting all differences.
 
@@ -587,16 +605,18 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 
 **Gate:** The finished scene delivers the promised woodland, not just a technical blockout. More density is earned by performance evidence, not assumed.
 
-### WP9 — Durable checkpoints, interruption and upgrade safety
+### WP9 — Save/Load slots, tomb-exit checkpoint and upgrade safety
 
 **Touches:** Existing/new campaign save adapter, traversal/dialogue generation handling, platform lifecycle and settings migration.
 
-- [ ] Write failing tests for corrupt save, version mismatch, atomic replacement interruption, duplicate reward, mid-climb termination and restored summit dialogue flags.
-- [ ] Implement/migrate the minimal checkpoint schema and checkpoint restore contract; preserve settings and RT Lab unlock independently.
+- [ ] Settle the proposed three-slot count and bounded manual-save policy from Section 12 before implementation; add shared slot state and entry/pause Save/Load/New Game surfaces with truthful metadata and occupied-slot confirmation.
+- [ ] Write failing tests for slot isolation, empty/unavailable slots, overwrite/New Game confirmation and Cancel, selected-slot load, corrupt/newer/older saves, interrupted atomic writes, duplicate reward, mid-climb termination and restored summit dialogue flags.
+- [ ] Implement/migrate the minimal versioned campaign schema and checkpoint restore contract; preserve settings and RT Lab unlock independently. Prove coherent quest, Kit, lantern/equipment and one-shot state across each slot.
+- [ ] Verify the exit gate cannot activate mid-climb or before grounded destination readiness. After a successful exit save, death/retry must restore outside without repeating the tomb/reward/rescue; test both pending and completed reunion states and truthful handling of save-write failure.
 - [ ] Verify Android background/resume and process-death recovery during voice, rope deployment, climb, reunion and forest walking. Verify desktop exit/relaunch and focus changes.
 - [ ] Repeat transitions/resets while observing resource high-water marks and delayed events. Reject stale loads/voice callbacks from previous generations.
 
-**Gate:** A interrupted short phone session cannot erase the reward, replay all progress or strand the player. No raw renderer handles in saves.
+**Gate:** All proposed slots save/load independently with safe overwrite handling. An interrupted short phone session cannot erase the reward or strand the player; death after the committed tomb-exit gate never forces the tomb to be replayed. No raw renderer handles in saves.
 
 ### WP10 — Integration, acceptance and handoff
 
@@ -627,7 +647,7 @@ Cover the legacy dungeon route as well. Verify the exact visible source/zone, st
 | Atmosphere | Shafts blocked by real geometry, depth-clipped fog, credible sky/hand/glass interaction, no screen-following mist/fireflies. |
 | Companion/voice | Runtime clip blending/foot placement, stable identity, no path blocking/visible teleport, offline speech, subtitle/skip/missing-audio safety. |
 | UI | Multi-touch action while moving/looking; font/DPI/inset coverage; readable themed states; focus/Back/Escape/controller operation; no input leakage. |
-| Recovery | Pause/resume, process death, save corruption/version handling, repeated restart/transition and stale-generation rejection. |
+| Recovery | Three-slot isolation and Save/Load/New Game/Cancel flows; safe occupied-slot replacement; pause/resume, process death, corrupt/newer/older saves and atomic-write interruption; grounded exit-gate activation; post-exit death without tomb replay; coherent Kit/lantern/quest/one-shot state; repeated restart/transition and stale-generation rejection. |
 | Performance | Matched baseline/candidate, combined worst case, warm behavior, explicit pixel/preset/build identity and resource peaks. |
 | Packaging | Correct version source, licenses/provenance, no secrets/source-art bloat, shader freshness and actual packaged runtime assets. |
 

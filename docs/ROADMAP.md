@@ -242,6 +242,10 @@ The final record states what shipped, what was accepted or deferred, actual qual
 
 Use directional world-space sound anchored beyond the actual small wall grate, separate Dialogue/Music/SFX gains and a subtitle on/off option with readable top-safe-area placement on mobile. Preserve a silent player, movement/look, combat cue priority, intelligibility and safe checkpoint/re-entry behaviour. The owner's suggested line is provisional recording copy. [Scene, stable line ID and acceptance details](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#41a-kits-early-wall-panel-call-and-the-waterfall-room-guards).
 
+## 1.7 addition — Save/Load and tomb-exit respawn
+
+**Owner request, 3 October 2026:** Add player-facing Save/Load, with **three local campaign slots proposed** (count remains provisional), and an automatic safe respawn checkpoint after the completed rope rescue/tomb exit. Activate it only when grounded outside with the destination ready; later death must not replay the tomb or re-award the lantern. Keep manual slot saves distinct from automatic recovery checkpoints, preserve coherent quest/Kit/equipment/one-shot state, and keep settings and RT Lab unlock separate. The [canonical 1.7 save contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#12-save-replay-and-recovery) defines safe resume, overwrite/New Game confirmation, versioned atomic storage and corruption/lifecycle checks. Final arbitrary-save policy and cloud sync are not implied. Planning only, after the accepted 1.6.2 baseline.
+
 ## The hub-and-dungeon loop
 
 Proposed campaign structure:
