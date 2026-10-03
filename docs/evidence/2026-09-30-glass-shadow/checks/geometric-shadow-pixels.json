@@ -1,0 +1,2456 @@
+{
+  "pixelTolerance": {
+    "maximumChannelDifference": 3,
+    "maximumFractionOverOne": 0.001
+  },
+  "note": "Correctness AB and pipeline-compute backend parity are separate comparisons. An AB difference is not automatically a regression: geometric shadow changes may affect lit opaque surfaces. PNG equivalence is not a physical-transport proof.",
+  "validManifestPolicy": "complete single rt-storage-image scene capture, hash and dimensions verified, RT presentation proven",
+  "manifestStatus": [
+    {
+      "quality": "mobile",
+      "config": "baseline",
+      "checkpoint": "lantern-glass-production",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\lantern-glass-production\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "baseline",
+      "checkpoint": "player-viewmodel-lantern-high-look-up",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\player-viewmodel-lantern-high-look-up\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "baseline",
+      "checkpoint": "player-viewmodel-lantern-low-parry",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\player-viewmodel-lantern-low-parry\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "baseline",
+      "checkpoint": "glass-edge-fresnel",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\glass-edge-fresnel\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "baseline",
+      "checkpoint": "glass-millimetre-closed",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\glass-millimetre-closed\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "baseline",
+      "checkpoint": "glass-tinted-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\glass-tinted-transport\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "baseline",
+      "checkpoint": "glass-fire-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\glass-fire-transport\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "candidate",
+      "checkpoint": "lantern-glass-production",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\lantern-glass-production\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "candidate",
+      "checkpoint": "player-viewmodel-lantern-high-look-up",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\player-viewmodel-lantern-high-look-up\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "candidate",
+      "checkpoint": "player-viewmodel-lantern-low-parry",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\player-viewmodel-lantern-low-parry\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "candidate",
+      "checkpoint": "glass-edge-fresnel",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-edge-fresnel\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "candidate",
+      "checkpoint": "glass-millimetre-closed",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-millimetre-closed\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "candidate",
+      "checkpoint": "glass-tinted-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-tinted-transport\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "candidate",
+      "checkpoint": "glass-fire-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-fire-transport\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "compute",
+      "checkpoint": "lantern-glass-production",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\lantern-glass-production\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "compute",
+      "checkpoint": "player-viewmodel-lantern-high-look-up",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\player-viewmodel-lantern-high-look-up\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "compute",
+      "checkpoint": "player-viewmodel-lantern-low-parry",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\player-viewmodel-lantern-low-parry\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "compute",
+      "checkpoint": "glass-edge-fresnel",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\glass-edge-fresnel\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "compute",
+      "checkpoint": "glass-millimetre-closed",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\glass-millimetre-closed\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "compute",
+      "checkpoint": "glass-tinted-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\glass-tinted-transport\\capture-manifest.json"
+    },
+    {
+      "quality": "mobile",
+      "config": "compute",
+      "checkpoint": "glass-fire-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\glass-fire-transport\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "baseline",
+      "checkpoint": "lantern-glass-production",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\lantern-glass-production\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "baseline",
+      "checkpoint": "player-viewmodel-lantern-high-look-up",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\player-viewmodel-lantern-high-look-up\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "baseline",
+      "checkpoint": "player-viewmodel-lantern-low-parry",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\player-viewmodel-lantern-low-parry\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "baseline",
+      "checkpoint": "glass-edge-fresnel",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\glass-edge-fresnel\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "baseline",
+      "checkpoint": "glass-millimetre-closed",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\glass-millimetre-closed\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "baseline",
+      "checkpoint": "glass-tinted-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\glass-tinted-transport\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "baseline",
+      "checkpoint": "glass-fire-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\glass-fire-transport\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "candidate",
+      "checkpoint": "lantern-glass-production",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\lantern-glass-production\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "candidate",
+      "checkpoint": "player-viewmodel-lantern-high-look-up",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\player-viewmodel-lantern-high-look-up\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "candidate",
+      "checkpoint": "player-viewmodel-lantern-low-parry",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\player-viewmodel-lantern-low-parry\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "candidate",
+      "checkpoint": "glass-edge-fresnel",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-edge-fresnel\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "candidate",
+      "checkpoint": "glass-millimetre-closed",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-millimetre-closed\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "candidate",
+      "checkpoint": "glass-tinted-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-tinted-transport\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "candidate",
+      "checkpoint": "glass-fire-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-fire-transport\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "compute",
+      "checkpoint": "lantern-glass-production",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\lantern-glass-production\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "compute",
+      "checkpoint": "player-viewmodel-lantern-high-look-up",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\player-viewmodel-lantern-high-look-up\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "compute",
+      "checkpoint": "player-viewmodel-lantern-low-parry",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\player-viewmodel-lantern-low-parry\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "compute",
+      "checkpoint": "glass-edge-fresnel",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\glass-edge-fresnel\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "compute",
+      "checkpoint": "glass-millimetre-closed",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\glass-millimetre-closed\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "compute",
+      "checkpoint": "glass-tinted-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\glass-tinted-transport\\capture-manifest.json"
+    },
+    {
+      "quality": "high",
+      "config": "compute",
+      "checkpoint": "glass-fire-transport",
+      "status": "valid",
+      "manifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\glass-fire-transport\\capture-manifest.json"
+    }
+  ],
+  "comparisons": [
+    {
+      "label": "RTX/mobile/correctness-AB/lantern-glass-production",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\lantern-glass-production\\115-lantern-glass-production.png",
+        "sha256": "0e31a6cdf97a5576b77207161848c1e75cab5180e93891615ec4b4bf18164a73"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\lantern-glass-production\\115-lantern-glass-production.png",
+        "sha256": "9c55be861c88151d41e826c60969e86350427c4a4afefdaa7f2d4637e6e711ec"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 85,
+      "fractionOverOne": 0.00016396604938271605,
+      "maximumChannelDifference": 26,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        185,
+        455,
+        539,
+        939
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            449,
+            689
+          ],
+          "before": [
+            64,
+            43,
+            34
+          ],
+          "after": [
+            47,
+            21,
+            8
+          ]
+        },
+        {
+          "xy": [
+            488,
+            798
+          ],
+          "before": [
+            22,
+            25,
+            28
+          ],
+          "after": [
+            3,
+            3,
+            4
+          ]
+        },
+        {
+          "xy": [
+            517,
+            879
+          ],
+          "before": [
+            24,
+            26,
+            28
+          ],
+          "after": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "xy": [
+            518,
+            882
+          ],
+          "before": [
+            24,
+            26,
+            27
+          ],
+          "after": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "xy": [
+            522,
+            893
+          ],
+          "before": [
+            25,
+            27,
+            28
+          ],
+          "after": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "xy": [
+            523,
+            896
+          ],
+          "before": [
+            27,
+            28,
+            30
+          ],
+          "after": [
+            3,
+            3,
+            4
+          ]
+        },
+        {
+          "xy": [
+            538,
+            938
+          ],
+          "before": [
+            69,
+            45,
+            32
+          ],
+          "after": [
+            52,
+            22,
+            6
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {
+        "dielectricReasonDiagnostics.shadowFiniteEndpointVolumeCount": 6817
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/mobile/pipeline-compute/lantern-glass-production",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\lantern-glass-production\\115-lantern-glass-production.png",
+        "sha256": "9c55be861c88151d41e826c60969e86350427c4a4afefdaa7f2d4637e6e711ec"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\lantern-glass-production\\115-lantern-glass-production.png",
+        "sha256": "8f98ac583e46aaaa4e1dbb269c0e5cc1884b540f0654b68602d7a7c81700298f"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 1,
+      "fractionOverOne": 1.9290123456790124e-06,
+      "maximumChannelDifference": 2,
+      "equivalencePassed": true,
+      "boundsOverOne": [
+        210,
+        475,
+        211,
+        476
+      ],
+      "peakExamples": [],
+      "counterDeltasComputeMinusCandidate": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/mobile/correctness-AB/player-viewmodel-lantern-high-look-up",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+        "sha256": "86532d2e9ce379f84d42c0bfc6bcfc360c25c6e9470ca693108914b974d07335"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+        "sha256": "25f705744633a4cbb6b52b9c99654214ae366a3e2ad0097bf514c7dd79bc17bd"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 382,
+      "fractionOverOne": 0.0007368827160493827,
+      "maximumChannelDifference": 53,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        44,
+        604,
+        539,
+        960
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            443,
+            949
+          ],
+          "before": [
+            51,
+            22,
+            3
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "xy": [
+            443,
+            951
+          ],
+          "before": [
+            52,
+            23,
+            3
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "xy": [
+            442,
+            952
+          ],
+          "before": [
+            53,
+            24,
+            3
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {
+        "dielectricReasonDiagnostics.shadowFiniteEndpointVolumeCount": 3773,
+        "dielectricReasonDiagnostics.shadowImplicitOriginExitCount": 178
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/mobile/pipeline-compute/player-viewmodel-lantern-high-look-up",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+        "sha256": "25f705744633a4cbb6b52b9c99654214ae366a3e2ad0097bf514c7dd79bc17bd"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+        "sha256": "f487cc66f5da20398f27bb7a93a41464ae1d74f69f690edf8ac74f994bbac1e0"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 4,
+      "fractionOverOne": 7.71604938271605e-06,
+      "maximumChannelDifference": 12,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        86,
+        659,
+        202,
+        802
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            201,
+            659
+          ],
+          "before": [
+            231,
+            63,
+            23
+          ],
+          "after": [
+            223,
+            51,
+            18
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {
+        "dielectricReasonDiagnostics.primaryTirCount": 1,
+        "dielectricReasonDiagnostics.primaryTirTerminationCount": 1
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/mobile/correctness-AB/player-viewmodel-lantern-low-parry",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+        "sha256": "352c8cee57cfca452500d3f1aeb98b181c4ab02b54b0a312bb3a2152fc1f4f8f"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+        "sha256": "dc7a50029f0ec11b7a4ca6ef4946c02d5b513239b13f07601529bd2730d78c25"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 391,
+      "fractionOverOne": 0.0007542438271604938,
+      "maximumChannelDifference": 60,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        0,
+        46,
+        539,
+        960
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            498,
+            540
+          ],
+          "before": [
+            63,
+            68,
+            76
+          ],
+          "after": [
+            24,
+            18,
+            16
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {
+        "dielectricReasonDiagnostics.shadowFiniteEndpointVolumeCount": 1163,
+        "dielectricReasonDiagnostics.shadowImplicitOriginExitCount": 3
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/mobile/pipeline-compute/player-viewmodel-lantern-low-parry",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+        "sha256": "dc7a50029f0ec11b7a4ca6ef4946c02d5b513239b13f07601529bd2730d78c25"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+        "sha256": "779a10873658d2d8c93ea1864ebbe6d1fe0b6a1f0fe1b948bf3a6521c780e09f"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 17,
+      "fractionOverOne": 3.279320987654321e-05,
+      "maximumChannelDifference": 5,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        111,
+        899,
+        218,
+        946
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            129,
+            921
+          ],
+          "before": [
+            30,
+            15,
+            2
+          ],
+          "after": [
+            26,
+            13,
+            2
+          ]
+        },
+        {
+          "xy": [
+            131,
+            921
+          ],
+          "before": [
+            22,
+            12,
+            2
+          ],
+          "after": [
+            26,
+            17,
+            2
+          ]
+        },
+        {
+          "xy": [
+            217,
+            923
+          ],
+          "before": [
+            37,
+            14,
+            3
+          ],
+          "after": [
+            42,
+            17,
+            3
+          ]
+        },
+        {
+          "xy": [
+            121,
+            939
+          ],
+          "before": [
+            19,
+            6,
+            1
+          ],
+          "after": [
+            23,
+            7,
+            1
+          ]
+        },
+        {
+          "xy": [
+            111,
+            945
+          ],
+          "before": [
+            22,
+            7,
+            2
+          ],
+          "after": [
+            18,
+            6,
+            1
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/mobile/correctness-AB/glass-edge-fresnel",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+        "sha256": "a08bd0d0cb0c905b8eb346fcdfabe5da695e15def107f6528ff0f6249866302c"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+        "sha256": "e40330f2f4e081b06e1b3fbacd57464afb75382d74779771cdd9e1f629ad3331"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 19,
+      "fractionOverOne": 3.6651234567901234e-05,
+      "maximumChannelDifference": 63,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        191,
+        674,
+        527,
+        770
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            344,
+            713
+          ],
+          "before": [
+            57,
+            68,
+            79
+          ],
+          "after": [
+            10,
+            13,
+            16
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/mobile/pipeline-compute/glass-edge-fresnel",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+        "sha256": "e40330f2f4e081b06e1b3fbacd57464afb75382d74779771cdd9e1f629ad3331"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+        "sha256": "9a38e4da9d8e12bbe814824bf0d2669ff9fe148da010e33fad4a6d9001e3dd37"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 61,
+      "fractionOverOne": 0.00011766975308641975,
+      "maximumChannelDifference": 10,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        213,
+        850,
+        329,
+        950
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            328,
+            860
+          ],
+          "before": [
+            5,
+            6,
+            8
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "xy": [
+            214,
+            874
+          ],
+          "before": [
+            4,
+            6,
+            9
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "xy": [
+            217,
+            878
+          ],
+          "before": [
+            0,
+            0,
+            0
+          ],
+          "after": [
+            5,
+            6,
+            10
+          ]
+        },
+        {
+          "xy": [
+            217,
+            879
+          ],
+          "before": [
+            0,
+            0,
+            0
+          ],
+          "after": [
+            4,
+            6,
+            9
+          ]
+        },
+        {
+          "xy": [
+            219,
+            880
+          ],
+          "before": [
+            0,
+            0,
+            0
+          ],
+          "after": [
+            5,
+            6,
+            9
+          ]
+        },
+        {
+          "xy": [
+            225,
+            887
+          ],
+          "before": [
+            0,
+            0,
+            0
+          ],
+          "after": [
+            5,
+            7,
+            10
+          ]
+        },
+        {
+          "xy": [
+            223,
+            895
+          ],
+          "before": [
+            4,
+            6,
+            9
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "xy": [
+            219,
+            900
+          ],
+          "before": [
+            5,
+            7,
+            10
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "xy": [
+            217,
+            908
+          ],
+          "before": [
+            4,
+            6,
+            9
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "xy": [
+            223,
+            914
+          ],
+          "before": [
+            0,
+            0,
+            0
+          ],
+          "after": [
+            4,
+            6,
+            9
+          ]
+        },
+        {
+          "xy": [
+            220,
+            915
+          ],
+          "before": [
+            4,
+            6,
+            9
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "xy": [
+            224,
+            920
+          ],
+          "before": [
+            4,
+            6,
+            9
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {
+        "dielectricReasonDiagnostics.primaryCertifiedClosedVolumeRecoveryCount": 8,
+        "dielectricReasonDiagnostics.primaryTirCount": -11,
+        "dielectricReasonDiagnostics.primaryTirTerminationCount": -1
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/mobile/correctness-AB/glass-millimetre-closed",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\glass-millimetre-closed\\112-glass-millimetre-closed.png",
+        "sha256": "7ed8777b2c659fea47989fdbd3e9bbae487c32b7bf4534521be18000db4efbe2"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-millimetre-closed\\112-glass-millimetre-closed.png",
+        "sha256": "ef770833f998849e0a945330c263aa8000aa11625224915e39ca78ebb54246b5"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 66,
+      "fractionOverOne": 0.0001273148148148148,
+      "maximumChannelDifference": 60,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        2,
+        253,
+        523,
+        755
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            432,
+            628
+          ],
+          "before": [
+            58,
+            68,
+            80
+          ],
+          "after": [
+            13,
+            16,
+            20
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/mobile/pipeline-compute/glass-millimetre-closed",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-millimetre-closed\\112-glass-millimetre-closed.png",
+        "sha256": "ef770833f998849e0a945330c263aa8000aa11625224915e39ca78ebb54246b5"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\glass-millimetre-closed\\112-glass-millimetre-closed.png",
+        "sha256": "18b72e6ace19258c0ad2c0002471a515047fe8b583632abd69025ec44d02d731"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 13,
+      "fractionOverOne": 2.507716049382716e-05,
+      "maximumChannelDifference": 85,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        50,
+        169,
+        355,
+        699
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            50,
+            465
+          ],
+          "before": [
+            89,
+            46,
+            9
+          ],
+          "after": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/mobile/correctness-AB/glass-tinted-transport",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\glass-tinted-transport\\111-glass-tinted-transport.png",
+        "sha256": "3ca65aed06830ab3db3ddde271e903f49d5f5c22f6b404329356d571ac9dea5e"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-tinted-transport\\111-glass-tinted-transport.png",
+        "sha256": "d8644c058e2f650eecc502bf17193c84b3e7b600e18c0b7a8b4e7052da083cc6"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 61972,
+      "fractionOverOne": 0.11954475308641975,
+      "maximumChannelDifference": 103,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        0,
+        136,
+        540,
+        960
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            494,
+            915
+          ],
+          "before": [
+            103,
+            55,
+            12
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/mobile/pipeline-compute/glass-tinted-transport",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-tinted-transport\\111-glass-tinted-transport.png",
+        "sha256": "d8644c058e2f650eecc502bf17193c84b3e7b600e18c0b7a8b4e7052da083cc6"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\glass-tinted-transport\\111-glass-tinted-transport.png",
+        "sha256": "b6df89746f2e29315a2dfe513d49c0992d1bcc5ee59732fde8a6cf778085961b"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 58,
+      "fractionOverOne": 0.00011188271604938272,
+      "maximumChannelDifference": 85,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        50,
+        174,
+        421,
+        929
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            50,
+            465
+          ],
+          "before": [
+            89,
+            46,
+            9
+          ],
+          "after": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/mobile/correctness-AB/glass-fire-transport",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\baseline\\glass-fire-transport\\110-glass-fire-transport.png",
+        "sha256": "ddd25f369aac2be1052818a3b8edd8f60f59d80b3d6b602acec2d820063fba3b"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-fire-transport\\110-glass-fire-transport.png",
+        "sha256": "1c839a71d2c06eadeca584263716fce623d40c639ad8d6d8cf79f98a82715888"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 62676,
+      "fractionOverOne": 0.12090277777777778,
+      "maximumChannelDifference": 103,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        0,
+        253,
+        540,
+        960
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            494,
+            915
+          ],
+          "before": [
+            103,
+            55,
+            12
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/mobile/pipeline-compute/glass-fire-transport",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\candidate\\glass-fire-transport\\110-glass-fire-transport.png",
+        "sha256": "1c839a71d2c06eadeca584263716fce623d40c639ad8d6d8cf79f98a82715888"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\mobile\\compute\\glass-fire-transport\\110-glass-fire-transport.png",
+        "sha256": "c32c65a847b00860e61d796c903e4e1fba53b3d156584640e319bdd05274511a"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 150,
+      "fractionOverOne": 0.00028935185185185184,
+      "maximumChannelDifference": 85,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        50,
+        174,
+        421,
+        944
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            50,
+            465
+          ],
+          "before": [
+            89,
+            46,
+            9
+          ],
+          "after": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/high/correctness-AB/lantern-glass-production",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\lantern-glass-production\\115-lantern-glass-production.png",
+        "sha256": "3944275f5398168ec6a5eb85985ed7d2550928c2c592aa9b4c5aa93f0179bb33"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\lantern-glass-production\\115-lantern-glass-production.png",
+        "sha256": "3ab84e4f91ca54b175cd4e17eeea61dda23f5dc96956747da88c5fcb1fe4b375"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 85,
+      "fractionOverOne": 0.00016396604938271605,
+      "maximumChannelDifference": 26,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        185,
+        455,
+        539,
+        939
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            449,
+            689
+          ],
+          "before": [
+            64,
+            43,
+            34
+          ],
+          "after": [
+            47,
+            21,
+            8
+          ]
+        },
+        {
+          "xy": [
+            488,
+            798
+          ],
+          "before": [
+            22,
+            25,
+            28
+          ],
+          "after": [
+            3,
+            3,
+            4
+          ]
+        },
+        {
+          "xy": [
+            517,
+            879
+          ],
+          "before": [
+            24,
+            26,
+            28
+          ],
+          "after": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "xy": [
+            518,
+            882
+          ],
+          "before": [
+            24,
+            26,
+            27
+          ],
+          "after": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "xy": [
+            522,
+            893
+          ],
+          "before": [
+            25,
+            27,
+            28
+          ],
+          "after": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "xy": [
+            523,
+            896
+          ],
+          "before": [
+            27,
+            28,
+            30
+          ],
+          "after": [
+            3,
+            3,
+            4
+          ]
+        },
+        {
+          "xy": [
+            538,
+            938
+          ],
+          "before": [
+            69,
+            45,
+            32
+          ],
+          "after": [
+            52,
+            22,
+            6
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {
+        "dielectricReasonDiagnostics.shadowFiniteEndpointVolumeCount": 6817
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/high/pipeline-compute/lantern-glass-production",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\lantern-glass-production\\115-lantern-glass-production.png",
+        "sha256": "3ab84e4f91ca54b175cd4e17eeea61dda23f5dc96956747da88c5fcb1fe4b375"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\lantern-glass-production\\115-lantern-glass-production.png",
+        "sha256": "b16dc0d297a1681818ddaf45a528e192730aa0faed6a8bf1cbc36d514bb61f34"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 1,
+      "fractionOverOne": 1.9290123456790124e-06,
+      "maximumChannelDifference": 2,
+      "equivalencePassed": true,
+      "boundsOverOne": [
+        210,
+        475,
+        211,
+        476
+      ],
+      "peakExamples": [],
+      "counterDeltasComputeMinusCandidate": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/high/correctness-AB/player-viewmodel-lantern-high-look-up",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+        "sha256": "3c8b27b0ce6235106d5d51d7ba4e0bd42a0ccc5de58f5fb3627bde46fe9e861b"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+        "sha256": "25da65664f254d29241be2370d26c89b7ee70ce43b6a04a9773387602c88671c"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 385,
+      "fractionOverOne": 0.0007426697530864198,
+      "maximumChannelDifference": 53,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        44,
+        604,
+        539,
+        960
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            443,
+            949
+          ],
+          "before": [
+            51,
+            22,
+            3
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "xy": [
+            443,
+            951
+          ],
+          "before": [
+            52,
+            23,
+            3
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "xy": [
+            442,
+            952
+          ],
+          "before": [
+            53,
+            24,
+            3
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {
+        "dielectricReasonDiagnostics.shadowFiniteEndpointVolumeCount": 3773,
+        "dielectricReasonDiagnostics.shadowImplicitOriginExitCount": 178
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/high/pipeline-compute/player-viewmodel-lantern-high-look-up",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+        "sha256": "25da65664f254d29241be2370d26c89b7ee70ce43b6a04a9773387602c88671c"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+        "sha256": "c90cbb741c1f81f538acbf0ca10eb3b38a8569de0ba7c583836ad30ed1327702"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 4,
+      "fractionOverOne": 7.71604938271605e-06,
+      "maximumChannelDifference": 12,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        86,
+        659,
+        202,
+        802
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            201,
+            659
+          ],
+          "before": [
+            231,
+            63,
+            23
+          ],
+          "after": [
+            223,
+            51,
+            18
+          ]
+        },
+        {
+          "xy": [
+            116,
+            788
+          ],
+          "before": [
+            8,
+            8,
+            9
+          ],
+          "after": [
+            18,
+            5,
+            1
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {
+        "dielectricReasonDiagnostics.primaryTirCount": 1
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/high/correctness-AB/player-viewmodel-lantern-low-parry",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+        "sha256": "d3863b7847b7c3ce22b5ef3b2f054d636dc9f5b2abc95e6c07344a6f0fda36cf"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+        "sha256": "ec9cf5be054503058eaffd6f00517db92670ecf5609d0ee99805fd9ee51c072c"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 391,
+      "fractionOverOne": 0.0007542438271604938,
+      "maximumChannelDifference": 60,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        0,
+        46,
+        539,
+        960
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            498,
+            540
+          ],
+          "before": [
+            63,
+            68,
+            76
+          ],
+          "after": [
+            24,
+            18,
+            16
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {
+        "dielectricReasonDiagnostics.shadowFiniteEndpointVolumeCount": 1163,
+        "dielectricReasonDiagnostics.shadowImplicitOriginExitCount": 3
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/high/pipeline-compute/player-viewmodel-lantern-low-parry",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+        "sha256": "ec9cf5be054503058eaffd6f00517db92670ecf5609d0ee99805fd9ee51c072c"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+        "sha256": "cff98a3af2758e98681ba769e6e6e0545f8a5b05c1d4beec672f857673fb2522"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 17,
+      "fractionOverOne": 3.279320987654321e-05,
+      "maximumChannelDifference": 5,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        111,
+        899,
+        218,
+        946
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            129,
+            921
+          ],
+          "before": [
+            30,
+            15,
+            2
+          ],
+          "after": [
+            26,
+            13,
+            2
+          ]
+        },
+        {
+          "xy": [
+            131,
+            921
+          ],
+          "before": [
+            22,
+            12,
+            2
+          ],
+          "after": [
+            26,
+            17,
+            2
+          ]
+        },
+        {
+          "xy": [
+            217,
+            923
+          ],
+          "before": [
+            37,
+            14,
+            3
+          ],
+          "after": [
+            42,
+            17,
+            3
+          ]
+        },
+        {
+          "xy": [
+            121,
+            939
+          ],
+          "before": [
+            19,
+            6,
+            1
+          ],
+          "after": [
+            23,
+            7,
+            1
+          ]
+        },
+        {
+          "xy": [
+            111,
+            945
+          ],
+          "before": [
+            22,
+            7,
+            2
+          ],
+          "after": [
+            18,
+            6,
+            1
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/high/correctness-AB/glass-edge-fresnel",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+        "sha256": "5646010ef849d7ade1bad290e14faaaaa578ad6cb98f0febf2bdfbcc52ec3db6"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+        "sha256": "2800c9f9ede96a5bfab50a4b1847418012d9a9b194e9f418c1b7b3193522ed2d"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 19,
+      "fractionOverOne": 3.6651234567901234e-05,
+      "maximumChannelDifference": 63,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        191,
+        674,
+        527,
+        770
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            344,
+            713
+          ],
+          "before": [
+            57,
+            68,
+            79
+          ],
+          "after": [
+            10,
+            13,
+            16
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/high/pipeline-compute/glass-edge-fresnel",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+        "sha256": "2800c9f9ede96a5bfab50a4b1847418012d9a9b194e9f418c1b7b3193522ed2d"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+        "sha256": "80047d269f8baafea6364201c06edbd94a6e93360878df1450567ff9a27447fd"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 122,
+      "fractionOverOne": 0.0002353395061728395,
+      "maximumChannelDifference": 22,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        190,
+        518,
+        329,
+        959
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            260,
+            526
+          ],
+          "before": [
+            2,
+            3,
+            3
+          ],
+          "after": [
+            22,
+            17,
+            17
+          ]
+        },
+        {
+          "xy": [
+            235,
+            531
+          ],
+          "before": [
+            22,
+            16,
+            17
+          ],
+          "after": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "xy": [
+            244,
+            531
+          ],
+          "before": [
+            22,
+            16,
+            17
+          ],
+          "after": [
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "xy": [
+            254,
+            533
+          ],
+          "before": [
+            2,
+            2,
+            3
+          ],
+          "after": [
+            22,
+            16,
+            17
+          ]
+        },
+        {
+          "xy": [
+            233,
+            534
+          ],
+          "before": [
+            2,
+            2,
+            3
+          ],
+          "after": [
+            22,
+            16,
+            17
+          ]
+        },
+        {
+          "xy": [
+            219,
+            536
+          ],
+          "before": [
+            2,
+            2,
+            3
+          ],
+          "after": [
+            22,
+            16,
+            17
+          ]
+        },
+        {
+          "xy": [
+            256,
+            536
+          ],
+          "before": [
+            1,
+            2,
+            2
+          ],
+          "after": [
+            22,
+            16,
+            17
+          ]
+        },
+        {
+          "xy": [
+            220,
+            539
+          ],
+          "before": [
+            22,
+            16,
+            17
+          ],
+          "after": [
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "xy": [
+            222,
+            539
+          ],
+          "before": [
+            2,
+            2,
+            3
+          ],
+          "after": [
+            22,
+            16,
+            17
+          ]
+        },
+        {
+          "xy": [
+            211,
+            540
+          ],
+          "before": [
+            2,
+            2,
+            3
+          ],
+          "after": [
+            22,
+            17,
+            17
+          ]
+        },
+        {
+          "xy": [
+            247,
+            540
+          ],
+          "before": [
+            22,
+            16,
+            17
+          ],
+          "after": [
+            1,
+            2,
+            2
+          ]
+        },
+        {
+          "xy": [
+            215,
+            542
+          ],
+          "before": [
+            1,
+            2,
+            2
+          ],
+          "after": [
+            22,
+            17,
+            17
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {
+        "dielectricReasonDiagnostics.primaryCertifiedClosedVolumeRecoveryCount": 1,
+        "dielectricReasonDiagnostics.primaryTirCount": -11
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/high/correctness-AB/glass-millimetre-closed",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\glass-millimetre-closed\\112-glass-millimetre-closed.png",
+        "sha256": "7ed8777b2c659fea47989fdbd3e9bbae487c32b7bf4534521be18000db4efbe2"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-millimetre-closed\\112-glass-millimetre-closed.png",
+        "sha256": "ef770833f998849e0a945330c263aa8000aa11625224915e39ca78ebb54246b5"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 66,
+      "fractionOverOne": 0.0001273148148148148,
+      "maximumChannelDifference": 60,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        2,
+        253,
+        523,
+        755
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            432,
+            628
+          ],
+          "before": [
+            58,
+            68,
+            80
+          ],
+          "after": [
+            13,
+            16,
+            20
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/high/pipeline-compute/glass-millimetre-closed",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-millimetre-closed\\112-glass-millimetre-closed.png",
+        "sha256": "ef770833f998849e0a945330c263aa8000aa11625224915e39ca78ebb54246b5"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\glass-millimetre-closed\\112-glass-millimetre-closed.png",
+        "sha256": "18b72e6ace19258c0ad2c0002471a515047fe8b583632abd69025ec44d02d731"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 13,
+      "fractionOverOne": 2.507716049382716e-05,
+      "maximumChannelDifference": 85,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        50,
+        169,
+        355,
+        699
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            50,
+            465
+          ],
+          "before": [
+            89,
+            46,
+            9
+          ],
+          "after": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/high/correctness-AB/glass-tinted-transport",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\glass-tinted-transport\\111-glass-tinted-transport.png",
+        "sha256": "95d5e6436196326d36e463960a2bcf10a1e30101c3af8c781b9b6aa7429eeb0f"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-tinted-transport\\111-glass-tinted-transport.png",
+        "sha256": "0caa544deea0b4ca72ea485bb284b84b86d2a0c6e82edef6e34db4c04301787f"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 61972,
+      "fractionOverOne": 0.11954475308641975,
+      "maximumChannelDifference": 103,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        0,
+        136,
+        540,
+        960
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            494,
+            915
+          ],
+          "before": [
+            103,
+            55,
+            12
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/high/pipeline-compute/glass-tinted-transport",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-tinted-transport\\111-glass-tinted-transport.png",
+        "sha256": "0caa544deea0b4ca72ea485bb284b84b86d2a0c6e82edef6e34db4c04301787f"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\glass-tinted-transport\\111-glass-tinted-transport.png",
+        "sha256": "bb0f99ac13c37a2d320c997e94f9ece202da7dd7eb4e1127ab6993a98aefb123"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 67,
+      "fractionOverOne": 0.00012924382716049382,
+      "maximumChannelDifference": 85,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        50,
+        174,
+        421,
+        929
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            50,
+            465
+          ],
+          "before": [
+            89,
+            46,
+            9
+          ],
+          "after": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {
+        "dielectricReasonDiagnostics.primaryCertifiedClosedVolumeRecoveryCount": 1
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    },
+    {
+      "label": "RTX/high/correctness-AB/glass-fire-transport",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\baseline\\glass-fire-transport\\110-glass-fire-transport.png",
+        "sha256": "2428c0f9d3e702d6be9bb8f503ecdc5546a91d87a74dd45419f509d92f4f0018"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-fire-transport\\110-glass-fire-transport.png",
+        "sha256": "c11c59c233c741c6a4d2990d6d34dad3d9c0220a2a09b7d58aeea00abbb287e2"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 62676,
+      "fractionOverOne": 0.12090277777777778,
+      "maximumChannelDifference": 103,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        0,
+        253,
+        540,
+        960
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            494,
+            915
+          ],
+          "before": [
+            103,
+            55,
+            12
+          ],
+          "after": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "counterDeltasCandidateMinusBaseline": {},
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayTracingPipeline"
+      ]
+    },
+    {
+      "label": "RTX/high/pipeline-compute/glass-fire-transport",
+      "status": "compared",
+      "before": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\candidate\\glass-fire-transport\\110-glass-fire-transport.png",
+        "sha256": "c11c59c233c741c6a4d2990d6d34dad3d9c0220a2a09b7d58aeea00abbb287e2"
+      },
+      "after": {
+        "path": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high\\compute\\glass-fire-transport\\110-glass-fire-transport.png",
+        "sha256": "d33611920093b3aa6ba5f35b863783131c632f3f814676a82a4eb99893be3bd7"
+      },
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 159,
+      "fractionOverOne": 0.00030671296296296295,
+      "maximumChannelDifference": 85,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        50,
+        174,
+        421,
+        944
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            50,
+            465
+          ],
+          "before": [
+            89,
+            46,
+            9
+          ],
+          "after": [
+            4,
+            4,
+            4
+          ]
+        }
+      ],
+      "counterDeltasComputeMinusCandidate": {
+        "dielectricReasonDiagnostics.primaryCertifiedClosedVolumeRecoveryCount": 1
+      },
+      "backendPair": [
+        "RayTracingPipeline",
+        "RayQueryCompute"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "comparison": "retained native control versus staged-primary candidate capture manifests",
+  "evidenceOnly": true,
+  "deviceEvidence": "All paired manifests identify NVIDIA GeForce RTX 5050 Laptop GPU and RayTracingPipeline; this is not Android or physical-phone evidence.",
+  "method": "Read-only comparison of existing JSON manifests and their recorded hashes. No capture, device call, build, or rerun was performed. The unchanged compare-foundation-captures.ps1 batch remains owned by the main agent.",
+  "result": {
+    "fixturePairs": 8,
+    "totalCapturePairs": 20,
+    "completeManifestPairs": 8,
+    "cameraObjectDifferences": 0,
+    "viewmodelObjHashDifferences": 0,
+    "playerWorldBodyObjHashDifferences": 0,
+    "primaryVisibilityPixelDifferences": 0,
+    "dielectricDiagnosticFieldDifferences": 0,
+    "reasonDiagnosticFieldDifferences": 0,
+    "singleDevelopmentFixturePngMatches": 7,
+    "standardBatchPngMatches": 1,
+    "standardBatchPngDifferences": 12
+  },
+  "pipelineBundleChange": {
+    "control": {
+      "opaqueFast": { "key": "diagnostic_mobile_opaque_fast", "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9" },
+      "genericDielectric": { "key": "diagnostic_mobile_generic_dielectric", "sha256": "9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91" }
+    },
+    "candidate": {
+      "opaqueFast": { "key": "staged_primary_v1_diagnostic_mobile_opaque_fast", "sha256": "701bb5a9410c78d75b0302ffdd3d34e171e867637bc24ea4ad4ac606901a6e44" },
+      "genericDielectric": { "key": "staged_primary_v1_diagnostic_mobile_generic_dielectric", "sha256": "51dd24fcffa9fafb1e416d085d78b3f7ef12c889ed30104d808c29c6cbade2b6" }
+    },
+    "interpretation": "The selected shader bundle key and hashes differ as expected. Camera objects, recorded geometry hashes, primary visibility counts, and diagnostic values remain equal. Pixel equality is not implied by those equal structural counters."
+  },
+  "diagnosticComparison": {
+    "dielectricObjectFields": 13,
+    "dielectricEventCounters": 11,
+    "reasonObjectFields": 32,
+    "reasonEventAndMaskCounters": 25,
+    "availability": "Available in all paired manifests",
+    "counterOutcome": "All event/overflow/recovery/mask counters compare equal and are zero in these manifests. The five reason-object primary pixel aggregate fields compare equal per pair; values are recorded per fixture below."
+  },
+  "manifestPairs": [
+    {
+      "fixture": "standard",
+      "control": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\control\\standard\\capture-manifest.json", "sha256": "7c53dcc79a1abfce65074a8a048702365e4ce9c13dc872c98eaef2d2dd5a6880" },
+      "candidate": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\candidate\\standard\\capture-manifest.json", "sha256": "3bb2b7c2567f1cda2d0e6bbec98743584d0c63ae1db8469ecbd55f1bc5ea88de" },
+      "capturePairs": 13,
+      "equal": { "camera": 13, "viewmodelObjSha256": 13, "playerWorldBodyObjSha256": 13, "primaryVisibilityPixels": 13, "pngSha256": 1 },
+      "primaryPixelAggregate": { "torch": 13652, "sword": 6798, "player": 10695, "rewardRing": 0, "rewardBody": 0 },
+      "captures": [
+        { "id": 0, "checkpoint": "opening", "viewmodelObjSha256": "ec903d3d30447a386e68b1e82ea5f0df03b10640a9835f1d5091ffd164765d81", "playerWorldBodyObjSha256": "578aeee9efc59b728ce546597ec3ef12c7a7f2b5e25eaaa7914c07c316089207", "primaryPixels": { "torch": 13636, "sword": 6797, "player": 10670, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false },
+        { "id": 1, "checkpoint": "skeleton", "viewmodelObjSha256": "4d002722014756fbd0f53cf50a5c925df89375cf9abc71aee8c1c82b1a5b0365", "playerWorldBodyObjSha256": "43434ab27d047c935118fc45ccd033102b5ae8009cd979c811a51215915273bf", "primaryPixels": { "torch": 13652, "sword": 6798, "player": 10695, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false },
+        { "id": 2, "checkpoint": "worst-bend", "viewmodelObjSha256": "2b8ec63e94a0eff8c9d7ebad62079c814f12947d88b848eaccbfc2480e854767", "playerWorldBodyObjSha256": "db96571317a7ef7673c335a56ca16a9b6845f010afdcf167e53772f9e0ee7061", "primaryPixels": { "torch": 13639, "sword": 6797, "player": 10677, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false },
+        { "id": 3, "checkpoint": "lantern-drop", "viewmodelObjSha256": "258e63c2705b58bbecda45b8ebab4d10ed3ee0786bd55f10c7c1541546218414", "playerWorldBodyObjSha256": "7c2c253531df5f119922ca4034435814d2685ec71eb87d82d35ea570df4083b7", "primaryPixels": { "torch": 9419, "sword": 2741, "player": 10002, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false },
+        { "id": 4, "checkpoint": "skylight", "viewmodelObjSha256": "57cf7ec0a16188c13e64d51f68ab0fcc27f2974166599eb531f084781bd6152a", "playerWorldBodyObjSha256": "28d8fc50dc44a4d4a79cea27acb1722c457fe2703bd7034511eede00230d4d11", "primaryPixels": { "torch": 425, "sword": 6794, "player": 3856, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false },
+        { "id": 5, "checkpoint": "yellow", "viewmodelObjSha256": "bbe99aaaaf5ed12ca1f3a5811e587e7f3a0e5b3c67a9c20dfe93da7d52522a84", "playerWorldBodyObjSha256": "a523014e60a0e148b2132787c5bf385b962b3f3fcc3273b6efd56540e4d7324c", "primaryPixels": { "torch": 0, "sword": 6798, "player": 3852, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false },
+        { "id": 6, "checkpoint": "blue", "viewmodelObjSha256": "7a6f7b3bcf8797962f63dddbb10a65d44c4ac69a2452a06eb9475a2b3403f962", "playerWorldBodyObjSha256": "c2c753e54c4011a9de1a1678c87b1d4bb9c77c1b567f1c7bbb5aafebe81b7c74", "primaryPixels": { "torch": 0, "sword": 6798, "player": 3852, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false },
+        { "id": 7, "checkpoint": "red", "viewmodelObjSha256": "660303a74567733472ff6fcbb2eb44f41379d457bb272874ef259c161c1cc801", "playerWorldBodyObjSha256": "d063a29a1442bebb5a869b26f4456296a16fe9f359239cf02abf8fae07b4d30d", "primaryPixels": { "torch": 0, "sword": 6798, "player": 3852, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false },
+        { "id": 8, "checkpoint": "green", "viewmodelObjSha256": "f694829b0131173586a0ed2ae9462d810fe4a4f52bd2ca2046cf8693c6677e0c", "playerWorldBodyObjSha256": "7702129f2a8d60b9062a0d8ea4ed4a357d81bee047b52b33383e53481280f290", "primaryPixels": { "torch": 0, "sword": 6798, "player": 3852, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false },
+        { "id": 9, "checkpoint": "mirror", "viewmodelObjSha256": "860817cfafbe84534249ceb01500a34cc0cce1fcae7857f08c2371e3e699b85c", "playerWorldBodyObjSha256": "a8af4d0eb78cb966636cfb84d7a5ac7dc80401a6f93b964a3b8a8f3f92dd25be", "primaryPixels": { "torch": 0, "sword": 6798, "player": 3852, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false },
+        { "id": 10, "checkpoint": "lich", "viewmodelObjSha256": "54eddea2acd27c9f434242c8de18255b80cbfe28e16127fc0e7ee3e76ad0831f", "playerWorldBodyObjSha256": "2818e324fb87e75a3e0c9b3a2cac94d9b1e053be50d8bb2e2de6ff3acf1e3af2", "primaryPixels": { "torch": 13, "sword": 7482, "player": 2692, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false },
+        { "id": 11, "checkpoint": "finale-roof", "viewmodelObjSha256": "82809fdf9263ea87c21ddcbcdd1b4396d0c6cb4bf242f6e453afa7ce22146884", "playerWorldBodyObjSha256": "ea5e67f67d12dde6434d2722ac1e1b192f1ec624ccf65e92e166df52b684e976", "primaryPixels": { "torch": 0, "sword": 6806, "player": 57218, "rewardRing": 419, "rewardBody": 16230 }, "pngEqual": true },
+        { "id": 12, "checkpoint": "two-enemy-combat", "viewmodelObjSha256": "5d656e6533315fb369fc8bbf559f48008da710305b2e83d04e1eb5f70f93bd33", "playerWorldBodyObjSha256": "ab35082355f36738902ea6fcd4afb1c4325017fb28a1dec3d1dafb7044947f5f", "primaryPixels": { "torch": 13652, "sword": 6798, "player": 10695, "rewardRing": 0, "rewardBody": 0 }, "pngEqual": false }
+      ]
+    },
+    {
+      "fixture": "player-viewmodel-lantern-low-parry",
+      "control": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\control\\player-viewmodel-lantern-low-parry\\capture-manifest.json", "sha256": "7cba368f631b5790da94a9f51dd6509611e4200006f7286989c4913f867cf616" },
+      "candidate": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\candidate\\player-viewmodel-lantern-low-parry\\capture-manifest.json", "sha256": "5555506fc04b1326dd0876a3398e0b85bdc94bc38ded6359a0d2bfa8c1555852" },
+      "capturePairs": 1,
+      "equal": { "camera": 1, "viewmodelObjSha256": 1, "playerWorldBodyObjSha256": 1, "primaryVisibilityPixels": 1, "pngSha256": 1 },
+      "primaryPixelAggregate": { "torch": 0, "sword": 17641, "player": 94429, "rewardRing": 1233, "rewardBody": 24204 },
+      "capture": { "id": 144, "checkpoint": "player-viewmodel-lantern-low-parry", "viewmodelObjSha256": "bf2682f34192bf46b9756ed90ea122a6cf225f23f0aadbb608d6b01855579596", "playerWorldBodyObjSha256": "e25329b84914c5ccaf61aa72beac29edc34db1842fe395736eb4041d2a3f4e89", "pngEqual": true }
+    },
+    {
+      "fixture": "player-viewmodel-lantern-high-look-up",
+      "control": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\control\\player-viewmodel-lantern-high-look-up\\capture-manifest.json", "sha256": "5b32c22fd608893e3bf11c0348532a4d32fd68432c332b2bc94f85f8b3ff341f" },
+      "candidate": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\candidate\\player-viewmodel-lantern-high-look-up\\capture-manifest.json", "sha256": "2c5a56cdf27855462aaf579095ac2e695f682d4189a4767598a361b13e706edc" },
+      "capturePairs": 1,
+      "equal": { "camera": 1, "viewmodelObjSha256": 1, "playerWorldBodyObjSha256": 1, "primaryVisibilityPixels": 1, "pngSha256": 1 },
+      "primaryPixelAggregate": { "torch": 0, "sword": 21514, "player": 68268, "rewardRing": 1306, "rewardBody": 51267 },
+      "capture": { "id": 146, "checkpoint": "player-viewmodel-lantern-high-look-up", "viewmodelObjSha256": "01879034f533eb6e0e9f5dcd7c6895b4826b74f4c7ab256f4f7fa5f0926ffa7e", "playerWorldBodyObjSha256": "2a62823a4351312cf55f28272a8b9ce2f1905f0831c14f5db2bb4d3fe95aea63", "pngEqual": true }
+    },
+    {
+      "fixture": "lantern-glass-production",
+      "control": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\control\\lantern-glass-production\\capture-manifest.json", "sha256": "ca3f5b2047c93eac3435397d147970bbf45e1473c419919a157c7e3ebe12ef62" },
+      "candidate": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\candidate\\lantern-glass-production\\capture-manifest.json", "sha256": "caf045d3eb56009254a0dd02bcc1bc3397fb786d97095f977f63b21b78709075" },
+      "capturePairs": 1,
+      "equal": { "camera": 1, "viewmodelObjSha256": 1, "playerWorldBodyObjSha256": 1, "primaryVisibilityPixels": 1, "pngSha256": 1 },
+      "primaryPixelAggregate": { "torch": 0, "sword": 0, "player": 0, "rewardRing": 395, "rewardBody": 9667 },
+      "capture": { "id": 115, "checkpoint": "lantern-glass-production", "viewmodelObjSha256": "dfdb4b90b7d1776cfc47589613b44a98e257788f50c22d219e04037944987ae4", "playerWorldBodyObjSha256": "b95270e6b533d2b4ffefc71cbadec4d8b63af4d9d4877ab650a628e901efe2e3", "pngEqual": true }
+    },
+    {
+      "fixture": "glass-tinted-transport",
+      "control": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\control\\glass-tinted-transport\\capture-manifest.json", "sha256": "7cf3edb0d4492a5b98c3d679e64bba9fee406a0d3715311d280ed824fa043bb4" },
+      "candidate": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\candidate\\glass-tinted-transport\\capture-manifest.json", "sha256": "51d3ecab471eb285351610d393ab87f5680c3498f1c86a330d37a671387eb7d7" },
+      "capturePairs": 1,
+      "equal": { "camera": 1, "viewmodelObjSha256": 1, "playerWorldBodyObjSha256": 1, "primaryVisibilityPixels": 1, "pngSha256": 1 },
+      "primaryPixelAggregate": { "torch": 43112, "sword": 21484, "player": 27534, "rewardRing": 0, "rewardBody": 0 },
+      "capture": { "id": 111, "checkpoint": "glass-tinted-transport", "viewmodelObjSha256": "dd3a8acd3e79b6b291588b0b2729013a5158ea16bef13fdafb4bf142edafd7a6", "playerWorldBodyObjSha256": "4bc4f14d85f44a19e52c9f99bd59b2719ae67bb02210c30b7420c85eabbbafcb", "pngEqual": true }
+    },
+    {
+      "fixture": "glass-millimetre-closed",
+      "control": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\control\\glass-millimetre-closed\\capture-manifest.json", "sha256": "f1cd4533c8e008a6f5bb678f468682e75f8f7abc79bda0131f46844775f6c78d" },
+      "candidate": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\candidate\\glass-millimetre-closed\\capture-manifest.json", "sha256": "1761a933351bd5b3b4baf4d7907babd4ac306c56f4d05dd28670ee223f7740b6" },
+      "capturePairs": 1,
+      "equal": { "camera": 1, "viewmodelObjSha256": 1, "playerWorldBodyObjSha256": 1, "primaryVisibilityPixels": 1, "pngSha256": 1 },
+      "primaryPixelAggregate": { "torch": 0, "sword": 21484, "player": 9763, "rewardRing": 0, "rewardBody": 0 },
+      "capture": { "id": 112, "checkpoint": "glass-millimetre-closed", "viewmodelObjSha256": "b0891b7591e16bf11d332716656420407dfd3479eabdfc625093ad61d3f156d8", "playerWorldBodyObjSha256": "27a4680a21c30d2895ccded628c1984a5f2d5a37e6c1a96eb26cd6d8420137c0", "pngEqual": true }
+    },
+    {
+      "fixture": "glass-fire-transport",
+      "control": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\control\\glass-fire-transport\\capture-manifest.json", "sha256": "f4129083230f520282dbe4b5638e5972eed984eb505e4be4e0a308b0169a3378" },
+      "candidate": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\candidate\\glass-fire-transport\\capture-manifest.json", "sha256": "6a7fbcf3d83b999f855adcab6e5862e0ccf06f0eaaea8c6fd3b1faadeae17883" },
+      "capturePairs": 1,
+      "equal": { "camera": 1, "viewmodelObjSha256": 1, "playerWorldBodyObjSha256": 1, "primaryVisibilityPixels": 1, "pngSha256": 1 },
+      "primaryPixelAggregate": { "torch": 43112, "sword": 21484, "player": 27534, "rewardRing": 0, "rewardBody": 0 },
+      "capture": { "id": 110, "checkpoint": "glass-fire-transport", "viewmodelObjSha256": "dd3a8acd3e79b6b291588b0b2729013a5158ea16bef13fdafb4bf142edafd7a6", "playerWorldBodyObjSha256": "4bc4f14d85f44a19e52c9f99bd59b2719ae67bb02210c30b7420c85eabbbafcb", "pngEqual": true }
+    },
+    {
+      "fixture": "glass-edge-fresnel",
+      "control": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\control\\glass-edge-fresnel\\capture-manifest.json", "sha256": "ecba16ca1bf34391c4c898ed9ea669b1910d781419322a8a230d312ff770a5e8" },
+      "candidate": { "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\images-mobile\\candidate\\glass-edge-fresnel\\capture-manifest.json", "sha256": "0e0bdcaa49a02dc5f3e32f16290e5d68d4da8db8382882d1f5b5a5d927c08bcf" },
+      "capturePairs": 1,
+      "equal": { "camera": 1, "viewmodelObjSha256": 1, "playerWorldBodyObjSha256": 1, "primaryVisibilityPixels": 1, "pngSha256": 1 },
+      "primaryPixelAggregate": { "torch": 0, "sword": 21484, "player": 9763, "rewardRing": 0, "rewardBody": 0 },
+      "capture": { "id": 113, "checkpoint": "glass-edge-fresnel", "viewmodelObjSha256": "b617a42dec1f804f9a5d231f5e75707d4aa3a9f2a7bdb94ac2ae1c4b0207b54d", "playerWorldBodyObjSha256": "d2761bde7793362f9a01eb010ec0d3a45a39f18642952b45c213dc64e7a93723", "pngEqual": true }
+    }
+  ],
+  "limitations": [
+    "The seven single-development-fixture PNG byte matches demonstrate only equality for these retained desktop fixture renders; they do not establish phone behavior or fix any previously observed physical-device failure.",
+    "In the 13-capture standard batch, 12 PNG hashes differ despite equal camera, geometry, and primary visibility counts. This is a recorded image-output difference, not proof of visual acceptability or equivalence.",
+    "The main agent is independently running the unchanged compare-foundation-captures.ps1 batch; this summary does not replace or pre-empt its result."
+  ]
+}

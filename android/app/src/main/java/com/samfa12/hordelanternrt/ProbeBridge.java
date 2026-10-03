@@ -9,6 +9,19 @@ public final class ProbeBridge {
 
     public static native String getTextReport();
     public static native String getJsonReport();
+    // One status byte (0=ready), then strict UTF-8 JSON/error text. No modified UTF-8.
+    public static native byte[] preparePlaytestReport(String reportId, String capturedAtUtc,
+            int category, int impact, String note, boolean exportConsent,
+            boolean includeBasicContext, String rawModel);
+    public static native byte[] preparePlaytestSubmission(String reportId, String capturedAtUtc,
+            int category, int impact, String note, boolean submissionConsent,
+            boolean includeBasicContext, String rawModel, boolean includeScreenshot,
+            long captureToken, byte[] screenshotPng);
+    // Consent BEFORE render-owner readback. status0 + LE width,height + RGBA8;
+    // status1=pending,2=unavailable. This reads only the presented game RT target.
+    public static native long requestPlaytestCapture(boolean screenshotConsent);
+    public static native byte[] takePlaytestCapture(long captureToken);
+    public static native void cancelPlaytestCapture(long captureToken);
     public static native String getDeveloperOverlayText();
     public static native byte[] getGitHubReleaseRequestContract();
     public static native byte[] evaluateGitHubReleaseUpdate(String installedVersion,
@@ -16,8 +29,10 @@ public final class ProbeBridge {
                                                              byte[] responseBodyUtf8);
     public static native boolean writeReports(String baseDirectory);
 
-    public static native boolean startDiagnosticSurface(android.view.Surface surface, String baseDirectory);
-    public static native void stopDiagnosticSurface();
+    /** Returns an accepted request token, not renderer readiness; zero is failure. */
+    public static native long startDiagnosticSurface(android.view.Surface surface, String baseDirectory);
+    public static native void stopDiagnosticSurface(long generation);
+    public static native int getSurfaceRuntimeState(long generation);
     public static native void setViewControls(float yaw, float pitch, float torchLightStrength, float moveStrafe, float moveForward);
     public static native void requestAttack();
     public static native void requestParry();
@@ -48,10 +63,13 @@ public final class ProbeBridge {
     public static native int getCurrentRenderScalePercent();
     public static native int getCurrentWaterQuality();
     public static native void setGpuTimingEnabled(boolean enabled);
+    public static native void setRequiredRayQueryCompute(boolean required);
     public static native boolean requestDebugCheckpoint(int checkpointId);
     public static native boolean requestDebugCaptureCheckpoint(int checkpointId);
     public static native boolean requestDebugRouteReplay();
     public static native boolean requestBenchmark();
+    public static native boolean requestBenchmarkWithId(String runId);
+    public static native boolean requestBenchmarkWithIdAndWorkload(String runId, String workload);
     public static native void cancelBenchmark();
     public static native int getBenchmarkStatus();
     public static native String getBenchmarkProgress();

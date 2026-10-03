@@ -1,0 +1,6 @@
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-check-966f83dab7c246398569e95b8108848c\minimal.legacy.rgen.resolved
+Raygen check artifacts: C:\Users\sam_s\AppData\Local\Temp\horde-raygen-check-966f83dab7c246398569e95b8108848c
+Source dependency SHA-256: 470d0e6a1dc9b11b101a818b4d204048a9c6da7f1197e7425b93af396f0f22b6; embedded include SHA-256: a3b32262260a25e31fbc880f851baabc5df14bbbb7995fd532e5696afd3e06bb
+SPIR-V bytes: 505248; words: 126312; instructions: 27715; branch operations: 3715; loops: 49; selection merges: 1519; SHA-256: dcf51ae9a3a19689d7b71bf0e15cc0a00c07947d1417657301b196926b21665b
+Raygen optimizer shape: functions=1; calls=0; ray-query sites=23
+Embedded raygen SPIR-V words match the compiled shader.

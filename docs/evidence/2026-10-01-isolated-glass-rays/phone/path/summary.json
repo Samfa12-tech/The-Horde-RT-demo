@@ -1,0 +1,59 @@
+{
+  "schema": 8,
+  "runId": "20261001-034218",
+  "mode": "Benchmark",
+  "scale": 75,
+  "include100": false,
+  "rtLabWorkloadComparison": false,
+  "rtLabComparisonCheckpoints": null,
+  "checkpoints": [
+    "lantern-glass-production"
+  ],
+  "gpuTiming": "enabled",
+  "deviceSerial": "R5GL219SZGK",
+  "deviceModel": "SM-S948B",
+  "androidVersion": "16",
+  "apiLevel": "36",
+  "osBuildFingerprint": "samsung/m3qxxx/m3q:16/BP4A.251205.006/S948BXXS4AZHL_OXM4AZHL:user/release-keys",
+  "gpuName": "Adreno (TM) 840",
+  "gpuVendorId": 20803,
+  "gpuDeviceId": 1141180977,
+  "gpuDriverVersion": 2150932499,
+  "vulkanApiVersion": 4210983,
+  "displaySize": "Physical size: 1440x3120",
+  "displayDensity": "Physical density: 600\r\nOverride density: 560",
+  "package": "com.samfa12.hordelanternrt.debug",
+  "apkSha256": "3277fe818871e7a2a02073dac815e278ec1c9ad6cb0c89c33d3f1afc9062c20d",
+  "installedApkSha256": "3277fe818871e7a2a02073dac815e278ec1c9ad6cb0c89c33d3f1afc9062c20d",
+  "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+  "sourceDirty": true,
+  "selectedRtPipelineBundle": {
+    "opaqueFast": {
+      "key": "diagnostic_mobile_opaque_fast",
+      "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "sha256": "a1f236da37f20ddd7af20bc815b04e2d90fed14c1b883f733a4e042640079add"
+    }
+  },
+  "captureRequested": true,
+  "captureCheckpointCount": 1,
+  "captureManifest": "capture-manifest.json",
+  "lifecycle": {
+    "requested": true,
+    "homeResumePassed": true,
+    "honestPresentationAfterResume": true,
+    "log": "lifecycle-home-resume-logcat.txt"
+  },
+  "timingMethod": "CPU wall-clock from frame start through vkQueuePresentKHR; not a Vulkan GPU timestamp",
+  "performanceReference": {
+    "policy": "descriptive FPS-equivalent bands; no single frame-time threshold is a product acceptance gate",
+    "sixtyFpsMs": 16.667,
+    "fiftyFpsMs": 20.0,
+    "thirtyFpsMs": 33.333,
+    "matchedRegressionInvestigationPercent": 15.0
+  },
+  "warnings": [],
+  "failures": []
+}

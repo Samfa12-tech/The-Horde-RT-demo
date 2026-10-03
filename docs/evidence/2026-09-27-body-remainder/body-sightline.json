@@ -1,0 +1,33 @@
+{
+  "source": "C:/Dev/tmp/horde-seam-reconciled-native-20260927-a/player-viewmodel-lantern-low-look-down/145-player-viewmodel-lantern-low-look-down.player-world-body.obj",
+  "cameraModel": [
+    -0.0023995868467785336,
+    1.649749291,
+    -0.3009106001048898
+  ],
+  "targetDistanceMetres": 1.0855443197331927,
+  "intersections": [
+    {
+      "triangle": 15407,
+      "semantic": "HeadPrimaryMasked",
+      "distanceMetres": 0.08741535050148633,
+      "worldPosition": [
+        -10.720644744336965,
+        0.649589935592144,
+        -15.189531523164353
+      ],
+      "facing": "front"
+    },
+    {
+      "triangle": 23266,
+      "semantic": "NearFacePrimaryMasked",
+      "distanceMetres": 0.4098880183199653,
+      "worldPosition": [
+        -10.9812511371845,
+        0.46362868437887716,
+        -15.150913618713705
+      ],
+      "facing": "back"
+    }
+  ]
+}

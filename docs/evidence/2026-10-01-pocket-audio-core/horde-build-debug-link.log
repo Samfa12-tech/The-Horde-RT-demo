@@ -1,0 +1,66 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  SimulationGameplayTests.cpp
+  horde_rt_simulation_gameplay_tests.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_rt_simulation_gameplay_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  SimulationTimingTests.cpp
+  horde_rt_simulation_timing_tests.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_rt_simulation_timing_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  SpatialAudioSmoke.cpp
+  horde_rt_spatial_audio_smoke.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_rt_spatial_audio_smoke.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  RtPerformanceEvidence.cpp
+  RtEvidencePublication.cpp
+  RtBenchmarkEvidenceRun.cpp
+  RtBenchmarkEvidenceReport.cpp
+  ShowcaseBenchmark.cpp
+  AssetManifest.cpp
+  AssetValidation.cpp
+  GitHubReleaseUpdater.cpp
+  DeviceCapabilities.cpp
+  RtCapabilityReport.cpp
+  GpuFrameTimer.cpp
+  VulkanContext.cpp
+  RayTracingRequirements.cpp
+  RtGpuResources.cpp
+  HeldItemRenderSlot.cpp
+  FireEmitterBuffer.cpp
+  RtStaticMeshSlot.cpp
+  RtTextureArrays.cpp
+  CharacterRenderSlot.cpp
+  PlayerRenderSlot.cpp
+  Generating Code...
+  Compiling...
+  RtPipelineVariants.cpp
+  RtPipelineVariantProvider.cpp
+  RtPipelineBundleContracts.cpp
+  RtPipelineBundle.cpp
+  RtFrameEvidenceCoordinator.cpp
+  PresentableTinyRtScene.cpp
+  SimulationFrameAdapter.cpp
+  SkinnedMeshAsset.cpp
+  Generating Code...
+  GltfDocument.cpp
+  StaticMeshAsset.cpp
+  Generating Code...
+  horde_rt_probe_core.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_rt_probe_core.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  DiagnosticWindowMain.cpp
+  DiagnosticWindow.cpp
+  WindowsGitHubReleaseUpdate.cpp
+  DiagnosticOverlay.cpp
+  Generating Code...
+  horde_rt_diagnostic_window.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\HordeLanternRT.exe

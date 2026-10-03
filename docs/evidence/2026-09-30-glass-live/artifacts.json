@@ -1,0 +1,33 @@
+{
+  "baseCommit": "aaf973a44e2261bd284c91970f47447afbf365ff",
+  "sourceState": "base plus the committed benchmark row counter retention/report change; built before commit",
+  "rendererChanged": false,
+  "shaderAbiChanged": false,
+  "artifacts": [
+    {
+      "role": "ordinary Diagnostic/Mobile Android ARM64 Debug, installed and pulled back identically",
+      "path": "C:/Dev/tmp/horde-glass-live-20260930/HordeLanternRT-live-ledger-debug-arm64.apk",
+      "sha256": "ad6ebaa581f9ed874a268d373922e1b0b6cbc5ef3e19fd369c58adc28549d1f0"
+    },
+    {
+      "role": "unsigned Shipping/Mobile ARM64 Release, not installed or published",
+      "path": "C:/Dev/tmp/horde-glass-live-20260930/HordeLanternRT-live-ledger-shipping-unsigned-arm64.apk",
+      "sha256": "6040516b8de936266322f60496d62b6525ba4e81734eae08ee55b11dd4adfd4f"
+    },
+    {
+      "role": "Diagnostic/High Windows native RT live benchmark, both backends",
+      "path": "C:/Dev/tmp/horde-glass-corner-ab-20260930/candidate-stage/HordeLanternRT.live-ledger-high.exe",
+      "sha256": "3b33ce56c554173ec2807dab37f77f71483d1bb5e9894bd30b0ccb742bd314b2"
+    },
+    {
+      "role": "game-only continuous warm-up sequence plus first measured frames, local raw clip1 seconds20-179; reencoded for privacy, not a pixel gate",
+      "path": "live-reveal-game-only.mp4",
+      "sha256": "38da4c63f49cfeaedeab1513eb35459090a4726deaed48549ec30686b52370cd"
+    },
+    {
+      "role": "game-only later measured segment, local raw clip2 seconds0-40; reencoded for privacy, not a pixel gate",
+      "path": "live-reveal-late-game-only.mp4",
+      "sha256": "d7958210019c6008ca727c02a707d259df19cb5fa1fd9867f087edcf2e7ecb7d"
+    }
+  ]
+}

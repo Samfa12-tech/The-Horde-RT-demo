@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "classification": "staged-primary-analysis-preflight",
+  "newTrialReportsRead": false,
+  "deviceCallsMade": false,
+  "buildsRun": false,
+  "sourceEdits": false,
+  "artifactRoles": {
+    "control": {
+      "apkSha256": "8ead0a2ba632ba490027ee8806d7e135002fb09713fad14390fcd2186a5bf175",
+      "sourcePairing": "59cb0576790cdb47d529746ab3d2d30ac34462fb, tracked-clean runtime source; unrelated scratch preserved",
+      "executionOrganisation": "normal",
+      "selectedPair": {
+        "opaqueFast": {"key":"shipping_mobile_opaque_fast","sha256":"66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"},
+        "genericDielectric": {"key":"shipping_mobile_generic_dielectric","sha256":"ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532"}
+      }
+    },
+    "candidate": {
+      "apkSha256": "fe116182e2fbdbbecbfca84b1cd56a96d0f216fc671ccad68b5948a07887d62a",
+      "sourceHead": "783f1be06c4631101f05b4eb175cf095973ad9b7",
+      "sourcePairing": "783f1be+retained-dirty-inputs; candidate is not represented as a clean match to control",
+      "executionOrganisation": "staged-primary-v1",
+      "selectedPair": {
+        "opaqueFast": {"key":"staged_primary_v1_shipping_mobile_opaque_fast","sha256":"8f9f8cd60b35d9dd91ffd487b492ef4f64a8028c444feef2f8b853fe026dd918"},
+        "genericDielectric": {"key":"staged_primary_v1_shipping_mobile_generic_dielectric","sha256":"07b56d6576d8537813eca70bd99dfdffc10c4fafb1f63fad7a080735d1e8f814"}
+      },
+      "stagedModules": {
+        "staged_shipping_mobile_OpaqueFast_primary":"6a05d46a3a83671db431d1ff04782ecb1937243c3292257e8cf5a501a7877dff",
+        "staged_shipping_mobile_OpaqueFast_shade":"147f113e8dfcfeb14811513af667b81c0f7352544e931b9c25ff37293d67d7d3",
+        "staged_shipping_mobile_GenericDielectric_primary":"82b45ee960bbbeb6f0dfed1ffb9550dbb7bb34a7d70325c0d913a4186e8df5d0",
+        "staged_shipping_mobile_GenericDielectric_shade":"fabc53f43b7d00b4be683d23a978dd6045909c3e649fc1c8f8f9055d82e3c86d"
+      }
+    }
+  },
+  "identityPreflight": {
+    "result": "PASS",
+    "checks": [
+      "Immutable normal and staged APK SHA-256 values matched the explicit map.",
+      "Control and candidate packages contain byte-identical current normal Shipping/Mobile raygen modules.",
+      "Candidate staged four-module SHA roster matches staged-primary-manifest.json.",
+      "Staged Mobile pair keys and pair hashes match the staged manifest; normal pair keys/hashes match the retained normal package/catalog identities."
+    ],
+    "stagedManifestSha256":"0813589f6ed357857ab6c10a7f044e0db24c4c931ba60eb73a9b203c587e484f",
+    "candidateModuleInspectionSha256":"d7bcd2a3b5d93eb122ad18862831afae51bfcc29d0fceae0de781855e356994f",
+    "normalContainmentSha256":"dab8f5b6265cf36b145b9277c59d7e6c4025604164de493338e067f6ffe70394"
+  },
+  "analysisContract": {
+    "workloads": {"showcase-route-v1":1838,"lantern-held-high-v1":600,"lantern-reveal-sequence-v1":600},
+    "requiredContext": {"deviceModel":"SM-S948B","gpu":"Adreno (TM) 840","instrumentation":"Shipping","quality":"Mobile","renderScalePercent":75,"internalExtent":"1080x2235","presentationExtent":"1440x2980","rtMode":"RayTracingPipeline","presentMode":"MAILBOX","materialEncoding":"strict ASTC 6x6 lich"},
+    "runIdPattern": "staged-b[12]-{a1,b1,b2,a2}-{route,high,live}",
+    "checks": ["report/trial/result identity and complete fence status","seven submitted/completed joins plus strictly increasing completion serials","per-row compiled-out diagnostic status","full route zone denominators and 160 opening opaque-fast rows","live sequence 600-frame yellow-torch-bay denominator","GPU mean/median/p90/p95/slowest-1-percent recomputation from raw per-row durations","CPU zone counts and weighted means reconciled; raw CPU percentiles unavailable because frame rows omit stage durations","WholeFrameCycle full-scope plus route-opening and per-zone summaries retained","nonnegative finite CPU/GPU stage summaries"],
+    "executionOrganisation": "Preserve the field if present in retained report or marker JSON; otherwise explicitly record it as a missing export gap, never infer it.",
+    "claimBoundary": "Per-run arithmetic only. No causal A/B, physical performance acceptance, or production promotion."
+  },
+  "hostNegativeFixture": {
+    "result":"PASS",
+    "fixture":"retained-old-Shipping trial+actual baseline install receipt, copied and run IDs normalized only in the fixture copy",
+    "expectedMember":"candidate",
+    "observed":"rejected because actual retained receipt member is baseline",
+    "receipt":"host-negative-fixtures/staged-b2-a1-route-retained-old-shipping-negative-20261001T035714988Z/negative-fixture-receipt.json",
+    "receiptSha256":"4fdc891f43d4d778a6a7fa42b0899850debbbdbc7d2cd97767efca2b3d06f935"
+  },
+  "tools": {
+    "analyser":"analyse-staged-primary-trial.ps1",
+    "analyserSha256":"16dfc930c8cec83fbf46d7a4d9be8f915a7ccad5dad078f7701a628b83706318",
+    "negativeFixtureTest":"test-staged-primary-analyser-negative.ps1",
+    "negativeFixtureTestSha256":"102ea12d221165a3e17cf5fad3db973f2a777ef2465e17d315317f18567bf16b",
+    "syntax":"both PowerShell files parsed without syntax errors",
+    "controlCommit":"59cb0576790cdb47d529746ab3d2d30ac34462fb"
+  },
+  "pending": "Run the analyser only when a current staged trial and its matching real install receipt are sealed; keep each member/workload report immutable."
+}

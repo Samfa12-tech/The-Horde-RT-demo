@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "role": "Viewmodel",
+  "sourceWorldSha256": "e8737f10e7669b284e04109d9c3acdf537df284093a21511656bf191a70450fd",
+  "gauntletSourceHandedness": "Right",
+  "gripRollCorrectionRadians": null,
+  "gripRollRadiansBySide": {
+    "Left": 1.8325957145940461,
+    "Right": 2.530727415391778
+  },
+  "pairedWorldRuntime": "world-grip-calibrated.runtime.glb",
+  "pairedWorldSha256": "4050e15b5084bfa83ad9db09f8bb8ececd872be89a27d0b08447c12f9f7a501d",
+  "sleeveWeightMode": "ElbowCentredArmForeArm",
+  "sleeveHandWeightsMovedToForearm": {
+    "Left": 222,
+    "Right": 184
+  },
+  "elbowWeightField": {
+    "Left": {
+      "vertices": 2647,
+      "halfWidthMetres": 0.05410755714952701
+    },
+    "Right": {
+      "vertices": 1983,
+      "halfWidthMetres": 0.051390516825712766
+    }
+  },
+  "sleeveEnvelopeFit": {},
+  "runtime": "gothic-traveller-viewmodel.runtime.glb",
+  "runtimeSha256": "194aab2874993c68b0ab5950ed82085564e8567b9a5f8126f27ceb11283f5e06",
+  "primitiveSemantics": {
+    "ViewmodelSleeves": 5532,
+    "ViewmodelGauntlets": 8838
+  },
+  "processingVertices": 15850,
+  "ownership": "Primary-only modelled geometry; world body owns secondary visibility",
+  "animationAuthority": "Same authored rig, Idle/Walking NLA tracks and named grip bones as world reference",
+  "licence": "Derivative of existing licensed Meshy player/gauntlet inputs; see ASSET_LICENSES.md",
+  "status": "Offline candidate only; GPU ownership, grip/pitch/motion and owner acceptance not yet established"
+}

@@ -1,0 +1,53 @@
+{
+  "backend": "Vulkan",
+  "rtMode": "RayTracingPipeline",
+  "executionBackend": "RayTracingPipeline",
+  "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+  "vendorId": 4318,
+  "deviceId": 11672,
+  "driverVersion": 2559295488,
+  "driverVersionText": "610.188.0",
+  "vulkanApiVersion": 4211029,
+  "vulkanApiVersionText": "1.4.341",
+  "extensions": {
+    "VK_KHR_acceleration_structure": true,
+    "VK_KHR_ray_tracing_pipeline": true,
+    "VK_KHR_ray_query": true,
+    "VK_KHR_buffer_device_address": true,
+    "VK_KHR_deferred_host_operations": true
+  },
+  "features": {
+    "accelerationStructure": true,
+    "rayTracingPipeline": true,
+    "rayQuery": true,
+    "bufferDeviceAddress": true
+  },
+  "internalRenderResolution": {
+    "width": 1232,
+    "height": 803
+  },
+  "fps": 171.679718,
+  "frameTimeMs": 5.824800,
+  "gpuRtTiming": {
+    "status": "GPU RT command-buffer timing is available.",
+    "supported": true,
+    "valid": true,
+    "latestMs": 2.525216,
+    "averageMs": 2.524971,
+    "timestampPeriodNanoseconds": 1,
+    "timestampValidBits": 64,
+    "sampleCount": 7199,
+    "unavailableCount": 0,
+    "errorCount": 0
+  },
+  "rtScene": {
+    "status": "Presented via swapchain",
+    "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+    "dispatchWidth": 1232,
+    "dispatchHeight": 803,
+    "presented": true
+  },
+  "diagnostics": ["Inspecting candidate 1", "Driver version packed: 2559295488", "Driver version: 610.188.0", "Vulkan API version: 1.4.341", "RT capability mode: RayTracingPipeline"],
+  "rtFrameEvidence": {"version":1,"observerAvailable":true,"sceneEpoch":2,"measurementGeneration":4,"running":true,"paused":true,"presented":true,"diagnosticStatus":"compiled-out","gpuStatus":"valid","completedFrameStatus":"available","completedFrameReason":null,"completedFrame":{"schema":1,"identity":{"sceneEpoch":2,"measurementGeneration":4,"recordAttemptSerial":7199,"recordSerial":7199,"submissionSerial":7199,"completionSerial":7199,"simulationTick":618,"frameSlot":0},"pipeline":{"executionBackend":"RayTracingPipeline","instrumentation":"shipping","dielectricQuality":"high","bundleKey":"shipping_high_pair","opaqueFast":{"key":"shipping_high_opaque_fast","sha256":"66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b"},"genericDielectric":{"key":"shipping_high_generic_dielectric","sha256":"79e80a489e93f02f99292cf76bc8f7405645159b63d1fe2bcca407b65f16b8fa"},"activeStrategy":"opaque-fast","activeKey":"shipping_high_opaque_fast","activeSha256":"66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b","waterQuality":"high"},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"resources":{"bufferCount":44,"memoryAllocationCount":54,"bottomLevelAccelerationStructureCount":17,"topLevelAccelerationStructureCount":1,"tlasInstanceCount":21,"pipelineCount":2,"shaderBindingTableCount":2,"descriptorSetCount":1,"hostVisibleBytes":9816288,"deviceLocalBytes":235010816},"player":{"skinCadenceHz":60,"skinUpdateCount":619,"maximumSocketErrorMicrometres":10,"primaryPixelCountAvailable":false,"primaryPixelCount":null,"primaryVisible":false},"dielectric":{"status":"compiled-out","available":false,"compiled":false,"completedSubmissionSerial":0,"readCount":0,"resetCount":0,"counters":null,"detail":""},"gpu":{"status":"valid","available":true,"completedSubmissionSerial":7199,"wholeRtGpuMs":2.525216,"timestampValidBits":64,"timestampPeriodPicoseconds":1000,"sampleCount":7199,"unavailableResultCount":0,"errorCount":0,"detail":"GPU RT command-buffer timing is available."},"stages":{"status":"valid","simulationStepCpuMs":0.002700,"skinCpuMs":0.000000,"playerSkinCpuMs":0.000000,"characterSkinCpuMs":0.000000,"dynamicUploadCpuMs":0.002100,"blasRefitRecordCpuMs":0.000000,"tlasUpdateRecordCpuMs":0.027000,"traceCopyRecordCpuMs":0.030000,"frameFenceWaitCpuMs":0.004800,"imageAcquireCpuMs":0.004800,"queueSubmitCpuMs":0.046500,"presentCallCpuMs":5.513800,"wholeFrameCycleCpuMs":6.079400,"workInvocationCounts":[1,0,0,0,5,0,1,1,1,1,1,1,1],"byteCounts":[0,0,0,0,4688,0,0,0,0,0,0,0,0],"operationCounts":[0,0,0,0,5,0,0,0,1,1,1,1,1]},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":7199,"finalIdleCompletion":false},"cpuBenchmarkEligible":false,"benchmarkEligible":false}
+}
+}

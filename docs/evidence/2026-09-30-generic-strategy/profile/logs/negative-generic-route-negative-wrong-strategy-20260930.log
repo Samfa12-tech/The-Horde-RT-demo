@@ -1,0 +1,2 @@
+EXPECTED_REJECTION=all rows selected opaque-fast
+ACTUAL_DIAGNOSTIC=all rows selected opaque-fast expected '1838', found '1837'

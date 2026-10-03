@@ -1,0 +1,226 @@
+{
+  "schema": 1,
+  "status": "frozen",
+  "metrics": [
+    "bytes",
+    "words",
+    "instructions",
+    "branchOperations",
+    "loops",
+    "selectionMerges",
+    "functions",
+    "functionCalls",
+    "rayQueryInitializations",
+    "atomicInstructions"
+  ],
+  "budgets": [
+    {
+      "key": "diagnostic_high_generic_dielectric",
+      "max": {
+        "bytes": 252680,
+        "words": 63170,
+        "instructions": 14955,
+        "branchOperations": 830,
+        "loops": 15,
+        "selectionMerges": 353,
+        "functions": 63,
+        "functionCalls": 199,
+        "rayQueryInitializations": 2,
+        "atomicInstructions": 41
+      },
+      "exact": {
+        "instrumentation": "Diagnostic",
+        "quality": "High",
+        "material": "GenericDielectric",
+        "strategy": "GenericRetained",
+        "shippingAllowed": false,
+        "atomicInstructions": 41,
+        "hasDiagnosticsBinding": true,
+        "driverSafeFullyInlined": false,
+        "boundedGenericFunctionsRetained": true
+      }
+    },
+    {
+      "key": "diagnostic_high_opaque_fast",
+      "max": {
+        "bytes": 505660,
+        "words": 126415,
+        "instructions": 27733,
+        "branchOperations": 3715,
+        "loops": 49,
+        "selectionMerges": 1519,
+        "functions": 1,
+        "functionCalls": 0,
+        "rayQueryInitializations": 23,
+        "atomicInstructions": 5
+      },
+      "exact": {
+        "instrumentation": "Diagnostic",
+        "quality": "High",
+        "material": "OpaqueFast",
+        "strategy": "LegacyInlined",
+        "shippingAllowed": false,
+        "atomicInstructions": 5,
+        "hasDiagnosticsBinding": true,
+        "driverSafeFullyInlined": true,
+        "boundedGenericFunctionsRetained": false
+      }
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "max": {
+        "bytes": 252680,
+        "words": 63170,
+        "instructions": 14955,
+        "branchOperations": 830,
+        "loops": 15,
+        "selectionMerges": 353,
+        "functions": 63,
+        "functionCalls": 199,
+        "rayQueryInitializations": 2,
+        "atomicInstructions": 41
+      },
+      "exact": {
+        "instrumentation": "Diagnostic",
+        "quality": "Mobile",
+        "material": "GenericDielectric",
+        "strategy": "GenericRetained",
+        "shippingAllowed": false,
+        "atomicInstructions": 41,
+        "hasDiagnosticsBinding": true,
+        "driverSafeFullyInlined": false,
+        "boundedGenericFunctionsRetained": true
+      }
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "max": {
+        "bytes": 505660,
+        "words": 126415,
+        "instructions": 27733,
+        "branchOperations": 3715,
+        "loops": 49,
+        "selectionMerges": 1519,
+        "functions": 1,
+        "functionCalls": 0,
+        "rayQueryInitializations": 23,
+        "atomicInstructions": 5
+      },
+      "exact": {
+        "instrumentation": "Diagnostic",
+        "quality": "Mobile",
+        "material": "OpaqueFast",
+        "strategy": "LegacyInlined",
+        "shippingAllowed": false,
+        "atomicInstructions": 5,
+        "hasDiagnosticsBinding": true,
+        "driverSafeFullyInlined": true,
+        "boundedGenericFunctionsRetained": false
+      }
+    },
+    {
+      "key": "shipping_high_generic_dielectric",
+      "max": {
+        "bytes": 243852,
+        "words": 60963,
+        "instructions": 14531,
+        "branchOperations": 783,
+        "loops": 15,
+        "selectionMerges": 325,
+        "functions": 63,
+        "functionCalls": 199,
+        "rayQueryInitializations": 2,
+        "atomicInstructions": 0
+      },
+      "exact": {
+        "instrumentation": "Shipping",
+        "quality": "High",
+        "material": "GenericDielectric",
+        "strategy": "GenericRetained",
+        "shippingAllowed": true,
+        "atomicInstructions": 0,
+        "hasDiagnosticsBinding": false,
+        "driverSafeFullyInlined": false,
+        "boundedGenericFunctionsRetained": true
+      }
+    },
+    {
+      "key": "shipping_high_opaque_fast",
+      "max": {
+        "bytes": 501424,
+        "words": 125356,
+        "instructions": 27554,
+        "branchOperations": 3693,
+        "loops": 49,
+        "selectionMerges": 1510,
+        "functions": 1,
+        "functionCalls": 0,
+        "rayQueryInitializations": 23,
+        "atomicInstructions": 0
+      },
+      "exact": {
+        "instrumentation": "Shipping",
+        "quality": "High",
+        "material": "OpaqueFast",
+        "strategy": "LegacyInlined",
+        "shippingAllowed": true,
+        "atomicInstructions": 0,
+        "hasDiagnosticsBinding": false,
+        "driverSafeFullyInlined": true,
+        "boundedGenericFunctionsRetained": false
+      }
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "max": {
+        "bytes": 243852,
+        "words": 60963,
+        "instructions": 14531,
+        "branchOperations": 783,
+        "loops": 15,
+        "selectionMerges": 325,
+        "functions": 63,
+        "functionCalls": 199,
+        "rayQueryInitializations": 2,
+        "atomicInstructions": 0
+      },
+      "exact": {
+        "instrumentation": "Shipping",
+        "quality": "Mobile",
+        "material": "GenericDielectric",
+        "strategy": "GenericRetained",
+        "shippingAllowed": true,
+        "atomicInstructions": 0,
+        "hasDiagnosticsBinding": false,
+        "driverSafeFullyInlined": false,
+        "boundedGenericFunctionsRetained": true
+      }
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "max": {
+        "bytes": 501424,
+        "words": 125356,
+        "instructions": 27554,
+        "branchOperations": 3693,
+        "loops": 49,
+        "selectionMerges": 1510,
+        "functions": 1,
+        "functionCalls": 0,
+        "rayQueryInitializations": 23,
+        "atomicInstructions": 0
+      },
+      "exact": {
+        "instrumentation": "Shipping",
+        "quality": "Mobile",
+        "material": "OpaqueFast",
+        "strategy": "LegacyInlined",
+        "shippingAllowed": true,
+        "atomicInstructions": 0,
+        "hasDiagnosticsBinding": false,
+        "driverSafeFullyInlined": true,
+        "boundedGenericFunctionsRetained": false
+      }
+    }
+  ]
+}

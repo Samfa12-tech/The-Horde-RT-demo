@@ -3,21 +3,30 @@ param(
     [ValidatePattern('^[0-9A-Za-z][0-9A-Za-z.+-]*$')]
     [string]$Version,
 
+    [Parameter(Mandatory = $true)]
+    [ValidatePattern('^[0-9a-fA-F]{40}$')]
+    [string]$TargetCommit,
+
     [string]$ReleaseName,
     [string]$NotesFile,
+    [string]$ArtifactDirectory,
     [switch]$Draft,
-    [switch]$Prerelease = $true
+    [switch]$Prerelease = $true,
+    [switch]$PreflightOnly
 )
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
-$candidateRoot = Join-Path $repoRoot 'releases\candidates'
+if ([string]::IsNullOrWhiteSpace($ArtifactDirectory)) { $candidateRoot = Join-Path $repoRoot 'releases\candidates' }
+else { $candidateRoot = [IO.Path]::GetFullPath($ArtifactDirectory) }
 $safeVersion = $Version -replace '[^0-9A-Za-z.-]', '-'
 $tag = "v$Version"
 $baseName = "Horde-Lantern-RT-Alpha-$safeVersion"
 $windowsZip = Join-Path $candidateRoot "$baseName-Windows-x64.zip"
 $androidApk = Join-Path $candidateRoot "$baseName-Android.apk"
 $hashFile = Join-Path $candidateRoot 'SHA256SUMS.txt'
+$preflightScript = Join-Path $PSScriptRoot 'preflight-github-release.ps1'
+. (Join-Path $PSScriptRoot 'github-release-preflight-invoker.ps1')
 
 function Require-File([string]$Path, [string]$Description) {
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
@@ -52,6 +61,12 @@ foreach ($command in @('git', 'gh')) {
     }
 }
 
+Require-File $preflightScript 'Exact release-provenance preflight'
+$preflightResult = Invoke-HordeGitHubReleasePreflight -PreflightScript $preflightScript -Version $Version -ArtifactDirectory $candidateRoot -ExpectedTargetCommit $TargetCommit
+if ($preflightResult.ExitCode -ne 0) {
+    throw "Exact release-provenance preflight did not pass for $Version."
+}
+
 Require-File $windowsZip 'Windows release ZIP'
 Require-File $androidApk 'Signed Android release APK'
 Require-File $hashFile 'Release hash manifest'
@@ -64,6 +79,11 @@ $expectedHashes = Read-ExpectedHashes $hashFile
 Assert-Hash $windowsZip $expectedHashes
 Assert-Hash $androidApk $expectedHashes
 
+if ($PreflightOnly) {
+    Write-Host "Exact release-provenance preflight passed for $Version / $TargetCommit."
+    return
+}
+
 & gh auth status
 if ($LASTEXITCODE -ne 0) {
     throw 'GitHub CLI is not authenticated. Run: gh auth login'
@@ -71,6 +91,10 @@ if ($LASTEXITCODE -ne 0) {
 
 Push-Location $repoRoot
 try {
+    $resolvedTarget = (& git rev-parse "$TargetCommit^{commit}").Trim().ToLowerInvariant()
+    if ($LASTEXITCODE -ne 0 -or $resolvedTarget -ne $TargetCommit.ToLowerInvariant()) {
+        throw "TargetCommit must resolve to the exact supplied full commit: $TargetCommit"
+    }
     $remote = (& git remote get-url origin).Trim()
     if ($remote -notmatch 'Samfa12-tech/The-Horde-RT-demo(?:\.git)?$') {
         throw "Unexpected origin remote: $remote"
@@ -85,34 +109,22 @@ try {
         $ReleaseName = "Horde Lantern RT $Version"
     }
 
-    $generatedNotes = Join-Path $env:TEMP "horde-github-release-$safeVersion.md"
-    if ([string]::IsNullOrWhiteSpace($NotesFile)) {
-        @"
-# Horde Lantern RT $Version
-
-Native Vulkan hardware-ray-tracing technology demo for Windows and compatible Android devices.
-
-## Downloads
-
-- Windows x64 ZIP
-- Signed Android APK
-- SHA-256 checksum manifest
-
-The same release is also available from itch.io:
-https://samfa12.itch.io/the-horde
-
-Hardware support is intentionally narrow. Unsupported devices show explicit diagnostics rather than using a raster or simulated ray-tracing fallback.
-"@ | Set-Content -LiteralPath $generatedNotes -Encoding utf8
-        $NotesFile = $generatedNotes
-    } else {
+    $provenancePath = Join-Path $repoRoot "release-provenance\horde-lantern-rt-alpha-$Version.json"
+    Require-File $provenancePath 'Exact release-provenance record'
+    $provenance = Get-Content -LiteralPath $provenancePath -Raw -Encoding utf8 | ConvertFrom-Json
+    $plannedNotesFile = [IO.Path]::GetFullPath((Join-Path $repoRoot $provenance.documentation.releaseNotesPath))
+    Require-File $plannedNotesFile 'Planned release notes file'
+    if ([string]::IsNullOrWhiteSpace($NotesFile)) { $NotesFile = $plannedNotesFile }
+    else {
         $NotesFile = [IO.Path]::GetFullPath($NotesFile)
         Require-File $NotesFile 'Release notes file'
+        if ($NotesFile -ne $plannedNotesFile) { throw "Release notes must match the provenance attachment plan: $plannedNotesFile" }
     }
 
     $arguments = @(
         'release', 'create', $tag,
         '--repo', 'Samfa12-tech/The-Horde-RT-demo',
-        '--target', 'main',
+        '--target', $TargetCommit,
         '--title', $ReleaseName,
         '--notes-file', $NotesFile
     )

@@ -5,13 +5,58 @@ import math
 import os
 import sys
 from mathutils import Vector
+from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from player_gauntlet_geometry import authored_face_and_uvs, mirror_for_hand, fit_cuff_to_forearm
+from player_body_partition import upper_torso_partition_limits
+
+
+DEFAULT_GAUNTLET_SCALE = 0.090
+MIN_GAUNTLET_SCALE = 0.080
+MAX_GAUNTLET_SCALE = 0.105
 
 if "--" not in sys.argv:
     raise RuntimeError(
         "usage: blender --background --python process-player-rig-runtime.py -- idle.glb walking.glb pbr-directory gauntlet.glb output.glb"
     )
 arguments = sys.argv[sys.argv.index("--") + 1:]
+fit_right_cuff = '--fit-right-cuff' in arguments
+if fit_right_cuff:
+    arguments.remove('--fit-right-cuff')
+body_remainder = '--body-remainder' in arguments
+if body_remainder:
+    arguments.remove('--body-remainder')
+retain_upper_torso = '--retain-upper-torso' in arguments
+if retain_upper_torso:
+    arguments.remove('--retain-upper-torso')
+    if not body_remainder:
+        raise RuntimeError('Upper torso retention requires the explicit body remainder')
+# Omission is historical-export compatibility, not an anatomical judgement.
+# The owner's 2026-09-23 correction identifies the supplied source as Right.
+gauntlet_source_hand = 'Left'
+gauntlet_scale = DEFAULT_GAUNTLET_SCALE
+legacy_gauntlet_export = True
+if '--gauntlet-scale' in arguments:
+    option = arguments.index('--gauntlet-scale')
+    if option + 1 >= len(arguments):
+        raise RuntimeError('Gauntlet scale requires a number')
+    try:
+        gauntlet_scale = float(arguments[option + 1])
+    except ValueError as error:
+        raise RuntimeError('Gauntlet scale must be numeric') from error
+    if not math.isfinite(gauntlet_scale) or not MIN_GAUNTLET_SCALE <= gauntlet_scale <= MAX_GAUNTLET_SCALE:
+        raise RuntimeError(
+            f'Gauntlet scale must be finite and within '
+            f'[{MIN_GAUNTLET_SCALE:.3f}, {MAX_GAUNTLET_SCALE:.3f}]')
+    del arguments[option:option + 2]
+if '--gauntlet-source-hand' in arguments:
+    option = arguments.index('--gauntlet-source-hand')
+    if option + 1 >= len(arguments) or arguments[option + 1] not in ('Left', 'Right'):
+        raise RuntimeError('Gauntlet source handedness must be Left or Right')
+    gauntlet_source_hand = arguments[option + 1]
+    legacy_gauntlet_export = False
+    del arguments[option:option + 2]
 if len(arguments) != 5:
     raise RuntimeError("player runtime processing requires the audited gauntlet source")
 idle_source, walking_source, pbr_directory, gauntlet_source, destination = arguments
@@ -372,8 +417,9 @@ def create_authored_viewmodel_gauntlet(side):
     """Bake one rigid authored grip over the character's fitted sleeve.
 
     The accepted Meshy 7 hand supplies the visible fingers, thumb, palm and
-    cuff without any destructive voxel remesh or decimation.  It is rigid to
-    the actual Hand bone.  The character's original fitted sleeve is retained
+    cuff without any destructive voxel remesh or decimation. It is rigid to
+    the actual Hand bone by default; the opt-in right cuff fit articulates
+    only its proximal cuff. The character's original fitted sleeve is retained
     and reweighted separately so the visible arm follows shoulder, elbow and
     wrist anatomy instead of a synthetic straight cylinder.
     """
@@ -395,9 +441,10 @@ def create_authored_viewmodel_gauntlet(side):
     forearm_direction = forearm.normalized()
 
     # Reorient the accepted Meshy 7 glove into this asset-owned grip frame.
-    # The generated concept is anatomically a left palm despite the text label;
-    # preserve it for Left and mirror the local X axis for a true Right copy.
-    # Its long local +Z axis follows the cylindrical power grip/forearm.
+    # Reflect actual mesh chirality, never swap the named gameplay/rig chains.
+    # New candidates use the owner-corrected Right source classification.
+    # Local +Z follows the handle, not the forearm/cuff axis.
+    mirrored = mirror_for_hand(gauntlet_source_hand, side)
     handle_centre = frame["handleCentreWorld"]
     handle_axis = frame["handleAxisWorld"]
     palm_direction = frame["palmDirectionWorld"]
@@ -412,7 +459,6 @@ def create_authored_viewmodel_gauntlet(side):
     if target_y.dot(palm_direction) < 0.0:
         target_x.negate()
         target_y.negate()
-    gauntlet_scale = 0.090
     gauntlet_first = len(vertices)
     for source_point in gauntlet_world_vertices:
         relative = source_point - gauntlet_grip_source
@@ -421,16 +467,37 @@ def create_authored_viewmodel_gauntlet(side):
             relative.dot(gauntlet_source_y),
             relative.dot(gauntlet_source_z),
         ))
-        if side == "Right":
+        if mirrored:
             local.y = -local.y
         vertices.append(tuple(
             handle_centre +
             target_x * (local.x * gauntlet_scale) +
             target_y * (local.y * gauntlet_scale) +
             target_z * (local.z * gauntlet_scale)))
-    for source_face in gauntlet_faces:
-        face = tuple(gauntlet_first + index for index in source_face)
-        faces.append(tuple(reversed(face)) if side == "Right" else face)
+    cuff_fit = {}
+    forearm_shares = [0.0] * len(vertices)
+    if fit_right_cuff and side == 'Right':
+        # An infinite authored-handle cylinder protects contacts even far
+        # along the grip axis. Select from ORIGINAL positions: moving a point
+        # away from the handle cannot evade this guard. The distal wrist
+        # half-space is separately preserved by the fit itself.
+        protected_contact = []
+        for index, point in enumerate(vertices):
+            offset = Vector(point) - handle_centre
+            radial = offset - handle_axis * offset.dot(handle_axis)
+            if radial.length <= 0.034:
+                protected_contact.append(index)
+        vertices, forearm_shares, cuff_fit = fit_cuff_to_forearm(
+            vertices, tuple(wrist), tuple(elbow),
+            (tuple(target_x), tuple(target_y), tuple(target_z)),
+            protected_indices=protected_contact)
+    target_face_uvs = []
+    for source_face, source_uvs in zip(gauntlet_faces, gauntlet_face_uvs):
+        face, uvs = authored_face_and_uvs(
+            tuple(gauntlet_first + index for index in source_face), source_uvs,
+            mirror=mirrored, legacy_uv_order=legacy_gauntlet_export)
+        faces.append(face)
+        target_face_uvs.append(uvs)
 
     mesh = bpy.data.meshes.new(f"{side}AuthoredViewmodelGauntletMesh")
     mesh.from_pydata(vertices, [], faces)
@@ -438,7 +505,7 @@ def create_authored_viewmodel_gauntlet(side):
     authored_uv = mesh.uv_layers.new(name="UVMap")
     if len(mesh.polygons) != len(gauntlet_face_uvs):
         raise RuntimeError(f"{side} gauntlet polygon order changed before UV copy")
-    for polygon, source_uvs in zip(mesh.polygons, gauntlet_face_uvs):
+    for polygon, source_uvs in zip(mesh.polygons, target_face_uvs):
         if len(polygon.loop_indices) != len(source_uvs):
             raise RuntimeError(f"{side} gauntlet loop order changed before UV copy")
         for loop, uv in zip(polygon.loop_indices, source_uvs):
@@ -457,25 +524,30 @@ def create_authored_viewmodel_gauntlet(side):
     gauntlet_object.data.update()
 
     hand_group = gauntlet_object.vertex_groups.new(name=hand_name)
+    forearm_group = gauntlet_object.vertex_groups.new(name=side + 'ForeArm') if cuff_fit else None
     primary_group = gauntlet_object.vertex_groups.new(
         name="ViewmodelPrimary" + side)
     gauntlet_group = gauntlet_object.vertex_groups.new(
         name="ViewmodelGauntlet" + side)
     rigid_gauntlet_vertices = 0
     for vertex in gauntlet_object.data.vertices:
-        # Preserve the reviewed finger/palm silhouette exactly.  A hand has
-        # no finger bones in this compact rig, so neighbouring arm weights
-        # would tear the grip apart under IK.
-        hand_group.add([vertex.index], 1.0, "REPLACE")
+        # Preserve the grip-bearing finger/palm silhouette exactly. The
+        # opt-in fit articulates only the proven proximal cuff, never fingers.
+        # The default remains the byte-compatible Hand-rigid accepted export.
+        share = forearm_shares[vertex.index]
+        if share < 1.0:
+            hand_group.add([vertex.index], 1.0 - share, "REPLACE")
+        if share:
+            forearm_group.add([vertex.index], share, "REPLACE")
         primary_group.add([vertex.index], 1.0, "REPLACE")
         gauntlet_group.add([vertex.index], 1.0, "REPLACE")
-        rigid_gauntlet_vertices += 1
+        rigid_gauntlet_vertices += int(share == 0.0)
     for polygon in gauntlet_object.data.polygons:
         polygon.use_smooth = True
 
     components, boundary_edges, component_sizes = mesh_topology_metrics(
         gauntlet_object.data)
-    if rigid_gauntlet_vertices != len(gauntlet_world_vertices):
+    if rigid_gauntlet_vertices != len(gauntlet_world_vertices) - cuff_fit.get('proximalVertices', 0):
         raise RuntimeError(f"{side} authored gauntlet lost rigid hand weights")
     return gauntlet_object, {
         "triangles": sum(max(0, len(polygon.vertices) - 2)
@@ -487,9 +559,15 @@ def create_authored_viewmodel_gauntlet(side):
         "rigidGauntletVertices": rigid_gauntlet_vertices,
         "sleeveVertices": 0,
         "uvSource": "accepted Meshy glove/bracer authored loop UV0 preserved through fitted transform",
-        "gripConstruction": "accepted Meshy 7 anatomical gauntlet rigid to Hand; side-mirrored by chirality; authored fitted character sleeve retained beneath cuff",
+        "gripConstruction": ("accepted Meshy 7 distal hand rigid to Hand; local proximal cuff fit/articulation; authored sleeve unchanged"
+                             if cuff_fit else "accepted Meshy 7 anatomical gauntlet rigid to Hand; side-mirrored by chirality; authored fitted character sleeve retained beneath cuff"),
         "gauntletScale": gauntlet_scale,
         "handleForearmDot": handle_axis.dot(forearm_direction),
+        "sourceHandedness": gauntlet_source_hand,
+        "targetHandedness": side,
+        "mirrored": mirrored,
+        "legacyUvOrder": legacy_gauntlet_export,
+        **({'cuffFit': cuff_fit} if cuff_fit else {}),
     }
 
 
@@ -745,6 +823,10 @@ for name in ("HeadPrimaryMasked", "NearFacePrimaryMasked"):
     copy = material.copy()
     copy.name = name
     player.data.materials.append(copy)
+if body_remainder:
+    copy = material.copy()
+    copy.name = "BodyRemainderPrimaryVisible"
+    player.data.materials.append(copy)
 
 points = [player.matrix_world @ vertex.co for vertex in player.data.vertices]
 minimum = Vector(tuple(min(point[axis] for point in points) for axis in range(3)))
@@ -752,6 +834,13 @@ maximum = Vector(tuple(max(point[axis] for point in points) for axis in range(3)
 height = maximum.z - minimum.z
 head_start = minimum.z + height * 0.86
 near_face_start = minimum.z + height * 0.79
+if retain_upper_torso:
+    head_bone = rig.data.bones.get('Head')
+    if head_bone is None:
+        raise RuntimeError('Upper torso partition requires the authored Head landmark')
+    head_origin_height = (rig.matrix_world @ head_bone.head_local).z
+    head_start, near_face_start = upper_torso_partition_limits(
+        minimum.z, maximum.z, head_origin_height)
 viewmodel_group_indices = {}
 gauntlet_group_indices = {}
 for side in ("Left", "Right"):
@@ -765,7 +854,7 @@ for side in ("Left", "Right"):
     gauntlet_group_indices[side] = gauntlet_marker.index
 
 
-semantic_triangles = [0, 0, 0, 0]
+semantic_triangles = [0] * (5 if body_remainder else 4)
 primary_side_triangles = {"Left": 0, "Right": 0}
 gauntlet_side_triangles = {"Left": 0, "Right": 0}
 for polygon in player.data.polygons:
@@ -804,16 +893,23 @@ for polygon in player.data.polygons:
             0, len(polygon.vertices) - 2)
     elif centre.z >= head_start:
         polygon.material_index = 2
+    elif body_remainder and centre.z < near_face_start:
+        # Retain the disjoint connecting cloth, torso, pelvis and legs. This is
+        # NOT a second set of sleeve/gauntlet faces: their exact named regions
+        # were assigned above. The head/collar region remains primary-masked.
+        polygon.material_index = 4
     else:
-        # The camera remains inside the complete, boot-grounded body. Torso,
-        # pelvis and legs stay available to shadow/reflection rays while only
-        # the two bounded authored viewmodel arm surfaces enter primary rays.
+        # Preserve the historical four-region export when not requested.
+        # Extended exports retain just the near-face collar in this region;
+        # the disjoint lower connecting cloth/body uses its explicit semantic.
         polygon.material_index = 3
     semantic_triangles[polygon.material_index] += max(0, len(polygon.vertices) - 2)
     polygon.use_smooth = True
 if semantic_triangles[1] == 0 or semantic_triangles[2] == 0 or \
         semantic_triangles[3] == 0:
     raise RuntimeError("player semantic material split produced an empty masked primitive")
+if body_remainder and semantic_triangles[4] == 0:
+    raise RuntimeError("extended player split produced an empty body remainder")
 if (primary_side_triangles["Left"] < 500 or
         primary_side_triangles["Right"] < 450):
     raise RuntimeError(
@@ -912,6 +1008,8 @@ report = {
     "upAxis": "+Y",
     "forwardAxis": "+Z",
     "origin": "ground-centred within rigging tolerance",
+    "gauntletScale": gauntlet_scale,
+    "gauntletScaleAppliedAbout": "AuthoredGripOrigin",
     "bones": [bone.name for bone in rig.data.bones],
     "gripCorrection": grip_corrections,
     "sourceGloveReferenceVertices": source_glove_reference_vertices,
@@ -936,7 +1034,14 @@ report = {
         "GauntletPrimaryVisible": semantic_triangles[1],
         "HeadPrimaryMasked": semantic_triangles[2],
         "NearFacePrimaryMasked": semantic_triangles[3],
+        **({"BodyRemainderPrimaryVisible": semantic_triangles[4]} if body_remainder else {}),
     },
+    **({"bodyPrimaryPartition": {
+        "mode": "RetainUpperTorsoBelowExistingHeadMask",
+        "headStartMetres": head_start,
+        "nearFaceStartMetres": near_face_start,
+        "preservesOriginalHeadMask": True,
+    }} if retain_upper_torso else {}),
     "processing": "texture-before-rig PBR UV transfer, retained fitted character sleeves with bounded shoulder-elbow-wrist reweighting, accepted Meshy 7 grip surfaces rigid to Hand and mirrored by chirality without voxel remesh or decimation, gauntlet authored loop UV0 and distinct PBR material retained, asset-owned LeftGrip/RightGrip sockets, replaced unstable source glove surfaces, complete boot-grounded body retained for reflection and shadow rays, idle/walk-only clip packaging, semantic material primitives, generated tangents, 4x4 embedded identity textures",
 }
 with open(destination + ".processing.json", "w", encoding="utf-8") as handle:

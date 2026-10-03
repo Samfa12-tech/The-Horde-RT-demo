@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -47,20 +48,65 @@ public final class ContextualControlsLayoutTest {
     }
 
     @Test
+    public void rayQueryComputeLaunchRequirementIsExplicitAndDebugOnly() {
+        final Intent required = new Intent()
+                .putExtra("horde_require_rayquery_compute", true);
+        final Intent explicitlyDisabled = new Intent()
+                .putExtra("horde_require_rayquery_compute", false);
+
+        assertTrue("an explicit Debug launch may require the compute backend",
+                   MainActivity.shouldRequireRayQueryCompute(true, required));
+        assertFalse("a Release launch must reject the same private validation flag",
+                    MainActivity.shouldRequireRayQueryCompute(false, required));
+        assertFalse("an explicitly disabled flag must preserve normal backend selection",
+                    MainActivity.shouldRequireRayQueryCompute(true, explicitlyDisabled));
+        assertFalse("an absent flag must preserve normal backend selection",
+                    MainActivity.shouldRequireRayQueryCompute(true, new Intent()));
+        assertFalse("a null launch intent must preserve normal backend selection",
+                    MainActivity.shouldRequireRayQueryCompute(true, null));
+    }
+
+    @Test
     public void debugCheckpointMappingIncludesEveryNewOwnerReviewCapture() {
         final String[] names = {
                 "pbr-sword-closeup", "pbr-torch-fire", "player-body-grips",
                 "lantern-chest-unlock", "lantern-held-high", "lantern-held-low",
                 "lantern-glass-transmission", "lantern-motion-extreme",
-                "lantern-held-look-up", "lantern-chest-held-high"
+                "lantern-held-look-up", "lantern-chest-held-high",
+                "player-viewmodel-grips", "player-viewmodel-forward",
+                "player-viewmodel-downward-cut", "player-viewmodel-upward-slice",
+                "player-viewmodel-look-up", "player-viewmodel-look-down",
+                "player-viewmodel-lantern-high", "player-viewmodel-lantern-low",
+                "player-viewmodel-lantern-low-parry",
+                "player-viewmodel-lantern-low-look-down",
+                "player-viewmodel-lantern-high-look-up"
         };
-        final int[] ids = {100, 101, 102, 114, 116, 117, 118, 119, 134, 135};
+        final int[] ids = {100, 101, 102, 114, 116, 117, 118, 119, 134, 135,
+                136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146};
         for (int index = 0; index < names.length; ++index) {
             assertEquals("debug capture name must reach its native checkpoint",
                          ids[index], MainActivity.checkpointId(names[index]));
         }
         assertEquals("unknown automation names must remain rejected", -1,
                      MainActivity.checkpointId("not-a-checkpoint"));
+    }
+
+    @Test
+    public void modelledViewmodelCheckpointsRestoreTheirAuthoredCameraPose() {
+        final float[][] expected = {
+                {0.0f, -0.32f}, {0.0f, -0.05f}, {0.0f, -0.28f},
+                {0.0f, -0.28f}, {0.0f, 0.28f}, {0.0f, -0.32f},
+                {-1.5707963f, -0.30f}, {-1.5707963f, -0.30f},
+                {-1.5707963f, -0.30f}, {-1.5707963f, -0.32f},
+                {-1.5707963f, 0.28f}
+        };
+        for (int offset = 0; offset < expected.length; ++offset) {
+            final float[] pose = MainActivity.developmentCheckpointViewPose(136 + offset);
+            assertNotNull("development checkpoint must restore camera controls", pose);
+            assertEquals("checkpoint yaw", expected[offset][0], pose[0], 0.000001f);
+            assertEquals("checkpoint pitch", expected[offset][1], pose[1], 0.000001f);
+        }
+        assertTrue(MainActivity.developmentCheckpointViewPose(147) == null);
     }
 
     @Test

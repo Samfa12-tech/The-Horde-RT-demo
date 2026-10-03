@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-music-pcm-stream-20261001/build
+Test project C:/Dev/tmp/horde-music-pcm-stream-20261001/build
+    Start 57: horde_rt_playtest_report_tests
+1/1 Test #57: horde_rt_playtest_report_tests ...   Passed    2.47 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   2.48 sec

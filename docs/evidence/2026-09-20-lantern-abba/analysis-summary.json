@@ -1,0 +1,174 @@
+{
+  "schema": 1,
+  "status": "complete",
+  "generatedUtc": "2026-09-20T07:20:49.0092242+00:00",
+  "failures": [],
+  "baseline": [
+    {
+      "run": "baseline-a1",
+      "timestampUtc": "2026-09-20T07:10:06Z",
+      "gpu": "Adreno (TM) 840",
+      "vulkanApi": "1.4.295",
+      "rtMode": "RayTracingPipeline",
+      "presentMode": "MAILBOX",
+      "materialEncoding": "ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich",
+      "renderScalePercent": 100,
+      "internalExtent": "1440x2980",
+      "presentationExtent": "1440x2980",
+      "medianMs": 134.387,
+      "p95Ms": 135.938,
+      "zoneFrames": {
+        "opening": 0,
+        "skeleton-room": 0,
+        "shadow-corridor": 0,
+        "skylight-chamber": 0,
+        "yellow-torch-bay": 600,
+        "blue-torch-bay": 0,
+        "red-torch-bay": 0,
+        "green-torch-bay": 0,
+        "transmission-threshold": 0,
+        "finale": 0
+      }
+    },
+    {
+      "run": "baseline-a2",
+      "timestampUtc": "2026-09-20T07:19:56Z",
+      "gpu": "Adreno (TM) 840",
+      "vulkanApi": "1.4.295",
+      "rtMode": "RayTracingPipeline",
+      "presentMode": "MAILBOX",
+      "materialEncoding": "ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich",
+      "renderScalePercent": 100,
+      "internalExtent": "1440x2980",
+      "presentationExtent": "1440x2980",
+      "medianMs": 134.578,
+      "p95Ms": 145.751,
+      "zoneFrames": {
+        "opening": 0,
+        "skeleton-room": 0,
+        "shadow-corridor": 0,
+        "skylight-chamber": 0,
+        "yellow-torch-bay": 600,
+        "blue-torch-bay": 0,
+        "red-torch-bay": 0,
+        "green-torch-bay": 0,
+        "transmission-threshold": 0,
+        "finale": 0
+      }
+    }
+  ],
+  "candidates": [
+    {
+      "run": "held-high-b1-20260920",
+      "timestampUtc": "2026-09-20T07:13:25+00:00",
+      "gpu": "Adreno (TM) 840",
+      "vulkanApi": "1.4.295",
+      "rtMode": "RayTracingPipeline",
+      "presentMode": "MAILBOX",
+      "materialEncoding": "ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich",
+      "medianMs": 130.6903,
+      "p95Ms": 141.5853,
+      "lastCompletionSerial": 1201
+    },
+    {
+      "run": "held-high-b2-20260920",
+      "timestampUtc": "2026-09-20T07:16:23+00:00",
+      "gpu": "Adreno (TM) 840",
+      "vulkanApi": "1.4.295",
+      "rtMode": "RayTracingPipeline",
+      "presentMode": "MAILBOX",
+      "materialEncoding": "ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich",
+      "medianMs": 130.5626,
+      "p95Ms": 139.8669,
+      "lastCompletionSerial": 1201
+    }
+  ],
+  "performance": {
+    "runs": [
+      {
+        "run": "baseline-a1",
+        "medianMs": 134.387,
+        "p95Ms": 135.938
+      },
+      {
+        "run": "baseline-a2",
+        "medianMs": 134.578,
+        "p95Ms": 145.751
+      },
+      {
+        "run": "held-high-b1-20260920",
+        "medianMs": 130.69,
+        "p95Ms": 141.585
+      },
+      {
+        "run": "held-high-b2-20260920",
+        "medianMs": 130.563,
+        "p95Ms": 139.867
+      }
+    ],
+    "meanOfRunMediansBaselineMs": 134.483,
+    "meanOfRunMediansCandidateMs": 130.626,
+    "meanOfRunMediansChangePercent": -2.867,
+    "interpretation": "Descriptive mean-of-run-medians change; not pooled or causal."
+  },
+  "thermal": {
+    "assessment": "descriptive-only; temporal overlap is not a matched thermal-state claim",
+    "runs": [
+      {
+        "run": "baseline-a1",
+        "windowStartUtc": "2026-09-20T07:07:14.9290809+00:00",
+        "windowEndUtc": "2026-09-20T07:10:06.0000000+00:00",
+        "sampleCount": 32,
+        "thermalStatusMin": 0.0,
+        "thermalStatusMax": 1.0,
+        "batteryTempCMin": 33.0,
+        "batteryTempCMax": 34.6,
+        "gpuThermalPowerLevelMin": 0.0,
+        "gpuThermalPowerLevelMax": 1.0,
+        "gpuThermalPowerLevelMissingCount": 0
+      },
+      {
+        "run": "baseline-a2",
+        "windowStartUtc": "2026-09-20T07:17:00.4482570+00:00",
+        "windowEndUtc": "2026-09-20T07:19:56.0000000+00:00",
+        "sampleCount": 33,
+        "thermalStatusMin": 2.0,
+        "thermalStatusMax": 2.0,
+        "batteryTempCMin": 36.7,
+        "batteryTempCMax": 37.7,
+        "gpuThermalPowerLevelMin": 0.0,
+        "gpuThermalPowerLevelMax": 5.0,
+        "gpuThermalPowerLevelMissingCount": 0
+      },
+      {
+        "run": "held-high-b1-20260920",
+        "windowStartUtc": "2026-09-20T07:10:34.9627868+00:00",
+        "windowEndUtc": "2026-09-20T07:13:26.7442941+00:00",
+        "sampleCount": 32,
+        "thermalStatusMin": 1.0,
+        "thermalStatusMax": 1.0,
+        "batteryTempCMin": 35.0,
+        "batteryTempCMax": 36.1,
+        "gpuThermalPowerLevelMin": 0.0,
+        "gpuThermalPowerLevelMax": 5.0,
+        "gpuThermalPowerLevelMissingCount": 0
+      },
+      {
+        "run": "held-high-b2-20260920",
+        "windowStartUtc": "2026-09-20T07:13:26.7999648+00:00",
+        "windowEndUtc": "2026-09-20T07:16:29.3457431+00:00",
+        "sampleCount": 34,
+        "thermalStatusMin": 1.0,
+        "thermalStatusMax": 2.0,
+        "batteryTempCMin": 35.9,
+        "batteryTempCMax": 37.1,
+        "gpuThermalPowerLevelMin": 0.0,
+        "gpuThermalPowerLevelMax": 9.0,
+        "gpuThermalPowerLevelMissingCount": 0
+      }
+    ]
+  },
+  "limitations": [
+    "Observational comparison only; no causal performance claim."
+  ]
+}

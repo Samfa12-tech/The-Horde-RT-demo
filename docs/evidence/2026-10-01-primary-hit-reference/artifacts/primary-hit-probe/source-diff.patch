@@ -1,0 +1,39 @@
+diff --git a/shaders/raytracing/include/rt_frame.glsl b/shaders/raytracing/include/rt_frame.glsl
+index 3b988b6..4f57e20 100644
+--- a/shaders/raytracing/include/rt_frame.glsl
++++ b/shaders/raytracing/include/rt_frame.glsl
+@@ -5,6 +5,14 @@
+ #include "rt_dielectric_common.glsl"
+ #include "rt_dielectric_transport.glsl"
+ #include "rt_atmosphere.glsl"
++#if defined(HORDE_RT_VARIANT_INSTRUMENTATION) && defined(HORDE_RT_VARIANT_QUALITY) && \
++    HORDE_RT_VARIANT_INSTRUMENTATION == HORDE_RT_INSTRUMENTATION_SHIPPING && \
++    HORDE_RT_VARIANT_QUALITY == HORDE_RT_QUALITY_MOBILE
++#include "rt_primary_hit_reference.glsl"
++#define HORDE_RT_PRIMARY_HIT_REFERENCE_ENABLED 1
++#else
++#define HORDE_RT_PRIMARY_HIT_REFERENCE_ENABLED 0
++#endif
+ 
+ void main()
+ {
+@@ -56,13 +64,18 @@ void main()
+         else if (primary.instance == 8)
+             RT_DIAG_ADD(primaryRewardBodyPixelCount, 1u);
+     }
+-    vec3 color = shadePrimary(primary, rayDirection);
++    vec3 color;
++#if HORDE_RT_PRIMARY_HIT_REFERENCE_ENABLED
++    color = primaryHitReferenceColor(primary, rayDirection);
++#else
++    color = shadePrimary(primary, rayDirection);
+     vec4 fireVolume = integrateFireEmitters(
+         origin, rayDirection, primary.hit ? primary.t : 10000.0, false);
+     color = color * fireVolume.a + fireVolume.rgb;
+     vec4 lichMist = lichGroundMist(origin, rayDirection, primary.t);
+     color = color * lichMist.a + lichMist.rgb;
+     color += staffElectricity(origin, rayDirection, primary.t);
++#endif
+ 
+     vec2 centered = uv * 2.0 - 1.0;
+     float vignette = 1.0 - smoothstep(0.28, 1.22, length(centered * vec2(0.82, 1.08)));

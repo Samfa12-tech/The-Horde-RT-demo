@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "scope": "Matched frozen native RT player-asset admission images, not motion, performance, backend parity or owner acceptance",
+  "controls": {
+    "schemaVersion": 1,
+    "source": "rt-storage-image",
+    "sceneOnly": true,
+    "overlaysIncluded": false,
+    "settlingFrames": 12,
+    "fixedAnimationTimeSeconds": 0.0,
+    "buildId": "1.6.1",
+    "executionBackend": "RayTracingPipeline",
+    "selectedRtPipelineBundle": {
+      "opaqueFast": {
+        "key": "diagnostic_high_opaque_fast",
+        "sha256": "d7b0722e572e63bd96e62bae85cc6a5b968ae71bf157526b513b50b56e515c3b"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_high_generic_dielectric",
+        "sha256": "2b61176f676227adfd13a880cd415478536e1403b46317ea3321dc463bebecd0"
+      }
+    },
+    "device": {
+      "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "vendorId": 4318,
+      "deviceId": 11672
+    },
+    "presentation": {
+      "renderScale": 1.0,
+      "dispatchWidth": 960,
+      "dispatchHeight": 540,
+      "swapchainWidth": 960,
+      "swapchainHeight": 540,
+      "swapchainFormat": 44
+    }
+  },
+  "imageGate": {
+    "maximumChannelDifference": 3,
+    "maximumFractionDifferentByMoreThanOne": 0.001
+  },
+  "comparisons": [
+    {
+      "checkpoint": "player-body-grips",
+      "width": 960,
+      "height": 540,
+      "baselinePngSha256": "4e086f856185bf1513c6214bfb3bd564c0abbc93eb6a456c2a2c2c6ca6bffe50",
+      "candidatePngSha256": "4e086f856185bf1513c6214bfb3bd564c0abbc93eb6a456c2a2c2c6ca6bffe50",
+      "baselineManifestSha256": "fdc8f967b8dcf2c7aff8ac303c40e6b257f15b263d09c7f6dc4fa86a3dbc8cde",
+      "candidateManifestSha256": "aa2734b429972b2b2219890f096ba4fd08f7281b76c6922af0c1c8b34e6a9e84",
+      "maximumChannelDifference": 0,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "passed": true
+    },
+    {
+      "checkpoint": "player-body-forward",
+      "width": 960,
+      "height": 540,
+      "baselinePngSha256": "48d732f13098d605da790f06601a1b6989cda7c4f535aa805ca87b7f6ddbaac6",
+      "candidatePngSha256": "48d732f13098d605da790f06601a1b6989cda7c4f535aa805ca87b7f6ddbaac6",
+      "baselineManifestSha256": "28e47fd355be6973fdf8487e6199bd796a661df15fd18a5f8dd50364ce781366",
+      "candidateManifestSha256": "e9b89f6bc9e7ec9f4a974d5c884c45bf7a53b9e5dfa06fffa77df2a6aaeb655b",
+      "maximumChannelDifference": 0,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "passed": true
+    },
+    {
+      "checkpoint": "player-body-owner-feedback",
+      "width": 960,
+      "height": 540,
+      "baselinePngSha256": "28253a80055a742124742e8a3a2f15e02d9b56001709def06e01a838b3d95f31",
+      "candidatePngSha256": "28253a80055a742124742e8a3a2f15e02d9b56001709def06e01a838b3d95f31",
+      "baselineManifestSha256": "349975c5d801a7ffd439ac8f3f41f012b7ba4eb666eb795d408f4e83d70d1b5a",
+      "candidateManifestSha256": "bb7d7aee66d6b93a8758ead123e4a7a855586a5e7f9d20a51040923e31bba17a",
+      "maximumChannelDifference": 0,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "passed": true
+    },
+    {
+      "checkpoint": "player-body-downward-cut",
+      "width": 960,
+      "height": 540,
+      "baselinePngSha256": "b13b4576a951b39b10503817d40918e7d5a707fe92838a60ffebdcdf30a0bb80",
+      "candidatePngSha256": "b13b4576a951b39b10503817d40918e7d5a707fe92838a60ffebdcdf30a0bb80",
+      "baselineManifestSha256": "446e43be894b6b530d68cc22aca0769236d8b4e77eed178125e2ed7a66793f8e",
+      "candidateManifestSha256": "21a66171a8e1ff665c187a6d4aa23b950446a172bd0003145750a3c083382c4f",
+      "maximumChannelDifference": 0,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "passed": true
+    },
+    {
+      "checkpoint": "player-body-upward-slice",
+      "width": 960,
+      "height": 540,
+      "baselinePngSha256": "c6615ab3dfc66eb94c910084f42a3a8864735124b3540016608acc477585cc98",
+      "candidatePngSha256": "c6615ab3dfc66eb94c910084f42a3a8864735124b3540016608acc477585cc98",
+      "baselineManifestSha256": "158b771f7370d8a4aa0a9756ea45087cd8a07bdf2b0bbdc25fb5dd3b96f9af55",
+      "candidateManifestSha256": "ec3d3c8a7ee4e3c13ac8f6a0fc80eb2fb4f03e1532d34391bbaf6c84c4d1c099",
+      "maximumChannelDifference": 0,
+      "pixelsDifferentByMoreThanOne": 0,
+      "differentFraction": 0.0,
+      "passed": true
+    }
+  ],
+  "passed": true
+}

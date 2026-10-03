@@ -19,6 +19,7 @@ using horde::gameplay::simulation::PublishedInput;
 constexpr std::uint64_t kPublications = 125000u;
 constexpr std::size_t kReaderCount = 4u;
 constexpr std::chrono::seconds kCompletionDeadline{30};
+constexpr std::uint64_t kReaderYieldInterval = 64u;
 
 InputSnapshot MakeSnapshot(std::uint64_t sequence)
 {
@@ -95,7 +96,18 @@ int main()
         {
             if (Clock::now() >= deadline)
             {
-                std::cerr << "Input mailbox stress timed out before all threads completed.\n";
+                std::cerr << "Input mailbox stress timed out: writer published "
+                          << mailbox.PublishedSequence() << '/' << kPublications
+                          << ", reader sampled sequences [";
+                for (std::size_t readerIndex = 0u; readerIndex < kReaderCount; ++readerIndex)
+                {
+                    if (readerIndex != 0u)
+                    {
+                        std::cerr << ", ";
+                    }
+                    std::cerr << finalObserved[readerIndex].load(std::memory_order_relaxed);
+                }
+                std::cerr << "].\n";
                 std::_Exit(1);
             }
             std::this_thread::sleep_for(std::chrono::milliseconds{1});
@@ -130,6 +142,7 @@ int main()
             startGate.wait();
 
             std::uint64_t latest = 0u;
+            std::uint64_t validatedReads = 0u;
             for (;;)
             {
                 if (writerFinished.load(std::memory_order_acquire) && latest >= kPublications)
@@ -159,6 +172,13 @@ int main()
                     coherent.store(false, std::memory_order_release);
                     finalObserved[readerIndex].store(latest, std::memory_order_release);
                     return;
+                }
+                if ((++validatedReads % kReaderYieldInterval) == 0u)
+                {
+                    finalObserved[readerIndex].store(latest, std::memory_order_relaxed);
+                    // Keep all four readers active, but let the writer share an
+                    // oversubscribed CPU instead of continuously polling it.
+                    std::this_thread::yield();
                 }
             }
         });

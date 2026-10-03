@@ -1,0 +1,268 @@
+{
+  "schema": 1,
+  "classification": "Static compiler investigation evidence copy; no APK/ELF/source snapshot, ABBA trial report, or README included",
+  "sourceRoot": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930",
+  "controlImageRoot": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\restoration\\debug-opening\\run-20260930-234438",
+  "destination": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\docs\\evidence\\2026-10-01-opaque-compiler",
+  "copiedFiles": [
+    {
+      "path": "profile\\opaque-retained-profile.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\opaque-retained-profile.json",
+      "bytes": 5241,
+      "sha256": "23f17fc83520a515bf2bdf4642527910f292e4115ea66ef8eba80167aac91760"
+    },
+    {
+      "path": "images\\opening-image-comparison.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\opening-image-comparison.json",
+      "bytes": 2101,
+      "sha256": "e04b92c263256fc0404534e99f0975c455bbbb0a8f2455293028a1549a2f31d6"
+    },
+    {
+      "path": "images\\analysis\\analyze_opening.py",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\image-analysis\\analyze_opening.py",
+      "bytes": 6682,
+      "sha256": "3715cce43fa314efd59a987d31f43f2e9b207e148a4597e292e224f864b56c7d"
+    },
+    {
+      "path": "images\\analysis\\opening-difference-analysis.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\image-analysis\\opening-difference-analysis.json",
+      "bytes": 38785,
+      "sha256": "9c9662674f10b04ae511ff34526f2492b7b7cef7585cc87b00d039e845ea5348"
+    },
+    {
+      "path": "build\\arm64-benchmark-debug-build.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\arm64-benchmark-debug-build.log",
+      "bytes": 4390,
+      "sha256": "63ee28332eda83e97e797866eec1e12bc6f13e218930ff2dd25c6412d762e017"
+    },
+    {
+      "path": "compiler\\ordinary-generator.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\ordinary-generator.log",
+      "bytes": 304,
+      "sha256": "8a615f668bbe437a8cdb8f930aaa60ade5bd48ec7904b9fe0b52f11d96d405b4"
+    },
+    {
+      "path": "methods\\compile-retained-investigation.ps1",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\compile-retained-investigation.ps1",
+      "bytes": 7681,
+      "sha256": "8d77d583805679be7d92da1a97c1e92c4483dc3708b95734112cc89f0e71e336"
+    },
+    {
+      "path": "methods\\prepare-experimental-bundle.ps1",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\prepare-experimental-bundle.ps1",
+      "bytes": 14215,
+      "sha256": "c484c75c13fccd1ca23c5d6f8161a3539c2ceee3e42119fd4c88a1b49292d2cd"
+    },
+    {
+      "path": "methods\\inspect-apk-rt-modules-independent.ps1",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\inspect-apk-rt-modules-independent.ps1",
+      "bytes": 17050,
+      "sha256": "c4280ecbc324caf91a4990df30a59cee38c2cd2f4559997f51f3e52d6d71d4e1"
+    },
+    {
+      "path": "methods\\compare-opening.ps1",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\compare-opening.ps1",
+      "bytes": 6973,
+      "sha256": "79d75f6a0caf1bbb8a680a86bac4e463d0ff985bef4c4dae9193b7deca1d8562"
+    },
+    {
+      "path": "methods\\analyse-trial.ps1",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\analyse-trial.ps1",
+      "bytes": 18064,
+      "sha256": "7a9ca8dc897d5168843bc9e2c2435ce1568c13e7bebd70427972ad5aa33f63f0"
+    },
+    {
+      "path": "methods\\compare-trials.ps1",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\compare-trials.ps1",
+      "bytes": 11975,
+      "sha256": "87ac0c7a8eb726a93ea2df48808d24fa1365ff99a8cc04e531d268539065271a"
+    },
+    {
+      "path": "methods\\test-analyse-trial-synthetic-fixtures.ps1",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\test-analyse-trial-synthetic-fixtures.ps1",
+      "bytes": 7114,
+      "sha256": "44ebdb2b3657149c66cc8ec0aa006e8d9b7caf381c798e1a81413ac32553f3f0"
+    },
+    {
+      "path": "methods\\test-compare-trials-synthetic-fixtures.ps1",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\test-compare-trials-synthetic-fixtures.ps1",
+      "bytes": 3237,
+      "sha256": "e57d71196dd646a1db4628bc59dbb7a7079a2117352254c05faadca33e1e97ea"
+    },
+    {
+      "path": "compiler\\retained-investigation-recipe-results.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\recipe-run-2\\retained-investigation-recipe-results.json",
+      "bytes": 5078,
+      "sha256": "e62ac52c28d254c9ac7e41c301a70b3dc0c588eec0047e8ca537f712ea6601c9"
+    },
+    {
+      "path": "compiler\\experimental-bundle-preparation.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\experimental-bundle-preparation.json",
+      "bytes": 4182,
+      "sha256": "94df80818edd229b958303d0711fc9c4d368c805f66841ccade53a3e2107ea84"
+    },
+    {
+      "path": "build\\apk-build-review.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\apk-build-review.json",
+      "bytes": 7941,
+      "sha256": "985e056959b9bac5b3cf454731dce65ef4e90356f4153877637115011dd12fbc"
+    },
+    {
+      "path": "compiler\\catalog-adapter-check.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\catalog-adapter-check.log",
+      "bytes": 42,
+      "sha256": "7ad4629a61d1463cefde8a750dcf8a06e758943016b13e879fe398ed4d7548ce"
+    },
+    {
+      "path": "red\\diagnostic-five-atomic-expectation-rejected.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\diagnostic-five-atomic-expectation-rejected.json",
+      "bytes": 1267,
+      "sha256": "4a4ae32cd9edc7bfcb125962bafe76f35642dff81c6ba3892faf287ddcba0ea5"
+    },
+    {
+      "path": "red\\production-frozen-check-expected-rejection-2.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\production-frozen-check-expected-rejection-2.log",
+      "bytes": 2977,
+      "sha256": "33b012debb804a5b9f40897b27bf5d8cba8f45a857b25195fa47d0b663df49d9"
+    },
+    {
+      "path": "red\\strict-diagnostic-package-containment.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\strict-diagnostic-package-containment.log",
+      "bytes": 333,
+      "sha256": "593782267a3158d08413e3784206ff384714c5f6fa483c1b8f9975e3d3bd4298"
+    },
+    {
+      "path": "red\\strict-shipping-package-containment.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\strict-shipping-package-containment.log",
+      "bytes": 333,
+      "sha256": "593782267a3158d08413e3784206ff384714c5f6fa483c1b8f9975e3d3bd4298"
+    },
+    {
+      "path": "red\\host-preflight-configure-build-test.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\host-preflight-configure-build-test.log",
+      "bytes": 398,
+      "sha256": "c6abf3a8f3734bda87fa223d38f913de807d259bbc945067118a1d0eaed113c9"
+    },
+    {
+      "path": "build\\host-preflight-cmake-configure-explicit.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\host-preflight-cmake-configure-explicit.log",
+      "bytes": 1134,
+      "sha256": "85ce42e9de40fc0bfa6fdd887b5990a4ae51b407f375921ee7974f1d3b0b9347"
+    },
+    {
+      "path": "tests\\host-preflight-rayquery-compute-test.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\host-preflight-rayquery-compute-test.log",
+      "bytes": 413,
+      "sha256": "cdbe2b3c903b065ed126f4082d84fd8592b50511ba16f1a9da6dcf94ccbca5e9"
+    },
+    {
+      "path": "tests\\lead-host-bundle-build.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\lead-host-bundle-build.log",
+      "bytes": 512,
+      "sha256": "0c3b67d0cf74fdd665588da51aee775c1d9611cb46f466ca54cb9bb7eb3d238b"
+    },
+    {
+      "path": "tests\\lead-host-bundle-test.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\lead-host-bundle-test.log",
+      "bytes": 417,
+      "sha256": "09872c5f02aceac86672dfc4a690b580f4c66f5efcc19977164d2bad9134bb31"
+    },
+    {
+      "path": "build\\independent-apk-module-receipt.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\independent-scan-v3\\independent-apk-module-receipt.json",
+      "bytes": 58502,
+      "sha256": "6b2d154668ee1d56a09a9ac8d6c557eaf3a0fbc4353a3c7a7965f5f96d013f7b"
+    },
+    {
+      "path": "compiler\\diagnostic-mobile-control-compile.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\recipe-run-2\\diagnostic_mobile_opaque_fast-control-compile.log",
+      "bytes": 341,
+      "sha256": "03c62c21ab10e95e39b102ff1cbdeed1699af4ec09dab0c804d73be82b20a3a8"
+    },
+    {
+      "path": "compiler\\shipping-mobile-control-compile.log",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\recipe-run-2\\shipping_mobile_opaque_fast-control-compile.log",
+      "bytes": 335,
+      "sha256": "3190b14d57940ea7801b066bc6bb2980bc211b1e8328487e0e13cf7a646473f8"
+    },
+    {
+      "path": "compiler\\diagnostic-mobile-control-raygen-stats.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\recipe-run-2\\diagnostic_mobile_opaque_fast-control\\diagnostic_mobile_opaque_fast\\raygen-stats.json",
+      "bytes": 2997,
+      "sha256": "7fd9738ab7eec6f897fb64914e9ba4f1e89055497950b1a2683f523468765479"
+    },
+    {
+      "path": "compiler\\shipping-mobile-control-raygen-stats.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\recipe-run-2\\shipping_mobile_opaque_fast-control\\shipping_mobile_opaque_fast\\raygen-stats.json",
+      "bytes": 2994,
+      "sha256": "891eff14c313d1af1a4a0bdc83a99d0e3b0f86e3c488c52e9a4c10f0a2b886c8"
+    },
+    {
+      "path": "captures\\control\\capture-01-opening-75.png",
+      "source": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\restoration\\debug-opening\\run-20260930-234438\\capture-01-opening-75.png",
+      "bytes": 3929523,
+      "sha256": "d3ec98a838e61194c340343ae4e293aea0ce8b39697962dbac17e134c62dbbcf"
+    },
+    {
+      "path": "captures\\control\\capture-01-opening-state.json",
+      "source": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\restoration\\debug-opening\\run-20260930-234438\\capture-01-opening-state.json",
+      "bytes": 6874,
+      "sha256": "231a113f4477906bd5334e84f618f15e5ce2791aa436e00e2cd2a3c71a48de4a"
+    },
+    {
+      "path": "captures\\control\\capture-manifest.json",
+      "source": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\restoration\\debug-opening\\run-20260930-234438\\capture-manifest.json",
+      "bytes": 3436,
+      "sha256": "a06d7b230b94d4161797e00e34968ab304bf55088ec789f4688ab5a68a96710f"
+    },
+    {
+      "path": "captures\\control\\summary.json",
+      "source": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\restoration\\debug-opening\\run-20260930-234438\\summary.json",
+      "bytes": 2120,
+      "sha256": "ddb747658ce1bf7aa8a976f5fd3b30051272af8b31253a379bae72a5be9ee036"
+    },
+    {
+      "path": "captures\\control\\validation.md",
+      "source": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\restoration\\debug-opening\\run-20260930-234438\\validation.md",
+      "bytes": 1298,
+      "sha256": "e0f6013e1ae5941722de95543c1828e62913ebdefc719da3284b3bcd95c058a2"
+    },
+    {
+      "path": "captures\\opaque-fast\\capture-01-opening-75.png",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\images\\diagnostic-profile\\run-20261001-003239\\capture-01-opening-75.png",
+      "bytes": 3929387,
+      "sha256": "b944259d62f68fece59e79af3bc0299ece880a1fb6b1883caf1149706b9003aa"
+    },
+    {
+      "path": "captures\\opaque-fast\\capture-01-opening-state.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\images\\diagnostic-profile\\run-20261001-003239\\capture-01-opening-state.json",
+      "bytes": 6871,
+      "sha256": "48352f180674edbf7777e475dd6fc033f3d42036c904728897298e7342b2d47c"
+    },
+    {
+      "path": "captures\\opaque-fast\\capture-manifest.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\images\\diagnostic-profile\\run-20261001-003239\\capture-manifest.json",
+      "bytes": 3437,
+      "sha256": "ba84d873627b46a75ca23bf5a26c53d53c6683c28b1c99ad2f603480c8f944e8"
+    },
+    {
+      "path": "captures\\opaque-fast\\summary.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\images\\diagnostic-profile\\run-20261001-003239\\summary.json",
+      "bytes": 2120,
+      "sha256": "6e40d69c6b9b289a75e69d0861e999851806c31eb87e5381e4168ece25faafeb"
+    },
+    {
+      "path": "captures\\opaque-fast\\validation.md",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\images\\diagnostic-profile\\run-20261001-003239\\validation.md",
+      "bytes": 1298,
+      "sha256": "5d9f07994b9ca0c0cc5861a83cf959dec3dc7323e80596de656c4a5a4a61b643"
+    },
+    {
+      "path": "tests\\synthetic-comparator-test-receipt.json",
+      "source": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\comparison-fixtures\\synthetic-v3\\synthetic-comparator-test-receipt.json",
+      "bytes": 508,
+      "sha256": "bc2468befbb8cc61e0f03dbcef3b2f58b3d2c7de0a1c349422768c0a208ed47a"
+    }
+  ],
+  "verification": "all 43 copied files byte-length and SHA-256 match their source"
+}

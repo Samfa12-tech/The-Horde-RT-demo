@@ -1,0 +1,4 @@
+C:\Dev\tmp\horde-contact-shipping-admission-20261002\modules\shipping_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_high_generic_dielectric: 280344 bytes; functions=78; calls=235; ray-query sites=2; dependency SHA-256=d57babfbcf1c5ac05c962747fc8b3a6fd6f737f584cfabf4f4f148775dc74440
+RayQuery compute variant rayquery_compute_shipping_high_generic_dielectric: bytes=280580; functions=78; calls=235; ray-query sites=2; atomics=0; SPIR-V SHA-256=7a475f5fdd475386acbdb96fcb4a6fe5462d452ed0e4fccffc9a02b146fefb35
+COMPILE-ONLY: two modules compiled/validated, no embedded artifact/catalog/budget writes; cost failures=8.

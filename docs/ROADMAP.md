@@ -1,7 +1,7 @@
 # Horde Lantern RT — Campaign and Engine Roadmap
 
 **Owner:** Sam Small / Samfa12  
-**Planning update:** 11 September 2026  
+**Planning update:** 11 September 2026; engineering status reconciled 3 October 2026
 **Status:** Owner-approved direction; future milestones are provisional, not implemented or release promises.
 
 ## Authority and navigation
@@ -22,7 +22,8 @@ The defining design pillar is **light as gameplay, powered by the actual ray-tra
 
 | Milestone | Direction | Status / start condition |
 |---|---|---|
-| 1.6.x foundation | Preserve the dungeon, combat, fire/PBR assets, reward lantern, shared simulation and engineering work. | The inspected README records 1.6.0 as published. Finish and accept the separate 1.6.1 engineering baseline before 1.7 implementation. |
+| 1.6.x foundation | Preserve the dungeon, combat, fire/PBR assets, reward lantern, shared simulation and engineering work. |Showcase Alpha 1.6.1 is published within its documented limits. Itch builds `#2055201` (Windows) / `#2055202` (Android) and public non-draft GitHub prerelease `v1.6.1` are verified. S24 remains working but not fully tested; S25 is unverified. Performance is accepted as measured, not sustained 30 FPS at 75%; full graphics menu is planned for 1.6.2. [Current receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md). |
+| 1.6.2 — graphics controls | Full graphics-options menu, informed by retained exact-device performance evidence. | Owner-planned follow-up, not implemented or a promise that current phones sustain30FPS. |
 | 1.7.0 — Beyond the Tomb | Existing dungeon becomes prologue; physical rope rescue, companion, moonlit woodland, dialogue, world-zone ownership, checkpoints and themed controls/menus. | Scoped planning handoff exists. Implement and validate its complete agreed scope, then obtain owner acceptance. |
 | 1.8.0 — Village Hub | Continue from the forest to a small village with a few explorable interiors, a hero tavern and a small NPC cast. Reveal more of the wider Horde and establish the hub. | Pencilled in. Begin only after 1.7 is made, tested and accepted; use its actual performance and system evidence to finalise scope. |
 | Beyond 1.8 — three themed dungeons | Three distinct adventure dungeons, each with enemies, puzzles, a boss and one campaign piece; consider a dungeon-specific item that enables puzzle solving and boss defeat. | Big-picture direction only. Build and validate one complete dungeon before expanding to the next. No version numbers or release dates are assigned. |

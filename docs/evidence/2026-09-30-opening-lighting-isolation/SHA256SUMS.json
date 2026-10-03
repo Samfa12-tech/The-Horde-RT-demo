@@ -1,0 +1,852 @@
+[
+  {
+    "path": "phone/shipping-lighting-control-1-route-20260930/trial.json",
+    "sha256": "caec4dd898505b190601a337514e715a0bf13174a1d09730152bc3e13721ac49",
+    "bytes": 8654,
+    "sourceSha256": "caec4dd898505b190601a337514e715a0bf13174a1d09730152bc3e13721ac49",
+    "sourceBytes": 8654,
+    "compressed": false,
+    "roundtripSha256": "caec4dd898505b190601a337514e715a0bf13174a1d09730152bc3e13721ac49",
+    "roundtripBytes": 8654
+  },
+  {
+    "path": "phone/shipping-lighting-control-1-route-20260930/analysis.json",
+    "sha256": "045b242607592c639b50be6d1563b0090903f83868b370cd224fb8bf57504559",
+    "bytes": 9055,
+    "sourceSha256": "045b242607592c639b50be6d1563b0090903f83868b370cd224fb8bf57504559",
+    "sourceBytes": 9055,
+    "compressed": false,
+    "roundtripSha256": "045b242607592c639b50be6d1563b0090903f83868b370cd224fb8bf57504559",
+    "roundtripBytes": 9055
+  },
+  {
+    "path": "phone/shipping-lighting-control-1-route-20260930/context-samples.jsonl",
+    "sha256": "670e5136428a1ebf59eca47c7f142c3b6b8d9d5f4d2e46840e4f9be0b1c8a088",
+    "bytes": 5074,
+    "sourceSha256": "670e5136428a1ebf59eca47c7f142c3b6b8d9d5f4d2e46840e4f9be0b1c8a088",
+    "sourceBytes": 5074,
+    "compressed": false,
+    "roundtripSha256": "670e5136428a1ebf59eca47c7f142c3b6b8d9d5f4d2e46840e4f9be0b1c8a088",
+    "roundtripBytes": 5074
+  },
+  {
+    "path": "phone/shipping-lighting-control-1-route-20260930/launch.log",
+    "sha256": "2ba9467d91e0d0a6688bec0b912ebeaa2070c472c6ce275ee6bf4fb1c2132cd9",
+    "bytes": 323,
+    "sourceSha256": "2ba9467d91e0d0a6688bec0b912ebeaa2070c472c6ce275ee6bf4fb1c2132cd9",
+    "sourceBytes": 323,
+    "compressed": false,
+    "roundtripSha256": "2ba9467d91e0d0a6688bec0b912ebeaa2070c472c6ce275ee6bf4fb1c2132cd9",
+    "roundtripBytes": 323
+  },
+  {
+    "path": "phone/shipping-lighting-control-1-route-20260930/pull.log",
+    "sha256": "49da44dbcb3649e612b51382f63061645e450f6eed26fc329dca62e0da42f90b",
+    "bytes": 184,
+    "sourceSha256": "49da44dbcb3649e612b51382f63061645e450f6eed26fc329dca62e0da42f90b",
+    "sourceBytes": 184,
+    "compressed": false,
+    "roundtripSha256": "49da44dbcb3649e612b51382f63061645e450f6eed26fc329dca62e0da42f90b",
+    "roundtripBytes": 184
+  },
+  {
+    "path": "phone/shipping-lighting-control-1-route-20260930/shipping-lighting-control-1-route-20260930/result.json",
+    "sha256": "68995f1f1fcbb5dc5d288fb3564e08aa8bb731f06ebf5edab6d2503463b0253a",
+    "bytes": 122,
+    "sourceSha256": "68995f1f1fcbb5dc5d288fb3564e08aa8bb731f06ebf5edab6d2503463b0253a",
+    "sourceBytes": 122,
+    "compressed": false,
+    "roundtripSha256": "68995f1f1fcbb5dc5d288fb3564e08aa8bb731f06ebf5edab6d2503463b0253a",
+    "roundtripBytes": 122
+  },
+  {
+    "path": "phone/shipping-lighting-control-1-route-20260930/shipping-lighting-control-1-route-20260930/benchmark.json.gz",
+    "sha256": "c73562f39f4cf080a6ce998f63fd5d23d9b006e2296065d399ea4f38c77e8940",
+    "bytes": 68535,
+    "sourceSha256": "ad6921dae9b23cc7c2401f9a78d62d98a81588b088075186e9ae0c40ed15487e",
+    "sourceBytes": 1468426,
+    "compressed": true,
+    "roundtripSha256": "ad6921dae9b23cc7c2401f9a78d62d98a81588b088075186e9ae0c40ed15487e",
+    "roundtripBytes": 1468426
+  },
+  {
+    "path": "phone/shipping-lighting-shadow-1-route-20260930/trial.json",
+    "sha256": "cd9c87601ba3ea659a9a4562c55e6d36bd8108bf9c5a9d1636c1a8907c1b6b6b",
+    "bytes": 7914,
+    "sourceSha256": "cd9c87601ba3ea659a9a4562c55e6d36bd8108bf9c5a9d1636c1a8907c1b6b6b",
+    "sourceBytes": 7914,
+    "compressed": false,
+    "roundtripSha256": "cd9c87601ba3ea659a9a4562c55e6d36bd8108bf9c5a9d1636c1a8907c1b6b6b",
+    "roundtripBytes": 7914
+  },
+  {
+    "path": "phone/shipping-lighting-shadow-1-route-20260930/analysis.json",
+    "sha256": "4d164be2164e0c4aaaa54c97900078330509359e69ecfb83387f1debed66782e",
+    "bytes": 9361,
+    "sourceSha256": "4d164be2164e0c4aaaa54c97900078330509359e69ecfb83387f1debed66782e",
+    "sourceBytes": 9361,
+    "compressed": false,
+    "roundtripSha256": "4d164be2164e0c4aaaa54c97900078330509359e69ecfb83387f1debed66782e",
+    "roundtripBytes": 9361
+  },
+  {
+    "path": "phone/shipping-lighting-shadow-1-route-20260930/context-samples.jsonl",
+    "sha256": "80d7d162e192811e4e5d82a9c4fceb639b002293628b1d411eb3f7891c08e12b",
+    "bytes": 4563,
+    "sourceSha256": "80d7d162e192811e4e5d82a9c4fceb639b002293628b1d411eb3f7891c08e12b",
+    "sourceBytes": 4563,
+    "compressed": false,
+    "roundtripSha256": "80d7d162e192811e4e5d82a9c4fceb639b002293628b1d411eb3f7891c08e12b",
+    "roundtripBytes": 4563
+  },
+  {
+    "path": "phone/shipping-lighting-shadow-1-route-20260930/launch.log",
+    "sha256": "2e2364084889aca19a71f09613ff5a2f4d828aec5fe7f9239998087be913ba31",
+    "bytes": 326,
+    "sourceSha256": "2e2364084889aca19a71f09613ff5a2f4d828aec5fe7f9239998087be913ba31",
+    "sourceBytes": 326,
+    "compressed": false,
+    "roundtripSha256": "2e2364084889aca19a71f09613ff5a2f4d828aec5fe7f9239998087be913ba31",
+    "roundtripBytes": 326
+  },
+  {
+    "path": "phone/shipping-lighting-shadow-1-route-20260930/pull.log",
+    "sha256": "ffed5da34a06fa880890797cca62fa29f3a41b48fd9f705fc57a37c1be4fc2b2",
+    "bytes": 183,
+    "sourceSha256": "ffed5da34a06fa880890797cca62fa29f3a41b48fd9f705fc57a37c1be4fc2b2",
+    "sourceBytes": 183,
+    "compressed": false,
+    "roundtripSha256": "ffed5da34a06fa880890797cca62fa29f3a41b48fd9f705fc57a37c1be4fc2b2",
+    "roundtripBytes": 183
+  },
+  {
+    "path": "phone/shipping-lighting-shadow-1-route-20260930/shipping-lighting-shadow-1-route-20260930/result.json",
+    "sha256": "e5c4b0bfe4d28f9164fe0217b1f2be64699e30ff3732ea9342f63ff2a3c8b3d1",
+    "bytes": 121,
+    "sourceSha256": "e5c4b0bfe4d28f9164fe0217b1f2be64699e30ff3732ea9342f63ff2a3c8b3d1",
+    "sourceBytes": 121,
+    "compressed": false,
+    "roundtripSha256": "e5c4b0bfe4d28f9164fe0217b1f2be64699e30ff3732ea9342f63ff2a3c8b3d1",
+    "roundtripBytes": 121
+  },
+  {
+    "path": "phone/shipping-lighting-shadow-1-route-20260930/shipping-lighting-shadow-1-route-20260930/benchmark.json.gz",
+    "sha256": "3b9c586674bada32c4a5e971a97f5fb5280f2c25535f23233378afa908c7ac3b",
+    "bytes": 68306,
+    "sourceSha256": "ce2166fd2ad35e33d1190a7221f37b751f2e1285508d6b90fb19433aacdd1f04",
+    "sourceBytes": 1468420,
+    "compressed": true,
+    "roundtripSha256": "ce2166fd2ad35e33d1190a7221f37b751f2e1285508d6b90fb19433aacdd1f04",
+    "roundtripBytes": 1468420
+  },
+  {
+    "path": "phone/shipping-lighting-volume-1-route-20260930/trial.json",
+    "sha256": "e19730673f4ecf774826e5be271319736f3e20269d0ee1d1ce9378ce3f2fc403",
+    "bytes": 8087,
+    "sourceSha256": "e19730673f4ecf774826e5be271319736f3e20269d0ee1d1ce9378ce3f2fc403",
+    "sourceBytes": 8087,
+    "compressed": false,
+    "roundtripSha256": "e19730673f4ecf774826e5be271319736f3e20269d0ee1d1ce9378ce3f2fc403",
+    "roundtripBytes": 8087
+  },
+  {
+    "path": "phone/shipping-lighting-volume-1-route-20260930/analysis.json",
+    "sha256": "f86dc9f09db9bf106528740ca1513a43a03cfd62b4358bf55292f10f7f2434d7",
+    "bytes": 9359,
+    "sourceSha256": "f86dc9f09db9bf106528740ca1513a43a03cfd62b4358bf55292f10f7f2434d7",
+    "sourceBytes": 9359,
+    "compressed": false,
+    "roundtripSha256": "f86dc9f09db9bf106528740ca1513a43a03cfd62b4358bf55292f10f7f2434d7",
+    "roundtripBytes": 9359
+  },
+  {
+    "path": "phone/shipping-lighting-volume-1-route-20260930/context-samples.jsonl",
+    "sha256": "1a9d734ebe97fc2abce6c82f8b24a5ec37d160e7d9a5bf86c4798262208fef2f",
+    "bytes": 4680,
+    "sourceSha256": "1a9d734ebe97fc2abce6c82f8b24a5ec37d160e7d9a5bf86c4798262208fef2f",
+    "sourceBytes": 4680,
+    "compressed": false,
+    "roundtripSha256": "1a9d734ebe97fc2abce6c82f8b24a5ec37d160e7d9a5bf86c4798262208fef2f",
+    "roundtripBytes": 4680
+  },
+  {
+    "path": "phone/shipping-lighting-volume-1-route-20260930/launch.log",
+    "sha256": "a8ba5b1308414a91d9146e0e53933d2a6bab3facb2eb9425013cba3ef8ef3264",
+    "bytes": 323,
+    "sourceSha256": "a8ba5b1308414a91d9146e0e53933d2a6bab3facb2eb9425013cba3ef8ef3264",
+    "sourceBytes": 323,
+    "compressed": false,
+    "roundtripSha256": "a8ba5b1308414a91d9146e0e53933d2a6bab3facb2eb9425013cba3ef8ef3264",
+    "roundtripBytes": 323
+  },
+  {
+    "path": "phone/shipping-lighting-volume-1-route-20260930/pull.log",
+    "sha256": "18861fdb268ca30d02090e1934980d4b213cff794915199256163b076bb49925",
+    "bytes": 183,
+    "sourceSha256": "18861fdb268ca30d02090e1934980d4b213cff794915199256163b076bb49925",
+    "sourceBytes": 183,
+    "compressed": false,
+    "roundtripSha256": "18861fdb268ca30d02090e1934980d4b213cff794915199256163b076bb49925",
+    "roundtripBytes": 183
+  },
+  {
+    "path": "phone/shipping-lighting-volume-1-route-20260930/shipping-lighting-volume-1-route-20260930/result.json",
+    "sha256": "096156641ca4dd9d1b23cb3e46bcaee0b685461d1045fd27a8831cb1def93afb",
+    "bytes": 121,
+    "sourceSha256": "096156641ca4dd9d1b23cb3e46bcaee0b685461d1045fd27a8831cb1def93afb",
+    "sourceBytes": 121,
+    "compressed": false,
+    "roundtripSha256": "096156641ca4dd9d1b23cb3e46bcaee0b685461d1045fd27a8831cb1def93afb",
+    "roundtripBytes": 121
+  },
+  {
+    "path": "phone/shipping-lighting-volume-1-route-20260930/shipping-lighting-volume-1-route-20260930/benchmark.json.gz",
+    "sha256": "d8fabe1e0e55a6eef803208d82896d23e068a3a5e44dae6e6abbcdadfd0e64ae",
+    "bytes": 68423,
+    "sourceSha256": "ca5d96ce25106cc6476525ee4ba4e40ff493eb8be84e419eed3b62ea7996b5db",
+    "sourceBytes": 1468398,
+    "compressed": true,
+    "roundtripSha256": "ca5d96ce25106cc6476525ee4ba4e40ff493eb8be84e419eed3b62ea7996b5db",
+    "roundtripBytes": 1468398
+  },
+  {
+    "path": "phone/shipping-lighting-volume-2-route-20260930/trial.json",
+    "sha256": "d6c88f5ab8b7ed02f618cf6f1f1379380014b1b16577c7d89b1ccfa3d01f3ddb",
+    "bytes": 8436,
+    "sourceSha256": "d6c88f5ab8b7ed02f618cf6f1f1379380014b1b16577c7d89b1ccfa3d01f3ddb",
+    "sourceBytes": 8436,
+    "compressed": false,
+    "roundtripSha256": "d6c88f5ab8b7ed02f618cf6f1f1379380014b1b16577c7d89b1ccfa3d01f3ddb",
+    "roundtripBytes": 8436
+  },
+  {
+    "path": "phone/shipping-lighting-volume-2-route-20260930/analysis.json",
+    "sha256": "f8243208f0deeab1f31b37296a3e50af212a42c0e6e108e5e27f4ca264e9da17",
+    "bytes": 9387,
+    "sourceSha256": "f8243208f0deeab1f31b37296a3e50af212a42c0e6e108e5e27f4ca264e9da17",
+    "sourceBytes": 9387,
+    "compressed": false,
+    "roundtripSha256": "f8243208f0deeab1f31b37296a3e50af212a42c0e6e108e5e27f4ca264e9da17",
+    "roundtripBytes": 9387
+  },
+  {
+    "path": "phone/shipping-lighting-volume-2-route-20260930/context-samples.jsonl",
+    "sha256": "3dede0b08ed1c98a043de5ddb616b84a6dfbbfbab89a34f15ece68e179b14033",
+    "bytes": 4914,
+    "sourceSha256": "3dede0b08ed1c98a043de5ddb616b84a6dfbbfbab89a34f15ece68e179b14033",
+    "sourceBytes": 4914,
+    "compressed": false,
+    "roundtripSha256": "3dede0b08ed1c98a043de5ddb616b84a6dfbbfbab89a34f15ece68e179b14033",
+    "roundtripBytes": 4914
+  },
+  {
+    "path": "phone/shipping-lighting-volume-2-route-20260930/launch.log",
+    "sha256": "57795a6d54ad230150cd8633e292b0ce889ad34398df5206e6a2a56c9c4c1f44",
+    "bytes": 323,
+    "sourceSha256": "57795a6d54ad230150cd8633e292b0ce889ad34398df5206e6a2a56c9c4c1f44",
+    "sourceBytes": 323,
+    "compressed": false,
+    "roundtripSha256": "57795a6d54ad230150cd8633e292b0ce889ad34398df5206e6a2a56c9c4c1f44",
+    "roundtripBytes": 323
+  },
+  {
+    "path": "phone/shipping-lighting-volume-2-route-20260930/pull.log",
+    "sha256": "f94c662dbca3f59dcb1aad378295c2eccdbe1699490b373ab1f9f1c915ab55de",
+    "bytes": 183,
+    "sourceSha256": "f94c662dbca3f59dcb1aad378295c2eccdbe1699490b373ab1f9f1c915ab55de",
+    "sourceBytes": 183,
+    "compressed": false,
+    "roundtripSha256": "f94c662dbca3f59dcb1aad378295c2eccdbe1699490b373ab1f9f1c915ab55de",
+    "roundtripBytes": 183
+  },
+  {
+    "path": "phone/shipping-lighting-volume-2-route-20260930/shipping-lighting-volume-2-route-20260930/result.json",
+    "sha256": "1d242fb4e3750de374e632ad777ba5ccd90667c4b39ace793bcea863e4e0487e",
+    "bytes": 121,
+    "sourceSha256": "1d242fb4e3750de374e632ad777ba5ccd90667c4b39ace793bcea863e4e0487e",
+    "sourceBytes": 121,
+    "compressed": false,
+    "roundtripSha256": "1d242fb4e3750de374e632ad777ba5ccd90667c4b39ace793bcea863e4e0487e",
+    "roundtripBytes": 121
+  },
+  {
+    "path": "phone/shipping-lighting-volume-2-route-20260930/shipping-lighting-volume-2-route-20260930/benchmark.json.gz",
+    "sha256": "19937f7c42179cbeb0408bf4849b8901c3ff7cbb9c38c9b2d2c19a8b1f76be27",
+    "bytes": 68830,
+    "sourceSha256": "9b014830a3a2857d496801de53e6ca8187241f815eb1f3b01589d3fec4a48529",
+    "sourceBytes": 1472100,
+    "compressed": true,
+    "roundtripSha256": "9b014830a3a2857d496801de53e6ca8187241f815eb1f3b01589d3fec4a48529",
+    "roundtripBytes": 1472100
+  },
+  {
+    "path": "phone/shipping-lighting-control-2-route-20260930/trial.json",
+    "sha256": "1760bc7a0440af5fdeffe3134eb92f471369f8ecea089afc1d42329ba81bb4bf",
+    "bytes": 8828,
+    "sourceSha256": "1760bc7a0440af5fdeffe3134eb92f471369f8ecea089afc1d42329ba81bb4bf",
+    "sourceBytes": 8828,
+    "compressed": false,
+    "roundtripSha256": "1760bc7a0440af5fdeffe3134eb92f471369f8ecea089afc1d42329ba81bb4bf",
+    "roundtripBytes": 8828
+  },
+  {
+    "path": "phone/shipping-lighting-control-2-route-20260930/analysis.json",
+    "sha256": "6d8fd2fed8a8967f282932e162e86c5ee0c8003be36cdb6ab793ed863569e41f",
+    "bytes": 9067,
+    "sourceSha256": "6d8fd2fed8a8967f282932e162e86c5ee0c8003be36cdb6ab793ed863569e41f",
+    "sourceBytes": 9067,
+    "compressed": false,
+    "roundtripSha256": "6d8fd2fed8a8967f282932e162e86c5ee0c8003be36cdb6ab793ed863569e41f",
+    "roundtripBytes": 9067
+  },
+  {
+    "path": "phone/shipping-lighting-control-2-route-20260930/context-samples.jsonl",
+    "sha256": "83ce2227dc69b92d27688ce5234c569b7aa51510919d9eb0ffee0deba348f97e",
+    "bytes": 5192,
+    "sourceSha256": "83ce2227dc69b92d27688ce5234c569b7aa51510919d9eb0ffee0deba348f97e",
+    "sourceBytes": 5192,
+    "compressed": false,
+    "roundtripSha256": "83ce2227dc69b92d27688ce5234c569b7aa51510919d9eb0ffee0deba348f97e",
+    "roundtripBytes": 5192
+  },
+  {
+    "path": "phone/shipping-lighting-control-2-route-20260930/launch.log",
+    "sha256": "a8ba5b1308414a91d9146e0e53933d2a6bab3facb2eb9425013cba3ef8ef3264",
+    "bytes": 323,
+    "sourceSha256": "a8ba5b1308414a91d9146e0e53933d2a6bab3facb2eb9425013cba3ef8ef3264",
+    "sourceBytes": 323,
+    "compressed": false,
+    "roundtripSha256": "a8ba5b1308414a91d9146e0e53933d2a6bab3facb2eb9425013cba3ef8ef3264",
+    "roundtripBytes": 323
+  },
+  {
+    "path": "phone/shipping-lighting-control-2-route-20260930/pull.log",
+    "sha256": "61dc1db29611a6a069f30cda47e216cc4d558b7c72bbaee966c217f99bd347fe",
+    "bytes": 184,
+    "sourceSha256": "61dc1db29611a6a069f30cda47e216cc4d558b7c72bbaee966c217f99bd347fe",
+    "sourceBytes": 184,
+    "compressed": false,
+    "roundtripSha256": "61dc1db29611a6a069f30cda47e216cc4d558b7c72bbaee966c217f99bd347fe",
+    "roundtripBytes": 184
+  },
+  {
+    "path": "phone/shipping-lighting-control-2-route-20260930/shipping-lighting-control-2-route-20260930/result.json",
+    "sha256": "9225eb21b42729d6ad6d57d4a168c2b5bb2e4cd42cea877145e8608abe37b5aa",
+    "bytes": 122,
+    "sourceSha256": "9225eb21b42729d6ad6d57d4a168c2b5bb2e4cd42cea877145e8608abe37b5aa",
+    "sourceBytes": 122,
+    "compressed": false,
+    "roundtripSha256": "9225eb21b42729d6ad6d57d4a168c2b5bb2e4cd42cea877145e8608abe37b5aa",
+    "roundtripBytes": 122
+  },
+  {
+    "path": "phone/shipping-lighting-control-2-route-20260930/shipping-lighting-control-2-route-20260930/benchmark.json.gz",
+    "sha256": "dded18b14cc4ddc1c5b1b037dfbc4968d669f9c0c70e2f61580ecd7a6f38ce53",
+    "bytes": 68630,
+    "sourceSha256": "108144ea4d81abda0ed5b2378a54ecda38ef8a45c22ddd8c5b46bedb9164ee08",
+    "sourceBytes": 1468427,
+    "compressed": true,
+    "roundtripSha256": "108144ea4d81abda0ed5b2378a54ecda38ef8a45c22ddd8c5b46bedb9164ee08",
+    "roundtripBytes": 1468427
+  },
+  {
+    "path": "installs/lighting-control-1/receipt.json",
+    "sha256": "0a892997d8348139e787c09b12a497add85f29f1b2d355b4465fe8dbe065f1ed",
+    "bytes": 351,
+    "sourceSha256": "0a892997d8348139e787c09b12a497add85f29f1b2d355b4465fe8dbe065f1ed",
+    "sourceBytes": 351,
+    "compressed": false,
+    "roundtripSha256": "0a892997d8348139e787c09b12a497add85f29f1b2d355b4465fe8dbe065f1ed",
+    "roundtripBytes": 351
+  },
+  {
+    "path": "installs/lighting-control-1/install.log",
+    "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "bytes": 38,
+    "sourceSha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "sourceBytes": 38,
+    "compressed": false,
+    "roundtripSha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "roundtripBytes": 38
+  },
+  {
+    "path": "installs/lighting-control-1/pull.log",
+    "sha256": "b1be1894b29155d2fc54f7bc76a108398d5a1f89e7fad556c53ca90d8bc68b01",
+    "bytes": 173,
+    "sourceSha256": "b1be1894b29155d2fc54f7bc76a108398d5a1f89e7fad556c53ca90d8bc68b01",
+    "sourceBytes": 173,
+    "compressed": false,
+    "roundtripSha256": "b1be1894b29155d2fc54f7bc76a108398d5a1f89e7fad556c53ca90d8bc68b01",
+    "roundtripBytes": 173
+  },
+  {
+    "path": "installs/lighting-shadow-1/receipt.json",
+    "sha256": "6a70e81f377579df91a67b09ade46b168921af9d6179022615b682aaf2f6b739",
+    "bytes": 401,
+    "sourceSha256": "6a70e81f377579df91a67b09ade46b168921af9d6179022615b682aaf2f6b739",
+    "sourceBytes": 401,
+    "compressed": false,
+    "roundtripSha256": "6a70e81f377579df91a67b09ade46b168921af9d6179022615b682aaf2f6b739",
+    "roundtripBytes": 401
+  },
+  {
+    "path": "installs/lighting-shadow-1/install.log",
+    "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "bytes": 38,
+    "sourceSha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "sourceBytes": 38,
+    "compressed": false,
+    "roundtripSha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "roundtripBytes": 38
+  },
+  {
+    "path": "installs/lighting-shadow-1/pull.log",
+    "sha256": "fbf284a54bcb248d816508a673c9c7ae3140643395fdc94fc924e9bf94cb3067",
+    "bytes": 173,
+    "sourceSha256": "fbf284a54bcb248d816508a673c9c7ae3140643395fdc94fc924e9bf94cb3067",
+    "sourceBytes": 173,
+    "compressed": false,
+    "roundtripSha256": "fbf284a54bcb248d816508a673c9c7ae3140643395fdc94fc924e9bf94cb3067",
+    "roundtripBytes": 173
+  },
+  {
+    "path": "installs/lighting-volume-1/receipt.json",
+    "sha256": "afe58c086bec7d817ec382a45e21314ec9e77dcd7457c1a8b91c29bff5e65590",
+    "bytes": 401,
+    "sourceSha256": "afe58c086bec7d817ec382a45e21314ec9e77dcd7457c1a8b91c29bff5e65590",
+    "sourceBytes": 401,
+    "compressed": false,
+    "roundtripSha256": "afe58c086bec7d817ec382a45e21314ec9e77dcd7457c1a8b91c29bff5e65590",
+    "roundtripBytes": 401
+  },
+  {
+    "path": "installs/lighting-volume-1/install.log",
+    "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "bytes": 38,
+    "sourceSha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "sourceBytes": 38,
+    "compressed": false,
+    "roundtripSha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "roundtripBytes": 38
+  },
+  {
+    "path": "installs/lighting-volume-1/pull.log",
+    "sha256": "7c839e542a74c6aa34d112aceb23fc56e151d52f3bc9b11837ca8fda7d2a312b",
+    "bytes": 173,
+    "sourceSha256": "7c839e542a74c6aa34d112aceb23fc56e151d52f3bc9b11837ca8fda7d2a312b",
+    "sourceBytes": 173,
+    "compressed": false,
+    "roundtripSha256": "7c839e542a74c6aa34d112aceb23fc56e151d52f3bc9b11837ca8fda7d2a312b",
+    "roundtripBytes": 173
+  },
+  {
+    "path": "installs/lighting-control-2/receipt.json",
+    "sha256": "4e9abf2a5bbc359f3913cc7be145840b04751c9e0cedd0868ff5f32308b836c8",
+    "bytes": 403,
+    "sourceSha256": "4e9abf2a5bbc359f3913cc7be145840b04751c9e0cedd0868ff5f32308b836c8",
+    "sourceBytes": 403,
+    "compressed": false,
+    "roundtripSha256": "4e9abf2a5bbc359f3913cc7be145840b04751c9e0cedd0868ff5f32308b836c8",
+    "roundtripBytes": 403
+  },
+  {
+    "path": "installs/lighting-control-2/install.log",
+    "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "bytes": 38,
+    "sourceSha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "sourceBytes": 38,
+    "compressed": false,
+    "roundtripSha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3",
+    "roundtripBytes": 38
+  },
+  {
+    "path": "installs/lighting-control-2/pull.log",
+    "sha256": "c8df1f4ea255d001a0fc209c1129c076ac0e263604bc73824d4d1d3dffecc855",
+    "bytes": 173,
+    "sourceSha256": "c8df1f4ea255d001a0fc209c1129c076ac0e263604bc73824d4d1d3dffecc855",
+    "sourceBytes": 173,
+    "compressed": false,
+    "roundtripSha256": "c8df1f4ea255d001a0fc209c1129c076ac0e263604bc73824d4d1d3dffecc855",
+    "roundtripBytes": 173
+  },
+  {
+    "path": "opening-lighting-shadow/artifact.json",
+    "sha256": "df4c02a81ee31c5beb0e67bfb7d1a27b55f357843b78b23d51b60536473a7ac1",
+    "bytes": 758,
+    "sourceSha256": "df4c02a81ee31c5beb0e67bfb7d1a27b55f357843b78b23d51b60536473a7ac1",
+    "sourceBytes": 758,
+    "compressed": false,
+    "roundtripSha256": "df4c02a81ee31c5beb0e67bfb7d1a27b55f357843b78b23d51b60536473a7ac1",
+    "roundtripBytes": 758
+  },
+  {
+    "path": "opening-lighting-shadow/containment.json",
+    "sha256": "0d02db21822ab5bb844f5d90f1ef262e959a0cd258cb83802bbbbe0004196f07",
+    "bytes": 1592,
+    "sourceSha256": "0d02db21822ab5bb844f5d90f1ef262e959a0cd258cb83802bbbbe0004196f07",
+    "sourceBytes": 1592,
+    "compressed": false,
+    "roundtripSha256": "0d02db21822ab5bb844f5d90f1ef262e959a0cd258cb83802bbbbe0004196f07",
+    "roundtripBytes": 1592
+  },
+  {
+    "path": "opening-lighting-shadow/asset-shader-comparison.json",
+    "sha256": "b751bd13ac71be65c5767a8a3a5a95e06a9eacda47db49bc4708a7082cee824d",
+    "bytes": 42655,
+    "sourceSha256": "b751bd13ac71be65c5767a8a3a5a95e06a9eacda47db49bc4708a7082cee824d",
+    "sourceBytes": 42655,
+    "compressed": false,
+    "roundtripSha256": "b751bd13ac71be65c5767a8a3a5a95e06a9eacda47db49bc4708a7082cee824d",
+    "roundtripBytes": 42655
+  },
+  {
+    "path": "opening-lighting-shadow/raygen-variant-catalog.json",
+    "sha256": "268a25ec14a32e99cf97179360c35728a4e0a87fc48d2dfb31fbeda51c58f8c7",
+    "bytes": 35138,
+    "sourceSha256": "268a25ec14a32e99cf97179360c35728a4e0a87fc48d2dfb31fbeda51c58f8c7",
+    "sourceBytes": 35138,
+    "compressed": false,
+    "roundtripSha256": "268a25ec14a32e99cf97179360c35728a4e0a87fc48d2dfb31fbeda51c58f8c7",
+    "roundtripBytes": 35138
+  },
+  {
+    "path": "opening-lighting-shadow/rayquery-variant-catalog.json",
+    "sha256": "c4901f44a8b084a77f8c887d1b0f031b1bfa173fb15d0180d2cdfa8525edef28",
+    "bytes": 39470,
+    "sourceSha256": "c4901f44a8b084a77f8c887d1b0f031b1bfa173fb15d0180d2cdfa8525edef28",
+    "sourceBytes": 39470,
+    "compressed": false,
+    "roundtripSha256": "c4901f44a8b084a77f8c887d1b0f031b1bfa173fb15d0180d2cdfa8525edef28",
+    "roundtripBytes": 39470
+  },
+  {
+    "path": "opening-lighting-shadow/source3-filepatch/investigation.patch",
+    "sha256": "d5cb17b5850fc1b5ea02555ce4c962786da3355d4587c737741e9fdbfa4cdcb7",
+    "bytes": 2618,
+    "sourceSha256": "d5cb17b5850fc1b5ea02555ce4c962786da3355d4587c737741e9fdbfa4cdcb7",
+    "sourceBytes": 2618,
+    "compressed": false,
+    "roundtripSha256": "d5cb17b5850fc1b5ea02555ce4c962786da3355d4587c737741e9fdbfa4cdcb7",
+    "roundtripBytes": 2618
+  },
+  {
+    "path": "opening-lighting-shadow/source3-filepatch/newheader.glsl",
+    "sha256": "a5b5b2e2efe26cad43c9d053fd3713f30722ca9b089a820aeda23a7f44abfa31",
+    "bytes": 797,
+    "sourceSha256": "a5b5b2e2efe26cad43c9d053fd3713f30722ca9b089a820aeda23a7f44abfa31",
+    "sourceBytes": 797,
+    "compressed": false,
+    "roundtripSha256": "a5b5b2e2efe26cad43c9d053fd3713f30722ca9b089a820aeda23a7f44abfa31",
+    "roundtripBytes": 797
+  },
+  {
+    "path": "opening-lighting-shadow/android-build.log",
+    "sha256": "02103c6924b82815a23adbb948b2d306f632fb8f5f72475b87059013116c37db",
+    "bytes": 27152,
+    "sourceSha256": "02103c6924b82815a23adbb948b2d306f632fb8f5f72475b87059013116c37db",
+    "sourceBytes": 27152,
+    "compressed": false,
+    "roundtripSha256": "02103c6924b82815a23adbb948b2d306f632fb8f5f72475b87059013116c37db",
+    "roundtripBytes": 27152
+  },
+  {
+    "path": "opening-lighting-shadow/compute-build.log",
+    "sha256": "b995d0abe07de54051da02c33141b26b2bd23b99f0f31ffb4b7b11f075a272a3",
+    "bytes": 1875,
+    "sourceSha256": "b995d0abe07de54051da02c33141b26b2bd23b99f0f31ffb4b7b11f075a272a3",
+    "sourceBytes": 1875,
+    "compressed": false,
+    "roundtripSha256": "b995d0abe07de54051da02c33141b26b2bd23b99f0f31ffb4b7b11f075a272a3",
+    "roundtripBytes": 1875
+  },
+  {
+    "path": "opening-lighting-shadow/raygen-build.log",
+    "sha256": "94366d1ad9e11a33937badc76e6139aa44b394b49574737a4562ab27f310a84d",
+    "bytes": 2700,
+    "sourceSha256": "94366d1ad9e11a33937badc76e6139aa44b394b49574737a4562ab27f310a84d",
+    "sourceBytes": 2700,
+    "compressed": false,
+    "roundtripSha256": "94366d1ad9e11a33937badc76e6139aa44b394b49574737a4562ab27f310a84d",
+    "roundtripBytes": 2700
+  },
+  {
+    "path": "opening-lighting-shadow/android-build-2.log",
+    "sha256": "3969f0773793e5a06e5f63e89385a446c589143dfbf9cdb7dd4065546d00e5e8",
+    "bytes": 2878,
+    "sourceSha256": "3969f0773793e5a06e5f63e89385a446c589143dfbf9cdb7dd4065546d00e5e8",
+    "sourceBytes": 2878,
+    "compressed": false,
+    "roundtripSha256": "3969f0773793e5a06e5f63e89385a446c589143dfbf9cdb7dd4065546d00e5e8",
+    "roundtripBytes": 2878
+  },
+  {
+    "path": "opening-lighting-shadow/raygen-invocation-rejected.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sourceBytes": 0,
+    "compressed": false,
+    "roundtripSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "roundtripBytes": 0
+  },
+  {
+    "path": "opening-lighting-volume/artifact.json",
+    "sha256": "6eef50cd279fc191350f3c89ebc727a723f8acd295449706186c903a0b9e56f5",
+    "bytes": 758,
+    "sourceSha256": "6eef50cd279fc191350f3c89ebc727a723f8acd295449706186c903a0b9e56f5",
+    "sourceBytes": 758,
+    "compressed": false,
+    "roundtripSha256": "6eef50cd279fc191350f3c89ebc727a723f8acd295449706186c903a0b9e56f5",
+    "roundtripBytes": 758
+  },
+  {
+    "path": "opening-lighting-volume/containment.json",
+    "sha256": "0d2e2fb654d7151149fc600c11c7b4d74150319fb5a47605fa93ba4233e3c4cf",
+    "bytes": 1592,
+    "sourceSha256": "0d2e2fb654d7151149fc600c11c7b4d74150319fb5a47605fa93ba4233e3c4cf",
+    "sourceBytes": 1592,
+    "compressed": false,
+    "roundtripSha256": "0d2e2fb654d7151149fc600c11c7b4d74150319fb5a47605fa93ba4233e3c4cf",
+    "roundtripBytes": 1592
+  },
+  {
+    "path": "opening-lighting-volume/asset-shader-comparison.json",
+    "sha256": "8ff8dbad3c03a2ceefebf0c78173f0d50db73e054f58755691b6193a8371400d",
+    "bytes": 42679,
+    "sourceSha256": "8ff8dbad3c03a2ceefebf0c78173f0d50db73e054f58755691b6193a8371400d",
+    "sourceBytes": 42679,
+    "compressed": false,
+    "roundtripSha256": "8ff8dbad3c03a2ceefebf0c78173f0d50db73e054f58755691b6193a8371400d",
+    "roundtripBytes": 42679
+  },
+  {
+    "path": "opening-lighting-volume/raygen-variant-catalog.json",
+    "sha256": "d22505317972a88c5ea38904926e648a8063ebd0d093e7f168651b64f4caa5ac",
+    "bytes": 35138,
+    "sourceSha256": "d22505317972a88c5ea38904926e648a8063ebd0d093e7f168651b64f4caa5ac",
+    "sourceBytes": 35138,
+    "compressed": false,
+    "roundtripSha256": "d22505317972a88c5ea38904926e648a8063ebd0d093e7f168651b64f4caa5ac",
+    "roundtripBytes": 35138
+  },
+  {
+    "path": "opening-lighting-volume/rayquery-variant-catalog.json",
+    "sha256": "84cbb4d1e4734f984552d73a5e2b15fb83c352abae738ec820a03ce8d75986ef",
+    "bytes": 39470,
+    "sourceSha256": "84cbb4d1e4734f984552d73a5e2b15fb83c352abae738ec820a03ce8d75986ef",
+    "sourceBytes": 39470,
+    "compressed": false,
+    "roundtripSha256": "84cbb4d1e4734f984552d73a5e2b15fb83c352abae738ec820a03ce8d75986ef",
+    "roundtripBytes": 39470
+  },
+  {
+    "path": "opening-lighting-volume/source3-filepatch/investigation.patch",
+    "sha256": "d5cb17b5850fc1b5ea02555ce4c962786da3355d4587c737741e9fdbfa4cdcb7",
+    "bytes": 2618,
+    "sourceSha256": "d5cb17b5850fc1b5ea02555ce4c962786da3355d4587c737741e9fdbfa4cdcb7",
+    "sourceBytes": 2618,
+    "compressed": false,
+    "roundtripSha256": "d5cb17b5850fc1b5ea02555ce4c962786da3355d4587c737741e9fdbfa4cdcb7",
+    "roundtripBytes": 2618
+  },
+  {
+    "path": "opening-lighting-volume/source3-filepatch/newheader.glsl",
+    "sha256": "04b6e18bc8f0edeb7d50e55baee005a2321689316c05aed2eb396b370d0a220f",
+    "bytes": 797,
+    "sourceSha256": "04b6e18bc8f0edeb7d50e55baee005a2321689316c05aed2eb396b370d0a220f",
+    "sourceBytes": 797,
+    "compressed": false,
+    "roundtripSha256": "04b6e18bc8f0edeb7d50e55baee005a2321689316c05aed2eb396b370d0a220f",
+    "roundtripBytes": 797
+  },
+  {
+    "path": "opening-lighting-volume/android-build.log",
+    "sha256": "8173aeebca466a6341769f3212d45491cf06dc5a9cce7c2dfa90dceb3c2b8aa2",
+    "bytes": 2771,
+    "sourceSha256": "8173aeebca466a6341769f3212d45491cf06dc5a9cce7c2dfa90dceb3c2b8aa2",
+    "sourceBytes": 2771,
+    "compressed": false,
+    "roundtripSha256": "8173aeebca466a6341769f3212d45491cf06dc5a9cce7c2dfa90dceb3c2b8aa2",
+    "roundtripBytes": 2771
+  },
+  {
+    "path": "opening-lighting-volume/compute-build.log",
+    "sha256": "0e952d91434e29038356a1cb431c76e41101d65f3def57d752a576abc677e802",
+    "bytes": 1875,
+    "sourceSha256": "0e952d91434e29038356a1cb431c76e41101d65f3def57d752a576abc677e802",
+    "sourceBytes": 1875,
+    "compressed": false,
+    "roundtripSha256": "0e952d91434e29038356a1cb431c76e41101d65f3def57d752a576abc677e802",
+    "roundtripBytes": 1875
+  },
+  {
+    "path": "opening-lighting-volume/raygen-build.log",
+    "sha256": "de43f0ee1aa061ed25d103a9b7de49e53771f78c2b3e02010de8a43e41a56960",
+    "bytes": 2700,
+    "sourceSha256": "de43f0ee1aa061ed25d103a9b7de49e53771f78c2b3e02010de8a43e41a56960",
+    "sourceBytes": 2700,
+    "compressed": false,
+    "roundtripSha256": "de43f0ee1aa061ed25d103a9b7de49e53771f78c2b3e02010de8a43e41a56960",
+    "roundtripBytes": 2700
+  },
+  {
+    "path": "PROTOCOL.md",
+    "sha256": "7f67f98cf2bb72960e5749c6ce2a63c462f208c02359090ef0bb0e18a66c4980",
+    "bytes": 3926,
+    "sourceSha256": "7f67f98cf2bb72960e5749c6ce2a63c462f208c02359090ef0bb0e18a66c4980",
+    "sourceBytes": 3926,
+    "compressed": false,
+    "roundtripSha256": "7f67f98cf2bb72960e5749c6ce2a63c462f208c02359090ef0bb0e18a66c4980",
+    "roundtripBytes": 3926
+  },
+  {
+    "path": "opening-lighting-protocol.md",
+    "sha256": "cf2aabcf077e5e5df9f96b8864d937f3424a47698a36d88c3154e3e796f70017",
+    "bytes": 3462,
+    "sourceSha256": "cf2aabcf077e5e5df9f96b8864d937f3424a47698a36d88c3154e3e796f70017",
+    "sourceBytes": 3462,
+    "compressed": false,
+    "roundtripSha256": "cf2aabcf077e5e5df9f96b8864d937f3424a47698a36d88c3154e3e796f70017",
+    "roundtripBytes": 3462
+  },
+  {
+    "path": "seal-lighting-artifact.ps1",
+    "sha256": "fbc5d5d1464c93b0d7048468b57e2ebc88959a3998d4a7bbcd6cc48b986afc6c",
+    "bytes": 3068,
+    "sourceSha256": "fbc5d5d1464c93b0d7048468b57e2ebc88959a3998d4a7bbcd6cc48b986afc6c",
+    "sourceBytes": 3068,
+    "compressed": false,
+    "roundtripSha256": "fbc5d5d1464c93b0d7048468b57e2ebc88959a3998d4a7bbcd6cc48b986afc6c",
+    "roundtripBytes": 3068
+  },
+  {
+    "path": "install-lighting-artifact.ps1",
+    "sha256": "01a0fad92bd342a59a47c14df8e5d50c7fdeeb98a45b0ec3952bd4d5fe7082ca",
+    "bytes": 2424,
+    "sourceSha256": "01a0fad92bd342a59a47c14df8e5d50c7fdeeb98a45b0ec3952bd4d5fe7082ca",
+    "sourceBytes": 2424,
+    "compressed": false,
+    "roundtripSha256": "01a0fad92bd342a59a47c14df8e5d50c7fdeeb98a45b0ec3952bd4d5fe7082ca",
+    "roundtripBytes": 2424
+  },
+  {
+    "path": "analyse-lighting-trial.ps1",
+    "sha256": "9ca44d608dba6ccb350d79f61ae9cba6476498b051c9b9eb2f8bbd8d3faf3aa1",
+    "bytes": 12431,
+    "sourceSha256": "9ca44d608dba6ccb350d79f61ae9cba6476498b051c9b9eb2f8bbd8d3faf3aa1",
+    "sourceBytes": 12431,
+    "compressed": false,
+    "roundtripSha256": "9ca44d608dba6ccb350d79f61ae9cba6476498b051c9b9eb2f8bbd8d3faf3aa1",
+    "roundtripBytes": 12431
+  },
+  {
+    "path": "curate-lighting-evidence.ps1",
+    "sha256": "9b17344a6a23e5d4d5775388b6ed1cfd6295475272cb92b0059d13767e303016",
+    "bytes": 16164,
+    "sourceSha256": "9b17344a6a23e5d4d5775388b6ed1cfd6295475272cb92b0059d13767e303016",
+    "sourceBytes": 16164,
+    "compressed": false,
+    "roundtripSha256": "9b17344a6a23e5d4d5775388b6ed1cfd6295475272cb92b0059d13767e303016",
+    "roundtripBytes": 16164
+  },
+  {
+    "path": "run-shipping-trial.ps1",
+    "sha256": "d8e7677167ea3a206f6a25c81c70705eb003251893455314703b0e6e6c6e1525",
+    "bytes": 5379,
+    "sourceSha256": "d8e7677167ea3a206f6a25c81c70705eb003251893455314703b0e6e6c6e1525",
+    "sourceBytes": 5379,
+    "compressed": false,
+    "roundtripSha256": "d8e7677167ea3a206f6a25c81c70705eb003251893455314703b0e6e6c6e1525",
+    "roundtripBytes": 5379
+  },
+  {
+    "path": "asset-provenance/compare-apk-assets-and-shaders.ps1",
+    "sha256": "4fb33b0ee31e29d4aaed631fece0654e6c403807ddebd9ecf6b398d9e3ac0f1a",
+    "bytes": 19227,
+    "sourceSha256": "4fb33b0ee31e29d4aaed631fece0654e6c403807ddebd9ecf6b398d9e3ac0f1a",
+    "sourceBytes": 19227,
+    "compressed": false,
+    "roundtripSha256": "4fb33b0ee31e29d4aaed631fece0654e6c403807ddebd9ecf6b398d9e3ac0f1a",
+    "roundtripBytes": 19227
+  },
+  {
+    "path": "lighting-parser-negative-tests-final/test.log",
+    "sha256": "9eb58a36d74c5dbb54945ea4dc6c16e71d98ee361dd6a53aa956285b1f0b0596",
+    "bytes": 1132,
+    "sourceSha256": "9eb58a36d74c5dbb54945ea4dc6c16e71d98ee361dd6a53aa956285b1f0b0596",
+    "sourceBytes": 1132,
+    "compressed": false,
+    "roundtripSha256": "9eb58a36d74c5dbb54945ea4dc6c16e71d98ee361dd6a53aa956285b1f0b0596",
+    "roundtripBytes": 1132
+  },
+  {
+    "path": "lighting-parser-negative-tests-final/test-results.json",
+    "sha256": "155916e9bca3a35700b86b2fc91f8a7ddc0ac22f0e4543b05a7dbaee35aa0d24",
+    "bytes": 2250,
+    "sourceSha256": "155916e9bca3a35700b86b2fc91f8a7ddc0ac22f0e4543b05a7dbaee35aa0d24",
+    "sourceBytes": 2250,
+    "compressed": false,
+    "roundtripSha256": "155916e9bca3a35700b86b2fc91f8a7ddc0ac22f0e4543b05a7dbaee35aa0d24",
+    "roundtripBytes": 2250
+  },
+  {
+    "path": "active-strategy/artifact.json",
+    "sha256": "6aa891a83256a875cc8f89bac7441df9cf0800a2de6255744ac4c9e1b8867963",
+    "bytes": 344,
+    "sourceSha256": "6aa891a83256a875cc8f89bac7441df9cf0800a2de6255744ac4c9e1b8867963",
+    "sourceBytes": 344,
+    "compressed": false,
+    "roundtripSha256": "6aa891a83256a875cc8f89bac7441df9cf0800a2de6255744ac4c9e1b8867963",
+    "roundtripBytes": 344
+  },
+  {
+    "path": "active-strategy/containment.json",
+    "sha256": "8e12d901add425368144851a106f6d30e8ddea701f41e2f89365f9d042e672c6",
+    "bytes": 1584,
+    "sourceSha256": "8e12d901add425368144851a106f6d30e8ddea701f41e2f89365f9d042e672c6",
+    "sourceBytes": 1584,
+    "compressed": false,
+    "roundtripSha256": "8e12d901add425368144851a106f6d30e8ddea701f41e2f89365f9d042e672c6",
+    "roundtripBytes": 1584
+  },
+  {
+    "path": "cooling-transition.json",
+    "sha256": "577056e2027e79b690f2b7f13f9cef4d10ff62c12557361198860ab9c5e8bea6",
+    "bytes": 605,
+    "sourceSha256": "577056e2027e79b690f2b7f13f9cef4d10ff62c12557361198860ab9c5e8bea6",
+    "sourceBytes": 605,
+    "compressed": false,
+    "roundtripSha256": "577056e2027e79b690f2b7f13f9cef4d10ff62c12557361198860ab9c5e8bea6",
+    "roundtripBytes": 605
+  },
+  {
+    "path": "7a095c7-push-ci.log",
+    "sha256": "e68610835186a13160dc6a8e1329516d415cc9714ae5ee912b8bf7c532905986",
+    "bytes": 142923,
+    "sourceSha256": "e68610835186a13160dc6a8e1329516d415cc9714ae5ee912b8bf7c532905986",
+    "sourceBytes": 142923,
+    "compressed": false,
+    "roundtripSha256": "e68610835186a13160dc6a8e1329516d415cc9714ae5ee912b8bf7c532905986",
+    "roundtripBytes": 142923
+  },
+  {
+    "path": "7a095c7-pr-ci.log",
+    "sha256": "b20071440044cb6b1f6ef8544e7b54112a183cbe2d8540b15a4b2aa27718091a",
+    "bytes": 152668,
+    "sourceSha256": "b20071440044cb6b1f6ef8544e7b54112a183cbe2d8540b15a4b2aa27718091a",
+    "sourceBytes": 152668,
+    "compressed": false,
+    "roundtripSha256": "b20071440044cb6b1f6ef8544e7b54112a183cbe2d8540b15a4b2aa27718091a",
+    "roundtripBytes": 152668
+  },
+  {
+    "path": "README.md",
+    "sha256": "44c787b779ae49ce1dc3f6857db0a2e11688e53a92ef1d83735766b95f5a8bf4",
+    "bytes": 7760,
+    "sourceSha256": null,
+    "sourceBytes": null,
+    "compressed": false,
+    "roundtripSha256": null,
+    "roundtripBytes": null
+  }
+]

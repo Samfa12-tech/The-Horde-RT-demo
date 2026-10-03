@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.BenchmarkAutomationIntentTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-01T06:51:53" hostname="SAM_LAPPY" time="0.1">
+  <properties/>
+  <testcase name="malformedIdentityAndMixedDebugControlsAreRejected" classname="com.samfa12.hordelanternrt.BenchmarkAutomationIntentTest" time="0.06"/>
+  <testcase name="explicitRequestPreservesIdentityWithoutDebugPrivilege" classname="com.samfa12.hordelanternrt.BenchmarkAutomationIntentTest" time="0.02"/>
+  <testcase name="workloadExtraUsesTheStrictNativeAllowlistAndDefaultsToShowcase" classname="com.samfa12.hordelanternrt.BenchmarkAutomationIntentTest" time="0.02"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

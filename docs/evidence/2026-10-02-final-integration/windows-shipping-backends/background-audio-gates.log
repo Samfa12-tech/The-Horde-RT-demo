@@ -1,0 +1,43 @@
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=0 wallMs=14254468
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=0 snapshotPaused=0 accepted=1 volume=70 tick=0 wallMs=14254484
+XAudio2 ready; output channels=8, asset root=C:\Dev\tmp\horde-windows-shipping-backends-20261002\assets
+first voice started: ui_select.wav, format=48000 Hz/16 bit mono
+Windows music admitted PCM bank and created XAudio2 master; wallMs=14255140
+first voice completed: ui_select.wav
+positional loop started: waterfall_loop.wav
+positional loop started: waterfall_loop.wav
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=3676 wallMs=14294000
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=0 wallMs=14542625
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=0 snapshotPaused=0 accepted=1 volume=70 tick=0 wallMs=14542625
+XAudio2 ready; output channels=8, asset root=C:\Dev\tmp\horde-windows-shipping-backends-20261002\assets
+first voice started: ui_select.wav, format=48000 Hz/16 bit mono
+Windows music admitted PCM bank and created XAudio2 master; wallMs=14543234
+first voice completed: ui_select.wav
+positional loop started: waterfall_loop.wav
+positional loop started: waterfall_loop.wav
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=3676 wallMs=14577250
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=0 wallMs=14594515
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=0 snapshotPaused=0 accepted=1 volume=70 tick=0 wallMs=14594531
+Windows music admitted PCM bank and created XAudio2 master; wallMs=14595078
+XAudio2 ready; output channels=8, asset root=C:\Dev\tmp\horde-windows-shipping-backends-20261002\assets
+first voice started: ui_select.wav, format=48000 Hz/16 bit mono
+first voice completed: ui_select.wav
+positional loop started: waterfall_loop.wav
+positional loop started: waterfall_loop.wav
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=3676 wallMs=14629593
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=0 wallMs=14631281
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=0 snapshotPaused=0 accepted=1 volume=70 tick=0 wallMs=14631281
+Windows music admitted PCM bank and created XAudio2 master; wallMs=14631593
+XAudio2 ready; output channels=8, asset root=C:\Dev\tmp\horde-windows-shipping-backends-20261002\assets
+first voice started: ui_select.wav, format=48000 Hz/16 bit mono
+positional loop started: waterfall_loop.wav
+first voice completed: ui_select.wav
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=1202 wallMs=14643625
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=0 wallMs=14645500
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=0 snapshotPaused=0 accepted=1 volume=70 tick=0 wallMs=14645515
+XAudio2 ready; output channels=8, asset root=C:\Dev\tmp\horde-windows-shipping-backends-20261002\assets
+first voice started: ui_select.wav, format=48000 Hz/16 bit mono
+positional loop started: waterfall_loop.wav
+Windows music admitted PCM bank and created XAudio2 master; wallMs=14645906
+first voice completed: ui_select.wav
+Windows music gate: active=0 foreground=0 focusLoss=0 controls=1 menuPaused=1 snapshotPaused=0 accepted=1 volume=70 tick=1202 wallMs=14656218

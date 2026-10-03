@@ -1,0 +1,154 @@
+{
+  "scope": "Read-only source snapshot and one diagnostic Mobile dielectric checkpoint capture per native RTX backend; no phone/device use",
+  "source": {
+    "commit": "f50c32fe2f9b5de8347f40b0c18399fe32b3a52f",
+    "snapshotPath": "C:\\Dev\\tmp\\horde-mobile-assessment-20260930\\source-f50c32f",
+    "snapshotMethod": "git archive of committed HEAD",
+    "snapshotFiles": 291
+  },
+  "configure": {
+    "generator": "Visual Studio 17 2022",
+    "architecture": "x64",
+    "instrumentationOverride": "Diagnostic",
+    "dielectricQualityOverride": "Mobile",
+    "cachePath": "C:\\Dev\\tmp\\horde-mobile-assessment-20260930\\build-native-mobile\\CMakeCache.txt",
+    "cacheSha256": "e446521cd349aef2507d35da4b1edf175cac6b1e326ba451bf32f8c6c32cd7f0",
+    "configureLog": "C:\\Dev\\tmp\\horde-mobile-assessment-20260930\\configure-retry.log",
+    "configureLogSha256": "e0fa168f1f83777306a5c81475fcc62335a4b9a359551f210c43aed3126e8f50"
+  },
+  "build": {
+    "target": "horde_rt_diagnostic_window",
+    "configuration": "Debug",
+    "exitCode": 0,
+    "exePath": "C:\\Dev\\tmp\\horde-mobile-assessment-20260930\\build-native-mobile\\Debug\\HordeLanternRT.exe",
+    "exeBytes": 8089600,
+    "exeSha256": "fd063981f1d91b11b59c1cbca82ed8f5d46ac33da87f9d0deaba2bcb0c482987",
+    "buildLog": "C:\\Dev\\tmp\\horde-mobile-assessment-20260930\\build.log",
+    "buildLogSha256": "8b49bfd2b709aa37f674a3f7166bfd5937dad35dc4a091ce1b748072abc557c5"
+  },
+  "embeddedModuleValidation": {
+    "targetPlatform": "Windows",
+    "instrumentation": "Diagnostic",
+    "quality": "Mobile",
+    "spirvVal": "passed",
+    "spirvDis": "passed",
+    "modules": [
+      {
+        "offset": 5138192,
+        "backend": "RayTracingPipeline",
+        "executionModel": "RayGenerationKHR",
+        "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+        "words": 126312,
+        "rayQueryCapability": true,
+        "rayQueryInitializations": 23,
+        "binding22": true,
+        "atomicInstructions": 5
+      },
+      {
+        "offset": 5643440,
+        "backend": "RayTracingPipeline",
+        "executionModel": "RayGenerationKHR",
+        "sha256": "9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91",
+        "words": 63170,
+        "rayQueryCapability": true,
+        "rayQueryInitializations": 2,
+        "binding22": true,
+        "atomicInstructions": 41
+      },
+      {
+        "offset": 5896128,
+        "backend": "RayQueryCompute",
+        "executionModel": "GLCompute",
+        "sha256": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58",
+        "words": 126377,
+        "rayQueryCapability": true,
+        "rayQueryInitializations": 23,
+        "binding22": true,
+        "atomicInstructions": 5
+      },
+      {
+        "offset": 6401648,
+        "backend": "RayQueryCompute",
+        "executionModel": "GLCompute",
+        "sha256": "e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302",
+        "words": 63229,
+        "rayQueryCapability": true,
+        "rayQueryInitializations": 2,
+        "binding22": true,
+        "atomicInstructions": 41
+      }
+    ]
+  },
+  "captures": [
+    {
+      "executionBackend": "RayTracingPipeline",
+      "complete": true,
+      "checkpoint": "lantern-glass-production",
+      "camera": {
+        "x": -33.450001,
+        "z": -17.549999,
+        "yaw": -1.570796,
+        "pitch": -0.32
+      },
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "dispatchExtent": "540x960",
+      "renderScale": 1.0,
+      "manifestPath": "C:\\Dev\\tmp\\horde-mobile-assessment-20260930\\native-mobile-rtx-pipeline\\capture-manifest.json",
+      "manifestSha256": "8c9c279c57f63cd6db5ca33ba3fa858532ad920ab8b9ea7ec15b76854af1582e",
+      "pngPath": "C:\\Dev\\tmp\\horde-mobile-assessment-20260930\\native-mobile-rtx-pipeline\\115-lantern-glass-production.png",
+      "pngSha256": "c714c6eb4c72fb488a35d24dd8e712e9a0617a39cf9be0dd6d92bf5eb2e10bc6",
+      "sampleCount": 12,
+      "medianMs": 6.14665,
+      "meanMs": 63.680175,
+      "diagnosticCounters": {
+        "primaryTirCount": 166,
+        "primaryTirTerminationCount": 74,
+        "primaryInterfaceBudgetCount": 0,
+        "primaryInterfaceBudgetClosedVolumeCount": 0,
+        "primaryVolumeBudgetCount": 0,
+        "primaryMismatchedExitCount": 0,
+        "primaryCertifiedClosedVolumeRecoveryCount": 20,
+        "certifiedClosedVolumeRecoveryReasonMask": 2,
+        "shadowFiniteEndpointVolumeCount": 6817
+      }
+    },
+    {
+      "executionBackend": "RayQueryCompute",
+      "complete": true,
+      "checkpoint": "lantern-glass-production",
+      "camera": {
+        "x": -33.450001,
+        "z": -17.549999,
+        "yaw": -1.570796,
+        "pitch": -0.32
+      },
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "dispatchExtent": "540x960",
+      "renderScale": 1.0,
+      "manifestPath": "C:\\Dev\\tmp\\horde-mobile-assessment-20260930\\native-mobile-rtx-compute\\capture-manifest.json",
+      "manifestSha256": "460392c159948b36f86fae7b1fa9c4693a0eae32de221cf89d1a706b4f3c0395",
+      "pngPath": "C:\\Dev\\tmp\\horde-mobile-assessment-20260930\\native-mobile-rtx-compute\\115-lantern-glass-production.png",
+      "pngSha256": "c0559b1c18f5817d32acb71d5ca8f78d6726dd61ce29aa5314464edaa91e78ba",
+      "sampleCount": 12,
+      "medianMs": 6.1884,
+      "meanMs": 58.174567,
+      "diagnosticCounters": {
+        "primaryTirCount": 166,
+        "primaryTirTerminationCount": 74,
+        "primaryInterfaceBudgetCount": 0,
+        "primaryInterfaceBudgetClosedVolumeCount": 0,
+        "primaryVolumeBudgetCount": 0,
+        "primaryMismatchedExitCount": 0,
+        "primaryCertifiedClosedVolumeRecoveryCount": 20,
+        "certifiedClosedVolumeRecoveryReasonMask": 2,
+        "shadowFiniteEndpointVolumeCount": 6817
+      }
+    }
+  ],
+  "limits": [
+    "540x960 internal/dispatch extent, not phone 1080x2235",
+    "Windows capture path forces WaterQuality High; only dielectric module quality is Mobile",
+    "One 12-sample capture per backend; timing is not a performance acceptance result",
+    "RTX-only diagnostic evidence; no phone image/counter parity or device acceptance claim"
+  ]
+}

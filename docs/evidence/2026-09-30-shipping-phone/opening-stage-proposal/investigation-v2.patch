@@ -1,0 +1,576 @@
+diff --git a/android/app/build.gradle b/android/app/build.gradle
+index 7ae7c61..c181efa 100644
+--- a/android/app/build.gradle
++++ b/android/app/build.gradle
+@@ -56,6 +56,10 @@ if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
+ def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
+ def validationUnsigned = System.getenv('HORDE_VALIDATION_UNSIGNED') == '1'
+ def hordeBenchmarkValidation = providers.gradleProperty('hordeBenchmarkValidation').orNull == 'true'
++def hordeOpeningGpuStageProbe = providers.gradleProperty('hordeOpeningGpuStageProbe').orNull == 'true'
++if (hordeOpeningGpuStageProbe && !hordeBenchmarkValidation) {
++    throw new GradleException('Local GPU stage investigation is restricted to the isolated benchmark build.')
++}
+ // Benchmark validation is an isolated, development-signed app. Do not even
+ // read production signing environment variables when that opt-in is present.
+ def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation
+@@ -287,6 +291,9 @@ android {
+                 debuggable false
+                 jniDebuggable false
+                 signingConfig signingConfigs.debug
++                externalNativeBuild {
++                    cmake { arguments "-DHORDE_RT_OPENING_GPU_STAGE_PROBE=${hordeOpeningGpuStageProbe ? 'ON' : 'OFF'}" }
++                }
+             }
+         }
+     }
+diff --git a/android/app/src/main/cpp/CMakeLists.txt b/android/app/src/main/cpp/CMakeLists.txt
+index d2df837..0d49233 100644
+--- a/android/app/src/main/cpp/CMakeLists.txt
++++ b/android/app/src/main/cpp/CMakeLists.txt
+@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.22.1)
+ project(horde_rt_probe_android)
+ 
+ option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and replay commands" OFF)
++option(HORDE_RT_OPENING_GPU_STAGE_PROBE "LOCAL INVESTIGATION ONLY: additional GPU stage timestamps" OFF)
+ option(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE "Use the explicitly packaged viewmodel candidate for live Debug play" OFF)
+ if(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE AND (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug"))
+     message(FATAL_ERROR "The viewmodel candidate is restricted to Debug checkpoint-enabled builds.")
+@@ -41,6 +42,9 @@ target_compile_definitions(horde_rt_probe_android PRIVATE
+     HORDE_RT_PACKAGE_VERSION="${HORDE_RT_PACKAGE_VERSION}"
+     HORDE_RT_BUILD_ID="${HORDE_RT_BUILD_ID}"
+ )
++if(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++    target_compile_definitions(horde_rt_probe_android PRIVATE HORDE_RT_OPENING_GPU_STAGE_PROBE=1)
++endif()
+ if(HORDE_RT_DEBUG_CHECKPOINTS)
+     target_compile_definitions(horde_rt_probe_android PRIVATE
+         HORDE_RT_DEBUG_CHECKPOINTS=1
+diff --git a/android/app/src/main/cpp/android_probe_bridge.cpp b/android/app/src/main/cpp/android_probe_bridge.cpp
+index 6643d4b..a196ace 100644
+--- a/android/app/src/main/cpp/android_probe_bridge.cpp
++++ b/android/app/src/main/cpp/android_probe_bridge.cpp
+@@ -172,6 +172,18 @@ struct SwapchainContext
+     horde::vulkan::DeviceCapabilities capabilities;
+     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
+     horde::vulkan::GpuFrameTimer gpuFrameTimer;
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++    horde::vulkan::GpuFrameTimer openingGeometryTimer;
++    horde::vulkan::GpuFrameTimer openingDispatchTimer;
++    struct OpeningProbePending
++    {
++        horde::telemetry::RtSubmittedFrameIdentity identity{};
++        bool pending = false;
++        bool geometrySubmitted = false;
++        bool dispatchSubmitted = false;
++    };
++    std::array<OpeningProbePending, kMaxFramesInFlight> openingProbePending{};
++#endif
+     horde::vulkan::raytracing::RtFrameEvidenceCoordinator rtFrameEvidence;
+     bool gpuFrameTimingEnabled = true;
+     double gpuFrameTimingTotalMs = 0.0;
+@@ -211,6 +223,76 @@ struct SwapchainContext
+     uint32_t currentFrame = 0u;
+ };
+ 
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++void CancelOpeningProbeRecording(SwapchainContext& context, const char* reason = nullptr)
++{
++    if (reason != nullptr)
++    {
++        __android_log_print(ANDROID_LOG_WARN, kTag,
++            "OPENING_GPU_STAGE_UNAVAILABLE reason=%s slot=%u identity=unavailable duration=absent",
++            reason, context.currentFrame);
++    }
++    context.openingGeometryTimer.CancelRecording(context.currentFrame);
++    context.openingDispatchTimer.CancelRecording(context.currentFrame);
++}
++
++void NoteOpeningProbeUncompleted(SwapchainContext& context, const char* reason)
++{
++    // A failed wait grants neither query reads nor query-state reuse.
++    for (const auto& pending : context.openingProbePending)
++    {
++        if (pending.pending)
++        {
++            __android_log_print(ANDROID_LOG_WARN, kTag,
++                "OPENING_GPU_STAGE_UNAVAILABLE reason=%s epoch=%llu generation=%llu slot=%u submission=%llu duration=absent",
++                reason, static_cast<unsigned long long>(pending.identity.frame.sceneEpoch),
++                static_cast<unsigned long long>(pending.identity.frame.measurementGeneration),
++                pending.identity.frame.frameSlot,
++                static_cast<unsigned long long>(pending.identity.submissionSerial));
++        }
++    }
++}
++
++// Caller has successfully waited this slot's fence or the entire device.
++// Never reconstruct identity/zone from a later mutable scene snapshot.
++void CollectOpeningProbe(SwapchainContext& context, const std::uint32_t frameSlot)
++{
++    auto& pending = context.openingProbePending[frameSlot];
++    if (!pending.pending) return;
++    const auto emit = [&](const char* stage, horde::vulkan::GpuFrameTimer& timer,
++                          const bool submitted) {
++        const auto result = submitted ? timer.CollectCompleted(frameSlot)
++                                     : horde::vulkan::GpuFrameTimingCollection{};
++        const bool joined = result.consumed && result.submissionSequence ==
++            pending.identity.submissionSerial && result.frameSlot == frameSlot;
++        const bool valid = joined && result.hasSample && result.status ==
++            horde::vulkan::GpuFrameTimingCollectionStatus::Valid;
++        const auto& f = pending.identity.frame;
++        __android_log_print(ANDROID_LOG_INFO, kTag,
++            "OPENING_GPU_STAGE stage=%s epoch=%llu generation=%llu attempt=%llu record=%llu tick=%llu slot=%u submission=%llu submitted=%d joined=%d valid=%d ms=%.9f status=%d vk=%d timer=%s",
++            stage, static_cast<unsigned long long>(f.sceneEpoch),
++            static_cast<unsigned long long>(f.measurementGeneration),
++            static_cast<unsigned long long>(f.recordAttemptSerial),
++            static_cast<unsigned long long>(f.recordSerial),
++            static_cast<unsigned long long>(f.simulationTick), frameSlot,
++            static_cast<unsigned long long>(pending.identity.submissionSerial),
++            submitted, joined, valid, valid ? result.sample.milliseconds : -1.0,
++            static_cast<int>(result.status), static_cast<int>(result.result),
++            horde::vulkan::GpuFrameTimerStatusName(timer.Telemetry().status));
++    };
++    emit("geometry-as", context.openingGeometryTimer, pending.geometrySubmitted);
++    emit("rt-dispatch", context.openingDispatchTimer, pending.dispatchSubmitted);
++    pending = {};
++}
++
++void ResetOpeningProbeAfterSuccessfulIdle(SwapchainContext& context)
++{
++    context.openingGeometryTimer.ResetAfterDeviceIdle();
++    context.openingDispatchTimer.ResetAfterDeviceIdle();
++    context.openingProbePending = {};
++}
++#endif
++
+ SwapchainContext gSwapchainContext{};
+ std::atomic<bool> gSwapchainRunning{false};
+ std::thread gSwapchainThread;
+@@ -1963,6 +2045,9 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
+             horde::telemetry::RtResourceResetReason::SwapchainRecreate,
+             CurrentInitialGpuEvidenceStatus(context));
+     context.gpuFrameTimer.ResetAfterDeviceIdle();
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++    if (idleResult == VK_SUCCESS) ResetOpeningProbeAfterSuccessfulIdle(context);
++#endif
+     context.gpuFrameTimingTotalMs = 0.0;
+     context.gpuFrameTimingSampleCount = 0u;
+     context.rtScene.Destroy();
+@@ -2089,6 +2174,9 @@ bool CompleteRtEvidenceAfterDeviceIdle(
+     }
+     if (idleResult != VK_SUCCESS)
+     {
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++        NoteOpeningProbeUncompleted(context, "idle-failed");
++#endif
+         context.rtFrameEvidence.NoteFailedDeviceIdle();
+         __android_log_print(
+             ANDROID_LOG_ERROR, kTag,
+@@ -2104,6 +2192,9 @@ bool CompleteRtEvidenceAfterDeviceIdle(
+     bool completed = true;
+     for (std::uint32_t frameSlot = 0u; frameSlot < kMaxFramesInFlight; ++frameSlot)
+     {
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++        CollectOpeningProbe(context, frameSlot);
++#endif
+         horde::telemetry::RtPerformanceEvidenceSnapshot completedSnapshot{};
+         const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult result =
+             context.rtFrameEvidence.CompleteFinalIdle(
+@@ -2253,6 +2344,21 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
+     }
+     RefreshGpuTimingTelemetry(context);
+     __android_log_print(ANDROID_LOG_INFO, kTag, "PBR material encoding: %s", context.rtScene.MaterialEncoding().c_str());
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++    if (context.openingGeometryTimer.Telemetry().status == horde::vulkan::GpuFrameTimerStatus::Uninitialised)
++    {
++        context.openingGeometryTimer.Initialise(
++            context.physicalDevice, context.device, context.graphicsQueueFamilyIndex, kMaxFramesInFlight);
++        context.openingDispatchTimer.Initialise(
++            context.physicalDevice, context.device, context.graphicsQueueFamilyIndex, kMaxFramesInFlight);
++        __android_log_print(ANDROID_LOG_INFO, kTag,
++            "OPENING_GPU_STAGE_INIT geometry=%s dispatch=%s periodNs=%.9f validBits=%u",
++            horde::vulkan::GpuFrameTimerStatusName(context.openingGeometryTimer.Telemetry().status),
++            horde::vulkan::GpuFrameTimerStatusName(context.openingDispatchTimer.Telemetry().status),
++            context.openingGeometryTimer.Telemetry().timestampPeriodNanoseconds,
++            context.openingGeometryTimer.Telemetry().timestampValidBits);
++    }
++#endif
+     __android_log_print(ANDROID_LOG_INFO,
+                         kTag,
+                         "RT render scale %.0f%%: %ux%u -> %ux%u",
+@@ -2302,6 +2408,10 @@ void DestroySwapchainContext(SwapchainContext& context)
+     DestroyRtEvidenceOnOwnerThread(context);
+     context.rtScene.Destroy();
+     context.gpuFrameTimer.Destroy();
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++    context.openingGeometryTimer.Destroy();
++    context.openingDispatchTimer.Destroy();
++#endif
+     for (VkSemaphore semaphore : context.imageAvailableSemaphores)
+     {
+         if (semaphore != VK_NULL_HANDLE)
+@@ -2402,6 +2512,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+     const auto fenceDone = std::chrono::steady_clock::now();
+     if (waitResult != VK_SUCCESS)
+     {
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++        NoteOpeningProbeUncompleted(context, "fence-failed");
++#endif
+         if (evidenceFrame)
+         {
+             context.rtFrameEvidence.AbortFrame();
+@@ -2409,6 +2522,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+         return false;
+     }
+ 
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++    CollectOpeningProbe(context, context.currentFrame);
++#endif
+     if (evidenceFrame)
+     {
+         horde::telemetry::RtPerformanceEvidenceSnapshot completedSnapshot{};
+@@ -2489,6 +2605,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+     }
+ 
+     bool gpuTimingRecording = false;
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++    horde::vulkan::raytracing::RtSceneGpuStageProbe gpuProbe{};
++#endif
+     bool inAppBenchmarkFrame = false;
+     const auto recordStart = std::chrono::steady_clock::now();
+     if (useRtFrame)
+@@ -2825,13 +2944,25 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+         }
+         gpuTimingRecording = evidenceFrame && context.gpuFrameTimingEnabled &&
+             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++        if (evidenceFrame && context.inAppBenchmark.IsRunning())
++        {
++            gpuProbe.geometry = &context.openingGeometryTimer;
++            gpuProbe.dispatch = &context.openingDispatchTimer;
++            gpuProbe.frameSlot = context.currentFrame;
++        }
++#endif
+         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
+                                                 context.swapchainImages[imageIndex],
+                                                 context.swapchainImageLayouts[imageIndex],
+                                                 context.swapchainExtent,
+                                                 frameInputs,
+                                                 diagnostic,
+-                                                evidenceFrame ? &observation : nullptr))
++                                                evidenceFrame ? &observation : nullptr
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++                                                , &gpuProbe
++#endif
++                                                ))
+         {
+             if (evidenceFrame)
+             {
+@@ -2841,6 +2972,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+             {
+                 context.gpuFrameTimer.CancelRecording(context.currentFrame);
+             }
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++            CancelOpeningProbeRecording(context, "record-failed");
++#endif
+             RejectPendingBenchmarkExpectation(
+                 context, horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
+             __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to record RT frame: %s", diagnostic.c_str());
+@@ -2876,6 +3010,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+ 
+     if (vkEndCommandBuffer(context.commandBuffers[imageIndex]) != VK_SUCCESS)
+     {
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++        CancelOpeningProbeRecording(context, "command-end-failed");
++#endif
+         if (evidenceFrame)
+         {
+             context.rtFrameEvidence.FailGraphicsSubmit(
+@@ -2899,6 +3036,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+         : horde::vulkan::raytracing::RtEvidenceSubmitTransaction{};
+     if (vkResetFences(context.device, 1u, &context.inFlightFences[context.currentFrame]) != VK_SUCCESS)
+     {
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++        CancelOpeningProbeRecording(context, "fence-reset-failed");
++#endif
+         if (evidenceFrame)
+         {
+             context.rtFrameEvidence.FailGraphicsSubmit(
+@@ -2936,6 +3076,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+     submitScope.Complete(1u, 0u, 1u);
+     if (submitResult != VK_SUCCESS)
+     {
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++        CancelOpeningProbeRecording(context, "queue-submit-failed");
++#endif
+         if (evidenceFrame)
+         {
+             context.rtFrameEvidence.FailGraphicsSubmit(
+@@ -2960,6 +3103,25 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+             horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
+                 context.gpuFrameTimer));
+     }
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++    if (submitTransaction.valid && context.inAppBenchmark.IsRunning())
++    {
++        auto& pending = context.openingProbePending[context.currentFrame];
++        pending.identity = submitTransaction.identity;
++        pending.pending = true;
++        pending.geometrySubmitted = gpuProbe.geometryRecorded && context.openingGeometryTimer.MarkSubmitted(
++            context.currentFrame, submitTransaction.identity.submissionSerial);
++        pending.dispatchSubmitted = gpuProbe.dispatchRecorded && context.openingDispatchTimer.MarkSubmitted(
++            context.currentFrame, submitTransaction.identity.submissionSerial);
++        // Failed/unsupported optional timers must not alter real graphics.
++        CancelOpeningProbeRecording(context);
++    }
++    else
++    {
++        CancelOpeningProbeRecording(context,
++            gpuProbe.geometryRecorded || gpuProbe.dispatchRecorded ? "identity-unavailable" : nullptr);
++    }
++#endif
+     if (context.benchmarkExpectedFrame.has_value())
+     {
+         if (evidenceFrame)
+@@ -3155,6 +3317,9 @@ void SwapchainRenderLoop()
+                     horde::telemetry::RtResourceResetReason::RenderScaleChange,
+                     CurrentInitialGpuEvidenceStatus(gSwapchainContext));
+             gSwapchainContext.gpuFrameTimer.ResetAfterDeviceIdle();
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++            if (idleResult == VK_SUCCESS) ResetOpeningProbeAfterSuccessfulIdle(gSwapchainContext);
++#endif
+             gSwapchainContext.gpuFrameTimingTotalMs = 0.0;
+             gSwapchainContext.gpuFrameTimingSampleCount = 0u;
+             RefreshGpuTimingTelemetry(gSwapchainContext);
+diff --git a/src/vulkan/GpuFrameTimer.cpp b/src/vulkan/GpuFrameTimer.cpp
+index f5985b0..6bd40ee 100644
+--- a/src/vulkan/GpuFrameTimer.cpp
++++ b/src/vulkan/GpuFrameTimer.cpp
+@@ -214,7 +214,8 @@ void GpuFrameTimer::SetQueryError(const VkResult result, const std::string& diag
+     ++telemetry_.errorCount;
+ }
+ 
+-bool GpuFrameTimer::RecordBegin(const VkCommandBuffer commandBuffer, const std::uint32_t frameSlot)
++bool GpuFrameTimer::RecordBegin(const VkCommandBuffer commandBuffer, const std::uint32_t frameSlot,
++                               const VkPipelineStageFlagBits stage)
+ {
+     if (!ValidateOperationalSlot(frameSlot, "RecordBegin"))
+     {
+@@ -235,13 +236,14 @@ bool GpuFrameTimer::RecordBegin(const VkCommandBuffer commandBuffer, const std::
+ 
+     const std::uint32_t firstQuery = frameSlot * 2u;
+     vkCmdResetQueryPool(commandBuffer, queryPool_, firstQuery, 2u);
+-    vkCmdWriteTimestamp(commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, queryPool_, firstQuery);
++    vkCmdWriteTimestamp(commandBuffer, stage, queryPool_, firstQuery);
+     slot.recordingCommandBuffer = commandBuffer;
+     slot.recording = true;
+     return true;
+ }
+ 
+-bool GpuFrameTimer::RecordEnd(const VkCommandBuffer commandBuffer, const std::uint32_t frameSlot)
++bool GpuFrameTimer::RecordEnd(const VkCommandBuffer commandBuffer, const std::uint32_t frameSlot,
++                             const VkPipelineStageFlagBits stage)
+ {
+     if (!ValidateOperationalSlot(frameSlot, "RecordEnd"))
+     {
+@@ -261,7 +263,7 @@ bool GpuFrameTimer::RecordEnd(const VkCommandBuffer commandBuffer, const std::ui
+     }
+ 
+     vkCmdWriteTimestamp(commandBuffer,
+-                        VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
++                        stage,
+                         queryPool_,
+                         frameSlot * 2u + 1u);
+     slot.recordingCommandBuffer = VK_NULL_HANDLE;
+diff --git a/src/vulkan/GpuFrameTimer.h b/src/vulkan/GpuFrameTimer.h
+index 3304fea..fce107d 100644
+--- a/src/vulkan/GpuFrameTimer.h
++++ b/src/vulkan/GpuFrameTimer.h
+@@ -93,8 +93,10 @@ public:
+     // idle, for example during a render-scale or swapchain transition.
+     void ResetAfterDeviceIdle();
+ 
+-    bool RecordBegin(VkCommandBuffer commandBuffer, std::uint32_t frameSlot);
+-    bool RecordEnd(VkCommandBuffer commandBuffer, std::uint32_t frameSlot);
++    bool RecordBegin(VkCommandBuffer commandBuffer, std::uint32_t frameSlot,
++                     VkPipelineStageFlagBits stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
++    bool RecordEnd(VkCommandBuffer commandBuffer, std::uint32_t frameSlot,
++                   VkPipelineStageFlagBits stage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT);
+     void CancelRecording(std::uint32_t frameSlot);
+     bool MarkSubmitted(std::uint32_t frameSlot, std::uint64_t submissionSequence);
+     GpuFrameTimingCollection CollectCompleted(std::uint32_t frameSlot);
+diff --git a/src/vulkan/raytracing/PresentableTinyRtScene.cpp b/src/vulkan/raytracing/PresentableTinyRtScene.cpp
+index 4e64a2c..1c92ebe 100644
+--- a/src/vulkan/raytracing/PresentableTinyRtScene.cpp
++++ b/src/vulkan/raytracing/PresentableTinyRtScene.cpp
+@@ -5423,7 +5423,11 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
+                                                 VkExtent2D swapchainExtent,
+                                                 const RtSceneFrameInputs& frame,
+                                                 std::string& diagnostic,
+-                                                RtSceneRecordObservation* observation)
++                                                RtSceneRecordObservation* observation
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++                                                , RtSceneGpuStageProbe* gpuProbe
++#endif
++                                                )
+ {
+ #ifndef NDEBUG
+     // A rejected presentation attempt invalidates geometry evidence from the
+@@ -5456,10 +5460,23 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
+         return false;
+     }
+ 
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++    const bool geometryTiming = gpuProbe != nullptr && gpuProbe->geometry != nullptr &&
++        gpuProbe->geometry->RecordBegin(commandBuffer, gpuProbe->frameSlot,
++                                        VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR);
++#endif
+     if (!UpdateDynamicInstances(commandBuffer, frame, diagnostic, observation))
+     {
+         return false;
+     }
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++    if (geometryTiming)
++    {
++        gpuProbe->geometryRecorded = gpuProbe->geometry->RecordEnd(
++            commandBuffer, gpuProbe->frameSlot,
++            VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR);
++    }
++#endif
+ 
+     RtSceneStageScope traceCopyScope(
+         observation, horde::telemetry::RtStage::TraceCopyRecord);
+@@ -5537,6 +5554,12 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
+     ExecuteObservedTraceCopyCommands(
+         observation,
+         [&]() noexcept {
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++            const auto timestampStage = static_cast<VkPipelineStageFlagBits>(
++                executionPolicy_.shaderPipelineStage);
++            const bool dispatchTiming = gpuProbe != nullptr && gpuProbe->dispatch != nullptr &&
++                gpuProbe->dispatch->RecordBegin(commandBuffer, gpuProbe->frameSlot, timestampStage);
++#endif
+             if (executionPolicy_.requiresShaderBindingTable)
+             {
+                 vkCmdTraceRaysKHR_(commandBuffer,
+@@ -5553,6 +5576,13 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
+                 vkCmdDispatch(commandBuffer, computeDispatchGroups_[0],
+                               computeDispatchGroups_[1], computeDispatchGroups_[2]);
+             }
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++            if (dispatchTiming)
++            {
++                gpuProbe->dispatchRecorded = gpuProbe->dispatch->RecordEnd(
++                    commandBuffer, gpuProbe->frameSlot, timestampStage);
++            }
++#endif
+         },
+         [&]() noexcept {
+             SetImageBarrier(commandBuffer,
+diff --git a/src/vulkan/raytracing/PresentableTinyRtScene.h b/src/vulkan/raytracing/PresentableTinyRtScene.h
+index 019d49e..80227b6 100644
+--- a/src/vulkan/raytracing/PresentableTinyRtScene.h
++++ b/src/vulkan/raytracing/PresentableTinyRtScene.h
+@@ -1,5 +1,9 @@
+ #pragma once
+ 
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++#include "vulkan/GpuFrameTimer.h"
++#endif
++
+ #include <array>
+ #include <cstdint>
+ #include <string>
+@@ -34,6 +38,18 @@ struct PresentableTinyRtScenePreflightTestAccess;
+ struct PresentableTinyRtSceneObservationTestAccess;
+ struct RtDiagnosticCounterPayload;
+ 
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++// Local investigation only. No ownership or normal Shipping observation path.
++struct RtSceneGpuStageProbe
++{
++    GpuFrameTimer* geometry = nullptr;
++    GpuFrameTimer* dispatch = nullptr;
++    std::uint32_t frameSlot = 0u;
++    bool geometryRecorded = false;
++    bool dispatchRecorded = false;
++};
++#endif
++
+ [[nodiscard]] bool TryMakeRtPipelineEvidenceIdentity(
+     const RtPipelineBundleRequest& request,
+     const RtPipelineVariantArtifact& opaqueFast,
+@@ -373,7 +389,11 @@ public:
+                             VkExtent2D swapchainExtent,
+                             const RtSceneFrameInputs& frame,
+                             std::string& diagnostic,
+-                            RtSceneRecordObservation* observation = nullptr);
++                            RtSceneRecordObservation* observation = nullptr
++#if defined(HORDE_RT_OPENING_GPU_STAGE_PROBE)
++                            , RtSceneGpuStageProbe* gpuProbe = nullptr
++#endif
++                            );
+ 
+     // Synchronously reads the last RT-produced storage image. The returned
+     // bytes are canonical RGBA even when the presentation push constant had
+diff --git a/tests/GpuFrameTimerCollectionTests.cpp b/tests/GpuFrameTimerCollectionTests.cpp
+index b7fd817..4dd93e1 100644
+--- a/tests/GpuFrameTimerCollectionTests.cpp
++++ b/tests/GpuFrameTimerCollectionTests.cpp
+@@ -5,6 +5,7 @@
+ #include <iostream>
+ #include <limits>
+ #include <type_traits>
++#include <vector>
+ 
+ namespace
+ {
+@@ -19,6 +20,7 @@ enum class QueryMode
+ 
+ QueryMode gQueryMode = QueryMode::Valid;
+ std::uint64_t gQueryReadCount = 0u;
++std::vector<VkPipelineStageFlagBits> gTimestampStages;
+ 
+ template <typename Handle>
+ Handle FakeHandle(const std::uintptr_t value)
+@@ -101,10 +103,11 @@ VKAPI_ATTR void VKAPI_CALL vkCmdResetQueryPool(
+ 
+ VKAPI_ATTR void VKAPI_CALL vkCmdWriteTimestamp(
+     VkCommandBuffer,
+-    VkPipelineStageFlagBits,
++    VkPipelineStageFlagBits stage,
+     VkQueryPool,
+     std::uint32_t)
+ {
++    gTimestampStages.push_back(stage);
+ }
+ 
+ VKAPI_ATTR VkResult VKAPI_CALL vkGetQueryPoolResults(
+@@ -149,6 +152,17 @@ int main()
+                   "timer fixture must initialise");
+ 
+     const VkCommandBuffer commandBuffer = FakeHandle<VkCommandBuffer>(0x33u);
++    context.Check(timer.RecordBegin(commandBuffer, 0u,
++                      VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR) &&
++                  timer.RecordEnd(commandBuffer, 0u,
++                      VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR) &&
++                  timer.MarkSubmitted(0u, 39u), "probe must record a stage-specific pair");
++    const auto stageSample = timer.CollectCompleted(0u);
++    context.Check(stageSample.hasSample && stageSample.submissionSequence == 39u &&
++                  gTimestampStages.size() == 2u &&
++                  gTimestampStages[0] == VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR &&
++                  gTimestampStages[1] == VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
++                  "probe must forward both requested stage masks and preserve owning identity");
+     const auto submitAndCollect = [&](const std::uint64_t serial, const QueryMode mode) {
+         gQueryMode = mode;
+         context.Check(timer.RecordBegin(commandBuffer, 0u) &&
+@@ -169,6 +183,10 @@ int main()
+     };
+ 
+     const GpuFrameTimingCollection notReady = submitAndCollect(40u, QueryMode::NotReady);
++    context.Check(gTimestampStages.size() == 4u &&
++                  gTimestampStages[2] == VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT &&
++                  gTimestampStages[3] == VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
++                  "default full-frame query stages must remain unchanged");
+     context.Check(notReady.status == GpuFrameTimingCollectionStatus::Unavailable &&
+                       notReady.consumed && notReady.frameSlot == 0u &&
+                       notReady.submissionSequence == 40u && !notReady.hasSample &&

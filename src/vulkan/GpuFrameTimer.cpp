@@ -305,18 +305,25 @@ bool GpuFrameTimer::MarkSubmitted(const std::uint32_t frameSlot,
     return true;
 }
 
-std::optional<GpuFrameTimingSample> GpuFrameTimer::CollectCompleted(const std::uint32_t frameSlot)
+GpuFrameTimingCollection GpuFrameTimer::CollectCompleted(const std::uint32_t frameSlot)
 {
+    GpuFrameTimingCollection collection{};
+    collection.frameSlot = frameSlot;
     if (!ValidateOperationalSlot(frameSlot, "CollectCompleted"))
     {
-        return std::nullopt;
+        collection.status = GpuFrameTimingCollectionStatus::Error;
+        collection.result = telemetry_.lastVkResult;
+        return collection;
     }
 
     FrameSlotState& slot = slots_[frameSlot];
     if (!slot.submitted)
     {
-        return std::nullopt;
+        return collection;
     }
+
+    collection.consumed = true;
+    collection.submissionSequence = slot.submissionSequence;
 
     std::array<TimestampQueryResult, 2u> results{};
     const VkResult queryResult = vkGetQueryPoolResults(
@@ -335,14 +342,18 @@ std::optional<GpuFrameTimingSample> GpuFrameTimer::CollectCompleted(const std::u
     if (queryResult != VK_SUCCESS && queryResult != VK_NOT_READY)
     {
         SetQueryError(queryResult, VkResultDiagnostic("vkGetQueryPoolResults", queryResult));
-        return std::nullopt;
+        collection.status = GpuFrameTimingCollectionStatus::Error;
+        collection.result = queryResult;
+        return collection;
     }
     if (queryResult == VK_NOT_READY || results[0].available == 0u || results[1].available == 0u)
     {
         telemetry_.status = GpuFrameTimerStatus::ResultUnavailable;
         telemetry_.diagnostic = "A completed frame did not expose both GPU timestamp results.";
         ++telemetry_.unavailableResultCount;
-        return std::nullopt;
+        collection.status = GpuFrameTimingCollectionStatus::Unavailable;
+        collection.result = queryResult;
+        return collection;
     }
 
     const std::optional<GpuTimestampDuration> duration = ComputeGpuTimestampDuration(
@@ -353,18 +364,24 @@ std::optional<GpuFrameTimingSample> GpuFrameTimer::CollectCompleted(const std::u
     if (!duration.has_value())
     {
         SetQueryError(VK_ERROR_UNKNOWN, "GPU timestamp results could not be converted to a finite duration.");
-        return std::nullopt;
+        collection.status = GpuFrameTimingCollectionStatus::Error;
+        collection.result = VK_ERROR_UNKNOWN;
+        return collection;
     }
 
     telemetry_.status = GpuFrameTimerStatus::Available;
     telemetry_.latestMilliseconds = duration->milliseconds;
     telemetry_.diagnostic = "GPU RT command-buffer timing is available.";
     ++telemetry_.sampleCount;
-    return GpuFrameTimingSample{
+    collection.status = GpuFrameTimingCollectionStatus::Valid;
+    collection.hasSample = true;
+    collection.result = VK_SUCCESS;
+    collection.sample = GpuFrameTimingSample{
         duration->milliseconds,
         duration->elapsedTicks,
         submissionSequence,
         frameSlot};
+    return collection;
 }
 
 } // namespace horde::vulkan

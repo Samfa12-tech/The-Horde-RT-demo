@@ -1,0 +1,6 @@
+
+10-03 09:54:09.824 11942 14129 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=100 extent=1440x2980 output_only=1 idle_and_resize_ms=86.620
+10-03 09:54:12.979 11942 14129 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=75 extent=1080x2235 output_only=1 idle_and_resize_ms=131.290
+10-03 09:54:15.789 11942 14129 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=50 extent=720x1490 output_only=1 idle_and_resize_ms=86.248
+10-03 09:54:18.665 11942 14129 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=75 extent=1080x2235 output_only=1 idle_and_resize_ms=46.314
+

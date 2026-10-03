@@ -1,0 +1,952 @@
+{
+  "schema": 1,
+  "audit": "actual-APK-assets-and-embedded-ARM64-Shipping-Mobile-SPIR-V",
+  "repoRoot": "C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo",
+  "currentCatalogStatus": "frozen",
+  "catalogPins": {
+    "raygen": "4330a0711733a3c73b49eef350c4ed7a1672abe4bc4510daa1f767ef5c529bd1",
+    "compute": "20b98150b58653b471415ef78e9f95c2065ef2e003e97754be8785a84d9353d6"
+  },
+  "assetComparison": {
+    "controlEntryCount": 70,
+    "candidateEntryCount": 70,
+    "identicalEntries": 70,
+    "changedEntries": 0,
+    "lfsPointers": 0
+  },
+  "moduleComparison": {
+    "actualShippingMobileModulesEach": 4,
+    "unchangedSharedRtStagesEach": 2,
+    "changedSemanticKeys": [],
+    "result": "all four exact frozen Shipping/Mobile modules and both shared RT stages are byte-identical to control"
+  },
+  "artifacts": [
+    {
+      "role": "control",
+      "apkPath": "C:\\Dev\\tmp\\horde-mobile-lantern-profile-20261001\\control-complete-assets-shipping-mobile.apk",
+      "apkSha256": "3a4faf72923e24da9da859ef6cd71c221b818b97d7418a75b1c8dd0ca0540378",
+      "arm64LibrarySha256": "216382290a62f587e7e3063370d1cc2da59109eb2646bf4840e8d2c2e5d719de",
+      "arm64LibraryBytes": 3773048,
+      "alignedSpirvMagicOffsetsFound": 6,
+      "frozenCatalogHashes": {
+        "raygen": "4330a0711733a3c73b49eef350c4ed7a1672abe4bc4510daa1f767ef5c529bd1",
+        "compute": "20b98150b58653b471415ef78e9f95c2065ef2e003e97754be8785a84d9353d6"
+      },
+      "assetEntryCount": 70,
+      "assets": [
+        {
+          "path": "assets/ASSET_LICENSES.md",
+          "bytes": 25978,
+          "sha256": "e864aefbda149a2b50d1f34d9ce7aeb7c29e42c54c85047f3b1cd0c2f5aae588"
+        },
+        {
+          "path": "assets/audio/filmcow/enemy_fall.wav",
+          "bytes": 184964,
+          "sha256": "be5bb75fd09a4d24313a32b23d70a92d3c7ab81b5b838231be17fa92e952b217"
+        },
+        {
+          "path": "assets/audio/filmcow/lich_charge.wav",
+          "bytes": 115166,
+          "sha256": "37d8fc97f20a64737970459d3cbcb6f6d1894e730dc0b7f6021c535492f4cf30"
+        },
+        {
+          "path": "assets/audio/filmcow/lich_fall.wav",
+          "bytes": 119688,
+          "sha256": "b953f591c317a00b687073e78d0328fbdd3994c4eae34e77c0ec6a20ce1c520a"
+        },
+        {
+          "path": "assets/audio/filmcow/lich_hurt.wav",
+          "bytes": 24218,
+          "sha256": "020be6ff7e8bfd14aa946ee72e31f4a66230097e23fba98b0ddf5bf4672e8488"
+        },
+        {
+          "path": "assets/audio/filmcow/lich_impact.wav",
+          "bytes": 131984,
+          "sha256": "5e7672daa9a7248d022756faf2998221c3cbc6ab4a4193114f66e080bfdd83f0"
+        },
+        {
+          "path": "assets/audio/filmcow/menu_toggle.wav",
+          "bytes": 71640,
+          "sha256": "9d511866154c859d3250229a9cbc03948e57afab833a2dd68bbd25b61bb27e08"
+        },
+        {
+          "path": "assets/audio/filmcow/player_step_1.wav",
+          "bytes": 49172,
+          "sha256": "cdaaa9c321e6f4fbf12757fdc20633d4b8f0be30b127038d3cfe0581a8dea0fb"
+        },
+        {
+          "path": "assets/audio/filmcow/player_step_2.wav",
+          "bytes": 32146,
+          "sha256": "261413fb6c185f9e7038a980fc7b124ef9bc7f6f93b258ed83d1d76eb7b9883e"
+        },
+        {
+          "path": "assets/audio/filmcow/skeleton_attack.wav",
+          "bytes": 143684,
+          "sha256": "81eabe7c1bb196f1df5876419a85348128df2d864f79857c18849091218df11e"
+        },
+        {
+          "path": "assets/audio/filmcow/skeleton_step_1.wav",
+          "bytes": 50584,
+          "sha256": "78ede28cebbad2b61e8a373c45d072ab719fb69a3cf103e57ea7c926c06c176e"
+        },
+        {
+          "path": "assets/audio/filmcow/skeleton_step_2.wav",
+          "bytes": 52210,
+          "sha256": "e4a080064fdccd821096d9b42dcb312f0fb40ac8227242999b904602a4786122"
+        },
+        {
+          "path": "assets/audio/filmcow/sword_hit_1.wav",
+          "bytes": 54870,
+          "sha256": "11ba4ca02139ed59bbb71b901603314fe3772e29827a8b368f463fd33f8ab76f"
+        },
+        {
+          "path": "assets/audio/filmcow/sword_hit_2.wav",
+          "bytes": 59462,
+          "sha256": "372c2f83656c7fe6b1098c9fe1565cd43f0c42a5fa927d3d8deb3a562d7ed57b"
+        },
+        {
+          "path": "assets/audio/filmcow/sword_swing_1.wav",
+          "bytes": 38782,
+          "sha256": "1007af0e6b21cbfea341032e55c7944b4fdd097f55979679840c77745f3db267"
+        },
+        {
+          "path": "assets/audio/filmcow/sword_swing_2.wav",
+          "bytes": 44712,
+          "sha256": "ded16a59e6760342cc90c0e7fedacbd061ce1c661f6226ecb63ad98ebd672bf3"
+        },
+        {
+          "path": "assets/audio/filmcow/ui_back.wav",
+          "bytes": 32364,
+          "sha256": "b26df842011ae1813ce4d2129a099e1db449f56325fa1b2770f3380c160c219e"
+        },
+        {
+          "path": "assets/audio/filmcow/ui_select.wav",
+          "bytes": 36878,
+          "sha256": "37483938d3d68e6309e881e1d32bb976e2744743f3869b0bca7a8b6e217e1f33"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/asset.manifest.json",
+          "bytes": 5071,
+          "sha256": "ea7adbc1c248fc37d705239e6bcd529fbf10206ffb77165051658bce4e438c3e"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/A-body.wav",
+          "bytes": 2304044,
+          "sha256": "a58cacd493bd4604cf1d51096cf03092e35c993a079c10af7fcec3debc093277"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/A-tail.wav",
+          "bytes": 576044,
+          "sha256": "4fea7b227dee6b81f09fd54f202bfea33a76a2419fa07c1ec37a0d2f8d14e4e1"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/B-body.wav",
+          "bytes": 2304044,
+          "sha256": "27944d203f9453b7ff9edb2bfd653bac524d4da4db4a000f76115fb4810dd3b5"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/B-tail.wav",
+          "bytes": 576044,
+          "sha256": "7a437a4641f4b99d8b21db934ece9bb3a9c4d0464fea37eb94a2841d70f3132f"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/C-body.wav",
+          "bytes": 576044,
+          "sha256": "3ce3a8ea381c3e81c0b34841df3f1d8d236a5ef335f594001553a400b65accb3"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/C-tail.wav",
+          "bytes": 576044,
+          "sha256": "ec3650bd450cebe9985c1d4d4b59749debe34301f9f9e889171d0e49a316c89c"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/D-body.wav",
+          "bytes": 2304044,
+          "sha256": "22274bc3c17713c275b48232130299a443eb56c7cf871a5f3389e5c83c5a8d64"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/D-tail.wav",
+          "bytes": 576044,
+          "sha256": "d7a934809ab1024da19dc1b86c370b692d8400e0431897f7455936cd8959c3aa"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/E-body.wav",
+          "bytes": 2304044,
+          "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/E-tail.wav",
+          "bytes": 576044,
+          "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/F-body.wav",
+          "bytes": 2304044,
+          "sha256": "158f015c3ffbb12169eb088206751f56fbed799e0b3dea3ab4496124634b441d"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/F-tail.wav",
+          "bytes": 576044,
+          "sha256": "a4fdc4b38c8a1e7240cfad5ac364063ec8c6f27f9baefc2d2e6110a8a4429c21"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/G-body.wav",
+          "bytes": 1152044,
+          "sha256": "ab2dbe31c735cbeec11d09eaa308e5faee793a891c34b67f5f50f6b33af25736"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/G-tail.wav",
+          "bytes": 576044,
+          "sha256": "c51b9851ac32e34c57e586f154d3ee1d5f2d138b9c0f21b2c983618905a42609"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/H-body.wav",
+          "bytes": 2304044,
+          "sha256": "58ac260bd18204e9fb1aeb01aab9229de6830032f1d4be3d30b9527fde1fe6ae"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/H-tail.wav",
+          "bytes": 576044,
+          "sha256": "9e50268573d85733333e10304a0e9faf8d23545e510723035aef1b9d8b0238bf"
+        },
+        {
+          "path": "assets/audio/pixabay/chest_open.wav",
+          "bytes": 479276,
+          "sha256": "788b1c31c504c8eea9e5316c87859013aba6a49f205e0e4a66b181aafbdfb4a6"
+        },
+        {
+          "path": "assets/audio/pixabay/chest_unlock.wav",
+          "bytes": 36908,
+          "sha256": "a1dae01adb6534a2e1504f0d5bc41abff0305e619264dff0339577d4d5b2d808"
+        },
+        {
+          "path": "assets/audio/pixabay/torch_extinguish.wav",
+          "bytes": 100268,
+          "sha256": "ef2e85d4219cce2e5789d6326755909f59e302bd26bc2dbd8f3e39c270614ab8"
+        },
+        {
+          "path": "assets/audio/pixabay/waterfall_loop.wav",
+          "bytes": 2047132,
+          "sha256": "de7711f0e6ef9cf0bdd3d04ba7a1b713ce09ef18169bd994182b09ab2017ee62"
+        },
+        {
+          "path": "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
+          "bytes": 14940452,
+          "sha256": "049979a83aca55358f54af8d3af1f7d518607bef634474a4ef015bfdff947a42"
+        },
+        {
+          "path": "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
+          "bytes": 31568152,
+          "sha256": "340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db"
+        },
+        {
+          "path": "assets/models/player/runtime/asset.manifest.json",
+          "bytes": 1582,
+          "sha256": "556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141"
+        },
+        {
+          "path": "assets/models/player/runtime/clip-manifest.json",
+          "bytes": 1011,
+          "sha256": "1f8075bd1ff97010685172176535482f2b6fc262cc0f5c1daf63e5e8222f648d"
+        },
+        {
+          "path": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+          "bytes": 2568512,
+          "sha256": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb"
+        },
+        {
+          "path": "assets/models/player/viewmodel/runtime/asset.manifest.json",
+          "bytes": 1009,
+          "sha256": "7dd3749f9e4153eace88dd849a20ab344f89ebbc111d27c35dde44476b86cd28"
+        },
+        {
+          "path": "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
+          "bytes": 1228832,
+          "sha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b"
+        },
+        {
+          "path": "assets/models/props/runtime/asset.manifest.json",
+          "bytes": 706,
+          "sha256": "b96c47284c0de4197f69836aafe25f4c307b724fcd5b29b34d3010ce9e8f733f"
+        },
+        {
+          "path": "assets/models/props/runtime/dielectric-fixture/asset.manifest.json",
+          "bytes": 517,
+          "sha256": "65a7cc8c20506541f0b04165de6117868e201a95a500571c826bef27a8f4ad20"
+        },
+        {
+          "path": "assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
+          "bytes": 1848,
+          "sha256": "843fd245da61352a124e3de03f4ccf01923a293afedee2ed73b65a8a18eebf5b"
+        },
+        {
+          "path": "assets/models/props/runtime/gothic-chest-base/asset.manifest.json",
+          "bytes": 758,
+          "sha256": "4c187fa4b45eca1001137027d38e0cd20f86927b0ffb9ca3bc12905c55c892a2"
+        },
+        {
+          "path": "assets/models/props/runtime/gothic-chest-base/gothic-chest-base-lod0.runtime.glb",
+          "bytes": 288856,
+          "sha256": "b65e6e5c5e8c69ea4695c16e0085bdaa0209f5f963bc0af75eda5174354a04f2"
+        },
+        {
+          "path": "assets/models/props/runtime/gothic-chest-lid/asset.manifest.json",
+          "bytes": 702,
+          "sha256": "22c0701f4b1402c616cd56f6996ab0b4d2ad2d5979d204797d52dc540e887efb"
+        },
+        {
+          "path": "assets/models/props/runtime/gothic-chest-lid/gothic-chest-lid-lod0.runtime.glb",
+          "bytes": 208204,
+          "sha256": "cd0db348fad0939197f36a02e14f87abd15e7284c6701b1db1e679c8f7af03e2"
+        },
+        {
+          "path": "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+          "bytes": 280040,
+          "sha256": "b1a2078c78d54dae548b89e20168c9922c7dfe33851d47f3d98e7ff1e7c14b8d"
+        },
+        {
+          "path": "assets/models/props/runtime/reward-lantern-body/asset.manifest.json",
+          "bytes": 1115,
+          "sha256": "3c6352dc4fb1680e3aa3684294008bbbb189295ca1d5b8145c0f23e704c55e35"
+        },
+        {
+          "path": "assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb",
+          "bytes": 658308,
+          "sha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4"
+        },
+        {
+          "path": "assets/models/props/runtime/reward-lantern-ring/asset.manifest.json",
+          "bytes": 713,
+          "sha256": "c4f840ec9375628a6638ecaefaeff8868ecb0578c519589c48680c5726515860"
+        },
+        {
+          "path": "assets/models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb",
+          "bytes": 76716,
+          "sha256": "75bf4f0d7c64c67848f08f1b2fb5b802527160c79def7f71ca964bdcf72799f5"
+        },
+        {
+          "path": "assets/models/weapons/runtime/asset.manifest.json",
+          "bytes": 695,
+          "sha256": "c6203d4af94a74f317c826d6821f2b12c5b3e2316f3c2de58ef4f76a444ac980"
+        },
+        {
+          "path": "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
+          "bytes": 621220,
+          "sha256": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1"
+        },
+        {
+          "path": "assets/textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2",
+          "bytes": 1871648,
+          "sha256": "dc2cfb44f7929c4d85f3a85b3785296da9db607f04b727d64eafc85b47283e46"
+        },
+        {
+          "path": "assets/textures/meshy/lich_placeholder_v01/emissive-2048-astc6x6.ktx2",
+          "bytes": 1871648,
+          "sha256": "679e84d1b7797414aeaafe3268ebac756f734e3546e399b94ec5bec69d354f13"
+        },
+        {
+          "path": "assets/textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2",
+          "bytes": 591904,
+          "sha256": "63fc20bf503a676a56c83ee1d530451619624aa54078de6370240888cd1eb44d"
+        },
+        {
+          "path": "assets/textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2",
+          "bytes": 591904,
+          "sha256": "6333b5cd2ce594115e116b5ec676262ce77d578ea7a1147612f430bfcd10c73a"
+        },
+        {
+          "path": "assets/textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2",
+          "bytes": 1310944,
+          "sha256": "0223134ecdd64d9b897cb38c80bb5f9c86720910aaff917d6005be9ea77048bb"
+        },
+        {
+          "path": "assets/textures/props/runtime/asset.manifest.json",
+          "bytes": 1941,
+          "sha256": "1f32f8fff8832450291e7ba655a6c392840457883bfffc977d517398cbcdfeb8"
+        },
+        {
+          "path": "assets/textures/props/runtime/base-color.android.ktx2",
+          "bytes": 6263344,
+          "sha256": "e6934fca4a3452d5d5c239f2fc8d0047d5364c044543867ff002c9421edd5335"
+        },
+        {
+          "path": "assets/textures/props/runtime/emissive.android.ktx2",
+          "bytes": 626752,
+          "sha256": "da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a"
+        },
+        {
+          "path": "assets/textures/props/runtime/normal.android.ktx2",
+          "bytes": 13981744,
+          "sha256": "049c73a52c8c69a02dbbbc01c3bfdba18ab3782efd0e06b1afc20e3d5e6b3776"
+        },
+        {
+          "path": "assets/textures/props/runtime/orm.android.ktx2",
+          "bytes": 6263344,
+          "sha256": "8f431b7e03d63f2bcda36518daa29d68280b6af9fa188a787a86a77594e33c01"
+        }
+      ],
+      "modules": [
+        {
+          "key": "shipping_mobile_generic_dielectric",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "offsetInArm64Library": 1717408,
+          "bytes": 243852,
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+          "catalogKey": "shipping_mobile_generic_dielectric",
+          "words": 60963,
+          "instructions": 14531,
+          "rayQueryInitializations": 2,
+          "atomicsIncludingNoResultOpcodes": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "control-shipping_mobile_generic_dielectric.spv"
+        },
+        {
+          "key": "shipping_mobile_opaque_fast",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "offsetInArm64Library": 1216396,
+          "bytes": 501012,
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+          "catalogKey": "shipping_mobile_opaque_fast",
+          "words": 125253,
+          "instructions": 27536,
+          "rayQueryInitializations": 23,
+          "atomicsIncludingNoResultOpcodes": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "control-shipping_mobile_opaque_fast.spv"
+        },
+        {
+          "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "offsetInArm64Library": 972308,
+          "bytes": 244088,
+          "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+          "catalogKey": "rayquery_compute_shipping_mobile_generic_dielectric",
+          "words": 61022,
+          "instructions": 14546,
+          "rayQueryInitializations": 2,
+          "atomicsIncludingNoResultOpcodes": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "control-rayquery_compute_shipping_mobile_generic_dielectric.spv"
+        },
+        {
+          "key": "rayquery_compute_shipping_mobile_opaque_fast",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "offsetInArm64Library": 471036,
+          "bytes": 501272,
+          "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+          "catalogKey": "rayquery_compute_shipping_mobile_opaque_fast",
+          "words": 125318,
+          "instructions": 27555,
+          "rayQueryInitializations": 23,
+          "atomicsIncludingNoResultOpcodes": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "control-rayquery_compute_shipping_mobile_opaque_fast.spv"
+        }
+      ],
+      "sharedStages": [
+        {
+          "executionModel": "MissKHR",
+          "offsetInArm64Library": 1962652,
+          "bytes": 2272,
+          "sha256": "4fa56e1bd77015802f5ab513ea170748df5f0814911ef0de21ca8efa88e11365",
+          "atomicsIncludingNoResultOpcodes": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "control-shared-stage-0.spv"
+        },
+        {
+          "executionModel": "ClosestHitKHR",
+          "offsetInArm64Library": 1964924,
+          "bytes": 400,
+          "sha256": "3233c51ae375315ca652ec4c4f7d52d0a49d8aed8d1b79e8eeaa7272c0053322",
+          "atomicsIncludingNoResultOpcodes": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "control-shared-stage-1.spv"
+        }
+      ]
+    },
+    {
+      "role": "candidate",
+      "apkPath": "C:\\Dev\\tmp\\horde-mobile-lantern-profile-20261001\\candidate-1da483d-shipping-mobile.apk",
+      "apkSha256": "bac94c45bcfe3f8fcc367f21439735387d188959005b5ee873d02f0f1e9cf142",
+      "arm64LibrarySha256": "17a1bad6a83fac40d6fdbb991bb7e983c087a815434ef1edd10a576517bf4adc",
+      "arm64LibraryBytes": 3774648,
+      "alignedSpirvMagicOffsetsFound": 6,
+      "frozenCatalogHashes": {
+        "raygen": "4330a0711733a3c73b49eef350c4ed7a1672abe4bc4510daa1f767ef5c529bd1",
+        "compute": "20b98150b58653b471415ef78e9f95c2065ef2e003e97754be8785a84d9353d6"
+      },
+      "assetEntryCount": 70,
+      "assets": [
+        {
+          "path": "assets/ASSET_LICENSES.md",
+          "bytes": 25978,
+          "sha256": "e864aefbda149a2b50d1f34d9ce7aeb7c29e42c54c85047f3b1cd0c2f5aae588"
+        },
+        {
+          "path": "assets/audio/filmcow/enemy_fall.wav",
+          "bytes": 184964,
+          "sha256": "be5bb75fd09a4d24313a32b23d70a92d3c7ab81b5b838231be17fa92e952b217"
+        },
+        {
+          "path": "assets/audio/filmcow/lich_charge.wav",
+          "bytes": 115166,
+          "sha256": "37d8fc97f20a64737970459d3cbcb6f6d1894e730dc0b7f6021c535492f4cf30"
+        },
+        {
+          "path": "assets/audio/filmcow/lich_fall.wav",
+          "bytes": 119688,
+          "sha256": "b953f591c317a00b687073e78d0328fbdd3994c4eae34e77c0ec6a20ce1c520a"
+        },
+        {
+          "path": "assets/audio/filmcow/lich_hurt.wav",
+          "bytes": 24218,
+          "sha256": "020be6ff7e8bfd14aa946ee72e31f4a66230097e23fba98b0ddf5bf4672e8488"
+        },
+        {
+          "path": "assets/audio/filmcow/lich_impact.wav",
+          "bytes": 131984,
+          "sha256": "5e7672daa9a7248d022756faf2998221c3cbc6ab4a4193114f66e080bfdd83f0"
+        },
+        {
+          "path": "assets/audio/filmcow/menu_toggle.wav",
+          "bytes": 71640,
+          "sha256": "9d511866154c859d3250229a9cbc03948e57afab833a2dd68bbd25b61bb27e08"
+        },
+        {
+          "path": "assets/audio/filmcow/player_step_1.wav",
+          "bytes": 49172,
+          "sha256": "cdaaa9c321e6f4fbf12757fdc20633d4b8f0be30b127038d3cfe0581a8dea0fb"
+        },
+        {
+          "path": "assets/audio/filmcow/player_step_2.wav",
+          "bytes": 32146,
+          "sha256": "261413fb6c185f9e7038a980fc7b124ef9bc7f6f93b258ed83d1d76eb7b9883e"
+        },
+        {
+          "path": "assets/audio/filmcow/skeleton_attack.wav",
+          "bytes": 143684,
+          "sha256": "81eabe7c1bb196f1df5876419a85348128df2d864f79857c18849091218df11e"
+        },
+        {
+          "path": "assets/audio/filmcow/skeleton_step_1.wav",
+          "bytes": 50584,
+          "sha256": "78ede28cebbad2b61e8a373c45d072ab719fb69a3cf103e57ea7c926c06c176e"
+        },
+        {
+          "path": "assets/audio/filmcow/skeleton_step_2.wav",
+          "bytes": 52210,
+          "sha256": "e4a080064fdccd821096d9b42dcb312f0fb40ac8227242999b904602a4786122"
+        },
+        {
+          "path": "assets/audio/filmcow/sword_hit_1.wav",
+          "bytes": 54870,
+          "sha256": "11ba4ca02139ed59bbb71b901603314fe3772e29827a8b368f463fd33f8ab76f"
+        },
+        {
+          "path": "assets/audio/filmcow/sword_hit_2.wav",
+          "bytes": 59462,
+          "sha256": "372c2f83656c7fe6b1098c9fe1565cd43f0c42a5fa927d3d8deb3a562d7ed57b"
+        },
+        {
+          "path": "assets/audio/filmcow/sword_swing_1.wav",
+          "bytes": 38782,
+          "sha256": "1007af0e6b21cbfea341032e55c7944b4fdd097f55979679840c77745f3db267"
+        },
+        {
+          "path": "assets/audio/filmcow/sword_swing_2.wav",
+          "bytes": 44712,
+          "sha256": "ded16a59e6760342cc90c0e7fedacbd061ce1c661f6226ecb63ad98ebd672bf3"
+        },
+        {
+          "path": "assets/audio/filmcow/ui_back.wav",
+          "bytes": 32364,
+          "sha256": "b26df842011ae1813ce4d2129a099e1db449f56325fa1b2770f3380c160c219e"
+        },
+        {
+          "path": "assets/audio/filmcow/ui_select.wav",
+          "bytes": 36878,
+          "sha256": "37483938d3d68e6309e881e1d32bb976e2744743f3869b0bca7a8b6e217e1f33"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/asset.manifest.json",
+          "bytes": 5071,
+          "sha256": "ea7adbc1c248fc37d705239e6bcd529fbf10206ffb77165051658bce4e438c3e"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/A-body.wav",
+          "bytes": 2304044,
+          "sha256": "a58cacd493bd4604cf1d51096cf03092e35c993a079c10af7fcec3debc093277"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/A-tail.wav",
+          "bytes": 576044,
+          "sha256": "4fea7b227dee6b81f09fd54f202bfea33a76a2419fa07c1ec37a0d2f8d14e4e1"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/B-body.wav",
+          "bytes": 2304044,
+          "sha256": "27944d203f9453b7ff9edb2bfd653bac524d4da4db4a000f76115fb4810dd3b5"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/B-tail.wav",
+          "bytes": 576044,
+          "sha256": "7a437a4641f4b99d8b21db934ece9bb3a9c4d0464fea37eb94a2841d70f3132f"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/C-body.wav",
+          "bytes": 576044,
+          "sha256": "3ce3a8ea381c3e81c0b34841df3f1d8d236a5ef335f594001553a400b65accb3"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/C-tail.wav",
+          "bytes": 576044,
+          "sha256": "ec3650bd450cebe9985c1d4d4b59749debe34301f9f9e889171d0e49a316c89c"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/D-body.wav",
+          "bytes": 2304044,
+          "sha256": "22274bc3c17713c275b48232130299a443eb56c7cf871a5f3389e5c83c5a8d64"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/D-tail.wav",
+          "bytes": 576044,
+          "sha256": "d7a934809ab1024da19dc1b86c370b692d8400e0431897f7455936cd8959c3aa"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/E-body.wav",
+          "bytes": 2304044,
+          "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/E-tail.wav",
+          "bytes": 576044,
+          "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/F-body.wav",
+          "bytes": 2304044,
+          "sha256": "158f015c3ffbb12169eb088206751f56fbed799e0b3dea3ab4496124634b441d"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/F-tail.wav",
+          "bytes": 576044,
+          "sha256": "a4fdc4b38c8a1e7240cfad5ac364063ec8c6f27f9baefc2d2e6110a8a4429c21"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/G-body.wav",
+          "bytes": 1152044,
+          "sha256": "ab2dbe31c735cbeec11d09eaa308e5faee793a891c34b67f5f50f6b33af25736"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/G-tail.wav",
+          "bytes": 576044,
+          "sha256": "c51b9851ac32e34c57e586f154d3ee1d5f2d138b9c0f21b2c983618905a42609"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/H-body.wav",
+          "bytes": 2304044,
+          "sha256": "58ac260bd18204e9fb1aeb01aab9229de6830032f1d4be3d30b9527fde1fe6ae"
+        },
+        {
+          "path": "assets/audio/music/what-the-dark-keeps/runtime/H-tail.wav",
+          "bytes": 576044,
+          "sha256": "9e50268573d85733333e10304a0e9faf8d23545e510723035aef1b9d8b0238bf"
+        },
+        {
+          "path": "assets/audio/pixabay/chest_open.wav",
+          "bytes": 479276,
+          "sha256": "788b1c31c504c8eea9e5316c87859013aba6a49f205e0e4a66b181aafbdfb4a6"
+        },
+        {
+          "path": "assets/audio/pixabay/chest_unlock.wav",
+          "bytes": 36908,
+          "sha256": "a1dae01adb6534a2e1504f0d5bc41abff0305e619264dff0339577d4d5b2d808"
+        },
+        {
+          "path": "assets/audio/pixabay/torch_extinguish.wav",
+          "bytes": 100268,
+          "sha256": "ef2e85d4219cce2e5789d6326755909f59e302bd26bc2dbd8f3e39c270614ab8"
+        },
+        {
+          "path": "assets/audio/pixabay/waterfall_loop.wav",
+          "bytes": 2047132,
+          "sha256": "de7711f0e6ef9cf0bdd3d04ba7a1b713ce09ef18169bd994182b09ab2017ee62"
+        },
+        {
+          "path": "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
+          "bytes": 14940452,
+          "sha256": "049979a83aca55358f54af8d3af1f7d518607bef634474a4ef015bfdff947a42"
+        },
+        {
+          "path": "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
+          "bytes": 31568152,
+          "sha256": "340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db"
+        },
+        {
+          "path": "assets/models/player/runtime/asset.manifest.json",
+          "bytes": 1582,
+          "sha256": "556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141"
+        },
+        {
+          "path": "assets/models/player/runtime/clip-manifest.json",
+          "bytes": 1011,
+          "sha256": "1f8075bd1ff97010685172176535482f2b6fc262cc0f5c1daf63e5e8222f648d"
+        },
+        {
+          "path": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+          "bytes": 2568512,
+          "sha256": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb"
+        },
+        {
+          "path": "assets/models/player/viewmodel/runtime/asset.manifest.json",
+          "bytes": 1009,
+          "sha256": "7dd3749f9e4153eace88dd849a20ab344f89ebbc111d27c35dde44476b86cd28"
+        },
+        {
+          "path": "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
+          "bytes": 1228832,
+          "sha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b"
+        },
+        {
+          "path": "assets/models/props/runtime/asset.manifest.json",
+          "bytes": 706,
+          "sha256": "b96c47284c0de4197f69836aafe25f4c307b724fcd5b29b34d3010ce9e8f733f"
+        },
+        {
+          "path": "assets/models/props/runtime/dielectric-fixture/asset.manifest.json",
+          "bytes": 517,
+          "sha256": "65a7cc8c20506541f0b04165de6117868e201a95a500571c826bef27a8f4ad20"
+        },
+        {
+          "path": "assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
+          "bytes": 1848,
+          "sha256": "843fd245da61352a124e3de03f4ccf01923a293afedee2ed73b65a8a18eebf5b"
+        },
+        {
+          "path": "assets/models/props/runtime/gothic-chest-base/asset.manifest.json",
+          "bytes": 758,
+          "sha256": "4c187fa4b45eca1001137027d38e0cd20f86927b0ffb9ca3bc12905c55c892a2"
+        },
+        {
+          "path": "assets/models/props/runtime/gothic-chest-base/gothic-chest-base-lod0.runtime.glb",
+          "bytes": 288856,
+          "sha256": "b65e6e5c5e8c69ea4695c16e0085bdaa0209f5f963bc0af75eda5174354a04f2"
+        },
+        {
+          "path": "assets/models/props/runtime/gothic-chest-lid/asset.manifest.json",
+          "bytes": 702,
+          "sha256": "22c0701f4b1402c616cd56f6996ab0b4d2ad2d5979d204797d52dc540e887efb"
+        },
+        {
+          "path": "assets/models/props/runtime/gothic-chest-lid/gothic-chest-lid-lod0.runtime.glb",
+          "bytes": 208204,
+          "sha256": "cd0db348fad0939197f36a02e14f87abd15e7284c6701b1db1e679c8f7af03e2"
+        },
+        {
+          "path": "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+          "bytes": 280040,
+          "sha256": "b1a2078c78d54dae548b89e20168c9922c7dfe33851d47f3d98e7ff1e7c14b8d"
+        },
+        {
+          "path": "assets/models/props/runtime/reward-lantern-body/asset.manifest.json",
+          "bytes": 1115,
+          "sha256": "3c6352dc4fb1680e3aa3684294008bbbb189295ca1d5b8145c0f23e704c55e35"
+        },
+        {
+          "path": "assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb",
+          "bytes": 658308,
+          "sha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4"
+        },
+        {
+          "path": "assets/models/props/runtime/reward-lantern-ring/asset.manifest.json",
+          "bytes": 713,
+          "sha256": "c4f840ec9375628a6638ecaefaeff8868ecb0578c519589c48680c5726515860"
+        },
+        {
+          "path": "assets/models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb",
+          "bytes": 76716,
+          "sha256": "75bf4f0d7c64c67848f08f1b2fb5b802527160c79def7f71ca964bdcf72799f5"
+        },
+        {
+          "path": "assets/models/weapons/runtime/asset.manifest.json",
+          "bytes": 695,
+          "sha256": "c6203d4af94a74f317c826d6821f2b12c5b3e2316f3c2de58ef4f76a444ac980"
+        },
+        {
+          "path": "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
+          "bytes": 621220,
+          "sha256": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1"
+        },
+        {
+          "path": "assets/textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2",
+          "bytes": 1871648,
+          "sha256": "dc2cfb44f7929c4d85f3a85b3785296da9db607f04b727d64eafc85b47283e46"
+        },
+        {
+          "path": "assets/textures/meshy/lich_placeholder_v01/emissive-2048-astc6x6.ktx2",
+          "bytes": 1871648,
+          "sha256": "679e84d1b7797414aeaafe3268ebac756f734e3546e399b94ec5bec69d354f13"
+        },
+        {
+          "path": "assets/textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2",
+          "bytes": 591904,
+          "sha256": "63fc20bf503a676a56c83ee1d530451619624aa54078de6370240888cd1eb44d"
+        },
+        {
+          "path": "assets/textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2",
+          "bytes": 591904,
+          "sha256": "6333b5cd2ce594115e116b5ec676262ce77d578ea7a1147612f430bfcd10c73a"
+        },
+        {
+          "path": "assets/textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2",
+          "bytes": 1310944,
+          "sha256": "0223134ecdd64d9b897cb38c80bb5f9c86720910aaff917d6005be9ea77048bb"
+        },
+        {
+          "path": "assets/textures/props/runtime/asset.manifest.json",
+          "bytes": 1941,
+          "sha256": "1f32f8fff8832450291e7ba655a6c392840457883bfffc977d517398cbcdfeb8"
+        },
+        {
+          "path": "assets/textures/props/runtime/base-color.android.ktx2",
+          "bytes": 6263344,
+          "sha256": "e6934fca4a3452d5d5c239f2fc8d0047d5364c044543867ff002c9421edd5335"
+        },
+        {
+          "path": "assets/textures/props/runtime/emissive.android.ktx2",
+          "bytes": 626752,
+          "sha256": "da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a"
+        },
+        {
+          "path": "assets/textures/props/runtime/normal.android.ktx2",
+          "bytes": 13981744,
+          "sha256": "049c73a52c8c69a02dbbbc01c3bfdba18ab3782efd0e06b1afc20e3d5e6b3776"
+        },
+        {
+          "path": "assets/textures/props/runtime/orm.android.ktx2",
+          "bytes": 6263344,
+          "sha256": "8f431b7e03d63f2bcda36518daa29d68280b6af9fa188a787a86a77594e33c01"
+        }
+      ],
+      "modules": [
+        {
+          "key": "shipping_mobile_generic_dielectric",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "offsetInArm64Library": 1717968,
+          "bytes": 243852,
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+          "catalogKey": "shipping_mobile_generic_dielectric",
+          "words": 60963,
+          "instructions": 14531,
+          "rayQueryInitializations": 2,
+          "atomicsIncludingNoResultOpcodes": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "candidate-shipping_mobile_generic_dielectric.spv"
+        },
+        {
+          "key": "shipping_mobile_opaque_fast",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "offsetInArm64Library": 1216956,
+          "bytes": 501012,
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+          "catalogKey": "shipping_mobile_opaque_fast",
+          "words": 125253,
+          "instructions": 27536,
+          "rayQueryInitializations": 23,
+          "atomicsIncludingNoResultOpcodes": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "candidate-shipping_mobile_opaque_fast.spv"
+        },
+        {
+          "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "offsetInArm64Library": 972868,
+          "bytes": 244088,
+          "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+          "catalogKey": "rayquery_compute_shipping_mobile_generic_dielectric",
+          "words": 61022,
+          "instructions": 14546,
+          "rayQueryInitializations": 2,
+          "atomicsIncludingNoResultOpcodes": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "candidate-rayquery_compute_shipping_mobile_generic_dielectric.spv"
+        },
+        {
+          "key": "rayquery_compute_shipping_mobile_opaque_fast",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "offsetInArm64Library": 471596,
+          "bytes": 501272,
+          "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+          "catalogKey": "rayquery_compute_shipping_mobile_opaque_fast",
+          "words": 125318,
+          "instructions": 27555,
+          "rayQueryInitializations": 23,
+          "atomicsIncludingNoResultOpcodes": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "candidate-rayquery_compute_shipping_mobile_opaque_fast.spv"
+        }
+      ],
+      "sharedStages": [
+        {
+          "executionModel": "MissKHR",
+          "offsetInArm64Library": 1963212,
+          "bytes": 2272,
+          "sha256": "4fa56e1bd77015802f5ab513ea170748df5f0814911ef0de21ca8efa88e11365",
+          "atomicsIncludingNoResultOpcodes": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "candidate-shared-stage-0.spv"
+        },
+        {
+          "executionModel": "ClosestHitKHR",
+          "offsetInArm64Library": 1965484,
+          "bytes": 400,
+          "sha256": "3233c51ae375315ca652ec4c4f7d52d0a49d8aed8d1b79e8eeaa7272c0053322",
+          "atomicsIncludingNoResultOpcodes": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed",
+          "extractedPath": "candidate-shared-stage-1.spv"
+        }
+      ]
+    }
+  ],
+  "limits": "Asset equality covers all non-directory APK assets/ ZIP entries. The four variable RT modules are byte-matched against frozen Shipping/Mobile catalog rows and freshly validated/disassembled from extracted ARM64-library bytes."
+}

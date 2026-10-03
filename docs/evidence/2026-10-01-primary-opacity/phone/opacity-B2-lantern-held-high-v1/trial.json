@@ -1,0 +1,38 @@
+{
+  "runId": "opacity-B2-lantern-held-high-v1",
+  "sourceCommit": "e78028c999e745e7cfd1695468062bb45f300b21",
+  "installedApkSha256": "b9d69ff43c13b0d84ff8fca11132578a27ae710ac2946546677d707655b9a188",
+  "member": "primary-opacity-candidate",
+  "workload": "lantern-held-high-v1",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "requestedScalePercent": 75,
+  "requestedBackend": "RayTracingPipeline",
+  "instrumentation": "Shipping",
+  "quality": "Mobile",
+  "startUtc": "2026-10-01T13:09:41.0903516Z",
+  "recordingEnabled": false,
+  "appDataCleared": false,
+  "status": "complete",
+  "gpuMemoryCounters": "not-collected; not a pass",
+  "memoryBoundary": "before/after trial; not frame aligned",
+  "processId": "26273",
+  "endUtc": "2026-10-01T13:12:08.9017160Z",
+  "renderScalePercent": 75,
+  "internalExtent": {
+    "width": 1080,
+    "height": 2235
+  },
+  "presentationExtent": {
+    "width": 1440,
+    "height": 2980
+  },
+  "presentMode": "MAILBOX",
+  "overall": {
+    "averageMs": 104.2544,
+    "medianMs": 104.6725,
+    "p95Ms": 112.1038,
+    "onePercentLowFps": 8.6939
+  }
+}

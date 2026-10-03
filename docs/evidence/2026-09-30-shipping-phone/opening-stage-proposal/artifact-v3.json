@@ -1,0 +1,10 @@
+{
+  "baseCommit": "18616f4fdab2da24e822c999006f39f6cff258eb",
+  "sourceDirty": true,
+  "patchSha256": "1bedd469b34f8d09ed0259e90ab19131cac66afdc0a97fb693ed38e1d830d633",
+  "apkSha256": "cbfc5cf40d15b8a7c64561d4eff11a2dbf0a9dd9c7179da9a53850ef74905204",
+  "nativeSha256": "9b3b2ff2c332ee6fa24e7f56990e1de6e1a825fedb73a739e2f5affcaf2a48d6",
+  "purpose": "Temporary GPU stage probe; final-frame flag fixed after v2 admission rejection",
+  "shaderHashesMatchFrozenB": true,
+  "installed": false
+}

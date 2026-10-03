@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "classification": "synthetic analyzer fixtures only; no measured/physical data",
+  "analyzerPath": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\analyse-trial.ps1",
+  "tests": [
+    {
+      "fixture": "green-control",
+      "result": "PASS",
+      "diagnostic": "fixtures-v2/green-control integrity PASS: 1838 rows; median 20 ms (50 FPS), p95 25 ms; GPU median 1 ms."
+    },
+    {
+      "fixture": "green-candidate",
+      "result": "PASS",
+      "diagnostic": "fixtures-v2/green-candidate integrity PASS: 1838 rows; median 20 ms (50 FPS), p95 25 ms; GPU median 1 ms."
+    },
+    {
+      "fixture": "wrong-apk-sha",
+      "result": "expected rejection",
+      "diagnostic": "installed APK versus immutable build receipt expected '4827a3c2e26d3328ed53608e15c77afe12a34077e96dcd0564c8d65532e21ff4', found '0000000000000000000000000000000000000000000000000000000000000000'"
+    },
+    {
+      "fixture": "wrong-loaded-module-sha",
+      "result": "expected rejection",
+      "diagnostic": "loaded artifact pair versus actual APK shader identity expected 'opaqueFast:shipping_mobile_opaque_fast@14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3|genericDielectric:shipping_mobile_generic_dielectric@ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532', found 'opaqueFast:shipping_mobile_opaque_fast@ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff|genericDielectric:shipping_mobile_generic_dielectric@ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532'"
+    },
+    {
+      "fixture": "wrong-strategy",
+      "result": "expected rejection",
+      "diagnostic": "all rows selected opaque-fast expected '1838', found '1837'"
+    },
+    {
+      "fixture": "missing-completion-identity",
+      "result": "expected rejection",
+      "diagnostic": "Missing identity sceneEpoch at row 0"
+    }
+  ]
+}

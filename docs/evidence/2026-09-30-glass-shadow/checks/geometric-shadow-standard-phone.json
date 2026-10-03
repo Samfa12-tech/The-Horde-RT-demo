@@ -1,0 +1,1505 @@
+{
+  "pixelTolerance": {
+    "maximumChannelDifference": 3,
+    "maximumFractionOverOne": 0.001
+  },
+  "standard13": {
+    "candidateManifest": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\capture-manifest.json",
+    "baselineManifest": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\capture-manifest.json",
+    "candidateBackend": "RayTracingPipeline",
+    "baselineBackend": "RayTracingPipeline",
+    "results": [
+      {
+        "label": "RTX/High/standard13/opening",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\00-opening.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\00-opening.png",
+        "beforeSha256": "3afe620967f40985737f82cd119edc48424d482add83d542ebfad8bf09bd8189",
+        "afterSha256": "3afe620967f40985737f82cd119edc48424d482add83d542ebfad8bf09bd8189",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "ec903d3d30447a386e68b1e82ea5f0df03b10640a9835f1d5091ffd164765d81",
+          "after": "ec903d3d30447a386e68b1e82ea5f0df03b10640a9835f1d5091ffd164765d81"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "578aeee9efc59b728ce546597ec3ef12c7a7f2b5e25eaaa7914c07c316089207",
+          "after": "578aeee9efc59b728ce546597ec3ef12c7a7f2b5e25eaaa7914c07c316089207"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/skeleton",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\01-skeleton.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\01-skeleton.png",
+        "beforeSha256": "8094a7867beeba2fe25307f7674ff6c21dc16eb337900768c4efda2856a2f4be",
+        "afterSha256": "8094a7867beeba2fe25307f7674ff6c21dc16eb337900768c4efda2856a2f4be",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "4d002722014756fbd0f53cf50a5c925df89375cf9abc71aee8c1c82b1a5b0365",
+          "after": "4d002722014756fbd0f53cf50a5c925df89375cf9abc71aee8c1c82b1a5b0365"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "43434ab27d047c935118fc45ccd033102b5ae8009cd979c811a51215915273bf",
+          "after": "43434ab27d047c935118fc45ccd033102b5ae8009cd979c811a51215915273bf"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/worst-bend",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\02-worst-bend.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\02-worst-bend.png",
+        "beforeSha256": "ef88dd62f554740dd69130cbd7d0bd2eacc77e6f8400e0be1a007d35b266957c",
+        "afterSha256": "ef88dd62f554740dd69130cbd7d0bd2eacc77e6f8400e0be1a007d35b266957c",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "2b8ec63e94a0eff8c9d7ebad62079c814f12947d88b848eaccbfc2480e854767",
+          "after": "2b8ec63e94a0eff8c9d7ebad62079c814f12947d88b848eaccbfc2480e854767"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "db96571317a7ef7673c335a56ca16a9b6845f010afdcf167e53772f9e0ee7061",
+          "after": "db96571317a7ef7673c335a56ca16a9b6845f010afdcf167e53772f9e0ee7061"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/lantern-drop",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\03-lantern-drop.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\03-lantern-drop.png",
+        "beforeSha256": "0946c14e616c994c44e9cc39bda8b9eafbd2dd547fd5178c11841c359afbd2ed",
+        "afterSha256": "0946c14e616c994c44e9cc39bda8b9eafbd2dd547fd5178c11841c359afbd2ed",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "258e63c2705b58bbecda45b8ebab4d10ed3ee0786bd55f10c7c1541546218414",
+          "after": "258e63c2705b58bbecda45b8ebab4d10ed3ee0786bd55f10c7c1541546218414"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "7c2c253531df5f119922ca4034435814d2685ec71eb87d82d35ea570df4083b7",
+          "after": "7c2c253531df5f119922ca4034435814d2685ec71eb87d82d35ea570df4083b7"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/skylight",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\04-skylight.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\04-skylight.png",
+        "beforeSha256": "9c3a1f7922d5b416fd3f2fe9353812eef73d0924fb01aa35cf23a71914e8bcdf",
+        "afterSha256": "9c3a1f7922d5b416fd3f2fe9353812eef73d0924fb01aa35cf23a71914e8bcdf",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "57cf7ec0a16188c13e64d51f68ab0fcc27f2974166599eb531f084781bd6152a",
+          "after": "57cf7ec0a16188c13e64d51f68ab0fcc27f2974166599eb531f084781bd6152a"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "28d8fc50dc44a4d4a79cea27acb1722c457fe2703bd7034511eede00230d4d11",
+          "after": "28d8fc50dc44a4d4a79cea27acb1722c457fe2703bd7034511eede00230d4d11"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/yellow",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\05-yellow.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\05-yellow.png",
+        "beforeSha256": "3967003e88cce6cef8edb7af8989cb5f06ccfe05b9ae1931516a5e172e6e1dad",
+        "afterSha256": "3967003e88cce6cef8edb7af8989cb5f06ccfe05b9ae1931516a5e172e6e1dad",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "bbe99aaaaf5ed12ca1f3a5811e587e7f3a0e5b3c67a9c20dfe93da7d52522a84",
+          "after": "bbe99aaaaf5ed12ca1f3a5811e587e7f3a0e5b3c67a9c20dfe93da7d52522a84"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "a523014e60a0e148b2132787c5bf385b962b3f3fcc3273b6efd56540e4d7324c",
+          "after": "a523014e60a0e148b2132787c5bf385b962b3f3fcc3273b6efd56540e4d7324c"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/blue",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\06-blue.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\06-blue.png",
+        "beforeSha256": "37115a233662bd831be50f41e2ededd30666e94d412ffe8d029b15c2a31aadf6",
+        "afterSha256": "37115a233662bd831be50f41e2ededd30666e94d412ffe8d029b15c2a31aadf6",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "7a6f7b3bcf8797962f63dddbb10a65d44c4ac69a2452a06eb9475a2b3403f962",
+          "after": "7a6f7b3bcf8797962f63dddbb10a65d44c4ac69a2452a06eb9475a2b3403f962"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "c2c753e54c4011a9de1a1678c87b1d4bb9c77c1b567f1c7bbb5aafebe81b7c74",
+          "after": "c2c753e54c4011a9de1a1678c87b1d4bb9c77c1b567f1c7bbb5aafebe81b7c74"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/red",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\07-red.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\07-red.png",
+        "beforeSha256": "3f72d742b9705c857285b7c53e5e071c8317731b1b23ab4f1fa57b805f4af58e",
+        "afterSha256": "3f72d742b9705c857285b7c53e5e071c8317731b1b23ab4f1fa57b805f4af58e",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "660303a74567733472ff6fcbb2eb44f41379d457bb272874ef259c161c1cc801",
+          "after": "660303a74567733472ff6fcbb2eb44f41379d457bb272874ef259c161c1cc801"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "d063a29a1442bebb5a869b26f4456296a16fe9f359239cf02abf8fae07b4d30d",
+          "after": "d063a29a1442bebb5a869b26f4456296a16fe9f359239cf02abf8fae07b4d30d"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/green",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\08-green.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\08-green.png",
+        "beforeSha256": "5d7f53b156a6aa0f5d7aa3380273aed77288cd5742deeee5fa6608a87e0127df",
+        "afterSha256": "5d7f53b156a6aa0f5d7aa3380273aed77288cd5742deeee5fa6608a87e0127df",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "f694829b0131173586a0ed2ae9462d810fe4a4f52bd2ca2046cf8693c6677e0c",
+          "after": "f694829b0131173586a0ed2ae9462d810fe4a4f52bd2ca2046cf8693c6677e0c"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "7702129f2a8d60b9062a0d8ea4ed4a357d81bee047b52b33383e53481280f290",
+          "after": "7702129f2a8d60b9062a0d8ea4ed4a357d81bee047b52b33383e53481280f290"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/mirror",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\09-mirror.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\09-mirror.png",
+        "beforeSha256": "efdc76cb16d3cc47e7b246e50277f64cc6762948475702c7e6f53ce4165f2dd3",
+        "afterSha256": "efdc76cb16d3cc47e7b246e50277f64cc6762948475702c7e6f53ce4165f2dd3",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "860817cfafbe84534249ceb01500a34cc0cce1fcae7857f08c2371e3e699b85c",
+          "after": "860817cfafbe84534249ceb01500a34cc0cce1fcae7857f08c2371e3e699b85c"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "a8af4d0eb78cb966636cfb84d7a5ac7dc80401a6f93b964a3b8a8f3f92dd25be",
+          "after": "a8af4d0eb78cb966636cfb84d7a5ac7dc80401a6f93b964a3b8a8f3f92dd25be"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/lich",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\10-lich.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\10-lich.png",
+        "beforeSha256": "a7f2e6cf1c2a1d4649749096f82634557673c1deadd9bff07cf8d237fbb529af",
+        "afterSha256": "a7f2e6cf1c2a1d4649749096f82634557673c1deadd9bff07cf8d237fbb529af",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "54eddea2acd27c9f434242c8de18255b80cbfe28e16127fc0e7ee3e76ad0831f",
+          "after": "54eddea2acd27c9f434242c8de18255b80cbfe28e16127fc0e7ee3e76ad0831f"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "2818e324fb87e75a3e0c9b3a2cac94d9b1e053be50d8bb2e2de6ff3acf1e3af2",
+          "after": "2818e324fb87e75a3e0c9b3a2cac94d9b1e053be50d8bb2e2de6ff3acf1e3af2"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/finale-roof",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\11-finale-roof.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\11-finale-roof.png",
+        "beforeSha256": "7d44fae5b42bf996b6ba28bb716cc9645dd0dd94026fbc17e2c506bdcfc7e3e1",
+        "afterSha256": "f79c425026e33470c3403736ccb79200684891ddd1b61323687a066cb60477d0",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 2418,
+        "fractionOverOne": 0.004664351851851852,
+        "maximumChannelDifference": 67,
+        "equivalencePassed": false,
+        "boundsOverOne": [
+          2,
+          74,
+          958,
+          540
+        ],
+        "peakExamples": [
+          {
+            "xy": [
+              577,
+              534
+            ],
+            "before": [
+              67,
+              31,
+              4
+            ],
+            "after": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "viewmodelGeometrySha256": {
+          "before": "82809fdf9263ea87c21ddcbcdd1b4396d0c6cb4bf242f6e453afa7ce22146884",
+          "after": "82809fdf9263ea87c21ddcbcdd1b4396d0c6cb4bf242f6e453afa7ce22146884"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "ea5e67f67d12dde6434d2722ac1e1b192f1ec624ccf65e92e166df52b684e976",
+          "after": "ea5e67f67d12dde6434d2722ac1e1b192f1ec624ccf65e92e166df52b684e976"
+        }
+      },
+      {
+        "label": "RTX/High/standard13/two-enemy-combat",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\12-two-enemy-combat.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-geometric-shadow-20260930\\windows\\high-standard-complete\\12-two-enemy-combat.png",
+        "beforeSha256": "3457acd16a693dac2f7143dbc72416592ca5fc9f87b0fdc41b2947a3b6b615e6",
+        "afterSha256": "3457acd16a693dac2f7143dbc72416592ca5fc9f87b0fdc41b2947a3b6b615e6",
+        "size": [
+          960,
+          540
+        ],
+        "pixels": 518400,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "viewmodelGeometrySha256": {
+          "before": "5d656e6533315fb369fc8bbf559f48008da710305b2e83d04e1eb5f70f93bd33",
+          "after": "5d656e6533315fb369fc8bbf559f48008da710305b2e83d04e1eb5f70f93bd33"
+        },
+        "playerBodyGeometrySha256": {
+          "before": "ab35082355f36738902ea6fcd4afb1c4325017fb28a1dec3d1dafb7044947f5f",
+          "after": "ab35082355f36738902ea6fcd4afb1c4325017fb28a1dec3d1dafb7044947f5f"
+        }
+      }
+    ]
+  },
+  "phone7": {
+    "candidateManifest": "reports\\android-showcase-runs\\run-20260930-085838\\capture-manifest.json",
+    "baselineManifest": "reports\\android-showcase-runs\\run-20260930-080757\\capture-manifest.json",
+    "device": {
+      "serial": "R5GL219SZGK",
+      "model": "SM-S948B",
+      "androidVersion": "16",
+      "apiLevel": "36",
+      "displaySize": "Physical size: 1440x3120",
+      "displayDensity": "Physical density: 600\r\nOverride density: 560"
+    },
+    "candidateApkSha256": "3de01bb86cc26c3c930ebe7af0f1fe760a2701de7f9c2031f81d3a794d323043",
+    "cbcApkSha256": "457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570",
+    "captureClass": "ADB screenshot AB, not raw backend image parity",
+    "results": [
+      {
+        "label": "SM-S948B/ADB-screenshot-AB/lantern-glass-production",
+        "status": "compared",
+        "beforePath": "reports\\android-showcase-runs\\run-20260930-080757\\capture-01-lantern-glass-production-75.png",
+        "afterPath": "reports\\android-showcase-runs\\run-20260930-085838\\capture-01-lantern-glass-production-75.png",
+        "beforeSha256": "2882ee27364cb6d2fc8d4a7f7537d8ab60954c833b53ba09b34320a573fa21fa",
+        "afterSha256": "ef77d0b35a9760d602a8835e0bd55f0cc3c2e742cd3acfd49a19f17c13cae4b3",
+        "size": [
+          1440,
+          3120
+        ],
+        "pixels": 4492800,
+        "pixelsOverOne": 1591,
+        "fractionOverOne": 0.000354122150997151,
+        "maximumChannelDifference": 26,
+        "equivalencePassed": false,
+        "boundsOverOne": [
+          195,
+          890,
+          1440,
+          3061
+        ],
+        "peakExamples": [
+          {
+            "xy": [
+              1167,
+              1972
+            ],
+            "before": [
+              34,
+              33,
+              32
+            ],
+            "after": [
+              10,
+              11,
+              13
+            ]
+          },
+          {
+            "xy": [
+              1363,
+              2520
+            ],
+            "before": [
+              33,
+              32,
+              33
+            ],
+            "after": [
+              8,
+              6,
+              7
+            ]
+          }
+        ],
+        "counterDeltasCandidateMinusCBC": {
+          "shadowFiniteEndpointVolumeCount": 28546
+        },
+        "counterValues": {
+          "cbc": {
+            "dielectricTransportOverflowCount": 1,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 1,
+            "productionPaneSecondaryOriginCount": 1077,
+            "productionPaneSecondaryTerminalCount": 1077,
+            "productionPaneSecondarySameMediumCount": 1077,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 1,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 1166,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 1,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 1077,
+            "primaryTirTerminationCount": 489,
+            "shadowFiniteEndpointVolumeCount": 0,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 80,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 2,
+            "tlasInstanceCount": 21
+          },
+          "candidate": {
+            "dielectricTransportOverflowCount": 1,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 1,
+            "productionPaneSecondaryOriginCount": 1077,
+            "productionPaneSecondaryTerminalCount": 1077,
+            "productionPaneSecondarySameMediumCount": 1077,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 1,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 1166,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 1,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 1077,
+            "primaryTirTerminationCount": 489,
+            "shadowFiniteEndpointVolumeCount": 28546,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 80,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 2,
+            "tlasInstanceCount": 21
+          }
+        },
+        "provenance": {
+          "candidateApkSha256": "3de01bb86cc26c3c930ebe7af0f1fe760a2701de7f9c2031f81d3a794d323043",
+          "cbcApkSha256": "457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570",
+          "candidateBuildIdentity": "1.6.1 DEBUG",
+          "cbcBuildIdentity": "1.6.1 DEBUG",
+          "gpu": "Adreno (TM) 840",
+          "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+          "comparisonClass": "ADB screenshot AB; not raw storage-image or backend parity"
+        }
+      },
+      {
+        "label": "SM-S948B/ADB-screenshot-AB/player-viewmodel-lantern-high-look-up",
+        "status": "compared",
+        "beforePath": "reports\\android-showcase-runs\\run-20260930-080757\\capture-02-player-viewmodel-lantern-high-look-up-75.png",
+        "afterPath": "reports\\android-showcase-runs\\run-20260930-085838\\capture-02-player-viewmodel-lantern-high-look-up-75.png",
+        "beforeSha256": "7a2c52ad1120e6415173c1dd3dd4592c075d24e3148f30f91c75f152f60d5351",
+        "afterSha256": "65bd3894d12ff9be45da8dc346bb3999218b2ba1c2b6a355855695e3bb16753a",
+        "size": [
+          1440,
+          3120
+        ],
+        "pixels": 4492800,
+        "pixelsOverOne": 5817,
+        "fractionOverOne": 0.0012947382478632479,
+        "maximumChannelDifference": 54,
+        "equivalencePassed": false,
+        "boundsOverOne": [
+          17,
+          968,
+          1427,
+          3120
+        ],
+        "peakExamples": [
+          {
+            "xy": [
+              1256,
+              3095
+            ],
+            "before": [
+              55,
+              30,
+              10
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "xy": [
+              1255,
+              3096
+            ],
+            "before": [
+              54,
+              29,
+              9
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "xy": [
+              1255,
+              3099
+            ],
+            "before": [
+              55,
+              30,
+              10
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "xy": [
+              1256,
+              3100
+            ],
+            "before": [
+              53,
+              29,
+              9
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          }
+        ],
+        "counterDeltasCandidateMinusCBC": {
+          "shadowFiniteEndpointVolumeCount": 19676,
+          "shadowImplicitOriginExitCount": 908
+        },
+        "counterValues": {
+          "cbc": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 9593,
+            "productionPaneSecondaryTerminalCount": 9593,
+            "productionPaneSecondarySameMediumCount": 9593,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 9609,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 9593,
+            "primaryTirTerminationCount": 3579,
+            "shadowFiniteEndpointVolumeCount": 0,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 527,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 2,
+            "tlasInstanceCount": 21
+          },
+          "candidate": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 9593,
+            "productionPaneSecondaryTerminalCount": 9593,
+            "productionPaneSecondarySameMediumCount": 9593,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 9609,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 908,
+            "secondaryDielectricTerminalCount": 9593,
+            "primaryTirTerminationCount": 3579,
+            "shadowFiniteEndpointVolumeCount": 19676,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 527,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 2,
+            "tlasInstanceCount": 21
+          }
+        },
+        "provenance": {
+          "candidateApkSha256": "3de01bb86cc26c3c930ebe7af0f1fe760a2701de7f9c2031f81d3a794d323043",
+          "cbcApkSha256": "457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570",
+          "candidateBuildIdentity": "1.6.1 DEBUG",
+          "cbcBuildIdentity": "1.6.1 DEBUG",
+          "gpu": "Adreno (TM) 840",
+          "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+          "comparisonClass": "ADB screenshot AB; not raw storage-image or backend parity"
+        }
+      },
+      {
+        "label": "SM-S948B/ADB-screenshot-AB/player-viewmodel-lantern-low-parry",
+        "status": "compared",
+        "beforePath": "reports\\android-showcase-runs\\run-20260930-080757\\capture-03-player-viewmodel-lantern-low-parry-75.png",
+        "afterPath": "reports\\android-showcase-runs\\run-20260930-085838\\capture-03-player-viewmodel-lantern-low-parry-75.png",
+        "beforeSha256": "f3af806d03b681580d445c2a17d7ef189310df47927e56a6151e6a25b8f1b113",
+        "afterSha256": "564f360e692538a99b6cdcd6b99567c3161b420e8e1c539a7c3deb1d06320c66",
+        "size": [
+          1440,
+          3120
+        ],
+        "pixels": 4492800,
+        "pixelsOverOne": 6946,
+        "fractionOverOne": 0.0015460292022792023,
+        "maximumChannelDifference": 56,
+        "equivalencePassed": false,
+        "boundsOverOne": [
+          0,
+          352,
+          1438,
+          3120
+        ],
+        "peakExamples": [
+          {
+            "xy": [
+              1428,
+              1816
+            ],
+            "before": [
+              65,
+              69,
+              76
+            ],
+            "after": [
+              27,
+              22,
+              20
+            ]
+          },
+          {
+            "xy": [
+              872,
+              2751
+            ],
+            "before": [
+              55,
+              28,
+              8
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "xy": [
+              872,
+              2752
+            ],
+            "before": [
+              56,
+              28,
+              8
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "xy": [
+              1012,
+              2911
+            ],
+            "before": [
+              56,
+              31,
+              10
+            ],
+            "after": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "counterDeltasCandidateMinusCBC": {
+          "shadowFiniteEndpointVolumeCount": 2780,
+          "shadowImplicitOriginExitCount": 30
+        },
+        "counterValues": {
+          "cbc": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 3956,
+            "productionPaneSecondaryTerminalCount": 3956,
+            "productionPaneSecondarySameMediumCount": 3956,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 5200,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 3956,
+            "primaryTirTerminationCount": 1667,
+            "shadowFiniteEndpointVolumeCount": 0,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 0,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 0,
+            "tlasInstanceCount": 21
+          },
+          "candidate": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 3956,
+            "productionPaneSecondaryTerminalCount": 3956,
+            "productionPaneSecondarySameMediumCount": 3956,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 5200,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 30,
+            "secondaryDielectricTerminalCount": 3956,
+            "primaryTirTerminationCount": 1667,
+            "shadowFiniteEndpointVolumeCount": 2780,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 0,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 0,
+            "tlasInstanceCount": 21
+          }
+        },
+        "provenance": {
+          "candidateApkSha256": "3de01bb86cc26c3c930ebe7af0f1fe760a2701de7f9c2031f81d3a794d323043",
+          "cbcApkSha256": "457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570",
+          "candidateBuildIdentity": "1.6.1 DEBUG",
+          "cbcBuildIdentity": "1.6.1 DEBUG",
+          "gpu": "Adreno (TM) 840",
+          "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+          "comparisonClass": "ADB screenshot AB; not raw storage-image or backend parity"
+        }
+      },
+      {
+        "label": "SM-S948B/ADB-screenshot-AB/glass-millimetre-closed",
+        "status": "compared",
+        "beforePath": "reports\\android-showcase-runs\\run-20260930-080757\\capture-04-glass-millimetre-closed-75.png",
+        "afterPath": "reports\\android-showcase-runs\\run-20260930-085838\\capture-05-glass-millimetre-closed-75.png",
+        "beforeSha256": "edc2098c0adfe1732d3c27142b16d6b8532accd7669c2b01561db556136661cf",
+        "afterSha256": "7e17572d8c5a68cc22ff600eda994d9e831f0512cdfac8abb8cefa4dbd0824d5",
+        "size": [
+          1440,
+          3120
+        ],
+        "pixels": 4492800,
+        "pixelsOverOne": 885,
+        "fractionOverOne": 0.0001969818376068376,
+        "maximumChannelDifference": 58,
+        "equivalencePassed": false,
+        "boundsOverOne": [
+          1,
+          988,
+          1439,
+          2391
+        ],
+        "peakExamples": [
+          {
+            "xy": [
+              1371,
+              2296
+            ],
+            "before": [
+              55,
+              64,
+              77
+            ],
+            "after": [
+              13,
+              15,
+              19
+            ]
+          }
+        ],
+        "counterDeltasCandidateMinusCBC": {},
+        "counterValues": {
+          "cbc": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 0,
+            "productionPaneSecondaryTerminalCount": 0,
+            "productionPaneSecondarySameMediumCount": 0,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 1972,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 64,
+            "primaryTirTerminationCount": 611,
+            "shadowFiniteEndpointVolumeCount": 0,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 0,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 0,
+            "tlasInstanceCount": 21
+          },
+          "candidate": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 0,
+            "productionPaneSecondaryTerminalCount": 0,
+            "productionPaneSecondarySameMediumCount": 0,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 1972,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 64,
+            "primaryTirTerminationCount": 611,
+            "shadowFiniteEndpointVolumeCount": 0,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 0,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 0,
+            "tlasInstanceCount": 21
+          }
+        },
+        "provenance": {
+          "candidateApkSha256": "3de01bb86cc26c3c930ebe7af0f1fe760a2701de7f9c2031f81d3a794d323043",
+          "cbcApkSha256": "457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570",
+          "candidateBuildIdentity": "1.6.1 DEBUG",
+          "cbcBuildIdentity": "1.6.1 DEBUG",
+          "gpu": "Adreno (TM) 840",
+          "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+          "comparisonClass": "ADB screenshot AB; not raw storage-image or backend parity"
+        }
+      },
+      {
+        "label": "SM-S948B/ADB-screenshot-AB/glass-edge-fresnel",
+        "status": "compared",
+        "beforePath": "reports\\android-showcase-runs\\run-20260930-080757\\capture-05-glass-edge-fresnel-75.png",
+        "afterPath": "reports\\android-showcase-runs\\run-20260930-085838\\capture-04-glass-edge-fresnel-75.png",
+        "beforeSha256": "da847e98aa1b7bae11c9575517d1a1ebf27d3ebda3c0eae693323c5484072b2d",
+        "afterSha256": "76becd08decf62b8c542b07efc98bace78179f2135a2188e9662ed209ccae805",
+        "size": [
+          1440,
+          3120
+        ],
+        "pixels": 4492800,
+        "pixelsOverOne": 471,
+        "fractionOverOne": 0.00010483440170940171,
+        "maximumChannelDifference": 69,
+        "equivalencePassed": false,
+        "boundsOverOne": [
+          0,
+          2003,
+          1435,
+          2534
+        ],
+        "peakExamples": [
+          {
+            "xy": [
+              988,
+              2368
+            ],
+            "before": [
+              71,
+              81,
+              93
+            ],
+            "after": [
+              17,
+              19,
+              24
+            ]
+          }
+        ],
+        "counterDeltasCandidateMinusCBC": {},
+        "counterValues": {
+          "cbc": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 0,
+            "productionPaneSecondaryTerminalCount": 0,
+            "productionPaneSecondarySameMediumCount": 0,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 189790,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 0,
+            "primaryTirTerminationCount": 10430,
+            "shadowFiniteEndpointVolumeCount": 0,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 30703,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 1,
+            "tlasInstanceCount": 21
+          },
+          "candidate": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 0,
+            "productionPaneSecondaryTerminalCount": 0,
+            "productionPaneSecondarySameMediumCount": 0,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 189790,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 0,
+            "primaryTirTerminationCount": 10430,
+            "shadowFiniteEndpointVolumeCount": 0,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 30703,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 1,
+            "tlasInstanceCount": 21
+          }
+        },
+        "provenance": {
+          "candidateApkSha256": "3de01bb86cc26c3c930ebe7af0f1fe760a2701de7f9c2031f81d3a794d323043",
+          "cbcApkSha256": "457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570",
+          "candidateBuildIdentity": "1.6.1 DEBUG",
+          "cbcBuildIdentity": "1.6.1 DEBUG",
+          "gpu": "Adreno (TM) 840",
+          "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+          "comparisonClass": "ADB screenshot AB; not raw storage-image or backend parity"
+        }
+      },
+      {
+        "label": "SM-S948B/ADB-screenshot-AB/glass-tinted-transport",
+        "status": "compared",
+        "beforePath": "reports\\android-showcase-runs\\run-20260930-080757\\capture-06-glass-tinted-transport-75.png",
+        "afterPath": "reports\\android-showcase-runs\\run-20260930-085838\\capture-06-glass-tinted-transport-75.png",
+        "beforeSha256": "e3864591fdbc9d501a1317bd12da18ac443d376c0e9d1fa881625271f412881b",
+        "afterSha256": "c21ea194af44b764870de3fe3f1a74adeaaedf24116144a37c919419f9c896a7",
+        "size": [
+          1440,
+          3120
+        ],
+        "pixels": 4492800,
+        "pixelsOverOne": 578772,
+        "fractionOverOne": 0.12882211538461538,
+        "maximumChannelDifference": 100,
+        "equivalencePassed": false,
+        "boundsOverOne": [
+          0,
+          541,
+          1440,
+          3120
+        ],
+        "peakExamples": [
+          {
+            "xy": [
+              121,
+              2777
+            ],
+            "before": [
+              99,
+              58,
+              22
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "xy": [
+              122,
+              2777
+            ],
+            "before": [
+              99,
+              58,
+              22
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "xy": [
+              173,
+              2791
+            ],
+            "before": [
+              101,
+              65,
+              27
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          }
+        ],
+        "counterDeltasCandidateMinusCBC": {},
+        "counterValues": {
+          "cbc": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 0,
+            "productionPaneSecondaryTerminalCount": 0,
+            "productionPaneSecondarySameMediumCount": 0,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 112153,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 0,
+            "primaryTirTerminationCount": 34866,
+            "shadowFiniteEndpointVolumeCount": 0,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 0,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 0,
+            "tlasInstanceCount": 21
+          },
+          "candidate": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 0,
+            "productionPaneSecondaryTerminalCount": 0,
+            "productionPaneSecondarySameMediumCount": 0,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 112153,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 0,
+            "primaryTirTerminationCount": 34866,
+            "shadowFiniteEndpointVolumeCount": 0,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 0,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 0,
+            "tlasInstanceCount": 21
+          }
+        },
+        "provenance": {
+          "candidateApkSha256": "3de01bb86cc26c3c930ebe7af0f1fe760a2701de7f9c2031f81d3a794d323043",
+          "cbcApkSha256": "457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570",
+          "candidateBuildIdentity": "1.6.1 DEBUG",
+          "cbcBuildIdentity": "1.6.1 DEBUG",
+          "gpu": "Adreno (TM) 840",
+          "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+          "comparisonClass": "ADB screenshot AB; not raw storage-image or backend parity"
+        }
+      },
+      {
+        "label": "SM-S948B/ADB-screenshot-AB/glass-fire-transport",
+        "status": "compared",
+        "beforePath": "reports\\android-showcase-runs\\run-20260930-080757\\capture-07-glass-fire-transport-75.png",
+        "afterPath": "reports\\android-showcase-runs\\run-20260930-085838\\capture-07-glass-fire-transport-75.png",
+        "beforeSha256": "1c0d622e76d4185acee77236c57e28d3b77f34d1725e49409d3c5e4a33436961",
+        "afterSha256": "6bd4c5996349db7826c56555f4e747d7eef41e7cb9de7c25ccf62945975aaae2",
+        "size": [
+          1440,
+          3120
+        ],
+        "pixels": 4492800,
+        "pixelsOverOne": 572159,
+        "fractionOverOne": 0.12735020477207978,
+        "maximumChannelDifference": 100,
+        "equivalencePassed": false,
+        "boundsOverOne": [
+          0,
+          541,
+          1440,
+          3120
+        ],
+        "peakExamples": [
+          {
+            "xy": [
+              121,
+              2777
+            ],
+            "before": [
+              99,
+              58,
+              22
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "xy": [
+              122,
+              2777
+            ],
+            "before": [
+              99,
+              58,
+              22
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "xy": [
+              173,
+              2791
+            ],
+            "before": [
+              101,
+              65,
+              27
+            ],
+            "after": [
+              1,
+              1,
+              1
+            ]
+          }
+        ],
+        "counterDeltasCandidateMinusCBC": {},
+        "counterValues": {
+          "cbc": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 0,
+            "productionPaneSecondaryTerminalCount": 0,
+            "productionPaneSecondarySameMediumCount": 0,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 112153,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 0,
+            "primaryTirTerminationCount": 34866,
+            "shadowFiniteEndpointVolumeCount": 0,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 0,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 0,
+            "tlasInstanceCount": 21
+          },
+          "candidate": {
+            "dielectricTransportOverflowCount": 0,
+            "dielectricShadowOverflowCount": 0,
+            "dielectricSecondaryRejectCount": 0,
+            "dielectricUnclosedVolumeCount": 0,
+            "dielectricPrimaryUnclosedVolumeCount": 0,
+            "dielectricShadowUnclosedVolumeCount": 0,
+            "productionPaneStackFailureCount": 0,
+            "productionPaneSecondaryOriginCount": 0,
+            "productionPaneSecondaryTerminalCount": 0,
+            "productionPaneSecondarySameMediumCount": 0,
+            "productionPaneSecondaryDifferentMediumCount": 0,
+            "secondaryNearSelfHitCount": 0,
+            "primaryOpenMissCount": 0,
+            "primaryOpenOpaqueCount": 0,
+            "primaryMismatchedExitCount": 0,
+            "primaryInterfaceBudgetCount": 0,
+            "primaryVolumeBudgetCount": 0,
+            "shadowOpenMissCount": 0,
+            "shadowMismatchedExitCount": 0,
+            "primaryTirCount": 112153,
+            "primaryInterfaceBudgetOpenVolumeCount": 0,
+            "primaryInterfaceBudgetClosedVolumeCount": 0,
+            "shadowMismatchEmptyCount": 0,
+            "shadowImplicitOriginExitCount": 0,
+            "secondaryDielectricTerminalCount": 0,
+            "primaryTirTerminationCount": 34866,
+            "shadowFiniteEndpointVolumeCount": 0,
+            "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0,
+            "primaryOpenOpaqueAfterTirCount": 0,
+            "primaryOpenOpaqueTerminalInstanceMask": 0,
+            "primaryOpenOpaqueVolumeInstanceMask": 0,
+            "primaryOpenOpaqueTerminalMaterialMask": 0,
+            "primaryClosedVolumeAbsorptionCount": 0,
+            "primaryCertifiedClosedVolumeRecoveryCount": 0,
+            "shadowCertifiedClosedVolumeRecoveryCount": 0,
+            "certifiedClosedVolumeRecoveryReasonMask": 0,
+            "tlasInstanceCount": 21
+          }
+        },
+        "provenance": {
+          "candidateApkSha256": "3de01bb86cc26c3c930ebe7af0f1fe760a2701de7f9c2031f81d3a794d323043",
+          "cbcApkSha256": "457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570",
+          "candidateBuildIdentity": "1.6.1 DEBUG",
+          "cbcBuildIdentity": "1.6.1 DEBUG",
+          "gpu": "Adreno (TM) 840",
+          "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+          "comparisonClass": "ADB screenshot AB; not raw storage-image or backend parity"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+HORDE LANTERN RT - IN-APP BENCHMARK
+====================================
+Integrity: COMPLETE
+Status: complete
+Run ID: opaque-compiler-profile-b1-20261001
+Timestamp (UTC): 2026-09-30T14:45:56Z
+Build: 1.6.1
+Shader: opaqueFast:shipping_mobile_opaque_fast@14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3|genericDielectric:shipping_mobile_generic_dielectric@ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532
+GPU: Adreno (TM) 840
+Vulkan API: 1.4.295
+RT mode: RayTracingPipeline
+Execution backend: RayTracingPipeline
+Swapchain present mode: MAILBOX
+RT presented every measured frame: yes
+Material route: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+Render scale: 75%
+Internal RT extent: 1080x2235
+Presentation extent: 1440x2980
+
+COURSE
+Preset: showcase-route-v1
+Pass policy: lap 1 warm-up, final lap measured
+Simulation: fixed 0.032 world units/frame and 1/60 second gameplay step
+Laps completed: 2/2
+Waypoints reached: 26/26
+Measured frames: 1838
+
+LEGACY PLATFORM FRAME TIME
+Clock: android-render-entry-through-present
+Average: 45.214 ms
+Median: 44.011 ms (22.721 FPS)
+P95: 58.342 ms
+1% low: 14.239 FPS
+
+PER-ZONE FRAME TIME
+zone,frames,average_ms,median_ms,p95_ms,one_percent_low_fps
+opening,160,56.277,56.967,63.473,12.538
+skeleton-room,98,51.547,51.728,55.854,17.611
+shadow-corridor,599,48.213,47.997,58.293,13.811
+skylight-chamber,189,37.571,36.246,48.933,18.422
+yellow-torch-bay,157,40.899,40.622,44.512,21.286
+blue-torch-bay,157,41.561,40.930,46.598,17.222
+red-torch-bay,157,42.221,40.945,48.834,16.396
+green-torch-bay,157,44.106,44.193,48.051,19.928
+transmission-threshold,63,38.948,38.706,48.569,16.697
+finale,101,40.720,39.218,53.338,18.306
+
+This deterministic in-app course is intended for comparing Horde Lantern RT settings and builds.
+
+HORDE LANTERN RT - BENCHMARK EVIDENCE
+Schema: 1
+Whole-frame FPS is an inverse-duration proxy, not achieved presentation rate.
+Status: complete
+Identity: epoch 2, generation 6
+Capacity: 4000
+Rows: expected 1838, completed 1838, rejected 0, cancelled 0, outstanding 0
+CPU: accepted 1838, rejected 0
+GPU statuses (denominator 1838): valid 1838, pending 0, error 0, disabled 0, unsupported 0, compiled-out 0, not-ready 0, unknown 0, missing 0
+Failures: none
+
+CPU STAGES
+simulationStepCpuMs: samples=1838 mean=0.021 ms median=0.020 ms p90=0.028 ms p95=0.030 ms slowest1%Mean=0.073 ms
+skinCpuMs: samples=1838 mean=8.359 ms median=8.785 ms p90=9.541 ms p95=10.106 ms slowest1%Mean=11.888 ms
+playerSkinCpuMs: samples=1838 mean=8.236 ms median=8.741 ms p90=9.492 ms p95=9.536 ms slowest1%Mean=10.343 ms
+characterSkinCpuMs: samples=1838 mean=0.123 ms median=0.000 ms p90=0.000 ms p95=1.164 ms slowest1%Mean=2.324 ms
+dynamicUploadCpuMs: samples=1838 mean=0.362 ms median=0.340 ms p90=0.469 ms p95=0.525 ms slowest1%Mean=1.206 ms
+blasRefitRecordCpuMs: samples=1838 mean=0.033 ms median=0.032 ms p90=0.041 ms p95=0.045 ms slowest1%Mean=0.118 ms
+tlasUpdateRecordCpuMs: samples=1838 mean=0.009 ms median=0.008 ms p90=0.011 ms p95=0.012 ms slowest1%Mean=0.034 ms
+traceCopyRecordCpuMs: samples=1838 mean=0.169 ms median=0.161 ms p90=0.209 ms p95=0.241 ms slowest1%Mean=0.527 ms
+frameFenceWaitCpuMs: samples=1838 mean=34.697 ms median=33.902 ms p90=43.630 ms p95=47.403 ms slowest1%Mean=59.535 ms
+imageAcquireCpuMs: samples=1838 mean=0.035 ms median=0.037 ms p90=0.042 ms p95=0.043 ms slowest1%Mean=0.082 ms
+queueSubmitCpuMs: samples=1838 mean=0.240 ms median=0.220 ms p90=0.345 ms p95=0.419 ms slowest1%Mean=0.753 ms
+presentCallCpuMs: samples=1838 mean=0.187 ms median=0.168 ms p90=0.252 ms p95=0.277 ms slowest1%Mean=0.435 ms
+wholeFrameCycleCpuMs: samples=1838 mean=45.213 ms median=44.011 ms p90=55.019 ms p95=58.342 ms slowest1%Mean=70.230 ms onePercentLow=14.239 FPS
+gpuRtDurationMs: samples=1838 mean=34.290 ms median=33.501 ms p90=43.256 ms p95=46.956 ms slowest1%Mean=59.144 ms
+
+ZONES
+opening (1): intended=160 completed=160 rejected=0 cancelled=0 outstanding=0 cpuAccepted=160 cpuRejected=0 gpuValid=160/160 cpuWholeFrame=samples=160 mean=56.276 ms median=56.967 ms p90=61.924 ms p95=63.473 ms slowest1%Mean=79.756 ms onePercentLow=12.538 FPS gpuRt=samples=160 mean=45.083 ms median=46.044 ms p90=50.346 ms p95=51.348 ms slowest1%Mean=69.224 ms
+skeleton-room (2): intended=98 completed=98 rejected=0 cancelled=0 outstanding=0 cpuAccepted=98 cpuRejected=0 gpuValid=98/98 cpuWholeFrame=samples=98 mean=51.547 ms median=51.728 ms p90=55.183 ms p95=55.854 ms slowest1%Mean=56.782 ms onePercentLow=17.611 FPS gpuRt=samples=98 mean=39.548 ms median=39.912 ms p90=42.153 ms p95=42.723 ms slowest1%Mean=43.869 ms
+shadow-corridor (3): intended=599 completed=599 rejected=0 cancelled=0 outstanding=0 cpuAccepted=599 cpuRejected=0 gpuValid=599/599 cpuWholeFrame=samples=599 mean=48.213 ms median=47.997 ms p90=55.189 ms p95=58.293 ms slowest1%Mean=72.406 ms onePercentLow=13.811 FPS gpuRt=samples=599 mean=37.741 ms median=37.224 ms p90=44.106 ms p95=48.017 ms slowest1%Mean=61.189 ms
+skylight-chamber (4): intended=189 completed=189 rejected=0 cancelled=0 outstanding=0 cpuAccepted=189 cpuRejected=0 gpuValid=189/189 cpuWholeFrame=samples=189 mean=37.571 ms median=36.245 ms p90=45.553 ms p95=48.933 ms slowest1%Mean=54.284 ms onePercentLow=18.422 FPS gpuRt=samples=189 mean=26.620 ms median=25.045 ms p90=36.782 ms p95=37.837 ms slowest1%Mean=42.532 ms
+yellow-torch-bay (5): intended=157 completed=157 rejected=0 cancelled=0 outstanding=0 cpuAccepted=157 cpuRejected=0 gpuValid=157/157 cpuWholeFrame=samples=157 mean=40.899 ms median=40.622 ms p90=43.325 ms p95=44.512 ms slowest1%Mean=46.979 ms onePercentLow=21.286 FPS gpuRt=samples=157 mean=29.782 ms median=29.654 ms p90=32.179 ms p95=33.402 ms slowest1%Mean=34.924 ms
+blue-torch-bay (6): intended=157 completed=157 rejected=0 cancelled=0 outstanding=0 cpuAccepted=157 cpuRejected=0 gpuValid=157/157 cpuWholeFrame=samples=157 mean=41.561 ms median=40.930 ms p90=44.937 ms p95=46.598 ms slowest1%Mean=58.064 ms onePercentLow=17.222 FPS gpuRt=samples=157 mean=30.593 ms median=29.785 ms p90=33.874 ms p95=34.496 ms slowest1%Mean=49.677 ms
+red-torch-bay (7): intended=157 completed=157 rejected=0 cancelled=0 outstanding=0 cpuAccepted=157 cpuRejected=0 gpuValid=157/157 cpuWholeFrame=samples=157 mean=42.220 ms median=40.945 ms p90=47.759 ms p95=48.834 ms slowest1%Mean=60.991 ms onePercentLow=16.396 FPS gpuRt=samples=157 mean=31.271 ms median=30.140 ms p90=36.587 ms p95=37.113 ms slowest1%Mean=52.094 ms
+green-torch-bay (8): intended=157 completed=157 rejected=0 cancelled=0 outstanding=0 cpuAccepted=157 cpuRejected=0 gpuValid=157/157 cpuWholeFrame=samples=157 mean=44.106 ms median=44.193 ms p90=47.586 ms p95=48.051 ms slowest1%Mean=50.180 ms onePercentLow=19.928 FPS gpuRt=samples=157 mean=33.208 ms median=33.391 ms p90=36.279 ms p95=36.975 ms slowest1%Mean=38.102 ms
+transmission-threshold (9): intended=63 completed=63 rejected=0 cancelled=0 outstanding=0 cpuAccepted=63 cpuRejected=0 gpuValid=63/63 cpuWholeFrame=samples=63 mean=38.948 ms median=38.706 ms p90=40.887 ms p95=48.569 ms slowest1%Mean=59.892 ms onePercentLow=16.697 FPS gpuRt=samples=63 mean=27.751 ms median=26.925 ms p90=28.487 ms p95=29.574 ms slowest1%Mean=47.739 ms
+finale (10): intended=101 completed=101 rejected=0 cancelled=0 outstanding=0 cpuAccepted=101 cpuRejected=0 gpuValid=101/101 cpuWholeFrame=samples=101 mean=40.720 ms median=39.218 ms p90=51.532 ms p95=53.338 ms slowest1%Mean=54.626 ms onePercentLow=18.306 FPS gpuRt=samples=101 mean=29.190 ms median=26.961 ms p90=39.185 ms p95=40.331 ms slowest1%Mean=42.483 ms
+
+Private JSON copy: saved
+Use COPY REPORT or SAVE REPORT to export this result.

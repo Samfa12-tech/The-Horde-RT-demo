@@ -1,0 +1,1 @@
+Starting: Intent { cmp=com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity (has extras) }

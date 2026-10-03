@@ -9,31 +9,32 @@
 
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "scene/assets/SkinnedMeshAsset.h"
+#include "scene/assets/PlayerPrimitiveContract.h"
+#include "vulkan/raytracing/RtSceneAbi.generated.h"
+#include "vulkan/raytracing/PlayerRenderRoute.h"
 
 namespace horde::vulkan::raytracing
 {
+
+struct RtSceneRecordObservation;
 
 inline constexpr float kPlayerGripSocketToleranceMetres = 0.015f;
 inline constexpr float kPlayerGripOrientationToleranceRadians = 0.02f;
 inline constexpr float kPlayerBootGroundingSafetyMetres = 0.00025f;
 
-enum class PlayerRenderRoute : std::uint8_t
-{
-    Procedural,
-    Skinned,
-    // Stable first-person fallback: the skinned character remains available to
-    // reflection/shadow rays, while four procedural arm segments own the
-    // primary-camera view. This keeps the authored rig/socket authority without
-    // presenting the deferred hand mesh in the player's view.
-    HybridBlockPrimary,
-};
-
 struct PlayerRouteMasks
 {
-    std::array<std::uint8_t, 20u> instanceMasks{};
+    std::array<std::uint8_t, kRtInstanceMetadataCapacity> instanceMasks{};
 };
 
-PlayerRouteMasks BuildPlayerRouteMasks(PlayerRenderRoute route);
+PlayerRouteMasks BuildPlayerRouteMasks(PlayerRenderRoute route,
+                                      bool bodyRemainderAvailable = false);
+
+// A primary-visible world remainder is valid only with the matching per-instance
+// primitive filter. Never accept full-body primary visibility as a viewmodel.
+bool HasDedicatedPlayerPrimaryOwnership(
+    const std::array<std::uint8_t, kRtInstanceMetadataCapacity>& masks,
+    std::uint32_t worldBodyInstanceFlags);
 
 // The imported player is authored +Z forward with anatomical Left on +X.
 // Facing the gameplay -Z direction therefore requires a 180-degree Y rotation:
@@ -65,6 +66,7 @@ struct ProductionSceneVisibilityInput
     bool glassFixtureVisible = false;
     bool productionInspection = false;
     bool rewardLanternClaimed = false;
+    bool bodyRemainderAvailable = false;
 };
 
 struct ProductionSceneVisibility
@@ -93,12 +95,7 @@ std::array<float, 3u> GroundPlayerRootOnRouteFloor(
     float routeFloorWorldY,
     float assetGroundingOffsetMetres);
 
-enum class PlayerPrimitiveSemantic : std::uint8_t
-{
-    Body,
-    Head,
-    NearFace,
-};
+using PlayerPrimitiveSemantic = horde::scene::assets::PlayerPrimitiveSemantic;
 
 struct PlayerPrimitiveVisibility
 {
@@ -197,7 +194,8 @@ public:
                      std::uint64_t tickIndex,
                      PlayerCpuSkinCadence cadence,
                      bool& poseUpdated,
-                     std::string& diagnostic);
+                     std::string& diagnostic,
+                     RtSceneRecordObservation* observation = nullptr);
     bool ShoulderCenter(const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
                         std::array<float, 3u>& center,
                         std::string& diagnostic) const;
@@ -211,6 +209,11 @@ public:
         const horde::gameplay::animation::PlayerAnimationSnapshot& animation) const;
 
     bool IsLoaded() const { return asset_.IsLoaded(); }
+    bool ValidateStaticVertexLayout(const horde::scene::assets::StaticMeshAsset& asset,
+                                    std::string& diagnostic) const
+    {
+        return asset_.ValidateStaticVertexLayout(asset, diagnostic);
+    }
     const std::vector<horde::scene::TexturedSkinnedRtVertex>& UniqueVertices() const
     {
         return uniqueVertices_;
@@ -220,6 +223,8 @@ public:
         return uniqueTangents_;
     }
     const horde::scene::SkinnedPlayerSockets& BoneSockets() const { return sockets_; }
+    // Consume only after successful PreparePose, before the next pose update.
+    const horde::scene::SkinnedPlayerPose& SolvedPose() const { return solvedPose_; }
     float LeftSocketErrorMetres() const { return leftSocketErrorMetres_; }
     float RightSocketErrorMetres() const { return rightSocketErrorMetres_; }
     const PlayerGripAgreement& LeftGripAgreement() const { return leftGripAgreement_; }
@@ -234,6 +239,7 @@ private:
     bool BuildBootGroundingProfiles(std::string& diagnostic);
 
     horde::scene::SkinnedMeshAsset asset_;
+    horde::scene::SkinnedPlayerPose solvedPose_;
     std::vector<horde::scene::TexturedSkinnedRtVertex> uniqueVertices_;
     std::vector<horde::scene::SkinnedPbrTangent> uniqueTangents_;
     horde::scene::SkinnedPlayerSockets sockets_{};

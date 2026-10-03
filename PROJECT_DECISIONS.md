@@ -2,6 +2,75 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## Showcase Alpha 1.6.1 publication and acceptance — 2026-10-03
+
+Owner authorised signing/freezing, then publication, normal main integration and
+scoped cleanup. The immutable1.6.1/code9 packages are public: itch Windows
+`#2055201`, Android `#2055202`, and the non-draft GitHub prerelease `v1.6.1`
+at package source `a397757`. Exact artifact, downloaded-channel, CI and signed
+S26 update evidence is in [release validation](docs/SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md).
+The existing1.6.0 updater selects the public announcement; no automatic install
+or newly observed platform popup is claimed. Future updates require a new
+version and Android code greater than9; do not rebuild the published packages.
+
+Owner accepts the modelled player/cuff, music, independent SFX/music controls,
+footstep balance, reporting and performance as measured. Sustained30FPS at75%
+is not achieved; full graphics options are planned for1.6.2. Mobile omits actual
+lantern panes by quality profile while High retains complete physical transport.
+Remaining High glass defects/sub-pixel parity are future investigation, not
+passed gates. S24 is working but not fully tested, with final coverage explicitly
+deferred; S25 remains unverified. Hotstrike redistribution remains an owner issue,
+explicitly nonblocking publication, with no inferred licence grant or asset,
+history or source-distribution change. Earlier dated open-gate/publication-
+withheld statements below describe their checkpoints, not current authority.
+
+## Mobile lantern open-aperture quality profile - 2026-10-01
+
+The owner deliberately defers physical reward-lantern panes in the Mobile
+performance quality profile. Remove their geometry before BLAS construction;
+do not replace it with scalar transparency/shadows, raster, SSR or fake RT.
+This applies by quality profile, not Android model name or execution backend.
+Keep the native RT cage, flame, real geometric shadows, gameplay light, grips,
+animation and interactions. High (including the normal Windows profile) retains
+the canonical panes and complete physical dielectric transport unchanged.
+Preserve the full asset, glass implementation and correctness/performance evidence
+for future Mobile work. This supersedes only the Mobile-pane requirement of the
+August30 reward-lantern programme, not its other contracts. Measurement/acceptance
+remain separate from this authorised design decision; no30FPS promise or device
+certification follows from removing geometry. No publication is authorised.
+See `docs/ENGINEERING_1_6_1_MOBILE_LANTERN_PROFILE_2026-10-01.md`.
+
+## 1.6.1 player presentation acceptance - 2026-09-27
+
+The owner accepts the dedicated modelled RT arms, wrist/cuff, repaired inner-bicep/
+armpit, normal look-down angle/occlusion and mirror appearance. The accepted world
+`f2c3f62b...` and viewmodel `6f06d77e...` replace the development block-arm route in
+normal gameplay; procedural/full-body-primary routes remain explicit diagnostic
+comparisons only, never silent fallbacks. Preserve shared gameplay animation/IK/
+grip authority and separate world-body/viewmodel geometry and GPU ownership.
+
+Keep the current camera range. Visible feet, steeper look and direction-aware
+sideways/backward locomotion are owner-deferred future work, not1.6.1 acceptance
+blockers. See `FUTURE_WORK.md` and the exact owner/device evidence in
+`docs/evidence/2026-09-27-segmented-seams/phone/README.md`. This supersedes the
+historical 1.6.0 block-arm decision for1.6.1 development; it does not authorize
+publication or certify performance, glass, audio or other devices.
+
+## Shared music runtime ownership - 2026-10-01
+
+The owner directs Horde-specific gameplay-to-cue decisions to remain in
+`MusicDirector`, while reusable PCM looping, tails, crossfades and decoding live
+in/use Pocket Audio Core. The initial native-only Core subset is pinned to
+Pocket-Chordsmith `534a6e6811ce653efd5422138c5772b967263ed0`; it is not a copy of
+the editor/synth application. Keep one canonical reusable implementation, exact
+source admission and existing Core private/UNLICENSED notices. The owner-directed
+integration is not a general third-party licence grant or publication permission.
+
+Canonical PCS JSON/PCS1 remains the revisable musical source. Preserve the
+accepted A-H cue logic and rendered bodies/tails; platform playback, independent
+persisted music volume and exact-candidate listening remain separate open gates.
+See [integration evidence](docs/evidence/2026-10-01-pocket-audio-core/README.md).
+
 ## Identity
 
 - Public project: Samfa12 technology demo.
@@ -134,6 +203,28 @@ Publish the accepted Fire/PBR/reward-lantern programme as literal package versio
 The Windows ZIP passed an isolated packaged-file launch with `RayTracingPipeline`, honest swapchain presentation, and clean exit code 0. The Android APK passed established-certificate and static/package guards; ADB exposed no device at publication, but the exact signed APK was subsequently installed and byte-matched on `SM-S948B` with strict ASTC, `RayTracingPipeline`, honest presentation, Home/resume, and short route smoke passing. This is functional/presentation evidence, not a sustained Release performance or owner-feel claim; the accepted Debug runtime remains the feature timing/artistic evidence.
 
 Normal gameplay retains block arms; skinned gauntlets and arm/body shadow/reflection presentation remain deferred. The finite Mobile glass budget and measured performance remain accepted alpha boundaries and must not be hidden by silently lowering quality or render scale. The 1.6.0 release line and `versionCode 8` are immutable; the next Android release requires a new version and `versionCode > 8`. No Git tag or GitHub Release was created, so updater announcement remains a separate owner-authorised publication action.
+
+## 1.6.1 hardware ray-query compatibility decision - 2026-09-13
+
+The owner moved the already planned S24/S25 compatibility programme from
+post-1.6.1 into the current release, ahead of the remaining engineering work.
+The reported S25 Ultra / Adreno 830 / driver 512.800.64 and S24 Ultra / Adreno 750 /
+driver 512.762.41 expose acceleration structures and ray query but not
+`VK_KHR_ray_tracing_pipeline`; the existing bridge therefore never attempted the
+scene. This is a missing execution backend, not evidence of a failed AS build or
+of absent hardware ray tracing. Exact Samsung model codes and tested APK hashes
+were not captured in those screenshot-derived records.
+
+Preserve the preferred `RayTracingPipeline` backend on S26/Windows RTX and add
+the previously planned `RayQueryCompute` backend: a compute launcher invokes the
+same shared per-pixel shading and real Vulkan hardware `rayQueryEXT` traversal
+over the same BLAS/TLAS/resources. This implements the Rendering path section's
+existing genuine-RayQuery allowance; it does not authorise generic compute/software
+path tracing, raster fallback, feature removal or dishonest presentation. Keep
+backend and quality/instrumentation policy separate and report the actual backend.
+See `FUTURE_WORK.md` and `docs/ENGINEERING_1_6_1_PLAN.md` for parity and final gates.
+
+At this decision the alternate backend is not implemented or device-accepted.
 
 ## Target devices
 

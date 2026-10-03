@@ -1,0 +1,52 @@
+{
+  "backend": "Vulkan",
+  "rtMode": "RayTracingPipeline",
+  "executionBackend": "RayTracingPipeline",
+  "gpuName": "Adreno (TM) 840",
+  "vendorId": 20803,
+  "deviceId": 1141180977,
+  "driverVersion": 2150932499,
+  "driverVersionText": "512.842.19",
+  "vulkanApiVersion": 4210983,
+  "vulkanApiVersionText": "1.4.295",
+  "extensions": {
+    "VK_KHR_acceleration_structure": true,
+    "VK_KHR_ray_tracing_pipeline": true,
+    "VK_KHR_ray_query": true,
+    "VK_KHR_buffer_device_address": true,
+    "VK_KHR_deferred_host_operations": true
+  },
+  "features": {
+    "accelerationStructure": true,
+    "rayTracingPipeline": true,
+    "rayQuery": true,
+    "bufferDeviceAddress": true
+  },
+  "internalRenderResolution": {
+    "width": 1080,
+    "height": 2235
+  },
+  "fps": "N/A",
+  "frameTimeMs": "N/A",
+  "gpuRtTiming": {
+    "status": "GPU timestamp queries are ready; awaiting the first RT submission.",
+    "supported": true,
+    "valid": false,
+    "latestMs": "N/A",
+    "averageMs": "N/A",
+    "timestampPeriodNanoseconds": 52.0833,
+    "timestampValidBits": 48,
+    "sampleCount": 0,
+    "unavailableCount": 0,
+    "errorCount": 0
+  },
+  "rtScene": {
+    "status": "Presented via swapchain",
+    "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+    "dispatchWidth": 1080,
+    "dispatchHeight": 2235,
+    "presented": true
+  },
+  "diagnostics": ["Inspecting candidate 0", "Driver version packed: 2150932499", "Driver version: 512.842.19", "Vulkan API version: 1.4.295", "RT capability mode: RayTracingPipeline", "FPS / frame time: not measured yet."],
+  "rtFrameEvidence": {"version":1,"observerAvailable":true,"sceneEpoch":14,"measurementGeneration":7,"running":true,"paused":false,"presented":false,"diagnosticStatus":"pending","gpuStatus":"pending","completedFrameStatus":"pending","completedFrameReason":"no-accepted-completed-frame","completedFrame":null}
+}

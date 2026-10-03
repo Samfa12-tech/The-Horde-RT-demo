@@ -100,3 +100,18 @@ by the dated owner-candidate validation record.
 
 Audio/haptic manual revalidation required: NO — the updater does not alter
 audio assets, gameplay events, haptic routing, or platform feedback timing.
+
+## October 3, 2026 — 1.6.0 to 1.6.1 discovery check
+
+Released source `57c81b6` already contains Windows/Android startup checks on
+IncludePrerelease. The shared policy and Windows integration are unchanged in
+the1.6.1 candidate. An explicit installed1.6.0→published `v1.6.1` prerelease
+fixture now passes the registered Release CTest. This is selection-policy
+evidence, not an installed1.6.0 dialog observation against a future release.
+
+The live public releases-list endpoint currently exposes only `v0.1.3-alpha.1`.
+Separately authorised release publication must create a **non-draft GitHub
+Release tagged `v1.6.1`** with reviewed artifacts/checksums. Alpha prerelease is
+eligible; itch-only publication is insufficient. Update now opens the verified
+release page and still requires the player's download/install action. Offline,
+rate-limited or failed checks cannot guarantee a prompt. No release was created.

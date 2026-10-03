@@ -1,0 +1,12 @@
+Internal ctest changing into directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+Test project C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+    Start 44: horde_rt_static_texture_array_tool_tests
+1/3 Test #44: horde_rt_static_texture_array_tool_tests .................   Passed    1.71 sec
+    Start 45: horde_rt_static_preparation_lod_policy_tests
+2/3 Test #45: horde_rt_static_preparation_lod_policy_tests .............   Passed    6.59 sec
+    Start 47: horde_rt_static_preparation_colliding_lod_policy_tests
+3/3 Test #47: horde_rt_static_preparation_colliding_lod_policy_tests ...   Passed    9.74 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  18.05 sec

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "role": "Viewmodel",
+  "sourceWorldSha256": "e8737f10e7669b284e04109d9c3acdf537df284093a21511656bf191a70450fd",
+  "gripRollCorrectionRadians": 3.141592653589793,
+  "pairedWorldRuntime": "world-grip-calibrated.runtime.glb",
+  "pairedWorldSha256": "a08643bc0d798c185b826e5079b1d6ef53e616ce5fb0076c3babc505f1a12a91",
+  "sleeveWeightMode": "ArmForeArm",
+  "sleeveHandWeightsMovedToForearm": {
+    "Left": 222,
+    "Right": 184
+  },
+  "runtime": "gothic-traveller-viewmodel.runtime.glb",
+  "runtimeSha256": "f3c1c1c718c07fcc467e325cdeccfa9a721bd171e92f614cfc311304d27ac416",
+  "primitiveSemantics": {
+    "ViewmodelSleeves": 5532,
+    "ViewmodelGauntlets": 8838
+  },
+  "processingVertices": 15850,
+  "ownership": "Primary-only modelled geometry; world body owns secondary visibility",
+  "animationAuthority": "Same authored rig, Idle/Walking NLA tracks and named grip bones as world reference",
+  "licence": "Derivative of existing licensed Meshy player/gauntlet inputs; see ASSET_LICENSES.md",
+  "status": "Offline candidate only; GPU ownership, grip/pitch/motion and owner acceptance not yet established"
+}

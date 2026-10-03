@@ -1,0 +1,10 @@
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\shaders\raytracing\minimal.rgen.resolved
+Generated C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src\vulkan\raytracing\MinimalRayGenShader.inc
+Source dependency SHA-256: ee331366f1761eabe3631737bee05b9dbb93b19cc1d2f3ed90e49b1006082efd; embedded include SHA-256 before generation: b0998ce13f4ad43e28849060023f8bc64dbae5bafa973e9ab3abca7c97a5f56f
+SPIR-V bytes: 235484; words: 58871; instructions: 13914; branch operations: 760; loops: 13; selection merges: 315; SHA-256: 2b2e88b5b363925a9663798f529e578a47a8360cb37863782c5b27580c9cd94b
+Raygen optimizer shape: functions=59; calls=193; ray-query sites=2
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\shaders\raytracing\minimal.legacy.rgen.resolved
+Generated C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src\vulkan\raytracing\MinimalLegacyRayGenShader.inc
+Source dependency SHA-256: a3f1a9b7768d38d64e361f1eb1dfa1f4acb2523c2b271fa112b6de3b72ebcbce; embedded include SHA-256 before generation: 27defef06c637d659ecc4fbe78ceb477ffd5eadff839033ebf199f058c869b25
+SPIR-V bytes: 505248; words: 126312; instructions: 27715; branch operations: 3715; loops: 49; selection merges: 1519; SHA-256: 3f94d1547c68fa1750c2ab67506bd5f93a1b396096854633a440efdc5e444e4a
+Raygen optimizer shape: functions=1; calls=0; ray-query sites=23

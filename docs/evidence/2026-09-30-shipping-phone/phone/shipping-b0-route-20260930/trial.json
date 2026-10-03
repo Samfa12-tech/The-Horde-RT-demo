@@ -1,0 +1,19 @@
+{
+  "runId": "shipping-b0-route-20260930",
+  "buildLabel": "candidate",
+  "sourceCommit": "8cbe0ac44d4fb3a168ca891985ca560b43fe4541",
+  "installedApkSha256": "b5a4344b6f860259d88a4d7bae3d349f462704c9f5a689773626f8a93dc39c6f",
+  "workload": "showcase-route-v1",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "requestedScalePercent": 75,
+  "requestedBackend": "RayTracingPipeline",
+  "instrumentation": "Shipping",
+  "quality": "Mobile",
+  "startUtc": "2026-09-30T06:33:16.5261335Z",
+  "recordingEnabled": false,
+  "contextIntervalSeconds": 5,
+  "resumeExisting": false,
+  "status": "starting"
+}

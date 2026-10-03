@@ -1,0 +1,63 @@
+> Task :app:prepareRuntimeAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preBenchmarkBuild UP-TO-DATE
+> Task :app:generateBenchmarkBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileBenchmark UP-TO-DATE
+> Task :app:checkBenchmarkAarMetadata UP-TO-DATE
+> Task :app:generateBenchmarkResValues UP-TO-DATE
+> Task :app:mapBenchmarkSourceSetPaths UP-TO-DATE
+> Task :app:generateBenchmarkResources UP-TO-DATE
+> Task :app:mergeBenchmarkResources UP-TO-DATE
+> Task :app:createBenchmarkCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksBenchmark UP-TO-DATE
+> Task :app:processBenchmarkMainManifest UP-TO-DATE
+> Task :app:processBenchmarkManifest UP-TO-DATE
+> Task :app:processBenchmarkManifestForPackage UP-TO-DATE
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:processBenchmarkResources
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+
+> Task :app:compileBenchmarkJavaWithJavac
+Note: C:\Dev\tmp\horde-shipping-ab-20260930\opening-lighting-source\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:generateBenchmarkLintVitalReportModel
+> Task :app:lintVitalAnalyzeBenchmark
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:mergeBenchmarkJniLibFolders
+> Task :app:lintVitalReportBenchmark
+> Task :app:lintVitalBenchmark
+> Task :app:mergeBenchmarkArtProfile
+> Task :app:desugarBenchmarkFileDependencies
+> Task :app:mergeBenchmarkNativeLibs
+> Task :app:dexBuilderBenchmark
+> Task :app:mergeBenchmarkGlobalSynthetics
+> Task :app:stripBenchmarkDebugSymbols
+> Task :app:checkBenchmarkDuplicateClasses
+> Task :app:mergeBenchmarkStartupProfile
+> Task :app:mergeExtDexBenchmark
+> Task :app:extractBenchmarkNativeSymbolTables
+> Task :app:mergeDexBenchmark
+> Task :app:compileBenchmarkArtProfile
+> Task :app:mergeBenchmarkShaders
+> Task :app:compileBenchmarkShaders NO-SOURCE
+> Task :app:generateBenchmarkAssets UP-TO-DATE
+> Task :app:mergeBenchmarkNativeDebugMetadata
+> Task :app:mergeBenchmarkAssets
+> Task :app:extractBenchmarkVersionControlInfo
+> Task :app:processBenchmarkJavaRes NO-SOURCE
+> Task :app:mergeBenchmarkJavaResource
+> Task :app:optimizeBenchmarkResources
+> Task :app:collectBenchmarkDependencies
+> Task :app:sdkBenchmarkDependencyData
+> Task :app:validateSigningBenchmark
+> Task :app:writeBenchmarkAppMetadata
+> Task :app:writeBenchmarkSigningConfigVersions
+> Task :app:compressBenchmarkAssets
+> Task :app:packageBenchmark
+> Task :app:createBenchmarkApkListingFileRedirect
+> Task :app:assembleBenchmark
+[Incubating] Problems report is available at: file:///C:/Dev/tmp/horde-shipping-ab-20260930/opening-lighting-source/android/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 30s
+49 actionable tasks: 35 executed, 14 up-to-date

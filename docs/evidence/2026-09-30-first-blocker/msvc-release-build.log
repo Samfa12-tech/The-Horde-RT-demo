@@ -1,0 +1,23 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Release\horde_gameplay_simulation.lib
+  ShowcaseBenchmark.cpp
+  AssetManifest.cpp
+  SkinnedMeshAsset.cpp
+  RtBenchmarkEvidenceReport.cpp
+  RtBenchmarkEvidenceRun.cpp
+  CharacterRenderSlot.cpp
+  FireEmitterBuffer.cpp
+  PlayerRenderSlot.cpp
+  PresentableTinyRtScene.cpp
+  RtPipelineBundleContracts.cpp
+  RtPipelineVariantProvider.cpp
+  RtStaticMeshSlot.cpp
+  RtTextureArrays.cpp
+  SimulationFrameAdapter.cpp
+  Generating Code...
+  StaticMeshAsset.cpp
+  horde_rt_probe_core.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Release\horde_rt_probe_core.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  CharacterRenderSlotSmoke.cpp
+  horde_rt_character_render_slot_smoke.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Release\horde_rt_character_render_slot_smoke.exe

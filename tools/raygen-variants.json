@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "variants": [
+    { "name": "shipping_mobile_opaque_fast", "instrumentation": "Shipping", "quality": "Mobile", "material": "OpaqueFast", "strategy": "LegacyInlined", "shippingAllowed": true },
+    { "name": "shipping_mobile_generic_dielectric", "instrumentation": "Shipping", "quality": "Mobile", "material": "GenericDielectric", "strategy": "GenericRetained", "shippingAllowed": true },
+    { "name": "shipping_high_opaque_fast", "instrumentation": "Shipping", "quality": "High", "material": "OpaqueFast", "strategy": "LegacyInlined", "shippingAllowed": true },
+    { "name": "shipping_high_generic_dielectric", "instrumentation": "Shipping", "quality": "High", "material": "GenericDielectric", "strategy": "GenericRetained", "shippingAllowed": true },
+    { "name": "diagnostic_mobile_opaque_fast", "instrumentation": "Diagnostic", "quality": "Mobile", "material": "OpaqueFast", "strategy": "LegacyInlined", "shippingAllowed": false },
+    { "name": "diagnostic_mobile_generic_dielectric", "instrumentation": "Diagnostic", "quality": "Mobile", "material": "GenericDielectric", "strategy": "GenericRetained", "shippingAllowed": false },
+    { "name": "diagnostic_high_opaque_fast", "instrumentation": "Diagnostic", "quality": "High", "material": "OpaqueFast", "strategy": "LegacyInlined", "shippingAllowed": false },
+    { "name": "diagnostic_high_generic_dielectric", "instrumentation": "Diagnostic", "quality": "High", "material": "GenericDielectric", "strategy": "GenericRetained", "shippingAllowed": false }
+  ]
+}

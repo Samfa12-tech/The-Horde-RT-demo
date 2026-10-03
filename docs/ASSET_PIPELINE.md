@@ -4,6 +4,15 @@ The runtime currently uses animated skeleton/placeholder-lich assets, production
 
 ## Asset rules
 
+The1.6.1 player pair is admitted as a five-region `WorldBody` plus two-region
+`Viewmodel`. Exact runtime hashes are `f2c3f62b...` and `6f06d77e...`; manifests,
+clip semantics and processing receipts must agree. The body remainder shares
+the existing Body atlas group, and the viewmodel shares the Body/Gauntlet textures;
+neither adds production atlas layers. Regenerate and compare the accepted pair
+with `tools/validate-player-regeneration.ps1 -AcceptedPairDirectory` as documented
+in `evidence/2026-09-27-segmented-seams/production-preparation/README.md`. This does
+not change any asset licence or the owner-controlled Hotstrike issue.
+
 - All assets must be commercial-safe.
 - Asset source and license must be recorded in `ASSET_LICENSES.md`.
 - Meshy-assisted assets are allowed when the underlying source permits distribution and the applicable Meshy attribution route is recorded.

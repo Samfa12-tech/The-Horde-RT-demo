@@ -1,0 +1,32 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_windows_music.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_windows_music.lib
+  PresentableTinyRtScene.cpp
+  horde_rt_probe_core.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  horde_rt_diagnostic_window.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\HordeLanternRT.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  Building Custom Rule C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/CMakeLists.txt
+  CharacterRenderSlotSmoke.cpp
+  horde_rt_character_render_slot_smoke.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_rt_character_render_slot_smoke.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  Building Custom Rule C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/CMakeLists.txt
+  RtSceneInitialisePreflightTests.cpp
+  horde_rt_scene_initialise_preflight_tests.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_rt_scene_initialise_preflight_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_gameplay_simulation.lib
+  horde_rt_probe_core.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_rt_probe_core.lib
+  Building Custom Rule C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/CMakeLists.txt
+  RtSceneResourceInventoryTests.cpp
+  horde_rt_scene_resource_inventory_tests.vcxproj -> C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\presets\windows-x64-release\Release\horde_rt_scene_resource_inventory_tests.exe

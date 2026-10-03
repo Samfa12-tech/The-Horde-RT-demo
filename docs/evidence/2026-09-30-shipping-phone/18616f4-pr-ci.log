@@ -1,0 +1,954 @@
+player-vulkan-host	Set up job	﻿2026-09-30T07:36:35.5144425Z Current runner version: '2.337.0'
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5172184Z ##[group]Runner Image Provisioner
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5173139Z Hosted Compute Agent
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5173760Z Version: 20260828.587
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5174400Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5175216Z Build Date: 2026-08-28T16:44:25Z
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5176339Z Worker ID: {fce8f2f1-935d-4896-8239-2661e887ffad}
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5177167Z Azure Region: westcentralus
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5177796Z ##[endgroup]
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5179284Z ##[group]Operating System
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5180002Z Ubuntu
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5180561Z 24.04.5
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5181061Z LTS
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5181640Z ##[endgroup]
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5182192Z ##[group]Runner Image
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5182828Z Image: ubuntu-24.04
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5183445Z Version: 20260920.314.1
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5184523Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5186397Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5187349Z ##[endgroup]
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5188414Z ##[group]GITHUB_TOKEN Permissions
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5190375Z Contents: read
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5191007Z Metadata: read
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5191509Z ##[endgroup]
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5193749Z Secret source: Actions
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5194629Z Cache mode: write
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5195501Z Prepare workflow directory
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5559582Z Prepare all required actions
+player-vulkan-host	Set up job	2026-09-30T07:36:35.5605308Z Getting action download info
+player-vulkan-host	Set up job	2026-09-30T07:36:35.9040017Z Download action repository 'actions/checkout@v6' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+player-vulkan-host	Set up job	2026-09-30T07:36:36.1068677Z Complete job name: player-vulkan-host
+player-vulkan-host	Check out source	﻿2026-09-30T07:36:36.1826746Z ##[group]Run actions/checkout@v6
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1827679Z with:
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1828177Z   repository: Samfa12-tech/The-Horde-RT-demo
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1831914Z   token: ***
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1832387Z   ssh-strict: true
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1832834Z   ssh-user: git
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1833295Z   persist-credentials: true
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1833792Z   clean: true
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1834251Z   sparse-checkout-cone-mode: true
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1834778Z   fetch-depth: 1
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1835218Z   fetch-tags: false
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1835916Z   show-progress: true
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1836377Z   lfs: false
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1836801Z   submodules: false
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1837314Z   set-safe-directory: true
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1837883Z   allow-unsafe-pr-checkout: false
+player-vulkan-host	Check out source	2026-09-30T07:36:36.1838676Z ##[endgroup]
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2819753Z Syncing repository: Samfa12-tech/The-Horde-RT-demo
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2822738Z ##[group]Getting Git version info
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2824073Z Working directory is '/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo'
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2826204Z [command]/usr/bin/git version
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2888466Z git version 2.55.0
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2912853Z ##[endgroup]
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2928811Z Temporarily overriding HOME='/home/runner/work/_temp/9476e40c-377d-433f-b042-9f5984bdfd2a' before making global git config changes
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2931661Z Adding repository directory to the temporary git global config as a safe directory
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2937975Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2987853Z Deleting the contents of '/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo'
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2992390Z ##[group]Determining repository object format
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2994607Z ##[endgroup]
+player-vulkan-host	Check out source	2026-09-30T07:36:36.2996035Z ##[group]Initializing the repository
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3000175Z [command]/usr/bin/git init /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3103688Z hint: Using 'master' as the name for the initial branch. This default branch name
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3105332Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3106958Z hint: to use in all of your new repositories, which will suppress this warning,
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3107725Z hint: call:
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3108147Z hint:
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3108678Z hint: 	git config --global init.defaultBranch <name>
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3109302Z hint:
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3109901Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3110826Z hint: 'development'. The just-created branch can be renamed via this command:
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3111569Z hint:
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3112003Z hint: 	git branch -m <name>
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3112497Z hint:
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3113129Z hint: Disable this message with "git config set advice.defaultBranchName false"
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3118905Z Initialized empty Git repository in /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3149205Z [command]/usr/bin/git remote add origin https://github.com/Samfa12-tech/The-Horde-RT-demo
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3178948Z ##[endgroup]
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3180234Z ##[group]Disabling automatic garbage collection
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3182286Z [command]/usr/bin/git config --local gc.auto 0
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3214787Z ##[endgroup]
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3216606Z ##[group]Setting up auth
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3217488Z Removing SSH command configuration
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3223860Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3257663Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3609244Z Removing HTTP extra header
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3618346Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3660117Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3896737Z Removing includeIf entries pointing to credentials config files
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3904902Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+player-vulkan-host	Check out source	2026-09-30T07:36:36.3942330Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+player-vulkan-host	Check out source	2026-09-30T07:36:36.4162002Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+player-vulkan-host	Check out source	2026-09-30T07:36:36.4201010Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path /home/runner/work/_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Check out source	2026-09-30T07:36:36.4241073Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Check out source	2026-09-30T07:36:36.4274297Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Check out source	2026-09-30T07:36:36.4304797Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Check out source	2026-09-30T07:36:36.4332287Z ##[endgroup]
+player-vulkan-host	Check out source	2026-09-30T07:36:36.4333019Z ##[group]Fetching the repository
+player-vulkan-host	Check out source	2026-09-30T07:36:36.4339705Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +68553121ffbaa3b0584e785202d27310cd70833b:refs/remotes/pull/15/merge
+player-vulkan-host	Check out source	2026-09-30T07:36:38.3362356Z From https://github.com/Samfa12-tech/The-Horde-RT-demo
+player-vulkan-host	Check out source	2026-09-30T07:36:38.3364801Z  * [new ref]         68553121ffbaa3b0584e785202d27310cd70833b -> pull/15/merge
+player-vulkan-host	Check out source	2026-09-30T07:36:38.3374224Z ##[endgroup]
+player-vulkan-host	Check out source	2026-09-30T07:36:38.3376422Z ##[group]Determining the checkout info
+player-vulkan-host	Check out source	2026-09-30T07:36:38.3377940Z ##[endgroup]
+player-vulkan-host	Check out source	2026-09-30T07:36:38.3381304Z [command]/usr/bin/git sparse-checkout disable
+player-vulkan-host	Check out source	2026-09-30T07:36:38.3433771Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+player-vulkan-host	Check out source	2026-09-30T07:36:38.3466324Z ##[group]Checking out the ref
+player-vulkan-host	Check out source	2026-09-30T07:36:38.3469538Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/15/merge
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7901058Z Note: switching to 'refs/remotes/pull/15/merge'.
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7901725Z 
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7902179Z You are in 'detached HEAD' state. You can look around, make experimental
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7903199Z changes and commit them, and you can discard any commits you make in this
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7904107Z state without impacting any branches by switching back to a branch.
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7904728Z 
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7905096Z If you want to create a new branch to retain commits you create, you may
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7906217Z do so (now or later) by using -c with the switch command. Example:
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7906717Z 
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7906934Z   git switch -c <new-branch-name>
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7907258Z 
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7908505Z Or undo this operation with:
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7908845Z 
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7908982Z   git switch -
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7909226Z 
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7909497Z Turn off this advice by setting config variable advice.detachedHead to false
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7909846Z 
+player-vulkan-host	Check out source	2026-09-30T07:36:38.7910230Z HEAD is now at 6855312 Merge 18616f4fdab2da24e822c999006f39f6cff258eb into bda1b99a62e1de883273dd21f267bcfc92bc5490
+player-vulkan-host	Check out source	2026-09-30T07:36:38.8351178Z ##[endgroup]
+player-vulkan-host	Check out source	2026-09-30T07:36:38.8394827Z [command]/usr/bin/git log -1 --format=%H
+player-vulkan-host	Check out source	2026-09-30T07:36:38.8424902Z 68553121ffbaa3b0584e785202d27310cd70833b
+player-vulkan-host	Install Vulkan host development package	﻿2026-09-30T07:36:38.8686611Z ##[group]Run sudo apt-get update && sudo apt-get install --yes libvulkan-dev
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:38.8687240Z ^[[36;1msudo apt-get update && sudo apt-get install --yes libvulkan-dev^[[0m
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:38.8926034Z shell: /usr/bin/bash -e {0}
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:38.8926326Z ##[endgroup]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:38.9637212Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:38.9901446Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:38.9908071Z Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:38.9916508Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:38.9967748Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:38.9986075Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.0975174Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [454 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.1129982Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [503 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.1506077Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1322 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.1579990Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [299 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.1598495Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [181 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.1616224Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1699 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.1707181Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [341 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.1727271Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [388 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.1753624Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1662 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.1843951Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [379 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.1874466Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2097711Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Packages [40.6 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2588368Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [5760 B]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2599505Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Packages [31.0 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2608560Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe Translation-en [18.6 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2621234Z Get:22 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [12.6 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2631278Z Get:23 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1063 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2696723Z Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [220 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2716420Z Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [46.4 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2726815Z Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1216 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2785019Z Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [244 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2805052Z Get:28 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.3 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2820684Z Get:29 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1559 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:39.2896787Z Get:30 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [359 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:43.3391969Z Fetched 12.5 MB in 1s (9583 kB/s)
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.1302816Z Reading package lists...
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.1605608Z Reading package lists...
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.3234545Z Building dependency tree...
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.3241774Z Reading state information...
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.4645413Z The following NEW packages will be installed:
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.4646845Z   libvulkan-dev
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.4798830Z 0 upgraded, 1 newly installed, 0 to remove and 46 not upgraded.
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.4799442Z Need to get 1239 kB of archives.
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.4799806Z After this operation, 26.5 MB of additional disk space will be used.
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.4800205Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.5458944Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libvulkan-dev amd64 1.3.275.0-1build1 [1239 kB]
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8093446Z Fetched 1239 kB in 0s (11.6 MB/s)
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8295406Z Selecting previously unselected package libvulkan-dev:amd64.
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8551009Z (Reading database ... 
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8551510Z (Reading database ... 5%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8551930Z (Reading database ... 10%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8552363Z (Reading database ... 15%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8552781Z (Reading database ... 20%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8553329Z (Reading database ... 25%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8553872Z (Reading database ... 30%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8554430Z (Reading database ... 35%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8554947Z (Reading database ... 40%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8555432Z (Reading database ... 45%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8556136Z (Reading database ... 50%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.8668261Z (Reading database ... 55%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:44.9180345Z (Reading database ... 60%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.0633163Z (Reading database ... 65%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.2646583Z (Reading database ... 70%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.4257307Z (Reading database ... 75%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.5344008Z (Reading database ... 80%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.6703449Z (Reading database ... 85%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.7403227Z (Reading database ... 90%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.8327894Z (Reading database ... 95%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.8328738Z (Reading database ... 100%
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.8329603Z (Reading database ... 202190 files and directories currently installed.)
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.8369063Z Preparing to unpack .../libvulkan-dev_1.3.275.0-1build1_amd64.deb ...
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.8398032Z Unpacking libvulkan-dev:amd64 (1.3.275.0-1build1) ...
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:45.9447350Z Setting up libvulkan-dev:amd64 (1.3.275.0-1build1) ...
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:46.5452112Z 
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:46.5453622Z Running kernel seems to be up-to-date.
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:46.5454029Z 
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:46.5454541Z No services need to be restarted.
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:46.5454844Z 
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:46.5455026Z No containers need to be restarted.
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:46.5455309Z 
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:46.5455507Z No user sessions are running outdated binaries.
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:46.5456102Z 
+player-vulkan-host	Install Vulkan host development package	2026-09-30T07:36:46.5456427Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+player-vulkan-host	Fetch player smoke GLB and texture assets	﻿2026-09-30T07:36:47.3402161Z ##[group]Run git -c lfs.fetchexclude= lfs fetch --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb" && git lfs checkout "assets/models/enemies/meshy/*.glb" "assets/models/player/runtime/*.glb" "assets/models/player/viewmodel/runtime/*.glb" "assets/models/props/runtime/*.glb" "assets/models/props/runtime/*/*.glb" "assets/models/weapons/runtime/*.glb" "assets/textures/meshy/lich_placeholder_v01/*.ktx2" "tests/fixtures/*/*.glb"
+player-vulkan-host	Fetch player smoke GLB and texture assets	2026-09-30T07:36:47.3406602Z ^[[36;1mgit -c lfs.fetchexclude= lfs fetch --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb" && git lfs checkout "assets/models/enemies/meshy/*.glb" "assets/models/player/runtime/*.glb" "assets/models/player/viewmodel/runtime/*.glb" "assets/models/props/runtime/*.glb" "assets/models/props/runtime/*/*.glb" "assets/models/weapons/runtime/*.glb" "assets/textures/meshy/lich_placeholder_v01/*.ktx2" "tests/fixtures/*/*.glb"^[[0m
+player-vulkan-host	Fetch player smoke GLB and texture assets	2026-09-30T07:36:47.3468363Z shell: /usr/bin/bash -e {0}
+player-vulkan-host	Fetch player smoke GLB and texture assets	2026-09-30T07:36:47.3468603Z ##[endgroup]
+player-vulkan-host	Fetch player smoke GLB and texture assets	2026-09-30T07:36:47.3739926Z Fetching reference HEAD
+player-vulkan-host	Fetch player smoke GLB and texture assets	2026-09-30T07:36:50.4219356Z Checking out LFS objects: 100% (52/52), 91 MB | 0 B/s, done.
+player-vulkan-host	Configure Vulkan CPU-host player lane	﻿2026-09-30T07:36:50.9054646Z ##[group]Run cmake -S . -B build/player-vulkan-host -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DHORDE_RT_BUILD_VULKAN_TARGETS=ON -DHORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE=OFF -DHORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW=OFF -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=Mobile
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:50.9056988Z ^[[36;1mcmake -S . -B build/player-vulkan-host -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DHORDE_RT_BUILD_VULKAN_TARGETS=ON -DHORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE=OFF -DHORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW=OFF -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=Mobile^[[0m
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:50.9116545Z shell: /usr/bin/bash -e {0}
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:50.9116810Z ##[endgroup]
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:51.0909004Z -- The CXX compiler identification is GNU 13.3.0
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:51.1059516Z -- Detecting CXX compiler ABI info
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:51.1833712Z -- Detecting CXX compiler ABI info - done
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:51.2005401Z -- Check for working CXX compiler: /usr/bin/c++ - skipped
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:51.2011473Z -- Detecting CXX compile features
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:51.2020519Z -- Detecting CXX compile features - done
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:57.5863789Z Generated RT catalog adapter is current.
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:57.7816593Z -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: -fno-fast-math;-ffp-contract=off
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:57.8782839Z -- Found Vulkan: /usr/lib/x86_64-linux-gnu/libvulkan.so (found version "1.3.275")  missing components: glslc glslangValidator
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:57.8785260Z -- Vulkan SDK found: 1.3.275
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:58.6794055Z -- Legacy torch-failure identifiers were rejected by the configured GNU compiler.
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:58.6808255Z -- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:58.6809612Z -- Configuring done (7.7s)
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:58.7983249Z -- Generating done (0.1s)
+player-vulkan-host	Configure Vulkan CPU-host player lane	2026-09-30T07:36:58.7987545Z -- Build files have been written to: /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/build/player-vulkan-host
+player-vulkan-host	Build focused player Vulkan-host targets	﻿2026-09-30T07:36:58.8066801Z ##[group]Run cmake --build build/player-vulkan-host --config Release --parallel 2 --target horde_rt_player_primitive_contract_tests horde_rt_player_animation_tests horde_rt_held_item_socket_tests horde_rt_scene_abi_tests horde_rt_static_gltf_asset_tests horde_rt_skinned_character_smoke horde_rt_skinned_arm_reference_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:36:58.8069038Z ^[[36;1mcmake --build build/player-vulkan-host --config Release --parallel 2 --target horde_rt_player_primitive_contract_tests horde_rt_player_animation_tests horde_rt_held_item_socket_tests horde_rt_scene_abi_tests horde_rt_static_gltf_asset_tests horde_rt_skinned_character_smoke horde_rt_skinned_arm_reference_tests^[[0m
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:36:58.8131107Z shell: /usr/bin/bash -e {0}
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:36:58.8131360Z ##[endgroup]
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:36:58.8473760Z [100%] Building CXX object CMakeFiles/horde_rt_player_primitive_contract_tests.dir/tests/PlayerPrimitiveContractTests.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:00.0492708Z [100%] Linking CXX executable horde_rt_player_primitive_contract_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:00.0986475Z [100%] Built target horde_rt_player_primitive_contract_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:00.1184314Z [  0%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/simulation/GameSimulation.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:00.1186403Z [  0%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/animation/PlayerAnimationState.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:00.8444332Z [ 14%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/animation/PlayerIkTargets.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:01.1107937Z [ 14%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/effects/FireEmitterState.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:01.4047894Z [ 28%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/interactions/InteractionState.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:02.0178617Z [ 28%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/interactions/ChestRewardSequence.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:02.2583513Z [ 42%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/interactions/FinaleSequence.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:02.4952123Z [ 42%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/LanternPendulum.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:02.6364119Z [ 57%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/HeldItemState.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:02.7306884Z [ 57%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/HeldItemKinematics.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:02.8383475Z [ 71%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/HeldLightState.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:03.8492864Z [ 71%] Linking CXX static library libhorde_gameplay_simulation.a
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:04.5090624Z [ 71%] Built target horde_gameplay_simulation
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:04.5161027Z [ 71%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/tests/PlayerAnimationTests.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:04.5163330Z [ 85%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:05.7396183Z [ 85%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/src/scene/assets/SkinnedMeshAsset.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:05.7590177Z [100%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/src/vulkan/raytracing/PlayerRenderSlot.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:09.0651357Z [100%] Linking CXX executable horde_rt_player_animation_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:09.1203269Z [100%] Built target horde_rt_player_animation_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:09.1522183Z [ 55%] Built target horde_gameplay_simulation
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:09.1594048Z [ 66%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/tests/HeldItemSocketTests.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:09.1595919Z [ 66%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/AssetManifest.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:10.7037615Z [ 77%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/AssetValidation.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:11.2280165Z [ 77%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/GltfDocument.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:11.7395495Z [ 88%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:13.8976236Z [ 88%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/vulkan/raytracing/HeldItemRenderSlot.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:14.0191669Z [100%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:16.0976905Z [100%] Linking CXX executable horde_rt_held_item_socket_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:16.1537253Z [100%] Built target horde_rt_held_item_socket_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:16.1733817Z [  0%] Building CXX object CMakeFiles/horde_rt_scene_abi_tests.dir/tests/RtSceneAbiTests.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:16.1737161Z [ 50%] Building CXX object CMakeFiles/horde_rt_scene_abi_tests.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:17.3599135Z [ 50%] Building CXX object CMakeFiles/horde_rt_scene_abi_tests.dir/src/vulkan/raytracing/RtTextureArrays.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:18.0317585Z [100%] Linking CXX executable horde_rt_scene_abi_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:18.0777378Z [100%] Built target horde_rt_scene_abi_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:18.0972712Z [ 25%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/tests/StaticGltfAssetTests.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:18.0974106Z [ 25%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/AssetManifest.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:20.6572271Z [ 50%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/AssetValidation.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:21.1876849Z [ 50%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/GltfDocument.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:22.4790776Z [ 75%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:23.7714396Z [ 75%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:26.1505511Z [100%] Linking CXX executable horde_rt_static_gltf_asset_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:26.2026542Z [100%] Built target horde_rt_static_gltf_asset_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:26.2260789Z [ 25%] Built target horde_gameplay_simulation
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:26.2335888Z [ 30%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:26.2337203Z [ 30%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/telemetry/RtEvidencePublication.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:26.7578221Z [ 35%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/telemetry/RtBenchmarkEvidenceRun.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:27.4331950Z [ 35%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/telemetry/RtBenchmarkEvidenceReport.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:27.4586547Z [ 35%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/gameplay/ShowcaseBenchmark.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:28.5427368Z [ 40%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/assets/AssetManifest.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:28.9277797Z [ 40%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/assets/AssetValidation.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:29.4367373Z [ 45%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/assets/GltfDocument.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:31.0599173Z [ 45%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/assets/StaticMeshAsset.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:31.9373641Z [ 50%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/update/GitHubReleaseUpdater.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:33.6353395Z [ 50%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/DeviceCapabilities.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:33.9295022Z [ 55%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/RtCapabilityReport.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:34.7487334Z [ 55%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/GpuFrameTimer.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:34.7672077Z [ 60%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/VulkanContext.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:35.5804013Z [ 60%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RayTracingRequirements.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:35.8249394Z [ 65%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtGpuResources.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:36.6223398Z [ 65%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/HeldItemRenderSlot.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:36.6930928Z [ 70%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/FireEmitterBuffer.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:36.7877117Z [ 70%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:37.5213314Z [ 75%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtTextureArrays.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:37.7739261Z [ 75%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/CharacterRenderSlot.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:38.6510177Z [ 80%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/PlayerRenderSlot.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:39.1248327Z [ 80%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtPipelineVariants.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:39.4708200Z [ 80%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtPipelineVariantProvider.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:40.1941919Z [ 85%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtPipelineBundleContracts.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:40.5748961Z [ 85%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtPipelineBundle.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:41.1033742Z [ 90%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/RtFrameEvidenceCoordinator.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:41.2272809Z [ 90%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/PresentableTinyRtScene.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:42.2871293Z [ 95%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/vulkan/raytracing/SimulationFrameAdapter.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:43.2063950Z [ 95%] Building CXX object CMakeFiles/horde_rt_probe_core.dir/src/scene/assets/SkinnedMeshAsset.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:47.3242216Z [100%] Linking CXX static library libhorde_rt_probe_core.a
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:47.4357074Z [100%] Built target horde_rt_probe_core
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:47.4425037Z [100%] Building CXX object CMakeFiles/horde_rt_skinned_character_smoke.dir/tests/SkinnedCharacterModelSmoke.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:51.5915059Z [100%] Linking CXX executable horde_rt_skinned_character_smoke
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:51.6477976Z [100%] Built target horde_rt_skinned_character_smoke
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:51.6733655Z [ 23%] Built target horde_gameplay_simulation
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:51.7119286Z [ 95%] Built target horde_rt_probe_core
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:51.7182053Z [ 95%] Building CXX object CMakeFiles/horde_rt_skinned_arm_reference_tests.dir/tests/SkinnedArmReferenceTests.cpp.o
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:53.7872635Z [100%] Linking CXX executable horde_rt_skinned_arm_reference_tests
+player-vulkan-host	Build focused player Vulkan-host targets	2026-09-30T07:37:53.8377950Z [100%] Built target horde_rt_skinned_arm_reference_tests
+player-vulkan-host	Run focused player contract and semantic fixtures	﻿2026-09-30T07:37:53.8456477Z ##[group]Run ctest --test-dir build/player-vulkan-host --build-config Release --output-on-failure --no-tests=error -R "^(horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures)$"
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:53.8460158Z ^[[36;1mctest --test-dir build/player-vulkan-host --build-config Release --output-on-failure --no-tests=error -R "^(horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures)$"^[[0m
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:53.8522314Z shell: /usr/bin/bash -e {0}
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:53.8522567Z ##[endgroup]
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:54.2839859Z Internal ctest changing into directory: /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/build/player-vulkan-host
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:54.3577357Z Test project /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/build/player-vulkan-host
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:54.4110441Z       Start  1: horde_rt_player_primitive_contract_tests
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:54.4181881Z  1/11 Test  #1: horde_rt_player_primitive_contract_tests ....   Passed    0.00 sec
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:54.4241111Z       Start  3: horde_rt_player_manifest_agreement_tests
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3116657Z  2/11 Test  #3: horde_rt_player_manifest_agreement_tests ....   Passed    0.89 sec
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3120728Z       Start 28: horde_rt_player_animation_tests
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3149452Z  3/11 Test #28: horde_rt_player_animation_tests .............   Passed    0.00 sec
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3151193Z       Start 30: horde_rt_held_item_socket_tests
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3672674Z  4/11 Test #30: horde_rt_held_item_socket_tests .............   Passed    0.05 sec
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3674461Z       Start 32: horde_rt_scene_abi_tests
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3693391Z  5/11 Test #32: horde_rt_scene_abi_tests ....................   Passed    0.00 sec
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3694604Z       Start 33: horde_rt_static_gltf_asset_tests
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3959747Z  6/11 Test #33: horde_rt_static_gltf_asset_tests ............   Passed    0.03 sec
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3960912Z       Start 52: horde_rt_skinned_arm_reference_tests
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3980581Z  7/11 Test #52: horde_rt_skinned_arm_reference_tests ........   Passed    0.00 sec
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:55.3982054Z       Start 53: horde_rt_skinned_character_smoke
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:57.5710345Z  8/11 Test #53: horde_rt_skinned_character_smoke ............   Passed    2.17 sec
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:37:57.5764751Z       Start 54: horde_rt_player_skinned_semantic_fixtures
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:38:00.6251427Z  9/11 Test #54: horde_rt_player_skinned_semantic_fixtures ...   Passed    3.05 sec
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:38:00.6252857Z       Start 55: horde_rt_player_viewmodel_admission
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:38:00.6807021Z 10/11 Test #55: horde_rt_player_viewmodel_admission .........   Passed    0.06 sec
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:38:00.6809367Z       Start 56: horde_rt_player_viewmodel_pose_fixtures
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:38:02.1026751Z 11/11 Test #56: horde_rt_player_viewmodel_pose_fixtures .....   Passed    1.42 sec
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:38:02.1029891Z 
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:38:02.1030071Z 100% tests passed, 0 tests failed out of 11
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:38:02.1030396Z 
+player-vulkan-host	Run focused player contract and semantic fixtures	2026-09-30T07:38:02.1030501Z Total Test time (real) =   7.75 sec
+player-vulkan-host	Post Check out source	﻿2026-09-30T07:38:02.1561989Z Post job cleanup.
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.2396226Z [command]/usr/bin/git version
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.2426205Z git version 2.55.0
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.2466289Z Temporarily overriding HOME='/home/runner/work/_temp/a3cb9ac1-20d0-41a4-a237-753239ee0fdf' before making global git config changes
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.2467574Z Adding repository directory to the temporary git global config as a safe directory
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.2471801Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.2503765Z Removing SSH command configuration
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.2510516Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.2544794Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.2782491Z Removing HTTP extra header
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.2789983Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.2827049Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3064970Z Removing includeIf entries pointing to credentials config files
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3074509Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3114999Z includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3116720Z includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3118035Z includeif.gitdir:/github/workspace/.git.path
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3119089Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3127932Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3161864Z /home/runner/work/_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3173663Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path /home/runner/work/_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3220024Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3249130Z /home/runner/work/_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3260487Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3300853Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3326451Z /github/runner_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3336918Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3373886Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3399544Z /github/runner_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3406516Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3480396Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+player-vulkan-host	Post Check out source	2026-09-30T07:38:02.3712558Z Removing credentials config '/home/runner/work/_temp/git-credentials-30177f79-1db6-44b3-9b9b-85c059d18bbe.config'
+player-vulkan-host	Complete job	﻿2026-09-30T07:38:02.3870689Z Cleaning up orphan processes
+shared-gameplay	Set up job	﻿2026-09-30T07:37:04.5866861Z Current runner version: '2.337.0'
+shared-gameplay	Set up job	2026-09-30T07:37:04.5895324Z ##[group]Runner Image Provisioner
+shared-gameplay	Set up job	2026-09-30T07:37:04.5896230Z Hosted Compute Agent
+shared-gameplay	Set up job	2026-09-30T07:37:04.5897059Z Version: 20260901.588
+shared-gameplay	Set up job	2026-09-30T07:37:04.5897843Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+shared-gameplay	Set up job	2026-09-30T07:37:04.5898600Z Build Date: 2026-09-01T19:56:44Z
+shared-gameplay	Set up job	2026-09-30T07:37:04.5899395Z Worker ID: {b0867b79-fa88-46af-92dd-b61bb033bbe0}
+shared-gameplay	Set up job	2026-09-30T07:37:04.5900159Z Azure Region: eastus2
+shared-gameplay	Set up job	2026-09-30T07:37:04.5900728Z ##[endgroup]
+shared-gameplay	Set up job	2026-09-30T07:37:04.5902310Z ##[group]Operating System
+shared-gameplay	Set up job	2026-09-30T07:37:04.5903001Z Ubuntu
+shared-gameplay	Set up job	2026-09-30T07:37:04.5903578Z 24.04.5
+shared-gameplay	Set up job	2026-09-30T07:37:04.5904097Z LTS
+shared-gameplay	Set up job	2026-09-30T07:37:04.5904601Z ##[endgroup]
+shared-gameplay	Set up job	2026-09-30T07:37:04.5905221Z ##[group]Runner Image
+shared-gameplay	Set up job	2026-09-30T07:37:04.5905825Z Image: ubuntu-24.04
+shared-gameplay	Set up job	2026-09-30T07:37:04.5906403Z Version: 20260927.320.1
+shared-gameplay	Set up job	2026-09-30T07:37:04.5907711Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+shared-gameplay	Set up job	2026-09-30T07:37:04.5909529Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+shared-gameplay	Set up job	2026-09-30T07:37:04.5910516Z ##[endgroup]
+shared-gameplay	Set up job	2026-09-30T07:37:04.5911676Z ##[group]GITHUB_TOKEN Permissions
+shared-gameplay	Set up job	2026-09-30T07:37:04.5913764Z Contents: read
+shared-gameplay	Set up job	2026-09-30T07:37:04.5914417Z Metadata: read
+shared-gameplay	Set up job	2026-09-30T07:37:04.5915122Z ##[endgroup]
+shared-gameplay	Set up job	2026-09-30T07:37:04.5917944Z Secret source: Actions
+shared-gameplay	Set up job	2026-09-30T07:37:04.5919304Z Cache mode: write
+shared-gameplay	Set up job	2026-09-30T07:37:04.5920332Z Prepare workflow directory
+shared-gameplay	Set up job	2026-09-30T07:37:04.6253014Z Prepare all required actions
+shared-gameplay	Set up job	2026-09-30T07:37:04.6301544Z Getting action download info
+shared-gameplay	Set up job	2026-09-30T07:37:04.8767351Z Download action repository 'actions/checkout@v6' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+shared-gameplay	Set up job	2026-09-30T07:37:05.0732425Z Complete job name: shared-gameplay
+shared-gameplay	Check out source	﻿2026-09-30T07:37:05.1541089Z ##[group]Run actions/checkout@v6
+shared-gameplay	Check out source	2026-09-30T07:37:05.1541993Z with:
+shared-gameplay	Check out source	2026-09-30T07:37:05.1542482Z   repository: Samfa12-tech/The-Horde-RT-demo
+shared-gameplay	Check out source	2026-09-30T07:37:05.1546775Z   token: ***
+shared-gameplay	Check out source	2026-09-30T07:37:05.1547238Z   ssh-strict: true
+shared-gameplay	Check out source	2026-09-30T07:37:05.1547672Z   ssh-user: git
+shared-gameplay	Check out source	2026-09-30T07:37:05.1548106Z   persist-credentials: true
+shared-gameplay	Check out source	2026-09-30T07:37:05.1548584Z   clean: true
+shared-gameplay	Check out source	2026-09-30T07:37:05.1549018Z   sparse-checkout-cone-mode: true
+shared-gameplay	Check out source	2026-09-30T07:37:05.1549542Z   fetch-depth: 1
+shared-gameplay	Check out source	2026-09-30T07:37:05.1549959Z   fetch-tags: false
+shared-gameplay	Check out source	2026-09-30T07:37:05.1550393Z   show-progress: true
+shared-gameplay	Check out source	2026-09-30T07:37:05.1550829Z   lfs: false
+shared-gameplay	Check out source	2026-09-30T07:37:05.1551236Z   submodules: false
+shared-gameplay	Check out source	2026-09-30T07:37:05.1551676Z   set-safe-directory: true
+shared-gameplay	Check out source	2026-09-30T07:37:05.1552174Z   allow-unsafe-pr-checkout: false
+shared-gameplay	Check out source	2026-09-30T07:37:05.1553088Z ##[endgroup]
+shared-gameplay	Check out source	2026-09-30T07:37:05.2601683Z Syncing repository: Samfa12-tech/The-Horde-RT-demo
+shared-gameplay	Check out source	2026-09-30T07:37:05.2604352Z ##[group]Getting Git version info
+shared-gameplay	Check out source	2026-09-30T07:37:05.2605654Z Working directory is '/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo'
+shared-gameplay	Check out source	2026-09-30T07:37:05.2607846Z [command]/usr/bin/git version
+shared-gameplay	Check out source	2026-09-30T07:37:05.2666473Z git version 2.55.0
+shared-gameplay	Check out source	2026-09-30T07:37:05.2692703Z ##[endgroup]
+shared-gameplay	Check out source	2026-09-30T07:37:05.2708696Z Temporarily overriding HOME='/home/runner/work/_temp/4095ea68-acc7-40f9-a536-7d76f4b2ea71' before making global git config changes
+shared-gameplay	Check out source	2026-09-30T07:37:05.2710944Z Adding repository directory to the temporary git global config as a safe directory
+shared-gameplay	Check out source	2026-09-30T07:37:05.2714013Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo
+shared-gameplay	Check out source	2026-09-30T07:37:05.2771761Z Deleting the contents of '/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo'
+shared-gameplay	Check out source	2026-09-30T07:37:05.2777851Z ##[group]Determining repository object format
+shared-gameplay	Check out source	2026-09-30T07:37:05.2780769Z ##[endgroup]
+shared-gameplay	Check out source	2026-09-30T07:37:05.2782762Z ##[group]Initializing the repository
+shared-gameplay	Check out source	2026-09-30T07:37:05.2789174Z [command]/usr/bin/git init /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo
+shared-gameplay	Check out source	2026-09-30T07:37:05.2935403Z hint: Using 'master' as the name for the initial branch. This default branch name
+shared-gameplay	Check out source	2026-09-30T07:37:05.2937967Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+shared-gameplay	Check out source	2026-09-30T07:37:05.2940353Z hint: to use in all of your new repositories, which will suppress this warning,
+shared-gameplay	Check out source	2026-09-30T07:37:05.2952900Z hint: call:
+shared-gameplay	Check out source	2026-09-30T07:37:05.2953861Z hint:
+shared-gameplay	Check out source	2026-09-30T07:37:05.2954754Z hint: 	git config --global init.defaultBranch <name>
+shared-gameplay	Check out source	2026-09-30T07:37:05.2955831Z hint:
+shared-gameplay	Check out source	2026-09-30T07:37:05.2957026Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+shared-gameplay	Check out source	2026-09-30T07:37:05.2958210Z hint: 'development'. The just-created branch can be renamed via this command:
+shared-gameplay	Check out source	2026-09-30T07:37:05.2961670Z hint:
+shared-gameplay	Check out source	2026-09-30T07:37:05.2962614Z hint: 	git branch -m <name>
+shared-gameplay	Check out source	2026-09-30T07:37:05.2963440Z hint:
+shared-gameplay	Check out source	2026-09-30T07:37:05.2964541Z hint: Disable this message with "git config set advice.defaultBranchName false"
+shared-gameplay	Check out source	2026-09-30T07:37:05.2966455Z Initialized empty Git repository in /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/
+shared-gameplay	Check out source	2026-09-30T07:37:05.2969847Z [command]/usr/bin/git remote add origin https://github.com/Samfa12-tech/The-Horde-RT-demo
+shared-gameplay	Check out source	2026-09-30T07:37:05.3010009Z ##[endgroup]
+shared-gameplay	Check out source	2026-09-30T07:37:05.3011279Z ##[group]Disabling automatic garbage collection
+shared-gameplay	Check out source	2026-09-30T07:37:05.3014784Z [command]/usr/bin/git config --local gc.auto 0
+shared-gameplay	Check out source	2026-09-30T07:37:05.3063439Z ##[endgroup]
+shared-gameplay	Check out source	2026-09-30T07:37:05.3064605Z ##[group]Setting up auth
+shared-gameplay	Check out source	2026-09-30T07:37:05.3065511Z Removing SSH command configuration
+shared-gameplay	Check out source	2026-09-30T07:37:05.3073298Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+shared-gameplay	Check out source	2026-09-30T07:37:05.3110763Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+shared-gameplay	Check out source	2026-09-30T07:37:05.3519358Z Removing HTTP extra header
+shared-gameplay	Check out source	2026-09-30T07:37:05.3531117Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+shared-gameplay	Check out source	2026-09-30T07:37:05.3563046Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+shared-gameplay	Check out source	2026-09-30T07:37:05.3794709Z Removing includeIf entries pointing to credentials config files
+shared-gameplay	Check out source	2026-09-30T07:37:05.3802172Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+shared-gameplay	Check out source	2026-09-30T07:37:05.3840595Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+shared-gameplay	Check out source	2026-09-30T07:37:05.4069097Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+shared-gameplay	Check out source	2026-09-30T07:37:05.4110272Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path /home/runner/work/_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Check out source	2026-09-30T07:37:05.4147145Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Check out source	2026-09-30T07:37:05.4191366Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Check out source	2026-09-30T07:37:05.4224886Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Check out source	2026-09-30T07:37:05.4255610Z ##[endgroup]
+shared-gameplay	Check out source	2026-09-30T07:37:05.4256383Z ##[group]Fetching the repository
+shared-gameplay	Check out source	2026-09-30T07:37:05.4263764Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +68553121ffbaa3b0584e785202d27310cd70833b:refs/remotes/pull/15/merge
+shared-gameplay	Check out source	2026-09-30T07:37:06.4458499Z From https://github.com/Samfa12-tech/The-Horde-RT-demo
+shared-gameplay	Check out source	2026-09-30T07:37:06.4460963Z  * [new ref]         68553121ffbaa3b0584e785202d27310cd70833b -> pull/15/merge
+shared-gameplay	Check out source	2026-09-30T07:37:06.4464474Z ##[endgroup]
+shared-gameplay	Check out source	2026-09-30T07:37:06.4465849Z ##[group]Determining the checkout info
+shared-gameplay	Check out source	2026-09-30T07:37:06.4467587Z ##[endgroup]
+shared-gameplay	Check out source	2026-09-30T07:37:06.4468404Z [command]/usr/bin/git sparse-checkout disable
+shared-gameplay	Check out source	2026-09-30T07:37:06.4514687Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+shared-gameplay	Check out source	2026-09-30T07:37:06.4549162Z ##[group]Checking out the ref
+shared-gameplay	Check out source	2026-09-30T07:37:06.4551616Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/15/merge
+shared-gameplay	Check out source	2026-09-30T07:37:06.9049956Z Note: switching to 'refs/remotes/pull/15/merge'.
+shared-gameplay	Check out source	2026-09-30T07:37:06.9051563Z 
+shared-gameplay	Check out source	2026-09-30T07:37:06.9051961Z You are in 'detached HEAD' state. You can look around, make experimental
+shared-gameplay	Check out source	2026-09-30T07:37:06.9052965Z changes and commit them, and you can discard any commits you make in this
+shared-gameplay	Check out source	2026-09-30T07:37:06.9053966Z state without impacting any branches by switching back to a branch.
+shared-gameplay	Check out source	2026-09-30T07:37:06.9054637Z 
+shared-gameplay	Check out source	2026-09-30T07:37:06.9055074Z If you want to create a new branch to retain commits you create, you may
+shared-gameplay	Check out source	2026-09-30T07:37:06.9056010Z do so (now or later) by using -c with the switch command. Example:
+shared-gameplay	Check out source	2026-09-30T07:37:06.9056780Z 
+shared-gameplay	Check out source	2026-09-30T07:37:06.9057030Z   git switch -c <new-branch-name>
+shared-gameplay	Check out source	2026-09-30T07:37:06.9057362Z 
+shared-gameplay	Check out source	2026-09-30T07:37:06.9057581Z Or undo this operation with:
+shared-gameplay	Check out source	2026-09-30T07:37:06.9057893Z 
+shared-gameplay	Check out source	2026-09-30T07:37:06.9058090Z   git switch -
+shared-gameplay	Check out source	2026-09-30T07:37:06.9058343Z 
+shared-gameplay	Check out source	2026-09-30T07:37:06.9058792Z Turn off this advice by setting config variable advice.detachedHead to false
+shared-gameplay	Check out source	2026-09-30T07:37:06.9059358Z 
+shared-gameplay	Check out source	2026-09-30T07:37:06.9060019Z HEAD is now at 6855312 Merge 18616f4fdab2da24e822c999006f39f6cff258eb into bda1b99a62e1de883273dd21f267bcfc92bc5490
+shared-gameplay	Check out source	2026-09-30T07:37:06.9492159Z ##[endgroup]
+shared-gameplay	Check out source	2026-09-30T07:37:06.9538431Z [command]/usr/bin/git log -1 --format=%H
+shared-gameplay	Check out source	2026-09-30T07:37:06.9566250Z 68553121ffbaa3b0584e785202d27310cd70833b
+shared-gameplay	Fetch portable-test GLB assets	﻿2026-09-30T07:37:06.9841741Z ##[group]Run git -c lfs.fetchexclude= lfs fetch --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb" && git lfs checkout "assets/models/player/runtime/*.glb" "assets/models/player/viewmodel/runtime/*.glb" "assets/models/props/runtime/*.glb" "assets/models/props/runtime/*/*.glb" "assets/models/weapons/runtime/*.glb" "tests/fixtures/*/*.glb"
+shared-gameplay	Fetch portable-test GLB assets	2026-09-30T07:37:06.9845339Z ^[[36;1mgit -c lfs.fetchexclude= lfs fetch --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb" && git lfs checkout "assets/models/player/runtime/*.glb" "assets/models/player/viewmodel/runtime/*.glb" "assets/models/props/runtime/*.glb" "assets/models/props/runtime/*/*.glb" "assets/models/weapons/runtime/*.glb" "tests/fixtures/*/*.glb"^[[0m
+shared-gameplay	Fetch portable-test GLB assets	2026-09-30T07:37:07.0118507Z shell: /usr/bin/bash -e {0}
+shared-gameplay	Fetch portable-test GLB assets	2026-09-30T07:37:07.0118933Z ##[endgroup]
+shared-gameplay	Fetch portable-test GLB assets	2026-09-30T07:37:07.0433454Z Fetching reference HEAD
+shared-gameplay	Fetch portable-test GLB assets	2026-09-30T07:37:07.8169992Z Checking out LFS objects: 100% (46/46), 6.9 MB | 0 B/s, done.
+shared-gameplay	Configure non-hardware host tests	﻿2026-09-30T07:37:08.1982374Z ##[group]Run cmake -S . -B build/host-ci -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DHORDE_RT_BUILD_VULKAN_TARGETS=OFF
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:08.1983347Z ^[[36;1mcmake -S . -B build/host-ci -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DHORDE_RT_BUILD_VULKAN_TARGETS=OFF^[[0m
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:08.2050209Z shell: /usr/bin/bash -e {0}
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:08.2050490Z ##[endgroup]
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:08.4245137Z -- The CXX compiler identification is GNU 13.3.0
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:08.4446449Z -- Detecting CXX compiler ABI info
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:08.5344302Z -- Detecting CXX compiler ABI info - done
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:08.5525777Z -- Check for working CXX compiler: /usr/bin/c++ - skipped
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:08.5532061Z -- Detecting CXX compile features
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:08.5542184Z -- Detecting CXX compile features - done
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:11.6294632Z Generated RT catalog adapter is current.
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:11.8163286Z -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: -fno-fast-math;-ffp-contract=off
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:12.6122181Z -- Legacy torch-failure identifiers were rejected by the configured GNU compiler.
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:12.6123709Z -- Horde Lantern RT: configuring shared host gameplay tests without Vulkan targets.
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:12.6125752Z -- Configuring done (4.4s)
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:12.7081508Z -- Generating done (0.1s)
+shared-gameplay	Configure non-hardware host tests	2026-09-30T07:37:12.7084632Z -- Build files have been written to: /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/build/host-ci
+shared-gameplay	Build shared gameplay tests	﻿2026-09-30T07:37:12.7158001Z ##[group]Run cmake --build build/host-ci --config Release --parallel 2
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:12.7158533Z ^[[36;1mcmake --build build/host-ci --config Release --parallel 2^[[0m
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:12.7221464Z shell: /usr/bin/bash -e {0}
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:12.7221735Z ##[endgroup]
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:12.7493642Z [  1%] Building CXX object CMakeFiles/horde_rt_player_primitive_contract_tests.dir/tests/PlayerPrimitiveContractTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:12.7498582Z [  1%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/simulation/GameSimulation.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:13.9915566Z [  2%] Linking CXX executable horde_rt_player_primitive_contract_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:14.0412853Z [  2%] Built target horde_rt_player_primitive_contract_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:14.0482115Z [  3%] Building CXX object CMakeFiles/horde_rt_windows_benchmark_launch_tests.dir/tests/WindowsBenchmarkLaunchTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:14.5667368Z [  4%] Linking CXX executable horde_rt_windows_benchmark_launch_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:14.6163936Z [  4%] Built target horde_rt_windows_benchmark_launch_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:14.6233633Z [  4%] Building CXX object CMakeFiles/horde_rt_evidence_publication_tests.dir/tests/RtEvidencePublicationTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:15.2402165Z [  5%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/animation/PlayerAnimationState.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:15.2875919Z [  6%] Building CXX object CMakeFiles/horde_rt_evidence_publication_tests.dir/src/telemetry/RtEvidencePublication.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:15.8182607Z [  7%] Building CXX object CMakeFiles/horde_rt_evidence_publication_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:15.9514001Z [  8%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/animation/PlayerIkTargets.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:16.2077199Z [  8%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/effects/FireEmitterState.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:16.4984935Z [  9%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/interactions/InteractionState.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:16.7277083Z [ 10%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/interactions/ChestRewardSequence.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:16.9621447Z [ 10%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/interactions/FinaleSequence.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:17.0919661Z [ 10%] Linking CXX executable horde_rt_evidence_publication_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:17.1438825Z [ 10%] Built target horde_rt_evidence_publication_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:17.1509205Z [ 11%] Building CXX object CMakeFiles/horde_rt_ray_tracing_requirements_tests.dir/tests/RayTracingRequirementsTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:17.2014703Z [ 12%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/LanternPendulum.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:17.5432669Z [ 13%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/HeldItemState.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:17.6388707Z [ 13%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/HeldItemKinematics.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:17.6994294Z [ 13%] Building CXX object CMakeFiles/horde_rt_ray_tracing_requirements_tests.dir/src/vulkan/raytracing/RayTracingRequirements.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:17.9575289Z [ 14%] Linking CXX executable horde_rt_ray_tracing_requirements_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:18.0050525Z [ 14%] Built target horde_rt_ray_tracing_requirements_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:18.0120274Z [ 14%] Building CXX object CMakeFiles/horde_rt_performance_evidence_tests.dir/tests/RtPerformanceEvidenceTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:18.7747716Z [ 15%] Building CXX object CMakeFiles/horde_gameplay_simulation.dir/src/gameplay/items/HeldLightState.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:19.4514925Z [ 16%] Linking CXX static library libhorde_gameplay_simulation.a
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:19.9453305Z [ 17%] Building CXX object CMakeFiles/horde_rt_performance_evidence_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:20.1049444Z [ 17%] Built target horde_gameplay_simulation
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:20.1123314Z [ 18%] Building CXX object CMakeFiles/horde_rt_scene_record_observation_tests.dir/tests/RtSceneRecordObservationTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:20.9737590Z [ 18%] Building CXX object CMakeFiles/horde_rt_scene_record_observation_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:21.2174046Z [ 19%] Linking CXX executable horde_rt_performance_evidence_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:21.2692725Z [ 19%] Built target horde_rt_performance_evidence_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:21.2763857Z [ 20%] Building CXX object CMakeFiles/horde_rt_pipeline_variants_tests.dir/tests/RtPipelineVariantsTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:21.6490087Z [ 20%] Building CXX object CMakeFiles/horde_rt_pipeline_variants_tests.dir/src/vulkan/raytracing/RtPipelineVariants.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:21.9974556Z [ 21%] Linking CXX executable horde_rt_pipeline_variants_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:22.0439986Z [ 21%] Built target horde_rt_pipeline_variants_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:22.0511407Z [ 22%] Building CXX object CMakeFiles/horde_rt_pipeline_variant_provider_tests.dir/tests/RtPipelineVariantProviderTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:22.2292847Z [ 23%] Linking CXX executable horde_rt_scene_record_observation_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:22.2802348Z [ 23%] Built target horde_rt_scene_record_observation_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:22.2875752Z [ 23%] Building CXX object CMakeFiles/horde_rt_pipeline_bundle_contracts_tests.dir/tests/RtPipelineBundleContractsTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:22.4411922Z [ 24%] Building CXX object CMakeFiles/horde_rt_pipeline_variant_provider_tests.dir/src/vulkan/raytracing/RtPipelineVariants.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:22.7941018Z [ 24%] Building CXX object CMakeFiles/horde_rt_pipeline_variant_provider_tests.dir/src/vulkan/raytracing/RtPipelineVariantProvider.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:22.8056748Z [ 25%] Building CXX object CMakeFiles/horde_rt_pipeline_bundle_contracts_tests.dir/src/vulkan/raytracing/RtPipelineBundleContracts.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:23.5331292Z [ 26%] Linking CXX executable horde_rt_pipeline_variant_provider_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:23.5846353Z [ 26%] Built target horde_rt_pipeline_variant_provider_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:23.5917921Z [ 26%] Building CXX object CMakeFiles/horde_rtpv_0_0_obj.dir/src/vulkan/raytracing/RtPipelineVariantProvider.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:23.7372806Z [ 27%] Building CXX object CMakeFiles/horde_rt_pipeline_bundle_contracts_tests.dir/src/vulkan/raytracing/RtPipelineVariants.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:24.0870648Z [ 27%] Building CXX object CMakeFiles/horde_rt_pipeline_bundle_contracts_tests.dir/src/vulkan/raytracing/RtPipelineVariantProvider.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:24.3352005Z [ 27%] Built target horde_rtpv_0_0_obj
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:24.3426012Z [ 28%] Building CXX object CMakeFiles/horde_rtpv_0_1_obj.dir/src/vulkan/raytracing/RtPipelineVariantProvider.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:24.8217289Z [ 29%] Linking CXX executable horde_rt_pipeline_bundle_contracts_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:24.8732762Z [ 29%] Built target horde_rt_pipeline_bundle_contracts_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:24.8802970Z [ 30%] Building CXX object CMakeFiles/horde_rtpv_1_0_obj.dir/src/vulkan/raytracing/RtPipelineVariantProvider.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:25.0847870Z [ 30%] Built target horde_rtpv_0_1_obj
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:25.0910665Z [ 31%] Building CXX object CMakeFiles/horde_rtpv_1_1_obj.dir/src/vulkan/raytracing/RtPipelineVariantProvider.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:25.6230446Z [ 31%] Built target horde_rtpv_1_0_obj
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:25.6304427Z [ 32%] Building CXX object CMakeFiles/horde_rt_github_release_updater_tests.dir/tests/GitHubReleaseUpdaterTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:25.8385338Z [ 32%] Built target horde_rtpv_1_1_obj
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:25.8456170Z [ 33%] Building CXX object CMakeFiles/horde_rt_version_contract_tests.dir/tests/VersionContractTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:26.3685371Z [ 34%] Building CXX object CMakeFiles/horde_rt_github_release_updater_tests.dir/src/update/GitHubReleaseUpdater.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:28.1466112Z [ 34%] Linking CXX executable horde_rt_github_release_updater_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:28.1947904Z [ 34%] Built target horde_rt_github_release_updater_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:28.2019447Z [ 34%] Building CXX object CMakeFiles/horde_rt_version_contract_incremental_configure_tests.dir/tests/VersionContractIncrementalConfigureTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:29.8443077Z [ 35%] Linking CXX executable horde_rt_version_contract_incremental_configure_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:29.8917731Z [ 35%] Built target horde_rt_version_contract_incremental_configure_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:29.8989921Z [ 36%] Building CXX object CMakeFiles/horde_rt_dielectric_math_tests.dir/tests/DielectricMathTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:30.3085278Z [ 36%] Linking CXX executable horde_rt_version_contract_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:30.3611163Z [ 36%] Built target horde_rt_version_contract_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:30.3686149Z [ 37%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/tests/PlayerAnimationTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:31.3346858Z [ 38%] Linking CXX executable horde_rt_dielectric_math_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:31.3860596Z [ 38%] Built target horde_rt_dielectric_math_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:31.3931994Z [ 39%] Building CXX object CMakeFiles/horde_rt_fire_emitter_tests.dir/tests/FireEmitterTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:31.6306944Z [ 39%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:32.2691885Z [ 40%] Building CXX object CMakeFiles/horde_rt_fire_emitter_tests.dir/src/vulkan/raytracing/FireEmitterBuffer.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:32.8939274Z [ 41%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/src/scene/assets/SkinnedMeshAsset.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:33.1220817Z [ 41%] Linking CXX executable horde_rt_fire_emitter_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:33.1740983Z [ 41%] Built target horde_rt_fire_emitter_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:33.1812393Z [ 42%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/tests/HeldItemSocketTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:34.7275260Z [ 42%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/AssetManifest.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:36.2758823Z [ 43%] Building CXX object CMakeFiles/horde_rt_player_animation_tests.dir/src/vulkan/raytracing/PlayerRenderSlot.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:37.3185607Z [ 44%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/AssetValidation.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:37.8592720Z [ 45%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/GltfDocument.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:38.2134106Z [ 45%] Linking CXX executable horde_rt_player_animation_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:38.2694822Z [ 45%] Built target horde_rt_player_animation_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:38.2768885Z [ 46%] Building CXX object CMakeFiles/horde_rt_development_static_asset_tests.dir/tests/DevelopmentStaticAssetTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:39.2991558Z [ 46%] Linking CXX executable horde_rt_development_static_asset_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:39.3547649Z [ 46%] Built target horde_rt_development_static_asset_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:39.3634321Z [ 47%] Building CXX object CMakeFiles/horde_rt_scene_abi_tests.dir/tests/RtSceneAbiTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:40.4915617Z [ 47%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:40.5538609Z [ 47%] Building CXX object CMakeFiles/horde_rt_scene_abi_tests.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:42.4382534Z [ 48%] Building CXX object CMakeFiles/horde_rt_scene_abi_tests.dir/src/vulkan/raytracing/RtTextureArrays.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:42.6950346Z [ 49%] Linking CXX executable horde_rt_scene_abi_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:42.7439806Z [ 49%] Built target horde_rt_scene_abi_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:42.7513465Z [ 49%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/tests/StaticGltfAssetTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:44.7083704Z [ 50%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/vulkan/raytracing/HeldItemRenderSlot.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:44.7814891Z [ 51%] Building CXX object CMakeFiles/horde_rt_held_item_socket_tests.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:46.6545234Z [ 51%] Linking CXX executable horde_rt_held_item_socket_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:46.7094903Z [ 51%] Built target horde_rt_held_item_socket_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:46.7168592Z [ 52%] Building CXX object CMakeFiles/horde_rt_production_prop_asset_tests.dir/tests/ProductionPropAssetTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:47.2538754Z [ 53%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/AssetManifest.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:49.8505078Z [ 54%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/AssetValidation.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:49.9694710Z [ 54%] Building CXX object CMakeFiles/horde_rt_production_prop_asset_tests.dir/src/scene/assets/AssetManifest.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:50.3828672Z [ 55%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/GltfDocument.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:52.5419810Z [ 56%] Building CXX object CMakeFiles/horde_rt_production_prop_asset_tests.dir/src/scene/assets/AssetValidation.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:52.9857444Z [ 56%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:53.0698514Z [ 57%] Building CXX object CMakeFiles/horde_rt_production_prop_asset_tests.dir/src/scene/assets/GltfDocument.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:55.7021404Z [ 57%] Building CXX object CMakeFiles/horde_rt_production_prop_asset_tests.dir/src/scene/assets/StaticMeshAsset.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:56.8345210Z [ 58%] Building CXX object CMakeFiles/horde_rt_static_gltf_asset_tests.dir/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:58.7355374Z [ 59%] Linking CXX executable horde_rt_static_gltf_asset_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:58.7910630Z [ 59%] Built target horde_rt_static_gltf_asset_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:58.7982540Z [ 60%] Building CXX object CMakeFiles/horde_rt_simulation_timing_tests.dir/tests/SimulationTimingTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:59.5611753Z [ 61%] Linking CXX executable horde_rt_production_prop_asset_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:59.6157630Z [ 61%] Built target horde_rt_production_prop_asset_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:59.6230684Z [ 61%] Building CXX object CMakeFiles/horde_rt_simulation_gameplay_tests.dir/tests/SimulationGameplayTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:59.6843574Z [ 61%] Linking CXX executable horde_rt_simulation_timing_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:59.7382962Z [ 61%] Built target horde_rt_simulation_timing_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:37:59.7455419Z [ 62%] Building CXX object CMakeFiles/horde_rt_lantern_reward_tests.dir/tests/LanternRewardTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:00.7637803Z [ 63%] Linking CXX executable horde_rt_lantern_reward_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:00.8180224Z [ 63%] Built target horde_rt_lantern_reward_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:00.8249248Z [ 64%] Building CXX object CMakeFiles/horde_rt_lantern_pendulum_tests.dir/tests/LanternPendulumTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:01.1446098Z [ 65%] Linking CXX executable horde_rt_simulation_gameplay_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:01.1980890Z [ 65%] Built target horde_rt_simulation_gameplay_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:01.2052616Z [ 66%] Building CXX object CMakeFiles/horde_rt_input_mailbox_stress.dir/tests/InputMailboxStress.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:01.6759158Z [ 66%] Linking CXX executable horde_rt_lantern_pendulum_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:01.7299451Z [ 66%] Built target horde_rt_lantern_pendulum_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:01.7370604Z [ 67%] Building CXX object CMakeFiles/horde_rt_desktop_controller_input_tests.dir/tests/DesktopControllerInputTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:02.2509154Z [ 68%] Linking CXX executable horde_rt_input_mailbox_stress
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:02.3024449Z [ 68%] Built target horde_rt_input_mailbox_stress
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:02.3096339Z [ 69%] Building CXX object CMakeFiles/horde_rt_gpu_timestamp_math_tests.dir/tests/GpuTimestampMathTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:02.6010502Z [ 70%] Linking CXX executable horde_rt_desktop_controller_input_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:02.6497270Z [ 70%] Built target horde_rt_desktop_controller_input_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:02.6568057Z [ 71%] Building CXX object CMakeFiles/horde_rt_combat_smoke.dir/tests/SwordCombatSmoke.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:02.7355683Z [ 72%] Linking CXX executable horde_rt_gpu_timestamp_math_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:02.7847828Z [ 72%] Built target horde_rt_gpu_timestamp_math_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:02.7927348Z [ 73%] Building CXX object CMakeFiles/horde_rt_showcase_route_smoke.dir/tests/ShowcaseRouteSmoke.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:03.9780184Z [ 74%] Linking CXX executable horde_rt_showcase_route_smoke
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:04.0307062Z [ 74%] Built target horde_rt_showcase_route_smoke
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:04.0377699Z [ 75%] Building CXX object CMakeFiles/horde_rt_showcase_gameplay_smoke.dir/tests/ShowcaseGameplaySmoke.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:04.0542122Z [ 75%] Linking CXX executable horde_rt_combat_smoke
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:04.1059469Z [ 75%] Built target horde_rt_combat_smoke
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:04.1131015Z [ 76%] Building CXX object CMakeFiles/horde_rt_spatial_audio_smoke.dir/tests/SpatialAudioSmoke.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:05.3684257Z [ 77%] Linking CXX executable horde_rt_spatial_audio_smoke
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:05.4209985Z [ 77%] Built target horde_rt_spatial_audio_smoke
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:05.4281844Z [ 77%] Building CXX object CMakeFiles/horde_rt_lantern_benchmark_tests.dir/tests/LanternBenchmarkTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:05.4613323Z [ 77%] Linking CXX executable horde_rt_showcase_gameplay_smoke
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:05.5138730Z [ 77%] Built target horde_rt_showcase_gameplay_smoke
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:05.5211410Z [ 77%] Building CXX object CMakeFiles/horde_rt_benchmark_evidence_report_tests.dir/tests/RtBenchmarkEvidenceReportTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:06.3891851Z [ 78%] Building CXX object CMakeFiles/horde_rt_lantern_benchmark_tests.dir/src/gameplay/ShowcaseBenchmark.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:06.5622669Z [ 79%] Building CXX object CMakeFiles/horde_rt_benchmark_evidence_report_tests.dir/src/gameplay/ShowcaseBenchmark.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:07.9119732Z [ 80%] Building CXX object CMakeFiles/horde_rt_lantern_benchmark_tests.dir/src/telemetry/RtBenchmarkEvidenceReport.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:08.0701513Z [ 81%] Building CXX object CMakeFiles/horde_rt_benchmark_evidence_report_tests.dir/src/telemetry/RtBenchmarkEvidenceReport.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:09.0471186Z [ 82%] Building CXX object CMakeFiles/horde_rt_lantern_benchmark_tests.dir/src/telemetry/RtBenchmarkEvidenceRun.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:09.1958078Z [ 83%] Building CXX object CMakeFiles/horde_rt_benchmark_evidence_report_tests.dir/src/telemetry/RtBenchmarkEvidenceRun.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:09.7506289Z [ 83%] Building CXX object CMakeFiles/horde_rt_lantern_benchmark_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:09.8910851Z [ 83%] Building CXX object CMakeFiles/horde_rt_benchmark_evidence_report_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:11.0134322Z [ 84%] Linking CXX executable horde_rt_lantern_benchmark_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:11.0691424Z [ 84%] Built target horde_rt_lantern_benchmark_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:11.0770037Z [ 85%] Building CXX object CMakeFiles/horde_rt_benchmark_evidence_run_tests.dir/tests/RtBenchmarkEvidenceRunTests.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:11.1916381Z [ 86%] Linking CXX executable horde_rt_benchmark_evidence_report_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:11.2449004Z [ 86%] Built target horde_rt_benchmark_evidence_report_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:11.2521867Z [ 87%] Building CXX object CMakeFiles/horde_rt_provider_shipping_mobile_fixture.dir/tests/RtPipelineVariantFixture.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:11.8291904Z [ 88%] Building CXX object CMakeFiles/horde_rt_provider_shipping_mobile_fixture.dir/src/vulkan/raytracing/RtPipelineBundleContracts.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:12.2292787Z [ 88%] Building CXX object CMakeFiles/horde_rt_benchmark_evidence_run_tests.dir/src/telemetry/RtBenchmarkEvidenceRun.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:12.7536856Z [ 88%] Building CXX object CMakeFiles/horde_rt_provider_shipping_mobile_fixture.dir/src/vulkan/raytracing/RtPipelineVariants.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:12.9307832Z [ 89%] Building CXX object CMakeFiles/horde_rt_benchmark_evidence_run_tests.dir/src/telemetry/RtBenchmarkEvidenceReport.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:13.1061745Z [ 90%] Linking CXX executable horde_rt_provider_shipping_mobile_fixture
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:13.1589816Z [ 90%] Built target horde_rt_provider_shipping_mobile_fixture
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:13.1662597Z [ 91%] Building CXX object CMakeFiles/horde_rt_provider_shipping_high_fixture.dir/tests/RtPipelineVariantFixture.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:13.7451354Z [ 92%] Building CXX object CMakeFiles/horde_rt_provider_shipping_high_fixture.dir/src/vulkan/raytracing/RtPipelineBundleContracts.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:14.0632660Z [ 93%] Building CXX object CMakeFiles/horde_rt_benchmark_evidence_run_tests.dir/src/telemetry/RtPerformanceEvidence.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:14.6695548Z [ 94%] Building CXX object CMakeFiles/horde_rt_provider_shipping_high_fixture.dir/src/vulkan/raytracing/RtPipelineVariants.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:15.0137699Z [ 94%] Linking CXX executable horde_rt_provider_shipping_high_fixture
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:15.0647350Z [ 94%] Built target horde_rt_provider_shipping_high_fixture
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:15.0719746Z [ 94%] Building CXX object CMakeFiles/horde_rt_provider_diagnostic_mobile_fixture.dir/tests/RtPipelineVariantFixture.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:15.3324646Z [ 94%] Building CXX object CMakeFiles/horde_rt_benchmark_evidence_run_tests.dir/src/gameplay/ShowcaseBenchmark.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:15.6485970Z [ 95%] Building CXX object CMakeFiles/horde_rt_provider_diagnostic_mobile_fixture.dir/src/vulkan/raytracing/RtPipelineBundleContracts.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:16.5655472Z [ 96%] Building CXX object CMakeFiles/horde_rt_provider_diagnostic_mobile_fixture.dir/src/vulkan/raytracing/RtPipelineVariants.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:16.8459735Z [ 97%] Linking CXX executable horde_rt_benchmark_evidence_run_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:16.9007983Z [ 97%] Built target horde_rt_benchmark_evidence_run_tests
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:16.9081460Z [ 98%] Building CXX object CMakeFiles/horde_rt_provider_diagnostic_high_fixture.dir/tests/RtPipelineVariantFixture.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:16.9138922Z [ 98%] Linking CXX executable horde_rt_provider_diagnostic_mobile_fixture
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:16.9643872Z [ 98%] Built target horde_rt_provider_diagnostic_mobile_fixture
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:16.9666957Z [ 98%] Building CXX object CMakeFiles/horde_rt_provider_diagnostic_high_fixture.dir/src/vulkan/raytracing/RtPipelineBundleContracts.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:17.4942240Z [ 99%] Building CXX object CMakeFiles/horde_rt_provider_diagnostic_high_fixture.dir/src/vulkan/raytracing/RtPipelineVariants.cpp.o
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:17.8903011Z [100%] Linking CXX executable horde_rt_provider_diagnostic_high_fixture
+shared-gameplay	Build shared gameplay tests	2026-09-30T07:38:17.9392418Z [100%] Built target horde_rt_provider_diagnostic_high_fixture
+shared-gameplay	Run shared gameplay tests	﻿2026-09-30T07:38:17.9535422Z ##[group]Run ctest --test-dir build/host-ci --build-config Release --output-on-failure
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:17.9536104Z ^[[36;1mctest --test-dir build/host-ci --build-config Release --output-on-failure^[[0m
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:17.9600192Z shell: /usr/bin/bash -e {0}
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:17.9600454Z ##[endgroup]
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:17.9908937Z Internal ctest changing into directory: /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/build/host-ci
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:17.9967155Z Test project /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/build/host-ci
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:18.0020113Z       Start  1: horde_rt_player_primitive_contract_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:18.0041166Z  1/45 Test  #1: horde_rt_player_primitive_contract_tests ................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:18.0051368Z       Start  2: horde_rt_raygen_artifact_ownership_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:19.0105248Z  2/45 Test  #2: horde_rt_raygen_artifact_ownership_tests ................   Passed    1.01 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:19.0110151Z       Start  3: horde_rt_player_manifest_agreement_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:19.9382268Z  3/45 Test  #3: horde_rt_player_manifest_agreement_tests ................   Passed    0.93 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:19.9383570Z       Start  4: horde_rt_player_package_inventory_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9463952Z  4/45 Test  #4: horde_rt_player_package_inventory_tests .................   Passed    1.01 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9464901Z       Start  5: horde_rt_lantern_benchmark_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9599269Z  5/45 Test  #5: horde_rt_lantern_benchmark_tests ........................   Passed    0.01 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9600641Z       Start  6: horde_rt_benchmark_evidence_report_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9629372Z  6/45 Test  #6: horde_rt_benchmark_evidence_report_tests ................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9630655Z       Start  7: horde_rt_windows_benchmark_launch_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9645995Z  7/45 Test  #7: horde_rt_windows_benchmark_launch_tests .................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9647198Z       Start  8: horde_rt_benchmark_evidence_run_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9728755Z  8/45 Test  #8: horde_rt_benchmark_evidence_run_tests ...................   Passed    0.01 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9730059Z       Start  9: horde_rt_evidence_publication_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9746763Z  9/45 Test  #9: horde_rt_evidence_publication_tests .....................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9747935Z       Start 10: horde_rt_ray_tracing_requirements_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9762479Z 10/45 Test #10: horde_rt_ray_tracing_requirements_tests .................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:20.9763831Z       Start 11: horde_rt_performance_evidence_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2629116Z 11/45 Test #11: horde_rt_performance_evidence_tests .....................   Passed    0.29 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2630415Z       Start 12: horde_rt_scene_record_observation_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2649712Z 12/45 Test #12: horde_rt_scene_record_observation_tests .................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2650928Z       Start 13: horde_rt_pipeline_variants_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2666837Z 13/45 Test #13: horde_rt_pipeline_variants_tests ........................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2668323Z       Start 14: horde_rt_pipeline_variant_provider_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2683659Z 14/45 Test #14: horde_rt_pipeline_variant_provider_tests ................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2684856Z       Start 15: horde_rt_pipeline_bundle_contracts_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2852483Z 15/45 Test #15: horde_rt_pipeline_bundle_contracts_tests ................   Passed    0.02 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2853694Z       Start 16: horde_rt_provider_shipping_mobile_fixture
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2906196Z 16/45 Test #16: horde_rt_provider_shipping_mobile_fixture ...............   Passed    0.01 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:21.2907801Z       Start 17: horde_rt_provider_shipping_mobile_fixture_evidence
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:37.1514517Z 17/45 Test #17: horde_rt_provider_shipping_mobile_fixture_evidence ......   Passed   15.86 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:37.1516194Z       Start 18: horde_rt_provider_shipping_high_fixture
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:37.1576020Z 18/45 Test #18: horde_rt_provider_shipping_high_fixture .................   Passed    0.01 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:37.1577839Z       Start 19: horde_rt_provider_shipping_high_fixture_evidence
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:52.2517885Z 19/45 Test #19: horde_rt_provider_shipping_high_fixture_evidence ........   Passed   15.09 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:52.2518970Z       Start 20: horde_rt_provider_diagnostic_mobile_fixture
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:52.2576226Z 20/45 Test #20: horde_rt_provider_diagnostic_mobile_fixture .............   Passed    0.01 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:38:52.2577849Z       Start 21: horde_rt_provider_diagnostic_mobile_fixture_evidence
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:07.5656947Z 21/45 Test #21: horde_rt_provider_diagnostic_mobile_fixture_evidence ....   Passed   15.31 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:07.5659550Z       Start 22: horde_rt_provider_diagnostic_high_fixture
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:07.5716843Z 22/45 Test #22: horde_rt_provider_diagnostic_high_fixture ...............   Passed    0.01 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:07.5718092Z       Start 23: horde_rt_provider_diagnostic_high_fixture_evidence
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:22.9866074Z 23/45 Test #23: horde_rt_provider_diagnostic_high_fixture_evidence ......   Passed   15.41 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:22.9867241Z       Start 24: horde_rt_github_release_updater_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:22.9889180Z 24/45 Test #24: horde_rt_github_release_updater_tests ...................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:22.9890352Z       Start 25: horde_rt_version_contract_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:22.9985142Z 25/45 Test #25: horde_rt_version_contract_tests .........................   Passed    0.01 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:22.9986333Z       Start 26: horde_rt_version_contract_incremental_configure_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3093185Z 26/45 Test #26: horde_rt_version_contract_incremental_configure_tests ...   Passed    2.31 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3096103Z       Start 27: horde_rt_dielectric_math_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3170735Z 27/45 Test #27: horde_rt_dielectric_math_tests ..........................   Passed    0.01 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3172103Z       Start 28: horde_rt_player_animation_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3198756Z 28/45 Test #28: horde_rt_player_animation_tests .........................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3200126Z       Start 29: horde_rt_fire_emitter_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3222374Z 29/45 Test #29: horde_rt_fire_emitter_tests .............................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3223646Z       Start 30: horde_rt_held_item_socket_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3754599Z 30/45 Test #30: horde_rt_held_item_socket_tests .........................   Passed    0.05 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3755873Z       Start 31: horde_rt_development_static_asset_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3779047Z 31/45 Test #31: horde_rt_development_static_asset_tests .................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3780354Z       Start 32: horde_rt_scene_abi_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3798328Z 32/45 Test #32: horde_rt_scene_abi_tests ................................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.3799627Z       Start 33: horde_rt_static_gltf_asset_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4109260Z 33/45 Test #33: horde_rt_static_gltf_asset_tests ........................   Passed    0.03 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4111160Z       Start 34: horde_rt_production_prop_asset_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4428914Z 34/45 Test #34: horde_rt_production_prop_asset_tests ....................   Passed    0.03 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4431137Z       Start 35: horde_rt_simulation_timing_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4462357Z 35/45 Test #35: horde_rt_simulation_timing_tests ........................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4464323Z       Start 36: horde_rt_simulation_gameplay_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4525372Z 36/45 Test #36: horde_rt_simulation_gameplay_tests ......................   Passed    0.01 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4527330Z       Start 37: horde_rt_lantern_reward_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4544546Z 37/45 Test #37: horde_rt_lantern_reward_tests ...........................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4546121Z       Start 38: horde_rt_lantern_pendulum_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4569145Z 38/45 Test #38: horde_rt_lantern_pendulum_tests .........................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.4571102Z       Start 39: horde_rt_input_mailbox_stress
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5197490Z 39/45 Test #39: horde_rt_input_mailbox_stress ...........................   Passed    0.06 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5216141Z       Start 40: horde_rt_desktop_controller_input_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5231020Z 40/45 Test #40: horde_rt_desktop_controller_input_tests .................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5232903Z       Start 41: horde_rt_gpu_timestamp_math_tests
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5248889Z 41/45 Test #41: horde_rt_gpu_timestamp_math_tests .......................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5250513Z       Start 42: horde_rt_combat_smoke
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5271580Z 42/45 Test #42: horde_rt_combat_smoke ...................................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5273337Z       Start 43: horde_rt_showcase_route_smoke
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5289167Z 43/45 Test #43: horde_rt_showcase_route_smoke ...........................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5290938Z       Start 44: horde_rt_showcase_gameplay_smoke
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5307777Z 44/45 Test #44: horde_rt_showcase_gameplay_smoke ........................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5309219Z       Start 45: horde_rt_spatial_audio_smoke
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5342735Z 45/45 Test #45: horde_rt_spatial_audio_smoke ............................   Passed    0.00 sec
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5347515Z 
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5347744Z 100% tests passed, 0 tests failed out of 45
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5348074Z 
+shared-gameplay	Run shared gameplay tests	2026-09-30T07:39:25.5348259Z Total Test time (real) =  67.54 sec
+shared-gameplay	Check offline gauntlet chirality and UV winding	﻿2026-09-30T07:39:25.5419295Z ##[group]Run python3 -m unittest discover -s tests -p test_player_gauntlet_geometry.py -v
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.5419937Z ^[[36;1mpython3 -m unittest discover -s tests -p test_player_gauntlet_geometry.py -v^[[0m
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.5481885Z shell: /usr/bin/bash -e {0}
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.5482138Z ##[endgroup]
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.6177725Z test_invalid_chirality_is_rejected (test_player_gauntlet_geometry.GauntletGeometryTests.test_invalid_chirality_is_rejected) ... ok
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.6179875Z test_legacy_uv_mode_is_explicit_not_default (test_player_gauntlet_geometry.GauntletGeometryTests.test_legacy_uv_mode_is_explicit_not_default) ... ok
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.6181938Z test_mirror_preserves_vertex_to_uv_correspondence (test_player_gauntlet_geometry.GauntletGeometryTests.test_mirror_preserves_vertex_to_uv_correspondence) ... ok
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.6183812Z test_mismatched_corner_roster_is_rejected (test_player_gauntlet_geometry.GauntletGeometryTests.test_mismatched_corner_roster_is_rejected) ... ok
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.6185239Z test_right_source_is_mirrored_only_for_left_hand (test_player_gauntlet_geometry.GauntletGeometryTests.test_right_source_is_mirrored_only_for_left_hand) ... ok
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.6186800Z test_unmirrored_source_preserves_all_corners (test_player_gauntlet_geometry.GauntletGeometryTests.test_unmirrored_source_preserves_all_corners) ... ok
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.6187550Z 
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.6187725Z ----------------------------------------------------------------------
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.6188159Z Ran 6 tests in 0.000s
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.6188317Z 
+shared-gameplay	Check offline gauntlet chirality and UV winding	2026-09-30T07:39:25.6188410Z OK
+shared-gameplay	Check exact player cloth seam weight transfers	﻿2026-09-30T07:39:25.6280331Z ##[group]Run python3 -m unittest discover -s tests -p test_player_sleeve_seams.py -v
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6280948Z ^[[36;1mpython3 -m unittest discover -s tests -p test_player_sleeve_seams.py -v^[[0m
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6342787Z shell: /usr/bin/bash -e {0}
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6343044Z ##[endgroup]
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6938245Z test_conflicting_coincident_view_endpoint_records_fail (test_player_sleeve_seams.PlayerSleeveSeamTests.test_conflicting_coincident_view_endpoint_records_fail) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6943806Z test_explicit_body_remainder_preserves_the_same_cloth_seam (test_player_sleeve_seams.PlayerSleeveSeamTests.test_explicit_body_remainder_preserves_the_same_cloth_seam) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6945724Z test_invalid_face_index_fails (test_player_sleeve_seams.PlayerSleeveSeamTests.test_invalid_face_index_fails) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6949653Z test_negative_or_unnormalized_weight_fails (test_player_sleeve_seams.PlayerSleeveSeamTests.test_negative_or_unnormalized_weight_fails) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6951455Z test_nonfinite_position_fails (test_player_sleeve_seams.PlayerSleeveSeamTests.test_nonfinite_position_fails) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6955576Z test_nonmanifold_and_degenerate_sleeve_edges_fail (test_player_sleeve_seams.PlayerSleeveSeamTests.test_nonmanifold_and_degenerate_sleeve_edges_fail) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6963173Z test_retained_world_authoring_roundoff_does_not_relax_canonical_weights (test_player_sleeve_seams.PlayerSleeveSeamTests.test_retained_world_authoring_roundoff_does_not_relax_canonical_weights) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6967419Z test_transfers_canonical_shared_boundary_weights_without_mutating_inputs (test_player_sleeve_seams.PlayerSleeveSeamTests.test_transfers_canonical_shared_boundary_weights_without_mutating_inputs) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6969555Z test_unknown_view_bone_name_fails (test_player_sleeve_seams.PlayerSleeveSeamTests.test_unknown_view_bone_name_fails) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6974356Z test_unshared_and_no_nearface_edges_do_not_transfer (test_player_sleeve_seams.PlayerSleeveSeamTests.test_unshared_and_no_nearface_edges_do_not_transfer) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6976442Z test_unused_vertices_may_have_no_deform_weights (test_player_sleeve_seams.PlayerSleeveSeamTests.test_unused_vertices_may_have_no_deform_weights) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6979122Z test_vertices_shared_with_head_or_gauntlet_are_excluded (test_player_sleeve_seams.PlayerSleeveSeamTests.test_vertices_shared_with_head_or_gauntlet_are_excluded) ... ok
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6980184Z 
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6980416Z ----------------------------------------------------------------------
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6980941Z Ran 12 tests in 0.005s
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6981158Z 
+shared-gameplay	Check exact player cloth seam weight transfers	2026-09-30T07:39:25.6981284Z OK
+shared-gameplay	Check upper torso partition preserves the head mask	﻿2026-09-30T07:39:25.7083548Z ##[group]Run python3 -m unittest discover -s tests -p test_player_body_partition.py -v
+shared-gameplay	Check upper torso partition preserves the head mask	2026-09-30T07:39:25.7084215Z ^[[36;1mpython3 -m unittest discover -s tests -p test_player_body_partition.py -v^[[0m
+shared-gameplay	Check upper torso partition preserves the head mask	2026-09-30T07:39:25.7145545Z shell: /usr/bin/bash -e {0}
+shared-gameplay	Check upper torso partition preserves the head mask	2026-09-30T07:39:25.7145803Z ##[endgroup]
+shared-gameplay	Check upper torso partition preserves the head mask	2026-09-30T07:39:25.7675286Z test_invalid_or_incompatible_landmarks_reject (test_player_body_partition.BodyPartitionTests.test_invalid_or_incompatible_landmarks_reject) ... ok
+shared-gameplay	Check upper torso partition preserves the head mask	2026-09-30T07:39:25.7676967Z test_origin_and_scale_are_explicit (test_player_body_partition.BodyPartitionTests.test_origin_and_scale_are_explicit) ... ok
+shared-gameplay	Check upper torso partition preserves the head mask	2026-09-30T07:39:25.7678113Z test_retains_the_original_head_mask (test_player_body_partition.BodyPartitionTests.test_retains_the_original_head_mask) ... ok
+shared-gameplay	Check upper torso partition preserves the head mask	2026-09-30T07:39:25.7678730Z 
+shared-gameplay	Check upper torso partition preserves the head mask	2026-09-30T07:39:25.7678919Z ----------------------------------------------------------------------
+shared-gameplay	Check upper torso partition preserves the head mask	2026-09-30T07:39:25.7679332Z Ran 3 tests in 0.000s
+shared-gameplay	Check upper torso partition preserves the head mask	2026-09-30T07:39:25.7679503Z 
+shared-gameplay	Check upper torso partition preserves the head mask	2026-09-30T07:39:25.7679638Z OK
+shared-gameplay	Check bounded segmented cloth seam plans	﻿2026-09-30T07:39:25.7770709Z ##[group]Run python3 -m unittest discover -s tests -p test_player_segmented_seams.py -v
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.7771349Z ^[[36;1mpython3 -m unittest discover -s tests -p test_player_segmented_seams.py -v^[[0m
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.7832413Z shell: /usr/bin/bash -e {0}
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.7832673Z ##[endgroup]
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8385096Z test_already_matching_segments_need_no_split (test_player_segmented_seams.SegmentedSeamTests.test_already_matching_segments_need_no_split) ... ok
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8387180Z test_nearby_but_not_coincident_edge_is_not_welded (test_player_segmented_seams.SegmentedSeamTests.test_nearby_but_not_coincident_edge_is_not_welded) ... ok
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8388797Z test_no_body_primary_backing_does_not_authorize_a_split (test_player_segmented_seams.SegmentedSeamTests.test_no_body_primary_backing_does_not_authorize_a_split) ... ok
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8390551Z test_partial_cloth_coverage_rejects (test_player_segmented_seams.SegmentedSeamTests.test_partial_cloth_coverage_rejects) ... ok
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8393584Z test_plans_only_canonical_midpoint_without_mutating_inputs (test_player_segmented_seams.SegmentedSeamTests.test_plans_only_canonical_midpoint_without_mutating_inputs) ... ok
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8395559Z test_protected_vertex_rejects (test_player_segmented_seams.SegmentedSeamTests.test_protected_vertex_rejects) ... ok
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8398320Z test_same_winding_rejects (test_player_segmented_seams.SegmentedSeamTests.test_same_winding_rejects) ... ok
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8398825Z 
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8398992Z ----------------------------------------------------------------------
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8399672Z Ran 7 tests in 0.002s
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8399826Z 
+shared-gameplay	Check bounded segmented cloth seam plans	2026-09-30T07:39:25.8399912Z OK
+shared-gameplay	Check Gradle APK artifact resolution	﻿2026-09-30T07:39:25.8497645Z ##[group]Run ./tools/test-resolve-android-apk.ps1
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:25.8498069Z ^[[36;1m./tools/test-resolve-android-apk.ps1^[[0m
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:25.8523760Z shell: /usr/bin/pwsh -command ". '{0}'"
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:25.8524068Z ##[endgroup]
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:26.3494390Z PASS normal Gradle output
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:26.3736442Z PASS redirected intermediates output
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:26.3958668Z PASS wrong variant (rejected)
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:26.4026142Z PASS wrong artifact type (rejected)
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:26.4082341Z PASS missing output element (rejected)
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:26.4141518Z PASS multiple output elements (rejected)
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:26.4197070Z PASS missing APK file (rejected)
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:26.4249306Z PASS filename path traversal (rejected)
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:26.4299734Z PASS escaped listing path (rejected)
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:26.4351399Z PASS duplicate redirect entries (rejected)
+shared-gameplay	Check Gradle APK artifact resolution	2026-09-30T07:39:26.4360694Z All 10 resolver cases passed.
+shared-gameplay	Check Android combat capture expectations	﻿2026-09-30T07:39:26.4917840Z ##[group]Run ./tests/AndroidCombatCaptureExpectations.ps1
+shared-gameplay	Check Android combat capture expectations	2026-09-30T07:39:26.4918333Z ^[[36;1m./tests/AndroidCombatCaptureExpectations.ps1^[[0m
+shared-gameplay	Check Android combat capture expectations	2026-09-30T07:39:26.4942691Z shell: /usr/bin/pwsh -command ". '{0}'"
+shared-gameplay	Check Android combat capture expectations	2026-09-30T07:39:26.4942984Z ##[endgroup]
+shared-gameplay	Check Android combat capture expectations	2026-09-30T07:39:27.0397758Z Android combat capture expectations: 34 cases passed.
+shared-gameplay	Check Android combat capture expectations	2026-09-30T07:39:27.0692049Z Android gameplay versus isolated-glass ownership: 16 cases passed.
+shared-gameplay	Post Check out source	﻿2026-09-30T07:39:27.1286199Z Post job cleanup.
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2179099Z [command]/usr/bin/git version
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2226326Z git version 2.55.0
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2272240Z Temporarily overriding HOME='/home/runner/work/_temp/22cc820b-8ea5-40ca-9844-810870d4d050' before making global git config changes
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2273638Z Adding repository directory to the temporary git global config as a safe directory
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2279747Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2319022Z Removing SSH command configuration
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2326614Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2372132Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2629665Z Removing HTTP extra header
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2636886Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2674557Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2948885Z Removing includeIf entries pointing to credentials config files
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2957326Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2992075Z includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2993312Z includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2994415Z includeif.gitdir:/github/workspace/.git.path
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.2995272Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3003790Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3034742Z /home/runner/work/_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3050419Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git.path /home/runner/work/_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3099825Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3129498Z /home/runner/work/_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3142012Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/The-Horde-RT-demo/The-Horde-RT-demo/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3184185Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3212771Z /github/runner_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3222458Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3261339Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3287224Z /github/runner_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3295964Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3341415Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+shared-gameplay	Post Check out source	2026-09-30T07:39:27.3568327Z Removing credentials config '/home/runner/work/_temp/git-credentials-1f24aa9d-2634-4002-9f58-ad1ec8f42729.config'
+shared-gameplay	Complete job	﻿2026-09-30T07:39:27.3711676Z Cleaning up orphan processes

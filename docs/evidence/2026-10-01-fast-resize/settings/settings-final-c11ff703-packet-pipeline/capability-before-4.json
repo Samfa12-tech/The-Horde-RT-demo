@@ -1,0 +1,53 @@
+{
+  "backend": "Vulkan",
+  "rtMode": "RayTracingPipeline",
+  "executionBackend": "RayTracingPipeline",
+  "gpuName": "Adreno (TM) 840",
+  "vendorId": 20803,
+  "deviceId": 1141180977,
+  "driverVersion": 2150932499,
+  "driverVersionText": "512.842.19",
+  "vulkanApiVersion": 4210983,
+  "vulkanApiVersionText": "1.4.295",
+  "extensions": {
+    "VK_KHR_acceleration_structure": true,
+    "VK_KHR_ray_tracing_pipeline": true,
+    "VK_KHR_ray_query": true,
+    "VK_KHR_buffer_device_address": true,
+    "VK_KHR_deferred_host_operations": true
+  },
+  "features": {
+    "accelerationStructure": true,
+    "rayTracingPipeline": true,
+    "rayQuery": true,
+    "bufferDeviceAddress": true
+  },
+  "internalRenderResolution": {
+    "width": 720,
+    "height": 1490
+  },
+  "fps": 28.095760,
+  "frameTimeMs": 35.592560,
+  "gpuRtTiming": {
+    "status": "GPU RT command-buffer timing is available.",
+    "supported": true,
+    "valid": true,
+    "latestMs": 35.340157,
+    "averageMs": 35.144142,
+    "timestampPeriodNanoseconds": 52.0833,
+    "timestampValidBits": 48,
+    "sampleCount": 29,
+    "unavailableCount": 0,
+    "errorCount": 0
+  },
+  "rtScene": {
+    "status": "Presented via swapchain",
+    "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+    "dispatchWidth": 720,
+    "dispatchHeight": 1490,
+    "presented": true
+  },
+  "diagnostics": ["Inspecting candidate 0", "Driver version packed: 2150932499", "Driver version: 512.842.19", "Vulkan API version: 1.4.295", "RT capability mode: RayTracingPipeline"],
+  "rtFrameEvidence": {"version":1,"observerAvailable":true,"sceneEpoch":5,"measurementGeneration":1,"running":true,"paused":true,"presented":true,"diagnosticStatus":"valid","gpuStatus":"valid","completedFrameStatus":"available","completedFrameReason":null,"completedFrame":{"schema":1,"identity":{"sceneEpoch":5,"measurementGeneration":1,"recordAttemptSerial":831,"recordSerial":831,"submissionSerial":831,"completionSerial":831,"simulationTick":0,"frameSlot":0},"pipeline":{"executionBackend":"RayTracingPipeline","instrumentation":"diagnostic","dielectricQuality":"mobile","bundleKey":"diagnostic_mobile_pair","opaqueFast":{"key":"diagnostic_mobile_opaque_fast","sha256":"8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9"},"genericDielectric":{"key":"diagnostic_mobile_generic_dielectric","sha256":"9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91"},"activeStrategy":"opaque-fast","activeKey":"diagnostic_mobile_opaque_fast","activeSha256":"8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9","waterQuality":"mobile"},"dispatch":{"sceneReady":true,"rtDispatchRecorded":true,"swapchainCopyRecorded":true},"resources":{"bufferCount":45,"memoryAllocationCount":55,"bottomLevelAccelerationStructureCount":17,"topLevelAccelerationStructureCount":1,"tlasInstanceCount":21,"pipelineCount":2,"shaderBindingTableCount":2,"descriptorSetCount":1,"hostVisibleBytes":9815360,"deviceLocalBytes":71233856},"player":{"skinCadenceHz":60,"skinUpdateCount":1,"maximumSocketErrorMicrometres":10,"primaryPixelCountAvailable":true,"primaryPixelCount":52597,"primaryVisible":true},"dielectric":{"status":"valid","available":true,"compiled":true,"completedSubmissionSerial":831,"readCount":29,"resetCount":29,"counters":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,103982,51777,52597,0,0],"detail":"Diagnostic counters were collected after the owning fence."},"gpu":{"status":"valid","available":true,"completedSubmissionSerial":831,"wholeRtGpuMs":35.340155,"timestampValidBits":48,"timestampPeriodPicoseconds":52083,"sampleCount":831,"unavailableResultCount":0,"errorCount":0,"detail":"GPU RT command-buffer timing is available."},"stages":{"status":"valid","simulationStepCpuMs":0.004062,"skinCpuMs":0.000000,"playerSkinCpuMs":0.000000,"characterSkinCpuMs":0.000000,"dynamicUploadCpuMs":0.002396,"blasRefitRecordCpuMs":0.000000,"tlasUpdateRecordCpuMs":0.014635,"traceCopyRecordCpuMs":0.164583,"frameFenceWaitCpuMs":37.643959,"imageAcquireCpuMs":0.198229,"queueSubmitCpuMs":0.338646,"presentCallCpuMs":0.640313,"wholeFrameCycleCpuMs":39.687968,"workInvocationCounts":[1,0,0,0,5,0,1,1,1,1,1,1,1],"byteCounts":[0,0,0,0,4688,0,0,0,0,0,0,0,0],"operationCounts":[0,0,0,0,5,0,0,0,1,1,1,1,1]},"presentation":{"outcome":"presented","presented":true,"lastSuccessfulPresentSubmissionSerial":831,"finalIdleCompletion":false},"cpuBenchmarkEligible":false,"benchmarkEligible":false}
+}
+}

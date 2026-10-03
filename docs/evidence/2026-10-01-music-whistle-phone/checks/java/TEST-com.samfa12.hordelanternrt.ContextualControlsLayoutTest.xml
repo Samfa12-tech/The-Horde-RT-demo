@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.ContextualControlsLayoutTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-01T06:51:53" hostname="SAM_LAPPY" time="7.471">
+  <properties/>
+  <testcase name="updaterComparesDebugCandidatesUsingThePublishedBaseVersion" classname="com.samfa12.hordelanternrt.ContextualControlsLayoutTest" time="1.11"/>
+  <testcase name="maximumFontScaleContextualControlsRenderWithoutClippingOrOverlap" classname="com.samfa12.hordelanternrt.ContextualControlsLayoutTest" time="6.301"/>
+  <testcase name="rayQueryComputeLaunchRequirementIsExplicitAndDebugOnly" classname="com.samfa12.hordelanternrt.ContextualControlsLayoutTest" time="0.02"/>
+  <testcase name="debugCheckpointMappingIncludesEveryNewOwnerReviewCapture" classname="com.samfa12.hordelanternrt.ContextualControlsLayoutTest" time="0.021"/>
+  <testcase name="modelledViewmodelCheckpointsRestoreTheirAuthoredCameraPose" classname="com.samfa12.hordelanternrt.ContextualControlsLayoutTest" time="0.019"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+Invalid ID 0x00000000.
+]]></system-err>
+</testsuite>

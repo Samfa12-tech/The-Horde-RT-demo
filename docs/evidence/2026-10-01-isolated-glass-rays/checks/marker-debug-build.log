@@ -1,0 +1,87 @@
+> Task :app:prepareRuntimeAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:configureCMakeDebug[arm64-v8a]
+
+> Task :app:buildCMakeDebug[arm64-v8a]
+C/C++: Exception: C:\Dev\tmp\horde-glass-isolated-20261001\source\tools\GenerateRtPipelineVariantCatalog.ps1:9
+C/C++: Line |
+C/C++:    9 |  . ool]$value, [string]$message) { if (-not $value) { throw $message } }
+C/C++:      |                                                       ~~~~~~~~~~~~~~
+C/C++:      | Frozen catalog include is stale: diagnostic_mobile_generic_dielectric
+C/C++: CMake Error at C:/Dev/tmp/horde-glass-isolated-20261001/source/cmake/HordeRtRaygenArtifacts.cmake:10 (message):
+C/C++:   Frozen RT catalog adapter is stale or malformed.
+C/C++: Call Stack (most recent call first):
+C/C++:   CMakeLists.txt:18 (horde_rt_configure_raygen_artifacts)
+C/C++: ninja: error: rebuilding 'build.ninja': subcommand failed
+
+> Task :app:buildCMakeDebug[arm64-v8a] FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:buildCMakeDebug[arm64-v8a]'.
+> com.android.ide.common.process.ProcessException: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: -fno-fast-math;-ffp-contract=off
+  -- Configuring incomplete, errors occurred!
+  See also "C:/Dev/tmp/horde-glass-isolated-20261001/source/android/app/.cxx/Debug/1f1e2x4i/arm64-v8a/CMakeFiles/CMakeOutput.log".
+  ninja: Entering directory `C:\Dev\tmp\horde-glass-isolated-20261001\source\android\app\.cxx\Debug\1f1e2x4i\arm64-v8a'
+  [0/1] Re-running CMake...
+  FAILED: build.ninja 
+  C:\Users\sam_s\AppData\Local\Android\Sdk\cmake\3.22.1\bin\cmake.exe --regenerate-during-build -SC:\Dev\tmp\horde-glass-isolated-20261001\source\android\app\src\main\cpp -BC:\Dev\tmp\horde-glass-isolated-20261001\source\android\app\.cxx\Debug\1f1e2x4i\arm64-v8a
+  
+  C++ build system [build] failed while executing:
+      @echo off
+      "C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe" ^
+        -C ^
+        "C:\\Dev\\tmp\\horde-glass-isolated-20261001\\source\\android\\app\\.cxx\\Debug\\1f1e2x4i\\arm64-v8a" ^
+        horde_rt_probe_android
+    from C:\Dev\tmp\horde-glass-isolated-20261001\source\android\app
+  Exception: C:\Dev\tmp\horde-glass-isolated-20261001\source\tools\GenerateRtPipelineVariantCatalog.ps1:9
+  Line |
+     9 |  . ool]$value, [string]$message) { if (-not $value) { throw $message } }
+       |                                                       ~~~~~~~~~~~~~~
+       | Frozen catalog include is stale: diagnostic_mobile_generic_dielectric
+  CMake Error at C:/Dev/tmp/horde-glass-isolated-20261001/source/cmake/HordeRtRaygenArtifacts.cmake:10 (message):
+    Frozen RT catalog adapter is stale or malformed.
+  Call Stack (most recent call first):
+    CMakeLists.txt:18 (horde_rt_configure_raygen_artifacts)
+  
+  
+  ninja: error: rebuilding 'build.ninja': subcommand failed
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 4s
+27 actionable tasks: 2 executed, 25 up-to-date

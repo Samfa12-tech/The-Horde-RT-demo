@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <vulkan/vulkan.h>
@@ -21,11 +22,26 @@
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 #include "vulkan/raytracing/RtGpuResources.h"
+#include "vulkan/raytracing/RtPipelineBundle.h"
+#include "vulkan/raytracing/RtExecutionPolicy.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+#include "vulkan/raytracing/experimental/StagedPrimaryPass.h"
+#endif
 
 namespace horde::vulkan::raytracing
 {
+
+struct PresentableTinyRtScenePreflightTestAccess;
+struct PresentableTinyRtSceneObservationTestAccess;
+struct RtDiagnosticCounterPayload;
+
+[[nodiscard]] bool TryMakeRtPipelineEvidenceIdentity(
+    const RtPipelineBundleRequest& request,
+    const RtPipelineVariantArtifact& opaqueFast,
+    const RtPipelineVariantArtifact& genericDielectric,
+    horde::telemetry::RtPipelineEvidenceIdentity& identity) noexcept;
 
 enum class WaterQuality : std::uint32_t
 {
@@ -70,6 +86,8 @@ struct RtSceneFrameInputs
     horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};
     horde::gameplay::animation::PlayerAnimationSnapshot playerAnimation{};
     PlayerRenderRoute playerRenderRoute = PlayerRenderRoute::Procedural;
+    horde::gameplay::items::PlayerMountProfile playerMountProfile =
+        horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
     horde::gameplay::items::HeldLightState heldLight{};
     horde::gameplay::interactions::InteractionState interaction{};
     horde::gameplay::interactions::ChestRewardSnapshot chestReward{};
@@ -95,9 +113,10 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
+    // Baseline without the optional development viewmodel. Live reports count owners.
     static constexpr std::uint32_t kBlasCount = 16u;
     static constexpr std::uint32_t kTlasCount = 1u;
-    static constexpr std::uint32_t kTlasInstanceCount = 20u;
+    static constexpr std::uint32_t kTlasInstanceCount = kRtInstanceMetadataCapacity;
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -120,14 +139,23 @@ public:
                     const std::string& lichTextureDirectory,
                     std::string& diagnostic,
                     const std::string& developmentStaticAssetDirectory = {},
-                    const std::string& productionAssetRoot = {});
+                    const std::string& productionAssetRoot = {},
+                    RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline);
 
     void Destroy();
 
     bool IsReady() const { return ready_; }
+    RtExecutionBackend ExecutionBackend() const
+    {
+        return pipelineBundle_.HasSelection() ? pipelineBundle_.Request().executionBackend
+                                              : RtExecutionBackend::Unsupported;
+    }
     VkExtent2D DispatchExtent() const { return dispatchExtent_; }
     const std::string& MaterialEncoding() const { return materialEncoding_; }
-    std::uint32_t BlasCount() const { return ready_ ? kBlasCount : 0u; }
+    std::uint32_t BlasCount() const
+    {
+        return ready_ ? static_cast<std::uint32_t>(ResourceInventory().bottomLevelAccelerationStructureCount) : 0u;
+    }
     std::uint32_t TlasCount() const { return ready_ ? kTlasCount : 0u; }
     std::uint32_t TlasInstanceCount() const { return ready_ ? kTlasInstanceCount : 0u; }
     std::size_t SkeletonPoseBucketCount() const { return characterSlot_.SkeletonPoseBucketCount(); }
@@ -144,6 +172,7 @@ public:
         return lastInstanceMasks_;
     }
     bool LastPlayerPrimaryVisible() const { return lastPlayerPrimaryVisible_; }
+    std::uint32_t LastPlayerWorldBodyInstanceFlags() const { return lastPlayerWorldBodyInstanceFlags_; }
     const PlayerGripAgreement& RewardLanternGripAgreement() const
     {
         return rewardLanternGripAgreement_;
@@ -289,6 +318,70 @@ public:
     {
         return primaryRewardBodyPixelCount_;
     }
+    RtDiagnosticAvailability DiagnosticsAvailability() const
+    {
+        return pipelineBundle_.DiagnosticAvailability();
+    }
+    [[nodiscard]] std::string_view SelectedDielectricQualityName() const noexcept
+    {
+        if (!pipelineBundle_.HasSelection()) return {};
+        switch (pipelineBundle_.Request().quality)
+        {
+        case DielectricQuality::Mobile: return "Mobile";
+        case DielectricQuality::High: return "High";
+        default: return {};
+        }
+    }
+    std::string_view SelectedOpaqueFastKey() const
+    {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return experimental::StagedPrimaryPass::PairKey(RtMaterialStrategy::OpaqueFast);
+#endif
+        return pipelineBundle_.OpaqueFastKey();
+    }
+    std::string_view SelectedGenericDielectricKey() const
+    {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return experimental::StagedPrimaryPass::PairKey(RtMaterialStrategy::GenericDielectric);
+#endif
+        return pipelineBundle_.GenericDielectricKey();
+    }
+    std::string_view SelectedOpaqueFastSha256() const
+    {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return experimental::StagedPrimaryPass::PairSha256(RtMaterialStrategy::OpaqueFast);
+#endif
+        return pipelineBundle_.OpaqueFastSha256();
+    }
+    std::string_view SelectedGenericDielectricSha256() const
+    {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return experimental::StagedPrimaryPass::PairSha256(RtMaterialStrategy::GenericDielectric);
+#endif
+        return pipelineBundle_.GenericDielectricSha256();
+    }
+    std::string SelectedPipelineBundleIdentity() const
+    {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return std::string(SelectedOpaqueFastKey()) + "@" + std::string(SelectedOpaqueFastSha256()) +
+            "|" + std::string(SelectedGenericDielectricKey()) + "@" + std::string(SelectedGenericDielectricSha256());
+#endif
+        return pipelineBundle_.FullPairIdentity();
+    }
+    std::string SelectedPipelineBundleDisplayIdentity() const
+    {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return "StagedPrimaryV1Investigation";
+#endif
+        return pipelineBundle_.ShortPairIdentity();
+    }
+    std::string ExecutionOrganisationJson() const
+    {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return stagedPrimary_->MetadataJson();
+#endif
+        return "{\"organisation\":\"Monolithic\"}";
+    }
     bool GenericStaticAssetEnabled() const { return genericStaticAssetEnabled_; }
     const RtStaticMeshMeasurements& StaticMeshMeasurements() const { return staticMeshSlot_.Measurements(); }
     VkDeviceSize StaticMeshBlasBytes() const { return staticMeshBlasBytes_; }
@@ -309,29 +402,130 @@ public:
     {
         return productionPropBlasBuildMilliseconds_;
     }
+    [[nodiscard]] horde::telemetry::RtResourceInventory ResourceInventory() const noexcept;
+    [[nodiscard]] bool CollectCompletedDiagnostic(
+        RtDiagnosticCounterPayload& payload,
+        std::string& diagnostic);
+    void PublishCompletedDiagnostic(
+        const RtDiagnosticCounterPayload& payload) noexcept;
 
     bool RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                             VkImage swapchainImage,
                             VkImageLayout& swapchainImageLayout,
                             VkExtent2D swapchainExtent,
                             const RtSceneFrameInputs& frame,
-                            std::string& diagnostic);
+                            std::string& diagnostic,
+                            RtSceneRecordObservation* observation = nullptr
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                            , experimental::StagedPrimaryTiming* stagedTiming = nullptr,
+                            std::uint32_t timingFrameSlot = 0u
+#endif
+                            );
 
-    // Synchronously reads the last RT-produced storage image. The returned
+    // Owning render thread, only after successful submission of the recorded RT
+    // command buffer. One frame in flight: pending TLAS definitions never become
+    // the UPDATE baseline merely because a BUILD was recorded.
+    void NotifyFrameSubmitted() noexcept;
+
+    // Owning render thread only, after successful device-idle/evidence completion.
+    // Replaces only the extent-dependent output image; caller must reset and
+    // re-record command buffers invalidated by the descriptor update.
+    // Allocation/preflight failure leaves the previous output resources intact.
+    bool ResizeOutputAfterDeviceIdle(VkExtent2D extent, std::string& diagnostic);
+
+    // Submit a successfully recorded frame before calling. Synchronously reads
+    // the last RT-produced storage image; rejects a new output with no frame.
+    // The returned
     // bytes are canonical RGBA even when the presentation push constant had
     // swapped red/blue for a raw copy to a BGRA swapchain.
     bool CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic);
+#ifndef NDEBUG
+    // Debug asset inspection only: model-space copy of the exact current upload.
+    // This is CPU geometry evidence, not a GPU readback or a second pose solve.
+    bool CaptureViewmodelMesh(const std::string& path, std::string& diagnostic) const;
+    // Debug asset inspection only: model-space copy of the exact current world-body
+    // upload and its actual TLAS transform. This is CPU geometry evidence, not readback.
+    bool CapturePlayerWorldBodyMesh(const std::string& path, std::string& diagnostic) const;
+#endif
 
 private:
+    friend struct PresentableTinyRtScenePreflightTestAccess;
+    friend struct PresentableTinyRtSceneObservationTestAccess;
+    friend struct PresentableTinyRtSceneOutputResizeTestAccess;
+
     using Buffer = RtGpuBuffer;
     using AccelerationStructure = RtAccelerationStructure;
+
+    struct OutputImageResources
+    {
+        VkImage image = VK_NULL_HANDLE;
+        VkDeviceMemory memory = VK_NULL_HANDLE;
+        VkImageView view = VK_NULL_HANDLE;
+        VkDeviceSize allocationSize = 0u;
+        VkMemoryPropertyFlags memoryFlags = 0u;
+        VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
+    };
+    // Focused transaction seam for failure/ownership tests; production callbacks
+    // allocate, bind only storage-image binding1, then retire the old image.
+    struct OutputResizeApi
+    {
+        void* user = nullptr;
+        bool (*create)(void*, VkExtent2D, OutputImageResources&, std::string&) = nullptr;
+        void (*writeDescriptor)(void*, VkImageView) noexcept = nullptr;
+        void (*destroy)(void*, OutputImageResources&) noexcept = nullptr;
+    };
+    bool ResizeOutputWithApi(VkExtent2D extent, std::array<std::uint32_t, 3u> groups,
+                             const OutputResizeApi& api, std::string& diagnostic);
+    bool CreateOutputImage(VkExtent2D extent, OutputImageResources& out,
+                           std::string& diagnostic);
+    void DestroyOutputImage(OutputImageResources& image) const noexcept;
+    OutputImageResources OutputImage() const noexcept;
+    void AdoptOutputImage(const OutputImageResources& image) noexcept;
+
+    struct InitialiseOrchestrationApi
+    {
+        void* user = nullptr;
+        bool (*resolvePreflight)(void*, RtPipelineBundlePreflight&, std::string&) = nullptr;
+        bool (*continueAfterPreflight)(
+            void*, PresentableTinyRtScene&, VkFormat, const std::string&,
+            const std::string&, const std::string&, const std::string&,
+            const std::string&, const std::string&, std::string&) = nullptr;
+    };
 
     struct TextureArray
     {
         VkImage image = VK_NULL_HANDLE;
         VkDeviceMemory memory = VK_NULL_HANDLE;
         VkImageView view = VK_NULL_HANDLE;
+        VkDeviceSize allocationSize = 0u;
+        VkMemoryPropertyFlags memoryPropertyFlags = 0u;
     };
+
+    bool InitialiseWithOrchestration(
+        VkInstance instance,
+        VkPhysicalDevice physicalDevice,
+        VkDevice device,
+        VkQueue queue,
+        VkCommandPool commandPool,
+        VkExtent2D dispatchExtent,
+        VkFormat presentationFormat,
+        const std::string& skeletonAssetPath,
+        const std::string& lichAssetPath,
+        const std::string& materialAssetDirectory,
+        const std::string& lichTextureDirectory,
+        std::string& diagnostic,
+        const std::string& developmentStaticAssetDirectory,
+        const std::string& productionAssetRoot,
+        const InitialiseOrchestrationApi& api);
+    bool ContinueInitialiseAfterPreflight(
+        VkFormat presentationFormat,
+        const std::string& skeletonAssetPath,
+        const std::string& lichAssetPath,
+        const std::string& materialAssetDirectory,
+        const std::string& lichTextureDirectory,
+        const std::string& developmentStaticAssetDirectory,
+        const std::string& productionAssetRoot,
+        std::string& diagnostic);
 
     bool LoadEntryPoints(std::string& diagnostic);
     bool CreateBuffer(VkDeviceSize size,
@@ -339,12 +533,14 @@ private:
                       VkMemoryPropertyFlags memoryFlags,
                       bool deviceAddress,
                       Buffer& out,
-                      std::string& diagnostic) const;
+                      std::string& diagnostic,
+                      VkMemoryPropertyFlags preferredMemoryFlags = 0u) const;
     bool WriteBuffer(const Buffer& buffer,
                      const void* data,
                      VkDeviceSize size,
                      const char* label,
-                     std::string& diagnostic) const;
+                     std::string& diagnostic,
+                     RtSceneRecordObservation* observation = nullptr) const;
     bool ReadBuffer(const Buffer& buffer,
                     VkDeviceSize offset,
                     void* data,
@@ -367,13 +563,47 @@ private:
                                   const std::string& productionAssetRoot,
                                   std::string& diagnostic);
     bool CreateStaticMeshResources(std::string& diagnostic);
+    const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
-    bool CreateDescriptors(std::string& diagnostic);
-    bool CreatePipeline(std::string& diagnostic);
-    bool CreateShaderBindingTable(std::string& diagnostic);
+    bool CreateSelectedPipelineBundle(std::string& diagnostic);
+    [[nodiscard]] bool CapturePipelineEvidenceIdentity() noexcept;
+    bool CreateBundleDescriptorSetLayout(const RtDescriptorIoContract& contract,
+                                         VkDescriptorSetLayout& out,
+                                         std::string& diagnostic);
+    bool CreateBundleDescriptorPool(const RtDescriptorIoContract& contract,
+                                    VkDescriptorPool& out,
+                                    std::string& diagnostic);
+    bool AllocateBundleDescriptorSet(VkDescriptorPool pool,
+                                     VkDescriptorSetLayout layout,
+                                     VkDescriptorSet& out,
+                                     std::string& diagnostic);
+    bool CreateBundleDiagnosticBuffer(Buffer& out, std::string& diagnostic);
+    bool WriteBundleDescriptors(RtPipelineBundle& bundle, std::string& diagnostic);
+    bool CreateBundlePipelineLayout(VkDescriptorSetLayout descriptorSetLayout,
+                                    VkPipelineLayout& out,
+                                    std::string& diagnostic);
+    bool CreateBundleSharedShaderModules(VkShaderModule& miss,
+                                         VkShaderModule& hit,
+                                         std::string& diagnostic);
+    bool CreateBundleEntryShaderModule(const RtPipelineVariantArtifact& artifact,
+                                        VkShaderModule& out,
+                                        std::string& diagnostic);
+    bool CreateBundleStrategyPipeline(RtMaterialStrategy strategy,
+                                      VkShaderModule raygen,
+                                      VkShaderModule miss,
+                                      VkShaderModule hit,
+                                      VkPipelineLayout layout,
+                                      VkPipeline& out,
+                                      std::string& diagnostic);
+    bool CreateBundleStrategySbt(RtMaterialStrategy strategy,
+                                 VkPipeline pipeline,
+                                 Buffer& out,
+                                 std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
+                                 std::string& diagnostic);
     bool UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                 const RtSceneFrameInputs& frame,
-                                std::string& diagnostic);
+                                std::string& diagnostic,
+                                RtSceneRecordObservation* observation = nullptr);
     bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
     void DestroyBuffer(Buffer& buffer) const;
     void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
@@ -393,7 +623,10 @@ private:
     VkImage storageImage_ = VK_NULL_HANDLE;
     VkDeviceMemory storageImageMemory_ = VK_NULL_HANDLE;
     VkImageView storageImageView_ = VK_NULL_HANDLE;
+    VkDeviceSize storageImageAllocationSize_ = 0u;
+    VkMemoryPropertyFlags storageImageMemoryPropertyFlags_ = 0u;
     VkImageLayout storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
+    bool storageImageFrameRecorded_ = false;
     bool lastOutputRedBlueSwapApplied_ = false;
     TextureArray materialDiffuse_;
     TextureArray materialNormal_;
@@ -411,16 +644,21 @@ private:
     Buffer indexBuffer_;
     Buffer transformBuffer_;
     Buffer instanceBuffer_;
+    std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount> tlasBuiltInstances_{};
+    bool tlasInstanceDefinitionsValid_ = false;
+    std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount> tlasPendingInstances_{};
+    bool tlasPendingDefinitionsValid_ = false;
     Buffer heldLightBuffer_;
     Buffer fireEmitterBuffer_;
     Buffer worldSurfaceBuffer_;
     Buffer staticVertexBuffer_;
+    Buffer worldPlayerVertexBuffer_;
+    Buffer viewmodelVertexBuffer_;
     Buffer staticIndexBuffer_;
     Buffer staticGeometryTransformBuffer_;
     Buffer instanceMetadataBuffer_;
     Buffer primitiveMetadataBuffer_;
     Buffer materialMetadataBuffer_;
-    Buffer dielectricDiagnosticsBuffer_;
     AccelerationStructure blas_;
     AccelerationStructure waterfallBlas_;
     AccelerationStructure finaleRoofBlas_;
@@ -435,6 +673,8 @@ private:
     AccelerationStructure playerLimbBlas_;
     AccelerationStructure skinnedPlayerBlas_;
     Buffer skinnedPlayerBlasUpdateScratch_;
+    AccelerationStructure viewmodelBlas_;
+    Buffer viewmodelBlasUpdateScratch_;
     AccelerationStructure tlas_;
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
@@ -443,6 +683,19 @@ private:
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset productionTorchAsset_;
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
+    horde::scene::assets::StaticMeshAsset viewmodelAsset_;
+    horde::scene::SkinnedMeshAsset viewmodelSkin_;
+    std::vector<horde::scene::TexturedSkinnedRtVertex> viewmodelPoseVertices_;
+    std::vector<horde::scene::SkinnedPbrTangent> viewmodelPoseTangents_;
+    std::vector<horde::scene::assets::StaticRtVertex> viewmodelUpload_;
+    bool viewmodelAvailable_ = false;
+    bool playerBodyRemainderAvailable_ = false;
+    bool viewmodelPoseCurrent_ = false;
+#ifndef NDEBUG
+    VkTransformMatrixKHR viewmodelCaptureTransform_{};
+    VkTransformMatrixKHR playerWorldBodyCaptureTransform_{};
+    bool playerWorldBodyPoseCurrent_ = false;
+#endif
     horde::scene::assets::StaticMeshAsset gothicChestBaseAsset_;
     horde::scene::assets::StaticMeshAsset gothicChestLidAsset_;
     horde::scene::assets::StaticMeshAsset rewardLanternRingAsset_;
@@ -458,6 +711,7 @@ private:
     float playerMaxSocketErrorMetres_ = 0.0f;
     std::array<std::uint8_t, kTlasInstanceCount> lastInstanceMasks_{};
     bool lastPlayerPrimaryVisible_ = false;
+    std::uint32_t lastPlayerWorldBodyInstanceFlags_ = 0u;
     PlayerGripAgreement rewardLanternGripAgreement_{};
     PlayerGripAgreement rewardLanternAuthorityAgreement_{};
     std::array<float, 3u> rewardLanternFinalGripPosition_{};
@@ -517,22 +771,16 @@ private:
     double productionPropBlasBuildMilliseconds_ = 0.0;
     HeldItemBlasMeasurements heldItemBlasMeasurements_{};
 
-    VkDescriptorSetLayout descriptorSetLayout_ = VK_NULL_HANDLE;
-    VkDescriptorPool descriptorPool_ = VK_NULL_HANDLE;
-    VkDescriptorSet descriptorSet_ = VK_NULL_HANDLE;
-    VkPipelineLayout pipelineLayout_ = VK_NULL_HANDLE;
-    VkPipeline pipeline_ = VK_NULL_HANDLE;
-    VkPipeline legacyPipeline_ = VK_NULL_HANDLE;
-    Buffer shaderBindingTable_;
-    Buffer legacyShaderBindingTable_;
-    VkStridedDeviceAddressRegionKHR raygenRegion_{};
-    VkStridedDeviceAddressRegionKHR missRegion_{};
-    VkStridedDeviceAddressRegionKHR hitRegion_{};
-    VkStridedDeviceAddressRegionKHR callableRegion_{};
-    VkStridedDeviceAddressRegionKHR legacyRaygenRegion_{};
-    VkStridedDeviceAddressRegionKHR legacyMissRegion_{};
-    VkStridedDeviceAddressRegionKHR legacyHitRegion_{};
-    VkStridedDeviceAddressRegionKHR legacyCallableRegion_{};
+    RtPipelineBundle pipelineBundle_;
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    std::unique_ptr<experimental::StagedPrimaryPass> stagedPrimary_;
+#endif
+    RtExecutionPolicy executionPolicy_{};
+    std::array<std::uint32_t, 3u> computeDispatchGroups_{};
+    horde::telemetry::RtPipelineEvidenceIdentity pipelineEvidenceIdentity_{};
+    bool pipelineEvidenceIdentityValid_ = false;
+    horde::telemetry::RtPipelineEvidenceIdentity framePipelineEvidence_{};
+    bool framePipelineEvidenceValid_ = false;
 
     PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR_ = nullptr;
     PFN_vkDestroyAccelerationStructureKHR vkDestroyAccelerationStructureKHR_ = nullptr;

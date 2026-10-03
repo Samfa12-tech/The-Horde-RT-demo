@@ -6,6 +6,7 @@
 
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 
 namespace
 {
@@ -979,6 +980,63 @@ int main()
           finaleRoofCapture.Events().Empty(),
           "finale-roof zero-delta finalization must preserve the authored dead/open-roof state without a tick or event");
 
+    GameSimulation legacyMount;
+    GameSimulationConfig anatomicalMountConfig{};
+    anatomicalMountConfig.playerMountProfile = items::PlayerMountProfile::AnatomicalBody;
+    GameSimulation anatomicalMount(anatomicalMountConfig);
+    GameSimulation productionMount(ProductionGameSimulationConfig());
+    check(productionMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody &&
+          productionMount.Snapshot().heldItemKinematics.leftHandLocal ==
+              anatomicalMount.Snapshot().heldItemKinematics.leftHandLocal &&
+          productionMount.Snapshot().heldItemKinematics.rightHandLocal ==
+              anatomicalMount.Snapshot().heldItemKinematics.rightHandLocal,
+          "production application configuration must preserve the exact accepted anatomical targets");
+    check(legacyMount.Snapshot().playerMountProfile == items::PlayerMountProfile::LegacyViewRelative &&
+          NearlyEqual(legacyMount.Snapshot().heldItemKinematics.heldPropDepth,
+                      GameSimulation(GameSimulationConfig{}).Snapshot().heldItemKinematics.heldPropDepth),
+          "default game simulation retains the legacy view-relative mount profile and target");
+    check(anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody &&
+          NearlyEqual(anatomicalMount.Snapshot().heldItemKinematics.leftHandLocal[1] -
+                          legacyMount.Snapshot().heldItemKinematics.leftHandLocal[1],
+                      0.10f) &&
+          !NearlyEqual(anatomicalMount.Snapshot().heldItemKinematics.leftShoulderLocal[0],
+                       legacyMount.Snapshot().heldItemKinematics.leftShoulderLocal[0]),
+          "configured anatomical profile reaches shared held-item resolution and changes hand height and shoulder frame");
+    for (const auto profile : {items::PlayerMountProfile::LegacyViewRelative,
+                               items::PlayerMountProfile::AnatomicalBody})
+    {
+        GameSimulationConfig boundedLookConfig;
+        boundedLookConfig.playerMountProfile = profile;
+        boundedLookConfig.playerStartPitchRadians = -4.0f;
+        GameSimulation boundedLook(boundedLookConfig);
+        check(NearlyEqual(boundedLook.Snapshot().playerPitchRadians, -0.32f),
+              "both player mounts use the established gameplay look limit at construction");
+        InputSnapshot extremeLook;
+        extremeLook.pitchRadians = -4.0f;
+        boundedLook.StepFixed(extremeLook);
+        check(NearlyEqual(boundedLook.Snapshot().playerPitchRadians, -0.32f),
+              "an extreme diagnostic input cannot extend normal gameplay camera pitch");
+        extremeLook.pitchRadians = 1.0f;
+        boundedLook.StepFixed(extremeLook);
+        check(NearlyEqual(boundedLook.Snapshot().playerPitchRadians, 0.28f),
+              "both player mounts retain the normal upper look limit");
+        boundedLook.ResetRoute();
+        check(NearlyEqual(boundedLook.Snapshot().playerPitchRadians, -0.32f),
+              "reset retains the normal gameplay pitch boundary");
+    }
+    check(anatomicalMount.ApplyShowcaseCheckpoint(0) &&
+          anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody,
+          "authored checkpoint import preserves the configured player mount profile");
+    anatomicalMount.RetryEncounter();
+    check(anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody,
+          "encounter retry preserves the configured player mount profile");
+    anatomicalMount.ResetRoute();
+    check(anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody,
+          "route reset preserves the configured player mount profile");
+    anatomicalMount.ImportRewardCheckpoint({}, {}, {});
+    check(anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody,
+          "reward checkpoint import preserves the configured player mount profile");
+
     GameSimulation pausedRetry;
     InputSnapshot pausedFinale = finaleInput;
     pausedFinale.commands = {};
@@ -999,6 +1057,18 @@ int main()
           NearlyEqual(pausedRetry.Snapshot().playerX, -33.70f) &&
           NearlyEqual(pausedRetry.Snapshot().playerZ, -15.20f),
           "paused retry must consume the competing attack exactly once, discard stale events, and clear catch-up time");
+
+    for (const auto name : {"glass-transport", "glass-fire-transport",
+                            "glass-tinted-transport", "glass-millimetre-closed",
+                            "glass-edge-fresnel"})
+    {
+        GameSimulation glassCheckpoint(ProductionGameSimulationConfig());
+        const auto* checkpoint = FindDevelopmentCheckpoint(name);
+        check(checkpoint != nullptr &&
+              StageDevelopmentCheckpointSimulation(glassCheckpoint, *checkpoint) &&
+              glassCheckpoint.Snapshot().zone == ShowcaseZone::SkylightChamber,
+              "glass captures use the staged camera's skylight zone, not the borrowed lighting preset's opening zone");
+    }
 
     if (!passed)
     {

@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "status": "PASS-source-schedule-and-PCM; native/listening pending",
+  "sourceSha256": "f5d4bbc8068ae2865216304efc22337ac190ca5b7732e02a9ed5e9062b7b92f4",
+  "manifestSha256": "ea7adbc1c248fc37d705239e6bcd529fbf10206ffb77165051658bce4e438c3e",
+  "checks": [
+    {
+      "cue": "A",
+      "scheduleEquivalent": true,
+      "jsonPcs1Consistent": true,
+      "parts": [
+        {
+          "kind": "loop",
+          "frames": 576000,
+          "sha256": "a58cacd493bd4604cf1d51096cf03092e35c993a079c10af7fcec3debc093277",
+          "peak": 0.4009216589861751,
+          "reused": true
+        },
+        {
+          "kind": "tail",
+          "frames": 144000,
+          "sha256": "4fea7b227dee6b81f09fd54f202bfea33a76a2419fa07c1ec37a0d2f8d14e4e1",
+          "peak": 0.010834070863979004,
+          "reused": true
+        }
+      ],
+      "reused": true
+    },
+    {
+      "cue": "B",
+      "scheduleEquivalent": true,
+      "jsonPcs1Consistent": true,
+      "parts": [
+        {
+          "kind": "loop",
+          "frames": 576000,
+          "sha256": "27944d203f9453b7ff9edb2bfd653bac524d4da4db4a000f76115fb4810dd3b5",
+          "peak": 0.45582445753349404,
+          "reused": false
+        },
+        {
+          "kind": "tail",
+          "frames": 144000,
+          "sha256": "7a437a4641f4b99d8b21db934ece9bb3a9c4d0464fea37eb94a2841d70f3132f",
+          "peak": 0.0011291848506118961,
+          "reused": false
+        }
+      ],
+      "reused": false
+    },
+    {
+      "cue": "C",
+      "scheduleEquivalent": true,
+      "jsonPcs1Consistent": true,
+      "parts": [
+        {
+          "kind": "loop",
+          "frames": 144000,
+          "sha256": "3ce3a8ea381c3e81c0b34841df3f1d8d236a5ef335f594001553a400b65accb3",
+          "peak": 0.1575975829340495,
+          "reused": false
+        },
+        {
+          "kind": "tail",
+          "frames": 144000,
+          "sha256": "ec3650bd450cebe9985c1d4d4b59749debe34301f9f9e889171d0e49a316c89c",
+          "peak": 0,
+          "reused": false
+        }
+      ],
+      "reused": false
+    },
+    {
+      "cue": "D",
+      "scheduleEquivalent": true,
+      "jsonPcs1Consistent": true,
+      "parts": [
+        {
+          "kind": "loop",
+          "frames": 576000,
+          "sha256": "22274bc3c17713c275b48232130299a443eb56c7cf871a5f3389e5c83c5a8d64",
+          "peak": 0.1608935819574572,
+          "reused": false
+        },
+        {
+          "kind": "tail",
+          "frames": 144000,
+          "sha256": "d7a934809ab1024da19dc1b86c370b692d8400e0431897f7455936cd8959c3aa",
+          "peak": 0.00784325693533128,
+          "reused": false
+        }
+      ],
+      "reused": false
+    },
+    {
+      "cue": "E",
+      "scheduleEquivalent": true,
+      "jsonPcs1Consistent": true,
+      "parts": [
+        {
+          "kind": "loop",
+          "frames": 576000,
+          "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03",
+          "peak": 0.6468703268532365,
+          "reused": true
+        },
+        {
+          "kind": "tail",
+          "frames": 144000,
+          "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2",
+          "peak": 0.00924710837122715,
+          "reused": true
+        }
+      ],
+      "reused": true
+    },
+    {
+      "cue": "F",
+      "scheduleEquivalent": true,
+      "jsonPcs1Consistent": true,
+      "parts": [
+        {
+          "kind": "loop",
+          "frames": 576000,
+          "sha256": "158f015c3ffbb12169eb088206751f56fbed799e0b3dea3ab4496124634b441d",
+          "peak": 0.17142246772667624,
+          "reused": false
+        },
+        {
+          "kind": "tail",
+          "frames": 144000,
+          "sha256": "a4fdc4b38c8a1e7240cfad5ac364063ec8c6f27f9baefc2d2e6110a8a4429c21",
+          "peak": 0.010956144901882993,
+          "reused": false
+        }
+      ],
+      "reused": false
+    },
+    {
+      "cue": "G",
+      "scheduleEquivalent": true,
+      "jsonPcs1Consistent": true,
+      "parts": [
+        {
+          "kind": "loop",
+          "frames": 288000,
+          "sha256": "ab2dbe31c735cbeec11d09eaa308e5faee793a891c34b67f5f50f6b33af25736",
+          "peak": 0.15179906613361002,
+          "reused": false
+        },
+        {
+          "kind": "tail",
+          "frames": 144000,
+          "sha256": "c51b9851ac32e34c57e586f154d3ee1d5f2d138b9c0f21b2c983618905a42609",
+          "peak": 0.0012512588885158849,
+          "reused": false
+        }
+      ],
+      "reused": false
+    },
+    {
+      "cue": "H",
+      "scheduleEquivalent": true,
+      "jsonPcs1Consistent": true,
+      "parts": [
+        {
+          "kind": "loop",
+          "frames": 576000,
+          "sha256": "58ac260bd18204e9fb1aeb01aab9229de6830032f1d4be3d30b9527fde1fe6ae",
+          "peak": 0.1608325449385052,
+          "reused": false
+        },
+        {
+          "kind": "tail",
+          "frames": 144000,
+          "sha256": "9e50268573d85733333e10304a0e9faf8d23545e510723035aef1b9d8b0238bf",
+          "peak": 0.009369182409131139,
+          "reused": false
+        }
+      ],
+      "reused": false
+    }
+  ],
+  "normalMusicVolumeUnchanged": 70,
+  "pcmBytes": 20160000,
+  "waveBytes": 20160704,
+  "verifierSha256": "df093e93a3f0ceafe8818ef43f3230ad2433cbb2da785f76733f7e5282e681f7",
+  "runtimeNotChanged": true
+}

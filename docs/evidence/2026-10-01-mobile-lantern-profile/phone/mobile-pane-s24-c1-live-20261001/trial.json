@@ -1,0 +1,38 @@
+{
+  "runId": "mobile-pane-s24-c1-live-20261001",
+  "sourceCommit": "9f4f439e40a9477efe0bac42ee41b74de64b3b1b",
+  "installedApkSha256": "3a4faf72923e24da9da859ef6cd71c221b818b97d7418a75b1c8dd0ca0540378",
+  "member": "physical-control",
+  "workload": "lantern-reveal-sequence-v1",
+  "deviceModel": "SM-S928B",
+  "serial": "R5CXC0G9GBW",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "requestedScalePercent": 75,
+  "requestedBackend": "RayQueryCompute",
+  "instrumentation": "Shipping",
+  "quality": "Mobile",
+  "startUtc": "2026-10-01T08:22:28.6383266Z",
+  "recordingEnabled": false,
+  "appDataCleared": false,
+  "status": "complete",
+  "gpuMemoryCounters": "not-collected; not a pass",
+  "memoryBoundary": "before/after trial; not frame aligned",
+  "processId": "20422",
+  "endUtc": "2026-10-01T08:28:21.1847898Z",
+  "renderScalePercent": 75,
+  "internalExtent": {
+    "width": 810,
+    "height": 1682
+  },
+  "presentationExtent": {
+    "width": 1080,
+    "height": 2243
+  },
+  "presentMode": "MAILBOX",
+  "overall": {
+    "averageMs": 289.6733,
+    "medianMs": 279.7074,
+    "p95Ms": 325.5381,
+    "onePercentLowFps": 3.0332
+  }
+}

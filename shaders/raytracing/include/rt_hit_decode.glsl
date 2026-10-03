@@ -1,3 +1,5 @@
+#include "rt_dielectric_spawn.glsl"
+
 vec3 normalForSurfaceCode(uint code)
 {
     uint normalCode = (code >> 8u) & 0xffu;
@@ -348,6 +350,29 @@ void materialForPrimitive(int primitive,
     }
 }
 
+void loadPbrTriangle(RtInstanceMetadata instance, uint i0, uint i1, uint i2,
+                     out StaticRtVertex v0, out StaticRtVertex v1, out StaticRtVertex v2)
+{
+    if (instance.geometryRole == kRtGeometryRolePlayerWorldBody)
+    {
+        v0 = rtWorldPlayerVertices.values[i0];
+        v1 = rtWorldPlayerVertices.values[i1];
+        v2 = rtWorldPlayerVertices.values[i2];
+    }
+    else if (instance.geometryRole == kRtGeometryRolePlayerViewmodel)
+    {
+        v0 = rtViewmodelVertices.values[i0];
+        v1 = rtViewmodelVertices.values[i1];
+        v2 = rtViewmodelVertices.values[i2];
+    }
+    else
+    {
+        v0 = rtStaticVertices.values[i0];
+        v1 = rtStaticVertices.values[i1];
+        v2 = rtStaticVertices.values[i2];
+    }
+}
+
 HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                    float minimumDistance, bool ignoreWater,
                    bool ignorePlayerNearFace)
@@ -372,12 +397,17 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
     h.attenuationDistance = 0.0;
     h.attenuationColor = vec3(1.0);
     h.materialFlags = 0u;
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
+    h.dielectricSpawnPosition = h.position;
+    h.dielectricSpawnGuarded = false;
+    h.dielectricSpawnMinimumNormalBias = 0.0;
+#endif
 
     rayQueryEXT query;
     uint rayFlags = (ignoreWater || ignorePlayerNearFace)
         ? gl_RayFlagsNoOpaqueEXT : gl_RayFlagsOpaqueEXT;
     rayQueryInitializeEXT(query, topLevelAS, rayFlags, mask, origin,
-                          max(minimumDistance, 0.000001), direction, maxDistance);
+                          max(minimumDistance, 0.0), direction, maxDistance);
     while (rayQueryProceedEXT(query))
     {
         if ((!ignoreWater && !ignorePlayerNearFace) ||
@@ -391,18 +421,24 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
             (candidateInstance == 0 &&
              int(worldSurfaces.codes[candidatePrimitive] & 0xffu) == kMaterialWater);
         bool candidateIsPlayerNearFace = false;
-        if (ignorePlayerNearFace && candidateInstance == 4)
+        if (ignorePlayerNearFace &&
+            rtInstances.values[candidateInstance].geometryRole == kRtGeometryRolePlayerWorldBody)
         {
-            RtInstanceMetadata playerMetadata = rtInstances.values[4];
+            RtInstanceMetadata playerMetadata = rtInstances.values[candidateInstance];
             uint geometryIndex = rayQueryGetIntersectionGeometryIndexEXT(query, false);
             if (geometryIndex < playerMetadata.primitiveCount)
             {
                 RtPrimitiveMetadata playerPrimitive =
                     rtPrimitives.values[playerMetadata.primitiveBase + geometryIndex];
                 uint playerFlags = rtMaterials.values[playerPrimitive.materialIndex].materialFlags.x;
-                candidateIsPlayerNearFace =
-                    (playerFlags & (kRtMaterialFlagHeadPrimaryMasked |
-                                    kRtMaterialFlagNearFacePrimaryMasked)) != 0u;
+                // A dedicated viewmodel owns the primary arm/gauntlet surfaces.
+                // Only the explicit disjoint remainder may enter primary rays
+                // from this world-body instance; secondary visibility is intact.
+                uint excludedRegion = playerFlags & (kRtMaterialFlagHeadPrimaryMasked |
+                                                     kRtMaterialFlagNearFacePrimaryMasked);
+                uint remainderOnly = uint((playerMetadata.flags & kRtInstanceFlagBodyRemainderOnlyPrimary) != 0u);
+                uint outsideRemainder = uint((playerFlags & kRtMaterialFlagBodyRemainderPrimaryVisible) == 0u);
+                candidateIsPlayerNearFace = (excludedRegion | (remainderOnly & outsideRemainder)) != 0u;
             }
         }
         if ((!ignoreWater || !candidateIsWater) &&
@@ -433,9 +469,8 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 uint i2 = primitiveMetadata.vertexOffset + rtStaticIndices.values[triangleIndex + 2u];
                 vec2 bary = rayQueryGetIntersectionBarycentricsEXT(query, true);
                 vec3 weights = vec3(1.0 - bary.x - bary.y, bary.x, bary.y);
-                StaticRtVertex v0 = rtStaticVertices.values[i0];
-                StaticRtVertex v1 = rtStaticVertices.values[i1];
-                StaticRtVertex v2 = rtStaticVertices.values[i2];
+                StaticRtVertex v0, v1, v2;
+                loadPbrTriangle(instanceMetadata, i0, i1, i2, v0, v1, v2);
                 vec2 uv = v0.uv0.xy * weights.x + v1.uv0.xy * weights.y +
                           v2.uv0.xy * weights.z;
                 mat3 objectToWorld = mat3(rayQueryGetIntersectionObjectToWorldEXT(query, true));
@@ -508,6 +543,31 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
                 h.attenuationColor = clamp(staticMaterial.attenuationColor.rgb,
                                             vec3(0.0), vec3(1.0));
                 h.materialFlags = staticMaterial.materialFlags.x;
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
+                if ((h.materialFlags & kRtMaterialFlagTransmission) != 0u)
+                {
+                    // Spawn dielectric paths on the intersected triangle, not
+                    // origin+direction*t: cancellation can place a near-corner
+                    // entry outside its adjacent micrometre-scale exit. Keep
+                    // object-space interpolation and add translation last.
+                    precise vec3 localPosition = v0.position.xyz +
+                        (bary.x * (v1.position.xyz - v0.position.xyz) +
+                         bary.y * (v2.position.xyz - v0.position.xyz));
+                    precise vec3 surfacePosition = objectToWorld * localPosition +
+                        rayQueryGetIntersectionObjectToWorldEXT(query, true)[3];
+                    h.position = surfacePosition;
+                    h.dielectricSpawnPosition = surfacePosition;
+                    if ((h.materialFlags & kRtMaterialFlagCertifiedRectangularVolume) != 0u)
+                        h.dielectricSpawnGuarded = guardedRectangularDielectricSpawn(
+                            v0.position.xyz, v1.position.xyz, v2.position.xyz, bary,
+                            localPosition, surfacePosition, h.geometricNormal,
+                            rayQueryGetIntersectionObjectToWorldEXT(query, true),
+                            rayQueryGetIntersectionWorldToObjectEXT(query, true),
+                            staticMaterial.iorThicknessAttenuationDistance.w,
+                            staticMaterial.attenuationColor.w,
+                            h.dielectricSpawnPosition, h.dielectricSpawnMinimumNormalBias);
+                }
+#endif
                 vec3 emission = emissiveSample * staticMaterial.emissiveFactorStrength.rgb *
                                 staticMaterial.emissiveFactorStrength.w;
                 h.emissive = max(emission.r, max(emission.g, emission.b));

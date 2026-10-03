@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/build/presets/windows-x64-release
+Test project C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/build/presets/windows-x64-release
+    Start 28: horde_rt_dielectric_math_tests
+1/1 Test #28: horde_rt_dielectric_math_tests ...   Passed    2.74 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   2.75 sec

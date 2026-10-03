@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "complete": false,
+  "source": "rt-storage-image",
+  "sceneOnly": true,
+  "overlaysIncluded": false,
+  "settlingFrames": 12,
+  "fixedAnimationTimeSeconds": 0.000000,
+  "buildId": "1.6.1",
+  "playerMountProfile": "AnatomicalBody",
+  "executionBackend": "RayTracingPipeline",
+  "selectedRtPipelineBundle": {"opaqueFast": {"key": "diagnostic_high_opaque_fast", "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9"}, "genericDielectric": {"key": "diagnostic_high_generic_dielectric", "sha256": "feac38eca1df17159bca4d490825b7e3750742b05bb07cd2f6db4eec42261b5c"}},
+  "device": {
+    "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "vendorId": 4318,
+    "deviceId": 11672
+  },
+  "presentation": {
+    "renderScale": 1.000000,
+    "dispatchWidth": 960,
+    "dispatchHeight": 540,
+    "swapchainWidth": 960,
+    "swapchainHeight": 540,
+    "swapchainFormat": 44
+  },
+  "timing": {
+    "sampleCount": 0,
+    "overallMedianMs": 0.000000,
+    "overallMeanMs": 0.000000,
+    "gpuRtCommandBuffer": {"valid": true, "latestMs": 1.256704, "averageMs": 1.513004, "sampleCount": 11, "timestampValidBits": 64, "timestampPeriodNanoseconds": 1.000000}
+  },
+  "staticRtAsset": {"enabled": true, "vertexBytes": 5803648, "indexBytes": 825972, "materialBytes": 2016, "instanceMetadataBytes": 672, "primitiveMetadataBytes": 320, "textureBytes": 173364524, "descriptorCount": 9, "blasBytes": 1032704, "blasBuildMilliseconds": 1.506000, "swordBlasBytes": 717696, "swordBlasBuildMilliseconds": 0.850700, "torchBlasBytes": 315008, "torchBlasBuildMilliseconds": 0.655300, "productionPropBlasBytes": 648064, "productionPropBlasBuildMilliseconds": 3.558700},
+  "dielectricDiagnostics": {"availability": "Available", "available": true, "transportOverflowCount": 0, "shadowOverflowCount": 0, "secondaryDielectricRejectCount": 0, "unclosedVolumeCount": 0, "primaryUnclosedVolumeCount": 0, "shadowUnclosedVolumeCount": 0, "productionPaneStackFailureCount": 0, "productionPaneSecondaryOriginCount": 0, "productionPaneSecondaryTerminalCount": 0, "productionPaneSecondarySameMediumCount": 0, "productionPaneSecondaryDifferentMediumCount": 0},
+  "dielectricReasonDiagnostics": {"availability": "Available", "available": true, "secondaryNearSelfHitCount": 0, "primaryOpenMissCount": 0, "primaryOpenOpaqueCount": 0, "primaryMismatchedExitCount": 0, "primaryInterfaceBudgetCount": 0, "primaryVolumeBudgetCount": 0, "shadowOpenMissCount": 0, "shadowMismatchedExitCount": 0, "primaryTirCount": 0, "primaryInterfaceBudgetOpenVolumeCount": 0, "primaryInterfaceBudgetClosedVolumeCount": 0, "shadowMismatchEmptyCount": 0, "shadowImplicitOriginExitCount": 0, "secondaryDielectricTerminalCount": 0, "primaryTirTerminationCount": 0, "shadowFiniteEndpointVolumeCount": 30, "primaryOpenOpaqueSameInstanceDifferentMaterialCount": 0, "primaryOpenOpaqueAfterTirCount": 0, "primaryOpenOpaqueTerminalInstanceMask": 0, "primaryOpenOpaqueVolumeInstanceMask": 0, "primaryOpenOpaqueTerminalMaterialMask": 0, "primaryClosedVolumeAbsorptionCount": 0, "primaryCertifiedClosedVolumeRecoveryCount": 0, "shadowCertifiedClosedVolumeRecoveryCount": 0, "certifiedClosedVolumeRecoveryReasonMask": 0, "primaryTorchPixelCount": 0, "primarySwordPixelCount": 16086, "primaryPlayerPixelCount": 0, "primaryRewardRingPixelCount": 0, "primaryRewardBodyPixelCount": 0},
+  "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership.",
+  "captures": [
+  ]
+}

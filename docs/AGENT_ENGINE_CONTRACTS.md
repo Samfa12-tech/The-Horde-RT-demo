@@ -7,7 +7,7 @@ Reference for the subsystem being changed, not a repository-wide reading prerequ
 ### RT ownership and phone compatibility
 
 - Shared scene: `src/vulkan/raytracing/PresentableTinyRtScene.cpp`. Shaders: `shaders/raytracing/minimal.rgen`, `minimal.rmiss`, and `minimal.rchit`. Use `tools/compile-raygen.ps1` to regenerate embedded SPIR-V after shader changes.
-- Keep `vkCmdTraceRaysKHR` as the real frame dispatch/presentation path and keep `selectedCapabilities_.rtScene.presented` / report `rtScene.presented` honest. CPU tests, successful pipeline creation, or an RT dispatch without successful presentation do not establish that a frame was presented.
+- Keep `vkCmdTraceRaysKHR` on the preferred pipeline backend. The 1.6.1 S24/S25 programme also authorises `vkCmdDispatch` launching the same BLAS/TLAS-backed hardware ray-query shading, as detailed in root `FUTURE_WORK.md`. It is not software BVH traversal, an empty compute proof or reduced-feature rendering. Keep `selectedCapabilities_.rtScene.presented` / report `rtScene.presented` honest: CPU tests, pipeline creation or dispatch without successful RT-produced presentation do not establish a presented frame.
 - The phone-safe shading route uses `rayQueryEXT` inside raygen. A historical recursive depth-2 experiment failed phone pipeline creation; prove capability and pipeline creation on the phone before making recursion the default.
 - Keep one frame in flight while the held-torch TLAS uses a host-written instance buffer. Increasing concurrency requires proper per-frame TLAS/instance-buffer ownership, not just a higher frame count.
 - Preserve the presentation-format-driven `outputRedBlueSwap` push constant: RGBA RT storage is raw-copied to common BGRA swapchains. Losing the correction can turn warm fire cyan.
@@ -16,7 +16,7 @@ Reference for the subsystem being changed, not a repository-wide reading prerequ
 ### Reusable visuals and bounded transport
 
 - Production props use the measured static GLB/PBR route, fixed-capacity instance/material metadata, shared sockets, and immutable BLAS. Do not restore per-object geometry/material branches or fullscreen held-torch overlays.
-- Held-prop geometry, emissive flame and direct-light placement must agree in world/hand space. Preserve wall-aware retraction, camera/body separation, selective body masks (including the established `0x04` culling contract), and shadow/reflection participation. The owner-selected block-arm presentation is intentional pending acceptable skinned hands/gauntlets; do not silently replace it as incidental cleanup.
+- Held-prop geometry, emissive flame and direct-light placement must agree in world/hand space. Preserve wall-aware retraction, camera/body separation, selective body masks and shadow/reflection participation. The owner-accepted1.6.1 modelled viewmodel is now the normal route; retain block/full-body comparisons only when explicitly selected for diagnostics. Never silently fall back when required modelled assets are unavailable.
 - Use the reusable world-space fire, bounded dielectric glass, held-item sockets and fixed-step lantern-swing systems for extensions. Asset generation alone is not integration: preserve source/runtime separation, textures, licence evidence, budgets, and the measured runtime asset contract in `ASSET_PIPELINE.md` and root `ASSET_LICENSES.md`.
 - Water refracted and High-quality reflected opaque hits use the terminal ordinary material/direct-light path, shared active-light selection, and actual visibility for interface highlights. Preserve `gl_RayFlagsNoOpaqueEXT` transparent filtering, accumulated secondary hit distance from the camera, and physical roof traversal for the moon. Do not double-count a transmitted glossy bounce and water reflection, add water-only transport floors, or use screen-position shadow masks. Water-on-water secondary hits terminate without recursion.
 - The waterfall width control scales the world-Z cross-lane span; world-X is the thin transmission depth. Shader stream centres/radii must match the instance transform. Resolve the instance from current code rather than treating an old TLAS slot number as permanent.
@@ -43,3 +43,21 @@ For relevant background, consult `SHARED_SIMULATION_FOUNDATION_2026-08-10.md` or
 - While the post-lich Android RT Lab is open, `showEndingOverlay()` stays gated by `rtLabVisible`; the repeated finale poll must not replace the lab. Closing the lab clears the flag deliberately before restoring the ending card.
 - Windows RT Lab trackbars stay opaque native controls, repaint after scroll hide/show, and forward wheel input to the lab's vertical scroll owner. Preserve the existing regression contracts for these behaviours.
 - Automated capture evidence does not replace touch feel, perceived audio/haptics or actual lifecycle checks. Report missing evidence precisely instead of inferring it from a different platform or older build.
+
+## 1.6.1 integration contracts (development)
+
+- Horde's `MusicDirector` owns gameplay-state/event-to-cue decisions. Reusable
+  sample cursors, PCM looping/tails/crossfades and strict WAV decoding belong to
+  Pocket Audio Core, currently a byte-exact native-only pinned target under
+  `third_party/pocket-audio-core/`. Change reusable behaviour in the canonical
+  Core source, review/test it and deliberately update the pin; do not fork a
+  Horde-only mixer or import the Chordsmith editor/synth application. Preserve
+  canonical PCS JSON/PCS1 as the revisable score and existing event/SFX authority.
+  CPU helper contracts are not platform playback or owner listening acceptance.
+- Shipping consumes its immutable compiled Mobile/High strategy pair and performs no Diagnostic buffer IO; final Shipping SPIR-V must remain free of diagnostic atomics and binding 22. Policy selection must not become a nonphysical glass or fake-RT fallback.
+- Frame evidence joins recorded CPU/resource/strategy facts with the exact successful submission and its owning fence/final successful idle. Initial signalled fences own no submission. Never read Diagnostic buffers after failed idle or label prior GPU/counter results as the current recorded frame.
+- Optional telemetry identity, clock or timestamp failure must not stop otherwise valid rendering. Preserve independent real-graphics fence ownership for tokenless drains, explicit unavailable/error evidence, and monotonic identity seed floors through Android moves/restarts. No second submission counter or reused serials.
+- Resource inventory records actual live allocation sizes and selected memory flags. Host-visible and device-local byte classifications can overlap on UMA; they are not additive totals. CPU command-record timings are not GPU execution timings.
+- `DynamicUpload` measures scene-data map/copy/flush/unmap only; Diagnostic reset/read IO remains separately counted and included in `WholeFrameCycle`, not mixed into scene upload metrics. `WholeFrameCycle` spans RenderFrame entry through present return. A suboptimal successful presentation advances present identity but remains benchmark-ineligible pending recreation.
+- Preserve dedicated native-RT PlayerWorldBody/PlayerViewmodel ownership, not full-body primary visibility or overlay arms. The accepted five-region WorldBody contributes only its named body remainder to primary rays; its full body supplies secondary visibility. The two-region viewmodel supplies primary arms through independent resources and the same solved gameplay pose. Owner visual acceptance is recorded in `evidence/2026-09-27-segmented-seams/phone/README.md`; integration, physical performance and the final release matrix remain separate gates.
+- The unresolved Hotstrike-derived skeleton redistribution issue remains owner-controlled. Do not remove/replace the shipped skeleton, rewrite history or licensing statements, or change distribution as a workaround.

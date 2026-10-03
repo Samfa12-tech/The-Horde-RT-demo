@@ -1,0 +1,191 @@
+{
+  "investigationOnly": true,
+  "baseCommit": "fec73b88f22c9223ca7075cb5cf76f5cdcdd8d37",
+  "artifacts": [
+    {
+      "path": "pose-replay-03-compute/11-finale-roof.png",
+      "bytes": 1189553,
+      "sha256": "a7f7fbc517cf4d458c79772e3f8bbd1a8f2cd8f80c178fb3379ee96f3a9ee82f"
+    },
+    {
+      "path": "pose-replay-03-compute/capture-manifest.json",
+      "bytes": 5453,
+      "sha256": "239bc02748a14d000c5694dc816ca3a7b1239d74004ad5b56e0e04bb72042e90"
+    },
+    {
+      "path": "pose-replay-03-compute/stderr.log",
+      "bytes": 53,
+      "sha256": "a2d30c85627c146d186166b5fb993d781b874ba8d0a4987e01d235c9da57440c"
+    },
+    {
+      "path": "pose-replay-03-compute/stdout.log",
+      "bytes": 2154,
+      "sha256": "0ba63e90e548f2589a6475abdd879afbab68a9122dad268d4344dc2ca2ce28f6"
+    },
+    {
+      "path": "pose-replay-03-pipeline/11-finale-roof.png",
+      "bytes": 1189424,
+      "sha256": "8ddc0fa20e64012ac75a1f3c2ca90ce27642a37ed1422ae6a2ea4527bf32739b"
+    },
+    {
+      "path": "pose-replay-03-pipeline/capture-manifest.json",
+      "bytes": 5422,
+      "sha256": "8aba7f47a5aa0e7ee4d8801dfb44d476042b19622c8fa1766677e72b66b82cf9"
+    },
+    {
+      "path": "pose-replay-03-pipeline/stderr.log",
+      "bytes": 53,
+      "sha256": "a2d30c85627c146d186166b5fb993d781b874ba8d0a4987e01d235c9da57440c"
+    },
+    {
+      "path": "pose-replay-03-pipeline/stdout.log",
+      "bytes": 2158,
+      "sha256": "9fee76c2ed2b4279fd9f9412776746aff601fa39ce62d7a50bf0a144d0a44287"
+    },
+    {
+      "path": "probe/analyze-volume-geometry.py",
+      "bytes": 6283,
+      "sha256": "8be4f0406e7e736292947f8a61fc43c28b4d4de92932243cabac210a55a221c3"
+    },
+    {
+      "path": "probe/decode-volume-path.py",
+      "bytes": 1871,
+      "sha256": "d8a53040643118a4671a7183f913e25d8d3c9e84bbdb1145c89590d025d857ac"
+    },
+    {
+      "path": "probe/embed-investigation.ps1",
+      "bytes": 2438,
+      "sha256": "bd5e41546444b9f8ddb907c2f9bba216eee1571c029686c908b99de3c4b17bf7"
+    },
+    {
+      "path": "probe/ledger-ci-pr.log",
+      "bytes": 153572,
+      "sha256": "b177568cf4a4e29b6450d43e2598a1f3d739fe2e95d8a647fb22f0c857579889"
+    },
+    {
+      "path": "probe/ledger-ci-push.log",
+      "bytes": 142933,
+      "sha256": "7796bec658dc569cb629e0fa3e890e121f87b4e458c4283e85ed3fa279bfd631"
+    },
+    {
+      "path": "probe/live-volume-source.patch",
+      "bytes": 17994,
+      "sha256": "3c9d0ba59c87c839a8948167e802c27fec381b10edae97e1f9203a17e0c16f7e"
+    },
+    {
+      "path": "probe/minimal.rgen.spv",
+      "bytes": 252196,
+      "sha256": "611a5abc86e3a0035c3f9cd58f61952748b3c0474c33e7d8ae8e6c67a378ce86"
+    },
+    {
+      "path": "probe/minimal.rgen.spvasm",
+      "bytes": 743881,
+      "sha256": "c6818522d1582d2632061222d15722e2427f033c908f6264484e8e174a56baf3"
+    },
+    {
+      "path": "probe/production-restoration-catalog-check.log",
+      "bytes": 2718,
+      "sha256": "93e516e33639e4795ac459fef1e6f684b4dc51fcdb1f631d6d8a967b5a54c3a2"
+    },
+    {
+      "path": "probe/production-restoration-compute.log",
+      "bytes": 1906,
+      "sha256": "71f6fe50e65c7db72f218922fc748a358cc4ef906840db643b8d7f761a35bee7"
+    },
+    {
+      "path": "probe/production-restoration-freeze.log",
+      "bytes": 2700,
+      "sha256": "32c04070a1637884a172482f8b52dc0401884f508e2d427dc6093e521b3e9d1e"
+    },
+    {
+      "path": "probe/production-restoration-native.log",
+      "bytes": 1421,
+      "sha256": "169d167559f8786902046416f6f6593bd31ec46c3745baf259964d9f73dd29cd"
+    },
+    {
+      "path": "probe/production-restoration-tests.log",
+      "bytes": 751,
+      "sha256": "552c6c05a20c0dbe33b3d354de139f99076377cf8a044e1b6bfb9e9ea284dbc8"
+    },
+    {
+      "path": "probe/raygen-stats.json",
+      "bytes": 2840,
+      "sha256": "cd70437a92406f5a72b9b645449f98f08f92e65d051deaeb169d426bb6c7346b"
+    },
+    {
+      "path": "probe/volume-geometry-analysis.json",
+      "bytes": 6482,
+      "sha256": "97cb478099bd01007e431d2b7959bbb79f7ccafb8acd27e95be969cf43abf7e2"
+    },
+    {
+      "path": "probe/volume-objectray-analysis.json",
+      "bytes": 21391,
+      "sha256": "89138de8dd9a25b480f1a6271f71cf16bc87970979f61efdc4afa067ef27a3d7"
+    },
+    {
+      "path": "probe/volume-objectray-build.log",
+      "bytes": 1397,
+      "sha256": "dd466dc852d73553b5c900015b39ac83e2fa25035f7ec2539c0c643e327ae8e9"
+    },
+    {
+      "path": "probe/volume-objectray-compile.log",
+      "bytes": 313,
+      "sha256": "942fb04334dcc0e071cf0fdc829d1ab7753d0696b5e283b4efdd717a537cb5de"
+    },
+    {
+      "path": "README.md",
+      "bytes": 6418,
+      "sha256": "750412ee9636be03ae4d32334e29c094be60226f3ec306bc42da1fd5ae806ec3"
+    },
+    {
+      "path": "volume-marker-capture/11-finale-roof.png",
+      "bytes": 1189426,
+      "sha256": "190382ce2385b5e0735a6f73542e31f40a30c4efe7cd8935442ee02ca9cb659a"
+    },
+    {
+      "path": "volume-marker-capture/capture-manifest.json",
+      "bytes": 5422,
+      "sha256": "fcd2b06c15d7d378eb7b18e9e02380d6ff6fb7fdd5f5a40c45f8d81ae405e79d"
+    },
+    {
+      "path": "volume-marker-capture/stderr.log",
+      "bytes": 53,
+      "sha256": "a2d30c85627c146d186166b5fb993d781b874ba8d0a4987e01d235c9da57440c"
+    },
+    {
+      "path": "volume-marker-capture/stdout.log",
+      "bytes": 2154,
+      "sha256": "6dd66a377ef7df2554e48265a84c9f53ce84bf738952d8cf1a7022e5008e3cce"
+    },
+    {
+      "path": "volume-objectray-capture/11-finale-roof.png",
+      "bytes": 1169576,
+      "sha256": "fa7e4b1d68a8427483a5daf030be0c1832a0266b3174cb8e1d89bf3aa1bedcb7"
+    },
+    {
+      "path": "volume-objectray-capture/alternatives.json",
+      "bytes": 91393,
+      "sha256": "e246236c6c65e6114caf08477defe82fa353b9492032b46744e5dc9b09e53807"
+    },
+    {
+      "path": "volume-objectray-capture/capture-manifest.json",
+      "bytes": 5422,
+      "sha256": "f81a33d6e1988c8a483486f88417a62bc1538ad3d77379112039d1ed1c9a91b3"
+    },
+    {
+      "path": "volume-objectray-capture/paths.json",
+      "bytes": 17876,
+      "sha256": "d294569a9a27c5ad8cfd7508da3a48b5c3f5c72d6da458230f0c932a3bdc541b"
+    },
+    {
+      "path": "volume-objectray-capture/stderr.log",
+      "bytes": 53,
+      "sha256": "a2d30c85627c146d186166b5fb993d781b874ba8d0a4987e01d235c9da57440c"
+    },
+    {
+      "path": "volume-objectray-capture/stdout.log",
+      "bytes": 2160,
+      "sha256": "ad654647efae40342397e33b530dc43ba44a05719323f72e019991386bd7868a"
+    }
+  ]
+}

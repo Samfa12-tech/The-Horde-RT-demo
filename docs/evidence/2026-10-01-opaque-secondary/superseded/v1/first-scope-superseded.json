@@ -1,0 +1,8 @@
+{
+  "classification": "superseded-unmeasured-prior-scope",
+  "reason": "Pre-review OpaqueFast-only profile had a temporary direct-fire ownership override; parent directed scope change before final artifact. It is not to be installed, analysed for timing, or treated as accepted.",
+  "apk": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\artifacts\\candidate\\HordeLanternRT-opaque-secondary-shipping-mobile-benchmark-arm64.apk",
+  "apkSha256": "74fc8daec37b98c9f66c5136718b5085f18560b89059ef25e504adf9fdff0da4",
+  "supersededReceipt": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\logs\\candidate-package-containment-01.json",
+  "noPhoneUse": true
+}

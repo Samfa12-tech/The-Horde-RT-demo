@@ -1,0 +1,17 @@
+PASS: normal include graph expands to primary raygen source
+PASS: OpaqueFast compatibility selector is present and replaceable
+PASS: injected instrumentation and quality values match normal compiler policy
+PASS: primary stage retains camera/trace and stops after record store
+PASS: shade stage loads record while preserving original shade and presentation
+PASS: repeated primary-stage anchor is rejected
+PASS: missing primary-stage anchor is rejected
+PASS: repeated shade-stage end anchor is rejected
+PASS: missing shade-stage trace anchor is rejected
+PASS: primary transform preserves the exact camera and trace prefix
+PASS: primary transform only replaces shading tail and keeps one valid function close
+PASS: shade transform preserves the exact original shading/output suffix
+PASS: generated C++ header provides the four word arrays, spans, policy, and binding constants
+PASS: generator refuses an output directory equal to the repository root
+PASS: include cycle is rejected
+PASS: out-of-repository dependency is rejected
+Staged-primary transformation tests passed.

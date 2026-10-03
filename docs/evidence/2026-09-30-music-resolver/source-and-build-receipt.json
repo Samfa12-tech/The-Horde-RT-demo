@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "repositoryHeadAtValidation": "492eeee6c90d966a2ddaebb0bd877bbcd298d32a",
+  "sourceState": "Reviewed original resolver/CMake/test working changes; shared code not yet wired to playback",
+  "sourceCheckoutHashes": [
+    {
+      "path": "src/audio/MusicDirector.h",
+      "sha256": "608624b62d9dc89027e3a8e82317f3d7b723e4b6b16ee69cf7aa9fa36142acec"
+    },
+    {
+      "path": "src/audio/MusicDirector.cpp",
+      "sha256": "eec1e5eb7be8993817ba8c39a65bf9fbd7b0dfada381b890eac7887a5769fb82"
+    },
+    {
+      "path": "tests/MusicDirectorTests.cpp",
+      "sha256": "3f6ffcc648a1009f19b5a20c9ba65b99fe63160baf8faa8456fa5de9f503bf90"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "2313c193b39ecbde571b00cd6a84c4be0e02a4eabb4399a7087c938d6f843237"
+    },
+    {
+      "path": "cmake/HordeRtSources.cmake",
+      "sha256": "2b0b54d5926c2571e6d5737315a43002eb564fb4065db85274a4da4730648cb5"
+    }
+  ],
+  "validation": {
+    "msvcDebug": "2/2 pass, lead real simulation fixture",
+    "msvcRelease": "2/2 pass, lead real simulation fixture",
+    "androidArm64Debug": "Gradle exit0, compile/link/package; no install",
+    "newHeadCi": "pending"
+  },
+  "android": {
+    "apkPath": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/android/app/build/intermediates/apk/debug/app-debug.apk",
+    "sha256": "dc9215a23b9ae94c5419f32e310309d38b352564fbc51cc6155661db1ea08dbc",
+    "applicationId": "com.samfa12.hordelanternrt.debug",
+    "versionCode": 9,
+    "versionName": "1.6.1-debug",
+    "nativeAbi": "arm64-v8a",
+    "conventionalOutputStale": true,
+    "installed": false
+  },
+  "commands": [
+    "cmake --build --preset windows-x64-debug --target horde_rt_music_director_tests",
+    "ctest --preset windows-x64-debug -R ^horde_rt_(music_director|simulation_gameplay)_tests$ --output-on-failure",
+    "cmake --build --preset windows-x64-release --target horde_rt_music_director_tests",
+    "ctest --preset windows-x64-release -R ^horde_rt_(music_director|simulation_gameplay)_tests$ --output-on-failure",
+    "HORDE_VALIDATION_UNSIGNED=1 (process scoped); gradlew.bat assembleDebug \"-Pandroid.injected.build.abi=arm64-v8a\" --console=plain"
+  ],
+  "excludedClaims": [
+    "music rendered/listening/loop seams",
+    "device/playback acceptance",
+    "four-ABI final matrix",
+    "publication"
+  ]
+}

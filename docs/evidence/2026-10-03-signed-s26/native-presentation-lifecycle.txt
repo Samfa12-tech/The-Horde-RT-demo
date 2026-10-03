@@ -1,0 +1,27 @@
+10-03 11:21:52.044  7544  7544 I HordeRtProbeBridge: HORDE_SURFACE_REQUEST generation=1
+10-03 11:22:03.390  7544  7775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-03 11:22:03.390  7544  7775 I HordeRtProbeBridge: RT render scale 76%: 1094x2265 -> 1440x2980
+10-03 11:22:03.390  7544  7775 I HordeRtProbeBridge: HORDE_SURFACE_STARTED generation=1
+10-03 11:22:03.397  7544  7990 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-03 11:22:03.397  7544  7990 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=1
+10-03 11:24:35.106  7544  7544 I HordeRtProbeBridge: HORDE_SURFACE_CANCEL generation=1
+10-03 11:25:09.249  7544  7544 I HordeRtProbeBridge: HORDE_SURFACE_REQUEST generation=3
+10-03 11:25:21.972  7544  7775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-03 11:25:21.972  7544  7775 I HordeRtProbeBridge: RT render scale 76%: 1094x2265 -> 1440x2980
+10-03 11:25:21.972  7544  7775 I HordeRtProbeBridge: HORDE_SURFACE_STARTED generation=3
+10-03 11:25:21.979  7544  9495 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-03 11:25:21.979  7544  9495 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=3
+10-03 11:26:14.171  7544  7544 I HordeRtProbeBridge: HORDE_SURFACE_CANCEL generation=3
+10-03 11:26:38.176  7544  7544 I HordeRtProbeBridge: HORDE_SURFACE_REQUEST generation=5
+10-03 11:26:55.479  7544  7775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-03 11:26:55.479  7544  7775 I HordeRtProbeBridge: RT render scale 76%: 1094x2265 -> 1440x2980
+10-03 11:26:55.479  7544  7775 I HordeRtProbeBridge: HORDE_SURFACE_STARTED generation=5
+10-03 11:26:55.493  7544 10499 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-03 11:26:55.493  7544 10499 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=5
+10-03 11:27:39.665  7544  7544 I HordeRtProbeBridge: HORDE_SURFACE_CANCEL generation=5
+10-03 11:29:00.239  7544  7544 I HordeRtProbeBridge: HORDE_SURFACE_REQUEST generation=7
+10-03 11:29:13.602  7544  7775 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-03 11:29:13.602  7544  7775 I HordeRtProbeBridge: RT render scale 76%: 1094x2265 -> 1440x2980
+10-03 11:29:13.602  7544  7775 I HordeRtProbeBridge: HORDE_SURFACE_STARTED generation=7
+10-03 11:29:13.609  7544 13407 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-03 11:29:13.609  7544 13407 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=7

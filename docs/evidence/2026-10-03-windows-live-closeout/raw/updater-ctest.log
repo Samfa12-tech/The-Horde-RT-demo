@@ -1,0 +1,12 @@
+[OUTPUT] 
+Internal ctest changing into directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+
+[HANDLER_OUTPUT] 
+Test project C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+
+    Start 25: horde_rt_github_release_updater_tests
+1/1 Test #25: horde_rt_github_release_updater_tests ...   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.03 sec

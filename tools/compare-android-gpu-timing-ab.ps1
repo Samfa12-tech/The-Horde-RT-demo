@@ -21,7 +21,7 @@ function Read-Run([string]$directory) {
         throw "A/B run is missing summary.json, timing.csv, thermal-before.txt, or Vulkan capability evidence: $full"
     }
     $summary = Get-Content -LiteralPath $summaryPath -Raw | ConvertFrom-Json
-    if ([int]$summary.schema -lt 4) { throw "A/B run lacks exact installed-APK/source provenance: $full" }
+    if ([int]$summary.schema -lt 8) { throw "A/B run lacks exact selected RT pipeline-pair provenance: $full" }
     $thermal = Get-Content -LiteralPath $thermalPath -Raw
     $currentSection = [regex]::Match(
         $thermal,
@@ -58,9 +58,18 @@ if ($null -eq $enabled -or $null -eq $disabled) { throw "A/B requires exactly on
 
 $mismatches = [Collections.Generic.List[string]]::new()
 $provenanceWarnings = [Collections.Generic.List[string]]::new()
-foreach ($field in @("deviceModel", "androidVersion", "apiLevel", "scale", "package", "apkSha256", "installedApkSha256", "sourceCommit", "sourceDirty", "raygenSha256")) {
+foreach ($field in @("deviceModel", "androidVersion", "apiLevel", "scale", "package", "apkSha256", "installedApkSha256", "sourceCommit", "sourceDirty")) {
     if ([string]$enabled.summary.$field -ne [string]$disabled.summary.$field) {
         $mismatches.Add("Run provenance differs at $field.")
+    }
+}
+foreach ($strategy in @("opaqueFast", "genericDielectric")) {
+    foreach ($field in @("key", "sha256")) {
+        $enabledValue = [string]$enabled.summary.selectedRtPipelineBundle.$strategy.$field
+        $disabledValue = [string]$disabled.summary.selectedRtPipelineBundle.$strategy.$field
+        if ([string]::IsNullOrWhiteSpace($enabledValue) -or $enabledValue -cne $disabledValue) {
+            $mismatches.Add("Selected RT pipeline provenance differs or is missing at $strategy.$field.")
+        }
     }
 }
 foreach ($field in @("gpuName", "vendorId", "deviceId", "driverVersion", "vulkanApiVersion")) {
@@ -138,14 +147,14 @@ if ($mismatches.Count -eq 0) {
 
 $passed = $mismatches.Count -eq 0 -and -not $investigationRequired
 $result = [ordered]@{
-    schema = 2
+    schema = 3
     passed = $passed
     enabledRun = $enabled.directory
     disabledRun = $disabled.directory
     matchedApkSha256 = $enabled.summary.apkSha256
     matchedSourceCommit = $enabled.summary.sourceCommit
     matchedSourceDirty = [bool]$enabled.summary.sourceDirty
-    matchedRaygenSha256 = $enabled.summary.raygenSha256
+    matchedRtPipelineBundle = $enabled.summary.selectedRtPipelineBundle
     maximumStartingTemperatureDifferenceC = $MaximumStartingTemperatureDifferenceC
     startingTemperatureDifferencesC = $temperatureDifferences
     startingThermalStatusDifference = $thermalStatusDifference

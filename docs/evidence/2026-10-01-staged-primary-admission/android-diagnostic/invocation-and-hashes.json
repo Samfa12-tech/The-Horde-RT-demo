@@ -1,0 +1,50 @@
+{
+  "command": "& 'C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\inspect-diagnostic-staged-apk.ps1' -RepoRoot 'C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass' -ApkPath 'C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\horde-staged-debug-diagnostic-mobile.apk' -ReceiptPath 'C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\receipt.json' -StageDirectory 'C:\\Dev\\tmp\\horde-staged-rt-20261001\\shaders-diagnostic-mobile' -OutputDirectory 'C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\module-inspection-v3'",
+  "result": "exit 0; exact eight-module ARM64 Diagnostic/Mobile package inspection passed; all eight modules passed spirv-val and spirv-dis for Vulkan 1.2.",
+  "sourceHead": "59cb0576790cdb47d529746ab3d2d30ac34462fb",
+  "apk": {
+    "bytes": 113780999,
+    "sha256": "db125b80210753a9b1e50bdf51cbb5a923036d13280db346b3190f13f4afc299"
+  },
+  "moduleInspectionReceipt": {
+    "file": "module-inspection.json",
+    "bytes": 9230,
+    "sha256": "91cc303cb7aeb7fc06e2c2f7e24a7670a5f6162189c3c62c3a31c637707dd030"
+  },
+  "inspectionScript": {
+    "path": "../inspect-diagnostic-staged-apk.ps1",
+    "bytes": 11704,
+    "sha256": "17ff5626fd0b30073609ee4722a611140dee4f143b2293145f867cd746748e5d"
+  },
+  "pinnedInputs": {
+    "stagedManifestSha256": "d9dfe29d53774bab090dba671d53fb783872d81045366d07e3e7238e6e1a678b",
+    "raygenCatalogSha256": "1a262500da9098d5de9921f25e07423aeb59354445fe6c8a8a735a9eba6d65c4",
+    "rayqueryCatalogSha256": "20b98150b58653b471415ef78e9f95c2065ef2e003e97754be8785a84d9353d6",
+    "arm64LibrarySha256": "a5c108b9e7ccaacf9dd11c35cdccd455113ab4525606d4ea249ad32e261ca8f1"
+  },
+  "retainedOutputs": {
+    "spirvModules": 8,
+    "disassemblies": 8,
+    "spirvToolLogs": 16,
+    "rawToolCommand": "spirv-val --target-env vulkan1.2 <module.spv>; spirv-dis <module.spv> -o <module.spv.spvasm>",
+    "tools": {
+      "spirvVal": "C:\\VulkanSDK\\1.4.350.0\\Bin\\spirv-val.exe",
+      "spirvDis": "C:\\VulkanSDK\\1.4.350.0\\Bin\\spirv-dis.exe"
+    }
+  },
+  "limitations": [
+    "Diagnostic atomics and binding 22 are intentionally recorded, not treated as Shipping-policy failures.",
+    "Static package/module validation only. No install, ADB, device runtime, RT presentation, visual acceptance, or performance claim.",
+    "Earlier failed attempts remain in sibling module-inspection and module-inspection-v2 directories; module-inspection-v3 is the accepted successful run."
+  ],
+  "supersededToolingFailures": [
+    {
+      "directory": "../module-inspection",
+      "failure": "The helper import omitted Assert-True, which Get-IncludeBytes requires; script stopped before any SPIR-V verdict."
+    },
+    {
+      "directory": "../module-inspection-v2",
+      "failure": "The Run-Tool helper used PowerShell's automatic $args variable as a parameter, so spirv-val received an invalid argument invocation and reported Invalid SPIR-V magic number. Extracted bytes had the correct SPIR-V magic; a direct invocation with the intended arguments passed. This was a harness defect, not a module failure."
+    }
+  ]
+}

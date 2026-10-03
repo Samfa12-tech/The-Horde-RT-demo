@@ -1,0 +1,13 @@
+{
+  "baseCommit": "7a095c7836058f2129f1c3b08b1e8482671cbc72",
+  "sourceDirty": true,
+  "mode": "shadow",
+  "nonphysicalWorkloadIsolation": true,
+  "publishable": false,
+  "apkPath": "C:\\Dev\\tmp\\horde-shipping-ab-20260930\\opening-lighting-shadow\\HordeLanternRT-nonshipping-fire-shadow-isolation-arm64.apk",
+  "apkSha256": "23aa0cf67f5f0612290f8607078d47e7e47bdf81202d9290ab15cc796dd73fea",
+  "nativeSha256": "52658c1727f002fb76549063f32f3fc8f2dc38dca2ff6cb0908670014e1edc49",
+  "patchSha256": "d5cb17b5850fc1b5ea02555ce4c962786da3355d4587c737741e9fdbfa4cdcb7",
+  "headerSha256": "a5b5b2e2efe26cad43c9d053fd3713f30722ca9b089a820aeda23a7f44abfa31",
+  "purpose": "Opening cost attribution only; never a physical/quality-preserving candidate"
+}

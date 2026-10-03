@@ -22,6 +22,9 @@ struct PlayerArmIkTarget
     PlayerIkVector gripZ{{0.0f, 0.0f, -1.0f}};
     float upperArmLength = 0.42f;
     float lowerArmLength = 0.40f;
+    // Optional pose allowance for an overreaching authored chain. Zero keeps
+    // the existing minimum-stretch policy; it does not move the grip target.
+    float preferredElbowFlexionRadians = 0.0f;
 
     bool operator==(const PlayerArmIkTarget&) const = default;
 };

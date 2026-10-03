@@ -1,0 +1,22 @@
+CMake is re-running because C:/Dev/tmp/horde-music-bank-asan-20261001/build/CMakeFiles/generate.stamp is out-of-date.
+  the file 'C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt'
+  is newer than 'C:/Dev/tmp/horde-music-bank-asan-20261001/build/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+Generated RT catalog adapter is current.
+-- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+-- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+-- Horde Lantern RT: configuring shared host gameplay tests without Vulkan targets.
+-- Configuring done (17.4s)
+-- Generating done (0.7s)
+-- Build files have been written to: C:/Dev/tmp/horde-music-bank-asan-20261001/build
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-music-bank-asan-20261001\build\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-music-bank-asan-20261001\build\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  WindowsMusicPlayback.cpp
+  horde_windows_music.vcxproj -> C:\Dev\tmp\horde-music-bank-asan-20261001\build\Debug\horde_windows_music.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  WindowsMusicPlaybackSmoke.cpp
+  horde_rt_windows_music_playback_smoke.vcxproj -> C:\Dev\tmp\horde-music-bank-asan-20261001\build\Debug\horde_rt_windows_music_playback_smoke.exe

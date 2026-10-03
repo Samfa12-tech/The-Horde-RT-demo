@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start  6: horde_rt_benchmark_evidence_report_tests
+1/4 Test  #6: horde_rt_benchmark_evidence_report_tests ...   Passed    0.02 sec
+    Start  8: horde_rt_benchmark_evidence_run_tests
+2/4 Test  #8: horde_rt_benchmark_evidence_run_tests ......   Passed    0.03 sec
+    Start 27: horde_rt_dielectric_math_tests
+3/4 Test #27: horde_rt_dielectric_math_tests .............   Passed    0.13 sec
+    Start 75: horde_rt_character_render_slot_smoke
+4/4 Test #75: horde_rt_character_render_slot_smoke .......   Passed    0.84 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   1.04 sec

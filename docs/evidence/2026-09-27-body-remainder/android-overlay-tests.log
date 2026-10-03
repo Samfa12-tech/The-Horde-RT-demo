@@ -1,0 +1,6 @@
+paired manifest stages: passed
+manifest name without hash rejects: rejected
+manifest hash without name rejects: rejected
+manifest hash mismatch rejects: rejected
+manifest path traversal rejects: rejected
+legacy receipt stages without a world-manifest overlay: passed

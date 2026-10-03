@@ -1,6 +1,9 @@
 #include "vulkan/raytracing/DielectricMath.h"
+#include "vulkan/raytracing/DielectricContactGeometry.h"
+#include "fixtures/PrimaryBoundaryPlanePrototype.h"
 
 #include <array>
+#include <bit>
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -31,6 +34,7 @@ using horde::vulkan::raytracing::RefractDirection;
 using horde::vulkan::raytracing::ResolveDielectricInterfaceBudget;
 using horde::vulkan::raytracing::ResolveDielectricTerminal;
 using horde::vulkan::raytracing::SchlickFresnel;
+using horde::vulkan::raytracing::SelectDielectricNormalBias;
 using horde::vulkan::raytracing::ShadowInterfaceSample;
 using horde::vulkan::raytracing::ThinWallTransition;
 using horde::vulkan::raytracing::Vec3;
@@ -207,7 +211,7 @@ void TestNearestShadowTraversalIsCandidateOrderIndependent()
         {4.0f, 30u, 303u, true, true, 0.75f, 0.0f,
          Vec3{0.5f, 1.0f, 0.25f}, 0.0f},
     }};
-    const Vec3 expected{0.1269f, 0.5400f, 0.12285f};
+    const Vec3 expected{0.0486f, 0.3888f, 0.0243f};
     std::array<int, ordered.size()> permutation{{0, 1, 2, 3, 4}};
     do
     {
@@ -260,8 +264,8 @@ void TestShadowBlockersAndUnclosedVolumesFailDeterministically()
     }};
     const auto mismatched = EvaluateBoundedShadow<4u, 2u>(mismatchedInstance, 3.0f);
     Check(mismatched.unclosedVolume && !mismatched.blocked &&
-              NearlyEqual(mismatched.transmittance, Vec3{0.072f, 0.072f, 0.072f}),
-          "an exit from a different instance still uses the bounded stack-failure fallback");
+              NearlyEqual(mismatched.transmittance, Vec3{}),
+          "an exit from a different instance fails closed instead of creating pseudo-light");
 }
 
 void TestShadowOriginInsideClosedVolumes()
@@ -297,7 +301,7 @@ void TestShadowOriginInsideClosedVolumes()
          Vec3{0.5f, 0.8f, 1.0f}, 2.0f},
     }};
     const auto unmatched = EvaluateBoundedShadow<4u, 2u>(laterUnmatchedExit, 3.0f);
-    Check(unmatched.unclosedVolume,
+    Check(unmatched.unclosedVolume && NearlyEqual(unmatched.transmittance, Vec3{}),
           "an unmatched exit after a complete entry-exit pair is not reclassified as an inside-origin segment");
 }
 
@@ -313,6 +317,7 @@ void TestMobileAndHighShadowBounds()
     const auto mobileInterfaces = EvaluateBoundedShadow<4u, 2u>(thinInterfaces, 2.0f);
     const auto highInterfaces = EvaluateBoundedShadow<8u, 4u>(thinInterfaces, 2.0f);
     Check(mobileInterfaces.overflow && mobileInterfaces.interfaceCount == 4u &&
+              NearlyEqual(mobileInterfaces.transmittance, Vec3{}) &&
               !highInterfaces.overflow && highInterfaces.interfaceCount == 5u,
           "Mobile enforces four shadow interfaces while High accepts the same five-interface path");
 
@@ -327,6 +332,7 @@ void TestMobileAndHighShadowBounds()
     const auto mobileVolumes = EvaluateBoundedShadow<8u, 2u>(threeNestedVolumes, 2.0f);
     const auto highVolumes = EvaluateBoundedShadow<8u, 4u>(threeNestedVolumes, 2.0f);
     Check(mobileVolumes.overflow && mobileVolumes.interfaceCount == 3u &&
+              NearlyEqual(mobileVolumes.transmittance, Vec3{}) &&
               !highVolumes.overflow && !highVolumes.unclosedVolume &&
               highVolumes.interfaceCount == 6u,
           "Mobile enforces two nested shadow volumes while High closes the same three-volume path");
@@ -346,9 +352,8 @@ void TestMillimetreScaleRayAdvance()
     const Vec3 advanced = AdvanceDielectricRayOrigin(
         Vec3{0.0f, 0.0f, 0.0f}, Vec3{-1.0f, 0.0f, 0.0f},
         grazingDirection, epsilon);
-    Check(advanced.x > epsilon && advanced.x < epsilon * 1.10f &&
-              advanced.z > epsilon * 0.99f,
-          "grazing entry uses the bounded normal-aware bias and remains far below a one-millimetre wall");
+    Check(NearlyEqual(advanced.x, epsilon, epsilon * 0.00001f) && advanced.z == 0.0f,
+          "grazing entry uses bounded normal-only bias without moving along a nearby side edge");
 }
 
 void TestGenericShadowOriginKeepsMillimetreClearance()
@@ -368,6 +373,135 @@ void TestGenericShadowOriginKeepsMillimetreClearance()
           "generic shadow origin cannot jump a 1.5 mm cage-to-glass clearance");
     Check(NearlyEqual(legacy, Vec3{position.x - 0.004f, position.y, position.z}),
           "legacy-inactive shadow origin retains the reviewed four-millimetre normal offset");
+}
+
+void TestRecordedNormalSeparationSelectsBoundedBias()
+{
+    // Exact RTX row237 guard intermediates at (515,569)/(515,570). These are
+    // object-space projection bounds, not an invented geometry/material knob.
+    constexpr float floor = 3.0154373234836385e-5f;
+    constexpr float oldClearance = 6.853263039374724e-5f;
+    const float scaleLower = oldClearance / floor;
+    for (const float errorUpper : {6.928406219230965e-5f, 6.964926433283836e-5f})
+    {
+        Check(scaleLower * floor <= errorUpper,
+              "recorded coordinate-only bias fails the conservative separation check");
+        const float selected = SelectDielectricNormalBias(floor, scaleLower, errorUpper);
+        Check(selected > floor && selected < 3.1e-5f &&
+                  scaleLower * selected > errorUpper,
+              "per-hit projected error selects a strict bounded separation without global bias inflation");
+    }
+    Check(SelectDielectricNormalBias(floor, scaleLower, oldClearance * 0.8f) == floor,
+          "an already sufficient coordinate floor remains byte-identical");
+    Check(SelectDielectricNormalBias(0.00025f, 1.0f, 0.00025f) == 0.0f &&
+              SelectDielectricNormalBias(floor, 1.0f, 0.001f) == 0.0f,
+          "a separation requiring more than the unchanged quarter-millimetre cap fails closed");
+    const float nan = std::numeric_limits<float>::quiet_NaN();
+    const float infinity = std::numeric_limits<float>::infinity();
+    Check(SelectDielectricNormalBias(nan, 1.0f, 0.0f) == 0.0f &&
+              SelectDielectricNormalBias(floor, infinity, 0.0f) == 0.0f &&
+              SelectDielectricNormalBias(floor, 1.0f, nan) == 0.0f &&
+              SelectDielectricNormalBias(floor, 0.0f, 0.0f) == 0.0f &&
+              SelectDielectricNormalBias(floor, -1.0f, 0.0f) == 0.0f &&
+              SelectDielectricNormalBias(floor, 1.0f, -1.0f) == 0.0f,
+          "non-finite and invalid projection inputs cannot admit a guarded offset");
+}
+
+void TestBoundedShadowPhysicalSegmentLengthsAndCoincidentCandidates()
+{
+    const Vec3 color{0.25f, 0.5f, 1.0f};
+    const std::array<ShadowInterfaceSample, 2u> normalPath{{
+        {1.0f, 1u, 7u, true, false, 0.8f, 0.0f, color, 1.0f, 3u},
+        {2.0f, 2u, 7u, false, false, 0.8f, 0.0f, color, 1.0f, 3u},
+    }};
+    const auto normal = EvaluateBoundedShadow<4u, 2u>(normalPath, 4.0f);
+    Check(!normal.overflow && !normal.unclosedVolume && normal.interfaceCount == 2u &&
+              NearlyEqual(normal.transmittance, Vec3{0.16f, 0.32f, 0.64f}),
+          "normal-incidence closed segment applies measured unit path absorption and both interface transmissions");
+
+    const std::array<ShadowInterfaceSample, 2u> obliquePath{{
+        {1.0f, 1u, 7u, true, false, 0.8f, 0.0f, color, 1.0f, 3u},
+        {3.0f, 2u, 7u, false, false, 0.8f, 0.0f, color, 1.0f, 3u},
+    }};
+    const auto oblique = EvaluateBoundedShadow<4u, 2u>(obliquePath, 4.0f);
+    Check(!oblique.unclosedVolume && oblique.interfaceCount == 2u &&
+              NearlyEqual(oblique.transmittance, Vec3{0.04f, 0.16f, 0.64f}),
+          "oblique closed segment uses its longer measured ray distance rather than pane thickness");
+
+    const auto partial = EvaluateBoundedShadow<4u, 2u>(normalPath, 1.5f);
+    Check(!partial.unclosedVolume && partial.interfaceCount == 1u &&
+              NearlyEqual(partial.transmittance, Vec3{0.4f, 0.5656854f, 0.8f}),
+          "finite endpoint inside a volume integrates only the measured entry-to-endpoint segment");
+
+    const std::array<ShadowInterfaceSample, 1u> thinSheet{{
+        {1.0f, 1u, 8u, true, true, 0.75f, 0.0f, Vec3{0.5f, 0.25f, 1.0f}, 0.0f, 5u},
+    }};
+    const auto thin = EvaluateBoundedShadow<4u, 2u>(thinSheet, 2.0f);
+    Check(thin.interfaceCount == 1u &&
+              NearlyEqual(thin.transmittance, Vec3{0.375f, 0.1875f, 0.75f}),
+          "thin-sheet transmission multiplies the full supplied RGB tint without an arbitrary blend");
+
+    const std::array<ShadowInterfaceSample, 3u> exactDuplicate{{
+        {1.0f, 1u, 7u, true, false, 0.8f, 0.0f, color, 1.0f, 3u},
+        {1.0f, 99u, 7u, true, false, 0.8f, 0.0f, color, 1.0f, 3u},
+        {2.0f, 2u, 7u, false, false, 0.8f, 0.0f, color, 1.0f, 3u},
+    }};
+    const auto deduplicated = EvaluateBoundedShadow<4u, 2u>(exactDuplicate, 3.0f);
+    Check(!deduplicated.unclosedVolume && !deduplicated.overflow &&
+              deduplicated.interfaceCount == 2u &&
+              NearlyEqual(deduplicated.transmittance, normal.transmittance),
+          "only exact same instance/material/distance/orientation seam candidates are suppressed");
+
+    const std::array<ShadowInterfaceSample, 2u> coincidentOppositeFaces{{
+        {1.0f, 1u, 7u, true, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 3u},
+        {1.0f, 1u, 7u, false, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 3u},
+    }};
+    const auto oppositeFaces = EvaluateBoundedShadow<4u, 2u>(coincidentOppositeFaces, 2.0f);
+    Check(!oppositeFaces.unclosedVolume && oppositeFaces.interfaceCount == 2u &&
+              NearlyEqual(oppositeFaces.transmittance, Vec3{0.64f, 0.64f, 0.64f}),
+          "opposite orientations at an exactly coincident distance remain distinct interfaces");
+
+    const std::array<ShadowInterfaceSample, 4u> distinctIdentity{{
+        {1.0f, 1u, 7u, true, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 3u},
+        {1.0f, 2u, 8u, true, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 4u},
+        {2.0f, 3u, 8u, false, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 4u},
+        {3.0f, 4u, 7u, false, false, 0.8f, 0.0f, Vec3{1.0f, 1.0f, 1.0f}, 0.0f, 3u},
+    }};
+    const auto distinct = EvaluateBoundedShadow<4u, 2u>(distinctIdentity, 4.0f);
+    Check(!distinct.unclosedVolume && distinct.interfaceCount == 4u &&
+              NearlyEqual(distinct.transmittance, Vec3{0.4096f, 0.4096f, 0.4096f}),
+          "coincident candidates from different instance/material identities remain independently paired");
+
+    std::vector<ShadowInterfaceSample> overCandidateCapacity(33u);
+    const auto candidateOverflow = EvaluateBoundedShadow<8u, 4u>(overCandidateCapacity, 2.0f);
+    Check(candidateOverflow.overflow && candidateOverflow.interfaceCount == 0u &&
+              NearlyEqual(candidateOverflow.transmittance, Vec3{}),
+          "candidate-array overflow is an explicit zero-transmittance failure");
+
+    const std::array<ShadowInterfaceSample, 0u> noBoundaries{};
+    const auto noBoundaryEvidence = EvaluateBoundedShadow<4u, 2u>(noBoundaries, 2.0f);
+    Check(noBoundaryEvidence.interfaceCount == 0u &&
+              NearlyEqual(noBoundaryEvidence.transmittance, Vec3{1.0f, 1.0f, 1.0f}),
+          "without boundary or initial-medium evidence the segment cannot infer an enclosing volume");
+
+}
+
+void TestClosedPaneEntryNearEdgeKeepsExitReachable()
+{
+    // A thick pane still has arbitrarily short valid paths near its side edge.
+    // Corridor-scale bias cannot be justified by comparing only wall thickness.
+    constexpr float sideBoundary = 0.08f;
+    const Vec3 entry{sideBoundary - 0.000012f, 0.0f, 0.0f};
+    const Vec3 outward{0.0f, -1.0f, 0.0f};
+    const Vec3 transmitted{0.6f, 0.8f, 0.0f};
+    const float epsilon = DielectricRayEpsilon(Vec3{-35.03f, 0.16f, -17.3f}, 1.69f);
+    const Vec3 advanced = AdvanceDielectricRayOrigin(entry, outward, transmitted, epsilon);
+    Check(advanced.x == entry.x && advanced.y > 0.0f && advanced.y < 0.00308f,
+          "entry bias must stay inside a closed pane instead of stepping laterally beyond its side exit");
+    const float sideExitDistance = (sideBoundary - advanced.x) / transmitted.x;
+    Check(sideExitDistance > horde::vulkan::raytracing::kDielectricRayMinimumDistance &&
+              sideExitDistance < epsilon * 0.5f,
+          "a valid corner exit can precede half the normal bias; the next query must not skip it");
 }
 
 void TestRoughClosedVolumeTransmissionReachesPairedBoundary()
@@ -400,6 +534,619 @@ void TestRoughClosedVolumeTransmissionReachesPairedBoundary()
               std::sqrt(constrained.x * constrained.x + constrained.y * constrained.y +
                         constrained.z * constrained.z), 1.0f),
           "rough reflection and exit lobes cannot cross the physical ideal interface hemisphere at grazing angles");
+}
+
+void TestRecordedTriangleSurfacePointKeepsMicrometreExit()
+{
+    // Exact SM-S948B pixel(193,1537), cap59 -> side57. The storage-image
+    // probe records both surface points and the adjacent edge. These are
+    // float32 world coordinates, not a generic hardware error-bound claim.
+    const Vec3 rayPoint{-11.275285720825195f, 0.7012073397636414f, -15.045056343078613f};
+    const Vec3 surfacePoint{-11.275285720825195f, 0.701207160949707f, -15.045053482055664f};
+    const Vec3 edgeAnchor{-11.264504432678223f, 0.6987274885177612f, -15.064215660095215f};
+    const auto inwardDistance = [&](const Vec3& point) {
+        // Relative subtraction and double arithmetic isolate the recorded
+        // geometric error rather than rounding this tiny plane test again.
+        return 0.8439831927183018 * (double(point.x) - edgeAnchor.x) -
+            0.1941153799393518 * (double(point.y) - edgeAnchor.y) +
+            0.5000115895457053 * (double(point.z) - edgeAnchor.z);
+    };
+    const double sideDistance = inwardDistance(surfacePoint);
+    Check(inwardDistance(rayPoint) < 0.0 && sideDistance > 0.0,
+          "ray-t reconstruction can be outside an adjacent pane side while its triangle surface point remains inside");
+    const Vec3 outgoing{-0.7785452008247375f, -0.6073121428489685f, 0.15823812782764435f};
+    const double outwardSpeed = -(0.8439831927183018 * outgoing.x -
+        0.1941153799393518 * outgoing.y + 0.5000115895457053 * outgoing.z);
+    const double sideExitDistance = sideDistance / outwardSpeed;
+    Check(sideExitDistance > horde::vulkan::raytracing::kDielectricRayMinimumDistance &&
+              sideExitDistance < 0.00001,
+          "the captured triangle surface point retains a real micrometre-scale adjacent exit above the unchanged query minimum");
+}
+
+void TestPrimaryBoundaryNearSegmentProof()
+{
+    using namespace horde::vulkan::raytracing::investigation;
+    const RtPrimaryBoundaryBounds bounds{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, true};
+    const std::array<float, 12u> identity{{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0}};
+    const std::array<float, 3u> direction{{1.0f, 0.0f, 0.0f}};
+    const auto lower = BuildPrimaryBoundaryPlane(bounds, identity, {-2.0f, 0.0f, 0.0f});
+    const auto upper = BuildPrimaryBoundaryPlane(bounds, identity, {2.0f, 0.0f, 0.0f});
+    Check(lower.axisPlusOne == 1u && lower.negativeHalfSpace && lower.coordinate < -1.004f &&
+              upper.axisPlusOne == 1u && !upper.negativeHalfSpace && upper.coordinate > 1.004f,
+          "qualification planes enclose source bounds and the complete unchanged near interval outward");
+    Check(PrimaryBoundaryNearSegmentOutside(lower, {-2.0f, 0.0f, 0.0f}, direction, 0.002f) &&
+              PrimaryBoundaryNearSegmentOutside(upper, {2.0f, 0.0f, 0.0f}, direction, 0.002f),
+          "a separated primary origin certifies either exterior half-space without changing the ray");
+    Check(!PrimaryBoundaryNearSegmentOutside(lower, {-1.001f, 0.0f, 0.0f}, direction, 0.002f) &&
+              !PrimaryBoundaryNearSegmentOutside(upper, {0.0f, 0.0f, 0.0f}, direction, 0.002f) &&
+              !PrimaryBoundaryNearSegmentOutside(upper, {upper.coordinate, 0.0f, 0.0f}, direction, 0.002f),
+          "clipped entries, inside/nested origins and touching bounds cannot certify primary exit rejection");
+    Check(!PrimaryBoundaryNearSegmentOutside(upper, {2.0f, 0.0f, 0.0f}, {3.0f, 0.0f, 0.0f}, 0.002f) &&
+              !PrimaryBoundaryNearSegmentOutside(upper, {2.0f, 0.0f, 0.0f}, direction, 0.003f) &&
+              !PrimaryBoundaryNearSegmentOutside({}, {2.0f, 0.0f, 0.0f}, direction, 0.002f),
+          "unsupported ray bounds and absent certificates remain native fallbacks");
+    auto reflected = identity;
+    reflected[0] = -1.0f;
+    auto singular = identity;
+    singular[5] = 0.0f;
+    auto nonfinite = identity;
+    nonfinite[3] = std::numeric_limits<float>::infinity();
+    auto overflowing = identity;
+    overflowing[0] = std::numeric_limits<float>::max();
+    overflowing[5] = std::numeric_limits<float>::max();
+    overflowing[10] = std::numeric_limits<float>::max();
+    const float largest = std::numeric_limits<float>::max();
+    Check(BuildPrimaryBoundaryPlane(bounds, reflected, {2.0f, 0.0f, 0.0f}).axisPlusOne == 0u &&
+              BuildPrimaryBoundaryPlane(bounds, singular, {2.0f, 0.0f, 0.0f}).axisPlusOne == 0u &&
+              BuildPrimaryBoundaryPlane(bounds, nonfinite, {2.0f, 0.0f, 0.0f}).axisPlusOne == 0u,
+          "unknown winding parity, singular and nonfinite transforms cannot certify a boundary plane");
+    Check(BuildPrimaryBoundaryPlane({{-largest, -largest, -largest}, {largest, largest, largest}, true},
+                                    overflowing, {0.0f, 0.0f, 0.0f}).axisPlusOne == 0u,
+          "finite inputs exceeding the representable GPU plane domain fall back before narrowing");
+    // The nominal CPU camera selects an axis only. The actual bobbed shader
+    // origin may cross back inside and must then retain ordinary traversal.
+    Check(!PrimaryBoundaryNearSegmentOutside(lower, {-0.99f, 0.0f, 0.0f}, direction, 0.002f),
+          "actual shader origin, not a nominal camera flag, controls near-segment qualification");
+}
+
+void TestOutsideOriginKeepsExactBoundaryTouch()
+{
+    using namespace horde::vulkan::raytracing::investigation;
+    const RtPrimaryBoundaryBounds bounds{{-1, -1, -1}, {1, 1, 1}, true};
+    const std::array<float, 12u> identity{{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0}};
+    const std::array<float, 3u> origin{{-2, 0, 0}};
+    const float component = std::sqrt(0.5f);
+    const std::array<float, 3u> direction{{component, component, 0}};
+    const auto plane = BuildPrimaryBoundaryPlane(bounds, identity, origin);
+    Check(PrimaryBoundaryNearSegmentOutside(plane, origin, direction, 0.002f),
+          "an exact corner-touch ray still has a certified exterior near segment");
+
+    // Equal binary32 x/y direction components give equal exact slab times.
+    // The ray touches (-1,1,0): left entry and top exit coincide, with no
+    // positive-length interval inside the cube. Outward top winding is +Y.
+    const std::array<Vec3, 3u> top{{{-1, 1, -1}, {-1, 1, 1}, {1, 1, 1}}};
+    const Vec3 point{-1, 1, 0};
+    const float u = 0.5f, v = 0.0f;
+    const Vec3 reconstructed{
+        top[0].x * (1-u-v) + top[1].x*u + top[2].x*v,
+        top[0].y * (1-u-v) + top[1].y*u + top[2].y*v,
+        top[0].z * (1-u-v) + top[1].z*u + top[2].z*v};
+    const double entryTime = (-1.0-double(origin[0]))/double(direction[0]);
+    const double exitTime = (1.0-double(origin[1]))/double(direction[1]);
+    const auto topOrientation = OrientInterface({component, component, 0}, {0, 1, 0});
+    Check(reconstructed.x == point.x && reconstructed.y == point.y &&
+              reconstructed.z == point.z && u >= 0 && v >= 0 && u+v <= 1 &&
+              entryTime == exitTime && entryTime > 0.002 && !topOrientation.entering,
+          "a native backface may be a genuine closed-volume edge touch despite an outside origin");
+    Check(SchlickFresnel(component, 1.0f, 1.5f) > 0.0f,
+          "a valid edge surface cannot be silently erased on the assumption that zero interior length means no reflection");
+    // No traversal promise supplies the simultaneous front face. This test is
+    // a NO-GO witness for blanket backface rejection, not an alternative tracer
+    // or a new optical policy for corner ownership.
+}
+
+void TestRecordedRow43OutsideOriginCornerRejectsFirstExit()
+{
+    using horde::vulkan::raytracing::investigation::BuildPrimaryBoundaryPlane;
+    using horde::vulkan::raytracing::investigation::PrimaryBoundaryNearSegmentOutside;
+    using horde::vulkan::raytracing::investigation::RtPrimaryBoundaryBounds;
+    // Investigation witnesses are retained under
+    // docs/evidence/2026-09-30-glass-spawn/derived-normal-bias/row43/:
+    // native-path.json decodes 11-finale-roof.png, SHA-256
+    // 9d68aef8110e5f64319690973dbcafa6f3178204a5bec89e2c978fefb845be1c,
+    // and records pipeline primitive 63. compute-native-path.json decodes
+    // 11-finale-roof.png, SHA-256
+    // e0cbf7fd2f3246c84c4e03e26ea8e2d7b8cdcb4af6c9f8f5b1fdd60340a24a0e,
+    // and records the valid primitive 9 entry at the same pixel. The values
+    // below preserve each backend's captured float32 ray independently; these
+    // double-precision fixture calculations are not runtime predicates.
+    const Vec3 origin{
+        0.29004669189453125f, -0.018100142478942871f, 1.5681824684143066f};
+    const Vec3 pipelineDirection{
+        -0.40491229295730591f, -0.49916413426399231f, -2.1799464225769043f};
+    const Vec3 computeDirection{
+        -0.40491232275962830f, -0.49916410446166992f, -2.1799466609954834f};
+    const float nativeExitBaryV = 3.486895217008623e-9f;
+    const std::array<Vec3, 3u> nativeExitTriangle{{
+        {0.013142652809619904f, -0.33249998092651367f, 0.20776373147964478f},
+        {0.17335733771324158f, -0.33249998092651367f, 0.11526373028755188f},
+        {0.17335733771324158f, -0.67750000953674316f, 0.11526373028755188f},
+    }};
+    const std::array<Vec3, 3u> capturedValidEntryTriangle{{
+        {-0.013142652809619904f, -0.33249998092651367f, -0.20776373147964478f},
+        {-0.17335733771324158f, -0.67750000953674316f, -0.11526373028755188f},
+        {-0.013142652809619904f, -0.67750000953674316f, -0.20776373147964478f},
+    }};
+
+    struct ReferenceHit
+    {
+        double determinant;
+        double uNumerator;
+        double vNumerator;
+        double tNumerator;
+        double t;
+        bool insideTriangle;
+    };
+    using DVec3 = std::array<double, 3u>;
+    const auto asDouble = [](const Vec3& value) -> DVec3 {
+        return {static_cast<double>(value.x), static_cast<double>(value.y),
+                static_cast<double>(value.z)};
+    };
+    const auto referenceDoubleHit = [](const DVec3& rayOrigin, const DVec3& rayDirection,
+                                       const std::array<DVec3, 3u>& triangle) {
+        const auto subtract = [](const DVec3& left, const DVec3& right) -> DVec3 {
+            return {left[0] - right[0], left[1] - right[1], left[2] - right[2]};
+        };
+        const auto cross = [](const DVec3& left, const DVec3& right) -> DVec3 {
+            return {left[1] * right[2] - left[2] * right[1],
+                    left[2] * right[0] - left[0] * right[2],
+                    left[0] * right[1] - left[1] * right[0]};
+        };
+        const auto dot = [](const DVec3& left, const DVec3& right) {
+            return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+        };
+        const DVec3 o = rayOrigin;
+        const DVec3 d = rayDirection;
+        const DVec3 a = triangle[0];
+        const DVec3 edge1 = subtract(triangle[1], a);
+        const DVec3 edge2 = subtract(triangle[2], a);
+        const DVec3 p = cross(d, edge2);
+        const double determinant = dot(edge1, p);
+        const DVec3 fromA = subtract(o, a);
+        const double uNumerator = dot(fromA, p);
+        const DVec3 q = cross(fromA, edge1);
+        const double vNumerator = dot(d, q);
+        const double tNumerator = dot(edge2, q);
+        const double signedUvSum = uNumerator + vNumerator;
+        const bool insideTriangle = determinant > 0.0
+            ? uNumerator >= 0.0 && vNumerator >= 0.0 && signedUvSum <= determinant
+            : determinant < 0.0 && uNumerator <= 0.0 && vNumerator <= 0.0 &&
+                  signedUvSum >= determinant;
+        return ReferenceHit{determinant, uNumerator, vNumerator, tNumerator,
+                            tNumerator / determinant, insideTriangle};
+    };
+    const auto referenceHit = [&](const Vec3& rayOrigin, const Vec3& rayDirection,
+                                  const std::array<Vec3, 3u>& triangle) {
+        return referenceDoubleHit(asDouble(rayOrigin), asDouble(rayDirection),
+            {asDouble(triangle[0]), asDouble(triangle[1]), asDouble(triangle[2])});
+    };
+
+    const ReferenceHit exit = referenceHit(
+        origin, pipelineDirection, nativeExitTriangle);
+    Check(nativeExitBaryV > 0.0f && exit.determinant < 0.0 &&
+              exit.uNumerator < 0.0 && exit.vNumerator > 0.0 &&
+              exit.uNumerator + exit.vNumerator >= exit.determinant &&
+              !exit.insideTriangle,
+          "row43 primitive 63 has positive native baryV but a strictly outside double-precision signed numerator");
+    Check(std::abs(exit.vNumerator / exit.determinant -
+                   (-1.0472011617346364e-7)) < 1.0e-15,
+          "pipeline primitive 63 normalized v reproduces the retained strictly negative double reference");
+    Check(exit.t > 0.0 && std::abs(exit.t - 0.629852548967093) < 1.0e-12,
+          "the outside primitive 63 reference distance reproduces the retained double result");
+
+    DielectricStack<4u> outsideOriginStack;
+    const auto rejectedFirstExit = outsideOriginStack.Exit(8u, 115u);
+    Check(!rejectedFirstExit.accepted && outsideOriginStack.Depth() == 0u,
+          "an exiting glass boundary cannot pop an empty primary stack for the recorded outside ray origin");
+
+    const ReferenceHit pipelineEntry = referenceHit(
+        origin, pipelineDirection, capturedValidEntryTriangle);
+    const ReferenceHit computeEntry = referenceHit(
+        origin, computeDirection, capturedValidEntryTriangle);
+    Check(pipelineEntry.determinant > 0.0 && pipelineEntry.uNumerator > 0.0 &&
+              pipelineEntry.vNumerator > 0.0 &&
+              pipelineEntry.uNumerator + pipelineEntry.vNumerator <
+                  pipelineEntry.determinant && pipelineEntry.insideTriangle &&
+              computeEntry.determinant > 0.0 && computeEntry.uNumerator > 0.0 &&
+              computeEntry.vNumerator > 0.0 &&
+              computeEntry.uNumerator + computeEntry.vNumerator <
+                  computeEntry.determinant && computeEntry.insideTriangle,
+          "captured primitive 9 is inside under each backend's own captured ray");
+    Check(pipelineEntry.t > 0.0 &&
+              std::abs(pipelineEntry.t - 0.8082919771786382) < 1.0e-12,
+          "pipeline ray reproduces its retained primitive 9 double distance");
+    Check(computeEntry.t > 0.0 &&
+              std::abs(computeEntry.t - 0.8082918915765992) < 1.0e-12,
+          "compute ray reproduces its distinct retained primitive 9 double distance");
+    DielectricStack<4u> validEntryStack;
+    Check(validEntryStack.Enter(8u, 115u, 1.52f).accepted &&
+              validEntryStack.Depth() == 1u,
+          "the valid primitive 9 entry is admitted as the paired volume's first boundary");
+
+    // The rounded object ray above is not the authored world-geometry proof.
+    // Check the actual captured world ray against the uploaded triangle and
+    // captured float32 objectToWorld, without rounding transformed vertices
+    // back to float32. The independent exact-rational analysis (all72 uploaded
+    // triangles, both rays) is retained under docs/evidence/2026-10-02-high-row43/
+    // source-world-exact-reference.json.
+    const std::array<DVec3, 4u> objectToWorld{{
+        asDouble({0.0006712007452733815f, -0.0019177242647856474f, -0.43999528884887695f}),
+        asDouble({-0.14535273611545563f, 0.41529321670532227f, -0.002031791489571333f}),
+        asDouble({0.4152977764606476f, 0.14535430073738098f, -3.080929733556559e-09f}),
+        asDouble({-11.30408763885498f, 0.48013100028038025f, -15.072416305541992f}),
+    }};
+    const auto worldTriangle = [&](const std::array<Vec3, 3u>& triangle) {
+        std::array<DVec3, 3u> transformed{};
+        for (std::size_t vertex = 0u; vertex < triangle.size(); ++vertex)
+        {
+            const DVec3 source = asDouble(triangle[vertex]);
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+                transformed[vertex][axis] = objectToWorld[0][axis] * source[0] +
+                    objectToWorld[1][axis] * source[1] + objectToWorld[2][axis] * source[2] +
+                    objectToWorld[3][axis];
+        }
+        return transformed;
+    };
+    const DVec3 worldOrigin = asDouble({-10.649999618530273f, 0.699999988079071f, -15.199999809265137f});
+    const std::array<DVec3, 2u> worldDirections{{
+        asDouble({-0.8330438733100891f, -0.523387610912323f, 0.17917372286319733f}),
+        asDouble({-0.8330439329147339f, -0.523387610912323f, 0.17917373776435852f}),
+    }};
+    const std::array<double, 2u> exactWorldExitV{{-2.2272837458911408e-7, -3.5984283192344683e-7}};
+    const std::array<double, 2u> exactWorldEntryT{{0.8082922814899058, 0.8082922320854496}};
+    const RtPrimaryBoundaryBounds cornerBounds{
+        {-0.22f, -0.70f, -0.22f}, {0.22f, -0.30f, 0.22f}, true};
+    std::array<float, 12u> rowMajorTransform{};
+    for (std::size_t row = 0u; row < 3u; ++row)
+        for (std::size_t column = 0u; column < 4u; ++column)
+            rowMajorTransform[row * 4u + column] = static_cast<float>(objectToWorld[column][row]);
+    const auto primaryPlane = BuildPrimaryBoundaryPlane(cornerBounds, rowMajorTransform,
+        {-10.649999618530273f, 0.699999988079071f, -15.199999809265137f});
+    Check(primaryPlane.axisPlusOne != 0u,
+          "recorded positive-winding held-lantern transform admits a bounded source-box qualification plane");
+    for (std::size_t backend = 0u; backend < worldDirections.size(); ++backend)
+    {
+        const ReferenceHit worldExit = referenceDoubleHit(
+            worldOrigin, worldDirections[backend], worldTriangle(nativeExitTriangle));
+        const ReferenceHit worldEntry = referenceDoubleHit(
+            worldOrigin, worldDirections[backend], worldTriangle(capturedValidEntryTriangle));
+        Check(worldExit.determinant < 0.0 && worldExit.vNumerator > 0.0 &&
+                  !worldExit.insideTriangle && worldExit.t > 0.0 &&
+                  std::abs(worldExit.vNumerator / worldExit.determinant - exactWorldExitV[backend]) < 1.0e-14,
+              "each actual world ray also misses uploaded primitive63, independently of rounded object-ray arithmetic");
+        Check(worldEntry.determinant > 0.0 && worldEntry.insideTriangle &&
+                  worldEntry.t > worldExit.t && std::abs(worldEntry.t - exactWorldEntryT[backend]) < 1.0e-12,
+              "each actual world ray preserves the genuine primitive9 entry under the source transform");
+        std::array<float, 3u> direction{};
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+            direction[axis] = static_cast<float>(worldDirections[backend][axis]);
+        Check(PrimaryBoundaryNearSegmentOutside(primaryPlane,
+                  {-10.649999618530273f, 0.699999988079071f, -15.199999809265137f}, direction, 0.002f),
+              "both recorded world-ray near segments are outside the conservative component enclosure");
+    }
+    // The independent TestRecordedTriangleSurfacePointKeepsMicrometreExit
+    // covers a distinct valid short exit; this row43 assertion rejects an
+    // outside triangle candidate without introducing a spatial epsilon.
+}
+
+void TestRecordedHighGlassFloorContactKeepsBothSurfaces()
+{
+    // Native source4870272, pixel456,304. Both lossless witnesses and their
+    // float32 fields are retained in high-edge/decoded.json under
+    // docs/evidence/2026-10-02-backend-pixel-witness/. This double-precision
+    // plane reference is test-only, not an analytic production ray substitute.
+    struct ContactRay
+    {
+        Vec3 origin;
+        Vec3 direction;
+        double expectedRawDistance;
+    };
+    const std::array<ContactRay, 2u> rays{{
+        {{-9.151651f, -0.70825523f, -15.574968f},
+         {0.42783222f, -0.7623293f, 0.4856065f}, 0.3171133038196251},
+        {{-9.151651f, -0.7082553f, -15.574968f},
+         {0.4278322f, -0.7623293f, 0.4856064f}, 0.31711322563209343},
+    }};
+    // Unit-box bottom -0.5 under the actual fixture Y transform. The route
+    // floor is -0.95f. These authored float operands produce exactly the
+    // same double plane; do not introduce a proximity epsilon to join them.
+    const double glassBottom = static_cast<double>(-0.5f) * 1.25f +
+                               static_cast<double>(-0.325f);
+    const double floorPlane = static_cast<double>(-0.95f);
+    Check(glassBottom == floorPlane,
+          "the authored closed-glass bottom and opaque route floor are exactly coplanar");
+    for (const ContactRay& ray : rays)
+    {
+        const double exitDistance = (glassBottom - ray.origin.y) / ray.direction.y;
+        const double receiverDistance = (floorPlane - ray.origin.y) / ray.direction.y;
+        const double x = ray.origin.x + static_cast<double>(ray.direction.x) * exitDistance;
+        const double z = ray.origin.z + static_cast<double>(ray.direction.z) * exitDistance;
+        Check(exitDistance == receiverDistance && exitDistance > 0.0 &&
+                  std::abs(exitDistance - ray.expectedRawDistance) < 1.0e-14,
+              "each captured backend ray reaches the real exit and opaque receiver at its own identical raw distance");
+        Check(x > -9.20 && x < -9.00 && z > -15.575 && z < -14.825 &&
+                  x > -28.50 && x < -8.50 && z > -16.80 && z < -13.60,
+              "the contact lies strictly inside both glass bottom and authored route-floor footprints");
+        // Native HitInfo.t also includes the preceding normal advance. It is
+        // not the raw plane-intersection distance asserted above.
+        const auto exit = OrientInterface(ray.direction, Vec3{0.0f, -1.0f, 0.0f});
+        Vec3 transmitted{};
+        Check(!exit.entering && RefractDirection(ray.direction, exit.normal,
+                                                1.52f, 1.0f, transmitted),
+              "this recorded glass bottom is a genuine transmitting exit, not TIR");
+        Check(transmitted.y < 0.0f,
+              "post-exit transmission enters the opaque floor's lower half-space");
+        const float cosine = -ray.direction.y;
+        const auto partition = horde::vulkan::raytracing::PartitionDielectricEnergy(
+            EffectiveDielectricFresnel(cosine, 1.52f, 1.0f, 0.12f), 0.94f);
+        Check(partition.reflection > 0.0f && partition.transmission > 0.0f &&
+                  partition.reflection + partition.transmission <= 1.0f,
+              "contact keeps the exit Fresnel partition instead of replacing transport with blanket absorption");
+        DielectricStack<4u> stack;
+        Check(stack.Enter(9u, 107u, 1.52f).accepted &&
+                  ResolveDielectricTerminal(stack.Depth(), DielectricTerminalKind::Opaque) ==
+                      DielectricTerminalResolution::FailUnclosedVolume,
+              "an opaque tie winner alone cannot certify or silently pop the open glass volume");
+        Check(stack.Exit(9u, 107u).accepted &&
+                  ResolveDielectricTerminal(stack.Depth(), DielectricTerminalKind::Opaque) ==
+                      DielectricTerminalResolution::ShadeTerminal,
+              "only the actual paired glass exit admits shading the retained opaque receiver");
+    }
+    const Vec3 escapedOrigin{-9.015981f, -0.9500308f, -15.420976f};
+    const Vec3 escapedDirection{0.6500254f, -0.17963497f, 0.7383753f};
+    const double lostReceiverDistance = (floorPlane - escapedOrigin.y) / escapedDirection.y;
+    Check(lostReceiverDistance < 0.0,
+          "the recorded post-exit spawn moves below the coincident floor and puts its receiver behind the ray");
+    // A runtime correction must keep actual floor0/486/1 with the exit9/8/107
+    // at the same event. This reference neither chooses a backend's RGB nor
+    // relaxes ordinary open-volume failure, query bounds or image tolerances.
+}
+
+void TestConservativeGeometricContactQualification()
+{
+    using horde::vulkan::raytracing::CertifyAxisContactPlane;
+    using horde::vulkan::raytracing::MatchesAxisContactPlane;
+    using horde::vulkan::raytracing::contact_detail::ExactAffineCoordinate;
+    // Actual world floor primitive486 and unit-box bottom8, not a replacement
+    // ray intersection. Native candidates establish the bounded footprints.
+    const std::array<Vec3, 3u> floor{{
+        {-28.5f, -0.95f, -13.6f}, {-8.5f, -0.95f, -13.6f}, {-8.5f, -0.95f, -16.8f}}};
+    const std::array<Vec3, 3u> bottom{{
+        {-0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, 0.5f}}};
+    const auto receiver = CertifyAxisContactPlane(floor, {0.0f, 1.0f, 0.0f});
+    const std::array<float, 4u> row{0.0f, 1.25f, 0.0f, -0.325f};
+    Check(receiver.has_value() && MatchesAxisContactPlane(*receiver, bottom, row),
+          "actual authored glass/floor contact is certified independently of native raw-distance ordering");
+    if (!receiver) return;
+    auto gapRow = row;
+    gapRow[3] = std::nextafter(row[3], 0.0f);
+    Check(static_cast<double>(gapRow[1]) * -0.5 + gapRow[3] != receiver->coordinate,
+          "air-gap fixture remains distinct in the exact double reference");
+    Check(!MatchesAxisContactPlane(*receiver, bottom, gapRow),
+          "a real air gap at the recorded contact is rejected without an epsilon");
+    auto insideRow = row;
+    insideRow[3] = std::nextafter(row[3], -1.0f);
+    Check(!MatchesAxisContactPlane(*receiver, bottom, insideRow),
+          "an interior receiver is not reclassified as a coincident exit");
+    auto slanted = bottom;
+    slanted[1].y = std::nextafter(slanted[1].y, 0.0f);
+    Check(!MatchesAxisContactPlane(*receiver, slanted, row),
+          "a triangle with only partial coplanarity does not qualify");
+    Check(!MatchesAxisContactPlane(*receiver, {bottom[0], bottom[0], bottom[0]}, row) &&
+              !MatchesAxisContactPlane(*receiver,
+                  {bottom[0], Vec3{0.0f, -0.5f, -0.5f}, bottom[1]}, row),
+          "a degenerate exit triangle cannot establish an actual contact plane");
+    auto sheared = row;
+    sheared[0] = 0.125f;
+    Check(!MatchesAxisContactPlane(*receiver, bottom, sheared) &&
+              !MatchesAxisContactPlane(*receiver, bottom, {0.0f, 0.0f, 0.0f, -0.95f}),
+          "unsupported multi-coefficient and collapsed transform rows remain uncertified");
+    Check(!CertifyAxisContactPlane(floor, {0.0f, -1.0f, 0.0f}) &&
+              !CertifyAxisContactPlane(floor, {0.0f, 0.5f, 0.0f}) &&
+              !CertifyAxisContactPlane({floor[0], floor[0], floor[0]}, {0.0f, 1.0f, 0.0f}),
+          "wrong winding, non-unit axis normal and degenerate source receiver are rejected");
+    Check(!CertifyAxisContactPlane({Vec3{0.0f, -0.95f, 0.0f},
+                  Vec3{2.0f, -0.95f, 4.0f}, Vec3{3.0f, -0.95f, 1.0f}}, {0.0f, 1.0f, 0.0f}),
+          "valid planes without a provable axis-edge winding remain deliberately uncertified");
+    auto nonplanarFloor = floor;
+    nonplanarFloor[2].y = std::nextafter(-0.95f, 0.0f);
+    Check(!CertifyAxisContactPlane(nonplanarFloor, {0.0f, 1.0f, 0.0f}),
+          "authored normal code alone cannot certify a nonplanar receiver");
+    const float nan = std::numeric_limits<float>::quiet_NaN();
+    Check(!MatchesAxisContactPlane(*receiver, bottom, {0.0f, nan, 0.0f, -0.325f}) &&
+              !MatchesAxisContactPlane(*receiver, bottom, {0.0f, 0x1p-30f, 0.0f, -0.95f}) &&
+              !MatchesAxisContactPlane(*receiver, bottom, {0.0f, 0x1p30f, 0.0f, -0.95f}),
+          "nonfinite, subnormal-sensitive and oversized arithmetic domains are rejected, not clamped");
+    for (float gap : {-0x1p-20f, 0x1p-20f})
+    {
+        const float rounded = 128.0f * 0.5f + gap;
+        Check(rounded == 64.0f && 64.0 + static_cast<double>(gap) != 64.0 &&
+              !ExactAffineCoordinate(128.0f, 0.5f, gap, 64.0f),
+              "a rounded-away gap or interior obstruction is rejected in both signs");
+    }
+    Check(ExactAffineCoordinate(1.0f, 1.0f, -0.5f, 0.5f) &&
+              ExactAffineCoordinate(-1.0f, 1.0f, 0.5f, -0.5f) &&
+              ExactAffineCoordinate(1.0f, 0.0f, -0.325f, -0.325f) &&
+              ExactAffineCoordinate(1.0f, 1.0f, -0.0f, 1.0f),
+          "integer proof preserves exact differences of both signs and signed zero");
+    const float oneNext = std::nextafter(1.0f, 2.0f);
+    Check(!ExactAffineCoordinate(oneNext, 1.0f, 3.0f, 4.0f) &&
+              ExactAffineCoordinate(1.0f, 1.0f, 3.0f, 4.0f),
+          "discarded significand bits reject a rounded-only equality at the maximum alignment shift");
+    Check(!ExactAffineCoordinate(1.0f, 1.0f, -2.0f, -1.0f) &&
+              !ExactAffineCoordinate(1.0f, 1.0f, -1.0f, 0.0f) &&
+              !ExactAffineCoordinate(1.0f, 1.0f, 7.0f, 8.0f),
+          "unsupported sign cancellation, zero receiver and exponent gaps are not silently certified");
+    // Independently exact double reference over a finite dyadic/nextafter grid.
+    // Inputs remain in a narrow range: double represents every product+sum
+    // exactly here (this is not a claimed oracle for arbitrary float exponents).
+    unsigned cases = 0u;
+    unsigned accepted = 0u;
+    for (int i = 0; i < 16; ++i)
+        for (int j = 0; j < 16; ++j)
+            for (int k = 0; k < 8; ++k)
+                for (int sign : {-1, 1})
+                {
+                    const float scale = sign * std::bit_cast<float>(
+                        std::bit_cast<std::uint32_t>(0.5f + i / 16.0f) + j / 4u);
+                    const float local = std::ldexp(0.25f, j % 4);
+                    const float translation = sign * k / 16.0f;
+                    const double exact = static_cast<double>(scale) * local + translation;
+                    const float rounded = static_cast<float>(exact);
+                    for (const float plane : {rounded, std::nextafter(rounded, -4.0f),
+                                             std::nextafter(rounded, 4.0f)})
+                    {
+                        const bool qualified = ExactAffineCoordinate(scale, local, translation, plane);
+                        const bool commuted = ExactAffineCoordinate(local, scale, translation, plane);
+                        Check(qualified == (exact == static_cast<double>(plane)) &&
+                                  commuted == qualified,
+                              "bounded integer equality agrees with the independent exact finite-grid reference");
+                        if (qualified) accepted += 2u;
+                        cases += 2u;
+                    }
+                }
+    Check(cases == 24576u && accepted > 0u && accepted < cases,
+          "finite integer-contact grid exercises both certification and rejection");
+    std::cout << "Integer contact grid: " << cases << " checks, " << accepted
+              << " exact contacts admitted.\n";
+    Check(!ExactAffineCoordinate(1.25f, 0.75f, 0.0f, 0.9375f),
+          "unsupported non-power-of-two products remain uncertified even when exact");
+    for (std::uint32_t axis = 0u; axis < 3u; ++axis)
+    {
+        auto rotated = floor;
+        for (auto& vertex : rotated)
+            vertex = axis == 0u ? Vec3{vertex.y, vertex.z, vertex.x} :
+                (axis == 2u ? Vec3{vertex.z, vertex.x, vertex.y} : vertex);
+        const Vec3 normal = axis == 0u ? Vec3{1.0f, 0.0f, 0.0f} :
+            (axis == 2u ? Vec3{0.0f, 0.0f, 1.0f} : Vec3{0.0f, 1.0f, 0.0f});
+        for (unsigned edge = 0; edge < 3u; ++edge)
+        {
+            const auto plane = CertifyAxisContactPlane(rotated, normal);
+            Check(plane && plane->axis == axis && plane->coordinate == -0.95f,
+                  "source winding certificate is cyclically invariant on all three plane axes");
+            const auto first = rotated[0];
+            rotated[0] = rotated[1]; rotated[1] = rotated[2]; rotated[2] = first;
+        }
+    }
+    DielectricStack<4u> stack;
+    stack.Enter(9u, 107u, 1.52f);
+    const Vec3 incident{0.8660254f, -0.5f, 0.0f};
+    const auto exit = OrientInterface(incident, {0.0f, -1.0f, 0.0f});
+    Vec3 transmitted{};
+    const bool transmits = RefractDirection(incident, exit.normal, 1.52f, 1.0f, transmitted);
+    if (transmits) stack.Exit(9u, 107u);
+    Check(!transmits && stack.Depth() == 1u &&
+              ResolveDielectricTerminal(stack.Depth(), DielectricTerminalKind::Opaque) ==
+                  DielectricTerminalResolution::FailUnclosedVolume,
+          "geometric coincidence does not consume an opaque receiver or pop the volume during TIR");
+}
+
+void TestOpposedNativeContactAdmission()
+{
+    using namespace horde::vulkan::raytracing;
+    const std::array<Vec3, 3u> bottom{{
+        {-0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, 0.5f}}};
+    using Rows = std::array<std::array<float, 4u>, 3u>;
+    const Rows actual{{{0.2f, 0.0f, 0.0f, -9.06f},
+                       {0.0f, 1.25f, 0.0f, -0.325f},
+                       {0.0f, 0.0f, 0.85f, -15.2464f}}};
+    const AxisContactPlane floor{1u, -0.95f, 1.0f};
+    Check(MatchesOpposedAxisContactPlane(floor, bottom, actual),
+          "recorded native glass exit has exactly the receiver plane and opposed winding");
+    auto shear = actual;
+    shear[0][2] = 0.125f;
+    Check(!MatchesOpposedAxisContactPlane(floor, bottom, shear),
+          "shear outside the plane row cannot bypass full transformed-winding qualification");
+    auto collapsed = actual;
+    collapsed[0][0] = 0.0f;
+    Check(!MatchesOpposedAxisContactPlane(floor, bottom, collapsed),
+          "collapsed linear transforms remain uncertified");
+    auto reversed = bottom;
+    std::swap(reversed[1], reversed[2]);
+    Check(!MatchesOpposedAxisContactPlane(floor, reversed, actual),
+          "plane coincidence with a nonopposed exit winding is not a contact");
+    auto gap = actual;
+    gap[1][3] = std::nextafter(gap[1][3], 0.0f);
+    Check(!MatchesOpposedAxisContactPlane(floor, bottom, gap),
+          "full transform qualifier still rejects the real one-step air gap");
+
+    // Independent transformed cross-product reference. Dyadic fixture inputs
+    // make these double transforms/differences exact; all48 signed axis maps.
+    std::array<std::uint32_t, 3u> permutation{0u, 1u, 2u};
+    unsigned cases = 0;
+    do
+    {
+        for (unsigned signs = 0; signs < 8u; ++signs)
+        {
+            Rows rows{};
+            std::uint32_t receiverAxis = 3u;
+            for (std::uint32_t row = 0u; row < 3u; ++row)
+            {
+                const float scale = std::ldexp((signs & (1u << row)) != 0u ? -1.0f : 1.0f, row);
+                rows[row][permutation[row]] = scale;
+                if (permutation[row] == 1u)
+                {
+                    receiverAxis = row;
+                    rows[row][3] = -0.25f * scale;
+                }
+            }
+            std::array<std::array<double, 3u>, 3u> points{};
+            for (unsigned vertex = 0; vertex < 3u; ++vertex)
+                for (unsigned row = 0; row < 3u; ++row)
+                    points[vertex][row] = rows[row][3] +
+                        static_cast<double>(rows[row][permutation[row]]) *
+                        contact_detail::Component(bottom[vertex], permutation[row]);
+            const auto u = (receiverAxis + 1u) % 3u;
+            const auto v = (receiverAxis + 2u) % 3u;
+            const double cross = (points[1][u] - points[0][u]) * (points[2][v] - points[0][v]) -
+                (points[1][v] - points[0][v]) * (points[2][u] - points[0][u]);
+            const AxisContactPlane receiver{receiverAxis,
+                static_cast<float>(points[0][receiverAxis]), cross < 0.0 ? 1.0f : -1.0f};
+            Check(MatchesOpposedAxisContactPlane(receiver, bottom, rows) &&
+                      !MatchesOpposedAxisContactPlane(
+                          {receiver.axis, receiver.coordinate, -receiver.outwardSign}, bottom, rows),
+                  "signed permutation parity agrees with independent exact transformed winding");
+            ++cases;
+        }
+    } while (std::next_permutation(permutation.begin(), permutation.end()));
+    Check(cases == 48u, "all48 signed axis permutations were tested");
+    Check(NativeContactInterior(0.7147344f, 0.20536497f) &&
+              NativeContactInterior(0.4051459f, 0.56905514f) &&
+              !NativeContactInterior(0.0f, 0.5f) && !NativeContactInterior(0.5f, 0.5f) &&
+              !NativeContactInterior(-0.01f, 0.5f) && !NativeContactInterior(0.6f, 0.5f) &&
+              !NativeContactInterior(std::numeric_limits<float>::quiet_NaN(), 0.5f) &&
+              !NativeContactInterior(0.5f, std::numeric_limits<float>::infinity()),
+          "actual native interiors qualify, but edges/out-of-range/nonfinite barycentrics do not");
+    DielectricStack<4u> stack;
+    stack.Enter(9u, 107u, 1.52f);
+    const Vec3 incident{0.42783222f, -0.7623293f, 0.4856065f};
+    const auto exit = OrientInterface(incident, {0.0f, -1.0f, 0.0f});
+    Vec3 outgoing{};
+    const bool transmits = RefractDirection(incident, exit.normal, 1.52f, 1.0f, outgoing);
+    if (transmits) stack.Exit(9u, 107u);
+    Check(transmits && stack.Depth() == 0u && OutgoingIntoContactReceiver(floor, outgoing) &&
+              ResolveDielectricTerminal(stack.Depth(), DielectricTerminalKind::Opaque) ==
+                  DielectricTerminalResolution::ShadeTerminal,
+          "real non-TIR exit closes the medium before the contact receiver can be shaded");
+    Check(!OutgoingIntoContactReceiver(floor, {0.0f, 1.0f, 0.0f}) &&
+              !OutgoingIntoContactReceiver(floor, {1.0f, 0.0f, 0.0f}),
+          "away/tangent outgoing directions cannot consume the contact receiver");
+    Check(ContactFallbackWorldWins(true, true, 0.317f, 0.317f) &&
+              !ContactFallbackWorldWins(true, false, 0.317f, 0.317f) &&
+              ContactFallbackWorldWins(false, false, 10000.0f, 10000.0f) &&
+              ContactFallbackWorldWins(true, false, 0.318f, 0.317f) &&
+              !ContactFallbackWorldWins(true, true, 0.316f, 0.317f),
+          "rejected exact exit/receiver ties keep the opaque hit without masking another confirmed blocker");
 }
 
 void TestBoundedTirAndWaterTerminationContracts()
@@ -538,9 +1285,19 @@ int main()
     TestNearestShadowTraversalIsCandidateOrderIndependent();
     TestShadowBlockersAndUnclosedVolumesFailDeterministically();
     TestShadowOriginInsideClosedVolumes();
+    TestBoundedShadowPhysicalSegmentLengthsAndCoincidentCandidates();
     TestMobileAndHighShadowBounds();
     TestMillimetreScaleRayAdvance();
+    TestRecordedNormalSeparationSelectsBoundedBias();
     TestGenericShadowOriginKeepsMillimetreClearance();
+    TestClosedPaneEntryNearEdgeKeepsExitReachable();
+    TestRecordedTriangleSurfacePointKeepsMicrometreExit();
+    TestPrimaryBoundaryNearSegmentProof();
+    TestOutsideOriginKeepsExactBoundaryTouch();
+    TestRecordedRow43OutsideOriginCornerRejectsFirstExit();
+    TestRecordedHighGlassFloorContactKeepsBothSurfaces();
+    TestConservativeGeometricContactQualification();
+    TestOpposedNativeContactAdmission();
     TestRoughClosedVolumeTransmissionReachesPairedBoundary();
     TestBoundedTirAndWaterTerminationContracts();
     TestSelfHitClassificationUsesBoundedEpsilon();

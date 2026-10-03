@@ -164,7 +164,8 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
 
 HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    const float swordSwingRadians,
-                                   const float heldPropDepth)
+                                   const float heldPropDepth,
+                                   const bool bulkyLeftHandCarry)
 {
     float parryBlend = 0.0f;
     switch (playerCombat.action)
@@ -194,14 +195,19 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         return Lerp(from, to, amount);
     };
     const float swordGripDepth = heldPropDepth - 0.05f;
+    // A bulky off-hand carry reserves the left-side cage volume. Author a
+    // right-side cut through all windup/active/recovery phases, not a rendered
+    // prop offset: this same grip pose drives the sword hand/arm IK and item.
+    // Vertical/depth travel, combat timing and the free-torch arc are unchanged.
+    const float cutInward = bulkyLeftHandCarry ? 0.18f : 0.78f;
     const Vec3 restHand{{0.18f, -0.44f, swordGripDepth}};
-    const Vec3 downwardWindupHand{{0.08f, -0.17f,
+    const Vec3 downwardWindupHand{{bulkyLeftHandCarry ? 0.18f : 0.08f, -0.17f,
                                    std::max(0.56f, swordGripDepth - 0.01f)}};
-    const Vec3 downwardImpactHand{{0.02f, -0.70f,
+    const Vec3 downwardImpactHand{{bulkyLeftHandCarry ? 0.17f : 0.02f, -0.70f,
                                    std::max(0.48f, swordGripDepth - 0.18f)}};
-    const Vec3 upwardStartHand{{0.01f, -0.72f,
+    const Vec3 upwardStartHand{{bulkyLeftHandCarry ? 0.17f : 0.01f, -0.72f,
                                 std::max(0.48f, swordGripDepth - 0.16f)}};
-    const Vec3 upwardEndHand{{0.06f, -0.15f,
+    const Vec3 upwardEndHand{{bulkyLeftHandCarry ? 0.18f : 0.06f, -0.15f,
                               std::max(0.52f, swordGripDepth - 0.08f)}};
 
     Vec3 swingHand = restHand;
@@ -229,7 +235,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         // The blade tilts strongly into depth while the hand travels down.
         // This reads as a real camera-facing cut without sweeping the full
         // metre-long blade beyond a narrow phone's horizontal safe frame.
-        swingInwardRadians = -0.05f + (0.78f + 0.05f) * amount;
+        swingInwardRadians = -0.05f + (cutInward + 0.05f) * amount;
         swingForwardRadians = 0.55f + (1.00f - 0.55f) * amount;
         break;
     }
@@ -238,8 +244,8 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         const float amount = smooth(
             playerCombat.actionTime / SwordCombat::kSwingRecoveryDuration);
         swingHand = blendHand(downwardImpactHand, restHand, amount);
-        swingInwardRadians = 0.78f +
-            (kSwordRestInwardRadians - 0.78f) * amount;
+        swingInwardRadians = cutInward +
+            (kSwordRestInwardRadians - cutInward) * amount;
         swingForwardRadians = 1.00f +
             (kSwordRestForwardRadians - 1.00f) * amount;
         break;
@@ -249,7 +255,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         const float amount = smooth(
             playerCombat.actionTime / SwordCombat::kUpwardSliceWindupDuration);
         swingHand = blendHand(downwardImpactHand, upwardStartHand, amount);
-        swingInwardRadians = 0.78f + 0.04f * amount;
+        swingInwardRadians = cutInward + 0.04f * amount;
         swingForwardRadians = 1.00f - 0.02f * amount;
         break;
     }
@@ -258,7 +264,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         const float amount = smooth(
             playerCombat.actionTime / SwordCombat::kUpwardSliceActiveDuration);
         swingHand = blendHand(upwardStartHand, upwardEndHand, amount);
-        swingInwardRadians = 0.82f + (-0.30f - 0.82f) * amount;
+        swingInwardRadians = cutInward + 0.04f + (-0.30f - cutInward - 0.04f) * amount;
         swingForwardRadians = 0.98f + (0.60f - 0.98f) * amount;
         break;
     }
@@ -284,16 +290,20 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                 0.0f, 1.0f));
             swingHand = blendHand(restHand, downwardImpactHand, amount);
             swingInwardRadians = kSwordRestInwardRadians +
-                (0.78f - kSwordRestInwardRadians) * amount;
+                (cutInward - kSwordRestInwardRadians) * amount;
             swingForwardRadians = kSwordRestForwardRadians +
                 (1.00f - kSwordRestForwardRadians) * amount;
         }
         break;
     }
     const std::array<float, 3u> parryHand{{
-        -0.16f + 0.055f * successJolt,
+        (bulkyLeftHandCarry ? 0.08f : -0.16f) + 0.055f * successJolt,
         -0.29f + 0.025f * successJolt,
         std::min(heldPropDepth, 0.90f)}};
+    // With the lantern carried, keep the guard/forearm on the sword side.
+    // A more upright blade retains a similar blocking tip position without
+    // driving the right hand through the low left arm. The lantern stays put.
+    const float parryInwardRadians = bulkyLeftHandCarry ? -0.28f : -0.62f;
 
     HeldSwordPose pose;
     for (std::size_t axis = 0u; axis < pose.rightHandLocal.size(); ++axis)
@@ -302,7 +312,7 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
             (parryHand[axis] - swingHand[axis]) * parryBlend;
     }
     pose.swordRadians = swingInwardRadians +
-                        parryBlend * (-0.62f + 0.14f * successJolt -
+                        parryBlend * (parryInwardRadians + 0.14f * successJolt -
                                       swingInwardRadians);
     pose.swordForwardRadians = swingForwardRadians +
         parryBlend * (kSwordRestForwardRadians - swingForwardRadians);
@@ -400,6 +410,7 @@ FirstPersonSafeFrame EvaluateOwnerFeedbackPortraitSafeFrame(
 
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input)
 {
+    const bool anatomicalBody = input.playerMountProfile == PlayerMountProfile::AnatomicalBody;
     const float forwardX = std::sin(input.cameraYawRadians);
     const float forwardZ = -std::cos(input.cameraYawRadians);
     const float forwardClearance = ComputeRewardLanternForwardClearance(
@@ -412,7 +423,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float carriedPropDepth = MapContinuousCarryDepth(
         forwardClearance, 0.68f);
     const float swordPropDepth = MapContinuousCarryDepth(
-        forwardClearance, 0.82f);
+        forwardClearance, anatomicalBody ? 0.65f : 0.82f);
     const LowerBodyPoseState lowerBodyPose = EvaluateLowerBodyPose(input.walkTime, input.walkAmount);
     const float movement = std::max(std::clamp(input.walkAmount, 0.0f, 1.0f), 0.2f);
     const float torchSway = std::sin(input.walkTime * 6.2f) * 0.035f * movement;
@@ -433,10 +444,14 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     // of compressing the carry-to-wall response into the final metre. This
     // preserves the exact open/emergency endpoints while keeping a normal
     // fixed walking tick below the skinned-arm silhouette continuity bound.
+    // A body mounted under the player's eye cannot reach the historical
+    // metre-forward ring. Use a reachable authored carry envelope; the same
+    // target drives the hand, rigid lantern, pendulum and emitted light.
+    const float openRewardDepth = anatomicalBody ? 0.70f : 1.05f;
     const float continuousHeldDepth = MapContinuousCarryDepth(
-        rewardForwardClearance, 1.05f);
+        rewardForwardClearance, openRewardDepth);
     const float rewardClearance = std::clamp(
-        (continuousHeldDepth - 0.30f) / (1.05f - 0.30f), 0.0f, 1.0f);
+        (continuousHeldDepth - 0.30f) / (openRewardDepth - 0.30f), 0.0f, 1.0f);
     const float rewardClearanceBlend = rewardClearance * rewardClearance *
         (3.0f - 2.0f * rewardClearance);
     // Leave enough camera-side travel for the full authored body at the real
@@ -499,7 +514,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         }
     }
     const HeldSwordPose sword = EvaluateHeldSwordPose(
-        input.playerCombat, input.swordSwingRadians, swordPropDepth);
+        input.playerCombat, input.swordSwingRadians, swordPropDepth, rewardLantern);
 
     HeldItemKinematicsState result;
     // Props move the hand effector only. Keep the calibrated clavicle/shoulder
@@ -514,6 +529,20 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         0.36f,
         -0.44f + lowerBodyPose.pelvisBob * 0.35f,
         0.39f + lowerBodyPose.leftStride * 0.018f}};
+    if (anatomicalBody)
+    {
+        // Nominal authored shoulder centres in the yaw-relative body frame.
+        // Convert to view coordinates so pitch does not drag the torso forward.
+        // Actual skin shoulders still come from the shared authored rig pose.
+        const float verticalForward = -0.05f + std::clamp(input.cameraPitchRadians, -0.32f, 0.28f);
+        const float inverseLength = 1.0f / std::sqrt(1.0f + verticalForward * verticalForward);
+        constexpr float shoulderBelowEye = -0.184f;
+        constexpr float shoulderBehindEye = -0.078f;
+        const float y = (shoulderBelowEye - shoulderBehindEye * verticalForward) * inverseLength;
+        const float z = (shoulderBelowEye * verticalForward + shoulderBehindEye) * inverseLength;
+        result.leftShoulderLocal = {{-0.166f, y, z}};
+        result.rightShoulderLocal = {{0.166f, y, z}};
+    }
     for (std::size_t axis = 0u; axis < result.leftHandLocal.size(); ++axis)
     {
         const auto& highTarget = rewardLantern ? rewardHighLeftHand : heldLeftHand;
@@ -522,6 +551,15 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
             (lowTarget[axis] - highTarget[axis]) * lowerBlend;
     }
     result.rightHandLocal = sword.rightHandLocal;
+    if (anatomicalBody)
+    {
+        // The closer body-mounted carry rests at lower-chest height rather
+        // than the historical distant waist-height presentation. Raise both
+        // authored hand paths together, preserving their relative attack and
+        // parry motion; no renderer-only prop or frozen-capture correction.
+        result.leftHandLocal[1] += 0.10f;
+        result.rightHandLocal[1] += 0.10f;
+    }
     const float leftGripRollCos = std::cos(kLeftGripRollRadians);
     const float leftGripRollSin = std::sin(kLeftGripRollRadians);
     result.leftGripXInView = {{leftGripRollCos, 0.0f, leftGripRollSin}};
@@ -632,7 +670,9 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.torchFailure,
         input.playerCombat,
         input.swordSwingRadians,
-        input.interaction});
+        input.interaction,
+        input.playerMountProfile,
+        input.playerPitchRadians});
 
     constexpr Vec3 worldUp{{0.0f, 1.0f, 0.0f}};
     const float pitch = std::clamp(input.playerPitchRadians, -0.32f, 0.28f);

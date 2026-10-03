@@ -1,0 +1,8 @@
+{
+  "bothScriptsParse": true,
+  "comparatorContainsPsObjectPropertyLookup": true,
+  "comparatorCountsPropertyCollection": true,
+  "realPhoneRoot": true,
+  "comparisonJsonGenerated": false,
+  "fixtureOnly": true
+}

@@ -1,0 +1,7 @@
+Starting: Intent { act=com.samfa12.hordelanternrt.action.BENCHMARK cmp=com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity (has extras) }
+Status: ok
+LaunchState: COLD
+Activity: com.samfa12.hordelanternrt.benchmark/com.samfa12.hordelanternrt.MainActivity
+TotalTime: 7254
+WaitTime: 7256
+Complete

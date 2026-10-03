@@ -1,0 +1,129 @@
+diff --git a/shaders/raytracing/include/rt_dielectric_transport.glsl b/shaders/raytracing/include/rt_dielectric_transport.glsl
+index fbd4e70..f8b7692 100644
+--- a/shaders/raytracing/include/rt_dielectric_transport.glsl
++++ b/shaders/raytracing/include/rt_dielectric_transport.glsl
+@@ -3,6 +3,11 @@ const int kHighDielectricInterfaces = 8;
+ const int kMobileDielectricVolumes = 2;
+ const int kHighDielectricVolumes = 4;
+ 
++#if HORDE_GENERIC_TRANSMISSION_VARIANT
++// Investigation only; locate the remaining row237 production failure rays.
++bool investigationRemainingVolumeFailure = false;
++#endif
++
+ #if defined(HORDE_RT_VARIANT_QUALITY)
+ #define HORDE_RT_DIELECTRIC_INTERFACE_CEILING kRtVariantDielectricInterfaceBudget
+ #define HORDE_RT_DIELECTRIC_VOLUME_CAPACITY kRtVariantDielectricVolumeBudget
+@@ -622,6 +627,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+                 // nested stack on every phone ray.
+                 if (volumeOpen)
+                 {
++#if HORDE_GENERIC_TRANSMISSION_VARIANT
++                    investigationRemainingVolumeFailure = true;
++#endif
+                     RT_DIAG_ADD(primaryVolumeBudgetCount,
+                         1u);
+                     overflowed = true;
+diff --git a/shaders/raytracing/include/rt_frame.glsl b/shaders/raytracing/include/rt_frame.glsl
+index 3b988b6..94f6b40 100644
+--- a/shaders/raytracing/include/rt_frame.glsl
++++ b/shaders/raytracing/include/rt_frame.glsl
+@@ -69,6 +69,9 @@ void main()
+     color = color * (0.62 + 0.38 * vignette);
+     color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
+     color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
++#if HORDE_GENERIC_TRANSMISSION_VARIANT
++    if (investigationRemainingVolumeFailure) color = vec3(1.0, 0.0, 1.0);
++#endif
+     // The RT storage image is RGBA, while common Android/Windows swapchains are BGRA and receive a raw image copy.
+     if (controls.outputRedBlueSwap > 0.5)
+     {
+diff --git a/src/platform/windows/DiagnosticWindow.cpp b/src/platform/windows/DiagnosticWindow.cpp
+index 6f51c3d..0df868e 100644
+--- a/src/platform/windows/DiagnosticWindow.cpp
++++ b/src/platform/windows/DiagnosticWindow.cpp
+@@ -90,8 +90,9 @@ constexpr char kAboutText[] = "Horde Lantern RT\nShowcase Alpha " HORDE_RT_DISPL
+ constexpr char kReportDirectory[] = "reports";
+ constexpr char kTextReportFilename[] = "vulkan_capability_report.txt";
+ constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
+-constexpr std::uint32_t kCaptureWidth = 960u;
+-constexpr std::uint32_t kCaptureHeight = 540u;
++constexpr std::uint32_t kCaptureWidth = 1232u;
++constexpr std::uint32_t kCaptureHeight = 803u;
++constexpr std::uint32_t kInvestigationLiveFrame = 238u;
+ constexpr int kCaptureSettlingFrames = 12;
+ constexpr int kEditControlId = 101;
+ constexpr int kHudControlId = 102;
+@@ -3915,7 +3916,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
+         PollDesktopController(ctx);
+         const bool frozenDevelopmentCheckpoint =
+             ctx.simulationPaused && ctx.frameDeltaSeconds == 0.0f &&
+-            !ctx.developmentCheckpoint.empty();
++            (!ctx.developmentCheckpoint.empty() ||
++             GetPropA(ctx.windowHandle, kCaptureModeProperty) != nullptr);
+         if (!frozenDevelopmentCheckpoint)
+         {
+             UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
+@@ -4181,7 +4183,29 @@ const char* CapturePresetName(const horde::gameplay::ShowcaseCheckpointPreset pr
+ void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
+                             const horde::gameplay::ShowcaseCheckpoint& checkpoint)
+ {
+-    context.simulation.ApplyShowcaseCheckpoint(checkpoint.id);
++    // Investigation only: reproduce remaining ordinary live row237/tick840.
++    horde::gameplay::simulation::InputSnapshot liveInput{};
++    liveInput.damageEnabled = false;
++    liveInput.hasAuthoritativePlayerPose = true;
++    liveInput.authoritativePlayerX = horde::gameplay::kLanternBenchmarkX;
++    liveInput.authoritativePlayerZ = horde::gameplay::kLanternBenchmarkZ;
++    liveInput.yawRadians = horde::gameplay::kLanternBenchmarkYaw;
++    liveInput.pitchRadians = horde::gameplay::kLanternBenchmarkPitch;
++    liveInput.torchLightStrength = 1.8f;
++    for (std::uint32_t lap = 0u; lap < 2u; ++lap)
++    {
++        if (!horde::gameplay::StageLanternBenchmark(
++                context.simulation, horde::gameplay::BenchmarkWorkload::LanternRevealSequence))
++            throw std::runtime_error("Investigation live replay failed to stage.");
++        const std::uint32_t frames = lap == 0u
++            ? horde::gameplay::kLanternBenchmarkFramesPerLap : kInvestigationLiveFrame;
++        for (std::uint32_t frame = 0u; frame < frames; ++frame)
++            context.simulation.AdvanceFrame(liveInput, 1.0f / 60.0f,
++                                            ++context.inputPublicationSequence);
++    }
++    std::cerr << "INVESTIGATION live frame=" << kInvestigationLiveFrame
++              << " tick=" << context.simulation.Snapshot().tickIndex
++              << " walkTime=" << context.simulation.Snapshot().walkTime << '\n';
+     context.benchmarkEvidence.Cancel();
+     if (context.rtFrameEvidenceInitialised)
+     {
+@@ -4196,9 +4220,6 @@ void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
+     context.simulationInput.damageEnabled = false;
+     context.simulationInput.hasAuthoritativePlayerPose = false;
+     context.simulationInput.torchLightStrength = context.torchLightStrength;
+-    context.simulation.AdvanceFrame(context.simulationInput,
+-                                    0.0,
+-                                    ++context.inputPublicationSequence);
+     MirrorSimulationSnapshot(context);
+     context.debugEnemyOverride = horde::gameplay::EnemyKind::None;
+ }
+@@ -4246,7 +4267,10 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
+              << "  \"sceneOnly\": true,\n"
+              << "  \"overlaysIncluded\": false,\n"
+              << "  \"settlingFrames\": " << kCaptureSettlingFrames << ",\n"
+-             << "  \"fixedAnimationTimeSeconds\": 0.000000,\n"
++             << "  \"investigationOnly\": true,\n"
++             << "  \"liveBenchmarkFrame\": " << kInvestigationLiveFrame << ",\n"
++             << "  \"liveSimulationTick\": " << context.simulation.Snapshot().tickIndex << ",\n"
++             << "  \"fixedAnimationTimeSeconds\": " << context.simulation.Snapshot().walkTime << ",\n"
+              << "  \"buildId\": \"" << JsonEscape(HORDE_RT_BUILD_ID) << "\",\n"
+              << "  \"playerMountProfile\": \""
+              << (context.simulation.Snapshot().playerMountProfile ==
+@@ -4525,7 +4549,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
+     else
+     {
+         for (const auto& checkpoint : horde::gameplay::kShowcaseCheckpoints)
+-            checkpoints.push_back(&checkpoint);
++            if (checkpoint.id == 11)
++                checkpoints.push_back(&checkpoint);
+     }
+     captures.reserve(checkpoints.size());
+     auto fail = [&](const std::string& diagnostic) {

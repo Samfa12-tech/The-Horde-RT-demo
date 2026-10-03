@@ -1,0 +1,25 @@
+{
+  "source": "android-presented-compositor-screenshots",
+  "workload": "lantern-held-high-v1",
+  "simulationPolicy": "frozen-authored-snapshot",
+  "region": [
+    0,
+    400,
+    1440,
+    3120
+  ],
+  "excluded": "top 400 rows, including differing benchmark HUD text",
+  "pngSha256": {
+    "baseline-a1-start.png": "70ad251c47d5af7c950883f1e7a7c3c8d3ee735fc7873e63a3ebacbe680c29c9",
+    "candidate-b1-start.png": "530e07dfb46d3df750fa557bb95d3923970c10fe7d91acf6c5d456fd120eb00c"
+  },
+  "maxRgbDelta": 0,
+  "meanRgbDelta": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "existingRgbTolerance": 3,
+  "withinTolerance": true,
+  "qualification": "One presented frozen-view comparison, not full transport correctness or same-build Diagnostic/Shipping parity."
+}

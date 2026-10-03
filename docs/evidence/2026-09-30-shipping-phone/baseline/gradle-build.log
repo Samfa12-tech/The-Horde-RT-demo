@@ -1,0 +1,63 @@
+> Task :app:prepareRuntimeAssets
+> Task :app:preBuild
+> Task :app:preBenchmarkBuild
+> Task :app:generateBenchmarkBuildConfig
+> Task :app:javaPreCompileBenchmark
+> Task :app:checkBenchmarkAarMetadata
+> Task :app:generateBenchmarkResValues
+> Task :app:mapBenchmarkSourceSetPaths
+> Task :app:generateBenchmarkResources
+> Task :app:createBenchmarkCompatibleScreenManifests
+> Task :app:extractDeepLinksBenchmark
+> Task :app:processBenchmarkMainManifest
+> Task :app:processBenchmarkManifest
+> Task :app:processBenchmarkManifestForPackage
+> Task :app:extractProguardFiles
+> Task :app:mergeBenchmarkResources
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:processBenchmarkResources
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+
+> Task :app:compileBenchmarkJavaWithJavac
+Note: C:\Dev\tmp\horde-shipping-ab-20260930\baseline-source\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:generateBenchmarkLintVitalReportModel
+> Task :app:mergeBenchmarkJniLibFolders
+> Task :app:mergeBenchmarkNativeLibs
+> Task :app:stripBenchmarkDebugSymbols
+> Task :app:extractBenchmarkNativeSymbolTables
+> Task :app:mergeBenchmarkNativeDebugMetadata
+> Task :app:mergeBenchmarkArtProfile
+> Task :app:desugarBenchmarkFileDependencies
+> Task :app:dexBuilderBenchmark
+> Task :app:mergeBenchmarkGlobalSynthetics
+> Task :app:checkBenchmarkDuplicateClasses
+> Task :app:mergeBenchmarkStartupProfile
+> Task :app:mergeExtDexBenchmark
+> Task :app:mergeDexBenchmark
+> Task :app:compileBenchmarkArtProfile
+> Task :app:mergeBenchmarkShaders
+> Task :app:compileBenchmarkShaders NO-SOURCE
+> Task :app:generateBenchmarkAssets UP-TO-DATE
+> Task :app:mergeBenchmarkAssets
+> Task :app:lintVitalAnalyzeBenchmark
+> Task :app:lintVitalReportBenchmark
+> Task :app:lintVitalBenchmark
+> Task :app:extractBenchmarkVersionControlInfo
+> Task :app:processBenchmarkJavaRes NO-SOURCE
+> Task :app:mergeBenchmarkJavaResource
+> Task :app:compressBenchmarkAssets
+> Task :app:collectBenchmarkDependencies
+> Task :app:sdkBenchmarkDependencyData
+> Task :app:validateSigningBenchmark
+> Task :app:writeBenchmarkAppMetadata
+> Task :app:writeBenchmarkSigningConfigVersions
+> Task :app:optimizeBenchmarkResources
+> Task :app:packageBenchmark
+> Task :app:createBenchmarkApkListingFileRedirect
+> Task :app:assembleBenchmark
+[Incubating] Problems report is available at: file:///C:/Dev/tmp/horde-shipping-ab-20260930/baseline-source/android/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 55s
+49 actionable tasks: 49 executed

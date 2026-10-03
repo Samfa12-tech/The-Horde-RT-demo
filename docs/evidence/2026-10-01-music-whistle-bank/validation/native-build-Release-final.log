@@ -1,0 +1,9 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-music-instrumentation-20261001\whistle-bank\native-build\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  MusicPcmWaveTests.cpp
+  horde_music_staged_wave_tests.vcxproj -> C:\Dev\tmp\horde-music-instrumentation-20261001\whistle-bank\native-build\Release\horde_music_staged_wave_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-music-instrumentation-20261001\whistle-bank\native-build\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_music_staged_asset_bank_tests.vcxproj -> C:\Dev\tmp\horde-music-instrumentation-20261001\whistle-bank\native-build\Release\horde_music_staged_asset_bank_tests.exe

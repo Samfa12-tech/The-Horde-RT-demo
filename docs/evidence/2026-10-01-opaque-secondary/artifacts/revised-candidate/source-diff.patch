@@ -1,0 +1,34 @@
+diff --git a/shaders/raytracing/include/rt_dielectric_common.glsl b/shaders/raytracing/include/rt_dielectric_common.glsl
+index b5a0ad5..3929284 100644
+--- a/shaders/raytracing/include/rt_dielectric_common.glsl
++++ b/shaders/raytracing/include/rt_dielectric_common.glsl
+@@ -1,3 +1,5 @@
++#include "rt_opaque_secondary_investigation.glsl"
++
+ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection);
+ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection);
+ 
+@@ -309,6 +311,7 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
+                                    localVisibility, skyVisibility, skyDiffuse,
+                                    localLightColor, localLightStrength);
+     // Keep the one RT bounce deterministic. The previous time-varying hemisphere sample was the main source of shimmer.
++#if !HORDE_RT_OMIT_OPAQUE_PRIMARY_SECONDARY_INVESTIGATION
+     vec3 bounce = vec3(0.0);
+     if (!leanWorkload)
+     {
+@@ -331,12 +334,15 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
+     color += h.base * bounce * (0.10 + reflective * 0.16);
+     float reflectionGain = h.instance == 0 && h.material == kMaterialMirror ? 0.82 : 0.32;
+     color += bounce * reflective * reflectionGain;
++#endif
+ 
+     if (h.instance == 0 && h.material == kMaterialWetCobble)
+     {
+         float puddle = puddleMask(h.position);
+         color += localLightColor * puddle * localVisibility * localLightStrength * 0.28;
++#if !HORDE_RT_OMIT_OPAQUE_PRIMARY_SECONDARY_INVESTIGATION
+         color += bounce * puddle * 0.46;
++#endif
+     }
+ 
+     float fog = 1.0 - exp(-h.t * h.t * 0.012 * controls.fogDensityScale);

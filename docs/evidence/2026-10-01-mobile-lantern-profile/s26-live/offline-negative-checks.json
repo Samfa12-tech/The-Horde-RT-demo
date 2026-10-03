@@ -1,0 +1,22 @@
+[
+  {
+    "case": "missing-period20",
+    "result": "PASS-expected-rejection",
+    "reason": "Missing/duplicate first twenty epoch-4 periods."
+  },
+  {
+    "case": "underrun-period20",
+    "result": "PASS-expected-rejection",
+    "reason": "Clock/order/queue/underrun gate failed at period 20."
+  },
+  {
+    "case": "clock-period20",
+    "result": "PASS-expected-rejection",
+    "reason": "Consumed period exceeds existing 50 ms logging bound."
+  },
+  {
+    "case": "wrong-apk",
+    "result": "PASS-expected-rejection",
+    "reason": "Wrong installed APK."
+  }
+]

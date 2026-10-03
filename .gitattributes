@@ -1,9 +1,233 @@
 # Keep high-resolution source art out of normal Git history.
+tools/run-host-sanitizer-validation.sh text eol=lf
+# Preserve lossless backend witnesses and the exact native manifest receipts.
+docs/evidence/2026-10-02-s26-report-ui/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-02-s26-report-send/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-benchmark-fps/s26-20261002/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-02-backend-pixel-witness/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-02-backend-pixel-witness/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
 *.glb filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 *.ktx2 filter=lfs diff=lfs merge=lfs -text
 *.rgba filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
 
+# Exact native ray witnesses and their temporary packaged diagnostic module.
+docs/evidence/2026-10-01-isolated-glass-rays/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-isolated-glass-rays/*.rgba.gz filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-01-isolated-glass-rays/**/*.spv filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-01-isolated-glass-rays/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-01-isolated-glass-rays/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-01-isolated-glass-rays/path-module/minimal.rgen.preprocessed whitespace=-blank-at-eof,cr-at-eol
+
 # Preserve the audited upstream cgltf bytes, including its one trailing tab.
 third_party/cgltf/cgltf.h whitespace=-trailing-space
+
+# Native Core is a byte-hashed upstream subset, not a locally edited engine.
+third_party/pocket-audio-core/** text eol=lf
+
+# The explicitly restored Windows report SDK inventory is byte-hash pinned.
+third_party/webview2-sdk/manifest.json text eol=lf
+
+# Verbatim editable music sources, pinned manifest and measured derivatives.
+assets/audio/music/what-the-dark-keeps/source/** -text
+assets/audio/music/what-the-dark-keeps/asset.manifest.json text eol=lf
+assets/audio/music/what-the-dark-keeps/runtime/*.wav filter=lfs diff=lfs merge=lfs -text
+
+# The release identity contract is one UTF-8 line. Keep its checkout bytes
+# stable even when core.autocrlf is enabled on Windows.
+VERSION text eol=lf
+
+# The pipeline catalog adapter is byte-checked during clean configure too.
+src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h text eol=lf
+
+# Compute shader artifacts and their generated provenance are byte-checked.
+src/vulkan/raytracing/variants/rayquery_compute_*.inc text eol=lf
+src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h text eol=lf
+tools/rayquery-variant-catalog.json text eol=lf
+
+# Retained validation reports are bound to their original byte hashes.
+docs/evidence/2026-10-02-world-box-normals/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-20-lantern/** -text
+docs/evidence/2026-09-20-android-route/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-20-lantern-abba/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-23-player-admission/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-23-viewmodel-rt/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-23-viewmodel-portrait/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-23-viewmodel-sleeve-closure/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-live-arm-followup/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-yellow-wash/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-parry-guard/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-parry-guard/*.obj filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-09-27-phone-parry-followup/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-player-boundary/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-player-boundary/**/*.obj filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-09-27-player-seam-repair/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-player-seam-repair/**/*.obj filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-09-27-deep-body-look/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-upper-torso/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-normal-look/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-segmented-seams/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-modelled-production/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-27-glass-path/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-glass-corner/** -text whitespace=cr-at-eol
+# Unified-diff context lines intentionally contain a single space; keep probe bytes.
+docs/evidence/2026-09-27-glass-path/probe/*.patch whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-candidates/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-glass-recovery/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-glass-recovery/probe/*.patch whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-surface/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-glass-shadow/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-glass-shadow/probe/*.patch whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-shadow/probe/near-field/*.obj filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-09-30-glass-shadow/checks/*.log whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-live/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-glass-live/checks/*.log whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-live/rays/probe/*.log whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-live/rays/probe/*.patch whitespace=-blank-at-eol,cr-at-eol
+# Preserve the native optional empty Run ID line exactly in benchmark text.
+docs/evidence/2026-09-30-glass-live/windows-high-*/HordeLanternRT-benchmark-*.txt whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-spawn/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-glass-spawn/cpu/*.patch whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-spawn/remaining-row237/*.patch whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-spawn/checks/*.log whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-glass-spawn/windows/**/HordeLanternRT-benchmark-*.txt whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-09-30-shipping-phone/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-shipping-phone/**/*.log whitespace=-blank-at-eol,-blank-at-eof,cr-at-eol
+docs/evidence/2026-09-30-shipping-phone/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-09-30-shipping-phone/candidate/*.txt whitespace=-blank-at-eof,cr-at-eol
+docs/evidence/2026-09-30-shipping-phone/opening-stage-proposal/PROPOSAL.md whitespace=-blank-at-eof,cr-at-eol
+
+# Exact non-shippable opening-work isolation reports and patches.
+docs/evidence/2026-09-30-opening-lighting-isolation/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-opening-lighting-isolation/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-09-30-opening-lighting-isolation/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact accepted paired-manifest bytes are part of runtime admission/provenance.
+assets/models/player/runtime/asset.manifest.json -text whitespace=cr-at-eol
+
+# Exact first-blocker trial and rejected optimisation/restoration evidence.
+docs/evidence/2026-09-30-first-blocker/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-first-blocker/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-09-30-first-blocker/**/*.log.txt whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-09-30-first-blocker/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact native Mobile-dielectric RTX subset evidence (not phone acceptance).
+docs/evidence/2026-09-30-mobile-rtx/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-mobile-rtx/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Shared unwired music resolver build/red-green evidence.
+docs/evidence/2026-09-30-music-resolver/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-music-resolver/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact whole-strategy containment, image mismatch and profiling evidence.
+docs/evidence/2026-09-30-generic-strategy/** -text whitespace=cr-at-eol
+docs/evidence/2026-09-30-generic-strategy/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-09-30-generic-strategy/captures/generic-profile-timeout/timeout-app-logcat.txt whitespace=-trailing-space,cr-at-eol
+docs/evidence/2026-09-30-generic-strategy/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Non-runtime owner-authorised music rendering prototypes and exact receipts.
+docs/evidence/2026-10-01-music-render/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-music-render/audio/*.wav filter=lfs diff=lfs merge=lfs -text
+
+# Instrumentation-only auditions; never admitted by runtime music packaging.
+docs/evidence/2026-10-01-music-instrumentation/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-music-instrumentation/**/*.wav filter=lfs diff=lfs merge=lfs -text
+# Preserve the exact script bytes bound by the audition manifest on every host.
+tools/music-instrumentation-audition.cjs -text whitespace=cr-at-eol
+tools/verify-music-instrumentation-audition.cjs -text whitespace=cr-at-eol
+tools/music-instrumentation-combat-check.cjs -text whitespace=cr-at-eol
+tools/archive-music-instrumentation-audition.cjs -text whitespace=cr-at-eol
+tools/music-instrumentation-bank.cjs -text whitespace=cr-at-eol
+tools/music-instrumentation-core-check/* -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-music-whistle-bank/** -text whitespace=cr-at-eol
+# Retain raw compiler/Gradle log spaces byte-for-byte, not source formatting.
+docs/evidence/2026-10-01-music-whistle-bank/**/*.log whitespace=-blank-at-eol,cr-at-eol
+docs/evidence/2026-10-01-music-whistle-phone/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-music-whistle-phone/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact compiler-treatment investigation receipts; not Shipping artifacts.
+docs/evidence/2026-10-01-opaque-compiler/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-opaque-compiler/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-10-01-opaque-compiler/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact output-only resize comparisons and ownership/validation receipts.
+docs/evidence/2026-10-01-fast-resize/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-fast-resize/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-10-01-fast-resize/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-01-fast-resize/**/battery*.txt whitespace=-trailing-space,cr-at-eol
+docs/evidence/2026-10-01-fast-resize/**/runtime-*.txt whitespace=-trailing-space,cr-at-eol
+
+# Frozen non-shippable all-direct-visibility measurements and actual shader bytes.
+docs/evidence/2026-10-01-all-direct-visibility/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-all-direct-visibility/**/*.spv filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-01-all-direct-visibility/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-10-01-all-direct-visibility/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact non-shippable primary-hit reference measurements and packaged shaders.
+docs/evidence/2026-10-01-primary-hit-reference/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-primary-hit-reference/**/*.spv filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-01-primary-hit-reference/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-10-01-primary-hit-reference/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Original unwired PCM helper validation; no packaged music admission.
+docs/evidence/2026-10-01-music-pcm/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-music-pcm/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+
+# Exact Core-integration logs and source/package receipts, not runtime assets.
+docs/evidence/2026-10-01-pocket-audio-core/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-pocket-audio-core/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+
+# Non-shippable opaque-secondary investigation: exact raw evidence and modules.
+docs/evidence/2026-10-01-opaque-secondary/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-opaque-secondary/**/*.spv filter=lfs diff=lfs merge=lfs -text
+docs/evidence/2026-10-01-opaque-secondary/**/*.log whitespace=-trailing-space,-blank-at-eof,-space-before-tab,cr-at-eol
+docs/evidence/2026-10-01-opaque-secondary/**/*.patch whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact unwired music admission build/negative-check receipts.
+docs/evidence/2026-10-01-music-admission/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-music-admission/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact unwired immutable-bank compile, sanitizer and package receipts.
+docs/evidence/2026-10-01-music-bank/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-music-bank/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+# Preserve raw music-session validation logs byte for byte.
+docs/evidence/2026-10-01-music-session/*.log -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-windows-music/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-01-android-music/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-01-android-music/*.json -text
+docs/evidence/2026-10-01-android-music/lint-results-debug*.txt -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-benchmark-fps/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-01-report-contract/*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact paired Mobile pane-profile reports, package pins and admission scripts.
+docs/evidence/2026-10-01-mobile-lantern-profile/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Exact local-report payloads, native UI evidence and validation logs.
+docs/evidence/2026-10-01-report-export/** -text whitespace=cr-at-eol
+docs/evidence/2026-10-01-report-export/**/*.log whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Byte-preserved bounded primary-opacity image and Shipping measurement receipts.
+docs/evidence/2026-10-01-primary-opacity/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Byte-preserved bounded S24 primary-hit and acceleration-structure receipts.
+docs/evidence/2026-10-02-s24-instance-hits/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Byte-preserved bounded TLAS refresh capture and live-route receipts.
+docs/evidence/2026-10-02-tlas-instance-refresh/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Scoped Android music-focus/lifecycle evidence, preserving raw receipt bytes.
+docs/evidence/2026-10-02-music-focus/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+
+# Preserve hashed A/D source, render and device receipts byte-for-byte.
+docs/evidence/2026-10-03-music-drone/** -text whitespace=cr-at-eol
+
+# Frozen finite closeout receipts and raw Android memory/lifecycle evidence.
+docs/evidence/2026-10-03-final-s26-resources/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-03-final-s26-interactive/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-03-windows-music-package/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-03-windows-live-closeout/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+# Preserve exact signed-release receipts, including verbatim readelf output.
+docs/evidence/2026-10-03-signed-freeze/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-03-signed-s26/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+docs/evidence/2026-10-03-release-publication/** -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol

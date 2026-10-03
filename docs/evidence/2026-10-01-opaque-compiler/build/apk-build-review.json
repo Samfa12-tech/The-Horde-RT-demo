@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "classification": "nonproduction compiler-treatment investigation; built APKs were not installed or accepted for timing",
+  "source": {
+    "worktree": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\source-eaf",
+    "head": "eafbf8262442a82e0835edf5cf5306d718e64633",
+    "workingTreeTrackedPaths": [
+      "src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+      "src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+      "src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+      "tools/raygen-variant-catalog.json"
+    ],
+    "rendererCppOrShaderMathChanges": false,
+    "raygenManifestChanged": false,
+    "frozenBudgetsChanged": false,
+    "rayqueryComputeCatalogChanged": false,
+    "committed": false,
+    "externalDiffPatch": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\source-eaf-experimental-bundle.patch",
+    "externalDiffPatchSha256": "62833d386426cae4589cd14fa055a91c4c78664f33e62e281e6c824e0de21eb2"
+  },
+  "compilerEvidence": {
+    "externalRecipe": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\compile-retained-investigation.ps1",
+    "externalRecipeSha256": "8d77d583805679be7d92da1a97c1e92c4483dc3708b95734112cc89f0e71e336",
+    "receipt": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\recipe-run-2\\retained-investigation-recipe-results.json",
+    "target": "vulkan1.2",
+    "bothCandidatesUsedExactNormalCompileRaygenPreprocessedInputs": true,
+    "variants": [
+      {
+        "key": "shipping_mobile_opaque_fast",
+        "preprocessedSourceSha256": "eaa0b8a9f7b1a87fce83e34ab8568c524b1a8ed4160009bf35fc1a89e728713f",
+        "ordinaryControlSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+        "retainedSha256": "14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3",
+        "retainedBytes": 212452,
+        "retainedWords": 53113,
+        "instructions": 12595,
+        "functions": 60,
+        "functionCalls": 192,
+        "rayQueryInitializations": 2,
+        "atomicInstructions": 0,
+        "binding22": false,
+        "OpImageRead": 0,
+        "spirvValVulkan12": "passed",
+        "spirvDis": "passed"
+      },
+      {
+        "key": "diagnostic_mobile_opaque_fast",
+        "preprocessedSourceSha256": "4263a710ef0d381f3a6920ae9379f8f59f154d5a0280154b1459b0445838d8c2",
+        "ordinaryControlSha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+        "ordinaryControlBytes": 505248,
+        "ordinaryControlAtomicInstructions": 5,
+        "retainedSha256": "4ba45dce815f5e1af8282fd40d6d650e144556992b939a0254ff28a0e94831b4",
+        "retainedBytes": 219932,
+        "retainedWords": 54983,
+        "instructions": 12948,
+        "functions": 60,
+        "functionCalls": 192,
+        "rayQueryInitializations": 2,
+        "atomicInstructions": 30,
+        "atomicOpcodeCounts": { "OpAtomicIAdd": 27, "OpAtomicOr": 3 },
+        "binding22": true,
+        "OpImageRead": 0,
+        "spirvValVulkan12": "passed",
+        "spirvDis": "passed",
+        "runtimeCounterEquivalence": "not established"
+      }
+    ],
+    "adapter": {
+      "catalogStatusWireValue": "frozen (required by unchanged adapter schema; does not imply production acceptance)",
+      "catalogGeneratorIdentity": "external opaque-retained-investigation-v1 recipe path+SHA",
+      "strategyRows": "OpaqueRetainedInvestigation; shippingAllowed=false for both changed rows",
+      "GenerateRtPipelineVariantCatalogWriteAndCheck": "passed",
+      "adapterCheckLog": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\catalog-adapter-check.log",
+      "adapterCheckLogSha256": "7ad4629a61d1463cefde8a750dcf8a06e758943016b13e879fe398ed4d7548ce"
+    }
+  },
+  "build": {
+    "command": "gradlew.bat assembleBenchmark assembleDebug '-Pandroid.injected.build.abi=arm64-v8a' -PhordeBenchmarkValidation=true --console=plain",
+    "javaHome": "C:\\Program Files\\Eclipse Adoptium\\jdk-21.0.11.10-hotspot",
+    "processEnvironment": { "HORDE_VALIDATION_UNSIGNED": "1" },
+    "exitCode": 0,
+    "result": "BUILD SUCCESSFUL in 52s; 83 actionable tasks",
+    "log": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\arm64-benchmark-debug-build.log",
+    "logBytes": 4390,
+    "logSha256": "63ee28332eda83e97e797866eec1e12bc6f13e218930ff2dd25c6412d762e017",
+    "resolver": "tools/resolve-android-apk.ps1, output resolved through Gradle redirect/listing metadata"
+  },
+  "apks": [
+    {
+      "variant": "benchmark",
+      "resolvedBuildOutput": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\source-eaf\\android\\app\\build\\intermediates\\apk\\benchmark\\app-benchmark.apk",
+      "sealedArtifact": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\artifacts\\benchmark\\HordeLanternRT-opaque-retained-investigation-shipping-mobile-arm64.apk",
+      "sha256": "4827a3c2e26d3328ed53608e15c77afe12a34077e96dcd0564c8d65532e21ff4",
+      "bytes": 76094197,
+      "applicationId": "com.samfa12.hordelanternrt.benchmark",
+      "versionName": "1.6.1-benchmark",
+      "signer": "Android Debug",
+      "signerCertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736"
+    },
+    {
+      "variant": "debug",
+      "resolvedBuildOutput": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\source-eaf\\android\\app\\build\\intermediates\\apk\\debug\\app-debug.apk",
+      "sealedArtifact": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\artifacts\\debug\\HordeLanternRT-opaque-retained-investigation-diagnostic-mobile-arm64.apk",
+      "sha256": "1a515220ff77f33b89f675b6f96de64b55e33331cde2286758d39dbc2baeb069",
+      "bytes": 77937214,
+      "applicationId": "com.samfa12.hordelanternrt.debug",
+      "versionName": "1.6.1-debug",
+      "signer": "Android Debug",
+      "signerCertificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736"
+    }
+  ],
+  "strictChecks": {
+    "productionFrozenCompilerCheck": {
+      "command": "compile-raygen.ps1 -CheckCatalog -ArtifactDirectory <absolute variants dir> -CatalogPath <absolute experimental raygen catalog> -BudgetPath <absolute frozen budget file>",
+      "result": "expected rejection after compiling the original eight frozen variants",
+      "diagnostic": "Frozen raygen variant catalog is stale or malformed.",
+      "log": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\production-frozen-check-expected-rejection-2.log",
+      "logSha256": "33b012debb804a5b9f40897b27bf5d8cba8f45a857b25195fa47d0b663df49d9"
+    },
+    "standardPackageContainment": {
+      "benchmark": "failed before ELF/module scan",
+      "debug": "failed before ELF/module scan",
+      "exactDiagnostic": "RayQuery compute row lost policy parity: rayquery_compute_diagnostic_mobile_opaque_fast",
+      "reason": "The explicit experimental raygen strategy label disagrees with the unchanged compute catalog strategy; no checker or catalog guard was altered or bypassed.",
+      "benchmarkLog": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\strict-shipping-package-containment.log",
+      "debugLog": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\strict-diagnostic-package-containment.log"
+    },
+    "hostPreflightTest": {
+      "result": "not run; cmake CLI unavailable on PATH and standard install paths absent",
+      "attemptLog": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\host-preflight-configure-build-test.log"
+    },
+    "device": "not installed; no ADB/device actions"
+  },
+  "disposition": "APK compilation succeeded, but strict standard package containment rejects catalog strategy parity before examining ELF modules. Therefore these APKs are sealed build outputs only; no actual packaged-module containment/runtime preflight, visual equivalence, diagnostic counter equivalence, device capture, timing, or promotion claim is made."
+}

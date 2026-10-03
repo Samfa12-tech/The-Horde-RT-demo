@@ -1,0 +1,112 @@
+diff --git a/android/app/src/main/cpp/android_probe_bridge.cpp b/android/app/src/main/cpp/android_probe_bridge.cpp
+index a4486bd..a25c326 100644
+--- a/android/app/src/main/cpp/android_probe_bridge.cpp
++++ b/android/app/src/main/cpp/android_probe_bridge.cpp
+@@ -3099,6 +3099,35 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
+         ++context.capturePresentedFrames;
+         if (context.capturePresentedFrames == 12u)
+         {
++#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
++            // Temporary isolated-glass investigation, not a production readback
++            // route or performance sample. Preserve native bytes before Android
++            // presentation scaling and join the same completed frame packet.
++            if (context.activeBenchmarkName == "lantern-glass-production")
++            {
++                horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture raw;
++                std::string rawDiagnostic;
++                const VkResult idle = vkDeviceWaitIdle(context.device);
++                if (idle == VK_SUCCESS && CompleteRtEvidenceAfterDeviceIdle(context, idle) &&
++                    context.rtScene.CaptureStorageImage(raw, rawDiagnostic))
++                {
++                    std::ofstream output(context.reportDirectory + "/isolated-transport.rgba",
++                                         std::ios::binary);
++                    output.write(reinterpret_cast<const char*>(&raw.width), sizeof(raw.width));
++                    output.write(reinterpret_cast<const char*>(&raw.height), sizeof(raw.height));
++                    output.write(reinterpret_cast<const char*>(raw.rgba.data()),
++                                 static_cast<std::streamsize>(raw.rgba.size()));
++                    output.flush();
++                    __android_log_print(output.good() ? ANDROID_LOG_INFO : ANDROID_LOG_ERROR,
++                        kTag, "HORDE_ISOLATED_RAW_CAPTURE width=%u height=%u bytes=%zu written=%d",
++                        raw.width, raw.height, raw.rgba.size(), output.good() ? 1 : 0);
++                }
++                else
++                    __android_log_print(ANDROID_LOG_ERROR, kTag,
++                        "HORDE_ISOLATED_RAW_CAPTURE failed idle=%d diagnostic=%s",
++                        static_cast<int>(idle), rawDiagnostic.c_str());
++            }
++#endif
+             WriteShowcaseDebugState(context, "capture-ready");
+             __android_log_print(ANDROID_LOG_INFO,
+                                 kTag,
+diff --git a/shaders/raytracing/include/rt_dielectric_transport.glsl b/shaders/raytracing/include/rt_dielectric_transport.glsl
+index da96a52..a3bc4c0 100644
+--- a/shaders/raytracing/include/rt_dielectric_transport.glsl
++++ b/shaders/raytracing/include/rt_dielectric_transport.glsl
+@@ -520,6 +520,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+             {
+                 if (volumeCertified)
+                 {
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++                    isolatedGlassMarker = vec3(1.0, 0.0, 0.0);
++#endif
+                     RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
+                         1u);
+                     RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
+@@ -563,6 +566,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+             }
+             else if (volumeOpen && volumeCertified)
+             {
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++                isolatedGlassMarker = vec3(1.0, 1.0, 0.0);
++#endif
+                 RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
+                     1u);
+                 RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
+@@ -572,6 +578,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+             }
+             else
+             {
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++                isolatedGlassMarker = vec3(0.0, 0.0, 1.0);
++#endif
+                 RT_DIAG_ADD(primaryInterfaceBudgetCount,
+                     1u);
+                 if (volumeOpen)
+@@ -676,6 +685,9 @@ vec3 shadeProductionBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
+     {
+         if (volumeOpen && volumeCertified)
+         {
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++            isolatedGlassMarker = vec3(1.0, 0.0, 1.0);
++#endif
+             RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount,
+                 1u);
+             RT_DIAG_OR(certifiedClosedVolumeRecoveryReasonMask,
+diff --git a/shaders/raytracing/include/rt_frame.glsl b/shaders/raytracing/include/rt_frame.glsl
+index 3b988b6..f6183b1 100644
+--- a/shaders/raytracing/include/rt_frame.glsl
++++ b/shaders/raytracing/include/rt_frame.glsl
+@@ -69,6 +69,10 @@ void main()
+     color = color * (0.62 + 0.38 * vignette);
+     color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
+     color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
++#if HORDE_LOCAL_ISOLATED_GLASS_MARKER
++    if (any(greaterThan(isolatedGlassMarker, vec3(0.0))))
++        color = isolatedGlassMarker;
++#endif
+     // The RT storage image is RGBA, while common Android/Windows swapchains are BGRA and receive a raw image copy.
+     if (controls.outputRedBlueSwap > 0.5)
+     {
+diff --git a/shaders/raytracing/include/rt_scene_abi.glsl b/shaders/raytracing/include/rt_scene_abi.glsl
+index 804e601..0457aae 100644
+--- a/shaders/raytracing/include/rt_scene_abi.glsl
++++ b/shaders/raytracing/include/rt_scene_abi.glsl
+@@ -113,6 +113,8 @@ struct HitInfo
+ #endif
+ };
+ 
++#include "rt_isolated_glass_investigation.glsl"
++
+ const vec3 kMoonDirection = vec3(-0.180027, 0.930140, -0.320048);
+ const int kMaterialDryStone = 0;
+ const int kMaterialWetCobble = 1;

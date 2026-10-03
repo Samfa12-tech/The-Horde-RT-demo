@@ -1,0 +1,105 @@
+{
+  "runId": "lantern-motion-20260920-01",
+  "workload": "lantern-motion-extreme-v1",
+  "processId": "7856",
+  "startUtc": "2026-09-20T05:24:41.4028281Z",
+  "endUtc": "2026-09-20T05:27:26.1967145Z",
+  "samples": [
+    {
+      "utc": "2026-09-20T05:24:51.7044870Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 401",
+      "gpuThermalPowerLevel": "2"
+    },
+    {
+      "utc": "2026-09-20T05:25:01.9815783Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 403",
+      "gpuThermalPowerLevel": "1"
+    },
+    {
+      "utc": "2026-09-20T05:25:12.2704138Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 403",
+      "gpuThermalPowerLevel": "1"
+    },
+    {
+      "utc": "2026-09-20T05:25:22.5664106Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 402",
+      "gpuThermalPowerLevel": "0"
+    },
+    {
+      "utc": "2026-09-20T05:25:32.8463653Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 402",
+      "gpuThermalPowerLevel": "0"
+    },
+    {
+      "utc": "2026-09-20T05:25:43.1412831Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 404",
+      "gpuThermalPowerLevel": "0"
+    },
+    {
+      "utc": "2026-09-20T05:25:53.4379128Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 407",
+      "gpuThermalPowerLevel": "0"
+    },
+    {
+      "utc": "2026-09-20T05:26:03.7495447Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 409",
+      "gpuThermalPowerLevel": "0"
+    },
+    {
+      "utc": "2026-09-20T05:26:14.0469100Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 411",
+      "gpuThermalPowerLevel": "0"
+    },
+    {
+      "utc": "2026-09-20T05:26:24.3412518Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 413",
+      "gpuThermalPowerLevel": "1"
+    },
+    {
+      "utc": "2026-09-20T05:26:34.6309726Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 415",
+      "gpuThermalPowerLevel": "1"
+    },
+    {
+      "utc": "2026-09-20T05:26:44.9221279Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 416",
+      "gpuThermalPowerLevel": "1"
+    },
+    {
+      "utc": "2026-09-20T05:26:55.2089198Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 418",
+      "gpuThermalPowerLevel": "1"
+    },
+    {
+      "utc": "2026-09-20T05:27:05.4662989Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 423",
+      "gpuThermalPowerLevel": "0"
+    },
+    {
+      "utc": "2026-09-20T05:27:15.7663357Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 421",
+      "gpuThermalPowerLevel": "1"
+    },
+    {
+      "utc": "2026-09-20T05:27:26.0880029Z",
+      "thermal": "Thermal Status: 2",
+      "battery": "temperature: 422",
+      "gpuThermalPowerLevel": "0"
+    }
+  ]
+}

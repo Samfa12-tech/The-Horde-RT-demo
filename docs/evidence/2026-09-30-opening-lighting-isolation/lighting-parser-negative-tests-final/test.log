@@ -1,0 +1,5 @@
+PASS control-pass: shipping-lighting-control-1-route-20260930 integrity PASS: 1838 rows; median 58.8834 ms (16.983 FPS), p95 79.2701 ms; GPU median 47.9161705 ms.
+PASS forged-apk-sha: installed APK versus immutable artifact receipt expected 'ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae', found '0000000000000000000000000000000000000000000000000000000000000000'
+PASS forged-loaded-shader-sha: loaded artifact pair versus actual APK shader identity expected 'opaqueFast:shipping_mobile_opaque_fast@66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b|genericDielectric:shipping_mobile_generic_dielectric@ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532', found 'opaqueFast:shipping_mobile_opaque_fast@0000000000000000000000000000000000000000000000000000000000000000|genericDielectric:shipping_mobile_generic_dielectric@1111111111111111111111111111111111111111111111111111111111111111'
+PASS mismatched-completion-identity: identity recordSerial at row 0 expected '1841', found '1840'
+PASS invalid-opening-strategy: actual opening OpaqueFast completions expected '160', found '159'

@@ -1,8 +1,10 @@
-HORDE LANTERN RT - SHOWCASE ALPHA 1.6.0
+HORDE LANTERN RT - SHOWCASE ALPHA 1.6.1
 =======================================
 
 This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.
 There is no raster, browser, or fake-RT fallback.
+Package version: 1.6.1; Android companion versionCode: 9.
+Canonical downloads and current availability: https://samfa12.itch.io/the-horde
 
 WINDOWS REQUIREMENTS
 - Windows 10 or 11, 64-bit
@@ -32,7 +34,7 @@ CONTROLS
 SETTINGS
 - Render resolution: 50-100% of the window, 100% by default
 - Lower percentages reduce RT ray count and upscale to the full window
-- Sound, look sensitivity, display mode, and render scale persist beside the demo
+- Independent Music and SFX volume, look sensitivity, display mode, and render scale persist beside the demo
 - Per-Monitor V2 DPI scaling keeps menus and overlays crisp across display scales
 
 STARTING THE DEMO
@@ -47,7 +49,8 @@ SHOWCASE CONTENT
 - Animation-owned sword contact, timed parry, attacker stagger, and riposte window
 - Textured PBR sword and hand torch with shared held-item sockets
 - World-space volumetric torch fire with movement-reactive coloured RT light
-- Stable block-arm first-person presentation while the reusable skinned-player path remains in development
+- Modelled native-RT sleeves, hands and gauntlets with shared gameplay animation/IK/grips
+- Separate world-body geometry for appropriate shadows/reflections and normal look-down presence
 - Three-point vitality, encounter retry, and route restart flow
 - Blue skylight chamber and four bay-selected coloured torch environments
 - Open framed threshold, wet stone, and a single-bounce hero mirror
@@ -56,23 +59,28 @@ SHOWCASE CONTENT
 - Positional looping waterfall ambience
 - Floating staff-lit lich finale with violet charge electricity, three-hit combat,
   hit recoil/cry, death animation, and an illuminated Gothic reward chest
-- Locked/open/claim interaction prompts, authored chest opening, and a physical
-  reward lantern with bounded ray-traced glass and acceleration-driven swing
+- Locked/open/claim interaction prompts, authored chest opening, and a reward
+  lantern with acceleration-driven swing; High retains physical ray-traced glass
+- Mobile deliberately omits lantern pane geometry rather than faking transparency
 - Two-second post-lich latch cue and chest guidance light before interaction
 - Automatic GitHub Release availability checks with an optional update action
 - Native Vulkan BLAS/TLAS, RT pipeline/SBT and vkCmdTraceRaysKHR presentation
 - Phone-safe ray-query shading work inside raygen
 - FilmCow UI, combat, movement, skeleton, and lich sound cues, plus credited
   Pixabay waterfall, torch-extinguish, chest-unlock, and chest-open effects
+- Adaptive A-H What the Dark Keeps music with owner-accepted whistle-lead instrumentation
+- Consent-based in-game reporting with optional bounded diagnostics and game-only screenshot
 - Help > Credits & licences carries the main attribution inside the executable
 
 KNOWN ALPHA LIMITS
 - The opening encounter is capped at two skeletons and one attacker at a time.
 - The lich is a CC0 Meshy placeholder with visible source-rig limitations.
 - Larger hordes remain deferred.
-- First-person skinned gauntlets and arm/body shadow/reflection polish remain deferred;
-  normal gameplay deliberately uses the stable block-arm viewmodel.
-- The bounded Mobile lantern-glass path is expensive and 75% RT resolution is recommended.
+- Remaining High physical-glass contact/near-edge defects are deferred future investigation.
+- Android defaults to 75% RT resolution; sustained 30 FPS is not achieved in the measured
+  current phone workloads. Performance is accepted as-is for 1.6.1, not guaranteed.
+- S24 is working but not fully tested; exact S25 remains unverified.
+- Full graphics-options menu is planned for 1.6.2.
 - Only tested RT-capable hardware paths are supported.
 - See ASSET_LICENSES.md and ALPHA_RELEASE_NOTES.md.
 

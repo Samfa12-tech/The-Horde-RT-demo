@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-opaque-retained-profile-20260930/host-debug-external
+Test project C:/Dev/tmp/horde-opaque-retained-profile-20260930/host-debug-external
+    Start 39: horde_rt_rayquery_compute_shader_tests
+1/1 Test #39: horde_rt_rayquery_compute_shader_tests ...   Passed   45.26 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  45.27 sec

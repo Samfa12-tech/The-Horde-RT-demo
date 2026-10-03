@@ -1,0 +1,26 @@
+[
+  {
+    "scene": "lantern-glass-production",
+    "pixels": 518400,
+    "pixelsOverOne": 3,
+    "fractionOverOne": 5.787037037037037e-06,
+    "maximum": 5,
+    "passed": false
+  },
+  {
+    "scene": "player-viewmodel-lantern-high-look-up",
+    "pixels": 518400,
+    "pixelsOverOne": 0,
+    "fractionOverOne": 0.0,
+    "maximum": 1,
+    "passed": true
+  },
+  {
+    "scene": "player-viewmodel-lantern-low-parry",
+    "pixels": 518400,
+    "pixelsOverOne": 9,
+    "fractionOverOne": 1.736111111111111e-05,
+    "maximum": 4,
+    "passed": false
+  }
+]

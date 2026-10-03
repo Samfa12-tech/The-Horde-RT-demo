@@ -1,0 +1,270 @@
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:113: Warning: Attribute autoSizeMaxTextSize is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeMaxTextSize="17sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:114: Warning: Attribute autoSizeMinTextSize is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeMinTextSize="10sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:115: Warning: Attribute autoSizeStepGranularity is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeStepGranularity="1sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:116: Warning: Attribute autoSizeTextType is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeTextType="uniform"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:132: Warning: Attribute autoSizeMaxTextSize is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeMaxTextSize="17sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:133: Warning: Attribute autoSizeMinTextSize is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeMinTextSize="10sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:134: Warning: Attribute autoSizeStepGranularity is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeStepGranularity="1sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:135: Warning: Attribute autoSizeTextType is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeTextType="uniform"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:151: Warning: Attribute autoSizeMaxTextSize is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeMaxTextSize="17sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:152: Warning: Attribute autoSizeMinTextSize is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeMinTextSize="9sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:153: Warning: Attribute autoSizeStepGranularity is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeStepGranularity="1sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:154: Warning: Attribute autoSizeTextType is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeTextType="uniform"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:171: Warning: Attribute autoSizeMaxTextSize is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeMaxTextSize="17sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:172: Warning: Attribute autoSizeMinTextSize is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeMinTextSize="9sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:173: Warning: Attribute autoSizeStepGranularity is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeStepGranularity="1sp"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:174: Warning: Attribute autoSizeTextType is only used in API level 26 and higher (current min is 24) [UnusedAttribute]
+        android:autoSizeTextType="uniform"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedAttribute":
+   This check finds attributes set in XML files that were introduced in a
+   version newer than the oldest version targeted by your application (with
+   the minSdkVersion attribute).
+
+   This is not an error; the application will simply ignore the attribute.
+   However, if the attribute is important to the appearance or functionality
+   of your application, you should consider finding an alternative way to
+   achieve the same result with only available attributes, and then you can
+   optionally create a copy of the layout in a layout-vNN folder which will be
+   used on API NN or higher where you can take advantage of the newer
+   attribute.
+
+   Note: This check does not only apply to attributes. For example, some tags
+   can be unused too, such as the new <tag> element in layouts introduced in
+   API 21.
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\AndroidManifest.xml:17: Warning: Expecting android:screenOrientation="unspecified" or "fullSensor" for this activity so the user can use the application in any orientation and provide a great experience on Chrome OS devices [LockedOrientationActivity]
+            android:screenOrientation="sensorPortrait">
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "LockedOrientationActivity":
+   The <activity> element should not be locked to any orientation so that
+   users can take advantage of the multi-window environments and larger
+   screens available on Android. To fix the issue, consider declaring the
+   corresponding activity element with `screenOrientation="unspecified"`or
+   fullSensor attribute.
+
+   https://developer.android.com/topic/arc/window-management
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\AndroidManifest.xml:17: Warning: Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed. [DiscouragedApi]
+            android:screenOrientation="sensorPortrait">
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "DiscouragedApi":
+   Discouraged APIs are allowed and are not deprecated, but they may be unfit
+   for common use (e.g. due to slow performance or subtle behavior).
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\values\strings.xml:71: Warning: Formatting %d followed by words ("samples"): This should probably be a plural rather than a string [PluralsCandidate]
+    <string name="rt_lab_telemetry">GPU RT %1$s ms · %2$d samples\nRender %3$d%% · Water %4$s</string>
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "PluralsCandidate":
+   This lint check looks for potential errors in internationalization where
+   you have translated a message which involves a quantity and it looks like
+   other parts of the string may need grammatical changes.
+
+   For example, rather than something like this:
+     <string name="try_again">Try again in %d seconds.</string>
+   you should be using a plural:
+      <plurals name="try_again">
+           <item quantity="one">Try again in %d second</item>
+           <item quantity="other">Try again in %d seconds</item>
+       </plurals>
+   This will ensure that in other languages the right set of translations are
+   provided for the different quantity classes.
+
+   (This check depends on some heuristics, so it may not accurately determine
+   whether a string really should be a quantity. You can use tools:ignore to
+   filter out false positives.
+
+   https://developer.android.com/guide/topics/resources/string-resource.html#Plurals
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\AndroidManifest.xml:7: Warning: The attribute android:allowBackup is deprecated from Android 12 and higher and may be removed in future versions. Consider adding the attribute android:dataExtractionRules specifying an @xml resource which configures cloud backups and device transfers on Android 12 and higher. [DataExtractionRules]
+        android:allowBackup="false"
+                             ~~~~~
+
+   Explanation for issues of type "DataExtractionRules":
+   Before Android 12, the attributes android:allowBackup and
+   android:fullBackupContent were used to configure all forms of backup,
+   including cloud backups, device-to-device transfers and adb backup.
+
+   In Android 12 and higher, these attributes have been deprecated and will
+   only apply to cloud backups. You should instead use the attribute
+   android:dataExtractionRules, specifying an @xml resource that configures
+   which files to back up, for cloud backups and for device-to-device
+   transfers, separately. If your minSdkVersion supports older versions,
+   you'll still want to specify an android:fullBackupContent resource if the
+   default behavior is not right for your app.
+
+   https://developer.android.com/about/versions/12/backup-restore#xml-changes
+   https://goo.gle/DataExtractionRules
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:1343: Warning: Unnecessary; SDK_INT is always >= 24 [ObsoleteSdkInt]
+        if (isFinishing() || (Build.VERSION.SDK_INT >= 17 && isDestroyed())) return;
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "ObsoleteSdkInt":
+   This check flags version checks that are not necessary, because the
+   minSdkVersion (or surrounding known API level) is already at least as high
+   as the version checked for.
+
+   Similarly, it also looks for resources in -vNN folders, such as values-v14
+   where the version qualifier is less than or equal to the minSdkVersion,
+   where the contents should be merged into the best folder.
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:6: Warning: Possible overdraw: Root element paints background #050403 with a theme that also paints a background (inferred theme is @style/Theme.HordeLanternRTProbe) [Overdraw]
+    android:background="#050403"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "Overdraw":
+   If you set a background drawable on a root view, then you should use a
+   custom theme where the theme background is null. Otherwise, the theme
+   background will be painted first, only to have your custom background
+   completely cover it; this is called "overdraw".
+
+   NOTE: This detector relies on figuring out which layouts are associated
+   with which activities based on scanning the Java code, and it's currently
+   doing that using an inexact pattern matching algorithm. Therefore, it can
+   incorrectly conclude which activity the layout is associated with and then
+   wrongly complain that a background-theme is hidden.
+
+   If you want your custom background on multiple pages, then you should
+   consider making a custom theme with your custom background and just using
+   that theme instead of a root element background.
+
+   Of course it's possible that your custom drawable is translucent and you
+   want it to be mixed with the background. However, you will get better
+   performance if you pre-mix the background with your drawable and use that
+   resulting image or color as a custom theme background instead.
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\values\strings.xml:39: Warning: The resource R.string.continue_in_ruin appears to be unused [UnusedResources]
+    <string name="continue_in_ruin">CONTINUE IN THE RUIN</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedResources":
+   Unused resources make applications larger and slow down builds.
+
+
+   The unused resource check can ignore tests. If you want to include
+   resources that are only referenced from tests, consider packaging them in a
+   test source set instead.
+
+   You can include test sources in the unused resource check by setting the
+   system property lint.unused-resources.include-tests =true, and to exclude
+   them (usually for performance reasons), use
+   lint.unused-resources.exclude-tests =true.
+   ,
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\values\strings.xml:111: Warning: Replace "-" with an "en dash" character (–, &#8211;) ? [TypographyDashes]
+    <string name="credits_body">Environment materials: Poly Haven — CC0.\nhttps://polyhaven.com/\n\nSound effects: FilmCow Royalty Free Sound Effects Library — FilmCow custom royalty-free licence.\nhttps://filmcow.itch.io/filmcow-sfx\n\nWater Dripping by DRAGON-STUDIO via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/nature-water-dripping-364450/\n\nWooden Trunk Latch 1 by floraphonic via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/film-special-effects-wooden-trunk-latch-1-183944/\n\nChest Opening by spookymodem (Freesound), via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/household-chest-opening-87569/\n\nFire extinguishing by MUSICHOLDER via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/film-special-effects-fire-extinguishing-212651/\n\nSkeleton derivative: original Free Stylized Dark Fantasy Skeleton by Hotstrike Studio; texture, rig, and animation processing created with Meshy — CC BY 4.0.\nhttps://hotstrikestudio.itch.io/free-stylized-skeleton\n\nPlaceholder lich character created and animated with Meshy — CC0.\nhttps://www.meshy.ai/\n\nProduction Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nProduction medieval hand torch created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nHistorical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex — CC BY 4.0.\n\nProduction Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nProduction Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nApplication icon created for this project with OpenAI image generation.\n\nFull provenance and licence details are bundled as ASSET_LICENSES.md and published at:\nhttps://github.com/Samfa12-tech/The-Horde-RT-demo/blob/main/ASSET_LICENSES.md</string>
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "TypographyDashes":
+   The "n dash" (u2013, &#8211;) and the "m dash" (u2014, &#8212;) characters
+   are used for ranges (n dash) and breaks (m dash). Using these instead of
+   plain hyphens can make text easier to read and your application will look
+   more polished.
+
+   https://en.wikipedia.org/wiki/Dash
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\mipmap-hdpi\ic_launcher.png: Warning: Launcher icon used as round icon did not have a circular shape [IconLauncherShape]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\mipmap-mdpi\ic_launcher.png: Warning: Launcher icon used as round icon did not have a circular shape [IconLauncherShape]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\mipmap-xhdpi\ic_launcher.png: Warning: Launcher icon used as round icon did not have a circular shape [IconLauncherShape]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\mipmap-xxhdpi\ic_launcher.png: Warning: Launcher icon used as round icon did not have a circular shape [IconLauncherShape]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\mipmap-xxxhdpi\ic_launcher.png: Warning: Launcher icon used as round icon did not have a circular shape [IconLauncherShape]
+
+   Explanation for issues of type "IconLauncherShape":
+   According to the Android Design Guide
+   (https://d.android.com/r/studio-ui/designer/material/iconography) your
+   launcher icons should "use a distinct silhouette", a "three-dimensional,
+   front view, with a slight perspective as if viewed from above, so that
+   users perceive some depth."
+
+   The unique silhouette implies that your launcher icon should not be a
+   filled square.
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:63: Warning: Avoid using sizes smaller than 11sp: 9sp [SmallSp]
+        android:textSize="9sp"
+        ~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\res\layout\activity_main.xml:99: Warning: Avoid using sizes smaller than 11sp: 8sp [SmallSp]
+        android:textSize="8sp"
+        ~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SmallSp":
+   Avoid using sizes smaller than 11sp.
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:356: Warning: Custom view `Button` has setOnTouchListener called on it but does not override performClick [ClickableViewAccessibility]
+        parryButton.setOnTouchListener((view, event) -> {
+        ^
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:506: Warning: Custom view `SurfaceView` has setOnTouchListener called on it but does not override performClick [ClickableViewAccessibility]
+        surfaceView.setOnTouchListener((view, event) -> {
+        ^
+
+   Explanation for issues of type "ClickableViewAccessibility":
+   If a View that overrides onTouchEvent or uses an OnTouchListener does not
+   also implement performClick and call it when clicks are detected, the View
+   may not handle accessibility actions properly. Logic handling the click
+   actions should ideally be placed in View#performClick as some accessibility
+   services invoke performClick when a click action should occur.
+
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:953: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        reportTextView.setText((diagnosticsErrorState ? getString(R.string.rt_error) + "\n\n" : "") + currentReport);
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:973: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        vitalityStatus.setText("VITALITY  " + safeVitality + " / 3");
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:973: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        vitalityStatus.setText("VITALITY  " + safeVitality + " / 3");
+                               ~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:2256: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        label.setText(title + "  " + value + "%");
+                      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:2269: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+                label.setText(title + "  " + current + "%");
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SetTextI18n":
+   When calling TextView#setText
+   * Never call Number#toString() to format numbers; it will not handle
+   fraction separators and locale-specific digits properly. Consider using
+   String#format with proper format specifications (%d or %f) instead.
+   * Do not pass a string literal (e.g. "Hello") to display text. Hardcoded
+   text can not be properly translated to other languages. Consider using
+   Android resource strings instead.
+   * Do not build messages by concatenating text chunks. Such messages can not
+   be properly translated.
+
+   https://developer.android.com/guide/topics/resources/localization.html
+
+0 errors, 38 warnings

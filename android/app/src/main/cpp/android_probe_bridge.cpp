@@ -13,12 +13,14 @@
 #include <ctime>
 #include <fstream>
 #include <limits>
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <thread>
+#include <tuple>
 #include <vector>
 #include <sys/stat.h>
 
@@ -28,10 +30,13 @@
 #include <vulkan/vulkan_android.h>
 
 #include "ui/DiagnosticOverlay.h"
+#include "reporting/PlaytestReport.h"
+#include "reporting/PlaytestSubmission.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/ShowcaseBenchmark.h"
+#include "gameplay/LanternBenchmarkScenario.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/ShowcaseReplay.h"
@@ -41,20 +46,25 @@
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/InputMailbox.h"
 #include "platform/android/AndroidRtLabState.h"
+#include "platform/android/AndroidMusicPlayback.h"
+#include "platform/android/SurfaceSessionMailbox.h"
 #include "update/GitHubReleaseUpdater.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
+#include "vulkan/raytracing/RtDeviceEnablePlan.h"
+#include "telemetry/RtBenchmarkEvidenceRun.h"
+#include "telemetry/RtEvidencePublication.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+#include "vulkan/raytracing/experimental/StagedPrimaryProfile.h"
+#endif
 
 #ifndef HORDE_RT_BUILD_ID
 #define HORDE_RT_BUILD_ID "development"
 #endif
-#ifndef HORDE_RT_RAYGEN_SHA256
-#define HORDE_RT_RAYGEN_SHA256 "unknown"
-#endif
-
 namespace
 {
 
@@ -63,6 +73,7 @@ constexpr const char* kReportDirectory = "reports";
 constexpr const char* kTextReportFilename = "vulkan_capability_report.txt";
 constexpr const char* kJsonReportFilename = "vulkan_capability_report.json";
 constexpr const char* kShowcaseDebugStateFilename = "showcase_debug_state.json";
+constexpr float kDefaultAndroidRtRenderScale = 0.75f;
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr uint32_t kMaxFramesInFlight = 1u;
 
@@ -132,8 +143,12 @@ const char* DebugPlayerCombatActionName(const horde::gameplay::PlayerCombatActio
     return "unknown";
 }
 
+constexpr auto kDefaultPlayerPresentationRoute =
+    horde::vulkan::raytracing::kProductionPlayerRenderRoute;
+
 struct SwapchainContext
 {
+    std::uint64_t surfaceGeneration = 0u;
     ANativeWindow* window = nullptr;
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -146,7 +161,7 @@ struct SwapchainContext
     VkColorSpaceKHR swapchainColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
     VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
     VkExtent2D swapchainExtent{};
-    float renderScale = 1.0f;
+    float renderScale = kDefaultAndroidRtRenderScale;
     float frameDeltaSeconds = 1.0f / 60.0f;
     uint32_t timingFrameCount = 0u;
     double timingFenceMs = 0.0;
@@ -167,15 +182,20 @@ struct SwapchainContext
     horde::vulkan::DeviceCapabilities capabilities;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
     horde::vulkan::GpuFrameTimer gpuFrameTimer;
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    horde::vulkan::raytracing::experimental::StagedPrimaryTiming stagedPassTimer;
+    horde::vulkan::raytracing::experimental::StagedPrimaryProfile stagedPassProfile;
+#endif
+    horde::vulkan::raytracing::RtFrameEvidenceCoordinator rtFrameEvidence;
     bool gpuFrameTimingEnabled = true;
     double gpuFrameTimingTotalMs = 0.0;
     std::uint64_t gpuFrameTimingSampleCount = 0u;
-    std::uint64_t gpuFrameSubmissionSequence = 0u;
+    bool rtFrameEvidenceInitialised = false;
     float outputExposure = 0.92f;
     std::int32_t activeBenchmarkCheckpoint = -1;
     std::string activeBenchmarkName;
     horde::vulkan::raytracing::PlayerRenderRoute playerRenderRoute =
-        horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+        kDefaultPlayerPresentationRoute;
     bool glassFixtureRequested = false;
     bool productionRewardPropsRequested = false;
     bool productionLanternGlassOnly = false;
@@ -196,22 +216,56 @@ struct SwapchainContext
     horde::gameplay::ShowcaseRouteReplay routeReplay;
     bool routeReplayActive = false;
     horde::gameplay::ShowcaseBenchmarkRun inAppBenchmark;
+    std::string benchmarkRunId;
+    horde::telemetry::RtBenchmarkEvidenceRun benchmarkEvidence;
+    std::optional<std::size_t> benchmarkExpectedFrame;
     std::string reportDirectory;
     bool useRtPath = false;
+    horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
     uint32_t currentFrame = 0u;
 };
 
 SwapchainContext gSwapchainContext{};
 std::atomic<bool> gSwapchainRunning{false};
 std::thread gSwapchainThread;
-std::mutex gSwapchainMutex;
+struct NativeWindowRelease
+{
+    void operator()(ANativeWindow* window) const { if (window) ANativeWindow_release(window); }
+};
+struct SurfaceStartRequest
+{
+    std::unique_ptr<ANativeWindow, NativeWindowRelease> window;
+    std::string reportDirectory;
+};
+horde::platform::android::SurfaceSessionMailbox<SurfaceStartRequest> gSurfaceSessions;
 std::mutex gReportMutex;
 std::string gLatestTextReport;
 std::string gLatestJsonReport;
+std::uint64_t gLatestReportSurfaceGeneration = 0u; // guarded by gReportMutex; zero is probe-only.
+horde::reporting::OwnedPlaytestReportContext gLatestPlaytestContext;
+// One consented foreground capture; only the render owner accesses rtScene.
+// JNI transfers owned pixels/context, never a live renderer pointer. Cancellation
+// invalidates the generation; it cannot undo a GPU readback already started.
+struct PlaytestCaptureRequest
+{
+    std::uint64_t token = 0u;
+    enum class State { Empty, Pending, Ready, Transferred, Failed } state = State::Empty;
+    horde::reporting::PlaytestScreenshotPixels pixels;
+    horde::reporting::OwnedPlaytestReportContext context;
+    std::string capturedAtUtc;
+    std::uint32_t width = 0u, height = 0u;
+};
+PlaytestCaptureRequest gPlaytestCapture;
+std::uint64_t gPlaytestCaptureNextToken = 0u; // guarded by gReportMutex
 std::string gLatestDeveloperOverlayText;
 std::string gLatestBenchmarkReport;
 std::string gLatestBenchmarkProgress;
-horde::gameplay::simulation::GameSimulation gGameSimulation;
+// Request identity shares the report mutex; it is not a frame/submission counter.
+std::string gRequestedBenchmarkRunId;
+horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
+    horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
+horde::gameplay::simulation::GameSimulation gGameSimulation(
+    horde::gameplay::simulation::ProductionGameSimulationConfig());
 horde::gameplay::simulation::InputMailbox gInputMailbox;
 std::mutex gInputPublisherMutex;
 horde::gameplay::simulation::InputSnapshot gInputPublisherState = []
@@ -230,10 +284,18 @@ std::uint64_t gLifecyclePausedPublicationSequence = 0u;
 std::uint64_t gLifecyclePauseGeneration = 0u;
 std::uint64_t gLifecyclePauseAcknowledgedGeneration = 0u;
 bool gLifecycleUnpausePending = false;
-std::atomic<int> gRuntimeState{0}; // 0 starting/stopped, 1 honestly presented RT, 2 unsupported, 3 render error.
-std::atomic<float> gRequestedRenderScale{1.0f};
+bool gLifecycleMeasurementPaused = true;
+horde::telemetry::RtLifecycleSeeds gPreservedRtEvidenceSeeds = [] {
+    horde::telemetry::RtLifecycleSeeds seeds{};
+    seeds.sceneEpoch = 1u;
+    seeds.measurementGeneration = 1u;
+    return seeds;
+}();
+std::mutex gRtEvidenceSeedMutex;
+std::atomic<float> gRequestedRenderScale{kDefaultAndroidRtRenderScale};
 std::atomic<int> gRequestedWaterQuality{1};
 std::atomic<bool> gRequestedGpuFrameTimingEnabled{true};
+std::atomic<bool> gRequiredRayQueryCompute{false};
 // The sole Android-owned RT tuning state. The render thread takes one coherent
 // copy per frame while JNI setters publish complete, clamped updates.
 horde::platform::android::AndroidRtLabState gRtLabState;
@@ -287,9 +349,10 @@ void RequestLifecyclePauseSynchronizationLocked(const bool resumeAfterAcknowledg
     gLifecyclePausedInput = gInputPublisherState;
     ++gLifecyclePauseGeneration;
     gLifecycleUnpausePending = resumeAfterAcknowledgement;
+    gLifecycleMeasurementPaused = true;
 }
 
-void SynchronizeLifecyclePauseOnOwnerThread()
+bool SynchronizeLifecyclePauseOnOwnerThread()
 {
     horde::gameplay::simulation::InputSnapshot pausedInput;
     std::uint64_t publicationSequence = 0u;
@@ -297,7 +360,7 @@ void SynchronizeLifecyclePauseOnOwnerThread()
     {
         std::lock_guard<std::mutex> lock(gInputPublisherMutex);
         if (gLifecyclePauseAcknowledgedGeneration >= gLifecyclePauseGeneration)
-            return;
+            return gLifecycleMeasurementPaused;
         pausedInput = gLifecyclePausedInput;
         publicationSequence = gLifecyclePausedPublicationSequence;
         generation = gLifecyclePauseGeneration;
@@ -316,7 +379,32 @@ void SynchronizeLifecyclePauseOnOwnerThread()
         gInputPublisherState.paused = false;
         PublishInputLocked();
         gLifecycleUnpausePending = false;
+        gLifecycleMeasurementPaused = false;
     }
+    return gLifecycleMeasurementPaused;
+}
+
+horde::telemetry::RtLifecycleSeeds LoadPreservedRtEvidenceSeeds()
+{
+    std::lock_guard<std::mutex> lock(gRtEvidenceSeedMutex);
+    return gPreservedRtEvidenceSeeds;
+}
+
+void PreserveRtEvidenceSeeds(const horde::telemetry::RtLifecycleSeeds& seeds)
+{
+    std::lock_guard<std::mutex> lock(gRtEvidenceSeedMutex);
+    gPreservedRtEvidenceSeeds.sceneEpoch = std::max(
+        gPreservedRtEvidenceSeeds.sceneEpoch, seeds.sceneEpoch);
+    gPreservedRtEvidenceSeeds.measurementGeneration = std::max(
+        gPreservedRtEvidenceSeeds.measurementGeneration, seeds.measurementGeneration);
+    gPreservedRtEvidenceSeeds.recordAttemptSerial = std::max(
+        gPreservedRtEvidenceSeeds.recordAttemptSerial, seeds.recordAttemptSerial);
+    gPreservedRtEvidenceSeeds.successfulRecordSerial = std::max(
+        gPreservedRtEvidenceSeeds.successfulRecordSerial, seeds.successfulRecordSerial);
+    gPreservedRtEvidenceSeeds.submissionSerial = std::max(
+        gPreservedRtEvidenceSeeds.submissionSerial, seeds.submissionSerial);
+    gPreservedRtEvidenceSeeds.completionSerial = std::max(
+        gPreservedRtEvidenceSeeds.completionSerial, seeds.completionSerial);
 }
 
 void ClearPlatformGameplayEvents()
@@ -408,13 +496,14 @@ void PublishSimulationUiState()
         std::memory_order_release);
 }
 
-std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
+std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities,
+    const horde::telemetry::RtLifecyclePublishedState* evidence = nullptr, bool observerAvailable = true)
 {
     if (capabilities.rtMode == horde::vulkan::RtMode::Unsupported)
     {
         return horde::ui::BuildUnsupportedDeviceText(capabilities);
     }
-    return horde::ui::BuildDiagnosticOverlayText(capabilities);
+    return horde::vulkan::BuildCapabilityTextReport(capabilities, evidence, observerAvailable);
 }
 
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
@@ -456,7 +545,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     const horde::gameplay::EnemyEncounterSnapshot* encounter = SelectedEncounter(roster);
     horde::ui::DeveloperOverlaySnapshot snapshot;
     snapshot.buildIdentity = std::string(HORDE_RT_BUILD_ID) + " DEBUG";
-    snapshot.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
+    snapshot.shaderIdentity = context.rtScene.SelectedPipelineBundleDisplayIdentity();
     const horde::gameplay::PlayerVitalsSnapshot& playerVitals = simulation.playerVitals;
     snapshot.playerLifePhase = horde::gameplay::PlayerLifePhaseName(playerVitals.phase);
     snapshot.playerVitality = playerVitals.vitality;
@@ -469,7 +558,7 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
 
     snapshot.gpuName = context.capabilities.identity.gpuName;
     snapshot.vulkanApi = PackedVulkanVersion(context.capabilities.identity.vulkanApiVersion);
-    snapshot.rtMode = horde::vulkan::ToString(context.capabilities.rtMode);
+    snapshot.rtMode = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
         simulation.zone);
     snapshot.materialEncoding = context.rtScene.MaterialEncoding();
@@ -553,17 +642,23 @@ void PublishReportSnapshot(const horde::vulkan::DeviceCapabilities& capabilities
     std::lock_guard<std::mutex> lock(gReportMutex);
     gLatestTextReport = text;
     gLatestJsonReport = json;
+    gLatestReportSurfaceGeneration = 0u;
+    gLatestPlaytestContext = {}; // A probe is not a live renderer/context snapshot.
 }
 
 std::string LatestTextReport()
 {
     std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gLatestReportSurfaceGeneration != 0u && !gSurfaceSessions.IsCurrent(gLatestReportSurfaceGeneration))
+        return "RT surface stopped or starting. No current surface report is available.";
     return gLatestTextReport;
 }
 
 std::string LatestJsonReport()
 {
     std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gLatestReportSurfaceGeneration != 0u && !gSurfaceSessions.IsCurrent(gLatestReportSurfaceGeneration))
+        return R"({"rtScene":{"presented":false,"status":"Surface stopped or starting"}})";
     return gLatestJsonReport;
 }
 
@@ -601,9 +696,51 @@ bool WriteTextFile(const std::string& path, const std::string& data)
     return stream.good();
 }
 
+horde::reporting::OwnedPlaytestReportContext PlaytestContextOnRenderOwner(const SwapchainContext& context)
+{
+    return {"Horde Lantern RT", HORDE_RT_PACKAGE_VERSION,
+        HORDE_RT_BUILD_ID, "Android", "", context.capabilities.identity.gpuName,
+        horde::vulkan::ToString(context.capabilities.rtScene.executionBackend),
+        std::string(context.rtScene.SelectedDielectricQualityName()),
+        context.renderScale, context.capabilities.performance.internalRenderWidth,
+        context.capabilities.performance.internalRenderHeight, context.capabilities.rtScene.presented};
+}
+
+void PublishRuntimeReports(const SwapchainContext& context,
+    const horde::telemetry::RtLifecyclePublishedState* finalPublication = nullptr)
+{
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return;
+    const auto publication = finalPublication ? *finalPublication
+        : context.rtFrameEvidence.PublishedStateByValue();
+    const auto* evidence = finalPublication ||
+        (context.rtFrameEvidenceInitialised && context.rtFrameEvidence.ObserverAvailable())
+        ? &publication : nullptr;
+    const std::string text = BuildDisplayText(context.capabilities, evidence, finalPublication == nullptr);
+    const std::string json = horde::vulkan::BuildCapabilityJsonReport(context.capabilities, evidence, finalPublication == nullptr);
+    {
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return;
+        gLatestTextReport = text;
+        gLatestJsonReport = json;
+        gLatestReportSurfaceGeneration = context.surfaceGeneration;
+        // Publish the narrow allowlist from this render-thread-owned snapshot;
+        // report preparation never reads the live scene or private diagnostic JSON.
+        gLatestPlaytestContext = PlaytestContextOnRenderOwner(context);
+    }
+    WriteTextFile(context.reportDirectory + '/' + kTextReportFilename, text);
+    WriteTextFile(context.reportDirectory + '/' + kJsonReportFilename, json);
+}
+
 void ResetShowcaseSimulation()
 {
-    gGameSimulation.ResetRoute();
+    const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile !=
+        horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
+    if (replacedQueue)
+        gGameSimulation = horde::gameplay::simulation::GameSimulation(
+            horde::gameplay::simulation::ProductionGameSimulationConfig());
+    else
+        gGameSimulation.ResetRoute();
+    horde::platform::android::ResetMusicSession(replacedQueue);
     gGameSimulation.ClearEvents();
     ClearPlatformGameplayEvents();
     PublishSimulationUiState();
@@ -630,18 +767,65 @@ std::string UtcTimestamp()
     return text;
 }
 
+void CaptureConsentedPlaytestFrameOnRenderOwner(SwapchainContext& context,
+    const bool framePresented, const bool framePaused)
+{
+    std::uint64_t token = 0u;
+    {
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        if (gPlaytestCapture.state != PlaytestCaptureRequest::State::Pending) return;
+        token = gPlaytestCapture.token;
+    }
+    // This exact frame must have reached presentation; a recorded/ready target
+    // alone is not RT presentation evidence. Do not capture at all when unpaused.
+    bool pauseAcknowledged = false;
+    {
+        std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+        pauseAcknowledged = gLifecycleMeasurementPaused && gInputPublisherState.paused &&
+            gLifecyclePauseAcknowledgedGeneration >= gLifecyclePauseGeneration;
+    }
+    if (!framePresented || !context.capabilities.rtScene.presented ||
+        !framePaused || !pauseAcknowledged) return;
+    const auto extent = context.rtScene.DispatchExtent();
+    const auto sourcePixels = static_cast<std::uint64_t>(extent.width) * extent.height;
+    horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture raw;
+    horde::reporting::PlaytestScreenshotPixels pixels;
+    std::string diagnostic; // Never added to the public report/logged with user content.
+    bool success = false;
+    try
+    {
+        success = sourcePixels != 0u && sourcePixels <= horde::reporting::kPlaytestScreenshotMaxSourcePixels &&
+            context.rtScene.CaptureStorageImage(raw, diagnostic) &&
+            horde::reporting::ResizePlaytestScreenshotRgba(raw.width, raw.height, raw.rgba, pixels);
+    }
+    catch (...) { success = false; }
+    const auto ownedContext = PlaytestContextOnRenderOwner(context);
+    const auto capturedAtUtc = UtcTimestamp();
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gPlaytestCapture.token != token || gPlaytestCapture.state != PlaytestCaptureRequest::State::Pending) return;
+    if (!success) { gPlaytestCapture.state = PlaytestCaptureRequest::State::Failed; return; }
+    gPlaytestCapture.width = pixels.width; gPlaytestCapture.height = pixels.height;
+    gPlaytestCapture.pixels = std::move(pixels);
+    gPlaytestCapture.context = ownedContext;
+    gPlaytestCapture.capturedAtUtc = capturedAtUtc;
+    gPlaytestCapture.state = PlaytestCaptureRequest::State::Ready;
+}
+
 horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(const SwapchainContext& context)
 {
     horde::gameplay::ShowcaseBenchmarkMetadata metadata;
+    metadata.runId = context.benchmarkRunId;
     metadata.timestampUtc = UtcTimestamp();
     metadata.buildIdentity = HORDE_RT_BUILD_ID;
-    metadata.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
+    metadata.shaderIdentity = context.rtScene.SelectedPipelineBundleIdentity();
     metadata.gpuName = context.capabilities.identity.gpuName;
     metadata.vulkanApi = std::to_string(VK_API_VERSION_MAJOR(context.capabilities.identity.vulkanApiVersion)) + "." +
                          std::to_string(VK_API_VERSION_MINOR(context.capabilities.identity.vulkanApiVersion)) + "." +
                          std::to_string(VK_API_VERSION_PATCH(context.capabilities.identity.vulkanApiVersion));
     metadata.rtMode = horde::vulkan::ToString(context.capabilities.rtMode);
+    metadata.executionBackend = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     metadata.presentMode = PresentModeName(context.swapchainPresentMode);
+    metadata.legacyFrameTimingScope = "android-render-entry-through-present";
     metadata.materialEncoding = context.rtScene.MaterialEncoding();
     metadata.renderScalePercent = static_cast<std::uint32_t>(std::lround(context.renderScale * 100.0f));
     metadata.internalWidth = context.rtScene.DispatchExtent().width;
@@ -649,6 +833,120 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(const Swapchai
     metadata.presentationWidth = context.swapchainExtent.width;
     metadata.presentationHeight = context.swapchainExtent.height;
     return metadata;
+}
+
+void CancelActiveInAppBenchmark(SwapchainContext& context)
+{
+    bool cancelled = false;
+    if (context.inAppBenchmark.IsRunning())
+    {
+        context.inAppBenchmark.Cancel();
+        cancelled = true;
+    }
+    if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        context.benchmarkEvidence.Cancel();
+        cancelled = true;
+    }
+    context.benchmarkExpectedFrame.reset();
+    if (cancelled)
+    {
+        // All active-context callers run on the owning render thread, including
+        // surface teardown. Home can stop the loop before the queued cancel
+        // command runs; restore the benchmark's temporary gameplay state here.
+        ResetShowcaseSimulation();
+        gInAppBenchmarkStatus.store(3, std::memory_order_release);
+    }
+}
+
+void CancelBenchmarkEvidenceOnly(SwapchainContext& context)
+{
+    if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        context.benchmarkEvidence.Cancel();
+    }
+    context.benchmarkExpectedFrame.reset();
+}
+
+void DeliverCompletedBenchmarkEvidence(
+    SwapchainContext& context,
+    const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult& completion,
+    const horde::telemetry::RtPerformanceEvidenceSnapshot& snapshot)
+{
+    if (!completion.completedEvidence ||
+        context.benchmarkEvidence.Status() != horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        return;
+    }
+    if (snapshot.identity.submitted.frame.sceneEpoch != context.benchmarkEvidence.SceneEpoch() ||
+        snapshot.identity.submitted.frame.measurementGeneration !=
+            context.benchmarkEvidence.MeasurementGeneration())
+    {
+        return;
+    }
+    if (!context.benchmarkEvidence.Complete(snapshot))
+    {
+        __android_log_print(ANDROID_LOG_ERROR, kTag,
+                            "Android benchmark rejected completed RT evidence.");
+    }
+}
+
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+void CollectStagedPassTiming(SwapchainContext& context, std::uint32_t frameSlot,
+                            const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult& completion,
+                            const horde::telemetry::RtPerformanceEvidenceSnapshot& snapshot)
+{
+    if (!completion.ownedGraphicsSubmission) return; // Own fence/device idle already succeeded.
+    const auto timing = context.stagedPassTimer.CollectCompleted(frameSlot);
+    if (completion.completedEvidence &&
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring &&
+        snapshot.identity.submitted.frame.sceneEpoch == context.benchmarkEvidence.SceneEpoch() &&
+        snapshot.identity.submitted.frame.measurementGeneration == context.benchmarkEvidence.MeasurementGeneration())
+        (void)context.stagedPassProfile.Append(timing, snapshot);
+}
+#endif
+
+void RejectPendingBenchmarkExpectation(
+    SwapchainContext& context,
+    const horde::telemetry::RtBenchmarkFailureReason reason)
+{
+    if (!context.benchmarkExpectedFrame.has_value())
+    {
+        return;
+    }
+    if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        (void)context.benchmarkEvidence.RejectExpected(*context.benchmarkExpectedFrame, reason);
+    }
+    context.benchmarkExpectedFrame.reset();
+}
+
+void BindCommittedBenchmarkExpectation(SwapchainContext& context)
+{
+    if (!context.benchmarkExpectedFrame.has_value())
+    {
+        return;
+    }
+    horde::telemetry::RtSubmittedFrameIdentity committedIdentity{};
+    if (context.rtFrameEvidence.TryGetCommittedIdentity(
+            context.currentFrame, committedIdentity))
+    {
+        if (!context.benchmarkEvidence.BindSubmitted(
+                *context.benchmarkExpectedFrame, committedIdentity))
+        {
+            __android_log_print(ANDROID_LOG_ERROR, kTag,
+                                "Android benchmark failed to bind committed submission.");
+        }
+    }
+    else
+    {
+        (void)context.benchmarkEvidence.RejectExpected(
+            *context.benchmarkExpectedFrame,
+            horde::telemetry::RtBenchmarkFailureReason::TokenlessCompletion);
+    }
+    context.benchmarkExpectedFrame.reset();
 }
 
 void PublishBenchmarkProgress(const SwapchainContext& context)
@@ -663,15 +961,41 @@ void StartInAppBenchmark(SwapchainContext& context)
     gCaptureCheckpointRequested.store(-1, std::memory_order_release);
     gRouteReplayRequested.store(false, std::memory_order_release);
     ResetShowcaseSimulation();
+    if (context.rtFrameEvidenceInitialised)
+    {
+        (void)context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::RouteReset);
+        (void)context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::BenchmarkStart);
+    }
     context.activeBenchmarkCheckpoint = -1;
     context.benchmarkSampling = false;
     context.routeReplayActive = false;
     context.captureActive = false;
     context.capturePresentedFrames = 0u;
-    context.inAppBenchmark.Start();
+    context.benchmarkExpectedFrame.reset();
+    horde::gameplay::BenchmarkWorkload requestedWorkload =
+        horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
     {
         std::lock_guard<std::mutex> lock(gReportMutex);
         gLatestBenchmarkReport.clear();
+        context.benchmarkRunId = std::move(gRequestedBenchmarkRunId);
+        requestedWorkload = gRequestedBenchmarkWorkload;
+    }
+    if (!context.benchmarkEvidence.Start(
+            horde::gameplay::ShowcaseBenchmarkRun::kMaximumFramesPerLap))
+    {
+        __android_log_print(ANDROID_LOG_ERROR, kTag,
+                            "Android benchmark evidence allocation failed; route will remain invalid.");
+    }
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    (void)context.stagedPassProfile.Start(horde::gameplay::ShowcaseBenchmarkRun::kMaximumFramesPerLap);
+#endif
+    context.inAppBenchmark.Start(
+        horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps, requestedWorkload,
+        context.benchmarkRunId.empty()); // Automated evidence has no FPS observer.
+    {
+        std::lock_guard<std::mutex> lock(gReportMutex);
         gLatestBenchmarkProgress = context.inAppBenchmark.ProgressText();
     }
     gInAppBenchmarkStatus.store(1, std::memory_order_release);
@@ -680,8 +1004,16 @@ void StartInAppBenchmark(SwapchainContext& context)
 void FinishInAppBenchmark(SwapchainContext& context)
 {
     const horde::gameplay::ShowcaseBenchmarkMetadata metadata = BuildBenchmarkMetadata(context);
-    std::string text = context.inAppBenchmark.BuildTextReport(metadata);
-    const std::string json = context.inAppBenchmark.BuildJsonReport(metadata);
+    const bool evidenceComplete = context.benchmarkEvidence.Status() ==
+        horde::telemetry::RtBenchmarkRunStatus::Complete &&
+        context.benchmarkEvidence.ExpectedCount() == context.inAppBenchmark.Frames().size();
+    std::string text = context.inAppBenchmark.BuildTextReport(metadata, &context.benchmarkEvidence);
+    std::string json = context.inAppBenchmark.BuildJsonReport(metadata, &context.benchmarkEvidence);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    json = horde::vulkan::raytracing::experimental::AttachStagedPrimaryProfile(std::move(json),
+        context.stagedPassProfile.Json(context.benchmarkEvidence.ExpectedCount(), context.stagedPassTimer,
+                                      context.rtScene.ExecutionOrganisationJson()));
+#endif
     const std::string textPath = context.reportDirectory + "/HordeLanternRT-benchmark-latest.txt";
     const std::string jsonPath = context.reportDirectory + "/HordeLanternRT-benchmark-latest.json";
     const bool jsonSaved = WriteTextFile(jsonPath, json);
@@ -694,15 +1026,23 @@ void FinishInAppBenchmark(SwapchainContext& context)
     {
         std::lock_guard<std::mutex> lock(gReportMutex);
         gLatestBenchmarkReport = text;
-        gLatestBenchmarkProgress = context.inAppBenchmark.Passed() ? "BENCHMARK COMPLETE" : "BENCHMARK INVALID";
+        gLatestBenchmarkProgress = context.inAppBenchmark.Passed() && evidenceComplete
+            ? "BENCHMARK COMPLETE" : "BENCHMARK INVALID";
     }
-    gInAppBenchmarkStatus.store(context.inAppBenchmark.Passed() ? 2 : 3, std::memory_order_release);
+    gInAppBenchmarkStatus.store(context.inAppBenchmark.Passed() && evidenceComplete ? 2 : 3,
+                                std::memory_order_release);
     {
         std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
         gInputPublisherState.paused = true;
         PublishInputLocked();
     }
     ResetShowcaseSimulation();
+    context.benchmarkExpectedFrame.reset();
+    if (context.rtFrameEvidenceInitialised)
+    {
+        (void)context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::RouteReset);
+    }
 }
 
 void ResetBenchmarkTiming(SwapchainContext& context)
@@ -737,7 +1077,7 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
     if (const auto* showcase = horde::gameplay::FindShowcaseCheckpoint(id))
     {
         selection = {*showcase, showcase->id,
-                     horde::vulkan::raytracing::PlayerRenderRoute::Procedural};
+                     kDefaultPlayerPresentationRoute};
         return true;
     }
     const auto* development = horde::gameplay::FindDevelopmentCheckpoint(id);
@@ -750,28 +1090,70 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
                             development->yaw, development->pitch,
                             base->expectedZone, base->preset};
     selection.simulationCheckpointId = base->id;
-    // Only the explicit player-body A/B is allowed to expose the unfinished
-    // authored gauntlets. Every gameplay/reward/glass checkpoint uses the same
-    // block-primary route as the live phone game until the hands are accepted
-    // across sword, torch and reward-lantern poses.
-    selection.playerRoute = development->name.starts_with("player-body-")
-        ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
-        : ((development->usesGlassFixture ||
-            development->usesProductionRewardProps)
-            ? horde::vulkan::raytracing::PlayerRenderRoute::HybridBlockPrimary
-            : horde::vulkan::raytracing::PlayerRenderRoute::Procedural);
+    selection.playerRoute = horde::vulkan::raytracing::PlayerRenderRouteForCheckpoint(
+        development->name);
     selection.development = development;
     return true;
 }
 
-void ApplyDebugCheckpointSimulation(const DebugCheckpointSelection& selection)
+void ApplyDebugCheckpointSimulation(
+    const DebugCheckpointSelection& selection,
+    horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
+    // Owning-thread, explicit full checkpoint import; not JNI or a fallback.
+    const auto config = selection.playerRoute == kDefaultPlayerPresentationRoute
+        ? horde::gameplay::simulation::ProductionGameSimulationConfig()
+        : horde::gameplay::simulation::GameSimulationConfig{};
+    const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile != config.playerMountProfile;
+    if (replacedQueue)
+        gGameSimulation = horde::gameplay::simulation::GameSimulation(config);
+    horde::platform::android::ResetMusicSession(replacedQueue);
     if (selection.development != nullptr)
     {
         horde::gameplay::DevelopmentCheckpointStageEvidence evidence{};
+        struct StepTimingState
+        {
+            horde::vulkan::raytracing::RtSceneRecordObservation* observation = nullptr;
+            std::optional<horde::vulkan::raytracing::RtSceneStageScope> activeScope;
+        } stepTiming{observation};
+        const horde::gameplay::DevelopmentCheckpointStepFixedObservation
+            stepObservation{
+                &stepTiming,
+                [](void* user) noexcept
+                {
+                    auto& timing = *static_cast<StepTimingState*>(user);
+                    timing.activeScope.emplace(
+                        timing.observation,
+                        horde::telemetry::RtStage::SimulationStep);
+                },
+                [](void* user) noexcept
+                {
+                    auto& timing = *static_cast<StepTimingState*>(user);
+                    if (timing.activeScope.has_value())
+                    {
+                        timing.activeScope->Complete(1u);
+                        timing.activeScope.reset();
+                    }
+                }};
         const bool staged = horde::gameplay::StageDevelopmentCheckpointSimulation(
-            gGameSimulation, *selection.development, &evidence);
-        if (selection.development->combatPose != horde::gameplay::DevelopmentCombatPose::Rest)
+            gGameSimulation, *selection.development, &evidence,
+            observation != nullptr ? &stepObservation : nullptr);
+        if (selection.development->combatPose ==
+            horde::gameplay::DevelopmentCombatPose::ParryActive)
+        {
+            __android_log_print(
+                ANDROID_LOG_INFO, kTag,
+                "HORDE_PARRY_STAGE checkpoint=%s staged=%d consumed_parry_edges=%u "
+                "parry_success_events=%u player_damaged_events=%u player_killed_events=%u "
+                "enemy_hit_events=%u action=%s action_time=%.4f events_cleared=1",
+                selection.development->name.data(), staged ? 1 : 0,
+                evidence.consumedParryEdges,
+                evidence.playerParrySucceededEvents, evidence.playerDamagedEvents,
+                evidence.playerKilledEvents, evidence.enemyHitEvents,
+                DebugPlayerCombatActionName(evidence.action), evidence.actionTime);
+        }
+        else if (selection.development->combatPose !=
+                 horde::gameplay::DevelopmentCombatPose::Rest)
         {
             __android_log_print(
                 ANDROID_LOG_INFO, kTag,
@@ -796,12 +1178,22 @@ void ApplyDebugCheckpointSimulation(const DebugCheckpointSelection& selection)
     input.yawRadians = selection.checkpoint.yaw;
     input.pitchRadians = selection.checkpoint.pitch;
     input.torchLightStrength = 1.8f;
+    horde::vulkan::raytracing::RtSceneStageScope simulationScope(
+        observation, horde::telemetry::RtStage::SimulationStep);
     gGameSimulation.StepFixed(input, 0.0f,
                               gGameSimulation.Snapshot().inputPublicationSequence + 1u);
+    simulationScope.Complete(1u);
 }
 
 void WriteShowcaseDebugState(const SwapchainContext& context, const char* status)
 {
+    const auto publication = context.rtFrameEvidence.PublishedStateByValue();
+    std::string frameEvidenceJson;
+    std::string frameEvidenceText;
+    std::string frameEvidenceError;
+    (void)horde::telemetry::SerializeRtEvidencePublication(
+        publication, context.rtFrameEvidenceInitialised && context.rtFrameEvidence.ObserverAvailable(),
+        frameEvidenceJson, frameEvidenceText, frameEvidenceError);
     const horde::gameplay::simulation::SimulationSnapshot& simulation = gGameSimulation.Snapshot();
     const horde::gameplay::ShowcaseZone zone = simulation.zone;
     const horde::gameplay::LichSnapshot& lich = simulation.lich;
@@ -834,6 +1226,7 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << ", \"comboQueued\": " << (simulation.playerCombat.comboQueued ? "true" : "false")
          << ", \"swordRadians\": " << simulation.swordCombat.swordSwingRadians
          << ", \"lastConsumedAttackSequence\": " << simulation.lastConsumedAttackSequence
+         << ", \"lastConsumedParrySequence\": " << simulation.lastConsumedParrySequence
          << "},\n"
          << "  \"zone\": \"" << horde::gameplay::ShowcaseZoneName(zone) << "\",\n"
          << "  \"renderScale\": " << context.renderScale << ",\n"
@@ -859,16 +1252,43 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"internalExtent\": {\"width\": " << context.capabilities.performance.internalRenderWidth
          << ", \"height\": " << context.capabilities.performance.internalRenderHeight << "},\n"
          << "  \"presented\": " << (context.capabilities.rtScene.presented ? "true" : "false") << ",\n"
+         << "  \"executionBackend\": \""
+         << horde::vulkan::ToString(context.rtScene.ExecutionBackend()) << "\",\n"
          << "  \"playerRenderRoute\": \""
-         << (context.playerRenderRoute == horde::vulkan::raytracing::PlayerRenderRoute::Skinned
+         << (context.playerRenderRoute == horde::vulkan::raytracing::PlayerRenderRoute::ModelledViewmodel
+                 ? "modelled-viewmodel"
+                 : context.playerRenderRoute == horde::vulkan::raytracing::PlayerRenderRoute::Skinned
                  ? "skinned"
                  : (context.playerRenderRoute ==
                         horde::vulkan::raytracing::PlayerRenderRoute::HybridBlockPrimary
                         ? "hybrid-block-primary" : "procedural")) << "\",\n"
          << "  \"playerSkinCadenceHz\": " << context.rtScene.PlayerSkinCadenceHz() << ",\n"
+         << "  \"playerMountProfile\": \""
+         << (simulation.playerMountProfile == horde::gameplay::items::PlayerMountProfile::AnatomicalBody
+                 ? "AnatomicalBody" : "LegacyViewRelative") << "\",\n"
+         << "  \"dedicatedPlayerPrimaryOwnership\": "
+         << (horde::vulkan::raytracing::HasDedicatedPlayerPrimaryOwnership(
+                 context.rtScene.LastInstanceMasks(), context.rtScene.LastPlayerWorldBodyInstanceFlags())
+                 ? "true" : "false") << ",\n"
          << "  \"playerSkinUpdates\": " << context.rtScene.PlayerSkinUpdateCount() << ",\n"
          << "  \"playerSkinCpuAverageMs\": " << context.rtScene.PlayerSkinAverageMilliseconds() << ",\n"
          << "  \"playerMaxSocketErrorM\": " << context.rtScene.PlayerMaxSocketErrorMetres() << ",\n"
+         << "  \"selectedRtPipelineBundle\": {\"opaqueFast\": {\"key\": \""
+         << context.rtScene.SelectedOpaqueFastKey() << "\", \"sha256\": \""
+         << context.rtScene.SelectedOpaqueFastSha256()
+         << "\"}, \"genericDielectric\": {\"key\": \""
+         << context.rtScene.SelectedGenericDielectricKey() << "\", \"sha256\": \""
+         << context.rtScene.SelectedGenericDielectricSha256() << "\"}},\n"
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+         << "  \"executionOrganisation\": " << context.rtScene.ExecutionOrganisationJson() << ",\n"
+#endif
+         << "  \"diagnosticsAvailability\": \""
+         << horde::vulkan::raytracing::ToString(
+                context.rtScene.DiagnosticsAvailability()) << "\",\n"
+         << "  \"diagnosticsAvailable\": "
+         << (context.rtScene.DiagnosticsAvailability() ==
+                     horde::vulkan::raytracing::RtDiagnosticAvailability::Available
+                 ? "true" : "false") << ",\n"
          << "  \"dielectricTransportOverflowCount\": "
          << context.rtScene.DielectricTransportOverflowCount() << ",\n"
          << "  \"dielectricShadowOverflowCount\": "
@@ -933,7 +1353,9 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << context.rtScene.CertifiedClosedVolumeRecoveryReasonMask() << ",\n"
          << "  \"tlasInstanceCount\": " << context.rtScene.TlasInstanceCount() << ",\n"
          << "  \"buildIdentity\": \"" << HORDE_RT_BUILD_ID << " DEBUG\",\n"
-         << "  \"shaderIdentity\": \"" << std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u) << "\",\n"
+         << "  \"shaderIdentity\": \""
+         << context.rtScene.SelectedPipelineBundleDisplayIdentity()
+         << "\",\n"
          << "  \"gpu\": \"" << context.capabilities.identity.gpuName << "\",\n"
          << "  \"swapchainExtent\": {\"width\": " << context.swapchainExtent.width
          << ", \"height\": " << context.swapchainExtent.height << "},\n"
@@ -964,15 +1386,26 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "  \"benchmarkWindowsCompleted\": " << context.benchmarkWindow << ",\n"
          << "  \"replayWaypointsReached\": " << replay.reachedWaypoints << ",\n"
          << "  \"replayComplete\": " << (replay.complete ? "true" : "false") << ",\n"
-         << "  \"replayFailed\": " << (replay.failed ? "true" : "false") << "\n"
+         << "  \"replayFailed\": " << (replay.failed ? "true" : "false") << ",\n"
+         << "  \"rtFrameEvidence\": " << frameEvidenceJson
          << "}\n";
     WriteTextFile(context.reportDirectory + '/' + kShowcaseDebugStateFilename, json.str());
 }
 
-void ApplyBenchmarkCheckpoint(SwapchainContext& context, const DebugCheckpointSelection& selection)
+void ApplyBenchmarkCheckpoint(
+    SwapchainContext& context,
+    const DebugCheckpointSelection& selection,
+    horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const auto& checkpoint = selection.checkpoint;
-    ApplyDebugCheckpointSimulation(selection);
+    ApplyDebugCheckpointSimulation(selection, observation);
+    if (context.rtFrameEvidenceInitialised)
+    {
+        (void)context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::CheckpointChange);
+        (void)context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::BenchmarkStart);
+    }
     gGameSimulation.ResetTiming();
     gGameSimulation.ClearEvents();
     PublishSimulationUiState();
@@ -1007,10 +1440,18 @@ void ApplyBenchmarkCheckpoint(SwapchainContext& context, const DebugCheckpointSe
     WriteShowcaseDebugState(context, "warming");
 }
 
-void ApplyCaptureCheckpoint(SwapchainContext& context, const DebugCheckpointSelection& selection)
+void ApplyCaptureCheckpoint(
+    SwapchainContext& context,
+    const DebugCheckpointSelection& selection,
+    horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const auto& checkpoint = selection.checkpoint;
-    ApplyDebugCheckpointSimulation(selection);
+    ApplyDebugCheckpointSimulation(selection, observation);
+    if (context.rtFrameEvidenceInitialised)
+    {
+        (void)context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::CheckpointChange);
+    }
     gGameSimulation.ResetTiming();
     gGameSimulation.ClearEvents();
     PublishSimulationUiState();
@@ -1048,9 +1489,14 @@ void ApplyCaptureCheckpoint(SwapchainContext& context, const DebugCheckpointSele
 void ApplyRouteReplay(SwapchainContext& context)
 {
     ResetShowcaseSimulation();
+    if (context.rtFrameEvidenceInitialised)
+    {
+        (void)context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::RouteReset);
+    }
     context.activeBenchmarkCheckpoint = -1;
     context.activeBenchmarkName.clear();
-    context.playerRenderRoute = horde::vulkan::raytracing::PlayerRenderRoute::Procedural;
+    context.playerRenderRoute = kDefaultPlayerPresentationRoute;
     context.glassFixtureRequested = false;
     context.productionRewardPropsRequested = false;
     context.productionLanternGlassOnly = false;
@@ -1087,6 +1533,11 @@ void RecordBenchmarkFrame(SwapchainContext& context,
         ++context.benchmarkWarmupFrames;
         if (context.benchmarkWarmupFrames == 120u)
         {
+            if (context.rtFrameEvidenceInitialised)
+            {
+                (void)context.rtFrameEvidence.ApplyEvent(
+                    horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
+            }
             WriteShowcaseDebugState(context, "sampling");
         }
         return;
@@ -1171,7 +1622,7 @@ bool CreateInstance(VkInstance& instance)
         VK_MAKE_VERSION(1, 0, 0),
         "horde_rt",
         VK_MAKE_VERSION(1, 0, 0),
-        VK_API_VERSION_1_1};
+        VK_API_VERSION_1_2};
 
     VkInstanceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -1219,7 +1670,8 @@ bool FindGraphicsAndPresentQueueFamily(VkPhysicalDevice physicalDevice, VkSurfac
     vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
     for (uint32_t index = 0u; index < queueFamilyCount; ++index)
     {
-        if ((queueFamilies[index].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0u)
+        constexpr VkQueueFlags requiredFlags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT;
+        if ((queueFamilies[index].queueFlags & requiredFlags) != requiredFlags)
         {
             continue;
         }
@@ -1258,7 +1710,7 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
 
 bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
                          uint32_t graphicsQueueFamilyIndex,
-                         const horde::vulkan::DeviceCapabilities& capabilities,
+                         horde::vulkan::RtExecutionBackend executionBackend,
                          VkDevice& device,
                          VkQueue& graphicsQueue)
 {
@@ -1271,22 +1723,17 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
         1u,
         &queuePriority};
     std::vector<const char*> extensions{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-    const bool enableRayTracing = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    const auto rtPlan = horde::vulkan::raytracing::MakeRtDeviceEnablePlan(executionBackend);
+    const bool enableRayTracing = rtPlan.has_value();
+    const horde::vulkan::FeatureSupport requestedFeatures = rtPlan ? rtPlan->features : horde::vulkan::FeatureSupport{};
     if (enableRayTracing)
     {
-        const char* rtExtensions[] = {
-            VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
-            VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
-            VK_KHR_RAY_QUERY_EXTENSION_NAME,
-            VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
-            VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
-            VK_KHR_SPIRV_1_4_EXTENSION_NAME,
-            VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME};
-        for (const char* extension : rtExtensions)
+        for (std::uint32_t index = 0u; index < rtPlan->extensionCount; ++index)
         {
+            const char* extension = rtPlan->extensions[index];
             if (!HasDeviceExtension(physicalDevice, extension))
             {
-                __android_log_print(ANDROID_LOG_ERROR, kTag, "Selected RayTracingPipeline device is missing required extension: %s", extension);
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Selected hardware RT backend is missing required extension: %s", extension);
                 return false;
             }
             extensions.push_back(extension);
@@ -1295,22 +1742,24 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
 
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR};
-    accelerationStructureFeatures.accelerationStructure = enableRayTracing ? VK_TRUE : VK_FALSE;
+    accelerationStructureFeatures.accelerationStructure = requestedFeatures.accelerationStructure ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
-    rayTracingPipelineFeatures.rayTracingPipeline = enableRayTracing ? VK_TRUE : VK_FALSE;
+    rayTracingPipelineFeatures.rayTracingPipeline = requestedFeatures.rayTracingPipeline ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
-    rayQueryFeatures.rayQuery = enableRayTracing ? VK_TRUE : VK_FALSE;
+    rayQueryFeatures.rayQuery = requestedFeatures.rayQuery ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceBufferDeviceAddressFeaturesKHR bufferDeviceAddressFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR};
-    bufferDeviceAddressFeatures.bufferDeviceAddress = enableRayTracing ? VK_TRUE : VK_FALSE;
+    bufferDeviceAddressFeatures.bufferDeviceAddress = requestedFeatures.bufferDeviceAddress ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceFeatures2 features2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
     VkPhysicalDeviceFeatures supportedCoreFeatures{};
     vkGetPhysicalDeviceFeatures(physicalDevice, &supportedCoreFeatures);
     features2.features.textureCompressionASTC_LDR = supportedCoreFeatures.textureCompressionASTC_LDR;
     features2.pNext = &accelerationStructureFeatures;
-    accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
+    accelerationStructureFeatures.pNext = &rayQueryFeatures;
+    if (requestedFeatures.rayTracingPipeline)
+        accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
     rayTracingPipelineFeatures.pNext = &rayQueryFeatures;
     rayQueryFeatures.pNext = &bufferDeviceAddressFeatures;
 
@@ -1611,9 +2060,10 @@ VkPhysicalDevice FindMatchingPhysicalDevice(
     {
         VkPhysicalDeviceProperties properties{};
         vkGetPhysicalDeviceProperties(candidate, &properties);
-        if (properties.vendorID == capabilities.identity.vendorId &&
-            properties.deviceID == capabilities.identity.deviceId &&
-            capabilities.identity.gpuName == properties.deviceName)
+        const horde::vulkan::DeviceIdentity candidateIdentity{
+            properties.deviceName, properties.vendorID, properties.deviceID,
+            properties.driverVersion, properties.apiVersion};
+        if (horde::vulkan::raytracing::SameRtDeviceIdentity(capabilities.identity, candidateIdentity))
         {
             uint32_t queueFamilyIndex = 0u;
             if (FindGraphicsAndPresentQueueFamily(candidate, surface, queueFamilyIndex))
@@ -1623,27 +2073,34 @@ VkPhysicalDevice FindMatchingPhysicalDevice(
         }
     }
 
-    for (const VkPhysicalDevice candidate : physicalDevices)
-    {
-        uint32_t queueFamilyIndex = 0u;
-        if (FindGraphicsAndPresentQueueFamily(candidate, surface, queueFamilyIndex))
-        {
-            return candidate;
-        }
-    }
-
     return VK_NULL_HANDLE;
 }
 
-void ReleaseSwapchainResources(SwapchainContext& context)
+void RefreshGpuTimingTelemetry(
+    SwapchainContext& context,
+    const horde::vulkan::GpuFrameTimingCollection* completed = nullptr);
+bool CompleteRtEvidenceAfterDeviceIdle(SwapchainContext& context, VkResult idleResult);
+horde::telemetry::RtSampleStatus CurrentInitialGpuEvidenceStatus(
+    SwapchainContext& context);
+
+bool ReleaseSwapchainResources(SwapchainContext& context)
 {
     if (context.device == VK_NULL_HANDLE)
     {
-        return;
+        return true;
     }
 
-    vkDeviceWaitIdle(context.device);
+    const VkResult idleResult = vkDeviceWaitIdle(context.device);
+    const bool evidenceCompleted = CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+    CancelActiveInAppBenchmark(context);
+    const bool evidenceRecreated = !context.rtFrameEvidenceInitialised ||
+        context.rtFrameEvidence.Recreate(
+            horde::telemetry::RtResourceResetReason::SwapchainRecreate,
+            CurrentInitialGpuEvidenceStatus(context));
     context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    if (idleResult == VK_SUCCESS) context.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
     context.gpuFrameTimingTotalMs = 0.0;
     context.gpuFrameTimingSampleCount = 0u;
     context.rtScene.Destroy();
@@ -1720,12 +2177,18 @@ void ReleaseSwapchainResources(SwapchainContext& context)
     context.swapchainImageLayouts.clear();
     context.swapchainImages.clear();
     context.currentFrame = 0u;
+    return evidenceCompleted && evidenceRecreated;
 }
 
 void RefreshGpuTimingTelemetry(
     SwapchainContext& context,
-    const std::optional<horde::vulkan::GpuFrameTimingSample>& completedSample = std::nullopt)
+    const horde::vulkan::GpuFrameTimingCollection* completed)
 {
+    if (completed != nullptr && completed->hasSample)
+    {
+        context.gpuFrameTimingTotalMs += completed->sample.milliseconds;
+        ++context.gpuFrameTimingSampleCount;
+    }
     if (!context.gpuFrameTimingEnabled)
     {
         context.capabilities.performance.gpuRt = {};
@@ -1734,11 +2197,6 @@ void RefreshGpuTimingTelemetry(
         gRtLabGpuFrameTimeMs.store(0.0f, std::memory_order_release);
         gRtLabGpuSampleCount.store(0u, std::memory_order_release);
         return;
-    }
-    if (completedSample.has_value())
-    {
-        context.gpuFrameTimingTotalMs += completedSample->milliseconds;
-        ++context.gpuFrameTimingSampleCount;
     }
     const horde::vulkan::GpuFrameTimerTelemetry& timer = context.gpuFrameTimer.Telemetry();
     auto& output = context.capabilities.performance.gpuRt;
@@ -1757,6 +2215,147 @@ void RefreshGpuTimingTelemetry(
     output.errorCount = timer.errorCount;
     gRtLabGpuFrameTimeMs.store(output.valid ? output.latestMs : 0.0f, std::memory_order_release);
     gRtLabGpuSampleCount.store(output.sampleCount, std::memory_order_release);
+}
+
+bool CompleteRtEvidenceAfterDeviceIdle(
+    SwapchainContext& context,
+    const VkResult idleResult)
+{
+    if (!context.rtFrameEvidenceInitialised)
+    {
+        return idleResult == VK_SUCCESS;
+    }
+    if (idleResult != VK_SUCCESS)
+    {
+        context.rtFrameEvidence.NoteFailedDeviceIdle();
+        __android_log_print(
+            ANDROID_LOG_ERROR, kTag,
+            "vkDeviceWaitIdle failed before RT evidence completion: %d",
+            static_cast<int>(idleResult));
+        return false;
+    }
+
+    const horde::vulkan::raytracing::RtGpuFrameTimerIo gpuIo =
+        horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(context.gpuFrameTimer);
+    const horde::vulkan::raytracing::RtDiagnosticFrameIo diagnosticIo =
+        horde::vulkan::raytracing::MakeRtDiagnosticFrameIo(context.rtScene);
+    bool completed = true;
+    for (std::uint32_t frameSlot = 0u; frameSlot < kMaxFramesInFlight; ++frameSlot)
+    {
+        horde::telemetry::RtPerformanceEvidenceSnapshot completedSnapshot{};
+        const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult result =
+            context.rtFrameEvidence.CompleteFinalIdle(
+                frameSlot, gpuIo, diagnosticIo, &completedSnapshot);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        CollectStagedPassTiming(context, frameSlot, result, completedSnapshot);
+#endif
+        if (result.gpuCollectionAttempted)
+        {
+            RefreshGpuTimingTelemetry(context, &result.gpuCollection);
+        }
+        DeliverCompletedBenchmarkEvidence(context, result, completedSnapshot);
+        if (result.fatalDiagnosticIoFailure)
+        {
+            __android_log_print(
+                ANDROID_LOG_ERROR, kTag,
+                "Failed to read the completed RT Diagnostic buffer after device idle.");
+            completed = false;
+        }
+    }
+    return completed;
+}
+
+bool FinalizeCompletedInAppBenchmark(SwapchainContext& context)
+{
+    const VkResult idleResult = vkDeviceWaitIdle(context.device);
+    const bool drained = CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+    if (context.benchmarkEvidence.Status() != horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        return drained;
+    }
+    const bool drainRecorded = context.benchmarkEvidence.RecordOwnerDrainResult(
+        idleResult == VK_SUCCESS && drained);
+    const bool finalized = context.benchmarkEvidence.Finalize();
+    return drained && drainRecorded && finalized;
+}
+
+void FailInAppBenchmarkAfterRenderFailure(SwapchainContext& context)
+{
+    const bool active = context.inAppBenchmark.IsRunning() ||
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring;
+    if (!active)
+    {
+        return;
+    }
+
+    const VkResult idleResult = vkDeviceWaitIdle(context.device);
+    const bool drained = CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+    if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        (void)context.benchmarkEvidence.RecordOwnerDrainResult(
+            idleResult == VK_SUCCESS && drained);
+        (void)context.benchmarkEvidence.Finalize();
+    }
+    CancelActiveInAppBenchmark(context);
+    FinishInAppBenchmark(context);
+}
+
+horde::telemetry::RtSampleStatus CurrentInitialGpuEvidenceStatus(
+    SwapchainContext& context)
+{
+    const horde::vulkan::raytracing::RtGpuFrameTimerIo gpuIo =
+        horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(context.gpuFrameTimer);
+    const horde::vulkan::raytracing::RtGpuTimerStateSnapshot timer =
+        gpuIo.snapshot != nullptr ? gpuIo.snapshot(gpuIo.user)
+                                  : horde::vulkan::raytracing::RtGpuTimerStateSnapshot{};
+    return horde::vulkan::raytracing::InitialRtGpuEvidenceStatus(
+        context.gpuFrameTimingEnabled, timer);
+}
+
+bool InitialiseRtEvidenceOnOwnerThread(
+    SwapchainContext& context,
+    const bool initiallyPaused)
+{
+    if (!context.useRtPath || context.rtFrameEvidenceInitialised)
+    {
+        return true;
+    }
+    const horde::telemetry::RtInstrumentationMode instrumentation =
+        context.rtScene.DiagnosticsAvailability() ==
+                horde::vulkan::raytracing::RtDiagnosticAvailability::Available
+            ? horde::telemetry::RtInstrumentationMode::Diagnostic
+            : horde::telemetry::RtInstrumentationMode::Shipping;
+    if (!context.rtFrameEvidence.Initialise(
+            LoadPreservedRtEvidenceSeeds(),
+            kMaxFramesInFlight,
+            instrumentation,
+            CurrentInitialGpuEvidenceStatus(context),
+            initiallyPaused))
+    {
+        return false;
+    }
+    context.rtFrameEvidenceInitialised = true;
+    return true;
+}
+
+void DestroyRtEvidenceOnOwnerThread(SwapchainContext& context)
+{
+    if (!context.rtFrameEvidenceInitialised)
+    {
+        return;
+    }
+    const bool destroyed = context.rtFrameEvidence.Destroy();
+    context.capabilities.rtScene.presented = false;
+    context.capabilities.rtScene.status = "RT surface stopped";
+    context.capabilities.rtScene.dispatchWidth = 0u;
+    context.capabilities.rtScene.dispatchHeight = 0u;
+    context.capabilities.performance = {};
+    const auto stoppedPublication = context.rtFrameEvidence.PublishedStateByValue();
+    // A successful Destroy yields one final accepted not-running publication.
+    PublishRuntimeReports(context, destroyed ? &stoppedPublication : nullptr);
+    PreserveRtEvidenceSeeds(context.rtFrameEvidence.SeedsByValue());
+    context.rtFrameEvidenceInitialised = false;
 }
 
 bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
@@ -1781,7 +2380,8 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     context.reportDirectory + "/..",
                                     diagnostic,
                                     {},
-                                    context.reportDirectory + "/.."))
+                                    context.reportDirectory + "/..",
+                                    context.executionBackend))
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to initialise presentable RT scene: %s", diagnostic.c_str());
         return false;
@@ -1792,6 +2392,10 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
         context.gpuFrameTimer.Initialise(
             context.physicalDevice, context.device, context.graphicsQueueFamilyIndex, kMaxFramesInFlight);
     }
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    if (context.stagedPassTimer.Status() == horde::vulkan::raytracing::experimental::StagedPrimaryTimingInitStatus::Uninitialised)
+        context.stagedPassTimer.Initialise(context.physicalDevice, context.device, context.graphicsQueueFamilyIndex, kMaxFramesInFlight);
+#endif
     RefreshGpuTimingTelemetry(context);
     __android_log_print(ANDROID_LOG_INFO, kTag, "PBR material encoding: %s", context.rtScene.MaterialEncoding().c_str());
     __android_log_print(ANDROID_LOG_INFO,
@@ -1808,7 +2412,10 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
 
 bool RecreateSwapchain(SwapchainContext& context)
 {
-    ReleaseSwapchainResources(context);
+    if (!ReleaseSwapchainResources(context))
+    {
+        return false;
+    }
     return CreateSwapchain(context) && InitialiseRtSceneForSwapchain(context);
 }
 
@@ -1816,6 +2423,7 @@ void DestroySwapchainContext(SwapchainContext& context)
 {
     if (context.device == VK_NULL_HANDLE)
     {
+        DestroyRtEvidenceOnOwnerThread(context);
         if (context.surface != VK_NULL_HANDLE && context.instance != VK_NULL_HANDLE)
         {
             vkDestroySurfaceKHR(context.instance, context.surface, nullptr);
@@ -1833,9 +2441,15 @@ void DestroySwapchainContext(SwapchainContext& context)
         return;
     }
 
-    vkDeviceWaitIdle(context.device);
+    const VkResult idleResult = vkDeviceWaitIdle(context.device);
+    (void)CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+    CancelActiveInAppBenchmark(context);
+    DestroyRtEvidenceOnOwnerThread(context);
     context.rtScene.Destroy();
     context.gpuFrameTimer.Destroy();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    context.stagedPassTimer.Destroy();
+#endif
     for (VkSemaphore semaphore : context.imageAvailableSemaphores)
     {
         if (semaphore != VK_NULL_HANDLE)
@@ -1907,24 +2521,79 @@ void DestroySwapchainContext(SwapchainContext& context)
 bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 {
     const auto frameStart = std::chrono::steady_clock::now();
+    const auto frameStartCount = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        frameStart.time_since_epoch()).count();
+    const std::uint64_t frameStartNanoseconds = frameStartCount < 0
+        ? 0u
+        : static_cast<std::uint64_t>(frameStartCount);
     rtFramePresented = false;
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return false;
     if (context.commandBuffers.empty())
     {
         return false;
     }
 
-    const VkResult waitResult = vkWaitForFences(context.device, 1u, &context.inFlightFences[context.currentFrame], VK_TRUE, UINT64_MAX);
+    const bool useRtFrame = context.useRtPath && context.rtScene.IsReady();
+    horde::vulkan::raytracing::RtSceneRecordObservation observation{};
+    const bool evidenceFrame = useRtFrame && context.rtFrameEvidenceInitialised &&
+        context.rtFrameEvidence.BeginFrame(context.currentFrame, observation);
+    horde::vulkan::raytracing::RtSceneStageScope wholeFrameScope(
+        evidenceFrame ? &observation : nullptr,
+        horde::telemetry::RtStage::WholeFrameCycle,
+        frameStartNanoseconds);
+    horde::vulkan::raytracing::RtSceneStageScope fenceScope(
+        evidenceFrame ? &observation : nullptr,
+        horde::telemetry::RtStage::FrameFenceWait);
+    const VkResult waitResult = vkWaitForFences(
+        context.device, 1u, &context.inFlightFences[context.currentFrame],
+        VK_TRUE, UINT64_MAX);
+    fenceScope.Complete(1u, 0u, 1u);
     const auto fenceDone = std::chrono::steady_clock::now();
-    if (waitResult != VK_SUCCESS)
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration))
     {
+        if (evidenceFrame) context.rtFrameEvidence.AbortFrame();
         return false;
     }
-    if (context.gpuFrameTimingEnabled)
+    if (waitResult != VK_SUCCESS)
     {
-        RefreshGpuTimingTelemetry(context, context.gpuFrameTimer.CollectCompleted(context.currentFrame));
+        if (evidenceFrame)
+        {
+            context.rtFrameEvidence.AbortFrame();
+        }
+        return false;
+    }
+
+    if (evidenceFrame)
+    {
+        horde::telemetry::RtPerformanceEvidenceSnapshot completedSnapshot{};
+        const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult completion =
+            context.rtFrameEvidence.CompleteFence(
+                context.currentFrame,
+                horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
+                    context.gpuFrameTimer),
+                horde::vulkan::raytracing::MakeRtDiagnosticFrameIo(context.rtScene),
+                &completedSnapshot);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        CollectStagedPassTiming(context, context.currentFrame, completion, completedSnapshot);
+#endif
+        RefreshGpuTimingTelemetry(
+            context,
+            completion.gpuCollectionAttempted ? &completion.gpuCollection : nullptr);
+        DeliverCompletedBenchmarkEvidence(context, completion, completedSnapshot);
+        if (completion.fatalDiagnosticIoFailure)
+        {
+            __android_log_print(
+                ANDROID_LOG_ERROR, kTag,
+                "Failed to read the completed RT Diagnostic buffer after its owning fence.");
+            context.rtFrameEvidence.AbortFrame();
+            return false;
+        }
     }
 
     uint32_t imageIndex = 0u;
+    horde::vulkan::raytracing::RtSceneStageScope acquireScope(
+        evidenceFrame ? &observation : nullptr,
+        horde::telemetry::RtStage::ImageAcquire);
     const VkResult acquireResult = vkAcquireNextImageKHR(
         context.device,
         context.swapchain,
@@ -1932,19 +2601,37 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         context.imageAvailableSemaphores[context.currentFrame],
         VK_NULL_HANDLE,
         &imageIndex);
+    acquireScope.Complete(1u, 0u, 1u);
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration))
+    {
+        if (evidenceFrame) context.rtFrameEvidence.AbortFrame();
+        return false;
+    }
 
     if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR || acquireResult == VK_SUBOPTIMAL_KHR)
     {
+        if (evidenceFrame)
+        {
+            context.rtFrameEvidence.AbortFrame();
+        }
         return RecreateSwapchain(context);
     }
     if (acquireResult != VK_SUCCESS)
     {
+        if (evidenceFrame)
+        {
+            context.rtFrameEvidence.AbortFrame();
+        }
         return false;
     }
 
     VkCommandBufferResetFlags resetFlags = 0;
     if (vkResetCommandBuffer(context.commandBuffers[imageIndex], resetFlags) != VK_SUCCESS)
     {
+        if (evidenceFrame)
+        {
+            context.rtFrameEvidence.AbortFrame();
+        }
         return false;
     }
 
@@ -1956,11 +2643,17 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 
     if (vkBeginCommandBuffer(context.commandBuffers[imageIndex], &beginInfo) != VK_SUCCESS)
     {
+        if (evidenceFrame)
+        {
+            context.rtFrameEvidence.AbortFrame();
+        }
         return false;
     }
 
-    const bool useRtFrame = context.useRtPath && context.rtScene.IsReady();
     bool gpuTimingRecording = false;
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    horde::vulkan::raytracing::experimental::StagedPrimaryRecordingGuard stagedRecordingGuard(context.stagedPassTimer, context.currentFrame);
+#endif
     bool inAppBenchmarkFrame = false;
     const auto recordStart = std::chrono::steady_clock::now();
     if (useRtFrame)
@@ -1970,10 +2663,16 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             StartInAppBenchmark(context);
         }
         if (gInAppBenchmarkCancelRequested.exchange(false, std::memory_order_acq_rel) &&
-            context.inAppBenchmark.IsRunning())
+            (context.inAppBenchmark.IsRunning() ||
+             context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+             context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring))
         {
-            context.inAppBenchmark.Cancel();
-            ResetShowcaseSimulation();
+            CancelActiveInAppBenchmark(context);
+            if (context.rtFrameEvidenceInitialised)
+            {
+                (void)context.rtFrameEvidence.ApplyEvent(
+                    horde::telemetry::RtLifecycleEvent::RouteReset);
+            }
             {
                 std::lock_guard<std::mutex> lock(gReportMutex);
                 gLatestBenchmarkProgress = "BENCHMARK CANCELLED";
@@ -1990,11 +2689,13 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             DebugCheckpointSelection selection;
             if (ResolveDebugCheckpoint(requestedCaptureCheckpoint, selection))
             {
-                ApplyCaptureCheckpoint(context, selection);
+                ApplyCaptureCheckpoint(
+                    context, selection, evidenceFrame ? &observation : nullptr);
             }
             else if (ResolveDebugCheckpoint(requestedCheckpoint, selection))
             {
-                ApplyBenchmarkCheckpoint(context, selection);
+                ApplyBenchmarkCheckpoint(
+                    context, selection, evidenceFrame ? &observation : nullptr);
             }
             if (gRouteReplayRequested.exchange(false, std::memory_order_acq_rel))
             {
@@ -2017,16 +2718,32 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             simulationInput.commands.retry > beforeCommands.lastConsumedRetrySequence;
         if (routeResetPending)
         {
-            if (context.inAppBenchmark.IsRunning())
+            if (context.inAppBenchmark.IsRunning() ||
+                context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+                context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
             {
-                context.inAppBenchmark.Cancel();
-                gInAppBenchmarkStatus.store(3, std::memory_order_release);
+                CancelActiveInAppBenchmark(context);
             }
             context.activeBenchmarkCheckpoint = -1;
             context.benchmarkSampling = false;
             context.routeReplayActive = false;
             context.captureActive = false;
             context.capturePresentedFrames = 0u;
+        }
+        if (context.rtFrameEvidenceInitialised && routeResetPending)
+        {
+            (void)context.rtFrameEvidence.ApplyEvent(
+                horde::telemetry::RtLifecycleEvent::RouteReset);
+        }
+        if (context.rtFrameEvidenceInitialised && retryPending &&
+            context.inAppBenchmark.IsRunning())
+        {
+            CancelBenchmarkEvidenceOnly(context);
+        }
+        else if (context.rtFrameEvidenceInitialised && retryPending)
+        {
+            (void)context.rtFrameEvidence.ApplyEvent(
+                horde::telemetry::RtLifecycleEvent::Retry);
         }
 
         // World commands remain responsive while menus/death pause fixed time.
@@ -2044,7 +2761,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             {
                 break;
             }
+            horde::vulkan::raytracing::RtSceneStageScope simulationScope(
+                evidenceFrame ? &observation : nullptr,
+                horde::telemetry::RtStage::SimulationStep);
             gGameSimulation.StepFixed(simulationInput, 0.0f, publishedInput.publicationSequence);
+            simulationScope.Complete(1u);
         }
 
         const bool simulationPaused = context.captureActive || simulationInput.paused;
@@ -2058,6 +2779,53 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             if (advance.lapStarted)
             {
                 ResetShowcaseSimulation();
+                if (context.rtFrameEvidenceInitialised)
+                {
+                    const bool routeResetApplied = context.rtFrameEvidence.ApplyEvent(
+                        horde::telemetry::RtLifecycleEvent::RouteReset);
+                    const bool finalLap = context.inAppBenchmark.CurrentLap() ==
+                        context.inAppBenchmark.TotalLaps();
+                    const bool warmupApplied = !finalLap || context.rtFrameEvidence.ApplyEvent(
+                        horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
+                    if (finalLap && routeResetApplied && warmupApplied &&
+                        context.benchmarkEvidence.Status() ==
+                            horde::telemetry::RtBenchmarkRunStatus::Allocated)
+                    {
+                        const horde::telemetry::RtLifecycleSeeds seeds =
+                            context.rtFrameEvidence.SeedsByValue();
+                        (void)context.benchmarkEvidence.ArmMeasurement(
+                            seeds.sceneEpoch, seeds.measurementGeneration);
+                    }
+                }
+            }
+            if (context.rtFrameEvidenceInitialised &&
+                context.benchmarkEvidence.Status() ==
+                    horde::telemetry::RtBenchmarkRunStatus::Allocated &&
+                context.inAppBenchmark.TotalLaps() == 1u &&
+                !advance.lapStarted &&
+                context.inAppBenchmark.CurrentLap() == context.inAppBenchmark.TotalLaps())
+            {
+                const bool warmupApplied = context.rtFrameEvidence.ApplyEvent(
+                    horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
+                if (warmupApplied)
+                {
+                    const horde::telemetry::RtLifecycleSeeds seeds =
+                        context.rtFrameEvidence.SeedsByValue();
+                    (void)context.benchmarkEvidence.ArmMeasurement(
+                        seeds.sceneEpoch, seeds.measurementGeneration);
+                }
+                else
+                {
+                    CancelBenchmarkEvidenceOnly(context);
+                }
+            }
+            const bool lanternBenchmark =
+                horde::gameplay::IsLanternBenchmark(context.inAppBenchmark.Workload());
+            if (lanternBenchmark && advance.frameInLap == 1u &&
+                !horde::gameplay::StageLanternBenchmark(
+                    gGameSimulation, context.inAppBenchmark.Workload()))
+            {
+                CancelActiveInAppBenchmark(context);
             }
             simulationInput.paused = false;
             simulationInput.damageEnabled = false;
@@ -2065,12 +2833,41 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             simulationInput.authoritativePlayerX = advance.replay.x;
             simulationInput.authoritativePlayerZ = advance.replay.z;
             simulationInput.yawRadians = advance.replay.yaw;
-            simulationInput.pitchRadians = -0.04f;
-            gGameSimulation.StepFixed(
-                simulationInput,
-                static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
-                publishedInput.publicationSequence);
-            if (advance.replay.waypointReached || advance.lapStarted || advance.finished)
+            simulationInput.pitchRadians = lanternBenchmark
+                ? horde::gameplay::kLanternBenchmarkPitch : -0.04f;
+            horde::vulkan::raytracing::RtSceneStageScope simulationScope(
+                evidenceFrame ? &observation : nullptr,
+                horde::telemetry::RtStage::SimulationStep);
+            if (lanternBenchmark &&
+                horde::gameplay::IsFrozenBenchmark(context.inAppBenchmark.Workload()))
+            {
+                gGameSimulation.AdvanceFrame(
+                    simulationInput, 0.0, publishedInput.publicationSequence);
+            }
+            else if (lanternBenchmark)
+            {
+                gGameSimulation.AdvanceFrame(
+                    simulationInput,
+                    horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds,
+                    publishedInput.publicationSequence);
+            }
+            else
+            {
+                gGameSimulation.StepFixed(
+                    simulationInput,
+                    static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
+                    publishedInput.publicationSequence);
+            }
+            simulationScope.Complete(1u);
+            if (context.benchmarkEvidence.Status() ==
+                    horde::telemetry::RtBenchmarkRunStatus::Measuring)
+            {
+                context.benchmarkExpectedFrame = context.benchmarkEvidence.ExpectFrame({
+                    static_cast<std::uint32_t>(advance.replay.zone),
+                    context.inAppBenchmark.CurrentLap()});
+            }
+            if (advance.replay.waypointReached || advance.lapStarted || advance.finished ||
+                (lanternBenchmark && (advance.frameInLap == 1u || advance.frameInLap % 60u == 0u)))
             {
                 PublishBenchmarkProgress(context);
             }
@@ -2088,10 +2885,14 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             simulationInput.authoritativePlayerZ = replay.z;
             simulationInput.yawRadians = replay.yaw;
             simulationInput.pitchRadians = -0.04f;
+            horde::vulkan::raytracing::RtSceneStageScope simulationScope(
+                evidenceFrame ? &observation : nullptr,
+                horde::telemetry::RtStage::SimulationStep);
             gGameSimulation.StepFixed(
                 simulationInput,
                 static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
                 publishedInput.publicationSequence);
+            simulationScope.Complete(1u);
             if (replay.waypointReached)
             {
                 __android_log_print(ANDROID_LOG_INFO,
@@ -2124,25 +2925,39 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             simulationInput.paused = true;
             simulationInput.damageEnabled = false;
             simulationInput.hasAuthoritativePlayerPose = false;
+            horde::vulkan::raytracing::RtSceneStageScope simulationScope(
+                evidenceFrame ? &observation : nullptr,
+                horde::telemetry::RtStage::SimulationStep);
             gGameSimulation.AdvanceFrame(
                 simulationInput,
                 0.0,
                 publishedInput.publicationSequence);
+            simulationScope.Complete(1u);
         }
         else if (!inAppBenchmarkFrame && !context.routeReplayActive)
         {
             simulationInput.hasAuthoritativePlayerPose = false;
+            horde::vulkan::raytracing::RtSceneStageScope simulationScope(
+                evidenceFrame ? &observation : nullptr,
+                horde::telemetry::RtStage::SimulationStep);
             gGameSimulation.AdvanceFrame(
                 simulationInput,
                 context.frameDeltaSeconds,
                 publishedInput.publicationSequence);
+            simulationScope.Complete(1u);
         }
 
+        // Immutable copy before the established SFX transport is drained. Music
+        // has no authority over simulation or renderer and no second SFX drain.
+        horde::platform::android::PublishMusicSnapshot(
+            gGameSimulation.Snapshot(), gGameSimulation.Events().Events(), context.captureActive);
         DrainSimulationEventsToPlatform();
         PublishSimulationUiState();
         const horde::gameplay::simulation::SimulationSnapshot& renderedSimulation =
             gGameSimulation.Snapshot();
-        const bool benchmarkActive = context.benchmarkSampling || context.inAppBenchmark.IsRunning();
+        const bool benchmarkActive = context.benchmarkSampling ||
+            context.inAppBenchmark.IsRunning() ||
+            gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1;
         gRtLabUnlockEligible.store(
             horde::platform::android::ShouldPersistRtLabUnlock({
                 renderedSimulation.finaleComplete,
@@ -2173,19 +2988,34 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         frameInputs.tuning.productionLanternGlassOnly =
             context.productionLanternGlassOnly;
         std::string diagnostic;
-        gpuTimingRecording = context.gpuFrameTimingEnabled &&
+        if (evidenceFrame)
+        {
+            (void)context.rtFrameEvidence.BeginRecord(frameInputs.tickIndex);
+        }
+        gpuTimingRecording = evidenceFrame && context.gpuFrameTimingEnabled &&
             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);
         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
                                                 context.swapchainImages[imageIndex],
                                                 context.swapchainImageLayouts[imageIndex],
                                                 context.swapchainExtent,
                                                 frameInputs,
-                                                diagnostic))
+                                                diagnostic,
+                                                evidenceFrame ? &observation : nullptr
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                                                , gpuTimingRecording ? &context.stagedPassTimer : nullptr, context.currentFrame
+#endif
+                                                ))
         {
+            if (evidenceFrame)
+            {
+                context.rtFrameEvidence.FailRecord(observation);
+            }
             if (gpuTimingRecording)
             {
                 context.gpuFrameTimer.CancelRecording(context.currentFrame);
             }
+            RejectPendingBenchmarkExpectation(
+                context, horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
             __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to record RT frame: %s", diagnostic.c_str());
             return false;
         }
@@ -2195,6 +3025,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context.gpuFrameTimer.CancelRecording(context.currentFrame);
             gpuTimingRecording = false;
             RefreshGpuTimingTelemetry(context);
+        }
+        if (evidenceFrame)
+        {
+            (void)context.rtFrameEvidence.FinishRecord(observation);
         }
     }
     else
@@ -2215,14 +3049,42 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
 
     if (vkEndCommandBuffer(context.commandBuffers[imageIndex]) != VK_SUCCESS)
     {
-        if (gpuTimingRecording) context.gpuFrameTimer.CancelRecording(context.currentFrame);
+        if (evidenceFrame)
+        {
+            context.rtFrameEvidence.FailGraphicsSubmit(
+                gpuTimingRecording,
+                horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
+                    context.gpuFrameTimer));
+        }
+        else if (gpuTimingRecording)
+        {
+            context.gpuFrameTimer.CancelRecording(context.currentFrame);
+        }
+        RejectPendingBenchmarkExpectation(
+            context, horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
         return false;
     }
     const auto recordDone = std::chrono::steady_clock::now();
 
+    const horde::vulkan::raytracing::RtEvidenceSubmitTransaction submitTransaction =
+        evidenceFrame
+        ? context.rtFrameEvidence.PrevalidateSubmit()
+        : horde::vulkan::raytracing::RtEvidenceSubmitTransaction{};
     if (vkResetFences(context.device, 1u, &context.inFlightFences[context.currentFrame]) != VK_SUCCESS)
     {
-        if (gpuTimingRecording) context.gpuFrameTimer.CancelRecording(context.currentFrame);
+        if (evidenceFrame)
+        {
+            context.rtFrameEvidence.FailGraphicsSubmit(
+                gpuTimingRecording,
+                horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
+                    context.gpuFrameTimer));
+        }
+        else if (gpuTimingRecording)
+        {
+            context.gpuFrameTimer.CancelRecording(context.currentFrame);
+        }
+        RejectPendingBenchmarkExpectation(
+            context, horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
         return false;
     }
 
@@ -2238,16 +3100,56 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         1u,
         &context.renderFinishedSemaphores[context.currentFrame]};
 
-    if (vkQueueSubmit(context.graphicsQueue, 1u, &submitInfo, context.inFlightFences[context.currentFrame]) != VK_SUCCESS)
+    horde::vulkan::raytracing::RtSceneStageScope submitScope(
+        evidenceFrame ? &observation : nullptr,
+        horde::telemetry::RtStage::QueueSubmit);
+    const VkResult submitResult = vkQueueSubmit(
+        context.graphicsQueue, 1u, &submitInfo,
+        context.inFlightFences[context.currentFrame]);
+    submitScope.Complete(1u, 0u, 1u);
+    if (submitResult != VK_SUCCESS)
     {
-        if (gpuTimingRecording) context.gpuFrameTimer.CancelRecording(context.currentFrame);
+        if (evidenceFrame)
+        {
+            context.rtFrameEvidence.FailGraphicsSubmit(
+                gpuTimingRecording,
+                horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
+                    context.gpuFrameTimer));
+        }
+        else if (gpuTimingRecording)
+        {
+            context.gpuFrameTimer.CancelRecording(context.currentFrame);
+        }
+        RejectPendingBenchmarkExpectation(
+            context, horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
         return false;
     }
-    if (gpuTimingRecording &&
-        !context.gpuFrameTimer.MarkSubmitted(context.currentFrame, ++context.gpuFrameSubmissionSequence))
+    if (useRtFrame) context.rtScene.NotifyFrameSubmitted();
+    if (evidenceFrame)
     {
-        context.gpuFrameTimer.CancelRecording(context.currentFrame);
-        RefreshGpuTimingTelemetry(context);
+        context.rtFrameEvidence.CommitGraphicsSubmit(
+            submitTransaction,
+            context.gpuFrameTimingEnabled,
+            gpuTimingRecording,
+            horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
+                context.gpuFrameTimer));
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        horde::telemetry::RtSubmittedFrameIdentity stagedOwner{};
+        if (context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, stagedOwner))
+            (void)context.stagedPassTimer.MarkSubmitted(context.currentFrame, stagedOwner.submissionSerial);
+#endif
+    }
+    if (context.benchmarkExpectedFrame.has_value())
+    {
+        if (evidenceFrame)
+        {
+            BindCommittedBenchmarkExpectation(context);
+        }
+        else
+        {
+            RejectPendingBenchmarkExpectation(
+                context, horde::telemetry::RtBenchmarkFailureReason::TokenlessCompletion);
+        }
     }
 
     VkPresentInfoKHR presentInfo{};
@@ -2257,10 +3159,29 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     presentInfo.swapchainCount = 1u;
     presentInfo.pSwapchains = &context.swapchain;
     presentInfo.pImageIndices = &imageIndex;
+    horde::vulkan::raytracing::RtSceneStageScope presentScope(
+        evidenceFrame ? &observation : nullptr,
+        horde::telemetry::RtStage::PresentCall);
     const VkResult presentResult = vkQueuePresentKHR(context.graphicsQueue, &presentInfo);
+    presentScope.Complete(1u, 0u, 1u);
+    wholeFrameScope.Complete(1u, 0u, 1u);
     const auto presentDone = std::chrono::steady_clock::now();
+    if (evidenceFrame)
+    {
+        const horde::telemetry::RtPresentationOutcome outcome =
+            presentResult == VK_SUCCESS
+            ? horde::telemetry::RtPresentationOutcome::Presented
+            : (presentResult == VK_SUBOPTIMAL_KHR
+                ? horde::telemetry::RtPresentationOutcome::PresentedNeedsRecreate
+                : presentResult == VK_ERROR_OUT_OF_DATE_KHR
+                ? horde::telemetry::RtPresentationOutcome::NotPresentedNeedsRecreate
+                : horde::telemetry::RtPresentationOutcome::Failed);
+        (void)context.rtFrameEvidence.AttachPresentation(outcome);
+        context.rtFrameEvidence.FinalizeSubmittedFrame(observation);
+    }
     if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR)
     {
+        rtFramePresented = useRtFrame && presentResult == VK_SUBOPTIMAL_KHR;
         if (inAppBenchmarkFrame)
         {
             const double interruptedFrameMs =
@@ -2268,7 +3189,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
             context.inAppBenchmark.RecordFrame(interruptedFrameMs, false);
             PublishBenchmarkProgress(context);
         }
-        return RecreateSwapchain(context);
+        const bool recreated = RecreateSwapchain(context);
+        return recreated;
     }
     if (presentResult != VK_SUCCESS)
     {
@@ -2302,10 +3224,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
         timingDiagnostics.erase(std::remove(timingDiagnostics.begin(), timingDiagnostics.end(),
                                             "FPS / frame time: not measured yet."),
                                 timingDiagnostics.end());
-        PublishReportSnapshot(context.capabilities);
-        WriteTextFile(context.reportDirectory + '/' + kTextReportFilename, BuildDisplayText(context.capabilities));
-        WriteTextFile(context.reportDirectory + '/' + kJsonReportFilename,
-                      horde::vulkan::BuildCapabilityJsonReport(context.capabilities));
+        PublishRuntimeReports(context);
         __android_log_print(ANDROID_LOG_INFO,
                             kTag,
                             "RT frame timing avg ms: total=%.3f fence=%.3f record=%.3f submit+present=%.3f",
@@ -2336,8 +3255,22 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented)
     if (inAppBenchmarkFrame)
     {
         context.inAppBenchmark.RecordFrame(frameTotalMs, rtFramePresented);
+        if (context.inAppBenchmark.ConsumeLiveProgressUpdate()) PublishBenchmarkProgress(context);
         if (!context.inAppBenchmark.IsRunning())
         {
+            if (context.inAppBenchmark.Status() ==
+                    horde::gameplay::ShowcaseBenchmarkStatus::Complete)
+            {
+                if (!FinalizeCompletedInAppBenchmark(context))
+                {
+                    __android_log_print(ANDROID_LOG_ERROR, kTag,
+                                        "Android benchmark final evidence drain was incomplete.");
+                }
+            }
+            else
+            {
+                CancelActiveInAppBenchmark(context);
+            }
             FinishInAppBenchmark(context);
         }
     }
@@ -2365,20 +3298,61 @@ void SwapchainRenderLoop()
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
     std::chrono::steady_clock::time_point lastDeveloperOverlayPublish{};
 #endif
-    while (gSwapchainRunning.load(std::memory_order_acquire))
+    const bool initiallyPaused = SynchronizeLifecyclePauseOnOwnerThread();
+    if (!InitialiseRtEvidenceOnOwnerThread(gSwapchainContext, initiallyPaused))
     {
-        SynchronizeLifecyclePauseOnOwnerThread();
+        gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
+        gSwapchainRunning.store(false, std::memory_order_release);
+        __android_log_print(
+            ANDROID_LOG_ERROR, kTag,
+            "Invalid RT evidence ownership configuration on render owner thread.");
+    }
+    while (gSwapchainRunning.load(std::memory_order_acquire) &&
+           gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration))
+    {
+        const bool measurementPaused = SynchronizeLifecyclePauseOnOwnerThread();
+        if (gSwapchainContext.rtFrameEvidenceInitialised)
+        {
+            (void)gSwapchainContext.rtFrameEvidence.SetPaused(measurementPaused);
+        }
+        if (measurementPaused &&
+            (gSwapchainContext.benchmarkEvidence.Status() ==
+                 horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+             gSwapchainContext.benchmarkEvidence.Status() ==
+                 horde::telemetry::RtBenchmarkRunStatus::Measuring))
+        {
+            CancelActiveInAppBenchmark(gSwapchainContext);
+        }
         const float requestedRenderScale = std::clamp(gRequestedRenderScale.load(std::memory_order_acquire), 0.50f, 1.0f);
         if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale - gSwapchainContext.renderScale) > 0.001f)
         {
-            vkDeviceWaitIdle(gSwapchainContext.device);
+            const auto resizeStart = std::chrono::steady_clock::now();
+            const VkResult idleResult = vkDeviceWaitIdle(gSwapchainContext.device);
+            const bool evidenceCompleted = CompleteRtEvidenceAfterDeviceIdle(
+                gSwapchainContext, idleResult);
+            CancelActiveInAppBenchmark(gSwapchainContext);
+            if (!evidenceCompleted)
+            {
+                gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Cannot resize RT output before owned GPU work completes.");
+                break;
+            }
+            const bool evidenceRecreated =
+                !gSwapchainContext.rtFrameEvidenceInitialised ||
+                gSwapchainContext.rtFrameEvidence.Recreate(
+                    horde::telemetry::RtResourceResetReason::RenderScaleChange,
+                    CurrentInitialGpuEvidenceStatus(gSwapchainContext));
             gSwapchainContext.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+            gSwapchainContext.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
             gSwapchainContext.gpuFrameTimingTotalMs = 0.0;
             gSwapchainContext.gpuFrameTimingSampleCount = 0u;
             RefreshGpuTimingTelemetry(gSwapchainContext);
-            gSwapchainContext.rtScene.Destroy();
-            gSwapchainContext.renderScale = requestedRenderScale;
             gSwapchainContext.capabilities.rtScene.presented = false;
+            // Capture readiness must count frames at the new extent, not mix
+            // previously presented frames with the replacement output.
+            gSwapchainContext.capturePresentedFrames = 0u;
             gSwapchainContext.capabilities.rtScene.dispatchWidth = 0u;
             gSwapchainContext.capabilities.rtScene.dispatchHeight = 0u;
             gSwapchainContext.capabilities.performance.internalRenderWidth = 0u;
@@ -2388,18 +3362,32 @@ void SwapchainRenderLoop()
             gSwapchainContext.timingFrameCount = 0u;
             gSwapchainContext.timingFenceMs = gSwapchainContext.timingRecordMs = 0.0;
             gSwapchainContext.timingPresentMs = gSwapchainContext.timingTotalMs = 0.0;
-            gRuntimeState.store(0, std::memory_order_release);
-            if (!InitialiseRtSceneForSwapchain(gSwapchainContext))
+            gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 0);
+            std::string resizeDiagnostic;
+            const VkExtent2D requestedExtent = ScaledRenderExtent(
+                gSwapchainContext.swapchainExtent, requestedRenderScale);
+            if (!evidenceRecreated || !gSwapchainContext.rtScene.ResizeOutputAfterDeviceIdle(
+                    requestedExtent, resizeDiagnostic))
             {
-                if (gSwapchainContext.inAppBenchmark.IsRunning())
+                if (gSwapchainContext.inAppBenchmark.IsRunning() ||
+                    gSwapchainContext.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated ||
+                    gSwapchainContext.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
                 {
-                    gSwapchainContext.inAppBenchmark.Cancel();
-                    gInAppBenchmarkStatus.store(3, std::memory_order_release);
+                    CancelActiveInAppBenchmark(gSwapchainContext);
                 }
-                gRuntimeState.store(3, std::memory_order_release);
-                __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to apply requested RT render scale.");
+                gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to apply requested RT render scale: %s", resizeDiagnostic.c_str());
                 break;
             }
+            // The next RenderFrame resets/re-records its invalidated command
+            // buffer; no old output descriptor may be submitted after resize.
+            gSwapchainContext.renderScale = requestedRenderScale;
+            const double resizeMilliseconds = std::chrono::duration<double, std::milli>(
+                std::chrono::steady_clock::now() - resizeStart).count();
+            __android_log_print(ANDROID_LOG_INFO, kTag,
+                                "HORDE_RT_SCALE_RESIZE scale=%.0f extent=%ux%u output_only=1 idle_and_resize_ms=%.3f",
+                                requestedRenderScale * 100.0f, requestedExtent.width,
+                                requestedExtent.height, resizeMilliseconds);
         }
         const auto frameStart = std::chrono::steady_clock::now();
         gSwapchainContext.frameDeltaSeconds = std::clamp(std::chrono::duration<float>(frameStart - previousFrameStart).count(), 1.0f / 240.0f, 0.1f);
@@ -2407,18 +3395,18 @@ void SwapchainRenderLoop()
         bool rtFramePresented = false;
         if (!RenderFrame(gSwapchainContext, rtFramePresented))
         {
-            if (gSwapchainContext.inAppBenchmark.IsRunning())
-            {
-                gSwapchainContext.inAppBenchmark.Cancel();
-                gInAppBenchmarkStatus.store(3, std::memory_order_release);
-            }
-            gRuntimeState.store(3, std::memory_order_release);
+            if (!gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration)) break;
+            FailInAppBenchmarkAfterRenderFailure(gSwapchainContext);
+            gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
             __android_log_print(ANDROID_LOG_ERROR, kTag, "Diagnostic surface render loop ended unexpectedly.");
             break;
         }
+        if (!gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration)) break;
         if (rtFramePresented && !gSwapchainContext.capabilities.rtScene.presented)
         {
             gSwapchainContext.capabilities.rtScene.presented = true;
+            gSwapchainContext.capabilities.rtScene.executionBackend =
+                gSwapchainContext.rtScene.ExecutionBackend();
             gSwapchainContext.capabilities.rtScene.status = "Presented via swapchain";
             gSwapchainContext.capabilities.rtScene.geometry = "Complete Horde showcase route with sequential animated skeleton and staff-lit lich";
             gSwapchainContext.capabilities.rtScene.dispatchWidth = gSwapchainContext.rtScene.DispatchExtent().width;
@@ -2429,13 +3417,14 @@ void SwapchainRenderLoop()
             presentationDiagnostics.erase(std::remove(presentationDiagnostics.begin(), presentationDiagnostics.end(),
                                                        "Internal render resolution: not measured yet."),
                                           presentationDiagnostics.end());
-            gRuntimeState.store(1, std::memory_order_release);
+            if (!gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 1)) break;
 
-            PublishReportSnapshot(gSwapchainContext.capabilities);
-            WriteTextFile(gSwapchainContext.reportDirectory + '/' + kTextReportFilename, BuildDisplayText(gSwapchainContext.capabilities));
-            WriteTextFile(gSwapchainContext.reportDirectory + '/' + kJsonReportFilename, horde::vulkan::BuildCapabilityJsonReport(gSwapchainContext.capabilities));
+            PublishRuntimeReports(gSwapchainContext);
             __android_log_print(ANDROID_LOG_INFO, kTag, "RT frame reached Android swapchain presentation.");
+            __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_SURFACE_PRESENTED generation=%llu",
+                static_cast<unsigned long long>(gSwapchainContext.surfaceGeneration));
         }
+        CaptureConsentedPlaytestFrameOnRenderOwner(gSwapchainContext, rtFramePresented, measurementPaused);
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
         if (!gSwapchainContext.inAppBenchmark.IsRunning() &&
             frameStart - lastDeveloperOverlayPublish >= std::chrono::milliseconds(250))
@@ -2448,6 +3437,16 @@ void SwapchainRenderLoop()
 
     gSwapchainRunning.store(false, std::memory_order_release);
 
+    {
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        if (gPlaytestCapture.state != PlaytestCaptureRequest::State::Empty)
+        {
+            gPlaytestCapture.pixels = {};
+            gPlaytestCapture.context = {};
+            gPlaytestCapture.state = PlaytestCaptureRequest::State::Failed;
+        }
+    }
+
     SwapchainContext cleanup = std::move(gSwapchainContext);
     gSwapchainContext = {};
     DestroySwapchainContext(cleanup);
@@ -2455,7 +3454,8 @@ void SwapchainRenderLoop()
 
 bool StartSurfaceInternal(ANativeWindow* window,
                           horde::vulkan::DeviceCapabilities capabilities,
-                          const std::string& reportDirectory)
+                          const std::string& reportDirectory,
+                          const std::uint64_t generation)
 {
     if (window == nullptr)
     {
@@ -2472,77 +3472,113 @@ bool StartSurfaceInternal(ANativeWindow* window,
 
     SwapchainContext context;
     context.window = window;
+    context.surfaceGeneration = generation;
+    struct Cleanup
+    {
+        SwapchainContext& context;
+        bool transferred = false;
+        ~Cleanup() { if (!transferred && context.window) DestroySwapchainContext(context); }
+    } cleanup{context};
     context.capabilities = capabilities;
     context.reportDirectory = reportDirectory;
     context.renderScale = std::clamp(gRequestedRenderScale.load(std::memory_order_acquire), 0.50f, 1.0f);
     context.gpuFrameTimingEnabled = gRequestedGpuFrameTimingEnabled.load(std::memory_order_acquire);
-    context.useRtPath = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    const bool requireRayQueryCompute = gRequiredRayQueryCompute.load(std::memory_order_acquire);
     context.clearColor = ClearColorForMode(capabilities.rtMode);
     __android_log_print(ANDROID_LOG_INFO,
                         kTag,
                         "HORDE_GPU_TIMING mode=%s rt_rendering=unchanged",
                         context.gpuFrameTimingEnabled ? "enabled" : "disabled");
-    gRuntimeState.store(context.useRtPath ? 0 : 2, std::memory_order_release);
+    if (!gSurfaceSessions.IsCurrent(generation)) return false;
+    // Refresh the probe snapshot off the UI thread even on later startup failure;
+    // this does not certify an RT-presented frame.
+    PublishRuntimeReports(context);
     ClearPlatformGameplayEvents();
     {
         std::lock_guard<std::mutex> inputLock(gInputPublisherMutex);
         PublishInputLocked();
     }
 
-    if (!CreateInstance(context.instance))
+    if (!CreateInstance(context.instance) || !gSurfaceSessions.IsCurrent(generation))
     {
         DestroySwapchainContext(context);
         return false;
     }
 
-    if (!CreateSurface(context.instance, context.window, context.surface))
+    if (!CreateSurface(context.instance, context.window, context.surface) || !gSurfaceSessions.IsCurrent(generation))
     {
         DestroySwapchainContext(context);
         return false;
     }
 
     context.physicalDevice = FindMatchingPhysicalDevice(context.instance, capabilities, context.surface);
-    if (context.physicalDevice == VK_NULL_HANDLE)
+    if (context.physicalDevice == VK_NULL_HANDLE || !gSurfaceSessions.IsCurrent(generation))
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "No matching physical device found for Android diagnostic surface.");
         DestroySwapchainContext(context);
         return false;
     }
 
-    if (!FindGraphicsAndPresentQueueFamily(context.physicalDevice, context.surface, context.graphicsQueueFamilyIndex))
+    if (!FindGraphicsAndPresentQueueFamily(context.physicalDevice, context.surface, context.graphicsQueueFamilyIndex) ||
+        !gSurfaceSessions.IsCurrent(generation))
     {
-        __android_log_print(ANDROID_LOG_ERROR, kTag, "Could not find graphics+present queue family on Android.");
+        __android_log_print(ANDROID_LOG_ERROR, kTag, "Could not find graphics+compute+present queue family on Android.");
         DestroySwapchainContext(context);
         return false;
     }
 
-    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, capabilities, context.device, context.graphicsQueue))
+    // The selector's queue prerequisite is now proved for this exact device/surface.
+    context.executionBackend = horde::vulkan::raytracing::SelectRtExecutionBackend(
+        capabilities, true, requireRayQueryCompute);
+    horde::vulkan::BeginRtBackendSelection(context.capabilities.rtScene, context.executionBackend);
+    PublishRuntimeReports(context);
+    if (requireRayQueryCompute &&
+        context.executionBackend != horde::vulkan::RtExecutionBackend::RayQueryCompute)
+    {
+        __android_log_print(
+            ANDROID_LOG_ERROR, kTag,
+            "Required hardware RayQuery compute backend is unavailable; no alternate backend will be selected.");
+        gSurfaceSessions.Publish(generation, 2);
+        DestroySwapchainContext(context);
+        return false;
+    }
+    context.useRtPath = context.executionBackend != horde::vulkan::RtExecutionBackend::Unsupported;
+    gSurfaceSessions.Publish(generation, context.useRtPath ? 0 : 2);
+
+    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, context.executionBackend, context.device, context.graphicsQueue) ||
+        !gSurfaceSessions.IsCurrent(generation))
     {
         DestroySwapchainContext(context);
         return false;
     }
 
-    if (!CreateSwapchain(context))
+    if (!CreateSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))
     {
         DestroySwapchainContext(context);
         return false;
     }
-    if (!InitialiseRtSceneForSwapchain(context))
+    if (!InitialiseRtSceneForSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))
     {
         DestroySwapchainContext(context);
         return false;
     }
 
     gSwapchainContext = std::move(context);
+    cleanup.transferred = true;
     gSwapchainRunning.store(true, std::memory_order_release);
-    gSwapchainThread = std::thread(SwapchainRenderLoop);
+    try { gSwapchainThread = std::thread(SwapchainRenderLoop); }
+    catch (...)
+    {
+        gSwapchainRunning.store(false, std::memory_order_release);
+        DestroySwapchainContext(gSwapchainContext);
+        throw;
+    }
 
     return true;
 }
 
 void StopSurfaceInternal()
 {
-    gRuntimeState.store(0, std::memory_order_release);
     if (gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
     {
         gInAppBenchmarkStatus.store(3, std::memory_order_release);
@@ -2560,6 +3596,65 @@ void StopSurfaceInternal()
     // gameplay cue (including ChestUnlocked) into the next Activity surface.
     ClearPlatformGameplayEvents();
     PublishSimulationUiState();
+}
+
+// Process-lifetime serial lifecycle owner. It joins the previous render owner
+// before touching Vulkan for another generation; gameplay remains on that
+// existing render owner. Activity callbacks never wait for driver work or joins.
+class NativeSurfaceOwner
+{
+public:
+    NativeSurfaceOwner() : thread_([this] { Run(); }) {}
+    ~NativeSurfaceOwner()
+    {
+        gSurfaceSessions.Close();
+        thread_.join();
+    }
+private:
+    void Run()
+    {
+        while (auto action = gSurfaceSessions.Take())
+        {
+            StopSurfaceInternal();
+            if (!action->request || !gSurfaceSessions.IsCurrent(action->generation)) continue;
+            auto& request = *action->request;
+            try
+            {
+                const auto capabilities = RunProbe();
+                if (!gSurfaceSessions.IsCurrent(action->generation)) continue;
+                if (!EnsureDirectoryExists(request.reportDirectory))
+                {
+                    gSurfaceSessions.Publish(action->generation, 3);
+                    continue;
+                }
+                if (!StartSurfaceInternal(request.window.release(), capabilities,
+                                          request.reportDirectory, action->generation))
+                {
+                    if (gSurfaceSessions.State(action->generation) == 0)
+                        gSurfaceSessions.Publish(action->generation, 3);
+                    continue;
+                }
+                __android_log_print(ANDROID_LOG_INFO, kTag,
+                    "HORDE_SURFACE_STARTED generation=%llu", static_cast<unsigned long long>(action->generation));
+            }
+            catch (const std::exception& error)
+            {
+                StopSurfaceInternal();
+                gSurfaceSessions.Publish(action->generation, 3);
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "Native surface startup failed: %s", error.what());
+            }
+        }
+        StopSurfaceInternal();
+    }
+    std::thread thread_;
+};
+
+NativeSurfaceOwner& SurfaceOwner()
+{
+    // Constructed after the globals and destroyed before them. This join is
+    // library/process teardown only, never Activity.onPause/onDestroy.
+    static NativeSurfaceOwner owner;
+    return owner;
 }
 
 } // namespace
@@ -2678,6 +3773,186 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getJsonReport(JNIEnv* env, jclass)
     return env->NewStringUTF(reportJson.c_str());
 }
 
+static jbyteArray PrepareAndroidPlaytestReport(JNIEnv* env,
+    jstring reportId, jstring capturedAtUtc, jint category, jint impact, jstring note,
+    jboolean exportConsent, jboolean includeBasicContext, jstring rawModel,
+    const bool submission, const bool includeScreenshot, const jlong captureToken, jbyteArray screenshotPng)
+{
+    using namespace horde::reporting;
+    const auto reply = [env](const PlaytestReportStatus status, const std::string_view text) {
+        std::string envelope(1u, static_cast<char>(status));
+        envelope.append(text);
+        return NewUtf8ByteArray(env, envelope);
+    };
+    try
+    {
+        if (exportConsent != JNI_TRUE)
+            return reply(PlaytestReportStatus::ConsentRequired,
+                PlaytestReportStatusName(PlaytestReportStatus::ConsentRequired));
+        if (category < 0 || category > 5 || impact < 0 || impact > 3)
+            return reply(PlaytestReportStatus::InvalidCategory, "Choose a valid category and impact.");
+        const auto read = [env](jstring value, const std::size_t maximum, std::string& out) {
+            if (!value) return PlaytestReportStatus::InvalidUtf8;
+            const auto length = env->GetStringLength(value);
+            if (static_cast<std::size_t>(length) > maximum) return PlaytestReportStatus::NoteTooLarge;
+            std::vector<jchar> units(static_cast<std::size_t>(length));
+            if (length) env->GetStringRegion(value, 0, length, units.data());
+            if (env->ExceptionCheck()) return PlaytestReportStatus::InvalidUtf8;
+            std::u16string text;
+            text.reserve(units.size());
+            for (const jchar unit : units) text.push_back(static_cast<char16_t>(unit));
+            return EncodePlaytestReportUtf16(text, maximum, out);
+        };
+        std::string id, utc, text;
+        for (const auto [value, maximum, out] : {
+            std::tuple{reportId, std::size_t{96u}, &id},
+            std::tuple{capturedAtUtc, std::size_t{30u}, &utc},
+            std::tuple{note, kPlaytestReportMaxNoteBytes, &text}})
+        {
+            const auto status = read(value, maximum, *out);
+            if (env->ExceptionCheck()) return nullptr;
+            if (status != PlaytestReportStatus::Ready) return reply(status, PlaytestReportStatusName(status));
+        }
+        OwnedPlaytestReportContext context;
+        std::uint32_t screenshotWidth = 0u, screenshotHeight = 0u;
+        std::vector<std::uint8_t> png;
+        if (includeScreenshot)
+        {
+            if (!submission || !screenshotPng || captureToken <= 0)
+                return reply(PlaytestReportStatus::InvalidPreparedReport, "The game screenshot is unavailable. Nothing was submitted.");
+            const auto pngLength = env->GetArrayLength(screenshotPng);
+            if (pngLength <= 0 || static_cast<std::size_t>(pngLength) > kPlaytestScreenshotMaxBytes)
+                return reply(PlaytestReportStatus::InvalidPreparedReport, "The screenshot exceeds the attachment limit. Nothing was submitted.");
+            {
+                std::lock_guard<std::mutex> lock(gReportMutex);
+                if (gPlaytestCapture.token != static_cast<std::uint64_t>(captureToken) ||
+                    gPlaytestCapture.state != PlaytestCaptureRequest::State::Transferred)
+                    return reply(PlaytestReportStatus::InvalidPreparedReport, "The game capture was cancelled or expired. Nothing was submitted.");
+                context = gPlaytestCapture.context;
+                utc = gPlaytestCapture.capturedAtUtc;
+                screenshotWidth = gPlaytestCapture.width; screenshotHeight = gPlaytestCapture.height;
+            }
+            png.resize(static_cast<std::size_t>(pngLength));
+            env->GetByteArrayRegion(screenshotPng, 0, pngLength, reinterpret_cast<jbyte*>(png.data()));
+            if (env->ExceptionCheck()) return nullptr;
+        }
+        else if (screenshotPng || captureToken != 0)
+            return reply(PlaytestReportStatus::ConsentRequired, "Screenshot consent is required before capture.");
+        if (includeBasicContext == JNI_TRUE)
+        {
+            if (!includeScreenshot) {
+                std::lock_guard<std::mutex> lock(gReportMutex);
+                if (gLatestReportSurfaceGeneration != 0u &&
+                    gSurfaceSessions.IsCurrent(gLatestReportSurfaceGeneration))
+                    context = gLatestPlaytestContext;
+            }
+            if (read(rawModel, kPlaytestReportMaxContextStringBytes, context.rawModel) != PlaytestReportStatus::Ready ||
+                context.internalWidth == 0u || context.internalHeight == 0u)
+            {
+                if (env->ExceptionCheck()) return nullptr;
+                return reply(PlaytestReportStatus::InvalidContext,
+                    "Renderer context is unavailable. Uncheck basic context to export your note alone.");
+            }
+        }
+        const PlaytestReportInput input{id, utc,
+            static_cast<PlaytestReportCategory>(category), static_cast<PlaytestReportImpact>(impact),
+            text, true, includeBasicContext == JNI_TRUE, context.View()};
+        if (submission)
+        {
+            const auto prepared = PreparePlaytestSubmission(input, includeScreenshot,
+                {png, screenshotWidth, screenshotHeight});
+            if (!prepared.IsReady())
+                return reply(prepared.reportStatus != PlaytestReportStatus::Ready ? prepared.reportStatus :
+                    PlaytestReportStatus::InvalidPreparedReport, "Report or screenshot validation failed. Nothing was submitted.");
+            if (includeScreenshot)
+            {
+                std::lock_guard<std::mutex> lock(gReportMutex);
+                if (gPlaytestCapture.token == static_cast<std::uint64_t>(captureToken)) gPlaytestCapture = {};
+            }
+            return reply(PlaytestReportStatus::Ready, prepared.json);
+        }
+        const auto prepared = PreparePlaytestReport(input);
+        return reply(prepared.status, prepared.IsReady() ? std::string_view(prepared.json)
+            : PlaytestReportStatusName(prepared.status));
+    }
+    catch (...)
+    {
+        return nullptr; // No exception or allocation retry escapes the JNI boundary.
+    }
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_preparePlaytestReport(JNIEnv* env, jclass,
+    jstring reportId, jstring capturedAtUtc, jint category, jint impact, jstring note,
+    jboolean exportConsent, jboolean includeBasicContext, jstring rawModel)
+{
+    return PrepareAndroidPlaytestReport(env, reportId, capturedAtUtc, category, impact, note,
+        exportConsent, includeBasicContext, rawModel, false, false, 0, nullptr);
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_preparePlaytestSubmission(JNIEnv* env, jclass,
+    jstring reportId, jstring capturedAtUtc, jint category, jint impact, jstring note,
+    jboolean submissionConsent, jboolean includeBasicContext, jstring rawModel,
+    jboolean includeScreenshot, jlong captureToken, jbyteArray screenshotPng)
+{
+    return PrepareAndroidPlaytestReport(env, reportId, capturedAtUtc, category, impact, note,
+        submissionConsent, includeBasicContext, rawModel, true, includeScreenshot == JNI_TRUE,
+        captureToken, screenshotPng);
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestPlaytestCapture(JNIEnv*, jclass, jboolean screenshotConsent)
+{
+    if (screenshotConsent != JNI_TRUE || !gSwapchainRunning.load(std::memory_order_acquire) ||
+        gSurfaceSessions.State() != 1) return 0;
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gPlaytestCapture.state != PlaytestCaptureRequest::State::Empty ||
+        gPlaytestCaptureNextToken == static_cast<std::uint64_t>(std::numeric_limits<jlong>::max())) return 0;
+    gPlaytestCapture.token = ++gPlaytestCaptureNextToken;
+    gPlaytestCapture.state = PlaytestCaptureRequest::State::Pending;
+    return static_cast<jlong>(gPlaytestCapture.token);
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_takePlaytestCapture(JNIEnv* env, jclass, jlong token)
+{
+    // status0 + little-endian width/height + owned RGBA;1=pending,2=unavailable.
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (token <= 0 || gPlaytestCapture.token != static_cast<std::uint64_t>(token) ||
+        gPlaytestCapture.state != PlaytestCaptureRequest::State::Ready)
+    {
+        const jbyte status = token > 0 && gPlaytestCapture.token == static_cast<std::uint64_t>(token) &&
+            gPlaytestCapture.state == PlaytestCaptureRequest::State::Pending ? 1 : 2;
+        auto result = env->NewByteArray(1);
+        if (result) env->SetByteArrayRegion(result, 0, 1, &status);
+        return result;
+    }
+    const auto& pixels = gPlaytestCapture.pixels;
+    const auto length = static_cast<jsize>(pixels.rgba.size() + 9u);
+    auto result = env->NewByteArray(length);
+    if (!result) return nullptr;
+    std::array<jbyte, 9u> header{};
+    for (unsigned byte = 0u; byte < 4u; ++byte)
+    {
+        header[1u + byte] = static_cast<jbyte>(pixels.width >> (byte * 8u));
+        header[5u + byte] = static_cast<jbyte>(pixels.height >> (byte * 8u));
+    }
+    env->SetByteArrayRegion(result, 0, 9, header.data());
+    env->SetByteArrayRegion(result, 9, length - 9, reinterpret_cast<const jbyte*>(pixels.rgba.data()));
+    if (env->ExceptionCheck()) return nullptr;
+    gPlaytestCapture.pixels = {};
+    gPlaytestCapture.state = PlaytestCaptureRequest::State::Transferred;
+    return result;
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_cancelPlaytestCapture(JNIEnv*, jclass, jlong token)
+{
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (token > 0 && gPlaytestCapture.token == static_cast<std::uint64_t>(token)) gPlaytestCapture = {};
+}
+
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getDeveloperOverlayText(JNIEnv* env, jclass)
 {
@@ -2728,7 +4003,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_writeReports(JNIEnv* env, jclass, js
     return JNI_TRUE;
 }
 
-extern "C" JNIEXPORT jboolean JNICALL
+extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, jclass, jobject surface, jstring baseDirectory)
 {
     if (surface == nullptr)
@@ -2753,47 +4028,42 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, 
     env->ReleaseStringUTFChars(baseDirectory, baseDirectoryUtf);
 
     const std::string reportDirectory = BuildReportDirectory(baseDirectoryValue);
-    if (!EnsureDirectoryExists(reportDirectory))
-    {
-        __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to create report directory: %s", reportDirectory.c_str());
-        return JNI_FALSE;
-    }
-
-    ANativeWindow* window = ANativeWindow_fromSurface(env, surface);
+    // Acquire the native reference before enqueueing; never retain a Java Surface
+    // or JNIEnv across threads. Pending replacements release their own reference.
+    std::unique_ptr<ANativeWindow, NativeWindowRelease> window(ANativeWindow_fromSurface(env, surface));
     if (!window)
     {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Failed to resolve ANativeWindow.");
         return JNI_FALSE;
     }
 
-    std::lock_guard<std::mutex> lock(gSwapchainMutex);
-    const horde::vulkan::DeviceCapabilities capabilities = RunProbe();
-
-    // Write updated report from shared probe source.
-    const std::string textReport = BuildDisplayText(capabilities);
-    const std::string jsonReport = horde::vulkan::BuildCapabilityJsonReport(capabilities);
-    PublishReportSnapshot(capabilities);
-    if (!WriteTextFile(reportDirectory + '/' + kTextReportFilename, textReport) ||
-        !WriteTextFile(reportDirectory + '/' + kJsonReportFilename, jsonReport))
+    try
     {
-        ANativeWindow_release(window);
-        return JNI_FALSE;
+        (void)SurfaceOwner();
+        const auto generation = gSurfaceSessions.Start({std::move(window), reportDirectory});
+        __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_SURFACE_REQUEST generation=%llu",
+                            static_cast<unsigned long long>(generation));
+        return static_cast<jlong>(generation); // Accepted request, NOT presented/ready.
     }
-
-    if (!StartSurfaceInternal(window, capabilities, reportDirectory))
+    catch (const std::exception& error)
     {
-        return JNI_FALSE;
+        __android_log_print(ANDROID_LOG_ERROR, kTag, "Could not request native surface: %s", error.what());
+        return 0;
     }
-
-    __android_log_print(ANDROID_LOG_INFO, kTag, "Started Android diagnostic surface rendering loop.");
-    return JNI_TRUE;
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_stopDiagnosticSurface(JNIEnv*, jclass)
+Java_com_samfa12_hordelanternrt_ProbeBridge_stopDiagnosticSurface(JNIEnv*, jclass, jlong generation)
 {
-    std::lock_guard<std::mutex> lock(gSwapchainMutex);
-    StopSurfaceInternal();
+    if (generation > 0 && gSurfaceSessions.Stop(static_cast<std::uint64_t>(generation)))
+        __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_SURFACE_CANCEL generation=%llu",
+                            static_cast<unsigned long long>(generation));
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getSurfaceRuntimeState(JNIEnv*, jclass, jlong generation)
+{
+    return static_cast<jint>(gSurfaceSessions.State(static_cast<std::uint64_t>(generation)));
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -2893,7 +4163,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getContextualControlState(JNIEnv*, j
 extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_retryEncounter(JNIEnv*, jclass)
 {
-    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+    if (gSurfaceSessions.State() != 1 ||
         gPlayerLifePhase.load(std::memory_order_acquire) !=
             static_cast<int>(horde::gameplay::PlayerLifePhase::Dead))
     {
@@ -3051,6 +4321,18 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setGpuTimingEnabled(JNIEnv*, jclass,
 #endif
 }
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setRequiredRayQueryCompute(
+    JNIEnv*, jclass, jboolean required)
+{
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS)
+    gRequiredRayQueryCompute.store(required == JNI_TRUE, std::memory_order_release);
+#else
+    (void)required;
+    gRequiredRayQueryCompute.store(false, std::memory_order_release);
+#endif
+}
+
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugCheckpoint(JNIEnv*, jclass, jint checkpointId)
 {
@@ -3073,7 +4355,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugCaptureCheckpoint(JNIEnv
 {
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
     DebugCheckpointSelection selection;
-    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+    if (gSurfaceSessions.State() != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1 ||
         !ResolveDebugCheckpoint(static_cast<std::int32_t>(checkpointId), selection))
     {
@@ -3101,11 +4383,80 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugRouteReplay(JNIEnv*, jcl
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmark(JNIEnv*, jclass)
 {
-    if (gRuntimeState.load(std::memory_order_acquire) != 1 ||
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gSurfaceSessions.State() != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
     {
         return JNI_FALSE;
     }
+    gRequestedBenchmarkRunId.clear();
+    gRequestedBenchmarkWorkload = horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
+    gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
+    gRtLabBenchmarkRoute.store(true, std::memory_order_release);
+    gInAppBenchmarkStatus.store(1, std::memory_order_release);
+    gInAppBenchmarkRequested.store(true, std::memory_order_release);
+    return JNI_TRUE;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithId(
+    JNIEnv* env, jclass, jstring runId)
+{
+    if (runId == nullptr || env->GetStringUTFLength(runId) < 1 ||
+        env->GetStringUTFLength(runId) > 64) return JNI_FALSE;
+    const char* text = env->GetStringUTFChars(runId, nullptr);
+    if (text == nullptr) return JNI_FALSE;
+    const std::string id(text);
+    env->ReleaseStringUTFChars(runId, text);
+    if (!std::all_of(id.begin(), id.end(), [](const char c) {
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                (c >= '0' && c <= '9') || c == '-' || c == '_';
+        })) return JNI_FALSE;
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gSurfaceSessions.State() != 1 ||
+        gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
+    gRequestedBenchmarkRunId = id;
+    gRequestedBenchmarkWorkload = horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
+    gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
+    gRtLabBenchmarkRoute.store(true, std::memory_order_release);
+    gInAppBenchmarkStatus.store(1, std::memory_order_release);
+    gInAppBenchmarkRequested.store(true, std::memory_order_release);
+    return JNI_TRUE;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithIdAndWorkload(
+    JNIEnv* env, jclass, jstring runId, jstring workloadName)
+{
+    if (runId == nullptr || workloadName == nullptr ||
+        env->GetStringUTFLength(runId) < 1 || env->GetStringUTFLength(runId) > 64 ||
+        env->GetStringUTFLength(workloadName) < 1 || env->GetStringUTFLength(workloadName) > 64) {
+        return JNI_FALSE;
+    }
+    const char* runText = env->GetStringUTFChars(runId, nullptr);
+    const char* workloadText = env->GetStringUTFChars(workloadName, nullptr);
+    if (runText == nullptr || workloadText == nullptr) {
+        if (runText != nullptr) env->ReleaseStringUTFChars(runId, runText);
+        if (workloadText != nullptr) env->ReleaseStringUTFChars(workloadName, workloadText);
+        return JNI_FALSE;
+    }
+    const std::string id(runText);
+    const std::string workloadNameUtf8(workloadText);
+    env->ReleaseStringUTFChars(runId, runText);
+    env->ReleaseStringUTFChars(workloadName, workloadText);
+    if (!std::all_of(id.begin(), id.end(), [](const char c) {
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                (c >= '0' && c <= '9') || c == '-' || c == '_';
+        })) return JNI_FALSE;
+    horde::gameplay::BenchmarkWorkload workload;
+    if (!horde::gameplay::ParseBenchmarkWorkload(workloadNameUtf8, workload)) {
+        return JNI_FALSE;
+    }
+    std::lock_guard<std::mutex> lock(gReportMutex);
+    if (gSurfaceSessions.State() != 1 ||
+        gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
+    gRequestedBenchmarkRunId = id;
+    gRequestedBenchmarkWorkload = workload;
     gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
     gRtLabBenchmarkRoute.store(true, std::memory_order_release);
     gInAppBenchmarkStatus.store(1, std::memory_order_release);
@@ -3142,7 +4493,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getBenchmarkReport(JNIEnv* env, jcla
 extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getRuntimeState(JNIEnv*, jclass)
 {
-    return static_cast<jint>(gRuntimeState.load(std::memory_order_acquire));
+    return static_cast<jint>(gSurfaceSessions.State());
 }
 
 extern "C" JNIEXPORT jlong JNICALL

@@ -1,0 +1,338 @@
+{
+  "status": "PASS",
+  "scope": "Independent PCM16 payload/header/hash audit against float metrics in the frozen render receipt; no rendering or audio transformation.",
+  "earlierAttempt": {
+    "status": "did_not_complete",
+    "cause": "Verifier initially compared the four-byte WAVE tag to the longer WAVEfmt literal; the WAVs were not changed. The check was corrected to validate WAVE, fmt, and data tags independently before this passing run."
+  },
+  "quantizationTolerance": 0.00006103701895199438,
+  "sourceFloatMetricsLimitation": "Nonfinite/clipping counts are from the recorded pre-PCM OfflineAudioContext buffer; cropped PCM WAV cannot independently recover NaN values that the encoder may coerce to zero or leader samples outside the crops.",
+  "cues": [
+    {
+      "cue": "A",
+      "loop": {
+        "name": "A-loop.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "8e5be0c046d95a3058037c311ea6a1b7a330f82536788fd33954980d31dfcc02",
+        "pcmPeak": 0.41792046876430555,
+        "sourceFloatPeak": 0.41790762543678284,
+        "peakAbsDelta": 0.000012843327522715775,
+        "pcmRms": 0.02977246925306513,
+        "sourceFloatRms": 0.02977246463804722,
+        "rmsAbsDelta": 4.6150179094928134e-9,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": 0.0005798516800439467,
+        "sourceFloatSeamMaxAbsDifference": 0.0005942704738117754
+      },
+      "tail": {
+        "name": "A-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "bb1c5be7c74f1026ff0ab7f2fd566e4ab81c756370246b3143c2e128ed6ed223",
+        "pcmPeak": 0.0007019257179479354,
+        "sourceFloatPeak": 0.0007139511872082949,
+        "peakAbsDelta": 0.000012025469260359446,
+        "pcmRms": 0.000057970944366756245,
+        "sourceFloatRms": 0.00005783691151764795,
+        "rmsAbsDelta": 1.340328491082965e-7,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": null,
+        "sourceFloatSeamMaxAbsDifference": null
+      }
+    },
+    {
+      "cue": "B",
+      "loop": {
+        "name": "B-loop.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "e05b2efcd5220be7c83538c24a52e9438726ac4c9f7d23c6c8ffa98778ce2d47",
+        "pcmPeak": 0.4594256416516617,
+        "sourceFloatPeak": 0.4594268500804901,
+        "peakAbsDelta": 0.0000012084288283920053,
+        "pcmRms": 0.04579477589187859,
+        "sourceFloatRms": 0.0457947679086678,
+        "rmsAbsDelta": 7.983210786877137e-9,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": 0.0010071108127079073,
+        "sourceFloatSeamMaxAbsDifference": 0.00100989721249789
+      },
+      "tail": {
+        "name": "B-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "99a0dc08f2249977e8e19f1b944ca1173b91a3ce171c62195696cf21f4b114ed",
+        "pcmPeak": 0.0018311105685598315,
+        "sourceFloatPeak": 0.0018414633814245462,
+        "peakAbsDelta": 0.000010352812864714706,
+        "pcmRms": 0.00018477648210186588,
+        "sourceFloatRms": 0.0001847312769103494,
+        "rmsAbsDelta": 4.5205191516478225e-8,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": null,
+        "sourceFloatSeamMaxAbsDifference": null
+      }
+    },
+    {
+      "cue": "C",
+      "loop": {
+        "name": "C-loop.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "7e378cdb37adaa3f88a3594ba080fac9be65c7c0e1d69c479263a516638223af",
+        "pcmPeak": 0.17511520737327188,
+        "sourceFloatPeak": 0.17512132227420807,
+        "peakAbsDelta": 0.000006114900936188272,
+        "pcmRms": 0.022827334667615794,
+        "sourceFloatRms": 0.0228273650056443,
+        "rmsAbsDelta": 3.03380285060495e-8,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": 0,
+        "sourceFloatSeamMaxAbsDifference": 0.000007582852049381472
+      },
+      "tail": {
+        "name": "C-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "0929b0a19a49fd8d1e6779db3d1a8db2a1edc30c25ef3fcab1321b1a0609f243",
+        "pcmPeak": 0.00003051850947599719,
+        "sourceFloatPeak": 0.000033100055588874966,
+        "peakAbsDelta": 0.0000025815461128777736,
+        "pcmRms": 0.000001999292378209108,
+        "sourceFloatRms": 0.000002025826074743631,
+        "rmsAbsDelta": 2.6533696534523027e-8,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": null,
+        "sourceFloatSeamMaxAbsDifference": null
+      }
+    },
+    {
+      "cue": "D",
+      "loop": {
+        "name": "D-loop.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "088d08a78ad55cffa3806b6f8daebf772fb4cf08528c6deb475938537fa09ff2",
+        "pcmPeak": 0.19199194311349835,
+        "sourceFloatPeak": 0.19199508428573608,
+        "peakAbsDelta": 0.000003141172237736134,
+        "pcmRms": 0.027287070650317904,
+        "sourceFloatRms": 0.027287065388964932,
+        "rmsAbsDelta": 5.261352971352995e-9,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": 0.0014038514358958708,
+        "sourceFloatSeamMaxAbsDifference": 0.001412892364896834
+      },
+      "tail": {
+        "name": "D-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "0ad9b252052c45572ddcc1bc2acf3c2aa1a8e80ccbe8a347947d38cd8c91a812",
+        "pcmPeak": 0.0017090365306558428,
+        "sourceFloatPeak": 0.0017069035675376654,
+        "peakAbsDelta": 0.0000021329631181774,
+        "pcmRms": 0.00014842033131676481,
+        "sourceFloatRms": 0.0001483346698405359,
+        "rmsAbsDelta": 8.566147622891774e-8,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": null,
+        "sourceFloatSeamMaxAbsDifference": null
+      }
+    },
+    {
+      "cue": "E",
+      "loop": {
+        "name": "E-loop.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "070278efd96e8259733801bc30fe87e232cb26b4aeb3075cb927c9c89c8afb32",
+        "pcmPeak": 0.6419263283181249,
+        "sourceFloatPeak": 0.6419335007667542,
+        "peakAbsDelta": 0.000007172448629244599,
+        "pcmRms": 0.060110500831846006,
+        "sourceFloatRms": 0.060110511842109034,
+        "rmsAbsDelta": 1.1010263027688705e-8,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": 0.0013122959074678793,
+        "sourceFloatSeamMaxAbsDifference": 0.0013073410373181105
+      },
+      "tail": {
+        "name": "E-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "aac330fb178822e86b0ea71307955eae95f1886de01a9bebf1620ad313877ddd",
+        "pcmPeak": 0.0029602954191717277,
+        "sourceFloatPeak": 0.0029468389693647623,
+        "peakAbsDelta": 0.000013456449806965344,
+        "pcmRms": 0.00022443945869468084,
+        "sourceFloatRms": 0.00022436368204048455,
+        "rmsAbsDelta": 7.577665419629268e-8,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": null,
+        "sourceFloatSeamMaxAbsDifference": null
+      }
+    },
+    {
+      "cue": "F",
+      "loop": {
+        "name": "F-loop.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "3d5b3562e716a99870151613adeda519f351602151c4a50eb5d93a4b98f4de80",
+        "pcmPeak": 0.19522690511795404,
+        "sourceFloatPeak": 0.1952144354581833,
+        "peakAbsDelta": 0.000012469659770752983,
+        "pcmRms": 0.02737222785059803,
+        "sourceFloatRms": 0.027372238040029157,
+        "rmsAbsDelta": 1.0189431128709847e-8,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": 0.000793481246375927,
+        "sourceFloatSeamMaxAbsDifference": 0.0007983323303051293
+      },
+      "tail": {
+        "name": "F-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "00b6c72aeb8ec50d7906ad4a12dc5a8cf53bbc862070902c625f31f1cc78d4f7",
+        "pcmPeak": 0.0009765923032319102,
+        "sourceFloatPeak": 0.0009898608550429344,
+        "peakAbsDelta": 0.000013268551811024265,
+        "pcmRms": 0.00006492604191106469,
+        "sourceFloatRms": 0.000064762723931821,
+        "rmsAbsDelta": 1.6331797924368956e-7,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": null,
+        "sourceFloatSeamMaxAbsDifference": null
+      }
+    },
+    {
+      "cue": "G",
+      "loop": {
+        "name": "G-loop.wav",
+        "frames": 288000,
+        "bytes": 1152044,
+        "sha256": "03b72d16b6bbc12c8bffc65173795925e69e1bb9356be4ad2737f7de9d2b0692",
+        "pcmPeak": 0.15659047212134158,
+        "sourceFloatPeak": 0.1566036194562912,
+        "peakAbsDelta": 0.00001314733494961473,
+        "pcmRms": 0.023473046636207442,
+        "sourceFloatRms": 0.02347306254001946,
+        "rmsAbsDelta": 1.5903812017326047e-8,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": 0.00012207403790398877,
+        "sourceFloatSeamMaxAbsDifference": 0.00010989626753143966
+      },
+      "tail": {
+        "name": "G-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "a8a2afd26e7ad2bc97e032cd83b5f0c5084aecd8741692c091d841aa64c610c7",
+        "pcmPeak": 0.002410962248603778,
+        "sourceFloatPeak": 0.002411436755210161,
+        "peakAbsDelta": 4.745066063830197e-7,
+        "pcmRms": 0.0002590492389037243,
+        "sourceFloatRms": 0.00025896615341692794,
+        "rmsAbsDelta": 8.308548679635853e-8,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": null,
+        "sourceFloatSeamMaxAbsDifference": null
+      }
+    },
+    {
+      "cue": "H",
+      "loop": {
+        "name": "H-loop.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "bb52cfa875b6fc359b380a2834df2ea8f633d2ae65f9e6f59f60c2c09fae9c0d",
+        "pcmPeak": 0.1595812860499893,
+        "sourceFloatPeak": 0.15957485139369965,
+        "peakAbsDelta": 0.0000064346562896611115,
+        "pcmRms": 0.027174449590233473,
+        "sourceFloatRms": 0.027174466215647224,
+        "rmsAbsDelta": 1.662541375055393e-8,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": 0.001281777397991882,
+        "sourceFloatSeamMaxAbsDifference": 0.0012708830181509256
+      },
+      "tail": {
+        "name": "H-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "62653fc9ae162c21a18e36646f23899642f56cf9094599d501cd681818a25d2c",
+        "pcmPeak": 0.0016174810022278512,
+        "sourceFloatPeak": 0.00160803715698421,
+        "peakAbsDelta": 0.000009443845243641176,
+        "pcmRms": 0.00014558462845510876,
+        "sourceFloatRms": 0.00014545435929944455,
+        "rmsAbsDelta": 1.3026915566421472e-7,
+        "pcmSaturatedSamples": 0,
+        "pcmSeamMaxAbsDifference": null,
+        "sourceFloatSeamMaxAbsDifference": null
+      }
+    }
+  ],
+  "chorusLoopFinding": {
+    "source": "Pocket Chordsmith current HTML updateFx at line 4267: chorus LFO frequency = 0.25 + chorusAmount * 1.9 Hz.",
+    "perCue": [
+      {
+        "cue": "A",
+        "bodySeconds": 12,
+        "chorusAmount": 0.09,
+        "chorusFrequencyHz": 0.421,
+        "chorusCyclesInBody": 5.052
+      },
+      {
+        "cue": "B",
+        "bodySeconds": 12,
+        "chorusAmount": 0.09,
+        "chorusFrequencyHz": 0.421,
+        "chorusCyclesInBody": 5.052
+      },
+      {
+        "cue": "C",
+        "bodySeconds": 3,
+        "chorusAmount": 0.09,
+        "chorusFrequencyHz": 0.421,
+        "chorusCyclesInBody": 1.263
+      },
+      {
+        "cue": "D",
+        "bodySeconds": 12,
+        "chorusAmount": 0.09,
+        "chorusFrequencyHz": 0.421,
+        "chorusCyclesInBody": 5.052
+      },
+      {
+        "cue": "E",
+        "bodySeconds": 12,
+        "chorusAmount": 0.09,
+        "chorusFrequencyHz": 0.421,
+        "chorusCyclesInBody": 5.052
+      },
+      {
+        "cue": "F",
+        "bodySeconds": 12,
+        "chorusAmount": 0.09,
+        "chorusFrequencyHz": 0.421,
+        "chorusCyclesInBody": 5.052
+      },
+      {
+        "cue": "G",
+        "bodySeconds": 6,
+        "chorusAmount": 0.09,
+        "chorusFrequencyHz": 0.421,
+        "chorusCyclesInBody": 2.526
+      },
+      {
+        "cue": "H",
+        "bodySeconds": 12,
+        "chorusAmount": 0.09,
+        "chorusFrequencyHz": 0.421,
+        "chorusCyclesInBody": 5.052
+      }
+    ],
+    "implication": "Each body ends at a nonintegral chorus-LFO phase; exact bar-duration cropping alone does not establish seamless looping."
+  }
+}

@@ -1,0 +1,3 @@
+command=C:\VulkanSDK\1.4.350.0\Bin\spirv-val.exe --target-env vulkan1.2 C:\Dev\tmp\horde-primary-hit-profile-20261001\audit-primary-hit-packaged-20261001-retry2\control-shipping_mobile_opaque_fast.spv
+exitCode=0
+result=passed

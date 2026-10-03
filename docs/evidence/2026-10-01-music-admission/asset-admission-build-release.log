@@ -1,0 +1,13 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  MusicPcmStream.cpp
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Release\horde_gameplay_simulation.lib
+  MusicPcmWaveTests.cpp
+  horde_rt_music_pcm_wave_tests.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Release\horde_rt_music_pcm_wave_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Release\horde_gameplay_simulation.lib
+  MusicPcmStreamTests.cpp
+  horde_rt_music_pcm_stream_tests.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Release\horde_rt_music_pcm_stream_tests.exe

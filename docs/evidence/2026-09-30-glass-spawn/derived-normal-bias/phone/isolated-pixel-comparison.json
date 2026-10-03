@@ -1,0 +1,22 @@
+{
+  "baselineSha256": "a3ad99a8acca0a93c940cd87cc54cdac782df6aa0a8a5124405658711a4ff7d2",
+  "candidateSha256": "de462da3d7294ad91ca8e845ea7d53f189a0c449d3b6671457f6d25ce4fc9531",
+  "size": [
+    1440,
+    3120
+  ],
+  "changedPixels": 3179,
+  "pixelsOverOne": 823,
+  "pixelsOverThree": 232,
+  "maxChannelDifference": 187,
+  "minYX": [
+    1523,
+    455
+  ],
+  "maxYX": [
+    1784,
+    658
+  ],
+  "unchangedMaxThreeGatePassed": false,
+  "causeAttributed": false
+}

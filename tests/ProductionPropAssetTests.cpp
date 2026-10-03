@@ -571,7 +571,8 @@ ProjectedSafeFrame ProjectAuthoredBoundsToSafeFrame(
     }
     constexpr float safeMinimum = -0.90f;
     constexpr float safeMaximum = 0.90f;
-    const auto coverage = [](const float minimum, const float maximum) {
+    const auto coverage = [safeMinimum, safeMaximum](const float minimum,
+                                                      const float maximum) {
         const float span = maximum - minimum;
         if (!std::isfinite(span) || span <= 0.000001f) return 0.0f;
         const float visible = std::max(
@@ -1284,8 +1285,13 @@ int main()
     Check(glass != lanternBody.asset.materials.end() && glass->transmissionFactor >= 0.90f &&
               glass->ior > 1.50f && glass->ior < 1.53f && glass->thicknessFactor > 0.0f &&
               (glass->flags & 4u) != 0u && (glass->flags & 512u) == 0u &&
+              (glass->flags & 1024u) != 0u && (glass->flags & 4096u) != 0u &&
+              glass->numericalSpawnMinimumWidth > 0.00699f &&
+              glass->numericalSpawnMinimumWidth < 0.007f &&
+              glass->numericalSpawnGeometryError > 0.0f &&
+              glass->numericalSpawnGeometryError < 0.000002f &&
               glass->baseColorTexture < 0,
-          "lantern glass is a separate unpainted thick dielectric with physical IOR");
+          "lantern glass is a separate unpainted thick dielectric with physical IOR and derived rectangular-volume certification");
     // The deterministic production asset uses six isolated closed cuboids: 12
     // triangles each. This ensures the runtime cannot silently regress to a
     // single thin/fused pane while still retaining the LanternGlass material.

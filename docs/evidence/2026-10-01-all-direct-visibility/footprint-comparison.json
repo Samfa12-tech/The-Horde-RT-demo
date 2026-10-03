@@ -1,0 +1,172 @@
+{
+  "referenceApkSha256": "ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae",
+  "referenceAndCurrentControlModuleHashesIdentical": true,
+  "referenceModules": [
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "backend": "RayQueryCompute",
+      "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "words": 125318,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 23
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "backend": "RayQueryCompute",
+      "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+      "words": 61022,
+      "functions": 63,
+      "functionCalls": 199,
+      "rayQueryInitializations": 2
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "backend": "RayTracingPipeline",
+      "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "words": 125253,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 23
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "backend": "RayTracingPipeline",
+      "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+      "words": 60963,
+      "functions": 63,
+      "functionCalls": 199,
+      "rayQueryInitializations": 2
+    }
+  ],
+  "currentControlModules": [
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "backend": "RayQueryCompute",
+      "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "words": 125318,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 23
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "backend": "RayQueryCompute",
+      "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+      "words": 61022,
+      "functions": 63,
+      "functionCalls": 199,
+      "rayQueryInitializations": 2
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "backend": "RayTracingPipeline",
+      "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "words": 125253,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 23
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "backend": "RayTracingPipeline",
+      "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+      "words": 60963,
+      "functions": 63,
+      "functionCalls": 199,
+      "rayQueryInitializations": 2
+    }
+  ],
+  "isolateModules": [
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "backend": "RayQueryCompute",
+      "sha256": "7b35d5961d27c3385ed97fed8d4f4a00ccc0884b257a2480bd9ef56741a4d295",
+      "words": 118590,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 6
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "backend": "RayQueryCompute",
+      "sha256": "f72f6ee70cae2608e5b3f787cb37f3b51907e9078158deb70ada3273bbc97e76",
+      "words": 57156,
+      "functions": 60,
+      "functionCalls": 192,
+      "rayQueryInitializations": 1
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "backend": "RayTracingPipeline",
+      "sha256": "1e2b907a3b1fce730711aeb97f369440d4f8d0b0c5d1619290e1b35b61952f23",
+      "words": 118525,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializations": 6
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "backend": "RayTracingPipeline",
+      "sha256": "ec04234ca954a07070e669657b4bbfcf93fdb556a66be31580975c1a6df9e2ab",
+      "words": 57093,
+      "functions": 60,
+      "functionCalls": 192,
+      "rayQueryInitializations": 1
+    }
+  ],
+  "deltas": [
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "controlWords": 125318,
+      "isolateWords": 118590,
+      "wordDelta": -6728,
+      "controlFunctions": 1,
+      "isolateFunctions": 1,
+      "controlCalls": 0,
+      "isolateCalls": 0,
+      "controlRayQueryInitializations": 23,
+      "isolateRayQueryInitializations": 6,
+      "referenceShaMatchesCurrentControl": true
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "controlWords": 61022,
+      "isolateWords": 57156,
+      "wordDelta": -3866,
+      "controlFunctions": 63,
+      "isolateFunctions": 60,
+      "controlCalls": 199,
+      "isolateCalls": 192,
+      "controlRayQueryInitializations": 2,
+      "isolateRayQueryInitializations": 1,
+      "referenceShaMatchesCurrentControl": true
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "controlWords": 125253,
+      "isolateWords": 118525,
+      "wordDelta": -6728,
+      "controlFunctions": 1,
+      "isolateFunctions": 1,
+      "controlCalls": 0,
+      "isolateCalls": 0,
+      "controlRayQueryInitializations": 23,
+      "isolateRayQueryInitializations": 6,
+      "referenceShaMatchesCurrentControl": true
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "controlWords": 60963,
+      "isolateWords": 57093,
+      "wordDelta": -3870,
+      "controlFunctions": 63,
+      "isolateFunctions": 60,
+      "controlCalls": 199,
+      "isolateCalls": 192,
+      "controlRayQueryInitializations": 2,
+      "isolateRayQueryInitializations": 1,
+      "referenceShaMatchesCurrentControl": true
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "count": 23,
+  "totalBytes": 168697,
+  "files": [
+    {
+      "path": "android-arm64-debug.log",
+      "bytes": 1955,
+      "sha256": "5877b990d313624ac79c0579234c1c0bca3a2e91ed4c6c5a46005037f22eda35"
+    },
+    {
+      "path": "android-package-containment.log",
+      "bytes": 3751,
+      "sha256": "23a25fbb1e618fbac9ac0a32ad80b91e500ed7dd8ed79bd1d4b270b641f58815"
+    },
+    {
+      "path": "apk-assets-comparison.json",
+      "bytes": 9818,
+      "sha256": "4f917dfc9670cdfa8fdf38a4a48918b84ec44c9c02b33ff6c1a251f75190b5cb"
+    },
+    {
+      "path": "apk-resolver-test.log",
+      "bytes": 403,
+      "sha256": "593b33078df6982be4c9226f98b91474337ac1786df9afc04dd030c0c76fac17"
+    },
+    {
+      "path": "build-current-debug.log",
+      "bytes": 1917,
+      "sha256": "03c24c4e445a457087d0032cb18f342fc4f3b4969ce17c2aeb98c6935b884a08"
+    },
+    {
+      "path": "build-current-release.log",
+      "bytes": 1933,
+      "sha256": "f0259bc799445ed97f091cb983a40cb1866ae7d289532b1d6d9f6e3cee9e49e0"
+    },
+    {
+      "path": "configure-current.log",
+      "bytes": 549,
+      "sha256": "c462a5eb52495f0b76ea2116380bc1ecc33763376db1057ff717f68e8b761b83"
+    },
+    {
+      "path": "configure.log",
+      "bytes": 921,
+      "sha256": "3b8ebcb58e64e3ea328a09e86f1a7ad347db8cd145d62951c6231ac3c51065b2"
+    },
+    {
+      "path": "lead-arm64-module-validation.log",
+      "bytes": 1733,
+      "sha256": "5e1b1525f4af8bdb0787ec35d9b353f05515467b0abe7dc5bf95a312e56f78d3"
+    },
+    {
+      "path": "music-pcm-arm64-ninja-rule.log",
+      "bytes": 6774,
+      "sha256": "5cbd61d5a9e96b3d51eee716d6930d110203bd122d18be780e42b00f996a4049"
+    },
+    {
+      "path": "music-pcm-arm64-object.log",
+      "bytes": 312,
+      "sha256": "040c40ff8dee2f34cdf5d41db89b70d7424260654c97139c48acda77b6cc7963"
+    },
+    {
+      "path": "offline/compose.py",
+      "bytes": 17533,
+      "sha256": "65eb43d0ef9bfdf0d93084a3bbaf47f0cc32006fff18c755d91af7509682dcc2"
+    },
+    {
+      "path": "offline/loop-tail-composition-metrics.json",
+      "bytes": 104649,
+      "sha256": "dd6dcdc6f22213c332d82c28b3f69cb866eb8b8d45ff0277d02fd9f5f3b1d49e"
+    },
+    {
+      "path": "offline/README.md",
+      "bytes": 3123,
+      "sha256": "0a19d98759346e9588ab63970379a4878f2fd670bc476662aee6d888189bce2e"
+    },
+    {
+      "path": "package-asset-comparison.ps1",
+      "bytes": 1689,
+      "sha256": "289f48fce0cd807979586ab675b7cbf61ec1e353afddacee2fcab99d63fd38a4"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3584,
+      "sha256": "6de802ff49229be85e99f4912b5c96eacc1748f60b0733a696db157894653bde"
+    },
+    {
+      "path": "source-and-build-receipt.json",
+      "bytes": 3685,
+      "sha256": "68578c10f993da97d225b66380a56a1222991ceb34ab00e5f74cdf2017742ff3"
+    },
+    {
+      "path": "test-current-debug.log",
+      "bytes": 728,
+      "sha256": "ad97bf1251d30b7b1affd38ab766cc9fe4da3a8b6717f57e48eb71df894f4ae6"
+    },
+    {
+      "path": "test-current-release.log",
+      "bytes": 728,
+      "sha256": "787fba98020c9592f20a0568ff1e8de936a34229c43d0e76df3f0646bef7d973"
+    },
+    {
+      "path": "test-expanded-debug.log",
+      "bytes": 728,
+      "sha256": "43495929714ed4f264d1e857eaa28396d89bfd59543012deef9334e8ab1d3061"
+    },
+    {
+      "path": "test-expanded-release.log",
+      "bytes": 728,
+      "sha256": "1133d888627d1527e5dedd8afb3a3ce5ab4bf036840f1c877667a001f426f68b"
+    },
+    {
+      "path": "test-lead-debug.log",
+      "bytes": 728,
+      "sha256": "ce59fd877470a0ae76e01a359a59d8873f51a158210f618372769d24692a51b7"
+    },
+    {
+      "path": "test-lead-release.log",
+      "bytes": 728,
+      "sha256": "787fba98020c9592f20a0568ff1e8de936a34229c43d0e76df3f0646bef7d973"
+    }
+  ]
+}

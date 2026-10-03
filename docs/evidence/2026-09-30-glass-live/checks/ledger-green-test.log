@@ -1,0 +1,10 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start 6: horde_rt_benchmark_evidence_report_tests
+1/2 Test #6: horde_rt_benchmark_evidence_report_tests ...   Passed    5.01 sec
+    Start 8: horde_rt_benchmark_evidence_run_tests
+2/2 Test #8: horde_rt_benchmark_evidence_run_tests ......   Passed    3.67 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   8.69 sec

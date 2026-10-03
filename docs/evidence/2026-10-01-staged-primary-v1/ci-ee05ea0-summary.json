@@ -1,0 +1,68 @@
+{
+  "repository": "Samfa12-tech/The-Horde-RT-demo",
+  "pull_request": 15,
+  "source": {
+    "head": "ee05ea0ad1ac1673d9051cd0fd024b1bd0cc7144",
+    "branch": "codex/horde-1.6.1-engineering-pass",
+    "base": "bda1b99a62e1de883273dd21f267bcfc92bc5490",
+    "base_branch": "main",
+    "synthetic_merge": "75e1a02e280a4937439665948da5930605fcf63f",
+    "synthetic_merge_parents": [
+      "bda1b99a62e1de883273dd21f267bcfc92bc5490",
+      "ee05ea0ad1ac1673d9051cd0fd024b1bd0cc7144"
+    ]
+  },
+  "runs": {
+    "push": {
+      "id": 36804796096,
+      "conclusion": "success",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36804796096",
+      "shared_simulation_host": {
+        "gcc": "55/55 passed",
+        "clang": "55/55 passed",
+        "msvc": "55/55 passed"
+      },
+      "player_vulkan_cpu_host": "14/14 passed"
+    },
+    "pull_request": {
+      "id": 36804800378,
+      "conclusion": "success",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36804800378",
+      "shared_simulation_host": {
+        "gcc": "55/55 passed",
+        "clang": "55/55 passed",
+        "msvc": "55/55 passed"
+      },
+      "player_vulkan_cpu_host": "14/14 passed"
+    }
+  },
+  "selected_test_evidence": {
+    "ctest_configuration": "Release",
+    "music_asset_admission_seconds": {
+      "push_gcc": 5.67,
+      "push_clang": 6.22,
+      "push_msvc": 8.53,
+      "pr_gcc": 6.32,
+      "pr_clang": 5.73,
+      "pr_msvc": 8.33
+    },
+    "music_pcm_stream_wave_bank_playback_session_and_director": "passed in all six compiler jobs",
+    "vulkan_cpu_host": "14 focused player/resource/semantic tests passed per event; this is not hardware RT validation"
+  },
+  "diagnostics": {
+    "test_failures": 0,
+    "compiler_warning_or_error_matches": 0,
+    "noncompiler_note": "Git checkout emitted standard default-branch hint text; no build/test warning or failure was observed.",
+    "hardware_or_phone_validation": false
+  },
+  "logs": [
+    {"file":"push-gcc.log","bytes":109781,"sha256":"53E57349400E0F38C78F4153A10D2B7684EDB41B9474DD88785C11C93DC718AF"},
+    {"file":"push-clang.log","bytes":101212,"sha256":"7BB255CA9EE776E9396ECB2BFE29442169AD670526B512941179ABE84310DBD3"},
+    {"file":"push-msvc.log","bytes":113325,"sha256":"0F8828F292E164FC8274F66D37F21B8FE6B7FF2D83BB4700A25B6328871A540D"},
+    {"file":"push-vulkan-host.log","bytes":68093,"sha256":"B41F2AF81CA1BC48B44D4756A5CC9532052F1FA79B5BCC1EC4881CF280CE0F2B"},
+    {"file":"pr-gcc.log","bytes":108947,"sha256":"DC28C08C87DF8090B4601ACEDBF63F8E189D0BA622D477AD437BD1693DC6D3DC"},
+    {"file":"pr-clang.log","bytes":102239,"sha256":"09CF0C5A2A8BB8662170641865478817985C6A0ABCE430EB0AA1FBB02BA48ECF"},
+    {"file":"pr-msvc.log","bytes":114189,"sha256":"8C8369B3968F77C1CBC839C5F5ED19821BDA190809AF2467F6BC62AEC50F464A"},
+    {"file":"pr-vulkan-host.log","bytes":68975,"sha256":"D9AE45A61A469EF59C07154DB83C67AF9062864105D0EAB637482980A5BEC98A"}
+  ]
+}

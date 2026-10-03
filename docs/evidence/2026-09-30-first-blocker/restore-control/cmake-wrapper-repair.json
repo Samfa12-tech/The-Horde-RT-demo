@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "purpose": "Revalidate corrected Debug CMake wrapper for the frozen RayQuery compute shader gate",
+  "repository": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass",
+  "head": "e12aabe1f3b7d42b60e3faa9d49c29148d15ac66",
+  "inputChange": {
+    "path": "CMakeLists.txt",
+    "change": "Removed the in-repository -OutputDirectory argument from horde_rt_rayquery_compute_shader_tests; validator now uses its unique external temporary directory and exact cleanup path.",
+    "fileSha256": "40e1b3b58903947e16747b93dc3ec0e2f53f1287ddd2dd65c5147f5df47d806b",
+    "workingDiffSha256": "02af8547ff52dcd47c4312f74031c699f084e77cd5ac78e47af908de38c155c1"
+  },
+  "configure": {
+    "command": "cmake --preset windows-x64-debug",
+    "result": "pass",
+    "durationSeconds": 13.35,
+    "log": "compute-wrapper-reconfigure.log",
+    "logSha256": "052a2ca4db07251d24701c6a1ed16587a926c22397667821d0db4016d87b99d4"
+  },
+  "test": {
+    "command": "ctest --test-dir C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/build/presets/windows-x64-debug -C Debug --output-on-failure --parallel 1 -R ^horde_rt_rayquery_compute_shader_tests$",
+    "result": "pass",
+    "testsPassed": 1,
+    "testsFailed": 0,
+    "durationSeconds": 33.51,
+    "log": "rayquery-compute-ctest-wrapper-rerun.log",
+    "logSha256": "21ad7726e6d01bf6d16d025a659bfca5da374d6c971300bdf63026c6e8faba3d"
+  },
+  "scope": {
+    "testSelector": "horde_rt_rayquery_compute_shader_tests only",
+    "shaderOrApplicationRebuild": false,
+    "phoneOperations": false,
+    "sourceEditsByThisTask": false
+  }
+}

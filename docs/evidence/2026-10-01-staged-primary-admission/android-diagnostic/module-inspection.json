@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "scope": "Static actual-package inspection of Diagnostic/Mobile staged Debug APK; distinct from Shipping policy checks.",
+  "sourceHead": "59cb0576790cdb47d529746ab3d2d30ac34462fb",
+  "apk": {
+    "path": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\horde-staged-debug-diagnostic-mobile.apk",
+    "bytes": 113780999,
+    "sha256": "db125b80210753a9b1e50bdf51cbb5a923036d13280db346b3190f13f4afc299",
+    "applicationId": "com.samfa12.hordelanternrt.debug.staged",
+    "variant": "Horde RT Staged Investigation",
+    "signing": "development/debug build per admission receipt"
+  },
+  "arm64Native": {
+    "apkEntry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+    "bytes": 4780480,
+    "sha256": "a5c108b9e7ccaacf9dd11c35cdccd455113ab4525606d4ea249ad32e261ca8f1",
+    "elfClass": "ELF64",
+    "endianness": "little",
+    "machine": "AArch64"
+  },
+  "policy": {
+    "instrumentation": "Diagnostic",
+    "quality": "Mobile",
+    "stage": "rgen",
+    "stagedDefaultEnabled": true,
+    "timingEnabled": false,
+    "manifestPath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\shaders-diagnostic-mobile\\staged-primary-manifest.json",
+    "manifestSha256": "d9dfe29d53774bab090dba671d53fb783872d81045366d07e3e7238e6e1a678b",
+    "normalCatalogs": [
+      {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\tools\\raygen-variant-catalog.json",
+        "sha256": "1a262500da9098d5de9921f25e07423aeb59354445fe6c8a8a735a9eba6d65c4"
+      },
+      {
+        "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\tools\\rayquery-variant-catalog.json",
+        "sha256": "20b98150b58653b471415ef78e9f95c2065ef2e003e97754be8785a84d9353d6"
+      }
+    ]
+  },
+  "tools": {
+    "spirvVal": "C:\\VulkanSDK\\1.4.350.0\\Bin\\spirv-val.exe",
+    "spirvDis": "C:\\VulkanSDK\\1.4.350.0\\Bin\\spirv-dis.exe",
+    "targetEnvironment": "vulkan1.2"
+  },
+  "expectedModuleCount": 8,
+  "observedModuleCount": 8,
+  "modules": [
+    {
+      "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+      "category": "normal",
+      "backend": "RayQueryCompute",
+      "material": "OpaqueFast",
+      "pass": null,
+      "offset": 485804,
+      "bytes": 505508,
+      "words": 126377,
+      "sha256": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58",
+      "executionModel": "GLCompute",
+      "descriptorSet1Bindings": null,
+      "diagnosticBinding22": true,
+      "atomicInstructionCount": 5,
+      "spirvVal": "passed",
+      "spirvDis": "passed",
+      "disassemblyPath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\module-inspection-v3\\extracted\\rayquery_compute_diagnostic_mobile_opaque_fast-c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58.spv.spvasm"
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+      "category": "normal",
+      "backend": "RayQueryCompute",
+      "material": "GenericDielectric",
+      "pass": null,
+      "offset": 991312,
+      "bytes": 252916,
+      "words": 63229,
+      "sha256": "e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302",
+      "executionModel": "GLCompute",
+      "descriptorSet1Bindings": null,
+      "diagnosticBinding22": true,
+      "atomicInstructionCount": 41,
+      "spirvVal": "passed",
+      "spirvDis": "passed",
+      "disassemblyPath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\module-inspection-v3\\extracted\\rayquery_compute_diagnostic_mobile_generic_dielectric-e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302.spv.spvasm"
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "category": "normal",
+      "backend": "RayTracingPipeline",
+      "material": "OpaqueFast",
+      "pass": null,
+      "offset": 1244228,
+      "bytes": 505248,
+      "words": 126312,
+      "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+      "executionModel": "RayGenerationKHR",
+      "descriptorSet1Bindings": null,
+      "diagnosticBinding22": true,
+      "atomicInstructionCount": 5,
+      "spirvVal": "passed",
+      "spirvDis": "passed",
+      "disassemblyPath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\module-inspection-v3\\extracted\\diagnostic_mobile_opaque_fast-8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9.spv.spvasm"
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "category": "normal",
+      "backend": "RayTracingPipeline",
+      "material": "GenericDielectric",
+      "pass": null,
+      "offset": 1749476,
+      "bytes": 252680,
+      "words": 63170,
+      "sha256": "9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91",
+      "executionModel": "RayGenerationKHR",
+      "descriptorSet1Bindings": null,
+      "diagnosticBinding22": true,
+      "atomicInstructionCount": 41,
+      "spirvVal": "passed",
+      "spirvDis": "passed",
+      "disassemblyPath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\module-inspection-v3\\extracted\\diagnostic_mobile_generic_dielectric-9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91.spv.spvasm"
+    },
+    {
+      "key": "staged_primary_v1_diagnostic_mobile_opaquefast_primary",
+      "category": "staged",
+      "backend": "RayTracingPipeline",
+      "material": "OpaqueFast",
+      "pass": "primary",
+      "offset": 2006860,
+      "bytes": 60648,
+      "words": 15162,
+      "sha256": "23a489043f4d0ef4c0979f8d8ceb8a83962dbe9f47bfaa3673a1538fd648b5a3",
+      "executionModel": "RayGenerationKHR",
+      "descriptorSet1Bindings": [
+        0,
+        1,
+        2
+      ],
+      "diagnosticBinding22": true,
+      "atomicInstructionCount": 5,
+      "spirvVal": "passed",
+      "spirvDis": "passed",
+      "disassemblyPath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\module-inspection-v3\\extracted\\staged_primary_v1_diagnostic_mobile_opaquefast_primary-23a489043f4d0ef4c0979f8d8ceb8a83962dbe9f47bfaa3673a1538fd648b5a3.spv.spvasm"
+    },
+    {
+      "key": "staged_primary_v1_diagnostic_mobile_opaquefast_shade",
+      "category": "staged",
+      "backend": "RayTracingPipeline",
+      "material": "OpaqueFast",
+      "pass": "shade",
+      "offset": 2067508,
+      "bytes": 464224,
+      "words": 116056,
+      "sha256": "a20f658086e103f4ce9eda591177c5ad4f337715b75c49b5970383b4e229f157",
+      "executionModel": "RayGenerationKHR",
+      "descriptorSet1Bindings": [
+        0,
+        1,
+        2
+      ],
+      "diagnosticBinding22": false,
+      "atomicInstructionCount": 0,
+      "spirvVal": "passed",
+      "spirvDis": "passed",
+      "disassemblyPath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\module-inspection-v3\\extracted\\staged_primary_v1_diagnostic_mobile_opaquefast_shade-a20f658086e103f4ce9eda591177c5ad4f337715b75c49b5970383b4e229f157.spv.spvasm"
+    },
+    {
+      "key": "staged_primary_v1_diagnostic_mobile_genericdielectric_primary",
+      "category": "staged",
+      "backend": "RayTracingPipeline",
+      "material": "GenericDielectric",
+      "pass": "primary",
+      "offset": 2531732,
+      "bytes": 96724,
+      "words": 24181,
+      "sha256": "35044d5ff95d9f09f51e70aaf7c9c1f3747b1113a7929b92b521425f9d587d50",
+      "executionModel": "RayGenerationKHR",
+      "descriptorSet1Bindings": [
+        0,
+        1,
+        2
+      ],
+      "diagnosticBinding22": true,
+      "atomicInstructionCount": 5,
+      "spirvVal": "passed",
+      "spirvDis": "passed",
+      "disassemblyPath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\module-inspection-v3\\extracted\\staged_primary_v1_diagnostic_mobile_genericdielectric_primary-35044d5ff95d9f09f51e70aaf7c9c1f3747b1113a7929b92b521425f9d587d50.spv.spvasm"
+    },
+    {
+      "key": "staged_primary_v1_diagnostic_mobile_genericdielectric_shade",
+      "category": "staged",
+      "backend": "RayTracingPipeline",
+      "material": "GenericDielectric",
+      "pass": "shade",
+      "offset": 2628456,
+      "bytes": 254988,
+      "words": 63747,
+      "sha256": "1857f535ebe921416060d366b6e632a7777144218fbe222912a4cc53df1f981e",
+      "executionModel": "RayGenerationKHR",
+      "descriptorSet1Bindings": [
+        0,
+        1,
+        2
+      ],
+      "diagnosticBinding22": true,
+      "atomicInstructionCount": 36,
+      "spirvVal": "passed",
+      "spirvDis": "passed",
+      "disassemblyPath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\android-staged-debug-admission\\module-inspection-v3\\extracted\\staged_primary_v1_diagnostic_mobile_genericdielectric_shade-1857f535ebe921416060d366b6e632a7777144218fbe222912a4cc53df1f981e.spv.spvasm"
+    }
+  ],
+  "interpretation": "Diagnostic binding 22 and atomic counters are observed and recorded per module, not treated as failures. This is static package/module evidence only; no device install, runtime presentation, GPU performance, or promotion claim."
+}

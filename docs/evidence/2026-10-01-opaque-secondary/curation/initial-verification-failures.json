@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "classification": "external-curation-process-failure-history",
+  "originalEvidenceModified": false,
+  "buildReceiptSha256": "d61caec63e4d97d48415f24d4a55e1569a7a5660f531d058bbf0c98997b29158",
+  "attempts": [
+    {
+      "target": "curated/",
+      "status": "partial-verification-failed",
+      "diagnostic": "build classification expected 'investigation-only-nonphysical-opaque-primary-secondary-bounce-omission', found 'nonphysical-opaque-primary-secondary-omission-investigation-only'",
+      "disposition": "preserved; root receipt and candidate nested build receipt use distinct classification labels"
+    },
+    {
+      "target": "curated-final/",
+      "status": "partial-verification-failed",
+      "diagnostic": "portable verifier expected logs/apk-assets-module-comparison-02.json, but allowlist retained the evidence at receipts/assets-and-package-module-comparison.json",
+      "disposition": "preserved; verifier relative path corrected for the fresh final packet"
+    }
+  ],
+  "correctiveEvidence": {
+    "intermediatePacketTransientlyAffected": "curated-v3/",
+    "repair": "restored build-receipt.json from canonical source hash d61caec63e4d97d48415f24d4a55e1569a7a5660f531d058bbf0c98997b29158, restored manifest build entry, and reran verifier PASS",
+    "originalPhoneAndSourceReceiptsModified": false,
+    "finalPacket": "curated-v5/",
+    "classificationVerifierNegative": "classification-negative-test-receipt-v2.json",
+    "classificationFixture": "classification-negative-fixture-v2/",
+    "fixtureType": "synthetic-only; hardlinked immutable packet payloads, copied build receipt and manifest, altered fixture classification only"
+  }
+}

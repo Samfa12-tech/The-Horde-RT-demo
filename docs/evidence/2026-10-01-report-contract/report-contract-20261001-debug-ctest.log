@@ -1,0 +1,15 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-music-pcm-stream-20261001/build
+Test project C:/Dev/tmp/horde-music-pcm-stream-20261001/build
+    Start 57: horde_rt_playtest_report_tests
+1/1 Test #57: horde_rt_playtest_report_tests ...***Failed    2.00 sec
+Playtest report contract: final encoded JSON byte cap is independently enforced
+Playtest report contract: likely credential/contact/URL/private path is explicitly rejected
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   2.01 sec
+
+The following tests FAILED:
+	 57 - horde_rt_playtest_report_tests (Failed)
+Errors while running CTest

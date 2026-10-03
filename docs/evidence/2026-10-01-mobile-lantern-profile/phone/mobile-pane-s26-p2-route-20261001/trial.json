@@ -1,0 +1,38 @@
+{
+  "runId": "mobile-pane-s26-p2-route-20261001",
+  "sourceCommit": "1da483d01124ca673badf6c13939d99736c4a658",
+  "installedApkSha256": "bac94c45bcfe3f8fcc367f21439735387d188959005b5ee873d02f0f1e9cf142",
+  "member": "open-aperture-candidate",
+  "workload": "showcase-route-v1",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "requestedScalePercent": 75,
+  "requestedBackend": "RayTracingPipeline",
+  "instrumentation": "Shipping",
+  "quality": "Mobile",
+  "startUtc": "2026-10-01T08:33:09.3756513Z",
+  "recordingEnabled": false,
+  "appDataCleared": false,
+  "status": "complete",
+  "gpuMemoryCounters": "not-collected; not a pass",
+  "memoryBoundary": "before/after trial; not frame aligned",
+  "processId": "31375",
+  "endUtc": "2026-10-01T08:37:37.5750718Z",
+  "renderScalePercent": 75,
+  "internalExtent": {
+    "width": 1080,
+    "height": 2235
+  },
+  "presentationExtent": {
+    "width": 1440,
+    "height": 2980
+  },
+  "presentMode": "MAILBOX",
+  "overall": {
+    "averageMs": 67.0962,
+    "medianMs": 66.3701,
+    "p95Ms": 87.2827,
+    "onePercentLowFps": 10.3473
+  }
+}

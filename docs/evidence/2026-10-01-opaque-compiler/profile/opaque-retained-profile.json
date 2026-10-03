@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "classification": "compiler-only OpaqueFast investigation hypothesis; not implementation, promotion, runtime evidence, or a performance claim",
+  "source": {
+    "repositoryWorktree": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\source-eaf",
+    "head": "eafbf8262442a82e0835edf5cf5306d718e64633",
+    "dirtyTrackedPathOutsideShaderInputs": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+    "compiler": "tools/compile-raygen.ps1",
+    "compilerSha256RawFile": "11147f647ed10a8ee4b606157229e588a3bde71017072a7bc5f9132702d7ce7e",
+    "compilerCatalogIdentitySha256": "2d919bdb6ad03ed4b67e7691ffb1547801268d09df0794c658ea2f59054debcf",
+    "variantCatalog": "tools/raygen-variant-catalog.json",
+    "variantKey": "shipping_mobile_opaque_fast",
+    "variantDependencySha256": "3cfda44c46ac18f813b94cd457344594b7cc4bfac191bfe62537a4da0aada2e7",
+    "shaderFilesWereEdited": false,
+    "configuration": {
+      "instrumentation": "Shipping (0)",
+      "quality": "Mobile (0)",
+      "material": "OpaqueFast (0)",
+      "HORDE_GENERIC_TRANSMISSION_VARIANT": 0
+    },
+    "resolvedSource": {
+      "path": "control-generator/shipping_mobile_opaque_fast/minimal.rgen.resolved",
+      "bytes": 180686,
+      "sha256": "e25bd4959ffeb8ddabc6ee1e83b7c97f3d198f79959e86a9ea0f78c1ef3891f9"
+    },
+    "preprocessedSource": {
+      "path": "control-generator/shipping_mobile_opaque_fast/minimal.rgen.preprocessed",
+      "bytes": 143863,
+      "sha256": "eaa0b8a9f7b1a87fce83e34ab8568c524b1a8ed4160009bf35fc1a89e728713f"
+    },
+    "samePreprocessedFileUsedForBothCompiles": true
+  },
+  "controlBinding": {
+    "controlApk": "C:\\Dev\\tmp\\horde-shipping-ab-20260930\\active-strategy\\HordeLanternRT-eaf-active-strategy-benchmark-arm64.apk",
+    "controlApkSha256": "ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae",
+    "packagedRaygenModuleSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+    "packageContainmentReceipt": "C:\\Dev\\tmp\\horde-generic-route-profile-20260930\\profile\\provenance\\containment-control-benchmark-shipping-mobile-eaf-scanner.json",
+    "packageContainmentReceiptSha256": "5bde1466796ef6020962cd9486235dd86a35d1e7802ce792b0f661f0f3f05f87",
+    "ordinaryGeneratorModuleSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+    "controlRecompiledFromExactPreprocessedSourceSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+    "bothControlHashesMatchPackagedControl": true
+  },
+  "toolchain": {
+    "glslangValidator": "Glslang 16.2.0",
+    "spirvTools": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a",
+    "targetEnvironment": "vulkan1.2"
+  },
+  "compilerTreatments": {
+    "packagedControl": {
+      "glslangArguments": ["-V", "--target-env", "vulkan1.2", "-Os", "-S", "rgen"],
+      "spirvOptArguments": ["-O"]
+    },
+    "retainedPassHypothesis": {
+      "glslangArguments": ["-V", "--target-env", "vulkan1.2", "-S", "rgen"],
+      "spirvOptArguments": ["--eliminate-dead-functions", "--eliminate-dead-code-aggressive", "--simplify-instructions", "--eliminate-dead-branches", "--cfg-cleanup"],
+      "sourceIsByteIdenticalToControlPreprocessedInput": true
+    }
+  },
+  "moduleComparison": {
+    "control": {
+      "path": "control-from-preprocessed/module.spv",
+      "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "bytes": 501012,
+      "words": 125253,
+      "instructions": 27536,
+      "branchOps": 3693,
+      "loops": 49,
+      "selectionMerges": 1510,
+      "functions": 1,
+      "functionCalls": 0,
+      "rayQueryInitializationSites": 23,
+      "atomicInstructions": 0,
+      "binding22": false,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    },
+    "retainedPassHypothesis": {
+      "path": "retained-from-preprocessed/module.spv",
+      "sha256": "14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3",
+      "bytes": 212452,
+      "words": 53113,
+      "instructions": 12595,
+      "branchOps": 624,
+      "loops": 9,
+      "selectionMerges": 254,
+      "functions": 60,
+      "functionCalls": 192,
+      "rayQueryInitializationSites": 2,
+      "rayQueryFunctions": ["traceScene", "visibilityMask"],
+      "frequentFunctionCallTargets": [
+        {"target": "tunedLightColor", "calls": 17},
+        {"target": "integrateLichMistSample", "calls": 16},
+        {"target": "lichMistSample", "calls": 16},
+        {"target": "offsetRayOrigin", "calls": 11},
+        {"target": "skyColor", "calls": 10},
+        {"target": "traceScene", "calls": 7},
+        {"target": "sceneShadowTransmittanceMask", "calls": 6}
+      ],
+      "atomicInstructions": 0,
+      "binding22": false,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    }
+  },
+  "interpretationLimits": [
+    "Counts and byte sizes describe static SPIR-V representation; query sites and function-call counts are not dynamic ray or execution counts.",
+    "No equivalence proof, driver compilation result, visual comparison, device run, timing, speedup, or promotion decision is included.",
+    "The experiment changes glslang optimization flags and SPIR-V pass strategy as one compiler-treatment group; it does not isolate those substeps from each other."
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "classification": "investigation-only-staged-primary",
+  "instrumentation": "Diagnostic",
+  "quality": "Mobile",
+  "stage": "rgen",
+  "targetEnvironment": "vulkan1.2",
+  "compilerRecipe": {
+    "opaque": [
+      "-V",
+      "--target-env",
+      "vulkan1.2",
+      "-Os",
+      "-S",
+      "rgen",
+      "<output>",
+      "<source>",
+      "spirv-opt",
+      "-O"
+    ],
+    "generic": [
+      "-V",
+      "--target-env",
+      "vulkan1.2",
+      "-S",
+      "rgen",
+      "<output>",
+      "<source>",
+      "spirv-opt",
+      "--eliminate-dead-functions",
+      "--eliminate-dead-code-aggressive",
+      "--simplify-instructions",
+      "--eliminate-dead-branches",
+      "--cfg-cleanup"
+    ]
+  },
+  "source": {
+    "path": "shaders/raytracing/minimal.rgen",
+    "dependencies": [
+      {
+        "path": "shaders/raytracing/minimal.rgen",
+        "sha256": "033484e51931a6884517e003d8bf968f6d9e00438f5ba789cc58f3153a6740ca"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_frame.glsl",
+        "sha256": "b00beb8ed59360d9aa4c2befd22af165b0a0305784d8556a7812de4979d942ed"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+        "sha256": "4aa020123345dbf67237f0b6b9fb8e0abd10c8ef2ac09a8b776e6804b6b81688"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+        "sha256": "c44875baf74ef0601f1bdfee5510eacf6c3750e90ba3052e6958b5ecb2cc9e95"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+        "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_lighting.glsl",
+        "sha256": "0b901ab5ac3fdfce3f07bf49b461ff266f2008ba24ede4b7c538adbf6e72ee66"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_fire.glsl",
+        "sha256": "bf9428b6cca9bc38d3f15d5ebccba59113b85dbc48f509cffa533fdae3264fcf"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+        "sha256": "89e97cf7f55ebcc703cce214aee017c1fe319b7da0f730129d0bbe04c6a82309"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+        "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+        "sha256": "019c3755e7da40d2b57c16c2325f50f9a12cb1504f9e5437aa3571c14aa203a6"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+        "sha256": "64677d1effb0a62a4d8845482360d9051cbe6584c95ee1fd330f9e7279540377"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+        "sha256": "9411bceae76c4211cde6ee2d682d5d7c4ed387cd65082d098b806d830404ffd8"
+      }
+    ]
+  },
+  "recordIncludeSha256": "a12b889773f4cbd69823a5e3188f1bfa983155ecd07904e8d2aa365239f77d15",
+  "variantConfigSha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649",
+  "passContract": {
+    "primary": "camera + primary trace + primary diagnostics + storeStagedPrimary",
+    "shade": "camera + loadStagedPrimary + original shading/presentation",
+    "descriptorSet": 1,
+    "bindings": [
+      0,
+      1,
+      2
+    ],
+    "pages": 3,
+    "bytesPerRecord": 128
+  },
+  "pairs": [
+    {
+      "key": "staged_primary_v1_diagnostic_mobile_opaque_fast",
+      "strategy": "opaque-fast",
+      "sha256": "701bb5a9410c78d75b0302ffdd3d34e171e867637bc24ea4ad4ac606901a6e44"
+    },
+    {
+      "key": "staged_primary_v1_diagnostic_mobile_generic_dielectric",
+      "strategy": "generic-dielectric",
+      "sha256": "51dd24fcffa9fafb1e416d085d78b3f7ef12c889ed30104d808c29c6cbade2b6"
+    }
+  ],
+  "modules": [
+    {
+      "material": "OpaqueFast",
+      "pass": "primary",
+      "source": "opaque-primary.rgen",
+      "sourceSha256": "4df889dd8368aa3084f18292a56c1a2e88de77ec4a4ae4d79dfd82f1b9ef955f",
+      "spirv": "opaque-primary.rgen.spv",
+      "spirvSha256": "23a489043f4d0ef4c0979f8d8ceb8a83962dbe9f47bfaa3673a1538fd648b5a3",
+      "bytes": 60648,
+      "words": 15162,
+      "descriptorBindingsSet1": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "material": "OpaqueFast",
+      "pass": "shade",
+      "source": "opaque-shade.rgen",
+      "sourceSha256": "0f81c35cf4eaa7696120b95a402ec94c42f7b11b3a4348b0541abe30b8fce2de",
+      "spirv": "opaque-shade.rgen.spv",
+      "spirvSha256": "a20f658086e103f4ce9eda591177c5ad4f337715b75c49b5970383b4e229f157",
+      "bytes": 464224,
+      "words": 116056,
+      "descriptorBindingsSet1": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "material": "GenericDielectric",
+      "pass": "primary",
+      "source": "generic-primary.rgen",
+      "sourceSha256": "4af5e0dd9c1de8325c783d9cf70265eb70e980779236eecb207208bf3c7a12ff",
+      "spirv": "generic-primary.rgen.spv",
+      "spirvSha256": "35044d5ff95d9f09f51e70aaf7c9c1f3747b1113a7929b92b521425f9d587d50",
+      "bytes": 96724,
+      "words": 24181,
+      "descriptorBindingsSet1": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "material": "GenericDielectric",
+      "pass": "shade",
+      "source": "generic-shade.rgen",
+      "sourceSha256": "fd62c7fe4c2207a48d844f4dc4a69a1944efb9fc03cc2d059c46fce34ebd1676",
+      "spirv": "generic-shade.rgen.spv",
+      "spirvSha256": "1857f535ebe921416060d366b6e632a7777144218fbe222912a4cc53df1f981e",
+      "bytes": 254988,
+      "words": 63747,
+      "descriptorBindingsSet1": [
+        0,
+        1,
+        2
+      ]
+    }
+  ]
+}

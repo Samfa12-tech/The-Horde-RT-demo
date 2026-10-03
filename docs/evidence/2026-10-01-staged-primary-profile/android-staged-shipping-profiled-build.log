@@ -1,0 +1,160 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.11.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:verifyMusicRuntimeAssets
+> Task :app:prepareRuntimeAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preBenchmarkBuild UP-TO-DATE
+> Task :app:generateBenchmarkBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileBenchmark UP-TO-DATE
+> Task :app:checkBenchmarkAarMetadata UP-TO-DATE
+> Task :app:generateBenchmarkResValues UP-TO-DATE
+> Task :app:mapBenchmarkSourceSetPaths UP-TO-DATE
+> Task :app:generateBenchmarkResources UP-TO-DATE
+> Task :app:mergeBenchmarkResources UP-TO-DATE
+> Task :app:createBenchmarkCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksBenchmark UP-TO-DATE
+> Task :app:processBenchmarkMainManifest UP-TO-DATE
+> Task :app:processBenchmarkManifest UP-TO-DATE
+> Task :app:processBenchmarkManifestForPackage UP-TO-DATE
+> Task :app:processBenchmarkResources UP-TO-DATE
+> Task :app:compileBenchmarkJavaWithJavac UP-TO-DATE
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:generateBenchmarkLintVitalReportModel
+
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]-2
+[CXX5304] This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+[CXX5304] This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+
+> Task :app:lintVitalAnalyzeBenchmark
+> Task :app:lintVitalReportBenchmark
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]-2
+> Task :app:lintVitalBenchmark
+> Task :app:configureCMakeRelWithDebInfo[armeabi-v7a]-2
+
+> Task :app:buildCMakeRelWithDebInfo[armeabi-v7a]-2
+C/C++: ninja: Entering directory `C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\.cxx\RelWithDebInfo\5a1e172n\armeabi-v7a'
+C/C++: C:\Users\sam_s\AppData\Local\Android\Sdk\ndk\26.1.10909125\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=armv7-none-linux-androideabi24 --sysroot=C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DHORDE_RT_BUILD_ID=\"1.6.1\" -DHORDE_RT_DISPLAY_VERSION=\"1.6.1\" -DHORDE_RT_PACKAGE_VERSION=\"1.6.1\" -DHORDE_RT_SELECTED_DIELECTRIC_QUALITY=0 -DHORDE_RT_SELECTED_INSTRUMENTATION=0 -DHORDE_RT_STAGED_PRIMARY_DEFAULT=1 -DHORDE_RT_STAGED_PRIMARY_EXPERIMENT=1 -DHORDE_RT_STAGED_PRIMARY_TIMING=1 -Dhorde_rt_probe_android_EXPORTS -I"C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src" -I"C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/third_party" -IC:/Dev/tmp/horde-staged-rt-20261001/shaders-shipping-mobile -I"C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/third_party/pocket-audio-core/native/include" -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++20 -O2 -g -DNDEBUG -fPIC -MD -MT CMakeFiles/horde_rt_probe_android.dir/ded4753dc92a3e153a93dd3b53d888ac/experimental/StagedPrimaryTiming.cpp.o -MF CMakeFiles\horde_rt_probe_android.dir\ded4753dc92a3e153a93dd3b53d888ac\experimental\StagedPrimaryTiming.cpp.o.d -o CMakeFiles/horde_rt_probe_android.dir/ded4753dc92a3e153a93dd3b53d888ac/experimental/StagedPrimaryTiming.cpp.o -c "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src/vulkan/raytracing/experimental/StagedPrimaryTiming.cpp"
+C/C++: In file included from C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src/vulkan/raytracing/experimental/StagedPrimaryTiming.cpp:1:
+C/C++: In file included from C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src/vulkan/raytracing/experimental/StagedPrimaryTiming.h:4:
+C/C++: In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/string:537:
+C/C++: In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__algorithm/max.h:14:
+C/C++: In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__algorithm/max_element.h:15:
+C/C++: In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__iterator/iterator_traits.h:16:
+C/C++: In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__concepts/copyable.h:14:
+C/C++: In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__concepts/movable.h:14:
+C/C++: In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__concepts/swappable.h:21:
+C/C++: C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__utility/exchange.h:31:13: error: incompatible integer to pointer conversion assigning to 'VkDevice_T *' from 'unsigned long long'
+C/C++:     __obj = _VSTD::forward<_T2>(__new_value);
+C/C++:             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__config:655:17: note: expanded from macro '_VSTD'
+C/C++: #  define _VSTD std
+C/C++:                 ^
+C/C++: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src/vulkan/raytracing/experimental/StagedPrimaryTiming.cpp:37:20: note: in instantiation of function template specialization 'std::exchange<VkDevice_T *, unsigned long long>' requested here
+C/C++:     device_ = std::exchange(other.device_, VK_NULL_HANDLE);
+C/C++:                    ^
+C/C++: 1 error generated.
+
+> Task :app:buildCMakeRelWithDebInfo[armeabi-v7a]-2 FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:buildCMakeRelWithDebInfo[armeabi-v7a]-2'.
+> com.android.ide.common.process.ProcessException: ninja: Entering directory `C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\.cxx\RelWithDebInfo\5a1e172n\armeabi-v7a'
+  [1/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/gameplay/animation/PlayerIkTargets.cpp.o
+  [2/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/bf5cba96607ee5f8df21b628ef9e91b5/interactions/InteractionState.cpp.o
+  [3/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/bf5cba96607ee5f8df21b628ef9e91b5/interactions/ChestRewardSequence.cpp.o
+  [4/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/audio/MusicPcmWave.cpp.o
+  [5/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/telemetry/RtBenchmarkEvidenceRun.cpp.o
+  [6/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/telemetry/RtEvidencePublication.cpp.o
+  [7/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/reporting/PlaytestReport.cpp.o
+  [8/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/audio/MusicDirector.cpp.o
+  [9/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/bf5cba96607ee5f8df21b628ef9e91b5/animation/PlayerAnimationState.cpp.o
+  [10/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/audio/MusicPcmStream.cpp.o
+  [11/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/audio/MusicPlaybackSession.cpp.o
+  [12/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/audio/MusicPcmAssetBank.cpp.o
+  [13/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/bf5cba96607ee5f8df21b628ef9e91b5/interactions/FinaleSequence.cpp.o
+  [14/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/gameplay/effects/FireEmitterState.cpp.o
+  [15/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/gameplay/items/LanternPendulum.cpp.o
+  [16/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/gameplay/items/HeldItemState.cpp.o
+  [17/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/telemetry/RtBenchmarkEvidenceReport.cpp.o
+  [18/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/gameplay/simulation/GameSimulation.cpp.o
+  [19/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/scene/assets/AssetValidation.cpp.o
+  [20/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/vulkan/DeviceCapabilities.cpp.o
+  [21/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/gameplay/items/HeldLightState.cpp.o
+  [22/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/962a06a4687df69e52d8a3bc6f685e41/raytracing/RayTracingRequirements.cpp.o
+  [23/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/gameplay/items/HeldItemKinematics.cpp.o
+  [24/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/vulkan/RtCapabilityReport.cpp.o
+  [25/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/vulkan/raytracing/RtTextureArrays.cpp.o
+  [26/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/962a06a4687df69e52d8a3bc6f685e41/raytracing/HeldItemRenderSlot.cpp.o
+  [27/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/gameplay/ShowcaseBenchmark.cpp.o
+  [28/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/update/GitHubReleaseUpdater.cpp.o
+  [29/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/vulkan/GpuFrameTimer.cpp.o
+  [30/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/vulkan/raytracing/RtGpuResources.cpp.o
+  [31/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/vulkan/VulkanContext.cpp.o
+  [32/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/vulkan/raytracing/FireEmitterBuffer.cpp.o
+  [33/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/962a06a4687df69e52d8a3bc6f685e41/raytracing/RtPipelineVariants.cpp.o
+  [34/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/962a06a4687df69e52d8a3bc6f685e41/raytracing/CharacterRenderSlot.cpp.o
+  [35/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/ded4753dc92a3e153a93dd3b53d888ac/RtFrameEvidenceCoordinator.cpp.o
+  [36/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/ded4753dc92a3e153a93dd3b53d888ac/RtPipelineVariantProvider.cpp.o
+  [37/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/scene/assets/AssetManifest.cpp.o
+  [38/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/vulkan/raytracing/RtPipelineBundle.cpp.o
+  [39/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/ded4753dc92a3e153a93dd3b53d888ac/RtPipelineBundleContracts.cpp.o
+  [40/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/ui/DiagnosticOverlay.cpp.o
+  [41/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/android_music_playback.cpp.o
+  [42/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/962a06a4687df69e52d8a3bc6f685e41/raytracing/SimulationFrameAdapter.cpp.o
+  [43/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/vulkan/raytracing/PlayerRenderSlot.cpp.o
+  [44/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/ded4753dc92a3e153a93dd3b53d888ac/experimental/StagedPrimaryTiming.cpp.o
+  FAILED: CMakeFiles/horde_rt_probe_android.dir/ded4753dc92a3e153a93dd3b53d888ac/experimental/StagedPrimaryTiming.cpp.o 
+  C:\Users\sam_s\AppData\Local\Android\Sdk\ndk\26.1.10909125\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=armv7-none-linux-androideabi24 --sysroot=C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DHORDE_RT_BUILD_ID=\"1.6.1\" -DHORDE_RT_DISPLAY_VERSION=\"1.6.1\" -DHORDE_RT_PACKAGE_VERSION=\"1.6.1\" -DHORDE_RT_SELECTED_DIELECTRIC_QUALITY=0 -DHORDE_RT_SELECTED_INSTRUMENTATION=0 -DHORDE_RT_STAGED_PRIMARY_DEFAULT=1 -DHORDE_RT_STAGED_PRIMARY_EXPERIMENT=1 -DHORDE_RT_STAGED_PRIMARY_TIMING=1 -Dhorde_rt_probe_android_EXPORTS -I"C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src" -I"C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/third_party" -IC:/Dev/tmp/horde-staged-rt-20261001/shaders-shipping-mobile -I"C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/third_party/pocket-audio-core/native/include" -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++20 -O2 -g -DNDEBUG -fPIC -MD -MT CMakeFiles/horde_rt_probe_android.dir/ded4753dc92a3e153a93dd3b53d888ac/experimental/StagedPrimaryTiming.cpp.o -MF CMakeFiles\horde_rt_probe_android.dir\ded4753dc92a3e153a93dd3b53d888ac\experimental\StagedPrimaryTiming.cpp.o.d -o CMakeFiles/horde_rt_probe_android.dir/ded4753dc92a3e153a93dd3b53d888ac/experimental/StagedPrimaryTiming.cpp.o -c "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src/vulkan/raytracing/experimental/StagedPrimaryTiming.cpp"
+  In file included from C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src/vulkan/raytracing/experimental/StagedPrimaryTiming.cpp:1:
+  In file included from C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src/vulkan/raytracing/experimental/StagedPrimaryTiming.h:4:
+  In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/string:537:
+  In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__algorithm/max.h:14:
+  In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__algorithm/max_element.h:15:
+  In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__iterator/iterator_traits.h:16:
+  In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__concepts/copyable.h:14:
+  In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__concepts/movable.h:14:
+  In file included from C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__concepts/swappable.h:21:
+  C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__utility/exchange.h:31:13: error: incompatible integer to pointer conversion assigning to 'VkDevice_T *' from 'unsigned long long'
+      __obj = _VSTD::forward<_T2>(__new_value);
+              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/c++/v1/__config:655:17: note: expanded from macro '_VSTD'
+  #  define _VSTD std
+                  ^
+  C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src/vulkan/raytracing/experimental/StagedPrimaryTiming.cpp:37:20: note: in instantiation of function template specialization 'std::exchange<VkDevice_T *, unsigned long long>' requested here
+
+      device_ = std::exchange(other.device_, VK_NULL_HANDLE);
+
+                     ^
+
+  1 error generated.
+
+  [45/56] Building CXX object pocket-audio-core-native/CMakeFiles/pocket_audio_native_pcm.dir/src/PcmWave.cpp.o
+  [46/56] Building CXX object pocket-audio-core-native/CMakeFiles/pocket_audio_native_pcm.dir/src/PcmLoopStream.cpp.o
+  [47/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/ded4753dc92a3e153a93dd3b53d888ac/experimental/StagedPrimaryPass.cpp.o
+  [48/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/telemetry/RtPerformanceEvidence.cpp.o
+  [49/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/f9d8391f314bf60256b841fa60f3dff9/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+  [50/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/scene/assets/GltfDocument.cpp.o
+  [51/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/scene/assets/StaticMeshAsset.cpp.o
+  [52/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/df7e6b631aaf6ef0dde3560a527b66f7/src/scene/assets/SkinnedMeshAsset.cpp.o
+  [53/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/android_probe_bridge.cpp.o
+  [54/56] Building CXX object CMakeFiles/horde_rt_probe_android.dir/962a06a4687df69e52d8a3bc6f685e41/raytracing/PresentableTinyRtScene.cpp.o
+  ninja: build stopped: subcommand failed.
+  
+  C++ build system [build] failed while executing:
+      @echo off
+      "C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe" ^
+        -C ^
+        "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\android\\app\\.cxx\\RelWithDebInfo\\5a1e172n\\armeabi-v7a" ^
+        horde_rt_probe_android
+    from C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 1m 16s
+25 actionable tasks: 9 executed, 16 up-to-date

@@ -1,0 +1,3595 @@
+{
+  "scope": "External offline prototype composition only; not native playback, listening, runtime admission, or licensing approval.",
+  "method": "Unchanged PCM16 input samples converted to float32 and summed linearly for 3s prior-tail/new-body overlap. No fades, gain changes, normalization, resampling, source edits, or score/FX-rate changes.",
+  "format": {
+    "input": "stereo 48 kHz PCM16 WAV",
+    "output": "stereo 48 kHz IEEE-float32 WAV",
+    "rate": 48000
+  },
+  "source": {
+    "root": "docs/evidence/2026-10-01-music-render",
+    "sha256Manifest": "46218bbc649984b369111a17a4d20366c13fd62057b949ca5da917738c77df38",
+    "renderReceiptGzSha256": "d47a1e1dd23a1f31d43ce83c68880b93fa5e36c70b31eba8252d0d7f0483b678",
+    "ownerArchiveSha256": "see source/evidence-scope.json",
+    "inputWavs": {
+      "audio/A-loop.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/A-loop.wav",
+        "bytes": 2304044,
+        "sha256": "8e5be0c046d95a3058037c311ea6a1b7a330f82536788fd33954980d31dfcc02",
+        "frames": 576000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.41790771484375,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/A-tail.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/A-tail.wav",
+        "bytes": 576044,
+        "sha256": "bb1c5be7c74f1026ff0ab7f2fd566e4ab81c756370246b3143c2e128ed6ed223",
+        "frames": 144000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.000701904296875,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/B-loop.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/B-loop.wav",
+        "bytes": 2304044,
+        "sha256": "e05b2efcd5220be7c83538c24a52e9438726ac4c9f7d23c6c8ffa98778ce2d47",
+        "frames": 576000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.45941162109375,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/B-tail.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/B-tail.wav",
+        "bytes": 576044,
+        "sha256": "99a0dc08f2249977e8e19f1b944ca1173b91a3ce171c62195696cf21f4b114ed",
+        "frames": 144000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.0018310546875,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/D-loop.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/D-loop.wav",
+        "bytes": 2304044,
+        "sha256": "088d08a78ad55cffa3806b6f8daebf772fb4cf08528c6deb475938537fa09ff2",
+        "frames": 576000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.191986083984375,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/D-tail.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/D-tail.wav",
+        "bytes": 576044,
+        "sha256": "0ad9b252052c45572ddcc1bc2acf3c2aa1a8e80ccbe8a347947d38cd8c91a812",
+        "frames": 144000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.001708984375,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/E-loop.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/E-loop.wav",
+        "bytes": 2304044,
+        "sha256": "070278efd96e8259733801bc30fe87e232cb26b4aeb3075cb927c9c89c8afb32",
+        "frames": 576000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.64190673828125,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/E-tail.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/E-tail.wav",
+        "bytes": 576044,
+        "sha256": "aac330fb178822e86b0ea71307955eae95f1886de01a9bebf1620ad313877ddd",
+        "frames": 144000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.002960205078125,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/F-loop.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/F-loop.wav",
+        "bytes": 2304044,
+        "sha256": "3d5b3562e716a99870151613adeda519f351602151c4a50eb5d93a4b98f4de80",
+        "frames": 576000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.195220947265625,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/F-tail.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/F-tail.wav",
+        "bytes": 576044,
+        "sha256": "00b6c72aeb8ec50d7906ad4a12dc5a8cf53bbc862070902c625f31f1cc78d4f7",
+        "frames": 144000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.0009765625,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/H-loop.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/H-loop.wav",
+        "bytes": 2304044,
+        "sha256": "bb52cfa875b6fc359b380a2834df2ea8f633d2ae65f9e6f59f60c2c09fae9c0d",
+        "frames": 576000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.159576416015625,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/H-tail.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/H-tail.wav",
+        "bytes": 576044,
+        "sha256": "62653fc9ae162c21a18e36646f23899642f56cf9094599d501cd681818a25d2c",
+        "frames": 144000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.001617431640625,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/C-loop.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/C-loop.wav",
+        "bytes": 576044,
+        "sha256": "7e378cdb37adaa3f88a3594ba080fac9be65c7c0e1d69c479263a516638223af",
+        "frames": 144000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.17510986328125,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/C-tail.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/C-tail.wav",
+        "bytes": 576044,
+        "sha256": "0929b0a19a49fd8d1e6779db3d1a8db2a1edc30c25ef3fcab1321b1a0609f243",
+        "frames": 144000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 3.0517578125e-05,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/G-loop.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/G-loop.wav",
+        "bytes": 1152044,
+        "sha256": "03b72d16b6bbc12c8bffc65173795925e69e1bb9356be4ad2737f7de9d2b0692",
+        "frames": 288000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.156585693359375,
+        "fullScaleChannelSamples": 0
+      },
+      "audio/G-tail.wav": {
+        "path": "evidence/2026-10-01-music-render/audio/G-tail.wav",
+        "bytes": 576044,
+        "sha256": "a8a2afd26e7ad2bc97e032cd83b5f0c5084aecd8741692c091d841aa64c610c7",
+        "frames": 144000,
+        "channels": 2,
+        "sampleRate": 48000,
+        "pcmPeak": 0.002410888671875,
+        "fullScaleChannelSamples": 0
+      }
+    }
+  },
+  "loopPolicy": {
+    "cues": [
+      "A",
+      "B",
+      "D",
+      "E",
+      "F",
+      "H"
+    ],
+    "cycleFrames": 576000,
+    "cycleSeconds": 12.0,
+    "bodyStarts": 20,
+    "bodyStartPeriodDriftFrames": 0,
+    "tailFrames": 144000,
+    "tailOverlapFrames": 144000,
+    "steadyOverlapWindows": 19,
+    "finalTailAppended": true,
+    "framesPerOutput": 11664000,
+    "secondsPerOutput": 243.0
+  },
+  "oneShots": {
+    "cues": [
+      "C",
+      "G"
+    ],
+    "bodyTailPolicy": "one full body then one full separate tail; no repetition or overlap",
+    "GFirstFsharp4": {
+      "midi": 66,
+      "timeFromMusicalStartSeconds": 4.5,
+      "confirmedUnchangedInSourceReceipt": true
+    }
+  },
+  "cues": [
+    {
+      "cue": "A",
+      "mode": "20 exact body starts; prior 3s tail sample-added over next body's first 3s; final tail appended",
+      "bodyStarts": [
+        {
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "frame": 576000,
+          "seconds": 12.0
+        },
+        {
+          "frame": 1152000,
+          "seconds": 24.0
+        },
+        {
+          "frame": 1728000,
+          "seconds": 36.0
+        },
+        {
+          "frame": 2304000,
+          "seconds": 48.0
+        },
+        {
+          "frame": 2880000,
+          "seconds": 60.0
+        },
+        {
+          "frame": 3456000,
+          "seconds": 72.0
+        },
+        {
+          "frame": 4032000,
+          "seconds": 84.0
+        },
+        {
+          "frame": 4608000,
+          "seconds": 96.0
+        },
+        {
+          "frame": 5184000,
+          "seconds": 108.0
+        },
+        {
+          "frame": 5760000,
+          "seconds": 120.0
+        },
+        {
+          "frame": 6336000,
+          "seconds": 132.0
+        },
+        {
+          "frame": 6912000,
+          "seconds": 144.0
+        },
+        {
+          "frame": 7488000,
+          "seconds": 156.0
+        },
+        {
+          "frame": 8064000,
+          "seconds": 168.0
+        },
+        {
+          "frame": 8640000,
+          "seconds": 180.0
+        },
+        {
+          "frame": 9216000,
+          "seconds": 192.0
+        },
+        {
+          "frame": 9792000,
+          "seconds": 204.0
+        },
+        {
+          "frame": 10368000,
+          "seconds": 216.0
+        },
+        {
+          "frame": 10944000,
+          "seconds": 228.0
+        }
+      ],
+      "overlapStartFrames": [
+        576000,
+        1152000,
+        1728000,
+        2304000,
+        2880000,
+        3456000,
+        4032000,
+        4608000,
+        5184000,
+        5760000,
+        6336000,
+        6912000,
+        7488000,
+        8064000,
+        8640000,
+        9216000,
+        9792000,
+        10368000,
+        10944000
+      ],
+      "overlapFramesEach": 144000,
+      "tailFrameCount": 144000,
+      "timeline": [
+        {
+          "kind": "body-start",
+          "cycle": 0,
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 1,
+          "frame": 576000,
+          "seconds": 12.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 2,
+          "frame": 1152000,
+          "seconds": 24.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 3,
+          "frame": 1728000,
+          "seconds": 36.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 4,
+          "frame": 2304000,
+          "seconds": 48.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 5,
+          "frame": 2880000,
+          "seconds": 60.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 6,
+          "frame": 3456000,
+          "seconds": 72.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 7,
+          "frame": 4032000,
+          "seconds": 84.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 8,
+          "frame": 4608000,
+          "seconds": 96.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 9,
+          "frame": 5184000,
+          "seconds": 108.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 10,
+          "frame": 5760000,
+          "seconds": 120.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 11,
+          "frame": 6336000,
+          "seconds": 132.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 12,
+          "frame": 6912000,
+          "seconds": 144.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 13,
+          "frame": 7488000,
+          "seconds": 156.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 14,
+          "frame": 8064000,
+          "seconds": 168.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 15,
+          "frame": 8640000,
+          "seconds": 180.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 16,
+          "frame": 9216000,
+          "seconds": 192.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 17,
+          "frame": 9792000,
+          "seconds": 204.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 18,
+          "frame": 10368000,
+          "seconds": 216.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 19,
+          "frame": 10944000,
+          "seconds": 228.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "final-tail-start",
+          "afterCycle": 19,
+          "frame": 11520000,
+          "seconds": 240.0,
+          "frames": 144000,
+          "secondsLong": 3.0
+        }
+      ],
+      "sourceBoundaryMaxAbsDelta": {
+        "body-end-to-body-start-for-naive-repeat": 0.000579833984375,
+        "body-end-to-tail-start": 3.0517578125e-05,
+        "tail-end-to-silence": 0.0
+      },
+      "sourcePeaks": {
+        "body": 0.41790771484375,
+        "tail": 0.000701904296875
+      },
+      "overlapPeakIncreaseDbVsBody": 0.0,
+      "overlapWindowPeakComparison": {
+        "bodyPeakSameFirst3s": 0.285614013671875,
+        "mixedPeakSame3s": 0.285552978515625,
+        "mixedPeakIncrease": 0.0,
+        "maxPositivePerChannelSamplePeakIncrease": 0.00067138671875,
+        "maxPositivePerChannelSamplePeakIncreaseDb": 23.521825181113627,
+        "tailPeak": 0.000701904296875
+      },
+      "output": "A-20cycle-tail-overlap-f32.wav",
+      "outputSha256": "731dea65eb177c8612d141228a5583ce2a5493217977e8e707136187fb0224aa",
+      "outputBytes": 93312044,
+      "format": "stereo 48 kHz IEEE-float32 WAV; unnormalised additive mix",
+      "frames": 11664000,
+      "durationSeconds": 243.0,
+      "globalPeak": 0.41790771484375,
+      "peakAboveFullScale": 0.0,
+      "overrangeChannelSamples": 0,
+      "rollingOneSecondWindows": 243,
+      "maxOneSecondPeak": 0.41790771484375,
+      "maxOneSecondWindow": {
+        "startFrame": 288000,
+        "peak": 0.41790771484375,
+        "overrangeChannelSamples": 0
+      },
+      "boundaries": [
+        {
+          "label": "cycle-1-start: prior-tail + new-body",
+          "frame": 576000,
+          "seconds": 12.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-1-tail-off: body-only resumes",
+          "frame": 720000,
+          "seconds": 15.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-2-start: prior-tail + new-body",
+          "frame": 1152000,
+          "seconds": 24.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-2-tail-off: body-only resumes",
+          "frame": 1296000,
+          "seconds": 27.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-3-start: prior-tail + new-body",
+          "frame": 1728000,
+          "seconds": 36.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-3-tail-off: body-only resumes",
+          "frame": 1872000,
+          "seconds": 39.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-4-start: prior-tail + new-body",
+          "frame": 2304000,
+          "seconds": 48.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-4-tail-off: body-only resumes",
+          "frame": 2448000,
+          "seconds": 51.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-5-start: prior-tail + new-body",
+          "frame": 2880000,
+          "seconds": 60.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-5-tail-off: body-only resumes",
+          "frame": 3024000,
+          "seconds": 63.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-6-start: prior-tail + new-body",
+          "frame": 3456000,
+          "seconds": 72.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-6-tail-off: body-only resumes",
+          "frame": 3600000,
+          "seconds": 75.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-7-start: prior-tail + new-body",
+          "frame": 4032000,
+          "seconds": 84.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-7-tail-off: body-only resumes",
+          "frame": 4176000,
+          "seconds": 87.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-8-start: prior-tail + new-body",
+          "frame": 4608000,
+          "seconds": 96.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-8-tail-off: body-only resumes",
+          "frame": 4752000,
+          "seconds": 99.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-9-start: prior-tail + new-body",
+          "frame": 5184000,
+          "seconds": 108.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-9-tail-off: body-only resumes",
+          "frame": 5328000,
+          "seconds": 111.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-10-start: prior-tail + new-body",
+          "frame": 5760000,
+          "seconds": 120.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-10-tail-off: body-only resumes",
+          "frame": 5904000,
+          "seconds": 123.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-11-start: prior-tail + new-body",
+          "frame": 6336000,
+          "seconds": 132.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-11-tail-off: body-only resumes",
+          "frame": 6480000,
+          "seconds": 135.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-12-start: prior-tail + new-body",
+          "frame": 6912000,
+          "seconds": 144.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-12-tail-off: body-only resumes",
+          "frame": 7056000,
+          "seconds": 147.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-13-start: prior-tail + new-body",
+          "frame": 7488000,
+          "seconds": 156.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-13-tail-off: body-only resumes",
+          "frame": 7632000,
+          "seconds": 159.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-14-start: prior-tail + new-body",
+          "frame": 8064000,
+          "seconds": 168.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-14-tail-off: body-only resumes",
+          "frame": 8208000,
+          "seconds": 171.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-15-start: prior-tail + new-body",
+          "frame": 8640000,
+          "seconds": 180.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-15-tail-off: body-only resumes",
+          "frame": 8784000,
+          "seconds": 183.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-16-start: prior-tail + new-body",
+          "frame": 9216000,
+          "seconds": 192.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-16-tail-off: body-only resumes",
+          "frame": 9360000,
+          "seconds": 195.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-17-start: prior-tail + new-body",
+          "frame": 9792000,
+          "seconds": 204.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-17-tail-off: body-only resumes",
+          "frame": 9936000,
+          "seconds": 207.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-18-start: prior-tail + new-body",
+          "frame": 10368000,
+          "seconds": 216.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-18-tail-off: body-only resumes",
+          "frame": 10512000,
+          "seconds": 219.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-19-start: prior-tail + new-body",
+          "frame": 10944000,
+          "seconds": 228.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-19-tail-off: body-only resumes",
+          "frame": 11088000,
+          "seconds": 231.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "final-tail-start-no-next-body",
+          "frame": 11520000,
+          "seconds": 240.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        }
+      ]
+    },
+    {
+      "cue": "B",
+      "mode": "20 exact body starts; prior 3s tail sample-added over next body's first 3s; final tail appended",
+      "bodyStarts": [
+        {
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "frame": 576000,
+          "seconds": 12.0
+        },
+        {
+          "frame": 1152000,
+          "seconds": 24.0
+        },
+        {
+          "frame": 1728000,
+          "seconds": 36.0
+        },
+        {
+          "frame": 2304000,
+          "seconds": 48.0
+        },
+        {
+          "frame": 2880000,
+          "seconds": 60.0
+        },
+        {
+          "frame": 3456000,
+          "seconds": 72.0
+        },
+        {
+          "frame": 4032000,
+          "seconds": 84.0
+        },
+        {
+          "frame": 4608000,
+          "seconds": 96.0
+        },
+        {
+          "frame": 5184000,
+          "seconds": 108.0
+        },
+        {
+          "frame": 5760000,
+          "seconds": 120.0
+        },
+        {
+          "frame": 6336000,
+          "seconds": 132.0
+        },
+        {
+          "frame": 6912000,
+          "seconds": 144.0
+        },
+        {
+          "frame": 7488000,
+          "seconds": 156.0
+        },
+        {
+          "frame": 8064000,
+          "seconds": 168.0
+        },
+        {
+          "frame": 8640000,
+          "seconds": 180.0
+        },
+        {
+          "frame": 9216000,
+          "seconds": 192.0
+        },
+        {
+          "frame": 9792000,
+          "seconds": 204.0
+        },
+        {
+          "frame": 10368000,
+          "seconds": 216.0
+        },
+        {
+          "frame": 10944000,
+          "seconds": 228.0
+        }
+      ],
+      "overlapStartFrames": [
+        576000,
+        1152000,
+        1728000,
+        2304000,
+        2880000,
+        3456000,
+        4032000,
+        4608000,
+        5184000,
+        5760000,
+        6336000,
+        6912000,
+        7488000,
+        8064000,
+        8640000,
+        9216000,
+        9792000,
+        10368000,
+        10944000
+      ],
+      "overlapFramesEach": 144000,
+      "tailFrameCount": 144000,
+      "timeline": [
+        {
+          "kind": "body-start",
+          "cycle": 0,
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 1,
+          "frame": 576000,
+          "seconds": 12.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 2,
+          "frame": 1152000,
+          "seconds": 24.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 3,
+          "frame": 1728000,
+          "seconds": 36.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 4,
+          "frame": 2304000,
+          "seconds": 48.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 5,
+          "frame": 2880000,
+          "seconds": 60.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 6,
+          "frame": 3456000,
+          "seconds": 72.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 7,
+          "frame": 4032000,
+          "seconds": 84.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 8,
+          "frame": 4608000,
+          "seconds": 96.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 9,
+          "frame": 5184000,
+          "seconds": 108.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 10,
+          "frame": 5760000,
+          "seconds": 120.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 11,
+          "frame": 6336000,
+          "seconds": 132.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 12,
+          "frame": 6912000,
+          "seconds": 144.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 13,
+          "frame": 7488000,
+          "seconds": 156.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 14,
+          "frame": 8064000,
+          "seconds": 168.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 15,
+          "frame": 8640000,
+          "seconds": 180.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 16,
+          "frame": 9216000,
+          "seconds": 192.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 17,
+          "frame": 9792000,
+          "seconds": 204.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 18,
+          "frame": 10368000,
+          "seconds": 216.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 19,
+          "frame": 10944000,
+          "seconds": 228.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "final-tail-start",
+          "afterCycle": 19,
+          "frame": 11520000,
+          "seconds": 240.0,
+          "frames": 144000,
+          "secondsLong": 3.0
+        }
+      ],
+      "sourceBoundaryMaxAbsDelta": {
+        "body-end-to-body-start-for-naive-repeat": 0.001007080078125,
+        "body-end-to-tail-start": 3.0517578125e-05,
+        "tail-end-to-silence": 0.0
+      },
+      "sourcePeaks": {
+        "body": 0.45941162109375,
+        "tail": 0.0018310546875
+      },
+      "overlapPeakIncreaseDbVsBody": 0.0,
+      "overlapWindowPeakComparison": {
+        "bodyPeakSameFirst3s": 0.408447265625,
+        "mixedPeakSame3s": 0.408447265625,
+        "mixedPeakIncrease": 0.0,
+        "maxPositivePerChannelSamplePeakIncrease": 0.0018310546875,
+        "maxPositivePerChannelSamplePeakIncreaseDb": 26.848453616444125,
+        "tailPeak": 0.0018310546875
+      },
+      "output": "B-20cycle-tail-overlap-f32.wav",
+      "outputSha256": "93e8e4874e3295f0c87ae09b686cc2dc2cefcd71e2ea11eda219d3bb08d01e0c",
+      "outputBytes": 93312044,
+      "format": "stereo 48 kHz IEEE-float32 WAV; unnormalised additive mix",
+      "frames": 11664000,
+      "durationSeconds": 243.0,
+      "globalPeak": 0.45941162109375,
+      "peakAboveFullScale": 0.0,
+      "overrangeChannelSamples": 0,
+      "rollingOneSecondWindows": 243,
+      "maxOneSecondPeak": 0.45941162109375,
+      "maxOneSecondWindow": {
+        "startFrame": 144000,
+        "peak": 0.45941162109375,
+        "overrangeChannelSamples": 0
+      },
+      "boundaries": [
+        {
+          "label": "cycle-1-start: prior-tail + new-body",
+          "frame": 576000,
+          "seconds": 12.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-1-tail-off: body-only resumes",
+          "frame": 720000,
+          "seconds": 15.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-2-start: prior-tail + new-body",
+          "frame": 1152000,
+          "seconds": 24.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-2-tail-off: body-only resumes",
+          "frame": 1296000,
+          "seconds": 27.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-3-start: prior-tail + new-body",
+          "frame": 1728000,
+          "seconds": 36.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-3-tail-off: body-only resumes",
+          "frame": 1872000,
+          "seconds": 39.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-4-start: prior-tail + new-body",
+          "frame": 2304000,
+          "seconds": 48.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-4-tail-off: body-only resumes",
+          "frame": 2448000,
+          "seconds": 51.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-5-start: prior-tail + new-body",
+          "frame": 2880000,
+          "seconds": 60.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-5-tail-off: body-only resumes",
+          "frame": 3024000,
+          "seconds": 63.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-6-start: prior-tail + new-body",
+          "frame": 3456000,
+          "seconds": 72.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-6-tail-off: body-only resumes",
+          "frame": 3600000,
+          "seconds": 75.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-7-start: prior-tail + new-body",
+          "frame": 4032000,
+          "seconds": 84.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-7-tail-off: body-only resumes",
+          "frame": 4176000,
+          "seconds": 87.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-8-start: prior-tail + new-body",
+          "frame": 4608000,
+          "seconds": 96.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-8-tail-off: body-only resumes",
+          "frame": 4752000,
+          "seconds": 99.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-9-start: prior-tail + new-body",
+          "frame": 5184000,
+          "seconds": 108.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-9-tail-off: body-only resumes",
+          "frame": 5328000,
+          "seconds": 111.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-10-start: prior-tail + new-body",
+          "frame": 5760000,
+          "seconds": 120.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-10-tail-off: body-only resumes",
+          "frame": 5904000,
+          "seconds": 123.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-11-start: prior-tail + new-body",
+          "frame": 6336000,
+          "seconds": 132.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-11-tail-off: body-only resumes",
+          "frame": 6480000,
+          "seconds": 135.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-12-start: prior-tail + new-body",
+          "frame": 6912000,
+          "seconds": 144.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-12-tail-off: body-only resumes",
+          "frame": 7056000,
+          "seconds": 147.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-13-start: prior-tail + new-body",
+          "frame": 7488000,
+          "seconds": 156.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-13-tail-off: body-only resumes",
+          "frame": 7632000,
+          "seconds": 159.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-14-start: prior-tail + new-body",
+          "frame": 8064000,
+          "seconds": 168.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-14-tail-off: body-only resumes",
+          "frame": 8208000,
+          "seconds": 171.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-15-start: prior-tail + new-body",
+          "frame": 8640000,
+          "seconds": 180.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-15-tail-off: body-only resumes",
+          "frame": 8784000,
+          "seconds": 183.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-16-start: prior-tail + new-body",
+          "frame": 9216000,
+          "seconds": 192.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-16-tail-off: body-only resumes",
+          "frame": 9360000,
+          "seconds": 195.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-17-start: prior-tail + new-body",
+          "frame": 9792000,
+          "seconds": 204.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-17-tail-off: body-only resumes",
+          "frame": 9936000,
+          "seconds": 207.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-18-start: prior-tail + new-body",
+          "frame": 10368000,
+          "seconds": 216.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-18-tail-off: body-only resumes",
+          "frame": 10512000,
+          "seconds": 219.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "cycle-19-start: prior-tail + new-body",
+          "frame": 10944000,
+          "seconds": 228.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-19-tail-off: body-only resumes",
+          "frame": 11088000,
+          "seconds": 231.0,
+          "maxAbsAdjacentDelta": 0.0
+        },
+        {
+          "label": "final-tail-start-no-next-body",
+          "frame": 11520000,
+          "seconds": 240.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        }
+      ]
+    },
+    {
+      "cue": "D",
+      "mode": "20 exact body starts; prior 3s tail sample-added over next body's first 3s; final tail appended",
+      "bodyStarts": [
+        {
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "frame": 576000,
+          "seconds": 12.0
+        },
+        {
+          "frame": 1152000,
+          "seconds": 24.0
+        },
+        {
+          "frame": 1728000,
+          "seconds": 36.0
+        },
+        {
+          "frame": 2304000,
+          "seconds": 48.0
+        },
+        {
+          "frame": 2880000,
+          "seconds": 60.0
+        },
+        {
+          "frame": 3456000,
+          "seconds": 72.0
+        },
+        {
+          "frame": 4032000,
+          "seconds": 84.0
+        },
+        {
+          "frame": 4608000,
+          "seconds": 96.0
+        },
+        {
+          "frame": 5184000,
+          "seconds": 108.0
+        },
+        {
+          "frame": 5760000,
+          "seconds": 120.0
+        },
+        {
+          "frame": 6336000,
+          "seconds": 132.0
+        },
+        {
+          "frame": 6912000,
+          "seconds": 144.0
+        },
+        {
+          "frame": 7488000,
+          "seconds": 156.0
+        },
+        {
+          "frame": 8064000,
+          "seconds": 168.0
+        },
+        {
+          "frame": 8640000,
+          "seconds": 180.0
+        },
+        {
+          "frame": 9216000,
+          "seconds": 192.0
+        },
+        {
+          "frame": 9792000,
+          "seconds": 204.0
+        },
+        {
+          "frame": 10368000,
+          "seconds": 216.0
+        },
+        {
+          "frame": 10944000,
+          "seconds": 228.0
+        }
+      ],
+      "overlapStartFrames": [
+        576000,
+        1152000,
+        1728000,
+        2304000,
+        2880000,
+        3456000,
+        4032000,
+        4608000,
+        5184000,
+        5760000,
+        6336000,
+        6912000,
+        7488000,
+        8064000,
+        8640000,
+        9216000,
+        9792000,
+        10368000,
+        10944000
+      ],
+      "overlapFramesEach": 144000,
+      "tailFrameCount": 144000,
+      "timeline": [
+        {
+          "kind": "body-start",
+          "cycle": 0,
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 1,
+          "frame": 576000,
+          "seconds": 12.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 2,
+          "frame": 1152000,
+          "seconds": 24.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 3,
+          "frame": 1728000,
+          "seconds": 36.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 4,
+          "frame": 2304000,
+          "seconds": 48.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 5,
+          "frame": 2880000,
+          "seconds": 60.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 6,
+          "frame": 3456000,
+          "seconds": 72.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 7,
+          "frame": 4032000,
+          "seconds": 84.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 8,
+          "frame": 4608000,
+          "seconds": 96.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 9,
+          "frame": 5184000,
+          "seconds": 108.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 10,
+          "frame": 5760000,
+          "seconds": 120.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 11,
+          "frame": 6336000,
+          "seconds": 132.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 12,
+          "frame": 6912000,
+          "seconds": 144.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 13,
+          "frame": 7488000,
+          "seconds": 156.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 14,
+          "frame": 8064000,
+          "seconds": 168.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 15,
+          "frame": 8640000,
+          "seconds": 180.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 16,
+          "frame": 9216000,
+          "seconds": 192.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 17,
+          "frame": 9792000,
+          "seconds": 204.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 18,
+          "frame": 10368000,
+          "seconds": 216.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 19,
+          "frame": 10944000,
+          "seconds": 228.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "final-tail-start",
+          "afterCycle": 19,
+          "frame": 11520000,
+          "seconds": 240.0,
+          "frames": 144000,
+          "secondsLong": 3.0
+        }
+      ],
+      "sourceBoundaryMaxAbsDelta": {
+        "body-end-to-body-start-for-naive-repeat": 0.00140380859375,
+        "body-end-to-tail-start": 6.103515625e-05,
+        "tail-end-to-silence": 0.0
+      },
+      "sourcePeaks": {
+        "body": 0.191986083984375,
+        "tail": 0.001708984375
+      },
+      "overlapPeakIncreaseDbVsBody": 0.0,
+      "overlapWindowPeakComparison": {
+        "bodyPeakSameFirst3s": 0.143035888671875,
+        "mixedPeakSame3s": 0.14337158203125,
+        "mixedPeakIncrease": 0.000335693359375,
+        "maxPositivePerChannelSamplePeakIncrease": 0.001708984375,
+        "maxPositivePerChannelSamplePeakIncreaseDb": 28.29946695941636,
+        "tailPeak": 0.001708984375
+      },
+      "output": "D-20cycle-tail-overlap-f32.wav",
+      "outputSha256": "1f010c1f96185e7ac051c8256eea2c97dc9a749d67c544b7bd621439733d0a9f",
+      "outputBytes": 93312044,
+      "format": "stereo 48 kHz IEEE-float32 WAV; unnormalised additive mix",
+      "frames": 11664000,
+      "durationSeconds": 243.0,
+      "globalPeak": 0.191986083984375,
+      "peakAboveFullScale": 0.0,
+      "overrangeChannelSamples": 0,
+      "rollingOneSecondWindows": 243,
+      "maxOneSecondPeak": 0.191986083984375,
+      "maxOneSecondWindow": {
+        "startFrame": 432000,
+        "peak": 0.191986083984375,
+        "overrangeChannelSamples": 0
+      },
+      "boundaries": [
+        {
+          "label": "cycle-1-start: prior-tail + new-body",
+          "frame": 576000,
+          "seconds": 12.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-1-tail-off: body-only resumes",
+          "frame": 720000,
+          "seconds": 15.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-2-start: prior-tail + new-body",
+          "frame": 1152000,
+          "seconds": 24.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-2-tail-off: body-only resumes",
+          "frame": 1296000,
+          "seconds": 27.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-3-start: prior-tail + new-body",
+          "frame": 1728000,
+          "seconds": 36.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-3-tail-off: body-only resumes",
+          "frame": 1872000,
+          "seconds": 39.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-4-start: prior-tail + new-body",
+          "frame": 2304000,
+          "seconds": 48.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-4-tail-off: body-only resumes",
+          "frame": 2448000,
+          "seconds": 51.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-5-start: prior-tail + new-body",
+          "frame": 2880000,
+          "seconds": 60.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-5-tail-off: body-only resumes",
+          "frame": 3024000,
+          "seconds": 63.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-6-start: prior-tail + new-body",
+          "frame": 3456000,
+          "seconds": 72.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-6-tail-off: body-only resumes",
+          "frame": 3600000,
+          "seconds": 75.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-7-start: prior-tail + new-body",
+          "frame": 4032000,
+          "seconds": 84.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-7-tail-off: body-only resumes",
+          "frame": 4176000,
+          "seconds": 87.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-8-start: prior-tail + new-body",
+          "frame": 4608000,
+          "seconds": 96.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-8-tail-off: body-only resumes",
+          "frame": 4752000,
+          "seconds": 99.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-9-start: prior-tail + new-body",
+          "frame": 5184000,
+          "seconds": 108.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-9-tail-off: body-only resumes",
+          "frame": 5328000,
+          "seconds": 111.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-10-start: prior-tail + new-body",
+          "frame": 5760000,
+          "seconds": 120.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-10-tail-off: body-only resumes",
+          "frame": 5904000,
+          "seconds": 123.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-11-start: prior-tail + new-body",
+          "frame": 6336000,
+          "seconds": 132.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-11-tail-off: body-only resumes",
+          "frame": 6480000,
+          "seconds": 135.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-12-start: prior-tail + new-body",
+          "frame": 6912000,
+          "seconds": 144.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-12-tail-off: body-only resumes",
+          "frame": 7056000,
+          "seconds": 147.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-13-start: prior-tail + new-body",
+          "frame": 7488000,
+          "seconds": 156.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-13-tail-off: body-only resumes",
+          "frame": 7632000,
+          "seconds": 159.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-14-start: prior-tail + new-body",
+          "frame": 8064000,
+          "seconds": 168.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-14-tail-off: body-only resumes",
+          "frame": 8208000,
+          "seconds": 171.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-15-start: prior-tail + new-body",
+          "frame": 8640000,
+          "seconds": 180.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-15-tail-off: body-only resumes",
+          "frame": 8784000,
+          "seconds": 183.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-16-start: prior-tail + new-body",
+          "frame": 9216000,
+          "seconds": 192.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-16-tail-off: body-only resumes",
+          "frame": 9360000,
+          "seconds": 195.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-17-start: prior-tail + new-body",
+          "frame": 9792000,
+          "seconds": 204.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-17-tail-off: body-only resumes",
+          "frame": 9936000,
+          "seconds": 207.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-18-start: prior-tail + new-body",
+          "frame": 10368000,
+          "seconds": 216.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-18-tail-off: body-only resumes",
+          "frame": 10512000,
+          "seconds": 219.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "cycle-19-start: prior-tail + new-body",
+          "frame": 10944000,
+          "seconds": 228.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-19-tail-off: body-only resumes",
+          "frame": 11088000,
+          "seconds": 231.0,
+          "maxAbsAdjacentDelta": 0.000701904296875
+        },
+        {
+          "label": "final-tail-start-no-next-body",
+          "frame": 11520000,
+          "seconds": 240.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        }
+      ]
+    },
+    {
+      "cue": "E",
+      "mode": "20 exact body starts; prior 3s tail sample-added over next body's first 3s; final tail appended",
+      "bodyStarts": [
+        {
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "frame": 576000,
+          "seconds": 12.0
+        },
+        {
+          "frame": 1152000,
+          "seconds": 24.0
+        },
+        {
+          "frame": 1728000,
+          "seconds": 36.0
+        },
+        {
+          "frame": 2304000,
+          "seconds": 48.0
+        },
+        {
+          "frame": 2880000,
+          "seconds": 60.0
+        },
+        {
+          "frame": 3456000,
+          "seconds": 72.0
+        },
+        {
+          "frame": 4032000,
+          "seconds": 84.0
+        },
+        {
+          "frame": 4608000,
+          "seconds": 96.0
+        },
+        {
+          "frame": 5184000,
+          "seconds": 108.0
+        },
+        {
+          "frame": 5760000,
+          "seconds": 120.0
+        },
+        {
+          "frame": 6336000,
+          "seconds": 132.0
+        },
+        {
+          "frame": 6912000,
+          "seconds": 144.0
+        },
+        {
+          "frame": 7488000,
+          "seconds": 156.0
+        },
+        {
+          "frame": 8064000,
+          "seconds": 168.0
+        },
+        {
+          "frame": 8640000,
+          "seconds": 180.0
+        },
+        {
+          "frame": 9216000,
+          "seconds": 192.0
+        },
+        {
+          "frame": 9792000,
+          "seconds": 204.0
+        },
+        {
+          "frame": 10368000,
+          "seconds": 216.0
+        },
+        {
+          "frame": 10944000,
+          "seconds": 228.0
+        }
+      ],
+      "overlapStartFrames": [
+        576000,
+        1152000,
+        1728000,
+        2304000,
+        2880000,
+        3456000,
+        4032000,
+        4608000,
+        5184000,
+        5760000,
+        6336000,
+        6912000,
+        7488000,
+        8064000,
+        8640000,
+        9216000,
+        9792000,
+        10368000,
+        10944000
+      ],
+      "overlapFramesEach": 144000,
+      "tailFrameCount": 144000,
+      "timeline": [
+        {
+          "kind": "body-start",
+          "cycle": 0,
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 1,
+          "frame": 576000,
+          "seconds": 12.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 2,
+          "frame": 1152000,
+          "seconds": 24.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 3,
+          "frame": 1728000,
+          "seconds": 36.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 4,
+          "frame": 2304000,
+          "seconds": 48.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 5,
+          "frame": 2880000,
+          "seconds": 60.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 6,
+          "frame": 3456000,
+          "seconds": 72.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 7,
+          "frame": 4032000,
+          "seconds": 84.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 8,
+          "frame": 4608000,
+          "seconds": 96.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 9,
+          "frame": 5184000,
+          "seconds": 108.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 10,
+          "frame": 5760000,
+          "seconds": 120.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 11,
+          "frame": 6336000,
+          "seconds": 132.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 12,
+          "frame": 6912000,
+          "seconds": 144.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 13,
+          "frame": 7488000,
+          "seconds": 156.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 14,
+          "frame": 8064000,
+          "seconds": 168.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 15,
+          "frame": 8640000,
+          "seconds": 180.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 16,
+          "frame": 9216000,
+          "seconds": 192.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 17,
+          "frame": 9792000,
+          "seconds": 204.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 18,
+          "frame": 10368000,
+          "seconds": 216.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 19,
+          "frame": 10944000,
+          "seconds": 228.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "final-tail-start",
+          "afterCycle": 19,
+          "frame": 11520000,
+          "seconds": 240.0,
+          "frames": 144000,
+          "secondsLong": 3.0
+        }
+      ],
+      "sourceBoundaryMaxAbsDelta": {
+        "body-end-to-body-start-for-naive-repeat": 0.001312255859375,
+        "body-end-to-tail-start": 9.1552734375e-05,
+        "tail-end-to-silence": 0.0
+      },
+      "sourcePeaks": {
+        "body": 0.64190673828125,
+        "tail": 0.002960205078125
+      },
+      "overlapPeakIncreaseDbVsBody": 0.0,
+      "overlapWindowPeakComparison": {
+        "bodyPeakSameFirst3s": 0.57220458984375,
+        "mixedPeakSame3s": 0.57220458984375,
+        "mixedPeakIncrease": 0.0,
+        "maxPositivePerChannelSamplePeakIncrease": 0.00274658203125,
+        "maxPositivePerChannelSamplePeakIncreaseDb": 26.444385894678387,
+        "tailPeak": 0.002960205078125
+      },
+      "output": "E-20cycle-tail-overlap-f32.wav",
+      "outputSha256": "f888b0e2a12bb096ff16198145235dfe8dc1ea77919399cca19d5c62329062d0",
+      "outputBytes": 93312044,
+      "format": "stereo 48 kHz IEEE-float32 WAV; unnormalised additive mix",
+      "frames": 11664000,
+      "durationSeconds": 243.0,
+      "globalPeak": 0.64190673828125,
+      "peakAboveFullScale": 0.0,
+      "overrangeChannelSamples": 0,
+      "rollingOneSecondWindows": 243,
+      "maxOneSecondPeak": 0.64190673828125,
+      "maxOneSecondWindow": {
+        "startFrame": 528000,
+        "peak": 0.64190673828125,
+        "overrangeChannelSamples": 0
+      },
+      "boundaries": [
+        {
+          "label": "cycle-1-start: prior-tail + new-body",
+          "frame": 576000,
+          "seconds": 12.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-1-tail-off: body-only resumes",
+          "frame": 720000,
+          "seconds": 15.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-2-start: prior-tail + new-body",
+          "frame": 1152000,
+          "seconds": 24.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-2-tail-off: body-only resumes",
+          "frame": 1296000,
+          "seconds": 27.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-3-start: prior-tail + new-body",
+          "frame": 1728000,
+          "seconds": 36.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-3-tail-off: body-only resumes",
+          "frame": 1872000,
+          "seconds": 39.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-4-start: prior-tail + new-body",
+          "frame": 2304000,
+          "seconds": 48.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-4-tail-off: body-only resumes",
+          "frame": 2448000,
+          "seconds": 51.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-5-start: prior-tail + new-body",
+          "frame": 2880000,
+          "seconds": 60.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-5-tail-off: body-only resumes",
+          "frame": 3024000,
+          "seconds": 63.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-6-start: prior-tail + new-body",
+          "frame": 3456000,
+          "seconds": 72.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-6-tail-off: body-only resumes",
+          "frame": 3600000,
+          "seconds": 75.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-7-start: prior-tail + new-body",
+          "frame": 4032000,
+          "seconds": 84.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-7-tail-off: body-only resumes",
+          "frame": 4176000,
+          "seconds": 87.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-8-start: prior-tail + new-body",
+          "frame": 4608000,
+          "seconds": 96.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-8-tail-off: body-only resumes",
+          "frame": 4752000,
+          "seconds": 99.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-9-start: prior-tail + new-body",
+          "frame": 5184000,
+          "seconds": 108.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-9-tail-off: body-only resumes",
+          "frame": 5328000,
+          "seconds": 111.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-10-start: prior-tail + new-body",
+          "frame": 5760000,
+          "seconds": 120.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-10-tail-off: body-only resumes",
+          "frame": 5904000,
+          "seconds": 123.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-11-start: prior-tail + new-body",
+          "frame": 6336000,
+          "seconds": 132.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-11-tail-off: body-only resumes",
+          "frame": 6480000,
+          "seconds": 135.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-12-start: prior-tail + new-body",
+          "frame": 6912000,
+          "seconds": 144.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-12-tail-off: body-only resumes",
+          "frame": 7056000,
+          "seconds": 147.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-13-start: prior-tail + new-body",
+          "frame": 7488000,
+          "seconds": 156.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-13-tail-off: body-only resumes",
+          "frame": 7632000,
+          "seconds": 159.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-14-start: prior-tail + new-body",
+          "frame": 8064000,
+          "seconds": 168.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-14-tail-off: body-only resumes",
+          "frame": 8208000,
+          "seconds": 171.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-15-start: prior-tail + new-body",
+          "frame": 8640000,
+          "seconds": 180.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-15-tail-off: body-only resumes",
+          "frame": 8784000,
+          "seconds": 183.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-16-start: prior-tail + new-body",
+          "frame": 9216000,
+          "seconds": 192.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-16-tail-off: body-only resumes",
+          "frame": 9360000,
+          "seconds": 195.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-17-start: prior-tail + new-body",
+          "frame": 9792000,
+          "seconds": 204.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-17-tail-off: body-only resumes",
+          "frame": 9936000,
+          "seconds": 207.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-18-start: prior-tail + new-body",
+          "frame": 10368000,
+          "seconds": 216.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-18-tail-off: body-only resumes",
+          "frame": 10512000,
+          "seconds": 219.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "cycle-19-start: prior-tail + new-body",
+          "frame": 10944000,
+          "seconds": 228.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        },
+        {
+          "label": "cycle-19-tail-off: body-only resumes",
+          "frame": 11088000,
+          "seconds": 231.0,
+          "maxAbsAdjacentDelta": 0.00067138671875
+        },
+        {
+          "label": "final-tail-start-no-next-body",
+          "frame": 11520000,
+          "seconds": 240.0,
+          "maxAbsAdjacentDelta": 9.1552734375e-05
+        }
+      ]
+    },
+    {
+      "cue": "F",
+      "mode": "20 exact body starts; prior 3s tail sample-added over next body's first 3s; final tail appended",
+      "bodyStarts": [
+        {
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "frame": 576000,
+          "seconds": 12.0
+        },
+        {
+          "frame": 1152000,
+          "seconds": 24.0
+        },
+        {
+          "frame": 1728000,
+          "seconds": 36.0
+        },
+        {
+          "frame": 2304000,
+          "seconds": 48.0
+        },
+        {
+          "frame": 2880000,
+          "seconds": 60.0
+        },
+        {
+          "frame": 3456000,
+          "seconds": 72.0
+        },
+        {
+          "frame": 4032000,
+          "seconds": 84.0
+        },
+        {
+          "frame": 4608000,
+          "seconds": 96.0
+        },
+        {
+          "frame": 5184000,
+          "seconds": 108.0
+        },
+        {
+          "frame": 5760000,
+          "seconds": 120.0
+        },
+        {
+          "frame": 6336000,
+          "seconds": 132.0
+        },
+        {
+          "frame": 6912000,
+          "seconds": 144.0
+        },
+        {
+          "frame": 7488000,
+          "seconds": 156.0
+        },
+        {
+          "frame": 8064000,
+          "seconds": 168.0
+        },
+        {
+          "frame": 8640000,
+          "seconds": 180.0
+        },
+        {
+          "frame": 9216000,
+          "seconds": 192.0
+        },
+        {
+          "frame": 9792000,
+          "seconds": 204.0
+        },
+        {
+          "frame": 10368000,
+          "seconds": 216.0
+        },
+        {
+          "frame": 10944000,
+          "seconds": 228.0
+        }
+      ],
+      "overlapStartFrames": [
+        576000,
+        1152000,
+        1728000,
+        2304000,
+        2880000,
+        3456000,
+        4032000,
+        4608000,
+        5184000,
+        5760000,
+        6336000,
+        6912000,
+        7488000,
+        8064000,
+        8640000,
+        9216000,
+        9792000,
+        10368000,
+        10944000
+      ],
+      "overlapFramesEach": 144000,
+      "tailFrameCount": 144000,
+      "timeline": [
+        {
+          "kind": "body-start",
+          "cycle": 0,
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 1,
+          "frame": 576000,
+          "seconds": 12.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 2,
+          "frame": 1152000,
+          "seconds": 24.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 3,
+          "frame": 1728000,
+          "seconds": 36.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 4,
+          "frame": 2304000,
+          "seconds": 48.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 5,
+          "frame": 2880000,
+          "seconds": 60.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 6,
+          "frame": 3456000,
+          "seconds": 72.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 7,
+          "frame": 4032000,
+          "seconds": 84.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 8,
+          "frame": 4608000,
+          "seconds": 96.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 9,
+          "frame": 5184000,
+          "seconds": 108.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 10,
+          "frame": 5760000,
+          "seconds": 120.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 11,
+          "frame": 6336000,
+          "seconds": 132.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 12,
+          "frame": 6912000,
+          "seconds": 144.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 13,
+          "frame": 7488000,
+          "seconds": 156.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 14,
+          "frame": 8064000,
+          "seconds": 168.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 15,
+          "frame": 8640000,
+          "seconds": 180.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 16,
+          "frame": 9216000,
+          "seconds": 192.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 17,
+          "frame": 9792000,
+          "seconds": 204.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 18,
+          "frame": 10368000,
+          "seconds": 216.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 19,
+          "frame": 10944000,
+          "seconds": 228.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "final-tail-start",
+          "afterCycle": 19,
+          "frame": 11520000,
+          "seconds": 240.0,
+          "frames": 144000,
+          "secondsLong": 3.0
+        }
+      ],
+      "sourceBoundaryMaxAbsDelta": {
+        "body-end-to-body-start-for-naive-repeat": 0.00079345703125,
+        "body-end-to-tail-start": 3.0517578125e-05,
+        "tail-end-to-silence": 0.0
+      },
+      "sourcePeaks": {
+        "body": 0.195220947265625,
+        "tail": 0.0009765625
+      },
+      "overlapPeakIncreaseDbVsBody": 0.0,
+      "overlapWindowPeakComparison": {
+        "bodyPeakSameFirst3s": 0.14453125,
+        "mixedPeakSame3s": 0.14483642578125,
+        "mixedPeakIncrease": 0.00030517578125,
+        "maxPositivePerChannelSamplePeakIncrease": 0.0009765625,
+        "maxPositivePerChannelSamplePeakIncreaseDb": 24.60897842756548,
+        "tailPeak": 0.0009765625
+      },
+      "output": "F-20cycle-tail-overlap-f32.wav",
+      "outputSha256": "d7dcf5dbd406898e5d200547a865775410975aab9ac3146f24beac76a70cf0a2",
+      "outputBytes": 93312044,
+      "format": "stereo 48 kHz IEEE-float32 WAV; unnormalised additive mix",
+      "frames": 11664000,
+      "durationSeconds": 243.0,
+      "globalPeak": 0.195220947265625,
+      "peakAboveFullScale": 0.0,
+      "overrangeChannelSamples": 0,
+      "rollingOneSecondWindows": 243,
+      "maxOneSecondPeak": 0.195220947265625,
+      "maxOneSecondWindow": {
+        "startFrame": 432000,
+        "peak": 0.195220947265625,
+        "overrangeChannelSamples": 0
+      },
+      "boundaries": [
+        {
+          "label": "cycle-1-start: prior-tail + new-body",
+          "frame": 576000,
+          "seconds": 12.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-1-tail-off: body-only resumes",
+          "frame": 720000,
+          "seconds": 15.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-2-start: prior-tail + new-body",
+          "frame": 1152000,
+          "seconds": 24.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-2-tail-off: body-only resumes",
+          "frame": 1296000,
+          "seconds": 27.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-3-start: prior-tail + new-body",
+          "frame": 1728000,
+          "seconds": 36.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-3-tail-off: body-only resumes",
+          "frame": 1872000,
+          "seconds": 39.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-4-start: prior-tail + new-body",
+          "frame": 2304000,
+          "seconds": 48.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-4-tail-off: body-only resumes",
+          "frame": 2448000,
+          "seconds": 51.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-5-start: prior-tail + new-body",
+          "frame": 2880000,
+          "seconds": 60.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-5-tail-off: body-only resumes",
+          "frame": 3024000,
+          "seconds": 63.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-6-start: prior-tail + new-body",
+          "frame": 3456000,
+          "seconds": 72.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-6-tail-off: body-only resumes",
+          "frame": 3600000,
+          "seconds": 75.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-7-start: prior-tail + new-body",
+          "frame": 4032000,
+          "seconds": 84.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-7-tail-off: body-only resumes",
+          "frame": 4176000,
+          "seconds": 87.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-8-start: prior-tail + new-body",
+          "frame": 4608000,
+          "seconds": 96.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-8-tail-off: body-only resumes",
+          "frame": 4752000,
+          "seconds": 99.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-9-start: prior-tail + new-body",
+          "frame": 5184000,
+          "seconds": 108.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-9-tail-off: body-only resumes",
+          "frame": 5328000,
+          "seconds": 111.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-10-start: prior-tail + new-body",
+          "frame": 5760000,
+          "seconds": 120.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-10-tail-off: body-only resumes",
+          "frame": 5904000,
+          "seconds": 123.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-11-start: prior-tail + new-body",
+          "frame": 6336000,
+          "seconds": 132.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-11-tail-off: body-only resumes",
+          "frame": 6480000,
+          "seconds": 135.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-12-start: prior-tail + new-body",
+          "frame": 6912000,
+          "seconds": 144.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-12-tail-off: body-only resumes",
+          "frame": 7056000,
+          "seconds": 147.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-13-start: prior-tail + new-body",
+          "frame": 7488000,
+          "seconds": 156.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-13-tail-off: body-only resumes",
+          "frame": 7632000,
+          "seconds": 159.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-14-start: prior-tail + new-body",
+          "frame": 8064000,
+          "seconds": 168.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-14-tail-off: body-only resumes",
+          "frame": 8208000,
+          "seconds": 171.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-15-start: prior-tail + new-body",
+          "frame": 8640000,
+          "seconds": 180.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-15-tail-off: body-only resumes",
+          "frame": 8784000,
+          "seconds": 183.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-16-start: prior-tail + new-body",
+          "frame": 9216000,
+          "seconds": 192.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-16-tail-off: body-only resumes",
+          "frame": 9360000,
+          "seconds": 195.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-17-start: prior-tail + new-body",
+          "frame": 9792000,
+          "seconds": 204.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-17-tail-off: body-only resumes",
+          "frame": 9936000,
+          "seconds": 207.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-18-start: prior-tail + new-body",
+          "frame": 10368000,
+          "seconds": 216.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-18-tail-off: body-only resumes",
+          "frame": 10512000,
+          "seconds": 219.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "cycle-19-start: prior-tail + new-body",
+          "frame": 10944000,
+          "seconds": 228.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        },
+        {
+          "label": "cycle-19-tail-off: body-only resumes",
+          "frame": 11088000,
+          "seconds": 231.0,
+          "maxAbsAdjacentDelta": 0.001495361328125
+        },
+        {
+          "label": "final-tail-start-no-next-body",
+          "frame": 11520000,
+          "seconds": 240.0,
+          "maxAbsAdjacentDelta": 3.0517578125e-05
+        }
+      ]
+    },
+    {
+      "cue": "H",
+      "mode": "20 exact body starts; prior 3s tail sample-added over next body's first 3s; final tail appended",
+      "bodyStarts": [
+        {
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "frame": 576000,
+          "seconds": 12.0
+        },
+        {
+          "frame": 1152000,
+          "seconds": 24.0
+        },
+        {
+          "frame": 1728000,
+          "seconds": 36.0
+        },
+        {
+          "frame": 2304000,
+          "seconds": 48.0
+        },
+        {
+          "frame": 2880000,
+          "seconds": 60.0
+        },
+        {
+          "frame": 3456000,
+          "seconds": 72.0
+        },
+        {
+          "frame": 4032000,
+          "seconds": 84.0
+        },
+        {
+          "frame": 4608000,
+          "seconds": 96.0
+        },
+        {
+          "frame": 5184000,
+          "seconds": 108.0
+        },
+        {
+          "frame": 5760000,
+          "seconds": 120.0
+        },
+        {
+          "frame": 6336000,
+          "seconds": 132.0
+        },
+        {
+          "frame": 6912000,
+          "seconds": 144.0
+        },
+        {
+          "frame": 7488000,
+          "seconds": 156.0
+        },
+        {
+          "frame": 8064000,
+          "seconds": 168.0
+        },
+        {
+          "frame": 8640000,
+          "seconds": 180.0
+        },
+        {
+          "frame": 9216000,
+          "seconds": 192.0
+        },
+        {
+          "frame": 9792000,
+          "seconds": 204.0
+        },
+        {
+          "frame": 10368000,
+          "seconds": 216.0
+        },
+        {
+          "frame": 10944000,
+          "seconds": 228.0
+        }
+      ],
+      "overlapStartFrames": [
+        576000,
+        1152000,
+        1728000,
+        2304000,
+        2880000,
+        3456000,
+        4032000,
+        4608000,
+        5184000,
+        5760000,
+        6336000,
+        6912000,
+        7488000,
+        8064000,
+        8640000,
+        9216000,
+        9792000,
+        10368000,
+        10944000
+      ],
+      "overlapFramesEach": 144000,
+      "tailFrameCount": 144000,
+      "timeline": [
+        {
+          "kind": "body-start",
+          "cycle": 0,
+          "frame": 0,
+          "seconds": 0.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 1,
+          "frame": 576000,
+          "seconds": 12.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 2,
+          "frame": 1152000,
+          "seconds": 24.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 3,
+          "frame": 1728000,
+          "seconds": 36.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 4,
+          "frame": 2304000,
+          "seconds": 48.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 5,
+          "frame": 2880000,
+          "seconds": 60.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 6,
+          "frame": 3456000,
+          "seconds": 72.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 7,
+          "frame": 4032000,
+          "seconds": 84.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 8,
+          "frame": 4608000,
+          "seconds": 96.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 9,
+          "frame": 5184000,
+          "seconds": 108.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 10,
+          "frame": 5760000,
+          "seconds": 120.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 11,
+          "frame": 6336000,
+          "seconds": 132.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 12,
+          "frame": 6912000,
+          "seconds": 144.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 13,
+          "frame": 7488000,
+          "seconds": 156.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 14,
+          "frame": 8064000,
+          "seconds": 168.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 15,
+          "frame": 8640000,
+          "seconds": 180.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 16,
+          "frame": 9216000,
+          "seconds": 192.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 17,
+          "frame": 9792000,
+          "seconds": 204.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 18,
+          "frame": 10368000,
+          "seconds": 216.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "body-start-and-tail-overlap",
+          "cycle": 19,
+          "frame": 10944000,
+          "seconds": 228.0,
+          "overlapFrames": 144000,
+          "overlapSeconds": 3.0
+        },
+        {
+          "kind": "final-tail-start",
+          "afterCycle": 19,
+          "frame": 11520000,
+          "seconds": 240.0,
+          "frames": 144000,
+          "secondsLong": 3.0
+        }
+      ],
+      "sourceBoundaryMaxAbsDelta": {
+        "body-end-to-body-start-for-naive-repeat": 0.00128173828125,
+        "body-end-to-tail-start": 6.103515625e-05,
+        "tail-end-to-silence": 0.0
+      },
+      "sourcePeaks": {
+        "body": 0.159576416015625,
+        "tail": 0.001617431640625
+      },
+      "overlapPeakIncreaseDbVsBody": 0.0,
+      "overlapWindowPeakComparison": {
+        "bodyPeakSameFirst3s": 0.14874267578125,
+        "mixedPeakSame3s": 0.14898681640625,
+        "mixedPeakIncrease": 0.000244140625,
+        "maxPositivePerChannelSamplePeakIncrease": 0.001617431640625,
+        "maxPositivePerChannelSamplePeakIncreaseDb": 28.29946695941636,
+        "tailPeak": 0.001617431640625
+      },
+      "output": "H-20cycle-tail-overlap-f32.wav",
+      "outputSha256": "46a334cd4eaaee24d72e3790a277cc616e6fc6e6e68f85b5168ec3282da9b5e8",
+      "outputBytes": 93312044,
+      "format": "stereo 48 kHz IEEE-float32 WAV; unnormalised additive mix",
+      "frames": 11664000,
+      "durationSeconds": 243.0,
+      "globalPeak": 0.159576416015625,
+      "peakAboveFullScale": 0.0,
+      "overrangeChannelSamples": 0,
+      "rollingOneSecondWindows": 243,
+      "maxOneSecondPeak": 0.159576416015625,
+      "maxOneSecondWindow": {
+        "startFrame": 144000,
+        "peak": 0.159576416015625,
+        "overrangeChannelSamples": 0
+      },
+      "boundaries": [
+        {
+          "label": "cycle-1-start: prior-tail + new-body",
+          "frame": 576000,
+          "seconds": 12.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-1-tail-off: body-only resumes",
+          "frame": 720000,
+          "seconds": 15.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-2-start: prior-tail + new-body",
+          "frame": 1152000,
+          "seconds": 24.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-2-tail-off: body-only resumes",
+          "frame": 1296000,
+          "seconds": 27.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-3-start: prior-tail + new-body",
+          "frame": 1728000,
+          "seconds": 36.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-3-tail-off: body-only resumes",
+          "frame": 1872000,
+          "seconds": 39.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-4-start: prior-tail + new-body",
+          "frame": 2304000,
+          "seconds": 48.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-4-tail-off: body-only resumes",
+          "frame": 2448000,
+          "seconds": 51.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-5-start: prior-tail + new-body",
+          "frame": 2880000,
+          "seconds": 60.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-5-tail-off: body-only resumes",
+          "frame": 3024000,
+          "seconds": 63.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-6-start: prior-tail + new-body",
+          "frame": 3456000,
+          "seconds": 72.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-6-tail-off: body-only resumes",
+          "frame": 3600000,
+          "seconds": 75.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-7-start: prior-tail + new-body",
+          "frame": 4032000,
+          "seconds": 84.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-7-tail-off: body-only resumes",
+          "frame": 4176000,
+          "seconds": 87.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-8-start: prior-tail + new-body",
+          "frame": 4608000,
+          "seconds": 96.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-8-tail-off: body-only resumes",
+          "frame": 4752000,
+          "seconds": 99.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-9-start: prior-tail + new-body",
+          "frame": 5184000,
+          "seconds": 108.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-9-tail-off: body-only resumes",
+          "frame": 5328000,
+          "seconds": 111.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-10-start: prior-tail + new-body",
+          "frame": 5760000,
+          "seconds": 120.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-10-tail-off: body-only resumes",
+          "frame": 5904000,
+          "seconds": 123.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-11-start: prior-tail + new-body",
+          "frame": 6336000,
+          "seconds": 132.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-11-tail-off: body-only resumes",
+          "frame": 6480000,
+          "seconds": 135.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-12-start: prior-tail + new-body",
+          "frame": 6912000,
+          "seconds": 144.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-12-tail-off: body-only resumes",
+          "frame": 7056000,
+          "seconds": 147.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-13-start: prior-tail + new-body",
+          "frame": 7488000,
+          "seconds": 156.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-13-tail-off: body-only resumes",
+          "frame": 7632000,
+          "seconds": 159.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-14-start: prior-tail + new-body",
+          "frame": 8064000,
+          "seconds": 168.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-14-tail-off: body-only resumes",
+          "frame": 8208000,
+          "seconds": 171.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-15-start: prior-tail + new-body",
+          "frame": 8640000,
+          "seconds": 180.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-15-tail-off: body-only resumes",
+          "frame": 8784000,
+          "seconds": 183.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-16-start: prior-tail + new-body",
+          "frame": 9216000,
+          "seconds": 192.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-16-tail-off: body-only resumes",
+          "frame": 9360000,
+          "seconds": 195.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-17-start: prior-tail + new-body",
+          "frame": 9792000,
+          "seconds": 204.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-17-tail-off: body-only resumes",
+          "frame": 9936000,
+          "seconds": 207.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-18-start: prior-tail + new-body",
+          "frame": 10368000,
+          "seconds": 216.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-18-tail-off: body-only resumes",
+          "frame": 10512000,
+          "seconds": 219.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "cycle-19-start: prior-tail + new-body",
+          "frame": 10944000,
+          "seconds": 228.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        },
+        {
+          "label": "cycle-19-tail-off: body-only resumes",
+          "frame": 11088000,
+          "seconds": 231.0,
+          "maxAbsAdjacentDelta": 0.00091552734375
+        },
+        {
+          "label": "final-tail-start-no-next-body",
+          "frame": 11520000,
+          "seconds": 240.0,
+          "maxAbsAdjacentDelta": 6.103515625e-05
+        }
+      ]
+    },
+    {
+      "cue": "C",
+      "mode": "single unchanged body followed by exact 3s tail; no repeat/overlap",
+      "timeline": [
+        {
+          "kind": "body-start",
+          "frame": 0,
+          "seconds": 0.0,
+          "frames": 144000
+        },
+        {
+          "kind": "tail-start",
+          "frame": 144000,
+          "seconds": 3.0,
+          "frames": 144000,
+          "secondsLong": 3.0
+        }
+      ],
+      "sourceBoundaryMaxAbsDelta": {
+        "body-end-to-tail-start": 0.0,
+        "tail-end-to-silence": 0.0
+      },
+      "sourcePeaks": {
+        "body": 0.17510986328125,
+        "tail": 3.0517578125e-05
+      },
+      "output": "C-single-body-plus-tail-f32.wav",
+      "outputSha256": "1c7c14b6a1457533abffa549648bea5f5e2bce24a0be5afb43ca11f3f14fb198",
+      "outputBytes": 2304044,
+      "format": "stereo 48 kHz IEEE-float32 WAV; unnormalised additive mix",
+      "frames": 288000,
+      "durationSeconds": 6.0,
+      "globalPeak": 0.17510986328125,
+      "peakAboveFullScale": 0.0,
+      "overrangeChannelSamples": 0,
+      "rollingOneSecondWindows": 6,
+      "maxOneSecondPeak": 0.17510986328125,
+      "maxOneSecondWindow": {
+        "startFrame": 0,
+        "peak": 0.17510986328125,
+        "overrangeChannelSamples": 0
+      },
+      "boundaries": [
+        {
+          "label": "body-tail-transition",
+          "frame": 144000,
+          "seconds": 3.0,
+          "maxAbsAdjacentDelta": 0.0
+        }
+      ]
+    },
+    {
+      "cue": "G",
+      "mode": "single unchanged body followed by exact 3s tail; no repeat/overlap",
+      "timeline": [
+        {
+          "kind": "body-start",
+          "frame": 0,
+          "seconds": 0.0,
+          "frames": 288000
+        },
+        {
+          "kind": "tail-start",
+          "frame": 288000,
+          "seconds": 6.0,
+          "frames": 144000,
+          "secondsLong": 3.0
+        }
+      ],
+      "sourceBoundaryMaxAbsDelta": {
+        "body-end-to-tail-start": 0.0001220703125,
+        "tail-end-to-silence": 0.0
+      },
+      "sourcePeaks": {
+        "body": 0.156585693359375,
+        "tail": 0.002410888671875
+      },
+      "output": "G-single-body-plus-tail-f32.wav",
+      "outputSha256": "6a968f96810d4fc5364b6b402a77063938b658e0208357b02a22190920885c68",
+      "outputBytes": 3456044,
+      "format": "stereo 48 kHz IEEE-float32 WAV; unnormalised additive mix",
+      "frames": 432000,
+      "durationSeconds": 9.0,
+      "globalPeak": 0.156585693359375,
+      "peakAboveFullScale": 0.0,
+      "overrangeChannelSamples": 0,
+      "rollingOneSecondWindows": 9,
+      "maxOneSecondPeak": 0.156585693359375,
+      "maxOneSecondWindow": {
+        "startFrame": 0,
+        "peak": 0.156585693359375,
+        "overrangeChannelSamples": 0
+      },
+      "boundaries": [
+        {
+          "label": "body-tail-transition",
+          "frame": 288000,
+          "seconds": 6.0,
+          "maxAbsAdjacentDelta": 0.0001220703125
+        }
+      ]
+    }
+  ]
+}

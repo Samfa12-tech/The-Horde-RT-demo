@@ -29,7 +29,18 @@ struct GameSimulationConfig
     float playerStartYawRadians = 0.0f;
     float playerStartPitchRadians = 0.0f;
     float movementSpeedMetresPerSecond = 1.9f;
+    horde::gameplay::items::PlayerMountProfile playerMountProfile =
+        horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
 };
+
+// Keep the historical constructor configuration available for deterministic
+// legacy fixtures. Applications explicitly select the owner-accepted profile.
+inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
+{
+    GameSimulationConfig config;
+    config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
+    return config;
+}
 
 class GameSimulation
 {

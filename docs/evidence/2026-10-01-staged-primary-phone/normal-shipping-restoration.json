@@ -1,0 +1,16 @@
+{
+  "member": "control",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "installedApkSha256": "8ead0a2ba632ba490027ee8806d7e135002fb09713fad14390fcd2186a5bf175",
+  "utc": "2026-10-01T04:08:56.9630330Z",
+  "publishable": false,
+  "appDataCleared": false,
+  "stableAppTouched": false,
+  "executionOrganisation": "normal",
+  "profileObserver": false,
+  "normalControlSource": "59cb057",
+  "candidateSource": "783f1be+retained-dirty-inputs",
+  "sourcePairing": "See sealed artifact/source receipts; never retroactively claim these are the same clean commit."
+}

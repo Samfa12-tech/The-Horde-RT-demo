@@ -1,0 +1,3 @@
+command=C:\VulkanSDK\1.4.350.0\Bin\spirv-dis.exe C:\Dev\tmp\horde-primary-hit-profile-20261001\audit-primary-hit-packaged-20261001-retry2\reference-shipping_mobile_generic_dielectric.spv -o <temporary-disassembly>
+exitCode=0
+result=passed; temporary disassembly removed

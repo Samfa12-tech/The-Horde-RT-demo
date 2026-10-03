@@ -1,6 +1,8 @@
 #include "vulkan/RtCapabilityReport.h"
+#include "telemetry/RtEvidencePublication.h"
 
 #include <iomanip>
+#include <locale>
 #include <sstream>
 #include <string>
 
@@ -39,7 +41,16 @@ std::string JsonEscape(const std::string& value)
             escaped << "\\t";
             break;
         default:
-            escaped << c;
+            if (static_cast<unsigned char>(c) < 0x20u)
+            {
+                constexpr char hex[] = "0123456789abcdef";
+                escaped << "\\u00" << hex[static_cast<unsigned char>(c) >> 4u]
+                        << hex[static_cast<unsigned char>(c) & 0x0fu];
+            }
+            else
+            {
+                escaped << c;
+            }
             break;
         }
     }
@@ -54,6 +65,13 @@ std::string FormatVkPackedVersion(const std::uint32_t value)
     return std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(patch);
 }
 
+std::string FormatConformanceVersion(const DriverProperties& driver)
+{
+    const auto& v = driver.conformanceVersion;
+    return std::to_string(v[0]) + "." + std::to_string(v[1]) + "." +
+           std::to_string(v[2]) + "." + std::to_string(v[3]);
+}
+
 bool IsMeasured(const float value)
 {
     return value > 0.0f;
@@ -64,17 +82,34 @@ bool IsResolutionMeasured(const std::uint32_t width, const std::uint32_t height)
     return width > 0 && height > 0;
 }
 
+std::string JsonLegacyFloat(const float value, const bool available)
+{
+    if (!available) return "\"N/A\"";
+    std::ostringstream number;
+    number.imbue(std::locale::classic());
+    number << std::fixed << std::setprecision(6) << value;
+    return number.str();
+}
+
 } // namespace
 
-std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities)
+std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities,
+    const horde::telemetry::RtLifecyclePublishedState* evidence, const bool observerAvailable)
 {
     std::ostringstream out;
     out << "Backend: " << capabilities.backend << '\n';
     out << "RT mode: " << ToString(capabilities.rtMode) << '\n';
+    out << "Execution backend: " << ToString(capabilities.rtScene.executionBackend) << '\n';
     out << "GPU name: " << capabilities.identity.gpuName << '\n';
     out << "Vendor ID: " << capabilities.identity.vendorId << '\n';
     out << "Device ID: " << capabilities.identity.deviceId << '\n';
-    out << "Driver version: " << FormatVkPackedVersion(capabilities.identity.driverVersion) << '\n';
+    out << "Driver version: " << FormatDriverVersionText(capabilities.identity.driverVersion) << '\n';
+    const auto& driver = capabilities.identity.driverProperties;
+    out << "Driver properties available: " << YesNo(driver.available) << '\n';
+    out << "Driver ID: " << (driver.available ? std::to_string(driver.id) : "N/A") << '\n';
+    out << "Driver name: " << (driver.available ? driver.name : "N/A") << '\n';
+    out << "Driver info: " << (driver.available ? driver.info : "N/A") << '\n';
+    out << "Driver conformance version: " << (driver.available ? FormatConformanceVersion(driver) : "N/A") << '\n';
     out << "Vulkan API version: " << FormatVkPackedVersion(capabilities.identity.vulkanApiVersion) << '\n';
     out << "VK_KHR_acceleration_structure: " << YesNo(capabilities.extensions.accelerationStructure) << '\n';
     out << "VK_KHR_ray_tracing_pipeline: " << YesNo(capabilities.extensions.rayTracingPipeline) << '\n';
@@ -125,6 +160,16 @@ std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities)
         out << "RT scene dispatch resolution: N/A\n";
     }
     out << "RT scene presented: " << (capabilities.rtScene.presented ? "yes" : "no") << '\n';
+    std::string frameJson;
+    std::string frameText;
+    std::string frameError;
+    (void)horde::telemetry::SerializeRtEvidencePublication(
+        evidence ? *evidence : horde::telemetry::RtLifecyclePublishedState{},
+        evidence == nullptr ? horde::telemetry::RtEvidencePublicationSource::Unavailable :
+            observerAvailable ? horde::telemetry::RtEvidencePublicationSource::ActiveObserver :
+                horde::telemetry::RtEvidencePublicationSource::StoppedObserver,
+        frameJson, frameText, frameError);
+    out << frameText;
 
     if (!capabilities.diagnostics.empty())
     {
@@ -138,17 +183,28 @@ std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities)
     return out.str();
 }
 
-std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities)
+std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities,
+    const horde::telemetry::RtLifecyclePublishedState* evidence, const bool observerAvailable)
 {
     std::ostringstream out;
+    out.imbue(std::locale::classic());
     out << "{\n";
     out << "  \"backend\": \"" << JsonEscape(capabilities.backend) << "\",\n";
     out << "  \"rtMode\": \"" << ToString(capabilities.rtMode) << "\",\n";
+    out << "  \"executionBackend\": \"" << ToString(capabilities.rtScene.executionBackend) << "\",\n";
     out << "  \"gpuName\": \"" << JsonEscape(capabilities.identity.gpuName) << "\",\n";
     out << "  \"vendorId\": " << capabilities.identity.vendorId << ",\n";
     out << "  \"deviceId\": " << capabilities.identity.deviceId << ",\n";
     out << "  \"driverVersion\": " << capabilities.identity.driverVersion << ",\n";
-    out << "  \"driverVersionText\": \"" << FormatVkPackedVersion(capabilities.identity.driverVersion) << "\",\n";
+    out << "  \"driverVersionText\": \"" << FormatDriverVersionText(capabilities.identity.driverVersion) << "\",\n";
+    const auto& driver = capabilities.identity.driverProperties;
+    out << "  \"driverProperties\": {\n";
+    out << "    \"available\": " << (driver.available ? "true" : "false") << ",\n";
+    out << "    \"driverId\": " << (driver.available ? std::to_string(driver.id) : "null") << ",\n";
+    out << "    \"driverName\": " << (driver.available ? "\"" + JsonEscape(driver.name) + "\"" : "null") << ",\n";
+    out << "    \"driverInfo\": " << (driver.available ? "\"" + JsonEscape(driver.info) + "\"" : "null") << ",\n";
+    out << "    \"conformanceVersion\": " << (driver.available ? "\"" + FormatConformanceVersion(driver) + "\"" : "null") << '\n';
+    out << "  },\n";
     out << "  \"vulkanApiVersion\": " << capabilities.identity.vulkanApiVersion << ",\n";
     out << "  \"vulkanApiVersionText\": \"" << FormatVkPackedVersion(capabilities.identity.vulkanApiVersion) << "\",\n";
     out << "  \"extensions\": {\n";
@@ -168,14 +224,14 @@ std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities)
     out << "    \"width\": " << capabilities.performance.internalRenderWidth << ",\n";
     out << "    \"height\": " << capabilities.performance.internalRenderHeight << "\n";
     out << "  },\n";
-    out << "  \"fps\": " << (IsMeasured(capabilities.performance.fps) ? std::to_string(capabilities.performance.fps) : "\"N/A\"") << ",\n";
-    out << "  \"frameTimeMs\": " << (capabilities.performance.frameTimeMs > 0.0f ? std::to_string(capabilities.performance.frameTimeMs) : "\"N/A\"") << ",\n";
+    out << "  \"fps\": " << JsonLegacyFloat(capabilities.performance.fps, IsMeasured(capabilities.performance.fps)) << ",\n";
+    out << "  \"frameTimeMs\": " << JsonLegacyFloat(capabilities.performance.frameTimeMs, capabilities.performance.frameTimeMs > 0.0f) << ",\n";
     out << "  \"gpuRtTiming\": {\n";
     out << "    \"status\": \"" << JsonEscape(capabilities.performance.gpuRt.status) << "\",\n";
     out << "    \"supported\": " << (capabilities.performance.gpuRt.supported ? "true" : "false") << ",\n";
     out << "    \"valid\": " << (capabilities.performance.gpuRt.valid ? "true" : "false") << ",\n";
-    out << "    \"latestMs\": " << (capabilities.performance.gpuRt.valid ? std::to_string(capabilities.performance.gpuRt.latestMs) : "\"N/A\"") << ",\n";
-    out << "    \"averageMs\": " << (capabilities.performance.gpuRt.valid ? std::to_string(capabilities.performance.gpuRt.averageMs) : "\"N/A\"") << ",\n";
+    out << "    \"latestMs\": " << JsonLegacyFloat(capabilities.performance.gpuRt.latestMs, capabilities.performance.gpuRt.valid) << ",\n";
+    out << "    \"averageMs\": " << JsonLegacyFloat(capabilities.performance.gpuRt.averageMs, capabilities.performance.gpuRt.valid) << ",\n";
     out << "    \"timestampPeriodNanoseconds\": " << capabilities.performance.gpuRt.timestampPeriodNanoseconds << ",\n";
     out << "    \"timestampValidBits\": " << capabilities.performance.gpuRt.timestampValidBits << ",\n";
     out << "    \"sampleCount\": " << capabilities.performance.gpuRt.sampleCount << ",\n";
@@ -200,7 +256,17 @@ std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities)
         out << "\"" << JsonEscape(capabilities.diagnostics[i]) << "\"";
     }
 
-    out << "]\n";
+    out << "],\n";
+    std::string frameJson;
+    std::string frameText;
+    std::string frameError;
+    (void)horde::telemetry::SerializeRtEvidencePublication(
+        evidence ? *evidence : horde::telemetry::RtLifecyclePublishedState{},
+        evidence == nullptr ? horde::telemetry::RtEvidencePublicationSource::Unavailable :
+            observerAvailable ? horde::telemetry::RtEvidencePublicationSource::ActiveObserver :
+                horde::telemetry::RtEvidencePublicationSource::StoppedObserver,
+        frameJson, frameText, frameError);
+    out << "  \"rtFrameEvidence\": " << frameJson;
     out << "}\n";
     return out.str();
 }

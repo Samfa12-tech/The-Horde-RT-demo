@@ -1,7 +1,7 @@
 #include "scene/assets/GltfDocument.h"
 
 #define CGLTF_IMPLEMENTATION
-#include "third_party/cgltf/cgltf.h"
+#include "cgltf/cgltf.h"
 
 #include <cstdint>
 #include <fstream>

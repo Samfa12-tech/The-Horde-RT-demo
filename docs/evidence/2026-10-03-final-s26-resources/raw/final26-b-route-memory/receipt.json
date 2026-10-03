@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "runId": "final26-b-route-20261003",
+    "sourceCommit": "3d26ad64a3db1e1e1b7965587a72fd114189bdf6",
+    "installedApkSha256": "5f05a13102a6bf2205cb9af38124139469dd7605a40e3e99217570d835b7c70e",
+    "workload": "showcase-route-v1",
+    "deviceModel": "SM-S948B",
+    "serial": "R5GL219SZGK",
+    "package": "com.samfa12.hordelanternrt.benchmark",
+    "instrumentation": "Shipping",
+    "quality": "Mobile",
+    "scalePercent": 75,
+    "backend": "RayTracingPipeline"
+  },
+  "boundaryLabels": [
+    "scheduled-live-1",
+    "scheduled-live-2",
+    "scheduled-live-3"
+  ],
+  "boundaryLabelsAre": "operator-declared schedule labels; not independently observed or frame-aligned",
+  "requestedSampleCount": 3,
+  "intervalSeconds": 20,
+  "expectedSampleIndices": [
+    1,
+    2,
+    3
+  ],
+  "startedUtc": "2026-10-02T22:41:16.1738356Z",
+  "completedUtc": "2026-10-02T22:41:58.7551320Z",
+  "status": "complete",
+  "capturedSamples": 3,
+  "capturedSampleIndices": [
+    1,
+    2,
+    3
+  ],
+  "missingSampleIndices": [],
+  "failedAtSample": null,
+  "sampleGaps": [],
+  "thermalSource": "same trial context-samples.jsonl, nearest timestamp only; not frame-aligned",
+  "gpuCounters": {
+    "status": "not-collected",
+    "gap": "Supported vendor/driver counters were not inventoried or captured by this sidecar."
+  },
+  "measurementCaveat": "dumpsys/proc reads add observer work; per-sample collection duration is recorded. This file does not infer FPS or DRAM traffic.",
+  "recordTrafficEstimate": {
+    "status": "analytical-only-not-collected",
+    "note": "128-byte/pixel records distributed across 3 pages at example 1080x2235: logical 309 MB and estimated 618 MB read/write per frame. Analytical estimate only; not an observed allocation or measured DRAM traffic."
+  },
+  "processId": "5426",
+  "processStartTicks": 93542614
+}

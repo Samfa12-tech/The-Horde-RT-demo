@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "sourceCommit": "53624d83dd984a4cc479755dae2886623e7069bb",
+  "executableSha256": "f970be463e3f81bf3a50b426a721811e0914fe9b911800203d712a6ccb23a754",
+  "instrumentation": "Diagnostic",
+  "quality": "Mobile",
+  "payloadRows": 0,
+  "existingNormalBinary": false,
+  "investigationOnly": true,
+  "performanceEvidence": false,
+  "runs": [
+    {
+      "backend": "pipeline",
+      "checkpoint": null,
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-world-plane-native-mobile-route-20261002\\pipeline"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": null,
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-world-plane-native-mobile-route-20261002\\compute",
+        "--require-rayquery-compute"
+      ]
+    }
+  ]
+}

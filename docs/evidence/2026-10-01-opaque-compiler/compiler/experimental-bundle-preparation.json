@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "classification": "nonproduction experimental RT raygen package; no promotion or performance claim",
+  "sourceRoot": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\source-eaf",
+  "sourceHead": "eafbf8262442a82e0835edf5cf5306d718e64633",
+  "externalCompilerRecipe": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\compile-retained-investigation.ps1",
+  "externalCompilerRecipeSha256": "8d77d583805679be7d92da1a97c1e92c4483dc3708b95734112cc89f0e71e336",
+  "catalogPath": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\source-eaf\\tools\\raygen-variant-catalog.json",
+  "catalogSha256": "79e705812ba56951f4e3b265d52d65441c5348f670509972dfb354f64fde74cd",
+  "generatedAdapterPath": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\source-eaf\\src\\vulkan\\raytracing\\RtPipelineVariantCatalog.generated.h",
+  "generatedAdapterSha256": "d698ea45028c477d7a5ad954d63b0f5a0d4d41014112d396d994c7f6c47dc64a",
+  "originalFrozenCatalog": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\original-frozen-raygen-variant-catalog.json",
+  "originalFrozenCatalogSha256": "4330a0711733a3c73b49eef350c4ed7a1672abe4bc4510daa1f767ef5c529bd1",
+  "originalFrozenAdapter": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\package-provenance\\original-frozen-RtPipelineVariantCatalog.generated.h",
+  "originalFrozenAdapterSha256": "98b8924f36238c5c4cdac92428192564a3260d6cf63e4255a4c813c051617f0e",
+  "adapterCommands": [
+    "tools/GenerateRtPipelineVariantCatalog.ps1 -Write -CatalogPath tools/raygen-variant-catalog.json -OutputPath src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+    "tools/GenerateRtPipelineVariantCatalog.ps1 -Check -CatalogPath tools/raygen-variant-catalog.json -OutputPath src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h"
+  ],
+  "adapterCheck": "passed; unchanged adapter validates root schema, actual include words/hashes, and emitted C++ header",
+  "variantEvidence": [
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "originalDependencySha256": "3cfda44c46ac18f813b94cd457344594b7cc4bfac191bfe62537a4da0aada2e7",
+      "preprocessedSourceSha256": "eaa0b8a9f7b1a87fce83e34ab8568c524b1a8ed4160009bf35fc1a89e728713f",
+      "controlModuleSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "retainedModuleSha256": "14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3",
+      "retainedBytes": 212452,
+      "retainedWords": 53113,
+      "retainedAtomicInstructions": 0,
+      "retainedHasBinding22": false,
+      "includeSha256": "7564a0ff6191f788baf697331bb4096e87542734e6df75269ddd2213404355ff",
+      "investigationDependencySha256": "44a107018ddced6ae0902aab1e4221c491226647a90711dda60860ab730ecf3a"
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "originalDependencySha256": "ad5e1af53dac790395b3651ccf8447d3e4da11aede0cc67e31ed9acff2161107",
+      "preprocessedSourceSha256": "4263a710ef0d381f3a6920ae9379f8f59f154d5a0280154b1459b0445838d8c2",
+      "controlModuleSha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+      "retainedModuleSha256": "4ba45dce815f5e1af8282fd40d6d650e144556992b939a0254ff28a0e94831b4",
+      "retainedBytes": 219932,
+      "retainedWords": 54983,
+      "retainedAtomicInstructions": 30,
+      "retainedHasBinding22": true,
+      "includeSha256": "0c1d4f2af6660b374e319a0dc312d5023f7bdd2008a5bf23b1880ef92f631604",
+      "investigationDependencySha256": "950382966d20fe557e555c57bc86ae89f288a5e4e6bde1e927079e20aa9a2f20"
+    }
+  ],
+  "interpretation": [
+    "The frozen production compiler/manifest/budget gates were not edited or weakened; the experimental compiler recipe is distinct and external.",
+    "The experimental catalog retains wire-compatible frozen schema/status because the unchanged adapter requires it; its generator identity and strategy label explicitly identify this nonproduction investigation.",
+    "The Diagnostic retained module has 30 static atomic instructions and binding 22; the normal Diagnostic/Mobile control has 5. No runtime counter equivalence is asserted."
+  ]
+}

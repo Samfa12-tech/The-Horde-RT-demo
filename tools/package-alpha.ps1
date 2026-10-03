@@ -35,6 +35,8 @@ function Find-LatestVersionedTool {
 }
 
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
+. (Join-Path $PSScriptRoot "music-asset-policy.ps1")
+$null = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
 $outputFull = [IO.Path]::GetFullPath($OutputRoot)
 $allowedRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "releases\candidates"))
 $allowedPrefix = $allowedRoot.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
@@ -174,6 +176,8 @@ $assetCopies = @(
     @{ Source = "assets\models\player\runtime\asset.manifest.json"; Destination = "assets\models\player\runtime" },
     @{ Source = "assets\models\player\runtime\clip-manifest.json"; Destination = "assets\models\player\runtime" },
     @{ Source = "assets\models\player\runtime\gothic-traveller-lod0.runtime.glb"; Destination = "assets\models\player\runtime" },
+    @{ Source = "assets\models\player\viewmodel\runtime\asset.manifest.json"; Destination = "assets\models\player\viewmodel\runtime" },
+    @{ Source = "assets\models\player\viewmodel\runtime\gothic-traveller-viewmodel.runtime.glb"; Destination = "assets\models\player\viewmodel\runtime" },
     @{ Source = "assets\textures\props\runtime\asset.manifest.json"; Destination = "assets\textures\props\runtime" },
     @{ Source = "assets\textures\props\runtime\base-color.windows.ktx2"; Destination = "assets\textures\props\runtime" },
     @{ Source = "assets\textures\props\runtime\normal.windows.ktx2"; Destination = "assets\textures\props\runtime" },
@@ -191,10 +195,12 @@ Copy-Item -Path (Join-Path $repoRoot "assets\audio\filmcow\*.wav") -Destination 
 $pixabayAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
 New-Item -ItemType Directory -Force -Path $pixabayAudioDestination | Out-Null
 Copy-Item -Path (Join-Path $repoRoot "assets\audio\pixabay\*.wav") -Destination $pixabayAudioDestination
+$null = Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets")
 
 $windowsZip = Join-Path $outputFull "$baseName-Windows-x64.zip"
 if (Test-Path -LiteralPath $windowsZip) { Remove-Item -LiteralPath $windowsZip -Force }
 Compress-Archive -Path (Join-Path $windowsStage "*") -DestinationPath $windowsZip -CompressionLevel Optimal
+$null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip
 
 Push-Location (Join-Path $repoRoot "android")
 try {
@@ -207,6 +213,7 @@ try {
 $debugApk = Join-Path $repoRoot "android\app\build\outputs\apk\debug\app-debug.apk"
 $debugCandidate = Join-Path $outputFull "$baseName-Android-preview-debug-signed.apk"
 Copy-Item -LiteralPath $debugApk -Destination $debugCandidate -Force
+$null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $debugCandidate
 
 $signedRelease = Join-Path $repoRoot "android\app\build\outputs\apk\release\app-release.apk"
 $unsignedRelease = Join-Path $repoRoot "android\app\build\outputs\apk\release\app-release-unsigned.apk"
@@ -223,6 +230,7 @@ if ($releaseSigningConfigured -and (Test-Path -LiteralPath $signedRelease)) {
 } else {
     throw "No unsigned Android release APK was produced."
 }
+$null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $androidCandidate
 
 $androidSdkRoot = if (-not [string]::IsNullOrWhiteSpace($env:ANDROID_HOME)) {
     $env:ANDROID_HOME
@@ -301,6 +309,8 @@ try {
         'assets/models/player/runtime/asset.manifest.json',
         'assets/models/player/runtime/clip-manifest.json',
         'assets/models/player/runtime/gothic-traveller-lod0.runtime.glb',
+        'assets/models/player/viewmodel/runtime/asset.manifest.json',
+        'assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb',
         'assets/textures/props/runtime/asset.manifest.json',
         'assets/textures/props/runtime/base-color.android.ktx2',
         'assets/textures/props/runtime/normal.android.ktx2',
@@ -377,6 +387,8 @@ try {
         "assets/models/player/runtime/asset.manifest.json",
         "assets/models/player/runtime/clip-manifest.json",
         "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+        "assets/models/player/viewmodel/runtime/asset.manifest.json",
+        "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
         "assets/textures/props/runtime/asset.manifest.json",
         "assets/textures/props/runtime/base-color.windows.ktx2",
         "assets/textures/props/runtime/normal.windows.ktx2",

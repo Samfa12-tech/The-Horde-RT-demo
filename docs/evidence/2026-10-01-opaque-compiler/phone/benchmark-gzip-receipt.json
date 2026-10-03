@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "classification": "Four completed actual run benchmark JSON reports compressed losslessly; no APK/ELF included",
+  "items": [
+    {
+      "run": "opaque-compiler-control-a1-20261001",
+      "originalSource": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\phone\\opaque-compiler-control-a1-20261001\\opaque-compiler-control-a1-20261001\\benchmark.json",
+      "originalBytes": 1468419,
+      "originalSha256": "c25a522de35a2cd1ae2c8794dece9c341f0c046c98022f3272dbe49f47350f54",
+      "gzipPath": "phone\\opaque-compiler-control-a1-20261001\\benchmark.json.gz",
+      "gzipBytes": 68620,
+      "gzipSha256": "0fca7a535406d4919ef96cb6e8e27ed23f0cc2f7350bc9bfbd1169cd60427c6b",
+      "decompressedBytes": 1468419,
+      "decompressedSha256": "c25a522de35a2cd1ae2c8794dece9c341f0c046c98022f3272dbe49f47350f54",
+      "roundTripExact": true
+    },
+    {
+      "run": "opaque-compiler-profile-b1-20261001",
+      "originalSource": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\phone\\opaque-compiler-profile-b1-20261001\\opaque-compiler-profile-b1-20261001\\benchmark.json",
+      "originalBytes": 1468418,
+      "originalSha256": "026d370446424b6c83492e1619b88975045af8ec187f419294ad604b2773f929",
+      "gzipPath": "phone\\opaque-compiler-profile-b1-20261001\\benchmark.json.gz",
+      "gzipBytes": 68411,
+      "gzipSha256": "2c8f6a29ff832b839844a1a16e854fcd058f6e4789dcbd4218ab6d3c8f90eea9",
+      "decompressedBytes": 1468418,
+      "decompressedSha256": "026d370446424b6c83492e1619b88975045af8ec187f419294ad604b2773f929",
+      "roundTripExact": true
+    },
+    {
+      "run": "opaque-compiler-profile-b2-20261001",
+      "originalSource": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\phone\\opaque-compiler-profile-b2-20261001\\opaque-compiler-profile-b2-20261001\\benchmark.json",
+      "originalBytes": 1472096,
+      "originalSha256": "68a47eb2a6de92f8d1bc97126fa2d812c3fcc28202cb801066d9997232323189",
+      "gzipPath": "phone\\opaque-compiler-profile-b2-20261001\\benchmark.json.gz",
+      "gzipBytes": 68692,
+      "gzipSha256": "e2fe0f4d969b6d663819983eabc8cddcbd54b948febabb29677d94905bfb1c7e",
+      "decompressedBytes": 1472096,
+      "decompressedSha256": "68a47eb2a6de92f8d1bc97126fa2d812c3fcc28202cb801066d9997232323189",
+      "roundTripExact": true
+    },
+    {
+      "run": "opaque-compiler-control-a2-20261001",
+      "originalSource": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\phone\\opaque-compiler-control-a2-20261001\\opaque-compiler-control-a2-20261001\\benchmark.json",
+      "originalBytes": 1468419,
+      "originalSha256": "f4e08727bffff0905764134be0ce775707ef0054ecdebf967f7b74d991ff33da",
+      "gzipPath": "phone\\opaque-compiler-control-a2-20261001\\benchmark.json.gz",
+      "gzipBytes": 68728,
+      "gzipSha256": "8ba0f50775f2f9c4675105fe5f1ca52d05c40cc80152fd83f617048387a0268a",
+      "decompressedBytes": 1468419,
+      "decompressedSha256": "f4e08727bffff0905764134be0ce775707ef0054ecdebf967f7b74d991ff33da",
+      "roundTripExact": true
+    }
+  ]
+}

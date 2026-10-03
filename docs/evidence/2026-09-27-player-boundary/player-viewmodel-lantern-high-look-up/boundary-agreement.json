@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "geometricMatchRoundingMetres": 1e-06,
+  "source": "Exact CPU uploads, not GPU readback or image acceptance",
+  "inputs": {
+    "world_bind": {
+      "path": "C:\\Dev\\tmp\\horde-gauntlet-proportion-20260927-a\\world-grip-calibrated.runtime.glb",
+      "sha256": "baa5b7dc78a180eda94de813c71f890e46a27cc19b1d3122330ba873ec75c23a"
+    },
+    "view_bind": {
+      "path": "C:\\Dev\\tmp\\horde-gauntlet-proportion-20260927-a\\gothic-traveller-viewmodel.runtime.glb",
+      "sha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b"
+    },
+    "world_obj": {
+      "path": "C:\\Dev\\tmp\\horde-paired-player-geometry-20260927-b\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.player-world-body.obj",
+      "sha256": "b2532239880bffd5f5664dc6c36ecd47f3cf2bb19dbe192648733dd30ea0e36d"
+    },
+    "view_obj": {
+      "path": "C:\\Dev\\tmp\\horde-paired-player-geometry-20260927-b\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.obj",
+      "sha256": "3101d1fd12c4513a75c41058a82fe5b9d5942add630653b4dcf706d66ceb460c"
+    }
+  },
+  "sharedModelToWorld": [
+    4.37113883e-08,
+    0.0,
+    -1.0,
+    -11.216897,
+    -0.0,
+    1.0,
+    0.0,
+    -0.949749291,
+    1.0,
+    0.0,
+    4.37113883e-08,
+    -15.1976004
+  ],
+  "boundaryEdges": 278,
+  "loops": [
+    {
+      "bindCentre": [
+        -0.3699261,
+        1.21481438,
+        0.1216624
+      ],
+      "vertices": 50,
+      "edges": 50,
+      "degreeCounts": {
+        "2": 50
+      },
+      "retainedWorldAdjacency": {
+        "NearFacePrimaryMasked": 42,
+        "missing": 8
+      },
+      "posedEndpointComparisons": 84,
+      "maximumSeparationMetres": 0.1049856579643064,
+      "medianSeparationMetres": 0.004526920531983731
+    },
+    {
+      "bindCentre": [
+        -0.22628833870967743,
+        1.3330133387096774,
+        -0.09270864516129032
+      ],
+      "vertices": 62,
+      "edges": 62,
+      "degreeCounts": {
+        "2": 62
+      },
+      "retainedWorldAdjacency": {
+        "missing": 24,
+        "NearFacePrimaryMasked": 38
+      },
+      "posedEndpointComparisons": 76,
+      "maximumSeparationMetres": 0.06894504889455179,
+      "medianSeparationMetres": 0.0
+    },
+    {
+      "bindCentre": [
+        0.22565699099099099,
+        1.3654035585585587,
+        -0.10934921621621621
+      ],
+      "vertices": 111,
+      "edges": 112,
+      "degreeCounts": {
+        "2": 110,
+        "4": 1
+      },
+      "retainedWorldAdjacency": {
+        "NearFacePrimaryMasked": 82,
+        "missing": 30
+      },
+      "posedEndpointComparisons": 164,
+      "maximumSeparationMetres": 0.04296970720110451,
+      "medianSeparationMetres": 0.0
+    },
+    {
+      "bindCentre": [
+        0.3730609074074074,
+        1.2208809814814814,
+        0.10807274074074075
+      ],
+      "vertices": 54,
+      "edges": 54,
+      "degreeCounts": {
+        "2": 54
+      },
+      "retainedWorldAdjacency": {
+        "missing": 18,
+        "NearFacePrimaryMasked": 36
+      },
+      "posedEndpointComparisons": 72,
+      "maximumSeparationMetres": 0.08717517663283991,
+      "medianSeparationMetres": 0.012336650689325724
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "checkoutBaseCommit": "d2682a5",
+  "stage": "candidate",
+  "executableSha256": "819176a7a71b5327dc546e37f18df915322b0ce5f76d92170cf2648988e53107",
+  "retainedControlAtCommit": null,
+  "candidateSceneSourceSha256": "3a96b8ad73e474336336b09f012d84943192bb7f8d73949975b34e01f3e3d419",
+  "candidateSourceDirty": true,
+  "instrumentation": "Diagnostic",
+  "quality": "High",
+  "performanceEvidence": false,
+  "runs": [
+    {
+      "backend": "pipeline",
+      "checkpoint": "pbr-torch-fire",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-world-box-normals-20261002\\candidate\\pipeline\\pbr-torch-fire",
+        "--development-checkpoint",
+        "pbr-torch-fire"
+      ]
+    },
+    {
+      "backend": "pipeline",
+      "checkpoint": "lantern-held-high",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-world-box-normals-20261002\\candidate\\pipeline\\lantern-held-high",
+        "--development-checkpoint",
+        "lantern-held-high"
+      ]
+    },
+    {
+      "backend": "pipeline",
+      "checkpoint": "lantern-held-low",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-world-box-normals-20261002\\candidate\\pipeline\\lantern-held-low",
+        "--development-checkpoint",
+        "lantern-held-low"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "pbr-torch-fire",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-world-box-normals-20261002\\candidate\\compute\\pbr-torch-fire",
+        "--development-checkpoint",
+        "pbr-torch-fire",
+        "--require-rayquery-compute"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "lantern-held-high",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-world-box-normals-20261002\\candidate\\compute\\lantern-held-high",
+        "--development-checkpoint",
+        "lantern-held-high",
+        "--require-rayquery-compute"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "lantern-held-low",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-world-box-normals-20261002\\candidate\\compute\\lantern-held-low",
+        "--development-checkpoint",
+        "lantern-held-low",
+        "--require-rayquery-compute"
+      ]
+    }
+  ]
+}

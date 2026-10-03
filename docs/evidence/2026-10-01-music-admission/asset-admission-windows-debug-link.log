@@ -1,0 +1,8 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  horde_rt_probe_core.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_rt_probe_core.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  horde_rt_diagnostic_window.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\HordeLanternRT.exe

@@ -1,0 +1,100 @@
+{
+  "scope": "Windows Diagnostic/High staged-primary image-equivalence supplement",
+  "source": {
+    "branch": "codex/horde-1.6.1-engineering-pass",
+    "head_when_captured": "59cb0576790cdb47d529746ab3d2d30ac34462fb",
+    "build_identity": "Both Debug apps were built from the same engineering worktree/source slice. Parent confirmed the subsequent source-only delta during this task was Android-only; Windows renderer and shaders were unchanged. Exact executable hashes identify the produced binaries.",
+    "worktree": "dirty before the later checkpoint commit; no tracked files were edited for this capture task."
+  },
+  "configuration": {
+    "cmake_generator": "Visual Studio 17 2022",
+    "platform": "x64",
+    "configuration": "Debug",
+    "instrumentation": "Diagnostic",
+    "dielectric_quality": "High",
+    "backend": "RayTracingPipeline",
+    "control": {
+      "staged_primary_default": false,
+      "staged_primary_timing": false,
+      "shader_directory": ""
+    },
+    "candidate": {
+      "staged_primary_default": true,
+      "staged_primary_timing": true,
+      "shader_directory": "C:/Dev/tmp/horde-staged-rt-20261001/shaders-diagnostic-high"
+    },
+    "staged_manifest_sha256": "1cddc64cbfbcf54943736df517ba35cd74c8d0838f8dc24135e3a3ab5f4b0cb3",
+    "candidate_high_modules": [
+      {"id":"OpaqueFast/primary","sha256":"23a489043f4d0ef4c0979f8d8ceb8a83962dbe9f47bfaa3673a1538fd648b5a3"},
+      {"id":"OpaqueFast/shade","sha256":"a20f658086e103f4ce9eda591177c5ad4f337715b75c49b5970383b4e229f157"},
+      {"id":"GenericDielectric/primary","sha256":"35044d5ff95d9f09f51e70aaf7c9c1f3747b1113a7929b92b521425f9d587d50"},
+      {"id":"GenericDielectric/shade","sha256":"91e5dcd8299e67a09a00d0c39645fdb0ffe88d95ea2fdf80e749222925791586"}
+    ],
+    "selected_pipeline_bundles": {
+      "control": {
+        "opaqueFast": {"key":"diagnostic_high_opaque_fast","sha256":"8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9"},
+        "genericDielectric": {"key":"diagnostic_high_generic_dielectric","sha256":"feac38eca1df17159bca4d490825b7e3750742b05bb07cd2f6db4eec42261b5c"}
+      },
+      "candidate": {
+        "opaqueFast": {"key":"staged_primary_v1_diagnostic_high_opaque_fast","sha256":"701bb5a9410c78d75b0302ffdd3d34e171e867637bc24ea4ad4ac606901a6e44"},
+        "genericDielectric": {"key":"staged_primary_v1_diagnostic_high_generic_dielectric","sha256":"e2d511cdd01ddc23d860bf198280f5e66b9f518c86e0ddc67537741ad15ecf62"}
+      }
+    }
+  },
+  "binaries": {
+    "control_exe": {"path":"C:/Dev/tmp/horde-staged-rt-20261001/build-high-current-control/Debug/HordeLanternRT.exe","bytes":8219648,"sha256":"2f3161980d45122b4861e2ff99a8e2cfadf94776a20bee968d04d41ad957edde"},
+    "candidate_exe": {"path":"C:/Dev/tmp/horde-staged-rt-20261001/build-high-current-candidate/Debug/HordeLanternRT.exe","bytes":9346560,"sha256":"87e974a814ee6a2be0730e1e5fa15e902d80ffa817ed435cfff63898019a8b77"},
+    "build_logs": [
+      {"file":"high-current-control-configure.log","sha256":"1e5620e0954575cddbc99cad014ed90163c537c5ac394c366809e39ba8df5b5e"},
+      {"file":"high-current-control-build-window-target.log","sha256":"c6fd5985856f5b77daeb25a8f6751ea06f988047e4e6c87279796f43b057928e"},
+      {"file":"high-current-candidate-configure.log","sha256":"8280c519ccad92c84f1984878564580889c023eda586d0120633ab7c97a0b0a0"},
+      {"file":"high-current-candidate-build.log","sha256":"711e8280c5176e3435bacabc32fb37ce98f3ff0682c5bacf84b0fd7a7b727cd5"}
+    ]
+  },
+  "captures": {
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "resolution": "960x540",
+    "groups": {
+      "standard": {"control_count":13,"candidate_count":13,"all_rt_presented":true},
+      "lantern-glass-production": {"control_count":1,"candidate_count":1,"png_byte_identical":true},
+      "glass-tinted-transport": {"control_count":1,"candidate_count":1,"png_byte_identical":true}
+    },
+    "standard_comparison": {
+      "image_gate": "PASS: 13/13 unchanged tolerance checks; maximum channel difference 3; worst fraction differing by more than 1 was 0.00000579 (limit 0.001).",
+      "timing_comparator": "FAIL and retained: control 6.103 ms vs candidate 10.7973 ms, +76.918% against the comparator's 2% threshold.",
+      "timing_interpretation": "Debug fresh-process capture-loop timing is not a matched performance result: candidate enables timestamp profiling and changes execution organisation. Do not attribute the delta to the renderer organisation, Mobile, or phone performance."
+    },
+    "counter_preservation": {
+      "standard_manifest_physical_fields": "Dielectric diagnostics, reason diagnostics, per-capture camera/state/visibility/geometry fields match across all 13; no control diagnostics were hidden or relaxed.",
+      "lantern-glass-production": "Control and candidate match: productionPane secondary origin/terminal/same-medium counts 212; TIR 350; secondary dielectric terminal 212; TIR termination 46; finite-endpoint shadow volume 6817; reward ring/body primary pixels 395/9667.",
+      "glass-tinted-transport": "Control and candidate match: TIR count 36043; TIR termination 153; certified closed-volume recovery 14 with reason mask 1; primary torch/sword/player pixels 43112/21484/27534. These nonzero values remain visible; this comparison does not claim underlying historical physical failures are fixed."
+    },
+    "candidate_execution_organisation": {
+      "id":"StagedPrimaryV1Investigation",
+      "traceDispatchesPerFrame":2,
+      "recordBytes":128,
+      "pages":3,
+      "passProfilingCompiled":true,
+      "logicalBytes":66355200,
+      "paddedBufferBytes":66355200,
+      "allocationBytes":66355200,
+      "logicalReadWriteBytesPerFrame":132710400,
+      "dramTrafficMeasured":false,
+      "memoryFlags":[1,1,1]
+    },
+    "manifest_hashes": {
+      "control_standard":"f5011594ac7c0ad016f66f5902278722725239cd3530a128c615030c24c1077a",
+      "candidate_standard":"0f821a49a71aa5a9fa54cb575b8064f4a5dbe3ca2923a00d3df33793b3410bad",
+      "standard_comparison":"fdae6e3420404f2fc994241c983d3d7be93b5ace36cd55c7fe68f870719ca243",
+      "control_production_lantern":"7ea44d55e8c66ea0a6d91fa1cb2254c560c98f0eebbd6aaca1b393696bac830a",
+      "candidate_production_lantern":"56c160026c6e0361a26f5fce804a0f5ab04ff2a9ccc7f26ad6f6cd3937a10ef5",
+      "control_tinted_transport":"acc7357d71a7bf9bf9812739246b61b54d087559c6e76d45c1da7263276ddfed",
+      "candidate_tinted_transport":"c580e8af8370d475487b14ce9ae9ee103820e164a5f3e8bd2e6ddc99461e2203"
+    }
+  },
+  "limits": [
+    "This is a Windows Diagnostic/High RTX image-equivalence gate, not Shipping performance acceptance or Android evidence.",
+    "The standard comparator's timing failure is preserved separately from its passing pixel gate and is not causally attributed.",
+    "No phone, APK runtime, warm performance, memory-pressure, DRAM bandwidth, occupancy, register or spill evidence was collected here."
+  ]
+}

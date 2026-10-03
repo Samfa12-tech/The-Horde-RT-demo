@@ -1,0 +1,54 @@
+{
+  "repository": "Samfa12-tech/The-Horde-RT-demo",
+  "head": "8fb1da494069c695127c714d2246321a14d8de8b",
+  "branch": "codex/horde-1.6.1-engineering-pass",
+  "pull_request": {
+    "number": 15,
+    "state": "OPEN",
+    "draft": true,
+    "base_branch": "main",
+    "base_sha": "bda1b99a62e1de883273dd21f267bcfc92bc5490",
+    "head_sha": "8fb1da494069c695127c714d2246321a14d8de8b",
+    "synthetic_merge_sha": "f66a6fe9bf89211ab6070482c83e3a989e67ada9",
+    "synthetic_merge_parents": [
+      "bda1b99a62e1de883273dd21f267bcfc92bc5490",
+      "8fb1da494069c695127c714d2246321a14d8de8b"
+    ],
+    "merge_ref": "refs/pull/15/merge"
+  },
+  "runs": {
+    "push": {
+      "id": "36810364762",
+      "event": "push",
+      "conclusion": "success",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36810364762",
+      "jobs": {
+        "gcc": {"id":"110203866067","conclusion":"success","tests_passed":55,"tests_total":55,"seconds":70.31,"log":"push-gcc.log","bytes":99978,"sha256":"1b149587853c7e9b7ed89879d68dbd98a00959b709d3d9888993b517e7add479"},
+        "clang": {"id":"110203865752","conclusion":"success","tests_passed":55,"tests_total":55,"seconds":79.29,"log":"push-clang.log","bytes":112622,"sha256":"9e165e5a7478c8b8bae4cb15c75ca69c18ddae53872c5d180ed5f88d64e536f9"},
+        "msvc": {"id":"110203866127","conclusion":"success","tests_passed":56,"tests_total":56,"seconds":92.43,"log":"push-msvc.log","bytes":113648,"sha256":"e81c0208bdcb247cc9fc173d78b687b23a3b73166e8173f4c7eb17bcd95ea0bd"},
+        "vulkan_cpu_host": {"id":"110203866162","conclusion":"success","tests_passed":15,"tests_total":15,"seconds":8.44,"log":"push-vulkan-host.log","bytes":71105,"sha256":"7bbd6af1c5636a9f0b6f337b2e83e90d12864af2837df336ffd2e67f84453ceb"}
+      }
+    },
+    "pull_request": {
+      "id": "36810369431",
+      "event": "pull_request",
+      "conclusion": "success",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/36810369431",
+      "jobs": {
+        "gcc": {"id":"110203880743","conclusion":"success","tests_passed":55,"tests_total":55,"seconds":61.53,"log":"pr-gcc.log","bytes":100982,"sha256":"87eb1932861d55090532f3cb689105b113c67f4740980a789f1b1621cec8a9d9"},
+        "clang": {"id":"110203880855","conclusion":"success","tests_passed":55,"tests_total":55,"seconds":79.29,"log":"pr-clang.log","bytes":113541,"sha256":"598fa18e55e919af0e75dde44e2a3b1468d1d6cda9ae0b52f66627a33e814f49"},
+        "msvc": {"id":"110203880801","conclusion":"success","tests_passed":56,"tests_total":56,"seconds":92.43,"log":"pr-msvc.log","bytes":114621,"sha256":"31b2e2f78b4ae1de39aa79c0f47bd26689a82280f86b56bbcd6fc3d5eadbdf80"},
+        "vulkan_cpu_host": {"id":"110203880685","conclusion":"success","tests_passed":15,"tests_total":15,"seconds":8.44,"log":"pr-vulkan-host.log","bytes":73408,"sha256":"683bd3703ab4cc10c400dc3e1dcbb62218e5c9123118d81f08c9ea640bf8d392"}
+      }
+    }
+  },
+  "platform_specific_fixture": {
+    "name": "horde_rt_android_staged_admission_tests",
+    "msvc_position": "36/56",
+    "push_seconds": 0.71,
+    "pull_request_seconds": 0.85,
+    "gcc_clang": "intentionally not registered; fixture is in existing Windows policy/PowerShell test block"
+  },
+  "interpretation": "All requested push and PR jobs passed. The Vulkan lane is focused CPU-host validation only; no hardware RT, Android device, phone, or performance evidence is established by these runs.",
+  "collected_utc": "2026-10-01"
+}

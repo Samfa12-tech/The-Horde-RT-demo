@@ -1,0 +1,7 @@
+Starting: Intent { cmp=com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity
+TotalTime: 426
+WaitTime: 428
+Complete

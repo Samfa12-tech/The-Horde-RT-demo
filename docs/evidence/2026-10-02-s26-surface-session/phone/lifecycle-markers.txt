@@ -1,0 +1,16 @@
+10-02 18:15:06.097 10077 10077 I HordeRtProbeBridge: HORDE_SURFACE_REQUEST generation=1
+10-02 18:15:06.389 10077 10077 I HordeRtProbeBridge: HORDE_SURFACE_CANCEL generation=1
+10-02 18:15:06.498 10077 10077 I HordeRtProbeBridge: HORDE_SURFACE_REQUEST generation=3
+10-02 18:15:30.155 10077 10190 I HordeRtProbeBridge: HORDE_SURFACE_STARTED generation=3
+10-02 18:15:30.164 10077 10329 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-02 18:15:30.164 10077 10329 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=3
+10-02 18:17:21.423 10077 10077 I HordeRtProbeBridge: HORDE_SURFACE_CANCEL generation=3
+10-02 18:17:21.544 10077 10077 I HordeRtProbeBridge: HORDE_SURFACE_REQUEST generation=5
+10-02 18:17:34.657 10077 10190 I HordeRtProbeBridge: HORDE_SURFACE_STARTED generation=5
+10-02 18:17:34.663 10077 10784 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-02 18:17:34.663 10077 10784 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=5
+10-02 18:17:35.530 10077 10077 I HordeRtProbeBridge: HORDE_SURFACE_CANCEL generation=5
+10-02 18:17:35.630 10077 10077 I HordeRtProbeBridge: HORDE_SURFACE_REQUEST generation=7
+10-02 18:17:49.419 10077 10190 I HordeRtProbeBridge: HORDE_SURFACE_STARTED generation=7
+10-02 18:17:49.425 10077 11007 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-02 18:17:49.425 10077 11007 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=7

@@ -1,0 +1,167 @@
+{
+  "source": "ee71f98a2e00cddb5c6b88fd5ba78834e06fc32a",
+  "executableSha256": "743379cf9fc58a322d762d47847fa9a64dabd1a9cdd7be567e9d117c5a90e17f",
+  "budgetSha256": "f2ff4be07c08536d140ea395fb24d1e3d502882449a84fc245df121e2ad89f4d",
+  "variants": [
+    {
+      "key": "diagnostic_high_generic_dielectric",
+      "bytes": 252680,
+      "instructions": 14955,
+      "sha256": "feac38eca1df17159bca4d490825b7e3750742b05bb07cd2f6db4eec42261b5c",
+      "controlSha256": "feac38eca1df17159bca4d490825b7e3750742b05bb07cd2f6db4eec42261b5c",
+      "sameSpirv": true,
+      "atomicInstructions": 41,
+      "hasDiagnosticsBinding": true
+    },
+    {
+      "key": "diagnostic_high_opaque_fast",
+      "bytes": 505248,
+      "instructions": 27715,
+      "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+      "controlSha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+      "sameSpirv": true,
+      "atomicInstructions": 5,
+      "hasDiagnosticsBinding": true
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "bytes": 269004,
+      "instructions": 15959,
+      "sha256": "d19802bab30443b5cff87dc2e2c258c123f7656600f9f2a4daf171fbdbd671b3",
+      "controlSha256": "9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91",
+      "sameSpirv": false,
+      "atomicInstructions": 41,
+      "hasDiagnosticsBinding": true
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "bytes": 561672,
+      "instructions": 30701,
+      "sha256": "cc204b433d9a7c74d3c14e1d7b3ea991248831860e7f79a8853fbe797e89cc9e",
+      "controlSha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+      "sameSpirv": false,
+      "atomicInstructions": 5,
+      "hasDiagnosticsBinding": true
+    },
+    {
+      "key": "shipping_high_generic_dielectric",
+      "bytes": 243852,
+      "instructions": 14531,
+      "sha256": "79e80a489e93f02f99292cf76bc8f7405645159b63d1fe2bcca407b65f16b8fa",
+      "controlSha256": "79e80a489e93f02f99292cf76bc8f7405645159b63d1fe2bcca407b65f16b8fa",
+      "sameSpirv": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false
+    },
+    {
+      "key": "shipping_high_opaque_fast",
+      "bytes": 501012,
+      "instructions": 27536,
+      "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "controlSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "sameSpirv": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "bytes": 243852,
+      "instructions": 14531,
+      "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+      "controlSha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+      "sameSpirv": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "bytes": 501012,
+      "instructions": 27536,
+      "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "controlSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "sameSpirv": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+      "bytes": 252916,
+      "instructions": 14970,
+      "sha256": "a88abd1880da54d159e0e912cc9030a51a46cb5759bf29bc548c99b08c62cbd8",
+      "controlSha256": "a88abd1880da54d159e0e912cc9030a51a46cb5759bf29bc548c99b08c62cbd8",
+      "sameSpirv": true,
+      "atomicInstructions": 41,
+      "hasDiagnosticsBinding": true
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_opaque_fast",
+      "bytes": 505508,
+      "instructions": 27734,
+      "sha256": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58",
+      "controlSha256": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58",
+      "sameSpirv": true,
+      "atomicInstructions": 5,
+      "hasDiagnosticsBinding": true
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+      "bytes": 269240,
+      "instructions": 15974,
+      "sha256": "410dc6f69a7a425115403a64873ac2d827f2ad9144e77568561ed35cba296727",
+      "controlSha256": "e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302",
+      "sameSpirv": false,
+      "atomicInstructions": 41,
+      "hasDiagnosticsBinding": true
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+      "bytes": 561868,
+      "instructions": 30714,
+      "sha256": "5787949c6d51da50ace6cde4f98cdc82f54816aae83639646c57b0ce294a6c50",
+      "controlSha256": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58",
+      "sameSpirv": false,
+      "atomicInstructions": 5,
+      "hasDiagnosticsBinding": true
+    },
+    {
+      "key": "rayquery_compute_shipping_high_generic_dielectric",
+      "bytes": 244088,
+      "instructions": 14546,
+      "sha256": "f0e10d5af6017aa9b27e0538cd90375da215f366aac1bb35e02ba60468e94c60",
+      "controlSha256": "f0e10d5af6017aa9b27e0538cd90375da215f366aac1bb35e02ba60468e94c60",
+      "sameSpirv": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false
+    },
+    {
+      "key": "rayquery_compute_shipping_high_opaque_fast",
+      "bytes": 501272,
+      "instructions": 27555,
+      "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "controlSha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "sameSpirv": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "bytes": 244088,
+      "instructions": 14546,
+      "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+      "controlSha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+      "sameSpirv": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "bytes": 501272,
+      "instructions": 27555,
+      "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "controlSha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "sameSpirv": true,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false
+    }
+  ]
+}

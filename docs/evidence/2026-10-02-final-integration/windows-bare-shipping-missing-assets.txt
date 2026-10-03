@@ -1,0 +1,1 @@
+Failed to initialise presentable RT scene: Could not open skeleton GLB: C:\Users\sam_s\.codex\worktrees\horde-mobile-lantern-profile\the Horde RT Demo\build\foundation-validation\20261002-183151\Release\assets\models/enemies/meshy/skeleton_biped_merged_animations_v01.glb

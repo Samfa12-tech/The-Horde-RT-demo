@@ -1,0 +1,17 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  1>Checking Build System
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  MusicPcmStream.cpp
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  MusicPcmWaveTests.cpp
+  horde_rt_music_pcm_wave_tests.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_rt_music_pcm_wave_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  MusicPcmStreamTests.cpp
+  horde_rt_music_pcm_stream_tests.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_rt_music_pcm_stream_tests.exe

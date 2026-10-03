@@ -1,0 +1,542 @@
+{
+  "schema": 2,
+  "runId": "20260930-121919",
+  "captureMode": "debug-only deterministic checkpoint intent plus ADB screencap",
+  "scale": 75,
+  "device": {
+    "serial": "R5GL219SZGK",
+    "model": "SM-S948B",
+    "androidVersion": "16",
+    "apiLevel": "36",
+    "displaySize": "Physical size: 1440x3120",
+    "displayDensity": "Physical density: 600\r\nOverride density: 560"
+  },
+  "package": "com.samfa12.hordelanternrt.debug",
+  "apkSha256": "b30d64fd4ad4193e3150b1512e0425ad5c7b98c1c78ccc96516d1db66b39592e",
+  "installedApkSha256": "b30d64fd4ad4193e3150b1512e0425ad5c7b98c1c78ccc96516d1db66b39592e",
+  "sourceCommit": "b4ad2783a10980b09f1435e1fb48d48073fc55cd",
+  "sourceDirty": true,
+  "selectedRtPipelineBundle": {
+    "opaqueFast": {
+      "key": "diagnostic_mobile_opaque_fast",
+      "sha256": "fa3b41774785b8c7a658145fa4ec9d2a29f0cb52e184cf05a4a5954d77d8dd7e"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "sha256": "75630c890e906dc94f987682dde8eacfb55d2bc2e979afa3c844b86ef9590321"
+    }
+  },
+  "checkpointCount": 7,
+  "checkpoints": [
+    {
+      "index": 1,
+      "checkpoint": "lantern-glass-production",
+      "expectedZone": "finale",
+      "zone": "finale",
+      "generation": 1,
+      "camera": {
+        "x": -33.45,
+        "z": -17.55,
+        "yaw": -1.5708,
+        "pitch": -0.32,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "fa3b4177+75630c89",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "fa3b41774785b8c7a658145fa4ec9d2a29f0cb52e184cf05a4a5954d77d8dd7e"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "75630c890e906dc94f987682dde8eacfb55d2bc2e979afa3c844b86ef9590321"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 3,
+      "playerSkinCpuAverageMs": 3.9986,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-01-lantern-glass-production-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "a3ad99a8acca0a93c940cd87cc54cdac782df6aa0a8a5124405658711a4ff7d2"
+      },
+      "nativeStateFile": "capture-01-lantern-glass-production-state.json"
+    },
+    {
+      "index": 2,
+      "checkpoint": "player-viewmodel-lantern-high-look-up",
+      "expectedZone": "yellow-torch-bay",
+      "zone": "yellow-torch-bay",
+      "generation": 1,
+      "camera": {
+        "x": -10.65,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": 0.28,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "fa3b4177+75630c89",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "fa3b41774785b8c7a658145fa4ec9d2a29f0cb52e184cf05a4a5954d77d8dd7e"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "75630c890e906dc94f987682dde8eacfb55d2bc2e979afa3c844b86ef9590321"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 0
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 5,
+      "playerSkinCpuAverageMs": 4.1732,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-02-player-viewmodel-lantern-high-look-up-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "aa5766ff2e29c458a24a39f533acd5ece93b790343ad8035d142e31ea8f6e117"
+      },
+      "nativeStateFile": "capture-02-player-viewmodel-lantern-high-look-up-state.json"
+    },
+    {
+      "index": 3,
+      "checkpoint": "player-viewmodel-lantern-low-parry",
+      "expectedZone": "yellow-torch-bay",
+      "zone": "yellow-torch-bay",
+      "generation": 1,
+      "camera": {
+        "x": -10.65,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.3,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "fa3b4177+75630c89",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "fa3b41774785b8c7a658145fa4ec9d2a29f0cb52e184cf05a4a5954d77d8dd7e"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "75630c890e906dc94f987682dde8eacfb55d2bc2e979afa3c844b86ef9590321"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.15,
+      "playerCombat": {
+        "action": "parry-active",
+        "actionTime": 0.11,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 1
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 2,
+      "playerSkinCpuAverageMs": 1.758,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-03-player-viewmodel-lantern-low-parry-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "0fb906c870de8fb10667b8d2fc54f7a0e21dfafaec1f88d5c74efde34c53d63d"
+      },
+      "nativeStateFile": "capture-03-player-viewmodel-lantern-low-parry-state.json"
+    },
+    {
+      "index": 4,
+      "checkpoint": "glass-edge-fresnel",
+      "expectedZone": "skylight-chamber",
+      "zone": "skylight-chamber",
+      "generation": 1,
+      "camera": {
+        "x": -7.6,
+        "z": -13.25,
+        "yaw": -0.65,
+        "pitch": -0.05,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "fa3b4177+75630c89",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "fa3b41774785b8c7a658145fa4ec9d2a29f0cb52e184cf05a4a5954d77d8dd7e"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "75630c890e906dc94f987682dde8eacfb55d2bc2e979afa3c844b86ef9590321"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 1
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 2,
+      "playerSkinCpuAverageMs": 4.9361,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-04-glass-edge-fresnel-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "c20e4ef74c8a78902f354f24a9d8f959ac510abc5592cefdd8cd84d0df626df3"
+      },
+      "nativeStateFile": "capture-04-glass-edge-fresnel-state.json"
+    },
+    {
+      "index": 5,
+      "checkpoint": "glass-millimetre-closed",
+      "expectedZone": "skylight-chamber",
+      "zone": "skylight-chamber",
+      "generation": 1,
+      "camera": {
+        "x": -7.6,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.05,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "fa3b4177+75630c89",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "fa3b41774785b8c7a658145fa4ec9d2a29f0cb52e184cf05a4a5954d77d8dd7e"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "75630c890e906dc94f987682dde8eacfb55d2bc2e979afa3c844b86ef9590321"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 1
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 5,
+      "playerSkinCpuAverageMs": 6.6946,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-05-glass-millimetre-closed-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "52d730b0093bf52f58ab39440074b2dd58f51bc809d1e97dfb602399eb05364a"
+      },
+      "nativeStateFile": "capture-05-glass-millimetre-closed-state.json"
+    },
+    {
+      "index": 6,
+      "checkpoint": "glass-tinted-transport",
+      "expectedZone": "skylight-chamber",
+      "zone": "skylight-chamber",
+      "generation": 1,
+      "camera": {
+        "x": -7.6,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.05,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "fa3b4177+75630c89",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "fa3b41774785b8c7a658145fa4ec9d2a29f0cb52e184cf05a4a5954d77d8dd7e"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "75630c890e906dc94f987682dde8eacfb55d2bc2e979afa3c844b86ef9590321"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 1
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 5,
+      "playerSkinCpuAverageMs": 5.0458,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-06-glass-tinted-transport-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "201e0f6ff709a5b799e080b24904a94cdf3c37dba3001f7a4cdc1e6f45ae551c"
+      },
+      "nativeStateFile": "capture-06-glass-tinted-transport-state.json"
+    },
+    {
+      "index": 7,
+      "checkpoint": "glass-fire-transport",
+      "expectedZone": "skylight-chamber",
+      "zone": "skylight-chamber",
+      "generation": 1,
+      "camera": {
+        "x": -7.6,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.05,
+        "vitality": 3,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false
+      },
+      "renderScale": 0.75,
+      "internalExtent": {
+        "width": 1080,
+        "height": 2235
+      },
+      "swapchainExtent": {
+        "width": 1440,
+        "height": 2980
+      },
+      "gpu": "Adreno (TM) 840",
+      "buildIdentity": "1.6.1 DEBUG",
+      "shaderIdentity": "fa3b4177+75630c89",
+      "selectedRtPipelineBundle": {
+        "opaqueFast": {
+          "key": "diagnostic_mobile_opaque_fast",
+          "sha256": "fa3b41774785b8c7a658145fa4ec9d2a29f0cb52e184cf05a4a5954d77d8dd7e"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_mobile_generic_dielectric",
+          "sha256": "75630c890e906dc94f987682dde8eacfb55d2bc2e979afa3c844b86ef9590321"
+        }
+      },
+      "outputRedBlueSwap": false,
+      "animationTime": 0.0,
+      "playerCombat": {
+        "action": "idle",
+        "actionTime": 0.0,
+        "comboQueued": false,
+        "swordRadians": 0.0,
+        "lastConsumedAttackSequence": 0,
+        "lastConsumedParrySequence": 1
+      },
+      "stablePresentedFrames": 12,
+      "presented": true,
+      "playerRenderRoute": "modelled-viewmodel",
+      "playerSkinCadenceHz": 60,
+      "playerSkinUpdates": 3,
+      "playerSkinCpuAverageMs": 3.1205,
+      "playerMaxSocketErrorM": 0.0,
+      "tlasInstanceCount": 21,
+      "sceneOnly": true,
+      "overlaysHidden": [
+        "menu",
+        "touch-actions",
+        "HUD",
+        "diagnostics",
+        "developer-overlay"
+      ],
+      "png": {
+        "file": "capture-07-glass-fire-transport-75.png",
+        "width": 1440,
+        "height": 3120,
+        "sha256": "b015d16bce7ef48ae618ee25fd1139a4fa8488ebec3e708de1874f232b379dd8"
+      },
+      "nativeStateFile": "capture-07-glass-fire-transport-state.json"
+    }
+  ],
+  "lifecycle": {
+    "requested": true,
+    "homeResumePassed": true,
+    "honestPresentationAfterResume": true,
+    "log": "lifecycle-home-resume-logcat.txt"
+  }
+}

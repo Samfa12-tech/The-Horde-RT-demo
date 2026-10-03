@@ -1,0 +1,169 @@
+{
+  "schema": 1,
+  "scope": "Frozen RT ownership/pose evidence, not art acceptance, motion, glass correctness, performance or backend parity",
+  "controls": {
+    "device": {
+      "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "vendorId": 4318,
+      "deviceId": 11672
+    },
+    "presentation": {
+      "renderScale": 1.0,
+      "dispatchWidth": 960,
+      "dispatchHeight": 540,
+      "swapchainWidth": 960,
+      "swapchainHeight": 540,
+      "swapchainFormat": 44
+    },
+    "selectedRtPipelineBundle": {
+      "opaqueFast": {
+        "key": "diagnostic_high_opaque_fast",
+        "sha256": "0d2fcad4d24fcfb9d8744398789be0ec7c0b7486dcbb5d19d3aba4860e76b9de"
+      },
+      "genericDielectric": {
+        "key": "diagnostic_high_generic_dielectric",
+        "sha256": "c569e0a07dada8fda0f6009fce7521c37b2f75ad9eb56ddca5b95a83131acb7e"
+      }
+    },
+    "settlingFrames": 12,
+    "fixedAnimationTimeSeconds": 0.0
+  },
+  "captures": [
+    {
+      "checkpoint": "player-body-grips",
+      "camera": {
+        "x": 0.0,
+        "z": 1.85,
+        "yaw": 0.0,
+        "pitch": -0.32
+      },
+      "pngSha256": "4dc5a97716f4501bf9e56d79eb31547343a7e149e68dba5ccb11b211bc2a8cf8",
+      "manifestSha256": "fb858805e969783cd38c37f0f01d2c59002a7772f390311756d82954adda8862",
+      "primaryPlayerPixels": 28764,
+      "transportOverflowCount": 0,
+      "unclosedVolumeCount": 0
+    },
+    {
+      "checkpoint": "player-viewmodel-grips",
+      "camera": {
+        "x": 0.0,
+        "z": 1.85,
+        "yaw": 0.0,
+        "pitch": -0.32
+      },
+      "pngSha256": "af18aead04ecf88879d9e91634dc156dde13b3cb10ad921f8f920418744968a1",
+      "manifestSha256": "593d26de409f080c8facbf39b00d1cb4d3ab032b1ae8686f964a5f5d08cbfa85",
+      "primaryPlayerPixels": 28764,
+      "transportOverflowCount": 0,
+      "unclosedVolumeCount": 0
+    },
+    {
+      "checkpoint": "player-viewmodel-forward",
+      "camera": {
+        "x": 0.0,
+        "z": 1.85,
+        "yaw": 0.0,
+        "pitch": -0.05
+      },
+      "pngSha256": "35ef2e6698ff7f8f1a3943f8f7d8b759380dd154f6934757978316926108805f",
+      "manifestSha256": "9be7737020ff280531732ec0903ee6419ba741527c72daae270ed970b8d602f4",
+      "primaryPlayerPixels": 14529,
+      "transportOverflowCount": 0,
+      "unclosedVolumeCount": 0
+    },
+    {
+      "checkpoint": "player-viewmodel-downward-cut",
+      "camera": {
+        "x": 0.0,
+        "z": 1.85,
+        "yaw": 0.0,
+        "pitch": -0.28
+      },
+      "pngSha256": "c6d69d597b4cc57092bfeafaf3e1d34f23cd1eaf5358cfe3f3c0b9b335293ef3",
+      "manifestSha256": "31a21e7f60d40c8d17e03cd12720cfc695927ba170ca6f2e4c09501e82f00dce",
+      "primaryPlayerPixels": 19727,
+      "transportOverflowCount": 0,
+      "unclosedVolumeCount": 0
+    },
+    {
+      "checkpoint": "player-viewmodel-upward-slice",
+      "camera": {
+        "x": 0.0,
+        "z": 1.85,
+        "yaw": 0.0,
+        "pitch": -0.28
+      },
+      "pngSha256": "8d3955aebb6760d051be5f645b9e655f5cb12a6c060bbff664cfbb5f7ccc2dcd",
+      "manifestSha256": "edb68e8144d573cf6cf874f45ff1e34d7c9734f0a7e2a7a9d553c6e36201c075",
+      "primaryPlayerPixels": 36687,
+      "transportOverflowCount": 0,
+      "unclosedVolumeCount": 0
+    },
+    {
+      "checkpoint": "player-viewmodel-look-up",
+      "camera": {
+        "x": 0.0,
+        "z": 1.85,
+        "yaw": 0.0,
+        "pitch": 0.28
+      },
+      "pngSha256": "218e10a54d3e8b5c9bcfc492ede39d4edb11569a80bc2a401094d42f10952725",
+      "manifestSha256": "58f8db6fa28b993362dc0c14d44193387d3c768918d98e26f6a916159f2760e0",
+      "primaryPlayerPixels": 3527,
+      "transportOverflowCount": 0,
+      "unclosedVolumeCount": 0
+    },
+    {
+      "checkpoint": "player-viewmodel-look-down",
+      "camera": {
+        "x": 0.0,
+        "z": 1.85,
+        "yaw": 0.0,
+        "pitch": -0.32
+      },
+      "pngSha256": "af18aead04ecf88879d9e91634dc156dde13b3cb10ad921f8f920418744968a1",
+      "manifestSha256": "2d260f2050c419b96ed45813eebba65811b4d587989a558a7317e7246d13e968",
+      "primaryPlayerPixels": 28764,
+      "transportOverflowCount": 0,
+      "unclosedVolumeCount": 0
+    },
+    {
+      "checkpoint": "player-viewmodel-lantern-high",
+      "camera": {
+        "x": -10.65,
+        "z": -15.2,
+        "yaw": -1.570796,
+        "pitch": -0.3
+      },
+      "pngSha256": "f65ed3cdecf59531d84c652066bb71815d85653ce54f44182261093f2c2fcb46",
+      "manifestSha256": "93c59abbbbb799701426c347b25cbe06081296872f3b196d587f507257102b00",
+      "primaryPlayerPixels": 31096,
+      "transportOverflowCount": 1,
+      "unclosedVolumeCount": 0
+    },
+    {
+      "checkpoint": "player-viewmodel-lantern-low",
+      "camera": {
+        "x": -10.65,
+        "z": -15.2,
+        "yaw": -1.570796,
+        "pitch": -0.3
+      },
+      "pngSha256": "e8eb959807b2d6b6e951e1f6ce8b650c4965ab960af57dc7ad230dc0787d664a",
+      "manifestSha256": "fd38617d3a2b61025134986baccf42a20bedb9df52b334646d59dd3f04781ee5",
+      "primaryPlayerPixels": 32293,
+      "transportOverflowCount": 0,
+      "unclosedVolumeCount": 0
+    }
+  ],
+  "worldBodyRegression": {
+    "beforePngSha256": "4e086f856185bf1513c6214bfb3bd564c0abbc93eb6a456c2a2c2c6ca6bffe50",
+    "afterPngSha256": "4dc5a97716f4501bf9e56d79eb31547343a7e149e68dba5ccb11b211bc2a8cf8",
+    "maximumChannelDifference": 2,
+    "pixelsDifferentByMoreThanOne": 1,
+    "differentFraction": 1.9290123456790124e-06,
+    "maximumAllowedChannelDifference": 3,
+    "maximumAllowedFractionDifferentByMoreThanOne": 0.001,
+    "passed": true
+  }
+}

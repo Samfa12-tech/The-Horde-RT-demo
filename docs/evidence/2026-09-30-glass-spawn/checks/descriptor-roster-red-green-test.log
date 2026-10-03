@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start 64: horde_rt_pipeline_bundle_lifetime_tests
+1/1 Test #64: horde_rt_pipeline_bundle_lifetime_tests ...   Passed    5.27 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   5.28 sec

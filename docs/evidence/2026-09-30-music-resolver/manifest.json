@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "sourceRoot": "C:/Dev/tmp/horde-music-director-20260930",
+  "records": [
+    {
+      "path": "lead-real-sequence-debug-build.log",
+      "sha256": "c25080e06d6a0c63ee14cc6303f73c5ef2a3e3a66bec59980e28cfc36c7d0544",
+      "bytes": 494
+    },
+    {
+      "path": "lead-real-sequence-debug-tests.log",
+      "sha256": "218b11a758a7cfa077832e6dc69958739b8d5d93a4230cc8ec04166225f63966",
+      "bytes": 459
+    },
+    {
+      "path": "lead-real-sequence-release-build.log",
+      "sha256": "a6ce45a9fd8201ce39f4740c0823f299cc8906078e69cb0bc63c33bcb1ee2b31",
+      "bytes": 502
+    },
+    {
+      "path": "lead-real-sequence-release-tests.log",
+      "sha256": "4538a55a0f0cf634e40b10f99a100b2f67b5e1b4a91b8bcd7655ae71b053662b",
+      "bytes": 461
+    },
+    {
+      "path": "debug-queue-reset-ctest-20260930-215725.log",
+      "sha256": "647e060eab55514030203fd26631a8777e0cdc46b122bbe64d5c18db36387ea0",
+      "bytes": 824
+    },
+    {
+      "path": "android-arm64-debug-build-argument-split-failure.log",
+      "sha256": "5088b98b5fc002d99deabb5ab7a1a4299af630ef2906cb5b1a53ccb2997bb65e",
+      "bytes": 825
+    },
+    {
+      "path": "android-arm64-debug-build.log",
+      "sha256": "c70f6d0b88e3152e843dbfd4de0cff0a564122a807046ee3c3a9d21301b48f23",
+      "bytes": 1955
+    },
+    {
+      "path": "source-and-build-receipt.json",
+      "sha256": "4b110200b1ff7f36221406f2ad33829d81f7a17a3e51c27d8cfc6ea59feec5c2",
+      "bytes": 2413
+    },
+    {
+      "path": "README.md",
+      "sha256": "7f4ea54d6420f92a4721927e5dc1dc68972930ddb2889147f10a37bda995a8cb",
+      "bytes": 1628
+    }
+  ]
+}

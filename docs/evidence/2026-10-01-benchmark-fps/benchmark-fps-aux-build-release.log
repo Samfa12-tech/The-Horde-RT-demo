@@ -1,0 +1,18 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  WindowsBenchmarkLaunchTests.cpp
+  horde_rt_windows_benchmark_launch_tests.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Release\horde_rt_windows_benchmark_launch_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  PlaytestReport.cpp
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Release\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  RtBenchmarkEvidenceReportTests.cpp
+  ShowcaseBenchmark.cpp
+  RtBenchmarkEvidenceReport.cpp
+  RtBenchmarkEvidenceRun.cpp
+  RtPerformanceEvidence.cpp
+  Generating Code...
+  horde_rt_benchmark_evidence_report_tests.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Release\horde_rt_benchmark_evidence_report_tests.exe

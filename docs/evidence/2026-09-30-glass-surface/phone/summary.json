@@ -1,0 +1,57 @@
+{
+  "schema": 8,
+  "runId": "20260930-080757",
+  "mode": "Benchmark",
+  "scale": 75,
+  "include100": false,
+  "rtLabWorkloadComparison": false,
+  "rtLabComparisonCheckpoints": null,
+  "checkpoints": [],
+  "gpuTiming": "enabled",
+  "deviceSerial": "R5GL219SZGK",
+  "deviceModel": "SM-S948B",
+  "androidVersion": "16",
+  "apiLevel": "36",
+  "osBuildFingerprint": "samsung/m3qxxx/m3q:16/BP4A.251205.006/S948BXXS4AZHL_OXM4AZHL:user/release-keys",
+  "gpuName": "Adreno (TM) 840",
+  "gpuVendorId": 20803,
+  "gpuDeviceId": 1141180977,
+  "gpuDriverVersion": 2150932499,
+  "vulkanApiVersion": 4210983,
+  "displaySize": "Physical size: 1440x3120",
+  "displayDensity": "Physical density: 600\r\nOverride density: 560",
+  "package": "com.samfa12.hordelanternrt.debug",
+  "apkSha256": "457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570",
+  "installedApkSha256": "457641fdec90e3cfda220934060c34413014e8aeafe64f8b50c0969c465e3570",
+  "sourceCommit": "f707bc4d2015d6a94c7c285316ff1a2805c64f40",
+  "sourceDirty": true,
+  "selectedRtPipelineBundle": {
+    "opaqueFast": {
+      "key": "diagnostic_mobile_opaque_fast",
+      "sha256": "b562973addb78d5d9c24c8d27211695eb582d2f26336dff29603a6c2e04420d7"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "sha256": "2d20a64a3ddbbe737db9cdbf01733c0882e017f9792972bb0e3584839b148d10"
+    }
+  },
+  "captureRequested": true,
+  "captureCheckpointCount": 7,
+  "captureManifest": "capture-manifest.json",
+  "lifecycle": {
+    "requested": true,
+    "homeResumePassed": true,
+    "honestPresentationAfterResume": true,
+    "log": "lifecycle-home-resume-logcat.txt"
+  },
+  "timingMethod": "CPU wall-clock from frame start through vkQueuePresentKHR; not a Vulkan GPU timestamp",
+  "performanceReference": {
+    "policy": "descriptive FPS-equivalent bands; no single frame-time threshold is a product acceptance gate",
+    "sixtyFpsMs": 16.667,
+    "fiftyFpsMs": 20.0,
+    "thirtyFpsMs": 33.333,
+    "matchedRegressionInvestigationPercent": 15.0
+  },
+  "warnings": [],
+  "failures": []
+}

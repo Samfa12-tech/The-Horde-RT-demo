@@ -1,0 +1,42 @@
+--------- beginning of main
+10-01 02:05:13.267  8767  8767 I HordeLanternAudio: Accepted debug automation intent: checkpoint=-1 capture=false replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 2
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 1
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 4
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 3
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 5
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 6
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 8
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 7
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 9
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 10
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 11
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 12
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 13
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 14
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 15
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 16
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 17
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 18
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 19
+10-01 02:05:13.547  8767  8767 I HordeLanternAudio: SFX loaded: 20
+10-01 02:05:13.565  8767  8767 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 02:05:26.906  8767  8767 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 02:05:26.906  8767  8767 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 02:05:26.906  8767  8767 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 02:05:26.916  8767  9369 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 02:05:27.334  8767  8767 I HordeLanternAudio: Accepted debug automation intent: checkpoint=0 capture=true replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 02:05:27.341  8767  8767 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 02:05:41.722  8767  8767 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 02:05:41.722  8767  8767 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 02:05:41.722  8767  8767 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 02:05:41.731  8767  9579 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 02:05:41.917  8767  9579 I HordeRtProbeBridge: HORDE_CAPTURE begin generation=1 checkpoint=opening scale=75 stable_frames=12 zone=opening
+10-01 02:05:42.969  8767  9579 I HordeRtProbeBridge: HORDE_CAPTURE_READY generation=1 checkpoint=opening scale=75 stable_frames=12 presented=1
+10-01 02:05:44.628  8767  9579 I HordeRtProbeBridge: RT frame timing avg ms: total=93.424 fence=91.490 record=1.099 submit+present=0.646
+10-01 02:05:44.628  8767  9579 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=87.306 average_ms=91.351 samples=31 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 02:05:47.052  8767  8767 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 02:06:01.836  8767  8767 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 02:06:01.836  8767  8767 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 02:06:01.836  8767  8767 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 02:06:01.847  8767  9998 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.

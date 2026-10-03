@@ -1,0 +1,38 @@
+[
+  {
+    "module": "RayQueryCompute-0",
+    "sha256": "9f3da843b447597045cae567eb9da06506a6a6e90d5191d50d9a5a431e33a801",
+    "bindings": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,23,24",
+    "binding22": false,
+    "atomics": 0,
+    "explicitImageOrAtomicLoads": 0,
+    "stride112": true
+  },
+  {
+    "module": "RayQueryCompute-1",
+    "sha256": "4f86e53ef27af2ca24111f06052ba39be81c42d506af85f04bc475c41274a527",
+    "bindings": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,23,24",
+    "binding22": false,
+    "atomics": 0,
+    "explicitImageOrAtomicLoads": 0,
+    "stride112": true
+  },
+  {
+    "module": "RayTracingPipeline-2",
+    "sha256": "777b9147bb1068e769fccb0512b823f7c7db6b45fb5d6c244d5ea92c5468651f",
+    "bindings": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,23,24",
+    "binding22": false,
+    "atomics": 0,
+    "explicitImageOrAtomicLoads": 0,
+    "stride112": true
+  },
+  {
+    "module": "RayTracingPipeline-3",
+    "sha256": "d3ed4c7ba52bbbc9725d6a89ec16fcb101de73fb386fb04d973c6617d4e7c287",
+    "bindings": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,23,24",
+    "binding22": false,
+    "atomics": 0,
+    "explicitImageOrAtomicLoads": 0,
+    "stride112": true
+  }
+]

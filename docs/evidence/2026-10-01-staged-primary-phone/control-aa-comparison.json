@@ -1,0 +1,189 @@
+{
+  "scope": "Two-checkpoint normal Debug A/A comparator stability check; no recapture or staged comparison",
+  "apkSha256": "581ea4668967458c000162da9c3eb722cd5e69719f069b80aa79591cebcc066a",
+  "package": "com.samfa12.hordelanternrt.debug",
+  "device": "SM-S948B",
+  "renderScale": 0.75,
+  "extent": {
+    "width": 1080,
+    "height": 2235
+  },
+  "newRun": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\phone-images\\control-aa\\run-20261001-140240",
+  "newManifestSha256": "dbef7e113de53d1461f025e3dd648ec3ce4961d2c37ced42f3bf9fd966225818",
+  "newManifestCheckpointCount": 2,
+  "originalRun": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\phone-images\\control\\run-20261001-132511",
+  "checkpoints": [
+    {
+      "checkpoint": "opening",
+      "originalControlIndex": 1,
+      "zone": "opening",
+      "image": {
+        "label": "control-A/A/opening",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\phone-images\\control\\run-20261001-132511\\capture-01-opening-75.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\phone-images\\control-aa\\run-20261001-140240\\capture-01-opening-75.png",
+        "beforeSha256": "d3ec98a838e61194c340343ae4e293aea0ce8b39697962dbac17e134c62dbbcf",
+        "afterSha256": "d3ec98a838e61194c340343ae4e293aea0ce8b39697962dbac17e134c62dbbcf",
+        "size": [
+          1440,
+          3120
+        ],
+        "pixels": 4492800,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "checkpoint": "control-A/A/opening"
+      },
+      "imageByteIdentical": true,
+      "nativeStateSha256": {
+        "original": "b2bf3f11dbcf58f2d75ac779f981424a31add0c0d70bad9d4a518acfef103076",
+        "repeat": "e6aef315fb075308352c32a94fbe912b66516704d278761829baa971883ba31f"
+      },
+      "semanticFieldsEqual": true,
+      "semanticFieldDifferences": [],
+      "activeStrategyEqual": true,
+      "all41DiagnosticCountersEqual": true,
+      "counterDifferences": [],
+      "playerOwnershipIdentityEqual": true,
+      "playerOwnershipObservations": {
+        "original": {
+          "skinCadenceHz": 60,
+          "skinUpdateCount": 3,
+          "maximumSocketErrorMicrometres": 10,
+          "primaryPixelCountAvailable": true,
+          "primaryPixelCount": 118540,
+          "primaryVisible": true
+        },
+        "repeat": {
+          "skinCadenceHz": 60,
+          "skinUpdateCount": 4,
+          "maximumSocketErrorMicrometres": 10,
+          "primaryPixelCountAvailable": true,
+          "primaryPixelCount": 118540,
+          "primaryVisible": true
+        }
+      },
+      "resources": {
+        "original": {
+          "bufferCount": 45,
+          "memoryAllocationCount": 55,
+          "bottomLevelAccelerationStructureCount": 17,
+          "topLevelAccelerationStructureCount": 1,
+          "tlasInstanceCount": 21,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "descriptorSetCount": 1,
+          "hostVisibleBytes": 9815360,
+          "deviceLocalBytes": 76411200
+        },
+        "repeat": {
+          "bufferCount": 45,
+          "memoryAllocationCount": 55,
+          "bottomLevelAccelerationStructureCount": 17,
+          "topLevelAccelerationStructureCount": 1,
+          "tlasInstanceCount": 21,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "descriptorSetCount": 1,
+          "hostVisibleBytes": 9815360,
+          "deviceLocalBytes": 76411200
+        }
+      },
+      "presentSubmissionSerial": {
+        "original": 26,
+        "repeat": 30
+      }
+    },
+    {
+      "checkpoint": "skeleton",
+      "originalControlIndex": 13,
+      "zone": "skeleton-room",
+      "image": {
+        "label": "control-A/A/skeleton",
+        "status": "compared",
+        "beforePath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\phone-images\\control\\run-20261001-132511\\capture-13-skeleton-75.png",
+        "afterPath": "C:\\Dev\\tmp\\horde-staged-rt-20261001\\phone-images\\control-aa\\run-20261001-140240\\capture-02-skeleton-75.png",
+        "beforeSha256": "21f80d2d27e5991f3de76b8c89906eaa6ce43fd2dde100f2437fb1cc6a5db6a8",
+        "afterSha256": "21f80d2d27e5991f3de76b8c89906eaa6ce43fd2dde100f2437fb1cc6a5db6a8",
+        "size": [
+          1440,
+          3120
+        ],
+        "pixels": 4492800,
+        "pixelsOverOne": 0,
+        "fractionOverOne": 0.0,
+        "maximumChannelDifference": 0,
+        "equivalencePassed": true,
+        "boundsOverOne": null,
+        "peakExamples": [],
+        "checkpoint": "control-A/A/skeleton"
+      },
+      "imageByteIdentical": true,
+      "nativeStateSha256": {
+        "original": "7e13e1606b1432e7cc402c9d864d026f78fdfba162891dff2483f736c1fda4fe",
+        "repeat": "2b752f3eaba269b6af6a518830c5f885e62ca17caa1e0cafb2643c11f212e08d"
+      },
+      "semanticFieldsEqual": true,
+      "semanticFieldDifferences": [],
+      "activeStrategyEqual": true,
+      "all41DiagnosticCountersEqual": true,
+      "counterDifferences": [],
+      "playerOwnershipIdentityEqual": true,
+      "playerOwnershipObservations": {
+        "original": {
+          "skinCadenceHz": 60,
+          "skinUpdateCount": 2,
+          "maximumSocketErrorMicrometres": 10,
+          "primaryPixelCountAvailable": true,
+          "primaryPixelCount": 118314,
+          "primaryVisible": true
+        },
+        "repeat": {
+          "skinCadenceHz": 60,
+          "skinUpdateCount": 3,
+          "maximumSocketErrorMicrometres": 10,
+          "primaryPixelCountAvailable": true,
+          "primaryPixelCount": 118314,
+          "primaryVisible": true
+        }
+      },
+      "resources": {
+        "original": {
+          "bufferCount": 45,
+          "memoryAllocationCount": 55,
+          "bottomLevelAccelerationStructureCount": 17,
+          "topLevelAccelerationStructureCount": 1,
+          "tlasInstanceCount": 21,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "descriptorSetCount": 1,
+          "hostVisibleBytes": 9815360,
+          "deviceLocalBytes": 76411200
+        },
+        "repeat": {
+          "bufferCount": 45,
+          "memoryAllocationCount": 55,
+          "bottomLevelAccelerationStructureCount": 17,
+          "topLevelAccelerationStructureCount": 1,
+          "tlasInstanceCount": 21,
+          "pipelineCount": 2,
+          "shaderBindingTableCount": 2,
+          "descriptorSetCount": 1,
+          "hostVisibleBytes": 9815360,
+          "deviceLocalBytes": 76411200
+        }
+      },
+      "presentSubmissionSerial": {
+        "original": 576,
+        "repeat": 87
+      }
+    }
+  ],
+  "threshold": {
+    "maximumRgbDifference": 3,
+    "fractionPixelsOverOneMaximum": 0.001
+  }
+}

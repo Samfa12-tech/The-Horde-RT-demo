@@ -290,6 +290,12 @@ int main()
     Require(StepControllerSlider(50, false) == 50 &&
             StepControllerSlider(100, true) == 100,
             "controller slider steps must respect the 50-100 percent bounds");
+    Require(horde::platform::windows::StepControllerAudioVolume(40, false) == 30 &&
+            horde::platform::windows::StepControllerAudioVolume(40, true) == 50 &&
+            horde::platform::windows::StepControllerAudioVolume(10, false) == 0 &&
+            horde::platform::windows::StepControllerAudioVolume(0, false) == 0 &&
+            horde::platform::windows::StepControllerAudioVolume(100, true) == 100,
+            "both audio sliders must step by ten and reach mute, not inherit render-scale bounds");
     const auto confirm = MapLegacyControllerMenuEdges(
         0x001u, 0u, 65535u, 65535u, capturedBackbone);
     Require(confirm.confirm && !confirm.cancel && !confirm.togglePause,
@@ -316,10 +322,19 @@ int main()
             windowsSource.find("WritePrivateProfileStringA(\"progress\", \"rtLabUnlocked\"") != std::string::npos &&
             windowsSource.find("CanPersistRtLabUnlock(decision)") != std::string::npos,
             "Windows RT Lab progress must use its independent INI section and the genuine-finale decision");
+    const std::size_t measurementPauseBegin = windowsSource.find("bool MeasurementPausedByUi(");
+    const std::size_t measurementPauseEnd = windowsSource.find(
+        "void ApplyOverlayState(", measurementPauseBegin);
     Require(windowsSource.find("simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning") != std::string::npos &&
             windowsSource.find("context.rtSceneTuning = {};") != std::string::npos &&
-            windowsSource.find("context.simulationPaused = pauseVisible || context.settingsVisible || context.rtLabVisible") != std::string::npos,
-            "Windows RT Lab must pass route-local tuning to the renderer while pausing only simulation");
+            measurementPauseBegin != std::string::npos && measurementPauseEnd != std::string::npos &&
+            windowsSource.substr(measurementPauseBegin, measurementPauseEnd - measurementPauseBegin)
+                    .find("return pauseVisible || context.settingsVisible || context.rtLabVisible") != std::string::npos &&
+            windowsSource.substr(measurementPauseBegin, measurementPauseEnd - measurementPauseBegin)
+                    .find("context.diagnosticsVisible || context.benchmarkReportVisible;") != std::string::npos &&
+            windowsSource.find("context.simulationPaused = MeasurementPausedByUi(context);") != std::string::npos &&
+            windowsSource.find("context.simulationInput.paused = context.simulationPaused;") != std::string::npos,
+            "Windows RT Lab must pass route-local tuning to the renderer while pausing simulation through the shared UI helper");
     Require(windowsSource.find("RT LAB UNLOCKED") != std::string::npos &&
             windowsSource.find("OPEN RT LAB") != std::string::npos &&
             windowsSource.find("RESTORE AUTHORED") != std::string::npos &&

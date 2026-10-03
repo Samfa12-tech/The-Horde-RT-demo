@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-music-pcm-stream-20261001/build
+Test project C:/Dev/tmp/horde-music-pcm-stream-20261001/build
+    Start 50: horde_rt_simulation_timing_tests
+1/4 Test #50: horde_rt_simulation_timing_tests .....   Passed    0.01 sec
+    Start 51: horde_rt_simulation_gameplay_tests
+2/4 Test #51: horde_rt_simulation_gameplay_tests ...   Passed    0.02 sec
+    Start 52: horde_rt_music_director_tests
+3/4 Test #52: horde_rt_music_director_tests ........   Passed    0.01 sec
+    Start 53: horde_rt_music_pcm_stream_tests
+4/4 Test #53: horde_rt_music_pcm_stream_tests ......   Passed    0.13 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   0.19 sec

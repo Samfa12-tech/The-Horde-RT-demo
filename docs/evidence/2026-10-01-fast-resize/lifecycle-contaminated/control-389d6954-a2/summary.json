@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "device": "SM-S948B",
+  "apkSha256": "389d6954f7a3fddde1ced690470029fa4b14cc6f825fa34bf7269dc617f946e0",
+  "method": "Same-process Debug intent acceptance to successful native swapchain presentation log timestamps, not touchscreen/compositor latency or Shipping FPS",
+  "cooled": false,
+  "rows": [
+    {
+      "sequence": 1,
+      "scale": 100,
+      "requestUtc": "2026-09-30T15:21:52.3033862Z",
+      "pid": "10517",
+      "requestLog": "         1790781713.120 10517 10517 I HordeLanternAudio: Accepted debug automation intent: checkpoint=-1 capture=false replay=false scale=100 gpuTiming=enabled requireRayQueryCompute=false rtLab=false",
+      "presentationLog": "         1790781727.328 10517 17489 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 14208.000183105469,
+      "fastPathLog": null
+    },
+    {
+      "sequence": 2,
+      "scale": 75,
+      "requestUtc": "2026-09-30T15:22:07.0771952Z",
+      "pid": "10517",
+      "requestLog": "         1790781727.882 10517 10517 I HordeLanternAudio: Accepted debug automation intent: checkpoint=-1 capture=false replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false",
+      "presentationLog": "         1790781743.790 10517 17950 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 15907.999992370605,
+      "fastPathLog": null
+    },
+    {
+      "sequence": 3,
+      "scale": 50,
+      "requestUtc": "2026-09-30T15:22:23.5242001Z",
+      "pid": "10517",
+      "requestLog": "         1790781744.291 10517 10517 I HordeLanternAudio: Accepted debug automation intent: checkpoint=-1 capture=false replay=false scale=50 gpuTiming=enabled requireRayQueryCompute=false rtLab=false",
+      "presentationLog": "         1790781760.013 10517 18360 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 15722.000122070312,
+      "fastPathLog": null
+    },
+    {
+      "sequence": 4,
+      "scale": 75,
+      "requestUtc": "2026-09-30T15:22:39.7424011Z",
+      "pid": "10517",
+      "requestLog": "         1790781760.514 10517 10517 I HordeLanternAudio: Accepted debug automation intent: checkpoint=-1 capture=false replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false",
+      "presentationLog": "         1790781773.658 10517 18751 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 13144.000053405762,
+      "fastPathLog": null
+    }
+  ]
+}

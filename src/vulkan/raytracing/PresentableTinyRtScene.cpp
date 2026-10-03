@@ -5,7 +5,11 @@
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldLightState.h"
 #include "vulkan/raytracing/HeldItemRenderSlot.h"
+#include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
+#include "vulkan/raytracing/RtLanternGeometryProfile.h"
+#include "vulkan/raytracing/TlasInstanceRefresh.h"
 
 #include <algorithm>
 #include <array>
@@ -15,6 +19,10 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
+#include <locale>
+#include <limits>
+#include <optional>
 #include <span>
 #include <utility>
 #include <vector>
@@ -32,6 +40,55 @@ namespace
 {
 
 constexpr VkFormat kStorageImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
+
+bool ValidEvidenceHash(const std::string_view hash) noexcept
+{
+    return hash.size() == 64u &&
+           std::all_of(hash.begin(), hash.end(), [](const char value) {
+               return (value >= '0' && value <= '9') ||
+                      (value >= 'a' && value <= 'f');
+           });
+}
+
+bool CheckedMetresToMicrometres(const float metres,
+                                std::uint64_t& micrometres) noexcept
+{
+    if (!std::isfinite(metres) || metres < 0.0f)
+    {
+        return false;
+    }
+    const long double converted = static_cast<long double>(metres) * 1'000'000.0L;
+    const long double upper = std::ldexp(
+        1.0L, std::numeric_limits<std::uint64_t>::digits);
+    if (converted >= upper)
+    {
+        return false;
+    }
+    micrometres = static_cast<std::uint64_t>(std::round(converted));
+    return true;
+}
+
+std::string_view EvidenceBundleKey(
+    const RtPipelineBundleRequest& request) noexcept
+{
+    if (request.executionBackend == RtExecutionBackend::RayQueryCompute)
+    {
+        if (request.instrumentation == RtInstrumentation::Shipping)
+        {
+            return request.quality == DielectricQuality::Mobile
+                ? "rayquery_compute_shipping_mobile_pair" : "rayquery_compute_shipping_high_pair";
+        }
+        return request.quality == DielectricQuality::Mobile
+            ? "rayquery_compute_diagnostic_mobile_pair" : "rayquery_compute_diagnostic_high_pair";
+    }
+    if (request.instrumentation == RtInstrumentation::Shipping)
+    {
+        return request.quality == DielectricQuality::Mobile
+            ? "shipping_mobile_pair" : "shipping_high_pair";
+    }
+    return request.quality == DielectricQuality::Mobile
+        ? "diagnostic_mobile_pair" : "diagnostic_high_pair";
+}
 
 struct ScenePushConstants
 {
@@ -114,16 +171,6 @@ bool HasActiveGenericTransmission(
     }
     return false;
 }
-
-// Generated from shaders/raytracing/minimal.rgen with glslangValidator -V -Os.
-// Keep this embedded so the Android RT scene remains a self-contained native build.
-constexpr std::uint32_t kMinimalRayGenShader[] = {
-#include "vulkan/raytracing/MinimalRayGenShader.inc"
-};
-
-constexpr std::uint32_t kMinimalLegacyRayGenShader[] = {
-#include "vulkan/raytracing/MinimalLegacyRayGenShader.inc"
-};
 
 constexpr std::uint32_t kMinimalMissShader[] = {
     0x07230203u, 0x00010500u, 0x0008000bu, 0x00000069u, 0x00000000u, 0x00020011u, 0x0000117fu, 0x0006000au,
@@ -257,6 +304,65 @@ bool CreateShaderModule(VkDevice device, const std::uint32_t* code, std::size_t 
 
 } // namespace
 
+bool TryMakeRtPipelineEvidenceIdentity(
+    const RtPipelineBundleRequest& request,
+    const RtPipelineVariantArtifact& opaqueFast,
+    const RtPipelineVariantArtifact& genericDielectric,
+    horde::telemetry::RtPipelineEvidenceIdentity& identity) noexcept
+{
+    identity = {};
+    if ((request.instrumentation != RtInstrumentation::Shipping &&
+         request.instrumentation != RtInstrumentation::Diagnostic) ||
+        (request.quality != DielectricQuality::Mobile &&
+         request.quality != DielectricQuality::High) ||
+        (request.executionBackend != RtExecutionBackend::RayTracingPipeline &&
+         request.executionBackend != RtExecutionBackend::RayQueryCompute) ||
+        opaqueFast.key.executionBackend != request.executionBackend ||
+        genericDielectric.key.executionBackend != request.executionBackend ||
+        opaqueFast.key.instrumentation != request.instrumentation ||
+        genericDielectric.key.instrumentation != request.instrumentation ||
+        opaqueFast.key.quality != request.quality ||
+        genericDielectric.key.quality != request.quality ||
+        opaqueFast.key.material != RtMaterialStrategy::OpaqueFast ||
+        genericDielectric.key.material != RtMaterialStrategy::GenericDielectric ||
+        opaqueFast.canonicalKey.empty() || genericDielectric.canonicalKey.empty() ||
+        !ValidEvidenceHash(opaqueFast.spirvSha256) ||
+        !ValidEvidenceHash(genericDielectric.spirvSha256))
+    {
+        return false;
+    }
+
+    horde::telemetry::RtPipelineEvidenceIdentity candidate{};
+    candidate.executionMode = request.executionBackend == RtExecutionBackend::RayQueryCompute
+        ? horde::telemetry::RtExecutionMode::RayQueryCompute
+        : horde::telemetry::RtExecutionMode::RayTracingPipeline;
+    candidate.instrumentation = request.instrumentation == RtInstrumentation::Shipping
+        ? horde::telemetry::RtInstrumentationMode::Shipping
+        : horde::telemetry::RtInstrumentationMode::Diagnostic;
+    candidate.dielectricQuality = request.quality == DielectricQuality::Mobile
+        ? horde::telemetry::RtDielectricQuality::Mobile
+        : horde::telemetry::RtDielectricQuality::High;
+    candidate.activeStrategy = horde::telemetry::RtMaterialStrategy::OpaqueFast;
+    candidate.waterQuality = horde::telemetry::RtWaterQuality::Off;
+    if (!horde::telemetry::AssignRtFixedText(
+            candidate.bundleKey, EvidenceBundleKey(request)) ||
+        !horde::telemetry::AssignRtFixedText(
+            candidate.opaqueFast.key, opaqueFast.canonicalKey) ||
+        !horde::telemetry::AssignRtFixedText(
+            candidate.opaqueFast.sha256, opaqueFast.spirvSha256) ||
+        !horde::telemetry::AssignRtFixedText(
+            candidate.genericDielectric.key, genericDielectric.canonicalKey) ||
+        !horde::telemetry::AssignRtFixedText(
+            candidate.genericDielectric.sha256,
+            genericDielectric.spirvSha256))
+    {
+        return false;
+    }
+    candidate.active = candidate.opaqueFast;
+    identity = candidate;
+    return true;
+}
+
 PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
     const horde::gameplay::PlayerCombatSnapshot& playerCombat,
     const float swordSwingRadians,
@@ -301,7 +407,11 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     storageImage_ = std::exchange(other.storageImage_, VK_NULL_HANDLE);
     storageImageMemory_ = std::exchange(other.storageImageMemory_, VK_NULL_HANDLE);
     storageImageView_ = std::exchange(other.storageImageView_, VK_NULL_HANDLE);
+    storageImageAllocationSize_ = std::exchange(other.storageImageAllocationSize_, 0u);
+    storageImageMemoryPropertyFlags_ =
+        std::exchange(other.storageImageMemoryPropertyFlags_, 0u);
     storageImageLayout_ = std::exchange(other.storageImageLayout_, VK_IMAGE_LAYOUT_UNDEFINED);
+    storageImageFrameRecorded_ = std::exchange(other.storageImageFrameRecorded_, false);
     lastOutputRedBlueSwapApplied_ = std::exchange(other.lastOutputRedBlueSwapApplied_, false);
     materialDiffuse_ = std::exchange(other.materialDiffuse_, TextureArray{});
     materialNormal_ = std::exchange(other.materialNormal_, TextureArray{});
@@ -318,17 +428,21 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     indexBuffer_ = std::exchange(other.indexBuffer_, Buffer{});
     transformBuffer_ = std::exchange(other.transformBuffer_, Buffer{});
     instanceBuffer_ = std::exchange(other.instanceBuffer_, Buffer{});
+    tlasBuiltInstances_ = std::exchange(other.tlasBuiltInstances_, {});
+    tlasInstanceDefinitionsValid_ = std::exchange(other.tlasInstanceDefinitionsValid_, false);
+    tlasPendingInstances_ = std::exchange(other.tlasPendingInstances_, {});
+    tlasPendingDefinitionsValid_ = std::exchange(other.tlasPendingDefinitionsValid_, false);
     heldLightBuffer_ = std::exchange(other.heldLightBuffer_, Buffer{});
     fireEmitterBuffer_ = std::exchange(other.fireEmitterBuffer_, Buffer{});
     worldSurfaceBuffer_ = std::exchange(other.worldSurfaceBuffer_, Buffer{});
     staticVertexBuffer_ = std::exchange(other.staticVertexBuffer_, Buffer{});
+    worldPlayerVertexBuffer_ = std::exchange(other.worldPlayerVertexBuffer_, Buffer{});
+    viewmodelVertexBuffer_ = std::exchange(other.viewmodelVertexBuffer_, Buffer{});
     staticIndexBuffer_ = std::exchange(other.staticIndexBuffer_, Buffer{});
     staticGeometryTransformBuffer_ = std::exchange(other.staticGeometryTransformBuffer_, Buffer{});
     instanceMetadataBuffer_ = std::exchange(other.instanceMetadataBuffer_, Buffer{});
     primitiveMetadataBuffer_ = std::exchange(other.primitiveMetadataBuffer_, Buffer{});
     materialMetadataBuffer_ = std::exchange(other.materialMetadataBuffer_, Buffer{});
-    dielectricDiagnosticsBuffer_ =
-        std::exchange(other.dielectricDiagnosticsBuffer_, Buffer{});
     blas_ = std::exchange(other.blas_, AccelerationStructure{});
     waterfallBlas_ = std::exchange(other.waterfallBlas_, AccelerationStructure{});
     finaleRoofBlas_ = std::exchange(other.finaleRoofBlas_, AccelerationStructure{});
@@ -347,6 +461,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     playerBodyBlas_ = std::exchange(other.playerBodyBlas_, AccelerationStructure{});
     playerLimbBlas_ = std::exchange(other.playerLimbBlas_, AccelerationStructure{});
     skinnedPlayerBlas_ = std::exchange(other.skinnedPlayerBlas_, AccelerationStructure{});
+    viewmodelBlas_ = std::exchange(other.viewmodelBlas_, AccelerationStructure{});
+    viewmodelBlasUpdateScratch_ = std::exchange(other.viewmodelBlasUpdateScratch_, Buffer{});
     skinnedPlayerBlasUpdateScratch_ =
         std::exchange(other.skinnedPlayerBlasUpdateScratch_, Buffer{});
     tlas_ = std::exchange(other.tlas_, AccelerationStructure{});
@@ -365,6 +481,21 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     productionDielectricFixtureAsset_ =
         std::move(other.productionDielectricFixtureAsset_);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
+    viewmodelAsset_ = std::move(other.viewmodelAsset_);
+    viewmodelSkin_ = std::move(other.viewmodelSkin_);
+    viewmodelPoseVertices_ = std::move(other.viewmodelPoseVertices_);
+    viewmodelPoseTangents_ = std::move(other.viewmodelPoseTangents_);
+    viewmodelUpload_ = std::move(other.viewmodelUpload_);
+    viewmodelAvailable_ = std::exchange(other.viewmodelAvailable_, false);
+    playerBodyRemainderAvailable_ = std::exchange(other.playerBodyRemainderAvailable_, false);
+    viewmodelPoseCurrent_ = std::exchange(other.viewmodelPoseCurrent_, false);
+#ifndef NDEBUG
+    viewmodelCaptureTransform_ = std::exchange(other.viewmodelCaptureTransform_, {});
+    playerWorldBodyCaptureTransform_ =
+        std::exchange(other.playerWorldBodyCaptureTransform_, {});
+    playerWorldBodyPoseCurrent_ =
+        std::exchange(other.playerWorldBodyPoseCurrent_, false);
+#endif
     playerStaticVertexBase_ = std::exchange(other.playerStaticVertexBase_, 0u);
     dielectricFixtureMaterialIndex_ =
         std::exchange(other.dielectricFixtureMaterialIndex_, 0u);
@@ -375,6 +506,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     playerMaxSocketErrorMetres_ = std::exchange(other.playerMaxSocketErrorMetres_, 0.0f);
     lastInstanceMasks_ = std::exchange(other.lastInstanceMasks_, {});
     lastPlayerPrimaryVisible_ = std::exchange(other.lastPlayerPrimaryVisible_, false);
+    lastPlayerWorldBodyInstanceFlags_ = std::exchange(other.lastPlayerWorldBodyInstanceFlags_, 0u);
     rewardLanternGripAgreement_ = std::exchange(other.rewardLanternGripAgreement_, {});
     rewardLanternAuthorityAgreement_ = std::exchange(other.rewardLanternAuthorityAgreement_, {});
     rewardLanternFinalGripPosition_ = std::exchange(other.rewardLanternFinalGripPosition_, {});
@@ -464,26 +596,22 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
         std::exchange(other.productionPropBlasBuildMilliseconds_, 0.0);
     heldItemBlasMeasurements_ = std::exchange(
         other.heldItemBlasMeasurements_, HeldItemBlasMeasurements{});
-    descriptorSetLayout_ = std::exchange(other.descriptorSetLayout_, VK_NULL_HANDLE);
-    descriptorPool_ = std::exchange(other.descriptorPool_, VK_NULL_HANDLE);
-    descriptorSet_ = std::exchange(other.descriptorSet_, VK_NULL_HANDLE);
-    pipelineLayout_ = std::exchange(other.pipelineLayout_, VK_NULL_HANDLE);
-    pipeline_ = std::exchange(other.pipeline_, VK_NULL_HANDLE);
-    legacyPipeline_ = std::exchange(other.legacyPipeline_, VK_NULL_HANDLE);
-    shaderBindingTable_ = std::exchange(other.shaderBindingTable_, Buffer{});
-    legacyShaderBindingTable_ = std::exchange(other.legacyShaderBindingTable_, Buffer{});
-    raygenRegion_ = std::exchange(other.raygenRegion_, VkStridedDeviceAddressRegionKHR{});
-    missRegion_ = std::exchange(other.missRegion_, VkStridedDeviceAddressRegionKHR{});
-    hitRegion_ = std::exchange(other.hitRegion_, VkStridedDeviceAddressRegionKHR{});
-    callableRegion_ = std::exchange(other.callableRegion_, VkStridedDeviceAddressRegionKHR{});
-    legacyRaygenRegion_ = std::exchange(
-        other.legacyRaygenRegion_, VkStridedDeviceAddressRegionKHR{});
-    legacyMissRegion_ = std::exchange(
-        other.legacyMissRegion_, VkStridedDeviceAddressRegionKHR{});
-    legacyHitRegion_ = std::exchange(
-        other.legacyHitRegion_, VkStridedDeviceAddressRegionKHR{});
-    legacyCallableRegion_ = std::exchange(
-        other.legacyCallableRegion_, VkStridedDeviceAddressRegionKHR{});
+    pipelineBundle_ = std::move(other.pipelineBundle_);
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    stagedPrimary_ = std::move(other.stagedPrimary_);
+#endif
+    executionPolicy_ = std::exchange(other.executionPolicy_, RtExecutionPolicy{});
+    computeDispatchGroups_ = std::exchange(other.computeDispatchGroups_, {});
+    pipelineEvidenceIdentity_ = std::exchange(
+        other.pipelineEvidenceIdentity_,
+        horde::telemetry::RtPipelineEvidenceIdentity{});
+    pipelineEvidenceIdentityValid_ = std::exchange(
+        other.pipelineEvidenceIdentityValid_, false);
+    framePipelineEvidence_ = std::exchange(
+        other.framePipelineEvidence_,
+        horde::telemetry::RtPipelineEvidenceIdentity{});
+    framePipelineEvidenceValid_ = std::exchange(
+        other.framePipelineEvidenceValid_, false);
     vkCreateAccelerationStructureKHR_ = other.vkCreateAccelerationStructureKHR_;
     vkDestroyAccelerationStructureKHR_ = other.vkDestroyAccelerationStructureKHR_;
     vkGetAccelerationStructureBuildSizesKHR_ = other.vkGetAccelerationStructureBuildSizesKHR_;
@@ -494,6 +622,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     vkCmdTraceRaysKHR_ = other.vkCmdTraceRaysKHR_;
     vkGetBufferDeviceAddressKHR_ = other.vkGetBufferDeviceAddressKHR_;
     gpuResources_.Bind(physicalDevice_, device_, vkDestroyAccelerationStructureKHR_, vkGetBufferDeviceAddressKHR_);
+    pipelineBundle_.RebindDestroyContext(this, &gpuResources_);
     other.gpuResources_.Reset();
     ready_ = std::exchange(other.ready_, false);
 
@@ -513,7 +642,49 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         const std::string& lichTextureDirectory,
                                         std::string& diagnostic,
                                         const std::string& developmentStaticAssetDirectory,
-                                        const std::string& productionAssetRoot)
+                                        const std::string& productionAssetRoot,
+                                        RtExecutionBackend executionBackend)
+{
+    InitialiseOrchestrationApi api{};
+    api.user = &executionBackend;
+    api.resolvePreflight = [](void* user, RtPipelineBundlePreflight& preflight,
+                              std::string& failureKey) {
+        return ResolveCompiledRtPipelineBundlePreflight(
+            preflight, failureKey, *static_cast<RtExecutionBackend*>(user));
+    };
+    api.continueAfterPreflight = [](
+        void*, PresentableTinyRtScene& scene, VkFormat format,
+        const std::string& skeletonPath, const std::string& lichPath,
+        const std::string& materialDirectory, const std::string& lichDirectory,
+        const std::string& developmentDirectory, const std::string& productionRoot,
+        std::string& error) {
+        return scene.ContinueInitialiseAfterPreflight(
+            format, skeletonPath, lichPath, materialDirectory, lichDirectory,
+            developmentDirectory, productionRoot, error);
+    };
+    return InitialiseWithOrchestration(
+        instance, physicalDevice, device, queue, commandPool, dispatchExtent,
+        presentationFormat, skeletonAssetPath, lichAssetPath,
+        materialAssetDirectory, lichTextureDirectory, diagnostic,
+        developmentStaticAssetDirectory, productionAssetRoot, api);
+}
+
+bool PresentableTinyRtScene::InitialiseWithOrchestration(
+    VkInstance instance,
+    VkPhysicalDevice physicalDevice,
+    VkDevice device,
+    VkQueue queue,
+    VkCommandPool commandPool,
+    VkExtent2D dispatchExtent,
+    VkFormat presentationFormat,
+    const std::string& skeletonAssetPath,
+    const std::string& lichAssetPath,
+    const std::string& materialAssetDirectory,
+    const std::string& lichTextureDirectory,
+    std::string& diagnostic,
+    const std::string& developmentStaticAssetDirectory,
+    const std::string& productionAssetRoot,
+    const InitialiseOrchestrationApi& api)
 {
     Destroy();
 
@@ -533,6 +704,95 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
     {
         diagnostic = "RT dispatch extent is zero.";
         return false;
+    }
+    if (api.resolvePreflight == nullptr || api.continueAfterPreflight == nullptr)
+    {
+        diagnostic = "Invalid RT scene initialisation orchestration.";
+        Destroy();
+        return false;
+    }
+    RtPipelineBundlePreflight selectedPreflight{};
+    if (!api.resolvePreflight(api.user, selectedPreflight, diagnostic))
+    {
+        Destroy();
+        return false;
+    }
+    RtPipelineBundleDestroyApi destroyApi{};
+    destroyApi.user = this;
+    destroyApi.gpuResources = &gpuResources_;
+    destroyApi.destroyBuffer = [](void*, RtGpuResources* resources, RtGpuBuffer& buffer,
+                                  RtPipelineOwnedBuffer) noexcept {
+        if (resources != nullptr) resources->DestroyBuffer(buffer);
+        else buffer = {};
+    };
+    destroyApi.destroyPipeline = [](void* user, VkPipeline& pipeline,
+                                    RtMaterialStrategy) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (scene.device_ != VK_NULL_HANDLE && pipeline != VK_NULL_HANDLE)
+            vkDestroyPipeline(scene.device_, pipeline, nullptr);
+        pipeline = VK_NULL_HANDLE;
+    };
+    destroyApi.destroyPipelineLayout = [](void* user, VkPipelineLayout& layout) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (scene.device_ != VK_NULL_HANDLE && layout != VK_NULL_HANDLE)
+            vkDestroyPipelineLayout(scene.device_, layout, nullptr);
+        layout = VK_NULL_HANDLE;
+    };
+    destroyApi.destroyDescriptorPool = [](void* user, VkDescriptorPool& pool) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (scene.device_ != VK_NULL_HANDLE && pool != VK_NULL_HANDLE)
+            vkDestroyDescriptorPool(scene.device_, pool, nullptr);
+        pool = VK_NULL_HANDLE;
+    };
+    destroyApi.destroyDescriptorSetLayout = [](void* user,
+                                               VkDescriptorSetLayout& layout) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (scene.device_ != VK_NULL_HANDLE && layout != VK_NULL_HANDLE)
+            vkDestroyDescriptorSetLayout(scene.device_, layout, nullptr);
+        layout = VK_NULL_HANDLE;
+    };
+    if (!pipelineBundle_.AdoptPreflight(
+            std::move(selectedPreflight), destroyApi, diagnostic))
+    {
+        Destroy();
+        return false;
+    }
+    const auto executionPolicy = TryMakeRtExecutionPolicy(ExecutionBackend());
+    if (!executionPolicy)
+    {
+        diagnostic = "Selected RT execution backend has no valid Vulkan policy.";
+        Destroy();
+        return false;
+    }
+    executionPolicy_ = *executionPolicy;
+    return api.continueAfterPreflight(
+        api.user, *this, presentationFormat, skeletonAssetPath, lichAssetPath,
+        materialAssetDirectory, lichTextureDirectory,
+        developmentStaticAssetDirectory, productionAssetRoot, diagnostic);
+}
+
+bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
+    VkFormat presentationFormat,
+    const std::string& skeletonAssetPath,
+    const std::string& lichAssetPath,
+    const std::string& materialAssetDirectory,
+    const std::string& lichTextureDirectory,
+    const std::string& developmentStaticAssetDirectory,
+    const std::string& productionAssetRoot,
+    std::string& diagnostic)
+{
+    if (ExecutionBackend() == RtExecutionBackend::RayQueryCompute)
+    {
+        VkPhysicalDeviceProperties properties{};
+        vkGetPhysicalDeviceProperties(physicalDevice_, &properties);
+        const auto groups = TryMakeRtComputeDispatch(dispatchExtent_, properties.limits);
+        if (!groups)
+        {
+            diagnostic = "Device compute limits cannot execute the fixed 8x8 hardware RT workload.";
+            Destroy();
+            return false;
+        }
+        computeDispatchGroups_ = *groups;
     }
     VkFormatProperties storageFormatProperties{};
     VkFormatProperties presentationFormatProperties{};
@@ -556,14 +816,46 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         !CreateLichTextures(lichTextureDirectory, diagnostic) ||
         !CreateStaticMeshResources(diagnostic) ||
         !BuildAccelerationStructures(diagnostic) ||
-        !CreateDescriptors(diagnostic) ||
-        !CreatePipeline(diagnostic) ||
-        !CreateShaderBindingTable(diagnostic))
+        !CreateSelectedPipelineBundle(diagnostic))
     {
         Destroy();
         return false;
     }
 
+#if defined(HORDE_RT_STAGED_PRIMARY_EXPERIMENT) && HORDE_RT_STAGED_PRIMARY_DEFAULT
+    if (ExecutionBackend() != RtExecutionBackend::RayTracingPipeline)
+    {
+        diagnostic = "StagedPrimaryV1Investigation requires RayTracingPipeline; no alternate-backend substitution.";
+        Destroy();
+        return false;
+    }
+    RtPipelineBundleBuildApi stagedApi{};
+    stagedApi.user = this;
+    stagedApi.createSharedShaderModules = [](void* user, VkShaderModule& miss, VkShaderModule& hit, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleSharedShaderModules(miss, hit, error);
+    };
+    stagedApi.createEntryShaderModule = [](void* user, const RtPipelineVariantArtifact& artifact, VkShaderModule& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleEntryShaderModule(artifact, out, error);
+    };
+    stagedApi.createStrategyPipeline = [](void* user, RtMaterialStrategy strategy, VkShaderModule entry, VkShaderModule miss,
+                                         VkShaderModule hit, VkPipelineLayout layout, VkPipeline& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleStrategyPipeline(strategy, entry, miss, hit, layout, out, error);
+    };
+    stagedApi.createStrategySbt = [](void* user, RtMaterialStrategy strategy, VkPipeline pipeline, Buffer& out,
+                                   std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleStrategySbt(strategy, pipeline, out, regions, error);
+    };
+    stagedApi.destroyShaderModule = [](void* user, VkShaderModule& module) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (module != VK_NULL_HANDLE) vkDestroyShaderModule(scene.device_, module, nullptr);
+        module = VK_NULL_HANDLE;
+    };
+    stagedPrimary_ = experimental::StagedPrimaryPass::Create(physicalDevice_, device_, gpuResources_,
+        pipelineBundle_.descriptorSetLayout, pipelineBundle_.descriptorSet, dispatchExtent_, sizeof(ScenePushConstants),
+        vkCmdTraceRaysKHR_, stagedApi, diagnostic);
+    if (!stagedPrimary_) { Destroy(); return false; }
+#endif
+    pipelineEvidenceIdentityValid_ = CapturePipelineEvidenceIdentity();
     ready_ = true;
     diagnostic.clear();
     return true;
@@ -571,45 +863,32 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
 
 void PresentableTinyRtScene::Destroy()
 {
+    tlasBuiltInstances_ = {};
+    tlasInstanceDefinitionsValid_ = false;
+    tlasPendingInstances_ = {};
+    tlasPendingDefinitionsValid_ = false;
+    executionPolicy_ = {};
+    computeDispatchGroups_ = {};
     if (device_ == VK_NULL_HANDLE)
     {
+        pipelineEvidenceIdentity_ = {};
+        pipelineEvidenceIdentityValid_ = false;
+        framePipelineEvidence_ = {};
+        framePipelineEvidenceValid_ = false;
         ready_ = false;
         return;
     }
 
-    if (pipeline_ != VK_NULL_HANDLE)
-    {
-        vkDestroyPipeline(device_, pipeline_, nullptr);
-        pipeline_ = VK_NULL_HANDLE;
-    }
-    if (legacyPipeline_ != VK_NULL_HANDLE)
-    {
-        vkDestroyPipeline(device_, legacyPipeline_, nullptr);
-        legacyPipeline_ = VK_NULL_HANDLE;
-    }
-    if (pipelineLayout_ != VK_NULL_HANDLE)
-    {
-        vkDestroyPipelineLayout(device_, pipelineLayout_, nullptr);
-        pipelineLayout_ = VK_NULL_HANDLE;
-    }
-    if (descriptorPool_ != VK_NULL_HANDLE)
-    {
-        vkDestroyDescriptorPool(device_, descriptorPool_, nullptr);
-        descriptorPool_ = VK_NULL_HANDLE;
-        descriptorSet_ = VK_NULL_HANDLE;
-    }
-    if (descriptorSetLayout_ != VK_NULL_HANDLE)
-    {
-        vkDestroyDescriptorSetLayout(device_, descriptorSetLayout_, nullptr);
-        descriptorSetLayout_ = VK_NULL_HANDLE;
-    }
-
-    DestroyBuffer(shaderBindingTable_);
-    DestroyBuffer(legacyShaderBindingTable_);
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    stagedPrimary_.reset();
+#endif
+    pipelineBundle_.Reset();
     DestroyAccelerationStructure(tlas_);
     DestroyBuffer(tlasUpdateScratch_);
     characterSlot_.DestroyGpuResources(gpuResources_);
     DestroyBuffer(skinnedPlayerBlasUpdateScratch_);
+    DestroyBuffer(viewmodelBlasUpdateScratch_);
+    DestroyAccelerationStructure(viewmodelBlas_);
     DestroyAccelerationStructure(skinnedPlayerBlas_);
     DestroyAccelerationStructure(playerLimbBlas_);
     DestroyAccelerationStructure(playerBodyBlas_);
@@ -625,12 +904,13 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(blas_);
     DestroyBuffer(worldSurfaceBuffer_);
     DestroyBuffer(materialMetadataBuffer_);
-    DestroyBuffer(dielectricDiagnosticsBuffer_);
     DestroyBuffer(primitiveMetadataBuffer_);
     DestroyBuffer(instanceMetadataBuffer_);
     DestroyBuffer(staticIndexBuffer_);
     DestroyBuffer(staticGeometryTransformBuffer_);
     DestroyBuffer(staticVertexBuffer_);
+    DestroyBuffer(worldPlayerVertexBuffer_);
+    DestroyBuffer(viewmodelVertexBuffer_);
     DestroyBuffer(heldLightBuffer_);
     DestroyBuffer(fireEmitterBuffer_);
     DestroyBuffer(instanceBuffer_);
@@ -663,6 +943,20 @@ void PresentableTinyRtScene::Destroy()
     productionDielectricFixtureAsset_ = {};
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
+    viewmodelAsset_ = {};
+    viewmodelSkin_ = {};
+    viewmodelPoseVertices_.clear();
+    viewmodelPoseTangents_.clear();
+    viewmodelUpload_.clear();
+    viewmodelAvailable_ = false;
+    playerBodyRemainderAvailable_ = false;
+    lastPlayerWorldBodyInstanceFlags_ = 0u;
+    viewmodelPoseCurrent_ = false;
+#ifndef NDEBUG
+    viewmodelCaptureTransform_ = {};
+    playerWorldBodyCaptureTransform_ = {};
+    playerWorldBodyPoseCurrent_ = false;
+#endif
     playerStaticVertexBase_ = 0u;
     dielectricFixtureMaterialIndex_ = 0u;
     dielectricTransportOverflowCount_ = 0u;
@@ -718,36 +1012,179 @@ void PresentableTinyRtScene::Destroy()
     productionPropBlasBytes_ = 0u;
     productionPropBlasBuildMilliseconds_ = 0.0;
     heldItemBlasMeasurements_ = {};
+    pipelineEvidenceIdentity_ = {};
+    pipelineEvidenceIdentityValid_ = false;
+    framePipelineEvidence_ = {};
+    framePipelineEvidenceValid_ = false;
 
-    if (storageImageView_ != VK_NULL_HANDLE)
-    {
-        vkDestroyImageView(device_, storageImageView_, nullptr);
-        storageImageView_ = VK_NULL_HANDLE;
-    }
-    if (storageImage_ != VK_NULL_HANDLE)
-    {
-        vkDestroyImage(device_, storageImage_, nullptr);
-        storageImage_ = VK_NULL_HANDLE;
-    }
-    if (storageImageMemory_ != VK_NULL_HANDLE)
-    {
-        vkFreeMemory(device_, storageImageMemory_, nullptr);
-        storageImageMemory_ = VK_NULL_HANDLE;
-    }
-    storageImageLayout_ = VK_IMAGE_LAYOUT_UNDEFINED;
+    auto output = OutputImage();
+    DestroyOutputImage(output);
+    AdoptOutputImage(output);
+    storageImageFrameRecorded_ = false;
     lastOutputRedBlueSwapApplied_ = false;
 
-    raygenRegion_ = {};
-    missRegion_ = {};
-    hitRegion_ = {};
-    callableRegion_ = {};
-    legacyRaygenRegion_ = {};
-    legacyMissRegion_ = {};
-    legacyHitRegion_ = {};
-    legacyCallableRegion_ = {};
     scaledBlitSupported_ = false;
     ready_ = false;
     gpuResources_.Reset();
+}
+
+horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory() const noexcept
+{
+    horde::telemetry::RtResourceInventory inventory{};
+    for (const Buffer* buffer : std::array{
+             &vertexBuffer_, &indexBuffer_, &transformBuffer_, &instanceBuffer_,
+             &heldLightBuffer_, &fireEmitterBuffer_, &worldSurfaceBuffer_,
+             &staticVertexBuffer_, &worldPlayerVertexBuffer_, &viewmodelVertexBuffer_,
+             &staticIndexBuffer_, &staticGeometryTransformBuffer_,
+             &instanceMetadataBuffer_, &primitiveMetadataBuffer_, &materialMetadataBuffer_,
+             &skinnedPlayerBlasUpdateScratch_, &viewmodelBlasUpdateScratch_, &tlas_.backing, &tlasUpdateScratch_})
+    {
+        AccumulateRtGpuBuffer(inventory, *buffer);
+    }
+    const auto accumulateBlas = [&inventory](const AccelerationStructure& blas) {
+        AccumulateRtGpuBuffer(inventory, blas.backing);
+        if (blas.handle != VK_NULL_HANDLE)
+        {
+            AccumulateRtResourceCount(inventory.bottomLevelAccelerationStructureCount);
+        }
+    };
+    for (const AccelerationStructure* blas : std::array{
+             &blas_, &waterfallBlas_, &finaleRoofBlas_, &torchBlas_, &swordBlas_,
+             &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
+             &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
+             &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_})
+    {
+        accumulateBlas(*blas);
+    }
+    if (tlas_.handle != VK_NULL_HANDLE)
+    {
+        AccumulateRtResourceCount(inventory.topLevelAccelerationStructureCount);
+        inventory.tlasInstanceCount = kTlasInstanceCount;
+    }
+    characterSlot_.AccumulateResourceInventory(inventory);
+    pipelineBundle_.AccumulateResourceInventory(inventory);
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    if (stagedPrimary_) stagedPrimary_->AccumulateResourceInventory(inventory);
+#endif
+
+    AccumulateRtMemoryAllocation(
+        inventory, storageImageMemory_, storageImageAllocationSize_,
+        storageImageMemoryPropertyFlags_);
+    for (const TextureArray* texture : std::array<const TextureArray*, 9u>{
+             &materialDiffuse_, &materialNormal_, &materialArm_, &lichBaseColor_,
+             &lichEmissive_, &staticBaseColor_, &staticNormal_, &staticOrm_,
+             &staticEmissive_})
+    {
+        AccumulateRtMemoryAllocation(
+            inventory, texture->memory, texture->allocationSize,
+            texture->memoryPropertyFlags);
+    }
+    return inventory;
+}
+
+bool PresentableTinyRtScene::CollectCompletedDiagnostic(
+    RtDiagnosticCounterPayload& payload,
+    std::string& diagnostic)
+{
+    payload = {};
+    static_assert(kRtDielectricDiagnosticsSchema1FieldCount ==
+                  horde::telemetry::kRtDielectricCounterCount);
+    static_assert(offsetof(RtDielectricDiagnostics, primaryRewardBodyPixelCount) +
+                      sizeof(std::uint32_t) ==
+                  horde::telemetry::kRtDielectricCounterCount *
+                      sizeof(std::uint32_t));
+    static_assert(offsetof(RtDielectricDiagnostics, primaryPlayerPixelCount) /
+                      sizeof(std::uint32_t) ==
+                  horde::telemetry::kRtPrimaryPlayerPixelCounterIndex);
+    if (pipelineBundle_.DiagnosticAvailability() !=
+            RtDiagnosticAvailability::Available ||
+        pipelineBundle_.diagnosticBuffer.memory == VK_NULL_HANDLE)
+    {
+        diagnostic = "The completed RT Diagnostic buffer is unavailable.";
+        return false;
+    }
+    RtDielectricDiagnostics completed{};
+    if (!ReadBuffer(pipelineBundle_.diagnosticBuffer, 0u,
+                    &completed, sizeof(completed),
+                    "dielectric diagnostics", diagnostic))
+    {
+        return false;
+    }
+    std::memcpy(payload.counters.data(), &completed,
+                payload.counters.size() * sizeof(payload.counters[0]));
+    diagnostic.clear();
+    return true;
+}
+
+void PresentableTinyRtScene::PublishCompletedDiagnostic(
+    const RtDiagnosticCounterPayload& payload) noexcept
+{
+    using CounterMember = std::uint32_t PresentableTinyRtScene::*;
+    static constexpr std::array<CounterMember,
+                                horde::telemetry::kRtDielectricCounterCount>
+        members{{
+            &PresentableTinyRtScene::dielectricTransportOverflowCount_,
+            &PresentableTinyRtScene::dielectricShadowOverflowCount_,
+            &PresentableTinyRtScene::dielectricSecondaryRejectCount_,
+            &PresentableTinyRtScene::dielectricUnclosedVolumeCount_,
+            &PresentableTinyRtScene::dielectricPrimaryUnclosedVolumeCount_,
+            &PresentableTinyRtScene::dielectricShadowUnclosedVolumeCount_,
+            &PresentableTinyRtScene::productionPaneStackFailureCount_,
+            &PresentableTinyRtScene::productionPaneSecondaryOriginCount_,
+            &PresentableTinyRtScene::productionPaneSecondaryTerminalCount_,
+            &PresentableTinyRtScene::productionPaneSecondarySameMediumCount_,
+            &PresentableTinyRtScene::productionPaneSecondaryDifferentMediumCount_,
+            &PresentableTinyRtScene::secondaryNearSelfHitCount_,
+            &PresentableTinyRtScene::primaryOpenMissCount_,
+            &PresentableTinyRtScene::primaryOpenOpaqueCount_,
+            &PresentableTinyRtScene::primaryMismatchedExitCount_,
+            &PresentableTinyRtScene::primaryInterfaceBudgetCount_,
+            &PresentableTinyRtScene::primaryVolumeBudgetCount_,
+            &PresentableTinyRtScene::shadowOpenMissCount_,
+            &PresentableTinyRtScene::shadowMismatchedExitCount_,
+            &PresentableTinyRtScene::primaryTirCount_,
+            &PresentableTinyRtScene::primaryInterfaceBudgetOpenVolumeCount_,
+            &PresentableTinyRtScene::primaryInterfaceBudgetClosedVolumeCount_,
+            &PresentableTinyRtScene::shadowMismatchEmptyCount_,
+            &PresentableTinyRtScene::shadowImplicitOriginExitCount_,
+            &PresentableTinyRtScene::secondaryDielectricTerminalCount_,
+            &PresentableTinyRtScene::primaryTirTerminationCount_,
+            &PresentableTinyRtScene::shadowFiniteEndpointVolumeCount_,
+            &PresentableTinyRtScene::primaryOpenOpaqueSameInstanceDifferentMaterialCount_,
+            &PresentableTinyRtScene::primaryOpenOpaqueAfterTirCount_,
+            &PresentableTinyRtScene::primaryOpenOpaqueTerminalInstanceMask_,
+            &PresentableTinyRtScene::primaryOpenOpaqueVolumeInstanceMask_,
+            &PresentableTinyRtScene::primaryOpenOpaqueTerminalMaterialMask_,
+            &PresentableTinyRtScene::primaryClosedVolumeAbsorptionCount_,
+            &PresentableTinyRtScene::primaryCertifiedClosedVolumeRecoveryCount_,
+            &PresentableTinyRtScene::shadowCertifiedClosedVolumeRecoveryCount_,
+            &PresentableTinyRtScene::certifiedClosedVolumeRecoveryReasonMask_,
+            &PresentableTinyRtScene::primaryTorchPixelCount_,
+            &PresentableTinyRtScene::primarySwordPixelCount_,
+            &PresentableTinyRtScene::primaryPlayerPixelCount_,
+            &PresentableTinyRtScene::primaryRewardRingPixelCount_,
+            &PresentableTinyRtScene::primaryRewardBodyPixelCount_,
+        }};
+    for (std::size_t index = 0u; index < members.size(); ++index)
+    {
+        this->*members[index] = payload.counters[index];
+    }
+}
+
+RtDiagnosticFrameIo MakeRtDiagnosticFrameIo(
+    PresentableTinyRtScene& scene) noexcept
+{
+    return {
+        &scene,
+        [](void* user, RtDiagnosticCounterPayload& output,
+           std::string& diagnostic) {
+            return static_cast<PresentableTinyRtScene*>(user)
+                ->CollectCompletedDiagnostic(output, diagnostic);
+        },
+        [](void* user, const RtDiagnosticCounterPayload& value) noexcept {
+            static_cast<PresentableTinyRtScene*>(user)
+                ->PublishCompletedDiagnostic(value);
+        }};
 }
 
 bool PresentableTinyRtScene::LoadEntryPoints(std::string& diagnostic)
@@ -757,15 +1194,31 @@ bool PresentableTinyRtScene::LoadEntryPoints(std::string& diagnostic)
     vkGetAccelerationStructureBuildSizesKHR_ = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(vkGetDeviceProcAddr(device_, "vkGetAccelerationStructureBuildSizesKHR"));
     vkGetAccelerationStructureDeviceAddressKHR_ = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(vkGetDeviceProcAddr(device_, "vkGetAccelerationStructureDeviceAddressKHR"));
     vkCmdBuildAccelerationStructuresKHR_ = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(device_, "vkCmdBuildAccelerationStructuresKHR"));
-    vkCreateRayTracingPipelinesKHR_ = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(device_, "vkCreateRayTracingPipelinesKHR"));
-    vkGetRayTracingShaderGroupHandlesKHR_ = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(device_, "vkGetRayTracingShaderGroupHandlesKHR"));
-    vkCmdTraceRaysKHR_ = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(vkGetDeviceProcAddr(device_, "vkCmdTraceRaysKHR"));
+    if (executionPolicy_.requiresShaderBindingTable)
+    {
+        vkCreateRayTracingPipelinesKHR_ = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(device_, "vkCreateRayTracingPipelinesKHR"));
+        vkGetRayTracingShaderGroupHandlesKHR_ = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(device_, "vkGetRayTracingShaderGroupHandlesKHR"));
+        vkCmdTraceRaysKHR_ = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(vkGetDeviceProcAddr(device_, "vkCmdTraceRaysKHR"));
+    }
+    else
+    {
+        vkCreateRayTracingPipelinesKHR_ = nullptr;
+        vkGetRayTracingShaderGroupHandlesKHR_ = nullptr;
+        vkCmdTraceRaysKHR_ = nullptr;
+    }
     vkGetBufferDeviceAddressKHR_ = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(device_, "vkGetBufferDeviceAddressKHR"));
+    if (!vkGetBufferDeviceAddressKHR_)
+    {
+        vkGetBufferDeviceAddressKHR_ = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(
+            vkGetDeviceProcAddr(device_, "vkGetBufferDeviceAddress"));
+    }
 
     if (!vkCreateAccelerationStructureKHR_ || !vkDestroyAccelerationStructureKHR_ ||
         !vkGetAccelerationStructureBuildSizesKHR_ || !vkGetAccelerationStructureDeviceAddressKHR_ ||
-        !vkCmdBuildAccelerationStructuresKHR_ || !vkCreateRayTracingPipelinesKHR_ ||
-        !vkGetRayTracingShaderGroupHandlesKHR_ || !vkCmdTraceRaysKHR_ || !vkGetBufferDeviceAddressKHR_)
+        !vkCmdBuildAccelerationStructuresKHR_ || !vkGetBufferDeviceAddressKHR_ ||
+        (executionPolicy_.requiresShaderBindingTable &&
+         (!vkCreateRayTracingPipelinesKHR_ || !vkGetRayTracingShaderGroupHandlesKHR_ ||
+          !vkCmdTraceRaysKHR_)))
     {
         diagnostic = "Required Vulkan RT entry points are unavailable.";
         return false;
@@ -780,9 +1233,11 @@ bool PresentableTinyRtScene::CreateBuffer(VkDeviceSize size,
                                           VkMemoryPropertyFlags memoryFlags,
                                           bool deviceAddress,
                                           Buffer& out,
-                                          std::string& diagnostic) const
+                                          std::string& diagnostic,
+                                          VkMemoryPropertyFlags preferredMemoryFlags) const
 {
-    return gpuResources_.CreateBuffer(size, usage, memoryFlags, deviceAddress, out, diagnostic);
+    return gpuResources_.CreateBuffer(size, usage, memoryFlags, deviceAddress, out,
+                                      diagnostic, preferredMemoryFlags);
 }
 
 void PresentableTinyRtScene::DestroyBuffer(Buffer& buffer) const
@@ -794,9 +1249,11 @@ bool PresentableTinyRtScene::WriteBuffer(const Buffer& buffer,
                                          const void* data,
                                          const VkDeviceSize size,
                                          const char* label,
-                                         std::string& diagnostic) const
+                                         std::string& diagnostic,
+                                         RtSceneRecordObservation* observation) const
 {
-    return gpuResources_.WriteBuffer(buffer, data, size, label, diagnostic);
+    return gpuResources_.WriteBuffer(
+        buffer, data, size, label, diagnostic, observation);
 }
 
 bool PresentableTinyRtScene::ReadBuffer(const Buffer& buffer,
@@ -892,13 +1349,164 @@ bool PresentableTinyRtScene::RunOneTimeCommands(void (*record)(VkCommandBuffer, 
 
 bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
 {
+    OutputImageResources output{};
+    if (!CreateOutputImage(dispatchExtent_, output, diagnostic))
+    {
+        DestroyOutputImage(output);
+        return false;
+    }
+    AdoptOutputImage(output);
+    storageImageFrameRecorded_ = false;
+    return true;
+}
+
+PresentableTinyRtScene::OutputImageResources PresentableTinyRtScene::OutputImage() const noexcept
+{
+    return {storageImage_, storageImageMemory_, storageImageView_,
+            storageImageAllocationSize_, storageImageMemoryPropertyFlags_, storageImageLayout_};
+}
+
+void PresentableTinyRtScene::AdoptOutputImage(const OutputImageResources& image) noexcept
+{
+    storageImage_ = image.image;
+    storageImageMemory_ = image.memory;
+    storageImageView_ = image.view;
+    storageImageAllocationSize_ = image.allocationSize;
+    storageImageMemoryPropertyFlags_ = image.memoryFlags;
+    storageImageLayout_ = image.layout;
+}
+
+void PresentableTinyRtScene::DestroyOutputImage(OutputImageResources& image) const noexcept
+{
+    if (image.view != VK_NULL_HANDLE) vkDestroyImageView(device_, image.view, nullptr);
+    if (image.image != VK_NULL_HANDLE) vkDestroyImage(device_, image.image, nullptr);
+    if (image.memory != VK_NULL_HANDLE) vkFreeMemory(device_, image.memory, nullptr);
+    image = {};
+}
+
+bool PresentableTinyRtScene::ResizeOutputAfterDeviceIdle(VkExtent2D extent, std::string& diagnostic)
+{
+    if (!ready_ || device_ == VK_NULL_HANDLE || extent.width == 0u || extent.height == 0u)
+    {
+        diagnostic = "Cannot resize an unready RT output or use a zero extent.";
+        return false;
+    }
+    VkPhysicalDeviceRayTracingPipelinePropertiesKHR rayProperties{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR};
+    VkPhysicalDeviceProperties2 properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
+    if (ExecutionBackend() == RtExecutionBackend::RayTracingPipeline)
+        properties.pNext = &rayProperties;
+    // Android minSdk24 cannot link the Vulkan1.1 symbol directly. Resolve it
+    // through the same loader route used by the existing pipeline/SBT setup.
+    auto getProperties = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2>(
+        vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceProperties2"));
+    if (getProperties == nullptr)
+        getProperties = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2>(
+            vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceProperties2KHR"));
+    if (getProperties == nullptr)
+    {
+        diagnostic = "Vulkan properties2 entry point is unavailable for RT output resize.";
+        return false;
+    }
+    getProperties(physicalDevice_, &properties);
+    if (extent.width > properties.properties.limits.maxImageDimension2D ||
+        extent.height > properties.properties.limits.maxImageDimension2D ||
+        (ExecutionBackend() == RtExecutionBackend::RayTracingPipeline &&
+         static_cast<std::uint64_t>(extent.width) * extent.height >
+             rayProperties.maxRayDispatchInvocationCount))
+    {
+        diagnostic = "Requested RT output exceeds the device image/dispatch limits.";
+        return false;
+    }
+    auto groups = computeDispatchGroups_;
+    if (ExecutionBackend() == RtExecutionBackend::RayQueryCompute)
+    {
+        const auto selected = TryMakeRtComputeDispatch(extent, properties.properties.limits);
+        if (!selected)
+        {
+            diagnostic = "Device compute limits cannot execute the requested RT output.";
+            return false;
+        }
+        groups = *selected;
+    }
+    OutputResizeApi api{};
+    api.user = this;
+    api.create = [](void* user, VkExtent2D size, OutputImageResources& image, std::string& failure) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateOutputImage(size, image, failure);
+    };
+    api.writeDescriptor = [](void* user, VkImageView view) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        const VkDescriptorImageInfo info{VK_NULL_HANDLE, view, VK_IMAGE_LAYOUT_GENERAL};
+        VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+        write.dstSet = scene.pipelineBundle_.descriptorSet;
+        write.dstBinding = 1u;
+        write.descriptorCount = 1u;
+        write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        write.pImageInfo = &info;
+        vkUpdateDescriptorSets(scene.device_, 1u, &write, 0u, nullptr);
+    };
+    api.destroy = [](void* user, OutputImageResources& image) noexcept {
+        static_cast<PresentableTinyRtScene*>(user)->DestroyOutputImage(image);
+    };
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    if (stagedPrimary_ && !stagedPrimary_->PrepareResizeAfterDeviceIdle(extent, diagnostic)) return false;
+#endif
+    const bool resized = ResizeOutputWithApi(extent, groups, api, diagnostic);
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    if (stagedPrimary_) {
+        if (resized) stagedPrimary_->CommitResizeAfterDeviceIdle();
+        else stagedPrimary_->CancelResizeAfterDeviceIdle();
+    }
+#endif
+    return resized;
+}
+
+bool PresentableTinyRtScene::ResizeOutputWithApi(VkExtent2D extent, std::array<std::uint32_t, 3u> groups,
+                                               const OutputResizeApi& api, std::string& diagnostic)
+{
+    if (!ready_ || device_ == VK_NULL_HANDLE || storageImage_ == VK_NULL_HANDLE ||
+        pipelineBundle_.descriptorSet == VK_NULL_HANDLE || extent.width == 0u || extent.height == 0u ||
+        api.create == nullptr || api.writeDescriptor == nullptr || api.destroy == nullptr)
+    {
+        diagnostic = "Invalid RT output resize transaction.";
+        return false;
+    }
+    if (extent.width == dispatchExtent_.width && extent.height == dispatchExtent_.height)
+    {
+        diagnostic.clear();
+        return true;
+    }
+    OutputImageResources replacement{};
+    if (!api.create(api.user, extent, replacement, diagnostic))
+    {
+        api.destroy(api.user, replacement);
+        return false;
+    }
+    auto old = OutputImage();
+    api.writeDescriptor(api.user, replacement.view);
+    AdoptOutputImage(replacement);
+    dispatchExtent_ = extent;
+    computeDispatchGroups_ = groups;
+    // No recorded frame identifies the newly allocated, as-yet unpresented output.
+    framePipelineEvidence_ = {};
+    framePipelineEvidenceValid_ = false;
+    storageImageFrameRecorded_ = false;
+    lastOutputRedBlueSwapApplied_ = false;
+    api.destroy(api.user, old);
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateOutputImage(VkExtent2D extent, OutputImageResources& out,
+                                              std::string& diagnostic)
+{
     const VkImageCreateInfo imageInfo{
         VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
         nullptr,
         0u,
         VK_IMAGE_TYPE_2D,
         kStorageImageFormat,
-        {dispatchExtent_.width, dispatchExtent_.height, 1u},
+        {extent.width, extent.height, 1u},
         1u,
         1u,
         VK_SAMPLE_COUNT_1_BIT,
@@ -908,16 +1516,18 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
         0u,
         nullptr,
         VK_IMAGE_LAYOUT_UNDEFINED};
-    if (vkCreateImage(device_, &imageInfo, nullptr, &storageImage_) != VK_SUCCESS)
+    if (vkCreateImage(device_, &imageInfo, nullptr, &out.image) != VK_SUCCESS)
     {
         diagnostic = "Failed to create RT storage image.";
         return false;
     }
 
     VkMemoryRequirements requirements{};
-    vkGetImageMemoryRequirements(device_, storageImage_, &requirements);
+    vkGetImageMemoryRequirements(device_, out.image, &requirements);
+    VkMemoryPropertyFlags selectedMemoryFlags = 0u;
     const std::uint32_t memoryType = gpuResources_.FindMemoryType(
-        requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        &selectedMemoryFlags);
     if (memoryType == UINT32_MAX)
     {
         diagnostic = "No compatible memory type for RT storage image.";
@@ -929,23 +1539,25 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
         nullptr,
         requirements.size,
         memoryType};
-    if (vkAllocateMemory(device_, &allocateInfo, nullptr, &storageImageMemory_) != VK_SUCCESS ||
-        vkBindImageMemory(device_, storageImage_, storageImageMemory_, 0u) != VK_SUCCESS)
+    if (vkAllocateMemory(device_, &allocateInfo, nullptr, &out.memory) != VK_SUCCESS ||
+        vkBindImageMemory(device_, out.image, out.memory, 0u) != VK_SUCCESS)
     {
         diagnostic = "Failed to allocate RT storage image memory.";
         return false;
     }
+    out.allocationSize = requirements.size;
+    out.memoryFlags = selectedMemoryFlags;
 
     const VkImageViewCreateInfo viewInfo{
         VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
         nullptr,
         0u,
-        storageImage_,
+        out.image,
         VK_IMAGE_VIEW_TYPE_2D,
         kStorageImageFormat,
         {VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY, VK_COMPONENT_SWIZZLE_IDENTITY},
         {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 1u, 0u, 1u}};
-    if (vkCreateImageView(device_, &viewInfo, nullptr, &storageImageView_) != VK_SUCCESS)
+    if (vkCreateImageView(device_, &viewInfo, nullptr, &out.view) != VK_SUCCESS)
     {
         diagnostic = "Failed to create RT storage image view.";
         return false;
@@ -954,7 +1566,8 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
     struct TransitionData
     {
         VkImage image;
-    } data{storageImage_};
+        VkPipelineStageFlags shaderStage;
+    } data{out.image, executionPolicy_.shaderPipelineStage};
     const auto record = [](VkCommandBuffer commandBuffer, void* userData) {
         const auto* transition = static_cast<const TransitionData*>(userData);
         SetImageBarrier(commandBuffer,
@@ -962,7 +1575,7 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
                         VK_IMAGE_LAYOUT_UNDEFINED,
                         VK_IMAGE_LAYOUT_GENERAL,
                         VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                        VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                        transition->shaderStage,
                         0u,
                         VK_ACCESS_SHADER_WRITE_BIT);
     };
@@ -971,7 +1584,7 @@ bool PresentableTinyRtScene::CreateStorageImage(std::string& diagnostic)
         return false;
     }
 
-    storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
+    out.layout = VK_IMAGE_LAYOUT_GENERAL;
     diagnostic.clear();
     return true;
 }
@@ -1122,8 +1735,10 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
     }
     VkMemoryRequirements requirements{};
     vkGetImageMemoryRequirements(device_, texture.image, &requirements);
+    VkMemoryPropertyFlags selectedMemoryFlags = 0u;
     const std::uint32_t memoryType = gpuResources_.FindMemoryType(
-        requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+        &selectedMemoryFlags);
     VkMemoryAllocateInfo allocation{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
     allocation.allocationSize = requirements.size;
     allocation.memoryTypeIndex = memoryType;
@@ -1134,6 +1749,8 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         diagnostic = "Failed to allocate PBR texture array memory.";
         return false;
     }
+    texture.allocationSize = requirements.size;
+    texture.memoryPropertyFlags = selectedMemoryFlags;
     struct UploadData
     {
         PresentableTinyRtScene* scene;
@@ -1174,7 +1791,7 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         toShader.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         toShader.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         toShader.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR, 0u, 0u, nullptr, 0u, nullptr, 1u, &toShader);
+        vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, data->scene->executionPolicy_.shaderPipelineStage, 0u, 0u, nullptr, 0u, nullptr, 1u, &toShader);
     };
     const bool uploaded = RunOneTimeCommands(recordUpload, &upload, diagnostic);
     DestroyBuffer(staging);
@@ -1363,6 +1980,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             diagnostic) ||
         !horde::scene::assets::AssetManifest::Load(
             playerDirectory / "asset.manifest.json", playerManifest, diagnostic) ||
+        !playerManifest.ValidatePlayerSemantics(diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
             playerDirectory / "gothic-traveller-lod0.runtime.glb",
             playerManifest, productionPlayerAsset_, diagnostic) ||
@@ -1395,14 +2013,31 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             lanternBodyDirectory / "reward-lantern-body-lod0.runtime.glb",
             lanternBodyManifest, rewardLanternBodyAsset_, diagnostic))
         return false;
+    // The selected immutable quality bundle owns the geometry profile too.
+    // Mobile panes are absent from the BLAS, not hidden/skipped in a shader.
+    if (!SelectLanternGeometryForQuality(
+            rewardLanternBodyAsset_, pipelineBundle_.Request().quality, diagnostic))
+        return false;
     staticTextureDirectory_ = (root / "textures/props/runtime").string();
-    std::array<StaticRtAssetRegistration, 8u> registrations{{
+    const auto viewmodelDirectory = root / "models/player/viewmodel/runtime";
+    const auto viewmodelPath = viewmodelDirectory / "gothic-traveller-viewmodel.runtime.glb";
+    viewmodelAvailable_ = std::filesystem::exists(viewmodelPath);
+    if (viewmodelAvailable_)
+    {
+        horde::scene::assets::AssetManifest manifest;
+        if (!horde::scene::assets::AssetManifest::Load(viewmodelDirectory / "asset.manifest.json", manifest, diagnostic) ||
+            !manifest.ValidatePlayerViewmodelSemantics(diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(viewmodelPath, manifest, viewmodelAsset_, diagnostic) ||
+            !viewmodelSkin_.LoadClips(viewmodelPath.string(), horde::scene::PlayerLocomotionClipSet(), diagnostic) ||
+            !viewmodelSkin_.ValidateStaticVertexLayout(viewmodelAsset_, diagnostic)) return false;
+    }
+    std::vector<StaticRtAssetRegistration> registrations{
         {3u, 0x53574f52u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          0u, &developmentStaticAsset_},
         {1u, 0x544f5243u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          1u, &productionTorchAsset_},
-        {4u, 0x504c4159u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
-         0u, &productionPlayerAsset_},
+        {kPlayerWorldBodyInstanceIndex, 0x504c4159u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+         0u, &productionPlayerAsset_, nullptr, RtGeometryRole::PlayerWorldBody},
         {9u, 0x474c4153u,
          static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
              static_cast<std::uint32_t>(RtInstanceFlag::Transmissive),
@@ -1417,17 +2052,29 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
          static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
              static_cast<std::uint32_t>(RtInstanceFlag::Transmissive),
          0u, &rewardLanternBodyAsset_},
-    }};
+    };
+    if (viewmodelAvailable_)
+        registrations.push_back({kPlayerViewmodelInstanceIndex, 0x56494557u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
+            &viewmodelAsset_, &productionPlayerAsset_, RtGeometryRole::PlayerViewmodel});
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
-    const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[4u];
-    if (playerMetadata.primitiveCount != 4u ||
-        playerMetadata.primitiveBase >= staticMeshSlot_.PrimitiveMetadata().size())
+    const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
+    if (playerMetadata.primitiveCount == 0u ||
+        playerMetadata.primitiveCount != productionPlayerAsset_.primitives.size() ||
+        playerMetadata.primitiveBase >= staticMeshSlot_.PrimitiveMetadata().size() ||
+        playerMetadata.primitiveCount > staticMeshSlot_.PrimitiveMetadata().size() - playerMetadata.primitiveBase)
     {
         diagnostic = "Runtime player static-PBR primitive metadata is incomplete.";
         return false;
     }
     playerStaticVertexBase_ =
         staticMeshSlot_.PrimitiveMetadata()[playerMetadata.primitiveBase].vertexOffset;
+    playerBodyRemainderAvailable_ = std::any_of(
+        productionPlayerAsset_.primitives.begin(), productionPlayerAsset_.primitives.end(),
+        [this](const auto& primitive) {
+            return (productionPlayerAsset_.materials[primitive.materialIndex].flags &
+                static_cast<std::uint32_t>(RtMaterialFlag::BodyRemainderPrimaryVisible)) != 0u;
+        });
     const RtInstanceMetadata dielectricMetadata =
         staticMeshSlot_.InstanceMetadata()[9u];
     if (dielectricMetadata.primitiveCount != 1u ||
@@ -1438,12 +2085,15 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     }
     dielectricFixtureMaterialIndex_ = staticMeshSlot_.PrimitiveMetadata()[
         dielectricMetadata.primitiveBase].materialIndex;
-    if (playerRenderSlot_.UniqueVertices().size() > productionPlayerAsset_.vertices.size())
-    {
-        diagnostic = "Runtime player skinned/static vertex streams do not share ordering.";
-        return false;
-    }
+    if (!playerRenderSlot_.ValidateStaticVertexLayout(productionPlayerAsset_, diagnostic)) return false;
     return true;
+}
+
+const PresentableTinyRtScene::Buffer& PresentableTinyRtScene::VertexBufferForRole(RtGeometryRole role) const
+{
+    const std::array<const Buffer*, 3u> buffers{{
+        &staticVertexBuffer_, &worldPlayerVertexBuffer_, &viewmodelVertexBuffer_}};
+    return *buffers.at(static_cast<std::size_t>(role));
 }
 
 bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
@@ -1454,19 +2104,23 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto& primitives = staticMeshSlot_.PrimitiveMetadata();
     const auto& materials = staticMeshSlot_.Materials();
     const auto& vertices = staticMeshSlot_.Vertices();
+    const auto& worldVertices = staticMeshSlot_.Vertices(RtGeometryRole::PlayerWorldBody);
+    const auto& viewVertices = staticMeshSlot_.Vertices(RtGeometryRole::PlayerViewmodel);
+    const horde::scene::assets::StaticRtVertex unusedViewVertex{};
     const auto& indices = staticMeshSlot_.Indices();
     const auto& geometryTransforms = staticMeshSlot_.GeometryTransforms();
-    const RtDielectricDiagnostics dielectricDiagnostics{};
     const auto createAndWrite = [this, uploadMemory, &diagnostic](
         const void* data,
         VkDeviceSize size,
         VkBufferUsageFlags usage,
         bool address,
         const char* label,
-        Buffer& buffer) {
+        Buffer& buffer, const bool dynamic = false) {
         const std::array<std::uint8_t, 16u> zeros{};
         const VkDeviceSize actualSize = std::max<VkDeviceSize>(size, zeros.size());
-        if (!CreateBuffer(actualSize, usage, uploadMemory, address, buffer, diagnostic)) return false;
+        if (!CreateBuffer(actualSize, usage, uploadMemory, address, buffer, diagnostic,
+                          dynamic ? 0u : VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)) return false;
+        if (dynamic && !gpuResources_.MapBufferForHostWrites(buffer, diagnostic)) return false;
         return WriteBuffer(buffer, size == 0u ? zeros.data() : data, actualSize, label, diagnostic);
     };
 
@@ -1474,17 +2128,19 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const VkBufferUsageFlags geometry = storage |
         VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
     if (!createAndWrite(instances.data(), sizeof(instances), storage, false,
-                        "RT instance metadata", instanceMetadataBuffer_) ||
+                        "RT instance metadata", instanceMetadataBuffer_, true) ||
         !createAndWrite(primitives.data(), primitives.size() * sizeof(RtPrimitiveMetadata),
                         storage, false, "RT primitive metadata", primitiveMetadataBuffer_) ||
         !createAndWrite(materials.data(), materials.size() * sizeof(RtMaterialGpu),
-                        storage, false, "RT material metadata", materialMetadataBuffer_) ||
-        !createAndWrite(&dielectricDiagnostics, sizeof(dielectricDiagnostics),
-                        storage, false, "dielectric diagnostics",
-                        dielectricDiagnosticsBuffer_) ||
+                        storage, false, "RT material metadata", materialMetadataBuffer_, true) ||
         !createAndWrite(vertices.data(),
                         vertices.size() * sizeof(horde::scene::assets::StaticRtVertex),
                         geometry, true, "static RT vertices", staticVertexBuffer_) ||
+        !createAndWrite(worldVertices.data(), worldVertices.size() * sizeof(worldVertices.front()),
+                        geometry, true, "world player RT vertices", worldPlayerVertexBuffer_, true) ||
+        !createAndWrite(viewVertices.empty() ? &unusedViewVertex : viewVertices.data(),
+                        std::max<std::size_t>(viewVertices.size(), 1u) * sizeof(unusedViewVertex),
+                        geometry, true, "viewmodel RT vertices", viewmodelVertexBuffer_, true) ||
         !createAndWrite(indices.data(), indices.size() * sizeof(std::uint32_t),
                         geometry, true, "static RT indices", staticIndexBuffer_) ||
         !createAndWrite(geometryTransforms.data(),
@@ -1653,12 +2309,15 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const auto addWorldBox = [&addWorldQuad](float minX, float minY, float minZ,
                                              float maxX, float maxY, float maxZ,
                                              SurfaceMaterial material) {
-        addWorldQuad({{minX, minY, minZ}}, {{minX, maxY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, minY, minZ}}, material, SurfaceForward);
-        addWorldQuad({{maxX, minY, maxZ}}, {{maxX, maxY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, minY, maxZ}}, material, SurfaceBack);
-        addWorldQuad({{minX, minY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, maxY, minZ}}, {{minX, minY, minZ}}, material, SurfaceRight);
-        addWorldQuad({{maxX, minY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, maxY, maxZ}}, {{maxX, minY, maxZ}}, material, SurfaceLeft);
-        addWorldQuad({{minX, maxY, minZ}}, {{minX, maxY, maxZ}}, {{maxX, maxY, maxZ}}, {{maxX, maxY, minZ}}, material, SurfaceDown);
-        addWorldQuad({{minX, minY, maxZ}}, {{minX, minY, minZ}}, {{maxX, minY, minZ}}, {{maxX, minY, maxZ}}, material, SurfaceUp);
+        // Closed solid boxes use outward geometric normals matching winding.
+        // Inward metadata launched hemisphere bounces/spawn offsets inside the
+        // solid, including the coincident bracket-top/flame-bottom interface.
+        addWorldQuad({{minX, minY, minZ}}, {{minX, maxY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, minY, minZ}}, material, SurfaceBack);
+        addWorldQuad({{maxX, minY, maxZ}}, {{maxX, maxY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, minY, maxZ}}, material, SurfaceForward);
+        addWorldQuad({{minX, minY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, maxY, minZ}}, {{minX, minY, minZ}}, material, SurfaceLeft);
+        addWorldQuad({{maxX, minY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, maxY, maxZ}}, {{maxX, minY, maxZ}}, material, SurfaceRight);
+        addWorldQuad({{minX, maxY, minZ}}, {{minX, maxY, maxZ}}, {{maxX, maxY, maxZ}}, {{maxX, maxY, minZ}}, material, SurfaceUp);
+        addWorldQuad({{minX, minY, maxZ}}, {{minX, minY, minZ}}, {{maxX, minY, minZ}}, {{maxX, minY, maxZ}}, material, SurfaceDown);
     };
     const auto addBox = [&addQuad](float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
         // Fixed face order for the raygen material normal lookup:
@@ -2244,22 +2903,28 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const VkDeviceSize vertexBufferSize = sizeof(Vertex) * vertices.size();
     const VkDeviceSize indexBufferSize = sizeof(std::uint32_t) * indices.size();
     const VkDeviceSize worldSurfaceBufferSize = sizeof(std::uint32_t) * worldSurfaceCodes.size();
-    if (!CreateBuffer(vertexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, vertexBuffer_, diagnostic) ||
-        !CreateBuffer(indexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, indexBuffer_, diagnostic) ||
-        !CreateBuffer(sizeof(transform), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, transformBuffer_, diagnostic) ||
+    if (!CreateBuffer(vertexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+                      uploadMemory, true, vertexBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) ||
+        !CreateBuffer(indexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+                      uploadMemory, true, indexBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) ||
+        !CreateBuffer(sizeof(transform), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+                      uploadMemory, true, transformBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) ||
         !CreateBuffer(sizeof(RtHeldLightGpu), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, heldLightBuffer_, diagnostic) ||
         !CreateBuffer(sizeof(RtFireEmitterGpu) * kRtFireEmitterCapacity,
                       VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, fireEmitterBuffer_, diagnostic) ||
-        !CreateBuffer(worldSurfaceBufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, uploadMemory, false, worldSurfaceBuffer_, diagnostic))
+        !CreateBuffer(worldSurfaceBufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      uploadMemory, false, worldSurfaceBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
     {
         return false;
     }
 
     const RtHeldLightGpu initialHeldLight{};
     const std::array<RtFireEmitterGpu, kRtFireEmitterCapacity> initialFireEmitters{};
-    if (!WriteBuffer(vertexBuffer_, vertices.data(), vertexBufferSize, "world vertex", diagnostic) ||
+    if (!gpuResources_.MapBufferForHostWrites(heldLightBuffer_, diagnostic) ||
+        !gpuResources_.MapBufferForHostWrites(fireEmitterBuffer_, diagnostic) ||
+        !WriteBuffer(vertexBuffer_, vertices.data(), vertexBufferSize, "world vertex", diagnostic) ||
         !WriteBuffer(indexBuffer_, indices.data(), indexBufferSize, "world index", diagnostic) ||
         !WriteBuffer(transformBuffer_, &transform, sizeof(transform), "world transform", diagnostic) ||
         !WriteBuffer(heldLightBuffer_, &initialHeldLight, sizeof(initialHeldLight),
@@ -2475,15 +3140,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             staticMeshSlot_.InstanceMetadata()[instanceCustomIndex];
         const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
         const auto& materialMetadata = staticMeshSlot_.Materials();
-        const auto& staticVertices = staticMeshSlot_.Vertices();
+        const auto& vertexBuffer = VertexBufferForRole(static_cast<RtGeometryRole>(instance.geometryRole));
+        const auto& vertexCounts = staticMeshSlot_.PrimitiveVertexCounts();
         for (std::uint32_t localIndex = 0u; localIndex < instance.primitiveCount; ++localIndex)
         {
             const std::uint32_t geometryIndex = instance.primitiveBase + localIndex;
             const RtPrimitiveMetadata& primitive = primitiveMetadata[geometryIndex];
-            const std::uint32_t nextVertexOffset = geometryIndex + 1u < primitiveMetadata.size()
-                ? primitiveMetadata[geometryIndex + 1u].vertexOffset
-                : static_cast<std::uint32_t>(staticVertices.size());
-            if (nextVertexOffset <= primitive.vertexOffset || primitive.indexCount == 0u)
+            if (vertexCounts[geometryIndex] == 0u || primitive.indexCount == 0u)
             {
                 diagnostic = "Static RT BLAS primitive has an empty geometry range.";
                 return false;
@@ -2499,20 +3162,23 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             const bool transmissive =
                 (materialMetadata[primitive.materialIndex].materialFlags[0] &
                  static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) != 0u;
-            // Let rayQuery NoOpaque filtering see physical dielectric
-            // interfaces while retaining the fast opaque path for metal/wood.
-            geometry.flags = transmissive ? 0u : VK_GEOMETRY_OPAQUE_BIT_KHR;
+            // Transparent-shadow accumulation is not idempotent: Vulkan may
+            // otherwise report the same triangle candidate more than once.
+            // Preserve non-opaque dielectric filtering and the opaque fast path.
+            geometry.flags = transmissive
+                ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR
+                : VK_GEOMETRY_OPAQUE_BIT_KHR;
             geometry.geometry.triangles.sType =
                 VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
             geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
             geometry.geometry.triangles.vertexData.deviceAddress =
-                staticVertexBuffer_.address +
+                vertexBuffer.address +
                 static_cast<VkDeviceSize>(primitive.vertexOffset) *
                     sizeof(horde::scene::assets::StaticRtVertex);
             geometry.geometry.triangles.vertexStride =
                 sizeof(horde::scene::assets::StaticRtVertex);
             geometry.geometry.triangles.maxVertex =
-                nextVertexOffset - primitive.vertexOffset - 1u;
+                vertexCounts[geometryIndex] - 1u;
             geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
             geometry.geometry.triangles.indexData.deviceAddress =
                 staticIndexBuffer_.address +
@@ -2895,11 +3561,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     playerLimbBlasAddressInfo.accelerationStructure = playerLimbBlas_.handle;
     playerLimbBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &playerLimbBlasAddressInfo);
 
+    const auto buildPlayerGeometry = [&](std::uint32_t instanceIndex,
+                                         AccelerationStructure& playerBlas,
+                                         Buffer& playerScratch) -> bool {
     std::vector<VkAccelerationStructureGeometryKHR> skinnedPlayerGeometries;
     std::vector<VkAccelerationStructureBuildRangeInfoKHR> skinnedPlayerRanges;
     std::vector<std::uint32_t> skinnedPlayerPrimitiveCounts;
     if (!appendStaticGeometries(
-            4u, skinnedPlayerGeometries, skinnedPlayerRanges,
+            instanceIndex, skinnedPlayerGeometries, skinnedPlayerRanges,
             skinnedPlayerPrimitiveCounts))
         return false;
     VkAccelerationStructureBuildGeometryInfoKHR skinnedPlayerBuildInfo{
@@ -2920,15 +3589,15 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     if (!CreateBuffer(skinnedPlayerSizes.accelerationStructureSize,
                       VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR,
                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true,
-                      skinnedPlayerBlas_.backing, diagnostic))
+                      playerBlas.backing, diagnostic))
         return false;
     VkAccelerationStructureCreateInfoKHR skinnedPlayerCreateInfo{
         VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR};
-    skinnedPlayerCreateInfo.buffer = skinnedPlayerBlas_.backing.buffer;
+    skinnedPlayerCreateInfo.buffer = playerBlas.backing.buffer;
     skinnedPlayerCreateInfo.size = skinnedPlayerSizes.accelerationStructureSize;
     skinnedPlayerCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
     if (vkCreateAccelerationStructureKHR_(device_, &skinnedPlayerCreateInfo,
-                                          nullptr, &skinnedPlayerBlas_.handle) != VK_SUCCESS)
+                                          nullptr, &playerBlas.handle) != VK_SUCCESS)
     {
         diagnostic = "Failed to create skinned player BLAS.";
         return false;
@@ -2937,10 +3606,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                                skinnedPlayerSizes.updateScratchSize),
                       VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, true,
-                      skinnedPlayerBlasUpdateScratch_, diagnostic))
+                      playerScratch, diagnostic))
         return false;
-    skinnedPlayerBuildInfo.dstAccelerationStructure = skinnedPlayerBlas_.handle;
-    skinnedPlayerBuildInfo.scratchData.deviceAddress = skinnedPlayerBlasUpdateScratch_.address;
+    skinnedPlayerBuildInfo.dstAccelerationStructure = playerBlas.handle;
+    skinnedPlayerBuildInfo.scratchData.deviceAddress = playerScratch.address;
     std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> skinnedPlayerRangePointers;
     skinnedPlayerRangePointers.reserve(skinnedPlayerRanges.size());
     for (const auto& range : skinnedPlayerRanges)
@@ -2950,9 +3619,16 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     if (!RunOneTimeCommands(buildBlas, &skinnedPlayerBuildData, diagnostic)) return false;
     VkAccelerationStructureDeviceAddressInfoKHR skinnedPlayerAddressInfo{
         VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
-    skinnedPlayerAddressInfo.accelerationStructure = skinnedPlayerBlas_.handle;
-    skinnedPlayerBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(
+    skinnedPlayerAddressInfo.accelerationStructure = playerBlas.handle;
+    playerBlas.address = vkGetAccelerationStructureDeviceAddressKHR_(
         device_, &skinnedPlayerAddressInfo);
+    return true;
+    };
+    if (!buildPlayerGeometry(kPlayerWorldBodyInstanceIndex, skinnedPlayerBlas_, skinnedPlayerBlasUpdateScratch_))
+        return false;
+    if (viewmodelAvailable_ &&
+        !buildPlayerGeometry(kPlayerViewmodelInstanceIndex, viewmodelBlas_, viewmodelBlasUpdateScratch_))
+        return false;
 
     if (!characterSlot_.PrepareInitialGeometry(diagnostic))
     {
@@ -2980,6 +3656,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                           true,
                           skeletonGpu.vertices,
                           diagnostic) ||
+            !gpuResources_.MapBufferForHostWrites(skeletonGpu.vertices, diagnostic) ||
             !WriteBuffer(skeletonGpu.vertices,
                          skeletonVertices.data(),
                          skeletonVertexBufferSize,
@@ -3071,7 +3748,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     {
         return false;
     }
-    if (!WriteBuffer(lichVertexBuffer_, lichSkinnedVertices_.data(), lichVertexBufferSize,
+    if (!gpuResources_.MapBufferForHostWrites(lichVertexBuffer_, diagnostic) ||
+        !WriteBuffer(lichVertexBuffer_, lichSkinnedVertices_.data(), lichVertexBufferSize,
                      "lich vertex", diagnostic))
     {
         return false;
@@ -3162,20 +3840,20 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[3].instanceCustomIndex = 3u;
     instances[3].mask = 0x02u;
     instances[3].accelerationStructureReference = swordBlas_.address;
-    instances[4] = instances[0];
-    instances[4].instanceCustomIndex = 4u;
+    instances[kPlayerWorldBodyInstanceIndex] = instances[0];
+    instances[kPlayerWorldBodyInstanceIndex].instanceCustomIndex = kPlayerWorldBodyInstanceIndex;
     // The complete coat remains visible in mirror/reflection rays. Keeping its
     // chest out of first-person primary rays avoids a near-camera slab while
     // articulated arms, pelvis, legs and boots stay visible on mask 0x04.
-    instances[4].mask = 0x10u;
-    instances[4].accelerationStructureReference = playerBodyBlas_.address;
-    instances[4].transform = {{
+    instances[kPlayerWorldBodyInstanceIndex].mask = 0x10u;
+    instances[kPlayerWorldBodyInstanceIndex].accelerationStructureReference = playerBodyBlas_.address;
+    instances[kPlayerWorldBodyInstanceIndex].transform = {{
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, kShowcaseEyeWorldY,
         0.0f, 0.0f, 1.0f, 0.0f}};
     for (std::size_t i = 5u; i <= 16u; ++i)
     {
-        instances[i] = instances[4];
+        instances[i] = instances[kPlayerWorldBodyInstanceIndex];
         instances[i].instanceCustomIndex = static_cast<std::uint32_t>(i);
         instances[i].mask = 0x04u;
         instances[i].accelerationStructureReference = playerLimbBlas_.address;
@@ -3209,11 +3887,17 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         1.0f, 0.0f, 0.0f, -2.32f,
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, -15.26f}};
+    instances[kPlayerViewmodelInstanceIndex] = instances[0];
+    instances[kPlayerViewmodelInstanceIndex].instanceCustomIndex = kPlayerViewmodelInstanceIndex;
+    instances[kPlayerViewmodelInstanceIndex].mask = 0u;
+    instances[kPlayerViewmodelInstanceIndex].accelerationStructureReference =
+        viewmodelAvailable_ ? viewmodelBlas_.address : skinnedPlayerBlas_.address;
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
         return false;
     }
-    if (!WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "TLAS instance", diagnostic))
+    if (!gpuResources_.MapBufferForHostWrites(instanceBuffer_, diagnostic) ||
+        !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances), "TLAS instance", diagnostic))
     {
         return false;
     }
@@ -3277,90 +3961,222 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     VkAccelerationStructureDeviceAddressInfoKHR tlasAddressInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR};
     tlasAddressInfo.accelerationStructure = tlas_.handle;
     tlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &tlasAddressInfo);
+    tlasBuiltInstances_ = instances;
+    tlasInstanceDefinitionsValid_ = true;
 
     diagnostic.clear();
     return true;
 }
 
-bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
+bool PresentableTinyRtScene::CreateSelectedPipelineBundle(std::string& diagnostic)
+{
+    RtPipelineBundleBuildApi api{};
+    api.user = this;
+    api.createDescriptorSetLayout = [](void* user, const RtDescriptorIoContract& contract,
+                                       VkDescriptorSetLayout& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleDescriptorSetLayout(
+            contract, out, error);
+    };
+    api.createDescriptorPool = [](void* user, const RtDescriptorIoContract& contract,
+                                  VkDescriptorPool& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleDescriptorPool(
+            contract, out, error);
+    };
+    api.allocateDescriptorSet = [](void* user, VkDescriptorPool pool,
+                                   VkDescriptorSetLayout layout, VkDescriptorSet& out,
+                                   std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->AllocateBundleDescriptorSet(
+            pool, layout, out, error);
+    };
+    api.createDiagnosticBuffer = [](void* user, RtGpuBuffer& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleDiagnosticBuffer(
+            out, error);
+    };
+    api.writeDescriptors = [](void* user, RtPipelineBundle& bundle, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->WriteBundleDescriptors(
+            bundle, error);
+    };
+    api.createPipelineLayout = [](void* user, VkDescriptorSetLayout layout,
+                                  VkPipelineLayout& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundlePipelineLayout(
+            layout, out, error);
+    };
+    api.createSharedShaderModules = [](void* user, VkShaderModule& miss,
+                                       VkShaderModule& hit, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleSharedShaderModules(
+            miss, hit, error);
+    };
+    api.createEntryShaderModule = [](void* user,
+                                      const RtPipelineVariantArtifact& artifact,
+                                      VkShaderModule& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleEntryShaderModule(
+            artifact, out, error);
+    };
+    api.createStrategyPipeline = [](void* user, RtMaterialStrategy strategy,
+                                    VkShaderModule raygen, VkShaderModule miss,
+                                    VkShaderModule hit, VkPipelineLayout layout,
+                                    VkPipeline& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleStrategyPipeline(
+            strategy, raygen, miss, hit, layout, out, error);
+    };
+    api.destroyShaderModule = [](void* user, VkShaderModule& module) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (scene.device_ != VK_NULL_HANDLE && module != VK_NULL_HANDLE)
+            vkDestroyShaderModule(scene.device_, module, nullptr);
+        module = VK_NULL_HANDLE;
+    };
+    api.createStrategySbt = [](void* user, RtMaterialStrategy strategy,
+                               VkPipeline pipeline, RtGpuBuffer& out,
+                               std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
+                               std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleStrategySbt(
+            strategy, pipeline, out, regions, error);
+    };
+    return BuildRtPipelineBundleResources(pipelineBundle_, api, diagnostic);
+}
+
+bool PresentableTinyRtScene::CapturePipelineEvidenceIdentity() noexcept
+{
+    horde::telemetry::RtPipelineEvidenceIdentity candidate{};
+    if (!pipelineBundle_.HasSelection() ||
+        !TryMakeRtPipelineEvidenceIdentity(
+            pipelineBundle_.Request(),
+            pipelineBundle_.Strategy(RtMaterialStrategy::OpaqueFast).artifact,
+            pipelineBundle_.Strategy(RtMaterialStrategy::GenericDielectric).artifact,
+            candidate))
+    {
+        pipelineEvidenceIdentity_ = {};
+        return false;
+    }
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+    if (stagedPrimary_) {
+        if (!horde::telemetry::AssignRtFixedText(candidate.bundleKey, "staged_primary_v1_investigation_pair") ||
+            !horde::telemetry::AssignRtFixedText(candidate.opaqueFast.key, SelectedOpaqueFastKey()) ||
+            !horde::telemetry::AssignRtFixedText(candidate.opaqueFast.sha256, SelectedOpaqueFastSha256()) ||
+            !horde::telemetry::AssignRtFixedText(candidate.genericDielectric.key, SelectedGenericDielectricKey()) ||
+            !horde::telemetry::AssignRtFixedText(candidate.genericDielectric.sha256, SelectedGenericDielectricSha256())) return false;
+        candidate.active = candidate.opaqueFast;
+    }
+#endif
+    pipelineEvidenceIdentity_ = candidate;
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateBundleDescriptorSetLayout(
+    const RtDescriptorIoContract& contract,
+    VkDescriptorSetLayout& out,
+    std::string& diagnostic)
+{
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(physicalDevice_, &properties);
+    if (contract.storageBufferDescriptorCount > properties.limits.maxPerStageDescriptorStorageBuffers ||
+        contract.storageBufferDescriptorCount > properties.limits.maxDescriptorSetStorageBuffers)
+    {
+        diagnostic = "Device storage-buffer descriptor limits cannot accommodate the independent player geometry streams.";
+        return false;
+    }
+    std::array<VkDescriptorSetLayoutBinding, 25u> bindings{};
+    for (std::uint32_t index = 0u; index < contract.bindingCount; ++index)
+    {
+        const RtDescriptorBindingContract& selected = contract.bindings[index];
+        VkDescriptorType type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        switch (selected.kind)
+        {
+        case RtDescriptorResourceKind::AccelerationStructure:
+            type = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+            break;
+        case RtDescriptorResourceKind::StorageImage:
+            type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+            break;
+        case RtDescriptorResourceKind::CombinedImageSampler:
+            type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            break;
+        case RtDescriptorResourceKind::StorageBuffer:
+            break;
+        }
+        bindings[index] = {selected.binding, type, 1u,
+            selected.binding == 0u ? executionPolicy_.pushConstantStages
+                                   : executionPolicy_.shaderStage,
+            nullptr};
+    }
+    const VkDescriptorSetLayoutCreateInfo layoutInfo{
+        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, nullptr, 0u,
+        contract.bindingCount, bindings.data()};
+    if (vkCreateDescriptorSetLayout(device_, &layoutInfo, nullptr, &out) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create selected RT descriptor set layout.";
+        return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateBundleDescriptorPool(
+    const RtDescriptorIoContract& contract,
+    VkDescriptorPool& out,
+    std::string& diagnostic)
+{
+    const std::array<VkDescriptorPoolSize, 4u> poolSizes{{
+        {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u},
+        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, contract.storageBufferDescriptorCount},
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9u},
+    }};
+    const VkDescriptorPoolCreateInfo poolInfo{
+        VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO, nullptr, 0u, 1u,
+        static_cast<std::uint32_t>(poolSizes.size()), poolSizes.data()};
+    if (vkCreateDescriptorPool(device_, &poolInfo, nullptr, &out) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create selected RT descriptor pool.";
+        return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::AllocateBundleDescriptorSet(
+    VkDescriptorPool pool,
+    VkDescriptorSetLayout layout,
+    VkDescriptorSet& out,
+    std::string& diagnostic)
+{
+    const VkDescriptorSetAllocateInfo allocateInfo{
+        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO, nullptr, pool, 1u, &layout};
+    if (vkAllocateDescriptorSets(device_, &allocateInfo, &out) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to allocate selected RT descriptor set.";
+        return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateBundleDiagnosticBuffer(
+    Buffer& out,
+    std::string& diagnostic)
+{
+    static_assert(sizeof(RtDielectricDiagnostics) == 176u);
+    static_assert(alignof(RtDielectricDiagnostics) == 16u);
+    const RtDielectricDiagnostics zeros{};
+    if (!CreateBuffer(sizeof(zeros), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                          VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                      false, out, diagnostic))
+        return false;
+    return WriteBuffer(out, &zeros, sizeof(zeros), "dielectric diagnostics", diagnostic);
+}
+
+bool PresentableTinyRtScene::WriteBundleDescriptors(RtPipelineBundle& bundle,
+                                                    std::string& diagnostic)
 {
     const auto& skeletonVertexBuffer_ = characterSlot_.SkeletonGpu(0u).vertices;
     const auto& secondSkeletonVertexBuffer = characterSlot_.SkeletonGpu(1u).vertices;
     const auto& lichVertexBuffer_ = characterSlot_.LichGpu().vertices;
-    const std::array<VkDescriptorSetLayoutBinding, 23u> bindings{{
-        {0u, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, nullptr},
-        {1u, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {2u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {3u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {4u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {5u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {6u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {7u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {8u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {9u, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {10u, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingInstanceMetadata, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingPrimitiveMetadata, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingMaterials, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingStaticVertices, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingStaticIndices, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingBaseColorTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingNormalTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingOrmTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingEmissiveTextures, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingHeldLight, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingFireEmitters, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-        {kRtBindingDielectricDiagnostics, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, nullptr},
-    }};
-    const VkDescriptorSetLayoutCreateInfo layoutInfo{
-        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-        nullptr,
-        0u,
-        static_cast<std::uint32_t>(bindings.size()),
-        bindings.data()};
-    if (vkCreateDescriptorSetLayout(device_, &layoutInfo, nullptr, &descriptorSetLayout_) != VK_SUCCESS)
-    {
-        diagnostic = "Failed to create RT descriptor set layout.";
-        return false;
-    }
-
-    const std::array<VkDescriptorPoolSize, 4u> poolSizes{{
-        {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1u},
-        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1u},
-        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 12u},
-        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9u},
-    }};
-    const VkDescriptorPoolCreateInfo poolInfo{
-        VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
-        nullptr,
-        0u,
-        1u,
-        static_cast<std::uint32_t>(poolSizes.size()),
-        poolSizes.data()};
-    if (vkCreateDescriptorPool(device_, &poolInfo, nullptr, &descriptorPool_) != VK_SUCCESS)
-    {
-        diagnostic = "Failed to create RT descriptor pool.";
-        return false;
-    }
-
-    const VkDescriptorSetAllocateInfo allocateInfo{
-        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
-        nullptr,
-        descriptorPool_,
-        1u,
-        &descriptorSetLayout_};
-    if (vkAllocateDescriptorSets(device_, &allocateInfo, &descriptorSet_) != VK_SUCCESS)
-    {
-        diagnostic = "Failed to allocate RT descriptor set.";
-        return false;
-    }
+    const VkDescriptorSet descriptorSet = bundle.descriptorSet;
 
     VkWriteDescriptorSetAccelerationStructureKHR asWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR};
     asWrite.accelerationStructureCount = 1u;
     asWrite.pAccelerationStructures = &tlas_.handle;
     VkWriteDescriptorSet accelerationStructureWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
     accelerationStructureWrite.pNext = &asWrite;
-    accelerationStructureWrite.dstSet = descriptorSet_;
+    accelerationStructureWrite.dstSet = descriptorSet;
     accelerationStructureWrite.dstBinding = 0u;
     accelerationStructureWrite.descriptorCount = 1u;
     accelerationStructureWrite.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
@@ -3369,7 +4185,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
     imageInfo.imageView = storageImageView_;
     VkWriteDescriptorSet imageWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-    imageWrite.dstSet = descriptorSet_;
+    imageWrite.dstSet = descriptorSet;
     imageWrite.dstBinding = 1u;
     imageWrite.descriptorCount = 1u;
     imageWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
@@ -3380,7 +4196,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     skeletonBufferInfo.offset = 0u;
     skeletonBufferInfo.range = skeletonVertexBuffer_.size;
     VkWriteDescriptorSet skeletonWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-    skeletonWrite.dstSet = descriptorSet_;
+    skeletonWrite.dstSet = descriptorSet;
     skeletonWrite.dstBinding = 2u;
     skeletonWrite.descriptorCount = 1u;
     skeletonWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -3391,16 +4207,16 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     secondSkeletonBufferInfo.offset = 0u;
     secondSkeletonBufferInfo.range = secondSkeletonVertexBuffer.size;
     VkWriteDescriptorSet secondSkeletonWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-    secondSkeletonWrite.dstSet = descriptorSet_;
+    secondSkeletonWrite.dstSet = descriptorSet;
     secondSkeletonWrite.dstBinding = 10u;
     secondSkeletonWrite.descriptorCount = 1u;
     secondSkeletonWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     secondSkeletonWrite.pBufferInfo = &secondSkeletonBufferInfo;
 
-    const auto bufferWrite = [this](std::uint32_t binding,
-                                    const VkDescriptorBufferInfo* info) {
+    const auto bufferWrite = [descriptorSet](std::uint32_t binding,
+                                             const VkDescriptorBufferInfo* info) {
         VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-        write.dstSet = descriptorSet_;
+        write.dstSet = descriptorSet;
         write.dstBinding = binding;
         write.descriptorCount = 1u;
         write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -3415,21 +4231,27 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
         materialMetadataBuffer_.buffer, 0u, materialMetadataBuffer_.size};
     const VkDescriptorBufferInfo staticVertexInfo{
         staticVertexBuffer_.buffer, 0u, staticVertexBuffer_.size};
+    const VkDescriptorBufferInfo worldVertexInfo{
+        worldPlayerVertexBuffer_.buffer, 0u, worldPlayerVertexBuffer_.size};
+    const VkDescriptorBufferInfo viewVertexInfo{
+        viewmodelVertexBuffer_.buffer, 0u, viewmodelVertexBuffer_.size};
     const VkDescriptorBufferInfo staticIndexInfo{
         staticIndexBuffer_.buffer, 0u, staticIndexBuffer_.size};
     const VkDescriptorBufferInfo heldLightInfo{
         heldLightBuffer_.buffer, 0u, heldLightBuffer_.size};
     const VkDescriptorBufferInfo fireEmitterInfo{
         fireEmitterBuffer_.buffer, 0u, fireEmitterBuffer_.size};
-    const VkDescriptorBufferInfo dielectricDiagnosticsInfo{
-        dielectricDiagnosticsBuffer_.buffer, 0u, dielectricDiagnosticsBuffer_.size};
+    std::optional<VkDescriptorBufferInfo> dielectricDiagnosticsInfo;
+    if (bundle.DescriptorIo().diagnosticIo.descriptorInfo)
+        dielectricDiagnosticsInfo.emplace(VkDescriptorBufferInfo{
+            bundle.diagnosticBuffer.buffer, 0u, bundle.diagnosticBuffer.size});
 
     VkDescriptorBufferInfo lichBufferInfo{};
     lichBufferInfo.buffer = lichVertexBuffer_.buffer;
     lichBufferInfo.offset = 0u;
     lichBufferInfo.range = lichVertexBuffer_.size;
     VkWriteDescriptorSet lichBufferWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-    lichBufferWrite.dstSet = descriptorSet_;
+    lichBufferWrite.dstSet = descriptorSet;
     lichBufferWrite.dstBinding = 7u;
     lichBufferWrite.descriptorCount = 1u;
     lichBufferWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -3440,7 +4262,7 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     worldSurfaceBufferInfo.offset = 0u;
     worldSurfaceBufferInfo.range = worldSurfaceBuffer_.size;
     VkWriteDescriptorSet worldSurfaceWrite{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-    worldSurfaceWrite.dstSet = descriptorSet_;
+    worldSurfaceWrite.dstSet = descriptorSet;
     worldSurfaceWrite.dstBinding = 6u;
     worldSurfaceWrite.descriptorCount = 1u;
     worldSurfaceWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
@@ -3463,59 +4285,131 @@ bool PresentableTinyRtScene::CreateDescriptors(std::string& diagnostic)
     const VkDescriptorImageInfo staticEmissiveInfo{
         materialSampler_, genericStaticAssetEnabled_ ? staticEmissive_.view : lichEmissive_.view,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL};
-    const auto sampledWrite = [this](std::uint32_t binding, const VkDescriptorImageInfo* info) {
+    const auto sampledWrite = [descriptorSet](std::uint32_t binding,
+                                              const VkDescriptorImageInfo* info) {
         VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
-        write.dstSet = descriptorSet_;
+        write.dstSet = descriptorSet;
         write.dstBinding = binding;
         write.descriptorCount = 1u;
         write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         write.pImageInfo = info;
         return write;
     };
-    const std::array<VkWriteDescriptorSet, 23u> writes{{accelerationStructureWrite, imageWrite, skeletonWrite,
-                                                       sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo), sampledWrite(5u, &armInfo),
-                                                       worldSurfaceWrite, lichBufferWrite,
-                                                       sampledWrite(8u, &lichBaseInfo), sampledWrite(9u, &lichEmissiveInfo),
-                                                       secondSkeletonWrite,
-                                                       bufferWrite(kRtBindingInstanceMetadata, &instanceMetadataInfo),
-                                                       bufferWrite(kRtBindingPrimitiveMetadata, &primitiveMetadataInfo),
-                                                       bufferWrite(kRtBindingMaterials, &materialMetadataInfo),
-                                                       bufferWrite(kRtBindingStaticVertices, &staticVertexInfo),
-                                                       bufferWrite(kRtBindingStaticIndices, &staticIndexInfo),
-                                                       sampledWrite(kRtBindingBaseColorTextures, &staticBaseInfo),
-                                                       sampledWrite(kRtBindingNormalTextures, &staticNormalInfo),
-                                                       sampledWrite(kRtBindingOrmTextures, &staticOrmInfo),
-                                                       sampledWrite(kRtBindingEmissiveTextures, &staticEmissiveInfo),
-                                                       bufferWrite(kRtBindingHeldLight, &heldLightInfo),
-                                                       bufferWrite(kRtBindingFireEmitters, &fireEmitterInfo),
-                                                       bufferWrite(kRtBindingDielectricDiagnostics, &dielectricDiagnosticsInfo)}};
+    std::vector<VkWriteDescriptorSet> writes{
+        accelerationStructureWrite, imageWrite, skeletonWrite,
+        sampledWrite(3u, &diffuseInfo), sampledWrite(4u, &normalInfo),
+        sampledWrite(5u, &armInfo), worldSurfaceWrite, lichBufferWrite,
+        sampledWrite(8u, &lichBaseInfo), sampledWrite(9u, &lichEmissiveInfo),
+        secondSkeletonWrite,
+        bufferWrite(kRtBindingInstanceMetadata, &instanceMetadataInfo),
+        bufferWrite(kRtBindingPrimitiveMetadata, &primitiveMetadataInfo),
+        bufferWrite(kRtBindingMaterials, &materialMetadataInfo),
+        bufferWrite(kRtBindingStaticVertices, &staticVertexInfo),
+        bufferWrite(kRtBindingStaticIndices, &staticIndexInfo),
+        sampledWrite(kRtBindingBaseColorTextures, &staticBaseInfo),
+        sampledWrite(kRtBindingNormalTextures, &staticNormalInfo),
+        sampledWrite(kRtBindingOrmTextures, &staticOrmInfo),
+        sampledWrite(kRtBindingEmissiveTextures, &staticEmissiveInfo),
+        bufferWrite(kRtBindingHeldLight, &heldLightInfo),
+        bufferWrite(kRtBindingFireEmitters, &fireEmitterInfo),
+        bufferWrite(kRtBindingWorldPlayerVertices, &worldVertexInfo),
+        bufferWrite(kRtBindingViewmodelVertices, &viewVertexInfo)};
+    if (bundle.DescriptorIo().diagnosticIo.descriptorWrite &&
+        dielectricDiagnosticsInfo.has_value())
+        writes.push_back(bufferWrite(kRtBindingDielectricDiagnostics,
+                                     &*dielectricDiagnosticsInfo));
+    if (writes.size() != bundle.DescriptorIo().descriptorWriteCount)
+    {
+        diagnostic = "Selected RT descriptor write count disagrees with its contract.";
+        return false;
+    }
     vkUpdateDescriptorSets(device_, static_cast<std::uint32_t>(writes.size()), writes.data(), 0u, nullptr);
 
     diagnostic.clear();
     return true;
 }
 
-bool PresentableTinyRtScene::CreatePipeline(std::string& diagnostic)
+bool PresentableTinyRtScene::CreateBundlePipelineLayout(
+    VkDescriptorSetLayout descriptorSetLayout,
+    VkPipelineLayout& out,
+    std::string& diagnostic)
 {
-    VkShaderModule raygenModule = VK_NULL_HANDLE;
-    VkShaderModule legacyRaygenModule = VK_NULL_HANDLE;
-    VkShaderModule missModule = VK_NULL_HANDLE;
-    VkShaderModule hitModule = VK_NULL_HANDLE;
-    if (!CreateShaderModule(device_, kMinimalRayGenShader, sizeof(kMinimalRayGenShader), raygenModule) ||
-        !CreateShaderModule(device_, kMinimalLegacyRayGenShader,
-                            sizeof(kMinimalLegacyRayGenShader), legacyRaygenModule) ||
-        !CreateShaderModule(device_, kMinimalMissShader, sizeof(kMinimalMissShader), missModule) ||
-        !CreateShaderModule(device_, kMinimalClosestHitShader, sizeof(kMinimalClosestHitShader), hitModule))
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(physicalDevice_, &properties);
+    if (properties.limits.maxPushConstantsSize < sizeof(ScenePushConstants))
     {
-        if (raygenModule != VK_NULL_HANDLE) vkDestroyShaderModule(device_, raygenModule, nullptr);
-        if (legacyRaygenModule != VK_NULL_HANDLE)
-            vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
-        if (missModule != VK_NULL_HANDLE) vkDestroyShaderModule(device_, missModule, nullptr);
-        if (hitModule != VK_NULL_HANDLE) vkDestroyShaderModule(device_, hitModule, nullptr);
-        diagnostic = "Failed to create RT shader modules.";
+        diagnostic = "Device maxPushConstantsSize is below the required 128-byte RT scene ABI.";
         return false;
     }
+    const VkPushConstantRange pushConstantRange{
+        executionPolicy_.pushConstantStages,
+        0u, sizeof(ScenePushConstants)};
+    const VkPipelineLayoutCreateInfo pipelineLayoutInfo{
+        VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO, nullptr, 0u, 1u,
+        &descriptorSetLayout, 1u, &pushConstantRange};
+    if (vkCreatePipelineLayout(device_, &pipelineLayoutInfo, nullptr, &out) != VK_SUCCESS)
+    {
+        diagnostic = "Failed to create selected RT pipeline layout.";
+        return false;
+    }
+    return true;
+}
 
+bool PresentableTinyRtScene::CreateBundleSharedShaderModules(
+    VkShaderModule& miss,
+    VkShaderModule& hit,
+    std::string& diagnostic)
+{
+    if (!CreateShaderModule(device_, kMinimalMissShader,
+                            sizeof(kMinimalMissShader), miss) ||
+        !CreateShaderModule(device_, kMinimalClosestHitShader,
+                            sizeof(kMinimalClosestHitShader), hit))
+    {
+        diagnostic = "Failed to create shared RT shader modules.";
+        return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateBundleEntryShaderModule(
+    const RtPipelineVariantArtifact& artifact,
+    VkShaderModule& out,
+    std::string& diagnostic)
+{
+    if (artifact.words.empty() ||
+        !CreateShaderModule(device_, artifact.words.data(),
+                            artifact.words.size_bytes(), out))
+    {
+        diagnostic = std::string("Failed to create selected RT entry module: ") +
+            std::string(artifact.canonicalKey);
+        return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::CreateBundleStrategyPipeline(
+    RtMaterialStrategy,
+    VkShaderModule raygenModule,
+    VkShaderModule missModule,
+    VkShaderModule hitModule,
+    VkPipelineLayout layout,
+    VkPipeline& out,
+    std::string& diagnostic)
+{
+    if (ExecutionBackend() == RtExecutionBackend::RayQueryCompute)
+    {
+        VkComputePipelineCreateInfo pipelineInfo{VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO};
+        pipelineInfo.stage = {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0u,
+                              VK_SHADER_STAGE_COMPUTE_BIT, raygenModule, "main", nullptr};
+        pipelineInfo.layout = layout;
+        if (vkCreateComputePipelines(device_, VK_NULL_HANDLE, 1u, &pipelineInfo, nullptr, &out) != VK_SUCCESS)
+        {
+            diagnostic = "Failed to create selected hardware RayQuery compute pipeline.";
+            return false;
+        }
+        diagnostic.clear();
+        return true;
+    }
     std::array<VkPipelineShaderStageCreateInfo, 3u> stages{{
         {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0u, VK_SHADER_STAGE_RAYGEN_BIT_KHR, raygenModule, "main", nullptr},
         {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0u, VK_SHADER_STAGE_MISS_BIT_KHR, missModule, "main", nullptr},
@@ -3542,68 +4436,18 @@ bool PresentableTinyRtScene::CreatePipeline(std::string& diagnostic)
     groups[2].anyHitShader = VK_SHADER_UNUSED_KHR;
     groups[2].intersectionShader = VK_SHADER_UNUSED_KHR;
 
-    VkPhysicalDeviceProperties properties{};
-    vkGetPhysicalDeviceProperties(physicalDevice_, &properties);
-    if (properties.limits.maxPushConstantsSize < sizeof(ScenePushConstants))
-    {
-        vkDestroyShaderModule(device_, raygenModule, nullptr);
-        vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
-        vkDestroyShaderModule(device_, missModule, nullptr);
-        vkDestroyShaderModule(device_, hitModule, nullptr);
-        diagnostic = "Device maxPushConstantsSize is below the required 124-byte RT scene ABI.";
-        return false;
-    }
-
-    const VkPushConstantRange pushConstantRange{
-        VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR,
-        0u,
-        sizeof(ScenePushConstants)};
-    const VkPipelineLayoutCreateInfo pipelineLayoutInfo{
-        VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-        nullptr,
-        0u,
-        1u,
-        &descriptorSetLayout_,
-        1u,
-        &pushConstantRange};
-    if (vkCreatePipelineLayout(device_, &pipelineLayoutInfo, nullptr, &pipelineLayout_) != VK_SUCCESS)
-    {
-        vkDestroyShaderModule(device_, raygenModule, nullptr);
-        vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
-        vkDestroyShaderModule(device_, missModule, nullptr);
-        vkDestroyShaderModule(device_, hitModule, nullptr);
-        diagnostic = "Failed to create RT pipeline layout.";
-        return false;
-    }
-
     VkRayTracingPipelineCreateInfoKHR pipelineInfo{VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR};
     pipelineInfo.stageCount = static_cast<std::uint32_t>(stages.size());
     pipelineInfo.pStages = stages.data();
     pipelineInfo.groupCount = static_cast<std::uint32_t>(groups.size());
     pipelineInfo.pGroups = groups.data();
     pipelineInfo.maxPipelineRayRecursionDepth = 1u;
-    pipelineInfo.layout = pipelineLayout_;
+    pipelineInfo.layout = layout;
     const VkResult result = vkCreateRayTracingPipelinesKHR_(
-        device_, VK_NULL_HANDLE, VK_NULL_HANDLE, 1u, &pipelineInfo, nullptr, &pipeline_);
-    stages[0].module = legacyRaygenModule;
-    const VkResult legacyResult = result == VK_SUCCESS
-        ? vkCreateRayTracingPipelinesKHR_(device_, VK_NULL_HANDLE, VK_NULL_HANDLE,
-                                          1u, &pipelineInfo, nullptr, &legacyPipeline_)
-        : result;
-
-    vkDestroyShaderModule(device_, raygenModule, nullptr);
-    vkDestroyShaderModule(device_, legacyRaygenModule, nullptr);
-    vkDestroyShaderModule(device_, missModule, nullptr);
-    vkDestroyShaderModule(device_, hitModule, nullptr);
-
-    if (result != VK_SUCCESS || legacyResult != VK_SUCCESS)
+        device_, VK_NULL_HANDLE, VK_NULL_HANDLE, 1u, &pipelineInfo, nullptr, &out);
+    if (result != VK_SUCCESS)
     {
-        if (pipeline_ != VK_NULL_HANDLE)
-        {
-            vkDestroyPipeline(device_, pipeline_, nullptr);
-            pipeline_ = VK_NULL_HANDLE;
-        }
-        diagnostic = "Failed to create generic/legacy RT raygen pipelines.";
+        diagnostic = "Failed to create selected material-strategy RT pipeline.";
         return false;
     }
 
@@ -3611,7 +4455,12 @@ bool PresentableTinyRtScene::CreatePipeline(std::string& diagnostic)
     return true;
 }
 
-bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
+bool PresentableTinyRtScene::CreateBundleStrategySbt(
+    RtMaterialStrategy strategy,
+    VkPipeline pipeline,
+    Buffer& out,
+    std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
+    std::string& diagnostic)
 {
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR rtProperties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR};
     VkPhysicalDeviceProperties2 properties2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
@@ -3638,13 +4487,10 @@ bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
     const std::uint32_t regionSize = AlignUp(groupStride, baseAlignment);
     const std::uint32_t sbtSize = regionSize * groupCount;
 
+    const char* label = strategy == RtMaterialStrategy::GenericDielectric
+        ? "generic dielectric" : "opaque fast";
     const auto createTable = [&](VkPipeline sourcePipeline,
-                                 const char* label,
-                                 Buffer& table,
-                                 VkStridedDeviceAddressRegionKHR& raygen,
-                                 VkStridedDeviceAddressRegionKHR& miss,
-                                 VkStridedDeviceAddressRegionKHR& hit,
-                                 VkStridedDeviceAddressRegionKHR& callable) -> bool
+                                 Buffer& table) -> bool
     {
         std::vector<std::uint8_t> handles(handleSize * groupCount);
         if (vkGetRayTracingShaderGroupHandlesKHR_(
@@ -3673,24 +4519,20 @@ bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
                          tableLabel.c_str(), diagnostic))
             return false;
 
-        raygen.deviceAddress = table.address;
-        raygen.stride = groupStride;
-        raygen.size = groupStride;
-        miss.deviceAddress = table.address + regionSize;
-        miss.stride = groupStride;
-        miss.size = groupStride;
-        hit.deviceAddress = table.address + (regionSize * 2u);
-        hit.stride = groupStride;
-        hit.size = groupStride;
-        callable = {};
+        regions[0].deviceAddress = table.address;
+        regions[0].stride = groupStride;
+        regions[0].size = groupStride;
+        regions[1].deviceAddress = table.address + regionSize;
+        regions[1].stride = groupStride;
+        regions[1].size = groupStride;
+        regions[2].deviceAddress = table.address + (regionSize * 2u);
+        regions[2].stride = groupStride;
+        regions[2].size = groupStride;
+        regions[3] = {};
         return true;
     };
 
-    if (!createTable(pipeline_, "generic", shaderBindingTable_,
-                     raygenRegion_, missRegion_, hitRegion_, callableRegion_) ||
-        !createTable(legacyPipeline_, "legacy", legacyShaderBindingTable_,
-                     legacyRaygenRegion_, legacyMissRegion_, legacyHitRegion_,
-                     legacyCallableRegion_))
+    if (!createTable(pipeline, out))
         return false;
 
     diagnostic.clear();
@@ -3699,8 +4541,14 @@ bool PresentableTinyRtScene::CreateShaderBindingTable(std::string& diagnostic)
 
 bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                                      const RtSceneFrameInputs& frame,
-                                                     std::string& diagnostic)
+                                                     std::string& diagnostic,
+                                                     RtSceneRecordObservation* observation)
 {
+#ifndef NDEBUG
+    // Captures after this call are valid only if this frame finishes preparing
+    // and recording the current skinned world-body instance successfully.
+    playerWorldBodyPoseCurrent_ = false;
+#endif
     const RtSceneTuning clampedTuning = ClampRtSceneTuning(frame.tuning);
     const bool glassFixtureVisible =
         clampedTuning.glassFixtureVisible &&
@@ -3717,7 +4565,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         BuildProductionSceneVisibility({frame.playerRenderRoute,
                                         glassFixtureVisible,
                                         productionInspection,
-                                        rewardLanternClaimed});
+                                        rewardLanternClaimed,
+                                        playerBodyRemainderAvailable_});
     const bool productionRewardWorldVisible =
         productionVisibility.rewardWorldVisible;
     const PlayerRenderRoute effectivePlayerRenderRoute =
@@ -3746,7 +4595,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const auto& lichGpu = characterSlot_.LichGpu();
     if (instanceBuffer_.memory == VK_NULL_HANDLE || heldLightBuffer_.memory == VK_NULL_HANDLE ||
         fireEmitterBuffer_.memory == VK_NULL_HANDLE ||
-        dielectricDiagnosticsBuffer_.memory == VK_NULL_HANDLE ||
+        (pipelineBundle_.DescriptorIo().diagnosticIo.allocateBuffer &&
+         pipelineBundle_.diagnosticBuffer.memory == VK_NULL_HANDLE) ||
         skeletonGpu.vertices.memory == VK_NULL_HANDLE ||
         secondSkeletonGpu.vertices.memory == VK_NULL_HANDLE ||
         skeletonGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
@@ -3847,6 +4697,20 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const Vec3 rightHand = toWorld(rightHandLocal);
 
     bool updateSkinnedPlayer = false;
+    bool updateViewmodel = false;
+    const bool usesViewmodel = effectivePlayerRenderRoute == PlayerRenderRoute::ModelledViewmodel;
+    if (frame.playerMountProfile == horde::gameplay::items::PlayerMountProfile::AnatomicalBody &&
+        (!usesViewmodel || !playerBodyRemainderAvailable_))
+    {
+        diagnostic = "Anatomical player mount requires the dedicated viewmodel and explicit body remainder.";
+        return false;
+    }
+    if (!usesViewmodel) viewmodelPoseCurrent_ = false;
+    if (usesViewmodel && (!viewmodelAvailable_ || viewmodelBlas_.handle == VK_NULL_HANDLE))
+    {
+        diagnostic = "Dedicated modelled RT viewmodel requested without its validated runtime geometry.";
+        return false;
+    }
     horde::gameplay::items::HeldItemStates renderHeldItems = frame.heldItems;
     horde::gameplay::items::HeldItemTransform finalSkinnedLeftGrip =
         horde::gameplay::items::IdentityHeldItemTransform();
@@ -3872,6 +4736,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             shoulderAnchoredRootWorld, kRouteFloorWorldY,
             playerRenderSlot_.BootGroundingOffsetMetres(
                 frame.playerAnimation));
+        if (frame.playerMountProfile == horde::gameplay::items::PlayerMountProfile::AnatomicalBody)
+        {
+            // The authored face lies near model Z=0. Put the grounded body
+            // beneath the player, not at the old view-relative .40 m shoulder
+            // plane behind which the camera saw the character's back.
+            skinnedPlayerRootWorld = GroundPlayerRootOnRouteFloor(
+                animatedBodyOrigin, kRouteFloorWorldY,
+                playerRenderSlot_.BootGroundingOffsetMetres(frame.playerAnimation));
+        }
         const auto worldPointToPlayer = [&subtract, &playerModelBasis,
                                          &skinnedPlayerRootWorld](
                                             const Vec3& worldPoint) {
@@ -3902,7 +4775,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         rigAnimation.rightIk.gripZ = viewVectorToPlayer(frame.playerAnimation.rightIk.gripZ);
         if (!playerRenderSlot_.PreparePose(rigAnimation, frame.tickIndex,
                                            playerCpuSkinCadence_, updateSkinnedPlayer,
-                                           diagnostic))
+                                           diagnostic, observation))
             return false;
         if (updateSkinnedPlayer)
         {
@@ -3939,11 +4812,47 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 static_cast<VkDeviceSize>(playerStaticVertexBase_) *
                 sizeof(horde::scene::assets::StaticRtVertex);
             if (!gpuResources_.WriteBufferRange(
-                    staticVertexBuffer_, playerOffset, skinnedPlayerUpload_.data(),
+                    worldPlayerVertexBuffer_, playerOffset, skinnedPlayerUpload_.data(),
                     skinnedPlayerUpload_.size() *
                         sizeof(horde::scene::assets::StaticRtVertex),
-                    "skinned player static-PBR vertices", diagnostic))
+                    "skinned player static-PBR vertices", diagnostic,
+                    observation))
                 return false;
+        }
+
+        updateViewmodel = usesViewmodel && (updateSkinnedPlayer || !viewmodelPoseCurrent_);
+        if (updateViewmodel)
+        {
+            const auto viewSkinBegin = std::chrono::steady_clock::now();
+            RtSceneStageScope viewSkinScope(observation, horde::telemetry::RtStage::PlayerSkin);
+            if (!viewmodelSkin_.SkinPlayerPoseUniqueTextured(playerRenderSlot_.SolvedPose(),
+                    viewmodelPoseVertices_, viewmodelPoseTangents_, diagnostic))
+            {
+                viewSkinScope.Cancel();
+                return false;
+            }
+            playerSkinTotalMilliseconds_ += std::chrono::duration<double, std::milli>(
+                std::chrono::steady_clock::now() - viewSkinBegin).count();
+            if (!updateSkinnedPlayer) ++playerSkinUpdateCount_;
+            if (viewmodelPoseVertices_.size() != viewmodelAsset_.vertices.size() ||
+                viewmodelPoseTangents_.size() != viewmodelPoseVertices_.size())
+            {
+                diagnostic = "Viewmodel skin output disagrees with its independent static-PBR stream.";
+                viewSkinScope.Cancel();
+                return false;
+            }
+            if (viewmodelUpload_.empty()) viewmodelUpload_ = viewmodelAsset_.vertices;
+            for (std::size_t vertex = 0u; vertex < viewmodelUpload_.size(); ++vertex)
+            {
+                std::copy_n(viewmodelPoseVertices_[vertex].position, 4u, viewmodelUpload_[vertex].position.begin());
+                std::copy_n(viewmodelPoseVertices_[vertex].normal, 4u, viewmodelUpload_[vertex].normal.begin());
+                std::copy_n(viewmodelPoseTangents_[vertex].tangent, 4u, viewmodelUpload_[vertex].tangent.begin());
+            }
+            viewSkinScope.Complete(1u);
+            if (!gpuResources_.WriteBuffer(viewmodelVertexBuffer_, viewmodelUpload_.data(),
+                    viewmodelUpload_.size() * sizeof(viewmodelUpload_.front()),
+                    "modelled player viewmodel vertices", diagnostic, observation)) return false;
+            viewmodelPoseCurrent_ = true;
         }
 
         const auto rigidWorldFromBone = [&playerModelBasis,
@@ -3989,7 +4898,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                      roster,
                                      lich,
                                      gpuResources_,
-                                     diagnostic))
+                                     diagnostic,
+                                     observation))
     {
         return false;
     }
@@ -4047,14 +4957,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[3].mask = productionVisibility.swordMask;
     instances[3].accelerationStructureReference = swordBlas_.address;
     instances[3].transform = heldItemInstanceTransform(renderHeldItems[1]);
-    instances[4] = instances[0];
-    instances[4].instanceCustomIndex = 4u;
-    const PlayerRouteMasks playerRouteMasks = BuildPlayerRouteMasks(effectivePlayerRenderRoute);
-    instances[4].mask = productionVisibility.playerMask;
-    instances[4].accelerationStructureReference =
+    instances[kPlayerWorldBodyInstanceIndex] = instances[0];
+    instances[kPlayerWorldBodyInstanceIndex].instanceCustomIndex = kPlayerWorldBodyInstanceIndex;
+    const PlayerRouteMasks playerRouteMasks = BuildPlayerRouteMasks(
+        effectivePlayerRenderRoute, playerBodyRemainderAvailable_);
+    instances[kPlayerWorldBodyInstanceIndex].mask = productionVisibility.playerMask;
+    instances[kPlayerWorldBodyInstanceIndex].accelerationStructureReference =
         usesSkinnedPlayer
         ? skinnedPlayerBlas_.address : playerBodyBlas_.address;
-    instances[4].transform = usesSkinnedPlayer
+    instances[kPlayerWorldBodyInstanceIndex].transform = usesSkinnedPlayer
         ? VkTransformMatrixKHR{{
             playerModelBasis.modelXInWorld[0], playerModelBasis.modelYInWorld[0], playerModelBasis.modelZInWorld[0], skinnedPlayerRootWorld[0],
             playerModelBasis.modelXInWorld[1], playerModelBasis.modelYInWorld[1], playerModelBasis.modelZInWorld[1], skinnedPlayerRootWorld[1],
@@ -4065,7 +4976,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             animatedBodyRight[2], 0.0f, animatedBodyForward[2], animatedBodyOrigin[2]}};
     for (std::size_t i = 5u; i <= 16u; ++i)
     {
-        instances[i] = instances[4];
+        instances[i] = instances[kPlayerWorldBodyInstanceIndex];
         instances[i].instanceCustomIndex = static_cast<std::uint32_t>(i);
         instances[i].mask = productionVisibility.inspectionOverride
             ? 0u : playerRouteMasks.instanceMasks[i];
@@ -4125,6 +5036,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[16].transform = segmentTransform(headBase, headTop, 0.145f);
     instances[16].mask = productionVisibility.inspectionOverride
         ? 0u : playerRouteMasks.instanceMasks[16];
+    auto& viewmodelInstance = instances[kPlayerViewmodelInstanceIndex];
+    viewmodelInstance = instances[kPlayerWorldBodyInstanceIndex];
+    viewmodelInstance.instanceCustomIndex = kPlayerViewmodelInstanceIndex;
+    viewmodelInstance.mask = productionVisibility.inspectionOverride
+        ? 0u : playerRouteMasks.instanceMasks[kPlayerViewmodelInstanceIndex];
+    viewmodelInstance.accelerationStructureReference = viewmodelAvailable_
+        ? viewmodelBlas_.address : skinnedPlayerBlas_.address;
     horde::gameplay::items::HeldItemTransform productionLanternWorldFromFlame =
         horde::gameplay::items::IdentityHeldItemTransform();
     horde::gameplay::items::HeldItemTransform productionLanternWorldFromLight =
@@ -4305,6 +5223,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         0.0f, 0.0f, waterfallScale.crossLane, -15.26f}};
     for (std::size_t instance = 0u; instance < instances.size(); ++instance)
         lastInstanceMasks_[instance] = instances[instance].mask;
+#ifndef NDEBUG
+    viewmodelCaptureTransform_ = instances[kPlayerViewmodelInstanceIndex].transform;
+    playerWorldBodyCaptureTransform_ =
+        instances[kPlayerWorldBodyInstanceIndex].transform;
+#endif
     lastPlayerPrimaryVisible_ = productionVisibility.playerPrimaryVisible;
     RtHeldLightGpu heldLightGpu{{
         frame.heldLight.worldFromLight[12],
@@ -4371,82 +5294,17 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             std::max<std::size_t>(fireEmitterUpload.activeCount,
                                   lanternEmitterIndex + 1u));
     }
-    RtDielectricDiagnostics previousDielectricDiagnostics{};
-    if (!ReadBuffer(dielectricDiagnosticsBuffer_, 0u,
-                    &previousDielectricDiagnostics, sizeof(previousDielectricDiagnostics),
-                    "dielectric diagnostics", diagnostic))
-        return false;
-    dielectricTransportOverflowCount_ = previousDielectricDiagnostics.transportOverflowCount;
-    dielectricShadowOverflowCount_ = previousDielectricDiagnostics.shadowOverflowCount;
-    dielectricSecondaryRejectCount_ =
-        previousDielectricDiagnostics.secondaryDielectricRejectCount;
-    dielectricUnclosedVolumeCount_ = previousDielectricDiagnostics.unclosedVolumeCount;
-    dielectricPrimaryUnclosedVolumeCount_ =
-        previousDielectricDiagnostics.primaryUnclosedVolumeCount;
-    dielectricShadowUnclosedVolumeCount_ =
-        previousDielectricDiagnostics.shadowUnclosedVolumeCount;
-    productionPaneStackFailureCount_ =
-        previousDielectricDiagnostics.productionPaneStackFailureCount;
-    productionPaneSecondaryOriginCount_ =
-        previousDielectricDiagnostics.productionPaneSecondaryOriginCount;
-    productionPaneSecondaryTerminalCount_ =
-        previousDielectricDiagnostics.productionPaneSecondaryTerminalCount;
-    productionPaneSecondarySameMediumCount_ =
-        previousDielectricDiagnostics.productionPaneSecondarySameMediumCount;
-    productionPaneSecondaryDifferentMediumCount_ =
-        previousDielectricDiagnostics.productionPaneSecondaryDifferentMediumCount;
-    secondaryNearSelfHitCount_ = previousDielectricDiagnostics.secondaryNearSelfHitCount;
-    primaryOpenMissCount_ = previousDielectricDiagnostics.primaryOpenMissCount;
-    primaryOpenOpaqueCount_ = previousDielectricDiagnostics.primaryOpenOpaqueCount;
-    primaryMismatchedExitCount_ = previousDielectricDiagnostics.primaryMismatchedExitCount;
-    primaryInterfaceBudgetCount_ = previousDielectricDiagnostics.primaryInterfaceBudgetCount;
-    primaryVolumeBudgetCount_ = previousDielectricDiagnostics.primaryVolumeBudgetCount;
-    shadowOpenMissCount_ = previousDielectricDiagnostics.shadowOpenMissCount;
-    shadowMismatchedExitCount_ = previousDielectricDiagnostics.shadowMismatchedExitCount;
-    primaryTirCount_ = previousDielectricDiagnostics.primaryTirCount;
-    primaryInterfaceBudgetOpenVolumeCount_ =
-        previousDielectricDiagnostics.primaryInterfaceBudgetOpenVolumeCount;
-    primaryInterfaceBudgetClosedVolumeCount_ =
-        previousDielectricDiagnostics.primaryInterfaceBudgetClosedVolumeCount;
-    shadowMismatchEmptyCount_ = previousDielectricDiagnostics.shadowMismatchEmptyCount;
-    shadowImplicitOriginExitCount_ =
-        previousDielectricDiagnostics.shadowImplicitOriginExitCount;
-    secondaryDielectricTerminalCount_ =
-        previousDielectricDiagnostics.secondaryDielectricTerminalCount;
-    primaryTirTerminationCount_ =
-        previousDielectricDiagnostics.primaryTirTerminationCount;
-    shadowFiniteEndpointVolumeCount_ =
-        previousDielectricDiagnostics.shadowFiniteEndpointVolumeCount;
-    primaryOpenOpaqueSameInstanceDifferentMaterialCount_ =
-        previousDielectricDiagnostics.primaryOpenOpaqueSameInstanceDifferentMaterialCount;
-    primaryOpenOpaqueAfterTirCount_ =
-        previousDielectricDiagnostics.primaryOpenOpaqueAfterTirCount;
-    primaryOpenOpaqueTerminalInstanceMask_ =
-        previousDielectricDiagnostics.primaryOpenOpaqueTerminalInstanceMask;
-    primaryOpenOpaqueVolumeInstanceMask_ =
-        previousDielectricDiagnostics.primaryOpenOpaqueVolumeInstanceMask;
-    primaryOpenOpaqueTerminalMaterialMask_ =
-        previousDielectricDiagnostics.primaryOpenOpaqueTerminalMaterialMask;
-    primaryClosedVolumeAbsorptionCount_ =
-        previousDielectricDiagnostics.primaryClosedVolumeAbsorptionCount;
-    primaryCertifiedClosedVolumeRecoveryCount_ =
-        previousDielectricDiagnostics.primaryCertifiedClosedVolumeRecoveryCount;
-    shadowCertifiedClosedVolumeRecoveryCount_ =
-        previousDielectricDiagnostics.shadowCertifiedClosedVolumeRecoveryCount;
-    certifiedClosedVolumeRecoveryReasonMask_ =
-        previousDielectricDiagnostics.certifiedClosedVolumeRecoveryReasonMask;
-    primaryTorchPixelCount_ = previousDielectricDiagnostics.primaryTorchPixelCount;
-    primarySwordPixelCount_ = previousDielectricDiagnostics.primarySwordPixelCount;
-    primaryPlayerPixelCount_ = previousDielectricDiagnostics.primaryPlayerPixelCount;
-    primaryRewardRingPixelCount_ =
-        previousDielectricDiagnostics.primaryRewardRingPixelCount;
-    primaryRewardBodyPixelCount_ =
-        previousDielectricDiagnostics.primaryRewardBodyPixelCount;
+    const bool diagnosticsAvailable =
+        pipelineBundle_.DiagnosticAvailability() == RtDiagnosticAvailability::Available;
     const RtDielectricDiagnostics clearedDielectricDiagnostics{};
     auto frameInstanceMetadata = staticMeshSlot_.InstanceMetadata();
+    if (effectivePlayerRenderRoute == PlayerRenderRoute::ModelledViewmodel &&
+        playerBodyRemainderAvailable_)
+        frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags |=
+            static_cast<std::uint32_t>(RtInstanceFlag::BodyRemainderOnlyPrimary);
     if (effectivePlayerRenderRoute == PlayerRenderRoute::Procedural)
     {
-        frameInstanceMetadata[4u].flags = 0u;
+        frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags = 0u;
         for (std::size_t i = 5u; i <= 9u; ++i)
             frameInstanceMetadata[i].flags = 0u;
     }
@@ -4468,6 +5326,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         if (!glassFixtureVisible)
             frameInstanceMetadata[9u].flags = 0u;
     }
+    lastPlayerWorldBodyInstanceFlags_ = frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags;
     auto frameMaterials = staticMeshSlot_.Materials();
     if (dielectricFixtureMaterialIndex_ >= frameMaterials.size())
     {
@@ -4487,46 +5346,102 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     fixtureMaterial.attenuationColor[2] = clampedTuning.glassAttenuationColor[2];
     genericTransmissionActive_ = HasActiveGenericTransmission(frameInstanceMetadata,
         staticMeshSlot_.PrimitiveMetadata(), frameMaterials);
+    framePipelineEvidence_ = pipelineEvidenceIdentity_;
+    framePipelineEvidenceValid_ = pipelineEvidenceIdentityValid_;
+    framePipelineEvidence_.activeStrategy = genericTransmissionActive_
+        ? horde::telemetry::RtMaterialStrategy::GenericDielectric
+        : horde::telemetry::RtMaterialStrategy::OpaqueFast;
+    framePipelineEvidence_.active = genericTransmissionActive_
+        ? framePipelineEvidence_.genericDielectric
+        : framePipelineEvidence_.opaqueFast;
+    switch (frame.waterQuality)
+    {
+    case WaterQuality::Off:
+        framePipelineEvidence_.waterQuality = horde::telemetry::RtWaterQuality::Off;
+        break;
+    case WaterQuality::Mobile:
+        framePipelineEvidence_.waterQuality = horde::telemetry::RtWaterQuality::Mobile;
+        break;
+    case WaterQuality::High:
+        framePipelineEvidence_.waterQuality = horde::telemetry::RtWaterQuality::High;
+        break;
+    default:
+        framePipelineEvidenceValid_ = false;
+        break;
+    }
     if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
-                     "held light", diagnostic) ||
+                     "held light", diagnostic, observation) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
-                     sizeof(fireEmitterUpload.emitters), "fire emitters", diagnostic) ||
+                     sizeof(fireEmitterUpload.emitters), "fire emitters", diagnostic,
+                     observation) ||
         !WriteBuffer(instanceBuffer_, instances.data(), sizeof(instances),
-                     "animated TLAS instance", diagnostic) ||
+                     "animated TLAS instance", diagnostic, observation) ||
         !WriteBuffer(instanceMetadataBuffer_, frameInstanceMetadata.data(),
-                     sizeof(frameInstanceMetadata), "player route metadata", diagnostic) ||
+                      sizeof(frameInstanceMetadata), "player route metadata", diagnostic,
+                      observation) ||
         !WriteBuffer(materialMetadataBuffer_, frameMaterials.data(),
                      frameMaterials.size() * sizeof(RtMaterialGpu),
-                     "RT Lab dielectric material", diagnostic) ||
-        !WriteBuffer(dielectricDiagnosticsBuffer_, &clearedDielectricDiagnostics,
-                     sizeof(clearedDielectricDiagnostics),
-                     "dielectric diagnostics reset", diagnostic))
+                     "RT Lab dielectric material", diagnostic, observation))
     {
         return false;
+    }
+    if (diagnosticsAvailable)
+    {
+        if (!WriteBuffer(pipelineBundle_.diagnosticBuffer,
+                         &clearedDielectricDiagnostics,
+                         sizeof(clearedDielectricDiagnostics),
+                         "dielectric diagnostics reset", diagnostic))
+        {
+            if (observation != nullptr)
+            {
+                observation->failure = RtSceneRecordFailure::DiagnosticReset;
+            }
+            return false;
+        }
+        if (observation != nullptr)
+        {
+            observation->diagnosticResetCompleted = true;
+        }
     }
 
     VkMemoryBarrier hostWriteBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     hostWriteBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
     hostWriteBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR |
-                                     VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT;
-    vkCmdPipelineBarrier(commandBuffer,
-                         VK_PIPELINE_STAGE_HOST_BIT,
-                         VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR |
-                             VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
-                         0u,
-                         1u,
-                         &hostWriteBarrier,
-                         0u,
-                         nullptr,
-                         0u,
-                         nullptr);
+                                     VK_ACCESS_SHADER_READ_BIT;
+    if (pipelineBundle_.DescriptorIo().diagnosticIo.shaderWriteBarrier)
+        hostWriteBarrier.dstAccessMask |= VK_ACCESS_SHADER_WRITE_BIT;
+    ExecuteObservedRtSceneCommand(
+        observation, RtSceneCommandEvent::HostWriteBarrier, [&]() noexcept {
+            vkCmdPipelineBarrier(commandBuffer,
+                                 VK_PIPELINE_STAGE_HOST_BIT,
+                                 VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR |
+                                     executionPolicy_.shaderPipelineStage,
+                                 0u,
+                                 1u,
+                                 &hostWriteBarrier,
+                                 0u,
+                                 nullptr,
+                                 0u,
+                                 nullptr);
+        });
 
-    if (updateSkinnedPlayer)
+    const std::array<bool, 5u> requestedBlasWork{{
+        updateSkinnedPlayer, updateSkeletonPose0, updateSkeletonPose1, updateLich, updateViewmodel}};
+    const std::uint64_t blasWorkInvocationCount = static_cast<std::uint64_t>(
+        std::count(requestedBlasWork.begin(), requestedBlasWork.end(), true));
+    RtSceneStageScope blasRefitScope(
+        blasWorkInvocationCount != 0u ? observation : nullptr,
+        horde::telemetry::RtStage::BlasRefitRecord);
+
+    const auto recordPlayerBlas = [&](std::uint32_t instanceIndex,
+                                      const AccelerationStructure& playerBlas,
+                                      const Buffer& playerScratch)
     {
         const RtInstanceMetadata playerMetadata =
-            staticMeshSlot_.InstanceMetadata()[4u];
+            staticMeshSlot_.InstanceMetadata()[instanceIndex];
         const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
-        const auto& staticVertices = staticMeshSlot_.Vertices();
+        const auto& vertexBuffer = VertexBufferForRole(static_cast<RtGeometryRole>(playerMetadata.geometryRole));
+        const auto& vertexCounts = staticMeshSlot_.PrimitiveVertexCounts();
         std::vector<VkAccelerationStructureGeometryKHR> playerGeometries;
         std::vector<VkAccelerationStructureBuildRangeInfoKHR> playerRanges;
         std::vector<const VkAccelerationStructureBuildRangeInfoKHR*> playerRangePointers;
@@ -4537,9 +5452,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         {
             const std::uint32_t geometryIndex = playerMetadata.primitiveBase + localIndex;
             const RtPrimitiveMetadata& primitive = primitiveMetadata[geometryIndex];
-            const std::uint32_t nextVertexOffset = geometryIndex + 1u < primitiveMetadata.size()
-                ? primitiveMetadata[geometryIndex + 1u].vertexOffset
-                : static_cast<std::uint32_t>(staticVertices.size());
             VkAccelerationStructureGeometryKHR geometry{
                 VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
             geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
@@ -4548,13 +5460,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
             geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
             geometry.geometry.triangles.vertexData.deviceAddress =
-                staticVertexBuffer_.address +
+                vertexBuffer.address +
                 static_cast<VkDeviceSize>(primitive.vertexOffset) *
                     sizeof(horde::scene::assets::StaticRtVertex);
             geometry.geometry.triangles.vertexStride =
                 sizeof(horde::scene::assets::StaticRtVertex);
             geometry.geometry.triangles.maxVertex =
-                nextVertexOffset - primitive.vertexOffset - 1u;
+                vertexCounts[geometryIndex] - 1u;
             geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
             geometry.geometry.triangles.indexData.deviceAddress =
                 staticIndexBuffer_.address +
@@ -4575,23 +5487,18 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR |
             VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
         playerUpdateInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
-        playerUpdateInfo.srcAccelerationStructure = skinnedPlayerBlas_.handle;
-        playerUpdateInfo.dstAccelerationStructure = skinnedPlayerBlas_.handle;
+        playerUpdateInfo.srcAccelerationStructure = playerBlas.handle;
+        playerUpdateInfo.dstAccelerationStructure = playerBlas.handle;
         playerUpdateInfo.geometryCount =
             static_cast<std::uint32_t>(playerGeometries.size());
         playerUpdateInfo.pGeometries = playerGeometries.data();
-        playerUpdateInfo.scratchData.deviceAddress = skinnedPlayerBlasUpdateScratch_.address;
+        playerUpdateInfo.scratchData.deviceAddress = playerScratch.address;
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &playerUpdateInfo,
                                              playerRangePointers.data());
-    }
+    };
 
-    for (std::size_t bucket = 0u; bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
+    const auto recordSkeletonBlas = [&](const std::size_t bucket) noexcept
     {
-        const bool updateBucket = bucket == 0u ? updateSkeletonPose0 : updateSkeletonPose1;
-        if (!updateBucket)
-        {
-            continue;
-        }
         const auto& skeletonBucketGpu = characterSlot_.SkeletonGpu(bucket);
         const auto& skeletonVertices = characterSlot_.SkeletonVertices(bucket);
         VkAccelerationStructureGeometryKHR skeletonGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
@@ -4616,10 +5523,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         skeletonRange.primitiveCount = static_cast<std::uint32_t>(skeletonVertices.size() / 3u);
         const VkAccelerationStructureBuildRangeInfoKHR* skeletonRanges[] = {&skeletonRange};
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &skeletonUpdateInfo, skeletonRanges);
+    };
 
-    }
-
-    if (updateLich)
+    const auto recordLichBlas = [&]() noexcept
     {
         VkAccelerationStructureGeometryKHR lichGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
         lichGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
@@ -4643,13 +5549,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lichRange.primitiveCount = static_cast<std::uint32_t>(lichSkinnedVertices_.size() / 3u);
         const VkAccelerationStructureBuildRangeInfoKHR* lichRanges[] = {&lichRange};
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &lichUpdateInfo, lichRanges);
-
-    }
+    };
 
     const DynamicBlasToTlasDependency blasToTlasDependency =
         BuildDynamicBlasToTlasDependency({
-            updateSkinnedPlayer, updateSkeletonPose0, updateSkeletonPose1, updateLich});
-    if (blasToTlasDependency.required)
+            requestedBlasWork[0] || requestedBlasWork[4], requestedBlasWork[1],
+            requestedBlasWork[2], requestedBlasWork[3]});
+    const auto recordBlasToTlasBarrier = [&]() noexcept
     {
         VkMemoryBarrier dynamicBlasBuildBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
         dynamicBlasBuildBarrier.srcAccessMask = blasToTlasDependency.sourceAccessMask;
@@ -4664,8 +5570,25 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                              nullptr,
                              0u,
                              nullptr);
-    }
+    };
+    const std::uint64_t executedBlasWork = ExecuteObservedDynamicBlasCommands(
+        observation, requestedBlasWork,
+        [&](const std::size_t index) {
+            switch (index)
+            {
+            case 0u: recordPlayerBlas(kPlayerWorldBodyInstanceIndex, skinnedPlayerBlas_, skinnedPlayerBlasUpdateScratch_); break;
+            case 1u: recordSkeletonBlas(0u); break;
+            case 2u: recordSkeletonBlas(1u); break;
+            case 3u: recordLichBlas(); break;
+            case 4u: recordPlayerBlas(kPlayerViewmodelInstanceIndex, viewmodelBlas_, viewmodelBlasUpdateScratch_); break;
+            default: break;
+            }
+        },
+        recordBlasToTlasBarrier);
+    blasRefitScope.Complete(executedBlasWork);
 
+    RtSceneStageScope tlasUpdateScope(
+        observation, horde::telemetry::RtStage::TlasUpdateRecord);
     VkAccelerationStructureGeometryKHR tlasGeometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     tlasGeometry.geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR;
     tlasGeometry.geometry.instances.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_INSTANCES_DATA_KHR;
@@ -4675,8 +5598,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     VkAccelerationStructureBuildGeometryInfoKHR updateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
     updateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
     updateInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
-    updateInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
-    updateInfo.srcAccelerationStructure = tlas_.handle;
+    const bool rebuildTlas = !tlasInstanceDefinitionsValid_ ||
+        RequiresTlasInstanceRebuild(tlasBuiltInstances_, instances);
+    updateInfo.mode = rebuildTlas ? VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR
+                                 : VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
+    updateInfo.srcAccelerationStructure = rebuildTlas ? VK_NULL_HANDLE : tlas_.handle;
     updateInfo.dstAccelerationStructure = tlas_.handle;
     updateInfo.geometryCount = 1u;
     updateInfo.pGeometries = &tlasGeometry;
@@ -4685,24 +5611,49 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     VkAccelerationStructureBuildRangeInfoKHR updateRange{};
     updateRange.primitiveCount = static_cast<std::uint32_t>(instances.size());
     const VkAccelerationStructureBuildRangeInfoKHR* updateRanges[] = {&updateRange};
-    vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &updateInfo, updateRanges);
-
     VkMemoryBarrier traceBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
     traceBarrier.srcAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR;
     traceBarrier.dstAccessMask = VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR | VK_ACCESS_SHADER_READ_BIT;
-    vkCmdPipelineBarrier(commandBuffer,
-                         VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
-                         VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
-                         0u,
-                         1u,
-                         &traceBarrier,
-                         0u,
-                         nullptr,
-                         0u,
-                         nullptr);
+    ExecuteObservedTlasUpdateCommands(
+        observation,
+        [&]() noexcept {
+            vkCmdBuildAccelerationStructuresKHR_(
+                commandBuffer, 1u, &updateInfo, updateRanges);
+        },
+        [&]() noexcept {
+            vkCmdPipelineBarrier(commandBuffer,
+                                 VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,
+                                 executionPolicy_.shaderPipelineStage,
+                                 0u,
+                                 1u,
+                                 &traceBarrier,
+                                 0u,
+                                 nullptr,
+                                 0u,
+                                 nullptr);
+        });
+    tlasUpdateScope.Complete(1u);
+    if (rebuildTlas)
+    {
+        tlasPendingInstances_ = instances;
+        tlasPendingDefinitionsValid_ = true;
+    }
 
+#ifndef NDEBUG
+    playerWorldBodyPoseCurrent_ = usesSkinnedPlayer &&
+        !productionPlayerAsset_.vertices.empty() &&
+        skinnedPlayerUpload_.size() == productionPlayerAsset_.vertices.size();
+#endif
     diagnostic.clear();
     return true;
+}
+
+void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
+{
+    if (!tlasPendingDefinitionsValid_) return;
+    tlasBuiltInstances_ = tlasPendingInstances_;
+    tlasInstanceDefinitionsValid_ = true;
+    tlasPendingDefinitionsValid_ = false;
 }
 
 bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
@@ -4710,8 +5661,34 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 VkImageLayout& swapchainImageLayout,
                                                 VkExtent2D swapchainExtent,
                                                 const RtSceneFrameInputs& frame,
-                                                std::string& diagnostic)
+                                                std::string& diagnostic,
+                                                RtSceneRecordObservation* observation
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                                                , experimental::StagedPrimaryTiming* stagedTiming,
+                                                std::uint32_t timingFrameSlot
+#endif
+                                                )
 {
+    // A prior unsubmitted recording must not advance the GPU definition cache.
+    tlasPendingDefinitionsValid_ = false;
+#ifndef NDEBUG
+    // A rejected presentation attempt invalidates geometry evidence from the
+    // prior recorded frame, including failures before dynamic scene updates.
+    playerWorldBodyPoseCurrent_ = false;
+#endif
+    if (observation != nullptr)
+    {
+        observation->failure = RtSceneRecordFailure::None;
+        observation->diagnosticResetCompleted = false;
+        if (observation->commands != nullptr)
+        {
+            *observation->commands = {};
+        }
+        if (observation->recordedScene != nullptr)
+        {
+            *observation->recordedScene = {};
+        }
+    }
     if (!ready_)
     {
         diagnostic = "RT scene is not ready.";
@@ -4725,11 +5702,13 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         return false;
     }
 
-    if (!UpdateDynamicInstances(commandBuffer, frame, diagnostic))
+    if (!UpdateDynamicInstances(commandBuffer, frame, diagnostic, observation))
     {
         return false;
     }
 
+    RtSceneStageScope traceCopyScope(
+        observation, horde::telemetry::RtStage::TraceCopyRecord);
     if (storageImageLayout_ != VK_IMAGE_LAYOUT_GENERAL)
     {
         SetImageBarrier(commandBuffer,
@@ -4737,24 +5716,20 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                         storageImageLayout_,
                         VK_IMAGE_LAYOUT_GENERAL,
                         VK_PIPELINE_STAGE_TRANSFER_BIT,
-                        VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                        executionPolicy_.shaderPipelineStage,
                         VK_ACCESS_TRANSFER_READ_BIT,
                         VK_ACCESS_SHADER_WRITE_BIT);
         storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
     }
 
-    const VkPipeline activePipeline = genericTransmissionActive_ ? pipeline_ : legacyPipeline_;
-    const VkStridedDeviceAddressRegionKHR& activeRaygenRegion =
-        genericTransmissionActive_ ? raygenRegion_ : legacyRaygenRegion_;
-    const VkStridedDeviceAddressRegionKHR& activeMissRegion =
-        genericTransmissionActive_ ? missRegion_ : legacyMissRegion_;
-    const VkStridedDeviceAddressRegionKHR& activeHitRegion =
-        genericTransmissionActive_ ? hitRegion_ : legacyHitRegion_;
-    const VkStridedDeviceAddressRegionKHR& activeCallableRegion =
-        genericTransmissionActive_ ? callableRegion_ : legacyCallableRegion_;
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR,
-                      activePipeline);
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, pipelineLayout_, 0u, 1u, &descriptorSet_, 0u, nullptr);
+    const RtStrategyPipelineResources& activeStrategy = pipelineBundle_.Strategy(
+        genericTransmissionActive_ ? RtMaterialStrategy::GenericDielectric
+                                   : RtMaterialStrategy::OpaqueFast);
+    vkCmdBindPipeline(commandBuffer, executionPolicy_.bindPoint,
+                      activeStrategy.pipeline);
+    vkCmdBindDescriptorSets(commandBuffer, executionPolicy_.bindPoint,
+                            pipelineBundle_.pipelineLayout, 0u, 1u,
+                            &pipelineBundle_.descriptorSet, 0u, nullptr);
     const std::array<float, 3u> staffWorldPosition = characterSlot_.LichStaffWorldPosition(frame.lich);
     const RtGuidanceLight guidanceLight = ResolveChestGuidanceLight(frame.chestReward);
     const bool guidanceLightActive = guidanceLight.strength > 0.0f;
@@ -4800,74 +5775,102 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                              guidanceLight.strength};
     lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
     vkCmdPushConstants(commandBuffer,
-                       pipelineLayout_,
-                       VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR,
+                       pipelineBundle_.pipelineLayout,
+                       executionPolicy_.pushConstantStages,
                        0u,
                        sizeof(pushConstants),
                        &pushConstants);
-    vkCmdTraceRaysKHR_(commandBuffer,
-                       &activeRaygenRegion,
-                       &activeMissRegion,
-                       &activeHitRegion,
-                       &activeCallableRegion,
-                       dispatchExtent_.width,
-                       dispatchExtent_.height,
-                       1u);
+    ExecuteObservedTraceCopyCommands(
+        observation,
+        [&]() noexcept {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+            if (stagedPrimary_) {
+                stagedPrimary_->Record(commandBuffer,
+                    genericTransmissionActive_ ? RtMaterialStrategy::GenericDielectric : RtMaterialStrategy::OpaqueFast,
+                    std::as_bytes(std::span{&pushConstants, 1u})
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                    , stagedTiming, timingFrameSlot
+#endif
+                    );
+                return;
+            }
+#endif
+            if (executionPolicy_.requiresShaderBindingTable)
+            {
+                vkCmdTraceRaysKHR_(commandBuffer,
+                                   &activeStrategy.sbtRegions[0],
+                                   &activeStrategy.sbtRegions[1],
+                                   &activeStrategy.sbtRegions[2],
+                                   &activeStrategy.sbtRegions[3],
+                                   dispatchExtent_.width,
+                                   dispatchExtent_.height,
+                                   1u);
+            }
+            else
+            {
+                vkCmdDispatch(commandBuffer, computeDispatchGroups_[0],
+                              computeDispatchGroups_[1], computeDispatchGroups_[2]);
+            }
+        },
+        [&]() noexcept {
+            SetImageBarrier(commandBuffer,
+                            storageImage_,
+                            VK_IMAGE_LAYOUT_GENERAL,
+                            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                            executionPolicy_.shaderPipelineStage,
+                            VK_PIPELINE_STAGE_TRANSFER_BIT,
+                            VK_ACCESS_SHADER_WRITE_BIT,
+                            VK_ACCESS_TRANSFER_READ_BIT);
+            storageImageLayout_ = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 
-    SetImageBarrier(commandBuffer,
-                    storageImage_,
-                    VK_IMAGE_LAYOUT_GENERAL,
-                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                    VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
-                    VK_PIPELINE_STAGE_TRANSFER_BIT,
-                    VK_ACCESS_SHADER_WRITE_BIT,
-                    VK_ACCESS_TRANSFER_READ_BIT);
-    storageImageLayout_ = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            const VkPipelineStageFlags swapSrcStage =
+                swapchainImageLayout == VK_IMAGE_LAYOUT_UNDEFINED
+                    ? VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT
+                    : VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+            SetImageBarrier(commandBuffer,
+                            swapchainImage,
+                            swapchainImageLayout,
+                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                            swapSrcStage,
+                            VK_PIPELINE_STAGE_TRANSFER_BIT,
+                            0u,
+                            VK_ACCESS_TRANSFER_WRITE_BIT);
 
-    const VkPipelineStageFlags swapSrcStage = swapchainImageLayout == VK_IMAGE_LAYOUT_UNDEFINED
-        ? VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT
-        : VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    SetImageBarrier(commandBuffer,
-                    swapchainImage,
-                    swapchainImageLayout,
-                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                    swapSrcStage,
-                    VK_PIPELINE_STAGE_TRANSFER_BIT,
-                    0u,
-                    VK_ACCESS_TRANSFER_WRITE_BIT);
-
-    if (scaledPresentation)
-    {
-        VkImageBlit blitRegion{};
-        blitRegion.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
-        blitRegion.srcOffsets[1] = {static_cast<std::int32_t>(dispatchExtent_.width),
-                                    static_cast<std::int32_t>(dispatchExtent_.height), 1};
-        blitRegion.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
-        blitRegion.dstOffsets[1] = {static_cast<std::int32_t>(swapchainExtent.width),
-                                    static_cast<std::int32_t>(swapchainExtent.height), 1};
-        vkCmdBlitImage(commandBuffer,
-                       storageImage_,
-                       VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                       swapchainImage,
-                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                       1u,
-                       &blitRegion,
-                       VK_FILTER_LINEAR);
-    }
-    else
-    {
-        VkImageCopy copyRegion{};
-        copyRegion.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
-        copyRegion.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
-        copyRegion.extent = {dispatchExtent_.width, dispatchExtent_.height, 1u};
-        vkCmdCopyImage(commandBuffer,
-                       storageImage_,
-                       VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                       swapchainImage,
-                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                       1u,
-                       &copyRegion);
-    }
+            if (scaledPresentation)
+            {
+                VkImageBlit blitRegion{};
+                blitRegion.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+                blitRegion.srcOffsets[1] = {
+                    static_cast<std::int32_t>(dispatchExtent_.width),
+                    static_cast<std::int32_t>(dispatchExtent_.height), 1};
+                blitRegion.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+                blitRegion.dstOffsets[1] = {
+                    static_cast<std::int32_t>(swapchainExtent.width),
+                    static_cast<std::int32_t>(swapchainExtent.height), 1};
+                vkCmdBlitImage(commandBuffer,
+                               storageImage_,
+                               VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                               swapchainImage,
+                               VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                               1u,
+                               &blitRegion,
+                               VK_FILTER_LINEAR);
+            }
+            else
+            {
+                VkImageCopy copyRegion{};
+                copyRegion.srcSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+                copyRegion.dstSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, 0u, 1u};
+                copyRegion.extent = {dispatchExtent_.width, dispatchExtent_.height, 1u};
+                vkCmdCopyImage(commandBuffer,
+                               storageImage_,
+                               VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                               swapchainImage,
+                               VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                               1u,
+                               &copyRegion);
+            }
+        });
 
     SetImageBarrier(commandBuffer,
                     swapchainImage,
@@ -4884,19 +5887,227 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                     VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                     VK_IMAGE_LAYOUT_GENERAL,
                     VK_PIPELINE_STAGE_TRANSFER_BIT,
-                    VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                    executionPolicy_.shaderPipelineStage,
                     VK_ACCESS_TRANSFER_READ_BIT,
                     VK_ACCESS_SHADER_WRITE_BIT);
     storageImageLayout_ = VK_IMAGE_LAYOUT_GENERAL;
 
+    storageImageFrameRecorded_ = true;
+    traceCopyScope.Complete(1u);
+    if (observation != nullptr && observation->recordedScene != nullptr)
+    {
+        horde::telemetry::RtRecordedSceneEvidence recorded{};
+        bool recordedFactsValid = framePipelineEvidenceValid_;
+        recorded.pipeline = framePipelineEvidence_;
+        recorded.resources = ResourceInventory();
+        switch (playerCpuSkinCadence_)
+        {
+        case PlayerCpuSkinCadence::Hz30:
+            recorded.player.skinCadenceHz = 30u;
+            break;
+        case PlayerCpuSkinCadence::Hz60:
+            recorded.player.skinCadenceHz = 60u;
+            break;
+        case PlayerCpuSkinCadence::RequiresReviewedBackend:
+            recorded.player.skinCadenceHz = 0u;
+            break;
+        }
+        recorded.player.skinUpdateCount = playerSkinUpdateCount_;
+        recordedFactsValid =
+            CheckedMetresToMicrometres(
+                playerMaxSocketErrorMetres_,
+                recorded.player.maximumSocketErrorMicrometres) &&
+            recordedFactsValid;
+        // Primary pixels are populated only from this submission's completed
+        // Diagnostic record at its owning fence.
+        recorded.player.primaryPixelCountAvailable = false;
+        recorded.player.primaryPixelCount = 0u;
+        recorded.player.primaryVisible = false;
+        recorded.dispatch.sceneReady = true;
+        recorded.dispatch.rtDispatchRecorded = true;
+        recorded.dispatch.swapchainCopyRecorded = true;
+        if (recordedFactsValid)
+        {
+            *observation->recordedScene = recorded;
+        }
+        else
+        {
+            observation->healthy = false;
+        }
+    }
     diagnostic.clear();
     return true;
 }
 
+#ifndef NDEBUG
+bool PresentableTinyRtScene::CaptureViewmodelMesh(const std::string& path,
+                                                 std::string& diagnostic) const
+{
+    if (!ready_ || !viewmodelPoseCurrent_ || viewmodelUpload_.empty() ||
+        viewmodelUpload_.size() != viewmodelAsset_.vertices.size())
+    {
+        diagnostic = "No current modelled viewmodel upload is available for geometry capture.";
+        return false;
+    }
+    std::error_code pathError;
+    const bool pathExists = std::filesystem::exists(path, pathError);
+    if (pathExists || pathError)
+    {
+        diagnostic = "Viewmodel geometry capture path already exists or cannot be inspected.";
+        return false;
+    }
+    std::ofstream output(path, std::ios::binary);
+    output.imbue(std::locale::classic());
+    output << std::setprecision(std::numeric_limits<float>::max_digits10)
+           << "# Exact CPU viewmodel upload, model-space metres; not GPU readback.\n";
+    output << "# model_to_world_row_major_3x4";
+    for (const auto& row : viewmodelCaptureTransform_.matrix)
+        for (const float value : row) output << ' ' << value;
+    output << '\n';
+    for (const auto& vertex : viewmodelUpload_)
+        output << "v " << vertex.position[0] << ' ' << vertex.position[1] << ' ' << vertex.position[2] << '\n';
+    for (const auto& vertex : viewmodelUpload_)
+        output << "vt " << vertex.uv0[0] << ' ' << vertex.uv0[1] << '\n';
+    for (const auto& vertex : viewmodelUpload_)
+        output << "vn " << vertex.normal[0] << ' ' << vertex.normal[1] << ' ' << vertex.normal[2] << '\n';
+    for (const auto& primitive : viewmodelAsset_.primitives)
+    {
+        output << "g " << viewmodelAsset_.materials.at(primitive.materialIndex).name << '\n';
+        for (std::uint32_t offset = 0; offset < primitive.indexCount; offset += 3u)
+        {
+            output << 'f';
+            for (std::uint32_t corner = 0; corner < 3u; ++corner)
+            {
+                const auto index = primitive.vertexOffset +
+                    viewmodelAsset_.indices.at(primitive.indexOffset + offset + corner) + 1u;
+                output << ' ' << index << '/' << index << '/' << index;
+            }
+            output << '\n';
+        }
+    }
+    output.close();
+    if (!output)
+    {
+        diagnostic = "Failed to write the viewmodel geometry capture.";
+        return false;
+    }
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::CapturePlayerWorldBodyMesh(
+    const std::string& path, std::string& diagnostic) const
+{
+    if (!ready_ || !playerWorldBodyPoseCurrent_ ||
+        productionPlayerAsset_.vertices.empty() ||
+        skinnedPlayerUpload_.size() != productionPlayerAsset_.vertices.size())
+    {
+        diagnostic = "No current skinned player world-body upload is available for geometry capture.";
+        return false;
+    }
+    for (const auto& row : playerWorldBodyCaptureTransform_.matrix)
+        for (const float value : row)
+            if (!std::isfinite(value))
+            {
+                diagnostic = "Current player world-body TLAS transform is not finite.";
+                return false;
+            }
+    if (productionPlayerAsset_.primitives.empty())
+    {
+        diagnostic = "Player world-body asset has no primitives for geometry capture.";
+        return false;
+    }
+    for (const auto& primitive : productionPlayerAsset_.primitives)
+    {
+        if (primitive.materialIndex >= productionPlayerAsset_.materials.size() ||
+            primitive.indexCount == 0u || primitive.indexCount % 3u != 0u ||
+            primitive.indexOffset > productionPlayerAsset_.indices.size() ||
+            primitive.indexCount > productionPlayerAsset_.indices.size() -
+                                       primitive.indexOffset ||
+            primitive.vertexOffset > skinnedPlayerUpload_.size())
+        {
+            diagnostic = "Player world-body primitive ranges are invalid for geometry capture.";
+            return false;
+        }
+        std::size_t primitiveVertexEnd = skinnedPlayerUpload_.size();
+        for (const auto& candidate : productionPlayerAsset_.primitives)
+            if (candidate.vertexOffset > primitive.vertexOffset)
+                primitiveVertexEnd = std::min<std::size_t>(
+                    primitiveVertexEnd, candidate.vertexOffset);
+        if (primitiveVertexEnd <= primitive.vertexOffset)
+        {
+            diagnostic = "Player world-body primitive vertex range is empty or invalid.";
+            return false;
+        }
+        for (std::uint32_t offset = 0u; offset < primitive.indexCount; ++offset)
+        {
+            const std::uint32_t localIndex = productionPlayerAsset_.indices[
+                primitive.indexOffset + offset];
+            if (localIndex >= primitiveVertexEnd - primitive.vertexOffset)
+            {
+                diagnostic = "Player world-body index exceeds its current CPU upload.";
+                return false;
+            }
+        }
+    }
+
+    std::error_code pathError;
+    const bool pathExists = std::filesystem::exists(path, pathError);
+    if (pathExists || pathError)
+    {
+        diagnostic = "Player world-body geometry capture path already exists or cannot be inspected.";
+        return false;
+    }
+    std::ofstream output(path, std::ios::binary);
+    output.imbue(std::locale::classic());
+    output << std::setprecision(std::numeric_limits<float>::max_digits10)
+           << "# Exact CPU PlayerWorldBody upload, model-space metres; not GPU readback.\n";
+    output << "# model_to_world_row_major_3x4";
+    for (const auto& row : playerWorldBodyCaptureTransform_.matrix)
+        for (const float value : row) output << ' ' << value;
+    output << '\n';
+    for (const auto& vertex : skinnedPlayerUpload_)
+        output << "v " << vertex.position[0] << ' ' << vertex.position[1] << ' '
+               << vertex.position[2] << '\n';
+    for (const auto& vertex : skinnedPlayerUpload_)
+        output << "vt " << vertex.uv0[0] << ' ' << vertex.uv0[1] << '\n';
+    for (const auto& vertex : skinnedPlayerUpload_)
+        output << "vn " << vertex.normal[0] << ' ' << vertex.normal[1] << ' '
+               << vertex.normal[2] << '\n';
+    for (const auto& primitive : productionPlayerAsset_.primitives)
+    {
+        output << "g "
+               << productionPlayerAsset_.materials[primitive.materialIndex].name
+               << '\n';
+        for (std::uint32_t offset = 0u; offset < primitive.indexCount; offset += 3u)
+        {
+            output << 'f';
+            for (std::uint32_t corner = 0u; corner < 3u; ++corner)
+            {
+                const auto index = primitive.vertexOffset +
+                    productionPlayerAsset_.indices[
+                        primitive.indexOffset + offset + corner] + 1u;
+                output << ' ' << index << '/' << index << '/' << index;
+            }
+            output << '\n';
+        }
+    }
+    output.close();
+    if (!output)
+    {
+        diagnostic = "Failed to write the player world-body geometry capture.";
+        return false;
+    }
+    diagnostic.clear();
+    return true;
+}
+#endif
+
 bool PresentableTinyRtScene::CaptureStorageImage(StorageImageCapture& capture, std::string& diagnostic)
 {
     capture = {};
-    if (!ready_ || storageImage_ == VK_NULL_HANDLE || storageImageLayout_ != VK_IMAGE_LAYOUT_GENERAL)
+    if (!ready_ || storageImage_ == VK_NULL_HANDLE ||
+        storageImageLayout_ != VK_IMAGE_LAYOUT_GENERAL || !storageImageFrameRecorded_)
     {
         diagnostic = "RT storage image is not ready for capture.";
         return false;
@@ -4904,6 +6115,16 @@ bool PresentableTinyRtScene::CaptureStorageImage(StorageImageCapture& capture, s
 
     const VkDeviceSize byteSize = static_cast<VkDeviceSize>(dispatchExtent_.width) *
                                   static_cast<VkDeviceSize>(dispatchExtent_.height) * 4u;
+    // Allocate CPU storage BEFORE acquiring the readback buffer or mapping its
+    // memory. Allocation failure must not strand a mapped Vulkan allocation.
+    // The reporting caller additionally bounds source pixels before this call.
+    std::vector<std::uint8_t> pixels;
+    try { pixels.resize(static_cast<std::size_t>(byteSize)); }
+    catch (...)
+    {
+        diagnostic = "Failed to allocate RT capture CPU storage.";
+        return false;
+    }
     Buffer readback;
     if (!CreateBuffer(byteSize,
                       VK_BUFFER_USAGE_TRANSFER_DST_BIT,
@@ -4921,14 +6142,15 @@ bool PresentableTinyRtScene::CaptureStorageImage(StorageImageCapture& capture, s
         VkImage image;
         VkBuffer buffer;
         VkExtent2D extent;
-    } commands{storageImage_, readback.buffer, dispatchExtent_};
+        VkPipelineStageFlags shaderStage;
+    } commands{storageImage_, readback.buffer, dispatchExtent_, executionPolicy_.shaderPipelineStage};
     const auto record = [](VkCommandBuffer commandBuffer, void* userData) {
         const auto* captureCommands = static_cast<const CaptureCommands*>(userData);
         SetImageBarrier(commandBuffer,
                         captureCommands->image,
                         VK_IMAGE_LAYOUT_GENERAL,
                         VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                        VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                        captureCommands->shaderStage,
                         VK_PIPELINE_STAGE_TRANSFER_BIT,
                         VK_ACCESS_SHADER_WRITE_BIT,
                         VK_ACCESS_TRANSFER_READ_BIT);
@@ -4948,7 +6170,7 @@ bool PresentableTinyRtScene::CaptureStorageImage(StorageImageCapture& capture, s
                         VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                         VK_IMAGE_LAYOUT_GENERAL,
                         VK_PIPELINE_STAGE_TRANSFER_BIT,
-                        VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR,
+                        captureCommands->shaderStage,
                         VK_ACCESS_TRANSFER_READ_BIT,
                         VK_ACCESS_SHADER_WRITE_BIT);
     };
@@ -4967,13 +6189,13 @@ bool PresentableTinyRtScene::CaptureStorageImage(StorageImageCapture& capture, s
         return false;
     }
 
+    std::memcpy(pixels.data(), mapped, pixels.size());
+    vkUnmapMemory(device_, readback.memory);
+    DestroyBuffer(readback);
     capture.width = dispatchExtent_.width;
     capture.height = dispatchExtent_.height;
     capture.redBlueSwapNormalised = lastOutputRedBlueSwapApplied_;
-    capture.rgba.resize(static_cast<std::size_t>(byteSize));
-    std::memcpy(capture.rgba.data(), mapped, capture.rgba.size());
-    vkUnmapMemory(device_, readback.memory);
-    DestroyBuffer(readback);
+    capture.rgba = std::move(pixels);
 
     if (capture.redBlueSwapNormalised)
     {

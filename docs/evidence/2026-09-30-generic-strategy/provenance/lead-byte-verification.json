@@ -1,0 +1,358 @@
+{
+  "schema": 1,
+  "status": "PASS",
+  "sourceBase": "eafbf8262442a82e0835edf5cf5306d718e64633",
+  "sourcePatchSha256": "0775f22d28e91966707db8e62407eb5738c1654e97da30fa239792f8dbd4c474",
+  "sourceClaim": "base-plus-reviewed-investigation-patch, not clean engineering HEAD",
+  "assets": [
+    {
+      "name": "assets/ASSET_LICENSES.md",
+      "controlSha256": "3cd9f2c5367d471390ff82de98e60a0e22b766b1cf15199196ad0d90da3c2b48",
+      "profileSha256": "bc3bc86da3f55a22db17c223498b8e9bf23a9d312737c73894d58935e947d796",
+      "classification": "line-ending-only"
+    },
+    {
+      "name": "assets/audio/filmcow/enemy_fall.wav",
+      "controlSha256": "be5bb75fd09a4d24313a32b23d70a92d3c7ab81b5b838231be17fa92e952b217",
+      "profileSha256": "be5bb75fd09a4d24313a32b23d70a92d3c7ab81b5b838231be17fa92e952b217",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/lich_charge.wav",
+      "controlSha256": "37d8fc97f20a64737970459d3cbcb6f6d1894e730dc0b7f6021c535492f4cf30",
+      "profileSha256": "37d8fc97f20a64737970459d3cbcb6f6d1894e730dc0b7f6021c535492f4cf30",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/lich_fall.wav",
+      "controlSha256": "b953f591c317a00b687073e78d0328fbdd3994c4eae34e77c0ec6a20ce1c520a",
+      "profileSha256": "b953f591c317a00b687073e78d0328fbdd3994c4eae34e77c0ec6a20ce1c520a",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/lich_hurt.wav",
+      "controlSha256": "020be6ff7e8bfd14aa946ee72e31f4a66230097e23fba98b0ddf5bf4672e8488",
+      "profileSha256": "020be6ff7e8bfd14aa946ee72e31f4a66230097e23fba98b0ddf5bf4672e8488",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/lich_impact.wav",
+      "controlSha256": "5e7672daa9a7248d022756faf2998221c3cbc6ab4a4193114f66e080bfdd83f0",
+      "profileSha256": "5e7672daa9a7248d022756faf2998221c3cbc6ab4a4193114f66e080bfdd83f0",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/menu_toggle.wav",
+      "controlSha256": "9d511866154c859d3250229a9cbc03948e57afab833a2dd68bbd25b61bb27e08",
+      "profileSha256": "9d511866154c859d3250229a9cbc03948e57afab833a2dd68bbd25b61bb27e08",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/player_step_1.wav",
+      "controlSha256": "cdaaa9c321e6f4fbf12757fdc20633d4b8f0be30b127038d3cfe0581a8dea0fb",
+      "profileSha256": "cdaaa9c321e6f4fbf12757fdc20633d4b8f0be30b127038d3cfe0581a8dea0fb",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/player_step_2.wav",
+      "controlSha256": "261413fb6c185f9e7038a980fc7b124ef9bc7f6f93b258ed83d1d76eb7b9883e",
+      "profileSha256": "261413fb6c185f9e7038a980fc7b124ef9bc7f6f93b258ed83d1d76eb7b9883e",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/skeleton_attack.wav",
+      "controlSha256": "81eabe7c1bb196f1df5876419a85348128df2d864f79857c18849091218df11e",
+      "profileSha256": "81eabe7c1bb196f1df5876419a85348128df2d864f79857c18849091218df11e",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/skeleton_step_1.wav",
+      "controlSha256": "78ede28cebbad2b61e8a373c45d072ab719fb69a3cf103e57ea7c926c06c176e",
+      "profileSha256": "78ede28cebbad2b61e8a373c45d072ab719fb69a3cf103e57ea7c926c06c176e",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/skeleton_step_2.wav",
+      "controlSha256": "e4a080064fdccd821096d9b42dcb312f0fb40ac8227242999b904602a4786122",
+      "profileSha256": "e4a080064fdccd821096d9b42dcb312f0fb40ac8227242999b904602a4786122",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/sword_hit_1.wav",
+      "controlSha256": "11ba4ca02139ed59bbb71b901603314fe3772e29827a8b368f463fd33f8ab76f",
+      "profileSha256": "11ba4ca02139ed59bbb71b901603314fe3772e29827a8b368f463fd33f8ab76f",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/sword_hit_2.wav",
+      "controlSha256": "372c2f83656c7fe6b1098c9fe1565cd43f0c42a5fa927d3d8deb3a562d7ed57b",
+      "profileSha256": "372c2f83656c7fe6b1098c9fe1565cd43f0c42a5fa927d3d8deb3a562d7ed57b",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/sword_swing_1.wav",
+      "controlSha256": "1007af0e6b21cbfea341032e55c7944b4fdd097f55979679840c77745f3db267",
+      "profileSha256": "1007af0e6b21cbfea341032e55c7944b4fdd097f55979679840c77745f3db267",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/sword_swing_2.wav",
+      "controlSha256": "ded16a59e6760342cc90c0e7fedacbd061ce1c661f6226ecb63ad98ebd672bf3",
+      "profileSha256": "ded16a59e6760342cc90c0e7fedacbd061ce1c661f6226ecb63ad98ebd672bf3",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/ui_back.wav",
+      "controlSha256": "b26df842011ae1813ce4d2129a099e1db449f56325fa1b2770f3380c160c219e",
+      "profileSha256": "b26df842011ae1813ce4d2129a099e1db449f56325fa1b2770f3380c160c219e",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/filmcow/ui_select.wav",
+      "controlSha256": "37483938d3d68e6309e881e1d32bb976e2744743f3869b0bca7a8b6e217e1f33",
+      "profileSha256": "37483938d3d68e6309e881e1d32bb976e2744743f3869b0bca7a8b6e217e1f33",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/pixabay/chest_open.wav",
+      "controlSha256": "788b1c31c504c8eea9e5316c87859013aba6a49f205e0e4a66b181aafbdfb4a6",
+      "profileSha256": "788b1c31c504c8eea9e5316c87859013aba6a49f205e0e4a66b181aafbdfb4a6",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/pixabay/chest_unlock.wav",
+      "controlSha256": "a1dae01adb6534a2e1504f0d5bc41abff0305e619264dff0339577d4d5b2d808",
+      "profileSha256": "a1dae01adb6534a2e1504f0d5bc41abff0305e619264dff0339577d4d5b2d808",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/pixabay/torch_extinguish.wav",
+      "controlSha256": "ef2e85d4219cce2e5789d6326755909f59e302bd26bc2dbd8f3e39c270614ab8",
+      "profileSha256": "ef2e85d4219cce2e5789d6326755909f59e302bd26bc2dbd8f3e39c270614ab8",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/audio/pixabay/waterfall_loop.wav",
+      "controlSha256": "de7711f0e6ef9cf0bdd3d04ba7a1b713ce09ef18169bd994182b09ab2017ee62",
+      "profileSha256": "de7711f0e6ef9cf0bdd3d04ba7a1b713ce09ef18169bd994182b09ab2017ee62",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
+      "controlSha256": "049979a83aca55358f54af8d3af1f7d518607bef634474a4ef015bfdff947a42",
+      "profileSha256": "049979a83aca55358f54af8d3af1f7d518607bef634474a4ef015bfdff947a42",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
+      "controlSha256": "340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db",
+      "profileSha256": "340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/player/runtime/asset.manifest.json",
+      "controlSha256": "556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141",
+      "profileSha256": "556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/player/runtime/clip-manifest.json",
+      "controlSha256": "c53fd3a4c5d9e9095c683b2062a9e3c7c53662c3440d8980fe3c71d3bad400a1",
+      "profileSha256": "1f8075bd1ff97010685172176535482f2b6fc262cc0f5c1daf63e5e8222f648d",
+      "classification": "json-formatting-only"
+    },
+    {
+      "name": "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+      "controlSha256": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb",
+      "profileSha256": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/player/viewmodel/runtime/asset.manifest.json",
+      "controlSha256": "e90020ba31fe22d888e3db02ad4a6bc830c015ea9e03fbccc83c2d4517bdcbe6",
+      "profileSha256": "7dd3749f9e4153eace88dd849a20ab344f89ebbc111d27c35dde44476b86cd28",
+      "classification": "json-formatting-only"
+    },
+    {
+      "name": "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
+      "controlSha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b",
+      "profileSha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/asset.manifest.json",
+      "controlSha256": "b96c47284c0de4197f69836aafe25f4c307b724fcd5b29b34d3010ce9e8f733f",
+      "profileSha256": "b96c47284c0de4197f69836aafe25f4c307b724fcd5b29b34d3010ce9e8f733f",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/dielectric-fixture/asset.manifest.json",
+      "controlSha256": "65a7cc8c20506541f0b04165de6117868e201a95a500571c826bef27a8f4ad20",
+      "profileSha256": "65a7cc8c20506541f0b04165de6117868e201a95a500571c826bef27a8f4ad20",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
+      "controlSha256": "843fd245da61352a124e3de03f4ccf01923a293afedee2ed73b65a8a18eebf5b",
+      "profileSha256": "843fd245da61352a124e3de03f4ccf01923a293afedee2ed73b65a8a18eebf5b",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/gothic-chest-base/asset.manifest.json",
+      "controlSha256": "4c187fa4b45eca1001137027d38e0cd20f86927b0ffb9ca3bc12905c55c892a2",
+      "profileSha256": "4c187fa4b45eca1001137027d38e0cd20f86927b0ffb9ca3bc12905c55c892a2",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/gothic-chest-base/gothic-chest-base-lod0.runtime.glb",
+      "controlSha256": "b65e6e5c5e8c69ea4695c16e0085bdaa0209f5f963bc0af75eda5174354a04f2",
+      "profileSha256": "b65e6e5c5e8c69ea4695c16e0085bdaa0209f5f963bc0af75eda5174354a04f2",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/gothic-chest-lid/asset.manifest.json",
+      "controlSha256": "22c0701f4b1402c616cd56f6996ab0b4d2ad2d5979d204797d52dc540e887efb",
+      "profileSha256": "22c0701f4b1402c616cd56f6996ab0b4d2ad2d5979d204797d52dc540e887efb",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/gothic-chest-lid/gothic-chest-lid-lod0.runtime.glb",
+      "controlSha256": "cd0db348fad0939197f36a02e14f87abd15e7284c6701b1db1e679c8f7af03e2",
+      "profileSha256": "cd0db348fad0939197f36a02e14f87abd15e7284c6701b1db1e679c8f7af03e2",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+      "controlSha256": "b1a2078c78d54dae548b89e20168c9922c7dfe33851d47f3d98e7ff1e7c14b8d",
+      "profileSha256": "b1a2078c78d54dae548b89e20168c9922c7dfe33851d47f3d98e7ff1e7c14b8d",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/reward-lantern-body/asset.manifest.json",
+      "controlSha256": "3c6352dc4fb1680e3aa3684294008bbbb189295ca1d5b8145c0f23e704c55e35",
+      "profileSha256": "3c6352dc4fb1680e3aa3684294008bbbb189295ca1d5b8145c0f23e704c55e35",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/reward-lantern-body/reward-lantern-body-lod0.runtime.glb",
+      "controlSha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+      "profileSha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/reward-lantern-ring/asset.manifest.json",
+      "controlSha256": "c4f840ec9375628a6638ecaefaeff8868ecb0578c519589c48680c5726515860",
+      "profileSha256": "c4f840ec9375628a6638ecaefaeff8868ecb0578c519589c48680c5726515860",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/props/runtime/reward-lantern-ring/reward-lantern-ring-lod0.runtime.glb",
+      "controlSha256": "75bf4f0d7c64c67848f08f1b2fb5b802527160c79def7f71ca964bdcf72799f5",
+      "profileSha256": "75bf4f0d7c64c67848f08f1b2fb5b802527160c79def7f71ca964bdcf72799f5",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/weapons/runtime/asset.manifest.json",
+      "controlSha256": "c6203d4af94a74f317c826d6821f2b12c5b3e2316f3c2de58ef4f76a444ac980",
+      "profileSha256": "c6203d4af94a74f317c826d6821f2b12c5b3e2316f3c2de58ef4f76a444ac980",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
+      "controlSha256": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1",
+      "profileSha256": "477ff6c53c4b407bc16e9e84d16aaf47dc72131b812debf2b92d0ab2fcfab5c1",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/textures/meshy/lich_placeholder_v01/base-color-2048-astc6x6.ktx2",
+      "controlSha256": "dc2cfb44f7929c4d85f3a85b3785296da9db607f04b727d64eafc85b47283e46",
+      "profileSha256": "dc2cfb44f7929c4d85f3a85b3785296da9db607f04b727d64eafc85b47283e46",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/textures/meshy/lich_placeholder_v01/emissive-2048-astc6x6.ktx2",
+      "controlSha256": "679e84d1b7797414aeaafe3268ebac756f734e3546e399b94ec5bec69d354f13",
+      "profileSha256": "679e84d1b7797414aeaafe3268ebac756f734e3546e399b94ec5bec69d354f13",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/textures/polyhaven/mobile_1k/arm-array-512-astc6x6.ktx2",
+      "controlSha256": "63fc20bf503a676a56c83ee1d530451619624aa54078de6370240888cd1eb44d",
+      "profileSha256": "63fc20bf503a676a56c83ee1d530451619624aa54078de6370240888cd1eb44d",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2",
+      "controlSha256": "6333b5cd2ce594115e116b5ec676262ce77d578ea7a1147612f430bfcd10c73a",
+      "profileSha256": "6333b5cd2ce594115e116b5ec676262ce77d578ea7a1147612f430bfcd10c73a",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2",
+      "controlSha256": "0223134ecdd64d9b897cb38c80bb5f9c86720910aaff917d6005be9ea77048bb",
+      "profileSha256": "0223134ecdd64d9b897cb38c80bb5f9c86720910aaff917d6005be9ea77048bb",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/textures/props/runtime/asset.manifest.json",
+      "controlSha256": "1f32f8fff8832450291e7ba655a6c392840457883bfffc977d517398cbcdfeb8",
+      "profileSha256": "1f32f8fff8832450291e7ba655a6c392840457883bfffc977d517398cbcdfeb8",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/textures/props/runtime/base-color.android.ktx2",
+      "controlSha256": "e6934fca4a3452d5d5c239f2fc8d0047d5364c044543867ff002c9421edd5335",
+      "profileSha256": "e6934fca4a3452d5d5c239f2fc8d0047d5364c044543867ff002c9421edd5335",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/textures/props/runtime/emissive.android.ktx2",
+      "controlSha256": "da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a",
+      "profileSha256": "da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/textures/props/runtime/normal.android.ktx2",
+      "controlSha256": "049c73a52c8c69a02dbbbc01c3bfdba18ab3782efd0e06b1afc20e3d5e6b3776",
+      "profileSha256": "049c73a52c8c69a02dbbbc01c3bfdba18ab3782efd0e06b1afc20e3d5e6b3776",
+      "classification": "exact-byte-equality"
+    },
+    {
+      "name": "assets/textures/props/runtime/orm.android.ktx2",
+      "controlSha256": "8f431b7e03d63f2bcda36518daa29d68280b6af9fa188a787a86a77594e33c01",
+      "profileSha256": "8f431b7e03d63f2bcda36518daa29d68280b6af9fa188a787a86a77594e33c01",
+      "classification": "exact-byte-equality"
+    }
+  ],
+  "modules": [
+    {
+      "backend": "RayQueryCompute",
+      "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "words": 125318,
+      "nativeBytesVerified": true,
+      "shippingPolicy": "PASS"
+    },
+    {
+      "backend": "RayQueryCompute",
+      "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+      "words": 61022,
+      "nativeBytesVerified": true,
+      "shippingPolicy": "PASS"
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "words": 125253,
+      "nativeBytesVerified": true,
+      "shippingPolicy": "PASS"
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+      "words": 60963,
+      "nativeBytesVerified": true,
+      "shippingPolicy": "PASS"
+    }
+  ],
+  "scope": "Lead independently verified APK/source/patch/log bytes, 53 asset comparisons and four actual packaged SPIR-V hashes; compiler val/dis diagnostics independently inspected, no device or performance acceptance"
+}

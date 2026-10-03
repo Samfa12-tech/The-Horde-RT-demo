@@ -1,0 +1,23 @@
+{
+  "classification": "immutable-music-bank-compile-and-package-only-not-playback-or-device-acceptance",
+  "baseCommit": "199697bf52b811e7f45ab18476093485166feff0",
+  "sourceState": "authorised bank edits over base; final commit identifies reviewed source, not pristine base artifact",
+  "apk": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+  "apkBytes": 113350863,
+  "apkSha256": "450d2cf6a331bc482302a81a27339f812d6f7a44c29772e6f5b151d04dfb3f2d",
+  "build": "Debug universal, four ABIs",
+  "musicManifestSha256": "1126f9f537efb607b11bd492e1c79d6e8b94814567ce06b654e03b0d915c9ff3",
+  "musicEntries": 17,
+  "musicWaveBytes": 20160704,
+  "musicPcmBytes": 20160000,
+  "sourceExcludedFromPackage": true,
+  "existingRenderAndSfxAssetsMatched": 52,
+  "packagedLicenceMatchesCurrentSource": true,
+  "arm64Bytes": 3719384,
+  "arm64Sha256": "5b122656de753abaac94f7ceeff872e3d964bbeb2c17dea95cca78f59827619d",
+  "actualDiagnosticMobileModules": 4,
+  "moduleValidation": "fresh val/dis PASS, identities equal accepted C11",
+  "installed": false,
+  "playbackWired": false,
+  "physicalDeviceAcceptance": false
+}

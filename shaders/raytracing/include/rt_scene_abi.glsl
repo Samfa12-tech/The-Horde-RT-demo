@@ -106,6 +106,11 @@ struct HitInfo
     float attenuationDistance;
     vec3 attenuationColor;
     uint materialFlags;
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
+    vec3 dielectricSpawnPosition;
+    bool dielectricSpawnGuarded;
+    float dielectricSpawnMinimumNormalBias;
+#endif
 };
 
 const vec3 kMoonDirection = vec3(-0.180027, 0.930140, -0.320048);

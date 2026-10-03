@@ -1,0 +1,52 @@
+> Task :app:verifyMusicRuntimeAssets
+> Task :app:prepareRuntimeAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+
+> Task :app:compileDebugJavaWithJavac FAILED
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:930: error: package ViewGroup does not exist
+        final ViewGroup.LayoutParams layout = rtStatus.getLayoutParams();
+                       ^
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:931: error: package ViewGroup does not exist
+        layout.height = expanded ? ViewGroup.LayoutParams.WRAP_CONTENT : dp(40);
+                                            ^
+Note: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+2 errors
+[Incubating] Problems report is available at: file:///C:/Users/sam_s/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.6.1-engineering-pass/android/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileDebugJavaWithJavac'.
+> Compilation failed; see the compiler output below.
+  C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:930: error: package ViewGroup does not exist
+          final ViewGroup.LayoutParams layout = rtStatus.getLayoutParams();
+                         ^
+  C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java:931: error: package ViewGroup does not exist
+          layout.height = expanded ? ViewGroup.LayoutParams.WRAP_CONTENT : dp(40);
+                                              ^
+  Note: Recompile with -Xlint:deprecation for details.
+  Note: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java uses or overrides a deprecated API.
+  2 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights.
+
+BUILD FAILED in 1s
+16 actionable tasks: 2 executed, 14 up-to-date

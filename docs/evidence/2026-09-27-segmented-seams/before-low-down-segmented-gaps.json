@@ -1,0 +1,1933 @@
+{
+  "source": "Classify unmatched sleeve edges against collinear retained cloth segments.\n\nReads exact native CPU uploads. No mesh edits and no image acceptance claim.\n",
+  "worldPose": "C:\\Dev\\tmp\\horde-normal-look-native-20260927-a\\player-viewmodel-lantern-low-look-down\\145-player-viewmodel-lantern-low-look-down.player-world-body.obj",
+  "viewPose": "C:\\Dev\\tmp\\horde-normal-look-native-20260927-a\\player-viewmodel-lantern-low-look-down\\145-player-viewmodel-lantern-low-look-down.obj",
+  "bindCollinearityToleranceMetres": 2e-06,
+  "boundaryEdges": 278,
+  "unmatchedEdges": 80,
+  "fullyCovered": 80,
+  "uncoveredEdges": [],
+  "maximumCoveredPosedGapMetres": 0.03217284598076158,
+  "edges": [
+    {
+      "bindEdge": [
+        [
+          -0.350899,
+          1.15643,
+          0.165931
+        ],
+        [
+          -0.348795,
+          1.164922,
+          0.168011
+        ]
+      ],
+      "bindCentre": [
+        -0.349847,
+        1.160676,
+        0.16697099999999998
+      ],
+      "lengthMetres": 0.008992623643853835,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 5.393008733950763e-07
+    },
+    {
+      "bindEdge": [
+        [
+          -0.333927,
+          1.198755,
+          0.102594
+        ],
+        [
+          -0.333107,
+          1.195243,
+          0.09752
+        ]
+      ],
+      "bindCentre": [
+        -0.33351699999999995,
+        1.196999,
+        0.10005700000000001
+      ],
+      "lengthMetres": 0.006225112047184355,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.00022315499566637897
+    },
+    {
+      "bindEdge": [
+        [
+          -0.336522,
+          1.205068,
+          0.113368
+        ],
+        [
+          -0.334747,
+          1.202268,
+          0.107668
+        ]
+      ],
+      "bindCentre": [
+        -0.3356345,
+        1.203668,
+        0.110518
+      ],
+      "lengthMetres": 0.006593984000587249,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0004462075737636397
+    },
+    {
+      "bindEdge": [
+        [
+          -0.340973,
+          1.270132,
+          0.079543
+        ],
+        [
+          -0.333606,
+          1.267892,
+          0.077745
+        ]
+      ],
+      "bindCentre": [
+        -0.3372895,
+        1.269012,
+        0.07864399999999999
+      ],
+      "lengthMetres": 0.007907154545093975,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 1.7483484823847744e-07
+    },
+    {
+      "bindEdge": [
+        [
+          -0.277492,
+          1.389854,
+          -0.139573
+        ],
+        [
+          -0.274819,
+          1.379366,
+          -0.15106
+        ]
+      ],
+      "bindCentre": [
+        -0.2761555,
+        1.38461,
+        -0.14531650000000002
+      ],
+      "lengthMetres": 0.01578271972760071,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.009461073299519436
+    },
+    {
+      "bindEdge": [
+        [
+          -0.269963,
+          1.360115,
+          -0.167157
+        ],
+        [
+          -0.26778,
+          1.351352,
+          -0.171767
+        ]
+      ],
+      "bindCentre": [
+        -0.26887150000000004,
+        1.3557335,
+        -0.169462
+      ],
+      "lengthMetres": 0.010139416058136555,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.02322027979949702
+    },
+    {
+      "bindEdge": [
+        [
+          -0.265155,
+          1.326216,
+          -0.175695
+        ],
+        [
+          -0.26253,
+          1.30108,
+          -0.179623
+        ]
+      ],
+      "bindCentre": [
+        -0.2638425,
+        1.3136480000000001,
+        -0.177659
+      ],
+      "lengthMetres": 0.025576127638874544,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.011610225851382562
+    },
+    {
+      "bindEdge": [
+        [
+          -0.228098,
+          1.210081,
+          -0.068372
+        ],
+        [
+          -0.22502,
+          1.223391,
+          -0.065974
+        ]
+      ],
+      "bindCentre": [
+        -0.226559,
+        1.216736,
+        -0.06717300000000001
+      ],
+      "lengthMetres": 0.013870132948173143,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 2.648406939172807e-07
+    },
+    {
+      "bindEdge": [
+        [
+          -0.204386,
+          1.324669,
+          -0.043802
+        ],
+        [
+          -0.198928,
+          1.330795,
+          -0.04916
+        ]
+      ],
+      "bindCentre": [
+        -0.201657,
+        1.3277320000000001,
+        -0.046481
+      ],
+      "lengthMetres": 0.00979927568751887,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.00988711761392221
+    },
+    {
+      "bindEdge": [
+        [
+          -0.194373,
+          1.345837,
+          -0.053549
+        ],
+        [
+          -0.193922,
+          1.341378,
+          -0.054033
+        ]
+      ],
+      "bindCentre": [
+        -0.1941475,
+        1.3436075,
+        -0.053791
+      ],
+      "lengthMetres": 0.004507808558490467,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.009887307287289857
+    },
+    {
+      "bindEdge": [
+        [
+          -0.193348,
+          1.36779,
+          -0.059118
+        ],
+        [
+          -0.192302,
+          1.375903,
+          -0.060975
+        ]
+      ],
+      "bindCentre": [
+        -0.192825,
+        1.3718465000000002,
+        -0.0600465
+      ],
+      "lengthMetres": 0.008388285522083795,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.010883932138809208
+    },
+    {
+      "bindEdge": [
+        [
+          -0.193396,
+          1.352392,
+          -0.059591
+        ],
+        [
+          -0.193372,
+          1.360091,
+          -0.059355
+        ]
+      ],
+      "bindCentre": [
+        -0.193384,
+        1.3562414999999999,
+        -0.059473
+      ],
+      "lengthMetres": 0.007702653633651099,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0054419581424714125
+    },
+    {
+      "bindEdge": [
+        [
+          -0.184166,
+          1.408675,
+          -0.057099
+        ],
+        [
+          -0.181835,
+          1.398388,
+          -0.054063
+        ]
+      ],
+      "bindCentre": [
+        -0.1830005,
+        1.4035315,
+        -0.055581
+      ],
+      "lengthMetres": 0.010976029610018308,
+      "overlappingSegments": 1,
+      "coveredFraction": 0.9999999999999999,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0010290383961258005
+    },
+    {
+      "bindEdge": [
+        [
+          -0.184623,
+          1.431899,
+          -0.065962
+        ],
+        [
+          -0.182749,
+          1.444837,
+          -0.07179
+        ]
+      ],
+      "bindCentre": [
+        -0.18368600000000002,
+        1.438368,
+        -0.068876
+      ],
+      "lengthMetres": 0.014313256233296368,
+      "overlappingSegments": 1,
+      "coveredFraction": 0.9999999999999999,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.001028720329747814
+    },
+    {
+      "bindEdge": [
+        [
+          0.192236,
+          1.430793,
+          -0.091355
+        ],
+        [
+          0.194571,
+          1.433712,
+          -0.097241
+        ]
+      ],
+      "bindCentre": [
+        0.1934035,
+        1.4322525000000002,
+        -0.09429799999999999
+      ],
+      "lengthMetres": 0.006972645265607634,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.009640529629349262
+    },
+    {
+      "bindEdge": [
+        [
+          0.204431,
+          1.430781,
+          -0.097026
+        ],
+        [
+          0.214292,
+          1.427851,
+          -0.09681
+        ]
+      ],
+      "bindCentre": [
+        0.2093615,
+        1.429316,
+        -0.096918
+      ],
+      "lengthMetres": 0.010289357462932306,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.004820635284670122
+    },
+    {
+      "bindEdge": [
+        [
+          0.226351,
+          1.4402,
+          -0.104054
+        ],
+        [
+          0.233042,
+          1.444524,
+          -0.115037
+        ]
+      ],
+      "bindCentre": [
+        0.2296965,
+        1.442362,
+        -0.10954549999999999
+      ],
+      "lengthMetres": 0.013568078198477489,
+      "overlappingSegments": 1,
+      "coveredFraction": 0.9999999999999999,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 1.6101529898077314e-07
+    },
+    {
+      "bindEdge": [
+        [
+          0.221726,
+          1.248825,
+          -0.06323
+        ],
+        [
+          0.222375,
+          1.245257,
+          -0.06599
+        ]
+      ],
+      "bindCentre": [
+        0.22205049999999998,
+        1.247041,
+        -0.06461
+      ],
+      "lengthMetres": 0.00455734846155087,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.01706299331669849
+    },
+    {
+      "bindEdge": [
+        [
+          0.238485,
+          1.416727,
+          -0.087298
+        ],
+        [
+          0.2429,
+          1.395086,
+          -0.066062
+        ]
+      ],
+      "bindCentre": [
+        0.2406925,
+        1.4059065,
+        -0.07668
+      ],
+      "lengthMetres": 0.03063972587997486,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.005891149433292173
+    },
+    {
+      "bindEdge": [
+        [
+          0.249642,
+          1.395012,
+          -0.179719
+        ],
+        [
+          0.249978,
+          1.391075,
+          -0.181818
+        ]
+      ],
+      "bindCentre": [
+        0.24981,
+        1.3930435,
+        -0.1807685
+      ],
+      "lengthMetres": 0.004474222390538824,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.03217284598076158
+    },
+    {
+      "bindEdge": [
+        [
+          0.25217,
+          1.376554,
+          -0.181433
+        ],
+        [
+          0.254699,
+          1.358095,
+          -0.183146
+        ]
+      ],
+      "bindCentre": [
+        0.2534345,
+        1.3673245,
+        -0.1822895
+      ],
+      "lengthMetres": 0.018710021138416712,
+      "overlappingSegments": 1,
+      "coveredFraction": 0.9999999999999999,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.030085647562212704
+    },
+    {
+      "bindEdge": [
+        [
+          0.250018,
+          1.354877,
+          -0.202685
+        ],
+        [
+          0.253411,
+          1.356248,
+          -0.207941
+        ]
+      ],
+      "bindCentre": [
+        0.2517145,
+        1.3555625,
+        -0.205313
+      ],
+      "lengthMetres": 0.006404500448903029,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 1.4329893413780526e-07
+    },
+    {
+      "bindEdge": [
+        [
+          0.269489,
+          1.36265,
+          -0.158984
+        ],
+        [
+          0.284279,
+          1.367205,
+          -0.134821
+        ]
+      ],
+      "bindCentre": [
+        0.276884,
+        1.3649274999999998,
+        -0.1469025
+      ],
+      "lengthMetres": 0.028693948734881385,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.016355109821201978
+    },
+    {
+      "bindEdge": [
+        [
+          0.285139,
+          1.370184,
+          -0.12597
+        ],
+        [
+          0.286,
+          1.373163,
+          -0.117118
+        ]
+      ],
+      "bindCentre": [
+        0.2855695,
+        1.3716735,
+        -0.121544
+      ],
+      "lengthMetres": 0.009379427807707624,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0030491650772682304
+    },
+    {
+      "bindEdge": [
+        [
+          0.308662,
+          1.222712,
+          0.092363
+        ],
+        [
+          0.311638,
+          1.237343,
+          0.096578
+        ]
+      ],
+      "bindCentre": [
+        0.31015000000000004,
+        1.2300275,
+        0.0944705
+      ],
+      "lengthMetres": 0.015514153602436775,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.00023451588108482855
+    },
+    {
+      "bindEdge": [
+        [
+          0.316011,
+          1.247487,
+          0.09597
+        ],
+        [
+          0.320384,
+          1.257632,
+          0.095361
+        ]
+      ],
+      "bindCentre": [
+        0.3181975,
+        1.2525595,
+        0.0956655
+      ],
+      "lengthMetres": 0.01106413281735182,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0002099989713878779
+    },
+    {
+      "bindEdge": [
+        [
+          0.332578,
+          1.264891,
+          0.089218
+        ],
+        [
+          0.344773,
+          1.27215,
+          0.083076
+        ]
+      ],
+      "bindCentre": [
+        0.3386755,
+        1.2685205,
+        0.086147
+      ],
+      "lengthMetres": 0.01546399915933776,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 9.873716836033762e-05
+    },
+    {
+      "bindEdge": [
+        [
+          0.386935,
+          1.230336,
+          0.017754
+        ],
+        [
+          0.388722,
+          1.248212,
+          0.046109
+        ]
+      ],
+      "bindCentre": [
+        0.3878285,
+        1.239274,
+        0.0319315
+      ],
+      "lengthMetres": 0.03356710845455712,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 6.265181550996447e-08
+    },
+    {
+      "bindEdge": [
+        [
+          0.397223,
+          1.226339,
+          0.071009
+        ],
+        [
+          0.400323,
+          1.219365,
+          0.072451
+        ]
+      ],
+      "bindCentre": [
+        0.398773,
+        1.222852,
+        0.07173
+      ],
+      "lengthMetres": 0.0077669839706285245,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 2.2264640872481466e-07
+    },
+    {
+      "bindEdge": [
+        [
+          0.397223,
+          1.226339,
+          0.071009
+        ],
+        [
+          0.399767,
+          1.232965,
+          0.081986
+        ]
+      ],
+      "bindCentre": [
+        0.398495,
+        1.2296520000000002,
+        0.0764975
+      ],
+      "lengthMetres": 0.013071738254723441,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.00046479204201260244
+    },
+    {
+      "bindEdge": [
+        [
+          0.40231,
+          1.239591,
+          0.092964
+        ],
+        [
+          0.404086,
+          1.242854,
+          0.099366
+        ]
+      ],
+      "bindCentre": [
+        0.403198,
+        1.2412225000000001,
+        0.096165
+      ],
+      "lengthMetres": 0.007401820654406492,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0009301181963622287
+    },
+    {
+      "bindEdge": [
+        [
+          0.404086,
+          1.242854,
+          0.099366
+        ],
+        [
+          0.405862,
+          1.246118,
+          0.105768
+        ]
+      ],
+      "bindCentre": [
+        0.404974,
+        1.244486,
+        0.10256699999999999
+      ],
+      "lengthMetres": 0.007402261546311443,
+      "overlappingSegments": 1,
+      "coveredFraction": 0.9999999999999999,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0004648985485716085
+    },
+    {
+      "bindEdge": [
+        [
+          0.399767,
+          1.232965,
+          0.081986
+        ],
+        [
+          0.40231,
+          1.239591,
+          0.092964
+        ]
+      ],
+      "bindCentre": [
+        0.40103849999999996,
+        1.236278,
+        0.087475
+      ],
+      "lengthMetres": 0.013072383447558459,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0009301181963622287
+    },
+    {
+      "bindEdge": [
+        [
+          0.400323,
+          1.219365,
+          0.072451
+        ],
+        [
+          0.403422,
+          1.212391,
+          0.073893
+        ]
+      ],
+      "bindCentre": [
+        0.40187249999999997,
+        1.215878,
+        0.073172
+      ],
+      "lengthMetres": 0.007766584899426556,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 2.2259029892012287e-07
+    },
+    {
+      "bindEdge": [
+        [
+          0.388722,
+          1.248212,
+          0.046109
+        ],
+        [
+          0.390509,
+          1.266088,
+          0.074464
+        ]
+      ],
+      "bindCentre": [
+        0.3896155,
+        1.2571500000000002,
+        0.0602865
+      ],
+      "lengthMetres": 0.033567108454557126,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 6.265181552325487e-08
+    },
+    {
+      "bindEdge": [
+        [
+          0.334031,
+          1.204536,
+          0.110439
+        ],
+        [
+          0.335076,
+          1.207079,
+          0.113904
+        ]
+      ],
+      "bindCentre": [
+        0.3345535,
+        1.2058075000000001,
+        0.11217150000000001
+      ],
+      "lengthMetres": 0.004423245301811759,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 7.204860104358046e-07
+    },
+    {
+      "bindEdge": [
+        [
+          0.335076,
+          1.207079,
+          0.113904
+        ],
+        [
+          0.336122,
+          1.209621,
+          0.117368
+        ]
+      ],
+      "bindCentre": [
+        0.335599,
+        1.20835,
+        0.115636
+      ],
+      "lengthMetres": 0.004422123471817603,
+      "overlappingSegments": 1,
+      "coveredFraction": 0.9999999999999998,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 7.202455287033542e-07
+    },
+    {
+      "bindEdge": [
+        [
+          0.320384,
+          1.257632,
+          0.095361
+        ],
+        [
+          0.332578,
+          1.264891,
+          0.089218
+        ]
+      ],
+      "bindCentre": [
+        0.326481,
+        1.2612615,
+        0.0922895
+      ],
+      "lengthMetres": 0.015463607793784674,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0001975385392321953
+    },
+    {
+      "bindEdge": [
+        [
+          0.305686,
+          1.208082,
+          0.088147
+        ],
+        [
+          0.315326,
+          1.213652,
+          0.112421
+        ]
+      ],
+      "bindCentre": [
+        0.310506,
+        1.210867,
+        0.100284
+      ],
+      "lengthMetres": 0.026705459666517585,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 2.0988935634873622e-07
+    },
+    {
+      "bindEdge": [
+        [
+          0.315326,
+          1.213652,
+          0.112421
+        ],
+        [
+          0.324966,
+          1.219223,
+          0.136695
+        ]
+      ],
+      "bindCentre": [
+        0.320146,
+        1.2164375,
+        0.124558
+      ],
+      "lengthMetres": 0.026705668256008883,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 2.0991222282132014e-07
+    },
+    {
+      "bindEdge": [
+        [
+          0.311638,
+          1.237343,
+          0.096578
+        ],
+        [
+          0.316011,
+          1.247487,
+          0.09597
+        ]
+      ],
+      "bindCentre": [
+        0.3138245,
+        1.242415,
+        0.096274
+      ],
+      "lengthMetres": 0.011063160895512559,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.00023451588108482855
+    },
+    {
+      "bindEdge": [
+        [
+          0.305686,
+          1.208082,
+          0.088147
+        ],
+        [
+          0.308662,
+          1.222712,
+          0.092363
+        ]
+      ],
+      "bindCentre": [
+        0.307174,
+        1.215397,
+        0.090255
+      ],
+      "lengthMetres": 0.015513482265436009,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.00011740288981446313
+    },
+    {
+      "bindEdge": [
+        [
+          0.284279,
+          1.367205,
+          -0.134821
+        ],
+        [
+          0.285139,
+          1.370184,
+          -0.12597
+        ]
+      ],
+      "bindCentre": [
+        0.284709,
+        1.3686945000000001,
+        -0.1303955
+      ],
+      "lengthMetres": 0.00937839229292528,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0060985049711587795
+    },
+    {
+      "bindEdge": [
+        [
+          0.254699,
+          1.358095,
+          -0.183146
+        ],
+        [
+          0.269489,
+          1.36265,
+          -0.158984
+        ]
+      ],
+      "bindCentre": [
+        0.262094,
+        1.3603725,
+        -0.171065
+      ],
+      "lengthMetres": 0.028693106646022117,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.028079942808731054
+    },
+    {
+      "bindEdge": [
+        [
+          0.246626,
+          1.353506,
+          -0.197428
+        ],
+        [
+          0.250018,
+          1.354877,
+          -0.202685
+        ]
+      ],
+      "bindCentre": [
+        0.24832200000000001,
+        1.3541915000000002,
+        -0.2000565
+      ],
+      "lengthMetres": 0.006404791487628633,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 1.4344857655989333e-07
+    },
+    {
+      "bindEdge": [
+        [
+          0.249642,
+          1.395012,
+          -0.179719
+        ],
+        [
+          0.25217,
+          1.376554,
+          -0.181433
+        ]
+      ],
+      "bindCentre": [
+        0.250906,
+        1.385783,
+        -0.18057600000000001
+      ],
+      "lengthMetres": 0.018708990993637126,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.03217284598076158
+    },
+    {
+      "bindEdge": [
+        [
+          0.2429,
+          1.395086,
+          -0.066062
+        ],
+        [
+          0.249118,
+          1.398959,
+          -0.076749
+        ]
+      ],
+      "bindCentre": [
+        0.246009,
+        1.3970225,
+        -0.0714055
+      ],
+      "lengthMetres": 0.012956682522930018,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0005463799222216155
+    },
+    {
+      "bindEdge": [
+        [
+          0.249118,
+          1.398959,
+          -0.076749
+        ],
+        [
+          0.255336,
+          1.402831,
+          -0.087437
+        ]
+      ],
+      "bindCentre": [
+        0.252227,
+        1.400895,
+        -0.082093
+      ],
+      "lengthMetres": 0.012957208495659824,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.00027294752568179497
+    },
+    {
+      "bindEdge": [
+        [
+          0.249978,
+          1.391075,
+          -0.181818
+        ],
+        [
+          0.250314,
+          1.387137,
+          -0.183916
+        ]
+      ],
+      "bindCentre": [
+        0.250146,
+        1.389106,
+        -0.182867
+      ],
+      "lengthMetres": 0.004474633392804366,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.016087351886683296
+    },
+    {
+      "bindEdge": [
+        [
+          0.23407,
+          1.438367,
+          -0.108534
+        ],
+        [
+          0.238485,
+          1.416727,
+          -0.087298
+        ]
+      ],
+      "bindCentre": [
+        0.2362775,
+        1.4275470000000001,
+        -0.097916
+      ],
+      "lengthMetres": 0.03063901958287822,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.011286002673303236
+    },
+    {
+      "bindEdge": [
+        [
+          0.225928,
+          1.235755,
+          -0.056554
+        ],
+        [
+          0.229482,
+          1.226254,
+          -0.047118
+        ]
+      ],
+      "bindCentre": [
+        0.227705,
+        1.2310045,
+        -0.051836
+      ],
+      "lengthMetres": 0.013854169516791675,
+      "overlappingSegments": 1,
+      "coveredFraction": 0.9999999999999999,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.008742013409342927
+    },
+    {
+      "bindEdge": [
+        [
+          0.222375,
+          1.245257,
+          -0.06599
+        ],
+        [
+          0.225928,
+          1.235755,
+          -0.056554
+        ]
+      ],
+      "bindCentre": [
+        0.2241515,
+        1.2405059999999999,
+        -0.06127199999999999
+      ],
+      "lengthMetres": 0.013854598839374678,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.01706299331669849
+    },
+    {
+      "bindEdge": [
+        [
+          0.221078,
+          1.252393,
+          -0.060469
+        ],
+        [
+          0.221726,
+          1.248825,
+          -0.06323
+        ]
+      ],
+      "bindCentre": [
+        0.221402,
+        1.250609,
+        -0.0618495
+      ],
+      "lengthMetres": 0.00455781186535821,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.008531782823022733
+    },
+    {
+      "bindEdge": [
+        [
+          0.233042,
+          1.444524,
+          -0.115037
+        ],
+        [
+          0.233556,
+          1.441446,
+          -0.111786
+        ]
+      ],
+      "bindCentre": [
+        0.233299,
+        1.442985,
+        -0.1134115
+      ],
+      "lengthMetres": 0.00450636006106919,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.005642884196981395
+    },
+    {
+      "bindEdge": [
+        [
+          0.233556,
+          1.441446,
+          -0.111786
+        ],
+        [
+          0.23407,
+          1.438367,
+          -0.108534
+        ]
+      ],
+      "bindCentre": [
+        0.233813,
+        1.4399065,
+        -0.11016000000000001
+      ],
+      "lengthMetres": 0.00450776452357488,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.011286002673303236
+    },
+    {
+      "bindEdge": [
+        [
+          0.21966,
+          1.435875,
+          -0.093071
+        ],
+        [
+          0.226351,
+          1.4402,
+          -0.104054
+        ]
+      ],
+      "bindCentre": [
+        0.2230055,
+        1.4380375,
+        -0.0985625
+      ],
+      "lengthMetres": 0.013568396920786152,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 1.6104875342110715e-07
+    },
+    {
+      "bindEdge": [
+        [
+          0.206732,
+          1.267351,
+          -0.059696
+        ],
+        [
+          0.211628,
+          1.261159,
+          -0.056454
+        ]
+      ],
+      "bindCentre": [
+        0.20918,
+        1.264255,
+        -0.058075
+      ],
+      "lengthMetres": 0.008533595022029099,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.015836557221515273
+    },
+    {
+      "bindEdge": [
+        [
+          0.201835,
+          1.273543,
+          -0.062939
+        ],
+        [
+          0.206732,
+          1.267351,
+          -0.059696
+        ]
+      ],
+      "bindCentre": [
+        0.2042835,
+        1.2704469999999999,
+        -0.0613175
+      ],
+      "lengthMetres": 0.008534548728550476,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.031675842676594415
+    },
+    {
+      "bindEdge": [
+        [
+          0.201835,
+          1.273543,
+          -0.062939
+        ],
+        [
+          0.202386,
+          1.28224,
+          -0.060356
+        ]
+      ],
+      "bindCentre": [
+        0.2021105,
+        1.2778915,
+        -0.061647499999999994
+      ],
+      "lengthMetres": 0.009089185827124409,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.031675842676594415
+    },
+    {
+      "bindEdge": [
+        [
+          0.202386,
+          1.28224,
+          -0.060356
+        ],
+        [
+          0.202936,
+          1.290937,
+          -0.057774
+        ]
+      ],
+      "bindCentre": [
+        0.202661,
+        1.2865885000000001,
+        -0.059065
+      ],
+      "lengthMetres": 0.009088841125247993,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.015837822455309115
+    },
+    {
+      "bindEdge": [
+        [
+          0.194571,
+          1.433712,
+          -0.097241
+        ],
+        [
+          0.204431,
+          1.430781,
+          -0.097026
+        ]
+      ],
+      "bindCentre": [
+        0.19950099999999998,
+        1.4322465000000002,
+        -0.0971335
+      ],
+      "lengthMetres": 0.010288662984081083,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.009640529629349262
+    },
+    {
+      "bindEdge": [
+        [
+          0.189901,
+          1.427874,
+          -0.085468
+        ],
+        [
+          0.192236,
+          1.430793,
+          -0.091355
+        ]
+      ],
+      "bindCentre": [
+        0.19106849999999997,
+        1.4293335,
+        -0.0884115
+      ],
+      "lengthMetres": 0.006973489442165912,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.004820997241146265
+    },
+    {
+      "bindEdge": [
+        [
+          -0.186498,
+          1.418961,
+          -0.060134
+        ],
+        [
+          -0.184623,
+          1.431899,
+          -0.065962
+        ]
+      ],
+      "bindCentre": [
+        -0.18556050000000002,
+        1.42543,
+        -0.063048
+      ],
+      "lengthMetres": 0.014313387195210052,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0020573877665468333
+    },
+    {
+      "bindEdge": [
+        [
+          -0.186498,
+          1.418961,
+          -0.060134
+        ],
+        [
+          -0.184166,
+          1.408675,
+          -0.057099
+        ]
+      ],
+      "bindCentre": [
+        -0.185332,
+        1.413818,
+        -0.0586165
+      ],
+      "lengthMetres": 0.010975028245977337,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0020573877665468333
+    },
+    {
+      "bindEdge": [
+        [
+          -0.193372,
+          1.360091,
+          -0.059355
+        ],
+        [
+          -0.193348,
+          1.36779,
+          -0.059118
+        ]
+      ],
+      "bindCentre": [
+        -0.19335999999999998,
+        1.3639405,
+        -0.0592365
+      ],
+      "lengthMetres": 0.007702684337294492,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.010883932138809206
+    },
+    {
+      "bindEdge": [
+        [
+          -0.192302,
+          1.375903,
+          -0.060975
+        ],
+        [
+          -0.191256,
+          1.384017,
+          -0.062831
+        ]
+      ],
+      "bindCentre": [
+        -0.191779,
+        1.37996,
+        -0.061903
+      ],
+      "lengthMetres": 0.008389031410121149,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.005442017909370585
+    },
+    {
+      "bindEdge": [
+        [
+          -0.225467,
+          1.443224,
+          -0.086998
+        ],
+        [
+          -0.211042,
+          1.444285,
+          -0.078895
+        ]
+      ],
+      "bindCentre": [
+        -0.21825450000000002,
+        1.4437545,
+        -0.0829465
+      ],
+      "lengthMetres": 0.016579051691818798,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0064869228407599955
+    },
+    {
+      "bindEdge": [
+        [
+          -0.211042,
+          1.444285,
+          -0.078895
+        ],
+        [
+          -0.196616,
+          1.445345,
+          -0.070792
+        ]
+      ],
+      "bindCentre": [
+        -0.203829,
+        1.4448150000000002,
+        -0.07484350000000001
+      ],
+      "lengthMetres": 0.016579857810005493,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0032435437694613082
+    },
+    {
+      "bindEdge": [
+        [
+          -0.193922,
+          1.341378,
+          -0.054033
+        ],
+        [
+          -0.19347,
+          1.33692,
+          -0.054518
+        ]
+      ],
+      "bindCentre": [
+        -0.193696,
+        1.339149,
+        -0.0542755
+      ],
+      "lengthMetres": 0.004507027068922338,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.019773277114733298
+    },
+    {
+      "bindEdge": [
+        [
+          -0.198928,
+          1.330795,
+          -0.04916
+        ],
+        [
+          -0.19347,
+          1.33692,
+          -0.054518
+        ]
+      ],
+      "bindCentre": [
+        -0.196199,
+        1.3338575000000001,
+        -0.051838999999999996
+      ],
+      "lengthMetres": 0.009798650570359257,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.019773277114733298
+    },
+    {
+      "bindEdge": [
+        [
+          -0.226756,
+          1.432437,
+          -0.079381
+        ],
+        [
+          -0.226112,
+          1.43783,
+          -0.08319
+        ]
+      ],
+      "bindCentre": [
+        -0.22643400000000002,
+        1.4351335,
+        -0.0812855
+      ],
+      "lengthMetres": 0.0066338274020357095,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0032432141910087213
+    },
+    {
+      "bindEdge": [
+        [
+          -0.226112,
+          1.43783,
+          -0.08319
+        ],
+        [
+          -0.225467,
+          1.443224,
+          -0.086998
+        ]
+      ],
+      "bindCentre": [
+        -0.2257895,
+        1.440527,
+        -0.085094
+      ],
+      "lengthMetres": 0.00663416347401851,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.006486922840759988
+    },
+    {
+      "bindEdge": [
+        [
+          -0.22502,
+          1.223391,
+          -0.065974
+        ],
+        [
+          -0.221942,
+          1.236701,
+          -0.063577
+        ]
+      ],
+      "bindCentre": [
+        -0.22348099999999999,
+        1.230046,
+        -0.0647755
+      ],
+      "lengthMetres": 0.013869960093670211,
+      "overlappingSegments": 1,
+      "coveredFraction": 0.9999999999999999,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 2.6480375335237163e-07
+    },
+    {
+      "bindEdge": [
+        [
+          -0.26778,
+          1.351352,
+          -0.171767
+        ],
+        [
+          -0.265155,
+          1.326216,
+          -0.175695
+        ]
+      ],
+      "bindCentre": [
+        -0.26646749999999997,
+        1.338784,
+        -0.173731
+      ],
+      "lengthMetres": 0.025576127638874548,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.02322027979949702
+    },
+    {
+      "bindEdge": [
+        [
+          -0.272147,
+          1.368878,
+          -0.162547
+        ],
+        [
+          -0.269963,
+          1.360115,
+          -0.167157
+        ]
+      ],
+      "bindCentre": [
+        -0.271055,
+        1.3644965,
+        -0.164852
+      ],
+      "lengthMetres": 0.010139631403557094,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.021070569768141326
+    },
+    {
+      "bindEdge": [
+        [
+          -0.274819,
+          1.379366,
+          -0.15106
+        ],
+        [
+          -0.272147,
+          1.368878,
+          -0.162547
+        ]
+      ],
+      "bindCentre": [
+        -0.273483,
+        1.374122,
+        -0.15680349999999998
+      ],
+      "lengthMetres": 0.01578255039592781,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.018922343698982238
+    },
+    {
+      "bindEdge": [
+        [
+          -0.34834,
+          1.272372,
+          0.08134
+        ],
+        [
+          -0.340973,
+          1.270132,
+          0.079543
+        ]
+      ],
+      "bindCentre": [
+        -0.34465650000000003,
+        1.271252,
+        0.0804415
+      ],
+      "lengthMetres": 0.007906927216055515,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 1.7477202934426203e-07
+    },
+    {
+      "bindEdge": [
+        [
+          -0.338298,
+          1.207868,
+          0.119068
+        ],
+        [
+          -0.336522,
+          1.205068,
+          0.113368
+        ]
+      ],
+      "bindCentre": [
+        -0.33741,
+        1.206468,
+        0.11621799999999999
+      ],
+      "lengthMetres": 0.006594253255676452,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0002230590318293613
+    },
+    {
+      "bindEdge": [
+        [
+          -0.334747,
+          1.202268,
+          0.107668
+        ],
+        [
+          -0.333927,
+          1.198755,
+          0.102594
+        ]
+      ],
+      "bindCentre": [
+        -0.334337,
+        1.2005115,
+        0.105131
+      ],
+      "lengthMetres": 0.006225676268486754,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 0.0004462075737636397
+    },
+    {
+      "bindEdge": [
+        [
+          -0.348795,
+          1.164922,
+          0.168011
+        ],
+        [
+          -0.346691,
+          1.173413,
+          0.170091
+        ]
+      ],
+      "bindCentre": [
+        -0.347743,
+        1.1691675,
+        0.169051
+      ],
+      "lengthMetres": 0.008991679320349477,
+      "overlappingSegments": 1,
+      "coveredFraction": 1.0,
+      "fullyCovered": true,
+      "maximumPosedGapMetres": 5.392948392402318e-07
+    }
+  ]
+}

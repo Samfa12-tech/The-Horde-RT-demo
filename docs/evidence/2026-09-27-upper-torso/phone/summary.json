@@ -1,0 +1,64 @@
+{
+  "schema": 8,
+  "runId": "20260927-123412",
+  "mode": "Replay",
+  "scale": 75,
+  "include100": false,
+  "rtLabWorkloadComparison": false,
+  "rtLabComparisonCheckpoints": null,
+  "checkpoints": [
+    "opening",
+    "two-enemy-combat",
+    "worst-bend",
+    "skylight",
+    "green",
+    "lich"
+  ],
+  "gpuTiming": "enabled",
+  "deviceSerial": "R5GL219SZGK",
+  "deviceModel": "SM-S948B",
+  "androidVersion": "16",
+  "apiLevel": "36",
+  "osBuildFingerprint": "samsung/m3qxxx/m3q:16/BP4A.251205.006/S948BXXS4AZHL_OXM4AZHL:user/release-keys",
+  "gpuName": "Adreno (TM) 840",
+  "gpuVendorId": 20803,
+  "gpuDeviceId": 1141180977,
+  "gpuDriverVersion": 2150932499,
+  "vulkanApiVersion": 4210983,
+  "displaySize": "Physical size: 1440x3120",
+  "displayDensity": "Physical density: 600\r\nOverride density: 560",
+  "package": "com.samfa12.hordelanternrt.debug.viewmodel",
+  "apkSha256": "210d3bf234ef53e08e80fbef0c7574e37c6f9eaf6335cca7310751eff583b898",
+  "installedApkSha256": "210d3bf234ef53e08e80fbef0c7574e37c6f9eaf6335cca7310751eff583b898",
+  "sourceCommit": "bda5c2c15fbb637b0cd0129b1aea2b118f53666a",
+  "sourceDirty": true,
+  "selectedRtPipelineBundle": {
+    "opaqueFast": {
+      "key": "diagnostic_mobile_opaque_fast",
+      "sha256": "765b493d3975bda4364688c3af3eba4756e65cb72d3ac1bbc1785c34efdd1f78"
+    },
+    "genericDielectric": {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "sha256": "4c3b5b1ea7a0bfd00d1bd1fc08fc9f6fbe2b6f78e96980cda3e017b33ff5e29f"
+    }
+  },
+  "captureRequested": true,
+  "captureCheckpointCount": 4,
+  "captureManifest": "capture-manifest.json",
+  "lifecycle": {
+    "requested": true,
+    "homeResumePassed": true,
+    "honestPresentationAfterResume": true,
+    "log": "lifecycle-home-resume-logcat.txt"
+  },
+  "timingMethod": "CPU wall-clock from frame start through vkQueuePresentKHR; not a Vulkan GPU timestamp",
+  "performanceReference": {
+    "policy": "descriptive FPS-equivalent bands; no single frame-time threshold is a product acceptance gate",
+    "sixtyFpsMs": 16.667,
+    "fiftyFpsMs": 20.0,
+    "thirtyFpsMs": 33.333,
+    "matchedRegressionInvestigationPercent": 15.0
+  },
+  "warnings": [],
+  "failures": []
+}

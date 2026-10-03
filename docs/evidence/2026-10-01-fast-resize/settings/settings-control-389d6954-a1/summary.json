@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "model": "SM-S948B",
+  "apkSha256": "389d6954f7a3fddde1ced690470029fa4b14cc6f825fa34bf7269dc617f946e0",
+  "cooled": false,
+  "method": "Observed Settings SeekBar, same process/surface; device shell timestamp preceding touch to first successful RT swapchain presentation. Includes input/debounce/whole-device idle; excludes compositor/touchscreen latency. Not Shipping FPS.",
+  "rows": [
+    {
+      "sequence": 1,
+      "scale": 100,
+      "pid": "19730",
+      "requestDeviceEpochSeconds": 1790782272.4715462,
+      "presentationLog": "         1790782285.754 19730 20068 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 13282.453775405884,
+      "surfaceRestart": false,
+      "fastPathLog": null
+    },
+    {
+      "sequence": 2,
+      "scale": 75,
+      "pid": "19730",
+      "requestDeviceEpochSeconds": 1790782290.3712838,
+      "presentationLog": "         1790782304.435 19730 20068 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 14063.716173171997,
+      "surfaceRestart": false,
+      "fastPathLog": null
+    },
+    {
+      "sequence": 3,
+      "scale": 50,
+      "pid": "19730",
+      "requestDeviceEpochSeconds": 1790782309.1294346,
+      "presentationLog": "         1790782322.912 19730 20068 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 13782.565355300903,
+      "surfaceRestart": false,
+      "fastPathLog": null
+    },
+    {
+      "sequence": 4,
+      "scale": 75,
+      "pid": "19730",
+      "requestDeviceEpochSeconds": 1790782327.5339327,
+      "presentationLog": "         1790782341.343 19730 20068 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.",
+      "requestToPresentedMs": 13809.067249298096,
+      "surfaceRestart": false,
+      "fastPathLog": null
+    }
+  ]
+}

@@ -8,14 +8,20 @@
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
 #include "vulkan/raytracing/RtSceneAbi.generated.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
+#include "scene/assets/PlayerPrimitiveContract.h"
 
 #include <algorithm>
 #include <array>
+#include <numeric>
+#if defined(_MSC_VER)
+#include <crtdbg.h>
+#endif
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace
@@ -750,7 +756,7 @@ void TestProductionAssetsShareOneGenericStaticSlot()
     const auto& metadata = slot.InstanceMetadata();
     Check(metadata[3].primitiveCount == sword.primitives.size() &&
               metadata[1].primitiveCount == torch.primitives.size() &&
-              metadata[4].primitiveCount == 4u &&
+              metadata[4].primitiveCount == player.primitives.size() &&
               metadata[1].emitterIndex == 1u &&
               metadata[3].emitterIndex == 0u,
           "generic registrations must retain stable TLAS routes and engine-emitter ownership");
@@ -758,6 +764,49 @@ void TestProductionAssetsShareOneGenericStaticSlot()
     Check(counts.baseColor == 4u && counts.normal == 4u && counts.orm == 4u &&
               counts.emissive == 0u,
           "generic material routing must include the player in audited shared texture array layers");
+    const auto originalMaterials = player.materials;
+    const auto originalPrimitives = player.primitives;
+    constexpr auto regionCount = horde::scene::assets::kPlayerPrimitiveContract.size();
+    Check(player.materials.size() == regionCount && player.primitives.size() == regionCount,
+          "promoted world body must exercise all five named regions");
+    if (player.materials.size() != regionCount || player.primitives.size() != regionCount) return;
+    std::array<unsigned, regionCount> order{};
+    std::iota(order.begin(), order.end(), 0u);
+    unsigned permutations = 0u;
+    do
+    {
+        std::array<unsigned, regionCount> remap{};
+        for (unsigned i = 0; i < order.size(); ++i)
+        {
+            player.materials[i] = originalMaterials[order[i]];
+            remap[order[i]] = i;
+        }
+        player.primitives = originalPrimitives;
+        for (auto& primitive : player.primitives)
+        {
+            Check(primitive.materialIndex < remap.size(), "material remap must stay within admitted regions");
+            if (primitive.materialIndex >= remap.size()) return;
+            primitive.materialIndex = remap[primitive.materialIndex];
+        }
+        ++permutations;
+        const bool initialized = slot.Initialize(registrations, diagnostic);
+        Check(initialized, "all player material orders must register");
+        if (!initialized) continue;
+        const auto materialBase = sword.materials.size() + torch.materials.size();
+        for (std::size_t i = 0; i < player.materials.size(); ++i)
+        {
+            const auto* part = horde::scene::assets::FindPlayerPrimitiveContract(player.materials[i].name);
+            Check(part != nullptr, "loaded player material must have a named contract");
+            if (!part) continue;
+            const std::uint32_t expected = part->textureGroup == horde::scene::assets::PlayerTextureGroup::Body ? 2u : 3u;
+            Check(slot.Materials()[materialBase + i].textureLayers ==
+                      std::array<std::uint32_t, 4u>{{expected, expected, expected, 0u}},
+                  "actual player body and gauntlet map to generated atlas layers regardless of order");
+        }
+        Check(slot.TextureArrayCounts().baseColor == 4u && slot.TextureArrayCounts().normal == 4u &&
+                  slot.TextureArrayCounts().orm == 4u, "reordered player cannot grow texture allocations");
+    } while (std::next_permutation(order.begin(), order.end()));
+    Check(permutations == 120u, "all 120 five-region atlas permutations must be exercised");
 }
 
 void TestProductionSocketsMatchSharedFixedStepContracts()
@@ -785,8 +834,49 @@ void TestProductionSocketsMatchSharedFixedStepContracts()
 
 } // namespace
 
+void TestRewardCarryParryKeepsGuardOnSwordSide()
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::items;
+    bool separated = true;
+    bool leftGripUnchanged = true;
+    const std::array<std::pair<PlayerCombatAction, float>, 3> phases{{
+        {PlayerCombatAction::ParryStartup, SwordCombat::kParryStartupDuration},
+        {PlayerCombatAction::ParryActive, SwordCombat::kParryActiveDuration},
+        {PlayerCombatAction::ParryRecovery, SwordCombat::kParryRecoveryDuration}}};
+    for (const auto carry : {interactions::HeldLightPose::High, interactions::HeldLightPose::Low})
+        for (const auto& [action, duration] : phases)
+            for (int sample = 0; sample <= 60; ++sample)
+                for (float reactionTime : {0.0f, .06f, .12f})
+                {
+                    HeldItemKinematicsInput input;
+                    input.interaction.heldLightKind = interactions::HeldLightKind::RewardLantern;
+                    input.interaction.heldLightPose = carry;
+                    const auto idle = EvaluateHeldItemKinematics(input);
+                    input.playerCombat.action = action;
+                    input.playerCombat.actionTime = duration * sample / 60.0f;
+                    input.playerCombat.reaction = CombatReaction::Parried;
+                    input.playerCombat.reactionTime = reactionTime;
+                    const auto parry = EvaluateHeldItemKinematics(input);
+                    separated &= parry.rightHandLocal[0] >= .0799f &&
+                        parry.rightHandLocal[0] - parry.leftHandLocal[0] >= .18f;
+                    leftGripUnchanged &= parry.leftHandLocal == idle.leftHandLocal &&
+                        parry.leftGripXInView == idle.leftGripXInView &&
+                        parry.leftGripYInView == idle.leftGripYInView &&
+                        parry.leftGripZInView == idle.leftGripZInView;
+                }
+    Check(separated, "reward-carry parry must retain a sword-side guard through startup, active, recovery and success reaction");
+    Check(leftGripUnchanged, "parry clearance must not be obtained by moving the lantern grip");
+}
+
 int main()
 {
+#if defined(_MSC_VER) && defined(_DEBUG)
+    // CTest must receive diagnostics and a failure, never a blocking desktop
+    // Retry/Ignore dialog. Bounds checks themselves remain enabled.
+    _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+    _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
+#endif
     TestSocketLookupIsNamedAndOrderIndependent();
     TestWorldFromItemUsesRequiredCompositionOrder();
     TestScaledGripSocketIsRejected();
@@ -803,6 +893,7 @@ int main()
     TestSimulationOwnsResetAndCheckpointParentState();
     TestSharedKinematicsOwnsWallDepthHandsAndSwordPose();
     TestRewardLanternHighLowUsesSharedLeftArmTarget();
+    TestRewardCarryParryKeepsGuardOnSwordSide();
     TestProductionSwordAssetMeetsGenericSocketAndPbrBudget();
     TestProductionTorchAssetMeetsGenericSocketAndPbrBudget();
     TestProductionAssetsShareOneGenericStaticSlot();

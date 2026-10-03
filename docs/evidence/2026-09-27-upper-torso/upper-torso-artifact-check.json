@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "scope": "Compare actual GLBs: only reclassify torso; preserve every triangle attribute.",
+  "hashes": {
+    "C:\\Dev\\tmp\\horde-body-remainder-20260927-b\\world-seam-reconciled.runtime.glb": "e8e0488809ab350ddcca29127fb6827eeecc3ba90c99516643d0b6c431496583",
+    "C:\\Dev\\tmp\\horde-upper-torso-20260927-a\\world-seam-reconciled.runtime.glb": "58c8033850d9783c95c04e4040e015d1492d92437a6407642609633cd5bfa31b",
+    "C:\\Dev\\tmp\\horde-body-remainder-20260927-b\\gothic-traveller-viewmodel.runtime.glb": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b",
+    "C:\\Dev\\tmp\\horde-upper-torso-20260927-a\\gothic-traveller-viewmodel.runtime.glb": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b"
+  },
+  "trianglesBefore": {
+    "BodyPrimaryVisible": 5532,
+    "GauntletPrimaryVisible": 8838,
+    "HeadPrimaryMasked": 1813,
+    "NearFacePrimaryMasked": 1116,
+    "BodyRemainderPrimaryVisible": 10476
+  },
+  "trianglesAfter": {
+    "BodyPrimaryVisible": 5532,
+    "GauntletPrimaryVisible": 8838,
+    "HeadPrimaryMasked": 1345,
+    "NearFacePrimaryMasked": 468,
+    "BodyRemainderPrimaryVisible": 11592
+  },
+  "checks": [
+    "exact expanded position/normal/tangent/UV/joints/weights and winding",
+    "unchanged complete head-mask triangle union",
+    "unchanged arm and hand faces",
+    "only old torso band added to body primary",
+    "byte-identical viewmodel"
+  ]
+}

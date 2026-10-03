@@ -1,0 +1,19 @@
+Start testing: Oct 02 08:01 AUS Eastern Standard Time
+----------------------------------------------------------
+28/96 Testing: horde_rt_dielectric_math_tests
+28/96 Test: horde_rt_dielectric_math_tests
+Command: "C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/presets/windows-x64-release/Release/horde_rt_dielectric_math_tests.exe"
+Directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/presets/windows-x64-release
+"horde_rt_dielectric_math_tests" start time: Oct 02 08:01 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+Dielectric math tests passed.
+<end of output>
+Test time =   1.89 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_dielectric_math_tests" end time: Oct 02 08:01 AUS Eastern Standard Time
+"horde_rt_dielectric_math_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+End testing: Oct 02 08:01 AUS Eastern Standard Time

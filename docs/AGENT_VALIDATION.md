@@ -29,6 +29,60 @@ ctest --test-dir build/host-ci --build-config Release --output-on-failure
 
 This covers non-hardware shared tests, not Vulkan presentation or phone behaviour. Use CTest selection for an affected subset when appropriate; report the actual selection and result instead of hard-coding a test count.
 
+The portable workflow has GCC/Clang Linux and MSVC Windows entries. Windows builds
+the portable targets and runs common tests (including the
+music resolver, audio-worker session/inbox, Core-backed PCM cursor/WAV decoder and immutable asset bank, generic Core contracts and
+byte-exact native-only dependency and closed-roster music asset admission, plus
+the consent-bounded player-report contract and staged-primary page/packing
+contract), plus platform-specific native CPU/UI fixtures including the real
+Windows report form with an injected file destination. Its explicit exclusion is
+the 15 additional `WIN32` tooling fixtures, some of which need shader SDK/Android
+tools not provisioned by this compiler lane. This is additive MSVC coverage, not
+a replacement for the separate full Windows tooling/shader gate. Keep that scope
+and the workflow's fail-on-empty-test behaviour explicit in validation reports.
+
+The additive `selected-host-sanitizers` Ubuntu24.04 lane runs the finite15-target
+roster in `tools/run-host-sanitizer-validation.sh` with Clang ASan/UBSan on both
+compile and link, frame pointers, fail-fast diagnostics and leak detection. It
+covers shared simulation, animation/grips, physical math, Core/Horde PCM ownership,
+worker/mailbox and consent-bounded reporting contracts. Each required CTest
+registration is selected individually with `--no-tests=error`; a missing fixture
+cannot silently shrink coverage. This is CPU memory/undefined-behavior evidence,
+not Vulkan allocation/driver validation, race detection, hardware RT or listening.
+Do not add sanitizer flags to production presets or infer phone performance from
+instrumented host runs. Current-source job results, not YAML presence, prove a pass.
+
+For report changes, select `horde_rt_playtest_report_tests` and, on Windows,
+`horde_rt_windows_playtest_report_ui_tests`. The latter opens only its own native
+form, with bounded waits; it is not real Windows file-picker/write, remote delivery
+or RTX evidence. Android `PlaytestReportExportTest` covers approved-byte ownership,
+consent, explicit retry/cancellation and destination failure. Actual Android
+picker/export/contrast evidence and exact artifact identities are retained in
+[the reporting record](ENGINEERING_1_6_1_REPORTING_2026-10-01.md). Neither local
+export nor mocked destinations close a backend/real-delivery gate.
+
+The mailbox stress fixture retains 125,000 publications, four concurrent readers,
+coherence/monotonic/final-publication checks and its 30-second deadline. Readers
+yield after each 64 validated samples to share oversubscribed CPUs; timeout output
+reports writer and sampled reader progress. A local pass is not proof of the
+precise cause of a Windows CI timeout or a substitute for fresh current-source CI.
+
+The same workflow also runs on pushes to `codex/horde-1.6.1-engineering-pass`, so
+PR merge conflicts cannot suppress all current-source compiler coverage. Its
+`player-vulkan-host` lane enables Vulkan targets with the Ubuntu development
+package and builds/runs the focused player contracts, actual skinned-player smoke
+and malformed/reordered GLB fixtures. Focused initialization preflight and scene
+resource-inventory tests also cover output-only resize rollback and ownership.
+The investigation-only staged-primary owner has CPU fault-injection coverage in
+this focused lane. Current ec13876 push/PR jobs pass17/17, including dynamic
+buffer mapping/placement and driver metadata contracts; future roster changes
+must use their actual job results rather than this historical count. Its tiny non-SPIR-V header and
+fake Vulkan/resource functions test cleanup/resize ownership only, not real
+allocation, shader validity, device limits or image/performance acceptance.
+The tests do not create a Vulkan device:
+SDK-enabled host compilation is **not** physical RT presentation, backend image
+parity or Android-device acceptance. Keep the portable lane as separate coverage.
+
 Windows configure/build/test presets are in `CMakePresets.json`:
 
 ```powershell
@@ -74,3 +128,9 @@ The [README](../README.md) package summary, `release/` metadata, current release
 Existing reports such as `SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md` retain their source IDs, hashes, test counts and limitations. Those details belong in the evidence record rather than an always-loaded instruction file. A past pass does not certify a later commit or device driver.
 
 Signing, public uploads and release identity changes require an authorised release task. Follow [OWNER_RELEASE_SAFETY_CHECKLIST.md](OWNER_RELEASE_SAFETY_CHECKLIST.md): preserve the stable Android certificate; never expose signing material; never inspect/copy recovery material or mark owner-only backup/recovery checks complete. A configured in-memory signing handoff is allowed only as documented for an authorised release and is not proof of independent backup. Asset licences must be recorded before shipping.
+
+## Current 1.6.1 programme sequencing
+
+The owner's 2026-09-13 update supersedes older task briefs that demand a full Host/device programme after each implementation slice. Use relevant targeted checks during development, broaden only when coupling or failures warrant it, and reserve the comprehensive Windows/Android/cross-device/release matrix for the complete final candidate. S24/S25 compatibility, adaptive Pocket Chordsmith music and cross-platform player reporting are required before that final pass. This changes validation scheduling, not any RT, correctness, exact-artifact or final acceptance requirement.
+
+Existing 1.6.1 evidence remains tied to its original source/build: `ENGINEERING_1_6_1_ANDROID_OBSERVATION_BASELINE_2026-09-05.md` is Diagnostic/Debug evidence, not Shipping/Release performance. Preserve matched A/B build, pipeline, workload, scale and thermal identity. A window-average median must not be relabelled as a per-frame median. The full route exceeds the 128-sample window collector; retain all intended samples with explicit capacity/invalid-run handling.

@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "status": "pass",
+  "publicationReady": true,
+  "fixtureValidated": false,
+  "generatedAtUtc": "2026-10-03T02:22:42.5905818Z",
+  "recordPath": "C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\release-provenance\\horde-lantern-rt-alpha-1.6.1.json",
+  "artifactDirectory": "C:\\Users\\sam_s\\.codex\\worktrees\\horde-mobile-lantern-profile\\the Horde RT Demo\\releases\\candidates\\1.6.1-metadata-freeze-20261003-a397757",
+  "checks": [
+    {
+      "name": "record.schema",
+      "status": "pass",
+      "detail": "schema 1, 1.6.1, Android code 9"
+    },
+    {
+      "name": "source.commit",
+      "status": "pass",
+      "detail": "exact commit exists, is a commit, and is reachable from HEAD"
+    },
+    {
+      "name": "source.release-surfaces",
+      "status": "pass",
+      "detail": "source-time CMake, Gradle, and release notes match 1.6.1/code 9"
+    },
+    {
+      "name": "documentation.immutable-validation",
+      "status": "pass",
+      "detail": "current validation record and release notes agree with the provenance record"
+    },
+    {
+      "name": "artifacts.manifest",
+      "status": "pass",
+      "detail": "exact checksum manifest SHA256SUMS.txt verified"
+    },
+    {
+      "name": "artifacts.Horde-Lantern-RT-Alpha-1.6.1-Windows-x64.zip",
+      "status": "pass",
+      "detail": "exact size 116163245, SHA-256, and manifest entry verified"
+    },
+    {
+      "name": "artifacts.Horde-Lantern-RT-Alpha-1.6.1-Android.apk",
+      "status": "pass",
+      "detail": "exact size 108261409, SHA-256, and manifest entry verified"
+    },
+    {
+      "name": "tag.local",
+      "status": "absent",
+      "detail": "local tag v1.6.1 is absent (expected before publication)"
+    },
+    {
+      "name": "tag.origin",
+      "status": "absent",
+      "detail": "origin tag v1.6.1 is absent (expected before publication)"
+    },
+    {
+      "name": "github.release",
+      "status": "absent",
+      "detail": "GitHub Release v1.6.1 is absent (expected before publication)"
+    }
+  ]
+}

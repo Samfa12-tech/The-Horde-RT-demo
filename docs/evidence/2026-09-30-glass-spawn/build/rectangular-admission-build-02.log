@@ -1,0 +1,25 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  RtStaticMeshSlot.cpp
+  StaticGltfAssetTests.cpp
+  Generating Code...
+  StaticMeshAsset.cpp
+  horde_rt_static_gltf_asset_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_static_gltf_asset_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  PlayerAnimationState.cpp
+  HeldItemKinematics.cpp
+  HeldLightState.cpp
+  GameSimulation.cpp
+  Generating Code...
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_gameplay_simulation.lib
+  ProductionPropAssetTests.cpp
+  StaticMeshAsset.cpp
+  horde_rt_production_prop_asset_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_production_prop_asset_tests.exe
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  RtStaticMeshSlot.cpp
+  RtTextureArrays.cpp
+  RtSceneAbiTests.cpp
+  Generating Code...
+  horde_rt_scene_abi_tests.vcxproj -> C:\Dev\tmp\horde-phase3-native-20260923\Debug\horde_rt_scene_abi_tests.exe

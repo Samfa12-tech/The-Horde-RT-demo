@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "baseCommit": "113200ee67445b4869d012ad1d11fbb15c42a301",
+  "equivalentImplementationCommit": "54057689872102f1bd2c2735f8b127a1e3686d29",
+  "apkSha256": "c11ff703794d74dbfb75dc7a0186af0f6c5c416e8383755a5cd8f84310daf0fe",
+  "apkBuiltBeforeImplementationCommit": true,
+  "sourceDirtyAtBuild": true,
+  "sourcePatchSha256": "1833bf90c7135ac7e6729d05342985ddafa1cc6d4ebf15c9555e62c510d54906",
+  "command": "android/gradlew.bat assembleDebug -Pandroid.injected.build.abi=arm64-v8a --console=plain",
+  "inputs": [
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "gitBlob": "a4486bda6cf53148edf62266e807b83ba0e8dd82",
+      "fileSha256": "30d9256c41da92fc431db4d5874414c63a6b85abbca90ec95b918d214111afd9"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.cpp",
+      "gitBlob": "e1576ee160e16ab29dd04c769eaacfba0187511d",
+      "fileSha256": "e66921c20d79194cf0a32001e766c93b2557a12f2b4c91593e5fbed2dad6afba"
+    },
+    {
+      "path": "src/vulkan/raytracing/PresentableTinyRtScene.h",
+      "gitBlob": "27de130a87f2ac46a04ed72404557bfcf53f15d6",
+      "fileSha256": "2a344b872697295d874d4969974ea1a0af530eacded6a02a1929dba4ec9baaf9"
+    },
+    {
+      "path": "tests/CharacterRenderSlotSmoke.cpp",
+      "gitBlob": "9442e08f68d1c484d4f464c3b89fbdd95525823f",
+      "fileSha256": "1a46ac92bcfa087d97ddb99c8c6062120ac328953625f988a570f881be0957b0"
+    },
+    {
+      "path": "tests/RtSceneResourceInventoryTests.cpp",
+      "gitBlob": "cd7d460609be97300af354631edb0d393276928d",
+      "fileSha256": "98b96037a07a34aaafa214e0bf26c18cd1d83a667bb0b8d9f9b0e2edf8b588c4"
+    }
+  ]
+}

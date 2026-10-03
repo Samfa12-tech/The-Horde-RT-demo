@@ -1,0 +1,136 @@
+09:54:20 | INFO: Data are loaded, start creating Blender stuff
+09:54:20 | INFO: Blender create Mesh node char1
+09:54:20 | INFO: glTF import finished in 0.12s
+09:54:20 | INFO: Data are loaded, start creating Blender stuff
+09:54:20 | INFO: Blender create Mesh node char1
+09:54:20 | INFO: glTF import finished in 0.12s
+09:54:20 | INFO: Data are loaded, start creating Blender stuff
+09:54:20 | INFO: Blender create Mesh node output_unwrapped
+09:54:20 | INFO: glTF import finished in 0.03s
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\tools\process-player-rig-runtime.py:737: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  material.use_nodes = True
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\tools\process-player-rig-runtime.py:772: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  if not gauntlet_material.use_nodes:
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+09:54:26 | INFO: Starting glTF 2.0 export
+09:54:26 | INFO: Extracting primitive: char1
+09:54:26 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:27 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:27 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:27 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:27 | INFO: Primitives created: 4
+09:54:27 | INFO: Finished glTF 2.0 export in 1.4411749839782715 s
+
+09:54:27 | INFO: Data are loaded, start creating Blender stuff
+09:54:27 | INFO: Blender create Mesh node char1
+09:54:28 | INFO: glTF import finished in 0.11s
+09:54:28 | INFO: Data are loaded, start creating Blender stuff
+09:54:28 | INFO: Blender create Mesh node char1
+09:54:28 | INFO: glTF import finished in 0.12s
+09:54:28 | INFO: Data are loaded, start creating Blender stuff
+09:54:28 | INFO: Blender create Mesh node output_unwrapped
+09:54:28 | INFO: glTF import finished in 0.03s
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\tools\process-player-rig-runtime.py:737: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  material.use_nodes = True
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\tools\process-player-rig-runtime.py:772: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  if not gauntlet_material.use_nodes:
+09:54:33 | INFO: Starting glTF 2.0 export
+09:54:33 | INFO: Extracting primitive: char1
+09:54:33 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:34 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:34 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:34 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:34 | INFO: Primitives created: 4
+09:54:34 | INFO: Finished glTF 2.0 export in 1.4027090072631836 s
+
+09:54:34 | INFO: Starting glTF 2.0 export
+09:54:34 | INFO: Extracting primitive: char1
+09:54:35 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:35 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:35 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:36 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:36 | INFO: Primitives created: 4
+09:54:36 | INFO: Finished glTF 2.0 export in 1.3962647914886475 s
+
+09:54:36 | INFO: Starting glTF 2.0 export
+09:54:36 | INFO: Extracting primitive: char1.002
+09:54:36 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:37 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:37 | INFO: Primitives created: 2
+09:54:37 | INFO: Finished glTF 2.0 export in 0.8060276508331299 s
+
+SEAM_INPUT_WEIGHT_SUMS {"world": {"minimum": 0.9999416470527649, "maximum": 1.0000001192092896}, "view": {"minimum": 0.9999999701976776, "maximum": 1.0000000298023224}}
+09:54:37 | INFO: Starting glTF 2.0 export
+09:54:37 | INFO: Extracting primitive: char1
+09:54:38 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:38 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:38 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:39 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+09:54:39 | INFO: Primitives created: 4
+09:54:39 | INFO: Finished glTF 2.0 export in 1.420668363571167 s
+
+{
+  "schema": 1,
+  "role": "Viewmodel",
+  "sourceWorldSha256": "e8737f10e7669b284e04109d9c3acdf537df284093a21511656bf191a70450fd",
+  "gauntletScale": 0.099,
+  "gauntletScaleAppliedAbout": "AuthoredGripOrigin",
+  "gauntletSourceHandedness": "Right",
+  "gripRollCorrectionRadians": null,
+  "gripRollRadiansBySide": {
+    "Left": 1.8325957145940461,
+    "Right": 2.530727415391778
+  },
+  "pairedWorldRuntime": "world-seam-reconciled.runtime.glb",
+  "pairedWorldSha256": "2385fbb8c0415f5c39f6b1ce7e8bdccc36aba79971492a682c6f6e6df26771c6",
+  "sleeveWeightMode": "ElbowCentredArmForeArm",
+  "sleeveHandWeightsMovedToForearm": {
+    "Left": 222,
+    "Right": 184
+  },
+  "elbowWeightField": {
+    "Left": {
+      "vertices": 2647,
+      "halfWidthMetres": 0.05410755714952701
+    },
+    "Right": {
+      "vertices": 1983,
+      "halfWidthMetres": 0.051390516825712766
+    }
+  },
+  "sleeveEnvelopeFit": {},
+  "sleeveClosure": {},
+  "sleeveSeamReconciliation": {
+    "viewSleeveBoundaryEdges": 278,
+    "matchedWorldSeamEdges": 198,
+    "transferredWorldVertices": 355,
+    "maximumWeightDelta": 0.9628335498273373,
+    "sourceAuthoringWeightSums": {
+      "world": {
+        "minimum": 0.9999416470527649,
+        "maximum": 1.0000001192092896
+      },
+      "view": {
+        "minimum": 0.9999999701976776,
+        "maximum": 1.0000000298023224
+      }
+    },
+    "scope": "Coincident Body/NearFace world vertices at matched view sleeve boundary edges only",
+    "canonicalWeights": "Unchanged exported viewmodel sleeve endpoints"
+  },
+  "runtime": "gothic-traveller-viewmodel.runtime.glb",
+  "runtimeSha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b",
+  "primitiveSemantics": {
+    "ViewmodelSleeves": 5532,
+    "ViewmodelGauntlets": 8838
+  },
+  "processingVertices": 15850,
+  "ownership": "Primary-only modelled geometry; world body owns secondary visibility",
+  "animationAuthority": "Same authored rig, Idle/Walking NLA tracks and named grip bones as world reference",
+  "licence": "Derivative of existing licensed Meshy player/gauntlet inputs; see ASSET_LICENSES.md",
+  "status": "Offline candidate only; GPU ownership, grip/pitch/motion and owner acceptance not yet established"
+}
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

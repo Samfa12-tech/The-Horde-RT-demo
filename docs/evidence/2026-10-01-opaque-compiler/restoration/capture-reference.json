@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "classification": "Restored normal-Debug control capture; image bytes are shared by exact SHA-256 with captures/control/capture-01-opening-75.png and intentionally not duplicated",
+  "restoredRunId": "run-20261001-010627",
+  "restoredArtifactSha256": "389d6954f7a3fddde1ced690470029fa4b14cc6f825fa34bf7269dc617f946e0",
+  "restoredSourceCommit": "452d4ff0ded88ec4910f6dae7f6a417def72017d",
+  "sourceCommitAndWorktreeDirtyAreHarnessMetadata": true,
+  "png": {
+    "sourcePath": "C:/Dev/tmp/horde-opaque-retained-profile-20260930/restoration/debug-opening/run-20261001-010627/capture-01-opening-75.png",
+    "sharedEvidencePath": "../captures/control/capture-01-opening-75.png",
+    "bytes": 3929523,
+    "sha256": "d3ec98a838e61194c340343ae4e293aea0ce8b39697962dbac17e134c62dbbcf",
+    "identicalToControlImage": true
+  },
+  "copiedCaptureMetadata": [
+    "summary.json",
+    "capture-manifest.json",
+    "capture-01-opening-state.json",
+    "lifecycle-home-resume-logcat.txt",
+    "validation.md",
+    "installation-receipt.txt"
+  ],
+  "excluded": ["device-properties.txt", "package-before-install.txt", "package-after-install.txt", "duplicate PNG"]
+}

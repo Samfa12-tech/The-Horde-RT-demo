@@ -178,6 +178,36 @@ inline float DielectricRayEpsilon(const Vec3& position, float interfaceDistance)
         2.0e-5f, 2.5e-4f);
 }
 
+// A normal bias already separates the ray from its source face. A side exit
+// near a corner can be closer than that bias, despite millimetre wall thickness.
+inline constexpr float kDielectricRayMinimumDistance = 0.000001f;
+
+// CPU reference for the shader's per-hit normal-separation selection. The
+// caller supplies a conservative lower scale / upper projection error and
+// still owns opposite-face clearance and admissible triangle-inset checks.
+// Zero means reject; it is never a valid production offset.
+inline float SelectDielectricNormalBias(float coordinateFloor,
+                                        float separationScaleLower,
+                                        float separationErrorUpper)
+{
+    if (!std::isfinite(coordinateFloor) || coordinateFloor < 0.00002f ||
+        coordinateFloor > 0.00025f || !std::isfinite(separationScaleLower) ||
+        separationScaleLower <= 0.0f || !std::isfinite(separationErrorUpper) ||
+        separationErrorUpper < 0.0f)
+        return 0.0f;
+    if (separationScaleLower * coordinateFloor > separationErrorUpper)
+        return coordinateFloor;
+    constexpr float unitRoundoff = 5.9604644775390625e-8f;
+    constexpr float gamma8 = (8.0f * unitRoundoff) / (1.0f - 8.0f * unitRoundoff);
+    const float requiredBias = std::nextafter(
+        (separationErrorUpper / separationScaleLower) * (1.0f + gamma8),
+        std::numeric_limits<float>::infinity());
+    if (!std::isfinite(requiredBias) || requiredBias > 0.00025f)
+        return 0.0f;
+    const float selected = std::max(coordinateFloor, requiredBias);
+    return separationScaleLower * selected > separationErrorUpper ? selected : 0.0f;
+}
+
 inline Vec3 AdvanceDielectricRayOrigin(const Vec3& position,
                                        const Vec3& geometricNormal,
                                        const Vec3& direction,
@@ -192,9 +222,7 @@ inline Vec3 AdvanceDielectricRayOrigin(const Vec3& position,
     const float side = dielectric_detail::Dot(outward, rayDirection) >= 0.0f
         ? 1.0f : -1.0f;
     return dielectric_detail::Add(position,
-        dielectric_detail::Add(
-            dielectric_detail::Scale(outward, side * epsilon),
-            dielectric_detail::Scale(rayDirection, epsilon)));
+        dielectric_detail::Scale(outward, side * epsilon));
 }
 
 inline Vec3 OffsetShadowRayOrigin(const Vec3& position,
@@ -364,7 +392,7 @@ BoundedShadowResult EvaluateBoundedShadow(
     if (candidates.size() > kCandidateCapacity)
     {
         result.overflow = true;
-        result.transmittance = {0.08f, 0.08f, 0.08f};
+        result.transmittance = {};
         return result;
     }
 
@@ -378,6 +406,19 @@ BoundedShadowResult EvaluateBoundedShadow(
     std::array<float, MaxVolumes> volumeAttenuationDistances{};
     std::size_t volumeDepth = 0u;
     bool observedClosedVolumeEntry = false;
+    const auto boundaryRank = [](const ShadowInterfaceSample& sample) {
+        return sample.thinWall ? (sample.entering ? 3u : 2u)
+                               : (sample.entering ? 1u : 0u);
+    };
+    const auto precedesAtEqualDistance = [&boundaryRank](
+        const ShadowInterfaceSample& left, const ShadowInterfaceSample& right) {
+        const std::uint32_t leftRank = boundaryRank(left);
+        const std::uint32_t rightRank = boundaryRank(right);
+        if (leftRank != rightRank) return leftRank < rightRank;
+        if (left.instanceId != right.instanceId) return left.instanceId < right.instanceId;
+        if (left.materialId != right.materialId) return left.materialId < right.materialId;
+        return left.stableId < right.stableId;
+    };
 
     for (std::size_t traversal = 0u; traversal < candidates.size(); ++traversal)
     {
@@ -395,7 +436,7 @@ BoundedShadowResult EvaluateBoundedShadow(
             if (nearest == candidates.size() ||
                 candidate.distance < candidates[nearest].distance ||
                 (candidate.distance == candidates[nearest].distance &&
-                 candidate.stableId < candidates[nearest].stableId))
+                 precedesAtEqualDistance(candidate, candidates[nearest])))
             {
                 nearest = index;
             }
@@ -403,6 +444,20 @@ BoundedShadowResult EvaluateBoundedShadow(
         if (nearest == candidates.size()) break;
         consumed[nearest] = true;
         const ShadowInterfaceSample& sample = candidates[nearest];
+        // Duplicate hardware candidates for one exact boundary are common at
+        // triangle seams. Suppress only exact same-instance/material/distance/
+        // orientation records; no spatial epsilon can merge a nearby real face.
+        for (std::size_t index = 0u; index < candidates.size(); ++index)
+        {
+            if (index == nearest || consumed[index]) continue;
+            const ShadowInterfaceSample& duplicate = candidates[index];
+            if (duplicate.distance == sample.distance &&
+                duplicate.instanceId == sample.instanceId &&
+                duplicate.materialId == sample.materialId &&
+                duplicate.thinWall == sample.thinWall &&
+                duplicate.entering == sample.entering)
+                consumed[index] = true;
+        }
         const float transmission = std::clamp(
             dielectric_detail::FiniteOr(sample.transmission, 0.0f), 0.0f, 1.0f);
         const float metallic = std::clamp(
@@ -416,19 +471,18 @@ BoundedShadowResult EvaluateBoundedShadow(
         if (result.interfaceCount >= MaxInterfaces)
         {
             result.overflow = true;
-            result.transmittance = dielectric_detail::Scale(result.transmittance, 0.08f);
+            result.transmittance = {};
             return result;
         }
         ++result.interfaceCount;
         if (sample.thinWall)
         {
-            const Vec3 tint = dielectric_detail::Lerp(
-                Vec3{1.0f, 1.0f, 1.0f},
-                Vec3{
-                    std::clamp(dielectric_detail::FiniteOr(sample.attenuationColor.x, 1.0f), 0.0f, 1.0f),
-                    std::clamp(dielectric_detail::FiniteOr(sample.attenuationColor.y, 1.0f), 0.0f, 1.0f),
-                    std::clamp(dielectric_detail::FiniteOr(sample.attenuationColor.z, 1.0f), 0.0f, 1.0f)},
-                0.12f);
+            // This CPU sample's attenuationColor carries the existing shader
+            // tint convention; thin sheets have no measurable interior segment.
+            const Vec3 tint{
+                std::clamp(sample.attenuationColor.x, 0.0f, 1.0f),
+                std::clamp(sample.attenuationColor.y, 0.0f, 1.0f),
+                std::clamp(sample.attenuationColor.z, 0.0f, 1.0f)};
             result.transmittance = dielectric_detail::Multiply(
                 result.transmittance, dielectric_detail::Scale(tint, transmission));
             continue;
@@ -438,7 +492,7 @@ BoundedShadowResult EvaluateBoundedShadow(
             if (volumeDepth >= MaxVolumes)
             {
                 result.overflow = true;
-                result.transmittance = dielectric_detail::Scale(result.transmittance, 0.08f);
+                result.transmittance = {};
                 return result;
             }
             observedClosedVolumeEntry = true;
@@ -471,7 +525,7 @@ BoundedShadowResult EvaluateBoundedShadow(
                 volumeMaterials[volumeDepth - 1u] != sample.materialId)
             {
                 result.unclosedVolume = true;
-                result.transmittance = dielectric_detail::Scale(result.transmittance, 0.08f);
+                result.transmittance = {};
                 return result;
             }
             --volumeDepth;
@@ -480,7 +534,7 @@ BoundedShadowResult EvaluateBoundedShadow(
                 std::max(sample.distance - volumeEntryDistances[volumeDepth], 0.0f),
                 volumeAttenuationDistances[volumeDepth]);
             result.transmittance = dielectric_detail::Multiply(
-                result.transmittance, absorption);
+                result.transmittance, dielectric_detail::Scale(absorption, transmission));
         }
     }
     if (volumeDepth != 0u)

@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "comparison": "control RayTracingPipeline RGB vs control RayQueryCompute RGB",
+  "pixelThreshold": "max(abs(deltaRGB)) > 3",
+  "deltaSign": "compute minus pipeline",
+  "sourceSummary": "docs/evidence/2026-10-01-primary-opacity/windows/control-backend-comparison.json",
+  "imagesRoot": "C:/Dev/tmp/horde-primary-opacity-20261001",
+  "dimensions": "960x540",
+  "totalOutlierPixels": 6,
+  "allSummaryCountsMatched": true,
+  "captures": [
+    {
+      "file": "02-worst-bend.png",
+      "outlierCountMaxRgbGreaterThan3": 1,
+      "pixelsDifferentByMoreThanOne": 6,
+      "maximumChannelDifference": 4,
+      "summaryMatched": true,
+      "outliers": [
+        {"x": 556, "y": 378, "controlRgb": [29, 15, 9], "computeRgb": [33, 16, 9], "deltaComputeMinusControl": [4, 1, 0], "maxAbsDelta": 4}
+      ]
+    },
+    {
+      "file": "06-blue.png",
+      "outlierCountMaxRgbGreaterThan3": 1,
+      "pixelsDifferentByMoreThanOne": 1,
+      "maximumChannelDifference": 116,
+      "summaryMatched": true,
+      "outliers": [
+        {"x": 396, "y": 262, "controlRgb": [9, 13, 24], "computeRgb": [125, 21, 25], "deltaComputeMinusControl": [116, 8, 1], "maxAbsDelta": 116}
+      ]
+    },
+    {
+      "file": "07-red.png",
+      "outlierCountMaxRgbGreaterThan3": 1,
+      "pixelsDifferentByMoreThanOne": 1,
+      "maximumChannelDifference": 120,
+      "summaryMatched": true,
+      "outliers": [
+        {"x": 396, "y": 262, "controlRgb": [20, 10, 12], "computeRgb": [54, 130, 58], "deltaComputeMinusControl": [34, 120, 46], "maxAbsDelta": 120}
+      ]
+    },
+    {
+      "file": "11-finale-roof.png",
+      "outlierCountMaxRgbGreaterThan3": 2,
+      "pixelsDifferentByMoreThanOne": 3,
+      "maximumChannelDifference": 6,
+      "summaryMatched": true,
+      "outliers": [
+        {"x": 552, "y": 395, "controlRgb": [34, 16, 2], "computeRgb": [38, 18, 3], "deltaComputeMinusControl": [4, 2, 1], "maxAbsDelta": 4},
+        {"x": 770, "y": 526, "controlRgb": [18, 21, 25], "computeRgb": [13, 15, 20], "deltaComputeMinusControl": [-5, -6, -5], "maxAbsDelta": 6}
+      ]
+    },
+    {
+      "file": "12-two-enemy-combat.png",
+      "outlierCountMaxRgbGreaterThan3": 1,
+      "pixelsDifferentByMoreThanOne": 4,
+      "maximumChannelDifference": 92,
+      "summaryMatched": true,
+      "outliers": [
+        {"x": 564, "y": 393, "controlRgb": [118, 64, 18], "computeRgb": [26, 14, 8], "deltaComputeMinusControl": [-92, -50, -10], "maxAbsDelta": 92}
+      ]
+    }
+  ],
+  "visualInspection": "Inspected the five pipeline captures at full-frame scale; the exact 1px outlier locations were not confidently classifiable as object boundaries or bright specular features."
+}

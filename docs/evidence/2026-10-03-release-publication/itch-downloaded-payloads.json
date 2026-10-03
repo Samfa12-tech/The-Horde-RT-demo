@@ -1,0 +1,11 @@
+{
+  "result": "pass",
+  "sourceCommit": "a397757249871b6b64fe5b77fc14f24e8cfcbb2b",
+  "itchWindowsBuild": 2055201,
+  "itchAndroidBuild": 2055202,
+  "windowsPayloadEntriesVerified": 73,
+  "windowsExecutableSha256": "11e0a59b032cee25296d99cbf74d531871d98abbfe784823cc52f9b3b84dba45",
+  "androidBytes": 108261409,
+  "androidSha256": "bc5c7ce3c755c16ec39e2c16fa9eae01c31983c7393e645f881c5bcc9e6a346c",
+  "note": "Butler directory distribution verified file-by-file; no claim that its recompressed download ZIP has the GitHub ZIP hash."
+}

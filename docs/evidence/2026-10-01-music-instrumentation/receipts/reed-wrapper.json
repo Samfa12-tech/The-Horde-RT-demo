@@ -1,0 +1,10 @@
+{
+  "variant": "reed",
+  "renderRepo": "C:\\Dev\\tmp\\horde-music-instrumentation-20261001\\chordsmith-render-source",
+  "output": "C:\\Dev\\tmp\\horde-music-instrumentation-20261001\\reed\\render",
+  "sourceSha256": "433e64bf02d8ad858ea2f2a3b348f5028ac926a600450c4c8d4c1857ba1797d1",
+  "wrapperSha256": "715ff1035c9112c5c2e0d62d40984d3af020d640c4505f6ea5d0f4972bbed98a",
+  "retainedAdapterSha256": "689fa7124ef39ef7e36b2c122d1510ac495091cb0d0b3c37b575d481cd9e05aa",
+  "effectiveAdapterSha256": "cb9a2017f2dcee50f01c1962e0e84d3b7c0e807b9c54f7b0e9c76fd839b6a441",
+  "route": "retained actual app voices/live FX; no synthesis/scheduler replacement"
+}

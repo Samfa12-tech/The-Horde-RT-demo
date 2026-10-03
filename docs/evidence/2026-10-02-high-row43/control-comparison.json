@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "sourceBase": "a32a718",
+  "pixelTolerance": {
+    "maxRgb": 3,
+    "maximumFractionOverOne": 0.001
+  },
+  "rows": [
+    {
+      "backend": "RayTracingPipeline",
+      "counterCount": 41,
+      "matchedCpuGeometryAndModules": true,
+      "primaryMismatchedExitCount": 1,
+      "controlPngSha256": "5f0b1a6cc9c2184accb375d8ca4e6644c93aea956ae9c3942233327de52ffb01",
+      "currentPngSha256": "5f0b1a6cc9c2184accb375d8ca4e6644c93aea956ae9c3942233327de52ffb01",
+      "pixels": {
+        "maximumChannelDifference": 0,
+        "pixelsDifferentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "controlWitnessRgb": [
+          32,
+          14,
+          35
+        ],
+        "currentWitnessRgb": [
+          32,
+          14,
+          35
+        ]
+      },
+      "pixelGatePassed": true
+    },
+    {
+      "backend": "RayQueryCompute",
+      "counterCount": 41,
+      "matchedCpuGeometryAndModules": true,
+      "primaryMismatchedExitCount": 0,
+      "controlPngSha256": "0bf5a402451d12ced7058649961e7690ae2056a7632026c68556d18ddcd0ac5d",
+      "currentPngSha256": "0bf5a402451d12ced7058649961e7690ae2056a7632026c68556d18ddcd0ac5d",
+      "pixels": {
+        "maximumChannelDifference": 0,
+        "pixelsDifferentByMoreThanOne": 0,
+        "differentFraction": 0.0,
+        "controlWitnessRgb": [
+          202,
+          169,
+          91
+        ],
+        "currentWitnessRgb": [
+          202,
+          169,
+          91
+        ]
+      },
+      "pixelGatePassed": true
+    }
+  ]
+}

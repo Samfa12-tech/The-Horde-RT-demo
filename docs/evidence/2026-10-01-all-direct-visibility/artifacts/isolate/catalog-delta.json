@@ -1,0 +1,102 @@
+{
+  "pipeline": [
+    {
+      "key": "diagnostic_high_generic_dielectric",
+      "before": "feac38eca1df17159bca4d490825b7e3750742b05bb07cd2f6db4eec42261b5c",
+      "after": "feac38eca1df17159bca4d490825b7e3750742b05bb07cd2f6db4eec42261b5c",
+      "changed": false
+    },
+    {
+      "key": "diagnostic_high_opaque_fast",
+      "before": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+      "after": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+      "changed": false
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "before": "9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91",
+      "after": "9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91",
+      "changed": false
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "before": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+      "after": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+      "changed": false
+    },
+    {
+      "key": "shipping_high_generic_dielectric",
+      "before": "79e80a489e93f02f99292cf76bc8f7405645159b63d1fe2bcca407b65f16b8fa",
+      "after": "79e80a489e93f02f99292cf76bc8f7405645159b63d1fe2bcca407b65f16b8fa",
+      "changed": false
+    },
+    {
+      "key": "shipping_high_opaque_fast",
+      "before": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "after": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "changed": false
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "before": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+      "after": "ec04234ca954a07070e669657b4bbfcf93fdb556a66be31580975c1a6df9e2ab",
+      "changed": true
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "before": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "after": "1e2b907a3b1fce730711aeb97f369440d4f8d0b0c5d1619290e1b35b61952f23",
+      "changed": true
+    }
+  ],
+  "compute": [
+    {
+      "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+      "before": "a88abd1880da54d159e0e912cc9030a51a46cb5759bf29bc548c99b08c62cbd8",
+      "after": "a88abd1880da54d159e0e912cc9030a51a46cb5759bf29bc548c99b08c62cbd8",
+      "changed": false
+    },
+    {
+      "key": "rayquery_compute_diagnostic_high_opaque_fast",
+      "before": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58",
+      "after": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58",
+      "changed": false
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_generic_dielectric",
+      "before": "e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302",
+      "after": "e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302",
+      "changed": false
+    },
+    {
+      "key": "rayquery_compute_diagnostic_mobile_opaque_fast",
+      "before": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58",
+      "after": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58",
+      "changed": false
+    },
+    {
+      "key": "rayquery_compute_shipping_high_generic_dielectric",
+      "before": "f0e10d5af6017aa9b27e0538cd90375da215f366aac1bb35e02ba60468e94c60",
+      "after": "f0e10d5af6017aa9b27e0538cd90375da215f366aac1bb35e02ba60468e94c60",
+      "changed": false
+    },
+    {
+      "key": "rayquery_compute_shipping_high_opaque_fast",
+      "before": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "after": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "changed": false
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "before": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+      "after": "f72f6ee70cae2608e5b3f787cb37f3b51907e9078158deb70ada3273bbc97e76",
+      "changed": true
+    },
+    {
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "before": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "after": "7b35d5961d27c3385ed97fed8d4f4a00ccc0884b257a2480bd9ef56741a4d295",
+      "changed": true
+    }
+  ]
+}

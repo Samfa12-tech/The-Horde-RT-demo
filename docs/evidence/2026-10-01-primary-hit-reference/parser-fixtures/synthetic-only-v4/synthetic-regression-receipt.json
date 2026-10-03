@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "syntheticRegressionOnly": true,
+  "phoneEvidence": false,
+  "sourceFixture": "completed historical all-shadow control report copied and relabelled only inside this isolated test fixture",
+  "testCount": 8,
+  "expectedRejections": 6,
+  "results": [
+    {
+      "name": "synthetic-control-positive",
+      "expected": "PASS",
+      "observed": "PASS",
+      "diagnostic": "synthetic fixture accepted"
+    },
+    {
+      "name": "synthetic-reference-positive",
+      "expected": "PASS",
+      "observed": "PASS",
+      "diagnostic": "synthetic fixture accepted"
+    },
+    {
+      "name": "forged-build-label",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "diagnostic": "primary-hit build label expected 'primary-hit-control', found 'wrong-label'"
+    },
+    {
+      "name": "forged-installed-apk",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "diagnostic": "installed APK versus exact primary-hit artifact expected 'a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033', found '0000000000000000000000000000000000000000000000000000000000000000'"
+    },
+    {
+      "name": "wrong-loaded-module-sha",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "diagnostic": "loaded artifact pair versus actual APK shader identity expected 'opaqueFast:shipping_mobile_opaque_fast@5c03eed845bea5fe0c0a654f613694ca428e97b61cdb940da90133309156e928|genericDielectric:shipping_mobile_generic_dielectric@0e5a658a94e2dd26d6e959aea90eca21cd52867baa2e734f3a2f7cb2dff2c92b', found 'opaqueFast:shipping_mobile_opaque_fast@0000000000000000000000000000000000000000000000000000000000000000'"
+    },
+    {
+      "name": "forged-completion-denominator",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "diagnostic": "measured count expected '1838', found '1837'"
+    },
+    {
+      "name": "invalid-opening-strategy",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "diagnostic": "actual opening OpaqueFast completions expected '160', found '159'"
+    },
+    {
+      "name": "mismatched-completion-identity",
+      "expected": "REJECT",
+      "observed": "REJECT",
+      "diagnostic": "identity submissionSerial at row 0 expected '1841', found '1840'"
+    }
+  ],
+  "limitations": [
+    "Positive parser fixtures only exercise parsing/identity joins; they are not primary-hit measurements.",
+    "No synthetic report is in the live phone directory or actual analysis directory."
+  ]
+}

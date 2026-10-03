@@ -1,0 +1,9 @@
+{
+  "sourceCommit": "eafbf8262442a82e0835edf5cf5306d718e64633",
+  "apkSha256": "ab3e2261fd081f87e667a6e4967e2476077fa96554702330e6aa49baa8133eae",
+  "instrumentation": "Shipping",
+  "quality": "Mobile",
+  "abi": "arm64-v8a",
+  "installed": false,
+  "purpose": "Existing owning active-strategy metadata export; unchanged GPU shaders"
+}

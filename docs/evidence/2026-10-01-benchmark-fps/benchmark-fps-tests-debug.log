@@ -1,0 +1,37 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+Test project C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+    Start  5: horde_rt_lantern_benchmark_tests
+1/4 Test  #5: horde_rt_lantern_benchmark_tests ...........   Passed    5.64 sec
+    Start  6: horde_rt_benchmark_evidence_report_tests
+Could not find executable C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_benchmark_evidence_report_tests.exe
+Looked in the following places:
+C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_benchmark_evidence_report_tests.exe
+C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_benchmark_evidence_report_tests.exe.exe
+C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/Debug/horde_rt_benchmark_evidence_report_tests.exe
+C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/Debug/horde_rt_benchmark_evidence_report_tests.exe.exe
+Debug/C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_benchmark_evidence_report_tests.exe
+Debug/C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_benchmark_evidence_report_tests.exe.exe
+2/4 Test  #6: horde_rt_benchmark_evidence_report_tests ...***Not Run   0.00 sec
+Unable to find executable: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_benchmark_evidence_report_tests.exe
+    Start  7: horde_rt_windows_benchmark_launch_tests
+Could not find executable C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_windows_benchmark_launch_tests.exe
+Looked in the following places:
+C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_windows_benchmark_launch_tests.exe
+C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_windows_benchmark_launch_tests.exe.exe
+C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/Debug/horde_rt_windows_benchmark_launch_tests.exe
+C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/Debug/horde_rt_windows_benchmark_launch_tests.exe.exe
+Debug/C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_windows_benchmark_launch_tests.exe
+Debug/C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_windows_benchmark_launch_tests.exe.exe
+Unable to find executable: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Debug/horde_rt_windows_benchmark_launch_tests.exe
+3/4 Test  #7: horde_rt_windows_benchmark_launch_tests ....***Not Run   0.00 sec
+    Start 85: horde_rt_showcase_benchmark_smoke
+4/4 Test #85: horde_rt_showcase_benchmark_smoke ..........   Passed    5.48 sec
+
+50% tests passed, 2 tests failed out of 4
+
+Total Test time (real) =  11.14 sec
+
+The following tests FAILED:
+	  6 - horde_rt_benchmark_evidence_report_tests (Not Run)
+	  7 - horde_rt_windows_benchmark_launch_tests (Not Run)
+Errors while running CTest

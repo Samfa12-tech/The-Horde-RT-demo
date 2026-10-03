@@ -38,11 +38,42 @@ float dielectricRayEpsilon(vec3 position, float interfaceDistance)
                  0.00002, 0.00025);
 }
 
+const float kDielectricRayMinimumDistance = 0.000001;
+
+vec3 dielectricSpawnPoint(HitInfo hit)
+{
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
+    if (hit.dielectricSpawnGuarded) return hit.dielectricSpawnPosition;
+#endif
+    return hit.position;
+}
+
+float dielectricQueryMinimum(HitInfo hit)
+{
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
+    // A proven source-face-separated spawn must not discard a valid tiny exit.
+    if (hit.dielectricSpawnGuarded) return 0.0;
+#endif
+    return kDielectricRayMinimumDistance;
+}
+
+float dielectricSpawnEpsilon(HitInfo hit, float interfaceDistance)
+{
+    float epsilon = dielectricRayEpsilon(hit.position, interfaceDistance);
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
+    if (hit.dielectricSpawnGuarded) return max(epsilon, hit.dielectricSpawnMinimumNormalBias);
+#endif
+    return epsilon;
+}
+
 vec3 advanceDielectricRayOrigin(vec3 position, vec3 geometricNormal,
                                 vec3 direction, float epsilon)
 {
     float side = dot(geometricNormal, direction) >= 0.0 ? 1.0 : -1.0;
-    return position + geometricNormal * side * epsilon + direction * epsilon;
+    // Do not advance tangentially past a nearby side exit at a pane corner.
+    // The normal offset supplies source-face separation; traversal tMin is
+    // independently small so that it cannot discard that valid short exit.
+    return position + geometricNormal * side * epsilon;
 }
 
 vec3 dielectricBeerLambert(vec3 attenuationColor, float pathLength,
@@ -185,7 +216,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
         ? sceneShadowTransmittanceMask(offsetRayOrigin(h, localDirection),
                                   localDirection, localDistance - 0.02, 0x35u)
         : vec3(0.0);
-    int skySample = int((gl_LaunchIDEXT.x + gl_LaunchIDEXT.y) & 1u);
+    int skySample = int((HORDE_RT_PIXEL_ID.x + HORDE_RT_PIXEL_ID.y) & 1u);
     vec3 skyDirection;
     float skyDistance;
     vec3 skyRadiance;
@@ -314,10 +345,9 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
             skyVisibility * skyDiffuse * 0.55),
         kLightSkylight);
     color = mix(color, fogColor, fog);
-    // This close-range haze belongs to the selected local emitter. Keeping the
-    // old unconditional warm term made the lantern-off skylight chamber brown
-    // and also contaminated every authored bay colour.
-    color += localLightColor * 0.16 * clamp(localLightStrength, 0.0, 1.0) * exp(-h.t * 0.24);
+    // Local-emitter surface radiance is already visibility-tested above.
+    // A camera-distance colour floor here would light even a fully occluded
+    // receiver; it is not a participating-medium integration.
     return color;
 }
 

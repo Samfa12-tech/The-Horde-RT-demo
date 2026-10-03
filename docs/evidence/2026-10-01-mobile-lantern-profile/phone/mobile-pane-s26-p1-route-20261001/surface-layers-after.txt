@@ -1,0 +1,136 @@
+RequestedLayerState{cf53318 ActivityRecordInputSink com.sec.android.app.launcher/.Launcher#124 parentId=118 z=-2147483648}
+RequestedLayerState{WindowedMagnification:0:31#2 parentId=41}
+RequestedLayerState{HideDisplayCutout:0:14#3 parentId=2}
+RequestedLayerState{OneHanded:0:14#4 parentId=3}
+RequestedLayerState{AppZoomOut:0:0#5 parentId=4}
+RequestedLayerState{Leaf:0:0#6 parentId=5}
+RequestedLayerState{RemoteWallpaperAnim:1:1#7 parentId=4 z=1}
+RequestedLayerState{Leaf:1:1#8 parentId=7}
+RequestedLayerState{AppZoomOut:2:14#9 parentId=4 z=2}
+RequestedLayerState{DefaultTaskDisplayArea_d0#10 parentId=9}
+RequestedLayerState{ChangeLeashAnchor#11 parentId=10 z=5}
+RequestedLayerState{FloatingLeashAnchor#12 parentId=10 z=6}
+RequestedLayerState{Leaf:3:12#13 parentId=9 z=1}
+RequestedLayerState{ImePlaceholder:13:14#14 parentId=9 z=2}
+RequestedLayerState{ImeContainer#15 parentId=118 relativeParentId=119 z=1}
+RequestedLayerState{OneHanded:15:15#16 parentId=2 z=1}
+RequestedLayerState{Leaf:15:15#17 parentId=16}
+RequestedLayerState{HideDisplayCutout:16:16#18 parentId=2 z=2}
+RequestedLayerState{OneHanded:16:16#19 parentId=18}
+RequestedLayerState{AppZoomOut:16:16#20 parentId=19}
+RequestedLayerState{Leaf:16:16#21 parentId=20}
+RequestedLayerState{OneHanded:17:17#22 parentId=2 z=3}
+RequestedLayerState{Leaf:17:17#23 parentId=22}
+RequestedLayerState{HideDisplayCutout:18:23#24 parentId=2 z=4}
+RequestedLayerState{OneHanded:18:23#25 parentId=24}
+RequestedLayerState{Leaf:18:19#26 parentId=25}
+RequestedLayerState{AppZoomOut:20:22#27 parentId=25 z=1}
+RequestedLayerState{Leaf:20:22#28 parentId=27}
+RequestedLayerState{Leaf:23:23#29 parentId=25 z=2}
+RequestedLayerState{Leaf:24:25#30 parentId=2 z=5}
+RequestedLayerState{HideDisplayCutout:26:31#31 parentId=2 z=6}
+RequestedLayerState{OneHanded:26:31#32 parentId=31}
+RequestedLayerState{Leaf:26:31#33 parentId=32}
+RequestedLayerState{HideDisplayCutout:32:35#34 parentId=41 z=1}
+RequestedLayerState{OneHanded:32:32#35 parentId=34}
+RequestedLayerState{Leaf:32:32#36 parentId=35}
+RequestedLayerState{Leaf:33:33#37 parentId=34 z=1}
+RequestedLayerState{OneHanded:34:35#38 parentId=34 z=2}
+RequestedLayerState{Leaf:34:35#39 parentId=38}
+RequestedLayerState{Leaf:36:36#40 parentId=41 z=2}
+RequestedLayerState{Display 0 name="Built-in Screen"#41}
+RequestedLayerState{Display Overlays#42 parentId=41 z=2147483647}
+RequestedLayerState{Input Overlays#43 parentId=41 z=2147483646}
+RequestedLayerState{PointerEventDispatcherOverlay0#44 parentId=43 z=2147483647}
+RequestedLayerState{Accessibility Overlays#45 parentId=41 z=2147483645}
+RequestedLayerState{Task=1#46 parentId=10}
+RequestedLayerState{RecentsTransitionOverlay$_5623#128 parentId=127}
+RequestedLayerState{[Gesture Monitor] PalmMotion#97 parentId=43 z=1}
+RequestedLayerState{NavigationBar0$_4998#88 parentId=81}
+RequestedLayerState{home_task_overlay_container#51 parentId=46 z=2147483647}
+RequestedLayerState{Task=2(SplitRoot)#52 parentId=10 z=1}
+RequestedLayerState{Task=3#53 parentId=52}
+RequestedLayerState{Task=4#54 parentId=52 z=1}
+RequestedLayerState{WindowToken{b987a4a type=2016 android.os.BinderProxy@ca18203}#55 parentId=33 z=2}
+RequestedLayerState{2257943 ShellDropTarget#56 parentId=55}
+RequestedLayerState{Split Background Layer#57 parentId=52 z=-1}
+RequestedLayerState{Dim layer#58 parentId=53 z=2147483647}
+RequestedLayerState{Dim layer#59 parentId=54 z=2147483647}
+RequestedLayerState{ActivityRecord{254994311 u0 com.sec.android.app.launcher/com.android.quickstep.RecentsActivity t3176}#131 parentId=130}
+RequestedLayerState{Task=3176#130 parentId=10 z=2}
+RequestedLayerState{5e32c66 RecentsTransitionOverlay#127 parentId=126}
+RequestedLayerState{Surface(name=Task=4042#76847)/@0x9dff3e5_transition-leash#76863 z=4}
+RequestedLayerState{StatusBar$_4998#96 parentId=85}
+RequestedLayerState{TransientLaunchOverlayToken{7ae7dcb token=android.os.BinderProxy@314760}#126 parentId=13}
+RequestedLayerState{WallpaperWindowToken{3c51af6}#66 parentId=8 z=1}
+RequestedLayerState{WallpaperWindowToken{1b13b85}#67 parentId=8}
+RequestedLayerState{c5795d9 com.samsung.android.wallpaper.live.layered.LayeredWallpaperService#68 parentId=67}
+RequestedLayerState{com.samsung.android.wallpaper.live.layered.LayeredWallpaperService$_5212#69 parentId=68}
+RequestedLayerState{Wallpaper Transform wrapper#70 parentId=69}
+RequestedLayerState{Wallpaper BBQ wrapper 6_lock#71 parentId=70}
+RequestedLayerState{WindowToken{732a383 type=2415 android.os.BinderProxy@f3d3ece}#72 parentId=26}
+RequestedLayerState{27a7e0b LockscreenShortcutBlur#73 parentId=72}
+RequestedLayerState{c936887 com.android.systemui.wallpapers.ImageWallpaper#74 parentId=66}
+RequestedLayerState{com.android.systemui.wallpapers.ImageWallpaper$_4998#75 parentId=74}
+RequestedLayerState{Wallpaper Transform wrapper#76 parentId=75}
+RequestedLayerState{Wallpaper BBQ wrapper 5_system#77 parentId=76}
+RequestedLayerState{b28e48c Bouncer#87 parentId=86}
+RequestedLayerState{WindowToken{288725d type=2019 android.os.BinderProxy@7a6ab07}#80 parentId=30}
+RequestedLayerState{7df37d2 NavigationBar0#81 parentId=82865}
+RequestedLayerState{WindowToken{f06454b type=2040 android.os.BinderProxy@e7afcc5}#82 parentId=23}
+RequestedLayerState{1ca8b28 NotificationShade#83 parentId=82}
+RequestedLayerState{WindowToken{a4b0e58 type=2000 android.os.BinderProxy@249f9ca}#84 parentId=17}
+RequestedLayerState{6f5e896 StatusBar#85 parentId=82864}
+RequestedLayerState{WindowToken{e9255bf type=2009 android.os.BinderProxy@9f0cfde}#86 parentId=26 z=1}
+RequestedLayerState{Shell Root Leash 0#23607 parentId=23606}
+RequestedLayerState{Task=4098#82454 z=3}
+RequestedLayerState{Input Consumer recents_animation_input_consumer#125 relativeParentId=82285 z=2}
+RequestedLayerState{WindowToken{6da72f9 type=2228 android.os.BinderProxy@d53fb43}#81462 parentId=33 z=1}
+RequestedLayerState{[Gesture Monitor] secinputdev#81483 parentId=43 z=1}
+RequestedLayerState{bcb4f48 com.ebay.mobile/com.ebay.mobile.home.impl.main.MainActivity#82666 parentId=82655}
+RequestedLayerState{cbfb208 ActivityRecordInputSink com.sec.android.app.launcher/com.android.quickstep.RecentsActivity#673 parentId=131 z=-2147483648}
+RequestedLayerState{Task=3175#117 parentId=46}
+RequestedLayerState{ActivityRecord{173701974 u0 com.sec.android.app.launcher/.activities.LauncherActivity t3175}#118 parentId=117}
+RequestedLayerState{dd7129c com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity#119 parentId=118}
+RequestedLayerState{[BBQ] Sprite#368#369 parentId=368}
+RequestedLayerState{Sprite#368 parentId=42 z=351000}
+RequestedLayerState{Task=3384#20187 z=2}
+RequestedLayerState{65978bf com.sec.android.app.launcher/com.android.quickstep.RecentsActivity#132 parentId=131}
+RequestedLayerState{Task=4099#82497 z=3}
+RequestedLayerState{ActivityRecord{176711442 u0 com.ebay.mobile/.myebay.summary.MyEbaySummaryActivity t4103}#82677 parentId=82654 z=1}
+RequestedLayerState{557c3ad ActivityRecordInputSink com.ebay.mobile/.orderdetails.page.view.OrderDetailsActivity#82702 parentId=82695 z=-2147483648}
+RequestedLayerState{Task=3411#23559 z=11}
+RequestedLayerState{Task=4097#82325 z=1}
+RequestedLayerState{WindowToken{484a9e7 type=2038 android.os.BinderProxy@6b4bba6}#23606 parentId=13 z=1}
+RequestedLayerState{WindowToken{b2a7a3 type=2011 android.os.Binder@1a16ad2}#76987 parentId=15}
+RequestedLayerState{cfe5e1f com.samsung.android.spay.pay.HintService#73627 parentId=73626}
+RequestedLayerState{Task=4095#82242 z=3}
+RequestedLayerState{d4a415c InputMethod#76988 parentId=82871}
+RequestedLayerState{70875fa ActivityRecordInputSink com.ebay.mobile/.home.impl.main.MainActivity#82657 parentId=82655 z=-2147483648}
+RequestedLayerState{Task=4096#82285 z=3}
+RequestedLayerState{WindowToken{3a03dbe type=2634 android.os.BinderProxy@5ab6c79}#73626 parentId=33}
+RequestedLayerState{Task=4093#82164 z=5}
+RequestedLayerState{d907461 GoogleDiscoverWindow#81966 parentId=118 z=1}
+RequestedLayerState{fa1023e KeyguardBiometricToastView#81463 parentId=81462}
+RequestedLayerState{39cea0c ActivityRecordInputSink com.ebay.mobile/.myebay.purchasehistory.view.PurchaseHistoryActivity#82692 parentId=82686 z=-2147483648}
+RequestedLayerState{Task=4101#82563 z=3}
+RequestedLayerState{Task=4102#82611 z=3}
+RequestedLayerState{Surface(name=7df37d2 NavigationBar0#81)/@0x97e6903 - animation-leash of insets_animation#82865 parentId=80}
+RequestedLayerState{Task=4103#82654 parentId=10 z=3}
+RequestedLayerState{ActivityRecord{159440392 u0 com.ebay.mobile/.home.impl.main.MainActivity t4103}#82655 parentId=82654}
+RequestedLayerState{8dbe547 ActivityRecordInputSink com.ebay.mobile/.myebay.summary.MyEbaySummaryActivity#82683 parentId=82677 z=-2147483648}
+RequestedLayerState{Surface(name=d4a415c InputMethod#76988)/@0x6da3d3a - animation-leash of insets_animation#82871 parentId=76987}
+RequestedLayerState{520d93d com.ebay.mobile/com.ebay.mobile.myebay.summary.MyEbaySummaryActivity#82678 parentId=82677}
+RequestedLayerState{ActivityRecord{145912411 u0 com.ebay.mobile/.myebay.purchasehistory.view.PurchaseHistoryActivity t4103}#82686 parentId=82654 z=2}
+RequestedLayerState{8f10dd0 com.ebay.mobile/com.ebay.mobile.myebay.purchasehistory.view.PurchaseHistoryActivity#82687 parentId=82686}
+RequestedLayerState{com.samsung.android.spay.pay.HintService$_17135#82869 parentId=73627}
+RequestedLayerState{ActivityRecord{222137648 u0 com.ebay.mobile/.orderdetails.page.view.OrderDetailsActivity t4103}#82695 parentId=82654 z=3}
+RequestedLayerState{501c4ab com.ebay.mobile/com.ebay.mobile.orderdetails.page.view.OrderDetailsActivity#82696 parentId=82695}
+RequestedLayerState{Surface(name=6f5e896 StatusBar#85)/@0x8f99afe - animation-leash of insets_animation#82864 parentId=84}
+RequestedLayerState{com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity$_5623#82863 parentId=119}
+RequestedLayerState{GoogleDiscoverWindow$_31734#82862 parentId=81966}
+RequestedLayerState{Task=4104#82717 z=4}
+RequestedLayerState{Task=4105#82747 z=4}
+RequestedLayerState{Task=4106#82777 z=4}
+RequestedLayerState{Task=4107#82810 z=4}
+RequestedLayerState{Task=4108#82840 z=4}

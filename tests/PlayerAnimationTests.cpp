@@ -1,6 +1,7 @@
 #include "gameplay/animation/PlayerAnimationState.h"
 #include "gameplay/animation/PlayerIkTargets.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 
@@ -35,6 +36,66 @@ int main()
 {
     using namespace horde::gameplay;
     using namespace horde::gameplay::animation;
+
+    const TwoBoneIkSolution foldedUnequal = SolveTwoBoneIk(
+        {{0.0f, 0.0f, 0.0f}}, {{0.20f, 0.0f, 0.0f}}, {{0.0f, 1.0f, 0.0f}}, 0.30f, 0.40f);
+    std::cout << "Unequal folded IK: elbow=(" << foldedUnequal.elbow[0] << ','
+              << foldedUnequal.elbow[1] << ',' << foldedUnequal.elbow[2]
+              << "), upper=" << Distance(foldedUnequal.shoulder, foldedUnequal.elbow)
+              << ", lower=" << Distance(foldedUnequal.elbow, foldedUnequal.hand) << '\n';
+    if (!Require(foldedUnequal.reachable &&
+                 Near(Distance(foldedUnequal.shoulder, foldedUnequal.elbow), 0.30f, 0.000002f) &&
+                 Near(Distance(foldedUnequal.elbow, foldedUnequal.hand), 0.40f, 0.000002f) &&
+                 Near(foldedUnequal.elbow[0], -0.075f, 0.000002f),
+                 "reachable unequal-arm fold must preserve both segment lengths and signed elbow projection")) return 1;
+
+    // A pole is a direction, not a point. Check length preservation across
+    // reachable folds, both reach boundaries, clamping, and rigid root changes.
+    for (const auto lengths : {std::array<float, 2u>{0.30f, 0.40f},
+                               std::array<float, 2u>{0.40f, 0.30f},
+                               std::array<float, 2u>{0.40f, 0.40f}})
+    {
+        const float inner = std::abs(lengths[0] - lengths[1]);
+        const float outer = lengths[0] + lengths[1];
+        for (const float distance : {0.0f, inner * 0.5f, inner + 0.00002f,
+                                     0.20f, outer - 0.00002f, outer, outer + 0.20f})
+        {
+            const auto solved = SolveTwoBoneIk(
+                {{0.0f, 0.0f, 0.0f}}, {{distance, 0.0f, 0.0f}},
+                {{0.0f, 1.0f, 0.0f}}, lengths[0], lengths[1]);
+            if (!Require(Near(Distance(solved.shoulder, solved.elbow), lengths[0], 0.000002f) &&
+                         Near(Distance(solved.elbow, solved.hand), lengths[1], 0.000002f) &&
+                         Near(solved.solvedDistance,
+                              std::clamp(distance, inner + 0.00001f, outer), 0.000002f),
+                         "IK must preserve both bone lengths at folds and clamped reach boundaries")) return 1;
+            if (!Require(solved.reachable == (distance >= inner && distance <= outer),
+                         "IK reachability must retain the existing inclusive boundary policy")) return 1;
+            if (distance == 0.0f) continue; // Zero target has a documented world-axis fallback.
+            const auto rotate = [](const PlayerIkVector& v) -> PlayerIkVector {
+                return {{-v[1], v[0], v[2]}};
+            };
+            const auto transform = [&rotate](const PlayerIkVector& v) -> PlayerIkVector {
+                const auto r = rotate(v);
+                return {{r[0] + 2.0f, r[1] - 1.0f, r[2] + 0.5f}};
+            };
+            const auto transformed = SolveTwoBoneIk(
+                transform({{0.0f, 0.0f, 0.0f}}), transform({{distance, 0.0f, 0.0f}}),
+                rotate({{0.0f, 1.0f, 0.0f}}), lengths[0], lengths[1]);
+            if (!Require(Distance(transformed.elbow, transform(solved.elbow)) < 0.00002f &&
+                         Distance(transformed.hand, transform(solved.hand)) < 0.000002f,
+                         "IK positions must follow a rigid root while the pole follows rotation only")) return 1;
+        }
+    }
+    for (const PlayerIkVector pole : {PlayerIkVector{{1.0f, 0.0f, 0.0f}},
+                                     PlayerIkVector{{1.0f, 0.0000001f, 0.0f}},
+                                     PlayerIkVector{{1.0f, 0.00001f, 0.0f}}})
+    {
+        const auto solved = SolveTwoBoneIk(
+            {{0.0f, 0.0f, 0.0f}}, {{0.2f, 0.0f, 0.0f}}, pole, 0.3f, 0.4f);
+        if (!Require(Near(Distance(solved.shoulder, solved.elbow), 0.3f, 0.000002f) &&
+                     Near(Distance(solved.elbow, solved.hand), 0.4f, 0.000002f),
+                     "collinear and nearly collinear poles must retain finite length-preserving output")) return 1;
+    }
 
     if (!Require(MapPlayerLocomotionClip(0.0f) == PlayerLocomotionClip::Idle,
                  "zero locomotion must map to idle")) return 1;
@@ -74,6 +135,38 @@ int main()
                  "parry layer must be continuous across startup/active")) return 1;
 
     PlayerAnimationState state;
+    {
+        PlayerAnimationState carryState;
+        PlayerAnimationInput carryInput;
+        carryInput.heldItemKinematics = items::EvaluateHeldItemKinematics({});
+        carryState.StepFixed(carryInput, 0.0f);
+        if (!Require(carryState.Snapshot().leftIk.preferredElbowFlexionRadians == 0.0f,
+                     "ordinary torch must preserve its existing chain stretch")) return 1;
+        carryInput.carryingRewardLantern = true;
+        carryState.StepFixed(carryInput, 0.0f);
+        const auto neutral = carryState.Snapshot();
+        if (!Require(Near(neutral.leftIk.preferredElbowFlexionRadians, 22.0f * .01745329252f) &&
+                     neutral.leftIk.target == carryInput.heldItemKinematics.leftHandLocal,
+                     "reward carry must reserve bend even at frozen zero-delta evaluation without moving grip")) return 1;
+        carryInput.lanternForwardAngleRadians = .5f;
+        carryInput.lanternStrafeAngleRadians = .4f;
+        carryState.StepFixed(carryInput, 1.0f / 60.0f);
+        const auto moving = carryState.Snapshot();
+        if (!Require(moving.leftIk.preferredElbowFlexionRadians > neutral.leftIk.preferredElbowFlexionRadians &&
+                     moving.leftIk.pole != neutral.leftIk.pole &&
+                     moving.leftIk.target == neutral.leftIk.target &&
+                     moving.leftIk.gripY == neutral.leftIk.gripY && moving.rightIk == neutral.rightIk,
+                     "lantern motion must affect elbow compliance without moving either grip or changing the sword arm")) return 1;
+        carryInput.heldItemKinematics.rightHandLocal[1] += .2f;
+        carryState.StepFixed(carryInput, 1.0f / 60.0f);
+        if (!Require(carryState.Snapshot().leftIk.preferredElbowFlexionRadians > moving.leftIk.preferredElbowFlexionRadians,
+                     "off-hand carry must respond to the authoritative sword lift")) return 1;
+        carryInput.carryingRewardLantern = false;
+        carryState.StepFixed(carryInput, 0.0f);
+        if (!Require(carryState.Snapshot().leftIk.preferredElbowFlexionRadians == 0.0f &&
+                     carryState.Snapshot().leftIk.pole == neutral.leftIk.pole,
+                     "leaving reward carry must clear its bend and pole allowance")) return 1;
+    }
     PlayerAnimationInput input{};
     input.walkAmount = 1.0f;
     input.walkTime = 0.5f;
@@ -254,6 +347,64 @@ int main()
                  upwardFrame.maximumNdcX <= 0.94f,
                  "upward-slice blade bounds must remain inside the 75% portrait safe frame"))
         return 1;
+    // Neutral carried-lantern control for the owner-reported live slice
+    // intersection. Actual body bounds are +/-0.223589 X, [-.975,-.015] Y,
+    // +/-0.255336 Z metres, uniformly scaled below the ring's .097 m hinge offset.
+    // A blade centre-line inside this cage envelope is unacceptable even if
+    // a particular sample happens to lie between individual frame triangles.
+    const std::array<std::pair<PlayerCombatAction, float>, 6> carryAttackPhases{{
+        {PlayerCombatAction::SwingWindup, SwordCombat::kSwingWindupDuration},
+        {PlayerCombatAction::SwingActive, SwordCombat::kSwingActiveDuration},
+        {PlayerCombatAction::SwingRecovery, SwordCombat::kSwingRecoveryDuration},
+        {PlayerCombatAction::UpwardSliceWindup, SwordCombat::kUpwardSliceWindupDuration},
+        {PlayerCombatAction::UpwardSliceActive, SwordCombat::kUpwardSliceActiveDuration},
+        {PlayerCombatAction::UpwardSliceRecovery, SwordCombat::kUpwardSliceRecoveryDuration}}};
+    for (const auto profile : {items::PlayerMountProfile::LegacyViewRelative,
+                              items::PlayerMountProfile::AnatomicalBody})
+    for (const auto carry : {interactions::HeldLightPose::High, interactions::HeldLightPose::Low})
+        for (const auto& [action, duration] : carryAttackPhases)
+            for (int frame = 0; frame <= 60; ++frame)
+            {
+                items::HeldItemKinematicsInput carryInput;
+                carryInput.playerMountProfile = profile;
+                carryInput.interaction.heldLightKind = interactions::HeldLightKind::RewardLantern;
+                carryInput.interaction.heldLightPose = carry;
+                carryInput.playerCombat.action = action;
+                carryInput.playerCombat.actionTime = duration * frame / 60.0f;
+                const auto pose = items::EvaluateHeldItemKinematics(carryInput);
+                const auto blade = items::EvaluateSwordBladeAxisInView(
+                    pose.swordRadians, pose.swordForwardRadians);
+                for (int along = 0; along <= 100; ++along)
+                {
+                    const float distance = .915f * along / 100.0f;
+                    const float x = pose.rightHandLocal[0] + blade[0] * distance - pose.leftHandLocal[0];
+                    constexpr float lanternScale = items::kClaimedRewardLanternScale;
+                    const float y = pose.rightHandLocal[1] + blade[1] * distance - pose.leftHandLocal[1] + .097f * lanternScale;
+                    const float z = pose.rightHandLocal[2] + blade[2] * distance - pose.leftHandLocal[2];
+                    if (!Require(!(std::abs(x) < .223590f * lanternScale &&
+                                   y > -.975f * lanternScale && y < -.015f * lanternScale &&
+                                   std::abs(z) < .255336f * lanternScale),
+                                 "complete sword attack must not pass through the neutral carried-lantern cage")) return 1;
+                }
+            }
+
+    for (const float pitch : {-0.32f, 0.0f, 0.28f})
+    {
+        items::HeldItemKinematicsInput anatomical;
+        anatomical.playerMountProfile = items::PlayerMountProfile::AnatomicalBody;
+        anatomical.cameraPitchRadians = pitch;
+        anatomical.interaction.heldLightKind = interactions::HeldLightKind::RewardLantern;
+        const auto pose = items::EvaluateHeldItemKinematics(anatomical);
+        const float vertical = -0.05f + pitch;
+        const float inverseLength = 1.0f / std::sqrt(1.0f + vertical * vertical);
+        const float bodyY = (pose.leftShoulderLocal[1] + vertical * pose.leftShoulderLocal[2]) * inverseLength;
+        const float bodyZ = (-vertical * pose.leftShoulderLocal[1] + pose.leftShoulderLocal[2]) * inverseLength;
+        if (!Require(Near(bodyY, -0.184f) && Near(bodyZ, -0.078f) &&
+                     Near(pose.leftShoulderLocal[0], -0.166f) &&
+                     pose.leftHandLocal[2] < 0.75f,
+                     "anatomical carry uses a bounded shared target and yaw-relative shoulders at every pitch")) return 1;
+    }
+
     for (int sample = 0; sample <= 24; ++sample)
     {
         const float amount = static_cast<float>(sample) / 24.0f;
@@ -376,9 +527,108 @@ int main()
                  "the +Z player rig must use a proper 180-degree rotation that keeps anatomical Left on gameplay left"))
         return 1;
     const PlayerRouteMasks proceduralMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Procedural);
+    unsigned viewmodelCheckpointCount = 0u;
+    for (const auto& checkpoint : horde::gameplay::kDevelopmentCheckpoints)
+    {
+        if (!checkpoint.name.starts_with("player-viewmodel-")) continue;
+        horde::gameplay::simulation::GameSimulation staged;
+        if (!Require(horde::gameplay::StageDevelopmentCheckpointSimulation(staged, checkpoint) &&
+                     std::abs(staged.Snapshot().playerPitchRadians - checkpoint.pitch) < 0.000001f,
+                     "viewmodel checkpoint pitch must match actual gameplay pose, not an out-of-range request")) return 1;
+        ++viewmodelCheckpointCount;
+        if (checkpoint.combatPose != DevelopmentCombatPose::Rest)
+        {
+            if (checkpoint.combatPose == DevelopmentCombatPose::ParryActive)
+            {
+                if (!Require(Near(staged.Snapshot().walkTime, 0.15f) &&
+                             Near(staged.Snapshot().playerCombat.actionTime, 0.11f) &&
+                             staged.Snapshot().playerCombat.action == PlayerCombatAction::ParryActive,
+                             "lantern parry capture must freeze a real fixed-step sample inside ParryActive")) return 1;
+            }
+            else
+            {
+                const bool upward = checkpoint.combatPose == DevelopmentCombatPose::UpwardSliceActive;
+                if (!Require(Near(staged.Snapshot().walkTime, upward ? 0.6167f : 0.5833f) &&
+                             Near(staged.Snapshot().playerCombat.actionTime, upward ? 0.1667f : 0.4033f),
+                             "Android capture timing must match the shared late-active attack checkpoint")) return 1;
+            }
+        }
+    }
+    if (!Require(viewmodelCheckpointCount == 11u, "all eleven viewmodel checkpoint pitches must be staged")) return 1;
+    const auto* lowParryCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(144);
+    horde::gameplay::simulation::GameSimulation stagedLowLanternParry;
+    horde::gameplay::DevelopmentCheckpointStageEvidence lowParryEvidence{};
+    if (!Require(lowParryCheckpoint != nullptr &&
+                 horde::gameplay::StageDevelopmentCheckpointSimulation(
+                     stagedLowLanternParry, *lowParryCheckpoint, &lowParryEvidence) &&
+                 stagedLowLanternParry.Snapshot().interaction.heldLightKind ==
+                     horde::gameplay::interactions::HeldLightKind::RewardLantern &&
+                 stagedLowLanternParry.Snapshot().interaction.heldLightPose ==
+                     horde::gameplay::interactions::HeldLightPose::Low &&
+                 stagedLowLanternParry.Snapshot().playerCombat.action == PlayerCombatAction::ParryActive &&
+                 Near(stagedLowLanternParry.Snapshot().playerCombat.actionTime, 0.11f) &&
+                 lowParryEvidence.consumedAttackEdges == 0u &&
+                 lowParryEvidence.consumedParryEdges == 1u &&
+                 lowParryEvidence.playerSwingEvents == 0u &&
+                 lowParryEvidence.playerParrySucceededEvents == 0u &&
+                 lowParryEvidence.playerDamagedEvents == 0u &&
+                 lowParryEvidence.playerKilledEvents == 0u &&
+                 lowParryEvidence.enemyHitEvents == 0u &&
+                 stagedLowLanternParry.Snapshot().playerVitals.vitality ==
+                     horde::gameplay::PlayerVitals::kMaxVitality &&
+                 stagedLowLanternParry.Events().Size() == 0u,
+                 "low-lantern parry capture must use one real parry edge and clear all feedback without hits")) return 1;
     const PlayerRouteMasks skinnedMasks = BuildPlayerRouteMasks(PlayerRenderRoute::Skinned);
     const PlayerRouteMasks hybridMasks =
         BuildPlayerRouteMasks(PlayerRenderRoute::HybridBlockPrimary);
+    const PlayerRouteMasks viewmodelMasks = BuildPlayerRouteMasks(PlayerRenderRoute::ModelledViewmodel);
+    const PlayerRouteMasks remainderMasks = BuildPlayerRouteMasks(PlayerRenderRoute::ModelledViewmodel, true);
+    const auto staticPlayerFlag = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    const auto remainderPlayerFlags = staticPlayerFlag |
+        static_cast<std::uint32_t>(RtInstanceFlag::BodyRemainderOnlyPrimary);
+    auto duplicateMasks = remainderMasks.instanceMasks;
+    duplicateMasks[10] = 0x04u;
+    auto fullBodyMasks = remainderMasks.instanceMasks;
+    fullBodyMasks[kPlayerWorldBodyInstanceIndex] |= 0x04u;
+    if (!Require(HasDedicatedPlayerPrimaryOwnership(viewmodelMasks.instanceMasks, staticPlayerFlag) &&
+                 HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, remainderPlayerFlags) &&
+                 !HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, staticPlayerFlag) &&
+                 !HasDedicatedPlayerPrimaryOwnership(viewmodelMasks.instanceMasks, remainderPlayerFlags) &&
+                 !HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, 0u) &&
+                 !HasDedicatedPlayerPrimaryOwnership(duplicateMasks, remainderPlayerFlags) &&
+                 !HasDedicatedPlayerPrimaryOwnership(fullBodyMasks, remainderPlayerFlags),
+                 "capture ownership rejects missing filters, full-body primary and duplicate procedural arms")) return 1;
+    if (!Require(remainderMasks.instanceMasks[kPlayerWorldBodyInstanceIndex] ==
+                     (0x10u | kPlayerBodyRemainderPrimaryMask) &&
+                 remainderMasks.instanceMasks[kPlayerViewmodelInstanceIndex] == kPlayerViewmodelPrimaryMask &&
+                 (kPlayerBodyRemainderPrimaryMask & (0x37u | kPlayerViewmodelPrimaryMask)) == 0u,
+                 "explicit body remainder has its own full-view primary bit and retains secondary visibility")) return 1;
+    for (std::size_t slot = 5u; slot <= 16u; ++slot)
+        if (!Require(remainderMasks.instanceMasks[slot] == 0u,
+                     "body remainder must not enable procedural or duplicate arm instances")) return 1;
+    const auto remainderVisibility = BuildProductionSceneVisibility(
+        {PlayerRenderRoute::ModelledViewmodel, false, false, false, true});
+    const auto remainderInspection = BuildProductionSceneVisibility(
+        {PlayerRenderRoute::ModelledViewmodel, false, true, false, true});
+    if (!Require(remainderVisibility.playerMask == (0x10u | kPlayerBodyRemainderPrimaryMask) &&
+                 remainderVisibility.playerPrimaryVisible && remainderVisibility.playerReflectionVisible &&
+                 remainderInspection.playerMask == 0u && !remainderInspection.playerPrimaryVisible &&
+                 BuildPlayerRouteMasks(PlayerRenderRoute::HybridBlockPrimary, true).instanceMasks ==
+                     hybridMasks.instanceMasks,
+                 "remainder availability affects only the requested modelled route and respects inspection isolation")) return 1;
+    if (!Require(viewmodelMasks.instanceMasks[kPlayerWorldBodyInstanceIndex] == 0x10u &&
+                 viewmodelMasks.instanceMasks[kPlayerViewmodelInstanceIndex] == kPlayerViewmodelPrimaryMask &&
+                 (kPlayerViewmodelPrimaryMask & 0x37u) == 0u,
+                 "dedicated viewmodel owns primary rays while world body owns secondary rays")) return 1;
+    for (std::size_t slot = 5u; slot <= 16u; ++slot)
+        if (!Require(viewmodelMasks.instanceMasks[slot] == 0u,
+                     "modelled route must disable every procedural player instance")) return 1;
+    const auto viewmodelVisibility = BuildProductionSceneVisibility(
+        {PlayerRenderRoute::ModelledViewmodel, false, false, false});
+    if (!Require(viewmodelVisibility.playerRoute == PlayerRenderRoute::ModelledViewmodel &&
+                 viewmodelVisibility.playerPrimaryVisible && viewmodelVisibility.playerReflectionVisible &&
+                 viewmodelVisibility.playerMask == 0x10u,
+                 "production props must not silently replace an explicit modelled viewmodel request")) return 1;
     if (!Require(proceduralMasks.instanceMasks[4] == 0x10u &&
                  proceduralMasks.instanceMasks[5] == 0x04u &&
                  proceduralMasks.instanceMasks[16] == 0x10u &&
@@ -454,13 +704,25 @@ int main()
         PlayerPrimitiveSemantic::Body,
         PlayerPrimitiveSemantic::Head,
         PlayerPrimitiveSemantic::NearFace,
+        PlayerPrimitiveSemantic::GauntletPrimaryVisible,
+        PlayerPrimitiveSemantic::BodyRemainderPrimaryVisible,
     });
     if (!Require(primitiveVisibility[0].primaryVisible &&
                  !primitiveVisibility[1].primaryVisible &&
                  !primitiveVisibility[2].primaryVisible &&
+                 primitiveVisibility[3].primaryVisible &&
+                 primitiveVisibility[3].shadowVisible &&
+                 primitiveVisibility[3].reflectionVisible &&
+                 primitiveVisibility[4].primaryVisible &&
+                 primitiveVisibility[4].shadowVisible &&
+                 primitiveVisibility[4].reflectionVisible &&
                  primitiveVisibility[1].shadowVisible &&
                  primitiveVisibility[2].reflectionVisible,
                  "material/primitive metadata must hide only head/near-face primary hits")) return 1;
+    const auto unknownVisibility = BuildPlayerPrimitiveVisibility({static_cast<PlayerPrimitiveSemantic>(255)});
+    if (!Require(!unknownVisibility[0].primaryVisible && !unknownVisibility[0].shadowVisible &&
+                 !unknownVisibility[0].reflectionVisible,
+                 "an invalid primitive semantic must not acquire implicit visibility")) return 1;
 
     const PlayerSocketPlan sockets = EvaluatePlayerSocketPlan(authoritative.playerAnimation);
     if (!Require(sockets.leftErrorMetres <= kPlayerGripSocketToleranceMetres &&

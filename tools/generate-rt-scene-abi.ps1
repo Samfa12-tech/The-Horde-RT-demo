@@ -17,13 +17,20 @@ function Normalize-Newlines([string]$text) { return $text.Replace("`r`n", "`n").
 $definition = Get-Content -LiteralPath $DefinitionPath -Raw | ConvertFrom-Json
 if ($definition.schema -ne 1) { throw "RT scene ABI definition schema must be 1." }
 $normalizedDefinition = Normalize-Newlines ([IO.File]::ReadAllText($DefinitionPath))
-$hash = [Convert]::ToHexString(
-    [Security.Cryptography.SHA256]::HashData(
-        [Text.Encoding]::UTF8.GetBytes($normalizedDefinition))).ToLowerInvariant()
+$sha256 = [Security.Cryptography.SHA256]::Create()
+try {
+    $hash = ([BitConverter]::ToString(
+        $sha256.ComputeHash([Text.Encoding]::UTF8.GetBytes($normalizedDefinition)))).Replace('-', '').ToLowerInvariant()
+}
+finally {
+    $sha256.Dispose()
+}
 $c = $definition.capacities
 $b = $definition.bindings
 $i = $definition.instanceFlags
 $m = $definition.materialFlags
+$g = $definition.geometryRoles
+$p = $definition.playerInstances
 $records = @($definition.records)
 if ($records.Count -eq 0) { throw "RT scene ABI definition must declare record layouts." }
 
@@ -61,6 +68,7 @@ $cpuRecords = @($records | ForEach-Object {
     $record = $_
     $fieldLines = @($record.fields | ForEach-Object {
         $info = $typeInfo[[string]$_.type]
+        if ($_.comment) { "    // $($_.comment)" }
         "    $($info.Cpu) $($_.name)$($info.Initializer)"
     }) -join "`n"
     $offsetAssertions = @($record.fields | ForEach-Object {
@@ -81,6 +89,7 @@ $glslRecords = @($records | ForEach-Object {
     $record = $_
     $fieldLines = @($record.fields | ForEach-Object {
         $info = $typeInfo[[string]$_.type]
+        if ($_.comment) { "    // $($_.comment)" }
         "    $($info.Glsl) $($_.name);"
     }) -join "`n"
 @"
@@ -124,12 +133,29 @@ inline constexpr std::uint32_t kRtBindingEmissiveTextures = $($b.emissiveTexture
 inline constexpr std::uint32_t kRtBindingHeldLight = $($b.heldLight)u;
 inline constexpr std::uint32_t kRtBindingFireEmitters = $($b.fireEmitters)u;
 inline constexpr std::uint32_t kRtBindingDielectricDiagnostics = $($b.dielectricDiagnostics)u;
+inline constexpr std::uint32_t kRtBindingWorldPlayerVertices = $($b.worldPlayerVertices)u;
+inline constexpr std::uint32_t kRtBindingViewmodelVertices = $($b.viewmodelVertices)u;
+
+enum class RtGeometryRole : std::uint32_t
+{
+    Static = $($g.static)u,
+    PlayerWorldBody = $($g.playerWorldBody)u,
+    PlayerViewmodel = $($g.playerViewmodel)u,
+};
+inline constexpr std::uint32_t kPlayerWorldBodyInstanceIndex = $($p.worldBody)u;
+inline constexpr std::uint32_t kPlayerViewmodelInstanceIndex = $($p.viewmodel)u;
+inline constexpr std::uint8_t kPlayerViewmodelPrimaryMask = $($p.viewmodelPrimaryMask)u;
+inline constexpr std::uint8_t kPlayerBodyRemainderPrimaryMask = $($p.bodyRemainderPrimaryMask)u;
+static_assert(kPlayerWorldBodyInstanceIndex < kRtInstanceMetadataCapacity);
+static_assert(kPlayerViewmodelInstanceIndex < kRtInstanceMetadataCapacity);
+static_assert(kPlayerWorldBodyInstanceIndex != kPlayerViewmodelInstanceIndex);
 
 enum class RtInstanceFlag : std::uint32_t
 {
     StaticPbr = $($i.staticPbr)u,
     Emissive = $($i.emissive)u,
     Transmissive = $($i.transmissive)u,
+    BodyRemainderOnlyPrimary = $($i.bodyRemainderOnlyPrimary)u,
 };
 
 enum class RtMaterialFlag : std::uint32_t
@@ -145,6 +171,8 @@ enum class RtMaterialFlag : std::uint32_t
     NearFacePrimaryMasked = $($m.nearFacePrimaryMasked)u,
     ThinWall = $($m.thinWall)u,
     CertifiedClosedVolume = $($m.certifiedClosedVolume)u,
+    CertifiedRectangularVolume = $($m.certifiedRectangularVolume)u,
+    BodyRemainderPrimaryVisible = $($m.bodyRemainderPrimaryVisible)u,
 };
 
 $cpuRecords
@@ -161,10 +189,16 @@ const uint kRtMaterialCapacity = $($c.materials)u;
 const uint kRtTextureLayerCapacity = $($c.textureLayers)u;
 const uint kRtFireEmitterCapacity = $($c.fireEmitters)u;
 const uint kRtActiveFireEmitterCapacity = $($c.activeFireEmitters)u;
+const uint kRtGeometryRoleStatic = $($g.static)u;
+const uint kRtGeometryRolePlayerWorldBody = $($g.playerWorldBody)u;
+const uint kRtGeometryRolePlayerViewmodel = $($g.playerViewmodel)u;
+const uint kPlayerViewmodelPrimaryMask = $($p.viewmodelPrimaryMask)u;
+const uint kPlayerBodyRemainderPrimaryMask = $($p.bodyRemainderPrimaryMask)u;
 
 const uint kRtInstanceFlagStaticPbr = $($i.staticPbr)u;
 const uint kRtInstanceFlagEmissive = $($i.emissive)u;
 const uint kRtInstanceFlagTransmissive = $($i.transmissive)u;
+const uint kRtInstanceFlagBodyRemainderOnlyPrimary = $($i.bodyRemainderOnlyPrimary)u;
 const uint kRtMaterialFlagDoubleSided = $($m.doubleSided)u;
 const uint kRtMaterialFlagAlpha = $($m.alpha)u;
 const uint kRtMaterialFlagTransmission = $($m.transmission)u;
@@ -176,6 +210,8 @@ const uint kRtMaterialFlagHeadPrimaryMasked = $($m.headPrimaryMasked)u;
 const uint kRtMaterialFlagNearFacePrimaryMasked = $($m.nearFacePrimaryMasked)u;
 const uint kRtMaterialFlagThinWall = $($m.thinWall)u;
 const uint kRtMaterialFlagCertifiedClosedVolume = $($m.certifiedClosedVolume)u;
+const uint kRtMaterialFlagCertifiedRectangularVolume = $($m.certifiedRectangularVolume)u;
+const uint kRtMaterialFlagBodyRemainderPrimaryVisible = $($m.bodyRemainderPrimaryVisible)u;
 
 $glslRecords
 layout(std430, set = 0, binding = $($b.instanceMetadata)) readonly buffer RtInstanceMetadataBuffer
@@ -194,6 +230,14 @@ layout(std430, set = 0, binding = $($b.staticVertices)) readonly buffer RtStatic
 {
     StaticRtVertex values[];
 } rtStaticVertices;
+layout(std430, set = 0, binding = $($b.worldPlayerVertices)) readonly buffer RtWorldPlayerVertexBuffer
+{
+    StaticRtVertex values[];
+} rtWorldPlayerVertices;
+layout(std430, set = 0, binding = $($b.viewmodelVertices)) readonly buffer RtViewmodelVertexBuffer
+{
+    StaticRtVertex values[];
+} rtViewmodelVertices;
 layout(std430, set = 0, binding = $($b.staticIndices)) readonly buffer RtStaticIndexBuffer
 {
     uint values[];
@@ -210,10 +254,12 @@ layout(std430, set = 0, binding = $($b.fireEmitters)) readonly buffer RtFireEmit
 {
     RtFireEmitterGpu values[$($c.fireEmitters)];
 } rtFireEmitters;
+#if !defined(HORDE_RT_VARIANT_INSTRUMENTATION) || HORDE_RT_VARIANT_INSTRUMENTATION == 1
 layout(std430, set = 0, binding = $($b.dielectricDiagnostics)) restrict buffer RtDielectricDiagnosticsBuffer
 {
     RtDielectricDiagnostics value;
 } rtDielectricDiagnostics;
+#endif
 "@
 
 function Publish-OrCheck([string]$path, [string]$content) {

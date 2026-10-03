@@ -1,0 +1,62 @@
+{
+  "results": [
+    {
+      "cue": "A",
+      "removed": [
+        {
+          "trackIndex": 2,
+          "step": 15,
+          "degree": 9,
+          "midi": 69,
+          "time": 2.8525,
+          "duration": 8.4525,
+          "instrument": "mellow_sax"
+        }
+      ],
+      "remainingEventsExact": true,
+      "metrics": {
+        "peak": 0.3966614305973053,
+        "bodyPeak": 0.3966614305973053,
+        "tailPeak": 0.000427456310717389,
+        "finiteSamples": 1443840,
+        "nonFiniteSamples": 0,
+        "clippedSamplesAtPcm16Ceiling": 0,
+        "totalSamples": 1443840,
+        "bodyRms": 0.017326440950284867,
+        "tailRms": 0.00003243819193158611,
+        "seamMaxAbsDifference": 0.0003982346097473055
+      }
+    },
+    {
+      "cue": "D",
+      "removed": [
+        {
+          "trackIndex": 2,
+          "step": 15,
+          "degree": 2,
+          "midi": 62,
+          "time": 2.8525,
+          "duration": 8.4525,
+          "instrument": "mellow_sax"
+        }
+      ],
+      "remainingEventsExact": true,
+      "metrics": {
+        "peak": 0.1558307409286499,
+        "bodyPeak": 0.1558307409286499,
+        "tailPeak": 0.0007607089937664568,
+        "finiteSamples": 1443840,
+        "nonFiniteSamples": 0,
+        "clippedSamplesAtPcm16Ceiling": 0,
+        "totalSamples": 1443840,
+        "bodyRms": 0.013020030860383497,
+        "tailRms": 0.00008590523277698485,
+        "seamMaxAbsDifference": 0.0005979878478683531
+      }
+    }
+  ],
+  "status": "PASS source/event/PCM; packaged listening pending",
+  "manifestSha256": "672f2321b2fb429cffe9d61119103a1aa3565f355391a162497f741eec9d6e29",
+  "unchangedWavs": 12,
+  "pcmBytes": 20160000
+}

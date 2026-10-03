@@ -1,0 +1,271 @@
+{
+  "schema": 1,
+  "scope": "Non-runtime instrumentation audition; no bank replacement or acoustic/listening acceptance.",
+  "rights": "Owner-supplied; authorised for Horde use only",
+  "records": [
+    {
+      "path": "source-variants.json",
+      "bytes": 1660,
+      "sha256": "364c184f57db323d5e1cde618e4458564b34351f6df0d5053c802c1038492ea0"
+    },
+    {
+      "path": "source-variants-owner-combo.json",
+      "bytes": 858,
+      "sha256": "3019b5c5be9a8334da715dadbf921fd50a6c65da7bfe571d1faa3c60c259da38"
+    },
+    {
+      "path": "sources/whistle/What_the_Dark_Keeps_Pocket_Chordsmith.json",
+      "bytes": 158665,
+      "sha256": "20cfe4eefb58b58207a3f1e008544fc461c57bbf80d3d3974fc8574d4440c4f7"
+    },
+    {
+      "path": "sources/whistle/What_the_Dark_Keeps_PCS1.txt",
+      "bytes": 93901,
+      "sha256": "a6a9a07e2b0faaa000b93563488e9421f1f07f1189accf8f49265d2f378929d8"
+    },
+    {
+      "path": "audio/whistle/A-loop.wav",
+      "bytes": 2304044,
+      "sha256": "a58cacd493bd4604cf1d51096cf03092e35c993a079c10af7fcec3debc093277"
+    },
+    {
+      "path": "audio/whistle/A-tail.wav",
+      "bytes": 576044,
+      "sha256": "4fea7b227dee6b81f09fd54f202bfea33a76a2419fa07c1ec37a0d2f8d14e4e1"
+    },
+    {
+      "path": "audio/whistle/E-loop.wav",
+      "bytes": 2304044,
+      "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03"
+    },
+    {
+      "path": "audio/whistle/E-tail.wav",
+      "bytes": 576044,
+      "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2"
+    },
+    {
+      "path": "receipts/whistle.json.gz",
+      "bytes": 45231,
+      "sha256": "e2f8ace4acd3f1de1c58e5e1599a8b26e12ac014a9a4ff2cc2d23d82c34f2fe1",
+      "originalBytes": 2039926,
+      "originalSha256": "119b966c977cb3f46e4b8f293c9e15d927e38373c96ca5f7cbe0fd8d7b903dfd"
+    },
+    {
+      "path": "receipts/whistle-wrapper.json",
+      "bytes": 655,
+      "sha256": "e5e7e1ecbf759d8e3f034caa1e2c81cee386295379c7034fd754a8e6ab7fd8f1"
+    },
+    {
+      "path": "sources/reed/What_the_Dark_Keeps_Pocket_Chordsmith.json",
+      "bytes": 158657,
+      "sha256": "433e64bf02d8ad858ea2f2a3b348f5028ac926a600450c4c8d4c1857ba1797d1"
+    },
+    {
+      "path": "sources/reed/What_the_Dark_Keeps_PCS1.txt",
+      "bytes": 93890,
+      "sha256": "57bbad475c96309a0ef91df03a93554e46b93238647b6d8390686449be39d17e"
+    },
+    {
+      "path": "audio/reed/A-loop.wav",
+      "bytes": 2304044,
+      "sha256": "b11791a5c1052910b537e7d95331623500ad208f37c478e455c5c555f0af05fa"
+    },
+    {
+      "path": "audio/reed/A-tail.wav",
+      "bytes": 576044,
+      "sha256": "220aa61ac377fe82558a61f51f5bf12343426dba1a7909c67e535e7bcc62b30a"
+    },
+    {
+      "path": "audio/reed/E-loop.wav",
+      "bytes": 2304044,
+      "sha256": "f3d22139c9231ca3e958b3a486c19013e8754f907dac5aa4c2eb915d8092e678"
+    },
+    {
+      "path": "audio/reed/E-tail.wav",
+      "bytes": 576044,
+      "sha256": "0f0f287e93c2160695b5c1b7f6ecd053ab3075af6a8ae8228ade43f57b77c1b5"
+    },
+    {
+      "path": "receipts/reed.json.gz",
+      "bytes": 45027,
+      "sha256": "ee06db5730040ac2a1764f4a4f35192c7005b51dcdf34655060155bd747a17c2",
+      "originalBytes": 2039235,
+      "originalSha256": "add58e84e32faebbf8d229fe9f2180136f3df40ec470c4208a4c0d284bfbfa93"
+    },
+    {
+      "path": "receipts/reed-wrapper.json",
+      "bytes": 649,
+      "sha256": "c60504038b5979cf6cff7a1c6fe311d9fb48b11d7eea5e5986a69a9c9556c56e"
+    },
+    {
+      "path": "sources/owner-combo/What_the_Dark_Keeps_Pocket_Chordsmith.json",
+      "bytes": 158666,
+      "sha256": "5f5f59d02613c6093c4a62e46461445fa3f9b68bc3b4fe716dc716465af24120"
+    },
+    {
+      "path": "sources/owner-combo/What_the_Dark_Keeps_PCS1.txt",
+      "bytes": 93902,
+      "sha256": "78542874563715c63614d2137f90429a4a7e8eff2355836305b4d7bfa5b49c36"
+    },
+    {
+      "path": "audio/owner-combo/A-loop.wav",
+      "bytes": 2304044,
+      "sha256": "a68ff774581481161993a9b485931a702bb3daa1dc09d3d74e4c6e2bb8794ae1"
+    },
+    {
+      "path": "audio/owner-combo/A-tail.wav",
+      "bytes": 576044,
+      "sha256": "788dc872b7131fb8a6ed2f16c7972525046f4c597c28b85951d32e066ccc5333"
+    },
+    {
+      "path": "audio/owner-combo/E-loop.wav",
+      "bytes": 2304044,
+      "sha256": "b69bf129779543aed417311b09222639c64c4157e9a41415db6a6cfabdd2e33f"
+    },
+    {
+      "path": "audio/owner-combo/E-tail.wav",
+      "bytes": 576044,
+      "sha256": "20ae38936ffd6e96f8661d862d0a60099b723017e7a1ac84b42a9fdb42e42112"
+    },
+    {
+      "path": "receipts/owner-combo.json.gz",
+      "bytes": 45059,
+      "sha256": "140b07f86d491814b8354eee7add25ce67961dedeea4f64f43725deb61c2081b",
+      "originalBytes": 2039338,
+      "originalSha256": "6e5eacbb9893f23a48f24704fedbca81f9e2f6a3e32f5b2865a9785fc8e065ef"
+    },
+    {
+      "path": "receipts/owner-combo-wrapper.json",
+      "bytes": 663,
+      "sha256": "d030a60374479ffae1ec665a2639c4e659e26e85ae1f5900b3a87ede58a64f89"
+    },
+    {
+      "path": "receipts/reference-repeat.json.gz",
+      "bytes": 44901,
+      "sha256": "5943732decd6dfc317ab89e41909c272fb8d0a8c0c49d30b9837101293b2e229",
+      "originalBytes": 2037793,
+      "originalSha256": "6f847095bae895a4be9732a3713a40c1d83d8bfa27b9fe9697dd2a4d97f95603"
+    },
+    {
+      "path": "receipts/reference-repeat-wrapper.json",
+      "bytes": 659,
+      "sha256": "dbe5ca94a1583674a3d0fc73bb3c429cb559fe7cfbefed359b2a0eddde1d0599"
+    },
+    {
+      "path": "verification/initial.json",
+      "bytes": 19440,
+      "sha256": "fd66278a1bc10283c779519c7f2e37d15fa4593241aaf7819153c1f9485f2de3"
+    },
+    {
+      "path": "verification/owner-combo.json",
+      "bytes": 13167,
+      "sha256": "6e3841c4f66e77464053e8419599a9f14890099652003d8c368aa2d2e3c2dbac"
+    },
+    {
+      "path": "verification/initial-transition-supplement.json",
+      "bytes": 18325,
+      "sha256": "da0cb63acd0236a8ac122b36d05b23a254161e68ac5733e808bfe3b6a1e73911"
+    },
+    {
+      "path": "verification/owner-combo-transition-supplement.json",
+      "bytes": 12282,
+      "sha256": "9aecc5ef6105c3b02aaa8d11578e38d62332f350d3eb8dbb39e5cb1afc14008c"
+    },
+    {
+      "path": "verification/combat.json",
+      "bytes": 8462,
+      "sha256": "770a97e8dd104b83243d700c39b7dc0718b889b7b3b222bf1f2e44ea5ff3b6a6"
+    },
+    {
+      "path": "previews/owner-combo.wav",
+      "bytes": 9504044,
+      "sha256": "c7689aaacd06ea83a0f0861d374ddc1def5a2390264eadffcf1ae6af2ca81e24"
+    },
+    {
+      "path": "previews/whistle-lead.wav",
+      "bytes": 9504044,
+      "sha256": "8f80dc576b94899be56a6e63dccbaed93660db91e586fb86830b5329a79f4d4c"
+    },
+    {
+      "path": "previews/owner-combo-combat.wav",
+      "bytes": 2304044,
+      "sha256": "b8c31bbde797762549160bf0b80b950410f185a596dd265c0bff7a6d47ea981d"
+    },
+    {
+      "path": "logs/reference-render.log",
+      "bytes": 2159,
+      "sha256": "897e376de87673d74bca13f4276a81abd100bad63e0ede9897c72ef796afcc0d"
+    },
+    {
+      "path": "logs/whistle-render.log",
+      "bytes": 2154,
+      "sha256": "63f61c1d3b6a8846de0d8c1125389985fd3593925aa2c2535f24c2302183cf86"
+    },
+    {
+      "path": "logs/reed-render.log",
+      "bytes": 2148,
+      "sha256": "45f7da443ee47e4491778160d77cbb68342b55082b87b3a9a70bf809e51ecf39"
+    },
+    {
+      "path": "logs/owner-combo-render.log",
+      "bytes": 2156,
+      "sha256": "827bf8ee4db192c25e360029a1ec9d15572ab5499e219d0de5e1ea2ad4c818ae"
+    },
+    {
+      "path": "logs/verification.log",
+      "bytes": 4951,
+      "sha256": "fe3dad9055a1053bee4a78654dedbd0b6926c95e5265f66ae1c434ad42b20def"
+    },
+    {
+      "path": "logs/owner-combo-verification.log",
+      "bytes": 3222,
+      "sha256": "dad1a32de2e4f5a57e3fbffcdd380b126dde18e7fc80ea6d7f53348dd26d9cd0"
+    },
+    {
+      "path": "logs/initial-transition-supplement.log",
+      "bytes": 173,
+      "sha256": "5faca418a0db2abba47530a5b1a7fdf70d69571a9d3dc01c4259eb3121d82940"
+    },
+    {
+      "path": "logs/owner-combo-transition-supplement.log",
+      "bytes": 172,
+      "sha256": "e3c1249f1ab142483296822d6c78b24c8862f61274e621958a4e74bdc904a9d4"
+    },
+    {
+      "path": "logs/combat-verification.log",
+      "bytes": 8192,
+      "sha256": "80aad2a3de3113f1caed6fba5ff8c68ececbf880341356b9170b28a5d7757499"
+    },
+    {
+      "path": "../../../tools/music-instrumentation-audition.cjs",
+      "bytes": 7830,
+      "sha256": "75c53d07a372ffff282206011103bd12c345b98b0a00bc6e3565b69db827466e",
+      "referenceOnly": true
+    },
+    {
+      "path": "../../../tools/verify-music-instrumentation-audition.cjs",
+      "bytes": 15264,
+      "sha256": "68791ab20fd8a6f79dfa57b8de25963d66b75c4d63cf9edc190611070c1681c9",
+      "referenceOnly": true
+    },
+    {
+      "path": "../../../tools/music-instrumentation-combat-check.cjs",
+      "bytes": 4554,
+      "sha256": "b5c481a9c724e28915159fe23ca92be8b9a44ebcf46592fc0af8e6d749c3ed27",
+      "referenceOnly": true
+    },
+    {
+      "path": "../../../tools/archive-music-instrumentation-audition.cjs",
+      "bytes": 4449,
+      "sha256": "602fb39935e4edb60afaebc043197dd8d8470260beafc497b01bf1ce58790dc6",
+      "referenceOnly": true
+    }
+  ],
+  "retainedReference": "Existing assets/audio/music/what-the-dark-keeps/runtime/A,E body/tail; current bank remains unchanged.",
+  "renderer": {
+    "sourceCommit": "2b87d7b1",
+    "htmlSha256": "b266814fff749bd4d7be9d8725e4d7becc2d944122bc2a302602457fa9b6e2cf",
+    "route": "actual app voices and live FX via retained adapter; app code not vendored"
+  },
+  "note": "Reed comparison and intermediate matched pieces remain external; its source/body/tail, receipt and completed checks are archived. Earlier transition figures superseded only by named supplements."
+}

@@ -1,0 +1,75 @@
+Starting a Gradle Daemon, 1 incompatible Daemon could not be reused, use --status for details
+> Task :app:verifyMusicRuntimeAssets
+> Task :app:prepareRuntimeAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preBenchmarkBuild UP-TO-DATE
+> Task :app:generateBenchmarkBuildConfig
+> Task :app:javaPreCompileBenchmark
+> Task :app:checkBenchmarkAarMetadata
+> Task :app:generateBenchmarkResValues
+> Task :app:mapBenchmarkSourceSetPaths
+> Task :app:generateBenchmarkResources
+> Task :app:createBenchmarkCompatibleScreenManifests
+> Task :app:extractDeepLinksBenchmark
+> Task :app:processBenchmarkMainManifest
+> Task :app:mergeBenchmarkResources
+> Task :app:processBenchmarkManifest
+> Task :app:extractProguardFiles
+
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+[CXX5304] This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+[CXX5304] This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :app:buildCMakeRelWithDebInfo[armeabi-v7a]
+> Task :app:configureCMakeRelWithDebInfo[x86]
+> Task :app:buildCMakeRelWithDebInfo[x86]
+> Task :app:configureCMakeRelWithDebInfo[x86_64]
+> Task :app:buildCMakeRelWithDebInfo[x86_64]
+> Task :app:mergeBenchmarkJniLibFolders
+> Task :app:mergeBenchmarkArtProfile
+> Task :app:desugarBenchmarkFileDependencies
+> Task :app:processBenchmarkManifestForPackage
+> Task :app:checkBenchmarkDuplicateClasses
+> Task :app:mergeBenchmarkStartupProfile
+> Task :app:mergeBenchmarkShaders
+> Task :app:compileBenchmarkShaders NO-SOURCE
+> Task :app:generateBenchmarkAssets UP-TO-DATE
+> Task :app:mergeExtDexBenchmark
+> Task :app:mergeBenchmarkNativeLibs
+> Task :app:processBenchmarkResources
+> Task :app:mergeBenchmarkAssets
+
+> Task :app:compileBenchmarkJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:generateBenchmarkLintVitalReportModel
+> Task :app:stripBenchmarkDebugSymbols
+> Task :app:dexBuilderBenchmark
+> Task :app:mergeBenchmarkGlobalSynthetics
+> Task :app:extractBenchmarkVersionControlInfo
+> Task :app:processBenchmarkJavaRes NO-SOURCE
+> Task :app:extractBenchmarkNativeSymbolTables
+> Task :app:mergeDexBenchmark
+> Task :app:collectBenchmarkDependencies
+> Task :app:mergeBenchmarkJavaResource
+> Task :app:compileBenchmarkArtProfile
+> Task :app:sdkBenchmarkDependencyData
+> Task :app:validateSigningBenchmark
+> Task :app:writeBenchmarkAppMetadata
+> Task :app:writeBenchmarkSigningConfigVersions
+> Task :app:optimizeBenchmarkResources
+> Task :app:compressBenchmarkAssets
+> Task :app:mergeBenchmarkNativeDebugMetadata
+> Task :app:packageBenchmark
+> Task :app:createBenchmarkApkListingFileRedirect
+> Task :app:lintVitalAnalyzeBenchmark
+> Task :app:lintVitalReportBenchmark
+> Task :app:lintVitalBenchmark
+> Task :app:assembleBenchmark
+[Incubating] Problems report is available at: file:///C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the%20Horde%20RT%20Demo/android/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 18s
+56 actionable tasks: 55 executed, 1 up-to-date

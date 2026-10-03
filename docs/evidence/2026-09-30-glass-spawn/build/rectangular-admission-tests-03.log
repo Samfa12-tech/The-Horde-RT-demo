@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-phase3-native-20260923
+Test project C:/Dev/tmp/horde-phase3-native-20260923
+    Start 32: horde_rt_scene_abi_tests
+1/4 Test #32: horde_rt_scene_abi_tests ...............   Passed    0.02 sec
+    Start 33: horde_rt_static_gltf_asset_tests
+2/4 Test #33: horde_rt_static_gltf_asset_tests .......   Passed    0.17 sec
+    Start 34: horde_rt_production_prop_asset_tests
+3/4 Test #34: horde_rt_production_prop_asset_tests ...   Passed    0.49 sec
+    Start 35: horde_rt_scene_abi_generator_tests
+4/4 Test #35: horde_rt_scene_abi_generator_tests .....   Passed    1.20 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   1.88 sec

@@ -1,0 +1,7 @@
+Exception: C:\Dev\tmp\horde-opaque-retained-profile-20260930\source-eaf\tools\InspectRtPipelineBundleContainment.ps1:21
+Line |
+  21 |      if (-not $condition) { throw $message }
+     |                             ~~~~~~~~~~~~~~
+     | RayQuery compute row lost policy parity: rayquery_compute_diagnostic_mobile_opaque_fast
+
+

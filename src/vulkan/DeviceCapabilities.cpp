@@ -3,6 +3,11 @@
 namespace horde::vulkan
 {
 
+std::string FormatDriverVersionText(const std::uint32_t rawVersion)
+{
+    return "raw " + std::to_string(rawVersion) + " (vendor-specific)";
+}
+
 std::string ToString(const RtMode mode)
 {
     switch (mode)
@@ -15,6 +20,29 @@ std::string ToString(const RtMode mode)
     default:
         return "Unsupported";
     }
+}
+
+std::string ToString(const RtExecutionBackend backend)
+{
+    switch (backend)
+    {
+    case RtExecutionBackend::RayTracingPipeline:
+        return "RayTracingPipeline";
+    case RtExecutionBackend::RayQueryCompute:
+        return "RayQueryCompute";
+    case RtExecutionBackend::Unsupported:
+    default:
+        return "Unsupported";
+    }
+}
+
+void BeginRtBackendSelection(RtSceneSnapshot& scene, const RtExecutionBackend backend)
+{
+    scene = {};
+    scene.executionBackend = backend;
+    scene.status = backend == RtExecutionBackend::Unsupported
+        ? "No supported execution backend selected"
+        : "Execution backend selected; presentation pending";
 }
 
 } // namespace horde::vulkan

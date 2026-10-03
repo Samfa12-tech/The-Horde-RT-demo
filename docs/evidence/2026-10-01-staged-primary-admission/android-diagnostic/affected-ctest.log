@@ -1,0 +1,16 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-staged-rt-20261001/build-control
+Test project C:/Dev/tmp/horde-staged-rt-20261001/build-control
+    Start 43: horde_rt_android_staged_admission_tests
+1/2 Test #43: horde_rt_android_staged_admission_tests ...   Passed    1.32 sec
+    Start 87: horde_rt_character_render_slot_smoke
+2/2 Test #87: horde_rt_character_render_slot_smoke ......***Failed    4.31 sec
+FAIL: Android RT Lab must preserve progress through settings reset and expose a live paused 48dp panel
+
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =   5.66 sec
+
+The following tests FAILED:
+	 87 - horde_rt_character_render_slot_smoke (Failed)
+Errors while running CTest

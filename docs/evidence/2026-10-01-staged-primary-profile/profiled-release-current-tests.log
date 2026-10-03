@@ -1,0 +1,18 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-staged-rt-20261001/build-shipping-profiled
+Test project C:/Dev/tmp/horde-staged-rt-20261001/build-shipping-profiled
+    Start  5: horde_rt_staged_primary_contract_tests
+1/6 Test  #5: horde_rt_staged_primary_contract_tests ......   Passed    0.93 sec
+    Start 70: horde_rt_staged_primary_timing_tests
+2/6 Test #70: horde_rt_staged_primary_timing_tests ........   Passed    0.95 sec
+    Start 71: horde_rt_staged_primary_resource_tests
+3/6 Test #71: horde_rt_staged_primary_resource_tests ......   Passed    0.94 sec
+    Start 72: horde_rt_gpu_frame_timer_collection_tests
+4/6 Test #72: horde_rt_gpu_frame_timer_collection_tests ...   Passed    1.04 sec
+    Start 76: horde_rt_scene_initialise_preflight_tests
+5/6 Test #76: horde_rt_scene_initialise_preflight_tests ...   Passed    1.09 sec
+    Start 77: horde_rt_scene_resource_inventory_tests
+6/6 Test #77: horde_rt_scene_resource_inventory_tests .....   Passed    1.11 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =   6.08 sec

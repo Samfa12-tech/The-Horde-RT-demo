@@ -16,6 +16,8 @@
 namespace horde::vulkan::raytracing
 {
 
+struct RtSceneRecordObservation;
+
 enum class CharacterBlasRefit
 {
     None = 0u,
@@ -91,7 +93,8 @@ public:
                       const horde::gameplay::EnemyRosterSnapshot& roster,
                       const horde::gameplay::LichSnapshot& lich,
                       const RtGpuResources& resources,
-                      std::string& diagnostic);
+                      std::string& diagnostic,
+                      RtSceneRecordObservation* observation = nullptr);
 
     std::array<VkAccelerationStructureInstanceKHR, kMaximumActiveSkeletons> BuildActiveInstances() const;
     std::array<float, 3u> LichStaffWorldPosition(const horde::gameplay::LichSnapshot& lich) const;
@@ -110,6 +113,9 @@ public:
     const std::array<float, 3u>& LichStaffLocalSample() const { return lichStaffLocalSample_; }
     float SkeletonDeadClipDuration() const { return skeletonDeadClipDuration_; }
     std::size_t SkeletonPoseBucketCount() const { return skeletonPoseBucketCount_; }
+
+    void AccumulateResourceInventory(
+        horde::telemetry::RtResourceInventory& inventory) const noexcept;
 
     void DestroyGpuResources(const RtGpuResources& resources);
 

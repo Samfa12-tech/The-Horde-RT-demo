@@ -1,0 +1,27 @@
+CMake is re-running because C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/CMakeFiles/generate.stamp is out-of-date.
+  the file 'C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt'
+  is newer than 'C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+Generated RT catalog adapter is current.
+-- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+-- Vulkan SDK found: 1.4.350
+-- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+-- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+-- Configuring done (12.4s)
+-- Generating done (0.5s)
+-- Build files have been written to: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  horde_gameplay_simulation.vcxproj -> C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\Debug\horde_gameplay_simulation.lib
+  Building Custom Rule C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/CMakeLists.txt
+  WindowsMusicPlayback.cpp
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src\platform\windows\WindowsMusicPlayback.cpp(490,48): error C2589: '(': illegal token on right side of '::' [C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\horde_windows_music.vcxproj]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src\platform\windows\WindowsMusicPlayback.cpp(491,87): error C2059: syntax error: ')' [C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\horde_windows_music.vcxproj]
+C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src\platform\windows\WindowsMusicPlayback.cpp(620,23): error C2248: 'horde::platform::windows::WindowsMusicPlayback::Impl::Stop': cannot access private member declared in class 'horde::platform::windows::WindowsMusicPlayback::Impl' [C:\Dev\tmp\horde-pocket-audio-core-native-20261001\horde-build\horde_windows_music.vcxproj]
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src\platform\windows\WindowsMusicPlayback.cpp(194,10):
+      see declaration of 'horde::platform::windows::WindowsMusicPlayback::Impl::Stop'
+      C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.6.1-engineering-pass\src\platform\windows\WindowsMusicPlayback.cpp(37,29):
+      see declaration of 'horde::platform::windows::WindowsMusicPlayback::Impl'
+  

@@ -1,0 +1,73 @@
+{
+  "analysis": "Post-build diagnostic ledger and frozen-image evidence only; not acceptance or performance evidence.",
+  "counterABI": {
+    "header": "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/src/vulkan/raytracing/RtSceneAbi.generated.h",
+    "counterFields": 41,
+    "method": "analyze-live.py analyze_report; in-memory window limit raised to retain every nonzero failure/recovery window. Window pairs are inclusive measured-row indices; simulationTick = index + 603 for these reports."
+  },
+  "runs": [
+    {
+      "label": "Windows-RayTracingPipeline",
+      "source": "C:/Dev/tmp/horde-glass-live-20260930/rectangular-spawn-high-live-pipeline/HordeLanternRT-benchmark-20260930-022215.json",
+      "sha256": "c3a891612b0d478540dd42b11479ab221687a8cd8fe34f35c447d3ba8fbe70f8",
+      "timestampUtc": "2026-09-30T02:22:15Z",
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "ledger": {"expected":600,"completed":600,"rejected":0,"cancelled":0,"cpuAccepted":600,"gpuValid":600,"validCounterRows":600,"identityMismatches":0,"submittedEqualsCompleted":true,"submissionSerialStrict":true,"completionSerialStrict":true,"firstTick":603,"lastTick":1202,"validationErrors":[]},
+      "nonzeroFailureAndRecovery": {
+        "transportOverflowCount":{"frames":3,"sum":4,"max":2,"maxWitness":[237,840,2],"windows":[[43,43],[237,237],[454,454]]},
+        "productionPaneStackFailureCount":{"frames":3,"sum":4,"max":2,"maxWitness":[237,840,2],"windows":[[43,43],[237,237],[454,454]]},
+        "primaryMismatchedExitCount":{"frames":1,"sum":1,"max":1,"maxWitness":[43,646,1],"windows":[[43,43]]},
+        "primaryVolumeBudgetCount":{"frames":2,"sum":3,"max":2,"maxWitness":[237,840,2],"windows":[[237,237],[454,454]]},
+        "primaryCertifiedClosedVolumeRecoveryCount":{"frames":6,"sum":7,"max":2,"maxWitness":[237,840,2],"windows":[[7,7],[31,31],[237,237],[273,273],[366,366],[454,454]]}
+      },
+      "zeroFailureCounters":["shadowOverflowCount","secondaryDielectricRejectCount","unclosedVolumeCount","primaryUnclosedVolumeCount","shadowUnclosedVolumeCount","secondaryNearSelfHitCount","primaryOpenMissCount","primaryOpenOpaqueCount","primaryInterfaceBudgetCount","shadowOpenMissCount","shadowMismatchedExitCount","primaryInterfaceBudgetOpenVolumeCount","primaryInterfaceBudgetClosedVolumeCount","shadowMismatchEmptyCount","primaryOpenOpaqueSameInstanceDifferentMaterialCount","primaryOpenOpaqueAfterTirCount"]
+    },
+    {
+      "label": "Windows-RayQueryCompute",
+      "source": "C:/Dev/tmp/horde-glass-live-20260930/rectangular-spawn-high-live-compute/HordeLanternRT-benchmark-20260930-022445.json",
+      "sha256": "7416df64cf43bf040a3f0a4f8f435564cf4047bbdcc09d884ccd34c3d162ee9a",
+      "timestampUtc": "2026-09-30T02:24:45Z",
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "ledger": {"expected":600,"completed":600,"rejected":0,"cancelled":0,"cpuAccepted":600,"gpuValid":600,"validCounterRows":600,"identityMismatches":0,"submittedEqualsCompleted":true,"submissionSerialStrict":true,"completionSerialStrict":true,"firstTick":603,"lastTick":1202,"validationErrors":[]},
+      "nonzeroFailureAndRecovery": {
+        "transportOverflowCount":{"frames":2,"sum":3,"max":2,"maxWitness":[237,840,2],"windows":[[237,237],[454,454]]},
+        "productionPaneStackFailureCount":{"frames":2,"sum":3,"max":2,"maxWitness":[237,840,2],"windows":[[237,237],[454,454]]},
+        "primaryVolumeBudgetCount":{"frames":2,"sum":3,"max":2,"maxWitness":[237,840,2],"windows":[[237,237],[454,454]]},
+        "primaryCertifiedClosedVolumeRecoveryCount":{"frames":7,"sum":8,"max":2,"maxWitness":[237,840,2],"windows":[[7,7],[31,31],[237,237],[240,240],[273,273],[366,366],[454,454]]}
+      },
+      "zeroFailureCounters":["shadowOverflowCount","secondaryDielectricRejectCount","unclosedVolumeCount","primaryUnclosedVolumeCount","shadowUnclosedVolumeCount","secondaryNearSelfHitCount","primaryOpenMissCount","primaryOpenOpaqueCount","primaryMismatchedExitCount","primaryInterfaceBudgetCount","shadowOpenMissCount","shadowMismatchedExitCount","primaryInterfaceBudgetOpenVolumeCount","primaryInterfaceBudgetClosedVolumeCount","shadowMismatchEmptyCount","primaryOpenOpaqueSameInstanceDifferentMaterialCount","primaryOpenOpaqueAfterTirCount"]
+    },
+    {
+      "label": "Android-RayTracingPipeline",
+      "source": "C:/Dev/tmp/horde-glass-live-20260930/rectangular-phone-live/glass-rectangular-live-20260930-01/benchmark.json",
+      "sha256": "a5da6491c8715b03063309fcfd39a204019002a55b151b0f09db89cc61c74037",
+      "runId": "glass-rectangular-live-20260930-01",
+      "timestampUtc": "2026-09-30T02:33:07Z",
+      "gpu": "Adreno (TM) 840",
+      "ledger": {"expected":600,"completed":600,"rejected":0,"cancelled":0,"cpuAccepted":600,"gpuValid":600,"validCounterRows":600,"identityMismatches":0,"submittedEqualsCompleted":true,"submissionSerialStrict":true,"completionSerialStrict":true,"firstTick":603,"lastTick":1202,"validationErrors":[]},
+      "nonzeroFailureAndRecovery": {
+        "transportOverflowCount":{"frames":58,"sum":64,"max":4,"maxWitness":[298,901,4],"windows":[[39,39],[59,59],[70,70],[73,73],[75,75],[81,81],[89,89],[99,99],[103,103],[107,107],[111,111],[134,134],[170,170],[181,181],[200,200],[204,204],[220,220],[229,229],[231,231],[244,244],[250,250],[255,255],[270,270],[274,274],[277,277],[298,298],[300,300],[321,321],[323,323],[326,326],[330,331],[334,334],[367,367],[385,385],[407,407],[410,410],[415,415],[443,443],[454,454],[458,458],[461,461],[463,464],[486,486],[512,512],[523,523],[525,525],[530,530],[538,538],[543,543],[547,547],[559,559],[561,561],[569,569],[588,588],[590,590],[598,598]]},
+        "productionPaneStackFailureCount":{"frames":58,"sum":64,"max":4,"maxWitness":[298,901,4],"windowsSameAs":"transportOverflowCount"},
+        "primaryMismatchedExitCount":{"frames":7,"sum":7,"max":1,"maxWitness":[107,710,1],"windows":[[107,107],[250,250],[330,330],[461,461],[512,512],[523,523],[598,598]]},
+        "primaryVolumeBudgetCount":{"frames":52,"sum":57,"max":4,"maxWitness":[298,901,4],"windows":[[39,39],[59,59],[70,70],[73,73],[75,75],[81,81],[89,89],[99,99],[103,103],[111,111],[134,134],[170,170],[181,181],[200,200],[204,204],[220,220],[229,229],[231,231],[244,244],[255,255],[270,270],[274,274],[277,277],[298,298],[300,300],[321,321],[323,323],[326,326],[331,331],[334,334],[367,367],[385,385],[407,407],[410,410],[415,415],[443,443],[454,454],[458,458],[463,464],[486,486],[525,525],[530,530],[538,538],[543,543],[547,547],[559,559],[561,561],[569,569],[588,588],[590,590],[598,598]]},
+        "primaryCertifiedClosedVolumeRecoveryCount":{"frames":600,"sum":299636,"max":538,"maxWitness":[181,784,538],"windows":[[0,599]]}
+      },
+      "zeroFailureCounters":["shadowOverflowCount","secondaryDielectricRejectCount","unclosedVolumeCount","primaryUnclosedVolumeCount","shadowUnclosedVolumeCount","secondaryNearSelfHitCount","primaryOpenMissCount","primaryOpenOpaqueCount","primaryInterfaceBudgetCount","shadowOpenMissCount","shadowMismatchedExitCount","primaryInterfaceBudgetOpenVolumeCount","primaryInterfaceBudgetClosedVolumeCount","shadowMismatchEmptyCount","primaryOpenOpaqueSameInstanceDifferentMaterialCount","primaryOpenOpaqueAfterTirCount"],
+      "context": "First phone recorder failed closed on foreground query. Do not infer motion, thermal, or performance evidence from this run. A separate game-only 30-second recording/ledger was in progress; it is not included here."
+    }
+  ],
+  "frozen03bBackendPixels": {
+    "before": {"manifest":"C:/Dev/tmp/horde-glass-live-20260930/rectangular-guard-live-replay-03b-pipeline/capture-manifest.json","png":"C:/Dev/tmp/horde-glass-live-20260930/rectangular-guard-live-replay-03b-pipeline/11-finale-roof.png","sha256":"f6ba1446c0d468e7ab8d5f94a219bdd64e5e155aa4d7f4090290afe2482c7b32","size":[1232,803],"liveBenchmarkFrame":231,"liveSimulationTick":833,"investigationOnly":true,"backend":"RayTracingPipeline"},
+    "after": {"manifest":"C:/Dev/tmp/horde-glass-live-20260930/rectangular-guard-live-replay-03b-compute/capture-manifest.json","png":"C:/Dev/tmp/horde-glass-live-20260930/rectangular-guard-live-replay-03b-compute/11-finale-roof.png","sha256":"8c8ad6fdbab85e2b568a9b86a33d6e255c5e29c10db9ebc55e446d0e0afd0d4d","size":[1232,803],"liveBenchmarkFrame":231,"liveSimulationTick":833,"investigationOnly":true,"backend":"RayQueryCompute"},
+    "tolerance":{"maximumChannelDifference":3,"maximumFractionOverOne":0.001},
+    "comparison":{"pixels":989296,"pixelsOverOne":30,"fractionOverOne":0.0000303245944590901,"maximumChannelDifference":243,"equivalencePassed":false,"boundsOverOne":[485,86,1215,677],"peakExample":{"xy":[525,676],"pipelineRGB":[248,209,70],"computeRGB":[5,2,1]}}
+  },
+  "phoneCaptures": {
+    "manifest":"C:/Dev/tmp/horde-glass-live-20260930/rectangular-spawn-phone/run-20260930-121919/capture-manifest.json",
+    "apkSha256":"b30d64fd4ad4193e3150b1512e0425ad5c7b98c1c78ccc96516d1db66b39592e",
+    "captures":[["capture-01-lantern-glass-production-75.png","a3ad99a8acca0a93c940cd87cc54cdac782df6aa0a8a5124405658711a4ff7d2"],["capture-02-player-viewmodel-lantern-high-look-up-75.png","aa5766ff2e29c458a24a39f533acd5ece93b790343ad8035d142e31ea8f6e117"],["capture-03-player-viewmodel-lantern-low-parry-75.png","0fb906c870de8fb10667b8d2fc54f7a0e21dfafaec1f88d5c74efde34c53d63d"],["capture-04-glass-edge-fresnel-75.png","c20e4ef74c8a78902f354f24a9d8f959ac510abc5592cefdd8cd84d0df626df3"],["capture-05-glass-millimetre-closed-75.png","52d730b0093bf52f58ab39440074b2dd58f51bc809d1e97dfb602399eb05364a"],["capture-06-glass-tinted-transport-75.png","201e0f6ff709a5b799e080b24904a94cdf3c37dba3001f7a4cdc1e6f45ae551c"],["capture-07-glass-fire-transport-75.png","b015d16bce7ef48ae618ee25fd1139a4fa8488ebec3e708de1874f232b379dd8"]],
+    "dimensionsEach":[1440,3120],
+    "ad6Comparison":"not compared: exact ad6 APK SHA256 ad6ebaa581f9ed874a268d373922e1b0b6cbc5ef3e19fd369c58adc28549d1f0 appears in docs/evidence/2026-09-30-glass-live/artifacts.json, but bounded search found no ad6 screenshot manifest; the retained glass-geometric run has diagnostic reports only. Nearby seven-capture runs use different APK hashes."
+  },
+  "limits":["Identity joins establish completed-row ledger integrity only; nonzero failures and recoveries remain as enumerated.","Frozen screenshot manifests are investigation-only; their zero checkpoint counters do not erase the separate 600-frame live failures.","No phone visual parity comparison was possible across unmatched APKs.","No source, geometry, material, counter, budget, or device state was changed; no performance acceptance inferred."]
+}

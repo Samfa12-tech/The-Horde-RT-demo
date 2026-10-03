@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "capacities": {
-    "instanceMetadata": 20,
-    "staticAssets": 8,
+    "instanceMetadata": 21,
+    "staticAssets": 9,
     "primitives": 32,
     "materials": 32,
     "textureLayers": 16,
@@ -21,12 +21,17 @@
     "emissiveTextures": 19,
     "heldLight": 20,
     "fireEmitters": 21,
-    "dielectricDiagnostics": 22
+    "dielectricDiagnostics": 22,
+    "worldPlayerVertices": 23,
+    "viewmodelVertices": 24
   },
+  "geometryRoles": { "static": 0, "playerWorldBody": 1, "playerViewmodel": 2 },
+  "playerInstances": { "worldBody": 4, "viewmodel": 20, "viewmodelPrimaryMask": 64, "bodyRemainderPrimaryMask": 128 },
   "instanceFlags": {
     "staticPbr": 1,
     "emissive": 2,
-    "transmissive": 4
+    "transmissive": 4,
+    "bodyRemainderOnlyPrimary": 8
   },
   "materialFlags": {
     "doubleSided": 1,
@@ -39,7 +44,9 @@
     "headPrimaryMasked": 128,
     "nearFacePrimaryMasked": 256,
     "thinWall": 512,
-    "certifiedClosedVolume": 1024
+    "certifiedClosedVolume": 1024,
+    "bodyRemainderPrimaryVisible": 2048,
+    "certifiedRectangularVolume": 4096
   },
   "records": [
     {
@@ -60,7 +67,7 @@
         { "name": "flags", "type": "uint", "offset": 12 },
         { "name": "emitterIndex", "type": "uint", "offset": 16 },
         { "name": "assetIndex", "type": "uint", "offset": 20 },
-        { "name": "reserved0", "type": "uint", "offset": 24 },
+        { "name": "geometryRole", "type": "uint", "offset": 24 },
         { "name": "reserved1", "type": "uint", "offset": 28 }
       ]
     },
@@ -125,8 +132,8 @@
         { "name": "baseColorFactor", "type": "float4", "offset": 0 },
         { "name": "emissiveFactorStrength", "type": "float4", "offset": 16 },
         { "name": "metallicRoughnessOcclusionTransmission", "type": "float4", "offset": 32 },
-        { "name": "iorThicknessAttenuationDistance", "type": "float4", "offset": 48 },
-        { "name": "attenuationColor", "type": "float4", "offset": 64 },
+        { "name": "iorThicknessAttenuationDistance", "type": "float4", "offset": 48, "comment": "xyz: authored IOR/thickness/attenuation distance; w: loader-derived numerical spawn minimum width (zero without certificate)." },
+        { "name": "attenuationColor", "type": "float4", "offset": 64, "comment": "rgb: authored attenuation color; w: loader-derived numerical spawn geometry error, rounded upward." },
         { "name": "textureLayers", "type": "uint4", "offset": 80 },
         { "name": "materialFlags", "type": "uint4", "offset": 96 }
       ]

@@ -1,0 +1,13 @@
+CMake is re-running because C:/Dev/tmp/horde-music-instrumentation-20261001/core-verification/build/CMakeFiles/generate.stamp is out-of-date.
+  the file 'C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/tools/music-instrumentation-core-check/CMakeLists.txt'
+  is newer than 'C:/Dev/tmp/horde-music-instrumentation-20261001/core-verification/build/CMakeFiles/generate.stamp.depend'
+  result='-1'
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: C:/Dev/tmp/horde-music-instrumentation-20261001/core-verification/build
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> C:\Dev\tmp\horde-music-instrumentation-20261001\core-verification\build\pocket-audio-core-native\Release\pocket_audio_native_pcm.lib
+  check.cpp
+  horde_music_instrumentation_core_check.vcxproj -> C:\Dev\tmp\horde-music-instrumentation-20261001\core-verification\build\Release\horde_music_instrumentation_core_check.exe

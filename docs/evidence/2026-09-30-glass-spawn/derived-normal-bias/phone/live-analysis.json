@@ -1,0 +1,1490 @@
+{
+  "label": "SM-S948B-RayTracingPipeline",
+  "source": "C:\\Dev\\tmp\\horde-glass-live-20260930\\derived-normal-bias-01\\phone-live\\glass-derived-normal-bias-live-20260930-01\\benchmark.json",
+  "resultMarker": null,
+  "metadata": {
+    "schema": 2,
+    "status": "complete",
+    "workload": "lantern-reveal-sequence-v1",
+    "runId": "glass-derived-normal-bias-live-20260930-01",
+    "timestampUtc": "2026-09-30T05:35:25Z",
+    "executionBackend": "RayTracingPipeline",
+    "rtMode": "RayTracingPipeline",
+    "gpu": "Adreno (TM) 840",
+    "vulkanApi": "1.4.295",
+    "renderScalePercent": 75,
+    "internalExtent": {
+      "width": 1080,
+      "height": 2235
+    },
+    "presentationExtent": {
+      "width": 1440,
+      "height": 2980
+    },
+    "shaderArtifactIdentity": "opaqueFast:diagnostic_mobile_opaque_fast@8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9|genericDielectric:diagnostic_mobile_generic_dielectric@9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91",
+    "lapsCompleted": 2,
+    "lapsRequested": 2,
+    "measuredFrames": 600,
+    "presentedEveryFrame": true
+  },
+  "ledger": {
+    "expected": 600,
+    "completed": 600,
+    "rejected": 0,
+    "cancelled": 0,
+    "cpuAccepted": 600,
+    "gpuValid": 600,
+    "diagnosticStatusCounts": {
+      "valid": 600
+    },
+    "validCounterRows": 600,
+    "counterLengthOrAvailabilityErrors": [],
+    "rows": 600,
+    "identitiesEqualSubmittedToCompletion": true,
+    "identityMismatchCount": 0,
+    "submittedSerialStrictlyIncreasing": true,
+    "completionSerialStrictlyIncreasing": true,
+    "nonmonotonicSubmittedRows": [],
+    "nonmonotonicCompletionRows": [],
+    "firstIdentity": {
+      "sceneEpoch": 2,
+      "measurementGeneration": 6,
+      "recordAttemptSerial": 602,
+      "recordSerial": 602,
+      "simulationTick": 603,
+      "frameSlot": 0,
+      "submissionSerial": 602,
+      "completionSerial": 602
+    },
+    "lastIdentity": {
+      "sceneEpoch": 2,
+      "measurementGeneration": 6,
+      "recordAttemptSerial": 1201,
+      "recordSerial": 1201,
+      "simulationTick": 1202,
+      "frameSlot": 0,
+      "submissionSerial": 1201,
+      "completionSerial": 1201
+    }
+  },
+  "nonzeroCounterWindows": {
+    "transportOverflowCount": {
+      "category": "failure",
+      "index": 0,
+      "frames": 12,
+      "sum": 12,
+      "max": 1,
+      "maxWitness": {
+        "index": 73,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 676,
+        "submissionSerial": 675,
+        "completionSerial": 675,
+        "value": 1
+      },
+      "first": {
+        "index": 73,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 676,
+        "submissionSerial": 675,
+        "completionSerial": 675,
+        "value": 1
+      },
+      "last": {
+        "index": 598,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 1201,
+        "submissionSerial": 1200,
+        "completionSerial": 1200,
+        "value": 1
+      },
+      "windowCount": 12,
+      "windows": [
+        {
+          "first": {
+            "index": 73,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 676,
+            "submissionSerial": 675,
+            "completionSerial": 675,
+            "value": 1
+          },
+          "last": {
+            "index": 73,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 676,
+            "submissionSerial": 675,
+            "completionSerial": 675,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 73,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 676,
+            "submissionSerial": 675,
+            "completionSerial": 675,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 81,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 684,
+            "submissionSerial": 683,
+            "completionSerial": 683,
+            "value": 1
+          },
+          "last": {
+            "index": 81,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 684,
+            "submissionSerial": 683,
+            "completionSerial": 683,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 81,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 684,
+            "submissionSerial": 683,
+            "completionSerial": 683,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 107,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 710,
+            "submissionSerial": 709,
+            "completionSerial": 709,
+            "value": 1
+          },
+          "last": {
+            "index": 107,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 710,
+            "submissionSerial": 709,
+            "completionSerial": 709,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 107,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 710,
+            "submissionSerial": 709,
+            "completionSerial": 709,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 134,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 737,
+            "submissionSerial": 736,
+            "completionSerial": 736,
+            "value": 1
+          },
+          "last": {
+            "index": 134,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 737,
+            "submissionSerial": 736,
+            "completionSerial": 736,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 134,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 737,
+            "submissionSerial": 736,
+            "completionSerial": 736,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 250,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 853,
+            "submissionSerial": 852,
+            "completionSerial": 852,
+            "value": 1
+          },
+          "last": {
+            "index": 250,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 853,
+            "submissionSerial": 852,
+            "completionSerial": 852,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 250,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 853,
+            "submissionSerial": 852,
+            "completionSerial": 852,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 255,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 858,
+            "submissionSerial": 857,
+            "completionSerial": 857,
+            "value": 1
+          },
+          "last": {
+            "index": 255,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 858,
+            "submissionSerial": 857,
+            "completionSerial": 857,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 255,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 858,
+            "submissionSerial": 857,
+            "completionSerial": 857,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 330,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 933,
+            "submissionSerial": 932,
+            "completionSerial": 932,
+            "value": 1
+          },
+          "last": {
+            "index": 330,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 933,
+            "submissionSerial": 932,
+            "completionSerial": 932,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 330,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 933,
+            "submissionSerial": 932,
+            "completionSerial": 932,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 461,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1064,
+            "submissionSerial": 1063,
+            "completionSerial": 1063,
+            "value": 1
+          },
+          "last": {
+            "index": 461,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1064,
+            "submissionSerial": 1063,
+            "completionSerial": 1063,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 461,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1064,
+            "submissionSerial": 1063,
+            "completionSerial": 1063,
+            "value": 1
+          }
+        }
+      ],
+      "windowsTruncated": true
+    },
+    "productionPaneStackFailureCount": {
+      "category": "failure",
+      "index": 6,
+      "frames": 12,
+      "sum": 12,
+      "max": 1,
+      "maxWitness": {
+        "index": 73,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 676,
+        "submissionSerial": 675,
+        "completionSerial": 675,
+        "value": 1
+      },
+      "first": {
+        "index": 73,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 676,
+        "submissionSerial": 675,
+        "completionSerial": 675,
+        "value": 1
+      },
+      "last": {
+        "index": 598,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 1201,
+        "submissionSerial": 1200,
+        "completionSerial": 1200,
+        "value": 1
+      },
+      "windowCount": 12,
+      "windows": [
+        {
+          "first": {
+            "index": 73,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 676,
+            "submissionSerial": 675,
+            "completionSerial": 675,
+            "value": 1
+          },
+          "last": {
+            "index": 73,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 676,
+            "submissionSerial": 675,
+            "completionSerial": 675,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 73,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 676,
+            "submissionSerial": 675,
+            "completionSerial": 675,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 81,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 684,
+            "submissionSerial": 683,
+            "completionSerial": 683,
+            "value": 1
+          },
+          "last": {
+            "index": 81,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 684,
+            "submissionSerial": 683,
+            "completionSerial": 683,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 81,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 684,
+            "submissionSerial": 683,
+            "completionSerial": 683,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 107,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 710,
+            "submissionSerial": 709,
+            "completionSerial": 709,
+            "value": 1
+          },
+          "last": {
+            "index": 107,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 710,
+            "submissionSerial": 709,
+            "completionSerial": 709,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 107,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 710,
+            "submissionSerial": 709,
+            "completionSerial": 709,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 134,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 737,
+            "submissionSerial": 736,
+            "completionSerial": 736,
+            "value": 1
+          },
+          "last": {
+            "index": 134,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 737,
+            "submissionSerial": 736,
+            "completionSerial": 736,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 134,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 737,
+            "submissionSerial": 736,
+            "completionSerial": 736,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 250,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 853,
+            "submissionSerial": 852,
+            "completionSerial": 852,
+            "value": 1
+          },
+          "last": {
+            "index": 250,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 853,
+            "submissionSerial": 852,
+            "completionSerial": 852,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 250,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 853,
+            "submissionSerial": 852,
+            "completionSerial": 852,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 255,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 858,
+            "submissionSerial": 857,
+            "completionSerial": 857,
+            "value": 1
+          },
+          "last": {
+            "index": 255,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 858,
+            "submissionSerial": 857,
+            "completionSerial": 857,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 255,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 858,
+            "submissionSerial": 857,
+            "completionSerial": 857,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 330,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 933,
+            "submissionSerial": 932,
+            "completionSerial": 932,
+            "value": 1
+          },
+          "last": {
+            "index": 330,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 933,
+            "submissionSerial": 932,
+            "completionSerial": 932,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 330,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 933,
+            "submissionSerial": 932,
+            "completionSerial": 932,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 461,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1064,
+            "submissionSerial": 1063,
+            "completionSerial": 1063,
+            "value": 1
+          },
+          "last": {
+            "index": 461,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1064,
+            "submissionSerial": 1063,
+            "completionSerial": 1063,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 461,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1064,
+            "submissionSerial": 1063,
+            "completionSerial": 1063,
+            "value": 1
+          }
+        }
+      ],
+      "windowsTruncated": true
+    },
+    "primaryMismatchedExitCount": {
+      "category": "failure",
+      "index": 14,
+      "frames": 7,
+      "sum": 7,
+      "max": 1,
+      "maxWitness": {
+        "index": 107,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 710,
+        "submissionSerial": 709,
+        "completionSerial": 709,
+        "value": 1
+      },
+      "first": {
+        "index": 107,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 710,
+        "submissionSerial": 709,
+        "completionSerial": 709,
+        "value": 1
+      },
+      "last": {
+        "index": 598,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 1201,
+        "submissionSerial": 1200,
+        "completionSerial": 1200,
+        "value": 1
+      },
+      "windowCount": 7,
+      "windows": [
+        {
+          "first": {
+            "index": 107,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 710,
+            "submissionSerial": 709,
+            "completionSerial": 709,
+            "value": 1
+          },
+          "last": {
+            "index": 107,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 710,
+            "submissionSerial": 709,
+            "completionSerial": 709,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 107,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 710,
+            "submissionSerial": 709,
+            "completionSerial": 709,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 250,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 853,
+            "submissionSerial": 852,
+            "completionSerial": 852,
+            "value": 1
+          },
+          "last": {
+            "index": 250,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 853,
+            "submissionSerial": 852,
+            "completionSerial": 852,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 250,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 853,
+            "submissionSerial": 852,
+            "completionSerial": 852,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 330,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 933,
+            "submissionSerial": 932,
+            "completionSerial": 932,
+            "value": 1
+          },
+          "last": {
+            "index": 330,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 933,
+            "submissionSerial": 932,
+            "completionSerial": 932,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 330,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 933,
+            "submissionSerial": 932,
+            "completionSerial": 932,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 461,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1064,
+            "submissionSerial": 1063,
+            "completionSerial": 1063,
+            "value": 1
+          },
+          "last": {
+            "index": 461,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1064,
+            "submissionSerial": 1063,
+            "completionSerial": 1063,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 461,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1064,
+            "submissionSerial": 1063,
+            "completionSerial": 1063,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 512,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1115,
+            "submissionSerial": 1114,
+            "completionSerial": 1114,
+            "value": 1
+          },
+          "last": {
+            "index": 512,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1115,
+            "submissionSerial": 1114,
+            "completionSerial": 1114,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 512,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1115,
+            "submissionSerial": 1114,
+            "completionSerial": 1114,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 523,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1126,
+            "submissionSerial": 1125,
+            "completionSerial": 1125,
+            "value": 1
+          },
+          "last": {
+            "index": 523,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1126,
+            "submissionSerial": 1125,
+            "completionSerial": 1125,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 523,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1126,
+            "submissionSerial": 1125,
+            "completionSerial": 1125,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 598,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1201,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 1
+          },
+          "last": {
+            "index": 598,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1201,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 598,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1201,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 1
+          }
+        }
+      ],
+      "windowsTruncated": false
+    },
+    "primaryVolumeBudgetCount": {
+      "category": "failure",
+      "index": 16,
+      "frames": 5,
+      "sum": 5,
+      "max": 1,
+      "maxWitness": {
+        "index": 73,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 676,
+        "submissionSerial": 675,
+        "completionSerial": 675,
+        "value": 1
+      },
+      "first": {
+        "index": 73,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 676,
+        "submissionSerial": 675,
+        "completionSerial": 675,
+        "value": 1
+      },
+      "last": {
+        "index": 464,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 1067,
+        "submissionSerial": 1066,
+        "completionSerial": 1066,
+        "value": 1
+      },
+      "windowCount": 5,
+      "windows": [
+        {
+          "first": {
+            "index": 73,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 676,
+            "submissionSerial": 675,
+            "completionSerial": 675,
+            "value": 1
+          },
+          "last": {
+            "index": 73,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 676,
+            "submissionSerial": 675,
+            "completionSerial": 675,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 73,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 676,
+            "submissionSerial": 675,
+            "completionSerial": 675,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 81,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 684,
+            "submissionSerial": 683,
+            "completionSerial": 683,
+            "value": 1
+          },
+          "last": {
+            "index": 81,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 684,
+            "submissionSerial": 683,
+            "completionSerial": 683,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 81,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 684,
+            "submissionSerial": 683,
+            "completionSerial": 683,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 134,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 737,
+            "submissionSerial": 736,
+            "completionSerial": 736,
+            "value": 1
+          },
+          "last": {
+            "index": 134,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 737,
+            "submissionSerial": 736,
+            "completionSerial": 736,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 134,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 737,
+            "submissionSerial": 736,
+            "completionSerial": 736,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 255,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 858,
+            "submissionSerial": 857,
+            "completionSerial": 857,
+            "value": 1
+          },
+          "last": {
+            "index": 255,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 858,
+            "submissionSerial": 857,
+            "completionSerial": 857,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 255,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 858,
+            "submissionSerial": 857,
+            "completionSerial": 857,
+            "value": 1
+          }
+        },
+        {
+          "first": {
+            "index": 464,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1067,
+            "submissionSerial": 1066,
+            "completionSerial": 1066,
+            "value": 1
+          },
+          "last": {
+            "index": 464,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1067,
+            "submissionSerial": 1066,
+            "completionSerial": 1066,
+            "value": 1
+          },
+          "rows": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 464,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1067,
+            "submissionSerial": 1066,
+            "completionSerial": 1066,
+            "value": 1
+          }
+        }
+      ],
+      "windowsTruncated": false
+    },
+    "secondaryDielectricTerminalCount": {
+      "category": "boundedEvent",
+      "index": 24,
+      "frames": 600,
+      "sum": 5113826,
+      "max": 8956,
+      "maxWitness": {
+        "index": 115,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 718,
+        "submissionSerial": 717,
+        "completionSerial": 717,
+        "value": 8956
+      },
+      "first": {
+        "index": 0,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 603,
+        "submissionSerial": 602,
+        "completionSerial": 602,
+        "value": 8277
+      },
+      "last": {
+        "index": 599,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 1202,
+        "submissionSerial": 1201,
+        "completionSerial": 1201,
+        "value": 8123
+      },
+      "windowCount": 1,
+      "windows": [
+        {
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 602,
+            "completionSerial": 602,
+            "value": 8277
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1201,
+            "completionSerial": 1201,
+            "value": 8123
+          },
+          "rows": 600,
+          "sum": 5113826,
+          "max": 8956,
+          "maxWitness": {
+            "index": 115,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 718,
+            "submissionSerial": 717,
+            "completionSerial": 717,
+            "value": 8956
+          }
+        }
+      ],
+      "windowsTruncated": false
+    },
+    "primaryCertifiedClosedVolumeRecoveryCount": {
+      "category": "certifiedRecovery",
+      "index": 33,
+      "frames": 600,
+      "sum": 299513,
+      "max": 537,
+      "maxWitness": {
+        "index": 57,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 660,
+        "submissionSerial": 659,
+        "completionSerial": 659,
+        "value": 537
+      },
+      "first": {
+        "index": 0,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 603,
+        "submissionSerial": 602,
+        "completionSerial": 602,
+        "value": 507
+      },
+      "last": {
+        "index": 599,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 1202,
+        "submissionSerial": 1201,
+        "completionSerial": 1201,
+        "value": 511
+      },
+      "windowCount": 1,
+      "windows": [
+        {
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 602,
+            "completionSerial": 602,
+            "value": 507
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1201,
+            "completionSerial": 1201,
+            "value": 511
+          },
+          "rows": 600,
+          "sum": 299513,
+          "max": 537,
+          "maxWitness": {
+            "index": 57,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 660,
+            "submissionSerial": 659,
+            "completionSerial": 659,
+            "value": 537
+          }
+        }
+      ],
+      "windowsTruncated": false
+    },
+    "primaryTirCount": {
+      "category": "tir",
+      "index": 19,
+      "frames": 600,
+      "sum": 5440908,
+      "max": 10441,
+      "maxWitness": {
+        "index": 83,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 686,
+        "submissionSerial": 685,
+        "completionSerial": 685,
+        "value": 10441
+      },
+      "first": {
+        "index": 0,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 603,
+        "submissionSerial": 602,
+        "completionSerial": 602,
+        "value": 8431
+      },
+      "last": {
+        "index": 599,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 1202,
+        "submissionSerial": 1201,
+        "completionSerial": 1201,
+        "value": 9141
+      },
+      "windowCount": 1,
+      "windows": [
+        {
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 602,
+            "completionSerial": 602,
+            "value": 8431
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1201,
+            "completionSerial": 1201,
+            "value": 9141
+          },
+          "rows": 600,
+          "sum": 5440908,
+          "max": 10441,
+          "maxWitness": {
+            "index": 83,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 686,
+            "submissionSerial": 685,
+            "completionSerial": 685,
+            "value": 10441
+          }
+        }
+      ],
+      "windowsTruncated": false
+    },
+    "primaryTirTerminationCount": {
+      "category": "tir",
+      "index": 25,
+      "frames": 600,
+      "sum": 1858799,
+      "max": 3546,
+      "maxWitness": {
+        "index": 83,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 686,
+        "submissionSerial": 685,
+        "completionSerial": 685,
+        "value": 3546
+      },
+      "first": {
+        "index": 0,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 603,
+        "submissionSerial": 602,
+        "completionSerial": 602,
+        "value": 2902
+      },
+      "last": {
+        "index": 599,
+        "lap": 2,
+        "zone": 5,
+        "simulationTick": 1202,
+        "submissionSerial": 1201,
+        "completionSerial": 1201,
+        "value": 3092
+      },
+      "windowCount": 1,
+      "windows": [
+        {
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 602,
+            "completionSerial": 602,
+            "value": 2902
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1201,
+            "completionSerial": 1201,
+            "value": 3092
+          },
+          "rows": 600,
+          "sum": 1858799,
+          "max": 3546,
+          "maxWitness": {
+            "index": 83,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 686,
+            "submissionSerial": 685,
+            "completionSerial": 685,
+            "value": 3546
+          }
+        }
+      ],
+      "windowsTruncated": false
+    }
+  },
+  "maskBitEvidence": {
+    "primaryOpenOpaqueTerminalInstanceMask": {
+      "or": 0,
+      "nonzeroFrames": 0,
+      "bitOccurrences": []
+    },
+    "primaryOpenOpaqueVolumeInstanceMask": {
+      "or": 0,
+      "nonzeroFrames": 0,
+      "bitOccurrences": []
+    },
+    "primaryOpenOpaqueTerminalMaterialMask": {
+      "or": 0,
+      "nonzeroFrames": 0,
+      "bitOccurrences": []
+    },
+    "certifiedClosedVolumeRecoveryReasonMask": {
+      "or": 19,
+      "nonzeroFrames": 600,
+      "bitOccurrences": [
+        {
+          "bit": 0,
+          "frames": 6,
+          "first": {
+            "index": 294,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 897,
+            "submissionSerial": 896,
+            "completionSerial": 896,
+            "value": 3
+          },
+          "last": {
+            "index": 598,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1201,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 3
+          }
+        },
+        {
+          "bit": 1,
+          "frames": 600,
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 602,
+            "completionSerial": 602,
+            "value": 2
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1201,
+            "completionSerial": 1201,
+            "value": 2
+          }
+        },
+        {
+          "bit": 4,
+          "frames": 5,
+          "first": {
+            "index": 73,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 676,
+            "submissionSerial": 675,
+            "completionSerial": 675,
+            "value": 18
+          },
+          "last": {
+            "index": 464,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1067,
+            "submissionSerial": 1066,
+            "completionSerial": 1066,
+            "value": 18
+          }
+        }
+      ]
+    }
+  },
+  "validationErrors": []
+}

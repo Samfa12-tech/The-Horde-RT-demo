@@ -1,0 +1,308 @@
+{
+  "runId": "mobile-pane-s26-c1-live-20261001",
+  "integrity": "PASS",
+  "member": "physical-control",
+  "workload": "lantern-reveal-sequence-v1",
+  "sourceCommit": "9f4f439e40a9477efe0bac42ee41b74de64b3b1b",
+  "deviceModel": "SM-S948B",
+  "requestedBackend": "RayTracingPipeline",
+  "actualBackend": "RayTracingPipeline",
+  "apkSha256": "3a4faf72923e24da9da859ef6cd71c221b818b97d7418a75b1c8dd0ca0540378",
+  "packageReceiptSha256": "67c1ae7225c57bd1fa27cab6ab934b910d5d8f2dd993c460c1ba74917b44ddaa",
+  "scalePercent": 75,
+  "internalExtent": {
+    "width": 1080,
+    "height": 2235
+  },
+  "presentationExtent": {
+    "width": 1440,
+    "height": 2980
+  },
+  "measuredFrames": 600,
+  "namedZoneDenominators": [
+    {
+      "name": "opening",
+      "frames": 0,
+      "averageMs": 0.0,
+      "medianMs": 0.0,
+      "p95Ms": 0.0,
+      "onePercentLowFps": 0.0
+    },
+    {
+      "name": "skeleton-room",
+      "frames": 0,
+      "averageMs": 0.0,
+      "medianMs": 0.0,
+      "p95Ms": 0.0,
+      "onePercentLowFps": 0.0
+    },
+    {
+      "name": "shadow-corridor",
+      "frames": 0,
+      "averageMs": 0.0,
+      "medianMs": 0.0,
+      "p95Ms": 0.0,
+      "onePercentLowFps": 0.0
+    },
+    {
+      "name": "skylight-chamber",
+      "frames": 0,
+      "averageMs": 0.0,
+      "medianMs": 0.0,
+      "p95Ms": 0.0,
+      "onePercentLowFps": 0.0
+    },
+    {
+      "name": "yellow-torch-bay",
+      "frames": 600,
+      "averageMs": 238.9162,
+      "medianMs": 236.4368,
+      "p95Ms": 249.4892,
+      "onePercentLowFps": 3.9288
+    },
+    {
+      "name": "blue-torch-bay",
+      "frames": 0,
+      "averageMs": 0.0,
+      "medianMs": 0.0,
+      "p95Ms": 0.0,
+      "onePercentLowFps": 0.0
+    },
+    {
+      "name": "red-torch-bay",
+      "frames": 0,
+      "averageMs": 0.0,
+      "medianMs": 0.0,
+      "p95Ms": 0.0,
+      "onePercentLowFps": 0.0
+    },
+    {
+      "name": "green-torch-bay",
+      "frames": 0,
+      "averageMs": 0.0,
+      "medianMs": 0.0,
+      "p95Ms": 0.0,
+      "onePercentLowFps": 0.0
+    },
+    {
+      "name": "transmission-threshold",
+      "frames": 0,
+      "averageMs": 0.0,
+      "medianMs": 0.0,
+      "p95Ms": 0.0,
+      "onePercentLowFps": 0.0
+    },
+    {
+      "name": "finale",
+      "frames": 0,
+      "averageMs": 0.0,
+      "medianMs": 0.0,
+      "p95Ms": 0.0,
+      "onePercentLowFps": 0.0
+    }
+  ],
+  "shaderIdentity": "opaqueFast:shipping_mobile_opaque_fast@66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b|genericDielectric:shipping_mobile_generic_dielectric@ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+  "actualActiveStrategyCounts": {
+    "generic-dielectric": 600
+  },
+  "gpuOwningCompletion": {
+    "sampleCount": 600,
+    "medianMs": 225.5287,
+    "p95NearestRankMs": 238.3898,
+    "byZone": [
+      {
+        "zone": "opening",
+        "denominator": 0,
+        "medianMs": null,
+        "p95NearestRankMs": null
+      },
+      {
+        "zone": "skeleton-room",
+        "denominator": 0,
+        "medianMs": null,
+        "p95NearestRankMs": null
+      },
+      {
+        "zone": "shadow-corridor",
+        "denominator": 0,
+        "medianMs": null,
+        "p95NearestRankMs": null
+      },
+      {
+        "zone": "skylight-chamber",
+        "denominator": 0,
+        "medianMs": null,
+        "p95NearestRankMs": null
+      },
+      {
+        "zone": "yellow-torch-bay",
+        "denominator": 600,
+        "medianMs": 225.5287,
+        "p95NearestRankMs": 238.3898
+      },
+      {
+        "zone": "blue-torch-bay",
+        "denominator": 0,
+        "medianMs": null,
+        "p95NearestRankMs": null
+      },
+      {
+        "zone": "red-torch-bay",
+        "denominator": 0,
+        "medianMs": null,
+        "p95NearestRankMs": null
+      },
+      {
+        "zone": "green-torch-bay",
+        "denominator": 0,
+        "medianMs": null,
+        "p95NearestRankMs": null
+      },
+      {
+        "zone": "transmission-threshold",
+        "denominator": 0,
+        "medianMs": null,
+        "p95NearestRankMs": null
+      },
+      {
+        "zone": "finale",
+        "denominator": 0,
+        "medianMs": null,
+        "p95NearestRankMs": null
+      }
+    ]
+  },
+  "nativeCpuStages": {
+    "simulationStepCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 0.0313,
+      "p95Ms": 0.0361,
+      "slowestOnePercentMeanMs": 0.0929
+    },
+    "skinCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 8.4039,
+      "p95Ms": 9.5696,
+      "slowestOnePercentMeanMs": 10.0178
+    },
+    "playerSkinCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 8.4039,
+      "p95Ms": 9.5696,
+      "slowestOnePercentMeanMs": 10.0178
+    },
+    "characterSkinCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 0.0,
+      "p95Ms": 0.0,
+      "slowestOnePercentMeanMs": 0.0
+    },
+    "dynamicUploadCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 0.308,
+      "p95Ms": 0.3807,
+      "slowestOnePercentMeanMs": 0.5221
+    },
+    "blasRefitRecordCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 0.0446,
+      "p95Ms": 0.0576,
+      "slowestOnePercentMeanMs": 0.1106
+    },
+    "tlasUpdateRecordCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 0.0125,
+      "p95Ms": 0.016,
+      "slowestOnePercentMeanMs": 0.0299
+    },
+    "traceCopyRecordCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 0.2147,
+      "p95Ms": 0.2731,
+      "slowestOnePercentMeanMs": 0.388
+    },
+    "frameFenceWaitCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 225.8822,
+      "p95Ms": 238.7695,
+      "slowestOnePercentMeanMs": 243.1193
+    },
+    "imageAcquireCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 0.0404,
+      "p95Ms": 0.0507,
+      "slowestOnePercentMeanMs": 0.1054
+    },
+    "queueSubmitCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 0.2343,
+      "p95Ms": 0.4536,
+      "slowestOnePercentMeanMs": 0.6743
+    },
+    "presentCallCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 0.2357,
+      "p95Ms": 0.3243,
+      "slowestOnePercentMeanMs": 0.4744
+    },
+    "wholeFrameCycleCpuMs": {
+      "sampleCount": 600,
+      "medianMs": 236.4367,
+      "p95Ms": 249.4891,
+      "slowestOnePercentMeanMs": 254.53
+    }
+  },
+  "nativeCycle": {
+    "scope": "android-render-entry-through-present",
+    "medianMs": 236.4368,
+    "p95Ms": 249.4892,
+    "medianDerivedFps": 4.229,
+    "displayPacingProof": false
+  },
+  "thermalContext": {
+    "sampleCount": 56,
+    "firstUtc": "2026-10-01T08:18:39.0792492Z",
+    "lastUtc": "2026-10-01T08:23:28.0455634Z",
+    "batteryStartC": 35.8,
+    "batteryEndC": 42.4,
+    "thermalStatuses": [
+      0,
+      1,
+      2
+    ],
+    "gpuThermalPowerLevels": [
+      0,
+      1
+    ]
+  },
+  "ramBefore": {
+    "available": true,
+    "totalPssKb": 972563,
+    "totalRssKb": 1083376,
+    "totalSwapPssKb": 3122,
+    "nativeHeapPssKb": 692933
+  },
+  "ramAfter": {
+    "available": true,
+    "totalPssKb": 201084,
+    "totalRssKb": 313372,
+    "totalSwapPssKb": 1622,
+    "nativeHeapPssKb": 96629
+  },
+  "diagnosticReadback": {
+    "status": "compiled-out",
+    "nullCounters": true,
+    "provesPhysicalGlassCorrectness": false
+  },
+  "performanceAcceptance": "none",
+  "optimizationAdmission": "none",
+  "visualAcceptance": "pending owner review",
+  "limitations": [
+    "Native-cycle median-derived FPS is not display-pacing proof.",
+    "GPU command-buffer timing includes AS build/update, RT and copy work; it is not isolated shader timing.",
+    "Context samples are not aligned to individual measured frames.",
+    "RAM is a before/after boundary only; null fields mean the source did not provide parseable values.",
+    "Physical timing does not prove scene correctness. The open-aperture visual blocker remains open until owner review, including S24 hands, one-skeleton, and yellow-water concerns.",
+    "No matched repeated S24 candidate/control performance acceptance is implied."
+  ]
+}

@@ -1,0 +1,72 @@
+Start testing: Oct 02 19:00 AUS Eastern Standard Time
+----------------------------------------------------------
+41/97 Testing: horde_rt_pipeline_policy_fence_tests
+41/97 Test: horde_rt_pipeline_policy_fence_tests
+Command: "C:/Program Files/PowerShell/7/pwsh.exe" "-NoProfile" "-File" "C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/tests/RtPipelinePolicyFenceTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+Directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+"horde_rt_pipeline_policy_fence_tests" start time: Oct 02 19:00 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+Generated RT catalog adapter is current.
+-- Building for: Visual Studio 17 2022
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- The CXX compiler identification is MSVC 19.44.35227.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+Generated RT catalog adapter is current.
+-- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+-- Horde Lantern RT: configuring shared host gameplay tests without Vulkan targets.
+-- Configuring done (15.8s)
+-- Generating done (0.6s)
+-- Build files have been written to: C:/Users/sam_s/AppData/Local/Temp/horde-rt-fresh-configure-83f51cdd6df14d6a9c7e80f5bdb839ee
+RT provider policy and ownership behavior contracts passed.
+<end of output>
+Test time =  48.88 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_pipeline_policy_fence_tests" end time: Oct 02 19:01 AUS Eastern Standard Time
+"horde_rt_pipeline_policy_fence_tests" time elapsed: 00:00:48
+----------------------------------------------------------
+
+60/97 Testing: horde_rt_playtest_report_tests
+60/97 Test: horde_rt_playtest_report_tests
+Command: "C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151/Debug/horde_rt_playtest_report_tests.exe"
+Directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+"horde_rt_playtest_report_tests" start time: Oct 02 19:01 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_playtest_report_tests" end time: Oct 02 19:01 AUS Eastern Standard Time
+"horde_rt_playtest_report_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+84/97 Testing: horde_rt_scene_initialise_preflight_tests
+84/97 Test: horde_rt_scene_initialise_preflight_tests
+Command: "C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151/Debug/horde_rt_scene_initialise_preflight_tests.exe"
+Directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+"horde_rt_scene_initialise_preflight_tests" start time: Oct 02 19:01 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   3.49 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_scene_initialise_preflight_tests" end time: Oct 02 19:01 AUS Eastern Standard Time
+"horde_rt_scene_initialise_preflight_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Oct 02 19:01 AUS Eastern Standard Time

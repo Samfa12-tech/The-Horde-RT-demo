@@ -1,0 +1,251 @@
+{
+  "runId": "shipping-opening-gpu-stages-v3-route-20260930",
+  "apkSha256": "cbfc5cf40d15b8a7c64561d4eff11a2dbf0a9dd9c7179da9a53850ef74905204",
+  "processId": "22151",
+  "matchedCompletedRows": 1838,
+  "identityFieldsMatched": 7,
+  "zoneStrategyAuthority": "completed benchmark row, not fence-time mutable state",
+  "stageTimestampSemantics": "AS-build at both AS endpoints; selected RT/compute stage at both dispatch endpoints",
+  "zones": [
+    {
+      "zone": "blue-torch-bay",
+      "frames": 157,
+      "activeStrategy": "opaque-fast",
+      "geometryAsGpu": {
+        "frames": 157,
+        "medianMs": 0.490885405,
+        "p95NearestRankMs": 0.502291654,
+        "meanMs": 0.4913976127070065
+      },
+      "rtDispatchGpu": {
+        "frames": 157,
+        "medianMs": 40.232342768,
+        "p95NearestRankMs": 46.856457189,
+        "meanMs": 41.09424295900639
+      },
+      "fullCommandBufferGpu": {
+        "frames": 157,
+        "medianMs": 40.875624,
+        "p95NearestRankMs": 47.491613,
+        "meanMs": 41.741837152866225
+      }
+    },
+    {
+      "zone": "finale",
+      "frames": 101,
+      "activeStrategy": "opaque-fast",
+      "geometryAsGpu": {
+        "frames": 101,
+        "medianMs": 0.497708321,
+        "p95NearestRankMs": 0.586249986,
+        "meanMs": 0.5265037000198017
+      },
+      "rtDispatchGpu": {
+        "frames": 101,
+        "medianMs": 37.019947013,
+        "p95NearestRankMs": 55.223644485,
+        "meanMs": 39.92875624468318
+      },
+      "fullCommandBufferGpu": {
+        "frames": 101,
+        "medianMs": 37.728645,
+        "p95NearestRankMs": 55.894322,
+        "meanMs": 40.58981183168316
+      }
+    },
+    {
+      "zone": "green-torch-bay",
+      "frames": 157,
+      "activeStrategy": "opaque-fast",
+      "geometryAsGpu": {
+        "frames": 157,
+        "medianMs": 0.490989571,
+        "p95NearestRankMs": 0.501302071,
+        "meanMs": 0.4909431275923565
+      },
+      "rtDispatchGpu": {
+        "frames": 157,
+        "medianMs": 45.003748901,
+        "p95NearestRankMs": 50.39515502,
+        "meanMs": 44.91624326378346
+      },
+      "fullCommandBufferGpu": {
+        "frames": 157,
+        "medianMs": 45.632499,
+        "p95NearestRankMs": 51.022655,
+        "meanMs": 45.565667299363064
+      }
+    },
+    {
+      "zone": "opening",
+      "frames": 160,
+      "activeStrategy": "opaque-fast",
+      "geometryAsGpu": {
+        "frames": 160,
+        "medianMs": 0.4955989465,
+        "p95NearestRankMs": 0.590572902,
+        "meanMs": 0.5328596874750003
+      },
+      "rtDispatchGpu": {
+        "frames": 160,
+        "medianMs": 65.6334619395,
+        "p95NearestRankMs": 72.929633636,
+        "meanMs": 64.94280570614377
+      },
+      "fullCommandBufferGpu": {
+        "frames": 160,
+        "medianMs": 66.273045,
+        "p95NearestRankMs": 73.580675,
+        "meanMs": 65.62670738750002
+      }
+    },
+    {
+      "zone": "red-torch-bay",
+      "frames": 157,
+      "activeStrategy": "opaque-fast",
+      "geometryAsGpu": {
+        "frames": 157,
+        "medianMs": 0.490468738,
+        "p95NearestRankMs": 0.507447904,
+        "meanMs": 0.49519306114012707
+      },
+      "rtDispatchGpu": {
+        "frames": 157,
+        "medianMs": 41.305259408,
+        "p95NearestRankMs": 50.574321682,
+        "meanMs": 42.89341190394907
+      },
+      "fullCommandBufferGpu": {
+        "frames": 157,
+        "medianMs": 42.012343,
+        "p95NearestRankMs": 51.200051,
+        "meanMs": 43.54064481528664
+      }
+    },
+    {
+      "zone": "shadow-corridor",
+      "frames": 599,
+      "activeStrategy": "opaque-fast",
+      "geometryAsGpu": {
+        "frames": 599,
+        "medianMs": 0.491354155,
+        "p95NearestRankMs": 0.504270821,
+        "meanMs": 0.4938836308280476
+      },
+      "rtDispatchGpu": {
+        "frames": 599,
+        "medianMs": 53.273227866,
+        "p95NearestRankMs": 65.886769225,
+        "meanMs": 54.460617323003376
+      },
+      "fullCommandBufferGpu": {
+        "frames": 599,
+        "medianMs": 53.922499,
+        "p95NearestRankMs": 66.526144,
+        "meanMs": 55.11163019031717
+      }
+    },
+    {
+      "zone": "skeleton-room",
+      "frames": 98,
+      "activeStrategy": "opaque-fast",
+      "geometryAsGpu": {
+        "frames": 98,
+        "medianMs": 0.565156236,
+        "p95NearestRankMs": 0.671562484,
+        "meanMs": 0.5536341276020408
+      },
+      "rtDispatchGpu": {
+        "frames": 98,
+        "medianMs": 56.219113211,
+        "p95NearestRankMs": 59.686300626,
+        "meanMs": 55.65892189794897
+      },
+      "fullCommandBufferGpu": {
+        "frames": 98,
+        "medianMs": 56.933045500000006,
+        "p95NearestRankMs": 60.406509,
+        "meanMs": 56.3654833469388
+      }
+    },
+    {
+      "zone": "skylight-chamber",
+      "frames": 189,
+      "activeStrategy": "opaque-fast",
+      "geometryAsGpu": {
+        "frames": 189,
+        "medianMs": 0.491666655,
+        "p95NearestRankMs": 0.503333321,
+        "meanMs": 0.49299133496296305
+      },
+      "rtDispatchGpu": {
+        "frames": 189,
+        "medianMs": 33.531561681,
+        "p95NearestRankMs": 53.992029932,
+        "meanMs": 35.78099339452909
+      },
+      "fullCommandBufferGpu": {
+        "frames": 189,
+        "medianMs": 34.160103,
+        "p95NearestRankMs": 54.718853,
+        "meanMs": 36.40677019576719
+      }
+    },
+    {
+      "zone": "transmission-threshold",
+      "frames": 63,
+      "activeStrategy": "opaque-fast",
+      "geometryAsGpu": {
+        "frames": 63,
+        "medianMs": 0.491354155,
+        "p95NearestRankMs": 0.500260404,
+        "meanMs": 0.49155587428571434
+      },
+      "rtDispatchGpu": {
+        "frames": 63,
+        "medianMs": 36.356978279,
+        "p95NearestRankMs": 38.369374063,
+        "meanMs": 36.38287692257143
+      },
+      "fullCommandBufferGpu": {
+        "frames": 63,
+        "medianMs": 36.988853,
+        "p95NearestRankMs": 38.971978,
+        "meanMs": 37.005004920634924
+      }
+    },
+    {
+      "zone": "yellow-torch-bay",
+      "frames": 157,
+      "activeStrategy": "opaque-fast",
+      "geometryAsGpu": {
+        "frames": 157,
+        "medianMs": 0.491145821,
+        "p95NearestRankMs": 0.508124988,
+        "meanMs": 0.49245652987261124
+      },
+      "rtDispatchGpu": {
+        "frames": 157,
+        "medianMs": 39.945259441,
+        "p95NearestRankMs": 45.429686391,
+        "meanMs": 40.19446723791723
+      },
+      "fullCommandBufferGpu": {
+        "frames": 157,
+        "medianMs": 40.611457,
+        "p95NearestRankMs": 46.064999,
+        "meanMs": 40.849637726114665
+      }
+    }
+  ],
+  "initializationAndUnavailableMessages": [
+    "I/HordeRtProbeBridge(22151): OPENING_GPU_STAGE_INIT geometry=awaiting-submission dispatch=awaiting-submission periodNs=52.083332062 validBits=48"
+  ],
+  "limitations": [
+    "Temporary opt-in probe, not frozen A/B performance.",
+    "Stage-limited timestamps may occur at a logically later stage; no isolated-engine or additive claim.",
+    "AS interval excludes CPU skinning/preparation.",
+    "Dispatch includes all shading/lighting/shadow/ray traversal; does not isolate torch cost.",
+    "Cooled observation is not uncooled sustained or actual display-pacing acceptance."
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "apkSha256": "389d6954f7a3fddde1ced690470029fa4b14cc6f825fa34bf7269dc617f946e0",
+  "nativeLibrarySha256": "000d824e7315307c5ce506b0378fc83bb16ccfd93940b7223c6f3b8a0bd279d7",
+  "modules": [
+    {
+      "sha256": "c1e4622ae5df0c87a06c36d803617c7d4e0227845cd33a9dd38de5f0d956ff58",
+      "backend": "RayQueryCompute",
+      "words": 126377,
+      "atomicInstructions": 5,
+      "imageReadInstructions": 0,
+      "binding22": true,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    },
+    {
+      "sha256": "e18171591d4b07ccc3e7fb071400a6581e1fc132aec06dd37c09f88c7792e302",
+      "backend": "RayQueryCompute",
+      "words": 63229,
+      "atomicInstructions": 41,
+      "imageReadInstructions": 0,
+      "binding22": true,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    },
+    {
+      "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+      "backend": "RayTracingPipeline",
+      "words": 126312,
+      "atomicInstructions": 5,
+      "imageReadInstructions": 0,
+      "binding22": true,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    },
+    {
+      "sha256": "9865690c11de315c1c4e49af7d14eb8963b24dc522abfc01c53979bb1a5f5a91",
+      "backend": "RayTracingPipeline",
+      "words": 63170,
+      "atomicInstructions": 41,
+      "imageReadInstructions": 0,
+      "binding22": true,
+      "spirvVal": "passed",
+      "spirvDis": "passed"
+    }
+  ]
+}

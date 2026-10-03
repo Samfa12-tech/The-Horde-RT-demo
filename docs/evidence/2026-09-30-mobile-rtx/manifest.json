@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "sourceRoot": "C:/Dev/tmp/horde-mobile-assessment-20260930",
+  "sourceCommit": "f50c32fe2f9b5de8347f40b0c18399fe32b3a52f",
+  "records": [
+    {
+      "path": "artifact-cmake-module-receipt.json",
+      "bytes": 6308,
+      "sha256": "2456abe509b2c193046182e1c930c02cbcc4e98dbca56d0a19fc178b476aead5"
+    },
+    {
+      "path": "containment-debug-mobile.json",
+      "bytes": 1601,
+      "sha256": "51a6e60dc2f725eafa98bf15ba290c15a90d21f6be07c829356f97b2a2d7a97e"
+    },
+    {
+      "path": "configure-retry.log",
+      "bytes": 1128,
+      "sha256": "e0fa168f1f83777306a5c81475fcc62335a4b9a359551f210c43aed3126e8f50"
+    },
+    {
+      "path": "build.log",
+      "bytes": 2065,
+      "sha256": "8b49bfd2b709aa37f674a3f7166bfd5937dad35dc4a091ce1b748072abc557c5"
+    },
+    {
+      "path": "run-method.md",
+      "bytes": 2561,
+      "sha256": "10a30887037ac2007ad9349557a29860d6a7cab5ebbbed25317b3feddfb39b46"
+    },
+    {
+      "path": "verify-paired-capture.ps1",
+      "bytes": 5584,
+      "sha256": "d98854db0f8ad3a256bd65e54d3f7d412e1dd4662e8c1d92ec1bf842d6615186"
+    },
+    {
+      "path": "paired-capture-verification.json",
+      "bytes": 912,
+      "sha256": "8b3455eff58f3dd79717d725742a7ba6a7c0a3d45fcc379a2c05f04f13e54062"
+    },
+    {
+      "path": "logs/pipeline.stdout.log",
+      "bytes": 2229,
+      "sha256": "e15ad2d9583183ba71fbf507336ec801beff3e642eb74b90b8dbd52c7e8a22f8"
+    },
+    {
+      "path": "logs/pipeline.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/compute.stdout.log",
+      "bytes": 2226,
+      "sha256": "0b71844ccfad21c50887b9f48d3c20e2009a0863eeea4916911034d4d5e012f5"
+    },
+    {
+      "path": "logs/compute.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "native-mobile-rtx-pipeline/capture-manifest.json",
+      "bytes": 5376,
+      "sha256": "8c9c279c57f63cd6db5ca33ba3fa858532ad920ab8b9ea7ec15b76854af1582e"
+    },
+    {
+      "path": "native-mobile-rtx-pipeline/115-lantern-glass-production.png",
+      "bytes": 697128,
+      "sha256": "c714c6eb4c72fb488a35d24dd8e712e9a0617a39cf9be0dd6d92bf5eb2e10bc6"
+    },
+    {
+      "path": "native-mobile-rtx-compute/capture-manifest.json",
+      "bytes": 5407,
+      "sha256": "460392c159948b36f86fae7b1fa9c4693a0eae32de221cf89d1a706b4f3c0395"
+    },
+    {
+      "path": "native-mobile-rtx-compute/115-lantern-glass-production.png",
+      "bytes": 697133,
+      "sha256": "c0559b1c18f5817d32acb71d5ca8f78d6726dd61ce29aa5314464edaa91e78ba"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2848,
+      "sha256": "423afe244a8c1dc71bcd98be4cbb188c15afd3843f86eca5979d9fcdd9d63e21"
+    }
+  ]
+}

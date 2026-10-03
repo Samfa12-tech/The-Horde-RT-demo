@@ -1,0 +1,36 @@
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-d21e10812e5d43689bb437cfb54244f4\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 252680 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=47398dffb48fc56d41516870dca66bdfc339609bde26587835ba29de0761d95d
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-d21e10812e5d43689bb437cfb54244f4\diagnostic_high_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_high_opaque_fast: 505248 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=d565426419b3bbcc3950a225806401ff4d7ddcfe910d49de1c7c04dd51a6e34e
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-d21e10812e5d43689bb437cfb54244f4\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_generic_dielectric: 252680 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=6c3ac0e71d5b665f429f73f3c10c900bb900ceb81b8f5ce472ce50dc6036827a
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-d21e10812e5d43689bb437cfb54244f4\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_opaque_fast: 505248 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=ad5e1af53dac790395b3651ccf8447d3e4da11aede0cc67e31ed9acff2161107
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-d21e10812e5d43689bb437cfb54244f4\shipping_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_high_generic_dielectric: 243852 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=3770323e9213ba549aa8344dc50202eaaac18cb60b8cf4fd44b962b90e1e22ef
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-d21e10812e5d43689bb437cfb54244f4\shipping_high_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_high_opaque_fast: 501012 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=41cff39d122996c9b76c427a4cd3e2566c6f5f3436a32b624845af9813501b93
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-d21e10812e5d43689bb437cfb54244f4\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 243852 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=38c7c0c9ed0c2998cbe9b70f6c2157b154583d69a945a80008cb1fa2bb347c89
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-freeze-d21e10812e5d43689bb437cfb54244f4\shipping_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_mobile_opaque_fast: 501012 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=3cfda44c46ac18f813b94cd457344594b7cc4bfac191bfe62537a4da0aada2e7
+Frozen raygen variant catalog matches a fresh eight-key compilation.
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-artifacts-50cd647cbeb241ce922d6f3960914dcc\compatibility-generic\minimal.rgen.resolved
+Raygen check artifacts: C:\Users\sam_s\AppData\Local\Temp\horde-raygen-artifacts-50cd647cbeb241ce922d6f3960914dcc\compatibility-generic
+Source dependency SHA-256: 5160d093d04be743a77222b761933370123cf0d9522b8b2ec1aedc59e2ea2971; embedded include SHA-256: f4170abbf7f68364d7eeb5d9d01baeed0efacb2fc6db7ab4d1f4c0075dddacd4
+SPIR-V bytes: 253124; words: 63281; instructions: 14979; branch operations: 830; loops: 15; selection merges: 353; SHA-256: 03526a113daed58e6b9dc3565e7a0837c2040acdb685339dcd48b9d7219de658
+Raygen optimizer shape: functions=63; calls=199; ray-query sites=2
+Embedded raygen SPIR-V words match the compiled shader.
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-artifacts-50cd647cbeb241ce922d6f3960914dcc\compatibility-generic\legacy\minimal.legacy.rgen.resolved
+Raygen check artifacts: C:\Users\sam_s\AppData\Local\Temp\horde-raygen-artifacts-50cd647cbeb241ce922d6f3960914dcc\compatibility-generic\legacy
+Source dependency SHA-256: 470d0e6a1dc9b11b101a818b4d204048a9c6da7f1197e7425b93af396f0f22b6; embedded include SHA-256: a3b32262260a25e31fbc880f851baabc5df14bbbb7995fd532e5696afd3e06bb
+SPIR-V bytes: 505248; words: 126312; instructions: 27715; branch operations: 3715; loops: 49; selection merges: 1519; SHA-256: dcf51ae9a3a19689d7b71bf0e15cc0a00c07947d1417657301b196926b21665b
+Raygen optimizer shape: functions=1; calls=0; ray-query sites=23
+Embedded raygen SPIR-V words match the compiled shader.
+C:\Users\sam_s\AppData\Local\Temp\horde-raygen-artifacts-50cd647cbeb241ce922d6f3960914dcc\compatibility-legacy\minimal.legacy.rgen.resolved
+Raygen check artifacts: C:\Users\sam_s\AppData\Local\Temp\horde-raygen-artifacts-50cd647cbeb241ce922d6f3960914dcc\compatibility-legacy
+Source dependency SHA-256: 470d0e6a1dc9b11b101a818b4d204048a9c6da7f1197e7425b93af396f0f22b6; embedded include SHA-256: a3b32262260a25e31fbc880f851baabc5df14bbbb7995fd532e5696afd3e06bb
+SPIR-V bytes: 505248; words: 126312; instructions: 27715; branch operations: 3715; loops: 49; selection merges: 1519; SHA-256: dcf51ae9a3a19689d7b71bf0e15cc0a00c07947d1417657301b196926b21665b
+Raygen optimizer shape: functions=1; calls=0; ray-query sites=23
+Embedded raygen SPIR-V words match the compiled shader.
+Raygen variant artifact specialization and compatibility contracts passed.

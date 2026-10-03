@@ -1,0 +1,16 @@
+C:\Dev\tmp\horde-glass-live-20260930\derived-normal-bias-01\pipeline-modules\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 252680 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=47398dffb48fc56d41516870dca66bdfc339609bde26587835ba29de0761d95d
+C:\Dev\tmp\horde-glass-live-20260930\derived-normal-bias-01\pipeline-modules\diagnostic_high_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_high_opaque_fast: 505248 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=d565426419b3bbcc3950a225806401ff4d7ddcfe910d49de1c7c04dd51a6e34e
+C:\Dev\tmp\horde-glass-live-20260930\derived-normal-bias-01\pipeline-modules\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_generic_dielectric: 252680 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=6c3ac0e71d5b665f429f73f3c10c900bb900ceb81b8f5ce472ce50dc6036827a
+C:\Dev\tmp\horde-glass-live-20260930\derived-normal-bias-01\pipeline-modules\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_opaque_fast: 505248 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=ad5e1af53dac790395b3651ccf8447d3e4da11aede0cc67e31ed9acff2161107
+C:\Dev\tmp\horde-glass-live-20260930\derived-normal-bias-01\pipeline-modules\shipping_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_high_generic_dielectric: 243852 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=3770323e9213ba549aa8344dc50202eaaac18cb60b8cf4fd44b962b90e1e22ef
+C:\Dev\tmp\horde-glass-live-20260930\derived-normal-bias-01\pipeline-modules\shipping_high_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_high_opaque_fast: 501012 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=41cff39d122996c9b76c427a4cd3e2566c6f5f3436a32b624845af9813501b93
+C:\Dev\tmp\horde-glass-live-20260930\derived-normal-bias-01\pipeline-modules\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 243852 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=38c7c0c9ed0c2998cbe9b70f6c2157b154583d69a945a80008cb1fa2bb347c89
+C:\Dev\tmp\horde-glass-live-20260930\derived-normal-bias-01\pipeline-modules\shipping_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_mobile_opaque_fast: 501012 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=3cfda44c46ac18f813b94cd457344594b7cc4bfac191bfe62537a4da0aada2e7

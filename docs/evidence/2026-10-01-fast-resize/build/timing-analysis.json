@@ -1,0 +1,66 @@
+[
+  {
+    "run": "settings-control-389d6954-a1",
+    "apk": "389d6954f7a3fddde1ced690470029fa4b14cc6f825fa34bf7269dc617f946e0",
+    "count": 4,
+    "minimumMs": 13282.453775405884,
+    "medianMs": 13795.8163022995,
+    "maximumMs": 14063.716173171997
+  },
+  {
+    "run": "settings-candidate-8da43d5c-b1",
+    "apk": "8da43d5c635802479af2ad2b87f8d0f8971f9d3127cf499461e94868295f23d0",
+    "count": 4,
+    "minimumMs": 431.67734146118164,
+    "medianMs": 490.2569055557251,
+    "maximumMs": 539.2425060272217
+  },
+  {
+    "run": "settings-candidate-8da43d5c-b2",
+    "apk": "8da43d5c635802479af2ad2b87f8d0f8971f9d3127cf499461e94868295f23d0",
+    "count": 4,
+    "minimumMs": 414.28685188293457,
+    "medianMs": 452.2838592529297,
+    "maximumMs": 530.7817459106445
+  },
+  {
+    "run": "settings-control-389d6954-a2",
+    "apk": "389d6954f7a3fddde1ced690470029fa4b14cc6f825fa34bf7269dc617f946e0",
+    "count": 4,
+    "minimumMs": 13326.31254196167,
+    "medianMs": 13828.135251998901,
+    "maximumMs": 14238.260269165039
+  },
+  {
+    "run": "settings-final-c11ff703-c1",
+    "apk": "c11ff703794d74dbfb75dc7a0186af0f6c5c416e8383755a5cd8f84310daf0fe",
+    "count": 4,
+    "minimumMs": 430.1612377166748,
+    "medianMs": 489.1858100891113,
+    "maximumMs": 585.641622543335
+  },
+  {
+    "run": "settings-final-c11ff703-compute",
+    "apk": "c11ff703794d74dbfb75dc7a0186af0f6c5c416e8383755a5cd8f84310daf0fe",
+    "count": 4,
+    "minimumMs": 427.6115894317627,
+    "medianMs": 477.6947498321533,
+    "maximumMs": 554.11696434021
+  },
+  {
+    "run": "settings-final-c11ff703-packet-pipeline",
+    "apk": "c11ff703794d74dbfb75dc7a0186af0f6c5c416e8383755a5cd8f84310daf0fe",
+    "count": 4,
+    "minimumMs": 414.1104221343994,
+    "medianMs": 462.35597133636475,
+    "maximumMs": 562.2565746307373
+  },
+  {
+    "run": "settings-final-c11ff703-packet-compute",
+    "apk": "c11ff703794d74dbfb75dc7a0186af0f6c5c416e8383755a5cd8f84310daf0fe",
+    "count": 4,
+    "minimumMs": 436.3274574279785,
+    "medianMs": 480.65173625946045,
+    "maximumMs": 500.1108646392822
+  }
+]

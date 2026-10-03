@@ -2,8 +2,12 @@
 #include "scene/assets/AssetValidation.h"
 #include "scene/assets/DielectricTopologyMath.h"
 #include "scene/assets/StaticMeshAsset.h"
-#include "third_party/cgltf/cgltf.h"
+#include "scene/assets/PlayerPrimitiveContract.h"
+#include "vulkan/raytracing/RtLanternGeometryProfile.h"
+#include "vulkan/raytracing/RtStaticMeshSlot.h"
+#include "cgltf/cgltf.h"
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdlib>
@@ -12,10 +16,12 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #if defined(_WIN32)
@@ -39,6 +45,12 @@ void Check(bool condition, std::string_view message)
         std::cerr << "FAIL: " << message << '\n';
         ++failures;
     }
+}
+
+bool IsSafeCyclicRejectionDiagnostic(std::string_view diagnostic)
+{
+    return diagnostic == "Static GLB failed cgltf structural validation." ||
+           diagnostic == "Static GLB contains an out-of-range accessor or index reference.";
 }
 
 std::uint64_t CurrentProcessId()
@@ -248,13 +260,15 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
                                                bool includeVolume = true,
                                                float thicknessFactor = 1.0f,
                                                int windingMutation = 0,
-                                               std::string_view nodeTransform = {})
+                                               std::string_view nodeTransform = {},
+                                               bool tetrahedron = false,
+                                               int geometryMutation = 0)
 {
-    constexpr std::array<std::array<float, 3u>, 8u> positions{{
+    std::vector<std::array<float, 3u>> positions{
         {{-0.5f, -0.5f, -0.5f}}, {{0.5f, -0.5f, -0.5f}},
         {{0.5f, 0.5f, -0.5f}}, {{-0.5f, 0.5f, -0.5f}},
         {{-0.5f, -0.5f, 0.5f}}, {{0.5f, -0.5f, 0.5f}},
-        {{0.5f, 0.5f, 0.5f}}, {{-0.5f, 0.5f, 0.5f}}}};
+        {{0.5f, 0.5f, 0.5f}}, {{-0.5f, 0.5f, 0.5f}}};
     constexpr std::array<std::uint16_t, 36u> closedIndices{{
         0, 2, 1, 0, 3, 2,
         4, 5, 6, 4, 6, 7,
@@ -263,6 +277,16 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
         0, 1, 5, 0, 5, 4,
         3, 7, 6, 3, 6, 2}};
     std::vector<std::uint16_t> indices(closedIndices.begin(), closedIndices.end());
+    if (geometryMutation == 1)
+        for (auto& position : positions) position[0] += position[2] * 0.00001f;
+    if (geometryMutation == 2) positions[7u][0] += 0.000005f;
+    if (tetrahedron)
+    {
+        positions = {{{1.0f, 1.0f, 1.0f}}, {{2.0f, 1.0f, 1.0f}},
+                     {{1.0f, 2.0f, 1.0f}}, {{1.0f, 1.0f, 2.0f}}};
+        indices = {0u, 2u, 1u, 0u, 1u, 3u,
+                   0u, 3u, 2u, 1u, 2u, 3u};
+    }
     if (omitFrontFace) indices.erase(indices.begin() + 6, indices.begin() + 12);
     if (duplicateBottomTriangle) indices.insert(indices.end(), {0u, 1u, 5u});
     if (windingMutation == 1)
@@ -295,6 +319,25 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
     const std::size_t indexOffset = binary.size();
     for (std::uint16_t index : indices) AppendU16(binary, index);
 
+    std::array<float, 3u> positionMinimum{{
+        std::numeric_limits<float>::max(),
+        std::numeric_limits<float>::max(),
+        std::numeric_limits<float>::max()}};
+    std::array<float, 3u> positionMaximum{{
+        std::numeric_limits<float>::lowest(),
+        std::numeric_limits<float>::lowest(),
+        std::numeric_limits<float>::lowest()}};
+    for (const auto& position : positions)
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            positionMinimum[axis] = std::min(positionMinimum[axis], position[axis]);
+            positionMaximum[axis] = std::max(positionMaximum[axis], position[axis]);
+        }
+    const auto jsonVector = [](const std::array<float, 3u>& value) {
+        return "[" + std::to_string(value[0]) + "," +
+            std::to_string(value[1]) + "," + std::to_string(value[2]) + "]";
+    };
+
     const std::string extensionNames = includeVolume
         ? "[\"KHR_materials_transmission\",\"KHR_materials_volume\",\"KHR_materials_ior\"]"
         : "[\"KHR_materials_transmission\",\"KHR_materials_ior\"]";
@@ -309,18 +352,25 @@ std::filesystem::path WriteClosedDielectricGlb(const std::filesystem::path& root
         "\"extensionsRequired\":" + extensionNames + ","
         "\"buffers\":[{\"byteLength\":" + std::to_string(binary.size()) + "}],"
         "\"bufferViews\":["
-        "{\"buffer\":0,\"byteOffset\":0,\"byteLength\":96,\"target\":34962},"
+        "{\"buffer\":0,\"byteOffset\":0,\"byteLength\":" +
+            std::to_string(positions.size() * 3u * sizeof(float)) + ",\"target\":34962},"
         "{\"buffer\":0,\"byteOffset\":" + std::to_string(normalOffset) +
-            ",\"byteLength\":96,\"target\":34962},"
+            ",\"byteLength\":" +
+            std::to_string(positions.size() * 3u * sizeof(float)) + ",\"target\":34962},"
         "{\"buffer\":0,\"byteOffset\":" + std::to_string(uvOffset) +
-            ",\"byteLength\":64,\"target\":34962},"
+            ",\"byteLength\":" +
+            std::to_string(positions.size() * 2u * sizeof(float)) + ",\"target\":34962},"
         "{\"buffer\":0,\"byteOffset\":" + std::to_string(indexOffset) +
             ",\"byteLength\":" + std::to_string(indices.size() * 2u) +
             ",\"target\":34963}],"
         "\"accessors\":["
-        "{\"bufferView\":0,\"componentType\":5126,\"count\":8,\"type\":\"VEC3\",\"min\":[-0.5,-0.5,-0.5],\"max\":[0.5,0.5,0.5]},"
-        "{\"bufferView\":1,\"componentType\":5126,\"count\":8,\"type\":\"VEC3\"},"
-        "{\"bufferView\":2,\"componentType\":5126,\"count\":8,\"type\":\"VEC2\"},"
+        "{\"bufferView\":0,\"componentType\":5126,\"count\":" +
+            std::to_string(positions.size()) + ",\"type\":\"VEC3\",\"min\":" +
+            jsonVector(positionMinimum) + ",\"max\":" + jsonVector(positionMaximum) + "},"
+        "{\"bufferView\":1,\"componentType\":5126,\"count\":" +
+            std::to_string(positions.size()) + ",\"type\":\"VEC3\"},"
+        "{\"bufferView\":2,\"componentType\":5126,\"count\":" +
+            std::to_string(positions.size()) + ",\"type\":\"VEC2\"},"
         "{\"bufferView\":3,\"componentType\":5123,\"count\":" +
             std::to_string(indices.size()) + ",\"type\":\"SCALAR\"}],"
         "\"materials\":[{\"name\":\"ClosedGlass\",\"doubleSided\":true,"
@@ -500,6 +550,539 @@ void TestManifestContract(const std::filesystem::path& temporaryRoot)
                           "Asset manifest exceeds the bounded JSON size limit.");
 }
 
+void TestPlayerSemanticManifestAndGeometry(const std::filesystem::path& temporaryRoot)
+{
+    using namespace horde::scene::assets;
+    AssetManifest manifest;
+    std::string diagnostic;
+    Check(AssetManifest::Load(kFixtureRoot / "valid.manifest.json", manifest, diagnostic),
+          "generic asset remains compatible without player semantics");
+    Check(!manifest.ValidatePlayerSemantics(diagnostic), "player consumer rejects an undeclared contract");
+
+    const std::array<std::string, 4> declarations{{
+        R"({"material":"BodyPrimaryVisible","firstPersonPrimary":true,"shadow":true,"reflection":true})",
+        R"({"material":"HeadPrimaryMasked","firstPersonPrimary":false,"shadow":true,"reflection":true})",
+        R"({"material":"NearFacePrimaryMasked","firstPersonPrimary":false,"shadow":true,"reflection":true})",
+        R"({"material":"GauntletPrimaryVisible","firstPersonPrimary":true,"shadow":true,"reflection":true})",
+    }};
+    const std::string bodyRemainderDeclaration =
+        R"({"material":"BodyRemainderPrimaryVisible","firstPersonPrimary":true,"shadow":true,"reflection":true})";
+    const auto writeManifest = [&](const std::vector<std::string>& entries,
+                                   std::string_view role = {}) {
+        std::string field;
+        if (!role.empty()) field = "\"playerAssetRole\":\"" + std::string(role) + "\",";
+        field += "\"primitiveSemantics\":[";
+        for (std::size_t i = 0; i < entries.size(); ++i) field += (i ? "," : "") + entries[i];
+        field += "],\"schema\": 1,";
+        return RewriteManifest(temporaryRoot, "player.manifest.json", "\"schema\": 1,", field);
+    };
+    std::array<unsigned, 4> order{{0, 1, 2, 3}};
+    do {
+        std::vector<std::string> entries;
+        for (const auto index : order) entries.push_back(declarations[index]);
+        Check(AssetManifest::Load(writeManifest(entries), manifest, diagnostic) &&
+                  manifest.ValidatePlayerSemantics(diagnostic), "manifest order must not determine semantics");
+        auto copied = manifest;
+        manifest = {};
+        Check(copied.ValidatePlayerSemantics(diagnostic), "copied parsed manifest owns its material strings");
+    } while (std::next_permutation(order.begin(), order.end()));
+    std::vector<std::string> extendedDeclarations(declarations.begin(), declarations.end());
+    extendedDeclarations.push_back(bodyRemainderDeclaration);
+    Check(AssetManifest::Load(writeManifest(extendedDeclarations, "WorldBody"), manifest, diagnostic) &&
+              manifest.playerAssetRole == PlayerAssetRole::WorldBody &&
+              manifest.ValidatePlayerSemantics(diagnostic),
+          "explicit WorldBody role accepts the exact five-part profile");
+    Check(AssetManifest::Load(writeManifest({declarations.begin(), declarations.end()}), manifest, diagnostic) &&
+              manifest.playerAssetRole == PlayerAssetRole::Unspecified &&
+              manifest.ValidatePlayerSemantics(diagnostic),
+          "legacy four-part manifest remains compatible without an explicit role");
+    const auto rejected = [&](std::vector<std::string> entries, const char* message) {
+        Check(!AssetManifest::Load(writeManifest(entries), manifest, diagnostic) && !diagnostic.empty(), message);
+    };
+    rejected({}, "explicit empty semantics rejected");
+    rejected({declarations[0], declarations[1], declarations[2]}, "stale three-way manifest rejected");
+    rejected({declarations[0], declarations[1], declarations[2], declarations[0]}, "duplicate semantic rejected");
+    rejected({declarations[0], declarations[1], declarations[2], declarations[3], declarations[3]}, "extra semantic rejected");
+    rejected({declarations[0], declarations[1], declarations[2], bodyRemainderDeclaration},
+             "five-part profile cannot replace a legacy semantic");
+    rejected({declarations[0], declarations[1], declarations[2], declarations[3], declarations[3]},
+             "five-part profile rejects duplicate names");
+    auto extendedWithUnknown = extendedDeclarations;
+    extendedWithUnknown.back() = R"({"material":"Unknown","firstPersonPrimary":true,"shadow":true,"reflection":true})";
+    Check(!AssetManifest::Load(writeManifest(extendedWithUnknown, "WorldBody"), manifest, diagnostic) &&
+              !diagnostic.empty(),
+          "five-part profile rejects unknown semantics");
+    Check(!AssetManifest::Load(writeManifest(extendedDeclarations), manifest, diagnostic) &&
+              !diagnostic.empty(),
+          "five-part profile requires explicit WorldBody role");
+    const auto mutateLast = [&](std::string_view before, std::string_view after, const char* message) {
+        std::vector<std::string> entries(declarations.begin(), declarations.end());
+        const auto offset = entries.back().find(before);
+        Check(offset != std::string::npos, "semantic mutation source exists");
+        if (offset != std::string::npos) entries.back().replace(offset, before.size(), after);
+        rejected(entries, message);
+    };
+    mutateLast("GauntletPrimaryVisible", "Unknown", "unknown manifest semantic rejected");
+    mutateLast("\"firstPersonPrimary\":true", "\"firstPersonPrimary\":false", "visibility conflict rejected");
+    mutateLast("\"reflection\":true", "\"reflection\":1", "nonboolean visibility rejected");
+    mutateLast(",\"reflection\":true", "", "missing visibility field rejected");
+    mutateLast("\"shadow\":true", "\"shadow\":true,\"shadow\":true", "duplicate visibility field rejected");
+    mutateLast("\"shadow\":true", "\"shadow\":true,\"unexpected\":true", "unknown semantic field rejected");
+    Check(AssetManifest::Load(writeManifest({declarations.begin(), declarations.end()}), manifest, diagnostic),
+          "four-way manifest restored for geometry tests");
+    manifest.materialOverrides.clear();
+
+    // A small real GLB fixture: four primitives share triangle accessors but have
+    // distinct named materials. Reorder geometry independently of declarations.
+    std::vector<std::uint8_t> binary;
+    for (const float value : {0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f, 0.f}) AppendFloat(binary, value);
+    for (unsigned i = 0; i < 3; ++i)
+        for (const float value : {0.f, 0.f, 1.f}) AppendFloat(binary, value);
+    for (const float value : {0.f, 0.f, 1.f, 0.f, 0.f, 1.f}) AppendFloat(binary, value);
+    for (std::uint16_t i = 0; i < 3; ++i) AppendU16(binary, i);
+    const auto writeGeometry = [&](const std::vector<unsigned>& primitiveOrder,
+                                   bool unknownName = false,
+                                   bool extendedProfile = false) {
+        std::string json = R"({"asset":{"version":"2.0"},"buffers":[{"byteLength":102}],"bufferViews":[{"buffer":0,"byteOffset":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":36},{"buffer":0,"byteOffset":72,"byteLength":24},{"buffer":0,"byteOffset":96,"byteLength":6}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3","min":[0,0,0],"max":[1,1,0]},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":3,"type":"VEC2"},{"bufferView":3,"componentType":5123,"count":3,"type":"SCALAR"}],"materials":[)";
+        const std::size_t materialCount = extendedProfile
+            ? kPlayerPrimitiveContract.size() : kLegacyPlayerPrimitiveCount;
+        for (std::size_t i = 0; i < materialCount; ++i) {
+            if (i) json += ',';
+            json += "{\"name\":\"" + std::string(unknownName && i == 3 ? "Unknown" : kPlayerPrimitiveContract[i].material) + "\"}";
+        }
+        json += "],\"meshes\":[{\"primitives\":[";
+        for (std::size_t i = 0; i < primitiveOrder.size(); ++i) {
+            if (i) json += ',';
+            json += R"({"attributes":{"POSITION":0,"NORMAL":1,"TEXCOORD_0":2},"indices":3,"material":)" +
+                std::to_string(primitiveOrder[i]) + "}";
+        }
+        json += R"(]}],"nodes":[{"name":"grip","mesh":0}],"scenes":[{"nodes":[0]}],"scene":0})";
+        const auto path = temporaryRoot / "player-semantics.glb";
+        WriteGlb(path, json, binary);
+        return path;
+    };
+    StaticMeshAsset asset;
+    do {
+        const auto path = writeGeometry({order.begin(), order.end()});
+        const bool loaded = StaticMeshAsset::Load(path, manifest, asset, diagnostic);
+        Check(loaded, std::string("four-way reordered geometry loads: ") + diagnostic);
+        if (loaded) for (const auto& material : asset.materials) {
+            const auto* contract = FindPlayerPrimitiveContract(material.name);
+            const std::uint32_t expected = contract->semantic == PlayerPrimitiveSemantic::Head ? 128u :
+                contract->semantic == PlayerPrimitiveSemantic::NearFace ? 256u : 0u;
+            Check((material.flags & (128u | 256u)) == expected, "name-based primary masks survive geometry reordering");
+        }
+    } while (std::next_permutation(order.begin(), order.end()));
+    Check(AssetManifest::Load(writeManifest(extendedDeclarations, "WorldBody"), manifest, diagnostic),
+          "extended manifest reloads for geometry validation");
+    if (manifest.playerAssetRole == PlayerAssetRole::WorldBody)
+    {
+        const auto extendedPath = writeGeometry({0u, 1u, 2u, 3u, 4u}, false, true);
+        Check(!StaticMeshAsset::Load(extendedPath, manifest, asset, diagnostic),
+              "extended semantics must not bypass the legacy four-primitive budget");
+        manifest.budgets.maxPrimitives = 5u;
+        manifest.budgets.maxMaterials = 5u;
+        const bool loaded = StaticMeshAsset::Load(
+            extendedPath, manifest, asset, diagnostic);
+        Check(loaded, std::string("five-part body geometry loads: ") + diagnostic);
+        if (loaded)
+        {
+            constexpr std::uint32_t kBodyRemainderPrimaryVisible = 2048u;
+            for (const auto& material : asset.materials)
+            {
+                const auto* contract = FindPlayerPrimitiveContract(material.name);
+                Check(contract != nullptr &&
+                          material.textureGroup == static_cast<std::int32_t>(contract->textureGroup),
+                      "five-part materials retain their named Body or Gauntlet atlas group");
+                const bool isRemainder = material.name == "BodyRemainderPrimaryVisible";
+                Check(((material.flags & kBodyRemainderPrimaryVisible) != 0u) == isRemainder,
+                      "only BodyRemainderPrimaryVisible receives its dedicated material flag");
+            }
+        }
+    }
+    Check(AssetManifest::Load(writeManifest({declarations.begin(), declarations.end()}), manifest, diagnostic),
+          "legacy manifest restored after extended geometry validation");
+    for (const auto& bad : {std::vector<unsigned>{0, 1, 2}, std::vector<unsigned>{0, 1, 2, 0}}) {
+        Check(!StaticMeshAsset::Load(writeGeometry(bad), manifest, asset, diagnostic) && asset.primitives.empty(),
+              "missing/duplicate geometry rejected without retaining presentable asset");
+    }
+    Check(!StaticMeshAsset::Load(writeGeometry({0, 1, 2, 3}, true), manifest, asset, diagnostic),
+          "unknown actual geometry semantic rejected");
+    manifest.primitiveSemantics[0].shadow = false;
+    Check(!StaticMeshAsset::Load(writeGeometry({0, 1, 2, 3}), manifest, asset, diagnostic),
+          "programmatically conflicting manifest cannot bypass loader enforcement");
+
+    const std::array<std::string, 2> viewmodelDeclarations{{
+        R"({"material":"ViewmodelSleeves","firstPersonPrimary":true,"shadow":false,"reflection":false})",
+        R"({"material":"ViewmodelGauntlets","firstPersonPrimary":true,"shadow":false,"reflection":false})",
+    }};
+    AssetManifest directViewmodel;
+    directViewmodel.playerAssetRole = PlayerAssetRole::Viewmodel;
+    directViewmodel.primitiveSemantics = {
+        {"ViewmodelSleeves", true, false, false},
+        {"ViewmodelGauntlets", true, false, false},
+    };
+    Check(directViewmodel.ValidatePlayerViewmodelSemantics(diagnostic),
+          "direct viewmodel validator accepts only its explicit role");
+    directViewmodel.playerAssetRole = PlayerAssetRole::Unspecified;
+    Check(!directViewmodel.ValidatePlayerViewmodelSemantics(diagnostic),
+          "direct viewmodel validator rejects a missing role");
+    directViewmodel.playerAssetRole = PlayerAssetRole::WorldBody;
+    Check(!directViewmodel.ValidatePlayerViewmodelSemantics(diagnostic),
+          "direct viewmodel validator rejects the world-body role");
+    directViewmodel.playerAssetRole = static_cast<PlayerAssetRole>(255u);
+    Check(!directViewmodel.ValidatePlayerViewmodelSemantics(diagnostic),
+          "direct viewmodel validator rejects an invalid role");
+
+    AssetManifest directWorld;
+    directWorld.primitiveSemantics = {
+        {"BodyPrimaryVisible", true, true, true},
+        {"HeadPrimaryMasked", false, true, true},
+        {"NearFacePrimaryMasked", false, true, true},
+        {"GauntletPrimaryVisible", true, true, true},
+    };
+    directWorld.playerAssetRole = PlayerAssetRole::Unspecified;
+    Check(directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct world validator accepts legacy unspecified role");
+    directWorld.playerAssetRole = PlayerAssetRole::WorldBody;
+    Check(directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct world validator accepts explicit world-body role");
+    directWorld.playerAssetRole = PlayerAssetRole::Viewmodel;
+    Check(!directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct world validator rejects the viewmodel role");
+    directWorld.playerAssetRole = static_cast<PlayerAssetRole>(255u);
+    Check(!directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct world validator rejects an invalid role");
+    directWorld.playerAssetRole = PlayerAssetRole::Unspecified;
+    directWorld.primitiveSemantics.push_back(
+        {"BodyRemainderPrimaryVisible", true, true, true});
+    Check(!directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct validator rejects five-part semantics without explicit WorldBody role");
+    directWorld.playerAssetRole = PlayerAssetRole::WorldBody;
+    Check(directWorld.ValidatePlayerSemantics(diagnostic),
+          "direct validator accepts exact five-part semantics with explicit WorldBody role");
+    const auto writeViewmodelManifest = [&](const std::vector<std::string>& entries,
+                                            std::string_view role = "Viewmodel") {
+        std::string field = "\"playerAssetRole\":\"" + std::string(role) +
+            "\",\"primitiveSemantics\":[";
+        for (std::size_t i = 0u; i < entries.size(); ++i)
+            field += (i ? "," : "") + entries[i];
+        field += "],\"schema\": 1,";
+        return RewriteManifest(temporaryRoot, "viewmodel.manifest.json",
+                               "\"schema\": 1,", field);
+    };
+    const auto writeViewmodelGeometry = [&](const std::vector<unsigned>& primitiveOrder,
+                                            bool unknownName = false) {
+        std::string json = R"({"asset":{"version":"2.0"},"buffers":[{"byteLength":102}],"bufferViews":[{"buffer":0,"byteOffset":0,"byteLength":36},{"buffer":0,"byteOffset":36,"byteLength":36},{"buffer":0,"byteOffset":72,"byteLength":24},{"buffer":0,"byteOffset":96,"byteLength":6}],"accessors":[{"bufferView":0,"componentType":5126,"count":3,"type":"VEC3","min":[0,0,0],"max":[1,1,0]},{"bufferView":1,"componentType":5126,"count":3,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":3,"type":"VEC2"},{"bufferView":3,"componentType":5123,"count":3,"type":"SCALAR"}],"materials":[)";
+        for (std::size_t i = 0u; i < kPlayerViewmodelPrimitiveContract.size(); ++i)
+        {
+            if (i) json += ',';
+            json += "{\"name\":\"" + std::string(
+                unknownName && i == 1u ? "UnknownViewmodelPart" :
+                    kPlayerViewmodelPrimitiveContract[i].material) + "\"}";
+        }
+        json += "] ,\"meshes\":[{\"primitives\":[";
+        for (std::size_t i = 0u; i < primitiveOrder.size(); ++i)
+        {
+            if (i) json += ',';
+            json += R"({"attributes":{"POSITION":0,"NORMAL":1,"TEXCOORD_0":2},"indices":3,"material":)" +
+                std::to_string(primitiveOrder[i]) + "}";
+        }
+        json += R"(]}],"nodes":[{"name":"grip","mesh":0}],"scenes":[{"nodes":[0]}],"scene":0})";
+        const auto path = temporaryRoot / "viewmodel-semantics.glb";
+        WriteGlb(path, json, binary);
+        return path;
+    };
+    AssetManifest viewmodelManifest;
+    Check(AssetManifest::Load(
+              writeViewmodelManifest({viewmodelDeclarations.begin(), viewmodelDeclarations.end()}),
+              viewmodelManifest, diagnostic) &&
+              viewmodelManifest.playerAssetRole == PlayerAssetRole::Viewmodel &&
+              viewmodelManifest.ValidatePlayerViewmodelSemantics(diagnostic),
+          "explicit viewmodel role and declarations load");
+    for (const auto order : {std::vector<unsigned>{0u, 1u}, std::vector<unsigned>{1u, 0u}})
+    {
+        Check(StaticMeshAsset::Load(writeViewmodelGeometry(order), viewmodelManifest,
+                                    asset, diagnostic),
+              std::string("both viewmodel primitive orders load: ") + diagnostic);
+        if (asset.materials.size() == 2u)
+        {
+            for (const auto& material : asset.materials)
+            {
+                const auto* contract = FindPlayerViewmodelPrimitiveContract(material.name);
+                Check(contract != nullptr &&
+                          material.textureGroup == static_cast<std::int32_t>(contract->textureGroup),
+                      "viewmodel materials receive their named body/gauntlet texture groups");
+            }
+        }
+    }
+    Check(!AssetManifest::Load(writeViewmodelManifest({}, "Viewmodel"), viewmodelManifest, diagnostic),
+          "explicit viewmodel role requires declarations");
+    Check(!AssetManifest::Load(writeViewmodelManifest(
+                                   {viewmodelDeclarations[0], viewmodelDeclarations[0]}),
+                               viewmodelManifest, diagnostic),
+          "duplicate viewmodel declarations are rejected by the parser");
+    auto contaminated = std::vector<std::string>{viewmodelDeclarations[0], viewmodelDeclarations[1]};
+    contaminated[1] = R"({"material":"BodyPrimaryVisible","firstPersonPrimary":true,"shadow":true,"reflection":true})";
+    Check(!AssetManifest::Load(writeViewmodelManifest(contaminated), viewmodelManifest, diagnostic),
+          "world-body declaration cannot contaminate a viewmodel role");
+    auto conflicting = std::vector<std::string>{viewmodelDeclarations[0], viewmodelDeclarations[1]};
+    conflicting[0] = R"({"material":"ViewmodelSleeves","firstPersonPrimary":true,"shadow":true,"reflection":false})";
+    Check(!AssetManifest::Load(writeViewmodelManifest(conflicting), viewmodelManifest, diagnostic),
+          "viewmodel visibility conflicts are rejected by the parser");
+    Check(!AssetManifest::Load(writeViewmodelManifest(
+                                   {viewmodelDeclarations.begin(), viewmodelDeclarations.end()}, "WorldBody"),
+                               viewmodelManifest, diagnostic),
+          "world-body role rejects viewmodel declarations");
+    Check(AssetManifest::Load(
+              writeViewmodelManifest({viewmodelDeclarations.begin(), viewmodelDeclarations.end()}),
+              viewmodelManifest, diagnostic),
+          "viewmodel manifest is restored for geometry validation");
+    Check(!StaticMeshAsset::Load(writeViewmodelGeometry({0u}), viewmodelManifest,
+                                 asset, diagnostic),
+          "missing actual viewmodel primitive is rejected");
+    Check(!StaticMeshAsset::Load(writeViewmodelGeometry({0u, 0u}), viewmodelManifest,
+                                 asset, diagnostic),
+          "duplicate actual viewmodel primitive is rejected");
+    Check(!StaticMeshAsset::Load(writeViewmodelGeometry({0u, 1u}, true), viewmodelManifest,
+                                 asset, diagnostic),
+          "unknown actual viewmodel primitive is rejected");
+}
+
+void TestSharedTextureSourceRouting()
+{
+    using horde::scene::assets::StaticMaterial;
+    using horde::scene::assets::StaticMeshAsset;
+    using horde::vulkan::raytracing::RtStaticMeshSlot;
+    using horde::vulkan::raytracing::StaticRtAssetRegistration;
+
+    const auto makeMaterial = [](std::string name, std::int32_t group,
+                                 std::int32_t seed,
+                                 std::array<bool, 4u> presence = {{true, true, true, true}},
+                                 float factor = 1.0f) {
+        StaticMaterial material;
+        material.name = std::move(name);
+        material.textureGroup = group;
+        material.baseColorFactor = {{factor, 0.5f, 0.25f, 1.0f}};
+        material.baseColorTexture = presence[0] ? seed : -1;
+        material.normalTexture = presence[1] ? seed + 10 : -1;
+        material.ormTexture = presence[2] ? seed + 20 : -1;
+        material.emissiveTexture = presence[3] ? seed + 30 : -1;
+        return material;
+    };
+    const auto makeAsset = [](std::vector<StaticMaterial> materials) {
+        StaticMeshAsset asset;
+        asset.materials = std::move(materials);
+        asset.nodeTransforms.resize(1u);
+        asset.vertices.resize(asset.materials.size() * 3u);
+        asset.indices.resize(asset.materials.size() * 3u);
+        for (std::size_t i = 0u; i < asset.materials.size(); ++i)
+        {
+            asset.indices[i * 3u + 0u] = 0u;
+            asset.indices[i * 3u + 1u] = 1u;
+            asset.indices[i * 3u + 2u] = 2u;
+            asset.primitives.push_back({static_cast<std::uint32_t>(i * 3u),
+                                        static_cast<std::uint32_t>(i * 3u), 3u,
+                                        static_cast<std::uint32_t>(i), 0u});
+        }
+        return asset;
+    };
+
+    auto world = makeAsset({
+        makeMaterial("WorldBody", 7, 1, {{true, true, true, true}}, 1.0f),
+        makeMaterial("WorldGauntlet", 9, 2, {{true, true, true, true}}, 1.1f)});
+    auto viewmodel = makeAsset({
+        makeMaterial("ViewmodelSleeves", 7, 101, {{true, true, true, true}}, 2.0f),
+        makeMaterial("ViewmodelGauntlets", 9, 102, {{true, true, true, true}}, 2.1f)});
+    const StaticRtAssetRegistration worldRegistration{
+        0u, 1u, 0u, 0u, &world};
+    const StaticRtAssetRegistration viewmodelDefaultRegistration{
+        1u, 2u, 0u, 0u, &viewmodel};
+    const StaticRtAssetRegistration viewmodelAliasRegistration{
+        1u, 2u, 0u, 0u, &viewmodel, &world};
+
+    std::string diagnostic;
+    RtStaticMeshSlot defaultSlot;
+    Check(defaultSlot.Initialize(
+              std::array<StaticRtAssetRegistration, 2u>{{
+                  worldRegistration, viewmodelDefaultRegistration}}, diagnostic),
+          std::string("default per-asset texture routing remains valid: ") + diagnostic);
+    const auto defaultCounts = defaultSlot.TextureArrayCounts();
+    Check(defaultCounts.baseColor == 4u && defaultCounts.normal == 4u &&
+              defaultCounts.orm == 4u && defaultCounts.emissive == 4u,
+          "default registrations retain independent per-asset texture layers");
+    Check(defaultSlot.Materials().size() == 4u &&
+              defaultSlot.Materials()[2u].textureLayers != defaultSlot.Materials()[0u].textureLayers &&
+              defaultSlot.Vertices().size() == world.vertices.size() + viewmodel.vertices.size(),
+          "default routing preserves consumer geometry and does not alias layers");
+
+    RtStaticMeshSlot aliasedSlot;
+    Check(aliasedSlot.Initialize(
+              std::array<StaticRtAssetRegistration, 2u>{{
+                  worldRegistration, viewmodelAliasRegistration}}, diagnostic),
+          std::string("explicit texture source routing is valid: ") + diagnostic);
+    const auto aliasedCounts = aliasedSlot.TextureArrayCounts();
+    Check(aliasedCounts.baseColor == 2u && aliasedCounts.normal == 2u &&
+              aliasedCounts.orm == 2u && aliasedCounts.emissive == 2u,
+          "aliased named groups preserve provider layer counts without allocation");
+    Check(aliasedSlot.Materials().size() == 4u &&
+              aliasedSlot.Materials()[2u].textureLayers == aliasedSlot.Materials()[0u].textureLayers &&
+              aliasedSlot.Materials()[3u].textureLayers == aliasedSlot.Materials()[1u].textureLayers &&
+              aliasedSlot.Materials()[2u].baseColorFactor != aliasedSlot.Materials()[0u].baseColorFactor &&
+              aliasedSlot.Vertices().size() == world.vertices.size() + viewmodel.vertices.size() &&
+              aliasedSlot.InstanceMetadata()[1u].primitiveBase == world.primitives.size(),
+          "aliased consumer retains independent material factors and geometry metadata");
+
+    const auto expectFailure = [&](std::vector<StaticRtAssetRegistration> registrations,
+                                   std::string_view fragment, std::string_view label) {
+        RtStaticMeshSlot slot;
+        diagnostic.clear();
+        const bool loaded = slot.Initialize(registrations, diagnostic);
+    Check(!loaded && diagnostic.find(fragment) != std::string::npos,
+              std::string(label) + ": " + diagnostic);
+    };
+
+    auto unregistered = makeAsset({makeMaterial("Unregistered", 7, 201)});
+    expectFailure({worldRegistration, {1u, 3u, 0u, 0u, &viewmodel, &unregistered}},
+                  "not registered", "unknown texture source is rejected");
+    expectFailure({{1u, 2u, 0u, 0u, &viewmodel, &world}, worldRegistration},
+                  "registered earlier", "forward texture source is rejected");
+
+    auto intermediary = makeAsset({makeMaterial("Intermediary", 7, 301)});
+    expectFailure({worldRegistration,
+                   {1u, 2u, 0u, 0u, &intermediary, &world},
+                   {2u, 3u, 0u, 0u, &viewmodel, &intermediary}},
+                  "alias chains", "texture source alias chains are rejected");
+    expectFailure({worldRegistration,
+                   viewmodelAliasRegistration,
+                   {2u, 3u, 0u, 0u, &viewmodel}},
+                  "consistent texture source", "repeated asset source conflicts are rejected");
+
+    auto missingGroup = makeAsset({makeMaterial("MissingGroup", 99, 401)});
+    expectFailure({worldRegistration, {1u, 2u, 0u, 0u, &missingGroup, &world}},
+                  "absent from its provider", "consumer unknown texture group is rejected");
+    auto conflictingPresence = makeAsset({
+        makeMaterial("ConflictingBody", 7, 501, {{true, false, true, true}})});
+    expectFailure({worldRegistration, {1u, 2u, 0u, 0u, &conflictingPresence, &world}},
+                  "conflicting four-category", "consumer texture presence conflict is rejected");
+    auto ungroupedTextured = makeAsset({makeMaterial("UngroupedTextured", -1, 601)});
+    expectFailure({worldRegistration, {1u, 2u, 0u, 0u, &ungroupedTextured, &world}},
+                  "explicit texture group", "textured ungrouped alias is rejected");
+}
+
+void TestGeometryRolePartitioning()
+{
+    using horde::scene::assets::StaticMaterial;
+    using horde::scene::assets::StaticMeshAsset;
+    using horde::vulkan::raytracing::RtGeometryRole;
+    using horde::vulkan::raytracing::kRtStaticAssetCapacity;
+    using horde::vulkan::raytracing::RtInstanceFlag;
+    using horde::vulkan::raytracing::RtStaticMeshSlot;
+    using horde::vulkan::raytracing::StaticRtAssetRegistration;
+
+    const auto makeAsset = [](std::string_view prefix, std::size_t materialCount) {
+        StaticMeshAsset asset;
+        asset.nodeTransforms.resize(1u);
+        asset.materials.resize(materialCount);
+        asset.vertices.resize(materialCount * 3u);
+        asset.indices.resize(materialCount * 3u);
+        for (std::size_t i = 0u; i < materialCount; ++i)
+        {
+            asset.materials[i].name = std::string(prefix) + std::to_string(i);
+            asset.primitives.push_back({static_cast<std::uint32_t>(i * 3u),
+                                        static_cast<std::uint32_t>(i * 3u), 3u,
+                                        static_cast<std::uint32_t>(i), 0u});
+            asset.indices[i * 3u + 0u] = 0u;
+            asset.indices[i * 3u + 1u] = 1u;
+            asset.indices[i * 3u + 2u] = 2u;
+        }
+        return asset;
+    };
+    const auto staticPbr = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    auto staticAsset = makeAsset("static", 1u);
+    auto worldAsset = makeAsset("world", 2u);
+    auto viewmodelAsset = makeAsset("viewmodel", 2u);
+    const StaticRtAssetRegistration staticRegistration{
+        0u, 1u, 0u, 0u, &staticAsset, nullptr, RtGeometryRole::Static};
+    const StaticRtAssetRegistration worldRegistration{
+        1u, 2u, staticPbr, 0u, &worldAsset, nullptr, RtGeometryRole::PlayerWorldBody};
+    const StaticRtAssetRegistration viewmodelRegistration{
+        2u, 3u, staticPbr, 0u, &viewmodelAsset, nullptr, RtGeometryRole::PlayerViewmodel};
+    const StaticRtAssetRegistration worldDuplicate{
+        3u, 4u, staticPbr, 0u, &worldAsset, nullptr, RtGeometryRole::PlayerWorldBody};
+
+    std::string diagnostic;
+    RtStaticMeshSlot slot;
+    Check(slot.Initialize(std::array<StaticRtAssetRegistration, 4u>{{
+              staticRegistration, worldRegistration, viewmodelRegistration, worldDuplicate}}, diagnostic),
+          std::string("static/world/viewmodel streams initialize: ") + diagnostic);
+    Check(slot.Vertices().size() == staticAsset.vertices.size() &&
+              slot.Vertices(RtGeometryRole::PlayerWorldBody).size() == worldAsset.vertices.size() &&
+              slot.Vertices(RtGeometryRole::PlayerViewmodel).size() == viewmodelAsset.vertices.size() &&
+              slot.Vertices(static_cast<RtGeometryRole>(255u)).empty(),
+          "role vertex vectors are separate and invalid role lookup is safe");
+    const auto& primitiveMetadata = slot.PrimitiveMetadata();
+    const auto& primitiveVertexCounts = slot.PrimitiveVertexCounts();
+    Check(primitiveMetadata.size() == 5u && primitiveVertexCounts ==
+              std::vector<std::uint32_t>{3u, 3u, 3u, 3u, 3u} &&
+              primitiveMetadata[0u].vertexOffset == 0u &&
+              primitiveMetadata[1u].vertexOffset == 0u &&
+              primitiveMetadata[2u].vertexOffset == 3u &&
+              primitiveMetadata[3u].vertexOffset == 0u &&
+              primitiveMetadata[4u].vertexOffset == 3u,
+          "primitive vertex offsets and counts stay local to each role stream");
+    Check(slot.InstanceMetadata()[0u].geometryRole == static_cast<std::uint32_t>(RtGeometryRole::Static) &&
+              slot.InstanceMetadata()[1u].geometryRole == static_cast<std::uint32_t>(RtGeometryRole::PlayerWorldBody) &&
+              slot.InstanceMetadata()[2u].geometryRole == static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel) &&
+              slot.InstanceMetadata()[1u].primitiveBase == slot.InstanceMetadata()[3u].primitiveBase,
+          "instance metadata records role identity and duplicate role routes");
+    Check(slot.Measurements().vertexBytes ==
+              (staticAsset.vertices.size() + worldAsset.vertices.size() + viewmodelAsset.vertices.size()) *
+                  sizeof(horde::scene::assets::StaticRtVertex),
+          "vertex byte measurement totals independent role streams");
+
+    const auto expectFailure = [&](std::vector<StaticRtAssetRegistration> registrations,
+                                   std::string_view fragment, std::string_view label) {
+        RtStaticMeshSlot failed;
+        diagnostic.clear();
+        const bool initialized = failed.Initialize(registrations, diagnostic);
+        Check(!initialized && diagnostic.find(fragment) != std::string::npos,
+              std::string(label) + ": " + diagnostic);
+    };
+    expectFailure({worldRegistration,
+                   {3u, 4u, staticPbr, 0u, &worldAsset, nullptr, RtGeometryRole::Static}},
+                  "consistent geometry role", "duplicate asset role conflict is rejected");
+    auto otherWorld = makeAsset("other-world", 1u);
+    expectFailure({worldRegistration,
+                   {3u, 4u, staticPbr, 0u, &otherWorld, nullptr, RtGeometryRole::PlayerWorldBody}},
+                  "only one unique PlayerWorldBody", "multiple unique world-body assets are rejected");
+    expectFailure({{0u, 1u, 0u, 0u, &staticAsset, nullptr,
+                    static_cast<RtGeometryRole>(255u)}},
+                  "invalid geometry role", "invalid geometry role is rejected");
+    expectFailure({{0u, 1u, 0u, 0u, &worldAsset, nullptr, RtGeometryRole::PlayerWorldBody}},
+                  "requires the StaticPbr flag", "player role without StaticPbr is rejected");
+
+    auto invalidSpan = makeAsset("invalid-span", 1u);
+    invalidSpan.primitives[0u].vertexOffset = static_cast<std::uint32_t>(invalidSpan.vertices.size());
+    expectFailure({{0u, 1u, 0u, 0u, &invalidSpan}},
+                  "empty or out-of-range asset-local vertex span",
+                  "empty asset-local primitive span is rejected");
+
+    std::vector<StaticMeshAsset> capacityAssets;
+    std::vector<StaticRtAssetRegistration> capacityRegistrations;
+    capacityAssets.reserve(kRtStaticAssetCapacity + 1u);
+    capacityRegistrations.reserve(kRtStaticAssetCapacity + 1u);
+    for (std::uint32_t i = 0u; i <= kRtStaticAssetCapacity; ++i)
+    {
+        capacityAssets.push_back(makeAsset("capacity", 1u));
+        capacityRegistrations.push_back({i, i + 1u, 0u, 0u, &capacityAssets.back(), nullptr,
+                                          RtGeometryRole::Static});
+    }
+    expectFailure(capacityRegistrations,
+                  "static assets exceed " + std::to_string(kRtStaticAssetCapacity),
+                  "static asset capacity remains generated and bounded");
+}
+
 void TestAccessorRangeRejectsOverflow()
 {
     std::uint8_t byte = 0u;
@@ -630,8 +1213,63 @@ void TestThickDielectricTopology(const std::filesystem::path& temporaryRoot,
     Check(horde::scene::assets::StaticMeshAsset::Load(closed, manifest, asset, diagnostic),
           std::string("closed manifold thick dielectric loads: ") + diagnostic);
     Check(asset.materials.size() == 1u &&
-              (asset.materials[0].flags & 1024u) != 0u,
-          "validated outward closed thick dielectric receives the runtime certification flag");
+              (asset.materials[0].flags & 1024u) != 0u &&
+              (asset.materials[0].flags & 4096u) != 0u,
+          "validated outward closed unit cube receives both closed-volume and derived rectangular-volume certification");
+    const auto& cubeMaterial = asset.materials[0];
+    Check(cubeMaterial.numericalSpawnMinimumWidth > 0.9999f &&
+              cubeMaterial.numericalSpawnMinimumWidth < 1.0f &&
+              cubeMaterial.numericalSpawnGeometryError > 0.0f &&
+              cubeMaterial.numericalSpawnGeometryError < 1e-10f,
+          "unit cube certificate rounds clearance down and measured error up");
+    horde::vulkan::raytracing::RtStaticMeshSlot slot;
+    const horde::vulkan::raytracing::StaticRtAssetRegistration registration{
+        0u, 1u, 0u, 0u, &asset, nullptr};
+    Check(slot.Initialize(std::array{registration}, diagnostic),
+          std::string("certified material uploads: ") + diagnostic);
+    if (slot.Materials().size() == 1u)
+        Check(slot.Materials()[0].iorThicknessAttenuationDistance[3] ==
+                  cubeMaterial.numericalSpawnMinimumWidth &&
+                  slot.Materials()[0].attenuationColor[3] ==
+                  cubeMaterial.numericalSpawnGeometryError &&
+                  slot.Materials()[0].iorThicknessAttenuationDistance[1] ==
+                  cubeMaterial.thicknessFactor,
+              "GPU numerical lanes preserve loader bounds and separate authored thickness");
+    for (int mutation : {1, 2})
+    {
+        const auto malformed = WriteClosedDielectricGlb(
+            temporaryRoot, "near-rectangular-lod0.runtime.glb", false, false,
+            true, 1.0f, 0, {}, false, mutation);
+        Check(horde::scene::assets::StaticMeshAsset::Load(malformed, manifest, asset, diagnostic) &&
+                  (asset.materials[0].flags & 1024u) != 0u &&
+                  (asset.materials[0].flags & 4096u) == 0u &&
+                  asset.materials[0].numericalSpawnMinimumWidth == 0.0f &&
+                  asset.materials[0].numericalSpawnGeometryError == 0.0f,
+              "closed near-rectangular shear/warp does not acquire an unsafe numerical certificate");
+    }
+
+    const auto tetrahedron = WriteClosedDielectricGlb(
+        temporaryRoot, "closed-tetrahedron-lod0.runtime.glb", false, false,
+        true, 0.1f, 0, {}, true);
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              tetrahedron, manifest, asset, diagnostic) &&
+              (asset.materials[0].flags & 1024u) != 0u &&
+              (asset.materials[0].flags & 4096u) == 0u,
+          std::string("closed tetrahedron keeps ordinary closed-volume certification without rectangular certification: ") +
+              diagnostic);
+
+    const auto oversizedThickness = WriteClosedDielectricGlb(
+        temporaryRoot, "oversized-thickness-lod0.runtime.glb", false, false,
+        true, 1.0001f);
+    Check(horde::scene::assets::StaticMeshAsset::Load(
+              oversizedThickness, manifest, asset, diagnostic) &&
+              (asset.materials[0].flags & 1024u) != 0u &&
+              (asset.materials[0].flags & 4096u) != 0u &&
+              asset.materials[0].thicknessFactor == 1.0001f &&
+              asset.materials[0].numericalSpawnMinimumWidth < 1.0f &&
+              asset.materials[0].numericalSpawnMinimumWidth > 0.9999f,
+          std::string("numerical clearance derives from geometry, not a larger authored optical thickness: ") +
+              diagnostic);
 
     const auto open = WriteClosedDielectricGlb(
         temporaryRoot, "open-dielectric-lod0.runtime.glb", true, false);
@@ -955,6 +1593,301 @@ void TestProductionDielectricFixture()
           "production dielectric fixture keeps one closed twelve-triangle volume and KHR material properties");
 }
 
+void TestLanternGeometryQualityProfile()
+{
+    using horde::scene::assets::AssetManifest;
+    using horde::scene::assets::StaticMeshAsset;
+    using horde::vulkan::raytracing::DielectricQuality;
+    using horde::vulkan::raytracing::RtMaterialFlag;
+    using horde::vulkan::raytracing::RtStaticMeshSlot;
+    using horde::vulkan::raytracing::SelectLanternGeometryForQuality;
+    using horde::vulkan::raytracing::StaticRtAssetRegistration;
+
+    const auto lanternDirectory = kDielectricFixtureRoot.parent_path() / "reward-lantern-body";
+    AssetManifest manifest;
+    StaticMeshAsset source;
+    std::string diagnostic;
+    Check(AssetManifest::Load(lanternDirectory / "asset.manifest.json", manifest, diagnostic),
+          std::string("canonical reward lantern manifest loads: ") + diagnostic);
+    diagnostic.clear();
+    Check(StaticMeshAsset::Load(
+              lanternDirectory / "reward-lantern-body-lod0.runtime.glb",
+              manifest, source, diagnostic),
+          std::string("canonical reward lantern runtime asset loads: ") + diagnostic);
+    if (source.primitives.empty() || source.materials.empty()) return;
+
+    const auto sameVertex = [](const auto& a, const auto& b) {
+        return a.position == b.position && a.normal == b.normal &&
+               a.tangent == b.tangent && a.uv0 == b.uv0;
+    };
+    const auto sameMaterial = [](const auto& a, const auto& b) {
+        return a.name == b.name && a.baseColorFactor == b.baseColorFactor &&
+               a.emissiveFactor == b.emissiveFactor &&
+               a.attenuationColor == b.attenuationColor &&
+               a.emissiveStrength == b.emissiveStrength &&
+               a.metallicFactor == b.metallicFactor &&
+               a.roughnessFactor == b.roughnessFactor &&
+               a.occlusionStrength == b.occlusionStrength &&
+               a.transmissionFactor == b.transmissionFactor && a.ior == b.ior &&
+               a.thicknessFactor == b.thicknessFactor &&
+               a.attenuationDistance == b.attenuationDistance &&
+               a.numericalSpawnMinimumWidth == b.numericalSpawnMinimumWidth &&
+               a.numericalSpawnGeometryError == b.numericalSpawnGeometryError &&
+               a.baseColorTexture == b.baseColorTexture &&
+               a.normalTexture == b.normalTexture && a.ormTexture == b.ormTexture &&
+               a.emissiveTexture == b.emissiveTexture &&
+               a.textureGroup == b.textureGroup && a.flags == b.flags;
+    };
+    const auto samePrimitive = [](const auto& a, const auto& b) {
+        return a.vertexOffset == b.vertexOffset && a.indexOffset == b.indexOffset &&
+               a.indexCount == b.indexCount && a.materialIndex == b.materialIndex &&
+               a.nodeTransformIndex == b.nodeTransformIndex;
+    };
+    const auto sameNode = [](const auto& a, const auto& b) {
+        return a.name == b.name && a.world == b.world;
+    };
+    const auto sameSocket = [](const auto& a, const auto& b) {
+        return a.name == b.name && a.nodeTransformIndex == b.nodeTransformIndex &&
+               a.world == b.world;
+    };
+    const auto sameAsset = [&](const StaticMeshAsset& a, const StaticMeshAsset& b) {
+        return a.vertices.size() == b.vertices.size() &&
+               std::equal(a.vertices.begin(), a.vertices.end(), b.vertices.begin(), sameVertex) &&
+               a.indices == b.indices && a.materials.size() == b.materials.size() &&
+               std::equal(a.materials.begin(), a.materials.end(), b.materials.begin(), sameMaterial) &&
+               a.primitives.size() == b.primitives.size() &&
+               std::equal(a.primitives.begin(), a.primitives.end(), b.primitives.begin(), samePrimitive) &&
+               a.nodeTransforms.size() == b.nodeTransforms.size() &&
+               std::equal(a.nodeTransforms.begin(), a.nodeTransforms.end(), b.nodeTransforms.begin(), sameNode) &&
+               a.sockets.size() == b.sockets.size() &&
+               std::equal(a.sockets.begin(), a.sockets.end(), b.sockets.begin(), sameSocket) &&
+               a.bounds.minimum == b.bounds.minimum && a.bounds.maximum == b.bounds.maximum;
+    };
+    const auto countNamedMaterial = [](const StaticMeshAsset& asset, std::string_view name) {
+        return static_cast<std::size_t>(std::count_if(
+            asset.materials.begin(), asset.materials.end(),
+            [name](const auto& material) { return material.name == name; }));
+    };
+    const auto glassMaterialIndex = [](const StaticMeshAsset& asset) {
+        const auto found = std::find_if(asset.materials.begin(), asset.materials.end(),
+            [](const auto& material) { return material.name == "LanternGlass"; });
+        return static_cast<std::size_t>(found - asset.materials.begin());
+    };
+    const auto hasOnlyValidPrimitiveReferences = [](const StaticMeshAsset& asset) {
+        return std::all_of(asset.primitives.begin(), asset.primitives.end(),
+            [&asset](const auto& primitive) {
+                return primitive.materialIndex < asset.materials.size();
+            });
+    };
+
+    StaticMeshAsset high = source;
+    diagnostic = "stale diagnostic";
+    Check(SelectLanternGeometryForQuality(high, DielectricQuality::High, diagnostic) &&
+              diagnostic.empty() && sameAsset(high, source),
+          "High lantern geometry profile is an exact no-op");
+
+    const std::size_t glassIndex = glassMaterialIndex(source);
+    Check(countNamedMaterial(source, "LanternGlass") == 1u &&
+              source.materials[glassIndex].transmissionFactor > 0.0f &&
+              (source.materials[glassIndex].flags &
+                  static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) != 0u &&
+              std::any_of(source.primitives.begin(), source.primitives.end(),
+                  [glassIndex](const auto& primitive) { return primitive.materialIndex == glassIndex; }) &&
+              std::any_of(source.primitives.begin(), source.primitives.end(),
+                  [glassIndex](const auto& primitive) { return primitive.materialIndex != glassIndex; }),
+          "canonical lantern includes named pane primitives and retained body primitives");
+    if (countNamedMaterial(source, "LanternGlass") != 1u) return;
+
+    StaticMeshAsset mobile = source;
+    diagnostic.clear();
+    Check(SelectLanternGeometryForQuality(mobile, DielectricQuality::Mobile, diagnostic),
+          std::string("Mobile lantern profile selects successfully: ") + diagnostic);
+    const auto retainedSourcePrimitive = [glassIndex](const auto& primitive) {
+        return primitive.materialIndex != glassIndex;
+    };
+    std::vector<horde::scene::assets::StaticPrimitiveRecord> expectedPrimitives;
+    std::copy_if(source.primitives.begin(), source.primitives.end(),
+                 std::back_inserter(expectedPrimitives), retainedSourcePrimitive);
+    Check(mobile.primitives.size() == expectedPrimitives.size() &&
+              std::equal(mobile.primitives.begin(), mobile.primitives.end(),
+                         expectedPrimitives.begin(), samePrimitive) &&
+              hasOnlyValidPrimitiveReferences(mobile) &&
+              std::none_of(mobile.primitives.begin(), mobile.primitives.end(),
+                  [&mobile](const auto& primitive) {
+                      return mobile.materials[primitive.materialIndex].name == "LanternGlass";
+                  }),
+          "Mobile removes every named LanternGlass primitive in stable order");
+    Check(mobile.vertices.size() == source.vertices.size() &&
+              std::equal(mobile.vertices.begin(), mobile.vertices.end(), source.vertices.begin(), sameVertex) &&
+              mobile.indices == source.indices && mobile.materials.size() == source.materials.size() &&
+              std::equal(mobile.materials.begin(), mobile.materials.end(), source.materials.begin(), sameMaterial) &&
+              mobile.nodeTransforms.size() == source.nodeTransforms.size() &&
+              std::equal(mobile.nodeTransforms.begin(), mobile.nodeTransforms.end(), source.nodeTransforms.begin(), sameNode) &&
+              mobile.sockets.size() == source.sockets.size() &&
+              std::equal(mobile.sockets.begin(), mobile.sockets.end(), source.sockets.begin(), sameSocket),
+          "Mobile retains vertex/UV/index/material/node/socket data and authored order exactly");
+    const auto hasPrimitiveUsingMaterial = [](const StaticMeshAsset& asset, std::string_view name) {
+        return std::any_of(asset.primitives.begin(), asset.primitives.end(),
+            [&asset, name](const auto& primitive) {
+                if (primitive.materialIndex >= asset.materials.size()) return false;
+                return asset.materials[primitive.materialIndex].name == name;
+            });
+    };
+    Check(hasPrimitiveUsingMaterial(mobile, "BlackIron") &&
+              hasPrimitiveUsingMaterial(mobile, "FlameCore"),
+          "Mobile retains the lantern cage and flame primitives");
+
+    // Move LanternGlass to another material index while keeping each primitive's
+    // material identity. Selection must follow the named physical material.
+    StaticMeshAsset reordered = source;
+    std::vector<std::size_t> newToOld(reordered.materials.size());
+    for (std::size_t i = 0u; i < newToOld.size(); ++i) newToOld[i] = i;
+    if (glassIndex == 0u)
+        std::rotate(newToOld.begin(), newToOld.begin() + 1, newToOld.end());
+    else
+        std::rotate(newToOld.begin(), newToOld.begin() + static_cast<std::ptrdiff_t>(glassIndex),
+                    newToOld.begin() + static_cast<std::ptrdiff_t>(glassIndex + 1u));
+    std::vector<std::size_t> oldToNew(newToOld.size());
+    std::vector<horde::scene::assets::StaticMaterial> reorderedMaterials;
+    reorderedMaterials.reserve(newToOld.size());
+    for (std::size_t newIndex = 0u; newIndex < newToOld.size(); ++newIndex)
+    {
+        oldToNew[newToOld[newIndex]] = newIndex;
+        reorderedMaterials.push_back(source.materials[newToOld[newIndex]]);
+    }
+    reordered.materials = std::move(reorderedMaterials);
+    for (auto& primitive : reordered.primitives)
+        primitive.materialIndex = static_cast<std::uint32_t>(oldToNew[primitive.materialIndex]);
+    const std::size_t reorderedGlassIndex = glassMaterialIndex(reordered);
+    std::vector<horde::scene::assets::StaticPrimitiveRecord> expectedReorderedPrimitives;
+    for (const auto& primitive : source.primitives)
+    {
+        if (primitive.materialIndex == glassIndex) continue;
+        auto expected = primitive;
+        expected.materialIndex = static_cast<std::uint32_t>(oldToNew[primitive.materialIndex]);
+        expectedReorderedPrimitives.push_back(expected);
+    }
+    diagnostic.clear();
+    Check(SelectLanternGeometryForQuality(reordered, DielectricQuality::Mobile, diagnostic) &&
+              reordered.primitives.size() == expectedReorderedPrimitives.size() &&
+              std::equal(reordered.primitives.begin(), reordered.primitives.end(),
+                         expectedReorderedPrimitives.begin(), samePrimitive) &&
+              hasOnlyValidPrimitiveReferences(reordered) &&
+              std::none_of(reordered.primitives.begin(), reordered.primitives.end(),
+                  [&reordered](const auto& primitive) {
+                      if (primitive.materialIndex >= reordered.materials.size()) return false;
+                      return reordered.materials[primitive.materialIndex].name == "LanternGlass";
+                  }) &&
+              reorderedGlassIndex != glassIndex,
+          std::string("Mobile profile follows LanternGlass by name after material reordering: ") + diagnostic);
+
+    const auto expectRejectedUnchanged = [&](StaticMeshAsset candidate, DielectricQuality quality,
+                                              std::string_view label) {
+        const StaticMeshAsset before = candidate;
+        diagnostic.clear();
+        const bool selected = SelectLanternGeometryForQuality(candidate, quality, diagnostic);
+        Check(!selected && !diagnostic.empty() && sameAsset(candidate, before), label);
+    };
+    StaticMeshAsset missingMaterial = source;
+    std::erase_if(missingMaterial.materials,
+        [](const auto& material) { return material.name == "LanternGlass"; });
+    expectRejectedUnchanged(std::move(missingMaterial), DielectricQuality::Mobile,
+                            "missing LanternGlass fails closed without mutation");
+
+    StaticMeshAsset duplicateMaterial = source;
+    duplicateMaterial.materials.push_back(*std::find_if(source.materials.begin(), source.materials.end(),
+        [](const auto& material) { return material.name == "LanternGlass"; }));
+    expectRejectedUnchanged(std::move(duplicateMaterial), DielectricQuality::Mobile,
+                            "duplicate LanternGlass fails closed without mutation");
+
+    StaticMeshAsset nonphysicalMaterial = source;
+    auto& glass = nonphysicalMaterial.materials[glassIndex];
+    glass.transmissionFactor = 0.0f;
+    expectRejectedUnchanged(std::move(nonphysicalMaterial), DielectricQuality::Mobile,
+                            "zero-transmission LanternGlass fails closed without mutation");
+
+    StaticMeshAsset unflaggedMaterial = source;
+    unflaggedMaterial.materials[glassIndex].flags &=
+        ~static_cast<std::uint32_t>(RtMaterialFlag::Transmission);
+    expectRejectedUnchanged(std::move(unflaggedMaterial), DielectricQuality::Mobile,
+                            "LanternGlass without the transmission flag fails closed without mutation");
+
+    StaticMeshAsset invalidReference = source;
+    invalidReference.primitives.front().materialIndex =
+        static_cast<std::uint32_t>(invalidReference.materials.size());
+    expectRejectedUnchanged(std::move(invalidReference), DielectricQuality::Mobile,
+                            "invalid primitive material reference fails closed without mutation");
+
+    StaticMeshAsset noPanes = source;
+    std::erase_if(noPanes.primitives,
+        [glassIndex](const auto& primitive) { return primitive.materialIndex == glassIndex; });
+    expectRejectedUnchanged(std::move(noPanes), DielectricQuality::Mobile,
+                            "lantern without pane primitives fails closed without mutation");
+
+    StaticMeshAsset allPanes = source;
+    std::erase_if(allPanes.primitives,
+        [glassIndex](const auto& primitive) { return primitive.materialIndex != glassIndex; });
+    expectRejectedUnchanged(std::move(allPanes), DielectricQuality::Mobile,
+                            "lantern containing only panes fails closed without mutation");
+
+    expectRejectedUnchanged(source, static_cast<DielectricQuality>(255u),
+                            "invalid quality fails closed without mutation");
+
+    if (mobile.primitives.size() == expectedPrimitives.size() &&
+        hasOnlyValidPrimitiveReferences(mobile))
+    {
+        RtStaticMeshSlot slot;
+        const StaticRtAssetRegistration registration{0u, 1u, 0u, 0u, &mobile};
+        diagnostic.clear();
+        Check(slot.Initialize(std::array<StaticRtAssetRegistration, 1u>{{registration}}, diagnostic),
+              std::string("Mobile lantern registers in the static RT mesh slot: ") + diagnostic);
+        const auto& instance = slot.InstanceMetadata()[0u];
+        const auto& primitiveMetadata = slot.PrimitiveMetadata();
+        const auto& vertexCounts = slot.PrimitiveVertexCounts();
+        const auto& slotIndices = slot.Indices();
+        bool metadataMatches = instance.primitiveCount == mobile.primitives.size() &&
+            instance.primitiveBase + instance.primitiveCount <= primitiveMetadata.size() &&
+            primitiveMetadata.size() == vertexCounts.size();
+        for (std::size_t i = 0u; metadataMatches && i < mobile.primitives.size(); ++i)
+        {
+            const auto& sourcePrimitive = mobile.primitives[i];
+            const auto& packedPrimitive = primitiveMetadata[instance.primitiveBase + i];
+            const auto& sourceMaterial = mobile.materials[sourcePrimitive.materialIndex];
+            metadataMatches = packedPrimitive.indexCount == sourcePrimitive.indexCount &&
+                packedPrimitive.indexOffset == sourcePrimitive.indexOffset &&
+                packedPrimitive.materialIndex == sourcePrimitive.materialIndex &&
+                packedPrimitive.vertexOffset == sourcePrimitive.vertexOffset &&
+                packedPrimitive.materialIndex < slot.Materials().size() &&
+                slot.Materials()[packedPrimitive.materialIndex].baseColorFactor ==
+                    sourceMaterial.baseColorFactor &&
+                slot.Materials()[packedPrimitive.materialIndex].emissiveFactorStrength ==
+                    std::array<float, 4u>{{sourceMaterial.emissiveFactor[0],
+                        sourceMaterial.emissiveFactor[1], sourceMaterial.emissiveFactor[2],
+                        sourceMaterial.emissiveStrength}} &&
+                slot.Materials()[packedPrimitive.materialIndex].metallicRoughnessOcclusionTransmission ==
+                    std::array<float, 4u>{{sourceMaterial.metallicFactor, sourceMaterial.roughnessFactor,
+                        sourceMaterial.occlusionStrength, sourceMaterial.transmissionFactor}} &&
+                slot.Materials()[packedPrimitive.materialIndex].iorThicknessAttenuationDistance ==
+                    std::array<float, 4u>{{sourceMaterial.ior, sourceMaterial.thicknessFactor,
+                        sourceMaterial.attenuationDistance, sourceMaterial.numericalSpawnMinimumWidth}} &&
+                slot.Materials()[packedPrimitive.materialIndex].attenuationColor ==
+                    std::array<float, 4u>{{sourceMaterial.attenuationColor[0],
+                        sourceMaterial.attenuationColor[1], sourceMaterial.attenuationColor[2],
+                        sourceMaterial.numericalSpawnGeometryError}} &&
+                (slot.Materials()[packedPrimitive.materialIndex].materialFlags[0] & sourceMaterial.flags) ==
+                    sourceMaterial.flags &&
+                static_cast<std::size_t>(packedPrimitive.indexOffset) + packedPrimitive.indexCount <=
+                    slotIndices.size();
+            for (std::size_t index = packedPrimitive.indexOffset;
+                 metadataMatches && index < static_cast<std::size_t>(packedPrimitive.indexOffset) +
+                                         packedPrimitive.indexCount; ++index)
+                metadataMatches = slotIndices[index] < vertexCounts[instance.primitiveBase + i];
+        }
+        Check(metadataMatches,
+              "static-slot geometry count/material/index metadata agrees and retained local indices fit each advertised vertex span");
+    }
+}
+
 void TestRuntimeOfflineDielectricComponentParity()
 {
     using horde::scene::assets::AssetManifest;
@@ -1136,10 +2069,7 @@ int main(int argc, char** argv)
                 manifestEnvironment, manifest, diagnostic)) return 3;
         const bool loaded = horde::scene::assets::StaticMeshAsset::Load(
             cyclicEnvironment, manifest, asset, diagnostic);
-        const bool safeDiagnostic =
-            diagnostic == "Static GLB failed cgltf structural validation." ||
-            diagnostic == "Static GLB contains an out-of-range accessor or index reference.";
-        return !loaded && safeDiagnostic ? 0 : 2;
+        return !loaded && IsSafeCyclicRejectionDiagnostic(diagnostic) ? 0 : 2;
     }
 #endif
     if (argc == 4 && std::string_view(argv[1]) == "--probe-cyclic")
@@ -1150,7 +2080,7 @@ int main(int argc, char** argv)
         if (!horde::scene::assets::AssetManifest::Load(argv[3], manifest, diagnostic)) return 3;
         const bool loaded = horde::scene::assets::StaticMeshAsset::Load(
             argv[2], manifest, asset, diagnostic);
-        return !loaded && diagnostic == "Static GLB failed cgltf structural validation." ? 0 : 2;
+        return !loaded && IsSafeCyclicRejectionDiagnostic(diagnostic) ? 0 : 2;
     }
 
     const ScopedStaticGltfTestDirectory scopedTemporaryRoot;
@@ -1165,7 +2095,11 @@ int main(int argc, char** argv)
     TestAccessorRangeRejectsOverflow();
     TestCyclicNodeGraphIsRejectedBeforeTraversal(temporaryRoot);
     TestExactDielectricWeldCellDomain();
+    TestPlayerSemanticManifestAndGeometry(temporaryRoot);
+    TestSharedTextureSourceRouting();
+    TestGeometryRolePartitioning();
     TestProductionDielectricFixture();
+    TestLanternGeometryQualityProfile();
     TestRuntimeOfflineDielectricComponentParity();
 
     horde::scene::assets::AssetManifest manifest;

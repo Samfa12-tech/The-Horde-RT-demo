@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "checkoutBaseCommit": "d2682a5",
+  "retainedControlAtCommit": "d9be81e77493d7e5c9af01604f865d0d3ef11e48",
+  "stage": "control",
+  "executableSha256": "3526bc9d5727cf91f21785e91740bce55de0ea61ab5def68ec5174a68eb73a19",
+  "candidateSceneSourceSha256": null,
+  "candidateSourceDirty": false,
+  "instrumentation": "Diagnostic",
+  "quality": "High",
+  "performanceEvidence": false,
+  "runs": [
+    {
+      "backend": "pipeline",
+      "checkpoint": "pbr-torch-fire",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-world-box-normals-20261002\\control\\pipeline\\pbr-torch-fire",
+        "--development-checkpoint",
+        "pbr-torch-fire"
+      ]
+    },
+    {
+      "backend": "compute",
+      "checkpoint": "pbr-torch-fire",
+      "exitCode": 0,
+      "arguments": [
+        "--capture-showcase",
+        "C:\\Dev\\tmp\\horde-world-box-normals-20261002\\control\\compute\\pbr-torch-fire",
+        "--development-checkpoint",
+        "pbr-torch-fire",
+        "--require-rayquery-compute"
+      ]
+    }
+  ]
+}

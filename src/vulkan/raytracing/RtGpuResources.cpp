@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/RtGpuResources.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 
 #include <cstring>
 
@@ -25,8 +26,13 @@ void RtGpuResources::Reset()
 }
 
 std::uint32_t RtGpuResources::FindMemoryType(const std::uint32_t typeBits,
-                                             const VkMemoryPropertyFlags flags) const
+                                             const VkMemoryPropertyFlags flags,
+                                             VkMemoryPropertyFlags* selectedFlags) const
 {
+    if (selectedFlags != nullptr)
+    {
+        *selectedFlags = 0u;
+    }
     VkPhysicalDeviceMemoryProperties memoryProperties{};
     vkGetPhysicalDeviceMemoryProperties(physicalDevice_, &memoryProperties);
     for (std::uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i)
@@ -34,6 +40,10 @@ std::uint32_t RtGpuResources::FindMemoryType(const std::uint32_t typeBits,
         if ((typeBits & (1u << i)) != 0u &&
             (memoryProperties.memoryTypes[i].propertyFlags & flags) == flags)
         {
+            if (selectedFlags != nullptr)
+            {
+                *selectedFlags = memoryProperties.memoryTypes[i].propertyFlags;
+            }
             return i;
         }
     }
@@ -45,7 +55,8 @@ bool RtGpuResources::CreateBuffer(VkDeviceSize size,
                                   const VkMemoryPropertyFlags memoryFlags,
                                   const bool deviceAddress,
                                   RtGpuBuffer& out,
-                                  std::string& diagnostic) const
+                                  std::string& diagnostic,
+                                  const VkMemoryPropertyFlags preferredMemoryFlags) const
 {
     out = {};
     if (physicalDevice_ == VK_NULL_HANDLE || device_ == VK_NULL_HANDLE || size == 0u)
@@ -75,7 +86,15 @@ bool RtGpuResources::CreateBuffer(VkDeviceSize size,
 
     VkMemoryRequirements requirements{};
     vkGetBufferMemoryRequirements(device_, out.buffer, &requirements);
-    const std::uint32_t memoryType = FindMemoryType(requirements.memoryTypeBits, memoryFlags);
+    VkMemoryPropertyFlags selectedMemoryFlags = 0u;
+    // Relax placement only when a compatible preferred type is unavailable.
+    // Allocation/binding failures never retry on another heap.
+    std::uint32_t memoryType = FindMemoryType(
+        requirements.memoryTypeBits, memoryFlags | preferredMemoryFlags, &selectedMemoryFlags);
+    if (memoryType == UINT32_MAX && preferredMemoryFlags != 0u)
+    {
+        memoryType = FindMemoryType(requirements.memoryTypeBits, memoryFlags, &selectedMemoryFlags);
+    }
     if (memoryType == UINT32_MAX)
     {
         diagnostic = "No compatible memory type for RT buffer.";
@@ -99,7 +118,40 @@ bool RtGpuResources::CreateBuffer(VkDeviceSize size,
     }
 
     out.size = size;
+    out.allocationSize = requirements.size;
+    out.memoryPropertyFlags = selectedMemoryFlags;
     out.address = deviceAddress ? BufferAddress(out.buffer) : 0u;
+    diagnostic.clear();
+    return true;
+}
+
+bool RtGpuResources::MapBufferForHostWrites(RtGpuBuffer& buffer,
+                                           std::string& diagnostic) const
+{
+    constexpr VkMemoryPropertyFlags required =
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+    if (device_ == VK_NULL_HANDLE || buffer.memory == VK_NULL_HANDLE ||
+        buffer.buffer == VK_NULL_HANDLE || buffer.size == 0u ||
+        buffer.size > std::numeric_limits<std::size_t>::max() ||
+        (buffer.memoryPropertyFlags & required) != required)
+    {
+        diagnostic = "Persistent RT uploads require a valid host-visible coherent buffer.";
+        return false;
+    }
+    if (buffer.mappedWriteData != nullptr)
+    {
+        diagnostic.clear();
+        return true;
+    }
+    void* mapped = nullptr;
+    const VkResult result = vkMapMemory(device_, buffer.memory, 0u, buffer.size, 0u, &mapped);
+    if (result != VK_SUCCESS || mapped == nullptr)
+    {
+        if (result == VK_SUCCESS) vkUnmapMemory(device_, buffer.memory);
+        diagnostic = "Failed to persistently map RT upload memory.";
+        return false;
+    }
+    buffer.mappedWriteData = mapped;
     diagnostic.clear();
     return true;
 }
@@ -108,9 +160,10 @@ bool RtGpuResources::WriteBuffer(const RtGpuBuffer& buffer,
                                  const void* data,
                                  const VkDeviceSize size,
                                  const char* label,
-                                 std::string& diagnostic) const
+                                 std::string& diagnostic,
+                                 RtSceneRecordObservation* observation) const
 {
-    return WriteBufferRange(buffer, 0u, data, size, label, diagnostic);
+    return WriteBufferRange(buffer, 0u, data, size, label, diagnostic, observation);
 }
 
 bool RtGpuResources::WriteBufferRange(const RtGpuBuffer& buffer,
@@ -118,23 +171,40 @@ bool RtGpuResources::WriteBufferRange(const RtGpuBuffer& buffer,
                                       const void* data,
                                       const VkDeviceSize size,
                                       const char* label,
-                                      std::string& diagnostic) const
+                                      std::string& diagnostic,
+                                      RtSceneRecordObservation* observation) const
 {
     if (buffer.memory == VK_NULL_HANDLE || data == nullptr || size == 0u ||
-        offset > buffer.size || size > buffer.size - offset)
+        offset > buffer.size || size > buffer.size - offset ||
+        size > std::numeric_limits<std::size_t>::max() ||
+        offset > std::numeric_limits<std::size_t>::max())
     {
         diagnostic = std::string("Invalid ") + label + " upload.";
         return false;
     }
 
+    RtSceneStageScope uploadScope(observation, horde::telemetry::RtStage::DynamicUpload);
+    if (buffer.mappedWriteData != nullptr)
+    {
+        std::memcpy(static_cast<std::uint8_t*>(buffer.mappedWriteData) +
+                        static_cast<std::size_t>(offset),
+                    data, static_cast<std::size_t>(size));
+        // Still one copy/upload operation. There is no per-write map/unmap.
+        uploadScope.Complete(1u, size, 1u);
+        diagnostic.clear();
+        return true;
+    }
     void* mapped = nullptr;
     if (vkMapMemory(device_, buffer.memory, offset, size, 0u, &mapped) != VK_SUCCESS || mapped == nullptr)
     {
+        uploadScope.Cancel();
         diagnostic = std::string("Failed to map ") + label + " memory.";
         return false;
     }
     std::memcpy(mapped, data, static_cast<std::size_t>(size));
     vkUnmapMemory(device_, buffer.memory);
+    uploadScope.Complete(1u, size, 1u);
+    diagnostic.clear();
     return true;
 }
 
@@ -142,6 +212,10 @@ void RtGpuResources::DestroyBuffer(RtGpuBuffer& buffer) const
 {
     if (device_ != VK_NULL_HANDLE)
     {
+        if (buffer.mappedWriteData != nullptr && buffer.memory != VK_NULL_HANDLE)
+        {
+            vkUnmapMemory(device_, buffer.memory);
+        }
         if (buffer.buffer != VK_NULL_HANDLE)
         {
             vkDestroyBuffer(device_, buffer.buffer, nullptr);

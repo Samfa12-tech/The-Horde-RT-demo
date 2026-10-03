@@ -1,0 +1,12 @@
+{
+  "artifact": "generic-profile",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "installedApkSha256": "6c2621dc2b233f339773d1a686ad832cf16c875e3ea7a7718c70d08e9ba9fc2f",
+  "utc": "2026-09-30T13:10:54.5526317Z",
+  "externallyCooled": false,
+  "appDataCleared": false,
+  "stableAppTouched": false,
+  "publishable": false
+}

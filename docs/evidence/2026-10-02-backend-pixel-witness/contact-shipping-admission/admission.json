@@ -1,0 +1,264 @@
+{
+  "schema": 1,
+  "candidateSource": "e43c11c0365756f8b21efbfbdca33ac0f4a17071",
+  "investigationOnly": true,
+  "embedded": false,
+  "hardwareExecution": false,
+  "performanceEvidence": false,
+  "budgetSha256": "f2ff4be07c08536d140ea395fb24d1e3d502882449a84fc245df121e2ad89f4d",
+  "pipelineStats": {
+    "schema": 1,
+    "key": "shipping_high_generic_dielectric",
+    "instrumentation": "Shipping",
+    "quality": "High",
+    "material": "GenericDielectric",
+    "strategy": "GenericRetained",
+    "targetEnv": "vulkan1.2",
+    "manifestSha256": "c11665dc94c48dcb01ad2940d9884ece51eb9286a0c2fe5cae9d3812d794b62b",
+    "dependencySha256": "d57babfbcf1c5ac05c962747fc8b3a6fd6f737f584cfabf4f4f148775dc74440",
+    "dependencies": [
+      {
+        "path": "shaders/raytracing/experimental/contact_shipping.rgen",
+        "sha256": "961bdb5f66e1d0848d9ec1648d1025ae44c7a77d94a1c210b497dd3b9618e64b"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_frame.glsl",
+        "sha256": "48bb80407aa926edda0042634f0946f043f799e490e55aec7b8a8ea56b26987e"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_scene_abi.glsl",
+        "sha256": "5681408da7bccca04ed6975fdbe7ad188bfcaf2daf980630eb9b292e562dcbc2"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_scene_abi.generated.glsl",
+        "sha256": "0093cb27a5ab2e49e8954a169df9627c364fd33416d81c5628735547d16705ef"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_diagnostics.glsl",
+        "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+      },
+      {
+        "path": "shaders/raytracing/experimental/axis_contact_geometry.glsl",
+        "sha256": "59820a969073b7e26e74f53895c108f209b10cbd2d0dbc9242a057308948f0de"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_lighting.glsl",
+        "sha256": "decca40242cf6e33c5180d005cd4267cc9f05c921899e31fdb2b95b19c5f737a"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_fire.glsl",
+        "sha256": "2d61dd1e9bc0b677c3a6e693ce0a0fdb5307dd885686713b0d9e41b4ad334c44"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_hit_decode.glsl",
+        "sha256": "ca55595d298aeb3be7f90dce3ddafb61d6c7d0bd06bafd183534ef1c471e1d34"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_spawn.glsl",
+        "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+      },
+      {
+        "path": "shaders/raytracing/experimental/high_edge_witness.glsl",
+        "sha256": "4b9b2d53a82b7d625b1f24b5acbbf96814df735ca73d8e772ab8ec925d348567"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_common.glsl",
+        "sha256": "f8490daf84691cb658af8520a6f5353771118117a6668174bb33dbb105a59fe0"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_dielectric_transport.glsl",
+        "sha256": "3fee15c278656f382f9dd87e6e660c0deee60d22935b6f1822679a79f00c251b"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_atmosphere.glsl",
+        "sha256": "560d2e426460a0890c2dbf9537595e063649874186d60b653ba9e00a2b363861"
+      },
+      {
+        "path": "shaders/raytracing/include/rt_variant_config.glsl",
+        "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+      }
+    ],
+    "compiledSpirvSha256": "5bb7e8ecb7bd4ad7039bf4068eb249ac752c115c13f24099c835c3caa48ba569",
+    "bytes": 280344,
+    "words": 70086,
+    "instructions": 16836,
+    "branchOperations": 966,
+    "loops": 21,
+    "selectionMerges": 413,
+    "functions": 78,
+    "functionCalls": 235,
+    "rayQueryInitializations": 2,
+    "atomicInstructions": 0,
+    "hasDiagnosticsBinding": false,
+    "driverSafeFullyInlined": false,
+    "boundedGenericFunctionsRetained": true
+  },
+  "computeCatalogRow": {
+    "key": "rayquery_compute_shipping_high_generic_dielectric",
+    "policyKey": "shipping_high_generic_dielectric",
+    "instrumentation": "Shipping",
+    "quality": "High",
+    "material": "GenericDielectric",
+    "strategy": "GenericRetained",
+    "shippingAllowed": true,
+    "executionBackend": "RayQueryCompute",
+    "stage": "comp",
+    "executionModel": "GLCompute",
+    "artifactPath": "src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+    "dependencySha256": "858d3c8d60b86e4cc1b7f111c6a5d5d1817af71ca88f75d408834d0f6d532f57",
+    "dependencies": [
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/experimental/contact_shipping.comp",
+        "sha256": "3b4f5bf5a7b0f0739caba7939229c127575028b648bd6eb5aef2f1041e1936d7"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_variant_config.glsl",
+        "sha256": "8d043fae9db9c3efb31071045bfc5b2922cc0ae929e748416e164988c01b4649"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_frame.glsl",
+        "sha256": "48bb80407aa926edda0042634f0946f043f799e490e55aec7b8a8ea56b26987e"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_scene_abi.glsl",
+        "sha256": "5681408da7bccca04ed6975fdbe7ad188bfcaf2daf980630eb9b292e562dcbc2"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_scene_abi.generated.glsl",
+        "sha256": "0093cb27a5ab2e49e8954a169df9627c364fd33416d81c5628735547d16705ef"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_diagnostics.glsl",
+        "sha256": "17e28b3422c8218d7fa7c4183e1df9a6e07e45451ef5b86dbe0a7a16fc47df9f"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/experimental/axis_contact_geometry.glsl",
+        "sha256": "59820a969073b7e26e74f53895c108f209b10cbd2d0dbc9242a057308948f0de"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_lighting.glsl",
+        "sha256": "decca40242cf6e33c5180d005cd4267cc9f05c921899e31fdb2b95b19c5f737a"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_fire.glsl",
+        "sha256": "2d61dd1e9bc0b677c3a6e693ce0a0fdb5307dd885686713b0d9e41b4ad334c44"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_hit_decode.glsl",
+        "sha256": "ca55595d298aeb3be7f90dce3ddafb61d6c7d0bd06bafd183534ef1c471e1d34"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_dielectric_spawn.glsl",
+        "sha256": "ab76e15c20b7f5d3a390f56804db5f8afa0aa7c2709e5895c707c6ea220182c3"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/experimental/high_edge_witness.glsl",
+        "sha256": "4b9b2d53a82b7d625b1f24b5acbbf96814df735ca73d8e772ab8ec925d348567"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_dielectric_common.glsl",
+        "sha256": "f8490daf84691cb658af8520a6f5353771118117a6668174bb33dbb105a59fe0"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_dielectric_transport.glsl",
+        "sha256": "3fee15c278656f382f9dd87e6e660c0deee60d22935b6f1822679a79f00c251b"
+      },
+      {
+        "path": "C:/Users/sam_s/.codex/worktrees/horde-rtx-corrections/the Horde RT Demo/shaders/raytracing/include/rt_atmosphere.glsl",
+        "sha256": "560d2e426460a0890c2dbf9537595e063649874186d60b653ba9e00a2b363861"
+      }
+    ],
+    "includeSha256": "7c8bdff4ce9ca28a0f27d8ec677ec790c5701749cb42236b666a96983edd8769",
+    "spirvSha256": "7a475f5fdd475386acbdb96fcb4a6fe5462d452ed0e4fccffc9a02b146fefb35",
+    "bytes": 280580,
+    "words": 70145,
+    "instructions": 16851,
+    "branchOperations": 967,
+    "loops": 21,
+    "selectionMerges": 414,
+    "functions": 78,
+    "functionCalls": 235,
+    "rayQueryInitializations": 2,
+    "atomicInstructions": 0,
+    "hasDiagnosticsBinding": false,
+    "compiler": {
+      "glslangCompileArguments": [
+        "-V",
+        "--target-env",
+        "vulkan1.2",
+        "-S",
+        "comp",
+        "-DHORDE_RT_VARIANT_INSTRUMENTATION=0",
+        "-DHORDE_RT_VARIANT_QUALITY=1",
+        "-DHORDE_RT_VARIANT_MATERIAL=1",
+        "-o",
+        "<output>",
+        "<source>"
+      ],
+      "spirvOptArguments": [
+        "--eliminate-dead-functions",
+        "--eliminate-dead-code-aggressive",
+        "--simplify-instructions",
+        "--eliminate-dead-branches",
+        "--cfg-cleanup",
+        "<input>",
+        "-o",
+        "<output>"
+      ],
+      "spirvValArguments": [
+        "--target-env",
+        "vulkan1.2",
+        "<input>"
+      ],
+      "spirvDisArguments": [
+        "<input>",
+        "-o",
+        "<output>"
+      ]
+    }
+  },
+  "pipelineCostAdmitted": false,
+  "pipelineCostFailures": [
+    {
+      "metric": "bytes",
+      "actual": 280344,
+      "maximum": 243852
+    },
+    {
+      "metric": "words",
+      "actual": 70086,
+      "maximum": 60963
+    },
+    {
+      "metric": "instructions",
+      "actual": 16836,
+      "maximum": 14531
+    },
+    {
+      "metric": "branchOperations",
+      "actual": 966,
+      "maximum": 783
+    },
+    {
+      "metric": "loops",
+      "actual": 21,
+      "maximum": 15
+    },
+    {
+      "metric": "selectionMerges",
+      "actual": 413,
+      "maximum": 325
+    },
+    {
+      "metric": "functions",
+      "actual": 78,
+      "maximum": 63
+    },
+    {
+      "metric": "functionCalls",
+      "actual": 235,
+      "maximum": 199
+    }
+  ],
+  "nextStep": "STOP: no native/image run or production promotion; preserve cost failure."
+}

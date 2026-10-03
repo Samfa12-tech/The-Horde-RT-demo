@@ -1,0 +1,13 @@
+{
+  "deviceModel": "SM-S948B",
+  "package": "com.samfa12.hordelanternrt.debug",
+  "remote": "files/reports/isolated-transport.rgba",
+  "destination": "C:/Dev/tmp/horde-glass-isolated-20261001/path-native.rgba",
+  "width": 1080,
+  "height": 2235,
+  "bytes": 9655208,
+  "sha256": "d36581ce3a875e03f0d6dadc1098505e3d1738a224cbaf5156a0be710bf72916",
+  "remoteSha256": "d36581ce3a875e03f0d6dadc1098505e3d1738a224cbaf5156a0be710bf72916",
+  "transfer": "native bytes; no Android screenshot resampling",
+  "result": "PASS"
+}

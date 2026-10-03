@@ -1,0 +1,7 @@
+{
+  "key": "diagnostic_high_generic_dielectric",
+  "spirvSha256": "feac38eca1df17159bca4d490825b7e3750742b05bb07cd2f6db4eec42261b5c",
+  "includeSha256": "9f79c78ffe0c01f6652c7fe7916ecc06e8e15ac5516ce7657acefa6d6319c5f0",
+  "words": 63170,
+  "atomicInstructions": 41
+}

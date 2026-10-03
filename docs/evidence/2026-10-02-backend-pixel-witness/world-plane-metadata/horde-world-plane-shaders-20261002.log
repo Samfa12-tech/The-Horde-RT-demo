@@ -1,0 +1,26 @@
+C:\Dev\tmp\horde-world-plane-shaders-20261002\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_high_generic_dielectric: 279788 bytes; functions=69; calls=253; ray-query sites=3; dependency SHA-256=64efd4cc0c69fe71bc0308c8cea8833623156f1346e6ca598729d52698761132
+C:\Dev\tmp\horde-world-plane-shaders-20261002\diagnostic_high_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_high_opaque_fast: 506048 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=8ea83ad62b5079dc22d50ac4ad5ff7e05f0c5e079cb89e7e080fa9cdaacc3f75
+C:\Dev\tmp\horde-world-plane-shaders-20261002\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_generic_dielectric: 252972 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=0c0f87f7d6cdf47e87401d7646f8484ad8ab6575f8176355ec305e6aa64b790c
+C:\Dev\tmp\horde-world-plane-shaders-20261002\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant diagnostic_mobile_opaque_fast: 506048 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=68b69b24abb365235acd61f43a3482914c25cbe64c7126dcef47a27331625645
+C:\Dev\tmp\horde-world-plane-shaders-20261002\shipping_high_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_high_generic_dielectric: 244144 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=d9162501fa3797ca1a9eb4eadc8d0f691759e968c642057aad91a5393b739255
+C:\Dev\tmp\horde-world-plane-shaders-20261002\shipping_high_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_high_opaque_fast: 501812 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=a1a0866ef780841ca0103dfee39c0cd4e3fc20481d1a33aacd67cd264d847796
+C:\Dev\tmp\horde-world-plane-shaders-20261002\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+Raygen variant shipping_mobile_generic_dielectric: 244144 bytes; functions=63; calls=199; ray-query sites=2; dependency SHA-256=964ce2810bffe42cc13d3537d409cefd7b1f3d0ad163729a2bc798410de305ef
+C:\Dev\tmp\horde-world-plane-shaders-20261002\shipping_mobile_opaque_fast\minimal.rgen.resolved
+Raygen variant shipping_mobile_opaque_fast: 501812 bytes; functions=1; calls=0; ray-query sites=23; dependency SHA-256=53690f9d3b564d6847de2a0ca208e84f0ffa0ec9e8aecc0c2a5f50a0b12b0dc0
+RayQuery compute variant rayquery_compute_diagnostic_high_generic_dielectric: bytes=280024; functions=69; calls=253; ray-query sites=3; atomics=41; SPIR-V SHA-256=5d51146b97f3c4a8c6df2fd50f9530757ec0b226670bb308594228dff4ac05b0
+RayQuery compute variant rayquery_compute_diagnostic_high_opaque_fast: bytes=506308; functions=1; calls=0; ray-query sites=23; atomics=5; SPIR-V SHA-256=85f08f90f110ae4752b1b7cd625de361524c29649d61b2e81655b551031d2b2a
+RayQuery compute variant rayquery_compute_diagnostic_mobile_generic_dielectric: bytes=253208; functions=63; calls=199; ray-query sites=2; atomics=41; SPIR-V SHA-256=1b91509579a6612f4c83392def8ea99da40517990aa37f1dbec0bae79aa10b64
+RayQuery compute variant rayquery_compute_diagnostic_mobile_opaque_fast: bytes=506308; functions=1; calls=0; ray-query sites=23; atomics=5; SPIR-V SHA-256=85f08f90f110ae4752b1b7cd625de361524c29649d61b2e81655b551031d2b2a
+RayQuery compute variant rayquery_compute_shipping_high_generic_dielectric: bytes=244380; functions=63; calls=199; ray-query sites=2; atomics=0; SPIR-V SHA-256=57ab926923062445da1ba1e14b215d807961d9502bb92e07f45797194156b9a9
+RayQuery compute variant rayquery_compute_shipping_high_opaque_fast: bytes=502072; functions=1; calls=0; ray-query sites=23; atomics=0; SPIR-V SHA-256=0ede4214d95aa8a8af9c462b2d3e65aa5b72dcb52ad0c58f57bca24a25599cd7
+RayQuery compute variant rayquery_compute_shipping_mobile_generic_dielectric: bytes=244380; functions=63; calls=199; ray-query sites=2; atomics=0; SPIR-V SHA-256=0c83a2fb2ce4dddb3953e028e651267bf5f6530b5bb782bd288e4773f7eab9f1
+RayQuery compute variant rayquery_compute_shipping_mobile_opaque_fast: bytes=502072; functions=1; calls=0; ray-query sites=23; atomics=0; SPIR-V SHA-256=0ede4214d95aa8a8af9c462b2d3e65aa5b72dcb52ad0c58f57bca24a25599cd7
+Frozen eight RayQuery compute artifacts, provenance catalog, and generated adapter.
+INVESTIGATION ONLY: clean candidate staged; no frozen-cost admission or production promotion.

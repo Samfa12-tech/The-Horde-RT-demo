@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "classification": "exact-source-github-actions-ci-receipt",
+  "repository": "Samfa12-tech/The-Horde-RT-demo",
+  "head": {
+    "sha": "3499eeab8dcb5402fb33d51d08ee3fbb0a293961",
+    "parent": "8fb1da494069c695127c714d2246321a14d8de8b",
+    "tree": "a451691d465f57c83423383e9a5af9e3124059fb",
+    "branch": "codex/horde-1.6.1-engineering-pass"
+  },
+  "pullRequest": {
+    "number": 15,
+    "base": "bda1b99a62e1de883273dd21f267bcfc92bc5490",
+    "head": "3499eeab8dcb5402fb33d51d08ee3fbb0a293961",
+    "integration": "9add73abefc88ac6b68abd9fbfaae8a1b20ec884",
+    "integrationParents": [
+      "bda1b99a62e1de883273dd21f267bcfc92bc5490",
+      "3499eeab8dcb5402fb33d51d08ee3fbb0a293961"
+    ],
+    "integrationTree": "a451691d465f57c83423383e9a5af9e3124059fb"
+  },
+  "runs": {
+    "push": {"id": 36813383791, "conclusion": "success"},
+    "pull_request": {"id": 36813388376, "conclusion": "success"}
+  },
+  "results": {
+    "push": {
+      "gcc": {"ctestPassed": 55, "ctestFailed": 0, "resolverCases": 10, "combatCaptureCases": 34, "glassOwnershipCases": 16},
+      "clang": {"ctestPassed": 55, "ctestFailed": 0, "resolverCases": 10, "combatCaptureCases": 34, "glassOwnershipCases": 16},
+      "msvc": {"ctestPassed": 56, "ctestFailed": 0, "resolverCases": 10, "combatCaptureCases": 34, "glassOwnershipCases": 16},
+      "vulkanCpuHost": {"ctestPassed": 15, "ctestFailed": 0}
+    },
+    "pull_request": {
+      "gcc": {"ctestPassed": 55, "ctestFailed": 0, "resolverCases": 10, "combatCaptureCases": 34, "glassOwnershipCases": 16},
+      "clang": {"ctestPassed": 55, "ctestFailed": 0, "resolverCases": 10, "combatCaptureCases": 34, "glassOwnershipCases": 16},
+      "msvc": {"ctestPassed": 56, "ctestFailed": 0, "resolverCases": 10, "combatCaptureCases": 34, "glassOwnershipCases": 16},
+      "vulkanCpuHost": {"ctestPassed": 15, "ctestFailed": 0}
+    }
+  },
+  "logSha256": {
+    "push-clang.log": "a6df3f2c4c5ff9c4fc6d35dc14869cb918c123dc4c75190fa69ea60c0746b0d5",
+    "push-gcc.log": "7e459bd20b0538f24dd153cea3f7baa4e790474520c0abc15bbbf58bf59ad771",
+    "push-msvc.log": "ee1b2ef52771025679c0898b6f8380af43258a3b0e9f4a34d709cd14885b0376",
+    "push-vulkan-host.log": "7d885ea0b591db9ac8108d3c76e2723ae00ef5f427511f4d8235317ab8865f01",
+    "pr-clang.log": "fd75d255a176c37df8f3f870b53331c866d34cde502146134fc2612b77ec21f6",
+    "pr-gcc.log": "4a33bf524cd610d7c0f08ba8f1e61433fc0c245c3c900c9771200c147fa2c671",
+    "pr-msvc.log": "38044211b62c0ec2a1fc3bbd9adc595da6692bc4629b72fbf36c7ce0400c907c",
+    "pr-vulkan-host.log": "448f4756c9d371b6eb57fa5dc07e187de4afff1563f532c0ac00582d75179f3a"
+  },
+  "warnings": "No compiler warning/error pattern matches in the eight captured job logs.",
+  "claimBoundary": "Portable host tests and a focused Vulkan CPU-host lane only; no Vulkan hardware, Android device, staged image-equivalence, or phone-performance validation is established by these runs."
+}

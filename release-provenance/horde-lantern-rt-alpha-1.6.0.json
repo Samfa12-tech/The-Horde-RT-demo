@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "release": {
+    "version": "1.6.0",
+    "tag": "v1.6.0",
+    "repository": "Samfa12-tech/The-Horde-RT-demo"
+  },
+  "source": {
+    "commit": "57c81b635a6c10e2772283639026936adac80f8b"
+  },
+  "android": {
+    "versionCode": 8
+  },
+  "artifacts": {
+    "checksumManifest": {
+      "fileName": "SHA256SUMS.txt",
+      "bytes": 349,
+      "sha256": "b86650261d7b8cdf000aeaf33f5a0a526b118c55ba59ea2ec2993d4a1bb47a30"
+    },
+    "windows": {
+      "fileName": "Horde-Lantern-RT-Alpha-1.6.0-Windows-x64.zip",
+      "bytes": 105508271,
+      "sha256": "7b0dcf24b4a47771a9c3a27cbc52e3899c87781109afcef20f7a9a8472411d77"
+    },
+    "android": {
+      "fileName": "Horde-Lantern-RT-Alpha-1.6.0-Android.apk",
+      "bytes": 82357855,
+      "sha256": "52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48"
+    }
+  },
+  "documentation": {
+    "validationPath": "docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md",
+    "releaseNotesPath": "docs/SHOWCASE_ALPHA_1_6_0_RELEASE_NOTES_2026-08-30.md"
+  }
+}

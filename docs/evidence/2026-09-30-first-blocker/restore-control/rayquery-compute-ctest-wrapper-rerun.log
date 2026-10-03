@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/build/presets/windows-x64-debug
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/build/presets/windows-x64-debug
+    Start 39: horde_rt_rayquery_compute_shader_tests
+1/1 Test #39: horde_rt_rayquery_compute_shader_tests ...   Passed   33.50 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =  33.51 sec

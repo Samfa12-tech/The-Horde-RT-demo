@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "assetId": "what-the-dark-keeps",
+  "title": "What the Dark Keeps",
+  "rights": "Owner-supplied; authorised for Horde use only",
+  "archive": {
+    "fileName": "What_the_Dark_Keeps_Horde_RT_Music_Pack.zip",
+    "sha256": "e28e5936189919fed25f6208dd7a8b97172eb5f7d25f69732cc7339c45f386fa"
+  },
+  "sources": [
+    {
+      "path": "source/What_the_Dark_Keeps_Pocket_Chordsmith.json",
+      "bytes": 72783,
+      "sha256": "3ab832e08807d3745fca172b0bb6b95ccbbe37face4e60077027d6d35b55c9a0"
+    },
+    {
+      "path": "source/What_the_Dark_Keeps_PCS1.txt",
+      "bytes": 94574,
+      "sha256": "fc7dab9a0e187740f352b440e92e55b922c663019bfe8df0896b1c617aea570d"
+    }
+  ],
+  "render": {
+    "tool": "Pocket Chordsmith",
+    "version": "v68",
+    "sourceCommit": "2b87d7b",
+    "htmlSha256": "b266814fff749bd4d7be9d8725e4d7becc2d944122bc2a302602457fa9b6e2cf",
+    "evidenceManifest": "docs/evidence/2026-10-03-music-drone/SHA256SUMS.json",
+    "processing": "Owner-authorised removal only of Melody3 step15 held phrases in A/D. A/D bodies and tails rendered with retained v68 actual app voices/live FX; twelve unaffected WAVs retained byte-exact. All remaining events, timing, voices, FX, cue mapping, lengths and PCM playback unchanged."
+  },
+  "format": {
+    "encoding": "PCM16_LE",
+    "sampleRate": 48000,
+    "channels": 2
+  },
+  "tailFrames": 144000,
+  "crossfadeFrames": 12000,
+  "totalWaveBytes": 20160704,
+  "totalPcmBytes": 20160000,
+  "cues": [
+    {
+      "cue": "A",
+      "looping": true,
+      "body": {
+        "path": "runtime/A-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "8c6201afb7129775ded6696c5819f4e592202d1b0f33f755b9d4f408f2e81556"
+      },
+      "tail": {
+        "path": "runtime/A-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "a7459fc656b1520be5fad2b9e11cec314d62cdf0164abdb2fda53d619d7b962c"
+      }
+    },
+    {
+      "cue": "B",
+      "looping": true,
+      "body": {
+        "path": "runtime/B-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "27944d203f9453b7ff9edb2bfd653bac524d4da4db4a000f76115fb4810dd3b5"
+      },
+      "tail": {
+        "path": "runtime/B-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "7a437a4641f4b99d8b21db934ece9bb3a9c4d0464fea37eb94a2841d70f3132f"
+      }
+    },
+    {
+      "cue": "C",
+      "looping": false,
+      "body": {
+        "path": "runtime/C-body.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "3ce3a8ea381c3e81c0b34841df3f1d8d236a5ef335f594001553a400b65accb3"
+      },
+      "tail": {
+        "path": "runtime/C-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "ec3650bd450cebe9985c1d4d4b59749debe34301f9f9e889171d0e49a316c89c"
+      }
+    },
+    {
+      "cue": "D",
+      "looping": true,
+      "body": {
+        "path": "runtime/D-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "4398311b5870e614ffe611950264e370cf819f8d323aafe291816f38e36bf4c6"
+      },
+      "tail": {
+        "path": "runtime/D-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "14550157b1a3fbf44f3d1a4dda424223475a7a0a9975b0361687bb2031f7ec50"
+      }
+    },
+    {
+      "cue": "E",
+      "looping": true,
+      "body": {
+        "path": "runtime/E-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03"
+      },
+      "tail": {
+        "path": "runtime/E-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2"
+      }
+    },
+    {
+      "cue": "F",
+      "looping": true,
+      "body": {
+        "path": "runtime/F-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "158f015c3ffbb12169eb088206751f56fbed799e0b3dea3ab4496124634b441d"
+      },
+      "tail": {
+        "path": "runtime/F-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "a4fdc4b38c8a1e7240cfad5ac364063ec8c6f27f9baefc2d2e6110a8a4429c21"
+      }
+    },
+    {
+      "cue": "G",
+      "looping": false,
+      "body": {
+        "path": "runtime/G-body.wav",
+        "frames": 288000,
+        "bytes": 1152044,
+        "sha256": "ab2dbe31c735cbeec11d09eaa308e5faee793a891c34b67f5f50f6b33af25736"
+      },
+      "tail": {
+        "path": "runtime/G-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "c51b9851ac32e34c57e586f154d3ee1d5f2d138b9c0f21b2c983618905a42609"
+      }
+    },
+    {
+      "cue": "H",
+      "looping": true,
+      "body": {
+        "path": "runtime/H-body.wav",
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "58ac260bd18204e9fb1aeb01aab9229de6830032f1d4be3d30b9527fde1fe6ae"
+      },
+      "tail": {
+        "path": "runtime/H-tail.wav",
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "9e50268573d85733333e10304a0e9faf8d23545e510723035aef1b9d8b0238bf"
+      }
+    }
+  ]
+}

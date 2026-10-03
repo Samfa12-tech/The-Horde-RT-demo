@@ -1,0 +1,37 @@
+{
+  "model": "SM-S948B",
+  "sourceCommit": "0c7db23beb5af1fd83b9a4d7cdf950386f6e0eea",
+  "artifactSha256": "bc5c7ce3c755c16ec39e2c16fa9eae01c31983c7393e645f881c5bcc9e6a346c",
+  "installedPullbackSha256": "bc5c7ce3c755c16ec39e2c16fa9eae01c31983c7393e645f881c5bcc9e6a346c",
+  "bytes": 108261409,
+  "install": "update-without-data-clear",
+  "beforeVersion": "1.6.0",
+  "beforeCode": 8,
+  "afterVersion": "1.6.1",
+  "afterCode": 9,
+  "preservedSettings": {
+    "water": "Mobile",
+    "lookPercent": 100,
+    "renderPercent": 76,
+    "sfxPercent": 70
+  },
+  "newMusicControlPercent": 70,
+  "initialReadySeconds": 11.353,
+  "resumeReadySeconds": [
+    12.73,
+    17.317,
+    13.37
+  ],
+  "initialUnpausedInterval": "gameplay-death-observed",
+  "controlledPausedResume": "native-RT-active-vitality3",
+  "cleanedUp": "production-Horde-force-stopped-no-PID",
+  "performanceRun": false,
+  "audioManualRevalidation": false,
+  "gaps": [
+    "not-full-combat-route-or-animation-capture",
+    "diagnostics-UI-idle-dump-unavailable",
+    "no-new-sustained-performance",
+    "S24-final-matrix-deferred",
+    "S25-unverified"
+  ]
+}

@@ -1,18 +1,25 @@
 param(
     [Parameter(Mandatory = $true)]
     [string]$Version,
+    [Parameter(Mandatory = $true)]
+    [int]$VersionCode,
     [ValidateSet("Both", "Windows", "Android")]
     [string]$Channels = "Both",
+    [string]$ArtifactDirectory,
     [switch]$ConfirmPush,
     [string]$ButlerPath = "C:\Dev\tools\butler\butler.exe"
 )
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "release-version-policy.ps1")
-Assert-HordeReleaseVersionIsMutable -Version $Version -UploadOnly
+Assert-HordeReleaseVersionIsMutable -Version $Version -VersionCode $VersionCode
 $expectedCertificateSha256 = "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
-$candidateRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "releases\candidates"))
+if ([string]::IsNullOrWhiteSpace($ArtifactDirectory)) {
+    $candidateRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "releases\candidates"))
+} else {
+    $candidateRoot = [IO.Path]::GetFullPath($ArtifactDirectory)
+}
 $safeVersion = $Version -replace '[^0-9A-Za-z.-]', '-'
 $baseName = "Horde-Lantern-RT-Alpha-$safeVersion"
 $windowsZip = Join-Path $candidateRoot "$baseName-Windows-x64.zip"
@@ -86,9 +93,12 @@ $candidatePrefix = $candidateRoot.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO
 if (-not $stage.StartsWith($candidatePrefix, [StringComparison]::OrdinalIgnoreCase)) {
     throw "Unsafe Butler staging path: $stage"
 }
+$ownsStage = $false
 try {
     if ($Channels -in @("Both", "Windows")) {
-        if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
+        if (Test-Path -LiteralPath $stage) { throw "Butler staging path already exists; preserve and inspect it before retrying: $stage" }
+        New-Item -ItemType Directory -Path $stage | Out-Null
+        $ownsStage = $true
         Expand-Archive -LiteralPath $windowsZip -DestinationPath $stage
         & $ButlerPath push $stage $windowsTarget --userversion $Version
         if ($LASTEXITCODE -ne 0) { throw "Windows Butler push failed." }
@@ -98,7 +108,7 @@ try {
         if ($LASTEXITCODE -ne 0) { throw "Android Butler push failed." }
     }
 } finally {
-    if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
+    if ($ownsStage -and (Test-Path -LiteralPath $stage)) { Remove-Item -LiteralPath $stage -Recurse -Force }
 }
 
 Write-Host "Requested itch channel push completed."

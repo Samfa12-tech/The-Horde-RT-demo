@@ -1,0 +1,55 @@
+{
+  "evidenceHead": "0ff58606ed6499d73b2f0ccbf035f22f51e99870",
+  "runtimeSource": "1da483d01124ca673badf6c13939d99736c4a658",
+  "exactModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "process": 26202,
+  "apkSha256": "e10b02034e0a0a78828c6ff885d03b79dd2058f77c6f20346a7c977edd794af4",
+  "profile": "Diagnostic/Mobile",
+  "backend": "RayTracingPipeline",
+  "scalePercent": 75,
+  "musicVolumePercent": 70,
+  "liveState": "authored finale-roof; benchmark finished; ending Continue; normal inputs; no new cheats",
+  "music": {
+    "periods": 20,
+    "afterHomeResumePeriods": [
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37
+    ],
+    "underruns": 0,
+    "consumedFrames": 11520000,
+    "beforePausePeriod": 28,
+    "minimumSeconds": 11.996,
+    "maximumSeconds": 12.004,
+    "loggingBoundSeconds": 0.05,
+    "epoch": 4,
+    "intervalCount": 19,
+    "status": "PASS-twenty-device-consumed-periods"
+  },
+  "display": {
+    "p95Milliseconds": 116.666719,
+    "timestamps": 81,
+    "averageFps": 8.946877759973043,
+    "intervals": 80,
+    "status": "short Debug stationary observation, not Shipping A/B",
+    "medianMilliseconds": 112.499948,
+    "durationSeconds": 8.941666819
+  },
+  "openGates": [
+    "owner live feel",
+    "pickup-to-reveal inputs",
+    "matched Shipping display pacing",
+    "audio focus loss",
+    "full cue-route/SFX balance",
+    "sustained active RAM and GPU memory counters",
+    "S24 hands/enemies",
+    "S25 exact device"
+  ]
+}

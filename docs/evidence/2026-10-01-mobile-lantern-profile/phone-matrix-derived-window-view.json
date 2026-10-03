@@ -1,0 +1,338 @@
+[
+  {
+    "runId": "mobile-pane-s26-c1-route-valid-20261001",
+    "window": "opening",
+    "frames": 160,
+    "cycleMedianMs": 82.7015,
+    "cycleP95Ms": 91.5064,
+    "gpuMedianMs": 72.1891,
+    "gpuP95Ms": 79.9912,
+    "strategy": {
+      "opaque-fast": 1838
+    },
+    "benchmarkSha256": "3182fd50ba9ffdbddf307a9e2e0d07c0c55c621b3ec1f6536565df1efcb924e1",
+    "analysisSha256": "9df1400743ba7b3fc80c364d446a20af9ed591c9e9dee92f3ed8a98bb63aa43e"
+  },
+  {
+    "runId": "mobile-pane-s26-c1-high-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 235.8743,
+    "cycleP95Ms": 253.2629,
+    "gpuMedianMs": 234.0921,
+    "gpuP95Ms": 251.4266,
+    "strategy": {
+      "generic-dielectric": 600
+    },
+    "benchmarkSha256": "635d23f3aa277c2864ed4ef3237cb4d7b9e3746d5f1e1103a0b807062fa42d58",
+    "analysisSha256": "610d2d25cddb5459bc405ba0f721a0ddb2f24e9dfdc1700c02374d7d6e502e03"
+  },
+  {
+    "runId": "mobile-pane-s26-c1-live-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 236.4367,
+    "cycleP95Ms": 249.4891,
+    "gpuMedianMs": 225.5287,
+    "gpuP95Ms": 238.3898,
+    "strategy": {
+      "generic-dielectric": 600
+    },
+    "benchmarkSha256": "449f1ca7048af360183226165031b97b2d50fcc054315dcf8a4250acefcd30e2",
+    "analysisSha256": "a87074abdde86f67c0fa3dd48abc947a39081ae04e509c8446bb8f2d63126ccc"
+  },
+  {
+    "runId": "mobile-pane-s26-p1-route-20261001",
+    "window": "opening",
+    "frames": 160,
+    "cycleMedianMs": 81.4377,
+    "cycleP95Ms": 90.7177,
+    "gpuMedianMs": 70.8993,
+    "gpuP95Ms": 80.0999,
+    "strategy": {
+      "opaque-fast": 1838
+    },
+    "benchmarkSha256": "0055abe795cfebb8b0f04350c9c93f7c8cd2d503e8bf64cb01c94f7d5bbb9bf7",
+    "analysisSha256": "63c7a590be1e8b28bfc9db1a8526e431d0f52fafc4a6e0c91523f8fae8d83034"
+  },
+  {
+    "runId": "mobile-pane-s26-p1-high-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 112.0317,
+    "cycleP95Ms": 115.7495,
+    "gpuMedianMs": 110.6618,
+    "gpuP95Ms": 113.9254,
+    "strategy": {
+      "opaque-fast": 600
+    },
+    "benchmarkSha256": "7083ec548a3c77d88efbf97b92fe56cceb1b6a7c8b9fe92f28bb6a55b1a57f68",
+    "analysisSha256": "f2ad2c84156d0ef7cacee83672ae10d5ebe1e0674ca09038e24544bd7b54642c"
+  },
+  {
+    "runId": "mobile-pane-s26-p1-live-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 114.8763,
+    "cycleP95Ms": 123.447,
+    "gpuMedianMs": 104.1214,
+    "gpuP95Ms": 112.8352,
+    "strategy": {
+      "opaque-fast": 600
+    },
+    "benchmarkSha256": "928b0e1392f7366556d369bf28b8cea427f9fa85204ac690f3eb768530ca4e21",
+    "analysisSha256": "b848f7e694a3490ded8e514dace296015e9df5cc27569b2da753ab03ff8a08f2"
+  },
+  {
+    "runId": "mobile-pane-s26-p2-route-20261001",
+    "window": "opening",
+    "frames": 160,
+    "cycleMedianMs": 86.2055,
+    "cycleP95Ms": 96.7764,
+    "gpuMedianMs": 75.9572,
+    "gpuP95Ms": 85.8815,
+    "strategy": {
+      "opaque-fast": 1838
+    },
+    "benchmarkSha256": "2a5ae79146e020a761f4ab7b65c1c22f36939669c611778a9939993862a8c183",
+    "analysisSha256": "6996245bdf03606385eea0d88836115e49206f0728c4977a71d5b00b92b99864"
+  },
+  {
+    "runId": "mobile-pane-s26-p2-high-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 114.2301,
+    "cycleP95Ms": 123.8273,
+    "gpuMedianMs": 112.5478,
+    "gpuP95Ms": 122.3791,
+    "strategy": {
+      "opaque-fast": 600
+    },
+    "benchmarkSha256": "46eca0d3b01f349316c2d796576475513df8c6b13153ee2316a468b7d1d653c4",
+    "analysisSha256": "066e9bfc1342bef318a5666e3f757a6489265ee6de63333059e97e5cd5d33161"
+  },
+  {
+    "runId": "mobile-pane-s26-p2-live-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 122.4959,
+    "cycleP95Ms": 130.8366,
+    "gpuMedianMs": 112.07,
+    "gpuP95Ms": 120.3959,
+    "strategy": {
+      "opaque-fast": 600
+    },
+    "benchmarkSha256": "9084ae6c8ecac9c28ac0b9a3701a1164b2eb168eb8b9680d73270bfe11849491",
+    "analysisSha256": "6a2978ce690b92e963a5f18636c93fb2ac6d7ec1e97ccf43e2e63e1be25fa038"
+  },
+  {
+    "runId": "mobile-pane-s26-c2-route-20261001",
+    "window": "opening",
+    "frames": 160,
+    "cycleMedianMs": 89.7215,
+    "cycleP95Ms": 97.118,
+    "gpuMedianMs": 78.6362,
+    "gpuP95Ms": 86.386,
+    "strategy": {
+      "opaque-fast": 1838
+    },
+    "benchmarkSha256": "8b097f0b267a58f30f35bb8843afafc9f496319902993d9426cf539b7ac8ed71",
+    "analysisSha256": "c8d4518b5f95682fa10056fcf7d264be276374c6ac8ea488e0023bb9455e1ddc"
+  },
+  {
+    "runId": "mobile-pane-s26-c2-high-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 272.8013,
+    "cycleP95Ms": 283.192,
+    "gpuMedianMs": 271.0851,
+    "gpuP95Ms": 281.3531,
+    "strategy": {
+      "generic-dielectric": 600
+    },
+    "benchmarkSha256": "afa34644da30c59640c2d032f33319743b509e7cba0f21b102028d8ccf50ae7f",
+    "analysisSha256": "f6882be6135fb35bd351e3721b5b2ab7c2b278737d378159448494bce8c9993a"
+  },
+  {
+    "runId": "mobile-pane-s26-c2-live-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 278.817,
+    "cycleP95Ms": 283.5992,
+    "gpuMedianMs": 268.3942,
+    "gpuP95Ms": 272.1386,
+    "strategy": {
+      "generic-dielectric": 600
+    },
+    "benchmarkSha256": "384a3388e3633575dfcaa226948ad376f5dfec89f65ea39bb5ff073b9ac33af3",
+    "analysisSha256": "23cd89855466e829d152c96a207ec92ec69b93f8e08913dc423d6727f01b8820"
+  },
+  {
+    "runId": "mobile-pane-s24-c1-route-20261001",
+    "window": "opening",
+    "frames": 160,
+    "cycleMedianMs": 58.7013,
+    "cycleP95Ms": 64.949,
+    "gpuMedianMs": 45.8439,
+    "gpuP95Ms": 50.6967,
+    "strategy": {
+      "opaque-fast": 1838
+    },
+    "benchmarkSha256": "f3afb16c5976f9ff491ce83ff7300cf214da8de72345fd558f5b23a8f91b3f31",
+    "analysisSha256": "8681f6e0931c65156b6b8766e36847e0f8877c5ca8b1d86e3e3e54ed23cee0bf"
+  },
+  {
+    "runId": "mobile-pane-s24-c1-high-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 265.3314,
+    "cycleP95Ms": 267.5597,
+    "gpuMedianMs": 263.268,
+    "gpuP95Ms": 265.4003,
+    "strategy": {
+      "generic-dielectric": 600
+    },
+    "benchmarkSha256": "4febe91e79c6fed52e57bcd3a8f25e96b393237e0747bc85c38e4b076dc4eb72",
+    "analysisSha256": "16e6b3838f2ae27284144a903161859f289704aa7fd968a16af0d230917eb0d3"
+  },
+  {
+    "runId": "mobile-pane-s24-c1-live-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 279.7073,
+    "cycleP95Ms": 325.538,
+    "gpuMedianMs": 264.4594,
+    "gpuP95Ms": 311.7136,
+    "strategy": {
+      "generic-dielectric": 600
+    },
+    "benchmarkSha256": "60d8fa0833fc6767379190972a867897d75ae587e18a37a68e4e242716e949b8",
+    "analysisSha256": "0cd3bbdc625a2dd819100329c5e249eaf95b1e34105310adb1fae6fd1fa97938"
+  },
+  {
+    "runId": "mobile-pane-s24-p1-route-20261001",
+    "window": "opening",
+    "frames": 160,
+    "cycleMedianMs": 58.6877,
+    "cycleP95Ms": 64.8057,
+    "gpuMedianMs": 45.8601,
+    "gpuP95Ms": 50.8401,
+    "strategy": {
+      "opaque-fast": 1838
+    },
+    "benchmarkSha256": "0707e20c50b93f90cfaeb9dcb7103edd3194e4a6bc8f882898c59f4259c297c7",
+    "analysisSha256": "3820bb866d081e0a66aaa06e87943d073b39946da06d3bfb2b3669b054577b0d"
+  },
+  {
+    "runId": "mobile-pane-s24-p1-high-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 84.1731,
+    "cycleP95Ms": 85.4456,
+    "gpuMedianMs": 82.2629,
+    "gpuP95Ms": 83.3203,
+    "strategy": {
+      "opaque-fast": 600
+    },
+    "benchmarkSha256": "672699606ed26ae8a88c1788cca6a5ceeb6275e8642ee5363142b324c16c8950",
+    "analysisSha256": "64f0376252d7faf9227e61fea55e09c38e13a2dc35ba0d6acac7e41021d1b128"
+  },
+  {
+    "runId": "mobile-pane-s24-p1-live-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 100.455,
+    "cycleP95Ms": 104.7851,
+    "gpuMedianMs": 86.8861,
+    "gpuP95Ms": 91.606,
+    "strategy": {
+      "opaque-fast": 600
+    },
+    "benchmarkSha256": "543d23173e17b58bf931ebf158051fba5af3c5a8c2a9313ba2019844b315ed53",
+    "analysisSha256": "16c7e7e50d1c7980552a84c3b7fdbc295f453e9d4d2a055e34a5037ee19b94c7"
+  },
+  {
+    "runId": "mobile-pane-s24-p2-route-20261001",
+    "window": "opening",
+    "frames": 160,
+    "cycleMedianMs": 62.4268,
+    "cycleP95Ms": 66.7942,
+    "gpuMedianMs": 48.3821,
+    "gpuP95Ms": 53.3433,
+    "strategy": {
+      "opaque-fast": 1838
+    },
+    "benchmarkSha256": "12c58746ce91f9206c58c43bfb466788d4c9a2fe0f4019e159337d1a6e9e72dd",
+    "analysisSha256": "ee79cf4bb9813dc69ac1ceed3d19621c9ccbc7d924e9e1c29852496d88b5f774"
+  },
+  {
+    "runId": "mobile-pane-s24-p2-high-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 84.4666,
+    "cycleP95Ms": 88.9137,
+    "gpuMedianMs": 82.5042,
+    "gpuP95Ms": 86.7906,
+    "strategy": {
+      "opaque-fast": 600
+    },
+    "benchmarkSha256": "8508a9dc37c4f3579432f661e41df3f522e2fc9a2f905238981fe0190a194a03",
+    "analysisSha256": "5e04664eb3eecf3a29755b87d76a7fca46970f14e5b8f533b7b787001e31fddc"
+  },
+  {
+    "runId": "mobile-pane-s24-p2-live-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 109.6535,
+    "cycleP95Ms": 121.0975,
+    "gpuMedianMs": 97.5633,
+    "gpuP95Ms": 106.9885,
+    "strategy": {
+      "opaque-fast": 600
+    },
+    "benchmarkSha256": "fe76672fd957cde42c440db6b38cb080dc2f0ffc9926ff99f47ed0c49cce3dc4",
+    "analysisSha256": "5103430cf48b299be0e9aedb29a7142c74ed3fc73d148ced93f8baf3efe6526b"
+  },
+  {
+    "runId": "mobile-pane-s24-c2-route-20261001",
+    "window": "opening",
+    "frames": 160,
+    "cycleMedianMs": 63.998,
+    "cycleP95Ms": 71.4718,
+    "gpuMedianMs": 50.6905,
+    "gpuP95Ms": 55.848,
+    "strategy": {
+      "opaque-fast": 1838
+    },
+    "benchmarkSha256": "113d8093f64a09a609b5fb7c8cb9b80340bf77b3fbccaf417ce92d9e30fd316c",
+    "analysisSha256": "208647b7d790a4bc05b66af7bdc92ea19c8c53fd5be98a8b1d04779b74fab7c7"
+  },
+  {
+    "runId": "mobile-pane-s24-c2-high-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 346.3175,
+    "cycleP95Ms": 350.4899,
+    "gpuMedianMs": 344.3299,
+    "gpuP95Ms": 348.4421,
+    "strategy": {
+      "generic-dielectric": 600
+    },
+    "benchmarkSha256": "b42a951476f533316888ae507a839190c697e04555d626c9a2726ab27ee8d493",
+    "analysisSha256": "146d738f8f2ac305a015b3c749914663341b88772e7ccb48e1df676b332ff3b7"
+  },
+  {
+    "runId": "mobile-pane-s24-c2-live-20261001",
+    "window": "yellow-torch-bay",
+    "frames": 600,
+    "cycleMedianMs": 354.8791,
+    "cycleP95Ms": 362.0684,
+    "gpuMedianMs": 343.8325,
+    "gpuP95Ms": 348.6731,
+    "strategy": {
+      "generic-dielectric": 600
+    },
+    "benchmarkSha256": "994afab687b64c50cb030069f2d0acdeb7cc8a66dc66ea2a948d879e156601aa",
+    "analysisSha256": "ecc148181445c8ff15cd535c53b310e6c5ac2aae4d9d9e018ae6e65a685b0ccd"
+  }
+]

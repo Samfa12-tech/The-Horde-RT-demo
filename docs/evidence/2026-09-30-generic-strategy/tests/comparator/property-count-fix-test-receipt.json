@@ -1,0 +1,16 @@
+{
+  "fixtureOnly": true,
+  "positiveFourRunFixture": {
+    "passed": true,
+    "runs": 4,
+    "fullRouteRows": 7352,
+    "openingRows": 640,
+    "validatedOnly": true
+  },
+  "negativeExtraStrategyProperty": {
+    "rejected": true,
+    "diagnostic": "Comparison admission failed: generic-route-control-a1-20260930"
+  },
+  "realPhoneEvidenceModified": false,
+  "actualComparisonJsonGenerated": false
+}

@@ -1,0 +1,83 @@
+diff --git a/shaders/raytracing/include/rt_lighting.glsl b/shaders/raytracing/include/rt_lighting.glsl
+index fa0a436..488595a 100644
+--- a/shaders/raytracing/include/rt_lighting.glsl
++++ b/shaders/raytracing/include/rt_lighting.glsl
+@@ -626,6 +626,44 @@ bool shadowSegmentCrossesTransparentWorld(vec3 origin, vec3 direction,
+ // segment, not a refractive caustic solver; primary transport owns refraction.
+ // Scratch storage and crossing/volume limits remain quality-specialised.
+ #if HORDE_GENERIC_TRANSMISSION_VARIANT
++int investigationShadowSlot = 0;
++void investigationShadowRecord(vec3 origin, vec3 direction, float distance,
++    rayQueryEXT query, vec3 result, int count, int depth, int reason)
++{
++    if (HORDE_RT_PIXEL_ID.xy != uvec2(577u, 534u)) return;
++    int slot = investigationShadowSlot++;
++    if (slot >= 12) return;
++    bool committed = rayQueryGetIntersectionTypeEXT(query, true) !=
++        gl_RayQueryCommittedIntersectionNoneEXT;
++    float t = committed ? rayQueryGetIntersectionTEXT(query, true) : -1.0;
++    uint instance = committed ? uint(rayQueryGetIntersectionInstanceCustomIndexEXT(query, true)) : 0u;
++    uint primitive = committed ? uint(rayQueryGetIntersectionPrimitiveIndexEXT(query, true)) : 0u;
++    uint geometry = committed ? rayQueryGetIntersectionGeometryIndexEXT(query, true) : 0u;
++    bool front = committed && rayQueryGetIntersectionFrontFaceEXT(query, true);
++    uint materialIndex = 0u;
++    RtInstanceMetadata metadata = rtInstances.values[instance];
++    if (committed && (metadata.flags & kRtInstanceFlagStaticPbr) != 0u &&
++        geometry < metadata.primitiveCount)
++        materialIndex = rtPrimitives.values[metadata.primitiveBase + geometry].materialIndex;
++    RtMaterialGpu material = rtMaterials.values[materialIndex];
++    vec3 position = origin + direction * t;
++    float fields[25] = float[25](origin.x, origin.y, origin.z,
++        direction.x, direction.y, direction.z, distance, t, float(instance),
++        float(primitive), float(geometry), front ? 1.0 : 0.0,
++        result.r, result.g, result.b, float(count), float(depth), float(reason),
++        position.x, position.y, position.z, float(materialIndex),
++        float(material.materialFlags.x), material.metallicRoughnessOcclusionTransmission.w,
++        float(slot));
++    for (int i = 0; i < 25; ++i)
++    {
++        uint bits = floatBitsToUint(fields[i]);
++        vec3 low = vec3(uvec3(bits & 255u, (bits >> 8) & 255u, (bits >> 16) & 255u)) / 255.0;
++        vec3 high = vec3(float(bits >> 24) / 255.0, 0.0, 0.0);
++        if (controls.outputRedBlueSwap > 0.5) { low = low.bgr; high = high.bgr; }
++        imageStore(outputImage, ivec2(i * 2, slot), vec4(low, 1.0));
++        imageStore(outputImage, ivec2(i * 2 + 1, slot), vec4(high, 1.0));
++    }
++}
+ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
+                                     float maxDistance, uint mask)
+ {
+@@ -732,7 +770,11 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
+ 
+     if (rayQueryGetIntersectionTypeEXT(query, true) !=
+         gl_RayQueryCommittedIntersectionNoneEXT)
++    {
++        investigationShadowRecord(origin, direction, maxDistance, query,
++            vec3(0.0), interfaceCount, 0, 1);
+         return vec3(0.0);
++    }
+     if (overflow)
+     {
+         RT_DIAG_ADD(shadowOverflowCount, 1u);
+@@ -839,6 +881,8 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
+                 max(maxDistance - volumeEntryDistances[volume], 0.0), attenuation.a);
+         }
+     }
++    investigationShadowRecord(origin, direction, maxDistance, query,
++        clamp(transmittance, vec3(0.0), vec3(1.0)), interfaceCount, volumeDepth, 0);
+     return clamp(transmittance, vec3(0.0), vec3(1.0));
+ }
+ #endif
+diff --git a/shaders/raytracing/include/rt_frame.glsl b/shaders/raytracing/include/rt_frame.glsl
+index 3b988b6..cc31a24 100644
+--- a/shaders/raytracing/include/rt_frame.glsl
++++ b/shaders/raytracing/include/rt_frame.glsl
+@@ -15,6 +15,8 @@ void main()
+         return;
+     }
+ #endif
++    // Investigation owners reserve raw rows for the selected finale pixel.
++    if (HORDE_RT_PIXEL_ID.x < 50u && HORDE_RT_PIXEL_ID.y < 12u) return;
+     vec2 uv = (vec2(HORDE_RT_PIXEL_ID.xy) + vec2(0.5)) / vec2(HORDE_RT_PIXEL_EXTENT.xy);
+     float aspect = float(HORDE_RT_PIXEL_EXTENT.x) / max(float(HORDE_RT_PIXEL_EXTENT.y), 1.0);
+     float step = controls.time * 6.2;

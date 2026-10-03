@@ -1,0 +1,120 @@
+> Task :app:prepareRuntimeAssets
+> Task :app:preBuild
+> Task :app:preDebugBuild
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugBuildConfig
+> Task :app:javaPreCompileDebug
+> Task :app:checkDebugAarMetadata
+> Task :app:generateDebugResValues
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:extractDeepLinksDebug
+> Task :app:mergeDebugResources
+> Task :app:processDebugMainManifest
+> Task :app:processDebugManifest
+> Task :app:mergeDebugShaders
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :app:checkDebugDuplicateClasses
+> Task :app:mergeDebugJavaResource
+> Task :app:desugarDebugFileDependencies
+> Task :app:mergeExtDexDebug
+> Task :app:processDebugManifestForPackage
+> Task :app:mergeLibDexDebug
+> Task :app:processDebugResources
+> Task :app:compressDebugAssets
+> Task :app:configureCMakeDebug[arm64-v8a]
+
+> Task :app:compileDebugJavaWithJavac
+Note: C:\Dev\tmp\horde-glass-isolated-20261001\source\android\app\src\main\java\com\samfa12\hordelanternrt\MainActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:dexBuilderDebug
+> Task :app:mergeProjectDexDebug
+
+> Task :app:buildCMakeDebug[arm64-v8a]
+C/C++: ninja: Entering directory `C:\Dev\tmp\horde-glass-isolated-20261001\source\android\app\.cxx\Debug\1f1e2x4i\arm64-v8a'
+C/C++: C:\Users\sam_s\AppData\Local\Android\Sdk\ndk\26.1.10909125\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DHORDE_RT_BUILD_ID=\"1.6.1\" -DHORDE_RT_DEBUG_CHECKPOINTS=1 -DHORDE_RT_DISPLAY_VERSION=\"1.6.1\" -DHORDE_RT_PACKAGE_VERSION=\"1.6.1\" -DHORDE_RT_SELECTED_DIELECTRIC_QUALITY=0 -DHORDE_RT_SELECTED_INSTRUMENTATION=1 -Dhorde_rt_probe_android_EXPORTS -IC:/Dev/tmp/horde-glass-isolated-20261001/source/src -IC:/Dev/tmp/horde-glass-isolated-20261001/source/third_party -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info  -fPIC -O2 -MD -MT CMakeFiles/horde_rt_probe_android.dir/android_probe_bridge.cpp.o -MF CMakeFiles\horde_rt_probe_android.dir\android_probe_bridge.cpp.o.d -o CMakeFiles/horde_rt_probe_android.dir/android_probe_bridge.cpp.o -c C:/Dev/tmp/horde-glass-isolated-20261001/source/android/app/src/main/cpp/android_probe_bridge.cpp
+C/C++: C:/Dev/tmp/horde-glass-isolated-20261001/source/android/app/src/main/cpp/android_probe_bridge.cpp:3111:43: error: no matching function for call to 'CompleteRtEvidenceAfterDeviceIdle'
+C/C++:                 if (idle == VK_SUCCESS && CompleteRtEvidenceAfterDeviceIdle(context) &&
+C/C++:                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: C:/Dev/tmp/horde-glass-isolated-20261001/source/android/app/src/main/cpp/android_probe_bridge.cpp:2082:6: note: candidate function not viable: requires 2 arguments, but 1 was provided
+C/C++: bool CompleteRtEvidenceAfterDeviceIdle(
+C/C++:      ^
+C/C++: 1 error generated.
+
+
+> Task :app:buildCMakeDebug[arm64-v8a] FAILED
+[Incubating] Problems report is available at: file:///C:/Dev/tmp/horde-glass-isolated-20261001/source/android/build/reports/problems/problems-report.html
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:buildCMakeDebug[arm64-v8a]'.
+> com.android.ide.common.process.ProcessException: ninja: Entering directory `C:\Dev\tmp\horde-glass-isolated-20261001\source\android\app\.cxx\Debug\1f1e2x4i\arm64-v8a'
+  [1/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/interactions/FinaleSequence.cpp.o
+  [2/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/interactions/InteractionState.cpp.o
+  [3/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/items/LanternPendulum.cpp.o
+  [4/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/animation/PlayerIkTargets.cpp.o
+  [5/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/effects/FireEmitterState.cpp.o
+  [6/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/telemetry/RtBenchmarkEvidenceRun.cpp.o
+  [7/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/ui/DiagnosticOverlay.cpp.o
+  [8/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/animation/PlayerAnimationState.cpp.o
+  [9/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/telemetry/RtEvidencePublication.cpp.o
+  [10/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/items/HeldItemState.cpp.o
+  [11/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/audio/MusicDirector.cpp.o
+  [12/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/interactions/ChestRewardSequence.cpp.o
+  [13/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/telemetry/RtBenchmarkEvidenceReport.cpp.o
+  [14/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/telemetry/RtPerformanceEvidence.cpp.o
+  [15/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/simulation/GameSimulation.cpp.o
+  [16/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/items/HeldLightState.cpp.o
+  [17/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/android_probe_bridge.cpp.o
+  FAILED: CMakeFiles/horde_rt_probe_android.dir/android_probe_bridge.cpp.o 
+  C:\Users\sam_s\AppData\Local\Android\Sdk\ndk\26.1.10909125\toolchains\llvm\prebuilt\windows-x86_64\bin\clang++.exe --target=aarch64-none-linux-android24 --sysroot=C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DHORDE_RT_BUILD_ID=\"1.6.1\" -DHORDE_RT_DEBUG_CHECKPOINTS=1 -DHORDE_RT_DISPLAY_VERSION=\"1.6.1\" -DHORDE_RT_PACKAGE_VERSION=\"1.6.1\" -DHORDE_RT_SELECTED_DIELECTRIC_QUALITY=0 -DHORDE_RT_SELECTED_INSTRUMENTATION=1 -Dhorde_rt_probe_android_EXPORTS -IC:/Dev/tmp/horde-glass-isolated-20261001/source/src -IC:/Dev/tmp/horde-glass-isolated-20261001/source/third_party -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -fno-limit-debug-info  -fPIC -O2 -MD -MT CMakeFiles/horde_rt_probe_android.dir/android_probe_bridge.cpp.o -MF CMakeFiles\horde_rt_probe_android.dir\android_probe_bridge.cpp.o.d -o CMakeFiles/horde_rt_probe_android.dir/android_probe_bridge.cpp.o -c C:/Dev/tmp/horde-glass-isolated-20261001/source/android/app/src/main/cpp/android_probe_bridge.cpp
+  C:/Dev/tmp/horde-glass-isolated-20261001/source/android/app/src/main/cpp/android_probe_bridge.cpp:3111:43: error: no matching function for call to 'CompleteRtEvidenceAfterDeviceIdle'
+
+                  if (idle == VK_SUCCESS && CompleteRtEvidenceAfterDeviceIdle(context) &&
+
+                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  C:/Dev/tmp/horde-glass-isolated-20261001/source/android/app/src/main/cpp/android_probe_bridge.cpp:2082:6: note: candidate function not viable: requires 2 arguments, but 1 was provided
+
+  bool CompleteRtEvidenceAfterDeviceIdle(
+
+       ^
+
+  1 error generated.
+
+  [18/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/vulkan/raytracing/RayTracingRequirements.cpp.o
+  [19/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/scene/assets/AssetValidation.cpp.o
+  [20/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/ShowcaseBenchmark.cpp.o
+  [21/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/gameplay/items/HeldItemKinematics.cpp.o
+  [22/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/vulkan/RtCapabilityReport.cpp.o
+  [23/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/vulkan/DeviceCapabilities.cpp.o
+  [24/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/vulkan/GpuFrameTimer.cpp.o
+  [25/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/update/GitHubReleaseUpdater.cpp.o
+  [26/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/vulkan/VulkanContext.cpp.o
+  [27/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/scene/assets/AssetManifest.cpp.o
+  [28/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/vulkan/raytracing/RtStaticMeshSlot.cpp.o
+  [29/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/scene/assets/GltfDocument.cpp.o
+  [30/45] Building CXX object CMakeFiles/horde_rt_probe_android.dir/C_/Dev/tmp/horde-glass-isolated-20261001/source/src/scene/assets/StaticMeshAsset.cpp.o
+  ninja: build stopped: subcommand failed.
+  
+  C++ build system [build] failed while executing:
+      @echo off
+      "C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe" ^
+        -C ^
+        "C:\\Dev\\tmp\\horde-glass-isolated-20261001\\source\\android\\app\\.cxx\\Debug\\1f1e2x4i\\arm64-v8a" ^
+        horde_rt_probe_android
+    from C:\Dev\tmp\horde-glass-isolated-20261001\source\android\app
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 25s
+27 actionable tasks: 27 executed

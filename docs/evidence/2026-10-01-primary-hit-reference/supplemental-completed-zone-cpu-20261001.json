@@ -1,0 +1,1620 @@
+{
+  "schema": 1,
+  "classification": "supplementary-completed-zone-cpu-evidence",
+  "sourceHead": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+  "sourceParserSha256": "f8e25e0e34ee490c8cb204e9f62d5206e9827f0b5a97363727b5953c31cd7d81",
+  "sourceAggregateSha256": "f5b7ed18def6840075a672514f2d4361991067fda3f27fd5ffddfb9b21dfa5ba",
+  "generatedUtc": "2026-09-30T20:20:12.4943213Z",
+  "runCount": 12,
+  "records": [
+    {
+      "runId": "primary-hit-c1-route-20261001",
+      "artifactRole": "control",
+      "buildLabel": "primary-hit-control",
+      "workload": "showcase-route-v1",
+      "zone": "opening",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+      "reportBytes": 1468411,
+      "rawBenchmarkJsonSha256": "71fd75112be660407cf58380b42dccc3504de2d7bcff5a1e375a03fc1df96245",
+      "completedFrames": 160,
+      "gpuValidFrames": 160,
+      "legacyZoneCycleMs": {
+        "mean": 77.033,
+        "median": 78.1513,
+        "p95": 85.6869
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 160,
+        "meanMilliseconds": 65.6535,
+        "medianMilliseconds": 66.4631,
+        "p90Milliseconds": 73.0112,
+        "p95Milliseconds": 73.5397,
+        "slowestOnePercentMeanMilliseconds": 74.1877
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0197,
+          "medianMilliseconds": 0.0192,
+          "p90Milliseconds": 0.0228,
+          "p95Milliseconds": 0.0242,
+          "slowestOnePercentMeanMilliseconds": 0.0682
+        },
+        "skinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 8.6901,
+          "medianMilliseconds": 9.0149,
+          "p90Milliseconds": 10.3991,
+          "p95Milliseconds": 10.921,
+          "slowestOnePercentMeanMilliseconds": 12.8298
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 8.2034,
+          "medianMilliseconds": 8.6268,
+          "p90Milliseconds": 9.5177,
+          "p95Milliseconds": 9.6135,
+          "slowestOnePercentMeanMilliseconds": 10.2803
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.4868,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 1.323,
+          "p95Milliseconds": 1.651,
+          "slowestOnePercentMeanMilliseconds": 3.2202
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.4055,
+          "medianMilliseconds": 0.3639,
+          "p90Milliseconds": 0.5341,
+          "p95Milliseconds": 0.5864,
+          "slowestOnePercentMeanMilliseconds": 2.1854
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0387,
+          "medianMilliseconds": 0.0361,
+          "p90Milliseconds": 0.0489,
+          "p95Milliseconds": 0.055,
+          "slowestOnePercentMeanMilliseconds": 0.1242
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0097,
+          "medianMilliseconds": 0.0088,
+          "p90Milliseconds": 0.0122,
+          "p95Milliseconds": 0.0126,
+          "slowestOnePercentMeanMilliseconds": 0.0444
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.1825,
+          "medianMilliseconds": 0.1739,
+          "p90Milliseconds": 0.2171,
+          "p95Milliseconds": 0.2305,
+          "slowestOnePercentMeanMilliseconds": 0.5998
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 65.9851,
+          "medianMilliseconds": 66.8412,
+          "p90Milliseconds": 73.3541,
+          "p95Milliseconds": 73.7956,
+          "slowestOnePercentMeanMilliseconds": 74.4905
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0361,
+          "medianMilliseconds": 0.0378,
+          "p90Milliseconds": 0.0432,
+          "p95Milliseconds": 0.0507,
+          "slowestOnePercentMeanMilliseconds": 0.084
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.242,
+          "medianMilliseconds": 0.2313,
+          "p90Milliseconds": 0.3461,
+          "p95Milliseconds": 0.397,
+          "slowestOnePercentMeanMilliseconds": 0.4727
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.213,
+          "medianMilliseconds": 0.2095,
+          "p90Milliseconds": 0.2774,
+          "p95Milliseconds": 0.3132,
+          "slowestOnePercentMeanMilliseconds": 0.4432
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 77.0329,
+          "medianMilliseconds": 78.1512,
+          "p90Milliseconds": 84.5773,
+          "p95Milliseconds": 85.6867,
+          "slowestOnePercentMeanMilliseconds": 90.6761,
+          "onePercentLowFps": 11.0283
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    },
+    {
+      "runId": "primary-hit-p1-route-20261001",
+      "artifactRole": "reference",
+      "buildLabel": "primary-hit-reference",
+      "workload": "showcase-route-v1",
+      "zone": "opening",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "40d0f759dca40ff8433ce4aca19156a135a9146a960f115f4cdbb78d3db7cf9e",
+      "reportBytes": 1466475,
+      "rawBenchmarkJsonSha256": "2665ccae0113f847ef943906a45a937d693dc7ed39e5f4eca2b63674d8be46be",
+      "completedFrames": 160,
+      "gpuValidFrames": 160,
+      "legacyZoneCycleMs": {
+        "mean": 17.5828,
+        "median": 18.416,
+        "p95": 20.7833
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 160,
+        "meanMilliseconds": 7.3141,
+        "medianMilliseconds": 7.5,
+        "p90Milliseconds": 8.1584,
+        "p95Milliseconds": 8.3826,
+        "slowestOnePercentMeanMilliseconds": 10.1845
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0126,
+          "medianMilliseconds": 0.0123,
+          "p90Milliseconds": 0.0163,
+          "p95Milliseconds": 0.017,
+          "slowestOnePercentMeanMilliseconds": 0.031
+        },
+        "skinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 8.0325,
+          "medianMilliseconds": 8.511,
+          "p90Milliseconds": 9.8587,
+          "p95Milliseconds": 10.3819,
+          "slowestOnePercentMeanMilliseconds": 11.2592
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 7.5643,
+          "medianMilliseconds": 8.136,
+          "p90Milliseconds": 9.0968,
+          "p95Milliseconds": 9.3756,
+          "slowestOnePercentMeanMilliseconds": 9.7461
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.4683,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 1.3348,
+          "p95Milliseconds": 1.6793,
+          "slowestOnePercentMeanMilliseconds": 2.534
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.36,
+          "medianMilliseconds": 0.3533,
+          "p90Milliseconds": 0.4695,
+          "p95Milliseconds": 0.5432,
+          "slowestOnePercentMeanMilliseconds": 0.6728
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0302,
+          "medianMilliseconds": 0.029,
+          "p90Milliseconds": 0.0375,
+          "p95Milliseconds": 0.0403,
+          "slowestOnePercentMeanMilliseconds": 0.0896
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0077,
+          "medianMilliseconds": 0.007,
+          "p90Milliseconds": 0.0102,
+          "p95Milliseconds": 0.0109,
+          "slowestOnePercentMeanMilliseconds": 0.0257
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.1522,
+          "medianMilliseconds": 0.1434,
+          "p90Milliseconds": 0.1824,
+          "p95Milliseconds": 0.2024,
+          "slowestOnePercentMeanMilliseconds": 0.4332
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 7.6225,
+          "medianMilliseconds": 7.8122,
+          "p90Milliseconds": 8.4982,
+          "p95Milliseconds": 8.7583,
+          "slowestOnePercentMeanMilliseconds": 10.6318
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0285,
+          "medianMilliseconds": 0.0264,
+          "p90Milliseconds": 0.0403,
+          "p95Milliseconds": 0.0423,
+          "slowestOnePercentMeanMilliseconds": 0.1275
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.2175,
+          "medianMilliseconds": 0.205,
+          "p90Milliseconds": 0.3011,
+          "p95Milliseconds": 0.3734,
+          "slowestOnePercentMeanMilliseconds": 0.5046
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.1598,
+          "medianMilliseconds": 0.1471,
+          "p90Milliseconds": 0.2207,
+          "p95Milliseconds": 0.2479,
+          "slowestOnePercentMeanMilliseconds": 0.297
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 17.5827,
+          "medianMilliseconds": 18.4159,
+          "p90Milliseconds": 20.1959,
+          "p95Milliseconds": 20.7832,
+          "slowestOnePercentMeanMilliseconds": 22.3011,
+          "onePercentLowFps": 44.8408
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    },
+    {
+      "runId": "primary-hit-p2-route-20261001",
+      "artifactRole": "reference",
+      "buildLabel": "primary-hit-reference",
+      "workload": "showcase-route-v1",
+      "zone": "opening",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "40d0f759dca40ff8433ce4aca19156a135a9146a960f115f4cdbb78d3db7cf9e",
+      "reportBytes": 1470133,
+      "rawBenchmarkJsonSha256": "520a6e3bb5f580557a2cd2e748e1139663375f02aa72251616d236caf04582b1",
+      "completedFrames": 160,
+      "gpuValidFrames": 160,
+      "legacyZoneCycleMs": {
+        "mean": 17.4526,
+        "median": 17.938,
+        "p95": 20.7418
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 160,
+        "meanMilliseconds": 7.345,
+        "medianMilliseconds": 7.5508,
+        "p90Milliseconds": 8.1816,
+        "p95Milliseconds": 8.3292,
+        "slowestOnePercentMeanMilliseconds": 9.5328
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0127,
+          "medianMilliseconds": 0.012,
+          "p90Milliseconds": 0.0167,
+          "p95Milliseconds": 0.0172,
+          "slowestOnePercentMeanMilliseconds": 0.0192
+        },
+        "skinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 7.8552,
+          "medianMilliseconds": 8.361,
+          "p90Milliseconds": 10.0538,
+          "p95Milliseconds": 10.4713,
+          "slowestOnePercentMeanMilliseconds": 11.7318
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 7.3617,
+          "medianMilliseconds": 8.0614,
+          "p90Milliseconds": 9.0197,
+          "p95Milliseconds": 9.1857,
+          "slowestOnePercentMeanMilliseconds": 9.6112
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.4935,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 1.4663,
+          "p95Milliseconds": 1.6477,
+          "slowestOnePercentMeanMilliseconds": 3.0661
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.3621,
+          "medianMilliseconds": 0.339,
+          "p90Milliseconds": 0.4311,
+          "p95Milliseconds": 0.501,
+          "slowestOnePercentMeanMilliseconds": 1.9747
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0314,
+          "medianMilliseconds": 0.0284,
+          "p90Milliseconds": 0.0394,
+          "p95Milliseconds": 0.0442,
+          "slowestOnePercentMeanMilliseconds": 0.129
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0077,
+          "medianMilliseconds": 0.0069,
+          "p90Milliseconds": 0.0096,
+          "p95Milliseconds": 0.0104,
+          "slowestOnePercentMeanMilliseconds": 0.0454
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.161,
+          "medianMilliseconds": 0.1415,
+          "p90Milliseconds": 0.2124,
+          "p95Milliseconds": 0.2444,
+          "slowestOnePercentMeanMilliseconds": 0.8214
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 7.6481,
+          "medianMilliseconds": 7.8522,
+          "p90Milliseconds": 8.5341,
+          "p95Milliseconds": 8.8005,
+          "slowestOnePercentMeanMilliseconds": 9.8714
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0289,
+          "medianMilliseconds": 0.0277,
+          "p90Milliseconds": 0.0419,
+          "p95Milliseconds": 0.0432,
+          "slowestOnePercentMeanMilliseconds": 0.0623
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.2237,
+          "medianMilliseconds": 0.2093,
+          "p90Milliseconds": 0.3115,
+          "p95Milliseconds": 0.3645,
+          "slowestOnePercentMeanMilliseconds": 0.5522
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.1669,
+          "medianMilliseconds": 0.1517,
+          "p90Milliseconds": 0.2318,
+          "p95Milliseconds": 0.2525,
+          "slowestOnePercentMeanMilliseconds": 0.3545
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 17.4525,
+          "medianMilliseconds": 17.9379,
+          "p90Milliseconds": 20.254,
+          "p95Milliseconds": 20.7417,
+          "slowestOnePercentMeanMilliseconds": 24.4077,
+          "onePercentLowFps": 40.9707
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    },
+    {
+      "runId": "primary-hit-c2-route-20261001",
+      "artifactRole": "control",
+      "buildLabel": "primary-hit-control",
+      "workload": "showcase-route-v1",
+      "zone": "opening",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+      "reportBytes": 1468409,
+      "rawBenchmarkJsonSha256": "0f76a418dd1a59955eb82339afc23c9a3c7c0e7046d65f3ed6a75129b0c8b2d5",
+      "completedFrames": 160,
+      "gpuValidFrames": 160,
+      "legacyZoneCycleMs": {
+        "mean": 81.4406,
+        "median": 83.2447,
+        "p95": 92.4779
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 160,
+        "meanMilliseconds": 70.4304,
+        "medianMilliseconds": 72.1506,
+        "p90Milliseconds": 79.6037,
+        "p95Milliseconds": 80.9062,
+        "slowestOnePercentMeanMilliseconds": 96.3502
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0197,
+          "medianMilliseconds": 0.019,
+          "p90Milliseconds": 0.0222,
+          "p95Milliseconds": 0.0254,
+          "slowestOnePercentMeanMilliseconds": 0.0851
+        },
+        "skinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 8.3879,
+          "medianMilliseconds": 8.6984,
+          "p90Milliseconds": 10.1997,
+          "p95Milliseconds": 10.6272,
+          "slowestOnePercentMeanMilliseconds": 11.6017
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 7.9013,
+          "medianMilliseconds": 8.4769,
+          "p90Milliseconds": 9.4245,
+          "p95Milliseconds": 9.4738,
+          "slowestOnePercentMeanMilliseconds": 9.762
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.4866,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 1.4809,
+          "p95Milliseconds": 1.5923,
+          "slowestOnePercentMeanMilliseconds": 2.3093
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.3774,
+          "medianMilliseconds": 0.3541,
+          "p90Milliseconds": 0.5266,
+          "p95Milliseconds": 0.5781,
+          "slowestOnePercentMeanMilliseconds": 0.7348
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0384,
+          "medianMilliseconds": 0.0367,
+          "p90Milliseconds": 0.0483,
+          "p95Milliseconds": 0.0544,
+          "slowestOnePercentMeanMilliseconds": 0.0951
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0094,
+          "medianMilliseconds": 0.0092,
+          "p90Milliseconds": 0.0125,
+          "p95Milliseconds": 0.0132,
+          "slowestOnePercentMeanMilliseconds": 0.0152
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.1822,
+          "medianMilliseconds": 0.1767,
+          "p90Milliseconds": 0.218,
+          "p95Milliseconds": 0.2338,
+          "slowestOnePercentMeanMilliseconds": 0.4204
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 70.7472,
+          "medianMilliseconds": 72.5287,
+          "p90Milliseconds": 79.9847,
+          "p95Milliseconds": 81.0,
+          "slowestOnePercentMeanMilliseconds": 96.6043
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.0366,
+          "medianMilliseconds": 0.0369,
+          "p90Milliseconds": 0.0455,
+          "p95Milliseconds": 0.0492,
+          "slowestOnePercentMeanMilliseconds": 0.0917
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.257,
+          "medianMilliseconds": 0.2318,
+          "p90Milliseconds": 0.4,
+          "p95Milliseconds": 0.4609,
+          "slowestOnePercentMeanMilliseconds": 0.5901
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 0.2218,
+          "medianMilliseconds": 0.2208,
+          "p90Milliseconds": 0.2905,
+          "p95Milliseconds": 0.3078,
+          "slowestOnePercentMeanMilliseconds": 0.3754
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 160,
+          "meanMilliseconds": 81.4405,
+          "medianMilliseconds": 83.2447,
+          "p90Milliseconds": 91.3154,
+          "p95Milliseconds": 92.4778,
+          "slowestOnePercentMeanMilliseconds": 106.9625,
+          "onePercentLowFps": 9.3491
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    },
+    {
+      "runId": "primary-hit-c1-high-20261001",
+      "artifactRole": "control",
+      "buildLabel": "primary-hit-control",
+      "workload": "lantern-held-high-v1",
+      "zone": "yellow-torch-bay",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+      "reportBytes": 483166,
+      "rawBenchmarkJsonSha256": "46b5be974a1adb5700bb6099a152e52c7499632963af0f28c9a973365236128b",
+      "completedFrames": 600,
+      "gpuValidFrames": 600,
+      "legacyZoneCycleMs": {
+        "mean": 225.5918,
+        "median": 224.4992,
+        "p95": 236.6512
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 600,
+        "meanMilliseconds": 223.7122,
+        "medianMilliseconds": 222.574,
+        "p90Milliseconds": 224.4655,
+        "p95Milliseconds": 234.6783,
+        "slowestOnePercentMeanMilliseconds": 256.2796
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0043,
+          "medianMilliseconds": 0.0042,
+          "p90Milliseconds": 0.005,
+          "p95Milliseconds": 0.0053,
+          "slowestOnePercentMeanMilliseconds": 0.0173
+        },
+        "skinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0147,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 1.467
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0147,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 1.467
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0047,
+          "medianMilliseconds": 0.0031,
+          "p90Milliseconds": 0.0061,
+          "p95Milliseconds": 0.0069,
+          "slowestOnePercentMeanMilliseconds": 0.1032
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0001,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0096
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0272,
+          "medianMilliseconds": 0.0216,
+          "p90Milliseconds": 0.0394,
+          "p95Milliseconds": 0.0453,
+          "slowestOnePercentMeanMilliseconds": 0.2345
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2246,
+          "medianMilliseconds": 0.1932,
+          "p90Milliseconds": 0.3318,
+          "p95Milliseconds": 0.383,
+          "slowestOnePercentMeanMilliseconds": 0.9528
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 224.0084,
+          "medianMilliseconds": 222.9329,
+          "p90Milliseconds": 224.8739,
+          "p95Milliseconds": 235.1194,
+          "slowestOnePercentMeanMilliseconds": 256.5769
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.046,
+          "medianMilliseconds": 0.043,
+          "p90Milliseconds": 0.0539,
+          "p95Milliseconds": 0.078,
+          "slowestOnePercentMeanMilliseconds": 0.1432
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.3647,
+          "medianMilliseconds": 0.3255,
+          "p90Milliseconds": 0.5544,
+          "p95Milliseconds": 0.6858,
+          "slowestOnePercentMeanMilliseconds": 1.2087
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.3541,
+          "medianMilliseconds": 0.313,
+          "p90Milliseconds": 0.527,
+          "p95Milliseconds": 0.6278,
+          "slowestOnePercentMeanMilliseconds": 0.9758
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 225.5917,
+          "medianMilliseconds": 224.499,
+          "p90Milliseconds": 226.6916,
+          "p95Milliseconds": 236.651,
+          "slowestOnePercentMeanMilliseconds": 258.4274,
+          "onePercentLowFps": 3.8696
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    },
+    {
+      "runId": "primary-hit-p1-high-20261001",
+      "artifactRole": "reference",
+      "buildLabel": "primary-hit-reference",
+      "workload": "lantern-held-high-v1",
+      "zone": "yellow-torch-bay",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "40d0f759dca40ff8433ce4aca19156a135a9146a960f115f4cdbb78d3db7cf9e",
+      "reportBytes": 482161,
+      "rawBenchmarkJsonSha256": "a73bfa3073c4c065566be364f7d699859c951a946985f8da5ff24ec3587e2707",
+      "completedFrames": 600,
+      "gpuValidFrames": 600,
+      "legacyZoneCycleMs": {
+        "mean": 11.298,
+        "median": 11.2368,
+        "p95": 11.9071
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 600,
+        "meanMilliseconds": 9.7515,
+        "medianMilliseconds": 9.5697,
+        "p90Milliseconds": 10.0235,
+        "p95Milliseconds": 10.0259,
+        "slowestOnePercentMeanMilliseconds": 10.6131
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0022,
+          "medianMilliseconds": 0.0022,
+          "p90Milliseconds": 0.0026,
+          "p95Milliseconds": 0.0027,
+          "slowestOnePercentMeanMilliseconds": 0.003
+        },
+        "skinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0158,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 1.5759
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0158,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 1.5759
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0036,
+          "medianMilliseconds": 0.0022,
+          "p90Milliseconds": 0.0027,
+          "p95Milliseconds": 0.0028,
+          "slowestOnePercentMeanMilliseconds": 0.1427
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0001,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.005
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0119,
+          "medianMilliseconds": 0.0113,
+          "p90Milliseconds": 0.0135,
+          "p95Milliseconds": 0.0143,
+          "slowestOnePercentMeanMilliseconds": 0.0683
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.1802,
+          "medianMilliseconds": 0.1716,
+          "p90Milliseconds": 0.2476,
+          "p95Milliseconds": 0.281,
+          "slowestOnePercentMeanMilliseconds": 0.6094
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 9.9802,
+          "medianMilliseconds": 9.8724,
+          "p90Milliseconds": 10.3205,
+          "p95Milliseconds": 10.3786,
+          "slowestOnePercentMeanMilliseconds": 10.9525
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0277,
+          "medianMilliseconds": 0.023,
+          "p90Milliseconds": 0.0381,
+          "p95Milliseconds": 0.042,
+          "slowestOnePercentMeanMilliseconds": 0.1427
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.3458,
+          "medianMilliseconds": 0.3182,
+          "p90Milliseconds": 0.5309,
+          "p95Milliseconds": 0.5732,
+          "slowestOnePercentMeanMilliseconds": 0.858
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2548,
+          "medianMilliseconds": 0.2465,
+          "p90Milliseconds": 0.3349,
+          "p95Milliseconds": 0.3816,
+          "slowestOnePercentMeanMilliseconds": 0.5464
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 11.2978,
+          "medianMilliseconds": 11.2366,
+          "p90Milliseconds": 11.7629,
+          "p95Milliseconds": 11.907,
+          "slowestOnePercentMeanMilliseconds": 14.5851,
+          "onePercentLowFps": 68.5629
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    },
+    {
+      "runId": "primary-hit-p2-high-20261001",
+      "artifactRole": "reference",
+      "buildLabel": "primary-hit-reference",
+      "workload": "lantern-held-high-v1",
+      "zone": "yellow-torch-bay",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "40d0f759dca40ff8433ce4aca19156a135a9146a960f115f4cdbb78d3db7cf9e",
+      "reportBytes": 487935,
+      "rawBenchmarkJsonSha256": "cc5de6cc8aa32160757359ec9622b8b081276c1f48b7e53e1b23125096d3822d",
+      "completedFrames": 600,
+      "gpuValidFrames": 600,
+      "legacyZoneCycleMs": {
+        "mean": 12.2086,
+        "median": 12.0542,
+        "p95": 13.4826
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 600,
+        "meanMilliseconds": 10.5892,
+        "medianMilliseconds": 10.5062,
+        "p90Milliseconds": 11.6571,
+        "p95Milliseconds": 11.6608,
+        "slowestOnePercentMeanMilliseconds": 14.6631
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0024,
+          "medianMilliseconds": 0.0023,
+          "p90Milliseconds": 0.0026,
+          "p95Milliseconds": 0.0027,
+          "slowestOnePercentMeanMilliseconds": 0.0226
+        },
+        "skinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0159,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 1.5882
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0159,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 1.5882
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0034,
+          "medianMilliseconds": 0.0021,
+          "p90Milliseconds": 0.0026,
+          "p95Milliseconds": 0.0028,
+          "slowestOnePercentMeanMilliseconds": 0.123
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0001,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0072
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0129,
+          "medianMilliseconds": 0.0125,
+          "p90Milliseconds": 0.0142,
+          "p95Milliseconds": 0.0155,
+          "slowestOnePercentMeanMilliseconds": 0.0879
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2177,
+          "medianMilliseconds": 0.2152,
+          "p90Milliseconds": 0.2927,
+          "p95Milliseconds": 0.3385,
+          "slowestOnePercentMeanMilliseconds": 0.7527
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 10.7835,
+          "medianMilliseconds": 10.6664,
+          "p90Milliseconds": 11.812,
+          "p95Milliseconds": 11.933,
+          "slowestOnePercentMeanMilliseconds": 14.9087
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0286,
+          "medianMilliseconds": 0.0239,
+          "p90Milliseconds": 0.0394,
+          "p95Milliseconds": 0.042,
+          "slowestOnePercentMeanMilliseconds": 0.143
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.3766,
+          "medianMilliseconds": 0.3465,
+          "p90Milliseconds": 0.5681,
+          "p95Milliseconds": 0.5978,
+          "slowestOnePercentMeanMilliseconds": 0.9692
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.27,
+          "medianMilliseconds": 0.2539,
+          "p90Milliseconds": 0.3654,
+          "p95Milliseconds": 0.4056,
+          "slowestOnePercentMeanMilliseconds": 0.6379
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 12.2084,
+          "medianMilliseconds": 12.0541,
+          "p90Milliseconds": 13.2051,
+          "p95Milliseconds": 13.4824,
+          "slowestOnePercentMeanMilliseconds": 18.6759,
+          "onePercentLowFps": 53.5451
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    },
+    {
+      "runId": "primary-hit-c2-high-20261001",
+      "artifactRole": "control",
+      "buildLabel": "primary-hit-control",
+      "workload": "lantern-held-high-v1",
+      "zone": "yellow-torch-bay",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+      "reportBytes": 483166,
+      "rawBenchmarkJsonSha256": "8d524559273cc3e1de40edec6e8fbd1f416f9fbf4782d84fd27051797a187610",
+      "completedFrames": 600,
+      "gpuValidFrames": 600,
+      "legacyZoneCycleMs": {
+        "mean": 230.4785,
+        "median": 226.9871,
+        "p95": 245.1883
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 600,
+        "meanMilliseconds": 228.6242,
+        "medianMilliseconds": 225.2675,
+        "p90Milliseconds": 237.3339,
+        "p95Milliseconds": 241.9854,
+        "slowestOnePercentMeanMilliseconds": 263.9829
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0036,
+          "medianMilliseconds": 0.0036,
+          "p90Milliseconds": 0.0044,
+          "p95Milliseconds": 0.0048,
+          "slowestOnePercentMeanMilliseconds": 0.0068
+        },
+        "skinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0145,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 1.4527
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0145,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 1.4527
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0045,
+          "medianMilliseconds": 0.0033,
+          "p90Milliseconds": 0.0061,
+          "p95Milliseconds": 0.0071,
+          "slowestOnePercentMeanMilliseconds": 0.0789
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0001,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0073
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0268,
+          "medianMilliseconds": 0.0208,
+          "p90Milliseconds": 0.0381,
+          "p95Milliseconds": 0.0459,
+          "slowestOnePercentMeanMilliseconds": 0.3087
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2181,
+          "medianMilliseconds": 0.1877,
+          "p90Milliseconds": 0.3306,
+          "p95Milliseconds": 0.3817,
+          "slowestOnePercentMeanMilliseconds": 0.8537
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 228.9226,
+          "medianMilliseconds": 225.4327,
+          "p90Milliseconds": 237.5662,
+          "p95Milliseconds": 242.1645,
+          "slowestOnePercentMeanMilliseconds": 264.0583
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0445,
+          "medianMilliseconds": 0.0423,
+          "p90Milliseconds": 0.0517,
+          "p95Milliseconds": 0.0707,
+          "slowestOnePercentMeanMilliseconds": 0.166
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.3559,
+          "medianMilliseconds": 0.317,
+          "p90Milliseconds": 0.5759,
+          "p95Milliseconds": 0.6754,
+          "slowestOnePercentMeanMilliseconds": 1.1312
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.352,
+          "medianMilliseconds": 0.3064,
+          "p90Milliseconds": 0.5401,
+          "p95Milliseconds": 0.6338,
+          "slowestOnePercentMeanMilliseconds": 0.9783
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 230.4783,
+          "medianMilliseconds": 226.9869,
+          "p90Milliseconds": 239.3587,
+          "p95Milliseconds": 245.1882,
+          "slowestOnePercentMeanMilliseconds": 265.5286,
+          "onePercentLowFps": 3.7661
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    },
+    {
+      "runId": "primary-hit-c1-live-20261001",
+      "artifactRole": "control",
+      "buildLabel": "primary-hit-control",
+      "workload": "lantern-reveal-sequence-v1",
+      "zone": "yellow-torch-bay",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+      "reportBytes": 483167,
+      "rawBenchmarkJsonSha256": "fc6aa53ab5ee73e36db066db4518831a13108909d6391f9d4b3f002bdd528426",
+      "completedFrames": 600,
+      "gpuValidFrames": 600,
+      "legacyZoneCycleMs": {
+        "mean": 236.2352,
+        "median": 234.3794,
+        "p95": 250.4789
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 600,
+        "meanMilliseconds": 225.143,
+        "medianMilliseconds": 222.8572,
+        "p90Milliseconds": 237.3212,
+        "p95Milliseconds": 238.8894,
+        "slowestOnePercentMeanMilliseconds": 254.2984
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0307,
+          "medianMilliseconds": 0.0308,
+          "p90Milliseconds": 0.0354,
+          "p95Milliseconds": 0.0367,
+          "slowestOnePercentMeanMilliseconds": 0.0998
+        },
+        "skinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 7.98,
+          "medianMilliseconds": 8.5371,
+          "p90Milliseconds": 9.2473,
+          "p95Milliseconds": 9.545,
+          "slowestOnePercentMeanMilliseconds": 10.0899
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 7.98,
+          "medianMilliseconds": 8.5371,
+          "p90Milliseconds": 9.2473,
+          "p95Milliseconds": 9.545,
+          "slowestOnePercentMeanMilliseconds": 10.0899
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.4128,
+          "medianMilliseconds": 0.3773,
+          "p90Milliseconds": 0.5763,
+          "p95Milliseconds": 0.5955,
+          "slowestOnePercentMeanMilliseconds": 1.0449
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0454,
+          "medianMilliseconds": 0.044,
+          "p90Milliseconds": 0.0577,
+          "p95Milliseconds": 0.064,
+          "slowestOnePercentMeanMilliseconds": 0.1022
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0132,
+          "medianMilliseconds": 0.0126,
+          "p90Milliseconds": 0.0164,
+          "p95Milliseconds": 0.0179,
+          "slowestOnePercentMeanMilliseconds": 0.0427
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2213,
+          "medianMilliseconds": 0.2079,
+          "p90Milliseconds": 0.2999,
+          "p95Milliseconds": 0.3295,
+          "slowestOnePercentMeanMilliseconds": 0.5456
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 225.5395,
+          "medianMilliseconds": 223.2646,
+          "p90Milliseconds": 237.7764,
+          "p95Milliseconds": 239.2444,
+          "slowestOnePercentMeanMilliseconds": 254.6737
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0379,
+          "medianMilliseconds": 0.0372,
+          "p90Milliseconds": 0.0455,
+          "p95Milliseconds": 0.0509,
+          "slowestOnePercentMeanMilliseconds": 0.1382
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2719,
+          "medianMilliseconds": 0.2498,
+          "p90Milliseconds": 0.4111,
+          "p95Milliseconds": 0.458,
+          "slowestOnePercentMeanMilliseconds": 0.7111
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2327,
+          "medianMilliseconds": 0.2292,
+          "p90Milliseconds": 0.2956,
+          "p95Milliseconds": 0.3232,
+          "slowestOnePercentMeanMilliseconds": 0.4295
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 236.2351,
+          "medianMilliseconds": 234.3793,
+          "p90Milliseconds": 247.9129,
+          "p95Milliseconds": 250.4789,
+          "slowestOnePercentMeanMilliseconds": 266.6123,
+          "onePercentLowFps": 3.7508
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    },
+    {
+      "runId": "primary-hit-p1-live-20261001",
+      "artifactRole": "reference",
+      "buildLabel": "primary-hit-reference",
+      "workload": "lantern-reveal-sequence-v1",
+      "zone": "yellow-torch-bay",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "40d0f759dca40ff8433ce4aca19156a135a9146a960f115f4cdbb78d3db7cf9e",
+      "reportBytes": 481930,
+      "rawBenchmarkJsonSha256": "7ec1356a26d2e259b0df0c9ebbc6382d90871b3909b0ad3dc86674b8987a4fa8",
+      "completedFrames": 600,
+      "gpuValidFrames": 600,
+      "legacyZoneCycleMs": {
+        "mean": 19.6895,
+        "median": 20.2013,
+        "p95": 22.1554
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 600,
+        "meanMilliseconds": 9.0739,
+        "medianMilliseconds": 9.2162,
+        "p90Milliseconds": 9.2703,
+        "p95Milliseconds": 9.2789,
+        "slowestOnePercentMeanMilliseconds": 14.7826
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0199,
+          "medianMilliseconds": 0.0205,
+          "p90Milliseconds": 0.024,
+          "p95Milliseconds": 0.0249,
+          "slowestOnePercentMeanMilliseconds": 0.0412
+        },
+        "skinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 7.996,
+          "medianMilliseconds": 8.6542,
+          "p90Milliseconds": 9.5039,
+          "p95Milliseconds": 9.558,
+          "slowestOnePercentMeanMilliseconds": 9.9269
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 7.996,
+          "medianMilliseconds": 8.6542,
+          "p90Milliseconds": 9.5039,
+          "p95Milliseconds": 9.558,
+          "slowestOnePercentMeanMilliseconds": 9.9269
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.4009,
+          "medianMilliseconds": 0.3926,
+          "p90Milliseconds": 0.5241,
+          "p95Milliseconds": 0.5563,
+          "slowestOnePercentMeanMilliseconds": 1.0143
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0295,
+          "medianMilliseconds": 0.0295,
+          "p90Milliseconds": 0.037,
+          "p95Milliseconds": 0.0403,
+          "slowestOnePercentMeanMilliseconds": 0.089
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0079,
+          "medianMilliseconds": 0.0076,
+          "p90Milliseconds": 0.0099,
+          "p95Milliseconds": 0.0104,
+          "slowestOnePercentMeanMilliseconds": 0.0317
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2396,
+          "medianMilliseconds": 0.2286,
+          "p90Milliseconds": 0.346,
+          "p95Milliseconds": 0.3705,
+          "slowestOnePercentMeanMilliseconds": 0.5714
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 9.457,
+          "medianMilliseconds": 9.5679,
+          "p90Milliseconds": 9.721,
+          "p95Milliseconds": 9.8204,
+          "slowestOnePercentMeanMilliseconds": 15.0796
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0306,
+          "medianMilliseconds": 0.0304,
+          "p90Milliseconds": 0.0414,
+          "p95Milliseconds": 0.042,
+          "slowestOnePercentMeanMilliseconds": 0.0553
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2189,
+          "medianMilliseconds": 0.2076,
+          "p90Milliseconds": 0.2972,
+          "p95Milliseconds": 0.3536,
+          "slowestOnePercentMeanMilliseconds": 0.5814
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.1609,
+          "medianMilliseconds": 0.1444,
+          "p90Milliseconds": 0.2284,
+          "p95Milliseconds": 0.2531,
+          "slowestOnePercentMeanMilliseconds": 0.382
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 19.6894,
+          "medianMilliseconds": 20.2011,
+          "p90Milliseconds": 21.8467,
+          "p95Milliseconds": 22.1554,
+          "slowestOnePercentMeanMilliseconds": 26.9224,
+          "onePercentLowFps": 37.1438
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    },
+    {
+      "runId": "primary-hit-p2-live-20261001",
+      "artifactRole": "reference",
+      "buildLabel": "primary-hit-reference",
+      "workload": "lantern-reveal-sequence-v1",
+      "zone": "yellow-torch-bay",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "40d0f759dca40ff8433ce4aca19156a135a9146a960f115f4cdbb78d3db7cf9e",
+      "reportBytes": 487330,
+      "rawBenchmarkJsonSha256": "50a643fa5c5d2868832bf534600419424fb436a7339b101adb83b088c63ecbfd",
+      "completedFrames": 600,
+      "gpuValidFrames": 600,
+      "legacyZoneCycleMs": {
+        "mean": 19.6529,
+        "median": 20.3577,
+        "p95": 22.2332
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 600,
+        "meanMilliseconds": 9.2979,
+        "medianMilliseconds": 9.2387,
+        "p90Milliseconds": 9.2688,
+        "p95Milliseconds": 9.2829,
+        "slowestOnePercentMeanMilliseconds": 13.1707
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0193,
+          "medianMilliseconds": 0.0197,
+          "p90Milliseconds": 0.0236,
+          "p95Milliseconds": 0.0242,
+          "slowestOnePercentMeanMilliseconds": 0.033
+        },
+        "skinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 7.8116,
+          "medianMilliseconds": 8.5986,
+          "p90Milliseconds": 9.5288,
+          "p95Milliseconds": 9.5675,
+          "slowestOnePercentMeanMilliseconds": 9.8747
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 7.8116,
+          "medianMilliseconds": 8.5986,
+          "p90Milliseconds": 9.5288,
+          "p95Milliseconds": 9.5675,
+          "slowestOnePercentMeanMilliseconds": 9.8747
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.3806,
+          "medianMilliseconds": 0.3776,
+          "p90Milliseconds": 0.516,
+          "p95Milliseconds": 0.5422,
+          "slowestOnePercentMeanMilliseconds": 0.9991
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0278,
+          "medianMilliseconds": 0.0273,
+          "p90Milliseconds": 0.0358,
+          "p95Milliseconds": 0.0377,
+          "slowestOnePercentMeanMilliseconds": 0.0743
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0077,
+          "medianMilliseconds": 0.0074,
+          "p90Milliseconds": 0.0102,
+          "p95Milliseconds": 0.0106,
+          "slowestOnePercentMeanMilliseconds": 0.0228
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2204,
+          "medianMilliseconds": 0.2068,
+          "p90Milliseconds": 0.3252,
+          "p95Milliseconds": 0.3515,
+          "slowestOnePercentMeanMilliseconds": 0.4573
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 9.6783,
+          "medianMilliseconds": 9.621,
+          "p90Milliseconds": 9.7317,
+          "p95Milliseconds": 9.887,
+          "slowestOnePercentMeanMilliseconds": 13.6191
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0304,
+          "medianMilliseconds": 0.0295,
+          "p90Milliseconds": 0.0411,
+          "p95Milliseconds": 0.0418,
+          "slowestOnePercentMeanMilliseconds": 0.1105
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2144,
+          "medianMilliseconds": 0.2041,
+          "p90Milliseconds": 0.2914,
+          "p95Milliseconds": 0.3521,
+          "slowestOnePercentMeanMilliseconds": 0.5959
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.1615,
+          "medianMilliseconds": 0.1427,
+          "p90Milliseconds": 0.2375,
+          "p95Milliseconds": 0.267,
+          "slowestOnePercentMeanMilliseconds": 0.3137
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 19.6528,
+          "medianMilliseconds": 20.3576,
+          "p90Milliseconds": 21.9749,
+          "p95Milliseconds": 22.2331,
+          "slowestOnePercentMeanMilliseconds": 27.4251,
+          "onePercentLowFps": 36.463
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    },
+    {
+      "runId": "primary-hit-c2-live-20261001",
+      "artifactRole": "control",
+      "buildLabel": "primary-hit-control",
+      "workload": "lantern-reveal-sequence-v1",
+      "zone": "yellow-torch-bay",
+      "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+      "installedApkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+      "reportBytes": 483167,
+      "rawBenchmarkJsonSha256": "de2d4e4b468200aa0a163bd92ba7317546728312013204c086eab1225fdc4514",
+      "completedFrames": 600,
+      "gpuValidFrames": 600,
+      "legacyZoneCycleMs": {
+        "mean": 245.2162,
+        "median": 245.8305,
+        "p95": 259.7315
+      },
+      "completedZoneGpuMs": {
+        "sampleCount": 600,
+        "meanMilliseconds": 233.6748,
+        "medianMilliseconds": 234.8479,
+        "p90Milliseconds": 240.5456,
+        "p95Milliseconds": 248.0931,
+        "slowestOnePercentMeanMilliseconds": 269.2583
+      },
+      "completedZoneCpuStages": {
+        "simulationStepCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0306,
+          "medianMilliseconds": 0.031,
+          "p90Milliseconds": 0.0346,
+          "p95Milliseconds": 0.0359,
+          "slowestOnePercentMeanMilliseconds": 0.1169
+        },
+        "skinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 8.34,
+          "medianMilliseconds": 8.7154,
+          "p90Milliseconds": 9.569,
+          "p95Milliseconds": 9.7392,
+          "slowestOnePercentMeanMilliseconds": 10.2533
+        },
+        "playerSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 8.34,
+          "medianMilliseconds": 8.7154,
+          "p90Milliseconds": 9.569,
+          "p95Milliseconds": 9.7392,
+          "slowestOnePercentMeanMilliseconds": 10.2533
+        },
+        "characterSkinCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0,
+          "medianMilliseconds": 0.0,
+          "p90Milliseconds": 0.0,
+          "p95Milliseconds": 0.0,
+          "slowestOnePercentMeanMilliseconds": 0.0
+        },
+        "dynamicUploadCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.4211,
+          "medianMilliseconds": 0.3902,
+          "p90Milliseconds": 0.5755,
+          "p95Milliseconds": 0.6064,
+          "slowestOnePercentMeanMilliseconds": 0.9831
+        },
+        "blasRefitRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0458,
+          "medianMilliseconds": 0.0435,
+          "p90Milliseconds": 0.057,
+          "p95Milliseconds": 0.0637,
+          "slowestOnePercentMeanMilliseconds": 0.153
+        },
+        "tlasUpdateRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0139,
+          "medianMilliseconds": 0.0129,
+          "p90Milliseconds": 0.0165,
+          "p95Milliseconds": 0.0176,
+          "slowestOnePercentMeanMilliseconds": 0.0888
+        },
+        "traceCopyRecordCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2228,
+          "medianMilliseconds": 0.2091,
+          "p90Milliseconds": 0.3068,
+          "p95Milliseconds": 0.3255,
+          "slowestOnePercentMeanMilliseconds": 0.4801
+        },
+        "frameFenceWaitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 234.0948,
+          "medianMilliseconds": 235.3335,
+          "p90Milliseconds": 241.088,
+          "p95Milliseconds": 248.4806,
+          "slowestOnePercentMeanMilliseconds": 269.6375
+        },
+        "imageAcquireCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.0397,
+          "medianMilliseconds": 0.0401,
+          "p90Milliseconds": 0.0481,
+          "p95Milliseconds": 0.0515,
+          "slowestOnePercentMeanMilliseconds": 0.1347
+        },
+        "queueSubmitCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2795,
+          "medianMilliseconds": 0.2504,
+          "p90Milliseconds": 0.4188,
+          "p95Milliseconds": 0.4827,
+          "slowestOnePercentMeanMilliseconds": 0.7901
+        },
+        "presentCallCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 0.2372,
+          "medianMilliseconds": 0.2339,
+          "p90Milliseconds": 0.2953,
+          "p95Milliseconds": 0.3152,
+          "slowestOnePercentMeanMilliseconds": 0.4615
+        },
+        "wholeFrameCycleCpuMs": {
+          "sampleCount": 600,
+          "meanMilliseconds": 245.2161,
+          "medianMilliseconds": 245.8304,
+          "p90Milliseconds": 253.1328,
+          "p95Milliseconds": 259.7315,
+          "slowestOnePercentMeanMilliseconds": 280.7003,
+          "onePercentLowFps": 3.5625
+        }
+      },
+      "parserSelectionNote": "Supplement reads report.completedFrameEvidence.zones for completed CPU stages. Frozen parser selected CPU stages from report.zones, a timing-only projection that has no cpuStages property; its null stage fields mean selector mismatch, not missing or zero cost."
+    }
+  ],
+  "scopeNote": "Raw completion-owned zone reports only; no benchmark schema/parser/aggregate rewrite, no ADB or production edits. CPU stage values are host-side record/submit/present measurements as named, not GPU substage costs."
+}

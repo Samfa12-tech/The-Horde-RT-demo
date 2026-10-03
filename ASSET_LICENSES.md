@@ -46,6 +46,91 @@ The running RT scene uses the five Poly Haven material sets, the Hotstrike Studi
 | Fire extinguishing 212651 torch-failure cue | 1.044-second mono 48 kHz 16-bit PCM WAV runtime derivative | “Fire extinguishing” by MUSICHOLDER, https://pixabay.com/sound-effects/film-special-effects-fire-extinguishing-212651/; see `assets/audio/pixabay/torch_extinguish.METADATA.md` | Pixabay Content License. Free use, adaptation, and commercial use are permitted without required attribution; standalone distribution in substantially the same form is prohibited. Licence summary: https://pixabay.com/service/license-summary/ | MUSICHOLDER; runtime processing and integration by Codex, 2026-08-28 | The user-supplied Pixabay MP3 is deterministically decoded, mixed to mono, resampled from 32 kHz to 48 kHz, and encoded as PCM16 without changing duration. Only `assets/audio/pixabay/torch_extinguish.wav` is packaged. Voluntary credit: “Fire extinguishing by MUSICHOLDER via Pixabay.” |
 | Horde Lantern RT application icon | 1024 px source PNG, Windows ICO, and Android launcher PNG derivatives | Generated specifically for this project with OpenAI image generation; prompt recorded in the 2026-07-15 release-prep work | Project-created generated asset; no third-party source asset imported | Codex, 2026-07-15 | Gothic iron lantern and amber hardware-ray motif. Source and derivatives are under `assets/branding/` and Android `mipmap-*`. |
 
+Anatomy correction, 2026-09-23: the gauntlet row's left-source/right-mirror description records the historical export, not the corrected source classification. The owner identified the source as **Right**; current investigation candidates reflect that source for Left/torch and preserve it for Right/sword, with corresponding winding and UV-corner reversal. The historical classification is withdrawn. Accepted runtime files remain unchanged pending visual and device acceptance. See [hand-orientation evidence](docs/ENGINEERING_1_6_1_HAND_ORIENTATION_2026-09-23.md). This corrects geometry provenance only; licences, attribution, source bytes and distribution permissions are unchanged.
+
 Android runtime derivatives for the five CC0 rows are strict KTX2 arrays using ASTC 6x6 for diffuse/AO-roughness-metal and ASTC 4x4 for normals. The retained raw RGBA arrays and original 1K JPGs remain the provenance/source chain; layer order is unchanged.
 
 Poly Haven's asset license states that its assets are CC0 and may be used commercially without required attribution: https://polyhaven.com/license. Attribution is retained here as project provenance.
+
+## Supplied adaptive score (1.6.1 runtime assets and playback accepted)
+
+`What the Dark Keeps`, supplied in `What_the_Dark_Keeps_Horde_RT_Music_Pack.zip`
+SHA-256 `e28e5936189919fed25f6208dd7a8b97172eb5f7d25f69732cc7339c45f386fa`.
+Owner-confirmed rights statement,2026-09-30: **Owner-supplied; authorised for Horde use only**.
+No general permissive redistribution licence is inferred. Editable canonical JSON/
+PCS1 under `assets/audio/music/what-the-dark-keeps/source/` remains the revisable
+source of truth and is excluded from game packages, as is the supplied preview.
+Only the hash-pinned manifest and sixteen measured stereo48kHz PCM16 body/tail
+derivatives under that asset's `runtime/` enter Windows/Android packages.
+Current native-clock/loop/transition and owner listening checks are accepted;
+see the [finite current A/D delta receipt](docs/evidence/2026-10-03-music-drone/README.md).
+Asset admission alone is not listening acceptance. This grant does not relicense Pocket Chordsmith/Pocket Audio source,
+change existing asset licence statements or authorise production publication.
+See [music integration checkpoint](docs/ENGINEERING_1_6_1_MUSIC_2026-09-30.md).
+The sixteen A-H PCM body/tail prototypes under
+`docs/evidence/2026-10-01-music-render/audio/` carry that same Horde-only owner grant.
+They are non-runtime rendering evidence, excluded from game packages, not a
+general asset library or seamless/playback acceptance. Source/tool hashes and
+original unmodified-score processing are recorded in that directory. Initial
+runtime copies were byte-identical; historical `-loop` filenames became
+`-body` to distinguish the C/G one-shots. The separate
+native-only Pocket Audio Core utility pin is documented in
+`third_party/pocket-audio-core/README.horde.md`; no Chordsmith editor/synth app is
+vendored and no upstream code is relicensed. Its software permission is separate
+from this Horde-only score grant.
+
+Owner-directed instrumentation studies under
+`docs/evidence/2026-10-01-music-instrumentation/` carry the same **Horde-only**
+score grant. They retain separate editable JSON/PCS1 candidates and actual v68
+app-voice/live-FX derivatives; comparison gain changes apply only to previews.
+They are excluded from runtime packages and are not a bank-replacement,
+general acoustic-instrument library, listening or publication acceptance.
+
+On October 1 the owner selected the whistle-lead instrumentation. The canonical
+JSON/PCS1 and sixteen runtime derivatives now carry that palette: retained v68
+actual app voices/live FX, unchanged notes/cue timing, accepted A/E PCM reused,
+six remaining cues rendered once. Sparse authored bell accents remain in C/G.
+No preview normalization is applied to runtime. Rights remain **Horde-only**;
+that bank's historical receipt alone is not public distribution or later exact-
+artifact acceptance. Subsequent owner listening and scoped A/D-only held-drone
+removal are recorded separately in the current receipt above. See
+`docs/evidence/2026-10-01-music-whistle-bank/README.md` for exact provenance.
+
+## Windows report-verification SDK (1.6.1 development)
+
+Microsoft.Web.WebView2 **1.0.4258.31**, official NuGet package, BSD-3-Clause.
+Native headers/static loader only; exact archive/entry hashes and source URL in
+`third_party/webview2-sdk/manifest.json`. The SDK is explicitly restored into
+ignored build storage, not vendored source. Windows uses the separately installed
+Evergreen WebView2 Runtime for consented anti-spam verification only; no bundled
+fixed Runtime, editor/framework migration or automatic Runtime installation.
+Missing Runtime leaves clear diagnostics and offline JSON fallback.
+SDK licence (reproduced for the statically linked loader's binary distribution):
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * The name of Microsoft Corporation, or the names of its contributors
+may not be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

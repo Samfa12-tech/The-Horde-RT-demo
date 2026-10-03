@@ -1,0 +1,104 @@
+Start testing: Oct 01 08:56 AUS Eastern Standard Time
+----------------------------------------------------------
+52/83 Testing: horde_rt_music_director_tests
+52/83 Test: horde_rt_music_director_tests
+Command: "C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Release/horde_rt_music_director_tests.exe"
+Directory: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+"horde_rt_music_director_tests" start time: Oct 01 08:56 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+Shared adaptive music resolver tests passed.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_director_tests" end time: Oct 01 08:56 AUS Eastern Standard Time
+"horde_rt_music_director_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+53/83 Testing: horde_rt_music_pcm_stream_tests
+53/83 Test: horde_rt_music_pcm_stream_tests
+Command: "C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Release/horde_rt_music_pcm_stream_tests.exe"
+Directory: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+"horde_rt_music_pcm_stream_tests" start time: Oct 01 08:56 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+Shared PCM music stream tests passed.
+<end of output>
+Test time =   0.14 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_pcm_stream_tests" end time: Oct 01 08:56 AUS Eastern Standard Time
+"horde_rt_music_pcm_stream_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+54/83 Testing: horde_rt_music_pcm_wave_tests
+54/83 Test: horde_rt_music_pcm_wave_tests
+Command: "C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/Release/horde_rt_music_pcm_wave_tests.exe"
+Directory: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+"horde_rt_music_pcm_wave_tests" start time: Oct 01 08:56 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_pcm_wave_tests" end time: Oct 01 08:56 AUS Eastern Standard Time
+"horde_rt_music_pcm_wave_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+55/83 Testing: horde_rt_music_asset_admission_tests
+55/83 Test: horde_rt_music_asset_admission_tests
+Command: "C:/Program Files/PowerShell/7/pwsh.exe" "-NoProfile" "-File" "C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/tests/MusicAssetAdmissionTests.ps1"
+Directory: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+"horde_rt_music_asset_admission_tests" start time: Oct 01 08:56 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+PASS: canonical source/runtime admission and manifest pin
+PASS: explicit seventeen-file runtime roster and staged byte verification
+PASS: positive Windows-style staged ZIP and Android-style APK validation
+PASS negative: independent source-byte mutation
+PASS negative: independent PCM sample-byte mutation
+PASS negative: manifest-content repin attempt
+PASS negative: one-shot looping-policy mutation
+PASS negative: missing runtime wave
+PASS negative: extra runtime file
+PASS negative: archive source-entry rejection
+PASS negative: archive missing-entry rejection
+PASS negative: archive duplicate-entry rejection
+PASS negative: archive same-count duplicate-entry rejection
+PASS negative: archive corrupted PCM rejection
+Music asset admission tests: 14 passed, 0 failed.
+Independent copies and ZIP fixtures retained under: C:\Users\sam_s\AppData\Local\Temp\Horde-MusicAssetAdmission-017604f9a9304fd1b15c2a96ce40b389
+<end of output>
+Test time =   7.02 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_music_asset_admission_tests" end time: Oct 01 08:56 AUS Eastern Standard Time
+"horde_rt_music_asset_admission_tests" time elapsed: 00:00:07
+----------------------------------------------------------
+
+83/83 Testing: pocket_audio_native_pcm_tests
+83/83 Test: pocket_audio_native_pcm_tests
+Command: "C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/pocket-audio-core-native/Release/pocket_audio_native_pcm_tests.exe"
+Directory: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build/pocket-audio-core-native
+"pocket_audio_native_pcm_tests" start time: Oct 01 08:56 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+clip validation
+loop periods
+natural tail
+selection controls
+rapid changes
+wave valid
+wave invalid
+Pocket Audio Core native PCM tests passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"pocket_audio_native_pcm_tests" end time: Oct 01 08:56 AUS Eastern Standard Time
+"pocket_audio_native_pcm_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 01 08:56 AUS Eastern Standard Time

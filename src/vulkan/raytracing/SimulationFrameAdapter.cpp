@@ -27,6 +27,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     const RtSceneTuning& tuning)
 {
     RtSceneFrameInputs frame;
+    frame.playerRenderRoute = kProductionPlayerRenderRoute;
     frame.tickIndex = simulation.tickIndex;
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;
@@ -47,6 +48,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.heldItems = simulation.heldItems;
     frame.heldItemKinematics = simulation.heldItemKinematics;
     frame.playerAnimation = simulation.playerAnimation;
+    frame.playerMountProfile = simulation.playerMountProfile;
     frame.heldLight = simulation.heldLight;
     frame.interaction = simulation.interaction;
     frame.chestReward = simulation.chestReward;

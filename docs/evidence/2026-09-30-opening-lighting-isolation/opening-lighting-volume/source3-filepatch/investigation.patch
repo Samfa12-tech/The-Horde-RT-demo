@@ -1,0 +1,54 @@
+diff --git a/shaders/raytracing/include/rt_fire.glsl b/shaders/raytracing/include/rt_fire.glsl
+index c51229d..9d880f7 100644
+--- a/shaders/raytracing/include/rt_fire.glsl
++++ b/shaders/raytracing/include/rt_fire.glsl
+@@ -195,6 +195,10 @@ vec4 integrateOneFireEmitter(RtFireEmitterGpu emitter,
+ vec4 integrateFireEmitters(vec3 rayOrigin, vec3 rayDirection,
+                            float maximumDistance, bool reflectionPath)
+ {
++#if HORDE_LOCAL_FIRE_VOLUME_ISOLATION
++    // NONPHYSICAL WORKLOAD ISOLATE, not a quality-preserving optimisation.
++    return vec4(0.0, 0.0, 0.0, 1.0);
++#else
+     vec3 accumulated = vec3(0.0);
+     float transmittance = 1.0;
+     for (uint index = 0u; index < kRtActiveFireEmitterCapacity; ++index)
+@@ -207,4 +211,5 @@ vec4 integrateFireEmitters(vec3 rayOrigin, vec3 rayDirection,
+         transmittance *= sampleValue.a;
+     }
+     return vec4(accumulated, transmittance);
++#endif
+ }
+diff --git a/shaders/raytracing/include/rt_frame.glsl b/shaders/raytracing/include/rt_frame.glsl
+index 3b988b6..2db1122 100644
+--- a/shaders/raytracing/include/rt_frame.glsl
++++ b/shaders/raytracing/include/rt_frame.glsl
+@@ -1,4 +1,5 @@
+ // One per-pixel implementation; launchers supply only stage and pixel builtins.
++#include "rt_lighting_investigation.glsl"
+ #include "rt_scene_abi.glsl"
+ #include "rt_diagnostics.glsl"
+ #include "rt_lighting.glsl"
+diff --git a/shaders/raytracing/include/rt_lighting.glsl b/shaders/raytracing/include/rt_lighting.glsl
+index fa0a436..60391f8 100644
+--- a/shaders/raytracing/include/rt_lighting.glsl
++++ b/shaders/raytracing/include/rt_lighting.glsl
+@@ -1070,6 +1070,10 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
+         // approximation) and matters for the three orthogonal corridor faces.
+         if (diffuse <= 0.0 && specular <= 0.0)
+             continue;
++#if HORDE_LOCAL_FIRE_SHADOW_ISOLATION
++        // NONPHYSICAL WORKLOAD ISOLATE, not a quality-preserving optimisation.
++        vec3 lightTransmittance = vec3(1.0);
++#else
+         vec3 lightTransmittance = sceneShadowTransmittanceMask(
+             offsetRayOrigin(h, sampleDirection), sampleDirection,
+             sampleDistance - 0.02, 0x35u);
+@@ -1083,6 +1087,7 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool dualVisibility
+                     offsetRayOrigin(h, otherDirection), otherDirection,
+                     otherDistance - 0.02, 0x35u));
+         }
++#endif
+         float lightVisibility = lightTransmittance.x;
+         if (!genericTransmissionActive)
+         {

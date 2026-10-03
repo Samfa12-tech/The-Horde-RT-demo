@@ -1,4 +1,9 @@
 #include "platform/windows/DiagnosticWindow.h"
+#include "platform/windows/WindowsMusicPlayback.h"
+#include "platform/windows/WindowsMusicFocus.h"
+#include "platform/windows/WindowsPlaytestReport.h"
+#include "platform/windows/WindowsRemotePlaytestReport.h"
+#include "audio/SfxVolume.h"
 
 #include <algorithm>
 #include <array>
@@ -50,13 +55,16 @@
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/FeedbackTiming.h"
 #include "gameplay/ShowcaseBenchmark.h"
+#include "telemetry/RtBenchmarkEvidenceRun.h"
 #include "gameplay/ShowcaseCheckpoints.h"
+#include "gameplay/LanternBenchmarkScenario.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/SwordCombat.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "platform/windows/DesktopControllerInput.h"
 #include "platform/windows/WindowsCaptureContracts.h"
+#include "platform/windows/WindowsBenchmarkLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
 #include "platform/windows/WindowsGitHubReleaseUpdate.h"
 #include "platform/windows/WindowsRtLabState.h"
@@ -65,7 +73,12 @@
 #include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
+#include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
+#include "vulkan/raytracing/RtDeviceEnablePlan.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+#include "vulkan/raytracing/experimental/StagedPrimaryProfile.h"
+#endif
 
 #ifndef HORDE_RT_BUILD_ID
 #define HORDE_RT_BUILD_ID "development"
@@ -73,10 +86,6 @@
 #ifndef HORDE_RT_DISPLAY_VERSION
 #define HORDE_RT_DISPLAY_VERSION "development"
 #endif
-#ifndef HORDE_RT_RAYGEN_SHA256
-#define HORDE_RT_RAYGEN_SHA256 "unknown"
-#endif
-
 namespace
 {
 
@@ -102,7 +111,8 @@ constexpr int kSettingsButtonId = 107;
 constexpr int kDiagnosticsButtonId = 108;
 constexpr int kExitButtonId = 109;
 constexpr int kSettingsTitleId = 110;
-constexpr int kSfxButtonId = 111;
+constexpr int kSfxVolumeLabelId = 165;
+constexpr int kSfxVolumeSliderId = 166;
 constexpr int kSensitivityButtonId = 112;
 constexpr int kFullscreenButtonId = 113;
 constexpr int kSettingsBackButtonId = 114;
@@ -153,10 +163,12 @@ constexpr int kRtLabGlassIorSliderId = 158;
 constexpr int kRtLabGlassRoughnessLabelId = 159;
 constexpr int kRtLabGlassRoughnessSliderId = 160;
 constexpr int kChestPromptControlId = 161;
+constexpr int kMusicVolumeLabelId = 162;
+constexpr int kMusicVolumeSliderId = 163;
+constexpr int kReportProblemButtonId = 164;
 constexpr int kMenuPauseId = 2001;
 constexpr int kMenuRestartId = 2002;
 constexpr int kMenuExitId = 2003;
-constexpr int kMenuSfxId = 2010;
 constexpr int kMenuSensitivityLowId = 2011;
 constexpr int kMenuSensitivityNormalId = 2012;
 constexpr int kMenuSensitivityHighId = 2013;
@@ -167,6 +179,7 @@ constexpr int kMenuAboutId = 2022;
 constexpr int kMenuCreditsId = 2023;
 constexpr int kMenuDeveloperOverlayId = 2024;
 constexpr int kMenuCheckUpdatesId = 2025;
+constexpr int kMenuReportProblemId = 2026;
 constexpr int kAppIconId = 1;
 constexpr UINT kDefaultDpi = 96u;
 constexpr char kUiFontProperty[] = "HordeLanternRtUiFont";
@@ -178,7 +191,11 @@ constexpr UINT kMaxFramesInFlight = 1u;
 
 struct CaptureLaunchOptions
 {
+    horde::platform::windows::WindowsBenchmarkLaunch benchmark;
     bool requested = false;
+    bool requireRayQueryCompute = false;
+    bool portrait = false;
+    bool anatomicalPlayerMount = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -197,12 +214,18 @@ struct RtLabDebugLaunchOptions
 struct ShowcaseCaptureRecord
 {
     const horde::gameplay::ShowcaseCheckpoint* checkpoint = nullptr;
+    // Record the rendered simulation state, not an unclamped authored request.
+    std::array<float, 4u> camera{};
     std::string torchFailurePhase;
     std::string selectedEnemy;
     std::string lichPhase;
     float finaleSkylightOpenProgress = 0.0f;
     std::string filename;
     std::string pngSha256;
+    std::string viewmodelGeometryFile;
+    std::string viewmodelGeometrySha256;
+    std::string playerWorldBodyGeometryFile;
+    std::string playerWorldBodyGeometrySha256;
     std::uint32_t width = 0u;
     std::uint32_t height = 0u;
     bool redBlueSwapNormalised = false;
@@ -210,6 +233,7 @@ struct ShowcaseCaptureRecord
                horde::vulkan::raytracing::PresentableTinyRtScene::kTlasInstanceCount>
         instanceMasks{};
     bool playerPrimaryVisible = false;
+    std::uint32_t playerWorldBodyInstanceFlags = 0u;
     std::uint32_t primaryTorchPixels = 0u;
     std::uint32_t primarySwordPixels = 0u;
     std::uint32_t primaryPlayerPixels = 0u;
@@ -253,11 +277,22 @@ struct VulkanSurfaceContext
     std::vector<VkFence> inFlightFences;
     horde::vulkan::raytracing::PresentableTinyRtScene rtScene;
     horde::vulkan::GpuFrameTimer gpuFrameTimer;
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    horde::vulkan::raytracing::experimental::StagedPrimaryTiming stagedPassTimer;
+    horde::vulkan::raytracing::experimental::StagedPrimaryProfile stagedPassProfile;
+#endif
+    horde::vulkan::raytracing::RtFrameEvidenceCoordinator rtFrameEvidence;
     horde::vulkan::GpuRtTimingSnapshot gpuRtTiming;
     double gpuFrameTimingTotalMs = 0.0;
     std::uint64_t gpuFrameTimingSampleCount = 0u;
-    std::uint64_t gpuFrameSubmissionSequence = 0u;
+    bool rtFrameEvidenceInitialised = false;
+    horde::telemetry::RtPresentationOutcome lastFramePresentation =
+        horde::telemetry::RtPresentationOutcome::NotAttempted;
+    // Borrowed from RunDiagnosticSwapchainWindow's live owner; UI captures a
+    // copied report context on this same application thread.
+    const horde::vulkan::DeviceCapabilities* capabilitySnapshot = nullptr;
     bool useRtPath = false;
+    horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
     std::string developmentCheckpoint;
     std::string lastRtFrameError;
     bool controlsEnabled = false;
@@ -281,7 +316,11 @@ struct VulkanSurfaceContext
     bool developerOverlayVisible = false;
     ULONGLONG lastDeveloperOverlayTick = 0u;
 #endif
-    bool sfxEnabled = true;
+    int sfxVolumePercent = 100;
+    int musicVolumePercent = 70;
+    std::unique_ptr<horde::platform::windows::WindowsMusicPlayback> musicPlayback;
+    std::uint64_t musicResetToken = 0u;
+    int musicLastLoggedGate = -1;
     bool fullscreen = false;
     bool forwardHeld = false;
     bool backwardHeld = false;
@@ -348,9 +387,13 @@ struct VulkanSurfaceContext
     horde::gameplay::EnemyKind debugEnemyOverride = horde::gameplay::EnemyKind::None;
     uint32_t debugValidationPoint = 0u;
     horde::gameplay::ShowcaseBenchmarkRun benchmark;
+    horde::telemetry::RtBenchmarkEvidenceRun benchmarkEvidence;
+    std::optional<std::size_t> expectedBenchmarkFrame;
     std::string benchmarkReport;
     std::string benchmarkJsonReport;
     bool benchmarkCompletionHandled = false;
+    bool benchmarkReportsSaved = false;
+    bool unattendedBenchmark = false;
     uint32_t currentFrame = 0u;
 };
 
@@ -361,6 +404,12 @@ void UpdateChestPrompt(VulkanSurfaceContext& context);
 int ScaleForDpi(HWND window, int logicalPixels);
 void LayoutOverlayControls(HWND window, int width, int height);
 std::string WindowSafeText(const std::string& value);
+void RefreshGpuTimingTelemetry(
+    VulkanSurfaceContext& context,
+    const horde::vulkan::GpuFrameTimingCollection* completed = nullptr);
+horde::telemetry::RtSampleStatus CurrentInitialGpuEvidenceStatus(
+    VulkanSurfaceContext& context);
+bool CompleteRtEvidenceAfterDeviceIdle(VulkanSurfaceContext& ctx, VkResult idleResult);
 
 CaptureLaunchOptions ParseCaptureLaunchOptions()
 {
@@ -372,9 +421,42 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
         options.error = "Failed to parse the process command line.";
         return options;
     }
+    std::vector<std::wstring_view> argumentViews;
+    for (int index = 1; index < argumentCount; ++index) argumentViews.emplace_back(arguments[index]);
+    options.benchmark = horde::platform::windows::ParseWindowsBenchmarkLaunch(argumentViews);
+    if (!options.benchmark.error.empty())
+    {
+        options.error = options.benchmark.error;
+        LocalFree(arguments);
+        return options;
+    }
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
+        if (argument == L"--anatomical-player-mount")
+        {
+#if defined(_DEBUG)
+            options.anatomicalPlayerMount = true;
+#else
+            options.error = "--anatomical-player-mount is an unaccepted Debug-only candidate.";
+#endif
+            continue;
+        }
+        if (argument == L"--require-rayquery-compute")
+        {
+            options.requireRayQueryCompute = true;
+            continue;
+        }
+        if (argument == L"--capture-portrait")
+        {
+            if (options.portrait)
+            {
+                options.error = "--capture-portrait may only be specified once.";
+                break;
+            }
+            options.portrait = true;
+            continue;
+        }
         if (argument == L"--development-checkpoint")
         {
             if (!options.developmentCheckpoint.empty())
@@ -409,6 +491,11 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     if (options.error.empty() && !options.developmentCheckpoint.empty() && !options.requested)
         options.error = "--development-checkpoint requires --capture-showcase.";
+    if (options.error.empty() && options.portrait && !options.requested)
+        options.error = "--capture-portrait requires --capture-showcase.";
+    if (options.error.empty() && options.anatomicalPlayerMount &&
+        (!options.requested || !options.developmentCheckpoint.starts_with("player-viewmodel-")))
+        options.error = "--anatomical-player-mount requires a modelled-viewmodel development capture.";
     if (options.error.empty() && !options.developmentCheckpoint.empty() &&
         horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint) == nullptr)
         options.error = "Unknown development checkpoint: " + options.developmentCheckpoint;
@@ -602,7 +689,14 @@ void LoadSettings(VulkanSurfaceContext& context)
     const std::string path = SettingsPath().string();
     // Progress is deliberately loaded independently from ordinary display/audio settings.
     context.rtLabUnlocked = GetPrivateProfileIntA("progress", "rtLabUnlocked", 0, path.c_str()) != 0;
-    context.sfxEnabled = GetPrivateProfileIntA("audio", "sfx", 1, path.c_str()) != 0;
+    const bool legacySfxEnabled = GetPrivateProfileIntA("audio", "sfx", 1, path.c_str()) != 0;
+    const int configuredSfxVolume = static_cast<int>(
+        GetPrivateProfileIntA("audio", "sfxVolume",
+                              horde::audio::kSfxVolumeSettingMissing, path.c_str()));
+    context.sfxVolumePercent = horde::audio::ResolveSfxVolumePercent(
+        configuredSfxVolume, legacySfxEnabled);
+    context.musicVolumePercent = std::clamp(
+        static_cast<int>(GetPrivateProfileIntA("audio", "musicVolume", 70, path.c_str())), 0, 100);
     const int sensitivity = std::clamp(static_cast<int>(GetPrivateProfileIntA("controls", "lookSensitivity", 100, path.c_str())), 60, 150);
     context.mouseSensitivity = static_cast<float>(sensitivity) / 100.0f;
     const int renderScale = std::clamp(static_cast<int>(GetPrivateProfileIntA("display", "renderScale", 100, path.c_str())), 50, 100);
@@ -700,7 +794,13 @@ void SaveRtLabProgress(const VulkanSurfaceContext& context)
 void SaveSettings(const VulkanSurfaceContext& context)
 {
     const std::string path = SettingsPath().string();
-    WritePrivateProfileStringA("audio", "sfx", context.sfxEnabled ? "1" : "0", path.c_str());
+    const std::string sfxVolume = std::to_string(
+        horde::audio::ClampSfxVolumePercent(context.sfxVolumePercent));
+    WritePrivateProfileStringA("audio", "sfxVolume", sfxVolume.c_str(), path.c_str());
+    WritePrivateProfileStringA("audio", "sfx",
+                               context.sfxVolumePercent > 0 ? "1" : "0", path.c_str());
+    const std::string musicVolume = std::to_string(context.musicVolumePercent);
+    WritePrivateProfileStringA("audio", "musicVolume", musicVolume.c_str(), path.c_str());
     const std::string sensitivity = std::to_string(static_cast<int>(std::round(context.mouseSensitivity * 100.0f)));
     WritePrivateProfileStringA("controls", "lookSensitivity", sensitivity.c_str(), path.c_str());
     const std::string renderScale = std::to_string(static_cast<int>(std::round(context.renderScale * 100.0f)));
@@ -725,21 +825,21 @@ void LogWindowsAudio(const std::string& message)
     }
 }
 
-bool PlayXAudioFile(const std::filesystem::path& path, float leftGain, float rightGain);
+bool PlayXAudioFile(const std::filesystem::path& path,
+                    float leftGain,
+                    float rightGain,
+                    int sfxVolumePercent);
 
 void PlaySoundEffect(const VulkanSurfaceContext& context, const char* filename)
 {
-    if (!context.sfxEnabled)
+    if (context.sfxVolumePercent <= 0)
     {
         return;
     }
     const std::filesystem::path path = ResolveAssetRoot() / "audio/filmcow" / filename;
     if (std::filesystem::exists(path))
     {
-        if (!PlayXAudioFile(path, 1.0f, 1.0f))
-        {
-            PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
-        }
+        (void)PlayXAudioFile(path, 1.0f, 1.0f, context.sfxVolumePercent);
     }
     else
     {
@@ -747,19 +847,18 @@ void PlaySoundEffect(const VulkanSurfaceContext& context, const char* filename)
     }
 }
 
-void PlayAmbientSoundEffect(const VulkanSurfaceContext& context, const char* filename)
+void PlayAmbientSoundEffect(const VulkanSurfaceContext& context,
+                            const char* filename,
+                            const float cueGain = 1.0f)
 {
-    if (!context.sfxEnabled)
+    if (context.sfxVolumePercent <= 0)
     {
         return;
     }
     const std::filesystem::path path = ResolveAssetRoot() / "audio/filmcow" / filename;
     if (std::filesystem::exists(path))
     {
-        if (!PlayXAudioFile(path, 1.0f, 1.0f))
-        {
-            PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
-        }
+        (void)PlayXAudioFile(path, cueGain, cueGain, context.sfxVolumePercent);
     }
     else
     {
@@ -833,6 +932,24 @@ public:
                 ++it;
             }
         }
+    }
+
+    bool SetMasterVolumePercent(const int percent)
+    {
+        if (masteringVoice_ == nullptr)
+        {
+            LogFailureOnce("XAudio2 mastering voice unavailable while applying SFX volume");
+            return false;
+        }
+        const HRESULT result = masteringVoice_->SetVolume(
+            horde::audio::SfxVolumeLinearGain(percent));
+        if (FAILED(result))
+        {
+            LogFailureOnce("mastering voice SetVolume failed, HRESULT=" +
+                           std::to_string(static_cast<long>(result)));
+            return false;
+        }
+        return true;
     }
 
     bool StartOrUpdateLoop(const std::string_view key,
@@ -919,7 +1036,7 @@ public:
     {
         if (engine_ == nullptr || masteringVoice_ == nullptr)
         {
-            LogFailureOnce("XAudio2 unavailable; falling back for " + path.string());
+            LogFailureOnce("XAudio2 unavailable; SFX was not played: " + path.string());
             return false;
         }
         const std::shared_ptr<const LoadedWave> wave = Load(path);
@@ -1145,18 +1262,28 @@ PositionalAudioEngine& SpatialAudioEngine()
     return engine;
 }
 
-bool PlayXAudioFile(const std::filesystem::path& path, float leftGain, float rightGain)
+bool PlayXAudioFile(const std::filesystem::path& path,
+                    float leftGain,
+                    float rightGain,
+                    const int sfxVolumePercent)
 {
-    return SpatialAudioEngine().Play(path,
-                                     std::clamp(leftGain, 0.0f, 1.0f),
-                                     std::clamp(rightGain, 0.0f, 1.0f));
+    PositionalAudioEngine& engine = SpatialAudioEngine();
+    if (!engine.SetMasterVolumePercent(sfxVolumePercent)) return false;
+    return engine.Play(path,
+                       std::clamp(leftGain, 0.0f, 1.0f),
+                       std::clamp(rightGain, 0.0f, 1.0f));
 }
 
 void UpdateWaterfallAmbience(const VulkanSurfaceContext& context)
 {
     constexpr std::string_view loopKey = "waterfall";
     PositionalAudioEngine& engine = SpatialAudioEngine();
-    if (!context.sfxEnabled || context.simulationPaused)
+    if (!engine.SetMasterVolumePercent(context.sfxVolumePercent))
+    {
+        engine.StopLoop(loopKey);
+        return;
+    }
+    if (context.sfxVolumePercent <= 0 || context.simulationPaused)
     {
         engine.StopLoop(loopKey);
         return;
@@ -1182,7 +1309,7 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
                                const horde::gameplay::simulation::GameplayEvent& event,
                                const char* collection = "filmcow")
 {
-    if (!context.sfxEnabled)
+    if (context.sfxVolumePercent <= 0)
     {
         return;
     }
@@ -1196,14 +1323,49 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
     const std::filesystem::path path = ResolveAssetRoot() / "audio" / collection / filename;
     if (std::filesystem::exists(path))
     {
-        if (!PlayXAudioFile(path, gains.left, gains.right))
-        {
-            PlaySoundA(path.string().c_str(), nullptr, SND_FILENAME | SND_ASYNC | SND_NODEFAULT | SND_NOSTOP);
-        }
+        (void)PlayXAudioFile(path, gains.left, gains.right, context.sfxVolumePercent);
     }
     else
     {
         LogWindowsAudio("missing positional SFX asset: " + path.string());
+    }
+}
+
+void PublishMusicPlayback(VulkanSurfaceContext& context, const bool focusLossNotification = false)
+{
+    if (context.musicPlayback)
+    {
+        // Copy before the existing SFX drain. No worker accesses GameSimulation.
+        const auto& snapshot = context.simulation.Snapshot();
+        const bool gameForeground = GetForegroundWindow() == context.windowHandle;
+        const bool suspended = horde::platform::windows::WindowsMusicShouldSuspend(
+            gameForeground, context.controlsEnabled, context.simulationPaused, focusLossNotification);
+        const bool accepted = context.musicPlayback->Publish(snapshot,
+            context.simulation.Events().Events(), 1u, context.musicResetToken,
+            suspended,
+            context.musicVolumePercent);
+        // Bounded transition observations distinguish an explicit loss from a
+        // settled foreground handover. No foreign-window identity or frame log.
+        const bool active = gameForeground && !focusLossNotification;
+        const int gate = (active ? 1 : 0) |
+                         (context.controlsEnabled ? 2 : 0) |
+                         (context.simulationPaused ? 4 : 0) |
+                         (focusLossNotification ? 8 : 0) |
+                         (gameForeground ? 16 : 0);
+        if (gate != context.musicLastLoggedGate)
+        {
+            context.musicLastLoggedGate = gate;
+            LogWindowsAudio("Windows music gate: active=" + std::to_string(active) +
+                " foreground=" + std::to_string(gameForeground) +
+                " focusLoss=" + std::to_string(focusLossNotification) +
+                " controls=" + std::to_string(context.controlsEnabled) +
+                " menuPaused=" + std::to_string(context.simulationPaused) +
+                " snapshotPaused=" + std::to_string(snapshot.paused) +
+                " accepted=" + std::to_string(accepted) +
+                " volume=" + std::to_string(context.musicVolumePercent) +
+                " tick=" + std::to_string(snapshot.tickIndex) +
+                " wallMs=" + std::to_string(GetTickCount64()));
+        }
     }
 }
 
@@ -1226,7 +1388,7 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         {
             const char* clip = (context.playerFootstepVariant++ & 1) == 0
                 ? "player_step_1.wav" : "player_step_2.wav";
-            PlayAmbientSoundEffect(context, clip);
+            PlayAmbientSoundEffect(context, clip, horde::audio::kPlayerFootstepCueGain);
             break;
         }
         case GameplayEventType::PlayerSwing:
@@ -1310,9 +1472,14 @@ void SetControlVisible(HWND window, const int id, const bool visible)
 
 void UpdateSettingsLabels(VulkanSurfaceContext& context)
 {
-    if (HWND sfx = GetDlgItem(context.windowHandle, kSfxButtonId))
+    if (HWND label = GetDlgItem(context.windowHandle, kSfxVolumeLabelId))
     {
-        SetWindowTextA(sfx, context.sfxEnabled ? "SOUND EFFECTS: ON" : "SOUND EFFECTS: OFF");
+        const std::string text = "SFX VOLUME: " + std::to_string(context.sfxVolumePercent) + "%";
+        SetWindowTextA(label, text.c_str());
+    }
+    if (HWND slider = GetDlgItem(context.windowHandle, kSfxVolumeSliderId))
+    {
+        SendMessageA(slider, TBM_SETPOS, TRUE, static_cast<LPARAM>(context.sfxVolumePercent));
     }
     if (HWND sensitivity = GetDlgItem(context.windowHandle, kSensitivityButtonId))
     {
@@ -1340,11 +1507,20 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
     {
         SendMessageA(slider, TBM_SETPOS, TRUE, static_cast<LPARAM>(std::round(context.renderScale * 100.0f)));
     }
+    if (HWND label = GetDlgItem(context.windowHandle, kMusicVolumeLabelId))
+    {
+        const std::string text = "MUSIC VOLUME: " +
+                                 std::to_string(context.musicVolumePercent) + "%";
+        SetWindowTextA(label, text.c_str());
+    }
+    if (HWND slider = GetDlgItem(context.windowHandle, kMusicVolumeSliderId))
+    {
+        SendMessageA(slider, TBM_SETPOS, TRUE, static_cast<LPARAM>(context.musicVolumePercent));
+    }
 
     HMENU menu = GetMenu(context.windowHandle);
     if (menu)
     {
-        CheckMenuItem(menu, kMenuSfxId, MF_BYCOMMAND | (context.sfxEnabled ? MF_CHECKED : MF_UNCHECKED));
         CheckMenuItem(menu, kMenuFullscreenId, MF_BYCOMMAND | (context.fullscreen ? MF_CHECKED : MF_UNCHECKED));
         CheckMenuRadioItem(menu, kMenuSensitivityLowId, kMenuSensitivityHighId,
                            context.mouseSensitivity < 0.8f ? kMenuSensitivityLowId :
@@ -1536,6 +1712,15 @@ void MirrorSimulationSnapshot(VulkanSurfaceContext& context, const bool mirrorVi
     context.playerRetryCheckpoint = snapshot.retryCheckpoint;
 }
 
+bool MeasurementPausedByUi(const VulkanSurfaceContext& context)
+{
+    const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible &&
+                              !context.diagnosticsVisible &&
+                              !context.benchmarkReportVisible && !context.rtLabVisible;
+    return pauseVisible || context.settingsVisible || context.rtLabVisible ||
+           context.diagnosticsVisible || context.benchmarkReportVisible;
+}
+
 void ApplyOverlayState(VulkanSurfaceContext& context)
 {
     const bool pauseVisible = context.pauseMenuVisible && !context.settingsVisible &&
@@ -1548,15 +1733,17 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle, kEndingBodyId, pauseVisible && context.endingOverlayVisible);
     const bool fullPauseMenuVisible = pauseVisible && !context.deathOverlayVisible && !context.endingOverlayVisible;
     for (const int id : {kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId,
-                         kRunBenchmarkButtonId, kMoreBySamfa12ButtonId})
+                         kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kReportProblemButtonId})
     {
         SetControlVisible(context.windowHandle, id, fullPauseMenuVisible);
     }
     const bool rtLabAccess = context.rtLabUnlocked || context.rtLabDebugInjection;
     SetControlVisible(context.windowHandle, kRtLabButtonId,
                       pauseVisible && rtLabAccess && !context.deathOverlayVisible);
-    for (const int id : {kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
-                          kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId})
+    for (const int id : {kSettingsTitleId, kSfxVolumeLabelId, kSfxVolumeSliderId,
+                          kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
+                          kRenderScaleSliderId, kMusicVolumeLabelId, kMusicVolumeSliderId,
+                          kFullscreenButtonId, kSettingsBackButtonId})
     {
         SetControlVisible(context.windowHandle, id, context.settingsVisible);
     }
@@ -1598,15 +1785,20 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                            !context.benchmark.IsRunning() && !context.rtLabVisible);
 #endif
     const bool wasSimulationPaused = context.simulationPaused;
-    context.simulationPaused = pauseVisible || context.settingsVisible || context.rtLabVisible ||
-                               context.diagnosticsVisible || context.benchmarkReportVisible;
+    context.simulationPaused = MeasurementPausedByUi(context);
     context.simulationInput.paused = context.simulationPaused;
+    PublishMusicPlayback(context); // Menu suspension need not wait for a GPU frame.
+    if (context.rtFrameEvidenceInitialised)
+    {
+        (void)context.rtFrameEvidence.SetPaused(context.simulationPaused);
+    }
     if (context.simulationPaused != wasSimulationPaused)
     {
         context.simulation.ResetTiming();
     }
     if (context.simulationPaused)
     {
+        context.benchmarkEvidence.Cancel();
         ClearDesktopInput(context);
     }
     // Overlay transitions are synchronous. Re-evaluate here so a chest prompt
@@ -1718,8 +1910,107 @@ void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
     }
 }
 
-void ResetRoute(VulkanSurfaceContext& context)
+horde::platform::windows::WindowsPlaytestReportContext CapturePlaytestReportContext(
+    const VulkanSurfaceContext& context)
 {
+    horde::platform::windows::WindowsPlaytestReportContext report;
+    auto& values = report.values;
+    values.product = "Horde Lantern RT";
+    values.version = HORDE_RT_DISPLAY_VERSION;
+    values.build = HORDE_RT_BUILD_ID;
+    values.platform = "Windows";
+    values.rawModel = "Windows desktop";
+    values.renderScale = context.renderScale;
+    values.rtPresented = context.capabilitySnapshot != nullptr && context.capabilitySnapshot->rtScene.presented;
+    values.quality = context.rtScene.SelectedDielectricQualityName();
+
+    if (context.physicalDevice == VK_NULL_HANDLE) return report;
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(context.physicalDevice, &properties);
+    const auto extent = context.rtScene.DispatchExtent();
+    if (extent.width == 0u || extent.height == 0u || !std::isfinite(context.renderScale) ||
+        context.renderScale <= 0.0f || properties.deviceName[0] == '\0')
+    {
+        return report;
+    }
+    values.gpu = properties.deviceName;
+    values.backend = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
+    values.internalWidth = extent.width;
+    values.internalHeight = extent.height;
+    report.available = !values.backend.empty();
+    return report;
+}
+
+void OpenPlaytestReport(VulkanSurfaceContext& context)
+{
+    // The form is only reachable from paused/menu UI. A Help-menu request made
+    // during play pauses first; closing the form leaves the pause in place.
+    if (!context.simulationPaused || !context.pauseMenuVisible || context.settingsVisible ||
+        context.diagnosticsVisible || context.benchmarkReportVisible || context.rtLabVisible)
+    {
+        ShowPauseMenu(context, true);
+    }
+    PlaySoundEffect(context, "ui_select.wav");
+    horde::platform::windows::WindowsRemotePlaytestServices services;
+    services.captureGameFrame = [&context](HWND,
+        horde::platform::windows::WindowsPlaytestReportContext& capturedContext,
+        horde::reporting::PlaytestScreenshotPixels& thumbnail, std::wstring& error) {
+        // Called synchronously only after native consent/preflight. The paused
+        // application/render owner owns both the RT image and this context.
+        thumbnail = {};
+        capturedContext = {};
+        try
+        {
+            const auto presentation = context.lastFramePresentation;
+            if (GetCurrentThreadId() != GetWindowThreadProcessId(context.windowHandle, nullptr) ||
+                !context.simulationPaused || !context.useRtPath || !context.rtScene.IsReady() ||
+                (presentation != horde::telemetry::RtPresentationOutcome::Presented &&
+                 presentation != horde::telemetry::RtPresentationOutcome::PresentedNeedsRecreate))
+            {
+                error = L"No paused, successfully presented game RT frame is available. Uncheck the image option or try again after playing.";
+                return false;
+            }
+            const auto extent = context.rtScene.DispatchExtent();
+            if (extent.width == 0u || extent.height == 0u ||
+                std::uint64_t{extent.width} * extent.height > horde::reporting::kPlaytestScreenshotMaxSourcePixels)
+            {
+                error = L"The game RT target exceeds the bounded report readback size. No image was captured.";
+                return false;
+            }
+            horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
+            std::string diagnostic;
+            if (!context.rtScene.CaptureStorageImage(image, diagnostic) ||
+                image.width != extent.width || image.height != extent.height ||
+                !horde::reporting::ResizePlaytestScreenshotRgba(image.width, image.height, image.rgba, thumbnail))
+            {
+                error = L"The game-only image readback failed. No report was sent; the image was not silently omitted.";
+                return false;
+            }
+            capturedContext = CapturePlaytestReportContext(context);
+            return true;
+        }
+        catch (...)
+        {
+            thumbnail = {};
+            capturedContext = {};
+            // Error text itself may allocate. Return an empty last-resort error
+            // rather than throw out of the application/render-owner callback.
+            try { error = L"The bounded game-image allocation failed. No report was sent."; }
+            catch (...) { error.clear(); }
+            return false;
+        }
+    };
+    horde::platform::windows::ShowWindowsRemotePlaytestReport(
+        context.windowHandle, CapturePlaytestReportContext(context), std::move(services));
+}
+
+void ResetRoute(VulkanSurfaceContext& context, const bool preserveBenchmark = false)
+{
+    if (!preserveBenchmark)
+    {
+        context.benchmarkEvidence.Cancel();
+        if (context.benchmark.IsRunning()) context.benchmark.Cancel();
+    }
     context.torchLightStrength = 1.8f;
     context.deathOverlayVisible = false;
     context.endingOverlayVisible = false;
@@ -1734,6 +2025,11 @@ void ResetRoute(VulkanSurfaceContext& context)
     context.rtLabRouteTainted = false;
     context.delayedFeedback.Clear();
     context.simulation.ResetRoute();
+    if (context.rtFrameEvidenceInitialised)
+    {
+        (void)context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::RouteReset);
+    }
     context.simulation.ClearEvents();
     context.simulationInput.moveForward = 0.0f;
     context.simulationInput.moveStrafe = 0.0f;
@@ -1817,6 +2113,12 @@ bool ApplyPlayerRetryCheckpoint(VulkanSurfaceContext& context, const std::int32_
     }
     context.delayedFeedback.Clear();
     context.simulation.RetryEncounter();
+    context.benchmarkEvidence.Cancel();
+    if (context.rtFrameEvidenceInitialised)
+    {
+        (void)context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::Retry);
+    }
     context.simulation.ClearEvents();
     context.simulationInput.hasAuthoritativePlayerPose = false;
     context.simulationInput.paused = false;
@@ -1858,14 +2160,16 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(
     const horde::vulkan::DeviceCapabilities& capabilities)
 {
     horde::gameplay::ShowcaseBenchmarkMetadata metadata;
+    metadata.legacyFrameTimingScope = "windows-render-plus-rtlab-telemetry";
     metadata.timestampUtc = UtcTimestamp("%Y-%m-%dT%H:%M:%SZ");
     metadata.buildIdentity = HORDE_RT_BUILD_ID;
-    metadata.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
+    metadata.shaderIdentity = context.rtScene.SelectedPipelineBundleIdentity();
     metadata.gpuName = capabilities.identity.gpuName;
     metadata.vulkanApi = std::to_string(VK_API_VERSION_MAJOR(capabilities.identity.vulkanApiVersion)) + "." +
                          std::to_string(VK_API_VERSION_MINOR(capabilities.identity.vulkanApiVersion)) + "." +
                          std::to_string(VK_API_VERSION_PATCH(capabilities.identity.vulkanApiVersion));
     metadata.rtMode = horde::vulkan::ToString(capabilities.rtMode);
+    metadata.executionBackend = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     metadata.presentMode = PresentModeName(context.swapchainPresentMode);
     metadata.materialEncoding = context.rtScene.MaterialEncoding();
     metadata.renderScalePercent = static_cast<std::uint32_t>(std::lround(context.renderScale * 100.0f));
@@ -1885,12 +2189,27 @@ void UpdateBenchmarkHud(VulkanSurfaceContext& context)
     }
 }
 
-void StartBenchmark(VulkanSurfaceContext& context)
+void StartBenchmark(VulkanSurfaceContext& context,
+                    const horde::gameplay::BenchmarkWorkload workload =
+                        horde::gameplay::BenchmarkWorkload::ShowcaseRoute,
+                    const bool showLiveFps = true)
 {
     ResetRoute(context);
-    context.benchmark.Start();
+    context.benchmark.Start(horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps, workload, showLiveFps);
+    (void)context.benchmarkEvidence.Start(
+        horde::gameplay::ShowcaseBenchmarkRun::kMaximumFramesPerLap);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    (void)context.stagedPassProfile.Start(horde::gameplay::ShowcaseBenchmarkRun::kMaximumFramesPerLap);
+#endif
+    context.expectedBenchmarkFrame.reset();
+    if (context.rtFrameEvidenceInitialised)
+    {
+        (void)context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::BenchmarkStart);
+    }
     context.rtLabRouteTainted = true;
     context.benchmarkCompletionHandled = false;
+    context.benchmarkReportsSaved = false;
     context.benchmarkReport.clear();
     context.benchmarkJsonReport.clear();
     context.pauseMenuVisible = false;
@@ -1898,18 +2217,36 @@ void StartBenchmark(VulkanSurfaceContext& context)
     context.diagnosticsVisible = false;
     context.benchmarkReportVisible = false;
     ApplyOverlayState(context);
+    RECT benchmarkClient{};
+    GetClientRect(context.windowHandle, &benchmarkClient);
+    LayoutOverlayControls(context.windowHandle, benchmarkClient.right, benchmarkClient.bottom);
     UpdateBenchmarkHud(context);
     PlaySoundEffect(context, "ui_select.wav");
     SetFocus(context.windowHandle);
 }
 
-void CancelBenchmark(VulkanSurfaceContext& context, const bool showMenu)
+void LogBenchmarkCancellation(const VulkanSurfaceContext& context, const char* trigger)
+{
+    // One observation at cancellation, not per-frame instrumentation. Keep
+    // lifecycle failures distinct from a completed hardware timing result.
+    if (context.benchmark.IsRunning())
+    {
+        std::cerr << "Windows benchmark cancelled: trigger=" << trigger
+                  << " measuredFrames=" << context.benchmark.Frames().size()
+                  << " tick=" << context.simulation.Snapshot().tickIndex
+                  << " foreground=" << (GetForegroundWindow() == context.windowHandle) << '\n';
+    }
+}
+
+void CancelBenchmark(VulkanSurfaceContext& context, const bool showMenu, const char* trigger)
 {
     if (!context.benchmark.IsRunning())
     {
         return;
     }
+    LogBenchmarkCancellation(context, trigger);
     context.benchmark.Cancel();
+    context.benchmarkEvidence.Cancel();
     ResetRoute(context);
     if (HWND hud = GetDlgItem(context.windowHandle, kHudControlId))
     {
@@ -1930,10 +2267,26 @@ void CompleteBenchmark(VulkanSurfaceContext& context,
         return;
     }
     context.benchmarkCompletionHandled = true;
+    // The last measured present has no following frame fence. Drain its owning
+    // submission before report construction or the route reset below. The caller
+    // has already sampled the legacy outer-loop interval before this wait.
+    if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        const VkResult idleResult = vkDeviceWaitIdle(context.device);
+        const bool drained = CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+        (void)context.benchmarkEvidence.RecordOwnerDrainResult(drained);
+        (void)context.benchmarkEvidence.Finalize();
+    }
     const horde::gameplay::ShowcaseBenchmarkMetadata metadata =
         BuildBenchmarkMetadata(context, capabilities);
-    context.benchmarkReport = context.benchmark.BuildTextReport(metadata);
-    context.benchmarkJsonReport = context.benchmark.BuildJsonReport(metadata);
+    context.benchmarkReport = context.benchmark.BuildTextReport(metadata, &context.benchmarkEvidence);
+    context.benchmarkJsonReport = context.benchmark.BuildJsonReport(metadata, &context.benchmarkEvidence);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    context.benchmarkJsonReport = horde::vulkan::raytracing::experimental::AttachStagedPrimaryProfile(
+        std::move(context.benchmarkJsonReport),
+        context.stagedPassProfile.Json(context.benchmarkEvidence.ExpectedCount(), context.stagedPassTimer,
+                                      context.rtScene.ExecutionOrganisationJson()));
+#endif
     const std::string stamp = UtcTimestamp("%Y%m%d-%H%M%S");
     const std::filesystem::path textPath = reportDirectory / ("HordeLanternRT-benchmark-" + stamp + ".txt");
     const std::filesystem::path jsonPath = reportDirectory / ("HordeLanternRT-benchmark-" + stamp + ".json");
@@ -1941,7 +2294,9 @@ void CompleteBenchmark(VulkanSurfaceContext& context,
     context.benchmarkReport += "\nSaved text report: " + textPath.string() +
         "\nSaved JSON report: " + (jsonSaved ? jsonPath.string() : std::string("FAILED")) +
         "\nUse the buttons below or Ctrl+A, Ctrl+C to copy.\n";
-    if (!WriteReportFile(textPath, context.benchmarkReport))
+    const bool textSaved = WriteReportFile(textPath, context.benchmarkReport);
+    context.benchmarkReportsSaved = textSaved && jsonSaved;
+    if (!textSaved)
     {
         context.benchmarkReport += "WARNING: automatic text report save failed; COPY REPORT and SAVE AS remain available.\n";
     }
@@ -1989,13 +2344,14 @@ void ToggleFullscreen(VulkanSurfaceContext& context)
     UpdateSettingsLabels(context);
 }
 
-std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities)
+std::string BuildDisplayText(const horde::vulkan::DeviceCapabilities& capabilities,
+    const horde::telemetry::RtLifecyclePublishedState* evidence = nullptr)
 {
     if (capabilities.rtMode == horde::vulkan::RtMode::Unsupported)
     {
         return horde::ui::BuildUnsupportedDeviceText(capabilities);
     }
-    return horde::ui::BuildDiagnosticOverlayText(capabilities);
+    return horde::vulkan::BuildCapabilityTextReport(capabilities, evidence);
 }
 
 #if defined(_DEBUG)
@@ -2039,10 +2395,10 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     const horde::gameplay::EnemyEncounterSnapshot* encounter = SelectedEncounter(roster);
     horde::ui::DeveloperOverlaySnapshot snapshot;
     snapshot.buildIdentity = std::string(HORDE_RT_BUILD_ID) + " DEBUG";
-    snapshot.shaderIdentity = std::string(HORDE_RT_RAYGEN_SHA256).substr(0u, 12u);
+    snapshot.shaderIdentity = context.rtScene.SelectedPipelineBundleDisplayIdentity();
     snapshot.gpuName = capabilities.identity.gpuName;
     snapshot.vulkanApi = PackedVulkanVersion(capabilities.identity.vulkanApiVersion);
-    snapshot.rtMode = horde::vulkan::ToString(capabilities.rtMode);
+    snapshot.rtMode = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
         horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ));
     snapshot.materialEncoding = context.rtScene.MaterialEncoding();
@@ -2208,7 +2564,7 @@ bool CreateInstance(VkInstance& instance)
         VK_MAKE_VERSION(1, 0, 0),
         "horde_rt",
         VK_MAKE_VERSION(1, 0, 0),
-        VK_API_VERSION_1_1};
+        VK_API_VERSION_1_2};
 
     const VkInstanceCreateInfo createInfo{
         VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
@@ -2264,7 +2620,8 @@ bool FindGraphicsAndPresentQueueFamily(VkPhysicalDevice physicalDevice, VkSurfac
 
     for (uint32_t index = 0u; index < queueFamilyCount; ++index)
     {
-        if ((queueFamilies[index].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0u)
+        constexpr VkQueueFlags requiredFlags = VK_QUEUE_GRAPHICS_BIT | VK_QUEUE_COMPUTE_BIT;
+        if ((queueFamilies[index].queueFlags & requiredFlags) != requiredFlags)
         {
             continue;
         }
@@ -2333,11 +2690,12 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
 
 std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& context)
 {
-    constexpr std::array<int, 35u> controlIds{{
-        kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
+    constexpr std::array<int, 37u> controlIds{{
+        kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId, kReportProblemButtonId,
         kRtLabButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId,
-        kExitButtonId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId,
-        kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId,
+        kExitButtonId, kSensitivityButtonId, kWaterQualityButtonId,
+        kRenderScaleSliderId, kSfxVolumeSliderId, kMusicVolumeSliderId,
+        kFullscreenButtonId, kSettingsBackButtonId,
         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
         kRtLabWaterfallSliderId, kRtLabRoofSliderId, kRtLabDawnSliderId,
         kRtLabFogSliderId, kRtLabFireStrengthSliderId, kRtLabFireTurbulenceSliderId,
@@ -2480,11 +2838,14 @@ bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool inc
     case kRtLabHueSliderId: range = horde::platform::windows::RtLabControlRange::HueDegrees; break;
     default: rtLabSlider = false; break;
     }
-    if (!rtLabSlider && id != kRenderScaleSliderId) return false;
+    if (!rtLabSlider && id != kRenderScaleSliderId && id != kSfxVolumeSliderId &&
+        id != kMusicVolumeSliderId) return false;
     const int current = static_cast<int>(SendMessageA(focused, TBM_GETPOS, 0, 0));
     const int next = rtLabSlider
         ? horde::platform::windows::StepRtLabControl(current, increase, range)
-        : horde::platform::windows::StepControllerSlider(current, increase);
+        : (id == kRenderScaleSliderId
+               ? horde::platform::windows::StepControllerSlider(current, increase)
+               : horde::platform::windows::StepControllerAudioVolume(current, increase));
     if (next != current)
     {
         SendMessageA(focused, TBM_SETPOS, TRUE, next);
@@ -2756,7 +3117,9 @@ void PollDesktopController(VulkanSurfaceContext& context)
     HandleControllerMenuEdges(context, menuEdges);
 }
 
-void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
+void UpdateDesktopSceneControls(
+    VulkanSurfaceContext& context,
+    horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const int previousVitality = context.simulation.Snapshot().playerVitals.vitality;
     const horde::gameplay::PlayerLifePhase previousLifePhase =
@@ -2809,7 +3172,36 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
         const horde::gameplay::ShowcaseBenchmarkAdvance advance = context.benchmark.Advance();
         if (advance.lapStarted)
         {
-            ResetRoute(context);
+            ResetRoute(context, true);
+            if (context.benchmark.CurrentLap() == context.benchmark.TotalLaps() &&
+                context.rtFrameEvidenceInitialised)
+            {
+                (void)context.rtFrameEvidence.ApplyEvent(
+                    horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
+            }
+        }
+        const auto workload = context.benchmark.Workload();
+        if (horde::gameplay::IsLanternBenchmark(workload) && advance.frameInLap == 1u &&
+            !horde::gameplay::StageLanternBenchmark(context.simulation, workload))
+        {
+            LogBenchmarkCancellation(context, "lantern-staging-failed");
+            context.benchmark.Cancel();
+            context.benchmarkEvidence.Cancel();
+            return;
+        }
+        if (context.benchmark.CurrentLap() == context.benchmark.TotalLaps())
+        {
+            if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Allocated)
+            {
+                // Single-lap mode has no lapStarted transition.
+                if (context.benchmark.TotalLaps() == 1u && context.rtFrameEvidenceInitialised)
+                    (void)context.rtFrameEvidence.ApplyEvent(horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
+                const auto state = context.rtFrameEvidence.PublishedStateByValue();
+                (void)context.benchmarkEvidence.ArmMeasurement(state.sceneEpoch, state.measurementGeneration);
+            }
+            if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+                context.expectedBenchmarkFrame = context.benchmarkEvidence.ExpectFrame(
+                    {static_cast<std::uint32_t>(advance.replay.zone), context.benchmark.CurrentLap()});
         }
         input = context.simulationInput;
         input.paused = false;
@@ -2818,7 +3210,9 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
         input.authoritativePlayerX = advance.replay.x;
         input.authoritativePlayerZ = advance.replay.z;
         input.yawRadians = advance.replay.yaw;
-        input.pitchRadians = -0.04f;
+        input.pitchRadians = horde::gameplay::IsLanternBenchmark(workload)
+            ? horde::gameplay::kLanternBenchmarkPitch : -0.04f;
+        if (horde::gameplay::IsFrozenBenchmark(workload)) context.frameDeltaSeconds = 0.0f;
         input.torchLightStrength = context.torchLightStrength;
         input.commands.attack = context.attackSequence;
         input.commands.parry = context.parrySequence;
@@ -2834,9 +3228,12 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     }
 
     context.simulationInput = input;
+    horde::vulkan::raytracing::RtSceneStageScope simulationScope(
+        observation, horde::telemetry::RtStage::SimulationStep);
     context.simulation.AdvanceFrame(input,
                                     context.frameDeltaSeconds,
                                     ++context.inputPublicationSequence);
+    simulationScope.Complete(1u);
     // Camera yaw/pitch are continuous platform input targets. A render frame
     // may not produce a 60 Hz simulation tick, so copying the previous fixed
     // snapshot back here would erase right-stick and mouse look accumulated
@@ -2847,6 +3244,10 @@ void UpdateDesktopSceneControls(VulkanSurfaceContext& context)
     {
         UpdateVitalityHud(context);
     }
+    if (horde::gameplay::IsLanternBenchmark(context.benchmark.Workload()) &&
+        !context.benchmarkCompletionHandled &&
+        (context.benchmark.FrameInLap() == 1u || context.benchmark.FrameInLap() % 60u == 0u))
+        UpdateBenchmarkHud(context);
 }
 
 #if defined(_DEBUG)
@@ -2898,7 +3299,7 @@ bool SetDesktopMovementKey(VulkanSurfaceContext& context, const WPARAM key, cons
 
 bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
                          uint32_t graphicsQueueFamilyIndex,
-                         const horde::vulkan::DeviceCapabilities& capabilities,
+                         horde::vulkan::RtExecutionBackend executionBackend,
                          VkDevice& device,
                          VkQueue& graphicsQueue)
 {
@@ -2911,22 +3312,17 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
         1u,
         &queuePriority};
     std::vector<const char*> extensions{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-    const bool enableRayTracing = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    const auto rtPlan = horde::vulkan::raytracing::MakeRtDeviceEnablePlan(executionBackend);
+    const bool enableRayTracing = rtPlan.has_value();
+    const horde::vulkan::FeatureSupport requestedFeatures = rtPlan ? rtPlan->features : horde::vulkan::FeatureSupport{};
     if (enableRayTracing)
     {
-        const char* rtExtensions[] = {
-            VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
-            VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
-            VK_KHR_RAY_QUERY_EXTENSION_NAME,
-            VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
-            VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
-            VK_KHR_SPIRV_1_4_EXTENSION_NAME,
-            VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME};
-        for (const char* extension : rtExtensions)
+        for (std::uint32_t index = 0u; index < rtPlan->extensionCount; ++index)
         {
+            const char* extension = rtPlan->extensions[index];
             if (!HasDeviceExtension(physicalDevice, extension))
             {
-                std::cerr << "Selected RayTracingPipeline device is missing required extension: " << extension << ".\n";
+                std::cerr << "Selected hardware RT backend is missing required extension: " << extension << ".\n";
                 return false;
             }
             extensions.push_back(extension);
@@ -2935,22 +3331,24 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
 
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR};
-    accelerationStructureFeatures.accelerationStructure = enableRayTracing ? VK_TRUE : VK_FALSE;
+    accelerationStructureFeatures.accelerationStructure = requestedFeatures.accelerationStructure ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
-    rayTracingPipelineFeatures.rayTracingPipeline = enableRayTracing ? VK_TRUE : VK_FALSE;
+    rayTracingPipelineFeatures.rayTracingPipeline = requestedFeatures.rayTracingPipeline ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
-    rayQueryFeatures.rayQuery = enableRayTracing ? VK_TRUE : VK_FALSE;
+    rayQueryFeatures.rayQuery = requestedFeatures.rayQuery ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceBufferDeviceAddressFeaturesKHR bufferDeviceAddressFeatures{
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR};
-    bufferDeviceAddressFeatures.bufferDeviceAddress = enableRayTracing ? VK_TRUE : VK_FALSE;
+    bufferDeviceAddressFeatures.bufferDeviceAddress = requestedFeatures.bufferDeviceAddress ? VK_TRUE : VK_FALSE;
     VkPhysicalDeviceFeatures2 features2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
     VkPhysicalDeviceFeatures supportedCoreFeatures{};
     vkGetPhysicalDeviceFeatures(physicalDevice, &supportedCoreFeatures);
     features2.features.textureCompressionASTC_LDR = supportedCoreFeatures.textureCompressionASTC_LDR;
     features2.pNext = &accelerationStructureFeatures;
-    accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
+    accelerationStructureFeatures.pNext = &rayQueryFeatures;
+    if (requestedFeatures.rayTracingPipeline)
+        accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
     rayTracingPipelineFeatures.pNext = &rayQueryFeatures;
     rayQueryFeatures.pNext = &bufferDeviceAddressFeatures;
 
@@ -3244,15 +3642,99 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
     return true;
 }
 
-void ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
+void AcceptBenchmarkCompletion(
+    VulkanSurfaceContext& ctx,
+    const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult& result,
+    const horde::telemetry::RtPerformanceEvidenceSnapshot& snapshot)
+{
+    if (result.completedEvidence &&
+        ctx.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring &&
+        snapshot.identity.submitted.frame.sceneEpoch == ctx.benchmarkEvidence.SceneEpoch() &&
+        snapshot.identity.submitted.frame.measurementGeneration == ctx.benchmarkEvidence.MeasurementGeneration())
+    {
+        (void)ctx.benchmarkEvidence.Complete(snapshot);
+    }
+}
+
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+void CollectStagedPassTiming(VulkanSurfaceContext& ctx, std::uint32_t frameSlot,
+                            const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult& result,
+                            const horde::telemetry::RtPerformanceEvidenceSnapshot& snapshot)
+{
+    // Called only after this slot's fence or a successful device idle. Even a
+    // discarded benchmark identity must consume its query slot before reuse.
+    if (!result.ownedGraphicsSubmission) return;
+    const auto timing = ctx.stagedPassTimer.CollectCompleted(frameSlot);
+    if (result.completedEvidence &&
+        ctx.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring &&
+        snapshot.identity.submitted.frame.sceneEpoch == ctx.benchmarkEvidence.SceneEpoch() &&
+        snapshot.identity.submitted.frame.measurementGeneration == ctx.benchmarkEvidence.MeasurementGeneration())
+        (void)ctx.stagedPassProfile.Append(timing, snapshot);
+}
+#endif
+
+bool CompleteRtEvidenceAfterDeviceIdle(
+    VulkanSurfaceContext& ctx,
+    const VkResult idleResult)
+{
+    if (!ctx.rtFrameEvidenceInitialised)
+    {
+        return idleResult == VK_SUCCESS;
+    }
+    if (idleResult != VK_SUCCESS)
+    {
+        ctx.rtFrameEvidence.NoteFailedDeviceIdle();
+        ctx.lastRtFrameError = "vkDeviceWaitIdle failed before RT evidence completion.";
+        return false;
+    }
+
+    const horde::vulkan::raytracing::RtGpuFrameTimerIo gpuIo =
+        horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer);
+    const horde::vulkan::raytracing::RtDiagnosticFrameIo diagnosticIo =
+        horde::vulkan::raytracing::MakeRtDiagnosticFrameIo(ctx.rtScene);
+    bool completed = true;
+    for (std::uint32_t frameSlot = 0u; frameSlot < kMaxFramesInFlight; ++frameSlot)
+    {
+        horde::telemetry::RtPerformanceEvidenceSnapshot snapshot{};
+        const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult result =
+            ctx.rtFrameEvidence.CompleteFinalIdle(frameSlot, gpuIo, diagnosticIo, &snapshot);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        CollectStagedPassTiming(ctx, frameSlot, result, snapshot);
+#endif
+        AcceptBenchmarkCompletion(ctx, result, snapshot);
+        if (result.gpuCollectionAttempted)
+        {
+            RefreshGpuTimingTelemetry(ctx, &result.gpuCollection);
+        }
+        if (result.fatalDiagnosticIoFailure)
+        {
+            ctx.lastRtFrameError =
+                "Failed to read the completed RT Diagnostic buffer after device idle.";
+            completed = false;
+        }
+    }
+    return completed;
+}
+
+bool ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
 {
     if (ctx.device == VK_NULL_HANDLE)
     {
-        return;
+        ctx.benchmarkEvidence.Cancel();
+        return true;
     }
 
-    vkDeviceWaitIdle(ctx.device);
+    const VkResult idleResult = vkDeviceWaitIdle(ctx.device);
+    const bool evidenceCompleted = CompleteRtEvidenceAfterDeviceIdle(ctx, idleResult);
+    ctx.benchmarkEvidence.Cancel();
+    const bool evidenceRecreated = !ctx.rtFrameEvidenceInitialised ||
+        ctx.rtFrameEvidence.Recreate(
+            horde::telemetry::RtResourceResetReason::SwapchainRecreate,
+            CurrentInitialGpuEvidenceStatus(ctx));
     ctx.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    if (idleResult == VK_SUCCESS) ctx.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
     ctx.gpuFrameTimingTotalMs = 0.0;
     ctx.gpuFrameTimingSampleCount = 0u;
     ctx.rtScene.Destroy();
@@ -3329,6 +3811,7 @@ void ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
     ctx.swapchainImageLayouts.clear();
     ctx.swapchainImages.clear();
     ctx.currentFrame = 0u;
+    return evidenceCompleted && evidenceRecreated;
 }
 
 VkExtent2D ScaledRenderExtent(VkExtent2D presentationExtent, float renderScale)
@@ -3341,11 +3824,11 @@ VkExtent2D ScaledRenderExtent(VkExtent2D presentationExtent, float renderScale)
 
 void RefreshGpuTimingTelemetry(
     VulkanSurfaceContext& ctx,
-    const std::optional<horde::vulkan::GpuFrameTimingSample>& completedSample = std::nullopt)
+    const horde::vulkan::GpuFrameTimingCollection* completed)
 {
-    if (completedSample.has_value())
+    if (completed != nullptr && completed->hasSample)
     {
-        ctx.gpuFrameTimingTotalMs += completedSample->milliseconds;
+        ctx.gpuFrameTimingTotalMs += completed->sample.milliseconds;
         ++ctx.gpuFrameTimingSampleCount;
     }
     const horde::vulkan::GpuFrameTimerTelemetry& timer = ctx.gpuFrameTimer.Telemetry();
@@ -3363,6 +3846,17 @@ void RefreshGpuTimingTelemetry(
     output.sampleCount = ctx.gpuFrameTimingSampleCount;
     output.unavailableCount = timer.unavailableResultCount;
     output.errorCount = timer.errorCount;
+}
+
+horde::telemetry::RtSampleStatus CurrentInitialGpuEvidenceStatus(
+    VulkanSurfaceContext& ctx)
+{
+    const horde::vulkan::raytracing::RtGpuFrameTimerIo gpuIo =
+        horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer);
+    const horde::vulkan::raytracing::RtGpuTimerStateSnapshot timer =
+        gpuIo.snapshot != nullptr ? gpuIo.snapshot(gpuIo.user)
+                                  : horde::vulkan::raytracing::RtGpuTimerStateSnapshot{};
+    return horde::vulkan::raytracing::InitialRtGpuEvidenceStatus(true, timer);
 }
 
 bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
@@ -3397,10 +3891,11 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
                                 (assetRoot / "textures/meshy/lich_placeholder_v01").string(),
                                 diagnostic,
                                 developmentStaticAssetDirectory,
-                                assetRoot.string()))
+                                assetRoot.string(),
+                                ctx.executionBackend))
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
-        MessageBoxA(ctx.windowHandle,
+        if (!ctx.unattendedBenchmark) MessageBoxA(ctx.windowHandle,
                     ("The native RT scene could not start.\n\n" + diagnostic +
                      "\n\nKeep the packaged assets folder beside HordeLanternRT.exe. No fallback renderer will be used.").c_str(),
                     "Horde Lantern RT - startup error",
@@ -3412,7 +3907,31 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
         ctx.gpuFrameTimer.Initialise(
             ctx.physicalDevice, ctx.device, ctx.graphicsQueueFamilyIndex, kMaxFramesInFlight);
     }
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    if (ctx.stagedPassTimer.Status() == horde::vulkan::raytracing::experimental::StagedPrimaryTimingInitStatus::Uninitialised)
+        ctx.stagedPassTimer.Initialise(ctx.physicalDevice, ctx.device, ctx.graphicsQueueFamilyIndex, kMaxFramesInFlight);
+#endif
     RefreshGpuTimingTelemetry(ctx);
+    if (!ctx.rtFrameEvidenceInitialised)
+    {
+        horde::telemetry::RtLifecycleSeeds seeds{};
+        seeds.sceneEpoch = 1u;
+        seeds.measurementGeneration = 1u;
+        const horde::telemetry::RtInstrumentationMode instrumentation =
+            ctx.rtScene.DiagnosticsAvailability() ==
+                    horde::vulkan::raytracing::RtDiagnosticAvailability::Available
+                ? horde::telemetry::RtInstrumentationMode::Diagnostic
+                : horde::telemetry::RtInstrumentationMode::Shipping;
+        if (!ctx.rtFrameEvidence.Initialise(
+                seeds, kMaxFramesInFlight, instrumentation,
+                CurrentInitialGpuEvidenceStatus(ctx),
+                MeasurementPausedByUi(ctx)))
+        {
+            ctx.lastRtFrameError = "Invalid RT evidence ownership configuration.";
+            return false;
+        }
+        ctx.rtFrameEvidenceInitialised = true;
+    }
     std::cout << "PBR material encoding: " << ctx.rtScene.MaterialEncoding() << '\n'
               << "RT render scale " << std::round(ctx.renderScale * 100.0f) << "%: "
               << renderExtent.width << 'x' << renderExtent.height << " -> "
@@ -3443,19 +3962,29 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx)
 
 bool RecreateSwapchain(VulkanSurfaceContext& ctx)
 {
-    ReleaseSwapchainResources(ctx);
+    if (!ReleaseSwapchainResources(ctx))
+    {
+        return false;
+    }
     if (ctx.windowHandle == nullptr)
     {
         return false;
     }
 
-    return CreateSwapchain(ctx, ctx.windowHandle) && InitialiseRtSceneForSwapchain(ctx);
+    return CreateSwapchain(ctx, ctx.windowHandle) &&
+           InitialiseRtSceneForSwapchain(ctx);
 }
 
 void DestroyRenderContext(VulkanSurfaceContext& ctx)
 {
+    if (ctx.musicPlayback) ctx.musicPlayback->Stop(); // Join before context/storage destruction.
     if (ctx.device == VK_NULL_HANDLE)
     {
+        if (ctx.rtFrameEvidenceInitialised)
+        {
+            (void)ctx.rtFrameEvidence.Destroy();
+            ctx.rtFrameEvidenceInitialised = false;
+        }
         if (ctx.surface != VK_NULL_HANDLE)
         {
             vkDestroySurfaceKHR(ctx.instance, ctx.surface, nullptr);
@@ -3467,9 +3996,18 @@ void DestroyRenderContext(VulkanSurfaceContext& ctx)
         return;
     }
 
-    vkDeviceWaitIdle(ctx.device);
+    const VkResult idleResult = vkDeviceWaitIdle(ctx.device);
+    (void)CompleteRtEvidenceAfterDeviceIdle(ctx, idleResult);
+    if (ctx.rtFrameEvidenceInitialised)
+    {
+        (void)ctx.rtFrameEvidence.Destroy();
+        ctx.rtFrameEvidenceInitialised = false;
+    }
     ctx.rtScene.Destroy();
     ctx.gpuFrameTimer.Destroy();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    ctx.stagedPassTimer.Destroy();
+#endif
 
     for (VkFence fence : ctx.inFlightFences)
     {
@@ -3535,20 +4073,74 @@ void DestroyRenderContext(VulkanSurfaceContext& ctx)
 
 bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor, bool& rtFramePresented)
 {
+    const std::uint64_t frameStartNanoseconds =
+        horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
+    ctx.lastFramePresentation = horde::telemetry::RtPresentationOutcome::NotAttempted;
+    if (ctx.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        const auto state = ctx.rtFrameEvidence.PublishedStateByValue();
+        if (!state.running || state.paused ||
+            state.sceneEpoch != ctx.benchmarkEvidence.SceneEpoch() ||
+            state.measurementGeneration != ctx.benchmarkEvidence.MeasurementGeneration())
+            ctx.benchmarkEvidence.Cancel();
+    }
     rtFramePresented = false;
     if (ctx.commandBuffers.empty())
     {
         return false;
     }
 
-    const VkResult waitResult = vkWaitForFences(ctx.device, 1u, &ctx.inFlightFences[ctx.currentFrame], VK_TRUE, UINT64_MAX);
+    const bool useRtFrame = ctx.useRtPath && ctx.rtScene.IsReady();
+    horde::vulkan::raytracing::RtSceneRecordObservation observation{};
+    const bool evidenceFrame = useRtFrame && ctx.rtFrameEvidenceInitialised &&
+        ctx.rtFrameEvidence.BeginFrame(ctx.currentFrame, observation);
+    horde::vulkan::raytracing::RtSceneStageScope wholeFrameScope(
+        evidenceFrame ? &observation : nullptr,
+        horde::telemetry::RtStage::WholeFrameCycle,
+        frameStartNanoseconds);
+
+    horde::vulkan::raytracing::RtSceneStageScope fenceScope(
+        evidenceFrame ? &observation : nullptr,
+        horde::telemetry::RtStage::FrameFenceWait);
+    const VkResult waitResult = vkWaitForFences(
+        ctx.device, 1u, &ctx.inFlightFences[ctx.currentFrame], VK_TRUE, UINT64_MAX);
+    fenceScope.Complete(1u, 0u, 1u);
     if (waitResult != VK_SUCCESS)
     {
+        if (evidenceFrame)
+        {
+            ctx.rtFrameEvidence.AbortFrame();
+        }
         return false;
     }
-    RefreshGpuTimingTelemetry(ctx, ctx.gpuFrameTimer.CollectCompleted(ctx.currentFrame));
+
+    if (evidenceFrame)
+    {
+        horde::telemetry::RtPerformanceEvidenceSnapshot snapshot{};
+        const horde::vulkan::raytracing::RtFrameEvidenceCompletionResult completion =
+            ctx.rtFrameEvidence.CompleteFence(
+                ctx.currentFrame,
+                horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer),
+                horde::vulkan::raytracing::MakeRtDiagnosticFrameIo(ctx.rtScene), &snapshot);
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        CollectStagedPassTiming(ctx, ctx.currentFrame, completion, snapshot);
+#endif
+        AcceptBenchmarkCompletion(ctx, completion, snapshot);
+        RefreshGpuTimingTelemetry(
+            ctx, completion.gpuCollectionAttempted ? &completion.gpuCollection : nullptr);
+        if (completion.fatalDiagnosticIoFailure)
+        {
+            ctx.lastRtFrameError =
+                "Failed to read the completed RT Diagnostic buffer after its owning fence.";
+            ctx.rtFrameEvidence.AbortFrame();
+            return false;
+        }
+    }
 
     uint32_t imageIndex = 0u;
+    horde::vulkan::raytracing::RtSceneStageScope acquireScope(
+        evidenceFrame ? &observation : nullptr,
+        horde::telemetry::RtStage::ImageAcquire);
     const VkResult acquireResult = vkAcquireNextImageKHR(
         ctx.device,
         ctx.swapchain,
@@ -3556,13 +4148,22 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         ctx.imageAvailableSemaphores[ctx.currentFrame],
         VK_NULL_HANDLE,
         &imageIndex);
+    acquireScope.Complete(1u, 0u, 1u);
 
     if (acquireResult == VK_ERROR_OUT_OF_DATE_KHR || acquireResult == VK_SUBOPTIMAL_KHR)
     {
+        if (evidenceFrame)
+        {
+            ctx.rtFrameEvidence.AbortFrame();
+        }
         return RecreateSwapchain(ctx);
     }
     if (acquireResult != VK_SUCCESS)
     {
+        if (evidenceFrame)
+        {
+            ctx.rtFrameEvidence.AbortFrame();
+        }
         return false;
     }
 
@@ -3575,11 +4176,17 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     if (vkResetCommandBuffer(ctx.commandBuffers[imageIndex], 0u) != VK_SUCCESS ||
         vkBeginCommandBuffer(ctx.commandBuffers[imageIndex], &beginInfo) != VK_SUCCESS)
     {
+        if (evidenceFrame)
+        {
+            ctx.rtFrameEvidence.AbortFrame();
+        }
         return false;
     }
 
-    const bool useRtFrame = ctx.useRtPath && ctx.rtScene.IsReady();
     bool gpuTimingRecording = false;
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    horde::vulkan::raytracing::experimental::StagedPrimaryRecordingGuard stagedRecordingGuard(ctx.stagedPassTimer, ctx.currentFrame);
+#endif
     if (useRtFrame)
     {
         SpatialAudioEngine().Update();
@@ -3589,7 +4196,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             !ctx.developmentCheckpoint.empty();
         if (!frozenDevelopmentCheckpoint)
         {
-            UpdateDesktopSceneControls(ctx);
+            UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
         }
         UpdateWaterfallAmbience(ctx);
         const horde::gameplay::simulation::SimulationSnapshot& simulation =
@@ -3599,30 +4206,27 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             ShowDeathMenu(ctx);
         }
-        if (simulation.finaleComplete)
+        if (simulation.finaleComplete &&
+            (!ctx.benchmark.HasStarted() || ctx.benchmarkCompletionHandled))
         {
             TryGrantRtLabUnlock(ctx, true);
             ShowEndingMenu(ctx);
         }
+        PublishMusicPlayback(ctx);
         DrainGameplayEvents(ctx);
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning);
-        // Player-body checkpoints remain a deliberate skinned-route A/B proof.
-        // Ordinary gameplay, reward/glass proofs, and player-fallback captures
-        // use the production hybrid block-primary route selected below.
+        // Only explicit diagnostic comparisons opt out of the accepted
+        // modelled production presentation; gameplay and glass share one route.
         const horde::gameplay::DevelopmentCheckpoint* development =
             horde::gameplay::FindDevelopmentCheckpoint(ctx.developmentCheckpoint);
         const bool usesGlassFixture =
             development != nullptr && development->usesGlassFixture;
         const bool usesProductionRewardProps =
             development != nullptr && development->usesProductionRewardProps;
-        frameInputs.playerRenderRoute =
-            ctx.developmentCheckpoint.starts_with("player-body-")
-            ? horde::vulkan::raytracing::PlayerRenderRoute::Skinned
-            : ((usesGlassFixture || usesProductionRewardProps)
-                ? horde::vulkan::raytracing::PlayerRenderRoute::HybridBlockPrimary
-                : horde::vulkan::raytracing::PlayerRenderRoute::Procedural);
+        frameInputs.playerRenderRoute = horde::vulkan::raytracing::PlayerRenderRouteForCheckpoint(
+            ctx.developmentCheckpoint);
         if (usesGlassFixture)
         {
             frameInputs.tuning.glassFixtureVisible = true;
@@ -3651,15 +4255,28 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             }
         }
         std::string diagnostic;
-        gpuTimingRecording = ctx.gpuFrameTimer.RecordBegin(
+        if (evidenceFrame)
+        {
+            (void)ctx.rtFrameEvidence.BeginRecord(frameInputs.tickIndex);
+        }
+        gpuTimingRecording = evidenceFrame && ctx.gpuFrameTimer.RecordBegin(
             ctx.commandBuffers[imageIndex], ctx.currentFrame);
         if (!ctx.rtScene.RecordTraceAndCopy(ctx.commandBuffers[imageIndex],
                                             ctx.swapchainImages[imageIndex],
                                             ctx.swapchainImageLayouts[imageIndex],
                                             ctx.swapchainExtent,
                                             frameInputs,
-                                            diagnostic))
+                                            diagnostic,
+                                           evidenceFrame ? &observation : nullptr
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+                                           , gpuTimingRecording ? &ctx.stagedPassTimer : nullptr, ctx.currentFrame
+#endif
+                                           ))
         {
+            if (evidenceFrame)
+            {
+                ctx.rtFrameEvidence.FailRecord(observation);
+            }
             if (gpuTimingRecording)
             {
                 ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
@@ -3674,6 +4291,10 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
             gpuTimingRecording = false;
             RefreshGpuTimingTelemetry(ctx);
+        }
+        if (evidenceFrame)
+        {
+            (void)ctx.rtFrameEvidence.FinishRecord(observation);
         }
     }
     else
@@ -3699,13 +4320,35 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 
     if (vkEndCommandBuffer(ctx.commandBuffers[imageIndex]) != VK_SUCCESS)
     {
-        if (gpuTimingRecording) ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
+        if (evidenceFrame)
+        {
+            ctx.rtFrameEvidence.FailGraphicsSubmit(
+                gpuTimingRecording,
+                horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer));
+        }
+        else if (gpuTimingRecording)
+        {
+            ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
+        }
         return false;
     }
 
+    const horde::vulkan::raytracing::RtEvidenceSubmitTransaction submitTransaction =
+        evidenceFrame
+        ? ctx.rtFrameEvidence.PrevalidateSubmit()
+        : horde::vulkan::raytracing::RtEvidenceSubmitTransaction{};
     if (vkResetFences(ctx.device, 1u, &ctx.inFlightFences[ctx.currentFrame]) != VK_SUCCESS)
     {
-        if (gpuTimingRecording) ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
+        if (evidenceFrame)
+        {
+            ctx.rtFrameEvidence.FailGraphicsSubmit(
+                gpuTimingRecording,
+                horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer));
+        }
+        else if (gpuTimingRecording)
+        {
+            ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
+        }
         return false;
     }
 
@@ -3721,16 +4364,49 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         1u,
         &ctx.renderFinishedSemaphores[ctx.currentFrame]};
 
-    if (vkQueueSubmit(ctx.graphicsQueue, 1u, &submitInfo, ctx.inFlightFences[ctx.currentFrame]) != VK_SUCCESS)
+    horde::vulkan::raytracing::RtSceneStageScope submitScope(
+        evidenceFrame ? &observation : nullptr,
+        horde::telemetry::RtStage::QueueSubmit);
+    const VkResult submitResult = vkQueueSubmit(
+        ctx.graphicsQueue, 1u, &submitInfo, ctx.inFlightFences[ctx.currentFrame]);
+    submitScope.Complete(1u, 0u, 1u);
+    if (submitResult != VK_SUCCESS)
     {
-        if (gpuTimingRecording) ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
+        if (evidenceFrame)
+        {
+            ctx.rtFrameEvidence.FailGraphicsSubmit(
+                gpuTimingRecording,
+                horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer));
+        }
+        else if (gpuTimingRecording)
+        {
+            ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
+        }
         return false;
     }
-    if (gpuTimingRecording &&
-        !ctx.gpuFrameTimer.MarkSubmitted(ctx.currentFrame, ++ctx.gpuFrameSubmissionSequence))
+    if (useRtFrame) ctx.rtScene.NotifyFrameSubmitted();
+    if (evidenceFrame)
     {
-        ctx.gpuFrameTimer.CancelRecording(ctx.currentFrame);
-        RefreshGpuTimingTelemetry(ctx);
+        ctx.rtFrameEvidence.CommitGraphicsSubmit(
+            submitTransaction,
+            true,
+            gpuTimingRecording,
+            horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer));
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+        horde::telemetry::RtSubmittedFrameIdentity stagedOwner{};
+        if (ctx.rtFrameEvidence.TryGetCommittedIdentity(ctx.currentFrame, stagedOwner))
+            (void)ctx.stagedPassTimer.MarkSubmitted(ctx.currentFrame, stagedOwner.submissionSerial);
+#endif
+    }
+    if (ctx.expectedBenchmarkFrame &&
+        ctx.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
+    {
+        horde::telemetry::RtSubmittedFrameIdentity committed{};
+        if (ctx.rtFrameEvidence.TryGetCommittedIdentity(ctx.currentFrame, committed))
+            (void)ctx.benchmarkEvidence.BindSubmitted(*ctx.expectedBenchmarkFrame, committed);
+        else
+            (void)ctx.benchmarkEvidence.RejectExpected(*ctx.expectedBenchmarkFrame,
+                horde::telemetry::RtBenchmarkFailureReason::TokenlessCompletion);
     }
 
     VkPresentInfoKHR presentInfo{
@@ -3742,9 +4418,29 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         &ctx.swapchain,
         &imageIndex,
         nullptr};
+    horde::vulkan::raytracing::RtSceneStageScope presentScope(
+        evidenceFrame ? &observation : nullptr,
+        horde::telemetry::RtStage::PresentCall);
     const VkResult presentResult = vkQueuePresentKHR(ctx.graphicsQueue, &presentInfo);
+    presentScope.Complete(1u, 0u, 1u);
+    wholeFrameScope.Complete(1u, 0u, 1u);
+
+    ctx.lastFramePresentation =
+            presentResult == VK_SUCCESS
+            ? horde::telemetry::RtPresentationOutcome::Presented
+            : (presentResult == VK_SUBOPTIMAL_KHR
+                ? horde::telemetry::RtPresentationOutcome::PresentedNeedsRecreate
+                : presentResult == VK_ERROR_OUT_OF_DATE_KHR
+                ? horde::telemetry::RtPresentationOutcome::NotPresentedNeedsRecreate
+                : horde::telemetry::RtPresentationOutcome::Failed);
+    if (evidenceFrame)
+    {
+        (void)ctx.rtFrameEvidence.AttachPresentation(ctx.lastFramePresentation);
+        ctx.rtFrameEvidence.FinalizeSubmittedFrame(observation);
+    }
     if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR)
     {
+        rtFramePresented = useRtFrame && presentResult == VK_SUBOPTIMAL_KHR;
         return RecreateSwapchain(ctx);
     }
     if (presentResult != VK_SUCCESS)
@@ -3775,6 +4471,13 @@ void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
                             const horde::gameplay::ShowcaseCheckpoint& checkpoint)
 {
     context.simulation.ApplyShowcaseCheckpoint(checkpoint.id);
+    ++context.musicResetToken; // Import is an explicit audio discontinuity even at the same tick.
+    context.benchmarkEvidence.Cancel();
+    if (context.rtFrameEvidenceInitialised)
+    {
+        (void)context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::CheckpointChange);
+    }
     context.simulation.ClearEvents();
     context.simulation.ResetTiming();
     context.frameDeltaSeconds = 0.0f;
@@ -3835,7 +4538,24 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "  \"settlingFrames\": " << kCaptureSettlingFrames << ",\n"
              << "  \"fixedAnimationTimeSeconds\": 0.000000,\n"
              << "  \"buildId\": \"" << JsonEscape(HORDE_RT_BUILD_ID) << "\",\n"
-             << "  \"raygenSha256\": \"" << JsonEscape(HORDE_RT_RAYGEN_SHA256) << "\",\n"
+             << "  \"playerMountProfile\": \""
+             << (context.simulation.Snapshot().playerMountProfile ==
+                     horde::gameplay::items::PlayerMountProfile::AnatomicalBody
+                 ? "AnatomicalBody" : "LegacyViewRelative") << "\",\n"
+             << "  \"executionBackend\": \""
+             << JsonEscape(horde::vulkan::ToString(context.rtScene.ExecutionBackend())) << "\",\n"
+             << "  \"selectedRtPipelineBundle\": {\"opaqueFast\": {\"key\": \""
+             << JsonEscape(std::string(context.rtScene.SelectedOpaqueFastKey()))
+             << "\", \"sha256\": \""
+             << JsonEscape(std::string(context.rtScene.SelectedOpaqueFastSha256()))
+             << "\"}, \"genericDielectric\": {\"key\": \""
+             << JsonEscape(std::string(context.rtScene.SelectedGenericDielectricKey()))
+             << "\", \"sha256\": \""
+             << JsonEscape(std::string(context.rtScene.SelectedGenericDielectricSha256()))
+             << "\"}},\n"
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+             << "  \"executionOrganisation\": " << context.rtScene.ExecutionOrganisationJson() << ",\n"
+#endif
              << "  \"device\": {\n"
              << "    \"gpuName\": \"" << JsonEscape(capabilities.identity.gpuName) << "\",\n"
              << "    \"vendorId\": " << capabilities.identity.vendorId << ",\n"
@@ -3884,7 +4604,14 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << ", \"productionPropBlasBuildMilliseconds\": "
              << context.rtScene.ProductionPropBlasBuildMilliseconds()
              << "},\n"
-             << "  \"dielectricDiagnostics\": {\"transportOverflowCount\": "
+             << "  \"dielectricDiagnostics\": {\"availability\": \""
+             << horde::vulkan::raytracing::ToString(
+                    context.rtScene.DiagnosticsAvailability())
+             << "\", \"available\": "
+             << (context.rtScene.DiagnosticsAvailability() ==
+                         horde::vulkan::raytracing::RtDiagnosticAvailability::Available
+                     ? "true" : "false")
+             << ", \"transportOverflowCount\": "
              << context.rtScene.DielectricTransportOverflowCount()
              << ", \"shadowOverflowCount\": "
              << context.rtScene.DielectricShadowOverflowCount()
@@ -3906,7 +4633,14 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << context.rtScene.ProductionPaneSecondarySameMediumCount()
              << ", \"productionPaneSecondaryDifferentMediumCount\": "
              << context.rtScene.ProductionPaneSecondaryDifferentMediumCount() << "},\n"
-             << "  \"dielectricReasonDiagnostics\": {\"secondaryNearSelfHitCount\": "
+             << "  \"dielectricReasonDiagnostics\": {\"availability\": \""
+             << horde::vulkan::raytracing::ToString(
+                    context.rtScene.DiagnosticsAvailability())
+             << "\", \"available\": "
+             << (context.rtScene.DiagnosticsAvailability() ==
+                         horde::vulkan::raytracing::RtDiagnosticAvailability::Available
+                     ? "true" : "false")
+             << ", \"secondaryNearSelfHitCount\": "
              << context.rtScene.SecondaryNearSelfHitCount()
              << ", \"primaryOpenMissCount\": " << context.rtScene.PrimaryOpenMissCount()
              << ", \"primaryOpenOpaqueCount\": " << context.rtScene.PrimaryOpenOpaqueCount()
@@ -3969,7 +4703,9 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "      \"checkpoint\": \"" << JsonEscape(checkpoint.name) << "\",\n"
                  << "      \"preset\": \"" << CapturePresetName(checkpoint.preset) << "\",\n"
                  << "      \"zone\": \"" << horde::gameplay::ShowcaseZoneName(checkpoint.expectedZone) << "\",\n"
-                 << "      \"camera\": {\"x\": " << checkpoint.x << ", \"z\": " << checkpoint.z
+                 << "      \"camera\": {\"x\": " << capture.camera[0] << ", \"z\": " << capture.camera[1]
+                 << ", \"yaw\": " << capture.camera[2] << ", \"pitch\": " << capture.camera[3] << "},\n"
+                 << "      \"requestedCamera\": {\"x\": " << checkpoint.x << ", \"z\": " << checkpoint.z
                  << ", \"yaw\": " << checkpoint.yaw << ", \"pitch\": " << checkpoint.pitch << "},\n"
                  << "      \"state\": {\"torchFailurePhase\": \"" << capture.torchFailurePhase
                  << "\", \"selectedEnemy\": \"" << capture.selectedEnemy
@@ -3980,11 +4716,19 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "      \"honestlyPresentedRtFrame\": true,\n"
                  << "      \"visibility\": {\"playerPrimaryVisible\": "
                  << (capture.playerPrimaryVisible ? "true" : "false")
+                 << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
                  << ", \"instanceMasks\": [";
         for (std::size_t mask = 0u; mask < capture.instanceMasks.size(); ++mask)
             manifest << (mask == 0u ? "" : ", ")
                      << static_cast<std::uint32_t>(capture.instanceMasks[mask]);
-        manifest << "], \"primaryPixels\": {\"torch\": "
+        manifest << "], \"diagnostics\": {\"availability\": \""
+                 << horde::vulkan::raytracing::ToString(
+                        context.rtScene.DiagnosticsAvailability())
+                 << "\", \"available\": "
+                 << (context.rtScene.DiagnosticsAvailability() ==
+                             horde::vulkan::raytracing::RtDiagnosticAvailability::Available
+                         ? "true" : "false")
+                 << "}, \"primaryPixels\": {\"torch\": "
                  << capture.primaryTorchPixels << ", \"sword\": "
                  << capture.primarySwordPixels << ", \"player\": "
                  << capture.primaryPlayerPixels << ", \"rewardRing\": "
@@ -4016,6 +4760,16 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << (capture.redBlueSwapNormalised ? "true" : "false") << ",\n"
                  << "      \"pixelFormat\": \"RGBA8\",\n"
                  << "      \"file\": \"" << JsonEscape(capture.filename) << "\",\n"
+                 << "      \"viewmodelGeometry\": {\"available\": "
+                 << (capture.viewmodelGeometryFile.empty() ? "false" : "true")
+                 << ", \"space\": \"model\", \"source\": \"cpu-upload\", \"file\": \""
+                 << JsonEscape(capture.viewmodelGeometryFile) << "\", \"sha256\": \""
+                 << capture.viewmodelGeometrySha256 << "\"},\n"
+                 << "      \"playerWorldBodyGeometry\": {\"available\": "
+                 << (capture.playerWorldBodyGeometryFile.empty() ? "false" : "true")
+                 << ", \"space\": \"model\", \"source\": \"cpu-upload\", \"file\": \""
+                 << JsonEscape(capture.playerWorldBodyGeometryFile) << "\", \"sha256\": \""
+                 << capture.playerWorldBodyGeometrySha256 << "\"},\n"
                  << "      \"pngSha256\": \"" << capture.pngSha256 << "\"\n"
                  << "    }" << (index + 1u == captures.size() ? "\n" : ",\n");
     }
@@ -4123,6 +4877,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             frameTimesMs.push_back(std::chrono::duration<double, std::milli>(frameEnd - frameStart).count());
             capabilities.performance.gpuRt = context.gpuRtTiming;
             capabilities.rtScene.presented = true;
+            capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();
         }
 
         horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
@@ -4143,6 +4898,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         ShowcaseCaptureRecord record;
         record.checkpoint = &checkpoint;
         const horde::gameplay::simulation::SimulationSnapshot& simulation = context.simulation.Snapshot();
+        record.camera = {simulation.playerX, simulation.playerZ,
+                         simulation.playerYawRadians, simulation.playerPitchRadians};
         record.torchFailurePhase = horde::gameplay::TorchFailurePhaseName(simulation.torchFailure.phase);
         record.selectedEnemy = horde::gameplay::EnemyKindName(simulation.enemyRoster.selectedEnemy);
         record.lichPhase = horde::gameplay::LichPhaseName(simulation.lich.phase);
@@ -4153,6 +4910,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.redBlueSwapNormalised = image.redBlueSwapNormalised;
         record.instanceMasks = context.rtScene.LastInstanceMasks();
         record.playerPrimaryVisible = context.rtScene.LastPlayerPrimaryVisible();
+        record.playerWorldBodyInstanceFlags = context.rtScene.LastPlayerWorldBodyInstanceFlags();
         record.primaryTorchPixels = context.rtScene.PrimaryTorchPixelCount();
         record.primarySwordPixels = context.rtScene.PrimarySwordPixelCount();
         record.primaryPlayerPixels = context.rtScene.PrimaryPlayerPixelCount();
@@ -4181,46 +4939,60 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                  horde::gameplay::DevelopmentRewardPose::None);
         const auto claimedRewardPixelPolicy =
             horde::platform::windows::ClaimedRewardCapturePolicy(checkpoint.name);
+        const bool diagnosticPixelCountersAvailable =
+            context.rtScene.DiagnosticsAvailability() ==
+            horde::vulkan::raytracing::RtDiagnosticAvailability::Available;
+        const bool viewmodelCapture = horde::vulkan::raytracing::PlayerRenderRouteForCheckpoint(
+            context.developmentCheckpoint) == horde::vulkan::raytracing::kProductionPlayerRenderRoute;
+        const bool inspectionCapture = development != nullptr && development->usesProductionRewardProps &&
+            simulation.chestReward.phase == horde::gameplay::interactions::ChestRewardPhase::Locked;
+        const bool dedicatedPlayerOwnership = horde::vulkan::raytracing::HasDedicatedPlayerPrimaryOwnership(
+            record.instanceMasks, record.playerWorldBodyInstanceFlags);
+        if (viewmodelCapture && !inspectionCapture &&
+            (!dedicatedPlayerOwnership ||
+             !record.playerPrimaryVisible ||
+             (diagnosticPixelCountersAvailable && record.primaryPlayerPixels == 0u)))
+        {
+            return fail("Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership.");
+        }
         if (context.developmentCheckpoint.empty() &&
             !simulationRewardClaimed &&
             (record.instanceMasks[1] != 0x02u ||
              record.instanceMasks[3] != 0x02u ||
-             record.instanceMasks[4] != 0x10u ||
-             record.instanceMasks[10] != 0x04u ||
-             record.instanceMasks[11] != 0x04u ||
-             record.instanceMasks[12] != 0x04u ||
-             record.instanceMasks[13] != 0x04u ||
+             !dedicatedPlayerOwnership ||
              !record.playerPrimaryVisible ||
-             record.primaryPlayerPixels == 0u))
+             (diagnosticPixelCountersAvailable &&
+              record.primaryPlayerPixels == 0u)))
         {
             return fail(std::string("Checkpoint '") + checkpoint.name +
-                        "' masked the ordinary torch/sword or hybrid block-primary player instances.");
+                        "' masked the ordinary torch/sword or lost dedicated modelled player ownership.");
         }
-        if (checkpoint.name == "opening" &&
+        if (diagnosticPixelCountersAvailable && checkpoint.name == "opening" &&
             (record.primaryTorchPixels == 0u ||
              record.primarySwordPixels == 0u ||
              record.primaryPlayerPixels == 0u))
         {
-            return fail("Opening capture lacks primary-visible block arms, torch, or sword (floating-prop regression).");
+            return fail("Opening capture lacks primary-visible modelled arms, torch, or sword (floating-prop regression).");
         }
         if (claimedRewardCapture &&
-            (record.instanceMasks[4] != 0x10u ||
-             record.instanceMasks[10] != 0x04u ||
+            ((viewmodelCapture ? !dedicatedPlayerOwnership : record.instanceMasks[4] != 0x10u) ||
+             (!viewmodelCapture && (record.instanceMasks[10] != 0x04u ||
              record.instanceMasks[11] != 0x04u ||
              record.instanceMasks[12] != 0x04u ||
-             record.instanceMasks[13] != 0x04u ||
+             record.instanceMasks[13] != 0x04u)) ||
              !record.playerPrimaryVisible ||
              record.instanceMasks[7] != 0x01u ||
              record.instanceMasks[8] != 0x01u ||
-             record.primaryTorchPixels != 0u ||
-             (claimedRewardPixelPolicy.requirePlayerPixels &&
-              record.primaryPlayerPixels == 0u) ||
-             (claimedRewardPixelPolicy.requireRewardRingPixels &&
-              record.primaryRewardRingPixels == 0u) ||
-             (claimedRewardPixelPolicy.requireRewardBodyPixels &&
-              record.primaryRewardBodyPixels == 0u) ||
-             (claimedRewardPixelPolicy.requireSwordPixels &&
-              record.primarySwordPixels == 0u) ||
+             (diagnosticPixelCountersAvailable &&
+              (record.primaryTorchPixels != 0u ||
+               (claimedRewardPixelPolicy.requirePlayerPixels &&
+                record.primaryPlayerPixels == 0u) ||
+               (claimedRewardPixelPolicy.requireRewardRingPixels &&
+                record.primaryRewardRingPixels == 0u) ||
+               (claimedRewardPixelPolicy.requireRewardBodyPixels &&
+                record.primaryRewardBodyPixels == 0u) ||
+               (claimedRewardPixelPolicy.requireSwordPixels &&
+                record.primarySwordPixels == 0u))) ||
              record.rewardGripPositionErrorMetres >
                  horde::vulkan::raytracing::kPlayerGripSocketToleranceMetres ||
              record.rewardGripOrientationErrorRadians >
@@ -4255,6 +5027,25 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         {
             return fail(std::string("Checkpoint '") + checkpoint.name + "' hash failed: " + diagnostic);
         }
+        if (viewmodelCapture)
+        {
+            record.viewmodelGeometryFile = std::filesystem::path(record.filename).replace_extension(".obj").string();
+            const auto geometryPath = outputDirectory / record.viewmodelGeometryFile;
+            if (!context.rtScene.CaptureViewmodelMesh(geometryPath.string(), diagnostic) ||
+                !Sha256File(geometryPath, record.viewmodelGeometrySha256, diagnostic))
+                return fail(std::string("Checkpoint '") + checkpoint.name + "' geometry capture failed: " + diagnostic);
+
+            record.playerWorldBodyGeometryFile =
+                std::filesystem::path(record.filename).replace_extension(".player-world-body.obj").string();
+            const auto worldBodyGeometryPath =
+                outputDirectory / record.playerWorldBodyGeometryFile;
+            if (!context.rtScene.CapturePlayerWorldBodyMesh(
+                    worldBodyGeometryPath.string(), diagnostic) ||
+                !Sha256File(worldBodyGeometryPath,
+                            record.playerWorldBodyGeometrySha256, diagnostic))
+                return fail(std::string("Checkpoint '") + checkpoint.name +
+                            "' world-body geometry capture failed: " + diagnostic);
+        }
         captures.push_back(std::move(record));
         std::cout << "Captured " << checkpoint.name << " -> " << pngPath << '\n';
     }
@@ -4274,10 +5065,25 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const std::filesystem::path& textReportPath,
                                  const std::filesystem::path& jsonReportPath,
                                  const std::filesystem::path* captureDirectory,
-                                 const std::string* developmentCheckpoint)
+                                 const std::string* developmentCheckpoint,
+                                 const bool requireRayQueryCompute,
+                                 const bool unattendedBenchmark,
+                                 const horde::gameplay::BenchmarkWorkload benchmarkWorkload,
+                                 const bool anatomicalPlayerMount)
 {
     VulkanSurfaceContext context;
+    const bool explicitComparison = developmentCheckpoint != nullptr &&
+        horde::vulkan::raytracing::PlayerRenderRouteForCheckpoint(*developmentCheckpoint) !=
+            horde::vulkan::raytracing::kProductionPlayerRenderRoute;
+    context.simulation = horde::gameplay::simulation::GameSimulation(
+        explicitComparison ? horde::gameplay::simulation::GameSimulationConfig{} :
+                             horde::gameplay::simulation::ProductionGameSimulationConfig());
+    // The former opt-in argument remains compatible with recorded capture
+    // commands; every normal application now uses this accepted profile.
+    (void)anatomicalPlayerMount;
     context.windowHandle = hWnd;
+    context.capabilitySnapshot = &capabilities;
+    context.unattendedBenchmark = unattendedBenchmark;
     if (developmentCheckpoint != nullptr) context.developmentCheckpoint = *developmentCheckpoint;
     LoadSettings(context);
 #if defined(_DEBUG)
@@ -4295,7 +5101,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.renderScale = 1.0f;
         context.outputExposure = 0.62f;
         context.waterQuality = horde::vulkan::raytracing::WaterQuality::High;
-        context.sfxEnabled = false;
+        context.sfxVolumePercent = 0;
         context.simulationPaused = true;
         context.pauseMenuVisible = false;
     }
@@ -4309,10 +5115,6 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         DestroyRenderContext(context);
         return 1;
     }
-
-    const uint32_t desiredVendorId = capabilities.identity.vendorId;
-    const uint32_t desiredDeviceId = capabilities.identity.deviceId;
-    const std::string& desiredDeviceName = capabilities.identity.gpuName;
 
     uint32_t physicalDeviceCount = 0u;
     if (vkEnumeratePhysicalDevices(context.instance, &physicalDeviceCount, nullptr) != VK_SUCCESS || physicalDeviceCount == 0u)
@@ -4329,9 +5131,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     {
         VkPhysicalDeviceProperties properties{};
         vkGetPhysicalDeviceProperties(candidate, &properties);
-        if (properties.vendorID == desiredVendorId &&
-            properties.deviceID == desiredDeviceId &&
-            desiredDeviceName == properties.deviceName)
+        const horde::vulkan::DeviceIdentity candidateIdentity{
+            properties.deviceName, properties.vendorID, properties.deviceID,
+            properties.driverVersion, properties.apiVersion};
+        if (horde::vulkan::raytracing::SameRtDeviceIdentity(capabilities.identity, candidateIdentity))
         {
             context.physicalDevice = candidate;
             break;
@@ -4340,19 +5143,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 
     if (context.physicalDevice == VK_NULL_HANDLE)
     {
-        for (const VkPhysicalDevice candidate : physicalDevices)
-        {
-            uint32_t queueFamilyIndex = 0u;
-            if (FindGraphicsAndPresentQueueFamily(candidate, context.surface, queueFamilyIndex))
-            {
-                context.physicalDevice = candidate;
-                break;
-            }
-        }
-    }
-
-    if (context.physicalDevice == VK_NULL_HANDLE)
-    {
+        std::cerr << "No physical device matches the probed GPU, driver and API identity.\n";
         DestroyRenderContext(context);
         return 1;
     }
@@ -4363,8 +5154,25 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         return 1;
     }
 
-    context.useRtPath = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
-    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, capabilities, context.device, context.graphicsQueue))
+    context.executionBackend = horde::vulkan::raytracing::SelectRtExecutionBackend(
+        capabilities, true, requireRayQueryCompute);
+    horde::vulkan::BeginRtBackendSelection(capabilities.rtScene, context.executionBackend);
+    const bool selectedTextWritten = WriteReportFile(
+        textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
+    const bool selectedJsonWritten = WriteReportFile(
+        jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
+    if (!selectedTextWritten || !selectedJsonWritten)
+    {
+        std::cerr << "Failed to persist selected RT backend diagnostics.\n";
+    }
+    if (requireRayQueryCompute && context.executionBackend != horde::vulkan::RtExecutionBackend::RayQueryCompute)
+    {
+        std::cerr << "The required hardware RayQuery compute backend is unavailable; no other backend will be selected.\n";
+        DestroyRenderContext(context);
+        return 2;
+    }
+    context.useRtPath = context.executionBackend != horde::vulkan::RtExecutionBackend::Unsupported;
+    if (!CreateLogicalDevice(context.physicalDevice, context.graphicsQueueFamilyIndex, context.executionBackend, context.device, context.graphicsQueue))
     {
         DestroyRenderContext(context);
         return 1;
@@ -4387,9 +5195,21 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         SetWindowLongPtrA(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&context));
         if (captureDirectory == nullptr)
         {
+            // Normal gameplay and benchmark runs include music. Frozen image
+            // capture mode deliberately has no playback, as with existing SFX.
+            try
+            {
+                context.musicPlayback = std::make_unique<horde::platform::windows::WindowsMusicPlayback>(
+                    ResolveAssetRoot(), &LogWindowsAudio);
+            }
+            catch (const std::exception& error)
+            {
+                LogWindowsAudio(std::string("Music could not initialize; RT/SFX unchanged: ") + error.what());
+            }
             ApplyOverlayState(context);
-            horde::platform::windows::BeginGitHubReleaseUpdateCheck(
-                hWnd, HORDE_RT_DISPLAY_VERSION, false);
+            if (!unattendedBenchmark)
+                horde::platform::windows::BeginGitHubReleaseUpdateCheck(
+                    hWnd, HORDE_RT_DISPLAY_VERSION, false);
 #if defined(_DEBUG)
             if (context.rtLabDebugInjection) OpenRtLab(context);
             else
@@ -4401,7 +5221,35 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     if (captureDirectory != nullptr)
     {
-        const int captureResult = RunShowcaseCapture(context, capabilities, *captureDirectory);
+        int captureResult = RunShowcaseCapture(context, capabilities, *captureDirectory);
+        if (captureResult == 0 && capabilities.rtScene.presented)
+        {
+            capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();
+            capabilities.rtScene.status = "Presented via swapchain";
+            capabilities.rtScene.geometry =
+                "Complete Horde showcase route with sequential animated skeleton and staff-lit lich";
+            capabilities.rtScene.dispatchWidth = context.rtScene.DispatchExtent().width;
+            capabilities.rtScene.dispatchHeight = context.rtScene.DispatchExtent().height;
+            capabilities.performance.internalRenderWidth = capabilities.rtScene.dispatchWidth;
+            capabilities.performance.internalRenderHeight = capabilities.rtScene.dispatchHeight;
+            auto& presentationDiagnostics = capabilities.diagnostics;
+            presentationDiagnostics.erase(
+                std::remove(presentationDiagnostics.begin(), presentationDiagnostics.end(),
+                            "Internal render resolution: not measured yet."),
+                presentationDiagnostics.end());
+            const auto publication = context.rtFrameEvidence.PublishedStateByValue();
+            const auto* evidence = context.rtFrameEvidenceInitialised && context.rtFrameEvidence.ObserverAvailable()
+                ? &publication : nullptr;
+            const bool textReportWritten = WriteReportFile(
+                textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities, evidence));
+            const bool jsonReportWritten = WriteReportFile(
+                jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities, evidence));
+            if (!textReportWritten || !jsonReportWritten)
+            {
+                std::cerr << "Failed to refresh capability reports after successful showcase capture.\n";
+                captureResult = 1;
+            }
+        }
         if (IsWindow(hWnd))
         {
             SetWindowLongPtrA(hWnd, GWLP_USERDATA, 0);
@@ -4413,6 +5261,15 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     (void)captureDirectory;
 #endif
 
+    if (unattendedBenchmark)
+    {
+        if (!context.controlsEnabled)
+        {
+            DestroyRenderContext(context);
+            return 1;
+        }
+        StartBenchmark(context, benchmarkWorkload, false); // Unattended evidence has no FPS observer.
+    }
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
     MSG message{};
     bool running = true;
@@ -4443,13 +5300,28 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         {
             break;
         }
+        if (unattendedBenchmark && !context.benchmark.IsRunning())
+        {
+            CompleteBenchmark(context, capabilities, textReportPath.parent_path());
+            break;
+        }
 
         if (context.renderScaleDirty && context.useRtPath)
         {
+            context.benchmarkEvidence.Cancel();
             context.renderScaleDirty = false;
             timingSamples.clear();
-            vkDeviceWaitIdle(context.device);
+            const VkResult idleResult = vkDeviceWaitIdle(context.device);
+            const bool evidenceCompleted =
+                CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+            const bool evidenceRecreated = !context.rtFrameEvidenceInitialised ||
+                context.rtFrameEvidence.Recreate(
+                    horde::telemetry::RtResourceResetReason::RenderScaleChange,
+                    CurrentInitialGpuEvidenceStatus(context));
             context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+            if (idleResult == VK_SUCCESS) context.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
             context.gpuFrameTimingTotalMs = 0.0;
             context.gpuFrameTimingSampleCount = 0u;
             RefreshGpuTimingTelemetry(context);
@@ -4465,7 +5337,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             {
                 SetWindowTextA(hud, kHudApplyingScaleText);
             }
-            if (!InitialiseRtSceneForSwapchain(context))
+            if (!evidenceCompleted || !evidenceRecreated ||
+                !InitialiseRtSceneForSwapchain(context))
             {
                 renderFailed = true;
                 break;
@@ -4475,10 +5348,27 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         const bool benchmarkFrame = context.benchmark.IsRunning();
         const auto frameStart = std::chrono::steady_clock::now();
         bool rtFramePresented = false;
-        if (!RenderFrame(context, clearColor, rtFramePresented))
+        context.expectedBenchmarkFrame.reset();
+        const bool frameRendered = RenderFrame(context, clearColor, rtFramePresented);
+        if (context.expectedBenchmarkFrame &&
+            context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
         {
+            horde::telemetry::RtExpectedFrameRecord row{};
+            if (context.benchmarkEvidence.TryGetExpectedFrame(*context.expectedBenchmarkFrame, row) &&
+                row.disposition == horde::telemetry::RtExpectedFrameDisposition::AwaitingSubmission)
+                (void)context.benchmarkEvidence.RejectExpected(*context.expectedBenchmarkFrame,
+                    horde::telemetry::RtBenchmarkFailureReason::SubmissionFailed);
+        }
+        if (!frameRendered)
+        {
+            if (benchmarkFrame)
+            {
+                LogBenchmarkCancellation(context, "render-frame-failed");
+                context.benchmark.Cancel();
+                CompleteBenchmark(context, capabilities, textReportPath.parent_path());
+            }
             renderFailed = true;
-            MessageBoxA(hWnd,
+            if (!unattendedBenchmark) MessageBoxA(hWnd,
                         "The native RT render loop stopped unexpectedly. Check the reports folder for diagnostics.",
                         "Horde Lantern RT - renderer stopped",
                         MB_OK | MB_ICONERROR);
@@ -4491,7 +5381,19 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         if (benchmarkFrame)
         {
             timingSamples.clear();
+            if (context.lastFramePresentation ==
+                    horde::telemetry::RtPresentationOutcome::PresentedNeedsRecreate ||
+                context.lastFramePresentation ==
+                    horde::telemetry::RtPresentationOutcome::NotPresentedNeedsRecreate)
+            {
+                // A successful SUBOPTIMAL present is still honest presentation,
+                // but recreation interrupted this measurement. Cancel before
+                // RecordFrame so the legacy collector cannot admit its timing.
+                LogBenchmarkCancellation(context, "presentation-needs-recreate");
+                context.benchmark.Cancel();
+            }
             context.benchmark.RecordFrame(frameTimeMs, rtFramePresented);
+            if (context.benchmark.ConsumeLiveProgressUpdate()) UpdateBenchmarkHud(context);
             if (!context.benchmark.IsRunning())
             {
                 CompleteBenchmark(context, capabilities, textReportPath.parent_path());
@@ -4501,6 +5403,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         {
             timingSamples.push_back(frameTimeMs);
         }
+        const auto publication = context.rtFrameEvidence.PublishedStateByValue();
+        const auto* evidencePublication = context.rtFrameEvidenceInitialised && context.rtFrameEvidence.ObserverAvailable()
+            ? &publication : nullptr;
         if (timingSamples.size() >= 120u)
         {
             std::vector<double> sortedSamples = timingSamples;
@@ -4528,13 +5433,13 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             timingDiagnostics.erase(std::remove(timingDiagnostics.begin(), timingDiagnostics.end(),
                                                 "FPS / frame time: not measured yet."),
                                     timingDiagnostics.end());
-            WriteReportFile(textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
-            WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
+            WriteReportFile(textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities, evidencePublication));
+            WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities, evidencePublication));
             if (context.diagnosticsVisible)
             {
                 if (HWND edit = GetDlgItem(hWnd, kEditControlId))
                 {
-                    const std::string updatedText = WindowSafeText(BuildDisplayText(capabilities));
+                    const std::string updatedText = WindowSafeText(BuildDisplayText(capabilities, evidencePublication));
                     SetWindowTextA(edit, updatedText.c_str());
                 }
             }
@@ -4543,6 +5448,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         if (rtFramePresented && !capabilities.rtScene.presented)
         {
             capabilities.rtScene.presented = true;
+            capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();
             capabilities.rtScene.status = "Presented via swapchain";
             capabilities.rtScene.geometry = "Complete Horde showcase route with sequential animated skeleton and staff-lit lich";
             capabilities.rtScene.dispatchWidth = context.rtScene.DispatchExtent().width;
@@ -4553,15 +5459,15 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             presentationDiagnostics.erase(std::remove(presentationDiagnostics.begin(), presentationDiagnostics.end(),
                                                        "Internal render resolution: not measured yet."),
                                           presentationDiagnostics.end());
-            WriteReportFile(textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities));
-            WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities));
+            WriteReportFile(textReportPath, horde::vulkan::BuildCapabilityTextReport(capabilities, evidencePublication));
+            WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities, evidencePublication));
             if (HWND hud = GetDlgItem(hWnd, kHudControlId))
             {
                 SetWindowTextA(hud, kHudActiveText);
             }
             if (HWND edit = GetDlgItem(hWnd, kEditControlId))
             {
-                const std::string updatedText = WindowSafeText(BuildDisplayText(capabilities));
+                const std::string updatedText = WindowSafeText(BuildDisplayText(capabilities, evidencePublication));
                 SetWindowTextA(edit, updatedText.c_str());
             }
         }
@@ -4574,7 +5480,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     {
         SetWindowLongPtrA(hWnd, GWLP_USERDATA, 0);
     }
+    const bool benchmarkSucceeded = context.benchmark.Passed() && context.benchmarkReportsSaved &&
+        context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Complete &&
+        context.benchmarkEvidence.ExpectedCount() == context.benchmark.Frames().size();
     DestroyRenderContext(context);
+    if (unattendedBenchmark) return !renderFailed && benchmarkSucceeded ? 0 : 1;
     return renderFailed ? 1 : (running ? 0 : static_cast<int>(message.wParam));
 }
 
@@ -4647,11 +5557,13 @@ void ApplyDpiScaledFonts(HWND window)
     }
 #endif
     for (const int id : {kHudControlId, kVitalityHudControlId, kChestPromptControlId, kPauseTitleId, kEndingBodyId, kResumeButtonId, kRestartButtonId,
-                         kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
+                         kControlsButtonId, kSettingsButtonId, kReportProblemButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
                          kMoreBySamfa12ButtonId, kExitButtonId, kBenchmarkTitleId,
                          kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
-                         kSettingsTitleId, kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
-                         kRenderScaleSliderId, kFullscreenButtonId, kSettingsBackButtonId,
+                         kSettingsTitleId, kSfxVolumeLabelId, kSfxVolumeSliderId,
+                         kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
+                         kRenderScaleSliderId, kMusicVolumeLabelId, kMusicVolumeSliderId,
+                         kFullscreenButtonId, kSettingsBackButtonId,
                          kRtLabTitleId, kRtLabTelemetryId, kRtLabWaterfallLabelId, kRtLabWaterfallSliderId,
                          kRtLabRoofLabelId, kRtLabRoofSliderId, kRtLabDawnLabelId, kRtLabDawnSliderId,
                          kRtLabFogLabelId, kRtLabFogSliderId, kRtLabLightGroupButtonId,
@@ -4745,9 +5657,12 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     if (HWND hud = GetDlgItem(window, kHudControlId))
     {
         const int hudInset = ScaleForDpi(window, 14);
+        const bool expanded = sceneContext != nullptr && sceneContext->benchmark.ShowsLiveFps();
+        const LONG_PTR style = GetWindowLongPtrA(hud, GWL_STYLE);
+        SetWindowLongPtrA(hud, GWL_STYLE, expanded ? style & ~SS_CENTERIMAGE : style | SS_CENTERIMAGE);
         MoveWindow(hud, hudInset, hudInset,
                    std::min(ScaleForDpi(window, 650), std::max(ScaleForDpi(window, 260), width - hudInset * 2)),
-                   ScaleForDpi(window, 30), TRUE);
+                   ScaleForDpi(window, expanded ? 80 : 30), TRUE);
     }
     if (HWND vitality = GetDlgItem(window, kVitalityHudControlId))
     {
@@ -4795,7 +5710,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     const int compactButtonCount = endingLayout ? 4 : 3;
     const int pauseTotal = compactOverlayLayout
         ? titleHeight + endingBodyHeight + (endingLayout ? gap : 0) + compactButtonCount * buttonHeight + compactButtonCount * gap
-        : titleHeight + 9 * buttonHeight + 8 * gap;
+        : titleHeight + 10 * buttonHeight + 9 * gap;
     const int pauseX = (width - buttonWidth) / 2;
     int y = std::max(ScaleForDpi(window, 54), (height - pauseTotal) / 2);
     if (HWND title = GetDlgItem(window, kPauseTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
@@ -4819,8 +5734,9 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     }
     else
     {
-        for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId, kRtLabButtonId,
-                             kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
+        for (const int id : {kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId,
+                             kReportProblemButtonId, kRtLabButtonId, kDiagnosticsButtonId,
+                             kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
         {
             if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
             y += buttonHeight + gap;
@@ -4829,11 +5745,11 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
 
     const int labelHeight = ScaleForDpi(window, 26);
     const int sliderHeight = ScaleForDpi(window, 38);
-    const int settingsTotal = titleHeight + 5 * buttonHeight + labelHeight + sliderHeight + 6 * gap;
+    const int settingsTotal = titleHeight + 4 * buttonHeight + 3 * labelHeight + 3 * sliderHeight + 7 * gap;
     y = std::max(ScaleForDpi(window, 54), (height - settingsTotal) / 2);
     if (HWND title = GetDlgItem(window, kSettingsTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
     y += titleAdvance;
-    for (const int id : {kSfxButtonId, kSensitivityButtonId, kWaterQualityButtonId})
+    for (const int id : {kSensitivityButtonId, kWaterQualityButtonId})
     {
         if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
         y += buttonHeight + gap;
@@ -4841,6 +5757,14 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     if (HWND label = GetDlgItem(window, kRenderScaleLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
     y += labelHeight;
     if (HWND slider = GetDlgItem(window, kRenderScaleSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, sliderHeight, TRUE);
+    y += sliderHeight + gap;
+    if (HWND label = GetDlgItem(window, kSfxVolumeLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
+    y += labelHeight;
+    if (HWND slider = GetDlgItem(window, kSfxVolumeSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, sliderHeight, TRUE);
+    y += sliderHeight + gap;
+    if (HWND label = GetDlgItem(window, kMusicVolumeLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
+    y += labelHeight;
+    if (HWND slider = GetDlgItem(window, kMusicVolumeSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, sliderHeight, TRUE);
     y += sliderHeight + gap;
     for (const int id : {kFullscreenButtonId, kSettingsBackButtonId})
     {
@@ -5057,7 +5981,7 @@ void OpenSettings(VulkanSurfaceContext& context)
     context.benchmarkReportVisible = false;
     ApplyOverlayState(context);
     PlaySoundEffect(context, "ui_select.wav");
-    SetFocus(GetDlgItem(context.windowHandle, kSfxButtonId));
+    SetFocus(GetDlgItem(context.windowHandle, kSfxVolumeSliderId));
 }
 
 LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -5128,6 +6052,30 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_HSCROLL:
+        if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kSfxVolumeSliderId))
+        {
+            sceneContext->sfxVolumePercent = horde::audio::ClampSfxVolumePercent(
+                static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)));
+            (void)SpatialAudioEngine().SetMasterVolumePercent(sceneContext->sfxVolumePercent);
+            UpdateSettingsLabels(*sceneContext);
+            if (LOWORD(wParam) != TB_THUMBTRACK)
+            {
+                SaveSettings(*sceneContext);
+            }
+            return 0;
+        }
+        if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kMusicVolumeSliderId))
+        {
+            sceneContext->musicVolumePercent = std::clamp(
+                static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)), 0, 100);
+            UpdateSettingsLabels(*sceneContext);
+            PublishMusicPlayback(*sceneContext);
+            if (LOWORD(wParam) != TB_THUMBTRACK)
+            {
+                SaveSettings(*sceneContext);
+            }
+            return 0;
+        }
         if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kRenderScaleSliderId))
         {
             const int percentage = std::clamp(static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)), 50, 100);
@@ -5185,7 +6133,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 }
                 else if (LOWORD(wParam) == kMenuPauseId)
                 {
-                    CancelBenchmark(*sceneContext, true);
+                    CancelBenchmark(*sceneContext, true, "user-pause");
                 }
                 return 0;
             }
@@ -5228,7 +6176,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kRestartButtonId:
             case kMenuRestartId:
-                CancelBenchmark(*sceneContext, false);
+                CancelBenchmark(*sceneContext, false, "user-restart");
                 ResetRoute(*sceneContext);
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
                 ShowPauseMenu(*sceneContext, false);
@@ -5240,6 +6188,10 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kSettingsButtonId:
                 OpenSettings(*sceneContext);
+                return 0;
+            case kReportProblemButtonId:
+            case kMenuReportProblemId:
+                OpenPlaytestReport(*sceneContext);
                 return 0;
             case kRtLabButtonId:
                 OpenRtLab(*sceneContext);
@@ -5281,13 +6233,6 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 ToggleDeveloperOverlay(*sceneContext);
                 return 0;
 #endif
-            case kSfxButtonId:
-            case kMenuSfxId:
-                sceneContext->sfxEnabled = !sceneContext->sfxEnabled;
-                SaveSettings(*sceneContext);
-                UpdateSettingsLabels(*sceneContext);
-                PlaySoundEffect(*sceneContext, "ui_select.wav");
-                return 0;
             case kSensitivityButtonId:
                 sceneContext->mouseSensitivity = sceneContext->mouseSensitivity < 0.8f ? 1.0f :
                                                  (sceneContext->mouseSensitivity < 1.2f ? 1.35f : 0.70f);
@@ -5316,7 +6261,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             case kFullscreenButtonId:
             case kMenuFullscreenId:
-                CancelBenchmark(*sceneContext, true);
+                CancelBenchmark(*sceneContext, true, "fullscreen-change");
                 ToggleFullscreen(*sceneContext);
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
                 return 0;
@@ -5429,7 +6374,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 }
                 if (sceneContext->benchmark.IsRunning())
                 {
-                    CancelBenchmark(*sceneContext, true);
+                    CancelBenchmark(*sceneContext, true, "escape");
                     return 0;
                 }
                 if (sceneContext->benchmarkReportVisible)
@@ -5478,6 +6423,12 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 sceneContext->debugEnemyOverride = horde::gameplay::EnemyKind::None;
                 // Place the validation camera inside the real 2 m sword range.
                 sceneContext->simulation.ApplyShowcaseCheckpoint(10);
+                ++sceneContext->musicResetToken;
+                if (sceneContext->rtFrameEvidenceInitialised)
+                {
+                    (void)sceneContext->rtFrameEvidence.ApplyEvent(
+                        horde::telemetry::RtLifecycleEvent::CheckpointChange);
+                }
                 sceneContext->simulation.ClearEvents();
                 MirrorSimulationSnapshot(*sceneContext);
                 return 0;
@@ -5486,6 +6437,12 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             {
                 sceneContext->debugEnemyOverride = horde::gameplay::EnemyKind::None;
                 sceneContext->simulation.ApplyShowcaseCheckpoint(3);
+                ++sceneContext->musicResetToken;
+                if (sceneContext->rtFrameEvidenceInitialised)
+                {
+                    (void)sceneContext->rtFrameEvidence.ApplyEvent(
+                        horde::telemetry::RtLifecycleEvent::CheckpointChange);
+                }
                 sceneContext->simulation.ClearEvents();
                 MirrorSimulationSnapshot(*sceneContext);
                 return 0;
@@ -5525,7 +6482,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             {
                 const char* clip = (sceneContext->playerFootstepVariant++ & 1) == 0
                     ? "player_step_1.wav" : "player_step_2.wav";
-                PlayAmbientSoundEffect(*sceneContext, clip);
+                PlayAmbientSoundEffect(*sceneContext, clip, horde::audio::kPlayerFootstepCueGain);
                 return 0;
             }
             if (wParam == VK_F11 && (lParam & (1ll << 30)) == 0)
@@ -5673,15 +6630,25 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         break;
     case WM_ACTIVATEAPP:
+        if (sceneContext)
+        {
+            PublishMusicPlayback(*sceneContext, wParam == FALSE);
+        }
         if (sceneContext && wParam == FALSE && sceneContext->benchmark.IsRunning())
         {
-            CancelBenchmark(*sceneContext, true);
+            CancelBenchmark(*sceneContext, true, "app-deactivated");
+        }
+        break;
+    case WM_ACTIVATE:
+        if (sceneContext)
+        {
+            PublishMusicPlayback(*sceneContext, LOWORD(wParam) == WA_INACTIVE);
         }
         break;
     case WM_SIZE:
         if (sceneContext && sceneContext->benchmark.IsRunning() && wParam != SIZE_MINIMIZED)
         {
-            CancelBenchmark(*sceneContext, true);
+            CancelBenchmark(*sceneContext, true, "window-size");
         }
         LayoutOverlayControls(hWnd, LOWORD(lParam), HIWORD(lParam));
         return 0;
@@ -5700,7 +6667,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     {
         if (sceneContext && sceneContext->benchmark.IsRunning())
         {
-            CancelBenchmark(*sceneContext, true);
+            CancelBenchmark(*sceneContext, true, "dpi-change");
         }
         const auto* suggested = reinterpret_cast<const RECT*>(lParam);
         SetWindowPos(hWnd, nullptr,
@@ -5757,7 +6724,6 @@ HMENU CreateApplicationMenu()
     AppendMenuA(bar, MF_POPUP, reinterpret_cast<UINT_PTR>(demo), "&Demo");
 
     HMENU settings = CreatePopupMenu();
-    AppendMenuA(settings, MF_STRING | MF_CHECKED, kMenuSfxId, "Sound &effects");
     HMENU sensitivity = CreatePopupMenu();
     AppendMenuA(sensitivity, MF_STRING, kMenuSensitivityLowId, "Low");
     AppendMenuA(sensitivity, MF_STRING | MF_CHECKED, kMenuSensitivityNormalId, "Normal");
@@ -5774,6 +6740,7 @@ HMENU CreateApplicationMenu()
 #endif
     AppendMenuA(help, MF_SEPARATOR, 0, nullptr);
     AppendMenuA(help, MF_STRING, kMenuCheckUpdatesId, "Check for &updates...");
+    AppendMenuA(help, MF_STRING, kMenuReportProblemId, "&Report a problem...");
     AppendMenuA(help, MF_SEPARATOR, 0, nullptr);
     AppendMenuA(help, MF_STRING, kMenuCreditsId, "&Credits && licences");
     AppendMenuA(help, MF_STRING, kMenuAboutId, "&About");
@@ -5856,8 +6823,17 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const std::filesystem::path& textReportPath,
                         const std::filesystem::path& jsonReportPath,
                         const std::filesystem::path* captureDirectory,
-                        const std::string* developmentCheckpoint)
+                        const std::string* developmentCheckpoint,
+                        const bool portraitCapture,
+                        const bool requireRayQueryCompute,
+                        const bool unattendedBenchmark,
+                        const horde::gameplay::BenchmarkWorkload benchmarkWorkload,
+                        const bool anatomicalPlayerMount)
 {
+    // Only the Debug capture surface changes aspect; camera, gameplay pose,
+    // renderer quality and normal interactive-window sizing are untouched.
+    const auto captureWidth = portraitCapture ? kCaptureHeight : kCaptureWidth;
+    const auto captureHeight = portraitCapture ? kCaptureWidth : kCaptureHeight;
     const HINSTANCE instance = GetModuleHandleA(nullptr);
     INITCOMMONCONTROLSEX commonControls{sizeof(INITCOMMONCONTROLSEX), ICC_BAR_CLASSES};
     InitCommonControlsEx(&commonControls);
@@ -5881,7 +6857,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     int windowHeight = MulDiv(700, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi));
     if (captureDirectory != nullptr)
     {
-        RECT captureRect{0, 0, static_cast<LONG>(kCaptureWidth), static_cast<LONG>(kCaptureHeight)};
+        RECT captureRect{0, 0, static_cast<LONG>(captureWidth), static_cast<LONG>(captureHeight)};
         AdjustWindowRectEx(&captureRect, windowStyle, TRUE, 0u);
         windowWidth = captureRect.right - captureRect.left;
         windowHeight = captureRect.bottom - captureRect.top;
@@ -5913,9 +6889,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         GetWindowRect(hWnd, &windowRect);
         GetClientRect(hWnd, &actualClientRect);
         const int adjustedWidth = (windowRect.right - windowRect.left) +
-                                  static_cast<int>(kCaptureWidth) - (actualClientRect.right - actualClientRect.left);
+                                  static_cast<int>(captureWidth) - (actualClientRect.right - actualClientRect.left);
         const int adjustedHeight = (windowRect.bottom - windowRect.top) +
-                                   static_cast<int>(kCaptureHeight) - (actualClientRect.bottom - actualClientRect.top);
+                                   static_cast<int>(captureHeight) - (actualClientRect.bottom - actualClientRect.top);
         SetWindowPos(hWnd, nullptr, 0, 0, adjustedWidth, adjustedHeight,
                      SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
@@ -5977,6 +6953,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kRestartButtonId, "RESTART ROUTE");
     createButton(kControlsButtonId, "CONTROLS");
     createButton(kSettingsButtonId, "SETTINGS");
+    createButton(kReportProblemButtonId, "REPORT A PROBLEM...");
     createButton(kRtLabButtonId, "RT LAB");
     createButton(kDiagnosticsButtonId, "RT DIAGNOSTICS");
     createButton(kRunBenchmarkButtonId, "RUN BENCHMARK");
@@ -5987,7 +6964,6 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kBenchmarkSaveButtonId, "SAVE AS...");
     createButton(kBenchmarkBackButtonId, "BACK TO MENU");
     createStatic(kSettingsTitleId, "SETTINGS  |  SAVED BESIDE THE DEMO", SS_CENTER | SS_CENTERIMAGE);
-    createButton(kSfxButtonId, "SOUND EFFECTS: ON");
     createButton(kSensitivityButtonId, "LOOK SENSITIVITY: NORMAL");
     createButton(kWaterQualityButtonId, "RT WATER: HIGH");
     createStatic(kRenderScaleLabelId, "RENDER RESOLUTION: 100%", SS_CENTER | SS_CENTERIMAGE);
@@ -5999,6 +6975,24 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     SendMessageA(renderScaleSlider, TBM_SETRANGE, TRUE, MAKELPARAM(50, 100));
     SendMessageA(renderScaleSlider, TBM_SETTICFREQ, 10, 0);
     SendMessageA(renderScaleSlider, TBM_SETPOS, TRUE, 100);
+    createStatic(kSfxVolumeLabelId, "SFX VOLUME: 100%", SS_CENTER | SS_CENTERIMAGE);
+    HWND sfxVolumeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
+                                            WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,
+                                            0, 0, 100, 38, hWnd,
+                                            reinterpret_cast<HMENU>(static_cast<INT_PTR>(kSfxVolumeSliderId)), instance, nullptr);
+    InstallControllerFocusOutline(sfxVolumeSlider);
+    SendMessageA(sfxVolumeSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 100));
+    SendMessageA(sfxVolumeSlider, TBM_SETTICFREQ, 10, 0);
+    SendMessageA(sfxVolumeSlider, TBM_SETPOS, TRUE, 100);
+    createStatic(kMusicVolumeLabelId, "MUSIC VOLUME: 70%", SS_CENTER | SS_CENTERIMAGE);
+    HWND musicVolumeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
+                                              WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,
+                                              0, 0, 100, 38, hWnd,
+                                              reinterpret_cast<HMENU>(static_cast<INT_PTR>(kMusicVolumeSliderId)), instance, nullptr);
+    InstallControllerFocusOutline(musicVolumeSlider);
+    SendMessageA(musicVolumeSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 100));
+    SendMessageA(musicVolumeSlider, TBM_SETTICFREQ, 10, 0);
+    SendMessageA(musicVolumeSlider, TBM_SETPOS, TRUE, 70);
     createButton(kFullscreenButtonId, "DISPLAY: WINDOWED");
     createButton(kSettingsBackButtonId, "BACK");
 
@@ -6073,7 +7067,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     ApplyDpiScaledFonts(hWnd);
 
     const std::string windowText = WindowSafeText(diagnosticText);
-    const bool sceneMode = capabilities.rtMode == horde::vulkan::RtMode::RayTracingPipeline;
+    const bool sceneMode = horde::vulkan::raytracing::SelectRtExecutionBackend(capabilities, true) !=
+        horde::vulkan::RtExecutionBackend::Unsupported;
     const std::string windowTitle = sceneMode
         ? kWindowTitle
         : MakeWindowTitle(diagnosticText);
@@ -6102,9 +7097,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         GetWindowRect(hWnd, &windowRect);
         GetClientRect(hWnd, &actualClientRect);
         SetWindowPos(hWnd, nullptr, 0, 0,
-                     (windowRect.right - windowRect.left) + static_cast<int>(kCaptureWidth) -
+                     (windowRect.right - windowRect.left) + static_cast<int>(captureWidth) -
                          (actualClientRect.right - actualClientRect.left),
-                     (windowRect.bottom - windowRect.top) + static_cast<int>(kCaptureHeight) -
+                     (windowRect.bottom - windowRect.top) + static_cast<int>(captureHeight) -
                          (actualClientRect.bottom - actualClientRect.top),
                      SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
@@ -6116,8 +7111,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 
     const int result = RunDiagnosticSwapchainWindow(
         hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
-        developmentCheckpoint);
-    if (captureDirectory != nullptr && IsWindow(hWnd))
+        developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark, benchmarkWorkload,
+        anatomicalPlayerMount);
+    if ((captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
         DestroyWindow(hWnd);
     }
@@ -6161,7 +7157,9 @@ int RunDiagnosticWindow(const int showCommand)
     std::cout << diagnosticText << "\n\n";
 
     std::error_code error;
-    const std::filesystem::path reportDirectory = ExecutableDirectory() / kReportDirectory;
+    const std::filesystem::path reportDirectory = launchOptions.benchmark.requested
+        ? std::filesystem::absolute(std::filesystem::path(launchOptions.benchmark.outputDirectory))
+        : ExecutableDirectory() / kReportDirectory;
     std::filesystem::create_directories(reportDirectory, error);
     if (error)
     {
@@ -6194,7 +7192,10 @@ int RunDiagnosticWindow(const int showCommand)
         ? nullptr
         : &launchOptions.developmentCheckpoint;
     return CreateAndShowWindow(diagnosticText, capabilities, textReportPath, jsonReportPath,
-                               captureDirectory, developmentCheckpoint);
+                               captureDirectory, developmentCheckpoint, launchOptions.portrait,
+                               launchOptions.requireRayQueryCompute,
+                               launchOptions.benchmark.requested, launchOptions.benchmark.workload,
+                               launchOptions.anatomicalPlayerMount);
 }
 
 } // namespace horde::platform::windows

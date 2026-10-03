@@ -1,0 +1,9 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.6.1-engineering-pass/build/presets/windows-x64-release
+    Start 51: horde_rt_simulation_gameplay_tests
+1/2 Test #51: horde_rt_simulation_gameplay_tests ...   Passed    0.02 sec
+    Start 52: horde_rt_music_director_tests
+2/2 Test #52: horde_rt_music_director_tests ........   Passed    1.31 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   1.34 sec

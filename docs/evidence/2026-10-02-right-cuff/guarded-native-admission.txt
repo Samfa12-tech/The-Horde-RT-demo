@@ -1,0 +1,1 @@
+Viewmodel addressing, shared pose/vertex/tangent/grip agreement and invalid-pose rejection passed

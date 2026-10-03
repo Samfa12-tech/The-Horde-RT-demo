@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "sourceHead": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+  "expectedChangedKeys": [
+    "shipping_mobile_opaque_fast",
+    "shipping_mobile_generic_dielectric",
+    "rayquery_compute_shipping_mobile_opaque_fast",
+    "rayquery_compute_shipping_mobile_generic_dielectric"
+  ],
+  "artifacts": [
+    {
+      "kind": "control",
+      "apkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+      "nativeSha256": "41b34e601fa486e5cb5eeea24dd31df9771badb485b7cb74530344637644b049",
+      "modules": [
+        {
+          "key": "rayquery_compute_shipping_mobile_opaque_fast",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+          "words": 125318,
+          "rayQueryInitializations": 23,
+          "atomics": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        },
+        {
+          "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+          "words": 61022,
+          "rayQueryInitializations": 2,
+          "atomics": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        },
+        {
+          "key": "shipping_mobile_opaque_fast",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+          "words": 125253,
+          "rayQueryInitializations": 23,
+          "atomics": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        },
+        {
+          "key": "shipping_mobile_generic_dielectric",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+          "words": 60963,
+          "rayQueryInitializations": 2,
+          "atomics": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        }
+      ]
+    },
+    {
+      "kind": "isolate",
+      "apkSha256": "b57abb9127929665102a9de70b44085d6c469aeeee10fb016f09d6ffbd6d4829",
+      "nativeSha256": "0353ae686671c322cc1439c50becc51e1c527b5820892ea996f46ca80fe62866",
+      "modules": [
+        {
+          "key": "rayquery_compute_shipping_mobile_opaque_fast",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "7b35d5961d27c3385ed97fed8d4f4a00ccc0884b257a2480bd9ef56741a4d295",
+          "words": 118590,
+          "rayQueryInitializations": 6,
+          "atomics": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        },
+        {
+          "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "f72f6ee70cae2608e5b3f787cb37f3b51907e9078158deb70ada3273bbc97e76",
+          "words": 57156,
+          "rayQueryInitializations": 1,
+          "atomics": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        },
+        {
+          "key": "shipping_mobile_opaque_fast",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "1e2b907a3b1fce730711aeb97f369440d4f8d0b0c5d1619290e1b35b61952f23",
+          "words": 118525,
+          "rayQueryInitializations": 6,
+          "atomics": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        },
+        {
+          "key": "shipping_mobile_generic_dielectric",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "ec04234ca954a07070e669657b4bbfcf93fdb556a66be31580975c1a6df9e2ab",
+          "words": 57093,
+          "rayQueryInitializations": 1,
+          "atomics": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvVal": "passed",
+          "spirvDis": "passed"
+        }
+      ]
+    }
+  ]
+}
+

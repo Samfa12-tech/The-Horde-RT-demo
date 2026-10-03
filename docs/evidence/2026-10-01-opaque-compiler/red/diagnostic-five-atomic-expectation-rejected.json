@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "classification": "retained observation; earlier static-five-site expectation rejected by actual same-input experiment; not a production guard change",
+  "variant": "diagnostic_mobile_opaque_fast",
+  "sourceHead": "eafbf8262442a82e0835edf5cf5306d718e64633",
+  "samePreprocessedInputSha256": "4263a710ef0d381f3a6920ae9379f8f59f154d5a0280154b1459b0445838d8c2",
+  "ordinaryCompilerControl": {
+    "sha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+    "bytes": 505248,
+    "atomicInstructions": 5,
+    "hasDiagnosticsBinding22": true
+  },
+  "retainedCompilerModule": {
+    "sha256": "4ba45dce815f5e1af8282fd40d6d650e144556992b939a0254ff28a0e94831b4",
+    "bytes": 219932,
+    "atomicInstructions": 30,
+    "opcodeCounts": {
+      "OpAtomicIAdd": 27,
+      "OpAtomicOr": 3
+    },
+    "hasDiagnosticsBinding22": true,
+    "spirvValidation": "passed for Vulkan 1.2"
+  },
+  "disposition": "Lead superseded the expectation that retained compiler treatment must preserve the static count at five. The experimental catalog truthfully records 30. Do not alter production budgets, counters, compile guards, or claim runtime-counter equivalence; runtime ABI/counter roster remains unchanged and runtime evidence is still required."
+}

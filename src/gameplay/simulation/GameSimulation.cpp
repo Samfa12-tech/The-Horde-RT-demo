@@ -40,7 +40,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
       playerX_(config.playerStartX),
       playerZ_(config.playerStartZ),
       playerYawRadians_(config.playerStartYawRadians),
-      playerPitchRadians_(config.playerStartPitchRadians)
+      playerPitchRadians_(std::clamp(FiniteOr(config.playerStartPitchRadians, 0.0f),
+                                    kMinimumPitch, kMaximumPitch))
 {
     if (!IsShowcasePlayerPositionWalkable(playerX_, playerZ_))
     {
@@ -548,7 +549,8 @@ void GameSimulation::ResolveHeldItems()
         torchFailureSnapshot_,
         combatSnapshot_.player,
         combatSnapshot_.swordSwingRadians,
-        interactionState_};
+        interactionState_,
+        config_.playerMountProfile};
     // Every socket contract is a checked rigid transform. A failure would
     // indicate a source-code contract violation; preserve the last immutable
     // state rather than publishing a renderer-authored fallback.
@@ -646,7 +648,10 @@ void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
          walkTime_,
          combatSnapshot_.player,
          heldItemFixedStepState_.kinematics,
-         leftArmWeight},
+         leftArmWeight,
+         interactionState_.heldLightKind == horde::gameplay::interactions::HeldLightKind::RewardLantern,
+         lanternPendulum_.Snapshot().forwardAngleRadians,
+         lanternPendulum_.Snapshot().strafeAngleRadians},
         fixedDeltaSeconds);
 }
 
@@ -1085,6 +1090,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.playerVitals = playerVitals_.Snapshot();
     snapshot_.fireEmitters = fireEmitters_;
     snapshot_.fireEmitterCount = fireEmitterCount_;
+    snapshot_.playerMountProfile = config_.playerMountProfile;
     snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();
     snapshot_.catchUpOverrunCount = fixedStepRunner_.OverrunCount();
     snapshot_.queuedEventCount = events_.Size();

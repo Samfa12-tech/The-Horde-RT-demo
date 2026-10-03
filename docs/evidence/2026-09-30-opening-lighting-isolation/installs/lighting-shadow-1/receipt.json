@@ -1,0 +1,12 @@
+{
+  "artifact": "shadow",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "installedApkSha256": "23aa0cf67f5f0612290f8607078d47e7e47bdf81202d9290ab15cc796dd73fea",
+  "utc": "2026-09-30T08:55:53.8293331Z",
+  "nonphysicalWorkloadIsolation": true,
+  "publishable": false,
+  "appDataCleared": false,
+  "stableAppTouched": false
+}

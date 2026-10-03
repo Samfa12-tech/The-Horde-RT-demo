@@ -1,0 +1,7 @@
+Exception: C:\Dev\tmp\horde-primary-hit-profile-20261001\source\tools\compile-raygen.ps1:241
+Line |
+ 241 |          throw "$Label requires an absolute path."
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | ArtifactDirectory requires an absolute path.
+
+

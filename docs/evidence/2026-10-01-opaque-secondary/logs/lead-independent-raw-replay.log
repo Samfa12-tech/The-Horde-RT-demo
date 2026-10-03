@@ -1,0 +1,51 @@
+opaque-secondary-c1-route-20261001 integrity PASS: 1838 rows; median 59.0983 ms (16.921 FPS), p95 79.3641 ms; GPU median 48.0944 ms.
+opaque-secondary-c1-live-20261001 integrity PASS: 600 rows; median 235.0561 ms (4.254 FPS), p95 248.6921 ms; GPU median 223.38825 ms.
+opaque-secondary-s1-route-20261001 integrity PASS: 1838 rows; median 42.5299 ms (23.513 FPS), p95 55.8197 ms; GPU median 32.177291 ms.
+opaque-secondary-s1-live-20261001 integrity PASS: 600 rows; median 288.1404 ms (3.471 FPS), p95 312.5483 ms; GPU median 275.969108 ms.
+opaque-secondary-s2-route-20261001 integrity PASS: 1838 rows; median 41.0937 ms (24.335 FPS), p95 54.1981 ms; GPU median 30.381093 ms.
+opaque-secondary-s2-live-20261001 integrity PASS: 600 rows; median 314.0751 ms (3.184 FPS), p95 334.9927 ms; GPU median 302.4121805 ms.
+opaque-secondary-c2-route-20261001 integrity PASS: 1838 rows; median 70.8474 ms (14.115 FPS), p95 94.926 ms; GPU median 59.8481495 ms.
+opaque-secondary-c2-live-20261001 integrity PASS: 600 rows; median 270.232 ms (3.701 FPS), p95 295.5709 ms; GPU median 258.067728 ms.
+Aggregate all-8-strict-analyses: 8/8 strict analyses; 9752 owning rows; C:\Dev\tmp\horde-opaque-secondary-profile-20261001\lead-raw-replay-0b360ec815ad414db188aee44883d9cc\replayed-aggregate.json
+{
+  "result": "PASS",
+  "archive": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\curated-v5",
+  "replay": "C:\\Dev\\tmp\\horde-opaque-secondary-profile-20261001\\lead-raw-replay-0b360ec815ad414db188aee44883d9cc",
+  "rawRuns": [
+    {
+      "runId": "opaque-secondary-c1-route-20261001",
+      "result": "PASS: every analysis field agrees except relocated raw path"
+    },
+    {
+      "runId": "opaque-secondary-c1-live-20261001",
+      "result": "PASS: every analysis field agrees except relocated raw path"
+    },
+    {
+      "runId": "opaque-secondary-s1-route-20261001",
+      "result": "PASS: every analysis field agrees except relocated raw path"
+    },
+    {
+      "runId": "opaque-secondary-s1-live-20261001",
+      "result": "PASS: every analysis field agrees except relocated raw path"
+    },
+    {
+      "runId": "opaque-secondary-s2-route-20261001",
+      "result": "PASS: every analysis field agrees except relocated raw path"
+    },
+    {
+      "runId": "opaque-secondary-s2-live-20261001",
+      "result": "PASS: every analysis field agrees except relocated raw path"
+    },
+    {
+      "runId": "opaque-secondary-c2-route-20261001",
+      "result": "PASS: every analysis field agrees except relocated raw path"
+    },
+    {
+      "runId": "opaque-secondary-c2-live-20261001",
+      "result": "PASS: every analysis field agrees except relocated raw path"
+    }
+  ],
+  "aggregate": "All fields agree except new creation timestamp",
+  "owningRows": 9752,
+  "originalsOverwritten": false
+}

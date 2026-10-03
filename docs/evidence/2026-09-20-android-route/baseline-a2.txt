@@ -1,0 +1,48 @@
+HORDE LANTERN RT - IN-APP BENCHMARK
+====================================
+Integrity: COMPLETE
+Status: complete
+Timestamp (UTC): 2026-09-20T06:39:35Z
+Build: 1.6.0
+Shader: d0c8cccea28d
+GPU: Adreno (TM) 840
+Vulkan API: 1.4.295
+RT mode: RayTracingPipeline
+Swapchain present mode: MAILBOX
+RT presented every measured frame: yes
+Material route: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+Render scale: 76%
+Internal RT extent: 1094x2265
+Presentation extent: 1440x2980
+
+COURSE
+Preset: deterministic 13-waypoint complete showcase route
+Pass policy: lap 1 warm-up, final lap measured
+Simulation: fixed 0.032 world units/frame and 1/60 second gameplay step
+Laps completed: 2/2
+Waypoints reached: 26/26
+Measured frames: 1838
+
+OVERALL FRAME TIME
+Average: 58.955 ms
+Median: 58.795 ms (17.008 FPS)
+P95: 78.986 ms
+1% low: 11.638 FPS
+
+PER-ZONE FRAME TIME
+zone,frames,average_ms,median_ms,p95_ms,one_percent_low_fps
+opening,160,77.884,77.414,85.690,11.417
+skeleton-room,98,65.551,65.992,71.823,13.493
+shadow-corridor,599,65.480,63.239,78.278,12.055
+skylight-chamber,189,44.184,42.806,62.064,15.437
+yellow-torch-bay,157,51.152,50.385,57.480,16.819
+blue-torch-bay,157,52.077,51.298,59.025,16.127
+red-torch-bay,157,54.331,53.423,61.798,15.884
+green-torch-bay,157,57.714,57.369,63.570,14.991
+transmission-threshold,63,46.796,46.963,49.002,15.117
+finale,101,51.040,48.307,65.309,14.684
+
+This deterministic in-app course is intended for comparing Horde Lantern RT settings and builds.
+
+Private JSON copy: saved
+Use COPY REPORT or SAVE REPORT to export this result.

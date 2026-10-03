@@ -1,0 +1,65 @@
+> Task :app:verifyMusicRuntimeAssets
+> Task :app:prepareRuntimeAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preBenchmarkBuild UP-TO-DATE
+> Task :app:generateBenchmarkBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileBenchmark UP-TO-DATE
+> Task :app:checkBenchmarkAarMetadata UP-TO-DATE
+> Task :app:generateBenchmarkResValues UP-TO-DATE
+> Task :app:mapBenchmarkSourceSetPaths UP-TO-DATE
+> Task :app:generateBenchmarkResources UP-TO-DATE
+> Task :app:mergeBenchmarkResources UP-TO-DATE
+> Task :app:createBenchmarkCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksBenchmark UP-TO-DATE
+> Task :app:processBenchmarkMainManifest UP-TO-DATE
+> Task :app:processBenchmarkManifest UP-TO-DATE
+> Task :app:processBenchmarkManifestForPackage UP-TO-DATE
+> Task :app:processBenchmarkResources UP-TO-DATE
+> Task :app:compileBenchmarkJavaWithJavac UP-TO-DATE
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:generateBenchmarkLintVitalReportModel UP-TO-DATE
+> Task :app:lintVitalAnalyzeBenchmark UP-TO-DATE
+> Task :app:lintVitalReportBenchmark UP-TO-DATE
+> Task :app:lintVitalBenchmark
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :app:buildCMakeRelWithDebInfo[armeabi-v7a]
+> Task :app:configureCMakeRelWithDebInfo[x86]
+> Task :app:buildCMakeRelWithDebInfo[x86]
+> Task :app:configureCMakeRelWithDebInfo[x86_64]
+> Task :app:buildCMakeRelWithDebInfo[x86_64]
+> Task :app:mergeBenchmarkJniLibFolders UP-TO-DATE
+> Task :app:mergeBenchmarkArtProfile UP-TO-DATE
+> Task :app:desugarBenchmarkFileDependencies UP-TO-DATE
+> Task :app:dexBuilderBenchmark UP-TO-DATE
+> Task :app:mergeBenchmarkGlobalSynthetics UP-TO-DATE
+> Task :app:checkBenchmarkDuplicateClasses UP-TO-DATE
+> Task :app:mergeBenchmarkStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexBenchmark UP-TO-DATE
+> Task :app:mergeDexBenchmark UP-TO-DATE
+> Task :app:compileBenchmarkArtProfile UP-TO-DATE
+> Task :app:mergeBenchmarkShaders UP-TO-DATE
+> Task :app:compileBenchmarkShaders NO-SOURCE
+> Task :app:generateBenchmarkAssets UP-TO-DATE
+> Task :app:mergeBenchmarkAssets UP-TO-DATE
+> Task :app:compressBenchmarkAssets UP-TO-DATE
+> Task :app:extractBenchmarkVersionControlInfo UP-TO-DATE
+> Task :app:processBenchmarkJavaRes NO-SOURCE
+> Task :app:mergeBenchmarkJavaResource UP-TO-DATE
+> Task :app:optimizeBenchmarkResources UP-TO-DATE
+> Task :app:collectBenchmarkDependencies UP-TO-DATE
+> Task :app:sdkBenchmarkDependencyData UP-TO-DATE
+> Task :app:validateSigningBenchmark UP-TO-DATE
+> Task :app:writeBenchmarkAppMetadata UP-TO-DATE
+> Task :app:writeBenchmarkSigningConfigVersions UP-TO-DATE
+> Task :app:mergeBenchmarkNativeLibs
+> Task :app:stripBenchmarkDebugSymbols
+> Task :app:extractBenchmarkNativeSymbolTables
+> Task :app:packageBenchmark
+> Task :app:createBenchmarkApkListingFileRedirect UP-TO-DATE
+> Task :app:mergeBenchmarkNativeDebugMetadata
+> Task :app:assembleBenchmark
+
+BUILD SUCCESSFUL in 25s
+56 actionable tasks: 15 executed, 41 up-to-date

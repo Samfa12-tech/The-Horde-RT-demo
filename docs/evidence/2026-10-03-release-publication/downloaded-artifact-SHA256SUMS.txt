@@ -1,0 +1,2 @@
+3e1cdca75d78e02dbc3bb48553b1db68b6b4bf3e459a784e2be5473ad198c2cf  Horde-Lantern-RT-Alpha-1.6.1-Windows-x64.zip
+bc5c7ce3c755c16ec39e2c16fa9eae01c31983c7393e645f881c5bcc9e6a346c  Horde-Lantern-RT-Alpha-1.6.1-Android.apk

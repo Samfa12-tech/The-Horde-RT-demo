@@ -1,0 +1,259 @@
+{
+  "schema": 1,
+  "audit": "actual-sealed-APK-packaged-SPIR-V",
+  "sourceHead": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+  "classification": "nonphysical-primary-hit-reference-investigation-only",
+  "scriptSha256": "5d608c9fb774aa2f52ec3cdb2f47812cae70ea02254491567a4ffca62d27ed96",
+  "sourceFreeze": {
+    "patchSha256": "4500f823836f19123fd85b38fb4dd0220d11b96c84decb4e7b57280c0c74a277",
+    "referenceHeaderSha256": "bca3e4bb9f7c7c4aec176c38dcef5f988f94434d078db1cc77ca58705ab9cadb"
+  },
+  "apkZipAssetComparison": {
+    "payloadEntriesEach": 53,
+    "identicalPayloads": 53,
+    "changedPayloads": 0
+  },
+  "auditRules": {
+    "atomicMatcherIncludesNoResultOpcodes": true,
+    "shippingAtomicCount": 0,
+    "opImageReadCount": 0,
+    "binding22": false,
+    "moduleCountEach": 4,
+    "spirvTargetEnv": "vulkan1.2",
+    "disassemblyTempFilesRemoved": true,
+    "nativeELFRetained": false
+  },
+  "changedSemanticKeys": [
+    "rayquery_compute_shipping_mobile_generic_dielectric",
+    "rayquery_compute_shipping_mobile_opaque_fast",
+    "shipping_mobile_generic_dielectric",
+    "shipping_mobile_opaque_fast"
+  ],
+  "artifacts": [
+    {
+      "role": "control",
+      "apkSha256": "a6329657e585e9605098e667fc07fa1ef278626a4242f81a94f9f79d1d3cd033",
+      "nativeLibrarySha256": "41b34e601fa486e5cb5eeea24dd31df9771badb485b7cb74530344637644b049",
+      "modules": [
+        {
+          "semanticKey": "rayquery_compute_shipping_mobile_opaque_fast",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+          "words": 125318,
+          "disassemblyInstructionCount": 27555,
+          "rayQueryInitializations": 23,
+          "atomicsIncludingNoResult": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvValExitCode": 0,
+          "spirvDisExitCode": 0,
+          "spirvValLog": "control-rayquery_compute_shipping_mobile_opaque_fast-spirv-val.log",
+          "catalogFunctions": 1,
+          "catalogFunctionCalls": 0,
+          "catalogInstructions": 27555,
+          "catalogLoops": 49,
+          "catalogBranchOperations": 3697
+        },
+        {
+          "semanticKey": "rayquery_compute_shipping_mobile_generic_dielectric",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+          "words": 61022,
+          "disassemblyInstructionCount": 14546,
+          "rayQueryInitializations": 2,
+          "atomicsIncludingNoResult": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvValExitCode": 0,
+          "spirvDisExitCode": 0,
+          "spirvValLog": "control-rayquery_compute_shipping_mobile_generic_dielectric-spirv-val.log",
+          "catalogFunctions": 63,
+          "catalogFunctionCalls": 199,
+          "catalogInstructions": 14546,
+          "catalogLoops": 15,
+          "catalogBranchOperations": 784
+        },
+        {
+          "semanticKey": "shipping_mobile_opaque_fast",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+          "words": 125253,
+          "disassemblyInstructionCount": 27536,
+          "rayQueryInitializations": 23,
+          "atomicsIncludingNoResult": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvValExitCode": 0,
+          "spirvDisExitCode": 0,
+          "spirvValLog": "control-shipping_mobile_opaque_fast-spirv-val.log",
+          "catalogFunctions": 1,
+          "catalogFunctionCalls": 0,
+          "catalogInstructions": 27536,
+          "catalogLoops": 49,
+          "catalogBranchOperations": 3693
+        },
+        {
+          "semanticKey": "shipping_mobile_generic_dielectric",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+          "words": 60963,
+          "disassemblyInstructionCount": 14531,
+          "rayQueryInitializations": 2,
+          "atomicsIncludingNoResult": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvValExitCode": 0,
+          "spirvDisExitCode": 0,
+          "spirvValLog": "control-shipping_mobile_generic_dielectric-spirv-val.log",
+          "catalogFunctions": 63,
+          "catalogFunctionCalls": 199,
+          "catalogInstructions": 14531,
+          "catalogLoops": 15,
+          "catalogBranchOperations": 783
+        }
+      ]
+    },
+    {
+      "role": "reference",
+      "apkSha256": "40d0f759dca40ff8433ce4aca19156a135a9146a960f115f4cdbb78d3db7cf9e",
+      "nativeLibrarySha256": "f094974a32c6c20a7e3a0407e30635476b7e4f13d8f8de073ab95e4c2b9c3019",
+      "modules": [
+        {
+          "semanticKey": "rayquery_compute_shipping_mobile_opaque_fast",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "b28e543716b24ba102474436d4fbbcd7cf8ee8d87f0c0f8a61850b89c34d0468",
+          "words": 13028,
+          "disassemblyInstructionCount": 2821,
+          "rayQueryInitializations": 1,
+          "atomicsIncludingNoResult": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvValExitCode": 0,
+          "spirvDisExitCode": 0,
+          "spirvValLog": "reference-rayquery_compute_shipping_mobile_opaque_fast-spirv-val.log",
+          "catalogFunctions": 1,
+          "catalogFunctionCalls": 0,
+          "catalogInstructions": 2821,
+          "catalogLoops": 2,
+          "catalogBranchOperations": 287
+        },
+        {
+          "semanticKey": "rayquery_compute_shipping_mobile_generic_dielectric",
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "f8f0bfc78dfdbe9dfcd7d1df2a4dfa9370d3f04ba060e6db0f83c845f4bf51bb",
+          "words": 23069,
+          "disassemblyInstructionCount": 5427,
+          "rayQueryInitializations": 1,
+          "atomicsIncludingNoResult": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvValExitCode": 0,
+          "spirvDisExitCode": 0,
+          "spirvValLog": "reference-rayquery_compute_shipping_mobile_generic_dielectric-spirv-val.log",
+          "catalogFunctions": 18,
+          "catalogFunctionCalls": 24,
+          "catalogInstructions": 5427,
+          "catalogLoops": 4,
+          "catalogBranchOperations": 313
+        },
+        {
+          "semanticKey": "shipping_mobile_opaque_fast",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "5c03eed845bea5fe0c0a654f613694ca428e97b61cdb940da90133309156e928",
+          "words": 12967,
+          "disassemblyInstructionCount": 2803,
+          "rayQueryInitializations": 1,
+          "atomicsIncludingNoResult": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvValExitCode": 0,
+          "spirvDisExitCode": 0,
+          "spirvValLog": "reference-shipping_mobile_opaque_fast-spirv-val.log",
+          "catalogFunctions": 1,
+          "catalogFunctionCalls": 0,
+          "catalogInstructions": 2803,
+          "catalogLoops": 2,
+          "catalogBranchOperations": 283
+        },
+        {
+          "semanticKey": "shipping_mobile_generic_dielectric",
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "0e5a658a94e2dd26d6e959aea90eca21cd52867baa2e734f3a2f7cb2dff2c92b",
+          "words": 23010,
+          "disassemblyInstructionCount": 5412,
+          "rayQueryInitializations": 1,
+          "atomicsIncludingNoResult": 0,
+          "imageReads": 0,
+          "binding22": false,
+          "spirvValExitCode": 0,
+          "spirvDisExitCode": 0,
+          "spirvValLog": "reference-shipping_mobile_generic_dielectric-spirv-val.log",
+          "catalogFunctions": 18,
+          "catalogFunctionCalls": 24,
+          "catalogInstructions": 5412,
+          "catalogLoops": 4,
+          "catalogBranchOperations": 312
+        }
+      ]
+    }
+  ],
+  "staticFootprint": [
+    {
+      "semanticKey": "shipping_mobile_opaque_fast",
+      "control": {
+        "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+        "words": 125253,
+        "functions": 1,
+        "calls": 0,
+        "instructions": 27536,
+        "loops": 49,
+        "branchOperations": 3693,
+        "rayQueryInitializations": 23
+      },
+      "primaryHitReference": {
+        "sha256": "5c03eed845bea5fe0c0a654f613694ca428e97b61cdb940da90133309156e928",
+        "words": 12967,
+        "functions": 1,
+        "calls": 0,
+        "instructions": 2803,
+        "loops": 2,
+        "branchOperations": 283,
+        "rayQueryInitializations": 1
+      },
+      "interpretation": "Static packaged-module footprint only; not dynamic work or runtime cost."
+    },
+    {
+      "semanticKey": "rayquery_compute_shipping_mobile_opaque_fast",
+      "control": {
+        "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+        "words": 125318,
+        "functions": 1,
+        "calls": 0,
+        "instructions": 27555,
+        "loops": 49,
+        "branchOperations": 3697,
+        "rayQueryInitializations": 23
+      },
+      "primaryHitReference": {
+        "sha256": "b28e543716b24ba102474436d4fbbcd7cf8ee8d87f0c0f8a61850b89c34d0468",
+        "words": 13028,
+        "functions": 1,
+        "calls": 0,
+        "instructions": 2821,
+        "loops": 2,
+        "branchOperations": 287,
+        "rayQueryInitializations": 1
+      },
+      "interpretation": "Static packaged-module footprint only; not dynamic work or runtime cost."
+    }
+  ],
+  "limitation": "Footprint comparisons are static counts only; they do not estimate dynamic work, time, throughput, or additive decomposition. The primary-hit reference is nonphysical and excludes substantial shading paths."
+}

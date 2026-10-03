@@ -1,0 +1,1362 @@
+{
+  "schema": 1,
+  "scope": "03c live correctness, no matched Shipping performance acceptance",
+  "runs": [
+    {
+      "label": "Windows-RayTracingPipeline",
+      "source": "C:\\Dev\\tmp\\horde-glass-live-20260930\\rectangular-spawn-high-live-03c-pipeline\\HordeLanternRT-benchmark-20260930-030348.json",
+      "resultMarker": null,
+      "metadata": {
+        "schema": 2,
+        "status": "complete",
+        "workload": "lantern-reveal-sequence-v1",
+        "runId": "",
+        "timestampUtc": "2026-09-30T03:03:48Z",
+        "executionBackend": "RayTracingPipeline",
+        "rtMode": "RayTracingPipeline",
+        "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vulkanApi": "1.4.341",
+        "renderScalePercent": 100,
+        "internalExtent": {
+          "width": 1232,
+          "height": 803
+        },
+        "presentationExtent": {
+          "width": 1232,
+          "height": 803
+        },
+        "shaderArtifactIdentity": "opaqueFast:diagnostic_high_opaque_fast@fa3b41774785b8c7a658145fa4ec9d2a29f0cb52e184cf05a4a5954d77d8dd7e|genericDielectric:diagnostic_high_generic_dielectric@04ad3b61ff0169852ee39d38c8af108a68562d60e8292ea3c0efa3a0437c60cc",
+        "lapsCompleted": 2,
+        "lapsRequested": 2,
+        "measuredFrames": 600,
+        "presentedEveryFrame": true
+      },
+      "ledger": {
+        "expected": 600,
+        "completed": 600,
+        "rejected": 0,
+        "cancelled": 0,
+        "cpuAccepted": 600,
+        "gpuValid": 600,
+        "diagnosticStatusCounts": {
+          "valid": 600
+        },
+        "validCounterRows": 600,
+        "counterLengthOrAvailabilityErrors": [],
+        "rows": 600,
+        "identitiesEqualSubmittedToCompletion": true,
+        "identityMismatchCount": 0,
+        "submittedSerialStrictlyIncreasing": true,
+        "completionSerialStrictlyIncreasing": true,
+        "nonmonotonicSubmittedRows": [],
+        "nonmonotonicCompletionRows": [],
+        "firstIdentity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 6,
+          "recordAttemptSerial": 601,
+          "recordSerial": 601,
+          "simulationTick": 603,
+          "frameSlot": 0,
+          "submissionSerial": 601,
+          "completionSerial": 601
+        },
+        "lastIdentity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 6,
+          "recordAttemptSerial": 1200,
+          "recordSerial": 1200,
+          "simulationTick": 1202,
+          "frameSlot": 0,
+          "submissionSerial": 1200,
+          "completionSerial": 1200
+        }
+      },
+      "nonzeroCounterWindows": {
+        "transportOverflowCount": {
+          "category": "failure",
+          "index": 0,
+          "frames": 3,
+          "sum": 4,
+          "max": 2,
+          "maxWitness": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "first": {
+            "index": 43,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 646,
+            "submissionSerial": 644,
+            "completionSerial": 644,
+            "value": 1
+          },
+          "last": {
+            "index": 454,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1057,
+            "submissionSerial": 1055,
+            "completionSerial": 1055,
+            "value": 1
+          },
+          "windowCount": 3,
+          "windowsTruncated": false
+        },
+        "productionPaneStackFailureCount": {
+          "category": "failure",
+          "index": 6,
+          "frames": 3,
+          "sum": 4,
+          "max": 2,
+          "maxWitness": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "first": {
+            "index": 43,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 646,
+            "submissionSerial": 644,
+            "completionSerial": 644,
+            "value": 1
+          },
+          "last": {
+            "index": 454,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1057,
+            "submissionSerial": 1055,
+            "completionSerial": 1055,
+            "value": 1
+          },
+          "windowCount": 3,
+          "windowsTruncated": false
+        },
+        "primaryMismatchedExitCount": {
+          "category": "failure",
+          "index": 14,
+          "frames": 1,
+          "sum": 1,
+          "max": 1,
+          "maxWitness": {
+            "index": 43,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 646,
+            "submissionSerial": 644,
+            "completionSerial": 644,
+            "value": 1
+          },
+          "first": {
+            "index": 43,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 646,
+            "submissionSerial": 644,
+            "completionSerial": 644,
+            "value": 1
+          },
+          "last": {
+            "index": 43,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 646,
+            "submissionSerial": 644,
+            "completionSerial": 644,
+            "value": 1
+          },
+          "windowCount": 1,
+          "windowsTruncated": false
+        },
+        "primaryVolumeBudgetCount": {
+          "category": "failure",
+          "index": 16,
+          "frames": 2,
+          "sum": 3,
+          "max": 2,
+          "maxWitness": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "first": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "last": {
+            "index": 454,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1057,
+            "submissionSerial": 1055,
+            "completionSerial": 1055,
+            "value": 1
+          },
+          "windowCount": 2,
+          "windowsTruncated": false
+        },
+        "secondaryDielectricTerminalCount": {
+          "category": "boundedEvent",
+          "index": 24,
+          "frames": 600,
+          "sum": 664193,
+          "max": 1209,
+          "maxWitness": {
+            "index": 7,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 610,
+            "submissionSerial": 608,
+            "completionSerial": 608,
+            "value": 1209
+          },
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 601,
+            "completionSerial": 601,
+            "value": 1201
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 976
+          },
+          "windowCount": 1,
+          "windowsTruncated": false
+        },
+        "primaryCertifiedClosedVolumeRecoveryCount": {
+          "category": "certifiedRecovery",
+          "index": 33,
+          "frames": 6,
+          "sum": 7,
+          "max": 2,
+          "maxWitness": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "first": {
+            "index": 7,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 610,
+            "submissionSerial": 608,
+            "completionSerial": 608,
+            "value": 1
+          },
+          "last": {
+            "index": 454,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1057,
+            "submissionSerial": 1055,
+            "completionSerial": 1055,
+            "value": 1
+          },
+          "windowCount": 6,
+          "windowsTruncated": false
+        },
+        "primaryTirCount": {
+          "category": "tir",
+          "index": 19,
+          "frames": 600,
+          "sum": 1493998,
+          "max": 3194,
+          "maxWitness": {
+            "index": 423,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1026,
+            "submissionSerial": 1024,
+            "completionSerial": 1024,
+            "value": 3194
+          },
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 601,
+            "completionSerial": 601,
+            "value": 3120
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 1996
+          },
+          "windowCount": 1,
+          "windowsTruncated": false
+        },
+        "primaryTirTerminationCount": {
+          "category": "tir",
+          "index": 25,
+          "frames": 600,
+          "sum": 194800,
+          "max": 422,
+          "maxWitness": {
+            "index": 423,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1026,
+            "submissionSerial": 1024,
+            "completionSerial": 1024,
+            "value": 422
+          },
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 601,
+            "completionSerial": 601,
+            "value": 409
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 248
+          },
+          "windowCount": 1,
+          "windowsTruncated": false
+        }
+      },
+      "maskBitEvidence": {
+        "primaryOpenOpaqueTerminalInstanceMask": {
+          "or": 0,
+          "nonzeroFrames": 0,
+          "bitOccurrences": []
+        },
+        "primaryOpenOpaqueVolumeInstanceMask": {
+          "or": 0,
+          "nonzeroFrames": 0,
+          "bitOccurrences": []
+        },
+        "primaryOpenOpaqueTerminalMaterialMask": {
+          "or": 0,
+          "nonzeroFrames": 0,
+          "bitOccurrences": []
+        },
+        "certifiedClosedVolumeRecoveryReasonMask": {
+          "or": 17,
+          "nonzeroFrames": 6,
+          "bitOccurrences": [
+            {
+              "bit": 0,
+              "frames": 4,
+              "first": {
+                "index": 7,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 610,
+                "submissionSerial": 608,
+                "completionSerial": 608,
+                "value": 1
+              },
+              "last": {
+                "index": 366,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 969,
+                "submissionSerial": 967,
+                "completionSerial": 967,
+                "value": 1
+              }
+            },
+            {
+              "bit": 4,
+              "frames": 2,
+              "first": {
+                "index": 237,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 840,
+                "submissionSerial": 838,
+                "completionSerial": 838,
+                "value": 16
+              },
+              "last": {
+                "index": 454,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 1057,
+                "submissionSerial": 1055,
+                "completionSerial": 1055,
+                "value": 16
+              }
+            }
+          ]
+        }
+      },
+      "validationErrors": [],
+      "sourceSha256": "a825fa05ff073c3c1354635e4022ce509c1fe137f97c609cd2374574a1093501",
+      "predecessorSource": "C:\\Dev\\tmp\\horde-glass-live-20260930\\rectangular-spawn-high-live-pipeline\\HordeLanternRT-benchmark-20260930-022215.json",
+      "predecessorSha256": "c3a891612b0d478540dd42b11479ab221687a8cd8fe34f35c447d3ba8fbe70f8",
+      "predecessorCounterComparison": {
+        "alignedRows": 600,
+        "all41CountersEqualEveryRow": true
+      },
+      "diagnosticTimingOnly": {
+        "currentFrameMedianMs": 42.194,
+        "precedingFrameMedianMs": 42.638,
+        "currentGpu": {
+          "sampleCount": 600,
+          "meanMilliseconds": 10.1007,
+          "medianMilliseconds": 10.0599,
+          "p90Milliseconds": 10.4506,
+          "p95Milliseconds": 10.7046,
+          "slowestOnePercentMeanMilliseconds": 12.2547
+        },
+        "precedingGpu": {
+          "sampleCount": 600,
+          "meanMilliseconds": 10.0802,
+          "medianMilliseconds": 10.0446,
+          "p90Milliseconds": 10.331,
+          "p95Milliseconds": 10.5341,
+          "slowestOnePercentMeanMilliseconds": 11.4697
+        }
+      }
+    },
+    {
+      "label": "Windows-RayQueryCompute",
+      "source": "C:\\Dev\\tmp\\horde-glass-live-20260930\\rectangular-spawn-high-live-03c-compute\\HordeLanternRT-benchmark-20260930-030532.json",
+      "resultMarker": null,
+      "metadata": {
+        "schema": 2,
+        "status": "complete",
+        "workload": "lantern-reveal-sequence-v1",
+        "runId": "",
+        "timestampUtc": "2026-09-30T03:05:32Z",
+        "executionBackend": "RayQueryCompute",
+        "rtMode": "RayTracingPipeline",
+        "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vulkanApi": "1.4.341",
+        "renderScalePercent": 100,
+        "internalExtent": {
+          "width": 1232,
+          "height": 803
+        },
+        "presentationExtent": {
+          "width": 1232,
+          "height": 803
+        },
+        "shaderArtifactIdentity": "opaqueFast:rayquery_compute_diagnostic_high_opaque_fast@91b3873f89c6353426508b8d8301668e6fb1af6cc433668eb5819194645f9a5b|genericDielectric:rayquery_compute_diagnostic_high_generic_dielectric@98466b128b7c40fad1586fcf87d33bc533385b4975c1b726a2a5b0c22c793fd5",
+        "lapsCompleted": 2,
+        "lapsRequested": 2,
+        "measuredFrames": 600,
+        "presentedEveryFrame": true
+      },
+      "ledger": {
+        "expected": 600,
+        "completed": 600,
+        "rejected": 0,
+        "cancelled": 0,
+        "cpuAccepted": 600,
+        "gpuValid": 600,
+        "diagnosticStatusCounts": {
+          "valid": 600
+        },
+        "validCounterRows": 600,
+        "counterLengthOrAvailabilityErrors": [],
+        "rows": 600,
+        "identitiesEqualSubmittedToCompletion": true,
+        "identityMismatchCount": 0,
+        "submittedSerialStrictlyIncreasing": true,
+        "completionSerialStrictlyIncreasing": true,
+        "nonmonotonicSubmittedRows": [],
+        "nonmonotonicCompletionRows": [],
+        "firstIdentity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 6,
+          "recordAttemptSerial": 601,
+          "recordSerial": 601,
+          "simulationTick": 603,
+          "frameSlot": 0,
+          "submissionSerial": 601,
+          "completionSerial": 601
+        },
+        "lastIdentity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 6,
+          "recordAttemptSerial": 1200,
+          "recordSerial": 1200,
+          "simulationTick": 1202,
+          "frameSlot": 0,
+          "submissionSerial": 1200,
+          "completionSerial": 1200
+        }
+      },
+      "nonzeroCounterWindows": {
+        "transportOverflowCount": {
+          "category": "failure",
+          "index": 0,
+          "frames": 2,
+          "sum": 3,
+          "max": 2,
+          "maxWitness": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "first": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "last": {
+            "index": 454,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1057,
+            "submissionSerial": 1055,
+            "completionSerial": 1055,
+            "value": 1
+          },
+          "windowCount": 2,
+          "windowsTruncated": false
+        },
+        "productionPaneStackFailureCount": {
+          "category": "failure",
+          "index": 6,
+          "frames": 2,
+          "sum": 3,
+          "max": 2,
+          "maxWitness": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "first": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "last": {
+            "index": 454,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1057,
+            "submissionSerial": 1055,
+            "completionSerial": 1055,
+            "value": 1
+          },
+          "windowCount": 2,
+          "windowsTruncated": false
+        },
+        "primaryVolumeBudgetCount": {
+          "category": "failure",
+          "index": 16,
+          "frames": 2,
+          "sum": 3,
+          "max": 2,
+          "maxWitness": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "first": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "last": {
+            "index": 454,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1057,
+            "submissionSerial": 1055,
+            "completionSerial": 1055,
+            "value": 1
+          },
+          "windowCount": 2,
+          "windowsTruncated": false
+        },
+        "secondaryDielectricTerminalCount": {
+          "category": "boundedEvent",
+          "index": 24,
+          "frames": 600,
+          "sum": 664193,
+          "max": 1209,
+          "maxWitness": {
+            "index": 7,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 610,
+            "submissionSerial": 608,
+            "completionSerial": 608,
+            "value": 1209
+          },
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 601,
+            "completionSerial": 601,
+            "value": 1201
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 976
+          },
+          "windowCount": 1,
+          "windowsTruncated": false
+        },
+        "primaryCertifiedClosedVolumeRecoveryCount": {
+          "category": "certifiedRecovery",
+          "index": 33,
+          "frames": 7,
+          "sum": 8,
+          "max": 2,
+          "maxWitness": {
+            "index": 237,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 840,
+            "submissionSerial": 838,
+            "completionSerial": 838,
+            "value": 2
+          },
+          "first": {
+            "index": 7,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 610,
+            "submissionSerial": 608,
+            "completionSerial": 608,
+            "value": 1
+          },
+          "last": {
+            "index": 454,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1057,
+            "submissionSerial": 1055,
+            "completionSerial": 1055,
+            "value": 1
+          },
+          "windowCount": 7,
+          "windowsTruncated": false
+        },
+        "primaryTirCount": {
+          "category": "tir",
+          "index": 19,
+          "frames": 600,
+          "sum": 1494001,
+          "max": 3194,
+          "maxWitness": {
+            "index": 423,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1026,
+            "submissionSerial": 1024,
+            "completionSerial": 1024,
+            "value": 3194
+          },
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 601,
+            "completionSerial": 601,
+            "value": 3120
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 1996
+          },
+          "windowCount": 1,
+          "windowsTruncated": false
+        },
+        "primaryTirTerminationCount": {
+          "category": "tir",
+          "index": 25,
+          "frames": 600,
+          "sum": 194803,
+          "max": 422,
+          "maxWitness": {
+            "index": 423,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1026,
+            "submissionSerial": 1024,
+            "completionSerial": 1024,
+            "value": 422
+          },
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 601,
+            "completionSerial": 601,
+            "value": 409
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 248
+          },
+          "windowCount": 1,
+          "windowsTruncated": false
+        }
+      },
+      "maskBitEvidence": {
+        "primaryOpenOpaqueTerminalInstanceMask": {
+          "or": 0,
+          "nonzeroFrames": 0,
+          "bitOccurrences": []
+        },
+        "primaryOpenOpaqueVolumeInstanceMask": {
+          "or": 0,
+          "nonzeroFrames": 0,
+          "bitOccurrences": []
+        },
+        "primaryOpenOpaqueTerminalMaterialMask": {
+          "or": 0,
+          "nonzeroFrames": 0,
+          "bitOccurrences": []
+        },
+        "certifiedClosedVolumeRecoveryReasonMask": {
+          "or": 17,
+          "nonzeroFrames": 7,
+          "bitOccurrences": [
+            {
+              "bit": 0,
+              "frames": 5,
+              "first": {
+                "index": 7,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 610,
+                "submissionSerial": 608,
+                "completionSerial": 608,
+                "value": 1
+              },
+              "last": {
+                "index": 366,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 969,
+                "submissionSerial": 967,
+                "completionSerial": 967,
+                "value": 1
+              }
+            },
+            {
+              "bit": 4,
+              "frames": 2,
+              "first": {
+                "index": 237,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 840,
+                "submissionSerial": 838,
+                "completionSerial": 838,
+                "value": 16
+              },
+              "last": {
+                "index": 454,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 1057,
+                "submissionSerial": 1055,
+                "completionSerial": 1055,
+                "value": 16
+              }
+            }
+          ]
+        }
+      },
+      "validationErrors": [],
+      "sourceSha256": "8fe1805744d37afed5c0913b447fde8b9e43d5a2766e9266ebc1980f897bd4a0",
+      "predecessorSource": "C:\\Dev\\tmp\\horde-glass-live-20260930\\rectangular-spawn-high-live-compute\\HordeLanternRT-benchmark-20260930-022445.json",
+      "predecessorSha256": "7416df64cf43bf040a3f0a4f8f435564cf4047bbdcc09d884ccd34c3d162ee9a",
+      "predecessorCounterComparison": {
+        "alignedRows": 600,
+        "all41CountersEqualEveryRow": true
+      },
+      "diagnosticTimingOnly": {
+        "currentFrameMedianMs": 41.6035,
+        "precedingFrameMedianMs": 42.3005,
+        "currentGpu": {
+          "sampleCount": 600,
+          "meanMilliseconds": 9.6794,
+          "medianMilliseconds": 9.6633,
+          "p90Milliseconds": 9.9043,
+          "p95Milliseconds": 10.1347,
+          "slowestOnePercentMeanMilliseconds": 10.8157
+        },
+        "precedingGpu": {
+          "sampleCount": 600,
+          "meanMilliseconds": 9.6732,
+          "medianMilliseconds": 9.6332,
+          "p90Milliseconds": 9.9662,
+          "p95Milliseconds": 10.2384,
+          "slowestOnePercentMeanMilliseconds": 11.0895
+        }
+      }
+    },
+    {
+      "label": "Android-RayTracingPipeline",
+      "source": "C:\\Dev\\tmp\\horde-glass-live-20260930\\rectangular-phone-live-03c\\glass-rectangular-live-20260930-03c\\benchmark.json",
+      "resultMarker": {
+        "schema": 1,
+        "runId": "glass-rectangular-live-20260930-03c",
+        "status": "complete",
+        "detail": "benchmark export complete"
+      },
+      "metadata": {
+        "schema": 2,
+        "status": "complete",
+        "workload": "lantern-reveal-sequence-v1",
+        "runId": "glass-rectangular-live-20260930-03c",
+        "timestampUtc": "2026-09-30T03:08:01Z",
+        "executionBackend": "RayTracingPipeline",
+        "rtMode": "RayTracingPipeline",
+        "gpu": "Adreno (TM) 840",
+        "vulkanApi": "1.4.295",
+        "renderScalePercent": 75,
+        "internalExtent": {
+          "width": 1080,
+          "height": 2235
+        },
+        "presentationExtent": {
+          "width": 1440,
+          "height": 2980
+        },
+        "shaderArtifactIdentity": "opaqueFast:diagnostic_mobile_opaque_fast@fa3b41774785b8c7a658145fa4ec9d2a29f0cb52e184cf05a4a5954d77d8dd7e|genericDielectric:diagnostic_mobile_generic_dielectric@20fe5a83bf869d3d48444b2feeff83d69c17102e6647942a6c74539a78f628e4",
+        "lapsCompleted": 2,
+        "lapsRequested": 2,
+        "measuredFrames": 600,
+        "presentedEveryFrame": true
+      },
+      "ledger": {
+        "expected": 600,
+        "completed": 600,
+        "rejected": 0,
+        "cancelled": 0,
+        "cpuAccepted": 600,
+        "gpuValid": 600,
+        "diagnosticStatusCounts": {
+          "valid": 600
+        },
+        "validCounterRows": 600,
+        "counterLengthOrAvailabilityErrors": [],
+        "rows": 600,
+        "identitiesEqualSubmittedToCompletion": true,
+        "identityMismatchCount": 0,
+        "submittedSerialStrictlyIncreasing": true,
+        "completionSerialStrictlyIncreasing": true,
+        "nonmonotonicSubmittedRows": [],
+        "nonmonotonicCompletionRows": [],
+        "firstIdentity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 6,
+          "recordAttemptSerial": 602,
+          "recordSerial": 602,
+          "simulationTick": 603,
+          "frameSlot": 0,
+          "submissionSerial": 602,
+          "completionSerial": 602
+        },
+        "lastIdentity": {
+          "sceneEpoch": 2,
+          "measurementGeneration": 6,
+          "recordAttemptSerial": 1201,
+          "recordSerial": 1201,
+          "simulationTick": 1202,
+          "frameSlot": 0,
+          "submissionSerial": 1201,
+          "completionSerial": 1201
+        }
+      },
+      "nonzeroCounterWindows": {
+        "transportOverflowCount": {
+          "category": "failure",
+          "index": 0,
+          "frames": 58,
+          "sum": 64,
+          "max": 4,
+          "maxWitness": {
+            "index": 298,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 901,
+            "submissionSerial": 900,
+            "completionSerial": 900,
+            "value": 4
+          },
+          "first": {
+            "index": 39,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 642,
+            "submissionSerial": 641,
+            "completionSerial": 641,
+            "value": 1
+          },
+          "last": {
+            "index": 598,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1201,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 2
+          },
+          "windowCount": 56,
+          "windowsTruncated": true
+        },
+        "productionPaneStackFailureCount": {
+          "category": "failure",
+          "index": 6,
+          "frames": 58,
+          "sum": 64,
+          "max": 4,
+          "maxWitness": {
+            "index": 298,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 901,
+            "submissionSerial": 900,
+            "completionSerial": 900,
+            "value": 4
+          },
+          "first": {
+            "index": 39,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 642,
+            "submissionSerial": 641,
+            "completionSerial": 641,
+            "value": 1
+          },
+          "last": {
+            "index": 598,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1201,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 2
+          },
+          "windowCount": 56,
+          "windowsTruncated": true
+        },
+        "primaryMismatchedExitCount": {
+          "category": "failure",
+          "index": 14,
+          "frames": 7,
+          "sum": 7,
+          "max": 1,
+          "maxWitness": {
+            "index": 107,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 710,
+            "submissionSerial": 709,
+            "completionSerial": 709,
+            "value": 1
+          },
+          "first": {
+            "index": 107,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 710,
+            "submissionSerial": 709,
+            "completionSerial": 709,
+            "value": 1
+          },
+          "last": {
+            "index": 598,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1201,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 1
+          },
+          "windowCount": 7,
+          "windowsTruncated": false
+        },
+        "primaryVolumeBudgetCount": {
+          "category": "failure",
+          "index": 16,
+          "frames": 52,
+          "sum": 57,
+          "max": 4,
+          "maxWitness": {
+            "index": 298,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 901,
+            "submissionSerial": 900,
+            "completionSerial": 900,
+            "value": 4
+          },
+          "first": {
+            "index": 39,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 642,
+            "submissionSerial": 641,
+            "completionSerial": 641,
+            "value": 1
+          },
+          "last": {
+            "index": 598,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1201,
+            "submissionSerial": 1200,
+            "completionSerial": 1200,
+            "value": 1
+          },
+          "windowCount": 51,
+          "windowsTruncated": true
+        },
+        "secondaryDielectricTerminalCount": {
+          "category": "boundedEvent",
+          "index": 24,
+          "frames": 600,
+          "sum": 5113909,
+          "max": 8961,
+          "maxWitness": {
+            "index": 115,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 718,
+            "submissionSerial": 717,
+            "completionSerial": 717,
+            "value": 8961
+          },
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 602,
+            "completionSerial": 602,
+            "value": 8277
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1201,
+            "completionSerial": 1201,
+            "value": 8123
+          },
+          "windowCount": 1,
+          "windowsTruncated": false
+        },
+        "primaryCertifiedClosedVolumeRecoveryCount": {
+          "category": "certifiedRecovery",
+          "index": 33,
+          "frames": 600,
+          "sum": 299636,
+          "max": 538,
+          "maxWitness": {
+            "index": 181,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 784,
+            "submissionSerial": 783,
+            "completionSerial": 783,
+            "value": 538
+          },
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 602,
+            "completionSerial": 602,
+            "value": 507
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1201,
+            "completionSerial": 1201,
+            "value": 511
+          },
+          "windowCount": 1,
+          "windowsTruncated": false
+        },
+        "primaryTirCount": {
+          "category": "tir",
+          "index": 19,
+          "frames": 600,
+          "sum": 5440712,
+          "max": 10441,
+          "maxWitness": {
+            "index": 83,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 686,
+            "submissionSerial": 685,
+            "completionSerial": 685,
+            "value": 10441
+          },
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 602,
+            "completionSerial": 602,
+            "value": 8431
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1201,
+            "completionSerial": 1201,
+            "value": 9141
+          },
+          "windowCount": 1,
+          "windowsTruncated": false
+        },
+        "primaryTirTerminationCount": {
+          "category": "tir",
+          "index": 25,
+          "frames": 600,
+          "sum": 1858701,
+          "max": 3546,
+          "maxWitness": {
+            "index": 83,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 686,
+            "submissionSerial": 685,
+            "completionSerial": 685,
+            "value": 3546
+          },
+          "first": {
+            "index": 0,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 603,
+            "submissionSerial": 602,
+            "completionSerial": 602,
+            "value": 2902
+          },
+          "last": {
+            "index": 599,
+            "lap": 2,
+            "zone": 5,
+            "simulationTick": 1202,
+            "submissionSerial": 1201,
+            "completionSerial": 1201,
+            "value": 3092
+          },
+          "windowCount": 1,
+          "windowsTruncated": false
+        }
+      },
+      "maskBitEvidence": {
+        "primaryOpenOpaqueTerminalInstanceMask": {
+          "or": 0,
+          "nonzeroFrames": 0,
+          "bitOccurrences": []
+        },
+        "primaryOpenOpaqueVolumeInstanceMask": {
+          "or": 0,
+          "nonzeroFrames": 0,
+          "bitOccurrences": []
+        },
+        "primaryOpenOpaqueTerminalMaterialMask": {
+          "or": 0,
+          "nonzeroFrames": 0,
+          "bitOccurrences": []
+        },
+        "certifiedClosedVolumeRecoveryReasonMask": {
+          "or": 19,
+          "nonzeroFrames": 600,
+          "bitOccurrences": [
+            {
+              "bit": 0,
+              "frames": 59,
+              "first": {
+                "index": 1,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 604,
+                "submissionSerial": 603,
+                "completionSerial": 603,
+                "value": 3
+              },
+              "last": {
+                "index": 598,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 1201,
+                "submissionSerial": 1200,
+                "completionSerial": 1200,
+                "value": 19
+              }
+            },
+            {
+              "bit": 1,
+              "frames": 600,
+              "first": {
+                "index": 0,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 603,
+                "submissionSerial": 602,
+                "completionSerial": 602,
+                "value": 2
+              },
+              "last": {
+                "index": 599,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 1202,
+                "submissionSerial": 1201,
+                "completionSerial": 1201,
+                "value": 2
+              }
+            },
+            {
+              "bit": 4,
+              "frames": 52,
+              "first": {
+                "index": 39,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 642,
+                "submissionSerial": 641,
+                "completionSerial": 641,
+                "value": 18
+              },
+              "last": {
+                "index": 598,
+                "lap": 2,
+                "zone": 5,
+                "simulationTick": 1201,
+                "submissionSerial": 1200,
+                "completionSerial": 1200,
+                "value": 19
+              }
+            }
+          ]
+        }
+      },
+      "validationErrors": [],
+      "sourceSha256": "4746b099a66e3eaab9ae08c40e542dee719e9f88d364f523b6e01c5f347e1606",
+      "predecessorSource": "C:\\Dev\\tmp\\horde-glass-live-20260930\\rectangular-phone-live-02\\glass-rectangular-live-20260930-02\\benchmark.json",
+      "predecessorSha256": "d00786c98cf1894998fae09a24b169f9d7b9c4208f0e65bb11fe20cdeefbd1c4",
+      "predecessorCounterComparison": {
+        "alignedRows": 600,
+        "all41CountersEqualEveryRow": true
+      },
+      "diagnosticTimingOnly": {
+        "currentFrameMedianMs": 273.0075,
+        "precedingFrameMedianMs": 167.0518,
+        "currentGpu": {
+          "sampleCount": 600,
+          "meanMilliseconds": 264.3081,
+          "medianMilliseconds": 261.0851,
+          "p90Milliseconds": 276.323,
+          "p95Milliseconds": 277.7026,
+          "slowestOnePercentMeanMilliseconds": 285.4278
+        },
+        "precedingGpu": {
+          "sampleCount": 600,
+          "meanMilliseconds": 152.9046,
+          "medianMilliseconds": 155.9226,
+          "p90Milliseconds": 157.9004,
+          "p95Milliseconds": 158.4365,
+          "slowestOnePercentMeanMilliseconds": 159.8913
+        }
+      }
+    }
+  ]
+}

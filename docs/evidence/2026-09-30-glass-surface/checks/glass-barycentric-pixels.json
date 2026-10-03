@@ -1,0 +1,1285 @@
+{
+  "pixelTolerance": {
+    "maximumChannelDifference": 3,
+    "maximumFractionOverOne": 0.001
+  },
+  "note": "Correctness AB failures are not automatically regressions. Backend equivalence failures remain open. Phone images are ADB screenshots, not raw cross-backend image parity.",
+  "results": [
+    {
+      "label": "RTX/mobile/correctness-AB/lantern-glass-production",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\baseline\\lantern-glass-production\\115-lantern-glass-production.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\candidate\\lantern-glass-production\\115-lantern-glass-production.png",
+      "beforeSha256": "4d9930073cbb7cb95c636e8144fabec9e70489ec0c8455de3aa346a5a5c0e95b",
+      "afterSha256": "0e31a6cdf97a5576b77207161848c1e75cab5180e93891615ec4b4bf18164a73",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 96,
+      "fractionOverOne": 0.00018518518518518518,
+      "maximumChannelDifference": 29,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        185,
+        450,
+        250,
+        519
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            241,
+            493
+          ],
+          "before": [
+            0,
+            0,
+            1,
+            255
+          ],
+          "after": [
+            29,
+            11,
+            4,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/mobile/pipeline-compute/lantern-glass-production",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\candidate\\lantern-glass-production\\115-lantern-glass-production.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\compute\\lantern-glass-production\\115-lantern-glass-production.png",
+      "beforeSha256": "0e31a6cdf97a5576b77207161848c1e75cab5180e93891615ec4b4bf18164a73",
+      "afterSha256": "3672016293f49b1bef27aa186171185bb11d9e6538003ace985ed7e3248e6b36",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 2,
+      "fractionOverOne": 3.858024691358025e-06,
+      "maximumChannelDifference": 2,
+      "equivalencePassed": true,
+      "boundsOverOne": [
+        210,
+        475,
+        242,
+        491
+      ],
+      "peakExamples": []
+    },
+    {
+      "label": "RTX/mobile/correctness-AB/player-viewmodel-lantern-high-look-up",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\baseline\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\candidate\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+      "beforeSha256": "054dc2f260441042ac6b62dec285d9099f618fb83d3e0ebd4d7c4bbfdc578a07",
+      "afterSha256": "86532d2e9ce379f84d42c0bfc6bcfc360c25c6e9470ca693108914b974d07335",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 167,
+      "fractionOverOne": 0.00032214506172839505,
+      "maximumChannelDifference": 225,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        86,
+        649,
+        221,
+        842
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            127,
+            678
+          ],
+          "before": [
+            53,
+            146,
+            225,
+            255
+          ],
+          "after": [
+            0,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/mobile/pipeline-compute/player-viewmodel-lantern-high-look-up",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\candidate\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\compute\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+      "beforeSha256": "86532d2e9ce379f84d42c0bfc6bcfc360c25c6e9470ca693108914b974d07335",
+      "afterSha256": "8e89489e427020cbb8311f1ab28ede043a5c29ca8423125ef6e4a8a2bdafd73f",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 4,
+      "fractionOverOne": 7.71604938271605e-06,
+      "maximumChannelDifference": 12,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        86,
+        659,
+        202,
+        802
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            201,
+            659
+          ],
+          "before": [
+            231,
+            63,
+            23,
+            255
+          ],
+          "after": [
+            223,
+            51,
+            18,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/mobile/correctness-AB/player-viewmodel-lantern-low-parry",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\baseline\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\candidate\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+      "beforeSha256": "95bbc0cc16f2495ffc93ab84fab018b3ae637c8da64f0361fbfdee674e5bcc08",
+      "afterSha256": "352c8cee57cfca452500d3f1aeb98b181c4ab02b54b0a312bb3a2152fc1f4f8f",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 406,
+      "fractionOverOne": 0.000783179012345679,
+      "maximumChannelDifference": 72,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        110,
+        861,
+        222,
+        959
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            188,
+            952
+          ],
+          "before": [
+            75,
+            36,
+            8,
+            255
+          ],
+          "after": [
+            3,
+            3,
+            3,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/mobile/pipeline-compute/player-viewmodel-lantern-low-parry",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\candidate\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\compute\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+      "beforeSha256": "352c8cee57cfca452500d3f1aeb98b181c4ab02b54b0a312bb3a2152fc1f4f8f",
+      "afterSha256": "57d1ddfe3ffe2365a2f2558377442fb541f49b8177620b590c0dc66b68f5ce84",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 18,
+      "fractionOverOne": 3.472222222222222e-05,
+      "maximumChannelDifference": 5,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        111,
+        899,
+        218,
+        946
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            129,
+            921
+          ],
+          "before": [
+            30,
+            15,
+            2,
+            255
+          ],
+          "after": [
+            26,
+            13,
+            2,
+            255
+          ]
+        },
+        {
+          "xy": [
+            131,
+            921
+          ],
+          "before": [
+            22,
+            12,
+            2,
+            255
+          ],
+          "after": [
+            26,
+            17,
+            2,
+            255
+          ]
+        },
+        {
+          "xy": [
+            217,
+            923
+          ],
+          "before": [
+            37,
+            14,
+            3,
+            255
+          ],
+          "after": [
+            42,
+            17,
+            3,
+            255
+          ]
+        },
+        {
+          "xy": [
+            121,
+            939
+          ],
+          "before": [
+            19,
+            6,
+            1,
+            255
+          ],
+          "after": [
+            23,
+            7,
+            1,
+            255
+          ]
+        },
+        {
+          "xy": [
+            111,
+            945
+          ],
+          "before": [
+            22,
+            7,
+            2,
+            255
+          ],
+          "after": [
+            18,
+            6,
+            1,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/mobile/correctness-AB/glass-edge-fresnel",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\baseline\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\candidate\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+      "beforeSha256": "7854dd7b2932cf3c108d7fd236316099c7ba1abdddfe97c7bbf3146616aa54db",
+      "afterSha256": "a08bd0d0cb0c905b8eb346fcdfabe5da695e15def107f6528ff0f6249866302c",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 1093,
+      "fractionOverOne": 0.0021084104938271604,
+      "maximumChannelDifference": 53,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        188,
+        588,
+        332,
+        960
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            292,
+            694
+          ],
+          "before": [
+            7,
+            8,
+            10,
+            255
+          ],
+          "after": [
+            46,
+            54,
+            63,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/mobile/pipeline-compute/glass-edge-fresnel",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\candidate\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\mobile\\compute\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+      "beforeSha256": "a08bd0d0cb0c905b8eb346fcdfabe5da695e15def107f6528ff0f6249866302c",
+      "afterSha256": "656208265435bbe34fe1ea8aaff4af4051700ca84fc812e02a000785bfa30abf",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 62,
+      "fractionOverOne": 0.00011959876543209877,
+      "maximumChannelDifference": 38,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        192,
+        686,
+        329,
+        950
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            192,
+            686
+          ],
+          "before": [
+            5,
+            6,
+            9,
+            255
+          ],
+          "after": [
+            29,
+            38,
+            47,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/high/correctness-AB/lantern-glass-production",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\baseline\\lantern-glass-production\\115-lantern-glass-production.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\candidate\\lantern-glass-production\\115-lantern-glass-production.png",
+      "beforeSha256": "bbf2794cd938875eef9fdfb4ea0c44d1455f8badeafc1c788b011826f41cc2bd",
+      "afterSha256": "3944275f5398168ec6a5eb85985ed7d2550928c2c592aa9b4c5aa93f0179bb33",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 98,
+      "fractionOverOne": 0.0001890432098765432,
+      "maximumChannelDifference": 29,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        185,
+        450,
+        250,
+        519
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            241,
+            493
+          ],
+          "before": [
+            0,
+            0,
+            1,
+            255
+          ],
+          "after": [
+            29,
+            11,
+            4,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/high/pipeline-compute/lantern-glass-production",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\candidate\\lantern-glass-production\\115-lantern-glass-production.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\compute\\lantern-glass-production\\115-lantern-glass-production.png",
+      "beforeSha256": "3944275f5398168ec6a5eb85985ed7d2550928c2c592aa9b4c5aa93f0179bb33",
+      "afterSha256": "2412f3bdfb6c2dd1be23e65a4169a3453294115b58600c93af753af56c935e86",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 2,
+      "fractionOverOne": 3.858024691358025e-06,
+      "maximumChannelDifference": 2,
+      "equivalencePassed": true,
+      "boundsOverOne": [
+        210,
+        475,
+        242,
+        491
+      ],
+      "peakExamples": []
+    },
+    {
+      "label": "RTX/high/correctness-AB/player-viewmodel-lantern-high-look-up",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\baseline\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\candidate\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+      "beforeSha256": "4e87a52ec2c6b8bbad1e960d7dcefe86cb3924f7fb3b6a2ff575ed2fd45b0b0f",
+      "afterSha256": "3c8b27b0ce6235106d5d51d7ba4e0bd42a0ccc5de58f5fb3627bde46fe9e861b",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 191,
+      "fractionOverOne": 0.00036844135802469133,
+      "maximumChannelDifference": 225,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        86,
+        649,
+        222,
+        857
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            127,
+            678
+          ],
+          "before": [
+            53,
+            146,
+            225,
+            255
+          ],
+          "after": [
+            0,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/high/pipeline-compute/player-viewmodel-lantern-high-look-up",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\candidate\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\compute\\player-viewmodel-lantern-high-look-up\\146-player-viewmodel-lantern-high-look-up.png",
+      "beforeSha256": "3c8b27b0ce6235106d5d51d7ba4e0bd42a0ccc5de58f5fb3627bde46fe9e861b",
+      "afterSha256": "778d36ea07fde8f52514a8b8a74e7a6090e3950cac92809b14d1c77a97a0c53a",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 4,
+      "fractionOverOne": 7.71604938271605e-06,
+      "maximumChannelDifference": 12,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        86,
+        659,
+        202,
+        802
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            201,
+            659
+          ],
+          "before": [
+            231,
+            63,
+            23,
+            255
+          ],
+          "after": [
+            223,
+            51,
+            18,
+            255
+          ]
+        },
+        {
+          "xy": [
+            116,
+            788
+          ],
+          "before": [
+            8,
+            8,
+            9,
+            255
+          ],
+          "after": [
+            18,
+            5,
+            1,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/high/correctness-AB/player-viewmodel-lantern-low-parry",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\baseline\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\candidate\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+      "beforeSha256": "28e6f970fece3704f5588d14bd1a3f04aba7b0dffaadeffedc5fb567eb6e8ca7",
+      "afterSha256": "d3863b7847b7c3ce22b5ef3b2f054d636dc9f5b2abc95e6c07344a6f0fda36cf",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 406,
+      "fractionOverOne": 0.000783179012345679,
+      "maximumChannelDifference": 72,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        110,
+        861,
+        222,
+        959
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            188,
+            952
+          ],
+          "before": [
+            75,
+            36,
+            8,
+            255
+          ],
+          "after": [
+            3,
+            3,
+            3,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/high/pipeline-compute/player-viewmodel-lantern-low-parry",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\candidate\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\compute\\player-viewmodel-lantern-low-parry\\144-player-viewmodel-lantern-low-parry.png",
+      "beforeSha256": "d3863b7847b7c3ce22b5ef3b2f054d636dc9f5b2abc95e6c07344a6f0fda36cf",
+      "afterSha256": "11c7a5bf8d1c16fa40c882d3f2d8f1f6c7e1db5fae11b010bad207c2993556d7",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 18,
+      "fractionOverOne": 3.472222222222222e-05,
+      "maximumChannelDifference": 5,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        111,
+        899,
+        218,
+        946
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            129,
+            921
+          ],
+          "before": [
+            30,
+            15,
+            2,
+            255
+          ],
+          "after": [
+            26,
+            13,
+            2,
+            255
+          ]
+        },
+        {
+          "xy": [
+            131,
+            921
+          ],
+          "before": [
+            22,
+            12,
+            2,
+            255
+          ],
+          "after": [
+            26,
+            17,
+            2,
+            255
+          ]
+        },
+        {
+          "xy": [
+            217,
+            923
+          ],
+          "before": [
+            37,
+            14,
+            3,
+            255
+          ],
+          "after": [
+            42,
+            17,
+            3,
+            255
+          ]
+        },
+        {
+          "xy": [
+            121,
+            939
+          ],
+          "before": [
+            19,
+            6,
+            1,
+            255
+          ],
+          "after": [
+            23,
+            7,
+            1,
+            255
+          ]
+        },
+        {
+          "xy": [
+            111,
+            945
+          ],
+          "before": [
+            22,
+            7,
+            2,
+            255
+          ],
+          "after": [
+            18,
+            6,
+            1,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/high/correctness-AB/glass-edge-fresnel",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\baseline\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\candidate\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+      "beforeSha256": "70eb9760357c8781655a7dd193cf134f10c218c78a87260aa92a645e0462b0ee",
+      "afterSha256": "5646010ef849d7ade1bad290e14faaaaa578ad6cb98f0febf2bdfbcc52ec3db6",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 1490,
+      "fractionOverOne": 0.0028742283950617285,
+      "maximumChannelDifference": 53,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        188,
+        514,
+        332,
+        960
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            292,
+            694
+          ],
+          "before": [
+            7,
+            8,
+            10,
+            255
+          ],
+          "after": [
+            46,
+            54,
+            63,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/high/pipeline-compute/glass-edge-fresnel",
+      "before": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\candidate\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high\\compute\\glass-edge-fresnel\\113-glass-edge-fresnel.png",
+      "beforeSha256": "5646010ef849d7ade1bad290e14faaaaa578ad6cb98f0febf2bdfbcc52ec3db6",
+      "afterSha256": "fe6381b8ed0e4979913ebd5f6b72b48b502f87005ea2337f49a32a339858405b",
+      "size": [
+        540,
+        960
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 123,
+      "fractionOverOne": 0.00023726851851851852,
+      "maximumChannelDifference": 38,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        190,
+        518,
+        329,
+        959
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            192,
+            686
+          ],
+          "before": [
+            5,
+            6,
+            9,
+            255
+          ],
+          "after": [
+            29,
+            38,
+            47,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "SM-S948B/correctness-AB/capture-01-lantern-glass-production-75.png",
+      "before": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-064746\\capture-01-lantern-glass-production-75.png",
+      "after": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-080757\\capture-01-lantern-glass-production-75.png",
+      "beforeSha256": "5b09e72e6000c77e610a3dd125269519cd1035040aedeba5f58bda04f742f7cd",
+      "afterSha256": "2882ee27364cb6d2fc8d4a7f7537d8ab60954c833b53ba09b34320a573fa21fa",
+      "size": [
+        1440,
+        3120
+      ],
+      "pixels": 4492800,
+      "pixelsOverOne": 1144,
+      "fractionOverOne": 0.0002546296296296296,
+      "maximumChannelDifference": 187,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        456,
+        1533,
+        660,
+        1755
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            579,
+            1699
+          ],
+          "before": [
+            7,
+            6,
+            6,
+            255
+          ],
+          "after": [
+            194,
+            180,
+            97,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "SM-S948B/correctness-AB/capture-02-player-viewmodel-lantern-high-look-up-75.png",
+      "before": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-064746\\capture-02-player-viewmodel-lantern-high-look-up-75.png",
+      "after": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-080757\\capture-02-player-viewmodel-lantern-high-look-up-75.png",
+      "beforeSha256": "757ebe4ebcbc2973f503441ffbf20665e023fba5da526f6f23724f343df8fc85",
+      "afterSha256": "7a2c52ad1120e6415173c1dd3dd4592c075d24e3148f30f91c75f152f60d5351",
+      "size": [
+        1440,
+        3120
+      ],
+      "pixels": 4492800,
+      "pixelsOverOne": 2809,
+      "fractionOverOne": 0.0006252225783475783,
+      "maximumChannelDifference": 198,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        145,
+        2090,
+        577,
+        2771
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            508,
+            2179
+          ],
+          "before": [
+            23,
+            25,
+            31,
+            255
+          ],
+          "after": [
+            219,
+            90,
+            50,
+            255
+          ]
+        },
+        {
+          "xy": [
+            283,
+            2237
+          ],
+          "before": [
+            80,
+            140,
+            198,
+            255
+          ],
+          "after": [
+            0,
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "SM-S948B/correctness-AB/capture-03-player-viewmodel-lantern-low-parry-75.png",
+      "before": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-064746\\capture-03-player-viewmodel-lantern-low-parry-75.png",
+      "after": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-080757\\capture-03-player-viewmodel-lantern-low-parry-75.png",
+      "beforeSha256": "71b7a587c52ba0a952da8a8483b31417adc5fb9b00e0f342b67a96ba08442314",
+      "afterSha256": "f3af806d03b681580d445c2a17d7ef189310df47927e56a6151e6a25b8f1b113",
+      "size": [
+        1440,
+        3120
+      ],
+      "pixels": 4492800,
+      "pixelsOverOne": 4203,
+      "fractionOverOne": 0.0009354967948717949,
+      "maximumChannelDifference": 187,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        211,
+        2814,
+        570,
+        3120
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            428,
+            3096
+          ],
+          "before": [
+            217,
+            193,
+            91,
+            255
+          ],
+          "after": [
+            30,
+            27,
+            12,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "SM-S948B/correctness-AB/capture-04-glass-millimetre-closed-75.png",
+      "before": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-064746\\capture-04-glass-millimetre-closed-75.png",
+      "after": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-080757\\capture-04-glass-millimetre-closed-75.png",
+      "beforeSha256": "dd7317687c1a09e5927b3f81d1faa3da486f9a60748594dd450a27439e8b30fd",
+      "afterSha256": "edc2098c0adfe1732d3c27142b16d6b8532accd7669c2b01561db556136661cf",
+      "size": [
+        1440,
+        3120
+      ],
+      "pixels": 4492800,
+      "pixelsOverOne": 4349,
+      "fractionOverOne": 0.0009679932336182336,
+      "maximumChannelDifference": 8,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        276,
+        2029,
+        1164,
+        2952
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            640,
+            2163
+          ],
+          "before": [
+            19,
+            21,
+            26,
+            255
+          ],
+          "after": [
+            12,
+            14,
+            18,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "SM-S948B/correctness-AB/capture-05-glass-edge-fresnel-75.png",
+      "before": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-064746\\capture-05-glass-edge-fresnel-75.png",
+      "after": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-080757\\capture-05-glass-edge-fresnel-75.png",
+      "beforeSha256": "d3f3be0c58e51cf5791477af825f93457e2d88926fad9bb8dafaf379bc0e740d",
+      "afterSha256": "da847e98aa1b7bae11c9575517d1a1ebf27d3ebda3c0eae693323c5484072b2d",
+      "size": [
+        1440,
+        3120
+      ],
+      "pixels": 4492800,
+      "pixelsOverOne": 5259,
+      "fractionOverOne": 0.00117053952991453,
+      "maximumChannelDifference": 69,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        465,
+        1768,
+        911,
+        3120
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            599,
+            2224
+          ],
+          "before": [
+            59,
+            69,
+            81,
+            255
+          ],
+          "after": [
+            7,
+            9,
+            12,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "SM-S948B/correctness-AB/capture-06-glass-tinted-transport-75.png",
+      "before": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-064746\\capture-06-glass-tinted-transport-75.png",
+      "after": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-080757\\capture-06-glass-tinted-transport-75.png",
+      "beforeSha256": "f596fe8abc93ecfdef64362897f00e49536d2bf9378f72a14a4454f6b50030e9",
+      "afterSha256": "e3864591fdbc9d501a1317bd12da18ac443d376c0e9d1fa881625271f412881b",
+      "size": [
+        1440,
+        3120
+      ],
+      "pixels": 4492800,
+      "pixelsOverOne": 38991,
+      "fractionOverOne": 0.008678552350427351,
+      "maximumChannelDifference": 17,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        332,
+        2073,
+        1196,
+        3120
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            806,
+            2360
+          ],
+          "before": [
+            6,
+            13,
+            5,
+            255
+          ],
+          "after": [
+            17,
+            28,
+            8,
+            255
+          ]
+        },
+        {
+          "xy": [
+            616,
+            2396
+          ],
+          "before": [
+            21,
+            32,
+            8,
+            255
+          ],
+          "after": [
+            33,
+            47,
+            14,
+            255
+          ]
+        },
+        {
+          "xy": [
+            923,
+            2424
+          ],
+          "before": [
+            30,
+            43,
+            13,
+            255
+          ],
+          "after": [
+            19,
+            28,
+            8,
+            255
+          ]
+        },
+        {
+          "xy": [
+            599,
+            2460
+          ],
+          "before": [
+            8,
+            14,
+            4,
+            255
+          ],
+          "after": [
+            20,
+            30,
+            8,
+            255
+          ]
+        },
+        {
+          "xy": [
+            953,
+            2468
+          ],
+          "before": [
+            34,
+            48,
+            15,
+            255
+          ],
+          "after": [
+            20,
+            31,
+            8,
+            255
+          ]
+        },
+        {
+          "xy": [
+            954,
+            2468
+          ],
+          "before": [
+            36,
+            49,
+            15,
+            255
+          ],
+          "after": [
+            21,
+            32,
+            8,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "SM-S948B/correctness-AB/capture-07-glass-fire-transport-75.png",
+      "before": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-064746\\capture-07-glass-fire-transport-75.png",
+      "after": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\reports\\android-showcase-runs\\run-20260930-080757\\capture-07-glass-fire-transport-75.png",
+      "beforeSha256": "2014b69201cc876c31a39337b8c12edbf7a67bafac40cf9c2ee490659828981a",
+      "afterSha256": "1c0d622e76d4185acee77236c57e28d3b77f34d1725e49409d3c5e4a33436961",
+      "size": [
+        1440,
+        3120
+      ],
+      "pixels": 4492800,
+      "pixelsOverOne": 98519,
+      "fractionOverOne": 0.021928196225071226,
+      "maximumChannelDifference": 32,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        332,
+        2073,
+        1197,
+        3120
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            599,
+            2460
+          ],
+          "before": [
+            27,
+            17,
+            11,
+            255
+          ],
+          "after": [
+            59,
+            35,
+            19,
+            255
+          ]
+        },
+        {
+          "xy": [
+            953,
+            2468
+          ],
+          "before": [
+            91,
+            56,
+            29,
+            255
+          ],
+          "after": [
+            60,
+            35,
+            19,
+            255
+          ]
+        },
+        {
+          "xy": [
+            954,
+            2468
+          ],
+          "before": [
+            95,
+            58,
+            29,
+            255
+          ],
+          "after": [
+            63,
+            37,
+            20,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "label": "RTX/High/standard-finale",
+      "before": "C:\\Dev\\tmp\\horde-glass-no-duplicate-20260930\\high-standard\\11-finale-roof.png",
+      "after": "C:\\Dev\\tmp\\horde-glass-barycentric-20260930\\windows\\high-standard\\11-finale-roof.png",
+      "beforeSha256": "d7c6e111184fa7d5525eec6fc64e2c5ed86b60f1d7593b2fa91358d92e35af96",
+      "afterSha256": "7d44fae5b42bf996b6ba28bb716cc9645dd0dd94026fbc17e2c506bdcfc7e3e1",
+      "size": [
+        960,
+        540
+      ],
+      "pixels": 518400,
+      "pixelsOverOne": 24,
+      "fractionOverOne": 4.6296296296296294e-05,
+      "maximumChannelDifference": 89,
+      "equivalencePassed": false,
+      "boundsOverOne": [
+        382,
+        378,
+        449,
+        478
+      ],
+      "peakExamples": [
+        {
+          "xy": [
+            424,
+            378
+          ],
+          "before": [
+            7,
+            3,
+            1,
+            255
+          ],
+          "after": [
+            96,
+            56,
+            16,
+            255
+          ]
+        }
+      ]
+    }
+  ]
+}

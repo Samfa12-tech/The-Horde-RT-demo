@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "blender": [
+    "Blender 5.2.0 LTS",
+    "\tbuild date: 2026-07-14",
+    "\tbuild time: 01:35:40",
+    "\tbuild commit date: 2026-07-13",
+    "\tbuild commit time: 15:20",
+    "\tbuild hash: fbe6228777e7",
+    "\tbuild branch: blender-v5.2-release",
+    "\tbuild platform: Windows",
+    "\tbuild type: Release",
+    "\tbuild c flags:  /W3 -Werror=implicit-function-declaration -Werror=return-type -Wno-tautological-compare -Wno-unknown-pragmas -Wno-char-subscripts -Wstrict-prototypes -Wmissing-prototypes -Wunused-parameter -Wundef -Wundef-prefix -Werror=unguarded-availability-new /DWIN32 /D_WINDOWS /MP /nologo /J /Gy /Gd /showFilenames -Wno-unused-command-line-argument -Wno-microsoft-enum-forward-reference /clang:-funsigned-char /clang:-fno-strict-aliasing /clang:-ffp-contract=off -march=x86-64-v2 ",
+    "\tbuild c++ flags:  /W3 -Wno-tautological-compare -Wno-unknown-pragmas -Wno-char-subscripts -Wno-overloaded-virtual -Wno-sign-compare -Wno-invalid-offsetof -Wno-suggest-override -Wundef -Wundef-prefix -Wunused-parameter -Wmismatched-tags -Werror=unguarded-availability-new /DWIN32 /D_WINDOWS /EHsc  /Gy /MP /nologo /J /Gd /showFilenames /EHsc -Wno-unused-command-line-argument -Wno-microsoft-enum-forward-reference /clang:-funsigned-char /clang:-fno-strict-aliasing /clang:-ffp-contract=off -march=x86-64-v2 ",
+    "\tbuild link flags: /MACHINE:X64  /SUBSYSTEM:CONSOLE /STACK:2097152 /ignore:4049 /ignore:4217 /ignore:4221",
+    "\tbuild system: CMake"
+  ],
+  "threads": 1,
+  "inputs": [
+    {
+      "path": "tools/process-player-rig-runtime.py",
+      "sha256": "87c209098393a261647e6e2b057b5cfad7bbed742cba468427231781e814ae3b"
+    },
+    {
+      "path": "assets/models/player/source/meshy-2026-08-26-gothic-traveller-candidate-2/player-rigged.glb",
+      "sha256": "083adf4f86716155fc25ee1bb2f2966b513ceac6b6f3178374218e85b2295e00"
+    },
+    {
+      "path": "assets/models/player/source/meshy-2026-08-26-gothic-traveller-candidate-2/player-walking.glb",
+      "sha256": "1a8faa6667300da04e7088ee8e5bcae5506280fe259de33b6796a87f85a19d67"
+    },
+    {
+      "path": "assets/models/player/source/meshy-2026-08-30-viewmodel-gauntlet/right-gauntlet-5k-stripped.glb",
+      "sha256": "228e364d82075d7a7ae6e275bb463bc9e73021be83fed4d088734e424f66d400"
+    },
+    {
+      "path": "assets/textures/player/source/base-color.png",
+      "sha256": "902fa74f126635cb2aa2b2d44bcfb009e859b6a48d301a6e5a7e7cf9614c18f9"
+    },
+    {
+      "path": "assets/textures/player/source/emissive.png",
+      "sha256": "4e4123eaae2d93bf6249da62db754233caa860e1f9bc55b09eb10b64023dc076"
+    },
+    {
+      "path": "assets/textures/player/source/metallic.png",
+      "sha256": "0d7a99502d7ec6a622e6d8581d9edb403b99a53208e6e122f99c1c6e1d420e54"
+    },
+    {
+      "path": "assets/textures/player/source/normal.png",
+      "sha256": "b8d579b41178a55a3a6980f167204aed8e5139e5aef1b1b64f3bb39a26aa28fe"
+    },
+    {
+      "path": "assets/textures/player/source/orm.png",
+      "sha256": "472735ab5aa251dc755ea03e2336b3fd3e307e55f7ec9c402dc8ad8c8f7efd33"
+    },
+    {
+      "path": "assets/textures/player/source/roughness.png",
+      "sha256": "bf5530a3ef56e682f6c018d6d4b2debbc949bcb8cabd2c190e81f4471afe6b53"
+    },
+    {
+      "path": "tools/process-player-viewmodel-runtime.py",
+      "sha256": "757ced0cec5f49d7416a6eb7eb393a88b86f25cfbf6b0bda145f26376a9918d3"
+    },
+    {
+      "path": "tools/player_body_partition.py",
+      "sha256": "9e3e952b56b1d973dbf6f243f4f9ebebdabc0136df96761a64508bd5f66e1db8"
+    },
+    {
+      "path": "tools/player_sleeve_seams.py",
+      "sha256": "801d9ab0cca5f038c84ec5fe4cd5e0ad25bbbba00e6fc6e7eafeb936aad55963"
+    },
+    {
+      "path": "tools/player_segmented_seams_blender.py",
+      "sha256": "b18934115247a66df745d1ffa40f303a2cd389cf3f9f07a70d0fe1c79d3806b7"
+    },
+    {
+      "path": "assets/models/player/runtime/asset.manifest.json",
+      "sha256": "451e39efb1d23bf46e5104f0d5d57bc5c9b1080f827c1064e804dcb7d80c7d86"
+    },
+    {
+      "path": "assets/models/player/viewmodel/runtime/viewmodel-processing.json",
+      "sha256": "ef9a3e87a986c8487cfb1ec6355a3db3e17ac9f19fd92e4e2437e64835a9af5c"
+    }
+  ],
+  "outputs": [
+    {
+      "attempt": 1,
+      "file": "world-seam-reconciled.runtime.glb",
+      "bytes": 2568512,
+      "sha256": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb",
+      "referenceSha256": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb",
+      "matchesAcceptedReference": true
+    },
+    {
+      "attempt": 1,
+      "file": "gothic-traveller-viewmodel.runtime.glb",
+      "bytes": 1228832,
+      "sha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b",
+      "referenceSha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b",
+      "matchesAcceptedReference": true
+    },
+    {
+      "attempt": 1,
+      "file": "asset.manifest.json",
+      "bytes": 1582,
+      "sha256": "556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141",
+      "referenceSha256": "556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141",
+      "matchesAcceptedReference": true
+    },
+    {
+      "attempt": 2,
+      "file": "world-seam-reconciled.runtime.glb",
+      "bytes": 2568512,
+      "sha256": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb",
+      "referenceSha256": "f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb",
+      "matchesAcceptedReference": true
+    },
+    {
+      "attempt": 2,
+      "file": "gothic-traveller-viewmodel.runtime.glb",
+      "bytes": 1228832,
+      "sha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b",
+      "referenceSha256": "6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b",
+      "matchesAcceptedReference": true
+    },
+    {
+      "attempt": 2,
+      "file": "asset.manifest.json",
+      "bytes": 1582,
+      "sha256": "556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141",
+      "referenceSha256": "556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141",
+      "matchesAcceptedReference": true
+    }
+  ],
+  "byteRepeatable": true,
+  "acceptedPairReference": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\docs\\evidence\\2026-09-27-segmented-seams",
+  "scope": "Offline regeneration only. Does not replace runtime assets or establish new visual/device acceptance."
+}

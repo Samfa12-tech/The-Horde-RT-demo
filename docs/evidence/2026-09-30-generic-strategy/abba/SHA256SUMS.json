@@ -1,0 +1,284 @@
+{
+  "schema": 1,
+  "sourceCommit": "eafbf8262442a82e0835edf5cf5306d718e64633",
+  "evidenceClass": "investigation-only-whole-strategy",
+  "files": [
+    {
+      "path": "ci/ci-evidence-summary.json",
+      "bytes": 1494,
+      "sha256": "3d9361ce0239705247fc1dc667c23d5d3974d9fc7099ba47d5da5e02269fab35"
+    },
+    {
+      "path": "ci/pr-jobs-api.json",
+      "bytes": 5897,
+      "sha256": "40db45393cb9db951550bf785342f78eb390a45c63ef89265fefca5266778360"
+    },
+    {
+      "path": "ci/pr-run.json",
+      "bytes": 4394,
+      "sha256": "6a5d03245e80f6feb4fe8e34de59eaf0363766b0c8e51883b55a97e1945d7cc3"
+    },
+    {
+      "path": "ci/pr-run.log",
+      "bytes": 145555,
+      "sha256": "0572d9c9ab887ec471453fab8709ca94f2e8ab596e5ca425095183d74e5eaf6f"
+    },
+    {
+      "path": "ci/push-jobs-api.json",
+      "bytes": 5407,
+      "sha256": "1d3c48db5c226de4b589af51c952645a6fe3c2c749edb6e3ec32e38e6b5ed3cc"
+    },
+    {
+      "path": "ci/push-run.json",
+      "bytes": 4412,
+      "sha256": "2a353a1fca683bb41d3064c2701f5d482f61ad1f687bf3c0f4200edd5731b06f"
+    },
+    {
+      "path": "ci/push-run.log",
+      "bytes": 143828,
+      "sha256": "574b8f5ac17b8274a6f39f0a6d9569dec376725ebcbbc90e7f1dbdba62ed6b3e"
+    },
+    {
+      "path": "comparison.json",
+      "bytes": 25203,
+      "sha256": "226ea5b618358853e53a3a63e84066412cbbe42b4f28149c40df13d796fd86fa"
+    },
+    {
+      "path": "installs/generic-route-control-a1-20260930/install.log",
+      "bytes": 38,
+      "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3"
+    },
+    {
+      "path": "installs/generic-route-control-a1-20260930/pull.log",
+      "bytes": 173,
+      "sha256": "0bdc6ad558153249aad22a421b317eecf1104c7528cb709ec48e08c8e99f7bac"
+    },
+    {
+      "path": "installs/generic-route-control-a1-20260930/receipt.json",
+      "bytes": 391,
+      "sha256": "6afc6fb85b04dcfd90e0ee4c38e47a80cacbdccf70e840dd9c9ad4c66b603ae3"
+    },
+    {
+      "path": "installs/generic-route-control-a2-20260930/install.log",
+      "bytes": 38,
+      "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3"
+    },
+    {
+      "path": "installs/generic-route-control-a2-20260930/pull.log",
+      "bytes": 173,
+      "sha256": "320ad4e1182e25574f1fc60c1aaceb116dfcc3c747066074b291ec64f33f0669"
+    },
+    {
+      "path": "installs/generic-route-control-a2-20260930/receipt.json",
+      "bytes": 391,
+      "sha256": "8c1ca372939ed5886aa80b28e67c15bfe32ac0507785a2c285c133a8ef9f6f2a"
+    },
+    {
+      "path": "installs/generic-route-profile-b1-20260930/install.log",
+      "bytes": 38,
+      "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3"
+    },
+    {
+      "path": "installs/generic-route-profile-b1-20260930/pull.log",
+      "bytes": 173,
+      "sha256": "ab7cead30a5e6f0a534455ab5e828cdb4faa5fbac71246aa47dc7ff36854e529"
+    },
+    {
+      "path": "installs/generic-route-profile-b1-20260930/receipt.json",
+      "bytes": 399,
+      "sha256": "aa008e4a69459384a75b908b047f19796ba417e094c2b95b993c9e40d0091844"
+    },
+    {
+      "path": "installs/generic-route-profile-b2-20260930/install.log",
+      "bytes": 38,
+      "sha256": "c4aa470acafcf8576c15b0f0b5ae7e852d1ec5413372d0e6a9272e788e1306d3"
+    },
+    {
+      "path": "installs/generic-route-profile-b2-20260930/pull.log",
+      "bytes": 173,
+      "sha256": "9ad4faaa803872508f66ce01242c771613c63cb6e0cf0a7157f309e80c7e5d06"
+    },
+    {
+      "path": "installs/generic-route-profile-b2-20260930/receipt.json",
+      "bytes": 399,
+      "sha256": "758d1698c0f0ab7506b7550c0e141a4635cd18f6f723419222f9f2c33b2e988c"
+    },
+    {
+      "path": "method/curate-abba.ps1",
+      "bytes": 4007,
+      "sha256": "d880cb5b461ea2e1af219ac5004b6995927ea64e5de360f6a94da7552025c181"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4971,
+      "sha256": "14e63bc0bce1b27037496fb8818e1afe47d7866661e069f01ccbe2fde7b11235"
+    },
+    {
+      "path": "restoration/capture-01-opening-state.json",
+      "bytes": 6874,
+      "sha256": "231a113f4477906bd5334e84f618f15e5ce2791aa436e00e2cd2a3c71a48de4a"
+    },
+    {
+      "path": "restoration/capture-manifest.json",
+      "bytes": 3436,
+      "sha256": "a06d7b230b94d4161797e00e34968ab304bf55088ec789f4688ab5a68a96710f"
+    },
+    {
+      "path": "restoration/summary.json",
+      "bytes": 2120,
+      "sha256": "ddb747658ce1bf7aa8a976f5fd3b30051272af8b31253a379bae72a5be9ee036"
+    },
+    {
+      "path": "trials/generic-route-control-a1-20260930/analysis.json",
+      "bytes": 9424,
+      "sha256": "ed41f6fd7dfe5285ad930928e47f904802d63a9c0ef01a5fa9f46574eff9457f"
+    },
+    {
+      "path": "trials/generic-route-control-a1-20260930/benchmark.json.gz",
+      "bytes": 68590,
+      "sha256": "17808fab15574aa8d142cd8af45418069c2263f2b61d950e668bd1398fbd75c5",
+      "compressed": true,
+      "sourceBytes": 1468415,
+      "sourceSha256": "9163b08a458b563fceab3b815a3dbcefd08d97ed15ea54316d704f2d645123cf"
+    },
+    {
+      "path": "trials/generic-route-control-a1-20260930/context-samples.jsonl",
+      "bytes": 5310,
+      "sha256": "4e43bfe125da97382c1c8cd1f9aa8b6755c211367d45442929ab145bd12b5b83"
+    },
+    {
+      "path": "trials/generic-route-control-a1-20260930/launch.log",
+      "bytes": 323,
+      "sha256": "3ea68d00f857b73f335556903781aaf95a188007cd29c93bc98e602301922e16"
+    },
+    {
+      "path": "trials/generic-route-control-a1-20260930/pull.log",
+      "bytes": 175,
+      "sha256": "fb68778c526bbbb01368b8b01a6d8ae2de7bb08c8204238e0f5eb68ced6d2505"
+    },
+    {
+      "path": "trials/generic-route-control-a1-20260930/result.json",
+      "bytes": 113,
+      "sha256": "0eaf783d94d11d891ae40d9825b7cbff5e274d61166d71d7d8d5b74946692a9c"
+    },
+    {
+      "path": "trials/generic-route-control-a1-20260930/trial.json",
+      "bytes": 9017,
+      "sha256": "f6bb06fe76a36e438188e2bfe4c8736301ea72214d3981d051b10444924c7bc2"
+    },
+    {
+      "path": "trials/generic-route-control-a2-20260930/analysis.json",
+      "bytes": 9499,
+      "sha256": "bdabf697845eca4db3b33ab3cdfe120bfb91c593df661e9b7badf5a7cf6d9d03"
+    },
+    {
+      "path": "trials/generic-route-control-a2-20260930/benchmark.json.gz",
+      "bytes": 68829,
+      "sha256": "62b46db03094a2c6ec26b8e4325cf3f24f122d59447e103f5be1d79c124ea3d5",
+      "compressed": true,
+      "sourceBytes": 1468422,
+      "sourceSha256": "072e088b0f4d762b60ee6d0b135a27d6d6fd799ca366e8e2a37d7fbd63a220ad"
+    },
+    {
+      "path": "trials/generic-route-control-a2-20260930/context-samples.jsonl",
+      "bytes": 6201,
+      "sha256": "564d7bc1763171fa302bd322074ea6bbfa7b0c5096067f183905ec8d36ae5bee"
+    },
+    {
+      "path": "trials/generic-route-control-a2-20260930/launch.log",
+      "bytes": 323,
+      "sha256": "1085cee5a4a43c8548af5f349560838fec72ea82b95b369c803a3a414e06f96f"
+    },
+    {
+      "path": "trials/generic-route-control-a2-20260930/pull.log",
+      "bytes": 175,
+      "sha256": "0f32c3fe5c8e14969723f8a2a429a2e1480de996db44ed3701c4a80e80161f4a"
+    },
+    {
+      "path": "trials/generic-route-control-a2-20260930/result.json",
+      "bytes": 113,
+      "sha256": "667466e60245320e0c38fce57f74512ce8dd1d1d42948823172eb22c8029ca42"
+    },
+    {
+      "path": "trials/generic-route-control-a2-20260930/trial.json",
+      "bytes": 10362,
+      "sha256": "31c841aeb743c793556b6156d1c58729f5ab7f96c0d8158a4f867edb3eb0970d"
+    },
+    {
+      "path": "trials/generic-route-profile-b1-20260930/analysis.json",
+      "bytes": 9939,
+      "sha256": "236386291afb9ffafee324999a4610d65fd84ddfa932faa006ed56c74568c8ee"
+    },
+    {
+      "path": "trials/generic-route-profile-b1-20260930/benchmark.json.gz",
+      "bytes": 68880,
+      "sha256": "848a5f66942695923ed8a5c09ec56b4dba29ff03458911b8ddca380187aca19a",
+      "compressed": true,
+      "sourceBytes": 1483297,
+      "sourceSha256": "cfada2ee9c739b4bc2ca763307a8054ebac3126c3b49ebc6f4a8fc84ff16a640"
+    },
+    {
+      "path": "trials/generic-route-profile-b1-20260930/context-samples.jsonl",
+      "bytes": 14160,
+      "sha256": "1107dadb5ac0c0c48986f88e1867801405c58c78f4fe5324ae240bb0f69a5849"
+    },
+    {
+      "path": "trials/generic-route-profile-b1-20260930/launch.log",
+      "bytes": 323,
+      "sha256": "1085cee5a4a43c8548af5f349560838fec72ea82b95b369c803a3a414e06f96f"
+    },
+    {
+      "path": "trials/generic-route-profile-b1-20260930/pull.log",
+      "bytes": 175,
+      "sha256": "48af1a738bac75e7fd1706cb723246e6a16091d6285a934880802195462e5588"
+    },
+    {
+      "path": "trials/generic-route-profile-b1-20260930/result.json",
+      "bytes": 113,
+      "sha256": "57c36e9b79ef4bac2dfbff0005cf5924fd60573c61f4813f9520229d691bc4d2"
+    },
+    {
+      "path": "trials/generic-route-profile-b1-20260930/trial.json",
+      "bytes": 22152,
+      "sha256": "370a9eb13a845a2b1db8e894cdf8690a231e16d907ef28b8fe9f86d660fa3773"
+    },
+    {
+      "path": "trials/generic-route-profile-b2-20260930/analysis.json",
+      "bytes": 9935,
+      "sha256": "fc2122c1a7d285b93e3ef9b5656e05bf5d022d5b8cebe1ec931acf08f29f9e7c"
+    },
+    {
+      "path": "trials/generic-route-profile-b2-20260930/benchmark.json.gz",
+      "bytes": 69214,
+      "sha256": "e0f8c0ef31d0872a2c4c1834c3c4b4fabdb662e089879720262cec659c0874fc",
+      "compressed": true,
+      "sourceBytes": 1483296,
+      "sourceSha256": "458cde389d329b1cd0486cfc6070b32257569cc2e011f38b73b64b0501ee6253"
+    },
+    {
+      "path": "trials/generic-route-profile-b2-20260930/context-samples.jsonl",
+      "bytes": 16166,
+      "sha256": "1721b29ccfaa471c2685914dff3cff572a088f557cea60dea944cac5e6edee51"
+    },
+    {
+      "path": "trials/generic-route-profile-b2-20260930/launch.log",
+      "bytes": 323,
+      "sha256": "b32825666282483f29a22b9869b9190e1e60b73db2521e6c46c58f1310d2bbab"
+    },
+    {
+      "path": "trials/generic-route-profile-b2-20260930/pull.log",
+      "bytes": 175,
+      "sha256": "eda7307fc268bacc464e71d5ea44ea7369a913c79cef62e19e52278faecc16fe"
+    },
+    {
+      "path": "trials/generic-route-profile-b2-20260930/result.json",
+      "bytes": 113,
+      "sha256": "af08b9ede0b976ccad0934257d292a67e12f2960efb84001ffdad8944a4dc2d8"
+    },
+    {
+      "path": "trials/generic-route-profile-b2-20260930/trial.json",
+      "bytes": 25127,
+      "sha256": "7fae5dd1c458827c1d1042d638361c7f548295808633b7c72f49e325299744f6"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "runId": "mobile-pane-s26-p1-high-20261001",
+  "sourceCommit": "1da483d01124ca673badf6c13939d99736c4a658",
+  "installedApkSha256": "bac94c45bcfe3f8fcc367f21439735387d188959005b5ee873d02f0f1e9cf142",
+  "member": "open-aperture-candidate",
+  "workload": "lantern-held-high-v1",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "requestedScalePercent": 75,
+  "requestedBackend": "RayTracingPipeline",
+  "instrumentation": "Shipping",
+  "quality": "Mobile",
+  "startUtc": "2026-10-01T08:27:53.4805303Z",
+  "recordingEnabled": false,
+  "appDataCleared": false,
+  "status": "complete",
+  "gpuMemoryCounters": "not-collected; not a pass",
+  "memoryBoundary": "before/after trial; not frame aligned",
+  "processId": "31375",
+  "endUtc": "2026-10-01T08:30:25.7572595Z",
+  "renderScalePercent": 75,
+  "internalExtent": {
+    "width": 1080,
+    "height": 2235
+  },
+  "presentationExtent": {
+    "width": 1440,
+    "height": 2980
+  },
+  "presentMode": "MAILBOX",
+  "overall": {
+    "averageMs": 110.3641,
+    "medianMs": 112.0319,
+    "p95Ms": 115.7496,
+    "onePercentLowFps": 8.1724
+  }
+}

@@ -1,0 +1,16 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-music-instrumentation-20261001/whistle-bank/native-build
+Test project C:/Dev/tmp/horde-music-instrumentation-20261001/whistle-bank/native-build
+    Start 1: horde_music_staged_wave_tests
+1/2 Test #1: horde_music_staged_wave_tests .........***Failed    0.98 sec
+Music PCM WAV test failed: actual runtime audio is not all zero
+
+    Start 2: horde_music_staged_asset_bank_tests
+2/2 Test #2: horde_music_staged_asset_bank_tests ...   Passed    1.11 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =   2.10 sec
+
+The following tests FAILED:
+	  1 - horde_music_staged_wave_tests (Failed)
+Errors while running CTest

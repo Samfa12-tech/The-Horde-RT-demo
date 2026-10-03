@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <iomanip>
+#include <iterator>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -101,6 +102,11 @@ void AppendMissingRequirementsForRayQuery(const ExtensionSupport& extensions, co
     {
         AddMissing(diagnostics, "Missing required feature: VkPhysicalDeviceBufferDeviceAddressFeatures::bufferDeviceAddress");
     }
+
+    if (!extensions.deferredHostOperations)
+    {
+        AddMissing(diagnostics, "Missing required extension: VK_KHR_deferred_host_operations");
+    }
 }
 
 void AppendExtensionLine(std::vector<std::string>& diagnostics, const std::string& extension, const bool supported)
@@ -171,8 +177,7 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
     capabilities.identity.vulkanApiVersion = properties.apiVersion;
 
     capabilities.diagnostics.push_back("Inspecting candidate " + std::to_string(deviceIndex));
-    capabilities.diagnostics.push_back("Driver version packed: " + std::to_string(capabilities.identity.driverVersion));
-    capabilities.diagnostics.push_back("Driver version: " + VersionTextFromPacked(capabilities.identity.driverVersion));
+    capabilities.diagnostics.push_back("Driver version: " + FormatDriverVersionText(capabilities.identity.driverVersion));
     capabilities.diagnostics.push_back("Vulkan API version: " + VersionTextFromPacked(capabilities.identity.vulkanApiVersion));
 
     std::uint32_t extensionCount = 0;
@@ -180,8 +185,13 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
     std::vector<VkExtensionProperties> extensions(extensionCount);
     vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, extensions.data());
 
+    bool driverPropertiesExtension = false;
     for (const auto& extension : extensions)
     {
+        if (extension.extensionName == std::string(VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME))
+        {
+            driverPropertiesExtension = true;
+        }
         if (extension.extensionName == std::string(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME))
         {
             capabilities.extensions.accelerationStructure = true;
@@ -203,6 +213,33 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
             capabilities.extensions.deferredHostOperations = true;
         }
     }
+
+    // Promoted in Vulkan 1.2; older physical devices must advertise the KHR
+    // extension. This probe creates a 1.2 instance, so properties2 is core.
+    if (properties.apiVersion >= VK_API_VERSION_1_2 || driverPropertiesExtension)
+    {
+        const auto getProperties2 = reinterpret_cast<PFN_vkGetPhysicalDeviceProperties2>(
+            vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceProperties2"));
+        if (getProperties2 != nullptr)
+        {
+            VkPhysicalDeviceDriverProperties driver{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DRIVER_PROPERTIES};
+            VkPhysicalDeviceProperties2 properties2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
+            properties2.pNext = &driver;
+            getProperties2(physicalDevice, &properties2);
+            auto& metadata = capabilities.identity.driverProperties;
+            metadata.available = true;
+            metadata.id = static_cast<std::uint32_t>(driver.driverID);
+            // Bound reads even if a faulty implementation omits the terminator.
+            metadata.name.assign(driver.driverName, std::find(std::begin(driver.driverName),
+                std::end(driver.driverName), '\0'));
+            metadata.info.assign(driver.driverInfo, std::find(std::begin(driver.driverInfo),
+                std::end(driver.driverInfo), '\0'));
+            metadata.conformanceVersion = {driver.conformanceVersion.major, driver.conformanceVersion.minor,
+                driver.conformanceVersion.subminor, driver.conformanceVersion.patch};
+        }
+    }
+    capabilities.diagnostics.push_back(std::string("Driver properties: ") +
+        (capabilities.identity.driverProperties.available ? "available" : "unavailable"));
 
     VkPhysicalDeviceFeatures2 features2{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{
@@ -249,13 +286,17 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
     capabilities.features.rayQuery = rayQueryFeatures.rayQuery == VK_TRUE;
     capabilities.features.bufferDeviceAddress = bufferDeviceAddressFeatures.bufferDeviceAddress == VK_TRUE;
 
-    capabilities.rtMode = raytracing::EvaluateRtMode(capabilities.extensions, capabilities.features);
+    capabilities.rtMode = raytracing::EvaluateRtMode(
+        capabilities.extensions, capabilities.features, capabilities.identity.vulkanApiVersion);
 
     if (capabilities.rtMode == RtMode::Unsupported)
     {
         std::vector<std::string> missing;
-        AppendMissingRequirementsForRayTracingPipeline(capabilities.extensions, capabilities.features, missing);
-        AppendMissingRequirementsForRayQuery(capabilities.extensions, capabilities.features, missing);
+        ExtensionSupport effectiveRequirements = capabilities.extensions;
+        effectiveRequirements.bufferDeviceAddress = capabilities.extensions.bufferDeviceAddress ||
+            capabilities.identity.vulkanApiVersion >= VK_API_VERSION_1_2;
+        AppendMissingRequirementsForRayTracingPipeline(effectiveRequirements, capabilities.features, missing);
+        AppendMissingRequirementsForRayQuery(effectiveRequirements, capabilities.features, missing);
 
         if (missing.empty())
         {
@@ -267,7 +308,7 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
         }
     }
 
-    capabilities.diagnostics.push_back("RT mode selected: " + ToString(capabilities.rtMode));
+    capabilities.diagnostics.push_back("RT capability mode: " + ToString(capabilities.rtMode));
     return capabilities;
 }
 

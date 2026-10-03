@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "status": "PASS",
+  "deviceOperation": false,
+  "originalEvidenceReadOnly": true,
+  "modules": [
+    {
+      "role": "control",
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "sha256": "5002afa7ac6ce0d03fc749742bb0832a1006b9f01bb1c6ab8490710790a79133",
+      "validation": "PASS",
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false
+    },
+    {
+      "role": "control",
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "sha256": "c2bd389812841161951f819e0f12e95c929aa3f49ec87d9849393a687d20ebde",
+      "validation": "PASS",
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false
+    },
+    {
+      "role": "control",
+      "key": "shipping_mobile_opaque_fast",
+      "sha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "validation": "PASS",
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false
+    },
+    {
+      "role": "control",
+      "key": "shipping_mobile_generic_dielectric",
+      "sha256": "ce2302811cb2cb8bbff706fd54cd7f48705e4a5e8b2cda744a7d999574f84532",
+      "validation": "PASS",
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false
+    },
+    {
+      "role": "isolate",
+      "key": "rayquery_compute_shipping_mobile_opaque_fast",
+      "sha256": "7b35d5961d27c3385ed97fed8d4f4a00ccc0884b257a2480bd9ef56741a4d295",
+      "validation": "PASS",
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false
+    },
+    {
+      "role": "isolate",
+      "key": "rayquery_compute_shipping_mobile_generic_dielectric",
+      "sha256": "f72f6ee70cae2608e5b3f787cb37f3b51907e9078158deb70ada3273bbc97e76",
+      "validation": "PASS",
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false
+    },
+    {
+      "role": "isolate",
+      "key": "shipping_mobile_opaque_fast",
+      "sha256": "1e2b907a3b1fce730711aeb97f369440d4f8d0b0c5d1619290e1b35b61952f23",
+      "validation": "PASS",
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false
+    },
+    {
+      "role": "isolate",
+      "key": "shipping_mobile_generic_dielectric",
+      "sha256": "ec04234ca954a07070e669657b4bbfcf93fdb556a66be31580975c1a6df9e2ab",
+      "validation": "PASS",
+      "atomics": 0,
+      "imageReads": 0,
+      "binding22": false
+    }
+  ],
+  "analyses": [
+    {
+      "run": "all-shadow-c1-route-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    },
+    {
+      "run": "all-shadow-c1-high-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    },
+    {
+      "run": "all-shadow-c1-live-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    },
+    {
+      "run": "all-shadow-s1-route-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    },
+    {
+      "run": "all-shadow-s1-high-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    },
+    {
+      "run": "all-shadow-s1-live-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    },
+    {
+      "run": "all-shadow-s2-route-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    },
+    {
+      "run": "all-shadow-s2-high-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    },
+    {
+      "run": "all-shadow-s2-live-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    },
+    {
+      "run": "all-shadow-c2-route-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    },
+    {
+      "run": "all-shadow-c2-high-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    },
+    {
+      "run": "all-shadow-c2-live-20261001",
+      "recomputedAnalysis": "exact canonical JSON match"
+    }
+  ],
+  "aggregate": "exact per-run and per-workload values; creation time/output paths excluded"
+}

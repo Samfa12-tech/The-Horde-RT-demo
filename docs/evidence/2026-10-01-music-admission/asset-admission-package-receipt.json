@@ -1,0 +1,23 @@
+{
+  "classification": "runtime-music-admission-and-build-only-not-playback-or-device-acceptance",
+  "baseCommit": "0db0d0b2b47e6c208911dab8b8129793ed7918cc",
+  "sourceState": "authorised edits over base; reviewed source recorded by commit, not pristine base artifact",
+  "apk": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.6.1-engineering-pass\\android\\app\\build\\outputs\\apk\\debug\\app-debug.apk",
+  "apkBytes": 109517702,
+  "apkSha256": "e7f7c92e898ca7ea9dd56f0eaadce780168151bddeac55114c3ca169a223d44f",
+  "build": "Debug universal, four ABIs",
+  "musicManifestSha256": "1126f9f537efb607b11bd492e1c79d6e8b94814567ce06b654e03b0d915c9ff3",
+  "musicEntries": 17,
+  "musicWaveBytes": 20160704,
+  "musicPcmBytes": 20160000,
+  "sourceExcludedFromPackage": true,
+  "canonicalJsonPcs1Agreement": true,
+  "existingRenderAndSfxAssetsMatched": 52,
+  "packagedLicenceMatchesCurrentSource": true,
+  "arm64Sha256": "13b951d26230da67b1d82e41ccbcfd21a783ab3e3eb1bfbfb25d66c0778f0763",
+  "actualDiagnosticMobileModules": 4,
+  "moduleValidation": "fresh val/dis PASS, identities equal accepted C11",
+  "installed": false,
+  "playbackWired": false,
+  "physicalDeviceAcceptance": false
+}

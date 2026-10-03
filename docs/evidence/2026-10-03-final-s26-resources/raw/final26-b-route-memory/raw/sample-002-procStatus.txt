@@ -1,0 +1,54 @@
+Name:	ernrt.benchmark
+Umask:	0077
+State:	S (sleeping)
+Tgid:	5426
+Ngid:	0
+Pid:	5426
+PPid:	2142
+TracerPid:	0
+Uid:	10423	10423	10423	10423
+Gid:	10423	10423	10423	10423
+FDSize:	256
+Groups:	3003 9997 20423 50423 
+Kthread:	0
+VmPeak:	18065780 kB
+VmSize:	17482348 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	 1062528 kB
+VmRSS:	  296584 kB
+RssAnon:	  182748 kB
+RssFile:	  112992 kB
+RssShmem:	     844 kB
+VmData:	 4077992 kB
+VmStk:	    8192 kB
+VmExe:	       8 kB
+VmLib:	  213496 kB
+VmPTE:	    3752 kB
+VmSwap:	   18520 kB
+CoreDumping:	0
+THP_enabled:	1
+untag_mask:	0xffffffffffffff
+Threads:	35
+SigQ:	0/38661
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000080001204
+SigIgn:	0000000000000001
+SigCgt:	0000006e400084f8
+CapInh:	0000000000000000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	0000000000000000
+CapAmb:	0000000000000000
+NoNewPrivs:	0
+Seccomp:	2
+Seccomp_filters:	1
+Speculation_Store_Bypass:	thread vulnerable
+SpeculationIndirectBranch:	unknown
+Cpus_allowed:	ff
+Cpus_allowed_list:	0-7
+Mems_allowed:	1
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	6923
+nonvoluntary_ctxt_switches:	1935

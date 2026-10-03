@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "runId": "20261002-183151",
+  "mode": "Host",
+  "result": "fail",
+  "failure": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe failed with exit code 8",
+  "gitCommit": "242e573552fde43c8879fb968d1841aab7788ada",
+  "gitStatusBefore": "?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/battery-after.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/battery-before.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/device-properties.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/lifecycle-home-resume-logcat.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/logcat.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/package-after-install.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/package-before-install.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/runtime-resources-after.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/runtime-resources-before.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/runtime-threads-after.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/runtime-threads-before.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/thermal-after.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/thermal-before.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/timing.csv\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/vulkan_capability_report.json\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/vulkan_capability_report.txt",
+  "gitStatusAfter": " M tests/RaygenVariantManifestTests.ps1\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/battery-after.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/battery-before.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/device-properties.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/lifecycle-home-resume-logcat.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/logcat.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/package-after-install.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/package-before-install.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/runtime-resources-after.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/runtime-resources-before.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/runtime-threads-after.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/runtime-threads-before.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/thermal-after.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/thermal-before.txt\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/timing.csv\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/vulkan_capability_report.json\r\n?? docs/evidence/2026-10-01-s24-visual-followup/run-20261001-221511/vulkan_capability_report.txt\r\n?? docs/evidence/2026-10-02-final-integration/variant-manifest-repair.log",
+  "shaderRegisterPressureMeasured": false,
+  "shaderRegisterPressureNote": "NVIDIA Nsight is not installed; SPIR-V structure and device timing are the available evidence.",
+  "shaderRetention": "not-evaluated",
+  "sourceIdentity": {
+    "version": "1.6.1",
+    "androidVersionCode": 9,
+    "versionSource": "VERSION",
+    "versionCodeMap": "version-code-map.json"
+  },
+  "validationArtifactsPublishable": false,
+  "captureCount": 0,
+  "stages": [
+    {
+      "name": "shader-staleness",
+      "status": "pass",
+      "durationSeconds": 8.98,
+      "log": "logs\\shader-staleness.log"
+    },
+    {
+      "name": "negative-safety-gates",
+      "status": "pass",
+      "durationSeconds": 3.111,
+      "log": "logs\\negative-safety-gates.log"
+    },
+    {
+      "name": "windows-fresh-build-and-tests",
+      "status": "fail",
+      "durationSeconds": 1107.805,
+      "log": "logs\\windows-fresh-build-and-tests.log",
+      "error": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe failed with exit code 8"
+    }
+  ]
+}

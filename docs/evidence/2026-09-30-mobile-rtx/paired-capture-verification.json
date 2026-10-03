@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "artifactManifestModuleHashesVerified": true,
+  "sourceCommit": "f50c32fe2f9b5de8347f40b0c18399fe32b3a52f",
+  "exeSha256": "fd063981f1d91b11b59c1cbca82ed8f5d46ac33da87f9d0deaba2bcb0c482987",
+  "counterObjectsEqual": true,
+  "subset": "One RTX diagnostic Mobile isolated-lantern checkpoint; not the 13-capture foundation gate",
+  "pixelToleranceSource": "tools/compare-foundation-captures.ps1 (unchanged limits; pixel-only subset assessment)",
+  "pixelTolerance": {
+    "maximumChannelDifference": 3,
+    "maximumFractionOverOne": 0.001
+  },
+  "pixels": 518400,
+  "pixelsDifferent": 32,
+  "pixelsDifferentByMoreThanOne": 0,
+  "differentFraction": 0,
+  "maximumChannelDifference": 1,
+  "meanAbsoluteRgbChannelDifference": 2.1862139917695473E-05,
+  "pixelSubsetPassed": true,
+  "phoneFailureReproduced": false,
+  "performanceAcceptance": false,
+  "phase4Accepted": false
+}

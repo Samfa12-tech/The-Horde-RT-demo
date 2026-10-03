@@ -1,0 +1,240 @@
+{
+  "investigationOnly": true,
+  "precision": "double using captured GPU float inputs",
+  "glbSha256": "34a2522f2027d3fb04b77480cc929d36c5a19c6e0f33bf3fa0f0ae0959c99ec4",
+  "witnessSha256": "f3b361ba95e30e0397287d96a23c84b8a0153bdc85fd468b559c5f9ada02b2d7",
+  "paths": [
+    {
+      "pixel": [
+        515,
+        569
+      ],
+      "sourcePrimitive": 62.0,
+      "sourceComponent": 4,
+      "guarded": 1.0,
+      "minimumNormalBias": 3.0485020033665933e-05,
+      "nativeOriginMaximumOutsideLocalMetres": -5.870244514462352e-05,
+      "limitingFace": 63,
+      "nativeReturnedPrimitive": 27.0,
+      "nativeRawT": 4.263141090632416e-05,
+      "doubleIntersectionsOfNativeObjectRay": [
+        {
+          "t": 4.2631408182230114e-05,
+          "primitive": 27,
+          "component": 4,
+          "entering": false
+        },
+        {
+          "t": 0.16187316453528017,
+          "primitive": 3,
+          "component": 0,
+          "entering": true
+        },
+        {
+          "t": 0.16502219486527256,
+          "primitive": 37,
+          "component": 0,
+          "entering": false
+        }
+      ],
+      "followingInterfaces": [
+        {
+          "slot": 1,
+          "primitive": 27,
+          "component": 4,
+          "incomingTirCount": 0.0,
+          "cosine": 0.605869674843614,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 2,
+          "primitive": 61,
+          "component": 4,
+          "incomingTirCount": 1.0,
+          "cosine": 0.6057640034922044,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 3,
+          "primitive": 27,
+          "component": 4,
+          "incomingTirCount": 2.0,
+          "cosine": 0.6059611200298105,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 4,
+          "primitive": 61,
+          "component": 4,
+          "incomingTirCount": 3.0,
+          "cosine": 0.605879087494092,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 5,
+          "primitive": 63,
+          "component": 4,
+          "incomingTirCount": 4.0,
+          "cosine": 0.6057286350360244,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 6,
+          "primitive": 61,
+          "component": 4,
+          "incomingTirCount": 5.0,
+          "cosine": 0.6058808413424199,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 7,
+          "primitive": 63,
+          "component": 4,
+          "incomingTirCount": 6.0,
+          "cosine": 0.6057303065673947,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 8,
+          "primitive": 61,
+          "component": 4,
+          "incomingTirCount": 7.0,
+          "cosine": 0.6056824841301343,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": false
+        }
+      ]
+    },
+    {
+      "pixel": [
+        515,
+        570
+      ],
+      "sourcePrimitive": 62.0,
+      "sourceComponent": 4,
+      "guarded": 1.0,
+      "minimumNormalBias": 3.064571137656458e-05,
+      "nativeOriginMaximumOutsideLocalMetres": -6.155184314540215e-05,
+      "limitingFace": 63,
+      "nativeReturnedPrimitive": 27.0,
+      "nativeRawT": 4.471622742130421e-05,
+      "doubleIntersectionsOfNativeObjectRay": [
+        {
+          "t": 4.471622187351436e-05,
+          "primitive": 27,
+          "component": 4,
+          "entering": false
+        },
+        {
+          "t": 0.16189273832838902,
+          "primitive": 3,
+          "component": 0,
+          "entering": true
+        },
+        {
+          "t": 0.16504215789083393,
+          "primitive": 37,
+          "component": 0,
+          "entering": false
+        }
+      ],
+      "followingInterfaces": [
+        {
+          "slot": 1,
+          "primitive": 27,
+          "component": 4,
+          "incomingTirCount": 0.0,
+          "cosine": 0.6056596779415412,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 2,
+          "primitive": 61,
+          "component": 4,
+          "incomingTirCount": 1.0,
+          "cosine": 0.6057092372880343,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 3,
+          "primitive": 27,
+          "component": 4,
+          "incomingTirCount": 2.0,
+          "cosine": 0.6058852440468949,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 4,
+          "primitive": 61,
+          "component": 4,
+          "incomingTirCount": 3.0,
+          "cosine": 0.605876400910293,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 5,
+          "primitive": 63,
+          "component": 4,
+          "incomingTirCount": 4.0,
+          "cosine": 0.6059210858935281,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 6,
+          "primitive": 61,
+          "component": 4,
+          "incomingTirCount": 5.0,
+          "cosine": 0.6061151593745056,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 7,
+          "primitive": 63,
+          "component": 4,
+          "incomingTirCount": 6.0,
+          "cosine": 0.606311815427074,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": true
+        },
+        {
+          "slot": 8,
+          "primitive": 61,
+          "component": 4,
+          "incomingTirCount": 7.0,
+          "cosine": 0.6065058122341662,
+          "criticalCosine": 0.7531098886437283,
+          "totalInternalReflection": true,
+          "processedBeforeEightInterfaceCeiling": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+Internal ctest changing into directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+Test project C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+    Start  6: horde_rt_lantern_benchmark_tests
+1/6 Test  #6: horde_rt_lantern_benchmark_tests ...........   Passed    0.07 sec
+    Start  7: horde_rt_benchmark_evidence_report_tests
+2/6 Test  #7: horde_rt_benchmark_evidence_report_tests ...   Passed    0.05 sec
+    Start  8: horde_rt_windows_benchmark_launch_tests
+3/6 Test  #8: horde_rt_windows_benchmark_launch_tests ....   Passed    0.02 sec
+    Start  9: horde_rt_benchmark_evidence_run_tests
+4/6 Test  #9: horde_rt_benchmark_evidence_run_tests ......   Passed    0.04 sec
+    Start 56: horde_rt_windows_music_focus_tests
+5/6 Test #56: horde_rt_windows_music_focus_tests .........   Passed    0.02 sec
+    Start 98: horde_rt_showcase_benchmark_smoke
+6/6 Test #98: horde_rt_showcase_benchmark_smoke ..........   Passed    0.11 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =   0.33 sec

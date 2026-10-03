@@ -12,6 +12,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
+. (Join-Path $PSScriptRoot "music-asset-policy.ps1")
+$null = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
+. (Join-Path $PSScriptRoot "version-contract.ps1")
+$sourceIdentity = Get-HordeSourceIdentity -RepoRoot $repoRoot
 $outputRootFull = [IO.Path]::GetFullPath($OutputRoot)
 $allowedOutputRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot "reports"))
 $allowedOutputPrefix = $allowedOutputRoot.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
@@ -40,8 +44,8 @@ $gitCommit = "unknown"
 $gitStatusBefore = ""
 $gitStatusAfter = ""
 $shaderRetention = "not-evaluated"
-$sourcePackageVersion = ""
-$sourceVersionCode = 0
+$sourcePackageVersion = $sourceIdentity.Version
+$sourceVersionCode = $sourceIdentity.VersionCode
 
 foreach ($directory in @($runDirectory, $logDirectory, $artifactDirectory, $captureDirectory,
                           $windowsCaptureDirectory, $shaderDirectory)) {
@@ -158,6 +162,25 @@ function Get-PngMetadata {
     }
 }
 
+function Assert-SelectedRtPipelineBundle {
+    param([Parameter(Mandatory = $true)]$Bundle,
+          [Parameter(Mandatory = $true)][string]$Context)
+    foreach ($strategy in @("opaqueFast", "genericDielectric")) {
+        $entry = $Bundle.$strategy
+        if ($null -eq $entry -or [string]::IsNullOrWhiteSpace([string]$entry.key) -or
+            [string]$entry.sha256 -cnotmatch '^[0-9a-f]{64}$') {
+            throw "$Context selected RT pipeline bundle is missing exact $strategy key/hash identity."
+        }
+    }
+    $opaquePolicy = ([string]$Bundle.opaqueFast.key) -replace '_opaque_fast$', ''
+    $genericPolicy = ([string]$Bundle.genericDielectric.key) -replace '_generic_dielectric$', ''
+    if ($opaquePolicy -ceq [string]$Bundle.opaqueFast.key -or
+        $genericPolicy -ceq [string]$Bundle.genericDielectric.key -or
+        $opaquePolicy -cne $genericPolicy) {
+        throw "$Context selected RT pipeline bundle does not identify one coherent policy pair."
+    }
+}
+
 function Test-CaptureManifest {
     param([Parameter(Mandatory = $true)][string]$ManifestPath,
           [Parameter(Mandatory = $true)][ValidateSet("Windows", "Android")][string]$Platform,
@@ -167,12 +190,13 @@ function Test-CaptureManifest {
     $records = @($(if ($Platform -eq "Windows") { $manifest.captures } else { $manifest.checkpoints }))
     $expected = @("opening", "skeleton", "worst-bend", "lantern-drop", "skylight", "yellow", "blue", "red", "green", "mirror", "lich", "finale-roof", "two-enemy-combat")
     if ($records.Count -ne $expected.Count) { throw "$Platform manifest contains $($records.Count) captures; expected $($expected.Count)." }
+    Assert-SelectedRtPipelineBundle -Bundle $manifest.selectedRtPipelineBundle -Context "$Platform manifest"
     if ($Platform -eq "Windows") {
         if (-not $manifest.complete -or -not $manifest.sceneOnly -or $manifest.overlaysIncluded) {
             throw "Windows capture manifest is not a complete scene-only capture set."
         }
         if ([double]$manifest.fixedAnimationTimeSeconds -ne 0.0) { throw "Windows capture animation time is not fixed at zero." }
-        if ([string]::IsNullOrWhiteSpace($manifest.buildId) -or [string]::IsNullOrWhiteSpace($manifest.raygenSha256) -or
+        if ([string]::IsNullOrWhiteSpace($manifest.buildId) -or
             [string]::IsNullOrWhiteSpace($manifest.device.gpuName)) { throw "Windows capture identity metadata is incomplete." }
         if ([int]$manifest.presentation.dispatchWidth -le 0 -or [int]$manifest.presentation.dispatchHeight -le 0 -or
             [int]$manifest.presentation.swapchainWidth -le 0 -or [int]$manifest.presentation.swapchainHeight -le 0) {
@@ -208,6 +232,7 @@ function Test-CaptureManifest {
                 throw "Windows capture lacks honest-presentation or colour-route metadata: $file"
             }
         } else {
+            Assert-SelectedRtPipelineBundle -Bundle $record.selectedRtPipelineBundle -Context "Android capture $($record.checkpoint)"
             if (-not $record.presented -or -not $record.sceneOnly -or [double]$record.animationTime -ne 0.0 -or
                 [string]::IsNullOrWhiteSpace($record.gpu) -or [string]::IsNullOrWhiteSpace($record.buildIdentity) -or
                 [string]::IsNullOrWhiteSpace($record.shaderIdentity) -or
@@ -266,6 +291,8 @@ function Write-ValidationPackage {
         @{ Source = "assets\models\player\runtime\asset.manifest.json"; Destination = "assets\models\player\runtime" },
         @{ Source = "assets\models\player\runtime\clip-manifest.json"; Destination = "assets\models\player\runtime" },
         @{ Source = "assets\models\player\runtime\gothic-traveller-lod0.runtime.glb"; Destination = "assets\models\player\runtime" },
+        @{ Source = "assets\models\player\viewmodel\runtime\asset.manifest.json"; Destination = "assets\models\player\viewmodel\runtime" },
+        @{ Source = "assets\models\player\viewmodel\runtime\gothic-traveller-viewmodel.runtime.glb"; Destination = "assets\models\player\viewmodel\runtime" },
         @{ Source = "assets\textures\props\runtime\asset.manifest.json"; Destination = "assets\textures\props\runtime" },
         @{ Source = "assets\textures\props\runtime\base-color.windows.ktx2"; Destination = "assets\textures\props\runtime" },
         @{ Source = "assets\textures\props\runtime\normal.windows.ktx2"; Destination = "assets\textures\props\runtime" },
@@ -283,6 +310,7 @@ function Write-ValidationPackage {
     $pixabayAudioDestination = Join-Path $windowsStage "assets\audio\pixabay"
     New-Item -ItemType Directory -Force -Path $pixabayAudioDestination | Out-Null
     Copy-Item -Path (Join-Path $repoRoot "assets\audio\pixabay\*.wav") -Destination $pixabayAudioDestination
+    $null = Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets")
     Compress-Archive -Path (Join-Path $windowsStage "*") -DestinationPath $windowsZip -CompressionLevel Optimal
     Copy-Item -LiteralPath $AndroidApk -Destination $androidValidationApk
     @(
@@ -307,6 +335,7 @@ function Assert-ZipContainsEntries {
 }
 
 function Test-ValidationPackages {
+    $null = Assert-HordeMusicAssets -RepositoryRoot $repoRoot
     $entries = @(Assert-ZipContainsEntries -ArchivePath $windowsZip -PackageLabel "Windows validation zip" -RequiredEntries @(
         "HordeLanternRT.exe", "README.txt", "ASSET_LICENSES.md", "UNPUBLISHABLE_VALIDATION_BUILD.txt",
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
@@ -330,6 +359,8 @@ function Test-ValidationPackages {
         "assets/models/player/runtime/asset.manifest.json",
         "assets/models/player/runtime/clip-manifest.json",
         "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+        "assets/models/player/viewmodel/runtime/asset.manifest.json",
+        "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
         "assets/textures/props/runtime/asset.manifest.json",
         "assets/textures/props/runtime/base-color.windows.ktx2",
         "assets/audio/filmcow/sword_swing_1.wav",
@@ -337,6 +368,7 @@ function Test-ValidationPackages {
         "assets/audio/pixabay/chest_unlock.wav",
         "assets/audio/pixabay/chest_open.wav",
         "assets/audio/pixabay/torch_extinguish.wav"))
+    $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".android.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Windows validation zip contains forbidden development static asset content: $forbidden"
@@ -365,6 +397,8 @@ function Test-ValidationPackages {
         "assets/models/player/runtime/asset.manifest.json",
         "assets/models/player/runtime/clip-manifest.json",
         "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb",
+        "assets/models/player/viewmodel/runtime/asset.manifest.json",
+        "assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb",
         "assets/textures/props/runtime/asset.manifest.json",
         "assets/textures/props/runtime/base-color.android.ktx2",
         "assets/textures/props/runtime/normal.android.ktx2",
@@ -377,6 +411,7 @@ function Test-ValidationPackages {
         "assets/audio/pixabay/chest_unlock.wav",
         "assets/audio/pixabay/chest_open.wav",
         "assets/audio/pixabay/torch_extinguish.wav"))
+    $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $androidValidationApk
     foreach ($forbidden in @("/source/", "/high/", "runtime-development", "gothic_arming_sword", "models/props/meshy/production-", ".processing.json", ".windows.ktx2")) {
         if (@($entries | Where-Object { $_ -like "*$forbidden*" }).Count -ne 0) {
             throw "Android validation APK contains forbidden development static asset content: $forbidden"
@@ -503,10 +538,28 @@ try {
                 & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.6.0" -VersionCode 9
             } 'immutable'
             Assert-ExpectedFailure {
-                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.6.1" -VersionCode 8
+                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "1.6.1" -VersionCode 9
+            } 'immutable'
+            . (Join-Path $PSScriptRoot "release-version-policy.ps1")
+            Assert-ExpectedFailure {
+                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "contract-mismatch" -VersionCode $script:HordeLatestPublishedVersionCode
             } 'greater than'
             Assert-ExpectedFailure {
+                & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version "contract-mismatch" -VersionCode ($script:HordeLatestPublishedVersionCode + 1)
+            } 'active root contract'
+            # Validation packages are explicitly unpublishable. Published source
+            # remains valid to test, but production packaging must stay locked.
+            if (Test-HordeReleaseVersionIsPublished -Version $script:sourcePackageVersion) {
+                Assert-ExpectedFailure {
+                    Assert-HordeReleaseVersionIsMutable -Version $script:sourcePackageVersion -VersionCode $script:sourceVersionCode
+                } 'immutable'
+                Assert-HordeSourceIdentityMatches -Version $script:sourcePackageVersion -VersionCode $script:sourceVersionCode | Out-Null
+            } else {
+                Assert-HordeReleaseVersionIsMutable -Version $script:sourcePackageVersion -VersionCode $script:sourceVersionCode
+            }
+            Assert-ExpectedFailure {
                 & (Join-Path $PSScriptRoot "push-alpha-to-itch.ps1") -Version "1.6.0" `
+                    -VersionCode 9 `
                     -ButlerPath (Join-Path $runDirectory "missing-butler.exe")
             } 'immutable'
 
@@ -565,7 +618,9 @@ try {
             $validationUnsignedPrevious = $(if ($validationUnsignedExisted) { $env:HORDE_VALIDATION_UNSIGNED } else { $null })
             try {
                 $env:HORDE_VALIDATION_UNSIGNED = "1"
-                .\gradlew.bat clean assembleDebug assembleRelease lintRelease --console=plain
+                .\gradlew.bat clean assembleDebug assembleRelease lintRelease --console=plain `
+                    -PhordeRtInstrumentationOverride= `
+                    -PhordeRtDielectricQualityOverride=
                 if ($LASTEXITCODE -ne 0) { throw "Android build or lint failed." }
             } finally {
                 if ($validationUnsignedExisted) { $env:HORDE_VALIDATION_UNSIGNED = $validationUnsignedPrevious }
@@ -582,24 +637,50 @@ try {
                     "-OutputDirectory", (Join-Path $runDirectory "asset-math-compiler-contract\$($assetMathConfiguration.ToLowerInvariant())")
                 )
             }
+            $powerShell = (Get-Command pwsh -ErrorAction Stop).Source
+            $androidContainmentScanner = Join-Path $repoRoot "tools\InspectRtPipelineBundleContainment.ps1"
+            $androidPackageScanner = Join-Path $repoRoot "tools\InspectAndroidRtPipelineBundlePackage.ps1"
+            $androidContainmentControls = Join-Path $repoRoot "tests\RtPipelineBundleContainmentTests.ps1"
+            foreach ($containmentCase in @(
+                [pscustomobject]@{
+                    BuildType = "debug"
+                    StripTask = "stripDebugDebugSymbols"
+                    Apk = "app-debug.apk"
+                    Instrumentation = "Diagnostic"
+                },
+                [pscustomobject]@{
+                    BuildType = "release"
+                    StripTask = "stripReleaseDebugSymbols"
+                    Apk = "app-release-unsigned.apk"
+                    Instrumentation = "Shipping"
+                })) {
+                $strippedLibrary = Join-Path $repoRoot (
+                    "android\app\build\intermediates\stripped_native_libs\{0}\{1}\out\lib\arm64-v8a\libhorde_rt_probe_android.so" -f
+                        $containmentCase.BuildType, $containmentCase.StripTask)
+                $apkPath = Join-Path $repoRoot (
+                    "android\app\build\outputs\apk\{0}\{1}" -f
+                        $containmentCase.BuildType, $containmentCase.Apk)
+                Invoke-CheckedNative $powerShell @(
+                    "-NoProfile", "-File", $androidPackageScanner,
+                    "-Scanner", $androidContainmentScanner,
+                    "-StrippedLibraryPath", $strippedLibrary,
+                    "-ApkPath", $apkPath,
+                    "-Instrumentation", $containmentCase.Instrumentation,
+                    "-Quality", "Mobile")
+                Invoke-CheckedNative $powerShell @(
+                    "-NoProfile", "-File", $androidContainmentControls,
+                    "-Scanner", $androidContainmentScanner,
+                    "-TargetPath", $strippedLibrary,
+                    "-TargetPlatform", "Android",
+                    "-Instrumentation", $containmentCase.Instrumentation,
+                    "-Quality", "Mobile",
+                    "-PowerShellExecutable", $powerShell)
+            }
         }
 
         $windowsReleaseExe = Join-Path $windowsBuild "Release\HordeLanternRT.exe"
         $androidUnsignedApk = Join-Path $repoRoot "android\app\build\outputs\apk\release\app-release-unsigned.apk"
         Invoke-Stage "validation-package-and-licence-gate" {
-            $cmakeVersionSource = Get-Content -LiteralPath (Join-Path $repoRoot "cmake\HordeRtSources.cmake") -Raw
-            $gradleVersionSource = Get-Content -LiteralPath (Join-Path $repoRoot "android\app\build.gradle") -Raw
-            $cmakeVersionMatch = [regex]::Match($cmakeVersionSource, 'HORDE_RT_PACKAGE_VERSION\s+"([^"]+)"')
-            $gradleNameMatch = [regex]::Match($gradleVersionSource, "versionName\s+'([^']+)'")
-            $gradleCodeMatch = [regex]::Match($gradleVersionSource, 'versionCode\s+(\d+)(?:\s|$)')
-            if (-not $cmakeVersionMatch.Success -or -not $gradleNameMatch.Success -or -not $gradleCodeMatch.Success) {
-                throw "Could not parse the current CMake/Android release identity."
-            }
-            if ($cmakeVersionMatch.Groups[1].Value -ne $gradleNameMatch.Groups[1].Value) {
-                throw "CMake and Android package versions disagree."
-            }
-            $script:sourcePackageVersion = $cmakeVersionMatch.Groups[1].Value
-            $script:sourceVersionCode = [int]$gradleCodeMatch.Groups[1].Value
             foreach ($required in @(
                 $windowsReleaseExe, $androidUnsignedApk, (Join-Path $repoRoot "ASSET_LICENSES.md"),
                 (Join-Path $repoRoot "assets\models\enemies\meshy\lich_placeholder_source_licence.png"))) {
@@ -611,6 +692,24 @@ try {
             if ($windowsVersion.FileVersion -ne $script:sourcePackageVersion -or
                 $windowsVersion.ProductVersion -ne $script:sourcePackageVersion) {
                 throw "Windows validation binary version surfaces do not agree on $($script:sourcePackageVersion)."
+            }
+            $windowsSdkBin = Join-Path ${env:ProgramFiles(x86)} "Windows Kits\10\bin"
+            $mt = Find-LatestVersionedTool -Root $windowsSdkBin -RelativeToolPath "x64\mt.exe"
+            $embeddedManifest = Join-Path $artifactDirectory "HordeLanternRT.embedded.manifest"
+            try {
+                & $mt -nologo "-inputresource:$windowsReleaseExe;#1" "-out:$embeddedManifest"
+                if ($LASTEXITCODE -ne 0) { throw "Could not extract the Windows embedded manifest." }
+                $embeddedManifestText = Get-Content -LiteralPath $embeddedManifest -Raw
+                $expectedAssemblyVersion = "$($script:sourcePackageVersion).0"
+                if ($embeddedManifestText -notmatch [regex]::Escape(('version="{0}"' -f $expectedAssemblyVersion))) {
+                    throw "Windows embedded manifest does not contain expected assembly identity $expectedAssemblyVersion."
+                }
+                if ($embeddedManifestText -notmatch 'PerMonitorV2' -or $embeddedManifestText -notmatch 'longPathAware' -or
+                    $embeddedManifestText -notmatch 'Microsoft.Windows.Common-Controls') {
+                    throw "Windows embedded manifest lost a required compatibility declaration."
+                }
+            } finally {
+                if (Test-Path -LiteralPath $embeddedManifest) { Remove-Item -LiteralPath $embeddedManifest -Force }
             }
             $windowsBinaryText = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($windowsReleaseExe))
             foreach ($marker in @(
@@ -732,6 +831,8 @@ try {
             $sourceAndArtifactTargets = @(
                 (Join-Path $repoRoot "shaders\raytracing\minimal.rgen"),
                 (Join-Path $repoRoot "src\vulkan\raytracing\MinimalRayGenShader.inc"),
+                (Join-Path $repoRoot "VERSION"),
+                (Join-Path $repoRoot "version-code-map.json"),
                 (Join-Path $repoRoot "ASSET_LICENSES.md"),
                 $windowsReleaseExe,
                 $androidUnsignedApk,
@@ -787,6 +888,12 @@ try {
         shaderRegisterPressureMeasured = $false
         shaderRegisterPressureNote = "NVIDIA Nsight is not installed; SPIR-V structure and device timing are the available evidence."
         shaderRetention = $shaderRetention
+        sourceIdentity = [ordered]@{
+            version = $sourcePackageVersion
+            androidVersionCode = $sourceVersionCode
+            versionSource = [IO.Path]::GetRelativePath($repoRoot, $sourceIdentity.VersionPath)
+            versionCodeMap = [IO.Path]::GetRelativePath($repoRoot, $sourceIdentity.VersionCodeMapPath)
+        }
         validationArtifactsPublishable = $false
         captureCount = $pngCount
         stages = @($stageResults)
@@ -798,6 +905,7 @@ try {
         "- Mode: $Mode",
         "- Result: $($summary.result.ToUpperInvariant())",
         "- Git commit: ``$gitCommit``",
+        "- Source identity: ``$sourcePackageVersion`` / Android versionCode ``$sourceVersionCode``",
         "- Captures: $pngCount",
         "- Validation artifacts: UNPUBLISHABLE",
         "- Register pressure: not numerically measured; NVIDIA Nsight is not installed.",

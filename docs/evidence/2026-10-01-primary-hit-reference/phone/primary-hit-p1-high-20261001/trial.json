@@ -1,0 +1,67 @@
+{
+  "runId": "primary-hit-p1-high-20261001",
+  "buildLabel": "primary-hit-reference",
+  "sourceCommit": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+  "installedApkSha256": "40d0f759dca40ff8433ce4aca19156a135a9146a960f115f4cdbb78d3db7cf9e",
+  "workload": "lantern-held-high-v1",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "package": "com.samfa12.hordelanternrt.benchmark",
+  "requestedScalePercent": 75,
+  "requestedBackend": "RayTracingPipeline",
+  "instrumentation": "Shipping",
+  "quality": "Mobile",
+  "startUtc": "2026-09-30T19:50:01.9117760Z",
+  "recordingEnabled": false,
+  "contextIntervalSeconds": 5,
+  "resumeExisting": false,
+  "status": "complete",
+  "processId": "29797",
+  "endUtc": "2026-09-30T19:50:18.7378098Z",
+  "samples": [
+    {
+      "utc": "2026-09-30T19:50:02.8285559Z",
+      "processId": "29797",
+      "batteryC": 39.0,
+      "thermalStatus": 1,
+      "gpuThermalPowerLevel": 0
+    },
+    {
+      "utc": "2026-09-30T19:50:08.0771629Z",
+      "processId": "29797",
+      "batteryC": 39.1,
+      "thermalStatus": 2,
+      "gpuThermalPowerLevel": 3
+    },
+    {
+      "utc": "2026-09-30T19:50:13.3290542Z",
+      "processId": "29797",
+      "batteryC": 39.1,
+      "thermalStatus": 2,
+      "gpuThermalPowerLevel": 2
+    },
+    {
+      "utc": "2026-09-30T19:50:18.6141364Z",
+      "processId": "29797",
+      "batteryC": 39.5,
+      "thermalStatus": 2,
+      "gpuThermalPowerLevel": 3
+    }
+  ],
+  "renderScalePercent": 75,
+  "internalExtent": {
+    "width": 1080,
+    "height": 2235
+  },
+  "presentationExtent": {
+    "width": 1440,
+    "height": 2980
+  },
+  "presentMode": "MAILBOX",
+  "overall": {
+    "averageMs": 11.298,
+    "medianMs": 11.2368,
+    "p95Ms": 11.9071,
+    "onePercentLowFps": 68.5622
+  }
+}

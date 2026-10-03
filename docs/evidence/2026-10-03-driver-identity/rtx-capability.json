@@ -1,0 +1,59 @@
+{
+  "backend": "Vulkan",
+  "rtMode": "RayTracingPipeline",
+  "executionBackend": "Unsupported",
+  "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+  "vendorId": 4318,
+  "deviceId": 11672,
+  "driverVersion": 2559295488,
+  "driverVersionText": "raw 2559295488 (vendor-specific)",
+  "driverProperties": {
+    "available": true,
+    "driverId": 4,
+    "driverName": "NVIDIA",
+    "driverInfo": "610.47",
+    "conformanceVersion": "1.4.3.3"
+  },
+  "vulkanApiVersion": 4211029,
+  "vulkanApiVersionText": "1.4.341",
+  "extensions": {
+    "VK_KHR_acceleration_structure": true,
+    "VK_KHR_ray_tracing_pipeline": true,
+    "VK_KHR_ray_query": true,
+    "VK_KHR_buffer_device_address": true,
+    "VK_KHR_deferred_host_operations": true
+  },
+  "features": {
+    "accelerationStructure": true,
+    "rayTracingPipeline": true,
+    "rayQuery": true,
+    "bufferDeviceAddress": true
+  },
+  "internalRenderResolution": {
+    "width": 0,
+    "height": 0
+  },
+  "fps": "N/A",
+  "frameTimeMs": "N/A",
+  "gpuRtTiming": {
+    "status": "Not initialised",
+    "supported": false,
+    "valid": false,
+    "latestMs": "N/A",
+    "averageMs": "N/A",
+    "timestampPeriodNanoseconds": 0,
+    "timestampValidBits": 0,
+    "sampleCount": 0,
+    "unavailableCount": 0,
+    "errorCount": 0
+  },
+  "rtScene": {
+    "status": "Not attempted",
+    "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+    "dispatchWidth": 0,
+    "dispatchHeight": 0,
+    "presented": false
+  },
+  "diagnostics": ["Inspecting candidate 1", "Driver version: raw 2559295488 (vendor-specific)", "Vulkan API version: 1.4.341", "Driver properties: available", "RT capability mode: RayTracingPipeline", "Internal render resolution: not measured yet.", "FPS / frame time: not measured yet."],
+  "rtFrameEvidence": {"version":1,"observerAvailable":false,"sceneEpoch":null,"measurementGeneration":null,"running":null,"paused":null,"presented":null,"diagnosticStatus":"unavailable","gpuStatus":"unavailable","completedFrameStatus":"unavailable","completedFrameReason":"observer-unavailable","completedFrame":null}
+}

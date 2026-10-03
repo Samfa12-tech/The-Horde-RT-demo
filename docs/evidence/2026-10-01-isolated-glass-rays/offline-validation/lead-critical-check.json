@@ -1,0 +1,29 @@
+{
+  "result": "PASS",
+  "method": "double plane intersection and Gram-system barycentrics; native captured vertices/ray",
+  "notGPUEmulation": true,
+  "checks": [
+    {
+      "pixel": [
+        346,
+        1200
+      ],
+      "primitive": 27.0,
+      "nativeT": 0.13058379292488098,
+      "planeIntersectionT": 0.13058379912124332,
+      "absoluteTResidual": 6.196362339894179e-09,
+      "interiorMargin": 0.12773191475224432
+    },
+    {
+      "pixel": [
+        347,
+        1201
+      ],
+      "primitive": 13.0,
+      "nativeT": 0.005437989253550768,
+      "planeIntersectionT": 0.00543792267575703,
+      "absoluteTResidual": 6.657779373815675e-08,
+      "interiorMargin": 0.050943524803118256
+    }
+  ]
+}

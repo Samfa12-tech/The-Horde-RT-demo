@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "configuration": "Debug",
+  "variant": "bank",
+  "started": "2026-10-01T06:08:22.105Z",
+  "finished": "2026-10-01T06:10:48.777Z",
+  "exitCode": 0,
+  "executable": {
+    "bytes": 285696,
+    "sha256": "23fb9a5b6df5f5bf5d4092ae94f313f39e91370ff439d968427a88c423cd89ed"
+  },
+  "inputs": [
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/asset.manifest.json",
+      "bytes": 5071,
+      "sha256": "ea7adbc1c248fc37d705239e6bcd529fbf10206ffb77165051658bce4e438c3e"
+    },
+    {
+      "path": "docs/evidence/2026-10-01-music-instrumentation/SHA256SUMS.json",
+      "bytes": 9658,
+      "sha256": "72134d1f4172e957a8fe7935ae55fba8965527de72b9cdb4a8622e42f20293e3"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/source/What_the_Dark_Keeps_Pocket_Chordsmith.json",
+      "sha256": "f5d4bbc8068ae2865216304efc22337ac190ca5b7732e02a9ed5e9062b7b92f4",
+      "bytes": 72393
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/source/What_the_Dark_Keeps_PCS1.txt",
+      "sha256": "747e5a9a21f41f0fc587fe55572b03a6196cd25cece17283775dd03130164dab",
+      "bytes": 94054
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/A-body.wav",
+      "sha256": "a58cacd493bd4604cf1d51096cf03092e35c993a079c10af7fcec3debc093277",
+      "bytes": 2304044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/A-tail.wav",
+      "sha256": "4fea7b227dee6b81f09fd54f202bfea33a76a2419fa07c1ec37a0d2f8d14e4e1",
+      "bytes": 576044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/B-body.wav",
+      "sha256": "27944d203f9453b7ff9edb2bfd653bac524d4da4db4a000f76115fb4810dd3b5",
+      "bytes": 2304044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/B-tail.wav",
+      "sha256": "7a437a4641f4b99d8b21db934ece9bb3a9c4d0464fea37eb94a2841d70f3132f",
+      "bytes": 576044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/C-body.wav",
+      "sha256": "3ce3a8ea381c3e81c0b34841df3f1d8d236a5ef335f594001553a400b65accb3",
+      "bytes": 576044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/C-tail.wav",
+      "sha256": "ec3650bd450cebe9985c1d4d4b59749debe34301f9f9e889171d0e49a316c89c",
+      "bytes": 576044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/D-body.wav",
+      "sha256": "22274bc3c17713c275b48232130299a443eb56c7cf871a5f3389e5c83c5a8d64",
+      "bytes": 2304044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/D-tail.wav",
+      "sha256": "d7a934809ab1024da19dc1b86c370b692d8400e0431897f7455936cd8959c3aa",
+      "bytes": 576044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/E-body.wav",
+      "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03",
+      "bytes": 2304044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/E-tail.wav",
+      "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2",
+      "bytes": 576044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/F-body.wav",
+      "sha256": "158f015c3ffbb12169eb088206751f56fbed799e0b3dea3ab4496124634b441d",
+      "bytes": 2304044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/F-tail.wav",
+      "sha256": "a4fdc4b38c8a1e7240cfad5ac364063ec8c6f27f9baefc2d2e6110a8a4429c21",
+      "bytes": 576044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/G-body.wav",
+      "sha256": "ab2dbe31c735cbeec11d09eaa308e5faee793a891c34b67f5f50f6b33af25736",
+      "bytes": 1152044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/G-tail.wav",
+      "sha256": "c51b9851ac32e34c57e586f154d3ee1d5f2d138b9c0f21b2c983618905a42609",
+      "bytes": 576044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/H-body.wav",
+      "sha256": "58ac260bd18204e9fb1aeb01aab9229de6830032f1d4be3d30b9527fde1fe6ae",
+      "bytes": 2304044
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/H-tail.wav",
+      "sha256": "9e50268573d85733333e10304a0e9faf8d23545e510723035aef1b9d8b0238bf",
+      "bytes": 576044
+    },
+    {
+      "path": "tools/music-instrumentation-core-check/check.cpp",
+      "sha256": "0ec0622842d115616f8c1a88a39c8c9d7441cfe499acade5f8d1da78fd902f65",
+      "bytes": 15673
+    },
+    {
+      "path": "tools/music-instrumentation-core-check/CMakeLists.txt",
+      "sha256": "10e7267242b6122647775512c54c9800e214c4da4e2f50a34225efe272004602",
+      "bytes": 2685
+    },
+    {
+      "path": "tools/music-instrumentation-core-check/run.cjs",
+      "sha256": "a321cadcce3bb58a323f3f6f227dc322312c85d918994e3549143b4167f5a7ec",
+      "bytes": 4218
+    },
+    {
+      "path": "src/audio/MusicPcmStream.cpp",
+      "sha256": "479bc7c460e9bcc2d798f6f8239e1cbb4d82e923a8c42e2723ee145ef90dad6a",
+      "bytes": 2472
+    },
+    {
+      "path": "src/audio/MusicPcmStream.h",
+      "sha256": "f311dae38a4650ce0c3af7be119c5bd36812a8119cdbbc7913bb1c3080b8ec55",
+      "bytes": 1746
+    },
+    {
+      "path": "src/audio/MusicPcmAssets.h",
+      "sha256": "743507ab9ee00ef0ee8cd82a835502f8536c7311430f1544a61fd447af08302d",
+      "bytes": 2600
+    },
+    {
+      "path": "src/audio/MusicPcmWave.cpp",
+      "sha256": "d3165d1c12ad7cf5baadfcd21701974003643acb55266853246ee7e1486531a7",
+      "bytes": 367
+    },
+    {
+      "path": "src/audio/MusicPcmWave.h",
+      "sha256": "bcbafb86b90b0a2b3036a8928a438fac49f3e1d1e3072c9a4c2aaffdc71e0693",
+      "bytes": 1000
+    },
+    {
+      "path": "third_party/pocket-audio-core/manifest.json",
+      "sha256": "b0bda2ea83ef811cd19ac14ad76b5b8d36ddf8725d55031d2b22107a7c3d4f28",
+      "bytes": 2802
+    },
+    {
+      "path": "third_party/pocket-audio-core/native/src/PcmLoopStream.cpp",
+      "sha256": "4121689e6563ab3708f3b1d82fc86be2bc3b1c9ed9e5b13aa4762597296c669e",
+      "bytes": 11207
+    },
+    {
+      "path": "third_party/pocket-audio-core/native/src/PcmWave.cpp",
+      "sha256": "7f26a2bcc093a6ea761fc61695d67c0c0c454819dfed76949020e9a7fece1e53",
+      "bytes": 6972
+    }
+  ],
+  "inputHashesStable": true,
+  "resultSha256": "c5566efa710c303762c876dfc6f5c77a42add56925de36582358416a8a1c9ad0",
+  "scope": "Production Core/Horde adapter offline sample clock; no OS audio, DAW, renderer, device or audible acceptance."
+}

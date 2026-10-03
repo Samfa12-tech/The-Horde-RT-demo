@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.samfa12.hordelanternrt.PlaytestReportExportTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-01T11:04:53" hostname="SAM_LAPPY" time="0.004">
+  <properties/>
+  <testcase name="providerFailureAndCloseFailureNeverReportSuccessOrAutoRetry" classname="com.samfa12.hordelanternrt.PlaytestReportExportTest" time="0.002"/>
+  <testcase name="destroyedOrCancelledOwnerRejectsLateCallbacks" classname="com.samfa12.hordelanternrt.PlaytestReportExportTest" time="0.0"/>
+  <testcase name="pickerCancellationRetainsOnlyAnExplicitRetry" classname="com.samfa12.hordelanternrt.PlaytestReportExportTest" time="0.0"/>
+  <testcase name="writesOnlyApprovedExactUtf8AndClosesStream" classname="com.samfa12.hordelanternrt.PlaytestReportExportTest" time="0.001"/>
+  <testcase name="explicitConsentAndEnvelopeRequired" classname="com.samfa12.hordelanternrt.PlaytestReportExportTest" time="0.001"/>
+  <testcase name="retryOwnsExactImmutableBytesAndPreventsDuplicate" classname="com.samfa12.hordelanternrt.PlaytestReportExportTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

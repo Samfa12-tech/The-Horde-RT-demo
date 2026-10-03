@@ -1,0 +1,424 @@
+--------- beginning of main
+10-01 19:33:08.931 26202 26202 I HordeLanternAudio: Accepted debug automation intent: checkpoint=114 capture=false replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 19:33:09.125 26202 26329 I HordeLanternMusic: PCM ready48k stereo; queue capacity=5766frames minimumBytes=46128 allocatedFrames=5766 sampleRate=48000
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 2
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 1
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 3
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 4
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 6
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 5
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 8
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 7
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 9
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 10
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 12
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 11
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 13
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 14
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 16
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 17
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 15
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 18
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 19
+10-01 19:33:09.184 26202 26202 I HordeLanternAudio: SFX loaded: 20
+10-01 19:33:09.197 26202 26202 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:33:21.393 26202 26202 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:33:21.393 26202 26202 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:33:21.393 26202 26202 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:33:21.399 26202 26329 I HordeLanternMusic: Music epoch=1; discarded prior-session PCM
+10-01 19:33:21.400 26202 26621 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:33:21.470 26202 26621 I HordeRtProbeBridge: HORDE_BENCH begin generation=1 checkpoint=lantern-chest-unlock scale=75 warmup_frames=120 sample_frames=120 windows=3 zone=yellow-torch-bay
+10-01 19:33:21.475 26202 26329 I HordeLanternMusic: Music epoch=2; discarded prior-session PCM
+10-01 19:33:22.984 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=52.729 fence=51.287 record=0.692 submit+present=0.581
+10-01 19:33:22.984 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=50.079 average_ms=51.115 samples=30 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:33:29.215 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=51.903 fence=50.624 record=0.525 submit+present=0.578
+10-01 19:33:29.215 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=50.332 average_ms=50.494 samples=150 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:33:33.888 26202 26621 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=lantern-chest-unlock scale=75 window=1 frames=120 total_ms=51.934 fence_ms=50.660 record_ms=0.532 present_ms=0.569 zone=finale presented=1
+10-01 19:33:35.450 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=51.928 fence=50.669 record=0.526 submit+present=0.567
+10-01 19:33:35.450 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=50.666 average_ms=50.445 samples=270 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:33:40.124 26202 26621 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=lantern-chest-unlock scale=75 window=2 frames=120 total_ms=51.939 fence_ms=50.712 record_ms=0.517 present_ms=0.540 zone=finale presented=1
+10-01 19:33:41.686 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=51.947 fence=50.733 record=0.519 submit+present=0.530
+10-01 19:33:41.686 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.418 average_ms=50.435 samples=390 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:33:46.359 26202 26621 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=lantern-chest-unlock scale=75 window=3 frames=120 total_ms=51.937 fence_ms=50.703 record_ms=0.520 present_ms=0.547 zone=finale presented=1
+10-01 19:33:46.359 26202 26621 I HordeRtProbeBridge: HORDE_BENCH complete generation=1 checkpoint=lantern-chest-unlock scale=75 windows=3
+10-01 19:33:47.671 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=49.846 fence=46.198 record=2.972 submit+present=0.518
+10-01 19:33:47.671 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=32.042 average_ms=49.361 samples=510 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:33:52.879 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=43.382 fence=32.265 record=10.615 submit+present=0.391
+10-01 19:33:52.879 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.891 average_ms=46.037 samples=630 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:33:57.609 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=39.399 fence=32.035 record=6.830 submit+present=0.404
+10-01 19:33:57.609 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.474 average_ms=43.744 samples=750 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:01.751 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=34.491 fence=33.156 record=0.537 submit+present=0.575
+10-01 19:34:01.751 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.353 average_ms=42.232 samples=870 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:06.021 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=35.564 fence=34.095 record=0.603 submit+present=0.634
+10-01 19:34:06.021 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=34.159 average_ms=41.197 samples=990 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:10.364 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=36.168 fence=34.715 record=0.579 submit+present=0.639
+10-01 19:34:10.364 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=34.204 average_ms=40.451 samples=1110 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:14.542 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=34.802 fence=33.378 record=0.583 submit+present=0.624
+10-01 19:34:14.543 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.496 average_ms=39.723 samples=1230 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:18.859 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=35.950 fence=34.510 record=0.569 submit+present=0.626
+10-01 19:34:18.859 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=34.206 average_ms=39.224 samples=1350 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:23.185 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=36.035 fence=34.787 record=0.503 submit+present=0.547
+10-01 19:34:23.185 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=34.860 average_ms=38.830 samples=1470 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:27.853 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=38.887 fence=38.101 record=0.322 submit+present=0.341
+10-01 19:34:27.853 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=36.074 average_ms=38.734 samples=1590 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:32.079 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=35.192 fence=34.228 record=0.396 submit+present=0.416
+10-01 19:34:32.079 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.618 average_ms=38.388 samples=1710 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:36.076 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.292 fence=31.872 record=0.587 submit+present=0.587
+10-01 19:34:36.076 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.674 average_ms=37.938 samples=1830 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:40.069 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.258 fence=31.877 record=0.541 submit+present=0.592
+10-01 19:34:40.069 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.370 average_ms=37.542 samples=1950 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:44.067 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.297 fence=31.906 record=0.560 submit+present=0.602
+10-01 19:34:44.067 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.468 average_ms=37.193 samples=2070 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:48.063 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.282 fence=31.886 record=0.574 submit+present=0.585
+10-01 19:34:48.064 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.697 average_ms=36.881 samples=2190 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:52.155 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=34.074 fence=32.638 record=0.575 submit+present=0.628
+10-01 19:34:52.155 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.547 average_ms=36.641 samples=2310 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:34:56.219 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.846 fence=32.376 record=0.561 submit+present=0.639
+10-01 19:34:56.219 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.450 average_ms=36.411 samples=2430 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:00.254 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.612 fence=32.158 record=0.570 submit+present=0.624
+10-01 19:35:00.254 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.355 average_ms=36.194 samples=2550 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:04.321 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.872 fence=32.396 record=0.563 submit+present=0.660
+10-01 19:35:04.321 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.410 average_ms=36.006 samples=2670 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:08.343 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.486 fence=32.027 record=0.585 submit+present=0.625
+10-01 19:35:08.343 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.546 average_ms=35.818 samples=2790 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:12.361 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.465 fence=32.022 record=0.571 submit+present=0.605
+10-01 19:35:12.361 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=33.151 average_ms=35.645 samples=2910 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:16.448 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=34.038 fence=32.638 record=0.563 submit+present=0.615
+10-01 19:35:16.448 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.568 average_ms=35.511 samples=3030 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:20.463 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.437 fence=32.020 record=0.561 submit+present=0.621
+10-01 19:35:20.463 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.407 average_ms=35.362 samples=3150 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:24.525 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.828 fence=32.421 record=0.571 submit+present=0.606
+10-01 19:35:24.525 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.576 average_ms=35.240 samples=3270 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:28.557 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=33.580 fence=32.138 record=0.572 submit+present=0.608
+10-01 19:35:28.557 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=31.575 average_ms=35.116 samples=3390 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:31.102 26202 26329 I HordeLanternMusic: Music epoch=3; discarded prior-session PCM
+10-01 19:35:33.334 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=39.793 fence=35.808 record=3.376 submit+present=0.444
+10-01 19:35:33.334 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=45.460 average_ms=35.128 samples=3510 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:40.082 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=56.210 fence=45.477 record=10.238 submit+present=0.377
+10-01 19:35:40.082 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.613 average_ms=35.459 samples=3630 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:46.298 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=51.778 fence=49.132 record=1.939 submit+present=0.549
+10-01 19:35:46.299 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=50.558 average_ms=35.887 samples=3750 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:52.296 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=49.961 fence=48.531 record=0.586 submit+present=0.639
+10-01 19:35:52.296 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=44.487 average_ms=36.268 samples=3870 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:35:57.954 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=47.129 fence=45.721 record=0.586 submit+present=0.632
+10-01 19:35:57.955 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=44.712 average_ms=36.542 samples=3990 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:36:03.620 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=47.187 fence=45.760 record=0.608 submit+present=0.618
+10-01 19:36:03.620 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=44.942 average_ms=36.799 samples=4110 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:36:09.383 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=48.006 fence=46.584 record=0.607 submit+present=0.625
+10-01 19:36:09.383 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.506 average_ms=37.065 samples=4230 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:36:15.219 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=48.614 fence=47.157 record=0.592 submit+present=0.652
+10-01 19:36:15.220 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=44.647 average_ms=37.333 samples=4350 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:36:20.881 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=47.161 fence=45.738 record=0.579 submit+present=0.645
+10-01 19:36:20.881 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=45.138 average_ms=37.548 samples=4470 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:36:26.675 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=48.260 fence=46.915 record=0.565 submit+present=0.590
+10-01 19:36:26.675 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.138 average_ms=37.783 samples=4590 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:36:32.528 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=48.755 fence=47.334 record=0.592 submit+present=0.636
+10-01 19:36:32.528 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.629 average_ms=38.016 samples=4710 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:36:38.468 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=49.481 fence=48.091 record=0.597 submit+present=0.607
+10-01 19:36:38.469 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=49.922 average_ms=38.257 samples=4830 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:36:44.347 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=48.967 fence=47.531 record=0.607 submit+present=0.634
+10-01 19:36:44.347 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=44.913 average_ms=38.472 samples=4950 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:36:50.065 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=47.624 fence=46.227 record=0.581 submit+present=0.614
+10-01 19:36:50.065 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.628 average_ms=38.647 samples=5070 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:36:55.856 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=48.239 fence=46.818 record=0.591 submit+present=0.624
+10-01 19:36:55.856 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=44.743 average_ms=38.826 samples=5190 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:37:01.695 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=48.641 fence=47.218 record=0.600 submit+present=0.617
+10-01 19:37:01.695 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=44.996 average_ms=39.007 samples=5310 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:37:07.523 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=48.553 fence=47.792 record=0.329 submit+present=0.334
+10-01 19:37:07.523 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.649 average_ms=39.194 samples=5430 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:37:13.734 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=51.729 fence=50.213 record=0.629 submit+present=0.661
+10-01 19:37:13.734 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.330 average_ms=39.424 samples=5550 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:37:19.906 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=51.416 fence=49.931 record=0.636 submit+present=0.649
+10-01 19:37:19.906 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.629 average_ms=39.637 samples=5670 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:37:26.003 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.782 fence=49.315 record=0.618 submit+present=0.659
+10-01 19:37:26.003 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.440 average_ms=39.829 samples=5790 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:37:31.883 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=48.985 fence=47.494 record=0.641 submit+present=0.640
+10-01 19:37:31.883 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=44.918 average_ms=39.977 samples=5910 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:37:37.735 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=48.741 fence=47.310 record=0.627 submit+present=0.610
+10-01 19:37:37.735 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=44.612 average_ms=40.115 samples=6030 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:37:43.611 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=48.946 fence=47.510 record=0.620 submit+present=0.620
+10-01 19:37:43.611 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.988 average_ms=40.251 samples=6150 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:37:49.655 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.339 fence=48.885 record=0.641 submit+present=0.620
+10-01 19:37:49.655 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=44.643 average_ms=40.409 samples=6270 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:37:55.678 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.170 fence=48.712 record=0.624 submit+present=0.624
+10-01 19:37:55.678 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.673 average_ms=40.557 samples=6390 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:38:01.660 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=49.827 fence=48.401 record=0.623 submit+present=0.614
+10-01 19:38:01.660 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=50.003 average_ms=40.694 samples=6510 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:38:07.671 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.074 fence=48.593 record=0.623 submit+present=0.649
+10-01 19:38:07.671 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.427 average_ms=40.830 samples=6630 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:38:13.768 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.786 fence=49.316 record=0.630 submit+present=0.630
+10-01 19:38:13.768 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.805 average_ms=40.974 samples=6750 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:38:19.800 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.245 fence=48.774 record=0.642 submit+present=0.624
+10-01 19:38:19.800 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.535 average_ms=41.103 samples=6870 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:38:25.838 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.288 fence=48.822 record=0.637 submit+present=0.616
+10-01 19:38:25.838 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.436 average_ms=41.228 samples=6990 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:38:31.798 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=49.652 fence=48.466 record=0.491 submit+present=0.506
+10-01 19:38:31.798 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.708 average_ms=41.344 samples=7110 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:38:37.867 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.548 fence=49.115 record=0.612 submit+present=0.614
+10-01 19:38:37.867 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.132 average_ms=41.466 samples=7230 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:38:43.948 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.649 fence=49.186 record=0.619 submit+present=0.643
+10-01 19:38:43.948 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.245 average_ms=41.586 samples=7350 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:38:50.105 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=51.285 fence=49.829 record=0.621 submit+present=0.626
+10-01 19:38:50.105 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.815 average_ms=41.711 samples=7470 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:38:56.273 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=51.380 fence=49.887 record=0.648 submit+present=0.657
+10-01 19:38:56.273 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.773 average_ms=41.834 samples=7590 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:39:02.370 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.793 fence=49.366 record=0.602 submit+present=0.614
+10-01 19:39:02.370 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.403 average_ms=41.945 samples=7710 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:39:08.417 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.370 fence=48.931 record=0.613 submit+present=0.624
+10-01 19:39:08.417 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.922 average_ms=42.046 samples=7830 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:39:14.504 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=50.699 fence=49.279 record=0.627 submit+present=0.608
+10-01 19:39:14.504 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.509 average_ms=42.149 samples=7950 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:39:20.736 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=51.909 fence=50.410 record=0.621 submit+present=0.658
+10-01 19:39:20.736 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.341 average_ms=42.266 samples=8070 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:39:27.041 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=52.525 fence=51.036 record=0.630 submit+present=0.629
+10-01 19:39:27.041 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=50.058 average_ms=42.388 samples=8190 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:39:33.320 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=52.301 fence=50.805 record=0.623 submit+present=0.646
+10-01 19:39:33.320 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.490 average_ms=42.503 samples=8310 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:39:39.482 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=51.326 fence=49.866 record=0.615 submit+present=0.637
+10-01 19:39:39.482 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.383 average_ms=42.602 samples=8430 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:39:45.763 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=52.319 fence=50.819 record=0.629 submit+present=0.640
+10-01 19:39:45.763 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.620 average_ms=42.712 samples=8550 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:39:52.041 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=52.301 fence=50.805 record=0.627 submit+present=0.643
+10-01 19:39:52.041 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=50.037 average_ms=42.818 samples=8670 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:39:58.341 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=52.472 fence=51.016 record=0.625 submit+present=0.615
+10-01 19:39:58.341 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=49.483 average_ms=42.924 samples=8790 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:40:04.694 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=52.919 fence=51.442 record=0.627 submit+present=0.624
+10-01 19:40:04.694 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.747 average_ms=43.033 samples=8910 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:40:11.017 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=52.670 fence=51.178 record=0.619 submit+present=0.635
+10-01 19:40:11.017 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.689 average_ms=43.136 samples=9030 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:40:17.340 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=52.669 fence=51.172 record=0.616 submit+present=0.643
+10-01 19:40:17.341 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=54.107 average_ms=43.237 samples=9150 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:40:23.693 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=52.916 fence=51.453 record=0.617 submit+present=0.623
+10-01 19:40:23.693 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.853 average_ms=43.338 samples=9270 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:40:30.121 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=53.542 fence=52.026 record=0.623 submit+present=0.644
+10-01 19:40:30.121 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=49.815 average_ms=43.443 samples=9390 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:40:36.690 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=54.722 fence=53.170 record=0.658 submit+present=0.652
+10-01 19:40:36.690 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.492 average_ms=43.561 samples=9510 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:40:43.074 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=53.171 fence=51.657 record=0.633 submit+present=0.643
+10-01 19:40:43.074 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.401 average_ms=43.657 samples=9630 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:40:49.421 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=52.870 fence=51.404 record=0.629 submit+present=0.615
+10-01 19:40:49.421 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=48.184 average_ms=43.747 samples=9750 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:40:55.880 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=53.802 fence=52.255 record=0.652 submit+present=0.642
+10-01 19:40:55.880 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.538 average_ms=43.845 samples=9870 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:41:02.427 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=54.535 fence=53.017 record=0.651 submit+present=0.616
+10-01 19:41:02.427 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=53.927 average_ms=43.950 samples=9990 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:41:08.842 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=53.433 fence=51.917 record=0.623 submit+present=0.637
+10-01 19:41:08.842 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=49.678 average_ms=44.040 samples=10110 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:41:15.268 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=53.531 fence=52.068 record=0.629 submit+present=0.609
+10-01 19:41:15.268 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=49.663 average_ms=44.129 samples=10230 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:41:21.871 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=55.000 fence=53.473 record=0.625 submit+present=0.630
+10-01 19:41:21.871 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.244 average_ms=44.233 samples=10350 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:41:28.412 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=54.484 fence=53.008 record=0.629 submit+present=0.613
+10-01 19:41:28.412 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.310 average_ms=44.329 samples=10470 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:41:34.985 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=54.756 fence=53.242 record=0.649 submit+present=0.632
+10-01 19:41:34.985 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.688 average_ms=44.425 samples=10590 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:41:41.564 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=54.800 fence=53.281 record=0.626 submit+present=0.628
+10-01 19:41:41.564 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.272 average_ms=44.520 samples=10710 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:41:48.076 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=54.243 fence=52.743 record=0.624 submit+present=0.633
+10-01 19:41:48.076 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=50.405 average_ms=44.606 samples=10830 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:41:54.663 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=54.869 fence=53.370 record=0.638 submit+present=0.631
+10-01 19:41:54.663 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.808 average_ms=44.698 samples=10950 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:42:01.243 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=54.806 fence=53.277 record=0.650 submit+present=0.627
+10-01 19:42:01.243 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.760 average_ms=44.786 samples=11070 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:42:07.822 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=54.803 fence=53.296 record=0.639 submit+present=0.639
+10-01 19:42:07.822 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.478 average_ms=44.873 samples=11190 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:42:14.433 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=55.073 fence=53.521 record=0.666 submit+present=0.635
+10-01 19:42:14.434 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=53.977 average_ms=44.961 samples=11310 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:42:21.081 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=55.370 fence=53.837 record=0.629 submit+present=0.652
+10-01 19:42:21.081 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.877 average_ms=45.049 samples=11430 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:42:27.775 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=55.765 fence=54.277 record=0.640 submit+present=0.607
+10-01 19:42:27.775 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.768 average_ms=45.141 samples=11550 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:42:34.357 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=54.822 fence=53.281 record=0.627 submit+present=0.633
+10-01 19:42:34.357 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=52.466 average_ms=45.220 samples=11670 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:42:41.011 26202 26621 I HordeRtProbeBridge: RT frame timing avg ms: total=55.428 fence=53.888 record=0.628 submit+present=0.648
+10-01 19:42:41.011 26202 26621 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=57.011 average_ms=45.304 samples=11790 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:42:45.697 26202 26202 I HordeLanternAudio: Accepted debug automation intent: checkpoint=11 capture=false replay=false scale=75 gpuTiming=enabled requireRayQueryCompute=false rtLab=false
+10-01 19:42:45.699 26202 26202 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:43:00.162 26202 26202 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:43:00.162 26202 26202 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:43:00.162 26202 26202 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:43:00.173 26202 27581 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:43:00.377 26202 27581 I HordeRtProbeBridge: HORDE_BENCH begin generation=1 checkpoint=finale-roof scale=75 warmup_frames=120 sample_frames=120 windows=3 zone=finale
+10-01 19:43:00.382 26202 26329 I HordeLanternMusic: Music epoch=4; discarded prior-session PCM
+10-01 19:43:03.465 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=105.132 fence=102.947 record=1.232 submit+present=0.704
+10-01 19:43:03.465 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=103.145 average_ms=100.455 samples=32 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:43:16.402 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=107.776 fence=106.131 record=0.740 submit+present=0.675
+10-01 19:43:16.402 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=92.198 average_ms=104.697 samples=152 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:43:24.768 26202 27581 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=finale-roof scale=75 window=1 frames=120 total_ms=94.326 fence_ms=92.666 record_ms=0.734 present_ms=0.683 zone=finale presented=1
+10-01 19:43:27.431 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=91.875 fence=90.255 record=0.725 submit+present=0.657
+10-01 19:43:27.431 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=89.373 average_ms=98.172 samples=272 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:43:35.443 26202 27581 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=finale-roof scale=75 window=2 frames=120 total_ms=88.926 fence_ms=87.284 record_ms=0.721 present_ms=0.674 zone=finale presented=1
+10-01 19:43:38.090 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=88.792 fence=87.113 record=0.717 submit+present=0.707
+10-01 19:43:38.090 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=86.745 average_ms=94.687 samples=392 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:43:46.196 26202 27581 I HordeRtProbeBridge: HORDE_BENCH sample generation=1 checkpoint=finale-roof scale=75 window=3 frames=120 total_ms=89.578 fence_ms=87.942 record_ms=0.718 present_ms=0.679 zone=finale presented=1
+10-01 19:43:46.196 26202 27581 I HordeRtProbeBridge: HORDE_BENCH complete generation=1 checkpoint=finale-roof scale=75 windows=3
+10-01 19:43:49.064 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=91.414 fence=89.783 record=0.731 submit+present=0.673
+10-01 19:43:49.064 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=91.959 average_ms=93.464 samples=512 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:44:00.714 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=97.053 fence=95.445 record=0.735 submit+present=0.665
+10-01 19:44:00.714 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=107.051 average_ms=93.792 samples=632 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:44:12.433 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=97.627 fence=96.012 record=0.745 submit+present=0.656
+10-01 19:44:12.433 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=89.993 average_ms=94.106 samples=752 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:44:23.385 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=91.237 fence=88.476 record=1.961 submit+present=0.589
+10-01 19:44:23.385 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=90.465 average_ms=93.290 samples=872 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:44:34.897 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=95.904 fence=94.243 record=0.746 submit+present=0.660
+10-01 19:44:34.897 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=94.960 average_ms=93.364 samples=992 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:44:46.273 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=94.769 fence=93.134 record=0.721 submit+present=0.672
+10-01 19:44:46.273 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=87.988 average_ms=93.304 samples=1112 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:44:58.457 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=101.502 fence=93.605 record=7.249 submit+present=0.501
+10-01 19:44:58.457 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=95.269 average_ms=93.305 samples=1232 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:44:58.879 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=1 generated=580320 accepted=580320 deviceHeadObserved=576000 capacity=5766 underruns=0
+10-01 19:45:10.795 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=102.787 fence=93.137 record=9.066 submit+present=0.450
+10-01 19:45:10.795 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=96.083 average_ms=93.264 samples=1352 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:45:10.878 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=2 generated=1156320 accepted=1156320 deviceHeadObserved=1152000 capacity=5766 underruns=0
+10-01 19:45:22.878 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=3 generated=1732320 accepted=1732320 deviceHeadObserved=1728000 capacity=5766 underruns=0
+10-01 19:45:23.145 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=102.884 fence=92.723 record=9.568 submit+present=0.469
+10-01 19:45:23.146 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=96.108 average_ms=93.193 samples=1472 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:45:34.881 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=4 generated=2308320 accepted=2308320 deviceHeadObserved=2304000 capacity=5766 underruns=0
+10-01 19:45:35.254 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=100.876 fence=90.740 record=9.548 submit+present=0.465
+10-01 19:45:35.254 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=88.739 average_ms=92.984 samples=1592 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:45:46.880 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=5 generated=2884320 accepted=2884320 deviceHeadObserved=2880000 capacity=5766 underruns=0
+10-01 19:45:47.224 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=99.721 fence=89.653 record=9.475 submit+present=0.475
+10-01 19:45:47.224 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=88.054 average_ms=92.727 samples=1712 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:45:58.878 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=6 generated=3460320 accepted=3460320 deviceHeadObserved=3456000 capacity=5766 underruns=0
+10-01 19:45:59.310 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=100.684 fence=89.964 record=10.101 submit+present=0.486
+10-01 19:45:59.310 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=87.729 average_ms=92.525 samples=1832 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:46:10.880 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=7 generated=4036320 accepted=4036320 deviceHeadObserved=4032000 capacity=5766 underruns=0
+10-01 19:46:11.417 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=100.861 fence=89.942 record=10.317 submit+present=0.475
+10-01 19:46:11.417 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=87.525 average_ms=92.344 samples=1952 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:46:22.878 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=8 generated=4612320 accepted=4612320 deviceHeadObserved=4608000 capacity=5766 underruns=0
+10-01 19:46:23.438 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=100.149 fence=89.420 record=10.131 submit+present=0.471
+10-01 19:46:23.438 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=89.141 average_ms=92.155 samples=2072 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:46:34.881 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=9 generated=5188320 accepted=5188320 deviceHeadObserved=5184000 capacity=5766 underruns=0
+10-01 19:46:35.505 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=100.530 fence=90.850 record=9.109 submit+present=0.453
+10-01 19:46:35.505 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=88.808 average_ms=92.067 samples=2192 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:46:46.881 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=10 generated=5764320 accepted=5764320 deviceHeadObserved=5760000 capacity=5766 underruns=0
+10-01 19:46:47.554 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=100.382 fence=92.466 record=7.398 submit+present=0.417
+10-01 19:46:47.554 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=94.834 average_ms=92.073 samples=2312 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:46:58.881 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=11 generated=6340320 accepted=6340320 deviceHeadObserved=6336000 capacity=5766 underruns=0
+10-01 19:46:59.647 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=100.749 fence=92.781 record=7.448 submit+present=0.417
+10-01 19:46:59.647 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=94.527 average_ms=92.094 samples=2432 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:47:10.880 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=12 generated=6916320 accepted=6916320 deviceHeadObserved=6912000 capacity=5766 underruns=0
+10-01 19:47:11.363 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=97.605 fence=89.704 record=7.372 submit+present=0.426
+10-01 19:47:11.363 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=74.321 average_ms=91.968 samples=2552 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:47:12.194 26202 27581 I HordeRtProbeBridge: HORDE_PLAYER_SWING_TRANSPORT phase=enqueued sequence=21 cut=1 accepted=1
+10-01 19:47:12.285 26202 26202 I HordeRtProbeBridge: HORDE_PLAYER_SWING_TRANSPORT phase=drained sequence=21
+10-01 19:47:12.285 26202 26202 I HordeLanternAudio: HORDE_PLAYER_SWING_FEEDBACK sequence=21 sound=1 haptic=1
+10-01 19:47:21.327 26202 27581 I HordeRtProbeBridge: HORDE_PLAYER_SWING_TRANSPORT phase=enqueued sequence=26 cut=1 accepted=1
+10-01 19:47:21.337 26202 26202 I HordeRtProbeBridge: HORDE_PLAYER_SWING_TRANSPORT phase=drained sequence=26
+10-01 19:47:21.337 26202 26202 I HordeLanternAudio: HORDE_PLAYER_SWING_FEEDBACK sequence=26 sound=1 haptic=1
+10-01 19:47:22.880 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=13 generated=7492320 accepted=7492320 deviceHeadObserved=7488000 capacity=5766 underruns=0
+10-01 19:47:24.891 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=112.705 fence=104.881 record=7.280 submit+present=0.429
+10-01 19:47:24.891 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=113.844 average_ms=92.537 samples=2672 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:47:34.881 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=14 generated=8068320 accepted=8068320 deviceHeadObserved=8064000 capacity=5766 underruns=0
+10-01 19:47:38.872 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=116.481 fence=107.508 record=8.417 submit+present=0.432
+10-01 19:47:38.872 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=107.072 average_ms=93.167 samples=2792 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:47:46.880 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=15 generated=8644320 accepted=8644320 deviceHeadObserved=8640000 capacity=5766 underruns=0
+10-01 19:47:52.816 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=116.172 fence=105.378 record=10.205 submit+present=0.439
+10-01 19:47:52.816 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=106.461 average_ms=93.656 samples=2912 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:47:58.879 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=16 generated=9220320 accepted=9220320 deviceHeadObserved=9216000 capacity=5766 underruns=0
+10-01 19:48:06.711 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=115.758 fence=105.080 record=10.075 submit+present=0.458
+10-01 19:48:06.711 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=104.240 average_ms=94.094 samples=3032 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:48:10.877 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=17 generated=9796320 accepted=9796320 deviceHeadObserved=9792000 capacity=5766 underruns=0
+10-01 19:48:20.345 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=113.589 fence=103.227 record=9.768 submit+present=0.450
+10-01 19:48:20.345 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=109.387 average_ms=94.428 samples=3152 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:48:22.881 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=18 generated=10372320 accepted=10372320 deviceHeadObserved=10368000 capacity=5766 underruns=0
+10-01 19:48:34.511 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=118.019 fence=108.615 record=8.807 submit+present=0.458
+10-01 19:48:34.511 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=100.044 average_ms=94.937 samples=3272 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:48:34.877 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=19 generated=10948320 accepted=10948320 deviceHeadObserved=10944000 capacity=5766 underruns=0
+10-01 19:48:46.876 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=20 generated=11524320 accepted=11524320 deviceHeadObserved=11520000 capacity=5766 underruns=0
+10-01 19:48:47.816 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=110.848 fence=100.847 record=9.407 submit+present=0.460
+10-01 19:48:47.816 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=100.616 average_ms=95.133 samples=3392 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:48:58.880 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=21 generated=12100320 accepted=12100320 deviceHeadObserved=12096000 capacity=5766 underruns=0
+10-01 19:49:01.154 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=111.111 fence=100.943 record=9.595 submit+present=0.433
+10-01 19:49:01.154 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=101.020 average_ms=95.320 samples=3512 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:49:10.879 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=22 generated=12676320 accepted=12676320 deviceHeadObserved=12672000 capacity=5766 underruns=0
+10-01 19:49:14.561 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=111.692 fence=100.967 record=10.134 submit+present=0.430
+10-01 19:49:14.561 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=100.458 average_ms=95.493 samples=3632 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:49:22.876 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=23 generated=13252320 accepted=13252320 deviceHeadObserved=13248000 capacity=5766 underruns=0
+10-01 19:49:27.992 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=111.900 fence=100.969 record=10.343 submit+present=0.433
+10-01 19:49:27.993 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=100.105 average_ms=95.656 samples=3752 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:49:34.880 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=24 generated=13828320 accepted=13828320 deviceHeadObserved=13824000 capacity=5766 underruns=0
+10-01 19:49:41.393 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=111.641 fence=100.975 record=10.097 submit+present=0.411
+10-01 19:49:41.393 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=100.231 average_ms=95.808 samples=3872 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:49:46.879 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=25 generated=14404320 accepted=14404320 deviceHeadObserved=14400000 capacity=5766 underruns=0
+10-01 19:49:54.810 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=111.773 fence=100.923 record=10.273 submit+present=0.420
+10-01 19:49:54.810 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=100.769 average_ms=95.950 samples=3992 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:49:58.879 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=26 generated=14980320 accepted=14980320 deviceHeadObserved=14976000 capacity=5766 underruns=0
+10-01 19:50:08.233 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=111.827 fence=100.944 record=10.292 submit+present=0.430
+10-01 19:50:08.233 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=100.182 average_ms=96.084 samples=4112 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:50:10.877 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=27 generated=15556320 accepted=15556320 deviceHeadObserved=15552000 capacity=5766 underruns=0
+10-01 19:50:21.649 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=111.767 fence=100.916 record=10.251 submit+present=0.441
+10-01 19:50:21.649 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=99.986 average_ms=96.210 samples=4232 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:50:22.879 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=28 generated=16132320 accepted=16132320 deviceHeadObserved=16128000 capacity=5766 underruns=0
+10-01 19:50:34.479 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=106.878 fence=100.753 record=5.378 submit+present=0.561
+10-01 19:50:34.479 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=99.269 average_ms=96.326 samples=4352 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:50:47.065 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=104.854 fence=103.203 record=0.725 submit+present=0.672
+10-01 19:50:47.065 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=105.763 average_ms=96.501 samples=4472 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:50:59.671 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=105.022 fence=103.342 record=0.725 submit+present=0.713
+10-01 19:50:59.671 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=99.419 average_ms=96.671 samples=4592 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:51:12.254 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=104.831 fence=103.164 record=0.705 submit+present=0.708
+10-01 19:51:12.254 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=107.314 average_ms=96.829 samples=4712 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:51:25.242 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=108.204 fence=106.571 record=0.720 submit+present=0.680
+10-01 19:51:25.242 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=99.336 average_ms=97.063 samples=4832 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:51:37.833 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=104.892 fence=103.233 record=0.716 submit+present=0.691
+10-01 19:51:37.833 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=107.350 average_ms=97.204 samples=4952 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:51:50.646 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=106.749 fence=105.107 record=0.723 submit+present=0.655
+10-01 19:51:50.647 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=100.412 average_ms=97.384 samples=5072 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:52:03.476 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=106.883 fence=105.246 record=0.711 submit+present=0.683
+10-01 19:52:03.476 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=108.184 average_ms=97.558 samples=5192 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:52:03.906 26202 27581 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=100 extent=1440x2980 output_only=1 idle_and_resize_ms=107.186
+10-01 19:52:03.907 26202 27581 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:52:08.231 26202 27581 I HordeRtProbeBridge: HORDE_RT_SCALE_RESIZE scale=75 extent=1080x2235 output_only=1 idle_and_resize_ms=165.946
+10-01 19:52:08.234 26202 27581 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:52:11.349 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=103.870 fence=102.251 record=0.686 submit+present=0.718
+10-01 19:52:11.349 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=107.276 average_ms=105.461 samples=29 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:52:24.244 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=107.422 fence=105.862 record=0.641 submit+present=0.691
+10-01 19:52:24.244 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=106.158 average_ms=105.532 samples=149 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:52:37.203 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=107.961 fence=106.356 record=0.652 submit+present=0.715
+10-01 19:52:37.203 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=99.746 average_ms=105.764 samples=269 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:52:49.960 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=106.280 fence=104.688 record=0.635 submit+present=0.711
+10-01 19:52:49.961 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=102.057 average_ms=105.335 samples=389 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:53:02.849 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=107.365 fence=105.835 record=0.624 submit+present=0.686
+10-01 19:53:02.849 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=115.293 average_ms=105.383 samples=509 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:53:15.906 26202 27581 I HordeRtProbeBridge: RT frame timing avg ms: total=108.778 fence=107.246 record=0.618 submit+present=0.716
+10-01 19:53:15.906 26202 27581 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=110.149 average_ms=105.678 samples=629 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:53:41.802 26202 26202 I HordeRtProbeBridge: HORDE_GPU_TIMING mode=enabled rt_rendering=unchanged
+10-01 19:54:00.367 26202 26202 I HordeRtProbeBridge: PBR material encoding: ASTC 6x6 diffuse/ARM + ASTC 4x4 normal (KTX2) + strict ASTC 6x6 lich
+10-01 19:54:00.367 26202 26202 I HordeRtProbeBridge: RT render scale 75%: 1080x2235 -> 1440x2980
+10-01 19:54:00.367 26202 26202 I HordeRtProbeBridge: Started Android diagnostic surface rendering loop.
+10-01 19:54:00.381 26202 15201 I HordeRtProbeBridge: RT frame reached Android swapchain presentation.
+10-01 19:54:03.164 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=93.151 fence=91.176 record=1.069 submit+present=0.645
+10-01 19:54:03.164 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=99.447 average_ms=94.019 samples=29 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:54:16.057 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=107.416 fence=105.820 record=0.675 submit+present=0.712
+10-01 19:54:16.057 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=100.022 average_ms=103.274 samples=149 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:54:29.062 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=108.335 fence=106.776 record=0.664 submit+present=0.687
+10-01 19:54:29.062 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=99.483 average_ms=104.693 samples=269 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:54:42.462 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=111.638 fence=110.122 record=0.642 submit+present=0.666
+10-01 19:54:42.462 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=102.215 average_ms=106.260 samples=389 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:54:55.397 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=107.766 fence=106.234 record=0.631 submit+present=0.688
+10-01 19:54:55.397 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=109.030 average_ms=106.178 samples=509 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:55:08.275 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=107.284 fence=105.685 record=0.623 submit+present=0.735
+10-01 19:55:08.275 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=108.643 average_ms=106.024 samples=629 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:55:18.002 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=29 generated=16708320 accepted=16708320 deviceHeadObserved=16704000 capacity=5766 underruns=0
+10-01 19:55:22.222 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=116.196 fence=108.148 record=7.399 submit+present=0.498
+10-01 19:55:22.222 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=108.212 average_ms=106.312 samples=749 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:55:30.005 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=30 generated=17284320 accepted=17284320 deviceHeadObserved=17280000 capacity=5766 underruns=0
+10-01 19:55:36.434 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=118.396 fence=108.597 record=9.236 submit+present=0.434
+10-01 19:55:36.434 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=116.272 average_ms=106.581 samples=869 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:55:42.002 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=31 generated=17860320 accepted=17860320 deviceHeadObserved=17856000 capacity=5766 underruns=0
+10-01 19:55:50.544 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=117.552 fence=107.494 record=9.473 submit+present=0.455
+10-01 19:55:50.544 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=99.985 average_ms=106.649 samples=989 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:55:54.005 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=32 generated=18436320 accepted=18436320 deviceHeadObserved=18432000 capacity=5766 underruns=0
+10-01 19:56:04.606 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=117.149 fence=106.924 record=9.645 submit+present=0.448
+10-01 19:56:04.606 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=109.688 average_ms=106.638 samples=1109 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:56:06.003 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=33 generated=19012320 accepted=19012320 deviceHeadObserved=19008000 capacity=5766 underruns=0
+10-01 19:56:18.004 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=34 generated=19588320 accepted=19588320 deviceHeadObserved=19584000 capacity=5766 underruns=0
+10-01 19:56:18.860 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=118.748 fence=108.722 record=9.430 submit+present=0.459
+10-01 19:56:18.860 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=116.825 average_ms=106.807 samples=1229 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:56:30.006 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=35 generated=20164320 accepted=20164320 deviceHeadObserved=20160000 capacity=5766 underruns=0
+10-01 19:56:33.352 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=120.740 fence=109.784 record=10.340 submit+present=0.468
+10-01 19:56:33.352 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=109.216 average_ms=107.043 samples=1349 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:56:42.003 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=36 generated=20740320 accepted=20740320 deviceHeadObserved=20736000 capacity=5766 underruns=0
+10-01 19:56:47.662 26202 15201 I HordeRtProbeBridge: RT frame timing avg ms: total=119.219 fence=108.431 record=10.213 submit+present=0.432
+10-01 19:56:47.662 26202 15201 I HordeRtProbeBridge: HORDE_GPU mode=enabled status=awaiting-result valid=1 latest_ms=104.692 average_ms=107.126 samples=1469 valid_bits=48 period_ns=52.083332 unavailable=0 errors=0
+10-01 19:56:54.006 26202 26329 I HordeLanternMusic: Music progress epoch=4 periods=37 generated=21316320 accepted=21316320 deviceHeadObserved=21312000 capacity=5766 underruns=0

@@ -1,6 +1,7 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/DynamicBlasSynchronization.h"
 #include "vulkan/raytracing/RtSceneRouteConstants.h"
+#include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "platform/android/AndroidRtLabState.h"
@@ -12,6 +13,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <thread>
 
 namespace
@@ -44,6 +46,17 @@ bool HasInvertibleLinearTransform(const VkTransformMatrixKHR& transform)
     return std::abs(determinant) > 0.00001f;
 }
 
+struct CharacterObservationClock
+{
+    std::size_t reads = 0u;
+};
+
+std::uint64_t ReadCharacterObservationClock(void* user) noexcept
+{
+    auto& clock = *static_cast<CharacterObservationClock*>(user);
+    return clock.reads++ == 0u ? 300u : 335u;
+}
+
 std::filesystem::path FindRepoRoot()
 {
     std::filesystem::path candidate = std::filesystem::current_path();
@@ -72,6 +85,18 @@ std::string ReadTextFile(const std::filesystem::path& path)
         ++position;
     }
     return normalized;
+}
+
+std::size_t CountOccurrences(const std::string& text, const std::string_view needle)
+{
+    std::size_t count = 0u;
+    std::size_t position = 0u;
+    while ((position = text.find(needle, position)) != std::string::npos)
+    {
+        ++count;
+        position += needle.size();
+    }
+    return count;
 }
 
 } // namespace
@@ -208,8 +233,8 @@ int main()
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
     ok &= Require(PresentableTinyRtScene::kBlasCount == 16u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 20u,
-                  "production props and generic dielectric fixture must add bounded BLAS resources while TLAS remains capped at twenty instances");
+                      PresentableTinyRtScene::kTlasInstanceCount == 21u,
+                  "production props and generic dielectric fixture must add bounded BLAS resources while TLAS reserves the appended viewmodel slot");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =
@@ -564,6 +589,10 @@ int main()
             ReadTextFile(raygenDirectory / "include/rt_hit_decode.glsl");
         const std::string fireSource =
             ReadTextFile(raygenDirectory / "include/rt_fire.glsl");
+        const std::string diagnosticsSource =
+            ReadTextFile(raygenDirectory / "include/rt_diagnostics.glsl");
+        const std::string variantConfigSource =
+            ReadTextFile(raygenDirectory / "include/rt_variant_config.glsl");
         const std::string dielectricTransportSource =
             ReadTextFile(raygenDirectory / "include/rt_dielectric_transport.glsl");
         std::string lightingSource =
@@ -576,7 +605,10 @@ int main()
         }
         const std::string raygenSource =
             ReadTextFile(raygenDirectory / "minimal.rgen") +
+            ReadTextFile(raygenDirectory / "include/rt_frame.glsl") +
+            variantConfigSource +
             ReadTextFile(raygenDirectory / "include/rt_scene_abi.glsl") +
+            diagnosticsSource +
             lightingSource +
             fireSource +
             ReadTextFile(raygenDirectory / "include/rt_dielectric_common.glsl") +
@@ -602,6 +634,53 @@ int main()
             root / "android/app/src/test/java/com/samfa12/hordelanternrt/ContextualControlsLayoutTest.java");
         const std::string androidValidationSource =
             ReadTextFile(root / "tools/run-android-showcase-validation.ps1");
+        ok &= Require(sceneSource.find(
+                          "geometry.flags = transmissive\n"
+                          "                ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR\n"
+                          "                : VK_GEOMETRY_OPAQUE_BIT_KHR;") != std::string::npos,
+                      "transmissive BLAS geometry must suppress duplicate candidates without making glass opaque");
+        ok &= Require(hitDecodeSource.find("#if HORDE_GENERIC_TRANSMISSION_VARIANT\n") != std::string::npos &&
+                      hitDecodeSource.find("if ((h.materialFlags & kRtMaterialFlagTransmission) != 0u)") != std::string::npos &&
+                      hitDecodeSource.find("precise vec3 localPosition = v0.position.xyz +") != std::string::npos &&
+                      hitDecodeSource.find("precise vec3 surfacePosition = objectToWorld * localPosition +") != std::string::npos &&
+                      hitDecodeSource.find("h.position = surfacePosition;") != std::string::npos,
+                      "transmitting triangle hits must reconstruct the geometric surface point before spawning dielectric rays");
+        const std::size_t shadowStart = lightingSource.find("vec3 boundedShadowTransmittanceMask(");
+        const std::size_t shadowEnd = lightingSource.find("float visibilityMask(", shadowStart);
+        const std::string selectedShadow = shadowStart != std::string::npos &&
+            shadowEnd != std::string::npos ? lightingSource.substr(shadowStart, shadowEnd - shadowStart) : "";
+        ok &= Require(!selectedShadow.empty() &&
+                      selectedShadow.find("rayQueryGetIntersectionTEXT(query, false)") != std::string::npos &&
+                      selectedShadow.find("distance - volumeEntryDistances[volumeDepth]") != std::string::npos &&
+                      selectedShadow.find("maxDistance - volumeEntryDistances[volume]") != std::string::npos &&
+                      selectedShadow.find("closedThickness") == std::string::npos &&
+                      selectedShadow.find("iorThicknessAttenuationDistance.y") == std::string::npos &&
+                      selectedShadow.find("vec3(0.08)") == std::string::npos &&
+                      selectedShadow.find("origin, 0.000001, direction, maxDistance") != std::string::npos,
+                      "selected glass shadows must measure finite geometric medium segments without authored half-thickness or scalar recovery light");
+        const std::size_t binaryVisibilityEnd = lightingSource.find(
+            "vec3 sceneShadowTransmittanceMask(", shadowEnd);
+        const std::string binaryVisibility = shadowEnd != std::string::npos &&
+            binaryVisibilityEnd != std::string::npos
+                ? lightingSource.substr(shadowEnd, binaryVisibilityEnd - shadowEnd) : "";
+        ok &= Require(!binaryVisibility.empty() &&
+                      binaryVisibility.find(
+                          "rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask,") != std::string::npos &&
+                      binaryVisibility.find(
+                          "origin, 0.0015, direction, max(maxDistance, 0.004)") != std::string::npos &&
+                      binaryVisibility.find("instance == kWaterfallInstance") != std::string::npos &&
+                      binaryVisibility.find("if (instance == 0)") != std::string::npos &&
+                      binaryVisibility.find("material == kMaterialClearGlass ||") != std::string::npos &&
+                      binaryVisibility.find("material == kMaterialWater;") != std::string::npos &&
+                      binaryVisibility.find(
+                          "if (!transparentWorldPane) rayQueryConfirmIntersectionEXT(query);") != std::string::npos &&
+                      binaryVisibility.find(
+                          "gl_RayQueryCommittedIntersectionNoneEXT ? 1.0 : 0.0;") != std::string::npos,
+                      "binary visibility must preserve measured traversal, transparent admission, masks and ray bounds");
+        // The September 30 exact-phone ABBA trial did not admit the first-hit
+        // optimisation. Ordered dielectric traversal must also remain intact.
+        ok &= Require(lightingSource.find("gl_RayFlagsTerminateOnFirstHitEXT") == std::string::npos,
+                      "lighting traversal must not restore the unaccepted first-hit optimisation");
         ok &= Require(raygenSource.find(
                           "layout(std430, set = 0, binding = 10) readonly buffer SecondSkeletonVertices") !=
                           std::string::npos,
@@ -619,6 +698,43 @@ int main()
                       sceneSource.find("secondSkeletonWrite.pBufferInfo = &secondSkeletonBufferInfo;") !=
                           std::string::npos,
                       "CPU descriptor writes no longer bind the second skeleton GPU vertex buffer at binding 10");
+        // Bind the emitted vertices and metadata, not a duplicate normal table.
+        // These windings point outside the closed box (-Z,+Z,-X,+X,+Y,-Y).
+        const std::size_t worldBoxBegin = sceneSource.find("const auto addWorldBox =");
+        const std::size_t worldBoxEnd = sceneSource.find("const auto addBox =", worldBoxBegin);
+        ok &= Require(worldBoxBegin != std::string::npos && worldBoxEnd != std::string::npos,
+                      "world box authoring seam is missing");
+        if (worldBoxBegin != std::string::npos && worldBoxEnd != std::string::npos)
+        {
+            const std::string boxSource = sceneSource.substr(worldBoxBegin, worldBoxEnd - worldBoxBegin);
+            constexpr std::array<const char*, 6u> outwardFaces{{
+                "{{minX, minY, minZ}}, {{minX, maxY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, minY, minZ}}, material, SurfaceBack",
+                "{{maxX, minY, maxZ}}, {{maxX, maxY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, minY, maxZ}}, material, SurfaceForward",
+                "{{minX, minY, maxZ}}, {{minX, maxY, maxZ}}, {{minX, maxY, minZ}}, {{minX, minY, minZ}}, material, SurfaceLeft",
+                "{{maxX, minY, minZ}}, {{maxX, maxY, minZ}}, {{maxX, maxY, maxZ}}, {{maxX, minY, maxZ}}, material, SurfaceRight",
+                "{{minX, maxY, minZ}}, {{minX, maxY, maxZ}}, {{maxX, maxY, maxZ}}, {{maxX, maxY, minZ}}, material, SurfaceUp",
+                "{{minX, minY, maxZ}}, {{minX, minY, minZ}}, {{maxX, minY, minZ}}, {{maxX, minY, maxZ}}, material, SurfaceDown",
+            }};
+            for (const char* face : outwardFaces)
+                ok &= Require(boxSource.find(face) != std::string::npos,
+                              "closed world-box normal must agree with outward face winding");
+        }
+        constexpr std::array<const char*, 6u> cpuNormalAbi{{
+            "SurfaceUp = 0u", "SurfaceDown = 1u", "SurfaceRight = 2u",
+            "SurfaceLeft = 3u", "SurfaceForward = 4u", "SurfaceBack = 5u",
+        }};
+        constexpr std::array<const char*, 6u> shaderNormalAbi{{
+            "if (normalCode == 0u) return vec3(0.0, 1.0, 0.0);",
+            "if (normalCode == 1u) return vec3(0.0, -1.0, 0.0);",
+            "if (normalCode == 2u) return vec3(1.0, 0.0, 0.0);",
+            "if (normalCode == 3u) return vec3(-1.0, 0.0, 0.0);",
+            "if (normalCode == 4u) return vec3(0.0, 0.0, 1.0);",
+            "if (normalCode == 5u) return vec3(0.0, 0.0, -1.0);",
+        }};
+        for (std::size_t normal = 0u; normal < cpuNormalAbi.size(); ++normal)
+            ok &= Require(sceneSource.find(cpuNormalAbi[normal]) != std::string::npos &&
+                          hitDecodeSource.find(shaderNormalAbi[normal]) != std::string::npos,
+                          "CPU/GLSL world normal codes must retain their signed-axis agreement");
         constexpr std::array<const char*, 11u> cpuMaterialAbi{{
             "SurfaceDryStone = 0u", "SurfaceWetCobble = 1u", "SurfaceMossyStone = 2u",
             "SurfaceDampGround = 3u", "SurfaceAgedMetal = 4u", "SurfaceFlame = 5u",
@@ -678,12 +794,14 @@ int main()
                       "RT lab tuning, generic transmission, and chest guidance must append within the 128-byte phone-safe ABI");
         ok &= Require(sceneSource.find("properties.limits.maxPushConstantsSize") !=
                           std::string::npos &&
-                      sceneSource.find("kMinimalLegacyRayGenShader") != std::string::npos &&
-                      sceneSource.find("genericTransmissionActive_ ? pipeline_ : legacyPipeline_") !=
+                      sceneSource.find("BuildRtPipelineBundleResources(pipelineBundle_") !=
                           std::string::npos &&
-                      sceneSource.find("genericTransmissionActive_ ? raygenRegion_ : legacyRaygenRegion_") !=
-                          std::string::npos,
-                      "128-byte push ABI must be runtime-checked and fixture-hidden frames must bind a separately compiled legacy raygen pipeline/SBT");
+                      sceneSource.find("pipelineBundle_.Strategy(") != std::string::npos &&
+                      sceneSource.find("activeStrategy.pipeline") != std::string::npos &&
+                      sceneSource.find("activeStrategy.sbtRegions[0]") != std::string::npos &&
+                      sceneSource.find("kMinimalLegacyRayGenShader") == std::string::npos &&
+                      sceneSource.find("kMinimalRayGenShader") == std::string::npos,
+                      "128-byte push ABI must be runtime-checked and frames must bind one complete selected material-strategy record without compatibility arrays");
         ok &= Require(sceneSource.find("HasActiveGenericTransmission(frameInstanceMetadata") !=
                           std::string::npos &&
                       sceneSource.find("RtInstanceFlag::Transmissive") != std::string::npos &&
@@ -761,6 +879,16 @@ int main()
                           std::string::npos &&
                       raygenSource.find("gl_LaunchIDEXT.y * 100u") == std::string::npos,
                       "direct RT visibility must include player/world shadow casters independent of screen position");
+        ok &= Require(raygenSource.find("kPlayerViewmodelPrimaryMask | kPlayerBodyRemainderPrimaryMask;") !=
+                          std::string::npos &&
+                      raygenSource.find("RtInstanceMetadata playerMetadata = rtInstances.values[candidateInstance];") !=
+                          std::string::npos &&
+                      raygenSource.find("(playerMetadata.flags & kRtInstanceFlagBodyRemainderOnlyPrimary) != 0u") !=
+                          std::string::npos &&
+                      raygenSource.find("(playerFlags & kRtMaterialFlagBodyRemainderPrimaryVisible) == 0u") !=
+                          std::string::npos &&
+                      sceneSource.find("RtInstanceFlag::BodyRemainderOnlyPrimary") != std::string::npos,
+                      "explicit body remainder must traverse full-view primary rays with named nonduplicating primitive ownership");
         ok &= Require(raygenSource.find(
                           "uint rayFlags = (ignoreWater || ignorePlayerNearFace)") !=
                           std::string::npos &&
@@ -807,15 +935,21 @@ int main()
                       raygenSource.find("const int kHighDielectricInterfaces = 8;") != std::string::npos &&
                       raygenSource.find("const int kMobileDielectricVolumes = 2;") != std::string::npos &&
                       raygenSource.find("const int kHighDielectricVolumes = 4;") != std::string::npos &&
+                      raygenSource.find("kRtVariantDielectricInterfaceBudget") != std::string::npos &&
+                      raygenSource.find("kRtVariantDielectricVolumeBudget") != std::string::npos &&
+                      dielectricTransportSource.find("HORDE_RT_DIELECTRIC_INTERFACE_CEILING") !=
+                          std::string::npos &&
+                      dielectricTransportSource.find("HORDE_RT_DIELECTRIC_VOLUME_CAPACITY") !=
+                          std::string::npos &&
                       raygenSource.find("segmentLength = currentHit.t;") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.transportOverflowCount, 1u);") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.secondaryDielectricTerminalCount, 1u);") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.unclosedVolumeCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(transportOverflowCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(secondaryDielectricTerminalCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(unclosedVolumeCount, 1u);") != std::string::npos &&
                       dielectricTransportSource.find(
                           "atomicAdd(rtDielectricDiagnostics.value.primaryClosedVolumeAbsorptionCount") ==
                           std::string::npos &&
                       dielectricTransportSource.find(
-                          "atomicAdd(rtDielectricDiagnostics.value.primaryCertifiedClosedVolumeRecoveryCount") !=
+                          "RT_DIAG_ADD(primaryCertifiedClosedVolumeRecoveryCount") !=
                           std::string::npos &&
                       dielectricTransportSource.find("kRtMaterialFlagCertifiedClosedVolume") !=
                           std::string::npos &&
@@ -844,12 +978,16 @@ int main()
                       raygenSource.find("const int kShadowSampleCapacity = 4;") != std::string::npos &&
                       raygenSource.find("const int kMobileShadowInterfaces = 4;") != std::string::npos &&
                       raygenSource.find("const int kHighShadowInterfaces = 8;") != std::string::npos &&
+                      raygenSource.find("kRtVariantShadowInterfaceBudget") != std::string::npos &&
+                      raygenSource.find("kRtVariantShadowVolumeBudget") != std::string::npos &&
+                      lightingSource.find("HORDE_RT_SHADOW_INTERFACE_CEILING") != std::string::npos &&
+                      lightingSource.find("HORDE_RT_SHADOW_VOLUME_CAPACITY") != std::string::npos &&
                       raygenSource.find("material.metallicRoughnessOcclusionTransmission.x") != std::string::npos &&
                       raygenSource.find("dielectricBeerLambert(") != std::string::npos &&
-                      raygenSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowOverflowCount, 1u);") != std::string::npos &&
-                      lightingSource.find("atomicAdd(rtDielectricDiagnostics.value.shadowUnclosedVolumeCount, 1u);") != std::string::npos &&
+                      raygenSource.find("RT_DIAG_ADD(shadowOverflowCount, 1u);") != std::string::npos &&
+                      lightingSource.find("RT_DIAG_ADD(shadowUnclosedVolumeCount, 1u);") != std::string::npos &&
                       lightingSource.find(
-                          "atomicAdd(rtDielectricDiagnostics.value.shadowCertifiedClosedVolumeRecoveryCount") !=
+                          "RT_DIAG_ADD(shadowCertifiedClosedVolumeRecoveryCount") !=
                           std::string::npos &&
                       lightingSource.find("primaryUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos &&
@@ -862,10 +1000,10 @@ int main()
                       raygenSource.find("vec3 lightTransmittance = sceneShadowTransmittanceMask(") !=
                           std::string::npos,
                       "fixture-hidden lighting must retain released scalar arithmetic from the shared ordered query while active generic transmission uses RGB traversal");
-        ok &= Require(sceneSource.find("secondaryDielectricRejectCount") != std::string::npos &&
-                      sceneSource.find("unclosedVolumeCount") != std::string::npos &&
-                      sceneSource.find("primaryUnclosedVolumeCount") != std::string::npos &&
-                      sceneSource.find("shadowUnclosedVolumeCount") != std::string::npos &&
+        ok &= Require(sceneSource.find("dielectricSecondaryRejectCount_") != std::string::npos &&
+                      sceneSource.find("dielectricUnclosedVolumeCount_") != std::string::npos &&
+                      sceneSource.find("dielectricPrimaryUnclosedVolumeCount_") != std::string::npos &&
+                      sceneSource.find("dielectricShadowUnclosedVolumeCount_") != std::string::npos &&
                       sceneSource.find("productionPaneStackFailureCount") != std::string::npos &&
                       sceneSource.find("productionPaneSecondaryOriginCount") != std::string::npos &&
                       sceneSource.find("productionPaneSecondaryTerminalCount") != std::string::npos &&
@@ -999,6 +1137,15 @@ int main()
                       primaryDispatch.find("return shadeOpaquePrimary(h, rayDirection);") !=
                           std::string::npos,
                       "primary and refracted opaque hits must share real direct visibility and bounded bounce shading");
+        const auto hasUnoccludedPostFogColour = [](const std::string& shader) {
+            const auto fog = shader.find("color = mix(color, fogColor, fog);");
+            const auto end = shader.find("return color;", fog);
+            return fog == std::string::npos || end == std::string::npos ||
+                shader.substr(fog, end - fog).find("color +=") != std::string::npos;
+        };
+        ok &= Require(!hasUnoccludedPostFogColour(opaquePrimary) &&
+                      !hasUnoccludedPostFogColour(opaqueSecondary),
+                      "opaque receivers must not regain unoccluded local-emitter colour after visibility and fog");
         ok &= Require(raygenSource.find("rayBoxInterval(rayOrigin, rayDirection") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 6.0") != std::string::npos &&
                       raygenSource.find("color = color * lichMist.a + lichMist.rgb") != std::string::npos &&
@@ -1098,14 +1245,144 @@ int main()
                       windowsSource.find("instanceMasks[4] != 0x10u") != std::string::npos &&
                       windowsSource.find("instanceMasks[10] != 0x04u") != std::string::npos &&
                       windowsSource.find("record.primaryTorchPixels != 0u") != std::string::npos &&
+                      windowsSource.find("DiagnosticsAvailability()") != std::string::npos &&
+                      androidBridgeSource.find("diagnosticsAvailability") != std::string::npos &&
                       windowsSource.find("rewardGripPositionErrorMetres") != std::string::npos,
-                      "capture evidence must assert checkpoint-specific primary pixels, zero replaced-torch pixels, stable instance masks, and final reward GripRing contact");
+                      "capture evidence must qualify diagnostic pixels by availability while retaining masks and final reward GripRing contact");
         ok &= Require(simulationSource.find("SynchronizePausedInput") != std::string::npos &&
                       simulationSource.find("pendingToggleHeldLightPoseCommands_ = 0u") != std::string::npos &&
                       androidBridgeSource.find("RequestLifecyclePauseSynchronizationLocked") != std::string::npos &&
                       androidBridgeSource.find("SynchronizeLifecyclePauseOnOwnerThread") != std::string::npos &&
                       androidBridgeSource.find("gLifecycleUnpausePending") != std::string::npos,
                       "Android resume must defer unpause until the owner synchronizes all paused command sequences");
+        const std::size_t windowsMeasurementPauseBegin =
+            windowsSource.find("bool MeasurementPausedByUi(");
+        const std::size_t windowsMeasurementPauseEnd =
+            windowsSource.find("void ApplyOverlayState(", windowsMeasurementPauseBegin);
+        const std::string windowsMeasurementPause =
+            windowsMeasurementPauseBegin != std::string::npos &&
+                    windowsMeasurementPauseEnd != std::string::npos
+                ? windowsSource.substr(
+                    windowsMeasurementPauseBegin,
+                    windowsMeasurementPauseEnd - windowsMeasurementPauseBegin)
+                : std::string{};
+        ok &= Require(!windowsMeasurementPause.empty() &&
+                      windowsMeasurementPause.find("pauseMenuVisible") != std::string::npos &&
+                      windowsMeasurementPause.find("settingsVisible") != std::string::npos &&
+                      windowsMeasurementPause.find("diagnosticsVisible") != std::string::npos &&
+                      windowsMeasurementPause.find("rtLabVisible") != std::string::npos &&
+                      windowsMeasurementPause.find("simulationInput.paused") == std::string::npos &&
+                      windowsMeasurementPause.find("developmentCheckpoint") == std::string::npos &&
+                      windowsSource.find(
+                          "rtFrameEvidence.SetPaused(context.simulationPaused)") !=
+                          std::string::npos,
+                      "Windows measurement pause must follow consolidated UI overlays, not authored capture freeze");
+        const std::size_t androidPauseSyncBegin =
+            androidBridgeSource.find("bool SynchronizeLifecyclePauseOnOwnerThread(");
+        const std::size_t androidPauseSyncEnd =
+            androidBridgeSource.find("void ClearPlatformGameplayEvents(", androidPauseSyncBegin);
+        const std::string androidPauseSync =
+            androidPauseSyncBegin != std::string::npos &&
+                    androidPauseSyncEnd != std::string::npos
+                ? androidBridgeSource.substr(
+                    androidPauseSyncBegin,
+                    androidPauseSyncEnd - androidPauseSyncBegin)
+                : std::string{};
+        const std::size_t androidCaptureBegin =
+            androidBridgeSource.find("void ApplyCaptureCheckpoint(");
+        const std::size_t androidCaptureEnd =
+            androidBridgeSource.find("void ApplyRouteReplay(", androidCaptureBegin);
+        const std::string androidCapture =
+            androidCaptureBegin != std::string::npos && androidCaptureEnd != std::string::npos
+                ? androidBridgeSource.substr(
+                    androidCaptureBegin, androidCaptureEnd - androidCaptureBegin)
+                : std::string{};
+        ok &= Require(!androidPauseSync.empty() &&
+                      androidPauseSync.find("gLifecycleMeasurementPaused") != std::string::npos &&
+                      androidBridgeSource.find(
+                          "rtFrameEvidence.SetPaused(measurementPaused)") !=
+                          std::string::npos &&
+                      androidBridgeSource.find(
+                          "seeds.sceneEpoch = 1u;") != std::string::npos &&
+                      androidBridgeSource.find(
+                          "seeds.measurementGeneration = 1u;") != std::string::npos &&
+                      androidBridgeSource.find(
+                          "PreserveRtEvidenceSeeds(context.rtFrameEvidence.SeedsByValue())") !=
+                          std::string::npos &&
+                      !androidCapture.empty() &&
+                      androidCapture.find("RtLifecycleEvent::CheckpointChange") !=
+                          std::string::npos &&
+                      androidCapture.find("SetPaused") == std::string::npos,
+                      "Android measurement pause must publish only after owner acknowledgement, exclude frozen captures, and preserve a valid monotonic evidence seed floor");
+        ok &= Require(
+                      CountOccurrences(
+                          androidBridgeSource,
+                          "horde::telemetry::RtStage::SimulationStep") == 7u &&
+                      CountOccurrences(
+                          windowsSource,
+                          "horde::telemetry::RtStage::SimulationStep") == 1u,
+                      "every in-frame StepFixed/AdvanceFrame path must have exactly one simulation-step scope");
+        const auto resourceResetOrdered = [](const std::string& source,
+                                             const std::string_view beginMarker,
+                                             const std::string_view endMarker,
+                                             const std::string_view resourceAction = "rtScene.Destroy") {
+            const std::size_t begin = source.find(beginMarker);
+            const std::size_t end = source.find(endMarker, begin);
+            if (begin == std::string::npos || end == std::string::npos)
+            {
+                return false;
+            }
+            const std::string_view body(source.data() + begin, end - begin);
+            const std::size_t complete = body.find(
+                "CompleteRtEvidenceAfterDeviceIdle");
+            const std::size_t recreate = body.find(
+                "rtFrameEvidence.Recreate", complete);
+            const std::size_t timerReset = body.find(
+                "gpuFrameTimer.ResetAfterDeviceIdle", recreate);
+            const std::size_t sceneDestroy = body.find(resourceAction, timerReset);
+            return complete != std::string_view::npos &&
+                   recreate != std::string_view::npos &&
+                   timerReset != std::string_view::npos &&
+                   sceneDestroy != std::string_view::npos &&
+                   complete < recreate && recreate < timerReset &&
+                   timerReset < sceneDestroy;
+        };
+        ok &= Require(
+                      resourceResetOrdered(
+                          windowsSource,
+                          "bool ReleaseSwapchainResources(",
+                          "VkExtent2D ScaledRenderExtent(") &&
+                      resourceResetOrdered(
+                          androidBridgeSource,
+                          "bool ReleaseSwapchainResources(",
+                          "void RefreshGpuTimingTelemetry("),
+                      "both swapchain integrations must complete owned work, invalidate the epoch, then reset timer/scene resources");
+        ok &= Require(
+                      resourceResetOrdered(
+                          windowsSource,
+                          "if (context.renderScaleDirty && context.useRtPath)",
+                          "const bool benchmarkFrame = context.benchmark.IsRunning();") &&
+                      resourceResetOrdered(
+                          androidBridgeSource,
+                          "if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale",
+                          "const auto frameStart = std::chrono::steady_clock::now();",
+                          "rtScene.ResizeOutputAfterDeviceIdle"),
+                      "render-scale paths must complete owned work, invalidate the epoch, then reset timer/output resources");
+        const std::size_t resizeBegin = androidBridgeSource.find(
+            "if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale");
+        const std::size_t resizeEnd = androidBridgeSource.find(
+            "const auto frameStart = std::chrono::steady_clock::now();", resizeBegin);
+        const bool resizeMarkersValid = resizeBegin != std::string::npos &&
+                                        resizeEnd != std::string::npos && resizeEnd > resizeBegin;
+        const std::string resizeBody = resizeMarkersValid
+            ? androidBridgeSource.substr(resizeBegin, resizeEnd - resizeBegin) : std::string{};
+        ok &= Require(resizeMarkersValid &&
+                      resizeBody.find("rtScene.Destroy") == std::string::npos &&
+                      resizeBody.find("InitialiseRtSceneForSwapchain") == std::string::npos &&
+                      resizeBody.find("if (!evidenceCompleted)") != std::string::npos &&
+                      resizeBody.find("capturePresentedFrames = 0u") != std::string::npos &&
+                      androidBridgeSource.find("vkResetCommandBuffer(context.commandBuffers[imageIndex]") != std::string::npos,
+                      "Android scale-only resize must preserve the scene and reset commands after completed GPU work");
         ok &= Require(pendulumSource.find("torsionAngularAcceleration") != std::string::npos &&
                       pendulumSource.find("SignedYawDelta") != std::string::npos &&
                       pendulumSource.find("kHandBasisTeleportRadians") != std::string::npos &&
@@ -1131,14 +1408,14 @@ int main()
                           std::string::npos,
                       "authoritative Android route replay must not freeze behind menu/death pause state");
         ok &= Require(androidBridgeSource.find(
-                          "development->name.starts_with(\"player-body-\")") !=
+                          "PlayerRenderRouteForCheckpoint(") !=
                           std::string::npos &&
                       androidBridgeSource.find(
-                          "PlayerRenderRoute::HybridBlockPrimary") !=
+                          "kProductionPlayerRenderRoute") !=
                           std::string::npos &&
-                      androidBridgeSource.find("\"hybrid-block-primary\"") !=
+                      androidBridgeSource.find("ProductionGameSimulationConfig()") !=
                           std::string::npos,
-                      "Android reward/glass checkpoints must use and report the same block-primary arm route as live gameplay");
+                      "Android gameplay/reward/glass must use the accepted production route and shared anatomical profile");
         ok &= Require(androidBridgeSource.find("AndroidRtLabState gRtLabState;") != std::string::npos &&
                       androidBridgeSource.find("const horde::vulkan::raytracing::RtSceneTuning rtLabTuning = gRtLabState.Snapshot();") != std::string::npos &&
                       androidBridgeSource.find("rtLabTuning);") != std::string::npos &&
@@ -1173,6 +1450,12 @@ int main()
                       windowsSource.find("tuning.glassIor") != std::string::npos &&
                       windowsSource.find("tuning.glassRoughness") != std::string::npos,
                       "Windows RT Lab must expose bounded reusable dielectric controls");
+        const std::size_t androidLabBegin = androidSource.find("private void showRtLab()");
+        const std::size_t androidLabEnd = androidSource.find("private LinearLayout createRtLabPanel()", androidLabBegin);
+        const std::string androidLab = androidLabBegin != std::string::npos &&
+                androidLabEnd != std::string::npos
+            ? androidSource.substr(androidLabBegin, androidLabEnd - androidLabBegin)
+            : std::string{};
         ok &= Require(androidSource.find("PREF_RT_LAB_UNLOCKED = \"rt_lab_unlocked\"") != std::string::npos &&
                       androidSource.find(".putBoolean(PREF_RT_LAB_UNLOCKED, rtLabUnlocked)") != std::string::npos &&
                       androidSource.find("ProbeBridge.isRtLabUnlockEligible()") != std::string::npos &&
@@ -1185,8 +1468,9 @@ int main()
                           std::string::npos &&
                       androidSource.find("LinearLayout.LayoutParams.MATCH_PARENT, dp(48)") !=
                           std::string::npos &&
-                      androidSource.find("private void showRtLab()") != std::string::npos &&
-                      androidSource.find("ProbeBridge.setSimulationPaused(true)") != std::string::npos,
+                      androidLab.find("setGameplayPaused(true)") != std::string::npos &&
+                      androidSource.find("private void setGameplayPaused(boolean paused)") != std::string::npos &&
+                      androidSource.find("ProbeBridge.setSimulationPaused(paused)") != std::string::npos,
                       "Android RT Lab must preserve progress through settings reset and expose a live paused 48dp panel");
         const std::size_t androidShowEndingBegin =
             androidSource.find("private void showEndingOverlay()");
@@ -1303,6 +1587,27 @@ int main()
         diagnostic.clear();
         skeletons[1] = skeletons[0];
         skeletons[1].id = simulation::EntityId::SkeletonB;
+        horde::telemetry::RtStageAccumulator failedAttemptStages;
+        CharacterObservationClock observationClock;
+        RtSceneRecordObservation observation{
+            &failedAttemptStages, &observationClock,
+            ReadCharacterObservationClock};
+        ok &= Require(failedAttemptStages.Begin(),
+                      "failed character attempt did not begin");
+        ok &= Require(
+            !slot.PrepareFrame(skeletons, skeletons.size(), spareCapacityRoster,
+                               lich, unboundResources, diagnostic, &observation) &&
+                observationClock.reads == 2u,
+            "character skin must be observed at its inner call before upload failure");
+        ok &= Require(failedAttemptStages.Abort(),
+                      "failed character attempt did not abort");
+        ok &= Require(
+            failedAttemptStages.AggregatesByValue()
+                    .values[horde::telemetry::RtStageIndex(
+                        horde::telemetry::RtStage::CharacterSkin)]
+                    .sampleCount == 0u,
+            "failed character skin/upload attempt entered committed aggregates");
+        diagnostic.clear();
         ok &= Require(!slot.PrepareFrame(skeletons, skeletons.size(), spareCapacityRoster, lich,
                                          unboundResources, diagnostic) &&
                       diagnostic.find("Invalid animated skeleton pose 0 vertex upload") != std::string::npos,

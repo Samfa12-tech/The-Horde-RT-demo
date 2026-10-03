@@ -1,0 +1,175 @@
+{
+  "schema": 1,
+  "records": [
+    {
+      "path": "admission.json",
+      "bytes": 169,
+      "sha256": "c1b2d84d6d4f5af9afae59c02462ebe4dbefc4db63d5d10405b96da6f677fe5b"
+    },
+    {
+      "path": "method/archive.cjs",
+      "bytes": 3904,
+      "sha256": "6f62539857e48f1dbada5940bf74b453ae2b24fd9aa8e948e1494af73df7072d"
+    },
+    {
+      "path": "method/edit-render.cjs",
+      "bytes": 12392,
+      "sha256": "2370f3842ad1e234807cb028bed826c1ddf792ffd7d1b031d347a656b854f20c"
+    },
+    {
+      "path": "method/render-wrapper-used.cjs",
+      "bytes": 11490,
+      "sha256": "3c9ef99345b84aa830b5275f84717b76a62767a092f9eea293fa8397804fd0db"
+    },
+    {
+      "path": "reference-manifest.json",
+      "bytes": 5071,
+      "sha256": "ea7adbc1c248fc37d705239e6bcd529fbf10206ffb77165051658bce4e438c3e"
+    },
+    {
+      "path": "reference-source.json",
+      "bytes": 72393,
+      "sha256": "f5d4bbc8068ae2865216304efc22337ac190ca5b7732e02a9ed5e9062b7b92f4"
+    },
+    {
+      "path": "render/all-cues.json.gz",
+      "bytes": 43780,
+      "sha256": "3085c3630c7fc49fb2dcb3bc7e8c0fbe2406acc61552a2c89b372648ecf34e69"
+    },
+    {
+      "path": "render/wrapper-config.json",
+      "bytes": 457,
+      "sha256": "aeaf238576595f27e793b4049b01575d2fa86053e9a94ab26227676288497139"
+    },
+    {
+      "path": "validation/android-debug-build.log",
+      "bytes": 2494,
+      "sha256": "60bf208c1aca28994807fe4881c48ae1ed49aef3cde981d4b45341caa890853b"
+    },
+    {
+      "path": "validation/native-Release-drone.json",
+      "bytes": 1452,
+      "sha256": "f14bb9a796f6e3670f8d2a85fd128eebb60e5e6f66b1f52ad79ade3cae774aba"
+    },
+    {
+      "path": "validation/native-first-failure.log",
+      "bytes": 634,
+      "sha256": "1c0a2f96166f4e45af96240007df47d771ae45deb6199468b15489887941da68"
+    },
+    {
+      "path": "verification.json",
+      "bytes": 1675,
+      "sha256": "88cdb7ec365e36940f2df321ba333042da53859229026635697551a94c74ae47"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/asset.manifest.json",
+      "bytes": 5099,
+      "sha256": "672f2321b2fb429cffe9d61119103a1aa3565f355391a162497f741eec9d6e29"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/source/What_the_Dark_Keeps_Pocket_Chordsmith.json",
+      "bytes": 72783,
+      "sha256": "3ab832e08807d3745fca172b0bb6b95ccbbe37face4e60077027d6d35b55c9a0"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/source/What_the_Dark_Keeps_PCS1.txt",
+      "bytes": 94574,
+      "sha256": "fc7dab9a0e187740f352b440e92e55b922c663019bfe8df0896b1c617aea570d"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/A-body.wav",
+      "bytes": 2304044,
+      "sha256": "8c6201afb7129775ded6696c5819f4e592202d1b0f33f755b9d4f408f2e81556"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/A-tail.wav",
+      "bytes": 576044,
+      "sha256": "a7459fc656b1520be5fad2b9e11cec314d62cdf0164abdb2fda53d619d7b962c"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/B-body.wav",
+      "bytes": 2304044,
+      "sha256": "27944d203f9453b7ff9edb2bfd653bac524d4da4db4a000f76115fb4810dd3b5"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/B-tail.wav",
+      "bytes": 576044,
+      "sha256": "7a437a4641f4b99d8b21db934ece9bb3a9c4d0464fea37eb94a2841d70f3132f"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/C-body.wav",
+      "bytes": 576044,
+      "sha256": "3ce3a8ea381c3e81c0b34841df3f1d8d236a5ef335f594001553a400b65accb3"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/C-tail.wav",
+      "bytes": 576044,
+      "sha256": "ec3650bd450cebe9985c1d4d4b59749debe34301f9f9e889171d0e49a316c89c"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/D-body.wav",
+      "bytes": 2304044,
+      "sha256": "4398311b5870e614ffe611950264e370cf819f8d323aafe291816f38e36bf4c6"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/D-tail.wav",
+      "bytes": 576044,
+      "sha256": "14550157b1a3fbf44f3d1a4dda424223475a7a0a9975b0361687bb2031f7ec50"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/E-body.wav",
+      "bytes": 2304044,
+      "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/E-tail.wav",
+      "bytes": 576044,
+      "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/F-body.wav",
+      "bytes": 2304044,
+      "sha256": "158f015c3ffbb12169eb088206751f56fbed799e0b3dea3ab4496124634b441d"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/F-tail.wav",
+      "bytes": 576044,
+      "sha256": "a4fdc4b38c8a1e7240cfad5ac364063ec8c6f27f9baefc2d2e6110a8a4429c21"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/G-body.wav",
+      "bytes": 1152044,
+      "sha256": "ab2dbe31c735cbeec11d09eaa308e5faee793a891c34b67f5f50f6b33af25736"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/G-tail.wav",
+      "bytes": 576044,
+      "sha256": "c51b9851ac32e34c57e586f154d3ee1d5f2d138b9c0f21b2c983618905a42609"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/H-body.wav",
+      "bytes": 2304044,
+      "sha256": "58ac260bd18204e9fb1aeb01aab9229de6830032f1d4be3d30b9527fde1fe6ae"
+    },
+    {
+      "path": "assets/audio/music/what-the-dark-keeps/runtime/H-tail.wav",
+      "bytes": 576044,
+      "sha256": "9e50268573d85733333e10304a0e9faf8d23545e510723035aef1b9d8b0238bf"
+    },
+    {
+      "path": "tools/music-instrumentation-core-check/check.cpp",
+      "bytes": 18184,
+      "sha256": "15a4b08b31b88675419b7e3e04b6035fab09e2aedfe160cde5590ef52b61c805"
+    }
+  ],
+  "apk": {
+    "path": "C:\\Dev\\tmp\\horde-music-drone-20261003\\HordeLanternRT-music-drone-debug.apk",
+    "sha256": "315b1c9f4ba99f397f1aa638fd0b19f251a7dd1877c3d9fff6680587feda3f04"
+  },
+  "coreExecutable": {
+    "sha256": "81c7d881606637321cb9847dfadc95083fde5acff474e586ed3e6469769b482e"
+  },
+  "scope": "Only A/D Melody3 held-phrase deletion. New native sample/format/package checks; no shader, renderer, gameplay, OS-audio or perceptual equivalence inferred."
+}

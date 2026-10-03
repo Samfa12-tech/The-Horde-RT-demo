@@ -8,15 +8,23 @@
 #include "scene/assets/StaticMeshAsset.h"
 
 #include <span>
+#include <cstdint>
 #include <string>
 #include <string_view>
 
 namespace horde::gameplay::items
 {
 
-inline constexpr float kClaimedRewardLanternScale = 0.50f;
+// Owner-requested 12% reduction from the .50 presentation. Ring, cage,
+// dielectric geometry and authored Flame/Light sockets share this scale;
+// the gameplay-owned hand Grip remains fixed.
+inline constexpr float kClaimedRewardLanternScale = 0.44f;
 
 inline constexpr float kSwordGripRollRadians = 1.3962634f;
+
+// Shared pose authority, not a renderer-only offset. The anatomical profile is
+// opt-in until the modelled body/viewmodel route passes live owner acceptance.
+enum class PlayerMountProfile : std::uint8_t { LegacyViewRelative, AnatomicalBody };
 
 struct HeldItemKinematicsInput
 {
@@ -29,6 +37,8 @@ struct HeldItemKinematicsInput
     PlayerCombatSnapshot playerCombat{};
     float swordSwingRadians = 0.0f;
     horde::gameplay::interactions::InteractionState interaction{};
+    PlayerMountProfile playerMountProfile = PlayerMountProfile::LegacyViewRelative;
+    float cameraPitchRadians = 0.0f;
 };
 
 struct HeldSwordPose
@@ -74,6 +84,7 @@ struct HeldItemFixedStepInput
     PlayerCombatSnapshot playerCombat{};
     float swordSwingRadians = 0.0f;
     horde::gameplay::interactions::InteractionState interaction{};
+    PlayerMountProfile playerMountProfile = PlayerMountProfile::LegacyViewRelative;
 };
 
 struct HeldItemFixedStepState
@@ -106,7 +117,8 @@ struct FirstPersonSafeFrame
 
 HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
                                    float swordSwingRadians,
-                                   float heldPropDepth);
+                                   float heldPropDepth,
+                                   bool bulkyLeftHandCarry = false);
 
 std::array<float, 3u> EvaluateSwordBladeAxisInView(float inwardRadians,
                                                    float forwardRadians);

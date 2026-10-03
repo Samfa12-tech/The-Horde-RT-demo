@@ -1,0 +1,41 @@
+{
+  "purpose": "Bind archived existing Windows package-admission inputs and documentation; not a build or game run.",
+  "sourceArtifactRoot": "C:\\Dev\\tmp\\horde-final-windows-music-package-20261003",
+  "finalZip": {
+    "path": "Horde-Lantern-RT-Alpha-1.6.1-Windows-x64-SHIPPING-HIGH-CURRENT-PLAYER-ASSETS-UNPUBLISHABLE.zip",
+    "bytes": 116168306,
+    "sha256": "d2984666b292862c13cf1b8161ad2c085495bafb5c0d844f39538a7a3df58b12"
+  },
+  "boundFiles": [
+    {
+      "path": "README.md",
+      "bytes": 5150,
+      "sha256": "3506a0f27c45b9133a39aea751fbc4865e9146e5c04431416b93f07034b7bd0e"
+    },
+    {
+      "path": "SHA256SUMS.txt",
+      "bytes": 2603,
+      "sha256": "113f2f9231d9182399622cd09f13bbbdccdd8ef440ba3feef155461b5d963bb5"
+    },
+    {
+      "path": "archive-final-package-evidence.ps1",
+      "bytes": 3967,
+      "sha256": "4671dd58276587137e6ba080b2262b333a36133923808503a47c6dd6a6895ef0"
+    },
+    {
+      "path": "pipeline-containment.json",
+      "bytes": 1649,
+      "sha256": "a612f60f32488675a8e885220c70afb286b1b56522b0280d0686b16879edc285"
+    },
+    {
+      "path": "windows-release-build.log",
+      "bytes": 1049,
+      "sha256": "d27d8a9c4951e76bddb65f055da4df8b5367faa9ec00511cb4e7a1ac8fb209d7"
+    },
+    {
+      "path": "final-zip-entry-roster.json",
+      "bytes": 15233,
+      "sha256": "40915f68da07a7d70c7cbf2b9ac326e51bbd68b131f1a5f00682f7bf92ff93e2"
+    }
+  ]
+}

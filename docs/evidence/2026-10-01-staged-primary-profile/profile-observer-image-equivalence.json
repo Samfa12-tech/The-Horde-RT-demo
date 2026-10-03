@@ -1,0 +1,118 @@
+{
+  "images": [
+    {
+      "fixture": "standard",
+      "file": "00-opening.png",
+      "baselineSha256": "a68eb3349f7f709df9d0f8da0dd44e5aa44486de74b021f40a2d1d69a39e7f0d",
+      "profiledSha256": "a68eb3349f7f709df9d0f8da0dd44e5aa44486de74b021f40a2d1d69a39e7f0d",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "01-skeleton.png",
+      "baselineSha256": "c9c04cac914985700613cff2f293cd8cbd11bd652cc7980f7948fb9ec5e9e47e",
+      "profiledSha256": "c9c04cac914985700613cff2f293cd8cbd11bd652cc7980f7948fb9ec5e9e47e",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "02-worst-bend.png",
+      "baselineSha256": "9bb84b2b3f91bbfe8a4017fe5ab1f40099dd5a39f5976d28d09b4b43bd5eae38",
+      "profiledSha256": "9bb84b2b3f91bbfe8a4017fe5ab1f40099dd5a39f5976d28d09b4b43bd5eae38",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "03-lantern-drop.png",
+      "baselineSha256": "65d75a70dd537c8d311e7db96850880094df8d91f584bb047d25896ccd8033b3",
+      "profiledSha256": "65d75a70dd537c8d311e7db96850880094df8d91f584bb047d25896ccd8033b3",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "04-skylight.png",
+      "baselineSha256": "771fabcd062e055c303fea5e2b18125b7ca134a0ee4a940f1f8863c6433a67c3",
+      "profiledSha256": "771fabcd062e055c303fea5e2b18125b7ca134a0ee4a940f1f8863c6433a67c3",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "05-yellow.png",
+      "baselineSha256": "ec31e39b117427aea8493e31dc1a6db57cc5ddd3530d2f3c5ad69fa0da8ff72e",
+      "profiledSha256": "ec31e39b117427aea8493e31dc1a6db57cc5ddd3530d2f3c5ad69fa0da8ff72e",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "06-blue.png",
+      "baselineSha256": "dc93e7a872d111cdc2f814aceba761a23a4fd8491940d97fbbd010bb6d367242",
+      "profiledSha256": "dc93e7a872d111cdc2f814aceba761a23a4fd8491940d97fbbd010bb6d367242",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "07-red.png",
+      "baselineSha256": "28fb5b45d3179b9fef574b45fb0a99f166444a68658bde6b5640d336bfd84319",
+      "profiledSha256": "28fb5b45d3179b9fef574b45fb0a99f166444a68658bde6b5640d336bfd84319",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "08-green.png",
+      "baselineSha256": "2c934efa4277c12e746ca4b8c5c1567e0d75c3a6f4e9700e127e350abcfd1f21",
+      "profiledSha256": "2c934efa4277c12e746ca4b8c5c1567e0d75c3a6f4e9700e127e350abcfd1f21",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "09-mirror.png",
+      "baselineSha256": "988941d07fa8811209bdb0f317e264e53653fbed29b972ef462eccd50552017f",
+      "profiledSha256": "988941d07fa8811209bdb0f317e264e53653fbed29b972ef462eccd50552017f",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "10-lich.png",
+      "baselineSha256": "f6ba25fb497d24a93956a31a1c06f0612b75efb2a8fba295f6367bab64123de6",
+      "profiledSha256": "f6ba25fb497d24a93956a31a1c06f0612b75efb2a8fba295f6367bab64123de6",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "11-finale-roof.png",
+      "baselineSha256": "c2fbb089984bfdc543a964848ed851312414c7bb051625c45e18043d4c0cdf6d",
+      "profiledSha256": "c2fbb089984bfdc543a964848ed851312414c7bb051625c45e18043d4c0cdf6d",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "standard",
+      "file": "12-two-enemy-combat.png",
+      "baselineSha256": "2ade4197c77ff5472aea25c405b7d45fc9ed4d4b3ed81d8fd1693aac8d70e1e5",
+      "profiledSha256": "2ade4197c77ff5472aea25c405b7d45fc9ed4d4b3ed81d8fd1693aac8d70e1e5",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    },
+    {
+      "fixture": "lantern-glass-production",
+      "file": "115-lantern-glass-production.png",
+      "baselineSha256": "c714c6eb4c72fb488a35d24dd8e712e9a0617a39cf9be0dd6d92bf5eb2e10bc6",
+      "profiledSha256": "c714c6eb4c72fb488a35d24dd8e712e9a0617a39cf9be0dd6d92bf5eb2e10bc6",
+      "maximumRgbDifference": 0,
+      "fractionOverOne": 0
+    }
+  ],
+  "scope": "14 exact RTX Shipping-policy Debug-shell observer images; no Release/phone performance claim",
+  "passed": true
+}

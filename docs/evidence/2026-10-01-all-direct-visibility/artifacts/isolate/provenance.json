@@ -1,0 +1,32 @@
+{
+  "Resolved": "C:\\Dev\\tmp\\horde-all-shadow-profile-20261001\\source\\android\\app\\build\\intermediates\\apk\\benchmark\\app-benchmark.apk",
+  "Sealed": "C:\\Dev\\tmp\\horde-all-shadow-profile-20261001\\artifacts\\isolate\\HordeLanternRT-all-shadow-isolate-benchmark-arm64.apk",
+  "ApkSha256": "b57abb9127929665102a9de70b44085d6c469aeeee10fb016f09d6ffbd6d4829",
+  "Bytes": 76306557,
+  "SourceHead": "71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95",
+  "SourceStatus": [
+    " M shaders/raytracing/include/rt_lighting.glsl",
+    " M src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+    " M src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+    " M src/vulkan/raytracing/variants/diagnostic_high_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/diagnostic_high_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/diagnostic_mobile_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/diagnostic_mobile_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_high_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_diagnostic_mobile_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_shipping_high_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_shipping_high_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/rayquery_compute_shipping_mobile_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/shipping_high_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/shipping_high_opaque_fast.inc",
+    " M src/vulkan/raytracing/variants/shipping_mobile_generic_dielectric.inc",
+    " M src/vulkan/raytracing/variants/shipping_mobile_opaque_fast.inc",
+    " M tools/raygen-variant-catalog.json",
+    " M tools/rayquery-variant-catalog.json",
+    "?? shaders/raytracing/include/rt_all_direct_visibility_investigation.glsl"
+  ],
+  "PatchSha256": "f892d6270f3d5a776884d787f0bd5de7df080263319439d286016687f2d705b6"
+}

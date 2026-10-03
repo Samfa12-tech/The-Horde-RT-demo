@@ -1,0 +1,638 @@
+{
+  "schema": 1,
+  "status": "PASS-objective-checks; owner-listening-pending",
+  "scope": "instrumentation audition only; no runtime bank/PCM playback/memory change",
+  "referenceRepeat": [
+    {
+      "cue": "A",
+      "maxPcmLsb": 1,
+      "differingSamples": 95,
+      "tailByteIdentical": true
+    },
+    {
+      "cue": "E",
+      "maxPcmLsb": 1,
+      "differingSamples": 117,
+      "tailByteIdentical": true
+    }
+  ],
+  "audit": [
+    {
+      "variant": "reference",
+      "cue": "A",
+      "body": {
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "d9405e8ff3ba55396322bfd58763f3f9f0691f49d9fb12f02175c80784f67e5f",
+        "peak": 0.41792046876430555,
+        "rms": 0.029772469351300495,
+        "bodyCutSeam": 0.0005798516800439467
+      },
+      "tail": {
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "bb1c5be7c74f1026ff0ab7f2fd566e4ab81c756370246b3143c2e128ed6ed223",
+        "peak": 0.0007019257179479354,
+        "rms": 0.000057970944366756245,
+        "bodyCutSeam": 0.0005798516800439467
+      },
+      "scheduleEquivalent": true,
+      "jsonPcs1Equivalent": true,
+      "floatFiniteAndUnclipped": true,
+      "sourceInstrument": [
+        "soft",
+        "bell",
+        "soft"
+      ],
+      "loudness": {
+        "integratedLufs": -28.38,
+        "truePeakDbtp": -7.58,
+        "lraLu": 2.2,
+        "analysisOnly": true
+      }
+    },
+    {
+      "variant": "reference",
+      "cue": "E",
+      "body": {
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "1442e04b855753f0e0c7ce5e43bbe502a3a49554d8b697386bd122a128ae57c2",
+        "peak": 0.6419263283181249,
+        "rms": 0.060110500945586336,
+        "bodyCutSeam": 0.0013122959074678793
+      },
+      "tail": {
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "aac330fb178822e86b0ea71307955eae95f1886de01a9bebf1620ad313877ddd",
+        "peak": 0.0029602954191717277,
+        "rms": 0.00022443945869468084,
+        "bodyCutSeam": 0.0012207403790398877
+      },
+      "scheduleEquivalent": true,
+      "jsonPcs1Equivalent": true,
+      "floatFiniteAndUnclipped": true,
+      "sourceInstrument": [
+        "synth",
+        "bell",
+        "soft"
+      ],
+      "loudness": {
+        "integratedLufs": -22.51,
+        "truePeakDbtp": -3.31,
+        "lraLu": 0.6,
+        "analysisOnly": true
+      }
+    },
+    {
+      "variant": "whistle",
+      "cue": "A",
+      "body": {
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "a58cacd493bd4604cf1d51096cf03092e35c993a079c10af7fcec3debc093277",
+        "peak": 0.4009216589861751,
+        "rms": 0.01855089720065219,
+        "bodyCutSeam": 0.0007019257179479354
+      },
+      "tail": {
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "4fea7b227dee6b81f09fd54f202bfea33a76a2419fa07c1ec37a0d2f8d14e4e1",
+        "peak": 0.010834070863979004,
+        "rms": 0.0040969384696666784,
+        "bodyCutSeam": 0.000793481246375927
+      },
+      "scheduleEquivalent": true,
+      "jsonPcs1Equivalent": true,
+      "floatFiniteAndUnclipped": true,
+      "sourceInstrument": [
+        "cowboy_whistle",
+        "soft_pluck",
+        "mellow_sax"
+      ],
+      "loudness": {
+        "integratedLufs": -33.89,
+        "truePeakDbtp": -7.94,
+        "lraLu": 4.4,
+        "analysisOnly": true
+      }
+    },
+    {
+      "variant": "whistle",
+      "cue": "E",
+      "body": {
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "ddeb175cb27a3bf1e3ee1e0677a2bf6fb8c2fe8c6fd62a68e32c19bc06378f03",
+        "peak": 0.6468703268532365,
+        "rms": 0.05532566018428815,
+        "bodyCutSeam": 0.007324442274239326
+      },
+      "tail": {
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "0ed95cbf3d301692c5fb9909a681df7c6d3bd6716d6dd8af6638b3bc761fc2a2",
+        "peak": 0.00924710837122715,
+        "rms": 0.002670281477903876,
+        "bodyCutSeam": 0.007629627368999298
+      },
+      "scheduleEquivalent": true,
+      "jsonPcs1Equivalent": true,
+      "floatFiniteAndUnclipped": true,
+      "sourceInstrument": [
+        "cowboy_whistle",
+        "soft_pluck",
+        "mellow_sax"
+      ],
+      "loudness": {
+        "integratedLufs": -23.37,
+        "truePeakDbtp": -3.29,
+        "lraLu": 0.7,
+        "analysisOnly": true
+      }
+    },
+    {
+      "variant": "reed",
+      "cue": "A",
+      "body": {
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "b11791a5c1052910b537e7d95331623500ad208f37c478e455c5c555f0af05fa",
+        "peak": 0.4008301034577471,
+        "rms": 0.01769642482631806,
+        "bodyCutSeam": 0.0006103701895199438
+      },
+      "tail": {
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "220aa61ac377fe82558a61f51f5bf12343426dba1a7909c67e535e7bcc62b30a",
+        "peak": 0.010834070863979004,
+        "rms": 0.004096965266747235,
+        "bodyCutSeam": 0.000793481246375927
+      },
+      "scheduleEquivalent": true,
+      "jsonPcs1Equivalent": true,
+      "floatFiniteAndUnclipped": true,
+      "sourceInstrument": [
+        "mellow_sax",
+        "soft_pluck",
+        "mellow_sax"
+      ],
+      "loudness": {
+        "integratedLufs": -34.41,
+        "truePeakDbtp": -7.94,
+        "lraLu": 5.2,
+        "analysisOnly": true
+      }
+    },
+    {
+      "variant": "reed",
+      "cue": "E",
+      "body": {
+        "frames": 576000,
+        "bytes": 2304044,
+        "sha256": "f3d22139c9231ca3e958b3a486c19013e8754f907dac5aa4c2eb915d8092e678",
+        "peak": 0.6347849971007417,
+        "rms": 0.05482670220237492,
+        "bodyCutSeam": 0.007202368236335337
+      },
+      "tail": {
+        "frames": 144000,
+        "bytes": 576044,
+        "sha256": "0f0f287e93c2160695b5c1b7f6ecd053ab3075af6a8ae8228ade43f57b77c1b5",
+        "peak": 0.008301034577471236,
+        "rms": 0.0026649679390348202,
+        "bodyCutSeam": 0.007446516312143315
+      },
+      "scheduleEquivalent": true,
+      "jsonPcs1Equivalent": true,
+      "floatFiniteAndUnclipped": true,
+      "sourceInstrument": [
+        "mellow_sax",
+        "soft_pluck",
+        "mellow_sax"
+      ],
+      "loudness": {
+        "integratedLufs": -23.43,
+        "truePeakDbtp": -3.34,
+        "lraLu": 0.7,
+        "analysisOnly": true
+      }
+    }
+  ],
+  "loopChecks": [
+    {
+      "variant": "reference",
+      "cue": "A",
+      "periodFrames": 576000,
+      "periodCount": 20,
+      "totalBodyFrames": 11520000,
+      "peak": 0.41792046876430555,
+      "loopBoundaryDelta": 0.00003051850947599719,
+      "tailOffDelta": 0.0014954069643238616,
+      "claim": "offline bounded PCM arithmetic, not native playback or audible-seam acceptance"
+    },
+    {
+      "variant": "reference",
+      "cue": "E",
+      "periodFrames": 576000,
+      "periodCount": 20,
+      "totalBodyFrames": 11520000,
+      "peak": 0.6419263283181249,
+      "loopBoundaryDelta": 0.00009155552842799158,
+      "tailOffDelta": 0.0006714072084719382,
+      "claim": "offline bounded PCM arithmetic, not native playback or audible-seam acceptance"
+    },
+    {
+      "variant": "whistle",
+      "cue": "A",
+      "periodFrames": 576000,
+      "periodCount": 20,
+      "totalBodyFrames": 11520000,
+      "peak": 0.4009216589861751,
+      "loopBoundaryDelta": 0.0010071108127079073,
+      "tailOffDelta": 0.0010376293221839045,
+      "claim": "offline bounded PCM arithmetic, not native playback or audible-seam acceptance"
+    },
+    {
+      "variant": "whistle",
+      "cue": "E",
+      "periodFrames": 576000,
+      "periodCount": 20,
+      "totalBodyFrames": 11520000,
+      "peak": 0.6468703268532365,
+      "loopBoundaryDelta": 0.0003051850947599719,
+      "tailOffDelta": 0.00009155552842799158,
+      "claim": "offline bounded PCM arithmetic, not native playback or audible-seam acceptance"
+    },
+    {
+      "variant": "reed",
+      "cue": "A",
+      "periodFrames": 576000,
+      "periodCount": 20,
+      "totalBodyFrames": 11520000,
+      "peak": 0.4008301034577471,
+      "loopBoundaryDelta": 0.0009765923032319102,
+      "tailOffDelta": 0.001098666341135899,
+      "claim": "offline bounded PCM arithmetic, not native playback or audible-seam acceptance"
+    },
+    {
+      "variant": "reed",
+      "cue": "E",
+      "periodFrames": 576000,
+      "periodCount": 20,
+      "totalBodyFrames": 11520000,
+      "peak": 0.6347849971007417,
+      "loopBoundaryDelta": 0.00024414807580797754,
+      "tailOffDelta": 0.00009155552842799158,
+      "claim": "offline bounded PCM arithmetic, not native playback or audible-seam acceptance"
+    }
+  ],
+  "transitions": [
+    {
+      "variant": "reference",
+      "from": "A",
+      "to": "E",
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.13180159916989656,
+      "maxAdjacentDelta": 0.006468148848943551,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "reference",
+      "from": "A",
+      "to": "E",
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.415271978413241,
+      "maxAdjacentDelta": 0.007550510676391897,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "reference",
+      "from": "A",
+      "to": "E",
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.13204109317300944,
+      "maxAdjacentDelta": 0.006483436078981902,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "reference",
+      "from": "E",
+      "to": "A",
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.27106776635029145,
+      "maxAdjacentDelta": 0.16811008789330728,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "reference",
+      "from": "E",
+      "to": "A",
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.43794443851028986,
+      "maxAdjacentDelta": 0.011135413169754055,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "reference",
+      "from": "E",
+      "to": "A",
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.06985925880713319,
+      "maxAdjacentDelta": 0.0025830078025655956,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "whistle",
+      "from": "A",
+      "to": "E",
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.11823773918881803,
+      "maxAdjacentDelta": 0.00604579048025961,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "whistle",
+      "from": "A",
+      "to": "E",
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.3989156061484624,
+      "maxAdjacentDelta": 0.008152925707775099,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "whistle",
+      "from": "A",
+      "to": "E",
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.11846736045411542,
+      "maxAdjacentDelta": 0.006065703807692699,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "whistle",
+      "from": "E",
+      "to": "A",
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.27396180608539084,
+      "maxAdjacentDelta": 0.16787508519750566,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "whistle",
+      "from": "E",
+      "to": "A",
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.4426599780266732,
+      "maxAdjacentDelta": 0.009646117536952829,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "whistle",
+      "from": "E",
+      "to": "A",
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.06575689718314157,
+      "maxAdjacentDelta": 0.0025244300668355365,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "reed",
+      "from": "A",
+      "to": "E",
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.12644662312692648,
+      "maxAdjacentDelta": 0.006231925412762842,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "reed",
+      "from": "A",
+      "to": "E",
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.39877035838902963,
+      "maxAdjacentDelta": 0.008180667032888788,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "reed",
+      "from": "A",
+      "to": "E",
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.12620585243283383,
+      "maxAdjacentDelta": 0.006244865260780664,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "reed",
+      "from": "E",
+      "to": "A",
+      "exitFrame": 48000,
+      "crossfadeFrames": 12000,
+      "peak": 0.27544588813948995,
+      "maxAdjacentDelta": 0.1665197276731671,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "reed",
+      "from": "E",
+      "to": "A",
+      "exitFrame": 288000,
+      "crossfadeFrames": 12000,
+      "peak": 0.44371850744142993,
+      "maxAdjacentDelta": 0.009616491693879002,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    },
+    {
+      "variant": "reed",
+      "from": "E",
+      "to": "A",
+      "exitFrame": 575999,
+      "crossfadeFrames": 12000,
+      "peak": 0.07552281258583331,
+      "maxAdjacentDelta": 0.0027730058697266547,
+      "claim": "representative linear250ms arithmetic; gameplay cue routing and actual Core clocks unchanged"
+    }
+  ],
+  "matching": [
+    {
+      "variant": "reference",
+      "cue": "A",
+      "path": "reference-A-matched.wav",
+      "gainDb": 0,
+      "targetLufs": -28.38,
+      "integratedLufs": -28.38,
+      "truePeakDbtp": -7.58,
+      "lraLu": 2.2,
+      "analysisOnly": true,
+      "sha256": "8e5be0c046d95a3058037c311ea6a1b7a330f82536788fd33954980d31dfcc02",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "whistle",
+      "cue": "A",
+      "path": "whistle-A-matched.wav",
+      "gainDb": 5.510000000000002,
+      "targetLufs": -28.38,
+      "integratedLufs": -28.36,
+      "truePeakDbtp": -2.43,
+      "lraLu": 4.4,
+      "analysisOnly": true,
+      "sha256": "7eaa5520e520edcc33b90250caa78285d972e880bf9ebdd63e3f0991ab5bd8c4",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "reed",
+      "cue": "A",
+      "path": "reed-A-matched.wav",
+      "gainDb": 6.029999999999998,
+      "targetLufs": -28.38,
+      "integratedLufs": -28.37,
+      "truePeakDbtp": -1.91,
+      "lraLu": 5.1,
+      "analysisOnly": true,
+      "sha256": "3b965343939614fd07c2158ba2494ea4d79687f1f30e56aea3df8e2e42785b81",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "reference",
+      "cue": "E",
+      "path": "reference-E-matched.wav",
+      "gainDb": 0,
+      "targetLufs": -22.51,
+      "integratedLufs": -22.51,
+      "truePeakDbtp": -3.31,
+      "lraLu": 0.6,
+      "analysisOnly": true,
+      "sha256": "070278efd96e8259733801bc30fe87e232cb26b4aeb3075cb927c9c89c8afb32",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "whistle",
+      "cue": "E",
+      "path": "whistle-E-matched.wav",
+      "gainDb": 0.8599999999999994,
+      "targetLufs": -22.51,
+      "integratedLufs": -22.5,
+      "truePeakDbtp": -2.44,
+      "lraLu": 0.7,
+      "analysisOnly": true,
+      "sha256": "9ba677502fad067b954bf1db38371e0c3dd310b2aededdd4a265c8e4d40f832c",
+      "processing": "constant gain only; preview not runtime asset"
+    },
+    {
+      "variant": "reed",
+      "cue": "E",
+      "path": "reed-E-matched.wav",
+      "gainDb": 0.9199999999999982,
+      "targetLufs": -22.51,
+      "integratedLufs": -22.51,
+      "truePeakDbtp": -2.42,
+      "lraLu": 0.7,
+      "analysisOnly": true,
+      "sha256": "a74949b70f0ad7f50108489122682becf36de8de4948db27c5fefe374e33e698",
+      "processing": "constant gain only; preview not runtime asset"
+    }
+  ],
+  "previews": [
+    {
+      "variant": "whistle",
+      "path": "01-whistle-comparison.wav",
+      "seconds": 49.5,
+      "sha256": "8f80dc576b94899be56a6e63dccbaed93660db91e586fb86830b5329a79f4d4c",
+      "timeline": [
+        {
+          "startSeconds": 0,
+          "variant": "reference",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 12.5,
+          "variant": "whistle",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 25,
+          "variant": "reference",
+          "cue": "E",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 37.5,
+          "variant": "whistle",
+          "cue": "E",
+          "durationSeconds": 12
+        }
+      ],
+      "note": "body-only short audition with0.5s silence; full bodies/tails remain separate and unchanged"
+    },
+    {
+      "variant": "reed",
+      "path": "02-reed-comparison.wav",
+      "seconds": 49.5,
+      "sha256": "757ad4707e2a07d195ec7f540657f81cdd3d0d4c4bc106b31d6fccf8746144a0",
+      "timeline": [
+        {
+          "startSeconds": 0,
+          "variant": "reference",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 12.5,
+          "variant": "reed",
+          "cue": "A",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 25,
+          "variant": "reference",
+          "cue": "E",
+          "durationSeconds": 12
+        },
+        {
+          "startSeconds": 37.5,
+          "variant": "reed",
+          "cue": "E",
+          "durationSeconds": 12
+        }
+      ],
+      "note": "body-only short audition with0.5s silence; full bodies/tails remain separate and unchanged"
+    }
+  ],
+  "unchangedRuntime": {
+    "manifestSha256": "1126f9f537efb607b11bd492e1c79d6e8b94814567ce06b654e03b0d915c9ff3",
+    "waveBytes": 20160704,
+    "pcmBytes": 20160000
+  },
+  "limitations": [
+    "Preset names are not evidence of realistic acoustic timbre.",
+    "Audible loop/transition acceptance remains open.",
+    "Combat masking requires actual mixed-game listening; no spatialized SFX guarantee from these checks.",
+    "No phone install or native playback changes in this pass."
+  ],
+  "inputs": {
+    "verifierSha256": "eb194161b743af6efb98e9d8b45f44f9c951f018687efe6ebbb9d78e9aaa441e",
+    "sourceVariantsSha256": "364c184f57db323d5e1cde618e4458564b34351f6df0d5053c802c1038492ea0"
+  }
+}

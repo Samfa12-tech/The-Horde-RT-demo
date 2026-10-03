@@ -2,14 +2,300 @@ plugins {
     id 'com.android.application'
 }
 
+import groovy.json.JsonSlurper
+import java.nio.ByteBuffer
+import java.nio.charset.CharacterCodingException
+import java.nio.charset.CodingErrorAction
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+
+def hordeVersionFile = rootProject.file('../VERSION')
+def hordeVersionCodeMapFile = rootProject.file('../version-code-map.json')
+def readHordeUtf8Authority = { File authorityFile, String authorityName ->
+    def bytes = authorityFile.bytes
+    if (bytes.length >= 3 && (bytes[0] & 0xff) == 0xef && (bytes[1] & 0xff) == 0xbb && (bytes[2] & 0xff) == 0xbf) {
+        throw new GradleException("${authorityName} must be valid UTF-8 without a byte-order mark.")
+    }
+    try {
+        return StandardCharsets.UTF_8.newDecoder()
+            .onMalformedInput(CodingErrorAction.REPORT)
+            .onUnmappableCharacter(CodingErrorAction.REPORT)
+            .decode(ByteBuffer.wrap(bytes))
+            .toString()
+    } catch (CharacterCodingException exception) {
+        throw new GradleException("${authorityName} must be valid UTF-8 without a byte-order mark.", exception)
+    }
+}
+
+def hordeVersionRaw = readHordeUtf8Authority(hordeVersionFile, 'VERSION')
+def hordeVersionMatcher = hordeVersionRaw =~ /^((?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))(?:\r?\n)?$/
+if (!hordeVersionMatcher.matches()) {
+    throw new GradleException("VERSION must contain exactly one MAJOR.MINOR.PATCH line without whitespace.")
+}
+def hordeVersionName = hordeVersionMatcher.group(1)
+def hordeVersionCodeMapRaw = readHordeUtf8Authority(hordeVersionCodeMapFile, 'Android version-code map')
+def hordeVersionCodeMap = new JsonSlurper().parseText(hordeVersionCodeMapRaw)
+if (!(hordeVersionCodeMap instanceof Map) || !(hordeVersionCodeMap.androidVersionCodes instanceof Map)) {
+    throw new GradleException('Android version-code map androidVersionCodes must be an object.')
+}
+def hordeActiveAssignmentMatcher = java.util.regex.Pattern
+    .compile('"' + java.util.regex.Pattern.quote(hordeVersionName) + '"\\s*:')
+    .matcher(hordeVersionCodeMapRaw)
+int hordeActiveAssignmentCount = 0
+while (hordeActiveAssignmentMatcher.find()) {
+    ++hordeActiveAssignmentCount
+}
+if (hordeActiveAssignmentCount != 1) {
+    throw new GradleException("Android version-code map must contain exactly one active assignment for ${hordeVersionName}.")
+}
+def hordeVersionCode = hordeVersionCodeMap?.androidVersionCodes?[(hordeVersionName)]
+if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
+    throw new GradleException("Android version-code map has no positive integer for ${hordeVersionName}.")
+}
+
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
 def validationUnsigned = System.getenv('HORDE_VALIDATION_UNSIGNED') == '1'
-def releaseStoreFile = validationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
-def releaseStorePassword = validationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
-def releaseKeyAlias = validationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
-def releaseKeyPassword = validationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_PASSWORD')
+def hordeBenchmarkValidation = providers.gradleProperty('hordeBenchmarkValidation').orNull == 'true'
+def hordeStagedPrimaryDebugValidationProperty = providers.gradleProperty('hordeStagedPrimaryDebugValidation').orNull
+if (hordeStagedPrimaryDebugValidationProperty != null && !(hordeStagedPrimaryDebugValidationProperty in ['true', 'false'])) {
+    throw new GradleException('hordeStagedPrimaryDebugValidation must be true or false.')
+}
+def hordeStagedPrimaryDebugValidation = hordeStagedPrimaryDebugValidationProperty == 'true'
+if (hordeStagedPrimaryDebugValidation && hordeBenchmarkValidation) {
+    throw new GradleException('Staged diagnostic Debug and Shipping benchmark investigations must be separate configurations.')
+}
+// Benchmark validation is an isolated, development-signed app. Do not even
+// read production signing environment variables for either investigation opt-in.
+def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation
+def releaseStoreFile = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
+def releaseStorePassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
+def releaseKeyAlias = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
+def releaseKeyPassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_PASSWORD')
+def hordeRtInstrumentationOverride = providers.gradleProperty('hordeRtInstrumentationOverride').orNull
+def hordeRtDielectricQualityOverride = providers.gradleProperty('hordeRtDielectricQualityOverride').orNull
+def hordeStagedPrimaryShaderDirProperty = providers.gradleProperty('hordeStagedPrimaryShaderDir').orNull
+def hordeStagedPrimaryShaderDir = null
+def hordeStagedPrimaryTimingProperty = providers.gradleProperty('hordeStagedPrimaryTiming').orNull
+if (hordeStagedPrimaryTimingProperty != null && !(hordeStagedPrimaryTimingProperty in ['true', 'false'])) {
+    throw new GradleException('hordeStagedPrimaryTiming must be true or false.')
+}
+def hordeStagedPrimaryTiming = hordeStagedPrimaryTimingProperty == 'true'
+if (hordeStagedPrimaryShaderDirProperty != null) {
+    if (!hordeBenchmarkValidation && !hordeStagedPrimaryDebugValidation) {
+        throw new GradleException('hordeStagedPrimaryShaderDir requires explicit benchmark or diagnostic Debug investigation validation.')
+    }
+    if (hordeStagedPrimaryShaderDirProperty.isEmpty() ||
+        hordeStagedPrimaryShaderDirProperty != hordeStagedPrimaryShaderDirProperty.trim() ||
+        (hordeStagedPrimaryShaderDirProperty =~ /[;|\r\n\u0000]/).find()) {
+        throw new GradleException('hordeStagedPrimaryShaderDir must be a non-empty absolute path without Gradle/CMake argument delimiters.')
+    }
+    def stagedPrimaryDirectory = new File(hordeStagedPrimaryShaderDirProperty)
+    if (!stagedPrimaryDirectory.isAbsolute()) {
+        throw new GradleException('hordeStagedPrimaryShaderDir must be absolute.')
+    }
+    stagedPrimaryDirectory = stagedPrimaryDirectory.canonicalFile
+    def stagedPrimaryHeader = new File(stagedPrimaryDirectory, 'StagedPrimaryShaders.generated.h')
+    if (!stagedPrimaryDirectory.isDirectory() || !stagedPrimaryHeader.isFile() || stagedPrimaryHeader.length() == 0) {
+        throw new GradleException('hordeStagedPrimaryShaderDir must contain a non-empty StagedPrimaryShaders.generated.h.')
+    }
+    def stagedPrimaryManifestFile = new File(stagedPrimaryDirectory, 'staged-primary-manifest.json')
+    if (!stagedPrimaryManifestFile.isFile()) {
+        throw new GradleException('Staged investigation artifacts require their compiler/validation manifest.')
+    }
+    def stagedPrimaryManifest = new JsonSlurper().parse(stagedPrimaryManifestFile, 'UTF-8')
+    def expectedInstrumentation = hordeStagedPrimaryDebugValidation ? 'Diagnostic' : 'Shipping'
+    def expectedPasses = ['GenericDielectric:primary', 'GenericDielectric:shade', 'OpaqueFast:primary', 'OpaqueFast:shade']
+    if (stagedPrimaryManifest.schema != 1 ||
+        stagedPrimaryManifest.classification != 'investigation-only-staged-primary' ||
+        stagedPrimaryManifest.instrumentation != expectedInstrumentation || stagedPrimaryManifest.quality != 'Mobile' ||
+        stagedPrimaryManifest.stage != 'rgen' || !(stagedPrimaryManifest.modules instanceof List) ||
+        stagedPrimaryManifest.modules.size() != 4 ||
+        stagedPrimaryManifest.modules.collect { "${it.material}:${it.pass}".toString() }.sort() != expectedPasses) {
+        throw new GradleException("Staged investigation requires the exact ${expectedInstrumentation}/Mobile four-pass manifest.")
+    }
+    hordeStagedPrimaryShaderDir = stagedPrimaryDirectory.absolutePath
+}
+if (hordeStagedPrimaryDebugValidation && (!hordeStagedPrimaryShaderDir ||
+    hordeRtInstrumentationOverride != null || hordeRtDielectricQualityOverride != null)) {
+    throw new GradleException('Staged Debug validation requires explicit Diagnostic/Mobile artifacts and the normal Debug shader policy, without policy overrides.')
+}
+if (hordeStagedPrimaryTiming && (!hordeBenchmarkValidation || !hordeStagedPrimaryShaderDir)) {
+    throw new GradleException('hordeStagedPrimaryTiming=true requires the explicit staged benchmark shader directory.')
+}
+def hordeRtOverridePresent = { String value -> value != null && !value.isEmpty() }
+if (hordeRtOverridePresent(hordeRtInstrumentationOverride) != hordeRtOverridePresent(hordeRtDielectricQualityOverride)) {
+    throw new GradleException('hordeRtInstrumentationOverride and hordeRtDielectricQualityOverride must be supplied together.')
+}
+if (hordeRtOverridePresent(hordeRtInstrumentationOverride) &&
+    !(hordeRtInstrumentationOverride == 'Shipping' || hordeRtInstrumentationOverride == 'Diagnostic')) {
+    throw new GradleException('hordeRtInstrumentationOverride must be exactly Shipping or Diagnostic.')
+}
+if (hordeRtOverridePresent(hordeRtDielectricQualityOverride) &&
+    !(hordeRtDielectricQualityOverride == 'Mobile' || hordeRtDielectricQualityOverride == 'High')) {
+    throw new GradleException('hordeRtDielectricQualityOverride must be exactly Mobile or High.')
+}
+if (hordeBenchmarkValidation &&
+    ((hordeRtOverridePresent(hordeRtInstrumentationOverride) &&
+      hordeRtInstrumentationOverride != 'Shipping') ||
+     (hordeRtOverridePresent(hordeRtDielectricQualityOverride) &&
+      hordeRtDielectricQualityOverride != 'Mobile'))) {
+    throw new GradleException('benchmark validation requires Shipping/Mobile native policy.')
+}
+def hordeRtNativePolicyArguments = { String defaultInstrumentation ->
+    def instrumentation = hordeRtOverridePresent(hordeRtInstrumentationOverride) ? hordeRtInstrumentationOverride : defaultInstrumentation
+    def quality = hordeRtOverridePresent(hordeRtDielectricQualityOverride) ? hordeRtDielectricQualityOverride : 'Mobile'
+    return ["-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=${instrumentation}",
+            "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=${quality}",
+            '-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=',
+            '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF',
+            '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF']
+}
+def hordeRtBenchmarkStagedPrimaryArguments = [
+    "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
+    "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}",
+    "-DHORDE_RT_STAGED_PRIMARY_TIMING=${hordeStagedPrimaryTiming ? 'ON' : 'OFF'}"
+]
+def hordeRtDebugStagedPrimaryArguments = hordeStagedPrimaryDebugValidation ? [
+    "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir}",
+    '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=ON',
+    '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF'
+] : []
+
+// Explicit local-only asset experiment. Release and ordinary Debug never consume
+// this overlay, and its separate application id prevents stale private-file assets.
+def viewmodelCandidatePath = providers.gradleProperty('hordeViewmodelCandidateDir').orNull
+def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).canonicalFile : null
+if (hordeStagedPrimaryDebugValidation && viewmodelCandidate) {
+    throw new GradleException('Staged execution investigation must preserve the accepted player assets, not a viewmodel asset overlay.')
+}
+def viewmodelOverlayDir = layout.buildDirectory.dir('generated/viewmodelCandidateAssets')
+def viewmodelReceipt = viewmodelCandidate ? new JsonSlurper().parse(
+    new File(viewmodelCandidate, 'viewmodel-processing.json'), 'UTF-8') : null
+// Keep old candidate commands valid; the accepted profile is now production.
+def anatomicalPlayerMount = providers.gradleProperty('hordeAnatomicalPlayerMount').orElse('true').get()
+if (!(anatomicalPlayerMount in ['true', 'false'])) {
+    throw new GradleException('hordeAnatomicalPlayerMount must be true or false.')
+}
+if (anatomicalPlayerMount == 'false') {
+    throw new GradleException('Legacy player mounting is retired; production uses the accepted anatomical profile.')
+}
+def candidateFile = { String name ->
+    if (!name || new File(name).name != name || name.contains('\\') || name.contains('/')) {
+        throw new GradleException('Candidate receipt requires plain local file names.')
+    }
+    def resolved = new File(viewmodelCandidate, name).canonicalFile
+    if (resolved.parentFile != viewmodelCandidate || !resolved.isFile()) {
+        throw new GradleException('Candidate file is absent or outside its declared directory.')
+    }
+    return resolved
+}
+if (viewmodelCandidate) {
+    def candidateWorld = candidateFile(viewmodelReceipt.pairedWorldRuntime as String)
+    def candidateView = candidateFile(viewmodelReceipt.runtime as String)
+    def pairedWorldManifestName = viewmodelReceipt.pairedWorldManifest as String
+    def pairedWorldManifestSha256 = viewmodelReceipt.pairedWorldManifestSha256 as String
+    if ((pairedWorldManifestName == null) != (pairedWorldManifestSha256 == null)) {
+        throw new GradleException('Candidate paired-world manifest name and SHA-256 must be supplied together.')
+    }
+    if (pairedWorldManifestName == null) {
+        throw new GradleException('Modelled viewmodel candidates require an explicit paired-world manifest.')
+    }
+    def candidateWorldManifest = pairedWorldManifestName == null
+        ? null : candidateFile(pairedWorldManifestName)
+    tasks.register('prepareViewmodelCandidateAssets', Sync) {
+        into viewmodelOverlayDir
+        inputs.file new File(viewmodelCandidate, 'viewmodel-processing.json')
+        inputs.file file('../../assets/models/player/viewmodel/runtime/viewmodel-processing.json')
+        if (candidateWorldManifest != null) inputs.file candidateWorldManifest
+        doFirst {
+            def digest = { File input -> MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() }
+            if (viewmodelReceipt.role != 'Viewmodel' || viewmodelReceipt.gauntletSourceHandedness != 'Right' ||
+                digest(candidateWorld) != viewmodelReceipt.pairedWorldSha256 ||
+                digest(candidateView) != viewmodelReceipt.runtimeSha256 ||
+                (candidateWorldManifest != null && digest(candidateWorldManifest) != pairedWorldManifestSha256) ||
+                new JsonSlurper().parse(file('../../assets/models/player/viewmodel/runtime/viewmodel-processing.json'), 'UTF-8').sourceWorldSha256 != viewmodelReceipt.sourceWorldSha256) {
+                throw new GradleException('Viewmodel candidate role, handedness, hashes or source authority disagree.')
+            }
+        }
+        from(candidateWorld) {
+            into 'models/player/runtime'
+            rename { 'gothic-traveller-lod0.runtime.glb' }
+        }
+        if (candidateWorldManifest != null) {
+            from(candidateWorldManifest) {
+                into 'models/player/runtime'
+                rename { 'asset.manifest.json' }
+            }
+        }
+        from(candidateView) {
+            into 'models/player/viewmodel/runtime'
+            rename { 'gothic-traveller-viewmodel.runtime.glb' }
+        }
+        from('../../assets/models/player/viewmodel/runtime/asset.manifest.json') {
+            into 'models/player/viewmodel/runtime'
+        }
+        from(new File(viewmodelCandidate, 'viewmodel-processing.json')) {
+            into 'models/player/viewmodel/runtime'
+            rename { 'candidate-receipt.json' }
+        }
+    }
+}
+
+def hordeMusicRoot = file('../../assets/audio/music/what-the-dark-keeps')
+def hordeMusicManifest = new File(hordeMusicRoot, 'asset.manifest.json')
+tasks.register('verifyMusicRuntimeAssets') {
+    inputs.file hordeMusicManifest
+    inputs.dir new File(hordeMusicRoot, 'runtime')
+    doLast {
+        def digest = { File input -> MessageDigest.getInstance('SHA-256').digest(input.bytes).encodeHex().toString() }
+        if (digest(hordeMusicManifest) != '672f2321b2fb429cffe9d61119103a1aa3565f355391a162497f741eec9d6e29') {
+            throw new GradleException('Music manifest differs from the reviewed Horde admission pin.')
+        }
+        def manifest = new JsonSlurper().parse(hordeMusicManifest, 'UTF-8')
+        if (manifest.schemaVersion != 1 || manifest.assetId != 'what-the-dark-keeps' ||
+            manifest.rights != 'Owner-supplied; authorised for Horde use only' ||
+            manifest.format.encoding != 'PCM16_LE' || manifest.format.sampleRate != 48000 ||
+            manifest.format.channels != 2 || manifest.tailFrames != 144000 ||
+            manifest.crossfadeFrames != 12000 || manifest.cues.size() != 8) {
+            throw new GradleException('Music rights, encoding or cue contract disagree.')
+        }
+        def expectedPaths = [] as Set
+        long waveBytes = 0
+        long pcmBytes = 0
+        manifest.cues.eachWithIndex { cue, index ->
+            def name = String.valueOf((char) (65 + index))
+            def bodyFrames = name == 'C' ? 144000 : name == 'G' ? 288000 : 576000
+            if (cue.cue != name || cue.looping != !(name in ['C', 'G'])) {
+                throw new GradleException("Music ${name} cue/loop policy disagrees.")
+            }
+            ['body', 'tail'].each { part ->
+                def record = cue[part]
+                def path = "runtime/${name}-${part}.wav".toString()
+                def frames = part == 'body' ? bodyFrames : 144000
+                if (record.path != path || record.frames != frames || record.bytes != frames * 4 + 44 ||
+                    !expectedPaths.add(path)) {
+                    throw new GradleException("Music ${name}-${part} path/frame contract disagrees.")
+                }
+                def input = new File(hordeMusicRoot, path)
+                if (!input.isFile() || input.length() != record.bytes || digest(input) != record.sha256) {
+                    throw new GradleException("Music runtime identity differs: ${path}")
+                }
+                waveBytes += record.bytes
+                pcmBytes += frames * 4
+            }
+        }
+        def actualPaths = fileTree(new File(hordeMusicRoot, 'runtime')).files.collect {
+            hordeMusicRoot.toPath().relativize(it.toPath()).toString().replace('\\', '/')
+        } as Set
+        if (actualPaths != expectedPaths || waveBytes != 20160704 || pcmBytes != 20160000 ||
+            manifest.totalWaveBytes != waveBytes || manifest.totalPcmBytes != pcmBytes) {
+            throw new GradleException('Music runtime inventory or byte budget disagrees; no unknown assets may be packaged.')
+        }
+    }
+}
 
 tasks.register('prepareRuntimeAssets', Sync) {
+    dependsOn tasks.named('verifyMusicRuntimeAssets')
     from('../../assets') {
         include 'models/enemies/meshy/skeleton_biped_merged_animations_v01.glb'
         include 'models/enemies/meshy/lich_placeholder_merged_animations_v01.glb'
@@ -35,6 +321,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/player/runtime/asset.manifest.json'
         include 'models/player/runtime/clip-manifest.json'
         include 'models/player/runtime/gothic-traveller-lod0.runtime.glb'
+        include 'models/player/viewmodel/runtime/asset.manifest.json'
+        include 'models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb'
         include 'textures/props/runtime/*.android.ktx2'
         include 'textures/props/runtime/asset.manifest.json'
         include 'audio/filmcow/*.wav'
@@ -42,6 +330,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/pixabay/chest_unlock.wav'
         include 'audio/pixabay/chest_open.wav'
         include 'audio/pixabay/torch_extinguish.wav'
+        include 'audio/music/what-the-dark-keeps/asset.manifest.json'
+        include 'audio/music/what-the-dark-keeps/runtime/*.wav'
     }
     from('../..') {
         include 'ASSET_LICENSES.md'
@@ -52,13 +342,16 @@ tasks.register('prepareRuntimeAssets', Sync) {
 android {
     namespace 'com.samfa12.hordelanternrt'
     compileSdk 34
+    buildFeatures { buildConfig true }
 
     defaultConfig {
         applicationId 'com.samfa12.hordelanternrt'
         minSdk 24
         targetSdk 34
-        versionCode 8
-        versionName '1.6.0'
+        versionCode hordeVersionCode.intValue()
+        versionName hordeVersionName
+        buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
+        resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
         externalNativeBuild {
             cmake {
@@ -78,7 +371,7 @@ android {
     }
 
     signingConfigs {
-        if (!validationUnsigned && releaseStoreFile && releaseStorePassword && releaseKeyAlias && releaseKeyPassword) {
+        if (!hordeValidationUnsigned && releaseStoreFile && releaseStorePassword && releaseKeyAlias && releaseKeyPassword) {
             release {
                 storeFile file(releaseStoreFile)
                 storePassword releaseStorePassword
@@ -90,12 +383,18 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix '.debug'
+            applicationIdSuffix hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug')
+            buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
+            if (viewmodelCandidate) resValue 'string', 'app_name', 'Horde RT Viewmodel Candidate'
+            if (hordeStagedPrimaryDebugValidation) resValue 'string', 'app_name', 'Horde RT Staged Investigation'
             versionNameSuffix '-debug'
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON'
+                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
+                        "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
+                        *hordeRtNativePolicyArguments('Diagnostic'),
+                        *hordeRtDebugStagedPrimaryArguments
                 }
             }
         }
@@ -103,11 +402,29 @@ android {
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF'
+                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF',
+                        *hordeRtNativePolicyArguments('Shipping')
                 }
             }
             if (signingConfigs.findByName('release') != null) {
                 signingConfig signingConfigs.release
+            }
+        }
+        if (hordeBenchmarkValidation) {
+            benchmark {
+                initWith release
+                applicationIdSuffix '.benchmark'
+                versionNameSuffix '-benchmark'
+                debuggable false
+                jniDebuggable false
+                signingConfig signingConfigs.debug
+                externalNativeBuild {
+                    cmake {
+                        arguments "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
+                            "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}",
+                            "-DHORDE_RT_STAGED_PRIMARY_TIMING=${hordeStagedPrimaryTiming ? 'ON' : 'OFF'}"
+                    }
+                }
             }
         }
     }
@@ -123,6 +440,7 @@ android {
 
     sourceSets {
         main.assets.srcDirs = [runtimeAssetsDir.get().asFile]
+        if (viewmodelCandidate) debug.assets.srcDir(viewmodelOverlayDir)
     }
 }
 
@@ -133,4 +451,24 @@ dependencies {
 
 tasks.named('preBuild').configure {
     dependsOn tasks.named('prepareRuntimeAssets')
+}
+if (viewmodelCandidate) {
+    tasks.matching { it.name == 'preDebugBuild' }.configureEach {
+        dependsOn tasks.named('prepareViewmodelCandidateAssets')
+    }
+}
+
+// Hermetic policy evidence invokes this narrow task with explicit -P inputs.
+// It intentionally reports the CMake arguments without configuring native code.
+tasks.register('printHordeRtPolicyForTest') {
+    doLast {
+        println("debug=" + (hordeRtNativePolicyArguments('Diagnostic') + hordeRtDebugStagedPrimaryArguments).join('|'))
+        println("release=" + hordeRtNativePolicyArguments('Shipping').join('|'))
+        println("benchmark=" + (hordeBenchmarkValidation
+            ? (hordeRtNativePolicyArguments('Shipping') + hordeRtBenchmarkStagedPrimaryArguments).join('|')
+            : 'unavailable; set hordeBenchmarkValidation=true'))
+        println("benchmarkValidation=${hordeBenchmarkValidation}")
+        println("stagedPrimaryDebugValidation=${hordeStagedPrimaryDebugValidation}")
+        println("stagedPrimaryShaderDir=${hordeStagedPrimaryShaderDir ?: ''}")
+    }
 }

@@ -1,0 +1,460 @@
+{
+  "comparison": "Preserved original investigation run versus fresh provenance-corrected run; same score/app/scheduler, no audio changes",
+  "cues": [
+    {
+      "cue": "A",
+      "files": [
+        {
+          "name": "A-loop.wav",
+          "sampleCount": 1152000,
+          "changedSamples": 85,
+          "maxAbsDelta": 1,
+          "overOneLsb": 0,
+          "firstDifferences": [
+            {
+              "sample": 16476,
+              "old": -11,
+              "fresh": -12,
+              "delta": 1
+            },
+            {
+              "sample": 28101,
+              "old": 444,
+              "fresh": 443,
+              "delta": 1
+            },
+            {
+              "sample": 35812,
+              "old": -2035,
+              "fresh": -2036,
+              "delta": 1
+            },
+            {
+              "sample": 37494,
+              "old": 346,
+              "fresh": 345,
+              "delta": 1
+            },
+            {
+              "sample": 40174,
+              "old": -1327,
+              "fresh": -1328,
+              "delta": 1
+            }
+          ],
+          "oldSha256": "2e05252189a4ef3970948d25640486173565df04e0b5ed47c8e7583631c1d99e",
+          "freshSha256": "8e5be0c046d95a3058037c311ea6a1b7a330f82536788fd33954980d31dfcc02"
+        },
+        {
+          "name": "A-tail.wav",
+          "sampleCount": 288000,
+          "changedSamples": 0,
+          "maxAbsDelta": 0,
+          "overOneLsb": 0,
+          "firstDifferences": [],
+          "oldSha256": "bb1c5be7c74f1026ff0ab7f2fd566e4ab81c756370246b3143c2e128ed6ed223",
+          "freshSha256": "bb1c5be7c74f1026ff0ab7f2fd566e4ab81c756370246b3143c2e128ed6ed223"
+        }
+      ]
+    },
+    {
+      "cue": "B",
+      "files": [
+        {
+          "name": "B-loop.wav",
+          "sampleCount": 1152000,
+          "changedSamples": 110,
+          "maxAbsDelta": 1,
+          "overOneLsb": 0,
+          "firstDifferences": [
+            {
+              "sample": 7991,
+              "old": -4975,
+              "fresh": -4974,
+              "delta": 1
+            },
+            {
+              "sample": 11806,
+              "old": -320,
+              "fresh": -321,
+              "delta": 1
+            },
+            {
+              "sample": 12277,
+              "old": -562,
+              "fresh": -563,
+              "delta": 1
+            },
+            {
+              "sample": 17738,
+              "old": 2362,
+              "fresh": 2361,
+              "delta": 1
+            },
+            {
+              "sample": 28306,
+              "old": 1145,
+              "fresh": 1146,
+              "delta": 1
+            }
+          ],
+          "oldSha256": "d6c83994bf538f799846bafd77fde2bcdbd3f7c6f5276f87a38b85a1e47eb1e2",
+          "freshSha256": "e05b2efcd5220be7c83538c24a52e9438726ac4c9f7d23c6c8ffa98778ce2d47"
+        },
+        {
+          "name": "B-tail.wav",
+          "sampleCount": 288000,
+          "changedSamples": 0,
+          "maxAbsDelta": 0,
+          "overOneLsb": 0,
+          "firstDifferences": [],
+          "oldSha256": "99a0dc08f2249977e8e19f1b944ca1173b91a3ce171c62195696cf21f4b114ed",
+          "freshSha256": "99a0dc08f2249977e8e19f1b944ca1173b91a3ce171c62195696cf21f4b114ed"
+        }
+      ]
+    },
+    {
+      "cue": "C",
+      "files": [
+        {
+          "name": "C-loop.wav",
+          "sampleCount": 288000,
+          "changedSamples": 24,
+          "maxAbsDelta": 1,
+          "overOneLsb": 0,
+          "firstDifferences": [
+            {
+              "sample": 13493,
+              "old": -2144,
+              "fresh": -2145,
+              "delta": 1
+            },
+            {
+              "sample": 34265,
+              "old": -324,
+              "fresh": -325,
+              "delta": 1
+            },
+            {
+              "sample": 34669,
+              "old": -792,
+              "fresh": -793,
+              "delta": 1
+            },
+            {
+              "sample": 35303,
+              "old": 45,
+              "fresh": 46,
+              "delta": 1
+            },
+            {
+              "sample": 68923,
+              "old": 1315,
+              "fresh": 1316,
+              "delta": 1
+            }
+          ],
+          "oldSha256": "a5541c5da1f051c3230f633b885645e0d1692a94eac794a6f76154f0d0bc1781",
+          "freshSha256": "7e378cdb37adaa3f88a3594ba080fac9be65c7c0e1d69c479263a516638223af"
+        },
+        {
+          "name": "C-tail.wav",
+          "sampleCount": 288000,
+          "changedSamples": 0,
+          "maxAbsDelta": 0,
+          "overOneLsb": 0,
+          "firstDifferences": [],
+          "oldSha256": "0929b0a19a49fd8d1e6779db3d1a8db2a1edc30c25ef3fcab1321b1a0609f243",
+          "freshSha256": "0929b0a19a49fd8d1e6779db3d1a8db2a1edc30c25ef3fcab1321b1a0609f243"
+        }
+      ]
+    },
+    {
+      "cue": "D",
+      "files": [
+        {
+          "name": "D-loop.wav",
+          "sampleCount": 1152000,
+          "changedSamples": 75,
+          "maxAbsDelta": 1,
+          "overOneLsb": 0,
+          "firstDifferences": [
+            {
+              "sample": 8900,
+              "old": 908,
+              "fresh": 907,
+              "delta": 1
+            },
+            {
+              "sample": 9833,
+              "old": 1298,
+              "fresh": 1299,
+              "delta": 1
+            },
+            {
+              "sample": 11141,
+              "old": 2582,
+              "fresh": 2581,
+              "delta": 1
+            },
+            {
+              "sample": 40765,
+              "old": -424,
+              "fresh": -425,
+              "delta": 1
+            },
+            {
+              "sample": 46756,
+              "old": 1701,
+              "fresh": 1702,
+              "delta": 1
+            }
+          ],
+          "oldSha256": "9ed9f50834b3422f25b9ee8a93df03e06659e91bf8114a2a9726fb67a389ab24",
+          "freshSha256": "088d08a78ad55cffa3806b6f8daebf772fb4cf08528c6deb475938537fa09ff2"
+        },
+        {
+          "name": "D-tail.wav",
+          "sampleCount": 288000,
+          "changedSamples": 0,
+          "maxAbsDelta": 0,
+          "overOneLsb": 0,
+          "firstDifferences": [],
+          "oldSha256": "0ad9b252052c45572ddcc1bc2acf3c2aa1a8e80ccbe8a347947d38cd8c91a812",
+          "freshSha256": "0ad9b252052c45572ddcc1bc2acf3c2aa1a8e80ccbe8a347947d38cd8c91a812"
+        }
+      ]
+    },
+    {
+      "cue": "E",
+      "files": [
+        {
+          "name": "E-loop.wav",
+          "sampleCount": 1152000,
+          "changedSamples": 144,
+          "maxAbsDelta": 1,
+          "overOneLsb": 0,
+          "firstDifferences": [
+            {
+              "sample": 20013,
+              "old": -1831,
+              "fresh": -1832,
+              "delta": 1
+            },
+            {
+              "sample": 20742,
+              "old": 1059,
+              "fresh": 1060,
+              "delta": 1
+            },
+            {
+              "sample": 20932,
+              "old": -4153,
+              "fresh": -4154,
+              "delta": 1
+            },
+            {
+              "sample": 30532,
+              "old": -1689,
+              "fresh": -1690,
+              "delta": 1
+            },
+            {
+              "sample": 30577,
+              "old": -1782,
+              "fresh": -1783,
+              "delta": 1
+            }
+          ],
+          "oldSha256": "2424868c549ada2eed5e29555e5ee32ee5989aa92ecb7b3a0f09bc010d474b79",
+          "freshSha256": "070278efd96e8259733801bc30fe87e232cb26b4aeb3075cb927c9c89c8afb32"
+        },
+        {
+          "name": "E-tail.wav",
+          "sampleCount": 288000,
+          "changedSamples": 1,
+          "maxAbsDelta": 1,
+          "overOneLsb": 0,
+          "firstDifferences": [
+            {
+              "sample": 50039,
+              "old": -6,
+              "fresh": -5,
+              "delta": 1
+            }
+          ],
+          "oldSha256": "3b5734b43a2f26a0d032c1d2f03947011d6c3008d6e9ca013a7f487d2bebfcbe",
+          "freshSha256": "aac330fb178822e86b0ea71307955eae95f1886de01a9bebf1620ad313877ddd"
+        }
+      ]
+    },
+    {
+      "cue": "F",
+      "files": [
+        {
+          "name": "F-loop.wav",
+          "sampleCount": 1152000,
+          "changedSamples": 64,
+          "maxAbsDelta": 1,
+          "overOneLsb": 0,
+          "firstDifferences": [
+            {
+              "sample": 58336,
+              "old": -516,
+              "fresh": -515,
+              "delta": 1
+            },
+            {
+              "sample": 100859,
+              "old": -292,
+              "fresh": -293,
+              "delta": 1
+            },
+            {
+              "sample": 116814,
+              "old": 1104,
+              "fresh": 1105,
+              "delta": 1
+            },
+            {
+              "sample": 129041,
+              "old": -1081,
+              "fresh": -1082,
+              "delta": 1
+            },
+            {
+              "sample": 307936,
+              "old": -508,
+              "fresh": -509,
+              "delta": 1
+            }
+          ],
+          "oldSha256": "8c8ac33ac774ea5a0124ddecc8b11203e30e2c7bb8827c01429742fce2b12b6f",
+          "freshSha256": "3d5b3562e716a99870151613adeda519f351602151c4a50eb5d93a4b98f4de80"
+        },
+        {
+          "name": "F-tail.wav",
+          "sampleCount": 288000,
+          "changedSamples": 0,
+          "maxAbsDelta": 0,
+          "overOneLsb": 0,
+          "firstDifferences": [],
+          "oldSha256": "00b6c72aeb8ec50d7906ad4a12dc5a8cf53bbc862070902c625f31f1cc78d4f7",
+          "freshSha256": "00b6c72aeb8ec50d7906ad4a12dc5a8cf53bbc862070902c625f31f1cc78d4f7"
+        }
+      ]
+    },
+    {
+      "cue": "G",
+      "files": [
+        {
+          "name": "G-loop.wav",
+          "sampleCount": 576000,
+          "changedSamples": 30,
+          "maxAbsDelta": 1,
+          "overOneLsb": 0,
+          "firstDifferences": [
+            {
+              "sample": 5383,
+              "old": -2433,
+              "fresh": -2434,
+              "delta": 1
+            },
+            {
+              "sample": 14652,
+              "old": 1668,
+              "fresh": 1669,
+              "delta": 1
+            },
+            {
+              "sample": 32982,
+              "old": -479,
+              "fresh": -480,
+              "delta": 1
+            },
+            {
+              "sample": 42682,
+              "old": 1964,
+              "fresh": 1965,
+              "delta": 1
+            },
+            {
+              "sample": 53408,
+              "old": 563,
+              "fresh": 564,
+              "delta": 1
+            }
+          ],
+          "oldSha256": "6a6a2999171b72a5435002d8b5c2e4180501d346f09d56c584a7e596b2c44597",
+          "freshSha256": "03b72d16b6bbc12c8bffc65173795925e69e1bb9356be4ad2737f7de9d2b0692"
+        },
+        {
+          "name": "G-tail.wav",
+          "sampleCount": 288000,
+          "changedSamples": 0,
+          "maxAbsDelta": 0,
+          "overOneLsb": 0,
+          "firstDifferences": [],
+          "oldSha256": "a8a2afd26e7ad2bc97e032cd83b5f0c5084aecd8741692c091d841aa64c610c7",
+          "freshSha256": "a8a2afd26e7ad2bc97e032cd83b5f0c5084aecd8741692c091d841aa64c610c7"
+        }
+      ]
+    },
+    {
+      "cue": "H",
+      "files": [
+        {
+          "name": "H-loop.wav",
+          "sampleCount": 1152000,
+          "changedSamples": 78,
+          "maxAbsDelta": 1,
+          "overOneLsb": 0,
+          "firstDifferences": [
+            {
+              "sample": 4116,
+              "old": -1557,
+              "fresh": -1558,
+              "delta": 1
+            },
+            {
+              "sample": 5666,
+              "old": -2551,
+              "fresh": -2552,
+              "delta": 1
+            },
+            {
+              "sample": 8127,
+              "old": -717,
+              "fresh": -718,
+              "delta": 1
+            },
+            {
+              "sample": 13940,
+              "old": 973,
+              "fresh": 972,
+              "delta": 1
+            },
+            {
+              "sample": 29461,
+              "old": -449,
+              "fresh": -448,
+              "delta": 1
+            }
+          ],
+          "oldSha256": "9645aed025b584c9f688c384dabae4b798096404045bff579d0b2694010a004c",
+          "freshSha256": "bb52cfa875b6fc359b380a2834df2ea8f633d2ae65f9e6f59f60c2c09fae9c0d"
+        },
+        {
+          "name": "H-tail.wav",
+          "sampleCount": 288000,
+          "changedSamples": 0,
+          "maxAbsDelta": 0,
+          "overOneLsb": 0,
+          "firstDifferences": [],
+          "oldSha256": "62653fc9ae162c21a18e36646f23899642f56cf9094599d501cd681818a25d2c",
+          "freshSha256": "62653fc9ae162c21a18e36646f23899642f56cf9094599d501cd681818a25d2c"
+        }
+      ]
+    }
+  ]
+}

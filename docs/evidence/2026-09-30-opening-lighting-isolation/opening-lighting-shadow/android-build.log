@@ -1,0 +1,294 @@
+> Task :app:prepareRuntimeAssets
+> Task :app:preBuild
+> Task :app:preBenchmarkBuild
+> Task :app:generateBenchmarkBuildConfig
+> Task :app:javaPreCompileBenchmark
+> Task :app:checkBenchmarkAarMetadata
+> Task :app:generateBenchmarkResValues
+> Task :app:mapBenchmarkSourceSetPaths
+> Task :app:generateBenchmarkResources
+> Task :app:createBenchmarkCompatibleScreenManifests
+> Task :app:extractDeepLinksBenchmark
+> Task :app:processBenchmarkMainManifest
+> Task :app:processBenchmarkManifest
+> Task :app:processBenchmarkManifestForPackage
+> Task :app:extractProguardFiles
+> Task :app:mergeBenchmarkResources
+
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+C/C++: Exception: C:\Dev\tmp\horde-shipping-ab-20260930\opening-lighting-source\tools\GenerateRtPipelineVariantCatalog.ps1:80
+C/C++: Line |
+C/C++:   80 |  . edBytes)) { throw 'Generated RT catalog adapter is stale, malformed,  .
+C/C++:      |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:      | Generated RT catalog adapter is stale, malformed, or hand-edited.
+C/C++: CMake Error at C:/Dev/tmp/horde-shipping-ab-20260930/opening-lighting-source/cmake/HordeRtRaygenArtifacts.cmake:10 (message):
+C/C++:   Frozen RT catalog adapter is stale or malformed.
+C/C++: Call Stack (most recent call first):
+C/C++:   CMakeLists.txt:18 (horde_rt_configure_raygen_artifacts)
+
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a] FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:configureCMakeRelWithDebInfo[arm64-v8a]'.
+> [CXX1429] error when building with cmake using C:\Dev\tmp\horde-shipping-ab-20260930\opening-lighting-source\android\app\src\main\cpp\CMakeLists.txt: -- The C compiler identification is Clang 17.0.2
+  -- The CXX compiler identification is Clang 17.0.2
+  -- Detecting C compiler ABI info
+  -- Detecting C compiler ABI info - done
+  -- Check for working C compiler: C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe - skipped
+  -- Detecting C compile features
+  -- Detecting C compile features - done
+  -- Detecting CXX compiler ABI info
+  -- Detecting CXX compiler ABI info - done
+  -- Check for working CXX compiler: C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe - skipped
+  -- Detecting CXX compile features
+  -- Detecting CXX compile features - done
+  -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: -fno-fast-math;-ffp-contract=off
+  -- Configuring incomplete, errors occurred!
+  See also "C:/Dev/tmp/horde-shipping-ab-20260930/opening-lighting-source/android/app/.cxx/RelWithDebInfo/1j1i2969/arm64-v8a/CMakeFiles/CMakeOutput.log".
+  
+  C++ build system [configure] failed while executing:
+      @echo off
+      "C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\cmake.exe" ^
+        "-HC:\\Dev\\tmp\\horde-shipping-ab-20260930\\opening-lighting-source\\android\\app\\src\\main\\cpp" ^
+        "-DCMAKE_SYSTEM_NAME=Android" ^
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON" ^
+        "-DCMAKE_SYSTEM_VERSION=24" ^
+        "-DANDROID_PLATFORM=android-24" ^
+        "-DANDROID_ABI=arm64-v8a" ^
+        "-DCMAKE_ANDROID_ARCH_ABI=arm64-v8a" ^
+        "-DANDROID_NDK=C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125" ^
+        "-DCMAKE_ANDROID_NDK=C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125" ^
+        "-DCMAKE_TOOLCHAIN_FILE=C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\build\\cmake\\android.toolchain.cmake" ^
+        "-DCMAKE_MAKE_PROGRAM=C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe" ^
+        "-DCMAKE_CXX_FLAGS=-std=c++20" ^
+        "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\\Dev\\tmp\\horde-shipping-ab-20260930\\opening-lighting-source\\android\\app\\build\\intermediates\\cxx\\RelWithDebInfo\\1j1i2969\\obj\\arm64-v8a" ^
+        "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=C:\\Dev\\tmp\\horde-shipping-ab-20260930\\opening-lighting-source\\android\\app\\build\\intermediates\\cxx\\RelWithDebInfo\\1j1i2969\\obj\\arm64-v8a" ^
+        "-DCMAKE_BUILD_TYPE=RelWithDebInfo" ^
+        "-BC:\\Dev\\tmp\\horde-shipping-ab-20260930\\opening-lighting-source\\android\\app\\.cxx\\RelWithDebInfo\\1j1i2969\\arm64-v8a" ^
+        -GNinja ^
+        "-DANDROID_STL=c++_static" ^
+        "-DHORDE_RT_DEBUG_CHECKPOINTS=OFF" ^
+        "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF" ^
+        "-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Shipping" ^
+        "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile"
+    from C:\Dev\tmp\horde-shipping-ab-20260930\opening-lighting-source\android\app
+  Exception: C:\Dev\tmp\horde-shipping-ab-20260930\opening-lighting-source\tools\GenerateRtPipelineVariantCatalog.ps1:80
+  Line |
+    80 |  . edBytes)) { throw 'Generated RT catalog adapter is stale, malformed,  .
+       |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       | Generated RT catalog adapter is stale, malformed, or hand-edited.
+  CMake Error at C:/Dev/tmp/horde-shipping-ab-20260930/opening-lighting-source/cmake/HordeRtRaygenArtifacts.cmake:10 (message):
+    Frozen RT catalog adapter is stale or malformed.
+  Call Stack (most recent call first):
+    CMakeLists.txt:18 (horde_rt_configure_raygen_artifacts) : com.android.ide.common.process.ProcessException: -- The C compiler identification is Clang 17.0.2
+  -- The CXX compiler identification is Clang 17.0.2
+  -- Detecting C compiler ABI info
+  -- Detecting C compiler ABI info - done
+  -- Check for working C compiler: C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe - skipped
+  -- Detecting C compile features
+  -- Detecting C compile features - done
+  -- Detecting CXX compiler ABI info
+  -- Detecting CXX compiler ABI info - done
+  -- Check for working CXX compiler: C:/Users/sam_s/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe - skipped
+  -- Detecting CXX compile features
+  -- Detecting CXX compile features - done
+  -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: -fno-fast-math;-ffp-contract=off
+  -- Configuring incomplete, errors occurred!
+  See also "C:/Dev/tmp/horde-shipping-ab-20260930/opening-lighting-source/android/app/.cxx/RelWithDebInfo/1j1i2969/arm64-v8a/CMakeFiles/CMakeOutput.log".
+  
+  C++ build system [configure] failed while executing:
+      @echo off
+      "C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\cmake.exe" ^
+        "-HC:\\Dev\\tmp\\horde-shipping-ab-20260930\\opening-lighting-source\\android\\app\\src\\main\\cpp" ^
+        "-DCMAKE_SYSTEM_NAME=Android" ^
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON" ^
+        "-DCMAKE_SYSTEM_VERSION=24" ^
+        "-DANDROID_PLATFORM=android-24" ^
+        "-DANDROID_ABI=arm64-v8a" ^
+        "-DCMAKE_ANDROID_ARCH_ABI=arm64-v8a" ^
+        "-DANDROID_NDK=C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125" ^
+        "-DCMAKE_ANDROID_NDK=C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125" ^
+        "-DCMAKE_TOOLCHAIN_FILE=C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\build\\cmake\\android.toolchain.cmake" ^
+        "-DCMAKE_MAKE_PROGRAM=C:\\Users\\sam_s\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe" ^
+        "-DCMAKE_CXX_FLAGS=-std=c++20" ^
+        "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\\Dev\\tmp\\horde-shipping-ab-20260930\\opening-lighting-source\\android\\app\\build\\intermediates\\cxx\\RelWithDebInfo\\1j1i2969\\obj\\arm64-v8a" ^
+        "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=C:\\Dev\\tmp\\horde-shipping-ab-20260930\\opening-lighting-source\\android\\app\\build\\intermediates\\cxx\\RelWithDebInfo\\1j1i2969\\obj\\arm64-v8a" ^
+        "-DCMAKE_BUILD_TYPE=RelWithDebInfo" ^
+        "-BC:\\Dev\\tmp\\horde-shipping-ab-20260930\\opening-lighting-source\\android\\app\\.cxx\\RelWithDebInfo\\1j1i2969\\arm64-v8a" ^
+        -GNinja ^
+        "-DANDROID_STL=c++_static" ^
+        "-DHORDE_RT_DEBUG_CHECKPOINTS=OFF" ^
+        "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF" ^
+        "-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Shipping" ^
+        "-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile"
+    from C:\Dev\tmp\horde-shipping-ab-20260930\opening-lighting-source\android\app
+  Exception: C:\Dev\tmp\horde-shipping-ab-20260930\opening-lighting-source\tools\GenerateRtPipelineVariantCatalog.ps1:80
+  Line |
+    80 |  . edBytes)) { throw 'Generated RT catalog adapter is stale, malformed,  .
+       |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       | Generated RT catalog adapter is stale, malformed, or hand-edited.
+  CMake Error at C:/Dev/tmp/horde-shipping-ab-20260930/opening-lighting-source/cmake/HordeRtRaygenArtifacts.cmake:10 (message):
+    Frozen RT catalog adapter is stale or malformed.
+  Call Stack (most recent call first):
+    CMakeLists.txt:18 (horde_rt_configure_raygen_artifacts)
+  	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.execute(ExecuteProcess.kt:288)
+  	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt$executeProcess$1.invoke(ExecuteProcess.kt:108)
+  	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt$executeProcess$1.invoke(ExecuteProcess.kt:106)
+  	at com.android.build.gradle.internal.cxx.timing.TimingEnvironmentKt.time(TimingEnvironment.kt:32)
+  	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.executeProcess(ExecuteProcess.kt:106)
+  	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.executeProcess$default(ExecuteProcess.kt:85)
+  	at com.android.build.gradle.tasks.CmakeQueryMetadataGenerator.executeProcess(CmakeFileApiMetadataGenerator.kt:59)
+  	at com.android.build.gradle.tasks.ExternalNativeJsonGenerator$configureOneAbi$1$1$3.invoke(ExternalNativeJsonGenerator.kt:247)
+  	at com.android.build.gradle.tasks.ExternalNativeJsonGenerator$configureOneAbi$1$1$3.invoke(ExternalNativeJsonGenerator.kt:247)
+  	at com.android.build.gradle.internal.cxx.timing.TimingEnvironmentKt.time(TimingEnvironment.kt:32)
+  	at com.android.build.gradle.tasks.ExternalNativeJsonGenerator.configureOneAbi(ExternalNativeJsonGenerator.kt:247)
+  	at com.android.build.gradle.tasks.ExternalNativeJsonGenerator.configure(ExternalNativeJsonGenerator.kt:113)
+  	at com.android.build.gradle.tasks.ExternalNativeBuildJsonTask.doTaskAction(ExternalNativeBuildJsonTask.kt:89)
+  	at com.android.build.gradle.internal.tasks.UnsafeOutputsTask$taskAction$$inlined$recordTaskAction$1.invoke(BaseTask.kt:78)
+  	at com.android.build.gradle.internal.tasks.Blocks.recordSpan(Blocks.java:51)
+  	at com.android.build.gradle.internal.tasks.UnsafeOutputsTask.taskAction(UnsafeOutputsTask.kt:81)
+  	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+  	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+  	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
+  	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.doExecute(StandardTaskAction.java:58)
+  	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
+  	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
+  	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:244)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:47)
+  	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:229)
+  	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:212)
+  	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:195)
+  	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:162)
+  	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
+  	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
+  	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
+  	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+  	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)
+  	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)
+  	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+  	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+  	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+  	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
+  	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
+  	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:67)
+  	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:37)
+  	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
+  	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
+  	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+  	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+  	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:40)
+  	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:29)
+  	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+  	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:75)
+  	at org.gradle.internal.Either$Right.fold(Either.java:175)
+  	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+  	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
+  	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
+  	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)
+  	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)
+  	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+  	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+  	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+  	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+  	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+  	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+  	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+  	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)
+  	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)
+  	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)
+  	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)
+  	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:65)
+  	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:36)
+  	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:107)
+  	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:56)
+  	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:64)
+  	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
+  	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
+  	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
+  	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
+  	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+  	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+  	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+  	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+  	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+  	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+  	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:289)
+  	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+  	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+  	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+  	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+  	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+  	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+  	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+  	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+  	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+  	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+  	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:48)
+  	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:35)
+  	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:61)
+  	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:127)
+  	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+  	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+  	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+  	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+  	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+  	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+  	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+  	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+  	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+  	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+  	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+  	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+  	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+  	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+  	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+  	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+  	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+  	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+  	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+  	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+  	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+  	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+  	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+  	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+  	at java.base/java.lang.Thread.run(Thread.java:1583)
+  Caused by: com.android.ide.common.process.ProcessException: Error while executing process C:\Users\sam_s\AppData\Local\Android\Sdk\cmake\3.22.1\bin\cmake.exe with arguments {-HC:\Dev\tmp\horde-shipping-ab-20260930\opening-lighting-source\android\app\src\main\cpp -DCMAKE_SYSTEM_NAME=Android -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_SYSTEM_VERSION=24 -DANDROID_PLATFORM=android-24 -DANDROID_ABI=arm64-v8a -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a -DANDROID_NDK=C:\Users\sam_s\AppData\Local\Android\Sdk\ndk\26.1.10909125 -DCMAKE_ANDROID_NDK=C:\Users\sam_s\AppData\Local\Android\Sdk\ndk\26.1.10909125 -DCMAKE_TOOLCHAIN_FILE=C:\Users\sam_s\AppData\Local\Android\Sdk\ndk\26.1.10909125\build\cmake\android.toolchain.cmake -DCMAKE_MAKE_PROGRAM=C:\Users\sam_s\AppData\Local\Android\Sdk\cmake\3.22.1\bin\ninja.exe -DCMAKE_CXX_FLAGS=-std=c++20 -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\Dev\tmp\horde-shipping-ab-20260930\opening-lighting-source\android\app\build\intermediates\cxx\RelWithDebInfo\1j1i2969\obj\arm64-v8a -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=C:\Dev\tmp\horde-shipping-ab-20260930\opening-lighting-source\android\app\build\intermediates\cxx\RelWithDebInfo\1j1i2969\obj\arm64-v8a -DCMAKE_BUILD_TYPE=RelWithDebInfo -BC:\Dev\tmp\horde-shipping-ab-20260930\opening-lighting-source\android\app\.cxx\RelWithDebInfo\1j1i2969\arm64-v8a -GNinja -DANDROID_STL=c++_static -DHORDE_RT_DEBUG_CHECKPOINTS=OFF -DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF -DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Shipping -DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile}
+  	at com.android.build.gradle.internal.process.GradleProcessResult.buildProcessException(GradleProcessResult.java:73)
+  	at com.android.build.gradle.internal.process.GradleProcessResult.assertNormalExitValue(GradleProcessResult.java:48)
+  	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.execute(ExecuteProcess.kt:277)
+  	... 139 more
+  Caused by: org.gradle.process.internal.ExecException: Process 'command 'C:\Users\sam_s\AppData\Local\Android\Sdk\cmake\3.22.1\bin\cmake.exe'' finished with non-zero exit value 1
+  	at org.gradle.process.internal.DefaultExecHandle$ExecResultImpl.assertNormalExitValue(DefaultExecHandle.java:442)
+  	at com.android.build.gradle.internal.process.GradleProcessResult.assertNormalExitValue(GradleProcessResult.java:46)
+  	... 140 more
+
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 13s
+15 actionable tasks: 15 executed

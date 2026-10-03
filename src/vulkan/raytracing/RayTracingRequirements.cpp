@@ -24,6 +24,7 @@ bool SupportsRayQuery(const ExtensionSupport& extensions, const FeatureSupport& 
     return extensions.accelerationStructure &&
            extensions.rayQuery &&
            extensions.bufferDeviceAddress &&
+           extensions.deferredHostOperations &&
            features.accelerationStructure &&
            features.rayQuery &&
            features.bufferDeviceAddress;
@@ -31,14 +32,18 @@ bool SupportsRayQuery(const ExtensionSupport& extensions, const FeatureSupport& 
 
 } // namespace
 
-RtMode EvaluateRtMode(const ExtensionSupport& extensions, const FeatureSupport& features)
+RtMode EvaluateRtMode(const ExtensionSupport& extensions, const FeatureSupport& features,
+                      const std::uint32_t apiVersion)
 {
-    if (SupportsPresentableRayTracingPath(extensions, features))
+    constexpr std::uint32_t vulkan12 = (1u << 22u) | (2u << 12u);
+    ExtensionSupport effective = extensions;
+    effective.bufferDeviceAddress = extensions.bufferDeviceAddress || apiVersion >= vulkan12;
+    if (SupportsPresentableRayTracingPath(effective, features))
     {
         return RtMode::RayTracingPipeline;
     }
 
-    if (SupportsRayQuery(extensions, features))
+    if (SupportsRayQuery(effective, features))
     {
         return RtMode::RayQuery;
     }

@@ -5,22 +5,153 @@ on:
   push:
     branches:
       - main
+      - codex/horde-1.6.1-engineering-pass
 
 permissions:
   contents: read
 
 jobs:
-  shared-gameplay:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+  android-debug:
+    name: Android Debug build, playback/report contracts and lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
     steps:
       - name: Check out source
         uses: actions/checkout@v6
 
+      - name: Set up the Android Gradle JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+          cache-dependency-path: |
+            android/gradle/wrapper/gradle-wrapper.properties
+            android/gradle.properties
+            android/build.gradle
+            android/app/build.gradle
+
+      - name: Install the repository-pinned Android SDK tools
+        run: |
+          hordeSdkManager="${ANDROID_HOME:?Android SDK root is unavailable}/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$hordeSdkManager"
+          # Ignore only yes's expected SIGPIPE, not a failed sdkmanager command.
+          (set +o pipefail; yes | "$hordeSdkManager" --licenses)
+          "$hordeSdkManager" --install "platforms;android-34" "build-tools;34.0.0" "ndk;26.1.10909125" "cmake;3.22.1"
+
+      - name: Fetch only Android runtime LFS payloads
+        run: >-
+          git -c lfs.fetchexclude= lfs fetch
+          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb,assets/models/player/runtime/*.runtime.glb,assets/models/player/viewmodel/runtime/*.runtime.glb,assets/models/props/runtime/*.runtime.glb,assets/models/props/runtime/*/*.runtime.glb,assets/models/weapons/runtime/*.runtime.glb,assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2,assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          && git lfs checkout
+          "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb"
+          "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb"
+          "assets/models/player/runtime/*.runtime.glb"
+          "assets/models/player/viewmodel/runtime/*.runtime.glb"
+          "assets/models/props/runtime/*.runtime.glb"
+          "assets/models/props/runtime/*/*.runtime.glb"
+          "assets/models/weapons/runtime/*.runtime.glb"
+          "assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2"
+          "assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2"
+          "assets/textures/props/runtime/*.android.ktx2"
+          "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+
+      - name: Build all Debug ABIs, run Java contracts and lint
+        working-directory: android
+        env:
+          # Never load production signing credentials. Debug uses only AGP's debug key.
+          HORDE_VALIDATION_UNSIGNED: '1'
+        run: >-
+          bash gradlew --no-daemon --max-workers=2 --console=plain
+          :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+
+      - name: Check actual Java results and runtime APK payload
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $reports = @(Get-ChildItem android/app/build/test-results/testDebugUnitTest -Filter 'TEST-*.xml')
+          if ($reports.Count -eq 0) { throw 'No Android unit-test reports were produced.' }
+          foreach ($required in @{
+            'MusicAudioFocusTest' = 8
+            'MusicOutputBufferTest' = 5
+            'PlaytestReportExportTest' = 6
+            'PlaytestReportSubmissionTest' = 16
+            'PlaytestReportScreenshotTest' = 5
+            'PlaytestReportVerificationTest' = 7
+            'PlaytestReportFlowResourceTest' = 2
+            'MainActivityPlaytestReportLifecycleTest' = 7
+          }.GetEnumerator()) {
+            $requiredReport = Join-Path android/app/build/test-results/testDebugUnitTest "TEST-com.samfa12.hordelanternrt.$($required.Key).xml"
+            if (-not (Test-Path -LiteralPath $requiredReport)) { throw "Missing Android contract suite: $($required.Key)" }
+            $suite = [xml](Get-Content -LiteralPath $requiredReport -Raw)
+            if ([int]$suite.testsuite.tests -lt $required.Value) { throw "Incomplete Android contract suite: $($required.Key)" }
+          }
+          $tests = 0; $failures = 0; $errors = 0; $skipped = 0
+          foreach ($report in $reports) {
+            $suite = [xml](Get-Content -LiteralPath $report.FullName -Raw)
+            $tests += [int]$suite.testsuite.tests
+            $failures += [int]$suite.testsuite.failures
+            $errors += [int]$suite.testsuite.errors
+            $skipped += [int]$suite.testsuite.skipped
+          }
+          Write-Output "Android Debug unit tests: $tests total; $failures failures; $errors errors; $skipped skipped."
+          if ($tests -lt 75 -or $failures -ne 0 -or $errors -ne 0 -or $skipped -ne 0) {
+            throw 'Android Java contract tests did not pass completely.'
+          }
+          $apk = ./tools/resolve-android-apk.ps1 -AndroidRoot (Join-Path $PWD android) -Variant debug
+          ./tools/test-held-item-package-contract.ps1 -AndroidApkPath $apk
+          Get-FileHash -LiteralPath $apk -Algorithm SHA256
+          # Compile/package evidence only: this job has no physical Vulkan RT device.
+
+  shared-gameplay:
+    name: Shared simulation host (${{ matrix.compiler }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            compiler: GCC
+            compiler_args: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release
+            ctest_filter_args: ''
+          - os: ubuntu-latest
+            compiler: Clang
+            compiler_args: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release
+            ctest_filter_args: ''
+          - os: windows-latest
+            compiler: MSVC
+            compiler_args: ''
+            # The separate WIN32 tool matrix includes SDK/Android/tool-dependent fixtures.
+            # This additive compiler lane runs the same common CPU-host tests.
+            ctest_filter_args: >-
+              -E '^(horde_rt_scene_abi_generator_tests|horde_rt_raygen_compiler_strategy_tests|horde_rt_raygen_variant_manifest_tests|horde_rt_raygen_variant_artifact_tests|horde_rt_rayquery_compute_shader_tests|horde_rt_pipeline_policy_fence_tests|horde_rt_pipeline_policy_execution_tests|horde_rt_static_texture_array_tool_tests|horde_rt_static_preparation_lod_policy_tests|horde_rt_static_preparation_skip_policy_tests|horde_rt_static_preparation_colliding_lod_policy_tests|horde_rt_dielectric_topology_tool_tests|horde_rt_version_contract_powershell_tests|horde_rt_github_release_preflight_tests|horde_rt_version_contract_windows_powershell_tests)$'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Fetch portable-test GLB and music PCM assets
+        run: >-
+          git -c lfs.fetchexclude= lfs fetch
+          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          && git lfs checkout
+          "assets/models/player/runtime/*.glb"
+          "assets/models/player/viewmodel/runtime/*.glb"
+          "assets/models/props/runtime/*.glb"
+          "assets/models/props/runtime/*/*.glb"
+          "assets/models/weapons/runtime/*.glb"
+          "tests/fixtures/*/*.glb"
+          "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+
+      - name: Restore pinned Windows report-verification SDK
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./tools/restore-report-webview2.ps1
+
       - name: Configure non-hardware host tests
         run: >-
           cmake -S . -B build/host-ci
-          -DCMAKE_BUILD_TYPE=Release
+          ${{ matrix.compiler_args }}
           -DBUILD_TESTING=ON
           -DHORDE_RT_BUILD_VULKAN_TARGETS=OFF
 
@@ -28,4 +159,113 @@ jobs:
         run: cmake --build build/host-ci --config Release --parallel 2
 
       - name: Run shared gameplay tests
-        run: ctest --test-dir build/host-ci --build-config Release --output-on-failure
+        run: >-
+          ctest --test-dir build/host-ci --build-config Release
+          --output-on-failure --no-tests=error ${{ matrix.ctest_filter_args }}
+
+      - name: Check offline gauntlet chirality and UV winding
+        run: python -m unittest discover -s tests -p test_player_gauntlet_geometry.py -v
+
+      - name: Check exact player cloth seam weight transfers
+        run: python -m unittest discover -s tests -p test_player_sleeve_seams.py -v
+
+      - name: Check upper torso partition preserves the head mask
+        run: python -m unittest discover -s tests -p test_player_body_partition.py -v
+
+      - name: Check bounded segmented cloth seam plans
+        run: python -m unittest discover -s tests -p test_player_segmented_seams.py -v
+
+      - name: Check Gradle APK artifact resolution
+        shell: pwsh
+        run: ./tools/test-resolve-android-apk.ps1
+
+      - name: Check Android combat capture expectations
+        shell: pwsh
+        run: ./tests/AndroidCombatCaptureExpectations.ps1
+
+  selected-host-sanitizers:
+    name: Selected host contracts (Clang ASan/UBSan)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Fetch only selected fixture and PCM payloads
+        run: >-
+          git -c lfs.fetchexclude= lfs fetch
+          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          && git lfs checkout
+          "assets/models/player/runtime/*.glb"
+          "assets/models/player/viewmodel/runtime/*.glb"
+          "assets/models/props/runtime/*.glb"
+          "assets/models/props/runtime/*/*.glb"
+          "assets/models/weapons/runtime/*.glb"
+          "tests/fixtures/*/*.glb"
+          "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+
+      - name: Build and run the finite sanitizer roster
+        run: bash tools/run-host-sanitizer-validation.sh
+
+  player-vulkan-host:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Install Vulkan host development package
+        run: sudo apt-get update && sudo apt-get install --yes libvulkan-dev
+
+      - name: Fetch player smoke GLB and texture assets
+        run: >-
+          git -c lfs.fetchexclude= lfs fetch
+          --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb"
+          && git lfs checkout
+          "assets/models/enemies/meshy/*.glb"
+          "assets/models/player/runtime/*.glb"
+          "assets/models/player/viewmodel/runtime/*.glb"
+          "assets/models/props/runtime/*.glb"
+          "assets/models/props/runtime/*/*.glb"
+          "assets/models/weapons/runtime/*.glb"
+          "assets/textures/meshy/lich_placeholder_v01/*.ktx2"
+          "tests/fixtures/*/*.glb"
+
+      - name: Configure Vulkan CPU-host player and resource lane
+        run: >-
+          cmake -S . -B build/player-vulkan-host
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_TESTING=ON
+          -DHORDE_RT_BUILD_VULKAN_TARGETS=ON
+          -DHORDE_RT_BUILD_CAPABILITY_PROBE_EXECUTABLE=OFF
+          -DHORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW=OFF
+          -DHORDE_RT_INSTRUMENTATION_OVERRIDE=Shipping
+          -DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=Mobile
+
+      - name: Build focused player and resource Vulkan-host targets
+        run: >-
+          cmake --build build/player-vulkan-host
+          --config Release
+          --parallel 2
+          --target
+          horde_rt_player_primitive_contract_tests
+          horde_rt_player_animation_tests
+          horde_rt_held_item_socket_tests
+          horde_rt_scene_abi_tests
+          horde_rt_static_gltf_asset_tests
+          horde_rt_skinned_character_smoke
+          horde_rt_skinned_arm_reference_tests
+          horde_rt_scene_initialise_preflight_tests
+          horde_rt_scene_resource_inventory_tests
+          horde_rt_gpu_resources_observation_tests
+          horde_rt_staged_primary_resource_tests
+          horde_rt_staged_primary_timing_tests
+          horde_rt_driver_capability_report_tests
+
+      - name: Run focused player, semantic and output-ownership fixtures
+        run: >-
+          ctest --test-dir build/player-vulkan-host
+          --build-config Release
+          --output-on-failure
+          --no-tests=error
+          -R "^(horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures|horde_rt_scene_initialise_preflight_tests|horde_rt_scene_resource_inventory_tests|horde_rt_gpu_resources_observation_tests|horde_rt_staged_primary_resource_tests|horde_rt_staged_primary_timing_tests|horde_rt_driver_capability_report_tests)$"

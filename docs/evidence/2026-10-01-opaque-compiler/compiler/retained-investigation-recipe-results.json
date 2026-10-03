@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "classification": "nonproduction compiler-treatment investigation; no renderer or shader-source changes",
+  "sourceRoot": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\source-eaf",
+  "sourceHead": "eafbf8262442a82e0835edf5cf5306d718e64633",
+  "recipe": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\compile-retained-investigation.ps1",
+  "recipeSha256": "8d77d583805679be7d92da1a97c1e92c4483dc3708b95734112cc89f0e71e336",
+  "toolchain": {
+    "targetEnvironment": "vulkan1.2",
+    "glslangValidator": "Glslang Version: 11:16.2.0 ESSL Version: OpenGL ES GLSL 3.20 glslang Khronos. 16.2.0 GLSL Version: 4.60 glslang Khronos. 16.2.0 SPIR-V Version 0x00010600, Revision 1 GLSL.std.450 Version 100, Revision 1 Khronos Tool ID 8 SPIR-V Generator Version 11 GL_KHR_vulkan_glsl version 100 ARB_GL_gl_spirv version 100",
+    "spirvOpt": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a",
+    "spirvVal": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a Targets: SPIR-V 1.0 SPIR-V 1.1 SPIR-V 1.2 SPIR-V 1.3 SPIR-V 1.4 SPIR-V 1.5 SPIR-V 1.6 SPIR-V 1.2 (under OpenCL 2.2 Full Profile semantics) SPIR-V 1.0 (under Vulkan 1.0 semantics) SPIR-V 1.3 (under Vulkan 1.1 semantics) SPIR-V 1.4 (under Vulkan 1.1 semantics) SPIR-V 1.5 (under Vulkan 1.2 semantics) SPIR-V 1.6 (under Vulkan 1.3 semantics) SPIR-V 1.6 (under Vulkan 1.4 semantics)",
+    "spirvDis": "SPIRV-Tools v2026.2 v2026.2.rc2-1-g2ec8457a Target: SPIR-V 1.5"
+  },
+  "compilerTreatment": {
+    "baseline": "exact normal compile-raygen.ps1 output for same variant and byte-identical preprocessed input",
+    "experiment": "glslang without -Os followed by the five retained-function/dead-code passes recorded per variant",
+    "causalScope": "combined compiler-treatment group; does not isolate glslang flag from SPIR-V optimizer pass changes"
+  },
+  "variants": [
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "preprocessedSource": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\recipe-run-2\\shipping_mobile_opaque_fast-control\\shipping_mobile_opaque_fast\\minimal.rgen.preprocessed",
+      "preprocessedSourceSha256": "eaa0b8a9f7b1a87fce83e34ab8568c524b1a8ed4160009bf35fc1a89e728713f",
+      "sourceIsExactOrdinaryCompilerPreprocess": true,
+      "controlModuleSha256": "66e39df9f53b058fb62cbfa913d424b161c93be4aff59a1685cf8b7e54bb9c4b",
+      "retainedRawSha256": "060a61fc0cd01a8dec44f231d179b333517d81b67426c32bb1c4481f0746387a",
+      "retainedModuleSha256": "14509c272fa4fa9f92a8d180abf170b2485447798b7940ec98f55150c05249d3",
+      "retainedBytes": 212452,
+      "retainedWords": 53113,
+      "instructions": 12595,
+      "branchOperations": 624,
+      "loops": 9,
+      "selectionMerges": 254,
+      "functions": 60,
+      "functionCalls": 192,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 0,
+      "hasDiagnosticsBinding": false,
+      "spirvVal": "passed (Vulkan 1.2)",
+      "spirvDis": "passed",
+      "glslangCompileArguments": [
+        "-V",
+        "--target-env",
+        "vulkan1.2",
+        "-S",
+        "rgen",
+        "-o",
+        "<output>",
+        "<exact-preprocessed-source>"
+      ],
+      "spirvOptArguments": [
+        "--eliminate-dead-functions",
+        "--eliminate-dead-code-aggressive",
+        "--simplify-instructions",
+        "--eliminate-dead-branches",
+        "--cfg-cleanup",
+        "<input>",
+        "-o",
+        "<output>"
+      ]
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "preprocessedSource": "C:\\Dev\\tmp\\horde-opaque-retained-profile-20260930\\recipe-run-2\\diagnostic_mobile_opaque_fast-control\\diagnostic_mobile_opaque_fast\\minimal.rgen.preprocessed",
+      "preprocessedSourceSha256": "4263a710ef0d381f3a6920ae9379f8f59f154d5a0280154b1459b0445838d8c2",
+      "sourceIsExactOrdinaryCompilerPreprocess": true,
+      "controlModuleSha256": "8dbebd86eeed23b388626719e6f9946b8027df754869b5811673e24036ae12c9",
+      "retainedRawSha256": "f247fcc158a8db1d214598fb838eb1a43956e26f3295d133332e3308b1fcbff1",
+      "retainedModuleSha256": "4ba45dce815f5e1af8282fd40d6d650e144556992b939a0254ff28a0e94831b4",
+      "retainedBytes": 219932,
+      "retainedWords": 54983,
+      "instructions": 12948,
+      "branchOperations": 664,
+      "loops": 9,
+      "selectionMerges": 276,
+      "functions": 60,
+      "functionCalls": 192,
+      "rayQueryInitializations": 2,
+      "atomicInstructions": 30,
+      "hasDiagnosticsBinding": true,
+      "spirvVal": "passed (Vulkan 1.2)",
+      "spirvDis": "passed",
+      "glslangCompileArguments": [
+        "-V",
+        "--target-env",
+        "vulkan1.2",
+        "-S",
+        "rgen",
+        "-o",
+        "<output>",
+        "<exact-preprocessed-source>"
+      ],
+      "spirvOptArguments": [
+        "--eliminate-dead-functions",
+        "--eliminate-dead-code-aggressive",
+        "--simplify-instructions",
+        "--eliminate-dead-branches",
+        "--cfg-cleanup",
+        "<input>",
+        "-o",
+        "<output>"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "repository": "Samfa12-tech/The-Horde-RT-demo",
+  "headSha": "b56d1bfb3eccbac31550a8b0960e706f9d061455",
+  "runs": [
+    {
+      "id": 36721846883,
+      "event": "push",
+      "conclusion": "success",
+      "jobs": {
+        "shared-gameplay": "success",
+        "player-vulkan-host": "success"
+      },
+      "log": "push-run.log",
+      "jobApi": "push-jobs-api.json"
+    },
+    {
+      "id": 36721855646,
+      "event": "pull_request",
+      "conclusion": "success",
+      "jobs": {
+        "shared-gameplay": "success",
+        "player-vulkan-host": "success"
+      },
+      "log": "pr-run.log",
+      "jobApi": "pr-jobs-api.json"
+    }
+  ],
+  "checksPerRun": {
+    "portableHostCtest": { "passed": 46, "failed": 0 },
+    "vulkanCpuHostPlayerCtest": { "passed": 11, "failed": 0 },
+    "gauntletGeometryTests": { "passed": 6 },
+    "sleeveSeamTests": { "passed": 12 },
+    "bodyPartitionTests": { "passed": 3 },
+    "segmentedSeamTests": { "passed": 7 },
+    "androidApkResolverCases": { "passed": 10 },
+    "androidCombatCaptureExpectationCases": { "passed": 34 },
+    "gameplayVersusIsolatedGlassOwnershipCases": { "passed": 16 }
+  },
+  "failures": [],
+  "annotations": [
+    "GitHub-hosted runner notes future ubuntu-latest migration; informational only."
+  ],
+  "limitations": [
+    "Vulkan CPU-host tests are host tests, not hardware ray-tracing or Android-device evidence.",
+    "No physical-device or performance acceptance is established by these CI runs."
+  ]
+}

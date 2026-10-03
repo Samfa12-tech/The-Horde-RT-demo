@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+Test project C:/Dev/tmp/horde-pocket-audio-core-native-20261001/horde-build
+    Start 74: horde_rt_final_windows_bundle_containment
+1/1 Test #74: horde_rt_final_windows_bundle_containment ...   Passed    8.30 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   8.31 sec

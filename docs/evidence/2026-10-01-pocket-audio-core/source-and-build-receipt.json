@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "classification": "unwired-native-core-integration-build-and-contract-evidence-only",
+  "engineeringBase": "baa8bfecba25de509e25803e3b4f231c54834745",
+  "sourceState": "authorised edits over base; exact Windows worktree bytes at validation, not platform-independent checkout hashes",
+  "coreCommit": "534a6e6811ce653efd5422138c5772b967263ed0",
+  "coreCiRun": 36781667753,
+  "sourceFiles": [
+    {
+      "path": "CMakeLists.txt",
+      "bytes": 47319,
+      "sha256": "7c333e578f8555cebf1de89063a086301f5306ce8a3e80aa094199a5f2978d26"
+    },
+    {
+      "path": "android/app/src/main/cpp/CMakeLists.txt",
+      "bytes": 3651,
+      "sha256": "82afacd4866401f572edd25e30a2fecd834f8cc6086bc9fb4bbd7f05de05790b"
+    },
+    {
+      "path": "cmake/HordeRtSources.cmake",
+      "bytes": 2023,
+      "sha256": "70a2cec5e04d74a3812989aa45001ba348294aa7b2dd0ad11ba52232dda06180"
+    },
+    {
+      "path": "cmake/HordeRtPocketAudioCore.cmake",
+      "bytes": 3724,
+      "sha256": "de004b0b7007172cce36546a833e6888b58d6ea2af67c2a8a1ceb0a82f3fe0ec"
+    },
+    {
+      "path": "src/audio/MusicDirector.cpp",
+      "bytes": 12230,
+      "sha256": "eec1e5eb7be8993817ba8c39a65bf9fbd7b0dfada381b890eac7887a5769fb82"
+    },
+    {
+      "path": "src/audio/MusicDirector.h",
+      "bytes": 2736,
+      "sha256": "608624b62d9dc89027e3a8e82317f3d7b723e4b6b16ee69cf7aa9fa36142acec"
+    },
+    {
+      "path": "src/audio/MusicPcmStream.cpp",
+      "bytes": 3111,
+      "sha256": "be32c4a4a6fcb96cdebf7d63b01c6ae260e55944c1fde3e14db831c2d375002e"
+    },
+    {
+      "path": "src/audio/MusicPcmStream.h",
+      "bytes": 2115,
+      "sha256": "42e6b1049a01cb5a428ce860cc310fb521041a6a6b8feeff582db67f917b50c7"
+    },
+    {
+      "path": "src/audio/MusicPcmWave.cpp",
+      "bytes": 367,
+      "sha256": "d3165d1c12ad7cf5baadfcd21701974003643acb55266853246ee7e1486531a7"
+    },
+    {
+      "path": "src/audio/MusicPcmWave.h",
+      "bytes": 1000,
+      "sha256": "bcbafb86b90b0a2b3036a8928a438fac49f3e1d1e3072c9a4c2aaffdc71e0693"
+    },
+    {
+      "path": "tests/MusicPcmStreamTests.cpp",
+      "bytes": 23609,
+      "sha256": "17bf17be6ce5776b81e5bc60299ff706a139787307a98c3ce3e83b420dd7527a"
+    },
+    {
+      "path": "tests/MusicPcmWaveTests.cpp",
+      "bytes": 14998,
+      "sha256": "067ed7feee40d296b3337d336f69a855301e05b0adb3662df747680d9a9ac7e7"
+    },
+    {
+      "path": "tests/PocketAudioCorePinTests.ps1",
+      "bytes": 4484,
+      "sha256": "c6293d5fff63b08e05fec0ce9c137eaead01103910c1a2d17bd70b3934892f76"
+    },
+    {
+      "path": "third_party/pocket-audio-core/manifest.json",
+      "bytes": 2802,
+      "sha256": "b0bda2ea83ef811cd19ac14ad76b5b8d36ddf8725d55031d2b22107a7c3d4f28"
+    }
+  ],
+  "hordeDebugTests": 8,
+  "hordeReleaseTests": 8,
+  "hordeCommonCpuTestInventory": 50,
+  "androidApkSha256": "eab79c4a5f6757b600824f85e08b290ce3fe57e735022647c41377c69589d21a",
+  "androidBuild": "Debug universal: four ABIs, package-only",
+  "androidInstalled": false,
+  "playbackWired": false,
+  "physicalDeviceAcceptance": false
+}

@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "result": "pass",
+  "deviceModel": "SM-S948B",
+  "serial": "R5GL219SZGK",
+  "run": "run-20260930-204834",
+  "apkSha256": "389d6954f7a3fddde1ced690470029fa4b14cc6f825fa34bf7269dc617f946e0",
+  "installedApkSha256": "389d6954f7a3fddde1ced690470029fa4b14cc6f825fa34bf7269dc617f946e0",
+  "runnerSourceCommit": "e12aabe1f3b7d42b60e3faa9d49c29148d15ac66",
+  "runnerSourceDirty": true,
+  "artifactProvenance": "Reused immutable derived-normal-bias-01 Debug APK, not a new clean build from the runner worktree commit.",
+  "backend": "RayTracingPipeline",
+  "scale": 75,
+  "sceneOnly": true,
+  "replayAndHomeResume": "pass",
+  "capturedOwningIdentity": {
+    "sceneEpoch": 6,
+    "measurementGeneration": 4,
+    "recordAttemptSerial": 1866,
+    "recordSerial": 1866,
+    "submissionSerial": 1866,
+    "completionSerial": 1866,
+    "simulationTick": 1873,
+    "frameSlot": 0
+  },
+  "restoredPngSha256": "de462da3d7294ad91ca8e845ea7d53f189a0c449d3b6671457f6d25ce4fc9531",
+  "historicalSameArtifactPngSha256": "de462da3d7294ad91ca8e845ea7d53f189a0c449d3b6671457f6d25ce4fc9531",
+  "exactPngEqual": true,
+  "diagnosticAggregateCounters": {
+    "primaryInterfaceBudgetCount": 1,
+    "primaryInterfaceBudgetClosedVolumeCount": 1,
+    "primaryCertifiedClosedVolumeRecoveryCount": 80,
+    "certifiedClosedVolumeRecoveryReasonMask": 2
+  },
+  "inputs": [
+    {
+      "path": "capture-manifest.json",
+      "sha256": "c4e18e7cc8c45455507eccfb20dd1973f33f80190e2a951cc1cbebcb6cc49666"
+    },
+    {
+      "path": "summary.json",
+      "sha256": "bc3146f6fdfa85c0613b8c2f816c51f6dc3c552f72a0cb4c0047efce5f603975"
+    },
+    {
+      "path": "capture-01-lantern-glass-production-state.json",
+      "sha256": "ba3c10bcef96acd6dca2520c1015ec8c46f9e35715046cfba0755c9bfa652d95"
+    },
+    {
+      "path": "route-replay-state.json",
+      "sha256": "a8fcd6903bbdf9a2fcfffd9b2ba92009a6dbfc5601c2dde6e41e15364fe8f00d"
+    },
+    {
+      "path": "vulkan_capability_report.json",
+      "sha256": "47b373530a912f149db1c8b3a91e9d3903c46cef54a509891454488ab18edf18"
+    }
+  ],
+  "retainedEarlierAttempt": "run-20260930-204031 timed out at the original 120-second operational deadline. Retry used the existing TimeoutSeconds 300 option; no count, pixel, performance or physics gates changed.",
+  "limits": [
+    "Historical image equality and aggregate counters do not close current glass path, live-motion or physical-shadow gates.",
+    "Single Diagnostic frame is not a Shipping performance measurement.",
+    "No phone compute, S24/S25 or backend parity certification.",
+    "No phone operations performed by this offline verifier."
+  ]
+}

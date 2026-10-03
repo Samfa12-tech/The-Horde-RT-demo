@@ -1,0 +1,19 @@
+Start testing: Oct 03 11:48 AUS Eastern Standard Time
+----------------------------------------------------------
+50/100 Testing: horde_rt_github_release_preflight_tests
+50/100 Test: horde_rt_github_release_preflight_tests
+Command: "C:/Program Files/PowerShell/7/pwsh.exe" "-NoProfile" "-File" "C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/tests/GitHubReleasePreflightTests.ps1"
+Directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+"horde_rt_github_release_preflight_tests" start time: Oct 03 11:48 AUS Eastern Standard Time
+Output:
+----------------------------------------------------------
+GitHub release preflight offline tests passed.
+<end of output>
+Test time =  18.03 sec
+----------------------------------------------------------
+Test Passed.
+"horde_rt_github_release_preflight_tests" end time: Oct 03 11:48 AUS Eastern Standard Time
+"horde_rt_github_release_preflight_tests" time elapsed: 00:00:18
+----------------------------------------------------------
+
+End testing: Oct 03 11:48 AUS Eastern Standard Time
