@@ -14,7 +14,7 @@ function Expect-Failure([scriptblock]$Action,[string]$Message) {
     Require ($observed -like "*$Message*") "Negative fixture failed for an unrelated reason: $observed"
     ++$script:checks
 }
-function New-FixtureArchive([string]$Name,[string]$Platform,[string]$Omit='', [string]$Extra='', [string]$Duplicate='', [string]$Corrupt='') {
+function New-FixtureArchive([string]$Name,[string]$Platform,[string]$Omit='', [string]$Extra='', [string]$Duplicate='', [string]$Corrupt='', [string[]]$Directories=@(), [string]$EmptyFile='') {
     $path=Join-Path $scratch $Name
     $zip=[IO.Compression.ZipFile]::Open($path,[IO.Compression.ZipArchiveMode]::Create)
     try {
@@ -34,6 +34,8 @@ function New-FixtureArchive([string]$Name,[string]$Platform,[string]$Omit='', [s
             $entry=$zip.CreateEntry($Extra);$stream=$entry.Open()
             try{$bytes=[Text.Encoding]::ASCII.GetBytes('synthetic foreign source, never admitted');$stream.Write($bytes,0,$bytes.Length)}finally{$stream.Dispose()}
         }
+        foreach($directory in $Directories){$null=$zip.CreateEntry($directory)}
+        if($EmptyFile){$null=$zip.CreateEntry($EmptyFile)}
         # A Debug candidate may contain unrelated native/signing metadata. The
         # asset validator intentionally does not mistake this for Release proof.
         $entry=$zip.CreateEntry('META-INF/debug-fixture.txt');$stream=$entry.Open()
@@ -57,6 +59,22 @@ try {
         Assert-Horde162StagedAssets $repo $stage $platform
         ++$script:checks
     }
+    $directories=@('assets/audio/pixabay/','assets/textures/environment/','assets/textures/environment/runtime/')
+    $archive=New-FixtureArchive 'explicit-directory-entries.zip' Windows -Directories $directories
+    Assert-Horde162Package $repo $archive Windows
+    ++$script:checks
+    $archive=Join-Path $scratch 'actual-compress-archive.zip'
+    Compress-Archive -Path (Join-Path $scratch 'Windows-stage/*') -DestinationPath $archive
+    Assert-Horde162Package $repo $archive Windows
+    ++$script:checks
+    $archive=New-FixtureArchive 'directory-plus-foreign-file.zip' Windows -Directories $directories -Extra 'assets/textures/environment/source/foreign.png'
+    Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'closed runtime roster'
+    $archive=New-FixtureArchive 'nonempty-directory.zip' Windows -Extra 'assets/textures/environment/runtime/'
+    Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'malformed nonempty directory'
+    $archive=New-FixtureArchive 'zero-byte-foreign-file.zip' Windows -EmptyFile 'assets/audio/pixabay/foreign.wav'
+    Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'closed runtime roster'
+    $archive=New-FixtureArchive 'foreign-empty-directory.zip' Windows -Directories @('assets/textures/environment/source/')
+    Expect-Failure {Assert-Horde162Package $repo $archive Windows} 'closed runtime roster'
     foreach($case in @(
         @{Name='missing-cue';Platform='Windows';Omit='assets/audio/pixabay/keeper_i_sense_you.wav'},
         @{Name='missing-core-manifest';Platform='Android';Omit='assets/audio/pixabay/waterfall-core.manifest.json'},

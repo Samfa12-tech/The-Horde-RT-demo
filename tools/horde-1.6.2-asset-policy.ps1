@@ -168,9 +168,21 @@ function Assert-Horde162Package {
     $zip=[IO.Compression.ZipFile]::OpenRead([IO.Path]::GetFullPath($ArchivePath))
     try {
         $entries=@($zip.Entries | Where-Object { $_.FullName.Replace('\','/') -match '(?i)^assets/(audio/pixabay|textures/environment)(/|$)' })
+        # ZIP directory entries are metadata, distinguished by their trailing
+        # slash, not by byte length (a zero-byte foreign file is still a file).
+        foreach($entry in $entries) {
+            if ($entry.FullName.EndsWith('/', [StringComparison]::Ordinal)) {
+                if ($entry.Length -ne 0) { throw '1.6.2 package has a malformed nonempty directory entry.' }
+                if ($entry.FullName.Contains('\') -or @($expected | Where-Object {
+                    $_.StartsWith($entry.FullName, [StringComparison]::Ordinal)
+                }).Count -eq 0) { throw '1.6.2 package directory is outside the closed runtime roster.' }
+            }
+        }
         $names=@($entries | ForEach-Object FullName)
         $unique=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
         foreach($name in $names) { if (-not $unique.Add($name)) { throw '1.6.2 package has duplicate runtime entry names.' } }
+        $entries=@($entries | Where-Object { -not $_.FullName.EndsWith('/', [StringComparison]::Ordinal) })
+        $names=@($entries | ForEach-Object FullName)
         if ([string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive)) -cne
             [string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive))) { throw "1.6.2 $Platform package inventory is not the closed runtime roster (missing, source, foreign or other-platform entry)." }
         foreach($entry in $entries) {

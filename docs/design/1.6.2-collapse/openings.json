@@ -17,7 +17,7 @@
       "destination": "Impassable rubble before five ascending steps and recessed sealed backing z6.35",
       "mask": "plans/blocked-opening-mask.png",
       "cutter": "plans/blocked-opening-cutter.json",
-      "approved": false
+      "approved": true
     }
   ]
 }

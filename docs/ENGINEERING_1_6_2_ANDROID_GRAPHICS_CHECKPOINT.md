@@ -42,3 +42,7 @@ Android source and candidate host validation are complete. The lead can snapshot
 ## Open acceptance gates
 
 Actual native RT preview composition, profile return, allocation-failure recovery and stale input clearing require coordinated RTX/device validation. The phone is now allocated to the lead; lifecycle/touch/font/inset/composited-contrast checks remain pending actual execution. Performance costs are not yet measured; no sustained FPS claim is made. Owner visual acceptance of the HUD/menu prototype, Graphics, preview and Keeper title remains open. The new preview route requires changed-route listening checks for music suspension/resumption; admitted Keeper voices, incidental/falling-bones cues, independent music reveal gain and the bounded waterfall derivative require owner changed-audio listening acceptance. Source/build/unit success does not close these gates.
+
+## Current allocation and integration follow-up
+
+Phone allocation was subsequently withdrawn before any install/test; no device actions or queued operations are permitted until explicitly renewed. Current source/evidence is summarized in ENGINEERING_1_6_2_HANDOFF.md and ENGINEERING_1_6_2_RTX_VALIDATION.md. Historical allocation and pending-test statements above describe their dated slice, not current permission or current test results.
