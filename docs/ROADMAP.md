@@ -264,6 +264,21 @@ Use directional world-space sound anchored beyond the actual small wall grate, s
 
 **Owner request, 3 October 2026:** Add player-facing Save/Load, with **three local campaign slots proposed** (count remains provisional), and an automatic safe respawn checkpoint after the completed rope rescue/tomb exit. Activate it only when grounded outside with the destination ready; later death must not replay the tomb or re-award the lantern. Keep manual slot saves distinct from automatic recovery checkpoints, preserve coherent quest/Kit/equipment/one-shot state, and keep settings and RT Lab unlock separate. The [canonical 1.7 save contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#12-save-replay-and-recovery) defines safe resume, overwrite/New Game confirmation, versioned atomic storage and corruption/lifecycle checks. Final arbitrary-save policy and cloud sync are not implied. Planning only, after the accepted 1.6.2 baseline.
 
+## Future visual backlog — carried-torch ember detachment
+
+**Owner observation, 3 October 2026:** While walking with the torch, the embers appear to move with it instead of rising independently and leaving a short trail. This is an owner-reported visual concern, not a reproduced defect or a confirmed root cause. The observed build, device, backend and effective settings were not specified; do not attribute it to a particular release or inherit metadata from unrelated reports.
+
+**Scope:** retain as a bounded 1.7/backlog investigation after acceptance of 1.6.2. It adds no required work or acceptance blocker to the frozen current 1.6.2 scope and must not interrupt or steer the active implementation run.
+
+**Investigation and intended result**
+- Establish the exact candidate and reproduce standing, walking, turning and stopping with a moving held torch. Inspect whether the current effect is procedural noise repeatedly anchored to the current emitter transform, persistent particles, or another representation; do not assume an emitter-local implementation merely from the report.
+- Each admitted ember should retain its emission-time world position and birth time (or an equivalent reconstructible birth state). After birth, its trajectory must evolve independently of the torch's current transform, so old embers do not translate or rotate rigidly with later torch movement.
+- Use bounded lifetime, upward drift/rise and fade. Optional inherited emission-time torch velocity may improve motion but must remain bounded and must not reattach the particle to the emitter. This specifies appearance and ownership, not a mandatory particle architecture or full fluid simulation.
+- Preserve coherent world-space visibility, occlusion and relevant reflected/transmitted RT views across supported rendering paths; no camera-only overlay or unsupported reflection claim. Reuse shared effect contracts and retain existing gameplay light behaviour.
+- Bound active count, spawning, storage and per-frame update/render/acceleration-structure cost as applicable. Measure phone and Windows costs on identified hardware and settings before admission; no unmeasured performance promise or reduction of unrelated quality to hide the cost.
+
+**Acceptance evidence for any later implementation:** matched motion captures show old embers rising and fading independently while the emitter moves, without rigid dragging, trails across teleports or stale particles after reset/zone unload. Verify appropriate pause/resume and lifecycle handling, supported quality settings and affected secondary views. Record exact build/device/backend/settings, changed source, actual checks, measured budgets and remaining gaps. Decide implement/defer from that evidence; no runtime work, merge or release is authorised by this entry.
+
 ## The hub-and-dungeon loop
 
 Proposed campaign structure:
