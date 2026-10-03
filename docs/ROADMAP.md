@@ -260,6 +260,12 @@ This is future campaign planning. It does not change the accepted 1.6.2 dungeon-
 
 Use directional world-space sound anchored beyond the actual small wall grate, separate Dialogue/Music/SFX gains and a subtitle on/off option with readable top-safe-area placement on mobile. Preserve a silent player, movement/look, combat cue priority, intelligibility and safe checkpoint/re-entry behaviour. The owner's suggested line is provisional recording copy. [Scene, stable line ID and acceptance details](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#41a-kits-early-wall-panel-call-and-the-waterfall-room-guards).
 
+## 1.7 addition — traversal pace and material-aware footsteps
+
+**Owner direction, 3 October 2026:** Evaluate running for the larger world and add surface-aware footstep sound to the 1.7 plan, after its start gate. Proposed mobile Run toggle and desktop hold/toggle accessibility should retain precise walking, existing combat/traversal semantics and safe input cancellation; no stamina system is implied. Tune pace against the 40–80 m forest blockout and approved map routes rather than fixing a speculative speed multiplier.
+
+Extend the existing collision-distance cadence, shared gameplay events and audio path. Classify actual authored supporting surfaces (stone, dirt, grass/leaf litter, wood or shallow water where present), preserve accepted SFX balance, and use bounded clip variation/voices. Share wet-contact ownership with the existing 1.7 water-interaction investigation to prevent duplicate step/splash audio. See [the canonical traversal and surface-audio contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#55-larger-world-walking-running-and-surface-aware-footsteps) for source evidence, controls, collision/animation and platform acceptance. This planning addition does not change the current/frozen 1.6.2 scope or claim runtime work is complete.
+
 ## 1.7 addition — Save/Load and tomb-exit respawn
 
 **Owner request, 3 October 2026:** Add player-facing Save/Load, with **three local campaign slots proposed** (count remains provisional), and an automatic safe respawn checkpoint after the completed rope rescue/tomb exit. Activate it only when grounded outside with the destination ready; later death must not replay the tomb or re-award the lantern. Keep manual slot saves distinct from automatic recovery checkpoints, preserve coherent quest/Kit/equipment/one-shot state, and keep settings and RT Lab unlock separate. The [canonical 1.7 save contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#12-save-replay-and-recovery) defines safe resume, overwrite/New Game confirmation, versioned atomic storage and corruption/lifecycle checks. Final arbitrary-save policy and cloud sync are not implied. Planning only, after the accepted 1.6.2 baseline.
@@ -278,6 +284,12 @@ Use directional world-space sound anchored beyond the actual small wall grate, s
 - Bound active count, spawning, storage and per-frame update/render/acceleration-structure cost as applicable. Measure phone and Windows costs on identified hardware and settings before admission; no unmeasured performance promise or reduction of unrelated quality to hide the cost.
 
 **Acceptance evidence for any later implementation:** matched motion captures show old embers rising and fading independently while the emitter moves, without rigid dragging, trails across teleports or stale particles after reset/zone unload. Verify appropriate pause/resume and lifecycle handling, supported quality settings and affected secondary views. Record exact build/device/backend/settings, changed source, actual checks, measured budgets and remaining gaps. Decide implement/defer from that evidence; no runtime work, merge or release is authorised by this entry.
+
+## 1.7 foundation and later campaign — hearts, health growth and recovery
+
+**Owner direction, 3 October 2026:** Use original stylized heart icons for player health instead of the ordinary `3/3` display, with accessible current/max text. No floating heart pickups. Preserve and extend the existing authoritative vitality/death system. Consider modest capacity growth through selected boss milestones, discoveries and mixable Constitution/Tech/Magic improvements; Constitution favors health/recovery, Tech flask equipment and Magic restoration/protection.
+
+The recovery direction is a limited healing flask, food/rest in safe places and optional healing abilities. Amounts, capacity, refill/use rules and ability costs remain provisional; do not infer a stamina/mana system, automatic regeneration or mandatory farming. The 1.7 slice owns heart presentation and a scoped health/recovery/save foundation; full campaign upgrades and later rewards are not all 1.7 gates. See [the staged health and recovery contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#105-heart-health-display-and-grounded-recovery-direction). Validate persistent upgrades, consumption/refill/retry integrity and a viable mandatory route without optional health rewards. This does not expand frozen/current 1.6.2 work.
 
 ## The hub-and-dungeon loop
 
