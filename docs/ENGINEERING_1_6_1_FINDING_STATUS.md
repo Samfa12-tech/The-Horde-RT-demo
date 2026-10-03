@@ -8,7 +8,7 @@ handoff and publication receipt for exact artifacts and post-publication integra
 | Audit finding | Current disposition / evidence boundary |
 | --- | --- |
 | F01 red host/CI baseline |Resolved baseline and bounded fixture repairs. Exact945f990 push37089806774/PR37089810005 both six-lane green before publication; package-source0c7db23 results retained separately. Post-publication closeout gets fresh checks, not an old-job rerun. Initial failures retained, not a single97/97 Windows claim. |
-| F02 release/version identity |Resolved1.6.1/code9 consistency, stable-key frozen packages and signed S26 update smoke. Both itch channels and non-draft GitHub prerelease are public with verified bytes/digests;1.6.1/code9 is immutable. Normal PR15 mergeee6d877 and main six-lane CI pass; scoped cleanup/preservation verified. Future versions/code require new source authority. |
+| F02 release/version identity |Resolved1.6.1/code9 consistency, stable-key frozen packages and signed S26 update smoke. Both itch channels and non-draft GitHub prerelease are public with verified bytes/digests;1.6.1/code9 is immutable. The original retroactive1.6.0 announcement recommendation is deliberately superseded by the verified current1.6.1 release/updater selection, not a fabricated historical tag. Normal PR15 mergeee6d877 and main six-lane CI pass; scoped cleanup/preservation verified. Future versions/code require new source authority. |
 | F03 procedural first-person arms |Resolved dedicated RT Viewmodel/WorldBody with shared gameplay pose authority; accepted production integration and newer Windows right cuff. Current-bank S26 live image/motion check passes; owner now confirms cuff green. No new tuning. |
 | F04 primitive semantic mismatch |Resolved processor/GLB/manifest/loader/atlas/native contracts; actual skinned/semantic fixtures run in Vulkan-host CI, not just portable builds. |
 | F05 diagnostics in Shipping |Resolved in actual extracted Windows/Android SPIR-V: zero diagnostic atomics/no binding22. Diagnostic ownership/readback stays separate. |
@@ -16,7 +16,7 @@ handoff and publication receipt for exact artifacts and post-publication integra
 | F07 Mobile/High specialization |Resolved fixed quality/strategy pairs across Pipeline/real hardware Compute. Mobile intentionally omits actual lantern panes; High physical path retained. |
 | F08 static/dynamic resources |Resolved bounded coherent lifetime mapping36f99c2 and compatible device-local/coherent immutable preference3d26ad6 with current CI, native Windows captures, six complete S26 measurement reports and current-bank scale/lifecycle checks. Direct host upload supersedes redundant staging where supported. Heavy pair shows no meaningful speedup; no false device-local/OOM/performance claim. Generic staging/per-buffer heap export remain future-platform gaps. |
 | F09 frame concurrency/pacing |Deliberately superseded speculative multi-frame work: retain one frame in flight for1.6.1 and binding host-written ownership. Completed warm measurements do not meet30FPS at75%; owner explicitly accepts performance as-is for1.6.1. Full graphics-options menu planned1.6.2. Multi-frame overlap remains measured future work, not implemented. |
-| F10 cross-platform CI |Resolved additive GCC/Clang/MSVC, Vulkan CPU-host player/resource fixtures, Android four-ABI build/Java/lint and finite Clang ASan/UBSan. Shader validation remains exact-artifact Windows/Android evidence, not claimed hardware CI. Current-source results tracked separately. |
+| F10 cross-platform CI |Resolved additive GCC/Clang/MSVC, Vulkan CPU-host player/resource fixtures, Android four-ABI build/Java/lint and finite Clang ASan/UBSan. Main protection requires all six checks, up-to-date PRs and no force-push/deletion; explicit admin bypass retained and configuration read back. Shader validation remains exact-artifact Windows/Android evidence, not claimed hardware CI. Current-source results tracked separately. |
 | F11 monolithic architecture |Bounded seams extracted: variants/bundles, resource/lifetime owners, frame evidence, player roles and shared reporting/audio. Deliberately no gratuitous renderer/platform rewrite. |
 | F12 behavior-sensitive tests |Resolved affected semantic, IK, topology/seams, physical math, resource failures, input/timing, version, PCM/focus, reporting consent/retry/cancellation and platform contracts. Host tests never replace live/device/owner evidence. |
 | F13 source-of-truth/version docs |Resolved version contracts, current package inventories, released README/docs and bounded finding/evidence/commit indexes. Release notes describe actual ownership and exact-artifact limits; downloaded public payload verification is distinct from development packages. |
@@ -64,3 +64,9 @@ main ee6d877 pass fresh six-lane CI. [Closeout receipt](evidence/2026-10-03-rele
 records preservation and full ancestry. Explicit owner deferrals remain future
 work, not pending1.6.1 gates or passed evidence. Do not restart prior audits,
 glass investigation, accepted arms/music or completed host matrices.
+
+Receipt-only main006c288 passes six-lane run37092782420. The original secondary-only
+body recommendation is boundedly superseded by the accepted nonduplicating primary
+body remainder for normal look-down; world arms/head stay excluded. Low-priority
+device selection/enumeration and general diagnostics extraction remain future work,
+not hidden release gates or completed by the driver metadata repair.

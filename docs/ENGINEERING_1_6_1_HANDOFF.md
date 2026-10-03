@@ -27,6 +27,13 @@ not a product regression. Released-docs head271f6c0 passes push37091774573 and
 PR37091777614 in all six lanes. PR15 merged normally at
 `ee6d87775b976ed683bbf1138fe95c995c6345ef`; its tree equals the validated PR head,
 and main run37092128244 passes all six lanes. No history rewrite/force-push.
+Receipt-only main006c288 passes run37092782420 in all six lanes. Main protection
+now requires those six checks and up-to-date PRs, blocks force-push/deletion and
+retains explicit admin bypass. The read-back is in the publication receipt.
+Final audit dispositions explicitly supersede the historical1.6.0 announcement
+and secondary-only body recommendation with the verified1.6.1 release and accepted
+nonduplicating primary body remainder. Low-priority device-selection/enumeration
+and broader diagnostics extraction stay future work; no runtime task is reopened.
 
 Primary main is synced while unrelated future-intake edits/untracked files are
 preserved and verified. Three classified finished worktrees are recoverably

@@ -53,6 +53,14 @@ accepted listening or old benchmarks. No further1.6.1 runtime task is queued.
 The owner's live itch description and draft devlog remain preserved; attempted
 bounded description edits did not persist and are not claimed as published.
 
+Receipt-only main006c288 passes run37092782420 in all six lanes. Audit-requested
+main protection is applied/read back: six required checks, up-to-date PRs,
+no force-push/deletion, explicit admin bypass retained. The public
+`main-protection.json`/`PROTECTION_SHA256SUMS.txt` receipt is separate from the
+immutable package and earlier evidence hashes. Subsequent documentation-only
+head checks are verified directly in main Actions; do not rebuild game artifacts
+or create an endless commit-the-previous-CI-result cycle.
+
 `SHA256SUMS.txt` binds the raw receipts and complete commit inventory through
 guard0a6bd27. Later documentation/integration ancestry is visible on PR15/main;
 the inventory includes parallel/main integration commits, not one feature per

@@ -129,8 +129,17 @@ Existing reports such as `SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`
 
 Signing, public uploads and release identity changes require an authorised release task. Follow [OWNER_RELEASE_SAFETY_CHECKLIST.md](OWNER_RELEASE_SAFETY_CHECKLIST.md): preserve the stable Android certificate; never expose signing material; never inspect/copy recovery material or mark owner-only backup/recovery checks complete. A configured in-memory signing handoff is allowed only as documented for an authorised release and is not proof of independent backup. Asset licences must be recorded before shipping.
 
-## Current 1.6.1 programme sequencing
+## Historical 1.6.1 programme sequencing and final disposition
 
 The owner's 2026-09-13 update supersedes older task briefs that demand a full Host/device programme after each implementation slice. Use relevant targeted checks during development, broaden only when coupling or failures warrant it, and reserve the comprehensive Windows/Android/cross-device/release matrix for the complete final candidate. S24/S25 compatibility, adaptive Pocket Chordsmith music and cross-platform player reporting are required before that final pass. This changes validation scheduling, not any RT, correctness, exact-artifact or final acceptance requirement.
+
+October3 owner decisions explicitly defer final S24 coverage as working but not
+fully tested, leave exact final S25 unverified, accept measured performance as-is
+and move remaining High glass defects to future investigation.1.6.1 is published
+and normally integrated; see the [completion report](ENGINEERING_1_6_1_COMPLETION_REPORT.md).
+Retain the original evidence/failures and do not turn deferred gates into passes
+or restart them after resumption. Main now requires the actual six workflow checks
+and up-to-date PRs, with no force-push/deletion and explicit admin bypass. Device,
+shader and owner-feel evidence remain separate from these host/build checks.
 
 Existing 1.6.1 evidence remains tied to its original source/build: `ENGINEERING_1_6_1_ANDROID_OBSERVATION_BASELINE_2026-09-05.md` is Diagnostic/Debug evidence, not Shipping/Release performance. Preserve matched A/B build, pipeline, workload, scale and thermal identity. A window-average median must not be relabelled as a per-frame median. The full route exceeds the 128-sample window collector; retain all intended samples with explicit capacity/invalid-run handling.
