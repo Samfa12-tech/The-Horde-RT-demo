@@ -8,7 +8,7 @@ handoff and publication receipt for exact artifacts and post-publication integra
 | Audit finding | Current disposition / evidence boundary |
 | --- | --- |
 | F01 red host/CI baseline |Resolved baseline and bounded fixture repairs. Exact945f990 push37089806774/PR37089810005 both six-lane green before publication; package-source0c7db23 results retained separately. Post-publication closeout gets fresh checks, not an old-job rerun. Initial failures retained, not a single97/97 Windows claim. |
-| F02 release/version identity |Resolved1.6.1/code9 consistency, stable-key frozen packages and signed S26 update smoke. Both itch channels and non-draft GitHub prerelease are public with verified bytes/digests;1.6.1/code9 is now immutable. Future versions/code require new source authority. Normal main integration is separately tracked. |
+| F02 release/version identity |Resolved1.6.1/code9 consistency, stable-key frozen packages and signed S26 update smoke. Both itch channels and non-draft GitHub prerelease are public with verified bytes/digests;1.6.1/code9 is immutable. Normal PR15 mergeee6d877 and main six-lane CI pass; scoped cleanup/preservation verified. Future versions/code require new source authority. |
 | F03 procedural first-person arms |Resolved dedicated RT Viewmodel/WorldBody with shared gameplay pose authority; accepted production integration and newer Windows right cuff. Current-bank S26 live image/motion check passes; owner now confirms cuff green. No new tuning. |
 | F04 primitive semantic mismatch |Resolved processor/GLB/manifest/loader/atlas/native contracts; actual skinned/semantic fixtures run in Vulkan-host CI, not just portable builds. |
 | F05 diagnostics in Shipping |Resolved in actual extracted Windows/Android SPIR-V: zero diagnostic atomics/no binding22. Diagnostic ownership/readback stays separate. |
@@ -59,5 +59,8 @@ Owner authorises normal main integration/scoped cleanup; fresh closeout CI is
 tracked on [PR15](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/15).
 Deferred evidence is not
 relabelled passed. These are not reasons to restart accepted investigations.
-Independent closeout work continues; the goal is not paused. Do not restart prior audits,
-glass investigation, accepted arms/music or completed host matrix.
+Release/integration/scoped cleanup are complete:271f6c0 push/PR and merged
+main ee6d877 pass fresh six-lane CI. [Closeout receipt](evidence/2026-10-03-release-publication/closeout.md)
+records preservation and full ancestry. Explicit owner deferrals remain future
+work, not pending1.6.1 gates or passed evidence. Do not restart prior audits,
+glass investigation, accepted arms/music or completed host matrices.

@@ -44,9 +44,12 @@ another freeze, and refuses to delete a pre-existing staging directory.
   compiled C++ executable (Not Run), retained separately; the actual existing
   validated build directory passes. No unchanged binary rebuild or secret access.
 
-Next unfinished step: fresh released-docs/guard closeout CI, normal PR15 merge,
-preservation-safe main sync and scoped recoverable worktree cleanup. Do not
-repeat publication, signed phone smoke, accepted listening or old benchmarks.
+Released-docs/guard head271f6c0 passes push37091774573/PR37091777614, all six lanes.
+PR15 merged normally into main at ee6d877, whose tree matches the validated PR
+head; main37092128244 also passes all six lanes. Primary main sync and scoped
+recoverable worktree cleanup are complete. [Closeout](closeout.md) preserves
+exact evidence and limitations. Do not repeat publication, signed phone smoke,
+accepted listening or old benchmarks. No further1.6.1 runtime task is queued.
 The owner's live itch description and draft devlog remain preserved; attempted
 bounded description edits did not persist and are not claimed as published.
 

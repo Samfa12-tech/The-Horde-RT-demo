@@ -1,0 +1,343 @@
+Complete commit inventory: 9572a87..ee6d87775b976ed683bbf1138fe95c995c6345ef (oldest first)
+Includes integration ancestry; final normal PR15 merge included.
+
+e884e1590c1643d929d0e4394dee14250648d8a3	2026-09-01T21:58:08+10:00	fix portable safe-frame coverage capture
+1a03746615e2974eb33d4ba278134affbb7b2a5a	2026-09-01T22:07:26+10:00	CI: fetch portable-test GLBs via scoped LFS include
+2b6eaddd8bc4e77a2dc9cbf7f9356b1daeb9d1ca	2026-09-01T22:14:04+10:00	CI: scope LFS checkout to portable GLBs
+821d40579c7a02d296c2208ab4a675de18d1bd7f	2026-09-01T22:21:41+10:00	test: unify cyclic GLB rejection diagnostics
+9402bb7ed4083fad7cc9bf927fafb3f471a9953d	2026-09-01T23:29:06+10:00	build(version): centralize 1.6.1 package identity
+e91e3adac0059fbb359d7a17123bd05948127e84	2026-09-02T00:06:07+10:00	test(version): harden source contract regressions
+086009c0f1eba8b5b833fddeab7e0d49c29d2983	2026-09-02T00:15:19+10:00	test(version): cover Windows PowerShell identity parsing
+e4c2b6d706c18627c0c4bbe753acc5e35ab49985	2026-09-02T00:48:32+10:00	feat: add exact GitHub release provenance preflight
+0c82cb6e4dd7bbac1d2ff19c9b1c1235a4753734	2026-09-02T01:15:50+10:00	fix: harden GitHub release provenance preflight
+13273d12820dcdd02852b9cc7926baabdb028dd0	2026-09-02T01:31:15+10:00	fix: isolate release preflight fixtures
+37cfce38477d53e3ea5b2125ebce5485167f61a9	2026-09-02T02:04:10+10:00	build(shader): add temporary raygen variant matrix
+e9763ea935ee2217056088e277b9d2d0546a3950	2026-09-02T02:14:31+10:00	fix(shader): reject invalid variant contracts
+14aebf22374c4c13b9cdc7de70ea3de9b0f6adec	2026-09-02T02:48:53+10:00	Route raygen diagnostics through helper seam
+2b22a865d0abdbac88c42ef40f1811ec74ca6479	2026-09-02T03:22:07+10:00	build(shader): specialize shipping raygen matrix
+ff9ba4005728404cf8b445af6617f56c57e93f75	2026-09-04T16:36:23+10:00	test(shader): harden raygen matrix review gates
+702e49a7de396eb6d4f1c16775477a06f4cda722	2026-09-04T17:14:37+10:00	test(shader): close raygen route ceiling gate
+f8564f5baa3b7635fbfc8c67ea2720cc7165cea9	2026-09-04T18:07:03+10:00	build(shader): freeze raygen variant artifacts
+5ee7423d4dea7370df1babc7bd58ccca2f6f3706	2026-09-04T18:15:54+10:00	fix(shader): support catalog checks in powershell 5
+46b37d3906fd65df2dc2b0828e1e5df870722f06	2026-09-04T18:21:23+10:00	fix(shader): compare catalog across powershell hosts
+c45ccb1c23bf61548f465dceb55f94c6b13e27a2	2026-09-04T18:40:19+10:00	test(shader): align manifest gate with frozen budgets
+b15c78bc1d374be4874015668c3a0e3c0c102693	2026-09-04T18:52:49+10:00	fix(shader): harden frozen catalog contracts
+a8c1c47fb0c6b4110d8e21dedad7be99af269968	2026-09-04T19:15:23+10:00	test(shader): verify frozen catalog fixtures
+17479b66288f14fc445d6e08fb031a620d50df26	2026-09-04T19:51:33+10:00	test(shader): extend raygen ctest timeout
+acea9fd8be8afc201cb2a5508b3bb44a2bcd6e33	2026-09-04T20:21:09+10:00	test(shader): bound artifact gate workload
+31904c1d077b1abdcb04ee9dca3bed571d88a3dc	2026-09-04T22:09:35+10:00	fix(shader): harden frozen catalog publication
+3d52cf0501039a425a3191e5b1921c2a294a41fa	2026-09-04T22:42:21+10:00	feat(rt): expose the selected frozen shader pair
+ac1376c89e19691e31f7c18c3abe1bd59dbdd337	2026-09-04T22:48:08+10:00	test(rt): verify frozen provider catalog authority
+f3beceffbc908b019b405552cb0e3989eaf757a8	2026-09-04T23:51:18+10:00	test(rt): harden frozen provider policy evidence
+01bb5f76ab504a307a882c4b02b359b3af6aa21c	2026-09-05T00:13:41+10:00	test(rt): bound provider policy fixtures
+fa373b5437af3d841af56ed01e1d63bca2acec9d	2026-09-05T00:52:27+10:00	feat(rt): define selected bundle resource contracts
+4a94ef24d06e9d70153968bb26f5012ee69f2601	2026-09-05T01:20:44+10:00	refactor(rt): consume the selected raygen pipeline bundle
+b0beb2d4482a166022b43205306c8711b3f40a72	2026-09-05T01:40:34+10:00	test(rt): prove final selected module containment
+9c931a275468f8564716612fce2b19165c673cc3	2026-09-05T01:48:35+10:00	build(rt): keep provider fixtures below MAX_PATH
+ec0746999902bd5cda0ebfcb1d83eb6622162bc0	2026-09-05T06:55:37+10:00	fix(rt): enforce compiled bundle preflight authority
+ad7cecef1e13860071549e3413aba9657947feff	2026-09-05T07:11:19+10:00	test(rt): validate final target container identity
+93b46e4ff959e744eef5c49f573328457233bd77	2026-09-05T07:26:44+10:00	test(rt): require Android ELF shared objects
+291352311f2ae8738f20c80658a9cd269102404a	2026-09-05T07:27:01+10:00	fix(rt): report selected pipeline pair identity
+e58d1df92730705cde0c135184d265db28ad95f7	2026-09-05T08:51:48+10:00	test(rt): execute mobile pipeline lifetime policies
+7c70d4a4f70732360d260a31fde3734884e4b44d	2026-09-05T10:05:44+10:00	feat(rt): add immutable performance evidence contracts
+4dadfb456bcbf0a5612e3828f3aad050fadea2ba	2026-09-05T14:45:28+10:00	fix(rt): harden performance evidence contracts
+33832460184f342dea612fd0b1f2309e74bd6c77	2026-09-05T15:29:36+10:00	feat(rt): add renderer observation plumbing
+4c69928df0eef46789cd5903e33312368411a913	2026-09-05T15:52:37+10:00	fix(tests): link renderer telemetry dependency
+8edb3f4a4c91c676abd3852445f66d648277b530	2026-09-05T15:59:04+10:00	docs(android): record engineering 1.6.1 phone evidence
+191d799ab7fda54fab36d9792b11f908ddaaf42d	2026-09-05T16:03:14+10:00	docs(android): clarify host and USB evidence boundaries
+b497796abcfd041ca160a9518f695e0540161e00	2026-09-11T10:40:50+10:00	docs: scope Beyond the Tomb 1.7.0 and themed UI update
+15074e6fd13f7524c7fb22ae348a2620a613d18e	2026-09-11T11:36:32+10:00	docs: pencil in 1.8 village hub and three-dungeon roadmap
+eb0b64f0b4324641a4fa5100963947f706184aad	2026-09-11T16:55:04+10:00	docs: record Galaxy S25 Ultra RayQuery-only compatibility result
+1743b0aa9a187abd270968811a58b117acaa772a	2026-09-11T17:06:47+10:00	Document post-1.6.1 music and RayQuery compatibility roadmap
+e79530fde02833abf5b19c4277f9cb2bf0a19021	2026-09-11T22:15:43+10:00	docs: record Galaxy S24 Ultra RayQuery capability evidence
+1cbe631f7feb15d1de755fc6377a64e468f3496a	2026-09-11T22:16:20+10:00	docs: add Galaxy S24 Ultra to RayQuery compatibility plan
+111bc46d24138955482981354c56d994b0e99e19	2026-09-11T22:18:52+10:00	docs: record Galaxy S24 Ultra RayQuery capability evidence
+d4af9ab7623de5df8a17ca59f83b4201d604674b	2026-09-11T22:19:38+10:00	docs: reconcile S24 evidence references
+bda1b99a62e1de883273dd21f267bcfc92bc5490	2026-09-12T05:21:07+10:00	docs(agents): scope instructions and validation to the task
+f264c4f6a2b0bf7d33299a08c9e5233b82024270	2026-09-13T02:31:04+10:00	docs(agents): reconcile lean guidance for 1.6.1
+e0143c2e556463d8fef3c830dd6f1e76a0e2d1ee	2026-09-13T02:35:01+10:00	docs(plan): add compatibility music and reporting to 1.6.1
+1acb28c4fb31d6ade5a211a0af975cee5a421d94	2026-09-13T02:47:01+10:00	docs(rt): reconcile RayQuery compatibility evidence and scope
+0d750ca18d539dd4c5045932b753decbac58ff55	2026-09-13T02:48:13+10:00	fix(rt): require acceleration-structure dependencies for ray queries
+04181325c76786f517b6f54afdf69efa26689b32	2026-09-13T02:57:03+10:00	refactor(shaders): share hardware RT frame across launchers
+380382981f0877f438213c366f77093ad173f440	2026-09-13T03:14:15+10:00	fix(tests): load shared RT frame and locate smoke assets
+4c25b87a9d6fce73306d6e26ef347aacbb37e32b	2026-09-13T03:39:01+10:00	refactor(rt): distinguish shader execution backend identities
+f443904cd6bc1d3c8ad72c0b6c92ef324621322b	2026-09-13T03:50:40+10:00	feat(telemetry): join RT frame evidence at owning completions
+98edea8467aa2a0da9078f9611942afe3d2f50e6	2026-09-13T03:52:38+10:00	docs(telemetry): record frame integration evidence and limits
+aceba50273a2735ed7cac942193bec1ae9041fe7	2026-09-13T04:05:03+10:00	feat(shaders): freeze fixed hardware RayQuery compute variants
+9b2fddb552be7151a5b97fc9d0da266f7240481c	2026-09-13T04:36:55+10:00	feat(shaders): provide and verify both compiled RT backend pairs
+1391024ab58e336972b6a58ad8ce94f5f170756b	2026-09-13T04:50:43+10:00	fix(vulkan): select RT backends from exact device requirements
+99b856575e14573cdf4600daf8b49a9f7976b428	2026-09-13T04:58:38+10:00	feat(rt): present the shared scene through hardware RayQuery compute
+b18f023b47f0bd636ed1e9f13911e5b1043669fc	2026-09-13T05:00:30+10:00	docs(rt): record dual-backend validation and remaining device gates
+33a87c6be3e91ca63a16616a0e1918a826963ed9	2026-09-13T05:07:21+10:00	docs(rt): describe preferred pipeline and hardware query launchers
+0fecabc8772027dccfbcbbe84a8c5bbb44d6ad21	2026-09-13T05:13:07+10:00	fix(reports): serialize portable JSON across numeric locales
+7a237039784950207c062a0c3e7762a5c1feedbe	2026-09-13T05:14:36+10:00	refactor(telemetry): share bounded route and window statistics
+66b04d546241f0ce9425d26a97ec5bb412e48a10	2026-09-13T05:18:03+10:00	feat(telemetry): project canonical completion-owned reports
+9fdb3a62e0d25c8b20b087e984be2f1f684bf4a7	2026-09-13T05:21:38+10:00	fix(telemetry): retain CPU admission through optional GPU failures
+f0e1ad354dad75a5674907a93df56b09be8bb84e	2026-09-13T05:23:58+10:00	feat(telemetry): hand off committed and completed frame identities
+c7eaa87c502ab8579ffe677f1ff4b18555c1ca56	2026-09-13T05:45:01+10:00	feat(telemetry): publish joined frame evidence across native reports
+7287d5797ad23f51651d550e2ece7e74d3202152	2026-09-13T06:08:33+10:00	feat(telemetry): retain exact full-route benchmark evidence
+badcd232950759ed808f56c95580c20adf849504	2026-09-20T13:52:39+10:00	feat(telemetry): report full-route completion and independent timings
+762cd350c0e08f4e21351e695c371725b2f29818	2026-09-20T13:53:45+10:00	feat(windows): export completion-owned Release benchmark runs
+cbea6b09dd0573d4c2a6b2072f73f0bf2dcb4be3	2026-09-20T14:01:47+10:00	docs(telemetry): record exact Release route and failure evidence
+f46de7aca781dd613f782889d4083557e89d247e	2026-09-20T14:02:43+10:00	feat(android): join benchmark frames through final GPU completion
+15b83aa61c5c2b0ad148c6f168e79808722cef80	2026-09-20T14:03:25+10:00	docs(android): record completed-frame benchmark build evidence
+2961ad0b81d29ac45c566595364736e49f19b518	2026-09-20T14:21:12+10:00	feat(benchmark): correlate native reports with explicit run IDs
+e85616115d4520560c21d0c83fccc49f91eeafba	2026-09-20T14:21:56+10:00	feat(android): automate Release benchmark export with run identity guards
+e451f97787f8ab45b558c94aa8ab62412975b2e5	2026-09-20T14:27:14+10:00	docs(android): document Release benchmark automation and evidence limits
+62ed1f13e815699ccb7551e1b83fc4220135dcfb	2026-09-20T14:36:16+10:00	fix(build): preserve frozen pipeline catalog checkout bytes
+fabdcdc810956d0f3784e7430c237d7825a6a126	2026-09-20T14:51:37+10:00	docs(perf): record clean Windows route evidence and lantern coverage gap
+a8505c3be23ef72ee64194cb331aa8412b57f3d4	2026-09-20T15:00:46+10:00	build(android): add isolated Shipping benchmark validation APK
+6335049c905723262d6ad1ab688b2260381951af	2026-09-20T15:10:32+10:00	feat(benchmark): add deterministic production lantern workloads
+efb04d16e2d4cd766c23df5f18b97578aa558e7d	2026-09-20T15:10:33+10:00	feat(windows): run explicit Shipping lantern benchmark cases
+7ccb753ec27b43766afe21b07f1695751b4a6d01	2026-09-20T15:12:53+10:00	feat(android): automate allowlisted production lantern benchmarks
+2cbad44e73f424e743932f756cf8b92a2e545c0a	2026-09-20T15:20:37+10:00	fix(android): refresh progress for stationary lantern benchmarks
+6576950e9b9b3a4dcce4af4d5b41533098bf00f5	2026-09-20T15:49:43+10:00	fix(android): restore gameplay after benchmark surface cancellation
+89b20bfcd9709e26a83e30c78bee0b57b8ef3628	2026-09-20T15:58:02+10:00	docs(validation): record exact lantern workloads, parity and phone lifecycle evidence
+167ce8b09374bd522d7e8b2493693bc50c00931c	2026-09-20T16:11:38+10:00	docs(recovery): preserve benchmark evidence and quota pause handoff
+5a0d86b80f9c4adf4f6dfee18ba1eaf65f65a71c	2026-09-20T16:47:11+10:00	docs(perf): record exact warmed Android route comparison and recovery evidence
+72660494ecca9320fef963b7d0396b6f47ba87a7	2026-09-20T16:47:42+10:00	chore(evidence): recognize preserved CRLF report line endings
+c5caec567096ed5a5941dae59c5b4004c3a8bfd9	2026-09-20T17:33:28+10:00	docs(perf): close observation gate with exact held-lantern A/B evidence
+4063f90823b470419ba601e7ce7be4c836861fce	2026-09-20T17:49:08+10:00	Define typed four-way player primitive contract
+d26f1c947cb96ae35c68ee2181a9d6912bcfc8e7	2026-09-20T17:55:36+10:00	Enforce player semantics across manifests and asset loading
+ef8fdc088ac9e1a7c9b5a81e20d5f42811a48e28	2026-09-20T18:00:25+10:00	Route player texture groups independently of material order
+81908e13e78beac51192bd8f2f00ba76c3f27575	2026-09-20T18:10:06+10:00	Test actual skinned player semantic rejection and reordering
+614a0e2daea00f4eec3ce02792cbc1af3317ec5c	2026-09-20T18:11:55+10:00	Record repeatable single-thread player regeneration evidence
+cb3a29e7f0cd6e8a8efdb08de419e7e884fdb1e2	2026-09-20T18:13:07+10:00	Checkpoint engineering handoff at requested usage pause
+f9eb5149a468a52070011108c0eb7586eb80a365	2026-09-20T18:32:47+10:00	Preserve latest steering and remove explicit-resume restriction
+d3a7225f24bb265ede6074cfe8e698ebefdab1ee	2026-09-20T18:37:46+10:00	Merge main documentation while preserving accepted 1.6.1 scope
+cd8614bf83404bd342b9f84fb434254d39d58e1e	2026-09-20T18:38:59+10:00	ci: validate engineering pushes and actual skinned player contracts
+c46e255b4e8b055f6bdc16c7ca5cb200e245725a	2026-09-20T18:49:32+10:00	test: reconcile RT Lab pause assertion with current UI helper
+adc4579763abe474a08cf8aa9172e0d622579a34	2026-09-20T18:50:48+10:00	Validate static and skinned player addressing before GPU upload
+f2168f7d457464ad71f03542efce1cd8a5e684e8	2026-09-23T07:29:00+10:00	docs: close current-source CI recovery with fresh green runs
+56cd5397b981355e0bdacebc0a94480d4de60611	2026-09-23T07:29:02+10:00	Admit reproducible player runtime after native RT image parity
+04c1845a1aea787331523e48027f2e78ba0d73d2	2026-09-23T07:34:39+10:00	docs: close Phase 2 technical gates and advance to viewmodel work
+64049763895c30d6c3e7711498e5bd00dd823f0b	2026-09-23T07:51:36+10:00	feat: define explicit arms-only player asset contract
+6a93eb7a33d2467292a4ec07d51be330014f2369	2026-09-23T07:58:28+10:00	feat: derive and validate reproducible modelled viewmodel geometry
+fff46495dd33019bf89b486d8342a0c08a3e6f5c	2026-09-23T08:07:59+10:00	refactor: share validated player pose across independent meshes
+051fcde00aa3084164f17a99b2c75aa1581b4fe8	2026-09-23T08:17:37+10:00	feat: share named texture domains across independent RT meshes
+34b27b4892c4adf585769f24045145e30b8c894a	2026-09-23T09:25:05+10:00	test: derive stale shader hash fixture from current catalog
+d8b1b7fce4c41c5d86beba1de1a8d9626f6ad299	2026-09-23T09:27:11+10:00	feat: isolate native RT world-body and viewmodel geometry
+6b219832514b3e36bda3792ad6639119894675c2	2026-09-23T09:47:30+10:00	test: reconcile viewmodel shader and checkpoint validation
+8277df2549ff81e62f735a810ce0039e1198117e	2026-09-23T09:51:57+10:00	docs: record green native viewmodel integration checkpoint
+52b0cb91dd0470b9f09b114fecfcd253901e7417	2026-09-23T10:38:28+10:00	test: capture exact posed viewmodel geometry for diagnosis
+f584be2f7fa10f6b7f8f970054152fe5d7eae579	2026-09-23T10:38:40+10:00	test: preserve isolated grip-roll and sleeve-weight investigation
+6da83ac2fdcea57b298152a1fa9d5a9b97ce73df	2026-09-23T10:57:54+10:00	test: retain exact viewmodel instance frame in geometry captures
+c27aa3a87bdf3afa706e436cdbcea4e67c134a21	2026-09-23T10:58:16+10:00	test: stabilize candidate elbow weights and localize scene panels
+a1164a095c607b9f18f4b0a1d15c37a15a8ac044	2026-09-23T11:24:46+10:00	fix: export explicit gauntlet chirality with matching mirrored UVs
+b352599309c7203368d439b5096541b92766ffdb	2026-09-23T11:24:50+10:00	test: retain corrected hand evidence and run mirror regressions in CI
+9dd5a3753d19c4e3c0ddf962544b758d0881701b	2026-09-23T11:59:14+10:00	test: retain corrected-hand sleeve fitting investigation
+921a3bae9bab5be26a1d3cb366a8fa5cc4f41b6e	2026-09-23T12:02:17+10:00	test: resolve Android APKs from Gradle artifact listings
+ed78452567682563e071cc117870eb6e00c57da5	2026-09-23T12:04:18+10:00	test: isolate Android modelled viewmodel candidate builds
+67a3ea198f66f615b7eeb1de09e7b9c227048a76	2026-09-23T12:07:56+10:00	docs: record green isolated viewmodel candidate checkpoint
+6f282bb1c3a2aaab784f24ccf177de2b81a5b751	2026-09-23T12:29:10+10:00	test: inspect native viewmodel poses in portrait captures
+7907e054168a07dd0c65f2bdc12e5c4ca875080f	2026-09-23T13:06:56+10:00	asset: add bounded sleeve closure with preserved source normals
+362fc27ab2770894cb0cb58984978c30e0a6c66d	2026-09-23T13:18:06+10:00	fix: reject intersecting sleeve closure candidates
+69014cf5ca269a40b072f2f26968843a567b4378	2026-09-23T16:31:35+10:00	fix: preserve signed elbow projection with independent skinning control
+c7bb1c1062a19f3ae6d63f4adc52f3f6210701dd	2026-09-23T16:36:54+10:00	test: align phone arm captures with authoritative attack staging
+643ba914d9006ff3389c1a50f5595a96b90f3c0c	2026-09-23T16:50:00+10:00	docs: record exact-phone signed IK regression evidence
+ed6e4bb8773f5822be0a14e33dea01e4267787ea	2026-09-27T07:07:35+10:00	fix(android): default RT rendering to 75 percent
+bf0334b0adbfd24ba5eb071161953dc3525ea7c8	2026-09-27T07:26:32+10:00	fix(animation): keep sword cuts clear of the carried lantern
+e706f618909723a964bff539081de11f29196bd3	2026-09-27T07:33:57+10:00	fix(animation): reserve elbow compliance for lantern carry
+54493cfbc1906e4926ca0bef559363ddb2ac0e74	2026-09-27T07:37:55+10:00	feat(assets): add bounded grip-anchored gauntlet sizing
+0e10da8404ba8a9d2109ca53437d2d9305f65ddd	2026-09-27T07:55:14+10:00	docs: preserve live phone arm evidence and lighting follow-up
+178b33220dc47dad6570f94954806c849bfaef62	2026-09-27T08:12:34+10:00	fix(rt): remove unoccluded local-light colour floor
+11bdf481997ec6d9fd41df24651a6533b3dcc7b6	2026-09-27T08:18:13+10:00	adjust(assets): reduce reward lantern presentation by 12 percent
+b4b5c82cc02a65658d71f0fbe0fe5893a04e1ae1	2026-09-27T08:40:42+10:00	test: capture combined lantern parry and pitch poses
+f227b6453487ccd1caf34972a163f58e954ddc10	2026-09-27T08:45:42+10:00	fix(animation): keep lantern parry clear of the left arm
+e584ba5b5ae2864b417694d434b00d1067927c0d	2026-09-27T09:12:44+10:00	test(android): retain owner-feedback parry candidate evidence
+acc73b9cb7f4d41035a0302eb224d69144119bad	2026-09-27T09:33:38+10:00	test(player): capture paired world-body pose and expose cloth seam gaps
+363bc72ba0d2f373869f8d9177bb0c8d554eca25	2026-09-27T10:03:14+10:00	fix(assets): reconcile exact player cloth seam weights in paired candidates
+01a65002f5acae8386f966ee1a16692148fa2ece	2026-09-27T10:44:01+10:00	Add opt-in disjoint body-remainder RT ownership
+53c786aa19138ce99beb8184199d7e39c820f4a1	2026-09-27T10:44:04+10:00	Validate and stage paired candidate world manifests on Android
+c339b6b24b098b232522e34765fa4e60285e8801	2026-09-27T10:49:32+10:00	Record native body mounting and fixed-grip reach constraint
+30e2679c95212800631c902bf01051aaba2737dc	2026-09-27T10:52:09+10:00	Retain uninstalled body candidate Android build evidence
+259bd26952867a3341b08a8a459dda4ff9b0a21e	2026-09-27T11:23:57+10:00	Add opt-in shared anatomical body and held-pose mounting
+66f1149225c3cbb7547d2f7ad4c5cf2e5b2d52af	2026-09-27T11:32:38+10:00	Record S26 anatomical candidate validation and owner feedback
+9d8432e3bb174e013ad6acec7af2cc3cac142076	2026-09-27T12:08:14+10:00	Separate anatomical camera look from bounded held poses
+11ca3836ef3f6a87bce79daaa1af98abc5a0d028	2026-09-27T12:10:14+10:00	Keep one exact copy of deep-look validation logs
+bda5c2c15fbb637b0cd0129b1aea2b118f53666a	2026-09-27T12:28:25+10:00	Retain upper torso cloth without exposing the head mask
+35ba2f9d5a56911961665964d21f866ecfd87578	2026-09-27T12:55:12+10:00	Restore normal gameplay look as the player acceptance boundary
+95792de8beb3704e7343a278af5493a5a6059f28	2026-09-27T13:03:01+10:00	Record exact S26 normal-range capture and live-motion evidence
+cc9b898186d31ed3c998d606c0cc60997855c745	2026-09-27T13:31:41+10:00	docs: record owner acceptance of normal-range wrist seam
+6dd9c1f37cf1a9546fc36fd0fd9a657864b656ca	2026-09-27T13:49:03+10:00	fix(assets): reconcile segmented player cloth boundaries
+d23e95dc7ef1a1c5dbb41bcf2d2a93eb139e7f7f	2026-09-27T13:55:13+10:00	test(android): retain exact segmented-seam phone evidence
+8cd7cc8deb26f450e6749191995327d5f47dd707	2026-09-27T13:58:04+10:00	docs: record owner acceptance of repaired armpit seam
+7f59480e447532d7790596fb990218fe8225d020	2026-09-27T14:05:40+10:00	docs: accept player visuals and defer directional locomotion
+ad023f3da85b6a5a6a2200fd843a762eba700556	2026-09-27T14:13:22+10:00	build(player): prepare reproducible modelled asset admission and packaging
+7f35e2fa954b5414efd3075bbcaf1e9d8c4551e6	2026-09-27T15:12:02+10:00	Promote accepted modelled player to the native RT production route
+d7b24fbba381ae59d9dfa66498dabac45919a704	2026-09-27T15:16:44+10:00	Fetch viewmodel runtime for portable CI manifest validation
+5935db9b273e8683748005bfea4ddc626cafedf7	2026-09-27T15:22:14+10:00	Distinguish isolated glass inspection from gameplay ownership in Android gates
+bbb00f0ecbe611c29a9df21563e9fd367e40c656	2026-09-30T06:34:04+10:00	test(android): align glass capture zones and allow test-only debug APKs
+3b9232963f966a5429d22d0c7de71d3a893b55e5	2026-09-30T06:43:27+10:00	fix(rt): preserve near-corner dielectric exits with independent ray minimum
+632322d7a5e1901c732d6d012adaeaa936737d6c	2026-09-30T06:59:53+10:00	fix(vulkan): suppress repeated transparent ray-query candidates
+f707bc4d2015d6a94c7c285316ff1a2805c64f40	2026-09-30T07:54:42+10:00	docs: isolate remaining glass recovery paths on exact RT devices
+cbc135ffb7b98167a20a40a72b3e39b96cf36d34	2026-09-30T08:25:03+10:00	fix: reconstruct dielectric hits on the triangle surface
+aaf973a44e2261bd284c91970f47447afbf365ff	2026-09-30T09:38:44+10:00	fix: integrate glass shadow absorption over geometric segments
+fec73b88f22c9223ca7075cb5cf76f5cdcdd8d37	2026-09-30T10:10:22+10:00	fix: retain owning glass counters in live benchmark rows
+b4ad2783a10980b09f1435e1fb48d48073fc55cd	2026-09-30T11:13:40+10:00	test: retain exact live dielectric continuation witnesses
+c4169ac3491861f686f275d1327b63789f4654b2	2026-09-30T12:51:14+10:00	test: actually forge Diagnostic descriptor binding roster
+d504bfed51976e71e496ead81dbd284bec03da33	2026-09-30T13:30:26+10:00	fix: guard rectangular dielectric continuation spawns
+c604e899f06fb37872a68fbc9599facf1ae72ed8	2026-09-30T13:54:12+10:00	test: isolate remaining live glass row 237 on RTX
+4b6149e14a19bff6bb5ace813a1355712aeaaf98	2026-09-30T13:56:03+10:00	docs: retain plain CI test evidence lines
+3140aca9ae528df65766bda6f63a2bfe28ba742d	2026-09-30T13:57:50+10:00	docs: record active goal and phone availability boundary
+d63e29c7f119a180ce2a6504831d501e8ba0a95e	2026-09-30T15:12:04+10:00	fix(rt): derive bounded per-hit glass normal separation
+25a379c60264e367f8bfe1db60b03915731f5d98	2026-09-30T15:16:07+10:00	docs(rt): retain per-hit glass separation evidence and open gates
+8cbe0ac44d4fb3a168ca891985ca560b43fe4541	2026-09-30T16:13:11+10:00	docs(rt): retain S26 live glass and backend corner witnesses
+8fbd46cd53e0382ce415a42a543869501a9b8781	2026-09-30T17:12:34+10:00	fix(telemetry): retain owning benchmark shader strategy
+eafbf8262442a82e0835edf5cf5306d718e64633	2026-09-30T17:13:13+10:00	docs(rt): prioritize phone Shipping and opening-room evidence
+18616f4fdab2da24e822c999006f39f6cff258eb	2026-09-30T17:36:14+10:00	docs(benchmark): queue live FPS counter after current measurements
+7a095c7836058f2129f1c3b08b1e8482671cbc72	2026-09-30T18:31:28+10:00	docs(perf): retain phone Shipping ABBA and opening GPU attribution
+3e5bd64a6eff533f6255cd48e18b694a9bba8bfb	2026-09-30T19:30:15+10:00	docs(perf): isolate opening fire costs and cooling boundary
+e12aabe1f3b7d42b60e3faa9d49c29148d15ac66	2026-09-30T20:05:38+10:00	rt: end binary visibility at confirmed opaque blockers
+f77dc4d3dba30b19aa6c65f9cca57364135e86f7	2026-09-30T21:25:43+10:00	rt: restore control traversal after unaccepted phone trial
+20c13c46747f3bc8cf31891e602ca51e310a61d6	2026-09-30T21:25:44+10:00	test: stage compute conformance outside the checkout
+f50c32fe2f9b5de8347f40b0c18399fe32b3a52f	2026-09-30T21:26:12+10:00	docs(perf): retain uncooled first-blocker trial and restoration
+34242f855785d2be4f30d233ec1fbe475cc3fb91	2026-09-30T21:44:18+10:00	docs(perf): quantify Mobile RT frame budget and candidate bounds
+492eeee6c90d966a2ddaebb0bd877bbcd298d32a	2026-09-30T22:10:06+10:00	docs(rt): retain Mobile-dielectric RTX subset evidence
+ca57e55933ffdf17ae954a08a3ae96acd9c58994	2026-09-30T22:23:16+10:00	audio: resolve adaptive score from shared gameplay state
+b56d1bfb3eccbac31550a8b0960e706f9d061455	2026-09-30T23:27:58+10:00	docs(perf): retain whole-strategy opening mismatch evidence
+88a1546b683626c59edc8b8f68ffcd3826704cbd	2026-09-30T23:51:28+10:00	docs(perf): retain completed whole-strategy Shipping comparison
+452d4ff0ded88ec4910f6dae7f6a417def72017d	2026-10-01T00:26:00+10:00	docs(audio): retain owner-authorised score rendering prototypes
+113200ee67445b4869d012ad1d11fbb15c42a301	2026-10-01T01:24:26+10:00	docs(perf): retain exact OpaqueFast compiler investigation
+54057689872102f1bd2c2735f8b127a1e3686d29	2026-10-01T02:20:21+10:00	perf(android): preserve RT scene during render-scale resize
+b74559cf77248b8bcc9c46c9c002d898d920a91c	2026-10-01T02:24:13+10:00	ci: cover RT output ownership in Vulkan host lane
+71cb366c5cbe5cf6fe338c4cd6fd7bec0bd12d95	2026-10-01T02:58:12+10:00	docs: retain exact-phone output resize evidence
+571141bd92b1ff4f90df4b59091bcdd43be4617e	2026-10-01T04:12:28+10:00	ci: validate portable host code with GCC Clang and MSVC
+20c2a0471a1e161e01f583389a09268abad199bc	2026-10-01T04:25:37+10:00	docs: prove isolated lantern failures are real fifth interfaces
+9623d5bbbf7e47b4b776de8177d7fdc66648adcf	2026-10-01T04:39:50+10:00	test: share oversubscribed CPUs in mailbox stress fixture
+37e0882e453f21d89a41c2855ab86d684ebea0a3	2026-10-01T05:10:07+10:00	docs: retain matched direct-visibility cost bounds on S26
+36183272e63a283e478d986a676c389ecea3cf64	2026-10-01T06:33:38+10:00	docs: bound native primary-hit cost with matched S26 evidence
+4870532638e3ca4b6fd89735bdf292c7bba16713	2026-10-01T06:41:21+10:00	feat: add bounded PCM music cursor and tail mixing
+baa8bfecba25de509e25803e3b4f231c54834745	2026-10-01T07:33:59+10:00	docs: preserve Core migration and phone profile handoff
+5dbb7dfdecd62f32c78f449edd92e31dc8110a25	2026-10-01T08:15:52+10:00	refactor: reuse pinned Pocket Audio Core for native music PCM
+0db0d0b2b47e6c208911dab8b8129793ed7918cc	2026-10-01T08:25:27+10:00	docs: preserve exact secondary-profile evidence and gate state
+199697bf52b811e7f45ab18476093485166feff0	2026-10-01T09:02:59+10:00	feat: admit hash-checked Horde music runtime assets
+c122e4a22d3e66d0e85cc30d615da337ff538631	2026-10-01T09:22:43+10:00	feat: load immutable music bank through Pocket Audio Core
+638528899805eb4303aaef4dbd2247480258f236	2026-10-01T09:58:14+10:00	feat: drive Core music from copied gameplay and sample boundaries
+84f111e8d86dc2e201c766f0f6da8bc45169b7d2	2026-10-01T10:20:36+10:00	feat: stream Core-backed music through native Windows audio
+884dc8b1b3001384bd9222f48fb86daad77538d0	2026-10-01T10:37:13+10:00	feat: stream Core-backed music through Android AudioTrack
+2cb19ded8dc608b8e6e93a479d4429f7985e561d	2026-10-01T10:57:45+10:00	feat: show bounded live benchmark render-loop FPS
+7ab8607e3f3297444dc17fcac9344b29b8d8ccce	2026-10-01T10:59:42+10:00	feat: define consent-bounded player report preparation contract
+783f1be06c4631101f05b4eb175cf095973ad9b7	2026-10-01T11:51:33+10:00	test(android): add bounded RAM profiling sidecar with honest counter gaps
+0c84e40156bf00b7940ce80ddc24d4c0ac229d07	2026-10-01T12:12:58+10:00	feat(rt): add isolated lossless staged-primary investigation
+ee05ea0ad1ac1673d9051cd0fd024b1bd0cc7144	2026-10-01T12:13:09+10:00	ci(rt): exercise staged resource ownership in focused host lane
+59cb0576790cdb47d529746ab3d2d30ac34462fb	2026-10-01T12:51:42+10:00	feat(rt): add opt-in submission-owned staged pass profiling
+8fb1da494069c695127c714d2246321a14d8de8b	2026-10-01T13:24:23+10:00	test(android): admit isolated staged diagnostic captures
+3499eeab8dcb5402fb33d51d08ee3fbb0a293961	2026-10-01T14:03:58+10:00	test(android): preserve failed staged image admission and preflight captures
+02fed662fa9a15a88daa5df1eaf76d0f985a18bc	2026-10-01T14:14:25+10:00	docs(rt): record stable controls and staged phone admission no-go
+a1c90bb877eb2689cdccd43dd50ee2c84647866d	2026-10-01T15:29:29+10:00	audio: preserve dark-fantasy instrumentation auditions for owner choice
+97f07e2a5791346f2b4563221909a87ab5948086	2026-10-01T16:17:15+10:00	audio: admit owner-selected whistle-lead music bank
+9f4f439e40a9477efe0bac42ee41b74de64b3b1b	2026-10-01T17:26:04+10:00	fix(android): respect native music buffer capacity
+4f87844be4cd4940109fabc985db0bc769ffcc34	2026-10-01T18:05:21+10:00	test(packaging): reject LFS pointers in runtime assets
+1da483d01124ca673badf6c13939d99736c4a658	2026-10-01T18:09:58+10:00	feat(rt): defer lantern panes in Mobile quality profile
+ccb0ac9020cc3efd0c633585061cf07e8a787116	2026-10-01T18:54:46+10:00	test(rt): retain matched Mobile lantern profile evidence
+6d29d8bfe0464e803b02cde1f5b1dde151b6cdbf	2026-10-01T19:05:48+10:00	docs(rt): preserve complete phone matrix and S24 handback
+0ff58606ed6499d73b2f0ccbf035f22f51e99870	2026-10-01T19:28:06+10:00	docs(rt): interpret phone pane-profile matrix and S26 containment
+cc3c077874b4465c883de43370b8093d366d7259	2026-10-01T20:10:09+10:00	test(android): retain live lantern and music-clock evidence
+3e0f9be2f8b67fcf3f432d750fb761882c46a560	2026-10-01T20:38:13+10:00	feat(reporting): validate native Unicode and preserve reproduction steps
+69afe4e2b9c3499061fa285529d96dd01bd75766	2026-10-01T21:09:09+10:00	feat(reporting): add explicit-consent native local report exports
+ca58f0956637f9063fe1cda42989ad5f74daa47d	2026-10-01T21:12:33+10:00	test(reporting): retain native forms and exact S26 export evidence
+dfaf3f387a1c1204e97089e16a2dc4b0991bb3a6	2026-10-01T21:31:30+10:00	docs(reporting): retain green integration CI and bounded Windows picker gap
+8c65afa694067e56b09ccb09c427fffd0b5ee570	2026-10-01T21:49:18+10:00	test(reporting): retain settled Windows picker gap
+6fa1c53d1f0e4ec3938983f2cad7bd2ece233f4a	2026-10-01T22:11:35+10:00	docs: bound final mobile performance trials and renewed S24 checks
+1e20f4384d0edea8786054d07a8627e8258a910f	2026-10-01T22:34:09+10:00	test(android): confirm S24 missing hands on current native RT candidate
+8452ae31cf985c9aaa1e98d7f7acff43365ef7e2	2026-10-01T23:01:01+10:00	test(rt): retain primary-opacity image admission and S24 containment
+d44a671e3ea2cd7bec82384f2e1f6b996b93cc89	2026-10-01T23:29:47+10:00	test(android): retain bounded primary-opacity no-go measurements
+982ff9aa321872baf5ea55f13ac7cebcc1ef78f5	2026-10-01T23:33:03+10:00	docs: record normal source restoration after opacity trial
+0cf4f059b354e544c89d3901455dd355130fc4d2	2026-10-01T23:53:46+10:00	test: wait for initialized Windows report form
+6ec30f0fd29764d60e8ae6bae1cb0440b208570a	2026-10-02T00:47:06+10:00	docs: retain bounded S24 TLAS visibility evidence and current CI
+9f4042f00cfd6227fb1418b92e7f3b1b5ce3e4c4	2026-10-02T01:00:35+10:00	fix: rebuild TLAS on instance-definition changes with submit-owned state
+46afd732e3762bb1aa34865aef750168b0fabc85	2026-10-02T01:20:55+10:00	docs: retain bounded TLAS refresh device and RTX admission evidence
+5942e9405f3dc0ef8bfe0584ad7e71889a74e9d2	2026-10-02T01:39:43+10:00	docs: close TLAS refresh source CI gate and retain High regression checks
+ef812d060509dd7e9f959aaeaf38aee2682e9504	2026-10-02T02:06:40+10:00	fix: gate Android music playback on lifecycle-owned audio focus
+3cf25b3c6b0a1217147bea401cec10ab32801046	2026-10-02T02:26:00+10:00	ci: validate Android native builds and playback contracts on branch pushes
+687dda931a0a9f8d66309157902f8cfd3bdec5c9	2026-10-02T02:29:37+10:00	docs: retain exact Android music focus and lifecycle admission evidence
+bdac9655efc2a6ec0abea4141ad11bab129de04e	2026-10-02T02:31:52+10:00	ci: resolve the pinned Android SDK manager outside runner PATH
+eb3f69b7363b9dc87329f15dc18868dd1a43464d	2026-10-02T02:53:32+10:00	docs: admit current Android lane and music focus integration CI
+a32a718b61bef0edb002b3cab8de739c82bd838f	2026-10-02T02:59:50+10:00	docs: narrow backend pixel evidence and distinguish High glass gates
+ccb61cc8723a6d674d5266297df2874e9643f332	2026-10-02T03:33:50+10:00	docs: retain current High edge failure and unadmitted precision evidence
+4afe39f38df0ede61cdac0dcca2335c0e5d1a371	2026-10-02T03:54:23+10:00	docs: preserve rejected native precision trial and current CI
+cf156c2667834f0948d96f3a985d13441ff8033a	2026-10-02T05:01:24+10:00	feat: add consented report submission and bounded HTTPS owner
+046fa3e8a096ba3ff4c92fd10277dfb2febb6a6c	2026-10-02T05:28:46+10:00	fix: allocate capture pixels before acquiring Vulkan readback
+33cb7c4cb4e7fcfb46117ded430885b99d61376d	2026-10-02T05:37:21+10:00	feat: capture bounded consented game RT report images
+ed43e305867a39c74d428dece9f40b420cd5ac16	2026-10-02T05:53:45+10:00	feat: add foreground Android report verification and submission
+301105f595bcb33ffc87968a90c0f2673247da74	2026-10-02T05:53:46+10:00	ci: require Android reporting contract suites
+dfa0735405422bb7746214db12af68a7eea998c8	2026-10-02T06:21:02+10:00	Pin native WebView2 SDK for foreground report verification
+68bf472e5ab3d86f0d203c5d24457691c25d79f7	2026-10-02T06:22:56+10:00	Add bounded Windows report transport and PNG attachments
+5d335d67fb9075ee69841b89ad5a60417654f58b	2026-10-02T06:31:44+10:00	Isolate Windows report verification in private bounded WebView
+52d3ed2001021e01d5017e6b845059c57275ad2c	2026-10-02T06:33:13+10:00	Preserve report SDK manifest pin across Windows checkouts
+f2b73c3547568ed596b1f007fd087ed79a8b2b7a	2026-10-02T06:38:29+10:00	Validate Windows report PNG against retained native RT fixture
+4cf9151142be1389a4b74aada637df15c068f583	2026-10-02T06:51:32+10:00	Diagnose native report verification without retaining tokens
+5d1dd848819c0c9af18a73bba614ca746c5dde65	2026-10-02T07:12:11+10:00	fix(reporting): admit local Turnstile child documents only
+d6d187ee60173a5f29eae1e8acbb1ebea08f4439	2026-10-02T07:23:06+10:00	Add consented remote-first Windows playtest reporting
+4d0dad7fec0e7f1aa4ea211be6d85335b03ea7c1	2026-10-02T07:25:02+10:00	Add guarded single-fixture report relay acceptance tool
+23ac884c13e7261f63a103c64be90d517a26ab4d	2026-10-02T07:28:34+10:00	Permit exact Turnstile child documents in Android verification
+03a6870f66dd9cb4bab62d2f521f4fd663368678	2026-10-02T07:31:31+10:00	Record accepted reporting delivery and integrated platform checks
+70e13bd92adfff9632ac5264e5b2df7227b72e0d	2026-10-02T08:03:18+10:00	test(rt): preserve outside-origin dielectric corner witness
+970b520a05f6b9dca68219402b43c70a937bf15f	2026-10-02T08:27:04+10:00	Record corner regression and localized backend shading evidence
+fe28d1a4ed25f7f232ecb140bc3bb1883076d78e	2026-10-02T08:43:09+10:00	Record isolated world-box correction, exact CI and next numerical gate
+2be7f5f78dcde64013179bfb400659d0ac54ee6e	2026-10-02T09:08:08+10:00	Preserve isolated light-region evidence and exact next reflection gate
+d9be81e77493d7e5c9af01604f865d0d3ef11e48	2026-10-02T09:47:26+10:00	Preserve ordered UV parity evidence and clean-admission handoff
+e8552a3a8aa0926536a4514035a27075c8b3c18b	2026-10-02T10:33:35+10:00	docs: preserve clean RTX admission and pre-existing High parity failures
+081b77a08082a5d8ad6daac09af88cf804f49a95	2026-10-02T10:45:09+10:00	docs: retain clean Shipping parity and bounded High edge next step
+23651564000d4d185e4e7da08c98cb0e2c48fb0b	2026-10-02T11:09:49+10:00	docs(rt): checkpoint demonstrated High glass-floor contact divergence
+1f684a8f4f912d11a947827273d91b1a5bd5f66f	2026-10-02T11:24:36+10:00	test(rt): retain glass exit and opaque floor in contact reference
+9d8849660cc8d578c6b9ee2ba00c79f222f13497	2026-10-02T11:42:49+10:00	docs(rt): record verified native contact candidates and next gate
+441a8f581e191193978325f4feb8e364ed399dcc	2026-10-02T12:11:26+10:00	test(rt): qualify authored axis contact without rounded-distance tolerances
+bb2b87817ee0e6e508d013af12031c860f2a10fd	2026-10-02T12:17:55+10:00	docs(rt): retain contact qualification proof and next geometry gate
+3d84e5489bd36b9a2f94cbf587a9d825299af7b5	2026-10-02T12:22:12+10:00	docs(rt): record green current-source contact qualification CI
+d1ab5dfd50b34be6f86c2fe7a244959547b46663	2026-10-02T13:01:00+10:00	docs(rt): preserve isolated world-plane compatibility evidence and remaining gates
+4ee22869df06e87229e2cc31fe8bce63c4bf8e56	2026-10-02T14:05:10+10:00	Formalise opposed native contact and conservative blocker tie contracts
+16a046f6040096c1bc23fc79a19a929c93d07a90	2026-10-02T14:06:26+10:00	Preserve native contact result and exact next glass gate
+3be703498458352fcd6bf18193352825dbba0a7c	2026-10-02T14:37:55+10:00	test(rt): integrate source-world corner regression evidence
+9dbba7806d826589d2aabb618ac5c2b78eab8ce7	2026-10-02T15:12:43+10:00	test(rt): preserve valid edge touches in primary guard investigation
+e209f928a26fb44e4502d89299b89e149ea7d389	2026-10-02T15:16:04+10:00	test(rt): close bounded relative-world footprint feasibility check
+8299c55ebc8df0146cb085c395944a513dcbbafe	2026-10-02T15:17:56+10:00	docs(rt): record bounded primary-filter no-go integration
+5ea481d1b891d57a3d951485bbe781b454f0719b	2026-10-02T15:31:59+10:00	docs(rt): preserve observer-free contact admission evidence
+516abf4c49455cb8299af4a2e58144bd0d1c006c	2026-10-02T15:50:43+10:00	docs(android): admit S26 report preparation and ready-state lifecycle
+18109e34e083a96a224a60b850b6d9e0e1ab08bb	2026-10-02T15:55:39+10:00	docs(benchmark): verify S26 live FPS display cancel and reset
+75d0b4c9939d6b87a66f144631d1ff6499ccd33b	2026-10-02T16:14:04+10:00	docs(1.6.1): prioritize release and gameplay gates over pixel parity
+d2682a57b64f779ca4b2a7fa41754899f1bf3920	2026-10-02T16:21:48+10:00	docs(1.6.1): record owner audio and S24 screenshot acceptance
+00af842e942940eb0726dbbf698a14e8c1cc73ab	2026-10-02T16:40:09+10:00	fix(rt): align production world-box normals with outward winding
+d6efcd2d44541d32960f9df741f184abcf11e815	2026-10-02T17:21:06+10:00	test(android): verify world-box normals on the S26 route
+383a596a58bc7b2d5615ca5dfeef0028cba17f96	2026-10-02T17:28:10+10:00	test(reporting): record S26 delivery and native resume ANR
+242e573552fde43c8879fb968d1841aab7788ada	2026-10-02T18:24:26+10:00	fix(android): serialize cancellable surface startup off the UI thread
+de334209435b267685cae7b44878792fabd8e584	2026-10-02T18:38:49+10:00	test(android): close surface-owner route and retain integration checkpoint
+5fc5545d821e2b3e394833f1fe5b3f92fb87c19a	2026-10-02T18:59:56+10:00	test(shaders): canonicalize pinned text without weakening byte mutation checks
+22d6633147ed4ba735e7c82ab2111bdd3fd62d94	2026-10-02T19:14:30+10:00	fix(reporting): observe dielectric quality from the selected scene bundle
+6c55cdb1bd79332c139ac44d81d69542d6ca3d3e	2026-10-02T19:18:35+10:00	test(reporting): record owner acceptance of the Windows prepared report
+4e5304a12946c6e58dc9a82044975c264c912ad4	2026-10-02T19:18:36+10:00	test(integration): retain repaired host rows and current artifact evidence
+e39ac0a5368e4a4c8ae62aec811efd4e6f952676	2026-10-02T19:30:35+10:00	fix(packaging): handle empty music reparse-point results under strict mode
+7e8a8ac187f6145b3cf86f5cc365ac46032c23ce	2026-10-02T20:27:37+10:00	docs(validation): retain final package and Shipping containment results
+2bb88aa8bfe7ce90122179ce80ff0b0a4ad7b2e8	2026-10-02T20:39:43+10:00	fix(assets): add guarded anatomical right cuff fitting
+8b4433eff03b154ffcf8030a8e5fb39d8328f0a7	2026-10-02T20:49:28+10:00	fix(player): integrate owner-accepted right cuff alignment
+b8d2a605b3a5f16934590ddcc3c60ecfe1e6c63c	2026-10-02T21:08:39+10:00	feat(audio): add independent SFX volume and quieter player footsteps
+90b3d3a736949a3dba5f6e95c72da9657243485f	2026-10-02T21:14:02+10:00	test(audio): cover suspended startup and observe Windows music gates
+5e20f109b20ff9613a7ed5bdce323d13cae2ddb3	2026-10-02T21:34:39+10:00	fix(audio): prevent stale Windows focus gate from muting startup music
+3281bce66eca18651acc75e5de1d3ce28d214dea	2026-10-02T21:45:19+10:00	docs(audio): close accepted Windows focus and SFX gates
+172cbb93c8e7a03e66a09520c7c4aaedb03c6d9f	2026-10-02T22:07:46+10:00	fix(windows): identify benchmark cancellations and retain Shipping backend proof
+c8cb355d06f8fd74e809d6756c5533ae2ca3a8a4	2026-10-02T22:24:22+10:00	test(android): prepare current Shipping device artifact and preserve CI outcomes
+631f4d48d321719b47684304a1a16c76e6e38aea	2026-10-03T07:35:52+10:00	docs: defer remaining glass defects beyond 1.6.1
+aa2000b03f32c7d80097ffe84f966e5298f300e6	2026-10-03T07:38:49+10:00	fix(vulkan): report driver identity without API-version decoding
+f2ebe4211f14d3ae16f122cb709539ead024cff1	2026-10-03T07:44:29+10:00	ci: add focused Clang ASan and UBSan host contracts
+d4e6cba638819efc162aac1a187d8f1f97abbe39	2026-10-03T07:54:36+10:00	test(ci): bound player asset inventory to its own job
+36f99c227cedefcd31ae8f7b3991670dbc0c3fd0	2026-10-03T08:07:27+10:00	perf(vulkan): retain coherent mappings for dynamic RT uploads
+3d26ad64a3db1e1e1b7965587a72fd114189bdf6	2026-10-03T08:21:24+10:00	perf(vulkan): prefer local coherent storage for immutable RT data
+9931cf18fc36369ca6efbe2b785d15f877bf6d31	2026-10-03T08:32:13+10:00	docs: retain final control evidence and release S26 trial ownership
+ec13876069b4049b524c5198734c0bbbabbd039c	2026-10-03T09:30:36+10:00	audio: remove only A/D Melody 3 held drones
+d068d8843552d18a3aa61515eadb62eaf23dffd7	2026-10-03T10:11:43+10:00	docs: archive final S26 resource and Shipping-path evidence
+91dacfd075e5509192f824122a6caf095a9774f8	2026-10-03T10:16:01+10:00	docs: reconcile 1.6.1 candidate gates and package admission
+5e28da306b63ff8678d1d944e0e59232ea097d4b	2026-10-03T10:47:03+10:00	test: cover installed 1.6.0 discovery of 1.6.1
+93e64006ac23f587c9fff06fde530bcecbba2192	2026-10-03T10:51:12+10:00	docs: close accepted 1.6.1 gates and Windows live validation
+0c7db23beb5af1fd83b9a4d7cdf950386f6e0eea	2026-10-03T11:05:41+10:00	docs: prepare authorised 1.6.1 package metadata
+0e52493aa2eb6e7945aab033b5037b008bf21b64	2026-10-03T11:50:48+10:00	fix: admit generated version authorities in release preflight
+034d67b5682525400c1344afde40f70537aac51d	2026-10-03T11:53:04+10:00	docs: record signed 1.6.1 freeze and exact S26 update smoke
+196e220a79c748c676b2cfb4426b7439f5fcfc90	2026-10-03T11:54:02+10:00	docs: preserve signed receipt bytes across platforms
+c8b58a38fcacf5f91ee88293cfe6213eb4d595d8	2026-10-03T11:59:46+10:00	docs: reconcile rolling engine memory with accepted 1.6.1
+a397757249871b6b64fe5b77fc14f24e8cfcbb2b	2026-10-03T12:10:47+10:00	docs: make 1.6.1 packaged guidance distribution-neutral
+5ec70e2bcf41b81426f1cdc939b2a7d0b91e51bf	2026-10-03T12:20:31+10:00	release: publish from an explicit frozen artifact directory
+b4c640497a9b1301ed16d9201ecc28ebb5276623	2026-10-03T12:22:21+10:00	release: admit immutable metadata-only 1.6.1 packages
+945f99065851ae2926b2a3ebba02c6fc56f08fb0	2026-10-03T12:26:08+10:00	test: separate portable version guidance from release history
+0a6bd2732262283862e07a92eaad04200f0b123a	2026-10-03T12:50:44+10:00	release: lock published 1.6.1 and preserve validation-only builds
+271f6c0e66d30c7056ca9863ff627df73c3d664d	2026-10-03T13:00:49+10:00	docs: record verified 1.6.1 publication and audit disposition
+ee6d87775b976ed683bbf1138fe95c995c6345ef	2026-10-02T20:07:07-07:00	Merge pull request #15 from Samfa12-tech/codex/horde-1.6.1-engineering-pass

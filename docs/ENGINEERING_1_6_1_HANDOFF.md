@@ -1,7 +1,8 @@
 # 1.6.1 release closeout handoff
 
-Updated 2026-10-03. Branch: `codex/horde-1.6.1-engineering-pass`.
-Engineering work has resumed by explicit owner instruction; the goal is not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
+Updated 2026-10-03. Released1.6.1 is integrated on `main`; the engineering branch
+is retained as reviewed history. Release/main integration and scoped cleanup
+are complete within the explicit owner deferrals. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
 and [current finite release evidence](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md).
 
 ## Current closeout checkpoint — October 3
@@ -22,10 +23,19 @@ owns finite completed tests and hashes; do not rebuild, resign or re-upload.
 Post-publication guard0a6bd27 locks1.6.1/code9 before package/sign/upload side
 effects while preserving validation-only builds. Focused Release version/policy
 CTest3/3 passes; initial wrong-preset missing executable is retained separately,
-not a product regression. Next unfinished step: review/commit released docs and
-receipts, fresh closeout CI, update/normal-merge PR15, then preserve primary user
-work and recoverably archive only classified finished worktrees. No device,
-audio audition or renderer investigation is queued.
+not a product regression. Released-docs head271f6c0 passes push37091774573 and
+PR37091777614 in all six lanes. PR15 merged normally at
+`ee6d87775b976ed683bbf1138fe95c995c6345ef`; its tree equals the validated PR head,
+and main run37092128244 passes all six lanes. No history rewrite/force-push.
+
+Primary main is synced while unrelated future-intake edits/untracked files are
+preserved and verified. Three classified finished worktrees are recoverably
+archived; frozen packages/reports/S24 scratch are independently hash-backed.
+Windows retains only an empty unregistered directory handle; its residual
+contents were moved to the external archive, not discarded. Dirty historical
+experiments and the separate1.6.0 baseline remain untouched. [Final closeout](evidence/2026-10-03-release-publication/closeout.md)
+records integration/cleanup and complete ancestry. No further1.6.1 device,
+audio audition, renderer investigation or publication action is queued.
 
 ## Earlier October3 preparation checkpoints — superseded by publication above
 

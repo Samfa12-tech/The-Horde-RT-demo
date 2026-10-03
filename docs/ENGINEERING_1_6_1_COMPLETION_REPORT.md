@@ -34,7 +34,10 @@ the frozen game binaries and assets unchanged.
 
 Publication checkpoint945f990: push37089806774 and PR37089810005 both completed
 success, all six lanes. Post-publication docs/guard closeout and normal main
-integration receive separate current-head checks on [PR15](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/15).
+integration have separate current-head checks:271f6c0 push37091774573/PR37091777614
+both six-lane green; [PR15](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/15)
+merged normally at ee6d877 with identical tree and green main37092128244.
+The final documentation receipt does not change the frozen runtime.
 
 | Scope | Result / limit |
 | --- | --- |
@@ -90,9 +93,9 @@ options1.6.2, rather than another broad optimisation/quality-reduction pass.
 - [Publication receipts/commit inventory](evidence/2026-10-03-release-publication/README.md)
   and [release validation](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md)
   bind hashes, source, tests and device scopes. Frozen packages must not be rebuilt.
-- Normal main integration and recoverable local cleanup are separately verified
-  at closeout, preserving unrelated future1.6.2 intake, scratch and historical
-  dirty experiments. A clean release is not permission to delete unknown work.
+- Normal main integration and recoverable local cleanup are [verified](evidence/2026-10-03-release-publication/closeout.md),
+  preserving unrelated future1.6.2 intake, scratch and historical dirty
+  experiments. A clean release is not permission to delete unknown work.
 - Recommended next line: owner-planned1.6.2 with complete graphics options,
   new version/code greater than9 and scoped future investigations. No automatic
   temporal renderer expansion, S25 certification or licence remediation.
