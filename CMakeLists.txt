@@ -291,10 +291,12 @@ if(BUILD_TESTING)
         ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_windows_output_resize_launch_tests COMMAND horde_rt_windows_output_resize_launch_tests)
 
-    add_executable(horde_rt_final_held_torch_clearance_tests tests/FinalHeldTorchClearanceTests.cpp)
-    target_link_libraries(horde_rt_final_held_torch_clearance_tests PRIVATE horde_rt_probe_core)
-    add_test(NAME horde_rt_final_held_torch_clearance_tests
-        COMMAND horde_rt_final_held_torch_clearance_tests ${CMAKE_CURRENT_SOURCE_DIR})
+    if(HORDE_RT_BUILD_VULKAN_TARGETS)
+        add_executable(horde_rt_final_held_torch_clearance_tests tests/FinalHeldTorchClearanceTests.cpp)
+        target_link_libraries(horde_rt_final_held_torch_clearance_tests PRIVATE horde_rt_probe_core)
+        add_test(NAME horde_rt_final_held_torch_clearance_tests
+            COMMAND horde_rt_final_held_torch_clearance_tests ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
 
     add_executable(horde_rt_benchmark_evidence_run_tests
         tests/RtBenchmarkEvidenceRunTests.cpp
