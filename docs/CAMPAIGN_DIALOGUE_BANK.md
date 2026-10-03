@@ -55,11 +55,13 @@ Every table row is one proposed spoken line unless marked **EVENT**. IDs are sta
 
 **Beat:** The guards are defending a charge. Kit's unseen concern makes the later rescue personal. The player earns the lantern, climbs under their own control and shows it without speaking. Let relief turn to wonder before the first clue.
 
+**Location and sequence clarification, 3 October 2026:** Kit's early unseen call comes through the small grated **wall access panel just to the right outside the opening room**, where the intended overgrowth belongs. It does not come from either skylight or depend on defeating the two guards, who move to the waterfall room in 1.7. The queued post-run 1.6.2 visual change closes the entry-room skylight and leaves the waterfall's own hole/vines untouched, and adds an impassable iron grid to the separate large skylight in that room. Preserve the distinct later-created finale opening for rope rescue. Kit does not know about the lich and is not knowingly waiting for its defeat.
+
 The grate wording preserves the owner's suggested draft. Other retained IDs below refine the earlier provisional copy: notably renewed contact at the rescue, and a practical destination after reunion. These are proposals for review, not approved performance text.
 
 | ID | Speaker / direction | Proposed text | Type / trigger |
 |---|---|---|---|
-| `prologue.kit_grate` | Kit; call from above, genuine concern | Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful! | O; first eligible pass after skeleton encounter, before lich/reward/rescue; exact one-shot contract in 1.7 §7.3. |
+| `prologue.kit_grate` | Kit; unseen beyond the small wall access panel, genuine concern | Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful! | O; first safe eligible approach to the small wall panel, independent of the later waterfall skeleton encounter, before reward/rescue; exact one-shot contract in 1.7 §7.3. |
 | `prologue.keeper_warning` | Fourth Keeper; spent, controlled | Leave this chamber. My watch is not ended. | O; future campaign candidate at awakening; not part of 1.7 Kit delivery or active 1.6.2 scope. |
 | `prologue.keeper_last` | Fourth Keeper; fading effort | I cannot... leave my post. | O; future campaign candidate on defeat, before reward; do not delay existing reward logic. |
 | `rescue.found` | Kit; relieved renewed contact | There you are. Still in one piece? | C; roof sufficiently open and Kit positioned above. |
