@@ -31,6 +31,6 @@ updated in the same task. No phone step remains queued for1.6.1. S24 remains
 owner-deferred **working but not fully tested**, exact S25 unverified, performance
 accepted as-is below30FPS target; High defects deferred, not fixed.
 Release-preflight version-source tooling repair, focused fixture/CTest and actual
-canonical preflight pass. Finish current checkpoint CI; merge/publication still
+canonical preflight pass. Verify current checkpoint CI on PR15; merge/publication still
 require separate authority.
 Audio/haptic manual revalidation required:NO — no changed playback bytes/events.

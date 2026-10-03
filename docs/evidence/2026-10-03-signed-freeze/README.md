@@ -53,7 +53,7 @@ is required. S24 remains owner-deferred **working but not fully tested**; exact
 S25 is unverified. No physical result is inferred from signing or CI.
 
 Read the release validation and handoff after resumption, verify these hashes,
-and finish only the current documentation/tooling checkpoint CI and separately
-authorised release operations. Do not rebuild unchanged artifacts or
+and verify fresh current-head CI on PR15 before separately authorised release
+operations. Do not rebuild unchanged artifacts or
 restart accepted player/music/glass work. A structural publication preflight
 does not grant publication authority or certify hardware/owner experience.

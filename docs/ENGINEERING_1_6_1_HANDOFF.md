@@ -44,7 +44,9 @@ anchored guards and validates generated VERSION/map plus actual CMake/Gradle
 authority wiring for1.6.1. Focused fixture/CTest1/1 and the real canonical
 preflight now pass, including live tag/release-absence checks. Its structural
 publicationReady flag is not owner publication authority or hardware proof.
-Do not rebuild frozen artifacts. Final receipt/docs checkpoint needs its own CI.
+Do not rebuild frozen artifacts. Fresh receipt/tooling checkpoint CI is tracked
+on [PR15](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/15), separately
+from green package-source0c7db23. Require current-head success before publication.
 Owner asks for current README/docs, normal main integration and scoped local
 cleanup after release. Publication remains separately awaiting clarification.
 The original frozen Windows ZIP retains the preceding metadata snapshot;

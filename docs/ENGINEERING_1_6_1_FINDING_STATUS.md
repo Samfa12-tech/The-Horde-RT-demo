@@ -51,8 +51,10 @@ can only be observed after separately authorised non-draft GitHub publication.
 Owner confirms backup/recovery; final signed/frozen artifacts and actual S26
 production update smoke now pass. [Release receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md)
 pins exact identity. Bounded version-source preflight tooling repair, focused
-fixture/CTest1/1 and actual canonical preflight now pass; final receipt/docs
-checkpoint still needs its own CI. Merge/publication authority is still withheld.
+fixture/CTest1/1 and actual canonical preflight now pass. Fresh receipt/docs
+checkpoint CI is tracked on [PR15](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/15),
+separately from package-source validation. Require current-head success before
+publication; merge/publication authority is still withheld.
 Deferred evidence is not
 relabelled passed. These are not reasons to restart accepted investigations.
 Independent closeout work continues; the goal is not paused. Do not restart prior audits,
