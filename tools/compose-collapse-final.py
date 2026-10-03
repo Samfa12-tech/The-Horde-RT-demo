@@ -22,10 +22,13 @@ parser.add_argument("--source", type=Path, required=True)
 parser.add_argument("--approved", type=Path, required=True)
 parser.add_argument("--output", type=Path, required=True)
 parser.add_argument("--views", default="all", help="Comma-separated view names or all/none")
+parser.add_argument("--revision", type=int, choices=(1, 2), default=1)
 args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:])
 args.source = args.source.resolve()
 args.approved = args.approved.resolve()
 args.output = args.output.resolve()
+if args.revision == 2 and args.output.name == "final":
+    raise RuntimeError("The rejected revision-one package must remain untouched")
 args.output.mkdir(parents=True, exist_ok=True)
 repo = Path(__file__).resolve().parent.parent
 approval = json.loads((args.approved / "milestone-reviews.json").read_text())
@@ -185,20 +188,74 @@ boolean.solver = "EXACT"
 boolean.object = cutter
 bpy.ops.object.modifier_apply(modifier=boolean.name)
 bpy.data.objects.remove(cutter, do_unlink=True)
-box("Sealed backing 6.35m",(-1.55,-1.10,6.35),(1.55,2.35,6.52))
-box("Recess left wall",(-1.55,-1.10,3.66),(-1.4,2.35,6.4))
-box("Recess right wall",(1.4,-1.10,3.66),(1.55,2.35,6.4))
-roof = box("Sealed recess roof",(-1.55,2.20,3.55),(1.55,2.35,6.52))
-box("Continuous solid floor",(-1.92,-1.10,-6.4),(1.92,-.95,6.52),floor_material)
+roof_meshes = []
+roof_supports = []
+stair_count = 5 if args.revision == 1 else 44
+stair_width = .96 if args.revision == 1 else 3.7
+stair_end = 4.78 + stair_count*.28
+seal_z = 6.35 if args.revision == 1 else stair_end + .20
+def tread_height(i):
+    return .28+i*.21 if args.revision == 1 or i < 8 else .28+7*.21+(i-7)*.24
+
+def wedge(name, xmin, xmax, z0, z1, bottom0, bottom1, top0, top1):
+    """Closed rising masonry substrate, with metric UVs and explicit normals."""
+    coordinates = [(xmin,bottom0,z0),(xmax,bottom0,z0),(xmax,top0,z0),(xmin,top0,z0),
+                   (xmin,bottom1,z1),(xmax,bottom1,z1),(xmax,top1,z1),(xmin,top1,z1)]
+    data = bpy.data.meshes.new(name)
+    data.from_pydata([vec(p) for p in coordinates],[],[(0,3,2,1),(4,5,6,7),(0,1,5,4),
+                                                     (1,2,6,5),(2,3,7,6),(3,0,4,7)])
+    data.update()
+    o = bpy.data.objects.new(name,data)
+    scene.collection.objects.link(o)
+    o["role"] = "structure"
+    data.materials.append(wall_material)
+    bm = bmesh.new()
+    bm.from_mesh(data)
+    bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces))
+    bm.to_mesh(data)
+    bm.free()
+    uv = data.uv_layers.new()
+    for p in data.polygons:
+        axis = max(range(3),key=lambda i:abs(p.normal[i]))
+        axes = [i for i in range(3) if i != axis]
+        for index in p.loop_indices:
+            vertex = data.vertices[data.loops[index].vertex_index].co
+            uv.data[index].uv = (vertex[axes[0]]*.42,vertex[axes[1]]*.42)
+    return o
+
+if args.revision == 1:
+    box("Sealed backing 6.35m",(-1.55,-1.10,6.35),(1.55,2.35,6.52))
+    box("Recess left wall",(-1.55,-1.10,3.66),(-1.4,2.35,6.4))
+    box("Recess right wall",(1.4,-1.10,3.66),(1.55,2.35,6.4))
+    roof = box("Sealed recess roof",(-1.55,2.20,3.55),(1.55,2.35,6.52))
+    roof_meshes.append(roof)
+else:
+    # Owner steering replaces the old narrow five-tread dead end. Forty-four
+    # risers continue upward at full chamber width. The distant physical
+    # seal is behind their ascent, rather than a visible wall at the remnant.
+    # Beyond the low visible remnant the older upper flight rises 24cm per28cm.
+    distant_top = tread_height(stair_count-1)
+    box("Remote physical seal - visibility forbidden",(-2,-1.10,seal_z),(2,distant_top+1.85,seal_z+.18))
+    for name,xmin,xmax in (("left",-2,-1.85),("right",1.85,2)):
+        wedge("Closed cave-in side envelope "+name,xmin,xmax,2.92,3.68,1.35,1.35,1.80,1.98)
+        wedge("Rising full-width stairwell "+name,xmin,xmax,3.66,4.78,-1.1,-1.1,1.8,1.95)
+        wedge("Upper stairwell "+name,xmin,xmax,4.78,seal_z+.18,-1.1,-1.1,1.95,distant_top+1.85)
+    # The roof recedes upward over the ascent. It is a closed envelope above the
+    # fractured lower roof shoulders: no open world/sky leak or artificial black cap.
+    roof_meshes.append(wedge("Rising enclosure over collapse",-2,2,2.92,4.78,1.60,1.80,1.78,1.98))
+    roof = wedge("Ascending roof beyond visible flight",-2,2,4.78,seal_z+.18,1.80,distant_top+1.65,1.98,distant_top+1.85)
+    roof_meshes.append(roof)
+box("Continuous solid floor",(-1.92,-1.10,-6.4),(1.92,-.95,6.52 if args.revision == 1 else seal_z+.18),floor_material)
 box("Existing chamber left",(-2.0,-1.10,-6.4),(-1.85,1.50,3.66))
 box("Existing chamber right",(1.85,-1.10,-6.4),(2.0,1.50,3.66))
-chamber_roof = box("Existing chamber roof",(-2,1.35,-6.4),(2,1.50,3.66))
-for i in range(5):
+chamber_roof = box("Existing chamber roof",(-2,1.35,-6.4),(2,1.50,3.66 if args.revision == 1 else 2.94))
+roof_meshes.append(chamber_roof)
+for i in range(stair_count):
     z = 4.78 + i*.28
     # The lower flight is buried by the settled collapse. Its exposed five-tread
     # remnant climbs above the low upper cavities rather than disappearing behind
     # the approved interlock. No accessible route or collision change is implied.
-    box("Stair remnant tread %d" % (i+1),(-.48,-.95,z),(.48,.28+i*.21,z+.28),wall_material, "stair", .007)
+    box("Stair remnant tread %d" % (i+1),(-stair_width/2,-.95,z),(stair_width/2,tread_height(i),z+.28),wall_material, "stair", .007 if i < 8 else 0)
 
 before_import = set(scene.objects)
 bpy.ops.import_scene.gltf(filepath=str(args.source))
@@ -329,6 +386,69 @@ def bvh(o):
     vertices = [o.matrix_world @ v.co for v in o.data.vertices]
     return BVHTree.FromPolygons(vertices,[list(p.vertices) for p in o.data.polygons],all_triangles=False,epsilon=.00001)
 
+if args.revision == 2:
+    # A genuine missing header/roof section exposes the continued ascent. Its
+    # lower remnants remain attached to the side walls, with downward-canted,
+    # jagged edges of the same masonry as the fallen lintel and interlock.
+    chip = box("Temporary central roof breach",(-.86,1.05,3.27),(.80,1.70,3.80))
+    select(frame)
+    cut = frame.modifiers.new("Owner-requested partial cave-in", "BOOLEAN")
+    cut.operation = "DIFFERENCE"
+    cut.solver = "EXACT"
+    cut.object = chip
+    bpy.ops.object.modifier_apply(modifier=cut.name)
+    bpy.data.objects.remove(chip,do_unlink=True)
+    def subtract_fracture(substrate, name, position, yaw, dimensions):
+        chip = broken_stone(name,dimensions,position,yaw,skew=.09)
+        for o in (substrate,chip):
+            bm = bmesh.new()
+            bm.from_mesh(o.data)
+            bmesh.ops.triangulate(bm,faces=list(bm.faces))
+            bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces))
+            bm.to_mesh(o.data)
+            bm.free()
+        select(substrate)
+        cut = substrate.modifiers.new(name,"BOOLEAN")
+        cut.operation = "DIFFERENCE"
+        cut.solver = "EXACT"
+        cut.object = chip
+        bpy.ops.object.modifier_apply(modifier=cut.name)
+        bpy.data.objects.remove(chip,do_unlink=True)
+        # New cross-sections are stone, not inherited stretched cutter texture.
+        uv = substrate.data.uv_layers.active
+        for p in substrate.data.polygons:
+            axis = max(range(3),key=lambda i:abs(p.normal[i]))
+            axes = [i for i in range(3) if i != axis]
+            for index in p.loop_indices:
+                world = substrate.matrix_world @ substrate.data.vertices[substrate.data.loops[index].vertex_index].co
+                uv.data[index].uv = (world[axes[0]]*.42,world[axes[1]]*.42)
+    subtract_fracture(frame,"Left broken roof/header underside",[-1.08,1.08,3.52],-.38,(.46,.28,.58))
+    subtract_fracture(frame,"Right diagonal header/roof fracture",[1.04,1.13,3.53],.49,(.52,.35,.55))
+    for name,xmin,xmax,side in (("left",-2,-.63,-1),("right",.70,2,1)):
+        shoulder = box("Supported fractured roof shoulder "+name,(xmin,1.32,2.92),(xmax,1.49,4.56))
+        for v in shoulder.data.vertices:
+            world_x = shoulder.location.x+v.co.x
+            inward = (2-abs(world_x))/(2-(.63 if side < 0 else .70))
+            v.co.z -= .28*inward
+            # Unequal fracture front/rear tips avoid two matching shelf silhouettes.
+            if v.co.y < 0 and inward > .5:
+                v.co.y += .13 if side < 0 else -.10
+        clip(shoulder,(side*.49,0,0),(-side, .21 if side < 0 else -.27, .12))
+        subtract_fracture(shoulder,"Irregular unsupported roof edge "+name,
+                          [side*.87,1.00,3.85 if side < 0 else 4.08],-.38 if side < 0 else .43,
+                          (.57,.32,.64))
+        subtract_fracture(shoulder,"Broken front roof arris "+name,
+                          [side*1.31,1.12,3.15],.31 if side < 0 else -.24,(.43,.25,.53))
+        roof_meshes.append(shoulder)
+        candidates = [o for o in scene.objects if o.type == "MESH" and
+                      (o.name == "Existing chamber "+name or o.name == "Rising full-width stairwell "+name)]
+        bpy.context.view_layer.update()
+        witnesses = [o.name for o in candidates if bvh(shoulder).overlap(bvh(o))]
+        if not witnesses:
+            raise RuntimeError("Roof remnant is detached from structural support: "+name)
+        roof_supports.append({"object":shoulder.name,"structuralSupports":witnesses,
+                              "intersectsRealSupport":True})
+
 # All interlocked pieces must contact real supporting geometry. Overlap checks
 # are geometric witnesses, not a substitute for owner judgment of natural placement.
 bpy.context.view_layer.update()
@@ -362,6 +482,14 @@ for o in rocks[:2]:
     floor_contacts.append({"object":o.name,"planarFootAreaSquareMeters":area,"floorInsetMeters":inset})
     if area < .12 or not 0 <= inset <= .005:
         raise RuntimeError("Grounded rock lacks broad controlled floor attachment: "+json.dumps(floor_contacts[-1]))
+
+# Reject structural faults before spending CPU time on review images.
+preflight_meshes = [o for o in scene.objects if o.type == "MESH"]
+if sum(tris(o) for o in preflight_meshes) >= 10000:
+    raise RuntimeError("Collapse source exceeds approved 10k triangle budget")
+if any(not closed(o) or not o.data.uv_layers for o in preflight_meshes):
+    raise RuntimeError("Open mesh or missing UV before review render: "+str([
+        o.name for o in preflight_meshes if not closed(o) or not o.data.uv_layers]))
 
 # Inspection lights live only in this editable review file. They never enter
 # runtime exports; existing game illumination must be accepted later in native RT.
@@ -419,6 +547,54 @@ camera.data.clip_start = .02
 camera.data.clip_end = 50
 camera.data.sensor_fit = "VERTICAL"
 camera.data.sensor_height = 24
+frustum_checks = []
+if args.revision == 2:
+    bpy.context.view_layer.update()
+    vertices,faces,face_names = [],[],[]
+    for o in scene.objects:
+        if o.type != "MESH":
+            continue
+        offset = len(vertices)
+        vertices.extend(o.matrix_world @ v.co for v in o.data.vertices)
+        faces.extend([offset+i for i in p.vertices] for p in o.data.polygons)
+        face_names.extend(o.name for p in o.data.polygons)
+    enclosure_bvh = BVHTree.FromPolygons(vertices,faces,epsilon=.000001)
+    physical_views = dict(views)
+    # Actual player can approach the unchanged cap to radius .24m. This upward
+    # look is additional coverage, not a changed approved production camera.
+    physical_views["near-cap-upward"] = ((0,.70,3.16),(0,1.9,5.5),60,False)
+    for name,(position,target,fov,cutaway) in physical_views.items():
+        if cutaway:
+            continue
+        eye = vec(position)
+        rotation = (vec(target)-eye).to_track_quat("-Z","Y")
+        tangent = math.tan(math.radians(fov)/2)
+        misses,seal_hits,rear_rays,roof_hits = 0,0,0,0
+        failed_rays = []
+        for row in range(72):
+            for column in range(128):
+                direction = rotation @ Vector((((column+.5)/128*2-1)*tangent*960/540,
+                                                ((row+.5)/72*2-1)*tangent,-1))
+                direction.normalize()
+                if -direction.y <= .01:
+                    continue  # Front chamber exit is deliberately outside this art slice.
+                rear_rays += 1
+                location,normal,index,distance = enclosure_bvh.ray_cast(eye,direction,200)
+                if index is None:
+                    misses += 1
+                else:
+                    seal_hits += face_names[index].startswith("Remote physical seal")
+                    roof_hits += "roof" in face_names[index].lower() or "enclosure" in face_names[index].lower()
+                if index is None or face_names[index].startswith("Remote physical seal"):
+                    if len(failed_rays)<8:
+                        failed_rays.append({"pixel":[column,row],"directionHorde":[direction.x,direction.z,-direction.y],
+                                            "hitHorde":None if location is None else [location.x,location.z,-location.y]})
+        frustum_checks.append({"view":name,"sampleGrid":[128,72],"rearwardRays":rear_rays,
+                               "worldBoundaryMisses":misses,"visibleRemoteSealSamples":seal_hits,
+                               "physicalRoofHits":roof_hits,"failedRayDetails":failed_rays})
+    (args.output/"frustum-audit.json").write_text(json.dumps(frustum_checks,indent=2))
+    if any(c["worldBoundaryMisses"] or c["visibleRemoteSealSamples"] for c in frustum_checks):
+        raise RuntimeError("Rear enclosure leak/visible stair termination: "+json.dumps(frustum_checks))
 original_energies = [o.data.energy for o in inspection_lights]
 rendered = []
 for name,(position,target,fov,cutaway) in views.items():
@@ -429,7 +605,8 @@ for name,(position,target,fov,cutaway) in views.items():
     camera.location = vec(position)
     camera.rotation_euler = (vec(target)-camera.location).to_track_quat("-Z","Y").to_euler()
     camera.data.lens = 12/math.tan(math.radians(fov)/2)
-    roof.hide_render = chamber_roof.hide_render = cutaway
+    for o in roof_meshes:
+        o.hide_render = cutaway
     scene.world.node_tree.nodes["Background"].inputs[1].default_value = .002 if name == "production" else .035
     torch_data.energy = 75 if name == "production" else 0
     for o,energy in zip(inspection_lights,original_energies):
@@ -437,7 +614,8 @@ for name,(position,target,fov,cutaway) in views.items():
     scene.render.filepath = str(args.output/(name+".png"))
     bpy.ops.render.render(write_still=True)
     rendered.append(name+".png")
-roof.hide_render = chamber_roof.hide_render = False
+for o in roof_meshes:
+    o.hide_render = False
 for o,energy in zip(inspection_lights,original_energies):
     o.data.energy = 0
 torch_data.energy = 75
@@ -463,10 +641,10 @@ if not all(1000 <= tris(o) <= 3000 for o in rocks):
 stair_visibility = []
 depsgraph = bpy.context.evaluated_depsgraph_get()
 eye = vec(views["production"][0])
-for i in range(5):
+for i in range(min(stair_count,12)):
     samples = []
     for x in (-.30,0,.30):
-        target = vec((x,.28+i*.21-.06,4.78+i*.28))
+        target = vec((x,tread_height(i)-.06,4.78+i*.28))
         direction = target-eye
         hit,location,normal,index,obj,matrix = scene.ray_cast(depsgraph,eye,direction.normalized(),distance=direction.length+.01)
         samples.append(bool(hit and obj.name == "Stair remnant tread %d" % (i+1)))
@@ -483,10 +661,12 @@ bpy.ops.outliner.orphans_purge(do_local_ids=True,do_linked_ids=False,do_recursiv
 images = [{"name":image.name,"dimensions":list(image.size),"packed":bool(image.packed_file)}
           for image in bpy.data.images if image.users and image.source == "FILE"]
 report = {
-    "schema":"horde.collapse-form-authoring.v1", "function":"approved", "form":"pending-owner-review",
+    "schema":"horde.collapse-form-authoring.v1", "revision":args.revision, "function":"approved", "form":"pending-owner-review",
     "runtime":"not-exported-not-validated", "sourceTriangles":source_triangles,
     "totalTrianglesIncludingStructuralContext":total,"geometry":geometry,"supportChecks":support_checks,
     "floorContacts":floor_contacts,
+    "roofSupportChecks":roof_supports,
+    "physicalEnclosureFrustumChecks":frustum_checks,
     "productionRiserVisibility":stair_visibility,
     "unsharedVertexIndexPrimitiveBytesUpperBound":total*(3*64+3*4+16),
     "gpuMemoryDisclosure":"Upper bound uses current64Bvertex/4Bindex/16Bprimitive records; excludes unmeasured BLAS/TLAS and textures, no runtime asset admitted",
@@ -498,8 +678,11 @@ report = {
     "cpuRenderer":{"engine":"Cycles","device":"CPU","threads":2,"samples":20},
     "productionCameraHorde":{"position":list(views["production"][0]),"target":list(views["production"][1]),
                              "verticalFovDegrees":60,"viewport":[960,540]},
-    "sealedBackingFrontZ":6.35,"unchangedCollisionCapZ":3.4,"stairDepthRange":[4.78,6.18],
-    "renderedViews":rendered,"cutawayDisclosure":"overhead-cutaway hides two roof meshes for inspection only",
+    "sealedBackingFrontZ":seal_z,"unchangedCollisionCapZ":3.4,"stairDepthRange":[4.78,stair_end],
+    "stairWidthMeters":stair_width,"stairCount":stair_count,"lowerRiseRunMeters":[.21,.28],
+    "upperRiseRunMeters":[.24,.28] if args.revision == 2 else [.21,.28],
+    "ownerSteeringOverridesOldRecess":args.revision == 2,
+    "renderedViews":rendered,"cutawayDisclosure":"overhead-cutaway hides roof meshes for inspection only",
     "provenance":{"asset":"Boulder 01","license":"CC0 1.0","receipt":"../download-receipt.json",
                   "licenseSnapshot":"../polyhaven-license.html","verifiedSourceFiles":receipt},
     "acceptanceGaps":["Owner Form approval","No runtime GLB export before Form approval",

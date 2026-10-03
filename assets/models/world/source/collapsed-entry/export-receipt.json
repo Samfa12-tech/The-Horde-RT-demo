@@ -1,0 +1,99 @@
+{
+  "schema": "horde.collapse-export.v1",
+  "form": "owner-approved-revision2",
+  "runtimeAcceptance": "pending",
+  "approvedBlendSha256": "f03e8a175b20c60f444a133831586a533d7c1de2a73ceda916af6e521ecd547a",
+  "approvedContactSheetSha256": "0fa7fca2b8e403b8c8f33b9adc70381a751e8e2c9e397e3dd1efe06547807486",
+  "excludedContextMeshes": [
+    "Continuous solid floor",
+    "Existing chamber left",
+    "Existing chamber right",
+    "Existing chamber roof"
+  ],
+  "coreSourceMeshes": 63,
+  "triangles": 8422,
+  "vertices": 12467,
+  "indices": 25266,
+  "primitives": 2,
+  "materials": [
+    "Boulder01Rock",
+    "MedievalWall02"
+  ],
+  "worldTransform": "baked, identity node/TLAS placement; glTF metre+Yup maps to Horde",
+  "lightingBaked": false,
+  "exportedCamerasOrLights": false,
+  "runtimeEmbeddedImageDimensions": [
+    4,
+    4
+  ],
+  "source": {
+    "path": "assets/models/world/source/collapsed-entry/collapsed-entry-lod0.glb",
+    "bytes": 6192076,
+    "sha256": "49dce74ca5be222f3b18e4c48a85618e61de4e883f871257823ff48f218353d9"
+  },
+  "runtime": {
+    "path": "assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
+    "bytes": 652980,
+    "sha256": "c67471b522c92f354d9a5880dea6e48b4f22b5095207841c35c95b5cfc75c4d4"
+  },
+  "textureInputReceipt": "assets/textures/props/source/collapsed-entry/input-receipt.json",
+  "authoredTangentCorrections": [
+    {
+      "primitive": 0,
+      "vertex": 3270,
+      "reason": "singular Mikk UV derivative",
+      "normal": [
+        -0.08890379220247269,
+        -0.9954425096511841,
+        -0.03450147062540054
+      ],
+      "authoredUnitTangent": [
+        0.9960354894898029,
+        -0.08895675172132154,
+        0.0,
+        -1.0
+      ],
+      "positionsAndUvsUnchanged": true
+    }
+  ],
+  "acceptanceGaps": [
+    "Atlas/native integration",
+    "Native RT owner visual/resource/performance/device acceptance"
+  ],
+  "runtimeManifest": {
+    "path": "assets/models/world/runtime/collapsed-entry/asset.manifest.json",
+    "bytes": 742,
+    "sha256": "952e1920fbc60646154d0424556c2935a18e7cf882866a9fe9f4f45ef38be623"
+  },
+  "actualLoaderValidation": {
+    "loader": "PASS",
+    "vertices": 12467,
+    "indices": 25266,
+    "triangles": 8422,
+    "primitives": 2,
+    "materials": 2,
+    "vertexBytes": 797888,
+    "indexBytes": 101064,
+    "boundsHorde": [
+      [
+        -2,
+        -1.1,
+        2.92
+      ],
+      [
+        2,
+        12.24,
+        17.48
+      ]
+    ],
+    "mappedUnitFrames": "PASS",
+    "opaqueNonmetalFactors": "PASS"
+  },
+  "validator": {
+    "version": "2.0.0-dev.3.10",
+    "sourceErrors": 0,
+    "sourceWarnings": 0,
+    "runtimeErrors": 0,
+    "runtimeWarnings": 0
+  }
+}

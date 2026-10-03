@@ -52,6 +52,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.HorizontalScrollView;
+import android.widget.PopupMenu;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -271,11 +272,17 @@ public class MainActivity extends Activity {
     private String graphicsRecoveryNotice;
     private boolean graphicsPreviewWanted, graphicsPreviewPaused, graphicsPreviewMotion, graphicsSceneRestoring;
     private int graphicsPreviewCamera;
-    private GraphicsPreferences.Values graphicsComparisonDraft;
+    private GraphicsPreferences.Values graphicsOriginalPreviewDraft;
     private GraphicsPreferences.Values graphicsRestoreDraftAfterPreview;
-    private int graphicsPreviewChoice = GraphicsPreviewComparison.RESOLUTION;
-    private boolean graphicsPreviewAfter;
-    private Button graphicsBefore, graphicsDetailsButton;
+    private int graphicsPreviewChoice = GraphicsPreviewOptions.RESOLUTION;
+    private boolean graphicsPreviewImageOnly;
+    private final Button[] graphicsOptionButtons = new Button[4];
+    private Button graphicsDetailsButton, graphicsImageButton, graphicsControlsButton;
+    private double graphicsPreviewPerformanceEpochFloor;
+    private long graphicsPreviewPerformanceGeneration, graphicsNextFpsUpdate;
+    private double graphicsDisplayedFps = Double.NaN, graphicsDisplayedFpsEpoch;
+    private PopupMenu graphicsOptionsPopup;
+    private String graphicsLiveChoiceError;
     private AlertDialog graphicsDetailsDialog;
     private TextView graphicsDetailsTelemetry;
     private LinearLayout graphicsDetailsPanel;
@@ -521,6 +528,11 @@ public class MainActivity extends Activity {
                     && stageAsset("textures/props/runtime/orm.android.ktx2", "textures/props/runtime/orm.android.ktx2")
                     && stageAsset("textures/props/runtime/emissive.android.ktx2", "textures/props/runtime/emissive.android.ktx2");
             if (!heldItemsStaged) throw new IllegalStateException("Required production held-item/player assets could not be staged.");
+            final boolean collapseStaged = stageAsset("models/world/runtime/collapsed-entry/asset.manifest.json",
+                    "models/world/runtime/collapsed-entry/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
+                    "models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb");
+            if (!collapseStaged) throw new IllegalStateException("Required collapsed-entry runtime assets could not be staged.");
             if (BuildConfig.VIEWMODEL_CANDIDATE && !stageAsset(
                     "models/player/viewmodel/runtime/candidate-receipt.json",
                     "models/player/viewmodel/runtime/candidate-receipt.json")) {
@@ -1725,6 +1737,7 @@ public class MainActivity extends Activity {
         graphicsConfirmed = GraphicsPreferences.confirmed(preferences);
         graphicsDraft = graphicsConfirmed;
         graphicsRestoreDraftAfterPreview = null;
+        graphicsPreviewImageOnly = false;
         graphicsBusy = false;
         ProbeBridge.beginGraphicsEdit(graphicsConfirmed.scale, graphicsConfirmed.water,
                 graphicsConfirmed.fire, graphicsConfirmed.cap);
@@ -1760,30 +1773,30 @@ public class MainActivity extends Activity {
         addSlider(panel, getString(R.string.render_scale), graphicsDraft.scale, 50, 100, value -> {
             graphicsDraft = new GraphicsPreferences.Values(value, graphicsDraft.water, graphicsDraft.fire, graphicsDraft.cap);
         });
-        addGraphicsButton(panel, "Preview resolution", () -> openGraphicsPreview(GraphicsPreviewComparison.RESOLUTION));
+        addGraphicsButton(panel, "Preview resolution", () -> openGraphicsPreview(GraphicsPreviewOptions.RESOLUTION));
         addGraphicsButton(panel, "Water: " + waterName(graphicsDraft.water), () -> {
             graphicsDraft = new GraphicsPreferences.Values(graphicsDraft.scale, (graphicsDraft.water + 1) % 3,
                     graphicsDraft.fire, graphicsDraft.cap); showGraphicsPage();
         });
         addBody(panel, getString(R.string.graphics_water_help));
-        addGraphicsButton(panel, "Preview water", () -> openGraphicsPreview(GraphicsPreviewComparison.WATER));
+        addGraphicsButton(panel, "Preview water", () -> openGraphicsPreview(GraphicsPreviewOptions.WATER));
         addGraphicsButton(panel, "Fire detail: " + (graphicsDraft.fire == 1 ? "High" : "Mobile"), () -> {
             graphicsDraft = new GraphicsPreferences.Values(graphicsDraft.scale, graphicsDraft.water,
                     1 - graphicsDraft.fire, graphicsDraft.cap); showGraphicsPage();
         });
         addBody(panel, getString(R.string.graphics_fire_help));
-        addGraphicsButton(panel, "Preview fire", () -> openGraphicsPreview(GraphicsPreviewComparison.FIRE));
+        addGraphicsButton(panel, "Preview fire", () -> openGraphicsPreview(GraphicsPreviewOptions.FIRE));
         addGraphicsButton(panel, "Menu / preview cap: " + graphicsDraft.cap + " Hz", () -> {
             final int next = graphicsDraft.cap == 30 ? 60 : graphicsDraft.cap == 60 ? 15 : 30;
             graphicsDraft = new GraphicsPreferences.Values(graphicsDraft.scale, graphicsDraft.water, graphicsDraft.fire, next);
             showGraphicsPage();
         });
-        addGraphicsButton(panel, "Preview frame cap", () -> openGraphicsPreview(GraphicsPreviewComparison.CAP));
+        addGraphicsButton(panel, "Preview frame cap", () -> openGraphicsPreview(GraphicsPreviewOptions.CAP));
         addGraphicsButton(panel, getString(R.string.graphics_baseline), () -> {
             graphicsDraft = GraphicsPreferences.baseline(); showGraphicsPage();
         });
         addGraphicsButton(panel, "Open authored RT preview", () -> {
-            openGraphicsPreview(GraphicsPreviewComparison.RESOLUTION);
+            openGraphicsPreview(GraphicsPreviewOptions.RESOLUTION);
         });
         graphicsApply = addGraphicsButton(panel, getString(R.string.graphics_apply), () -> {
             graphicsSubmitted = graphicsDraft;
@@ -1835,7 +1848,8 @@ public class MainActivity extends Activity {
             final ViewGroup group = (ViewGroup)view;
             for (int i = 0; i < group.getChildCount(); ++i) setGraphicsEditorsEnabled(group.getChildAt(i), enabled);
         } else if ((view instanceof SeekBar || view instanceof Button) && view != graphicsConfirm &&
-                view != graphicsRevert && view != graphicsBack && view != graphicsDetailsButton) view.setEnabled(enabled);
+                view != graphicsRevert && view != graphicsBack && view != graphicsDetailsButton &&
+                view != graphicsImageButton && view != graphicsControlsButton) view.setEnabled(enabled);
     }
 
     private void publishGraphicsPreview(boolean reset) {
@@ -1844,46 +1858,112 @@ public class MainActivity extends Activity {
     }
 
     private void openGraphicsPreview(int choice) {
-        graphicsComparisonDraft = graphicsDraft;
+        graphicsOriginalPreviewDraft = graphicsDraft;
         graphicsDraft = graphicsConfirmed;
         graphicsRestoreDraftAfterPreview = null;
-        graphicsPreviewChoice = choice; graphicsPreviewAfter = false;
+        graphicsPreviewChoice = choice;
+        graphicsPreviewImageOnly = false;
         graphicsPreviewWanted = true;
         graphicsPreviewPaused = false;
-        graphicsPreviewMotion = choice == GraphicsPreviewComparison.CAP;
-        graphicsPreviewCamera = GraphicsPreviewComparison.camera(choice);
+        graphicsPreviewMotion = choice == GraphicsPreviewOptions.CAP;
+        graphicsPreviewCamera = GraphicsPreviewOptions.camera(choice);
         graphicsRequestSerial = 0;
+        graphicsLiveChoiceError = null;
         graphicsPreviewDetailsText = "Waiting for current RT preview presentation.";
-        publishGraphicsPreview(true); showGraphicsPreviewPage();
+        resetGraphicsPreviewTimeline(); showGraphicsPreviewPage();
+        compareGraphicsPreview(GraphicsPreviewOptions.withChoice(graphicsDraft, choice,
+                GraphicsPreviewOptions.value(graphicsOriginalPreviewDraft, choice)));
     }
 
     private GraphicsPreferences.Values previewSelection() {
-        return GraphicsPreviewComparison.selection(graphicsConfirmed, graphicsComparisonDraft,
-                graphicsPreviewChoice, graphicsPreviewAfter);
+        return graphicsDraft;
     }
 
-    private void compareGraphicsPreview(boolean after) {
-        final GraphicsPreferences.Values values = GraphicsPreviewComparison.selection(graphicsConfirmed,
-                graphicsComparisonDraft, graphicsPreviewChoice, after);
-        if (!GraphicsPreferences.markPending(preferences, values)) return;
-        graphicsSubmitted = values; graphicsDraft = values;
-        graphicsRequestSerial = ProbeBridge.compareGraphicsPreview(values.scale, values.water, values.fire,
-                values.cap, surfaceRequestGeneration);
-        if (graphicsRequestSerial == 0) {
-            graphicsTelemetry.setText("Comparison unavailable; use Revert to restore confirmed settings."); return;
+    private void beginGraphicsPreviewPerformanceScope() {
+        final double[] old = ProbeBridge.getGraphicsPreviewPerformance();
+        graphicsPreviewPerformanceEpochFloor = GraphicsPreviewOptions.performanceEpochFloor(
+                graphicsPreviewPerformanceGeneration, surfaceRequestGeneration, old);
+        graphicsPreviewPerformanceGeneration = surfaceRequestGeneration;
+        graphicsDisplayedFps = Double.NaN; graphicsDisplayedFpsEpoch = 0; graphicsNextFpsUpdate = 0;
+    }
+
+    private void resetGraphicsPreviewTimeline() {
+        beginGraphicsPreviewPerformanceScope();
+        publishGraphicsPreview(true);
+    }
+
+    private void compareGraphicsPreview(GraphicsPreferences.Values values) {
+        graphicsPreviewImageOnly = false;
+        if (!GraphicsPreferences.markPending(preferences, values)) {
+            graphicsLiveChoiceError = getString(R.string.graphics_storage_failed); return;
         }
-        graphicsPreviewAfter = after;
+        final long serial = ProbeBridge.compareGraphicsPreview(values.scale, values.water, values.fire,
+                values.cap, surfaceRequestGeneration);
+        if (serial == 0) {
+            graphicsLiveChoiceError = "Choice unavailable; use Revert to restore confirmed settings."; return;
+        }
+        graphicsLiveChoiceError = null;
+        graphicsSubmitted = values; graphicsDraft = values; graphicsRequestSerial = serial;
         graphicsBusy = false;
         graphicsConfirmationStarted = 0;
-        graphicsPreviewCamera = GraphicsPreviewComparison.camera(graphicsPreviewChoice);
-        publishGraphicsPreview(true); // Deterministic A/B timeline and scope.
+        resetGraphicsPreviewTimeline();
         showGraphicsPreviewPage();
     }
 
+    private String graphicsOptionLabel(int choice) {
+        if (graphicsDraft == null) return GraphicsPreviewOptions.name(choice);
+        switch (choice) {
+            case GraphicsPreviewOptions.RESOLUTION: return "Resolution " + graphicsDraft.scale + "%";
+            case GraphicsPreviewOptions.WATER: return "Water " + waterName(graphicsDraft.water);
+            case GraphicsPreviewOptions.FIRE: return "Fire " + (graphicsDraft.fire == 1 ? "High" : "Mobile");
+            default: return "Cap " + graphicsDraft.cap + " Hz";
+        }
+    }
+
+    private PopupMenu createGraphicsPreviewOptionMenu(Button anchor, int choice) {
+        final PopupMenu popup = new PopupMenu(this, anchor);
+        final int[] choices = GraphicsPreviewOptions.choices(graphicsDraft, choice);
+        for (int value : choices) {
+            final String label = choice == GraphicsPreviewOptions.RESOLUTION ? value + "%" :
+                    choice == GraphicsPreviewOptions.WATER ? waterName(value) :
+                    choice == GraphicsPreviewOptions.FIRE ? (value == 1 ? "High" : "Mobile") : value + " Hz";
+            popup.getMenu().add(0,value,0,label).setCheckable(true)
+                    .setChecked(value == GraphicsPreviewOptions.value(graphicsDraft,choice));
+        }
+        popup.setOnMenuItemClickListener(item -> {
+            if (graphicsBusy || !graphicsPreviewWanted || !GraphicsPreviewOptions.presented(
+                    ProbeBridge.getGraphicsSnapshot(), surfaceRequestGeneration, graphicsRequestSerial, previewSelection())) return true;
+            graphicsPreviewChoice = choice;
+            graphicsPreviewCamera = GraphicsPreviewOptions.camera(choice);
+            graphicsPreviewMotion = choice == GraphicsPreviewOptions.CAP;
+            compareGraphicsPreview(GraphicsPreviewOptions.withChoice(graphicsDraft,choice,item.getItemId()));
+            return true;
+        });
+        return popup;
+    }
+
+    private void dismissGraphicsPreviewOptions() {
+        if (graphicsOptionsPopup != null) graphicsOptionsPopup.dismiss();
+        graphicsOptionsPopup = null;
+    }
+
+    private void showGraphicsPreviewOptionMenu(Button anchor, int choice) {
+        dismissGraphicsPreviewOptions();
+        final PopupMenu popup = createGraphicsPreviewOptionMenu(anchor, choice);
+        graphicsOptionsPopup = popup;
+        popup.setOnDismissListener(ignored -> { if (graphicsOptionsPopup == popup) graphicsOptionsPopup = null; });
+        popup.show();
+    }
+
     private void showGraphicsPreviewPage() {
+        dismissGraphicsPreviewOptions();
         dismissGraphicsPreviewDetails();
         menuScrim.setBackgroundColor(0x00000000);
+        // The transparent inspection overlay still owns input; no touch reaches gameplay.
+        menuScrim.setClickable(true);
         menuScrim.removeAllViews();
+        if (graphicsPreviewImageOnly) { showGraphicsPreviewImageOnly(); return; }
+        graphicsControlsButton = null;
         final LinearLayout panel = new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL); panel.setPadding(dp(8), dp(4), dp(8), dp(4));
         panel.setBackground(HordeUiTokens.plate(this, 0xEB151719, HordeUiTokens.BRASS, 1));
@@ -1891,42 +1971,49 @@ public class MainActivity extends Activity {
         graphicsTelemetry = new TextView(this);
         graphicsTelemetry.setTextColor(HordeUiTokens.PARCHMENT); graphicsTelemetry.setTextSize(14);
         graphicsTelemetry.setMaxLines(2); graphicsTelemetry.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        graphicsTelemetry.setText(GraphicsPreviewComparison.name(graphicsPreviewChoice) + ": waiting for RT");
+        graphicsTelemetry.setText("Preview FPS: waiting for RT");
         panel.addView(graphicsTelemetry, matchWrap());
-        final LinearLayout comparisonRow = addPreviewControlRow(panel);
-        graphicsBefore = addPreviewControl(comparisonRow, "Before", () -> compareGraphicsPreview(false));
-        graphicsBefore.setContentDescription("Before: confirmed graphics settings");
-        graphicsBefore.setSelected(!graphicsPreviewAfter);
-        graphicsApply = addPreviewControl(comparisonRow, "After", () -> compareGraphicsPreview(true));
-        graphicsApply.setContentDescription("After: only draft " + GraphicsPreviewComparison.name(graphicsPreviewChoice));
-        graphicsApply.setSelected(graphicsPreviewAfter);
-        graphicsBack = addPreviewControl(comparisonRow, "Back", this::returnFromGraphicsPreview);
-        graphicsBack.setContentDescription("Revert comparison and return to Graphics");
+        final LinearLayout optionsRow = addPreviewControlRow(panel);
+        for (int choice = 0; choice < graphicsOptionButtons.length; ++choice) {
+            final int selectedChoice = choice;
+            graphicsOptionButtons[choice] = addPreviewControl(optionsRow, graphicsOptionLabel(choice),
+                    () -> showGraphicsPreviewOptionMenu(graphicsOptionButtons[selectedChoice],selectedChoice));
+            graphicsOptionButtons[choice].setContentDescription(graphicsOptionLabel(choice) + "; choose live preview setting");
+            graphicsOptionButtons[choice].setEnabled(false); // A matching current RT frame enables editing.
+        }
         final LinearLayout actionRow = addPreviewControlRow(panel);
         final String[] cameras = {"Overview", "Materials", "Glass", "Water", "Skeleton", "Mirror"};
         final Button view = addPreviewControl(actionRow, "View", () -> {
             graphicsPreviewCamera = (graphicsPreviewCamera + 1) % cameras.length;
-            publishGraphicsPreview(false); showGraphicsPreviewPage();
+            resetGraphicsPreviewTimeline(); showGraphicsPreviewPage();
         });
         view.setContentDescription("View: " + cameras[graphicsPreviewCamera] + "; change preview camera");
+        graphicsImageButton = addPreviewControl(actionRow, "Image", () -> {
+            graphicsPreviewImageOnly = true; showGraphicsPreviewPage();
+        });
+        graphicsImageButton.setContentDescription("Show image without the control strip; Controls restores it. Unconfirmed settings still revert after 15 visible seconds.");
         graphicsDetailsButton = addPreviewControl(actionRow, "Details", this::showGraphicsPreviewDetails);
         graphicsConfirm = addPreviewControl(actionRow, "Apply", () -> {
             final long[] applied = ProbeBridge.getGraphicsSnapshot();
-            if (!GraphicsPreviewComparison.presented(applied, surfaceRequestGeneration, graphicsRequestSerial, previewSelection())) return;
+            if (!GraphicsPreviewOptions.presented(applied, surfaceRequestGeneration, graphicsRequestSerial, previewSelection())) return;
             if (applied[2] == 2) {
                 confirmGraphicsSelection();
             } else if (GraphicsPreferences.markPending(preferences, previewSelection())) {
+                resetGraphicsPreviewTimeline();
                 graphicsSubmitted = previewSelection(); graphicsDraft = graphicsSubmitted;
                 graphicsRequestSerial = ProbeBridge.applyGraphicsSettings(graphicsSubmitted.scale, graphicsSubmitted.water,
                         graphicsSubmitted.fire, graphicsSubmitted.cap, surfaceRequestGeneration);
                 graphicsBusy = graphicsRequestSerial != 0; graphicsConfirmationStarted = 0;
             }
         });
+        graphicsApply = graphicsConfirm;
         graphicsConfirm.setEnabled(false);
         graphicsRevert = addPreviewControl(actionRow, "Revert", () -> {
-            requestGraphicsRevert(false); publishGraphicsPreview(true);
+            requestGraphicsRevert(false);
         });
         graphicsRevert.setContentDescription(getString(R.string.graphics_revert));
+        graphicsBack = addPreviewControl(actionRow, "Back", this::returnFromGraphicsPreview);
+        graphicsBack.setContentDescription("Revert live settings and return to Graphics");
         int left = dp(8), right = dp(8), bottom = dp(8);
         final WindowInsets insets = menuScrim.getRootWindowInsets();
         if (insets != null) {
@@ -1941,12 +2028,13 @@ public class MainActivity extends Activity {
         }
         final int viewportHeight = menuScrim.getHeight() > 0 ? menuScrim.getHeight() : getResources().getDisplayMetrics().heightPixels;
         final ScrollView scroller = new GraphicsPreviewControlsScrollView(this,
-                GraphicsPreviewComparison.maximumOverlayHeight(viewportHeight, bottom));
+                GraphicsPreviewOptions.maximumOverlayHeight(viewportHeight, bottom));
         scroller.addView(panel, new ScrollView.LayoutParams(-1, -2));
         final FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(-1, -2);
         layout.gravity = Gravity.BOTTOM; layout.setMargins(left, 0, right, bottom);
         menuScrim.addView(scroller, layout);
         setGraphicsEditorsEnabled(panel, !graphicsBusy);
+        for (Button option : graphicsOptionButtons) option.setEnabled(false);
     }
 
     private LinearLayout addPreviewControlRow(LinearLayout panel) {
@@ -1960,10 +2048,33 @@ public class MainActivity extends Activity {
     }
 
     private void returnFromGraphicsPreview() {
-        graphicsRestoreDraftAfterPreview = graphicsComparisonDraft;
+        graphicsPreviewImageOnly = false;
+        graphicsRestoreDraftAfterPreview = graphicsOriginalPreviewDraft;
         requestGraphicsRevert(false);
         graphicsPreviewWanted = false; graphicsSceneRestoring = true;
         publishGraphicsPreview(false); showGraphicsPage();
+    }
+
+    private void showGraphicsPreviewImageOnly() {
+        final LinearLayout row = new LinearLayout(this); row.setOrientation(LinearLayout.HORIZONTAL);
+        graphicsPanel = row;
+        graphicsControlsButton = addPreviewControl(row, "Controls", () -> {
+            graphicsPreviewImageOnly = false; showGraphicsPreviewPage();
+        });
+        graphicsControlsButton.setContentDescription("Show graphics controls. Image inspection does not save; unconfirmed settings still revert after 15 visible seconds.");
+        int left = dp(8), top = dp(8);
+        final WindowInsets insets = menuScrim.getRootWindowInsets();
+        if (insets != null) {
+            left = Math.max(left, insets.getStableInsetLeft() + dp(8));
+            top = Math.max(top, insets.getStableInsetTop() + dp(8));
+            if (Build.VERSION.SDK_INT >= 28 && insets.getDisplayCutout() != null) {
+                left = Math.max(left, insets.getDisplayCutout().getSafeInsetLeft() + dp(8));
+                top = Math.max(top, insets.getDisplayCutout().getSafeInsetTop() + dp(8));
+            }
+        }
+        final FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(-2, -2);
+        layout.gravity = Gravity.TOP | Gravity.START; layout.setMargins(left, top, dp(8), dp(8));
+        menuScrim.addView(row, layout); graphicsControlsButton.requestFocus();
     }
 
     private Button addPreviewControl(LinearLayout row, String text, Runnable action) {
@@ -1977,11 +2088,13 @@ public class MainActivity extends Activity {
     }
 
     private void dismissGraphicsPreviewDetails() {
+        dismissGraphicsPreviewOptions();
         if (graphicsDetailsDialog != null) graphicsDetailsDialog.dismiss();
         graphicsDetailsDialog = null; graphicsDetailsTelemetry = null; graphicsDetailsPanel = null; graphicsGraph = null;
     }
 
     private void showGraphicsPreviewDetails() {
+        graphicsPreviewImageOnly = false;
         dismissGraphicsPreviewDetails();
         final LinearLayout panel = new LinearLayout(this); panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPadding(dp(16), dp(12), dp(16), dp(12));
@@ -1991,16 +2104,16 @@ public class MainActivity extends Activity {
         graphicsDetailsTelemetry.setText(graphicsPreviewDetailsText); panel.addView(graphicsDetailsTelemetry, matchWrap());
         if (graphicsRecoveryNotice != null) addBody(panel, graphicsRecoveryNotice);
         graphicsGraph = new PreviewTimingGraphView(this); panel.addView(graphicsGraph, new LinearLayout.LayoutParams(-1, dp(56)));
-        addBody(panel, "Before uses your confirmed settings. After changes only " + GraphicsPreviewComparison.name(graphicsPreviewChoice) +
-                ". Comparison does not save. Apply then Keep is required. Frame cap is preview pacing, not a full-game performance setting.");
+        addBody(panel, "Choose settings directly in this scene. Each choice retains the other live settings. Preview changes do not save; Apply then Keep is required. " +
+                "Preview FPS counts successful RT swapchain presents per second, not display scanout FPS or full-game performance. Image hides the strip; Controls restores it.");
         final Button pause = addGraphicsButton(panel, graphicsPreviewPaused ? "Resume preview animation" : "Pause preview animation", () -> {
             graphicsPreviewPaused = !graphicsPreviewPaused; publishGraphicsPreview(false);
             dismissGraphicsPreviewDetails(); showGraphicsPreviewDetails();
         });
         pause.setEnabled(!graphicsBusy);
-        addGraphicsButton(panel, "Reset timeline", () -> publishGraphicsPreview(true));
+        addGraphicsButton(panel, "Reset timeline", this::resetGraphicsPreviewTimeline);
         addGraphicsButton(panel, graphicsPreviewMotion ? "Stop motion test" : "Start motion test", () -> {
-            graphicsPreviewMotion = !graphicsPreviewMotion; publishGraphicsPreview(true);
+            graphicsPreviewMotion = !graphicsPreviewMotion; resetGraphicsPreviewTimeline();
             dismissGraphicsPreviewDetails(); showGraphicsPreviewDetails();
         });
         final ScrollView scroller = new ScrollView(this); scroller.addView(panel);
@@ -2022,29 +2135,35 @@ public class MainActivity extends Activity {
             showGraphicsPage(); return;
         }
         if (!GraphicsPreferences.presented(applied, surfaceRequestGeneration) || applied[19] != 1) {
-            graphicsTelemetry.setText(GraphicsPreviewComparison.name(graphicsPreviewChoice) + ": loading RT preview");
+            setGraphicsPreviewStatus("Preview FPS: waiting for RT");
             graphicsPreviewDetailsText = "Loading actual RT preview...\n" + settingsText;
-            if (graphicsDetailsTelemetry != null) graphicsDetailsTelemetry.setText(graphicsPreviewDetailsText);
-            return;
-        }
-        final boolean matching = GraphicsPreviewComparison.presented(applied, surfaceRequestGeneration,
-                graphicsRequestSerial, previewSelection());
-        final String selection = graphicsPreviewAfter ? "After" : "Before";
-        final String state = applied[2] == 2 && matching ? "Keep? " + Math.max(0, 15 -
-                (SystemClock.elapsedRealtime() - graphicsConfirmationStarted) / 1000) + "s" : matching ? "RT ready" :
-                (applied[14] & 64) != 0 ? "unavailable; previous output retained" : "waiting for RT";
-        final String[] cameras = {"Overview", "Materials", "Glass", "Water", "Skeleton", "Mirror"};
-        graphicsTelemetry.setText(GraphicsPreviewComparison.name(graphicsPreviewChoice) + " / " + selection + ": " + state +
-                "\nView: " + cameras[graphicsPreviewCamera]);
-        if (!matching) {
-            graphicsPreviewDetailsText = "Waiting for this comparison's current RT presentation.\n" + settingsText;
             if (graphicsDetailsTelemetry != null) graphicsDetailsTelemetry.setText(graphicsPreviewDetailsText);
             if (graphicsGraph != null) graphicsGraph.setSamples(new double[9]);
             return;
         }
-        final double[] p = ProbeBridge.getGraphicsPreviewPerformance();
-        if (p == null || p.length < 9) {
-            graphicsPreviewDetailsText = settingsText + "\nPreview timing and allocations unavailable.";
+        final boolean matching = GraphicsPreviewOptions.presented(applied, surfaceRequestGeneration,
+                graphicsRequestSerial, previewSelection());
+        final String state = graphicsLiveChoiceError != null ? "choice unavailable; Revert" : applied[2] == 2 && matching ? "Keep? " + Math.max(0, 15 -
+                (SystemClock.elapsedRealtime() - graphicsConfirmationStarted) / 1000) + "s" : matching ? "RT ready" :
+                (applied[14] & 64) != 0 ? "unavailable; previous output retained" : "waiting for RT";
+        final String[] cameras = {"Overview", "Materials", "Glass", "Water", "Skeleton", "Mirror"};
+        final double[] p = matching ? ProbeBridge.getGraphicsPreviewPerformance() : null;
+        final boolean currentTiming = matching && GraphicsPreviewOptions.currentPerformance(p, graphicsPreviewPerformanceEpochFloor);
+        final long now = SystemClock.elapsedRealtime();
+        if (currentTiming && (Double.isNaN(graphicsDisplayedFps) || graphicsDisplayedFpsEpoch != p[0] || now >= graphicsNextFpsUpdate)) {
+            graphicsDisplayedFps = p[1]; graphicsDisplayedFpsEpoch = p[0]; graphicsNextFpsUpdate = now + 1000;
+        }
+        final String fps = currentTiming ? String.format(Locale.US,"%.1f",graphicsDisplayedFps) : "waiting for RT";
+        setGraphicsPreviewStatus("Preview FPS: " + fps + "\n" + cameras[graphicsPreviewCamera] + " · " + state);
+        if (!matching) {
+            graphicsPreviewDetailsText = "Waiting for these settings' current RT presentation.\n" + settingsText;
+            if (graphicsLiveChoiceError != null) graphicsPreviewDetailsText += "\n" + graphicsLiveChoiceError;
+            if (graphicsDetailsTelemetry != null) graphicsDetailsTelemetry.setText(graphicsPreviewDetailsText);
+            if (graphicsGraph != null) graphicsGraph.setSamples(new double[9]);
+            return;
+        }
+        if (!currentTiming) {
+            graphicsPreviewDetailsText = settingsText + "\nWaiting for current-epoch preview timing and allocations.";
             if (graphicsDetailsTelemetry != null) graphicsDetailsTelemetry.setText(graphicsPreviewDetailsText);
             if (graphicsGraph != null) graphicsGraph.setSamples(new double[9]);
             return;
@@ -2058,8 +2177,14 @@ public class MainActivity extends Activity {
                 "\nAllocation classifications may overlap. GPU budget/residency unavailable." +
                 "\nSuccessful swapchain presents are not display scanout FPS. Preview is not a full-game benchmark.",
                 p[1], p[2], p[3], gpu, applied[6], p[7], deviceLocal, hostVisible);
+        if (graphicsLiveChoiceError != null) graphicsPreviewDetailsText += "\n" + graphicsLiveChoiceError;
         if (graphicsDetailsTelemetry != null) graphicsDetailsTelemetry.setText(graphicsPreviewDetailsText);
         if (graphicsGraph != null) graphicsGraph.setSamples(p);
+    }
+
+    private void setGraphicsPreviewStatus(String status) {
+        // Keep native 4 Hz sampling without repeated accessibility/text events or FPS label flicker.
+        if (!status.contentEquals(graphicsTelemetry.getText())) graphicsTelemetry.setText(status);
     }
 
     private Button addGraphicsButton(LinearLayout panel, String text, Runnable action) {
@@ -2080,6 +2205,11 @@ public class MainActivity extends Activity {
             // a later Back/Revert would restore its unsaved committed candidate.
             ProbeBridge.beginGraphicsEdit(graphicsConfirmed.scale, graphicsConfirmed.water,
                     graphicsConfirmed.fire, graphicsConfirmed.cap);
+            if (graphicsPreviewWanted) {
+                // Match the actual restored tuple; the original outside draft remains separate.
+                graphicsDraft = graphicsConfirmed;
+                resetGraphicsPreviewTimeline();
+            }
             graphicsAwaitingRestore = true;
             graphicsRequestSerial = ProbeBridge.revertGraphicsSettings(surfaceRequestGeneration);
             if (graphicsRequestSerial == 0) { setNativeGraphics(graphicsConfirmed); graphicsRecovering = true; }
@@ -2208,7 +2338,9 @@ public class MainActivity extends Activity {
 
     private void requestGraphicsRevert(boolean close) {
         dismissGraphicsPreviewDetails();
-        if (graphicsPreviewWanted) graphicsPreviewAfter = false;
+        if (close) graphicsPreviewImageOnly = false;
+        graphicsLiveChoiceError = null;
+        if (graphicsPreviewWanted) { graphicsDraft = graphicsConfirmed; resetGraphicsPreviewTimeline(); }
         if (close) graphicsRestoreDraftAfterPreview = null;
         if (graphicsPreviewWanted && close) {
             graphicsPreviewWanted = false;
@@ -2236,7 +2368,7 @@ public class MainActivity extends Activity {
             final double seconds = graphicsPollTime == 0 ? 0 : Math.max(0, now - graphicsPollTime) / 1000.0;
             graphicsPollTime = now;
             final long[] a = ProbeBridge.getGraphicsSnapshot();
-            if (a == null || a.length != 20) { handler.postDelayed(this, 200); return; }
+            if (a == null || a.length != 20) { handler.postDelayed(this, 250); return; }
             final boolean presented = GraphicsPreferences.presented(a, surfaceRequestGeneration);
             if (graphicsRecovering && presented && graphicsConfirmed.same(
                     new GraphicsPreferences.Values((int)a[3], (int)a[4], (int)a[5], (int)a[6]))) {
@@ -2253,14 +2385,14 @@ public class MainActivity extends Activity {
                 setGraphicsEditorsEnabled(graphicsPanel, !busy);
                 if (graphicsDetailsPanel != null) setGraphicsEditorsEnabled(graphicsDetailsPanel, !busy);
                 final boolean ready = presented && a[0] == graphicsRequestSerial && (!graphicsPreviewWanted ||
-                        GraphicsPreviewComparison.presented(a, surfaceRequestGeneration, graphicsRequestSerial, previewSelection()));
+                        GraphicsPreviewOptions.presented(a, surfaceRequestGeneration, graphicsRequestSerial, previewSelection()));
                 if (state == 2 && ready) {
                     final boolean firstConfirmationPoll = graphicsConfirmationStarted == 0;
                     if (firstConfirmationPoll) graphicsConfirmationStarted = now;
                     final long reverted = ProbeBridge.advanceGraphicsConfirmation(firstConfirmationPoll ? 0 : seconds,
                             true, surfaceRequestGeneration);
                     if (reverted != 0) { graphicsRequestSerial = reverted; graphicsConfirmationStarted = 0;
-                        if (graphicsPreviewWanted) graphicsPreviewAfter = false;
+                        if (graphicsPreviewWanted) { graphicsDraft = graphicsConfirmed; resetGraphicsPreviewTimeline(); }
                         graphicsAwaitingRestore = true; }
                 }
                 if (graphicsSceneRestoring && ready && a[19] == 1 && (a[14] & 64) != 0) {
@@ -2280,14 +2412,23 @@ public class MainActivity extends Activity {
                     showGraphicsPage();
                 }
                 graphicsApply.setEnabled(!busy && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1);
-                final boolean comparisonReady = graphicsPreviewWanted && GraphicsPreviewComparison.presented(a,
+                final boolean previewReady = graphicsPreviewWanted && GraphicsPreviewOptions.presented(a,
                         surfaceRequestGeneration, graphicsRequestSerial, previewSelection());
-                graphicsConfirm.setEnabled(graphicsPreviewWanted ? comparisonReady && ((state == 2 && ready) || !busy) : state == 2 && ready);
+                graphicsConfirm.setEnabled(graphicsPreviewWanted ? previewReady && graphicsLiveChoiceError == null && ((state == 2 && ready) || !busy) : state == 2 && ready);
                 if (graphicsPreviewWanted) {
-                    graphicsBefore.setEnabled(!busy && presented && a[19] == 1);
-                    graphicsApply.setEnabled(!busy && presented && a[19] == 1);
-                    graphicsConfirm.setText(state == 2 ? "Keep" : "Apply");
-                    graphicsConfirm.setContentDescription(state == 2 ? getString(R.string.graphics_keep) : "Apply selected comparison; confirmation is required");
+                    for (int choice = 0; choice < graphicsOptionButtons.length; ++choice) {
+                        final Button option = graphicsOptionButtons[choice];
+                        if (option != null) {
+                            final String label = graphicsOptionLabel(choice);
+                            if (!label.contentEquals(option.getText())) option.setText(label);
+                            option.setContentDescription(label + "; choose live preview setting");
+                            option.setEnabled(!busy && previewReady && graphicsLiveChoiceError == null);
+                        }
+                    }
+                    final String confirmLabel = state == 2 ? "Keep" : "Apply";
+                    final String confirmDescription = state == 2 ? getString(R.string.graphics_keep) : "Apply live preview settings; confirmation is required";
+                    if (!confirmLabel.contentEquals(graphicsConfirm.getText())) graphicsConfirm.setText(confirmLabel);
+                    if (!confirmDescription.equals(graphicsConfirm.getContentDescription())) graphicsConfirm.setContentDescription(confirmDescription);
                 }
                 graphicsRevert.setEnabled(state != 4);
                 final String preset = graphicsDraft.same(GraphicsPreferences.baseline()) ?
@@ -2309,7 +2450,7 @@ public class MainActivity extends Activity {
                 if (graphicsPreviewWanted) refreshGraphicsPreviewTelemetry(a, settingsText);
                 else graphicsTelemetry.setText(settingsText);
             }
-            handler.postDelayed(this, 200);
+            handler.postDelayed(this, 250);
         }
     };
 
@@ -3965,6 +4106,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        graphicsPreviewImageOnly = false;
         dismissGraphicsPreviewDetails();
         if (keeperRevealTitle != null) keeperRevealTitle.setVisibility(View.GONE);
         if (graphicsVisible) {

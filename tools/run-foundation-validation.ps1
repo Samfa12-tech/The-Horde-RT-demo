@@ -348,6 +348,8 @@ function Test-ValidationPackages {
         "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
         "assets/models/props/runtime/asset.manifest.json",
         "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/models/world/runtime/collapsed-entry/asset.manifest.json",
+        "assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
         "assets/models/props/runtime/dielectric-fixture/asset.manifest.json",
         "assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
         "assets/models/props/runtime/gothic-chest-base/asset.manifest.json",
@@ -388,6 +390,8 @@ function Test-ValidationPackages {
         "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
         "assets/models/props/runtime/asset.manifest.json",
         "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/models/world/runtime/collapsed-entry/asset.manifest.json",
+        "assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
         "assets/models/props/runtime/dielectric-fixture/asset.manifest.json",
         "assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
         "assets/models/props/runtime/gothic-chest-base/asset.manifest.json",
@@ -452,7 +456,7 @@ function Test-ValidationPackages {
         if ($resources -notmatch [regex]::Escape($marker)) { throw "Android validation APK lacks credit marker: $marker" }
     }
     & (Join-Path $PSScriptRoot "test-held-item-package-contract.ps1") `
-        -AndroidApkPath $androidValidationApk -WindowsZipPath $windowsZip
+        -AndroidApkPath $androidValidationApk -WindowsZipPath $windowsZip -RequireHorde162World
     if ($LASTEXITCODE -ne 0) { throw "Held-item validation package contract failed." }
     $manifest = (& $aapt2 dump xmltree --file AndroidManifest.xml $androidValidationApk 2>&1 | Out-String)
     if ($LASTEXITCODE -ne 0) { throw "aapt2 could not inspect Android validation manifest." }
@@ -847,6 +851,8 @@ try {
                 $androidValidationApk,
                 (Join-Path $repoRoot "assets\models\enemies\meshy\skeleton_biped_merged_animations_v01.glb"),
                 (Join-Path $repoRoot "assets\models\enemies\meshy\lich_placeholder_merged_animations_v01.glb"),
+                (Join-Path $repoRoot "assets\models\world\runtime\collapsed-entry\asset.manifest.json"),
+                (Join-Path $repoRoot "assets\models\world\runtime\collapsed-entry\collapsed-entry-lod0.runtime.glb"),
                 (Join-Path $repoRoot "assets\textures\polyhaven\mobile_1k\diff-array-512-astc6x6.ktx2"),
                 (Join-Path $repoRoot "assets\textures\polyhaven\mobile_1k\normal-array-512-astc4x4.ktx2"),
                 (Join-Path $repoRoot "assets\textures\polyhaven\mobile_1k\arm-array-512-astc6x6.ktx2"),

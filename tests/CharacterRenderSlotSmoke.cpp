@@ -232,9 +232,10 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kBlasCount == 16u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 21u,
-                  "production props and generic dielectric fixture must add bounded BLAS resources while TLAS reserves the appended viewmodel slot");
+    ok &= Require(PresentableTinyRtScene::kBlasCount == 18u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 22u &&
+                      PresentableTinyRtScene::kCollapseInstanceIndex == 21u,
+                  "bounded BLAS maximum includes optional viewmodel and immutable collapse; TLAS preserves viewmodel20 and appends collapse21");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =
@@ -1458,6 +1459,35 @@ int main()
             androidConfirm.find("gSurfaceSessions.State(static_cast<std::uint64_t>(generation)) != 1") <
                 androidConfirm.find("gGraphicsEdit->Confirm()"),
             "Android must acknowledge a replacement output only after its own presentation and reject confirmation for an inactive surface under the graphics lock");
+        const auto androidFunctionSource = [&androidBridgeSource](const std::string_view name)
+        {
+            const auto begin = androidBridgeSource.find(name);
+            const auto end = androidBridgeSource.find("\n}", begin);
+            return begin != std::string::npos && end != std::string::npos
+                ? androidBridgeSource.substr(begin, end - begin) : std::string{};
+        };
+        const auto androidPerformanceGetter = androidFunctionSource(
+            "Java_com_samfa12_hordelanternrt_ProbeBridge_getGraphicsPreviewPerformance(");
+        const auto androidSurfaceStart = androidFunctionSource(
+            "Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(");
+        const auto androidRenderLoop = androidFunctionSource("void SwapchainRenderLoop()");
+        ok &= Require(!androidPerformanceGetter.empty() && !androidSurfaceStart.empty() && !androidRenderLoop.empty() &&
+            androidPerformanceGetter.find("std::lock_guard lock(gGraphicsMutex);") <
+                androidPerformanceGetter.find("gPreviewPerformanceGeneration == 0u") &&
+            androidPerformanceGetter.find("gPreviewPerformanceGeneration != gAppliedGraphics.lifecycleGeneration") != std::string::npos &&
+            androidPerformanceGetter.find("gPreviewPerformanceGeneration != gPreviewControls.generation") != std::string::npos &&
+            androidPerformanceGetter.find("!gSurfaceSessions.IsCurrent(gPreviewPerformanceGeneration)") <
+                androidPerformanceGetter.find("return env->NewDoubleArray(0)") &&
+            androidPerformanceGetter.find("return env->NewDoubleArray(0)") <
+                androidPerformanceGetter.find("const auto& a = gPreviewPerformance") &&
+            androidSurfaceStart.find("gSurfaceSessions.Start(") < androidSurfaceStart.find("std::lock_guard lock(gGraphicsMutex);") &&
+            androidSurfaceStart.find("std::lock_guard lock(gGraphicsMutex);") < androidSurfaceStart.find("gPreviewPerformance = {};") &&
+            androidSurfaceStart.find("gPreviewPerformanceGeneration = 0u;") != std::string::npos &&
+            androidRenderLoop.find("std::lock_guard lock(gGraphicsMutex);\n                if (gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration))") != std::string::npos &&
+            androidRenderLoop.find("if (gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration))") <
+                androidRenderLoop.find("gPreviewPerformance = gSwapchainContext.previewPerformance.Snapshot();") &&
+            androidRenderLoop.find("gPreviewPerformanceGeneration = gSwapchainContext.surfaceGeneration;") != std::string::npos,
+            "Android preview telemetry must be published and read under the graphics lock with a live matching surface generation, and clear on each new surface request");
         ok &= Require(pendulumSource.find("torsionAngularAcceleration") != std::string::npos &&
                       pendulumSource.find("SignedYawDelta") != std::string::npos &&
                       pendulumSource.find("kHandBasisTeleportRadians") != std::string::npos &&

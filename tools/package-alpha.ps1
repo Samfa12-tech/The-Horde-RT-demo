@@ -266,7 +266,7 @@ foreach ($creditMarker in @(
 }
 
 & (Join-Path $repoRoot "tools\test-held-item-package-contract.ps1") `
-    -AndroidApkPath $androidCandidate -WindowsZipPath $windowsZip
+    -AndroidApkPath $androidCandidate -WindowsZipPath $windowsZip -RequireHorde162World
 if ($LASTEXITCODE -ne 0) { throw "Held-item package attribution contract failed." }
 $androidManifest = (& $aapt2 dump xmltree --file AndroidManifest.xml $androidCandidate 2>&1 | Out-String)
 if ($LASTEXITCODE -ne 0) { throw "Failed to inspect the Android manifest in $androidCandidate" }
@@ -305,6 +305,8 @@ try {
         'assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb',
         'assets/models/props/runtime/asset.manifest.json',
         'assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb',
+        'assets/models/world/runtime/collapsed-entry/asset.manifest.json',
+        'assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb',
         'assets/models/props/runtime/dielectric-fixture/asset.manifest.json',
         'assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb',
         'assets/models/props/runtime/gothic-chest-base/asset.manifest.json',
@@ -383,6 +385,8 @@ try {
         "assets/models/weapons/runtime/gothic-arming-sword-rh-lod0.runtime.glb",
         "assets/models/props/runtime/asset.manifest.json",
         "assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",
+        "assets/models/world/runtime/collapsed-entry/asset.manifest.json",
+        "assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",
         "assets/models/props/runtime/dielectric-fixture/asset.manifest.json",
         "assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb",
         "assets/models/props/runtime/gothic-chest-base/asset.manifest.json",

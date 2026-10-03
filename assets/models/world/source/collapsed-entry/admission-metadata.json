@@ -1,0 +1,25 @@
+{
+  "productionAtlas": {
+    "categoryOrder": [
+      "baseColor",
+      "normal",
+      "orm"
+    ],
+    "materialOrder": [
+      "Boulder01Rock",
+      "MedievalWall02"
+    ],
+    "layerOrder": [
+      10,
+      11
+    ],
+    "emissive": "none; existing black fallback unchanged"
+  },
+  "formApproval": {
+    "revision": 2,
+    "day": "2026-10-03",
+    "blendSha256": "f03e8a175b20c60f444a133831586a533d7c1de2a73ceda916af6e521ecd547a",
+    "contactSheetSha256": "0fa7fca2b8e403b8c8f33b9adc70381a751e8e2c9e397e3dd1efe06547807486"
+  },
+  "acceptance": "Form approved for export; native Runtime/resource/device acceptance pending"
+}

@@ -155,7 +155,8 @@ float TorchOverheadLowering(const Vec3& gripWorld, const Vec3& viewUp,
     float lowering = 0.0f;
     const auto include = [&](const horde::scene::OverheadVolume& volume) {
         const float required = std::max(0.0f,
-            highestY + kHeldTorchOverheadGap - volume.bottomY);
+            highestY + kHeldTorchOverheadGap -
+                horde::scene::MinimumOverheadBottomY(volume, gripWorld[0], gripWorld[2], radius));
         if (required == 0.0f) return;
         const float distance = std::max(0.0f,
             DistanceToOverheadFootprint(volume, gripWorld[0], gripWorld[2]) - radius);
@@ -166,6 +167,8 @@ float TorchOverheadLowering(const Vec3& gripWorld, const Vec3& viewUp,
     };
     for (const auto& volume : horde::scene::kShowcaseLowOverheadVolumes) include(volume);
     for (const auto& volume : horde::scene::kShowcaseCeilingPatches) include(volume);
+    for (const auto& volume : horde::scene::kShowcaseImportedOverheadVolumes) include(volume);
+    include(horde::scene::kShowcaseCollapseRoofSeam);
     return lowering;
 }
 

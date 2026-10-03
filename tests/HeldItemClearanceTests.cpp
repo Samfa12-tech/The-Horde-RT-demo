@@ -55,12 +55,17 @@ bool PointHasClearance(Vec3 point)
     const auto clear = [&](const auto& volumes) {
         for (const auto& volume : volumes)
             if (InsideFootprint(volume, point) &&
-                point[1] > volume.bottomY - kHeldTorchOverheadGap + 0.00001f)
+                point[1] > volume.bottomY +
+                    volume.bottomGradientXZ[0] * (point[0] - volume.bottomAnchorXZ[0]) +
+                    volume.bottomGradientXZ[1] * (point[2] - volume.bottomAnchorXZ[1]) -
+                    kHeldTorchOverheadGap + 0.00001f)
                 return false;
         return true;
     };
     return clear(horde::scene::kShowcaseLowOverheadVolumes) &&
-           clear(horde::scene::kShowcaseCeilingPatches);
+           clear(horde::scene::kShowcaseCeilingPatches) &&
+           clear(horde::scene::kShowcaseImportedOverheadVolumes) &&
+           clear(std::array{horde::scene::kShowcaseCollapseRoofSeam});
 }
 
 bool FullTorchEnvelopeHasClearance(const HeldItemFixedStepState& state)
@@ -90,7 +95,7 @@ void TestPortalApproachesAndLookAngles()
     for (const auto profile : {PlayerMountProfile::LegacyViewRelative, PlayerMountProfile::AnatomicalBody})
         for (float yaw : {-3.14159265f, -1.5707963f, 0.0f, 1.5707963f})
             for (float pitch : {-0.32f, 0.0f, 0.28f})
-                for (int portal = 0; portal < 3; ++portal)
+                for (int portal = 0; portal < 4; ++portal)
                     for (int step = 0; step <= 100; ++step)
                     {
                         HeldItemFixedStepInput input;
@@ -100,7 +105,7 @@ void TestPortalApproachesAndLookAngles()
                         input.walkTime = step / 60.0f;
                         input.walkAmount = 1.0f;
                         input.playerX = portal == 2 ? -28.3f - 0.025f * step : 0.0f;
-                        input.playerZ = portal == 2 ? -15.2f :
+                        input.playerZ = portal == 3 ? 1.95f + 0.0121f * step : portal == 2 ? -15.2f :
                             (portal == 0 ? -2.0f : -5.2f) - 0.025f * step;
                         input.playerCombat.action = step % 2 == 0
                             ? PlayerCombatAction::SwingActive : PlayerCombatAction::ParryActive;
@@ -116,7 +121,7 @@ void TestPortalApproachesAndLookAngles()
                         coherent &= Distance(flame, TransformPoint(state.light.worldFromFlame, {})) < 0.00001f &&
                                     Distance(light, TransformPoint(state.light.worldFromLight, {})) < 0.00001f;
                     }
-    Check(clear, "torch mesh and complete tilted flame envelope must clear all three low portal approaches and look angles");
+    Check(clear, "torch mesh and complete tilted flame envelope must clear three low portals and the imported roof transition at the unchanged route limit");
     Check(coherent, "clearance hand/item/flame/light must retain exact shared socket composition through attack and parry");
     Check(maximumLowering > 0.4f && maximumLowering < 0.8f,
           "low-lintel response must be real bounded carry lowering");

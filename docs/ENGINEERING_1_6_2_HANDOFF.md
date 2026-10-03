@@ -14,6 +14,20 @@ Read this first after compaction. Current source and explicit owner instructions
 
 ## Current next action
 
+Latest source is frozen for the integrated build/backup slice. Live Resolution/Water/Fire/Cap options replace historical Before/After; scoped Preview FPS counts actual RT presents, and Image/Controls exposes the scene. Java120/21classes PASS, lint0errors46warnings, exact MainActivityb57eb875... and bridge0899b7be...; no new APK/device acceptance yet. Native performance publication tags actual surface generation. Save-failure restores the confirmed tuple while preserving the outside draft.
+
+Owner-approved revision-two collapse is exported through generic static PBR: required652980B GLB c67471b5..., ABI22/static10, atlas12 layers with every original mip preserved (Android+5301408B/Windows+33554424B encoded payload). Packaging now closes world and selected-platform props rosters, manifest+4arrays, with exact hashes. All16 finite shaders regenerated against ABI. Approved Blender/art is unchanged.
+
+Expanded final animated-rig checking initially failed61 real checks near retained arch masonry, worst-.335003m. Exact authored roof/shoulder/side-envelope/arch constraints now fix the shared smooth lowering without weakening the solver or30mm reserve/15mm grip guard: all3107 poses PASS,1632 new15855-vertex skins,3178 real triangle samples,57970 disk samples, minimum32.2371mm/maxgrip12.1731micrometres. Negative and corrected evidence remain sealed privately. Owner explicitly requested smooth lowering under roofs/thresholds analogous to wall retraction. Native feel/motion acceptance is separate.
+
+Debug application rebuild PASS after correcting a nonexistent resize-field reference, exactexe186e1ce887f6fb8618bc417921560f9207c8f35a998cd8397cd37b9f861cb70a. Motion CPU fixtures2/2 PASS9.59s; affected Debug renderer/resource/policy6/6 PASS76.85s. Windows Release full build PASS, exactexe64f24a6f96a08926a530103c144f889525424b8ef90bfb36ecb72366769f4ecc. Props closed-package69cases and registeredCTest1/1PASS39.78s; actual19-file managed Android staging matches exactbytes. New bounded Debug ordinary motion adapter was independently reviewed: exact submitted-slot and completed-identity joins, portable fixture dependency, real retry scope reset, one measured-dt simulation and muted isolated output. Current GPU motion, full integrated checks, final packages/performance and owner visual/audio gates remain OPEN.
+
+Current remote backup remains e411b8036f8dc59ffebc49b469bd72c1bafe6562; six jobs passed for push37114575003/PR37114577660. Next: commit/push this coherent source slice, bind fresh build inputs to new HEAD, complete all4ABI Android APK, then lead-only actual RT motion/collapse/shaft/options/FPS/lifecycle and exact final matched performance. Old119-test APK a4388e81... is preserved; actual unchanged75%/Mobile/Mobile/30Hz Apply/Keep passed under explicit owner permission. Later Back attempt failed closed after user removed the Debug task, so no Back/resume pass claimed. Lead alone owns allocated phone/GPU; preserve all data and use only owned processes. No merge/sign/tag/publication.
+
+## Historical intermediate snapshots
+
+The following earlier checkpoints retain their exact artifacts and rejected paths; they are historical and are superseded by the current action above.
+
 **3 October current steering supersedes the dated snapshots below.** Owner explicitly approved revision two's full-width ascending stairs and partial roof cave-in for runtime export. Art owner exports the sealed revision-two geometry; native owner integrates it through generic static PBR admission. Native lighting, memory, performance and final owner visual acceptance remain open. Preserve rejected revision one's files and evidence.
 
 Latest mobile steering replaces Before/After with settings choices inside the live graphics scene and a visible preview FPS counter. Java owner is implementing that follow-up plus an Image/Controls toggle; the sealed119-test Before/After slice below is finite historical validation and a safe backup, not final UX acceptance. Owner also explicitly permits Apply/Keep testing only with the unchanged original75%/Mobile-water/Mobile-fire/30Hz tuple. Automatic approval review's earlier Apply rejection remains recorded; no blocked tap ran. Verify exact current values before the authorized unchanged-settings test.
@@ -65,7 +79,7 @@ Collapse Function/layout/reference approval explicitly received after owner manu
 | P2 graphics/preview | graphics_design + lead | host/RTX verified | Shared settings, actual isolated compact Pipeline/RayQuery preview; native UI/lifecycle owner acceptance pending |
 | P3 material/temporal/shadows | material_audit | host verified | Shared128B ABI and bounded High+Max samples implemented; DRS/motion CPU feasibility and vendor deferrals recorded; matched GPU cost pending |
 | P4 audio/reveal | audio_reveal_audit | host verified | Deterministic reveal/music/idle/voices and Core sample/queue tests pass; changed-audio listening and route motion pending |
-| P4 scenes/UI/fire/clearance | lead + audit_alignment | implementing/gated | Function/layout approved; final Blender composition underway; Form/export pending. Shaft/UI/fire/clearance host checked, motion/owner acceptance pending |
+| P4 scenes/UI/fire/clearance | lead + audit_alignment | implementing/gated | Revision2 Form approved/exported; strict3107 real-rig poses pass. Native motion/device/owner acceptance pending |
 | P5 integrated candidate | lead | implementing | PR18/current six-job CI green3500099; Debug/Release and Android built; full Release114 tests and matched PC evidence next |
 
 ## Evidence and decisions

@@ -248,6 +248,9 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         $<$<CONFIG:Debug>:HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}">
     )
     horde_rt_attach_raygen_artifacts(horde_rt_diagnostic_window)
+    target_sources(horde_rt_diagnostic_window PRIVATE
+        "$<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/src/gameplay/validation/MotionEvidenceScenario.cpp>"
+        "$<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/src/telemetry/MotionEvidenceLedger.cpp>")
 
     set_target_properties(horde_rt_diagnostic_window PROPERTIES
         OUTPUT_NAME "HordeLanternRT"
@@ -290,6 +293,15 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_windows_output_resize_launch_tests PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_windows_output_resize_launch_tests COMMAND horde_rt_windows_output_resize_launch_tests)
+    add_executable(horde_rt_windows_motion_evidence_launch_tests tests/WindowsMotionEvidenceLaunchTests.cpp)
+    target_include_directories(horde_rt_windows_motion_evidence_launch_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_windows_motion_evidence_launch_tests COMMAND horde_rt_windows_motion_evidence_launch_tests)
+    add_executable(horde_rt_motion_evidence_scenario_tests tests/MotionEvidenceScenarioTests.cpp
+        src/gameplay/validation/MotionEvidenceScenario.cpp src/telemetry/MotionEvidenceLedger.cpp
+        src/telemetry/RtPerformanceEvidence.cpp)
+    target_include_directories(horde_rt_motion_evidence_scenario_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(horde_rt_motion_evidence_scenario_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_motion_evidence_scenario_tests COMMAND horde_rt_motion_evidence_scenario_tests)
 
     if(HORDE_RT_BUILD_VULKAN_TARGETS)
         add_executable(horde_rt_final_held_torch_clearance_tests tests/FinalHeldTorchClearanceTests.cpp)
@@ -570,6 +582,17 @@ if(BUILD_TESTING)
         horde_gameplay_simulation
     )
     add_test(NAME horde_rt_production_prop_asset_tests COMMAND horde_rt_production_prop_asset_tests)
+
+    add_executable(horde_rt_static_collapse_asset_tests tests/StaticCollapseAssetTests.cpp)
+    target_include_directories(horde_rt_static_collapse_asset_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+    target_sources(horde_rt_static_collapse_asset_tests PRIVATE
+        src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp
+        src/vulkan/raytracing/RtStaticMeshSlot.cpp)
+    target_compile_definitions(horde_rt_static_collapse_asset_tests PRIVATE
+        HORDE_RT_SOURCE_ASSET_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/assets")
+    add_test(NAME horde_rt_static_collapse_asset_tests COMMAND horde_rt_static_collapse_asset_tests)
 
     if(WIN32)
         find_program(HORDE_RT_PWSH_EXECUTABLE NAMES pwsh)

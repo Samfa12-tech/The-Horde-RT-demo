@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "capacities": {
-    "instanceMetadata": 21,
-    "staticAssets": 9,
+    "instanceMetadata": 22,
+    "staticAssets": 10,
     "primitives": 32,
     "materials": 32,
     "textureLayers": 16,

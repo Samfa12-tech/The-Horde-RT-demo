@@ -326,6 +326,7 @@ struct PreviewControls {
 };
 PreviewControls gPreviewControls{};
 horde::graphics::GraphicsPreviewPerformanceSnapshot gPreviewPerformance{};
+std::uint64_t gPreviewPerformanceGeneration = 0u; // guarded by gGraphicsMutex.
 PreviewControls ReadPreviewControls() { std::lock_guard lock(gGraphicsMutex); return gPreviewControls; }
 
 horde::graphics::GraphicsCommand ReadRequestedGraphics()
@@ -3730,7 +3731,11 @@ void SwapchainRenderLoop()
                 gSwapchainContext.previewPerformance.SetTrackedAllocations(inventory.deviceLocalBytes, inventory.hostVisibleBytes);
                 gSwapchainContext.previewLastPublish = publishTime;
                 std::lock_guard lock(gGraphicsMutex);
-                gPreviewPerformance = gSwapchainContext.previewPerformance.Snapshot();
+                if (gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration))
+                {
+                    gPreviewPerformance = gSwapchainContext.previewPerformance.Snapshot();
+                    gPreviewPerformanceGeneration = gSwapchainContext.surfaceGeneration;
+                }
             }
         }
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
@@ -4374,6 +4379,11 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(JNIEnv* env, 
     {
         (void)SurfaceOwner();
         const auto generation = gSurfaceSessions.Start({std::move(window), reportDirectory});
+        {
+            std::lock_guard lock(gGraphicsMutex);
+            gPreviewPerformance = {};
+            gPreviewPerformanceGeneration = 0u;
+        }
         __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_SURFACE_REQUEST generation=%llu",
                             static_cast<unsigned long long>(generation));
         return static_cast<jlong>(generation); // Accepted request, NOT presented/ready.
@@ -4560,6 +4570,10 @@ extern "C" JNIEXPORT jdoubleArray JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getGraphicsPreviewPerformance(JNIEnv* env, jclass)
 {
     std::lock_guard lock(gGraphicsMutex);
+    if (gPreviewPerformanceGeneration == 0u ||
+        gPreviewPerformanceGeneration != gAppliedGraphics.lifecycleGeneration ||
+        gPreviewPerformanceGeneration != gPreviewControls.generation ||
+        !gSurfaceSessions.IsCurrent(gPreviewPerformanceGeneration)) return env->NewDoubleArray(0);
     const auto& a = gPreviewPerformance;
     std::array<jdouble, 9u + 256u> values{};
     values[0] = static_cast<double>(a.scopeEpoch); values[1] = a.successfulPresentsPerSecond;

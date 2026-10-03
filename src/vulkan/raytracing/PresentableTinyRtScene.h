@@ -151,8 +151,9 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
-    // Baseline without the optional development viewmodel. Live reports count owners.
-    static constexpr std::uint32_t kBlasCount = 16u;
+    // Maximum including the optional development viewmodel. Live reports count owners.
+    static constexpr std::uint32_t kBlasCount = 18u;
+    static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kTlasInstanceCount = kRtInstanceMetadataCapacity;
 
@@ -747,6 +748,7 @@ private:
     AccelerationStructure rewardLanternRingBlas_;
     AccelerationStructure rewardLanternBodyBlas_;
     AccelerationStructure dielectricFixtureBlas_;
+    AccelerationStructure collapseBlas_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
     AccelerationStructure skinnedPlayerBlas_;
@@ -766,6 +768,7 @@ private:
     CharacterRenderSlot characterSlot_;
     PlayerRenderSlot playerRenderSlot_;
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
+    horde::scene::assets::StaticMeshAsset collapseStaticAsset_;
     horde::scene::assets::StaticMeshAsset productionTorchAsset_;
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
     horde::scene::assets::StaticMeshAsset viewmodelAsset_;

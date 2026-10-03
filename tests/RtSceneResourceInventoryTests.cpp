@@ -60,7 +60,7 @@ bool Require(const bool condition, const std::string_view message)
 bool CheckTlasInstanceRefresh()
 {
     using horde::vulkan::raytracing::RequiresTlasInstanceRebuild;
-    std::array<VkAccelerationStructureInstanceKHR, 21u> built{};
+    std::array<VkAccelerationStructureInstanceKHR, horde::vulkan::raytracing::PresentableTinyRtScene::kTlasInstanceCount> built{};
     for (std::size_t i = 0u; i < built.size(); ++i)
     {
         built[i].instanceCustomIndex = static_cast<std::uint32_t>(i);
@@ -241,7 +241,7 @@ struct PresentableTinyRtSceneObservationTestAccess
                  &scene.gothicChestLidBlas_, &scene.rewardLanternRingBlas_,
                  &scene.rewardLanternBodyBlas_, &scene.dielectricFixtureBlas_,
                  &scene.playerBodyBlas_, &scene.playerLimbBlas_,
-                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_})
+                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.collapseBlas_})
         {
             populateBlas(*accelerationStructure);
         }
@@ -529,7 +529,7 @@ struct PresentableTinyRtSceneOutputResizeTestAccess
                  &scene.gothicChestLidBlas_, &scene.rewardLanternRingBlas_,
                  &scene.rewardLanternBodyBlas_, &scene.dielectricFixtureBlas_,
                  &scene.playerBodyBlas_, &scene.playerLimbBlas_,
-                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.tlas_})
+                 &scene.skinnedPlayerBlas_, &scene.viewmodelBlas_, &scene.collapseBlas_, &scene.tlas_})
         {
             addAs(*as);
         }
@@ -1083,7 +1083,7 @@ int main()
 #ifndef NDEBUG
     const auto originalHandles = scene.CaptureResourceHandles();
     ok &= Require(originalHandles.ready &&
-                      originalHandles.bottomLevelAccelerationStructures.size() == 17u &&
+                      originalHandles.bottomLevelAccelerationStructures.size() == 18u &&
                       originalHandles.topLevelAccelerationStructures.size() == 1u &&
                       originalHandles.pipelines.size() == 2u &&
                       originalHandles.shaderBindingTableBuffers.size() == 2u &&
@@ -1106,26 +1106,26 @@ int main()
                       scene.PrimaryRewardBodyPixelCount() == 41u,
                   "legacy getters must project one explicitly published completed record");
     const auto diagnostic = scene.ResourceInventory();
-    ok &= Require(diagnostic.bufferCount == 45u &&
-                      diagnostic.memoryAllocationCount == 55u &&
-                      diagnostic.bottomLevelAccelerationStructureCount == 17u &&
-                      scene.BlasCount() == 17u &&
+    ok &= Require(diagnostic.bufferCount == 46u &&
+                      diagnostic.memoryAllocationCount == 56u &&
+                      diagnostic.bottomLevelAccelerationStructureCount == 18u &&
+                      scene.BlasCount() == 18u &&
                       diagnostic.topLevelAccelerationStructureCount == 1u &&
-                      diagnostic.tlasInstanceCount == 21u &&
+                      diagnostic.tlasInstanceCount == 22u &&
                       diagnostic.pipelineCount == 2u &&
                       diagnostic.shaderBindingTableCount == 2u &&
                       diagnostic.descriptorSetCount == 1u,
                   "live inventory must include direct, character, image, and both SBT owners");
-    ok &= Require(diagnostic.hostVisibleBytes == 3008u &&
-                      diagnostic.deviceLocalBytes == 4160u,
+    ok &= Require(diagnostic.hostVisibleBytes == 3072u &&
+                      diagnostic.deviceLocalBytes == 4224u,
                   "host-visible and device-local bytes must use inclusive allocation classes");
 
     PresentableTinyRtSceneObservationTestAccess::RemoveDiagnosticBuffer(scene);
     const auto shipping = scene.ResourceInventory();
-    ok &= Require(shipping.bufferCount == 44u &&
-                      shipping.memoryAllocationCount == 54u &&
-                      shipping.hostVisibleBytes == 2944u &&
-                      shipping.deviceLocalBytes == 4096u,
+    ok &= Require(shipping.bufferCount == 45u &&
+                      shipping.memoryAllocationCount == 55u &&
+                      shipping.hostVisibleBytes == 3008u &&
+                      shipping.deviceLocalBytes == 4160u,
                   "inventory must count only a genuinely live Diagnostic buffer");
 
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(scene);
@@ -1167,7 +1167,7 @@ int main()
                   "even partial/no-device destruction must invalidate cached TLAS definitions");
     const auto movedFrom = scene.ResourceInventory();
     const auto movedTo = moved.ResourceInventory();
-    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 17u &&
+    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 18u &&
                       movedFrom.bufferCount == 0u &&
                       movedFrom.memoryAllocationCount == 0u &&
                       movedFrom.hostVisibleBytes == 0u &&

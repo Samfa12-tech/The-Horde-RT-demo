@@ -74,6 +74,11 @@
 #include "platform/windows/WindowsCaptureContracts.h"
 #include "platform/windows/WindowsGraphicsPreviewCapture.h"
 #include "platform/windows/WindowsOutputResizeLaunch.h"
+#include "platform/windows/WindowsMotionEvidenceLaunch.h"
+#if defined(_DEBUG)
+#include "gameplay/validation/MotionEvidenceScenario.h"
+#include "telemetry/MotionEvidenceLedger.h"
+#endif
 #include "platform/windows/WindowsBenchmarkLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
 #include "platform/windows/WindowsGitHubReleaseUpdate.h"
@@ -221,6 +226,7 @@ struct CaptureLaunchOptions
     bool requested = false;
     bool graphicsPreview = false;
     bool outputResizeValidation = false;
+    std::string nativeMotionScenario;
     bool requireRayQueryCompute = false;
     bool portrait = false;
     bool anatomicalPlayerMount = false;
@@ -338,7 +344,13 @@ struct VulkanSurfaceContext
     // It never loads or writes the user's INI, advances gameplay, or starts audio.
     bool graphicsPreviewCapture = false;
     bool outputResizeValidation = false;
+    bool nativeMotionValidation = false;
 #if defined(_DEBUG)
+    horde::gameplay::validation::MotionEvidenceScenario motionScenario;
+    horde::telemetry::MotionEvidenceLedger motionLedger;
+    std::uint32_t motionRetryGeneration = 0;
+    bool motionRetryPending = false;
+    std::uint64_t motionSurfaceGeneration = 1;
     bool resizePresentTimestampArmed = false;
     std::uint64_t resizeFirstPresentNanoseconds = 0u;
     double lastOutputResizeIdleMilliseconds = 0.0;
@@ -499,6 +511,19 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     std::vector<std::wstring_view> argumentViews;
     for (int index = 1; index < argumentCount; ++index) argumentViews.emplace_back(arguments[index]);
+    const auto motionLaunch = horde::platform::windows::ParseWindowsMotionEvidenceLaunch(argumentViews);
+    if (!motionLaunch.error.empty())
+    { options.error = motionLaunch.error; LocalFree(arguments); return options; }
+    if (motionLaunch.requested)
+    {
+#if defined(_DEBUG)
+        options.requested = true; options.nativeMotionScenario = motionLaunch.scenario;
+        options.outputDirectory = std::filesystem::path(motionLaunch.outputDirectory);
+#else
+        options.error = "--validate-native-motion and --motion-scenario are Debug-only validation controls.";
+        LocalFree(arguments); return options;
+#endif
+    }
     const auto resizeValidation = horde::platform::windows::ParseOutputResizeValidationLaunch(argumentViews);
     if (!resizeValidation.error.empty())
     { options.error = resizeValidation.error; LocalFree(arguments); return options; }
@@ -525,6 +550,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
+        if (argument == L"--validate-native-motion" || argument == L"--motion-scenario") { ++index; continue; }
         if (argument == L"--validate-output-resize") { ++index; continue; }
         if (argument == L"--capture-graphics-preview") { ++index; continue; }
         if (argument == L"--anatomical-player-mount")
@@ -906,7 +932,7 @@ RtLabDebugLaunchOptions ParseRtLabDebugLaunchOptions()
 
 void SaveRtLabProgress(const VulkanSurfaceContext& context)
 {
-    if (context.graphicsPreviewCapture || context.outputResizeValidation) return;
+    if (context.graphicsPreviewCapture || context.outputResizeValidation || context.nativeMotionValidation) return;
     const std::string path = SettingsPath().string();
     WritePrivateProfileStringA("progress", "rtLabUnlocked",
                                context.rtLabUnlocked ? "1" : "0", path.c_str());
@@ -914,7 +940,7 @@ void SaveRtLabProgress(const VulkanSurfaceContext& context)
 
 void SaveSettings(const VulkanSurfaceContext& context)
 {
-    if (context.graphicsPreviewCapture || context.outputResizeValidation) return;
+    if (context.graphicsPreviewCapture || context.outputResizeValidation || context.nativeMotionValidation) return;
     const std::string path = SettingsPath().string();
     const std::string sfxVolume = std::to_string(
         horde::audio::ClampSfxVolumePercent(context.sfxVolumePercent));
@@ -3559,6 +3585,16 @@ void UpdateDesktopSceneControls(
         }
     }
 
+#if defined(_DEBUG)
+    if (context.nativeMotionValidation)
+    {
+        const auto publication = context.rtFrameEvidence.PublishedStateByValue();
+        const bool ready = context.motionLedger.HasCurrentPresentedFrame(context.motionSurfaceGeneration,
+            publication.sceneEpoch, publication.measurementGeneration);
+        input = context.motionScenario.BuildInput(context.simulation.Snapshot(), input,
+            horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr), ready);
+    }
+#endif
     context.simulationInput = input;
     horde::vulkan::raytracing::RtSceneStageScope simulationScope(
         observation, horde::telemetry::RtStage::SimulationStep);
@@ -3566,6 +3602,21 @@ void UpdateDesktopSceneControls(
                                     context.frameDeltaSeconds,
                                     ++context.inputPublicationSequence);
     simulationScope.Complete(1u);
+#if defined(_DEBUG)
+    if (context.nativeMotionValidation)
+    {
+        const auto& snapshot = context.simulation.Snapshot();
+        const auto events = context.simulation.Events().Events();
+        context.motionScenario.ObserveAdvance(snapshot, events);
+        if (!context.motionLedger.AppendState(horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr), snapshot, input,
+                context.motionScenario, events)) context.motionScenario.Fail(context.motionLedger.Failure());
+        if (snapshot.retryGeneration != context.motionRetryGeneration)
+        {
+            context.motionRetryGeneration = snapshot.retryGeneration;
+            context.motionRetryPending = true;
+        }
+    }
+#endif
     // Camera yaw/pitch are continuous platform input targets. A render frame
     // may not produce a 60 Hz simulation tick, so copying the previous fixed
     // snapshot back here would erase right-stick and mouse look accumulated
@@ -4058,6 +4109,11 @@ bool CompleteRtEvidenceAfterDeviceIdle(
         CollectStagedPassTiming(ctx, frameSlot, result, snapshot);
 #endif
         AcceptBenchmarkCompletion(ctx, result, snapshot);
+#if defined(_DEBUG)
+        if (ctx.nativeMotionValidation &&
+            !ctx.motionLedger.AppendCompletedFrame(ctx.motionSurfaceGeneration, ctx.rtFrameEvidence.PublishedStateByValue()))
+            ctx.motionScenario.Fail(ctx.motionLedger.Failure());
+#endif
         if (result.gpuCollectionAttempted)
         {
             RefreshGpuTimingTelemetry(ctx, &result.gpuCollection);
@@ -4092,7 +4148,8 @@ bool ConsumePendingImageAcquire(VulkanSurfaceContext& ctx)
 bool SaveGraphicsRecord(const VulkanSurfaceContext& context,
                         const horde::graphics::GraphicsPersistenceRecord& record)
 {
-    if (context.graphicsPreviewCapture || context.outputResizeValidation) return true; // Ephemeral validation transaction.
+    if (context.graphicsPreviewCapture || context.outputResizeValidation || context.nativeMotionValidation)
+        return true; // Ephemeral validation transaction.
     return horde::platform::windows::SaveGraphicsPersistenceRecord(SettingsPath(), record);
 }
 
@@ -4598,7 +4655,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         horde::telemetry::RtStage::FrameFenceWait);
     const VkResult waitResult = vkWaitForFences(
         ctx.device, 1u, &ctx.inFlightFences[ctx.currentFrame], VK_TRUE,
-        (ctx.graphicsPreviewCapture || ctx.outputResizeValidation) ? 2'000'000'000ull : UINT64_MAX);
+        (ctx.graphicsPreviewCapture || ctx.outputResizeValidation || ctx.nativeMotionValidation) ? 2'000'000'000ull : UINT64_MAX);
     fenceScope.Complete(1u, 0u, 1u);
     if (waitResult != VK_SUCCESS)
     {
@@ -4621,6 +4678,11 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         CollectStagedPassTiming(ctx, ctx.currentFrame, completion, snapshot);
 #endif
         AcceptBenchmarkCompletion(ctx, completion, snapshot);
+#if defined(_DEBUG)
+        if (ctx.nativeMotionValidation &&
+            !ctx.motionLedger.AppendCompletedFrame(ctx.motionSurfaceGeneration, ctx.rtFrameEvidence.PublishedStateByValue()))
+            ctx.motionScenario.Fail(ctx.motionLedger.Failure());
+#endif
         RefreshGpuTimingTelemetry(
             ctx, completion.gpuCollectionAttempted ? &completion.gpuCollection : nullptr);
         if (completion.fatalDiagnosticIoFailure)
@@ -4639,7 +4701,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     const VkResult acquireResult = vkAcquireNextImageKHR(
         ctx.device,
         ctx.swapchain,
-        (ctx.graphicsPreviewCapture || ctx.outputResizeValidation) ? 2'000'000'000ull : UINT64_MAX,
+        (ctx.graphicsPreviewCapture || ctx.outputResizeValidation || ctx.nativeMotionValidation) ? 2'000'000'000ull : UINT64_MAX,
         ctx.imageAvailableSemaphores[ctx.currentFrame],
         VK_NULL_HANDLE,
         &imageIndex);
@@ -4686,7 +4748,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 #endif
     if (useRtFrame)
     {
-        if (!ctx.graphicsPreviewCapture && !ctx.outputResizeValidation)
+        if (!ctx.graphicsPreviewCapture && !ctx.outputResizeValidation && !ctx.nativeMotionValidation)
         { SpatialAudioEngine().Update(); PollDesktopController(ctx); }
         const bool frozenDevelopmentCheckpoint =
             ctx.simulationPaused && ctx.frameDeltaSeconds == 0.0f &&
@@ -4696,21 +4758,21 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
         }
-        if (!previewFrame && !ctx.outputResizeValidation) UpdateWaterfallAmbience(ctx);
+        if (!previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation) UpdateWaterfallAmbience(ctx);
         const horde::gameplay::simulation::SimulationSnapshot& simulation =
             ctx.simulation.Snapshot();
         UpdateChestPrompt(ctx);
-        if (!previewFrame && !ctx.outputResizeValidation && simulation.playerVitals.phase == horde::gameplay::PlayerLifePhase::Dead)
+        if (!previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation && simulation.playerVitals.phase == horde::gameplay::PlayerLifePhase::Dead)
         {
             ShowDeathMenu(ctx);
         }
-        if (!previewFrame && !ctx.outputResizeValidation && !ctx.graphicsVisible && simulation.finaleComplete &&
+        if (!previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation && !ctx.graphicsVisible && simulation.finaleComplete &&
             (!ctx.benchmark.HasStarted() || ctx.benchmarkCompletionHandled))
         {
             TryGrantRtLabUnlock(ctx, true);
             ShowEndingMenu(ctx);
         }
-        if (!ctx.graphicsPreviewCapture && !ctx.outputResizeValidation) PublishMusicPlayback(ctx);
+        if (!ctx.graphicsPreviewCapture && !ctx.outputResizeValidation && !ctx.nativeMotionValidation) PublishMusicPlayback(ctx);
         if (!previewFrame && !ctx.outputResizeValidation) DrainGameplayEvents(ctx);
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
@@ -4903,6 +4965,15 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             true,
             gpuTimingRecording,
             horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(ctx.gpuFrameTimer));
+#if defined(_DEBUG)
+        if (ctx.nativeMotionValidation)
+        {
+            horde::telemetry::RtSubmittedFrameIdentity committed{};
+            if (!ctx.rtFrameEvidence.TryGetCommittedIdentity(ctx.currentFrame, committed) ||
+                !ctx.motionLedger.BindSubmittedFrame(ctx.motionSurfaceGeneration, committed))
+                ctx.motionScenario.Fail("Motion frame could not bind its actual committed graphics owner.");
+        }
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
         horde::telemetry::RtSubmittedFrameIdentity stagedOwner{};
         if (ctx.rtFrameEvidence.TryGetCommittedIdentity(ctx.currentFrame, stagedOwner))
@@ -5599,6 +5670,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
 }
 #include "platform/windows/WindowsGraphicsPreviewCapture.inl"
 #include "platform/windows/WindowsOutputResizeValidation.inl"
+#include "platform/windows/WindowsMotionEvidenceValidation.inl"
 #endif
 
 int RunDiagnosticSwapchainWindow(HWND hWnd,
@@ -5613,11 +5685,13 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const horde::vulkan::raytracing::RtWorkloadPreset benchmarkRtWorkloadPreset,
                                  const bool anatomicalPlayerMount,
                                  const bool graphicsPreviewCapture,
-                                 const bool outputResizeValidation)
+                                 const bool outputResizeValidation,
+                                 const std::string& nativeMotionScenario)
 {
     VulkanSurfaceContext context;
     context.graphicsPreviewCapture = graphicsPreviewCapture;
     context.outputResizeValidation = outputResizeValidation;
+    context.nativeMotionValidation = !nativeMotionScenario.empty();
     if (graphicsPreviewCapture)
         context.sceneProfile = horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview;
     const bool explicitComparison = developmentCheckpoint != nullptr &&
@@ -5634,10 +5708,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.capabilitySnapshot = &capabilities;
     context.unattendedBenchmark = unattendedBenchmark;
     if (developmentCheckpoint != nullptr) context.developmentCheckpoint = *developmentCheckpoint;
-    if (!graphicsPreviewCapture && !outputResizeValidation) LoadSettings(context);
+    if (!graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation) LoadSettings(context);
 #if defined(_DEBUG)
     const RtLabDebugLaunchOptions rtLabDebug = ParseRtLabDebugLaunchOptions();
-    if (rtLabDebug.requested && !graphicsPreviewCapture && !outputResizeValidation)
+    if (rtLabDebug.requested && !graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation)
     {
         context.rtLabDebugInjection = true;
         context.rtLabRouteTainted = true;
@@ -5655,6 +5729,21 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.pauseMenuVisible = false;
         context.graphicsPreviewDelta = 0.0;
     }
+#if defined(_DEBUG)
+    if (context.nativeMotionValidation)
+    {
+        horde::gameplay::validation::MotionScenario scenario;
+        const auto now = horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
+        const auto runId = std::string("native-motion-") + std::to_string(GetCurrentProcessId()) + "-" + std::to_string(now);
+        if (!horde::gameplay::validation::ParseMotionScenario(nativeMotionScenario, scenario) ||
+            !context.motionScenario.Begin(scenario, context.simulation, now) ||
+            !context.motionLedger.Begin(runId, scenario)) return 2;
+        context.motionRetryGeneration = context.simulation.Snapshot().retryGeneration;
+        context.simulationPaused = false;
+        context.simulationInput.paused = false;
+        MirrorSimulationSnapshot(context);
+    }
+#endif
     if (!CreateInstance(context.instance, context.presentSurfaceSupport))
     {
         return 1;
@@ -5773,7 +5862,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     if (captureDirectory != nullptr)
     {
-        int captureResult = outputResizeValidation
+        int captureResult = context.nativeMotionValidation
+            ? RunNativeMotionEvidence(context, capabilities, *captureDirectory)
+            : outputResizeValidation
             ? RunOutputResizeValidation(context, capabilities, *captureDirectory)
             : graphicsPreviewCapture
             ? RunGraphicsPreviewCapture(context, capabilities, *captureDirectory)
@@ -6685,6 +6776,25 @@ bool NativeUiUsesHighContrast()
 LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
+#if defined(_DEBUG)
+    if (sceneContext && sceneContext->nativeMotionValidation)
+    {
+        switch (message)
+        {
+        case WM_COMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL:
+        case WM_KEYDOWN: case WM_SYSKEYDOWN: case WM_KEYUP: case WM_SYSKEYUP:
+        case WM_LBUTTONDOWN: case WM_RBUTTONDOWN:
+            sceneContext->motionScenario.Fail("Native motion interrupted by external input/menu control."); return 0;
+        case WM_ACTIVATEAPP:
+            if (!wParam) sceneContext->motionScenario.Fail("Native motion lost application focus."); return 0;
+        case WM_ACTIVATE:
+            if (LOWORD(wParam) == WA_INACTIVE) sceneContext->motionScenario.Fail("Native motion lost window focus."); return 0;
+        case WM_MOUSEMOVE: case WM_CAPTURECHANGED: case WM_KILLFOCUS:
+            return 0; // Producer axes are exclusively the declared schedule; outer focus guard remains authoritative.
+        default: break;
+        }
+    }
+#endif
     if (sceneContext && (sceneContext->graphicsPreviewCapture || sceneContext->outputResizeValidation))
     {
         // Keep externally delivered input/menu/focus messages from mutating the
@@ -7769,7 +7879,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const horde::vulkan::raytracing::RtWorkloadPreset benchmarkRtWorkloadPreset,
                         const bool anatomicalPlayerMount,
                         const bool graphicsPreviewCapture,
-                        const bool outputResizeValidation)
+                        const bool outputResizeValidation,
+                        const std::string& nativeMotionScenario)
 {
     // Only the Debug capture surface changes aspect; camera, gameplay pose,
     // renderer quality and normal interactive-window sizing are untouched.
@@ -8068,7 +8179,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
         developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark, benchmarkWorkload,
         benchmarkRtWorkloadPreset,
-        anatomicalPlayerMount, graphicsPreviewCapture, outputResizeValidation);
+        anatomicalPlayerMount, graphicsPreviewCapture, outputResizeValidation, nativeMotionScenario);
     if ((captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
         DestroyWindow(hWnd);
@@ -8100,7 +8211,7 @@ int RunDiagnosticWindow(const int showCommand)
     }
 #endif
 
-    if (launchOptions.graphicsPreview || launchOptions.outputResizeValidation)
+    if (launchOptions.graphicsPreview || launchOptions.outputResizeValidation || !launchOptions.nativeMotionScenario.empty())
     {
         std::error_code capturePathError;
         const bool exists = std::filesystem::exists(launchOptions.outputDirectory, capturePathError);
@@ -8126,7 +8237,7 @@ int RunDiagnosticWindow(const int showCommand)
     std::cout << diagnosticText << "\n\n";
 
     std::error_code error;
-    const std::filesystem::path reportDirectory = (launchOptions.graphicsPreview || launchOptions.outputResizeValidation)
+    const std::filesystem::path reportDirectory = (launchOptions.graphicsPreview || launchOptions.outputResizeValidation || !launchOptions.nativeMotionScenario.empty())
         ? launchOptions.outputDirectory
         : launchOptions.benchmark.requested
         ? std::filesystem::absolute(std::filesystem::path(launchOptions.benchmark.outputDirectory))
@@ -8167,7 +8278,8 @@ int RunDiagnosticWindow(const int showCommand)
                                launchOptions.requireRayQueryCompute,
                                launchOptions.benchmark.requested, launchOptions.benchmark.workload,
                                launchOptions.benchmark.rtWorkloadPreset,
-                               launchOptions.anatomicalPlayerMount, launchOptions.graphicsPreview, launchOptions.outputResizeValidation);
+                               launchOptions.anatomicalPlayerMount, launchOptions.graphicsPreview, launchOptions.outputResizeValidation,
+                               launchOptions.nativeMotionScenario);
 }
 
 } // namespace horde::platform::windows

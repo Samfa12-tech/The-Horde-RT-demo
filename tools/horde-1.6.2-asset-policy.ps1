@@ -1,4 +1,4 @@
-# Runtime-only 1.6.2 audio/environment admission. This does not certify device,
+# Runtime-only 1.6.2 audio/environment/world admission. This does not certify device,
 # listening, signing or release acceptance and works with Debug ZIP/APK files.
 function Get-Horde162AssetSpecification {
     @(
@@ -12,7 +12,18 @@ function Get-Horde162AssetSpecification {
         [pscustomobject]@{ Path='audio/pixabay/waterfall_loop.wav'; Bytes=2047132; Sha256='de7711f0e6ef9cf0bdd3d04ba7a1b713ce09ef18169bd994182b09ab2017ee62'; Platform='Windows'; Kind='Wave'; Channels=1; Frames=1023527 },
         [pscustomobject]@{ Path='audio/pixabay/waterfall_core_loop.wav'; Bytes=2208044; Sha256='5bb82801f0cff75c56f07993fad128bf1dee2a9876d032c808b8033a135fbad3'; Platform='Android'; Kind='Wave'; Channels=2; Frames=552000 },
         [pscustomobject]@{ Path='textures/environment/runtime/night-storm.windows.ktx2'; Bytes=699532; Sha256='a5e274bfafae55efa4a80840208a39fc7f24c6cf5fe69c744c9c2cd7d60420b0'; Platform='Windows'; Kind='Ktx'; Format=43 },
-        [pscustomobject]@{ Path='textures/environment/runtime/night-storm.android.ktx2'; Bytes=80128; Sha256='f833b77867e7b3c01659f5e9ef38834e4a0e5b967cd077023157eb682feb7cec'; Platform='Android'; Kind='Ktx'; Format=166 }
+        [pscustomobject]@{ Path='textures/environment/runtime/night-storm.android.ktx2'; Bytes=80128; Sha256='f833b77867e7b3c01659f5e9ef38834e4a0e5b967cd077023157eb682feb7cec'; Platform='Android'; Kind='Ktx'; Format=166 },
+        [pscustomobject]@{ Path='models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb'; Bytes=652980; Sha256='c67471b522c92f354d9a5880dea6e48b4f22b5095207841c35c95b5cfc75c4d4'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/world/runtime/collapsed-entry/asset.manifest.json'; Bytes=742; Sha256='952e1920fbc60646154d0424556c2935a18e7cf882866a9fe9f4f45ef38be623'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='textures/props/runtime/asset.manifest.json'; Bytes=10743; Sha256='71688b7feff3f71cede98f5ed6d76e8396067e77a1da37ea5c270311664b5600'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='textures/props/runtime/base-color.android.ktx2'; Bytes=7515920; Sha256='ddf9fc41fabb3913216fa06a22b9cc80907eea0a1c530f19b4191d32f648b9c8'; Platform='Android'; Kind='PropsKtx'; Format=166; Layers=12 },
+        [pscustomobject]@{ Path='textures/props/runtime/normal.android.ktx2'; Bytes=16778000; Sha256='7b6c4e34d4a6fcb8450c0a8b489a3355a53cf00741fb1703a8da1ba2e16fde12'; Platform='Android'; Kind='PropsKtx'; Format=157; Layers=12 },
+        [pscustomobject]@{ Path='textures/props/runtime/orm.android.ktx2'; Bytes=7515920; Sha256='a65968188c2da94d7df4946cff3057847f8f786f92b1d3c06cb5e44bf6683e8c'; Platform='Android'; Kind='PropsKtx'; Format=165; Layers=12 },
+        [pscustomobject]@{ Path='textures/props/runtime/emissive.android.ktx2'; Bytes=626752; Sha256='da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a'; Platform='Android'; Kind='PropsKtx'; Format=166; Layers=1 },
+        [pscustomobject]@{ Path='textures/props/runtime/base-color.windows.ktx2'; Bytes=67109352; Sha256='0ac3747f1c92a76fdbbb08320fabeb1af4eb03808655441141caae427f8f1204'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=12 },
+        [pscustomobject]@{ Path='textures/props/runtime/normal.windows.ktx2'; Bytes=67109352; Sha256='9d6b5c73c5fd7c20b1c40b3db5559f4efaad11169c191560aad63a249a198fa1'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=12 },
+        [pscustomobject]@{ Path='textures/props/runtime/orm.windows.ktx2'; Bytes=67109352; Sha256='fc78f0e2fab2412eb7022ed5c7d3a12584c6ce78520f8d7d7594de6c2d2d9876'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=12 },
+        [pscustomobject]@{ Path='textures/props/runtime/emissive.windows.ktx2'; Bytes=5592908; Sha256='c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=1 }
     )
 }
 
@@ -84,7 +95,26 @@ function Assert-Horde162Assets {
         if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "1.6.2 runtime asset missing: $($spec.Path)" }
         if ((Get-Item -LiteralPath $path).Length -ne $spec.Bytes -or (Get-Horde162Sha256 $path) -cne $spec.Sha256) { throw "1.6.2 runtime byte/hash mismatch: $($spec.Path)" }
         if ($spec.Kind -ceq 'Wave') { Assert-Horde162Wave $path $spec.Channels $spec.Frames }
-        else { Assert-Horde162EnvironmentKtx $path $spec.Format }
+        elseif ($spec.Kind -ceq 'Ktx') { Assert-Horde162EnvironmentKtx $path $spec.Format }
+        elseif ($spec.Kind -ceq 'PropsKtx') {
+            $bytes=[byte[]]::new(80); $stream=[IO.File]::OpenRead($path)
+            try { $read=$stream.Read($bytes,0,$bytes.Length) } finally { $stream.Dispose() }
+            if ($read -ne 80 -or [BitConverter]::ToString($bytes,0,12) -cne 'AB-4B-54-58-20-32-30-BB-0D-0A-1A-0A' -or
+                [BitConverter]::ToUInt32($bytes,12) -ne $spec.Format -or [BitConverter]::ToUInt32($bytes,20) -ne 1024 -or
+                [BitConverter]::ToUInt32($bytes,24) -ne 1024 -or [BitConverter]::ToUInt32($bytes,28) -ne 0 -or
+                [BitConverter]::ToUInt32($bytes,32) -ne $spec.Layers -or [BitConverter]::ToUInt32($bytes,36) -ne 1 -or
+                [BitConverter]::ToUInt32($bytes,40) -ne 11 -or [BitConverter]::ToUInt32($bytes,44) -ne 0) {
+                throw "1.6.2 props KTX must match the admitted 1K/full-mip/layer/native-format profile: $path"
+            }
+        }
+        elseif ($spec.Kind -ceq 'Glb') {
+            $bytes=[IO.File]::ReadAllBytes($path)
+            if ($bytes.Length -lt 20 -or [Text.Encoding]::ASCII.GetString($bytes,0,4) -cne 'glTF' -or
+                [BitConverter]::ToUInt32($bytes,4) -ne 2 -or [BitConverter]::ToUInt32($bytes,8) -ne $bytes.Length -or
+                [Text.Encoding]::ASCII.GetString($bytes,16,4) -cne 'JSON') { throw "1.6.2 runtime GLB header/length mismatch: $path" }
+        }
+        elseif ($spec.Kind -ceq 'Json') { $null=Get-Content -LiteralPath $path -Raw | ConvertFrom-Json }
+        else { throw "1.6.2 runtime asset has an unknown admission type: $($spec.Path)" }
     }
     $keeper=Get-Content -LiteralPath (Join-Horde162Path $assets 'audio/pixabay/keeper-asset.manifest.json') -Raw | ConvertFrom-Json
     if ($keeper.schema -ne 1 -or $keeper.target -cne '1.6.2' -or $keeper.license -cne 'Pixabay Content License; no CC0 claim' -or
@@ -127,7 +157,7 @@ function Get-Horde162RuntimeFiles {
 function Assert-Horde162StagedAssets {
     param([string]$RepositoryRoot, [string]$AssetRoot, [ValidateSet('Windows','Android')][string]$Platform)
     $expected=@(Get-Horde162RuntimeFiles $RepositoryRoot $Platform)
-    $observed=@(foreach($root in @('audio/pixabay','textures/environment')) {
+    $observed=@(foreach($root in @('audio/pixabay','textures/environment','textures/props','models/world')) {
         $path=Join-Horde162Path $AssetRoot $root
         if (Test-Path -LiteralPath $path -PathType Container) {
             foreach($item in Get-ChildItem -LiteralPath $path -Recurse -Force) {
@@ -167,7 +197,11 @@ function Assert-Horde162Package {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $zip=[IO.Compression.ZipFile]::OpenRead([IO.Path]::GetFullPath($ArchivePath))
     try {
-        $entries=@($zip.Entries | Where-Object { $_.FullName.Replace('\','/') -match '(?i)^assets/(audio/pixabay|textures/environment)(/|$)' })
+        foreach ($entry in $zip.Entries) {
+            if ($entry.FullName.Contains('\') -or $entry.FullName.StartsWith('/', [StringComparison]::Ordinal) -or
+                $entry.FullName -match '(^|/)(\.|\.\.)(/|$)') { throw '1.6.2 package contains a noncanonical or traversing entry path.' }
+        }
+        $entries=@($zip.Entries | Where-Object { $_.FullName -match '(?i)^assets/(audio/pixabay|textures/environment|textures/props|models/world)(/|$)' })
         # ZIP directory entries are metadata, distinguished by their trailing
         # slash, not by byte length (a zero-byte foreign file is still a file).
         foreach($entry in $entries) {

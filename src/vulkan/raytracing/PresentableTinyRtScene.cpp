@@ -464,6 +464,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     playerLimbBlas_ = std::exchange(other.playerLimbBlas_, AccelerationStructure{});
     skinnedPlayerBlas_ = std::exchange(other.skinnedPlayerBlas_, AccelerationStructure{});
     viewmodelBlas_ = std::exchange(other.viewmodelBlas_, AccelerationStructure{});
+    collapseBlas_ = std::exchange(other.collapseBlas_, AccelerationStructure{});
     viewmodelBlasUpdateScratch_ = std::exchange(other.viewmodelBlasUpdateScratch_, Buffer{});
     skinnedPlayerBlasUpdateScratch_ =
         std::exchange(other.skinnedPlayerBlasUpdateScratch_, Buffer{});
@@ -474,6 +475,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     playerRenderSlot_ = std::move(other.playerRenderSlot_);
     other.playerRenderSlot_ = {};
     developmentStaticAsset_ = std::move(other.developmentStaticAsset_);
+    collapseStaticAsset_ = std::move(other.collapseStaticAsset_);
     productionTorchAsset_ = std::move(other.productionTorchAsset_);
     productionPlayerAsset_ = std::move(other.productionPlayerAsset_);
     gothicChestBaseAsset_ = std::move(other.gothicChestBaseAsset_);
@@ -903,6 +905,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(skinnedPlayerBlasUpdateScratch_);
     DestroyBuffer(viewmodelBlasUpdateScratch_);
     DestroyAccelerationStructure(viewmodelBlas_);
+    DestroyAccelerationStructure(collapseBlas_);
     DestroyAccelerationStructure(skinnedPlayerBlas_);
     DestroyAccelerationStructure(playerLimbBlas_);
     DestroyAccelerationStructure(playerBodyBlas_);
@@ -954,6 +957,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyTextureArray(staticBaseColor_);
     materialEncoding_.clear();
     developmentStaticAsset_ = {};
+    collapseStaticAsset_ = {};
     productionTorchAsset_ = {};
     productionPlayerAsset_ = {};
     gothicChestBaseAsset_ = {};
@@ -1074,7 +1078,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &blas_, &waterfallBlas_, &finaleRoofBlas_, &torchBlas_, &swordBlas_,
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
-             &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_})
+             &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
     for (std::size_t bucket = 0u;
          bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
@@ -1127,7 +1131,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &blas_, &waterfallBlas_, &finaleRoofBlas_, &torchBlas_, &swordBlas_,
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
-             &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_})
+             &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_})
     {
         accumulateBlas(*blas);
     }
@@ -2069,6 +2073,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     developmentStaticAssetDirectory_.clear();
     staticTextureDirectory_.clear();
     developmentStaticAsset_ = {};
+    collapseStaticAsset_ = {};
     productionTorchAsset_ = {};
     productionPlayerAsset_ = {};
     gothicChestBaseAsset_ = {};
@@ -2099,6 +2104,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         root / "models/props/runtime/reward-lantern-ring";
     const auto lanternBodyDirectory =
         root / "models/props/runtime/reward-lantern-body";
+    const auto collapseDirectory = root / "models/world/runtime/collapsed-entry";
     horde::scene::assets::AssetManifest swordManifest;
     horde::scene::assets::AssetManifest torchManifest;
     horde::scene::assets::AssetManifest playerManifest;
@@ -2107,6 +2113,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     horde::scene::assets::AssetManifest chestLidManifest;
     horde::scene::assets::AssetManifest lanternRingManifest;
     horde::scene::assets::AssetManifest lanternBodyManifest;
+    horde::scene::assets::AssetManifest collapseManifest;
     if (!horde::scene::assets::AssetManifest::Load(
             swordDirectory / "asset.manifest.json", swordManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
@@ -2154,7 +2161,12 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             lanternBodyDirectory / "asset.manifest.json", lanternBodyManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
             lanternBodyDirectory / "reward-lantern-body-lod0.runtime.glb",
-            lanternBodyManifest, rewardLanternBodyAsset_, diagnostic))
+            lanternBodyManifest, rewardLanternBodyAsset_, diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            collapseDirectory / "asset.manifest.json", collapseManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            collapseDirectory / "collapsed-entry-lod0.runtime.glb",
+            collapseManifest, collapseStaticAsset_, diagnostic))
         return false;
     // The selected immutable quality bundle owns the geometry profile too.
     // Mobile panes are absent from the BLAS, not hidden/skipped in a shader.
@@ -2200,6 +2212,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         registrations.push_back({kPlayerViewmodelInstanceIndex, 0x56494557u,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
             &viewmodelAsset_, &productionPlayerAsset_, RtGeometryRole::PlayerViewmodel});
+    registrations.push_back({kCollapseInstanceIndex, 0x434f4c4cu,
+        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
+        &collapseStaticAsset_});
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
@@ -2903,12 +2918,18 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                     box.footprint[3][0], box.topY, box.footprint[3][1], SurfaceMossyStone);
     };
     addWorldQuad({{-1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, -6.4f}}, {{-1.85f, kRouteFloorWorldY, -6.4f}}, SurfaceWetCobble, SurfaceUp);
+    // The exported collapse excludes its inspection floor. Continue the same
+    // ordinary dungeon floor under the sealed, non-walkable stairwell instead.
+    addWorldQuad({{-1.92f, kRouteFloorWorldY, 17.48f}}, {{1.92f, kRouteFloorWorldY, 17.48f}},
+                 {{1.92f, kRouteFloorWorldY, 3.4f}}, {{-1.92f, kRouteFloorWorldY, 3.4f}}, SurfaceWetCobble, SurfaceUp);
     addCeilingPatch(0u);
+    const auto& roofSeam = horde::scene::kShowcaseCollapseRoofSeam;
+    addWorldBox(roofSeam.footprint[1][0], roofSeam.bottomY, roofSeam.footprint[1][1],
+                roofSeam.footprint[3][0], roofSeam.topY, roofSeam.footprint[3][1], SurfaceMossyStone);
     addWorldQuad({{-1.85f, kRouteFloorWorldY, 3.4f}}, {{-1.85f, kRouteFloorWorldY, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, 3.4f}}, SurfaceMossyStone, SurfaceRight);
     addWorldQuad({{1.85f, kRouteFloorWorldY, -6.4f}}, {{1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceLeft);
-    // Close the starting chamber behind the player. This is real RT geometry,
-    // preventing a 180-degree turn at spawn from exposing the exterior sky.
-    addWorldQuad({{-1.85f, kRouteFloorWorldY, 3.4f}}, {{-1.85f, 1.35f, 3.4f}}, {{1.85f, 1.35f, 3.4f}}, {{1.85f, kRouteFloorWorldY, 3.4f}}, SurfaceMossyStone, SurfaceBack);
+    // The required immutable collapsed-entry asset physically seals this end.
+    // Keep the gameplay/collision threshold at 3.4 m while revealing its recess.
     // The former sealed far wall is split around a 1.8 m doorway into the
     // extended showcase route. The matching hidden shell is split below too.
     addWorldQuad({{-1.85f, kRouteFloorWorldY, -6.4f}}, {{-0.90f, kRouteFloorWorldY, -6.4f}}, {{-0.90f, 1.35f, -6.4f}}, {{-1.85f, 1.35f, -6.4f}}, SurfaceMossyStone, SurfaceForward);
@@ -2975,7 +2996,6 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addWorldQuad({{-1.92f, -1.02f, 3.4f}}, {{-1.92f, -1.02f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, 3.4f}}, SurfaceHiddenShell, SurfaceRight);
     addWorldQuad({{1.92f, -1.02f, -6.47f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, 1.42f, 3.4f}}, {{1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceLeft);
     addWorldQuad({{-1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, 3.4f}}, {{1.92f, -1.02f, -6.47f}}, {{-1.92f, -1.02f, -6.47f}}, SurfaceHiddenShell, SurfaceUp);
-    addWorldQuad({{-1.92f, -1.02f, 3.47f}}, {{-1.92f, 1.42f, 3.47f}}, {{1.92f, 1.42f, 3.47f}}, {{1.92f, -1.02f, 3.47f}}, SurfaceHiddenShell, SurfaceBack);
     addWorldQuad({{-1.92f, -1.02f, -6.47f}}, {{-0.90f, -1.02f, -6.47f}}, {{-0.90f, 1.42f, -6.47f}}, {{-1.92f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceForward);
     addWorldQuad({{0.90f, -1.02f, -6.47f}}, {{1.92f, -1.02f, -6.47f}}, {{1.92f, 1.42f, -6.47f}}, {{0.90f, 1.42f, -6.47f}}, SurfaceHiddenShell, SurfaceForward);
     addWorldQuad({{exitCapMinX, exitCap.bottomY, exitCapBackZ}}, {{exitCapMaxX, exitCap.bottomY, exitCapBackZ}},
@@ -4017,7 +4037,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         !buildRegisteredStaticBlas(
             8u, "production reward lantern body", rewardLanternBodyBlas_, true) ||
         !buildRegisteredStaticBlas(
-            9u, "generic dielectric fixture", dielectricFixtureBlas_))
+            9u, "generic dielectric fixture", dielectricFixtureBlas_) ||
+        !buildRegisteredStaticBlas(
+            kCollapseInstanceIndex, "production collapsed entry", collapseBlas_, true))
         return false;
 
     VkAccelerationStructureBuildRangeInfoKHR playerBodyRange{};
@@ -4434,6 +4456,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[kPlayerViewmodelInstanceIndex].mask = 0u;
     instances[kPlayerViewmodelInstanceIndex].accelerationStructureReference =
         viewmodelAvailable_ ? viewmodelBlas_.address : skinnedPlayerBlas_.address;
+    // Authored world coordinates use the same ordinary static-PBR instance path.
+    instances[kCollapseInstanceIndex] = instances[0];
+    instances[kCollapseInstanceIndex].instanceCustomIndex = kCollapseInstanceIndex;
+    instances[kCollapseInstanceIndex].mask = 0x01u;
+    instances[kCollapseInstanceIndex].accelerationStructureReference = collapseBlas_.address;
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
         return false;
@@ -5337,6 +5364,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         rewardLanternRingBlas_.handle == VK_NULL_HANDLE ||
         rewardLanternBodyBlas_.handle == VK_NULL_HANDLE ||
         dielectricFixtureBlas_.handle == VK_NULL_HANDLE ||
+        collapseBlas_.handle == VK_NULL_HANDLE ||
         playerBodyBlas_.handle == VK_NULL_HANDLE || playerLimbBlas_.handle == VK_NULL_HANDLE ||
         skinnedPlayerBlas_.handle == VK_NULL_HANDLE ||
         skinnedPlayerBlasUpdateScratch_.address == 0u ||
@@ -5949,6 +5977,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         waterfallScale.depth, 0.0f, 0.0f, -2.32f,
         0.0f, waterfallScale.vertical, 0.0f, 0.0f,
         0.0f, 0.0f, waterfallScale.crossLane, -15.26f}};
+    instances[kCollapseInstanceIndex] = instances[0];
+    instances[kCollapseInstanceIndex].instanceCustomIndex = kCollapseInstanceIndex;
+    instances[kCollapseInstanceIndex].mask = 0x01u;
+    instances[kCollapseInstanceIndex].accelerationStructureReference = collapseBlas_.address;
     for (std::size_t instance = 0u; instance < instances.size(); ++instance)
         lastInstanceMasks_[instance] = instances[instance].mask;
 #ifndef NDEBUG

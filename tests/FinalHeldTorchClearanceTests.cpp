@@ -36,11 +36,60 @@ bool Inside(const horde::scene::OverheadVolume& volume,V point) {
     }
     return true;
 }
-float Headroom(V point) {
-    float room=100;
-    const auto include=[&](const auto& volumes) { for(const auto& volume:volumes) if(Inside(volume,point)) room=std::min(room,volume.bottomY-point[1]); };
+float UndersideY(const horde::scene::OverheadVolume& volume,V point) {
+    return volume.bottomY+volume.bottomGradientXZ[0]*(point[0]-volume.bottomAnchorXZ[0])+
+        volume.bottomGradientXZ[1]*(point[2]-volume.bottomAnchorXZ[1]);
+}
+float SharedRoofY(V point) {
+    float roof=100;
+    const auto include=[&](const auto& volumes) { for(const auto& volume:volumes) if(Inside(volume,point)) roof=std::min(roof,UndersideY(volume,point)); };
     include(horde::scene::kShowcaseLowOverheadVolumes); include(horde::scene::kShowcaseCeilingPatches);
-    return room;
+    include(horde::scene::kShowcaseImportedOverheadVolumes);
+    if(Inside(horde::scene::kShowcaseCollapseRoofSeam,point)) roof=std::min(roof,horde::scene::kShowcaseCollapseRoofSeam.bottomY);
+    return roof;
+}
+struct OverheadTriangle {
+    V a,b,c;
+    float minX,maxX,minZ,maxZ;
+};
+// An independent vertical triangle intersection verifies the actual admitted
+// masonry, including fractured shoulders that a smooth roof plane could miss.
+bool TriangleY(const OverheadTriangle& triangle,V point,float& height) {
+    if(point[0]<triangle.minX-1e-6f || point[0]>triangle.maxX+1e-6f ||
+       point[2]<triangle.minZ-1e-6f || point[2]>triangle.maxZ+1e-6f) return false;
+    const V ab=Add(triangle.b,Scale(triangle.a,-1)),ac=Add(triangle.c,Scale(triangle.a,-1));
+    const float determinant=ab[0]*ac[2]-ab[2]*ac[0];
+    const float dx=point[0]-triangle.a[0],dz=point[2]-triangle.a[2];
+    const float u=(dx*ac[2]-dz*ac[0])/determinant;
+    const float v=(ab[0]*dz-ab[2]*dx)/determinant;
+    if(u< -1e-5f || v< -1e-5f || u+v>1.00001f) return false;
+    height=triangle.a[1]+u*ab[1]+v*ac[1];return true;
+}
+std::vector<OverheadTriangle> ImportedStructuralUndersides(const horde::scene::assets::StaticMeshAsset& asset) {
+    std::vector<OverheadTriangle> triangles;
+    for(const auto& primitive:asset.primitives) {
+        if(asset.materials[primitive.materialIndex].name!="MedievalWall02") continue;
+        for(std::uint32_t index=0;index<primitive.indexCount;index+=3) {
+            std::array<V,3> points{};
+            for(std::size_t corner=0;corner<3;++corner) {
+                const auto& position=asset.vertices[primitive.vertexOffset+asset.indices[primitive.indexOffset+index+corner]].position;
+                points[corner]={{position[0],position[1],position[2]}};
+            }
+            const V normal=Cross(Add(points[1],Scale(points[0],-1)),Add(points[2],Scale(points[0],-1)));
+            // Reject vertical walls and ground-facing bases below the eye. Keep
+            // real overhead fracture faces as well as both rising roof wedges.
+            if(normal[1]>=-1e-7f || std::min({points[0][1],points[1][1],points[2][1]})<kShowcaseEyeWorldY) continue;
+            triangles.push_back({points[0],points[1],points[2],
+                std::min({points[0][0],points[1][0],points[2][0]}),std::max({points[0][0],points[1][0],points[2][0]}),
+                std::min({points[0][2],points[1][2],points[2][2]}),std::max({points[0][2],points[1][2],points[2][2]})});
+        }
+    }
+    return triangles;
+}
+float Headroom(V point,const std::vector<OverheadTriangle>& triangles) {
+    float roof=SharedRoofY(point);
+    for(const auto& triangle:triangles) { float y=0;if(TriangleY(triangle,point,y)) roof=std::min(roof,y); }
+    return roof-point[1];
 }
 struct Solved { HeldItemFixedStepState target; HeldItemStates rendered; HeldLightState light; HeldItemTransform grip; V root; PlayerModelWorldBasis basis; };
 // CPU reconstruction of the production scene's view->grounded rig conversion,
@@ -90,36 +139,103 @@ bool Solve(PlayerRenderSlot& rig,const HeldItemFixedStepInput& input,std::uint64
 }
 }
 int main(int argc,char** argv) {
-    if(argc<2) { std::cerr<<"Pass repository root [--original-sweep] [--capture-obj path]\n";return 2; }
-    bool originalSweep=false;
+    if(argc<2) { std::cerr<<"Pass repository root [--original-sweep | --roof-witness] [--capture-obj path]\n";return 2; }
+    bool originalSweep=false,roofWitness=false;
     std::filesystem::path captureObj;
     for(int argument=2;argument<argc;++argument) {
         const std::string flag=argv[argument];
         if(flag=="--original-sweep" && !originalSweep) originalSweep=true;
+        else if(flag=="--roof-witness" && !roofWitness) roofWitness=true;
         else if(flag=="--capture-obj" && captureObj.empty() && argument+1<argc) captureObj=argv[++argument];
         else { std::cerr<<"Invalid diagnostic argument: "<<flag<<'\n';return 2; }
     }
+    if(roofWitness && (originalSweep || !captureObj.empty())) { std::cerr<<"Roof witness is a separate CPU diagnostic\n";return 2; }
     const std::filesystem::path root=argv[1]; std::string diagnostic;
     PlayerRenderSlot rig;
     horde::scene::SkinnedMeshAsset viewmodel;
     horde::scene::assets::AssetManifest manifest;
     horde::scene::assets::StaticMeshAsset torch;
+    horde::scene::assets::AssetManifest collapseManifest;
+    horde::scene::assets::StaticMeshAsset collapse;
     if(!rig.LoadAsset((root/"assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),diagnostic) ||
         !viewmodel.LoadClips((root/"assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb").string(),horde::scene::PlayerLocomotionClipSet(),diagnostic) ||
         !horde::scene::assets::AssetManifest::Load(root/"assets/models/props/runtime/asset.manifest.json",manifest,diagnostic) ||
-        !horde::scene::assets::StaticMeshAsset::Load(root/"assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",manifest,torch,diagnostic)) { std::cerr<<diagnostic<<'\n';return 2; }
-    unsigned cases=0,failures=0; float worstHeadroom=100,maxGripError=0;
-    const auto inspect=[&](HeldItemFixedStepInput input,bool capture) {
+        !horde::scene::assets::StaticMeshAsset::Load(root/"assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",manifest,torch,diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(root/"assets/models/world/runtime/collapsed-entry/asset.manifest.json",collapseManifest,diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(root/"assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",collapseManifest,collapse,diagnostic)) { std::cerr<<diagnostic<<'\n';return 2; }
+    const auto structuralUndersides=ImportedStructuralUndersides(collapse);
+    if(structuralUndersides.empty()) { std::cerr<<"No imported structural underside triangles were inspected\n";return 2; }
+    unsigned cases=0,failures=0,roofCases=0,skinnedRoofCases=0,planeSamples=0,diskSamples=0;
+    float worstHeadroom=100,maxGripError=0,worstRoofHeadroom=100;
+    HeldItemFixedStepInput worstRoofInput{};
+    V worstRoofPoint{};
+    float worstTargetGripY=0,worstFinalGripY=0;
+    // Match authored clearance to the admitted near-route GLB, including the
+    // arch just beyond the retained gameplay cap that the held flame can reach.
+    // Sample real triangle vertices/edges/interiors, not fixture literals.
+    for(const auto& triangle:structuralUndersides) for(int u=0;u<=6;++u) for(int v=0;v<=6-u;++v) {
+        const V point=Add(Add(Scale(triangle.a,1-(u+v)/6.0f),Scale(triangle.b,u/6.0f)),Scale(triangle.c,v/6.0f));
+        if(point[2]<2.92f-1e-5f || point[2]>3.68f+1e-5f) continue;
+        ++planeSamples;
+        if(SharedRoofY(point)>point[1]+1e-5f) {
+            if(failures<12) std::cerr<<"Imported underside missing from clearance at "<<point[0]<<','<<point[1]<<','<<point[2]<<" sharedY="<<SharedRoofY(point)<<'\n';
+            ++failures;
+        }
+    }
+    // Check the conservative disk bound against actual plane points at multiple
+    // radii and clipped boundaries. This includes oblique shoulder gradients.
+    for(const auto& volume:horde::scene::kShowcaseImportedOverheadVolumes) {
+        V centre{};for(const auto& corner:volume.footprint) {centre[0]+=corner[0]*.25f;centre[2]+=corner[1]*.25f;}
+        for(const auto& corner:volume.footprint) for(float radius:{.0f,.05f,kHeldTorchEnvelopeRadius,.40f}) {
+            for(float fraction:{0.0f,.5f,1.0f,1.1f}) {
+                const V origin{{centre[0]+fraction*(corner[0]-centre[0]),0,centre[2]+fraction*(corner[1]-centre[2])}};
+                const float bound=horde::scene::MinimumOverheadBottomY(volume,origin[0],origin[2],radius);
+                for(int angle=0;angle<64;++angle) for(float ring:{0.0f,.5f,1.0f}) {
+                    const float radians=angle*6.283185307f/64;
+                    const V sample{{origin[0]+std::cos(radians)*radius*ring,0,origin[2]+std::sin(radians)*radius*ring}};
+                    if(!Inside(volume,sample)) continue;
+                    ++diskSamples;
+                    if(bound>UndersideY(volume,sample)+1e-5f) { ++failures;std::cerr<<"Disk bound misses underside plane\n"; }
+                }
+            }
+        }
+    }
+    if(planeSamples==0 || diskSamples==0) { std::cerr<<"Empty imported plane/disk validation\n";return 2; }
+    std::vector<horde::scene::TexturedSkinnedRtVertex> roofVertices;
+    std::vector<horde::scene::SkinnedPbrTangent> roofTangents;
+    const auto inspect=[&](HeldItemFixedStepInput input,bool capture,bool nearRoof=false) {
         Solved solved;
         if(!Solve(rig,input,++cases,solved,diagnostic)) { ++failures;std::cerr<<"pose case="<<cases<<" xz="<<input.playerX<<','<<input.playerZ<<" yaw/pitch="<<input.playerYawRadians<<','<<input.playerPitchRadians<<" walk="<<input.walkTime<<": "<<diagnostic<<'\n';return; }
         float room=100;
-        for(const auto& vertex:torch.vertices) room=std::min(room,Headroom(Point(solved.rendered[0].worldFromItem,{{vertex.position[0],vertex.position[1],vertex.position[2]}})));
+        V limitingPoint{};
+        const auto measure=[&](V point) { const float candidate=Headroom(point,structuralUndersides);if(candidate<room) {room=candidate;limitingPoint=point;} };
+        for(const auto& vertex:torch.vertices) measure(Point(solved.rendered[0].worldFromItem,{{vertex.position[0],vertex.position[1],vertex.position[2]}}));
         // Main visible flame plus admitted .06m tip margin and lateral domain.
         for(float x:{-.105f,.105f}) for(float z:{-.105f,.105f}) for(float y:{0.0f,.4f})
-            room=std::min(room,Headroom(Point(solved.light.worldFromFlame,{{x,y,z}})));
-        room=std::min(room,Headroom(Point(solved.light.worldFromLight,{})));
+            measure(Point(solved.light.worldFromFlame,{{x,y,z}}));
+        measure(Point(solved.light.worldFromLight,{}));
         worstHeadroom=std::min(worstHeadroom,room);maxGripError=std::max(maxGripError,rig.LeftGripAgreement().positionErrorMetres);
-        if(room < kHeldTorchOverheadGap-1e-5f) { ++failures;std::cerr<<"clearance case="<<cases<<" xyz="<<input.playerX<<','<<input.playerZ<<" yaw="<<input.playerYawRadians<<" pitch="<<input.playerPitchRadians<<" walk="<<input.walkTime<<" final headroom="<<room<<" gripError="<<rig.LeftGripAgreement().positionErrorMetres<<'\n'; }
+        if(room < kHeldTorchOverheadGap-1e-5f) { if(failures<24) std::cerr<<"clearance case="<<cases<<" xyz="<<input.playerX<<','<<input.playerZ<<" yaw="<<input.playerYawRadians<<" pitch="<<input.playerPitchRadians<<" walk="<<input.walkTime<<" final headroom="<<room<<" gripError="<<rig.LeftGripAgreement().positionErrorMetres<<'\n';++failures; }
+        if(nearRoof) {
+            ++roofCases;
+            if(room<worstRoofHeadroom) { worstRoofHeadroom=room;worstRoofInput=input;worstRoofPoint=limitingPoint;worstTargetGripY=solved.target.worldFromLeftHand[13];worstFinalGripY=solved.grip[13]; }
+            if(!viewmodel.SkinPlayerPoseUniqueTextured(rig.SolvedPose(),roofVertices,roofTangents,diagnostic) ||
+               roofVertices.size()!=15855 || roofTangents.size()!=roofVertices.size()) { ++failures;std::cerr<<"Actual final viewmodel skin: "<<diagnostic<<'\n';return; }
+            ++skinnedRoofCases;
+            // The same solved pose supplies both actual skins and final item
+            // sockets. Retain finite world positions and the 15mm grip guard.
+            for(const auto& vertex:roofVertices) {
+                const V world=Add(solved.root,PlayerModelVectorToWorld(solved.basis,{{vertex.position[0],vertex.position[1],vertex.position[2]}}));
+                if(!std::all_of(world.begin(),world.end(),[](float value){return std::isfinite(value);})) { ++failures;break; }
+            }
+            if(rig.UniqueVertices().empty() || rig.LeftGripAgreement().positionErrorMetres>kPlayerGripSocketToleranceMetres) ++failures;
+            if(roofWitness) {
+                std::cout<<"roof witness playerXZ="<<input.playerX<<','<<input.playerZ<<" yaw/pitch="<<input.playerYawRadians<<','<<input.playerPitchRadians
+                    <<" targetGrip="<<solved.target.worldFromLeftHand[12]<<','<<solved.target.worldFromLeftHand[13]<<','<<solved.target.worldFromLeftHand[14]
+                    <<" finalGrip="<<solved.grip[12]<<','<<solved.grip[13]<<','<<solved.grip[14]<<" lowering="<<solved.target.kinematics.torchOverheadLowering
+                    <<" limitingPoint="<<limitingPoint[0]<<','<<limitingPoint[1]<<','<<limitingPoint[2]<<" headroom="<<room<<'\n';
+            }
+        }
         if(capture) {
             std::cout<<"worst-bend targetGripY="<<solved.target.worldFromLeftHand[13]<<" finalGripY="<<solved.grip[13]<<" flameY="<<solved.light.worldFromFlame[13]<<" lightY="<<solved.light.worldFromLight[13]<<" finalMainEnvelopeHeadroom="<<room<<" root="<<solved.root[0]<<','<<solved.root[1]<<','<<solved.root[2]<<'\n';
             // Local RT captures are diagnostic evidence, never a CI dependency.
@@ -146,6 +262,22 @@ int main(int argc,char** argv) {
             if(index!=vertices.size() || vertexError>1e-5f) ++failures;
         }
     };
+    const auto printLimitingTriangle=[&](V point) {
+        const OverheadTriangle* limiting=nullptr;float roof=SharedRoofY(point);
+        for(const auto& triangle:structuralUndersides) {float y=0;if(TriangleY(triangle,point,y) && y<roof) {roof=y;limiting=&triangle;} }
+        std::cout<<"limiting worldPoint="<<point[0]<<','<<point[1]<<','<<point[2]<<" roofY="<<roof<<" sharedY="<<SharedRoofY(point)<<'\n';
+        if(limiting) for(const auto vertex:{limiting->a,limiting->b,limiting->c}) std::cout<<"limiting actual triangle vertex="<<vertex[0]<<','<<vertex[1]<<','<<vertex[2]<<'\n';
+    };
+    if(roofWitness) {
+        HeldItemFixedStepInput input;input.playerMountProfile=PlayerMountProfile::AnatomicalBody;
+        input.playerX=-1.56f;input.playerZ=3.05f;input.playerYawRadians=3.14159265f;input.playerPitchRadians=0;input.walkTime=2.37f;input.walkAmount=1;
+        input.playerCombat.action=PlayerCombatAction::SwingActive;input.playerCombat.actionTime=.04f;
+        inspect(input,false,true);printLimitingTriangle(worstRoofPoint);
+        input.playerZ=2.83f;input.playerPitchRadians=-.32f;input.walkTime=.80f;input.walkAmount=.5f;input.playerCombat.action=PlayerCombatAction::Idle;
+        inspect(input,false,true);
+        std::cout<<"CPU roof witness subset only: poses="<<cases<<" actualViewmodelSkins="<<skinnedRoofCases<<" failures="<<failures<<'\n';
+        return failures ? 1 : 0;
+    }
     HeldItemFixedStepInput capture;capture.playerMountProfile=PlayerMountProfile::AnatomicalBody;capture.playerX=4.2f;capture.playerZ=-10;capture.playerPitchRadians=-.04f;inspect(capture,true);
     for(int portal=0;portal<3;++portal) for(int step=0;step<=12;++step) for(float pitch:{-.32f,0.0f,.28f}) for(int pose=0;pose<3;++pose) for(float yaw:{0.0f,1.5707963f,-1.5707963f,3.14159265f}) {
         if(originalSweep && yaw!=0) continue;
@@ -164,6 +296,42 @@ int main(int argc,char** argv) {
         input.walkAmount=step*.25f;input.walkTime=step*.4f;input.playerCombat.action=action;input.playerCombat.actionTime=step*.03f;
         inspect(input,false);
     }
+    const unsigned legacyCases=cases;
+    if(!originalSweep) {
+        if(legacyCases!=1475) { ++failures;std::cerr<<"Legacy1,475-pose sweep changed\n"; }
+        constexpr std::array<float,12> routeZ{{1.95f,2.17f,2.39f,2.61f,2.83f,2.91f,2.92f,2.93f,2.94f,2.95f,3.05f,3.16f}};
+        for(std::size_t step=0;step<routeZ.size();++step) for(float x:{-1.56f,0.0f,1.56f})
+            for(float pitch:{-.32f,0.0f,.28f}) for(int pose=0;pose<3;++pose)
+                for(float yaw:{0.0f,1.5707963f,-1.5707963f,3.14159265f}) {
+            HeldItemFixedStepInput input;input.playerMountProfile=PlayerMountProfile::AnatomicalBody;
+            input.playerX=x;input.playerZ=routeZ[step];input.playerYawRadians=yaw;input.playerPitchRadians=pitch;
+            input.walkTime=static_cast<float>(step)*.20f+pose*.37f;
+            input.walkAmount=static_cast<float>((step+pose)%3)*.5f;
+            input.playerCombat.action=pose==0 ? PlayerCombatAction::Idle : pose==1 ? PlayerCombatAction::SwingActive : PlayerCombatAction::ParryActive;
+            input.playerCombat.actionTime=.04f;inspect(input,false,true);
+        }
+        // Oblique orientations and every transient sword/parry phase at the
+        // roof join and last legal near-cap stance probe the final solved grip.
+        unsigned phase=0;
+        for(const auto action:{PlayerCombatAction::SwingWindup,PlayerCombatAction::SwingRecovery,
+            PlayerCombatAction::UpwardSliceWindup,PlayerCombatAction::UpwardSliceActive,PlayerCombatAction::UpwardSliceRecovery,
+            PlayerCombatAction::ParryStartup,PlayerCombatAction::ParryRecovery}) {
+            for(float z:{2.93f,3.16f}) for(float x:{-1.56f,0.0f,1.56f}) for(float pitch:{-.32f,.28f})
+                for(float yaw:{.78539816f,-.78539816f,2.35619449f,-2.35619449f}) {
+                HeldItemFixedStepInput input;input.playerMountProfile=PlayerMountProfile::AnatomicalBody;
+                input.playerX=x;input.playerZ=z;input.playerYawRadians=yaw;input.playerPitchRadians=pitch;
+                input.walkTime=phase*.31f;input.walkAmount=static_cast<float>(phase%3)*.5f;
+                input.playerCombat.action=action;input.playerCombat.actionTime=.03f;inspect(input,false,true);
+            }
+            ++phase;
+        }
+        if(roofCases!=1632 || skinnedRoofCases!=roofCases) { ++failures;std::cerr<<"Incomplete new real-rig/viewmodel sweep\n"; }
+    }
+    std::cout<<"imported structural underside triangles="<<structuralUndersides.size()<<" planeSamples="<<planeSamples<<" diskSamples="<<diskSamples<<'\n';
+    std::cout<<"new roof final rig cases="<<roofCases<<" actualViewmodelVerticesPerPose=15855 skinnedRoofCases="<<skinnedRoofCases<<" worstHeadroom="<<worstRoofHeadroom
+        <<" worstPoseXZ="<<worstRoofInput.playerX<<','<<worstRoofInput.playerZ<<" yaw/pitch="<<worstRoofInput.playerYawRadians<<','<<worstRoofInput.playerPitchRadians
+        <<" walk="<<worstRoofInput.walkTime<<" action="<<static_cast<int>(worstRoofInput.playerCombat.action)<<" target/finalGripY="<<worstTargetGripY<<','<<worstFinalGripY<<'\n';
+    if(roofCases) printLimitingTriangle(worstRoofPoint);
     std::cout<<"actual final rig cases="<<cases<<" worstHeadroom="<<worstHeadroom<<" maxGripError="<<maxGripError<<" failures="<<failures<<'\n';
     return failures ? 1 : 0;
 }

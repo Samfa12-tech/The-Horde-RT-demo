@@ -1,0 +1,28 @@
+{
+  "schema": "horde.collapse-owner-steering.v1",
+  "revision": 2,
+  "function": "existing approval retained; explicit owner revision overrides dimensions below",
+  "form": "changes-requested; revised package requires explicit approval",
+  "runtime": "not exported",
+  "ownerRequests": [
+    "the stairs need to be the width of the room and not go up to a wall but continue up with the roof opening as they go up until theyre not longer in view",
+    "also the roof needs to be a bit caved in over it, otherwise, where did the debris come from?"
+  ],
+  "dimensionAuthority": {
+    "fullRoomAndStairWidthMeters": 3.7,
+    "stairInteriorX": [-1.85, 1.85],
+    "frontThresholdWidthMeters": 2.8,
+    "unchangedGameplayCollisionCapZ": 3.4,
+    "unchangedSpawnXZ": [0, 1.85],
+    "overriddenOldConstraints": ["2.8m rear stairwell width", "five-tread remnant", "6.35m rear depth", "flat visible backing", "flat recess roof"],
+    "newStructuralIntent": "Full-width ascending treads and rising sealed enclosure; remote closure must be occluded by physical ascent/roof from actual rear-facing review frusta. Supported broken lower roof shoulders and matching fallen masonry explain collapse origin."
+  },
+  "rejectedRevision1": {
+    "contactSheetSha256": "a10444be158b10d16bdcb9d150bcc66cf6324e0b5b419a05695fb18f50aef9c3",
+    "editableBlendSha256": "dc9ff5831fbfd6a1e287a1e7ebae449c9b46c4b98f28b612dcc24b5118009f6b",
+    "auditSha256": "77bf23f6335e51dfaab1279af0dcd49887620ff2c03f49f217fcac609e63d886",
+    "preservedOutsideRepository": true
+  },
+  "unchangedContracts": ["Existing gallery and forward route", "Existing gameplay and collision", "Native lights and RT renderer", "No baked lighting", "No paid generation", "No runtime GLB export before explicit Form approval"],
+  "authoringValidationOnly": "CPU Blender two threads; physical scene ray audits and geometry checks are not native RT acceptance or a device memory measurement"
+}

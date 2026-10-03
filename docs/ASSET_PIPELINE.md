@@ -43,6 +43,42 @@ Do not pass an untextured mesh into the game and call it complete.
 - Runtime textures are 1K mipmapped raw RGBA8 KTX2 on Windows and strict ASTC KTX2 on Android (6x6 base/ORM/emissive, 4x4 normal). No uncompressed Android fallback is allowed.
 - The generic static PBR slot registers TLAS instance 3 for the sword and instance 1 for the torch while preserving the 20-instance TLAS and one-frame ownership contract. Socket composition stays in shared gameplay/render interfaces, not in asset-specific shader branches.
 
+## Collapsed-entry shared static atlas (1.6.2)
+
+The approved revision-two export joins geometry into two ordinary PBR material
+families: `Boulder01Rock` and `MedievalWall02`, appended at shared static atlas
+layers10/11. Existing layers0..9 keep their order and every mip payload byte;
+preview subset selection remains independent. Base/normal/ORM arrays have12
+layers, while the shared emissive fallback remains1. Six1K RGBA source PNGs in
+`assets/textures/props/source/collapsed-entry` losslessly preserve decoded JPEG
+pixels, opaque alpha, OpenGL+Y normals and ARM channels R=AO/G=roughness/B=metal.
+Their original sources, hashes and licences are recorded in `input-receipt.json`
+and [ASSET_LICENSES.md](../ASSET_LICENSES.md). Source maps/high geometry stay out
+of game packages; only approved runtime derivatives and manifests are packaged.
+
+`tools/build-production-prop-textures.ps1` retains the existing1K full11-mip
+policy: Windows RGBA8 sRGB base/emissive and linear normal/ORM; Android strict
+ASTC6x6 base/ORM/emissive and4x4 normals. Explicit BT709/sRGB primaries assignment
+labels known source data without pixel conversion. It resolves heterogeneous
+PNG metadata while preserving actual legacy DFD and payload hashes. Normal
+filtering and strength defaults are unchanged; no detail normal, parallax or
+baked scene illumination is introduced.
+
+For an incremental atlas build use `-SkipSourceGeneration` to preserve current
+admitted source images and `-OutputDirectory` to stage candidates separately.
+Then run `tools/validate-static-prop-atlas-growth.py --before <preserved-atlas>
+--after <staged-atlas> --output <receipt>` before copying runtime files. It checks
+format/dimensions/layers/full mips, primaries/transfer DFD identity, every old
+layer payload at every mip, unchanged emissive bytes and manifest hashes/order.
+`tests/StaticTextureArrayToolTests.ps1` exercises real mixed-metadata PNG inputs.
+
+The [exact atlas receipt](evidence/2026-10-03-collapse-atlas/atlas-growth.json)
+records Android payload growth5,301,408B and Windows33,554,424B for the two
+families. Full prop-atlas payloads including emissive are32,434,736B and
+206,918,948B respectively. These are encoded/format upload bytes, excluding
+driver allocation/alignment, geometry/AS and bandwidth; they are not measured
+GPU allocation, performance or native/owner visual acceptance.
+
 ## Model format preference
 
 Prefer glTF/GLB for models unless a better Vulkan-friendly pipeline is chosen later.

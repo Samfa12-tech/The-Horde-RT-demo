@@ -206,8 +206,8 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 21u, "instance metadata capacity reserves the appended viewmodel slot");
-    Check(kRtStaticAssetCapacity == 9u, "static asset capacity is 9");
+    Check(kRtInstanceMetadataCapacity == 22u, "instance metadata preserves viewmodel20 and appends immutable collapse21");
+    Check(kRtStaticAssetCapacity == 10u, "static asset capacity admits exactly one additional collapse asset");
     Check(kRtPrimitiveMetadataCapacity == 32u, "primitive capacity is 32");
     Check(kRtMaterialCapacity == 32u, "material capacity is 32");
     Check(kRtTextureLayerCapacity == 16u, "each PBR texture category has 16 layers");
@@ -300,7 +300,7 @@ void TestGenericRegistrationAndMeasurements()
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 128u &&
-              slot.Measurements().instanceMetadataBytes == 21u * 32u &&
+               slot.Measurements().instanceMetadataBytes == 22u * 32u &&
               slot.Measurements().primitiveMetadataBytes == 2u * 16u &&
               slot.Measurements().descriptorCount == 9u,
           "resource measurements use literal ABI sizes and descriptor count");
