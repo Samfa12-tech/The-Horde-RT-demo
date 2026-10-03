@@ -347,7 +347,9 @@ struct VulkanSurfaceContext
     bool nativeMotionValidation = false;
 #if defined(_DEBUG)
     horde::gameplay::validation::MotionEvidenceScenario motionScenario;
+    horde::gameplay::validation::MotionScenario motionRequestedScenario{};
     horde::telemetry::MotionEvidenceLedger motionLedger;
+    bool motionArmed = false;
     std::uint32_t motionRetryGeneration = 0;
     bool motionRetryPending = false;
     std::uint64_t motionSurfaceGeneration = 1;
@@ -5732,16 +5734,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     if (context.nativeMotionValidation)
     {
-        horde::gameplay::validation::MotionScenario scenario;
         const auto now = horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
         const auto runId = std::string("native-motion-") + std::to_string(GetCurrentProcessId()) + "-" + std::to_string(now);
-        if (!horde::gameplay::validation::ParseMotionScenario(nativeMotionScenario, scenario) ||
-            !context.motionScenario.Begin(scenario, context.simulation, now) ||
-            !context.motionLedger.Begin(runId, scenario)) return 2;
-        context.motionRetryGeneration = context.simulation.Snapshot().retryGeneration;
-        context.simulationPaused = false;
-        context.simulationInput.paused = false;
-        MirrorSimulationSnapshot(context);
+        if (!horde::gameplay::validation::ParseMotionScenario(nativeMotionScenario, context.motionRequestedScenario) ||
+            !context.motionLedger.Begin(runId, context.motionRequestedScenario)) return 2;
+        // The sole checkpoint seed and scenario clock start only after actual
+        // user focus arms the run. Native evidence starts no audio at any point.
     }
 #endif
     if (!CreateInstance(context.instance, context.presentSurfaceSupport))
@@ -6784,11 +6782,12 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         case WM_COMMAND: case WM_HSCROLL: case WM_VSCROLL: case WM_MOUSEWHEEL:
         case WM_KEYDOWN: case WM_SYSKEYDOWN: case WM_KEYUP: case WM_SYSKEYUP:
         case WM_LBUTTONDOWN: case WM_RBUTTONDOWN:
-            sceneContext->motionScenario.Fail("Native motion interrupted by external input/menu control."); return 0;
+            if (sceneContext->motionArmed)
+                sceneContext->motionScenario.Fail("Native motion interrupted by external input/menu control."); return 0;
         case WM_ACTIVATEAPP:
-            if (!wParam) sceneContext->motionScenario.Fail("Native motion lost application focus."); return 0;
+            if (sceneContext->motionArmed && !wParam) sceneContext->motionScenario.Fail("Native motion lost application focus."); return 0;
         case WM_ACTIVATE:
-            if (LOWORD(wParam) == WA_INACTIVE) sceneContext->motionScenario.Fail("Native motion lost window focus."); return 0;
+            if (sceneContext->motionArmed && LOWORD(wParam) == WA_INACTIVE) sceneContext->motionScenario.Fail("Native motion lost window focus."); return 0;
         case WM_MOUSEMOVE: case WM_CAPTURECHANGED: case WM_KILLFOCUS:
             return 0; // Producer axes are exclusively the declared schedule; outer focus guard remains authoritative.
         default: break;
@@ -8154,7 +8153,11 @@ int CreateAndShowWindow(const std::string& diagnosticText,
             return TRUE;
         }, 0);
     }
-    ShowWindow(hWnd, captureDirectory != nullptr ? SW_SHOWNOACTIVATE : SW_SHOW);
+    int showMode=captureDirectory != nullptr ? SW_SHOWNOACTIVATE : SW_SHOW;
+#if defined(_DEBUG)
+    if (!nativeMotionScenario.empty()) showMode=SW_SHOWNORMAL;
+#endif
+    ShowWindow(hWnd,showMode);
     UpdateWindow(hWnd);
     if (captureDirectory != nullptr)
     {

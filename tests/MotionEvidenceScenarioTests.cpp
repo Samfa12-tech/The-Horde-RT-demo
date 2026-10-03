@@ -1,6 +1,8 @@
 #include "gameplay/validation/MotionEvidenceScenario.h"
 #include "telemetry/MotionEvidenceLedger.h"
+#include "scene/ShowcaseOverheadGeometry.h"
 
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -17,6 +19,31 @@ void Check(bool condition, const char* message)
 {
     if (!condition) { ++failures; std::cerr << "FAIL: " << message << '\n'; }
 }
+bool UpwardRayEntersWaterShaft(const SimulationSnapshot& state)
+{
+    // Independent actual shader ray and physical roof-patch intersection,
+    // including production camera bob. Elapsed time alone cannot certify the
+    // waterfall rim when the camera is in the other chamber or finale room.
+    const float step=state.walkTime*6.2f;
+    const float pitch=std::clamp(state.playerPitchRadians+std::sin(step)*0.012f*state.walkAmount,-0.32f,0.28f)-0.05f;
+    const float slope=(1.22f*pitch+0.592f)/(1.22f-0.592f*pitch);
+    if (slope<=0.0f) return false;
+    const float eye=kShowcaseEyeWorldY+std::abs(std::sin(step))*0.035f*state.walkAmount;
+    const float distance=(horde::scene::kShowcaseRouteCeilingWorldY-eye)/slope;
+    const float x=state.playerX+std::sin(step*0.5f)*0.035f*state.walkAmount+std::sin(state.playerYawRadians)*distance;
+    const float z=state.playerZ-std::cos(state.playerYawRadians)*distance;
+    if (x<=-2.9f || x>=-1.58f || z<=-16.1f || z>=-14.72f) return false;
+    for (std::size_t patch=8;patch<12;++patch)
+    {
+        const auto& roof=horde::scene::kShowcaseCeilingPatches[patch];
+        float minX=roof.footprint[0][0],maxX=minX,minZ=roof.footprint[0][1],maxZ=minZ;
+        for (const auto& corner:roof.footprint)
+        { minX=std::min(minX,corner[0]);maxX=std::max(maxX,corner[0]);minZ=std::min(minZ,corner[1]);maxZ=std::max(maxZ,corner[1]); }
+        if (x>=minX && x<=maxX && z>=minZ && z<=maxZ) return false;
+    }
+    return state.torchFailure.heldByPlayer && !state.torchFailure.triggered &&
+        state.interaction.heldLightKind==interactions::HeldLightKind::Torch;
+}
 
 void Run(MotionScenario kind, int rate, const char* receiptPath)
 {
@@ -25,6 +52,10 @@ void Run(MotionScenario kind, int rate, const char* receiptPath)
     MotionEvidenceLedger ledger;
     std::uint64_t now = 1'000'000'000ull;
     Check(scenario.Begin(kind, simulation, now), "actual production scenario starts from an admitted checkpoint seed");
+    if (kind==MotionScenario::ShaftUp)
+        Check(simulation.Snapshot().torchFailure.heldByPlayer && !simulation.Snapshot().torchFailure.triggered &&
+              simulation.Snapshot().interaction.heldLightKind==interactions::HeldLightKind::Torch,
+              "water shaft route starts from an admitted fresh torch checkpoint before ordinary movement");
     Check(ledger.Begin("cpu_only_input_evidence", kind), "bounded ledger accepts a safe local run ID");
     InputSnapshot publication;
     // No current RT output: same production paused-input path, no commands.
@@ -39,6 +70,9 @@ void Run(MotionScenario kind, int rate, const char* receiptPath)
     bool walkingSeen = false;
     bool retryRecognitionSeen = false;
     bool chargeSeen = false;
+    bool rearViewSeen=false,rearParallaxSeen=false,rearReturnSeen=false;
+    float shaftMinZ=simulation.Snapshot().playerZ,shaftMaxZ=shaftMinZ;
+    unsigned shaftViewSamples=0;
     std::uint64_t publicationSequence = 1u;
     for (int frame = 0; frame < rate * 120 && !scenario.Complete() && !scenario.Failed(); ++frame)
     {
@@ -71,9 +105,25 @@ void Run(MotionScenario kind, int rate, const char* receiptPath)
         if (!ledger.AppendState(now, simulation.Snapshot(), input, scenario, simulation.Events().Events()))
         { std::cerr << ledger.Failure() << '\n'; Check(false, "actual state/event ledger admission"); break; }
         publication = input;
-        walkingSeen = walkingSeen || simulation.Snapshot().walkAmount > 0.5f;
+        walkingSeen = walkingSeen || simulation.Snapshot().walkAmount > (kind==MotionScenario::ShaftUp ? 0.1f : 0.5f);
         retryRecognitionSeen = retryRecognitionSeen || simulation.Snapshot().lich.revealPhase == KeeperRevealPhase::RetryRecognition;
         chargeSeen = chargeSeen || simulation.Snapshot().lich.phase == LichPhase::Charging;
+        if (kind==MotionScenario::TorchLowOpening && scenario.Stage()==MotionStage::Approach)
+        {
+            const auto& state=simulation.Snapshot();
+            rearViewSeen=rearViewSeen || (state.playerZ>2.5f && std::cos(state.playerYawRadians)< -0.95f && state.torchFailure.heldByPlayer);
+            rearParallaxSeen=rearParallaxSeen || (state.playerZ>2.5f && state.playerX>0.15f && state.walkAmount>0.1f);
+            rearReturnSeen=rearReturnSeen || (rearViewSeen && rearParallaxSeen &&
+                std::hypot(state.playerX-kPlayerSpawn.x,state.playerZ-kPlayerSpawn.z)<0.06f);
+        }
+        if (kind==MotionScenario::ShaftUp && !simulation.Snapshot().paused &&
+            (scenario.Stage()==MotionStage::ShaftMotion || scenario.Complete()))
+        {
+            const auto& state=simulation.Snapshot();
+            Check(UpwardRayEntersWaterShaft(state),"ordinary water shaft motion keeps actual upper-screen ray clear of fixed surrounding roof slabs");
+            if (shaftViewSamples==0) shaftMinZ=shaftMaxZ=state.playerZ;
+            shaftMinZ=std::min(shaftMinZ,state.playerZ);shaftMaxZ=std::max(shaftMaxZ,state.playerZ);++shaftViewSamples;
+        }
         simulation.ClearEvents();
     }
     std::cout << MotionScenarioName(kind) << " rate=" << rate << " stage=" << MotionStageName(scenario.Stage())
@@ -81,6 +131,17 @@ void Run(MotionScenario kind, int rate, const char* receiptPath)
               << " events=" << ledger.Events().size() << " reservedLedgerBytes=" << ledger.ReservedBytes()
               << " reason=" << scenario.Failure() << '\n';
     Check(scenario.Complete() && !ledger.Failed() && walkingSeen, "real simulation reaches the bounded scenario outcome");
+    if (kind==MotionScenario::TorchLowOpening)
+        Check(rearViewSeen && rearParallaxSeen && rearReturnSeen && scenario.SimulationSeconds()>24.0,
+              "torch run first observes actual rear collapse look and positive-Z parallax, returns to spawn, then completes unchanged portal sweep");
+    if (kind==MotionScenario::ShaftUp)
+    {
+        std::cout<<"shaft coverage views="<<shaftViewSamples<<" zSpan="<<shaftMaxZ-shaftMinZ
+            <<" retry="<<simulation.Snapshot().retryGeneration<<" finaleRoof="<<simulation.Snapshot().finale.skylightOpenProgress<<'\n';
+        Check(shaftViewSamples>static_cast<unsigned>(rate)*10u && shaftMaxZ-shaftMinZ>0.40f &&
+              simulation.Snapshot().retryGeneration==0u && simulation.Snapshot().finale.skylightOpenProgress==0.0f,
+              "shaft evidence includes sustained waterfall-rim views and actual walking parallax without drench/retry/phase mutation");
+    }
     if (kind == MotionScenario::KeeperFirstEntry)
         Check(pauseChecked && chargeSeen && scenario.EventCounts()[17] == 1u && scenario.EventCounts()[18] == 1u && scenario.EventCounts()[19] == 1u,
               "six-second keeper motion includes pause, ordered once-only cues and a full actual charge");
@@ -107,6 +168,17 @@ void TestAdmissionAndFrameBinding()
     GameSimulation legacy;
     MotionEvidenceScenario rejected;
     Check(!rejected.Begin(MotionScenario::TorchLowOpening, legacy, 1u), "legacy profile cannot certify the production anatomical motion path");
+    GameSimulation wrongShaft(ProductionGameSimulationConfig());
+    MotionEvidenceScenario shaft;
+    Check(shaft.Begin(MotionScenario::ShaftUp,wrongShaft,1u) && wrongShaft.ApplyShowcaseCheckpoint(11),
+          "rejected finale-roof negative fixture uses actual admitted checkpoint state");
+    auto shaftInput=shaft.BuildInput(wrongShaft.Snapshot(),{},2u,true);
+    wrongShaft.AdvanceFrame(shaftInput,1.0/60.0,1u);
+    shaft.ObserveAdvance(wrongShaft.Snapshot(),wrongShaft.Events().Events());
+    Check(shaft.Failed() && !UpwardRayEntersWaterShaft(wrongShaft.Snapshot()),
+          "the accepted open finale roof cannot certify the different active-torch waterfall shaft");
+    Check(wrongShaft.ApplyShowcaseCheckpoint(4) && !UpwardRayEntersWaterShaft(wrongShaft.Snapshot()),
+          "old dark skylight chamber cannot certify the waterfall rim either");
     GameSimulation simulation(ProductionGameSimulationConfig());
     MotionEvidenceScenario scenario;
     Check(scenario.Begin(MotionScenario::TorchLowOpening, simulation, 1'000u), "deadline fixture admitted");
@@ -227,6 +299,32 @@ void TestAdmissionAndFrameBinding()
     publication = lifecycle.PublishedStateByValue();
     Check(!unbound.AppendCompletedFrame(5u, publication), "last state and presentation flag alone cannot fabricate a committed frame join");
 }
+void TestRearLookCannotBeSkipped()
+{
+    GameSimulation simulation(ProductionGameSimulationConfig());
+    MotionEvidenceScenario scenario;
+    std::uint64_t now=1'000'000'000ull;
+    Check(scenario.Begin(MotionScenario::TorchLowOpening,simulation,now),"rear-look negative starts an ordinary production route");
+    InputSnapshot publication;
+    bool rearTravelSeen=false,portalStageSeen=false;
+    for(unsigned frame=0;frame<60u*50u && !scenario.Failed() && !scenario.Complete();++frame)
+    {
+        now+=16'666'667ull;
+        auto input=scenario.BuildInput(simulation.Snapshot(),publication,now,true);
+        // Preserve ordinary world movement but omit the rear camera look.
+        // Positive-Z travel alone must not certify a collapse-view milestone.
+        const float dx=input.moveForward*std::sin(input.yawRadians)+input.moveStrafe*std::cos(input.yawRadians);
+        const float dz=-input.moveForward*std::cos(input.yawRadians)+input.moveStrafe*std::sin(input.yawRadians);
+        input.yawRadians=0;input.moveForward=-dz;input.moveStrafe=dx;
+        simulation.AdvanceFrame(input,1.0/60.0,frame+1u);
+        scenario.ObserveAdvance(simulation.Snapshot(),simulation.Events().Events());
+        rearTravelSeen=rearTravelSeen || simulation.Snapshot().playerZ>2.5f;
+        portalStageSeen=portalStageSeen || scenario.Stage()==MotionStage::TorchMotion;
+        simulation.ClearEvents();publication=input;
+    }
+    Check(rearTravelSeen && scenario.Failed() && !scenario.Complete() && !portalStageSeen,
+          "real rearward travel without rearward look fails instead of silently passing the collapse evidence stage");
+}
 }
 
 int main(int argc, char** argv)
@@ -234,6 +332,7 @@ int main(int argc, char** argv)
     if (argc != 1 && argc != 3) { std::cerr << "Optional --cpu-receipt path\n"; return 2; }
     if (argc == 3 && std::string_view(argv[1]) != "--cpu-receipt") return 2;
     TestAdmissionAndFrameBinding();
+    TestRearLookCannotBeSkipped();
     for (int rate : {15, 60, 120})
         for (const auto kind : {MotionScenario::TorchLowOpening, MotionScenario::ShaftUp,
                                MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward})

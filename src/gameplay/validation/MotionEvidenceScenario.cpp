@@ -69,14 +69,15 @@ bool MotionEvidenceScenario::Begin(MotionScenario scenario, GameSimulation& simu
     if (std::string_view(MotionScenarioName(scenario)) == "invalid" || now == 0u ||
         simulation.Snapshot().playerMountProfile != items::PlayerMountProfile::AnatomicalBody)
     { Fail("Motion evidence requires an admitted scenario, clock and production simulation profile."); return false; }
-    const int checkpoint = scenario == MotionScenario::TorchLowOpening ? 0 : scenario == MotionScenario::ShaftUp ? 4 : 8;
+    const int checkpoint = scenario == MotionScenario::TorchLowOpening ? 0 : scenario == MotionScenario::ShaftUp ? 2 : 8;
     if (!simulation.ApplyShowcaseCheckpoint(checkpoint))
     { Fail("The accepted scenario checkpoint seed could not be applied."); return false; }
     startWall_ = latestWall_ = now;
     previousTick_ = simulation.Snapshot().tickIndex;
+    previousRevealElapsed_ = simulation.Snapshot().lich.revealElapsedSeconds;
     initialVitality_ = simulation.Snapshot().playerVitals.vitality;
     initialRetryGeneration_ = simulation.Snapshot().retryGeneration;
-    Enter(scenario == MotionScenario::ShaftUp ? MotionStage::ShaftMotion : MotionStage::Approach);
+    Enter(MotionStage::Approach);
     return true;
 }
 std::string_view MotionEvidenceScenario::Failure() const noexcept { return failure_.data(); }
@@ -146,7 +147,24 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
         {
         case MotionStage::Approach:
             if (KeeperScenario(scenario_)) { input.yawRadians = -kPi * 0.5f; MoveTowards(input, state, kKeeperRetryPosition.x, kKeeperRetryPosition.z); }
-            else { input.yawRadians = 0.0f; MoveTowards(input, state, 0.0f, -2.5f); }
+            else if (scenario_==MotionScenario::ShaftUp)
+            {
+                const bool atWestLeg=state.playerZ< -15.05f;
+                input.yawRadians=atWestLeg ? -kPi*0.5f : 0.0f;
+                input.pitchRadians=atWestLeg ? 0.28f : -0.04f;
+                MoveTowards(input,state,atWestLeg ? -1.66f : 4.2f,atWestLeg ? -15.35f : -15.2f);
+            }
+            else if (elapsed<6.0f || !rearReturnSeen_)
+            {
+                const auto smooth=[](float value) {value=std::clamp(value,0.0f,1.0f);return value*value*(3.0f-2.0f*value);};
+                const float rearBlend=elapsed<5.2f ? smooth(elapsed/0.8f) : 1.0f-smooth((elapsed-5.2f)/0.8f);
+                input.yawRadians=kPi*rearBlend;
+                input.pitchRadians=0.10f+0.08f*std::sin(elapsed*kPi/3.0f);
+                if(elapsed<4.2f)
+                    MoveTowards(input,state,0.35f*std::sin(elapsed*kPi/4.2f),2.65f);
+                else MoveTowards(input,state,kPlayerSpawn.x,kPlayerSpawn.z);
+            }
+            else { input.yawRadians = 0.0f; input.pitchRadians=-0.05f; MoveTowards(input, state, 0.0f, -2.5f); }
             break;
         case MotionStage::TorchMotion:
             input.yawRadians = std::sin(elapsed * kPi / 8.0f) * 0.45f;
@@ -156,10 +174,12 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
             if (elapsed > 7.0f && !parrySent_) { PublishEdge(commands_.parry); parrySent_ = true; }
             break;
         case MotionStage::ShaftMotion:
-            input.yawRadians = elapsed * kPi / 6.0f;
-            input.pitchRadians = elapsed < 8.0f ? 0.28f : 0.12f + 0.16f * std::cos(elapsed * kPi / 2.0f);
-            MoveTowards(input, state, -5.5f + 0.6f * std::sin(elapsed * kPi / 3.0f),
-                        -15.2f + 0.6f * std::cos(elapsed * kPi / 3.0f));
+            // The report's shaft is the waterfall aperture, not the later
+            // skylight chamber or finale roof. Stay on the east side of the
+            // unchanged automatic drench trigger while looking into its rim.
+            input.yawRadians=-kPi*0.5f+0.06f*std::sin(elapsed*kPi/3.0f);
+            input.pitchRadians = 0.275f + 0.005f * std::cos(elapsed * kPi / 3.0f);
+            MoveTowards(input,state,-1.66f,-15.35f+0.26f*std::sin(elapsed*kPi/3.0f));
             break;
         case MotionStage::Reveal:
         {
@@ -241,6 +261,8 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
     if (state.paused && state.lich.revealElapsedSeconds != previousRevealElapsed_)
     { Fail("Keeper reveal advanced across paused input."); return; }
     previousRevealElapsed_ = state.lich.revealElapsedSeconds;
+    if (scenario_==MotionScenario::ShaftUp && (!state.torchFailure.heldByPlayer || state.torchFailure.triggered))
+    { Fail("Water shaft route must retain the active pre-drench torch."); return; }
     if (!state.playerAlive && stage_ != MotionStage::AwaitDeath && stage_ != MotionStage::RetryRequested)
     { Fail("Player died outside the intended actual death/retry stage."); return; }
     const double elapsed = simulationSeconds_ - stageStartSeconds_;
@@ -248,7 +270,21 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
     {
     case MotionStage::Approach:
         if (KeeperScenario(scenario_)) { if (state.lich.revealStarted) Enter(MotionStage::Reveal); }
-        else if (Distance(state, 0.0f, -2.5f) < 0.04f) Enter(MotionStage::TorchMotion);
+        else if (scenario_==MotionScenario::ShaftUp)
+        { if (Distance(state,-1.66f,-15.35f)<0.04f) Enter(MotionStage::ShaftMotion); }
+        else
+        {
+            rearLookSeen_=rearLookSeen_ || (std::cos(state.playerYawRadians)< -0.95f && state.playerZ>2.50f);
+            rearParallaxSeen_=rearParallaxSeen_ || (state.playerZ>2.50f && state.playerX>0.15f && state.walkAmount>0.1f);
+            rearReturnSeen_=rearReturnSeen_ || (elapsed>=5.2 && rearLookSeen_ && rearParallaxSeen_ &&
+                Distance(state,kPlayerSpawn.x,kPlayerSpawn.z)<0.06f);
+            if (elapsed>=6.0 && Distance(state,0.0f,-2.5f)<0.04f)
+            {
+                if(!rearLookSeen_ || !rearParallaxSeen_ || !rearReturnSeen_)
+                    Fail("Actual rear-collapse look, positive-Z parallax and spawn return were not observed.");
+                else Enter(MotionStage::TorchMotion);
+            }
+        }
         break;
     case MotionStage::TorchMotion:
         nearPortalSeen_ = nearPortalSeen_ || state.playerZ > -2.6f;
@@ -266,8 +302,30 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
         }
         break;
     case MotionStage::ShaftMotion:
-        if (elapsed >= 12.0) Enter(MotionStage::Complete);
+    {
+        if (!state.torchFailure.heldByPlayer || state.torchFailure.triggered ||
+            state.interaction.heldLightKind!=interactions::HeldLightKind::Torch || state.finale.skylightOpenProgress!=0.0f)
+        { Fail("Water shaft motion lost the actual active torch or admitted pre-drench route state."); break; }
+        {
+            // Actual upper-screen ray (u=.5,v=.1), with unchanged projection:
+            // forward*1.22 + up*.592. It enters the physical waterfall rim;
+            // it is not a claim that the enclosed5.6m sky or sprigs are visible.
+            const float pitch=state.playerPitchRadians-0.05f;
+            const float slope=(1.22f*pitch+0.592f)/(1.22f-0.592f*pitch);
+            const float distance=(1.35f-kShowcaseEyeWorldY)/slope;
+            const float x=state.playerX+std::sin(state.playerYawRadians)*distance;
+            const float z=state.playerZ-std::cos(state.playerYawRadians)*distance;
+            shaftOpeningSeen_=shaftOpeningSeen_ || (x> -2.9f && x< -1.58f && z> -16.1f && z< -14.72f);
+        }
+        shaftParallaxSeen_=shaftParallaxSeen_ || (std::abs(state.playerZ+15.35f)>0.12f && state.walkAmount>0.1f);
+        if (elapsed >= 12.0)
+        {
+            if (!shaftOpeningSeen_ || !shaftParallaxSeen_)
+                Fail("Actual upward waterfall rim view and walking parallax were not observed.");
+            else Enter(MotionStage::Complete);
+        }
         break;
+    }
     case MotionStage::Reveal:
         revealRetreatSeen_ = revealRetreatSeen_ || !HasReachedKeeperArrivalThreshold(state.playerX, state.playerZ);
         revealReturnSeen_ = revealReturnSeen_ || (revealRetreatSeen_ && HasReachedKeeperArrivalThreshold(state.playerX, state.playerZ));

@@ -15,7 +15,7 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
         manifest << "{\"schema\":1,\"complete\":"
             << (error.empty() && context.motionScenario.Complete() && !context.motionLedger.Failed() ? "true" : "false")
             << ",\"processId\":" << GetCurrentProcessId() << ",\"scenario\":\""
-            << horde::gameplay::validation::MotionScenarioName(context.motionScenario.Scenario())
+            << horde::gameplay::validation::MotionScenarioName(context.motionRequestedScenario)
             << "\",\"executableSha256\":\"" << executableSha256 << "\",\"gpu\":\""
             << JsonEscape(capabilities.identity.gpuName) << "\",\"apiVersion\":" << capabilities.identity.vulkanApiVersion
             << ",\"driverVersion\":" << capabilities.identity.driverVersion << ",\"backend\":\""
@@ -24,7 +24,8 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
             << "\",\"isolation\":{\"preferencesLoaded\":false,\"preferencesWritten\":false,\"audioStarted\":false,"
             << "\"automatedMutedLane\":true,\"audioAcceptance\":false,\"ownerVisualAcceptance\":false,"
             << "\"secondSimulation\":false,\"phaseForced\":false,\"fixedDeltaOverride\":false}"
-            << ",\"limits\":{\"wallSeconds\":120,\"maximumCaptures\":64,\"fenceAcquireTimeoutSeconds\":2,"
+            << ",\"focusArmed\":" << (context.motionArmed ? "true" : "false")
+            << ",\"limits\":{\"armingWallSeconds\":30,\"wallSeconds\":120,\"maximumCaptures\":64,\"fenceAcquireTimeoutSeconds\":2,"
             << "\"externalOwnedPidDeadlineRequired\":true,\"driverIdleReadbackCallsRemainProduction\":true,"
             << "\"frameScope\":\"RT-produced successful swapchain presentation and owning graphics completion, not scanout\","
             << "\"timingScope\":\"scripted run with milestone readback; not sustained performance comparison\"}"
@@ -58,13 +59,38 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
     if(!context.nativeMotionValidation || !context.useRtPath || !context.rtScene.IsReady() ||
        !context.rtFrameEvidenceInitialised || context.rtScene.Profile()!=horde::vulkan::raytracing::RtSceneProfile::Showcase)
         return fail("A ready full Showcase hardware RT owner is required.");
+    SetWindowTextA(context.windowHandle,"Horde Lantern RT - motion evidence: click this window to begin (30s)");
+    const auto armingStart=std::chrono::steady_clock::now();
+    for (;;)
+    {
+        MSG message{}; unsigned messages=0;
+        while(PeekMessageA(&message,nullptr,0,0,PM_REMOVE))
+        {
+            if(++messages>1024) return fail("Native motion arming message backlog exceeded its bounded budget.");
+            if(message.message==WM_QUIT) return fail("Native motion window was closed before arming.");
+            TranslateMessage(&message); DispatchMessageA(&message);
+        }
+        if(!IsWindow(context.windowHandle)) return fail("Native motion window was destroyed before arming.");
+        if(std::chrono::steady_clock::now()-armingStart>=std::chrono::seconds(30))
+            return fail("Native motion was not armed by actual visible-window foreground focus within30s.");
+        if(IsWindowVisible(context.windowHandle) && !IsIconic(context.windowHandle) &&
+           GetForegroundWindow()==context.windowHandle) break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+    if(!context.motionScenario.Begin(context.motionRequestedScenario,context.simulation,
+            horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr)))
+        return fail(std::string(context.motionScenario.Failure()));
+    context.motionRetryGeneration=context.simulation.Snapshot().retryGeneration;
+    context.simulationPaused=false; context.simulationInput.paused=false;
+    MirrorSimulationSnapshot(context);
+    context.motionArmed=true;
+    SetWindowTextA(context.windowHandle,"Horde Lantern RT - motion evidence running (keep this window focused)");
     auto publication=context.rtFrameEvidence.PublishedStateByValue();
     if(!context.motionLedger.ObserveScope(context.motionSurfaceGeneration,publication.sceneEpoch,publication.measurementGeneration))
         return fail(std::string(context.motionLedger.Failure()));
     const auto extent=context.swapchainExtent;
     const auto owningSwapchain=context.swapchain;
     auto owningSceneEpoch=publication.sceneEpoch;
-    SetForegroundWindow(context.windowHandle); SetFocus(context.windowHandle);
     const auto clearColor=ClearColorForMode(capabilities.rtMode);
     double lastCaptureSeconds=-10;
     MotionStage lastCaptureStage=MotionStage::NotStarted;

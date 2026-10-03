@@ -20,7 +20,7 @@ inline std::vector<OpaqueDressingQuad> MakeHangingSprig(
     DressingPoint attachment, float length, float phase)
 {
     std::vector<OpaqueDressingQuad> result;
-    result.reserve(96u);
+    result.reserve(84u);
     const auto quad = [&result](DressingPoint a, DressingPoint b,
                                DressingPoint c, DressingPoint d, unsigned int n) {
         result.push_back({{a, b, c, d}, n});
@@ -40,15 +40,32 @@ inline std::vector<OpaqueDressingQuad> MakeHangingSprig(
              {hi[0],lo[1],lo[2]},{hi[0],lo[1],hi[2]},1u);
     };
     constexpr unsigned int segments = 8u;
+    const auto endpoint = [&attachment, length, phase](float t) {
+        // The attachment is an actual endpoint. A bounded lateral curve gives
+        // variation without introducing separate disconnected stem fragments.
+        const float bend = std::sin(t * 3.14159265358979323846f);
+        return DressingPoint{attachment[0] + 0.035f * std::sin(phase+t*4.0f) * bend,
+                             attachment[1] - length*t,
+                             attachment[2] + 0.025f * std::cos(phase+t*3.0f) * bend};
+    };
     for (unsigned int i=0u; i<segments; ++i)
     {
         const float t=static_cast<float>(i)/segments;
-        const float x=attachment[0]+0.035f*std::sin(phase+t*4.0f);
-        const float z=attachment[2]+0.025f*std::cos(phase+t*3.0f);
-        const float y=attachment[1]-length*t;
-        box({x-0.004f,y-length/segments-0.004f,z-0.004f},
-            {x+0.004f,y+0.004f,z+0.004f});
+        const auto start=endpoint(t);
+        const auto end=endpoint(static_cast<float>(i+1u)/segments);
+        DressingPoint lo{}, hi{};
+        for (unsigned int axis=0u; axis<3u; ++axis)
+        {
+            lo[axis]=std::fmin(start[axis],end[axis])-0.004f;
+            hi[axis]=std::fmax(start[axis],end[axis])+0.004f;
+        }
+        // Each closed box spans both endpoints, so adjacent segments overlap
+        // at their shared endpoint even when the curve changes lateral axis.
+        box(lo,hi);
         if (i == 0u || i == 7u) continue;
+        const float x=(start[0]+end[0])*0.5f;
+        const float y=(start[1]+end[1])*0.5f;
+        const float z=(start[2]+end[2])*0.5f;
         const float side=(i%2u)==0u ? 1.0f : -1.0f;
         const float leafLength=0.105f*(0.88f+0.12f*std::sin(phase+i));
         const std::array<DressingPoint,4u> leaf{{
@@ -83,8 +100,11 @@ struct HangingSprigPlacement
 };
 inline constexpr float kWaterShaftTopWorldY=5.60f;
 inline constexpr std::array<HangingSprigPlacement,3u> kWaterShaftSprigs{{
-    {{-2.87f,5.58f,-15.91f},2.12f,0.4f},
-    {{-1.64f,5.58f,-15.64f},1.62f,2.1f},
-    {{-2.65f,5.58f,-14.78f},2.28f,4.0f},
+    // Roots intersect the existing masonry rim. Unequal hanging lengths put
+    // actual lower leaf silhouettes in the ordinary dry-side player view,
+    // while retaining the same three sprigs and immutable geometry budget.
+    {{-2.898f,5.58f,-15.72f},4.70f,-0.4f},
+    {{-1.582f,5.58f,-15.64f},3.40f,2.1f},
+    {{-2.65f,5.58f,-14.722f},4.95f,1.6f},
 }};
 } // namespace horde::scene

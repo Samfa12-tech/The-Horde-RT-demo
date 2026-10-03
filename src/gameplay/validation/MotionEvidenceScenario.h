@@ -101,6 +101,11 @@ private:
     bool downLookSeen_ = false;
     bool revealRetreatSeen_ = false;
     bool revealReturnSeen_ = false;
+    bool shaftOpeningSeen_ = false;
+    bool shaftParallaxSeen_ = false;
+    bool rearLookSeen_ = false;
+    bool rearParallaxSeen_ = false;
+    bool rearReturnSeen_ = false;
 };
 
 } // namespace horde::gameplay::validation
