@@ -140,6 +140,34 @@ void CheckPrereleaseChannelAndCurrentVersion()
     Check(!current.update.has_value(), "up-to-date results must not expose an update action");
 }
 
+void CheckInstalledAlpha160DiscoversAlpha161()
+{
+    const auto result = CheckForGitHubReleaseUpdate(
+        "1.6.0", ReleaseChannel::IncludePrerelease,
+        [](const GitHubHttpRequest&) {
+            return Ok(R"json([{
+                "tag_name":"v1.6.1",
+                "html_url":"https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.1",
+                "name":"Showcase Alpha 1.6.1",
+                "body":"New showcase candidate",
+                "draft":false,
+                "prerelease":true,
+                "published_at":"2026-10-03T00:00:00Z"
+            }])json");
+        });
+
+    Check(result.status == UpdateCheckStatus::UpdateAvailable,
+          "an installed 1.6.0 build must discover a published v1.6.1 prerelease");
+    Check(result.installedVersion == "1.6.0", "the installed 1.6.0 identity must be retained");
+    Check(result.update.has_value(), "the 1.6.1 candidate must expose update metadata");
+    Check(result.update->version == "1.6.1" && result.update->tag == "v1.6.1",
+          "the newer v1.6.1 release must be selected for installed 1.6.0");
+    Check(result.update->prerelease, "Showcase Alpha 1.6.1 must remain eligible on IncludePrerelease");
+    Check(result.update->releasePageUrl ==
+              "https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.1",
+          "the update action must use the verified v1.6.1 GitHub Release page");
+}
+
 void CheckUntrustedAndDraftReleasesAreIgnored()
 {
     const auto result = CheckForGitHubReleaseUpdate(
@@ -266,6 +294,7 @@ int main()
     CheckSemanticVersionOrdering();
     CheckStableSelectionAndRequestContract();
     CheckPrereleaseChannelAndCurrentVersion();
+    CheckInstalledAlpha160DiscoversAlpha161();
     CheckUntrustedAndDraftReleasesAreIgnored();
     CheckBoundedFailureModes();
     CheckReleaseNotesTruncateAtUtf8Boundary();
