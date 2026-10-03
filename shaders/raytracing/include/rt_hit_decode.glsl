@@ -448,7 +448,10 @@ HitInfo traceScene(vec3 origin, vec3 direction, float maxDistance, uint mask,
             (candidateInstance == 0 &&
              int(worldSurfaces.codes[candidatePrimitive] & 0xffu) == kMaterialWater);
         bool candidateIsPlayerNearFace = false;
+        // Scene admission restricts this role to its generated dedicated slot.
+        // Avoid a role-buffer lookup for every ordinary primary-ray candidate.
         if (ignorePlayerNearFace &&
+            candidateInstance == int(kPlayerWorldBodyInstanceIndex) &&
             rtInstances.values[candidateInstance].geometryRole == kRtGeometryRolePlayerWorldBody)
         {
             RtInstanceMetadata playerMetadata = rtInstances.values[candidateInstance];

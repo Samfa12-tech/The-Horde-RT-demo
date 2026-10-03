@@ -46,6 +46,32 @@ try {
     }
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
+    foreach ($slot in @(
+        @{ Name = 'kPlayerWorldBodyInstanceIndex'; Value = $definition.playerInstances.worldBody },
+        @{ Name = 'kPlayerViewmodelInstanceIndex'; Value = $definition.playerInstances.viewmodel })) {
+        if ($generatedGlsl -notmatch ([regex]::Escape("const uint $($slot.Name) = $($slot.Value)u;"))) {
+            throw "GLSL player slot '$($slot.Name)' must be generated from the shared ABI definition."
+        }
+    }
+    # Alternate valid indices prove both languages derive the slots from the definition.
+    # Production indices remain unchanged; this writes only isolated temporary outputs.
+    $alternateDefinition = $definitionText | ConvertFrom-Json
+    $alternateDefinition.playerInstances.worldBody = 3
+    $alternateDefinition.playerInstances.viewmodel = 18
+    $alternatePath = Join-Path $temporaryRoot "alternate-player-slots.def"
+    $alternateCpu = Join-Path $temporaryRoot "alternate-player-slots.generated.h"
+    $alternateGlsl = Join-Path $temporaryRoot "alternate-player-slots.generated.glsl"
+    [IO.File]::WriteAllText($alternatePath, ($alternateDefinition | ConvertTo-Json -Depth 20),
+        [Text.UTF8Encoding]::new($false))
+    & (Join-Path $repoRoot "tools\generate-rt-scene-abi.ps1") `
+        -DefinitionPath $alternatePath -CpuOutputPath $alternateCpu -GlslOutputPath $alternateGlsl
+    foreach ($output in @($alternateCpu, $alternateGlsl)) {
+        $outputText = [IO.File]::ReadAllText($output)
+        if ($outputText -notmatch 'kPlayerWorldBodyInstanceIndex = 3u;' -or
+            $outputText -notmatch 'kPlayerViewmodelInstanceIndex = 18u;') {
+            throw "Generated player slots must follow alternate valid definition values in both languages."
+        }
+    }
     if ($definition.schema -ne 1 -or $definition.bindings.dielectricDiagnostics -ne 22 -or
         $definition.bindings.environmentTexture -ne 25 -or
         $generatedGlsl -notmatch 'binding = 25\) uniform sampler2D rtEnvironmentTexture;') {

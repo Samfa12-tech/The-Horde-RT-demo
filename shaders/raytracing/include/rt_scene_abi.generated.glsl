@@ -10,6 +10,8 @@ const uint kRtActiveFireEmitterCapacity = 2u;
 const uint kRtGeometryRoleStatic = 0u;
 const uint kRtGeometryRolePlayerWorldBody = 1u;
 const uint kRtGeometryRolePlayerViewmodel = 2u;
+const uint kPlayerWorldBodyInstanceIndex = 4u;
+const uint kPlayerViewmodelInstanceIndex = 20u;
 const uint kPlayerViewmodelPrimaryMask = 64u;
 const uint kPlayerBodyRemainderPrimaryMask = 128u;
 

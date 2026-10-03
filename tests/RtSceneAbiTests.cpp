@@ -245,6 +245,66 @@ void TestGeneratedConstants()
           "material flag enum agrees with hand-checked literals");
 }
 
+void TestDedicatedPlayerInstanceRoleSlots()
+{
+    using namespace horde::vulkan::raytracing;
+    constexpr std::array<RtInstanceMetadata, kRtInstanceMetadataCapacity> absent{};
+    static_assert(HasDedicatedPlayerInstanceRoleSlots(absent));
+    Check(HasDedicatedPlayerInstanceRoleSlots(absent),
+          "Preview metadata without player roles passes dedicated scene admission");
+
+    auto dedicated = absent;
+    dedicated[kPlayerWorldBodyInstanceIndex].geometryRole =
+        static_cast<std::uint32_t>(RtGeometryRole::PlayerWorldBody);
+    dedicated[kPlayerViewmodelInstanceIndex].geometryRole =
+        static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel);
+    Check(HasDedicatedPlayerInstanceRoleSlots(dedicated),
+          "body and viewmodel roles in their dedicated slots pass scene admission");
+    for (std::size_t index = 0u; index < absent.size(); ++index)
+    {
+        auto misplaced = absent;
+        misplaced[index].geometryRole =
+            static_cast<std::uint32_t>(RtGeometryRole::PlayerWorldBody);
+        Check(HasDedicatedPlayerInstanceRoleSlots(misplaced) ==
+                  (index == kPlayerWorldBodyInstanceIndex),
+              "all slots, including unpopulated records, enforce the body role index");
+        misplaced[index].geometryRole =
+            static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel);
+        Check(HasDedicatedPlayerInstanceRoleSlots(misplaced) ==
+                  (index == kPlayerViewmodelInstanceIndex),
+              "all slots, including unpopulated records, enforce the viewmodel role index");
+    }
+    auto swapped = dedicated;
+    swapped[kPlayerWorldBodyInstanceIndex].geometryRole =
+        static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel);
+    swapped[kPlayerViewmodelInstanceIndex].geometryRole =
+        static_cast<std::uint32_t>(RtGeometryRole::PlayerWorldBody);
+    Check(!HasDedicatedPlayerInstanceRoleSlots(swapped),
+          "swapped player roles cannot be admitted to dedicated scene slots");
+
+    auto asset = MakeAsset(1u, 1u);
+    std::string diagnostic;
+    for (const auto role : {RtGeometryRole::PlayerWorldBody, RtGeometryRole::PlayerViewmodel})
+    {
+        const auto dedicatedIndex = role == RtGeometryRole::PlayerWorldBody
+            ? kPlayerWorldBodyInstanceIndex : kPlayerViewmodelInstanceIndex;
+        std::array<StaticRtAssetRegistration, 2u> aliases{{
+            {dedicatedIndex, 100u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+             0u, &asset, nullptr, role},
+            {1u, 101u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
+             0u, &asset, nullptr, role}}};
+        RtStaticMeshSlot slot;
+        const bool initialized = slot.Initialize(aliases, diagnostic);
+        Check(initialized,
+              std::string("generic loader retains same-asset player role aliases: ") + diagnostic);
+        if (initialized)
+        {
+            Check(!HasDedicatedPlayerInstanceRoleSlots(slot.InstanceMetadata()),
+                  "scene admission rejects aliases that would invalidate the shader slot preguard");
+        }
+    }
+}
+
 void TestGenericRegistrationAndMeasurements()
 {
     using namespace horde::vulkan::raytracing;
@@ -609,6 +669,7 @@ int main()
 {
     TestAbiLayout();
     TestGeneratedConstants();
+    TestDedicatedPlayerInstanceRoleSlots();
     TestGenericRegistrationAndMeasurements();
     TestExplicitTextureGroups();
     TestNamedCapacityFailures();

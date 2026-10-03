@@ -890,6 +890,9 @@ public class MainActivity extends Activity {
 
         final LinearLayout panel = createPanel(getString(R.string.benchmark_report),
                 completed ? getString(R.string.benchmark_complete) : getString(R.string.benchmark_invalid));
+        if (completed && BenchmarkSummaryReview.validUuid(readyBenchmarkSummaryRunId())) {
+            addMenuButton(panel, getString(R.string.benchmark_summary_review), this::showBenchmarkSummaryReview);
+        }
         final TextView report = new TextView(this);
         report.setText(latestBenchmarkReport);
         report.setTextColor(0xFFD8F0D0);
@@ -901,9 +904,6 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.copy_report), this::copyBenchmarkReport,
                 getString(R.string.save_report), this::saveBenchmarkReport);
-        if (completed && BenchmarkSummaryReview.validUuid(readyBenchmarkSummaryRunId())) {
-            addMenuButton(panel, getString(R.string.benchmark_summary_review), this::showBenchmarkSummaryReview);
-        }
         addMenuButton(panel, getString(R.string.back), () -> showMainMenu(false));
         attachPanel(panel);
     }

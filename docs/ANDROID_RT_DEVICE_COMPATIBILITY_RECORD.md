@@ -2,6 +2,59 @@
 
 Last updated: 2026-10-03
 
+## October3: current1.6.2 exact admission and Shipping performance regression
+
+Evidence class: **local exact development-APK identity, complete hardware-RT
+benchmark and bounded native UI interaction**, not signed release, sustained
+performance or owner scene/listening acceptance. Actual **SM-S948B / Android16 /
+Adreno(TM)840**, raw driver2150932499/API4210983. Only the allocated separate
+Debug/benchmark packages were updated; production and user data were preserved.
+
+Current source backup `c299c2eb52b37471709b2607ebb29d002629151b` has all six
+PR CI37133774665 jobs green. Debug APK
+`b95c15ed68c110741a17ec256800605ddf89d29d0ad50c0f56bd790bfd954726`
+and isolated ShippingMobile benchmark APK
+`560414d8ab095c8f12be6bad915e60d67ad8af9b276cc2a401b09e8db5705236`
+match installed pullbacks. Actual all-four-ABI assemblies,138Java tests/23classes,
+lint0errors46warnings, frozen387-input bank and both ZIP16KiB checks pass.
+All eight packaged native libraries and81assets/notices per APK are byte-identical
+to the fully admitted preceding d44a7fc9/5d573533 artifacts; selected shader/ELF
+admission carries through those actual identical bytes. Java-only pose mapping
+does not imply new native shader validation.
+
+Both historical167ce8 ShippingMobile75 and current c299 candidate complete the
+same two-lap1,838-frame course with all CPU/GPU timestamps valid and no
+missing/rejected/cancelled/outstanding samples. Actual Pipeline, MAILBOX,
+1080x2235 internal/1440x2980 output,75%/Mobile water/Mobile fire/defaultGlassOn
+remain unchanged.
+
+| Recorded timing | Historical ms | Current ms | Increase |
+|---|---:|---:|---:|
+| Whole-frame median |51.661|69.694|34.9%|
+| GPU RT median |42.360|59.308|40.0%|
+| Whole-frame mean |51.938|70.923|18.986ms|
+| Fence-wait mean |42.980|60.516|17.536ms|
+| Player-skin mean |6.686|8.194|1.508ms|
+
+This is a performance regression, not an acceptance pass. Fence wait accounts
+for92.36% of whole-frame mean increase, matching GPU-duration delta17.575ms.
+Historical167ce8 uses block primary arms; current source adds the accepted
+modelled viewmodel/body remainder, so this compares different whole-product
+feature contracts. Historical cold start27.2C/thermal0 versus current29.0C/
+thermal0 is within2C. Endpoint battery readings37.8C/status1 and33.0C/status0
+were collected after completion; they do not prove in-run trajectories. Clocks
+and cooling equivalence are unavailable. No bandwidth cause, quality reduction,
+near60FPS or sustained30FPS at fixed75% is established.
+
+On preceding byte-identical-native d44a7fc9, actual fontScale1.7 preview exposes
+two persistent amber horizontal scrollbars, a swipe reveals Fire/Cap choices,
+Image/Controls works, and live FPS/RT-ready is visible. Confirmed75/Mobile/Mobile/
+30 settings remained unchanged; startup recovered legacy pending metadata.
+These hot transient Diagnostic UI observations are not Shipping performance.
+Final current phone five-feature/replay/Glass/modal/local statistics export and
+owner visual/audio/haptic gates remain open. Home restores passive recovery
+between tests. S24/S25 remain unverified.
+
 ## October3: 1.6.2 Compute compatibility and compact native preview
 
 Evidence class: **local exact development-APK identity, actual hardware RT,
