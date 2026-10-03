@@ -2,14 +2,16 @@
 
 Last updated: 2026-10-03
 
-## Current df0c7335: Java-only preview alias fix and installed identity
+## Current dfd5a8f1: unchanged alias artifacts and local statistics evidence
 
-Evidence class: **exact isolated development-APK identity and bounded native
-UI attempt**, not new Replay, physical Keep success or owner acceptance.
-Source `df0c7335c17dd9b471fe05e9759264f381c3feb0` has all six jobs completed
-successfully in [CI37145068293](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37145068293).
-The peer-reviewed Java fix stops repeated enabled-state changes on the aliased
-preview Keep button; native rendering is unchanged.
+Evidence class: **exact isolated development-APK identity, original-tuple
+Apply/Keep and physical local-statistics export**, not new Replay or complete
+owner acceptance.
+Checkpoint `dfd5a8f1b405a4a07a97629d69fcace9280d8dcc` has all six jobs completed
+successfully in [CI37147767271](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37147767271).
+This documentation continuation changes no runtime/artifact bytes from
+df0c7335's peer-reviewed Java alias fix. Repeated enabled-state changes on the
+aliased Keep button are corrected; native rendering is unchanged.
 
 New Debug APK SHA256
 `1f95f44f5f2fd37642c11b96bcb2b00c11e1ed79aa4faf015997c13a7df780f8`
@@ -27,14 +29,41 @@ including five compact-preview tests with a production-button transition
 regression, pass with zero failures/errors/skips; lint0errors/46warnings.
 Build28s and collected387-input/23-fixture/eight-command bank pass.
 
-The new event-based Keep attempt times out without a fresh enabled Keep event
-or Keep tap. The original confirmed tuple and pending=false remain. This is
-not a Keep acceptance pass; the initially observed popup-idle cause remains
-unproven. Host tests establish the bounded alias enabled-state correction only.
-Final popup/confirmation/statistics/lifecycle and owner UI/audio/quality gates
-remain open; remote Send remains blocked. Windows820/e639/ZIP1ea artifacts are
-unchanged. The earlier completed Replay below belongs to Debug47430943, not
-this new Java APK; native byte identity does not certify new UI/lifecycle.
+Subsequent original-tuple Apply/Keep passes on Debug1f95f44f with fresh ordinary
+touches1.578s apart, matching requested/effective preconditions and actual saved
+schema2/pending=false/Glass On. Before-Apply pending=true was a transient
+preview marker with confirmed schema1 retained, not failure. Hierarchy receipts
+are not atomic native ACKs; no timer/ACK changes were made. The earlier
+event-based timeout without a Keep tap is retained. Popup-idle cause and
+broader confirmation/lifecycle acceptance remain unproven.
+
+Physical local statistics on exact benchmarke339da58 is separately verified:
+the ordinary UI benchmark's native/typed reports complete1,838 CPU-accepted/
+GPU-valid rows at75% Mobile/Pipeline, with correct population/configuration
+joins. Initial and reopened forms have both consents unchecked, Prepare
+disabled and exports absent. Explicit preparation keeps hardware off; cooling
+is Unknown and thermal data not-collected/null/unknown. Cancel/retry retains
+the same UUID and literal. Prepared/copy/cancel/retry/saved UI literal and
+actual pulled local file are byte-identical UTF8 without BOM:10,320bytes,
+SHA256 `216b244b20c84b3e9593bdddd67babcaabc97f050deb7709b1474737a0f93032`.
+Copy app status is proven; clipboard bytes are unverified. File association
+uses actual local Downloads selection, a unique chosen name, one file,
+recorded prior absence and exact bytes. Provider queries were denied; direct
+accepted-URI-to-filesystem mapping is unproven. No grant/security changes.
+Sealed144-file audit SHA256
+`5c1ebc39ec4894f400b71f82f57ea3c2b660ba470b19726f10696974244a9739`.
+This is a functional UI/export lane, not repeated comparative performance;
+delayed thermal observations establish no measured thermal parity or new
+completed lifecycle proof.
+
+Final transient Glass/further confirmation/lifecycle, benchmark50/40/33,
+Windows statistics, remaining native owner/audio/haptic and performance gates remain
+open; remote Send is blocked. Windows820/e639/ZIP1ea artifacts are unchanged;
+all four final Authored/Max torch motion runs now pass with56captures and zero
+markers. Owner approval covers watched torch lowering/no-clipping only;
+changed audio and broader appearance acceptance remain open. The earlier
+Replay below belongs to Debug47430943, not this Java APK; native byte identity
+does not certify new UI/lifecycle.
 
 ## Prior restored eba2: exact admission and bounded feature Replay
 
