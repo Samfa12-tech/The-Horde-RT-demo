@@ -63,6 +63,7 @@
 #include "gameplay/FeedbackTiming.h"
 #include "gameplay/ShowcaseBenchmark.h"
 #include "telemetry/RtBenchmarkEvidenceRun.h"
+#include "telemetry/RtEvidencePublication.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/LanternBenchmarkScenario.h"
 #include "gameplay/ShowcaseGameplay.h"
@@ -72,6 +73,7 @@
 #include "platform/windows/DesktopControllerInput.h"
 #include "platform/windows/WindowsCaptureContracts.h"
 #include "platform/windows/WindowsGraphicsPreviewCapture.h"
+#include "platform/windows/WindowsOutputResizeLaunch.h"
 #include "platform/windows/WindowsBenchmarkLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
 #include "platform/windows/WindowsGitHubReleaseUpdate.h"
@@ -218,6 +220,7 @@ struct CaptureLaunchOptions
     horde::platform::windows::WindowsBenchmarkLaunch benchmark;
     bool requested = false;
     bool graphicsPreview = false;
+    bool outputResizeValidation = false;
     bool requireRayQueryCompute = false;
     bool portrait = false;
     bool anatomicalPlayerMount = false;
@@ -334,6 +337,12 @@ struct VulkanSurfaceContext
     // Debug automation uses an isolated in-memory graphics transaction only.
     // It never loads or writes the user's INI, advances gameplay, or starts audio.
     bool graphicsPreviewCapture = false;
+    bool outputResizeValidation = false;
+#if defined(_DEBUG)
+    bool resizePresentTimestampArmed = false;
+    std::uint64_t resizeFirstPresentNanoseconds = 0u;
+    double lastOutputResizeIdleMilliseconds = 0.0;
+#endif
     std::optional<horde::graphics::GraphicsEditSession> graphicsEdit;
     std::optional<horde::graphics::GraphicsCommand> graphicsCommand;
     horde::graphics::GraphicsSettings savedGraphics =
@@ -485,6 +494,14 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     std::vector<std::wstring_view> argumentViews;
     for (int index = 1; index < argumentCount; ++index) argumentViews.emplace_back(arguments[index]);
+    const auto resizeValidation = horde::platform::windows::ParseOutputResizeValidationLaunch(argumentViews);
+    if (!resizeValidation.error.empty())
+    { options.error = resizeValidation.error; LocalFree(arguments); return options; }
+    if (resizeValidation.requested)
+    {
+        options.requested = true; options.outputResizeValidation = true;
+        options.outputDirectory = std::filesystem::path(resizeValidation.outputDirectory);
+    }
     const auto previewCapture = horde::platform::windows::ParseGraphicsPreviewCaptureLaunch(argumentViews);
     if (!previewCapture.error.empty())
     { options.error = previewCapture.error; LocalFree(arguments); return options; }
@@ -503,6 +520,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
+        if (argument == L"--validate-output-resize") { ++index; continue; }
         if (argument == L"--capture-graphics-preview") { ++index; continue; }
         if (argument == L"--anatomical-player-mount")
         {
@@ -883,6 +901,7 @@ RtLabDebugLaunchOptions ParseRtLabDebugLaunchOptions()
 
 void SaveRtLabProgress(const VulkanSurfaceContext& context)
 {
+    if (context.graphicsPreviewCapture || context.outputResizeValidation) return;
     const std::string path = SettingsPath().string();
     WritePrivateProfileStringA("progress", "rtLabUnlocked",
                                context.rtLabUnlocked ? "1" : "0", path.c_str());
@@ -890,7 +909,7 @@ void SaveRtLabProgress(const VulkanSurfaceContext& context)
 
 void SaveSettings(const VulkanSurfaceContext& context)
 {
-    if (context.graphicsPreviewCapture) return;
+    if (context.graphicsPreviewCapture || context.outputResizeValidation) return;
     const std::string path = SettingsPath().string();
     const std::string sfxVolume = std::to_string(
         horde::audio::ClampSfxVolumePercent(context.sfxVolumePercent));
@@ -4044,7 +4063,7 @@ bool ConsumePendingImageAcquire(VulkanSurfaceContext& ctx)
 bool SaveGraphicsRecord(const VulkanSurfaceContext& context,
                         const horde::graphics::GraphicsPersistenceRecord& record)
 {
-    if (context.graphicsPreviewCapture) return true; // GraphicsEditSession owns the ephemeral record.
+    if (context.graphicsPreviewCapture || context.outputResizeValidation) return true; // Ephemeral validation transaction.
     return horde::platform::windows::SaveGraphicsPersistenceRecord(SettingsPath(), record);
 }
 
@@ -4428,6 +4447,95 @@ bool DestroyRenderContext(VulkanSurfaceContext& ctx)
     return true;
 }
 
+bool ApplyPendingOutputResize(VulkanSurfaceContext& context,
+                              horde::vulkan::DeviceCapabilities& capabilities,
+                              std::vector<double>& timingSamples)
+{
+    const HWND hWnd = context.windowHandle;
+        if (context.renderScaleDirty && context.useRtPath)
+        {
+            const auto resizeStart = std::chrono::steady_clock::now();
+            const float requestedRenderScale = context.renderScale;
+            context.benchmarkEvidence.Cancel();
+            context.renderScaleDirty = false;
+            timingSamples.clear();
+            const VkResult idleResult = vkDeviceWaitIdle(context.device);
+            const bool evidenceCompleted =
+                CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+            if (idleResult != VK_SUCCESS || !evidenceCompleted)
+            {
+                return false;
+            }
+            const bool evidenceRecreated = !context.rtFrameEvidenceInitialised ||
+                context.rtFrameEvidence.Recreate(
+                    horde::telemetry::RtResourceResetReason::RenderScaleChange,
+                    CurrentInitialGpuEvidenceStatus(context));
+            context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+            if (idleResult == VK_SUCCESS) context.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
+            context.gpuFrameTimingTotalMs = 0.0;
+            context.gpuFrameTimingSampleCount = 0u;
+            RefreshGpuTimingTelemetry(context);
+            if (HWND hud = GetDlgItem(hWnd, kHudControlId))
+            {
+                SetWindowTextA(hud, kHudApplyingScaleText);
+            }
+            if (!evidenceRecreated)
+            {
+                return false;
+            }
+            const VkExtent2D requestedExtent = ScaledRenderExtent(
+                context.swapchainExtent, requestedRenderScale);
+            std::string resizeDiagnostic;
+            if (!context.rtScene.ResizeOutputAfterDeviceIdle(requestedExtent, resizeDiagnostic))
+            {
+                // Allocation/preflight failure retains the old image and descriptor.
+                // Restore the saved selection so relaunch does not repeat an unusable choice.
+                context.renderScale = context.appliedRenderScale;
+                if (context.graphicsCommand && context.graphicsEdit)
+                {
+                    context.waterQuality = static_cast<horde::vulkan::raytracing::WaterQuality>(context.graphicsBeforeApply.waterQuality);
+                    context.fireDetail = context.graphicsBeforeApply.fireDetail;
+                    context.graphicsPreviewFrameCap = context.graphicsBeforeApply.previewFrameCap;
+                    context.graphicsEdit->Acknowledge(GraphicsSnapshot(context, *context.graphicsCommand), false);
+                    context.graphicsCommand.reset();
+                    context.graphicsStatus = "Requested output allocation failed; previous effective graphics were retained. Your saved choice is unchanged.";
+                }
+                UpdateSettingsLabels(context);
+                std::cerr << "RT render scale was restored after resize failure: "
+                          << resizeDiagnostic << '\n';
+                if (!context.unattendedBenchmark && !context.outputResizeValidation) MessageBoxA(hWnd,
+                    ("The requested render resolution could not be applied. Your previous setting was restored.\n\n" +
+                     resizeDiagnostic).c_str(), "Horde Lantern RT - graphics", MB_OK | MB_ICONWARNING);
+            }
+            else
+            {
+                context.appliedRenderScale = requestedRenderScale;
+                capabilities.rtScene.presented = false;
+                capabilities.rtScene.dispatchWidth = 0u;
+                capabilities.rtScene.dispatchHeight = 0u;
+                capabilities.performance.internalRenderWidth = 0u;
+                capabilities.performance.internalRenderHeight = 0u;
+                capabilities.performance.frameTimeMs = 0.0f;
+                capabilities.performance.fps = 0.0f;
+            }
+            // RenderFrame resets/re-records each acquired command buffer before
+            // submission; no commands referencing the retired image are reused.
+            const double resizeMilliseconds = std::chrono::duration<double, std::milli>(
+                std::chrono::steady_clock::now() - resizeStart).count();
+#if defined(_DEBUG)
+            context.lastOutputResizeIdleMilliseconds = resizeMilliseconds;
+#endif
+            const auto effectiveExtent = context.rtScene.DispatchExtent();
+            std::cout << "HORDE_RT_SCALE_RESIZE scale=" << std::round(context.appliedRenderScale * 100.0f)
+                      << " extent=" << effectiveExtent.width << 'x' << effectiveExtent.height
+                      << " output_only=1 applied=" << resizeDiagnostic.empty()
+                      << " idle_and_resize_ms=" << resizeMilliseconds << '\n';
+        }
+    return true;
+}
+
 bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor, bool& rtFramePresented)
 {
     const std::uint64_t frameStartNanoseconds =
@@ -4461,7 +4569,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         horde::telemetry::RtStage::FrameFenceWait);
     const VkResult waitResult = vkWaitForFences(
         ctx.device, 1u, &ctx.inFlightFences[ctx.currentFrame], VK_TRUE,
-        ctx.graphicsPreviewCapture ? 2'000'000'000ull : UINT64_MAX);
+        (ctx.graphicsPreviewCapture || ctx.outputResizeValidation) ? 2'000'000'000ull : UINT64_MAX);
     fenceScope.Complete(1u, 0u, 1u);
     if (waitResult != VK_SUCCESS)
     {
@@ -4502,7 +4610,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     const VkResult acquireResult = vkAcquireNextImageKHR(
         ctx.device,
         ctx.swapchain,
-        ctx.graphicsPreviewCapture ? 2'000'000'000ull : UINT64_MAX,
+        (ctx.graphicsPreviewCapture || ctx.outputResizeValidation) ? 2'000'000'000ull : UINT64_MAX,
         ctx.imageAvailableSemaphores[ctx.currentFrame],
         VK_NULL_HANDLE,
         &imageIndex);
@@ -4549,32 +4657,32 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 #endif
     if (useRtFrame)
     {
-        if (!ctx.graphicsPreviewCapture)
+        if (!ctx.graphicsPreviewCapture && !ctx.outputResizeValidation)
         { SpatialAudioEngine().Update(); PollDesktopController(ctx); }
         const bool frozenDevelopmentCheckpoint =
             ctx.simulationPaused && ctx.frameDeltaSeconds == 0.0f &&
             !ctx.developmentCheckpoint.empty();
         const bool previewFrame = ctx.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview;
-        if (!frozenDevelopmentCheckpoint && !previewFrame)
+        if (!frozenDevelopmentCheckpoint && !previewFrame && !ctx.outputResizeValidation)
         {
             UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
         }
-        if (!previewFrame) UpdateWaterfallAmbience(ctx);
+        if (!previewFrame && !ctx.outputResizeValidation) UpdateWaterfallAmbience(ctx);
         const horde::gameplay::simulation::SimulationSnapshot& simulation =
             ctx.simulation.Snapshot();
         UpdateChestPrompt(ctx);
-        if (!previewFrame && simulation.playerVitals.phase == horde::gameplay::PlayerLifePhase::Dead)
+        if (!previewFrame && !ctx.outputResizeValidation && simulation.playerVitals.phase == horde::gameplay::PlayerLifePhase::Dead)
         {
             ShowDeathMenu(ctx);
         }
-        if (!previewFrame && !ctx.graphicsVisible && simulation.finaleComplete &&
+        if (!previewFrame && !ctx.outputResizeValidation && !ctx.graphicsVisible && simulation.finaleComplete &&
             (!ctx.benchmark.HasStarted() || ctx.benchmarkCompletionHandled))
         {
             TryGrantRtLabUnlock(ctx, true);
             ShowEndingMenu(ctx);
         }
-        if (!ctx.graphicsPreviewCapture) PublishMusicPlayback(ctx);
-        if (!previewFrame) DrainGameplayEvents(ctx);
+        if (!ctx.graphicsPreviewCapture && !ctx.outputResizeValidation) PublishMusicPlayback(ctx);
+        if (!previewFrame && !ctx.outputResizeValidation) DrainGameplayEvents(ctx);
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning,
@@ -4801,6 +4909,14 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         evidenceFrame ? &observation : nullptr,
         horde::telemetry::RtStage::PresentCall);
     const VkResult presentResult = vkQueuePresentKHR(ctx.graphicsQueue, &presentInfo);
+#if defined(_DEBUG)
+    if (ctx.outputResizeValidation && ctx.resizePresentTimestampArmed &&
+        useRtFrame && presentResult == VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR)
+    {
+        ctx.resizeFirstPresentNanoseconds = horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
+        ctx.resizePresentTimestampArmed = false;
+    }
+#endif
     ctx.presentCompletionFences.Presented(imageIndex, presentResult);
     presentScope.Complete(1u, 0u, 1u);
     wholeFrameScope.Complete(1u, 0u, 1u);
@@ -5453,6 +5569,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     return 0;
 }
 #include "platform/windows/WindowsGraphicsPreviewCapture.inl"
+#include "platform/windows/WindowsOutputResizeValidation.inl"
 #endif
 
 int RunDiagnosticSwapchainWindow(HWND hWnd,
@@ -5465,10 +5582,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const bool unattendedBenchmark,
                                  const horde::gameplay::BenchmarkWorkload benchmarkWorkload,
                                  const bool anatomicalPlayerMount,
-                                 const bool graphicsPreviewCapture)
+                                 const bool graphicsPreviewCapture,
+                                 const bool outputResizeValidation)
 {
     VulkanSurfaceContext context;
     context.graphicsPreviewCapture = graphicsPreviewCapture;
+    context.outputResizeValidation = outputResizeValidation;
     if (graphicsPreviewCapture)
         context.sceneProfile = horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview;
     const bool explicitComparison = developmentCheckpoint != nullptr &&
@@ -5485,10 +5604,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.capabilitySnapshot = &capabilities;
     context.unattendedBenchmark = unattendedBenchmark;
     if (developmentCheckpoint != nullptr) context.developmentCheckpoint = *developmentCheckpoint;
-    if (!graphicsPreviewCapture) LoadSettings(context);
+    if (!graphicsPreviewCapture && !outputResizeValidation) LoadSettings(context);
 #if defined(_DEBUG)
     const RtLabDebugLaunchOptions rtLabDebug = ParseRtLabDebugLaunchOptions();
-    if (rtLabDebug.requested && !graphicsPreviewCapture)
+    if (rtLabDebug.requested && !graphicsPreviewCapture && !outputResizeValidation)
     {
         context.rtLabDebugInjection = true;
         context.rtLabRouteTainted = true;
@@ -5624,7 +5743,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     if (captureDirectory != nullptr)
     {
-        int captureResult = graphicsPreviewCapture
+        int captureResult = outputResizeValidation
+            ? RunOutputResizeValidation(context, capabilities, *captureDirectory)
+            : graphicsPreviewCapture
             ? RunGraphicsPreviewCapture(context, capabilities, *captureDirectory)
             : RunShowcaseCapture(context, capabilities, *captureDirectory);
         if (captureResult == 0 && capabilities.rtScene.presented)
@@ -5777,86 +5898,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             context.graphicsPreviewLastFrame = previewNow;
         }
 
-        if (context.renderScaleDirty && context.useRtPath)
-        {
-            const auto resizeStart = std::chrono::steady_clock::now();
-            const float requestedRenderScale = context.renderScale;
-            context.benchmarkEvidence.Cancel();
-            context.renderScaleDirty = false;
-            timingSamples.clear();
-            const VkResult idleResult = vkDeviceWaitIdle(context.device);
-            const bool evidenceCompleted =
-                CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
-            if (idleResult != VK_SUCCESS || !evidenceCompleted)
-            {
-                renderFailed = true;
-                break;
-            }
-            const bool evidenceRecreated = !context.rtFrameEvidenceInitialised ||
-                context.rtFrameEvidence.Recreate(
-                    horde::telemetry::RtResourceResetReason::RenderScaleChange,
-                    CurrentInitialGpuEvidenceStatus(context));
-            context.gpuFrameTimer.ResetAfterDeviceIdle();
-#if HORDE_RT_STAGED_PRIMARY_TIMING
-            if (idleResult == VK_SUCCESS) context.stagedPassTimer.ResetAfterDeviceIdle();
-#endif
-            context.gpuFrameTimingTotalMs = 0.0;
-            context.gpuFrameTimingSampleCount = 0u;
-            RefreshGpuTimingTelemetry(context);
-            if (HWND hud = GetDlgItem(hWnd, kHudControlId))
-            {
-                SetWindowTextA(hud, kHudApplyingScaleText);
-            }
-            if (!evidenceRecreated)
-            {
-                renderFailed = true;
-                break;
-            }
-            const VkExtent2D requestedExtent = ScaledRenderExtent(
-                context.swapchainExtent, requestedRenderScale);
-            std::string resizeDiagnostic;
-            if (!context.rtScene.ResizeOutputAfterDeviceIdle(requestedExtent, resizeDiagnostic))
-            {
-                // Allocation/preflight failure retains the old image and descriptor.
-                // Restore the saved selection so relaunch does not repeat an unusable choice.
-                context.renderScale = context.appliedRenderScale;
-                if (context.graphicsCommand && context.graphicsEdit)
-                {
-                    context.waterQuality = static_cast<horde::vulkan::raytracing::WaterQuality>(context.graphicsBeforeApply.waterQuality);
-                    context.fireDetail = context.graphicsBeforeApply.fireDetail;
-                    context.graphicsPreviewFrameCap = context.graphicsBeforeApply.previewFrameCap;
-                    context.graphicsEdit->Acknowledge(GraphicsSnapshot(context, *context.graphicsCommand), false);
-                    context.graphicsCommand.reset();
-                    context.graphicsStatus = "Requested output allocation failed; previous effective graphics were retained. Your saved choice is unchanged.";
-                }
-                UpdateSettingsLabels(context);
-                std::cerr << "RT render scale was restored after resize failure: "
-                          << resizeDiagnostic << '\n';
-                if (!context.unattendedBenchmark) MessageBoxA(hWnd,
-                    ("The requested render resolution could not be applied. Your previous setting was restored.\n\n" +
-                     resizeDiagnostic).c_str(), "Horde Lantern RT - graphics", MB_OK | MB_ICONWARNING);
-            }
-            else
-            {
-                context.appliedRenderScale = requestedRenderScale;
-                capabilities.rtScene.presented = false;
-                capabilities.rtScene.dispatchWidth = 0u;
-                capabilities.rtScene.dispatchHeight = 0u;
-                capabilities.performance.internalRenderWidth = 0u;
-                capabilities.performance.internalRenderHeight = 0u;
-                capabilities.performance.frameTimeMs = 0.0f;
-                capabilities.performance.fps = 0.0f;
-            }
-            // RenderFrame resets/re-records each acquired command buffer before
-            // submission; no commands referencing the retired image are reused.
-            const double resizeMilliseconds = std::chrono::duration<double, std::milli>(
-                std::chrono::steady_clock::now() - resizeStart).count();
-            const auto effectiveExtent = context.rtScene.DispatchExtent();
-            std::cout << "HORDE_RT_SCALE_RESIZE scale=" << std::round(context.appliedRenderScale * 100.0f)
-                      << " extent=" << effectiveExtent.width << 'x' << effectiveExtent.height
-                      << " output_only=1 applied=" << resizeDiagnostic.empty()
-                      << " idle_and_resize_ms=" << resizeMilliseconds << '\n';
-        }
+        if (!ApplyPendingOutputResize(context, capabilities, timingSamples))
+        { renderFailed = true; break; }
 
         const bool benchmarkFrame = context.benchmark.IsRunning();
         const auto frameStart = std::chrono::steady_clock::now();
@@ -6612,7 +6655,7 @@ bool NativeUiUsesHighContrast()
 LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     auto* sceneContext = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(hWnd, GWLP_USERDATA));
-    if (sceneContext && sceneContext->graphicsPreviewCapture)
+    if (sceneContext && (sceneContext->graphicsPreviewCapture || sceneContext->outputResizeValidation))
     {
         // Keep externally delivered input/menu/focus messages from mutating the
         // frozen gameplay snapshot or entering a preferences-writing UI path.
@@ -7694,7 +7737,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const bool unattendedBenchmark,
                         const horde::gameplay::BenchmarkWorkload benchmarkWorkload,
                         const bool anatomicalPlayerMount,
-                        const bool graphicsPreviewCapture)
+                        const bool graphicsPreviewCapture,
+                        const bool outputResizeValidation)
 {
     // Only the Debug capture surface changes aspect; camera, gameplay pose,
     // renderer quality and normal interactive-window sizing are untouched.
@@ -7992,7 +8036,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     const int result = RunDiagnosticSwapchainWindow(
         hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
         developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark, benchmarkWorkload,
-        anatomicalPlayerMount, graphicsPreviewCapture);
+        anatomicalPlayerMount, graphicsPreviewCapture, outputResizeValidation);
     if ((captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
         DestroyWindow(hWnd);
@@ -8024,7 +8068,7 @@ int RunDiagnosticWindow(const int showCommand)
     }
 #endif
 
-    if (launchOptions.graphicsPreview)
+    if (launchOptions.graphicsPreview || launchOptions.outputResizeValidation)
     {
         std::error_code capturePathError;
         const bool exists = std::filesystem::exists(launchOptions.outputDirectory, capturePathError);
@@ -8032,7 +8076,7 @@ int RunDiagnosticWindow(const int showCommand)
             (!std::filesystem::is_directory(launchOptions.outputDirectory, capturePathError) ||
              !std::filesystem::is_empty(launchOptions.outputDirectory, capturePathError))) || capturePathError)
         {
-            std::cerr << "Graphics preview capture requires a new or empty absolute output directory.\n";
+            std::cerr << "Isolated RT validation requires a new or empty absolute output directory.\n";
             return 2;
         }
     }
@@ -8050,7 +8094,7 @@ int RunDiagnosticWindow(const int showCommand)
     std::cout << diagnosticText << "\n\n";
 
     std::error_code error;
-    const std::filesystem::path reportDirectory = launchOptions.graphicsPreview
+    const std::filesystem::path reportDirectory = (launchOptions.graphicsPreview || launchOptions.outputResizeValidation)
         ? launchOptions.outputDirectory
         : launchOptions.benchmark.requested
         ? std::filesystem::absolute(std::filesystem::path(launchOptions.benchmark.outputDirectory))
@@ -8090,7 +8134,7 @@ int RunDiagnosticWindow(const int showCommand)
                                captureDirectory, developmentCheckpoint, launchOptions.portrait,
                                launchOptions.requireRayQueryCompute,
                                launchOptions.benchmark.requested, launchOptions.benchmark.workload,
-                               launchOptions.anatomicalPlayerMount, launchOptions.graphicsPreview);
+                               launchOptions.anatomicalPlayerMount, launchOptions.graphicsPreview, launchOptions.outputResizeValidation);
 }
 
 } // namespace horde::platform::windows

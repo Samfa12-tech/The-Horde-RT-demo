@@ -124,6 +124,25 @@ struct RtSceneFrameInputs
 class PresentableTinyRtScene
 {
 public:
+#ifndef NDEBUG
+    // Process-local opaque identities, read on the render owner thread after
+    // completion. No device addresses, resource contents or ownership transfer.
+    struct ResourceHandleSnapshot
+    {
+        bool ready = false;
+        std::vector<std::uint64_t> bottomLevelAccelerationStructures;
+        std::vector<std::uint64_t> topLevelAccelerationStructures;
+        std::vector<std::uint64_t> pipelines;
+        std::vector<std::uint64_t> shaderBindingTableBuffers;
+        std::vector<std::uint64_t> descriptorSets;
+        std::vector<std::uint64_t> textureImages;
+        std::uint64_t outputImage = 0u;
+        std::uint64_t outputMemory = 0u;
+        std::uint64_t outputView = 0u;
+        bool operator==(const ResourceHandleSnapshot&) const = default;
+    };
+    [[nodiscard]] ResourceHandleSnapshot CaptureResourceHandles() const;
+#endif
     struct StorageImageCapture
     {
         std::uint32_t width = 0u;

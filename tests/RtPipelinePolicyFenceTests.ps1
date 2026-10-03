@@ -130,8 +130,9 @@ $scene = Get-Content -LiteralPath (Join-Path $repoRoot 'src\vulkan\raytracing\Pr
 $sceneHeader = Get-Content -LiteralPath (Join-Path $repoRoot 'src\vulkan\raytracing\PresentableTinyRtScene.h') -Raw
 $windowsHost = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\DiagnosticWindow.cpp') -Raw
 $windowsPreviewCapture = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\WindowsGraphicsPreviewCapture.inl') -Raw
+$windowsResizeValidation = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\WindowsOutputResizeValidation.inl') -Raw
 # Included platform code has the same policy boundary as its translation unit.
-$windowsHost += $windowsPreviewCapture
+$windowsHost += $windowsPreviewCapture + $windowsResizeValidation
 $androidHost = Get-Content -LiteralPath (Join-Path $repoRoot 'android\app\src\main\cpp\android_probe_bridge.cpp') -Raw
 $foundationRunner = Get-Content -LiteralPath (Join-Path $repoRoot 'tools\run-foundation-validation.ps1') -Raw
 $androidRunner = Get-Content -LiteralPath (Join-Path $repoRoot 'tools\run-android-showcase-validation.ps1') -Raw

@@ -277,6 +277,7 @@ struct PresentableTinyRtSceneObservationTestAccess
 
         scene.storageImage_ = FakeHandle<VkImage>(next++);
         scene.storageImageMemory_ = FakeHandle<VkDeviceMemory>(next++);
+        scene.storageImageView_ = FakeHandle<VkImageView>(next++);
         scene.storageImageAllocationSize_ = 128u;
         scene.storageImageMemoryPropertyFlags_ =
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
@@ -1079,6 +1080,21 @@ int main()
 
     PresentableTinyRtScene scene;
     PresentableTinyRtSceneObservationTestAccess::Populate(scene);
+#ifndef NDEBUG
+    const auto originalHandles = scene.CaptureResourceHandles();
+    ok &= Require(originalHandles.ready &&
+                      originalHandles.bottomLevelAccelerationStructures.size() == 17u &&
+                      originalHandles.topLevelAccelerationStructures.size() == 1u &&
+                      originalHandles.pipelines.size() == 2u &&
+                      originalHandles.shaderBindingTableBuffers.size() == 2u &&
+                      originalHandles.descriptorSets.size() == 1u &&
+                      originalHandles.textureImages.size() == 9u &&
+                      originalHandles.outputImage != 0u &&
+                      originalHandles.outputMemory != 0u &&
+                      originalHandles.outputView != 0u &&
+                      scene.CaptureResourceHandles() == originalHandles,
+                  "Debug identity snapshot must include all actual owners and be read-only");
+#endif
     RtDiagnosticCounterPayload completedDiagnostic{};
     for (std::size_t index = 0u; index < completedDiagnostic.counters.size(); ++index)
     {
@@ -1115,6 +1131,22 @@ int main()
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(scene);
     PresentableTinyRtSceneObservationTestAccess::MarkPendingTlasDefinitions(scene);
     PresentableTinyRtScene moved(std::move(scene));
+#ifndef NDEBUG
+    const auto movedHandles = moved.CaptureResourceHandles();
+    const auto relinquishedHandles = scene.CaptureResourceHandles();
+    ok &= Require(movedHandles == originalHandles &&
+                      !relinquishedHandles.ready &&
+                      relinquishedHandles.bottomLevelAccelerationStructures.empty() &&
+                      relinquishedHandles.topLevelAccelerationStructures.empty() &&
+                      relinquishedHandles.pipelines.empty() &&
+                      relinquishedHandles.shaderBindingTableBuffers.empty() &&
+                      relinquishedHandles.descriptorSets.empty() &&
+                      relinquishedHandles.textureImages.empty() &&
+                      relinquishedHandles.outputImage == 0u &&
+                      relinquishedHandles.outputMemory == 0u &&
+                      relinquishedHandles.outputView == 0u,
+                  "Debug opaque identities must transfer to exactly one owner on move");
+#endif
     ok &= Require(!PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(scene) &&
                       PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(moved),
                   "TLAS definition cache must follow its sole scene owner on move");

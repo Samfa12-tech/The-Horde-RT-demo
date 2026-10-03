@@ -2,6 +2,74 @@
 
 Last updated: 2026-10-03
 
+## October3: exact torch-correction candidate, first matched75% comparison
+
+Evidence class: **local exact development-APK pullback and bounded actual RT
+checkpoint timing**, not signed release, sustained performance or owner acceptance.
+Only the separate user0 Debug package was updated without clearing data. Candidate
+APK SHA256 `b4e063afed5ea46be1467870a0d96adbb1a7e731e6bda8f978c2d4401f45e8ee`
+matches the installed pullback. Build identity is a669HEAD plus the recorded three
+native-file delta, with all294 Android runtime inputs unchanged during build;
+four ABIs, ELF16KiB alignment and actual notice/asset admission pass.
+
+Actual **SM-S948B / Android16 / Adreno(TM)840**, driver2150932499/API4210983,
+RayTracingPipeline, Mobile water, modelled viewmodel and fixed75% remain matched
+to the exact released-source baseline below (1080x2235 internal,1440x2980 output).
+Both started battery28.7C; baseline44%, candidate45%. All three states presented
+actual RT output, with no runner failure or warning. The runner force-stopped its
+owned Debug process; lead verified no remaining Debug PID.
+
+| Checkpoint | Baseline ms | Candidate ms | Descriptive increase | Candidate battery C / thermal status |
+|---|---:|---:|---:|---:|
+| Opening | 63.181 | 66.774 | 5.69% | 33.0 / 0 |
+| Worst bend | 56.117 | 58.654 | 4.52% | 35.1 / 0 |
+| Held lantern High pose / Mobile rendering | 93.657 | 100.442 | 7.25% | 37.1 / 1 |
+
+These are medians of three CPU present-loop window averages, not GPU-only or
+per-frame percentiles. GPU thermal-power level0 was reported throughout. Different
+endpoint temperatures and sequential order limit causal interpretation; repeated
+balanced comparisons remain pending. Fixed75% is still below30FPS. No lower scale,
+cooled run or DRS substitutes for that target. No Compute, Home/resume, settings,
+preview, moving clearance, changed-audio or owner visual acceptance is claimed.
+Raw scoped evidence remains private outside source in `../android-candidate-torch-162/`.
+
+## October3: renewed1.6.2 allocation and exact released-source baseline
+
+Evidence class: **local exact development-APK installation/pullback and bounded
+RT checkpoint timing**, not a1.6.2 candidate pass, signed release, lifecycle or
+owner acceptance. Owner explicitly returned the phone after withdrawing the
+earlier allocation. Lead reverified authorized **SM-S948B**, Android16/current
+user0. The exact newly built clean released-source `a397757` Diagnostic/Mobile
+Debug APK was installed only for user0 into the separate `.debug` package, without
+clearing data or modifying production saves/settings. Installed pullback SHA256
+matches `9d3fa47f4b2491e7d1cece984261d175314ad0cfd86353fd2010e50576b3ce47`.
+
+Actual GPU Adreno(TM)840, raw driver2150932499/API4210983; **RayTracingPipeline**,
+modelled viewmodel, Mobile water, fixed75% at1080x2235 into1440x2980. All three
+checkpoint states retained successful RT-produced presentation and exact baseline
+Mobile shader identities. Three window means per checkpoint give these medians:
+
+| Baseline checkpoint | CPU present-loop ms | Median-derived FPS | Battery C | Android thermal status |
+|---|---:|---:|---:|---:|
+| Opening | 63.181 | 15.828 | 32.6 | 0 |
+| Worst bend | 56.117 | 17.820 | 34.8 | 0 |
+| Held lantern High pose / Mobile rendering | 93.657 | 10.677 | 36.6 | 1 |
+
+GPU thermal-power level reported0 in each window. These are window-average CPU
+present-loop observations, not per-frame percentiles or GPU-only durations. Fixed
+75% still falls below the30FPS reference; no lower-scale result substitutes for
+it. The different thermal states remain explicit and must be matched before
+attributing a candidate delta. No Home/resume test was requested in this run.
+
+Private PID/time-scoped reports remain outside source under
+`../android-baseline-162-intake/`; raw identifiers/logs are not published. The
+runner owns separate baseline artifact/source and implementation-runner identities.
+It reported no failures and force-stopped its Debug app; lead verified no Debug
+PID afterward. Initial battery28.7C/44%, final cooldown observation33.2C/43%.
+Current candidate, Compute, lifecycle/settings/preview, motion and changed-audio
+acceptance remain pending. S24 final-release coverage and exact S25 remain
+separate unverified/deferred records.
+
 ## October3: 1.6.2 allocated-device intake (no new RT pass yet)
 
 Evidence class: **local read-only ADB identity/availability**, not installation,

@@ -1055,6 +1055,54 @@ void PresentableTinyRtScene::Destroy()
     previewFireInputs_ = {};
 }
 
+#ifndef NDEBUG
+PresentableTinyRtScene::ResourceHandleSnapshot
+PresentableTinyRtScene::CaptureResourceHandles() const
+{
+    ResourceHandleSnapshot result;
+    result.ready = ready_;
+    const auto bits = [](const auto handle) {
+        std::uint64_t value = 0u;
+        static_assert(sizeof(handle) <= sizeof(value));
+        std::memcpy(&value, &handle, sizeof(handle));
+        return value;
+    };
+    const auto append = [&bits](auto& values, const auto handle) {
+        if (handle != VK_NULL_HANDLE) values.push_back(bits(handle));
+    };
+    for (const AccelerationStructure* blas : std::array{
+             &blas_, &waterfallBlas_, &finaleRoofBlas_, &torchBlas_, &swordBlas_,
+             &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
+             &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
+             &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_})
+        append(result.bottomLevelAccelerationStructures, blas->handle);
+    for (std::size_t bucket = 0u;
+         bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
+        append(result.bottomLevelAccelerationStructures,
+               characterSlot_.SkeletonGpu(bucket).accelerationStructure.handle);
+    append(result.bottomLevelAccelerationStructures,
+           characterSlot_.LichGpu().accelerationStructure.handle);
+    append(result.topLevelAccelerationStructures, tlas_.handle);
+    for (const auto strategy : {RtMaterialStrategy::OpaqueFast,
+                               RtMaterialStrategy::GenericDielectric})
+    {
+        const auto& resources = pipelineBundle_.Strategy(strategy);
+        append(result.pipelines, resources.pipeline);
+        append(result.shaderBindingTableBuffers, resources.shaderBindingTable.buffer);
+    }
+    append(result.descriptorSets, pipelineBundle_.descriptorSet);
+    for (const TextureArray* texture : std::array<const TextureArray*, 10u>{
+             &environmentTexture_, &materialDiffuse_, &materialNormal_, &materialArm_,
+             &lichBaseColor_, &lichEmissive_, &staticBaseColor_, &staticNormal_,
+             &staticOrm_, &staticEmissive_})
+        append(result.textureImages, texture->image);
+    result.outputImage = bits(storageImage_);
+    result.outputMemory = bits(storageImageMemory_);
+    result.outputView = bits(storageImageView_);
+    return result;
+}
+#endif
+
 horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory() const noexcept
 {
     horde::telemetry::RtResourceInventory inventory{};

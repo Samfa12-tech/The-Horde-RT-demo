@@ -637,7 +637,20 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
             Add(Scale(viewRight, result.leftHandLocal[0]),
                 Add(Scale(viewUp, result.leftHandLocal[1]),
                     Scale(viewForward, result.leftHandLocal[2]))));
-        result.torchOverheadLowering = TorchOverheadLowering(gripWorld, viewUp, viewForward);
+        const float initialLowering = TorchOverheadLowering(gripWorld, viewUp, viewForward);
+        // A low grip held at the full forward extension exceeds the admitted
+        // anatomical arm's reach, especially when looking down. Retract along
+        // the horizontal player forward axis before resolving final overhead
+        // clearance. This moves the complete hand/item frame, not the light.
+        const float retraction = anatomicalBody
+            ? std::min(0.28f, initialLowering * 0.45f) : 0.0f;
+        const Vec3 horizontalForward{{forwardX, 0.0f, forwardZ}};
+        const Vec3 retractedGrip = Add(gripWorld, Scale(horizontalForward, -retraction));
+        result.leftHandLocal[1] -= retraction *
+            (horizontalForward[0] * viewUp[0] + horizontalForward[2] * viewUp[2]);
+        result.leftHandLocal[2] -= retraction *
+            (horizontalForward[0] * viewForward[0] + horizontalForward[2] * viewForward[2]);
+        result.torchOverheadLowering = TorchOverheadLowering(retractedGrip, viewUp, viewForward);
         // Inverse view projection of world down: both IK and socket composition
         // consume this same hand target. Do not tilt/fade the flame or detach its
         // light to obtain clearance. Lowered/falling/reward paths remain owned.

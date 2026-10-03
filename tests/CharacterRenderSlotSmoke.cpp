@@ -1380,11 +1380,40 @@ int main()
                           "bool ReleaseSwapchainResources(",
                           "void RefreshGpuTimingTelemetry("),
                       "both swapchain integrations must complete owned work, invalidate the epoch, then reset timer/scene resources");
+        const std::size_t windowsResizeBegin = windowsSource.find("bool ApplyPendingOutputResize(");
+        const std::size_t windowsResizeEnd = windowsSource.find("bool RenderFrame(", windowsResizeBegin);
+        const bool windowsResizeMarkersValid = windowsResizeBegin != std::string::npos &&
+            windowsResizeEnd != std::string::npos && windowsResizeEnd > windowsResizeBegin;
+        const std::string windowsResizeBody = windowsResizeMarkersValid
+            ? windowsSource.substr(windowsResizeBegin, windowsResizeEnd - windowsResizeBegin) : std::string{};
+        const std::size_t windowsMainBegin = windowsSource.find("int RunDiagnosticSwapchainWindow(");
+        const std::size_t windowsMainEnd = windowsSource.find("int ScaleForDpi(", windowsMainBegin);
+        const bool windowsMainMarkersValid = windowsMainBegin != std::string::npos &&
+            windowsMainEnd != std::string::npos && windowsMainEnd > windowsMainBegin;
+        const std::string windowsMainBody = windowsMainMarkersValid
+            ? windowsSource.substr(windowsMainBegin, windowsMainEnd - windowsMainBegin) : std::string{};
+        const std::size_t windowsResizeCall = windowsMainBody.find(
+            "if (!ApplyPendingOutputResize(context, capabilities, timingSamples))");
+        const std::size_t windowsNextFrame = windowsMainBody.find(
+            "const bool frameRendered = RenderFrame(context, clearColor, rtFramePresented);", windowsResizeCall);
         ok &= Require(
+                      windowsResizeMarkersValid && windowsMainMarkersValid &&
+                      windowsResizeCall != std::string::npos && windowsNextFrame != std::string::npos &&
+                      windowsResizeCall < windowsNextFrame &&
+                      windowsResizeBody.find("if (context.renderScaleDirty && context.useRtPath)") != std::string::npos &&
+                      windowsResizeBody.find("RtResourceResetReason::RenderScaleChange") != std::string::npos &&
+                      windowsResizeBody.find("context.renderScale = context.appliedRenderScale;") != std::string::npos &&
+                      windowsResizeBody.find("context.graphicsBeforeApply.waterQuality") != std::string::npos &&
+                      windowsResizeBody.find("context.fireDetail = context.graphicsBeforeApply.fireDetail;") != std::string::npos &&
+                      windowsResizeBody.find("context.graphicsPreviewFrameCap = context.graphicsBeforeApply.previewFrameCap;") != std::string::npos &&
+                      windowsResizeBody.find("Acknowledge(GraphicsSnapshot(context, *context.graphicsCommand), false)") != std::string::npos &&
+                      windowsResizeBody.find("context.graphicsCommand.reset();") != std::string::npos &&
+                      windowsResizeBody.find("rtScene.Destroy") == std::string::npos &&
+                      windowsResizeBody.find("InitialiseRtSceneForSwapchain") == std::string::npos &&
                       resourceResetOrdered(
                           windowsSource,
-                          "if (context.renderScaleDirty && context.useRtPath)",
-                          "const bool benchmarkFrame = context.benchmark.IsRunning();",
+                          "bool ApplyPendingOutputResize(",
+                          "bool RenderFrame(",
                           "rtScene.ResizeOutputAfterDeviceIdle") &&
                       resourceResetOrdered(
                           androidBridgeSource,
