@@ -1,0 +1,24 @@
+SHA256 (source commit ec13876069b4049b524c5198734c0bbbabbd039c)
+SHA256 (resource commit 3d26ad64a3db1e1e1b7965587a72fd114189bdf6)
+SHA256 (music asset manifest) 672f2321b2fb429cffe9d61119103a1aa3565f355391a162497f741eec9d6e29
+SHA256 (Release executable / ZIP executable entry) 11e0a59b032cee25296d99cbf74d531871d98abbfe784823cc52f9b3b84dba45  bytes=3448320
+SHA256 (superseded first Windows ZIP) d71101981a6035d3b5b4afd90cc9740f6288fb984783d5fa98e431c750074418  bytes=116153745
+SHA256 (final Windows ZIP with current receipt-pinned player assets) d2984666b292862c13cf1b8161ad2c085495bafb5c0d844f39538a7a3df58b12  bytes=116168306
+
+Updated music WAV inputs; each packaged entry matched exactly:
+8c6201afb7129775ded6696c5819f4e592202d1b0f33f755b9d4f408f2e81556  bytes=2304044  assets/audio/music/what-the-dark-keeps/runtime/A-body.wav
+a7459fc656b1520be5fad2b9e11cec314d62cdf0164abdb2fda53d619d7b962c  bytes=576044   assets/audio/music/what-the-dark-keeps/runtime/A-tail.wav
+4398311b5870e614ffe611950264e370cf819f8d323aafe291816f38e36bf4c6  bytes=2304044  assets/audio/music/what-the-dark-keeps/runtime/D-body.wav
+14550157b1a3fbf44f3d1a4dda424223475a7a0a9975b0361687bb2031f7ec50  bytes=576044   assets/audio/music/what-the-dark-keeps/runtime/D-tail.wav
+
+Current player GLBs: final ZIP entry SHA == current processing receipt runtimeSha256
+46a88dac9dd569117be5a17a35540fecf3e0e6026d3ad404dd5fdbc85a9ad54  bytes=2568508  assets/models/player/runtime/gothic-traveller-lod0.runtime.glb
+eaa0db3abb8ff2dae616247054c190031a08c542dd95396cc6dc1e18a7462488  bytes=1228828  assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb
+556f8b4f4f7509ee9cb6d8350d5bb79dd430a7544d923d88051794f18ab61141  bytes=1582     assets/models/player/runtime/asset.manifest.json
+8551bca483285a59f60e73a495bed9a76b1ac3c8b323bbb9957328845ea628fa  bytes=1298     assets/models/player/runtime/gothic-traveller-lod0.runtime.glb.processing.json
+7dd3749f9e4153eace88dd849a20ab344f89ebbc111d27c35dde44476b86cd28  bytes=1009     assets/models/player/viewmodel/runtime/asset.manifest.json
+d0eb96ed74608fd67a78b79c5a8c7f82fe2c9a6aae33210d970fca9be9ba0dd5  bytes=4117  assets/models/player/viewmodel/runtime/viewmodel-processing.json
+
+Superseded stage hashes match previousAcceptedRuntimeSha256 in current processing receipts
+f2c3f62b2696c4630309b1d0b0ecb366151054fb48f7c0c6bcc6956980ff81eb  bytes=2568512  assets/models/player/runtime/gothic-traveller-lod0.runtime.glb
+6f06d77e754d7e2d9017b84c1204879aba2be302b69c077c5f84578408d5166b  bytes=1228832  assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb

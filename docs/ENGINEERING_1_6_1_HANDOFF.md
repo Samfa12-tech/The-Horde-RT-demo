@@ -4,6 +4,58 @@ Updated 2026-10-03. Branch: `codex/horde-1.6.1-engineering-pass`.
 Engineering work has resumed by explicit owner instruction; the goal is not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
 and [latest lantern evidence](ENGINEERING_1_6_1_LANTERN_BENCHMARK_2026-09-20.md).
 
+## Current closeout checkpoint — October 3
+
+Newest bounded owner request: remove only held Melody3 notes in A/D. Implemented
+and regenerated with retained v68 app voices/FX; complete score/event differential,
+native A/D loops/transitions, package hashes and exact-S26 consumed clock pass.
+[Single finite music delta record](evidence/2026-10-03-music-drone/README.md) owns
+completed scoped validation and owner A/D acceptance ("both perfect"). Do not
+rerender or revisit instrumentation. New Debug APK315b1c9f is not the old resource A/B artifacts; those
+comparisons remain bound to their unchanged bank. Listening used the correct
+1.6.1-debug package; first accidental production1.6.0 launch excluded.
+
+Music/source checkpoint `ec13876` is pushed on both engineering/profile branches;
+renderer/resource runtime remains `3d26ad6`. Fresh current-source push37077929433
+and PR37077935253 both pass all six CI lanes: Vulkan CPU-host
+17/17 includes actual skinned semantics and mapping/placement failures; selected
+Clang ASan/UBSan15 named fixtures pass. No new hardware proof is inferred from CI.
+The [finding disposition](ENGINEERING_1_6_1_FINDING_STATUS.md) is the compact
+audit reconciliation; the [325-commit inventory](evidence/2026-10-03-closeout/commits-through-d068d88.txt)
+includes main/parallel integration ancestry through the completed S26 evidence
+commit `d068d88`. Subsequent final documentation checkpoint is separate.
+
+Read the [finite S26 resource matrix](evidence/2026-10-03-final-s26-resources/README.md)
+for completed state, not historical next-step prose below. All six finite reports
+have complete presented/CPU/GPU denominators; the interrupted first held-high
+attempt is excluded and the broken interleaving retained. Held-high candidate
+93.6585ms versus control93.6380ms is no meaningful improvement. Warm route timing
+is not a causal gain; standalone live-reveal121.2535ms followed music listening
+at thermal1–2. No sustained30FPS or universal device acceptance is claimed.
+
+[Current-bank S26 interaction admission](evidence/2026-10-03-final-s26-interactive/README.md)
+adds actual Shipping/Mobile shader Debug-shell motion, four output-only heavy-scene
+75→100→75→50→75 resizes (46–131ms native idle+resize), presentation and Home/resume.
+Resume takes about14.6s; state survives, not instant readiness. Current unsigned
+Release and Debug packages pass exact bank/SPIR-V admission; Release native ELF
+is unchanged from resource measurement. Normal current-bank Debug315b1c9f restored,
+saved preferences retained and Horde stopped; phone released. Do not repeat these
+checks or rerun resource benchmarks. External audio-focus/changed phone footsteps,
+subjective changed-cuff follow-up, current S24 artifact and foreground Windows
+Compute remain separate narrow gates. Pacing acceptance needs an owner decision:
+the current75% workloads do not meet30FPS, and no further micro-optimization is
+justified by these negative results.
+
+Current README/release notes are reconciled with actual modelled player,
+quality profiles, music/reporting, resources and six CI lanes. Current Windows
+Shipping/High package now includes the receipt-pinned cuff geometry; lead checks
+all69 asset entries byte-identical to source, not only the music/player subset.
+[Exact package admission](evidence/2026-10-03-windows-music-package/README.md)
+retains the superseded stale-player ZIP and final hash `d2984666...3df58b12`.
+Historical dated
+rows below retain their own source/artifact scope. Do not restart accepted glass,
+player/audio work or completed matrices. Signing/publication remain unauthorised.
+
 ## Owner's quota and backup instruction
 
 The owner explicitly removed the approximately 5% usage guard and resumed work
