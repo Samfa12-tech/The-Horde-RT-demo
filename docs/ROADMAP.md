@@ -18,9 +18,12 @@ The [README](../README.md) identifies the published package and its evidence. A 
 
 The dungeon becomes the prologue to a small, authored historical-gothic adventure. The player and companion emerge into woodland, reach an inhabited village, and learn more in its tavern about the wider **Horde**. The village becomes the recurring hub for three subsequent themed dungeons.
 
-The owner-approved [campaign, characters and progression direction](CAMPAIGN_DESIGN.md) defines the lost army/treasure-hoard ambiguity, cursed keepers, deceptive lantern voice, three dungeons and single ending. Preserve The Horde as the working title. Kit accompanies a silent player; the eventual narrative is fully voiced. Remaining names, detailed scripts and balance stay provisional.
+The owner-approved [campaign, characters and progression direction](CAMPAIGN_DESIGN.md) defines the lost army/treasure-hoard ambiguity, cursed keepers, deceptive lantern voice, three dungeons and single ending. Preserve The Horde as the working title. Kit accompanies a silent player; the eventual narrative is fully voiced. The land is The Veyrlands, the village is Bellwether and the real historical king is King Veyr (owner selection, 3 October 2026); the lantern entity's royal claim remains false. Other unapproved names, detailed scripts and balance stay provisional.
 
 The defining design pillar is **light as gameplay, powered by the actual ray-tracing engine**, not ray tracing as decoration added after conventional rooms and combat.
+
+## Approved world layout
+[WORLD_LAYOUT.md](WORLD_LAYOUT.md) is the canonical geography reference approved on 3 October 2026. Routes and relative landmark positions are locked; exact distances and local blockout require playable testing. 1.7 reaches the lookout and shows a low-detail village shell in its fixed future location, with no playable hub, interiors or crowds. 1.8 extends the same road into that village. Preserve the downstream Abbey/eastern Foundry peer branches and two-seal Court gate. This approval does not expand the current 1.6.2 run or promise a seamless open world.
 
 ## Milestone sequence
 
@@ -294,7 +297,7 @@ Across the project, assess existing Briarhold 3D models and sky assets before co
 
 ## Decisions intentionally left open
 
-Village final name/layout and supporting character names (avoid Mara); precise tools and encounter rules; voice casting/scripts; entity name/form; detailed finale and treasure distribution; XP/respec/prices and upgrade balance; exact content counts and sustained device budgets. The campaign's approved narrative and order are in CAMPAIGN_DESIGN.md, not open for silent reinvention.
+Detailed street/building blockout (regional geography and the names The Veyrlands/Bellwether are approved in WORLD_LAYOUT.md), and supporting character names (avoid Mara); precise tools and encounter rules; voice casting/scripts; entity name/form; detailed finale and treasure distribution; XP/respec/prices and upgrade balance; exact content counts and sustained device budgets. The campaign's approved narrative and order are in CAMPAIGN_DESIGN.md, not open for silent reinvention.
 
 ## Documentation-only change boundary
 

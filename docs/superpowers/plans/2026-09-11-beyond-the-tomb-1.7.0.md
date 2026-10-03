@@ -16,6 +16,10 @@
 
 ---
 
+## Approved geography update — 3 October 2026
+
+[WORLD_LAYOUT.md](../../WORLD_LAYOUT.md) now fixes the regional topology. The Keeper Tomb lies northwest in an abandoned burial ground beyond the woods; its forest path leads southeast to the **lookout**, which is the 1.7 chapter endpoint. Place a **low-detail distant village shell** below/beyond it in the fixed future 1.8 location. The land is The Veyrlands and this village is Bellwether (approved 3 October 2026). No playable village, interiors, NPC crowds or hub services enter 1.7. In 1.8 the same road continues into the village; do not create an enormous temporary wall across it or relocate the settlement later. The village's active churchyard is separate from the tomb burial ground. Exact distances and slopes remain playable-blockout decisions; this is bounded zone/area delivery, not a continuous open-world promise. Preserve all four separately approved dungeon-opening features and the later finale/rescue opening.
+
 ## 1. Source authority and what was actually inspected
 
 The owner's latest instructions govern the new experience. Preserve `AGENTS.md` engineering/safety requirements and use the accepted 1.6.2 source as implementation authority. Historical documents remain evidence of their own versions, not proof of current implementation or performance.
@@ -64,7 +68,7 @@ Deliver one complete extension: existing dungeon → Kit's early small-wall-pane
 
 Required content: one starting cave-in, one coherent tomb/shaft/exterior entrance, one physical rope, one fully animated companion, one modest forest route, complete short-scene voice playback and subtitles, three-dimensional trees, mist/fog with real shadowed moon shafts, fireflies, forest ambience, and refreshed in-game controls/menus on both supported platforms.
 
-Initial outdoor footprint: approximately **40–80 metres of authored trail**, with a clearing, two or three bends, a misty hollow and an old waymarker/gate as the final hook. Treat dimensions as blockout targets; choose final scale using player movement speed and scene composition. Do not stretch a small amount of content into a long empty walk. The player remains free to look and move within the corridor; this is not on-rails movement.
+Initial outdoor footprint: approximately **40–80 metres of authored trail**, with a clearing, two or three bends, a misty hollow and a lookout with an old waymarker as the final hook. Treat dimensions as blockout targets; choose final scale using player movement speed and scene composition. Do not stretch a small amount of content into a long empty walk. The player remains free to look and move within the corridor; this is not on-rails movement.
 
 Explicitly outside 1.7.0: an open world, extra dungeons, a new forest boss, new enemy species, larger simultaneous combat groups, companion combat, escort failure, dialogue trees, inventory/economy, procedural quests, day/night simulation, advanced weather, full fluid simulation, hair/cloth simulation, multiplayer, fully simulated human climbing, or cinematic facial capture. Existing enemies and existing combat remain the tutorial.
 
@@ -134,7 +138,7 @@ After the exchange, the companion turns onto the trail and walks ahead, waiting 
 
 Bends reveal compositions rather than identical tree corridors. Use banks, roots, rocks, fallen trees and understory as natural boundaries. The forest continues visually beyond them; no distant-flat-image substitute for the nearby woodland.
 
-At the final waymarker/gate, stage a restrained sound or silhouette beyond the route and let the companion wait. The chapter ends in-world with a continuing objective and an optional themed `Continue exploring / Return to menu` panel opened by the player. Do not automatically cover the forest reveal with the old completion overlay. Do not imply a further playable level already exists.
+At the final lookout/waymarker, reveal the approved distant low-detail village shell and let the companion wait. This is the fixed future hub location; a restrained sound or silhouette may support the quiet hook without implying an extra playable area. The chapter ends in-world with a continuing objective and an optional themed `Continue exploring / Return to menu` panel opened by the player. Do not automatically cover the forest reveal with the old completion overlay. Do not imply a further playable level already exists.
 
 ## 5. World zones, continuity and vertical movement
 
@@ -578,7 +582,7 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 - [ ] Complete the bounded trail, tree/ruin kit, 3D LODs, natural boundaries and hero compositions using the Blender production route.
 - [ ] Finish world-space shadowed moon/lantern volumetrics, bounded wind/fireflies and consistent important glass/sky paths. Add occluder-on/off comparison captures.
 - [ ] Add forest/rope/footstep ambience and integrate the accepted adaptive music route, with tested ducking and volume-zero/pause behavior.
-- [ ] Add the final marker/gate and quiet story hook. Companion waits; control remains available; no automatic fullscreen completion takeover.
+- [ ] Add the final lookout/waymarker and quiet story hook, with the low-detail village shell at its fixed future location. Verify no playable streets/interiors/crowds, no huge temporary road wall, and an honest chapter boundary. Companion waits; control remains available; no automatic fullscreen completion takeover.
 - [ ] Run the combined worst-case and traversal/regression route again after final art—not only with placeholders.
 
 **Gate:** The finished scene delivers the promised woodland, not just a technical blockout. More density is earned by performance evidence, not assumed.

@@ -10,13 +10,17 @@
 
 **Dialogue authoring draft, 3 October 2026:** See [the whole-campaign bank](../../CAMPAIGN_DIALOGUE_BANK.md#5-village-arrival-first-lead-and-first-small-expedition) for proposed arrival, useful services, access preparation and progress-aware return scenes. It separates canon from new connective tissue and preserves either dungeon order. These are reviewable story examples, not a commitment to deliver the entire bank in 1.8.
 
+## Approved geography update — 3 October 2026
+
+[WORLD_LAYOUT.md](../../WORLD_LAYOUT.md) fixes the settlement's regional position and landmark relationships. 1.7 shows its low-detail distant shell from the lookout; 1.8 extends the **same road** southeast from that lookout into the **same village**, arriving from the northwest. Keep the unwalled hamlet, central tavern/well, northern church and active graveyard, eastern mill/stream, nearby starter-shrine spur and outbound peer routes to the downstream Abbey and eastern Foundry. The northwest abandoned Keeper Tomb burial ground is distinct from the churchyard. The high-ridge Court remains northeast and locked after both middle dungeons; its dry treasury lies beneath/behind the ridge. The land is The Veyrlands and the village is Bellwether, now approved; the church-bell name origin and unpulled-bell folklore are recorded in WORLD_LAYOUT.md without prescribing a runtime event. Exact local distances, building footprints and playable content budgets require blockout/testing; the map does not make every depicted structure an explorable 1.8 interior.
+
 ## 1. Purpose and owner direction
 
 Extend the moonlit woodland into a small, believable village with a few explorable houses/interiors, a tavern and NPCs. The settlement should become the recurring hub for later adventures, while the tavern reveals more about the wider **Horde**.
 
 Beyond 1.8: Drowned Abbey and Ashen Foundry in either order, then Glass Court, followed by the treasury finale. Each dungeon combines contextual enemies, light puzzles, a local tool, boss and treasury seal. Read [CAMPAIGN_DESIGN.md](../../CAMPAIGN_DESIGN.md) for approved narrative, alternative access quests and remaining design decisions; later dungeons are not 1.8 implementation scope.
 
-Preserve The Horde as the working title and its lost-army/treasure ambiguity. Kit accompanies a silent player; the eventual narrative is fully voiced. Bellwether and supporting names remain provisional; do not use Mara. Spoilers and reveal order belong to CAMPAIGN_DESIGN.md.
+Preserve The Horde as the working title and its lost-army/treasure ambiguity. Kit accompanies a silent player; the eventual narrative is fully voiced. Bellwether is approved; unapproved supporting names remain provisional. Do not use Mara. Spoilers and reveal order belong to CAMPAIGN_DESIGN.md.
 
 This is a compact authored hub, not an open-world RPG conversion. Prioritise atmosphere, meaningful interactions and reliable continuity over settlement size.
 
@@ -120,7 +124,7 @@ Do not prebuild these as speculative infrastructure. Add only the reusable seams
 
 ## 8. Proposed execution order after the 1.7 acceptance gate
 
-1. Audit the accepted 1.7 source, saves, zone/actor/dialogue contracts and exact-device evidence; settle the hub layout, story beat and measured scope.
+1. Audit the accepted 1.7 source, saves, zone/actor/dialogue contracts and exact-device evidence; refine the approved hub geography into a tested street/building blockout, story beat and measured scope.
 2. Build the representative exterior/interior/NPC workload and prove the residency, interaction and performance approach before producing the whole asset set.
 3. Complete one playable arrival-to-tavern slice with one NPC exchange, safe checkpoint and reliable return outside.
 4. Extend to the agreed houses/cast and implement the scoped useful service, treasure/training and access-quest slice, progress-aware dialogue and lantern clue. Validate alternate progression routes and save/reward/spending integrity.

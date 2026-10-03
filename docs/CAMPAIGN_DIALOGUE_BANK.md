@@ -9,11 +9,13 @@ A playable story spine with representative dialogue from the tomb to the return 
 
 **Established canon:** silent player; practical, loyal, opinionated Kit; cursed fourth Keeper and two sworn skeleton guards protect the lantern before the player acquires it; rope rescue and moonlit forest; a useful village; Abbey and Foundry in either order, then Glass Court; three seals; a deceptive entity claiming to be the dead king; real plundered treasure; a release ritual that truly frees the bound dead while also releasing the entity; defeat and one hopeful, playable return.
 
-**Proposed connective tissue throughout this bank:** all new wording, individual clue objects, exact service exchanges, first lantern-speech timing, named-item claimant, side-expedition details, Glass Court confrontation staging, ritual explanations and epilogue scenes. These illustrate the canon; they do not amend it. Bellwether, Brother Ansel, Hester, Bellkeeper and Master of Coin remain working names. Use role-based IDs until names are approved. The entity's true name/form and the royal keeper's fate are still open.
+**Proposed connective tissue throughout this bank:** all new wording, individual clue objects, exact service exchanges, first lantern-speech timing, named-item claimant, side-expedition details, Glass Court confrontation staging, ritual explanations and epilogue scenes. These illustrate the canon; they do not amend it. Bellwether's church-bell name origin and unpulled-bell folklore are approved setting lore in WORLD_LAYOUT.md; specific spoken lines, supernatural explanations and runtime bell events are not thereby approved. The Veyrlands, Bellwether and the real historical King Veyr are approved names (3 October 2026); the lantern's claim to be that king remains deceptive. Brother Ansel, Hester, Bellkeeper and Master of Coin remain working names. Use role-based IDs until names are approved. The entity's true name/form and the royal keeper's fate are still open.
 
 The fourth Keeper's spoken lines below are **future campaign dialogue candidates**, not additions to the active 1.6.2 reveal/engine-polish goal. That milestone's approved sound/reveal brief remains its authority. The masked Briarhold Warden remains a Kit asset candidate pending rights/import/rig/performance validation, not final casting or appearance.
 
 **Milestone boundary:** 1.7 uses its reviewed Kit rescue/forest subset only. First lantern speech is proposed for the later hub chapter, avoiding an unscoped second speaking character in 1.7. Later dungeons/finale are not 1.7 or 1.8 deliverables. No runtime edit, asset transfer, audio generation, paid work, merge or release is requested by this bank.
+
+**Geography approved separately, 3 October 2026:** Follow [WORLD_LAYOUT.md](WORLD_LAYOUT.md). The tomb is in the northwest abandoned burial ground, separate from the village churchyard. The 1.7 forest ends at the lookout overlooking the low-detail, fixed-position future hub; 1.8 extends the same approach road. Shrine, downstream Abbey, eastern Foundry and northeastern high-ridge Court/treasury retain the approved route relationships and gates. This locks location/route continuity, not this bank's proposed spoken wording or new scene details.
 
 ## 2. Voice, staging and subtitle rules
 
@@ -77,11 +79,11 @@ The grate wording preserves the owner's suggested draft. Other retained IDs belo
 | `forest.waystone` | Kit; notices a real change | Hold it there. There are marks under the moss. | C; authored inscription genuinely revealed by lantern-light interaction. |
 | `forest.clue` | Kit; curious, not certain | A road to the treasury, perhaps. Someone in the village might read it. | C; inscription observed; carry objective even if line skipped. |
 | `forest.wait` | Kit; nearby, no pressure | I'll wait here. | O; first authored wait point when player explores; once in this chapter. |
-| `forest.village` | Kit; relieved | There. Chimney smoke. | C; village approach endpoint; no promise of entering unbuilt content. |
+| `forest.village` | Kit; relieved | There. Chimney smoke. | C; 1.7 lookout endpoint overlooking the distant village shell; no promise of entering unbuilt content. |
 
 **Clue proposal F1:** the lantern reveals a treasury-route mark beneath weathering. It establishes useful light, not the entity's identity. Exact symbol/text remains art/puzzle authoring. Leave forest sound and moonlight room to work; do not turn every path marker into dialogue.
 
-**Opening safeguards:** the grate beat is optional and missable; rescue lines must work with it heard or unheard. No lantern voice, prison speech or lantern ownership before lich defeat. If 1.7 ends at the approach, use the scoped chapter endpoint; the invitation to the village does not itself enable 1.8.
+**Opening safeguards:** the grate beat is optional and missable; rescue lines must work with it heard or unheard. No lantern voice, prison speech or lantern ownership before lich defeat. 1.7 ends at the lookout under WORLD_LAYOUT.md; use that scoped chapter endpoint; the invitation to the village does not itself enable 1.8.
 
 ## 5. Village arrival, first lead and first small expedition
 

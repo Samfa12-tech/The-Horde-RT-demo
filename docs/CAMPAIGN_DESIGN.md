@@ -1,6 +1,9 @@
 # The Horde — Campaign, Characters and Progression
 **Owner-approved creative direction: 30 September 2026.** Planning, not implemented content or release authority. Read with [ROADMAP.md](ROADMAP.md). This document supersedes older statements that the Horde's nature, dungeon order and final mystery are entirely undecided. Concrete encounters, scripts, balance and technical solutions still require scoped design and testing.
 
+## Approved regional geography
+**Owner-approved, 3 October 2026:** [WORLD_LAYOUT.md](WORLD_LAYOUT.md) locks the map's routes and relative landmark positions: northwest abandoned Keeper Tomb → southeast forest/lookout → compact unwalled village; southern downstream Abbey and eastern Foundry are peer branches; northeastern high-ridge Court opens after both; the treasury is a dry vault beneath/behind that ridge. The village's active churchyard is separate from the old tomb burial ground. 1.7 ends at the lookout with a low-detail distant town shell; 1.8 extends the same road into the fixed hub. Exact distances and local blockout remain to be tested. This is bounded regional/area delivery, not a seamless open-world promise. The land is The Veyrlands and the village is Bellwether; see the approved naming lore below.
+
 ## Dialogue authoring draft
 The [whole-campaign dialogue bank](CAMPAIGN_DIALOGUE_BANK.md) (3 October 2026) proposes scene-by-scene dialogue from the tomb through the playable return, with a tighter 1.7 opening, character voices, access/service exchanges, either-order dungeon returns, bounded barks and a fair-clue ledger. This document remains the creative authority; new connective scenes, wording and detailed ritual staging in the bank are drafts for review, not newly approved canon or voice-production scope.
 
@@ -30,7 +33,7 @@ Kit rescues the player via the planned rope. A familiar, practical fellow treasu
 A waystone/inscription seen differently by lantern light can hint at the lost treasury. Exact clue and spoken wording remain authoring work. Do not reveal the prison twist here.
 
 ## The village and recurring cast
-**Bellwether** remains a working village name. A compact settlement among the old kingdom's trade-route ruins, worth returning to and eventually thinking of as home.
+**Owner-approved names and setting lore, 3 October 2026:** The land is **The Veyrlands**, once the heart of **King Veyr's** realm, now remembered more through warnings than history. **Bellwether** is the village's approved name: a compact settlement among the old kingdom's trade-route ruins, worth returning to and eventually thinking of as home. It takes its name from the church bell that guided travellers home through the forest mist. Local folklore says that some nights it rings without anyone pulling the rope. Preserve that mystery without treating it as an approved supernatural explanation or runtime bell mechanic.
 The hub must benefit story AND play: information, access quests, gear, upgrades/training, spending/recovering treasure and visible consequences. It cannot be only a level-selection room.
 - Kit: loyal companion with humour, competence, personal wants and opinions; sometimes selfish, not an automatic traitor. Not a compulsory combat companion or escort-failure system.
 - Tavern keeper/former caravan leader: cares about reopening the road; name TBD. **Do not use Mara**, already reused across the owner's stories.
@@ -72,7 +75,7 @@ A surviving royal keeper recognises the prison being carried and supplies eviden
 Reward: final seal and treasury location. What seemed like protection is increasingly revealed as possession and control.
 
 ## Spoilers: the lantern, king and ending
-The lantern voice claims to be the dead king, betrayed and imprisoned by his keepers. It guides the player toward the three seals, promising release and restoration.
+The lantern voice claims to be the dead King Veyr, betrayed and imprisoned by his keepers. It guides the player toward the three seals, promising release and restoration.
 In truth it is the entity that offered the king victory. Its bargain created the conquering Horde, its plunder and the soldiers' service beyond death. The king eventually resisted; four keepers divided the prison's seals and became cursed custodians.
 The player took part of that prison from the fourth keeper in the prologue. The entity's guidance can be practically helpful while its account of history is false.
 Seed fair clues: mistaken personal memories, precise military knowledge, inscriptions where “keeper” means jailer, and guardians defending custody. These are clue candidates; maintain a reveal ledger so evidence is available before its payoff. Do not stage prologue guards attacking a lantern the player does not yet own.
