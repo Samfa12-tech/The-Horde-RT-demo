@@ -1,12 +1,12 @@
 # 1.6.1 engineering programme and release gates
 
-Updated 2026-10-03. Status: **engineering candidate accepted within documented limits; authorised signing/freezing and signed S26 smoke complete; publication/merge withheld**.
+Updated 2026-10-03. Status: **Showcase Alpha 1.6.1 is published; engineering accepted within documented limits**.
 
-This is the current next-step index for `codex/horde-1.6.1-engineering-pass`.
+This is the engineering record for the released `1.6.1` programme on `codex/horde-1.6.1-engineering-pass`.
 The owner-authorised full repository audit remains in scope. The 2026-09-13
 update adds S24/S25 compatibility, adaptive music and player reporting, changes
 the work order below, and defers the large validation matrix until the feature
-set is complete. It does not authorise publication or relax any RT requirement.
+set is complete. Publication is recorded below; release does not relax any RT requirement.
 
 Validated runtime checkpoint `00af842`: push36974679165 and PR36974684105
 CI are SUCCESS. Modelled-player presentation, semantics, music bank/
@@ -47,15 +47,19 @@ remains unmeasured, separate from correctness, and off in performance runs.
 No more phone or micro-optimisation work is queued. Existing failure/negative
 evidence,30FPS shortfall and owner-deferred High glass defects stay explicit.
 
-Owner has since confirmed independent signing backup/recovery and authorised
-production signing/freezing. Source0c7db23 has green push/PR CI; the stable-key
-Android APK, Windows ZIP and exact signed S26 update/settings/RT/ASTC/Home-resume
-smoke now pass. See the [current release receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md).
-The phone is released. Only the bounded release preflight/current documentation
-checkpoint remains locally; publication/merge still require separate authority.
-The installed1.6.0 updater already checks GitHub; a published non-draft
-`v1.6.1` GitHub Release is needed at authorised launch. Itch alone cannot trigger
-that prompt. No merge/publication is authorised by this closeout.
+Owner confirmed independent signing backup/recovery and authorised production
+signing/freezing and publication. Public itch builds `#2055201` (Windows) and
+`#2055202` (Android) are ready; the non-draft prerelease `v1.6.1` targets
+`a397757249871b6b64fe5b77fc14f24e8cfcbb2b`. Downloaded ZIP/APK hashes and the
+live updater parser selection are in the [publication evidence](evidence/2026-10-03-release-publication/).
+The actual update dialog/device-networking flow was not tested. Current CI runs
+`37089806774` and `37089810005` both passed all six jobs at `945f990`. See the
+[release receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md) for the
+S26 signed smoke, measured performance, device limits, and deferred High glass
+findings. No new audio/haptic manual revalidation was required; accepted runtime
+and audio inputs were unchanged. The full graphics-options menu remains planned
+for 1.6.2, and Hotstrike remains tracked and explicitly non-blocking without a
+change to the existing licence or asset provenance.
 
 ## Previous release-focused gates — October2 owner direction
 
@@ -64,7 +68,9 @@ significant sub-pixel parity work stop unless it addresses a genuine physical
 correctness defect. This section supersedes older "next pixel discriminator"
 instructions, including the proposed held-high521,444 witness. It changes work
 allocation/release triage, not ray transport, numerical tolerances or past results.
-The full agreed feature scope is retained; no merge/publication is authorised.
+At that October2 planning snapshot, the full agreed feature scope was retained
+and no merge/publication was authorised; the October3 release status above
+supersedes that dated authorization state.
 
 | Priority | Remaining gate | Smallest useful completion evidence |
 | --- | --- | --- |
@@ -105,14 +111,13 @@ The full agreed feature scope is retained; no merge/publication is authorised.
   Unavailable GPU bandwidth/cache/stall counters and unmeasured counter overhead
   are evidence gaps, not gameplay defects. The counter remains out of matched runs.
 - **Owner-controlled, not new engine work:** Hotstrike remains tracked and explicitly
-  non-blocking by owner decision; preserve provenance/licence/distribution. Signing
-  recovery and publication are not autonomously authorised.
+  non-blocking by owner decision; preserve provenance/licence/distribution. Do not
+  treat publication as a grant change or modify the asset/history/distribution.
 
-Next engineering work is the production-only correctness/feature closeout and
-final-candidate preparation above, **not** further parity instrumentation. Preserve
-completed positive/negative evidence; no unchanged artifact rebuild or repeated
-matrix without a specific validity change. Documentation-only reprioritisation
-requires no phone install, shader compilation or manual audio/haptic revalidation.
+The 1.6.1 engineering and release work is complete within the stated limits.
+Preserve completed positive/negative evidence; no unchanged artifact rebuild or
+repeated matrix without a specific validity change. Documentation-only updates
+require no phone install, shader compilation or manual audio/haptic revalidation.
 
 ## Authority and recovered state
 

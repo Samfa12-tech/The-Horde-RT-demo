@@ -1,0 +1,2 @@
+PASS: unchanged 1.6.0 shared updater selects public v1.6.1 and its verified release page.
+PASS: 1.6.1 is up to date. Platform dialog/device networking not exercised.

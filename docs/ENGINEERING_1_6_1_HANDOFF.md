@@ -1,4 +1,4 @@
-# 1.6.1 recovery handoff
+# 1.6.1 release closeout handoff
 
 Updated 2026-10-03. Branch: `codex/horde-1.6.1-engineering-pass`.
 Engineering work has resumed by explicit owner instruction; the goal is not complete. See [programme scope](ENGINEERING_1_6_1_PLAN.md)
@@ -12,10 +12,25 @@ cleanup. Final metadata-only package source is `a397757`; Windows ZIP `3e1cdca7`
 unchanged signed Android `bc5c7ce3`, manifest `c3aa1f3c`. Original freeze is
 preserved; exactly README/release notes/licence status changed in Windows, with
 executable/all69 assets unchanged. No phone or listening operation is queued.
-Next: push reviewed publisher/receipt changes, obtain current-head CI, run the
-canonical final preflight, publish exact artifacts, verify remote bytes/metadata,
-then update released facts/guards and merge. Later paragraphs preserve earlier
-checkpoints, not the current publication authority.
+Publication is complete: Windows itch2055201 and Android2055202 are ready at1.6.1;
+GitHub `v1.6.1` is a public non-draft prerelease at package sourcea397757. Downloaded
+Windows73 entries and signed APK match frozen bytes. Exact945f990 push37089806774
+and PR37089810005 pass all six CI lanes. Live public metadata is selected by the
+unchanged1.6.0 updater; no platform popup was retested. [Publication receipt](evidence/2026-10-03-release-publication/README.md)
+owns finite completed tests and hashes; do not rebuild, resign or re-upload.
+
+Post-publication guard0a6bd27 locks1.6.1/code9 before package/sign/upload side
+effects while preserving validation-only builds. Focused Release version/policy
+CTest3/3 passes; initial wrong-preset missing executable is retained separately,
+not a product regression. Next unfinished step: review/commit released docs and
+receipts, fresh closeout CI, update/normal-merge PR15, then preserve primary user
+work and recoverably archive only classified finished worktrees. No device,
+audio audition or renderer investigation is queued.
+
+## Earlier October3 preparation checkpoints — superseded by publication above
+
+The paragraphs in this section retain the sequence and original evidence scopes.
+Their pending publication/merge instructions are historical, not current gates.
 
 Owner now confirms the requested footstep/SFX, cuff and music checks are green,
 accepts performance **as measured** for1.6.1, and defers the final S24 matrix:

@@ -1,0 +1,14 @@
+Internal ctest changing into directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+Test project C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+    Start 26: horde_rt_version_contract_tests
+1/1 Test #26: horde_rt_version_contract_tests ...***Failed    0.02 sec
+FAIL: current README surface must preserve the latest published release: release/windows/README.txt
+
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.03 sec
+
+The following tests FAILED:
+	 26 - horde_rt_version_contract_tests (Failed)
+Errors while running CTest

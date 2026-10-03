@@ -2,13 +2,17 @@
 
 Last updated: 2026-10-03
 
-Current engineering state: accepted 1.6.1/code 9 within the documented limits;
-owner-authorised signing/freezing and exact signed S26 update/lifecycle smoke
-are complete, publication/merge withheld. The [current handoff](docs/ENGINEERING_1_6_1_HANDOFF.md),
+Current release: published Showcase Alpha 1.6.1 / Android code 9, accepted
+within the documented limits. Public itch builds, GitHub prerelease, artifact
+hashes and verification scopes are recorded in the [release receipt](docs/SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md)
+and [publication evidence](docs/evidence/2026-10-03-release-publication/). The
+[current handoff](docs/ENGINEERING_1_6_1_HANDOFF.md),
 [finding disposition](docs/ENGINEERING_1_6_1_FINDING_STATUS.md) and
 [release receipt](docs/SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md)
-supersede historical next-step directions below. S24 is working but not fully
-tested; S25 is unverified. Performance is accepted as measured, not 30 FPS at75%.
+supersede historical next-step directions below. The live updater parser selects
+1.6.1 from 1.6.0; the platform dialog/device-networking flow was not exercised.
+S24 is working but not fully tested; S25 is unverified. Performance is accepted
+as measured, not 30 FPS at 75%.
 The full graphics-options menu is planned for 1.6.2. Remaining High glass defects
 are future investigation, not passing. Do not restart accepted player/audio work.
 
@@ -18,17 +22,20 @@ are future investigation, not passing. Do not restart accepted player/audio work
 - Purpose: native Vulkan hardware-ray-tracing game/technology demo.
 - Principle: **RT or nothing**; unsupported devices receive honest diagnostics, never a fake fallback.
 - Primary target: Android phone. Equal validation target: Windows RTX.
-- Current release: **Showcase Alpha 1.6.0**, package version `1.6.0`, Android `versionCode 8`.
+- Current release: **Showcase Alpha 1.6.1**, package version `1.6.1`, Android `versionCode 9`; public itch builds `#2055201` (Windows) and `#2055202` (Android), plus public non-draft GitHub prerelease `v1.6.1` targeting package source `a397757249871b6b64fe5b77fc14f24e8cfcbb2b`.
+- Frozen GitHub Windows ZIP SHA-256: `3e1cdca75d78e02dbc3bb48553b1db68b6b4bf3e459a784e2be5473ad198c2cf` (remote digest verified; ZIP not downloaded); signed Android APK SHA-256: `bc5c7ce3c755c16ec39e2c16fa9eae01c31983c7393e645f881c5bcc9e6a346c` (downloaded and verified). The itch Windows payload was verified as a 73-entry directory; no recompressed itch ZIP hash is claimed. Current branch CI runs `37089806774` and `37089810005` both passed all six jobs at `945f990`.
+- Previous release: Showcase Alpha 1.6.0, package version `1.6.0`, Android `versionCode 8`; its original channel/build and artifact details below are historical.
 - Canonical downloads: https://samfa12.itch.io/the-horde. Samfa12.com links to itch rather than hosting a second copy; the live `/games/` card, itch link, GitHub link, thumbnail, and released status were rendered and verified on 2026-07-15.
 - Source: https://github.com/Samfa12-tech/The-Horde-RT-demo.
-- Windows itch channel: upload `#18339908`, build `#1931949`, `windows-x64`.
-- Android itch channel: upload `#18341739`, build `#1931951`, `android`.
-- Signed Android APK SHA-256: `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`.
-- Windows ZIP SHA-256: `7b0dcf24b4a47771a9c3a27cbc52e3899c87781109afcef20f7a9a8472411d77`.
+- Historical 1.6.0 Windows itch channel: upload `#18339908`, build `#1931949`, `windows-x64`.
+- Historical 1.6.0 Android itch channel: upload `#18341739`, build `#1931951`, `android`.
+- Historical signed 1.6.0 Android APK SHA-256: `52a64255ad5dec82cc866fb2ea3545be498ca06c73a789019be851c77e5d6c48`.
+- Historical 1.6.0 Windows ZIP SHA-256: `7b0dcf24b4a47771a9c3a27cbc52e3899c87781109afcef20f7a9a8472411d77`.
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
 - The release JKS and a local-only password note remain outside Git. The owner confirmed independent backup/recovery and authorised1.6.1 signing/freezing on October3; Codex does not mark owner-only checklist boxes or archive recovery material.
-- Release proof: `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
-- Published Fire/PBR/reward-lantern runtime lineage: feature runtime commit `a04dcb9`, final validation/provenance commit `41e9c6c`, and release source commit `57c81b6`. The exact accepted `SM-S948B` Debug APK is SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`. Final clean Host and 75%/100% exact-device runs pass, but instrumented feature medians are slow and Mobile dielectric budget terminals remain an explicit risk. The signed public APK has package/publication evidence only because no device was connected at publication. Evidence: `docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md`, `docs/TASK_9_OWNER_CANDIDATE_VALIDATION_2026-08-30.md`, and `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
+- Current release proof: `docs/SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md`; publication metadata, remote ZIP digest and downloaded-payload verification: `docs/evidence/2026-10-03-release-publication/`.
+- Previous release proof: `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
+- Historical 1.6.0 Fire/PBR/reward-lantern runtime lineage: feature runtime commit `a04dcb9`, final validation/provenance commit `41e9c6c`, and release source commit `57c81b6`. The exact accepted `SM-S948B` Debug APK is SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`. Final clean Host and 75%/100% exact-device runs pass, but instrumented feature medians were slow and Mobile dielectric budget terminals remained a risk for that release. Its signed APK initially had only package/publication evidence because no device was connected at publication; on 2026-08-31 it was subsequently installed and pulled back byte-for-byte on `SM-S948B`, with strict ASTC, `RayTracingPipeline`, honest RT presentation, Home/resume, and a short route smoke passing. See the dated evidence: `docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md`, `docs/TASK_9_OWNER_CANDIDATE_VALIDATION_2026-08-30.md`, and `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
 
 ## Locked creative direction
 

@@ -2,6 +2,28 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## Showcase Alpha 1.6.1 publication and acceptance — 2026-10-03
+
+Owner authorised signing/freezing, then publication, normal main integration and
+scoped cleanup. The immutable1.6.1/code9 packages are public: itch Windows
+`#2055201`, Android `#2055202`, and the non-draft GitHub prerelease `v1.6.1`
+at package source `a397757`. Exact artifact, downloaded-channel, CI and signed
+S26 update evidence is in [release validation](docs/SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md).
+The existing1.6.0 updater selects the public announcement; no automatic install
+or newly observed platform popup is claimed. Future updates require a new
+version and Android code greater than9; do not rebuild the published packages.
+
+Owner accepts the modelled player/cuff, music, independent SFX/music controls,
+footstep balance, reporting and performance as measured. Sustained30FPS at75%
+is not achieved; full graphics options are planned for1.6.2. Mobile omits actual
+lantern panes by quality profile while High retains complete physical transport.
+Remaining High glass defects/sub-pixel parity are future investigation, not
+passed gates. S24 is working but not fully tested, with final coverage explicitly
+deferred; S25 remains unverified. Hotstrike redistribution remains an owner issue,
+explicitly nonblocking publication, with no inferred licence grant or asset,
+history or source-distribution change. Earlier dated open-gate/publication-
+withheld statements below describe their checkpoints, not current authority.
+
 ## Mobile lantern open-aperture quality profile - 2026-10-01
 
 The owner deliberately defers physical reward-lantern panes in the Mobile

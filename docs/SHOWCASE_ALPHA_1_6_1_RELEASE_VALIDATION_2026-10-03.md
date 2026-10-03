@@ -1,4 +1,4 @@
-# Showcase Alpha1.6.1 — signed, frozen, unpublished candidate
+# Showcase Alpha1.6.1 — published release validation
 
 Initial package source checkpoint: `0c7db23beb5af1fd83b9a4d7cdf950386f6e0eea`.
 Final metadata-only package checkpoint: `a397757249871b6b64fe5b77fc14f24e8cfcbb2b`.
@@ -34,7 +34,8 @@ Final local directory: `releases/candidates/1.6.1-metadata-freeze-20261003-a3977
 
 The canonical provenance now selects this final directory/source/hash set.
 The initial provenance snapshot remains in the initial evidence receipt.
-Publication/merge is authorised, but no upload or merge is claimed until verified.
+Both itch channels and the non-draft GitHub prerelease are now public and verified;
+normal main integration is tracked separately. No frozen bytes were rebuilt.
 
 ### Initial freeze — retained unchanged
 
@@ -98,6 +99,7 @@ This is structural admission, not publication authorisation or a device test.
 
 | Lane | Actual result / boundary |
 | --- | --- |
+| Publication checkpoint945f990 | Push37089806774 and PR37089810005 completed success in all six lanes before publication. Initial stale portable README assertion failed atb4c6404; corrected source/fixture and fresh CI pass. Failure retained. |
 | Exact package-source push37084760313 and PR37084764357 | Both completed success, all six lanes, source0c7db23. Earlier93e6400 runs37083785643/37083790750 are also green. |
 | GCC / Clang portable hosts | Current six-lane compiler CI success; previous inspected current-source rosters59/59 each. No physical Vulkan device. |
 | MSVC portable host | CI success; inspected current-source roster65/65. Separate broader Windows tooling checks retain their own results. |
@@ -142,11 +144,26 @@ are separate evidence, not a full diagnostics UI pass. No performance matrix,
 email or accepted listening test was repeated. The exact Android compatibility
 record is updated; Horde is stopped and phone released.
 
-Publication and subsequent normal main integration are now explicitly authorised.
-The next unfinished step is fresh current-head CI and final-metadata preflight,
-then exact Butler uploads and a non-draft GitHub Release `v1.6.1`:
-installed1.6.0 selects it in the passing fixture, but itch alone cannot trigger
-the existing updater. The action opens a download page, not an automatic install.
-The real future update prompt remains post-publication evidence, not a preflight
-pass. Signed-update smoke is now separately proven; structural provenance
-preflight and owner publication authority remain distinct checks.
+## Verified publication and update announcement
+
+On October3 the guarded Butler publisher uploaded the exact final freeze:
+Windows itch `#2055201` (upload18339908) and Android `#2055202` (upload18341739)
+both report ready/version1.6.1. Downloaded public Windows73 payload entries match
+the frozen ZIP file-by-file; the public APK is exactly108,261,409 bytes/SHA-256
+`bc5c7ce3...a346c`. Butler recompresses the Windows directory, so its download ZIP
+hash is not claimed to equal the separately frozen GitHub archive.
+
+Public [GitHub v1.6.1](https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.1)
+is release402284385, non-draft/prerelease, published2026-10-03T02:33:39Z.
+Tag/target is exacta397757; all three uploaded asset sizes/SHA-256 digests match
+canonical provenance, and the public manifest was downloaded/hash-verified.
+The unchanged shared updater from1.6.0 selects1.6.1 against actual public API
+metadata; installed1.6.1 is up to date. This is live metadata/parser evidence,
+not a newly observed Windows/Android popup or network/lifecycle test. It opens
+a download page, never silently installs. See the [finite publication receipt](evidence/2026-10-03-release-publication/README.md).
+
+Post-publication guard0a6bd27 rejects1.6.1 package/sign/upload before side effects;
+focused Release version/policy CTest3/3 passes. Foundation validation retains
+explicitly unpublishable source-validation packages without reopening production
+packaging. Final docs/main integration/scoped cleanup are separate closeout work;
+no accepted runtime, frozen asset, listening or performance matrix is repeated.

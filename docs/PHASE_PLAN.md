@@ -1,6 +1,6 @@
 # Phase Plan
 
-> This file preserves the historical implementation sequence through published1.6.0; earlier “next” and “deferred” statements describe their dated snapshots. Current1.6.1 engineering, completed signing/S26 smoke, owner deferrals and release-operation boundaries are indexed by the [current handoff](ENGINEERING_1_6_1_HANDOFF.md) and [release receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md), not the historical July documentation checkpoint.
+> This file preserves the historical implementation sequence through published 1.6.0; earlier “next” and “deferred” statements describe their dated snapshots. Showcase Alpha 1.6.1 is now published. Its engineering limits, release facts and owner deferrals are indexed by the [current handoff](ENGINEERING_1_6_1_HANDOFF.md) and [release receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md), not the historical July documentation checkpoint.
 
 ## Phase 0 - Vulkan RT capability proof: complete
 
@@ -130,19 +130,18 @@ The runtime-only Android asset task is complete and reduced the debug APK from 9
 - Published Windows itch build `#1931949` and Android build `#1931951`. Exact source, hashes, Host gate, package, public-channel, Windows RT, and Android evidence boundaries are in `SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
 - At publication the exact signed 1.6.0 Android package had only static/certificate evidence because no ADB device was connected. On 2026-08-31 it was subsequently installed and pulled back byte-for-byte on `SM-S948B`; strict ASTC, `RayTracingPipeline`, honest RT presentation, Home/resume, and a short route smoke passed. The accepted exact Debug runtime remains the feature-timing/artistic evidence, while the signed smoke is functional/presentation evidence.
 
-## Current follow-up gates
+## Historical 1.6.1 follow-up gates
 
-The active 1.6.1 work order is now [the engineering programme](ENGINEERING_1_6_1_PLAN.md),
-updated by the owner on 2026-09-13: lean guidance, evidence/plan reconciliation,
-S24/S25 compatibility, remaining audit work plus adaptive music/player reporting,
-then comprehensive final-candidate validation. Targeted checks run during development;
-publication requires a separate explicit instruction.
+The former 1.6.1 work order is [the engineering programme](ENGINEERING_1_6_1_PLAN.md),
+updated by the owner on 2026-09-13 and completed for the published release. The
+dated follow-up directions below preserve their historical context; current
+release facts and remaining device/quality limits are in the release receipt.
 
 ### Historical 1.6.0 follow-up list
 
 The following list is retained as historical context, not the current execution
 order. Exact signed 1.6.0 installation/RT smoke was subsequently recorded above;
-it does not certify the forthcoming 1.6.1 candidate.
+at the time, it did not certify the then-forthcoming 1.6.1 candidate.
 
 1. Install the exact signed 1.6.0 APK on the authorised `SM-S948B`, pull it back byte-for-byte, and verify strict ASTC, honest RT presentation, reward progression, RT Lab retention/Back behavior, waterfall width, and Home/resume without treating earlier Debug evidence as signed-package proof.
 2. Preserve the completed integrated clean-build, test, shader-staleness, asset/licence, package, deterministic capture, developer-overlay, and player-benchmark foundations.

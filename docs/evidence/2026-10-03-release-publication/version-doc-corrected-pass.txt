@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+Test project C:/Users/sam_s/.codex/worktrees/horde-mobile-lantern-profile/the Horde RT Demo/build/foundation-validation/20261002-183151
+    Start 26: horde_rt_version_contract_tests
+1/1 Test #26: horde_rt_version_contract_tests ...   Passed    1.60 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.62 sec
