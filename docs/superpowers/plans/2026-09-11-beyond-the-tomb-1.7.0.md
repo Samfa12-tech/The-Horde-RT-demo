@@ -60,7 +60,7 @@ The original brainstorming described unloading the dungeon during climbing and c
 
 Working release label: **Showcase Alpha 1.7.0 — Beyond the Tomb**. This is a milestone subtitle, not a rename of Horde Lantern RT.
 
-Deliver one complete extension: existing dungeon → lantern reward → nighttime roof opening → companion's rope rescue → climb → woodland reunion → player-controlled lantern reveal → short companion-led forest trail → an authored atmospheric stopping point with continuing-story presentation.
+Deliver one complete extension: existing dungeon → Kit's post-skeleton skylight call → lantern reward → nighttime roof opening → companion's rope rescue → climb → woodland reunion → player-controlled lantern reveal → short companion-led forest trail → an authored atmospheric stopping point with continuing-story presentation.
 
 Required content: one starting cave-in, one coherent tomb/shaft/exterior entrance, one physical rope, one fully animated companion, one modest forest route, complete short-scene voice playback and subtitles, three-dimensional trees, mist/fog with real shadowed moon shafts, fireflies, forest ambience, and refreshed in-game controls/menus on both supported platforms.
 
@@ -79,6 +79,14 @@ Do not remove a required feature merely to finish quickly. When a required subsy
 At the existing spawn, turning approximately 180 degrees reveals a collapsed entrance, not a dressed-up flat wall. Use broken stone, dirt, a fractured arch and limited fallen timber consistent with the tomb. Show a blocked passage continuing beyond it where composition permits. Rubble must occupy real space, meet the floor and have a simple matching collision boundary. Keep the opening encounter and forward route clear.
 
 Do not simulate the collapse live. It already happened. A few settling particles/stone sounds are optional; the geometry must communicate the event without them. A second exterior view of the blocked original doorway, visible from the upper clearing, can explain why the companion could not simply walk in.
+
+### 4.1a Kit's first call through the skylight
+
+**Owner direction, 3 October 2026:** After the skeleton encounter, Kit calls down as the player approaches/passes the existing small skylight/grate. This is Kit's first in-dungeon introduction, before the later rope rescue. Reuse the deeper shaft and hanging growth specified by owner report **3696c1a2-5fb3-4476-aaeb-456a130837d8** in [the 1.6.2 goal](../../IMPLEMENTATION_GOAL_1_6_2.md#new-owner-screenshot-reports-3-october-2026); resolve the exact anchor and approach zone from the accepted scene and original authorised evidence, not guessed coordinates. This call does not open the grate, reveal the rescue route early or assume lantern ownership.
+
+Kit is unseen above the grate. A fixed world-space voice source at its upper opening should draw attention naturally, using the shared directional SFX/listener infrastructure with a separate Dialogue gain bus. No camera grab, forced interaction or player reply. The call acknowledges the collapse, reassures the player that treasure is ahead and warns them to be careful; it reveals no lantern/prison lore. Script and trigger contract: Sections 7.3–7.4.
+
+The deeper shaft/growth remains 1.6.2 environment polish. The voiced introduction, trigger and dialogue/subtitle controls belong to 1.7 after its start gate; this addition does not expand active 1.6.2 implementation.
 
 ### 4.2 Reward and night opening
 
@@ -190,6 +198,8 @@ Walking follows an authored collision-aware route with stopping points and speed
 
 Ship actual offline voice audio for the mandatory exchange, with one consistent Kit voice. The player is silent: do not produce player dialogue clips. Owner recordings, a licensed synthetic voice or authorized actors are acceptable. Do not clone or imitate an identifiable real person without authorization. Select/verify any provider and commercial distribution terms before paid generation; no provider, subscription or specific model is assumed by this plan.
 
+**Voice direction, 3 October 2026:** The owner imagines an English accent with a medieval-fantasy feel; no exact regional dialect is selected. Treat this as a modern performance direction, not a claim of a historically authentic universal medieval accent. A light northern English/Yorkshire-inspired delivery with warmth, practicality and dry humour is a provisional audition option; a softer southern English option can provide a comparison. Keep regional colouring subtle and words intelligible, especially through the grate. Final casting/accent requires listening and owner choice. This planning addition authorises no voice generation or spending.
+
 Store lossless source recordings outside runtime packaging; produce normalized, trimmed mono runtime clips through the accepted audio pipeline. Record provider/performer permission, voice identifier, generation/recording date, source hash and derivative processing. No API keys, private account data or signed temporary download URLs in Git. Gameplay must run offline, with no live TTS or network request on an interaction.
 
 Subtitles and temporary voice are valid development scaffolding, but **subtitles-only is not completion** of the scoped voiced scene.
@@ -200,6 +210,7 @@ These are provisional implementation script defaults, updated for the owner-appr
 
 | Line ID | Speaker / delivery | Text | Trigger |
 |---|---|---|---|
+| `prologue.kit_grate` | Kit, concerned call from above the skylight/grate; unseen | Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful! | First eligible approach after the skeleton encounter is resolved, before later rescue; see contract below. |
 | `rescue.found` | Companion, relief calling down | There you are! I thought that cave-in had buried you. | Roof sufficiently open; actor in position. |
 | `rescue.rope` | Companion, practical | Hold on. Rope coming down. | After first line; rope throw prepared. |
 | `reunion.question` | Companion, eager but believable | Did you find it? Tell me you found it. | Player safely at summit and companion at reunion mark. |
@@ -209,13 +220,24 @@ These are provisional implementation script defaults, updated for the owner-appr
 | `reunion.first_piece` | Kit, thoughtful | A start, then. Let's see where it leads. | After wonder reaction; provisional wording, no claim to know the prison's nature. |
 | `reunion.depart` | Companion, quiet purpose | Good. Let's find the rest. | Exchange complete; begin trail-leading state. |
 
+The `prologue.kit_grate` text preserves the owner's proposed line with light punctuation/capitalisation cleanup. It is a **draft, not approved final recording copy**; keep its ID stable when wording changes. The later `rescue.found` wording is also provisional: author it as renewed contact after this earlier call, not a contradictory first introduction.
+
+**Grate trigger and overlap contract**
+- Trigger once on the first eligible approach through the authored zone after the skeleton encounter resolves. No look-at requirement, stopping requirement or mandatory acknowledgement; allow the player to walk past. Use authoritative encounter/player state, not audio completion, to establish eligibility.
+- If combat or a higher-priority story line is active, defer while the player remains in a sensible audible approach area. Cancel stale pending delivery once they leave that area or enter the later rescue; a missed call must not play remotely or block progression. A later eligible return before rescue can trigger an unheard call.
+- If combat resumes during playback, suspend/end the introduction safely without suppressing critical combat cues, locking input or looping the line. Do not automatically restart from the beginning on every re-entry. Track pending, started and consumed state; completion, explicit skip or combat interruption consumes the one-shot for the run. Normal pause/resume continues through generation-safe dialogue handling.
+- Persist the consumed flag with applicable checkpoint progress; restoring that progress must not replay the call. A deliberate fresh run resets it. Missing audio uses subtitle/fallback timing and cannot gate the lich, reward, roof or rope. Starting a save beyond this encounter must not retroactively inject the call.
+- Verify first approach, early approach during combat, pass-by, backtrack, distance boundary, overlap, skip, pause/resume, checkpoint restore and stale callbacks. Preserve the silent player and later rescue/reunion semantics.
+
 The hint is conditional, not an extra line forced into every playthrough. Do not require camera aim at the NPC for quest progress. The answer event is nonverbal; do not trigger Kit's response before the lantern has reached its presented pose. The story context can use a short objective such as `The Horde — follow your companion`; do not add a lore monologue.
 
 ### 7.4 Dialogue infrastructure
 
 Use a small line manifest: stable line ID, speaker/entity, subtitle, audio asset, gesture, start condition, once-per-run/checkpoint policy and skip/completion behavior. A dialogue controller sequences state; platform backends play audio and report completion with a generation/line token. Stale completion messages must be ignored after pause/reset/reload or a skip. Audio duration/metadata provides a bounded fallback when playback fails, so missing audio cannot lock the game.
 
-Subtitles default on, with speaker label, configurable size and opaque-enough scrim. Companion speech is world-positioned with distance/pan and appropriate interior-to-exterior treatment; the player has no speech channel or spoken lines. Future lantern-entity voice positioning is a separate scoped design decision. Retain intelligibility, and do not bake tomb reverb permanently into a clip also heard outside. Use subtle animation/head/jaw response if the rig supports it, but cinematic phoneme-perfect facial animation is not required.
+Subtitles default on, with an explicit persisted on/off option, speaker label, configurable size and opaque-enough scrim. On mobile, place them near the top within the safe area, clear of cutouts, vitality/objective/pause HUD and touch controls; adapt wrapping and reserved HUD space at large font scales rather than overlaying essential information. Retain legibility on bright sky and dark stone. Companion speech is world-positioned with distance/pan and appropriate interior-to-exterior treatment; the player has no speech channel or spoken lines. Future lantern-entity voice positioning is a separate scoped design decision. Retain intelligibility, and do not bake tomb reverb permanently into a clip also heard outside. Use subtle animation/head/jaw response if the rig supports it, but cinematic phoneme-perfect facial animation is not required.
+
+Provide an independent persisted **Dialogue** volume slider, separate from **Music** and **SFX/Ambience**, as specified in Section 10. Dialogue zero must not mute other buses or disable enabled subtitles. Reuse shared spatial sound infrastructure rather than creating another audio engine. For the grate call, test a fixed source above the player while turning, approaching and walking away: bounded distance attenuation and shaft/stone occlusion should convey location without making the words unintelligible. Preserve comprehension through subtitles with speaker/location context (for example, `Kit, above`) when stereo direction/elevation is unavailable, including mono phone output. Do not require hearing spatial cues to progress or claim universal elevation localisation on phone speakers.
 
 Dialogue can pause/resume with gameplay. Provide an explicit skip for the current spoken line; skip is not the gameplay Interact action and must not skip the player-controlled raise lesson. Missing optional audio falls back to subtitle timing and a diagnostic. Story events are exactly-once state transitions, never dependent on the player hearing the clip.
 
@@ -503,8 +525,8 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 - [ ] Produce and clean the textured companion, author/repair required clips and event markers in Blender, and verify them in the runtime, not just the asset viewer.
 - [ ] Add failing tests for rope-release marker exactly once, NPC identity continuity, wait-for-player behavior and path nonblocking.
 - [ ] Record/generate authorized voices, validate/normalize clips and license metadata, and implement generation-safe playback/subtitle sequencing.
-- [ ] Add failing dialogue tests for missing audio, stale completion, pause/resume, line skip, repeated hints, and requiring a fresh reunion raise action.
-- [ ] Complete the actual lower-call → throw → reunion → manual raise → depart scene, with world-space light/audio and bounded look-at.
+- [ ] Add failing dialogue tests for missing audio, stale completion, pause/resume, line skip, repeated hints, and requiring a fresh reunion raise action. Cover the Section 7.3 grate one-shot, encounter/overlap deferral, pass-by/backtracking and persisted consumed state; verify upper-source direction, distance/occlusion intelligibility, independent Dialogue mute and mobile top-safe-area subtitles.
+- [ ] Complete the actual post-skeleton grate call → later lower-call → throw → reunion → manual raise → depart scene, with world-space light/audio and bounded look-at.
 
 **Gate:** All mandatory spoken lines play offline, the actor moves convincingly, and no audio/animation failure blocks progression. **Audio/haptic check:** YES for voice/spatial/mix changes.
 
@@ -560,7 +582,7 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 
 Add stable, versioned fixtures/checkpoints along these lines, adapting names to the final capture schema:
 
-`opening-cavein`, `rescue-roof-night`, `rescue-rope-deploy`, `rescue-rope-ready`, `rescue-climb-mid`, `rescue-summit`, `reunion-lantern-low`, `reunion-lantern-raised`, `forest-dense-mist`, `forest-trail-bend`, `forest-endpoint`.
+`opening-cavein`, `prologue-kit-grate`, `rescue-roof-night`, `rescue-rope-deploy`, `rescue-rope-ready`, `rescue-climb-mid`, `rescue-summit`, `reunion-lantern-low`, `reunion-lantern-raised`, `forest-dense-mist`, `forest-trail-bend`, `forest-endpoint`.
 
 Cover the legacy dungeon route as well. Verify the exact visible source/zone, stable presented frames, shader identity and artifact hashes. Scene-only captures and UI-on captures are separate. New deterministic particles/wind/rope use controlled seeds and imported snapshot state; do not require byte-identical images across different GPUs without justification.
 
