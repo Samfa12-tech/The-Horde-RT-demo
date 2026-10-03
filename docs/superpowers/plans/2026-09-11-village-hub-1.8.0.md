@@ -8,6 +8,8 @@
 
 > Implement only after 1.7.0 has been made, tested on the supported devices and accepted by the owner. Do not expand the unfinished 1.6.1 engineering pass or the agreed 1.7 chapter to start village work. Re-audit the accepted 1.7 baseline and write the concrete implementation/test plan at that point.
 
+**Dialogue authoring draft, 3 October 2026:** See [the whole-campaign bank](../../CAMPAIGN_DIALOGUE_BANK.md#5-village-arrival-first-lead-and-first-small-expedition) for proposed arrival, useful services, access preparation and progress-aware return scenes. It separates canon from new connective tissue and preserves either dungeon order. These are reviewable story examples, not a commitment to deliver the entire bank in 1.8.
+
 ## 1. Purpose and owner direction
 
 Extend the moonlit woodland into a small, believable village with a few explorable houses/interiors, a tavern and NPCs. The settlement should become the recurring hub for later adventures, while the tavern reveals more about the wider **Horde**.
