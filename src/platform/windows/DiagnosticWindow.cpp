@@ -63,6 +63,8 @@
 #include "gameplay/FeedbackTiming.h"
 #include "gameplay/ShowcaseBenchmark.h"
 #include "telemetry/RtBenchmarkEvidenceRun.h"
+#include "telemetry/BenchmarkSummary.h"
+#include "reporting/BenchmarkSummaryReport.h"
 #include "telemetry/RtEvidencePublication.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/LanternBenchmarkScenario.h"
@@ -141,6 +143,7 @@ constexpr int kBenchmarkTitleId = 120;
 constexpr int kBenchmarkCopyButtonId = 121;
 constexpr int kBenchmarkSaveButtonId = 122;
 constexpr int kBenchmarkBackButtonId = 123;
+constexpr int kBenchmarkReviewStatsButtonId = 205;
 constexpr int kVitalityHudControlId = 124;
 constexpr int kEndingBodyId = 125;
 constexpr int kWaterQualityButtonId = 126;
@@ -282,6 +285,13 @@ struct ShowcaseCaptureRecord
     std::array<float, 3u> rewardRingGripPosition{};
     std::array<float, 3u> rewardBodyPosition{};
     std::vector<double> frameTimesMs;
+};
+
+struct WindowsBenchmarkSummaryArm
+{
+    horde::telemetry::BenchmarkSummaryConfiguration configuration;
+    horde::graphics::GraphicsSettings applied;
+    horde::vulkan::raytracing::RtSceneProfile profile = horde::vulkan::raytracing::RtSceneProfile::Showcase;
 };
 
 struct VulkanSurfaceContext
@@ -480,6 +490,8 @@ struct VulkanSurfaceContext
         horde::vulkan::raytracing::RtWorkloadPreset::Authored;
     std::string benchmarkCompiledQualityAtStart;
     horde::telemetry::RtBenchmarkEvidenceRun benchmarkEvidence;
+    std::optional<WindowsBenchmarkSummaryArm> benchmarkSummaryArm;
+    std::optional<horde::telemetry::FrozenBenchmarkSummary> benchmarkSummary;
     std::optional<std::size_t> expectedBenchmarkFrame;
     std::string benchmarkReport;
     std::string benchmarkJsonReport;
@@ -1983,10 +1995,12 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle, kEditControlId,
                       context.diagnosticsVisible || context.benchmarkReportVisible);
     for (const int id : {kBenchmarkTitleId, kBenchmarkCopyButtonId,
-                         kBenchmarkSaveButtonId, kBenchmarkBackButtonId})
+                         kBenchmarkSaveButtonId, kBenchmarkReviewStatsButtonId, kBenchmarkBackButtonId})
     {
         SetControlVisible(context.windowHandle, id, context.benchmarkReportVisible);
     }
+    EnableWindow(GetDlgItem(context.windowHandle, kBenchmarkReviewStatsButtonId),
+        context.benchmarkSummary && context.benchmarkSummary->IsReady() && !context.benchmark.IsRunning());
     for (const int id : {kRtLabPanelId, kRtLabTitleId, kRtLabTelemetryId,
                          kRtLabWaterfallLabelId, kRtLabWaterfallSliderId,
                          kRtLabRoofLabelId, kRtLabRoofSliderId,
@@ -2541,6 +2555,8 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(
     return metadata;
 }
 
+#include "platform/windows/WindowsBenchmarkSummaryReview.inl"
+
 void UpdateBenchmarkHud(VulkanSurfaceContext& context)
 {
     if (HWND hud = GetDlgItem(context.windowHandle, kHudControlId))
@@ -2557,6 +2573,8 @@ void StartBenchmark(VulkanSurfaceContext& context,
                     const horde::vulkan::raytracing::RtWorkloadPreset rtWorkloadPreset =
                         horde::vulkan::raytracing::RtWorkloadPreset::Authored)
 {
+    context.benchmarkSummaryArm.reset();
+    context.benchmarkSummary.reset();
     ResetRoute(context);
     // Route resets restore authored tuning; apply only the explicit existing
     // preset afterwards, including the unattended Release path.
@@ -2614,6 +2632,8 @@ void CancelBenchmark(VulkanSurfaceContext& context, const bool showMenu, const c
         return;
     }
     LogBenchmarkCancellation(context, trigger);
+    context.benchmarkSummaryArm.reset();
+    context.benchmarkSummary.reset();
     context.benchmark.Cancel();
     context.benchmarkEvidence.Cancel();
     ResetRoute(context);
@@ -2646,6 +2666,9 @@ void CompleteBenchmark(VulkanSurfaceContext& context,
         (void)context.benchmarkEvidence.RecordOwnerDrainResult(drained);
         (void)context.benchmarkEvidence.Finalize();
     }
+    // Optional local review copies completed owner evidence before ResetRoute.
+    // It never changes the legacy outcome, automatic files or unattended runs.
+    FreezeWindowsBenchmarkSummary(context, capabilities);
     const horde::gameplay::ShowcaseBenchmarkMetadata metadata =
         BuildBenchmarkMetadata(context, capabilities);
     context.benchmarkReport = context.benchmark.BuildTextReport(metadata, &context.benchmarkEvidence);
@@ -3076,7 +3099,7 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
         kGraphicsOpenButtonId, kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsGlassButtonId,
         kGraphicsApplyButtonId, kGraphicsConfirmButtonId, kGraphicsRevertButtonId, kGraphicsResetButtonId,
         kGraphicsPreviewPauseId, kGraphicsPreviewCameraId, kGraphicsPreviewMotionId, kGraphicsPreviewResetId,
-        kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
+        kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkReviewStatsButtonId, kBenchmarkBackButtonId,
         kRtLabWaterfallSliderId, kRtLabRoofSliderId, kRtLabDawnSliderId,
         kRtLabFogSliderId, kRtLabFireStrengthSliderId, kRtLabFireTurbulenceSliderId,
         kRtLabFireSmokeSliderId, kRtLabGlassVisibilitySliderId,
@@ -3587,6 +3610,7 @@ void UpdateDesktopSceneControls(
                     (void)context.rtFrameEvidence.ApplyEvent(horde::telemetry::RtLifecycleEvent::WarmupToMeasure);
                 const auto state = context.rtFrameEvidence.PublishedStateByValue();
                 (void)context.benchmarkEvidence.ArmMeasurement(state.sceneEpoch, state.measurementGeneration);
+                ArmWindowsBenchmarkSummary(context);
             }
             if (context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
                 context.expectedBenchmarkFrame = context.benchmarkEvidence.ExpectFrame(
@@ -6362,7 +6386,7 @@ void ApplyDpiScaledFonts(HWND window)
     for (const int id : {kHudControlId, kVitalityHudControlId, kChestPromptControlId, kPauseTitleId, kEndingBodyId, kResumeButtonId, kRestartButtonId,
                          kControlsButtonId, kSettingsButtonId, kReportProblemButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
                          kMoreBySamfa12ButtonId, kExitButtonId, kBenchmarkTitleId,
-                         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId,
+                         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkReviewStatsButtonId, kBenchmarkBackButtonId,
                          kSettingsTitleId, kSfxVolumeLabelId, kSfxVolumeSliderId,
                          kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
                          kRenderScaleSliderId, kMusicVolumeLabelId, kMusicVolumeSliderId,
@@ -6459,10 +6483,10 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
             MoveWindow(edit, inset, editY, width - inset * 2,
                        std::max(ScaleForDpi(window, 100), reportButtonY - reportGap - editY), TRUE);
         }
-        const int availableWidth = width - inset * 2 - reportGap * 2;
-        const int reportButtonWidth = availableWidth / 3;
+        const int availableWidth = width - inset * 2 - reportGap * 3;
+        const int reportButtonWidth = availableWidth / 4;
         int reportX = inset;
-        for (const int id : {kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkBackButtonId})
+        for (const int id : {kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkReviewStatsButtonId, kBenchmarkBackButtonId})
         {
             if (HWND control = GetDlgItem(window, id))
             {
@@ -7317,6 +7341,11 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
                 OpenSamfa12Website(hWnd);
                 return 0;
+            case kBenchmarkReviewStatsButtonId:
+                if (!sceneContext->benchmark.IsRunning() && sceneContext->benchmarkSummary &&
+                    sceneContext->benchmarkSummary->IsReady())
+                    ShowWindowsBenchmarkSummaryReview(hWnd, *sceneContext->benchmarkSummary);
+                return 0;
             case kBenchmarkCopyButtonId:
                 if (!CopyTextToClipboard(hWnd, sceneContext->benchmarkReport))
                 {
@@ -8112,6 +8141,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createStatic(kBenchmarkTitleId, "BENCHMARK REPORT  |  SELECTABLE TEXT", SS_CENTER | SS_CENTERIMAGE);
     createButton(kBenchmarkCopyButtonId, "COPY REPORT");
     createButton(kBenchmarkSaveButtonId, "SAVE AS...");
+    createButton(kBenchmarkReviewStatsButtonId, "REVIEW STATS...");
     createButton(kBenchmarkBackButtonId, "BACK TO MENU");
     createStatic(kSettingsTitleId, "SETTINGS  |  SAVED BESIDE THE DEMO", SS_CENTER | SS_CENTERIMAGE);
     createButton(kGraphicsOpenButtonId, "GRAPHICS...");

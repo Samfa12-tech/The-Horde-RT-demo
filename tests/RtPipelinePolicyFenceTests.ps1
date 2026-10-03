@@ -133,8 +133,9 @@ $windowsPreviewCapture = Get-Content -LiteralPath (Join-Path $repoRoot 'src\plat
 $windowsResizeValidation = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\WindowsOutputResizeValidation.inl') -Raw
 $windowsMotionValidation = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\WindowsMotionEvidenceValidation.inl') -Raw
 $windowsMotionLaunch = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\WindowsMotionEvidenceLaunch.h') -Raw
+$windowsBenchmarkSummaryReview = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\WindowsBenchmarkSummaryReview.inl') -Raw
 # Included platform code has the same policy boundary as its translation unit.
-$windowsHost += $windowsPreviewCapture + $windowsResizeValidation + $windowsMotionValidation + $windowsMotionLaunch
+$windowsHost += $windowsPreviewCapture + $windowsResizeValidation + $windowsMotionValidation + $windowsMotionLaunch + $windowsBenchmarkSummaryReview
 $androidHost = Get-Content -LiteralPath (Join-Path $repoRoot 'android\app\src\main\cpp\android_probe_bridge.cpp') -Raw
 $foundationRunner = Get-Content -LiteralPath (Join-Path $repoRoot 'tools\run-foundation-validation.ps1') -Raw
 $androidRunner = Get-Content -LiteralPath (Join-Path $repoRoot 'tools\run-android-showcase-validation.ps1') -Raw

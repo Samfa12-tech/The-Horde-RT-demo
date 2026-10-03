@@ -12,12 +12,14 @@ struct OpaqueDressingQuad
     std::array<DressingPoint, 4u> vertices;
     unsigned int normalCode;
 };
+enum class DressingLeafPlane { Horizontal, WallFacing };
 
 // Static opaque mesh authoring data. Leaves have an actual diamond silhouette
 // and thickness: no alpha cards, invisible obstruction or extra texture fetch.
 // This recipe can be instanced/consolidated for any supported masonry rim.
 inline std::vector<OpaqueDressingQuad> MakeHangingSprig(
-    DressingPoint attachment, float length, float phase)
+    DressingPoint attachment, float length, float phase,
+    DressingLeafPlane leafPlane = DressingLeafPlane::Horizontal)
 {
     std::vector<OpaqueDressingQuad> result;
     result.reserve(84u);
@@ -63,6 +65,7 @@ inline std::vector<OpaqueDressingQuad> MakeHangingSprig(
         // at their shared endpoint even when the curve changes lateral axis.
         box(lo,hi);
         if (i == 0u || i == 7u) continue;
+        const auto leafBegin = result.size();
         const float x=(start[0]+end[0])*0.5f;
         const float y=(start[1]+end[1])*0.5f;
         const float z=(start[2]+end[2])*0.5f;
@@ -88,6 +91,21 @@ inline std::vector<OpaqueDressingQuad> MakeHangingSprig(
         };
         quad(a,aa,bb,b,edgeNormal(a,b));quad(b,bb,cc,c,edgeNormal(b,c));
         quad(c,cc,dd,d,edgeNormal(c,d));quad(d,dd,aa,a,edgeNormal(d,a));
+        if (leafPlane == DressingLeafPlane::WallFacing)
+        {
+            // Rotate the closed leaf around its attached root, not the stem.
+            // This is ordinary authored orientation with shared axis normals.
+            constexpr std::array<unsigned,6u> rotatedNormal{{5u,4u,2u,3u,0u,1u}};
+            for (auto face = leafBegin; face < result.size(); ++face)
+            {
+                for (auto& point : result[face].vertices)
+                {
+                    const float dy = point[1] - y, dz = point[2] - z;
+                    point[1] = y + dz; point[2] = z - dy;
+                }
+                result[face].normalCode = rotatedNormal[result[face].normalCode];
+            }
+        }
     }
     return result;
 }
@@ -97,6 +115,7 @@ struct HangingSprigPlacement
     DressingPoint attachment;
     float length;
     float phase;
+    DressingLeafPlane leafPlane = DressingLeafPlane::Horizontal;
 };
 inline constexpr float kWaterShaftTopWorldY=5.60f;
 inline constexpr std::array<HangingSprigPlacement,3u> kWaterShaftSprigs{{
@@ -106,5 +125,11 @@ inline constexpr std::array<HangingSprigPlacement,3u> kWaterShaftSprigs{{
     {{-2.898f,5.58f,-15.72f},4.70f,-0.4f},
     {{-1.582f,5.58f,-15.64f},3.40f,2.1f},
     {{-2.65f,5.58f,-14.722f},4.95f,1.6f},
+}};
+// Restrained wall growth rooted on the two retained masonry jambs. The central
+// four-bar access panel remains readable; no new light, alpha card or material.
+inline constexpr std::array<HangingSprigPlacement,2u> kWallPanelSprigs{{
+    {{2.052f,1.18f,-8.801f},0.96f,0.7f,DressingLeafPlane::WallFacing},
+    {{3.098f,1.22f,-8.801f},1.18f,2.4f,DressingLeafPlane::WallFacing},
 }};
 } // namespace horde::scene

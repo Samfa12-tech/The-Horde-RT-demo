@@ -1,6 +1,7 @@
 #pragma once
 
 #include "telemetry/BenchmarkSummary.h"
+#include <optional>
 
 namespace horde::reporting
 {
@@ -8,7 +9,7 @@ inline constexpr std::size_t kBenchmarkSummaryReportMaxBytes = 16u * 1024u;
 inline constexpr std::string_view kBenchmarkSummaryReportKind = "benchmark-summary";
 enum class BenchmarkSummaryReportStatus : std::uint8_t
 {
-    Ready, ConsentRequired, InvalidSummary, InvalidIdentity, InvalidTimestamp, InvalidLabel, TooLarge,
+    Ready, ConsentRequired, InvalidSummary, InvalidIdentity, InvalidTimestamp, InvalidLabel, TooLarge, InvalidCooling,
 };
 enum class BenchmarkSummaryContentMatch : std::uint8_t { Invalid, DifferentId, SameContent, Conflict };
 struct BenchmarkSummaryReportApproval
@@ -19,6 +20,9 @@ struct BenchmarkSummaryReportApproval
     bool includeBasicHardware = false;
     std::string_view reportUuid;
     std::string_view capturedAtUtc;
+    // Optional end-screen declaration; not a sensor measurement or a mutation
+    // of the immutable measured evidence. Omission preserves capture metadata.
+    std::optional<horde::telemetry::BenchmarkSummaryCooling> declaredCooling;
 };
 class PreparedBenchmarkSummaryReport;
 [[nodiscard]] PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(

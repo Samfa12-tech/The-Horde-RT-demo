@@ -648,6 +648,9 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_windows_glass_graphics_contract_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/WindowsGlassGraphicsContracts.ps1)
+        add_test(NAME horde_rt_windows_benchmark_summary_review_contract_tests
+            COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/WindowsBenchmarkSummaryReviewContracts.ps1)
         add_test(NAME horde_rt_pipeline_policy_execution_tests
             COMMAND ${HORDE_RT_POWERSHELL_EXECUTABLE} -NoProfile -File
                 ${CMAKE_CURRENT_SOURCE_DIR}/tests/RtPipelinePolicyExecutionTests.ps1

@@ -186,4 +186,22 @@
     <string name="keeper_reveal_title">THE FOURTH KEEPER</string>
     <string name="graphics_restored">Confirmed graphics settings restored after an interrupted change.</string>
     <string name="graphics_save_failed">Graphics could not be saved. Restoring the previous confirmed settings.</string>
+    <string name="benchmark_summary_review">Review benchmark statistics</string>
+    <string name="benchmark_summary_local_only">Local review and export only</string>
+    <string name="benchmark_summary_scope">Review a completed run before sharing. This report contains settings and owning frame, CPU and GPU timings. GPU duration is not FPS, and display scanout FPS was not measured. Temperature was not collected and thermal status is unknown. Statistics sending is unavailable in this build; nothing is sent automatically.</string>
+    <string name="benchmark_summary_consent">Prepare a local statistics report for review</string>
+    <string name="benchmark_summary_hardware">Include phone model, GPU name and Vulkan version (optional)</string>
+    <string name="benchmark_summary_cooling_help">Cooling during this run (optional declaration, not a measurement)</string>
+    <string-array name="benchmark_summary_cooling">
+        <item>Unknown / prefer not to declare</item>
+        <item>No external cooling declared</item>
+        <item>External cooling declared</item>
+    </string-array>
+    <string name="benchmark_summary_prepare">Prepare exact JSON</string>
+    <string name="benchmark_summary_prepared">Exact prepared report below. Copy or Save shares only these reviewed bytes. Edits require a new report ID and fresh consent.</string>
+    <string name="benchmark_summary_copy">Copy reviewed JSON</string>
+    <string name="benchmark_summary_save">Save reviewed JSON</string>
+    <string name="benchmark_summary_edit">Edit choices (requires new consent)</string>
+    <string name="benchmark_summary_unavailable">A complete matching benchmark summary is unavailable. Nothing was prepared or sent.</string>
+    <string name="benchmark_summary_picker_pending">Finish or dismiss the previous document picker before saving another report.</string>
 </resources>

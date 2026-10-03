@@ -149,6 +149,17 @@ void TestCompletedFreezePrivacyAndPopulation()
     const auto optIn = PrepareBenchmarkSummaryReport(summary, Approval(true));
     Check(optIn.IsReady() && optIn.Json().find("Nonunique model") != std::string_view::npos &&
         optIn.Json().find("Test GPU") != std::string_view::npos, "separate basic hardware opt-in changes only approved bytes");
+    auto coolingApproval = Approval();
+    coolingApproval.declaredCooling = BenchmarkSummaryCooling::ExternalDeclared;
+    const auto coolingReport = PrepareBenchmarkSummaryReport(summary, coolingApproval);
+    Check(coolingReport.IsReady() && coolingReport.Json().find("external-declared") != std::string_view::npos &&
+        summary.Data().cooling == BenchmarkSummaryCooling::Unknown &&
+        PrepareBenchmarkSummaryReport(summary, Approval()).Json() == json,
+        "end-screen cooling declaration leaves immutable measured evidence and prior approved bytes unchanged");
+    coolingApproval.declaredCooling = static_cast<BenchmarkSummaryCooling>(255u);
+    const auto invalidCooling = PrepareBenchmarkSummaryReport(summary, coolingApproval);
+    Check(invalidCooling.Status() == BenchmarkSummaryReportStatus::InvalidCooling && invalidCooling.Json().empty(),
+        "invalid end-screen cooling enum yields no exportable bytes");
     owners.benchmark.Start(); Check(owners.evidence.Start(2u), "new owner run replaces local evidence");
     config.metadata.buildIdentity = "later-build";
     Check(PrepareBenchmarkSummaryReport(summary, Approval()).Json() == json, "freeze survives route/reset/source-owner changes");

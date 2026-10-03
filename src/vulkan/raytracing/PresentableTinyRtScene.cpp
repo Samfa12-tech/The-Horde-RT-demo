@@ -2955,18 +2955,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addWorldQuad({{-1.84f, -0.32f, -0.82f}}, {{-1.84f, 0.24f, -0.62f}}, {{-1.84f, 0.42f, -1.12f}}, {{-1.84f, -0.12f, -1.34f}}, SurfaceMirror, SurfaceRight);
     addWorldQuad({{1.84f, -0.44f, 0.24f}}, {{1.84f, -0.02f, 0.5f}}, {{1.84f, 0.28f, 0.1f}}, {{1.84f, -0.18f, -0.2f}}, SurfaceMirror, SurfaceLeft);
     addWorldQuad({{-0.52f, -0.94f, -0.86f}}, {{0.34f, -0.94f, -0.64f}}, {{0.64f, -0.94f, -1.18f}}, {{-0.38f, -0.94f, -1.42f}}, SurfaceAgedMetal, SurfaceUp);
-    // Four physical roof slabs surround one broken opening in room two. The
-    // moon query sees this real breach, producing one composed floor/wall patch
-    // instead of several ruler-straight stripes across the entire room.
+    // Close the former irregular entry breach with the same opaque roof and
+    // shared clearance data. The independent waterfall/finale openings remain.
     addCeilingPatch(1u);
     addCeilingPatch(2u);
     addCeilingPatch(3u);
     addCeilingPatch(4u);
-    // One bounded thin clear pane closes the irregular roof breach. Primary
-    // rays route through the glass material while visibility rays treat it as
-    // non-occluding, preserving the physically open moon direction.
-    if (glassEnabled_)
-        addWorldQuad({{-0.55f, 1.33f, -3.45f}}, {{-0.72f, 1.33f, -5.20f}}, {{0.62f, 1.33f, -5.05f}}, {{0.32f, 1.33f, -3.55f}}, SurfaceClearGlass, SurfaceDown);
+    addCeilingPatch(22u);
     for (std::uint32_t i = 0u; i < 8u; ++i)
     {
         const float x = -1.05f + static_cast<float>(i % 4u) * 0.7f + (i >= 4u ? 0.18f : 0.0f);
@@ -3259,6 +3254,22 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const float x = 2.20f + static_cast<float>(i) * 0.25f;
         addWorldBox(x, -0.78f, -8.82f, x + 0.045f, 0.82f, -8.76f, SurfaceAgedMetal);
     }
+    // Two masonry-rooted side sprigs frame the retained central bars. Their
+    // wall-facing leaves are real closed geometry using the existing moss tint.
+    for (const auto& sprig : horde::scene::kWallPanelSprigs)
+    {
+        const auto dressing = horde::scene::MakeHangingSprig(
+            sprig.attachment, sprig.length, sprig.phase, sprig.leafPlane);
+        for (const auto& face : dressing)
+        {
+            const auto vertex = [&face](std::size_t index) {
+                const auto& point = face.vertices[index];
+                return Vertex{{point[0], point[1], point[2]}};
+            };
+            addWorldQuad(vertex(0), vertex(1), vertex(2), vertex(3), SurfaceMossyStone,
+                         static_cast<SurfaceNormal>(face.normalCode), leafMaterialIndexPlusOne);
+        }
+    }
 
     // Keep the turns open and let the wall returns plus barred recess cast the
     // large torch shadows. Earlier low lintel boxes crossed the route walls,
@@ -3281,6 +3292,13 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addWorldBox(-4.30f, shaftBase, -16.76f, -4.14f, 2.45f, -13.64f, SurfaceMossyStone);
     addWorldBox(-6.70f, shaftBase, -16.76f, -4.30f, 2.45f, -16.60f, SurfaceMossyStone);
     addWorldBox(-6.70f, shaftBase, -13.80f, -4.30f, 2.45f, -13.64f, SurfaceMossyStone);
+    // Supported iron grid belongs only to the separate large skylight. Every
+    // bar is a closed ordinary RT solid with its ends embedded in the rim.
+    for (const auto& bar : horde::scene::kShowcaseSkylightGrid)
+    {
+        addWorldBox(bar.footprint[1][0], bar.bottomY, bar.footprint[1][1],
+                    bar.footprint[2][0], bar.topY, bar.footprint[0][1], SurfaceAgedMetal);
+    }
     addRouteWallZ(-12.4f, -8.50f, -2.50f, SurfaceBack);
     addRouteWallZ(-18.0f, -8.50f, -2.50f, SurfaceForward);
     addRouteWallX(-2.50f, -18.0f, -16.4f, SurfaceLeft);

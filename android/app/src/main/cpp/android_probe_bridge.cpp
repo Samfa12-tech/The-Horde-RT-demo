@@ -34,6 +34,7 @@
 #include "graphics/GraphicsPreviewPerformance.h"
 #include "reporting/PlaytestReport.h"
 #include "reporting/PlaytestSubmission.h"
+#include "reporting/BenchmarkSummaryReport.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
@@ -236,6 +237,10 @@ struct SwapchainContext
     bool routeReplayActive = false;
     horde::gameplay::ShowcaseBenchmarkRun inAppBenchmark;
     std::string benchmarkRunId;
+    std::string benchmarkSummaryRunId;
+    std::string benchmarkSummaryRawModel;
+    std::uint64_t benchmarkSummaryRevision = 0u;
+    std::optional<horde::telemetry::BenchmarkSummaryConfiguration> benchmarkSummaryStart;
     horde::telemetry::RtBenchmarkEvidenceRun benchmarkEvidence;
     std::optional<std::size_t> benchmarkExpectedFrame;
     std::string reportDirectory;
@@ -284,6 +289,18 @@ std::string gLatestBenchmarkReport;
 std::string gLatestBenchmarkProgress;
 // Request identity shares the report mutex; it is not a frame/submission counter.
 std::string gRequestedBenchmarkRunId;
+std::string gRequestedBenchmarkSummaryRunId;
+std::string gRequestedBenchmarkSummaryRawModel;
+horde::telemetry::FrozenBenchmarkSummary gLatestBenchmarkSummary;
+std::uint64_t gBenchmarkSummaryRevision = 0u; // guarded by gReportMutex
+void InvalidateBenchmarkSummaryLocked()
+{
+    gLatestBenchmarkSummary = {};
+    gRequestedBenchmarkSummaryRunId.clear();
+    gRequestedBenchmarkSummaryRawModel.clear();
+    if (gBenchmarkSummaryRevision != std::numeric_limits<std::uint64_t>::max())
+        ++gBenchmarkSummaryRevision;
+}
 horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
     horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
 horde::gameplay::simulation::GameSimulation gGameSimulation(
@@ -911,6 +928,61 @@ horde::gameplay::ShowcaseBenchmarkMetadata BuildBenchmarkMetadata(const Swapchai
     return metadata;
 }
 
+std::optional<horde::telemetry::BenchmarkSummaryConfiguration>
+ReadBenchmarkSummaryConfigurationOnOwner(const SwapchainContext& context) noexcept
+{
+    if (context.benchmarkSummaryRunId.empty() || !context.rtFrameEvidenceInitialised ||
+        context.sceneProfile != horde::vulkan::raytracing::RtSceneProfile::Showcase) return std::nullopt;
+    try
+    {
+        horde::telemetry::BenchmarkSummaryConfiguration configuration;
+        configuration.platform = horde::telemetry::BenchmarkSummaryPlatform::Android;
+        configuration.metadata = BuildBenchmarkMetadata(context);
+        configuration.water = static_cast<horde::telemetry::RtWaterQuality>(context.graphicsSettings.waterQuality);
+        configuration.fire = context.graphicsSettings.fireDetail == horde::graphics::FireDetail::High ?
+            horde::telemetry::BenchmarkSummaryFireQuality::High : horde::telemetry::BenchmarkSummaryFireQuality::Mobile;
+        const auto optics = context.rtScene.SelectedDielectricQualityName();
+        if (optics != "Mobile" && optics != "High") return std::nullopt;
+        configuration.dielectric = optics == "High" ? horde::telemetry::RtDielectricQuality::High :
+            horde::telemetry::RtDielectricQuality::Mobile;
+        configuration.glassEnabled = context.rtScene.GlassEnabled();
+        // Real current owner scope at arming/completion, never a fabricated or
+        // stale ledger scope after another lifecycle event.
+        const auto seeds = context.rtFrameEvidence.SeedsByValue();
+        configuration.sceneEpoch = seeds.sceneEpoch;
+        configuration.measurementGeneration = seeds.measurementGeneration;
+        return configuration;
+    }
+    catch (...) { return std::nullopt; }
+}
+
+void CaptureBenchmarkSummaryStartOnOwner(SwapchainContext& context) noexcept
+{
+    // Called only after the real evidence owner accepted measurement arming.
+    context.benchmarkSummaryStart = ReadBenchmarkSummaryConfigurationOnOwner(context);
+}
+
+void FreezeCompletedBenchmarkSummaryOnOwner(SwapchainContext& context) noexcept
+{
+    if (!context.benchmarkSummaryStart) return;
+    try
+    {
+        // The same typed owner getter seam supplies completion; no latest file,
+        // JNI live scene read or fabricated scope participates in this record.
+        const auto completion = ReadBenchmarkSummaryConfigurationOnOwner(context);
+        if (!completion) return;
+        auto summary = horde::telemetry::CaptureBenchmarkSummary(context.inAppBenchmark,
+            context.benchmarkEvidence, *context.benchmarkSummaryStart, *completion,
+            context.benchmarkSummaryRunId, context.benchmarkSummaryRawModel);
+        if (!summary.IsReady()) return;
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        if (context.benchmarkSummaryRevision == gBenchmarkSummaryRevision &&
+            gBenchmarkSummaryRevision != std::numeric_limits<std::uint64_t>::max())
+            gLatestBenchmarkSummary = std::move(summary);
+    }
+    catch (...) { /* Optional summary failure never changes benchmark/render success. */ }
+}
+
 void CancelActiveInAppBenchmark(SwapchainContext& context)
 {
     bool cancelled = false;
@@ -1056,6 +1128,10 @@ void StartInAppBenchmark(SwapchainContext& context)
         std::lock_guard<std::mutex> lock(gReportMutex);
         gLatestBenchmarkReport.clear();
         context.benchmarkRunId = std::move(gRequestedBenchmarkRunId);
+        context.benchmarkSummaryRunId = std::move(gRequestedBenchmarkSummaryRunId);
+        context.benchmarkSummaryRawModel = std::move(gRequestedBenchmarkSummaryRawModel);
+        context.benchmarkSummaryRevision = gBenchmarkSummaryRevision;
+        context.benchmarkSummaryStart.reset();
         requestedWorkload = gRequestedBenchmarkWorkload;
     }
     if (!context.benchmarkEvidence.Start(
@@ -1079,6 +1155,7 @@ void StartInAppBenchmark(SwapchainContext& context)
 
 void FinishInAppBenchmark(SwapchainContext& context)
 {
+    FreezeCompletedBenchmarkSummaryOnOwner(context); // Finalized owners, before route/evidence reset below.
     const horde::gameplay::ShowcaseBenchmarkMetadata metadata = BuildBenchmarkMetadata(context);
     const bool evidenceComplete = context.benchmarkEvidence.Status() ==
         horde::telemetry::RtBenchmarkRunStatus::Complete &&
@@ -2946,8 +3023,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                         {
                             const horde::telemetry::RtLifecycleSeeds seeds =
                                 context.rtFrameEvidence.SeedsByValue();
-                            (void)context.benchmarkEvidence.ArmMeasurement(
-                                seeds.sceneEpoch, seeds.measurementGeneration);
+                            if (context.benchmarkEvidence.ArmMeasurement(
+                                    seeds.sceneEpoch, seeds.measurementGeneration))
+                                CaptureBenchmarkSummaryStartOnOwner(context);
                         }
                     }
                 }
@@ -2964,8 +3042,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     {
                         const horde::telemetry::RtLifecycleSeeds seeds =
                             context.rtFrameEvidence.SeedsByValue();
-                        (void)context.benchmarkEvidence.ArmMeasurement(
-                            seeds.sceneEpoch, seeds.measurementGeneration);
+                        if (context.benchmarkEvidence.ArmMeasurement(
+                                seeds.sceneEpoch, seeds.measurementGeneration))
+                            CaptureBenchmarkSummaryStartOnOwner(context);
                     }
                     else
                     {
@@ -4996,6 +5075,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmark(JNIEnv*, jclass)
     {
         return JNI_FALSE;
     }
+    InvalidateBenchmarkSummaryLocked();
     gRequestedBenchmarkRunId.clear();
     gRequestedBenchmarkWorkload = horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
     gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
@@ -5022,6 +5102,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithId(
     std::lock_guard<std::mutex> lock(gReportMutex);
     if (gSurfaceSessions.State() != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
+    InvalidateBenchmarkSummaryLocked();
     gRequestedBenchmarkRunId = id;
     gRequestedBenchmarkWorkload = horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
     gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
@@ -5062,6 +5143,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithIdAndWorkload(
     std::lock_guard<std::mutex> lock(gReportMutex);
     if (gSurfaceSessions.State() != 1 ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1) return JNI_FALSE;
+    InvalidateBenchmarkSummaryLocked();
     gRequestedBenchmarkRunId = id;
     gRequestedBenchmarkWorkload = workload;
     gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
@@ -5069,6 +5151,106 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithIdAndWorkload(
     gInAppBenchmarkStatus.store(1, std::memory_order_release);
     gInAppBenchmarkRequested.store(true, std::memory_order_release);
     return JNI_TRUE;
+}
+
+namespace
+{
+bool ReadBenchmarkSummaryText(JNIEnv* env, jstring value, const std::size_t maximum, std::string& out)
+{
+    if (!value) return false;
+    const auto length = env->GetStringLength(value);
+    if (static_cast<std::size_t>(length) > maximum) return false;
+    std::vector<jchar> units(static_cast<std::size_t>(length));
+    if (length) env->GetStringRegion(value, 0, length, units.data());
+    if (env->ExceptionCheck()) return false;
+    std::u16string text;
+    text.reserve(units.size());
+    for (const jchar unit : units) text.push_back(static_cast<char16_t>(unit));
+    return horde::reporting::EncodePlaytestReportUtf16(text, maximum, out) ==
+        horde::reporting::PlaytestReportStatus::Ready;
+}
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithSummaryId(
+    JNIEnv* env, jclass, jstring summaryRunUuid, jstring rawModel)
+{
+    try
+    {
+        std::string uuid, model;
+        if (!ReadBenchmarkSummaryText(env, summaryRunUuid, 36u, uuid) ||
+            !horde::telemetry::IsBenchmarkSummaryUuid(uuid) ||
+            !ReadBenchmarkSummaryText(env, rawModel, 128u, model)) return JNI_FALSE;
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        if (gSurfaceSessions.State() != 1 || gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
+            return JNI_FALSE;
+        InvalidateBenchmarkSummaryLocked();
+        gRequestedBenchmarkSummaryRunId = std::move(uuid);
+        gRequestedBenchmarkSummaryRawModel = std::move(model);
+        gRequestedBenchmarkRunId.clear(); // Ordinary run keeps its accepted FPS observer contract.
+        gRequestedBenchmarkWorkload = horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
+        gInAppBenchmarkCancelRequested.store(false, std::memory_order_release);
+        gRtLabBenchmarkRoute.store(true, std::memory_order_release);
+        gInAppBenchmarkStatus.store(1, std::memory_order_release);
+        gInAppBenchmarkRequested.store(true, std::memory_order_release);
+        return JNI_TRUE;
+    }
+    catch (...) { return JNI_FALSE; }
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getReadyBenchmarkSummaryRunId(JNIEnv* env, jclass)
+{
+    try
+    {
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        return env->NewStringUTF(gLatestBenchmarkSummary.IsReady() ?
+            gLatestBenchmarkSummary.Data().runUuid.c_str() : "");
+    }
+    catch (...) { return nullptr; }
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_prepareBenchmarkSummaryReport(
+    JNIEnv* env, jclass, jstring expectedRunUuid, jstring reportUuid, jstring capturedAtUtc,
+    jboolean consentToPrepare, jboolean includeBasicHardware, jint declaredCooling)
+{
+    using namespace horde::reporting;
+    const auto reply = [env](const BenchmarkSummaryReportStatus status, const std::string_view json = {}) {
+        std::string envelope(1u, static_cast<char>(status)); envelope.append(json);
+        return NewUtf8ByteArray(env, envelope);
+    };
+    try
+    {
+        if (consentToPrepare != JNI_TRUE) return reply(BenchmarkSummaryReportStatus::ConsentRequired);
+        if (declaredCooling < 0 || declaredCooling > 2) return reply(BenchmarkSummaryReportStatus::InvalidCooling);
+        std::string expected, id, utc;
+        if (!ReadBenchmarkSummaryText(env, expectedRunUuid, 36u, expected) ||
+            !ReadBenchmarkSummaryText(env, reportUuid, 36u, id))
+            return env->ExceptionCheck() ? nullptr : reply(BenchmarkSummaryReportStatus::InvalidIdentity);
+        if (!ReadBenchmarkSummaryText(env, capturedAtUtc, 30u, utc))
+            return env->ExceptionCheck() ? nullptr : reply(BenchmarkSummaryReportStatus::InvalidTimestamp);
+        horde::telemetry::FrozenBenchmarkSummary frozen;
+        std::uint64_t revision = 0u;
+        {
+            std::lock_guard<std::mutex> lock(gReportMutex);
+            if (!gLatestBenchmarkSummary.IsReady() || gLatestBenchmarkSummary.Data().runUuid != expected)
+                return reply(BenchmarkSummaryReportStatus::InvalidSummary);
+            frozen = gLatestBenchmarkSummary;
+            revision = gBenchmarkSummaryRevision;
+        }
+        const auto prepared = PrepareBenchmarkSummaryReport(frozen,
+            {true, includeBasicHardware == JNI_TRUE, id, utc,
+                static_cast<horde::telemetry::BenchmarkSummaryCooling>(declaredCooling)});
+        if (!prepared.IsReady()) return reply(prepared.Status());
+        // Never publish a copied old result after a newer accepted run invalidates it.
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        if (revision != gBenchmarkSummaryRevision || !gLatestBenchmarkSummary.IsReady() ||
+            gLatestBenchmarkSummary.Data().runUuid != expected)
+            return reply(BenchmarkSummaryReportStatus::InvalidSummary);
+        return reply(BenchmarkSummaryReportStatus::Ready, prepared.Json());
+    }
+    catch (...) { return nullptr; }
 }
 
 extern "C" JNIEXPORT void JNICALL

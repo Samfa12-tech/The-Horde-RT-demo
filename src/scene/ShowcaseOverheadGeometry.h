@@ -63,10 +63,10 @@ inline constexpr std::array<OverheadVolume, 6u> kShowcaseLowOverheadVolumes{{
     RectangularOverhead(-29.62f, -16.80f, -29.38f, -13.60f, 0.88f, 1.20f),
 }};
 
-// Exact static roof footprints, including the original irregular moon breach,
+// Exact static roof footprints, including the closed irregular entry ceiling,
 // drench slot and later open shafts. The moving finale seal is independently
 // owned after the original torch's authored drench/drop; it is not a static roof.
-inline constexpr std::array<OverheadVolume, 22u> kShowcaseCeilingPatches{{
+inline constexpr std::array<OverheadVolume, 23u> kShowcaseCeilingPatches{{
     RectangularOverhead(-1.85f, -0.20f, 1.85f, 2.94f, 1.35f, 1.35f),
     {{{{{-1.85f, -0.20f}}, {{-1.85f, -6.40f}}, {{-0.72f, -5.20f}}, {{-0.55f, -3.45f}}}}, 1.35f, 1.35f},
     {{{{{0.32f, -3.55f}}, {{0.62f, -5.05f}}, {{1.85f, -6.40f}}, {{1.85f, -0.20f}}}}, 1.35f, 1.35f},
@@ -89,7 +89,36 @@ inline constexpr std::array<OverheadVolume, 22u> kShowcaseCeilingPatches{{
     RectangularOverhead(-32.5f, -18.4f, -30.5f, -12.0f, 1.35f, 1.35f),
     RectangularOverhead(-34.9f, -18.4f, -32.5f, -16.6f, 1.35f, 1.35f),
     RectangularOverhead(-34.9f, -13.8f, -32.5f, -12.0f, 1.35f, 1.35f),
+    // Preserve the existing 0..21 roof indices. This exact former breach joins
+    // patches 1..4 and now participates in ordinary RT and shared clearance.
+    {{{{{-0.55f, -3.45f}}, {{-0.72f, -5.20f}},
+         {{0.62f, -5.05f}}, {{0.32f, -3.55f}}}}, 1.35f, 1.35f},
 }};
+
+// The large chamber aperture is distinct from the waterfall's own shaft and
+// the moving finale opening. Closed iron bars embed into its existing rim;
+// their clear cells remain open to sky but narrower than the player's body.
+inline constexpr float kLargeSkylightMinX = -6.70f, kLargeSkylightMaxX = -4.30f;
+inline constexpr float kLargeSkylightMinZ = -16.60f, kLargeSkylightMaxZ = -13.80f;
+inline constexpr auto kShowcaseSkylightGrid = [] {
+    std::array<OverheadVolume, 13u> bars{};
+    constexpr float halfWidth = 0.0175f, embed = 0.02f;
+    for (unsigned i = 0; i < 6u; ++i)
+    {
+        const float x = kLargeSkylightMinX + static_cast<float>(i + 1u) *
+            (kLargeSkylightMaxX - kLargeSkylightMinX) / 7.0f;
+        bars[i] = RectangularOverhead(x - halfWidth, kLargeSkylightMinZ - embed,
+            x + halfWidth, kLargeSkylightMaxZ + embed, 2.39f, 2.43f);
+    }
+    for (unsigned i = 0; i < 7u; ++i)
+    {
+        const float z = kLargeSkylightMinZ + static_cast<float>(i + 1u) *
+            (kLargeSkylightMaxZ - kLargeSkylightMinZ) / 8.0f;
+        bars[6u + i] = RectangularOverhead(kLargeSkylightMinX - embed, z - halfWidth,
+            kLargeSkylightMaxX + embed, z + halfWidth, 2.39f, 2.43f);
+    }
+    return bars;
+}();
 
 // Imported immutable roof: these planes describe the accepted closed wedges
 // and feed shared clearance only. Their RT triangles come from the static PBR

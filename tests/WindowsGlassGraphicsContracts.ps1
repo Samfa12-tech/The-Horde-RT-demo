@@ -67,4 +67,58 @@ Check ($source.Contains('createButton(kGraphicsGlassButtonId, "GLASS: ON")') -an
 $owner = $source.IndexOf('const bool graphicsTransition = context.sceneProfileDirty || context.glassGeometryDirty')
 Check ($owner -ge 0 -and $source.IndexOf('ApplyPendingSceneReplacement(context, capabilities, timingSamples)', $owner) -lt
     $source.IndexOf('ApplyPendingOutputResize(context, capabilities, timingSamples)', $owner)) 'Owner applies combined scene work before considering output-only resize.'
+$capture = Get-Content -LiteralPath (Join-Path $root 'src/platform/windows/WindowsGraphicsPreviewCapture.inl') -Raw
+$settle = Section $capture 'const auto settle = ' 'const auto capturePose = '
+$captureCommand = Section $capture 'const auto command = ' 'auto candidate = '
+$readback = Section $capture 'const auto capturePose = ' 'context.graphicsEdit.emplace('
+$completed = Section $capture 'bool CurrentCompletedGraphicsPreviewPresent(' 'bool WriteGraphicsPreviewCaptureManifest('
+function Test-CaptureCompletedPresent([string]$body) {
+    return $body.Contains('publication.hasCompletedEvidence') -and
+        $body.Contains('evidence.identity.completionSerial != 0u') -and
+        $body.Contains('evidence.identity.submitted.frame.sceneEpoch == publication.sceneEpoch') -and
+        $body.Contains('evidence.identity.submitted.frame.measurementGeneration == publication.measurementGeneration') -and
+        $body.Contains('evidence.presentation.outcome == horde::telemetry::RtPresentationOutcome::Presented') -and
+        $body.Contains('evidence.presentation.lastSuccessfulPresentSubmissionSerial >= evidence.identity.submitted.submissionSerial')
+}
+function Test-CaptureExactAck([string]$body) {
+    return $body.Contains('snapshot.serial != request->serial') -and
+        $body.Contains('snapshot.lifecycleGeneration != request->lifecycleGeneration') -and
+        $body.Contains('snapshot.requested == request->requested') -and
+        $body.Contains('snapshot.effective == request->requested') -and
+        $body.Contains('CurrentCompletedGraphicsPreviewPresent(after)') -and
+        $body.Contains('after.sceneEpoch <= before.sceneEpoch') -and
+        $body.Contains('request->requested.glassEnabled ? masks[9u] == 0u : masks[9u] != 0u')
+}
+Check ($settle.IndexOf('ApplyPendingSceneReplacement(context, capabilities, replacementTimingSamples)') -ge 0 -and
+    $settle.IndexOf('ApplyPendingSceneReplacement') -lt $settle.IndexOf('RenderFrame(context') -and
+    $settle.IndexOf('RenderFrame(context') -lt $settle.IndexOf('FinishGraphicsFrame(context, presented)')) 'Capture uses the ordinary owner replacement, rendering and current-frame acknowledgement boundary.'
+Check (Test-CaptureCompletedPresent $completed) 'Completed capture evidence joins actual ordinary presentation with the owning current resource and measurement epochs.'
+Check (-not (Test-CaptureCompletedPresent ($completed.Replace('evidence.identity.submitted.frame.sceneEpoch == publication.sceneEpoch', 'acceptOldResourceEpoch')))) 'Negative capture source fixture rejects old-resource completed evidence.'
+Check (-not (Test-CaptureCompletedPresent ($completed.Replace('evidence.presentation.outcome == horde::telemetry::RtPresentationOutcome::Presented', 'acceptSuboptimalBeforeRecreate')))) 'Negative capture source fixture rejects recreated/suboptimal output as ordinary current presentation.'
+Check (Test-CaptureExactAck $captureCommand) 'Transaction requires exact fresh request/effective serial/generation, completed current presentation, changed resource epoch and all-ray glass mask.'
+Check (-not (Test-CaptureExactAck ($captureCommand.Replace('snapshot.effective == request->requested', 'trustRequestedWithoutActualResources')))) 'Negative capture source fixture rejects requested-only acknowledgement.'
+Check (-not (Test-CaptureExactAck ($captureCommand.Replace('request->requested.glassEnabled ? masks[9u] == 0u : masks[9u] != 0u', 'ignoreOffFixtureMask')))) 'Negative capture source fixture rejects Glass Off retaining a nonzero all-ray fixture mask.'
+Check ($captureCommand.Contains('idle != VK_SUCCESS || !CompleteRtEvidenceAfterDeviceIdle(context, idle)') -and
+    $captureCommand.IndexOf('CompleteRtEvidenceAfterDeviceIdle') -lt $captureCommand.IndexOf('context.graphicsEdit->Confirm()') -and
+    $captureCommand.Contains('context.rtScene.ExecutionBackend() != baselineBackend') -and
+    $captureCommand.Contains('context.rtScene.Profile() != baselineProfile')) 'Keep needs real completed ownership and retains the backend and compact profile.'
+foreach ($phase in @('apply-glass-off', 'revert-glass-on', 'keep-glass-off-memory-only', 'restore-glass-on-memory-only')) {
+    Check ($capture.Contains('command("' + $phase + '"')) "Capture exercises ordinary production transaction $phase."
+}
+Check ($capture.Contains('capturePose("glass-on", glassPose, baseline)') -and
+    $capture.Contains('capturePose("glass-off", glassPose, glassOff)') -and
+    $capture.Contains('GraphicsPreviewCamera::Glass, 120u, false, false') -and
+    $capture.Contains('glassOnPose.camera.pitch != glassOffPose.camera.pitch') -and
+    $capture.Contains('glassOnPose.fireEmitters[1].phase != glassOffPose.fireEmitters[1].phase') -and
+    $capture.Contains('kGraphicsPreviewCapturePoses')) 'Two additional A/B images use the same shared paused Glass pose while preserving all nine accepted authored captures.'
+Check ($readback.Contains('CurrentCompletedGraphicsPreviewPresent(record.publication)') -and
+    $readback.Contains('simulationTick != pose.tick') -and
+    $readback.Contains('record.sceneGlassEnabled = context.rtScene.GlassEnabled()') -and
+    $readback.Contains('record.resources = context.rtScene.ResourceInventory()')) 'Readback records actual ready glass, current completed pose and honest live allocations.'
+foreach ($field in @('glassEnabled', 'sceneEpochBefore', 'sceneEpochAfter', 'sceneGlassEnabled', 'instanceMasksByCustomIndex', 'currentCompletedPresent')) {
+    Check ($capture.Contains('\"' + $field + '\"')) "Manifest exposes actual glass transaction field $field."
+}
+Check ($capture.Contains('Glass Off retains fixed BLAS/TLAS roles and implies no allocation savings') -and
+    $capture.Contains('full Showcase roof and lantern geometry remain a separate acceptance gate') -and
+    -not $capture.Contains('SaveSettings(') -and -not $capture.Contains('SettingsPath(')) 'Capture makes no savings/full-scene claim and does not read/write user preference storage.'
 Write-Output "PASS: Windows glass graphics source contracts; $script:checks checks. No Vulkan/GUI/device execution."

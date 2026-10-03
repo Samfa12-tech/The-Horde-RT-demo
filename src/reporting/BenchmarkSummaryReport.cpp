@@ -102,6 +102,9 @@ PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(const FrozenBenchma
     if (!PreparePlaytestReport(validation).IsReady())
     { result.status_ = BenchmarkSummaryReportStatus::InvalidTimestamp; return result; }
     const auto& data = summary.Data();
+    const auto cooling = approval.declaredCooling.value_or(data.cooling);
+    if (cooling > BenchmarkSummaryCooling::ExternalDeclared)
+    { result.status_ = BenchmarkSummaryReportStatus::InvalidCooling; return result; }
     const auto& c = data.configuration;
     const auto& m = c.metadata;
     if (!SafeLabel(m.buildIdentity) || !ValidShaderPair(m.shaderIdentity) || !SafeLabel(m.materialEncoding) ||
@@ -135,8 +138,8 @@ PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(const FrozenBenchma
     Text(out, m.legacyFrameTimingScope);
     out << ",\"cpuTimingScope\":\"completed-owning-render-entry-through-present\",\"gpuTimingScope\":\"completed-owning-rt-duration\","
         "\"thermal\":{\"availability\":\"not-collected\",\"temperatureC\":null,\"status\":\"unknown\"},\"declaredCooling\":";
-    Text(out, data.cooling == BenchmarkSummaryCooling::Unknown ? "unknown" :
-        data.cooling == BenchmarkSummaryCooling::NoneDeclared ? "none-declared" : "external-declared");
+    Text(out, cooling == BenchmarkSummaryCooling::Unknown ? "unknown" :
+        cooling == BenchmarkSummaryCooling::NoneDeclared ? "none-declared" : "external-declared");
     out << ",\"overall\":"; Population(out, data.overall, true);
     out << ",\"zones\":[";
     for (std::size_t i = 0u; i < data.zones.size(); ++i)

@@ -187,7 +187,9 @@ inline constexpr std::array<DevelopmentCheckpoint, 52u> kDevelopmentCheckpoints{
      true, false, DevelopmentRewardPose::HeldHigh},
     // Source-anchored layout identity views; fresh checkpoint two keeps the
     // ordinary held torch/player state for C/D/A/B without fixture overrides.
-    {147, "layout-c-wall-panel", 2, 2.55f, -10.00f, 3.14159265359f, 0.0f},
+    // A farther stand-off reduces ordinary wall-clearance retraction in this
+    // level identity view; native arm ownership/visibility stays capture-gated.
+    {147, "layout-c-wall-panel", 2, 2.55f, -10.60f, 3.14159265359f, 0.0f},
     {148, "layout-d-entry-breach", 2, 0.0f, -2.55f, 0.0f, 0.28f},
     // The legal upward view shows A's lower aperture and deep inner wall;
     // its 5.6 m rim is beyond this camera's accepted pitch/FOV, unlike B.

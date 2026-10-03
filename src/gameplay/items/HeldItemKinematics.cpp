@@ -167,6 +167,7 @@ float TorchOverheadLowering(const Vec3& gripWorld, const Vec3& viewUp,
     };
     for (const auto& volume : horde::scene::kShowcaseLowOverheadVolumes) include(volume);
     for (const auto& volume : horde::scene::kShowcaseCeilingPatches) include(volume);
+    for (const auto& volume : horde::scene::kShowcaseSkylightGrid) include(volume);
     for (const auto& volume : horde::scene::kShowcaseImportedOverheadVolumes) include(volume);
     include(horde::scene::kShowcaseCollapseRoofSeam);
     return lowering;

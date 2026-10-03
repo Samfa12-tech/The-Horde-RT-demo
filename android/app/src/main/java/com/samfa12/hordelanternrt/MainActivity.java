@@ -132,6 +132,15 @@ public class MainActivity extends Activity {
             "com.samfa12.hordelanternrt.DEBUG_RETRY_ENCOUNTER";
     private static final int REQUEST_SAVE_BENCHMARK = 7101;
     private static final int REQUEST_SAVE_PLAYTEST = 7102;
+    private static final int REQUEST_SAVE_BENCHMARK_SUMMARY = 7103;
+    private BenchmarkSummaryReview benchmarkSummaryReview;
+    private boolean benchmarkSummaryVisible;
+    private long benchmarkSummaryFormGeneration, benchmarkSummaryPickerToken, benchmarkSummaryPickerGeneration;
+    private BenchmarkSummaryReview benchmarkSummaryPickerReview;
+    private CheckBox benchmarkSummaryConsent, benchmarkSummaryHardware;
+    private Spinner benchmarkSummaryCooling;
+    private TextView benchmarkSummaryStatus, benchmarkSummaryJson;
+    private Button benchmarkSummaryPrepare, benchmarkSummaryCopy, benchmarkSummarySave, benchmarkSummaryEdit;
     private final ThreadPoolExecutor reportExecutor = new ThreadPoolExecutor(1, 1, 0L,
             TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2), runnable -> {
                 Thread thread = new Thread(runnable, "HordePlaytestReport");
@@ -667,6 +676,7 @@ public class MainActivity extends Activity {
     }
 
     private void showMainMenu(final boolean firstLaunch) {
+        closeBenchmarkSummaryReview();
         interfaceVisible=false;
         setBenchmarkStatusExpanded(false);
         rtLabVisible = false;
@@ -730,16 +740,24 @@ public class MainActivity extends Activity {
         }
     }
 
+    private boolean requestInteractiveBenchmark() {
+        try {
+            if (ProbeBridge.requestBenchmarkWithSummaryId(UUID.randomUUID().toString(), Build.MODEL)) return true;
+        } catch (RuntimeException | LinkageError unavailable) { /* Optional statistics cannot block the run. */ }
+        return ProbeBridge.requestBenchmark(); // Native readiness/busy guards still apply.
+    }
+
     private void startBenchmark() {
         playSound("ui_select", 0.18f);
         if (ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1 || !(benchmarkAutomationId == null
-                ? ProbeBridge.requestBenchmark()
+                ? requestInteractiveBenchmark()
                 : ProbeBridge.requestBenchmarkWithIdAndWorkload(
                         benchmarkAutomationId, benchmarkAutomationWorkload))) {
             Toast.makeText(this, R.string.benchmark_unavailable, Toast.LENGTH_LONG).show();
             return;
         }
         benchmarkRunning = true;
+        closeBenchmarkSummaryReview();
         benchmarkAutomationPending = false;
         latestBenchmarkReport = "";
         firstMenu = false;
@@ -852,6 +870,7 @@ public class MainActivity extends Activity {
     }
 
     private void showBenchmarkReport(final boolean completed) {
+        closeBenchmarkSummaryReview();
         benchmarkRunning = false;
         setBenchmarkStatusExpanded(false);
         benchmarkReportVisible = true;
@@ -882,8 +901,222 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.copy_report), this::copyBenchmarkReport,
                 getString(R.string.save_report), this::saveBenchmarkReport);
+        if (completed && BenchmarkSummaryReview.validUuid(readyBenchmarkSummaryRunId())) {
+            addMenuButton(panel, getString(R.string.benchmark_summary_review), this::showBenchmarkSummaryReview);
+        }
         addMenuButton(panel, getString(R.string.back), () -> showMainMenu(false));
         attachPanel(panel);
+    }
+
+    private String readyBenchmarkSummaryRunId() {
+        try { return ProbeBridge.getReadyBenchmarkSummaryRunId(); }
+        catch (RuntimeException | LinkageError unavailable) { return ""; }
+    }
+
+    private void showBenchmarkSummaryReview() {
+        final String runId = readyBenchmarkSummaryRunId();
+        if (!BenchmarkSummaryReview.validUuid(runId)) {
+            Toast.makeText(this, R.string.benchmark_summary_unavailable, Toast.LENGTH_LONG).show();
+            return;
+        }
+        closeBenchmarkSummaryReview();
+        benchmarkSummaryReview = new BenchmarkSummaryReview(runId);
+        benchmarkSummaryVisible = true;
+        renderBenchmarkSummaryForm();
+    }
+
+    private void renderBenchmarkSummaryForm() {
+        final BenchmarkSummaryReview owner = benchmarkSummaryReview;
+        final long generation = benchmarkSummaryFormGeneration;
+        menuScrim.removeAllViews();
+        final LinearLayout panel = createPanel(getString(R.string.benchmark_summary_review),
+                getString(R.string.benchmark_summary_local_only));
+        addBody(panel, getString(R.string.benchmark_summary_scope));
+        benchmarkSummaryConsent = new CheckBox(this);
+        benchmarkSummaryConsent.setText(R.string.benchmark_summary_consent);
+        stylePlaytestConsent(benchmarkSummaryConsent);
+        benchmarkSummaryConsent.setMinHeight(dp(48));
+        panel.addView(benchmarkSummaryConsent, matchWrap());
+        benchmarkSummaryHardware = new CheckBox(this);
+        benchmarkSummaryHardware.setText(R.string.benchmark_summary_hardware);
+        stylePlaytestConsent(benchmarkSummaryHardware);
+        benchmarkSummaryHardware.setMinHeight(dp(48));
+        panel.addView(benchmarkSummaryHardware, matchWrap());
+        addBody(panel, getString(R.string.benchmark_summary_cooling_help));
+        benchmarkSummaryCooling = createPlaytestChoice(getResources().getStringArray(R.array.benchmark_summary_cooling));
+        benchmarkSummaryCooling.setContentDescription(getString(R.string.benchmark_summary_cooling_help));
+        benchmarkSummaryCooling.setMinimumHeight(dp(48));
+        panel.addView(benchmarkSummaryCooling, matchWrap());
+        benchmarkSummaryStatus = new TextView(this);
+        benchmarkSummaryStatus.setTextColor(HordeUiTokens.PARCHMENT);
+        benchmarkSummaryStatus.setTextSize(14);
+        panel.addView(benchmarkSummaryStatus, matchWrap());
+        benchmarkSummaryPrepare = createMenuButton(getString(R.string.benchmark_summary_prepare),
+                benchmarkSummaryAction(owner, generation, this::prepareBenchmarkSummary));
+        benchmarkSummaryPrepare.setMinHeight(dp(48));
+        benchmarkSummaryPrepare.setEnabled(false);
+        panel.addView(benchmarkSummaryPrepare, menuButtonLayoutParams());
+        benchmarkSummaryConsent.setOnCheckedChangeListener((button, checked) -> {
+            if (isCurrentBenchmarkSummaryForm(owner, generation))
+                benchmarkSummaryPrepare.setEnabled(checked && !owner.isPrepared());
+        });
+        benchmarkSummaryJson = new TextView(this);
+        benchmarkSummaryJson.setTextColor(HordeUiTokens.PARCHMENT);
+        benchmarkSummaryJson.setTextSize(14);
+        benchmarkSummaryJson.setTypeface(Typeface.MONOSPACE);
+        benchmarkSummaryJson.setTextIsSelectable(true);
+        panel.addView(benchmarkSummaryJson, matchWrap());
+        benchmarkSummaryCopy = createMenuButton(getString(R.string.benchmark_summary_copy),
+                benchmarkSummaryAction(owner, generation, this::copyBenchmarkSummary));
+        benchmarkSummarySave = createMenuButton(getString(R.string.benchmark_summary_save),
+                benchmarkSummaryAction(owner, generation, this::chooseBenchmarkSummaryDestination));
+        benchmarkSummaryEdit = createMenuButton(getString(R.string.benchmark_summary_edit),
+                benchmarkSummaryAction(owner, generation, this::editBenchmarkSummary));
+        for (Button button : new Button[]{benchmarkSummaryCopy, benchmarkSummarySave, benchmarkSummaryEdit}) {
+            button.setMinHeight(dp(48));
+            button.setVisibility(View.GONE);
+            panel.addView(button, menuButtonLayoutParams());
+        }
+        addMenuButton(panel, getString(R.string.back),
+                benchmarkSummaryAction(owner, generation, () -> showBenchmarkReport(true)));
+        attachPanel(panel);
+    }
+
+    private boolean isCurrentBenchmarkSummaryForm(BenchmarkSummaryReview owner, long generation) {
+        return benchmarkSummaryVisible && benchmarkSummaryReview == owner &&
+                benchmarkSummaryFormGeneration == generation;
+    }
+
+    private Runnable benchmarkSummaryAction(BenchmarkSummaryReview owner, long generation, Runnable action) {
+        return () -> { if (isCurrentBenchmarkSummaryForm(owner, generation)) action.run(); };
+    }
+
+    private void prepareBenchmarkSummary() {
+        final BenchmarkSummaryReview owner = benchmarkSummaryReview;
+        if (!benchmarkSummaryVisible || owner == null || owner.isPrepared() || !benchmarkSummaryConsent.isChecked()) return;
+        final SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ROOT);
+        utc.setTimeZone(TimeZone.getTimeZone("UTC"));
+        if (!owner.prepare(true, benchmarkSummaryHardware.isChecked(), benchmarkSummaryCooling.getSelectedItemPosition(),
+                UUID.randomUUID().toString(), utc.format(new Date()), ProbeBridge::prepareBenchmarkSummaryReport)) {
+            benchmarkSummaryStatus.setText(R.string.benchmark_summary_unavailable);
+            return;
+        }
+        benchmarkSummaryConsent.setEnabled(false);
+        benchmarkSummaryHardware.setEnabled(false);
+        benchmarkSummaryCooling.setEnabled(false);
+        benchmarkSummaryPrepare.setEnabled(false);
+        benchmarkSummaryStatus.setText(R.string.benchmark_summary_prepared);
+        benchmarkSummaryJson.setText(owner.json()); // Literal exact native UTF-8 JSON; never reserialized.
+        benchmarkSummaryCopy.setVisibility(View.VISIBLE);
+        benchmarkSummarySave.setVisibility(View.VISIBLE);
+        benchmarkSummaryEdit.setVisibility(View.VISIBLE);
+    }
+
+    private void copyBenchmarkSummary() {
+        if (!benchmarkSummaryVisible || benchmarkSummaryReview == null || !benchmarkSummaryReview.isPrepared()) return;
+        final ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        if (clipboard == null) { benchmarkSummaryStatus.setText(R.string.report_copy_failed); return; }
+        clipboard.setPrimaryClip(ClipData.newPlainText(getString(R.string.benchmark_summary_review), benchmarkSummaryReview.json()));
+        benchmarkSummaryStatus.setText(R.string.report_copied);
+    }
+
+    private void editBenchmarkSummary() {
+        if (!benchmarkSummaryVisible || benchmarkSummaryReview == null) return;
+        final PlaytestReportExport export = benchmarkSummaryReview.exportOwner();
+        if (export != null && (export.state() == PlaytestReportExport.State.CHOOSING ||
+                export.state() == PlaytestReportExport.State.WRITING)) return;
+        final String runId = benchmarkSummaryReview.runId();
+        closeBenchmarkSummaryReview();
+        benchmarkSummaryReview = new BenchmarkSummaryReview(runId);
+        benchmarkSummaryVisible = true;
+        renderBenchmarkSummaryForm(); // New preparation needs new UUID and fresh unchecked consent.
+    }
+
+    private void chooseBenchmarkSummaryDestination() {
+        if (!benchmarkSummaryVisible || benchmarkSummaryReview == null) return;
+        // One platform picker may outlive Back. Its result must drain before another launch.
+        if (benchmarkSummaryPickerReview != null) {
+            benchmarkSummaryStatus.setText(R.string.benchmark_summary_picker_pending);
+            return;
+        }
+        if (!benchmarkSummaryReview.beginSave()) return;
+        final PlaytestReportExport owner = benchmarkSummaryReview.exportOwner();
+        benchmarkSummaryPickerToken = owner.token();
+        benchmarkSummaryPickerGeneration = benchmarkSummaryFormGeneration;
+        benchmarkSummaryPickerReview = benchmarkSummaryReview;
+        benchmarkSummarySave.setEnabled(false);
+        benchmarkSummaryEdit.setEnabled(false);
+        benchmarkSummaryStatus.setText(R.string.playtest_choose_destination);
+        final Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/json");
+        intent.putExtra(Intent.EXTRA_TITLE, "HordeLanternRT-benchmark-statistics.json");
+        try { startActivityForResult(intent, REQUEST_SAVE_BENCHMARK_SUMMARY); }
+        catch (RuntimeException unavailable) {
+            benchmarkSummaryPickerReview = null;
+            owner.pickerCancelled(benchmarkSummaryPickerToken);
+            benchmarkSummarySaveFailed(R.string.playtest_picker_failed);
+        }
+    }
+
+    private void benchmarkSummarySaveFailed(int message) {
+        benchmarkSummaryStatus.setText(message);
+        benchmarkSummarySave.setText(R.string.playtest_retry);
+        benchmarkSummarySave.setEnabled(true);
+        benchmarkSummaryEdit.setEnabled(true);
+    }
+
+    private void finishBenchmarkSummaryPicker(int resultCode, Intent data) {
+        final BenchmarkSummaryReview review = benchmarkSummaryPickerReview;
+        final long generation = benchmarkSummaryPickerGeneration;
+        benchmarkSummaryPickerReview = null;
+        if (!benchmarkSummaryVisible || review == null || review != benchmarkSummaryReview ||
+                generation != benchmarkSummaryFormGeneration || review.exportOwner() == null) return;
+        final PlaytestReportExport owner = review.exportOwner();
+        final long attempt = benchmarkSummaryPickerToken;
+        if (resultCode != RESULT_OK || data == null || data.getData() == null) {
+            if (owner.pickerCancelled(attempt)) benchmarkSummarySaveFailed(R.string.playtest_cancelled);
+            return;
+        }
+        final byte[] bytes = owner.startWrite(attempt);
+        if (bytes == null) return;
+        benchmarkSummaryStatus.setText(R.string.playtest_saving);
+        final android.content.ContentResolver resolver = getApplicationContext().getContentResolver();
+        final Uri destination = data.getData();
+        try {
+            reportExecutor.execute(() -> {
+                final boolean saved = PlaytestReportExport.writeApproved(owner, attempt, bytes,
+                        () -> resolver.openOutputStream(destination, "wt"));
+                handler.post(() -> {
+                    if (!benchmarkSummaryVisible || benchmarkSummaryReview != review ||
+                            generation != benchmarkSummaryFormGeneration || !owner.complete(attempt, saved)) return;
+                    if (saved) {
+                        benchmarkSummaryStatus.setText(R.string.playtest_saved);
+                        benchmarkSummarySave.setEnabled(false);
+                        benchmarkSummaryEdit.setEnabled(true);
+                    } else benchmarkSummarySaveFailed(R.string.playtest_save_failed);
+                });
+            });
+        } catch (RejectedExecutionException saturated) {
+            owner.complete(attempt, false);
+            benchmarkSummarySaveFailed(R.string.playtest_save_failed);
+        }
+    }
+
+    private void closeBenchmarkSummaryReview() {
+        ++benchmarkSummaryFormGeneration;
+        if (benchmarkSummaryReview != null) benchmarkSummaryReview.close();
+        benchmarkSummaryReview = null;
+        benchmarkSummaryVisible = false;
+        benchmarkSummaryConsent = null;
+        benchmarkSummaryHardware = null;
+        benchmarkSummaryCooling = null;
+        benchmarkSummaryStatus = null;
+        benchmarkSummaryJson = null;
+        benchmarkSummaryPrepare = null;
+        benchmarkSummaryCopy = null;
+        benchmarkSummarySave = null;
+        benchmarkSummaryEdit = null;
     }
 
     private void copyBenchmarkReport() {
@@ -4096,6 +4329,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_SAVE_BENCHMARK_SUMMARY) {
+            finishBenchmarkSummaryPicker(resultCode, data);
+            return;
+        }
         if (requestCode == REQUEST_SAVE_PLAYTEST) {
             finishPlaytestPicker(resultCode, data);
             return;
@@ -4116,6 +4353,10 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if (benchmarkSummaryVisible) {
+            showBenchmarkReport(true);
+            return;
+        }
         if (playtestReportVisible) {
             requestClosePlaytestReport();
             return;
@@ -4244,6 +4485,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        closeBenchmarkSummaryReview();
         dismissGraphicsPreviewDetails();
         invalidateRemotePlaytest(true);
         if (playtestExport != null) playtestExport.cancel();

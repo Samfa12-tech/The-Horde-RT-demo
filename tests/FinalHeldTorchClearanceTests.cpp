@@ -44,6 +44,7 @@ float SharedRoofY(V point) {
     float roof=100;
     const auto include=[&](const auto& volumes) { for(const auto& volume:volumes) if(Inside(volume,point)) roof=std::min(roof,UndersideY(volume,point)); };
     include(horde::scene::kShowcaseLowOverheadVolumes); include(horde::scene::kShowcaseCeilingPatches);
+    include(horde::scene::kShowcaseSkylightGrid);
     include(horde::scene::kShowcaseImportedOverheadVolumes);
     if(Inside(horde::scene::kShowcaseCollapseRoofSeam,point)) roof=std::min(roof,horde::scene::kShowcaseCollapseRoofSeam.bottomY);
     return roof;
@@ -326,6 +327,25 @@ int main(int argc,char** argv) {
             ++phase;
         }
         if(roofCases!=1632 || skinnedRoofCases!=roofCases) { ++failures;std::cerr<<"Incomplete new real-rig/viewmodel sweep\n"; }
+        // Changed entry ceiling: inspect the actual final skin/grip, torch,
+        // flame and light below its interior and all four irregular joins.
+        const unsigned beforeEntry = cases, beforeEntrySkins = skinnedRoofCases;
+        const std::array<std::array<float,2>,5> entryPositions{{
+            {{0.0f,-4.3f}},{{-0.58f,-4.3f}},{{0.47f,-4.3f}},
+            {{0.0f,-3.5f}},{{0.0f,-5.15f}}}};
+        for(const auto& position:entryPositions) for(float pitch:{-.32f,0.0f,.28f})
+            for(float yaw:{0.0f,1.5707963f,-1.5707963f,3.14159265f})
+                for(int pose=0;pose<3;++pose) {
+            HeldItemFixedStepInput input;input.playerMountProfile=PlayerMountProfile::AnatomicalBody;
+            input.playerX=position[0];input.playerZ=position[1];input.playerPitchRadians=pitch;
+            input.playerYawRadians=yaw;input.walkTime=static_cast<float>(cases-beforeEntry)*.19f;
+            input.walkAmount=pose*.5f;input.playerCombat.action=pose==0 ? PlayerCombatAction::Idle :
+                pose==1 ? PlayerCombatAction::SwingActive : PlayerCombatAction::ParryActive;
+            input.playerCombat.actionTime=.04f;inspect(input,false,true);
+        }
+        if(cases-beforeEntry!=180u || skinnedRoofCases-beforeEntrySkins!=180u) {
+            ++failures;std::cerr<<"Incomplete closed-entry real-rig sweep\n";
+        }
     }
     std::cout<<"imported structural underside triangles="<<structuralUndersides.size()<<" planeSamples="<<planeSamples<<" diskSamples="<<diskSamples<<'\n';
     std::cout<<"new roof final rig cases="<<roofCases<<" actualViewmodelVerticesPerPose=15855 skinnedRoofCases="<<skinnedRoofCases<<" worstHeadroom="<<worstRoofHeadroom
