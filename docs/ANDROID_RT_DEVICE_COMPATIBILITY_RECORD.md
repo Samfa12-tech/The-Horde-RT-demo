@@ -2,6 +2,55 @@
 
 Last updated: 2026-10-03
 
+## Current restored eba2: exact admission and bounded feature Replay
+
+Evidence class: **exact isolated development APK, completed hardware-RT route
+and checkpoint presentation, bounded surface-lifecycle observation**. Actual
+**SM-S948B / Android16 / Adreno(TM)840**, driver2150932499/API4210983. Source
+`eba2a6851e73a56bc9062d403fb2941f9fb8dd27` has all six jobs green in
+[CI37141752133](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37141752133).
+This is not release, sustained performance or owner visual/UI/audio acceptance.
+
+Restored Debug APK SHA256
+`4743094325bbb123b11a3bb4f6479877c856921974171a80bc3211af8019d69d`
+and isolated nondebuggable ShippingMobile benchmark
+`8a1f77d67cb7d7515592f299ed3323904ca9efa08cb0b5913cd355fa8f0ad5a2`
+both match update-only installed pullbacks. Production and app data remain
+preserved; no clearing. Fresh admission proves all eight packaged native ELFs
+directly byte-identical to original c299/current stripped/retained original
+libraries, not the rejected guard. Original matching ARM64 selected-shader
+proof is reused only for those exact bytes; other-ABI instruction validation
+is not inferred. Four-ABI class/machine/load16KiB and both APK ZIP16KiB checks,
+81 exact closed assets/notices including full cgltf, and the collected
+387-input/23-fixture/eight-command bank pass. Build3m1s reused completed
+138-test/23-class XML with zero failures/errors/skips; lint0errors/46warnings.
+Debug remains Diagnostic/Mobile/O2/minimum50; benchmark is Shipping/Mobile/O2/
+NDEBUG/guardedminimum33 with checkpoints disabled.
+
+Both actual Debug Replay runs complete13/13 route waypoints and five captures,
+each settled12 frames, at75% Mobile:1080x2235 internal/1440x2980 swapchain.
+Pipeline and RayQueryCompute remain the requested/effective backends. All12
+route/capture state packets have matching completed owning RT dispatch/copy/
+presentation proof and22 instances. The five paired full-display capture
+hashes match across backends; this is not a scene-only readback or owner
+appearance judgement. Replay audit SHA256
+`29ae38870aaa2a2608185401bf8abd278252d6c174244f04800aa3682ff3ac43`.
+
+**Resume limitation:** both summaries report Home/resume PASS and native logs
+show a new requested/started/presented surface generation with backend retained.
+Saved capability `rtScene.presented=true` nevertheless coexists with saved
+`rtFrameEvidence.presented=false`, status pending, `completedFrame=null` and
+zero GPU samples. Those reports do not supply fresh completed owning-frame
+proof after resume. Timing files are empty and benchmarkWindowsCompleted=0;
+no benchmark distribution or sustained30FPS claim follows. Final statistics/
+modal/export interaction, moving quality, owner scene/listening/haptics and
+repeated performance acceptance remain open; remote Send is blocked. S24/S25
+remain unverified. Feature-enabled S26 evidence does not prove the retained
+unextended-driver presentation teardown fallback.
+
+Earlier entries retain their exact artifacts and historical limitations; their
+then-current build/pending statuses are superseded by this restored checkpoint.
+
 ## October3: same-player released-source comparison and rejected lookup experiment
 
 Evidence class: **exact isolated local Shipping APK, complete owning hardware-RT
@@ -31,12 +80,13 @@ Cycle/GPU medians70.1879/59.1093ms versus c29969.6940/59.3083ms (+0.709%/
 -0.336%) demonstrate no net frame-time saving. Start30.1C/thermal0; endpoint
 33.7C/thermal0 is43.5s after completion. Unknown clocks/cooling and one ordered
 pair prohibit causal claims. The lookup experiment is rejected and its32 code/
-generated/fixture files restored; its exact evidence is retained. Refreshed
-restored artifacts, final phone UI/feature/lifecycle/quality investigations and
-owner acceptance remain open. No default quality reduction or sustained30FPS
+generated/fixture files restored; its exact evidence is retained. Restored
+artifact admission and bounded Replay are recorded above; final phone UI,
+fresh owning resume proof, quality and owner acceptance remain open.
+No default quality reduction or sustained30FPS
 claim. S24/S25 remain unverified.
 
-## October3: current1.6.2 exact admission and Shipping performance regression
+## October3 historical c299: exact admission and Shipping performance context
 
 Evidence class: **local exact development-APK identity, complete hardware-RT
 benchmark and bounded native UI interaction**, not signed release, sustained
@@ -44,7 +94,7 @@ performance or owner scene/listening acceptance. Actual **SM-S948B / Android16 /
 Adreno(TM)840**, raw driver2150932499/API4210983. Only the allocated separate
 Debug/benchmark packages were updated; production and user data were preserved.
 
-Current source backup `c299c2eb52b37471709b2607ebb29d002629151b` has all six
+Historical source backup `c299c2eb52b37471709b2607ebb29d002629151b` has all six
 PR CI37133774665 jobs green. Debug APK
 `b95c15ed68c110741a17ec256800605ddf89d29d0ad50c0f56bd790bfd954726`
 and isolated ShippingMobile benchmark APK
@@ -62,7 +112,7 @@ missing/rejected/cancelled/outstanding samples. Actual Pipeline, MAILBOX,
 1080x2235 internal/1440x2980 output,75%/Mobile water/Mobile fire/defaultGlassOn
 remain unchanged.
 
-| Recorded timing | Historical ms | Current ms | Increase |
+| Recorded timing | Historical167 ms | Historical c299 ms | Increase |
 |---|---:|---:|---:|
 | Whole-frame median |51.661|69.694|34.9%|
 | GPU RT median |42.360|59.308|40.0%|
@@ -70,7 +120,8 @@ remain unchanged.
 | Fence-wait mean |42.980|60.516|17.536ms|
 | Player-skin mean |6.686|8.194|1.508ms|
 
-This is a performance regression, not an acceptance pass. Fence wait accounts
+This historical whole-product difference is not the same-player released-source
+comparison above or an acceptance pass. Fence wait accounts
 for92.36% of whole-frame mean increase, matching GPU-duration delta17.575ms.
 Historical167ce8 uses block primary arms; current source adds the accepted
 modelled viewmodel/body remainder, so this compares different whole-product
