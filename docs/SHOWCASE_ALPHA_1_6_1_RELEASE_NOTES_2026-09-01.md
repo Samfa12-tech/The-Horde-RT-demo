@@ -1,4 +1,4 @@
-# Horde Lantern RT — Showcase Alpha 1.6.1 development candidate
+# Horde Lantern RT — Showcase Alpha 1.6.1
 
 Package version: `1.6.1`
 
@@ -6,17 +6,17 @@ Android version code: `9`
 
 ## Status
 
-Updated October 3. This is an unpublished engineering candidate, not a GitHub
-Release or itch upload. The owner confirmed signing backups/recovery and
-authorised production signing and artifact freezing on October3 after green CI.
-Exact frozen artifact identity and completed signed S26 update/lifecycle checks are recorded
-separately in the release validation; merge and publication remain withheld.
-Implementation and acceptance below refer to their retained exact builds;
-earlier owner/device passes do not certify every subsequent candidate.
+Updated October 3. These notes describe1.6.1 implementation and accepted limits,
+not publication authority. Exact artifact identity, completed signed S26
+update/lifecycle checks and distribution status are recorded separately in the
+[release validation](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md).
+The owner confirmed signing backup/recovery and authorised production signing/
+freezing after green CI. Only verified distribution receipts establish public
+availability. Acceptance below refers to retained exact builds; earlier owner/
+device passes do not certify every subsequent candidate.
 
-The latest published itch release remains exact package version `1.6.0` with
-Android version code `8`. Its historical artifact, device-smoke, and release
-evidence remain recorded separately and are not replaced by this candidate.
+The previous1.6.0/versionCode8 artifact, device-smoke and release evidence remains
+recorded separately. This update does not rewrite that history.
 
 ## Engineering changes
 
@@ -68,9 +68,9 @@ evidence remain recorded separately and are not replaced by this candidate.
   benchmark RT-loop FPS/ms is explicitly distinct from display Hz and disabled
   in unattended performance experiments.
 
-## Accepted candidate and remaining release-operation boundaries
+## Validation and known limits
 
-The candidate is not a public release. The [finding disposition](ENGINEERING_1_6_1_FINDING_STATUS.md)
+The [finding disposition](ENGINEERING_1_6_1_FINDING_STATUS.md)
 and [finite integration matrix](evidence/2026-10-02-final-integration/README.md)
 carry current evidence and next unfinished steps; do not restart completed tests.
 
@@ -88,7 +88,7 @@ carry current evidence and next unfinished steps; do not restart completed tests
   CPU/GPU rows. Matched observer overhead is unmeasured, not a speedup claim;
   counter stays off in performance runs. Owner audio acceptance is not a new
   externally instrumented OS focus trace. No repeated audition/email is queued.
-- Owner confirmed backups/recovery and authorised signing/freezing only;
+- Owner confirmed backups/recovery and authorised signing/freezing;
   exact signed S26 update/settings/RT/ASTC/Home-resume smoke now passes. S24/S25
   limits and publication authority remain separate. Actual1.6.0→public1.6.1 update dialog can only be
   observed after authorised GitHub publication; selection fixture passes.

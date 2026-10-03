@@ -1,10 +1,10 @@
-HORDE LANTERN RT - SHOWCASE ALPHA 1.6.1 DEVELOPMENT CANDIDATE
+HORDE LANTERN RT - SHOWCASE ALPHA 1.6.1
 =======================================
 
 This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.
 There is no raster, browser, or fake-RT fallback.
-This `1.6.1` package/version-code-9 candidate is not published. The latest
-published itch release remains the exact `1.6.0` / Android versionCode 8 line.
+Package version: 1.6.1; Android companion versionCode: 9.
+Canonical downloads and current availability: https://samfa12.itch.io/the-horde
 
 WINDOWS REQUIREMENTS
 - Windows 10 or 11, 64-bit
