@@ -177,25 +177,6 @@ enum class RtMaterialFlag : std::uint32_t
 };
 
 $cpuRecords
-
-// Scene admission for dedicated player filtering; generic asset aliases remain valid.
-// Absent player roles are permitted (for example, the settings Preview scene).
-constexpr bool HasDedicatedPlayerInstanceRoleSlots(
-    const std::array<RtInstanceMetadata, kRtInstanceMetadataCapacity>& instances) noexcept
-{
-    for (std::size_t index = 0u; index < instances.size(); ++index)
-    {
-        const std::uint32_t role = instances[index].geometryRole;
-        if ((role == static_cast<std::uint32_t>(RtGeometryRole::PlayerWorldBody) &&
-             index != kPlayerWorldBodyInstanceIndex) ||
-            (role == static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel) &&
-             index != kPlayerViewmodelInstanceIndex))
-        {
-            return false;
-        }
-    }
-    return true;
-}
 } // namespace horde::vulkan::raytracing
 "@
 
@@ -212,8 +193,6 @@ const uint kRtActiveFireEmitterCapacity = $($c.activeFireEmitters)u;
 const uint kRtGeometryRoleStatic = $($g.static)u;
 const uint kRtGeometryRolePlayerWorldBody = $($g.playerWorldBody)u;
 const uint kRtGeometryRolePlayerViewmodel = $($g.playerViewmodel)u;
-const uint kPlayerWorldBodyInstanceIndex = $($p.worldBody)u;
-const uint kPlayerViewmodelInstanceIndex = $($p.viewmodel)u;
 const uint kPlayerViewmodelPrimaryMask = $($p.viewmodelPrimaryMask)u;
 const uint kPlayerBodyRemainderPrimaryMask = $($p.bodyRemainderPrimaryMask)u;
 

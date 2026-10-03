@@ -1,7 +1,27 @@
 # Bounded primary player candidate lookup experiment
 
-This is a correctness-preserving optimization candidate, with no measured saving
-claimed yet. Released a397 and pre-experiment c299 both perform the same dynamic
+**Decision: reject from the runtime candidate.** The exact guarded Shipping APK
+`6bca7be1f5ab3afb443c4f39ca86b070e2a34ca222a727e3c147286b9198a085`
+completes1,838 owning CPU/GPU-valid frames at the unchanged75%/Mobile/Mobile/
+GlassOn Pipeline tuple. Median frame-cycle70.1879ms versus c29969.6940ms
+(+0.709%); GPU59.1093ms versus59.3083ms (-0.336%). No net measured frame-time
+benefit is demonstrated. Starts30.1C versus29.0C, both thermal0/USB charging,
+unknown cooling and uncontrolled clocks make this one pair unsuitable for
+causal improvement/regression claims. Endpoint33.7C/thermal0 was sampled43.5s
+after completion. Reject for lack of demonstrated benefit, not proof of harm.
+
+The32 experiment implementation/generated/fixture files are restored exactly
+from362's parent. This restores prior shader byte budgets, ABI generator and
+catalogs without changing accepted geometry, quality, scale, gameplay or player
+visibility. The large-font statistics entry fix and unrelated Windows Max
+motion validation remain. Exact experiment APKs, compiled control-flow proof,
+negative controls, captures and timing are preserved outside the repository;
+no rejected experiment is scheduled for repetition. Rebuild/admit the restored
+candidate before replacing artifact identities. The following is the archived
+experiment's design and evidence, not current shader behavior.
+
+This was a correctness-preserving optimization candidate. Released a397 and
+pre-experiment c299 both perform the same dynamic
 instance-role lookup for every primary ray-query candidate. The older167ce8
 historical benchmark predates the accepted dedicated modelled viewmodel; its
 35% whole-frame/40% GPU comparison cannot isolate a1.6.2 regression or this lookup.
@@ -49,7 +69,9 @@ preserved: missing explicit absolute freeze paths, old exact byte ceilings,
 missed Pipeline adapter regeneration and nonexistent executable-name targets.
 None is promoted to a successful application build.
 
-Remaining gates are refreshed Android admission, actual native image equivalence
-and cold matched same-artifact phone timing. Adopt or disposition this experiment
-from those results. Existing3,287-pose kinematic proof is unaffected by this
-metadata/lookup change; no new grip/headroom result is inferred from shader tests.
+Fresh Android eight-ELF/package/selected-ARM64 validation passes on both actual
+APKs. Both OpaqueFast and both GenericDielectric Shipping guard proofs and
+negative controls pass. Ten RTX PNG/pixel/pose pairs exactly match pre-guard
+evidence with zero validation markers. These establish correctness, not benefit;
+the completed phone timing above determines rejection. Existing3,287-pose
+kinematic proof remains separate; no new grip/headroom result is inferred.

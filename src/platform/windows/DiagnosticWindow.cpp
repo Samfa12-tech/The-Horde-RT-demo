@@ -231,6 +231,8 @@ struct CaptureLaunchOptions
     bool graphicsPreview = false;
     bool outputResizeValidation = false;
     std::string nativeMotionScenario;
+    horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset =
+        horde::vulkan::raytracing::RtWorkloadPreset::Authored;
     bool requireRayQueryCompute = false;
     bool portrait = false;
     bool anatomicalPlayerMount = false;
@@ -359,6 +361,8 @@ struct VulkanSurfaceContext
 #if defined(_DEBUG)
     horde::gameplay::validation::MotionEvidenceScenario motionScenario;
     horde::gameplay::validation::MotionScenario motionRequestedScenario{};
+    horde::vulkan::raytracing::RtWorkloadPreset motionRequestedRtPreset =
+        horde::vulkan::raytracing::RtWorkloadPreset::Authored;
     horde::telemetry::MotionEvidenceLedger motionLedger;
     bool motionArmed = false;
     std::uint32_t motionRetryGeneration = 0;
@@ -529,13 +533,20 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     std::vector<std::wstring_view> argumentViews;
     for (int index = 1; index < argumentCount; ++index) argumentViews.emplace_back(arguments[index]);
-    const auto motionLaunch = horde::platform::windows::ParseWindowsMotionEvidenceLaunch(argumentViews);
+    const auto motionLaunch = horde::platform::windows::ParseWindowsMotionEvidenceLaunch(argumentViews,
+#if defined(_DEBUG)
+        true
+#else
+        false
+#endif
+    );
     if (!motionLaunch.error.empty())
     { options.error = motionLaunch.error; LocalFree(arguments); return options; }
     if (motionLaunch.requested)
     {
 #if defined(_DEBUG)
         options.requested = true; options.nativeMotionScenario = motionLaunch.scenario;
+        options.nativeMotionRtWorkloadPreset = motionLaunch.rtWorkloadPreset;
         options.outputDirectory = std::filesystem::path(motionLaunch.outputDirectory);
 #else
         options.error = "--validate-native-motion and --motion-scenario are Debug-only validation controls.";
@@ -568,7 +579,8 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
-        if (argument == L"--validate-native-motion" || argument == L"--motion-scenario") { ++index; continue; }
+        if (argument == L"--validate-native-motion" || argument == L"--motion-scenario" ||
+            argument == L"--motion-rt-workload") { ++index; continue; }
         if (argument == L"--validate-output-resize") { ++index; continue; }
         if (argument == L"--capture-graphics-preview") { ++index; continue; }
         if (argument == L"--anatomical-player-mount")
@@ -5839,12 +5851,16 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const bool anatomicalPlayerMount,
                                  const bool graphicsPreviewCapture,
                                  const bool outputResizeValidation,
-                                 const std::string& nativeMotionScenario)
+                                 const std::string& nativeMotionScenario,
+                                 const horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset)
 {
     VulkanSurfaceContext context;
     context.graphicsPreviewCapture = graphicsPreviewCapture;
     context.outputResizeValidation = outputResizeValidation;
     context.nativeMotionValidation = !nativeMotionScenario.empty();
+#if defined(_DEBUG)
+    if (context.nativeMotionValidation) context.motionRequestedRtPreset = nativeMotionRtWorkloadPreset;
+#endif
     if (graphicsPreviewCapture)
         context.sceneProfile = horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview;
     const bool explicitComparison = developmentCheckpoint != nullptr &&
@@ -8007,7 +8023,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const bool anatomicalPlayerMount,
                         const bool graphicsPreviewCapture,
                         const bool outputResizeValidation,
-                        const std::string& nativeMotionScenario)
+                        const std::string& nativeMotionScenario,
+                        const horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset)
 {
     // Only the Debug capture surface changes aspect; camera, gameplay pose,
     // renderer quality and normal interactive-window sizing are untouched.
@@ -8312,7 +8329,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
         developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark, benchmarkWorkload,
         benchmarkRtWorkloadPreset,
-        anatomicalPlayerMount, graphicsPreviewCapture, outputResizeValidation, nativeMotionScenario);
+        anatomicalPlayerMount, graphicsPreviewCapture, outputResizeValidation, nativeMotionScenario, nativeMotionRtWorkloadPreset);
     if ((captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
         DestroyWindow(hWnd);
@@ -8412,7 +8429,7 @@ int RunDiagnosticWindow(const int showCommand)
                                launchOptions.benchmark.requested, launchOptions.benchmark.workload,
                                launchOptions.benchmark.rtWorkloadPreset,
                                launchOptions.anatomicalPlayerMount, launchOptions.graphicsPreview, launchOptions.outputResizeValidation,
-                               launchOptions.nativeMotionScenario);
+                               launchOptions.nativeMotionScenario, launchOptions.nativeMotionRtWorkloadPreset);
 }
 
 } // namespace horde::platform::windows

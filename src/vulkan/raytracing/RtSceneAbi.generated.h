@@ -263,23 +263,4 @@ static_assert(offsetof(RtFireEmitterGpu, shape) == 96u);
 static_assert(offsetof(RtFireEmitterGpu, animation) == 112u);
 static_assert(offsetof(RtFireEmitterGpu, smokeEmbers) == 128u);
 static_assert(offsetof(RtFireEmitterGpu, identity) == 144u);
-
-// Scene admission for dedicated player filtering; generic asset aliases remain valid.
-// Absent player roles are permitted (for example, the settings Preview scene).
-constexpr bool HasDedicatedPlayerInstanceRoleSlots(
-    const std::array<RtInstanceMetadata, kRtInstanceMetadataCapacity>& instances) noexcept
-{
-    for (std::size_t index = 0u; index < instances.size(); ++index)
-    {
-        const std::uint32_t role = instances[index].geometryRole;
-        if ((role == static_cast<std::uint32_t>(RtGeometryRole::PlayerWorldBody) &&
-             index != kPlayerWorldBodyInstanceIndex) ||
-            (role == static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel) &&
-             index != kPlayerViewmodelInstanceIndex))
-        {
-            return false;
-        }
-    }
-    return true;
-}
 } // namespace horde::vulkan::raytracing

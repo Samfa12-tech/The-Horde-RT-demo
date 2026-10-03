@@ -2,6 +2,40 @@
 
 Last updated: 2026-10-03
 
+## October3: same-player released-source comparison and rejected lookup experiment
+
+Evidence class: **exact isolated local Shipping APK, complete owning hardware-RT
+benchmark**, not release/signing, owner appearance/listening or sustained target
+acceptance. Actual SM-S948B/Android16/Adreno(TM)840; production and data preserved.
+Both runs use the accepted modelled player/viewmodel, Pipeline/MAILBOX/ASTC,
+75%/Mobile water/Mobile fire/GlassOn,1080x2235 internal/1440x2980 output. Each
+completes1,838 owning CPU/GPU-valid rows with zero rejected/cancelled/outstanding
+or error populations.
+
+Released sourcea397 baseline APK
+`b0177846a39e7de2d9300d264bc853689d871b6b98d0f210bbd8c34ed7fef49a`
+uses a guarded external benchmark-output-only code10 override for update-only
+installation; source1.6.1/code9 stays unchanged. Actual Shipping/Mobile ELF,
+signature,70-asset and16KiB admission passes. Its historical missing full cgltf
+notice is retained; it is a private comparison artifact, not a new release.
+Cycle/GPU medians64.9531/54.3676ms versus c29969.6940/59.3083ms imply+7.30%/
++9.09%. The older block-arm35%/40% comparison below is historical context, not
+the released-version regression. Baseline start29.6C versus current29.0C, both
+thermal0/USB charging; baseline endpoint31.2C is185.9s after completion.
+
+Guarded source362 APK
+`6bca7be1f5ab3afb443c4f39ca86b070e2a34ca222a727e3c147286b9198a085`
+matches installed pullback and fresh four-ABI/eight-ELF/81-asset/notice/16KiB
+admission; actual Shipping ARM64 guard/control-flow/negative checks pass.
+Cycle/GPU medians70.1879/59.1093ms versus c29969.6940/59.3083ms (+0.709%/
+-0.336%) demonstrate no net frame-time saving. Start30.1C/thermal0; endpoint
+33.7C/thermal0 is43.5s after completion. Unknown clocks/cooling and one ordered
+pair prohibit causal claims. The lookup experiment is rejected and its32 code/
+generated/fixture files restored; its exact evidence is retained. Refreshed
+restored artifacts, final phone UI/feature/lifecycle/quality investigations and
+owner acceptance remain open. No default quality reduction or sustained30FPS
+claim. S24/S25 remain unverified.
+
 ## October3: current1.6.2 exact admission and Shipping performance regression
 
 Evidence class: **local exact development-APK identity, complete hardware-RT

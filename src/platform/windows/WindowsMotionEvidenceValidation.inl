@@ -1,11 +1,25 @@
 // Debug owner only. Simulation, submit and completion use ordinary native paths.
-struct NativeMotionCaptureRow { std::string file, sha256; std::size_t stateRow=0, rtRow=0; };
+struct NativeMotionCaptureRow {
+    std::string file, sha256;
+    std::size_t stateRow=0, rtRow=0;
+    std::string rtWorkloadPolicy;
+};
 int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::DeviceCapabilities& capabilities,
                             const std::filesystem::path& directory)
 {
     using horde::gameplay::validation::MotionStage;
     std::vector<NativeMotionCaptureRow> captures; captures.reserve(64);
     std::string executableSha256, error;
+    bool policyAdmitted = false;
+    auto effectivePresetAtStart = context.rtSceneTuning.workloadPreset;
+    std::string compiledQualityAtStart(context.rtScene.SelectedDielectricQualityName());
+    std::array<std::string,2> artifactKeys{}, artifactSpirvHashes{}, artifactIncludeHashes{};
+    std::array<std::size_t,2> artifactWords{};
+    const auto policyJson = [&]() {
+        return horde::platform::windows::BuildWindowsMotionTuningJson(context.motionRequestedRtPreset,
+            effectivePresetAtStart, context.rtSceneTuning.workloadPreset, compiledQualityAtStart,
+            context.rtScene.SelectedDielectricQualityName());
+    };
     const auto write = [&]() {
         std::ofstream ledger(directory/"native-motion-ledger.json",std::ios::binary|std::ios::trunc);
         if (!ledger) return false;
@@ -20,7 +34,18 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
             << JsonEscape(capabilities.identity.gpuName) << "\",\"apiVersion\":" << capabilities.identity.vulkanApiVersion
             << ",\"driverVersion\":" << capabilities.identity.driverVersion << ",\"backend\":\""
             << (context.executionBackend==horde::vulkan::RtExecutionBackend::RayQueryCompute ? "RayQueryCompute" : "RayTracingPipeline")
-            << "\",\"presentationRetirement\":\"" << horde::vulkan::PresentCompletionDiagnostic(context.presentCompletionMode)
+            << "\",\"rtWorkloadPolicy\":" << policyJson()
+            << ",\"policyAdmitted\":" << (policyAdmitted ? "true" : "false")
+            << ",\"selectedArtifacts\":[";
+        for(std::size_t i=0;i<artifactKeys.size();++i)
+        {
+            if(i) manifest << ',';
+            manifest << "{\"key\":\"" << JsonEscape(artifactKeys[i]) << "\",\"spirvSha256\":\""
+                << artifactSpirvHashes[i] << "\",\"includeSha256\":\"" << artifactIncludeHashes[i]
+                << "\",\"wordCount\":" << artifactWords[i] << '}';
+        }
+        manifest << ']'
+            << ",\"presentationRetirement\":\"" << horde::vulkan::PresentCompletionDiagnostic(context.presentCompletionMode)
             << "\",\"isolation\":{\"preferencesLoaded\":false,\"preferencesWritten\":false,\"audioStarted\":false,"
             << "\"automatedMutedLane\":true,\"audioAcceptance\":false,\"ownerVisualAcceptance\":false,"
             << "\"secondSimulation\":false,\"phaseForced\":false,\"fixedDeltaOverride\":false}"
@@ -34,7 +59,8 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
         {
             if(i) manifest << ',';
             manifest << "{\"file\":\"" << captures[i].file << "\",\"sha256\":\"" << captures[i].sha256
-                << "\",\"stateRow\":" << captures[i].stateRow << ",\"rtRow\":" << captures[i].rtRow << '}';
+                << "\",\"stateRow\":" << captures[i].stateRow << ",\"rtRow\":" << captures[i].rtRow
+                << ",\"rtWorkloadPolicy\":" << captures[i].rtWorkloadPolicy << '}';
         }
         manifest << "]}\n";
         return WriteReportFile(directory/"native-motion-manifest.json",manifest.str());
@@ -59,6 +85,39 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
     if(!context.nativeMotionValidation || !context.useRtPath || !context.rtScene.IsReady() ||
        !context.rtFrameEvidenceInitialised || context.rtScene.Profile()!=horde::vulkan::raytracing::RtSceneProfile::Showcase)
         return fail("A ready full Showcase hardware RT owner is required.");
+    const bool compute=context.executionBackend==horde::vulkan::RtExecutionBackend::RayQueryCompute;
+    unsigned artifactIndex=0u;
+    for(const auto material:{horde::vulkan::raytracing::RtMaterialStrategy::OpaqueFast,
+                            horde::vulkan::raytracing::RtMaterialStrategy::GenericDielectric})
+    {
+        const auto artifact=context.rtScene.SelectedPipelineArtifactMetadata(material);
+        if(!artifact || !horde::platform::windows::WindowsMotionArtifactIdentityValid(
+            artifact->canonicalKey,artifact->spirvSha256,artifact->includeSha256,artifact->expectedWordCount,
+            compiledQualityAtStart,compute,artifactIndex==0u))
+            return fail("Actual selected motion shader pair has unavailable or inconsistent compiled provenance.");
+        artifactKeys[artifactIndex]=artifact->canonicalKey;
+        artifactSpirvHashes[artifactIndex]=artifact->spirvSha256;
+        artifactIncludeHashes[artifactIndex]=artifact->includeSha256;
+        artifactWords[artifactIndex++]=artifact->expectedWordCount;
+    }
+    if(!horde::platform::windows::WindowsMotionRtPolicyAdmitted(context.motionRequestedRtPreset,
+        context.motionRequestedRtPreset,compiledQualityAtStart,true))
+        return fail("Max motion requires the actual selected High shader policy supporting four primary local/fire samples.");
+    const auto policyStable=[&]() {
+        if(context.rtScene.SelectedDielectricQualityName()!=compiledQualityAtStart ||
+           !horde::platform::windows::WindowsMotionRtPolicyAdmitted(context.motionRequestedRtPreset,
+                context.rtSceneTuning.workloadPreset,compiledQualityAtStart,true)) return false;
+        unsigned index=0u;
+        for(const auto material:{horde::vulkan::raytracing::RtMaterialStrategy::OpaqueFast,
+                                horde::vulkan::raytracing::RtMaterialStrategy::GenericDielectric})
+        {
+            const auto artifact=context.rtScene.SelectedPipelineArtifactMetadata(material);
+            if(!artifact || artifact->canonicalKey!=artifactKeys[index] ||
+               artifact->spirvSha256!=artifactSpirvHashes[index] || artifact->includeSha256!=artifactIncludeHashes[index] ||
+               artifact->expectedWordCount!=artifactWords[index++]) return false;
+        }
+        return true;
+    };
     SetWindowTextA(context.windowHandle,"Horde Lantern RT - motion evidence: click this window to begin (30s)");
     const auto armingStart=std::chrono::steady_clock::now();
     for (;;)
@@ -80,6 +139,12 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
     if(!context.motionScenario.Begin(context.motionRequestedScenario,context.simulation,
             horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr)))
         return fail(std::string(context.motionScenario.Failure()));
+    // Select only the requested shared workload after the sole authored seed;
+    // all production camera, geometry, light, fire and water defaults stay intact.
+    context.rtSceneTuning.workloadPreset=context.motionRequestedRtPreset;
+    effectivePresetAtStart=context.rtSceneTuning.workloadPreset;
+    if(!policyStable()) return fail("Actual motion RT workload policy was not stable at arming.");
+    policyAdmitted=true;
     context.motionRetryGeneration=context.simulation.Snapshot().retryGeneration;
     context.simulationPaused=false; context.simulationInput.paused=false;
     MirrorSimulationSnapshot(context);
@@ -118,9 +183,11 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
            context.graphicsVisible || context.rtLabVisible || context.benchmark.IsRunning())
             return fail("Native motion was interrupted by resize, menu or rendering configuration changes.");
         if(context.motionScenario.Failed()) break;
+        if(!policyStable()) return fail("Actual selected shader or motion RT workload policy changed during the run.");
         bool presented=false;
         const auto submittedSlot=context.currentFrame;
         if(!RenderFrame(context,clearColor,presented)) return fail("Ordinary native RT rendering failed: "+context.lastRtFrameError);
+        if(!policyStable()) return fail("Actual motion RT workload policy changed while recording/presenting the current frame.");
         if(!presented || context.lastFramePresentation!=horde::telemetry::RtPresentationOutcome::Presented)
             return fail("Ordinary current-resource RT presentation was interrupted/recreated.");
         capabilities.rtScene.presented=true;
@@ -155,7 +222,7 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
                 std::ostringstream name; name<<std::setw(2)<<std::setfill('0')<<captures.size()<<'-'
                     <<horde::gameplay::validation::MotionStageName(stage)<<".png";
                 NativeMotionCaptureRow row{name.str(),{},owningFrame->stateRow,
-                    static_cast<std::size_t>(owningFrame-frames.begin())};
+                    static_cast<std::size_t>(owningFrame-frames.begin()),policyJson()};
                 if(!WriteRgbaPng(directory/row.file,image,diagnostic) || !Sha256File(directory/row.file,row.sha256,diagnostic))
                     return fail("Motion milestone PNG/identity failed: "+diagnostic);
                 captures.push_back(std::move(row)); lastCaptureSeconds=seconds; lastCaptureStage=stage;
@@ -178,6 +245,7 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
     if(context.motionScenario.Failed()) return fail(std::string(context.motionScenario.Failure()));
     if(context.motionLedger.Failed()) return fail(std::string(context.motionLedger.Failure()));
     if(!drain()) return fail("Final graphics ownership did not complete.");
+    if(!policyStable()) return fail("Actual motion RT workload policy changed before final evidence publication.");
     publication=context.rtFrameEvidence.PublishedStateByValue();
     if(!context.motionLedger.HasCurrentPresentedFrame(context.motionSurfaceGeneration,publication.sceneEpoch,publication.measurementGeneration))
         return fail("Final actual scope has no completed RT-produced presentation.");

@@ -2221,11 +2221,6 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
         &collapseStaticAsset_});
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
-    if (!HasDedicatedPlayerInstanceRoleSlots(staticMeshSlot_.InstanceMetadata()))
-    {
-        diagnostic = "Runtime player geometry roles must use their dedicated RT instance slots.";
-        return false;
-    }
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
         playerMetadata.primitiveCount != productionPlayerAsset_.primitives.size() ||
@@ -2293,11 +2288,6 @@ bool PresentableTinyRtScene::LoadPreviewStaticAssets(const std::string& producti
             static_cast<std::uint32_t>(RtInstanceFlag::Transmissive), 1u, &rewardLanternBodyAsset_},
     }};
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
-    if (!HasDedicatedPlayerInstanceRoleSlots(staticMeshSlot_.InstanceMetadata()))
-    {
-        diagnostic = "Preview player geometry roles must use their dedicated RT instance slots.";
-        return false;
-    }
     const auto fixture = staticMeshSlot_.InstanceMetadata()[9u];
     if (fixture.primitiveCount != 1u || fixture.primitiveBase >= staticMeshSlot_.PrimitiveMetadata().size())
     {
