@@ -11,7 +11,7 @@ the frozen game binaries and assets unchanged.
 | Finding / requirement | Disposition and authoritative evidence |
 | --- | --- |
 | F01 baseline recovery | **Resolved.** Recovered current-source/integration CI; fresh six-lane push/PR success at945f990 before publication. Original red results and bounded fixes retained, not relabelled a single97/97 Windows run. [Integration matrix](evidence/2026-10-02-final-integration/README.md). |
-| F02 version/release identity | **Resolved.** VERSION/map1.6.1/code9, stable certificate, frozen provenance, public itch/GitHub assets and downloaded bytes match. Published-line guards reject package/sign/upload before side effects. [Release receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md). |
+| F02 version/release identity | **Resolved for1.6.1; historical recommendation deliberately superseded.** VERSION/map1.6.1/code9, stable certificate, frozen provenance, public itch/GitHub assets and downloaded bytes match. The requested retroactive1.6.0 tag/release is superseded by the verified current1.6.1 announcement; no historical release was invented. Published-line guards reject package/sign/upload before side effects. [Release receipt](SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md). |
 | F03 modelled first-person arms | **Resolved and owner accepted.** Independent native-RT Viewmodel/WorldBody buffers/BLAS, shared gameplay animation/IK/grips, named semantics, accepted live cuff/armpit/look-down/mirror. No normal block-arm/full-body-primary/overlay substitute. [Cuff](evidence/2026-10-02-right-cuff/README.md), [seam/owner evidence](evidence/2026-09-27-segmented-seams/phone/README.md). |
 | F04 player semantic admission | **Resolved.** Processor, generated runtime, manifest, loader, atlas and actual static/skinned/reordered/malformed fixtures agree. Vulkan CPU-host lane runs affected contracts; it is not hardware acceptance. [Finding index](ENGINEERING_1_6_1_FINDING_STATUS.md). |
 | F05 Shipping diagnostic overhead | **Resolved.** Eight actual extracted final Windows/Android Shipping modules validate/disassemble with zero diagnostic atomics and no readback binding22. [Freeze](evidence/2026-10-03-signed-freeze/README.md). |
@@ -19,7 +19,7 @@ the frozen game binaries and assets unchanged.
 | F07 fixed quality variants | **Resolved.** Mobile/High and Shipping/Diagnostic pairs cover Pipeline and genuine BLAS/TLAS hardware RayQueryCompute. Quality is independent of backend/model name. [Backend record](ENGINEERING_1_6_1_RAYQUERY_BACKEND_2026-09-13.md). |
 | F08 memory/resource ownership | **Resolved bounded work; broader staging deliberately deferred.** Persistent coherent dynamic mapping and compatible local/coherent immutable placement preserve failure/fence ownership. Heavy A/B gives no meaningful speedup; no universal device-local/OOM fallback claim. [Resource matrix](evidence/2026-10-03-final-s26-resources/README.md). |
 | F09 frame pacing/concurrency | **Deliberately superseded.** Retain one frame in flight and correct host-written TLAS ownership. Owner accepts measured1.6.1 performance; no30FPS claim. Full graphics options planned1.6.2, multi-frame/temporal work not automatically promoted. |
-| F10 stronger cross-platform CI | **Resolved.** GCC/Clang/MSVC portable, actual Vulkan CPU-host player/resource fixtures, selected Clang ASan/UBSan and Android four-ABI/Java/lint. Hardware/shader/device evidence remains separate. |
+| F10 stronger cross-platform CI | **Resolved.** GCC/Clang/MSVC portable, actual Vulkan CPU-host player/resource fixtures, selected Clang ASan/UBSan and Android four-ABI/Java/lint. Main protection requires all six checks/up-to-date PRs, prevents force-push/deletion and retains explicit admin bypass. [Read-back receipt](evidence/2026-10-03-release-publication/main-protection.json). Hardware/shader/device evidence remains separate. |
 | F11 architecture extraction | **Resolved bounded seams.** Pipeline variants/bundles, GPU/resource lifetime, named player roles, evidence ownership, reporting and reusable Core PCM seams; no gratuitous renderer rewrite. |
 | F12 contract/regression coverage | **Resolved.** Semantic/IK/topology/seams, physical math, resource failure, input/event timing, version, PCM/focus and reporting consent/retry/cancel tests supplement native/owner evidence. |
 | F13 documentation | **Resolved.** Released README/platform guide/decisions/plan/finding/receipt indexes name actual ownership and publication; dated reports retain their original hashes and limitations. Complete commit inventory accompanies publication evidence. |
@@ -30,6 +30,20 @@ the frozen game binaries and assets unchanged.
 | In-game reporting | **Resolved and owner accepted.** Approved Briarhold-derived Cloudflare email with bounded schema/typed context, explicit consent, optional game-only RT screenshot, preview, retry/cancellation and offline fallback. Actual test email received; Windows prepare/preview/cancel accepted. No secrets in client. [Reporting record](ENGINEERING_1_6_1_REPORTING_2026-10-01.md). |
 | Lifecycle/output resize | **Resolved bounded path.** Extent-only resize retains compatible assets/AS/pipelines and rollback; Android off-UI scene ownership and cancellation/resume repair. Current-bank S26 motion/scale/resume and final signed update smoke pass; readiness remains slow, not instant. [Interaction](evidence/2026-10-03-final-s26-interactive/README.md). |
 
+The original secondary-only world-body recommendation is deliberately superseded
+only for the owner-required look-down body presence: explicit remainder primitives
+receive primary visibility, excluding world arms/head; independent viewmodel arms
+retain their own geometry/resources. This is not full-body primary visibility or
+a pitch-specific overlay. `PlayerRenderSlot.cpp` owns the named mask contract.
+Accepted normal-pitch live/owner evidence remains the boundary; visible feet and
+steeper pitch are future work.
+
+Broader device-selection scoring/enumeration hardening and a general structured
+diagnostics extraction from audit section7.4/11 remain low-priority future work,
+not claimed implemented by the driver-version fix. The owner's explicit measured
+performance acceptance supersedes the conditional1ms skinning target for this
+release; no per-viewmodel1ms measurement or sustained30FPS result is invented.
+
 ## Test/platform matrix
 
 Publication checkpoint945f990: push37089806774 and PR37089810005 both completed
@@ -37,7 +51,10 @@ success, all six lanes. Post-publication docs/guard closeout and normal main
 integration have separate current-head checks:271f6c0 push37091774573/PR37091777614
 both six-lane green; [PR15](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/15)
 merged normally at ee6d877 with identical tree and green main37092128244.
-The final documentation receipt does not change the frozen runtime.
+Receipt-only main006c288 also passes all six lanes in
+[run37092782420](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37092782420).
+Final documentation changes do not change the frozen runtime; their own current
+head checks remain visible in main Actions rather than causing a receipt loop.
 
 | Scope | Result / limit |
 | --- | --- |

@@ -21,6 +21,27 @@ published packages, accepted assets, shader words or runtime source.
   integration, including parallel/main ancestry, not340 independent features.
   This final receipt commit is separately visible in normal main history.
 
+## CI protection and final audit reconciliation
+
+Receipt-only main006c288 passes all six lanes in run37092782420. The final
+documentation patch leaves package/runtime/shader bytes unchanged and receives
+its own normal push checks; no old-job rerun is substituted for a new head.
+
+After restoring green CI, audit section10.4 main protection was applied and read
+back from GitHub. `main-protection.json` records the six actual workflow job names,
+strict/up-to-date status checks and a PR requirement. Force-push and deletion are
+disabled; `enforce_admins=false` deliberately retains the requested explicit
+owner/admin emergency bypass. No physical-device checks were made normal PR
+blockers. `PROTECTION_SHA256SUMS.txt` binds this public, non-secret configuration
+receipt; it is repository configuration evidence, not a source-only assertion.
+
+The original retroactive1.6.0 tag/release recommendation is superseded by the
+verified1.6.1 announcement and unchanged updater selection. The accepted primary
+body remainder is the bounded response to the later owner look-down requirement,
+not a full-body-primary substitute. Low-priority device selection/enumeration and
+broader diagnostics extraction remain future work. These dispositions reconcile
+the audit without restarting accepted runtime investigation.
+
 ## Primary checkout and owned cleanup
 
 Primary main fast-forwarded to origin/main; ahead/behind0/0. Only the owner's

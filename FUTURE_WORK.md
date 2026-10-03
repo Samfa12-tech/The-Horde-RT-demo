@@ -1,8 +1,12 @@
 # Horde Lantern RT - Current and Future Work
 
-Owner update: 2026-09-13. The [1.6.1 engineering programme](docs/ENGINEERING_1_6_1_PLAN.md) is the current execution authority. It supersedes the 2026-09-11 post-1.6.1 ordering while retaining the detailed compatibility design below. No release/publication is authorised.
+Current status, 2026-10-03:1.6.1 is published and normally merged to main. The
+[completion report](docs/ENGINEERING_1_6_1_COMPLETION_REPORT.md) records accepted
+scope and explicit deferrals. The September13 sequence below and September11
+compatibility design are historical planning context, not remaining1.6.1 gates
+or current publication restrictions. No later release is automatically authorised.
 
-## Ordered sequence
+## Historical September13 sequence
 
 1. Reconcile lean branch guidance and current plans/evidence.
 2. Resolve S24/S25 hardware-RT compatibility through the reusable alternate backend below.
@@ -22,6 +26,14 @@ not an achieved result. Reuse retained negative and thermal-context evidence.
 Owner defers final S24 coverage as **working but not fully tested**; exact S25
 remains unverified. Future device validation must use the exact candidate/device,
 not infer acceptance from S26/RTX or rewrite historical results.
+
+## Lower-priority platform hardening — retained audit follow-up
+
+Audit section7.4's secondary device-selection scoring and consistent incomplete/
+failed enumeration reporting remain future hardening, separate from the shipped
+raw driver-identity repair. Broader structured diagnostics extraction also remains
+future work; retain bounded subsystem seams rather than rewriting the renderer.
+These are not performance gains, completed features or remaining1.6.1 gates.
 
 ## Later animation work - not a 1.6.1 acceptance blocker
 
@@ -60,7 +72,7 @@ search. Original failed gates remain failed evidence, but are no longer1.6.1
 release blockers by explicit owner scope decision. Normal gameplay, lighting,
 RT presentation and final-candidate stability checks still apply.
 
-## S24/S25 compatibility programme - required within 1.6.1
+## Historical September11 S24/S25 compatibility design
 
 The immediate motivation is now confirmed across two Qualcomm flagship generations: real Samsung Galaxy S25 Ultra and Galaxy S24 Ultra tests performed on 2026-09-11 both reached Horde's Vulkan diagnostics and exposed acceleration structures plus `VK_KHR_ray_query`, but neither tested driver exposed `VK_KHR_ray_tracing_pipeline`. The current renderer therefore selected `RayQuery` capability mode but did not attempt or present the Horde RT scene.
 
