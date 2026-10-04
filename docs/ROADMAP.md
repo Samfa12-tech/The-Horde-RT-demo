@@ -1,7 +1,7 @@
 # Horde Lantern RT — Campaign and Engine Roadmap
 
 **Owner:** Sam Small / Samfa12  
-**Planning update:** 3 October 2026  
+**Planning update:** 4 October 2026  
 **Status:** Owner-approved direction; future milestones are provisional, not implemented or release promises.
 
 ## Authority and navigation
@@ -337,6 +337,14 @@ Required design safeguards for future light mechanics:
 - Missed moves, dropped/stowed tools, retry, pause and save restoration must not create an unrecoverable puzzle. Bound ray paths and interaction counts explicitly and report the actual phone cost.
 
 These are engine-system requirements, not an instruction to implement the future optical puzzle framework during 1.7 or 1.8.
+
+## Optimisation experiment bank and pre-release tests
+
+**Owner update, 4 October 2026:** Keep the [mobile performance audit and experiment bank](MOBILE_PERFORMANCE_AUDIT_2026-10-04.md) as a dated source/evidence reference. It separates verified mechanisms and recorded measurements from hypotheses, visual trade-offs and unmeasured priority rankings.
+
+After the current fixes, the owner has requested three sequential bounded tests before shipping 1.6.2: selective primary opacity, an actual eligible opaque-bounce skip preserving important RT reflections, and a SPIR-V-verified texture-footprint/LOD experiment. Give each its own comparable Shipping measurements, visual checks and keep/reject decision. These are experiments, not guaranteed shipping features or promised savings.
+
+The separately queued second pass for independent shadows, lower fire, upscaling, optional benchmark Send statistics and mist density/lighting retains its own implementation/measurement plan. The rest of the audit remains future proposals; preserving it does not commit every priority to 1.6.2, change defaults or authorise a renderer rewrite, credentials, deployment, merge or release. Retain the final independent review and explicit owner release gate.
 
 ## Engine growth and scope discipline
 
