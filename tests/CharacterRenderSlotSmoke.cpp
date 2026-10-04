@@ -865,14 +865,32 @@ int main()
                           std::string::npos,
                       "zero staff intensity must zero the complete partial-glow lich emissive radiance");
         ok &= Require(raygenSource.find("bool leanWorkload = controls.workloadPreset < 0.5;") != std::string::npos &&
-                      raygenSource.find("bool maxWorkload = controls.workloadPreset >= 1.5;") != std::string::npos &&
+                      raygenSource.find("bool dualVisibility = primaryReceiver && primaryLocalShadowSamples() > 1;") != std::string::npos &&
+                      raygenSource.find("bool dualSkyVisibility = primaryReceiver && primarySkyShadowSamples() > 1;") != std::string::npos &&
                       raygenSource.find("if (!leanWorkload)") != std::string::npos &&
-                      raygenSource.find("if (dualVisibility)") != std::string::npos &&
+                      raygenSource.find("if (dualVisibility && localStrength > 0.001)") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 2.0;") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 6.0;") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 8.0;") != std::string::npos &&
                       raygenSource.find("stepLength * 7.5") != std::string::npos,
-                      "Lean/Authored/Max must deterministically select no-bounce 2, authored 6, and dual-visibility 8 work");
+                      "Lean/Authored/Max must retain no-bounce 2, authored 6 and Max 8 mist work while primary visibility follows independent quality controls");
+        const std::size_t areaLightBegin = lightingSource.find("vec3 areaLightTransmittance(");
+        const std::size_t areaLightEnd = lightingSource.find("vec3 fireEmitterDirectLighting(", areaLightBegin);
+        const std::string areaLight = areaLightBegin != std::string::npos && areaLightEnd != std::string::npos
+            ? lightingSource.substr(areaLightBegin, areaLightEnd - areaLightBegin) : std::string{};
+        ok &= Require(!areaLight.empty() &&
+                      areaLight.find("int samples = primaryReceiver ? primaryLocalShadowSamples() : 1;") != std::string::npos &&
+                      areaLight.find("sampleNumber < 4") != std::string::npos &&
+                      areaLight.find("if (sampleNumber >= samples) break;") != std::string::npos &&
+                      areaLight.find("result += sceneShadowTransmittanceMask(offsetRayOrigin(h, direction),") != std::string::npos &&
+                      areaLight.find("direction, distance - 0.02, 0x35u)") != std::string::npos &&
+                      areaLight.find("return result / float(samples);") != std::string::npos &&
+                      areaLight.find("controls.workloadPreset") == std::string::npos &&
+                      lightingSource.find("return clamp(int(rtQualityControls.value.controls.y), 1, 4);") != std::string::npos &&
+                      lightingSource.find("return clamp(int(rtQualityControls.value.controls.y), 1, 2);") != std::string::npos &&
+                      lightingSource.find("return clamp(int(rtQualityControls.value.controls.z), 1, 2);") != std::string::npos &&
+                      lightingSource.find("if (rtQualityControls.value.controls.x == 0u) return vec3(0.0);") != std::string::npos,
+                      "independent shadow controls must retain bounded real RGB visibility, normalized weights, hard Lower and one-ray secondary receivers");
         ok &= Require(raygenSource.find("waterSheetCoverage") == std::string::npos &&
                       raygenSource.find("bool waterStreamExit") != std::string::npos &&
                       raygenSource.find("controls.waterQuality < 0.5") != std::string::npos &&
@@ -1012,14 +1030,17 @@ int main()
                           std::string::npos &&
                       lightingSource.find("primaryUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos &&
-                      raygenSource.find("lightTransmittance = sceneShadowTransmittanceMask(") != std::string::npos,
+                      lightingSource.find("result += sceneShadowTransmittanceMask(offsetRayOrigin(h, direction),") != std::string::npos &&
+                      lightingSource.find("vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver);") != std::string::npos,
                       "nearest committed shadow traversal must retain RGB through local, sky, and fire lighting while keeping metallic blockers and mobile/high ceilings");
         ok &= Require(raygenSource.find("if (!genericTransmissionActive)") !=
                           std::string::npos &&
                       raygenSource.find("float lightVisibility = lightTransmittance.x;") !=
                           std::string::npos &&
-                      raygenSource.find("vec3 lightTransmittance = sceneShadowTransmittanceMask(") !=
-                          std::string::npos,
+                      lightingSource.find("vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver);") !=
+                          std::string::npos &&
+                      lightingSource.find("h.base * lightColor * lightTransmittance * diffuse * attenuation") != std::string::npos &&
+                      lightingSource.find("lightColor * lightTransmittance * specular * attenuation") != std::string::npos,
                       "fixture-hidden lighting must retain released scalar arithmetic from the shared ordered query while active generic transmission uses RGB traversal");
         ok &= Require(sceneSource.find("dielectricSecondaryRejectCount_") != std::string::npos &&
                       sceneSource.find("dielectricUnclosedVolumeCount_") != std::string::npos &&
@@ -1149,7 +1170,10 @@ int main()
                           std::string::npos &&
                       opaqueDirect.find("mat4 transmittanceSamples = transparentTransmittanceBatch(") != std::string::npos &&
                       !opaquePrimary.empty() &&
-                      opaquePrimary.find("shadeOpaqueDirect(h, rayDirection, maxWorkload") !=
+                      opaqueDirect.find("bool dualVisibility = primaryReceiver && primaryLocalShadowSamples() > 1;") != std::string::npos &&
+                      opaqueDirect.find("bool dualSkyVisibility = primaryReceiver && primarySkyShadowSamples() > 1;") != std::string::npos &&
+                      opaqueSecondary.find("shadeOpaqueDirect(h, incoming, false, false") != std::string::npos &&
+                      opaquePrimary.find("shadeOpaqueDirect(h, rayDirection, true, !fireRayReflectionOwned") !=
                           std::string::npos &&
                       opaquePrimary.find("HitInfo bounceHit = traceScene(") != std::string::npos &&
                       !primaryDispatch.empty() &&
@@ -1180,7 +1204,9 @@ int main()
                           std::string::npos &&
                       raygenSource.find("emberDistance < maximumDistance") != std::string::npos,
                       "fire must be a bounded world-space volume and depth-clip analytic embers at the physical hit");
-        const std::size_t fireDirectBegin = raygenSource.find("vec3 fireEmitterDirectLighting(");
+        const std::size_t fireDirectBegin = raygenSource.find(
+            "vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool primaryReceiver,\n"
+            "                               bool allowAnalyticSpecular)\n{");
         const std::size_t fireDirectEnd =
             raygenSource.find("void activeSkyLight(", fireDirectBegin);
         const std::string fireDirect =
@@ -1192,7 +1218,7 @@ int main()
                       fireDirect.find("rtFireEmitters.values[emitterIndex]") != std::string::npos &&
                       fireDirect.find("emitter.lightPositionStrength.xyz") != std::string::npos &&
                       fireDirect.find("emitter.colourIntensity.rgb") != std::string::npos &&
-                      fireDirect.find("sceneShadowTransmittanceMask(") != std::string::npos &&
+                      fireDirect.find("areaLightTransmittance(h, lightPosition, primaryReceiver)") != std::string::npos &&
                       raygenSource.find("findFireEmitter(1u") == std::string::npos &&
                       raygenSource.find("currentTorchLightPosition") == std::string::npos &&
                       raygenSource.find("sin(controls.time * 15.0)") == std::string::npos &&
@@ -1200,11 +1226,11 @@ int main()
                       "every selected emitter must use its own Light socket, correlated colour/strength, and real visibility without stable-ID-1 assumptions");
         ok &= Require(waterPrimary.find("bool fireRayReflectionOwned = controls.waterQuality >= 1.5;") !=
                           std::string::npos &&
-                      waterPrimary.find("fireEmitterDirectLighting(\n        h, rayDirection, false, !fireRayReflectionOwned)") !=
+                      waterPrimary.find("fireEmitterDirectLighting(\n        h, rayDirection, true, !fireRayReflectionOwned)") !=
                           std::string::npos &&
                       opaquePrimary.find("bool fireRayReflectionOwned = !leanWorkload && wantsPlayerReflection;") !=
                           std::string::npos &&
-                      opaquePrimary.find("maxWorkload, !fireRayReflectionOwned") !=
+                      opaquePrimary.find("shadeOpaqueDirect(h, rayDirection, true, !fireRayReflectionOwned") !=
                           std::string::npos &&
                       fireDirect.find("if (allowAnalyticSpecular)") != std::string::npos,
                       "ray-integrated fire reflection must exclusively own emitter specular while direct diffuse and shadowing remain active");
