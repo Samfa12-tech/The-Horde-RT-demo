@@ -213,10 +213,12 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
         ? pow(max(dot(surfaceNormal, localHalf), 0.0), 14.0) : 0.0;
     bool genericTransmissionActive = genericTransmissionEnabled();
     vec3 localInterfaceTransmittance = localStrength > 0.001
-        ? sceneShadowTransmittanceMask(offsetRayOrigin(h, localDirection),
-                                  localDirection, localDistance - 0.02, 0x35u)
+        ? (primaryLocalShadowSamples() > 1
+            ? areaLightTransmittance(h, localPosition, true)
+            : sceneShadowTransmittanceMask(offsetRayOrigin(h, localDirection),
+                                  localDirection, localDistance - 0.02, 0x35u))
         : vec3(0.0);
-    int skySample = int((HORDE_RT_PIXEL_ID.x + HORDE_RT_PIXEL_ID.y) & 1u);
+    int skySample = areaShadowSampleIndex();
     vec3 skyDirection;
     float skyDistance;
     vec3 skyRadiance;
@@ -226,6 +228,19 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     vec3 skyInterfaceTransmittance = sceneShadowTransmittanceMask(
         offsetRayOrigin(h, skyDirection), skyDirection,
         skyDistance - 0.02, 0x35u) * skyGain;
+    if (primarySkyShadowSamples() > 1)
+    {
+        vec3 secondDirection;
+        float secondDistance;
+        vec3 secondRadiance;
+        float secondGain;
+        activeSkyLight(h.position, 1 - skySample, secondDirection, secondDistance,
+                       secondRadiance, secondGain);
+        skyInterfaceTransmittance = 0.5 * (skyInterfaceTransmittance +
+            sceneShadowTransmittanceMask(offsetRayOrigin(h, secondDirection), secondDirection,
+                secondDistance - 0.02, 0x35u) * secondGain);
+        skyRadiance = 0.5 * (skyRadiance + secondRadiance);
+    }
     float localInterfaceVisibility = localInterfaceTransmittance.x;
     float skyInterfaceVisibility = skyInterfaceTransmittance.x;
     float skyHighlight = pow(max(dot(surfaceNormal,
@@ -238,7 +253,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
             * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
             * localStrength / (1.0 + localDistanceSquared * 0.58);
     interfaceLight += fireEmitterDirectLighting(
-        h, rayDirection, false, !fireRayReflectionOwned);
+        h, rayDirection, true, !fireRayReflectionOwned);
     interfaceLight += !genericTransmissionActive
         ? skyRadiance * skyHighlight * skyInterfaceVisibility * 0.10
         : skyRadiance * skyInterfaceTransmittance * skyHighlight * 0.10;
@@ -305,7 +320,7 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
     float skyDiffuse;
     vec3 localLightColor;
     float localLightStrength;
-    vec3 color = shadeOpaqueDirect(h, rayDirection, maxWorkload, !fireRayReflectionOwned,
+    vec3 color = shadeOpaqueDirect(h, rayDirection, true, !fireRayReflectionOwned,
                                    localVisibility, skyVisibility, skyDiffuse,
                                    localLightColor, localLightStrength);
     // Keep the one RT bounce deterministic. The previous time-varying hemisphere sample was the main source of shimmer.

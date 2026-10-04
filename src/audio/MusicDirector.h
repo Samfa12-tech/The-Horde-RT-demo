@@ -30,6 +30,9 @@ struct MusicSelection
     bool clockValid = true;
     double positionSeconds = 0.0;
     std::uint64_t revision = 0;
+    // Presentation envelope, multiplied by independent user music volume at
+    // the existing device output. It never changes saved volume or cue PCM.
+    float revealGain = 1.0f;
 };
 
 // Resolves shared gameplay state into a cue and musical position. It owns no
@@ -81,6 +84,7 @@ private:
     bool clockInitialized_ = false;
     double lastAudioClockSeconds_ = 0.0;
     bool previousUpdateSuspended_ = false;
+    float revealGain_ = 1.0f;
     bool finalePhaseInitialized_ = false;
     bool skylightHReached_ = false;
     gameplay::interactions::FinaleSequencePhase previousFinalePhase_ =

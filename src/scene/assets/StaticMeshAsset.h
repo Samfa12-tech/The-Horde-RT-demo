@@ -52,6 +52,8 @@ struct StaticMaterial
     float metallicFactor = 1.0f;
     float roughnessFactor = 1.0f;
     float occlusionStrength = 1.0f;
+    float normalScale = 1.0f;
+    std::array<float, 2u> textureScale{{1.0f, 1.0f}};
     float transmissionFactor = 0.0f;
     float ior = 1.5f;
     float thicknessFactor = 0.0f;

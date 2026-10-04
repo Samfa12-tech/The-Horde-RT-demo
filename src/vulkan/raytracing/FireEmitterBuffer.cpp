@@ -43,9 +43,13 @@ float DistanceSquared(const horde::gameplay::effects::FireEmitterState& emitter,
 
 FireEmitterQualityBudget ResolveFireEmitterQualityBudget(const FireEmitterQuality quality)
 {
-    return quality == FireEmitterQuality::High
-        ? FireEmitterQualityBudget{10u, 2u}
-        : FireEmitterQualityBudget{4u, 1u};
+    switch (quality)
+    {
+    case FireEmitterQuality::High: return {10u, 2u};
+    case FireEmitterQuality::Low: return {2u, 1u};
+    case FireEmitterQuality::Mobile: return {4u, 1u};
+    }
+    return {4u, 1u};
 }
 
 RtFireEmitterGpu PackFireEmitterGpu(
@@ -97,6 +101,12 @@ bool BuildFireEmitterUpload(
     std::string& diagnostic)
 {
     upload = {};
+    if (quality != FireEmitterQuality::Mobile && quality != FireEmitterQuality::High &&
+        quality != FireEmitterQuality::Low)
+    {
+        diagnostic = "FireEmitterBuffer requires an admitted quality tier.";
+        return false;
+    }
     if (configuredEmitters.size() > kRtFireEmitterCapacity)
     {
         diagnostic = "FireEmitterBuffer capacity exceeded: " +

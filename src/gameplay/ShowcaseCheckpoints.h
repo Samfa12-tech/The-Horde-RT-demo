@@ -113,7 +113,7 @@ inline void AdvanceLichToActive(ShowcaseCheckpointState& state, const ShowcaseCh
 {
     state.enemyDirector.Update(checkpoint.x, checkpoint.z);
     state.activeEnemyKind = state.enemyDirector.Snapshot().selectedEnemy;
-    state.lichEncounter.Reset();
+    state.lichEncounter.ImportCombatCheckpoint();
     state.lichEncounter.Update(0.05f, checkpoint.x, checkpoint.z, true, true);
 }
 

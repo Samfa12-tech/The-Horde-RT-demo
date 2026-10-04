@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "status": "compiled-and-byte-verified-not-native-acceptance",
+  "sourceReceipt": "assets/textures/props/source/collapsed-entry/input-receipt.json",
+  "sourceReceiptSha256": "c893870e1649ebbed0a564f1bc72f27ad510ed2d68ba1aea5de4c37f974bd73d",
+  "ktx": {
+    "version": "4.4.2",
+    "executableSha256": "9f2d32007e7cd4a16cf76c954380e6bed027684545621b91457dffe0f4eac2ca",
+    "createPolicy": "--testrun --layers --width1024 --height1024 --generate-mipmap --assign-tf --assign-primaries bt709; inherited ASTC medium; no normalize/conversion/filter override"
+  },
+  "tools": [
+    {
+      "path": "tools/build-production-prop-textures.ps1",
+      "sha256": "aec0057b1e7a1ca04af526d271ba60ede0f0f98ff8dea1f6e61fd38a8135f931"
+    },
+    {
+      "path": "tools/compile-static-texture-array.ps1",
+      "sha256": "f2587bbac4e2012441795d04544748f405aa12cf067ca5f70457b5f10c4738d3"
+    },
+    {
+      "path": "tools/validate-static-prop-atlas-growth.py",
+      "sha256": "ad01d076536c9dbae5718522d5da0b2c4d17f13424a9339e15a957662f47f8a1"
+    }
+  ],
+  "checks": [
+    "6/6 JPEG and PNG hashes, exact decoded1024RGBA pixels, opaque alpha and CC0 snapshot hash",
+    "8/8 KTX create and validate",
+    "6/6 array DFD identical; 10oldlayers x11mips payload identical",
+    "2/2 unchanged1layer emissive whole-file hashes",
+    "6/6 negative header/format/mip/compression/transfer and changed-legacy-payload fixtures",
+    "Real mixed-PNG metadata fixture PASS: 2layers512x512, full10mips, BT709/sRGB"
+  ],
+  "preservedLegacyLayers": 10,
+  "appendedLayers": [
+    {
+      "name": "Boulder01Rock",
+      "author": "Rico Cilliers",
+      "license": "CC0",
+      "index": 10
+    },
+    {
+      "name": "MedievalWall02",
+      "author": "Rob Tuytel",
+      "license": "CC0",
+      "index": 11
+    }
+  ],
+  "licenceReview": {
+    "primarySources": [
+      "https://polyhaven.com/license",
+      "https://polyhaven.com/a/boulder_01",
+      "https://polyhaven.com/a/medieval_wall_02"
+    ],
+    "date": "2026-10-03",
+    "result": "Asset CC0 commercial/reuse confirmed; site content is not relicensed; earlier Meshy attribution retained"
+  },
+  "negativeExperiment": "Initial stage rejected mixed unspecified/BT709 source PNG primaries. Explicit metadata assignment fixed it; old DFD/payload comparison prevents colour/filter retuning.",
+  "performance": "No GPU/device/native/Gradle run; format-derived upload bytes exclude driver allocation/AS/geometry/bandwidth; runtime image/cost/owner acceptance remains open",
+  "fixture": {
+    "path": "tests/StaticTextureArrayToolTests.ps1",
+    "sha256": "0cfbd9a547b7ee7a656a686da9a0300b960d5943836f737c16f7552b5ab67ee7",
+    "initialFailure": "Mixed2K/1K fixture correctly rejected input dimensions; fixed fixture to real matching1K sources before requested512resampling, no runtime policy change."
+  }
+}

@@ -24,6 +24,12 @@ struct RtGpuBuffer
     // Owned by this buffer, opt-in for coherent CPU-written dynamic resources.
     // The caller still waits for the owning GPU fence before every write.
     void* mappedWriteData = nullptr;
+    // Raw address stays at buffer byte zero. Aligned users upload at this offset.
+    VkDeviceSize deviceAddressOffset = 0u;
+    [[nodiscard]] VkDeviceAddress AlignedAddress() const noexcept
+    {
+        return address + deviceAddressOffset;
+    }
 };
 
 struct RtAccelerationStructure
@@ -113,6 +119,12 @@ public:
                       RtGpuBuffer& out,
                       std::string& diagnostic,
                       VkMemoryPropertyFlags preferredMemoryFlags = 0u) const;
+    bool CreateAlignedBuffer(VkDeviceSize usableSize,
+                             VkDeviceSize addressAlignment,
+                             VkBufferUsageFlags usage,
+                             VkMemoryPropertyFlags memoryFlags,
+                             RtGpuBuffer& out,
+                             std::string& diagnostic) const;
     bool MapBufferForHostWrites(RtGpuBuffer& buffer,
                                std::string& diagnostic) const;
     bool WriteBuffer(const RtGpuBuffer& buffer,

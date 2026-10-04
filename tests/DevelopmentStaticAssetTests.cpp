@@ -63,10 +63,58 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 47u,
-          "forty-seven isolated render-development checkpoints include eleven dedicated viewmodel poses");
-    Check(FindDevelopmentCheckpoint(147) == nullptr && FindDevelopmentCheckpoint(148) == nullptr,
-          "withdrawn extreme-down studies must not define the normal player acceptance matrix");
+    Check(kDevelopmentCheckpoints.size() == 52u,
+          "development registry includes eleven viewmodel poses and five distinct layout identity views");
+    Check(FindDevelopmentCheckpoint(152) == nullptr && FindDevelopmentCheckpoint(153) == nullptr,
+          "development lookup rejects IDs beyond the admitted layout views");
+    for (std::size_t first = 0u; first < kDevelopmentCheckpoints.size(); ++first)
+    {
+        for (std::size_t second = first + 1u; second < kDevelopmentCheckpoints.size(); ++second)
+            Check(kDevelopmentCheckpoints[first].id != kDevelopmentCheckpoints[second].id &&
+                      kDevelopmentCheckpoints[first].name != kDevelopmentCheckpoints[second].name,
+                  "development names and IDs must remain unique across old and new capture requests");
+    }
+    std::int32_t layoutId = 147;
+    for (const auto name : {"layout-c-wall-panel", "layout-d-entry-breach",
+                           "layout-a-waterfall-own-hole", "layout-b-large-skylight",
+                           "layout-e-finale-opening"})
+    {
+        const auto* layout = FindDevelopmentCheckpoint(name);
+        Check(layout != nullptr && layout->id == layoutId &&
+                  FindDevelopmentCheckpoint(layoutId) == layout &&
+                  FindShowcaseCheckpoint(name) == nullptr && FindShowcaseCheckpoint(layoutId) == nullptr,
+              "layout identity names and IDs belong only to the development registry");
+        if (layout != nullptr)
+        {
+            Check(layout->baseShowcaseCheckpointId == (layoutId == 151 ? 11 : 2) &&
+                      layout->combatPose == DevelopmentCombatPose::Rest &&
+                      !layout->usesGlassFixture && !layout->usesProductionRewardProps &&
+                      !layout->productionLanternGlassOnly && !layout->stagesUnlockedChest &&
+                      layout->rewardPose == DevelopmentRewardPose::None &&
+                      std::isfinite(layout->pitch) && layout->pitch >= -0.32f && layout->pitch <= 0.28f,
+                  "layout proof uses the ordinary rest state and accepted camera pitch without reward/glass overrides");
+            simulation::GameSimulation stagedLayout;
+            DevelopmentCheckpointStageEvidence layoutEvidence{};
+            StepFixedObservationCounter layoutSteps{};
+            const DevelopmentCheckpointStepFixedObservation observer{
+                &layoutSteps, BeginObservedStepFixed, CompleteObservedStepFixed};
+            Check(StageDevelopmentCheckpointSimulation(stagedLayout, *layout, &layoutEvidence, &observer) &&
+                      stagedLayout.Snapshot().playerX == layout->cameraX &&
+                      stagedLayout.Snapshot().playerZ == layout->cameraZ &&
+                      stagedLayout.Snapshot().playerYawRadians == layout->yaw &&
+                      stagedLayout.Snapshot().playerPitchRadians == layout->pitch &&
+                      layoutSteps.started == 1u && layoutSteps.completed == 1u &&
+                      !layoutSteps.active && !layoutSteps.invalidPairing &&
+                      layoutEvidence.action == PlayerCombatAction::Idle &&
+                      layoutEvidence.consumedAttackEdges == 0u && layoutEvidence.consumedParryEdges == 0u &&
+                      stagedLayout.Events().Empty(),
+                  "layout capture stages exactly one ordinary zero-delta pose update with coherent player state and no combat edges");
+            if (layoutId != 151)
+                Check(stagedLayout.Snapshot().torchLightStrength > 0.0f,
+                      "C/D/A/B layout views retain the fresh torch instead of inheriting the later torch-loss checkpoint");
+        }
+        ++layoutId;
+    }
     int viewmodelId = 136;
     for (const auto name : {"player-viewmodel-grips", "player-viewmodel-forward",
                            "player-viewmodel-downward-cut", "player-viewmodel-upward-slice",

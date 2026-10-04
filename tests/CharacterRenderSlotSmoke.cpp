@@ -232,9 +232,10 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kBlasCount == 16u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 21u,
-                  "production props and generic dielectric fixture must add bounded BLAS resources while TLAS reserves the appended viewmodel slot");
+    ok &= Require(PresentableTinyRtScene::kBlasCount == 18u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 22u &&
+                      PresentableTinyRtScene::kCollapseInstanceIndex == 21u,
+                  "bounded BLAS maximum includes optional viewmodel and immutable collapse; TLAS preserves viewmodel20 and appends collapse21");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =
@@ -437,6 +438,24 @@ int main()
                   "matching skeleton poses did not share one bucket");
     ok &= Require(sharedPlan.skeletons[0].poseBucket == 0u && sharedPlan.skeletons[1].poseBucket == 0u,
                   "matching skeleton poses did not select bucket zero");
+    skeletons[1].idlePhaseSeconds = 0.73f;
+    const auto walkingWithOffset = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
+    ok &= Require(walkingWithOffset.skeletonPoseBucketCount == 1u &&
+                  Near(walkingWithOffset.skeletons[1].time, sharedPlan.skeletons[1].time),
+                  "incidental idle phase must not alter walking or foot-contact samples");
+    skeletons[0].animation = skeletons[1].animation = EnemyAnimation::Idle;
+    const auto independentIdle = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
+    ok &= Require(independentIdle.skeletonPoseBucketCount == 2u &&
+                  Near(independentIdle.skeletons[1].time - independentIdle.skeletons[0].time, 0.73f),
+                  "distinct idle phases use the admitted bounded second pose bucket");
+    skeletons[0].action = skeletons[1].action = EnemyCombatAction::AttackWindup;
+    const auto attackWithOffset = EvaluateCharacterFramePlan(skeletons, skeletons.size(), roster, lich, 2.967f);
+    ok &= Require(attackWithOffset.skeletonPoseBucketCount == 1u &&
+                  Near(attackWithOffset.skeletons[0].time, attackWithOffset.skeletons[1].time),
+                  "idle phase offsets cannot spend an authoritative attack wind-up");
+    skeletons[0].action = skeletons[1].action = EnemyCombatAction::Locomotion;
+    skeletons[0].animation = skeletons[1].animation = EnemyAnimation::Walking;
+    skeletons[1].idlePhaseSeconds = 0.0f;
     ok &= Require(Near(sharedPlan.skeletons[0].transform.matrix[0][3], -0.75f) &&
                   Near(sharedPlan.skeletons[1].transform.matrix[0][3], 0.75f),
                   "two-skeleton transforms were not independent");
@@ -624,6 +643,8 @@ int main()
             ReadTextFile(root / "src/platform/windows/DiagnosticWindow.cpp");
         const std::string androidSource = ReadTextFile(
             root / "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java");
+        const std::string androidGraphicsPreferencesSource = ReadTextFile(
+            root / "android/app/src/main/java/com/samfa12/hordelanternrt/GraphicsPreferences.java");
         const std::string androidBridgeSource =
             ReadTextFile(root / "android/app/src/main/cpp/android_probe_bridge.cpp");
         const std::string androidJavaBridgeSource = ReadTextFile(
@@ -844,14 +865,32 @@ int main()
                           std::string::npos,
                       "zero staff intensity must zero the complete partial-glow lich emissive radiance");
         ok &= Require(raygenSource.find("bool leanWorkload = controls.workloadPreset < 0.5;") != std::string::npos &&
-                      raygenSource.find("bool maxWorkload = controls.workloadPreset >= 1.5;") != std::string::npos &&
+                      raygenSource.find("bool dualVisibility = primaryReceiver && primaryLocalShadowSamples() > 1;") != std::string::npos &&
+                      raygenSource.find("bool dualSkyVisibility = primaryReceiver && primarySkyShadowSamples() > 1;") != std::string::npos &&
                       raygenSource.find("if (!leanWorkload)") != std::string::npos &&
-                      raygenSource.find("if (dualVisibility)") != std::string::npos &&
+                      raygenSource.find("if (dualVisibility && localStrength > 0.001)") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 2.0;") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 6.0;") != std::string::npos &&
                       raygenSource.find("const float sampleCount = 8.0;") != std::string::npos &&
                       raygenSource.find("stepLength * 7.5") != std::string::npos,
-                      "Lean/Authored/Max must deterministically select no-bounce 2, authored 6, and dual-visibility 8 work");
+                      "Lean/Authored/Max must retain no-bounce 2, authored 6 and Max 8 mist work while primary visibility follows independent quality controls");
+        const std::size_t areaLightBegin = lightingSource.find("vec3 areaLightTransmittance(");
+        const std::size_t areaLightEnd = lightingSource.find("vec3 fireEmitterDirectLighting(", areaLightBegin);
+        const std::string areaLight = areaLightBegin != std::string::npos && areaLightEnd != std::string::npos
+            ? lightingSource.substr(areaLightBegin, areaLightEnd - areaLightBegin) : std::string{};
+        ok &= Require(!areaLight.empty() &&
+                      areaLight.find("int samples = primaryReceiver ? primaryLocalShadowSamples() : 1;") != std::string::npos &&
+                      areaLight.find("sampleNumber < 4") != std::string::npos &&
+                      areaLight.find("if (sampleNumber >= samples) break;") != std::string::npos &&
+                      areaLight.find("result += sceneShadowTransmittanceMask(offsetRayOrigin(h, direction),") != std::string::npos &&
+                      areaLight.find("direction, distance - 0.02, 0x35u)") != std::string::npos &&
+                      areaLight.find("return result / float(samples);") != std::string::npos &&
+                      areaLight.find("controls.workloadPreset") == std::string::npos &&
+                      lightingSource.find("return clamp(int(rtQualityControls.value.controls.y), 1, 4);") != std::string::npos &&
+                      lightingSource.find("return clamp(int(rtQualityControls.value.controls.y), 1, 2);") != std::string::npos &&
+                      lightingSource.find("return clamp(int(rtQualityControls.value.controls.z), 1, 2);") != std::string::npos &&
+                      lightingSource.find("if (rtQualityControls.value.controls.x == 0u) return vec3(0.0);") != std::string::npos,
+                      "independent shadow controls must retain bounded real RGB visibility, normalized weights, hard Lower and one-ray secondary receivers");
         ok &= Require(raygenSource.find("waterSheetCoverage") == std::string::npos &&
                       raygenSource.find("bool waterStreamExit") != std::string::npos &&
                       raygenSource.find("controls.waterQuality < 0.5") != std::string::npos &&
@@ -991,14 +1030,17 @@ int main()
                           std::string::npos &&
                       lightingSource.find("primaryUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos &&
-                      raygenSource.find("lightTransmittance = sceneShadowTransmittanceMask(") != std::string::npos,
+                      lightingSource.find("result += sceneShadowTransmittanceMask(offsetRayOrigin(h, direction),") != std::string::npos &&
+                      lightingSource.find("vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver);") != std::string::npos,
                       "nearest committed shadow traversal must retain RGB through local, sky, and fire lighting while keeping metallic blockers and mobile/high ceilings");
         ok &= Require(raygenSource.find("if (!genericTransmissionActive)") !=
                           std::string::npos &&
                       raygenSource.find("float lightVisibility = lightTransmittance.x;") !=
                           std::string::npos &&
-                      raygenSource.find("vec3 lightTransmittance = sceneShadowTransmittanceMask(") !=
-                          std::string::npos,
+                      lightingSource.find("vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver);") !=
+                          std::string::npos &&
+                      lightingSource.find("h.base * lightColor * lightTransmittance * diffuse * attenuation") != std::string::npos &&
+                      lightingSource.find("lightColor * lightTransmittance * specular * attenuation") != std::string::npos,
                       "fixture-hidden lighting must retain released scalar arithmetic from the shared ordered query while active generic transmission uses RGB traversal");
         ok &= Require(sceneSource.find("dielectricSecondaryRejectCount_") != std::string::npos &&
                       sceneSource.find("dielectricUnclosedVolumeCount_") != std::string::npos &&
@@ -1128,7 +1170,10 @@ int main()
                           std::string::npos &&
                       opaqueDirect.find("mat4 transmittanceSamples = transparentTransmittanceBatch(") != std::string::npos &&
                       !opaquePrimary.empty() &&
-                      opaquePrimary.find("shadeOpaqueDirect(h, rayDirection, maxWorkload") !=
+                      opaqueDirect.find("bool dualVisibility = primaryReceiver && primaryLocalShadowSamples() > 1;") != std::string::npos &&
+                      opaqueDirect.find("bool dualSkyVisibility = primaryReceiver && primarySkyShadowSamples() > 1;") != std::string::npos &&
+                      opaqueSecondary.find("shadeOpaqueDirect(h, incoming, false, false") != std::string::npos &&
+                      opaquePrimary.find("shadeOpaqueDirect(h, rayDirection, true, !fireRayReflectionOwned") !=
                           std::string::npos &&
                       opaquePrimary.find("HitInfo bounceHit = traceScene(") != std::string::npos &&
                       !primaryDispatch.empty() &&
@@ -1159,7 +1204,9 @@ int main()
                           std::string::npos &&
                       raygenSource.find("emberDistance < maximumDistance") != std::string::npos,
                       "fire must be a bounded world-space volume and depth-clip analytic embers at the physical hit");
-        const std::size_t fireDirectBegin = raygenSource.find("vec3 fireEmitterDirectLighting(");
+        const std::size_t fireDirectBegin = raygenSource.find(
+            "vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool primaryReceiver,\n"
+            "                               bool allowAnalyticSpecular)\n{");
         const std::size_t fireDirectEnd =
             raygenSource.find("void activeSkyLight(", fireDirectBegin);
         const std::string fireDirect =
@@ -1171,7 +1218,7 @@ int main()
                       fireDirect.find("rtFireEmitters.values[emitterIndex]") != std::string::npos &&
                       fireDirect.find("emitter.lightPositionStrength.xyz") != std::string::npos &&
                       fireDirect.find("emitter.colourIntensity.rgb") != std::string::npos &&
-                      fireDirect.find("sceneShadowTransmittanceMask(") != std::string::npos &&
+                      fireDirect.find("areaLightTransmittance(h, lightPosition, primaryReceiver)") != std::string::npos &&
                       raygenSource.find("findFireEmitter(1u") == std::string::npos &&
                       raygenSource.find("currentTorchLightPosition") == std::string::npos &&
                       raygenSource.find("sin(controls.time * 15.0)") == std::string::npos &&
@@ -1179,11 +1226,11 @@ int main()
                       "every selected emitter must use its own Light socket, correlated colour/strength, and real visibility without stable-ID-1 assumptions");
         ok &= Require(waterPrimary.find("bool fireRayReflectionOwned = controls.waterQuality >= 1.5;") !=
                           std::string::npos &&
-                      waterPrimary.find("fireEmitterDirectLighting(\n        h, rayDirection, false, !fireRayReflectionOwned)") !=
+                      waterPrimary.find("fireEmitterDirectLighting(\n        h, rayDirection, true, !fireRayReflectionOwned)") !=
                           std::string::npos &&
                       opaquePrimary.find("bool fireRayReflectionOwned = !leanWorkload && wantsPlayerReflection;") !=
                           std::string::npos &&
-                      opaquePrimary.find("maxWorkload, !fireRayReflectionOwned") !=
+                      opaquePrimary.find("shadeOpaqueDirect(h, rayDirection, true, !fireRayReflectionOwned") !=
                           std::string::npos &&
                       fireDirect.find("if (allowAnalyticSpecular)") != std::string::npos,
                       "ray-integrated fire reflection must exclusively own emitter specular while direct diffuse and shadowing remain active");
@@ -1278,7 +1325,7 @@ int main()
                           std::string::npos,
                       "Windows measurement pause must follow consolidated UI overlays, not authored capture freeze");
         const std::size_t androidPauseSyncBegin =
-            androidBridgeSource.find("bool SynchronizeLifecyclePauseOnOwnerThread(");
+            androidBridgeSource.find("bool SynchronizeLifecyclePauseOnOwnerThreadLocked(");
         const std::size_t androidPauseSyncEnd =
             androidBridgeSource.find("void ClearPlatformGameplayEvents(", androidPauseSyncBegin);
         const std::string androidPauseSync =
@@ -1299,6 +1346,10 @@ int main()
                 : std::string{};
         ok &= Require(!androidPauseSync.empty() &&
                       androidPauseSync.find("gLifecycleMeasurementPaused") != std::string::npos &&
+                      androidPauseSync.find("gLifecyclePauseAcknowledgedGeneration = generation;") != std::string::npos &&
+                      androidPauseSync.find("gGameSimulation.SynchronizePausedInput") != std::string::npos &&
+                      androidPauseSync.find("std::lock_guard<std::mutex> lock(gInputPublisherMutex);") != std::string::npos &&
+                      androidPauseSync.find("return SynchronizeLifecyclePauseOnOwnerThreadLocked();") != std::string::npos &&
                       androidBridgeSource.find(
                           "rtFrameEvidence.SetPaused(measurementPaused)") !=
                           std::string::npos &&
@@ -1325,7 +1376,8 @@ int main()
         const auto resourceResetOrdered = [](const std::string& source,
                                              const std::string_view beginMarker,
                                              const std::string_view endMarker,
-                                             const std::string_view resourceAction = "rtScene.Destroy") {
+                                             const std::string_view resourceAction = "rtScene.Destroy",
+                                             const bool transactionalOutput = false) {
             const std::size_t begin = source.find(beginMarker);
             const std::size_t end = source.find(endMarker, begin);
             if (begin == std::string::npos || end == std::string::npos)
@@ -1339,13 +1391,15 @@ int main()
                 "rtFrameEvidence.Recreate", complete);
             const std::size_t timerReset = body.find(
                 "gpuFrameTimer.ResetAfterDeviceIdle", recreate);
-            const std::size_t sceneDestroy = body.find(resourceAction, timerReset);
+            const std::size_t sceneDestroy = body.find(
+                resourceAction, transactionalOutput ? complete : timerReset);
             return complete != std::string_view::npos &&
                    recreate != std::string_view::npos &&
                    timerReset != std::string_view::npos &&
                    sceneDestroy != std::string_view::npos &&
-                   complete < recreate && recreate < timerReset &&
-                   timerReset < sceneDestroy;
+                   (transactionalOutput
+                       ? complete < sceneDestroy && sceneDestroy < recreate && recreate < timerReset
+                       : complete < recreate && recreate < timerReset && timerReset < sceneDestroy);
         };
         ok &= Require(
                       resourceResetOrdered(
@@ -1357,19 +1411,51 @@ int main()
                           "bool ReleaseSwapchainResources(",
                           "void RefreshGpuTimingTelemetry("),
                       "both swapchain integrations must complete owned work, invalidate the epoch, then reset timer/scene resources");
+        const std::size_t windowsResizeBegin = windowsSource.find("bool ApplyPendingOutputResize(");
+        const std::size_t windowsResizeEnd = windowsSource.find("bool RenderFrame(", windowsResizeBegin);
+        const bool windowsResizeMarkersValid = windowsResizeBegin != std::string::npos &&
+            windowsResizeEnd != std::string::npos && windowsResizeEnd > windowsResizeBegin;
+        const std::string windowsResizeBody = windowsResizeMarkersValid
+            ? windowsSource.substr(windowsResizeBegin, windowsResizeEnd - windowsResizeBegin) : std::string{};
+        const std::size_t windowsMainBegin = windowsSource.find("int RunDiagnosticSwapchainWindow(");
+        const std::size_t windowsMainEnd = windowsSource.find("int ScaleForDpi(", windowsMainBegin);
+        const bool windowsMainMarkersValid = windowsMainBegin != std::string::npos &&
+            windowsMainEnd != std::string::npos && windowsMainEnd > windowsMainBegin;
+        const std::string windowsMainBody = windowsMainMarkersValid
+            ? windowsSource.substr(windowsMainBegin, windowsMainEnd - windowsMainBegin) : std::string{};
+        const std::size_t windowsResizeCall = windowsMainBody.find(
+            "if (!ApplyPendingOutputResize(context, capabilities, timingSamples))");
+        const std::size_t windowsNextFrame = windowsMainBody.find(
+            "const bool frameRendered = RenderFrame(context, clearColor, rtFramePresented);", windowsResizeCall);
         ok &= Require(
+                      windowsResizeMarkersValid && windowsMainMarkersValid &&
+                      windowsResizeCall != std::string::npos && windowsNextFrame != std::string::npos &&
+                      windowsResizeCall < windowsNextFrame &&
+                      windowsResizeBody.find("if (context.renderScaleDirty && context.useRtPath)") != std::string::npos &&
+                      windowsResizeBody.find("RtResourceResetReason::RenderScaleChange") != std::string::npos &&
+                      windowsResizeBody.find("context.renderScale = context.appliedRenderScale;") != std::string::npos &&
+                      windowsResizeBody.find("context.graphicsBeforeApply.waterQuality") != std::string::npos &&
+                      windowsResizeBody.find("context.fireDetail = context.graphicsBeforeApply.fireDetail;") != std::string::npos &&
+                      windowsResizeBody.find("context.graphicsPreviewFrameCap = context.graphicsBeforeApply.previewFrameCap;") != std::string::npos &&
+                      windowsResizeBody.find("auto failure = GraphicsSnapshot(context, *context.graphicsCommand);") != std::string::npos &&
+                      windowsResizeBody.find("failure.reasons = horde::graphics::GraphicsReason::ResourceFailure;") != std::string::npos &&
+                      windowsResizeBody.find("Acknowledge(failure, false)") != std::string::npos &&
+                      windowsResizeBody.find("context.graphicsCommand.reset();") != std::string::npos &&
+                      windowsResizeBody.find("rtScene.Destroy") == std::string::npos &&
+                      windowsResizeBody.find("InitialiseRtSceneForSwapchain") == std::string::npos &&
                       resourceResetOrdered(
                           windowsSource,
-                          "if (context.renderScaleDirty && context.useRtPath)",
-                          "const bool benchmarkFrame = context.benchmark.IsRunning();") &&
+                          "bool ApplyPendingOutputResize(",
+                          "bool RenderFrame(",
+                          "rtScene.ResizeOutputAfterDeviceIdle") &&
                       resourceResetOrdered(
                           androidBridgeSource,
-                          "if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale",
+                          "if (context.useRtPath && std::abs(requestedRenderScale",
                           "const auto frameStart = std::chrono::steady_clock::now();",
-                          "rtScene.ResizeOutputAfterDeviceIdle"),
-                      "render-scale paths must complete owned work, invalidate the epoch, then reset timer/output resources");
+                          "rtScene.ResizeOutputAfterDeviceIdle", true),
+                      "render-scale transactions must complete owned work and order output/observer/timer reset around successful application");
         const std::size_t resizeBegin = androidBridgeSource.find(
-            "if (gSwapchainContext.useRtPath && std::abs(requestedRenderScale");
+            "if (context.useRtPath && std::abs(requestedRenderScale");
         const std::size_t resizeEnd = androidBridgeSource.find(
             "const auto frameStart = std::chrono::steady_clock::now();", resizeBegin);
         const bool resizeMarkersValid = resizeBegin != std::string::npos &&
@@ -1379,10 +1465,61 @@ int main()
         ok &= Require(resizeMarkersValid &&
                       resizeBody.find("rtScene.Destroy") == std::string::npos &&
                       resizeBody.find("InitialiseRtSceneForSwapchain") == std::string::npos &&
-                      resizeBody.find("if (!evidenceCompleted)") != std::string::npos &&
+                      resizeBody.find("if (!CompleteRtEvidenceAfterDeviceIdle(context, idleResult))") != std::string::npos &&
+                      resizeBody.find("if (applied)") < resizeBody.find("gpuFrameTimer.ResetAfterDeviceIdle") &&
+                      resizeBody.find("if (applied)") < resizeBody.find("capturePresentedFrames = 0u") &&
+                      resizeBody.find("GraphicsReason::ResourceFailure") != std::string::npos &&
+                      resizeBody.find("gRequestedGraphics.requested = context.graphicsSettings") != std::string::npos &&
                       resizeBody.find("capturePresentedFrames = 0u") != std::string::npos &&
                       androidBridgeSource.find("vkResetCommandBuffer(context.commandBuffers[imageIndex]") != std::string::npos,
                       "Android scale-only resize must preserve the scene and reset commands after completed GPU work");
+        const auto androidConfirmBegin = androidBridgeSource.find(
+            "Java_com_samfa12_hordelanternrt_ProbeBridge_confirmGraphicsSettings(");
+        const auto androidConfirmEnd = androidBridgeSource.find("\n}", androidConfirmBegin);
+        const std::string androidConfirm = androidConfirmBegin != std::string::npos &&
+                androidConfirmEnd != std::string::npos
+            ? androidBridgeSource.substr(androidConfirmBegin, androidConfirmEnd - androidConfirmBegin)
+            : std::string{};
+        ok &= Require(
+            androidBridgeSource.find("const bool currentOutputPresented = rtFramePresented && !resourceRecreated;") != std::string::npos &&
+            androidBridgeSource.find("if (resourceRecreated) PublishGraphicsApplied(gSwapchainContext, true, false);") != std::string::npos &&
+            androidBridgeSource.find("if (currentOutputPresented) PublishGraphicsApplied(gSwapchainContext, true, true);") != std::string::npos &&
+            androidBridgeSource.find("CaptureConsentedPlaytestFrameOnRenderOwner(gSwapchainContext, currentOutputPresented, measurementPaused)") != std::string::npos &&
+            !androidConfirm.empty() &&
+            androidConfirm.find("std::lock_guard lock(gGraphicsMutex);") <
+                androidConfirm.find("gSurfaceSessions.State(static_cast<std::uint64_t>(generation)) != 1") &&
+            androidConfirm.find("gSurfaceSessions.State(static_cast<std::uint64_t>(generation)) != 1") <
+                androidConfirm.find("gGraphicsEdit->Confirm()"),
+            "Android must acknowledge a replacement output only after its own presentation and reject confirmation for an inactive surface under the graphics lock");
+        const auto androidFunctionSource = [&androidBridgeSource](const std::string_view name)
+        {
+            const auto begin = androidBridgeSource.find(name);
+            const auto end = androidBridgeSource.find("\n}", begin);
+            return begin != std::string::npos && end != std::string::npos
+                ? androidBridgeSource.substr(begin, end - begin) : std::string{};
+        };
+        const auto androidPerformanceGetter = androidFunctionSource(
+            "Java_com_samfa12_hordelanternrt_ProbeBridge_getGraphicsPreviewPerformance(");
+        const auto androidSurfaceStart = androidFunctionSource(
+            "Java_com_samfa12_hordelanternrt_ProbeBridge_startDiagnosticSurface(");
+        const auto androidRenderLoop = androidFunctionSource("void SwapchainRenderLoop()");
+        ok &= Require(!androidPerformanceGetter.empty() && !androidSurfaceStart.empty() && !androidRenderLoop.empty() &&
+            androidPerformanceGetter.find("std::lock_guard lock(gGraphicsMutex);") <
+                androidPerformanceGetter.find("gPreviewPerformanceGeneration == 0u") &&
+            androidPerformanceGetter.find("gPreviewPerformanceGeneration != gAppliedGraphics.lifecycleGeneration") != std::string::npos &&
+            androidPerformanceGetter.find("gPreviewPerformanceGeneration != gPreviewControls.generation") != std::string::npos &&
+            androidPerformanceGetter.find("!gSurfaceSessions.IsCurrent(gPreviewPerformanceGeneration)") <
+                androidPerformanceGetter.find("return env->NewDoubleArray(0)") &&
+            androidPerformanceGetter.find("return env->NewDoubleArray(0)") <
+                androidPerformanceGetter.find("const auto& a = gPreviewPerformance") &&
+            androidSurfaceStart.find("gSurfaceSessions.Start(") < androidSurfaceStart.find("std::lock_guard lock(gGraphicsMutex);") &&
+            androidSurfaceStart.find("std::lock_guard lock(gGraphicsMutex);") < androidSurfaceStart.find("gPreviewPerformance = {};") &&
+            androidSurfaceStart.find("gPreviewPerformanceGeneration = 0u;") != std::string::npos &&
+            androidRenderLoop.find("std::lock_guard lock(gGraphicsMutex);\n                if (gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration))") != std::string::npos &&
+            androidRenderLoop.find("if (gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration))") <
+                androidRenderLoop.find("gPreviewPerformance = gSwapchainContext.previewPerformance.Snapshot();") &&
+            androidRenderLoop.find("gPreviewPerformanceGeneration = gSwapchainContext.surfaceGeneration;") != std::string::npos,
+            "Android preview telemetry must be published and read under the graphics lock with a live matching surface generation, and clear on each new surface request");
         ok &= Require(pendulumSource.find("torsionAngularAcceleration") != std::string::npos &&
                       pendulumSource.find("SignedYawDelta") != std::string::npos &&
                       pendulumSource.find("kHandBasisTeleportRadians") != std::string::npos &&
@@ -1399,10 +1536,11 @@ int main()
                       windowsSource.find("context.waterQuality = horde::vulkan::raytracing::WaterQuality::High") !=
                           std::string::npos &&
                       androidSource.find("WATER_QUALITY_MOBILE = 1") != std::string::npos &&
-                      androidSource.find("preferences.getInt(\"water_quality\", WATER_QUALITY_MOBILE)") !=
-                          std::string::npos,
+                      androidSource.find("GraphicsPreferences.confirmed(preferences)") != std::string::npos &&
+                      androidGraphicsPreferencesSource.find("integer(prefs, \"water_quality\", 1)") != std::string::npos &&
+                      androidGraphicsPreferencesSource.find("baseline() { return new Values(75, 1, 0, 30); }") != std::string::npos,
                       "platform water-quality defaults changed (Windows/capture High, Android Mobile)");
-        ok &= Require(androidBridgeSource.find("else if (context.routeReplayActive)") !=
+        ok &= Require(androidBridgeSource.find("else if (!worldCommandsDeferred && context.routeReplayActive)") !=
                           std::string::npos &&
                       androidBridgeSource.find("context.routeReplayActive && !simulationPaused") ==
                           std::string::npos,
@@ -1456,8 +1594,19 @@ int main()
                 androidLabEnd != std::string::npos
             ? androidSource.substr(androidLabBegin, androidLabEnd - androidLabBegin)
             : std::string{};
+        const auto androidGeneralResetBegin = androidSource.find(
+            "getString(R.string.reset_non_graphics), () -> {");
+        const auto androidGeneralResetEnd = androidSource.find("showSettings();", androidGeneralResetBegin);
+        const std::string androidGeneralReset = androidGeneralResetBegin != std::string::npos &&
+                androidGeneralResetEnd != std::string::npos
+            ? androidSource.substr(androidGeneralResetBegin, androidGeneralResetEnd - androidGeneralResetBegin)
+            : std::string{};
         ok &= Require(androidSource.find("PREF_RT_LAB_UNLOCKED = \"rt_lab_unlocked\"") != std::string::npos &&
-                      androidSource.find(".putBoolean(PREF_RT_LAB_UNLOCKED, rtLabUnlocked)") != std::string::npos &&
+                      androidSource.find(".putBoolean(PREF_RT_LAB_UNLOCKED, true)") != std::string::npos &&
+                      !androidGeneralReset.empty() && androidGeneralReset.find(".clear()") == std::string::npos &&
+                      androidGeneralReset.find("PREF_RT_LAB_UNLOCKED") == std::string::npos &&
+                      androidGeneralReset.find(".putInt(PREF_MUSIC_VOLUME, 70)") != std::string::npos &&
+                      androidGeneralReset.find(".putBoolean(\"haptics_enabled\", true)") != std::string::npos &&
                       androidSource.find("ProbeBridge.isRtLabUnlockEligible()") != std::string::npos &&
                       androidSource.find("handler.postDelayed(this, 250L)") != std::string::npos &&
                       androidSource.find("slider.setMinimumHeight(dp(48))") != std::string::npos &&
@@ -1527,6 +1676,13 @@ int main()
                       androidJavaBridgeSource.find("getCurrentRenderScalePercent") != std::string::npos &&
                       androidJavaBridgeSource.find("getCurrentWaterQuality") != std::string::npos,
                       "ProbeBridge does not expose the typed RT Lab tuning and telemetry API");
+        const auto scopedWindowPrecedesLaunch = [&](const char* functionName) {
+            const auto function = androidValidationSource.find(functionName);
+            const auto window = androidValidationSource.find("Start-ScopedLogWindow", function);
+            const auto launch = androidValidationSource.find("Invoke-AdbText", function);
+            return function != std::string::npos && window != std::string::npos &&
+                   launch != std::string::npos && window < launch;
+        };
         ok &= Require(androidValidationSource.find("[switch]$RtLabWorkloadComparison") != std::string::npos &&
                       androidValidationSource.find("@('lantern-drop', 'skylight', 'finale-roof')") !=
                           std::string::npos &&
@@ -1534,9 +1690,15 @@ int main()
                       androidValidationSource.find("@{ name = 'lean'; workload = 0 }") !=
                           std::string::npos &&
                       androidValidationSource.find("rt_lab_profile") != std::string::npos &&
-                      androidValidationSource.find(
-                          "if ($RtWorkload -ge 0) { Invoke-AdbText @(\"logcat\", \"-c\")") !=
-                          std::string::npos &&
+                      androidValidationSource.find("function New-ScopedLogcatArguments") != std::string::npos &&
+                      androidValidationSource.find("'-T', $StartTimestamp") != std::string::npos &&
+                      androidValidationSource.find("\"--pid=$ProcessId\"") != std::string::npos &&
+                      androidValidationSource.find("@('shell', 'pidof', $packageName)") != std::string::npos &&
+                      androidValidationSource.find("Get-ScopedLogcat -WholeRun") != std::string::npos &&
+                      scopedWindowPrecedesLaunch("function Send-AutomationIntent") &&
+                      scopedWindowPrecedesLaunch("function Start-AutomationSession") &&
+                      androidValidationSource.find("\"logcat\", \"-c\"") == std::string::npos &&
+                      androidValidationSource.find("'logcat', '-c'") == std::string::npos &&
                       androidValidationSource.find(
                           "[math]::Abs(([double]$state.renderScale * 100.0) - [double]$RequestedScale)") !=
                           std::string::npos &&
@@ -1545,7 +1707,7 @@ int main()
                           std::string::npos &&
                       androidBridgeSource.find("\\\"waterQuality\\\":") != std::string::npos &&
                       androidBridgeSource.find("\\\"rtLab\\\":") != std::string::npos,
-                      "Android validation must reject matched RT Lab evidence when applied scale or water quality drifts");
+                      "Android validation must use fresh device-time/app-PID scoped logs without global clearing and reject matched RT Lab evidence when scale or water quality drifts");
 
         CharacterRenderSlot slot;
         std::string diagnostic;
@@ -1615,6 +1777,44 @@ int main()
         const auto& staff = slot.LichStaffLocalSample();
         ok &= Require(staff[0] > 0.90f && staff[1] > 0.70f,
                       "audited lich staff sample moved into the robe or eye cluster");
+
+        lich.phase = LichPhase::Dormant;
+        lich.y = -0.52f;
+        lich.presentationTiltRadians = -0.16f;
+        lich.hitRecoil = 0.0f;
+        const auto tilted = EvaluateCharacterFramePlan(skeletons, 0u, roster, lich, deadDuration);
+        const auto staffWorld = slot.LichStaffWorldPosition(lich);
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            const float expected = tilted.lichTransform.matrix[axis][0] * staff[0] +
+                tilted.lichTransform.matrix[axis][1] * staff[1] +
+                tilted.lichTransform.matrix[axis][2] * staff[2] + tilted.lichTransform.matrix[axis][3];
+            ok &= Require(Near(staffWorld[axis], expected),
+                          "keeper tilt/root transform must move staff geometry and physical light sample together");
+        }
+        ok &= Require(HasInvertibleLinearTransform(tilted.lichTransform) &&
+                      Near(tilted.lichTransform.matrix[1][3], -0.52f) &&
+                      std::abs(tilted.lichTransform.matrix[1][2]) > 0.1f,
+                      "bounded keeper presentation tilt stays invertible and preserves its raised root");
+
+        CharacterRenderSlot previewSlot;
+        diagnostic.clear();
+        ok &= Require(previewSlot.LoadAssets(
+            (root / "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
+            (root / "absent-preview-lich.glb").string(), diagnostic, true), diagnostic.c_str());
+        ok &= Require(previewSlot.PrepareInitialGeometry(diagnostic) &&
+                      !previewSlot.SkeletonVertices(0u).empty() &&
+                      previewSlot.SkeletonVertices(1u).empty() && previewSlot.LichVertices().empty(),
+                      "skeleton-only preview must omit lich and second-pose CPU geometry");
+        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 2u, spareCapacityRoster, lich, diagnostic),
+                      "skeleton-only preview cannot admit the full two-enemy game workload");
+        ok &= Require(previewSlot.CacheFramePlan(skeletons, 1u, spareCapacityRoster, lich, diagnostic) &&
+                      previewSlot.SkeletonPoseBucketCount() == 1u,
+                      "skeleton-only preview retains one actual authored skeleton pose");
+        auto forbiddenLich = spareCapacityRoster;
+        forbiddenLich.selectedEnemy = EnemyKind::Lich;
+        ok &= Require(!previewSlot.CacheFramePlan(skeletons, 1u, forbiddenLich, lich, diagnostic),
+                      "skeleton-only preview cannot select unadmitted lich resources");
     }
 
     return ok ? 0 : 1;

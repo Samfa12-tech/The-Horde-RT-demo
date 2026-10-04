@@ -445,7 +445,7 @@ void TestSuboptimalPresentation(TestContext& test)
     RtSceneRecordObservation observation{};
     test.Check(coordinator.BeginFrame(0u, observation), "suboptimal frame must begin");
     const auto transaction = RecordAndPrevalidate(
-        test, coordinator, observation, RtInstrumentationMode::Shipping, 24u);
+        test, coordinator, observation, RtInstrumentationMode::Shipping, 25u);
     coordinator.CommitGraphicsSubmit(transaction, false, false, MakeFakeGpuIo(gpu));
     test.Check(coordinator.AttachPresentation(RtPresentationOutcome::PresentedNeedsRecreate),
                "suboptimal is successful presentation needing recreation");

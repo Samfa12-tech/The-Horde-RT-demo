@@ -13,6 +13,31 @@ function Test-PortableViewmodelInventory([string]$WorkflowText) {
     return $lane.Success -and [regex]::Matches($lane.Groups[1].Value,
         [regex]::Escape('assets/models/player/viewmodel/runtime/*.glb')).Count -eq 2
 }
+function Test-PropsSourcePolicyInventory([string]$WorkflowText, [string]$JobName) {
+    # Admission checks both canonical native profiles, even for an Android APK.
+    # Require each bounded pattern in fetch AND checkout within its owning lane.
+    $lane = [regex]::Match($WorkflowText,
+        '(?ms)^  ' + [regex]::Escape($JobName) + ':[ \t]*\r?\n(.*?)(?=^  [A-Za-z0-9_-]+:[ \t]*\r?$|\z)')
+    if (-not $lane.Success) { return $false }
+    $fetch = [regex]::Matches($lane.Groups[1].Value,
+        '(?s)\bgit[^\r\n]*lfs fetch\s+--include="([^"]+)"')
+    $checkout = [regex]::Matches($lane.Groups[1].Value,
+        '(?s)&& git lfs checkout\s+(.*?)(?=\r?\n\s*\r?\n|\z)')
+    if ($fetch.Count -ne 1 -or $checkout.Count -ne 1) { return $false }
+    $fetched = @($fetch[0].Groups[1].Value.Split(','))
+    $checkedOut = @([regex]::Matches($checkout[0].Groups[1].Value, '"([^"]+)"') |
+        ForEach-Object { $_.Groups[1].Value })
+    foreach ($platform in @('android', 'windows')) {
+        $requiredPattern = "assets/textures/props/runtime/*.$platform.ktx2"
+        if (@($fetched | Where-Object { $_ -ceq $requiredPattern }).Count -ne 1 -or
+            @($checkedOut | Where-Object { $_ -ceq $requiredPattern }).Count -ne 1) { return $false }
+    }
+    # An all-repository/all-props substitute must not masquerade as bounded hydration.
+    foreach ($pattern in @('*', '**', 'assets/**', 'assets/textures/props/runtime/*.ktx2')) {
+        if ($fetched -ccontains $pattern -or $checkedOut -ccontains $pattern) { return $false }
+    }
+    return $true
+}
 # Regress an inserted sibling lane and retain the missing-checkout negative gate.
 $fixture = "  shared-gameplay:`n    fetch: assets/models/player/viewmodel/runtime/*.glb`n    checkout: assets/models/player/viewmodel/runtime/*.glb`n  inserted-lane:`n    fetch: assets/models/player/viewmodel/runtime/*.glb`n    checkout: assets/models/player/viewmodel/runtime/*.glb`n  player-vulkan-host:`n"
 $withoutCheckout = $fixture.Replace(
@@ -27,6 +52,39 @@ $workflow = Get-Content (Join-Path $repo '.github/workflows/shared-simulation-ho
 if (-not (Test-PortableViewmodelInventory $workflow)) {
     throw 'Portable manifest checks require viewmodel GLBs in both LFS fetch and checkout lists'
 }
+$propsPatterns = @('assets/textures/props/runtime/*.android.ktx2', 'assets/textures/props/runtime/*.windows.ktx2')
+$propsFetch = '          --include="' + ($propsPatterns -join ',') + '"'
+$propsCheckout = '          "' + ($propsPatterns -join "`"`n          `"") + '"'
+foreach ($job in @('android-debug', 'shared-gameplay')) {
+    $propsFixture = "  ${job}:`n    steps:`n      - name: Bounded payloads`n        run: >-`n          git -c lfs.fetchexclude= lfs fetch`n$propsFetch`n          && git lfs checkout`n$propsCheckout`n`n  inserted-lane:`n    ignored: true`n"
+    if (-not (Test-PropsSourcePolicyInventory $propsFixture $job) -or
+        -not (Test-PropsSourcePolicyInventory ($propsFixture.Replace("`n", "`r`n")) $job) -or
+        -not (Test-PropsSourcePolicyInventory $workflow $job)) {
+        throw "Both canonical props profiles require bounded fetch and checkout in $job"
+    }
+    foreach ($pattern in $propsPatterns) {
+        foreach ($operation in @('fetch', 'checkout')) {
+            $original = if ($operation -ceq 'fetch') { $propsFetch } else { $propsCheckout }
+            $missing = $propsFixture.Replace($original, $original.Replace($pattern, 'omitted'))
+            # A complete sibling cannot rescue a missing pattern in this lane.
+            $sibling = $propsFixture.Replace("  ${job}:", '  unrelated-complete-lane:')
+            if ((Test-PropsSourcePolicyInventory $missing $job) -or
+                (Test-PropsSourcePolicyInventory ($missing + $sibling) $job)) {
+                throw "Missing $operation $pattern must fail within $job"
+            }
+        }
+    }
+    $duplicateFetch = $propsFixture.Replace($propsFetch, $propsFetch.Replace($propsPatterns[0], $propsPatterns[0] + ',' + $propsPatterns[0]))
+    $duplicateCheckout = $propsFixture.Replace($propsCheckout, $propsCheckout + "`n          `"" + $propsPatterns[1] + '"')
+    $unbounded = $propsFixture.Replace($propsFetch, $propsFetch.Replace($propsPatterns[0], $propsPatterns[0] + ',assets/**'))
+    if ((Test-PropsSourcePolicyInventory $duplicateFetch $job) -or
+        (Test-PropsSourcePolicyInventory $duplicateCheckout $job) -or
+        (Test-PropsSourcePolicyInventory $unbounded $job) -or
+        (Test-PropsSourcePolicyInventory '  absent-job:' $job)) {
+        throw "Duplicate, unbounded or absent props hydration must fail in $job"
+    }
+}
+Write-Output 'Both canonical props profiles have bounded per-lane LFS fetch/checkout; missing/duplicate/sibling/unbounded guards passed.'
 foreach ($relative in @('tools/package-alpha.ps1', 'tools/run-foundation-validation.ps1')) {
     $errors = $null
     $ast = [Management.Automation.Language.Parser]::ParseFile(

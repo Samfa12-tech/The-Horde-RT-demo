@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "asset": "collapsed-entry",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "budgets": {
+    "maxVertices": 12467,
+    "maxIndices": 25266,
+    "maxPrimitives": 2,
+    "maxMaterials": 2,
+    "maxTextureLayersPerKind": 2
+  },
+  "lods": [
+    {
+      "name": "lod0",
+      "maxTriangles": 8422
+    }
+  ],
+  "requiredSockets": [],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true,
+    "resolution": 1024
+  },
+  "materialOverrides": [],
+  "distribution": "runtime",
+  "licenceStatus": "CC0 Poly Haven Boulder01 and MedievalWall02 reuse; project-authored architecture; provenance in ASSET_LICENSES.md"
+}

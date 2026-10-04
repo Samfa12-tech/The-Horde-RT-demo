@@ -42,9 +42,27 @@ public final class ProbeBridge {
     public static native int getPlayerVitality();
     public static native int getPlayerLifePhase();
     public static native int getFinaleEndingPhase();
+    public static native float getKeeperRevealTitleOpacity();
     public static native int getContextualControlState();
     public static native int retryEncounter();
     public static native void setSimulationPaused(boolean paused);
+    public static native void setGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow);
+    public static native void beginGraphicsEdit(int scale, int water, int fire, int cap, boolean glass, int shadow);
+    public static native long applyGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, long generation);
+    public static native long compareGraphicsPreview(int scale, int water, int fire, int cap, boolean glass, int shadow, long generation);
+    public static native long revertGraphicsSettings(long generation);
+    public static native boolean confirmGraphicsSettings(long serial, long generation);
+    public static native long advanceGraphicsConfirmation(double seconds, boolean foreground, long generation);
+    // Coherent render-owner snapshot: serial, generation, edit state, effective
+    // scale/water/fire/cap, internal W/H, output W/H, optics, backend, presented,
+    // reason bits, requested scale/water/fire/cap, scene, effective/requested glass.
+    // effective/requested shadow appended at22/23. Exactly24 fields; unknown extents stay zero.
+    public static native long[] getGraphicsSnapshot();
+    public static native void setGraphicsPreview(boolean enabled, boolean paused, boolean motion,
+            int camera, boolean resetTimeline, long generation);
+    // epoch,presents/s,loop ms,CPU ms,GPU ms (-1 unavailable),tracked device/host bytes,
+    // transition count,sample count, then loop-ms/transition pairs (at most128).
+    public static native double[] getGraphicsPreviewPerformance();
     public static native void setRenderScale(float scale);
     public static native void setWaterQuality(int quality);
     public static native void setRtSceneTuning(float waterfallWidthScale,
@@ -68,6 +86,13 @@ public final class ProbeBridge {
     public static native boolean requestDebugCaptureCheckpoint(int checkpointId);
     public static native boolean requestDebugRouteReplay();
     public static native boolean requestBenchmark();
+    // UUID.randomUUID() and Build.MODEL supplied by ordinary UI. Legacy run ID stays empty.
+    public static native boolean requestBenchmarkWithSummaryId(String summaryRunUuid, String rawModel);
+    public static native String getReadyBenchmarkSummaryRunId();
+    // Local preparation only: first status byte then exact bounded UTF8 JSON on Ready(0).
+    // Cooling: 0 unknown, 1 none declared, 2 external declared; hardware defaults off.
+    public static native byte[] prepareBenchmarkSummaryReport(String expectedRunUuid, String reportUuid,
+            String capturedAtUtc, boolean consentToPrepare, boolean includeBasicHardware, int declaredCooling);
     public static native boolean requestBenchmarkWithId(String runId);
     public static native boolean requestBenchmarkWithIdAndWorkload(String runId, String workload);
     public static native void cancelBenchmark();

@@ -1,6 +1,466 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-10-03
+Last updated: 2026-10-04
+
+## Returned allocation: current95 ordinary75% measurement
+
+The owner reallocated SM-S948B/Android16 on4October00:18UTC. Fresh installed
+pullbacks match the current Debug3d133d10/benchmark269ac11a hashes below, without
+a new installation. [Returned-device review](ENGINEERING_1_6_2_RETURNED_DEVICE_REVIEW.md)
+records the ordinary75% ShippingMobile/Pipeline two-lap route:1,838 valid owning
+CPU/GPU rows,13 waypoints per lap/26 visits, all13 CPU stages/10 zone joins.
+CPU median/p95 is64.160860/83.593542ms; GPU RT53.590051/73.118071ms. Settled
+Materials5.8successfulRTpresents/s/CPU173.43ms/GPU170.11ms/zero transitions is
+a separate workload. Audit `f8cc16aa9537aa8f426a771de08590e56c58c6ca9a032aacff33b46724bcb53d`
+seals29 checks/24 named files. Battery header40.2 -> 42.5C/USB/unknown cooling,
+native thermal not-collected and one ordered course provide no parity, causal
+saving or sustained fixed75% pass. Final requested/effective original tuple
+matches, but Draft require Apply is not a new persistence gate.
+
+Current Windows6394 collapse/moving-torch-flame appearance is explicitly owner
+approved, without phone/broader scene/audio/haptic acceptance. Both current Debug
+Replay routes complete13/13 with actual completed owning route/checkpointC packets
+at75%. Retain Pipeline120second9/13 timeout and its older pending Home packet.
+New Compute Home advances epoch6 -> 8/logged surface5 -> 7 with owning completion1937;
+separate Pipeline capture/Home advances4 -> 6/surface3 -> 5 with completion84,
+without a full Replay repeat. Exact modules/current owner scopes/ordinary RT
+presentation pass the hardened offline validator; external scoped surface logs
+are not an atomic native surface packet. All three C captures settle12 frames,
+retain22 instances; authored stationary poses are not motion/phone approval.
+Timing CSVs are empty, not performance distributions.
+
+Correctness audit `ca226dcb663e3b7571947aaf63bc1f2a5d8eff9dcd14bcb02eb4eb01f1196bb3`
+seals151 files/258,446,249 bytes with identical inventories. Ordinary Debug
+Preview/Home uses15 owned trees/four touches/one scroller; final XML retains all
+six confirmed schema2/original75/Mobile/Mobile/GlassOn/cap30 fields, pending=false,
+without Apply/Keep or quality edits. Home's transient pending=true and inactive
+pendingGlass change remain scoped; sequential UI/XML is not atomic ACK. Twelve
+selected saved logs have no fatal markers, not exhaustive stability proof.
+Physical collector6e271 and later pure offline validatord7e2 identities remain
+distinct; final host fixture82 assertions/review pass. Pushed tool headf06705bf's
+[current PR checks](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/18/checks)
+are in progress; final documentation needs fresh CI. Validation apps are stopped/
+phone Home, no install/data clearing; live Windows interactive review remains open.
+Earlier allocation/packet limits below retain their scopes; broader exact-device,
+owner/audio/haptic/performance and remote-endpoint gates remain open.
+
+## Current95eb0807: fresh native admission and physical death recovery
+
+Evidence class: **exact changed-native development APK admission and bounded
+sequential physical recovery**, not signed release, atomic native packet,
+owner audio/feel or sustained-performance acceptance. Actual SM-S948B/Android16.
+Source `95eb08070354d4b3b775e6d2368cca8688f9cfe6` has all six jobs individually
+completed/success in [CI37155231702](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37155231702).
+That runtime CI is historical to the newer pushed tool head/current checks above.
+The final documentation commit needs its own CI.
+
+Current Debug APK SHA256
+`3d133d10fb7bf30276c96e03df04709c69da4dc405132d6e0bf309ea789b128f`
+is127,987,050B; current isolated ShippingMobile benchmark
+`269ac11a129cf66b8f170bceb3b5b77670aa567480faec4764e5ab0322367790`
+is115,453,365B. Both update-only installed pullbacks match; original schema2
+Debug preferences remain byte-identical, production/data preserved. All eight
+native ELFs changed: fresh architecture/load/ZIP16KiB/strip/policy admission
+passes, with no whole-native copy-forward. All32 selected-module matches retain
+exact unchanged shader bytes; fresh ARM64 eight-module SDK validation/disassembly
+passes, Shipping has no binding22/atomics. Each APK has81 closed assets/notices
+and full cgltf.140tests/24classes pass with zero failures/errors/skips, including
+DeathRecovery; lint0errors/46warnings. Build1m46s/112tasks/43executed/69cached,
+collected387-runtime/24-test/eight-command banks pass. Admission SHA256
+`804120f4e8e55c9191b7545780a458a8f9fc32eb6490626a020022e8f455e3b7`.
+
+Current benchmark269ac11a physically cold-enters at vitality3; observed combat
+death -> Restart restores3, second death -> Retry restores3 and menu reset restores3.
+Root-reported Home/Resume has native surface cancellation/destruction/recreation/
+presentation (generations1/3) and fresh UI3. Closed66-file audit SHA256
+`e972280e988877542b1beebfb5e410c3216050e7bd53bd460c5ac964be486768`
+verifies sequential UI/log outcomes and Alive acknowledgment, not an atomic
+packet or audio/feel acceptance. That subset lacks a Home command receipt and
+post-final-Menu tree/native paused packet. Benchmark75% retention is root context; no
+Benchmark preference XML exists in this subset. Debug update-only preferences
+are independently byte-identical. The death report concerned an automated test. Earlier cold
+vitality3 at2s and death at30s near the idle skeleton was separate from the
+confirmed pre-existing Restart discard bug; stationary dead50/40 observations
+are excluded from matched-throughput evidence. See [death recovery](ENGINEERING_1_6_2_DEATH_RECOVERY.md).
+
+Separate final-state audit SHA256
+`cb3f0d24ba7185647694e78363a4b327fdb2d4d3bf5b3b519bc8a33e630d518c`
+seals20 unchanged files. Actual Apply/Keep restores75/Mobile/Mobile/GlassOn/30;
+a cold benchmark process shows matching requested/effective original values.
+Fresh Debug Restart restores vitality3, followed by an owned Menu action and
+actual main-menu tree; native generation1 presents RT at75%. Debug preferences
+directly verify schema2/original tuple/pending=false; retained pendingGlass=false
+is inactive. This fresh Debug tree does not fill the earlier Benchmark subset's
+missing tree. Evidence remains sequential, without atomic native paused-state
+proof or Benchmark preference XML; exact APK identity inherits the previous
+installed-pullback seal.
+
+Historical Debug1f95 GlassOff -> ordinary Revert On is closed by111-file audit
+`2c5b8945ac3638d83cba2b97d871d4a455afdc5211d68dfd0f24a60955c4e7f7`:
+settled sequential requested/effective Off/On, no confirmed Off save, final
+schema2/pending=false/original75/Mobile/Mobile/GlassOn/30. This is not current
+APK optical image validation, atomic ACK or reboot durability.
+
+Historical benchmarke339's Pipeline/Mobile50% course completes1,838 CPU/GPU-valid
+rows with zero exceptions,720x1490 internal/1440x2980 output. CPU cycle median
+37.585808ms and GPU RT median26.934999ms are separate scopes; battery41.9 -> 42.8C,
+USB power/cooling unknown and uncollected native thermal describe one ordered
+warm run, without causal/sustained saving or thermal parity. Historical40%
+preview17.1 successful presents/s, CPU58.42/GPU55.39ms at576x1192/output1440x2980
+is neither full-game nor scanout evidence. Its course observer never started
+and was stopped. Current269's first40 preparation failed before Preview touch,
+with75% unchanged/no course; preserve that negative separately from later success.
+
+Current269 experimental40% and33% courses are complete. Each has1,838 valid owning
+CPU/GPU rows,13 waypoints per lap/26 visits over two laps and zero rejected,
+cancelled,outstanding or unavailable samples.40 CPU cycle median/p95 is
+28.634323/37.904479ms, GPU RT18.486874/26.648437ms;33 CPU24.065652/30.603333ms,
+GPU13.728281/19.448125ms. Quality audit SHA256
+`bf46ad55dbff5412eab54242bad0be74adfbd056d08855edc98540572e5679bc`
+seals47 checks/362 stable files,13 CPU-stage denominators/10 zone joins and exact
+selected modules across all four ABIs/current APK/pullback; per-course linkage
+uses uninterrupted context, not atomic APK attestation. See [bounded mobile
+quality measurements](ENGINEERING_1_6_2_MOBILE_QUALITY_MEASUREMENTS.md) for extents,
+preview workloads and battery context. Single ordered USB-powered runs with
+unknown cooling/uncollected native thermal prove neither thermal parity, causal
+saving nor sustained ordinary-game performance. Ordinary minimum50/default75
+remain unchanged.
+
+Current Windows6394 Debug checkpointC passes both backends, one capture each,
+exit0/sync validation/zero markers; this is not four new motion cases. Geometry/
+shader content is unchanged. Historical820's56 captures and owner's watched
+torch lowering/no-clipping Yes remain narrowly historical content acceptance.
+The prior session ended with both validation apps stopped and original75 restored;
+its allocation pause is superseded by the returned allocation recorded above.
+Fresh broader settings/lifecycle/optical, Windows statistics, remaining native
+owner/audio/haptic and sustained-performance gates remain open; fixed75%
+sustained30FPS and S24/S25 support are unverified. Remote Send remains blocked.
+Earlier build/UI/export/pending statuses below retain their historical identities.
+
+## Historical pre-reset dfd5a8f1: alias artifacts and local statistics evidence
+
+Evidence class: **exact isolated development-APK identity, original-tuple
+Apply/Keep and physical local-statistics export**, not new Replay or complete
+owner acceptance.
+Checkpoint `dfd5a8f1b405a4a07a97629d69fcace9280d8dcc` has all six jobs completed
+successfully in [CI37147767271](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37147767271).
+This documentation continuation changes no runtime/artifact bytes from
+df0c7335's peer-reviewed Java alias fix. Repeated enabled-state changes on the
+aliased Keep button are corrected; native rendering is unchanged.
+
+New Debug APK SHA256
+`1f95f44f5f2fd37642c11b96bcb2b00c11e1ed79aa4faf015997c13a7df780f8`
+and isolated ShippingMobile benchmark
+`e339da5869690227158aaa2cc4cd66a8f0a7bf34b8fb0b08eb78fe967d5260a0`
+both match actual update-only installed pullbacks on the allocated SM-S948B.
+Production and data remain preserved. Fresh admission directly proves all eight
+native ELFs and81 assets/notices identical to the prior47430943/8a1f77d6 APKs,
+original c299 and current stripped/closed-roster bytes. Only DEX content entries
+change; whole APK signatures/container identities differ. Architecture/load/
+ZIP16KiB and full cgltf checks pass. Matching original ARM64 selected-shader
+proof is copied forward after direct binary/receipt validation; no fresh SDK
+retest or other-ABI instruction proof is claimed. Actual139 tests/23classes,
+including five compact-preview tests with a production-button transition
+regression, pass with zero failures/errors/skips; lint0errors/46warnings.
+Build28s and collected387-input/23-fixture/eight-command bank pass.
+
+Subsequent original-tuple Apply/Keep passes on Debug1f95f44f with fresh ordinary
+touches1.578s apart, matching requested/effective preconditions and actual saved
+schema2/pending=false/Glass On. Before-Apply pending=true was a transient
+preview marker with confirmed schema1 retained, not failure. Hierarchy receipts
+are not atomic native ACKs; no timer/ACK changes were made. The earlier
+event-based timeout without a Keep tap is retained. Popup-idle cause and
+broader confirmation/lifecycle acceptance remain unproven.
+
+Physical local statistics on exact benchmarke339da58 is separately verified:
+the ordinary UI benchmark's native/typed reports complete1,838 CPU-accepted/
+GPU-valid rows at75% Mobile/Pipeline, with correct population/configuration
+joins. Initial and reopened forms have both consents unchecked, Prepare
+disabled and exports absent. Explicit preparation keeps hardware off; cooling
+is Unknown and thermal data not-collected/null/unknown. Cancel/retry retains
+the same UUID and literal. Prepared/copy/cancel/retry/saved UI literal and
+actual pulled local file are byte-identical UTF8 without BOM:10,320bytes,
+SHA256 `216b244b20c84b3e9593bdddd67babcaabc97f050deb7709b1474737a0f93032`.
+Copy app status is proven; clipboard bytes are unverified. File association
+uses actual local Downloads selection, a unique chosen name, one file,
+recorded prior absence and exact bytes. Provider queries were denied; direct
+accepted-URI-to-filesystem mapping is unproven. No grant/security changes.
+Sealed144-file audit SHA256
+`5c1ebc39ec4894f400b71f82f57ea3c2b660ba470b19726f10696974244a9739`.
+This is a functional UI/export lane, not repeated comparative performance;
+delayed thermal observations establish no measured thermal parity or new
+completed lifecycle proof.
+
+Final transient Glass/further confirmation/lifecycle, benchmark50/40/33,
+Windows statistics, remaining native owner/audio/haptic and performance gates remain
+open; remote Send is blocked. Windows820/e639/ZIP1ea artifacts are unchanged;
+all four final Authored/Max torch motion runs now pass with56captures and zero
+markers. Owner approval covers watched torch lowering/no-clipping only;
+changed audio and broader appearance acceptance remain open. The earlier
+Replay below belongs to Debug47430943, not this Java APK; native byte identity
+does not certify new UI/lifecycle.
+
+## Prior restored eba2: exact admission and bounded feature Replay
+
+Evidence class: **exact isolated development APK, completed hardware-RT route
+and checkpoint presentation, bounded surface-lifecycle observation**. Actual
+**SM-S948B / Android16 / Adreno(TM)840**, driver2150932499/API4210983. Source
+`eba2a6851e73a56bc9062d403fb2941f9fb8dd27` has all six jobs green in
+[CI37141752133](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37141752133).
+This is not release, sustained performance or owner visual/UI/audio acceptance.
+
+Restored Debug APK SHA256
+`4743094325bbb123b11a3bb4f6479877c856921974171a80bc3211af8019d69d`
+and isolated nondebuggable ShippingMobile benchmark
+`8a1f77d67cb7d7515592f299ed3323904ca9efa08cb0b5913cd355fa8f0ad5a2`
+both match update-only installed pullbacks. Production and app data remain
+preserved; no clearing. Fresh admission proves all eight packaged native ELFs
+directly byte-identical to original c299/current stripped/retained original
+libraries, not the rejected guard. Original matching ARM64 selected-shader
+proof is reused only for those exact bytes; other-ABI instruction validation
+is not inferred. Four-ABI class/machine/load16KiB and both APK ZIP16KiB checks,
+81 exact closed assets/notices including full cgltf, and the collected
+387-input/23-fixture/eight-command bank pass. Build3m1s reused completed
+138-test/23-class XML with zero failures/errors/skips; lint0errors/46warnings.
+Debug remains Diagnostic/Mobile/O2/minimum50; benchmark is Shipping/Mobile/O2/
+NDEBUG/guardedminimum33 with checkpoints disabled.
+
+Both actual Debug Replay runs complete13/13 route waypoints and five captures,
+each settled12 frames, at75% Mobile:1080x2235 internal/1440x2980 swapchain.
+Pipeline and RayQueryCompute remain the requested/effective backends. All12
+route/capture state packets have matching completed owning RT dispatch/copy/
+presentation proof and22 instances. The five paired full-display capture
+hashes match across backends; this is not a scene-only readback or owner
+appearance judgement. Replay audit SHA256
+`29ae38870aaa2a2608185401bf8abd278252d6c174244f04800aa3682ff3ac43`.
+
+**Resume limitation:** both summaries report Home/resume PASS and native logs
+show a new requested/started/presented surface generation with backend retained.
+Saved capability `rtScene.presented=true` nevertheless coexists with saved
+`rtFrameEvidence.presented=false`, status pending, `completedFrame=null` and
+zero GPU samples. Those reports do not supply fresh completed owning-frame
+proof after resume. Timing files are empty and benchmarkWindowsCompleted=0;
+no benchmark distribution or sustained30FPS claim follows. Final statistics/
+modal/export interaction, moving quality, owner scene/listening/haptics and
+repeated performance acceptance remain open; remote Send is blocked. S24/S25
+remain unverified. Feature-enabled S26 evidence does not prove the retained
+unextended-driver presentation teardown fallback.
+
+Earlier entries retain their exact artifacts and historical limitations; their
+then-current build/pending statuses are superseded by this restored checkpoint.
+
+## October3: same-player released-source comparison and rejected lookup experiment
+
+Evidence class: **exact isolated local Shipping APK, complete owning hardware-RT
+benchmark**, not release/signing, owner appearance/listening or sustained target
+acceptance. Actual SM-S948B/Android16/Adreno(TM)840; production and data preserved.
+Both runs use the accepted modelled player/viewmodel, Pipeline/MAILBOX/ASTC,
+75%/Mobile water/Mobile fire/GlassOn,1080x2235 internal/1440x2980 output. Each
+completes1,838 owning CPU/GPU-valid rows with zero rejected/cancelled/outstanding
+or error populations.
+
+Released sourcea397 baseline APK
+`b0177846a39e7de2d9300d264bc853689d871b6b98d0f210bbd8c34ed7fef49a`
+uses a guarded external benchmark-output-only code10 override for update-only
+installation; source1.6.1/code9 stays unchanged. Actual Shipping/Mobile ELF,
+signature,70-asset and16KiB admission passes. Its historical missing full cgltf
+notice is retained; it is a private comparison artifact, not a new release.
+Cycle/GPU medians64.9531/54.3676ms versus c29969.6940/59.3083ms imply+7.30%/
++9.09%. The older block-arm35%/40% comparison below is historical context, not
+the released-version regression. Baseline start29.6C versus current29.0C, both
+thermal0/USB charging; baseline endpoint31.2C is185.9s after completion.
+
+Guarded source362 APK
+`6bca7be1f5ab3afb443c4f39ca86b070e2a34ca222a727e3c147286b9198a085`
+matches installed pullback and fresh four-ABI/eight-ELF/81-asset/notice/16KiB
+admission; actual Shipping ARM64 guard/control-flow/negative checks pass.
+Cycle/GPU medians70.1879/59.1093ms versus c29969.6940/59.3083ms (+0.709%/
+-0.336%) demonstrate no net frame-time saving. Start30.1C/thermal0; endpoint
+33.7C/thermal0 is43.5s after completion. Unknown clocks/cooling and one ordered
+pair prohibit causal claims. The lookup experiment is rejected and its32 code/
+generated/fixture files restored; its exact evidence is retained. Restored
+artifact admission and bounded Replay are recorded above; final phone UI,
+fresh owning resume proof, quality and owner acceptance remain open.
+No default quality reduction or sustained30FPS
+claim. S24/S25 remain unverified.
+
+## October3 historical c299: exact admission and Shipping performance context
+
+Evidence class: **local exact development-APK identity, complete hardware-RT
+benchmark and bounded native UI interaction**, not signed release, sustained
+performance or owner scene/listening acceptance. Actual **SM-S948B / Android16 /
+Adreno(TM)840**, raw driver2150932499/API4210983. Only the allocated separate
+Debug/benchmark packages were updated; production and user data were preserved.
+
+Historical source backup `c299c2eb52b37471709b2607ebb29d002629151b` has all six
+PR CI37133774665 jobs green. Debug APK
+`b95c15ed68c110741a17ec256800605ddf89d29d0ad50c0f56bd790bfd954726`
+and isolated ShippingMobile benchmark APK
+`560414d8ab095c8f12be6bad915e60d67ad8af9b276cc2a401b09e8db5705236`
+match installed pullbacks. Actual all-four-ABI assemblies,138Java tests/23classes,
+lint0errors46warnings, frozen387-input bank and both ZIP16KiB checks pass.
+All eight packaged native libraries and81assets/notices per APK are byte-identical
+to the fully admitted preceding d44a7fc9/5d573533 artifacts; selected shader/ELF
+admission carries through those actual identical bytes. Java-only pose mapping
+does not imply new native shader validation.
+
+Both historical167ce8 ShippingMobile75 and current c299 candidate complete the
+same two-lap1,838-frame course with all CPU/GPU timestamps valid and no
+missing/rejected/cancelled/outstanding samples. Actual Pipeline, MAILBOX,
+1080x2235 internal/1440x2980 output,75%/Mobile water/Mobile fire/defaultGlassOn
+remain unchanged.
+
+| Recorded timing | Historical167 ms | Historical c299 ms | Increase |
+|---|---:|---:|---:|
+| Whole-frame median |51.661|69.694|34.9%|
+| GPU RT median |42.360|59.308|40.0%|
+| Whole-frame mean |51.938|70.923|18.986ms|
+| Fence-wait mean |42.980|60.516|17.536ms|
+| Player-skin mean |6.686|8.194|1.508ms|
+
+This historical whole-product difference is not the same-player released-source
+comparison above or an acceptance pass. Fence wait accounts
+for92.36% of whole-frame mean increase, matching GPU-duration delta17.575ms.
+Historical167ce8 uses block primary arms; current source adds the accepted
+modelled viewmodel/body remainder, so this compares different whole-product
+feature contracts. Historical cold start27.2C/thermal0 versus current29.0C/
+thermal0 is within2C. Endpoint battery readings37.8C/status1 and33.0C/status0
+were collected after completion; they do not prove in-run trajectories. Clocks
+and cooling equivalence are unavailable. No bandwidth cause, quality reduction,
+near60FPS or sustained30FPS at fixed75% is established.
+
+On preceding byte-identical-native d44a7fc9, actual fontScale1.7 preview exposes
+two persistent amber horizontal scrollbars, a swipe reveals Fire/Cap choices,
+Image/Controls works, and live FPS/RT-ready is visible. Confirmed75/Mobile/Mobile/
+30 settings remained unchanged; startup recovered legacy pending metadata.
+These hot transient Diagnostic UI observations are not Shipping performance.
+Final current phone five-feature/replay/Glass/modal/local statistics export and
+owner visual/audio/haptic gates remain open. Home restores passive recovery
+between tests. S24/S25 remain unverified.
+
+## October3: 1.6.2 Compute compatibility and compact native preview
+
+Evidence class: **local exact development-APK identity, actual hardware RT,
+bounded lifecycle and native UI interaction**, not signed release, sustained
+performance, final integrated collapse or owner visual/listening acceptance.
+Actual **SM-S948B / Android16 / Adreno(TM)840**, raw driver2150932499/API4210983.
+Production data and package were preserved; only user0's separate Debug package
+was updated, without clearing app data or changing system text size.
+
+The exact preceding torch APK `b4e063afed5ea46be1467870a0d96adbb1a7e731e6bda8f978c2d4401f45e8ee`
+passed required **RayQueryCompute** startup, opening, three actual captures and
+Home/resume with newly presented hardware RT and the Compute backend retained.
+The runner checked executionBackend and successful presentation in actual native
+reports rather than treating advertised support as execution. Optional **EXT
+swapchain maintenance1 presentation fences were enabled**. Warm36.1C start and
+41.1C endpoint mean this is compatibility evidence, not baseline timing evidence.
+Private summary schema9 SHA256 `6da4d397694de3b0e7622dd2d17737e52f52f668ba4e5bb7ad511d98807c29dd`.
+
+Current Java-only compact preview APK
+`a4388e81fa03ac9fa16989da74fd13eefca7ed844522ad3d4e597bb206b9ef2a`
+matches the installed APK pullback exactly. Its four native libraries match the
+preceding torch APK byte-for-byte. Host119tests/21classes, lint0errors/51warnings,
+closed asset/full cgltf notice and four-ABI16KiB ELF admission passed. Source
+identity is861d0e0 plus the sealed Java inputs, not an unqualified clean commit.
+
+Actual fontScale1.7 controls leave about80% of the RT image unobstructed and retain
+native large text/minimum targets. Water Before/After changes only water
+Mobile/High, retaining75% resolution, Mobile fire and30Hz preview cap; Details
+shows distinct requested/effective values after actual RT presentation. Before
+and Revert restore the confirmed selection without saving the draft. The Water
+pool still falls behind the bottom strip in portrait; a follow-up Image/Controls
+toggle is being implemented. Latest owner steering replaces Before/After with
+live setting choices and an always-visible preview FPS reading; this tested
+Before/After APK is historical UI evidence. Apply/Keep persistence, further
+lifecycle and final owner acceptance remain open. Automatic approval review
+blocked an Apply tap; no blocked tap was executed. Owner then explicitly allowed
+testing Apply/Keep only with the unchanged original75%/Mobile-water/Mobile-fire/
+30Hz tuple after verifying those values. Raw screenshots/reports/preferences
+remain private outside Git.
+
+These feature-enabled results do not validate the unextended presentation
+teardown fallback. Owner chose to retain compatibility with that limitation
+explicitly open; S24/S25 feature support must not be inferred from hardware RT.
+Audio/haptic manual revalidation required:YES for the already changed cues and
+Core waterfall route; the preview UI itself adds no audio change.
+
+## October3: exact torch-correction candidate, first matched75% comparison
+
+Evidence class: **local exact development-APK pullback and bounded actual RT
+checkpoint timing**, not signed release, sustained performance or owner acceptance.
+Only the separate user0 Debug package was updated without clearing data. Candidate
+APK SHA256 `b4e063afed5ea46be1467870a0d96adbb1a7e731e6bda8f978c2d4401f45e8ee`
+matches the installed pullback. Build identity is a669HEAD plus the recorded three
+native-file delta, with all294 Android runtime inputs unchanged during build;
+four ABIs, ELF16KiB alignment and actual notice/asset admission pass.
+
+Actual **SM-S948B / Android16 / Adreno(TM)840**, driver2150932499/API4210983,
+RayTracingPipeline, Mobile water, modelled viewmodel and fixed75% remain matched
+to the exact released-source baseline below (1080x2235 internal,1440x2980 output).
+Both started battery28.7C; baseline44%, candidate45%. All three states presented
+actual RT output, with no runner failure or warning. The runner force-stopped its
+owned Debug process; lead verified no remaining Debug PID.
+
+| Checkpoint | Baseline ms | Candidate ms | Descriptive increase | Candidate battery C / thermal status |
+|---|---:|---:|---:|---:|
+| Opening | 63.181 | 66.774 | 5.69% | 33.0 / 0 |
+| Worst bend | 56.117 | 58.654 | 4.52% | 35.1 / 0 |
+| Held lantern High pose / Mobile rendering | 93.657 | 100.442 | 7.25% | 37.1 / 1 |
+
+These are medians of three CPU present-loop window averages, not GPU-only or
+per-frame percentiles. GPU thermal-power level0 was reported throughout. Different
+endpoint temperatures and sequential order limit causal interpretation; repeated
+balanced comparisons remain pending. Fixed75% is still below30FPS. No lower scale,
+cooled run or DRS substitutes for that target. No Compute, Home/resume, settings,
+preview, moving clearance, changed-audio or owner visual acceptance is claimed.
+Raw scoped evidence remains private outside source in `../android-candidate-torch-162/`.
+
+## October3: renewed1.6.2 allocation and exact released-source baseline
+
+Evidence class: **local exact development-APK installation/pullback and bounded
+RT checkpoint timing**, not a1.6.2 candidate pass, signed release, lifecycle or
+owner acceptance. Owner explicitly returned the phone after withdrawing the
+earlier allocation. Lead reverified authorized **SM-S948B**, Android16/current
+user0. The exact newly built clean released-source `a397757` Diagnostic/Mobile
+Debug APK was installed only for user0 into the separate `.debug` package, without
+clearing data or modifying production saves/settings. Installed pullback SHA256
+matches `9d3fa47f4b2491e7d1cece984261d175314ad0cfd86353fd2010e50576b3ce47`.
+
+Actual GPU Adreno(TM)840, raw driver2150932499/API4210983; **RayTracingPipeline**,
+modelled viewmodel, Mobile water, fixed75% at1080x2235 into1440x2980. All three
+checkpoint states retained successful RT-produced presentation and exact baseline
+Mobile shader identities. Three window means per checkpoint give these medians:
+
+| Baseline checkpoint | CPU present-loop ms | Median-derived FPS | Battery C | Android thermal status |
+|---|---:|---:|---:|---:|
+| Opening | 63.181 | 15.828 | 32.6 | 0 |
+| Worst bend | 56.117 | 17.820 | 34.8 | 0 |
+| Held lantern High pose / Mobile rendering | 93.657 | 10.677 | 36.6 | 1 |
+
+GPU thermal-power level reported0 in each window. These are window-average CPU
+present-loop observations, not per-frame percentiles or GPU-only durations. Fixed
+75% still falls below the30FPS reference; no lower-scale result substitutes for
+it. The different thermal states remain explicit and must be matched before
+attributing a candidate delta. No Home/resume test was requested in this run.
+
+Private PID/time-scoped reports remain outside source under
+`../android-baseline-162-intake/`; raw identifiers/logs are not published. The
+runner owns separate baseline artifact/source and implementation-runner identities.
+It reported no failures and force-stopped its Debug app; lead verified no Debug
+PID afterward. Initial battery28.7C/44%, final cooldown observation33.2C/43%.
+Current candidate, Compute, lifecycle/settings/preview, motion and changed-audio
+acceptance remain pending. S24 final-release coverage and exact S25 remain
+separate unverified/deferred records.
+
+## October3: 1.6.2 allocated-device intake (no new RT pass yet)
+
+Evidence class: **local read-only ADB identity/availability**, not installation,
+RT presentation, performance or owner acceptance. Sam explicitly allocated the
+connected phone for scoped development validation. ADB authorization resolved;
+raw model **SM-S948B**, Android16, current user0, battery28.6C/41% at intake.
+The production package is present and the separate `.debug` development package
+is absent. Preserve production saves/settings; no app-data clearing is authorized.
+Current candidate APK/device RT/lifecycle/listening evidence remains pending.
 
 ## October3: final signed1.6.1 production update — exact S26 smoke
 
@@ -1638,3 +2098,28 @@ changed A/D music YES, now owner PASS. No new SFX/haptic change in this slice.
 - [Samsung Exynos 2400](https://semiconductor.samsung.com/processor/mobile-processor/exynos-2400/)
 - [Samsung Exynos 2500](https://semiconductor.samsung.com/processor/mobile-processor/exynos-2500/)
 - [Samsung Exynos 2600](https://semiconductor.samsung.com/processor/mobile-processor/exynos-2600/)
+
+### 4 October 2026 — 1.6.2 controls candidate, local deterministic Pipeline evidence
+
+- Exact device: **SM-S948B**, Android16; locally allocated test device. This entry is local update/install, actual RT presentation, deterministic route/capture and lifecycle evidence, not vendor inference or broad compatibility certification.
+- Runtime source: `d579865bde460aa6acd94fee299e36fca3b39d32`. Debug APK SHA256: `5f344ce6f601b28c57ae3221872a05bfb351f14e045f9d62d91c18e017edaf60`; update-only installation retained app data. Packaged ARM64 and stripped library bytes match, and both selected Diagnostic/Mobile backend pairs pass SDK SPIR-V inspection.
+- Physically observed Pipeline at75%: successful RT-produced1080×2235 presentation; deterministic route13/13, three changed-feature captures and strict Home/Resume owning-frame checks in the separately identified300-second run. Preserve the preceding120-second timeout at9/13 as a negative; no scale or quality reduction was used to complete the longer observation.
+- Limits: current Compute/device controls, Shipping timing, changed enclosure/HUD/intro interaction and quality-choice owner acceptance remain pending. This new APK does not inherit earlier runtime95eb measurements or approvals. Raw logs/images and private device identifiers remain outside Git. See [active second-pass ledger](ENGINEERING_1_6_2_SECOND_PASS.md).
+
+### 4 October 2026 - same APK Compute and owner settings/HUD interaction
+
+- Same SM-S948B/Android16 and Debug APK `5f344ce6f601b28c57ae3221872a05bfb351f14e045f9d62d91c18e017edaf60`, runtime d579. Compute completed route13/13, three captures and strict Home/Resume at the owner's saved50%. This is correctness/lifecycle evidence; differing Pipeline75/Compute50 scales are not matched image or performance comparisons.
+- Owner confirmed Use these settings / Keep and save was clear, Saved displayed50%, and the Interact preview was fixed on one line. Read-only persisted settings agreed; owner50% was retained. Changed enclosure, Keeper hold, shadow/fire quality, Shipping timing and other-device gates remain open. Private evidence stays outside Git.
+
+### 4 October 2026 - corrected descriptor-layout runtime03a49
+
+- Same allocatedSM-S948B/Android16; updated Debug APK `a8ed270afbfc8e30c517c11104f198ad09fd771177d6742c039d7d73d99fa151`, runtime `03a49ff169e6ac7bfe80758bf94a0114d35cbfcc`. Installed pullback matches and the owner preference file stayed byte-identical at50%, pendingfalse.
+- Both Pipeline and Compute independently passed route13/13, three captures and strict Home/Resume at50%. Exact ARM64 modules/ELF/alignment/notices/assets pass. This refresh follows correction of Diagnostic27 descriptor-layout scratch capacity; earlier d579 observations are historical.
+- Evidence class: actual local install/presentation/deterministic correctness/lifecycle. No sustained timing, same-frame parity, signed release or other-device certification is implied. Upper enclosure/new quality-choice acceptance and controlled Shipping timing remain separate.
+
+### 4 October 2026 - corrected runtime Shipping baseline after restart
+
+- Exact allocated device rechecked: **SM-S948B/Android16**. Runtime 03a49, development-signed isolated Shipping APK SHA256 `f396c18a82ced465086d06fac364f68b8b8dfb8a43dcf845185a06e9506ac7d6`; current installed pullback matches. No reinstall, data clearing or owner Debug settings change occurred on resume.
+- Ordinary Run Benchmark after actual current-generation RT presentation completed its two-pass course: 1,838/1,838 accepted CPU frames and 1,838 valid GPU rows, zero rejected/cancelled/outstanding. Actual Pipeline/Shipping/Mobile tuple: 75%,1080x2235 into1440x2980, Mobile water/fire, GlassOn, Current shadows with uploaded 1/1 samples and uploaded fire 4/1/4. Cap 30 was verified in ordinary UI.
+- Frame-cycle median 62.727317 ms/p95 83.149167 ms; owning GPU command-buffer interval median 51.578827 ms/p95 72.782134 ms. USB powered, battery 35.5 to 41.5 degrees C; thermal status explicitly unknown/not collected. Evidence class: exact-artifact local route timing/correctness. This single ordered baseline does not establish sustained 30 FPS, performance optimization, identical-frame backend parity or other-device certification.
+- Private local report was prepared with hardware opt-in unchecked; nothing was sent. The earlier start failed admission and remains a negative with cause unproven. See [second-pass ledger](ENGINEERING_1_6_2_SECOND_PASS.md). Private identifiers, raw reports and images remain outside Git.

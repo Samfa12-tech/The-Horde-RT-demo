@@ -129,6 +129,13 @@ foreach ($relativePath in $isolatedSources) {
 $scene = Get-Content -LiteralPath (Join-Path $repoRoot 'src\vulkan\raytracing\PresentableTinyRtScene.cpp') -Raw
 $sceneHeader = Get-Content -LiteralPath (Join-Path $repoRoot 'src\vulkan\raytracing\PresentableTinyRtScene.h') -Raw
 $windowsHost = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\DiagnosticWindow.cpp') -Raw
+$windowsPreviewCapture = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\WindowsGraphicsPreviewCapture.inl') -Raw
+$windowsResizeValidation = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\WindowsOutputResizeValidation.inl') -Raw
+$windowsMotionValidation = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\WindowsMotionEvidenceValidation.inl') -Raw
+$windowsMotionLaunch = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\WindowsMotionEvidenceLaunch.h') -Raw
+$windowsBenchmarkSummaryReview = Get-Content -LiteralPath (Join-Path $repoRoot 'src\platform\windows\WindowsBenchmarkSummaryReview.inl') -Raw
+# Included platform code has the same policy boundary as its translation unit.
+$windowsHost += $windowsPreviewCapture + $windowsResizeValidation + $windowsMotionValidation + $windowsMotionLaunch + $windowsBenchmarkSummaryReview
 $androidHost = Get-Content -LiteralPath (Join-Path $repoRoot 'android\app\src\main\cpp\android_probe_bridge.cpp') -Raw
 $foundationRunner = Get-Content -LiteralPath (Join-Path $repoRoot 'tools\run-foundation-validation.ps1') -Raw
 $androidRunner = Get-Content -LiteralPath (Join-Path $repoRoot 'tools\run-android-showcase-validation.ps1') -Raw
@@ -171,6 +178,7 @@ foreach ($forbiddenRecordDecision in @('ResolveCompiledRtPipelineBundlePreflight
 foreach ($hostSource in @($windowsHost, $androidHost)) {
     Assert-True (-not $hostSource.Contains('RtPipelineBundleRequest')) 'A platform host must not construct or pass a bundle request.'
     Assert-True (-not $hostSource.Contains('RtPipelineVariantProvider')) 'A platform host must not resolve provider policy.'
+    Assert-True (-not $hostSource.Contains('ResolveExact(')) 'A platform host must not resolve a catalog artifact independently of its selected scene.'
     Assert-True $hostSource.Contains('SelectedOpaqueFastKey()') 'A platform host must serialize the selected OpaqueFast key.'
     Assert-True $hostSource.Contains('SelectedGenericDielectricKey()') 'A platform host must serialize the selected GenericDielectric key.'
     Assert-True $hostSource.Contains('DiagnosticsAvailability()') 'A platform host must publish diagnostic availability beside legacy scalars.'
@@ -179,6 +187,22 @@ foreach ($hostSource in @($windowsHost, $androidHost)) {
     Assert-True $hostSource.Contains('SelectedDielectricQualityName()') 'A platform host must report selected scene dielectric quality.'
     Assert-True (-not $hostSource.Contains('SelectedGenericDielectricSha256()).substr')) 'A platform host must not collapse pair identity to the generic-dielectric hash.'
 }
+Assert-True $windowsPreviewCapture.Contains('context.rtScene.SelectedPipelineArtifactMetadata(material)') `
+    'Preview capture must serialize already-selected scene artifact metadata.'
+$metadataStart = $sceneHeader.IndexOf('SelectedPipelineArtifactMetadata(RtMaterialStrategy strategy)')
+$metadataEnd = $sceneHeader.IndexOf('std::string_view SelectedGenericDielectricKey()', $metadataStart)
+Assert-True ($metadataStart -ge 0 -and $metadataEnd -gt $metadataStart) 'Unable to isolate selected artifact metadata getter.'
+$metadataGetter = $sceneHeader.Substring($metadataStart, $metadataEnd - $metadataStart)
+Assert-True ($metadataGetter.Contains('pipelineBundle_.HasSelection()') -and
+             $metadataGetter.Contains('pipelineBundle_.Strategy(strategy).artifact') -and
+             -not $metadataGetter.Contains('Compiled(') -and -not $metadataGetter.Contains('ResolveExact(')) `
+    'Scene metadata must project its cached selected artifact without resolving provider policy.'
+$rejectedIncludedPolicy = $false
+try {
+    Assert-True (-not ($windowsPreviewCapture + 'RtPipelineVariantProvider::Compiled').Contains('RtPipelineVariantProvider')) `
+        'Synthetic included host policy resolution must fail.'
+} catch { $rejectedIncludedPolicy = $true }
+Assert-True $rejectedIncludedPolicy 'Included-host policy negative control did not reject provider resolution.'
 foreach ($toolSource in @($foundationRunner, $androidRunner, $androidComparison)) {
     Assert-True $toolSource.Contains('selectedRtPipelineBundle') 'Live validation tooling must preserve selected RT pipeline-pair provenance.'
     Assert-True (-not $toolSource.Contains('raygenSha256')) 'Live validation tooling must not accept the compatibility raygen hash as runtime provenance.'

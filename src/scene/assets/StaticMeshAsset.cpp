@@ -221,6 +221,8 @@ StaticMaterial ConvertMaterial(const cgltf_data& data,
     std::copy_n(source.emissive_factor, 3u, result.emissiveFactor.begin());
     result.normalTexture = CategoryTextureLayer(
         textureRoutes[1], {TextureIndex(data, source.normal_texture), -1});
+    result.normalScale = source.normal_texture.texture != nullptr
+        ? source.normal_texture.scale : 1.0f;
     result.ormTexture = CategoryTextureLayer(
         textureRoutes[2],
         {source.has_pbr_metallic_roughness
@@ -269,7 +271,11 @@ bool IsFiniteMaterial(const StaticMaterial& material)
     return finiteRange(material.baseColorFactor) && finiteRange(material.emissiveFactor) &&
            finiteRange(material.attenuationColor) && std::isfinite(material.emissiveStrength) &&
            std::isfinite(material.metallicFactor) && std::isfinite(material.roughnessFactor) &&
-           std::isfinite(material.occlusionStrength) && std::isfinite(material.transmissionFactor) &&
+           std::isfinite(material.occlusionStrength) && std::isfinite(material.normalScale) &&
+           finiteRange(material.textureScale) &&
+           material.textureScale[0] >= 1.0f / 1024.0f && material.textureScale[0] <= 1024.0f &&
+           material.textureScale[1] >= 1.0f / 1024.0f && material.textureScale[1] <= 1024.0f &&
+           std::isfinite(material.transmissionFactor) &&
            std::isfinite(material.ior) && std::isfinite(material.thicknessFactor) &&
            (std::isfinite(material.attenuationDistance) ||
             material.attenuationDistance == std::numeric_limits<float>::max());
@@ -1160,6 +1166,20 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
     TextureLayerRoutes textureRoutes;
     for (std::size_t materialIndex = 0u; materialIndex < data.materials_count; ++materialIndex)
     {
+        const cgltf_material& source = data.materials[materialIndex];
+        const std::array<const cgltf_texture_view*, 5u> views{{
+            &source.pbr_metallic_roughness.base_color_texture,
+            &source.pbr_metallic_roughness.metallic_roughness_texture,
+            &source.normal_texture, &source.occlusion_texture, &source.emissive_texture}};
+        for (const cgltf_texture_view* view : views)
+        {
+            if (view->texture != nullptr && (view->texcoord != 0 || view->has_transform))
+            {
+                diagnostic = "Static GLB material " + std::to_string(materialIndex) +
+                    " requires unsupported texture coordinates/transform; bake textures to TEXCOORD_0.";
+                return false;
+            }
+        }
         if (data.materials[materialIndex].alpha_mode != cgltf_alpha_mode_opaque)
         {
             diagnostic = "Static GLB material " + std::to_string(materialIndex) +
@@ -1184,6 +1204,10 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
                     material.attenuationColor = materialOverride.attenuationColor;
                 if (materialOverride.hasRoughnessFactor)
                     material.roughnessFactor = materialOverride.roughnessFactor;
+                if (materialOverride.hasNormalScale)
+                    material.normalScale = materialOverride.normalScale;
+                if (materialOverride.hasTextureScale)
+                    material.textureScale = materialOverride.textureScale;
                 if (materialOverride.hasThinWall)
                 {
                     if (materialOverride.thinWall) material.flags |= 512u;
@@ -1406,17 +1430,36 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
                         "' has a non-invertible normal transform.";
                     return false;
                 }
-                const std::array<float, 4u> defaultTangent{{1.0f, 0.0f, 0.0f, 1.0f}};
-                const float* sourceTangent = tangents != nullptr
-                    ? unpackedTangents.data() + vertexIndex * 4u
-                    : defaultTangent.data();
                 std::array<float, 3u> transformedTangent{};
-                if (!TransformTangent(nodeWorld, sourceTangent,
-                                      transformedNormal, transformedTangent))
+                float tangentSign = 1.0f;
+                if (tangents == nullptr)
                 {
-                    diagnostic = "Static GLB primitive " + std::to_string(primitiveIndex) +
-                                 " has a degenerate tangent after node transform.";
-                    return false;
+                    // Only untextured primitives reach this fallback. An arbitrary
+                    // X tangent is parallel to +/-X normals and cannot be normalized.
+                    transformedTangent = Cross(
+                        std::abs(transformedNormal[1]) < 0.9f
+                            ? std::array<float, 3u>{{0.0f, 1.0f, 0.0f}}
+                            : std::array<float, 3u>{{1.0f, 0.0f, 0.0f}},
+                        transformedNormal);
+                    Normalize(transformedTangent);
+                }
+                else
+                {
+                    const float* sourceTangent = unpackedTangents.data() + vertexIndex * 4u;
+                    tangentSign = sourceTangent[3];
+                    if (tangentSign != -1.0f && tangentSign != 1.0f)
+                    {
+                        diagnostic = "Static GLB primitive " + std::to_string(primitiveIndex) +
+                                     " tangent handedness must be -1 or 1.";
+                        return false;
+                    }
+                    if (!TransformTangent(nodeWorld, sourceTangent,
+                                          transformedNormal, transformedTangent))
+                    {
+                        diagnostic = "Static GLB primitive " + std::to_string(primitiveIndex) +
+                                     " has a degenerate tangent after node transform.";
+                        return false;
+                    }
                 }
                 for (std::size_t axis = 0u; axis < 3u; ++axis)
                 {
@@ -1428,7 +1471,7 @@ bool StaticMeshAsset::Load(const std::filesystem::path& runtimeGlb,
                 }
                 vertex.position[3] = 1.0f;
                 vertex.normal[3] = 0.0f;
-                vertex.tangent[3] = sourceTangent[3];
+                vertex.tangent[3] = tangentSign;
                 vertex.uv0 = {{unpackedUv[vertexIndex * 2u],
                                unpackedUv[vertexIndex * 2u + 1u], 0.0f, 0.0f}};
                 asset.vertices.push_back(vertex);

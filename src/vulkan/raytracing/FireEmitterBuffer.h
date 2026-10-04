@@ -1,5 +1,7 @@
 #pragma once
 
+#include "graphics/GraphicsSettings.h"
+
 #include "gameplay/effects/FireEmitterState.h"
 #include "vulkan/raytracing/RtSceneAbi.generated.h"
 
@@ -14,7 +16,19 @@ enum class FireEmitterQuality : std::uint32_t
 {
     Mobile = 1u,
     High = 2u,
+    Low = 3u,
 };
+
+constexpr FireEmitterQuality ResolveFireEmitterQuality(const horde::graphics::FireDetail detail) noexcept
+{
+    switch (detail)
+    {
+    case horde::graphics::FireDetail::Mobile: return FireEmitterQuality::Mobile;
+    case horde::graphics::FireDetail::High: return FireEmitterQuality::High;
+    case horde::graphics::FireDetail::Low: return FireEmitterQuality::Low;
+    }
+    return FireEmitterQuality::Mobile; // Invalid tuples are rejected before admission.
+}
 
 struct FireEmitterQualityBudget
 {

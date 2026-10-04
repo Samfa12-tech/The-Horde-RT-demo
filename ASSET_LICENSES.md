@@ -34,7 +34,8 @@ The running RT scene uses the five Poly Haven material sets, the Hotstrike Studi
 | Generic closed dielectric fixture | Eight-vertex, twelve-triangle closed/manifold runtime GLB with authored KHR transmission, volume and IOR | Deterministically generated in-repository by `tools/generate-dielectric-fixture.py`; no external source | Project-created test geometry; no third-party licence or attribution requirement | Codex, 2026-08-26 | Small imported static-PBR fixture for the reusable bounded dielectric transport and RT Lab controls. Positive closed/manifold and negative open/non-manifold validation fixtures are retained under `tests/fixtures/dielectric-topology`. |
 | Stylized skeleton derivative, merged animations v01 | Hotstrike Studio base mesh, subsequently textured, rigged, and animated with Meshy; skinned GLB with 11 animation clips and embedded 4K texture | Original: Hotstrike Studio, https://hotstrikestudio.itch.io/free-stylized-skeleton. User-provided Meshy-processed archive: `Meshy_AI_SKM_Skeleton_Var_1_biped.zip`; see `assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.METADATA.md` | Hotstrike Studio asset licence permits use and modification in free or paid finished games and other media, but prohibits standalone resale/redistribution and asset-pack inclusion. Meshy processing is credited as **Meshy**; this release applies the Meshy Free-plan CC BY 4.0 attribution requirement conservatively, so it is safe whether the processing occurred on a free or paid plan. | Original by Hotstrike Studio; Meshy-assisted derivative supplied by user; runtime integration by Codex, 2026-07-11 | Credit: “Original stylized skeleton by Hotstrike Studio; texture, rig, and animation processing created with Meshy.” It owns the bounded two-skeleton opening encounter and uses `Idle_5`, `Walking`, `Attack`, and `Dead` through CPU skinning and dynamic RT BLAS refit with at most two pose buckets; the finale uses the separate singular lich GLB. The current RT proof uses a procedural bone material; the embedded 4K texture is retained but not sampled. Finished-game packaging is permitted; the raw derivative is also present in current public Git/LFS history. Permission to retain it in public source was requested from Hotstrike Studio on 2026-07-16 at https://itch.io/post/16578566; the request is pending and remains an explicit redistribution-permission/history-remediation gate. |
 | Lich placeholder, merged animations v01 | Active Meshy-generated skinned GLB placeholder; 9,188 triangles, nine clips, embedded 2K base-colour plus a falsely duplicated emissive image; deterministic raw-KTX2/ASTC derivatives and selective violet emissive mask | User-supplied `Meshy_AI_Meshy_Merged_Animations.glb`; see `assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.METADATA.md` | **CC0.** The user's Meshy workspace shows this exact lich asset with `Change License: CC0`; retained evidence: `assets/models/enemies/meshy/lich_placeholder_source_licence.png`, SHA-256 `6094E4D9A27A25022A1426C297F069DB60F779CC77526CFE6B154421F6DB96EE`. | User-supplied Meshy output; audited by Codex, 2026-07-15/16 | Runtime final-room placeholder. Robe, body, and staff are fused into one standard biped-skinned primitive with no staff or cloth bones; visible staff/robe deformation is a known source-art limitation. The two embedded image payloads decode identically, so `tools/prepare-lich-textures.ps1` derives a selective violet staff/eye/gem mask. Forty UV-audited emissive staff vertices drive the moving staff-light sample through their real skin weights. Proposed credit: “Placeholder lich character created and animated with Meshy.” |
-| Medieval Wall 02 | 1K diffuse, OpenGL normal, packed ARM | https://polyhaven.com/a/medieval_wall_02; Rob Tuytel | CC0 | Codex, 2026-07-12 | Dry corridor stone, runtime array layer 0. |
+| Medieval Wall 02 | 1K diffuse, OpenGL normal, packed ARM; lossless RGBA PNG derivatives for static masonry | https://polyhaven.com/a/medieval_wall_02; Rob Tuytel | CC0 | Codex, 2026-07-12; collapsed-entry reuse, 2026-10-03 | Dry corridor stone, dungeon runtime array layer 0 unchanged. Approved revision-two collapsed-entry masonry reuses the same admitted source family through static prop atlas layer 11; the new PNGs preserve decoded JPEG pixels and ARM channels without retouching or resizing. |
+| Boulder 01 collapsed-entry rock derivative | Original glTF/bin plus 1K diffuse, OpenGL normal and packed ARM; authored closed fractured geometry and lossless RGBA PNG derivatives | https://polyhaven.com/a/boulder_01; Rico Cilliers. Licence: https://polyhaven.com/license | CC0 1.0 | Poly Haven original; bounded Blender derivative/export by Codex, 2026-10-03 | Approved revision-two collapse uses shared static PBR atlas layer 10 (`Boulder01Rock`) with ordinary hardware-RT geometry. Original glTF/bin/JPEG maps, download receipt and CC0 snapshot are preserved in `assets/models/world/source/collapsed-entry/polyhaven-original`; exact source/PNG hashes and channel semantics are in `assets/textures/props/source/collapsed-entry/input-receipt.json`. Source assets are excluded from game packages. Native Runtime/owner visual acceptance remains separate from this licence admission. |
 | Cobblestone Floor 08 | 1K diffuse, OpenGL normal, packed ARM | https://polyhaven.com/a/cobblestone_floor_08; Rob Tuytel | CC0 | Codex, 2026-07-12 | Wet stone floor base, runtime array layer 1. |
 | Mossy Stone Wall | 1K diffuse, OpenGL normal, packed ARM | https://polyhaven.com/a/mossy_stone_wall; Amal Kumar | CC0 | Codex, 2026-07-12 | Mossed masonry, runtime array layer 2. |
 | Damp Sand | 1K diffuse, OpenGL normal, packed ARM | https://polyhaven.com/a/damp_sand; eye-candy.xyz | CC0 | Codex, 2026-07-12 | Puddle-edge/damp-ground blend, runtime array layer 3. |
@@ -134,3 +135,87 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+## cgltf glTF loader
+
+The bundled loader in `third_party/cgltf/` is cgltf by Johannes Kuhlmann,
+MIT licence. The complete copyright, permission notice and disclaimer from
+`third_party/cgltf/LICENSE` are distributed byte-for-byte as
+`THIRD_PARTY_NOTICES/cgltf-LICENSE.txt` in Windows packages and
+`assets/THIRD_PARTY_NOTICES/cgltf-LICENSE.txt` in Android APKs. Both in-app
+credits identify the loader and the notice location. Package admission verifies
+the complete notice bytes; this corrects future candidate packaging and does
+not alter frozen 1.6.1 artifacts.
+
+## 1.6.2 keeper and skeleton runtime cues
+
+The owner supplied four local Pixabay MP3s. Their original bytes remain local,
+outside public Git and distributed packages. The integrated game uses only the
+mono PCM16/48k runtime derivatives listed with exact source/runtime hashes,
+frames, edge trims, endpoint ramps and event mappings in
+`assets/audio/pixabay/keeper-asset.manifest.json`. These are under the
+[Pixabay Content License](https://pixabay.com/service/license-summary/) and
+[full terms](https://pixabay.com/service/terms/), verified3October2026; they are
+not represented as CC0. Attribution is voluntary. Do not redistribute these
+files as a standalone audio library.
+
+- Falling Bones and Rattling Bones by spookymodem (Freesound), uploaded through
+  freesound_community, via Pixabay. Runtime: `skeleton_falling_bones.wav` and
+  `skeleton_idle_rattle.wav`.
+- Lich Demonic Voice - I Sense You! and Come Closer! by PhatPhrogStudio, via
+  Pixabay. Runtime: `keeper_i_sense_you.wav` and `keeper_come_closer.wav`.
+
+`tools/prepare-keeper-audio.py` preserves source hashes, converts format, trims
+only quiet edge windows with a25ms reserve and adds short endpoint ramps. The
+idle excerpt is bounded to1.25s. No gain normalization or music instrumentation
+change is applied. Exact-candidate owner listening remains pending.
+
+## 1.6.2 native night environment and authored shaft foliage
+
+The night-storm panorama is an existing project-owned generated Briarhold asset,
+created9August2026 with OpenAI built-in image generation; no new generation or
+paid service was used. Its original provenance and source PNG are retained in
+`assets/textures/environment/source/`. Source SHA-256:
+`83c297f7373e52feee50a881d5291f8e99faab8556fbce4c041c4b63b497dd8b`.
+The inspected1024x512 WebP intermediary hash is
+`58dc7c09547d7ed560c75d97038556b908b50ffecd12873601b5ca9bfc814824`.
+
+`tools/prepare-horde-environment.py` produces mipmapped512x256 RGBA8-sRGB Windows
+and ASTC6x6-sRGB Android KTX2 files. Exact derivative hashes/formats/bytes are in
+`assets/textures/environment/runtime/asset.manifest.json`. Package only runtime
+tiers and their provenance, never source art. This is direction-based native RT
+miss/reflection radiance, not baked scene illumination.
+
+The bounded hanging sprigs are project-authored opaque leaf/stem geometry,
+reusing the admitted moss material through generic material tint/normal controls.
+There is no new third-party foliage texture, alpha card or generation licence.
+
+## 1.6.2 collapse reference study (not yet runtime-admitted)
+
+[Poly Haven Boulder01](https://polyhaven.com/a/boulder_01) by Rico Cilliers is
+[CC0](https://polyhaven.com/license), verified3October2026. The owner-selected
+1K glTF source and dependencies were downloaded and matched upstream byte/MD5
+metadata; SHA-256 receipts are retained in the isolated source-art workspace.
+The downloaded mesh has66122triangles, independently counted in Blender5.2;
+the source page's124K claim is not this download's topology. An unmodified source
+copy is preserved. A2200triangle welded/decimated study and project-authored
+broken dressed stone/lintel appear in `docs/design/1.6.2-collapse/` for the
+required owner layout/reference review. Final Form/runtime export is pending;
+these studies are excluded from shipping assets.
+
+## 1.6.2 Android Core-compatible waterfall derivative
+
+The existing admitted Pixabay waterfall source remains unchanged. The Windows
+runtime retains its full21.323479s mono loop. Android's canonical native PCM Core
+accepts stereo48k PCM16 bodies of at most12s; `tools/prepare-core-waterfall-loop.py`
+produces an11.5s dual-mono derivative without modifying Core or its pinned code.
+A750ms head crossfade uses the real continuation after the selected body to join
+the wrap without an added discontinuity. No silence, gain normalization or
+resampling is introduced. Exact source/derivative hashes, frames, processing and
+the shorter repetition tradeoff are recorded in
+`assets/audio/pixabay/waterfall-core.manifest.json`.
+
+The existing Pixabay licence/provenance applies to this integrated derivative;
+it is excluded from Windows runtime packaging. Exact-candidate repeated-loop
+listening and Android output/lifecycle acceptance remain pending. The change is
+not evidence that the former MediaPlayer issue was reproduced or diagnosed.

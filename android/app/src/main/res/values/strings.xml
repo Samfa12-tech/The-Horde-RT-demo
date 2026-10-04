@@ -79,6 +79,7 @@
     <string name="menu">MENU</string>
     <string name="rt_starting">VULKAN RT STARTING…</string>
     <string name="rt_active">NATIVE VULKAN RT ACTIVE</string>
+    <string name="rt_active_compact">RT</string>
     <string name="rt_unsupported">HARDWARE RT UNSUPPORTED</string>
     <string name="rt_error">RT RENDERER ERROR</string>
     <string name="hardware_requirement">Vulkan hardware RT required. No fallback.</string>
@@ -108,7 +109,7 @@
     <string name="water_quality_high">High</string>
     <string name="show_hud">Show compact HUD</string>
     <string name="reset_defaults">RESET DEFAULTS</string>
-    <string name="credits_body">Environment materials: Poly Haven — CC0.\nhttps://polyhaven.com/\n\nSound effects: FilmCow Royalty Free Sound Effects Library — FilmCow custom royalty-free licence.\nhttps://filmcow.itch.io/filmcow-sfx\n\nWater Dripping by DRAGON-STUDIO via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/nature-water-dripping-364450/\n\nWooden Trunk Latch 1 by floraphonic via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/film-special-effects-wooden-trunk-latch-1-183944/\n\nChest Opening by spookymodem (Freesound), via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/household-chest-opening-87569/\n\nFire extinguishing by MUSICHOLDER via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/film-special-effects-fire-extinguishing-212651/\n\nSkeleton derivative: original Free Stylized Dark Fantasy Skeleton by Hotstrike Studio; texture, rig, and animation processing created with Meshy — CC BY 4.0.\nhttps://hotstrikestudio.itch.io/free-stylized-skeleton\n\nPlaceholder lich character created and animated with Meshy — CC0.\nhttps://www.meshy.ai/\n\nProduction Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nProduction medieval hand torch created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nHistorical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex — CC BY 4.0.\n\nProduction Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nProduction Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nApplication icon created for this project with OpenAI image generation.\n\nFull provenance and licence details are bundled as ASSET_LICENSES.md and published at:\nhttps://github.com/Samfa12-tech/The-Horde-RT-demo/blob/main/ASSET_LICENSES.md</string>
+    <string name="credits_body">Environment materials: Poly Haven — CC0.\nhttps://polyhaven.com/\n\nSound effects: FilmCow Royalty Free Sound Effects Library — FilmCow custom royalty-free licence.\nhttps://filmcow.itch.io/filmcow-sfx\n\nWater Dripping by DRAGON-STUDIO via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/nature-water-dripping-364450/\n\nWooden Trunk Latch 1 by floraphonic via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/film-special-effects-wooden-trunk-latch-1-183944/\n\nChest Opening by spookymodem (Freesound), via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/household-chest-opening-87569/\n\nFire extinguishing by MUSICHOLDER via Pixabay — Pixabay Content License.\nhttps://pixabay.com/sound-effects/film-special-effects-fire-extinguishing-212651/\n\nSkeleton derivative: original Free Stylized Dark Fantasy Skeleton by Hotstrike Studio; texture, rig, and animation processing created with Meshy — CC BY 4.0.\nhttps://hotstrikestudio.itch.io/free-stylized-skeleton\n\nPlaceholder lich character created and animated with Meshy — CC0.\nhttps://www.meshy.ai/\n\nProduction Gothic arming sword created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nProduction medieval hand torch created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nHistorical-Gothic traveller/fighter and viewmodel gauntlets created with Meshy; runtime processing and animation integration by Samfa12/Codex — CC BY 4.0.\n\nProduction Gothic reward chest created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nProduction Gothic reward lantern created with Meshy; runtime processing by Samfa12/Codex — CC BY 4.0.\n\nApplication icon created for this project with OpenAI image generation.\n\nglTF loading: cgltf by Johannes Kuhlmann - MIT.\nFull notice: THIRD_PARTY_NOTICES/cgltf-LICENSE.txt in the app assets.\n\nFull provenance and licence details are bundled as ASSET_LICENSES.md and published at:\nhttps://github.com/Samfa12-tech/The-Horde-RT-demo/blob/main/ASSET_LICENSES.md</string>
     <string name="playtest_report">Report a problem</string>
     <string name="playtest_local_only">Choose local JSON export or prepare an explicitly consented remote report. Neither happens automatically.</string>
     <string name="playtest_remote_section">REMOTE REPORT — PRIMARY</string>
@@ -169,4 +170,38 @@
     <string-array name="playtest_impacts">
         <item>Blocks progress</item><item>Major friction</item><item>Minor friction</item><item>Polish</item>
     </string-array>
+    <string name="graphics_settings">Graphics</string>
+    <string name="graphics_help">Edit a draft, then Apply. Keep confirms only after an RT frame presents. Unconfirmed settings restore after 15 visible seconds or when backgrounded. Cost: not yet measured for this candidate.</string>
+    <string name="graphics_water_help">Off omits water appearance; geometry allocations remain. Mobile uses reduced reflected detail. High adds a reflected scene query. Cost: not yet measured.</string>
+    <string name="graphics_fire_help">Mobile: 4 main volume steps and 4 reflected steps. High: 10 main and 8 reflected steps. Authoritative lights and gameplay remain unchanged. Cost: not yet measured.</string>
+    <string name="graphics_baseline">Reset draft to accepted 1.6.1 baseline</string>
+    <string name="graphics_apply">Apply draft</string>
+    <string name="graphics_keep">Keep and save settings</string>
+    <string name="graphics_revert">Revert to confirmed settings</string>
+    <string name="graphics_storage_failed">Could not save recovery metadata. Settings were not applied.</string>
+    <string name="graphics_not_ready">RT surface is not ready. Confirmed settings remain saved.</string>
+    <string name="graphics_optics_mobile">Optics: Mobile build. Lantern panes are absent. Glass On enables other glass supported by this build; full lantern panes require a High build.</string>
+    <string name="graphics_optics_high">Optics: High build. Glass On retains physical lantern panes; Off removes glass from every ray path. Optical profile is fixed by this build.</string>
+    <string name="reset_non_graphics">Reset Audio / Controls / Interface</string>
+    <string name="keeper_reveal_title">THE FOURTH KEEPER</string>
+    <string name="graphics_restored">Confirmed graphics settings restored after an interrupted change.</string>
+    <string name="graphics_save_failed">Graphics could not be saved. Restoring the previous confirmed settings.</string>
+    <string name="benchmark_summary_review">Review benchmark statistics</string>
+    <string name="benchmark_summary_local_only">Local review and export only</string>
+    <string name="benchmark_summary_scope">Review a completed run before sharing. This report contains settings and owning frame, CPU and GPU timings. GPU duration is not FPS, and display scanout FPS was not measured. Temperature was not collected and thermal status is unknown. Statistics sending is unavailable in this build; nothing is sent automatically.</string>
+    <string name="benchmark_summary_consent">Prepare a local statistics report for review</string>
+    <string name="benchmark_summary_hardware">Include phone model, GPU name and Vulkan version (optional)</string>
+    <string name="benchmark_summary_cooling_help">Cooling during this run (optional declaration, not a measurement)</string>
+    <string-array name="benchmark_summary_cooling">
+        <item>Unknown / prefer not to declare</item>
+        <item>No external cooling declared</item>
+        <item>External cooling declared</item>
+    </string-array>
+    <string name="benchmark_summary_prepare">Prepare exact JSON</string>
+    <string name="benchmark_summary_prepared">Exact prepared report below. Copy or Save shares only these reviewed bytes. Edits require a new report ID and fresh consent.</string>
+    <string name="benchmark_summary_copy">Copy reviewed JSON</string>
+    <string name="benchmark_summary_save">Save reviewed JSON</string>
+    <string name="benchmark_summary_edit">Edit choices (requires new consent)</string>
+    <string name="benchmark_summary_unavailable">A complete matching benchmark summary is unavailable. Nothing was prepared or sent.</string>
+    <string name="benchmark_summary_picker_pending">Finish or dismiss the previous document picker before saving another report.</string>
 </resources>

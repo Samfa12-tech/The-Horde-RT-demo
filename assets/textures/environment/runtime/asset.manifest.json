@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "status": "admitted native-miss-radiance input; visual/device acceptance pending",
+  "rights": "Project-owned generated asset.",
+  "sourceProject": "Samfa12 Briarhold",
+  "sourceSha256": "83c297f7373e52feee50a881d5291f8e99faab8556fbce4c041c4b63b497dd8b",
+  "intermediateSha256": "58dc7c09547d7ed560c75d97038556b908b50ffecd12873601b5ca9bfc814824",
+  "processing": "Pillow Lanczos512x256 from owned1024x512WebP; KTX-Software4.4.2 generated10mips; RGBA8SRGB Windows and strict ASTC6x6SRGBAndroid; no supercompression.",
+  "colorSpace": "sRGB; sampled linear by Vulkan",
+  "sampler": "U repeat, V clamp, mipmapped; same direction-based native miss/glass/reflection shading",
+  "lighting": "Environment appearance/radiance, no baked scene illumination or added light; accepted moon and finale dawn policy retained",
+  "runtime": [
+    {
+      "platform": "windows",
+      "path": "night-storm.windows.ktx2",
+      "format": "R8G8B8A8_SRGB",
+      "dimensions": [
+        512,
+        256
+      ],
+      "mipLevels": 10,
+      "sha256": "a5e274bfafae55efa4a80840208a39fc7f24c6cf5fe69c744c9c2cd7d60420b0",
+      "bytes": 699532
+    },
+    {
+      "platform": "android",
+      "path": "night-storm.android.ktx2",
+      "format": "ASTC_6x6_SRGB_BLOCK",
+      "dimensions": [
+        512,
+        256
+      ],
+      "mipLevels": 10,
+      "sha256": "f833b77867e7b3c01659f5e9ef38834e4a0e5b967cd077023157eb682feb7cec",
+      "bytes": 80128
+    }
+  ]
+}

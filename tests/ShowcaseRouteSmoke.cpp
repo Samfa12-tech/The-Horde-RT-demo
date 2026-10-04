@@ -49,6 +49,24 @@ int main()
     };
 
     check(IsShowcasePlayerPositionWalkable(kPlayerSpawn.x, kPlayerSpawn.z), "spawn must be valid");
+    check(IsShowcasePlayerPositionWalkable(kKeeperRetryPosition.x, kKeeperRetryPosition.z) &&
+          HasReachedKeeperArrivalThreshold(kKeeperRetryPosition.x, kKeeperRetryPosition.z) &&
+          !HasReachedKeeperArrivalThreshold(kTransmissionThresholdCenter.x, kTransmissionThresholdCenter.z),
+          "keeper arrival trigger and playable retry remain inside the existing route");
+    float sweptX = -36.0f;
+    float sweptZ = kKeeperStagingPosition.z;
+    ResolveMovementAgainstCircle(kKeeperStagingPosition, 0.89f,
+                                -32.0f, sweptZ, sweptX, sweptZ);
+    check(sweptX > kKeeperStagingPosition.x &&
+          std::hypot(sweptX - kKeeperStagingPosition.x, sweptZ - kKeeperStagingPosition.z) >= 0.889f,
+          "staged-actor swept clearance prevents a long movement from tunnelling through its centre");
+    float tangentX = kKeeperStagingPosition.x + 0.90f;
+    float tangentZ = kKeeperStagingPosition.z + 0.2f;
+    ResolveMovementAgainstCircle(kKeeperStagingPosition, 0.89f,
+                                kKeeperStagingPosition.x + 0.90f, kKeeperStagingPosition.z,
+                                tangentX, tangentZ);
+    check(NearlyEqual(tangentZ, kKeeperStagingPosition.z + 0.2f),
+          "staged actor clearance preserves free tangential movement");
     RoutePosition reset = kPlayerSpawn;
     check(NearlyEqual(reset.x, 0.0f) && NearlyEqual(reset.z, 1.85f), "reset must remain deterministic");
 

@@ -5,5 +5,9 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowActionModeOverlay">true</item>
         <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#CFA96A</item>
+        <item name="android:textColorPrimary">#F2E9D8</item>
+        <item name="android:textColorSecondary">#C9C4B8</item>
+        <item name="android:colorButtonNormal">#24272A</item>
     </style>
 </resources>

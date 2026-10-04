@@ -1,0 +1,78 @@
+{
+  "schema": "game-room.room-final-report.v1",
+  "roomId": "horde-collapse-162",
+  "gates": {
+    "function": true,
+    "form": true,
+    "runtime": false
+  },
+  "formChecks": {
+    "floorPlanParity": false,
+    "primaryArrival": false,
+    "symmetry": false,
+    "shell": false,
+    "manifold": false,
+    "booleans": false,
+    "collisions": false,
+    "support": false,
+    "attachmentOrientation": false,
+    "ceilingAttachmentOrientation": false,
+    "seatingOrientation": false,
+    "focalDistribution": false,
+    "heroClearance": false,
+    "colonnades": false,
+    "screenClearance": false,
+    "scale": false,
+    "camera": false,
+    "ceilingCoverage": false,
+    "environmentCoverage": false,
+    "provenance": false
+  },
+  "reviewRenders": {
+    "corners": [],
+    "ceiling": [],
+    "environment": {}
+  },
+  "runtimeChecks": {
+    "vlow": false,
+    "textureTiers": false,
+    "lightmap": false,
+    "lightingManifest": false,
+    "performance": false,
+    "browserCapture": "",
+    "errors": []
+  },
+  "postmortem": {
+    "observations": [],
+    "corrections": [],
+    "remainingRisks": [
+      "Native Runtime/visual/performance acceptance remains pending; owner Form revision2 export is approved",
+      "Generic validator provider/browser/lightmap fields are inapplicable; free assets/native RT project contract governs",
+      "Phone allocated; collapse sustained mobile cost remains unmeasured"
+    ]
+  },
+  "proposedLessons": [],
+  "nativeFormExportApproval": {
+    "status": "approved",
+    "approvedBy": "owner",
+    "approvedAt": "2026-10-03",
+    "approvalReceivedAtUtc": "2026-10-03T09:32:24Z",
+    "approvalSource": "Explicit owner approval relayed by lead: Owner explicitly APPROVED revision 2 for runtime export this turn.",
+    "evidence": [
+      "revision-2-authoring/contact-sheet-sha256-0fa7fca2b8e403b8c8f33b9adc70381a751e8e2c9e397e3dd1efe06547807486",
+      "revision-2-authoring/blend-sha256-f03e8a175b20c60f444a133831586a533d7c1de2a73ceda916af6e521ecd547a"
+    ],
+    "strangestElement": "Full3.7m ascent continues beyond view beneath supported partial roof cave-in; remote physical seal stays invisible.",
+    "notes": "Revision1 was rejected. Revision2 is explicitly approved for runtime export; native Runtime/performance/owner-device acceptance is not approved. Approval time itself was not supplied; approvedAt records the confirmed day and approvalReceivedAtUtc records the local receipt."
+  },
+  "formEvidence": {
+    "closedUvMeshes": 67,
+    "trianglesIncludingInspectionContext": 8470,
+    "sampledRearRays": 102461,
+    "sampledBoundaryMisses": 0,
+    "sampledVisibleRemoteSeal": 0,
+    "roofSupports": "both shoulders contact chamber and stairwell walls",
+    "reviewViews": 13,
+    "runtimeExportBeginsAfterThisApproval": true
+  }
+}

@@ -135,6 +135,8 @@ inline constexpr std::uint32_t kRtBindingFireEmitters = $($b.fireEmitters)u;
 inline constexpr std::uint32_t kRtBindingDielectricDiagnostics = $($b.dielectricDiagnostics)u;
 inline constexpr std::uint32_t kRtBindingWorldPlayerVertices = $($b.worldPlayerVertices)u;
 inline constexpr std::uint32_t kRtBindingViewmodelVertices = $($b.viewmodelVertices)u;
+inline constexpr std::uint32_t kRtBindingEnvironmentTexture = $($b.environmentTexture)u;
+inline constexpr std::uint32_t kRtBindingQualityControls = $($b.qualityControls)u;
 
 enum class RtGeometryRole : std::uint32_t
 {
@@ -246,6 +248,7 @@ layout(set = 0, binding = $($b.baseColorTextures)) uniform sampler2DArray rtBase
 layout(set = 0, binding = $($b.normalTextures)) uniform sampler2DArray rtNormalTextures;
 layout(set = 0, binding = $($b.ormTextures)) uniform sampler2DArray rtOrmTextures;
 layout(set = 0, binding = $($b.emissiveTextures)) uniform sampler2DArray rtEmissiveTextures;
+layout(set = 0, binding = $($b.environmentTexture)) uniform sampler2D rtEnvironmentTexture;
 layout(std430, set = 0, binding = $($b.heldLight)) readonly buffer RtHeldLightBuffer
 {
     RtHeldLightGpu value;
@@ -254,6 +257,10 @@ layout(std430, set = 0, binding = $($b.fireEmitters)) readonly buffer RtFireEmit
 {
     RtFireEmitterGpu values[$($c.fireEmitters)];
 } rtFireEmitters;
+layout(std430, set = 0, binding = $($b.qualityControls)) readonly buffer RtQualityControlsBuffer
+{
+    RtQualityControlsGpu value;
+} rtQualityControls;
 #if !defined(HORDE_RT_VARIANT_INSTRUMENTATION) || HORDE_RT_VARIANT_INSTRUMENTATION == 1
 layout(std430, set = 0, binding = $($b.dielectricDiagnostics)) restrict buffer RtDielectricDiagnosticsBuffer
 {

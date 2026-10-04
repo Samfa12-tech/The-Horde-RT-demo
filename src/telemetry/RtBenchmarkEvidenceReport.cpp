@@ -480,6 +480,21 @@ std::string BuildRtBenchmarkEvidenceJson(const RtBenchmarkEvidenceRun& run)
         {
             out << "null";
         }
+        if (row.shadowQuality)
+        {
+            const auto& quality = *row.shadowQuality;
+            out << ", \"shadowQuality\": {\"mode\": "; WriteJsonString(out, RtShadowModeName(quality.mode));
+            out << ", \"localPrimarySamples\": " << quality.localPrimarySamples
+                << ", \"skyPrimarySamples\": " << quality.skyPrimarySamples << ", \"reserved\": 0}";
+        }
+        if (row.fireQuality)
+        {
+            const auto& quality = *row.fireQuality;
+            out << ", \"fireQuality\": {\"quality\": "; WriteJsonString(out, RtFireQualityName(quality.quality));
+            out << ", \"volumeSteps\": " << quality.volumeSteps
+                << ", \"reflectionSamples\": " << quality.reflectionSamples
+                << ", \"reflectedVolumeSteps\": " << std::min(quality.volumeSteps, quality.reflectionSamples * 4u) << '}';
+        }
         out << ", \"diagnosticCounters\": ";
         if (row.hasDiagnosticCounters)
         {

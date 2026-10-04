@@ -45,13 +45,31 @@ struct RtDescriptorIoContract {
     RtInstrumentation instrumentation = RtInstrumentation::Shipping;
     // Entries are the actual descriptor roster in binding order. Shipping is
     // deliberately non-contiguous because binding 22 is Diagnostic-only.
-    std::array<RtDescriptorBindingContract, 25u> bindings{};
+    std::array<RtDescriptorBindingContract, 27u> bindings{};
     std::uint32_t bindingCount = 0u;
     std::uint32_t storageBufferDescriptorCount = 0u;
+    std::uint32_t combinedImageSamplerDescriptorCount = 0u;
     std::uint32_t descriptorWriteCount = 0u;
     RtDiagnosticAvailability diagnosticAvailability = RtDiagnosticAvailability::Unavailable;
     RtDiagnosticIoContract diagnosticIo{};
 };
+
+struct RtSampledDescriptorLimits {
+    std::uint32_t perStageSamplers = 0u;
+    std::uint32_t setSamplers = 0u;
+    std::uint32_t perStageSampledImages = 0u;
+    std::uint32_t setSampledImages = 0u;
+};
+
+// Each current combined-image-sampler binding has descriptorCount1 and counts
+// against both sampler and sampled-image limits, including the environment.
+[[nodiscard]] inline bool ValidateRtSampledDescriptorLimits(
+    const RtDescriptorIoContract& contract, const RtSampledDescriptorLimits& limits) noexcept
+{
+    const auto count = contract.combinedImageSamplerDescriptorCount;
+    return count <= limits.perStageSamplers && count <= limits.setSamplers &&
+           count <= limits.perStageSampledImages && count <= limits.setSampledImages;
+}
 
 struct RtPipelineBundlePreflight {
     RtPipelineBundleRequest request{};

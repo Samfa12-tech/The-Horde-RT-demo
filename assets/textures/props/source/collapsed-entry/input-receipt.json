@@ -1,0 +1,147 @@
+{
+  "schema": "horde.collapse-texture-inputs.v1",
+  "materialOrder": [
+    "Boulder01Rock",
+    "MedievalWall02"
+  ],
+  "atlasLayerOrder": [
+    10,
+    11
+  ],
+  "maps": [
+    {
+      "material": "Boulder01Rock",
+      "category": "base-color",
+      "source": "assets/models/world/source/collapsed-entry/polyhaven-original/textures/boulder_01_diff_1k.jpg",
+      "sourceSha256": "c38f0e918f6dc16b8d386ba3cdd89805c78320c119a1ceec85856f82b09a65b8",
+      "sourceBytes": 987467,
+      "file": "boulder01-base-color.png",
+      "sha256": "fc8f868aaabe94b50906911f3212d7ca84c5296403049feac7ef25ba22ed4e3c",
+      "bytes": 2297056,
+      "resolution": [
+        1024,
+        1024
+      ],
+      "format": "RGBA8 PNG",
+      "decodedPixelsPreserved": true,
+      "transfer": "sRGB",
+      "normalScale": 0.42,
+      "assetSource": "https://polyhaven.com/a/boulder_01",
+      "license": "CC0 1.0"
+    },
+    {
+      "material": "Boulder01Rock",
+      "category": "normal",
+      "source": "assets/models/world/source/collapsed-entry/polyhaven-original/textures/boulder_01_nor_gl_1k.jpg",
+      "sourceSha256": "0810cf6e89d89bb6eb065b4d2e2855288f5dcbd2c15c6e40ab90d462021b50aa",
+      "sourceBytes": 1183552,
+      "file": "boulder01-normal.png",
+      "sha256": "65070b8fe4b9f1d029411558c4aa9c5a7f5dd93fd6b06b38ce35b893d61af65b",
+      "bytes": 2574169,
+      "resolution": [
+        1024,
+        1024
+      ],
+      "format": "RGBA8 PNG",
+      "decodedPixelsPreserved": true,
+      "transfer": "linear",
+      "normalScale": 0.42,
+      "assetSource": "https://polyhaven.com/a/boulder_01",
+      "license": "CC0 1.0"
+    },
+    {
+      "material": "Boulder01Rock",
+      "category": "orm",
+      "source": "assets/models/world/source/collapsed-entry/polyhaven-original/textures/boulder_01_arm_1k.jpg",
+      "sourceSha256": "c57187c5746b6be913fa53846cb44ff78743e7ca5000f131c9627b99563c2b87",
+      "sourceBytes": 659386,
+      "file": "boulder01-orm.png",
+      "sha256": "732f1c63ede2f5af04e736487fbe3d3ab49066ec9ec7c59bdc52825bb03140cc",
+      "bytes": 1561263,
+      "resolution": [
+        1024,
+        1024
+      ],
+      "format": "RGBA8 PNG",
+      "decodedPixelsPreserved": true,
+      "transfer": "linear",
+      "normalScale": 0.42,
+      "assetSource": "https://polyhaven.com/a/boulder_01",
+      "license": "CC0 1.0"
+    },
+    {
+      "material": "MedievalWall02",
+      "category": "base-color",
+      "source": "assets/textures/polyhaven/mobile_1k/medieval_wall_02/diff.jpg",
+      "sourceSha256": "c3123e0512b784dbfbb000fbe2cd7b5779c4b577ea2f221db6d59f3dbff2fd10",
+      "sourceBytes": 759153,
+      "file": "medieval-wall02-base-color.png",
+      "sha256": "8e45c274021d9f83f0f65e5f950df875b27efbceaa54d786ddd9bbc4fcbe0d15",
+      "bytes": 1777108,
+      "resolution": [
+        1024,
+        1024
+      ],
+      "format": "RGBA8 PNG",
+      "decodedPixelsPreserved": true,
+      "transfer": "sRGB",
+      "normalScale": 0.34,
+      "assetSource": "https://polyhaven.com/a/medieval_wall_02",
+      "license": "CC0 1.0"
+    },
+    {
+      "material": "MedievalWall02",
+      "category": "normal",
+      "source": "assets/textures/polyhaven/mobile_1k/medieval_wall_02/normal.jpg",
+      "sourceSha256": "3da467a4b25408892beda4c5d931feaf0b75a5424376f09a33b6356022a63da9",
+      "sourceBytes": 1169034,
+      "file": "medieval-wall02-normal.png",
+      "sha256": "cc076a2019d06816a58d6d61244354cac5d79c5c2259f78f7ef417a25792943c",
+      "bytes": 2503251,
+      "resolution": [
+        1024,
+        1024
+      ],
+      "format": "RGBA8 PNG",
+      "decodedPixelsPreserved": true,
+      "transfer": "linear",
+      "normalScale": 0.34,
+      "assetSource": "https://polyhaven.com/a/medieval_wall_02",
+      "license": "CC0 1.0"
+    },
+    {
+      "material": "MedievalWall02",
+      "category": "orm",
+      "source": "assets/textures/polyhaven/mobile_1k/medieval_wall_02/arm.jpg",
+      "sourceSha256": "b8b3186b6221ab007701d4b914b5bb3407ee17b4099dd2faaeded7d3208de0ea",
+      "sourceBytes": 780902,
+      "file": "medieval-wall02-orm.png",
+      "sha256": "68e68c8c66fd61b1a0143e77cb0a21a3ed8101dee47402e5d1f75c002cccb68e",
+      "bytes": 1771080,
+      "resolution": [
+        1024,
+        1024
+      ],
+      "format": "RGBA8 PNG",
+      "decodedPixelsPreserved": true,
+      "transfer": "linear",
+      "normalScale": 0.34,
+      "assetSource": "https://polyhaven.com/a/medieval_wall_02",
+      "license": "CC0 1.0"
+    }
+  ],
+  "normalConvention": "glTF/OpenGL +Y",
+  "ormChannels": {
+    "R": "occlusion",
+    "G": "roughness",
+    "B": "metallic"
+  },
+  "metallicFactor": 0,
+  "roughnessFactor": 1,
+  "imageRetouchOrResizing": false,
+  "licenseSource": "https://polyhaven.com/license",
+  "licenseSnapshotSha256": "0b7a23e05e933f7f28ffab64ac1302e215f44eeb69abbfac4f2c4fd331101be5",
+  "licenseSnapshot": "assets/models/world/source/collapsed-entry/polyhaven-original/polyhaven-license.html",
+  "originalSourceReceipt": "assets/models/world/source/collapsed-entry/polyhaven-original/download-receipt.json",
+  "licensingStatus": "CC0 reuse and project-authored architecture; native Runtime acceptance pending"
+}

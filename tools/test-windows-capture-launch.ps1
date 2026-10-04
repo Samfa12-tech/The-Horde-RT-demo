@@ -7,13 +7,13 @@ $ErrorActionPreference = 'Stop'
 $unusedOutput = Join-Path ([IO.Path]::GetTempPath()) ('horde-rejected-capture-' + [guid]::NewGuid().ToString('N'))
 $cases = @(
     @{ name='portrait requires capture'; exe=$DebugExecutable;
-       args=@('--capture-portrait'); message='--capture-portrait requires --capture-showcase.' },
+       args=@('--capture-portrait'); message='--capture-portrait requires a Debug capture mode.' },
     @{ name='duplicate portrait rejected'; exe=$DebugExecutable;
        args=@('--capture-portrait','--capture-portrait'); message='--capture-portrait may only be specified once.' },
     @{ name='portrait cannot select benchmark'; exe=$DebugExecutable;
-       args=@('--benchmark-showcase',$unusedOutput,'--capture-portrait'); message='--capture-portrait requires --capture-showcase.' },
+       args=@('--benchmark-showcase',$unusedOutput,'--capture-portrait'); message='--capture-portrait requires a Debug capture mode.' },
     @{ name='Release rejects portrait capture'; exe=$ReleaseExecutable;
-       args=@('--capture-showcase',$unusedOutput,'--capture-portrait'); message='--capture-showcase is a Debug-only automation mode; Release builds reject it.' }
+       args=@('--capture-showcase',$unusedOutput,'--capture-portrait'); message='Scene capture modes are Debug-only automation; Release builds reject them.' }
 )
 foreach ($case in $cases) {
     $start = [Diagnostics.ProcessStartInfo]::new()

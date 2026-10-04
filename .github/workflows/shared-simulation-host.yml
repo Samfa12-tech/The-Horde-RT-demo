@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - codex/horde-1.6.1-engineering-pass
+      - codex/horde-1.6.2-engine-readiness
 
 permissions:
   contents: read
@@ -42,7 +43,7 @@ jobs:
       - name: Fetch only Android runtime LFS payloads
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb,assets/models/player/runtime/*.runtime.glb,assets/models/player/viewmodel/runtime/*.runtime.glb,assets/models/props/runtime/*.runtime.glb,assets/models/props/runtime/*/*.runtime.glb,assets/models/weapons/runtime/*.runtime.glb,assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2,assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          --include="assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb,assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb,assets/models/player/runtime/*.runtime.glb,assets/models/player/viewmodel/runtime/*.runtime.glb,assets/models/props/runtime/*.runtime.glb,assets/models/props/runtime/*/*.runtime.glb,assets/models/weapons/runtime/*.runtime.glb,assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2,assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb"
           && git lfs checkout
           "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb"
           "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb"
@@ -51,10 +52,19 @@ jobs:
           "assets/models/props/runtime/*.runtime.glb"
           "assets/models/props/runtime/*/*.runtime.glb"
           "assets/models/weapons/runtime/*.runtime.glb"
+          "assets/models/world/runtime/collapsed-entry/*.runtime.glb"
           "assets/textures/polyhaven/mobile_1k/*-array-512-astc*.ktx2"
           "assets/textures/meshy/lich_placeholder_v01/*-2048-astc6x6.ktx2"
           "assets/textures/props/runtime/*.android.ktx2"
+          "assets/textures/props/runtime/*.windows.ktx2"
           "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          "assets/audio/pixabay/keeper_i_sense_you.wav"
+          "assets/audio/pixabay/keeper_come_closer.wav"
+          "assets/audio/pixabay/skeleton_idle_rattle.wav"
+          "assets/audio/pixabay/skeleton_falling_bones.wav"
+          "assets/audio/pixabay/waterfall_core_loop.wav"
+          "assets/textures/environment/runtime/night-storm.android.ktx2"
+          "assets/textures/environment/runtime/night-storm.windows.ktx2"
 
       - name: Build all Debug ABIs, run Java contracts and lint
         working-directory: android
@@ -80,6 +90,19 @@ jobs:
             'PlaytestReportVerificationTest' = 7
             'PlaytestReportFlowResourceTest' = 2
             'MainActivityPlaytestReportLifecycleTest' = 7
+            'GraphicsPreferencesTest' = 8
+            'GraphicsMenuLifecycleTest' = 3
+            'GraphicsPreviewOptionsTest' = 10
+            'BenchmarkSummaryReviewTest' = 5
+            'BenchmarkSummaryUiTest' = 5
+            'GraphicsPreviewCompactLayoutTest' = 4
+            'RenderScalePreferenceTest' = 3
+            'MusicOutputGainTest' = 5
+            'AmbienceOutputQueueTest' = 8
+            'AmbienceOutputBufferTest' = 7
+            'InterfacePreferencesTest' = 4
+            'InterfaceLayoutTest' = 3
+            'ContextualControlsLayoutTest' = 5
           }.GetEnumerator()) {
             $requiredReport = Join-Path android/app/build/test-results/testDebugUnitTest "TEST-com.samfa12.hordelanternrt.$($required.Key).xml"
             if (-not (Test-Path -LiteralPath $requiredReport)) { throw "Missing Android contract suite: $($required.Key)" }
@@ -95,11 +118,12 @@ jobs:
             $skipped += [int]$suite.testsuite.skipped
           }
           Write-Output "Android Debug unit tests: $tests total; $failures failures; $errors errors; $skipped skipped."
-          if ($tests -lt 75 -or $failures -ne 0 -or $errors -ne 0 -or $skipped -ne 0) {
+          if ($tests -lt 138 -or $failures -ne 0 -or $errors -ne 0 -or $skipped -ne 0) {
             throw 'Android Java contract tests did not pass completely.'
           }
           $apk = ./tools/resolve-android-apk.ps1 -AndroidRoot (Join-Path $PWD android) -Variant debug
-          ./tools/test-held-item-package-contract.ps1 -AndroidApkPath $apk
+          ./tools/test-held-item-package-contract.ps1 -AndroidApkPath $apk -RequireHorde162World
+          ./tools/test-horde-1.6.2-package.ps1 -ArchivePath $apk -Platform Android
           Get-FileHash -LiteralPath $apk -Algorithm SHA256
           # Compile/package evidence only: this job has no physical Vulkan RT device.
 
@@ -133,15 +157,25 @@ jobs:
       - name: Fetch portable-test GLB and music PCM assets
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb,assets/textures/props/runtime/*.android.ktx2,assets/textures/props/runtime/*.windows.ktx2"
           && git lfs checkout
           "assets/models/player/runtime/*.glb"
           "assets/models/player/viewmodel/runtime/*.glb"
           "assets/models/props/runtime/*.glb"
           "assets/models/props/runtime/*/*.glb"
           "assets/models/weapons/runtime/*.glb"
+          "assets/models/world/runtime/collapsed-entry/*.runtime.glb"
+          "assets/textures/props/runtime/*.android.ktx2"
+          "assets/textures/props/runtime/*.windows.ktx2"
           "tests/fixtures/*/*.glb"
           "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          "assets/audio/pixabay/keeper_i_sense_you.wav"
+          "assets/audio/pixabay/keeper_come_closer.wav"
+          "assets/audio/pixabay/skeleton_idle_rattle.wav"
+          "assets/audio/pixabay/skeleton_falling_bones.wav"
+          "assets/audio/pixabay/waterfall_core_loop.wav"
+          "assets/textures/environment/runtime/night-storm.android.ktx2"
+          "assets/textures/environment/runtime/night-storm.windows.ktx2"
 
       - name: Restore pinned Windows report-verification SDK
         if: runner.os == 'Windows'
@@ -194,15 +228,23 @@ jobs:
       - name: Fetch only selected fixture and PCM payloads
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          --include="assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,tests/fixtures/*/*.glb,assets/audio/music/what-the-dark-keeps/runtime/*.wav,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb"
           && git lfs checkout
           "assets/models/player/runtime/*.glb"
           "assets/models/player/viewmodel/runtime/*.glb"
           "assets/models/props/runtime/*.glb"
           "assets/models/props/runtime/*/*.glb"
           "assets/models/weapons/runtime/*.glb"
+          "assets/models/world/runtime/collapsed-entry/*.runtime.glb"
           "tests/fixtures/*/*.glb"
           "assets/audio/music/what-the-dark-keeps/runtime/*.wav"
+          "assets/audio/pixabay/keeper_i_sense_you.wav"
+          "assets/audio/pixabay/keeper_come_closer.wav"
+          "assets/audio/pixabay/skeleton_idle_rattle.wav"
+          "assets/audio/pixabay/skeleton_falling_bones.wav"
+          "assets/audio/pixabay/waterfall_core_loop.wav"
+          "assets/textures/environment/runtime/night-storm.android.ktx2"
+          "assets/textures/environment/runtime/night-storm.windows.ktx2"
 
       - name: Build and run the finite sanitizer roster
         run: bash tools/run-host-sanitizer-validation.sh
@@ -220,7 +262,7 @@ jobs:
       - name: Fetch player smoke GLB and texture assets
         run: >-
           git -c lfs.fetchexclude= lfs fetch
-          --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb"
+          --include="assets/models/enemies/meshy/*.glb,assets/models/player/runtime/*.glb,assets/models/player/viewmodel/runtime/*.glb,assets/models/props/runtime/*.glb,assets/models/props/runtime/*/*.glb,assets/models/weapons/runtime/*.glb,assets/textures/meshy/lich_placeholder_v01/*.ktx2,tests/fixtures/*/*.glb,assets/audio/pixabay/keeper_i_sense_you.wav,assets/audio/pixabay/keeper_come_closer.wav,assets/audio/pixabay/skeleton_idle_rattle.wav,assets/audio/pixabay/skeleton_falling_bones.wav,assets/audio/pixabay/waterfall_core_loop.wav,assets/textures/environment/runtime/night-storm.android.ktx2,assets/textures/environment/runtime/night-storm.windows.ktx2,assets/models/world/runtime/collapsed-entry/*.runtime.glb"
           && git lfs checkout
           "assets/models/enemies/meshy/*.glb"
           "assets/models/player/runtime/*.glb"
@@ -228,8 +270,16 @@ jobs:
           "assets/models/props/runtime/*.glb"
           "assets/models/props/runtime/*/*.glb"
           "assets/models/weapons/runtime/*.glb"
+          "assets/models/world/runtime/collapsed-entry/*.runtime.glb"
           "assets/textures/meshy/lich_placeholder_v01/*.ktx2"
           "tests/fixtures/*/*.glb"
+          "assets/audio/pixabay/keeper_i_sense_you.wav"
+          "assets/audio/pixabay/keeper_come_closer.wav"
+          "assets/audio/pixabay/skeleton_idle_rattle.wav"
+          "assets/audio/pixabay/skeleton_falling_bones.wav"
+          "assets/audio/pixabay/waterfall_core_loop.wav"
+          "assets/textures/environment/runtime/night-storm.android.ktx2"
+          "assets/textures/environment/runtime/night-storm.windows.ktx2"
 
       - name: Configure Vulkan CPU-host player and resource lane
         run: >-
@@ -250,9 +300,12 @@ jobs:
           --target
           horde_rt_player_primitive_contract_tests
           horde_rt_player_animation_tests
+          horde_rt_final_held_torch_clearance_tests
+          horde_rt_windows_output_resize_launch_tests
           horde_rt_held_item_socket_tests
           horde_rt_scene_abi_tests
           horde_rt_static_gltf_asset_tests
+          horde_rt_static_collapse_asset_tests
           horde_rt_skinned_character_smoke
           horde_rt_skinned_arm_reference_tests
           horde_rt_scene_initialise_preflight_tests
@@ -268,4 +321,4 @@ jobs:
           --build-config Release
           --output-on-failure
           --no-tests=error
-          -R "^(horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures|horde_rt_scene_initialise_preflight_tests|horde_rt_scene_resource_inventory_tests|horde_rt_gpu_resources_observation_tests|horde_rt_staged_primary_resource_tests|horde_rt_staged_primary_timing_tests|horde_rt_driver_capability_report_tests)$"
+          -R "^(horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_final_held_torch_clearance_tests|horde_rt_windows_output_resize_launch_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_static_collapse_asset_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures|horde_rt_scene_initialise_preflight_tests|horde_rt_scene_resource_inventory_tests|horde_rt_gpu_resources_observation_tests|horde_rt_staged_primary_resource_tests|horde_rt_staged_primary_timing_tests|horde_rt_driver_capability_report_tests)$"

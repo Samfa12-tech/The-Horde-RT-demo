@@ -43,6 +43,8 @@ struct MaterialOverride
     float attenuationDistance = 0.0f;
     std::array<float, 3u> attenuationColor{{1.0f, 1.0f, 1.0f}};
     float roughnessFactor = 1.0f;
+    float normalScale = 1.0f;
+    std::array<float, 2u> textureScale{{1.0f, 1.0f}};
     bool thinWall = false;
     bool hasEmissiveStrength = false;
     bool hasTransmissionFactor = false;
@@ -51,6 +53,8 @@ struct MaterialOverride
     bool hasAttenuationDistance = false;
     bool hasAttenuationColor = false;
     bool hasRoughnessFactor = false;
+    bool hasNormalScale = false;
+    bool hasTextureScale = false;
     bool hasThinWall = false;
 };
 

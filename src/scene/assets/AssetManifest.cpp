@@ -531,6 +531,22 @@ bool ParseMaterialOverrides(JsonReader& reader, AssetManifest& manifest)
             if (key == "roughnessFactor")
                 return ParseOptionalFloat(reader, overrideValue.roughnessFactor,
                     overrideValue.hasRoughnessFactor, 0.0, 1.0);
+            if (key == "normalScale")
+                return ParseOptionalFloat(reader, overrideValue.normalScale,
+                    overrideValue.hasNormalScale, -std::numeric_limits<float>::max(),
+                    std::numeric_limits<float>::max());
+            if (key == "textureScale")
+            {
+                std::size_t count = 0u;
+                const bool valid = reader.Array([&](std::size_t) {
+                    if (count >= overrideValue.textureScale.size()) return false;
+                    bool present = false;
+                    return ParseOptionalFloat(reader, overrideValue.textureScale[count++],
+                        present, 1.0 / 1024.0, 1024.0);
+                });
+                overrideValue.hasTextureScale = valid && count == 2u;
+                return overrideValue.hasTextureScale;
+            }
             if (key == "attenuationColor")
             {
                 overrideValue.hasAttenuationColor = ParseFloat3(
@@ -548,7 +564,8 @@ bool ParseMaterialOverrides(JsonReader& reader, AssetManifest& manifest)
             overrideValue.hasTransmissionFactor || overrideValue.hasIor ||
             overrideValue.hasThicknessFactor || overrideValue.hasAttenuationDistance ||
             overrideValue.hasAttenuationColor || overrideValue.hasRoughnessFactor ||
-            overrideValue.hasThinWall;
+            overrideValue.hasThinWall || overrideValue.hasNormalScale ||
+            overrideValue.hasTextureScale;
         if (!parsed || !hasMaterial || !hasOverride) return false;
         manifest.materialOverrides.push_back(std::move(overrideValue));
         return true;

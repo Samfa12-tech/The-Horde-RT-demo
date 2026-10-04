@@ -533,6 +533,10 @@ void TestActiveStrategyComesFromEachOwningCompletion(TestContext& context)
         2u, 79u, 89u, 1u, 1'000'000u, RtSampleStatus::Valid, 2'000'000u);
     generic.scene.pipeline.activeStrategy = RtMaterialStrategy::GenericDielectric;
     generic.scene.pipeline.active = generic.scene.pipeline.genericDielectric;
+    opaque.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Lower, 1u, 1u, 0u};
+    opaque.scene.fireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
+    generic.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Higher, 2u, 2u, 0u};
+    generic.scene.fireQuality = RtFireQualityEvidence{RtFireQuality::High, 10u, 2u};
     ExpectAndBind(context, run, {1u, 2u}, opaque);
     ExpectAndBind(context, run, {2u, 2u}, generic);
     context.Check(run.Complete(opaque) && run.Complete(generic) &&
@@ -541,15 +545,24 @@ void TestActiveStrategyComesFromEachOwningCompletion(TestContext& context)
     // A later observer/snapshot mutation must not relabel an earlier GPU frame.
     generic.scene.pipeline.activeStrategy = RtMaterialStrategy::OpaqueFast;
     generic.scene.pipeline.active = generic.scene.pipeline.opaqueFast;
+    generic.scene.shadowQuality = opaque.scene.shadowQuality;
+    generic.scene.fireQuality = opaque.scene.fireQuality;
     const std::string json = BuildRtBenchmarkEvidenceJson(run);
     context.Check(ArrayObjectWith(json, "\"index\": 0").find(
                       "\"activeStrategy\": \"opaque-fast\"") != std::string::npos &&
                       ArrayObjectWith(json, "\"index\": 1").find(
                       "\"activeStrategy\": \"generic-dielectric\"") != std::string::npos,
                   "active strategy must describe each owning completed frame, not the loaded pair or latest observer");
+    context.Check(ArrayObjectWith(json, "\"index\": 0").find("\"quality\": \"Low\"") != std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 1").find("\"quality\": \"High\"") != std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 1").find("\"localPrimarySamples\": 2") != std::string::npos,
+        "report row quality comes from each immutable completed owning upload");
     context.Check(ArrayObjectWith(json, "\"index\": 2").find(
                       "\"activeStrategy\": null") != std::string::npos,
                   "an unavailable completion must not be mislabeled as default OpaqueFast");
+    context.Check(ArrayObjectWith(json, "\"index\": 2").find("shadowQuality") == std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 2").find("fireQuality") == std::string::npos,
+        "uncompleted row cannot acquire default quality controls");
 }
 
 void TestDiagnosticCounterRowsPreserveAvailability(TestContext& context)

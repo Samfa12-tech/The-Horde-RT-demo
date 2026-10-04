@@ -6,6 +6,8 @@
 
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/simulation/InputMailbox.h"
+#include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 
 namespace
@@ -27,7 +29,420 @@ bool NearlyEqual(float left, float right, float epsilon = 0.0001f)
     return std::abs(left - right) <= epsilon;
 }
 
+template <typename Check>
+void TestKeeperReveal(Check&& check)
+{
+    static_assert(static_cast<int>(GameplayEventType::TorchExtinguished) == 16);
+    static_assert(static_cast<int>(GameplayEventType::KeeperRevealStarted) == 17);
+    static_assert(static_cast<int>(GameplayEventType::KeeperWarning) == 18);
+    static_assert(static_cast<int>(GameplayEventType::KeeperCombatReady) == 19);
+    InputSnapshot arrival;
+    arrival.hasAuthoritativePlayerPose = true;
+    arrival.authoritativePlayerX = kKeeperRetryPosition.x;
+    arrival.authoritativePlayerZ = kKeeperRetryPosition.z;
+    arrival.yawRadians = -1.57079632679f;
+
+    GameSimulation unsettled;
+    unsettled.AdvanceFrame(arrival, 1.0 / 60.0);
+    check(!unsettled.Snapshot().lich.revealStarted &&
+          CountEvents(unsettled.Events(), GameplayEventType::KeeperRevealStarted) == 0u,
+          "keeper threshold cannot awaken before the torch-loss sequence settles");
+
+    for (const int rate : {15, 30, 60, 120})
+    {
+        GameSimulation simulation;
+        check(simulation.ApplyShowcaseCheckpoint(8), "green approach import initializes the settled torch");
+        std::array<std::size_t, 3> counts{};
+        std::uint64_t previousSequence = 0u;
+        bool ordered = true;
+        bool safe = true;
+        bool aligned = true;
+        float previousY = simulation.Snapshot().lich.y;
+        for (int frame = 0; frame < rate * 6; ++frame)
+        {
+            simulation.AdvanceFrame(arrival, 1.0 / static_cast<double>(rate));
+            const auto& state = simulation.Snapshot();
+            safe = safe && state.lich.health == 3 && state.playerVitals.vitality == 3 &&
+                !state.lich.damagePulse && state.lich.staffLightStrength == 0.0f &&
+                state.chestReward.phase == interactions::ChestRewardPhase::Locked;
+            aligned = aligned && NearlyEqual(state.lich.x, kKeeperStagingPosition.x) &&
+                NearlyEqual(state.lich.z, kKeeperStagingPosition.z) &&
+                state.lich.y >= previousY - 0.0001f &&
+                state.lich.y - previousY < 0.025f;
+            previousY = state.lich.y;
+            for (const GameplayEvent& event : simulation.Events().Events())
+            {
+                if (event.type == GameplayEventType::KeeperRevealStarted ||
+                    event.type == GameplayEventType::KeeperWarning ||
+                    event.type == GameplayEventType::KeeperCombatReady)
+                {
+                    const auto index = static_cast<std::size_t>(event.type) - 17u;
+                    ++counts[index];
+                    ordered = ordered && event.sequence > previousSequence &&
+                        event.source == EntityId::Lich && event.target == EntityId::Player &&
+                        NearlyEqual(event.worldX, kKeeperStagingPosition.x) &&
+                        NearlyEqual(event.listenerX, arrival.authoritativePlayerX) &&
+                        NearlyEqual(event.listenerYawRadians, arrival.yawRadians);
+                    previousSequence = event.sequence;
+                }
+            }
+            simulation.ClearEvents();
+            if (frame < rate * 6 - 1)
+                safe = safe && !state.lich.revealComplete;
+        }
+        check(safe && aligned && ordered && counts == std::array<std::size_t, 3>{1u, 1u, 1u} &&
+              simulation.Snapshot().lich.revealComplete &&
+              simulation.Snapshot().lich.phase == LichPhase::MaintainingRange &&
+              NearlyEqual(simulation.Snapshot().lich.phaseTime, 0.0f) &&
+              NearlyEqual(simulation.Snapshot().lich.y, -0.77f + LichEncounter::kRevealRise),
+              "six-second reveal must be continuous, harmless and once-only at all delivery rates");
+
+        int chargeTicks = 0;
+        while (simulation.Snapshot().lich.phase != LichPhase::Charging && chargeTicks < 600)
+        {
+            simulation.AdvanceFrame(arrival, 1.0 / 60.0);
+            ++chargeTicks;
+            simulation.ClearEvents();
+        }
+        check(chargeTicks >= 39 && chargeTicks < 600,
+              "combat must begin with the full existing reposition rather than spending it during warning");
+        for (int tick = 0; tick < 71; ++tick)
+        {
+            simulation.AdvanceFrame(arrival, 1.0 / 60.0);
+            check(simulation.Snapshot().lich.phase == LichPhase::Charging &&
+                  !simulation.Snapshot().lich.damagePulse,
+                  "first attack cannot arrive before all 1.20 seconds of charging");
+            simulation.ClearEvents();
+        }
+        simulation.AdvanceFrame(arrival, 1.0 / 60.0);
+        check(simulation.Snapshot().lich.phase == LichPhase::Recovering &&
+              simulation.Snapshot().lich.damagePulse,
+              "the complete first telegraph ends in the existing damage pulse");
+    }
+
+    GameSimulation retreat;
+    retreat.ApplyShowcaseCheckpoint(8);
+    for (int tick = 0; tick < 200; ++tick) retreat.StepFixed(arrival);
+    check(retreat.Snapshot().lich.revealPhase == KeeperRevealPhase::Warning &&
+          retreat.Snapshot().lich.titleOpacity > 0.99f,
+          "the warning presents a readable title through the immutable snapshot");
+    retreat.ClearEvents();
+    const auto frozen = retreat.Snapshot().lich;
+    InputSnapshot paused = arrival;
+    paused.paused = true;
+    paused.commands.attack = 1u;
+    retreat.AdvanceFrame(paused, 30.0);
+    check(NearlyEqual(retreat.Snapshot().lich.revealElapsedSeconds, frozen.revealElapsedSeconds) &&
+          NearlyEqual(retreat.Snapshot().lich.titleOpacity, frozen.titleOpacity) && retreat.Events().Empty(),
+          "pause suspends reveal/title and consumes attack without replaying one-shot boundaries");
+    const auto generation = retreat.Snapshot().enemyRoster.encounters[1].resetGeneration;
+    InputSnapshot back = arrival;
+    back.authoritativePlayerX = 4.2f;
+    back.authoritativePlayerZ = -15.2f;
+    back.yawRadians = 1.0f;
+    back.commands.attack = 1u;
+    retreat.AdvanceFrame(back, 1.0 / 60.0);
+    check(retreat.Snapshot().activeEnemyKind == EnemyKind::Lich &&
+          NearlyEqual(retreat.Snapshot().playerX, arrival.authoritativePlayerX) &&
+          NearlyEqual(retreat.Snapshot().playerZ, arrival.authoritativePlayerZ) &&
+          NearlyEqual(retreat.Snapshot().playerYawRadians, back.yawRadians) &&
+          retreat.Snapshot().lich.revealElapsedSeconds > frozen.revealElapsedSeconds &&
+          NearlyEqual(retreat.Snapshot().lich.x, kKeeperStagingPosition.x),
+          "intro holds translation while allowing look and advancing the reveal clock");
+    for (int tick = 0; tick < 160; ++tick)
+    {
+        retreat.AdvanceFrame(back, 1.0 / 60.0);
+        retreat.ClearEvents();
+    }
+    arrival.commands.attack = 1u;
+    retreat.AdvanceFrame(arrival, 1.0 / 60.0);
+    check(retreat.Snapshot().lich.revealComplete &&
+          retreat.Snapshot().enemyRoster.encounters[1].resetGeneration == generation &&
+          CountEvents(retreat.Events(), GameplayEventType::KeeperRevealStarted) == 0u &&
+          CountEvents(retreat.Events(), GameplayEventType::KeeperWarning) == 0u,
+          "threshold reentry preserves the completed encounter attempt without replaying awakening");
+
+    GameSimulation retreatSafety;
+    retreatSafety.ApplyShowcaseCheckpoint(8);
+    InputSnapshot safeArrival = arrival;
+    safeArrival.commands = {};
+    for (int tick = 0; tick < 100; ++tick) retreatSafety.StepFixed(safeArrival);
+    InputSnapshot nearGuard;
+    nearGuard.hasAuthoritativePlayerPose = true;
+    nearGuard.authoritativePlayerX = 0.0f;
+    nearGuard.authoritativePlayerZ = -4.8f;
+    bool stayedInvulnerable = true;
+    for (int tick = 0; tick < 240; ++tick)
+    {
+        retreatSafety.StepFixed(nearGuard);
+        stayedInvulnerable = stayedInvulnerable && retreatSafety.Snapshot().playerVitals.vitality == 3 &&
+            NearlyEqual(retreatSafety.Snapshot().playerX, safeArrival.authoritativePlayerX) &&
+            NearlyEqual(retreatSafety.Snapshot().playerZ, safeArrival.authoritativePlayerZ) &&
+            CountEvents(retreatSafety.Events(), GameplayEventType::PlayerDamaged) == 0u &&
+            CountEvents(retreatSafety.Events(), GameplayEventType::PlayerKilled) == 0u;
+        retreatSafety.ClearEvents();
+    }
+    check(stayedInvulnerable && !retreatSafety.Snapshot().lich.revealComplete,
+          "authoritative pose publications cannot bypass the harmless intro translation hold");
+
+    GameSimulation held;
+    held.ApplyShowcaseCheckpoint(8);
+    InputSnapshot beforeArrival = arrival;
+    beforeArrival.authoritativePlayerX = 4.2f;
+    beforeArrival.authoritativePlayerZ = -15.2f;
+    beforeArrival.commands.attack = 1u;
+    held.StepFixed(beforeArrival);
+    check(held.Snapshot().playerCombat.action != PlayerCombatAction::Idle,
+          "approach fixture begins with an ordinary live sword cut");
+    held.ClearEvents();
+    InputSnapshot heldInput = arrival;
+    heldInput.commands.attack = 3u;
+    heldInput.commands.parry = 1u;
+    held.StepFixed(heldInput);
+    check(held.Snapshot().lich.revealStarted &&
+          held.Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+          CountEvents(held.Events(), GameplayEventType::PlayerSwing) == 0u,
+          "arrival cancels an existing cut and drops simultaneous buffered actions");
+    held.ClearEvents();
+    heldInput.hasAuthoritativePlayerPose = false;
+    heldInput.moveForward = 1.0f;
+    heldInput.moveStrafe = -1.0f;
+    bool allPhasesHeld = true;
+    std::array<bool, 3> heldPhases{};
+    for (int tick = 1; tick < 360; ++tick)
+    {
+        const auto phase = held.Snapshot().lich.revealPhase;
+        if (phase == KeeperRevealPhase::Awakening) heldPhases[0] = true;
+        if (phase == KeeperRevealPhase::Warning) heldPhases[1] = true;
+        if (phase == KeeperRevealPhase::Ready) heldPhases[2] = true;
+        heldInput.yawRadians += 0.01f;
+        ++heldInput.commands.attack;
+        ++heldInput.commands.parry;
+        ++heldInput.commands.dodge;
+        held.StepFixed(heldInput);
+        allPhasesHeld = allPhasesHeld &&
+            NearlyEqual(held.Snapshot().playerX, arrival.authoritativePlayerX) &&
+            NearlyEqual(held.Snapshot().playerZ, arrival.authoritativePlayerZ) &&
+            NearlyEqual(held.Snapshot().playerYawRadians, heldInput.yawRadians) &&
+            held.Snapshot().playerTravelledThisTick == 0.0f &&
+            held.Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+            CountEvents(held.Events(), GameplayEventType::PlayerSwing) == 0u &&
+            CountEvents(held.Events(), GameplayEventType::PlayerFootstep) == 0u;
+        held.ClearEvents();
+    }
+    check(allPhasesHeld && heldPhases == std::array<bool, 3>{true, true, true} &&
+          held.Snapshot().lich.revealComplete,
+          "all initial intro phases hold actions and translation without holding look or time");
+    heldInput.moveForward = heldInput.moveStrafe = 0.0f;
+    held.StepFixed(heldInput);
+    check(held.Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+          held.Snapshot().playerTravelledThisTick == 0.0f &&
+          CountEvents(held.Events(), GameplayEventType::PlayerSwing) == 0u,
+          "combat handoff cannot replay held attack, parry or dodge edges");
+
+    GameSimulation attacks;
+    attacks.ApplyShowcaseCheckpoint(8);
+    InputSnapshot close = arrival;
+    close.commands = {};
+    close.authoritativePlayerX = kKeeperStagingPosition.x;
+    close.authoritativePlayerZ = kKeeperStagingPosition.z;
+    for (int tick = 0; tick < 351; ++tick) attacks.StepFixed(close);
+    close.commands.attack = 1u;
+    attacks.StepFixed(close);
+    // Multiple reveal-time edges must be consumed without a swing or a
+    // continuation leaking into combat after the presentation ends.
+    for (int tick = 0; tick < 4; ++tick) attacks.StepFixed(close);
+    close.commands.attack = 3u;
+    for (int tick = 0; tick < 70; ++tick) attacks.StepFixed(close);
+    check(attacks.Snapshot().lich.revealComplete && attacks.Snapshot().lich.health == 3 &&
+          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 0u &&
+          CountEvents(attacks.Events(), GameplayEventType::EnemyHit) == 0u &&
+          CountEvents(attacks.Events(), GameplayEventType::LichDefeated) == 0u,
+          "reveal attack edges are dropped without swinging across combat handoff");
+    attacks.ClearEvents();
+    close.commands.attack = 4u;
+    for (int tick = 0; tick < 40; ++tick)
+    {
+        close.authoritativePlayerX = attacks.Snapshot().lich.x;
+        close.authoritativePlayerZ = attacks.Snapshot().lich.z;
+        attacks.StepFixed(close);
+    }
+    check(attacks.Snapshot().lich.health == 2 &&
+          CountEvents(attacks.Events(), GameplayEventType::EnemyHit) == 1u,
+          "a fresh post-reveal attack uses the unchanged accepted-hit rules");
+
+    attacks.RetryEncounter();
+    check(attacks.Snapshot().lich.revealPhase == KeeperRevealPhase::RetryRecognition &&
+          NearlyEqual(attacks.Snapshot().playerX, kKeeperRetryPosition.x) &&
+          NearlyEqual(attacks.Snapshot().playerZ, kKeeperRetryPosition.z) && attacks.Events().Empty(),
+          "live retry uses safe arrival and event-free one-second recognition initialization");
+    InputSnapshot retryInput;
+    retryInput.yawRadians = -1.57079632679f;
+    retryInput.moveForward = 1.0f;
+    retryInput.moveStrafe = 1.0f;
+    for (int tick = 0; tick < 59; ++tick)
+    {
+        ++retryInput.commands.attack;
+        ++retryInput.commands.parry;
+        ++retryInput.commands.dodge;
+        attacks.StepFixed(retryInput);
+    }
+    check(!attacks.Snapshot().lich.revealComplete && attacks.Snapshot().lich.health == 3,
+          "retry cannot enable either actor's damage before its complete recognition beat");
+    ++retryInput.commands.attack;
+    ++retryInput.commands.parry;
+    ++retryInput.commands.dodge;
+    attacks.StepFixed(retryInput);
+    check(attacks.Snapshot().lich.revealComplete &&
+          CountEvents(attacks.Events(), GameplayEventType::KeeperRevealStarted) == 0u &&
+          CountEvents(attacks.Events(), GameplayEventType::KeeperWarning) == 0u &&
+          CountEvents(attacks.Events(), GameplayEventType::KeeperCombatReady) == 1u &&
+          NearlyEqual(attacks.Snapshot().lich.phaseTime, 0.0f) &&
+          NearlyEqual(attacks.Snapshot().playerX, kKeeperRetryPosition.x) &&
+          NearlyEqual(attacks.Snapshot().playerZ, kKeeperRetryPosition.z) &&
+          attacks.Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 0u &&
+          CountEvents(attacks.Events(), GameplayEventType::PlayerFootstep) == 0u,
+          "retry enables full combat once after one second without replaying full reveal cues");
+    retryInput.moveForward = retryInput.moveStrafe = 0.0f;
+    attacks.ClearEvents();
+    attacks.StepFixed(retryInput);
+    check(attacks.Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+          NearlyEqual(attacks.Snapshot().playerX, kKeeperRetryPosition.x) &&
+          NearlyEqual(attacks.Snapshot().playerZ, kKeeperRetryPosition.z) && attacks.Events().Empty(),
+          "last recognition tick leaves no buffered sword, parry or dodge action");
+    ++retryInput.commands.attack;
+    attacks.StepFixed(retryInput);
+    check(CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 1u,
+          "fresh input after recognition releases the sword action hold");
+    attacks.ResetRoute();
+    check(!attacks.Snapshot().lich.revealStarted &&
+          NearlyEqual(attacks.Snapshot().lich.x, kKeeperStagingPosition.x) &&
+          attacks.Snapshot().skeletonEnemies[1].idlePhaseSeconds > 0.0f,
+          "full reset restores fresh keeper and bounded per-entity incidental idle phase");
+
+    GameSimulation clearance;
+    clearance.ApplyShowcaseCheckpoint(8);
+    arrival.commands = {};
+    for (int tick = 0; tick < 2; ++tick) clearance.StepFixed(arrival);
+    InputSnapshot move;
+    move.yawRadians = -1.57079632679f;
+    move.moveForward = 1.0f;
+    for (int tick = 0; tick < 130; ++tick) clearance.StepFixed(move);
+    const auto& stopped = clearance.Snapshot();
+    check(NearlyEqual(stopped.playerX, arrival.authoritativePlayerX) &&
+          NearlyEqual(stopped.playerZ, arrival.authoritativePlayerZ) &&
+          stopped.playerTravelledThisTick == 0.0f &&
+          std::hypot(stopped.playerX - stopped.lich.x, stopped.playerZ - stopped.lich.z) >=
+              kKeeperPresentationCollisionRadius + kPlayerCollisionRadius - 0.001f &&
+          stopped.playerX > stopped.lich.x && NearlyEqual(stopped.playerYawRadians, move.yawRadians),
+          "held movement cannot advance or overlap the rising keeper");
+    move.moveForward = -1.0f;
+    const float contactX = stopped.playerX;
+    for (int tick = 0; tick < 10; ++tick) clearance.StepFixed(move);
+    check(NearlyEqual(clearance.Snapshot().playerX, contactX),
+          "reverse movement is also held during the presentation");
+    move.moveForward = 0.0f;
+    for (int tick = 0; tick < 218; ++tick) clearance.StepFixed(move);
+    move.moveForward = -1.0f;
+    for (int tick = 0; tick < 10; ++tick) clearance.StepFixed(move);
+    check(clearance.Snapshot().lich.revealComplete && clearance.Snapshot().playerX > contactX + 0.2f,
+          "normal translation resumes after the full presentation");
+
+    for (const int captureId : {9, 10, 11})
+    {
+        GameSimulation capture;
+        check(capture.ApplyShowcaseCheckpoint(captureId), "legacy keeper capture import succeeds");
+        const auto* checkpoint = FindShowcaseCheckpoint(captureId);
+        check(NearlyEqual(capture.Snapshot().playerX, checkpoint->x) &&
+              NearlyEqual(capture.Snapshot().playerZ, checkpoint->z) &&
+              capture.Snapshot().lich.revealComplete && capture.Events().Empty() &&
+              capture.Snapshot().tickIndex == 0u &&
+              NearlyEqual(capture.Snapshot().skeletonEnemies[1].idlePhaseSeconds, 0.0f),
+              "legacy capture retains authored player/combat state without reveal events or incidental offsets");
+    }
+    GameSimulation defeated;
+    defeated.ApplyShowcaseCheckpoint(11);
+    const auto rewardBeforeRetreat = defeated.Snapshot().chestReward;
+    defeated.AdvanceFrame(back, 1.0 / 60.0);
+    defeated.AdvanceFrame(arrival, 1.0 / 60.0);
+    check(defeated.Snapshot().lich.phase == LichPhase::Dead && defeated.Snapshot().lich.health == 0 &&
+          defeated.Snapshot().enemyRoster.encounters[1].status == EncounterStatus::Dead &&
+          defeated.Snapshot().chestReward.phase == rewardBeforeRetreat.phase &&
+          CountEvents(defeated.Events(), GameplayEventType::KeeperRevealStarted) == 0u &&
+          CountEvents(defeated.Events(), GameplayEventType::LichDefeated) == 0u &&
+          CountEvents(defeated.Events(), GameplayEventType::LanternClaimed) == 0u,
+          "defeated keeper and claimed reward stay terminal across route selection and reentry");
+}
+
 } // namespace
+
+template <typename Check>
+void TestSkeletonIncidental(Check&& check)
+{
+    static_assert(static_cast<int>(GameplayEventType::SkeletonIncidental) == 20);
+    GameSimulationConfig config;
+    config.playerStartZ = -7.0f;
+    GameSimulation simulation(config);
+    InputSnapshot idle;
+    idle.hasAuthoritativePlayerPose = true;
+    idle.authoritativePlayerZ = -7.0f;
+    std::array<EntityId, 3> sources{};
+    std::array<int, 3> times{};
+    std::size_t cueCount = 0u;
+    bool valid = true;
+    for (int tick = 1; tick <= 2400; ++tick)
+    {
+        simulation.StepFixed(idle);
+        for (const auto& event : simulation.Events().Events())
+        {
+            if (event.type != GameplayEventType::SkeletonIncidental) continue;
+            valid = valid && cueCount < sources.size() && event.target == EntityId::Invalid &&
+                NearlyEqual(event.intensity, 0.30f) &&
+                NearlyEqual(event.listenerZ, idle.authoritativePlayerZ);
+            if (cueCount < sources.size())
+            {
+                sources[cueCount] = event.source;
+                times[cueCount] = tick;
+            }
+            ++cueCount;
+        }
+        simulation.ClearEvents();
+        if (tick == 719)
+        {
+            check(cueCount == 0u, "idle bones remain silent until at least twelve seconds");
+            idle.paused = true;
+            simulation.SynchronizePausedInput(idle);
+            simulation.AdvanceFrame(idle, 60.0);
+            check(CountEvents(simulation.Events(), GameplayEventType::SkeletonIncidental) == 0u,
+                  "paused lifecycle barrier cannot generate or catch up idle cues");
+            idle.paused = false;
+        }
+    }
+    check(valid && cueCount == 3u &&
+          sources == std::array<EntityId, 3>{EntityId::SkeletonA, EntityId::SkeletonB, EntityId::SkeletonA} &&
+          times == std::array<int, 3>{720, 1080, 2400},
+          "sparse incidental cues stagger actors and preserve event-time positional identity");
+    simulation.ResetRoute();
+    for (int tick = 0; tick < 719; ++tick)
+    {
+        simulation.StepFixed(idle);
+        check(CountEvents(simulation.Events(), GameplayEventType::SkeletonIncidental) == 0u,
+              "route reset starts a fresh idle delay without a stale cue");
+        simulation.ClearEvents();
+    }
+    simulation.StepFixed(idle);
+    check(CountEvents(simulation.Events(), GameplayEventType::SkeletonIncidental) == 1u,
+          "reset deterministic idle cadence restarts once at the minimum delay");
+    check(simulation.ApplyShowcaseCheckpoint(0), "idle capture fixture imports");
+    for (int tick = 0; tick < 1200; ++tick)
+    {
+        simulation.StepFixed(idle);
+        check(CountEvents(simulation.Events(), GameplayEventType::SkeletonIncidental) == 0u,
+              "legacy capture imports keep incidental presentation event-free");
+        simulation.ClearEvents();
+    }
+}
 
 int main()
 {
@@ -40,6 +455,8 @@ int main()
             std::cerr << "Simulation gameplay test failed: " << message << '\n';
         }
     };
+    TestKeeperReveal(check);
+    TestSkeletonIncidental(check);
 
     BoundedGameplayEventQueue identityQueue;
     GameplayEvent first;
@@ -510,6 +927,103 @@ int main()
           playerDamageEventsIdentifyTheirAttacker,
           "two entity-aware nonfatal hits must emit PlayerDamaged while the lethal hit emits only PlayerKilled");
 
+    // Reproduce Restart Route's actual ordering: the UI publishes reset and
+    // immediately resumes before the owner gets to consume the mailbox.
+    GameSimulation deadBeforeMenu = damageEvents;
+    for (int frame = 0; frame < 60; ++frame)
+        deadBeforeMenu.StepFixed(damageInput);
+    check(deadBeforeMenu.Snapshot().playerVitals.phase == PlayerLifePhase::Dead &&
+          deadBeforeMenu.Snapshot().playerVitals.vitality == 0,
+          "menu reset regression begins with a genuinely combat-killed player");
+    InputSnapshot menuWorldInput;
+    menuWorldInput.paused = true;
+    menuWorldInput.commands.attack = 4u;
+    menuWorldInput.commands.parry = 2u;
+    menuWorldInput.commands.dodge = 3u;
+    menuWorldInput.commands.interact = 5u;
+    menuWorldInput.commands.toggleHeldLightPose = 6u;
+    menuWorldInput.commands.routeReset = 1u;
+    InputMailbox menuMailbox;
+    menuMailbox.Publish(menuWorldInput);
+    InputSnapshot menuResume = menuWorldInput;
+    menuResume.paused = false;
+    menuMailbox.Publish(menuResume);
+    const auto coalescedMenu = menuMailbox.ConsumeLatest();
+    GameSimulation menuRestart = deadBeforeMenu;
+    menuRestart.SynchronizePausedInput(coalescedMenu.snapshot, coalescedMenu.publicationSequence,
+        PausedInputPolicy::PreserveWorldCommands);
+    menuRestart.SynchronizePausedInput(coalescedMenu.snapshot, coalescedMenu.publicationSequence,
+        PausedInputPolicy::PreserveWorldCommands);
+    check(menuRestart.Snapshot().playerVitals.phase == PlayerLifePhase::Dead &&
+          menuRestart.Snapshot().lastConsumedRouteResetSequence == 0u,
+          "menu synchronization neither executes nor acknowledges the retained reset prematurely");
+    menuRestart.StepFixed(coalescedMenu.snapshot, 0.0f, coalescedMenu.publicationSequence);
+    const auto restarted = menuRestart.Snapshot();
+    check(restarted.playerVitals.phase == PlayerLifePhase::Alive && restarted.playerVitals.vitality == 3 &&
+          restarted.lastConsumedRouteResetSequence == 1u && restarted.retryGeneration == 0u &&
+          NearlyEqual(restarted.playerX, kPlayerSpawn.x) && NearlyEqual(restarted.playerZ, kPlayerSpawn.z) &&
+          restarted.lastConsumedAttackSequence == 4u && restarted.lastConsumedParrySequence == 2u &&
+          restarted.lastConsumedDodgeSequence == 3u && restarted.lastConsumedInteractSequence == 5u &&
+          restarted.lastConsumedToggleHeldLightPoseSequence == 6u && menuRestart.Events().Empty(),
+          "reset then resume before owner consumption restores vitality once and discards all competing actions");
+    menuRestart.AdvanceFrame(coalescedMenu.snapshot, 0.0, coalescedMenu.publicationSequence);
+    check(menuRestart.Snapshot().lastConsumedRouteResetSequence == 1u &&
+          menuRestart.Snapshot().tickIndex == restarted.tickIndex && menuRestart.Events().Empty(),
+          "the same resumed publication cannot apply a reset twice or advance paused gameplay time");
+
+    GameSimulation menuRetry = deadBeforeMenu;
+    InputSnapshot retryMenu = menuWorldInput;
+    retryMenu.commands.routeReset = 0u;
+    retryMenu.commands.retry = 1u;
+    menuRetry.SynchronizePausedInput(retryMenu, 301u, PausedInputPolicy::PreserveWorldCommands);
+    menuRetry.AdvanceFrame(retryMenu, 0.0, 301u);
+    check(menuRetry.Snapshot().playerVitals.phase == PlayerLifePhase::Alive &&
+          menuRetry.Snapshot().playerVitals.vitality == 3 &&
+          menuRetry.Snapshot().lastConsumedRetrySequence == 1u &&
+          menuRetry.Snapshot().retryGeneration == 1u && menuRetry.Events().Empty(),
+          "paused death-menu retry remains responsive without a gameplay tick or competing actions");
+    menuRetry.SynchronizePausedInput(retryMenu, 301u, PausedInputPolicy::PreserveWorldCommands);
+    menuRetry.AdvanceFrame(retryMenu, 1.0, 301u);
+    check(menuRetry.Snapshot().retryGeneration == 1u && menuRetry.Snapshot().simulationTicksThisFrame == 0u &&
+          menuRetry.Snapshot().playerVitals.vitality == 3 && menuRetry.Events().Empty(),
+          "repeated menu synchronization never duplicates retry or enables paused damage");
+
+    GameSimulation stopOverridesMenu = deadBeforeMenu;
+    stopOverridesMenu.SynchronizePausedInput(menuWorldInput, 401u, PausedInputPolicy::PreserveWorldCommands);
+    stopOverridesMenu.SynchronizePausedInput(menuWorldInput, 402u); // New actual stop: default discards all.
+    stopOverridesMenu.AdvanceFrame(menuResume, 0.0, 403u);
+    check(stopOverridesMenu.Snapshot().playerVitals.phase == PlayerLifePhase::Dead &&
+          stopOverridesMenu.Snapshot().lastConsumedRouteResetSequence == 1u &&
+          stopOverridesMenu.Snapshot().retryGeneration == 0u && stopOverridesMenu.Events().Empty(),
+          "a newer genuine lifecycle stop discards an earlier menu reset without reviving the player");
+
+    GameSimulation menuAfterStop = deadBeforeMenu;
+    menuAfterStop.SynchronizePausedInput(menuWorldInput, 501u); // Retained lifecycle discard floor.
+    InputSnapshot newerMenuReset = menuWorldInput;
+    newerMenuReset.commands.routeReset = 2u;
+    menuAfterStop.SynchronizePausedInput(newerMenuReset, 502u, PausedInputPolicy::PreserveWorldCommands);
+    menuAfterStop.AdvanceFrame(newerMenuReset, 0.0, 502u);
+    check(menuAfterStop.Snapshot().playerVitals.phase == PlayerLifePhase::Alive &&
+          menuAfterStop.Snapshot().playerVitals.vitality == 3 &&
+          menuAfterStop.Snapshot().lastConsumedRouteResetSequence == 2u && menuAfterStop.Events().Empty(),
+          "a deliberate newer menu reset survives after older stopped edges were discarded");
+
+    GameSimulation menuTwoWorldCommands = deadBeforeMenu;
+    InputSnapshot bothWorld = menuWorldInput;
+    bothWorld.commands.retry = 1u;
+    menuTwoWorldCommands.SynchronizePausedInput(bothWorld, 601u, PausedInputPolicy::PreserveWorldCommands);
+    menuTwoWorldCommands.AdvanceFrame(bothWorld, 0.0, 601u);
+    check(menuTwoWorldCommands.Snapshot().lastConsumedRouteResetSequence == 1u &&
+          menuTwoWorldCommands.Snapshot().lastConsumedRetrySequence == 0u,
+          "preserved coalesced reset retains established priority over retry");
+    menuTwoWorldCommands.SynchronizePausedInput(bothWorld, 602u, PausedInputPolicy::PreserveWorldCommands);
+    menuTwoWorldCommands.AdvanceFrame(bothWorld, 0.0, 602u);
+    menuTwoWorldCommands.AdvanceFrame(bothWorld, 0.0, 602u);
+    check(menuTwoWorldCommands.Snapshot().lastConsumedRouteResetSequence == 1u &&
+          menuTwoWorldCommands.Snapshot().lastConsumedRetrySequence == 1u &&
+          menuTwoWorldCommands.Snapshot().retryGeneration == 1u && menuTwoWorldCommands.Events().Empty(),
+          "another menu barrier preserves already-ingested retry until it is applied exactly once");
+
     GameSimulation skeletonFeedback;
     InputSnapshot skeletonFeedbackInput;
     skeletonFeedbackInput.damageEnabled = false;
@@ -692,6 +1206,7 @@ int main()
           "three accepted hits must emit one lich defeat followed exactly two fixed seconds later by one chest unlock");
 
     GameSimulation retry;
+    check(retry.ApplyShowcaseCheckpoint(9), "legacy combat fixture imports its exact authored state");
     InputSnapshot finaleInput;
     finaleInput.hasAuthoritativePlayerPose = true;
     finaleInput.authoritativePlayerX = -33.70f;
@@ -737,10 +1252,10 @@ int main()
     check(retry.Snapshot().lastConsumedRetrySequence == 1u &&
           retry.Snapshot().retryGeneration == 1u &&
           retry.Snapshot().activeEnemyKind == EnemyKind::Lich &&
-          NearlyEqual(retry.Snapshot().playerX, -33.70f) &&
-          NearlyEqual(retry.Snapshot().playerZ, -15.20f) &&
+          NearlyEqual(retry.Snapshot().playerX, kKeeperRetryPosition.x) &&
+          NearlyEqual(retry.Snapshot().playerZ, kKeeperRetryPosition.z) &&
           retry.Snapshot().torchFailure.phase == TorchFailurePhase::Settled &&
-          retry.Snapshot().lich.phase != LichPhase::Dormant &&
+          retry.Snapshot().lich.revealPhase == KeeperRevealPhase::RetryRecognition &&
           retry.Snapshot().playerVitals.vitality == PlayerVitals::kMaxVitality,
           "retry must restore the authored mirror player, torch failure, lich, and vitality state exactly once");
     retry.AdvanceFrame(finaleInput, 1.0 / 60.0);
@@ -1054,8 +1569,8 @@ int main()
           pausedRetry.Snapshot().lastConsumedAttackSequence == 1u &&
           pausedRetry.Snapshot().retryGeneration == 1u &&
           pausedRetry.Events().Empty() &&
-          NearlyEqual(pausedRetry.Snapshot().playerX, -33.70f) &&
-          NearlyEqual(pausedRetry.Snapshot().playerZ, -15.20f),
+          NearlyEqual(pausedRetry.Snapshot().playerX, kKeeperRetryPosition.x) &&
+          NearlyEqual(pausedRetry.Snapshot().playerZ, kKeeperRetryPosition.z),
           "paused retry must consume the competing attack exactly once, discard stale events, and clear catch-up time");
 
     for (const auto name : {"glass-transport", "glass-fire-transport",

@@ -18,6 +18,7 @@ $diagnosticConsumerPaths = @(
 )
 $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ('horde-raygen-variants-' + [guid]::NewGuid().ToString('N'))
 $worktreeStatusBefore = (& git -C $repoRoot status --porcelain) -join "`n"
+if ($LASTEXITCODE -ne 0) { throw 'Unable to inspect worktree before temporary variant compilation.' }
 
 function Assert-True {
     param([bool]$Condition, [string]$Message)
@@ -167,10 +168,10 @@ try {
     $legacyIncludePath = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
     $genericHashBefore = Get-RawFileHash $genericIncludePath
     $legacyHashBefore = Get-RawFileHash $legacyIncludePath
-    # Restored measured control compatibility artifacts; matrix mode must not
+    # Admitted 1.6.2 independent shadow/fire binding26 compatibility artifacts; matrix mode must not
     # mutate them, and the artifact suite independently checks fresh compilation.
-    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq 'f4170abbf7f68364d7eeb5d9d01baeed0efacb2fc6db7ab4d1f4c0075dddacd4') 'Generic include hash changed before matrix compilation.'
-    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq 'a3b32262260a25e31fbc880f851baabc5df14bbbb7995fd532e5696afd3e06bb') 'Legacy include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq 'fe583ea8d35f69958848482892bed0b47adbc1009942268bf601462803019d0b') 'Generic include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq '61c569fa7a245599d812c0305cca00a19fac32f75f2545d57bd8d1477da4a100') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)
@@ -351,7 +352,10 @@ try {
     $crlfStats = Get-Content -LiteralPath (Join-Path $crlfOutput 'shipping_mobile_generic_dielectric\raygen-stats.json') -Raw | ConvertFrom-Json
     Assert-True ($lfStats.dependencySha256 -eq $crlfStats.dependencySha256 -and
         $lfStats.compiledSpirvSha256 -eq $crlfStats.compiledSpirvSha256) 'LF/CRLF variant compilation must retain identical dependency and SPIR-V hashes.'
-    Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) 'Temporary variant compilation modified the worktree.'
+    $worktreeStatusAfter = (& git -C $repoRoot status --porcelain) -join "`n"
+    Assert-True ($LASTEXITCODE -eq 0) 'Unable to inspect worktree after temporary variant compilation.'
+    $statusChanges = Compare-Object ($worktreeStatusBefore -split "`n") ($worktreeStatusAfter -split "`n") | Out-String
+    Assert-True ($worktreeStatusAfter -ceq $worktreeStatusBefore) "Temporary variant compilation modified the worktree. Status differences: $statusChanges"
     Write-Output 'Raygen variant manifest and temporary compiler matrix passed.'
 }
 finally {

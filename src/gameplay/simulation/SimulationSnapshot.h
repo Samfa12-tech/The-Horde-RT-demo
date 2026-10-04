@@ -28,6 +28,8 @@ struct SkeletonEnemySnapshot
     float z = -4.65f;
     float facingRadians = 0.0f;
     float animationTime = 0.0f;
+    // Presentation-only idle sample offset; combat/action clocks stay exact.
+    float idlePhaseSeconds = 0.0f;
     float damageFlash = 0.0f;
     std::int32_t health = 1;
     EnemyAnimation animation = EnemyAnimation::Walking;

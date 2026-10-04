@@ -39,6 +39,11 @@ enum class GameplayEventType : std::uint8_t
     ChestOpened,
     LanternClaimed,
     TorchExtinguished,
+    // Append only: Android's compact transport preserves the existing IDs.
+    KeeperRevealStarted,
+    KeeperWarning,
+    KeeperCombatReady,
+    SkeletonIncidental,
 };
 
 struct GameplayEvent

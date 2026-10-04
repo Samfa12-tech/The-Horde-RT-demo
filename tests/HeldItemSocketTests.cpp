@@ -832,6 +832,34 @@ void TestProductionSocketsMatchSharedFixedStepContracts()
           "actual GLB Grip/Flame/Light transforms must exactly match shared fixed-step contracts");
 }
 
+void TestProductionTorchFitsSharedClearanceEnvelope()
+{
+    using namespace horde::gameplay::items;
+    horde::scene::assets::StaticMeshAsset sword;
+    horde::scene::assets::StaticMeshAsset torch;
+    std::string diagnostic;
+    const bool loaded = LoadProductionHeldAssets(sword, torch, diagnostic);
+    Check(loaded, "actual production torch must load before clearance-envelope admission");
+    if (!loaded) return;
+    const auto* grip = FindHeldItemSocket(torch.sockets, "Grip");
+    const auto* flame = FindHeldItemSocket(torch.sockets, "Flame");
+    Check(grip != nullptr && flame != nullptr, "clearance admission requires exact Grip and Flame sockets");
+    if (grip == nullptr || flame == nullptr) return;
+    bool bodyAdmitted = true;
+    for (const auto& vertex : torch.vertices)
+    {
+        const float x = vertex.position[0] - grip->world[12];
+        const float y = vertex.position[1] - grip->world[13];
+        const float z = vertex.position[2] - grip->world[14];
+        bodyAdmitted &= std::hypot(x, z) <= kHeldTorchEnvelopeRadius &&
+                        y <= kHeldTorchEnvelopeTopFromGrip && y >= -0.25f;
+    }
+    Check(bodyAdmitted, "actual GLB body vertices must fit the shared held-torch clearance envelope");
+    Check(flame->world[13] - grip->world[13] + 0.34f + 0.06f <=
+              kHeldTorchEnvelopeTopFromGrip + 0.00001f,
+          "clearance must include full visible fire height above the actual Flame socket, not just the cage");
+}
+
 } // namespace
 
 void TestRewardCarryParryKeepsGuardOnSwordSide()
@@ -898,6 +926,7 @@ int main()
     TestProductionTorchAssetMeetsGenericSocketAndPbrBudget();
     TestProductionAssetsShareOneGenericStaticSlot();
     TestProductionSocketsMatchSharedFixedStepContracts();
+    TestProductionTorchFitsSharedClearanceEnvelope();
     if (failures == 0)
     {
         std::cout << "Held-item socket contracts passed.\n";

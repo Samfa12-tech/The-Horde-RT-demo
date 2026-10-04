@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/RtGpuResources.h"
+#include "vulkan/raytracing/RtDeviceAddressLayout.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 
 #include <cstring>
@@ -121,6 +122,35 @@ bool RtGpuResources::CreateBuffer(VkDeviceSize size,
     out.allocationSize = requirements.size;
     out.memoryPropertyFlags = selectedMemoryFlags;
     out.address = deviceAddress ? BufferAddress(out.buffer) : 0u;
+    diagnostic.clear();
+    return true;
+}
+
+bool RtGpuResources::CreateAlignedBuffer(const VkDeviceSize usableSize,
+                                         const VkDeviceSize addressAlignment,
+                                         const VkBufferUsageFlags usage,
+                                         const VkMemoryPropertyFlags memoryFlags,
+                                         RtGpuBuffer& out,
+                                         std::string& diagnostic) const
+{
+    out = {};
+    std::uint64_t paddedSize = 0u;
+    if (!TryPaddedDeviceAddressSize(usableSize, addressAlignment, paddedSize))
+    {
+        diagnostic = "Invalid or overflowing aligned RT buffer size/alignment.";
+        return false;
+    }
+    if (!CreateBuffer(paddedSize, usage, memoryFlags, true, out, diagnostic))
+        return false;
+    std::uint64_t offset = 0u;
+    if (!TryAlignDeviceAddressRange(out.address, out.size, usableSize,
+                                    addressAlignment, offset))
+    {
+        diagnostic = "RT device address is zero, overflowing or outside the aligned buffer range.";
+        DestroyBuffer(out);
+        return false;
+    }
+    out.deviceAddressOffset = offset;
     diagnostic.clear();
     return true;
 }

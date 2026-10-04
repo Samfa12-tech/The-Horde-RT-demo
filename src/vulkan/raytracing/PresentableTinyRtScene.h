@@ -5,6 +5,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <span>
 
 #include <vulkan/vulkan.h>
 
@@ -25,10 +26,13 @@
 #include "vulkan/raytracing/RtPipelineBundle.h"
 #include "vulkan/raytracing/RtExecutionPolicy.h"
 #include "vulkan/raytracing/RtSceneTuning.h"
+#include "vulkan/raytracing/RtSceneProfile.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
 #include "vulkan/raytracing/experimental/StagedPrimaryPass.h"
 #endif
+
+namespace horde::graphics { class GraphicsPreviewSession; }
 
 namespace horde::vulkan::raytracing
 {
@@ -42,6 +46,18 @@ struct RtDiagnosticCounterPayload;
     const RtPipelineVariantArtifact& opaqueFast,
     const RtPipelineVariantArtifact& genericDielectric,
     horde::telemetry::RtPipelineEvidenceIdentity& identity) noexcept;
+
+// Read-only provenance of an already selected strategy. No policy request or
+// shader words cross the platform boundary through this metadata snapshot.
+struct RtSelectedPipelineArtifactMetadata
+{
+    std::string_view canonicalKey;
+    std::string_view artifactPath;
+    std::string_view spirvSha256;
+    std::string_view includeSha256;
+    std::size_t expectedWordCount;
+    bool hasDiagnosticsBinding;
+};
 
 enum class WaterQuality : std::uint32_t
 {
@@ -75,6 +91,11 @@ struct RtSceneFrameInputs
     float walkAmount = 0.0f;
     float outputExposure = 0.92f;
     WaterQuality waterQuality = WaterQuality::High;
+    // Legacy fixtures inherit water detail; Graphics always supplies a real tier.
+    std::optional<FireEmitterQuality> fireDetail;
+    // Absence is the explicitly retained diagnostic LegacyWorkload policy.
+    std::optional<horde::graphics::ShadowQuality> shadowQuality;
+    bool previewMotion = false;
     RtSceneTuning tuning{};
     horde::gameplay::CombatSnapshot combat{};
     horde::gameplay::PlayerCombatSnapshot playerCombat{};
@@ -105,6 +126,25 @@ struct RtSceneFrameInputs
 class PresentableTinyRtScene
 {
 public:
+#ifndef NDEBUG
+    // Process-local opaque identities, read on the render owner thread after
+    // completion. No device addresses, resource contents or ownership transfer.
+    struct ResourceHandleSnapshot
+    {
+        bool ready = false;
+        std::vector<std::uint64_t> bottomLevelAccelerationStructures;
+        std::vector<std::uint64_t> topLevelAccelerationStructures;
+        std::vector<std::uint64_t> pipelines;
+        std::vector<std::uint64_t> shaderBindingTableBuffers;
+        std::vector<std::uint64_t> descriptorSets;
+        std::vector<std::uint64_t> textureImages;
+        std::uint64_t outputImage = 0u;
+        std::uint64_t outputMemory = 0u;
+        std::uint64_t outputView = 0u;
+        bool operator==(const ResourceHandleSnapshot&) const = default;
+    };
+    [[nodiscard]] ResourceHandleSnapshot CaptureResourceHandles() const;
+#endif
     struct StorageImageCapture
     {
         std::uint32_t width = 0u;
@@ -113,8 +153,9 @@ public:
         std::vector<std::uint8_t> rgba;
     };
 
-    // Baseline without the optional development viewmodel. Live reports count owners.
-    static constexpr std::uint32_t kBlasCount = 16u;
+    // Maximum including the optional development viewmodel. Live reports count owners.
+    static constexpr std::uint32_t kBlasCount = 18u;
+    static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kTlasInstanceCount = kRtInstanceMetadataCapacity;
 
@@ -140,11 +181,20 @@ public:
                     std::string& diagnostic,
                     const std::string& developmentStaticAssetDirectory = {},
                     const std::string& productionAssetRoot = {},
-                    RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline);
+                    RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline,
+                    RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
+                    bool glassEnabled = true);
 
     void Destroy();
 
     bool IsReady() const { return ready_; }
+    RtSceneProfile Profile() const { return sceneProfile_; }
+    bool GlassEnabled() const { return glassEnabled_; }
+    const RtQualityControlsGpu& QualityControls() const noexcept { return uploadedQualityControls_; }
+    bool HasUploadedQualityControls() const noexcept { return uploadedQualityControlsValid_; }
+    FireEmitterQuality UploadedFireQuality() const noexcept { return uploadedFireQuality_; }
+    bool ConfigurePreviewFireSockets(horde::graphics::GraphicsPreviewSession& session,
+                                     std::string& diagnostic) const;
     RtExecutionBackend ExecutionBackend() const
     {
         return pipelineBundle_.HasSelection() ? pipelineBundle_.Request().executionBackend
@@ -157,7 +207,7 @@ public:
         return ready_ ? static_cast<std::uint32_t>(ResourceInventory().bottomLevelAccelerationStructureCount) : 0u;
     }
     std::uint32_t TlasCount() const { return ready_ ? kTlasCount : 0u; }
-    std::uint32_t TlasInstanceCount() const { return ready_ ? kTlasInstanceCount : 0u; }
+    std::uint32_t TlasInstanceCount() const { return ready_ ? tlasInstanceCount_ : 0u; }
     std::size_t SkeletonPoseBucketCount() const { return characterSlot_.SkeletonPoseBucketCount(); }
     std::uint32_t PlayerSkinCadenceHz() const { return 60u; }
     std::uint64_t PlayerSkinUpdateCount() const { return playerSkinUpdateCount_; }
@@ -339,6 +389,19 @@ public:
 #endif
         return pipelineBundle_.OpaqueFastKey();
     }
+    [[nodiscard]] std::optional<RtSelectedPipelineArtifactMetadata>
+    SelectedPipelineArtifactMetadata(RtMaterialStrategy strategy) const noexcept
+    {
+#ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
+        if (stagedPrimary_) return std::nullopt;
+#endif
+        if (!pipelineBundle_.HasSelection() ||
+            (strategy != RtMaterialStrategy::OpaqueFast && strategy != RtMaterialStrategy::GenericDielectric))
+            return std::nullopt;
+        const auto& artifact = pipelineBundle_.Strategy(strategy).artifact;
+        return RtSelectedPipelineArtifactMetadata{artifact.canonicalKey, artifact.artifactPath,
+            artifact.spirvSha256, artifact.includeSha256, artifact.expectedWordCount, artifact.hasDiagnosticsBinding};
+    }
     std::string_view SelectedGenericDielectricKey() const
     {
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
@@ -499,6 +562,7 @@ private:
         VkImageView view = VK_NULL_HANDLE;
         VkDeviceSize allocationSize = 0u;
         VkMemoryPropertyFlags memoryPropertyFlags = 0u;
+        std::uint32_t mipLevels = 0u;
     };
 
     bool InitialiseWithOrchestration(
@@ -516,7 +580,10 @@ private:
         std::string& diagnostic,
         const std::string& developmentStaticAssetDirectory,
         const std::string& productionAssetRoot,
-        const InitialiseOrchestrationApi& api);
+        const InitialiseOrchestrationApi& api,
+        RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
+        bool glassEnabled = true);
+    void ApplyGlassFixtureVisibility(std::span<VkAccelerationStructureInstanceKHR> instances) const;
     bool ContinueInitialiseAfterPreflight(
         VkFormat presentationFormat,
         const std::string& skeletonAssetPath,
@@ -555,16 +622,35 @@ private:
                        std::uint32_t height,
                        std::uint32_t layers,
                        TextureArray& texture,
-                       std::string& diagnostic);
+                       std::string& diagnostic,
+                       std::span<const std::uint32_t> sourceLayers = {},
+                       VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY);
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
+    bool CreateEnvironmentTexture(const std::string& productionRoot, std::string& diagnostic);
     bool CreateLichTextures(const std::string& directory, std::string& diagnostic);
     bool LoadStaticHeldItemAssets(const std::string& developmentDirectory,
                                   const std::string& productionAssetRoot,
                                   std::string& diagnostic);
     bool CreateStaticMeshResources(std::string& diagnostic);
+    bool LoadPreviewStaticAssets(const std::string& productionAssetRoot,
+                                 std::string& diagnostic);
+    bool ResolvePreviewPropTransforms(std::string& diagnostic);
+    bool BuildPreviewAccelerationStructures(std::string& diagnostic);
+    bool BuildProfileAccelerationStructure(
+        std::span<const VkAccelerationStructureGeometryKHR> geometries,
+        std::span<const VkAccelerationStructureBuildRangeInfoKHR> ranges,
+        VkAccelerationStructureTypeKHR type, VkBuildAccelerationStructureFlagsKHR flags,
+        AccelerationStructure& out, Buffer* retainedScratch,
+        std::string& diagnostic);
+    bool UpdatePreviewInstances(VkCommandBuffer commandBuffer,
+                                const RtSceneFrameInputs& frame,
+                                std::string& diagnostic,
+                                RtSceneRecordObservation* observation);
     const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
+    bool CreateScratchBuffer(VkDeviceSize usableSize, Buffer& out,
+                             std::string& diagnostic) const;
     bool CreateSelectedPipelineBundle(std::string& diagnostic);
     [[nodiscard]] bool CapturePipelineEvidenceIdentity() noexcept;
     bool CreateBundleDescriptorSetLayout(const RtDescriptorIoContract& contract,
@@ -631,6 +717,8 @@ private:
     TextureArray materialDiffuse_;
     TextureArray materialNormal_;
     TextureArray materialArm_;
+    TextureArray environmentTexture_;
+    VkSampler environmentSampler_ = VK_NULL_HANDLE;
     TextureArray lichBaseColor_;
     TextureArray lichEmissive_;
     TextureArray staticBaseColor_;
@@ -650,6 +738,10 @@ private:
     bool tlasPendingDefinitionsValid_ = false;
     Buffer heldLightBuffer_;
     Buffer fireEmitterBuffer_;
+    Buffer qualityControlsBuffer_;
+    RtQualityControlsGpu uploadedQualityControls_{};
+    FireEmitterQuality uploadedFireQuality_ = FireEmitterQuality::Mobile;
+    bool uploadedQualityControlsValid_ = false;
     Buffer worldSurfaceBuffer_;
     Buffer staticVertexBuffer_;
     Buffer worldPlayerVertexBuffer_;
@@ -669,6 +761,7 @@ private:
     AccelerationStructure rewardLanternRingBlas_;
     AccelerationStructure rewardLanternBodyBlas_;
     AccelerationStructure dielectricFixtureBlas_;
+    AccelerationStructure collapseBlas_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
     AccelerationStructure skinnedPlayerBlas_;
@@ -678,9 +771,18 @@ private:
     AccelerationStructure tlas_;
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
+    RtSceneProfile sceneProfile_ = RtSceneProfile::Showcase;
+    bool glassEnabled_ = true;
+    std::vector<RtMaterialGpu> sceneMaterials_;
+    std::uint32_t worldMaterialBase_ = 0u;
+    std::uint32_t tlasInstanceCount_ = kTlasInstanceCount;
+    std::array<horde::gameplay::items::HeldItemTransform, 5u> previewTransforms_{};
+    std::array<horde::gameplay::effects::FireEmitterFixedStepInput, 2u> previewFireInputs_{};
+    VkDeviceSize scratchAddressAlignment_ = 0u;
     CharacterRenderSlot characterSlot_;
     PlayerRenderSlot playerRenderSlot_;
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
+    horde::scene::assets::StaticMeshAsset collapseStaticAsset_;
     horde::scene::assets::StaticMeshAsset productionTorchAsset_;
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
     horde::scene::assets::StaticMeshAsset viewmodelAsset_;

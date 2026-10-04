@@ -338,6 +338,8 @@ RtRecordedSceneEvidence MakeRecordedScene(const RtSceneFrameEvidence& evidence)
     RtRecordedSceneEvidence recorded{};
     recorded.pipeline = evidence.pipeline;
     recorded.resources = evidence.resources;
+    recorded.shadowQuality = evidence.shadowQuality;
+    recorded.fireQuality = evidence.fireQuality;
     recorded.player = evidence.player;
     recorded.player.primaryPixelCountAvailable = false;
     recorded.player.primaryPixelCount = 0u;
@@ -991,8 +993,10 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     context.Check(lifecycle.BeginRecord(0u, 101u, attemptA), "record A must begin");
     context.Check(attemptA.recordAttemptSerial == 1u && attemptA.recordSerial == 0u,
                   "Begin must allocate a unique attempt but no successful-record serial");
-    const RtSceneFrameEvidence sceneA = MakeSceneEvidence(
+    RtSceneFrameEvidence sceneA = MakeSceneEvidence(
         context, RtInstrumentationMode::Diagnostic, RtMaterialStrategy::OpaqueFast, 'a', 1'000u);
+    sceneA.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Lower, 1u, 1u, 0u};
+    sceneA.fireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
     RtFrameToken recordedA{};
     context.Check(lifecycle.FinishRecord(attemptA, MakeRecordedScene(sceneA), recordedA),
                   "record A must finish");
@@ -1008,8 +1012,10 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     RtFrameToken attemptB{};
     context.Check(lifecycle.BeginRecord(1u, 202u, attemptB),
                   "record B may begin in another fixed slot while A awaits completion");
-    const RtSceneFrameEvidence sceneB = MakeSceneEvidence(
+    RtSceneFrameEvidence sceneB = MakeSceneEvidence(
         context, RtInstrumentationMode::Diagnostic, RtMaterialStrategy::GenericDielectric, 'c', 2'000u);
+    sceneB.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Higher, 4u, 2u, 0u};
+    sceneB.fireQuality = RtFireQualityEvidence{RtFireQuality::High, 10u, 2u};
     RtFrameToken recordedB{};
     context.Check(lifecycle.FinishRecord(attemptB, MakeRecordedScene(sceneB), recordedB),
                   "record B must finish");
@@ -1055,6 +1061,11 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
                       completedA.dielectric.counters[0] == 1u &&
                       completedA.gpu.durationNanoseconds == 11'000'000u,
                   "completed A must contain only A identity, scene, diagnostic and GPU sentinels");
+    context.Check(completedA.scene.shadowQuality == sceneA.shadowQuality &&
+                      completedA.scene.fireQuality == sceneA.fireQuality &&
+                      completedA.scene.shadowQuality != sceneB.shadowQuality &&
+                      completedA.scene.fireQuality != sceneB.fireQuality,
+                  "record B uploaded quality must not contaminate A owning completion");
     context.Check(completedA.scene.pipeline.activeStrategy != sceneB.pipeline.activeStrategy &&
                       completedA.scene.resources.bufferCount != sceneB.resources.bufferCount &&
                       completedA.scene.player.primaryPixelCount != sceneB.player.primaryPixelCount &&
@@ -2420,6 +2431,43 @@ void TestNoAllocationAndOneWayIsolation(TestContext& context)
                   "serializer failure must remain a one-way observer with no deterministic side effect");
 }
 
+void TestUploadedQualityEvidence(TestContext& context)
+{
+    auto snapshot = MakeSnapshot(context, RtInstrumentationMode::Shipping);
+    RtEvidenceValidationError error{};
+    std::string json;
+    context.Check(SerializeRtPerformanceEvidenceJson(snapshot, json, error) &&
+        json.find("shadowQuality") == std::string::npos && json.find("fireQuality") == std::string::npos,
+        "legacy absent uploads must not acquire fabricated default budgets");
+    for (const auto fire : {RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u},
+         RtFireQualityEvidence{RtFireQuality::Mobile, 4u, 1u}, RtFireQualityEvidence{RtFireQuality::High, 10u, 2u}})
+    {
+        snapshot.scene.fireQuality = fire;
+        context.Check(ValidateRtPerformanceEvidence(snapshot, error), "all three exact uploaded fire budgets admitted");
+        snapshot.scene.fireQuality->volumeSteps++;
+        context.Check(!ValidateRtPerformanceEvidence(snapshot, error), "wrong uploaded fire steps rejected");
+    }
+    snapshot.scene.fireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
+    snapshot.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Higher, 4u, 2u, 0u};
+    context.Check(SerializeRtPerformanceEvidenceJson(snapshot, json, error) &&
+        json.find("\"localPrimarySamples\":4") != std::string::npos &&
+        json.find("\"quality\":\"Low\"") != std::string::npos &&
+        json.find("\"reflectedVolumeSteps\":2") != std::string::npos,
+        "serialized budgets are copied owning values and genuine reflected evaluations");
+    snapshot.scene.pipeline.dielectricQuality = RtDielectricQuality::Mobile;
+    context.Check(!ValidateRtPerformanceEvidence(snapshot, error), "Mobile cannot certify High four-sample shadow budget");
+    snapshot.scene.pipeline.dielectricQuality = RtDielectricQuality::High;
+    context.Check(ValidateRtPerformanceEvidence(snapshot, error), "High exact higher shadow budget admitted");
+    snapshot.scene.shadowQuality->reserved = 1u;
+    context.Check(!ValidateRtPerformanceEvidence(snapshot, error), "nonzero shadow reserved word rejected");
+    snapshot.scene.shadowQuality = RtShadowQualityEvidence{static_cast<RtShadowMode>(255u), 1u, 1u, 0u};
+    context.Check(!ValidateRtPerformanceEvidence(snapshot, error), "unknown shadow mode rejected");
+    snapshot.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::DiagnosticLegacy, 4u, 2u, 0u};
+    context.Check(ValidateRtPerformanceEvidence(snapshot, error), "explicit legacy Max resolved budget remains named");
+    snapshot.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Current, 1u, 1u, 0u};
+    snapshot.scene.fireQuality = RtFireQualityEvidence{static_cast<RtFireQuality>(255u), 2u, 1u};
+    context.Check(!ValidateRtPerformanceEvidence(snapshot, error), "unknown fire tier rejected");
+}
 } // namespace
 
 int main()
@@ -2427,6 +2475,7 @@ int main()
     TestContext context;
     TestExecutionModeEvidence(context);
     TestFixedTextAndEnums(context);
+    TestUploadedQualityEvidence(context);
     TestStageAccumulatorAndConversion(context);
     TestSharedDurationStatistics(context);
     TestExternalStageSampleCollectionCore(context);
