@@ -2110,3 +2110,9 @@ changed A/D music YES, now owner PASS. No new SFX/haptic change in this slice.
 
 - Same SM-S948B/Android16 and Debug APK `5f344ce6f601b28c57ae3221872a05bfb351f14e045f9d62d91c18e017edaf60`, runtime d579. Compute completed route13/13, three captures and strict Home/Resume at the owner's saved50%. This is correctness/lifecycle evidence; differing Pipeline75/Compute50 scales are not matched image or performance comparisons.
 - Owner confirmed Use these settings / Keep and save was clear, Saved displayed50%, and the Interact preview was fixed on one line. Read-only persisted settings agreed; owner50% was retained. Changed enclosure, Keeper hold, shadow/fire quality, Shipping timing and other-device gates remain open. Private evidence stays outside Git.
+
+### 4 October 2026 - corrected descriptor-layout runtime03a49
+
+- Same allocatedSM-S948B/Android16; updated Debug APK `a8ed270afbfc8e30c517c11104f198ad09fd771177d6742c039d7d73d99fa151`, runtime `03a49ff169e6ac7bfe80758bf94a0114d35cbfcc`. Installed pullback matches and the owner preference file stayed byte-identical at50%, pendingfalse.
+- Both Pipeline and Compute independently passed route13/13, three captures and strict Home/Resume at50%. Exact ARM64 modules/ELF/alignment/notices/assets pass. This refresh follows correction of Diagnostic27 descriptor-layout scratch capacity; earlier d579 observations are historical.
+- Evidence class: actual local install/presentation/deterministic correctness/lifecycle. No sustained timing, same-frame parity, signed release or other-device certification is implied. Upper enclosure/new quality-choice acceptance and controlled Shipping timing remain separate.
