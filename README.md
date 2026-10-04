@@ -4,6 +4,7 @@ Horde Lantern RT is a native Vulkan hardware-ray-tracing technology demo for And
 
 - Public alpha: https://samfa12.itch.io/the-horde
 - Source repository: https://github.com/Samfa12-tech/The-Horde-RT-demo
+- Original Horde code: [MIT](LICENSE); assets, Pocket Audio Core and other separately licensed material are excluded. Read [licence scope](LICENSE_SCOPE.md).
 - Published Showcase Alpha: `1.6.1` / Android `versionCode 9`; Windows itch `#2055201`; Android itch `#2055202`
 - Public update announcement and frozen packages: [GitHub v1.6.1](https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.1) (non-draft prerelease)
 - Frozen GitHub ZIP SHA-256: `3e1cdca75d78e02dbc3bb48553b1db68b6b4bf3e459a784e2be5473ad198c2cf`; signed APK: `bc5c7ce3c755c16ec39e2c16fa9eae01c31983c7393e645f881c5bcc9e6a346c`
@@ -273,6 +274,22 @@ There are no packaging version defaults: candidate scripts require explicit `Ver
 Android native code is linked for 16 KiB page compatibility. The release uses a static C++ runtime, 16 KiB ELF `LOAD` alignment, and AGP 8.7.2 APK alignment; `package-alpha.ps1` rejects candidates that fail either APK or ELF verification or reintroduce `libc++_shared.so` from the r26 NDK.
 
 Never commit a keystore, signing properties, credentials, APK, or generated candidate directory. Losing the release JKS or its passwords prevents compatible Android updates.
+
+## Code licence and scope
+
+Sam Small's original Horde engine/game code is licensed under the [MIT License](LICENSE),
+with the exact code-versus-content boundary in [LICENSE_SCOPE.md](LICENSE_SCOPE.md).
+MIT permits commercial and closed-source reuse of that covered code while retaining
+the copyright and permission notice.
+
+This is a mixed-licence repository. Assets, models, textures, audio, fonts, branding,
+generated artwork, campaign content and third-party components are excluded from
+the root MIT grant and keep their separate terms. **Pocket Audio Core remains
+UNLICENSED and is explicitly excluded**; its vendored upstream MIT scope exception
+is unchanged. A public repository or the root MIT licence does not clear the
+remaining Hotstrike public-source or Pixabay redistribution questions. Consult
+[ASSET_LICENSES.md](ASSET_LICENSES.md), component notices and the
+[scope guide](LICENSE_SCOPE.md) before reusing or redistributing a complete game.
 
 ## Asset and licence policy
 

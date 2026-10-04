@@ -1,6 +1,6 @@
 # Horde 1.6.2 review candidate - 4 October 2026
 
-**Stopped at the owner's allowance threshold.** Read the [restart checkpoint](ENGINEERING_1_6_2_STOP_CHECKPOINT_2026_10_04.md); no work resumes until explicit owner authorization. Phone validation remains pending.
+**Explicitly resumed by the owner after replenishing allowance and reconnecting the allocated phone.** The [stopped checkpoint](ENGINEERING_1_6_2_STOP_CHECKPOINT_2026_10_04.md) remains historical evidence. Its081f84a4 CI37198696076 completed successfully. Private mist native admission is in progress; production mist remains unchanged and refreshed-APK phone validation is pending.
 
 Draft [PR18](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/18) contains runtime `3f9b294bd846b6d5e1c982986dc2f6c752abf973`. All six individual jobs in [CI37196417758](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37196417758) succeeded, including the affected ownership fixture in Clang ASan/UBSan. Subsequent documentation commits need their own CI. This is an unpublished review candidate with the gates below still open. Read this record before historical “current” labels in the older handoffs; the [second-pass ledger](ENGINEERING_1_6_2_SECOND_PASS.md) preserves chronology and negatives.
 
