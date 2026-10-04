@@ -1,5 +1,7 @@
 # Horde 1.6.2 frozen completion scope
 
+**Current execution:** the authorized second pass has proceeded; [review-candidate status](ENGINEERING_1_6_2_REVIEW_CANDIDATE.md) identifies runtime89fec/current packages and open gates. The earlier queue/CI/runtime95 labels below describe their historical checkpoint. Release hold and independent final assistant/owner approvals still apply.
+
 **4 October release hold:** finish the current bounded closeout, then propose the second-pass plan recorded in [the handoff](ENGINEERING_1_6_2_HANDOFF.md) before implementation. That explicit owner request supersedes the earlier additions freeze for the queued work; S24 retesting is deferred. Group remaining current visual/audio/haptic checks and, after additions, revalidate changed or affected behavior while preserving existing specific approvals. The final exact candidate requires a full independent assistant review via the parent and explicit release approval before merge or public release. Green CI and coding completion alone do not grant that authority.
 
 Owner froze new additions on 3 October. The accepted implementation goal and requests received before that freeze remain in scope. New ideas belong in the follow-up backlog. This checklist distinguishes completed source work, required validation, and bounded investigations; an investigation is not a promised performance gain.

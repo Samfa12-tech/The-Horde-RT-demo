@@ -1,5 +1,7 @@
 # Horde 1.6.2 execution checkpoint
 
+**Current 4 October status:** use the [compact review-candidate record](ENGINEERING_1_6_2_REVIEW_CANDIDATE.md) and [second-pass ledger](ENGINEERING_1_6_2_SECOND_PASS.md) first. Runtime89fec has fresh Windows/Android packages and all six CI jobs passed. The earlier runtime95 and “queued second pass” text below are preserved historical checkpoints. Mist polish, exact final-device admission, owner gates and independent final review remain open; no release authority is implied.
+
 ## Release hold and queued second pass (4 October)
 
 The owner has expanded the pre-release requirements. Finish this current bounded validation and closeout first; do not start the additions concurrently. Completion of the old scope does not authorize merging or releasing 1.6.2. After closeout, report its status and propose a bounded implementation/measurement plan before starting the second pass.

@@ -1,5 +1,7 @@
 # 1.6.2 current development candidate
 
+**Superseding checkpoint, 4 October:** the latest packaged runtime is89fec, identified in the [compact review-candidate record](ENGINEERING_1_6_2_REVIEW_CANDIDATE.md). Read that record and the [second-pass ledger](ENGINEERING_1_6_2_SECOND_PASS.md) before the historical runtime95 artifacts below. New packages are unpublished and final owner/device/mist/review gates remain open.
+
 **Current runtime candidate:** `95eb08070354d4b3b775e6d2368cca8688f9cfe6` corrects the pre-existing reset/resume ordering bug and waits for native Alive acknowledgment before leaving the death menu. Runtime95's six jobs in [CI37155231702](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37155231702) passed, individually checked. Tool/fixture head `f06705bfcdce77cd00e096f091f6854f6695c0b6` is pushed with [current PR checks](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/18/checks) in progress; no six-green claim applies to it yet. See [death-recovery scope](ENGINEERING_1_6_2_DEATH_RECOVERY.md). This is an admitted development candidate, not release or complete owner acceptance; the final documentation commit needs its own CI. Historical evidence below retains its exact older artifact identity.
 
 | Current death-recovery artifact | SHA256 | Evidence |
