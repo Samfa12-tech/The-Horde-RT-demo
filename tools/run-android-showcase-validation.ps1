@@ -184,6 +184,8 @@ $lifecycleEvidence = [ordered]@{
     requested = [bool]$Capture
     homeResumePassed = $false
     honestPresentationAfterResume = $false
+    completedOwningFrameAfterResume = $false
+    completedOwningFrameStatus = 'NotRequested'
     log = $null
 }
 
@@ -583,8 +585,175 @@ function Invoke-CaptureCheckpoint {
     })
 }
 
+function Get-HomeResumePresentedGeneration {
+    param([string]$Log, [string]$ProcessId)
+    if ($ProcessId -cnotmatch '^[1-9]\d*$') { throw 'Home/resume requires one actual app PID.' }
+    $pattern = '(?m)^\S+\s+\S+\s+' + [regex]::Escape($ProcessId) +
+        '\s+\d+\s+[VDIWEF]\s+HordeRtProbeBridge\s*:\s+HORDE_SURFACE_PRESENTED generation=(\d+)\b'
+    $matches = [regex]::Matches($Log, $pattern)
+    if (-not $matches.Count) { throw 'No scoped own-process surface presentation generation was recorded.' }
+    return [long]$matches[$matches.Count - 1].Groups[1].Value
+}
+
+function Assert-HomeResumeCompletedFrame {
+    param($BeforeCapability, $InitialCapability, $Capability, [long]$BeforeSurfaceGeneration,
+          [string]$ProcessId, [string]$CurrentProcessId, [string]$Log, [string]$ExpectedBackend, $ExpectedBundle = $null)
+    if ($ProcessId -cnotmatch '^[1-9]\d*$' -or $CurrentProcessId -cne $ProcessId) {
+        throw 'Home/resume changed or lost its actual app process; no prior process packet is reused.'
+    }
+    $generation = Get-HomeResumePresentedGeneration -Log $Log -ProcessId $ProcessId
+    if ($BeforeSurfaceGeneration -lt 1 -or $generation -le $BeforeSurfaceGeneration) {
+        throw 'No newer own-process surface presentation generation was observed.'
+    }
+    $requestPattern = '(?m)^\S+\s+\S+\s+' + [regex]::Escape($ProcessId) +
+        '\s+\d+\s+[VDIWEF]\s+HordeRtProbeBridge\s*:\s+HORDE_SURFACE_REQUEST generation=' + $generation + '\b'
+    $request = [regex]::Match($Log, $requestPattern)
+    $presentPattern = '(?m)^\S+\s+\S+\s+' + [regex]::Escape($ProcessId) +
+        '\s+\d+\s+[VDIWEF]\s+HordeRtProbeBridge\s*:\s+HORDE_SURFACE_PRESENTED generation=' + $generation + '\b'
+    $present = [regex]::Match($Log, $presentPattern)
+    if (-not $request.Success -or -not $present.Success -or $request.Index -ge $present.Index) {
+        throw 'Fresh surface REQUEST/PRESENTED do not form one ordered own-process generation.'
+    }
+    $latestRequestPattern = '(?m)^\S+\s+\S+\s+' + [regex]::Escape($ProcessId) +
+        '\s+\d+\s+[VDIWEF]\s+HordeRtProbeBridge\s*:\s+HORDE_SURFACE_REQUEST generation=(\d+)\b'
+    $requests = [regex]::Matches($Log, $latestRequestPattern)
+    $cancelPattern = '(?m)^\S+\s+\S+\s+' + [regex]::Escape($ProcessId) +
+        '\s+\d+\s+[VDIWEF]\s+HordeRtProbeBridge\s*:\s+HORDE_SURFACE_CANCEL generation=' + $generation + '\b'
+    $cancel = [regex]::Match($Log, $cancelPattern)
+    if ([long]$requests[$requests.Count - 1].Groups[1].Value -ne $generation -or
+        $cancel.Success) {
+        throw 'A newer request or cancellation superseded the post-Home surface proof.'
+    }
+    Assert-ShowcaseExecutionBackend -ExpectedBackend $ExpectedBackend -Backend $Capability.executionBackend -Presented $Capability.rtScene.presented
+    $before = $BeforeCapability.rtFrameEvidence
+    $initial = $InitialCapability.rtFrameEvidence
+    $e = $Capability.rtFrameEvidence
+    foreach ($value in @($before.sceneEpoch, $initial.sceneEpoch, $initial.measurementGeneration, $e.sceneEpoch, $e.measurementGeneration)) {
+        if (($value -isnot [int] -and $value -isnot [long]) -or $value -le 0) {
+            throw 'Home/resume has no exact positive native epoch/generation floor.'
+        }
+    }
+    if ($initial.sceneEpoch -le $before.sceneEpoch -or $e.sceneEpoch -ne $initial.sceneEpoch -or
+        $e.measurementGeneration -lt $initial.measurementGeneration) {
+        throw 'Completed frame is not from the fresh post-Home scene epoch.'
+    }
+    foreach ($flag in @($e.observerAvailable, $e.running, $e.presented)) {
+        if ($flag -isnot [bool] -or -not $flag) { throw 'Fresh observer is not running and RT-presented.' }
+    }
+    $c = $e.completedFrame
+    if ($e.completedFrameStatus -cne 'available' -or $null -eq $c) {
+        throw 'Fresh owning completed RT frame has not been published yet.'
+    }
+    $id = $c.identity
+    foreach ($value in @($id.sceneEpoch, $id.measurementGeneration, $id.recordAttemptSerial,
+        $id.recordSerial, $id.submissionSerial, $id.completionSerial)) {
+        if (($value -isnot [int] -and $value -isnot [long]) -or $value -le 0) {
+            throw 'Completed owner identity contains a missing/nonintegral serial.'
+        }
+    }
+    if ($id.sceneEpoch -ne $e.sceneEpoch -or $id.measurementGeneration -ne $e.measurementGeneration -or
+        $id.frameSlot -ne 0 -or $id.recordAttemptSerial -lt $id.recordSerial) {
+        throw 'Completed owner identity does not join the current publication and single frame slot.'
+    }
+    # Serial floors are scoped to an epoch. A fresh epoch may legitimately reset
+    # serials; never compare them numerically to a different epoch's counters.
+    if ($before.sceneEpoch -eq $id.sceneEpoch -and $null -ne $before.completedFrame -and
+        ($id.submissionSerial -le $before.completedFrame.identity.submissionSerial -or
+         $id.completionSerial -le $before.completedFrame.identity.completionSerial)) {
+        throw 'Completed frame did not advance its same-epoch serial floors.'
+    }
+    foreach ($flag in @($c.dispatch.sceneReady, $c.dispatch.rtDispatchRecorded, $c.dispatch.swapchainCopyRecorded,
+        $c.presentation.presented, $c.dielectric.available, $c.dielectric.compiled)) {
+        if ($flag -isnot [bool] -or -not $flag) { throw 'Completed frame lacks real dispatch/copy/presentation/Diagnostic evidence.' }
+    }
+    if ($c.presentation.outcome -cne 'presented' -or $c.presentation.finalIdleCompletion -isnot [bool] -or
+        $c.presentation.finalIdleCompletion -or $c.presentation.lastSuccessfulPresentSubmissionSerial -ne $id.submissionSerial -or
+        $c.stages.status -cne 'valid' -or $c.dielectric.status -cne 'valid' -or
+        $c.dielectric.completedSubmissionSerial -ne $id.submissionSerial) {
+        throw 'Completed frame is not an ordinary successful owning fence/Diagnostic join.'
+    }
+    if ($c.gpu.status -ceq 'valid' -and $c.gpu.completedSubmissionSerial -ne $id.submissionSerial) {
+        throw 'Available GPU sample belongs to a different submission.'
+    }
+    Assert-ShowcaseExecutionBackend -ExpectedBackend $ExpectedBackend -Backend $c.pipeline.executionBackend -Presented $c.presentation.presented -Bundle $c.pipeline
+    foreach ($strategy in @('opaqueFast','genericDielectric')) {
+        if ([string]$c.pipeline.$strategy.sha256 -cnotmatch '^[0-9a-f]{64}$') {
+            throw 'Completed frame has no exact selected module hashes.'
+        }
+        foreach ($reference in @($before.completedFrame.pipeline, $ExpectedBundle)) {
+            if ($null -ne $reference -and
+                ([string]$c.pipeline.$strategy.key -cne [string]$reference.$strategy.key -or
+                 [string]$c.pipeline.$strategy.sha256 -cne [string]$reference.$strategy.sha256)) {
+                throw 'Post-Home completed frame changed the exact selected RT module pair.'
+            }
+        }
+    }
+    return [pscustomobject]@{ processId=$ProcessId; surfaceGeneration=$generation;
+        beforeSurfaceGeneration=$BeforeSurfaceGeneration; sceneEpoch=$id.sceneEpoch;
+        measurementGeneration=$id.measurementGeneration; identity=$id; executionBackend=$c.pipeline.executionBackend;
+        gpuStatus=$c.gpu.status; diagnosticStatus=$c.dielectric.status;
+        surfaceGenerationJoin='scoped own-PID REQUEST/PRESENTED plus fresh native scene epoch; capability has no surfaceGeneration field' }
+}
+
+function Invoke-BoundedHomeResumeRead {
+    param([string[]]$Arguments, [int]$TimeoutMilliseconds)
+    if ($TimeoutMilliseconds -lt 1) { throw 'Home/resume owning-frame deadline expired.' }
+    $start = [Diagnostics.ProcessStartInfo]::new()
+    $start.FileName = $adb; $start.UseShellExecute = $false; $start.CreateNoWindow = $true
+    $start.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
+    $start.RedirectStandardOutput = $true; $start.RedirectStandardError = $true
+    foreach ($argument in (@('-s', $DeviceSerial) + $Arguments)) { $start.ArgumentList.Add($argument) }
+    $process = [Diagnostics.Process]::Start($start)
+    try {
+        $stdout = $process.StandardOutput.ReadToEndAsync(); $stderr = $process.StandardError.ReadToEndAsync()
+        if (-not $process.WaitForExit($TimeoutMilliseconds)) { $process.Kill(); throw 'Bounded Home/resume read timed out.' }
+        $output = $stdout.GetAwaiter().GetResult(); $errorText = $stderr.GetAwaiter().GetResult()
+        if ($process.ExitCode -ne 0) { throw "Home/resume read failed: $errorText" }
+        return $output.TrimEnd()
+    } finally { $process.Dispose() }
+}
+
+function Wait-HomeResumeCompletedFrame {
+    param($BeforeCapability, $InitialCapability, [long]$BeforeSurfaceGeneration, [string]$ProcessId,
+          [string]$StartTimestamp, [string]$ExpectedBackend, [string]$DestinationDirectory,
+          [ValidateRange(1,60000)][int]$BudgetMilliseconds = 60000)
+    $clock = [Diagnostics.Stopwatch]::StartNew(); $attempt = 0; $lastReason = 'No read completed.'
+    do {
+        ++$attempt
+        $prefix = Join-Path $DestinationDirectory ('lifecycle-owning-attempt-{0:d3}' -f $attempt)
+        try {
+            $remaining = $BudgetMilliseconds - [int]$clock.ElapsedMilliseconds
+            $currentProcessId = (Invoke-BoundedHomeResumeRead @('shell','pidof',$packageName) ([Math]::Min(5000,$remaining))).Trim()
+            if ($currentProcessId -cne $ProcessId) { throw 'Home/resume app PID changed; no other process is admitted.' }
+            $remaining = $BudgetMilliseconds - [int]$clock.ElapsedMilliseconds
+            $raw = Invoke-BoundedHomeResumeRead @('shell','run-as',$packageName,'cat','files/reports/vulkan_capability_report.json') ([Math]::Min(5000,$remaining))
+            $raw | Set-Content -LiteralPath ($prefix + '-capability.json') -Encoding utf8
+            $capability = $raw | ConvertFrom-Json # Concurrent native file write may need the next bounded read.
+            $remaining = $BudgetMilliseconds - [int]$clock.ElapsedMilliseconds
+            $log = Invoke-BoundedHomeResumeRead (New-ScopedLogcatArguments $StartTimestamp $ProcessId) ([Math]::Min(5000,$remaining))
+            $log | Set-Content -LiteralPath ($prefix + '-logcat.txt') -Encoding utf8
+            $proof = Assert-HomeResumeCompletedFrame $BeforeCapability $InitialCapability $capability $BeforeSurfaceGeneration $ProcessId $currentProcessId $log $ExpectedBackend $script:selectedRtPipelineBundle
+            if ($clock.ElapsedMilliseconds -ge $BudgetMilliseconds) { throw 'Home/resume owning-frame deadline expired before admission.' }
+            $proof | Add-Member -NotePropertyName capabilityFile -NotePropertyValue ([IO.Path]::GetFileName($prefix + '-capability.json'))
+            $proof | Add-Member -NotePropertyName logFile -NotePropertyValue ([IO.Path]::GetFileName($prefix + '-logcat.txt'))
+            $proof | Add-Member -NotePropertyName elapsedMilliseconds -NotePropertyValue $clock.ElapsedMilliseconds
+            $proof | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $DestinationDirectory 'lifecycle-home-resume-owning-frame.json') -Encoding utf8
+            return $proof
+        } catch {
+            $lastReason = $_.Exception.Message
+            if ($lastReason -match 'PID changed|process; no prior') { throw }
+        }
+        $remaining = $BudgetMilliseconds - [int]$clock.ElapsedMilliseconds
+        if ($remaining -gt 0) { Start-Sleep -Milliseconds ([Math]::Min(750,$remaining)) }
+    } while ($clock.ElapsedMilliseconds -lt $BudgetMilliseconds)
+    throw "No fresh completed owning RT frame within bounded Home/resume read budget: $lastReason"
+}
+
 function Invoke-HomeResumeLifecycleCheck {
     Write-Host "Checking Android Home/resume surface recreation..."
+    $beforeProcessId = (Invoke-AdbText @('shell','pidof',$packageName)).Trim()
+    $beforeCapability = Get-ShowcaseCapability -Destination (Join-Path $outputDirectory 'lifecycle-pre-home-capability.json')
+    $beforeSurfaceGeneration = Get-HomeResumePresentedGeneration -Log (Get-ScopedLogcat -WholeRun) -ProcessId $beforeProcessId
     Start-ScopedLogWindow
     $beforeLog = Get-ScopedLogcat
     $presentationPattern = "RT frame reached Android swapchain presentation"
@@ -609,6 +778,26 @@ function Invoke-HomeResumeLifecycleCheck {
     $lifecycleEvidence.honestPresentationAfterResume = $true
     $lifecycleEvidence.log = "lifecycle-home-resume-logcat.txt"
     $resumeLog | Set-Content -LiteralPath (Join-Path $outputDirectory $lifecycleEvidence.log) -Encoding utf8
+    $lifecycleEvidence.completedOwningFrameAfterResume = $false
+    $lifecycleEvidence.completedOwningFrameStatus = 'Pending'
+    $lifecycleEvidence.beforeProcessId = $beforeProcessId
+    $lifecycleEvidence.beforeSurfaceGeneration = $beforeSurfaceGeneration
+    $lifecycleEvidence.beforeSceneEpoch = $beforeCapability.rtFrameEvidence.sceneEpoch
+    $lifecycleEvidence.beforeCompletedIdentity = $beforeCapability.rtFrameEvidence.completedFrame.identity
+    try {
+        $proof = Wait-HomeResumeCompletedFrame -BeforeCapability $beforeCapability -InitialCapability $resumeCapability `
+            -BeforeSurfaceGeneration $beforeSurfaceGeneration -ProcessId $beforeProcessId -StartTimestamp $script:operationLogStart `
+            -ExpectedBackend $requestedExecutionBackend -DestinationDirectory $outputDirectory
+        $lifecycleEvidence.completedOwningFrameAfterResume = $true
+        $lifecycleEvidence.completedOwningFrameStatus = 'Verified'
+        $lifecycleEvidence.completedOwningFrame = $proof
+    } catch {
+        $lifecycleEvidence.completedOwningFrameStatus = 'NotVerified'
+        $lifecycleEvidence.completedOwningFrameFailure = $_.Exception.Message
+        throw
+    } finally {
+        $lifecycleEvidence | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath (Join-Path $outputDirectory 'lifecycle-home-resume-evidence.json') -Encoding utf8
+    }
 }
 
 function Start-AutomationSession {

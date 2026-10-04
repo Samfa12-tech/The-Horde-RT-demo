@@ -6,7 +6,8 @@ if($errors.Count){throw ($errors | Out-String)}
 foreach($name in @('Get-ExpectedShowcaseInstanceCapacity','New-ScopedLogcatArguments','Start-ScopedLogWindow','Get-ScopedLogcat',
     'Get-ShowcaseBackendIntentArguments','Get-ShowcaseInstallArguments','Assert-ShowcaseComputeUserZero','Assert-ShowcaseExecutionBackend',
     'Register-ShowcaseBackendEvidence','Get-ShowcaseState','Get-ShowcaseCapability','Start-AutomationSession',
-    'Send-AutomationIntent','Invoke-HomeResumeLifecycleCheck','Wait-ForLogPattern')){
+    'Send-AutomationIntent','Invoke-HomeResumeLifecycleCheck','Wait-ForLogPattern',
+    'Get-HomeResumePresentedGeneration','Assert-HomeResumeCompletedFrame','Invoke-BoundedHomeResumeRead','Wait-HomeResumeCompletedFrame')){
     $definition=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
     if($definition.Count -ne 1){throw "Expected one runner function: $name"}
     . ([scriptblock]::Create($definition[0].Extent.Text))
@@ -80,6 +81,21 @@ $computeBundle=[pscustomobject]@{
     opaqueFast=[pscustomobject]@{key='rayquery_compute_diagnostic_mobile_opaque_fast';sha256=('c'*64)}
     genericDielectric=[pscustomobject]@{key='rayquery_compute_diagnostic_mobile_generic_dielectric';sha256=('d'*64)}
 }
+function New-HomeCapability([long]$Epoch, [bool]$Completed) {
+    $pipeline=[pscustomobject]@{executionBackend='RayQueryCompute';opaqueFast=$computeBundle.opaqueFast;genericDielectric=$computeBundle.genericDielectric}
+    $frame=[pscustomobject]@{
+        identity=[pscustomobject]@{sceneEpoch=$Epoch;measurementGeneration=6;recordAttemptSerial=1;recordSerial=1;submissionSerial=1;completionSerial=1;frameSlot=0;simulationTick=27}
+        pipeline=$pipeline
+        dispatch=[pscustomobject]@{sceneReady=$true;rtDispatchRecorded=$true;swapchainCopyRecorded=$true}
+        presentation=[pscustomobject]@{presented=$true;outcome='presented';finalIdleCompletion=$false;lastSuccessfulPresentSubmissionSerial=1}
+        stages=[pscustomobject]@{status='valid'}
+        dielectric=[pscustomobject]@{available=$true;compiled=$true;status='valid';completedSubmissionSerial=1}
+        gpu=[pscustomobject]@{status='valid';completedSubmissionSerial=1}
+    }
+    return [pscustomobject]@{rtMode='RayTracingPipeline';executionBackend='RayQueryCompute';rtScene=[pscustomobject]@{presented=$true}
+        rtFrameEvidence=[pscustomobject]@{sceneEpoch=$Epoch;measurementGeneration=6;observerAvailable=$true;running=$true;presented=$true
+            completedFrameStatus=$(if($Completed){'available'}else{'pending'});completedFrame=$(if($Completed){$frame}else{$null})}}
+}
 Assert-ShowcaseExecutionBackend 'RayTracingPipeline' 'RayTracingPipeline' $true $pipelineBundle
 Assert-ShowcaseExecutionBackend 'RayQueryCompute' 'RayQueryCompute' $true $computeBundle
 foreach($backend in @('RayTracingPipeline','RayQuery','Unsupported','Raster','')) {
@@ -103,16 +119,35 @@ try {
     $fixtureState=[pscustomobject]@{executionBackend='RayQueryCompute';presented=$true;selectedRtPipelineBundle=$computeBundle}
     # Max supported rtMode deliberately differs: only actual executionBackend
     # and RT-produced presentation can certify the selected Compute route.
-    $fixtureCapability=[pscustomobject]@{rtMode='RayTracingPipeline';executionBackend='RayQueryCompute';rtScene=[pscustomobject]@{presented=$true}}
+    $beforeHomeCapability=New-HomeCapability 10 $true
+    $beforeHomeCapability.rtFrameEvidence.completedFrame.identity.submissionSerial=900
+    $beforeHomeCapability.rtFrameEvidence.completedFrame.identity.completionSerial=900
+    $fixtureCapability=New-HomeCapability 12 $false
+    $freshHomeCapability=New-HomeCapability 12 $true
+    $preHomeLog="10-04 12:00:00.100 4242 4243 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=1`nRT frame reached Android swapchain presentation"
+    $postHomeLog="10-04 12:00:01.100 4242 4243 I HordeRtProbeBridge: HORDE_SURFACE_REQUEST generation=3`n10-04 12:00:02.100 4242 4243 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=3`nRT frame reached Android swapchain presentation"
     function Save-PrivateFile {
         param([string]$RemotePath,[string]$Destination)
-        $value=if($RemotePath.EndsWith('vulkan_capability_report.json')){$fixtureCapability}else{$fixtureState}
-        $value | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $Destination
+        $value=if($RemotePath.EndsWith('vulkan_capability_report.json')){
+            if($Destination.EndsWith('lifecycle-pre-home-capability.json')){$beforeHomeCapability}else{$fixtureCapability}
+        }else{$fixtureState}
+        $value | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $Destination
     }
     function Register-SelectedRtPipelineBundle {param($Bundle,[string]$Context); Check ($Bundle.opaqueFast.sha256 -ceq ('c'*64)) 'Native state continues selected-bundle registration.'}
     function Start-Sleep {param([int]$Milliseconds)} # Lifecycle waits are injected, too.
     $script:resumeReads=0
-    function Get-ScopedLogcat {param([switch]$WholeRun);$script:resumeReads++;if($script:resumeReads -gt 1){return 'RT frame reached Android swapchain presentation'};return ''}
+    function Get-ScopedLogcat {param([switch]$WholeRun);$script:resumeReads++;if($script:resumeReads -gt 2){return "$preHomeLog`n$postHomeLog"};return $preHomeLog}
+    $script:owningCapabilityReads=0
+    $script:owningReadTimeouts=[Collections.Generic.List[int]]::new()
+    function Invoke-BoundedHomeResumeRead {
+        param([string[]]$Arguments,[int]$TimeoutMilliseconds)
+        $script:owningReadTimeouts.Add($TimeoutMilliseconds)
+        if($Arguments[0] -ceq 'shell' -and $Arguments[1] -ceq 'pidof'){return '4242'}
+        if($Arguments[0] -ceq 'logcat'){return $postHomeLog}
+        $script:owningCapabilityReads++
+        $value=if($script:owningCapabilityReads -eq 1){$fixtureCapability}else{$freshHomeCapability}
+        return ($value | ConvertTo-Json -Depth 12)
+    }
     $observedArguments.Clear()
     Start-AutomationSession -RequestedScale 75
     Send-AutomationIntent -Checkpoint 'opening' -RequestedScale 75
@@ -127,6 +162,53 @@ try {
     }
     Check ($lifecycleEvidence.homeResumePassed -and $lifecycleEvidence.honestPresentationAfterResume -and
         $lifecycleEvidence.effectiveExecutionBackend -ceq 'RayQueryCompute') 'Resume acceptance requires a fresh matching capability report.'
+    Check ($lifecycleEvidence.completedOwningFrameAfterResume -and $lifecycleEvidence.completedOwningFrameStatus -ceq 'Verified' -and
+        $lifecycleEvidence.completedOwningFrame.surfaceGeneration -eq 3 -and $script:owningCapabilityReads -eq 2) 'Real collector retains initial pending proof and waits for one fresh completed owning frame.'
+    $initialSaved=Get-Content (Join-Path $outputDirectory 'lifecycle-home-resume-capability.json') -Raw | ConvertFrom-Json
+    Check ($initialSaved.rtFrameEvidence.completedFrameStatus -ceq 'pending' -and
+        (Test-Path (Join-Path $outputDirectory 'lifecycle-owning-attempt-001-capability.json')) -and
+        (Test-Path (Join-Path $outputDirectory 'lifecycle-owning-attempt-002-capability.json'))) 'Initial post-Home pending packet and each subsequent attempt are preserved separately.'
+    Check (($script:owningReadTimeouts | Where-Object {$_ -lt 1 -or $_ -gt 5000}).Count -eq 0) 'Every collector transport read has a bounded remaining deadline.'
+    $proof=Assert-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability $freshHomeCapability 1 '4242' '4242' $postHomeLog 'RayQueryCompute'
+    Check ($proof.identity.completionSerial -eq 1) 'Fresh-epoch completion1 is valid despite older-epoch completion900; no invented cross-epoch serial floor.'
+    Reject {Assert-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability $fixtureCapability 1 '4242' '4242' $postHomeLog 'RayQueryCompute'}
+    Reject {Assert-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability $freshHomeCapability 1 '4242' '5000' $postHomeLog 'RayQueryCompute'}
+    Reject {Assert-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability $freshHomeCapability 3 '4242' '4242' $postHomeLog 'RayQueryCompute'}
+    Reject {Assert-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability $freshHomeCapability 1 '4242' '4242' ($postHomeLog.Replace('4242','5000')) 'RayQueryCompute'}
+    Reject {Assert-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability $freshHomeCapability 1 '4242' '4242' ($postHomeLog.Replace('REQUEST generation=3','REQUEST generation=4')) 'RayQueryCompute'}
+    Reject {Assert-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability $freshHomeCapability 1 '4242' '4242' ($postHomeLog + "`n10-04 12:00:03.100 4242 4243 I HordeRtProbeBridge: HORDE_SURFACE_REQUEST generation=5") 'RayQueryCompute'}
+    Reject {Assert-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability $freshHomeCapability 1 '4242' '4242' ($postHomeLog + "`n10-04 12:00:03.100 4242 4243 I HordeRtProbeBridge: HORDE_SURFACE_CANCEL generation=3") 'RayQueryCompute'}
+    $cancelBeforePresent=$postHomeLog.Replace('HORDE_SURFACE_PRESENTED generation=3',"HORDE_SURFACE_CANCEL generation=3`n10-04 12:00:02.900 4242 4243 I HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=3")
+    Reject {Assert-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability $freshHomeCapability 1 '4242' '4242' $cancelBeforePresent 'RayQueryCompute'}
+    $olderInitial=$fixtureCapability | ConvertTo-Json -Depth 12 | ConvertFrom-Json
+    $olderCompleted=$freshHomeCapability | ConvertTo-Json -Depth 12 | ConvertFrom-Json
+    $olderInitial.rtFrameEvidence.sceneEpoch=9
+    $olderCompleted.rtFrameEvidence.sceneEpoch=9
+    $olderCompleted.rtFrameEvidence.completedFrame.identity.sceneEpoch=9
+    Reject {Assert-HomeResumeCompletedFrame $beforeHomeCapability $olderInitial $olderCompleted 1 '4242' '4242' $postHomeLog 'RayQueryCompute'}
+    $olderScope=$freshHomeCapability | ConvertTo-Json -Depth 12 | ConvertFrom-Json
+    $olderScope.rtFrameEvidence.measurementGeneration=5
+    $olderScope.rtFrameEvidence.completedFrame.identity.measurementGeneration=5
+    Reject {Assert-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability $olderScope 1 '4242' '4242' $postHomeLog 'RayQueryCompute'}
+    foreach($mutation in @(
+        {param($c) $c.rtFrameEvidence.sceneEpoch=10},
+        {param($c) $c.rtFrameEvidence.completedFrame.identity.measurementGeneration=5},
+        {param($c) $c.rtFrameEvidence.completedFrame.identity.completionSerial=0},
+        {param($c) $c.rtFrameEvidence.completedFrame.presentation.outcome='presented-needs-recreate'},
+        {param($c) $c.rtFrameEvidence.completedFrame.dispatch.rtDispatchRecorded=$false},
+        {param($c) $c.rtFrameEvidence.completedFrame.dielectric.completedSubmissionSerial=2},
+        {param($c) $c.rtFrameEvidence.completedFrame.gpu.completedSubmissionSerial=2},
+        {param($c) $c.rtFrameEvidence.completedFrame.pipeline.opaqueFast.sha256=('e'*64)},
+        {param($c) $c.rtFrameEvidence.completedFrame.pipeline.genericDielectric.key='rayquery_compute_diagnostic_high_generic_dielectric'},
+        {param($c) $c.rtFrameEvidence.completedFrame.pipeline.executionBackend='RayTracingPipeline'})) {
+        $changed=$freshHomeCapability | ConvertTo-Json -Depth 12 | ConvertFrom-Json
+        & $mutation $changed
+        Reject {Assert-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability $changed 1 '4242' '4242' $postHomeLog 'RayQueryCompute'}
+    }
+    $script:owningCapabilityReads=0
+    function Invoke-BoundedHomeResumeRead {param([string[]]$Arguments,[int]$TimeoutMilliseconds);throw 'Injected read timeout; no device action.'}
+    Reject {Wait-HomeResumeCompletedFrame $beforeHomeCapability $fixtureCapability 1 '4242' '1791000001.123456789' 'RayQueryCompute' $outputDirectory -BudgetMilliseconds 1}
+    Check ($lifecycleEvidence.homeResumePassed -and $lifecycleEvidence.honestPresentationAfterResume) 'Owning-frame negative evidence never rewrites legacy first-present booleans.'
     $null=Get-ShowcaseState -Destination (Join-Path $backendFixture 'synthetic-state.json')
     Check ($backendSelectionEvidence.status -ceq 'Accepted' -and $backendSelectionEvidence.effective -ceq 'RayQueryCompute') 'Native state metadata separates requested and accepted effective backend.'
     $fixtureState.executionBackend='RayTracingPipeline'
