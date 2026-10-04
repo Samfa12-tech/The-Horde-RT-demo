@@ -1,5 +1,7 @@
 #pragma once
 
+#include "scene/ShowcaseOverheadGeometry.h"
+
 #include <array>
 #include <cmath>
 #include <vector>
@@ -13,6 +15,30 @@ struct OpaqueDressingQuad
     unsigned int normalCode;
 };
 enum class DressingLeafPlane { Horizontal, WallFacing };
+
+// Four closed masonry walls around a clear rectangular aperture. The inner
+// footprint stays open at every height; each wall's top is a real receding rim.
+// These neutral solids use the ordinary world-box authoring and RT paths.
+constexpr std::array<OverheadVolume, 4u> MakeMasonryWell(
+    float minX, float minZ, float maxX, float maxZ,
+    float bottomY, float topY, float thickness)
+{
+    return {{
+        RectangularOverhead(minX - thickness, minZ - thickness,
+            minX, maxZ + thickness, bottomY, topY),
+        RectangularOverhead(maxX, minZ - thickness,
+            maxX + thickness, maxZ + thickness, bottomY, topY),
+        RectangularOverhead(minX, minZ - thickness,
+            maxX, minZ, bottomY, topY),
+        RectangularOverhead(minX, maxZ,
+            maxX, maxZ + thickness, bottomY, topY),
+    }};
+}
+
+// First-bend wall panel, distinct from both chamber skylights. Begin at the
+// retained roof height so the front rim never reduces player/held clearance.
+inline constexpr auto kWallPanelMasonryWell = MakeMasonryWell(
+    2.05f, -8.80f, 3.10f, -8.35f, kShowcaseRouteCeilingWorldY, 4.10f, 0.16f);
 
 // Static opaque mesh authoring data. Leaves have an actual diamond silhouette
 // and thickness: no alpha cards, invisible obstruction or extra texture fetch.

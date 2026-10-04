@@ -142,10 +142,13 @@ void TestKeeperReveal(Check&& check)
     back.yawRadians = 1.0f;
     back.commands.attack = 1u;
     retreat.AdvanceFrame(back, 1.0 / 60.0);
-    check(retreat.Snapshot().activeEnemyKind == EnemyKind::Skeleton &&
+    check(retreat.Snapshot().activeEnemyKind == EnemyKind::Lich &&
+          NearlyEqual(retreat.Snapshot().playerX, arrival.authoritativePlayerX) &&
+          NearlyEqual(retreat.Snapshot().playerZ, arrival.authoritativePlayerZ) &&
+          NearlyEqual(retreat.Snapshot().playerYawRadians, back.yawRadians) &&
           retreat.Snapshot().lich.revealElapsedSeconds > frozen.revealElapsedSeconds &&
           NearlyEqual(retreat.Snapshot().lich.x, kKeeperStagingPosition.x),
-          "looking away and retreating beyond route selection cannot reset or hold the reveal");
+          "intro holds translation while allowing look and advancing the reveal clock");
     for (int tick = 0; tick < 160; ++tick)
     {
         retreat.AdvanceFrame(back, 1.0 / 60.0);
@@ -173,12 +176,69 @@ void TestKeeperReveal(Check&& check)
     {
         retreatSafety.StepFixed(nearGuard);
         stayedInvulnerable = stayedInvulnerable && retreatSafety.Snapshot().playerVitals.vitality == 3 &&
+            NearlyEqual(retreatSafety.Snapshot().playerX, safeArrival.authoritativePlayerX) &&
+            NearlyEqual(retreatSafety.Snapshot().playerZ, safeArrival.authoritativePlayerZ) &&
             CountEvents(retreatSafety.Events(), GameplayEventType::PlayerDamaged) == 0u &&
             CountEvents(retreatSafety.Events(), GameplayEventType::PlayerKilled) == 0u;
         retreatSafety.ClearEvents();
     }
     check(stayedInvulnerable && !retreatSafety.Snapshot().lich.revealComplete,
-          "reveal invulnerability remains authoritative when retreat reaches a surviving guard");
+          "authoritative pose publications cannot bypass the harmless intro translation hold");
+
+    GameSimulation held;
+    held.ApplyShowcaseCheckpoint(8);
+    InputSnapshot beforeArrival = arrival;
+    beforeArrival.authoritativePlayerX = 4.2f;
+    beforeArrival.authoritativePlayerZ = -15.2f;
+    beforeArrival.commands.attack = 1u;
+    held.StepFixed(beforeArrival);
+    check(held.Snapshot().playerCombat.action != PlayerCombatAction::Idle,
+          "approach fixture begins with an ordinary live sword cut");
+    held.ClearEvents();
+    InputSnapshot heldInput = arrival;
+    heldInput.commands.attack = 3u;
+    heldInput.commands.parry = 1u;
+    held.StepFixed(heldInput);
+    check(held.Snapshot().lich.revealStarted &&
+          held.Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+          CountEvents(held.Events(), GameplayEventType::PlayerSwing) == 0u,
+          "arrival cancels an existing cut and drops simultaneous buffered actions");
+    held.ClearEvents();
+    heldInput.hasAuthoritativePlayerPose = false;
+    heldInput.moveForward = 1.0f;
+    heldInput.moveStrafe = -1.0f;
+    bool allPhasesHeld = true;
+    std::array<bool, 3> heldPhases{};
+    for (int tick = 1; tick < 360; ++tick)
+    {
+        const auto phase = held.Snapshot().lich.revealPhase;
+        if (phase == KeeperRevealPhase::Awakening) heldPhases[0] = true;
+        if (phase == KeeperRevealPhase::Warning) heldPhases[1] = true;
+        if (phase == KeeperRevealPhase::Ready) heldPhases[2] = true;
+        heldInput.yawRadians += 0.01f;
+        ++heldInput.commands.attack;
+        ++heldInput.commands.parry;
+        ++heldInput.commands.dodge;
+        held.StepFixed(heldInput);
+        allPhasesHeld = allPhasesHeld &&
+            NearlyEqual(held.Snapshot().playerX, arrival.authoritativePlayerX) &&
+            NearlyEqual(held.Snapshot().playerZ, arrival.authoritativePlayerZ) &&
+            NearlyEqual(held.Snapshot().playerYawRadians, heldInput.yawRadians) &&
+            held.Snapshot().playerTravelledThisTick == 0.0f &&
+            held.Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+            CountEvents(held.Events(), GameplayEventType::PlayerSwing) == 0u &&
+            CountEvents(held.Events(), GameplayEventType::PlayerFootstep) == 0u;
+        held.ClearEvents();
+    }
+    check(allPhasesHeld && heldPhases == std::array<bool, 3>{true, true, true} &&
+          held.Snapshot().lich.revealComplete,
+          "all initial intro phases hold actions and translation without holding look or time");
+    heldInput.moveForward = heldInput.moveStrafe = 0.0f;
+    held.StepFixed(heldInput);
+    check(held.Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+          held.Snapshot().playerTravelledThisTick == 0.0f &&
+          CountEvents(held.Events(), GameplayEventType::PlayerSwing) == 0u,
+          "combat handoff cannot replay held attack, parry or dodge edges");
 
     GameSimulation attacks;
     attacks.ApplyShowcaseCheckpoint(8);
@@ -189,16 +249,16 @@ void TestKeeperReveal(Check&& check)
     for (int tick = 0; tick < 351; ++tick) attacks.StepFixed(close);
     close.commands.attack = 1u;
     attacks.StepFixed(close);
-    // Both a reveal-time downward active window and its queued upward
-    // continuation cross the combat boundary; neither earns a free hit.
+    // Multiple reveal-time edges must be consumed without a swing or a
+    // continuation leaking into combat after the presentation ends.
     for (int tick = 0; tick < 4; ++tick) attacks.StepFixed(close);
     close.commands.attack = 3u;
     for (int tick = 0; tick < 70; ++tick) attacks.StepFixed(close);
     check(attacks.Snapshot().lich.revealComplete && attacks.Snapshot().lich.health == 3 &&
-          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 2u &&
+          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 0u &&
           CountEvents(attacks.Events(), GameplayEventType::EnemyHit) == 0u &&
           CountEvents(attacks.Events(), GameplayEventType::LichDefeated) == 0u,
-          "attacks begun or queued during reveal stay ineligible across combat handoff");
+          "reveal attack edges are dropped without swinging across combat handoff");
     attacks.ClearEvents();
     close.commands.attack = 4u;
     for (int tick = 0; tick < 40; ++tick)
@@ -218,16 +278,43 @@ void TestKeeperReveal(Check&& check)
           "live retry uses safe arrival and event-free one-second recognition initialization");
     InputSnapshot retryInput;
     retryInput.yawRadians = -1.57079632679f;
-    for (int tick = 0; tick < 59; ++tick) attacks.StepFixed(retryInput);
+    retryInput.moveForward = 1.0f;
+    retryInput.moveStrafe = 1.0f;
+    for (int tick = 0; tick < 59; ++tick)
+    {
+        ++retryInput.commands.attack;
+        ++retryInput.commands.parry;
+        ++retryInput.commands.dodge;
+        attacks.StepFixed(retryInput);
+    }
     check(!attacks.Snapshot().lich.revealComplete && attacks.Snapshot().lich.health == 3,
           "retry cannot enable either actor's damage before its complete recognition beat");
+    ++retryInput.commands.attack;
+    ++retryInput.commands.parry;
+    ++retryInput.commands.dodge;
     attacks.StepFixed(retryInput);
     check(attacks.Snapshot().lich.revealComplete &&
           CountEvents(attacks.Events(), GameplayEventType::KeeperRevealStarted) == 0u &&
           CountEvents(attacks.Events(), GameplayEventType::KeeperWarning) == 0u &&
           CountEvents(attacks.Events(), GameplayEventType::KeeperCombatReady) == 1u &&
-          NearlyEqual(attacks.Snapshot().lich.phaseTime, 0.0f),
+          NearlyEqual(attacks.Snapshot().lich.phaseTime, 0.0f) &&
+          NearlyEqual(attacks.Snapshot().playerX, kKeeperRetryPosition.x) &&
+          NearlyEqual(attacks.Snapshot().playerZ, kKeeperRetryPosition.z) &&
+          attacks.Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+          CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 0u &&
+          CountEvents(attacks.Events(), GameplayEventType::PlayerFootstep) == 0u,
           "retry enables full combat once after one second without replaying full reveal cues");
+    retryInput.moveForward = retryInput.moveStrafe = 0.0f;
+    attacks.ClearEvents();
+    attacks.StepFixed(retryInput);
+    check(attacks.Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+          NearlyEqual(attacks.Snapshot().playerX, kKeeperRetryPosition.x) &&
+          NearlyEqual(attacks.Snapshot().playerZ, kKeeperRetryPosition.z) && attacks.Events().Empty(),
+          "last recognition tick leaves no buffered sword, parry or dodge action");
+    ++retryInput.commands.attack;
+    attacks.StepFixed(retryInput);
+    check(CountEvents(attacks.Events(), GameplayEventType::PlayerSwing) == 1u,
+          "fresh input after recognition releases the sword action hold");
     attacks.ResetRoute();
     check(!attacks.Snapshot().lich.revealStarted &&
           NearlyEqual(attacks.Snapshot().lich.x, kKeeperStagingPosition.x) &&
@@ -243,15 +330,24 @@ void TestKeeperReveal(Check&& check)
     move.moveForward = 1.0f;
     for (int tick = 0; tick < 130; ++tick) clearance.StepFixed(move);
     const auto& stopped = clearance.Snapshot();
-    check(std::hypot(stopped.playerX - stopped.lich.x, stopped.playerZ - stopped.lich.z) >=
+    check(NearlyEqual(stopped.playerX, arrival.authoritativePlayerX) &&
+          NearlyEqual(stopped.playerZ, arrival.authoritativePlayerZ) &&
+          stopped.playerTravelledThisTick == 0.0f &&
+          std::hypot(stopped.playerX - stopped.lich.x, stopped.playerZ - stopped.lich.z) >=
               kKeeperPresentationCollisionRadius + kPlayerCollisionRadius - 0.001f &&
           stopped.playerX > stopped.lich.x && NearlyEqual(stopped.playerYawRadians, move.yawRadians),
-          "live movement remains responsive while preventing overlap with the rising keeper");
+          "held movement cannot advance or overlap the rising keeper");
     move.moveForward = -1.0f;
     const float contactX = stopped.playerX;
     for (int tick = 0; tick < 10; ++tick) clearance.StepFixed(move);
-    check(clearance.Snapshot().playerX > contactX + 0.2f,
-          "staged keeper clearance allows the player to back away without trapping or teleporting");
+    check(NearlyEqual(clearance.Snapshot().playerX, contactX),
+          "reverse movement is also held during the presentation");
+    move.moveForward = 0.0f;
+    for (int tick = 0; tick < 218; ++tick) clearance.StepFixed(move);
+    move.moveForward = -1.0f;
+    for (int tick = 0; tick < 10; ++tick) clearance.StepFixed(move);
+    check(clearance.Snapshot().lich.revealComplete && clearance.Snapshot().playerX > contactX + 0.2f,
+          "normal translation resumes after the full presentation");
 
     for (const int captureId : {9, 10, 11})
     {

@@ -704,6 +704,18 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
 
     dodgeCooldownRemainingSeconds_ = std::max(
         0.0f, dodgeCooldownRemainingSeconds_ - deltaSeconds);
+    if (IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase))
+    {
+        // Looking and lifecycle commands remain responsive. Translation and
+        // dodge edges cannot escape or queue behind the presentation hold.
+        lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+        pendingDodgeCommands_ = 0u;
+        dodgeRemainingSeconds_ = 0.0f;
+        snapshot_.playerTravelledThisTick = 0.0f;
+        walkVisualAmount_ = 0.0f;
+        playerFootsteps_.Reset();
+        return;
+    }
     if (pendingDodgeCommands_ > 0u)
     {
         lastConsumedDodgeSequence_ += pendingDodgeCommands_;
@@ -813,6 +825,25 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         // Only explicit reset/retry/checkpoint import may initialise them.
     }
 
+    const bool finaleActive = QueryShowcaseZone(playerX_, playerZ_) == ShowcaseZone::Finale;
+    const auto& keeperBeforeActions = lichEncounter_.Snapshot();
+    const bool keeperHoldsActions = IsKeeperRevealing(keeperBeforeActions.revealPhase) ||
+        (!keeperBeforeActions.revealStarted && activeEnemyKind_ == EnemyKind::Lich &&
+         finaleActive && torchFailureSnapshot_.phase == TorchFailurePhase::Settled &&
+         HasReachedKeeperArrivalThreshold(playerX_, playerZ_));
+    if (keeperHoldsActions)
+    {
+        // Include the triggering and final reveal ticks, so neither an old cut
+        // nor any buffered input becomes a swing at the combat boundary.
+        lastConsumedAttackSequence_ += pendingAttackCommands_;
+        pendingAttackCommands_ = 0u;
+        lastConsumedParrySequence_ += pendingParryCommands_;
+        pendingParryCommands_ = 0u;
+        dodgeRemainingSeconds_ = 0.0f;
+        swordCombat_.CancelPlayerActions();
+        lichAttackEligible_ = false;
+        lichRevealAttackSequenceFloor_ = latestAttackSequence_;
+    }
     const bool parryAvailable = swordCombat_.CanAcceptParry();
     bool playerActionAccepted = false;
     if (pendingAttackCommands_ > 0u)
@@ -946,7 +977,6 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         enemyDirector_.MarkSelectedDead();
     }
 
-    const bool finaleActive = QueryShowcaseZone(playerX_, playerZ_) == ShowcaseZone::Finale;
     const LichSnapshot previousLich = lichEncounter_.Snapshot();
     const LichPhase previousLichPhase = previousLich.phase;
     if (!previousLich.revealComplete)

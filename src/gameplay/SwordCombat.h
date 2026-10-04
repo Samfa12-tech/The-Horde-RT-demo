@@ -172,6 +172,20 @@ public:
         parryQueued_ = true;
     }
 
+    // Presentation holds cancel the player's current and buffered actions
+    // without resetting enemy health, attack ownership or encounter progress.
+    void CancelPlayerActions()
+    {
+        attackQueued_ = false;
+        parryQueued_ = false;
+        successfulParryEndsNextTick_ = false;
+        player_ = {};
+        snapshot_.player = player_;
+        snapshot_.playerAttackPulse = false;
+        snapshot_.playerAttackCut = PlayerAttackCut::None;
+        snapshot_.swordSwingRadians = 0.0f;
+    }
+
     bool CanAcceptPlayerAction() const
     {
         return player_.action == PlayerCombatAction::Idle || successfulParryEndsNextTick_;

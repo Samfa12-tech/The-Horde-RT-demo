@@ -3249,6 +3249,15 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addRouteWallZ(-8.35f, 2.05f, 3.10f, SurfaceBack);
     addRouteWallX(2.05f, -8.8f, -8.35f, SurfaceRight);
     addRouteWallX(3.10f, -8.8f, -8.35f, SurfaceLeft);
+    // Extend this small entry-side panel into an open masonry light well.
+    // Four real walls rise 2.75 m above its retained roof/jambs, preserving the
+    // clear opening, bars and growth below. Consolidate into the existing world
+    // BLAS: no extra instance, material, light or special shading response.
+    for (const auto& wall : horde::scene::kWallPanelMasonryWell)
+    {
+        addWorldBox(wall.footprint[1][0], wall.bottomY, wall.footprint[1][1],
+                    wall.footprint[3][0], wall.topY, wall.footprint[3][1], SurfaceMossyStone);
+    }
     for (std::uint32_t i = 0u; i < 4u; ++i)
     {
         const float x = 2.20f + static_cast<float>(i) * 0.25f;

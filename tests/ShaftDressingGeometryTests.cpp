@@ -247,6 +247,50 @@ Bounds VolumeBounds(const horde::scene::OverheadVolume& v)
     }
     b.lo[1]=v.bottomY;b.hi[1]=v.topY;return b;
 }
+float MasonryWellDistance(const std::array<horde::scene::OverheadVolume,4u>& walls,
+                         Point origin,Point direction,unsigned omitted=4u)
+{
+    float distance=1e9f;
+    for(unsigned i=0;i<walls.size();++i) if(i!=omitted)
+        distance=std::min(distance,BoxDistance(origin,direction,VolumeBounds(walls[i])));
+    return distance;
+}
+bool CheckPanelMasonryWell()
+{
+    using namespace horde::scene;
+    const auto& walls=kWallPanelMasonryWell;
+    // Test the same authored solids consumed by the native world builder.
+    // New masonry never intrudes below the retained route/held clearance.
+    for(const auto& wall:walls) {
+        const auto b=VolumeBounds(wall);
+        for(unsigned a=0;a<3;++a) if(!(b.hi[a]>b.lo[a])) return false;
+        if(b.lo[1]!=kShowcaseRouteCeilingWorldY||b.hi[1]!=4.10f) return false;
+    }
+    constexpr Point center{2.575f,2.0f,-8.575f};
+    constexpr std::array<Point,4> outward{{{-1,0,0},{1,0,0},{0,0,-1},{0,0,1}}};
+    // An upper ray must meet each real side, rather than see the unbounded sky
+    // beyond the old shallow panel. Missing any wall is a meaningful negative.
+    for(unsigned i=0;i<outward.size();++i) {
+        const float hit=MasonryWellDistance(walls,center,outward[i]);
+        if(!(hit>0.1f&&hit<0.6f)||MasonryWellDistance(walls,center,outward[i],i)<1e8f) return false;
+    }
+    // The full original aperture remains vertically open; no top cap or bar
+    // can fake depth by sealing its light path. Wall footprint stays external.
+    for(float x:{2.06f,2.575f,3.09f}) for(float z:{-8.79f,-8.575f,-8.36f})
+        if(MasonryWellDistance(walls,{x,.9f,z},{0,1,0})<1e8f) return false;
+    // A close ordinary approach like the owner's view sees upper rear masonry:
+    // the ray crosses the corridor edge below the roof, then hits above it.
+    const Point approach{2.575f,.70f,-8.92f};
+    const auto upToRear=Normalise({0,1,.70f});
+    const float hit=MasonryWellDistance(walls,approach,upToRear);
+    if(!(hit<1.1f&&approach[1]+hit*upToRear[1]>1.45f)) return false;
+    if(MasonryWellDistance(walls,approach,upToRear,3u)<1e8f) return false;
+    // Recipe reuse is spatial rather than a per-panel rendering response.
+    constexpr auto another=MakeMasonryWell(-1,-3,2,1,4,6.5f,.12f);
+    if(MasonryWellDistance(another,{.5f,4.5f,-1},{0,1,0})<1e8f||
+       std::abs(MasonryWellDistance(another,{.5f,4.5f,-1},{1,0,0})-1.5f)>1e-5f) return false;
+    return walls.size()*12u==48u;
+}
 float GridDistance(Point origin,Point direction)
 {
     float distance=1e9f;
@@ -350,6 +394,7 @@ unsigned PanelLeafPixelHits()
             Point dir{};for(unsigned a=0;a<3;++a) dir[a]=forward[a]*1.22f+right[a]*sx+up[a]*sy;
             dir=Normalise(dir);const float leaf=FaceDistance(eye,dir,face);float opaque=1e9f;
             for(const auto& f:obstructions) opaque=std::min(opaque,FaceDistance(eye,dir,f));
+            opaque=std::min(opaque,MasonryWellDistance(horde::scene::kWallPanelMasonryWell,eye,dir));
             for(unsigned i=0;i<4;++i) {
                 const float bx=2.20f+static_cast<float>(i)*.25f;
                 opaque=std::min(opaque,BoxDistance(eye,dir,{{{bx,-.78f,-8.82f}},{{bx+.045f,.82f,-8.76f}}}));
@@ -376,6 +421,7 @@ int main()
     passed=CheckSprig({{1.25f,3.0f,-2.0f},0.90f,1.6f})&&passed;
     passed=CheckSprig({{-4.0f,5.5f,-8.0f},2.30f,5.9f})&&passed;
     passed=CheckGridAndCeiling()&&passed;
+    passed=CheckPanelMasonryWell()&&passed;
     for(const auto& placement:horde::scene::kWallPanelSprigs) {
         passed=CheckSprig(placement)&&passed;
         const auto faces=horde::scene::MakeHangingSprig(placement.attachment,placement.length,placement.phase,placement.leafPlane);
@@ -414,6 +460,6 @@ int main()
     passed=LeafPixelHits(LeafFaces(original),ProductionCamera(0,0,960,540))==0&&passed;
     std::cout<<"shaft faces="<<totalFaces<<" triangles="<<totalFaces*2<<" bytes="<<meshBytes
              <<" cameraStates="<<cameraStates<<" minimumUnoccludedLeafPixelHits="<<minimumHits
-             <<" panelLeafPixelHits="<<panelHits<<" gridBars=13 gridTriangles=156 panelTriangles=336\n";
+             <<" panelLeafPixelHits="<<panelHits<<" gridBars=13 gridTriangles=156 panelTriangles=336 panelWellTriangles=48\n";
     return passed?0:1;
 }
