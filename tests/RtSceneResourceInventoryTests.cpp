@@ -3,6 +3,7 @@
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 #include "vulkan/raytracing/RtExecutionPolicy.h"
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
+#include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
 
 #include <algorithm>
 #include <array>
@@ -851,6 +852,37 @@ int main()
     using namespace horde::vulkan::raytracing;
 
     bool ok = true;
+    for (const auto instrumentation : {RtInstrumentation::Diagnostic, RtInstrumentation::Shipping})
+    {
+        const auto contract = TryMakeRtDescriptorIoContract(instrumentation);
+        for (const auto backend : {horde::vulkan::RtExecutionBackend::RayTracingPipeline,
+                                  horde::vulkan::RtExecutionBackend::RayQueryCompute})
+        {
+            const auto policy = TryMakeRtExecutionPolicy(backend);
+            const auto layout = TryMakeRtDescriptorSetLayoutBindings(*contract,
+                policy->pushConstantStages, policy->shaderStage);
+            const auto count = instrumentation == RtInstrumentation::Diagnostic ? 27u : 26u;
+            ok &= Require(layout && layout->count == count,
+                          "both real backend layouts must fit the full Diagnostic/Shipping rosters");
+            if (!layout) continue;
+            ok &= Require(layout->values[count - 1u].binding == 26u &&
+                          layout->values[count - 1u].descriptorType == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                          "the final quality-control descriptor must survive layout construction");
+            for (std::uint32_t i = 0u; i < count; ++i)
+                ok &= Require(layout->values[i].binding == contract->bindings[i].binding &&
+                              layout->values[i].descriptorCount == 1u &&
+                              layout->values[i].stageFlags == (i == 0u ? policy->pushConstantStages : policy->shaderStage),
+                              "actual layout roster and backend stage ownership must be preserved");
+        }
+        auto malformed = *contract;
+        malformed.bindingCount = static_cast<std::uint32_t>(malformed.bindings.size() + 1u);
+        ok &= Require(!TryMakeRtDescriptorSetLayoutBindings(malformed, VK_SHADER_STAGE_COMPUTE_BIT, VK_SHADER_STAGE_COMPUTE_BIT),
+                      "oversized descriptor count must fail before any array access");
+        malformed = *contract;
+        malformed.bindings[0].kind = static_cast<RtDescriptorResourceKind>(999u);
+        ok &= Require(!TryMakeRtDescriptorSetLayoutBindings(malformed, VK_SHADER_STAGE_COMPUTE_BIT, VK_SHADER_STAGE_COMPUTE_BIT),
+                      "unknown resource kind must not silently become a storage descriptor");
+    }
     ok &= CheckTlasInstanceRefresh();
     ok &= PresentableTinyRtSceneOutputResizeTestAccess::RunTests();
     const auto pipelinePolicy = TryMakeRtExecutionPolicy(

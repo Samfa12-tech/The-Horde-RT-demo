@@ -1,5 +1,6 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/RtDeviceAddressLayout.h"
+#include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
 #include "vulkan/raytracing/RtTextureLayerSubset.h"
 #include "graphics/GraphicsPreviewSession.h"
 #include "vulkan/raytracing/DynamicBlasSynchronization.h"
@@ -4700,33 +4701,16 @@ bool PresentableTinyRtScene::CreateBundleDescriptorSetLayout(
         diagnostic = "Device sampled-image/sampler limits cannot accommodate the shared RT environment.";
         return false;
     }
-    std::array<VkDescriptorSetLayoutBinding, 26u> bindings{};
-    for (std::uint32_t index = 0u; index < contract.bindingCount; ++index)
+    const auto bindings = TryMakeRtDescriptorSetLayoutBindings(contract,
+        executionPolicy_.pushConstantStages, executionPolicy_.shaderStage);
+    if (!bindings)
     {
-        const RtDescriptorBindingContract& selected = contract.bindings[index];
-        VkDescriptorType type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-        switch (selected.kind)
-        {
-        case RtDescriptorResourceKind::AccelerationStructure:
-            type = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-            break;
-        case RtDescriptorResourceKind::StorageImage:
-            type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-            break;
-        case RtDescriptorResourceKind::CombinedImageSampler:
-            type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            break;
-        case RtDescriptorResourceKind::StorageBuffer:
-            break;
-        }
-        bindings[index] = {selected.binding, type, 1u,
-            selected.binding == 0u ? executionPolicy_.pushConstantStages
-                                   : executionPolicy_.shaderStage,
-            nullptr};
+        diagnostic = "Selected RT descriptor roster exceeds its capacity or contains an invalid resource kind.";
+        return false;
     }
     const VkDescriptorSetLayoutCreateInfo layoutInfo{
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, nullptr, 0u,
-        contract.bindingCount, bindings.data()};
+        bindings->count, bindings->values.data()};
     if (vkCreateDescriptorSetLayout(device_, &layoutInfo, nullptr, &out) != VK_SUCCESS)
     {
         diagnostic = "Failed to create selected RT descriptor set layout.";
