@@ -67,7 +67,7 @@ The grate wording preserves the owner's suggested draft. Other retained IDs belo
 | `prologue.keeper_warning` | Fourth Keeper; spent, controlled | Leave this chamber. My watch is not ended. | O; future campaign candidate at awakening; not part of 1.7 Kit delivery or active 1.6.2 scope. |
 | `prologue.keeper_last` | Fourth Keeper; fading effort | I cannot... leave my post. | O; future campaign candidate on defeat, before reward; do not delay existing reward logic. |
 | `rescue.found` | Kit; relieved renewed contact | There you are. Still in one piece? | C; roof sufficiently open and Kit positioned above. |
-| `rescue.rope` | Kit; practical, no joke | Stay clear. Rope coming down. | C; throw prepared; release gesture/event places rope, not audio completion. |
+| `rescue.rope` | Kit; practical, no joke | Stay clear. Rope coming down. | C; fixed-anchor deployment ready during lantern pickup; one-time runtime event places rope independently of Kit's idle, not a hand-release marker or audio completion. See [animation plan](KIT_ANIMATION_PLAN_1_7.md). |
 | `rescue.climb` | EVENT; player | Player takes the rope and climbs. | E; valid traversal input; no automatic ascent or voiced answer. |
 | `reunion.question` | Kit; first checking player, then curious | Steady. Catch your breath. Did you find it? | C; safe summit/reunion mark; settle before line. |
 | `reunion.hint` | Kit; gentle, not impatient | Let me see. Raise it. | H; generous idle delay during raise lesson; once. |

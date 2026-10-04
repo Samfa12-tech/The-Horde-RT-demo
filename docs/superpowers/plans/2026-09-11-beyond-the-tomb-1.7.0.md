@@ -28,6 +28,12 @@ The engine is the core product; The Horde is the game used to build and test it.
 
 This direction changes the future campaign contract only. Preserve accepted 1.6.2 demo progression and frozen release artifacts unless a separately scoped change is approved.
 
+## Owner clarification — Kit animation and rope staging, 4 October 2026
+
+The [Kit animation acquisition and production plan](../../KIT_ANIMATION_PLAN_1_7.md) preserves the delivered shortlist, free alternatives, Blender workflow and separate player-motion appendix. Eric selects animations and handles rig/technical checks; Sam reviews the in-game appearance and feel. External clips and the Warden model remain candidates until rights, import, rig and scene validation pass. No generation or spending is authorised by this planning update.
+
+The rope may deploy during lantern pickup, including offscreen, from a fixed world anchor while Kit idles nearby. No Kit throw, hand-release, recovery or rope-holding clip is required. Deployment is a one-time simulation event independent of Kit's animation; preserve lantern ownership, sufficient rescue-opening clearance and all existing climb/readiness gates. Visible arrival must remain credible if the player looks up, without camera coercion or view-dependent progression.
+
 ## 1. Source authority and what was actually inspected
 
 The owner's latest instructions govern the new experience. Preserve `AGENTS.md` engineering/safety requirements and use the accepted 1.6.2 source as implementation authority. Historical documents remain evidence of their own versions, not proof of current implementation or performance.
@@ -137,7 +143,7 @@ On opening, the player sees actual sky, rim stone, roots/branches and the compan
 
 ### 4.3 Rescue and rope
 
-The companion notices the player, speaks, throws the rope and steps aside. The rope pays out from a bounded authored starting arrangement, then falls and reacts dynamically to gravity, the rim and shaft. Its upper end has a visible, credible tie-off on a tree, stone ring or fixed tomb fixture; the companion does not hold the player's weight by a magically locked wrist.
+The rope deploys once during lantern pickup when the reward and rescue-opening gates permit, while Kit can idle safely nearby. Offscreen deployment is acceptable; a visible throw, hand-release, recovery or holding action is not required. The rope pays out from a bounded authored starting arrangement, then falls and reacts dynamically to gravity, the rim and shaft. Its upper end has a visible, credible fixed tie-off on a tree, stone ring or tomb fixture. The rope's arrival remains credible if the player looks up; neither the camera direction nor Kit's hand animation gates progression.
 
 The interact prompt becomes `Climb` only once the rope is deployed, reachable, anchored and the traversal destination is ready. Interaction must use the existing semantic action, not a new bespoke platform control.
 
@@ -261,7 +267,7 @@ Use the shared solved player/equipment pose for the visible hands and the corres
 
 Use a bounded XPBD-style rope solver within the fixed-step simulation [R4]. Initial implementation settings: one rope, up to 32 nodes, fixed upper anchor, distance constraints, modest bending resistance, gravity, damping, two substeps per 60 Hz tick and a small fixed iteration budget. Treat these as starting values; measure stability and cost before locking them.
 
-Model the deployment starting configuration and the throw impulse; do not keyframe every rope node along a prerecorded sway. Use segment/capsule-style collision against simplified shaft/rim/ground proxies, with substeps or swept contact sufficient to prevent tunnelling. Full knots, rope cutting and arbitrary rope self-collision are outside scope. Choose a loose starting fold/deployment that does not require a knot solver.
+Model the deployment starting configuration and any bounded deployment impulse independently of Kit's animation; do not keyframe every rope node along a prerecorded sway. Use segment/capsule-style collision against simplified shaft/rim/ground proxies, with substeps or swept contact sufficient to prevent tunnelling. Full knots, rope cutting and arbitrary rope self-collision are outside scope. Choose a loose starting fold/deployment that does not require a knot solver.
 
 Use a single continuous deformed tube mesh with stable topology and tangent frames, driven by node state. Prefer one refittable BLAS; compare a bounded segment-instance alternative only if it proves better on the actual hardware. Keep UV density/diameter stable, and avoid geometry seams, exploding frame rotation, per-frame allocations and rebuilding the entire forest because the rope moved. Refit legality and synchronization must be tested, not assumed [R5].
 
@@ -294,9 +300,9 @@ Add one friendly actor with a stable entity identity. Reuse existing skinned-ass
 
 Default visual brief: an original practical adult human dungeon crawler, travel-worn layered clothing, restrained gothic detail, belt equipment, readable hands/face and a short coat or garment that skins well. No ornate full-body armor, long simulated cloak or complex hair. Final face, presentation and colors should be selected from a small reference set; use **Kit** as the companion's narrative/speaker name; a stable generic internal entity ID may remain.
 
-**Briarhold reuse candidate, 3 October 2026:** Assess the existing Warden at `assets/meshy/runtime/briarhold-warden-1k.glb` before producing a replacement Kit. Asset review used a SHA-matched deployed GLB and Blender renders: the mask fully covers nose and mouth; recorded inventory is 25,968 triangles, a 24-joint skin, seven clips (idle, walk, run, jump, fall, slide, mantle), approximately 6.71 MiB and one material with four 1K textures. These are candidate asset facts, not proof of Horde importer compatibility or phone performance. The provenance record names Samfa as owner; generation entitlement/distribution rights still need verification before transfer/shipping. Validate scale, rig/clip semantics, native RT import, memory and skinning cost; preserve source/runtime provenance. An identity tweak and authored speaking/rope gestures may be needed. The concealed mouth does not require visible lip-sync; subtle head/body acting can carry speech. No asset transfer, generation or implementation is delivered by this note, and this candidate is not yet a locked final Kit design.
+**Briarhold reuse candidate, 3 October 2026:** Assess the existing Warden at `assets/meshy/runtime/briarhold-warden-1k.glb` before producing a replacement Kit. Asset review used a SHA-matched deployed GLB and Blender renders: the mask fully covers nose and mouth; recorded inventory is 25,968 triangles, a 24-joint skin, seven clips (idle, walk, run, jump, fall, slide, mantle), approximately 6.71 MiB and one material with four 1K textures. These are candidate asset facts, not proof of Horde importer compatibility or phone performance. The provenance record names Samfa as owner; generation entitlement/distribution rights still need verification before transfer/shipping. Validate scale, rig/clip semantics, native RT import, memory and skinning cost; preserve source/runtime provenance. An identity tweak and authored speaking/lantern-reaction gestures may be needed. The concealed mouth does not require visible lip-sync; subtle head/body acting can carry speech. No asset transfer, generation or implementation is delivered by this note, and this candidate is not yet a locked final Kit design.
 
-Required animation behaviors: idle/breathing, look down, throw/release rope, recover/stand, approach, concerned talk, lantern reaction, turn, walk, wait and natural look-at. Reuse compatible clips, blend layers and author missing actions in Blender. The rope release is a semantic marker in the body action, connected to the same simulation event that releases the rope.
+Required animation behaviors: idle/breathing, approach, restrained listening/concerned talk, lantern reaction, turn, walk, wait and natural bounded look-at. A look-down pose is conditional on the final staging. Reuse compatible clips and author only necessary transitions/adjustments in Blender; verify blend-layer/IK support before relying on it. No throw, hand-release, recovery or rope-holding clip is needed for Kit. A one-time runtime deployment event owns the anchored rope independently of body animation. See the [animation plan](../../KIT_ANIMATION_PLAN_1_7.md) for candidate IDs, acquisition gates and acceptance checks.
 
 Walking follows an authored collision-aware route with stopping points and speed matched to stride. No advanced navmesh/companion combat system is required. Wait before disappearing around a bend when the player lags. Never visibly teleport through the player, trees or tomb; prevent blocking the only route. Look-at is bounded and blended, without head spins. Idle continues during conversation unless paused.
 
@@ -320,7 +326,7 @@ These are provisional implementation script defaults, updated for the owner-appr
 |---|---|---|---|
 | `prologue.kit_grate` | Kit, concerned call through the small wall access grate; unseen | Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful! | First safe eligible wall-panel approach, independent of the later waterfall fight, before reward/rescue; see contract below. |
 | `rescue.found` | Companion, relief calling down | There you are! I thought that cave-in had buried you. | Roof sufficiently open; actor in position. |
-| `rescue.rope` | Companion, practical | Hold on. Rope coming down. | After first line; rope throw prepared. |
+| `rescue.rope` | Companion, practical | Hold on. Rope coming down. | After first line; anchored deployment ready during lantern pickup. Runtime event owns deployment, not a hand marker or audio completion. |
 | `reunion.question` | Companion, eager but believable | Did you find it? Tell me you found it. | Player safely at summit and companion at reunion mark. |
 | `reunion.hint` | Companion, gentle reminder | Let me see. Raise it. | Once only, after a generous idle delay during the raise lesson. |
 | `reunion.answer` | Silent player action/event; no audio or subtitle line | — | Fresh valid raise action; wait for visibly presented lantern. |
@@ -407,7 +413,7 @@ Forest ambience includes quiet wind/foliage, distant animal/insect calls, rope m
 |---|---|---|
 | Image generation | Establish forest/companion/UI visual direction; create selected decorative texture/background inputs; coherent reference views for modeling. | A screenshot as the forest, a generated menu image as working controls, fake text baked into UI, or a static image claimed as runtime evidence. |
 | Meshy | Generate/texture the selected humanoid and selected bespoke props when it improves output. Discover supported rigging/animation options. | Untextured export, blind import of high-poly assets, assumed facial acting or mandatory custom-motion API support. |
-| Blender | Author cave-in, tomb/shaft/terrain kit and placement; clean/remesh/UV/LOD assets; repair rig/weights; author missing rope-throw/climb/gesture actions; export validated runtime data. | Blender-only simulation caches presented as live rope physics, cinematic renders as engine proof, or a new dependency on opening Blender during gameplay. |
+| Blender | Author cave-in, tomb/shaft/terrain kit and placement; clean/remesh/UV/LOD assets; repair rig/weights; author missing player-climb/companion-gesture actions and transitions; export validated runtime data. | Blender-only simulation caches presented as live rope physics, cinematic renders as engine proof, or a new dependency on opening Blender during gameplay. |
 | Existing native engine | Physical rope, authoritative traversal, rendering, lighting, volumetrics, interaction, playback and UI behavior. | Hardcoded camera tricks hiding incompatible assets or missing systems. |
 
 ### 9.2 Approval and cost gates
@@ -695,7 +701,7 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 **Consumes:** WP2 transforms/readiness and WP4 shaft geometry. **Produces:** Reliable action-driven ascent with dynamic rope and proper carried equipment.
 
 - [ ] Write failing tests for anchored deployment, deterministic load response, bounded stretch, rim/ground contact, duplicate interact edges and invalid destination readiness.
-- [ ] Implement the solver and continuous rope mesh/refit. Add runtime throw/contact/sway tests from multiple views.
+- [ ] Implement the solver and continuous rope mesh/refit. Add runtime anchored-deployment/contact/sway tests from multiple views, including when the player looks up during lantern pickup.
 - [ ] Add failing tests for command suppression during climb, safe mantle destination, stow/restore ownership, zero duplicate lantern awards and pause/restart behavior.
 - [ ] Implement grip/mantle animation and stable/reduced-motion camera through the authoritative traversal snapshot. Attach lantern to the actual carry socket.
 - [ ] Repeatedly climb, look down, pause, background/resume and restart on-device. Inspect hands, rope, shadows, glass and equipment in motion.
@@ -707,10 +713,10 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 **Touches:** Selected Meshy/Blender actor, reusable actor controller/rendering, line manifest, dialogue/audio adapters.
 
 - [ ] Produce and clean the textured companion, author/repair required clips and event markers in Blender, and verify them in the runtime, not just the asset viewer.
-- [ ] Add failing tests for rope-release marker exactly once, NPC identity continuity, wait-for-player behavior and path nonblocking.
+- [ ] Add failing tests for the runtime rope-deployment event exactly once, independent of Kit's idle/animation, plus NPC identity continuity, wait-for-player behavior and path nonblocking. Cover pause, skip, save/load and repeated deployment triggers.
 - [ ] Record/generate authorized voices, validate/normalize clips and license metadata, and implement generation-safe playback/subtitle sequencing.
 - [ ] Add failing dialogue tests for missing audio, stale completion, pause/resume, line skip, repeated hints, and requiring a fresh reunion raise action. Cover the Section 7.3 wall-panel one-shot before the waterfall encounter, safety/overlap deferral, pass-by/backtracking and persisted consumed state; verify actual wall-panel source direction, distance/occlusion intelligibility, independent Dialogue mute and mobile top-safe-area subtitles.
-- [ ] Complete the early wall-panel call → later rescue call → throw → reunion → manual raise → depart scene, with world-space light/audio and bounded look-at.
+- [ ] Complete the early wall-panel call → later rescue call and anchored deployment during lantern pickup → player climb → reunion → manual raise → depart scene, with world-space light/audio and bounded look-at.
 
 **Gate:** All mandatory spoken lines play offline, the actor moves convincingly, and no audio/animation failure blocks progression. **Audio/haptic check:** YES for voice/spatial/mix changes.
 
