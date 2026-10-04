@@ -288,6 +288,14 @@ The 1.12-second gameplay versus 1.20-second renderer contact conventions require
 
 These are 1.7 planning requirements after the accepted 1.6.2 baseline. They do not expand the active 1.6.2 runtime/PR18, demonstrate implementation or authorise a merge or release.
 
+## 1.7 addition — low-power mobile pause
+
+**Owner goal, 4 October 2026:** Reduce unnecessary work and phone heat/battery drain while the game is paused. Read-only PR18 inspection confirms the foreground paused loop still renders before its preview-frame-cap delay; it does not prove the cause or size of the reported heat/drain. Android background suspension already has a separate surface-stop path. Re-audit accepted 1.6.2 before implementation.
+
+The [canonical low-power pause contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#103b-low-power-mobile-pause) requires an evidence-led, bounded solution: prefer reusing the frozen scene with responsive UI-only/on-demand updates, or a safe measured low-rate fallback; suppress unchanged simulation/skinning/AS/RT work and avoid busy waiting. Keep live Graphics preview explicit and separate. Preserve cache invalidation, safe settings apply/acknowledgment/revert, input/audio resume, background/screen-lock suspension and Vulkan resource/swapchain ownership. No active game frames while suspended, apart from finite in-flight retirement.
+
+Acceptance compares matched active play and old/new pause using CPU/GPU/work/submission evidence and longer controlled battery/power/thermal observations with honest limits; a lower FPS counter alone proves no energy saving. No fixed savings claim, screenshot-compositor mandate or renderer rewrite is implied. This adds only 1.7 planning/WP7 acceptance after the existing start gate; it does not expand active 1.6.2, change runtime or authorise a build, merge or release.
+
 ## 1.7 addition — Save/Load and tomb-exit respawn
 
 **Owner request, 3 October 2026:** Add player-facing Save/Load, with **three local campaign slots proposed** (count remains provisional), and an automatic safe respawn checkpoint after the completed rope rescue/tomb exit. Activate it only when grounded outside with the destination ready; later death must not replay the tomb or re-award the lantern. Keep manual slot saves distinct from automatic recovery checkpoints, preserve coherent quest/Kit/equipment/one-shot state, and keep settings and RT Lab unlock separate. The [canonical 1.7 save contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#12-save-replay-and-recovery) defines safe resume, overwrite/New Game confirmation, versioned atomic storage and corruption/lifecycle checks. Final arbitrary-save policy and cloud sync are not implied. Planning only, after the accepted 1.6.2 baseline.
