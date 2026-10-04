@@ -1,6 +1,48 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-10-03
+Last updated: 2026-10-04
+
+## Returned allocation: current95 ordinary75% measurement
+
+The owner reallocated SM-S948B/Android16 on4October00:18UTC. Fresh installed
+pullbacks match the current Debug3d133d10/benchmark269ac11a hashes below, without
+a new installation. [Returned-device review](ENGINEERING_1_6_2_RETURNED_DEVICE_REVIEW.md)
+records the ordinary75% ShippingMobile/Pipeline two-lap route:1,838 valid owning
+CPU/GPU rows,13 waypoints per lap/26 visits, all13 CPU stages/10 zone joins.
+CPU median/p95 is64.160860/83.593542ms; GPU RT53.590051/73.118071ms. Settled
+Materials5.8successfulRTpresents/s/CPU173.43ms/GPU170.11ms/zero transitions is
+a separate workload. Audit `f8cc16aa9537aa8f426a771de08590e56c58c6ca9a032aacff33b46724bcb53d`
+seals29 checks/24 named files. Battery header40.2 -> 42.5C/USB/unknown cooling,
+native thermal not-collected and one ordered course provide no parity, causal
+saving or sustained fixed75% pass. Final requested/effective original tuple
+matches, but Draft require Apply is not a new persistence gate.
+
+Current Windows6394 collapse/moving-torch-flame appearance is explicitly owner
+approved, without phone/broader scene/audio/haptic acceptance. Both current Debug
+Replay routes complete13/13 with actual completed owning route/checkpointC packets
+at75%. Retain Pipeline120second9/13 timeout and its older pending Home packet.
+New Compute Home advances epoch6 -> 8/logged surface5 -> 7 with owning completion1937;
+separate Pipeline capture/Home advances4 -> 6/surface3 -> 5 with completion84,
+without a full Replay repeat. Exact modules/current owner scopes/ordinary RT
+presentation pass the hardened offline validator; external scoped surface logs
+are not an atomic native surface packet. All three C captures settle12 frames,
+retain22 instances; authored stationary poses are not motion/phone approval.
+Timing CSVs are empty, not performance distributions.
+
+Correctness audit `ca226dcb663e3b7571947aaf63bc1f2a5d8eff9dcd14bcb02eb4eb01f1196bb3`
+seals151 files/258,446,249 bytes with identical inventories. Ordinary Debug
+Preview/Home uses15 owned trees/four touches/one scroller; final XML retains all
+six confirmed schema2/original75/Mobile/Mobile/GlassOn/cap30 fields, pending=false,
+without Apply/Keep or quality edits. Home's transient pending=true and inactive
+pendingGlass change remain scoped; sequential UI/XML is not atomic ACK. Twelve
+selected saved logs have no fatal markers, not exhaustive stability proof.
+Physical collector6e271 and later pure offline validatord7e2 identities remain
+distinct; final host fixture82 assertions/review pass. Pushed tool headf06705bf's
+[current PR checks](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/18/checks)
+are in progress; final documentation needs fresh CI. Validation apps are stopped/
+phone Home, no install/data clearing; live Windows interactive review remains open.
+Earlier allocation/packet limits below retain their scopes; broader exact-device,
+owner/audio/haptic/performance and remote-endpoint gates remain open.
 
 ## Current95eb0807: fresh native admission and physical death recovery
 
@@ -9,7 +51,8 @@ sequential physical recovery**, not signed release, atomic native packet,
 owner audio/feel or sustained-performance acceptance. Actual SM-S948B/Android16.
 Source `95eb08070354d4b3b775e6d2368cca8688f9cfe6` has all six jobs individually
 completed/success in [CI37155231702](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37155231702).
-A later docs/tools commit needs its own CI.
+That runtime CI is historical to the newer pushed tool head/current checks above.
+The final documentation commit needs its own CI.
 
 Current Debug APK SHA256
 `3d133d10fb7bf30276c96e03df04709c69da4dc405132d6e0bf309ea789b128f`
@@ -87,9 +130,9 @@ Current Windows6394 Debug checkpointC passes both backends, one capture each,
 exit0/sync validation/zero markers; this is not four new motion cases. Geometry/
 shader content is unchanged. Historical820's56 captures and owner's watched
 torch lowering/no-clipping Yes remain narrowly historical content acceptance.
-Both validation apps are stopped with original75/Mobile/Mobile/GlassOn/30 restored.
-Phone allocation is paused until Sam explicitly reallocates it, even if connected;
-remaining phone checks await reallocation. Fresh broader settings/lifecycle/optical, Windows statistics, remaining native
+The prior session ended with both validation apps stopped and original75 restored;
+its allocation pause is superseded by the returned allocation recorded above.
+Fresh broader settings/lifecycle/optical, Windows statistics, remaining native
 owner/audio/haptic and sustained-performance gates remain open; fixed75%
 sustained30FPS and S24/S25 support are unverified. Remote Send remains blocked.
 Earlier build/UI/export/pending statuses below retain their historical identities.

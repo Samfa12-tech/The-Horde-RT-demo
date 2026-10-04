@@ -30,6 +30,12 @@ The closed-glass Materials scene differs from the moving route and Mobile lanter
 
 The historical 50% course used a different APK (`e339da58`): CPU cycle median 37.585808 ms/GPU RT 26.934999 ms, internal720x1490, battery41.9 -> 42.8 C. It remains historical evidence, not the third member of a same-artifact controlled cohort. Its earlier 40% observer never started an accepted course; stationary dead-player runs and second-Activity command-line attempts are rejected. Failed preview/navigation attempts remain recorded privately without being promoted to successful courses.
 
+## Later returned75% review
+
+The owner reallocated the same SM-S948B/Android16 on4October. The same benchmark269 APK was freshly pulled back and matched without installation. [Returned-device review](ENGINEERING_1_6_2_RETURNED_DEVICE_REVIEW.md) records a separate ordinary75% course with1,838 owning CPU/GPU-valid rows, CPU median/p95 64.160860/83.593542ms and GPU53.590051/73.118071ms. Settled75% Materials reported5.8 successful RT presents/s, CPU173.43ms/GPU170.11ms/zero transitions. Course battery header40.2 -> 42.5C/USB/unknown cooling and native thermal not-collected do not make this a balanced or thermally matched cohort with earlier40/33. Initial33.3C preceded Preview and is not the course baseline. Live original requested/effective values match; Draft require Apply does not prove a new save gate.
+
+Separate Debug Replay/capture/Home correctness is now sealed by receipt `ca226dcb663e3b7571947aaf63bc1f2a5d8eff9dcd14bcb02eb4eb01f1196bb3`: both Replay routes complete13/13 and new completed owning resume packets pass on both backends. These Diagnostic runs have empty timing CSVs/stationary captures and add no Shipping performance distribution or phone owner approval. Ordinary Debug Preview/Home retains the original confirmed tuple/pending=false without quality edits or Apply/Keep. Earlier saved-pending packets remain historical limits, not upgraded by later proofs. Validation apps are stopped/phone Home; live Windows owner review remains open.
+
 ## Disposition and restoration
 
 Retain explicit experimental choices in the isolated benchmark only. Do not silently reduce ordinary quality or infer an upscaler/DRS benefit. The rejected player-lookup experiment remains rejected; its implementation was restored. Low-fire/shadow investigation has a separate [bounded design outcome](ENGINEERING_1_6_2_LOW_FIRE_SHADOW_INVESTIGATION.md), with no independent control or measured saving claimed.
