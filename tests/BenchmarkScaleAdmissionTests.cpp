@@ -25,11 +25,26 @@ int main()
             static_cast<unsigned>((2980 * scale + 50) / 100)} : GraphicsExtent{}),
             "effective internal dimensions must reflect the admitted percentage");
         const auto recovery = RecoverGraphicsSettings({kGraphicsSettingsSchema, requested, requested}, GraphicsPlatform::Android);
-        check(recovery.startup.renderScalePercent == (admitted ? scale : 75) && recovery.retainedRequested == requested,
-              "invalid stored experiments must restore ordinary baseline while preserving interrupted intent");
+        check(recovery.startup.renderScalePercent == (admitted ? scale : 75) &&
+              recovery.retainedRequested == (admitted ? std::optional<GraphicsSettings>{requested} : std::nullopt),
+              "recovery restores the admitted confirmed tuple and retains only valid interrupted intent");
+        check((static_cast<std::uint32_t>(recovery.reasons) &
+               static_cast<std::uint32_t>(GraphicsReason::InterruptedApply)) != 0u &&
+              ((static_cast<std::uint32_t>(recovery.reasons) &
+                static_cast<std::uint32_t>(GraphicsReason::InvalidStoredSettings)) != 0u) == !admitted,
+              "invalid interrupted experiments must remain explicitly diagnosed without becoming a draft");
         check(MigrateLegacyGraphicsSettings({scale, 1}, GraphicsPlatform::Android).renderScalePercent ==
               (admitted ? scale : 50), "legacy values must share explicit floor admission");
     }
+    auto invalidConfirmed = BaselineGraphicsSettings(GraphicsPlatform::Android);
+    invalidConfirmed.renderScalePercent = 32;
+    auto validPending = BaselineGraphicsSettings(GraphicsPlatform::Android);
+    validPending.renderScalePercent = 50;
+    const auto independentRecovery = RecoverGraphicsSettings(
+        {kGraphicsSettingsSchema, invalidConfirmed, validPending}, GraphicsPlatform::Android);
+    check(independentRecovery.startup.renderScalePercent == 75 &&
+          independentRecovery.retainedRequested == validPending,
+          "an invalid confirmed tuple must not discard independently valid interrupted intent");
     for (int scale : {-1, 0, 32, 34, 39, 41, 49, 101})
     {
         auto requested = GraphicsSettings{}; requested.renderScalePercent = scale;

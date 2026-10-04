@@ -2098,3 +2098,10 @@ changed A/D music YES, now owner PASS. No new SFX/haptic change in this slice.
 - [Samsung Exynos 2400](https://semiconductor.samsung.com/processor/mobile-processor/exynos-2400/)
 - [Samsung Exynos 2500](https://semiconductor.samsung.com/processor/mobile-processor/exynos-2500/)
 - [Samsung Exynos 2600](https://semiconductor.samsung.com/processor/mobile-processor/exynos-2600/)
+
+### 4 October 2026 — 1.6.2 controls candidate, local deterministic Pipeline evidence
+
+- Exact device: **SM-S948B**, Android16; locally allocated test device. This entry is local update/install, actual RT presentation, deterministic route/capture and lifecycle evidence, not vendor inference or broad compatibility certification.
+- Runtime source: `d579865bde460aa6acd94fee299e36fca3b39d32`. Debug APK SHA256: `5f344ce6f601b28c57ae3221872a05bfb351f14e045f9d62d91c18e017edaf60`; update-only installation retained app data. Packaged ARM64 and stripped library bytes match, and both selected Diagnostic/Mobile backend pairs pass SDK SPIR-V inspection.
+- Physically observed Pipeline at75%: successful RT-produced1080×2235 presentation; deterministic route13/13, three changed-feature captures and strict Home/Resume owning-frame checks in the separately identified300-second run. Preserve the preceding120-second timeout at9/13 as a negative; no scale or quality reduction was used to complete the longer observation.
+- Limits: current Compute/device controls, Shipping timing, changed enclosure/HUD/intro interaction and quality-choice owner acceptance remain pending. This new APK does not inherit earlier runtime95eb measurements or approvals. Raw logs/images and private device identifiers remain outside Git. See [active second-pass ledger](ENGINEERING_1_6_2_SECOND_PASS.md).
