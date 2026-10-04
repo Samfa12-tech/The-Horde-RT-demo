@@ -179,6 +179,36 @@ void TestAdmissionAndFrameBinding()
           "the accepted open finale roof cannot certify the different active-torch waterfall shaft");
     Check(wrongShaft.ApplyShowcaseCheckpoint(4) && !UpwardRayEntersWaterShaft(wrongShaft.Snapshot()),
           "old dark skylight chamber cannot certify the waterfall rim either");
+    for (const bool invalidSword : {false, true})
+    {
+        GameSimulation held(ProductionGameSimulationConfig());
+        MotionEvidenceScenario contract;
+        std::uint64_t heldNow = 1'000'000u;
+        Check(contract.Begin(MotionScenario::KeeperFirstEntry, held, heldNow),
+              "intro hold negative fixture starts the real ordinary approach");
+        InputSnapshot heldInput;
+        for (int tick = 0; tick < 600 && contract.Stage() == MotionStage::Approach; ++tick)
+        {
+            heldNow += 16'666'667u;
+            heldInput = contract.BuildInput(held.Snapshot(), heldInput, heldNow, true);
+            held.AdvanceFrame(heldInput, 1.0 / 60.0);
+            contract.ObserveAdvance(held.Snapshot(), held.Events().Events());
+            held.ClearEvents();
+        }
+        Check(contract.Stage() == MotionStage::Reveal, "negative fixture reaches genuine awakening");
+        heldNow += 16'666'667u;
+        heldInput = contract.BuildInput(held.Snapshot(), heldInput, heldNow, true);
+        held.AdvanceFrame(heldInput, 1.0 / 60.0);
+        auto rejectedState = held.Snapshot();
+        // Deliberately corrupt only the observer input. Gameplay state is
+        // untouched; neither a moving nor swinging actor may be certified.
+        if (invalidSword) rejectedState.playerCombat.action = PlayerCombatAction::SwingWindup;
+        else rejectedState.playerX += 0.01f;
+        contract.ObserveAdvance(rejectedState, held.Events().Events());
+        Check(contract.Failed() && contract.Failure() ==
+              "Keeper presentation did not hold translation and player actions.",
+              "motion evidence rejects a reveal that moves or swings despite valid timing");
+    }
     GameSimulation simulation(ProductionGameSimulationConfig());
     MotionEvidenceScenario scenario;
     Check(scenario.Begin(MotionScenario::TorchLowOpening, simulation, 1'000u), "deadline fixture admitted");

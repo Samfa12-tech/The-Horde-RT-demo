@@ -99,8 +99,11 @@ private:
     bool parryPoseSeen_ = false;
     bool upLookSeen_ = false;
     bool downLookSeen_ = false;
-    bool revealRetreatSeen_ = false;
-    bool revealReturnSeen_ = false;
+    float revealHeldX_ = 0.0f;
+    float revealHeldZ_ = 0.0f;
+    bool revealHeldMoveSeen_ = false;
+    bool revealLookAwaySeen_ = false;
+    bool revealLookReturnSeen_ = false;
     bool shaftOpeningSeen_ = false;
     bool shaftParallaxSeen_ = false;
     bool rearLookSeen_ = false;

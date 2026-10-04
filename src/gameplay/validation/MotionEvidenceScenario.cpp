@@ -242,6 +242,7 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
 {
     if (Failed() || Complete() || stage_ == MotionStage::NotStarted) return;
     if (state.tickIndex < previousTick_) { Fail("Shared simulation tick regressed during measured motion."); return; }
+    const bool advanced = state.tickIndex > previousTick_;
     simulationSeconds_ += static_cast<double>(state.tickIndex - previousTick_) * FixedStepRunner::kFixedDeltaSeconds;
     previousTick_ = state.tickIndex;
     if (state.eventQueueOverflowCount != 0u) { Fail("Semantic gameplay event queue overflowed."); return; }
@@ -269,7 +270,15 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
     switch (stage_)
     {
     case MotionStage::Approach:
-        if (KeeperScenario(scenario_)) { if (state.lich.revealStarted) Enter(MotionStage::Reveal); }
+        if (KeeperScenario(scenario_))
+        {
+            if (state.lich.revealStarted)
+            {
+                revealHeldX_ = state.playerX;
+                revealHeldZ_ = state.playerZ;
+                Enter(MotionStage::Reveal);
+            }
+        }
         else if (scenario_==MotionScenario::ShaftUp)
         { if (Distance(state,-1.66f,-15.35f)<0.04f) Enter(MotionStage::ShaftMotion); }
         else
@@ -327,13 +336,26 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
         break;
     }
     case MotionStage::Reveal:
-        revealRetreatSeen_ = revealRetreatSeen_ || !HasReachedKeeperArrivalThreshold(state.playerX, state.playerZ);
-        revealReturnSeen_ = revealReturnSeen_ || (revealRetreatSeen_ && HasReachedKeeperArrivalThreshold(state.playerX, state.playerZ));
+        if (IsKeeperRevealing(state.lich.revealPhase) &&
+            (Distance(state, revealHeldX_, revealHeldZ_) > 0.0001f ||
+             (advanced && state.playerTravelledThisTick != 0.0f) ||
+             state.playerCombat.action != PlayerCombatAction::Idle))
+        { Fail("Keeper presentation did not hold translation and player actions."); break; }
+        // The schedule still tries to retreat and swing during the intro.
+        // Validate the new owner contract: reject movement, permit look, and
+        // discard the scheduled action edges rather than replaying them later.
+        revealHeldMoveSeen_ = revealHeldMoveSeen_ ||
+            (state.lich.revealElapsedSeconds > 2.2f && state.lich.revealElapsedSeconds < 2.8f &&
+             Distance(state, revealHeldX_, revealHeldZ_) <= 0.0001f);
+        revealLookAwaySeen_ = revealLookAwaySeen_ || std::sin(state.playerYawRadians) > 0.95f;
+        revealLookReturnSeen_ = revealLookReturnSeen_ ||
+            (revealLookAwaySeen_ && std::sin(state.playerYawRadians) < -0.95f);
         if (state.lich.revealComplete)
         {
             if (state.lich.revealElapsedSeconds < LichEncounter::kRevealDuration || state.lich.health != 3 ||
                 state.lich.phase != LichPhase::MaintainingRange || eventCounts_[17] != 1u || eventCounts_[18] != 1u || eventCounts_[19] != 1u ||
-                !revealRetreatSeen_ || !revealReturnSeen_ || eventCounts_[6] != 0u)
+                !revealHeldMoveSeen_ || !revealLookAwaySeen_ || !revealLookReturnSeen_ ||
+                eventCounts_[static_cast<std::size_t>(GameplayEventType::PlayerSwing)] != 0u || eventCounts_[6] != 0u)
                 Fail("First reveal did not complete exactly once with a fresh full telegraph.");
             else { Enter(MotionStage::FirstTelegraph); telegraphInitialSeconds_ = state.lich.phaseTime; }
         }
