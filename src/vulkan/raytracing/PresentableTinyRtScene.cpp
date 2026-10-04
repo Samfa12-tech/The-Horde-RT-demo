@@ -1357,10 +1357,29 @@ bool PresentableTinyRtScene::ReadBuffer(const Buffer& buffer,
                                         std::string& diagnostic) const
 {
     if (buffer.memory == VK_NULL_HANDLE || data == nullptr || size == 0u ||
-        offset > buffer.size || size > buffer.size - offset)
+        offset > buffer.size || size > buffer.size - offset ||
+        offset > std::numeric_limits<std::size_t>::max() ||
+        size > std::numeric_limits<std::size_t>::max())
     {
         diagnostic = std::string("Invalid ") + label + " readback.";
         return false;
+    }
+    // Persistent mappings belong to the resource owner. Reading coherent
+    // uploaded inputs must neither remap nor release that owner's mapping.
+    if (buffer.mappedWriteData != nullptr)
+    {
+        constexpr auto required = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        if ((buffer.memoryPropertyFlags & required) != required)
+        {
+            diagnostic = std::string("Invalid coherent ") + label + " mapping for readback.";
+            return false;
+        }
+        std::memcpy(data, static_cast<const std::uint8_t*>(buffer.mappedWriteData) +
+                            static_cast<std::size_t>(offset),
+                    static_cast<std::size_t>(size));
+        diagnostic.clear();
+        return true;
     }
     void* mapped = nullptr;
     if (vkMapMemory(device_, buffer.memory, 0u, buffer.size, 0u, &mapped) != VK_SUCCESS ||
@@ -1372,6 +1391,7 @@ bool PresentableTinyRtScene::ReadBuffer(const Buffer& buffer,
     std::memcpy(data, static_cast<const std::uint8_t*>(mapped) + offset,
                 static_cast<std::size_t>(size));
     vkUnmapMemory(device_, buffer.memory);
+    diagnostic.clear();
     return true;
 }
 

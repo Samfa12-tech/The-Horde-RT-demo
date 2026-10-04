@@ -164,6 +164,47 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static bool CheckPersistentReadback()
+    {
+        PresentableTinyRtScene scene; // No Vulkan device: a remap would be invalid.
+        std::array<std::uint8_t, 8u> uploaded{11, 23, 37, 41, 53, 67, 79, 83};
+        RtGpuBuffer buffer;
+        buffer.memory = FakeHandle<VkDeviceMemory>(0xCAFEu);
+        buffer.size = uploaded.size();
+        buffer.mappedWriteData = uploaded.data();
+        buffer.memoryPropertyFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                     VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        std::array<std::uint8_t, 4u> output{};
+        std::string diagnostic = "stale";
+        bool ok = Require(scene.ReadBuffer(buffer, 2u, output.data(), output.size(),
+                                           "fixture", diagnostic) &&
+                          output == std::array<std::uint8_t, 4u>{37, 41, 53, 67} &&
+                          diagnostic.empty(), "persistent read uses exact offset bytes");
+        uploaded[7] = 97;
+        ok &= Require(scene.ReadBuffer(buffer, 4u, output.data(), output.size(),
+                                       "fixture", diagnostic) && output[3] == 97 &&
+                      buffer.mappedWriteData == uploaded.data(),
+                      "repeat read observes current bytes and preserves mapping ownership");
+        const auto reject = [&](VkDeviceSize offset, VkDeviceSize count, void* destination)
+        {
+            output.fill(0xABu);
+            return !scene.ReadBuffer(buffer, offset, destination, count, "fixture", diagnostic) &&
+                   !diagnostic.empty() &&
+                   std::all_of(output.begin(), output.end(), [](auto v) { return v == 0xABu; });
+        };
+        ok &= Require(reject(5u, 4u, output.data()) &&
+                      reject(~VkDeviceSize{0u}, 1u, output.data()) &&
+                      reject(0u, 0u, output.data()) && reject(0u, 1u, nullptr),
+                      "invalid reads fail without touching destination or Vulkan");
+        buffer.memoryPropertyFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+        ok &= Require(reject(0u, 1u, output.data()), "noncoherent mapping fails closed");
+        buffer.memoryPropertyFlags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        ok &= Require(reject(0u, 1u, output.data()), "nonvisible mapping fails closed");
+        buffer.memory = VK_NULL_HANDLE;
+        ok &= Require(reject(0u, 1u, output.data()), "missing owner memory fails closed");
+        return ok;
+    }
+
     static bool CheckGlassVisibility(PresentableTinyRtScene& scene, bool enabled)
     {
         scene.glassEnabled_ = enabled;
@@ -851,7 +892,7 @@ int main()
 {
     using namespace horde::vulkan::raytracing;
 
-    bool ok = true;
+    bool ok = PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
     for (const auto instrumentation : {RtInstrumentation::Diagnostic, RtInstrumentation::Shipping})
     {
         const auto contract = TryMakeRtDescriptorIoContract(instrumentation);
