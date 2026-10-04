@@ -89,6 +89,7 @@
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/PresentCompletion.h"
+#include "vulkan/RetirementOwner.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
@@ -4522,9 +4523,20 @@ bool RecreateSwapchain(VulkanSurfaceContext& ctx)
            InitialiseRtSceneForSwapchain(ctx);
 }
 
+void DetachRenderContextHost(VulkanSurfaceContext& context) noexcept
+{
+    // Stop every host callback before either native cleanup or fatal retention.
+    const HWND window = context.windowHandle;
+    if (window != nullptr && IsWindow(window) &&
+        GetWindowLongPtrA(window, GWLP_USERDATA) == reinterpret_cast<LONG_PTR>(&context))
+        SetWindowLongPtrA(window, GWLP_USERDATA, 0);
+    if (context.musicPlayback) context.musicPlayback->Stop(); // Joins; noexcept.
+    context.windowHandle = nullptr;
+    context.capabilitySnapshot = nullptr; // Borrowed from the returning caller.
+}
+
 bool DestroyRenderContext(VulkanSurfaceContext& ctx)
 {
-    if (ctx.musicPlayback) ctx.musicPlayback->Stop(); // Join before context/storage destruction.
     if (ctx.device == VK_NULL_HANDLE)
     {
         if (ctx.rtFrameEvidenceInitialised)
@@ -5893,7 +5905,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const std::string& nativeMotionScenario,
                                  const horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset)
 {
-    VulkanSurfaceContext context;
+    horde::vulkan::RetirementOwner<VulkanSurfaceContext> renderOwner(
+        std::make_unique<VulkanSurfaceContext>(), DestroyRenderContext, DetachRenderContextHost);
+    auto& context = *renderOwner.Get();
     context.graphicsPreviewCapture = graphicsPreviewCapture;
     context.outputResizeValidation = outputResizeValidation;
     context.nativeMotionValidation = !nativeMotionScenario.empty();
@@ -5955,7 +5969,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 
     if (!CreateSurface(context.instance, hWnd, context.surface))
     {
-        DestroyRenderContext(context);
+        (void)renderOwner.Retire();
         return 1;
     }
 
@@ -5963,7 +5977,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     if (vkEnumeratePhysicalDevices(context.instance, &physicalDeviceCount, nullptr) != VK_SUCCESS || physicalDeviceCount == 0u)
     {
         std::cerr << "No physical devices found for diagnostic swapchain.\n";
-        DestroyRenderContext(context);
+        (void)renderOwner.Retire();
         return 1;
     }
 
@@ -5987,13 +6001,13 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     if (context.physicalDevice == VK_NULL_HANDLE)
     {
         std::cerr << "No physical device matches the probed GPU, driver and API identity.\n";
-        DestroyRenderContext(context);
+        (void)renderOwner.Retire();
         return 1;
     }
 
     if (!FindGraphicsAndPresentQueueFamily(context.physicalDevice, context.surface, context.graphicsQueueFamilyIndex))
     {
-        DestroyRenderContext(context);
+        (void)renderOwner.Retire();
         return 1;
     }
 
@@ -6011,26 +6025,26 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     if (requireRayQueryCompute && context.executionBackend != horde::vulkan::RtExecutionBackend::RayQueryCompute)
     {
         std::cerr << "The required hardware RayQuery compute backend is unavailable; no other backend will be selected.\n";
-        DestroyRenderContext(context);
+        (void)renderOwner.Retire();
         return 2;
     }
     context.useRtPath = context.executionBackend != horde::vulkan::RtExecutionBackend::Unsupported;
     if (!CreateLogicalDevice(context.physicalDevice, context.instance, context.graphicsQueueFamilyIndex, context.executionBackend,
         context.device, context.graphicsQueue, context.presentSurfaceSupport, context.presentCompletionMode))
     {
-        DestroyRenderContext(context);
+        (void)renderOwner.Retire();
         return 1;
     }
     capabilities.diagnostics.push_back(horde::vulkan::PresentCompletionDiagnostic(context.presentCompletionMode));
 
     if (!CreateSwapchain(context, hWnd))
     {
-        DestroyRenderContext(context);
+        (void)renderOwner.Retire();
         return 1;
     }
     if (!InitialiseRtSceneForSwapchain(context))
     {
-        DestroyRenderContext(context);
+        (void)renderOwner.Retire();
         return 1;
     }
 
@@ -6102,11 +6116,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 captureResult = 1;
             }
         }
-        if (IsWindow(hWnd))
-        {
-            SetWindowLongPtrA(hWnd, GWLP_USERDATA, 0);
-        }
-        if (!DestroyRenderContext(context)) captureResult = 1;
+        if (!renderOwner.Retire()) captureResult = 1;
         return captureResult;
     }
 #else
@@ -6117,7 +6127,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     {
         if (!context.controlsEnabled)
         {
-            DestroyRenderContext(context);
+            (void)renderOwner.Retire();
             return 1;
         }
         StartBenchmark(context, benchmarkWorkload, false, benchmarkRtWorkloadPreset); // No FPS observer.
@@ -6358,14 +6368,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #endif
     }
 
-    if (IsWindow(hWnd))
-    {
-        SetWindowLongPtrA(hWnd, GWLP_USERDATA, 0);
-    }
     const bool benchmarkSucceeded = context.benchmark.Passed() && context.benchmarkReportsSaved &&
         context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Complete &&
         context.benchmarkEvidence.ExpectedCount() == context.benchmark.Frames().size();
-    if (!DestroyRenderContext(context)) renderFailed = true;
+    if (!renderOwner.Retire()) renderFailed = true;
     if (unattendedBenchmark) return !renderFailed && benchmarkSucceeded ? 0 : 1;
     return renderFailed ? 1 : (running ? 0 : static_cast<int>(message.wParam));
 }
