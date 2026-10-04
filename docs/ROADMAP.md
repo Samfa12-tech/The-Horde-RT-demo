@@ -372,6 +372,21 @@ The remaining owner-authorised pre-release experiments are an actual eligible op
 
 The separately queued second pass for independent shadows, lower fire, upscaling, optional benchmark Send statistics and mist density/lighting retains its own implementation/measurement plan. The rest of the audit remains future proposals; preserving it does not commit every priority to 1.6.2, change defaults or authorise a renderer rewrite, credentials, deployment, merge or release. Retain the final independent review and explicit owner release gate.
 
+## Maybe one day — optional Windows path tracing
+
+**Owner direction, 4 October 2026:** Keep an optional path-tracing mode as a later Windows/high-end hardware-RT feasibility experiment. This is an uncommitted backlog idea, with no version or date promise and no 1.6.2 or 1.7 acceptance requirement. Android remains first-class with its existing default path; retain the current hardware ray tracer as the supported baseline and fallback when path tracing is unavailable, too expensive or visually unsuitable. Unsupported RT hardware still receives clear diagnostics, not a raster fallback.
+
+The existing Vulkan BLAS/TLAS, PBR materials and skinning support provide useful foundations to reassess against the eventual accepted baseline. They do not make the current deterministic, effect-specific renderer with limited approximate bounce lighting a general path tracer. A later experiment must define and validate a stochastic light-transport integrator rather than relabel existing effects.
+
+**Staged feasibility gates**
+1. Start with a small static test scene and stationary camera, using progressive accumulation to establish sampling, convergence and reference-image correctness with explicit sample/bounce budgets.
+2. Only if useful, test moving cameras and animated/skinned scenes. Define sampling and light selection, temporal history/reprojection, disocclusion and stale-history rejection, reset/invalidation rules and denoising. Inspect noise, ghosting, lag and lost detail in motion as well as still-image quality.
+3. Consider adoption only if matched comparisons justify the quality/performance trade-off. Record exact build, GPU, driver, scene, output/internal resolution, settings, frame-time/pacing and memory costs, including skinning/acceleration-structure work and sustained behaviour. Keep a clear opt-in and the accepted ray-traced fallback; defer or reject if the evidence is insufficient.
+
+**Explicit transport scope:** Before implementation, state which material models and lobes are supported, how emissive surfaces contribute and are sampled, and how alpha-cutout surfaces, transparent/refraction paths and volumetric fire/smoke/fog participate. Identify any retained approximations, exclusions, bounded path depths and unsupported combinations. Preserve coherent primary/secondary visibility and gameplay-critical lighting cues; path tracing must not change authoritative puzzle outcomes. This is not a promise of full physical simulation, unrestricted multiple scattering, spectral transport or every possible caustic.
+
+Admission must use measured capability and performance rather than vendor branding or a vendor lock-in requirement. The owner's RTX 5050 Laptop GPU with 8 GB is a possible evaluation target, not a certified path-tracing preset: suitable settings, memory headroom and FPS are unknown until tested. This entry authorises planning only, not runtime work, paid dependencies, a build, merge or release.
+
 ## Engine growth and scope discipline
 
 Retain native Vulkan hardware RT, Android as a first-class target, Windows RTX validation, the shared 60 Hz simulation and honest presentation evidence. Prefer reusable zone ownership, actors, conversations, progression flags, interactions and light mechanics over hardcoded exceptions for individual houses or bosses.
