@@ -4,7 +4,7 @@
 
 The owner approved the overhead concept titled **The Horde — Proposed World Layout**. Its printed “Proposed” and “Concept for review” labels describe the image's creation stage; the topology is now approved. The artwork is **not to scale**. Exact distances, traversal times, slopes, building footprints, collision and camera compositions must be established through playable blockout testing. Do not treat illustrative perspective or decorative details as measured level geometry.
 
-This is a connected regional plan delivered through bounded areas and measured zone/residency transitions. It does not promise a continuous seamless open world or require every visible region to be resident and explorable at once.
+This is a connected regional plan delivered through bounded areas and measured zone/residency transitions. Prefer seamless player-perceived continuity, using an explicit loading fallback only after owner review of measured constraints. This does not promise a general seamless open-world system or require every visible region to be resident and explorable at once. The [shared six-gate outdoor readiness contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#131-six-gate-outdoor-readiness-contract) owns cheap hero-view/terrain/town blockout, combined workload, real 3D LODs, separate RT relevance/residency and measured budgets, then 1.8's arrival-to-tavern proof before expansion. Exact distant-landmark visibility remains a blockout/review decision; this consolidation adds no new geography.
 
 ![The Horde - approved world layout, not to scale](design/world/the-horde-world-layout.png)
 

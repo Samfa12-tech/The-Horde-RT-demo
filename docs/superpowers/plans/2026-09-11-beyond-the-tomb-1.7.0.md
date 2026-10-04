@@ -48,7 +48,7 @@ Important inspected sources, relative to repository root:
 | `PROJECT_MEMORY.md` | Existing reward lantern, static GLB/PBR importer, player/character rendering, audio, RT Lab and historical finale. The rolling summary contains older details; inspect code before relying on counts. |
 | `src/gameplay/simulation/SimulationSnapshot.h` | Player location is represented by `playerX` and `playerZ`; no general player-height component is present in this inspected snapshot. |
 | `src/vulkan/raytracing/SimulationFrameAdapter.cpp` | Copies horizontal player location into render inputs and resolves roof/dawn overrides. Vertical traversal is an end-to-end dependency, not just a camera effect. |
-| `src/vulkan/raytracing/PresentableTinyRtScene.h` | Inspected scene declares 16 BLAS and 20 TLAS instances. These are current implementation limits, not permanent design limits or forest budgets. |
+| `src/vulkan/raytracing/PresentableTinyRtScene.h` | Historical `191d799` snapshot declares 16 BLAS and 20 TLAS instances. These are historical implementation bounds, not current capacity, permanent design limits or forest budgets; see the dated gap note below. |
 | `src/gameplay/interactions/FinaleSequence.h` | Current sequence includes `DawnRevealed` and `Complete`. The new continuation must explicitly replace the campaign ending behavior. |
 | `android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java` | Native Android views, buttons, panels, settings, SoundPool/MediaPlayer and menu/ending/RT Lab state. Preserve platform behavior while extracting focused helpers. |
 | `src/platform/windows/DiagnosticWindow.cpp` | Existing Windows gameplay/menu/audio/controller integration entry point; inspect the final baseline before changing it. |
@@ -59,6 +59,14 @@ Important inspected sources, relative to repository root:
 The phone evidence above is a reason to measure the combined forest/lantern/companion workload early, not a reason to declare the final 1.6.1 slow or to prescribe an arbitrary low resolution. Do not compare those instrumented Debug observations directly with old cooled or differently configured runs.
 
 The original brainstorming described unloading the dungeon during climbing and confidently mentioned Meshy custom motion. This specification tightens both: visible/RT-relevant geometry must remain resident, and custom-motion API availability is not a dependency. Verified rigging/preset animation plus Blender cleanup is the baseline asset route.
+
+### Dated implementation gap note — 4 October 2026
+
+Read-only source review of the paused 1.6.2 candidate `081f84a4661aade54142bf3fdc8d10d6e64bcf52` updates, but does not replace or accept, the historical snapshot above. The [scene ABI](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/081f84a4661aade54142bf3fdc8d10d6e64bcf52/src/vulkan/raytracing/RtSceneAbi.def#L1-L11) currently bounds instance metadata at 22, static assets at 10, primitives/materials at 32 each and texture layers at 16. These are implementation bounds, not device capacity or outdoor budgets.
+
+The inspected [fixed LOD0 loads](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/081f84a4661aade54142bf3fdc8d10d6e64bcf52/src/vulkan/raytracing/PresentableTinyRtScene.cpp#L2150-L2206) and [filename-selected LOD budget validation](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/081f84a4661aade54142bf3fdc8d10d6e64bcf52/src/scene/assets/StaticMeshAsset.cpp#L1139-L1163) do not establish general runtime distance-LOD switching or regional streaming; neither was found in the reviewed path. The static GLB importer currently [requires OPAQUE alpha mode](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/081f84a4661aade54142bf3fdc8d10d6e64bcf52/src/scene/assets/StaticMeshAsset.cpp#L1183-L1187), so alpha-cutout foliage remains a capability gate. [TLAS policy](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/081f84a4661aade54142bf3fdc8d10d6e64bcf52/src/vulkan/raytracing/TlasInstanceRefresh.h) can require a rebuild for changed instance definitions; updates are not universally cheap refits.
+
+Ray reach is already effect-specific: inspected [primary tracing](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/081f84a4661aade54142bf3fdc8d10d6e64bcf52/shaders/raytracing/include/rt_frame.glsl#L40-L43), [one bounce path](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/081f84a4661aade54142bf3fdc8d10d6e64bcf52/shaders/raytracing/include/rt_dielectric_common.glsl#L330-L336) and [moon/sky visibility](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/081f84a4661aade54142bf3fdc8d10d6e64bcf52/shaders/raytracing/include/rt_lighting.glsl#L1157-L1182) use different bounds. A long primary ray is not proof of correct distant reflection, shadow or light influence. Re-audit the accepted baseline and close these gaps through WP2/WP3 and §13.1; this note supplies no new device measurements and does not resume paused implementation.
 
 ## 2. Global constraints
 
@@ -177,7 +185,7 @@ At the final lookout/waymarker, reveal the approved distant low-detail village s
 
 ### 5.1 Choose residency from evidence, not from a cinematic assumption
 
-Implement bounded zone ownership, but choose the simplest successful loading policy at an early gate:
+Prefer seamless player-perceived continuity within bounded regional ownership; choose the simplest successful loading policy at the early [six-gate readiness review](#131-six-gate-outdoor-readiness-contract). Seamless presentation does not require every region or detail level to remain resident:
 
 | Candidate | Use / trade-off |
 |---|---|
@@ -606,6 +614,23 @@ Required measurements: final accepted baseline versus candidate at identical int
 
 Measure the **combined worst case** early: lantern glass raised near companion + dense tree view + fog + fireflies + wind. A fast empty forest and a fast isolated rope do not prove the integrated scene. Profile in native Release as well as diagnostic configurations before making player-facing performance claims. Persistent warm memory growth must be investigated across repeated entries/resets; two endpoint measurements alone do not prove leak freedom.
 
+### 13.1 Six-gate outdoor readiness contract
+
+**Owner-approved consolidation, 4 October 2026.** These gates join the existing WP2/WP3 and asset checks; they are not a new parallel programme or permission to start implementation. Gates 1–5 precede bulk detailed outdoor production in WP8; gate 6 belongs to 1.8 after accepted 1.7. Record the candidate, evidence, unresolved gaps and owner decisions at each gate.
+
+| Gate | Required proof / decision | Existing owner |
+|---|---|---|
+| 1 · Cheap geography and hero-view blockout | Establish real-scale lookout, Bellwether massing and enough coarse terrain/large forms to test the approach, route connectivity, elevations and near/mid/far composition before detailed terrain or bulk art. Use the approved, not-to-scale [world topology](../../WORLD_LAYOUT.md). Test a player-controlled hero view that suggests the wider adventure; exact distant-landmark visibility and dimensions remain reviewable blockout decisions, not new geography or a promise that the whole campaign is playable/resident. | WP1 direction; WP2 blockout |
+| 2 · Representative combined scene | Put representative trees, Kit, raised lantern and its accepted glass, actual moon illumination, mist, fireflies and distant Bellwether shell into the same workload. Include the worst permitted lookout/forest view and a representative transition/backtrack with overlapping source/destination resources. Add rope/wind where that tested state uses them. Isolated effect passes are insufficient. | WP3 |
+| 3 · Real 3D detail levels | Demonstrate near/mid/far geometry and material LODs in actual runtime views, including transitions in motion. Preserve tree/building/terrain silhouette, route and landmark connectivity, meaningful openings and required reflected/transmitted/shadow contributions. Validate foliage representation and supported alpha behavior before scaling placements; a skybox forest or billboard replacement does not satisfy the 3D contract. | WP3; asset admission |
+| 4 · Separate relevance and reach | Document memory residency separately from primary-camera visibility, reflection/transmission reach, shadow reach and light influence. Derive each from the bounded scene and permitted paths, including moon illumination, rather than copying a room-sized ray range or one universal distance. Retain off-camera contributors and safe GPU lifetimes; prove turns, backtracking and transition failure/recovery without pop-out or disappearing shadows/reflections. | WP2 ownership; WP3 rendering |
+| 5 · Measured production budgets | On the actual supported Android and Windows targets, collect sustained frame-time/pacing, CPU and valid GPU costs, animation/skinning and acceleration-structure build/update work, memory residency and upload/staging peaks, and transition hitches. Use exact build/device/driver, render dimensions, settings and thermal context. Set explicit numeric working budgets and acceptance thresholds from those measurements before production; none of the tentative counts above or current ABI bounds is certified device capacity. | WP3; §13 evidence |
+| 6 · One hub slice before expansion | In 1.8, reuse the same geography, ownership, LOD/relevance contracts and measurement method for one playable arrival-to-tavern stress slice, with a bounded representative actor/fire/glass workload, one exchange, checkpoint, return outdoors and repeat visits. Accept its combined behavior and budgets before expanding the cast or interiors. | [1.8 §§6–9](2026-09-11-village-hub-1.8.0.md#6-asset-and-performance-approach) |
+
+Gate failure means reduce optional density, improve a bounded implementation or return a specific experience compromise for owner review before expanding. Seamless arrival remains preferred; an explicit load remains an owner-reviewed fallback under §5.1. Do not silently trade away RT correctness, required effects or resolution to pass.
+
+**Experience reference:** *Jak & Daxter: The Precursor Legacy* (Jak 1) is the reference for world continuity, wide vistas and clever loading that supports the feeling of a connected journey. Andy Gavin's [PlayStation interview](https://blog.playstation.com/archive/2017/08/24/extended-play-how-naughty-dog-went-from-crash-to-jak-daxter/) discusses its LOD systems and seamless loading. This is an experiential reference, not an RT reference, an asset/style-copy brief or evidence that this engine can match its techniques or keep an entire world resident.
+
 ## 14. File and interface responsibility map
 
 Existing file paths here were inspected or are established repository integration points. Proposed new paths are design suggestions, not claims that files already exist. Reconcile with the final baseline before creating duplicates; record justified adjustments in the execution log.
@@ -670,7 +695,7 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 - [ ] Add failing tests for a nonzero player height reaching camera, hands, lantern and listener consistently, with unchanged dungeon X/Z behavior.
 - [ ] Add tests for stale destination readiness after reset, failed-load rollback and attempted destruction of resources still referenced by submitted work.
 - [ ] Implement bounded zone descriptors/ownership and the 3D traversal/ground-support path. Keep the old dungeon rendered through its existing implementation or a thin adapter.
-- [ ] Compare preloaded residency versus staged transition using blockout geometry. Test views up/down, reflection/shadow dependencies and peak residency before choosing a policy.
+- [ ] Complete §13.1 gates 1 and 4: cheap lookout/town/terrain blockout, hero-view and route checks; compare preloaded residency versus staged transition. Distinguish memory residency, primary visibility, reflection/transmission, shadows and light influence; test views up/down, backtracking and overlapping peak residency before choosing a policy.
 - [ ] Run existing dungeon regressions and exact-device presentation/lifecycle checks after meaningful renderer changes.
 
 **Gate:** Moving between meaningful heights and zone states works on both platforms without faking camera movement or exposing invalid GPU lifetime. **Audio/haptic check:** YES when listener height/spatial inputs change.
@@ -692,14 +717,14 @@ Create `docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0-execution-log.md
 
 ### WP3 — Combined outdoor rendering feasibility
 
-**Consumes:** WP1 blockout/import route and WP2 ownership. **Produces:** A small representative forest test scene and an evidence-backed resource decision.
+**Consumes:** WP1 blockout/import route and WP2 ownership, including §13.1 gates 1 and 4. **Produces:** Gates 2–5 evidence: a representative combined outdoor scene, proven real 3D LOD/relevance policy and numeric production budgets derived from measurements.
 
-- [ ] Assemble representative trees, the actual accepted lantern glass, one representative skinned actor and preliminary bounded fog/fireflies in the same camera view.
+- [ ] Assemble §13.1 gate 2's trees, Kit, raised lantern/glass, actual moon, mist, fireflies and distant Bellwether shell together; test the worst permitted view and representative transition/backtrack, not just an isolated forest.
 - [ ] Add rendering checks for matching sky/moon direction and actual emitter illumination, occluder-on/off shadow/transmittance checks at outdoor distances, 3D tree silhouettes, nonzero-height lighting and cutout visibility if used.
 - [ ] Profile combined resource/timing peaks and repeated zone resets on the phone and Windows. Record actual internals/preset/build/thermal context.
-- [ ] Settle residency, foliage representation and bounded atmosphere approach. Record sample/capacity changes with evidence rather than silently reducing the user's resolution.
+- [ ] Prove near/mid/far geometry/material LOD transitions and silhouette/connectivity, settle separate residency/ray/light-relevance reach and supported foliage/atmosphere representation, then record numeric production budgets from the measured evidence. Record sample/capacity changes rather than silently reducing the user's resolution.
 
-**Gate:** The expensive combination is understood before scaling art. A failed gate triggers focused optimization, not a bigger forest or fake RT fallback.
+**Gate:** §13.1 gates 1–5 have recorded evidence and explicit budget decisions before scaling art. A failed gate triggers focused optimization or owner review of a compromise, not a bigger forest or fake RT fallback.
 
 ### WP4 — Narrative geometry and continuation state
 

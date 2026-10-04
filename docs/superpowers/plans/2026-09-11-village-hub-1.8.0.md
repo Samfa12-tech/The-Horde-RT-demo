@@ -82,7 +82,7 @@ Proposed bounded interaction: one small lantern-based inspection or clue moment 
 
 ### Zones and interior ownership
 
-Extend the accepted bounded zone system for the forest connection, village exterior and accessible interiors. Keep campaign state independent of zone resource lifetimes. Select preloading, staged preparation or an explicitly approved loading transition from measurements rather than declaring seamless streaming mandatory.
+Extend the accepted bounded zone system for the forest connection, village exterior and accessible interiors. Keep campaign state independent of zone resource lifetimes. Prefer seamless player-perceived arrival using preloading or staged preparation chosen from measurements. An explicit loading transition remains an owner-reviewed fallback when the bounded resource constraints cannot be met; seamless continuity does not mean the whole regional world is resident.
 
 Do not equate off-camera with irrelevant: interiors can contribute through open doors, windows, reflections, transmission and shadows. Keep visible and RT-relevant content resident across transitions, or design a truthful closed/occluded boundary. Never delete an interior while its doorway or reflection still shows it.
 
@@ -110,11 +110,11 @@ Keep NPC interaction and doors comfortable on touch, keyboard/mouse and controll
 
 Use a small cohesive modular architectural kit, shared PBR materials and selected hero assets rather than a unique high-density model and material set for each building. Retain source art and provenance separately from packaged runtime assets. Validate scale, geometry, UVs, materials, animation, collision and mobile texture residency through the accepted asset pipeline.
 
-Build an early representative stress scene containing the tavern threshold, a realistic subset of NPCs, active fire/lantern sources, selected glass and any required atmosphere. This scene should exercise the combined workload, not benchmark an empty street and extrapolate the result.
+Use gate 6 of the shared [six-gate outdoor readiness contract](2026-09-11-beyond-the-tomb-1.7.0.md#131-six-gate-outdoor-readiness-contract): make the early stress workload part of one playable arrival-to-tavern slice before expanding cast or interiors. Reuse the established lookout/approach/Bellwether geography, real near/mid/far geometry/material LODs, separate memory/primary/reflection/shadow/light-relevance policy and measured budget method. Include the tavern threshold, a realistic bounded subset of actors, active fire/lantern sources, selected glass and required atmosphere, with the worst exterior/interior view, transitions, backtracking and repeat visits. One exchange, safe checkpoint and reliable return outside must work in this same slice; an empty street or isolated NPC benchmark cannot certify expansion.
 
 Measure warm exact-candidate frame timing, actual internal pixel dimensions/preset, CPU and valid GPU costs, animated-character work, acceleration-structure updates, texture/resource peaks, loading hitches and repeated interior transitions. Test both the S26 Ultra and Windows RTX target. Use the repository's descriptive 60/50/30 FPS bands and matched-regression policy; do not invent a guaranteed frame rate from a document or hide cost by reducing quality/resolution.
 
-Adjust optional density, ornament and activity counts before widening the scene. Any trade-off affecting required experience or RT correctness needs an explicit scope decision. No subscriptions, paid generation, credit top-ups or new asset purchases are authorised by this plan.
+Set explicit numeric working budgets and acceptance thresholds from the combined sustained Android/Windows measurements before expanding the provisional cast/interior envelope. Include memory residency, upload/staging peaks and AS build/update costs; accepted 1.7 numbers must be revalidated for the added hub workload. Adjust optional density, ornament and activity counts before widening the scene. Any trade-off affecting required experience or RT correctness needs an explicit scope decision. No subscriptions, paid generation, credit top-ups or new asset purchases are authorised by this plan.
 
 ## 7. Explicitly outside 1.8
 
@@ -126,7 +126,7 @@ Do not prebuild these as speculative infrastructure. Add only the reusable seams
 
 1. Audit the accepted 1.7 source, saves, zone/actor/dialogue contracts and exact-device evidence; refine the approved hub geography into a tested street/building blockout, story beat and measured scope.
 2. Build the representative exterior/interior/NPC workload and prove the residency, interaction and performance approach before producing the whole asset set.
-3. Complete one playable arrival-to-tavern slice with one NPC exchange, safe checkpoint and reliable return outside.
+3. Complete and accept that same playable arrival-to-tavern stress slice with one NPC exchange, safe checkpoint, reliable return outside and repeated visits; record gate 6's combined correctness and numeric-budget decision before proceeding.
 4. Extend to the agreed houses/cast and implement the scoped useful service, treasure/training and access-quest slice, progress-aware dialogue and lantern clue. Validate alternate progression routes and save/reward/spending integrity.
 5. Apply final art/audio polish, verify repeat visits and previous chapters, and complete cross-platform acceptance before proposing release.
 
