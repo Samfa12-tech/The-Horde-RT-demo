@@ -122,9 +122,13 @@ inline std::string BuildWindowsMotionTuningJson(
     const horde::vulkan::raytracing::RtWorkloadPreset requested,
     const horde::vulkan::raytracing::RtWorkloadPreset start,
     const horde::vulkan::raytracing::RtWorkloadPreset end,
-    const std::string_view startQuality, const std::string_view endQuality)
+    const std::string_view startQuality, const std::string_view endQuality,
+    const std::optional<horde::vulkan::raytracing::RtQualityControlsGpu> uploadedAtStart = std::nullopt,
+    const std::optional<horde::vulkan::raytracing::RtQualityControlsGpu> uploadedAtEnd = std::nullopt,
+    const bool requireUploadedPolicy = false)
 {
-    auto json = BuildWindowsBenchmarkTuningJson(requested, start, end, startQuality, endQuality);
+    auto json = BuildWindowsBenchmarkTuningJson(requested, start, end, startQuality, endQuality,
+        uploadedAtStart, uploadedAtEnd, requireUploadedPolicy);
     json.pop_back();
     const auto mistSamples = end == horde::vulkan::raytracing::RtWorkloadPreset::Max ? 8u :
         end == horde::vulkan::raytracing::RtWorkloadPreset::Authored ? 6u : 0u;

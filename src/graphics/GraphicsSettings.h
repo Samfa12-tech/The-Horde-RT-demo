@@ -10,7 +10,7 @@
 
 namespace horde::graphics
 {
-inline constexpr std::uint32_t kGraphicsSettingsSchema = 2u;
+inline constexpr std::uint32_t kGraphicsSettingsSchema = 3u;
 inline constexpr double kGraphicsConfirmationSeconds = 15.0;
 
 #ifndef HORDE_RT_MIN_RENDER_SCALE_PERCENT
@@ -37,7 +37,8 @@ inline constexpr int ClampGraphicsRenderScalePercent(const int percent) noexcept
 enum class GraphicsPlatform : std::uint8_t { Android, Windows };
 // Values deliberately match the legacy persisted water setting.
 enum class WaterQuality : std::uint8_t { Off = 0u, Mobile = 1u, High = 2u };
-enum class FireDetail : std::uint8_t { Mobile = 0u, High = 1u };
+enum class FireDetail : std::uint8_t { Mobile = 0u, High = 1u, Low = 2u };
+enum class ShadowQuality : std::uint8_t { Lower = 0u, Current = 1u, Higher = 2u };
 enum class OpticalProfile : std::uint8_t { Mobile, High };
 enum class GraphicsBackend : std::uint8_t { Unsupported, RayTracingPipeline, RayQueryCompute };
 enum class GraphicsPreset : std::uint8_t { AcceptedBaseline, ReducedEffects, Custom };
@@ -52,6 +53,7 @@ struct GraphicsSettings
     // Enables the physical glass supported by the immutable compiled profile.
     // It cannot add High lantern panes to a Mobile build.
     bool glassEnabled = true;
+    ShadowQuality shadowQuality = ShadowQuality::Current;
     bool operator==(const GraphicsSettings&) const = default;
 };
 
@@ -59,7 +61,8 @@ inline bool ValidGraphicsSettings(const GraphicsSettings& settings) noexcept
 {
     return ValidGraphicsRenderScalePercent(settings.renderScalePercent) &&
         static_cast<unsigned>(settings.waterQuality) <= 2u &&
-        static_cast<unsigned>(settings.fireDetail) <= 1u &&
+        static_cast<unsigned>(settings.fireDetail) <= 2u &&
+        static_cast<unsigned>(settings.shadowQuality) <= 2u &&
         settings.previewFrameCap >= 15 && settings.previewFrameCap <= 60;
 }
 
@@ -73,7 +76,8 @@ inline GraphicsSettings ReducedEffectsGraphicsSettings(const GraphicsPlatform pl
 {
     auto result = BaselineGraphicsSettings(platform);
     result.waterQuality = WaterQuality::Mobile;
-    result.fireDetail = FireDetail::Mobile;
+    result.fireDetail = FireDetail::Low;
+    result.shadowQuality = ShadowQuality::Lower;
     return result;
 }
 
@@ -224,20 +228,31 @@ inline GraphicsRecovery RecoverGraphicsSettings(const GraphicsPersistenceRecord&
 {
     GraphicsRecovery result;
     const bool legacySchema = record.schema == 1u;
-    if ((!legacySchema && record.schema != kGraphicsSettingsSchema) || !ValidGraphicsSettings(record.confirmed))
+    const bool oldSchema = legacySchema || record.schema == 2u;
+    auto confirmed = record.confirmed;
+    if (oldSchema) confirmed.shadowQuality = ShadowQuality::Current;
+    if ((!oldSchema && record.schema != kGraphicsSettingsSchema) || !ValidGraphicsSettings(confirmed) ||
+        (oldSchema && static_cast<unsigned>(confirmed.fireDetail) > 1u))
     {
         result.startup = BaselineGraphicsSettings(platform);
         result.reasons = GraphicsReason::InvalidStoredSettings;
     }
     else
     {
-        result.startup = record.confirmed;
+        result.startup = confirmed;
         if (legacySchema) result.startup.glassEnabled = true;
     }
     if (record.pending)
     {
         result.retainedRequested = record.pending;
         if (legacySchema) result.retainedRequested->glassEnabled = true;
+        if (oldSchema) result.retainedRequested->shadowQuality = ShadowQuality::Current;
+        if (!ValidGraphicsSettings(*result.retainedRequested) ||
+            (oldSchema && static_cast<unsigned>(result.retainedRequested->fireDetail) > 1u))
+        {
+            result.retainedRequested.reset();
+            result.reasons = result.reasons | GraphicsReason::InvalidStoredSettings;
+        }
         result.reasons = result.reasons | GraphicsReason::InterruptedApply;
     }
     return result;
@@ -326,6 +341,7 @@ public:
             snapshot.effective.waterQuality != snapshot.requested.waterQuality ||
             snapshot.effective.previewFrameCap != snapshot.requested.previewFrameCap ||
             snapshot.effective.glassEnabled != snapshot.requested.glassEnabled ||
+            snapshot.effective.shadowQuality != snapshot.requested.shadowQuality ||
             (snapshot.effective.fireDetail != snapshot.requested.fireDetail && !explainedFire) ||
             (HasGraphicsReason(snapshot.reasons, GraphicsReason::FireFollowsWater) && !explainedFire) ||
             HasGraphicsReason(snapshot.reasons, GraphicsReason::InvalidSettings) ||

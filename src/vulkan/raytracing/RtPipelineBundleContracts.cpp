@@ -19,7 +19,7 @@ constexpr std::uint32_t kExecutionModelRayGenerationKhr = 5313u;
 constexpr std::uint32_t kExecutionModelGlCompute = 5u;
 constexpr std::uint32_t kDecorationBinding = 33u;
 
-constexpr std::array<RtDescriptorResourceKind, 26u> kDescriptorKinds{
+constexpr std::array<RtDescriptorResourceKind, 27u> kDescriptorKinds{
     RtDescriptorResourceKind::AccelerationStructure,
     RtDescriptorResourceKind::StorageImage,
     RtDescriptorResourceKind::StorageBuffer,
@@ -46,16 +46,17 @@ constexpr std::array<RtDescriptorResourceKind, 26u> kDescriptorKinds{
     RtDescriptorResourceKind::StorageBuffer,
     RtDescriptorResourceKind::StorageBuffer,
     RtDescriptorResourceKind::CombinedImageSampler,
+    RtDescriptorResourceKind::StorageBuffer,
 };
 
-constexpr std::array<std::uint32_t, 26u> kDiagnosticBindingRoster{
+constexpr std::array<std::uint32_t, 27u> kDiagnosticBindingRoster{
     0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u,
-    13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 22u, 23u, 24u, 25u,
+    13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 22u, 23u, 24u, 25u, 26u,
 };
 
-constexpr std::array<std::uint32_t, 25u> kShippingBindingRoster{
+constexpr std::array<std::uint32_t, 26u> kShippingBindingRoster{
     0u, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u, 11u, 12u,
-    13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 23u, 24u, 25u,
+    13u, 14u, 15u, 16u, 17u, 18u, 19u, 20u, 21u, 23u, 24u, 25u, 26u,
 };
 
 constexpr std::uint32_t RotateRight(std::uint32_t value, std::uint32_t bits) noexcept
@@ -198,13 +199,13 @@ bool MatchesDescriptorBindingRoster(
         return false;
     }
     std::array<std::uint32_t, 32u> actual = reflected.descriptorBindings;
-    std::array<std::uint32_t, 26u> expected{};
+    std::array<std::uint32_t, 27u> expected{};
     std::size_t expectedCount = 0u;
     for (std::size_t index = 0u; index < descriptorIo.bindingCount; ++index) {
         const auto binding = descriptorIo.bindings[index].binding;
         // The legacy held-light record remains layout-compatible, but current
         // world-space fire shaders source lighting from binding 21 and optimize
-        // binding 20 away. All other bindings (including 23/24/25) remain required.
+        // binding 20 away. All other bindings (including 23/24/25/26) remain required.
         if (binding == kRtBindingHeldLight &&
             std::find(actual.begin(), actual.begin() + reflected.descriptorBindingCount, binding) ==
                 actual.begin() + reflected.descriptorBindingCount) continue;

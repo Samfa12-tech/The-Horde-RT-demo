@@ -212,6 +212,9 @@ struct PresentableTinyRtSceneObservationTestAccess
         // require readiness. No device is bound, so this fixture never invokes
         // Vulkan; allocation inventory remains independently observable.
         scene.ready_ = true;
+        scene.uploadedQualityControls_ = {{2u, 4u, 2u, 0u}};
+        scene.uploadedFireQuality_ = FireEmitterQuality::Low;
+        scene.uploadedQualityControlsValid_ = true;
         scene.sceneProfile_ = RtSceneProfile::GraphicsPreview;
         scene.tlasInstanceCount_ = 7u;
         scene.tlas_.handle = FakeHandle<VkAccelerationStructureKHR>(0x987u);
@@ -268,7 +271,7 @@ struct PresentableTinyRtSceneObservationTestAccess
 
         for (RtGpuBuffer* buffer : std::array{
                  &scene.vertexBuffer_, &scene.indexBuffer_, &scene.transformBuffer_,
-                 &scene.instanceBuffer_, &scene.heldLightBuffer_, &scene.fireEmitterBuffer_,
+                 &scene.instanceBuffer_, &scene.heldLightBuffer_, &scene.fireEmitterBuffer_, &scene.qualityControlsBuffer_,
                  &scene.worldSurfaceBuffer_, &scene.staticVertexBuffer_,
                  &scene.worldPlayerVertexBuffer_, &scene.viewmodelVertexBuffer_,
                  &scene.staticIndexBuffer_, &scene.staticGeometryTransformBuffer_,
@@ -291,6 +294,9 @@ struct PresentableTinyRtSceneObservationTestAccess
         populateBuffer(scene.skinnedPlayerBlasUpdateScratch_);
         populateBuffer(scene.viewmodelBlasUpdateScratch_);
         scene.ready_ = true;
+        scene.uploadedQualityControls_ = {{2u, 4u, 2u, 0u}};
+        scene.uploadedFireQuality_ = FireEmitterQuality::Low;
+        scene.uploadedQualityControlsValid_ = true;
         populateBlas(scene.tlas_);
         populateBuffer(scene.tlasUpdateScratch_);
 
@@ -555,7 +561,7 @@ struct PresentableTinyRtSceneOutputResizeTestAccess
 
         for (const RtGpuBuffer* buffer : std::array{
                  &scene.vertexBuffer_, &scene.indexBuffer_, &scene.transformBuffer_,
-                 &scene.instanceBuffer_, &scene.heldLightBuffer_, &scene.fireEmitterBuffer_,
+                 &scene.instanceBuffer_, &scene.heldLightBuffer_, &scene.fireEmitterBuffer_, &scene.qualityControlsBuffer_,
                  &scene.worldSurfaceBuffer_, &scene.staticVertexBuffer_,
                  &scene.worldPlayerVertexBuffer_, &scene.viewmodelVertexBuffer_,
                  &scene.staticIndexBuffer_, &scene.staticGeometryTransformBuffer_,
@@ -1153,8 +1159,8 @@ int main()
                       scene.PrimaryRewardBodyPixelCount() == 41u,
                   "legacy getters must project one explicitly published completed record");
     const auto diagnostic = scene.ResourceInventory();
-    ok &= Require(diagnostic.bufferCount == 46u &&
-                      diagnostic.memoryAllocationCount == 56u &&
+    ok &= Require(diagnostic.bufferCount == 47u &&
+                      diagnostic.memoryAllocationCount == 57u &&
                       diagnostic.bottomLevelAccelerationStructureCount == 18u &&
                       scene.BlasCount() == 18u &&
                       diagnostic.topLevelAccelerationStructureCount == 1u &&
@@ -1163,16 +1169,16 @@ int main()
                       diagnostic.shaderBindingTableCount == 2u &&
                       diagnostic.descriptorSetCount == 1u,
                   "live inventory must include direct, character, image, and both SBT owners");
-    ok &= Require(diagnostic.hostVisibleBytes == 3072u &&
-                      diagnostic.deviceLocalBytes == 4224u,
+    ok &= Require(diagnostic.hostVisibleBytes == 3136u &&
+                      diagnostic.deviceLocalBytes == 4288u,
                   "host-visible and device-local bytes must use inclusive allocation classes");
 
     PresentableTinyRtSceneObservationTestAccess::RemoveDiagnosticBuffer(scene);
     const auto shipping = scene.ResourceInventory();
-    ok &= Require(shipping.bufferCount == 45u &&
-                      shipping.memoryAllocationCount == 55u &&
-                      shipping.hostVisibleBytes == 3008u &&
-                      shipping.deviceLocalBytes == 4160u,
+    ok &= Require(shipping.bufferCount == 46u &&
+                      shipping.memoryAllocationCount == 56u &&
+                      shipping.hostVisibleBytes == 3072u &&
+                      shipping.deviceLocalBytes == 4224u,
                   "inventory must count only a genuinely live Diagnostic buffer");
 
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(scene);
@@ -1214,6 +1220,10 @@ int main()
                   "even partial/no-device destruction must invalidate cached TLAS definitions");
     const auto movedFrom = scene.ResourceInventory();
     const auto movedTo = moved.ResourceInventory();
+    ok &= Require(moved.HasUploadedQualityControls() && !scene.HasUploadedQualityControls() &&
+                      moved.QualityControls().controls == std::array<std::uint32_t, 4u>{{2u, 4u, 2u, 0u}} &&
+                      moved.UploadedFireQuality() == horde::vulkan::raytracing::FireEmitterQuality::Low,
+                  "actual uploaded policy must transfer to exactly one owner with its buffer");
     ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 18u &&
                       movedFrom.bufferCount == 0u &&
                       movedFrom.memoryAllocationCount == 0u &&

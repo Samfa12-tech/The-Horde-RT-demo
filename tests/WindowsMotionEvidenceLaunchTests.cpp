@@ -86,6 +86,22 @@ int main()
     check(authored.find("\"primaryAreaShadowSamplesPerContributingReceiver\":1")!=std::string::npos &&
           authored.find("\"lichMistSamplesPerIntersectingRay\":6")!=std::string::npos);
     check(BuildWindowsMotionTuningJson(RtWorkloadPreset::Max,RtWorkloadPreset::Max,RtWorkloadPreset::Authored,"High","High").find("\"policyStable\":false")!=std::string::npos);
+    const horde::vulkan::raytracing::RtQualityControlsGpu current{{1u,1u,1u,0u}};
+    const horde::vulkan::raytracing::RtQualityControlsGpu explicitLegacy{{3u,4u,2u,0u}};
+    const auto uploadedMax=BuildWindowsMotionTuningJson(RtWorkloadPreset::Max,RtWorkloadPreset::Max,
+        RtWorkloadPreset::Max,"High","High",explicitLegacy,explicitLegacy,true);
+    check(uploadedMax.find("\"shadowPolicySource\":\"uploaded\"")!=std::string::npos &&
+        uploadedMax.find("\"shadowMode\":\"DiagnosticLegacy\"")!=std::string::npos &&
+        uploadedMax.find("\"primaryAreaShadowSamplesPerContributingReceiver\":4")!=std::string::npos &&
+        uploadedMax.find("\"lichMistSamplesPerIntersectingRay\":8")!=std::string::npos);
+    const auto independentMax=BuildWindowsMotionTuningJson(RtWorkloadPreset::Max,RtWorkloadPreset::Max,
+        RtWorkloadPreset::Max,"High","High",current,current,true);
+    check(independentMax.find("\"shadowMode\":\"Current\"")!=std::string::npos &&
+        independentMax.find("\"primaryAreaShadowSamplesPerContributingReceiver\":1")!=std::string::npos &&
+        independentMax.find("\"primarySkyVisibilitySamples\":1")!=std::string::npos &&
+        independentMax.find("\"lichMistSamplesPerIntersectingRay\":8")!=std::string::npos);
+    check(BuildWindowsMotionTuningJson(RtWorkloadPreset::Max,RtWorkloadPreset::Max,RtWorkloadPreset::Max,
+        "High","High",std::nullopt,std::nullopt,true).find("\"policyStable\":false")!=std::string::npos);
     std::cout<<"Native motion launch failures="<<failures<<'\n';
     return failures ? 1 : 0;
 }

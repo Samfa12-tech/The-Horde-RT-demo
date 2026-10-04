@@ -8,7 +8,8 @@ namespace horde::vulkan::raytracing
 RtSceneFrameInputs BuildGraphicsPreviewFrameInputs(
     const horde::graphics::GraphicsPreviewSession& session,
     const float outputExposure, const WaterQuality waterQuality,
-    const FireEmitterQuality fireDetail, const RtSceneTuning& tuning)
+    const FireEmitterQuality fireDetail, const RtSceneTuning& tuning,
+    const std::optional<horde::graphics::ShadowQuality> shadowQuality)
 {
     const auto preview = session.Snapshot();
     RtSceneFrameInputs frame{};
@@ -21,6 +22,7 @@ RtSceneFrameInputs BuildGraphicsPreviewFrameInputs(
     frame.outputExposure = outputExposure;
     frame.waterQuality = waterQuality;
     frame.fireDetail = fireDetail;
+    frame.shadowQuality = shadowQuality;
     frame.previewMotion = preview.motionTest;
     frame.torchLightStrength = 1.8f;
     frame.tuning = ClampRtSceneTuning(tuning);
@@ -55,9 +57,10 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     const float outputExposure,
     const RtSceneTuning& tuning,
     const WaterQuality waterQuality,
-    const std::optional<FireEmitterQuality> fireDetail)
+    const std::optional<FireEmitterQuality> fireDetail,
+    const std::optional<horde::graphics::ShadowQuality> shadowQuality)
 {
-    return BuildRtSceneFrameInputs(simulation, outputExposure, waterQuality, tuning, fireDetail);
+    return BuildRtSceneFrameInputs(simulation, outputExposure, waterQuality, tuning, fireDetail, shadowQuality);
 }
 
 RtSceneFrameInputs BuildRtSceneFrameInputs(
@@ -65,7 +68,8 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     const float outputExposure,
     const WaterQuality waterQuality,
     const RtSceneTuning& tuning,
-    const std::optional<FireEmitterQuality> fireDetail)
+    const std::optional<FireEmitterQuality> fireDetail,
+    const std::optional<horde::graphics::ShadowQuality> shadowQuality)
 {
     RtSceneFrameInputs frame;
     frame.playerRenderRoute = kProductionPlayerRenderRoute;
@@ -80,6 +84,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.outputExposure = outputExposure;
     frame.waterQuality = waterQuality;
     frame.fireDetail = fireDetail;
+    frame.shadowQuality = shadowQuality;
     frame.tuning = ClampRtSceneTuning(tuning);
     frame.combat = simulation.swordCombat;
     frame.playerCombat = simulation.playerCombat;

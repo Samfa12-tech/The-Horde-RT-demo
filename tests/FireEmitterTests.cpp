@@ -23,6 +23,7 @@ using horde::gameplay::effects::StepFireEmitterFixed;
 using horde::gameplay::items::HeldItemTransform;
 using horde::gameplay::items::IdentityHeldItemTransform;
 using horde::vulkan::raytracing::BuildFireEmitterUpload;
+using horde::vulkan::raytracing::ResolveFireEmitterQuality;
 using horde::vulkan::raytracing::FireEmitterQuality;
 using horde::vulkan::raytracing::FireEmitterSelectionContext;
 using horde::vulkan::raytracing::FireEmitterTuning;
@@ -310,6 +311,41 @@ bool TestQualityChangesOnlyBoundedRayBudgets()
                    "quality-specific GPU differences must be limited to explicit bounded budgets");
 }
 
+bool TestLowChangesOnlyIntegrationBudgets()
+{
+    const std::array<FireEmitterState, 3u> emitters{{Emitter(3u,2.0f,ShowcaseZone::Opening),
+        Emitter(1u,0.0f,ShowcaseZone::Opening),Emitter(2u,1.0f,ShowcaseZone::Opening)}};
+    FireEmitterUpload mobile{}, low{}, high{};
+    std::string diagnostic;
+    bool ok = BuildFireEmitterUpload(emitters, {{0,1,0},ShowcaseZone::Opening,10}, {}, FireEmitterQuality::Mobile,mobile,diagnostic) &&
+        BuildFireEmitterUpload(emitters, {{0,1,0},ShowcaseZone::Opening,10}, {}, FireEmitterQuality::Low,low,diagnostic) &&
+        BuildFireEmitterUpload(emitters, {{0,1,0},ShowcaseZone::Opening,10}, {}, FireEmitterQuality::High,high,diagnostic);
+    ok &= Require(low.activeCount == mobile.activeCount && low.selectedStableIds == mobile.selectedStableIds &&
+                  high.selectedStableIds == mobile.selectedStableIds, "Low preserves real nearest stable emitter selection");
+    for (std::size_t index=0; index<low.activeCount; ++index)
+    {
+        auto reduced = low.emitters[index];
+        const auto ordinary = mobile.emitters[index];
+        ok &= Require(reduced.identity[2] == 2u && reduced.identity[3] == 1u &&
+                      ordinary.identity[2] == 4u && ordinary.identity[3] == 1u &&
+                      high.emitters[index].identity[2] == 10u && high.emitters[index].identity[3] == 2u,
+                      "Low actually reduces primary/reflected field integrations to2 versus4/4 and10/8");
+        reduced.identity = ordinary.identity;
+        ok &= Require(reduced.worldFromLocal0 == ordinary.worldFromLocal0 && reduced.worldFromLocal1 == ordinary.worldFromLocal1 &&
+                      reduced.worldFromLocal2 == ordinary.worldFromLocal2 && reduced.worldFromLocal3 == ordinary.worldFromLocal3 &&
+                      reduced.lightPositionStrength == ordinary.lightPositionStrength && reduced.colourIntensity == ordinary.colourIntensity &&
+                      reduced.shape == ordinary.shape && reduced.animation == ordinary.animation && reduced.smokeEmbers == ordinary.smokeEmbers &&
+                      reduced.identity == ordinary.identity, "Low changes no socket/phase/radiance/smoke/seed/shape state");
+    }
+    ok &= Require(ResolveFireEmitterQuality(horde::graphics::FireDetail::Low) == FireEmitterQuality::Low &&
+                  ResolveFireEmitterQuality(horde::graphics::FireDetail::Mobile) == FireEmitterQuality::Mobile &&
+                  ResolveFireEmitterQuality(horde::graphics::FireDetail::High) == FireEmitterQuality::High,
+                  "all persisted fire choices have distinct exhaustive renderer mappings");
+    ok &= Require(!BuildFireEmitterUpload(emitters, {{0,1,0},ShowcaseZone::Opening,10}, {},
+                      static_cast<FireEmitterQuality>(99u),low,diagnostic), "invalid renderer tier rejected before upload");
+    return ok;
+}
+
 bool TestHardCapacityRejectsFifthEmitter()
 {
     std::array<FireEmitterState, 5u> emitters{{
@@ -342,6 +378,7 @@ int main()
     ok &= TestActualPivotAccelerationDrivesBoundedMotionResponse();
     ok &= TestRenderDeliveryEquivalenceAt30_60_120Hz();
     ok &= TestQualityChangesOnlyBoundedRayBudgets();
+    ok &= TestLowChangesOnlyIntegrationBudgets();
     ok &= TestHardCapacityRejectsFifthEmitter();
     if (!ok) return 1;
     std::cout << "Fire emitter deterministic state, motion, selection, and budget contracts passed\n";

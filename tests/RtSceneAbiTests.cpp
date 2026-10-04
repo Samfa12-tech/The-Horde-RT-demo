@@ -194,6 +194,9 @@ void TestAbiLayout()
               offsetof(RtMaterialGpu, materialFlags) == 96u &&
               offsetof(RtMaterialGpu, normalScaleUvScaleBlend) == 112u,
           "RtMaterialGpu CPU offsets match generated GLSL declaration");
+    Check(sizeof(RtQualityControlsGpu) == 16u && alignof(RtQualityControlsGpu) == 16u &&
+              offsetof(RtQualityControlsGpu, controls) == 0u,
+          "typed quality record is exactly one aligned uint4 without push expansion");
     Check(sizeof(RtHeldLightGpu) == 16u && alignof(RtHeldLightGpu) == 16u &&
               offsetof(RtHeldLightGpu, positionStrength) == 0u,
           "RtHeldLightGpu appends one exact world-position/strength vec4");
@@ -218,8 +221,8 @@ void TestGeneratedConstants()
               kRtBindingEmissiveTextures == 19u && kRtBindingHeldLight == 20u &&
               kRtBindingFireEmitters == 21u && kRtBindingDielectricDiagnostics == 22u &&
               kRtBindingWorldPlayerVertices == 23u && kRtBindingViewmodelVertices == 24u &&
-              kRtBindingEnvironmentTexture == 25u,
-          "descriptor bindings preserve player streams23/24 and append environment25");
+              kRtBindingEnvironmentTexture == 25u && kRtBindingQualityControls == 26u,
+          "descriptor bindings preserve player streams23/24 and append environment25 and quality26");
     Check(static_cast<std::uint32_t>(RtGeometryRole::Static) == 0u &&
               static_cast<std::uint32_t>(RtGeometryRole::PlayerWorldBody) == 1u &&
               static_cast<std::uint32_t>(RtGeometryRole::PlayerViewmodel) == 2u &&

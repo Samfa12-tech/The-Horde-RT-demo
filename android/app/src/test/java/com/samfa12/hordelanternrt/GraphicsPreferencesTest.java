@@ -3,6 +3,7 @@ package com.samfa12.hordelanternrt;
 import static org.junit.Assert.*;
 import android.content.Context;
 import android.content.SharedPreferences;
+import java.lang.reflect.Proxy;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,7 +55,7 @@ public final class GraphicsPreferencesTest {
         assertEquals(75, GraphicsPreferences.confirmed(prefs).scale);
     }
     @Test public void snapshotRequiresCurrentGenerationAndRealPresentedDimensions() {
-        long[] a = new long[22];
+        long[] a = new long[24];
         a[1]=7; a[7]=800; a[8]=600; a[9]=1200; a[10]=900; a[12]=1; a[13]=1;
         assertTrue(GraphicsPreferences.presented(a, 7));
         assertFalse(GraphicsPreferences.presented(a, 8));
@@ -62,6 +63,7 @@ public final class GraphicsPreferencesTest {
         a[13]=1; a[7]=0; assertFalse(GraphicsPreferences.presented(a, 7));
         assertFalse(GraphicsPreferences.presented(new long[19], 7));
         assertFalse(GraphicsPreferences.presented(new long[20], 7));
+        assertFalse(GraphicsPreferences.presented(new long[22], 7));
         assertFalse(GraphicsPreferences.presented(null, 7));
     }
     @Test public void schemaOneMigrationDefaultsOnlyGlassAndKeepsPendingTuple() {
@@ -80,7 +82,7 @@ public final class GraphicsPreferencesTest {
         assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(off));
         assertTrue(GraphicsPreferences.confirmed(prefs).same(new GraphicsPreferences.Values(68,0,1,42,true)));
         assertTrue(GraphicsPreferences.confirm(prefs,off));
-        assertEquals(2,prefs.getInt("graphics_schema",0));
+        assertEquals(3,prefs.getInt("graphics_schema",0));
         assertFalse(GraphicsPreferences.hasPending(prefs));
         assertTrue(GraphicsPreferences.confirmed(prefs).same(off));
         prefs.edit().putBoolean(GraphicsPreferences.PENDING,true).commit();
@@ -92,7 +94,7 @@ public final class GraphicsPreferencesTest {
         prefs.edit().putInt("graphics_schema",2).putInt("render_scale",92)
                 .putString(GraphicsPreferences.GLASS,"Off").commit();
         assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.baseline()));
-        long[] a=new long[22]; a[1]=7; a[7]=800; a[8]=600; a[9]=1200; a[10]=900; a[12]=2; a[13]=1;
+        long[] a=new long[24]; a[1]=7; a[7]=800; a[8]=600; a[9]=1200; a[10]=900; a[12]=2; a[13]=1;
         assertTrue(GraphicsPreferences.presented(a,7));
         a[20]=2; assertFalse(GraphicsPreferences.presented(a,7));
         a[20]=1; a[21]=-1; assertFalse(GraphicsPreferences.presented(a,7));
@@ -115,5 +117,89 @@ public final class GraphicsPreferencesTest {
             assertFalse(GraphicsPreferences.markPending(prefs,new GraphicsPreferences.Values(scale,1,0,30)));
         }
         assertFalse(GraphicsPreferences.validScale(75,34));
+    }
+    @Test public void schemaTwoMigrationPreservesGlassAndIndependentPendingButDefaultsOnlyShadows() {
+        prefs.edit().putInt("graphics_schema",2).putInt("render_scale",68).putInt("water_quality",0)
+                .putInt(GraphicsPreferences.FIRE,1).putInt(GraphicsPreferences.CAP,42)
+                .putBoolean(GraphicsPreferences.GLASS,false).putInt(GraphicsPreferences.SHADOW,2)
+                .putBoolean(GraphicsPreferences.PENDING,true).putInt("graphics_pending_schema",2)
+                .putInt("graphics_pending_scale",92).putInt("graphics_pending_water",2)
+                .putInt("graphics_pending_fire",0).putInt("graphics_pending_cap",15)
+                .putBoolean(GraphicsPreferences.PENDING_GLASS,false)
+                .putString(GraphicsPreferences.PENDING_SHADOW,"stale-schema-three-field").commit();
+        GraphicsPreferences.Values oldConfirmed=new GraphicsPreferences.Values(68,0,1,42,false,1);
+        GraphicsPreferences.Values oldPending=new GraphicsPreferences.Values(92,2,0,15,false,1);
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(oldConfirmed));
+        assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(oldPending));
+        assertTrue(GraphicsPreferences.hasPending(prefs));
+        GraphicsPreferences.Values newest=new GraphicsPreferences.Values(63,1,2,30,false,0);
+        assertTrue(GraphicsPreferences.markPending(prefs,newest));
+        assertEquals(2,prefs.getInt("graphics_schema",0));
+        assertEquals(3,prefs.getInt("graphics_pending_schema",0));
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(oldConfirmed));
+        assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(newest));
+        assertTrue(GraphicsPreferences.confirm(prefs,newest));
+        // A retained older independently-versioned pending record does not inherit
+        // the confirmed schema3 shadow value during interrupted recovery.
+        prefs.edit().putBoolean(GraphicsPreferences.PENDING,true).putInt("graphics_pending_schema",2)
+                .putInt("graphics_pending_fire",0).putInt(GraphicsPreferences.PENDING_SHADOW,2).commit();
+        assertEquals(0,GraphicsPreferences.confirmed(prefs).shadow);
+        assertEquals(1,GraphicsPreferences.retainedCandidate(prefs).shadow);
+        assertTrue(GraphicsPreferences.hasPending(prefs));
+    }
+    @Test public void schemaThreeKeepsLowFireAndEveryShadowTierRejectsUnknownOrHistoricalEnums() {
+        for(int shadow=0;shadow<=2;++shadow) {
+            GraphicsPreferences.Values choice=new GraphicsPreferences.Values(75,2,2,42,false,shadow);
+            assertTrue(GraphicsPreferences.markPending(prefs,choice));
+            assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(choice));
+            assertTrue(GraphicsPreferences.confirm(prefs,choice));
+            assertTrue(GraphicsPreferences.confirmed(prefs).same(choice));
+            assertFalse(GraphicsPreferences.hasPending(prefs));
+        }
+        for(int schema:new int[]{1,2}) {
+            prefs.edit().putInt("graphics_schema",schema).putInt(GraphicsPreferences.FIRE,2)
+                    .putInt("graphics_pending_schema",schema).putInt("graphics_pending_fire",2).commit();
+            assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.baseline()));
+            assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(GraphicsPreferences.baseline()));
+        }
+        for(int invalid:new int[]{-1,3,99}) {
+            assertFalse(GraphicsPreferences.markPending(prefs,new GraphicsPreferences.Values(75,1,invalid,30,true,1)));
+            assertFalse(GraphicsPreferences.confirm(prefs,new GraphicsPreferences.Values(75,1,0,30,true,invalid)));
+            prefs.edit().putInt("graphics_schema",3).putInt(GraphicsPreferences.FIRE,0)
+                    .putInt(GraphicsPreferences.SHADOW,invalid).putInt("graphics_pending_schema",3)
+                    .putInt("graphics_pending_fire",0).putInt(GraphicsPreferences.PENDING_SHADOW,invalid).commit();
+            assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.baseline()));
+            assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(GraphicsPreferences.baseline()));
+        }
+        prefs.edit().putString(GraphicsPreferences.SHADOW,"Higher")
+                .putString(GraphicsPreferences.PENDING_SHADOW,"Lower").commit();
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.baseline()));
+        assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(GraphicsPreferences.baseline()));
+    }
+    @Test public void failedConfirmationRetainsCompletePendingSixTupleAndSavedRecord() {
+        GraphicsPreferences.Values saved=new GraphicsPreferences.Values(68,0,1,15,false,2);
+        GraphicsPreferences.Values pending=new GraphicsPreferences.Values(100,2,2,60,true,0);
+        assertTrue(GraphicsPreferences.confirm(prefs,saved));
+        assertTrue(GraphicsPreferences.markPending(prefs,pending));
+        prefs.edit().putInt("music_volume",43).putBoolean("rt_lab_unlocked",true).commit();
+        SharedPreferences failing=(SharedPreferences)Proxy.newProxyInstance(SharedPreferences.class.getClassLoader(),
+                new Class<?>[]{SharedPreferences.class},(proxy,method,args)->{
+                    if(!method.getName().equals("edit")) return method.invoke(prefs,args);
+                    SharedPreferences.Editor editor=prefs.edit();
+                    return Proxy.newProxyInstance(SharedPreferences.Editor.class.getClassLoader(),
+                            new Class<?>[]{SharedPreferences.Editor.class},(editorProxy,editMethod,editArgs)->{
+                                if(editMethod.getName().equals("commit")) return false;
+                                Object result=editMethod.invoke(editor,editArgs);
+                                return result instanceof SharedPreferences.Editor?editorProxy:result;
+                            });
+                });
+        assertFalse(GraphicsPreferences.confirm(failing,pending));
+        assertTrue(GraphicsPreferences.hasPending(prefs));
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(saved));
+        assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(pending));
+        assertTrue(GraphicsPreferences.clearAfterRestore(prefs));
+        assertFalse(GraphicsPreferences.hasPending(prefs));
+        assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(pending));
+        assertEquals(43,prefs.getInt("music_volume",0)); assertTrue(prefs.getBoolean("rt_lab_unlocked",false));
     }
 }

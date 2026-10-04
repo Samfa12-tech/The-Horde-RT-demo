@@ -1,6 +1,7 @@
 #pragma once
 
 #include <span>
+#include <optional>
 #include <string>
 #include <string_view>
 #include "gameplay/BenchmarkWorkload.h"
@@ -132,13 +133,36 @@ inline std::string BuildWindowsBenchmarkTuningJson(
     const horde::vulkan::raytracing::RtWorkloadPreset effectiveAtStart,
     const horde::vulkan::raytracing::RtWorkloadPreset effectiveAtEnd,
     const std::string_view compiledQualityAtStart,
-    const std::string_view compiledQualityAtEnd)
+    const std::string_view compiledQualityAtEnd,
+    const std::optional<horde::vulkan::raytracing::RtQualityControlsGpu> uploadedAtStart = std::nullopt,
+    const std::optional<horde::vulkan::raytracing::RtQualityControlsGpu> uploadedAtEnd = std::nullopt,
+    const bool requireUploadedPolicy = false)
 {
     const bool knownQuality = compiledQualityAtEnd == "High" || compiledQualityAtEnd == "Mobile";
+    const auto validUpload = [](
+        const std::optional<horde::vulkan::raytracing::RtQualityControlsGpu>& upload,
+        const horde::vulkan::raytracing::RtWorkloadPreset preset, const std::string_view quality) {
+        if (!upload || (quality != "High" && quality != "Mobile") || upload->controls[0] > 3u) return false;
+        std::optional<horde::graphics::ShadowQuality> shadow;
+        if (upload->controls[0] < 3u) shadow = static_cast<horde::graphics::ShadowQuality>(upload->controls[0]);
+        const auto expected = horde::vulkan::raytracing::ResolveRtQualityControls(shadow, preset, quality == "High");
+        return expected && expected->controls == upload->controls;
+    };
+    const bool startUploadValid = validUpload(uploadedAtStart, effectiveAtStart, compiledQualityAtStart);
+    const bool endUploadValid = validUpload(uploadedAtEnd, effectiveAtEnd, compiledQualityAtEnd);
+    // Only historical/non-Graphics fixtures explicitly omit both records.
+    // Ordinary owners require uploaded policy and never guess it from Max.
+    const bool legacy = !requireUploadedPolicy && !uploadedAtStart && !uploadedAtEnd;
     const bool stable = requested == effectiveAtStart && effectiveAtStart == effectiveAtEnd &&
-                        knownQuality && compiledQualityAtStart == compiledQualityAtEnd;
-    const auto samples = knownQuality
+        knownQuality && compiledQualityAtStart == compiledQualityAtEnd &&
+        (legacy || (startUploadValid && endUploadValid && uploadedAtStart->controls == uploadedAtEnd->controls));
+    const auto samples = endUploadValid ? uploadedAtEnd->controls[1] : legacy && knownQuality
         ? horde::vulkan::raytracing::ResolvePrimaryAreaShadowSamples(effectiveAtEnd, compiledQualityAtEnd == "High") : 0u;
+    const auto skySamples = endUploadValid ? uploadedAtEnd->controls[2] : legacy && knownQuality
+        ? (effectiveAtEnd == horde::vulkan::raytracing::RtWorkloadPreset::Max ? 2u : 1u) : 0u;
+    const char* shadowMode = endUploadValid ? (uploadedAtEnd->controls[0] == 0u ? "Lower" :
+        uploadedAtEnd->controls[0] == 1u ? "Current" : uploadedAtEnd->controls[0] == 2u ? "Higher" : "DiagnosticLegacy") :
+        legacy && knownQuality ? "DiagnosticLegacy" : "unavailable";
     const auto qualityName = [](const std::string_view name) -> std::string_view {
         return name == "High" || name == "Mobile" ? name : "unavailable";
     };
@@ -148,9 +172,11 @@ inline std::string BuildWindowsBenchmarkTuningJson(
         "\",\"compiledQualityAtStart\":\"" + std::string(qualityName(compiledQualityAtStart)) +
         "\",\"compiledQualityAtEnd\":\"" + std::string(qualityName(compiledQualityAtEnd)) +
         "\",\"policyStable\":" + (stable ? "true" : "false") +
+        ",\"shadowPolicySource\":\"" + (endUploadValid ? "uploaded" : legacy ? "explicit-diagnostic-legacy-workload" : "unavailable") +
+        "\",\"shadowMode\":\"" + shadowMode + "\"" +
         ",\"primaryAreaShadowSamplesPerContributingReceiver\":" + std::to_string(samples) +
         ",\"sampleDomain\":\"contributing-primary-local-and-fire-area-lights\",\"primarySkyVisibilitySamples\":" +
-        std::to_string(knownQuality ? (effectiveAtEnd == horde::vulkan::raytracing::RtWorkloadPreset::Max ? 2u : 1u) : 0u) +
+        std::to_string(skySamples) +
         ",\"secondaryAreaShadowSamples\":1,\"sampleCountMeaning\":\"compiled-physical-policy-not-dynamic-query-counts\","
         "\"costMeaning\":\"whole-rt-workload-preset-not-isolated-shadow-cost\"}";
 }

@@ -1,5 +1,6 @@
 #include "reporting/PlaytestReport.h"
 #include "reporting/BenchmarkSummaryReport.h"
+#include "reporting/BenchmarkSummarySubmission.h"
 #include "reporting/PlaytestSubmission.h"
 
 #include <algorithm>
@@ -472,6 +473,13 @@ bool PlaytestReportDelivery::BeginBenchmarkSummary(const PreparedBenchmarkSummar
 {
     return state_ == PlaytestReportDeliveryState::Idle && report.IsReady() &&
         BeginPayload(report.ReportId(), report.Json(), kBenchmarkSummaryReportMaxBytes, attempt);
+}
+
+bool PlaytestReportDelivery::BeginBenchmarkSummarySubmission(const PreparedBenchmarkSummarySubmission& submission,
+    PlaytestReportAttempt& attempt)
+{
+    return state_ == PlaytestReportDeliveryState::Idle && submission.IsReady() &&
+        BeginPayload(submission.ReportId(), submission.Json(), kBenchmarkSummarySubmissionMaxBytes, attempt);
 }
 
 bool PlaytestReportDelivery::Retry(PlaytestReportAttempt& attempt)

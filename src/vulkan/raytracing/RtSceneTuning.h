@@ -6,6 +6,9 @@
 #include <cstdint>
 #include <optional>
 
+#include "graphics/GraphicsSettings.h"
+#include "vulkan/raytracing/RtSceneAbi.generated.h"
+
 namespace horde::vulkan::raytracing
 {
 
@@ -22,6 +25,21 @@ constexpr std::uint32_t ResolvePrimaryAreaShadowSamples(
     const RtWorkloadPreset preset, const bool compiledHighQuality)
 {
     return preset == RtWorkloadPreset::Max ? (compiledHighQuality ? 4u : 2u) : 1u;
+}
+
+// Mode3 explicitly retains historical whole-workload diagnostics for callers
+// that do not supply a Graphics choice. Production Graphics always supplies one.
+inline constexpr std::uint32_t kRtShadowLegacyWorkload = 3u;
+inline std::optional<RtQualityControlsGpu> ResolveRtQualityControls(
+    const std::optional<horde::graphics::ShadowQuality> shadow,
+    const RtWorkloadPreset workload, const bool compiledHighQuality) noexcept
+{
+    if (shadow && static_cast<unsigned>(*shadow) > 2u) return std::nullopt;
+    const auto mode = shadow ? static_cast<std::uint32_t>(*shadow) : kRtShadowLegacyWorkload;
+    const bool higher = shadow ? *shadow == horde::graphics::ShadowQuality::Higher :
+        workload == RtWorkloadPreset::Max;
+    return RtQualityControlsGpu{{mode, higher ? (compiledHighQuality ? 4u : 2u) : 1u,
+        higher ? 2u : 1u, 0u}};
 }
 
 enum class RtLightGroup : std::uint32_t

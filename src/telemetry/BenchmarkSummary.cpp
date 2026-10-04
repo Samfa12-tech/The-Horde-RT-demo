@@ -20,7 +20,8 @@ bool SameConfiguration(const BenchmarkSummaryConfiguration& a, const BenchmarkSu
     const auto& x = a.metadata;
     const auto& y = b.metadata;
     return a.platform == b.platform && a.water == b.water && a.dielectric == b.dielectric &&
-        a.fire == b.fire && a.glassEnabled == b.glassEnabled && a.sceneEpoch == b.sceneEpoch &&
+        a.fire == b.fire && a.shadowQuality == b.shadowQuality &&
+        a.uploadedFireQuality == b.uploadedFireQuality && a.glassEnabled == b.glassEnabled && a.sceneEpoch == b.sceneEpoch &&
         a.measurementGeneration == b.measurementGeneration && x.buildIdentity == y.buildIdentity &&
         x.shaderIdentity == y.shaderIdentity && x.executionBackend == y.executionBackend &&
         x.gpuName == y.gpuName && x.vulkanApi == y.vulkanApi &&
@@ -50,7 +51,11 @@ bool ValidConfiguration(const BenchmarkSummaryConfiguration& c)
         !m.materialEncoding.empty() && m.materialEncoding.size() <= 128u &&
         m.gpuName.size() <= 128u && m.vulkanApi.size() <= 32u &&
         c.measurementGeneration != 0u && c.water <= RtWaterQuality::High &&
-        c.dielectric <= RtDielectricQuality::High && c.fire <= BenchmarkSummaryFireQuality::High &&
+        c.dielectric <= RtDielectricQuality::High && c.fire <= BenchmarkSummaryFireQuality::Low &&
+        (!c.shadowQuality || ValidRtShadowQualityEvidence(*c.shadowQuality, c.dielectric)) &&
+        (!c.uploadedFireQuality || (ValidRtFireQualityEvidence(*c.uploadedFireQuality) &&
+            static_cast<unsigned>(c.uploadedFireQuality->quality) == static_cast<unsigned>(c.fire))) &&
+        (c.fire != BenchmarkSummaryFireQuality::Low || c.uploadedFireQuality.has_value()) &&
         (m.executionBackend == "RayTracingPipeline" || m.executionBackend == "RayQueryCompute") &&
         (m.presentMode == "FIFO" || m.presentMode == "MAILBOX" || m.presentMode == "IMMEDIATE" ||
          m.presentMode == "FIFO_RELAXED") && scale &&
@@ -162,6 +167,7 @@ FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBe
             std::find(kZones.begin(), kZones.end(), frame.zone) == kZones.end() ||
             row.disposition != RtExpectedFrameDisposition::Completed || !row.cpuAccepted || !row.hasGpuStatus ||
             row.presentationOutcome != RtPresentationOutcome::Presented ||
+            row.shadowQuality != completion.shadowQuality || row.fireQuality != completion.uploadedFireQuality ||
             !std::isfinite(frame.frameTimeMs) || frame.frameTimeMs <= 0.0)
         { result.status_ = BenchmarkSummaryStatus::MismatchedPopulation; return result; }
     }
@@ -171,6 +177,8 @@ FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBe
     data.configuration.water = completion.water;
     data.configuration.dielectric = completion.dielectric;
     data.configuration.fire = completion.fire;
+    data.configuration.shadowQuality = completion.shadowQuality;
+    data.configuration.uploadedFireQuality = completion.uploadedFireQuality;
     data.configuration.glassEnabled = completion.glassEnabled;
     data.configuration.sceneEpoch = completion.sceneEpoch;
     data.configuration.measurementGeneration = completion.measurementGeneration;

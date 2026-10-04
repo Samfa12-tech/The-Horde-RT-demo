@@ -64,6 +64,13 @@ int main()
     const auto independent = BuildRtSceneFrameInputs(game, 1.0f, WaterQuality::Off, RtSceneTuning{}, FireEmitterQuality::High);
     check(independent.waterQuality == WaterQuality::Off && independent.fireDetail == FireEmitterQuality::High,
           "explicit fire quality remains independent of water off");
+    const auto lowerFireHigherShadow = BuildRtSceneFrameInputs(game,1.0f,WaterQuality::Off,
+        RtSceneTuning{},FireEmitterQuality::Low,horde::graphics::ShadowQuality::Higher);
+    check(lowerFireHigherShadow.fireDetail == FireEmitterQuality::Low &&
+          lowerFireHigherShadow.shadowQuality == horde::graphics::ShadowQuality::Higher &&
+          lowerFireHigherShadow.tuning.workloadPreset == RtWorkloadPreset::Authored &&
+          lowerFireHigherShadow.tuning.fogDensityScale == 1.0f && game.tickIndex == 417,
+          "independent shadow/fire adapter does not promote Max/mist or mutate simulation");
     horde::graphics::GraphicsPreviewSession session;
     horde::gameplay::effects::FireEmitterFixedStepInput torch;
     torch.worldFromFlame[12] = -3.65f; torch.worldFromFlame[13] = 0.965f;
@@ -102,5 +109,12 @@ int main()
     missedPool.cameraYaw=0.90f; missedPool.cameraPitch=-0.12f;
     check(!FramesWater(description,missedPool,16.0f/9.0f),
           "frustum fixture rejects the actual former close pose that cropped the pool");
+    const auto previewBefore = session.Snapshot();
+    const auto selected = BuildGraphicsPreviewFrameInputs(session,1.0f,WaterQuality::Mobile,
+        FireEmitterQuality::Low,RtSceneTuning{},horde::graphics::ShadowQuality::Lower);
+    check(selected.fireDetail == FireEmitterQuality::Low && selected.shadowQuality == horde::graphics::ShadowQuality::Lower &&
+          selected.tuning.workloadPreset == RtWorkloadPreset::Authored &&
+          session.Snapshot().tick == previewBefore.tick && session.Snapshot().timeSeconds == previewBefore.timeSeconds,
+          "preview independent policy adapter consumes immutable timeline without advancing gameplay");
     return passed ? 0 : 1;
 }

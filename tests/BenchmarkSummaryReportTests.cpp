@@ -81,7 +81,9 @@ struct CompletedOwners
     ShowcaseBenchmarkRun benchmark;
     RtBenchmarkEvidenceRun evidence;
     void Run(const RtSampleStatus gpu = RtSampleStatus::Valid, const bool wrongZone = false,
-        const bool leaveLastPending = false, const bool mixedUnsupported = false)
+        const bool leaveLastPending = false, const bool mixedUnsupported = false,
+        const BenchmarkSummaryConfiguration* uploaded = nullptr, const bool middleQualityChange = false,
+        const bool middleShadowChange = false)
     {
         benchmark.Start(2u, BenchmarkWorkload::LanternHeldHigh);
         Check(evidence.Start(kLanternBenchmarkFramesPerLap), "allocate real bounded evidence owner");
@@ -94,7 +96,16 @@ struct CompletedOwners
             {
                 if (!armed) { Check(evidence.ArmMeasurement(3u, 8u), "arm measurement after warmup"); armed = true; }
                 ++serial;
-                const auto s = Snapshot(serial, mixedUnsupported && serial % 2u == 0u ? RtSampleStatus::Unsupported : gpu);
+                auto s = Snapshot(serial, mixedUnsupported && serial % 2u == 0u ? RtSampleStatus::Unsupported : gpu);
+                if (uploaded)
+                {
+                    s.scene.shadowQuality = uploaded->shadowQuality;
+                    s.scene.fireQuality = uploaded->uploadedFireQuality;
+                    if (middleQualityChange && serial == kLanternBenchmarkFramesPerLap / 2u)
+                        s.scene.fireQuality = RtFireQualityEvidence{RtFireQuality::Mobile, 4u, 1u};
+                    if (middleShadowChange && serial == kLanternBenchmarkFramesPerLap / 2u)
+                        s.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Current, 1u, 1u, 0u};
+                }
                 const auto zone = wrongZone ? ShowcaseZone::Opening : advance.replay.zone;
                 const auto index = evidence.ExpectFrame({static_cast<std::uint32_t>(zone), 2u});
                 Check(index.has_value(), "expected frame owned");
@@ -289,6 +300,51 @@ void TestUnavailableHardwarePrivacyAndIdentityRetry()
         mixedSummary.Data().overall.gpu.slowestOnePercentMeanMilliseconds == independentlyProjected.slowestOnePercentMeanMilliseconds,
         "mixed summary statistics equal independently projected actual valid completed durations");
 }
+void TestUploadedQualitySummary()
+{
+    auto configuration = Configuration();
+    configuration.fire = BenchmarkSummaryFireQuality::Low;
+    configuration.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Higher, 2u, 2u, 0u};
+    configuration.uploadedFireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
+    CompletedOwners owners; owners.Run(RtSampleStatus::Valid, false, false, false, &configuration);
+    const auto frozen = CaptureBenchmarkSummary(owners.benchmark, owners.evidence,
+        configuration, configuration, kRunUuid);
+    const auto report = PrepareBenchmarkSummaryReport(frozen, Approval());
+    Check(frozen.IsReady() && report.IsReady() &&
+        report.Json().find("\"fireQuality\":\"Low\"") != std::string_view::npos &&
+        report.Json().find("\"shadowQuality\":{\"mode\":\"higher\",\"localPrimarySamples\":2,\"skyPrimarySamples\":2,\"reserved\":0}") != std::string_view::npos &&
+        report.Json().find("\"uploadedFireQuality\":{\"volumeSteps\":2,\"reflectionSamples\":1,\"reflectedVolumeSteps\":2}") != std::string_view::npos,
+        "local summary reports immutable actual Low fire and resolved uploaded shadow budgets");
+    auto changed = configuration; changed.shadowQuality->mode = RtShadowMode::Lower;
+    changed.shadowQuality->localPrimarySamples = changed.shadowQuality->skyPrimarySamples = 1u;
+    Check(!CaptureBenchmarkSummary(owners.benchmark, owners.evidence, configuration, changed, kRunUuid).IsReady(),
+        "different uploaded start/end shadow policy rejected");
+    changed = configuration; changed.uploadedFireQuality.reset();
+    Check(!CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
+        "requested Low with no actual uploaded budget cannot certify summary");
+    changed = configuration; changed.uploadedFireQuality->volumeSteps = 4u;
+    Check(!CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
+        "Low label cannot certify Mobile uploaded step budget");
+    changed = configuration; changed.shadowQuality->reserved = 1u;
+    Check(!CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
+        "nonzero uploaded reserved field cannot enter summary");
+    CompletedOwners middle; middle.Run(RtSampleStatus::Valid, false, false, false, &configuration, true);
+    Check(CaptureBenchmarkSummary(middle.benchmark, middle.evidence, configuration, configuration, kRunUuid).Status() ==
+        BenchmarkSummaryStatus::MismatchedPopulation,
+        "valid mid-run uploaded fire change restored by completion is still rejected by exact owning rows");
+    CompletedOwners middleShadow; middleShadow.Run(RtSampleStatus::Valid, false, false, false, &configuration, false, true);
+    Check(CaptureBenchmarkSummary(middleShadow.benchmark, middleShadow.evidence, configuration, configuration, kRunUuid).Status() ==
+        BenchmarkSummaryStatus::MismatchedPopulation,
+        "valid mid-run uploaded shadow change restored by completion is rejected by exact owning rows");
+    auto legacy = Configuration();
+    CompletedOwners legacyOwners; legacyOwners.Run();
+    const auto legacyReport = PrepareBenchmarkSummaryReport(CaptureBenchmarkSummary(legacyOwners.benchmark,
+        legacyOwners.evidence, legacy, legacy, kRunUuid), Approval());
+    Check(legacyReport.IsReady() && legacyReport.Json().find("shadowQuality") == std::string_view::npos &&
+        legacyReport.Json().find("uploadedFireQuality") == std::string_view::npos,
+        "legacy absent uploaded controls remain absent without fabricated Current budgets");
+}
+
 } // namespace
 
 int main(const int argc, const char* const* const argv)
@@ -313,6 +369,7 @@ int main(const int argc, const char* const* const argv)
     static_assert(std::is_same_v<decltype(std::declval<PreparedBenchmarkSummaryReport>().Json()), std::string_view>);
     TestCompletedFreezePrivacyAndPopulation();
     TestInvalidOwnersScopeAndIdentity();
+    TestUploadedQualitySummary();
     TestUnavailableHardwarePrivacyAndIdentityRetry();
     return passed ? 0 : 1;
 }

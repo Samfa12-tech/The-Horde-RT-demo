@@ -162,6 +162,7 @@ constexpr int kGraphicsPreviewResetId = 201;
 constexpr int kGraphicsPreviewTelemetryId = 202;
 constexpr int kGraphicsPreviewGraphId = 203;
 constexpr int kGraphicsGlassButtonId = 204;
+constexpr int kGraphicsShadowButtonId = 206;
 constexpr int kRtLabButtonId = 127;
 constexpr int kRtLabPanelId = 128;
 constexpr int kRtLabTitleId = 129;
@@ -378,6 +379,7 @@ struct VulkanSurfaceContext
         horde::graphics::BaselineGraphicsSettings(horde::graphics::GraphicsPlatform::Windows);
     horde::graphics::GraphicsSettings graphicsBeforeApply = savedGraphics;
     horde::graphics::FireDetail fireDetail = horde::graphics::FireDetail::High;
+    horde::graphics::ShadowQuality shadowQuality = horde::graphics::ShadowQuality::Current;
     // Requested intent is distinct from the ready scene's applied geometry policy.
     bool requestedGlassEnabled = true;
     bool glassGeometryDirty = false;
@@ -492,6 +494,7 @@ struct VulkanSurfaceContext
         horde::vulkan::raytracing::RtWorkloadPreset::Authored;
     horde::vulkan::raytracing::RtWorkloadPreset benchmarkEffectiveRtPresetAtStart =
         horde::vulkan::raytracing::RtWorkloadPreset::Authored;
+    std::optional<horde::vulkan::raytracing::RtQualityControlsGpu> benchmarkQualityControlsAtStart;
     std::string benchmarkCompiledQualityAtStart;
     horde::telemetry::RtBenchmarkEvidenceRun benchmarkEvidence;
     std::optional<WindowsBenchmarkSummaryArm> benchmarkSummaryArm;
@@ -855,37 +858,9 @@ void LoadSettings(VulkanSurfaceContext& context)
     context.waterQuality = static_cast<horde::vulkan::raytracing::WaterQuality>(waterQuality);
     context.savedGraphics = horde::graphics::MigrateLegacyGraphicsSettings(
         {renderScale, waterQuality}, horde::graphics::GraphicsPlatform::Windows);
-    if (GetPrivateProfileIntA("graphics", "schema", 0, path.c_str()) != 0u)
+    if (const auto record = horde::platform::windows::LoadGraphicsPersistenceRecord(path, context.savedGraphics))
     {
-        horde::graphics::GraphicsPersistenceRecord record;
-        record.schema = GetPrivateProfileIntA("graphics", "schema", 0, path.c_str());
-        record.confirmed = {
-            static_cast<int>(GetPrivateProfileIntA("graphics", "confirmedScale", renderScale, path.c_str())),
-            static_cast<horde::graphics::WaterQuality>(GetPrivateProfileIntA("graphics", "confirmedWater", waterQuality, path.c_str())),
-            static_cast<horde::graphics::FireDetail>(GetPrivateProfileIntA("graphics", "confirmedFire", waterQuality == 2 ? 1 : 0, path.c_str())),
-            static_cast<int>(GetPrivateProfileIntA("graphics", "confirmedCap", 30, path.c_str()))};
-        const auto readGlass = [&](const char* key) -> int
-        {
-            if (record.schema == 1u) return 1; // Ignore stale schema1 glass keys.
-            char value[8]{};
-            const DWORD length = GetPrivateProfileStringA("graphics", key, "", value, sizeof(value), path.c_str());
-            // Integer coercion would silently accept malformed text as zero.
-            return length == 1u && (value[0] == '0' || value[0] == '1') ? value[0] - '0' : -1;
-        };
-        const int confirmedGlass = readGlass("confirmedGlass");
-        record.confirmed.glassEnabled = confirmedGlass == 1;
-        if (GetPrivateProfileIntA("graphics", "pending", 0, path.c_str()) != 0u)
-            record.pending = horde::graphics::GraphicsSettings{
-                static_cast<int>(GetPrivateProfileIntA("graphics", "pendingScale", renderScale, path.c_str())),
-                static_cast<horde::graphics::WaterQuality>(GetPrivateProfileIntA("graphics", "pendingWater", waterQuality, path.c_str())),
-                static_cast<horde::graphics::FireDetail>(GetPrivateProfileIntA("graphics", "pendingFire", 0, path.c_str())),
-                static_cast<int>(GetPrivateProfileIntA("graphics", "pendingCap", 30, path.c_str()))};
-        const int pendingGlass = readGlass("pendingGlass");
-        if (record.pending) record.pending->glassEnabled = pendingGlass == 1;
-        // Schema2 booleans admit only exact0/1; invalid input recovers the safe baseline.
-        if ((confirmedGlass != 0 && confirmedGlass != 1) ||
-            (record.pending && pendingGlass != 0 && pendingGlass != 1)) record.schema = 0u;
-        const auto recovered = horde::graphics::RecoverGraphicsSettings(record, horde::graphics::GraphicsPlatform::Windows);
+        const auto recovered = horde::graphics::RecoverGraphicsSettings(*record, horde::graphics::GraphicsPlatform::Windows);
         context.savedGraphics = recovered.startup;
         if (recovered.reasons != horde::graphics::GraphicsReason::None)
             context.graphicsStatus = "Recovered last confirmed graphics settings after an interrupted or invalid selection.";
@@ -893,6 +868,7 @@ void LoadSettings(VulkanSurfaceContext& context)
     context.renderScale = context.savedGraphics.renderScalePercent / 100.0f;
     context.waterQuality = static_cast<horde::vulkan::raytracing::WaterQuality>(context.savedGraphics.waterQuality);
     context.fireDetail = context.savedGraphics.fireDetail;
+    context.shadowQuality = context.savedGraphics.shadowQuality;
     context.graphicsPreviewFrameCap = context.savedGraphics.previewFrameCap;
     context.requestedGlassEnabled = context.savedGraphics.glassEnabled;
 }
@@ -1676,6 +1652,50 @@ void SetControlVisible(HWND window, const int id, const bool visible)
     }
 }
 
+const char* GraphicsFireName(const horde::graphics::FireDetail detail)
+{
+    switch (detail)
+    {
+    case horde::graphics::FireDetail::Mobile: return "MOBILE";
+    case horde::graphics::FireDetail::High: return "HIGH";
+    case horde::graphics::FireDetail::Low: return "LOW";
+    }
+    return "UNAVAILABLE";
+}
+
+const char* GraphicsShadowName(const horde::graphics::ShadowQuality quality)
+{
+    switch (quality)
+    {
+    case horde::graphics::ShadowQuality::Lower: return "LOWER";
+    case horde::graphics::ShadowQuality::Current: return "CURRENT";
+    case horde::graphics::ShadowQuality::Higher: return "HIGHER";
+    }
+    return "UNAVAILABLE";
+}
+
+horde::graphics::FireDetail UploadedGraphicsFireDetail(const VulkanSurfaceContext& context)
+{
+    if (context.rtScene.IsReady() && context.rtScene.HasUploadedQualityControls())
+    {
+        switch (context.rtScene.UploadedFireQuality())
+        {
+        case horde::vulkan::raytracing::FireEmitterQuality::Mobile: return horde::graphics::FireDetail::Mobile;
+        case horde::vulkan::raytracing::FireEmitterQuality::High: return horde::graphics::FireDetail::High;
+        case horde::vulkan::raytracing::FireEmitterQuality::Low: return horde::graphics::FireDetail::Low;
+        }
+    }
+    return static_cast<horde::graphics::FireDetail>(255u);
+}
+
+horde::graphics::ShadowQuality UploadedGraphicsShadowQuality(const VulkanSurfaceContext& context)
+{
+    if (context.rtScene.IsReady() && context.rtScene.HasUploadedQualityControls() &&
+        context.rtScene.QualityControls().controls[0] <= 2u)
+        return static_cast<horde::graphics::ShadowQuality>(context.rtScene.QualityControls().controls[0]);
+    return static_cast<horde::graphics::ShadowQuality>(255u);
+}
+
 void UpdateSettingsLabels(VulkanSurfaceContext& context)
 {
     const auto graphicsDraft = context.graphicsEdit ? context.graphicsEdit->Draft() : context.savedGraphics;
@@ -1731,8 +1751,9 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
         SetWindowTextA(preset, ("PRESET: " + std::string(name)).c_str());
     }
     if (HWND fire = GetDlgItem(context.windowHandle, kGraphicsFireButtonId))
-        SetWindowTextA(fire, graphicsDraft.fireDetail == horde::graphics::FireDetail::High ?
-            "FIRE DETAIL: HIGH (10 STEPS)" : "FIRE DETAIL: MOBILE (4 STEPS)");
+        SetWindowTextA(fire, (std::string("FIRE: ") + GraphicsFireName(graphicsDraft.fireDetail)).c_str());
+    if (HWND shadow = GetDlgItem(context.windowHandle, kGraphicsShadowButtonId))
+        SetWindowTextA(shadow, (std::string("SHADOW: ") + GraphicsShadowName(graphicsDraft.shadowQuality)).c_str());
     if (HWND glass = GetDlgItem(context.windowHandle, kGraphicsGlassButtonId))
         SetWindowTextA(glass, graphicsDraft.glassEnabled ? "GLASS: ON" : "GLASS: OFF");
     if (context.graphicsVisible)
@@ -1740,7 +1761,7 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
         const auto state = context.graphicsEdit->State();
         const bool editable = !context.graphicsSceneRestoring && (state == horde::graphics::GraphicsEditState::Editing ||
             state == horde::graphics::GraphicsEditState::Committed || state == horde::graphics::GraphicsEditState::Failed);
-        for (const int id : {kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsGlassButtonId, kWaterQualityButtonId,
+        for (const int id : {kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kWaterQualityButtonId,
                              kRenderScaleSliderId, kGraphicsApplyButtonId, kGraphicsResetButtonId})
             EnableWindow(GetDlgItem(context.windowHandle, id), editable);
         EnableWindow(GetDlgItem(context.windowHandle, kGraphicsConfirmButtonId),
@@ -1755,12 +1776,14 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
         info << "Effective: " << std::lround(context.appliedRenderScale * 100.0f) << "%  |  internal "
              << extent.width << 'x' << extent.height << "  |  output " << context.swapchainExtent.width << 'x' << context.swapchainExtent.height
             << "  |  glass " << (context.rtScene.IsReady() && context.rtScene.GlassEnabled() ? "On" : "Off")
+            << "\r\nUploaded fire: " << GraphicsFireName(UploadedGraphicsFireDetail(context))
+            << "  |  shadows: " << GraphicsShadowName(UploadedGraphicsShadowQuality(context))
             << "\r\n" << (mobileOptics ?
                  "Mobile optical build remains fixed; Glass Off removes all pane geometry." :
                  "High optical build: physical panes retained; profile is fixed by this build.")
              << "\r\nWater: Off omits water, Mobile refracts, High adds scene reflections."
-             << "\r\nFire: 4/10 volume steps; light strength unchanged. Cost: not yet measured."
-             << "\r\nGlass Off removes panes from all rays. Scene rebuild cost: not yet measured."
+             << "\r\nFire: Low/Mobile/High use2/4/10 steps; light strength unchanged."
+             << "\r\nShadows: Lower fixed centre1; Current area1; Higher area2/4. Cost unmeasured."
              << "\r\nApply needs an RT frame. Keep confirms within 15 foreground seconds."
              << "\r\n" << context.graphicsStatus;
         SetWindowTextA(GetDlgItem(context.windowHandle, kGraphicsInfoId), info.str().c_str());
@@ -1999,7 +2022,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle, kSettingsTitleId, context.settingsVisible);
     SetControlVisible(context.windowHandle, kSettingsBackButtonId, context.settingsVisible);
     for (const int id : {kWaterQualityButtonId, kRenderScaleLabelId, kRenderScaleSliderId,
-                         kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsGlassButtonId, kGraphicsApplyButtonId,
+                         kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsApplyButtonId,
                          kGraphicsConfirmButtonId, kGraphicsRevertButtonId, kGraphicsResetButtonId, kGraphicsInfoId,
                          kGraphicsPreviewPauseId, kGraphicsPreviewCameraId, kGraphicsPreviewMotionId,
                          kGraphicsPreviewResetId, kGraphicsPreviewTelemetryId, kGraphicsPreviewGraphId})
@@ -2107,8 +2130,9 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
 horde::graphics::GraphicsSettings CurrentGraphicsSettings(const VulkanSurfaceContext& context)
 {
     return {static_cast<int>(std::lround(context.appliedRenderScale * 100.0f)),
-        static_cast<horde::graphics::WaterQuality>(context.waterQuality), context.fireDetail,
-        context.graphicsPreviewFrameCap, context.rtScene.IsReady() && context.rtScene.GlassEnabled()};
+        static_cast<horde::graphics::WaterQuality>(context.waterQuality), UploadedGraphicsFireDetail(context),
+        context.graphicsPreviewFrameCap, context.rtScene.IsReady() && context.rtScene.GlassEnabled(),
+        UploadedGraphicsShadowQuality(context)};
 }
 
 horde::graphics::GraphicsAppliedSnapshot GraphicsSnapshot(
@@ -2171,6 +2195,7 @@ bool QueueGraphicsCommand(VulkanSurfaceContext& context,
     context.renderScale = command->requested.renderScalePercent / 100.0f;
     context.waterQuality = static_cast<horde::vulkan::raytracing::WaterQuality>(command->requested.waterQuality);
     context.fireDetail = command->requested.fireDetail;
+    context.shadowQuality = command->requested.shadowQuality;
     context.graphicsPreviewFrameCap = command->requested.previewFrameCap;
     context.requestedGlassEnabled = command->requested.glassEnabled;
     context.glassGeometryDirty = !context.rtScene.IsReady() ||
@@ -2199,6 +2224,7 @@ void FinishGraphicsFrame(VulkanSurfaceContext& context, const bool rtPresented)
         context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::Showcase)
     { CloseGraphicsPage(context); return; }
     if (context.graphicsCommand && currentResourcesPresented && context.rtScene.IsReady() &&
+        context.rtScene.HasUploadedQualityControls() &&
         !context.renderScaleDirty && !context.sceneProfileDirty && !context.glassGeometryDirty)
     {
         auto snapshot = GraphicsSnapshot(context, *context.graphicsCommand);
@@ -2593,6 +2619,7 @@ void StartBenchmark(VulkanSurfaceContext& context,
     context.benchmarkRequestedRtPreset = rtWorkloadPreset;
     context.rtSceneTuning.workloadPreset = rtWorkloadPreset;
     context.benchmarkEffectiveRtPresetAtStart = context.rtSceneTuning.workloadPreset;
+    context.benchmarkQualityControlsAtStart.reset();
     context.benchmarkCompiledQualityAtStart = context.rtScene.SelectedDielectricQualityName();
     context.benchmark.Start(horde::gameplay::ShowcaseBenchmarkRun::kDefaultLaps, workload, showLiveFps);
     (void)context.benchmarkEvidence.Start(
@@ -2688,7 +2715,9 @@ void CompleteBenchmark(VulkanSurfaceContext& context,
     const auto tuningJson = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
         context.benchmarkRequestedRtPreset, context.benchmarkEffectiveRtPresetAtStart,
         context.rtSceneTuning.workloadPreset, context.benchmarkCompiledQualityAtStart,
-        context.rtScene.SelectedDielectricQualityName());
+        context.rtScene.SelectedDielectricQualityName(), context.benchmarkQualityControlsAtStart,
+        context.rtScene.IsReady() && context.rtScene.HasUploadedQualityControls() ?
+            std::optional{context.rtScene.QualityControls()} : std::nullopt, true);
     context.benchmarkReport += "\nWindows RT workload policy: " + tuningJson + "\n";
     if (const auto closingBrace = context.benchmarkJsonReport.rfind('}'); closingBrace != std::string::npos)
         context.benchmarkJsonReport.insert(closingBrace, ",\n  \"windowsBenchmarkTuning\": " + tuningJson + "\n");
@@ -3108,7 +3137,7 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
         kExitButtonId, kSensitivityButtonId, kWaterQualityButtonId,
         kRenderScaleSliderId, kSfxVolumeSliderId, kMusicVolumeSliderId,
         kFullscreenButtonId, kSettingsBackButtonId,
-        kGraphicsOpenButtonId, kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsGlassButtonId,
+        kGraphicsOpenButtonId, kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId,
         kGraphicsApplyButtonId, kGraphicsConfirmButtonId, kGraphicsRevertButtonId, kGraphicsResetButtonId,
         kGraphicsPreviewPauseId, kGraphicsPreviewCameraId, kGraphicsPreviewMotionId, kGraphicsPreviewResetId,
         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkReviewStatsButtonId, kBenchmarkBackButtonId,
@@ -4647,6 +4676,7 @@ bool ApplyPendingSceneReplacement(VulkanSurfaceContext& context,
         context.renderScale = previousSettings.renderScalePercent / 100.0f;
         context.waterQuality = static_cast<horde::vulkan::raytracing::WaterQuality>(previousSettings.waterQuality);
         context.fireDetail = previousSettings.fireDetail;
+        context.shadowQuality = previousSettings.shadowQuality;
         context.graphicsPreviewFrameCap = previousSettings.previewFrameCap;
         context.requestedGlassEnabled = previousSettings.glassEnabled;
         if (!InitialiseRtSceneForSwapchain(context, false)) return false;
@@ -4742,6 +4772,7 @@ bool ApplyPendingOutputResize(VulkanSurfaceContext& context,
                 {
                     context.waterQuality = static_cast<horde::vulkan::raytracing::WaterQuality>(context.graphicsBeforeApply.waterQuality);
                     context.fireDetail = context.graphicsBeforeApply.fireDetail;
+                    context.shadowQuality = context.graphicsBeforeApply.shadowQuality;
                     context.graphicsPreviewFrameCap = context.graphicsBeforeApply.previewFrameCap;
                     context.requestedGlassEnabled = context.graphicsBeforeApply.glassEnabled;
                     auto failure = GraphicsSnapshot(context, *context.graphicsCommand);
@@ -4939,16 +4970,21 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         horde::vulkan::raytracing::RtSceneFrameInputs frameInputs =
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning,
-                ctx.fireDetail == horde::graphics::FireDetail::High ?
-                    horde::vulkan::raytracing::FireEmitterQuality::High : horde::vulkan::raytracing::FireEmitterQuality::Mobile);
+                horde::vulkan::raytracing::ResolveFireEmitterQuality(ctx.fireDetail));
         if (previewFrame)
         {
             ctx.graphicsPreview.Advance(ctx.graphicsPreviewDelta);
             frameInputs = horde::vulkan::raytracing::BuildGraphicsPreviewFrameInputs(
                 ctx.graphicsPreview, ctx.outputExposure, ctx.waterQuality,
-                ctx.fireDetail == horde::graphics::FireDetail::High ?
-                    horde::vulkan::raytracing::FireEmitterQuality::High : horde::vulkan::raytracing::FireEmitterQuality::Mobile);
+                horde::vulkan::raytracing::ResolveFireEmitterQuality(ctx.fireDetail));
         }
+        frameInputs.shadowQuality = ctx.shadowQuality;
+#if defined(_DEBUG)
+        // The separately named Max motion diagnostic preserves its explicit
+        // legacy whole-workload policy. Ordinary Graphics/RT Lab do not opt in.
+        if (ctx.nativeMotionValidation && ctx.motionRequestedRtPreset == horde::vulkan::raytracing::RtWorkloadPreset::Max)
+            frameInputs.shadowQuality = std::nullopt;
+#endif
         // Only explicit diagnostic comparisons opt out of the accepted
         // modelled production presentation; gameplay and glass share one route.
         const horde::gameplay::DevelopmentCheckpoint* development =
@@ -5209,6 +5245,9 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     }
 
     rtFramePresented = useRtFrame;
+    if (rtFramePresented && ctx.benchmark.IsRunning() && !ctx.benchmarkQualityControlsAtStart &&
+        ctx.rtScene.HasUploadedQualityControls())
+        ctx.benchmarkQualityControlsAtStart = ctx.rtScene.QualityControls();
     ctx.currentFrame = (ctx.currentFrame + 1u) % kMaxFramesInFlight;
     return true;
 }
@@ -6407,7 +6446,7 @@ void ApplyDpiScaledFonts(HWND window)
                          kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
                          kRenderScaleSliderId, kMusicVolumeLabelId, kMusicVolumeSliderId,
                          kFullscreenButtonId, kSettingsBackButtonId,
-                         kGraphicsOpenButtonId, kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsGlassButtonId,
+                         kGraphicsOpenButtonId, kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId,
                          kGraphicsApplyButtonId, kGraphicsConfirmButtonId, kGraphicsRevertButtonId,
                          kGraphicsResetButtonId, kGraphicsInfoId,
                          kGraphicsPreviewPauseId, kGraphicsPreviewCameraId, kGraphicsPreviewMotionId,
@@ -6637,7 +6676,7 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
 
     if (layoutContext != nullptr && layoutContext->graphicsVisible)
     {
-        const int graphicsWidth = std::min(ScaleForDpi(window, 600), std::max(ScaleForDpi(window, 360), width / 2 - inset * 2));
+        const int graphicsWidth = std::min(ScaleForDpi(window, 600), std::max(ScaleForDpi(window, 420), width / 2 - inset * 2));
         const int graphicsX = inset;
         const int compactHeight = ScaleForDpi(window, 36);
         const int infoHeight = ScaleForDpi(window, 148);
@@ -6655,10 +6694,11 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         MoveWindow(GetDlgItem(window, kRenderScaleSliderId), graphicsX, y, graphicsWidth, sliderHeight, TRUE);
         y += sliderHeight + gap;
         const int half = (graphicsWidth - gap) / 2;
-        MoveWindow(GetDlgItem(window, kWaterQualityButtonId), graphicsX, y, half, compactHeight, TRUE);
-        MoveWindow(GetDlgItem(window, kGraphicsFireButtonId), graphicsX + half + gap, y, half, compactHeight, TRUE);
-        y += compactHeight + gap;
         const int third = (graphicsWidth - gap * 2) / 3;
+        MoveWindow(GetDlgItem(window, kWaterQualityButtonId), graphicsX, y, third, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsFireButtonId), graphicsX + third + gap, y, third, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsShadowButtonId), graphicsX + (third + gap) * 2, y, third, compactHeight, TRUE);
+        y += compactHeight + gap;
         int column = 0;
         for (const int id : {kGraphicsApplyButtonId, kGraphicsConfirmButtonId, kGraphicsRevertButtonId})
             MoveWindow(GetDlgItem(window, id), graphicsX + column++ * (third + gap), y, third, compactHeight, TRUE);
@@ -7242,8 +7282,18 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 if (sceneContext->graphicsEdit)
                 {
                     auto draft = sceneContext->graphicsEdit->Draft();
-                    draft.fireDetail = draft.fireDetail == horde::graphics::FireDetail::High ?
-                        horde::graphics::FireDetail::Mobile : horde::graphics::FireDetail::High;
+                    draft.fireDetail = static_cast<horde::graphics::FireDetail>(
+                        (static_cast<unsigned>(draft.fireDetail) + 1u) % 3u);
+                    sceneContext->graphicsEdit->Stage(draft);
+                    UpdateSettingsLabels(*sceneContext);
+                }
+                return 0;
+            case kGraphicsShadowButtonId:
+                if (sceneContext->graphicsEdit)
+                {
+                    auto draft = sceneContext->graphicsEdit->Draft();
+                    draft.shadowQuality = static_cast<horde::graphics::ShadowQuality>(
+                        (static_cast<unsigned>(draft.shadowQuality) + 1u) % 3u);
                     sceneContext->graphicsEdit->Stage(draft);
                     UpdateSettingsLabels(*sceneContext);
                 }
@@ -8164,6 +8214,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kGraphicsOpenButtonId, "GRAPHICS...");
     createButton(kGraphicsPresetButtonId, "PRESET: ACCEPTED BASELINE");
     createButton(kGraphicsFireButtonId, "FIRE DETAIL: HIGH");
+    createButton(kGraphicsShadowButtonId, "SHADOW: CURRENT");
     createButton(kGraphicsGlassButtonId, "GLASS: ON");
     createButton(kGraphicsApplyButtonId, "APPLY");
     createButton(kGraphicsConfirmButtonId, "KEEP (15 SECONDS)");

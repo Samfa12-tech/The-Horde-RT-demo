@@ -132,4 +132,94 @@ public final class BenchmarkSummaryReviewTest {
         assertNull(owner.json()); assertNull(owner.exactJsonBytes());
         assertFalse(owner.beginSave());
     }
+
+    @Test public void typedRemotePreparationNeedsSeparateConsentAndPreservesLocalLiteralAndIdentity() {
+        BenchmarkSummaryReview review = new BenchmarkSummaryReview(RUN);
+        assertTrue(review.prepare(true,false,0,REPORT,UTC,(run,id,time,c,h,k) -> prepared(run,id,h,k)));
+        byte[] local = review.exactJsonBytes();
+        String literal = review.json();
+        PlaytestReportSubmission remote = new PlaytestReportSubmission(work -> fail("offline preparation must not enqueue"),
+                bytes -> { fail("offline preparation must not open transport"); return null; });
+        assertFalse(remote.beginBenchmarkSummary(review));
+        assertFalse(remote.beginBenchmarkSummary(review,false));
+        assertEquals(PlaytestReportSubmission.State.DRAFT,remote.state());
+        assertNull(remote.benchmarkSummaryJsonForOfflineReview());
+        assertTrue(remote.beginBenchmarkSummary(review,true));
+        assertEquals(REPORT,remote.reportId());
+        assertEquals(PlaytestReportSubmission.State.READY,remote.state());
+        String expected = literal.substring(0,literal.length()-1)+",\"consentToSubmit\":true}";
+        assertEquals(expected,new String(remote.benchmarkSummaryJsonForOfflineReview(),StandardCharsets.UTF_8));
+        assertEquals(literal,review.json()); assertArrayEquals(local,review.exactJsonBytes());
+        assertFalse(literal.contains("consentToSubmit")); assertFalse(expected.contains("turnstileToken"));
+        // Disclosed remote wrapper and original local Copy/Save owner stay separate.
+        assertTrue(review.beginSave());
+        byte[] exported = review.exportOwner().startWrite(review.exportOwner().token());
+        assertArrayEquals(local,exported);
+        byte[] returned = remote.benchmarkSummaryJsonForOfflineReview(); returned[0]='!';
+        assertEquals(expected,new String(remote.benchmarkSummaryJsonForOfflineReview(),StandardCharsets.UTF_8));
+        assertFalse(remote.beginBenchmarkSummary(review,true));
+    }
+
+    @Test public void benchmarkNetworkGateRejectsEveryAttemptAndCancelInvalidatesOfflineOwner() {
+        BenchmarkSummaryReview review = new BenchmarkSummaryReview(RUN);
+        assertTrue(review.prepare(true,false,0,REPORT,UTC,(run,id,time,c,h,k) -> prepared(run,id,h,k)));
+        final int[] queued = {0}, opened = {0}, callbacks = {0};
+        PlaytestReportSubmission remote = new PlaytestReportSubmission(work -> ++queued[0],bytes -> {
+            ++opened[0]; fail("benchmark live admission is unproven"); return null;
+        });
+        assertFalse(PlaytestReportSubmission.benchmarkSummarySendAvailable());
+        assertTrue(remote.beginBenchmarkSummary(review,true));
+        long attempt = remote.attempt();
+        byte[] wrapper = remote.benchmarkSummaryJsonForOfflineReview();
+        for(String token:new String[]{"fresh-offline-token","", "bad\ntoken"})
+            assertFalse(remote.submit(attempt,token,(generation,result) -> ++callbacks[0]));
+        assertEquals(0,queued[0]); assertEquals(0,opened[0]); assertEquals(0,callbacks[0]);
+        assertEquals(PlaytestReportSubmission.State.READY,remote.state());
+        assertArrayEquals(wrapper,remote.benchmarkSummaryJsonForOfflineReview());
+        // Also verify the production transport cannot be enabled by typed prep.
+        PlaytestReportSubmission production = new PlaytestReportSubmission(work -> fail("no production work"),
+                new PlaytestReportSubmission.HttpsTransport());
+        assertTrue(production.beginBenchmarkSummary(review,true));
+        assertFalse(production.submit(production.attempt(),"fresh-offline-token",(generation,result) -> fail("no callback")));
+        remote.cancel();
+        assertNull(remote.benchmarkSummaryJsonForOfflineReview()); assertNull(remote.reportId());
+        assertEquals(PlaytestReportSubmission.State.CANCELLED,remote.state());
+        assertFalse(remote.submit(attempt,"fresh-offline-token",(generation,result) -> ++callbacks[0]));
+        assertEquals(-1L,remote.retry());
+        assertTrue(review.isPrepared()); assertTrue(review.beginSave());
+    }
+
+    @Test public void typedEntryRejectsMissingClosedAndWrongKindOwnersAndKeepsExact16KiBBoundary() {
+        PlaytestReportSubmission remote = new PlaytestReportSubmission(work -> fail("no queued work"),
+                bytes -> { fail("no transport"); return null; });
+        assertFalse(remote.beginBenchmarkSummary(null,true));
+        BenchmarkSummaryReview unprepared = new BenchmarkSummaryReview(RUN);
+        assertFalse(remote.beginBenchmarkSummary(unprepared,true));
+        BenchmarkSummaryReview closed = new BenchmarkSummaryReview(RUN);
+        assertTrue(closed.prepare(true,false,0,REPORT,UTC,(run,id,time,c,h,k) -> prepared(run,id,h,k)));
+        byte[] schema2 = prepared(RUN,REPORT,false,0);
+        assertFalse("legacy playtest admission must not silently widen",remote.begin(schema2,true));
+        closed.close(); assertFalse(remote.beginBenchmarkSummary(closed,true));
+        BenchmarkSummaryReview boundary = new BenchmarkSummaryReview(RUN);
+        assertTrue(boundary.prepare(true,false,0,REPORT,UTC,(run,id,time,c,h,k) -> {
+            byte[] original = prepared(run,id,h,k);
+            byte[] large = new byte[PlaytestReportSubmission.MAX_BENCHMARK_LOCAL_BYTES+1];
+            Arrays.fill(large,(byte)' '); large[0]=0;
+            System.arraycopy(original,1,large,1,original.length-2);
+            large[large.length-1]='}';
+            return large;
+        }));
+        byte[] local = boundary.exactJsonBytes();
+        assertEquals(16*1024,local.length);
+        assertTrue(remote.beginBenchmarkSummary(boundary,true));
+        byte[] wrapped = remote.benchmarkSummaryJsonForOfflineReview();
+        assertTrue(wrapped.length <= PlaytestReportSubmission.MAX_BENCHMARK_SUBMISSION_BYTES);
+        assertArrayEquals(Arrays.copyOf(local,local.length-1),Arrays.copyOf(wrapped,local.length-1));
+        BenchmarkSummaryReview oversized = new BenchmarkSummaryReview(RUN);
+        assertFalse(oversized.prepare(true,false,0,REPORT,UTC,(run,id,time,c,h,k) ->
+                new byte[PlaytestReportSubmission.MAX_BENCHMARK_LOCAL_BYTES+2]));
+        PlaytestReportSubmission rejected = new PlaytestReportSubmission(work -> fail("no queued work"),
+                bytes -> { fail("no transport"); return null; });
+        assertFalse(rejected.beginBenchmarkSummary(oversized,true));
+    }
 }

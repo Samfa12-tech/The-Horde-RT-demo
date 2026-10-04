@@ -4,13 +4,14 @@ import java.util.Arrays;
 
 /** Live preview choice/acknowledgement policy. No persistence or JNI side effects. */
 final class GraphicsPreviewOptions {
-    static final int RESOLUTION = 0, WATER = 1, FIRE = 2, CAP = 3, GLASS = 4;
+    static final int RESOLUTION = 0, WATER = 1, FIRE = 2, CAP = 3, GLASS = 4, SHADOW = 5;
     static String name(int choice) {
         switch (choice) {
             case WATER: return "Water";
             case FIRE: return "Fire";
             case CAP: return "Frame cap";
             case GLASS: return "Glass";
+            case SHADOW: return "Shadows";
             default: return "Resolution";
         }
     }
@@ -30,19 +31,21 @@ final class GraphicsPreviewOptions {
             case FIRE: return current.fire;
             case CAP: return current.cap;
             case GLASS: return current.glassEnabled ? 1 : 0;
+            case SHADOW: return current.shadow;
             default: throw new IllegalArgumentException("Unknown live graphics choice");
         }
     }
     static GraphicsPreferences.Values withChoice(GraphicsPreferences.Values current, int choice, int value) {
         final GraphicsPreferences.Values result;
         switch (choice) {
-            case RESOLUTION: result = new GraphicsPreferences.Values(value, current.water, current.fire, current.cap, current.glassEnabled); break;
-            case WATER: result = new GraphicsPreferences.Values(current.scale, value, current.fire, current.cap, current.glassEnabled); break;
-            case FIRE: result = new GraphicsPreferences.Values(current.scale, current.water, value, current.cap, current.glassEnabled); break;
-            case CAP: result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, value, current.glassEnabled); break;
+            case RESOLUTION: result = new GraphicsPreferences.Values(value, current.water, current.fire, current.cap, current.glassEnabled, current.shadow); break;
+            case WATER: result = new GraphicsPreferences.Values(current.scale, value, current.fire, current.cap, current.glassEnabled, current.shadow); break;
+            case FIRE: result = new GraphicsPreferences.Values(current.scale, current.water, value, current.cap, current.glassEnabled, current.shadow); break;
+            case CAP: result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, value, current.glassEnabled, current.shadow); break;
             case GLASS:
                 if (value != 0 && value != 1) throw new IllegalArgumentException("Invalid glass choice");
-                result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap, value == 1); break;
+                result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap, value == 1, current.shadow); break;
+            case SHADOW: result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap, current.glassEnabled, value); break;
             default: throw new IllegalArgumentException("Unknown live graphics choice");
         }
         if (!result.valid()) throw new IllegalArgumentException("Invalid live graphics value");
@@ -56,7 +59,8 @@ final class GraphicsPreviewOptions {
         switch (choice) {
             case RESOLUTION: presets = minimum == 33 ? new int[]{33,40,50,63,75,100} : new int[]{50,63,75,100}; break;
             case WATER: return new int[]{0,1,2};
-            case FIRE: return new int[]{0,1};
+            case FIRE: return new int[]{GraphicsPreferences.FIRE_LOW,GraphicsPreferences.FIRE_MOBILE,GraphicsPreferences.FIRE_HIGH};
+            case SHADOW: return new int[]{GraphicsPreferences.SHADOW_LOWER,GraphicsPreferences.SHADOW_CURRENT,GraphicsPreferences.SHADOW_HIGHER};
             case GLASS: return new int[]{0,1};
             case CAP: presets = new int[]{15,30,60}; break;
             default: throw new IllegalArgumentException("Unknown live graphics choice");
@@ -72,6 +76,22 @@ final class GraphicsPreviewOptions {
     }
     static String resolutionLabel(int percent, int minimum) {
         return percent + "%" + (minimum == 33 && (percent == 33 || percent == 40) ? " (Experimental)" : "");
+    }
+    static String fireLabel(int value) {
+        switch (value) {
+            case GraphicsPreferences.FIRE_LOW: return "Low";
+            case GraphicsPreferences.FIRE_MOBILE: return "Mobile";
+            case GraphicsPreferences.FIRE_HIGH: return "High";
+            default: throw new IllegalArgumentException("Unknown fire detail");
+        }
+    }
+    static String shadowLabel(int value) {
+        switch (value) {
+            case GraphicsPreferences.SHADOW_LOWER: return "Lower";
+            case GraphicsPreferences.SHADOW_CURRENT: return "Current";
+            case GraphicsPreferences.SHADOW_HIGHER: return "Higher";
+            default: throw new IllegalArgumentException("Unknown shadow quality");
+        }
     }
     static boolean presented(long[] snapshot, long generation, long serial, GraphicsPreferences.Values selected) {
         return selected != null && GraphicsPreferences.presented(snapshot, generation) && snapshot[19] == 1 &&

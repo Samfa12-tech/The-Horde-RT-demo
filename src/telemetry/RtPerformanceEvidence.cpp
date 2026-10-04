@@ -198,6 +198,12 @@ bool ValidSceneFrame(const RtSceneFrameEvidence& scene,
     {
         return false;
     }
+    if ((scene.shadowQuality && !ValidRtShadowQualityEvidence(*scene.shadowQuality, scene.pipeline.dielectricQuality)) ||
+        (scene.fireQuality && !ValidRtFireQualityEvidence(*scene.fireQuality)))
+    {
+        error = RtEvidenceValidationError::InconsistentIdentity;
+        return false;
+    }
     if (!scene.dispatch.sceneReady || !scene.dispatch.rtDispatchRecorded ||
         !scene.dispatch.swapchainCopyRecorded)
     {
@@ -213,6 +219,12 @@ bool ValidRecordedScene(const RtRecordedSceneEvidence& scene,
     if (!ValidPipelineIdentity(scene.pipeline, error) ||
         !ValidPlayerDiagnostics(scene.player, error))
     {
+        return false;
+    }
+    if ((scene.shadowQuality && !ValidRtShadowQualityEvidence(*scene.shadowQuality, scene.pipeline.dielectricQuality)) ||
+        (scene.fireQuality && !ValidRtFireQualityEvidence(*scene.fireQuality)))
+    {
+        error = RtEvidenceValidationError::InconsistentIdentity;
         return false;
     }
     if (scene.player.primaryPixelCountAvailable ||
@@ -439,6 +451,58 @@ bool IncrementSaturatingCounter(std::uint64_t& value) noexcept
 }
 
 } // namespace
+
+const char* RtShadowModeName(const RtShadowMode mode) noexcept
+{
+    switch (mode)
+    {
+    case RtShadowMode::Lower: return "lower";
+    case RtShadowMode::Current: return "current";
+    case RtShadowMode::Higher: return "higher";
+    case RtShadowMode::DiagnosticLegacy: return "legacy-workload";
+    }
+    return nullptr;
+}
+
+const char* RtFireQualityName(const RtFireQuality quality) noexcept
+{
+    switch (quality)
+    {
+    case RtFireQuality::Mobile: return "Mobile";
+    case RtFireQuality::High: return "High";
+    case RtFireQuality::Low: return "Low";
+    }
+    return nullptr;
+}
+
+bool ValidRtShadowQualityEvidence(const RtShadowQualityEvidence& evidence,
+                                 const RtDielectricQuality compiledQuality) noexcept
+{
+    if (evidence.reserved != 0u ||
+        (compiledQuality != RtDielectricQuality::Mobile && compiledQuality != RtDielectricQuality::High)) return false;
+    const bool authored = evidence.localPrimarySamples == 1u && evidence.skyPrimarySamples == 1u;
+    const bool higher = evidence.localPrimarySamples == (compiledQuality == RtDielectricQuality::High ? 4u : 2u) &&
+        evidence.skyPrimarySamples == 2u;
+    switch (evidence.mode)
+    {
+    case RtShadowMode::Lower:
+    case RtShadowMode::Current: return authored;
+    case RtShadowMode::Higher: return higher;
+    case RtShadowMode::DiagnosticLegacy: return authored || higher;
+    }
+    return false;
+}
+
+bool ValidRtFireQualityEvidence(const RtFireQualityEvidence& evidence) noexcept
+{
+    switch (evidence.quality)
+    {
+    case RtFireQuality::Mobile: return evidence.volumeSteps == 4u && evidence.reflectionSamples == 1u;
+    case RtFireQuality::High: return evidence.volumeSteps == 10u && evidence.reflectionSamples == 2u;
+    case RtFireQuality::Low: return evidence.volumeSteps == 2u && evidence.reflectionSamples == 1u;
+    }
+    return false;
+}
 
 const char* RtSampleStatusName(const RtSampleStatus status) noexcept
 {
@@ -972,6 +1036,22 @@ bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& sna
          << ",\"swapchainCopyRecorded\":"
          << (snapshot.scene.dispatch.swapchainCopyRecorded ? "true" : "false") << '}';
 
+    if (snapshot.scene.shadowQuality)
+    {
+        const auto& quality = *snapshot.scene.shadowQuality;
+        json << ",\"shadowQuality\":{\"mode\":\"" << RtShadowModeName(quality.mode)
+             << "\",\"localPrimarySamples\":" << quality.localPrimarySamples
+             << ",\"skyPrimarySamples\":" << quality.skyPrimarySamples << ",\"reserved\":0}";
+    }
+    if (snapshot.scene.fireQuality)
+    {
+        const auto& quality = *snapshot.scene.fireQuality;
+        json << ",\"fireQuality\":{\"quality\":\"" << RtFireQualityName(quality.quality)
+             << "\",\"volumeSteps\":" << quality.volumeSteps
+             << ",\"reflectionSamples\":" << quality.reflectionSamples
+             << ",\"reflectedVolumeSteps\":" << std::min(quality.volumeSteps, quality.reflectionSamples * 4u) << '}';
+    }
+
     const RtResourceInventory& resources = snapshot.scene.resources;
     json << ",\"resources\":{\"bufferCount\":" << resources.bufferCount
          << ",\"memoryAllocationCount\":" << resources.memoryAllocationCount
@@ -1169,6 +1249,19 @@ bool SerializeRtPerformanceEvidenceText(const RtPerformanceEvidenceSnapshot& sna
         }
     }
     text << '\n';
+    if (snapshot.scene.shadowQuality)
+    {
+        const auto& quality = *snapshot.scene.shadowQuality;
+        text << "\nUploaded shadows: " << RtShadowModeName(quality.mode)
+             << " primary-local=" << quality.localPrimarySamples << " primary-sky=" << quality.skyPrimarySamples;
+    }
+    if (snapshot.scene.fireQuality)
+    {
+        const auto& quality = *snapshot.scene.fireQuality;
+        text << "\nUploaded fire: " << RtFireQualityName(quality.quality)
+             << " volume-steps=" << quality.volumeSteps << " reflection-samples=" << quality.reflectionSamples
+             << " reflected-volume-steps=" << std::min(quality.volumeSteps, quality.reflectionSamples * 4u);
+    }
     output = text.str();
     return true;
 }
@@ -1531,6 +1624,8 @@ bool RtEvidenceLifecycle::Complete(const RtSubmittedFrameIdentity& submitted,
     candidate.identity.completionSerial = seeds_.completionSerial + 1u;
     candidate.scene.pipeline = slot.scene.pipeline;
     candidate.scene.resources = slot.scene.resources;
+    candidate.scene.shadowQuality = slot.scene.shadowQuality;
+    candidate.scene.fireQuality = slot.scene.fireQuality;
     candidate.scene.player = slot.scene.player;
     if (diagnostic.status == RtSampleStatus::Valid)
     {

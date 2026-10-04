@@ -130,5 +130,43 @@ int main()
               unavailable.find("\"policyStable\":false") != std::string::npos &&
               unavailable.find("\"primaryAreaShadowSamplesPerContributingReceiver\":0") != std::string::npos,
           "changed or unavailable actual shader policy never appears stable");
+    const horde::vulkan::raytracing::RtQualityControlsGpu current{{1u, 1u, 1u, 0u}};
+    const horde::vulkan::raytracing::RtQualityControlsGpu lower{{0u, 1u, 1u, 0u}};
+    const horde::vulkan::raytracing::RtQualityControlsGpu higher{{2u, 4u, 2u, 0u}};
+    const auto independentCurrentMax = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Max, RtWorkloadPreset::Max, RtWorkloadPreset::Max, "High", "High", current, current, true);
+    check(independentCurrentMax.find("\"policyStable\":true") != std::string::npos &&
+        independentCurrentMax.find("\"shadowPolicySource\":\"uploaded\"") != std::string::npos &&
+        independentCurrentMax.find("\"shadowMode\":\"Current\"") != std::string::npos &&
+        independentCurrentMax.find("\"primaryAreaShadowSamplesPerContributingReceiver\":1") != std::string::npos &&
+        independentCurrentMax.find("\"primarySkyVisibilitySamples\":1") != std::string::npos,
+        "production Current on whole Max reports actual uploaded1/1 rather than legacy4/2");
+    const auto independentHigherAuthored = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "High", "High", higher, higher, true);
+    check(independentHigherAuthored.find("\"shadowMode\":\"Higher\"") != std::string::npos &&
+        independentHigherAuthored.find("\"primaryAreaShadowSamplesPerContributingReceiver\":4") != std::string::npos &&
+        independentHigherAuthored.find("\"primarySkyVisibilitySamples\":2") != std::string::npos,
+        "uploaded Higher shadow budget does not require or invent a Max workload");
+    check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "High", "High", current, lower, true)
+        .find("\"policyStable\":false") != std::string::npos,
+        "changing spatial sample mode invalidates policy stability even when query budgets both equal1");
+    const auto notUploaded = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Max, RtWorkloadPreset::Max, RtWorkloadPreset::Max, "High", "High", std::nullopt, std::nullopt, true);
+    check(notUploaded.find("\"policyStable\":false") != std::string::npos &&
+        notUploaded.find("\"shadowPolicySource\":\"unavailable\"") != std::string::npos &&
+        notUploaded.find("\"primaryAreaShadowSamplesPerContributingReceiver\":0") != std::string::npos,
+        "ordinary reporting without an actual upload never fabricates Max shadow policy");
+    auto invalidUpload = higher; invalidUpload.controls[3] = 1u;
+    check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "High", "High", higher, invalidUpload, true)
+        .find("\"shadowPolicySource\":\"unavailable\"") != std::string::npos,
+        "reserved nonzero uploaded record is not admitted as actual physical policy");
+    check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "Mobile", "Mobile", higher, higher, true)
+        .find("\"policyStable\":false") != std::string::npos,
+        "High four-sample record cannot certify a Mobile compiled two-sample policy");
+    check(highMax.find("explicit-diagnostic-legacy-workload") != std::string::npos,
+        "historical explicit diagnostic caller keeps separately named legacy workload semantics");
     return passed ? 0 : 1;
 }

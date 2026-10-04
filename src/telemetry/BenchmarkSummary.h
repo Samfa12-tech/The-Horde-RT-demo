@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -11,7 +12,7 @@ namespace horde::telemetry
 {
 enum class BenchmarkSummaryPlatform : std::uint8_t { Windows, Android };
 enum class BenchmarkSummaryCooling : std::uint8_t { Unknown, NoneDeclared, ExternalDeclared };
-enum class BenchmarkSummaryFireQuality : std::uint8_t { Mobile, High };
+enum class BenchmarkSummaryFireQuality : std::uint8_t { Mobile, High, Low };
 enum class BenchmarkSummaryStatus : std::uint8_t
 {
     Ready, InvalidIdentity, InvalidConfiguration, Incomplete, MismatchedPopulation, InvalidTiming,
@@ -30,6 +31,8 @@ struct BenchmarkSummaryConfiguration
     bool glassEnabled = true;
     std::uint64_t sceneEpoch = 0u;
     std::uint64_t measurementGeneration = 0u;
+    std::optional<RtShadowQualityEvidence> shadowQuality{};
+    std::optional<RtFireQualityEvidence> uploadedFireQuality{};
 };
 
 struct BenchmarkSummaryPopulation

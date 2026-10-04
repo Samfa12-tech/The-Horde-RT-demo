@@ -88,6 +88,9 @@ struct RtExpectedFrameRecord
     // or a later observer. An uncompleted row has no active-strategy evidence.
     bool hasActiveStrategy = false;
     RtMaterialStrategy activeStrategy = RtMaterialStrategy::OpaqueFast;
+    // Exact uploaded policy copied from this row's validated owning completion.
+    std::optional<RtShadowQualityEvidence> shadowQuality{};
+    std::optional<RtFireQualityEvidence> fireQuality{};
     // Copied from the validated owning completion, never the latest observer.
     // An unavailable/Shipping sample is distinct from an available all-zero one.
     bool hasDiagnosticCounters = false;

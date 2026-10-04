@@ -369,6 +369,18 @@ void PublishGraphicsApplied(const SwapchainContext& context, const bool success,
     snapshot.requested = context.graphicsRequested;
     snapshot.effective = context.graphicsSettings;
     snapshot.effective.glassEnabled = context.rtScene.GlassEnabled();
+    const bool uploadedQuality = context.rtScene.HasUploadedQualityControls();
+    if (uploadedQuality)
+    {
+        snapshot.effective.shadowQuality = static_cast<horde::graphics::ShadowQuality>(
+            context.rtScene.QualityControls().controls[0]);
+        switch (context.rtScene.UploadedFireQuality())
+        {
+        case horde::vulkan::raytracing::FireEmitterQuality::Mobile: snapshot.effective.fireDetail = horde::graphics::FireDetail::Mobile; break;
+        case horde::vulkan::raytracing::FireEmitterQuality::High: snapshot.effective.fireDetail = horde::graphics::FireDetail::High; break;
+        case horde::vulkan::raytracing::FireEmitterQuality::Low: snapshot.effective.fireDetail = horde::graphics::FireDetail::Low; break;
+        }
+    }
     snapshot.opticalProfile = context.rtScene.SelectedDielectricQualityName() == "High" ?
         horde::graphics::OpticalProfile::High : horde::graphics::OpticalProfile::Mobile;
     snapshot.backend = context.rtScene.ExecutionBackend() == horde::vulkan::RtExecutionBackend::RayTracingPipeline ?
@@ -382,7 +394,7 @@ void PublishGraphicsApplied(const SwapchainContext& context, const bool success,
         horde::graphics::GraphicsScene::Preview : horde::graphics::GraphicsScene::Showcase;
     snapshot.reasons = context.graphicsReason | (context.previewTransitionFailed ?
         horde::graphics::GraphicsReason::ResourceFailure : horde::graphics::GraphicsReason::None);
-    snapshot.rtPresented = presented;
+    snapshot.rtPresented = presented && uploadedQuality;
     std::lock_guard lock(gGraphicsMutex);
     if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return;
     if ((gPreviewControls.generation == 0u || gPreviewControls.generation == snapshot.lifecycleGeneration) &&
@@ -958,8 +970,26 @@ ReadBenchmarkSummaryConfigurationOnOwner(const SwapchainContext& context) noexce
         configuration.platform = horde::telemetry::BenchmarkSummaryPlatform::Android;
         configuration.metadata = BuildBenchmarkMetadata(context);
         configuration.water = static_cast<horde::telemetry::RtWaterQuality>(context.graphicsSettings.waterQuality);
-        configuration.fire = context.graphicsSettings.fireDetail == horde::graphics::FireDetail::High ?
-            horde::telemetry::BenchmarkSummaryFireQuality::High : horde::telemetry::BenchmarkSummaryFireQuality::Mobile;
+        if (!context.rtScene.HasUploadedQualityControls()) return std::nullopt;
+        const auto& quality = context.rtScene.QualityControls().controls;
+        configuration.shadowQuality = horde::telemetry::RtShadowQualityEvidence{
+            static_cast<horde::telemetry::RtShadowMode>(quality[0]), quality[1], quality[2], quality[3]};
+        const auto fireQuality = context.rtScene.UploadedFireQuality();
+        horde::telemetry::RtFireQuality fireTier = horde::telemetry::RtFireQuality::Mobile;
+        switch (fireQuality)
+        {
+        case horde::vulkan::raytracing::FireEmitterQuality::Mobile:
+            configuration.fire = horde::telemetry::BenchmarkSummaryFireQuality::Mobile; break;
+        case horde::vulkan::raytracing::FireEmitterQuality::High:
+            configuration.fire = horde::telemetry::BenchmarkSummaryFireQuality::High;
+            fireTier = horde::telemetry::RtFireQuality::High; break;
+        case horde::vulkan::raytracing::FireEmitterQuality::Low:
+            configuration.fire = horde::telemetry::BenchmarkSummaryFireQuality::Low;
+            fireTier = horde::telemetry::RtFireQuality::Low; break;
+        }
+        const auto fireBudget = horde::vulkan::raytracing::ResolveFireEmitterQualityBudget(fireQuality);
+        configuration.uploadedFireQuality = horde::telemetry::RtFireQualityEvidence{
+            fireTier, fireBudget.volumeSteps, fireBudget.reflectionSamples};
         const auto optics = context.rtScene.SelectedDielectricQualityName();
         if (optics != "Mobile" && optics != "High") return std::nullopt;
         configuration.dielectric = optics == "High" ? horde::telemetry::RtDielectricQuality::High :
@@ -3250,8 +3280,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 0.0 : context.frameDeltaSeconds);
             frameInputs = horde::vulkan::raytracing::BuildGraphicsPreviewFrameInputs(context.previewSession,
                 context.outputExposure, static_cast<horde::vulkan::raytracing::WaterQuality>(context.graphicsSettings.waterQuality),
-                context.graphicsSettings.fireDetail == horde::graphics::FireDetail::High ?
-                    horde::vulkan::raytracing::FireEmitterQuality::High : horde::vulkan::raytracing::FireEmitterQuality::Mobile);
+                horde::vulkan::raytracing::ResolveFireEmitterQuality(context.graphicsSettings.fireDetail),
+                rtLabTuning, context.graphicsSettings.shadowQuality);
         }
         else
         {
@@ -3262,8 +3292,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     static_cast<horde::vulkan::raytracing::WaterQuality>(
                         static_cast<int>(context.graphicsSettings.waterQuality)),
                     rtLabTuning);
-            frameInputs.fireDetail = context.graphicsSettings.fireDetail == horde::graphics::FireDetail::High ?
-                horde::vulkan::raytracing::FireEmitterQuality::High : horde::vulkan::raytracing::FireEmitterQuality::Mobile;
+            frameInputs.fireDetail = horde::vulkan::raytracing::ResolveFireEmitterQuality(context.graphicsSettings.fireDetail);
+            frameInputs.shadowQuality = context.graphicsSettings.shadowQuality;
             frameInputs.playerRenderRoute = context.playerRenderRoute;
             if (context.glassFixtureRequested)
             {
@@ -4741,10 +4771,13 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setSimulationPaused(JNIEnv*, jclass,
 
 namespace
 {
-horde::graphics::GraphicsSettings GraphicsTuple(const jint scale, const jint water, const jint fire, const jint cap, const jboolean glass)
+horde::graphics::GraphicsSettings GraphicsTuple(const jint scale, const jint water, const jint fire, const jint cap, const jboolean glass, const jint shadow)
 {
+    if (water < 0 || water > 2 || fire < 0 || fire > 2 || shadow < 0 || shadow > 2)
+        return {0}; // Reject before narrowing enum storage.
     return {scale, static_cast<horde::graphics::WaterQuality>(water),
-        static_cast<horde::graphics::FireDetail>(fire), cap, glass == JNI_TRUE};
+        static_cast<horde::graphics::FireDetail>(fire), cap, glass == JNI_TRUE,
+        static_cast<horde::graphics::ShadowQuality>(shadow)};
 }
 void PublishGraphicsCommandLocked(const horde::graphics::GraphicsCommand& command)
 {
@@ -4801,18 +4834,18 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getKeeperRevealTitleOpacity(JNIEnv*,
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_setGraphicsSettings(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass)
+Java_com_samfa12_hordelanternrt_ProbeBridge_setGraphicsSettings(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow)
 {
-    const auto settings = GraphicsTuple(scale, water, fire, cap, glass);
+    const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow);
     if (!horde::graphics::ValidGraphicsSettings(settings)) return;
     std::lock_guard lock(gGraphicsMutex);
     gRequestedGraphics = {++gGraphicsSerial, 0u, horde::graphics::GraphicsCommandKind::Revert, settings};
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_beginGraphicsEdit(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass)
+Java_com_samfa12_hordelanternrt_ProbeBridge_beginGraphicsEdit(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow)
 {
-    const auto settings = GraphicsTuple(scale, water, fire, cap, glass);
+    const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow);
     if (!horde::graphics::ValidGraphicsSettings(settings)) return;
     std::lock_guard lock(gGraphicsMutex);
     gGraphicsEdit.emplace(settings, gGraphicsSerial);
@@ -4820,11 +4853,11 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_beginGraphicsEdit(JNIEnv*, jclass, j
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_applyGraphicsSettings(
-    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jlong generation)
+    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jlong generation)
 {
     if (!gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation))) return 0;
     std::lock_guard lock(gGraphicsMutex);
-    if (!gGraphicsEdit || !gGraphicsEdit->Stage(GraphicsTuple(scale, water, fire, cap, glass))) return 0;
+    if (!gGraphicsEdit || !gGraphicsEdit->Stage(GraphicsTuple(scale, water, fire, cap, glass, shadow))) return 0;
     const auto command = gGraphicsEdit->RequestApply(static_cast<std::uint64_t>(generation));
     if (!command) return 0;
     PublishGraphicsCommandLocked(*command);
@@ -4833,9 +4866,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_applyGraphicsSettings(
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_compareGraphicsPreview(
-    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jlong generation)
+    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jlong generation)
 {
-    const auto settings = GraphicsTuple(scale, water, fire, cap, glass);
+    const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow);
     if (!horde::graphics::ValidGraphicsSettings(settings) ||
         !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation))) return 0;
     std::lock_guard lock(gGraphicsMutex);
@@ -4901,7 +4934,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getGraphicsSnapshot(JNIEnv* env, jcl
         static_cast<jlong>(a.opticalProfile), static_cast<jlong>(a.backend), a.rtPresented ? 1 : 0,
         static_cast<jlong>(a.reasons), a.requested.renderScalePercent, static_cast<jlong>(a.requested.waterQuality),
         static_cast<jlong>(a.requested.fireDetail), a.requested.previewFrameCap, static_cast<jlong>(a.scene),
-        a.effective.glassEnabled ? 1 : 0, a.requested.glassEnabled ? 1 : 0};
+        a.effective.glassEnabled ? 1 : 0, a.requested.glassEnabled ? 1 : 0,
+        static_cast<jlong>(a.effective.shadowQuality), static_cast<jlong>(a.requested.shadowQuality)};
     auto result = env->NewLongArray(static_cast<jsize>(std::size(values)));
     if (result) env->SetLongArrayRegion(result, 0, static_cast<jsize>(std::size(values)), values);
     return result;

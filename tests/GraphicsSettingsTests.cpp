@@ -1,4 +1,5 @@
 #include "graphics/GraphicsSettings.h"
+#include "vulkan/raytracing/RtSceneTuning.h"
 
 #include <atomic>
 #include <iostream>
@@ -174,7 +175,7 @@ void TestGlassMigrationAndTransactions()
               "schema1 keeps every confirmed/pending quality and custom value, defaults only new glass field On");
         const auto current = RecoverGraphicsSettings({kGraphicsSettingsSchema, oldConfirmed, oldPending}, platform);
         Check(current.startup == oldConfirmed && current.retainedRequested == oldPending,
-              "schema2 preserves explicit Off through interrupted apply recovery");
+              "schema3 preserves explicit Off through interrupted apply recovery");
         auto off = BaselineGraphicsSettings(platform); off.glassEnabled = false;
         Check(MatchGraphicsPreset(off, platform) == GraphicsPreset::Custom, "glass-only override is Custom");
         const auto resolved = ResolveGraphicsSettings(off, {OpticalProfile::Mobile, GraphicsBackend::RayQueryCompute, true}, {800u, 600u});
@@ -200,12 +201,62 @@ void TestGlassMigrationAndTransactions()
         Check(session.Stage(off), "Off can be staged after restore");
         const auto kept = session.RequestApply(10u);
         Check(kept && session.Acknowledge(Presented(*kept), true) && session.Confirm() &&
-              !session.Persistence().confirmed.glassEnabled && session.Persistence().schema == 2u,
-              "explicit Keep persists Off in schema2 only after current presentation");
+              !session.Persistence().confirmed.glassEnabled && session.Persistence().schema == 3u,
+              "explicit Keep persists Off in schema3 only after current presentation");
         Check(session.ResetDraft(platform) && session.Draft().glassEnabled && !session.Committed().glassEnabled,
               "Reset restores On as draft without rewriting confirmed Off");
     }
 }
+void TestIndependentShadowAndLowFire()
+{
+    for (const auto oldSchema : {1u, 2u})
+    {
+        auto old = BaselineGraphicsSettings(GraphicsPlatform::Android);
+        old.glassEnabled = false; old.shadowQuality = ShadowQuality::Higher;
+        const auto recovery = RecoverGraphicsSettings({oldSchema, old, old}, GraphicsPlatform::Android);
+        Check(recovery.startup.shadowQuality == ShadowQuality::Current &&
+              recovery.startup.glassEnabled == (oldSchema == 1u) &&
+              recovery.retainedRequested && recovery.retainedRequested->shadowQuality == ShadowQuality::Current,
+              "historical confirmed and pending migrate Current preserving schema-specific glass");
+        old.fireDetail = FireDetail::Low;
+        Check(HasGraphicsReason(RecoverGraphicsSettings({oldSchema, old, old}, GraphicsPlatform::Android).reasons,
+              GraphicsReason::InvalidStoredSettings), "old schemas never reinterpret unknown fire2 as an admitted legacy choice");
+    }
+    auto draft = GraphicsSettings{};
+    draft.fireDetail = FireDetail::Low; draft.shadowQuality = ShadowQuality::Higher;
+    Check(RecoverGraphicsSettings({3u, draft, draft}, GraphicsPlatform::Android).startup == draft,
+          "schema3 retains Low and Higher without coupling or rewriting");
+    GraphicsEditSession edit(GraphicsSettings{});
+    Check(edit.Stage(draft), "independent Low/Higher draft accepted");
+    const auto command = edit.RequestApply(9u);
+    if (command)
+    {
+        auto snapshot = Presented(*command);
+        snapshot.effective.shadowQuality = ShadowQuality::Current;
+        Check(!edit.Acknowledge(snapshot, true), "old shadow upload cannot acknowledge Higher request");
+        snapshot.effective = draft;
+        Check(edit.Acknowledge(snapshot, true) && edit.Confirm() && edit.Committed() == draft,
+              "exact six-field presented ACK commits independent choices");
+    }
+    using namespace horde::vulkan::raytracing;
+    for (const bool high : {false, true})
+        for (const auto workload : {RtWorkloadPreset::Lean, RtWorkloadPreset::Authored, RtWorkloadPreset::Max})
+            for (const auto mode : {ShadowQuality::Lower, ShadowQuality::Current, ShadowQuality::Higher})
+            {
+                const auto policy = ResolveRtQualityControls(mode, workload, high);
+                Check(policy && policy->controls[0] == static_cast<std::uint32_t>(mode) &&
+                    policy->controls[1] == (mode == ShadowQuality::Higher ? (high ? 4u : 2u) : 1u) &&
+                    policy->controls[2] == (mode == ShadowQuality::Higher ? 2u : 1u) && policy->controls[3] == 0u,
+                    "independent shadow budgets ignore mist/workload and obey compiled profile");
+            }
+    Check(!ResolveRtQualityControls(static_cast<ShadowQuality>(3u), RtWorkloadPreset::Authored, true),
+          "unknown production shadow enum is rejected rather than diagnostic legacy");
+    Check(ResolveRtQualityControls(std::nullopt, RtWorkloadPreset::Max, true)->controls ==
+          std::array<std::uint32_t, 4u>{{3u,4u,2u,0u}}, "absent diagnostic choice explicitly retains legacy Max");
+    draft.shadowQuality = static_cast<ShadowQuality>(99u);
+    Check(!ValidGraphicsSettings(draft), "unknown shadow settings rejected before JNI/persistence admission");
+}
+
 void TestCoherentPublication()
 {
     GraphicsMailbox<GraphicsAppliedSnapshot> mailbox;
@@ -238,6 +289,6 @@ void TestCoherentPublication()
 int main()
 {
     TestMigrationAndProfiles(); TestResolutionAndEffectiveValues(); TestApplyConfirmAndCancel();
-    TestFailureDeadlineAndRecovery(); TestEffectiveAcknowledgement(); TestGlassMigrationAndTransactions(); TestCoherentPublication();
+    TestFailureDeadlineAndRecovery(); TestEffectiveAcknowledgement(); TestGlassMigrationAndTransactions(); TestIndependentShadowAndLowFire(); TestCoherentPublication();
     return passed ? 0 : 1;
 }

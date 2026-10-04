@@ -33,8 +33,23 @@ horde::telemetry::BenchmarkSummaryConfiguration WindowsBenchmarkSummaryConfigura
     const auto applied = CurrentGraphicsSettings(context);
     configuration.metadata.renderScalePercent = static_cast<std::uint32_t>(applied.renderScalePercent);
     configuration.water = static_cast<horde::telemetry::RtWaterQuality>(applied.waterQuality);
-    configuration.fire = applied.fireDetail == horde::graphics::FireDetail::High ?
-        horde::telemetry::BenchmarkSummaryFireQuality::High : horde::telemetry::BenchmarkSummaryFireQuality::Mobile;
+    if (!context.rtScene.IsReady() || !context.rtScene.HasUploadedQualityControls()) return {};
+    switch (context.rtScene.UploadedFireQuality())
+    {
+    case horde::vulkan::raytracing::FireEmitterQuality::Mobile:
+        configuration.fire = horde::telemetry::BenchmarkSummaryFireQuality::Mobile; break;
+    case horde::vulkan::raytracing::FireEmitterQuality::High:
+        configuration.fire = horde::telemetry::BenchmarkSummaryFireQuality::High; break;
+    case horde::vulkan::raytracing::FireEmitterQuality::Low:
+        configuration.fire = horde::telemetry::BenchmarkSummaryFireQuality::Low; break;
+    default: return {};
+    }
+    const auto fireBudget = horde::vulkan::raytracing::ResolveFireEmitterQualityBudget(context.rtScene.UploadedFireQuality());
+    configuration.uploadedFireQuality = horde::telemetry::RtFireQualityEvidence{
+        static_cast<horde::telemetry::RtFireQuality>(configuration.fire), fireBudget.volumeSteps, fireBudget.reflectionSamples};
+    const auto& quality = context.rtScene.QualityControls().controls;
+    configuration.shadowQuality = horde::telemetry::RtShadowQualityEvidence{
+        static_cast<horde::telemetry::RtShadowMode>(quality[0]), quality[1], quality[2], quality[3]};
     const auto optical = context.rtScene.SelectedDielectricQualityName();
     if (optical != "High" && optical != "Mobile") return {};
     configuration.dielectric = optical == "High" ?
@@ -55,7 +70,7 @@ void ArmWindowsBenchmarkSummary(VulkanSurfaceContext& context) noexcept
     // copies or additional unattended observer work are introduced.
     try
     {
-        if (!context.capabilitySnapshot || !context.rtScene.IsReady() ||
+        if (!context.capabilitySnapshot || !context.rtScene.IsReady() || !context.rtScene.HasUploadedQualityControls() ||
             context.rtScene.Profile() != horde::vulkan::raytracing::RtSceneProfile::Showcase ||
             context.graphicsCommand || context.renderScaleDirty || context.sceneProfileDirty || context.glassGeometryDirty ||
             context.benchmarkEvidence.Status() != horde::telemetry::RtBenchmarkRunStatus::Measuring) return;

@@ -93,6 +93,8 @@ struct RtSceneFrameInputs
     WaterQuality waterQuality = WaterQuality::High;
     // Legacy fixtures inherit water detail; Graphics always supplies a real tier.
     std::optional<FireEmitterQuality> fireDetail;
+    // Absence is the explicitly retained diagnostic LegacyWorkload policy.
+    std::optional<horde::graphics::ShadowQuality> shadowQuality;
     bool previewMotion = false;
     RtSceneTuning tuning{};
     horde::gameplay::CombatSnapshot combat{};
@@ -188,6 +190,9 @@ public:
     bool IsReady() const { return ready_; }
     RtSceneProfile Profile() const { return sceneProfile_; }
     bool GlassEnabled() const { return glassEnabled_; }
+    const RtQualityControlsGpu& QualityControls() const noexcept { return uploadedQualityControls_; }
+    bool HasUploadedQualityControls() const noexcept { return uploadedQualityControlsValid_; }
+    FireEmitterQuality UploadedFireQuality() const noexcept { return uploadedFireQuality_; }
     bool ConfigurePreviewFireSockets(horde::graphics::GraphicsPreviewSession& session,
                                      std::string& diagnostic) const;
     RtExecutionBackend ExecutionBackend() const
@@ -733,6 +738,10 @@ private:
     bool tlasPendingDefinitionsValid_ = false;
     Buffer heldLightBuffer_;
     Buffer fireEmitterBuffer_;
+    Buffer qualityControlsBuffer_;
+    RtQualityControlsGpu uploadedQualityControls_{};
+    FireEmitterQuality uploadedFireQuality_ = FireEmitterQuality::Mobile;
+    bool uploadedQualityControlsValid_ = false;
     Buffer worldSurfaceBuffer_;
     Buffer staticVertexBuffer_;
     Buffer worldPlayerVertexBuffer_;

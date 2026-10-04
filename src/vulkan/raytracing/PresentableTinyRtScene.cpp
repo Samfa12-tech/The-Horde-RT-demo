@@ -436,6 +436,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     tlasPendingDefinitionsValid_ = std::exchange(other.tlasPendingDefinitionsValid_, false);
     heldLightBuffer_ = std::exchange(other.heldLightBuffer_, Buffer{});
     fireEmitterBuffer_ = std::exchange(other.fireEmitterBuffer_, Buffer{});
+    qualityControlsBuffer_ = std::exchange(other.qualityControlsBuffer_, {});
+    uploadedQualityControls_ = std::exchange(other.uploadedQualityControls_, {});
+    uploadedFireQuality_ = std::exchange(other.uploadedFireQuality_, FireEmitterQuality::Mobile);
+    uploadedQualityControlsValid_ = std::exchange(other.uploadedQualityControlsValid_, false);
     worldSurfaceBuffer_ = std::exchange(other.worldSurfaceBuffer_, Buffer{});
     staticVertexBuffer_ = std::exchange(other.staticVertexBuffer_, Buffer{});
     worldPlayerVertexBuffer_ = std::exchange(other.worldPlayerVertexBuffer_, Buffer{});
@@ -935,6 +939,10 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(viewmodelVertexBuffer_);
     DestroyBuffer(heldLightBuffer_);
     DestroyBuffer(fireEmitterBuffer_);
+    DestroyBuffer(qualityControlsBuffer_);
+    uploadedQualityControls_ = {};
+    uploadedFireQuality_ = FireEmitterQuality::Mobile;
+    uploadedQualityControlsValid_ = false;
     DestroyBuffer(instanceBuffer_);
     DestroyBuffer(transformBuffer_);
     DestroyBuffer(indexBuffer_);
@@ -1117,7 +1125,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
     horde::telemetry::RtResourceInventory inventory{};
     for (const Buffer* buffer : std::array{
              &vertexBuffer_, &indexBuffer_, &transformBuffer_, &instanceBuffer_,
-             &heldLightBuffer_, &fireEmitterBuffer_, &worldSurfaceBuffer_,
+             &heldLightBuffer_, &fireEmitterBuffer_, &qualityControlsBuffer_, &worldSurfaceBuffer_,
              &staticVertexBuffer_, &worldPlayerVertexBuffer_, &viewmodelVertexBuffer_,
              &staticIndexBuffer_, &staticGeometryTransformBuffer_,
              &instanceMetadataBuffer_, &primitiveMetadataBuffer_, &materialMetadataBuffer_,
@@ -2649,12 +2657,16 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
         VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     RtHeldLightGpu light{};
     std::array<RtFireEmitterGpu, kRtFireEmitterCapacity> fire{};
+    const auto initialQuality = *ResolveRtQualityControls(std::nullopt, RtWorkloadPreset::Authored,
+        pipelineBundle_.Request().quality == DielectricQuality::High);
     if (!upload(vertices.data(), vertices.size() * sizeof(Vertex), geometryUsage, true, "preview world vertices", vertexBuffer_) ||
         !upload(indices.data(), indices.size() * sizeof(std::uint32_t), geometryUsage, true, "preview world indices", indexBuffer_) ||
         !upload(surfaceCodes.data(), surfaceCodes.size() * sizeof(std::uint32_t), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false,
                 "preview world surfaces", worldSurfaceBuffer_) ||
         !upload(&light, sizeof(light), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false, "preview light", heldLightBuffer_, true) ||
-        !upload(fire.data(), sizeof(fire), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false, "preview fire", fireEmitterBuffer_, true)) return false;
+        !upload(fire.data(), sizeof(fire), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false, "preview fire", fireEmitterBuffer_, true) ||
+        !upload(&initialQuality, sizeof(initialQuality), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false,
+                "preview quality controls", qualityControlsBuffer_, true)) return false;
     VkAccelerationStructureGeometryKHR world{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     world.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR; world.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
     auto& triangles = world.geometry.triangles;
@@ -3561,16 +3573,21 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         !CreateBuffer(sizeof(RtFireEmitterGpu) * kRtFireEmitterCapacity,
                       VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, fireEmitterBuffer_, diagnostic) ||
+        !CreateBuffer(sizeof(RtQualityControlsGpu), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+                      uploadMemory, false, qualityControlsBuffer_, diagnostic) ||
         !CreateBuffer(worldSurfaceBufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, worldSurfaceBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
     {
         return false;
     }
 
+    const auto initialQuality = *ResolveRtQualityControls(std::nullopt, RtWorkloadPreset::Authored,
+        pipelineBundle_.Request().quality == DielectricQuality::High);
     const RtHeldLightGpu initialHeldLight{};
     const std::array<RtFireEmitterGpu, kRtFireEmitterCapacity> initialFireEmitters{};
     if (!gpuResources_.MapBufferForHostWrites(heldLightBuffer_, diagnostic) ||
         !gpuResources_.MapBufferForHostWrites(fireEmitterBuffer_, diagnostic) ||
+        !gpuResources_.MapBufferForHostWrites(qualityControlsBuffer_, diagnostic) ||
         !WriteBuffer(vertexBuffer_, vertices.data(), vertexBufferSize, "world vertex", diagnostic) ||
         !WriteBuffer(indexBuffer_, indices.data(), indexBufferSize, "world index", diagnostic) ||
         !WriteBuffer(transformBuffer_, &transform, sizeof(transform), "world transform", diagnostic) ||
@@ -3578,6 +3595,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                      "held light", diagnostic) ||
         !WriteBuffer(fireEmitterBuffer_, initialFireEmitters.data(), sizeof(initialFireEmitters),
                      "fire emitters", diagnostic) ||
+        !WriteBuffer(qualityControlsBuffer_, &initialQuality, sizeof(initialQuality),
+                     "quality controls", diagnostic) ||
         !WriteBuffer(worldSurfaceBuffer_, worldSurfaceCodes.data(), worldSurfaceBufferSize,
                      "world surface metadata", diagnostic))
     {
@@ -4852,6 +4871,8 @@ bool PresentableTinyRtScene::WriteBundleDescriptors(RtPipelineBundle& bundle,
         heldLightBuffer_.buffer, 0u, heldLightBuffer_.size};
     const VkDescriptorBufferInfo fireEmitterInfo{
         fireEmitterBuffer_.buffer, 0u, fireEmitterBuffer_.size};
+    const VkDescriptorBufferInfo qualityControlsInfo{
+        qualityControlsBuffer_.buffer, 0u, qualityControlsBuffer_.size};
     std::optional<VkDescriptorBufferInfo> dielectricDiagnosticsInfo;
     if (bundle.DescriptorIo().diagnosticIo.descriptorInfo)
         dielectricDiagnosticsInfo.emplace(VkDescriptorBufferInfo{
@@ -4924,6 +4945,7 @@ bool PresentableTinyRtScene::WriteBundleDescriptors(RtPipelineBundle& bundle,
         sampledWrite(kRtBindingEmissiveTextures, &staticEmissiveInfo),
         bufferWrite(kRtBindingHeldLight, &heldLightInfo),
         bufferWrite(kRtBindingFireEmitters, &fireEmitterInfo),
+        bufferWrite(kRtBindingQualityControls, &qualityControlsInfo),
         bufferWrite(kRtBindingWorldPlayerVertices, &worldVertexInfo),
         bufferWrite(kRtBindingViewmodelVertices, &viewVertexInfo),
         sampledWrite(kRtBindingEnvironmentTexture, &environmentInfo)};
@@ -5181,6 +5203,7 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
                                                    std::string& diagnostic,
                                                    RtSceneRecordObservation* observation)
 {
+    uploadedQualityControlsValid_ = false;
     if (tlasInstanceCount_ != 7u || tlas_.handle == VK_NULL_HANDLE ||
         frame.skeletonEnemyCount != 1u || frame.roster.selectedEnemy != horde::gameplay::EnemyKind::Skeleton ||
         frame.skeletonEnemies[0].animation != horde::gameplay::EnemyAnimation::Idle ||
@@ -5215,6 +5238,9 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
         emitters[index].worldFromLight = previewFireInputs_[index].worldFromLight;
         emitters[index].zone = frame.zone;
     }
+    const auto quality = ResolveRtQualityControls(frame.shadowQuality, tuning.workloadPreset,
+        pipelineBundle_.Request().quality == DielectricQuality::High);
+    if (!quality) { diagnostic = "Graphics preview shadow quality is invalid."; return false; }
     FireEmitterUpload fire{};
     const auto fireDetail = frame.fireDetail.value_or(frame.waterQuality == WaterQuality::High
         ? FireEmitterQuality::High : FireEmitterQuality::Mobile);
@@ -5253,7 +5279,8 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
     case WaterQuality::High: framePipelineEvidence_.waterQuality = horde::telemetry::RtWaterQuality::High; break;
     default: framePipelineEvidenceValid_ = false; break;
     }
-    if (!WriteBuffer(heldLightBuffer_, &light, sizeof(light), "preview light", diagnostic, observation) ||
+    if (!WriteBuffer(qualityControlsBuffer_, &*quality, sizeof(*quality), "preview quality controls", diagnostic, observation) ||
+        !WriteBuffer(heldLightBuffer_, &light, sizeof(light), "preview light", diagnostic, observation) ||
         !WriteBuffer(fireEmitterBuffer_, fire.emitters.data(), sizeof(fire.emitters), "preview fire", diagnostic, observation) ||
         !WriteBuffer(instanceBuffer_, instances.data(), tlasInstanceCount_ * sizeof(instances[0]), "preview instances", diagnostic, observation) ||
         !WriteBuffer(materialMetadataBuffer_, materials.data(), materials.size() * sizeof(materials[0]),
@@ -5338,6 +5365,9 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
         lastInstanceMasks_[instances[index].instanceCustomIndex] = instances[index].mask;
     lastPlayerPrimaryVisible_ = false;
     lastPlayerWorldBodyInstanceFlags_ = 0u;
+    uploadedQualityControls_ = *quality;
+    uploadedFireQuality_ = fireDetail;
+    uploadedQualityControlsValid_ = true;
     diagnostic.clear();
     return true;
 }
@@ -5347,6 +5377,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                                      std::string& diagnostic,
                                                      RtSceneRecordObservation* observation)
 {
+    uploadedQualityControlsValid_ = false;
     if (sceneProfile_ == RtSceneProfile::GraphicsPreview)
         return UpdatePreviewInstances(commandBuffer, frame, diagnostic, observation);
 #ifndef NDEBUG
@@ -5399,7 +5430,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const auto& secondSkeletonGpu = characterSlot_.SkeletonGpu(1u);
     const auto& lichGpu = characterSlot_.LichGpu();
     if (instanceBuffer_.memory == VK_NULL_HANDLE || heldLightBuffer_.memory == VK_NULL_HANDLE ||
-        fireEmitterBuffer_.memory == VK_NULL_HANDLE ||
+        fireEmitterBuffer_.memory == VK_NULL_HANDLE || qualityControlsBuffer_.memory == VK_NULL_HANDLE ||
         (pipelineBundle_.DescriptorIo().diagnosticIo.allocateBuffer &&
          pipelineBundle_.diagnosticBuffer.memory == VK_NULL_HANDLE) ||
         skeletonGpu.vertices.memory == VK_NULL_HANDLE ||
@@ -6075,6 +6106,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         frame.torchLightStrength * clampedTuning.fireStrengthScale,
         clampedTuning.fireTurbulenceScale,
         clampedTuning.fireSmokeScale};
+    const auto quality = ResolveRtQualityControls(frame.shadowQuality, clampedTuning.workloadPreset,
+        pipelineBundle_.Request().quality == DielectricQuality::High);
+    if (!quality) { diagnostic = "Scene shadow quality is invalid."; return false; }
     const FireEmitterQuality fireQuality = frame.fireDetail.value_or(frame.waterQuality == WaterQuality::High
         ? FireEmitterQuality::High
         : FireEmitterQuality::Mobile);
@@ -6198,7 +6232,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         break;
     }
     ApplyGlassFixtureVisibility(instances);
-    if (!WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
+    if (!WriteBuffer(qualityControlsBuffer_, &*quality, sizeof(*quality), "quality controls", diagnostic, observation) ||
+        !WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
                      "held light", diagnostic, observation) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
                      sizeof(fireEmitterUpload.emitters), "fire emitters", diagnostic,
@@ -6473,6 +6508,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         !productionPlayerAsset_.vertices.empty() &&
         skinnedPlayerUpload_.size() == productionPlayerAsset_.vertices.size();
 #endif
+    uploadedQualityControls_ = *quality;
+    uploadedFireQuality_ = fireQuality;
+    uploadedQualityControlsValid_ = true;
     diagnostic.clear();
     return true;
 }
@@ -6729,6 +6767,22 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         bool recordedFactsValid = framePipelineEvidenceValid_;
         recorded.pipeline = framePipelineEvidence_;
         recorded.resources = ResourceInventory();
+        recordedFactsValid = uploadedQualityControlsValid_ && recordedFactsValid;
+        if (uploadedQualityControlsValid_)
+        {
+            recorded.shadowQuality = horde::telemetry::RtShadowQualityEvidence{
+                static_cast<horde::telemetry::RtShadowMode>(uploadedQualityControls_.controls[0]),
+                uploadedQualityControls_.controls[1], uploadedQualityControls_.controls[2], uploadedQualityControls_.controls[3]};
+            horde::telemetry::RtFireQuality fireTier = horde::telemetry::RtFireQuality::Mobile;
+            switch (uploadedFireQuality_)
+            {
+            case FireEmitterQuality::Mobile: break;
+            case FireEmitterQuality::High: fireTier = horde::telemetry::RtFireQuality::High; break;
+            case FireEmitterQuality::Low: fireTier = horde::telemetry::RtFireQuality::Low; break;
+            }
+            const auto budget = ResolveFireEmitterQualityBudget(uploadedFireQuality_);
+            recorded.fireQuality = horde::telemetry::RtFireQualityEvidence{fireTier, budget.volumeSteps, budget.reflectionSamples};
+        }
         switch (playerCpuSkinCadence_)
         {
         case PlayerCpuSkinCadence::Hz30:

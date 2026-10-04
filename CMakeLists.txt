@@ -117,6 +117,7 @@ add_library(horde_gameplay_simulation STATIC
     src/audio/MusicPlaybackSession.cpp
     src/reporting/PlaytestReport.cpp
     src/reporting/PlaytestSubmission.cpp
+    src/reporting/BenchmarkSummarySubmission.cpp
     src/gameplay/simulation/GameSimulation.cpp
     src/gameplay/animation/PlayerAnimationState.cpp
     src/gameplay/animation/PlayerIkTargets.cpp
@@ -774,7 +775,14 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_playtest_report_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_playtest_report_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_playtest_report_tests COMMAND horde_rt_playtest_report_tests)
-    add_executable(horde_rt_playtest_submission_tests tests/PlaytestSubmissionTests.cpp)
+    add_executable(horde_rt_playtest_submission_tests
+        tests/PlaytestSubmissionTests.cpp
+        src/telemetry/BenchmarkSummary.cpp
+        src/reporting/BenchmarkSummaryReport.cpp
+        src/gameplay/ShowcaseBenchmark.cpp
+        src/telemetry/RtBenchmarkEvidenceRun.cpp
+        src/telemetry/RtBenchmarkEvidenceReport.cpp
+        src/telemetry/RtPerformanceEvidence.cpp)
     target_link_libraries(horde_rt_playtest_submission_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_playtest_submission_tests COMMAND horde_rt_playtest_submission_tests)
     if(WIN32)

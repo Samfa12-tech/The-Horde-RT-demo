@@ -29,6 +29,8 @@ $queue = Section $source 'bool QueueGraphicsCommand(' 'void FinishGraphicsFrame(
 $finish = Section $source 'void FinishGraphicsFrame(' 'void OpenRtLab('
 $current = Section $source 'horde::graphics::GraphicsSettings CurrentGraphicsSettings(' 'horde::graphics::GraphicsAppliedSnapshot GraphicsSnapshot('
 $load = Section $source 'void LoadSettings(' '#if defined(_DEBUG)'
+$persistence = Get-Content -LiteralPath (Join-Path $root 'src/platform/windows/WindowsGraphicsPersistence.h') -Raw
+$loadRecord = Section $persistence 'inline std::optional<horde::graphics::GraphicsPersistenceRecord> LoadGraphicsPersistenceRecord(' '// The confirmed tuple'
 Check (Test-SceneRetirement $scene) 'Scene destruction requires successful idle/evidence, command/timer resets and replacement epoch.'
 Check (-not (Test-SceneRetirement ($scene.Replace('vkDeviceWaitIdle(context.device)', 'fabricatedIdleSuccess')))) 'No idle substitute can prove scene retirement.'
 Check (-not (Test-SceneRetirement ($scene.Replace('vkResetCommandBuffer(commandBuffer, 0u)', 'keepOldRecordedReferences')))) 'Recorded references must be invalidated before destruction.'
@@ -41,7 +43,7 @@ $failed = Section $scene 'const std::string requestedFailure' 'else context.last
 Check ($failed.IndexOf('if (!retireSceneReferences()) return false;') -lt $failed.IndexOf('context.rtScene.Destroy()')) 'Partial initialisation requires a fresh drain before cleanup.'
 foreach ($restore in @('context.sceneProfile = previousProfile', 'context.executionBackend = previousBackend',
     'context.renderScale = previousSettings.renderScalePercent', 'previousSettings.waterQuality',
-    'previousSettings.fireDetail', 'previousSettings.previewFrameCap', 'previousSettings.glassEnabled')) {
+    'previousSettings.fireDetail', 'previousSettings.previewFrameCap', 'previousSettings.glassEnabled', 'previousSettings.shadowQuality')) {
     Check ($failed.IndexOf($restore) -ge 0 -and $failed.IndexOf($restore) -lt $failed.IndexOf('if (!InitialiseRtSceneForSwapchain(context, false)) return false;')) "Rollback restores $restore before reinitialisation."
 }
 Check ($failed.Contains('failure.reasons = horde::graphics::GraphicsReason::ResourceFailure') -and
@@ -53,14 +55,33 @@ Check ($resize.Contains('ResizeOutputAfterDeviceIdle') -and -not $resize.Contain
     -not $resize.Contains('InitialiseRtSceneForSwapchain')) 'Scale-only requests retain the existing output-only allocation transaction.'
 Check ($current.Contains('context.rtScene.IsReady() && context.rtScene.GlassEnabled()') -and
     -not $current.Contains('context.requestedGlassEnabled')) 'Applied glass comes only from actual ready renderer geometry.'
+Check ($current.Contains('UploadedGraphicsFireDetail(context)') -and $current.Contains('UploadedGraphicsShadowQuality(context)') -and
+    -not $current.Contains('context.fireDetail') -and -not $current.Contains('context.shadowQuality')) 'Applied fire and shadow derive from successful renderer uploads, not requested context fields.'
 Check ($queue.IndexOf('command->serial <= context.graphicsSerialFloor') -ge 0 -and
     $queue.IndexOf('command->serial <= context.graphicsSerialFloor') -lt $queue.IndexOf('SaveGraphicsRecord') -and
     $queue.Contains('command->lifecycleGeneration != 1u')) 'Stale serial/generation is rejected before storage or live mutation.'
-Check ($finish.Contains('!context.renderScaleDirty && !context.sceneProfileDirty && !context.glassGeometryDirty') -and
-    $finish.Contains('context.rtScene.IsReady()') -and $finish.Contains('RtPresentationOutcome::Presented')) 'Success acknowledgement requires current presented output and every geometry dirty flag cleared.'
-Check ($load.Contains('if (record.schema == 1u) return 1') -and $load.Contains('readGlass("confirmedGlass")') -and
-    $load.Contains('readGlass("pendingGlass")') -and $load.Contains('record.schema = 0u') -and
-    $load.Contains('length == 1u') -and $load.Contains("value[0] == '0' || value[0] == '1'")) 'Schema1 retains old four fields with Glass On; schema2 rejects non-boolean or missing glass values without integer coercion.'
+function Test-CurrentQualityAck([string]$body) {
+    return $body.Contains('!context.renderScaleDirty && !context.sceneProfileDirty && !context.glassGeometryDirty') -and
+        $body.Contains('context.rtScene.IsReady()') -and $body.Contains('context.rtScene.HasUploadedQualityControls()') -and
+        $body.Contains('RtPresentationOutcome::Presented')
+}
+Check (Test-CurrentQualityAck $finish) 'Success acknowledgement requires current presented output, successful policy upload and every geometry dirty flag cleared.'
+Check (-not (Test-CurrentQualityAck ($finish.Replace('context.rtScene.HasUploadedQualityControls()', 'trustRequestedWithoutUploadedPolicy')))) 'Negative source fixture rejects requested fire/shadow without successful owner upload.'
+Check ($load.Contains('LoadGraphicsPersistenceRecord(path, context.savedGraphics)') -and
+    $loadRecord.Contains('schema == 1 ? 1 : read(pending ? "pendingGlass" : "confirmedGlass", 1, true)') -and
+    $loadRecord.Contains('historical ? 1 : read(pending ? "pendingShadow" : "confirmedShadow", 1, true)') -and
+    $loadRecord.Contains('fire > (historical ? 1 : 2)') -and $loadRecord.Contains('shadow < 0 || shadow > 2') -and
+    $loadRecord.Contains('std::from_chars') -and $loadRecord.Contains('std::to_string(value) != std::string(text.data(), length)') -and
+    $loadRecord.Contains('record.schema = 0u')) 'Ordinary strict INI loader preserves schema1 glass/schema1-2 shadow migration, rejects old Low/unknown enums before narrowing and requires canonical exact numeric/boolean keys.'
+Check ($persistence.Contains('write("confirmedShadow"') -and $persistence.Contains('write("pendingShadow"') -and
+    $queue.Contains('context.shadowQuality = command->requested.shadowQuality') -and
+    $resize.Contains('context.shadowQuality = context.graphicsBeforeApply.shadowQuality')) 'Complete shadow tuple is persisted, applied and restored after resize failure.'
+Check ($source.Contains('createButton(kGraphicsShadowButtonId, "SHADOW: CURRENT")') -and
+    $source.Contains('MoveWindow(GetDlgItem(window, kGraphicsShadowButtonId)') -and
+    $source.Contains('draft.shadowQuality = static_cast<horde::graphics::ShadowQuality>')) 'Native shadow button has visible placement and edits only the draft.'
+$render = Section $source 'bool RenderFrame(' 'void ApplyCaptureCheckpoint('
+Check ($render.Contains('ResolveFireEmitterQuality(ctx.fireDetail)') -and $render.Contains('frameInputs.shadowQuality = ctx.shadowQuality') -and
+    -not $render.Contains('ctx.fireDetail == horde::graphics::FireDetail::High ?')) 'Showcase and Preview share exhaustive Low/Mobile/High mapping and independent shadow frame policy.'
 Check ($source.Contains('createButton(kGraphicsGlassButtonId, "GLASS: ON")') -and
     $source.Contains('draft.glassEnabled = !draft.glassEnabled') -and
     $source.Contains('MoveWindow(GetDlgItem(window, kGraphicsGlassButtonId)')) 'Native glass action has visible placement and edits only the draft.'

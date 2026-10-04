@@ -101,8 +101,15 @@ bool WriteOutputResizeValidationManifest(const std::filesystem::path& directory,
         json << ",\"readbackMs\":" << record.readbackMilliseconds << ",\"file\":\"" << record.filename << "\",\"pngSha256\":\"" << record.pngSha256
              << "\",\"redBlueSwapNormalised\":" << (record.redBlueSwapNormalised ? "true" : "false")
              << ",\"requestedGraphics\":{\"scale\":" << snapshot.requested.renderScalePercent << ",\"water\":" << static_cast<unsigned>(snapshot.requested.waterQuality)
-             << ",\"fire\":" << static_cast<unsigned>(snapshot.requested.fireDetail) << "},\"effectiveGraphics\":{\"scale\":" << snapshot.effective.renderScalePercent
+             << ",\"fire\":" << static_cast<unsigned>(snapshot.requested.fireDetail)
+             << ",\"shadow\":" << static_cast<unsigned>(snapshot.requested.shadowQuality)
+             << ",\"glassEnabled\":" << (snapshot.requested.glassEnabled ? "true" : "false")
+             << ",\"previewFrameCap\":" << snapshot.requested.previewFrameCap
+             << "},\"effectiveGraphics\":{\"scale\":" << snapshot.effective.renderScalePercent
              << ",\"water\":" << static_cast<unsigned>(snapshot.effective.waterQuality) << ",\"fire\":" << static_cast<unsigned>(snapshot.effective.fireDetail)
+             << ",\"shadow\":" << static_cast<unsigned>(snapshot.effective.shadowQuality)
+             << ",\"glassEnabled\":" << (snapshot.effective.glassEnabled ? "true" : "false")
+             << ",\"previewFrameCap\":" << snapshot.effective.previewFrameCap
              << ",\"internalWidth\":" << snapshot.internalExtent.width << ",\"internalHeight\":" << snapshot.internalExtent.height
              << ",\"outputWidth\":" << snapshot.outputExtent.width << ",\"outputHeight\":" << snapshot.outputExtent.height
              << ",\"opticalProfile\":\"" << (snapshot.opticalProfile == horde::graphics::OpticalProfile::High ? "High" : "Mobile")
@@ -144,7 +151,7 @@ int RunOutputResizeValidation(VulkanSurfaceContext& context, horde::vulkan::Devi
     const auto clearColor = ClearColorForMode(capabilities.rtMode);
     const auto initialBackend = context.rtScene.ExecutionBackend();
     const auto productionGraphics = horde::graphics::BaselineGraphicsSettings(horde::graphics::GraphicsPlatform::Windows);
-    if (!(CurrentGraphicsSettings(context) == productionGraphics) || context.rtScene.SelectedPipelineBundleIdentity().empty() ||
+    if (context.rtScene.SelectedPipelineBundleIdentity().empty() ||
         !context.rtScene.SelectedPipelineArtifactMetadata(horde::vulkan::raytracing::RtMaterialStrategy::OpaqueFast) ||
         !context.rtScene.SelectedPipelineArtifactMetadata(horde::vulkan::raytracing::RtMaterialStrategy::GenericDielectric))
         return fail("Production baseline or exact selected shader artifact metadata is unavailable.");
@@ -200,6 +207,8 @@ int RunOutputResizeValidation(VulkanSurfaceContext& context, horde::vulkan::Devi
         }
         if (!drain()) return fail("Initial owning completion drain failed.");
         if (!unchanged()) return fail("Frozen gameplay/events changed during initial presentation.");
+        if (!(CurrentGraphicsSettings(context) == productionGraphics))
+            return fail("Ordinary initial RT presentation did not upload the complete production baseline policy.");
         context.graphicsEdit.emplace(productionGraphics, context.graphicsSerialFloor);
         for (const auto scale : horde::platform::windows::kOutputResizeScaleSequence)
         {
@@ -293,7 +302,10 @@ int RunOutputResizeValidation(VulkanSurfaceContext& context, horde::vulkan::Devi
             const auto expectedExtent = ScaledRenderExtent(context.swapchainExtent, scale / 100.0f);
             if (actualExtent.width != expectedExtent.width || actualExtent.height != expectedExtent.height ||
                 record.graphics.effective.renderScalePercent != scale || !record.graphics.rtPresented ||
-                record.graphics.effective.waterQuality != productionGraphics.waterQuality || record.graphics.effective.fireDetail != productionGraphics.fireDetail)
+                record.graphics.effective.waterQuality != productionGraphics.waterQuality || record.graphics.effective.fireDetail != productionGraphics.fireDetail ||
+                record.graphics.effective.shadowQuality != productionGraphics.shadowQuality ||
+                record.graphics.effective.glassEnabled != productionGraphics.glassEnabled ||
+                record.graphics.effective.previewFrameCap != productionGraphics.previewFrameCap)
                 return fail("Actual acknowledged dimensions/quality differ from requested production output.");
             capabilities.rtScene.presented = true;
             capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();

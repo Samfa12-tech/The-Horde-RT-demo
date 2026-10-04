@@ -133,7 +133,21 @@ PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(const FrozenBenchma
         "],\"presentationExtent\":[" << m.presentationWidth << ',' << m.presentationHeight << "],\"waterQuality\":";
     Text(out, RtWaterQualityName(c.water)); out << ",\"dielectricQuality\":"; Text(out, RtDielectricQualityName(c.dielectric));
     out << ",\"fireQuality\":";
-    Text(out, c.fire == BenchmarkSummaryFireQuality::Mobile ? "Mobile" : "High");
+    Text(out, RtFireQualityName(static_cast<RtFireQuality>(c.fire)));
+    if (c.shadowQuality)
+    {
+        const auto& quality = *c.shadowQuality;
+        out << ",\"shadowQuality\":{\"mode\":"; Text(out, RtShadowModeName(quality.mode));
+        out << ",\"localPrimarySamples\":" << quality.localPrimarySamples
+            << ",\"skyPrimarySamples\":" << quality.skyPrimarySamples << ",\"reserved\":0}";
+    }
+    if (c.uploadedFireQuality)
+    {
+        const auto& quality = *c.uploadedFireQuality;
+        out << ",\"uploadedFireQuality\":{\"volumeSteps\":" << quality.volumeSteps
+            << ",\"reflectionSamples\":" << quality.reflectionSamples
+            << ",\"reflectedVolumeSteps\":" << std::min(quality.volumeSteps, quality.reflectionSamples * 4u) << '}';
+    }
     out << ",\"glassEnabled\":" << (c.glassEnabled ? "true" : "false") << "},\"legacyFrameTimingScope\":";
     Text(out, m.legacyFrameTimingScope);
     out << ",\"cpuTimingScope\":\"completed-owning-render-entry-through-present\",\"gpuTimingScope\":\"completed-owning-rt-duration\","

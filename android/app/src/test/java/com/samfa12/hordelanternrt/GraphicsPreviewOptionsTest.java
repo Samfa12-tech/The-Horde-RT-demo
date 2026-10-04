@@ -35,17 +35,17 @@ public final class GraphicsPreviewOptionsTest {
         static GraphicsPreferences.Values requested;
         @Implementation protected static void __staticInitializer__() { }
         @Implementation protected static boolean confirmGraphicsSettings(long serial,long generation) { return (serial==42 || serial==45) && generation==7; }
-        @Implementation protected static void beginGraphicsEdit(int scale,int water,int fire,int cap,boolean glassEnabled) {
-            rebased=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled);
+        @Implementation protected static void beginGraphicsEdit(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality) {
+            rebased=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality);
         }
         @Implementation protected static long revertGraphicsSettings(long generation) { return generation==7?43:0; }
-        @Implementation protected static long compareGraphicsPreview(int scale,int water,int fire,int cap,boolean glassEnabled,long generation) {
+        @Implementation protected static long compareGraphicsPreview(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,long generation) {
             if(generation!=7) return 0;
-            ++compareCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled); return 44;
+            ++compareCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality); return 44;
         }
-        @Implementation protected static long applyGraphicsSettings(int scale,int water,int fire,int cap,boolean glassEnabled,long generation) {
+        @Implementation protected static long applyGraphicsSettings(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,long generation) {
             if(generation!=7) return 0;
-            ++applyCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled); return 45;
+            ++applyCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality); return 45;
         }
         @Implementation protected static double[] getGraphicsPreviewPerformance() { return new double[]{epoch,13,74,2,-1,0,0,0,1,74,0}; }
         @Implementation protected static long[] getGraphicsSnapshot() { return applied.clone(); }
@@ -109,7 +109,7 @@ public final class GraphicsPreviewOptionsTest {
         assertArrayEquals(new int[]{50,63,68,75,100},GraphicsPreviewOptions.choices(confirmed,0));
         assertArrayEquals(new int[]{50,63,75,100},GraphicsPreviewOptions.choices(draft,0));
         assertArrayEquals(new int[]{0,1,2},GraphicsPreviewOptions.choices(confirmed,1));
-        assertArrayEquals(new int[]{0,1},GraphicsPreviewOptions.choices(confirmed,2));
+        assertArrayEquals(new int[]{2,0,1},GraphicsPreviewOptions.choices(confirmed,2));
         assertArrayEquals(new int[]{15,30,42,60},GraphicsPreviewOptions.choices(new GraphicsPreferences.Values(75,1,0,42),3));
         assertArrayEquals(new int[]{15,30,60},GraphicsPreviewOptions.choices(confirmed,3));
         assertEquals(1,GraphicsPreviewOptions.camera(0)); assertEquals(3,GraphicsPreviewOptions.camera(1));
@@ -120,14 +120,71 @@ public final class GraphicsPreviewOptionsTest {
     }
 
     @Test public void invalidChoicesAndValuesCannotProduceLiveTuple() {
-        for (int[] input : new int[][]{{5,0},{0,49},{0,101},{1,-1},{1,3},{2,2},{3,14},{3,61},{4,-1},{4,2}}) {
+        for (int[] input : new int[][]{{6,0},{0,49},{0,101},{1,-1},{1,3},{2,-1},{2,3},{3,14},{3,61},{4,-1},{4,2},{5,-1},{5,3}}) {
             try { GraphicsPreviewOptions.withChoice(confirmed,input[0],input[1]); fail("invalid choice/value accepted"); }
             catch (IllegalArgumentException expected) { }
         }
     }
 
+    @Test public void lowFireAndShadowEditsPreserveEveryOtherLiveFieldAndStoredMeaning() {
+        GraphicsPreferences.Values initial=new GraphicsPreferences.Values(68,0,2,42,false,2);
+        assertArrayEquals(new int[]{2,0,1},GraphicsPreviewOptions.choices(initial,GraphicsPreviewOptions.FIRE));
+        assertArrayEquals(new int[]{0,1,2},GraphicsPreviewOptions.choices(initial,GraphicsPreviewOptions.SHADOW));
+        assertEquals("Low",GraphicsPreviewOptions.fireLabel(2));
+        assertEquals("Mobile",GraphicsPreviewOptions.fireLabel(0));
+        assertEquals("High",GraphicsPreviewOptions.fireLabel(1));
+        assertEquals("Lower",GraphicsPreviewOptions.shadowLabel(0));
+        assertEquals("Current",GraphicsPreviewOptions.shadowLabel(1));
+        assertEquals("Higher",GraphicsPreviewOptions.shadowLabel(2));
+        assertEquals("Shadows",GraphicsPreviewOptions.name(GraphicsPreviewOptions.SHADOW));
+        assertEquals(0,GraphicsPreviewOptions.camera(GraphicsPreviewOptions.SHADOW));
+        GraphicsPreferences.Values[] expected={
+            new GraphicsPreferences.Values(75,0,2,42,false,2),new GraphicsPreferences.Values(68,1,2,42,false,2),
+            new GraphicsPreferences.Values(68,0,1,42,false,2),new GraphicsPreferences.Values(68,0,2,30,false,2),
+            new GraphicsPreferences.Values(68,0,2,42,true,2),new GraphicsPreferences.Values(68,0,2,42,false,0)};
+        int[] selected={75,1,1,30,1,0};
+        for(int choice=0;choice<expected.length;++choice)
+            assertTrue("single choice preserves five other fields: "+choice,
+                    GraphicsPreviewOptions.withChoice(initial,choice,selected[choice]).same(expected[choice]));
+        assertTrue(initial.same(new GraphicsPreferences.Values(68,0,2,42,false,2)));
+        assertEquals(1,GraphicsPreferences.baseline().shadow); assertEquals(0,GraphicsPreferences.baseline().fire);
+        for(int unknown:new int[]{-1,3,99}) {
+            try { GraphicsPreviewOptions.fireLabel(unknown); fail("unknown fire label admitted"); }
+            catch(IllegalArgumentException expectedFailure) { }
+            try { GraphicsPreviewOptions.shadowLabel(unknown); fail("unknown shadow label admitted"); }
+            catch(IllegalArgumentException expectedFailure) { }
+        }
+    }
+
+    @Test public void lowAndShadowReadinessRequiresBothExactUploadedAndRequestedPolicy() {
+        GraphicsPreferences.Values selected=new GraphicsPreferences.Values(68,0,2,15,true,0);
+        long[] ack=snapshot(); ack[5]=2; ack[17]=2; ack[22]=0; ack[23]=0;
+        assertTrue(GraphicsPreviewOptions.presented(ack,7,42,selected));
+        for(int index:new int[]{5,17,22,23}) {
+            long[] stale=ack.clone(); stale[index]=1;
+            assertFalse("current serial/present cannot hide stale fire or shadows: "+index,
+                    GraphicsPreviewOptions.presented(stale,7,42,selected));
+        }
+        for(int shadow=0;shadow<=2;++shadow) {
+            ack[22]=shadow; ack[23]=shadow;
+            assertTrue(GraphicsPreviewOptions.presented(ack,7,42,
+                    new GraphicsPreferences.Values(68,0,2,15,true,shadow)));
+        }
+        for(int index:new int[]{22,23}) for(int invalid:new int[]{-1,3,99}) {
+            long[] malformed=ack.clone(); malformed[index]=invalid;
+            assertFalse(GraphicsPreferences.presented(malformed,7));
+        }
+        for(int index:new int[]{5,17}) for(int invalid:new int[]{-1,3,99}) {
+            long[] malformed=ack.clone(); malformed[index]=invalid;
+            assertFalse("unknown fire cannot reach exhaustive presentation labels",GraphicsPreferences.presented(malformed,7));
+        }
+        assertFalse(GraphicsPreviewOptions.presented(java.util.Arrays.copyOf(ack,22),7,42,selected));
+        assertFalse(GraphicsPreviewOptions.presented(ack,8,42,selected));
+        assertFalse(GraphicsPreviewOptions.presented(ack,7,43,selected));
+    }
+
     private long[] snapshot() {
-        return new long[]{42,7,0,68,0,1,15,245,435,360,640,0,1,1,0,68,0,1,15,1,1,1};
+        return new long[]{42,7,0,68,0,1,15,245,435,360,640,0,1,1,0,68,0,1,15,1,1,1,1,1};
     }
 
     private MainActivity livePreviewFixture() throws Exception {
@@ -179,7 +236,7 @@ public final class GraphicsPreviewOptionsTest {
         assertEquals(1,GraphicsBridgeShadow.applyCalls); assertTrue(GraphicsBridgeShadow.requested.same(off));
         assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
         GraphicsBridgeShadow.applied[0]=45; GraphicsBridgeShadow.applied[2]=2; GraphicsBridgeShadow.epoch=12;
-        poll.run(); assertEquals("Keep",((Button)get(activity,"graphicsConfirm")).getText().toString());
+        poll.run(); assertEquals("Keep and save",((Button)get(activity,"graphicsConfirm")).getText().toString());
         ((Button)get(activity,"graphicsConfirm")).performClick();
         assertTrue(GraphicsPreferences.confirmed(prefs).same(off)); assertFalse(GraphicsPreferences.hasPending(prefs));
     }
@@ -195,7 +252,7 @@ public final class GraphicsPreviewOptionsTest {
         GraphicsBridgeShadow.applied[21]=0; GraphicsBridgeShadow.applied[14]=64; // Actual prior On scene restored.
         Runnable poll=(Runnable)get(activity,"refreshGraphics"); poll.run();
         assertNull(get(activity,"graphicsOptionsPopup"));
-        assertTrue(((TextView)get(activity,"graphicsTelemetry")).getText().toString().contains("Choice failed; Revert"));
+        assertTrue(((TextView)get(activity,"graphicsTelemetry")).getText().toString().contains("Choice failed; Restore saved"));
         assertFalse(((Button)get(activity,"graphicsConfirm")).isEnabled());
         assertTrue(((Button)get(activity,"graphicsRevert")).isEnabled());
         assertTrue(GraphicsPreferences.hasPending(prefs)); assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
@@ -262,7 +319,7 @@ public final class GraphicsPreviewOptionsTest {
         assertFalse(GraphicsPreviewOptions.presented(snapshot(),8,42,confirmed));
         assertFalse(GraphicsPreviewOptions.presented(snapshot(),7,43,confirmed));
         assertFalse(GraphicsPreviewOptions.presented(snapshot(),7,42,draft));
-        for (int index : new int[]{3,4,5,6,15,16,17,18}) {
+        for (int index : new int[]{3,4,5,6,15,16,17,18,22,23}) {
             long[] changed=snapshot(); ++changed[index];
             assertFalse("tuple index " + index,GraphicsPreviewOptions.presented(changed,7,42,confirmed));
         }
@@ -281,8 +338,10 @@ public final class GraphicsPreviewOptionsTest {
         assertFalse(GraphicsPreviewOptions.presented(new long[19],7,42,confirmed));
 
         // Invoke the production save-failure branch, with only its JNI boundary replaced.
+        GraphicsPreferences.Values savedHigher=new GraphicsPreferences.Values(68,0,1,15,true,2);
+        GraphicsPreferences.Values pendingLowLower=new GraphicsPreferences.Values(100,2,2,60,false,0);
         SharedPreferences stored=RuntimeEnvironment.getApplication().getSharedPreferences("preview-save-failure",Context.MODE_PRIVATE);
-        stored.edit().clear().commit(); assertTrue(GraphicsPreferences.confirm(stored,confirmed));
+        stored.edit().clear().commit(); assertTrue(GraphicsPreferences.confirm(stored,savedHigher));
         SharedPreferences failing=(SharedPreferences)Proxy.newProxyInstance(SharedPreferences.class.getClassLoader(),
                 new Class<?>[]{SharedPreferences.class},(proxy,method,args)->{
                     if (!method.getName().equals("edit")) return method.invoke(stored,args);
@@ -295,23 +354,23 @@ public final class GraphicsPreviewOptionsTest {
                             });
                 });
         MainActivity activity=Robolectric.buildActivity(MainActivity.class).get();
-        set(activity,"preferences",failing); set(activity,"graphicsConfirmed",confirmed);
-        set(activity,"graphicsSubmitted",draft); set(activity,"graphicsDraft",draft);
+        set(activity,"preferences",failing); set(activity,"graphicsConfirmed",savedHigher);
+        set(activity,"graphicsSubmitted",pendingLowLower); set(activity,"graphicsDraft",pendingLowLower);
         set(activity,"graphicsOriginalPreviewDraft",draft); set(activity,"graphicsPreviewWanted",true);
         set(activity,"graphicsRequestSerial",42L); set(activity,"surfaceRequestGeneration",7L);
         set(activity,"graphicsPreviewPerformanceGeneration",7L);
         GraphicsBridgeShadow.rebased=null; GraphicsBridgeShadow.resetCount=0; GraphicsBridgeShadow.epoch=9;
         Method confirm=MainActivity.class.getDeclaredMethod("confirmGraphicsSelection");
         confirm.setAccessible(true); confirm.invoke(activity);
-        assertTrue(GraphicsBridgeShadow.rebased.same(confirmed));
-        assertSame(confirmed,get(activity,"graphicsDraft")); assertSame(draft,get(activity,"graphicsOriginalPreviewDraft"));
+        assertTrue(GraphicsBridgeShadow.rebased.same(savedHigher));
+        assertSame(savedHigher,get(activity,"graphicsDraft")); assertSame(draft,get(activity,"graphicsOriginalPreviewDraft"));
         assertEquals(43L,get(activity,"graphicsRequestSerial")); assertEquals(true,get(activity,"graphicsAwaitingRestore"));
         assertEquals(1,GraphicsBridgeShadow.resetCount);
         assertEquals(9,(double)get(activity,"graphicsPreviewPerformanceEpochFloor"),0);
-        long[] restored=snapshot(); restored[0]=43;
+        long[] restored=snapshot(); restored[0]=43; restored[22]=2; restored[23]=2;
         assertTrue(GraphicsPreviewOptions.presented(restored,7,43,(GraphicsPreferences.Values)get(activity,"graphicsDraft")));
         assertFalse(GraphicsPreviewOptions.presented(restored,7,43,draft));
-        assertTrue(GraphicsPreferences.confirmed(stored).same(confirmed));
+        assertTrue(GraphicsPreferences.confirmed(stored).same(savedHigher));
     }
 
     @Test public void counterRejectsOldOrMalformedScopesAndOverlayBudgetIncludesSafeGap() {

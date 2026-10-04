@@ -121,6 +121,9 @@ int main()
                       RtSceneProfile::Showcase, false) && !rejectedHandles.IsReady(),
                   "invalid-handle Glass Off request must fail without resource ownership");
     rejectedHandles.Destroy();
+    ok &= Require(!rejectedHandles.HasUploadedQualityControls() &&
+                      rejectedHandles.QualityControls().controls == std::array<std::uint32_t,4u>{},
+                  "failed initialization cannot report requested quality as successfully uploaded");
     ok &= Require(rejectedHandles.GlassEnabled(), "device-less failed initialization resets Glass On on destroy");
     const auto& provider = RtPipelineVariantProvider::Compiled();
     const auto opaque = provider.ResolveExact(

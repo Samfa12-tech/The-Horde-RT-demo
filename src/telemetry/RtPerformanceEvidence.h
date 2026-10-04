@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -114,6 +115,32 @@ enum class RtWaterQuality : std::uint8_t
     Mobile,
     High,
 };
+
+enum class RtShadowMode : std::uint8_t { Lower, Current, Higher, DiagnosticLegacy };
+enum class RtFireQuality : std::uint8_t { Mobile, High, Low };
+
+// Optional only for historical/non-reporting callers. Present records describe
+// successful owning uploads, never requested settings or guessed defaults.
+struct RtShadowQualityEvidence
+{
+    RtShadowMode mode = RtShadowMode::Current;
+    std::uint32_t localPrimarySamples = 1u;
+    std::uint32_t skyPrimarySamples = 1u;
+    std::uint32_t reserved = 0u;
+    bool operator==(const RtShadowQualityEvidence&) const = default;
+};
+struct RtFireQualityEvidence
+{
+    RtFireQuality quality = RtFireQuality::Mobile;
+    std::uint32_t volumeSteps = 4u;
+    std::uint32_t reflectionSamples = 1u;
+    bool operator==(const RtFireQualityEvidence&) const = default;
+};
+[[nodiscard]] const char* RtShadowModeName(RtShadowMode mode) noexcept;
+[[nodiscard]] const char* RtFireQualityName(RtFireQuality quality) noexcept;
+[[nodiscard]] bool ValidRtShadowQualityEvidence(const RtShadowQualityEvidence& evidence,
+                                              RtDielectricQuality compiledQuality) noexcept;
+[[nodiscard]] bool ValidRtFireQualityEvidence(const RtFireQualityEvidence& evidence) noexcept;
 
 [[nodiscard]] const char* RtSampleStatusName(RtSampleStatus status) noexcept;
 [[nodiscard]] const char* RtPresentationOutcomeName(RtPresentationOutcome outcome) noexcept;
@@ -302,6 +329,8 @@ struct RtRecordedSceneEvidence
     RtResourceInventory resources{};
     RtPlayerDiagnostics player{};
     RtDispatchEvidence dispatch{};
+    std::optional<RtShadowQualityEvidence> shadowQuality{};
+    std::optional<RtFireQualityEvidence> fireQuality{};
 };
 
 struct RtSceneFrameEvidence
@@ -311,6 +340,8 @@ struct RtSceneFrameEvidence
     RtPlayerDiagnostics player{};
     RtStageFrameSample stages{};
     RtDispatchEvidence dispatch{};
+    std::optional<RtShadowQualityEvidence> shadowQuality{};
+    std::optional<RtFireQualityEvidence> fireQuality{};
 };
 
 struct RtDiagnosticEvidence

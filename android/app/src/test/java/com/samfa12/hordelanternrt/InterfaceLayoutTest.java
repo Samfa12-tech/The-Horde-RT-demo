@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -53,6 +54,53 @@ public final class InterfaceLayoutTest {
         assertTrue("wrapped label must grow beyond minimum target: "+b.getMeasuredHeight(),b.getMeasuredHeight()>48);
         assertTrue("native text layout must wrap: "+b.getLayout().getLineCount(),b.getLayout().getLineCount()>1);
         assertTrue(b.isFocusable()); assertFalse(b.getText().toString().isEmpty());
+    }
+    @Test public void actualPausedPreviewKeepsInteractReadableWithoutShrinkingAcrossFontsAndWidths() throws Exception {
+        MainActivity activity=Robolectric.buildActivity(MainActivity.class).get();
+        Configuration original=new Configuration(activity.getResources().getConfiguration());
+        Method create=MainActivity.class.getDeclaredMethod("createInterfaceControlPreview",InterfacePreferences.Values.class);
+        create.setAccessible(true);
+        boolean paired=false,stacked=false;
+        try {
+            for(float font:new float[]{1,1.3f,1.7f,2}) for(boolean compact:new boolean[]{false,true})
+                for(int scale:new int[]{85,100,110}) for(int width:new int[]{208,272,360}) {
+                    Configuration config=new Configuration(original); config.fontScale=font; config.densityDpi=160;
+                    activity.getResources().updateConfiguration(config,activity.getResources().getDisplayMetrics());
+                    LinearLayout preview=(LinearLayout)create.invoke(activity,new InterfacePreferences.Values(compact,scale,70,false,false));
+                    preview.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),
+                            View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));
+                    preview.layout(0,0,width,preview.getMeasuredHeight());
+                    final String configuration="font="+font+" compact="+compact+" scale="+scale+" width="+width;
+                    assertEquals(configuration,2,preview.getChildCount());
+                    for(int rowIndex=0;rowIndex<2;++rowIndex) {
+                        LinearLayout row=(LinearLayout)preview.getChildAt(rowIndex);
+                        paired|=row.getOrientation()==LinearLayout.HORIZONTAL;
+                        stacked|=row.getOrientation()==LinearLayout.VERTICAL;
+                        for(int i=0;i<row.getChildCount();++i) {
+                            Button button=(Button)row.getChildAt(i);
+                            final String context=configuration+" row="+rowIndex+" label="+button.getText()+
+                                    " bounds="+button.getLeft()+","+button.getTop()+","+button.getRight()+","+button.getBottom();
+                            assertTrue(context+" native target width",button.getWidth()>=48);
+                            assertTrue(context+" native target height",button.getHeight()>=48);
+                            assertTrue(context+" responsive label stays inside row",button.getLeft()>=0 && button.getRight()<=width);
+                            assertNotNull(context,button.getLayout());
+                            assertEquals(context+" each complete action label uses one line",1,button.getLayout().getLineCount());
+                            assertEquals(context+" no hidden ellipsis",0,button.getLayout().getEllipsisCount(0));
+                            assertTrue(context+" entire label fits its native text area",button.getLayout().getLineWidth(0)<=
+                                    button.getWidth()-button.getCompoundPaddingLeft()-button.getCompoundPaddingRight()+1);
+                            assertEquals(context+" system-sized 17sp text is not auto-shrunk",android.widget.TextView.AUTO_SIZE_TEXT_TYPE_NONE,button.getAutoSizeTextType());
+                            assertEquals(context+" system 17sp size remains intact",android.util.TypedValue.applyDimension(
+                                    android.util.TypedValue.COMPLEX_UNIT_SP,17,activity.getResources().getDisplayMetrics()),button.getTextSize(),.5);
+                            assertFalse(button.isClickable()); assertFalse(button.isFocusable());
+                        }
+                    }
+                    Button interact=(Button)((ViewGroup)preview.getChildAt(0)).getChildAt(1);
+                    assertEquals(activity.getString(R.string.interact),interact.getText().toString());
+                    assertEquals(font,activity.getResources().getConfiguration().fontScale,0);
+                }
+            assertTrue("roomy widths retain paired controls",paired);
+            assertTrue("narrow large-font previews reflow vertically",stacked);
+        } finally { activity.getResources().updateConfiguration(original,activity.getResources().getDisplayMetrics()); }
     }
     @Test public void disabledLabelsRemainOpaqueAndFocusHasDistinctDrawableState() {
         Context c=RuntimeEnvironment.getApplication();

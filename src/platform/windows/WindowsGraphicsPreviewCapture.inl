@@ -50,7 +50,8 @@ bool WriteGraphicsPreviewCaptureManifest(
                  << ",\"waterQuality\":" << static_cast<unsigned>(settings.waterQuality)
                  << ",\"fireDetail\":" << static_cast<unsigned>(settings.fireDetail)
                  << ",\"previewFrameCap\":" << settings.previewFrameCap
-                 << ",\"glassEnabled\":" << (settings.glassEnabled ? "true" : "false") << '}';
+                 << ",\"glassEnabled\":" << (settings.glassEnabled ? "true" : "false")
+                 << ",\"shadowQuality\":" << static_cast<unsigned>(settings.shadowQuality) << '}';
     };
     const auto appliedJson = [&manifest, &settingsJson](const horde::graphics::GraphicsAppliedSnapshot& snapshot) {
         manifest << "{\"serial\":" << snapshot.serial << ",\"lifecycleGeneration\":" << snapshot.lifecycleGeneration
@@ -225,7 +226,7 @@ int RunGraphicsPreviewCapture(VulkanSurfaceContext& context,
     const auto baselineProfile = context.rtScene.Profile();
     const auto expectedBackend = baselineBackend == horde::vulkan::RtExecutionBackend::RayQueryCompute ?
         horde::graphics::GraphicsBackend::RayQueryCompute : horde::graphics::GraphicsBackend::RayTracingPipeline;
-    if (!baseline.glassEnabled || !(CurrentGraphicsSettings(context) == baseline))
+    if (!baseline.glassEnabled)
         return fail("Capture must begin with the ordinary Glass On baseline, without saved preferences.");
     context.graphicsPreviewDelta = 0.0;
     // Every readback follows ordinary successful presentation of the current
@@ -253,6 +254,11 @@ int RunGraphicsPreviewCapture(VulkanSurfaceContext& context,
         }
         return true;
     };
+    // Uploaded quality is unavailable before the first ordinary owner frame.
+    // Bootstrap through that same frame path, then require actual baseline policy.
+    std::vector<double> initialPolicyTimings;
+    if (!settle(1, initialPolicyTimings) || !(CurrentGraphicsSettings(context) == baseline))
+        return fail("The ordinary RT frame did not upload the complete baseline graphics policy.");
     const auto capturePose = [&](const std::string& name,
                                  const horde::platform::windows::GraphicsPreviewCapturePose& pose,
                                  const horde::graphics::GraphicsSettings& expectedSettings) {

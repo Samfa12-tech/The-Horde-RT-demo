@@ -13,12 +13,17 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
     bool policyAdmitted = false;
     auto effectivePresetAtStart = context.rtSceneTuning.workloadPreset;
     std::string compiledQualityAtStart(context.rtScene.SelectedDielectricQualityName());
+    std::optional<horde::vulkan::raytracing::RtQualityControlsGpu> uploadedPolicyAtStart;
+    const auto currentUploadedPolicy = [&]() -> std::optional<horde::vulkan::raytracing::RtQualityControlsGpu> {
+        return context.rtScene.IsReady() && context.rtScene.HasUploadedQualityControls() ?
+            std::optional{context.rtScene.QualityControls()} : std::nullopt;
+    };
     std::array<std::string,2> artifactKeys{}, artifactSpirvHashes{}, artifactIncludeHashes{};
     std::array<std::size_t,2> artifactWords{};
     const auto policyJson = [&]() {
         return horde::platform::windows::BuildWindowsMotionTuningJson(context.motionRequestedRtPreset,
             effectivePresetAtStart, context.rtSceneTuning.workloadPreset, compiledQualityAtStart,
-            context.rtScene.SelectedDielectricQualityName());
+            context.rtScene.SelectedDielectricQualityName(), uploadedPolicyAtStart, currentUploadedPolicy(), true);
     };
     const auto write = [&]() {
         std::ofstream ledger(directory/"native-motion-ledger.json",std::ios::binary|std::ios::trunc);
@@ -104,6 +109,8 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
         context.motionRequestedRtPreset,compiledQualityAtStart,true))
         return fail("Max motion requires the actual selected High shader policy supporting four primary local/fire samples.");
     const auto policyStable=[&]() {
+        const auto current = currentUploadedPolicy();
+        if (uploadedPolicyAtStart && (!current || current->controls != uploadedPolicyAtStart->controls)) return false;
         if(context.rtScene.SelectedDielectricQualityName()!=compiledQualityAtStart ||
            !horde::platform::windows::WindowsMotionRtPolicyAdmitted(context.motionRequestedRtPreset,
                 context.rtSceneTuning.workloadPreset,compiledQualityAtStart,true)) return false;
@@ -144,7 +151,6 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
     context.rtSceneTuning.workloadPreset=context.motionRequestedRtPreset;
     effectivePresetAtStart=context.rtSceneTuning.workloadPreset;
     if(!policyStable()) return fail("Actual motion RT workload policy was not stable at arming.");
-    policyAdmitted=true;
     context.motionRetryGeneration=context.simulation.Snapshot().retryGeneration;
     context.simulationPaused=false; context.simulationInput.paused=false;
     MirrorSimulationSnapshot(context);
@@ -187,9 +193,13 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
         bool presented=false;
         const auto submittedSlot=context.currentFrame;
         if(!RenderFrame(context,clearColor,presented)) return fail("Ordinary native RT rendering failed: "+context.lastRtFrameError);
-        if(!policyStable()) return fail("Actual motion RT workload policy changed while recording/presenting the current frame.");
         if(!presented || context.lastFramePresentation!=horde::telemetry::RtPresentationOutcome::Presented)
             return fail("Ordinary current-resource RT presentation was interrupted/recreated.");
+        const auto uploaded = currentUploadedPolicy();
+        if (!uploaded) return fail("Actual motion quality policy was not successfully uploaded.");
+        if (!uploadedPolicyAtStart) uploadedPolicyAtStart = uploaded;
+        if(!policyStable()) return fail("Actual motion RT workload policy changed while recording/presenting the current frame.");
+        policyAdmitted=true;
         capabilities.rtScene.presented=true;
         horde::telemetry::RtSubmittedFrameIdentity submitted{};
         if(!context.rtFrameEvidence.TryGetCommittedIdentity(submittedSlot,submitted))
