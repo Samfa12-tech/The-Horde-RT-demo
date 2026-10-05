@@ -1,7 +1,7 @@
 # Horde Lantern RT — Campaign and Engine Roadmap
 
 **Owner:** Sam Small / Samfa12  
-**Planning update:** 4 October 2026  
+**Planning update:** 5 October 2026  
 **Status:** Owner-approved direction; future milestones are provisional, not implemented or release promises.
 
 ## Authority and navigation
@@ -40,6 +40,7 @@ Detailed plans:
 
 - [1.7.0 — Beyond the Tomb](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md).
 - [1.8.0 — Village Hub: provisional plan](superpowers/plans/2026-09-11-village-hub-1.8.0.md).
+- [Drowned Abbey — flooded basin and staged delivery](DROWNED_ABBEY_PLAN.md): later campaign, version/date TBD. River-fed lake and a predominantly dry dungeon; prove the vista, short submerged crossing and one dry room before expanding. Preserve three alternative access paths and Foundry/Abbey either-order progression. Start water work from a bounded analytic-wave RT baseline; FFT is conditional on demonstrated need and measured budgets. This adds no 1.6.2, 1.7 or 1.8 implementation scope.
 
 The three later dungeons are additional adventures after the existing tomb/prologue, not a silent relabelling of that prologue as one of the three. Approved order: Abbey and Foundry in either order, then Glass Court, then the treasury finale; see CAMPAIGN_DESIGN.md for access quests and remaining detailed design.
 

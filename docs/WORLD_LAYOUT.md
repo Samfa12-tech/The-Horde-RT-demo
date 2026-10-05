@@ -31,12 +31,18 @@ North is up in the approved concept. Preserve these relationships when translati
 | Mill and stream | Eastern edge of the village; mill placement follows the watercourse and believable working access. |
 | Gardens and smith | Gardens on the western side; smith toward the southeastern side, within the compact hub. Their detailed footprints and service implementation remain blockout work. |
 | Starter shrine | A minor nearby spur beyond the northern/northeastern hub edge. It supports the small first-expedition direction, not a fourth major dungeon or required detour between the two middle dungeons. |
-| Drowned Abbey | South/downstream in the low, flooded basin. The route descends toward water and the submerged approach. |
+| Drowned Abbey | South/downstream in a river-fed lake filling the low flooded basin, not an ocean. Reveal the broken towers before descending toward the submerged approach. The buildings predate the flooding; its cause/date remain open. |
 | Ashen Foundry | East, on a terrace across the gorge, reached through its broken-bridge/access problem. |
 | Glass Court | Northeast, a ruined castle/palace on the high ridge, approached uphill through the Court gate. |
 | Treasury | Under/behind the high ridge in a dry vault, associated geographically with the Court. It is not below the flooded Abbey basin. |
 
 The watercourse begins at the northeastern upland headwaters and runs generally south, descending past the village/mill and through the ravine into the Abbey basin. Water direction, elevation changes and crossing geometry must remain coherent; a route line is not evidence that a steep slope or river crossing is already walkable.
+
+### Abbey basin clarification — 5 October 2026
+
+The flooded basin is a lake fed by the existing downstream watercourse. Preserve believable inflow, containment/outflow and elevation continuity with the mill/ravine. This clarifies the approved geography without moving the Abbey or enlarging the map into an ocean region.
+
+Before detailed Abbey art, block out a vertical section linking lake level, descent, submerged entry, safe air pockets and predominantly dry dungeon floors. Openings below the lake surface must not leave connected rooms inexplicably dry; use coherent enclosed volumes or higher floors/windows. Flood history and exact architectural explanation remain undecided. The [dedicated Abbey plan](DROWNED_ABBEY_PLAN.md) owns the staged spatial, access and water-rendering proof; the regional map remains not to scale.
 
 ## 2. Routes and progression gates
 
