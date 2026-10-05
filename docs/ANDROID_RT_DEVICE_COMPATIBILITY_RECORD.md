@@ -2133,7 +2133,11 @@ changed A/D music YES, now owner PASS. No new SFX/haptic change in this slice.
 
 ### 4 October 2026 - exact refreshed Debug APK, both RT backends
 
-- Allocated **SM-S948B**, Android16/API36, Adreno840. Exact89fec Debug APK SHA256 `c66bcde2b5cad882bb3899f5050a39b2ad2a90ee09c31b3e28ae6e4fd97e101e`; installed APK pullback matches in both runs. Clean c76 runner/source context is recorded separately and does not relabel the APK build.
+- Allocated **SM-S948B**, Android16/API36, Adreno840. Exact89fec Debug APK SHA256 `c66bcde2b5cad882bb3899f5050a39b2ad2a90ee09c31b3e28ae6e4fd97e101e`; recorded installed APK hashes match in both runs. A separate raw installed-APK pullback was not retained for these two packets. Clean c76 runner/source context is recorded separately and does not relabel the APK build.
 - Genuine RayTracingPipeline and RayQueryCompute each passed13/13 deterministic route waypoints, three named entry/Keeper/finale captures and strict Home/Resume. Each has fresh native scene/surface generations and a completed owning frame after resume; no validation failures were reported.
 - Saved owner preferences are byte-identical before and after both runs:50%, Mobile water/fire, cap30, GlassOn, Current shadows, no pending draft. No data clearing or default reduction occurred.
 - Evidence class: exact-artifact Debug replay/capture/lifecycle correctness. No sustained FPS, new subjective appearance/audio acceptance, Shipping benchmark admission, S24 or S25 certification follows. Private reports, raw images and device identifiers remain outside Git. See the [current candidate record](ENGINEERING_1_6_2_REVIEW_CANDIDATE.md).
+
+### 5 October 2026 - independent refreshed Debug evidence admission
+
+The two c66bcde2 packets above passed248 independent checks, with326 selected files/163,555,519 bytes unchanged. Actual four Debug ABI libraries equal their retained stripped build outputs, and selected ARM64 Diagnostic/Mobile modules join SDK evidence. Source continuity is239/240 designated files; the later difference is Windows-only. Receipt SHA256 `ae21b5f3a6ac78ab82e7dcfb5f0c83d7370f2c832e26ab461272930e975bee41`. Both runs retain strict new surface/scene generations and completed owning frames. Preferences before and after both remain byte-identical. This is Debug correctness/lifecycle admission, not Shipping performance, new owner acceptance or another-device certification.

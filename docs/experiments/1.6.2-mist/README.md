@@ -1,0 +1,9 @@
+# Inactive ordinary mist lighting candidate
+
+This directory backs up original Horde engineering work while its required admission is unfinished. Production shader sources and catalogs do not include these files. No build hook selects this directory.
+
+`rt_atmosphere.candidate.glsl` is the ordinary c112 source, SHA256 `c112f96aea1208ec790f10f1ded64017d0f255e045ed4b7ef8188a1c36431703`. It retains authored density, extinction, mist bounds and2/6/8 integration budgets. It uses actual sky, staff and fire emitters once and reuses source visibility at the interval midpoint, with at most four additional visibility queries per active mist pixel. That approximation is not per-step visibility or a general volume renderer. `raygen-variant-budgets.candidate.json`, SHA256 `0f130f8f1e50623772bf857561adafee23e730e2691c35e31cb6455df4b258ba`, records observed ordinary module budgets without probe headroom. Generated prototype banks stay outside production pending adoption.
+
+Ordinary phase and one-fire image pairs, private Diagnostic source-path captures, and four-ABI isolated Shipping/Mobile package admission have separate evidence scopes. The probe is absent from this source and from the cost APK. Current gameplay has one fire; supporting a second slot does not establish two-fire native overlap coverage. Mobile measured cost and owner appearance are required before adoption. Failed Pipeline probe creation, the first missed mist interval and the first incorrect host fire guard remain preserved negatives.
+
+Read the [current candidate](../../ENGINEERING_1_6_2_REVIEW_CANDIDATE.md) and [decision ledger](../../ENGINEERING_1_6_2_SECOND_PASS.md) before reopening experiments. Do not copy these files into active shaders or relax Shipping budgets solely because they are backed up here. This is neither a release nor a default-quality change.
