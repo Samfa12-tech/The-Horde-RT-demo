@@ -68,6 +68,8 @@ struct MotionRtRow
     std::uint64_t simulationCpuNanoseconds = 0u;
     bool gpuDurationAvailable = false;
     std::optional<RtFireLightingEvidence> fireLighting{};
+    // Owning successful upload only; absence is historical/unavailable, false is Off.
+    std::optional<bool> actualUploadedMistEnabled{};
 };
 struct MotionScopeRow
 {

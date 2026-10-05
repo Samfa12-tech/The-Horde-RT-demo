@@ -219,6 +219,7 @@ bool MotionEvidenceLedger::AppendCompletedFrame(std::uint64_t generation, const 
     row.surfaceGeneration = generation; row.identity = identity;
     row.resources = completed.scene.resources; row.player = completed.scene.player;
     row.fireLighting = completed.scene.fireLighting;
+    row.actualUploadedMistEnabled = completed.scene.actualUploadedMistEnabled;
     row.gpuStatus = completed.gpu.status; row.cpuStatus = completed.scene.stages.status;
     row.gpuDurationAvailable = completed.gpu.hasDuration && completed.gpu.status == RtSampleStatus::Valid &&
         completed.gpu.completedSubmissionSerial == identity.submitted.submissionSerial;
@@ -333,6 +334,8 @@ void MotionEvidenceLedger::WriteJson(std::ostream& output,
                << ",\"wholeFrameCpuNs\":" << r.wholeFrameCpuNanoseconds << ",\"simulationCpuNs\":" << r.simulationCpuNanoseconds
                << ",\"skinUpdates\":" << r.player.skinUpdateCount << ",\"socketErrorMicrometres\":" << r.player.maximumSocketErrorMicrometres
                << ",\"hostVisibleBytes\":" << r.resources.hostVisibleBytes << ",\"deviceLocalBytes\":" << r.resources.deviceLocalBytes;
+        if (r.actualUploadedMistEnabled.has_value())
+            output << ",\"actualUploadedMistEnabled\":" << (*r.actualUploadedMistEnabled ? "true" : "false");
         if (r.fireLighting)
         {
             output << ",\"fireLighting\":";

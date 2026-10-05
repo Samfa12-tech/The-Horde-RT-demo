@@ -35,17 +35,17 @@ public final class GraphicsPreviewOptionsTest {
         static GraphicsPreferences.Values requested;
         @Implementation protected static void __staticInitializer__() { }
         @Implementation protected static boolean confirmGraphicsSettings(long serial,long generation) { return (serial==42 || serial==45) && generation==7; }
-        @Implementation protected static void beginGraphicsEdit(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality) {
-            rebased=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality);
+        @Implementation protected static void beginGraphicsEdit(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled) {
+            rebased=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled);
         }
         @Implementation protected static long revertGraphicsSettings(long generation) { return generation==7?43:0; }
-        @Implementation protected static long compareGraphicsPreview(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,long generation) {
+        @Implementation protected static long compareGraphicsPreview(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled,long generation) {
             if(generation!=7) return 0;
-            ++compareCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality); return 44;
+            ++compareCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled); return 44;
         }
-        @Implementation protected static long applyGraphicsSettings(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,long generation) {
+        @Implementation protected static long applyGraphicsSettings(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled,long generation) {
             if(generation!=7) return 0;
-            ++applyCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality); return 45;
+            ++applyCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled); return 45;
         }
         @Implementation protected static double[] getGraphicsPreviewPerformance() { return new double[]{epoch,13,74,2,-1,0,0,0,1,74,0}; }
         @Implementation protected static long[] getGraphicsSnapshot() { return applied.clone(); }
@@ -103,6 +103,18 @@ public final class GraphicsPreviewOptionsTest {
         assertTrue("every other live edit preserves explicit glass Off",live.same(new GraphicsPreferences.Values(75,0,1,15,false)));
         assertTrue(confirmed.same(new GraphicsPreferences.Values(68,0,1,15)));
         assertTrue(draft.same(new GraphicsPreferences.Values(100,2,0,60,false)));
+        GraphicsPreferences.Values mistOff=GraphicsPreviewOptions.withChoice(confirmed,GraphicsPreviewOptions.MIST,0);
+        assertFalse(mistOff.mistEnabled); assertTrue(confirmed.mistEnabled);
+        for(int choice=0;choice<6;++choice) {
+            mistOff=GraphicsPreviewOptions.withChoice(mistOff,choice,GraphicsPreviewOptions.value(draft,choice));
+            assertFalse("every other live edit preserves explicit Mist Off: "+choice,mistOff.mistEnabled);
+        }
+        assertTrue(GraphicsPreviewOptions.withChoice(mistOff,GraphicsPreviewOptions.MIST,1).mistEnabled);
+        assertArrayEquals(new int[]{0,1},GraphicsPreviewOptions.choices(mistOff,GraphicsPreviewOptions.MIST));
+        for(int invalid:new int[]{-1,2,99}) {
+            try { GraphicsPreviewOptions.withChoice(mistOff,GraphicsPreviewOptions.MIST,invalid); fail("invalid mist"); }
+            catch(IllegalArgumentException rejectedMist) { }
+        }
     }
 
     @Test public void boundedMenusIncludeCurrentCustomValuesAndUseProductionCameras() {
@@ -120,7 +132,7 @@ public final class GraphicsPreviewOptionsTest {
     }
 
     @Test public void invalidChoicesAndValuesCannotProduceLiveTuple() {
-        for (int[] input : new int[][]{{6,0},{0,49},{0,101},{1,-1},{1,3},{2,-1},{2,3},{3,14},{3,61},{4,-1},{4,2},{5,-1},{5,3}}) {
+        for (int[] input : new int[][]{{7,0},{6,-1},{6,2},{0,49},{0,101},{1,-1},{1,3},{2,-1},{2,3},{3,14},{3,61},{4,-1},{4,2},{5,-1},{5,3}}) {
             try { GraphicsPreviewOptions.withChoice(confirmed,input[0],input[1]); fail("invalid choice/value accepted"); }
             catch (IllegalArgumentException expected) { }
         }
@@ -184,7 +196,7 @@ public final class GraphicsPreviewOptionsTest {
     }
 
     private long[] snapshot() {
-        return new long[]{42,7,0,68,0,1,15,245,435,360,640,0,1,1,0,68,0,1,15,1,1,1,1,1};
+        return new long[]{42,7,0,68,0,1,15,245,435,360,640,0,1,1,0,68,0,1,15,1,1,1,1,1,1,1};
     }
 
     private MainActivity livePreviewFixture() throws Exception {
@@ -323,7 +335,7 @@ public final class GraphicsPreviewOptionsTest {
             long[] changed=snapshot(); ++changed[index];
             assertFalse("tuple index " + index,GraphicsPreviewOptions.presented(changed,7,42,confirmed));
         }
-        for (int index : new int[]{20,21}) {
+        for (int index : new int[]{20,21,24,25}) {
             long[] changed=snapshot(); changed[index]=0;
             assertFalse("current resources/requested glass differs despite matching extent, index " + index,
                     GraphicsPreviewOptions.presented(changed,7,42,confirmed));
@@ -339,7 +351,7 @@ public final class GraphicsPreviewOptionsTest {
 
         // Invoke the production save-failure branch, with only its JNI boundary replaced.
         GraphicsPreferences.Values savedHigher=new GraphicsPreferences.Values(68,0,1,15,true,2);
-        GraphicsPreferences.Values pendingLowLower=new GraphicsPreferences.Values(100,2,2,60,false,0);
+        GraphicsPreferences.Values pendingLowLower=new GraphicsPreferences.Values(100,2,2,60,false,0,false);
         SharedPreferences stored=RuntimeEnvironment.getApplication().getSharedPreferences("preview-save-failure",Context.MODE_PRIVATE);
         stored.edit().clear().commit(); assertTrue(GraphicsPreferences.confirm(stored,savedHigher));
         SharedPreferences failing=(SharedPreferences)Proxy.newProxyInstance(SharedPreferences.class.getClassLoader(),
@@ -398,4 +410,57 @@ public final class GraphicsPreviewOptionsTest {
             assertTrue(GraphicsPreviewOptions.maximumOverlayHeight(height,gap)+gap <= height*.35);
         assertEquals(1,GraphicsPreviewOptions.maximumOverlayHeight(0,0));
     }
+    @Test public void nativeMistPopupRequiresOffResourceAckAndExplicitUseThenKeepBeforeSaving() throws Exception {
+        MainActivity activity=livePreviewFixture();
+        GraphicsBridgeShadow.epoch=10;
+        Runnable poll=(Runnable)get(activity,"refreshGraphics"); poll.run();
+        Button mist=((Button[])get(activity,"graphicsOptionButtons"))[GraphicsPreviewOptions.MIST];
+        assertTrue(mist.isEnabled()); assertEquals("Mist On",mist.getText().toString());
+        Method menu=MainActivity.class.getDeclaredMethod("showGraphicsPreviewOptionMenu",Button.class,int.class);
+        menu.setAccessible(true); menu.invoke(activity,mist,GraphicsPreviewOptions.MIST);
+        PopupMenu popup=(PopupMenu)get(activity,"graphicsOptionsPopup");
+        assertEquals("Off",popup.getMenu().findItem(0).getTitle()); assertTrue(popup.getMenu().findItem(1).isChecked());
+        assertTrue(popup.getMenu().performIdentifierAction(0,0));
+        GraphicsPreferences.Values off=new GraphicsPreferences.Values(68,0,1,15,true,1,false);
+        SharedPreferences prefs=(SharedPreferences)get(activity,"preferences");
+        assertTrue(GraphicsBridgeShadow.requested.same(off)); assertSame(draft,get(activity,"graphicsOriginalPreviewDraft"));
+        assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(off));
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
+        GraphicsBridgeShadow.applied=snapshot(); GraphicsBridgeShadow.applied[0]=44; GraphicsBridgeShadow.applied[25]=0;
+        GraphicsBridgeShadow.epoch=11; poll.run();
+        assertFalse("old Mist On frame cannot trial Off",((Button)get(activity,"graphicsConfirm")).isEnabled());
+        GraphicsBridgeShadow.applied[24]=0; poll.run();
+        assertTrue(((Button)get(activity,"graphicsConfirm")).isEnabled());
+        ((Button)get(activity,"graphicsConfirm")).performClick();
+        assertEquals(1,GraphicsBridgeShadow.applyCalls); assertTrue(GraphicsBridgeShadow.requested.same(off));
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
+        GraphicsBridgeShadow.applied[0]=45; GraphicsBridgeShadow.applied[2]=2; GraphicsBridgeShadow.epoch=12; poll.run();
+        assertEquals("Keep and save",((Button)get(activity,"graphicsConfirm")).getText().toString());
+        ((Button)get(activity,"graphicsConfirm")).performClick();
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(off)); assertFalse(GraphicsPreferences.hasPending(prefs));
+    }
+    private static Button findButton(android.view.View view,String text) {
+        if(view instanceof Button && text.contentEquals(((Button)view).getText())) return (Button)view;
+        if(view instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group=(android.view.ViewGroup)view;
+            for(int i=0;i<group.getChildCount();++i) { Button found=findButton(group.getChildAt(i),text); if(found!=null) return found; }
+        }
+        return null;
+    }
+    @Test public void productionResetStagesMobileDefaultsWithoutSavingOrChangingUnrelatedPrefs() throws Exception {
+        MainActivity activity=livePreviewFixture();
+        set(activity,"graphicsPreviewWanted",false);
+        SharedPreferences prefs=(SharedPreferences)get(activity,"preferences"); prefs.edit().putInt("music_volume",43).commit();
+        Method show=MainActivity.class.getDeclaredMethod("showGraphicsPage"); show.setAccessible(true); show.invoke(activity);
+        Button reset=findButton((android.view.View)get(activity,"menuScrim"),"Reset draft to mobile defaults");
+        assertNotNull(reset); reset.performClick();
+        assertTrue(((GraphicsPreferences.Values)get(activity,"graphicsDraft")).same(GraphicsPreferences.mobileDefaults()));
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed)); assertFalse(GraphicsPreferences.hasPending(prefs));
+        assertEquals(43,prefs.getInt("music_volume",0)); assertEquals(0,GraphicsBridgeShadow.applyCalls);
+        ((Button)get(activity,"graphicsApply")).performClick();
+        assertEquals(1,GraphicsBridgeShadow.applyCalls); assertTrue(GraphicsBridgeShadow.requested.same(GraphicsPreferences.mobileDefaults()));
+        assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(GraphicsPreferences.mobileDefaults()));
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
+    }
+
 }

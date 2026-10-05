@@ -269,9 +269,11 @@ void TestAdmissionAndFrameBinding()
     recorded.fireLighting->emitters[0] = {3u, {{-32.5f, 0.85f, -16.5f, 0.5f}}, {{1.0f, 0.5f, 0.25f, 0.5f}}};
     recorded.fireLighting->emitters[1] = {4u, {{-31.5f, 0.85f, -13.5f, 0.75f}}, {{1.0f, 0.5f, 0.25f, 0.75f}}};
     const auto owningLighting = recorded.fireLighting;
+    recorded.actualUploadedMistEnabled = false;
     Check(lifecycle.FinishRecord(token, recorded, token), "existing owner finishes record");
     RtSubmittedFrameIdentity submitted;
     Check(lifecycle.Submit(token, submitted), "existing owner commits submission identity");
+    recorded.actualUploadedMistEnabled = true;
     recorded.fireLighting = RtFireLightingEvidence{}; // later current upload must not overwrite committed copy
     Check(ledger.BindSubmittedFrame(5u, submitted), "ledger binds exact committed identity to current state row");
     Check(ledger.HasPendingSubmissions(), "submitted graphics work remains visibly pending before owning completion");
@@ -285,12 +287,14 @@ void TestAdmissionAndFrameBinding()
     Check(ledger.AppendCompletedFrame(5u, publication) && ledger.AppendCompletedFrame(5u, publication) && ledger.Frames().size() == 1u &&
           !ledger.HasPendingSubmissions(),
           "exact completed frame joins once despite duplicate output polls");
-    Check(ledger.Frames()[0].fireLighting == owningLighting &&
+    Check(ledger.Frames()[0].actualUploadedMistEnabled == std::optional<bool>{false} &&
+          ledger.Frames()[0].fireLighting == owningLighting &&
           ledger.Frames()[0].fireLighting != recorded.fireLighting,
           "motion completed row retains only its exact submitted upload despite a later getter changing");
     std::ostringstream fireJson;
     ledger.WriteJson(fireJson, scenario);
-    Check(fireJson.str().find("\"fireLighting\":{\"count\":2") != std::string::npos &&
+    Check(fireJson.str().find("\"actualUploadedMistEnabled\":false") != std::string::npos &&
+          fireJson.str().find("\"fireLighting\":{\"count\":2") != std::string::npos &&
           fireJson.str().find("\"simulationFireEmitterCount\":") != std::string::npos &&
           fireJson.str().find("\"strength\":") != std::string::npos,
           "motion JSON separates configured source strength/fuel/ID from completed upload selection");

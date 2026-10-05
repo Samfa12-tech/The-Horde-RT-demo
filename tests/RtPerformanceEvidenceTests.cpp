@@ -341,6 +341,7 @@ RtRecordedSceneEvidence MakeRecordedScene(const RtSceneFrameEvidence& evidence)
     recorded.shadowQuality = evidence.shadowQuality;
     recorded.fireQuality = evidence.fireQuality;
     recorded.fireLighting = evidence.fireLighting;
+    recorded.actualUploadedMistEnabled = evidence.actualUploadedMistEnabled;
     recorded.player = evidence.player;
     recorded.player.primaryPixelCountAvailable = false;
     recorded.player.primaryPixelCount = 0u;
@@ -998,6 +999,7 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
         context, RtInstrumentationMode::Diagnostic, RtMaterialStrategy::OpaqueFast, 'a', 1'000u);
     sceneA.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Lower, 1u, 1u, 0u};
     sceneA.fireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
+    sceneA.actualUploadedMistEnabled = true;
     sceneA.fireLighting = RtFireLightingEvidence{};
     sceneA.fireLighting->count = 2u;
     sceneA.fireLighting->emitters[0] = {3u, {{-32.5f, 0.85f, -16.5f, 0.5f}}, {{1.0f, 0.5f, 0.25f, 0.5f}}};
@@ -1021,6 +1023,7 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
         context, RtInstrumentationMode::Diagnostic, RtMaterialStrategy::GenericDielectric, 'c', 2'000u);
     sceneB.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Higher, 4u, 2u, 0u};
     sceneB.fireQuality = RtFireQualityEvidence{RtFireQuality::High, 10u, 2u};
+    sceneB.actualUploadedMistEnabled = false;
     sceneB.fireLighting = RtFireLightingEvidence{}; // actual empty upload, not legacy absence
     RtFrameToken recordedB{};
     context.Check(lifecycle.FinishRecord(attemptB, MakeRecordedScene(sceneB), recordedB),
@@ -1069,6 +1072,8 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
                   "completed A must contain only A identity, scene, diagnostic and GPU sentinels");
     context.Check(completedA.scene.shadowQuality == sceneA.shadowQuality &&
                       completedA.scene.fireQuality == sceneA.fireQuality &&
+                      completedA.scene.actualUploadedMistEnabled == sceneA.actualUploadedMistEnabled &&
+                      completedA.scene.actualUploadedMistEnabled != sceneB.actualUploadedMistEnabled &&
                       completedA.scene.fireLighting == sceneA.fireLighting &&
                       completedA.scene.fireLighting != sceneB.fireLighting &&
                       completedA.scene.shadowQuality != sceneB.shadowQuality &&
@@ -1116,6 +1121,7 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
                       completedB),
                   "failed-present submission may still publish matching completed diagnostics");
     context.Check(completedB.presentation.outcome == RtPresentationOutcome::Failed &&
+                      completedB.scene.actualUploadedMistEnabled == sceneB.actualUploadedMistEnabled &&
                       completedB.scene.fireLighting == sceneB.fireLighting &&
                       !completedB.benchmarkEligible &&
                       completedB.presentation.lastSuccessfulPresentSubmissionSerial ==

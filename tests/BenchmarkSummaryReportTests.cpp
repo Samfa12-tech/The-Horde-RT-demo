@@ -83,7 +83,8 @@ struct CompletedOwners
     void Run(const RtSampleStatus gpu = RtSampleStatus::Valid, const bool wrongZone = false,
         const bool leaveLastPending = false, const bool mixedUnsupported = false,
         const BenchmarkSummaryConfiguration* uploaded = nullptr, const bool middleQualityChange = false,
-        const bool middleShadowChange = false)
+        const bool middleShadowChange = false, const bool middleMistChange = false,
+        const bool middleMistUnavailable = false)
     {
         benchmark.Start(2u, BenchmarkWorkload::LanternHeldHigh);
         Check(evidence.Start(kLanternBenchmarkFramesPerLap), "allocate real bounded evidence owner");
@@ -101,6 +102,11 @@ struct CompletedOwners
                 {
                     s.scene.shadowQuality = uploaded->shadowQuality;
                     s.scene.fireQuality = uploaded->uploadedFireQuality;
+                    s.scene.actualUploadedMistEnabled = uploaded->actualUploadedMistEnabled;
+                    if (middleMistChange && serial == kLanternBenchmarkFramesPerLap / 2u)
+                        s.scene.actualUploadedMistEnabled = !uploaded->actualUploadedMistEnabled.value_or(true);
+                    if (middleMistUnavailable && serial == kLanternBenchmarkFramesPerLap / 2u)
+                        s.scene.actualUploadedMistEnabled.reset();
                     if (middleQualityChange && serial == kLanternBenchmarkFramesPerLap / 2u)
                         s.scene.fireQuality = RtFireQualityEvidence{RtFireQuality::Mobile, 4u, 1u};
                     if (middleShadowChange && serial == kLanternBenchmarkFramesPerLap / 2u)
@@ -345,6 +351,54 @@ void TestUploadedQualitySummary()
         "legacy absent uploaded controls remain absent without fabricated Current budgets");
 }
 
+void TestOwningMistSummary()
+{
+    for (const bool enabled : {true, false})
+    {
+        auto configuration = Configuration();
+        configuration.actualUploadedMistEnabled = enabled;
+        CompletedOwners owners;
+        owners.Run(RtSampleStatus::Valid, false, false, false, &configuration);
+        const auto frozen = CaptureBenchmarkSummary(owners.benchmark, owners.evidence,
+            configuration, configuration, kRunUuid);
+        const auto prepared = PrepareBenchmarkSummaryReport(frozen, Approval());
+        Check(frozen.IsReady() && frozen.Data().configuration.actualUploadedMistEnabled == std::optional<bool>{enabled} &&
+            prepared.IsReady() && prepared.Json().find(enabled ? "\"actualUploadedMistEnabled\":true" :
+                "\"actualUploadedMistEnabled\":false") != std::string_view::npos,
+            "frozen local summary identifies actual completed Mist On/Off without treating false as unavailable");
+        const auto unavailable = Configuration();
+        Check(CaptureBenchmarkSummary(owners.benchmark, owners.evidence, unavailable, unavailable, kRunUuid).Status() ==
+            BenchmarkSummaryStatus::MismatchedPopulation,
+            "legacy configuration cannot hide owning rows that actually uploaded a mist policy");
+        auto changed = configuration;
+        changed.actualUploadedMistEnabled = !enabled;
+        Check(CaptureBenchmarkSummary(owners.benchmark, owners.evidence, configuration, changed, kRunUuid).Status() ==
+            BenchmarkSummaryStatus::InvalidConfiguration,
+            "different uploaded mist at arming and completion cannot certify an unchanged measured configuration");
+        changed.actualUploadedMistEnabled.reset();
+        Check(CaptureBenchmarkSummary(owners.benchmark, owners.evidence, configuration, changed, kRunUuid).Status() ==
+            BenchmarkSummaryStatus::InvalidConfiguration,
+            "available and unavailable mist configurations do not compare equal");
+        CompletedOwners middle;
+        middle.Run(RtSampleStatus::Valid, false, false, false, &configuration, false, false, true);
+        Check(CaptureBenchmarkSummary(middle.benchmark, middle.evidence, configuration, configuration, kRunUuid).Status() ==
+            BenchmarkSummaryStatus::MismatchedPopulation,
+            "a single owning frame changed mid-run then restored is rejected despite matching mist endpoints");
+        CompletedOwners missing;
+        missing.Run(RtSampleStatus::Valid, false, false, false, &configuration, false, false, false, true);
+        Check(CaptureBenchmarkSummary(missing.benchmark, missing.evidence, configuration, configuration, kRunUuid).Status() ==
+            BenchmarkSummaryStatus::MismatchedPopulation,
+            "one unavailable owning upload cannot inherit current mist state from configuration metadata");
+    }
+    const auto legacy = Configuration();
+    CompletedOwners owners;
+    owners.Run();
+    const auto prepared = PrepareBenchmarkSummaryReport(CaptureBenchmarkSummary(owners.benchmark, owners.evidence,
+        legacy, legacy, kRunUuid), Approval());
+    Check(prepared.IsReady() && prepared.Json().find("actualUploadedMistEnabled") == std::string_view::npos,
+        "historical summary absence remains absent without an inferred Mist On default");
+}
+
 } // namespace
 
 int main(const int argc, const char* const* const argv)
@@ -370,6 +424,7 @@ int main(const int argc, const char* const* const argv)
     TestCompletedFreezePrivacyAndPopulation();
     TestInvalidOwnersScopeAndIdentity();
     TestUploadedQualitySummary();
+    TestOwningMistSummary();
     TestUnavailableHardwarePrivacyAndIdentityRetry();
     return passed ? 0 : 1;
 }

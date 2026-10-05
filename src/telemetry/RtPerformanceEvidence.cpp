@@ -1042,6 +1042,22 @@ bool ValidateRtPerformanceEvidence(const RtPerformanceEvidenceSnapshot& snapshot
     return true;
 }
 
+std::optional<bool> CurrentCompletedMistEnabled(const RtLifecyclePublishedState& publication) noexcept
+{
+    const auto& completed = publication.completedEvidence;
+    const auto& submitted = completed.identity.submitted;
+    RtEvidenceValidationError error{};
+    if (!publication.running || !publication.presented || !publication.hasCompletedEvidence ||
+        publication.sceneEpoch == 0u || publication.measurementGeneration == 0u ||
+        submitted.frame.sceneEpoch != publication.sceneEpoch ||
+        submitted.frame.measurementGeneration != publication.measurementGeneration ||
+        submitted.submissionSerial == 0u || completed.identity.completionSerial == 0u ||
+        completed.presentation.outcome != RtPresentationOutcome::Presented ||
+        completed.presentation.lastSuccessfulPresentSubmissionSerial != submitted.submissionSerial ||
+        !ValidateRtPerformanceEvidence(completed, error)) return std::nullopt;
+    return completed.scene.actualUploadedMistEnabled;
+}
+
 bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& snapshot,
                                         std::string& output,
                                         RtEvidenceValidationError& error)
@@ -1106,6 +1122,8 @@ bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& sna
              << ",\"reflectedVolumeSteps\":" << std::min(quality.volumeSteps, quality.reflectionSamples * 4u) << '}';
     }
 
+    if (snapshot.scene.actualUploadedMistEnabled.has_value())
+        json << ",\"actualUploadedMistEnabled\":" << (*snapshot.scene.actualUploadedMistEnabled ? "true" : "false");
     if (snapshot.scene.fireLighting)
     {
         json << ",\"fireLighting\":";
@@ -1321,6 +1339,8 @@ bool SerializeRtPerformanceEvidenceText(const RtPerformanceEvidenceSnapshot& sna
              << " volume-steps=" << quality.volumeSteps << " reflection-samples=" << quality.reflectionSamples
              << " reflected-volume-steps=" << std::min(quality.volumeSteps, quality.reflectionSamples * 4u);
     }
+    if (snapshot.scene.actualUploadedMistEnabled.has_value())
+        text << "\nOwning uploaded mist: " << (*snapshot.scene.actualUploadedMistEnabled ? "On" : "Off");
     if (snapshot.scene.fireLighting)
     {
         text << "\nOwning uploaded fire lights: ";
@@ -1691,6 +1711,7 @@ bool RtEvidenceLifecycle::Complete(const RtSubmittedFrameIdentity& submitted,
     candidate.scene.shadowQuality = slot.scene.shadowQuality;
     candidate.scene.fireQuality = slot.scene.fireQuality;
     candidate.scene.fireLighting = slot.scene.fireLighting;
+    candidate.scene.actualUploadedMistEnabled = slot.scene.actualUploadedMistEnabled;
     candidate.scene.player = slot.scene.player;
     if (diagnostic.status == RtSampleStatus::Valid)
     {

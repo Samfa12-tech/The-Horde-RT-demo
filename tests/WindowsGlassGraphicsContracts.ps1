@@ -142,4 +142,24 @@ foreach ($field in @('glassEnabled', 'sceneEpochBefore', 'sceneEpochAfter', 'sce
 Check ($capture.Contains('Glass Off retains fixed BLAS/TLAS roles and implies no allocation savings') -and
     $capture.Contains('full Showcase roof and lantern geometry remain a separate acceptance gate') -and
     -not $capture.Contains('SaveSettings(') -and -not $capture.Contains('SettingsPath(')) 'Capture makes no savings/full-scene claim and does not read/write user preference storage.'
+function Test-MistCompletedAck([string]$body) {
+    return $body.Contains('CurrentCompletedMistEnabled(after) != std::optional<bool>{request->requested.mistEnabled}') -and
+        $body.Contains('context.rtScene.UploadedMistEnabled() != std::optional<bool>{request->requested.mistEnabled}')
+}
+Check (Test-MistCompletedAck $captureCommand) 'Mist transactions require both actual current completed presentation and matching uploaded optional flag; false is a valid Off value.'
+Check (-not (Test-MistCompletedAck ($captureCommand.Replace('CurrentCompletedMistEnabled(after)', 'trustDesiredMist')))) 'Negative Mist fixture rejects desired-only or prior incomplete publication as acknowledgement.'
+Check (-not (Test-MistCompletedAck ($captureCommand.Replace('context.rtScene.UploadedMistEnabled()', 'context.rtScene.MistEnabled()')))) 'Negative Mist fixture rejects desired state replacing successful actual upload.'
+Check ($readback.Contains('CurrentCompletedMistEnabled(record.publication) != std::optional<bool>{expectedSettings.mistEnabled}') -and
+    $readback.Contains('context.rtScene.UploadedMistEnabled() != std::optional<bool>{expectedSettings.mistEnabled}')) 'Mist readback requires actual completed and uploaded choice, with absence never defaulted into On proof.'
+foreach ($phase in @('apply-mist-off', 'revert-mist-on')) {
+    Check ($capture.Contains('command("' + $phase + '"')) "Capture exercises ordinary live Mist transaction $phase."
+}
+Check ($capture.Contains('command("revert-mist-on", context.graphicsEdit->RequestRevert(1u), false)') -and
+    $capture.Contains('capturePose("mist-on", glassPose, baseline)') -and
+    $capture.Contains('capturePose("mist-off", glassPose, mistOff)') -and
+    $capture.Contains('capturePose("mist-restored-on", glassPose, baseline)') -and
+    $capture.Contains('mistOnCapture.pngSha256 != compared->pngSha256') -and
+    $capture.Contains('on.tick != other.tick || on.timeSeconds != other.timeSeconds') -and
+    $capture.Contains('Real Keeper captures remain') -and
+    $capture.Contains('const auto& pose : horde::platform::windows::kGraphicsPreviewCapturePoses')) 'Three additional fixed-pose Mist images prove unchanged compact pixels and live Revert without Keep; all nine accepted poses and real Keeper appearance gate remain.'
 Write-Output "PASS: Windows glass graphics source contracts; $script:checks checks. No Vulkan/GUI/device execution."

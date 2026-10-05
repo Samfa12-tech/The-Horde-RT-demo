@@ -170,8 +170,8 @@ try {
     $legacyHashBefore = Get-RawFileHash $legacyIncludePath
     # Admitted 1.6.2 actual-incident mist/active-fire4 compatibility artifacts; matrix mode must not
     # mutate them, and the artifact suite independently checks fresh compilation.
-    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq 'fc1dec4f8f242218cacdf17ff718bb2559b53c8d917feeca0e82c21dcd45519d') 'Generic include hash changed before matrix compilation.'
-    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq 'e3489a43934afc908d5f43703660927abb3442b71a08899a701960c9f21242af') 'Legacy include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq '5f1d94069d02507179da23b201c72ef6de7c273c680f2cbce6a12ec0cc35f80b') 'Generic include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq '8b7a7316d1c834ca8db62fd2f66d159bd3bd7c6a0bd13cde66944619b4004f4c') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)

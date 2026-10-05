@@ -16,20 +16,20 @@ int main()
     };
     GraphicsPersistenceRecord record;
     record.confirmed = BaselineGraphicsSettings(GraphicsPlatform::Windows);
-    record.pending = GraphicsSettings{63, WaterQuality::Off, FireDetail::Low, 30, false, ShadowQuality::Lower};
+    record.pending = GraphicsSettings{63, WaterQuality::Off, FireDetail::Low, 30, false, ShadowQuality::Lower, false};
     check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "pending tuple saved atomically");
     const auto read = [&filename](const char* section, const char* key) {
         return GetPrivateProfileIntA(section, key, -1, filename.c_str());
     };
     check(read("graphics", "pending") == 1 && read("graphics", "pendingScale") == 63 &&
           read("graphics", "confirmedScale") == 100 && read("graphics", "pendingGlass") == 0 &&
-          read("graphics", "confirmedGlass") == 1 && read("graphics", "schema") == 3 &&
+          read("graphics", "confirmedGlass") == 1 && read("graphics", "schema") == 4 &&
           read("graphics", "pendingFire") == 2 && read("graphics", "pendingShadow") == 0 &&
-          read("graphics", "confirmedShadow") == 1,
-          "interrupted six-field Low/Lower candidate retains complete last-confirmed tuple");
+          read("graphics", "confirmedShadow") == 1 && read("graphics", "confirmedMist") == 1 && read("graphics", "pendingMist") == 0,
+          "interrupted seven-field Low/Lower candidate retains complete last-confirmed tuple");
     const auto loadedPending = horde::platform::windows::LoadGraphicsPersistenceRecord(path, record.confirmed);
     check(loadedPending && loadedPending->confirmed == record.confirmed && loadedPending->pending == record.pending,
-          "ordinary owner loader reads exact confirmed and pending six-field tuples");
+          "ordinary owner loader reads exact confirmed and pending seven-field tuples");
     if (loadedPending)
     {
         const auto recovery = RecoverGraphicsSettings(*loadedPending, GraphicsPlatform::Windows);
@@ -43,7 +43,7 @@ int main()
     check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "confirmation tuple saved atomically");
     check(read("graphics", "pending") == 0 && read("graphics", "confirmedScale") == 63 &&
           read("graphics", "confirmedWater") == 0 && read("graphics", "confirmedFire") == 2 &&
-          read("graphics", "confirmedGlass") == 0 && read("graphics", "confirmedShadow") == 0,
+          read("graphics", "confirmedGlass") == 0 && read("graphics", "confirmedShadow") == 0 && read("graphics", "confirmedMist") == 0,
           "confirmation clears marker and publishes complete requested tuple");
     check(!horde::platform::windows::SaveGraphicsPersistenceRecord(directory / "missing" / "settings.ini", record),
           "write failure is explicit");
@@ -64,12 +64,12 @@ int main()
               read("audio", "volume") == 43,
               "failed publication preserves the entire prior record and unrelated preferences");
     }
-    record.confirmed = GraphicsSettings{63, WaterQuality::Off, FireDetail::Low, 30, false, ShadowQuality::Lower};
+    record.confirmed = GraphicsSettings{63, WaterQuality::Off, FireDetail::Low, 30, false, ShadowQuality::Lower, false};
     auto invalid = record;
     invalid.confirmed.shadowQuality = static_cast<ShadowQuality>(3);
     check(!horde::platform::windows::SaveGraphicsPersistenceRecord(path, invalid) &&
         read("graphics", "confirmedShadow") == 0,
-        "unknown shadow cannot replace a usable six-field record");
+        "unknown shadow cannot replace a usable seven-field record");
     const auto write = [&](const char* key, const char* value) {
         check(WritePrivateProfileStringA("graphics", key, value, filename.c_str()) != FALSE, "fixture INI key written");
     };
@@ -99,7 +99,27 @@ int main()
         check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "all new shadow selections save");
         const auto current = recover();
         check(current.startup == record.confirmed && current.reasons == GraphicsReason::None,
-            "schema3 Low retains all three exact shadow selections without remapping or unrelated changes");
+            "schema4 Low retains all three exact shadow selections without remapping or unrelated changes");
+    }
+    for (const char* schema : {"1", "2", "3"})
+    {
+        check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "old Mist migration source seeded");
+        write("schema", schema); write("confirmedFire", "1"); write("confirmedMist", "invalid-stale-key");
+        const auto migrated = recover();
+        check(migrated.startup.renderScalePercent == 63 && migrated.startup.mistEnabled &&
+              !HasGraphicsReason(migrated.reasons, GraphicsReason::InvalidStoredSettings),
+              "pre4 schemas ignore stale Mist keys and preserve saved quality with MistOn");
+    }
+    check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "schema4 missing Mist source seeded");
+    write("confirmedMist", nullptr);
+    check(recover().startup.mistEnabled && !HasGraphicsReason(recover().reasons, GraphicsReason::InvalidStoredSettings),
+          "missing schema4 Mist defaultsOn without replacing other saved tuple fields");
+    for (const char* malformed : {"-1", "2", "256", "01", "On", "1junk"})
+    {
+        check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "Mist negative source seeded");
+        write("confirmedMist", malformed);
+        check(HasGraphicsReason(recover().reasons, GraphicsReason::InvalidStoredSettings),
+              "schema4 Mist parser rejects every noncanonical boolean before native apply");
     }
     for (const char* malformed : {"", "-1", "3", "256", "01", "Current", "1junk", "999999999999999999999999999999999999"})
     {
@@ -118,7 +138,7 @@ int main()
     check(horde::platform::windows::SaveGraphicsPersistenceRecord(path, record), "pending negative source seeded");
     write("pendingShadow", nullptr);
     check(HasGraphicsReason(recover().reasons, GraphicsReason::InvalidStoredSettings),
-        "schema3 pending shadow is independently required while its marker is active");
+        "schema4 pending shadow is independently required while its marker is active");
     write("pending", "0");
     check(recover().startup == record.confirmed && recover().reasons == GraphicsReason::None,
         "inactive missing pending fields do not invalidate confirmed settings");

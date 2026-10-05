@@ -10,7 +10,7 @@
 
 namespace horde::graphics
 {
-inline constexpr std::uint32_t kGraphicsSettingsSchema = 3u;
+inline constexpr std::uint32_t kGraphicsSettingsSchema = 4u;
 inline constexpr double kGraphicsConfirmationSeconds = 15.0;
 
 #ifndef HORDE_RT_MIN_RENDER_SCALE_PERCENT
@@ -41,7 +41,7 @@ enum class FireDetail : std::uint8_t { Mobile = 0u, High = 1u, Low = 2u };
 enum class ShadowQuality : std::uint8_t { Lower = 0u, Current = 1u, Higher = 2u };
 enum class OpticalProfile : std::uint8_t { Mobile, High };
 enum class GraphicsBackend : std::uint8_t { Unsupported, RayTracingPipeline, RayQueryCompute };
-enum class GraphicsPreset : std::uint8_t { AcceptedBaseline, ReducedEffects, Custom };
+enum class GraphicsPreset : std::uint8_t { AcceptedBaseline, ReducedEffects, Custom, PlatformDefault };
 enum class GraphicsScene : std::uint8_t { Showcase, Preview };
 
 struct GraphicsSettings
@@ -54,6 +54,7 @@ struct GraphicsSettings
     // It cannot add High lantern panes to a Mobile build.
     bool glassEnabled = true;
     ShadowQuality shadowQuality = ShadowQuality::Current;
+    bool mistEnabled = true;
     bool operator==(const GraphicsSettings&) const = default;
 };
 
@@ -72,6 +73,17 @@ inline GraphicsSettings BaselineGraphicsSettings(const GraphicsPlatform platform
         GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30};
 }
 
+// Fresh installs and explicit Reset use these defaults. Historical baseline
+// and migration remain separate so existing confirmed choices are preserved.
+inline GraphicsSettings PlatformDefaultGraphicsSettings(const GraphicsPlatform platform) noexcept
+{
+    return platform == GraphicsPlatform::Android ?
+        GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false,
+            ShadowQuality::Current, true} :
+        GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true,
+            ShadowQuality::Current, true};
+}
+
 inline GraphicsSettings ReducedEffectsGraphicsSettings(const GraphicsPlatform platform) noexcept
 {
     auto result = BaselineGraphicsSettings(platform);
@@ -85,6 +97,7 @@ inline GraphicsPreset MatchGraphicsPreset(const GraphicsSettings& settings,
                                          const GraphicsPlatform platform) noexcept
 {
     if (settings == BaselineGraphicsSettings(platform)) return GraphicsPreset::AcceptedBaseline;
+    if (settings == PlatformDefaultGraphicsSettings(platform)) return GraphicsPreset::PlatformDefault;
     if (settings == ReducedEffectsGraphicsSettings(platform)) return GraphicsPreset::ReducedEffects;
     return GraphicsPreset::Custom;
 }
@@ -95,6 +108,7 @@ inline std::string_view GraphicsPresetName(const GraphicsPreset preset) noexcept
     {
     case GraphicsPreset::AcceptedBaseline: return "Accepted 1.6.1 baseline";
     case GraphicsPreset::ReducedEffects: return "Reduced effects";
+    case GraphicsPreset::PlatformDefault: return "Platform defaults";
     default: return "Custom";
     }
 }
@@ -229,9 +243,11 @@ inline GraphicsRecovery RecoverGraphicsSettings(const GraphicsPersistenceRecord&
     GraphicsRecovery result;
     const bool legacySchema = record.schema == 1u;
     const bool oldSchema = legacySchema || record.schema == 2u;
+    const bool beforeMistSchema = oldSchema || record.schema == 3u;
     auto confirmed = record.confirmed;
     if (oldSchema) confirmed.shadowQuality = ShadowQuality::Current;
-    if ((!oldSchema && record.schema != kGraphicsSettingsSchema) || !ValidGraphicsSettings(confirmed) ||
+    if (beforeMistSchema) confirmed.mistEnabled = true;
+    if ((!beforeMistSchema && record.schema != kGraphicsSettingsSchema) || !ValidGraphicsSettings(confirmed) ||
         (oldSchema && static_cast<unsigned>(confirmed.fireDetail) > 1u))
     {
         result.startup = BaselineGraphicsSettings(platform);
@@ -247,6 +263,7 @@ inline GraphicsRecovery RecoverGraphicsSettings(const GraphicsPersistenceRecord&
         result.retainedRequested = record.pending;
         if (legacySchema) result.retainedRequested->glassEnabled = true;
         if (oldSchema) result.retainedRequested->shadowQuality = ShadowQuality::Current;
+        if (beforeMistSchema) result.retainedRequested->mistEnabled = true;
         if (!ValidGraphicsSettings(*result.retainedRequested) ||
             (oldSchema && static_cast<unsigned>(result.retainedRequested->fireDetail) > 1u))
         {
@@ -301,7 +318,7 @@ public:
         state_ = GraphicsEditState::Editing;
         return true;
     }
-    bool ResetDraft(const GraphicsPlatform platform) noexcept { return Stage(BaselineGraphicsSettings(platform)); }
+    bool ResetDraft(const GraphicsPlatform platform) noexcept { return Stage(PlatformDefaultGraphicsSettings(platform)); }
     std::optional<GraphicsCommand> RequestApply(const std::uint64_t generation) noexcept
     {
         if ((state_ != GraphicsEditState::Editing && state_ != GraphicsEditState::Failed &&
@@ -342,6 +359,7 @@ public:
             snapshot.effective.previewFrameCap != snapshot.requested.previewFrameCap ||
             snapshot.effective.glassEnabled != snapshot.requested.glassEnabled ||
             snapshot.effective.shadowQuality != snapshot.requested.shadowQuality ||
+            snapshot.effective.mistEnabled != snapshot.requested.mistEnabled ||
             (snapshot.effective.fireDetail != snapshot.requested.fireDetail && !explainedFire) ||
             (HasGraphicsReason(snapshot.reasons, GraphicsReason::FireFollowsWater) && !explainedFire) ||
             HasGraphicsReason(snapshot.reasons, GraphicsReason::InvalidSettings) ||

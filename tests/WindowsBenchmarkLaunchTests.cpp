@@ -3,6 +3,7 @@
 #include <string_view>
 
 #include "platform/windows/WindowsBenchmarkLaunch.h"
+#include "platform/windows/WindowsMistCaptureLaunch.h"
 
 int main()
 {
@@ -157,16 +158,39 @@ int main()
         notUploaded.find("\"shadowPolicySource\":\"unavailable\"") != std::string::npos &&
         notUploaded.find("\"primaryAreaShadowSamplesPerContributingReceiver\":0") != std::string::npos,
         "ordinary reporting without an actual upload never fabricates Max shadow policy");
-    auto invalidUpload = higher; invalidUpload.controls[3] = 1u;
+    auto invalidUpload = higher; invalidUpload.controls[3] = 2u;
     check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
         RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "High", "High", higher, invalidUpload, true)
         .find("\"shadowPolicySource\":\"unavailable\"") != std::string::npos,
-        "reserved nonzero uploaded record is not admitted as actual physical policy");
+        "unknown quality flags are not admitted as actual physical policy");
     check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
         RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "Mobile", "Mobile", higher, higher, true)
         .find("\"policyStable\":false") != std::string::npos,
         "High four-sample record cannot certify a Mobile compiled two-sample policy");
     check(highMax.find("explicit-diagnostic-legacy-workload") != std::string::npos,
         "historical explicit diagnostic caller keeps separately named legacy workload semantics");
+    auto mistOff = current; mistOff.controls[3] = 1u;
+    const auto offJson = horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "High", "High", mistOff, mistOff, true);
+    check(offJson.find("\"policyStable\":true") != std::string::npos &&
+          offJson.find("\"actualUploadedMistEnabled\":false") != std::string::npos &&
+          offJson.find("\"shadowMode\":\"Current\"") != std::string::npos,
+          "actual MistOff flag is stable independently of unchanged shadow policy");
+    check(horde::platform::windows::BuildWindowsBenchmarkTuningJson(
+        RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, RtWorkloadPreset::Authored, "High", "High", current, mistOff, true)
+        .find("\"policyStable\":false") != std::string::npos, "changing onlyMist cannot certify a stable benchmark policy");
+    using horde::platform::windows::ParseWindowsMistCaptureLaunch;
+    const std::array<std::wstring_view, 3> offCapture{L"--capture-showcase", L"reports", L"--mist-off"};
+    check(ParseWindowsMistCaptureLaunch(offCapture, true).off && ParseWindowsMistCaptureLaunch(offCapture, true).error.empty(),
+          "bounded Debug Showcase accepts actual MistOff control");
+    check(!ParseWindowsMistCaptureLaunch(offCapture, false).error.empty(), "Release rejects Debug-only Mist capture control before Vulkan");
+    check(!ParseWindowsMistCaptureLaunch(std::array<std::wstring_view, 1>{L"--mist-off"}, true).error.empty(), "orphan Mist capture flag rejects");
+    check(!ParseWindowsMistCaptureLaunch(std::array<std::wstring_view, 4>{L"--capture-showcase", L"reports", L"--mist-off", L"--mist-off"}, true).error.empty(),
+          "duplicate Mist capture flag rejects");
+    for (const auto conflicting : {L"--capture-graphics-preview", L"--benchmark-showcase", L"--validate-native-motion", L"--validate-output-resize"})
+        check(!ParseWindowsMistCaptureLaunch(std::array<std::wstring_view, 4>{L"--capture-showcase", L"reports", L"--mist-off", conflicting}, true).error.empty(),
+              "mixed finite modes never admit a MistOff Showcase capture");
+    check(!ParseWindowsMistCaptureLaunch(capture, true).off && ParseWindowsMistCaptureLaunch(capture, true).error.empty(),
+          "ordinary historical Showcase capture preserves MistOn without new flag");
     return passed ? 0 : 1;
 }

@@ -287,7 +287,7 @@ public class MainActivity extends Activity {
     private GraphicsPreferences.Values graphicsRestoreDraftAfterPreview;
     private int graphicsPreviewChoice = GraphicsPreviewOptions.RESOLUTION;
     private boolean graphicsPreviewImageOnly;
-    private final Button[] graphicsOptionButtons = new Button[6];
+    private final Button[] graphicsOptionButtons = new Button[7];
     private Button graphicsDetailsButton, graphicsImageButton, graphicsControlsButton;
     private double graphicsPreviewPerformanceEpochFloor;
     private long graphicsPreviewPerformanceGeneration, graphicsNextFpsUpdate;
@@ -1965,7 +1965,7 @@ public class MainActivity extends Activity {
     }
 
     private void setNativeGraphics(GraphicsPreferences.Values values) {
-        ProbeBridge.setGraphicsSettings(values.scale, values.water, values.fire, values.cap, values.glassEnabled, values.shadow);
+        ProbeBridge.setGraphicsSettings(values.scale, values.water, values.fire, values.cap, values.glassEnabled, values.shadow, values.mistEnabled);
     }
 
     private void openGraphics() {
@@ -1977,7 +1977,7 @@ public class MainActivity extends Activity {
         graphicsPreviewImageOnly = false;
         graphicsBusy = false;
         ProbeBridge.beginGraphicsEdit(graphicsConfirmed.scale, graphicsConfirmed.water,
-                graphicsConfirmed.fire, graphicsConfirmed.cap, graphicsConfirmed.glassEnabled, graphicsConfirmed.shadow);
+                graphicsConfirmed.fire, graphicsConfirmed.cap, graphicsConfirmed.glassEnabled, graphicsConfirmed.shadow, graphicsConfirmed.mistEnabled);
         graphicsVisible = true;
         graphicsSceneRestoring = false;
         graphicsPreviewWanted = false;
@@ -2061,6 +2061,14 @@ public class MainActivity extends Activity {
         });
         addBody(panel, "Independent RT shadow sampling: Lower, Current or Higher. Current preserves the default; performance costs remain unmeasured here.");
         addGraphicsButton(panel, "Preview shadows", () -> openGraphicsPreview(GraphicsPreviewOptions.SHADOW));
+        addGraphicsButton(panel, "Mist: " + (graphicsDraft.mistEnabled ? "On" : "Off"), () -> {
+            graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.MIST, graphicsDraft.mistEnabled ? 0 : 1);
+            showGraphicsPage();
+        });
+        addBody(panel, "Keeper room mist. Off skips ground mist; fire, smoke and electricity stay enabled. This compact preview has no ground mist.");
+        addGraphicsButton(panel, "Reset draft to mobile defaults", () -> {
+            graphicsDraft = GraphicsPreferences.mobileDefaults(); showGraphicsPage();
+        });
         addGraphicsButton(panel, getString(R.string.graphics_baseline), () -> {
             graphicsDraft = GraphicsPreferences.baseline(); showGraphicsPage();
         });
@@ -2073,7 +2081,7 @@ public class MainActivity extends Activity {
                 graphicsTelemetry.setText(R.string.graphics_storage_failed); return;
             }
             graphicsRequestSerial = ProbeBridge.applyGraphicsSettings(graphicsDraft.scale, graphicsDraft.water,
-                    graphicsDraft.fire, graphicsDraft.cap, graphicsDraft.glassEnabled, graphicsDraft.shadow, surfaceRequestGeneration);
+                    graphicsDraft.fire, graphicsDraft.cap, graphicsDraft.glassEnabled, graphicsDraft.shadow, graphicsDraft.mistEnabled, surfaceRequestGeneration);
             if (graphicsRequestSerial == 0) {
                 graphicsTelemetry.setText(R.string.graphics_not_ready);
                 return; // Keep recovery marker until an acknowledged restore.
@@ -2169,7 +2177,7 @@ public class MainActivity extends Activity {
             graphicsLiveChoiceError = getString(R.string.graphics_storage_failed); return;
         }
         final long serial = ProbeBridge.compareGraphicsPreview(values.scale, values.water, values.fire,
-                values.cap, values.glassEnabled, values.shadow, surfaceRequestGeneration);
+                values.cap, values.glassEnabled, values.shadow, values.mistEnabled, surfaceRequestGeneration);
         if (serial == 0) {
             graphicsLiveChoiceError = "Choice unavailable; choose Restore saved."; return;
         }
@@ -2189,6 +2197,7 @@ public class MainActivity extends Activity {
             case GraphicsPreviewOptions.FIRE: return "Fire " + GraphicsPreviewOptions.fireLabel(graphicsDraft.fire);
             case GraphicsPreviewOptions.GLASS: return "Glass " + (graphicsDraft.glassEnabled ? "On" : "Off");
             case GraphicsPreviewOptions.SHADOW: return "Shadows " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow);
+            case GraphicsPreviewOptions.MIST: return "Mist " + (graphicsDraft.mistEnabled ? "On" : "Off");
             default: return "Cap " + graphicsDraft.cap + " Hz";
         }
     }
@@ -2201,7 +2210,7 @@ public class MainActivity extends Activity {
                     choice == GraphicsPreviewOptions.WATER ? waterName(value) :
                     choice == GraphicsPreviewOptions.FIRE ? GraphicsPreviewOptions.fireLabel(value) :
                     choice == GraphicsPreviewOptions.SHADOW ? GraphicsPreviewOptions.shadowLabel(value) :
-                    choice == GraphicsPreviewOptions.GLASS ? (value == 1 ? "On" : "Off") : value + " Hz";
+                    (choice == GraphicsPreviewOptions.GLASS || choice == GraphicsPreviewOptions.MIST) ? (value == 1 ? "On" : "Off") : value + " Hz";
             popup.getMenu().add(0,value,0,label).setCheckable(true)
                     .setChecked(value == GraphicsPreviewOptions.value(graphicsDraft,choice));
         }
@@ -2297,7 +2306,7 @@ public class MainActivity extends Activity {
                 resetGraphicsPreviewTimeline();
                 graphicsSubmitted = previewSelection(); graphicsDraft = graphicsSubmitted;
                 graphicsRequestSerial = ProbeBridge.applyGraphicsSettings(graphicsSubmitted.scale, graphicsSubmitted.water,
-                        graphicsSubmitted.fire, graphicsSubmitted.cap, graphicsSubmitted.glassEnabled, graphicsSubmitted.shadow, surfaceRequestGeneration);
+                        graphicsSubmitted.fire, graphicsSubmitted.cap, graphicsSubmitted.glassEnabled, graphicsSubmitted.shadow, graphicsSubmitted.mistEnabled, surfaceRequestGeneration);
                 graphicsBusy = graphicsRequestSerial != 0; graphicsConfirmationStarted = 0;
             }
         });
@@ -2439,6 +2448,7 @@ public class MainActivity extends Activity {
     }
 
     private void refreshGraphicsPreviewTelemetry(long[] applied, String settingsText) {
+        settingsText += "\nKeeper room mist; this preview has no ground mist. Off preserves fire, smoke and electricity.";
         if ((applied[14] & 64) != 0 && GraphicsPreferences.presented(applied, surfaceRequestGeneration) && applied[19] == 0) {
             graphicsPreviewWanted = false;
             graphicsPreviewDetailsSamples = new double[9];
@@ -2545,7 +2555,7 @@ public class MainActivity extends Activity {
             // A storage failure must also rebase the native session: otherwise
             // a later Back/Revert would restore its unsaved committed candidate.
             ProbeBridge.beginGraphicsEdit(graphicsConfirmed.scale, graphicsConfirmed.water,
-                    graphicsConfirmed.fire, graphicsConfirmed.cap, graphicsConfirmed.glassEnabled, graphicsConfirmed.shadow);
+                    graphicsConfirmed.fire, graphicsConfirmed.cap, graphicsConfirmed.glassEnabled, graphicsConfirmed.shadow, graphicsConfirmed.mistEnabled);
             if (graphicsPreviewWanted) {
                 // Match the actual restored tuple; the original outside draft remains separate.
                 graphicsDraft = graphicsConfirmed;
@@ -2794,7 +2804,7 @@ public class MainActivity extends Activity {
             final double seconds = graphicsPollTime == 0 ? 0 : Math.max(0, now - graphicsPollTime) / 1000.0;
             graphicsPollTime = now;
             final long[] a = ProbeBridge.getGraphicsSnapshot();
-            if (a == null || a.length != 24) { handler.postDelayed(this, 250); return; }
+            if (a == null || a.length != 26) { handler.postDelayed(this, 250); return; }
             final boolean presented = GraphicsPreferences.presented(a, surfaceRequestGeneration);
             if (graphicsRecovering && presented && GraphicsPreferences.matchesEffective(a, graphicsConfirmed)) {
                 if (GraphicsPreferences.clearAfterRestore(preferences)) {
@@ -2858,7 +2868,7 @@ public class MainActivity extends Activity {
                 }
                 graphicsRevert.setEnabled(state != 4);
                 final String preset = graphicsDraft.same(GraphicsPreferences.baseline()) ?
-                        "Accepted 1.6.1 baseline" : "Custom";
+                        "Accepted 1.6.1 baseline" : graphicsDraft.same(GraphicsPreferences.mobileDefaults()) ? "Mobile defaults" : "Custom";
                 final String status = state == 1 ? "Trying settings - waiting for an RT frame; Saved is unchanged" : state == 4 ? "Restoring saved settings" :
                         state == 5 ? "Trial failed; previous output retained" : state == 2 ?
                         (ready ? "Keep and save within " + Math.max(0, 15 - (now - graphicsConfirmationStarted) / 1000) + " seconds, or settings restore" :
@@ -2868,17 +2878,17 @@ public class MainActivity extends Activity {
                 final String settingsText = preset + "\n" + status + "\nRequested: " + graphicsDraft.scale + "% / water " +
                         waterName(graphicsDraft.water) + " / fire " + GraphicsPreviewOptions.fireLabel(graphicsDraft.fire) +
                         " / glass " + (graphicsDraft.glassEnabled ? "On" : "Off") +
-                        " / shadows " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow) +
+                        " / shadows " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow) + " / mist " + (graphicsDraft.mistEnabled ? "On" : "Off") +
                         (presented ? " / planned " + ((a[9] * graphicsDraft.scale + 50) / 100) + " x " +
                         ((a[10] * graphicsDraft.scale + 50) / 100) : " / planned extent unavailable") +
                         "\nSaved: " + (graphicsConfirmed == null ? "unavailable" : graphicsConfirmed.scale + "% / water " + waterName(graphicsConfirmed.water) +
                         " / fire " + GraphicsPreviewOptions.fireLabel(graphicsConfirmed.fire) + " / glass " + (graphicsConfirmed.glassEnabled ? "On" : "Off") +
-                        " / shadows " + GraphicsPreviewOptions.shadowLabel(graphicsConfirmed.shadow) +
+                        " / shadows " + GraphicsPreviewOptions.shadowLabel(graphicsConfirmed.shadow) + " / mist " + (graphicsConfirmed.mistEnabled ? "On" : "Off") +
                         " / cap " + graphicsConfirmed.cap + " Hz") +
                         "\nEffective: " + (presented ? a[3] + "% / " + a[7] + " x " + a[8] + " internal / " +
                         a[9] + " x " + a[10] + " output / water " + waterName((int)a[4]) + " / fire " +
                         GraphicsPreviewOptions.fireLabel((int)a[5]) + " / glass " + (a[20] == 1 ? "On" : "Off") +
-                        " / shadows " + GraphicsPreviewOptions.shadowLabel((int)a[22]) : "not yet presented") + "\n" +
+                        " / shadows " + GraphicsPreviewOptions.shadowLabel((int)a[22]) + " / mist " + (a[24] == 1 ? "On" : "Off") : "not yet presented") + "\n" +
                         (presented ? (a[11] == 1 ? getString(R.string.graphics_optics_high) : getString(R.string.graphics_optics_mobile)) :
                         "Optical profile: unavailable until an RT frame presents.") + "\nBackend: " +
                         (presented ? (a[12] == 2 ? "RayQueryCompute" : "RayTracingPipeline") : "not yet presented");

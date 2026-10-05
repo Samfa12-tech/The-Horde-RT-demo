@@ -56,10 +56,32 @@ completed mist evidence is separate from shadow quality and its reserved value.
 Missing historical evidence remains unavailable. No new resource binding,
 software rendering path, low-mist tier or measured performance claim follows.
 
+SDK control-flow inspection confirms the compiled Off path bypasses ground-mist
+source queries and marching. The required branch adds160 bytes/40 words/10
+instructions to Generic and144 bytes/36 words/9 instructions to Opaque versus
+their prior Pipeline artifacts, with two branches and one selection merge.
+Loops, functions, function calls, ray-query sites and diagnostic atomics do not
+increase. Five static ceilings per eight variants are updated to these exact
+measured values; all other ceilings and categorical guards remain unchanged.
+Budget SHA256 `f543692d968921d7e09df94e226da6579eeaebc44c92f8b79299a9624b04c220`
+supersedes the historical `0f130f8f1e50623772bf857561adafee23e730e2691c35e31cb6455df4b258ba`
+for this feature. This static-size change is not a dynamic timing result.
+
 ## Validation boundary
 
-Implementation and exact candidate checks are in progress. Required affected
-checks cover platform defaults and native/Java parity, valid legacy/pending
+Implementation is frozen; exact artifact/native/device admission remains in
+progress. Twelve affected Debug native CTests pass51.61s. The focused Java
+aggregate passes36 tests across preferences, options, compact layout and
+lifecycle; lint has0 errors and50 warnings at that boundary. The final menu
+also retains a separate staged historical-baseline button; its compilation and
+lint belong to the forthcoming exact build. Strict Pipeline8, Compute8 and
+compatibility2 SDK freshness checks pass, alongside ABI/adapter freshness.
+Both affected Release shader fixtures pass123.55s (Manifest32.64s and
+Artifact90.89s). Windows graphics source contracts pass56 checks after adding
+actual-completed Mist Apply/Revert/readback checks. These are CPU/source/SDK
+results, without a new device, moving-image or performance claim.
+
+Required affected checks cover platform defaults and native/Java parity, valid legacy/pending
 preservation, staged reset, rollback/background behavior, native persistence,
 unchanged desktop defaults, and actual Keeper-room On/Off/On captures with owning
 frame evidence. The compact skeleton preview does not exercise Keeper ground

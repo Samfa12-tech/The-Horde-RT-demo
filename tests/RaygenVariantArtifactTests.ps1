@@ -36,6 +36,21 @@ function Assert-Throws {
     Assert-True $threw $Message
 }
 
+function Assert-MistOffExitContract {
+    param([string]$Atmosphere)
+    $function = [regex]::Match($Atmosphere,
+        '(?ms)vec4\s+lichGroundMist\s*\([^)]*\)\s*\{(?<body>.*?)^\}')
+    Assert-True $function.Success 'Ground mist function must remain independently bounded.'
+    $body = $function.Groups['body'].Value
+    $withoutComments = [regex]::Replace($body, '(?m)^\s*//[^\r\n]*', '')
+    $gate = [regex]::Match($withoutComments,
+        '^\s*if\s*\(\s*controls\.enemyKind\s*<\s*0\.5\s*\|\|\s*rtQualityControls\.value\.controls\.w\s*!=\s*0u\s*\)\s*\{\s*return\s+vec4\(0\.0,\s*0\.0,\s*0\.0,\s*1\.0\);\s*\}')
+    Assert-True $gate.Success 'Mist Off must return neutral before any medium query, clipping or march work.'
+    Assert-True ($withoutComments.IndexOf('buildMistIncidentSources(') -gt ($gate.Index + $gate.Length) -and
+        $withoutComments.IndexOf('integrateLichMistSample(') -gt ($gate.Index + $gate.Length)) `
+        'Mist Off gate must dominate incident-source construction and integration.'
+}
+
 function Assert-FrozenCatalogShape {
     param([pscustomobject]$Catalog)
 
@@ -490,14 +505,26 @@ try {
         @($budgets.budgets).Count -eq 8 -and @($budgets.metrics).Count -eq 10) `
         'Task 3d must retain the reviewed frozen eight-key budget set.'
 
+    $atmosphere = [IO.File]::ReadAllText((Join-Path $repoRoot 'shaders\raytracing\include\rt_atmosphere.glsl'))
+    Assert-MistOffExitContract $atmosphere
+    Assert-Throws {
+        Assert-MistOffExitContract ($atmosphere.Replace(
+            ' || rtQualityControls.value.controls.w != 0u', ''))
+    } 'Removing the actual mist flag must fail even when enemy-kind gating remains.'
+    Assert-Throws {
+        Assert-MistOffExitContract ($atmosphere.Replace(
+            '    if (controls.enemyKind < 0.5 || rtQualityControls.value.controls.w != 0u)',
+            "    buildMistIncidentSources(vec3(0.0), sources);`n    if (controls.enemyKind < 0.5 || rtQualityControls.value.controls.w != 0u)"))
+    } 'Moving medium source queries before the Off exit must fail.'
+
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
     # Compatibility pins identify actual-incident mist with four admitted active fire records;
     # the independent fresh compiler check below still validates source identity.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'fc1dec4f8f242218cacdf17ff718bb2559b53c8d917feeca0e82c21dcd45519d') `
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq '5f1d94069d02507179da23b201c72ef6de7c273c680f2cbce6a12ec0cc35f80b') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq 'e3489a43934afc908d5f43703660927abb3442b71a08899a701960c9f21242af') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '8b7a7316d1c834ca8db62fd2f66d159bd3bd7c6a0bd13cde66944619b4004f4c') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -539,10 +566,10 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     # well as dielectric lighting. The former equal Mobile/High word pairs are
     # no longer the admitted snapshot; keep exact reviewed actual-incident mist/active-fire4 raw-word witnesses.
     $opaqueWordPins = @{
-        diagnostic_high_opaque_fast = 'ac714c11a404d4d2b3b4d5d7e60cb4a3861d8f6c0e4cce673a8b83576cbea76c'
-        diagnostic_mobile_opaque_fast = '5ee4a1bd1f5f9bee3c1cbc2a7a4c28c5dc9e3c64c7ca5aca93313dfcea0bb74f'
-        shipping_high_opaque_fast = '5f369cfa2d439cec1f5e3ae42440e859879b03d8f0305aef80f40ca3e423a653'
-        shipping_mobile_opaque_fast = 'db1b15cbcb379b5a4ef4750313ff704b092687c1ef8385c8602b30c0a5979eff'
+        diagnostic_high_opaque_fast = '3ac01d27e6e878738c26c4d26028cf057b6d89b38f5179c716365bcfa9de7615'
+        diagnostic_mobile_opaque_fast = 'd782d78910ecbf7b92efad6ca88f3533a06bc44a929c61e05addf70757bf8599'
+        shipping_high_opaque_fast = '81b7de85257fe35f46f168beeaf83ebb649e9157c789c3f44228c2e7cb92ab9c'
+        shipping_mobile_opaque_fast = '469fa6fea850cc9f6c2e0ca7b90333ef5038a93be6c33928c760b5c2b699cec9'
     }
     foreach ($row in @($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' })) {
         Assert-True ($row.spirvSha256 -ceq $opaqueWordPins[$row.key]) `
@@ -726,13 +753,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
-        'ee91878e4a991b6d0479d761769fb81aa8c45608a3da81f88de7fd4dd51b2d4c') `
+        'deb2db44b85a3e1a889e734b4d5e0b64f91da5389fd439b8e88a404a1f3eaa01') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
-        'db0d8b6fefb3a50c97b2bff36c64623bd47db2eccd25c98e9873f75485ed37c9') `
+        'b2c251daee976206a4e45d7ccb8a883ebc4d9daa2159af3e55e67ea17f131d9d') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `
         'Temporary artifact compilation modified the worktree.'

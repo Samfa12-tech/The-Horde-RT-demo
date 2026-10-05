@@ -357,6 +357,48 @@ void TestCompletedFireLightingProjection()
           "invalid completed fire suffix fails capability publication without exposing a light claim");
 }
 
+void TestCompletedMistAdmission()
+{
+    auto completed = MakeCompletedEvidence(RtInstrumentationMode::Shipping);
+    auto publication = MakePublished(completed);
+    std::string json, text, reason;
+    Check(!CurrentCompletedMistEnabled(publication).has_value() &&
+        SerializeRtEvidencePublication(publication, true, json, text, reason) &&
+        json.find("actualUploadedMistEnabled") == std::string::npos,
+        "historical absent mist upload is unavailable rather than a guessed default");
+    for (const bool enabled : {true, false})
+    {
+        completed.scene.actualUploadedMistEnabled = enabled;
+        publication = MakePublished(completed);
+        // A later upload cannot alter the retained completed fact.
+        completed.scene.actualUploadedMistEnabled = !enabled;
+        Check(CurrentCompletedMistEnabled(publication) == std::optional<bool>{enabled} &&
+            SerializeRtEvidencePublication(publication, true, json, text, reason) &&
+            json.find(enabled ? "\"actualUploadedMistEnabled\":true" : "\"actualUploadedMistEnabled\":false") != std::string::npos &&
+            text.find(enabled ? "Owning uploaded mist: On" : "Owning uploaded mist: Off") != std::string::npos,
+            "current owning mist On and Off survive publication independently of a later desired/uploaded value");
+        for (unsigned invalid = 0u; invalid < 10u; ++invalid)
+        {
+            auto stale = publication;
+            switch (invalid)
+            {
+            case 0u: stale.running = false; break;
+            case 1u: stale.presented = false; break;
+            case 2u: stale.hasCompletedEvidence = false; break;
+            case 3u: ++stale.sceneEpoch; break;
+            case 4u: ++stale.measurementGeneration; break;
+            case 5u: stale.completedEvidence.identity.completionSerial = 0u; break;
+            case 6u: stale.completedEvidence.presentation.outcome = RtPresentationOutcome::Failed; break;
+            case 7u: ++stale.completedEvidence.presentation.lastSuccessfulPresentSubmissionSerial; break;
+            case 8u: stale.completedEvidence.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Current, 1u, 1u, 1u}; break;
+            case 9u: stale.completedEvidence.identity.submitted.submissionSerial = 0u; break;
+            }
+            Check(!CurrentCompletedMistEnabled(stale).has_value(),
+                "pending/stopped/stale/failed/malformed owning packet cannot acknowledge either mist state");
+        }
+    }
+}
+
 void TestCurrentLifecycleDiffersFromHistoricalFrame()
 {
     const RtPerformanceEvidenceSnapshot completed =
@@ -528,6 +570,7 @@ int main()
     TestObserverUnavailable();
     TestCanonicalCompletedEvidence();
     TestCompletedFireLightingProjection();
+    TestCompletedMistAdmission();
     TestCurrentLifecycleDiffersFromHistoricalFrame();
     TestPreviousGenerationIsPendingNotError();
     TestInvalidPublications();

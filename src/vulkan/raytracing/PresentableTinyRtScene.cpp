@@ -639,6 +639,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     scratchAddressAlignment_ = std::exchange(other.scratchAddressAlignment_, 0u);
     sceneProfile_ = std::exchange(other.sceneProfile_, RtSceneProfile::Showcase);
     glassEnabled_ = std::exchange(other.glassEnabled_, true);
+    mistEnabled_ = std::exchange(other.mistEnabled_, true);
     sceneMaterials_ = std::move(other.sceneMaterials_);
     worldMaterialBase_ = std::exchange(other.worldMaterialBase_, 0u);
     tlasInstanceCount_ = std::exchange(other.tlasInstanceCount_, kTlasInstanceCount);
@@ -892,9 +893,13 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
 
 void PresentableTinyRtScene::Destroy()
 {
+    uploadedQualityControls_ = {};
+    uploadedFireQuality_ = FireEmitterQuality::Mobile;
+    uploadedQualityControlsValid_ = false;
     uploadedFireEmitters_ = {};
     uploadedFireEmittersValid_ = false;
     glassEnabled_ = true;
+    mistEnabled_ = true;
     tlasBuiltInstances_ = {};
     tlasInstanceDefinitionsValid_ = false;
     tlasPendingInstances_ = {};
@@ -949,9 +954,6 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(heldLightBuffer_);
     DestroyBuffer(fireEmitterBuffer_);
     DestroyBuffer(qualityControlsBuffer_);
-    uploadedQualityControls_ = {};
-    uploadedFireQuality_ = FireEmitterQuality::Mobile;
-    uploadedQualityControlsValid_ = false;
     DestroyBuffer(instanceBuffer_);
     DestroyBuffer(transformBuffer_);
     DestroyBuffer(indexBuffer_);
@@ -5273,7 +5275,7 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
         emitters[index].zone = frame.zone;
     }
     const auto quality = ResolveRtQualityControls(frame.shadowQuality, tuning.workloadPreset,
-        pipelineBundle_.Request().quality == DielectricQuality::High);
+        pipelineBundle_.Request().quality == DielectricQuality::High, mistEnabled_);
     if (!quality) { diagnostic = "Graphics preview shadow quality is invalid."; return false; }
     FireEmitterUpload fire{};
     const auto fireDetail = frame.fireDetail.value_or(frame.waterQuality == WaterQuality::High
@@ -6171,7 +6173,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         clampedTuning.fireSmokeScale,
         frame.torchLightStrength};
     const auto quality = ResolveRtQualityControls(frame.shadowQuality, clampedTuning.workloadPreset,
-        pipelineBundle_.Request().quality == DielectricQuality::High);
+        pipelineBundle_.Request().quality == DielectricQuality::High, mistEnabled_);
     if (!quality) { diagnostic = "Scene shadow quality is invalid."; return false; }
     const FireEmitterQuality fireQuality = frame.fireDetail.value_or(frame.waterQuality == WaterQuality::High
         ? FireEmitterQuality::High
@@ -6850,12 +6852,14 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
             recordedFactsValid = horde::telemetry::ValidRtFireLightingEvidence(lighting) &&
                 recordedFactsValid;
         }
-        recordedFactsValid = uploadedQualityControlsValid_ && recordedFactsValid;
-        if (uploadedQualityControlsValid_)
+        const auto actualMist = UploadedMistEnabled();
+        recordedFactsValid = actualMist.has_value() && recordedFactsValid;
+        if (actualMist.has_value())
         {
             recorded.shadowQuality = horde::telemetry::RtShadowQualityEvidence{
                 static_cast<horde::telemetry::RtShadowMode>(uploadedQualityControls_.controls[0]),
-                uploadedQualityControls_.controls[1], uploadedQualityControls_.controls[2], uploadedQualityControls_.controls[3]};
+                uploadedQualityControls_.controls[1], uploadedQualityControls_.controls[2], 0u};
+            recorded.actualUploadedMistEnabled = *actualMist;
             horde::telemetry::RtFireQuality fireTier = horde::telemetry::RtFireQuality::Mobile;
             switch (uploadedFireQuality_)
             {

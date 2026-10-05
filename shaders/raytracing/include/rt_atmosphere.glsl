@@ -204,7 +204,9 @@ void integrateLichMistSample(vec4 sampleValue, float stepLength,
 
 vec4 lichGroundMist(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
 {
-    if (controls.enemyKind < 0.5)
+    // On keeps the existing medium arithmetic; Off exits before source queries
+    // and march integration. This flag does not control emitter smoke or arcs.
+    if (controls.enemyKind < 0.5 || rtQualityControls.value.controls.w != 0u)
     {
         return vec4(0.0, 0.0, 0.0, 1.0);
     }
@@ -229,7 +231,7 @@ vec4 lichGroundMist(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
     }
 
     // All source visibility is evaluated once after the original no-mist
-    // gates. Peak is one sky + one staff + two independent fire queries.
+    // gates. Peak is one sky + one staff + four independent fire queries.
     MistIncidentSources sources;
     buildMistIncidentSources(rayOrigin + rayDirection *
         (0.5 * (marchStart + marchEnd)), sources);

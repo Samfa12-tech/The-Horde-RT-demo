@@ -537,6 +537,8 @@ void TestActiveStrategyComesFromEachOwningCompletion(TestContext& context)
     opaque.scene.fireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
     generic.scene.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Higher, 2u, 2u, 0u};
     generic.scene.fireQuality = RtFireQualityEvidence{RtFireQuality::High, 10u, 2u};
+    opaque.scene.actualUploadedMistEnabled = true;
+    generic.scene.actualUploadedMistEnabled = false;
     opaque.scene.fireLighting = RtFireLightingEvidence{};
     generic.scene.fireLighting = RtFireLightingEvidence{};
     generic.scene.fireLighting->count = 2u;
@@ -553,6 +555,7 @@ void TestActiveStrategyComesFromEachOwningCompletion(TestContext& context)
     generic.scene.shadowQuality = opaque.scene.shadowQuality;
     generic.scene.fireQuality = opaque.scene.fireQuality;
     generic.scene.fireLighting = opaque.scene.fireLighting;
+    generic.scene.actualUploadedMistEnabled = opaque.scene.actualUploadedMistEnabled;
     const std::string json = BuildRtBenchmarkEvidenceJson(run);
     context.Check(ArrayObjectWith(json, "\"index\": 0").find(
                       "\"activeStrategy\": \"opaque-fast\"") != std::string::npos &&
@@ -563,6 +566,10 @@ void TestActiveStrategyComesFromEachOwningCompletion(TestContext& context)
         ArrayObjectWith(json, "\"index\": 1").find("\"quality\": \"High\"") != std::string::npos &&
         ArrayObjectWith(json, "\"index\": 1").find("\"localPrimarySamples\": 2") != std::string::npos,
         "report row quality comes from each immutable completed owning upload");
+    context.Check(ArrayObjectWith(json, "\"index\": 0").find("\"actualUploadedMistEnabled\": true") != std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 1").find("\"actualUploadedMistEnabled\": false") != std::string::npos &&
+        ArrayObjectWith(json, "\"index\": 2").find("actualUploadedMistEnabled") == std::string::npos,
+        "mist report rows retain owning On/Off and cannot fabricate pending-row defaults");
     context.Check(ArrayObjectWith(json, "\"index\": 0").find("\"fireLighting\": {\"count\":0") != std::string::npos &&
         ArrayObjectWith(json, "\"index\": 1").find("\"fireLighting\": {\"count\":2") != std::string::npos &&
         ArrayObjectWith(json, "\"index\": 1").find("\"stableId\":4") != std::string::npos,

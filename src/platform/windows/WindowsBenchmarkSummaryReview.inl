@@ -49,7 +49,9 @@ horde::telemetry::BenchmarkSummaryConfiguration WindowsBenchmarkSummaryConfigura
         static_cast<horde::telemetry::RtFireQuality>(configuration.fire), fireBudget.volumeSteps, fireBudget.reflectionSamples};
     const auto& quality = context.rtScene.QualityControls().controls;
     configuration.shadowQuality = horde::telemetry::RtShadowQualityEvidence{
-        static_cast<horde::telemetry::RtShadowMode>(quality[0]), quality[1], quality[2], quality[3]};
+        static_cast<horde::telemetry::RtShadowMode>(quality[0]), quality[1], quality[2], 0u};
+    configuration.actualUploadedMistEnabled = context.rtScene.UploadedMistEnabled();
+    if (!configuration.actualUploadedMistEnabled) return {};
     const auto optical = context.rtScene.SelectedDielectricQualityName();
     if (optical != "High" && optical != "Mobile") return {};
     configuration.dielectric = optical == "High" ?

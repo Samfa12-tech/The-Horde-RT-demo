@@ -193,6 +193,14 @@ public:
     bool IsReady() const { return ready_; }
     RtSceneProfile Profile() const { return sceneProfile_; }
     bool GlassEnabled() const { return glassEnabled_; }
+    void SetMistEnabled(const bool enabled) noexcept { mistEnabled_ = enabled; }
+    bool MistEnabled() const noexcept { return mistEnabled_; }
+    // Raw successful upload only; owning completion/presentation is separate.
+    std::optional<bool> UploadedMistEnabled() const noexcept
+    {
+        return uploadedQualityControlsValid_
+            ? ResolveUploadedMistEnabled(uploadedQualityControls_) : std::nullopt;
+    }
     const RtQualityControlsGpu& QualityControls() const noexcept { return uploadedQualityControls_; }
     bool HasUploadedQualityControls() const noexcept { return uploadedQualityControlsValid_; }
     FireEmitterQuality UploadedFireQuality() const noexcept { return uploadedFireQuality_; }
@@ -784,6 +792,7 @@ private:
     RtGpuResources gpuResources_;
     RtSceneProfile sceneProfile_ = RtSceneProfile::Showcase;
     bool glassEnabled_ = true;
+    bool mistEnabled_ = true;
     std::vector<RtMaterialGpu> sceneMaterials_;
     std::uint32_t worldMaterialBase_ = 0u;
     std::uint32_t tlasInstanceCount_ = kTlasInstanceCount;

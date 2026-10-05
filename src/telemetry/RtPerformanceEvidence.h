@@ -353,6 +353,8 @@ struct RtRecordedSceneEvidence
     std::optional<RtShadowQualityEvidence> shadowQuality{};
     std::optional<RtFireQualityEvidence> fireQuality{};
     std::optional<RtFireLightingEvidence> fireLighting{};
+    // Owning successful upload only; absence is historical/unavailable, false is Off.
+    std::optional<bool> actualUploadedMistEnabled{};
 };
 
 struct RtSceneFrameEvidence
@@ -365,6 +367,8 @@ struct RtSceneFrameEvidence
     std::optional<RtShadowQualityEvidence> shadowQuality{};
     std::optional<RtFireQualityEvidence> fireQuality{};
     std::optional<RtFireLightingEvidence> fireLighting{};
+    // Owning successful upload only; absence is historical/unavailable, false is Off.
+    std::optional<bool> actualUploadedMistEnabled{};
 };
 
 struct RtDiagnosticEvidence
@@ -593,6 +597,11 @@ struct RtLifecyclePublishedState
     bool hasCompletedEvidence = false;
     RtPerformanceEvidenceSnapshot completedEvidence{};
 };
+
+// Settings admission reads this completed owning fact, then compares it to the
+// current successful scene upload. Requested state is never an acknowledgment.
+[[nodiscard]] std::optional<bool> CurrentCompletedMistEnabled(
+    const RtLifecyclePublishedState& publication) noexcept;
 
 class RtEvidenceLifecycle
 {

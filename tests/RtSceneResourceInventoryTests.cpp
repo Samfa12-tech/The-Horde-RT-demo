@@ -166,6 +166,49 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static bool CheckMistControlsAndLifetime()
+    {
+        bool ok = true;
+        for (const auto shadow : {std::optional<horde::graphics::ShadowQuality>{},
+                                  std::optional{horde::graphics::ShadowQuality::Lower},
+                                  std::optional{horde::graphics::ShadowQuality::Current},
+                                  std::optional{horde::graphics::ShadowQuality::Higher}})
+        for (const auto workload : {RtWorkloadPreset::Lean, RtWorkloadPreset::Authored, RtWorkloadPreset::Max})
+        for (const bool high : {false, true})
+        {
+            const auto defaultOn = ResolveRtQualityControls(shadow, workload, high);
+            const auto explicitOn = ResolveRtQualityControls(shadow, workload, high, true);
+            const auto off = ResolveRtQualityControls(shadow, workload, high, false);
+            ok &= defaultOn && explicitOn && off && defaultOn->controls == explicitOn->controls &&
+                  defaultOn->controls[3] == 0u && off->controls[3] == 1u;
+            for (std::size_t index = 0u; index < 3u; ++index)
+                ok &= defaultOn->controls[index] == off->controls[index];
+            ok &= ResolveUploadedMistEnabled(*defaultOn) == true && ResolveUploadedMistEnabled(*off) == false;
+            auto unknown = *off; unknown.controls[3] = 2u;
+            ok &= !ResolveUploadedMistEnabled(unknown).has_value();
+        }
+        PresentableTinyRtScene scene;
+        ok &= scene.MistEnabled() && !scene.UploadedMistEnabled().has_value();
+        scene.SetMistEnabled(false);
+        ok &= !scene.MistEnabled() && !scene.UploadedMistEnabled().has_value();
+        scene.uploadedQualityControls_ = *ResolveRtQualityControls(
+            horde::graphics::ShadowQuality::Current, RtWorkloadPreset::Authored, false, false);
+        scene.uploadedQualityControlsValid_ = true;
+        scene.SetMistEnabled(true);
+        ok &= scene.MistEnabled() && scene.UploadedMistEnabled() == false;
+        PresentableTinyRtScene moved(std::move(scene));
+        ok &= moved.MistEnabled() && moved.UploadedMistEnabled() == false &&
+              scene.MistEnabled() && !scene.UploadedMistEnabled().has_value();
+        moved.SetMistEnabled(false);
+        PresentableTinyRtScene assigned;
+        assigned = std::move(moved);
+        ok &= !assigned.MistEnabled() && assigned.UploadedMistEnabled() == false &&
+              moved.MistEnabled() && !moved.UploadedMistEnabled().has_value();
+        assigned.Destroy();
+        ok &= assigned.MistEnabled() && !assigned.UploadedMistEnabled().has_value();
+        return ok;
+    }
+
     static bool CheckKeeperTorchBodyAliases()
     {
         PresentableTinyRtScene scene;
@@ -947,6 +990,8 @@ int main()
     using namespace horde::vulkan::raytracing;
 
     bool ok = PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckMistControlsAndLifetime(),
+                  "mist control must preserve default-On/shadow policy and distinguish requested from owned uploaded state");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckKeeperTorchBodyAliases(),
                   "two physical world torch slots must share dark body geometry and valid static metadata aliases");
     for (const auto instrumentation : {RtInstrumentation::Diagnostic, RtInstrumentation::Shipping})

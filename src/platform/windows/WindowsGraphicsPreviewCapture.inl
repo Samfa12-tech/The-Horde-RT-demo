@@ -51,7 +51,8 @@ bool WriteGraphicsPreviewCaptureManifest(
                  << ",\"fireDetail\":" << static_cast<unsigned>(settings.fireDetail)
                  << ",\"previewFrameCap\":" << settings.previewFrameCap
                  << ",\"glassEnabled\":" << (settings.glassEnabled ? "true" : "false")
-                 << ",\"shadowQuality\":" << static_cast<unsigned>(settings.shadowQuality) << '}';
+                 << ",\"shadowQuality\":" << static_cast<unsigned>(settings.shadowQuality)
+                 << ",\"mistEnabled\":" << (settings.mistEnabled ? "true" : "false") << '}';
     };
     const auto appliedJson = [&manifest, &settingsJson](const horde::graphics::GraphicsAppliedSnapshot& snapshot) {
         manifest << "{\"serial\":" << snapshot.serial << ",\"lifecycleGeneration\":" << snapshot.lifecycleGeneration
@@ -299,6 +300,8 @@ int RunGraphicsPreviewCapture(VulkanSurfaceContext& context,
             (expectedSettings.glassEnabled ? masks[9u] == 0u : masks[9u] != 0u) ||
             context.rtScene.Profile() != baselineProfile || context.rtScene.ExecutionBackend() != baselineBackend ||
             !CurrentCompletedGraphicsPreviewPresent(record.publication) ||
+            horde::telemetry::CurrentCompletedMistEnabled(record.publication) != std::optional<bool>{expectedSettings.mistEnabled} ||
+            context.rtScene.UploadedMistEnabled() != std::optional<bool>{expectedSettings.mistEnabled} ||
             record.publication.completedEvidence.identity.submitted.frame.simulationTick != pose.tick)
             return captureFailure(record.name + " lacks current completed RT presentation or the selected live glass mask/profile/backend.");
         captures.push_back(std::move(record));
@@ -327,6 +330,8 @@ int RunGraphicsPreviewCapture(VulkanSurfaceContext& context,
             context.rtScene.GlassEnabled() != request->requested.glassEnabled ||
             context.renderScaleDirty || context.sceneProfileDirty || context.glassGeometryDirty ||
             !CurrentCompletedGraphicsPreviewPresent(after) ||
+            horde::telemetry::CurrentCompletedMistEnabled(after) != std::optional<bool>{request->requested.mistEnabled} ||
+            context.rtScene.UploadedMistEnabled() != std::optional<bool>{request->requested.mistEnabled} ||
             after.completedEvidence.identity.submitted.submissionSerial <= before.completedEvidence.identity.submitted.submissionSerial ||
             (glassChanged && (after.sceneEpoch <= before.sceneEpoch ||
                               after.measurementGeneration < before.measurementGeneration)) ||
@@ -369,6 +374,36 @@ int RunGraphicsPreviewCapture(VulkanSurfaceContext& context,
         !context.graphicsEdit->Stage(baseline) ||
         !command("restore-glass-on-memory-only", context.graphicsEdit->RequestApply(1u), true))
         return fail("Glass Revert/Keep/restore On did not acknowledge the exact fresh RT resources.");
+    // The compact Skeleton alcove has no Keeper ground-mist volume. These
+    // readbacks prove the ordinary live Apply/Revert path and actual uploaded
+    // flag without claiming visible mist coverage. Real Keeper captures remain
+    // the separate On/Off/restore appearance gate.
+    if (!baseline.mistEnabled) return fail("Mist transaction validation requires the unchanged On baseline.");
+    auto mistOff = baseline; mistOff.mistEnabled = false;
+    if (!capturePose("mist-on", glassPose, baseline) || !context.graphicsEdit->Stage(mistOff) ||
+        !command("apply-mist-off", context.graphicsEdit->RequestApply(1u), false) ||
+        !capturePose("mist-off", glassPose, mistOff) ||
+        !command("revert-mist-on", context.graphicsEdit->RequestRevert(1u), false) ||
+        !capturePose("mist-restored-on", glassPose, baseline))
+        return fail("Mist Apply/Revert/readback lacks the exact current completed uploaded choice.");
+    const auto& mistOnCapture = captures[captures.size() - 3u];
+    const auto& mistOffCapture = captures[captures.size() - 2u];
+    const auto& mistRestoredCapture = captures.back();
+    for (const auto* compared : {&mistOffCapture, &mistRestoredCapture})
+    {
+        const auto& on = mistOnCapture.pose;
+        const auto& other = compared->pose;
+        if (on.tick != other.tick || on.timeSeconds != other.timeSeconds ||
+            on.camera.x != other.camera.x || on.camera.z != other.camera.z ||
+            on.camera.yaw != other.camera.yaw || on.camera.pitch != other.camera.pitch ||
+            !on.paused || !other.paused || on.motionTest || other.motionTest ||
+            on.skeleton.x != other.skeleton.x || on.skeleton.z != other.skeleton.z ||
+            on.skeleton.facing != other.skeleton.facing || on.skeleton.animationTime != other.skeleton.animationTime ||
+            on.fireEmitters[0].phase != other.fireEmitters[0].phase ||
+            on.fireEmitters[1].phase != other.fireEmitters[1].phase ||
+            mistOnCapture.pngSha256 != compared->pngSha256)
+            return fail("Compact no-mist On/Off/restored readbacks changed their frozen pose or pixels.");
+    }
     context.graphicsEdit.reset(); context.graphicsCommand.reset();
     context.graphicsPreviewDelta = 0.0;
     for (const auto& pose : horde::platform::windows::kGraphicsPreviewCapturePoses)

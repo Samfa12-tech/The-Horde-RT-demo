@@ -33,6 +33,7 @@ struct BenchmarkSummaryConfiguration
     std::uint64_t measurementGeneration = 0u;
     std::optional<RtShadowQualityEvidence> shadowQuality{};
     std::optional<RtFireQualityEvidence> uploadedFireQuality{};
+    std::optional<bool> actualUploadedMistEnabled{};
 };
 
 struct BenchmarkSummaryPopulation

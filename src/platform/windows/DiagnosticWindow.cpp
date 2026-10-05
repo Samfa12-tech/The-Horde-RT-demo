@@ -82,6 +82,7 @@
 #include "telemetry/MotionEvidenceLedger.h"
 #endif
 #include "platform/windows/WindowsBenchmarkLaunch.h"
+#include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
 #include "platform/windows/WindowsGitHubReleaseUpdate.h"
 #include "platform/windows/WindowsRtLabState.h"
@@ -164,6 +165,7 @@ constexpr int kGraphicsPreviewTelemetryId = 202;
 constexpr int kGraphicsPreviewGraphId = 203;
 constexpr int kGraphicsGlassButtonId = 204;
 constexpr int kGraphicsShadowButtonId = 206;
+constexpr int kGraphicsMistButtonId = 207;
 constexpr int kRtLabButtonId = 127;
 constexpr int kRtLabPanelId = 128;
 constexpr int kRtLabTitleId = 129;
@@ -231,6 +233,7 @@ struct CaptureLaunchOptions
     horde::platform::windows::WindowsBenchmarkLaunch benchmark;
     bool requested = false;
     bool graphicsPreview = false;
+    bool mistOff = false;
     bool outputResizeValidation = false;
     std::string nativeMotionScenario;
     horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset =
@@ -379,12 +382,13 @@ struct VulkanSurfaceContext
     std::optional<horde::graphics::GraphicsEditSession> graphicsEdit;
     std::optional<horde::graphics::GraphicsCommand> graphicsCommand;
     horde::graphics::GraphicsSettings savedGraphics =
-        horde::graphics::BaselineGraphicsSettings(horde::graphics::GraphicsPlatform::Windows);
+        horde::graphics::PlatformDefaultGraphicsSettings(horde::graphics::GraphicsPlatform::Windows);
     horde::graphics::GraphicsSettings graphicsBeforeApply = savedGraphics;
     horde::graphics::FireDetail fireDetail = horde::graphics::FireDetail::High;
     horde::graphics::ShadowQuality shadowQuality = horde::graphics::ShadowQuality::Current;
     // Requested intent is distinct from the ready scene's applied geometry policy.
     bool requestedGlassEnabled = true;
+    bool requestedMistEnabled = true;
     bool glassGeometryDirty = false;
     std::uint64_t graphicsSerialFloor = 0u;
     ULONGLONG graphicsConfirmationTick = 0u;
@@ -539,6 +543,16 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     std::vector<std::wstring_view> argumentViews;
     for (int index = 1; index < argumentCount; ++index) argumentViews.emplace_back(arguments[index]);
+    const auto mistLaunch = horde::platform::windows::ParseWindowsMistCaptureLaunch(argumentViews,
+#if defined(_DEBUG)
+        true
+#else
+        false
+#endif
+    );
+    if (!mistLaunch.error.empty())
+    { options.error = mistLaunch.error; LocalFree(arguments); return options; }
+    options.mistOff = mistLaunch.off;
     const auto motionLaunch = horde::platform::windows::ParseWindowsMotionEvidenceLaunch(argumentViews,
 #if defined(_DEBUG)
         true
@@ -874,6 +888,7 @@ void LoadSettings(VulkanSurfaceContext& context)
     context.shadowQuality = context.savedGraphics.shadowQuality;
     context.graphicsPreviewFrameCap = context.savedGraphics.previewFrameCap;
     context.requestedGlassEnabled = context.savedGraphics.glassEnabled;
+    context.requestedMistEnabled = context.savedGraphics.mistEnabled;
 }
 
 #if defined(_DEBUG)
@@ -1759,12 +1774,14 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
         SetWindowTextA(shadow, (std::string("SHADOW: ") + GraphicsShadowName(graphicsDraft.shadowQuality)).c_str());
     if (HWND glass = GetDlgItem(context.windowHandle, kGraphicsGlassButtonId))
         SetWindowTextA(glass, graphicsDraft.glassEnabled ? "GLASS: ON" : "GLASS: OFF");
+    if (HWND mist = GetDlgItem(context.windowHandle, kGraphicsMistButtonId))
+        SetWindowTextA(mist, graphicsDraft.mistEnabled ? "MIST: ON" : "MIST: OFF");
     if (context.graphicsVisible)
     {
         const auto state = context.graphicsEdit->State();
         const bool editable = !context.graphicsSceneRestoring && (state == horde::graphics::GraphicsEditState::Editing ||
             state == horde::graphics::GraphicsEditState::Committed || state == horde::graphics::GraphicsEditState::Failed);
-        for (const int id : {kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kWaterQualityButtonId,
+        for (const int id : {kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsMistButtonId, kWaterQualityButtonId,
                              kRenderScaleSliderId, kGraphicsApplyButtonId, kGraphicsResetButtonId})
             EnableWindow(GetDlgItem(context.windowHandle, id), editable);
         EnableWindow(GetDlgItem(context.windowHandle, kGraphicsConfirmButtonId),
@@ -1781,6 +1798,7 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
             << "  |  glass " << (context.rtScene.IsReady() && context.rtScene.GlassEnabled() ? "On" : "Off")
             << "\r\nUploaded fire: " << GraphicsFireName(UploadedGraphicsFireDetail(context))
             << "  |  shadows: " << GraphicsShadowName(UploadedGraphicsShadowQuality(context))
+            << "  |  mist: " << (context.rtScene.UploadedMistEnabled().has_value() ? (*context.rtScene.UploadedMistEnabled() ? "On" : "Off") : "unavailable")
             << "\r\n" << (mobileOptics ?
                  "Mobile optical build remains fixed; Glass Off removes all pane geometry." :
                  "High optical build: physical panes retained; profile is fixed by this build.")
@@ -2025,7 +2043,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle, kSettingsTitleId, context.settingsVisible);
     SetControlVisible(context.windowHandle, kSettingsBackButtonId, context.settingsVisible);
     for (const int id : {kWaterQualityButtonId, kRenderScaleLabelId, kRenderScaleSliderId,
-                         kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsApplyButtonId,
+                         kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsMistButtonId, kGraphicsApplyButtonId,
                          kGraphicsConfirmButtonId, kGraphicsRevertButtonId, kGraphicsResetButtonId, kGraphicsInfoId,
                          kGraphicsPreviewPauseId, kGraphicsPreviewCameraId, kGraphicsPreviewMotionId,
                          kGraphicsPreviewResetId, kGraphicsPreviewTelemetryId, kGraphicsPreviewGraphId})
@@ -2135,7 +2153,8 @@ horde::graphics::GraphicsSettings CurrentGraphicsSettings(const VulkanSurfaceCon
     return {static_cast<int>(std::lround(context.appliedRenderScale * 100.0f)),
         static_cast<horde::graphics::WaterQuality>(context.waterQuality), UploadedGraphicsFireDetail(context),
         context.graphicsPreviewFrameCap, context.rtScene.IsReady() && context.rtScene.GlassEnabled(),
-        UploadedGraphicsShadowQuality(context)};
+        UploadedGraphicsShadowQuality(context), horde::telemetry::CurrentCompletedMistEnabled(
+            context.rtFrameEvidence.PublishedStateByValue()).value_or(true)};
 }
 
 horde::graphics::GraphicsAppliedSnapshot GraphicsSnapshot(
@@ -2201,6 +2220,7 @@ bool QueueGraphicsCommand(VulkanSurfaceContext& context,
     context.shadowQuality = command->requested.shadowQuality;
     context.graphicsPreviewFrameCap = command->requested.previewFrameCap;
     context.requestedGlassEnabled = command->requested.glassEnabled;
+    context.requestedMistEnabled = command->requested.mistEnabled;
     context.glassGeometryDirty = !context.rtScene.IsReady() ||
         context.requestedGlassEnabled != context.rtScene.GlassEnabled();
     context.renderScaleDirty = std::abs(context.renderScale - context.appliedRenderScale) > 0.001f;
@@ -2226,8 +2246,11 @@ void FinishGraphicsFrame(VulkanSurfaceContext& context, const bool rtPresented)
     if (context.graphicsSceneRestoring && currentResourcesPresented &&
         context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::Showcase)
     { CloseGraphicsPage(context); return; }
+    const auto completedMist = horde::telemetry::CurrentCompletedMistEnabled(context.rtFrameEvidence.PublishedStateByValue());
     if (context.graphicsCommand && currentResourcesPresented && context.rtScene.IsReady() &&
-        context.rtScene.HasUploadedQualityControls() &&
+        completedMist && completedMist == context.rtScene.UploadedMistEnabled() &&
+        *completedMist == context.requestedMistEnabled &&
+        context.rtScene.HasUploadedQualityControls() && context.rtScene.UploadedMistEnabled().has_value() &&
         !context.renderScaleDirty && !context.sceneProfileDirty && !context.glassGeometryDirty)
     {
         auto snapshot = GraphicsSnapshot(context, *context.graphicsCommand);
@@ -3140,7 +3163,7 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
         kExitButtonId, kSensitivityButtonId, kWaterQualityButtonId,
         kRenderScaleSliderId, kSfxVolumeSliderId, kMusicVolumeSliderId,
         kFullscreenButtonId, kSettingsBackButtonId,
-        kGraphicsOpenButtonId, kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId,
+        kGraphicsOpenButtonId, kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsMistButtonId,
         kGraphicsApplyButtonId, kGraphicsConfirmButtonId, kGraphicsRevertButtonId, kGraphicsResetButtonId,
         kGraphicsPreviewPauseId, kGraphicsPreviewCameraId, kGraphicsPreviewMotionId, kGraphicsPreviewResetId,
         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkReviewStatsButtonId, kBenchmarkBackButtonId,
@@ -4693,6 +4716,7 @@ bool ApplyPendingSceneReplacement(VulkanSurfaceContext& context,
         context.shadowQuality = previousSettings.shadowQuality;
         context.graphicsPreviewFrameCap = previousSettings.previewFrameCap;
         context.requestedGlassEnabled = previousSettings.glassEnabled;
+        context.requestedMistEnabled = previousSettings.mistEnabled;
         if (!InitialiseRtSceneForSwapchain(context, false)) return false;
         if (context.graphicsCommand && context.graphicsEdit)
         {
@@ -4789,6 +4813,7 @@ bool ApplyPendingOutputResize(VulkanSurfaceContext& context,
                     context.shadowQuality = context.graphicsBeforeApply.shadowQuality;
                     context.graphicsPreviewFrameCap = context.graphicsBeforeApply.previewFrameCap;
                     context.requestedGlassEnabled = context.graphicsBeforeApply.glassEnabled;
+                    context.requestedMistEnabled = context.graphicsBeforeApply.mistEnabled;
                     auto failure = GraphicsSnapshot(context, *context.graphicsCommand);
                     failure.reasons = horde::graphics::GraphicsReason::ResourceFailure;
                     context.graphicsEdit->Acknowledge(failure, false);
@@ -4993,6 +5018,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                 horde::vulkan::raytracing::ResolveFireEmitterQuality(ctx.fireDetail));
         }
         frameInputs.shadowQuality = ctx.shadowQuality;
+        ctx.rtScene.SetMistEnabled(ctx.requestedMistEnabled);
 #if defined(_DEBUG)
         // The separately named Max motion diagnostic preserves its explicit
         // legacy whole-workload policy. Ordinary Graphics/RT Lab do not opt in.
@@ -5597,6 +5623,9 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                        horde::vulkan::DeviceCapabilities& capabilities,
                        const std::filesystem::path& outputDirectory)
 {
+    // The finite validation flag overrides saved Mist only for this process.
+    // Ordinary captures retain historical Mist On; each frame uploads the choice.
+    context.requestedMistEnabled = !ParseCaptureLaunchOptions().mistOff;
     std::error_code directoryError;
     std::filesystem::create_directories(outputDirectory, directoryError);
     if (directoryError)
@@ -5725,7 +5754,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             completedFrame.presentation.outcome != horde::telemetry::RtPresentationOutcome::Presented ||
             completedIdentity.submissionSerial !=
                 completedFrame.presentation.lastSuccessfulPresentSubmissionSerial ||
-            !completedFrame.scene.fireLighting.has_value())
+            !completedFrame.scene.fireLighting.has_value() ||
+            completedFrame.scene.actualUploadedMistEnabled != std::optional<bool>{context.requestedMistEnabled})
             return fail(std::string("Checkpoint '") + checkpoint.name +
                         "' lacks current completed presentation and uploaded-fire evidence.");
         std::string completedFrameJson;
@@ -6488,7 +6518,7 @@ void ApplyDpiScaledFonts(HWND window)
                          kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
                          kRenderScaleSliderId, kMusicVolumeLabelId, kMusicVolumeSliderId,
                          kFullscreenButtonId, kSettingsBackButtonId,
-                         kGraphicsOpenButtonId, kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId,
+                         kGraphicsOpenButtonId, kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsMistButtonId,
                          kGraphicsApplyButtonId, kGraphicsConfirmButtonId, kGraphicsRevertButtonId,
                          kGraphicsResetButtonId, kGraphicsInfoId,
                          kGraphicsPreviewPauseId, kGraphicsPreviewCameraId, kGraphicsPreviewMotionId,
@@ -6728,8 +6758,9 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         MoveWindow(GetDlgItem(window, kGraphicsInfoId), graphicsX, y, graphicsWidth, infoHeight, TRUE);
         y += infoHeight + gap;
         const int glassWidth = ScaleForDpi(window, 110);
-        MoveWindow(GetDlgItem(window, kGraphicsPresetButtonId), graphicsX, y, graphicsWidth - glassWidth - gap, compactHeight, TRUE);
-        MoveWindow(GetDlgItem(window, kGraphicsGlassButtonId), graphicsX + graphicsWidth - glassWidth, y, glassWidth, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsPresetButtonId), graphicsX, y, graphicsWidth - glassWidth * 2 - gap * 2, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsGlassButtonId), graphicsX + graphicsWidth - glassWidth * 2 - gap, y, glassWidth, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsMistButtonId), graphicsX + graphicsWidth - glassWidth, y, glassWidth, compactHeight, TRUE);
         y += compactHeight + gap;
         MoveWindow(GetDlgItem(window, kRenderScaleLabelId), graphicsX, y, graphicsWidth, labelHeight, TRUE);
         y += labelHeight;
@@ -7349,6 +7380,15 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     UpdateSettingsLabels(*sceneContext);
                 }
                 return 0;
+            case kGraphicsMistButtonId:
+                if (sceneContext->graphicsEdit)
+                {
+                    auto draft = sceneContext->graphicsEdit->Draft();
+                    draft.mistEnabled = !draft.mistEnabled;
+                    sceneContext->graphicsEdit->Stage(draft);
+                    UpdateSettingsLabels(*sceneContext);
+                }
+                return 0;
             case kGraphicsApplyButtonId:
                 if (sceneContext->graphicsEdit)
                     (void)QueueGraphicsCommand(*sceneContext, sceneContext->graphicsEdit->RequestApply(1u));
@@ -7376,7 +7416,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 if (sceneContext->graphicsEdit)
                 {
                     sceneContext->graphicsEdit->ResetDraft(horde::graphics::GraphicsPlatform::Windows);
-                    sceneContext->graphicsStatus = "Accepted 1.6.1 baseline staged. Apply to compare; saved settings stay unchanged.";
+                    sceneContext->graphicsStatus = "Platform defaults staged. Use and Keep to save; saved settings stay unchanged.";
                     UpdateSettingsLabels(*sceneContext);
                 }
                 return 0;
@@ -8258,10 +8298,11 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kGraphicsFireButtonId, "FIRE DETAIL: HIGH");
     createButton(kGraphicsShadowButtonId, "SHADOW: CURRENT");
     createButton(kGraphicsGlassButtonId, "GLASS: ON");
+    createButton(kGraphicsMistButtonId, "MIST: ON");
     createButton(kGraphicsApplyButtonId, "APPLY");
     createButton(kGraphicsConfirmButtonId, "KEEP (15 SECONDS)");
     createButton(kGraphicsRevertButtonId, "REVERT");
-    createButton(kGraphicsResetButtonId, "RESET GRAPHICS DRAFT");
+    createButton(kGraphicsResetButtonId, "DEFAULTS (DRAFT)");
     createStatic(kGraphicsInfoId, "Cost: not yet measured for this candidate.", SS_LEFT);
     createButton(kGraphicsPreviewPauseId, "PAUSE PREVIEW");
     createButton(kGraphicsPreviewCameraId, "VIEW: OVERVIEW");

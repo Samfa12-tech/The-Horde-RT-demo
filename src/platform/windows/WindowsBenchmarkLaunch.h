@@ -142,10 +142,10 @@ inline std::string BuildWindowsBenchmarkTuningJson(
     const auto validUpload = [](
         const std::optional<horde::vulkan::raytracing::RtQualityControlsGpu>& upload,
         const horde::vulkan::raytracing::RtWorkloadPreset preset, const std::string_view quality) {
-        if (!upload || (quality != "High" && quality != "Mobile") || upload->controls[0] > 3u) return false;
+        if (!upload || (quality != "High" && quality != "Mobile") || upload->controls[0] > 3u || upload->controls[3] > 1u) return false;
         std::optional<horde::graphics::ShadowQuality> shadow;
         if (upload->controls[0] < 3u) shadow = static_cast<horde::graphics::ShadowQuality>(upload->controls[0]);
-        const auto expected = horde::vulkan::raytracing::ResolveRtQualityControls(shadow, preset, quality == "High");
+        const auto expected = horde::vulkan::raytracing::ResolveRtQualityControls(shadow, preset, quality == "High", upload->controls[3] == 0u);
         return expected && expected->controls == upload->controls;
     };
     const bool startUploadValid = validUpload(uploadedAtStart, effectiveAtStart, compiledQualityAtStart);
@@ -177,6 +177,7 @@ inline std::string BuildWindowsBenchmarkTuningJson(
         ",\"primaryAreaShadowSamplesPerContributingReceiver\":" + std::to_string(samples) +
         ",\"sampleDomain\":\"contributing-primary-local-and-fire-area-lights\",\"primarySkyVisibilitySamples\":" +
         std::to_string(skySamples) +
+        (endUploadValid ? ",\"actualUploadedMistEnabled\":" + std::string(uploadedAtEnd->controls[3] == 0u ? "true" : "false") : "") +
         ",\"secondaryAreaShadowSamples\":1,\"sampleCountMeaning\":\"compiled-physical-policy-not-dynamic-query-counts\","
         "\"costMeaning\":\"whole-rt-workload-preset-not-isolated-shadow-cost\"}";
 }

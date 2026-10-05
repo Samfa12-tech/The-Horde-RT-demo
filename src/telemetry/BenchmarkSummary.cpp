@@ -21,7 +21,9 @@ bool SameConfiguration(const BenchmarkSummaryConfiguration& a, const BenchmarkSu
     const auto& y = b.metadata;
     return a.platform == b.platform && a.water == b.water && a.dielectric == b.dielectric &&
         a.fire == b.fire && a.shadowQuality == b.shadowQuality &&
-        a.uploadedFireQuality == b.uploadedFireQuality && a.glassEnabled == b.glassEnabled && a.sceneEpoch == b.sceneEpoch &&
+        a.uploadedFireQuality == b.uploadedFireQuality &&
+        a.actualUploadedMistEnabled == b.actualUploadedMistEnabled &&
+        a.glassEnabled == b.glassEnabled && a.sceneEpoch == b.sceneEpoch &&
         a.measurementGeneration == b.measurementGeneration && x.buildIdentity == y.buildIdentity &&
         x.shaderIdentity == y.shaderIdentity && x.executionBackend == y.executionBackend &&
         x.gpuName == y.gpuName && x.vulkanApi == y.vulkanApi &&
@@ -168,6 +170,7 @@ FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBe
             row.disposition != RtExpectedFrameDisposition::Completed || !row.cpuAccepted || !row.hasGpuStatus ||
             row.presentationOutcome != RtPresentationOutcome::Presented ||
             row.shadowQuality != completion.shadowQuality || row.fireQuality != completion.uploadedFireQuality ||
+            row.actualUploadedMistEnabled != completion.actualUploadedMistEnabled ||
             !std::isfinite(frame.frameTimeMs) || frame.frameTimeMs <= 0.0)
         { result.status_ = BenchmarkSummaryStatus::MismatchedPopulation; return result; }
     }
@@ -179,6 +182,7 @@ FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBe
     data.configuration.fire = completion.fire;
     data.configuration.shadowQuality = completion.shadowQuality;
     data.configuration.uploadedFireQuality = completion.uploadedFireQuality;
+    data.configuration.actualUploadedMistEnabled = completion.actualUploadedMistEnabled;
     data.configuration.glassEnabled = completion.glassEnabled;
     data.configuration.sceneEpoch = completion.sceneEpoch;
     data.configuration.measurementGeneration = completion.measurementGeneration;

@@ -201,10 +201,10 @@ void TestGlassMigrationAndTransactions()
         Check(session.Stage(off), "Off can be staged after restore");
         const auto kept = session.RequestApply(10u);
         Check(kept && session.Acknowledge(Presented(*kept), true) && session.Confirm() &&
-              !session.Persistence().confirmed.glassEnabled && session.Persistence().schema == 3u,
-              "explicit Keep persists Off in schema3 only after current presentation");
-        Check(session.ResetDraft(platform) && session.Draft().glassEnabled && !session.Committed().glassEnabled,
-              "Reset restores On as draft without rewriting confirmed Off");
+              !session.Persistence().confirmed.glassEnabled && session.Persistence().schema == 4u,
+              "explicit Keep persists Off in schema4 only after current presentation");
+        Check(session.ResetDraft(platform) && session.Draft() == PlatformDefaultGraphicsSettings(platform) && !session.Committed().glassEnabled,
+              "Reset stages platform defaults without rewriting confirmed Off");
     }
 }
 void TestIndependentShadowAndLowFire()
@@ -257,6 +257,63 @@ void TestIndependentShadowAndLowFire()
     Check(!ValidGraphicsSettings(draft), "unknown shadow settings rejected before JNI/persistence admission");
 }
 
+void TestPlatformDefaultsAndMist()
+{
+    const auto mobile = PlatformDefaultGraphicsSettings(GraphicsPlatform::Android);
+    const auto desktop = PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows);
+    Check(mobile == GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false, ShadowQuality::Current, true},
+          "fresh mobile platform defaults are explicit50/Mobile/Mobile/30/Off/Current/On");
+    Check(desktop == GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true, ShadowQuality::Current, true},
+          "fresh desktop platform defaults preserve High appearance with MistOn");
+    Check(MatchGraphicsPreset(mobile, GraphicsPlatform::Android) == GraphicsPreset::PlatformDefault &&
+          GraphicsPresetName(GraphicsPreset::PlatformDefault) == "Platform defaults" &&
+          MatchGraphicsPreset(desktop, GraphicsPlatform::Windows) == GraphicsPreset::AcceptedBaseline,
+          "mobile defaults have a truthful preset label; identical desktop historical baseline retains its accepted label");
+    Check(BaselineGraphicsSettings(GraphicsPlatform::Android) == GraphicsSettings{} &&
+          BaselineGraphicsSettings(GraphicsPlatform::Android).renderScalePercent == 75 &&
+          BaselineGraphicsSettings(GraphicsPlatform::Android).glassEnabled,
+          "accepted historical mobile baseline remains75/GlassOn independently of fresh defaults");
+    for (const auto schema : {1u, 2u, 3u})
+    {
+        auto legacy = GraphicsSettings{63, WaterQuality::Off, FireDetail::High, 42, false, ShadowQuality::Higher, false};
+        const auto migrated = RecoverGraphicsSettings({schema, legacy, legacy}, GraphicsPlatform::Android);
+        Check(migrated.startup.renderScalePercent == 63 && migrated.startup.waterQuality == WaterQuality::Off &&
+              migrated.startup.fireDetail == FireDetail::High && migrated.startup.previewFrameCap == 42 &&
+              migrated.startup.glassEnabled == (schema == 1u) && migrated.startup.mistEnabled &&
+              migrated.startup.shadowQuality == (schema < 3u ? ShadowQuality::Current : ShadowQuality::Higher) &&
+              migrated.retainedRequested && migrated.retainedRequested->mistEnabled,
+              "schemas1/2/3 preserve historical tuple and pending intent while migrating only MistOn");
+    }
+    auto off = mobile; off.mistEnabled = false;
+    const auto migrated = RecoverGraphicsSettings({4u, off, mobile}, GraphicsPlatform::Android);
+    Check(migrated.startup == off && migrated.retainedRequested == mobile,
+          "schema4 preserves independently saved Off and interrupted On candidate");
+    GraphicsEditSession edit(off);
+    Check(edit.ResetDraft(GraphicsPlatform::Android) && edit.Draft() == mobile && edit.Committed() == off &&
+          !edit.Persistence().pending, "Reset stages defaults; it does not save or issue native work");
+    const auto apply = edit.RequestApply(10u);
+    if (apply)
+    {
+        auto old = Presented(*apply); old.effective.mistEnabled = false;
+        Check(!edit.Acknowledge(old, true) && !edit.Confirm(), "old Off frame cannot acknowledge requested MistOn");
+        Check(edit.Persistence().pending == mobile && edit.Committed() == off,
+              "pending Reset intent preserves last saved Off until current presented ACK and Keep");
+        Check(edit.Acknowledge(Presented(*apply), true) && edit.Committed() == off && edit.Confirm() &&
+              edit.Committed() == mobile && !edit.Persistence().pending, "only current exact MistOn presentation and Keep saves Reset");
+    }
+    using namespace horde::vulkan::raytracing;
+    for (const bool high : {false, true})
+        for (const auto shadow : {ShadowQuality::Lower, ShadowQuality::Current, ShadowQuality::Higher})
+            for (const auto workload : {RtWorkloadPreset::Lean, RtWorkloadPreset::Authored, RtWorkloadPreset::Max})
+            {
+                const auto on = ResolveRtQualityControls(shadow, workload, high);
+                const auto offPolicy = ResolveRtQualityControls(shadow, workload, high, false);
+                Check(on && offPolicy && on->controls[3] == 0u && offPolicy->controls[3] == 1u &&
+                      on->controls[0] == offPolicy->controls[0] && on->controls[1] == offPolicy->controls[1] &&
+                      on->controls[2] == offPolicy->controls[2], "Mist flag changes onlyw; all independent shadow budgets remain exact");
+            }
+}
+
 void TestCoherentPublication()
 {
     GraphicsMailbox<GraphicsAppliedSnapshot> mailbox;
@@ -289,6 +346,6 @@ void TestCoherentPublication()
 int main()
 {
     TestMigrationAndProfiles(); TestResolutionAndEffectiveValues(); TestApplyConfirmAndCancel();
-    TestFailureDeadlineAndRecovery(); TestEffectiveAcknowledgement(); TestGlassMigrationAndTransactions(); TestIndependentShadowAndLowFire(); TestCoherentPublication();
+    TestFailureDeadlineAndRecovery(); TestEffectiveAcknowledgement(); TestGlassMigrationAndTransactions(); TestIndependentShadowAndLowFire(); TestPlatformDefaultsAndMist(); TestCoherentPublication();
     return passed ? 0 : 1;
 }
