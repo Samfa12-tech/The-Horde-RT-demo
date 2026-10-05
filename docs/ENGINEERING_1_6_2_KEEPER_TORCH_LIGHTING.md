@@ -85,19 +85,30 @@ All16 published Pipeline/Compute modules and the two compatibility modules pass 
 The [candidate record](ENGINEERING_1_6_2_REVIEW_CANDIDATE.md#keeper-lighting-artifacts-and-evidence-5-october) pins both85-file Windows packages and all three four-ABI Android packages. Actual selected PE/ARM64 modules pass SDK admission; Shipping has no diagnostic atomics or binding22. Both Windows backends pass13 static captures with synchronization validation and no error markers. Admission receipt `9da9e01ca4721e7d0cdab16490d9d0902f849e0b7ab59fa2d3b612d47438cb1e` joins all26 PNGs to actual last-presented completed fire records.
 
 Both Debug50 phone backends pass13 route waypoints, seven captures and strict Home/Resume on SM-S948B/Android16. Admission receipt `11ce90149829db6943dc7c1a3e9e5c7bd8531623d4c044b39042bb40cd1a3d58` joins all14 PNG/state pairs, selected shaders, combat IDs3/4 and physical24/BLAS19 ownership. Fresh postflight raw APK pullbacks match Debugbd37 and saved1420-byte preferences remain identical. These checks establish development correctness, not Shipping cost or owner motion acceptance.
-Require actual reveal/fight/death/reward captures joining completed IDs3/4,
-including unlit dormant/reset and possible reward-lantern overlap before death
-completion. Review the new scene's appearance with the owner when available and
-measure matched ordinary Shipping phone cost/thermals. Do not carry earlier
-mist cost forward as this scene's cost.
+Four new owner-focused Windows runs on the exact current Debug5a executable pass
+both genuine RT backends: seven first-entry and28 retry/reward captures per
+backend,70 total, with synchronization validation and zero error markers.
+Admission `9b89b796f1b9d4723c62d5c3434aa8e076ec70e9688ba58289ffd1ab95eb407e` joins2,627 actual owning frames to simulation ticks, dense
+uploaded light IDs, fixed shared socket positions and image hashes. Flanks3/4
+ignite on the first reveal snapshot, remain during combat and all recorded
+death-clip frames, then disappear at the clamped2.967-second completion.
+Reward-lantern records remain distinct. The owner explicitly approves the
+reveal/combat/death/extinguish/chest lighting sequence after these four windows.
+The runs are muted and contain milestone readbacks; they establish neither
+audio nor sustained performance acceptance. Maximum observed active fire count
+is2; four simultaneous real lights and earlier-than-harness reward interaction
+remain unproved. Earlier mist cost is not reused for this scene.
 
 The [ordinary Shipping phone comparison](ENGINEERING_1_6_2_KEEPER_TORCH_COST.md)
 now retains four complete native reports, with a qualified A2 host-observer gap.
 Pooled hot-phone RT cost increases62.4 to72.1ms; the101-frame finale subset
 increases61.9 to129.9ms. These descriptive results cross the investigation
 threshold and leave the cost tradeoff open. No quality is silently reduced.
-Positive live-phone torch appearance feedback does not close that gate or the
-reveal/death motion review.
+Owner motion approval closes the lighting-sequence appearance gate; the cost
+tradeoff remains open. The separate mirror-versus-stone experiment keeps
+Current transport, geometry, lights and settings fixed. Owner preference keeps
+the mirror on desktop and high graphics choices, regardless of phone cost;
+only a lower-cost mobile choice may be considered from measured evidence.
 
 Audio/haptic manual revalidation for this lighting slice: **NO**; no cue asset,
 semantic event or feedback timing changes. Earlier Windows listening gates

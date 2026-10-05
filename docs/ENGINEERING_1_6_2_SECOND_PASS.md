@@ -259,3 +259,20 @@ A2 already had a running/retained case when a fresh invocation was attempted; th
 All four isolated Shipping75 courses complete and admit1,838 actual owning rows each, with mode/word, submission/completion, presentation and unchanged fire/shadow controls. Raw integer GPU means reproduce serialized statistics. Current/Lower pooled62.107672/61.934068ms differs0.173603ms,0.28%, with thermal headers3 versus2 and final Current A2 faster than either Lower run. Admission `ab968affb690b89282a96d0226eaf8cc121c7c1efd1868e836a478bf542b02a1`. Decision DEFER adoption; no useful benefit or causal saving established. Prototype excludes newer Keeper lights, removes radiance and lacks owner/motion/all-water/final-scene acceptance. No new Lower cohort or ordinary runtime/budget change follows. Exact source-only inactive backup preserves35 files with raw ZIP and normalized Git2bd patch roundtrips; copied-basis raw hash differences and initial archive failures remain explicit. Original Debug preferences remain identical and main Benchmark is restored after collection.
 
 Owner separately authorizes one bounded mirror-to-ordinary-stone comparison, following the torch cost hypothesis. Permanent removal is not authorized. Use the current Keeper scene with unchanged geometry/coverage, torches, camera, route, other materials and build settings; do not stack Lower. Source inspection identifies the final-room two-triangle mirror's material code8, distinct from the two earlier mirrors. Ordinary DryStone code0 uses authored ORM/normal material transport, replacing the forced0.95 mirror and its special reflection gain; its shared diffuse/specular secondary paths remain genuine RT, so zero-secondary/query savings must not be assumed. The experiment must prove actual authored material change and matched coverage/presentation, then collect appearance and whole-frame/GPU timing with thermal qualifications. If it needs broader renderer/material controls, report before expanding. Bundled owner Keeper motion review waits for a safe measured-run boundary.
+
+### October5 - Keeper owner motion approved, mirror retention constraint
+
+Four actual visible Default-desktop runs on current Debug5a pass Pipeline and
+RayQueryCompute first-entry/retry/reward:70 PNGs,2,627 owning frames, zero SYNC
+markers. Admission `9b89b796f1b9d4723c62d5c3434aa8e076ec70e9688ba58289ffd1ab95eb407e` joins every completed fire record to the
+actual snapshot: flanks3/4 lit from reveal through the clamped death clip,
+extinguished afterward; reward light separately owned. Owner approves this
+lighting sequence. Maximum observed fire count2; early reward overlap/full4 and
+Windows listening remain distinct gaps. No audio starts in these runs.
+
+Owner says50% looks fine on the phone; defaults and matched75 measurements are
+unchanged. Stone comparison still appearance works, but mirror is preferred.
+Desktop and high graphics must retain the mirror regardless of phone cost.
+Current transport remains ordinary; no permanent mirror removal or new
+upscaler/33% work follows. A bounded lower-cost mobile choice depends on the
+separate exact material comparison and owner/reviewer tradeoff decision.
