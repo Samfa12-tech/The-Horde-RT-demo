@@ -145,7 +145,13 @@ The inspected 1.6.2 baseline has Walk and Idle only; its clip manifest explicitl
 | Left and right strafe | No clearly named neutral upright pair found in the Meshy review; relevant Quaternius directional sets are paid | Keep as a gap for a free-source search or Blender production. Do not relabel diagonal running as strafing. |
 | Stops and direction changes | Meshy run-to-walk and turn candidates; Blender transition work | Define a small initial direction set and test blends before adding diagonals. |
 
-Player rope candidates such as Climb_Up_Rope 449, Rope_Hang_Idle 477 and Swing_on_Rope_to_Ground 494 are catalog references only. They still need the real grip, climb, crest and equipment contract. Kit does not need a rope-use animation under the current staging. [1,9,16]
+Player rope candidates such as Climb_Up_Rope 449, Rope_Hang_Idle 477 and Swing_on_Rope_to_Ground 494 are catalog references only. They do not prove a safe descent/landing or the real grip, climb, crest and equipment contract. Kit does not need a rope-use animation under the current staging. [1,9,16]
+
+**Locked player transition direction, 5 October 2026:** Stow **both sword and lantern** on visible, safe carry attachments before either hand grips; both hands are free for the rope. Exact hip/back placement remains prototype work on the actual rig. The lantern remains owned, physically present and lit, with its emitter moving with the prop and coherent shadows/reflections/transmission; never leave a phantom hand light or duplicate/drop/delete gear. Restore the prior valid held-item configuration only when grounded, retaining the first reunion's lowered-lantern/fresh-raise rule.
+
+Author real-height ascent, alternating grips and pull-up/mantle to reveal the Keeper gravestone moved aside after defeat. Author return rim entry, descent and lower landing separately rather than reversing an arbitrary candidate clip. Fit the accepted tomb and F01 rescue geometry; dimensions remain unmeasured. Use stable, modest limited-look framing and reduced-motion support, with real shaft occlusion instead of a forced camera tour. The current 4–7 second ascent target is not an I/O guarantee or a reason to loop/stall animation.
+
+The [master §§4.3–5 contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#43-rescue-and-rope) owns early destination preparation, readiness before commitment, resident shared transition geometry, no normal loading screen in either direction and safe failure recovery. Test pause/orientation/resume, pre-commit cancellation, interrupted ascent/descent checkpoints, gear/light continuity and persistent boss/loot/gravestone/dialogue state. If Kit does not accompany the return, use a bounded safe exterior wait; no Kit climb or dungeon-companion mechanic is added. This remains unimplemented 1.7 planning with no new clip purchase or generation authorization.
 
 ## Sources and verification
 

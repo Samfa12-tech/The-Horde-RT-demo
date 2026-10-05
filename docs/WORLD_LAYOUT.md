@@ -4,7 +4,7 @@
 
 The owner approved the overhead concept titled **The Horde — Proposed World Layout**. Its printed “Proposed” and “Concept for review” labels describe the image's creation stage; the topology is now approved. The artwork is **not to scale**. Exact distances, traversal times, slopes, building footprints, collision and camera compositions must be established through playable blockout testing. Do not treat illustrative perspective or decorative details as measured level geometry.
 
-This is a connected regional plan delivered through bounded areas and measured zone/residency transitions. Prefer seamless player-perceived continuity, using an explicit loading fallback only after owner review of measured constraints. This does not promise a general seamless open-world system or require every visible region to be resident and explorable at once. The [shared six-gate outdoor readiness contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#131-six-gate-outdoor-readiness-contract) owns cheap hero-view/terrain/town blockout, combined workload, real 3D LODs, separate RT relevance/residency and measured budgets, then 1.8's arrival-to-tavern proof before expansion. Exact distant-landmark visibility remains a blockout/review decision; this consolidation adds no new geography.
+This is a connected regional plan delivered through bounded areas and measured zone/residency transitions. Prefer seamless player-perceived continuity. The 1.7 rope route is now specifically locked to no normal loading screen in either direction; explicit loading/recovery presentation is failure/emergency-only there. Other regional loading compromises still need owner review of measured constraints. This does not promise a general seamless open-world system or require every visible region to be resident and explorable at once. The [shared six-gate outdoor readiness contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#131-six-gate-outdoor-readiness-contract) owns cheap hero-view/terrain/town blockout, combined workload, real 3D LODs, separate RT relevance/residency and measured budgets, then 1.8's arrival-to-tavern proof before expansion. Exact distant-landmark visibility remains a blockout/review decision; this consolidation adds no new geography.
 
 ![The Horde - approved world layout, not to scale](design/world/the-horde-world-layout.png)
 
@@ -69,6 +69,14 @@ The drawn broken bridge is an access landmark, not approval of final span dimens
 - Measure the shell together with forest, fog, Kit and lantern; simplified real geometry must preserve relevant visibility, shadows and reflections under the existing RT contracts
 
 The earlier 40–80 m trail figure remains an initial blockout target, not an exact distance approved by this map. Choose traversal length and sightlines through playable testing.
+
+### Locked rope boundary — 5 October 2026
+
+At the connected forest map's F01 rescue point, defeating the Keeper moves its gravestone clear of the separate finale/rescue exit. The ascent ends with a real pull-up onto the forest path, showing the displaced stone. Match shaft, rim, anchor, stone travel and safe landing to the accepted tomb; exact dimensions and poses remain blockout work. Preserve all four earlier openings below.
+
+The rope hides a bounded zone transition in both directions, with forest preparation beginning during reward/approach and tomb preparation on the return approach. Interact to climb down; readiness gates commitment before traversal. Keep the shared upper room/shaft/rope/rim/gravestone/immediate clearing resident and retain all permitted view, reflection/transmission and shadow contributors until retirement is GPU-safe. Both full zones need not remain resident. Both sword and lantern are visibly stowed for two free hands; light follows the physical lantern. Restore equipment only at the grounded landing and preserve victory, loot, moved stone, dialogue and checkpoints. Kit can wait outside; no dungeon-companion behavior is added.
+
+See the [master transition and recovery contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#43-rescue-and-rope) for authored ascent/descent, limited-look/reduced-motion comfort, no normal loading screen, truthful failure handling and phone/Windows memory/performance gates. This is unimplemented 1.7 planning, not a 1.6.2 addition.
 
 ### 1.8 — Extend the road and activate the hub
 
