@@ -51,9 +51,11 @@ struct DevelopmentCheckpoint
     float rewardTorsionAngleRadians = 0.0f;
     float rewardTorsionAngularVelocity = 0.0f;
     bool stagesUnlockedChest = false;
+    // Capture framing only; dedicated modelled primary ownership stays mandatory.
+    bool primaryArmsMayBeOutsideFrame = false;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 52u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 53u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -196,6 +198,17 @@ inline constexpr std::array<DevelopmentCheckpoint, 52u> kDevelopmentCheckpoints{
     {149, "layout-a-waterfall-own-hole", 2, -1.15f, -15.20f, -1.57079632679f, 0.28f},
     {150, "layout-b-large-skylight", 2, -6.50f, -15.20f, 1.57079632679f, 0.28f},
     {151, "layout-e-finale-opening", 11, -35.30f, -15.20f, 1.57079632679f, 0.28f},
+    // C147's authored state, with a radius-safe nearer approach and maximum
+    // legal upward pitch. This admits a partial upper/lintel enclosure view;
+    // the 4.10 m rim remains beyond the production camera's vertical FOV.
+    {.id = 152,
+     .name = "layout-c-wall-panel-upward",
+     .baseShowcaseCheckpointId = 2,
+     .cameraX = 2.55f,
+     .cameraZ = -9.45f,
+     .yaw = 3.14159265359f,
+     .pitch = 0.28f,
+     .primaryArmsMayBeOutsideFrame = true},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)

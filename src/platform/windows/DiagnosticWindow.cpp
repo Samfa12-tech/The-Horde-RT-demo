@@ -275,6 +275,7 @@ struct ShowcaseCaptureRecord
                horde::vulkan::raytracing::PresentableTinyRtScene::kTlasInstanceCount>
         instanceMasks{};
     bool playerPrimaryVisible = false;
+    bool primaryArmsMayBeOutsideFrame = false;
     std::uint32_t playerWorldBodyInstanceFlags = 0u;
     std::uint32_t primaryTorchPixels = 0u;
     std::uint32_t primarySwordPixels = 0u;
@@ -5527,6 +5528,8 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "      \"honestlyPresentedRtFrame\": true,\n"
                  << "      \"visibility\": {\"playerPrimaryVisible\": "
                  << (capture.playerPrimaryVisible ? "true" : "false")
+                 << ", \"primaryArmsMayBeOutsideFrame\": "
+                 << (capture.primaryArmsMayBeOutsideFrame ? "true" : "false")
                  << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
                  << ", \"instanceMasks\": [";
         for (std::size_t mask = 0u; mask < capture.instanceMasks.size(); ++mask)
@@ -5753,6 +5756,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.frameTimesMs = std::move(frameTimesMs);
         const auto* development = horde::gameplay::FindDevelopmentCheckpoint(
             context.developmentCheckpoint);
+        record.primaryArmsMayBeOutsideFrame = development != nullptr &&
+            development->primaryArmsMayBeOutsideFrame;
         const bool simulationRewardClaimed =
             simulation.interaction.heldLightKind ==
                 horde::gameplay::interactions::HeldLightKind::RewardLantern;
@@ -5772,9 +5777,10 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         const bool dedicatedPlayerOwnership = horde::vulkan::raytracing::HasDedicatedPlayerPrimaryOwnership(
             record.instanceMasks, record.playerWorldBodyInstanceFlags);
         if (viewmodelCapture && !inspectionCapture &&
-            (!dedicatedPlayerOwnership ||
-             !record.playerPrimaryVisible ||
-             (diagnosticPixelCountersAvailable && record.primaryPlayerPixels == 0u)))
+            !horde::platform::windows::HasExpectedPlayerCaptureVisibility(
+                dedicatedPlayerOwnership, record.playerPrimaryVisible,
+                diagnosticPixelCountersAvailable, record.primaryPlayerPixels,
+                record.primaryArmsMayBeOutsideFrame))
         {
             return fail("Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=" +
                         std::to_string(dedicatedPlayerOwnership) + ", visible=" +

@@ -1,7 +1,9 @@
+#include "gameplay/CorridorCollision.h"
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
+#include "platform/windows/WindowsCaptureContracts.h"
 
 #include <cmath>
 #include <cstdint>
@@ -63,10 +65,10 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 52u,
-          "development registry includes eleven viewmodel poses and five distinct layout identity views");
-    Check(FindDevelopmentCheckpoint(152) == nullptr && FindDevelopmentCheckpoint(153) == nullptr,
-          "development lookup rejects IDs beyond the admitted layout views");
+    Check(kDevelopmentCheckpoints.size() == 53u,
+          "development registry retains the prior views and adds one upward wall-panel approach");
+    Check(FindDevelopmentCheckpoint(153) == nullptr,
+          "development lookup rejects IDs beyond the admitted upward wall-panel view");
     for (std::size_t first = 0u; first < kDevelopmentCheckpoints.size(); ++first)
     {
         for (std::size_t second = first + 1u; second < kDevelopmentCheckpoints.size(); ++second)
@@ -114,6 +116,76 @@ int main()
                       "C/D/A/B layout views retain the fresh torch instead of inheriting the later torch-loss checkpoint");
         }
         ++layoutId;
+    }
+    const auto* levelPanel = FindDevelopmentCheckpoint("layout-c-wall-panel");
+    const auto* upwardPanel = FindDevelopmentCheckpoint("layout-c-wall-panel-upward");
+    using horde::platform::windows::HasExpectedPlayerCaptureVisibility;
+    for (const auto& capture : kDevelopmentCheckpoints)
+        Check(capture.primaryArmsMayBeOutsideFrame == (capture.id == 152),
+              "only the close upward C152 enclosure view declares cropped primary arms");
+    Check(!HasExpectedPlayerCaptureVisibility(true, true, true, 0u, false) &&
+              HasExpectedPlayerCaptureVisibility(true, true, true, 1u, false) &&
+              HasExpectedPlayerCaptureVisibility(true, true, false, 0u, false) &&
+              HasExpectedPlayerCaptureVisibility(true, true, true, 0u, true),
+          "declared cropping permits zero arm pixels while ordinary measured captures still require them");
+    for (const bool cropped : {false, true})
+        Check(!HasExpectedPlayerCaptureVisibility(false, true, true, 1u, cropped) &&
+                  !HasExpectedPlayerCaptureVisibility(true, false, true, 1u, cropped) &&
+                  !HasExpectedPlayerCaptureVisibility(false, false, false, 0u, cropped),
+              "cropping cannot admit legacy ownership or a hidden primary player instance");
+    Check(levelPanel != nullptr && levelPanel->id == 147 && levelPanel->pitch == 0.0f &&
+              upwardPanel != nullptr && upwardPanel->id == 152 &&
+              FindDevelopmentCheckpoint(152) == upwardPanel &&
+              FindShowcaseCheckpoint(152) == nullptr &&
+              FindShowcaseCheckpoint("layout-c-wall-panel-upward") == nullptr &&
+              upwardPanel->baseShowcaseCheckpointId == levelPanel->baseShowcaseCheckpointId &&
+              upwardPanel->cameraX == levelPanel->cameraX &&
+              levelPanel->cameraZ == -10.60f && upwardPanel->cameraZ == -9.45f &&
+              upwardPanel->yaw == levelPanel->yaw &&
+              upwardPanel->pitch == 0.28f &&
+              upwardPanel->combatPose == DevelopmentCombatPose::Rest &&
+              !upwardPanel->usesGlassFixture && !upwardPanel->usesProductionRewardProps &&
+              !upwardPanel->productionLanternGlassOnly && !upwardPanel->stagesUnlockedChest &&
+              upwardPanel->rewardPose == DevelopmentRewardPose::None,
+          "upward C152 changes only approach Z and legal pitch from C147 and cannot enter the shipping route registry");
+    if (levelPanel != nullptr && upwardPanel != nullptr)
+    {
+        float approachX = upwardPanel->cameraX;
+        float approachZ = upwardPanel->cameraZ;
+        ResolveCorridorPlayerCollision(levelPanel->cameraX, levelPanel->cameraZ, approachX, approachZ);
+        Check(IsShowcasePlayerPositionWalkable(levelPanel->cameraX, levelPanel->cameraZ) &&
+                  IsShowcasePlayerPositionWalkable(upwardPanel->cameraX, upwardPanel->cameraZ) &&
+                  approachX == upwardPanel->cameraX && approachZ == upwardPanel->cameraZ,
+              "the production radius-aware swept collision permits C147 to approach C152 without crossing masonry");
+        simulation::GameSimulation levelSimulation;
+        simulation::GameSimulation upwardSimulation;
+        DevelopmentCheckpointStageEvidence stageEvidence{};
+        StepFixedObservationCounter stepCount{};
+        const DevelopmentCheckpointStepFixedObservation observer{
+            &stepCount, BeginObservedStepFixed, CompleteObservedStepFixed};
+        const bool levelStaged = StageDevelopmentCheckpointSimulation(levelSimulation, *levelPanel);
+        const bool upwardStaged = StageDevelopmentCheckpointSimulation(
+            upwardSimulation, *upwardPanel, &stageEvidence, &observer);
+        const auto& level = levelSimulation.Snapshot();
+        const auto& upward = upwardSimulation.Snapshot();
+        Check(levelStaged && upwardStaged && upward.playerX == level.playerX &&
+                  upward.playerZ == upwardPanel->cameraZ && level.playerZ == levelPanel->cameraZ &&
+                  upward.playerYawRadians == level.playerYawRadians &&
+                  upward.playerPitchRadians == 0.28f && stepCount.started == 1u &&
+                  stepCount.completed == 1u && !stepCount.active && !stepCount.invalidPairing &&
+                  stageEvidence.action == PlayerCombatAction::Idle &&
+                  stageEvidence.consumedAttackEdges == 0u && stageEvidence.consumedParryEdges == 0u &&
+                  upwardSimulation.Events().Empty(),
+              "C152 stages one coherent zero-delta shared pose at the effective legal maximum without combat commands");
+        Check(levelStaged && upwardStaged && upward.tickIndex == level.tickIndex &&
+                  upward.zone == level.zone && upward.activeEnemyId == level.activeEnemyId &&
+                  upward.torchFailure.phase == level.torchFailure.phase &&
+                  upward.fireEmitterCount == level.fireEmitterCount && upward.fireEmitterCount == 1u &&
+                  upward.fireEmitters[0].stableId == level.fireEmitters[0].stableId &&
+                  upward.fireEmitters[0].seed == level.fireEmitters[0].seed &&
+                  upward.fireEmitters[0].phase == level.fireEmitters[0].phase &&
+                  upward.fireEmitters[0].fuel == level.fireEmitters[0].fuel,
+              "C152 keeps C147's authored encounter and actual fire timeline while held transforms respond to the nearer upward pose");
     }
     int viewmodelId = 136;
     for (const auto name : {"player-viewmodel-grips", "player-viewmodel-forward",

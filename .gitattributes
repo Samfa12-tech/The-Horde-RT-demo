@@ -1,8 +1,8 @@
 # Keep high-resolution source art out of normal Git history.
 tools/run-host-sanitizer-validation.sh text eol=lf
 # Inactive mist experiment: preserve the pinned original source/budget bytes.
-docs/experiments/1.6.2-mist/rt_atmosphere.candidate.glsl -text
-docs/experiments/1.6.2-mist/raygen-variant-budgets.candidate.json -text
+docs/experiments/1.6.2-mist/rt_atmosphere.candidate.glsl -text whitespace=cr-at-eol
+docs/experiments/1.6.2-mist/raygen-variant-budgets.candidate.json -text whitespace=cr-at-eol
 # Preserve lossless backend witnesses and the exact native manifest receipts.
 docs/evidence/2026-10-02-s26-report-ui/** -text whitespace=cr-at-eol
 docs/evidence/2026-10-02-s26-report-send/** -text whitespace=cr-at-eol

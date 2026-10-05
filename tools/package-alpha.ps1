@@ -376,6 +376,8 @@ try {
         "HordeLanternRT.exe",
         "README.txt",
         "ASSET_LICENSES.md",
+        "LICENSE",
+        "LICENSE_SCOPE.md",
         "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb",
         "assets/models/enemies/meshy/lich_placeholder_merged_animations_v01.glb",
         "assets/textures/meshy/lich_placeholder_v01/base-color-2048-rgba8.ktx2",

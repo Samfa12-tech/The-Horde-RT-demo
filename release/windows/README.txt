@@ -1,9 +1,10 @@
-HORDE LANTERN RT - SHOWCASE ALPHA 1.6.1
+HORDE LANTERN RT - SHOWCASE ALPHA 1.6.2 REVIEW CANDIDATE
 =======================================
 
 This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.
 There is no raster, browser, or fake-RT fallback.
-Package version: 1.6.1; Android companion versionCode: 9.
+Package version: 1.6.2; Android companion versionCode: 10.
+Unpublished review candidate; owner/device acceptance remains required.
 Canonical downloads and current availability: https://samfa12.itch.io/the-horde
 
 WINDOWS REQUIREMENTS
@@ -78,10 +79,11 @@ KNOWN ALPHA LIMITS
 - Larger hordes remain deferred.
 - Remaining High physical-glass contact/near-edge defects are deferred future investigation.
 - Android defaults to 75% RT resolution; sustained 30 FPS is not achieved in the measured
-  current phone workloads. Performance is accepted as-is for 1.6.1, not guaranteed.
-- S24 is working but not fully tested; exact S25 remains unverified.
-- Full graphics-options menu is planned for 1.6.2.
+  current phone workloads. No sustained 30 FPS or causal performance saving is guaranteed.
+- Current exact-device evidence is scoped to SM-S948B; S24 is deferred and S25 unverified.
+- Graphics options provide an RT preview, resolution/effect choices, and explicit save/restore.
 - Only tested RT-capable hardware paths are supported.
-- See ASSET_LICENSES.md and ALPHA_RELEASE_NOTES.md.
+- See ASSET_LICENSES.md, LICENSE, LICENSE_SCOPE.md and THIRD_PARTY_NOTICES.
+- The software grant does not relicense assets, Pocket Audio Core or the mixed package.
 
 Website: https://samfa12.com

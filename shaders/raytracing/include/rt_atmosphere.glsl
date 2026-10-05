@@ -69,7 +69,100 @@ bool rayBoxInterval(vec3 origin, vec3 direction, vec3 boundsMin, vec3 boundsMax,
     return intervalEnd > max(intervalStart, 0.0);
 }
 
-vec4 lichMistSample(vec3 p)
+// A bounded source-to-medium visibility estimate, not a surface receiver.
+// Keep point attenuation at each density sample; only visibility is reused.
+struct MistIncidentSources
+{
+    vec3 skyIncident;
+    vec3 staffPosition;
+    vec3 staffVisibleRadiance;
+    vec3 firePositions[kRtActiveFireEmitterCapacity];
+    vec3 fireVisibleRadiances[kRtActiveFireEmitterCapacity];
+};
+
+bool mistFiniteVector(vec3 value)
+{
+    return !any(isnan(value)) && !any(isinf(value));
+}
+
+bool mistRadianceActive(vec3 radiance)
+{
+    return mistFiniteVector(radiance) &&
+        max(radiance.r, max(radiance.g, radiance.b)) > 0.0;
+}
+
+vec3 mistSegmentTransmittance(vec3 origin, vec3 direction, float distance)
+{
+    // Reserve the existing 20 mm light-end separation and at least the
+    // opaque-fast helper's 4 mm tMax floor. Unresolved near segments are dark,
+    // not assumed unobstructed. The helper's existing tMin policy remains.
+    if (!mistFiniteVector(origin) || !mistFiniteVector(direction) ||
+        isnan(distance) || isinf(distance) || distance <= 0.024)
+        return vec3(0.0);
+    return sceneShadowTransmittanceMask(
+        origin, direction, distance - 0.02, 0x35u);
+}
+
+vec3 mistVisiblePointRadiance(vec3 midpoint, vec3 sourcePosition, vec3 radiance)
+{
+    if (!mistRadianceActive(radiance) || !mistFiniteVector(sourcePosition))
+        return vec3(0.0);
+    vec3 vectorToSource = sourcePosition - midpoint;
+    float distance = length(vectorToSource);
+    if (isnan(distance) || isinf(distance) || distance <= 0.024)
+        return vec3(0.0);
+    return radiance * mistSegmentTransmittance(
+        midpoint, vectorToSource / distance, distance);
+}
+
+void buildMistIncidentSources(vec3 midpoint, out MistIncidentSources sources)
+{
+    sources.skyIncident = vec3(0.0);
+    sources.staffPosition = vec3(controls.staffX, controls.staffY, controls.staffZ);
+    sources.staffVisibleRadiance = vec3(0.0);
+    vec3 skyDirection;
+    float skyDistance;
+    vec3 skyRadiance;
+    float skyGain;
+    activeSkyLight(midpoint, areaShadowSampleIndex(), skyDirection, skyDistance,
+                   skyRadiance, skyGain);
+    if (!isnan(skyGain) && !isinf(skyGain) && skyGain > 0.0 &&
+        mistRadianceActive(skyRadiance))
+        sources.skyIncident = skyRadiance * skyGain * mistSegmentTransmittance(
+            midpoint, skyDirection, skyDistance);
+
+    float staffStrength = controls.staffLightStrength;
+    if (!isnan(staffStrength) && !isinf(staffStrength) && staffStrength > 0.001)
+        sources.staffVisibleRadiance = mistVisiblePointRadiance(
+            midpoint, sources.staffPosition,
+            tunedLightColor(vec3(0.58, 0.10, 1.0), kLightStaff) * staffStrength);
+
+    // Consume both admitted active records; stable-ID order is not a torch
+    // identity. Strength is duplicated in colourIntensity.w: use it only once.
+    for (uint index = 0u; index < kRtActiveFireEmitterCapacity; ++index)
+    {
+        sources.firePositions[index] = vec3(0.0);
+        sources.fireVisibleRadiances[index] = vec3(0.0);
+        RtFireEmitterGpu emitter = rtFireEmitters.values[index];
+        float strength = emitter.lightPositionStrength.w;
+        if (emitter.identity.x == 0u || isnan(strength) || isinf(strength) ||
+            strength <= 0.001)
+            continue;
+        sources.firePositions[index] = emitter.lightPositionStrength.xyz;
+        sources.fireVisibleRadiances[index] = mistVisiblePointRadiance(
+            midpoint, sources.firePositions[index],
+            tunedLightColor(emitter.colourIntensity.rgb, kLightTorch) * strength);
+    }
+}
+
+float mistPointAttenuation(vec3 samplePosition, vec3 sourcePosition)
+{
+    // Shared direct-light distance convention; no fictitious surface cosine.
+    vec3 delta = sourcePosition - samplePosition;
+    return 1.0 / (1.0 + dot(delta, delta) * 0.58);
+}
+
+vec4 lichMistSample(vec3 p, MistIncidentSources sources)
 {
     // Broad, low-frequency world-space curls move slowly enough to read as a
     // coherent ground layer rather than screen-space violet noise.
@@ -88,13 +181,16 @@ vec4 lichMistSample(vec3 p)
     float density = (0.080 + ritualFocus * 0.27) * heightFalloff
         * flowNoise * dawnFade;
 
-    vec3 staff = vec3(controls.staffX, controls.staffY, controls.staffZ);
-    float staffGlow = controls.staffLightStrength /
-        (1.0 + dot(p - staff, p - staff) * 1.15);
-    vec3 ambientScattering = tunedLightColor(vec3(0.45, 0.60, 0.80), kLightSkylight);
-    vec3 ritualScattering = tunedLightColor(vec3(0.75, 0.16, 1.00), kLightStaff);
-    vec3 incidentLight = ambientScattering
-        + ritualScattering * clamp(staffGlow * 1.35, 0.0, 1.8);
+    vec3 incidentLight = sources.skyIncident;
+    if (mistRadianceActive(sources.staffVisibleRadiance))
+        incidentLight += sources.staffVisibleRadiance *
+            mistPointAttenuation(p, sources.staffPosition);
+    for (uint index = 0u; index < kRtActiveFireEmitterCapacity; ++index)
+    {
+        if (mistRadianceActive(sources.fireVisibleRadiances[index]))
+            incidentLight += sources.fireVisibleRadiances[index] *
+                mistPointAttenuation(p, sources.firePositions[index]);
+    }
     // RGB stores in-scattering per metre and A stores extinction per metre.
     return vec4(incidentLight * density * 0.82, density);
 }
@@ -132,6 +228,12 @@ vec4 lichGroundMist(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
         return vec4(0.0, 0.0, 0.0, 1.0);
     }
 
+    // All source visibility is evaluated once after the original no-mist
+    // gates. Peak is one sky + one staff + two independent fire queries.
+    MistIncidentSources sources;
+    buildMistIncidentSources(rayOrigin + rayDirection *
+        (0.5 * (marchStart + marchEnd)), sources);
+
     vec3 scattered = vec3(0.0);
     float transmittance = 1.0;
     if (controls.workloadPreset < 0.5)
@@ -139,47 +241,47 @@ vec4 lichGroundMist(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
         const float sampleCount = 2.0;
         float stepLength = (marchEnd - marchStart) / sampleCount;
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 0.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 0.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 1.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 1.5), sources), stepLength, scattered, transmittance);
     }
     else if (controls.workloadPreset < 1.5)
     {
         const float sampleCount = 6.0;
         float stepLength = (marchEnd - marchStart) / sampleCount;
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 0.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 0.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 1.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 1.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 2.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 2.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 3.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 3.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 4.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 4.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 5.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 5.5), sources), stepLength, scattered, transmittance);
     }
     else
     {
         const float sampleCount = 8.0;
         float stepLength = (marchEnd - marchStart) / sampleCount;
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 0.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 0.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 1.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 1.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 2.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 2.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 3.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 3.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 4.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 4.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 5.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 5.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 6.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 6.5), sources), stepLength, scattered, transmittance);
         integrateLichMistSample(lichMistSample(rayOrigin + rayDirection
-            * (marchStart + stepLength * 7.5)), stepLength, scattered, transmittance);
+            * (marchStart + stepLength * 7.5), sources), stepLength, scattered, transmittance);
     }
     return vec4(scattered, transmittance);
 }

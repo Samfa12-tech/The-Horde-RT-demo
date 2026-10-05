@@ -1,9 +1,22 @@
 #pragma once
 
 #include <string_view>
+#include <cstdint>
 
 namespace horde::platform::windows
 {
+
+constexpr bool HasExpectedPlayerCaptureVisibility(
+    const bool dedicatedPlayerOwnership,
+    const bool primaryPlayerVisible,
+    const bool pixelCountersAvailable,
+    const std::uint32_t primaryArmPixels,
+    const bool primaryArmsMayBeOutsideFrame)
+{
+    return dedicatedPlayerOwnership && primaryPlayerVisible &&
+        (!pixelCountersAvailable || primaryArmPixels != 0u ||
+         primaryArmsMayBeOutsideFrame);
+}
 
 struct ClaimedRewardCapturePixelPolicy
 {

@@ -359,6 +359,9 @@ tasks.register('prepareRuntimeAssets', Sync) {
     }
     from('../..') {
         include 'ASSET_LICENSES.md'
+        // Original software MIT grant and its exclusions travel together.
+        include 'LICENSE'
+        include 'LICENSE_SCOPE.md'
     }
     from('../../third_party/cgltf') {
         include 'LICENSE'
