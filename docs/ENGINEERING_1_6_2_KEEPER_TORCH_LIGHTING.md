@@ -91,6 +91,14 @@ completion. Review the new scene's appearance with the owner when available and
 measure matched ordinary Shipping phone cost/thermals. Do not carry earlier
 mist cost forward as this scene's cost.
 
+The [ordinary Shipping phone comparison](ENGINEERING_1_6_2_KEEPER_TORCH_COST.md)
+now retains four complete native reports, with a qualified A2 host-observer gap.
+Pooled hot-phone RT cost increases62.4 to72.1ms; the101-frame finale subset
+increases61.9 to129.9ms. These descriptive results cross the investigation
+threshold and leave the cost tradeoff open. No quality is silently reduced.
+Positive live-phone torch appearance feedback does not close that gate or the
+reveal/death motion review.
+
 Audio/haptic manual revalidation for this lighting slice: **NO**; no cue asset,
 semantic event or feedback timing changes. Earlier Windows listening gates
 remain open at their original scope. No release, merge or production signing is
