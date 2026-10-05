@@ -1,5 +1,15 @@
 # Horde 1.6.2 review candidate - 5 October 2026
 
+Final closeout is implementing the explicitly selected mobile defaults and Mist
+On/Off control in the [final graphics record](ENGINEERING_1_6_2_FINAL_GRAPHICS.md).
+New builds and affected native/device checks are required before this becomes
+the immutable audit candidate. Artifacts below remain historical Keeper-lighting
+evidence and are not relabelled as the new graphics build. The completed
+[mirror comparison](ENGINEERING_1_6_2_MIRROR_COST.md) found no useful repeatable
+saving; the ordinary mobile mirror and required desktop/High mirror are retained.
+Optional experiments are closed or deferred; no further exploratory cohorts
+are part of this release closeout.
+
 The ordinary c112 mist is adopted after owner still-image approval and independent Mobile ABBA review. The accepted mist boundary is `2bdad1327eb1d4fedee9e9e223a3054536717749`; the subsequent Keeper-lighting runtime is `6468c3e47908901e8a904cf4a0eb1c7029c9767b` on draft [PR18](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/18). The accepted2bd mist boundary's [CI37250895699](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37250895699) passed all six individual jobs; all six jobs on prior backup25a79299 in [CI37247496966](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37247496966) passed. New Windows/Android artifacts, native checks and the accepted upward grate view are recorded below. The owner also approved moving mist after the two current Windows runs. The subsequent two-flank-torch correction passes exact native/device checks and the owner-approved lighting motion sequence. Its measured Shipping cost crosses the investigation threshold; performance tradeoff acceptance remains open.
 
 This is an unpublished review candidate. Historical stopped/earlier current labels retain their own scope; read this record and the [second-pass ledger](ENGINEERING_1_6_2_SECOND_PASS.md) before reusing them. The owner has authorized a separate optional Lower indirect-lighting candidate and matched comparison while retaining Current as default. The separate prototype is now deferred after the balanced Shipping comparison fails to demonstrate useful benefit; Current remains default. Its inactive source backup preserves the experiment. Texture LOD remains separately unbenchmarked/deferred.
@@ -119,5 +129,7 @@ a useful accepted visual reference, without changing defaults or proving
 sustained performance. Existing comparisons retain75% and all matched settings.
 The ordinary stone still image is acceptable as an experiment, but the owner
 prefers the mirror and requires its retention for high graphics and desktop.
-The newly measured mobile fallback decision remains pending; no upscaler or
-33% phone test is authorized by that feedback.
+The completed mirror comparison now defers a mobile fallback because useful
+repeatable benefit is unproved. The owner's later explicit default selection
+is recorded separately above; earlier cost comparisons keep their original
+75% settings. No upscaler or33% phone experiment follows.

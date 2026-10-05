@@ -1,5 +1,31 @@
 # 1.6.2 second-pass execution ledger
 
+## Final closeout, 5 October: defaults and Mist On/Off
+
+The mirror experiment is closed: four balanced Shipping courses admit7,352
+owning rows with unchanged per-frame controls, fire lights and simulation ticks.
+Mirror/stone pooled GPU69.978937/76.164385ms and finale131.099532/138.033968ms
+do not establish useful repeatable saving; the last mirror control is faster
+than either stone course, with unequal thermal/clock context. Defer the stone
+fallback/removal/mobile option and retain mirrors. The
+[cost record](ENGINEERING_1_6_2_MIRROR_COST.md) preserves exact identities and
+limits. Original Debug preferences and APK pass raw postflight; the ordinary
+Benchmark package was restored, its existing75% Saved/effective tuple verified,
+then stopped. No original phone data was erased.
+
+The owner now prioritizes completing1.6.2. The final authorized implementation
+selects fresh-install/staged-reset Android50%/Mobile water/Mobile fire/cap30/
+GlassOff/Current shadows/MistOn, preserving saved custom and legacy settings.
+Windows100%/High water/High fire/GlassOn/Current/cap30 and mirrors remain.
+Mist Off must bypass scene ground-mist visibility/integration while preserving
+other effects and gameplay; the future lower-mist tier is deferred. Required
+new-candidate checks and evidence live in the
+[final graphics record](ENGINEERING_1_6_2_FINAL_GRAPHICS.md). Independent final
+audit precedes release actions; owner-only signing safeguards remain separate.
+No additional bisects, upscalers, wall-material probes or optional quality
+cohorts are authorized by this closeout. Existing failures and acceptance gaps
+retain their original scope.
+
 The first-pass reviewed source is `b2dc216a500e690b44ebac20ea05f7bb318349a4`; its measured runtime is `95eb08070354d4b3b775e6d2368cca8688f9cfe6`. New source below requires new artifact/device evidence. Preserve the closed first-pass cohorts and negative experiments rather than relabelling them.
 
 ## Current boundary, 5 October: integrated mist admitted; Keeper lights implementing

@@ -73,3 +73,7 @@ with cost and owner/reviewer tradeoff acceptance explicitly open. The separate
 Lower indirect-light prototype excludes these new torches and cannot certify an
 offsetting improvement for this scene. Review reveal/combat/death/extinguishing
 motion and the chest transition independently.
+
+The separate [mirror-versus-stone comparison](ENGINEERING_1_6_2_MIRROR_COST.md)
+found no useful repeatable saving and defers that fallback. It does not offset
+the torch comparison or change this cost/acceptance gate.

@@ -19,6 +19,16 @@ the static comparison. Both APKs carry four16KiB-aligned ELFs and exact notices.
 
 The owner accepts the stone still as an experiment but prefers the mirror.
 **Desktop and high graphics must retain the mirror regardless of phone cost.**
-A lower-cost mobile option remains a separate measured tradeoff decision.
-Matched Shipping75 phone comparison is in progress. No permanent removal,
-graphics option, causal saving, sustained30FPS or release is established.
+The matched Shipping 75% Pipeline ABBA comparison is complete: four courses,
+1,838 admitted owning rows each, 7,352 total. Recorded settings, actual fire
+populations and fixed 60 Hz ticks match frame by frame. Pooled RT GPU means are
+69.978937 ms for mirror and 76.164385 ms for stone; finale means are 131.099532 ms
+and 138.033968 ms. Thermal/battery context differs, so these are descriptive
+durations, not causal cost or sustained FPS.
+
+**Defer the stone fallback, removal and mobile option.** No useful repeatable
+saving is demonstrated, and the ordinary mobile mirror remains. Preserve this
+inactive backup; do not add a build hook or repeat it without a materially new
+reason. No causal stone slowdown, zero-cost mirror, moving-image adoption or
+release is established. See the [cost decision](../../../ENGINEERING_1_6_2_MIRROR_COST.md)
+and updated `source-record.json`; raw device evidence remains private.
