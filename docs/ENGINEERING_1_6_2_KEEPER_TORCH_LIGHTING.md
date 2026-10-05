@@ -1,7 +1,7 @@
 # Keeper flank lighting, 5 October 2026
 
 The owner's correction adds two rear flank torches because the Keeper is too
-dark under the physically occluded mist. This slice is implementing against the
+dark under the physically occluded mist. This slice is built against the
 admitted2bd mist baseline. Its new native appearance and phone cost are not yet
 accepted. The owner's earlier moving-mist approval remains scoped to2bd.
 
@@ -80,7 +80,11 @@ ABI/capacity checks pass; Android witness policy passes87 injected assertions
 without device actions. Initial fixture compiler/expectation failures remain
 preserved; runtime validators were not weakened.
 
-All16 published Pipeline/Compute modules and the two compatibility modules pass generation/freshness, exact catalog word joins and actual Shipping disassembly. Bank receipt `a3850959d6e1b75b330b4b098a31bd590f8a11e684dd708af22094617a9a9f31` retains unchanged budgets. Debug and Release native builds pass; six affected renderer/player tests pass, including resource ownership, physical-instance alias masks and initialization preflight. The initial22/24 mask-type compile failure is preserved and fixed by using physical TLAS capacity in the shared player mask helper. Static captures now retain canonical completed-frame evidence after draining the actual last presentation; a missing/stale owner or fire upload rejects the capture. Updated shader-tooling fixture execution, exact package admission and Android builds remain in progress.
+All16 published Pipeline/Compute modules and the two compatibility modules pass generation/freshness, exact catalog word joins and actual Shipping disassembly. Bank receipt `a3850959d6e1b75b330b4b098a31bd590f8a11e684dd708af22094617a9a9f31` retains unchanged budgets. Debug and Release native builds pass; six affected renderer/player tests pass, including resource ownership, physical-instance alias masks and initialization preflight. The initial22/24 mask-type compile failure is preserved and fixed by using physical TLAS capacity in the shared player mask helper. Static captures now retain canonical completed-frame evidence after draining the actual last presentation; a missing/stale owner or fire upload rejects the capture. Both shader-tooling fixtures pass after two exact compatibility-word pins; initial failures remain retained.
+
+The [candidate record](ENGINEERING_1_6_2_REVIEW_CANDIDATE.md#keeper-lighting-artifacts-and-evidence-5-october) pins both85-file Windows packages and all three four-ABI Android packages. Actual selected PE/ARM64 modules pass SDK admission; Shipping has no diagnostic atomics or binding22. Both Windows backends pass13 static captures with synchronization validation and no error markers. Admission receipt `9da9e01ca4721e7d0cdab16490d9d0902f849e0b7ab59fa2d3b612d47438cb1e` joins all26 PNGs to actual last-presented completed fire records.
+
+Both Debug50 phone backends pass13 route waypoints, seven captures and strict Home/Resume on SM-S948B/Android16. Admission receipt `11ce90149829db6943dc7c1a3e9e5c7bd8531623d4c044b39042bb40cd1a3d58` joins all14 PNG/state pairs, selected shaders, combat IDs3/4 and physical24/BLAS19 ownership. Fresh postflight raw APK pullbacks match Debugbd37 and saved1420-byte preferences remain identical. These checks establish development correctness, not Shipping cost or owner motion acceptance.
 Require actual reveal/fight/death/reward captures joining completed IDs3/4,
 including unlit dormant/reset and possible reward-lantern overlap before death
 completion. Review the new scene's appearance with the owner when available and
