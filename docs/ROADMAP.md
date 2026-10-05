@@ -394,6 +394,14 @@ The existing Vulkan BLAS/TLAS, PBR materials and skinning support provide useful
 
 Admission must use measured capability and performance rather than vendor branding or a vendor lock-in requirement. The owner's RTX 5050 Laptop GPU with 8 GB is a possible evaluation target, not a certified path-tracing preset: suitable settings, memory headroom and FPS are unknown until tested. This entry authorises planning only, not runtime work, paid dependencies, a build, merge or release.
 
+## Maybe one day — optional PC VR, very last
+
+**Owner direction, 5 October 2026:** Put a possible PC VR version at the very end of the backlog, **only after the game is finished**. This is the lowest-priority, uncommitted “maybe one day” idea, with no version/date or release commitment and no addition to current 1.6.2, 1.7 or campaign-completion scope.
+
+The owner has a **PSVR2 headset** as a potential PC test device. Verify its PC compatibility, adapter, runtime and hardware prerequisites when this is explored; ownership alone does not establish a ready or compatible test setup. This is a PC VR possibility, not a PS5 port commitment.
+
+Any later feasibility review should cover comfortable movement, stereo RT performance, headset/controller input and readable VR UI against the finished game's actual baseline. Existing rendering and gameplay do not make VR conversion automatic or cost-free. This entry records planning only and starts no implementation, asset work, purchase, build, merge or release.
+
 ## Engine growth and scope discipline
 
 Retain native Vulkan hardware RT, Android as a first-class target, Windows RTX validation, the shared 60 Hz simulation and honest presentation evidence. Prefer reusable zone ownership, actors, conversations, progression flags, interactions and light mechanics over hardcoded exceptions for individual houses or bosses.
