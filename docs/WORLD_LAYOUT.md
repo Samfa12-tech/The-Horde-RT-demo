@@ -97,7 +97,7 @@ This regional geography does not reopen the four distinct approved dungeon featu
 - Leave the waterfall's own hole and vines untouched
 - Fit the separate large waterfall-room skylight with the approved impassable iron grid and real RT bar shadows
 
-Preserve the separate later-created finale/rescue opening. Kit does not know about the lich or knowingly wait for its defeat. The two existing skeletons move into the waterfall room in 1.7, not as a consequence of this map approval.
+Preserve the separate later-created finale/rescue opening. Kit does not know about the lich or knowingly wait for its defeat. The two existing skeletons now move into the waterfall room during post-reset 1.6.2 under the explicit 5 October owner direction, not as a consequence of this map approval. Kit voice, night/forest and rope rescue remain 1.7.
 
 ## 5. Reference custody and verification
 
