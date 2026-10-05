@@ -75,6 +75,14 @@ Optional/off-by-default detail normals, a fallback-player/LOD experiment, textur
 
 Implement the three new screenshot requirements below together with the existing [collapsed entry](COLLAPSED_ENTRY_1_6_2.md), [UI refresh](UI_REFRESH_1_6_2.md), [lich reveal](LICH_REVEAL_1_6_2.md) and ROADMAP polish briefs. These are authored targets, not permission to expand the dungeon.
 
+#### Player's disposable rag torch — owner direction, 5 October 2026
+
+For the post-reset 1.6.2 polish pass, replace only the player's ornate hand torch with a practical burning stick: a rough, slightly crooked wooden shaft and a layered, wrapped, charred rag head, with no ornate metalwork. A treasure hunter should plausibly discard it. This supersedes the earlier player-torch appearance for future implementation; retain historical approvals and evidence as records of their own builds. Preserve the Keeper reward lantern as the distinct valuable upgrade and leave the lich chamber's wall torches unchanged; do not globally replace shared torch instances.
+
+Reuse suitable existing source/material inputs and adapt or author the simple prop in Blender through the established asset pipeline. Use rough wood/cloth/char materials and fit the existing animated in-engine flame base around the rag head, with no floating gap or baked mesh flame; inspect it in hand and in motion. This is not a new fire engine. Preserve grip and flame/emitter attachment sockets, existing held/drop/drench/discard state ownership and behavior, and shared overhead-clearance handling. The visible prop, hands, flame, physical light, shadows and reflections must stay coherent in held and dropped states, through extinguishing and the reward-lantern transition. Validate the new silhouette/materials and these transitions on the actual integrated candidate, with owner visual review and affected phone/Windows checks. Removing metalwork is an art decision, not evidence of a performance saving; record measured costs without a promised gain.
+
+This records a queued asset replacement, not completed work or permission to resume the paused run. No asset/image generation, paid Meshy job or runtime change is part of this documentation update.
+
 #### New owner screenshot reports, 3 October 2026
 
 All three report release 1.6.1 on SM-S948B / Adreno 840, RayTracingPipeline, Mobile, 63% internal scale (907×1877). These are report settings, not recommended defaults. The screenshots were inspected during intake; exact local scene coordinates remain to be established. Original images stay private and must be inspected through the authorised evidence handoff before image-dependent implementation. Do not infer precise geometry from prose or publish raw images/diagnostics.
