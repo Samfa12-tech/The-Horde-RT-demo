@@ -1,0 +1,91 @@
+# Performance investigation beyond 1.6.2
+
+**Owner direction recorded 5 October 2026. Version and date unassigned.** Performance investigation must continue after 1.6.2. This is the future-work contract, linked from the [roadmap](ROADMAP.md) and [dated mobile audit/experiment bank](MOBILE_PERFORMANCE_AUDIT_2026-10-04.md); it is not another 1.6.2 release gate or permission to start a new run now.
+
+Finish the current bounded 1.6.2 scope and mobile-defaults review under its existing acceptance plan. Before selecting later work, reconcile the actually accepted source, packages, settings and completed experiment decisions. The priorities below select evidence to collect, not guaranteed savings, shipping features or a promise to recover July performance. Preserve genuine hardware RT, gameplay-critical lighting, accepted quality choices and exact artifact provenance.
+
+## 1. Historical regression investigation comes first
+
+The historical question spans the early June/July baseline through August and later integrations. No verified June timing is available in the reviewed evidence; locate an identified artifact/record before making a June claim. July was already a textured playable renderer:
+
+- [12 July recovery](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/SKELETON_PERFORMANCE_2026-07-12.md) recorded 126 SurfaceFlinger intervals with median 16.667 ms and p95 20.833 ms. This supports approximately 60 FPS for that sample, not a sustained thermal guarantee.
+- The [12 July PBR batch](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/3408f3d441367e7990992b03e5c0011c2a33b07b/docs/PBR_MATERIAL_BATCH_2026-07-12.md) already supplied five-layer diffuse/normal/ARM world arrays. [16 July source](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/5a83cab637ecb00db542cbb24778af7169c6bc1c/shaders/raytracing/minimal.rgen#L437-L475) already had light-aware mirror bounce shading. [18 July validation](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/8b96744320a2ffbedb1cf1df9752328e624ef70a/docs/IN_APP_BENCHMARK_ANDROID_VALIDATION_2026-07-18.md#L10-L40) recorded an 11.870 ms opening checkpoint and a 12.330 ms 75% benchmark median. Wall-texture introduction alone is therefore not an established explanation for the later slowdown.
+- The recorded 75% opening changed from 11.340 ms on [21 August](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/CURRENT_DEVELOPMENT_BASELINE_VALIDATION_2026-08-21.md) to 36.115 ms in the [26 August Task 5 cohort](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/.superpowers/sdd/2026-08-26-fire-pbr-reward-lantern-player-upgrade/task-5-report.md#L140-L171) and 53.392 ms in [final 30 August validation](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md#L45-L101). These cross-date window statistics locate investigation boundaries; they are not matched causal percentages or display-FPS measurements.
+- [21 August repeated opening observations](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/CURRENT_DEVELOPMENT_BASELINE_VALIDATION_2026-08-21.md) already show frequency/power sensitivity. The Lich was slower before the [23 August first mist](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/RT_WATERFALL_LICH_MIST_VALIDATION_2026-08-23.md); do not blame all route-wide loss on mist.
+- [24–25 August corrected water transport](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/WATER_TRANSMISSION_SHADOW_VALIDATION_2026-08-24.md#L90-L108) has an unchanged-APK repeated cost increase. Its reported percentages use a particular rejected fixed-transport candidate, not July. Accurate lighting was intentionally retained.
+- Shader footprint is contextual evidence only. The [intermediate generic variant](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/.superpowers/sdd/2026-08-26-fire-pbr-reward-lantern-player-upgrade/task-6-report.md)'s 785,676 bytes / 43,378 instructions must not be called the final August shader. [Final 30 August Generic](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md#L45-L61) was 224,764 bytes / 13,244 instructions after later compiler work. Neither static size nor call-site count establishes dynamic traversal, bandwidth or device cost.
+- The [actual published 1.6.0 comparison](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/ENGINEERING_1_6_1_ANDROID_RELEASE_ABBA_2026-09-20.md#L1-L90) recorded ordinary-route render-cycle medians 52.329 / 58.795 ms at the owner's 76% setting, without acquiring the heavy lantern. The problem is not demonstrated to be Debug-only or confined to held glass.
+
+### Bounded historical comparisons
+
+Start with ordinary opening and Lich views, then a separate held-lantern workload:
+
+1. `547d89d → 172bb0a`: pre-mist versus original water/mist.
+2. `172bb0a → b45a1b7`: water/visibility correctness.
+3. `b45a1b7 → 139b828`: PBR props, fire and player integration before generic glass.
+4. `139b828 → a04dcb9`, with published `57c81b6` as a separate Release anchor: generic glass/reward-lantern integration.
+
+These are source bounds, not four already matched binary pairs. The water test was a dirty tree rooted at `a8088b6`; `b45a1b7` is a later pre-fire base, not its exact binary. Task 5's 36.115 ms cohort used clean `127ca80`; `139b828` is the corrected follow-on boundary. Final runtime `a04dcb9` and provenance-only `41e9c6c` remain distinct. Keep recorded APK/shader hashes and unavailable-artifact gaps.
+
+**Stopping rule:** establish whether a boundary reproduces a material regression under matched conditions, then narrow only the largest reproduced boundary with a finite reviewed commit shortlist. If old assets/toolchains or comparable workloads cannot be reconstructed honestly, record the gap and move to current-source isolation. No unbounded June-to-present bisect, transplanting current generated headers into old binaries, or assumption that one revert restores 60 FPS.
+
+## 2. Separate texture-fetch cost from material classification
+
+These are two different hypotheses with separate gates:
+
+- **Fetch/footprint probe:** hold decoded material values, ray directions, reflection selection, ray/sample budgets, lighting and geometry fixed while isolating texture traffic. Prove those invariants in the diagnostic design. Simply replacing textured stone with a flat material changes the workload and cannot attribute a speedup to texture bandwidth.
+- **Classification/transport probe:** measure the actual receiver coverage and cost of the existing material policy before changing it. [World ARM decode](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/8717112f16b010460ae4045d4b406a4f7f253b98/shaders/raytracing/include/rt_hit_decode.glsl#L283-L335) maps reflectivity from `clamp(1 - roughness, .05, .96)`. Combined with [reflective > .38 selection](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/8717112f16b010460ae4045d4b406a4f7f253b98/shaders/raytracing/include/rt_dielectric_common.glsl#L312-L348), roughness below .62 can select reflection-oriented handling. [Light-aware bounce shading](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/8717112f16b010460ae4045d4b406a4f7f253b98/shaders/raytracing/include/rt_lighting.glsl#L1000-L1061) now includes visibility and fire lighting. Old texture data can therefore interact with later expensive lighting; this is a source-backed hypothesis, not measured pixel coverage or a proven regression cause.
+
+Any later classification change must preserve important mirror, wet, metal, glass, water, player and held-item reflections, report changed radiance and obtain quality acceptance. Do not combine it with a fetch probe, change direction/ray budgets without declaring a separate quality experiment, or repeat Lower unchanged.
+
+## 3. Footprint-aware LOD needs real mip and transport prerequisites
+
+The [separate transport decision](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/ENGINEERING_1_6_2_OPTIONAL_TRANSPORT_DECISIONS.md#L32-L40) found literal LOD0 in the inspected material payloads, one mip for 512² world arrays and 2048² Lich maps, and 11 levels for 1024² prop arrays. Recheck the accepted baseline before implementation. Actual footprint-aware LOD remains unbenchmarked; having prop mips does not supply missing world/Lich levels.
+
+A bounded proposal must budget colour-correct and normal-renormalized mip generation, unchanged top-level pixels, provenance and package/memory cost. Define projection/UV-density/transform/deformation and grazing/degenerate behavior, and propagate a valid footprint across reflected, refracted and continued paths. Local segment distance alone is not the camera footprint. Verify actual compiled operands and independent planar/deformed/secondary math before phone tests.
+
+**Gate:** moving minification, normal/emissive detail, oblique surfaces and secondary views must remain acceptable; include extra ALU, upload/storage and memory costs in the measured net result. Stop/defer if prerequisites or useful benefit cannot be established. A prop-primary-only prototype must remain explicitly partial and cannot silently become the shared default.
+
+## 4. Compare 33% linear/upscaled against the actual 50% phone choice
+
+The owner says 50% looks fine; [current review](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/8717112f16b010460ae4045d4b406a4f7f253b98/docs/ENGINEERING_1_6_2_SECOND_PASS.md#L263-L282) preserves that preference while defaults review remains separate. Later compare actual newly traced 33% Linear, 33% with one bounded upscaler, and 50% Linear on the same phone/build/content/output. Include reconstruction cost and total presented-frame behavior; retain native-resolution UI.
+
+The [existing FSR feasibility test](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/ENGINEERING_1_6_2_SECOND_PASS.md#L157-L169) was six desktop static post-processing cases, 192 timestamp rows, at 50/75% inputs derived by downsampling a fixed capture. It was not live lower-resolution RT, motion, phone bandwidth, sustained FPS or a 33% phone solution. Retain its decision to defer production FSR and keep Linear; do not repeat the same still test unchanged.
+
+**Gate:** inspect motion, disocclusion, thin geometry, text/UI, fire, mist, water/glass and reflections; measure whole-frame pacing, thermal behavior, memory and battery/power where reliable. A sharper still or cheaper RT dispatch alone does not pass. No automatic 33% default, hidden quality cut or interpolation from unrelated APK cohorts. Temporal reconstruction retains its separate history/motion/resource prerequisites.
+
+## 5. Contextual lighting budgets and future fireflies
+
+Light cost depends on receiver coverage, overlapping influence, shadow visibility, mirrors, mist and fire-volume paths. Do not allocate a fixed milliseconds-per-light number or extrapolate two torches linearly to a village.
+
+The [hot-phone Keeper comparison](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/ENGINEERING_1_6_2_KEEPER_TORCH_COST.md) recorded about +15.5% whole-course GPU duration and roughly doubled finale cost at 75%. Geometry, active fire lighting and mist visibility changed together; thermal status 3 and the missing A2 endpoint qualify attribution. Owner [motion approval](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/8717112f16b010460ae4045d4b406a4f7f253b98/docs/ENGINEERING_1_6_2_SECOND_PASS.md#L263-L282) does not close performance acceptance.
+
+After the separate current mirror experiment reaches its own decision, retain it as evidence, not an assumed remedy for August's route-wide loss. Desktop/high graphics must retain the preferred mirror. Future probes may isolate receiver coverage, overlap and specific lighting paths one at a time, with budgets and quality changes explicit.
+
+For future forest fireflies, propose visual emissive/glow presentation as the baseline; add only a few bounded local illuminating sources if the intended scene actually needs them. A visible glow is not proof of world illumination. Preserve coherent world-space visibility and relevant secondary views, and measure local-light overlap on phone before increasing population. This is a future proposal, not an asset order or implementation commitment.
+
+### Later measured Low mist tier
+
+Keep the owner's current 1.6.2 direction limited to Mist On/Off: On remains the default, and Off must skip mist work. That implementation and its validation belong to the active task, not to completed results in this plan. A graded Low mist tier can be considered later as a separate bounded quality/cost experiment, with actual sample/integration/lighting work identified and measured. Reducing density alone does not demonstrate fewer samples or a performance gain. Preserve occlusion, silhouettes, light response and gameplay readability; reject an indistinguishable-cost tier or unacceptable visual tradeoff rather than adding a misleading performance label.
+
+## 6. Preserve negative results and current work ownership
+
+- **Selective opacity: rejected.** [Eight interleaved runs, 9,752 joined frames](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/ENGINEERING_1_6_1_PRIMARY_OPACITY_2026-10-01.md#L45-L115) found no repeatable net saving. Do not rerun unchanged; reconsider only a materially different mechanism or new contrary matched evidence with review.
+- **Lower indirect: trial closed, adoption deferred.** [7,352 owning rows](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/ENGINEERING_1_6_2_OPTIONAL_TRANSPORT_DECISIONS.md#L18-L30) gave Current/Lower means 62.107672 / 61.934068 ms, a descriptive 0.28% difference with thermal headers 3 versus 2; final Current A2 was faster than either Lower run. No useful win is established. It excludes newer Keeper lights and lacks full quality acceptance. Preserve the inactive backup; do not stack it into another experiment.
+- **Mirror-to-stone: ongoing at this planning snapshot.** Final result is unknown. Permanent removal is not authorized, and desktop/high must retain the mirror. Reconcile its completed record later rather than inventing an outcome here.
+- **Texture LOD: unbenchmarked/deferred.** **FSR: static desktop feasibility only, production deferred.** Keep those precise outcomes.
+- **Keeper lighting: motion approved; cost tradeoff open.** The current mobile-defaults review belongs to 1.6.2. This plan neither resolves it nor adds more pre-release tests.
+
+## 7. Evidence budget, decisions and sustained acceptance
+
+For each selected future hypothesis, write a short experiment card before execution: exact question, immutable baseline/candidate, changed mechanism, predicted observable, protected quality, device/time/run budget, run order, stop conditions and keep/reject/defer rule. One hypothesis at a time. Begin with the smallest diagnostic that can discriminate it; escalate only on useful evidence. Stop at the agreed budget, failed invariants, unacceptable quality or no repeatable net benefit. Preserve failures and uncertainty; do not tune or extend runs merely to obtain a favorable result.
+
+Match hardware/driver/backend, camera/route and loaded content, internal/output dimensions, material and lighting controls, build/compiler policy, timing definitions, power connection and thermal conditions. Alternate repeated control/candidate runs; include fresh-process and sustained observations. Battery temperature alone does not establish matched GPU clocks. Record missing counters and endpoint gaps.
+
+Report active CPU stages, GPU AS/update, trace/shading and output/upscale/transfer where valid, plus end-to-end presentation/pacing, per-zone median and tails, missed deadlines, quality captures, memory and thermal/power context. Measure diagnostic overhead; acceptance uses admitted Shipping artifacts. Native CPU-observed cycles include waits; GPU intervals include multiple components. Do not add CPU and GPU durations, subtract unrelated medians, or turn the wrong metric into an FPS claim.
+
+Keep correctness/build success, visual acceptance and sustained performance acceptance visibly separate. The 21 August policy change to [descriptive bands and investigation thresholds](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/CURRENT_DEVELOPMENT_BASELINE_VALIDATION_2026-08-21.md#L123-L133) did not prove the target was met. A proposed sustained 30 FPS tier needs approximately 33.3 ms end-to-end budget, useful headroom and acceptable pacing/thermals across ordinary play and expensive scenes; a median below that line is insufficient. No such result is established by this plan.
+
+The output of each later experiment is a concise retained decision with source/artifact identities, actual checks, measured costs, visible tradeoffs, uncertainties and next admissible step. Adoption and release remain separate decisions. This documentation update changes no runtime, assets, settings or defaults and runs no builds or device experiments.
+
+**Audio/haptic manual revalidation required: NO — documentation only.**

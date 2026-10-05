@@ -373,6 +373,12 @@ The remaining owner-authorised pre-release experiments are an actual eligible op
 
 The separately queued second pass for independent shadows, lower fire, upscaling, optional benchmark Send statistics and mist density/lighting retains its own implementation/measurement plan. The rest of the audit remains future proposals; preserving it does not commit every priority to 1.6.2, change defaults or authorise a renderer rewrite, credentials, deployment, merge or release. Retain the final independent review and explicit owner release gate.
 
+## Continuing performance work after 1.6.2
+
+**Owner direction, 5 October 2026:** Performance investigation and optimisation must continue beyond 1.6.2. The [future performance investigation plan](PERFORMANCE_INVESTIGATION_FUTURE.md) owns the bounded historical-regression, texture-fetch/material-classification, mip/footprint, actual-phone scaling/upscaling and contextual light-cost hypotheses. It includes later measured Low mist and firefly-light budgets, preserves closed negative experiments, and separates quality/build checks from sustained performance acceptance.
+
+Version and date are unassigned. Finish the current 1.6.2 scope and mobile-defaults review first; this adds no release gate or permission for another run now. The dated audit remains historical evidence, while completed current experiments must be reconciled before selecting one later hypothesis. No automatic 33% default, renderer rewrite, merge or release follows.
+
 ## Maybe one day — optional Windows path tracing
 
 **Owner direction, 4 October 2026:** Keep an optional path-tracing mode as a later Windows/high-end hardware-RT feasibility experiment. This is an uncommitted backlog idea, with no version or date promise and no 1.6.2 or 1.7 acceptance requirement. Android remains first-class with its existing default path; retain the current hardware ray tracer as the supported baseline and fallback when path tracing is unavailable, too expensive or visually unsuitable. Unsupported RT hardware still receives clear diagnostics, not a raster fallback.

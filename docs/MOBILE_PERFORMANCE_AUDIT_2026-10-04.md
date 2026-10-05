@@ -6,6 +6,12 @@
 **Measured runtime source:** [95eb08070354d4b3b775e6d2368cca8688f9cfe6](https://github.com/Samfa12-tech/The-Horde-RT-demo/commit/95eb08070354d4b3b775e6d2368cca8688f9cfe6)  
 **Planning context:** [Roadmap](ROADMAP.md) and [1.6.2 implementation goal](IMPLEMENTATION_GOAL_1_6_2.md)
 
+## Future continuation — 5 October 2026
+
+The owner explicitly wants performance work to continue after 1.6.2. Use the [future performance investigation plan](PERFORMANCE_INVESTIGATION_FUTURE.md) for later priorities, budgets and stopping criteria, and the [roadmap](ROADMAP.md#continuing-performance-work-after-162) for sequencing. It is version-unassigned and adds no current release gate or immediate experiment.
+
+The dated dispositions below describe their snapshots. Later [Lower-indirect evidence](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/92a16f355b1e5eefe62ccac05e666be1e84e0fde/docs/ENGINEERING_1_6_2_OPTIONAL_TRANSPORT_DECISIONS.md#L18-L40) closes that trial with adoption deferred and no useful measured win; actual footprint-aware texture LOD remains unbenchmarked/deferred. [The current review](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/8717112f16b010460ae4045d4b406a4f7f253b98/docs/ENGINEERING_1_6_2_SECOND_PASS.md#L257-L282) keeps the separate mirror comparison open and records Keeper motion approval, not performance acceptance. Preserve the opacity NO-GO and all original audit text; do not restart old proposals from their historical imperative wording.
+
 ## Current disposition and scope
 
 The owner requested that this audit be kept for future optimisation experiments, then requested testing three biggest-ticket proposals before shipping 1.6.2. Subsequent review found that selective primary opacity repeats an existing rejected experiment. Retain that NO-GO rather than automatically requeueing it; see the dated correction below.
