@@ -495,6 +495,11 @@ std::string BuildRtBenchmarkEvidenceJson(const RtBenchmarkEvidenceRun& run)
                 << ", \"reflectionSamples\": " << quality.reflectionSamples
                 << ", \"reflectedVolumeSteps\": " << std::min(quality.volumeSteps, quality.reflectionSamples * 4u) << '}';
         }
+        if (row.fireLighting)
+        {
+            out << ", \"fireLighting\": ";
+            WriteRtFireLightingEvidenceJson(out, *row.fireLighting);
+        }
         out << ", \"diagnosticCounters\": ";
         if (row.hasDiagnosticCounters)
         {

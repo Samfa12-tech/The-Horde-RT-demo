@@ -11,7 +11,7 @@ namespace horde::vulkan::raytracing
 {
 
 bool HasDedicatedPlayerPrimaryOwnership(
-    const std::array<std::uint8_t, kRtInstanceMetadataCapacity>& masks,
+    const std::array<std::uint8_t, kRtTlasInstanceCapacity>& masks,
     std::uint32_t worldBodyInstanceFlags)
 {
     const bool remainderOnly = (worldBodyInstanceFlags &

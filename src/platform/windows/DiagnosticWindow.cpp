@@ -264,6 +264,7 @@ struct ShowcaseCaptureRecord
     float finaleSkylightOpenProgress = 0.0f;
     std::string filename;
     std::string pngSha256;
+    std::string completedFrameEvidenceJson;
     std::string viewmodelGeometryFile;
     std::string viewmodelGeometrySha256;
     std::string playerWorldBodyGeometryFile;
@@ -5526,6 +5527,7 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "      \"width\": " << capture.width << ",\n"
                  << "      \"height\": " << capture.height << ",\n"
                  << "      \"honestlyPresentedRtFrame\": true,\n"
+                 << "      \"completedFrame\": " << capture.completedFrameEvidenceJson << ",\n"
                  << "      \"visibility\": {\"playerPrimaryVisible\": "
                  << (capture.playerPrimaryVisible ? "true" : "false")
                  << ", \"primaryArmsMayBeOutsideFrame\": "
@@ -5706,6 +5708,33 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();
         }
 
+        // Complete the actual last presented submission before reading its
+        // image. Capture evidence must not borrow an earlier checkpoint's fire
+        // upload or manufacture completion from the current CPU simulation.
+        const VkResult captureIdle = vkDeviceWaitIdle(context.device);
+        if (!CompleteRtEvidenceAfterDeviceIdle(context, captureIdle))
+            return fail(std::string("Checkpoint '") + checkpoint.name +
+                        "' could not complete its owning submitted frames.");
+        const auto capturePublication = context.rtFrameEvidence.PublishedStateByValue();
+        const auto& completedFrame = capturePublication.completedEvidence;
+        const auto& completedIdentity = completedFrame.identity.submitted;
+        if (!capturePublication.presented || !capturePublication.hasCompletedEvidence ||
+            completedIdentity.frame.sceneEpoch != capturePublication.sceneEpoch ||
+            completedIdentity.frame.measurementGeneration != capturePublication.measurementGeneration ||
+            completedIdentity.frame.simulationTick != context.simulation.Snapshot().tickIndex ||
+            completedFrame.presentation.outcome != horde::telemetry::RtPresentationOutcome::Presented ||
+            completedIdentity.submissionSerial !=
+                completedFrame.presentation.lastSuccessfulPresentSubmissionSerial ||
+            !completedFrame.scene.fireLighting.has_value())
+            return fail(std::string("Checkpoint '") + checkpoint.name +
+                        "' lacks current completed presentation and uploaded-fire evidence.");
+        std::string completedFrameJson;
+        horde::telemetry::RtEvidenceValidationError captureEvidenceError{};
+        if (!horde::telemetry::SerializeRtPerformanceEvidenceJson(
+                completedFrame, completedFrameJson, captureEvidenceError))
+            return fail(std::string("Checkpoint '") + checkpoint.name +
+                        "' completed-frame evidence failed canonical validation.");
+
         horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
         std::string diagnostic;
         if (!context.rtScene.CaptureStorageImage(image, diagnostic))
@@ -5722,6 +5751,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         }
 
         ShowcaseCaptureRecord record;
+        record.completedFrameEvidenceJson = std::move(completedFrameJson);
         record.checkpoint = &checkpoint;
         const horde::gameplay::simulation::SimulationSnapshot& simulation = context.simulation.Snapshot();
         record.camera = {simulation.playerX, simulation.playerZ,

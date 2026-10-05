@@ -199,7 +199,8 @@ bool ValidSceneFrame(const RtSceneFrameEvidence& scene,
         return false;
     }
     if ((scene.shadowQuality && !ValidRtShadowQualityEvidence(*scene.shadowQuality, scene.pipeline.dielectricQuality)) ||
-        (scene.fireQuality && !ValidRtFireQualityEvidence(*scene.fireQuality)))
+        (scene.fireQuality && !ValidRtFireQualityEvidence(*scene.fireQuality)) ||
+        (scene.fireLighting && !ValidRtFireLightingEvidence(*scene.fireLighting)))
     {
         error = RtEvidenceValidationError::InconsistentIdentity;
         return false;
@@ -222,7 +223,8 @@ bool ValidRecordedScene(const RtRecordedSceneEvidence& scene,
         return false;
     }
     if ((scene.shadowQuality && !ValidRtShadowQualityEvidence(*scene.shadowQuality, scene.pipeline.dielectricQuality)) ||
-        (scene.fireQuality && !ValidRtFireQualityEvidence(*scene.fireQuality)))
+        (scene.fireQuality && !ValidRtFireQualityEvidence(*scene.fireQuality)) ||
+        (scene.fireLighting && !ValidRtFireLightingEvidence(*scene.fireLighting)))
     {
         error = RtEvidenceValidationError::InconsistentIdentity;
         return false;
@@ -603,6 +605,58 @@ const char* RtStageMetricName(const RtStage stage) noexcept
     case RtStage::WholeFrameCycle: return "wholeFrameCycleCpuMs";
     default: return nullptr;
     }
+}
+
+bool ValidRtFireLightingEvidence(const RtFireLightingEvidence& evidence) noexcept
+{
+    if (evidence.count > evidence.emitters.size()) return false;
+    for (std::size_t index = 0u; index < evidence.emitters.size(); ++index)
+    {
+        const auto& emitter = evidence.emitters[index];
+        if (index >= evidence.count)
+        {
+            if (emitter != RtFireLightEvidence{}) return false;
+            continue;
+        }
+        if (emitter.stableId == 0u ||
+            !std::all_of(emitter.positionStrength.begin(), emitter.positionStrength.end(),
+                [](float value) { return std::isfinite(value); }) ||
+            !std::all_of(emitter.colourIntensity.begin(), emitter.colourIntensity.end(),
+                [](float value) { return std::isfinite(value) && value >= 0.0f; }) ||
+            emitter.positionStrength[3] <= 0.0f ||
+            emitter.colourIntensity[3] != emitter.positionStrength[3] ||
+            std::max({emitter.colourIntensity[0], emitter.colourIntensity[1],
+                      emitter.colourIntensity[2]}) <= 0.0f)
+            return false;
+        for (std::size_t earlier = 0u; earlier < index; ++earlier)
+            if (evidence.emitters[earlier].stableId == emitter.stableId) return false;
+    }
+    return true;
+}
+
+void WriteRtFireLightingEvidenceJson(std::ostream& output, const RtFireLightingEvidence& evidence)
+{
+    const auto oldLocale = output.getloc();
+    const auto oldFlags = output.flags();
+    const auto oldPrecision = output.precision();
+    output.imbue(std::locale::classic());
+    output << std::dec << std::defaultfloat << std::noshowpos << std::noshowbase << std::nouppercase
+           << std::setprecision(std::numeric_limits<float>::max_digits10)
+           << "{\"count\":" << evidence.count << ",\"emitters\":[";
+    for (std::size_t index = 0u; index < evidence.emitters.size(); ++index)
+    {
+        if (index != 0u) output << ',';
+        const auto& emitter = evidence.emitters[index];
+        output << "{\"stableId\":" << emitter.stableId << ",\"positionStrength\":[";
+        for (std::size_t component = 0u; component < 4u; ++component)
+        { if (component != 0u) output << ','; output << emitter.positionStrength[component]; }
+        output << "],\"colourIntensity\":[";
+        for (std::size_t component = 0u; component < 4u; ++component)
+        { if (component != 0u) output << ','; output << emitter.colourIntensity[component]; }
+        output << "]}";
+    }
+    output << "]}";
+    output.imbue(oldLocale); output.flags(oldFlags); output.precision(oldPrecision);
 }
 
 bool CheckedMillisecondsToNanoseconds(const double milliseconds,
@@ -1052,6 +1106,11 @@ bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& sna
              << ",\"reflectedVolumeSteps\":" << std::min(quality.volumeSteps, quality.reflectionSamples * 4u) << '}';
     }
 
+    if (snapshot.scene.fireLighting)
+    {
+        json << ",\"fireLighting\":";
+        WriteRtFireLightingEvidenceJson(json, *snapshot.scene.fireLighting);
+    }
     const RtResourceInventory& resources = snapshot.scene.resources;
     json << ",\"resources\":{\"bufferCount\":" << resources.bufferCount
          << ",\"memoryAllocationCount\":" << resources.memoryAllocationCount
@@ -1261,6 +1320,11 @@ bool SerializeRtPerformanceEvidenceText(const RtPerformanceEvidenceSnapshot& sna
         text << "\nUploaded fire: " << RtFireQualityName(quality.quality)
              << " volume-steps=" << quality.volumeSteps << " reflection-samples=" << quality.reflectionSamples
              << " reflected-volume-steps=" << std::min(quality.volumeSteps, quality.reflectionSamples * 4u);
+    }
+    if (snapshot.scene.fireLighting)
+    {
+        text << "\nOwning uploaded fire lights: ";
+        WriteRtFireLightingEvidenceJson(text, *snapshot.scene.fireLighting);
     }
     output = text.str();
     return true;
@@ -1626,6 +1690,7 @@ bool RtEvidenceLifecycle::Complete(const RtSubmittedFrameIdentity& submitted,
     candidate.scene.resources = slot.scene.resources;
     candidate.scene.shadowQuality = slot.scene.shadowQuality;
     candidate.scene.fireQuality = slot.scene.fireQuality;
+    candidate.scene.fireLighting = slot.scene.fireLighting;
     candidate.scene.player = slot.scene.player;
     if (diagnostic.status == RtSampleStatus::Valid)
     {

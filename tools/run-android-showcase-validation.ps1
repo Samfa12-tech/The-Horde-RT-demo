@@ -204,11 +204,14 @@ function Get-ExpectedShowcaseInstanceCapacity {
     param([string]$RepositoryRoot)
     $abi = Get-Content -LiteralPath (Join-Path $RepositoryRoot 'src/vulkan/raytracing/RtSceneAbi.def') -Raw | ConvertFrom-Json
     if ($abi.schema -ne 1 -or
+        ($abi.capacities.tlasInstances -isnot [int] -and $abi.capacities.tlasInstances -isnot [long]) -or
         ($abi.capacities.instanceMetadata -isnot [int] -and $abi.capacities.instanceMetadata -isnot [long]) -or
-        $abi.capacities.instanceMetadata -lt 1 -or $abi.capacities.instanceMetadata -gt 256) {
-        throw 'The checkout has no valid generated showcase instance capacity.'
+        $abi.capacities.instanceMetadata -lt 1 -or
+        $abi.capacities.tlasInstances -lt $abi.capacities.instanceMetadata -or
+        $abi.capacities.tlasInstances -gt 256) {
+        throw 'The checkout has no valid generated showcase TLAS instance capacity.'
     }
-    return [int]$abi.capacities.instanceMetadata
+    return [int]$abi.capacities.tlasInstances
 }
 
 function New-ScopedLogcatArguments {

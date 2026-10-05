@@ -9,7 +9,7 @@ adoption receipt SHA256:
 
 The medium retains density, extinction, authored bounds and 2/6/8 integration
 budgets. It uses actual sky, staff and fire RGB/strength, applies strength once
-and reuses each source's visibility at the mist interval midpoint. This adds at
+and reuses each source's visibility at the mist interval midpoint. At the admitted2bd two-slot capacity this adds at
 most four top-level source visibility calls per active mist pixel. Generic dielectric visibility can traverse multiple bounded interfaces, so this is not a bound on all hardware query initializations. Midpoint reuse is an
 approximation; it does not establish per-step volume visibility. The
 [adopted source and budget copies](experiments/1.6.2-mist/README.md) retain exact
@@ -77,7 +77,7 @@ for phone. These certify the2bd candidate; the newly requested Keeper flank
 torches require new artifacts, overlapping-light appearance and phone cost.
 Private Compute sky
 and blocked real-fire probes establish their specific sampled paths, not every
-march step or a clear warm-fire contribution. Current gameplay has one fire;
-native capacity-two overlap remains unverified. Preserve all negative packets
+march step or a clear warm-fire contribution. The admitted2bd gameplay had one fire;
+the later Keeper flank-light slice requires new native overlap evidence. Preserve all negative packets
 and the distinct evidence scopes in the
 [second-pass ledger](ENGINEERING_1_6_2_SECOND_PASS.md).

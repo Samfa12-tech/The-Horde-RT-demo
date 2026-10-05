@@ -8,6 +8,7 @@
 
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldLightState.h"
+#include "gameplay/effects/KeeperTorchLighting.h"
 #include "vulkan/raytracing/HeldItemRenderSlot.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
@@ -440,6 +441,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     qualityControlsBuffer_ = std::exchange(other.qualityControlsBuffer_, {});
     uploadedQualityControls_ = std::exchange(other.uploadedQualityControls_, {});
     uploadedFireQuality_ = std::exchange(other.uploadedFireQuality_, FireEmitterQuality::Mobile);
+    uploadedFireEmitters_ = std::exchange(other.uploadedFireEmitters_, FireEmitterUpload{});
+    uploadedFireEmittersValid_ = std::exchange(other.uploadedFireEmittersValid_, false);
     uploadedQualityControlsValid_ = std::exchange(other.uploadedQualityControlsValid_, false);
     worldSurfaceBuffer_ = std::exchange(other.worldSurfaceBuffer_, Buffer{});
     staticVertexBuffer_ = std::exchange(other.staticVertexBuffer_, Buffer{});
@@ -454,6 +457,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     waterfallBlas_ = std::exchange(other.waterfallBlas_, AccelerationStructure{});
     finaleRoofBlas_ = std::exchange(other.finaleRoofBlas_, AccelerationStructure{});
     torchBlas_ = std::exchange(other.torchBlas_, AccelerationStructure{});
+    worldTorchBodyBlas_ = std::exchange(other.worldTorchBodyBlas_, AccelerationStructure{});
     swordBlas_ = std::exchange(other.swordBlas_, AccelerationStructure{});
     gothicChestBaseBlas_ =
         std::exchange(other.gothicChestBaseBlas_, AccelerationStructure{});
@@ -888,6 +892,8 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
 
 void PresentableTinyRtScene::Destroy()
 {
+    uploadedFireEmitters_ = {};
+    uploadedFireEmittersValid_ = false;
     glassEnabled_ = true;
     tlasBuiltInstances_ = {};
     tlasInstanceDefinitionsValid_ = false;
@@ -897,6 +903,7 @@ void PresentableTinyRtScene::Destroy()
     computeDispatchGroups_ = {};
     if (device_ == VK_NULL_HANDLE)
     {
+        worldTorchBodyBlas_ = {};
         pipelineEvidenceIdentity_ = {};
         pipelineEvidenceIdentityValid_ = false;
         framePipelineEvidence_ = {};
@@ -926,6 +933,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(gothicChestBaseBlas_);
     DestroyAccelerationStructure(swordBlas_);
     DestroyAccelerationStructure(torchBlas_);
+    DestroyAccelerationStructure(worldTorchBodyBlas_);
     DestroyAccelerationStructure(finaleRoofBlas_);
     DestroyAccelerationStructure(waterfallBlas_);
     DestroyAccelerationStructure(blas_);
@@ -1089,7 +1097,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
         if (handle != VK_NULL_HANDLE) values.push_back(bits(handle));
     };
     for (const AccelerationStructure* blas : std::array{
-             &blas_, &waterfallBlas_, &finaleRoofBlas_, &torchBlas_, &swordBlas_,
+             &blas_, &waterfallBlas_, &finaleRoofBlas_, &torchBlas_, &worldTorchBodyBlas_, &swordBlas_,
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_})
@@ -1142,7 +1150,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
         }
     };
     for (const AccelerationStructure* blas : std::array{
-             &blas_, &waterfallBlas_, &finaleRoofBlas_, &torchBlas_, &swordBlas_,
+             &blas_, &waterfallBlas_, &finaleRoofBlas_, &torchBlas_, &worldTorchBodyBlas_, &swordBlas_,
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_})
@@ -3378,6 +3386,20 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // Dry final reveal room. The far-wall metal surround is an empty hero
     // mirror frame; its centre remains ordinary dry stone in Slice A.
     addRouteFloor(-36.90f, -18.4f, -30.50f, -12.0f, SurfaceDryStone);
+    // Upright admitted torch bodies rest on generic stone/iron floor stands.
+    // The supports are ordinary world triangles, outside the combat/chest lane;
+    // neither reveal nor extinguish rebuilds their immutable world geometry.
+    for (const auto& anchor : horde::gameplay::effects::kKeeperTorchAnchors)
+    {
+        const float x = anchor.position[0];
+        const float z = anchor.position[2];
+        addWorldBox(x - 0.16f, kRouteFloorWorldY, z - 0.16f,
+                    x + 0.16f, kRouteFloorWorldY + 0.13f, z + 0.16f, SurfaceMossyStone);
+        addWorldBox(x - 0.035f, kRouteFloorWorldY + 0.13f, z - 0.035f,
+                    x + 0.035f, anchor.position[1], z + 0.035f, SurfaceAgedMetal);
+        addWorldBox(x - 0.08f, anchor.position[1] - 0.05f, z - 0.08f,
+                    x + 0.08f, anchor.position[1], z + 0.08f, SurfaceAgedMetal);
+    }
     // Four fixed roof slabs leave a real finale aperture. A separate BLAS panel
     // below closes it until the defeated lich's authored roof sequence slides
     // the slab west under the surrounding masonry.
@@ -3935,6 +3957,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         }
         return accelerationStructure.address != 0u;
     };
+
+    // Shared body-only owner excludes the held torch's engine emissive core.
+    // Both permanent world instances alias custom metadata1 and the admitted
+    // asset buffers/materials; fire visibility is entirely the emitter record.
+    if (!buildRegisteredStaticBlas(1u, "world torch body", worldTorchBodyBlas_, true))
+        return false;
 
     std::vector<VkAccelerationStructureGeometryKHR> torchGeometries;
     std::vector<VkAccelerationStructureBuildRangeInfoKHR> torchRanges;
@@ -4535,6 +4563,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[kCollapseInstanceIndex].instanceCustomIndex = kCollapseInstanceIndex;
     instances[kCollapseInstanceIndex].mask = 0x01u;
     instances[kCollapseInstanceIndex].accelerationStructureReference = collapseBlas_.address;
+    ApplyKeeperTorchBodyInstances(instances);
     ApplyGlassFixtureVisibility(instances);
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
     {
@@ -5208,6 +5237,7 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
                                                    RtSceneRecordObservation* observation)
 {
     uploadedQualityControlsValid_ = false;
+    uploadedFireEmittersValid_ = false;
     if (tlasInstanceCount_ != 7u || tlas_.handle == VK_NULL_HANDLE ||
         frame.skeletonEnemyCount != 1u || frame.roster.selectedEnemy != horde::gameplay::EnemyKind::Skeleton ||
         frame.skeletonEnemies[0].animation != horde::gameplay::EnemyAnimation::Idle ||
@@ -5371,9 +5401,31 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
     lastPlayerWorldBodyInstanceFlags_ = 0u;
     uploadedQualityControls_ = *quality;
     uploadedFireQuality_ = fireDetail;
+    uploadedFireEmitters_ = fire;
+    uploadedFireEmittersValid_ = true;
     uploadedQualityControlsValid_ = true;
     diagnostic.clear();
     return true;
+}
+
+void PresentableTinyRtScene::ApplyKeeperTorchBodyInstances(
+    std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount>& instances) const
+{
+    static_assert(horde::gameplay::effects::kKeeperTorchAnchors.size() == kKeeperTorchInstanceCount);
+    for (std::size_t index = 0u; index < kKeeperTorchInstanceCount; ++index)
+    {
+        const auto worldFromItem = horde::gameplay::effects::KeeperTorchWorldFromItem(
+            horde::gameplay::effects::kKeeperTorchAnchors[index]);
+        auto& instance = instances[kKeeperTorchFirstTlasInstance + index];
+        instance = instances[0];
+        instance.instanceCustomIndex = 1u; // Existing admitted StaticPbr torch metadata alias.
+        instance.mask = instances[0].mask & 0x01u;
+        instance.accelerationStructureReference = worldTorchBodyBlas_.address;
+        instance.transform = {{
+            worldFromItem[0], worldFromItem[4], worldFromItem[8], worldFromItem[12],
+            worldFromItem[1], worldFromItem[5], worldFromItem[9], worldFromItem[13],
+            worldFromItem[2], worldFromItem[6], worldFromItem[10], worldFromItem[14]}};
+    }
 }
 
 bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffer,
@@ -5382,6 +5434,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                                      RtSceneRecordObservation* observation)
 {
     uploadedQualityControlsValid_ = false;
+    uploadedFireEmittersValid_ = false;
     if (sceneProfile_ == RtSceneProfile::GraphicsPreview)
         return UpdatePreviewInstances(commandBuffer, frame, diagnostic, observation);
 #ifndef NDEBUG
@@ -6066,6 +6119,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[kCollapseInstanceIndex].instanceCustomIndex = kCollapseInstanceIndex;
     instances[kCollapseInstanceIndex].mask = 0x01u;
     instances[kCollapseInstanceIndex].accelerationStructureReference = collapseBlas_.address;
+    ApplyKeeperTorchBodyInstances(instances);
     for (std::size_t instance = 0u; instance < instances.size(); ++instance)
         lastInstanceMasks_[instance] = instances[instance].mask;
 #ifndef NDEBUG
@@ -6083,6 +6137,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             horde::gameplay::items::OriginalTorchLightSocketTransform(),
             frame.heldLight.flameStrength, renderedTorchLight, diagnostic)) return false;
     auto renderFireEmitters = frame.fireEmitters;
+    if (frame.fireEmitterCount > renderFireEmitters.size())
+    {
+        diagnostic = "Scene configured fire emitter count exceeds its fixed storage capacity.";
+        return false;
+    }
     for (std::size_t emitter = 0; emitter < std::min(frame.fireEmitterCount, renderFireEmitters.size()); ++emitter)
     {
         if (renderFireEmitters[emitter].parentObject ==
@@ -6107,9 +6166,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
     FireEmitterUpload fireEmitterUpload;
     const FireEmitterTuning fireTuning{
-        frame.torchLightStrength * clampedTuning.fireStrengthScale,
+        clampedTuning.fireStrengthScale,
         clampedTuning.fireTurbulenceScale,
-        clampedTuning.fireSmokeScale};
+        clampedTuning.fireSmokeScale,
+        frame.torchLightStrength};
     const auto quality = ResolveRtQualityControls(frame.shadowQuality, clampedTuning.workloadPreset,
         pipelineBundle_.Request().quality == DielectricQuality::High);
     if (!quality) { diagnostic = "Scene shadow quality is invalid."; return false; }
@@ -6150,15 +6210,9 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             1.0f * clampedTuning.fireStrengthScale,
             clampedTuning.fireTurbulenceScale,
             clampedTuning.fireSmokeScale};
-        const std::size_t lanternEmitterIndex = std::min<std::size_t>(
-            fireEmitterUpload.activeCount, kRtActiveFireEmitterCapacity - 1u);
-        fireEmitterUpload.emitters[lanternEmitterIndex] = PackFireEmitterGpu(
-            lanternEmitter, lanternFireTuning,
-            ResolveFireEmitterQualityBudget(fireQuality));
-        fireEmitterUpload.selectedStableIds[lanternEmitterIndex] = lanternEmitter.stableId;
-        fireEmitterUpload.activeCount = static_cast<std::uint32_t>(
-            std::max<std::size_t>(fireEmitterUpload.activeCount,
-                                  lanternEmitterIndex + 1u));
+        if (!AppendFireEmitterUpload(lanternEmitter, lanternFireTuning,
+                                     fireQuality, fireEmitterUpload, diagnostic))
+            return false;
     }
     const bool diagnosticsAvailable =
         pipelineBundle_.DiagnosticAvailability() == RtDiagnosticAvailability::Available;
@@ -6514,6 +6568,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
 #endif
     uploadedQualityControls_ = *quality;
     uploadedFireQuality_ = fireQuality;
+    uploadedFireEmitters_ = fireEmitterUpload;
+    uploadedFireEmittersValid_ = true;
     uploadedQualityControlsValid_ = true;
     diagnostic.clear();
     return true;
@@ -6542,6 +6598,7 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
 {
     // A prior unsubmitted recording must not advance the GPU definition cache.
     tlasPendingDefinitionsValid_ = false;
+    uploadedFireEmittersValid_ = false;
 #ifndef NDEBUG
     // A rejected presentation attempt invalidates geometry evidence from the
     // prior recorded frame, including failures before dynamic scene updates.
@@ -6771,6 +6828,28 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         bool recordedFactsValid = framePipelineEvidenceValid_;
         recorded.pipeline = framePipelineEvidence_;
         recorded.resources = ResourceInventory();
+        const bool fireUploadBounded = uploadedFireEmittersValid_ &&
+            uploadedFireEmitters_.activeCount <= kRtActiveFireEmitterCapacity;
+        recordedFactsValid = fireUploadBounded && recordedFactsValid;
+        if (fireUploadBounded)
+        {
+            horde::telemetry::RtFireLightingEvidence lighting{};
+            lighting.count = uploadedFireEmitters_.activeCount;
+            static_assert(kRtActiveFireEmitterCapacity ==
+                horde::telemetry::kRtFireLightingEvidenceCapacity);
+            // Copy the complete uploaded prefix and suffix. The canonical
+            // validator verifies zero unused identity/light vectors.
+            for (std::size_t index = 0u; index < lighting.emitters.size(); ++index)
+            {
+                const auto& packed = uploadedFireEmitters_.emitters[index];
+                lighting.emitters[index].stableId = packed.identity[0];
+                lighting.emitters[index].positionStrength = packed.lightPositionStrength;
+                lighting.emitters[index].colourIntensity = packed.colourIntensity;
+            }
+            recorded.fireLighting = lighting;
+            recordedFactsValid = horde::telemetry::ValidRtFireLightingEvidence(lighting) &&
+                recordedFactsValid;
+        }
         recordedFactsValid = uploadedQualityControlsValid_ && recordedFactsValid;
         if (uploadedQualityControlsValid_)
         {

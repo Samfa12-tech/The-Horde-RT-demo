@@ -8,6 +8,8 @@
 
 The running RT scene uses the five Poly Haven material sets, the Hotstrike Studio skeleton derivative, the CC0 Meshy placeholder lich, the FilmCow sound subset, the DRAGON-STUDIO water loop, the user-selected Pixabay chest/torch cues, and the production Meshy 7 sword, torch, player, reward chest, and reward lantern recorded below. Source/high assets stay outside release packages; only audited runtime GLBs, manifests, WAV derivatives, 1K platform texture arrays, and this attribution record are distributed.
 
+1.6.2 Keeper flank lighting reuses two instances of the existing production medieval hand-torch runtime body and its admitted materials/textures/sockets. The source and runtime asset bytes, CC BY4.0 attribution and provenance below are unchanged. Generic authored stone/iron stand geometry uses the existing world material sets. No new generated or purchased asset is introduced; see [lighting evidence](docs/ENGINEERING_1_6_2_KEEPER_TORCH_LIGHTING.md).
+
 ## Asset rules
 
 - Every asset must be commercial-safe.

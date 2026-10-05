@@ -330,6 +330,33 @@ void TestCanonicalCompletedEvidence()
     }
 }
 
+void TestCompletedFireLightingProjection()
+{
+    auto completed = MakeCompletedEvidence(RtInstrumentationMode::Shipping);
+    completed.scene.fireLighting = RtFireLightingEvidence{};
+    completed.scene.fireLighting->count = 2u;
+    completed.scene.fireLighting->emitters[0] = {3u, {{-32.5f, 0.85f, -16.5f, 0.5f}}, {{1.0f, 0.5f, 0.25f, 0.5f}}};
+    completed.scene.fireLighting->emitters[1] = {4u, {{-31.5f, 0.85f, -13.5f, 0.75f}}, {{1.0f, 0.5f, 0.25f, 0.75f}}};
+    auto publication = MakePublished(completed);
+    completed.scene.fireLighting = RtFireLightingEvidence{};
+    std::string json, text, reason;
+    Check(SerializeRtEvidencePublication(publication, true, json, text, reason) &&
+          json.find("\"fireLighting\":{\"count\":2") != std::string::npos &&
+          json.find("\"stableId\":4") != std::string::npos,
+          "capability publication exposes actual completed owning fire lights rather than the current upload");
+    publication.hasCompletedEvidence = false;
+    Check(SerializeRtEvidencePublication(publication, true, json, text, reason) &&
+          json.find("\"completedFrame\":null") != std::string::npos &&
+          json.find("fireLighting") == std::string::npos,
+          "a pending completion cannot certify the stored/current fire selection");
+    publication = MakePublished(completed);
+    publication.completedEvidence.scene.fireLighting->emitters[3].stableId = 4u;
+    Check(!SerializeRtEvidencePublication(publication, true, json, text, reason) &&
+          json.find("\"completedFrame\":null") != std::string::npos &&
+          json.find("fireLighting") == std::string::npos,
+          "invalid completed fire suffix fails capability publication without exposing a light claim");
+}
+
 void TestCurrentLifecycleDiffersFromHistoricalFrame()
 {
     const RtPerformanceEvidenceSnapshot completed =
@@ -500,6 +527,7 @@ int main()
     TestPendingAndRecreatedPublication();
     TestObserverUnavailable();
     TestCanonicalCompletedEvidence();
+    TestCompletedFireLightingProjection();
     TestCurrentLifecycleDiffersFromHistoricalFrame();
     TestPreviousGenerationIsPendingNotError();
     TestInvalidPublications();

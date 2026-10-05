@@ -41,6 +41,8 @@ struct FireEmitterTuning
     float strengthScale = 1.0f;
     float turbulenceScale = 1.0f;
     float smokeScale = 1.0f;
+    // Apply the carried-torch gameplay fade/intensity without dimming world lights.
+    float originalTorchStrengthScale = 1.0f;
 };
 
 struct FireEmitterSelectionContext
@@ -65,6 +67,12 @@ RtFireEmitterGpu PackFireEmitterGpu(
 bool BuildFireEmitterUpload(
     std::span<const horde::gameplay::effects::FireEmitterState> configuredEmitters,
     const FireEmitterSelectionContext& selection,
+    const FireEmitterTuning& tuning,
+    FireEmitterQuality quality,
+    FireEmitterUpload& upload,
+    std::string& diagnostic);
+bool AppendFireEmitterUpload(
+    const horde::gameplay::effects::FireEmitterState& emitter,
     const FireEmitterTuning& tuning,
     FireEmitterQuality quality,
     FireEmitterUpload& upload,

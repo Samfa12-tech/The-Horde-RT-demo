@@ -83,6 +83,20 @@ bool MotionEvidenceLedger::AppendState(std::uint64_t now,
         std::abs(input.moveForward) > 1.00001f || std::abs(input.moveStrafe) > 1.00001f ||
         (!states_.empty() && (now < states_.back().wallNanoseconds || state.tickIndex < states_.back().tick)))
         return Reject("Motion state input/profile/time/capacity admission failed.");
+    if (state.fireEmitterCount > 4u || state.fireEmitterCount > state.fireEmitters.size())
+        return Reject("Motion configured fire-source count exceeds its admitted capacity.");
+    for (std::size_t index = 0u; index < state.fireEmitterCount; ++index)
+    {
+        const auto& source = state.fireEmitters[index];
+        if (source.stableId == 0u || !std::isfinite(source.strength) || source.strength < 0.0f ||
+            !std::isfinite(source.fuel) || source.fuel < 0.0f ||
+            !std::isfinite(source.phase) || !std::isfinite(source.leanX) ||
+            !std::isfinite(source.leanZ) || !std::isfinite(source.motionTurbulence))
+            return Reject("Motion configured fire-source identity/numeric admission failed.");
+        for (std::size_t earlier = 0u; earlier < index; ++earlier)
+            if (state.fireEmitters[earlier].stableId == source.stableId)
+                return Reject("Motion configured fire-source identity is duplicated.");
+    }
     for (const auto& event : events)
     {
         if (event.sequence <= latestEventSequence_ || static_cast<unsigned>(event.type) > 20u)
@@ -101,9 +115,14 @@ bool MotionEvidenceLedger::AppendState(std::uint64_t now,
     row.overrunCount = state.catchUpOverrunCount; row.ticksThisFrame = state.simulationTicksThisFrame;
     row.retryGeneration = state.retryGeneration; row.vitality = state.playerVitals.vitality;
     row.paused = state.paused; row.playerAlive = state.playerAlive;
-    for (std::size_t i = 0u; i < std::min(state.fireEmitterCount, row.fire.size()); ++i)
+    row.simulationFireEmitterCount = static_cast<std::uint32_t>(state.fireEmitterCount);
+    for (std::size_t i = 0u; i < state.fireEmitterCount; ++i)
+    {
         row.fire[i] = {{state.fireEmitters[i].phase, state.fireEmitters[i].leanX,
                        state.fireEmitters[i].leanZ, state.fireEmitters[i].motionTurbulence}};
+        row.simulationFireSources[i] = {state.fireEmitters[i].stableId,
+                                       state.fireEmitters[i].strength, state.fireEmitters[i].fuel};
+    }
     const auto index = states_.size(); states_.push_back(row);
     for (const auto& event : events) events_.push_back({index, event});
     return true;
@@ -199,6 +218,7 @@ bool MotionEvidenceLedger::AppendCompletedFrame(std::uint64_t generation, const 
     row.stateRow = pending.stateRow; row.pipelineIndex = static_cast<std::size_t>(found - pipelines_.begin());
     row.surfaceGeneration = generation; row.identity = identity;
     row.resources = completed.scene.resources; row.player = completed.scene.player;
+    row.fireLighting = completed.scene.fireLighting;
     row.gpuStatus = completed.gpu.status; row.cpuStatus = completed.scene.stages.status;
     row.gpuDurationAvailable = completed.gpu.hasDuration && completed.gpu.status == RtSampleStatus::Valid &&
         completed.gpu.completedSubmissionSerial == identity.submitted.submissionSerial;
@@ -265,7 +285,21 @@ void MotionEvidenceLedger::WriteJson(std::ostream& output,
                << ",\"finalePhase\":" << static_cast<int>(r.finale.phase) << ",\"roof\":" << r.finale.skylightOpenProgress
                << ",\"dawn\":" << r.finale.dawnRevealProgress << ",\"fire\":[";
         for (std::size_t j = 0u; j < r.fire.size(); ++j) { if (j) output << ','; output << '['; for (std::size_t k = 0u; k < 4u; ++k) { if (k) output << ','; output << r.fire[j][k]; } output << ']'; }
-        output << "]}";
+        output << ']';
+        if (r.simulationFireEmitterCount)
+        {
+            output << ",\"simulationFireEmitterCount\":" << *r.simulationFireEmitterCount
+                   << ",\"simulationFireSources\":[";
+            for (std::size_t j = 0u; j < r.simulationFireSources.size(); ++j)
+            {
+                if (j != 0u) output << ',';
+                const auto& source = r.simulationFireSources[j];
+                output << "{\"stableId\":" << source.stableId << ",\"strength\":" << source.strength
+                       << ",\"fuel\":" << source.fuel << '}';
+            }
+            output << ']';
+        }
+        output << '}';
     }
     output << "],\"events\":[";
     for (std::size_t i = 0u; i < events_.size(); ++i)
@@ -298,7 +332,13 @@ void MotionEvidenceLedger::WriteJson(std::ostream& output,
                << ",\"gpuNs\":" << r.gpuNanoseconds << ",\"cpuStatus\":" << static_cast<int>(r.cpuStatus)
                << ",\"wholeFrameCpuNs\":" << r.wholeFrameCpuNanoseconds << ",\"simulationCpuNs\":" << r.simulationCpuNanoseconds
                << ",\"skinUpdates\":" << r.player.skinUpdateCount << ",\"socketErrorMicrometres\":" << r.player.maximumSocketErrorMicrometres
-               << ",\"hostVisibleBytes\":" << r.resources.hostVisibleBytes << ",\"deviceLocalBytes\":" << r.resources.deviceLocalBytes << '}';
+               << ",\"hostVisibleBytes\":" << r.resources.hostVisibleBytes << ",\"deviceLocalBytes\":" << r.resources.deviceLocalBytes;
+        if (r.fireLighting)
+        {
+            output << ",\"fireLighting\":";
+            WriteRtFireLightingEvidenceJson(output, *r.fireLighting);
+        }
+        output << '}';
     }
     output << "],\"resourceScopes\":[";
     for (std::size_t i = 0u; i < scopes_.size(); ++i)

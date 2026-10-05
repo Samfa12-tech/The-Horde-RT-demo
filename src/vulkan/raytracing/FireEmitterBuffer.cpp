@@ -57,7 +57,13 @@ RtFireEmitterGpu PackFireEmitterGpu(
     const FireEmitterTuning& tuning,
     const FireEmitterQualityBudget& budget)
 {
-    const float strengthScale = FiniteClamped(tuning.strengthScale, 0.0f, 4.0f, 1.0f);
+    const float parentStrengthScale = emitter.parentObject ==
+        horde::gameplay::effects::FireEmitterParentObject::OriginalTorch
+            ? tuning.originalTorchStrengthScale : 1.0f;
+    // Clamp the combined scale once, preserving the carried torch's previous
+    // intensity/fade path even when gameplay intensity exceeds one.
+    const float strengthScale = FiniteClamped(
+        tuning.strengthScale * parentStrengthScale, 0.0f, 4.0f, 1.0f);
     const float turbulenceScale = FiniteClamped(tuning.turbulenceScale, 0.0f, 2.0f, 1.0f);
     const float smokeScale = FiniteClamped(tuning.smokeScale, 0.0f, 2.0f, 1.0f);
     const float baseStrength = FiniteClamped(emitter.strength, 0.0f, 1.0f, 0.0f) *
@@ -119,12 +125,14 @@ bool BuildFireEmitterUpload(
     {
         const horde::gameplay::effects::FireEmitterState* emitter = nullptr;
         float distanceSquared = 0.0f;
+        RtFireEmitterGpu packed{};
     };
     std::vector<Candidate> candidates;
     candidates.reserve(configuredEmitters.size());
     const float maximumDistance = FiniteClamped(
         selection.maximumDistance, 0.0f, 1000.0f, 24.0f);
     const float maximumDistanceSquared = maximumDistance * maximumDistance;
+    const FireEmitterQualityBudget budget = ResolveFireEmitterQualityBudget(quality);
     for (const auto& emitter : configuredEmitters)
     {
         if (emitter.stableId == 0u)
@@ -145,7 +153,11 @@ bool BuildFireEmitterUpload(
         const float distanceSquared = DistanceSquared(emitter, selection.cameraWorld);
         if (emitter.zone == selection.zone && emitter.strength * emitter.fuel > 0.0001f &&
             distanceSquared <= maximumDistanceSquared)
-            candidates.push_back({&emitter, distanceSquared});
+        {
+            const auto packed = PackFireEmitterGpu(emitter, tuning, budget);
+            if (packed.colourIntensity[3] > 0.0f)
+                candidates.push_back({&emitter, distanceSquared, packed});
+        }
     }
     std::sort(candidates.begin(), candidates.end(), [](const Candidate& left,
                                                         const Candidate& right) {
@@ -154,19 +166,67 @@ bool BuildFireEmitterUpload(
         return left.emitter->stableId < right.emitter->stableId;
     });
     if (candidates.size() > kRtActiveFireEmitterCapacity)
-        candidates.resize(kRtActiveFireEmitterCapacity);
+    {
+        diagnostic = "FireEmitterBuffer active capacity exceeded; no important light was discarded.";
+        return false;
+    }
     std::sort(candidates.begin(), candidates.end(), [](const Candidate& left,
                                                         const Candidate& right) {
         return left.emitter->stableId < right.emitter->stableId;
     });
 
-    const FireEmitterQualityBudget budget = ResolveFireEmitterQualityBudget(quality);
     upload.activeCount = static_cast<std::uint32_t>(candidates.size());
     for (std::size_t index = 0u; index < candidates.size(); ++index)
     {
         upload.selectedStableIds[index] = candidates[index].emitter->stableId;
-        upload.emitters[index] = PackFireEmitterGpu(*candidates[index].emitter, tuning, budget);
+        upload.emitters[index] = candidates[index].packed;
     }
+    diagnostic.clear();
+    return true;
+}
+
+bool AppendFireEmitterUpload(
+    const horde::gameplay::effects::FireEmitterState& emitter,
+    const FireEmitterTuning& tuning,
+    const FireEmitterQuality quality,
+    FireEmitterUpload& upload,
+    std::string& diagnostic)
+{
+    if (quality != FireEmitterQuality::Mobile && quality != FireEmitterQuality::High &&
+        quality != FireEmitterQuality::Low)
+    {
+        diagnostic = "FireEmitterBuffer append requires an admitted quality tier.";
+        return false;
+    }
+    if (emitter.stableId == 0u || upload.activeCount > kRtActiveFireEmitterCapacity)
+    {
+        diagnostic = "FireEmitterBuffer append requires a valid identity and bounded prefix.";
+        return false;
+    }
+    for (std::size_t index = 0u; index < upload.activeCount; ++index)
+    {
+        if (upload.selectedStableIds[index] == emitter.stableId)
+        {
+            diagnostic = "FireEmitterBuffer append requires a unique stable ID.";
+            return false;
+        }
+    }
+    const auto packed = PackFireEmitterGpu(
+        emitter, tuning, ResolveFireEmitterQualityBudget(quality));
+    if (packed.colourIntensity[3] <= 0.0f)
+    {
+        diagnostic.clear();
+        return true;
+    }
+    if (upload.activeCount == kRtActiveFireEmitterCapacity)
+    {
+        diagnostic = "FireEmitterBuffer append capacity exceeded; existing lights were retained.";
+        return false;
+    }
+    const std::size_t index = upload.activeCount;
+    upload.emitters[index] = packed;
+    upload.selectedStableIds[index] = emitter.stableId;
+    ++upload.activeCount;
     diagnostic.clear();
     return true;
 }

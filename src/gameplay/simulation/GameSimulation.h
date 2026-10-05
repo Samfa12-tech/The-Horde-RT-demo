@@ -130,7 +130,7 @@ private:
     std::array<horde::gameplay::effects::FireEmitterState,
                horde::gameplay::effects::kFireEmitterCapacity> fireEmitters_{{
         horde::gameplay::effects::MakeOpeningTorchFireEmitter()}};
-    std::size_t fireEmitterCount_ = 1u;
+    std::size_t fireEmitterCount_ = 3u;
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
     float playerX_ = 0.0f;

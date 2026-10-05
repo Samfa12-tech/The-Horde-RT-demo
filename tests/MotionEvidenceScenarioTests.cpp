@@ -226,6 +226,25 @@ void TestAdmissionAndFrameBinding()
     simulation.AdvanceFrame(input, 1.0 / 60.0, 1u);
     scenario.ObserveAdvance(simulation.Snapshot(), simulation.Events().Events());
     Check(ledger.AppendState(1'001u, simulation.Snapshot(), input, scenario, simulation.Events().Events()), "actual current state row admitted");
+    Check(ledger.States()[0].simulationFireEmitterCount == simulation.Snapshot().fireEmitterCount &&
+          ledger.States()[0].simulationFireSources[1].stableId == 3u &&
+          ledger.States()[0].simulationFireSources[2].stableId == 4u &&
+          ledger.States()[0].simulationFireSources[1].strength == 0.0f &&
+          ledger.States()[0].simulationFireSources[2].strength == 0.0f &&
+          ledger.States()[0].simulationFireSources[3].stableId == 0u,
+          "opening motion state retains three configured sources including dormant flank IDs without inventing an active light");
+    auto malformedState = simulation.Snapshot();
+    malformedState.fireEmitterCount = 5u;
+    auto malformedLedger = ledger;
+    Check(!malformedLedger.AppendState(1'001u, malformedState, input, scenario, {}) &&
+          malformedLedger.States().size() == 1u,
+          "oversized configured count rejects before indexing or adding a state row");
+    malformedState = simulation.Snapshot();
+    malformedState.fireEmitters[2].stableId = malformedState.fireEmitters[1].stableId;
+    malformedLedger = ledger;
+    Check(!malformedLedger.AppendState(1'001u, malformedState, input, scenario, {}) &&
+          malformedLedger.States().size() == 1u,
+          "duplicate configured IDs cannot fabricate two independently observed torches");
     simulation.ClearEvents();
     // Actual evidence lifecycle protocol with CPU-only injected graphics facts.
     // This fixture owns no Vulkan device and establishes no RT rendering pass.
@@ -245,9 +264,15 @@ void TestAdmissionAndFrameBinding()
           AssignRtFixedText(recorded.pipeline.opaqueFast.sha256, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") &&
           AssignRtFixedText(recorded.pipeline.genericDielectric.sha256, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"), "fixture shader identity");
     recorded.pipeline.active = recorded.pipeline.opaqueFast;
+    recorded.fireLighting = RtFireLightingEvidence{};
+    recorded.fireLighting->count = 2u;
+    recorded.fireLighting->emitters[0] = {3u, {{-32.5f, 0.85f, -16.5f, 0.5f}}, {{1.0f, 0.5f, 0.25f, 0.5f}}};
+    recorded.fireLighting->emitters[1] = {4u, {{-31.5f, 0.85f, -13.5f, 0.75f}}, {{1.0f, 0.5f, 0.25f, 0.75f}}};
+    const auto owningLighting = recorded.fireLighting;
     Check(lifecycle.FinishRecord(token, recorded, token), "existing owner finishes record");
     RtSubmittedFrameIdentity submitted;
     Check(lifecycle.Submit(token, submitted), "existing owner commits submission identity");
+    recorded.fireLighting = RtFireLightingEvidence{}; // later current upload must not overwrite committed copy
     Check(ledger.BindSubmittedFrame(5u, submitted), "ledger binds exact committed identity to current state row");
     Check(ledger.HasPendingSubmissions(), "submitted graphics work remains visibly pending before owning completion");
     Check(lifecycle.AttachPresentation(submitted, RtPresentationOutcome::Presented), "existing owner attaches presentation fact");
@@ -260,6 +285,21 @@ void TestAdmissionAndFrameBinding()
     Check(ledger.AppendCompletedFrame(5u, publication) && ledger.AppendCompletedFrame(5u, publication) && ledger.Frames().size() == 1u &&
           !ledger.HasPendingSubmissions(),
           "exact completed frame joins once despite duplicate output polls");
+    Check(ledger.Frames()[0].fireLighting == owningLighting &&
+          ledger.Frames()[0].fireLighting != recorded.fireLighting,
+          "motion completed row retains only its exact submitted upload despite a later getter changing");
+    std::ostringstream fireJson;
+    ledger.WriteJson(fireJson, scenario);
+    Check(fireJson.str().find("\"fireLighting\":{\"count\":2") != std::string::npos &&
+          fireJson.str().find("\"simulationFireEmitterCount\":") != std::string::npos &&
+          fireJson.str().find("\"strength\":") != std::string::npos,
+          "motion JSON separates configured source strength/fuel/ID from completed upload selection");
+    auto invalidLightingLedger = ledger;
+    auto invalidLightingPublication = publication;
+    invalidLightingPublication.completedEvidence.scene.fireLighting->emitters[1].stableId = 3u;
+    Check(!invalidLightingLedger.AppendCompletedFrame(5u, invalidLightingPublication) &&
+          invalidLightingLedger.Frames().size() == 1u,
+          "even a duplicate completion cannot smuggle invalid uploaded IDs into the motion rows");
     Check(ledger.HasCurrentPresentedFrame(5u, publication.sceneEpoch, publication.measurementGeneration) &&
           !ledger.HasCurrentPresentedFrame(6u, publication.sceneEpoch, publication.measurementGeneration), "new surface generation cannot inherit prior readiness");
     auto staleLedger = ledger;

@@ -2,6 +2,34 @@
 
 The first-pass reviewed source is `b2dc216a500e690b44ebac20ea05f7bb318349a4`; its measured runtime is `95eb08070354d4b3b775e6d2368cca8688f9cfe6`. New source below requires new artifact/device evidence. Preserve the closed first-pass cohorts and negative experiments rather than relabelling them.
 
+## Current boundary, 5 October: integrated mist admitted; Keeper lights implementing
+
+Integrated runtime2bdad132 passed all six current CI jobs, fresh85-member Windows
+Debug/Release archives and three all-four-ABI Android package admissions. Both
+allocated SM-S948B Debug backends pass13/13 route/seven captures/strict Home
+at saved50%; actual installed pullbacks and1420-byte preferences match before
+and after. The two current Windows motion runs pass28 captures each and the
+owner explicitly approves moving mist. Independent closed admission receipts:
+Windows `e4f56c9216ed33f84c2d66e20216dc3fa94308482f267b2c9f6eb17589777962`,
+phone `079be9eb959d89764b10987650d5a2f366a5306395369de5740f21a9049d4e03`.
+The earlier invisible-window focus failure is preserved; read-only probes proved
+an isolated validation desktop. The replacements use Default desktop with the
+same executable, harness/focus guard/deadline, without security changes.
+
+New owner scope: two rear Keeper flank torches ignite at existing reveal start,
+remain lit through combat and the actual death animation, then extinguish to
+restore the chest spotlight's focus. The corrected mist's occlusion remains.
+Shared simulation, admitted torch bodies/sockets and real simultaneous-light
+capacity are implementing; native overlapping-light appearance, reset/replay
+and phone cost will need a new exact candidate. Older2bd acceptance is not
+approval of these new lights.
+
+The owner also authorized an isolated opt-in Lower indirect-lighting candidate,
+with Current default and protected wet/metal/transmissive/reflection receivers.
+Preparation is active outside production; matched visual/cost evidence remains
+required. Texture LOD remains independently deferred. No old closed experiment,
+device cohort or paid asset work is restarted by either addition.
+
 ## Owner-feedback slice, 4 October 2026
 
 Actual private phone screenshots were inspected before the layout/scene changes. Raw reports and images remain outside the repository.

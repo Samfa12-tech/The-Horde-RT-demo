@@ -46,6 +46,35 @@ try {
     }
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
+    $capacityCpu = Get-Content -LiteralPath $portableCpuPath -Raw
+    if ($definition.capacities.instanceMetadata -ne 22 -or $definition.capacities.tlasInstances -ne 24 -or
+        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 24u;' -or
+        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 22u;' -or
+        $capacityCpu -notmatch 'kRtActiveFireEmitterCapacity = 4u;' -or
+        $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;') {
+        throw 'Generated owners must distinguish24 TLAS instances from22 metadata records while retaining four fire storage records.'
+    }
+    foreach ($case in @(
+        @{ name = 'tlasInstances'; value = 21 },
+        @{ name = 'tlasInstances'; value = 257 },
+        @{ name = 'tlasInstances'; value = 24.5 },
+        @{ name = 'tlasInstances'; value = '24' },
+        @{ name = 'activeFireEmitters'; value = 5 }
+    )) {
+        $invalidCapacity = Get-Content -LiteralPath $lfDefinitionPath -Raw | ConvertFrom-Json
+        $invalidCapacity.capacities.($case.name) = $case.value
+        $invalidCapacityPath = Join-Path $temporaryRoot 'invalid-capacity.def'
+        $invalidCapacity | ConvertTo-Json -Depth 32 | Set-Content -LiteralPath $invalidCapacityPath
+        $capacityRejected = $false
+        try {
+            & (Join-Path $repoRoot 'tools/generate-rt-scene-abi.ps1') -DefinitionPath $invalidCapacityPath `
+                -CpuOutputPath $portableCpuPath -GlslOutputPath $portableGlslPath
+        } catch {
+            if ($_.Exception.Message -notmatch '^RT scene ABI (capacity|owner capacities)') { throw }
+            $capacityRejected = $true
+        }
+        if (-not $capacityRejected) { throw 'Invalid physical owner/fire capacity was admitted.' }
+    }
     if ($definition.schema -ne 1 -or $definition.bindings.dielectricDiagnostics -ne 22 -or
         $definition.bindings.environmentTexture -ne 25 -or
         $generatedGlsl -notmatch 'binding = 25\) uniform sampler2D rtEnvironmentTexture;') {

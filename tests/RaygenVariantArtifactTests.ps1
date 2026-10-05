@@ -493,11 +493,11 @@ try {
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
-    # Compatibility pins identify the admitted independent shadow/fire binding26 shading;
+    # Compatibility pins identify actual-incident mist with four admitted active fire records;
     # the independent fresh compiler check below still validates source identity.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'fe583ea8d35f69958848482892bed0b47adbc1009942268bf601462803019d0b') `
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'fc1dec4f8f242218cacdf17ff718bb2559b53c8d917feeca0e82c21dcd45519d') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '61c569fa7a245599d812c0305cca00a19fac32f75f2545d57bd8d1477da4a100') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq 'e3489a43934afc908d5f43703660927abb3442b71a08899a701960c9f21242af') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -537,12 +537,12 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
         'Catalog keys must remain the exact approved set without duplicates or reordering.'
     # 1.6.2 independent primary shadow quality specializes OpaqueFast lighting as
     # well as dielectric lighting. The former equal Mobile/High word pairs are
-    # no longer the admitted snapshot; keep exact reviewed binding26 raw-word witnesses.
+    # no longer the admitted snapshot; keep exact reviewed actual-incident mist/active-fire4 raw-word witnesses.
     $opaqueWordPins = @{
-        diagnostic_high_opaque_fast = '916c43c18102cd1de9c7c2e9b7118722fa3f025d15d027af937b539f533d2705'
-        diagnostic_mobile_opaque_fast = 'c3217afa0af9de28fa52f595f59c82080abff67f241911c75ad8f20641455f6c'
-        shipping_high_opaque_fast = 'e908d7c9d3ff09d550644dcb255eacb26942b00cab68f70fab59c1ac0b6764dc'
-        shipping_mobile_opaque_fast = '7566ddfb2ae7c6bd60be02edfd7a1df1a5a9e872e83b66376f8d3c4bd1e4a398'
+        diagnostic_high_opaque_fast = 'ac714c11a404d4d2b3b4d5d7e60cb4a3861d8f6c0e4cce673a8b83576cbea76c'
+        diagnostic_mobile_opaque_fast = '5ee4a1bd1f5f9bee3c1cbc2a7a4c28c5dc9e3c64c7ca5aca93313dfcea0bb74f'
+        shipping_high_opaque_fast = '5f369cfa2d439cec1f5e3ae42440e859879b03d8f0305aef80f40ca3e423a653'
+        shipping_mobile_opaque_fast = 'db1b15cbcb379b5a4ef4750313ff704b092687c1ef8385c8602b30c0a5979eff'
     }
     foreach ($row in @($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' })) {
         Assert-True ($row.spirvSha256 -ceq $opaqueWordPins[$row.key]) `

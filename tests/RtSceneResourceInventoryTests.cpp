@@ -4,12 +4,14 @@
 #include "vulkan/raytracing/RtExecutionPolicy.h"
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
+#include "gameplay/effects/KeeperTorchLighting.h"
 
 #include <algorithm>
 #include <array>
 #include <cctype>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -164,6 +166,56 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static bool CheckKeeperTorchBodyAliases()
+    {
+        PresentableTinyRtScene scene;
+        scene.worldTorchBodyBlas_.address = 0xB0D1u;
+        scene.torchBlas_.address = 0xF1A0u; // Distinct owner contains the held emissive core.
+        std::array<VkAccelerationStructureInstanceKHR, PresentableTinyRtScene::kTlasInstanceCount> instances{};
+        instances[0].mask = 0x01u;
+        instances[0].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+        instances[0].accelerationStructureReference = 0x1234u;
+        const auto original = instances;
+        scene.ApplyKeeperTorchBodyInstances(instances);
+        bool ok = true;
+        for (std::size_t index = 0u; index < PresentableTinyRtScene::kKeeperTorchInstanceCount; ++index)
+        {
+            const auto& instance = instances[PresentableTinyRtScene::kKeeperTorchFirstTlasInstance + index];
+            const auto& anchor = horde::gameplay::effects::kKeeperTorchAnchors[index];
+            ok &= instance.instanceCustomIndex == 1u && instance.instanceCustomIndex < kRtInstanceMetadataCapacity &&
+                  instance.mask == 0x01u && instance.accelerationStructureReference == 0xB0D1u &&
+                  instance.accelerationStructureReference != scene.torchBlas_.address &&
+                  instance.transform.matrix[0][3] == anchor.position[0] &&
+                  instance.transform.matrix[1][3] == anchor.position[1] &&
+                  instance.transform.matrix[2][3] == anchor.position[2] &&
+                  instance.transform.matrix[0][0] == 1.0f && instance.transform.matrix[1][1] == 1.0f &&
+                  instance.transform.matrix[2][2] == 1.0f;
+        }
+        // Physical slots22/23 never become shader metadata22/23. All established
+        // player, pane, collapse and ordinary instance definitions remain intact.
+        ok &= std::memcmp(instances.data(), original.data(), kRtInstanceMetadataCapacity * sizeof(instances[0])) == 0;
+        instances[0].mask = 0u;
+        scene.ApplyKeeperTorchBodyInstances(instances);
+        ok &= instances[22].mask == 0u && instances[23].mask == 0u;
+        scene.worldTorchBodyBlas_ = {};
+        scene.torchBlas_ = {};
+        return ok;
+    }
+
+    static void MarkFireUpload(PresentableTinyRtScene& scene)
+    {
+        scene.uploadedFireEmitters_ = {};
+        scene.uploadedFireEmitters_.activeCount = 2u;
+        for (std::size_t index = 0u; index < 2u; ++index)
+        {
+            const auto id = static_cast<std::uint32_t>(3u + index);
+            scene.uploadedFireEmitters_.selectedStableIds[index] = id;
+            scene.uploadedFireEmitters_.emitters[index].identity[0] = id;
+            scene.uploadedFireEmitters_.emitters[index].lightPositionStrength = {{-35.5f,0.99f,-16.325f,0.8f}};
+            scene.uploadedFireEmitters_.emitters[index].colourIntensity = {{1.0f,0.5f,0.1f,0.8f}};
+        }
+        scene.uploadedFireEmittersValid_ = true;
+    }
     static bool CheckPersistentReadback()
     {
         PresentableTinyRtScene scene; // No Vulkan device: a remap would be invalid.
@@ -257,6 +309,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         scene.uploadedQualityControls_ = {{2u, 4u, 2u, 0u}};
         scene.uploadedFireQuality_ = FireEmitterQuality::Low;
         scene.uploadedQualityControlsValid_ = true;
+        MarkFireUpload(scene);
         scene.sceneProfile_ = RtSceneProfile::GraphicsPreview;
         scene.tlasInstanceCount_ = 7u;
         scene.tlas_.handle = FakeHandle<VkAccelerationStructureKHR>(0x987u);
@@ -325,7 +378,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         for (RtAccelerationStructure* accelerationStructure :
              std::array{
                  &scene.blas_, &scene.waterfallBlas_, &scene.finaleRoofBlas_,
-                 &scene.torchBlas_, &scene.swordBlas_, &scene.gothicChestBaseBlas_,
+                 &scene.torchBlas_, &scene.worldTorchBodyBlas_, &scene.swordBlas_, &scene.gothicChestBaseBlas_,
                  &scene.gothicChestLidBlas_, &scene.rewardLanternRingBlas_,
                  &scene.rewardLanternBodyBlas_, &scene.dielectricFixtureBlas_,
                  &scene.playerBodyBlas_, &scene.playerLimbBlas_,
@@ -340,6 +393,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         scene.uploadedFireQuality_ = FireEmitterQuality::Low;
         scene.uploadedQualityControlsValid_ = true;
         populateBlas(scene.tlas_);
+        MarkFireUpload(scene);
         populateBuffer(scene.tlasUpdateScratch_);
 
         for (std::size_t bucket = 0u;
@@ -893,6 +947,8 @@ int main()
     using namespace horde::vulkan::raytracing;
 
     bool ok = PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckKeeperTorchBodyAliases(),
+                  "two physical world torch slots must share dark body geometry and valid static metadata aliases");
     for (const auto instrumentation : {RtInstrumentation::Diagnostic, RtInstrumentation::Shipping})
     {
         const auto contract = TryMakeRtDescriptorIoContract(instrumentation);
@@ -1209,7 +1265,7 @@ int main()
 #ifndef NDEBUG
     const auto originalHandles = scene.CaptureResourceHandles();
     ok &= Require(originalHandles.ready &&
-                      originalHandles.bottomLevelAccelerationStructures.size() == 18u &&
+                      originalHandles.bottomLevelAccelerationStructures.size() == 19u &&
                       originalHandles.topLevelAccelerationStructures.size() == 1u &&
                       originalHandles.pipelines.size() == 2u &&
                       originalHandles.shaderBindingTableBuffers.size() == 2u &&
@@ -1232,26 +1288,26 @@ int main()
                       scene.PrimaryRewardBodyPixelCount() == 41u,
                   "legacy getters must project one explicitly published completed record");
     const auto diagnostic = scene.ResourceInventory();
-    ok &= Require(diagnostic.bufferCount == 47u &&
-                      diagnostic.memoryAllocationCount == 57u &&
-                      diagnostic.bottomLevelAccelerationStructureCount == 18u &&
-                      scene.BlasCount() == 18u &&
+    ok &= Require(diagnostic.bufferCount == 48u &&
+                      diagnostic.memoryAllocationCount == 58u &&
+                      diagnostic.bottomLevelAccelerationStructureCount == 19u &&
+                      scene.BlasCount() == 19u &&
                       diagnostic.topLevelAccelerationStructureCount == 1u &&
-                      diagnostic.tlasInstanceCount == 22u &&
+                      diagnostic.tlasInstanceCount == 24u &&
                       diagnostic.pipelineCount == 2u &&
                       diagnostic.shaderBindingTableCount == 2u &&
                       diagnostic.descriptorSetCount == 1u,
                   "live inventory must include direct, character, image, and both SBT owners");
-    ok &= Require(diagnostic.hostVisibleBytes == 3136u &&
-                      diagnostic.deviceLocalBytes == 4288u,
+    ok &= Require(diagnostic.hostVisibleBytes == 3200u &&
+                      diagnostic.deviceLocalBytes == 4352u,
                   "host-visible and device-local bytes must use inclusive allocation classes");
 
     PresentableTinyRtSceneObservationTestAccess::RemoveDiagnosticBuffer(scene);
     const auto shipping = scene.ResourceInventory();
-    ok &= Require(shipping.bufferCount == 46u &&
-                      shipping.memoryAllocationCount == 56u &&
-                      shipping.hostVisibleBytes == 3072u &&
-                      shipping.deviceLocalBytes == 4224u,
+    ok &= Require(shipping.bufferCount == 47u &&
+                      shipping.memoryAllocationCount == 57u &&
+                      shipping.hostVisibleBytes == 3136u &&
+                      shipping.deviceLocalBytes == 4288u,
                   "inventory must count only a genuinely live Diagnostic buffer");
 
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(scene);
@@ -1287,17 +1343,26 @@ int main()
     PresentableTinyRtScene emptyScene;
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(emptyScene);
     PresentableTinyRtSceneObservationTestAccess::MarkPendingTlasDefinitions(emptyScene);
+    PresentableTinyRtSceneObservationTestAccess::MarkFireUpload(emptyScene);
     emptyScene.Destroy();
+    ok &= Require(!emptyScene.HasUploadedFireEmitters() && emptyScene.UploadedFireEmitters().activeCount == 0u,
+                  "no-device destruction must invalidate and clear the last raw fire upload");
     emptyScene.NotifyFrameSubmitted();
     ok &= Require(!PresentableTinyRtSceneObservationTestAccess::HasTlasDefinitions(emptyScene),
                   "even partial/no-device destruction must invalidate cached TLAS definitions");
     const auto movedFrom = scene.ResourceInventory();
     const auto movedTo = moved.ResourceInventory();
+    ok &= Require(moved.HasUploadedFireEmitters() && !scene.HasUploadedFireEmitters() &&
+                      moved.UploadedFireEmitters().activeCount == 2u &&
+                      moved.UploadedFireEmitters().selectedStableIds[0] == 3u &&
+                      moved.UploadedFireEmitters().selectedStableIds[1] == 4u &&
+                      scene.UploadedFireEmitters().activeCount == 0u,
+                  "packed raw fire upload must move to exactly one owner without becoming a frame ACK");
     ok &= Require(moved.HasUploadedQualityControls() && !scene.HasUploadedQualityControls() &&
                       moved.QualityControls().controls == std::array<std::uint32_t, 4u>{{2u, 4u, 2u, 0u}} &&
                       moved.UploadedFireQuality() == horde::vulkan::raytracing::FireEmitterQuality::Low,
                   "actual uploaded policy must transfer to exactly one owner with its buffer");
-    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 18u &&
+    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 19u &&
                       movedFrom.bufferCount == 0u &&
                       movedFrom.memoryAllocationCount == 0u &&
                       movedFrom.hostVisibleBytes == 0u &&

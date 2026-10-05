@@ -210,6 +210,10 @@ void TestGeneratedConstants()
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
     Check(kRtInstanceMetadataCapacity == 22u, "instance metadata preserves viewmodel20 and appends immutable collapse21");
+    Check(kRtTlasInstanceCapacity == 24u && kRtTlasInstanceCapacity == kRtInstanceMetadataCapacity + 2u,
+          "two world torch physical instances alias admitted metadata instead of expanding material slots");
+    Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
+          "all four important lights are active within the unchanged 640-byte fire storage buffer");
     Check(kRtStaticAssetCapacity == 10u, "static asset capacity admits exactly one additional collapse asset");
     Check(kRtPrimitiveMetadataCapacity == 32u, "primitive capacity is 32");
     Check(kRtMaterialCapacity == 32u, "material capacity is 32");

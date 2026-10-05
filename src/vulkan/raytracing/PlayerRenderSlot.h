@@ -24,7 +24,8 @@ inline constexpr float kPlayerBootGroundingSafetyMetres = 0.00025f;
 
 struct PlayerRouteMasks
 {
-    std::array<std::uint8_t, kRtInstanceMetadataCapacity> instanceMasks{};
+    // Masks belong to physical TLAS instances, which may alias metadata.
+    std::array<std::uint8_t, kRtTlasInstanceCapacity> instanceMasks{};
 };
 
 PlayerRouteMasks BuildPlayerRouteMasks(PlayerRenderRoute route,
@@ -33,7 +34,7 @@ PlayerRouteMasks BuildPlayerRouteMasks(PlayerRenderRoute route,
 // A primary-visible world remainder is valid only with the matching per-instance
 // primitive filter. Never accept full-body primary visibility as a viewmodel.
 bool HasDedicatedPlayerPrimaryOwnership(
-    const std::array<std::uint8_t, kRtInstanceMetadataCapacity>& masks,
+    const std::array<std::uint8_t, kRtTlasInstanceCapacity>& masks,
     std::uint32_t worldBodyInstanceFlags);
 
 // The imported player is authored +Z forward with anatomical Left on +X.

@@ -180,12 +180,25 @@ int main()
         Check(levelStaged && upwardStaged && upward.tickIndex == level.tickIndex &&
                   upward.zone == level.zone && upward.activeEnemyId == level.activeEnemyId &&
                   upward.torchFailure.phase == level.torchFailure.phase &&
-                  upward.fireEmitterCount == level.fireEmitterCount && upward.fireEmitterCount == 1u &&
+                  upward.fireEmitterCount == level.fireEmitterCount && upward.fireEmitterCount == 3u &&
                   upward.fireEmitters[0].stableId == level.fireEmitters[0].stableId &&
                   upward.fireEmitters[0].seed == level.fireEmitters[0].seed &&
                   upward.fireEmitters[0].phase == level.fireEmitters[0].phase &&
                   upward.fireEmitters[0].fuel == level.fireEmitters[0].fuel,
               "C152 keeps C147's authored encounter and actual fire timeline while held transforms respond to the nearer upward pose");
+        for (std::size_t index = 1u; index < 3u; ++index)
+        {
+            const auto& levelFlank = level.fireEmitters[index];
+            const auto& upwardFlank = upward.fireEmitters[index];
+            Check(levelFlank.stableId == index + 2u && upwardFlank.stableId == levelFlank.stableId &&
+                      upwardFlank.parentObject == effects::FireEmitterParentObject::WorldObject &&
+                      levelFlank.strength == 0.0f && upwardFlank.strength == 0.0f &&
+                      upwardFlank.seed == levelFlank.seed && upwardFlank.phase == levelFlank.phase &&
+                      upwardFlank.fuel == levelFlank.fuel &&
+                      upwardFlank.worldFromFlame == levelFlank.worldFromFlame &&
+                      upwardFlank.worldFromLight == levelFlank.worldFromLight,
+                  "C147/C152 retain dark world flank IDs3/4 and identical sockets despite the nearer upward camera");
+        }
     }
     int viewmodelId = 136;
     for (const auto name : {"player-viewmodel-grips", "player-viewmodel-forward",

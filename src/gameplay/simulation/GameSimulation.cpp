@@ -6,6 +6,7 @@
 
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/ShowcaseCheckpoints.h"
+#include "gameplay/effects/KeeperTorchLighting.h"
 
 namespace horde::gameplay::simulation
 {
@@ -49,6 +50,11 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
         playerZ_ = kPlayerSpawn.z;
     }
     config_.movementSpeedMetresPerSecond = std::max(0.0f, config_.movementSpeedMetresPerSecond);
+    for (std::size_t index = 0u; index < effects::kKeeperTorchAnchors.size(); ++index)
+    {
+        const auto& anchor = effects::kKeeperTorchAnchors[index];
+        fireEmitters_[index + 1u] = effects::MakeWorldTorchFireEmitter(anchor.stableId, anchor.seed);
+    }
     enemyDirector_.Reset();
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     combatSnapshot_ = swordCombat_.Snapshot();
@@ -336,7 +342,8 @@ void GameSimulation::ResetRoute()
         heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
-    horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
+    for (std::size_t index = 0u; index < fireEmitterCount_; ++index)
+        horde::gameplay::effects::ResetFireEmitter(fireEmitters_[index]);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
 }
@@ -555,7 +562,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
-    horde::gameplay::effects::ResetFireEmitter(fireEmitters_[0]);
+    for (std::size_t index = 0u; index < fireEmitterCount_; ++index)
+        horde::gameplay::effects::ResetFireEmitter(fireEmitters_[index]);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
     snapshot_.eventsEmittedThisTick = 0u;
@@ -679,6 +687,7 @@ void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
          lanternPendulum_.Snapshot().forwardAngleRadians,
          lanternPendulum_.Snapshot().strafeAngleRadians},
         fixedDeltaSeconds);
+
 }
 
 void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
@@ -691,6 +700,23 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
          1.0f,
          QueryShowcaseZone(playerX_, playerZ_)},
         fixedDeltaSeconds);
+
+    // Resolve after the existing encounter update: the triggering reveal tick
+    // publishes its event, movement hold and both flames in the same snapshot.
+    // Death is still visible after health reaches zero, including the earlier
+    // chest unlock. Only the actual Dead clip completion extinguishes them.
+    const auto& keeper = lichEncounter_.Snapshot();
+    const float strength = keeper.revealStarted && !keeper.deathAnimationComplete ? 1.0f : 0.0f;
+    for (std::size_t index = 0u; index < effects::kKeeperTorchAnchors.size(); ++index)
+    {
+        const auto worldFromItem = effects::KeeperTorchWorldFromItem(effects::kKeeperTorchAnchors[index]);
+        effects::StepFireEmitterFixed(
+            fireEmitters_[index + 1u],
+            {items::MultiplyHeldItemTransforms(worldFromItem, items::OriginalTorchFlameSocketTransform()),
+             items::MultiplyHeldItemTransforms(worldFromItem, items::OriginalTorchLightSocketTransform()),
+             strength, 1.0f, ShowcaseZone::Finale},
+            fixedDeltaSeconds);
+    }
 }
 
 void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSeconds)

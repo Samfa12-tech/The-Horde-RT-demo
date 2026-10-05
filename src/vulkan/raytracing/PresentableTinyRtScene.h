@@ -154,10 +154,13 @@ public:
     };
 
     // Maximum including the optional development viewmodel. Live reports count owners.
-    static constexpr std::uint32_t kBlasCount = 18u;
+    static constexpr std::uint32_t kBlasCount = 19u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kTlasCount = 1u;
-    static constexpr std::uint32_t kTlasInstanceCount = kRtInstanceMetadataCapacity;
+    static constexpr std::uint32_t kTlasInstanceCount = kRtTlasInstanceCapacity;
+    static constexpr std::uint32_t kKeeperTorchFirstTlasInstance = kRtInstanceMetadataCapacity;
+    static constexpr std::uint32_t kKeeperTorchInstanceCount = 2u;
+    static_assert(kTlasInstanceCount == kKeeperTorchFirstTlasInstance + kKeeperTorchInstanceCount);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -193,6 +196,9 @@ public:
     const RtQualityControlsGpu& QualityControls() const noexcept { return uploadedQualityControls_; }
     bool HasUploadedQualityControls() const noexcept { return uploadedQualityControlsValid_; }
     FireEmitterQuality UploadedFireQuality() const noexcept { return uploadedFireQuality_; }
+    // Raw last successful scene upload, not a completed-frame/presentation ACK.
+    const FireEmitterUpload& UploadedFireEmitters() const noexcept { return uploadedFireEmitters_; }
+    bool HasUploadedFireEmitters() const noexcept { return uploadedFireEmittersValid_; }
     bool ConfigurePreviewFireSockets(horde::graphics::GraphicsPreviewSession& session,
                                      std::string& diagnostic) const;
     RtExecutionBackend ExecutionBackend() const
@@ -690,6 +696,8 @@ private:
                                 const RtSceneFrameInputs& frame,
                                 std::string& diagnostic,
                                 RtSceneRecordObservation* observation = nullptr);
+    void ApplyKeeperTorchBodyInstances(
+        std::array<VkAccelerationStructureInstanceKHR, kTlasInstanceCount>& instances) const;
     bool RunOneTimeCommands(void (*record)(VkCommandBuffer, void*), void* userData, std::string& diagnostic) const;
     void DestroyBuffer(Buffer& buffer) const;
     void DestroyAccelerationStructure(AccelerationStructure& accelerationStructure);
@@ -741,6 +749,8 @@ private:
     Buffer qualityControlsBuffer_;
     RtQualityControlsGpu uploadedQualityControls_{};
     FireEmitterQuality uploadedFireQuality_ = FireEmitterQuality::Mobile;
+    FireEmitterUpload uploadedFireEmitters_{};
+    bool uploadedFireEmittersValid_ = false;
     bool uploadedQualityControlsValid_ = false;
     Buffer worldSurfaceBuffer_;
     Buffer staticVertexBuffer_;
@@ -755,6 +765,7 @@ private:
     AccelerationStructure waterfallBlas_;
     AccelerationStructure finaleRoofBlas_;
     AccelerationStructure torchBlas_;
+    AccelerationStructure worldTorchBodyBlas_;
     AccelerationStructure swordBlas_;
     AccelerationStructure gothicChestBaseBlas_;
     AccelerationStructure gothicChestLidBlas_;

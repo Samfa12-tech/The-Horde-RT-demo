@@ -9,6 +9,7 @@
 #include "gameplay/simulation/InputMailbox.h"
 #include "gameplay/ShowcaseCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
+#include "gameplay/effects/KeeperTorchLighting.h"
 
 namespace
 {
@@ -27,6 +28,193 @@ std::size_t CountEvents(const BoundedGameplayEventQueue& queue, GameplayEventTyp
 bool NearlyEqual(float left, float right, float epsilon = 0.0001f)
 {
     return std::abs(left - right) <= epsilon;
+}
+
+bool KeeperLightsMatch(const SimulationSnapshot& snapshot, const float expectedStrength)
+{
+    if (snapshot.fireEmitterCount != 3u || snapshot.fireEmitters[0].stableId != 1u)
+        return false;
+    for (std::size_t index = 0u; index < effects::kKeeperTorchAnchors.size(); ++index)
+    {
+        const auto& anchor = effects::kKeeperTorchAnchors[index];
+        const auto& light = snapshot.fireEmitters[index + 1u];
+        const auto item = effects::KeeperTorchWorldFromItem(anchor);
+        if (light.stableId != anchor.stableId || light.seed != anchor.seed ||
+            light.parentObject != effects::FireEmitterParentObject::WorldObject ||
+            light.zone != ShowcaseZone::Finale || !NearlyEqual(light.strength, expectedStrength) ||
+            !NearlyEqual(light.fuel, 1.0f) || !std::isfinite(light.phase) ||
+            light.phase < 0.0f || light.phase >= 1.0f ||
+            light.worldFromFlame != items::MultiplyHeldItemTransforms(item, items::OriginalTorchFlameSocketTransform()) ||
+            light.worldFromLight != items::MultiplyHeldItemTransforms(item, items::OriginalTorchLightSocketTransform()))
+            return false;
+    }
+    return snapshot.fireEmitters[1].stableId != snapshot.fireEmitters[2].stableId &&
+           snapshot.fireEmitters[1].seed != snapshot.fireEmitters[2].seed;
+}
+
+template <typename Check>
+void TestKeeperTorchLighting(Check&& check)
+{
+    static_assert(effects::kFireEmitterCapacity == 4u);
+    static_assert(effects::kActiveFireEmitterCapacity == 4u);
+    GameSimulation simulation;
+    check(KeeperLightsMatch(simulation.Snapshot(), 0.0f) &&
+          simulation.Snapshot().fireEmitters[0].strength > 0.0f,
+          "new world torches start dark with IDs3/4 while the original opening torch remains lit");
+    check(NearlyEqual(simulation.Snapshot().fireEmitters[1].worldFromFlame[13], 1.02f) &&
+          NearlyEqual(simulation.Snapshot().fireEmitters[1].worldFromLight[13], 0.99f) &&
+          NearlyEqual(simulation.Snapshot().fireEmitters[1].worldFromLight[14] -
+                      simulation.Snapshot().fireEmitters[1].worldFromFlame[14], 0.025f),
+          "fixed world torches retain the admitted OriginalTorch Flame/Light socket offsets");
+    InputSnapshot input;
+    input.hasAuthoritativePlayerPose = true;
+    input.authoritativePlayerX = kKeeperRetryPosition.x;
+    input.authoritativePlayerZ = kKeeperRetryPosition.z;
+    input.yawRadians = -1.57079632679f;
+    input.damageEnabled = false;
+    simulation.StepFixed(input);
+    check(!simulation.Snapshot().lich.revealStarted && KeeperLightsMatch(simulation.Snapshot(), 0.0f),
+          "arrival or replay pose alone cannot ignite the flanks before the torch-loss reveal gate");
+    simulation.ApplyShowcaseCheckpoint(8);
+    check(KeeperLightsMatch(simulation.Snapshot(), 0.0f),
+          "settled torch approach import does not prematurely light the Keeper room");
+    simulation.StepFixed(input);
+    check(CountEvents(simulation.Events(), GameplayEventType::KeeperRevealStarted) == 1u &&
+          simulation.Snapshot().lich.revealStarted && KeeperLightsMatch(simulation.Snapshot(), 1.0f) &&
+          NearlyEqual(simulation.Snapshot().fireEmitters[1].phase, (1.0f / 60.0f) * 0.37f),
+          "both world torches ignite on the exact existing reveal-event tick and advance once per fixed step");
+    simulation.ClearEvents();
+    bool revealLit = true;
+    for (int tick = 0; tick < 359; ++tick)
+    {
+        simulation.StepFixed(input);
+        revealLit = revealLit && KeeperLightsMatch(simulation.Snapshot(), 1.0f);
+        simulation.ClearEvents();
+    }
+    check(revealLit && simulation.Snapshot().lich.revealComplete,
+          "both stationary flank flames remain continuously lit through all six seconds of reveal");
+    const auto beforePause = simulation.Snapshot().fireEmitters;
+    InputSnapshot paused = input;
+    paused.paused = true;
+    simulation.AdvanceFrame(paused, 20.0);
+    check(KeeperLightsMatch(simulation.Snapshot(), 1.0f) &&
+          simulation.Snapshot().fireEmitters[1].phase == beforePause[1].phase &&
+          simulation.Snapshot().fireEmitters[2].phase == beforePause[2].phase &&
+          simulation.Snapshot().fireEmitters[1].lowPassNoise == beforePause[1].lowPassNoise &&
+          simulation.Snapshot().fireEmitters[2].lowPassNoise == beforePause[2].lowPassNoise,
+          "menu or lifecycle suspension freezes flank phase and flicker without extinguishing the encounter");
+    InputSnapshot retreat = input;
+    retreat.authoritativePlayerX = kTorchBayCenters[3].x;
+    retreat.authoritativePlayerZ = kTorchBayCenters[3].z;
+    simulation.StepFixed(retreat);
+    check(simulation.Snapshot().zone != ShowcaseZone::Finale &&
+          KeeperLightsMatch(simulation.Snapshot(), 1.0f) &&
+          CountEvents(simulation.Events(), GameplayEventType::KeeperRevealStarted) == 0u,
+          "retreat keeps the existing revealed encounter lights without replaying ignition feedback");
+    simulation.ClearEvents();
+
+    std::uint64_t attack = 0u;
+    bool fightLit = true;
+    for (int tick = 0; tick < 1200 && simulation.Snapshot().lich.health > 0; ++tick)
+    {
+        const auto& before = simulation.Snapshot();
+        input.authoritativePlayerX = before.lich.x;
+        input.authoritativePlayerZ = before.lich.z;
+        if (before.playerCombat.action == PlayerCombatAction::Idle &&
+            before.lich.hitCooldownRemaining <= 0.00001f)
+            input.commands.attack = ++attack;
+        simulation.StepFixed(input);
+        fightLit = fightLit && KeeperLightsMatch(simulation.Snapshot(), 1.0f);
+        simulation.ClearEvents();
+    }
+    check(fightLit && simulation.Snapshot().lich.health == 0 &&
+          simulation.Snapshot().lich.phase == LichPhase::Dead &&
+          !simulation.Snapshot().lich.deathAnimationComplete && KeeperLightsMatch(simulation.Snapshot(), 1.0f),
+          "three actual accepted sword hits leave flank flames lit during the lethal tick and visible death clip");
+    bool deathLit = true;
+    bool unlockedBeforeCompletion = false;
+    int deathTicks = 0;
+    while (!simulation.Snapshot().lich.deathAnimationComplete && deathTicks < 300)
+    {
+        input.authoritativePlayerX = simulation.Snapshot().lich.x;
+        input.authoritativePlayerZ = simulation.Snapshot().lich.z;
+        simulation.StepFixed(input);
+        ++deathTicks;
+        const auto& state = simulation.Snapshot();
+        if (!state.lich.deathAnimationComplete)
+        {
+            deathLit = deathLit && KeeperLightsMatch(state, 1.0f);
+            if (state.chestReward.phase == interactions::ChestRewardPhase::ClosedUnlocked)
+                unlockedBeforeCompletion = true;
+        }
+        simulation.ClearEvents();
+    }
+    check(deathLit && unlockedBeforeCompletion && deathTicks >= 177 && deathTicks <= 179 &&
+          simulation.Snapshot().lich.deathAnimationComplete && KeeperLightsMatch(simulation.Snapshot(), 0.0f),
+          "flanks survive the earlier two-second chest unlock and extinguish exactly at the full Dead clip completion");
+    for (int tick = 0; tick < 60; ++tick) simulation.StepFixed(input);
+    check(KeeperLightsMatch(simulation.Snapshot(), 0.0f),
+          "completed death cannot reignite flank flames on later encounter ticks");
+    simulation.ClearEvents();
+    input.authoritativePlayerX = interactions::kRewardChestInteractionPosition.x + 1.30f;
+    input.authoritativePlayerZ = interactions::kRewardChestInteractionPosition.z;
+    input.yawRadians = -1.57079632679f;
+    ++input.commands.interact;
+    simulation.StepFixed(input);
+    bool rewardDark = KeeperLightsMatch(simulation.Snapshot(), 0.0f);
+    for (int tick = 0; tick < 90; ++tick)
+    {
+        simulation.StepFixed(input);
+        rewardDark = rewardDark && KeeperLightsMatch(simulation.Snapshot(), 0.0f);
+    }
+    ++input.commands.interact;
+    simulation.StepFixed(input);
+    check(rewardDark && simulation.Snapshot().chestReward.phase == interactions::ChestRewardPhase::LanternClaimed &&
+          simulation.Snapshot().interaction.heldLightKind == interactions::HeldLightKind::RewardLantern &&
+          CountEvents(simulation.Events(), GameplayEventType::LanternClaimed) == 1u &&
+          KeeperLightsMatch(simulation.Snapshot(), 0.0f),
+          "actual chest opening and reward claim preserve the lantern while both completed-encounter flanks remain dark");
+    simulation.ClearEvents();
+    simulation.StepFixed(input);
+    check(simulation.Snapshot().interaction.heldLightKind == interactions::HeldLightKind::RewardLantern &&
+          CountEvents(simulation.Events(), GameplayEventType::LanternClaimed) == 0u &&
+          KeeperLightsMatch(simulation.Snapshot(), 0.0f),
+          "ordinary claimed reward ticks cannot repeat claim feedback or reignite completed flank flames");
+    simulation.RetryEncounter();
+    check(simulation.Snapshot().lich.revealPhase == KeeperRevealPhase::RetryRecognition &&
+          KeeperLightsMatch(simulation.Snapshot(), 1.0f) &&
+          simulation.Snapshot().fireEmitters[1].phase == 0.0f &&
+          simulation.Snapshot().fireEmitters[2].phase == 0.0f && simulation.Events().Empty(),
+          "real retry restores lit one-second recognition with reset independent phases and no new audio events");
+    input = {};
+    input.damageEnabled = false;
+    input.yawRadians = -1.57079632679f;
+    for (int tick = 0; tick < 60; ++tick) simulation.StepFixed(input);
+    check(simulation.Snapshot().lich.revealComplete && KeeperLightsMatch(simulation.Snapshot(), 1.0f) &&
+          CountEvents(simulation.Events(), GameplayEventType::KeeperRevealStarted) == 0u &&
+          CountEvents(simulation.Events(), GameplayEventType::KeeperWarning) == 0u,
+          "retry recognition retains lit flanks while preserving the existing cue contract");
+    simulation.ResetRoute();
+    check(KeeperLightsMatch(simulation.Snapshot(), 0.0f) &&
+          simulation.Snapshot().fireEmitters[1].phase == 0.0f &&
+          simulation.Snapshot().fireEmitters[2].phase == 0.0f &&
+          simulation.Snapshot().fireEmitters[0].strength > 0.0f,
+          "full route reset extinguishes the world pair and resets phase without dropping the opening light");
+    for (const int checkpoint : {0, 6, 8, 9, 10, 11})
+    {
+        check(simulation.ApplyShowcaseCheckpoint(checkpoint), "Keeper fire coverage imports actual authored checkpoint");
+        const float expected = checkpoint == 9 || checkpoint == 10 ? 1.0f : 0.0f;
+        check(KeeperLightsMatch(simulation.Snapshot(), expected) &&
+              simulation.Snapshot().fireEmitters[1].phase == 0.0f &&
+              simulation.Snapshot().fireEmitters[2].phase == 0.0f && simulation.Events().Empty(),
+              "checkpoint import lights only already-revealed combat and never dormant or completed-death states");
+    }
+    const auto claimed = simulation.Snapshot();
+    simulation.ImportRewardCheckpoint(claimed.chestReward, claimed.interaction, claimed.finale);
+    check(simulation.Snapshot().chestReward.phase == interactions::ChestRewardPhase::LanternClaimed &&
+          KeeperLightsMatch(simulation.Snapshot(), 0.0f) &&
+          simulation.Events().Empty(),
+          "claimed reward checkpoint import preserves terminal dark flanks without emitting ignition cues");
 }
 
 template <typename Check>
@@ -64,7 +252,8 @@ void TestKeeperReveal(Check&& check)
             const auto& state = simulation.Snapshot();
             safe = safe && state.lich.health == 3 && state.playerVitals.vitality == 3 &&
                 !state.lich.damagePulse && state.lich.staffLightStrength == 0.0f &&
-                state.chestReward.phase == interactions::ChestRewardPhase::Locked;
+                state.chestReward.phase == interactions::ChestRewardPhase::Locked &&
+                KeeperLightsMatch(state, state.lich.revealStarted ? 1.0f : 0.0f);
             aligned = aligned && NearlyEqual(state.lich.x, kKeeperStagingPosition.x) &&
                 NearlyEqual(state.lich.z, kKeeperStagingPosition.z) &&
                 state.lich.y >= previousY - 0.0001f &&
@@ -456,6 +645,7 @@ int main()
         }
     };
     TestKeeperReveal(check);
+    TestKeeperTorchLighting(check);
     TestSkeletonIncidental(check);
 
     BoundedGameplayEventQueue identityQueue;

@@ -16,17 +16,26 @@ $script:witnessChecks=0
 function Check([bool]$condition,[string]$message){if(-not $condition){throw $message};$script:witnessChecks++}
 function Reject([scriptblock]$action){$failed=$false;try{& $action}catch{$failed=$true};Check $failed 'Invalid witness policy must fail closed.'}
 $repository=Split-Path -Parent $PSScriptRoot
-Check ((Get-ExpectedShowcaseInstanceCapacity $repository) -eq 22) 'Current actual generated instance capacity is 22; material capacity32 is separate.'
+Check ((Get-ExpectedShowcaseInstanceCapacity $repository) -eq 24) 'Current physical TLAS capacity24 includes two instances sharing metadata1; metadata22/material32 are separate.'
 $fixture=Join-Path ([IO.Path]::GetTempPath()) ('horde-witness-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path (Join-Path $fixture 'src/vulkan/raytracing') -Force | Out-Null
 try{
     $abiPath=Join-Path $fixture 'src/vulkan/raytracing/RtSceneAbi.def'
-    '{"schema":1,"capacities":{"instanceMetadata":21}}' | Set-Content -LiteralPath $abiPath
-    Check ((Get-ExpectedShowcaseInstanceCapacity $fixture) -eq 21) 'Released baseline checkout keeps its21-instance assertion.'
-    '{"schema":1,"capacities":{"instanceMetadata":32}}' | Set-Content -LiteralPath $abiPath
-    Check ((Get-ExpectedShowcaseInstanceCapacity $fixture) -eq 32) 'Changed ABI fixture derives32 without weakening exact expected count.'
-    '{"schema":1,"capacities":{"instanceMetadata":0}}' | Set-Content -LiteralPath $abiPath
-    Reject {Get-ExpectedShowcaseInstanceCapacity $fixture}
+    '{"schema":1,"capacities":{"instanceMetadata":21,"tlasInstances":21}}' | Set-Content -LiteralPath $abiPath
+    Check ((Get-ExpectedShowcaseInstanceCapacity $fixture) -eq 21) 'Equal metadata/TLAS fixtures retain their exact physical count.'
+    '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":32}}' | Set-Content -LiteralPath $abiPath
+    Check ((Get-ExpectedShowcaseInstanceCapacity $fixture) -eq 32) 'Aliased metadata22 derives actual physical32 rather than guessing metadata capacity.'
+    foreach($invalid in @(
+        '{"schema":1,"capacities":{"instanceMetadata":22}}',
+        '{"schema":1,"capacities":{"instanceMetadata":0,"tlasInstances":24}}',
+        '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":21}}',
+        '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":257}}',
+        '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":24.5}}',
+        '{"schema":1,"capacities":{"instanceMetadata":22,"tlasInstances":"24"}}'
+    )) {
+        $invalid | Set-Content -LiteralPath $abiPath
+        Reject {Get-ExpectedShowcaseInstanceCapacity $fixture}
+    }
 }finally{Remove-Item -LiteralPath $fixture -Recurse -Force}
 $arguments=@(New-ScopedLogcatArguments '1791000000.123456789' '4242')
 Check ($arguments -contains '--pid=4242' -and $arguments -contains '-T' -and

@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <iosfwd>
 #include <optional>
 #include <span>
 #include <string>
@@ -136,6 +137,26 @@ struct RtFireQualityEvidence
     std::uint32_t reflectionSamples = 1u;
     bool operator==(const RtFireQualityEvidence&) const = default;
 };
+inline constexpr std::size_t kRtFireLightingEvidenceCapacity = 4u;
+struct RtFireLightEvidence
+{
+    std::uint32_t stableId = 0u;
+    std::array<float, 4u> positionStrength{};
+    std::array<float, 4u> colourIntensity{};
+    bool operator==(const RtFireLightEvidence&) const = default;
+};
+// Optional absence is historical/unavailable, distinct from an uploaded empty
+// active prefix. Exact packed owning upload; unused entries are wholly zero.
+struct RtFireLightingEvidence
+{
+    std::uint32_t count = 0u;
+    std::array<RtFireLightEvidence, kRtFireLightingEvidenceCapacity> emitters{};
+    bool operator==(const RtFireLightingEvidence&) const = default;
+};
+[[nodiscard]] bool ValidRtFireLightingEvidence(const RtFireLightingEvidence& evidence) noexcept;
+// Call only after canonical evidence validation. This projects the retained
+// upload and restores stream formatting; it never reads current scene state.
+void WriteRtFireLightingEvidenceJson(std::ostream& output, const RtFireLightingEvidence& evidence);
 [[nodiscard]] const char* RtShadowModeName(RtShadowMode mode) noexcept;
 [[nodiscard]] const char* RtFireQualityName(RtFireQuality quality) noexcept;
 [[nodiscard]] bool ValidRtShadowQualityEvidence(const RtShadowQualityEvidence& evidence,
@@ -331,6 +352,7 @@ struct RtRecordedSceneEvidence
     RtDispatchEvidence dispatch{};
     std::optional<RtShadowQualityEvidence> shadowQuality{};
     std::optional<RtFireQualityEvidence> fireQuality{};
+    std::optional<RtFireLightingEvidence> fireLighting{};
 };
 
 struct RtSceneFrameEvidence
@@ -342,6 +364,7 @@ struct RtSceneFrameEvidence
     RtDispatchEvidence dispatch{};
     std::optional<RtShadowQualityEvidence> shadowQuality{};
     std::optional<RtFireQualityEvidence> fireQuality{};
+    std::optional<RtFireLightingEvidence> fireLighting{};
 };
 
 struct RtDiagnosticEvidence

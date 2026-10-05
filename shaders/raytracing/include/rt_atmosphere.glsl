@@ -137,7 +137,7 @@ void buildMistIncidentSources(vec3 midpoint, out MistIncidentSources sources)
             midpoint, sources.staffPosition,
             tunedLightColor(vec3(0.58, 0.10, 1.0), kLightStaff) * staffStrength);
 
-    // Consume both admitted active records; stable-ID order is not a torch
+    // Consume every admitted active record; stable-ID order is not a torch
     // identity. Strength is duplicated in colourIntensity.w: use it only once.
     for (uint index = 0u; index < kRtActiveFireEmitterCapacity; ++index)
     {

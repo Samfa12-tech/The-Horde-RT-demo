@@ -29,7 +29,17 @@ struct MotionStateRow
     horde::gameplay::interactions::ChestRewardSnapshot chest{};
     horde::gameplay::interactions::InteractionState heldLight{};
     horde::gameplay::interactions::FinaleSequenceSnapshot finale{};
-    std::array<std::array<float, 4u>, 2u> fire{}; // phase,leanX,leanZ,motionTurbulence
+    std::array<std::array<float, 4u>, 4u> fire{}; // unchanged: phase,leanX,leanZ,motionTurbulence
+    struct SimulationFireSource
+    {
+        std::uint32_t stableId = 0u;
+        float strength = 0.0f;
+        float fuel = 0.0f;
+    };
+    // Configured simulation sources include dormant torches; this differs from
+    // the completed upload's packed active selection below.
+    std::optional<std::uint32_t> simulationFireEmitterCount{};
+    std::array<SimulationFireSource, 4u> simulationFireSources{};
     horde::gameplay::simulation::SimulationCommandSequences consumed{};
     std::uint64_t overrunCount = 0u;
     std::uint32_t ticksThisFrame = 0u;
@@ -57,6 +67,7 @@ struct MotionRtRow
     std::uint64_t wholeFrameCpuNanoseconds = 0u;
     std::uint64_t simulationCpuNanoseconds = 0u;
     bool gpuDurationAvailable = false;
+    std::optional<RtFireLightingEvidence> fireLighting{};
 };
 struct MotionScopeRow
 {

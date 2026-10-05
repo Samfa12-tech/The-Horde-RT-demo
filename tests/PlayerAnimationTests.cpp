@@ -590,14 +590,21 @@ int main()
     duplicateMasks[10] = 0x04u;
     auto fullBodyMasks = remainderMasks.instanceMasks;
     fullBodyMasks[kPlayerWorldBodyInstanceIndex] |= 0x04u;
+    auto worldTorchMasks = remainderMasks.instanceMasks;
+    worldTorchMasks[22u] = 0x01u;
+    worldTorchMasks[23u] = 0x01u;
     if (!Require(HasDedicatedPlayerPrimaryOwnership(viewmodelMasks.instanceMasks, staticPlayerFlag) &&
                  HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, remainderPlayerFlags) &&
+                 HasDedicatedPlayerPrimaryOwnership(worldTorchMasks, remainderPlayerFlags) &&
+                 remainderMasks.instanceMasks.size() == kRtTlasInstanceCapacity &&
+                 remainderMasks.instanceMasks[22u] == 0u &&
+                 remainderMasks.instanceMasks[23u] == 0u &&
                  !HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, staticPlayerFlag) &&
                  !HasDedicatedPlayerPrimaryOwnership(viewmodelMasks.instanceMasks, remainderPlayerFlags) &&
                  !HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, 0u) &&
                  !HasDedicatedPlayerPrimaryOwnership(duplicateMasks, remainderPlayerFlags) &&
                  !HasDedicatedPlayerPrimaryOwnership(fullBodyMasks, remainderPlayerFlags),
-                 "capture ownership rejects missing filters, full-body primary and duplicate procedural arms")) return 1;
+                 "physical-instance capture ownership preserves world torch aliases and rejects missing filters, full-body primary and duplicate procedural arms")) return 1;
     if (!Require(remainderMasks.instanceMasks[kPlayerWorldBodyInstanceIndex] ==
                      (0x10u | kPlayerBodyRemainderPrimaryMask) &&
                  remainderMasks.instanceMasks[kPlayerViewmodelInstanceIndex] == kPlayerViewmodelPrimaryMask &&
