@@ -2183,3 +2183,35 @@ Evidence class: local authorized-device Debug correctness/capture/lifecycle, rat
 Each saved50%/Mobile-water/Mobile-fire/Glass-On/Current-shadow/30Hz backend run passes13 route waypoints, seven feature/Keeper/held-lantern captures and strict Home/Resume. Same-process Pipeline surface generation17->19 and scene epoch18->20 join completed submission2174; Compute's owning-frame join is retained in its separate private packet. Current phone completed combat records contain flank IDs3/4 at the shared authored sockets, physical TLAS24 and BLAS19. Debug saved preferences remain byte-identical1420 bytes before/after both runs. No settings writes or app data clearing occurred. Collection source context includes later test/documentation edits only; these do not relabel the compiled runtime.
 
 The [candidate record](ENGINEERING_1_6_2_REVIEW_CANDIDATE.md#keeper-lighting-artifacts-and-evidence-5-october) binds exact packages and scope. New-light motion/appearance, early-death lantern overlap, full four-light hardware coverage and matched ordinary Shipping cost remain open. Earlier2bd mist acceptance/evidence remains at its original build. S24 deferred and S25 unverified dispositions are unchanged.
+
+## 5 October 2026: SM-S948B final graphics candidate 1334
+
+Evidence class: local authorized-device Debug correctness/capture/lifecycle and
+isolated Shipping settings/persistence, without a new timing or other-model
+certificate. Exact SM-S948B/Android16/API36, runtime
+`1334cc9c58ec97940ac10d861f0397143ca7a9f4`. Debug APK
+`cea6f9594696a7d97df85c2d6cbe7782b82f5a9c561f5a43bc93aa194bf1a11e` passes
+all four ABI package checks; both actual installed pullbacks match.
+
+Both genuine Pipeline and BLAS/TLAS-backed RayQueryCompute pass 13 route
+waypoints, seven captures and strict same-process Home/resume at the owner's
+saved 50%/Mobile-water/Mobile-fire/GlassOn/Current/cap 30. Missing legacy mist is
+On. Completed records carry actual Mist On, fire 4/1/4, shadow 1/1, 24 physical TLAS
+instances and 19 BLAS. Each resume joins surface 17->19/scene epoch 18->20;
+completed serials 2259/2242 respectively. Original saved preferences remain
+byte-identical 1,420 bytes. Phone receipt
+`76211a9987b5235fb4cf323eaa43f46e5c9c9209d4f6e7a8845f4fd947ed2237`.
+
+Separate development-signed Shipping validation APK
+`dfb36907def5444327be2acfc6ee873db16594160a0f15d093b4ade7b02229db` verifies
+staged mobile reset 50%/GlassOff/MistOn at 720x1490 internal/1440x2980 output,
+real RT ACK/Restore, MistOff Home rollback and Keep/cold-restart Off/On
+persistence. Its original confirmed 75%/Mobile/GlassOn/Current/MistOn/cap 30
+values are restored. Settings receipt
+`ff03e377b5185ecb0329df652c34c0357df344e70a0a9eb5d151b20539413a2d`.
+No owner Debug settings write or data clearing occurs; fresh-install absence
+behavior is CPU/Java evidence, not a cleared-device experiment. Both validation
+apps are stopped afterward. See the
+[final graphics record](ENGINEERING_1_6_2_FINAL_GRAPHICS.md) for retained observer
+negatives and limits. No sustained 30 FPS, new audio acceptance, signed release,
+S24 completion or S25 certification follows. Raw evidence remains private.

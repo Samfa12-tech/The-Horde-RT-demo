@@ -1,5 +1,57 @@
 # 1.6.2 second-pass execution ledger
 
+Work is paused by owner direction until after the weekly reset and further
+review. Merge and publication are on hold; no additional experiment or long run
+starts during the pause. Read the [exact pause checkpoint](ENGINEERING_1_6_2_PAUSE_2026_10_05.md)
+for completed checks, glass-apply timing, artifacts and the resume plan.
+
+## Final evidence boundary, 5 October: runtime 1334 ready for independent audit
+
+Runtime `1334cc9c58ec97940ac10d861f0397143ca7a9f4` is pushed and exact sealed
+packages/builds are complete. All six runtime CI 37271761916 jobs pass. Local
+12 affected CTests, 3 renderer/player integration checks, two Release shader
+fixtures, 154 Java tests/24 classes and lint 0 errors/49 warnings pass. All 16
+published banks and actual packaged PE/ARM64 modules join SDK evidence, with
+Shipping 0 atomics/no binding22 and four-ABI 16KiB/notices/compiler-policy checks.
+The raw before/after source seal covers 5,823 tracked files/3,652,319,441 bytes.
+Exact artifacts and limits live in the
+[candidate](ENGINEERING_1_6_2_REVIEW_CANDIDATE.md#final-graphics-artifacts-and-evidence-5-october)
+and [final graphics record](ENGINEERING_1_6_2_FINAL_GRAPHICS.md).
+
+Windows admission c64c0156 verifies 78 Showcase/28 preview images and eight
+successful zero-SYNC launches. All 26 MistOn and 26 restored-On images match prior
+646 RGBA; source/actual completed uploads and physical 24/19 ownership preserve
+other controls, geometry and fire records. Compact preview is explicitly not
+Keeper-mist appearance proof. The owner reviewed original paired PNGs and
+accepted optional Off still appearance, noting little visible difference.
+Existing On motion/lighting approvals keep their original boundaries.
+
+Phone admission 76211a99 verifies both Debug backends at original saved 50%:
+13 route points, seven captures, same-process Home/Resume, exact installed APK
+pullbacks and byte-identical 1,420-byte saved preferences. Actual completed
+MistOn, Mobile fire 4/1/4, Current shadows 1/1, physical 24/19 and selected payloads
+join. Settings admission ff03e377 verifies staged mobile reset 50%/GlassOff/
+MistOn, real RT acknowledgement and Restore, MistOff Home rollback, and Use/
+Keep Off/On cold-restart persistence in the isolated validation app only.
+Original confirmed validation values return; no owner Debug write/data-clear.
+Both validation apps are stopped after collection.
+
+Initial UI traversal/stale-target failures remain negatives. A narrow initial
+first-ACK observer missed the slow real glass rebuild; the final observer waits
+at most 120s without extending the normal 15-second post-ACK confirmation.
+A touch that failed to stage Off was caught by requested-value inspection and
+never counted as an Off pass. Private wrapper argument-name, menu-case and Git
+working-directory preflight failures are retained; no renderer guard or timeout
+was weakened. Native/Java read-only diagnostics found no concrete new ACK bug.
+
+Mobile defaults deliberately select 50%/Mobile-water/Mobile-fire/GlassOff/
+Current/MistOn/cap 30, preserving valid saved/custom/legacy settings and historical
+75%/GlassOn baseline. Desktop/High mirrors and ordinary mobile mirror remain;
+closed stone/Lower experiments supply no useful repeatable saving. No new cost
+cohort follows. Sustained 30 FPS and savings from the final tuple/MistOff remain
+unproved. Final independent audit, existing owner/device gates and owner-only
+signing safeguards remain; no merge, signing, tagging or publication occurs.
+
 ## Final closeout, 5 October: defaults and Mist On/Off
 
 The mirror experiment is closed: four balanced Shipping courses admit7,352

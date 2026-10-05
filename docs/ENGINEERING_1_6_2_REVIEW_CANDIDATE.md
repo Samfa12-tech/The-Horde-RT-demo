@@ -1,18 +1,73 @@
 # Horde 1.6.2 review candidate - 5 October 2026
 
-Final closeout is implementing the explicitly selected mobile defaults and Mist
-On/Off control in the [final graphics record](ENGINEERING_1_6_2_FINAL_GRAPHICS.md).
-New builds and affected native/device checks are required before this becomes
-the immutable audit candidate. Artifacts below remain historical Keeper-lighting
-evidence and are not relabelled as the new graphics build. The completed
-[mirror comparison](ENGINEERING_1_6_2_MIRROR_COST.md) found no useful repeatable
-saving; the ordinary mobile mirror and required desktop/High mirror are retained.
-Optional experiments are closed or deferred; no further exploratory cohorts
-are part of this release closeout.
+Work is paused by owner direction until after the weekly reset and further
+review. Merge and publication are on hold; no additional experiment or long run
+starts during the pause. Read the [exact pause checkpoint](ENGINEERING_1_6_2_PAUSE_2026_10_05.md)
+for completed checks, glass-apply timing, artifacts and the resume plan.
+
+The final graphics candidate is frozen at runtime source
+`1334cc9c58ec97940ac10d861f0397143ca7a9f4`, with both Windows configurations,
+three four-ABI Android packages, exact hardware checks and all six runtime CI
+jobs passing. See the [final graphics record](ENGINEERING_1_6_2_FINAL_GRAPHICS.md)
+for defaults, migration/persistence, Mist On/Off and exact validation limits.
+Later documentation backups do not relabel binaries. Independent final audit
+and remaining owner/device gates precede release actions.
+
+The [mirror comparison](ENGINEERING_1_6_2_MIRROR_COST.md) found no useful
+repeatable saving. Retain the ordinary mobile mirror and the explicitly required
+desktop/High mirror. Optional experiments are closed or deferred; no further
+exploratory cohorts form part of this closeout.
 
 The ordinary c112 mist is adopted after owner still-image approval and independent Mobile ABBA review. The accepted mist boundary is `2bdad1327eb1d4fedee9e9e223a3054536717749`; the subsequent Keeper-lighting runtime is `6468c3e47908901e8a904cf4a0eb1c7029c9767b` on draft [PR18](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/18). The accepted2bd mist boundary's [CI37250895699](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37250895699) passed all six individual jobs; all six jobs on prior backup25a79299 in [CI37247496966](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37247496966) passed. New Windows/Android artifacts, native checks and the accepted upward grate view are recorded below. The owner also approved moving mist after the two current Windows runs. The subsequent two-flank-torch correction passes exact native/device checks and the owner-approved lighting motion sequence. Its measured Shipping cost crosses the investigation threshold; performance tradeoff acceptance remains open.
 
 This is an unpublished review candidate. Historical stopped/earlier current labels retain their own scope; read this record and the [second-pass ledger](ENGINEERING_1_6_2_SECOND_PASS.md) before reusing them. The owner has authorized a separate optional Lower indirect-lighting candidate and matched comparison while retaining Current as default. The separate prototype is now deferred after the balanced Shipping comparison fails to demonstrate useful benefit; Current remains default. Its inactive source backup preserves the experiment. Texture LOD remains separately unbenchmarked/deferred.
+
+## Final graphics artifacts and evidence, 5 October
+
+| Artifact at runtime 1334 | SHA256 |
+| --- | --- |
+| Windows Debug EXE | `fbfa3b08e86be05038dbc881953353bedf77146675d6560b445c8c63fe231759` |
+| Windows Release EXE | `8b886d20c0b5b9fc116a0ce0e3890e292eef4d29fe2540fca8c066eece2ba5e0` |
+| Windows Debug ZIP | `947f5beb5dda1e134671942aa50112f08ed51d4f0b002805f9cdf0d3d1a83aa3` |
+| Windows Release ZIP | `53642c2fbc973b1e7f32686cb2820ae9f6e14aa3c75bbe02da5aa405b600bb90` |
+| Android Debug APK | `cea6f9594696a7d97df85c2d6cbe7782b82f5a9c561f5a43bc93aa194bf1a11e` |
+| Android unsigned Release APK | `567f0d2043721c37ad26d88c1756f22f90e127488b20a905d4aaee5acb1167be` |
+| Isolated development-signed Shipping Benchmark APK | `dfb36907def5444327be2acfc6ee873db16594160a0f15d093b4ade7b02229db` |
+
+The [full admission record](ENGINEERING_1_6_2_FINAL_GRAPHICS.md#validation-boundary)
+binds 5,823 before/after source files, 85-member Windows packages, actual PE/ELF
+shader inspection and four-ABI Android alignment/notices/policy. Local checks:
+12 affected CTests plus 3 renderer/player integration checks, both Release
+shader fixtures, 154 Java tests/24 classes and lint 0 errors/49 warnings.
+[Runtime CI 37271761916](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37271761916)
+passes all six jobs.
+
+Both Windows backends admit 78 Showcase and 28 preview images. All 26 On and 26
+restored-On views match prior 646 RGBA exactly; actual Off completed uploads,
+shared camera/fire/geometry and physical 24/19 ownership join. The owner accepts
+the optional Off still images, noting little visible difference. No new motion
+or timing acceptance is inferred. Windows receipt
+`c64c0156c230a40376a6be8eb121cceececef8276f7daafac49466442c93a777`.
+
+Both new Debug phone backends pass 13 routes/seven captures/strict Home at
+saved 50%, with actual APK pullbacks and the original 1,420-byte preferences
+unchanged. Completed MistOn and fire/shadow controls join physical 24/19.
+Phone receipt `76211a9987b5235fb4cf323eaa43f46e5c9c9209d4f6e7a8845f4fd947ed2237`.
+The isolated validation app verifies the staged 50%/GlassOff/MistOn tuple,
+explicit restoration, MistOff background rollback and confirmed Off/On cold
+restarts. Settings receipt
+`ff03e377b5185ecb0329df652c34c0357df344e70a0a9eb5d151b20539413a2d`.
+No owner Debug settings write or data clearing occurs; the fresh-install
+key-absence rule is tested without clearing the existing phone app.
+
+Current mobile 50%/Mobile-water/Mobile-fire/GlassOff/Current/MistOn/cap 30 is the
+owner's deliberate default choice, preserving valid saved/custom/legacy tuples.
+Desktop 100%/High-water/High-fire/GlassOn/Current/MistOn/cap 30 and mirrors remain.
+This does not measure savings or sustained 30 FPS. The substantial Keeper cost,
+Windows listening/report interaction, new quality cost, full four-light/early
+reward overlap, final independent audit, owner signing safeguards and other
+device dispositions remain explicit. These packages remain unpublished and
+unsigned for production. Earlier artifacts below retain their own scopes.
 
 ## Keeper lighting artifacts and evidence, 5 October
 

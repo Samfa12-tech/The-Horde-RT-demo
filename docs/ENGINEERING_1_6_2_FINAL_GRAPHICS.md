@@ -1,5 +1,10 @@
 # Final graphics defaults and mist control
 
+Work is paused by owner direction until after the weekly reset and further
+review. Merge and publication are on hold; no additional experiment or long run
+starts during the pause. Read the [exact pause checkpoint](ENGINEERING_1_6_2_PAUSE_2026_10_05.md)
+for completed checks, glass-apply timing, artifacts and the resume plan.
+
 The owner's final 1.6.2 direction selects an explicit mobile default and a
 bounded Mist On/Off option. These changes require new artifacts and affected
 validation; earlier Keeper packages retain their recorded identities.
@@ -31,7 +36,7 @@ matched appearance/cost acceptance needed to make it the default.
 ## Storage and application
 
 Platform defaults are distinct from the historical Accepted 1.6.1 baseline:
-Android 75%, Mobile water/fire, cap30, Glass On and Current shadows. That baseline
+Android 75%, Mobile water/fire, cap 30, Glass On and Current shadows. That baseline
 remains available and truthful. Valid saved custom, legacy and interrupted
 pending settings retain their values; introducing a default does not rewrite
 them. A new Android graphics configuration is detected from graphics-key
@@ -69,24 +74,88 @@ for this feature. This static-size change is not a dynamic timing result.
 
 ## Validation boundary
 
-Implementation is frozen; exact artifact/native/device admission remains in
-progress. Twelve affected Debug native CTests pass51.61s. The focused Java
-aggregate passes36 tests across preferences, options, compact layout and
-lifecycle; lint has0 errors and50 warnings at that boundary. The final menu
-also retains a separate staged historical-baseline button; its compilation and
-lint belong to the forthcoming exact build. Strict Pipeline8, Compute8 and
-compatibility2 SDK freshness checks pass, alongside ABI/adapter freshness.
-Both affected Release shader fixtures pass123.55s (Manifest32.64s and
-Artifact90.89s). Windows graphics source contracts pass56 checks after adding
-actual-completed Mist Apply/Revert/readback checks. These are CPU/source/SDK
-results, without a new device, moving-image or performance claim.
+Implementation is complete at runtime source `1334cc9c58ec97940ac10d861f0397143ca7a9f4`.
+The [runtime CI run](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37271761916)
+passes all six individual jobs. Later documentation backups do not change these
+artifact identities. Independent final review and the remaining owner/device
+acceptance gates precede any release action.
 
-Required affected checks cover platform defaults and native/Java parity, valid legacy/pending
-preservation, staged reset, rollback/background behavior, native persistence,
-unchanged desktop defaults, and actual Keeper-room On/Off/On captures with owning
-frame evidence. The compact skeleton preview does not exercise Keeper ground
-mist and cannot substitute for those images. New artifact hashes, commands and
-results will replace this pending status before the audit handoff.
+Both Windows configurations and all four Android ABIs build. Twelve affected
+Debug CTests pass in 51.61s, and three renderer/player integration checks pass
+in 10.97s. Both affected Release shader fixtures pass in 123.55s. The complete
+Android Java suite passes 154 tests in 24 classes with no failures, errors or
+skips; lint reports 0 errors and 49 warnings. Pipeline8, Compute8, compatibility2,
+ABI/adapter freshness and the56 Windows graphics source checks pass.
+
+The pre-build seal covers 5,823 tracked files and 3,652,319,441 bytes. All sealed
+source bytes remain identical after the builds. Each Windows ZIP closes 85
+members; all three APKs pass four-ABI ELF/16KiB/compiler-policy/notices admission.
+Actual selected PE and ARM64 shader modules pass SDK validation/disassembly;
+Shipping has zero diagnostic atomics and no binding22. Unsigned Release fails
+certificate verification as expected. No production signing was invoked.
+
+Both Windows RT backends complete real Keeper-room On/Off/restored-On banks,
+13 poses per bank, plus 14 preview images and 10 transactions each: 78 Showcase
+and 28 preview readbacks. All eight launches exit 0 with synchronization validation
+and no error markers. Canonical Showcase records join actual uploaded mist,
+completed/present serials, selected payloads, 24 physical TLAS instances and 19
+BLAS. Camera, geometry, gameplay phases, fire-light records and remaining quality
+controls match across the modes. All 26 On and 26 restored-On RGBA images exactly
+match the corresponding prior 646 Keeper images, and all 26 restorations match
+new On. Off changes ground-mist contributions in seven checkpoints per backend.
+The owner reviewed the original PNG comparison and found the optional Off still
+appearance acceptable, with little visible difference in those views.
+
+The compact preview's Mist Apply/Revert transactions pass current owning-frame
+and desired/effective checks, with actual raw/completed mist checked by its
+frozen native success gate. Its JSON does not separately serialize that optional
+actual boolean. All three paused compact Mist images are identical because
+that Skeleton alcove has no Keeper ground medium. These images cannot prove
+Keeper-mist appearance or cost. Windows capture receipt
+`c64c0156c230a40376a6be8eb121cceececef8276f7daafac49466442c93a777`.
+
+On the allocated SM-S948B/Android16, the isolated Shipping validation app stages
+the mobile reset tuple while its saved 75%/Glass-On tuple remains unchanged.
+A real current RT frame acknowledges 50%, 720x1490 internal/1440x2980 output,
+Mobile water/fire, Glass Off, Current shadows, Mist On; explicit Restore returns the
+original tuple. Mist Off also has an actual requested/effective acknowledgement,
+restores on Home/resume, and survives Use/Keep and a cold restart. Use/Keep On
+and a second cold restart restore the original confirmed values. Only the
+isolated validation app's graphics storage changes; no app data is cleared.
+Fresh-install key-absence behavior is covered by CPU/Java migration tests;
+the owner's existing app was not cleared to simulate a fresh install.
+
+The exact new Debug APK on the same phone passes both Pipeline and
+RayQueryCompute at the owner's saved 50%: 13 route waypoints, seven captures and
+strict same-process Home/resume each. Actual installed pullbacks match
+`cea6f9594696a7d97df85c2d6cbe7782b82f5a9c561f5a43bc93aa194bf1a11e`.
+All 14 captures and both post-resume records carry actual completed Mist On,
+Mobile fire 4/1/4, Current shadows 1/1, 24 TLAS instances and 19 BLAS. Surface
+17->19 and scene epoch 18->20 join completed serial 2259 on Pipeline and 2242 on
+Compute. Original Debug preferences remain byte-identical 1,420 bytes, preserving
+saved 50%/Mobile-water/Mobile-fire/GlassOn/Current/cap 30, with missing old-schema
+mist interpreted as On. Phone receipt
+`76211a9987b5235fb4cf323eaa43f46e5c9c9209d4f6e7a8845f4fd947ed2237`;
+settings/persistence receipt
+`ff03e377b5185ecb0329df652c34c0357df344e70a0a9eb5d151b20539413a2d`.
+Both validation apps were stopped after collection. Raw reports, images,
+preferences and private identifiers remain outside Git.
+
+Initial owned-UI traversal/stale-target failures and an insufficient first-ACK
+poll remain private negatives. The corrected observer waits at most 120s for
+scene-rebuild acknowledgement, preserving the ordinary 15-second post-ACK
+confirmation deadline. A touch that did not stage Off was detected from the
+actual requested value and is not counted as an Off pass. The private wrapper's
+PowerShell argument-name and case-sensitive menu-label errors are retained;
+continuations resume from verified actual state. No runtime guard was weakened.
+
+These results certify affected correctness, persistence, package containment and
+lifecycle on the named builds/devices. They do not prove sustained 30 FPS, a cost
+saving from the new tuple or Mist Off, Windows Release execution, four
+simultaneous real fire lights, early reward overlap, other phones, or new audio
+acceptance. The significant measured Keeper cost and deferred optional choices
+retain their recorded scope. Current 50% defaults are a deliberate owner choice.
+
 
 Audio/haptic manual revalidation required: **NO** for these settings/rendering
 changes, provided semantic events, listener/source data and playback remain

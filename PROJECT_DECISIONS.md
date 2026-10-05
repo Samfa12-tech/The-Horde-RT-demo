@@ -2,6 +2,27 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
+## 1.6.2 defaults and release hold - 2026-10-05
+
+The owner selects fresh-install and staged Reset Defaults on Android at 50%
+resolution, Mobile water/fire, cap 30, Glass Off, Current shadows and Mist On.
+Preserve valid confirmed/custom/legacy/pending settings and the historical
+Accepted 1.6.1 Android 75%/Glass On baseline. Reset stages a draft; Use these
+settings then Keep and save confirms it. Windows remains 100%/High water/fire/
+Glass On/Current/Mist On/cap 30. Mist Off skips real ground-mist visibility and
+integration while preserving fire, smoke, electricity, lighting and gameplay.
+Missing old mist defaults to On. Current transport and Linear filtering remain.
+
+Retain the ordinary mobile mirror because the closed stone comparison found no
+useful repeatable saving; desktop and High retention are explicit requirements.
+These choices establish no sustained 30 FPS or final-tuple savings claim.
+
+The owner now prioritizes tightening after the weekly reset and further review.
+Hold merging, production signing, tagging and publication. No additional
+optimization experiment or long run starts during the pause. See the
+[pause checkpoint](docs/ENGINEERING_1_6_2_PAUSE_2026_10_05.md) and
+[final graphics evidence](docs/ENGINEERING_1_6_2_FINAL_GRAPHICS.md).
+
 ## Showcase Alpha 1.6.1 publication and acceptance — 2026-10-03
 
 Owner authorised signing/freezing, then publication, normal main integration and
