@@ -148,3 +148,10 @@ The final implementation handoff should cover the following gates at the accepte
 No builds, benchmarks, artwork, recordings or runtime tests are delivered by this documentation task. Application versions, release channels and public packages remain unchanged; publication requires separate owner authorisation and the normal release gates.
 
 **Audio/haptic manual revalidation required: NO for this documentation-only update.** When implementation changes dialogue, ambience, spatialisation or feedback, classify the exact work package under the existing change-triggered rule; those affected changes will require the relevant manual check.
+
+
+## Preserved connected Bellwether references — 5 October 2026
+
+![Bellwether connected town planning reference](../../design/world/connected/02a-bellwether-terrain-1-8.webp)
+
+Read the [connected map set](../../design/world/connected/README.md), building-feature data and geometry caveats together. These are coordinated blockout proposals, not validated distances, exact tree/fence instances, final geometry or additional approved content. Continue the same forest approach and keep Bellwether's fixed regional location. The archive separates the earlier atmospheric town image from these newer coordinated drawings. Natural forest boundaries, dry-stone garden edges and timber pens must agree with readable playable collision; they are proposals pending blockout. Existing hero-tavern, selected-interior, population and performance gates remain authoritative.

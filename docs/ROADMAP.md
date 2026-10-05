@@ -409,3 +409,8 @@ Detailed street/building blockout (regional geography and the names The Veyrland
 This update preserves the owner's 11 September campaign direction and records the 30 September 1.6.2 sequencing, demo-polish and asset-reuse additions the 1 October material-depth foundation, and the 2 October grouped post-release audit, graphics-menu and measured reduced-effects plan. It implements no gameplay, changes no package/release identity, generates no assets, authorises no paid work and publishes no build.
 
 **Audio/haptic manual revalidation required: NO — documentation only; runtime and semantic inputs are unchanged.**
+
+
+## Visual-reference custody — 5 October 2026
+
+The [design reference archive](design/README.md) keeps the selected UI/HUD direction, historical concepts and connected forest/Bellwether map proposals beside the plans. Use their status captions: the loading art's bar is superseded by a small spinner only; map dimensions and vegetation marks remain blockout proposals. The archive adds no runtime implementation, release, paid asset work or new milestone scope.

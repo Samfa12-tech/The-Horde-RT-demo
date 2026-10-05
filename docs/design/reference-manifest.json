@@ -1,0 +1,251 @@
+{
+  "date": "2026-10-05",
+  "purpose": "documentation-reference custody; no runtime admission",
+  "original_images": "Original PNGs retained in owner Library; no private storage URLs published",
+  "files": [
+    {
+      "path": "docs/design/world/connected/01-forest-track-1-7.webp",
+      "source_name": "01-forest-track-1-7.png",
+      "source_sha256": "9377a998b2c6283e937375187a193c6f14442dac1ab57b659a96366f1973a91f",
+      "source_dimensions": [
+        2646,
+        1870
+      ],
+      "encoding": "lossless WebP; unchanged dimensions and decoded pixels",
+      "status": "proposed connected blockout revision 2",
+      "bytes": 292488,
+      "sha256": "7ece732e40f11f777408d410cce79618a31c28e6bbd7303de36d1622fe018395",
+      "git_blob_sha": "7d91427a600e4fef1ad15618d5d6dee0ce4f1f1d"
+    },
+    {
+      "path": "docs/design/world/connected/01-forest-track-1-7.pdf",
+      "source_name": "01-forest-track-1-7.pdf",
+      "source_sha256": "f5a3a758a070108d9b24136c1f9c8c129c85b3b83660bafb6fea7d979c9756dc",
+      "encoding": "unchanged bytes",
+      "status": "editable planning reference; not runtime-validated",
+      "bytes": 116754,
+      "sha256": "f5a3a758a070108d9b24136c1f9c8c129c85b3b83660bafb6fea7d979c9756dc",
+      "git_blob_sha": "fd69dadeeaf05e1ba3f3e915283dd0991b812646"
+    },
+    {
+      "path": "docs/design/world/connected/01-forest-track-1-7.svg",
+      "source_name": "01-forest-track-1-7.svg",
+      "source_sha256": "317b282f62ec2cb02879717fcbd7452d3a48714703551deb604dbf3d740d57f9",
+      "encoding": "unchanged bytes",
+      "status": "editable planning reference; not runtime-validated",
+      "bytes": 310928,
+      "sha256": "317b282f62ec2cb02879717fcbd7452d3a48714703551deb604dbf3d740d57f9",
+      "git_blob_sha": "412da0b24ce6ed93455ddd74ac2bca20ffa2c1f6"
+    },
+    {
+      "path": "docs/design/world/connected/02-bellwether-town-1-8.pdf",
+      "source_name": "02-bellwether-town-1-8.pdf",
+      "source_sha256": "3cc75f450e2507980e864a3a03575f4f16a9bfba62f6337ea689fb6e8c1cd624",
+      "encoding": "unchanged bytes",
+      "status": "editable planning reference; not runtime-validated",
+      "bytes": 358566,
+      "sha256": "3cc75f450e2507980e864a3a03575f4f16a9bfba62f6337ea689fb6e8c1cd624",
+      "git_blob_sha": "35364ed60dc2919afc9aee0e82a3d96f8fb85c97"
+    },
+    {
+      "path": "docs/design/world/connected/02a-bellwether-terrain-1-8.webp",
+      "source_name": "02a-bellwether-terrain-1-8.png",
+      "source_sha256": "e01d8829a6cf510adf33415c74f6b5cec0147efc748c58c06a47b248ed003fc4",
+      "source_dimensions": [
+        2646,
+        1870
+      ],
+      "encoding": "lossless WebP; unchanged dimensions and decoded pixels",
+      "status": "proposed connected blockout revision 2",
+      "bytes": 391324,
+      "sha256": "8c463d0d87a2b0fe5aa1f16f934671819ac7f8954d0dc65744d509fb146d3135",
+      "git_blob_sha": "26e53772e80cda122eab51b7fed01764bad05c62"
+    },
+    {
+      "path": "docs/design/world/connected/02a-bellwether-terrain-1-8.svg",
+      "source_name": "02a-bellwether-terrain-1-8.svg",
+      "source_sha256": "d6fa87549c64050f89b70578da75896939798c622b9487877b0a9d2a8ba6a679",
+      "encoding": "unchanged bytes",
+      "status": "editable planning reference; not runtime-validated",
+      "bytes": 660337,
+      "sha256": "d6fa87549c64050f89b70578da75896939798c622b9487877b0a9d2a8ba6a679",
+      "git_blob_sha": "7b3509c6009d10be64d1da06a22a2bd05298961e"
+    },
+    {
+      "path": "docs/design/world/connected/02b-bellwether-use-1-8.webp",
+      "source_name": "02b-bellwether-use-1-8.png",
+      "source_sha256": "e3d6ef774ae455bee23447d1647f09efb916b77b4371d31c2354a090f8545e56",
+      "source_dimensions": [
+        2646,
+        1870
+      ],
+      "encoding": "lossless WebP; unchanged dimensions and decoded pixels",
+      "status": "proposed connected blockout revision 2",
+      "bytes": 184396,
+      "sha256": "d88f4c11b3e224cdb2e641afadb4524ff705eecf9dbaaa067bddb94206d18f49",
+      "git_blob_sha": "27d19f20a8e2d07f350fc3f04f4760a9ba612873"
+    },
+    {
+      "path": "docs/design/world/connected/02b-bellwether-use-1-8.svg",
+      "source_name": "02b-bellwether-use-1-8.svg",
+      "source_sha256": "5efa79a18750c4a1beea6375d6e5edbab15c9a8b648647425f6f46ae71555977",
+      "encoding": "unchanged bytes",
+      "status": "editable planning reference; not runtime-validated",
+      "bytes": 198114,
+      "sha256": "5efa79a18750c4a1beea6375d6e5edbab15c9a8b648647425f6f46ae71555977",
+      "git_blob_sha": "30e2cdaf7982381a52992321c805d532561053f9"
+    },
+    {
+      "path": "docs/design/world/connected/02c-bellwether-water-height-1-8.webp",
+      "source_name": "02c-bellwether-water-height-1-8.png",
+      "source_sha256": "644d956610d529320ac7739208961709b748476de2bbf0c5e62ebece74229e01",
+      "source_dimensions": [
+        2646,
+        1870
+      ],
+      "encoding": "lossless WebP; unchanged dimensions and decoded pixels",
+      "status": "proposed connected blockout revision 2",
+      "bytes": 114740,
+      "sha256": "fc7dd7418969a9ea05963a9be54cfeabd5570713381962715fe120a7fafe9bce",
+      "git_blob_sha": "54fbd1c1580739ecf0bf16a8a1905a184ca1d8be"
+    },
+    {
+      "path": "docs/design/world/connected/02c-bellwether-water-height-1-8.svg",
+      "source_name": "02c-bellwether-water-height-1-8.svg",
+      "source_sha256": "d59f1256f8b206b32ef49990df2ae4dd50ca12bb0df72fc2f53886f1687b6265",
+      "encoding": "unchanged bytes",
+      "status": "editable planning reference; not runtime-validated",
+      "bytes": 35115,
+      "sha256": "d59f1256f8b206b32ef49990df2ae4dd50ca12bb0df72fc2f53886f1687b6265",
+      "git_blob_sha": "be897f4306ecc0e5ab45b47e41b165c3f5d451a4"
+    },
+    {
+      "path": "docs/design/world/connected/shared-coordinate-layout.json",
+      "source_name": "shared-coordinate-layout.json",
+      "source_sha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+      "encoding": "unchanged bytes",
+      "status": "editable planning reference; not runtime-validated",
+      "bytes": 8345,
+      "sha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+      "git_blob_sha": "4ce1a6852c1572659b3498b948e538587053d829"
+    },
+    {
+      "path": "docs/design/world/connected/building-feature-register.csv",
+      "source_name": "building-feature-register.csv",
+      "source_sha256": "e0284fa28de3e1d8a4b2c3ba05ca795f0c445d90429ae215027508c4e5041719",
+      "encoding": "unchanged bytes",
+      "status": "editable planning reference; not runtime-validated",
+      "bytes": 585,
+      "sha256": "e0284fa28de3e1d8a4b2c3ba05ca795f0c445d90429ae215027508c4e5041719",
+      "git_blob_sha": "2a4509ee96cb766d7688aa89894995591021e6ef"
+    },
+    {
+      "path": "docs/design/world/connected/build_maps.py",
+      "source_name": "build_maps.py",
+      "source_sha256": "7a394e88be7b2a45f52dab40affa5baae74daf4a94eaf01328d9eab0bce0ffe7",
+      "encoding": "unchanged bytes",
+      "status": "editable planning reference; not runtime-validated",
+      "bytes": 28448,
+      "sha256": "7a394e88be7b2a45f52dab40affa5baae74daf4a94eaf01328d9eab0bce0ffe7",
+      "git_blob_sha": "1a4813f52833eeb723f9d128b3237b0c5262d273"
+    },
+    {
+      "path": "docs/design/ui/historical/horde-carved-stone-central-lantern.webp",
+      "source_name": "horde-carved-stone-central-lantern.png",
+      "source_sha256": "5f55b51c051b263c798a6c00fd49b40e9e15ae32c54dff67eb0531f9bc4d9f71",
+      "source_dimensions": [
+        1275,
+        1233
+      ],
+      "encoding": "WebP quality 92; unchanged dimensions; no crop",
+      "status": "historical exploration",
+      "bytes": 349626,
+      "sha256": "9ca6ecdcee94a64c6c68ca2c6a9246f894dd3e4803594f13096987d618287a66",
+      "git_blob_sha": "dc7b7bc13396f6416a3fb8d1fe22f285b19ade4d"
+    },
+    {
+      "path": "docs/design/ui/historical/horde-lantern-and-ash-concept.webp",
+      "source_name": "horde-lantern-and-ash-concept.png",
+      "source_sha256": "3ee8700df4cfee406079eebc98cb3a7e9a86dcf146c6f9b624a2ab9644a40774",
+      "source_dimensions": [
+        1383,
+        1137
+      ],
+      "encoding": "WebP quality 92; unchanged dimensions; no crop",
+      "status": "historical exploration",
+      "bytes": 330362,
+      "sha256": "f085203da407cc6837de2dcaea2e5b9f85a6b89457fbf22a520a616b47d10926",
+      "git_blob_sha": "ed09d52ff5e143cf3f51caf0ff14d383972c2543"
+    },
+    {
+      "path": "docs/design/ui/historical/horde-lantern-shrine-concept.webp",
+      "source_name": "horde-lantern-shrine-concept.png",
+      "source_sha256": "63d4abcf134dbee72df6763957d7e3c0a405dfd1ae976374a95dad3dea5d0a13",
+      "source_dimensions": [
+        1322,
+        1190
+      ],
+      "encoding": "WebP quality 92; unchanged dimensions; no crop",
+      "status": "historical exploration",
+      "bytes": 383922,
+      "sha256": "f3b64e7e738522f7fe3e6ecdcf61af3c444e334372c4fea6375b46647df68321",
+      "git_blob_sha": "8b4c63f2a6de4af2a09ebfd93e39463f9c8f9097"
+    },
+    {
+      "path": "docs/design/ui/horde-loading-orientation-concept-v1.webp",
+      "source_name": "horde-loading-orientation-concept-v1.png",
+      "source_sha256": "705c11b89dc2c47d1728461b5e6fe28a4389616fcf9d0ceaef6010b3cbc9fb40",
+      "source_dimensions": [
+        1774,
+        887
+      ],
+      "encoding": "WebP quality 92; unchanged dimensions; no crop",
+      "status": "composition only; bar superseded by small spinner",
+      "bytes": 318230,
+      "sha256": "bd186119773beb1e0446f34568bf572b1fb3d0ceeedd4f183d74841fd467c22f",
+      "git_blob_sha": "6694dfb5ea8789d8667f5b59a0ebef25ab66c411"
+    },
+    {
+      "path": "docs/design/ui/horde-physical-lantern-menu-v1.webp",
+      "source_name": "horde-physical-lantern-menu-v1.png",
+      "source_sha256": "5c7af71cd8cc71b73c0d32ee1839df4b8008f96c83fa5f066fbc60073326ac2a",
+      "source_dimensions": [
+        1276,
+        1233
+      ],
+      "encoding": "WebP quality 92; unchanged dimensions; no crop",
+      "status": "selected design direction",
+      "bytes": 421156,
+      "sha256": "788127c84358f2368110c3b2ef2aaf74c4162071c14280ee191c56e1f03c1f34",
+      "git_blob_sha": "03e26de6fcd747fb09ff465b14845a92d0181dbf"
+    },
+    {
+      "path": "docs/design/ui/horde-settings-graphics-physical-v1.webp",
+      "source_name": "horde-settings-graphics-physical-v1.png",
+      "source_sha256": "5f8c3bfc3cd2c695421fab270e0bae2232d98ac19d50dcb6e4a86bde27fb4a26",
+      "source_dimensions": [
+        1294,
+        1216
+      ],
+      "encoding": "WebP quality 92; unchanged dimensions; no crop",
+      "status": "selected design direction",
+      "bytes": 578948,
+      "sha256": "dd7151252f6e8f0d05a08f2b4c2bfdc66eed73df6863aca65441c601db846e94",
+      "git_blob_sha": "50b282e347c02819d4083f83073ce72d1a9d149e"
+    },
+    {
+      "path": "docs/design/world/historical/bellwether-earlier-town-concept.webp",
+      "source_name": "Moonlit Village Hub Map.png",
+      "source_sha256": "07d52af561844d77939d741e3cb052fe8623defa2e07fec35337fec18f0eae87",
+      "source_dimensions": [
+        1448,
+        1086
+      ],
+      "encoding": "WebP quality 92; unchanged dimensions; no crop",
+      "status": "historical; spatially superseded by connected blockout maps",
+      "bytes": 625408,
+      "sha256": "76318ede141f56971318a0d0fec83483b3f750d454c4ba98e6a895c7ea59281a",
+      "git_blob_sha": "06192db4a004fd664870b20a0e6ad1e4f0bd80e8"
+    }
+  ]
+}

@@ -1,5 +1,13 @@
 # Asset Licenses
 
+## Generated design-reference archive — 5 October 2026
+
+- Scope: WebP review derivatives under `docs/design/ui/`, `docs/design/world/historical/` and `docs/design/world/connected/`, with connected-map SVG/JSON/CSV/source documentation.
+- Source: owner-requested/generated UI and map reference work preserved for the owner's Horde planning; original PNG filenames and hashes are recorded in [the manifest](docs/design/reference-manifest.json). Original image files remain in the owner's Library.
+- Permission: the owner requested saving these maps and UI/HUD images to GitHub alongside the plans. This records permission for documentation-reference publication, not a third-party asset licence or blanket MIT grant.
+- Status: generated concept art and blockout proposals; selected, historical and partially superseded details are identified in the adjacent indexes. No runtime asset admission or production validation is implied.
+- Before runtime use or redistribution as production assets, verify applicable input/provider rights, preserve required notices and create separately audited runtime derivatives through the existing pipeline. Do not treat repository code licensing as automatically licensing these images.
+
 ## Approved world-layout planning reference
 
 - File: `docs/design/world/the-horde-world-layout.png` (PNG, 3,506,134 bytes; Git LFS).
@@ -57,3 +65,4 @@ The running RT scene uses the five Poly Haven material sets, the Hotstrike Studi
 Android runtime derivatives for the five CC0 rows are strict KTX2 arrays using ASTC 6x6 for diffuse/AO-roughness-metal and ASTC 4x4 for normals. The retained raw RGBA arrays and original 1K JPGs remain the provenance/source chain; layer order is unchanged.
 
 Poly Haven's asset license states that its assets are CC0 and may be used commercially without required attribution: https://polyhaven.com/license. Attribution is retained here as project provenance.
+

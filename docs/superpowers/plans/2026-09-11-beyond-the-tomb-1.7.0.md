@@ -940,3 +940,14 @@ Repository evidence for the planning snapshot is available at commit `191d799ab7
 ---
 
 **Final acceptance statement:** The dungeon now feels like a prologue; the rescue physically carries the player into a convincing moonlit woodland; the animated, voiced companion and player-controlled lantern reveal establish the larger adventure; the touch controls and menus belong visually to that world; and the engine gains reusable, tested capability without sacrificing honest hardware RT or phone usability.
+
+
+## Preserved map and UI references — 5 October 2026
+
+![Connected forest planning reference](../../design/world/connected/01-forest-track-1-7.webp)
+
+Use the [connected map set and caveats](../../design/world/connected/README.md) for the forest route and fixed future Bellwether relationship. Coordinates, dimensions, tree symbols and natural boundaries are proposals for playable blockout, not surveyed or accepted runtime geometry. The town remains a distant shell in 1.7; the chapter stops at the lookout.
+
+![Selected physical-lantern menu and HUD design reference](../../design/ui/horde-physical-lantern-menu-v1.webp)
+
+The [selected UI/HUD archive](../../design/ui/README.md) preserves the Carved Stone → central hanging lantern → physical-button direction and Settings/Graphics and loading references. It is generated concept art, not a working/pixel-perfect interface. Use three heart icons and touch Swing/Parry/Dodge; retain real SFX/Music/Look controls, future Dialogue scope, and actual Graphics Apply/Keep/Save with a 15-second rollback. Physical menu navigation proposes a leftward camera pan for Settings/More and Play/Continue fade to black, respecting reduced motion. The loading board's progress bar is superseded: **small spinner only**. These reference decisions do not expand current 1.6.2 implementation or waive this plan's baseline, scope and acceptance gates.

@@ -197,3 +197,8 @@ Where the asset-vendoring tooling is used, retain the verified canonical package
 **Later:** starter-expedition content beyond its approved milestone, Abbey/Foundry/Court/treasury environments and bosses, advanced tool props, broad upgrade/healing economy, full narrative voice bank and return-state variants. Their thematic direction is in CAMPAIGN_DESIGN, but they are not hidden dependencies of the 1.7 asset pack. Optional RTAO/RTGI is an engine investigation, not another asset-acquisition batch.
 
 **Delivered by this update:** documentation and source-candidate verification only. No asset generation, bulk download, transfer, spending, runtime edit, test execution, merge, release or deployment. Audio/haptic manual revalidation: **NO for this document; YES when affected sound/voice implementations are delivered.**
+
+
+## Preserved visual references — 5 October 2026
+
+Use the [reference archive](design/README.md) before commissioning duplicate concepts. The [selected UI/HUD boards](design/ui/README.md) and [connected forest/town proposals](design/world/connected/README.md) are documentation inputs only; runtime derivatives still require the existing provenance, importer, scale, collision, readability and measured-cost gates. The loading image's bar is explicitly superseded by a small spinner only. Historical alternatives are clearly separated.

@@ -106,3 +106,10 @@ Before later implementation acceptance, verify:
 - Other unapproved names, detailed dialogue, encounter rules and numerical content/performance budgets remain provisional
 
 **Documentation only.** No runtime implementation, new asset generation, paid work, merge, release or deployment is delivered or authorised by this update. Audio/haptic manual revalidation required: **NO**.
+
+
+## Connected local reference drawings — 5 October 2026
+
+The [forest and Bellwether map set](design/world/connected/README.md) translates the regional relationships above into coordinated **blockout proposals**. It does not replace this approved regional topology or certify exact distances, slopes, structures, fences, tree instances or collision. Editable coordinates and feature data accompany the drawings. The earlier [town atmosphere/layout concept](design/world/historical/bellwether-earlier-town-concept.webp) is historical and spatially superseded by that coordinated set; its decorative bridge and building details are not authoritative.
+
+Tree circles illustrate woodland coverage, not final exact placement. Author hero occluder/framing trees after blockout; use terrain banks, roots, rocks, undergrowth and fallen wood for natural forest containment while retaining deliberate off-trail pockets. Avoid inviting passable gaps closed by invisible collision. Dry-stone garden boundaries and timber pens remain proposals, not locked positions or meshes.
