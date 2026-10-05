@@ -10,7 +10,7 @@ adoption receipt SHA256:
 The medium retains density, extinction, authored bounds and 2/6/8 integration
 budgets. It uses actual sky, staff and fire RGB/strength, applies strength once
 and reuses each source's visibility at the mist interval midpoint. This adds at
-most four visibility queries per active mist pixel. Midpoint reuse is an
+most four top-level source visibility calls per active mist pixel. Generic dielectric visibility can traverse multiple bounded interfaces, so this is not a bound on all hardware query initializations. Midpoint reuse is an
 approximation; it does not establish per-step volume visibility. The
 [adopted source and budget copies](experiments/1.6.2-mist/README.md) retain exact
 hashes and limitations.
@@ -65,9 +65,17 @@ cleared and no default was reduced.
 
 ## Remaining exact-candidate gates
 
-Current main builds, extracted-module/package admission and affected native/device
-checks must join the adopted source. Owner approval covers the shown still
-proposal; moving light/camera appearance remains separate. Private Compute sky
+Integrated2bd Windows/Android builds and extracted-module/package admission now
+join the adopted source. Both current Debug phone backends pass13/13 route,
+seven captures and strict Home/Resume at saved50%. Both Windows motion runs
+pass28 captures each, and the owner approved moving mist after watching them.
+Independent evidence admission receipt SHA256 is
+`e4f56c9216ed33f84c2d66e20216dc3fa94308482f267b2c9f6eb17589777962`
+for Windows and
+`079be9eb959d89764b10987650d5a2f366a5306395369de5740f21a9049d4e03`
+for phone. These certify the2bd candidate; the newly requested Keeper flank
+torches require new artifacts, overlapping-light appearance and phone cost.
+Private Compute sky
 and blocked real-fire probes establish their specific sampled paths, not every
 march step or a clear warm-fire contribution. Current gameplay has one fire;
 native capacity-two overlap remains unverified. Preserve all negative packets

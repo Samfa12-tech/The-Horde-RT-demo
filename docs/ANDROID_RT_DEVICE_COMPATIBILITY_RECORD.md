@@ -1,6 +1,34 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-10-04
+Last updated: 2026-10-05
+
+## Integrated2bd ordinary mist: current Debug Pipeline and Compute
+
+Evidence class: **exact development APK correctness and lifecycle**, allocated
+SM-S948B, Android16/API36, Adreno840. Debug APK SHA256
+`d58f9f21743f5f68991f58905abfb239d20cfed029fd0d703cc1e46c780f4db6`
+was built at integrated runtime2bdad132. Both genuine backends passed13/13 route
+waypoints, seven selected feature/Keeper/held-lantern captures and strict
+Home/Resume with newly completed owning RT frames. Separate actual installed
+APK pullbacks are retained and match the tested APK. Saved50%/Mobile water and
+fire/GlassOn/Current shadows/cap30 preferences remain byte-identical1420 bytes;
+no settings writes or data clearing occurred.
+
+All four Debug ELF architectures,16KiB load/ZIP policy and actual packaged versus
+stripped ARM64 SDK modules pass the scoped package seal; receipt
+`e95564b256be7a753ad6b270c43c69089e6e88e6ca08b86ce7cfa672f692caf7`.
+The collector context was2bd with documentation-only changes. This is not a
+Shipping performance, release-signature or all-before-build compile-input claim.
+The current unsigned Release and separate development-signed Shipping Benchmark
+packages are admitted separately in the
+[candidate record](ENGINEERING_1_6_2_REVIEW_CANDIDATE.md), without device claims
+for those exact APKs. The older independently reviewed ABBA mist cost cohort
+retains its own isolated APKs and thermal/order limitations.
+
+Keeper captures remain dark under the corrected physical mist. The owner has
+requested two reveal-synchronized flank torches; that later scene is implementing
+and requires new appearance, overlap and phone-cost evidence. These runs do not
+certify that change. S24 remains deferred and S25 unverified.
 
 ## Returned allocation: current95 ordinary75% measurement
 

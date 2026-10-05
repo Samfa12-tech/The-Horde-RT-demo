@@ -4,6 +4,12 @@
 
 ## Creative intent
 
+### Owner lighting correction, 5 October 2026
+
+The physically occluded mist makes the dormant/revealing Keeper too dark. Add two torches behind and on either side of its current staging anchor. Ignite both on the existing reveal-start tick alongside the movement/sword hold, cue and title sequence. Keep both lit throughout the encounter and through the actual death animation; extinguish only when that animation completes, allowing the existing chest spotlight to become the visual focus. Preserve the reward timing, roof occlusion and chest spotlight.
+
+Reuse admitted torch bodies, shared flame/light sockets and ordinary hardware-RT shading. Admit the real simultaneous-light budget explicitly; do not evict the player's torch or reward lantern. Reset, retry and authored checkpoint imports must restore lighting from the authoritative encounter state, with no premature ignition in the dormant chamber. Capture reveal, sustained combat and the death-to-reward handoff on the exact candidate for owner appearance review. Overlapping mist lighting and matched phone cost remain required checks. This addition supersedes only the lighting target, and grants no merge or release authority.
+
 The player has entered a guarded resting place and disturbed its last custodian. The lich is the cursed fourth keeper; the two earlier skeletons are its sworn guards. Replace the current corner placement and abrupt combat start with a clearly staged, approximately six-second awakening in the existing final chamber. It should feel solemn, deliberate and threatening rather than like a random monster spawning.
 
 The keeper places itself between the intruder and the reward. That action becomes meaningful when the campaign later reveals its role as jailer. Do not explain the prison, the deceptive voice, or the king's bargain here. No spoken player line, Kit appearance, new dialogue recording or pre-reward lantern voice is required for this 1.6.2 slice.

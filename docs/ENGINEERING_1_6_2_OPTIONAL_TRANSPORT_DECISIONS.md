@@ -2,7 +2,10 @@
 
 These are bounded feasibility decisions after retaining the [selective-opacity NO-GO](ENGINEERING_1_6_1_PRIMARY_OPACITY_2026-10-01.md). Neither experiment changes production source, materials, settings, defaults or assets. Source inspection is not a performance measurement. Keep each decision separate from the mist and spatial investigations; no speculative changes are combined.
 
-## Diffuse-direction transport: defer adoption, retain the current path
+## Diffuse-direction transport: authorized optional Lower candidate, Current remains default
+
+**Owner clarification, 5 October:** prepare this as a separate opt-in Lower indirect-lighting candidate after the current mist/device slice reaches a safe boundary. Preserve Current as default. This resolves the quality-tradeoff decision only. Preserve selected reflective/metallic receivers, mirrors, wet cobbles/puddles, glass, every water mode and held-item/player/fire reflection ownership. Gate eligible opaque receivers' secondary-ray launch rather than removing reflected objects. Matched visual/performance comparison remains required; no global reflection equality or speedup is assumed. Broader architecture work must be reported before expanding scope. The earlier defer-adoption decision below describes the unmeasured state and remains a shipping gate, while candidate preparation is now authorized. Texture LOD remains independent and unbenchmarked/deferred.
+
 
 The shared opaque-primary path traces one secondary ray in Authored/Max. Reflection-selected receivers use the reflection direction and retain player/fire ownership; other opaque receivers use a deterministic diffuse direction. Ordinary secondary material decode/texture work occurs even when that branch has no additional shadow query.
 
