@@ -1,0 +1,5 @@
+PASS host-reader clip=Idle duration=3 samples=181 uniqueVertices=10073 expandedVertices=35712 primitives=2 boundsMin=-0.615135074,0.00199939846,-0.226595744, boundsMax=0.610646725,2.05450034,0.255934626, hipsEndMinusStart=0,0,0, hipsRange=0,0,0,
+PASS host-reader clip=ExposureOpen duration=0.649999976 samples=40 uniqueVertices=10073 expandedVertices=35712 primitives=2 boundsMin=-0.688441277,0.00199939846,-0.225999951, boundsMax=0.704189897,2.05450034,0.388897151, hipsEndMinusStart=0,0,0, hipsRange=0,0,0,
+PASS host-reader clip=ExposureHold duration=1.5 samples=91 uniqueVertices=10073 expandedVertices=35712 primitives=2 boundsMin=-0.688441277,0.00199939846,-0.225999951, boundsMax=0.704189897,2.05450034,0.359643072, hipsEndMinusStart=0,0,0, hipsRange=0,0,0,
+PASS host-reader clip=RecoveryClose duration=0.899999976 samples=55 uniqueVertices=10073 expandedVertices=35712 primitives=2 boundsMin=-0.688441277,0.00199939846,-0.225999951, boundsMax=0.704189956,2.05450034,0.388882756, hipsEndMinusStart=0,0,0, hipsRange=0,0,0,
+NOT RUN: GPU skinning, native RT materials/presentation, gameplay, device performance.

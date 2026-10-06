@@ -1,0 +1,11 @@
+{
+  "asset_id": "E05 proposed right-hand blunt short maul",
+  "derivative_of": "/source-workspace/horde-attendant-mallet-v1/source/build_mallet.py",
+  "parent_script_sha256": "be71b261e4732677abecc812e340046e8d8f6bab2d9cb7850cfe1d5b461c75d6",
+  "authoring": "Original local construction and procedural material derivative, new dimensions and seed",
+  "paid_generation": false,
+  "new_external_sources": false,
+  "new_public_license": false,
+  "parent_provenance": "/source-workspace/horde-attendant-mallet-v1/provenance.json",
+  "scope": "Proposed combat art only; final hand fit pending actual H2 rig"
+}

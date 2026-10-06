@@ -1,0 +1,366 @@
+{
+  "asset": "E05 Bellkeeper modular source prototype",
+  "status": "SEALED bounded source trial; not combat-ready",
+  "retained_source_clips": [
+    "Idle",
+    "ExposureOpen",
+    "ExposureHold",
+    "RecoveryClose"
+  ],
+  "draft_clips": {
+    "Attack": "Right upper-arm / FixedHingeCleat.R.1 crossings 0.80\u20130.90s",
+    "Dead": "Knee hover35.9\u201339.3mm at1.8/3.3s; visor/gorget from0.5s, rear-skirt/gorget from1.5s"
+  },
+  "omitted": [
+    "Walking heavy gait"
+  ],
+  "runtime_admitted_clips": [],
+  "proof_boundary": "Native host geometry/CPU pose, offline Blender images and source clearance only; PBR engine rendering unproven",
+  "geometry": {
+    "body_shell_triangles": 11904,
+    "joints": 33,
+    "meshes": 1,
+    "skins": 1,
+    "material_primitives": 2,
+    "separate_maul_triangles": 516
+  },
+  "rights": "RIGHTS.md; generated Meshy body/rig attribution plus distinct original local shell/maul/motion rights",
+  "primary_files": [
+    "E05_Bellkeeper_modular_motion_trial.blend",
+    "E05_Bellkeeper_source_subset.glb",
+    "E05_Bellkeeper_host_motion_trial.glb",
+    "bellkeeper_short_maul.glb"
+  ],
+  "files": [
+    {
+      "path": "E05_Bellkeeper_host_motion_trial.glb",
+      "bytes": 7384504,
+      "sha256": "06dec9de11cb85fb3956a14396ef7b98ebbae2420b02ac6204d71166678c8d8d"
+    },
+    {
+      "path": "E05_Bellkeeper_host_motion_trial.linear-receipt.json",
+      "bytes": 1349,
+      "sha256": "231717f6ccba28f5ce2cdc4d30404f7bc96b2e1c9dfe3df5f7c5d747edd18f4b"
+    },
+    {
+      "path": "E05_Bellkeeper_host_motion_trial.socket-axes.json",
+      "bytes": 611,
+      "sha256": "9e0442c5d2704cdefffc4d263e3a3c576470ad09877abef0b0f32fe420ceb7c7"
+    },
+    {
+      "path": "E05_Bellkeeper_modular_motion_trial.blend",
+      "bytes": 10596907,
+      "sha256": "118d5c916ea048532ed51e0756f2be10fa12acc2beb3d3fc47d1035ceadee44a"
+    },
+    {
+      "path": "E05_Bellkeeper_source_subset.glb",
+      "bytes": 7363508,
+      "sha256": "980f56846e45ccb88cbb8ba4db3ca9fea751625e5f2c565178b72ae4c563f76b"
+    },
+    {
+      "path": "FINAL_REVIEW.json",
+      "bytes": 850,
+      "sha256": "85549be40742d38929a4a2bd762f97bfde57d38cc391b81b4b4bdaed213ece8a"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3018,
+      "sha256": "6a25b5ab97bd2a789e3847d7dc7eda0ee22a765efd33381320529dc3fdc657e1"
+    },
+    {
+      "path": "RIGHTS.md",
+      "bytes": 4076,
+      "sha256": "2fd632bb3ebe60a49394b02d94b48e1a5ceb764656bcef1c7e00a375ee508c04"
+    },
+    {
+      "path": "bellkeeper_short_maul.blend",
+      "bytes": 1321061,
+      "sha256": "6343ff930d78eb56dbe36ae036a63bf28f0054f96e9dba09e835941d064f1a29"
+    },
+    {
+      "path": "bellkeeper_short_maul.glb",
+      "bytes": 853788,
+      "sha256": "c7246235d6345bd4d1d54d75502a5747c2898ff439f8acd729b92bc694b6e1d6"
+    },
+    {
+      "path": "clearance-evaluated-clearance.json",
+      "bytes": 428589,
+      "sha256": "414b4f63779949d63ff91b39ce942de4c07788d06ea9d94e3c38357afc784fec"
+    },
+    {
+      "path": "clearance-evidence-sha256.json",
+      "bytes": 3779,
+      "sha256": "8ffc9d2b3a3a30e51249ab41cceb0def6c36c343971c7447ec169f90cf662c21"
+    },
+    {
+      "path": "clearance-refined-intersections.json",
+      "bytes": 90336,
+      "sha256": "b6d24709718ad6744a0044eee7160a7a61334ad1adada964b824c6d6faeb9109"
+    },
+    {
+      "path": "clearance-review.md",
+      "bytes": 7052,
+      "sha256": "8ea9905f8ccdefce18cd0ea8429a46c4d296ea95d1d014f82154f750b6326798"
+    },
+    {
+      "path": "final-host-format-inspection.json",
+      "bytes": 58670,
+      "sha256": "050c407c0557b6fda4afffe706b6170f8061a630958e0d044520edc640b36761"
+    },
+    {
+      "path": "fresh-ExposureOpen.png",
+      "bytes": 343140,
+      "sha256": "584474fd18b04b4dad362cc50ebf436da2c44a2ef4ed3c0ea19dd6b52e0d1a67"
+    },
+    {
+      "path": "fresh-Idle.png",
+      "bytes": 336167,
+      "sha256": "4370cac5bf2e4b8238db07d0516737e99bf15ba7cbe31934390982322d2ab99d"
+    },
+    {
+      "path": "fresh-import-report.json",
+      "bytes": 1046,
+      "sha256": "a1825f833918bcfb429a24509974e6bb67f90ba63ca183f85c13109303e6e315"
+    },
+    {
+      "path": "hand-modification.json",
+      "bytes": 1182,
+      "sha256": "879bb897bc76e378614821939f4dab0482b7812f9694c495a1b9f3f2eab7bea7"
+    },
+    {
+      "path": "host-format-inspection.json",
+      "bytes": 58670,
+      "sha256": "39a2cccedb340dbf0151c80019e0ab5b8f0aac425d62da5a439c31f29515ba2f"
+    },
+    {
+      "path": "maul-provenance.json",
+      "bytes": 605,
+      "sha256": "31d7a446e84798b8b1ac7aeb40f21d9b31cad27f8eb25194bad0b4c4e5acbbae"
+    },
+    {
+      "path": "native-reader-contract.json",
+      "bytes": 1278,
+      "sha256": "d83f5f93c92928e6989417d4d6d64d5556b15f7275562f815454b8628d425e89"
+    },
+    {
+      "path": "native-retained-subset.txt",
+      "bytes": 1115,
+      "sha256": "a5937952402c0e3885595b3ff7912b6e805e14e29cf93b84b4eadfc969a6e6fa"
+    },
+    {
+      "path": "native-shell-probe.txt",
+      "bytes": 7101,
+      "sha256": "ba75c3c65ccab0495d22c417331837565aaacd9e1542d0519df27053eb7c43a8"
+    },
+    {
+      "path": "native-skin-probe.txt",
+      "bytes": 1714,
+      "sha256": "1c30026c72048788b10c19ca944d073f2e20e6c9d258f394ebbff5e710d3ef84"
+    },
+    {
+      "path": "native-socket-proof.json",
+      "bytes": 5885,
+      "sha256": "ad23eb9c0ecfcdd853c2cdc68a92f19dd33659b286ce5c1a2b096636a72f73d6"
+    },
+    {
+      "path": "original-rig-review.md",
+      "bytes": 7879,
+      "sha256": "4022ea28491ad672375b05a2f98e882e12891dcea5f79615e1590004d6280860"
+    },
+    {
+      "path": "preview-poses/Attack_065_front.jpg",
+      "bytes": 77015,
+      "sha256": "be8edff12f387c8eb4347f50a185ca0cf0d8e2fd97b9222ed5d180a940413378"
+    },
+    {
+      "path": "preview-poses/Attack_065_oblique.jpg",
+      "bytes": 114362,
+      "sha256": "72189fc5f533b6c33a80ddd387dfae6bcdea0a2431561813238268999a563a88"
+    },
+    {
+      "path": "preview-poses/Attack_065_side.jpg",
+      "bytes": 62911,
+      "sha256": "6b478804bbe6397d43b76d7a3f89cfefbc27d0b476a5f2e1cc0f65fa800c5b53"
+    },
+    {
+      "path": "preview-poses/Attack_085_front.jpg",
+      "bytes": 73972,
+      "sha256": "3bd59cfbc15ed22693895d67e442de5181de5d06e1c2d06d18645ff295188c86"
+    },
+    {
+      "path": "preview-poses/Attack_085_oblique.jpg",
+      "bytes": 113190,
+      "sha256": "69c79cea98c2dc2bf015584318f627eb42f53255fc654e3a3b4677a78080a066"
+    },
+    {
+      "path": "preview-poses/Attack_085_side.jpg",
+      "bytes": 64524,
+      "sha256": "fd63a8ccd2f2ff60abf1d1d29f0713f44abc1882fd28efb101fda51dc391cbd4"
+    },
+    {
+      "path": "preview-poses/Attack_115_front.jpg",
+      "bytes": 74763,
+      "sha256": "77687af9ced96aff97bc9b6cca8353cfa7b32b4ee6ef9377912f236b31d18225"
+    },
+    {
+      "path": "preview-poses/Attack_115_oblique.jpg",
+      "bytes": 112944,
+      "sha256": "ad2b941850a1e7ade511f8b96bc219177ebfc53875ee0c8a40866f780eadeebd"
+    },
+    {
+      "path": "preview-poses/Attack_115_side.jpg",
+      "bytes": 63259,
+      "sha256": "292b0fe8efa7acd36ecbab6050db823c08658b2eac64fa58f812af875219b7c3"
+    },
+    {
+      "path": "preview-poses/Dead_180_front.jpg",
+      "bytes": 74452,
+      "sha256": "582bb90988d0d254aabfe111a114bfbbfc55f1ca14d5cd98953bbc3cb6a996bc"
+    },
+    {
+      "path": "preview-poses/Dead_180_oblique.jpg",
+      "bytes": 104098,
+      "sha256": "75c8ff013cc06a5ce5b192b8577a003df3328138fce1fc1980faf9d41909ec0e"
+    },
+    {
+      "path": "preview-poses/Dead_180_side.jpg",
+      "bytes": 61440,
+      "sha256": "76e9a5bd1a9e5a999a2d449f2d56cddbddf04c488339b7a63051636cb13ccfdb"
+    },
+    {
+      "path": "preview-poses/Dead_330_front.jpg",
+      "bytes": 74445,
+      "sha256": "a2e49377480fb350a40b82758f3f25dda3a87df1146bd8120d46d33793cdc580"
+    },
+    {
+      "path": "preview-poses/Dead_330_oblique.jpg",
+      "bytes": 103991,
+      "sha256": "4743664b185d901a1dd1abd0c6411c915b93d1375a1b6b52600fb4d8c3d19eea"
+    },
+    {
+      "path": "preview-poses/Dead_330_side.jpg",
+      "bytes": 61504,
+      "sha256": "401767a3210bec88daa2660b02025e37ed17ebe157597bbf044a902d38042d76"
+    },
+    {
+      "path": "preview-poses/ExposureHold_075_front.jpg",
+      "bytes": 79846,
+      "sha256": "311b02fde9b0363e70174826c8462ac1db1961af5b6d282a61d2853b24704410"
+    },
+    {
+      "path": "preview-poses/ExposureHold_075_oblique.jpg",
+      "bytes": 115212,
+      "sha256": "e3fba6565ce268ebd6180628d3963b4b03b2fce6f94192cfb088a69cc0f3ca27"
+    },
+    {
+      "path": "preview-poses/ExposureHold_075_side.jpg",
+      "bytes": 63009,
+      "sha256": "2b37680200db6e77880c5029f155604267ebc03e528dc562ee39c3d03ef531c1"
+    },
+    {
+      "path": "preview-poses/ExposureOpen_065_front.jpg",
+      "bytes": 79941,
+      "sha256": "cd27a7e911267d8059f2ab74af6df2a3012a6f9e1f56e41365e2abb190a477ce"
+    },
+    {
+      "path": "preview-poses/ExposureOpen_065_oblique.jpg",
+      "bytes": 115309,
+      "sha256": "119e4d455706b021ed30775a8a7ba867a269e82fdccf07f8a08824ce432a83cc"
+    },
+    {
+      "path": "preview-poses/ExposureOpen_065_side.jpg",
+      "bytes": 63090,
+      "sha256": "65c0d8bf7604b00230cffae478186b86fd73b4008dad7a3e19932d3fae89b60f"
+    },
+    {
+      "path": "preview-poses/Idle_050_front.jpg",
+      "bytes": 75102,
+      "sha256": "e9c5816124dcb5ff3c44702447b9cce033d382c0ce6f337fa825f9a3dd875fed"
+    },
+    {
+      "path": "preview-poses/Idle_050_oblique.jpg",
+      "bytes": 112938,
+      "sha256": "f644cbc202f556ec8882503bf40a7ab1ed27f30ad154713dccfaa8f13f53f400"
+    },
+    {
+      "path": "preview-poses/Idle_050_side.jpg",
+      "bytes": 62526,
+      "sha256": "f50c224666c0b96ac394ecb537177fdc5bd64fd52c7314b4687be559b6202d4c"
+    },
+    {
+      "path": "preview-poses/RecoveryClose_090_front.jpg",
+      "bytes": 75143,
+      "sha256": "fd972f2be1295fc8e6e07b1900ef42f2dae06f98213c3b031ce6a0bc8ce90a5b"
+    },
+    {
+      "path": "preview-poses/RecoveryClose_090_oblique.jpg",
+      "bytes": 112966,
+      "sha256": "53da9f770994d794085dc00c4706e6f13238af2a5b0fa0a2428f14ff3c1779e4"
+    },
+    {
+      "path": "preview-poses/RecoveryClose_090_side.jpg",
+      "bytes": 62598,
+      "sha256": "c2c60e899d6aa76bab49d7723ffe6f9d295f20474b8a3776521d900cfbc5e38c"
+    },
+    {
+      "path": "rigid-shell-witnesses.txt",
+      "bytes": 4526,
+      "sha256": "8e9f1142cc71b557477833f81d570cb220ad058cb3e2d5268402171597200db6"
+    },
+    {
+      "path": "rigid-shell-witnesses.txt.json",
+      "bytes": 1077,
+      "sha256": "1514d734b4e7c75f3322432e754987545983a109c57708dee03b9811d7498723"
+    },
+    {
+      "path": "socket-scale-equivalence.json",
+      "bytes": 15843,
+      "sha256": "2a5e40c1c23f98483d02cb36a2cd6e68ad7ea4402dcea57b010c4890ee0ee7c2"
+    },
+    {
+      "path": "source/build_motion_trial_v02.py",
+      "bytes": 11672,
+      "sha256": "88c4bcbccd84322d1af2baf2da2d7cc0e4bfb44c6be70e9c61c4095f28c0943c"
+    },
+    {
+      "path": "source/extract_rigid_witnesses.py",
+      "bytes": 2649,
+      "sha256": "b64d05ae3ae7dd4c8581928455e06c30a029ad730c29949e3f765f59786a2878"
+    },
+    {
+      "path": "source/finalize_socket_axes.py",
+      "bytes": 2369,
+      "sha256": "323dd3154dfb0c097e0376f31886271407f79355bd6acb73e47de5cffbaddc09"
+    },
+    {
+      "path": "source/finalize_trial_glb.py",
+      "bytes": 1202,
+      "sha256": "e1a505ade1b483de61c4aefdac5a63d23a9a24c9936db1f8c57883c58f329ef3"
+    },
+    {
+      "path": "source/inspect_e05_glb.py",
+      "bytes": 15690,
+      "sha256": "426a6e4a6364a78e185a2b5fc850108dd9d9736ac3985a791d87ae97bbcc67b0"
+    },
+    {
+      "path": "source/native_shell_probe.cpp",
+      "bytes": 4716,
+      "sha256": "4ba320fad64d40613244186e7d14343145313e067a859876500309b71709d42b"
+    },
+    {
+      "path": "source/prepare_hand_grip.py",
+      "bytes": 4043,
+      "sha256": "0693a39c2d69a3396d2879f1580e9a7db1d17a5dc1d04779b42468ea747a80cd"
+    },
+    {
+      "path": "source/seal_motion_trial.py",
+      "bytes": 5175,
+      "sha256": "0ef9b53eb3b7962e6090f7f459e9444914cd70b547b1de48553e876c92735b2c"
+    },
+    {
+      "path": "uv-layer-validation.json",
+      "bytes": 700,
+      "sha256": "1225de5a92675ff900d186935fa935af1b88f88dbf6ac73c394bd03e4ece0840"
+    }
+  ]
+}

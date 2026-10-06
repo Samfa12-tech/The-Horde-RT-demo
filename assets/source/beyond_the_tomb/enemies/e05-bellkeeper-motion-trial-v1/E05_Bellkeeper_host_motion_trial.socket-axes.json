@@ -1,0 +1,14 @@
+{
+  "source_before_axis_correction_sha256": "48721b4affaa19ed16a19cbc2f5e5ee251bbb837c67a62979f3a126b48db6839",
+  "final_sha256": "06dec9de11cb85fb3956a14396ef7b98ebbae2420b02ac6204d71166678c8d8d",
+  "changed_node": "RightGrip",
+  "clips": [
+    "Idle",
+    "Attack",
+    "ExposureOpen",
+    "ExposureHold",
+    "RecoveryClose",
+    "Dead"
+  ],
+  "change": "Postmultiply RightGrip local rotation by +90deg X, and premultiply its unused inverse-bind by -90deg X; adapts Blender +Z tool shaft to standalone glTF +Y shaft. Body/shell weights to this socket are zero. No other geometry, rig keys or PBR changes."
+}

@@ -1,0 +1,24 @@
+{
+  "status": "PASS bounded source trial, with explicit draft exclusions",
+  "reviewed_final_fresh_import_images": [
+    "fresh-Idle.png",
+    "fresh-ExposureOpen.png"
+  ],
+  "observations": [
+    "Final joined GLB fresh-imports with embedded maps and readable closed/open modular shell.",
+    "Source preview includes a separate maul; host test GLB intentionally excludes its geometry and provides a unit-compatible socket.",
+    "Source .blend keeps separate shell meshes; joined host derivative is not runtime PBR admission."
+  ],
+  "retained_source_clips": [
+    "Idle",
+    "ExposureOpen",
+    "ExposureHold",
+    "RecoveryClose"
+  ],
+  "excluded_drafts": [
+    "Attack",
+    "Dead"
+  ],
+  "heavy_gait": "Not delivered; original walk/run remain source references",
+  "note": "Bounded source trial concluded with documented draft limitations."
+}

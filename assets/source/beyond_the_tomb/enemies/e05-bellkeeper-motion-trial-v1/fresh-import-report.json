@@ -1,0 +1,67 @@
+{
+  "fresh_import_succeeded": true,
+  "mesh_objects_excluding_bone_display": 1,
+  "materials": 2,
+  "images": [
+    {
+      "name": "e05_body_basecolor",
+      "size": [
+        1024,
+        1024
+      ],
+      "has_data": true
+    },
+    {
+      "name": "e05_body_normal",
+      "size": [
+        1024,
+        1024
+      ],
+      "has_data": true
+    },
+    {
+      "name": "e05_body_orm",
+      "size": [
+        1024,
+        1024
+      ],
+      "has_data": true
+    },
+    {
+      "name": "e05_shell_basecolor",
+      "size": [
+        1024,
+        1024
+      ],
+      "has_data": true
+    },
+    {
+      "name": "e05_shell_normal",
+      "size": [
+        1024,
+        1024
+      ],
+      "has_data": true
+    },
+    {
+      "name": "e05_shell_orm",
+      "size": [
+        1024,
+        1024
+      ],
+      "has_data": true
+    }
+  ],
+  "poses": [
+    {
+      "clip": "Idle",
+      "t": 0.5,
+      "image": "fresh-Idle.png"
+    },
+    {
+      "clip": "ExposureOpen",
+      "t": 0.65,
+      "image": "fresh-ExposureOpen.png"
+    }
+  ]
+}

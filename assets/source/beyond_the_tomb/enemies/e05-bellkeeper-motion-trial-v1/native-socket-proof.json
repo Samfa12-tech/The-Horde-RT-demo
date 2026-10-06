@@ -1,0 +1,168 @@
+{
+  "status": "PASS",
+  "scope": "Unchanged native NodeTransform versus Blender unit tool frame converted into glTF coordinates; native sampled at actual source frame/60. No runtime held-item renderer invoked.",
+  "samples": [
+    {
+      "clip": "Idle",
+      "sample_time_s": 0.0,
+      "requested_preview_time_s": 0,
+      "native_vs_source_unit_prop_frame_max_component_error": 3.5765068973070413e-07,
+      "unit_axis_max_error": 3.5592627001257426e-07
+    },
+    {
+      "clip": "Idle",
+      "sample_time_s": 1.5,
+      "requested_preview_time_s": 1.5,
+      "native_vs_source_unit_prop_frame_max_component_error": 4.172751099096317e-07,
+      "unit_axis_max_error": 5.430823810659291e-07
+    },
+    {
+      "clip": "Idle",
+      "sample_time_s": 3.0,
+      "requested_preview_time_s": 3,
+      "native_vs_source_unit_prop_frame_max_component_error": 3.5765068973070413e-07,
+      "unit_axis_max_error": 3.5592627001257426e-07
+    },
+    {
+      "clip": "Attack",
+      "sample_time_s": 0.0,
+      "requested_preview_time_s": 0,
+      "native_vs_source_unit_prop_frame_max_component_error": 3.5765068973070413e-07,
+      "unit_axis_max_error": 3.5592627001257426e-07
+    },
+    {
+      "clip": "Attack",
+      "sample_time_s": 0.65,
+      "requested_preview_time_s": 0.65,
+      "native_vs_source_unit_prop_frame_max_component_error": 4.1722767335494737e-07,
+      "unit_axis_max_error": 1.1687172074559271e-07
+    },
+    {
+      "clip": "Attack",
+      "sample_time_s": 0.85,
+      "requested_preview_time_s": 0.85,
+      "native_vs_source_unit_prop_frame_max_component_error": 2.5327881622572157e-07,
+      "unit_axis_max_error": 4.0080242080797746e-07
+    },
+    {
+      "clip": "Attack",
+      "sample_time_s": 1.15,
+      "requested_preview_time_s": 1.15,
+      "native_vs_source_unit_prop_frame_max_component_error": 3.576372253899507e-07,
+      "unit_axis_max_error": 3.7708472333530807e-07
+    },
+    {
+      "clip": "Attack",
+      "sample_time_s": 2.3,
+      "requested_preview_time_s": 2.3,
+      "native_vs_source_unit_prop_frame_max_component_error": 3.5765068973070413e-07,
+      "unit_axis_max_error": 3.5592627001257426e-07
+    },
+    {
+      "clip": "ExposureOpen",
+      "sample_time_s": 0.0,
+      "requested_preview_time_s": 0,
+      "native_vs_source_unit_prop_frame_max_component_error": 3.5765068973070413e-07,
+      "unit_axis_max_error": 3.5592627001257426e-07
+    },
+    {
+      "clip": "ExposureOpen",
+      "sample_time_s": 0.3333333333333333,
+      "requested_preview_time_s": 0.325,
+      "native_vs_source_unit_prop_frame_max_component_error": 5.662633117686777e-07,
+      "unit_axis_max_error": 6.193290520428718e-07
+    },
+    {
+      "clip": "ExposureOpen",
+      "sample_time_s": 0.65,
+      "requested_preview_time_s": 0.65,
+      "native_vs_source_unit_prop_frame_max_component_error": 4.768685729628075e-07,
+      "unit_axis_max_error": 6.141944317583636e-07
+    },
+    {
+      "clip": "ExposureHold",
+      "sample_time_s": 0.0,
+      "requested_preview_time_s": 0,
+      "native_vs_source_unit_prop_frame_max_component_error": 4.768685729628075e-07,
+      "unit_axis_max_error": 6.141944317583636e-07
+    },
+    {
+      "clip": "ExposureHold",
+      "sample_time_s": 0.75,
+      "requested_preview_time_s": 0.75,
+      "native_vs_source_unit_prop_frame_max_component_error": 4.768685729628075e-07,
+      "unit_axis_max_error": 6.141944317583636e-07
+    },
+    {
+      "clip": "ExposureHold",
+      "sample_time_s": 1.5,
+      "requested_preview_time_s": 1.5,
+      "native_vs_source_unit_prop_frame_max_component_error": 4.768685729628075e-07,
+      "unit_axis_max_error": 6.141944317583636e-07
+    },
+    {
+      "clip": "RecoveryClose",
+      "sample_time_s": 0.0,
+      "requested_preview_time_s": 0,
+      "native_vs_source_unit_prop_frame_max_component_error": 4.768685729628075e-07,
+      "unit_axis_max_error": 6.141944317583636e-07
+    },
+    {
+      "clip": "RecoveryClose",
+      "sample_time_s": 0.2,
+      "requested_preview_time_s": 0.2,
+      "native_vs_source_unit_prop_frame_max_component_error": 4.768685729628075e-07,
+      "unit_axis_max_error": 6.141944317583636e-07
+    },
+    {
+      "clip": "RecoveryClose",
+      "sample_time_s": 0.55,
+      "requested_preview_time_s": 0.55,
+      "native_vs_source_unit_prop_frame_max_component_error": 3.278289581326588e-07,
+      "unit_axis_max_error": 2.5847001938750225e-07
+    },
+    {
+      "clip": "RecoveryClose",
+      "sample_time_s": 0.9,
+      "requested_preview_time_s": 0.9,
+      "native_vs_source_unit_prop_frame_max_component_error": 3.5765068973070413e-07,
+      "unit_axis_max_error": 3.5592627001257426e-07
+    },
+    {
+      "clip": "Dead",
+      "sample_time_s": 0.0,
+      "requested_preview_time_s": 0,
+      "native_vs_source_unit_prop_frame_max_component_error": 4.768685729628075e-07,
+      "unit_axis_max_error": 6.141944317583636e-07
+    },
+    {
+      "clip": "Dead",
+      "sample_time_s": 0.65,
+      "requested_preview_time_s": 0.65,
+      "native_vs_source_unit_prop_frame_max_component_error": 4.768685729628075e-07,
+      "unit_axis_max_error": 6.141944317583636e-07
+    },
+    {
+      "clip": "Dead",
+      "sample_time_s": 1.8,
+      "requested_preview_time_s": 1.8,
+      "native_vs_source_unit_prop_frame_max_component_error": 3.576282611083767e-07,
+      "unit_axis_max_error": 4.3228992208099726e-07
+    },
+    {
+      "clip": "Dead",
+      "sample_time_s": 2.6,
+      "requested_preview_time_s": 2.6,
+      "native_vs_source_unit_prop_frame_max_component_error": 3.5761530758904314e-07,
+      "unit_axis_max_error": 4.4165476098534384e-07
+    },
+    {
+      "clip": "Dead",
+      "sample_time_s": 3.3,
+      "requested_preview_time_s": 3.3,
+      "native_vs_source_unit_prop_frame_max_component_error": 3.5761530758904314e-07,
+      "unit_axis_max_error": 4.3228992208099726e-07
+    }
+  ],
+  "max_matrix_error": 5.662633117686777e-07
+}

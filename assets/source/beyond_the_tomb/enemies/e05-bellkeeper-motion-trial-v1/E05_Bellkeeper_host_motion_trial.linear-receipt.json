@@ -1,0 +1,39 @@
+{
+  "source": "/source-workspace/horde-meshy/bellkeeper/motion-trial-v01/sealed-trial/E05_Bellkeeper_host_motion_trial_raw.glb",
+  "source_sha256": "84ed3fb8ed52f756e68439a7afbf6da35c7556dcd3b668ee7493863dd6992ad4",
+  "output": "/source-workspace/horde-meshy/bellkeeper/motion-trial-v01/sealed-trial/E05_Bellkeeper_host_motion_trial.glb",
+  "output_sha256": "48721b4affaa19ed16a19cbc2f5e5ee251bbb837c67a62979f3a126b48db6839",
+  "changes": [
+    {
+      "clip": "Idle",
+      "constant_STEP_to_LINEAR_channels": 97,
+      "max_component_range": 0
+    },
+    {
+      "clip": "Attack",
+      "constant_STEP_to_LINEAR_channels": 77,
+      "max_component_range": 1.1920928955078125e-07
+    },
+    {
+      "clip": "ExposureOpen",
+      "constant_STEP_to_LINEAR_channels": 76,
+      "max_component_range": 1.7881393432617188e-07
+    },
+    {
+      "clip": "ExposureHold",
+      "constant_STEP_to_LINEAR_channels": 98,
+      "max_component_range": 0
+    },
+    {
+      "clip": "RecoveryClose",
+      "constant_STEP_to_LINEAR_channels": 76,
+      "max_component_range": 1.7881393432617188e-07
+    },
+    {
+      "clip": "Dead",
+      "constant_STEP_to_LINEAR_channels": 19,
+      "max_component_range": 1.1920928955078125e-07
+    }
+  ],
+  "note": "Only constant STEP interpolation tags changed after numeric check; no binary/PBR/geometry/key-value edits."
+}

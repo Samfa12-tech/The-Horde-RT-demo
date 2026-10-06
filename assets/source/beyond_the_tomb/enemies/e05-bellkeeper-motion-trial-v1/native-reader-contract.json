@@ -1,0 +1,23 @@
+{
+  "source_checkout": "/source-workspace/horde-archive-remote-check",
+  "verified_file_references": [
+    {
+      "path": "src/scene/assets/SkinnedMeshAsset.cpp",
+      "lines": "636-753",
+      "finding": "Reads all primitives of meshes[0], appends skin attributes, records materialName; does not load texture/PBR factors."
+    },
+    {
+      "path": "src/scene/assets/SkinnedMeshAsset.cpp",
+      "lines": "768-841",
+      "finding": "Ordinary TRS nodes and skins[0], inverse bind matrices per skin joint."
+    },
+    {
+      "path": "src/vulkan/raytracing/CharacterRenderSlot.cpp",
+      "lines": "233-246",
+      "finding": "Existing skeleton route uses untextured Skin, lich uses separate SkinTextured."
+    }
+  ],
+  "permitted_evidence": "Joined one-mesh/one-skin derivative can establish host multi-primitive buffers, rigid helper bones and sampled pose evaluation only after actual test. Source GLB embedded materials can be statically validated and rendered by Blender.",
+  "not_established": "Actual engine PBR rendering of E05 body/shell, native RT scene integration, event authority, performance or device admission.",
+  "primary_source_policy": "Keep modular body/shell objects and editable rig authoritative; joined host-test derivative does not replace them."
+}

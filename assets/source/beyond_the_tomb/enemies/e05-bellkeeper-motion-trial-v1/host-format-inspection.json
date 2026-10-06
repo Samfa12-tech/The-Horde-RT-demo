@@ -1,0 +1,2957 @@
+{
+  "source": "/source-workspace/horde-meshy/bellkeeper/motion-trial-v01/sealed-trial/E05_Bellkeeper_host_motion_trial.glb",
+  "bytes": 7384364,
+  "sha256": "48721b4affaa19ed16a19cbc2f5e5ee251bbb837c67a62979f3a126b48db6839",
+  "meshes": 1,
+  "skins": 1,
+  "joints": 33,
+  "joint_names": [
+    "Hips",
+    "Spine02",
+    "Spine01",
+    "Spine",
+    "neck",
+    "Head",
+    "head_end",
+    "headfront",
+    "HeadMount",
+    "LeftShoulder",
+    "LeftArm",
+    "LeftForeArm",
+    "LeftHand",
+    "Shoulder.L",
+    "RightShoulder",
+    "RightArm",
+    "RightForeArm",
+    "RightHand",
+    "RightGrip",
+    "Shoulder.R",
+    "ChestMount",
+    "ReflectedPathReceiver_PROPOSAL",
+    "ExposureCentre_PROPOSAL",
+    "E05_Shutter.L",
+    "E05_Shutter.R",
+    "LeftUpLeg",
+    "LeftLeg",
+    "LeftFoot",
+    "LeftToeBase",
+    "RightUpLeg",
+    "RightLeg",
+    "RightFoot",
+    "RightToeBase"
+  ],
+  "vertices": 10073,
+  "triangles": 11904,
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "E05_PlainInnerBody_1K.001",
+      "normalTexture": {
+        "index": 0,
+        "scale": 0.699999988079071
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      }
+    },
+    {
+      "doubleSided": true,
+      "name": "E05_WeatheredIron_1K",
+      "normalTexture": {
+        "index": 3,
+        "scale": 0.4000000059604645
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 4
+        },
+        "metallicRoughnessTexture": {
+          "index": 5
+        }
+      }
+    }
+  ],
+  "primitives": [
+    {
+      "mesh": 0,
+      "primitive": 0,
+      "attributes": {
+        "POSITION": {
+          "componentType": 5126,
+          "type": "VEC3",
+          "count": 7071,
+          "normalized": null
+        },
+        "NORMAL": {
+          "componentType": 5126,
+          "type": "VEC3",
+          "count": 7071,
+          "normalized": null
+        },
+        "TEXCOORD_0": {
+          "componentType": 5126,
+          "type": "VEC2",
+          "count": 7071,
+          "normalized": null
+        },
+        "TANGENT": {
+          "componentType": 5126,
+          "type": "VEC4",
+          "count": 7071,
+          "normalized": null
+        },
+        "JOINTS_0": {
+          "componentType": 5121,
+          "type": "VEC4",
+          "count": 7071,
+          "normalized": null
+        },
+        "WEIGHTS_0": {
+          "componentType": 5126,
+          "type": "VEC4",
+          "count": 7071,
+          "normalized": null
+        }
+      },
+      "vertices": 7071,
+      "bounds_accessor_space": {
+        "min": [
+          -0.5688306093215942,
+          -2.6036175881927193e-07,
+          -0.18056096136569977
+        ],
+        "max": [
+          0.5719729661941528,
+          2.000000476837158,
+          0.18056125938892365
+        ]
+      },
+      "index_component_type": 5123,
+      "triangles": 9072,
+      "degenerate_triangles_area_lt_1e-12": 0,
+      "exact_weld_vertices": 4616,
+      "exact_weld_boundary_edges": 138,
+      "exact_weld_nonmanifold_edges": 3,
+      "exact_weld_components": 10,
+      "exact_weld_component_vertex_sizes": [
+        2258,
+        849,
+        456,
+        455,
+        131,
+        129,
+        109,
+        84,
+        73,
+        72
+      ],
+      "weights": {
+        "min": 0.0,
+        "max_sum_error": 1.1920928955078125e-07,
+        "zero_weight_vertices": 0,
+        "positive_influences_max": 4
+      },
+      "normal_length_range": [
+        0.9999998807907104,
+        1.0000001192092896
+      ]
+    },
+    {
+      "mesh": 0,
+      "primitive": 1,
+      "attributes": {
+        "POSITION": {
+          "componentType": 5126,
+          "type": "VEC3",
+          "count": 3002,
+          "normalized": null
+        },
+        "NORMAL": {
+          "componentType": 5126,
+          "type": "VEC3",
+          "count": 3002,
+          "normalized": null
+        },
+        "TEXCOORD_0": {
+          "componentType": 5126,
+          "type": "VEC2",
+          "count": 3002,
+          "normalized": null
+        },
+        "TANGENT": {
+          "componentType": 5126,
+          "type": "VEC4",
+          "count": 3002,
+          "normalized": null
+        },
+        "JOINTS_0": {
+          "componentType": 5121,
+          "type": "VEC4",
+          "count": 3002,
+          "normalized": null
+        },
+        "WEIGHTS_0": {
+          "componentType": 5126,
+          "type": "VEC4",
+          "count": 3002,
+          "normalized": null
+        }
+      },
+      "vertices": 3002,
+      "bounds_accessor_space": {
+        "min": [
+          -0.45440515875816345,
+          1.0919277667999268,
+          -0.22599996626377106
+        ],
+        "max": [
+          0.45440515875816345,
+          2.052500009536743,
+          0.23039613664150238
+        ]
+      },
+      "index_component_type": 5123,
+      "triangles": 2832,
+      "degenerate_triangles_area_lt_1e-12": 0,
+      "exact_weld_vertices": 1452,
+      "exact_weld_boundary_edges": 0,
+      "exact_weld_nonmanifold_edges": 0,
+      "exact_weld_components": 20,
+      "exact_weld_component_vertex_sizes": [
+        200,
+        170,
+        120,
+        114,
+        104,
+        104,
+        104,
+        104,
+        102,
+        88,
+        88,
+        42,
+        20,
+        20,
+        20,
+        20,
+        8,
+        8,
+        8,
+        8
+      ],
+      "weights": {
+        "min": 0.0,
+        "max_sum_error": 0.0,
+        "zero_weight_vertices": 0,
+        "positive_influences_max": 1
+      },
+      "normal_length_range": [
+        0.9999998807907104,
+        1.0000001192092896
+      ]
+    }
+  ],
+  "animations": [
+    {
+      "name": "Idle",
+      "channels": 99,
+      "duration": 3.0,
+      "translation_ranges_local": [
+        {
+          "node": "Hips",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine02",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine01",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "neck",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Head",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "head_end",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "headfront",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "HeadMount",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftShoulder",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftForeArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftHand",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Shoulder.L",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightShoulder",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightForeArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightHand",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightGrip",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Shoulder.R",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ChestMount",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ReflectedPathReceiver_PROPOSAL",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ExposureCentre_PROPOSAL",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "E05_Shutter.L",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "E05_Shutter.R",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftUpLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftFoot",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftToeBase",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightUpLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightFoot",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightToeBase",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Attack",
+      "channels": 99,
+      "duration": 2.299999952316284,
+      "translation_ranges_local": [
+        {
+          "node": "Hips",
+          "range": [
+            8.940696716308594e-08,
+            0.04962921142578125,
+            1.1920928955078125e-07
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine02",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine01",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "neck",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Head",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "head_end",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "headfront",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "HeadMount",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftShoulder",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftForeArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftHand",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Shoulder.L",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightShoulder",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightForeArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightHand",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightGrip",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Shoulder.R",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ChestMount",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ReflectedPathReceiver_PROPOSAL",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ExposureCentre_PROPOSAL",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "E05_Shutter.L",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "E05_Shutter.R",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftUpLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftLeg",
+          "range": [
+            7.292910595424473e-07,
+            0.0,
+            6.321697583189234e-07
+          ],
+          "end_minus_start": [
+            -7.292910595424473e-07,
+            0.0,
+            -6.321697583189234e-07
+          ]
+        },
+        {
+          "node": "LeftFoot",
+          "range": [
+            1.0054718586616218e-06,
+            7.62939453125e-06,
+            5.436713763629086e-07
+          ],
+          "end_minus_start": [
+            -1.0054718586616218e-06,
+            7.62939453125e-06,
+            5.436713763629086e-07
+          ]
+        },
+        {
+          "node": "LeftToeBase",
+          "range": [
+            1.312026142841205e-06,
+            0.0,
+            1.881562639027834e-07
+          ],
+          "end_minus_start": [
+            1.312026142841205e-06,
+            0.0,
+            1.881562639027834e-07
+          ]
+        },
+        {
+          "node": "RightUpLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightLeg",
+          "range": [
+            6.22394509264268e-07,
+            7.62939453125e-06,
+            2.83491681329906e-06
+          ],
+          "end_minus_start": [
+            6.22394509264268e-07,
+            7.62939453125e-06,
+            2.83491681329906e-06
+          ]
+        },
+        {
+          "node": "RightFoot",
+          "range": [
+            1.7089649873014423e-06,
+            0.0,
+            4.3871477828361094e-07
+          ],
+          "end_minus_start": [
+            -1.7089649873014423e-06,
+            0.0,
+            4.3871477828361094e-07
+          ]
+        },
+        {
+          "node": "RightToeBase",
+          "range": [
+            1.192787749459967e-06,
+            0.0,
+            1.0475487215444446e-06
+          ],
+          "end_minus_start": [
+            1.192787749459967e-06,
+            0.0,
+            -1.0475487215444446e-06
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ExposureOpen",
+      "channels": 99,
+      "duration": 0.6499999761581421,
+      "translation_ranges_local": [
+        {
+          "node": "Hips",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine02",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine01",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "neck",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Head",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "head_end",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "headfront",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "HeadMount",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftShoulder",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftForeArm",
+          "range": [
+            1.3676675735041499e-05,
+            9.5367431640625e-06,
+            1.0321564332116395e-06
+          ],
+          "end_minus_start": [
+            -1.3676675735041499e-05,
+            -9.5367431640625e-06,
+            -1.0321564332116395e-06
+          ]
+        },
+        {
+          "node": "LeftHand",
+          "range": [
+            5.140740540809929e-06,
+            0.0,
+            1.0025651135947555e-05
+          ],
+          "end_minus_start": [
+            5.140740540809929e-06,
+            0.0,
+            1.0025651135947555e-05
+          ]
+        },
+        {
+          "node": "Shoulder.L",
+          "range": [
+            7.3909759521484375e-06,
+            6.67572021484375e-06,
+            1.71661376953125e-05
+          ],
+          "end_minus_start": [
+            7.3909759521484375e-06,
+            6.67572021484375e-06,
+            -1.71661376953125e-05
+          ]
+        },
+        {
+          "node": "RightShoulder",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightForeArm",
+          "range": [
+            3.151828423142433e-06,
+            0.0,
+            5.95852907281369e-06
+          ],
+          "end_minus_start": [
+            3.151828423142433e-06,
+            0.0,
+            5.95852907281369e-06
+          ]
+        },
+        {
+          "node": "RightHand",
+          "range": [
+            1.3865646906197071e-05,
+            3.814697265625e-06,
+            6.439426215365529e-06
+          ],
+          "end_minus_start": [
+            1.3865646906197071e-05,
+            3.814697265625e-06,
+            6.439426215365529e-06
+          ]
+        },
+        {
+          "node": "RightGrip",
+          "range": [
+            4.76837158203125e-06,
+            1.9073486328125e-06,
+            6.683170795440674e-06
+          ],
+          "end_minus_start": [
+            -4.76837158203125e-06,
+            -1.9073486328125e-06,
+            6.683170795440674e-06
+          ]
+        },
+        {
+          "node": "Shoulder.R",
+          "range": [
+            5.9604644775390625e-06,
+            4.291534423828125e-06,
+            3.337860107421875e-06
+          ],
+          "end_minus_start": [
+            5.9604644775390625e-06,
+            -4.291534423828125e-06,
+            3.337860107421875e-06
+          ]
+        },
+        {
+          "node": "ChestMount",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ReflectedPathReceiver_PROPOSAL",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ExposureCentre_PROPOSAL",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "E05_Shutter.L",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "E05_Shutter.R",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftUpLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftFoot",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftToeBase",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightUpLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightFoot",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightToeBase",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ExposureHold",
+      "channels": 99,
+      "duration": 1.5,
+      "translation_ranges_local": [
+        {
+          "node": "Hips",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine02",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine01",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "neck",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Head",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "head_end",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "headfront",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "HeadMount",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftShoulder",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftForeArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftHand",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Shoulder.L",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightShoulder",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightForeArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightHand",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightGrip",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Shoulder.R",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ChestMount",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ReflectedPathReceiver_PROPOSAL",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ExposureCentre_PROPOSAL",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "E05_Shutter.L",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "E05_Shutter.R",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftUpLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftFoot",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftToeBase",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightUpLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightFoot",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightToeBase",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RecoveryClose",
+      "channels": 99,
+      "duration": 0.8999999761581421,
+      "translation_ranges_local": [
+        {
+          "node": "Hips",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine02",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine01",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Spine",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "neck",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "Head",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "head_end",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "headfront",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "HeadMount",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftShoulder",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftForeArm",
+          "range": [
+            1.3676675735041499e-05,
+            9.5367431640625e-06,
+            1.0321564332116395e-06
+          ],
+          "end_minus_start": [
+            1.3676675735041499e-05,
+            9.5367431640625e-06,
+            1.0321564332116395e-06
+          ]
+        },
+        {
+          "node": "LeftHand",
+          "range": [
+            5.140740540809929e-06,
+            0.0,
+            1.0025651135947555e-05
+          ],
+          "end_minus_start": [
+            -5.140740540809929e-06,
+            0.0,
+            -1.0025651135947555e-05
+          ]
+        },
+        {
+          "node": "Shoulder.L",
+          "range": [
+            7.3909759521484375e-06,
+            6.67572021484375e-06,
+            1.71661376953125e-05
+          ],
+          "end_minus_start": [
+            -7.3909759521484375e-06,
+            -6.67572021484375e-06,
+            1.71661376953125e-05
+          ]
+        },
+        {
+          "node": "RightShoulder",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightArm",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightForeArm",
+          "range": [
+            3.151828423142433e-06,
+            0.0,
+            5.95852907281369e-06
+          ],
+          "end_minus_start": [
+            -3.151828423142433e-06,
+            0.0,
+            -5.95852907281369e-06
+          ]
+        },
+        {
+          "node": "RightHand",
+          "range": [
+            1.3865646906197071e-05,
+            3.814697265625e-06,
+            6.439426215365529e-06
+          ],
+          "end_minus_start": [
+            -1.3865646906197071e-05,
+            -3.814697265625e-06,
+            -6.439426215365529e-06
+          ]
+        },
+        {
+          "node": "RightGrip",
+          "range": [
+            4.76837158203125e-06,
+            1.9073486328125e-06,
+            6.683170795440674e-06
+          ],
+          "end_minus_start": [
+            4.76837158203125e-06,
+            1.9073486328125e-06,
+            -6.683170795440674e-06
+          ]
+        },
+        {
+          "node": "Shoulder.R",
+          "range": [
+            5.9604644775390625e-06,
+            4.291534423828125e-06,
+            3.337860107421875e-06
+          ],
+          "end_minus_start": [
+            -5.9604644775390625e-06,
+            4.291534423828125e-06,
+            -3.337860107421875e-06
+          ]
+        },
+        {
+          "node": "ChestMount",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ReflectedPathReceiver_PROPOSAL",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "ExposureCentre_PROPOSAL",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "E05_Shutter.L",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "E05_Shutter.R",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftUpLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftFoot",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "LeftToeBase",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightUpLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightLeg",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightFoot",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "node": "RightToeBase",
+          "range": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dead",
+      "channels": 99,
+      "duration": 3.299999952316284,
+      "translation_ranges_local": [
+        {
+          "node": "Hips",
+          "range": [
+            1.1920928955078125e-07,
+            54.89620590209961,
+            2.384185791015625e-07
+          ],
+          "end_minus_start": [
+            -2.9802322387695312e-08,
+            -54.89620590209961,
+            -1.1920928955078125e-07
+          ]
+        },
+        {
+          "node": "Spine02",
+          "range": [
+            7.450557859556284e-08,
+            7.62939453125e-06,
+            1.1368683772161603e-13
+          ],
+          "end_minus_start": [
+            -7.450557859556284e-08,
+            -7.62939453125e-06,
+            -1.1368683772161603e-13
+          ]
+        },
+        {
+          "node": "Spine01",
+          "range": [
+            4.7497451305389404e-08,
+            3.814697265625e-06,
+            1.939479261636734e-07
+          ],
+          "end_minus_start": [
+            -4.7497451305389404e-08,
+            -3.814697265625e-06,
+            1.939479261636734e-07
+          ]
+        },
+        {
+          "node": "Spine",
+          "range": [
+            1.008252468182036e-07,
+            1.52587890625e-05,
+            6.351802994686295e-07
+          ],
+          "end_minus_start": [
+            -1.008252468182036e-07,
+            1.52587890625e-05,
+            -6.351802994686295e-07
+          ]
+        },
+        {
+          "node": "neck",
+          "range": [
+            9.313225746154785e-08,
+            1.239776611328125e-05,
+            3.864988684654236e-07
+          ],
+          "end_minus_start": [
+            9.313225746154785e-08,
+            1.239776611328125e-05,
+            -3.864988684654236e-07
+          ]
+        },
+        {
+          "node": "Head",
+          "range": [
+            1.2499776858021505e-07,
+            3.814697265625e-06,
+            9.736342008181964e-07
+          ],
+          "end_minus_start": [
+            1.2499776858021505e-07,
+            -3.814697265625e-06,
+            -9.736342008181964e-07
+          ]
+        },
+        {
+          "node": "head_end",
+          "range": [
+            2.0116476662224159e-07,
+            2.288818359375e-05,
+            2.2202830223250203e-06
+          ],
+          "end_minus_start": [
+            -2.0116476662224159e-07,
+            -2.288818359375e-05,
+            2.2202830223250203e-06
+          ]
+        },
+        {
+          "node": "headfront",
+          "range": [
+            1.4603137969970703e-06,
+            9.059906005859375e-06,
+            4.76837158203125e-06
+          ],
+          "end_minus_start": [
+            -1.4603137969970703e-06,
+            -9.059906005859375e-06,
+            4.76837158203125e-06
+          ]
+        },
+        {
+          "node": "HeadMount",
+          "range": [
+            5.960464477539062e-07,
+            7.62939453125e-06,
+            1.4603137969970703e-06
+          ],
+          "end_minus_start": [
+            -5.960464477539062e-07,
+            -7.62939453125e-06,
+            1.4603137969970703e-06
+          ]
+        },
+        {
+          "node": "LeftShoulder",
+          "range": [
+            0.0,
+            1.1920928955078125e-05,
+            9.760260581970215e-07
+          ],
+          "end_minus_start": [
+            0.0,
+            -1.1920928955078125e-05,
+            -9.760260581970215e-07
+          ]
+        },
+        {
+          "node": "LeftArm",
+          "range": [
+            4.4127773435320705e-06,
+            7.62939453125e-06,
+            2.2124804672785103e-05
+          ],
+          "end_minus_start": [
+            4.4127773435320705e-06,
+            -7.62939453125e-06,
+            2.2124804672785103e-05
+          ]
+        },
+        {
+          "node": "LeftForeArm",
+          "range": [
+            1.405718649039045e-05,
+            1.1444091796875e-05,
+            1.7270504031330347e-06
+          ],
+          "end_minus_start": [
+            1.405718649039045e-05,
+            1.1444091796875e-05,
+            -1.7270504031330347e-06
+          ]
+        },
+        {
+          "node": "LeftHand",
+          "range": [
+            7.436465239152312e-07,
+            1.9073486328125e-06,
+            2.8766662580892444e-06
+          ],
+          "end_minus_start": [
+            -7.436465239152312e-07,
+            -1.9073486328125e-06,
+            -2.8766662580892444e-06
+          ]
+        },
+        {
+          "node": "Shoulder.L",
+          "range": [
+            1.4781951904296875e-05,
+            6.67572021484375e-06,
+            2.193450927734375e-05
+          ],
+          "end_minus_start": [
+            -1.4781951904296875e-05,
+            6.67572021484375e-06,
+            2.193450927734375e-05
+          ]
+        },
+        {
+          "node": "RightShoulder",
+          "range": [
+            4.76837158203125e-07,
+            4.76837158203125e-06,
+            1.2293457984924316e-07
+          ],
+          "end_minus_start": [
+            -4.76837158203125e-07,
+            4.76837158203125e-06,
+            1.2293457984924316e-07
+          ]
+        },
+        {
+          "node": "RightArm",
+          "range": [
+            1.9462750060483813e-06,
+            5.7220458984375e-06,
+            1.2963388144271448e-05
+          ],
+          "end_minus_start": [
+            -1.9462750060483813e-06,
+            5.7220458984375e-06,
+            -1.2963388144271448e-05
+          ]
+        },
+        {
+          "node": "RightForeArm",
+          "range": [
+            1.1548370821401477e-05,
+            9.5367431640625e-06,
+            4.0068698581308126e-07
+          ],
+          "end_minus_start": [
+            -1.1548370821401477e-05,
+            -9.5367431640625e-06,
+            4.0068698581308126e-07
+          ]
+        },
+        {
+          "node": "RightHand",
+          "range": [
+            2.9884977266192436e-06,
+            1.9073486328125e-06,
+            4.862904461333528e-06
+          ],
+          "end_minus_start": [
+            -2.9884977266192436e-06,
+            -1.9073486328125e-06,
+            4.862904461333528e-06
+          ]
+        },
+        {
+          "node": "RightGrip",
+          "range": [
+            4.5299530029296875e-06,
+            1.52587890625e-05,
+            6.273388862609863e-06
+          ],
+          "end_minus_start": [
+            4.5299530029296875e-06,
+            1.52587890625e-05,
+            6.273388862609863e-06
+          ]
+        },
+        {
+          "node": "Shoulder.R",
+          "range": [
+            1.6450881958007812e-05,
+            2.86102294921875e-06,
+            2.86102294921875e-06
+          ],
+          "end_minus_start": [
+            -1.6450881958007812e-05,
+            -2.86102294921875e-06,
+            -2.86102294921875e-06
+          ]
+        },
+        {
+          "node": "ChestMount",
+          "range": [
+            1.7881393432617188e-07,
+            2.86102294921875e-06,
+            2.384185791015625e-07
+          ],
+          "end_minus_start": [
+            1.7881393432617188e-07,
+            -2.86102294921875e-06,
+            -2.384185791015625e-07
+          ]
+        },
+        {
+          "node": "ReflectedPathReceiver_PROPOSAL",
+          "range": [
+            2.842170943040401e-14,
+            0.0,
+            9.5367431640625e-07
+          ],
+          "end_minus_start": [
+            -2.842170943040401e-14,
+            0.0,
+            9.5367431640625e-07
+          ]
+        },
+        {
+          "node": "ExposureCentre_PROPOSAL",
+          "range": [
+            1.1368683772161603e-13,
+            0.0,
+            1.4781951904296875e-05
+          ],
+          "end_minus_start": [
+            -1.1368683772161603e-13,
+            0.0,
+            1.4781951904296875e-05
+          ]
+        },
+        {
+          "node": "E05_Shutter.L",
+          "range": [
+            0.0,
+            0.0,
+            3.337860107421875e-06
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            3.337860107421875e-06
+          ]
+        },
+        {
+          "node": "E05_Shutter.R",
+          "range": [
+            0.0,
+            0.0,
+            3.337860107421875e-06
+          ],
+          "end_minus_start": [
+            0.0,
+            0.0,
+            3.337860107421875e-06
+          ]
+        },
+        {
+          "node": "LeftUpLeg",
+          "range": [
+            0.0,
+            1.1444091796875e-05,
+            1.3113021850585938e-06
+          ],
+          "end_minus_start": [
+            0.0,
+            1.1444091796875e-05,
+            -1.3113021850585938e-06
+          ]
+        },
+        {
+          "node": "LeftLeg",
+          "range": [
+            1.4901452232152224e-06,
+            7.62939453125e-06,
+            6.901100277900696e-07
+          ],
+          "end_minus_start": [
+            -1.4901452232152224e-06,
+            -7.62939453125e-06,
+            6.901100277900696e-07
+          ]
+        },
+        {
+          "node": "LeftFoot",
+          "range": [
+            1.9330400391481817e-06,
+            1.52587890625e-05,
+            1.0329290489607956e-06
+          ],
+          "end_minus_start": [
+            -1.9330400391481817e-06,
+            1.52587890625e-05,
+            1.0329290489607956e-06
+          ]
+        },
+        {
+          "node": "LeftToeBase",
+          "range": [
+            1.5566474758088589e-06,
+            5.7220458984375e-06,
+            1.357286237180233e-06
+          ],
+          "end_minus_start": [
+            1.5566474758088589e-06,
+            5.7220458984375e-06,
+            1.357286237180233e-06
+          ]
+        },
+        {
+          "node": "RightUpLeg",
+          "range": [
+            9.5367431640625e-07,
+            0.0,
+            5.21540641784668e-08
+          ],
+          "end_minus_start": [
+            9.5367431640625e-07,
+            0.0,
+            -5.21540641784668e-08
+          ]
+        },
+        {
+          "node": "RightLeg",
+          "range": [
+            1.3372773537412286e-06,
+            0.0,
+            9.92353307083249e-07
+          ],
+          "end_minus_start": [
+            -1.3372773537412286e-06,
+            0.0,
+            -9.92353307083249e-07
+          ]
+        },
+        {
+          "node": "RightFoot",
+          "range": [
+            6.085415407142136e-07,
+            3.814697265625e-06,
+            1.6789017536211759e-06
+          ],
+          "end_minus_start": [
+            -6.085415407142136e-07,
+            3.814697265625e-06,
+            -1.6789017536211759e-06
+          ]
+        },
+        {
+          "node": "RightToeBase",
+          "range": [
+            1.5944842743920162e-06,
+            3.814697265625e-06,
+            1.0413350537419319e-07
+          ],
+          "end_minus_start": [
+            -1.5944842743920162e-06,
+            -3.814697265625e-06,
+            -1.0413350537419319e-07
+          ]
+        }
+      ]
+    }
+  ],
+  "images": [
+    {
+      "index": 0,
+      "name": "e05_body_normal",
+      "mimeType": "image/png",
+      "size": [
+        1024,
+        1024
+      ],
+      "format": "PNG",
+      "bytes": 1061875
+    },
+    {
+      "index": 1,
+      "name": "e05_body_basecolor",
+      "mimeType": "image/png",
+      "size": [
+        1024,
+        1024
+      ],
+      "format": "PNG",
+      "bytes": 1414994
+    },
+    {
+      "index": 2,
+      "name": "e05_body_orm",
+      "mimeType": "image/png",
+      "size": [
+        1024,
+        1024
+      ],
+      "format": "PNG",
+      "bytes": 436278
+    },
+    {
+      "index": 3,
+      "name": "e05_shell_normal",
+      "mimeType": "image/png",
+      "size": [
+        1024,
+        1024
+      ],
+      "format": "PNG",
+      "bytes": 1061849
+    },
+    {
+      "index": 4,
+      "name": "e05_shell_basecolor",
+      "mimeType": "image/png",
+      "size": [
+        1024,
+        1024
+      ],
+      "format": "PNG",
+      "bytes": 1024244
+    },
+    {
+      "index": 5,
+      "name": "e05_shell_orm",
+      "mimeType": "image/png",
+      "size": [
+        1024,
+        1024
+      ],
+      "format": "PNG",
+      "bytes": 1373487
+    }
+  ],
+  "host_format_pass": true,
+  "host_format_failures": [],
+  "notes": [],
+  "not_tested": [
+    "world-scale/axis visual acceptance",
+    "posed deformation",
+    "global root-motion/feet analysis",
+    "actual native importer execution",
+    "native RT material rendering",
+    "GPU skinning",
+    "mobile sustained performance"
+  ]
+}

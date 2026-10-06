@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "primitives": [
+    {
+      "material_index": 0,
+      "triangles": 9072,
+      "zero_area_uv_triangles": 0,
+      "uv_min": [
+        0.00010599999950500205,
+        1.1980533599853516e-05
+      ],
+      "uv_max": [
+        0.9895169734954834,
+        0.9997979998588562
+      ]
+    },
+    {
+      "material_index": 1,
+      "triangles": 2832,
+      "zero_area_uv_triangles": 0,
+      "uv_min": [
+        0.0022466820664703846,
+        0.0024471282958984375
+      ],
+      "uv_max": [
+        0.9977533221244812,
+        0.9977534413337708
+      ]
+    }
+  ],
+  "note": "Source active UV layer names normalized on derivative only before join; each material atlas retained."
+}

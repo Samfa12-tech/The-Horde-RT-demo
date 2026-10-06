@@ -1,0 +1,55 @@
+PRIMITIVE clip=Idle first=0 count=27216 material_name="E05_PlainInnerBody_1K.001"
+PRIMITIVE clip=Idle first=27216 count=8496 material_name="E05_WeatheredIron_1K"
+WITNESS clip=Idle node=ChestMount max_transform_residual_m=2.407356305e-07 max_pair_length_change_m=2.682209015e-07 max_movement_m=0.004622156266
+WITNESS clip=Idle node=E05_Shutter.L max_transform_residual_m=2.408909552e-07 max_pair_length_change_m=2.980232239e-07 max_movement_m=0.005382268224
+WITNESS clip=Idle node=E05_Shutter.R max_transform_residual_m=2.399272034e-07 max_pair_length_change_m=2.980232239e-07 max_movement_m=0.005382228643
+WITNESS clip=Idle node=HeadMount max_transform_residual_m=4.768517101e-07 max_pair_length_change_m=3.87430191e-07 max_movement_m=0.002484656172
+WITNESS clip=Idle node=Shoulder.L max_transform_residual_m=2.457633173e-07 max_pair_length_change_m=3.352761269e-07 max_movement_m=0.001543225488
+WITNESS clip=Idle node=Shoulder.R max_transform_residual_m=3.627331182e-07 max_pair_length_change_m=3.427267075e-07 max_movement_m=0.001595446724
+PASS host multi-primitive geometry/rigid witnesses clip=Idle duration=3 samples=181 uniqueVertices=10073 primitives=2
+PRIMITIVE clip=Attack first=0 count=27216 material_name="E05_PlainInnerBody_1K.001"
+PRIMITIVE clip=Attack first=27216 count=8496 material_name="E05_WeatheredIron_1K"
+WITNESS clip=Attack node=ChestMount max_transform_residual_m=3.579575605e-07 max_pair_length_change_m=3.576278687e-07 max_movement_m=0.05141829699
+WITNESS clip=Attack node=E05_Shutter.L max_transform_residual_m=2.431447683e-07 max_pair_length_change_m=3.129243851e-07 max_movement_m=0.05674022064
+WITNESS clip=Attack node=E05_Shutter.R max_transform_residual_m=2.417710618e-07 max_pair_length_change_m=3.129243851e-07 max_movement_m=0.04311477765
+WITNESS clip=Attack node=HeadMount max_transform_residual_m=2.402902624e-07 max_pair_length_change_m=3.87430191e-07 max_movement_m=0.0343956314
+WITNESS clip=Attack node=Shoulder.L max_transform_residual_m=2.546584028e-07 max_pair_length_change_m=3.725290298e-07 max_movement_m=0.09095090628
+WITNESS clip=Attack node=Shoulder.R max_transform_residual_m=3.653064482e-07 max_pair_length_change_m=3.576278687e-07 max_movement_m=0.2182453275
+PASS host multi-primitive geometry/rigid witnesses clip=Attack duration=2.299999952 samples=139 uniqueVertices=10073 primitives=2
+PRIMITIVE clip=ExposureOpen first=0 count=27216 material_name="E05_PlainInnerBody_1K.001"
+PRIMITIVE clip=ExposureOpen first=27216 count=8496 material_name="E05_WeatheredIron_1K"
+WITNESS clip=ExposureOpen node=ChestMount max_transform_residual_m=2.384476829e-07 max_pair_length_change_m=0 max_movement_m=0
+WITNESS clip=ExposureOpen node=E05_Shutter.L max_transform_residual_m=1.365714013e-07 max_pair_length_change_m=5.960464478e-08 max_movement_m=0.3915367126
+WITNESS clip=ExposureOpen node=E05_Shutter.R max_transform_residual_m=1.365714013e-07 max_pair_length_change_m=8.940696716e-08 max_movement_m=0.3910248578
+WITNESS clip=ExposureOpen node=HeadMount max_transform_residual_m=1.201514408e-07 max_pair_length_change_m=0 max_movement_m=0
+WITNESS clip=ExposureOpen node=Shoulder.L max_transform_residual_m=2.402740051e-07 max_pair_length_change_m=2.756714821e-07 max_movement_m=0.05115454644
+WITNESS clip=ExposureOpen node=Shoulder.R max_transform_residual_m=2.46207577e-07 max_pair_length_change_m=3.278255463e-07 max_movement_m=0.04499180242
+PASS host multi-primitive geometry/rigid witnesses clip=ExposureOpen duration=0.6499999762 samples=40 uniqueVertices=10073 primitives=2
+PRIMITIVE clip=ExposureHold first=0 count=27216 material_name="E05_PlainInnerBody_1K.001"
+PRIMITIVE clip=ExposureHold first=27216 count=8496 material_name="E05_WeatheredIron_1K"
+WITNESS clip=ExposureHold node=ChestMount max_transform_residual_m=2.384476829e-07 max_pair_length_change_m=0 max_movement_m=0
+WITNESS clip=ExposureHold node=E05_Shutter.L max_transform_residual_m=1.264405398e-07 max_pair_length_change_m=0 max_movement_m=0
+WITNESS clip=ExposureHold node=E05_Shutter.R max_transform_residual_m=1.264405398e-07 max_pair_length_change_m=0 max_movement_m=0
+WITNESS clip=ExposureHold node=HeadMount max_transform_residual_m=4.76837215e-07 max_pair_length_change_m=4.172325134e-07 max_movement_m=0.00560721755
+WITNESS clip=ExposureHold node=Shoulder.L max_transform_residual_m=1.229345798e-07 max_pair_length_change_m=0 max_movement_m=0
+WITNESS clip=ExposureHold node=Shoulder.R max_transform_residual_m=1.491977599e-07 max_pair_length_change_m=0 max_movement_m=0
+PASS host multi-primitive geometry/rigid witnesses clip=ExposureHold duration=1.5 samples=91 uniqueVertices=10073 primitives=2
+PRIMITIVE clip=RecoveryClose first=0 count=27216 material_name="E05_PlainInnerBody_1K.001"
+PRIMITIVE clip=RecoveryClose first=27216 count=8496 material_name="E05_WeatheredIron_1K"
+WITNESS clip=RecoveryClose node=ChestMount max_transform_residual_m=2.384476829e-07 max_pair_length_change_m=0 max_movement_m=0
+WITNESS clip=RecoveryClose node=E05_Shutter.L max_transform_residual_m=1.365714013e-07 max_pair_length_change_m=6.426125765e-08 max_movement_m=0.3915367126
+WITNESS clip=RecoveryClose node=E05_Shutter.R max_transform_residual_m=1.341104507e-07 max_pair_length_change_m=5.960464478e-08 max_movement_m=0.3910248578
+WITNESS clip=RecoveryClose node=HeadMount max_transform_residual_m=1.201514408e-07 max_pair_length_change_m=0 max_movement_m=0
+WITNESS clip=RecoveryClose node=Shoulder.L max_transform_residual_m=2.457562402e-07 max_pair_length_change_m=2.756714821e-07 max_movement_m=0.05115454644
+WITNESS clip=RecoveryClose node=Shoulder.R max_transform_residual_m=3.58944817e-07 max_pair_length_change_m=2.682209015e-07 max_movement_m=0.04499180242
+PASS host multi-primitive geometry/rigid witnesses clip=RecoveryClose duration=0.8999999762 samples=55 uniqueVertices=10073 primitives=2
+PRIMITIVE clip=Dead first=0 count=27216 material_name="E05_PlainInnerBody_1K.001"
+PRIMITIVE clip=Dead first=27216 count=8496 material_name="E05_WeatheredIron_1K"
+WITNESS clip=Dead node=ChestMount max_transform_residual_m=3.591767097e-07 max_pair_length_change_m=4.172325134e-07 max_movement_m=0.5732030272
+WITNESS clip=Dead node=E05_Shutter.L max_transform_residual_m=3.582482009e-07 max_pair_length_change_m=5.36441803e-07 max_movement_m=0.6113075018
+WITNESS clip=Dead node=E05_Shutter.R max_transform_residual_m=2.430305983e-07 max_pair_length_change_m=3.576278687e-07 max_movement_m=0.6113075018
+WITNESS clip=Dead node=HeadMount max_transform_residual_m=3.579575605e-07 max_pair_length_change_m=3.576278687e-07 max_movement_m=0.6453967094
+WITNESS clip=Dead node=Shoulder.L max_transform_residual_m=2.995096224e-07 max_pair_length_change_m=3.352761269e-07 max_movement_m=0.5644094944
+WITNESS clip=Dead node=Shoulder.R max_transform_residual_m=3.591767097e-07 max_pair_length_change_m=3.054738045e-07 max_movement_m=0.5700349808
+PASS host multi-primitive geometry/rigid witnesses clip=Dead duration=3.299999952 samples=199 uniqueVertices=10073 primitives=2
+NOT PROVEN: PBR texture/factor interpretation, native RT rendering, GPU/device performance, gameplay exposure/hit/victory authority.
