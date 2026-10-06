@@ -1,15 +1,20 @@
 {
-  "package": "E01-validation-grip-v2",
+  "package": "E01-validation-hands-v3",
   "files": [
     {
       "path": "ARCHIVE.md",
-      "bytes": 1067,
-      "sha256": "de3e884aca067aa68aed4bb998493932d7756865592145eca3754f2c9a8eaf02"
+      "bytes": 1264,
+      "sha256": "9af1492aacd22e5a5c45e222b45875bc42689fe46d4b91fc9f3e6f567fe79bc4"
     },
     {
       "path": "E01_Hammer_Before_After.mp4",
       "bytes": 5919308,
       "sha256": "81e6fb7228a83eefa0fbe3915e7370f2ea9fd14d4fd26ea58ac5ce9b9afeb88c"
+    },
+    {
+      "path": "E01_Hands_Before_After_v3.jpg",
+      "bytes": 350193,
+      "sha256": "f02fb6918795a3be3dd213aff2e204cb5278f7ea6deec5c59d9bfc53924a9a07"
     },
     {
       "path": "MALLET_PROVENANCE.json",
@@ -28,8 +33,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 3409,
-      "sha256": "15a8fe66b99b4940864932fcdcb5d3c87fc0654bec36ae6bf730bcb4c6527030"
+      "bytes": 5315,
+      "sha256": "06f76f56783850f7c12dafe21eb6869426f32ac38d020a8c2a7a8099d9c818c4"
+    },
+    {
+      "path": "REVISION_PROVENANCE.json",
+      "bytes": 1216,
+      "sha256": "29610d594cb7677a4d45270893becf9112dcd927cd4f9f7bb10ddf6417766d7e"
     },
     {
       "path": "RIGHTS.md",
@@ -38,8 +48,13 @@
     },
     {
       "path": "V2_REVISION.md",
-      "bytes": 327,
-      "sha256": "9c3d1895e4f068dd5725b12866b730301edcbeb381a85abb9aa478e889658e14"
+      "bytes": 524,
+      "sha256": "085eaa629d74c610acd6a37c23852118f12c21dd8344953b5c058c348337d8b5"
+    },
+    {
+      "path": "V3_REVISION.md",
+      "bytes": 892,
+      "sha256": "f4f3468d31d7a4dd8d28b161d131bc6c01059109a262e4c694ecb54c6f153ee8"
     },
     {
       "path": "evidence/dead-wrist-bounded-scan.json",
@@ -248,13 +263,28 @@
     },
     {
       "path": "socket-revision.json",
-      "bytes": 2389,
-      "sha256": "860ff3e51af53047a2b5fc000068c056ae16cd823a0df205c06dd7e5710b48ec"
+      "bytes": 417,
+      "sha256": "6e61ee37769b97877209f61d5ed599d8cc8cb58bae067b3d7165f47d4f6b643d"
     },
     {
       "path": "v2-evidence/E01_Hammer_Alignment_Independent_QA.txt",
       "bytes": 2925,
       "sha256": "362c74925ea5cd4c1d1e7669c2ffa86e116623e6f573fe484e119f714b8b169e"
+    },
+    {
+      "path": "v2-evidence/HISTORICAL.md",
+      "bytes": 226,
+      "sha256": "f82afe0701c0b4db097b65dbf775f309c15a955c3a3fb8ebccc1b1c640380338"
+    },
+    {
+      "path": "v2-evidence/archive-editable-revision.json",
+      "bytes": 664,
+      "sha256": "9b28df45f03e154a2f4dedf602f02c069904d8df581b5468058d463b4cc8a2be"
+    },
+    {
+      "path": "v2-evidence/archive-socket-revision.json",
+      "bytes": 2389,
+      "sha256": "860ff3e51af53047a2b5fc000068c056ae16cd823a0df205c06dd7e5710b48ec"
     },
     {
       "path": "v2-evidence/editable-glb-reconciliation.json",
@@ -292,9 +322,64 @@
       "sha256": "2f3f58d29a7b6c5ab48990b9bfaad590c70c002b2775e7066b104b4ff1b17465"
     },
     {
+      "path": "v3-evidence/E01_Hand_Orientation_Independent_QA.txt",
+      "bytes": 1497,
+      "sha256": "099465b635c948e7585369fa7d584603426dd722f58d09356e1ba73698609dd3"
+    },
+    {
+      "path": "v3-evidence/archive-variant-reconciliation.json",
+      "bytes": 7173,
+      "sha256": "0d83a4e493c7693bae8ccb0716586b4839c39fb77e56dde7e36549a337b9a6b7"
+    },
+    {
+      "path": "v3-evidence/archive-variants-native-reader.log",
+      "bytes": 2697,
+      "sha256": "8e555452eb846bb0ea1666b97518ef756a2864b767a345643da50908242d0563"
+    },
+    {
+      "path": "v3-evidence/contact-detail.log",
+      "bytes": 2105,
+      "sha256": "42c415e3a4c529fefef7e9b3a0a06f88c479f633e58fa527c4853b16311dbfb5"
+    },
+    {
+      "path": "v3-evidence/dead-grounding.json",
+      "bytes": 5058,
+      "sha256": "3ca5b3dfbada22d3ec5bcb038ead6b9133d84dc12097d0bfb61975c8151972f4"
+    },
+    {
+      "path": "v3-evidence/editable-glb-reconciliation.json",
+      "bytes": 10140,
+      "sha256": "7ced162576bb38b8ad45267935376bcbc49b086f4dbfb547b88b3a1a2a067942"
+    },
+    {
+      "path": "v3-evidence/final-clearance.json",
+      "bytes": 449841,
+      "sha256": "f77bd5165feb6047aef60426acb0ee214517fcdd614d912a757542a45236d56d"
+    },
+    {
+      "path": "v3-evidence/final-native-reader.log",
+      "bytes": 1369,
+      "sha256": "89154ab404935e557c817404741b7aeba6964e1cf4c65173bd02893e759a034f"
+    },
+    {
+      "path": "v3-evidence/media-validation.json",
+      "bytes": 344,
+      "sha256": "6dccaed0fa6f57fcd5f92acf12330cd0ab6e2f1a15817b4b987c439237cd88ea"
+    },
+    {
+      "path": "v3-evidence/structural-comparison.json",
+      "bytes": 2870,
+      "sha256": "d10e8bde4f7e6f93ae762b0368d1c1e54cc9eccbcd086bccbcb27fbeb7c2ceb3"
+    },
+    {
+      "path": "v3-evidence/wrist-deformation-check.json",
+      "bytes": 1478,
+      "sha256": "0c2b98dc8909766397a033a109b88f58c1fdf57eb797e1c92edcf54996968b57"
+    },
+    {
       "path": "validation-summary.json",
-      "bytes": 1879,
-      "sha256": "f08983b59d778855532cf6b7c4522e62eb6824a6fbf040dc336153f9d3e52a4a"
+      "bytes": 964,
+      "sha256": "c733f98592b3ab25402fda7b83309553f2b90d0f26989ac29817b4f35240720b"
     }
   ]
 }

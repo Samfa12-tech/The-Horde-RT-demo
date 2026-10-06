@@ -1,0 +1,328 @@
+[
+  {
+    "file": "E01_AbbeyAttendant_all_clips.glb",
+    "source_sha256": "2efc571367d597042525c5933bf6abb67bb8321b8af943a975012eb28308450e",
+    "sha256": "3af6188940ac55d59cf7b7179c1397ec7d59673e4c3dbdaeccb34d45856c7f54",
+    "bytes": 5654828,
+    "core_channels_exactly_equal_to_approved_core": 300,
+    "changes": [
+      {
+        "clip": "Idle",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle",
+        "node": "RightGrip",
+        "path": "rotation"
+      },
+      {
+        "clip": "Attack",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Attack",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Attack",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Attack",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Attack",
+        "node": "RightGrip",
+        "path": "rotation"
+      },
+      {
+        "clip": "Dead",
+        "node": "Hips",
+        "path": "translation"
+      },
+      {
+        "clip": "Dead",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Dead",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Dead",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Dead",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Dead",
+        "node": "RightGrip",
+        "path": "rotation"
+      },
+      {
+        "clip": "Hit_Reaction",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Hit_Reaction",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Hit_Reaction",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Hit_Reaction",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Hit_Reaction",
+        "node": "RightGrip",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Left",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Left",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Left",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Left",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Left",
+        "node": "RightGrip",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Right",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Right",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Right",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Right",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Right",
+        "node": "RightGrip",
+        "path": "rotation"
+      },
+      {
+        "clip": "Walking",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Walking",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Walking",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Walking",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Walking",
+        "node": "RightGrip",
+        "path": "rotation"
+      },
+      {
+        "clip": "Running",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Running",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Running",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Running",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Running",
+        "node": "RightGrip",
+        "path": "rotation"
+      }
+    ],
+    "extra_clips_visual_status": "source-only, not accepted for runtime"
+  },
+  {
+    "file": "E01_AbbeyAttendant_source_extras.glb",
+    "source_sha256": "3456c6ff886205bd280db0c8916880545f94f1098d4354f1cba961cf54b09c25",
+    "sha256": "46117c553d047205ffa78d09ce47fd5faf8fca3436c3c4db5b8dcd933d1b49ec",
+    "bytes": 5372192,
+    "core_channels_exactly_equal_to_approved_core": 0,
+    "changes": [
+      {
+        "clip": "Hit_Reaction",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Hit_Reaction",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Hit_Reaction",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Hit_Reaction",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Hit_Reaction",
+        "node": "RightGrip",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Left",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Left",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Left",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Left",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Left",
+        "node": "RightGrip",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Right",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Right",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Right",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Right",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Idle_Turn_Right",
+        "node": "RightGrip",
+        "path": "rotation"
+      },
+      {
+        "clip": "Running",
+        "node": "LeftForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Running",
+        "node": "LeftHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Running",
+        "node": "RightForeArm",
+        "path": "rotation"
+      },
+      {
+        "clip": "Running",
+        "node": "RightHand",
+        "path": "rotation"
+      },
+      {
+        "clip": "Running",
+        "node": "RightGrip",
+        "path": "rotation"
+      }
+    ],
+    "extra_clips_visual_status": "source-only, not accepted for runtime",
+    "extra_channels_exactly_equal_to_all_clips": 300
+  }
+]

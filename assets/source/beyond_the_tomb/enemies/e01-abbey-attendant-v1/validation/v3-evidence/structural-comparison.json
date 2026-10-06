@@ -1,0 +1,140 @@
+{
+  "old_sha256": "0028ee9c200cecfb1e0ae2503baaf9614fa1ef4239760e23cdb12d7fbe5b7fa6",
+  "final_sha256": "373ee8dafe1357e407d596ccf4e074156d0ab74b21f661184b92e378dd3e2fc4",
+  "geometry_normals_tangents_uv_weights_indices_bitwise_equal": true,
+  "images_materials_skins_equal": true,
+  "only_allowed_animation_binary_bytes_changed": true,
+  "changed_static_nodes": [
+    "RightGrip"
+  ],
+  "changed_channels": [
+    {
+      "clip": "Idle",
+      "node": "LeftForeArm",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Idle",
+      "node": "LeftHand",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Idle",
+      "node": "RightForeArm",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Idle",
+      "node": "RightHand",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Idle",
+      "node": "RightGrip",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Walking",
+      "node": "LeftForeArm",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Walking",
+      "node": "LeftHand",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Walking",
+      "node": "RightForeArm",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Walking",
+      "node": "RightHand",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Walking",
+      "node": "RightGrip",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Attack",
+      "node": "LeftForeArm",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Attack",
+      "node": "LeftHand",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Attack",
+      "node": "RightForeArm",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Attack",
+      "node": "RightHand",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Attack",
+      "node": "RightGrip",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Dead",
+      "node": "Hips",
+      "path": "translation",
+      "allowed": true
+    },
+    {
+      "clip": "Dead",
+      "node": "LeftForeArm",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Dead",
+      "node": "LeftHand",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Dead",
+      "node": "RightForeArm",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Dead",
+      "node": "RightHand",
+      "path": "rotation",
+      "allowed": true
+    },
+    {
+      "clip": "Dead",
+      "node": "RightGrip",
+      "path": "rotation",
+      "allowed": true
+    }
+  ],
+  "max_animation_quaternion_unit_error": 5.960464477539062e-07,
+  "clip_names_and_timing_preserved": true
+}

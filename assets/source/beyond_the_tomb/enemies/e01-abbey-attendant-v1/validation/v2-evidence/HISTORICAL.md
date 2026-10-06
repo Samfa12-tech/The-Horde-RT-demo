@@ -1,0 +1,1 @@
+Historical v2 receipts. Thumb/pinky identification and the claimed thumb-side hammer reversal were incorrect. These files do not validate v3. Use ../v3-evidence and ../../core/V3_REVISION.md for current source-level evidence.

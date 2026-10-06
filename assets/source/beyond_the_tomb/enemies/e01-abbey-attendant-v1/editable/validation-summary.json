@@ -1,49 +1,24 @@
 {
-  "revision": "E01 hammer grip v2",
-  "status": "PASS within source/native-reader scope",
-  "tested_sha256": {
-    "E01_AbbeyAttendant_core.glb": "0028ee9c200cecfb1e0ae2503baaf9614fa1ef4239760e23cdb12d7fbe5b7fa6",
-    "E01_AbbeyAttendant_all_clips.glb": "2efc571367d597042525c5933bf6abb67bb8321b8af943a975012eb28308450e",
-    "E01_AbbeyAttendant_source_extras.glb": "3456c6ff886205bd280db0c8916880545f94f1098d4354f1cba961cf54b09c25",
-    "E01_maintenance_mallet.glb": "23b7865ba2accc30914b6586453d7b512c916db49e221a433c40855dc9c72e20",
-    "E01_AbbeyAttendant_editable.blend": "412149be7dcda2ad993edf14c9f8fb7a06857dd9e905e00243068fa9410d7dc6"
-  },
-  "body_triangles": 14122,
-  "skin_joints": 25,
-  "core_clips": [
+  "revision": "E01 hands v3",
+  "core_sha256": "373ee8dafe1357e407d596ccf4e074156d0ab74b21f661184b92e378dd3e2fc4",
+  "mesh_and_skin_bitwise_preserved": true,
+  "allowed_animation_bytes_only": true,
+  "native_cpu_clips_passed": [
     "Idle",
     "Walking",
     "Attack",
     "Dead"
   ],
-  "grip_fix": "RightGrip local X +180 degrees; origin unchanged; head exits thumb side",
-  "death_wrist_fix": "Only Dead RightHand: +20 degree smoothstep 20%-55% relative to delivered; old -45 degree ramp becomes -25",
-  "clearance": {
-    "core_samples_60hz": 576,
-    "dead_samples_120hz": 357,
-    "nonhand_triangle_intersections": 0,
-    "head_body_triangle_intersections": 0,
-    "hand_contact": "Every sampled pose",
-    "tool_floor_min_m": {
-      "Idle": 0.73173,
-      "Walking": 0.59592,
-      "Attack": 0.65752,
-      "Dead": 0.03824
-    },
-    "dead_head_vertex_to_body_min_m": 0.01032
-  },
-  "native_cpu_reader": "PASS all four clips",
-  "editable_glb_agreement": {
-    "poses": 22,
-    "max_body_vertex_distance_mm": 0.01382,
-    "max_socket_mallet_matrix_element_difference": 4.42e-06
-  },
-  "not_tested": [
-    "GPU skinning",
-    "gameplay integration and blending",
-    "Vulkan RT presentation",
-    "device performance",
-    "continuous collision detection"
-  ],
-  "historical_claims": "v1 receipts and hashes describe the backwards-grip source; this summary supersedes them for v2."
+  "sample_hz": 60,
+  "body_floor_min_m": 0.000996690709143877,
+  "mallet_floor_min_m": 0.024434905499219894,
+  "max_mallet_head_body_triangle_pairs": 0,
+  "max_conservative_nonhand_triangle_pairs": 3,
+  "nonhand_pair_detail": "One proximal-palm/wrist triangle, not mallet-head contact; see README.",
+  "max_blender_glb_position_difference_m": 1.3775798834103625e-05,
+  "max_socket_matrix_difference": 5.245208740234375e-06,
+  "death_root_max_raise_m": 0.009460998535156251,
+  "runtime_gpu_gameplay_device_tests": "not run",
+  "game_dev_cli": "not installed",
+  "git_publication": "Owner visually approved v3 for archival; see archive commit receipt for publication status."
 }

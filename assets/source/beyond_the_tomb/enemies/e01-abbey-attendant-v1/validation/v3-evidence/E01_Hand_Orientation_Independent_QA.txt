@@ -1,0 +1,13 @@
+E01 hand orientation v3: independent visual QA
+
+Verdict: pass for the hand-orientation repair at source-preview level.
+
+Reviewed both hands across the complete 119-frame, 12 fps sequence, plus final ground-corrected Dead impact and settling frames. The sequence covers all four full core clips; the delivered review plays at half-speed.
+
+No wrist inversion, corkscrew collapse, orientation snap or grip slip was observed. The mallet head stays on the anatomically identified thumb/index side. Dead's left-wrist extension blends smoothly; final fingers and wrists visibly clear the floor. The final root correction introduces no visible disruption.
+
+The thumb was identified using its broad thumb-index web and the other four curled fingers, not hammer direction. The v2 thumb-side claim was incorrect and is superseded. A literal 180-degree hand-joint flip was rejected because it visibly pinched both wrists. The distributed forearm/hand correction preserves wrist volume.
+
+Minor style caveat: Dead ends with raised fingers and an upright mallet, which looks somewhat rigid. No blocking hand-anatomy defect remains in the inspected evidence. The source still has no finger bones, and the generated anatomical detail has not been rebuilt.
+
+This is visual review of offline fresh-GLB renders. It is not gameplay blending, GPU skinning, RT rendering or device-performance approval. Discrete collision and native CPU test limitations are recorded separately in README.md and validation-summary.json.

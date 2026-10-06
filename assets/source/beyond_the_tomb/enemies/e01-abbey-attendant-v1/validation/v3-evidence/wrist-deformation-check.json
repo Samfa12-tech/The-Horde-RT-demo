@@ -1,0 +1,37 @@
+{
+  "method": "All60Hz frames, triangles whose vertices each have >50% aggregate hand/forearm skin weight. Area ratio flags collapse, not anatomical correctness; positive joint determinants reject negative-scale reflection. Original near-zero triangles excluded. Visual review is separate.",
+  "results": [
+    {
+      "clip": "Idle",
+      "triangle_count": 3540,
+      "minimum_triangle_area_ratio_to_bind": 0.009785681076100075,
+      "maximum_triangle_area_ratio_to_bind": 7.228011881204273,
+      "nonfinite_area_count": 0,
+      "minimum_joint_matrix_determinant": 0.9999964237213135
+    },
+    {
+      "clip": "Walking",
+      "triangle_count": 3540,
+      "minimum_triangle_area_ratio_to_bind": 0.018254199155556247,
+      "maximum_triangle_area_ratio_to_bind": 11.077216755993634,
+      "nonfinite_area_count": 0,
+      "minimum_joint_matrix_determinant": 0.9999978542327881
+    },
+    {
+      "clip": "Attack",
+      "triangle_count": 3540,
+      "minimum_triangle_area_ratio_to_bind": 0.031066757346335294,
+      "maximum_triangle_area_ratio_to_bind": 11.153913053472406,
+      "nonfinite_area_count": 0,
+      "minimum_joint_matrix_determinant": 0.9999978542327881
+    },
+    {
+      "clip": "Dead",
+      "triangle_count": 3540,
+      "minimum_triangle_area_ratio_to_bind": 0.07683645484376737,
+      "maximum_triangle_area_ratio_to_bind": 13.178221276395709,
+      "nonfinite_area_count": 0,
+      "minimum_joint_matrix_determinant": 0.9999974966049194
+    }
+  ]
+}

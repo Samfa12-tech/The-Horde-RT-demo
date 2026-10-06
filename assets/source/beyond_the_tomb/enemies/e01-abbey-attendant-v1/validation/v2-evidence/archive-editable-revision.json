@@ -1,0 +1,14 @@
+{
+  "revision": "E01 hammer grip v2",
+  "file": {
+    "file": "E01_AbbeyAttendant_editable.blend",
+    "before_sha256": "3bd3e7d69705dc0a1afc2a9d6feafd9537d28ff5d45dfa2698e40fb28c17061e",
+    "after_sha256": "412149be7dcda2ad993edf14c9f8fb7a06857dd9e905e00243068fa9410d7dc6",
+    "bytes": 8133117
+  },
+  "changes": [
+    "RightGrip local X rotation +180 degrees at unchanged origin, consistently across all 8 source clips",
+    "Dead only: original RightHand local-Y smoothstep ramp reduced from -45 degrees to -25 degrees over 20%-55% of clip; net +20 degrees versus delivered"
+  ],
+  "default_view": "Idle; packed source maps and constrained mallet retained."
+}

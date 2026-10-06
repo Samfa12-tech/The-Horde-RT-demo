@@ -1,53 +1,9 @@
 {
-  "revision": "E01 hammer grip v2",
-  "base_archive_commit": "93bdbd54016de6c4c7381a29b909d4049e4bf528",
-  "original_delivered_video_sha256": "e83bba41169ff3ec831e62d9c9ef1b924668d145143fb31e2a40c6cd147b0d39",
-  "changes": [
-    "RightGrip local X rotation +180 degrees at unchanged origin, consistently across all 8 source clips",
-    "Dead only: original RightHand local-Y smoothstep ramp reduced from -45 degrees to -25 degrees over 20%-55% of clip; net +20 degrees versus delivered"
-  ],
-  "tool_convention": {
-    "gltf_handle_toward_head": "+Y",
-    "head_width": "X",
-    "grip": "Use corrected RightGrip and unchanged mallet identity Grip. No extra runtime flip."
-  },
-  "unchanged": [
-    "Body mesh, skin weights, textures, topology, 25 joints",
-    "Separate mallet bytes",
-    "All animation channels other than RightGrip rotation and Dead RightHand rotation",
-    "Clip names, duration and displacement"
-  ],
-  "files": [
-    {
-      "file": "E01_AbbeyAttendant_core.glb",
-      "before_sha256": "1e4d9c992ceef2511b171a6a7942bc2b9a7162b830c93eac75e0cef5097907db",
-      "after_sha256": "0028ee9c200cecfb1e0ae2503baaf9614fa1ef4239760e23cdb12d7fbe5b7fa6",
-      "bytes": 5483004
-    },
-    {
-      "file": "E01_AbbeyAttendant_all_clips.glb",
-      "before_sha256": "f9241e7e9a0239e7cf504cdd713e278864607bbec9cbfd4b923f45c38dddc87e",
-      "after_sha256": "2efc571367d597042525c5933bf6abb67bb8321b8af943a975012eb28308450e",
-      "bytes": 5654224
-    },
-    {
-      "file": "E01_AbbeyAttendant_source_extras.glb",
-      "before_sha256": "6add8af5e1eecce273eb64c7d2885d2470c59e05c45c70061ead42025bf0849b",
-      "after_sha256": "3456c6ff886205bd280db0c8916880545f94f1098d4354f1cba961cf54b09c25",
-      "bytes": 5371440
-    },
-    {
-      "file": "E01_AbbeyAttendant_editable.blend",
-      "before_sha256": "3bd3e7d69705dc0a1afc2a9d6feafd9537d28ff5d45dfa2698e40fb28c17061e",
-      "after_sha256": "412149be7dcda2ad993edf14c9f8fb7a06857dd9e905e00243068fa9410d7dc6",
-      "bytes": 8133117
-    },
-    {
-      "file": "E01_maintenance_mallet.glb",
-      "before_sha256": "23b7865ba2accc30914b6586453d7b512c916db49e221a433c40855dc9c72e20",
-      "after_sha256": "23b7865ba2accc30914b6586453d7b512c916db49e221a433c40855dc9c72e20",
-      "bytes": 853644
-    }
-  ],
-  "authority_boundary": "Local source correction only. No game code, Git push, merge or public deployment performed."
+  "revision": "v3",
+  "supersedes": "v2 thumb-side claim and socket reversal",
+  "head_direction": "thumb/index side, identified independently by thumb webbing and four curled fingers",
+  "static_and_animated_RightGrip": "Restored to original v1 direction; do not add a runtime 180-degree flip",
+  "tool": "unchanged separate mallet",
+  "same_body_geometry_and_weights": true,
+  "see": "REVISION_PROVENANCE.json"
 }

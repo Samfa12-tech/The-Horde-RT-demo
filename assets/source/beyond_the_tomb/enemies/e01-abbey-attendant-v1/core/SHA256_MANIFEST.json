@@ -1,25 +1,25 @@
 {
-  "package": "E01-core-grip-v2",
+  "package": "E01-core-hands-v3",
   "files": [
     {
       "path": "ARCHIVE.md",
-      "bytes": 1067,
-      "sha256": "de3e884aca067aa68aed4bb998493932d7756865592145eca3754f2c9a8eaf02"
+      "bytes": 1264,
+      "sha256": "9af1492aacd22e5a5c45e222b45875bc42689fe46d4b91fc9f3e6f567fe79bc4"
     },
     {
       "path": "E01_AbbeyAttendant_core.glb",
-      "bytes": 5483004,
-      "sha256": "0028ee9c200cecfb1e0ae2503baaf9614fa1ef4239760e23cdb12d7fbe5b7fa6"
+      "bytes": 5483464,
+      "sha256": "373ee8dafe1357e407d596ccf4e074156d0ab74b21f661184b92e378dd3e2fc4"
     },
     {
       "path": "E01_core_contact_sheet.jpg",
-      "bytes": 168974,
-      "sha256": "947fedba1ff9579d6b17cdfc8088cd84da87fc3af7cbbde89a314c18cee64358"
+      "bytes": 290920,
+      "sha256": "47d4582f5fa1cf6eb530dcab8b440be067c41195d0d03cdd152c244571856d7d"
     },
     {
       "path": "E01_defeat_rest_wide.png",
-      "bytes": 383134,
-      "sha256": "90335330b2ccbbe514468439c62ca70c626101e3f29b1aca63345eb9b65d3b85"
+      "bytes": 328624,
+      "sha256": "957e5392bb113a2adc5deb29ca866757230c5b1aa6c883d7a93f49733f1120f7"
     },
     {
       "path": "E01_maintenance_mallet.glb",
@@ -28,8 +28,8 @@
     },
     {
       "path": "E01_motion_preview.mp4",
-      "bytes": 4052499,
-      "sha256": "297519d20fd266ceedebf214cec66754436a24bf8a1e634e56ee468880dc5dae"
+      "bytes": 10562539,
+      "sha256": "3bcf953bc9c23951ec78613a893039710aed54a2d07e453605b7ce5eba7af200"
     },
     {
       "path": "MALLET_PROVENANCE.json",
@@ -48,8 +48,13 @@
     },
     {
       "path": "README.md",
-      "bytes": 3409,
-      "sha256": "15a8fe66b99b4940864932fcdcb5d3c87fc0654bec36ae6bf730bcb4c6527030"
+      "bytes": 5315,
+      "sha256": "06f76f56783850f7c12dafe21eb6869426f32ac38d020a8c2a7a8099d9c818c4"
+    },
+    {
+      "path": "REVISION_PROVENANCE.json",
+      "bytes": 1216,
+      "sha256": "29610d594cb7677a4d45270893becf9112dcd927cd4f9f7bb10ddf6417766d7e"
     },
     {
       "path": "RIGHTS.md",
@@ -58,8 +63,13 @@
     },
     {
       "path": "V2_REVISION.md",
-      "bytes": 341,
-      "sha256": "3d077f6b08b54a75cb16286dd3f515a8fe694310da48576b6b55bb1ba10aa9a0"
+      "bytes": 538,
+      "sha256": "0c4c14f10343f38d8cd8427b6bb58c1e44d78b37605ca78fa2461ccaa6ac1b30"
+    },
+    {
+      "path": "V3_REVISION.md",
+      "bytes": 906,
+      "sha256": "a111ef3fad520513bd13bfeece59debb2d9b209c2580cc4593d8c39eb07575a5"
     },
     {
       "path": "clip-set-receipt.json",
@@ -88,13 +98,13 @@
     },
     {
       "path": "socket-revision.json",
-      "bytes": 2389,
-      "sha256": "860ff3e51af53047a2b5fc000068c056ae16cd823a0df205c06dd7e5710b48ec"
+      "bytes": 417,
+      "sha256": "6e61ee37769b97877209f61d5ed599d8cc8cb58bae067b3d7165f47d4f6b643d"
     },
     {
       "path": "validation-summary.json",
-      "bytes": 1879,
-      "sha256": "f08983b59d778855532cf6b7c4522e62eb6824a6fbf040dc336153f9d3e52a4a"
+      "bytes": 964,
+      "sha256": "c733f98592b3ab25402fda7b83309553f2b90d0f26989ac29817b4f35240720b"
     }
   ]
 }

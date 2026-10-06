@@ -1,3 +1,5 @@
+Current asset revision: v3, approved by the owner. See V3_REVISION.md. The following earlier archive/revision text is retained as historical context; its v2 thumb-direction claims are superseded.
+
 # Public source archive derivative
 
 This directory preserves the bounded producer package, source binaries, attribution and local validation evidence. It is source-only and does not register or admit runtime assets.
