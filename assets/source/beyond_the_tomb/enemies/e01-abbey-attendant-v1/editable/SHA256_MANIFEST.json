@@ -1,0 +1,80 @@
+{
+  "package": "Horde-E01-editable-v1",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 4353,
+      "sha256": "19834d740f7dd916288a1a9726b2f950771d500d4066d791e7df1fa94f2af2f3"
+    },
+    {
+      "path": "validation-summary.json",
+      "bytes": 4373,
+      "sha256": "508d36215986aaeb0484f39cb55058e6c131a9dc994d3a81943f9f73b27e7636"
+    },
+    {
+      "path": "RIGHTS.md",
+      "bytes": 1321,
+      "sha256": "480768e2b16b8e7d530c2eeb6d7fb42baf61c555e964c84b492a5ce5198b223c"
+    },
+    {
+      "path": "MALLET_PROVENANCE.json",
+      "bytes": 1388,
+      "sha256": "071edc15f5c9ddb264cce56c13581b192e78dc610a344d4e62c31fec7d01f826"
+    },
+    {
+      "path": "MALLET_README.md",
+      "bytes": 5114,
+      "sha256": "0ffd5e3d1b36e0c4229e90b01219d6efe9358c036994cade4e06cfc3abca2136"
+    },
+    {
+      "path": "final-metadata-receipt.json",
+      "bytes": 1223,
+      "sha256": "78f898761afb3b58eedcaa8fb6e3e7fc27040845e00548b613946cf0bab4266d"
+    },
+    {
+      "path": "PRODUCTION_PROVENANCE.json",
+      "bytes": 5347,
+      "sha256": "f533618d3d7a80e00a775c27be3e0f4d7e0b39d56f9f1ea648762b2f8ae68a87"
+    },
+    {
+      "path": "E01_AbbeyAttendant_editable.blend",
+      "bytes": 8139795,
+      "sha256": "3bd3e7d69705dc0a1afc2a9d6feafd9537d28ff5d45dfa2698e40fb28c17061e"
+    },
+    {
+      "path": "E01_AbbeyAttendant_source_extras.glb",
+      "bytes": 5371304,
+      "sha256": "6add8af5e1eecce273eb64c7d2885d2470c59e05c45c70061ead42025bf0849b"
+    },
+    {
+      "path": "E01_AbbeyAttendant_all_clips.glb",
+      "bytes": 5653940,
+      "sha256": "f9241e7e9a0239e7cf504cdd713e278864607bbec9cbfd4b923f45c38dddc87e"
+    },
+    {
+      "path": "extras-inspection.json",
+      "bytes": 37688,
+      "sha256": "f20492b6c543151aa2e3296c4ef463babdf7da9f825ee58514b6b3197ed1412a"
+    },
+    {
+      "path": "all-clips-inspection.json",
+      "bytes": 71063,
+      "sha256": "d41172df5c851fa69786cc02001498c5f2e105a1c4e40552499b3d48d55c9588"
+    },
+    {
+      "path": "editable-verification.json",
+      "bytes": 862,
+      "sha256": "b96b4a7230aa1153582aef0af3f3eeb4688eb21b6248e6ec44527b18eb25c98e"
+    },
+    {
+      "path": "extras-native-proof.txt",
+      "bytes": 1808,
+      "sha256": "daa8b3e94811b9dc3ccefa16399d40753985fe87215e11f99643fe0622a2d969"
+    },
+    {
+      "path": "all-clips-name-receipt.json",
+      "bytes": 557,
+      "sha256": "d6fe1c2a6b6261ad2c35c6e8c6d6126fa354e112271ca806524f49879147bc86"
+    }
+  ]
+}

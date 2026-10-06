@@ -1,0 +1,103 @@
+{
+  "asset_id": "E01",
+  "name": "Abbey attendant H1 source pilot",
+  "status": "Source and native-reader candidate; not integrated or device-certified",
+  "body": {
+    "triangles": 14122,
+    "exported_vertices": 17173,
+    "skin_joints": 25,
+    "original_deform_joints": 24,
+    "added_unweighted_helper": "RightGrip",
+    "mesh_count": 1,
+    "skin_count": 1,
+    "materials": 1,
+    "runtime_maps": "3 embedded 1024x1024 PNGs: base, normal, ORM; AO neutral white",
+    "bind_height_m": 1.7,
+    "world_axes": {
+      "up": "+Y",
+      "forward": "+Z"
+    },
+    "geometry_warnings": {
+      "exact_weld_boundary_edges": 74,
+      "exact_weld_nonmanifold_edges": 11,
+      "degenerate_triangles_area_lt_1e-12": 0
+    }
+  },
+  "core_clips": [
+    {
+      "name": "Idle",
+      "duration_s": 4.0,
+      "loops": true
+    },
+    {
+      "name": "Walking",
+      "duration_s": 1.0666667222976685,
+      "loops": true
+    },
+    {
+      "name": "Attack",
+      "duration_s": 1.5,
+      "loops": false
+    },
+    {
+      "name": "Dead",
+      "duration_s": 2.9666666984558105,
+      "loops": false
+    }
+  ],
+  "source_extras": {
+    "Hit_Reaction": "Source-only; about 0.815m net horizontal Hips travel. Rejected for in-place H1 admission.",
+    "Idle_Turn_Left": "Source-only; authored yaw/translation requires authority policy.",
+    "Idle_Turn_Right": "Source-only; authored yaw/translation requires authority policy.",
+    "Running": "Source-only; loop finite and closes, flight/footlocking/game-speed not admitted."
+  },
+  "checks": {
+    "native_reader_and_rigid_socket": "PASS at 60 Hz for all clips; core rechecked under canonical Idle name",
+    "core_attribute_layout": "PASS; uint16 indices, uint8 joints, four float normalized nonnegative weights; no zero-weight vertices",
+    "ground_core_minimum_range_m": [
+      0.000991049223,
+      0.00100201252
+    ],
+    "idle_end_start_max_vertex_distance_m": 0.000100492289,
+    "walking_end_start_max_vertex_distance_m": 1.13870863e-06,
+    "core_nonhand_tool_overlap_pairs_max_at_17_samples": 0,
+    "corrected_dead_tool_floor_min_m": 0.04073280096054077,
+    "nominal_grip_inner_vertex_penetrations_checked_idle": 0,
+    "hand_contact_limit": "Conservative BVH still reports up to 414 triangle pairs confined to the intended gripping-hand region. This is not a collision-free or hero-hand certificate.",
+    "cross_reader_grip_max_position_error_m": 4.99233593476137e-06,
+    "roundtrip_max_joint_position_error_m": 5.045324247016052e-06,
+    "roundtrip_triangles_unchanged": true,
+    "roundtrip_image_pixels_identical": true,
+    "roundtrip_tangent_seam_vertex_delta": 2,
+    "roundtrip_clip_names_durations_preserved": "PASS after explicit NLA local-time normalization; final Idle rename changes metadata only"
+  },
+  "source_comparison": {
+    "12K_provider_remesh_triangles": 12467,
+    "6K_provider_remesh_triangles": 6261,
+    "selected": "12K base; 6K rejected for close face/finger silhouette, never claimed rig/deformation admitted",
+    "final_local_hand_repair_triangles": 14122
+  },
+  "not_tested": [
+    "native Vulkan RT material rendering/presentation",
+    "GPU skinning",
+    "Android/Windows sustained performance",
+    "gameplay blending, collision, hit/parry windows, authoritative events",
+    "footlocking at actual gameplay movement speed",
+    "facial/finger articulation"
+  ],
+  "integration_requirements": [
+    "Use explicit E01 clip bindings. Current legacy SkeletonCombatClipSet expects Idle_5, whereas final canonical clip is Idle.",
+    "Attack is 1.5s and does not match the existing legacy 2.8s combat timing; author gameplay-owned phase/event mapping.",
+    "Dead preserves authored fall displacement and uses a bounded -45 degree resting-wrist correction. Decide tool release/retention in gameplay.",
+    "Current skeleton renderer uses untextured CPU Skin; a PBR source does not prove an integrated textured enemy route.",
+    "Do not admit source extras silently.",
+    "Preserve source/runtime separation, attribution, and per-area actor/performance budgets."
+  ],
+  "provenance": {
+    "repo_contract_commit": "e6cf2e97e5577aa051c5a18014477598762d7b75",
+    "third_party_skeleton_geometry_used": false,
+    "source_prompt_file": "PRODUCTION_PROVENANCE.json: accepted spec-v02 and exact task prompt",
+    "source_files_unchanged": true,
+    "rights_file": "RIGHTS.md"
+  }
+}

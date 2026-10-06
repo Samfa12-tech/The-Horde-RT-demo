@@ -1,0 +1,882 @@
+[
+  {
+    "end_wrist_roll_degrees": -90,
+    "min_tool_floor_m": 0.016036225318908692,
+    "max_nonhand_overlap_pairs": 6,
+    "max_extra_body_floor_adjustment_m": 0.00011065580090507867,
+    "samples": [
+      {
+        "fraction": 0.0,
+        "adjusted_tool_floor_m": 0.6031848754025996,
+        "body_ground_adjustment_m": -2.7452372014522344e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.0625,
+        "adjusted_tool_floor_m": 0.6115580918956548,
+        "body_ground_adjustment_m": 4.429842717945578e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.125,
+        "adjusted_tool_floor_m": 0.5320656088404357,
+        "body_ground_adjustment_m": 4.926066845655462e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.1875,
+        "adjusted_tool_floor_m": 0.6066380547815934,
+        "body_ground_adjustment_m": 6.537371315062067e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.25,
+        "adjusted_tool_floor_m": 0.665961772155948,
+        "body_ground_adjustment_m": 6.705475039780161e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.3125,
+        "adjusted_tool_floor_m": 0.6933395118210465,
+        "body_ground_adjustment_m": 5.766818299889585e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.375,
+        "adjusted_tool_floor_m": 0.6917106795115396,
+        "body_ground_adjustment_m": 2.2339625284075945e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.4375,
+        "adjusted_tool_floor_m": 0.6377854027776048,
+        "body_ground_adjustment_m": 1.4686863869430716e-07,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5,
+        "adjusted_tool_floor_m": 0.4870898709157482,
+        "body_ground_adjustment_m": 5.660996772348902e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5625,
+        "adjusted_tool_floor_m": 0.4136178956357762,
+        "body_ground_adjustment_m": 4.2902025394141695e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.625,
+        "adjusted_tool_floor_m": 0.5098238287135027,
+        "body_ground_adjustment_m": 0.00011065580090507867,
+        "nonhand_overlap_pairs": 5
+      },
+      {
+        "fraction": 0.6875,
+        "adjusted_tool_floor_m": 0.2649302588067949,
+        "body_ground_adjustment_m": 2.0156916230916998e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.75,
+        "adjusted_tool_floor_m": 0.04414977303147316,
+        "body_ground_adjustment_m": 6.271362304687521e-06,
+        "nonhand_overlap_pairs": 6
+      },
+      {
+        "fraction": 0.8125,
+        "adjusted_tool_floor_m": 0.026678667589090765,
+        "body_ground_adjustment_m": 8.889771904796364e-05,
+        "nonhand_overlap_pairs": 2
+      },
+      {
+        "fraction": 0.875,
+        "adjusted_tool_floor_m": 0.06432480197306722,
+        "body_ground_adjustment_m": 3.1052147969603747e-06,
+        "nonhand_overlap_pairs": 3
+      },
+      {
+        "fraction": 0.9375,
+        "adjusted_tool_floor_m": 0.040934947271831335,
+        "body_ground_adjustment_m": 9.451945312321207e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 1.0,
+        "adjusted_tool_floor_m": 0.016036225318908692,
+        "body_ground_adjustment_m": 3.887176513671896e-06,
+        "nonhand_overlap_pairs": 0
+      }
+    ]
+  },
+  {
+    "end_wrist_roll_degrees": -75,
+    "min_tool_floor_m": 0.02181206813454628,
+    "max_nonhand_overlap_pairs": 3,
+    "max_extra_body_floor_adjustment_m": 0.00011065580090507867,
+    "samples": [
+      {
+        "fraction": 0.0,
+        "adjusted_tool_floor_m": 0.6031848754025996,
+        "body_ground_adjustment_m": -2.7452372014522344e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.0625,
+        "adjusted_tool_floor_m": 0.6115580918956548,
+        "body_ground_adjustment_m": 4.429842717945578e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.125,
+        "adjusted_tool_floor_m": 0.5320656088404357,
+        "body_ground_adjustment_m": 4.926066845655462e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.1875,
+        "adjusted_tool_floor_m": 0.6066380547815934,
+        "body_ground_adjustment_m": 6.537371315062067e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.25,
+        "adjusted_tool_floor_m": 0.6657322942735627,
+        "body_ground_adjustment_m": 6.705475039780161e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.3125,
+        "adjusted_tool_floor_m": 0.6889775843117386,
+        "body_ground_adjustment_m": 5.766818299889585e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.375,
+        "adjusted_tool_floor_m": 0.6773740935130045,
+        "body_ground_adjustment_m": 2.2339625284075945e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.4375,
+        "adjusted_tool_floor_m": 0.6098205723790452,
+        "body_ground_adjustment_m": 1.4686863869430716e-07,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5,
+        "adjusted_tool_floor_m": 0.45783889149222523,
+        "body_ground_adjustment_m": 5.660996772348902e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5625,
+        "adjusted_tool_floor_m": 0.39410843113344163,
+        "body_ground_adjustment_m": 4.2902025394141695e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.625,
+        "adjusted_tool_floor_m": 0.5168634352847002,
+        "body_ground_adjustment_m": 0.00011065580090507867,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.6875,
+        "adjusted_tool_floor_m": 0.2725136385522783,
+        "body_ground_adjustment_m": 2.0156916230916998e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.75,
+        "adjusted_tool_floor_m": 0.05037801882624626,
+        "body_ground_adjustment_m": 6.271362304687521e-06,
+        "nonhand_overlap_pairs": 3
+      },
+      {
+        "fraction": 0.8125,
+        "adjusted_tool_floor_m": 0.03309403099026531,
+        "body_ground_adjustment_m": 8.889771904796364e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.875,
+        "adjusted_tool_floor_m": 0.07061782311554998,
+        "body_ground_adjustment_m": 3.1052147969603747e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.9375,
+        "adjusted_tool_floor_m": 0.04736154242325574,
+        "body_ground_adjustment_m": 9.451945312321207e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 1.0,
+        "adjusted_tool_floor_m": 0.02181206813454628,
+        "body_ground_adjustment_m": 3.887176513671896e-06,
+        "nonhand_overlap_pairs": 0
+      }
+    ]
+  },
+  {
+    "end_wrist_roll_degrees": -60,
+    "min_tool_floor_m": 0.030323875904083253,
+    "max_nonhand_overlap_pairs": 0,
+    "max_extra_body_floor_adjustment_m": 0.00011065580090507867,
+    "samples": [
+      {
+        "fraction": 0.0,
+        "adjusted_tool_floor_m": 0.6031848754025996,
+        "body_ground_adjustment_m": -2.7452372014522344e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.0625,
+        "adjusted_tool_floor_m": 0.6115580918956548,
+        "body_ground_adjustment_m": 4.429842717945578e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.125,
+        "adjusted_tool_floor_m": 0.5320656088404357,
+        "body_ground_adjustment_m": 4.926066845655462e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.1875,
+        "adjusted_tool_floor_m": 0.6066380547815934,
+        "body_ground_adjustment_m": 6.537371315062067e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.25,
+        "adjusted_tool_floor_m": 0.6655350028993562,
+        "body_ground_adjustment_m": 6.705475039780161e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.3125,
+        "adjusted_tool_floor_m": 0.685332104632631,
+        "body_ground_adjustment_m": 5.766818299889585e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.375,
+        "adjusted_tool_floor_m": 0.6660392570300028,
+        "body_ground_adjustment_m": 2.2339625284075945e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.4375,
+        "adjusted_tool_floor_m": 0.5867182292966172,
+        "body_ground_adjustment_m": 1.4686863869430716e-07,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5,
+        "adjusted_tool_floor_m": 0.4283717558244243,
+        "body_ground_adjustment_m": 5.660996772348902e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5625,
+        "adjusted_tool_floor_m": 0.3649848268358037,
+        "body_ground_adjustment_m": 4.2902025394141695e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.625,
+        "adjusted_tool_floor_m": 0.48946711398800835,
+        "body_ground_adjustment_m": 0.00011065580090507867,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.6875,
+        "adjusted_tool_floor_m": 0.28245226603373885,
+        "body_ground_adjustment_m": 2.0156916230916998e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.75,
+        "adjusted_tool_floor_m": 0.058983409613370896,
+        "body_ground_adjustment_m": 6.271362304687521e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.8125,
+        "adjusted_tool_floor_m": 0.042109375073574484,
+        "body_ground_adjustment_m": 8.889771904796364e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.875,
+        "adjusted_tool_floor_m": 0.07952906023617834,
+        "body_ground_adjustment_m": 3.1052147969603747e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.9375,
+        "adjusted_tool_floor_m": 0.05624506710935384,
+        "body_ground_adjustment_m": 9.451945312321207e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 1.0,
+        "adjusted_tool_floor_m": 0.030323875904083253,
+        "body_ground_adjustment_m": 3.887176513671896e-06,
+        "nonhand_overlap_pairs": 0
+      }
+    ]
+  },
+  {
+    "end_wrist_roll_degrees": -45,
+    "min_tool_floor_m": 0.040736758917570115,
+    "max_nonhand_overlap_pairs": 0,
+    "max_extra_body_floor_adjustment_m": 0.00011065580090507867,
+    "samples": [
+      {
+        "fraction": 0.0,
+        "adjusted_tool_floor_m": 0.6031848754025996,
+        "body_ground_adjustment_m": -2.7452372014522344e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.0625,
+        "adjusted_tool_floor_m": 0.6115580918956548,
+        "body_ground_adjustment_m": 4.429842717945578e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.125,
+        "adjusted_tool_floor_m": 0.5320656088404357,
+        "body_ground_adjustment_m": 4.926066845655462e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.1875,
+        "adjusted_tool_floor_m": 0.6066380547815934,
+        "body_ground_adjustment_m": 6.537371315062067e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.25,
+        "adjusted_tool_floor_m": 0.6653698384286836,
+        "body_ground_adjustment_m": 6.705475039780161e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.3125,
+        "adjusted_tool_floor_m": 0.682417795130983,
+        "body_ground_adjustment_m": 5.766818299889585e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.375,
+        "adjusted_tool_floor_m": 0.6579000639719889,
+        "body_ground_adjustment_m": 2.2339625284075945e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.4375,
+        "adjusted_tool_floor_m": 0.5690872945813462,
+        "body_ground_adjustment_m": 1.4686863869430716e-07,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5,
+        "adjusted_tool_floor_m": 0.40048128222022206,
+        "body_ground_adjustment_m": 5.660996772348902e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5625,
+        "adjusted_tool_floor_m": 0.33299525240343064,
+        "body_ground_adjustment_m": 4.2902025394141695e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.625,
+        "adjusted_tool_floor_m": 0.4431667921706103,
+        "body_ground_adjustment_m": 0.00011065580090507867,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.6875,
+        "adjusted_tool_floor_m": 0.29131884437426925,
+        "body_ground_adjustment_m": 2.0156916230916998e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.75,
+        "adjusted_tool_floor_m": 0.0693794841170311,
+        "body_ground_adjustment_m": 6.271362304687521e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.8125,
+        "adjusted_tool_floor_m": 0.05310629047360271,
+        "body_ground_adjustment_m": 8.889771904796364e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.875,
+        "adjusted_tool_floor_m": 0.09045116435643286,
+        "body_ground_adjustment_m": 3.1052147969603747e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.9375,
+        "adjusted_tool_floor_m": 0.06714821322727949,
+        "body_ground_adjustment_m": 9.451945312321207e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 1.0,
+        "adjusted_tool_floor_m": 0.040736758917570115,
+        "body_ground_adjustment_m": 3.887176513671896e-06,
+        "nonhand_overlap_pairs": 0
+      }
+    ]
+  },
+  {
+    "end_wrist_roll_degrees": 45,
+    "min_tool_floor_m": -0.20384326779842377,
+    "max_nonhand_overlap_pairs": 150,
+    "max_extra_body_floor_adjustment_m": 0.018250746488571168,
+    "samples": [
+      {
+        "fraction": 0.0,
+        "adjusted_tool_floor_m": 0.6031848754025996,
+        "body_ground_adjustment_m": -2.7452372014522344e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.0625,
+        "adjusted_tool_floor_m": 0.6115580918956548,
+        "body_ground_adjustment_m": 4.429842717945578e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.125,
+        "adjusted_tool_floor_m": 0.5320656088404357,
+        "body_ground_adjustment_m": 4.926066845655462e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.1875,
+        "adjusted_tool_floor_m": 0.6066380547815934,
+        "body_ground_adjustment_m": 6.537371315062067e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.25,
+        "adjusted_tool_floor_m": 0.6650537549974397,
+        "body_ground_adjustment_m": 6.705475039780161e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.3125,
+        "adjusted_tool_floor_m": 0.6807384342644364,
+        "body_ground_adjustment_m": 5.766818299889585e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.375,
+        "adjusted_tool_floor_m": 0.6769714641375467,
+        "body_ground_adjustment_m": 2.2339625284075945e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.4375,
+        "adjusted_tool_floor_m": 0.6078433074979112,
+        "body_ground_adjustment_m": 1.4686863869430716e-07,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5,
+        "adjusted_tool_floor_m": 0.3406125292638317,
+        "body_ground_adjustment_m": 5.660996772348902e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5625,
+        "adjusted_tool_floor_m": 0.22381955543439835,
+        "body_ground_adjustment_m": 4.2902025394141695e-05,
+        "nonhand_overlap_pairs": 150
+      },
+      {
+        "fraction": 0.625,
+        "adjusted_tool_floor_m": 0.28249397851666436,
+        "body_ground_adjustment_m": 0.00011065580090507867,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.6875,
+        "adjusted_tool_floor_m": 0.016386567916721106,
+        "body_ground_adjustment_m": 2.0156916230916998e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.75,
+        "adjusted_tool_floor_m": -0.18909307026863098,
+        "body_ground_adjustment_m": 6.271362304687521e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.8125,
+        "adjusted_tool_floor_m": -0.20180543435364962,
+        "body_ground_adjustment_m": 0.0128050379678607,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.875,
+        "adjusted_tool_floor_m": -0.180175671168603,
+        "body_ground_adjustment_m": 3.1052147969603747e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.9375,
+        "adjusted_tool_floor_m": -0.20317567424010485,
+        "body_ground_adjustment_m": 9.451945312321207e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 1.0,
+        "adjusted_tool_floor_m": -0.20384326779842377,
+        "body_ground_adjustment_m": 0.018250746488571168,
+        "nonhand_overlap_pairs": 0
+      }
+    ]
+  },
+  {
+    "end_wrist_roll_degrees": 60,
+    "min_tool_floor_m": -0.20178560556471348,
+    "max_nonhand_overlap_pairs": 158,
+    "max_extra_body_floor_adjustment_m": 0.02824929712712765,
+    "samples": [
+      {
+        "fraction": 0.0,
+        "adjusted_tool_floor_m": 0.6031848754025996,
+        "body_ground_adjustment_m": -2.7452372014522344e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.0625,
+        "adjusted_tool_floor_m": 0.6115580918956548,
+        "body_ground_adjustment_m": 4.429842717945578e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.125,
+        "adjusted_tool_floor_m": 0.5320656088404357,
+        "body_ground_adjustment_m": 4.926066845655462e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.1875,
+        "adjusted_tool_floor_m": 0.6066380547815934,
+        "body_ground_adjustment_m": 6.537371315062067e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.25,
+        "adjusted_tool_floor_m": 0.6651137172700837,
+        "body_ground_adjustment_m": 6.705475039780161e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.3125,
+        "adjusted_tool_floor_m": 0.6831035465691239,
+        "body_ground_adjustment_m": 5.766818299889585e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.375,
+        "adjusted_tool_floor_m": 0.6899088907046244,
+        "body_ground_adjustment_m": 2.2339625284075945e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.4375,
+        "adjusted_tool_floor_m": 0.6352343835858628,
+        "body_ground_adjustment_m": 1.4686863869430716e-07,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5,
+        "adjusted_tool_floor_m": 0.3540966496327892,
+        "body_ground_adjustment_m": 5.660996772348902e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5625,
+        "adjusted_tool_floor_m": 0.2310591057864949,
+        "body_ground_adjustment_m": 4.2902025394141695e-05,
+        "nonhand_overlap_pairs": 158
+      },
+      {
+        "fraction": 0.625,
+        "adjusted_tool_floor_m": 0.2927514610453509,
+        "body_ground_adjustment_m": 0.00011065580090507867,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.6875,
+        "adjusted_tool_floor_m": 0.019562331330031157,
+        "body_ground_adjustment_m": 2.0156916230916998e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.75,
+        "adjusted_tool_floor_m": -0.19252199137210846,
+        "body_ground_adjustment_m": 6.271362304687521e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.8125,
+        "adjusted_tool_floor_m": -0.19931308755278587,
+        "body_ground_adjustment_m": 0.021722273737192155,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.875,
+        "adjusted_tool_floor_m": -0.18048622626904398,
+        "body_ground_adjustment_m": 3.1052147969603747e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.9375,
+        "adjusted_tool_floor_m": -0.20033604109287262,
+        "body_ground_adjustment_m": 0.00492913818359375,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 1.0,
+        "adjusted_tool_floor_m": -0.20178560556471348,
+        "body_ground_adjustment_m": 0.02824929712712765,
+        "nonhand_overlap_pairs": 0
+      }
+    ]
+  },
+  {
+    "end_wrist_roll_degrees": 75,
+    "min_tool_floor_m": -0.19096876138448715,
+    "max_nonhand_overlap_pairs": 95,
+    "max_extra_body_floor_adjustment_m": 0.033869718968868257,
+    "samples": [
+      {
+        "fraction": 0.0,
+        "adjusted_tool_floor_m": 0.6031848754025996,
+        "body_ground_adjustment_m": -2.7452372014522344e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.0625,
+        "adjusted_tool_floor_m": 0.6115580918956548,
+        "body_ground_adjustment_m": 4.429842717945578e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.125,
+        "adjusted_tool_floor_m": 0.5320656088404357,
+        "body_ground_adjustment_m": 4.926066845655462e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.1875,
+        "adjusted_tool_floor_m": 0.6066380547815934,
+        "body_ground_adjustment_m": 6.537371315062067e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.25,
+        "adjusted_tool_floor_m": 0.6652058660509065,
+        "body_ground_adjustment_m": 6.705475039780161e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.3125,
+        "adjusted_tool_floor_m": 0.6862090081665665,
+        "body_ground_adjustment_m": 5.766818299889585e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.375,
+        "adjusted_tool_floor_m": 0.7057776140971109,
+        "body_ground_adjustment_m": 2.2339625284075945e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.4375,
+        "adjusted_tool_floor_m": 0.667228428366594,
+        "body_ground_adjustment_m": 1.4686863869430716e-07,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5,
+        "adjusted_tool_floor_m": 0.3737187073091045,
+        "body_ground_adjustment_m": 5.660996772348902e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5625,
+        "adjusted_tool_floor_m": 0.24583994010370225,
+        "body_ground_adjustment_m": 4.2902025394141695e-05,
+        "nonhand_overlap_pairs": 95
+      },
+      {
+        "fraction": 0.625,
+        "adjusted_tool_floor_m": 0.3124260304137133,
+        "body_ground_adjustment_m": 0.00011065580090507867,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.6875,
+        "adjusted_tool_floor_m": 0.038341301795095206,
+        "body_ground_adjustment_m": 2.0156916230916998e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.75,
+        "adjusted_tool_floor_m": -0.17772437834739685,
+        "body_ground_adjustment_m": 6.271362304687521e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.8125,
+        "adjusted_tool_floor_m": -0.1889300515651703,
+        "body_ground_adjustment_m": 0.025871826171875,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.875,
+        "adjusted_tool_floor_m": -0.16945473272446543,
+        "body_ground_adjustment_m": 3.1052147969603747e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.9375,
+        "adjusted_tool_floor_m": -0.18590683506429195,
+        "body_ground_adjustment_m": 0.008848510518670083,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 1.0,
+        "adjusted_tool_floor_m": -0.19096876138448715,
+        "body_ground_adjustment_m": 0.033869718968868257,
+        "nonhand_overlap_pairs": 0
+      }
+    ]
+  },
+  {
+    "end_wrist_roll_degrees": 90,
+    "min_tool_floor_m": -0.17482755163311958,
+    "max_nonhand_overlap_pairs": 47,
+    "max_extra_body_floor_adjustment_m": 0.03320679983496666,
+    "samples": [
+      {
+        "fraction": 0.0,
+        "adjusted_tool_floor_m": 0.6031848754025996,
+        "body_ground_adjustment_m": -2.7452372014522344e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.0625,
+        "adjusted_tool_floor_m": 0.6115580918956548,
+        "body_ground_adjustment_m": 4.429842717945578e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.125,
+        "adjusted_tool_floor_m": 0.5320656088404357,
+        "body_ground_adjustment_m": 4.926066845655462e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.1875,
+        "adjusted_tool_floor_m": 0.6066380547815934,
+        "body_ground_adjustment_m": 6.537371315062067e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.25,
+        "adjusted_tool_floor_m": 0.6653302609445527,
+        "body_ground_adjustment_m": 6.705475039780161e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.3125,
+        "adjusted_tool_floor_m": 0.6900421232674271,
+        "body_ground_adjustment_m": 5.766818299889585e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.375,
+        "adjusted_tool_floor_m": 0.7241763758463785,
+        "body_ground_adjustment_m": 2.2339625284075945e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.4375,
+        "adjusted_tool_floor_m": 0.7016631641415879,
+        "body_ground_adjustment_m": 1.4686863869430716e-07,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5,
+        "adjusted_tool_floor_m": 0.39818841074500233,
+        "body_ground_adjustment_m": 5.660996772348902e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.5625,
+        "adjusted_tool_floor_m": 0.2675741181699559,
+        "body_ground_adjustment_m": 4.2902025394141695e-05,
+        "nonhand_overlap_pairs": 47
+      },
+      {
+        "fraction": 0.625,
+        "adjusted_tool_floor_m": 0.3410973248644732,
+        "body_ground_adjustment_m": 0.00011065580090507867,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.6875,
+        "adjusted_tool_floor_m": 0.06788971584662795,
+        "body_ground_adjustment_m": 2.0156916230916998e-05,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.75,
+        "adjusted_tool_floor_m": -0.1451901068687439,
+        "body_ground_adjustment_m": 6.271362304687521e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.8125,
+        "adjusted_tool_floor_m": -0.17132744581997394,
+        "body_ground_adjustment_m": 0.02380990593135357,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.875,
+        "adjusted_tool_floor_m": -0.1439566256487742,
+        "body_ground_adjustment_m": 3.1052147969603747e-06,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 0.9375,
+        "adjusted_tool_floor_m": -0.16511768025904894,
+        "body_ground_adjustment_m": 0.00642526226490736,
+        "nonhand_overlap_pairs": 0
+      },
+      {
+        "fraction": 1.0,
+        "adjusted_tool_floor_m": -0.17482755163311958,
+        "body_ground_adjustment_m": 0.03320679983496666,
+        "nonhand_overlap_pairs": 0
+      }
+    ]
+  }
+]

@@ -1,0 +1,207 @@
+{
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v4.3.47",
+    "version": "2.0"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        1
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "extras": {
+        "asset_id": "horde.e01.abbey-maintenance-mallet.v1",
+        "provenance": "Original deterministic local Blender geometry and procedural texture authoring.",
+        "grip_diameter_m": "0.027 x 0.023",
+        "grip_region_blender_z_m": "-0.040 to +0.060",
+        "authoring_seed": 261006
+      },
+      "mesh": 0,
+      "name": "AbbeyMaintenanceMallet"
+    },
+    {
+      "children": [
+        0
+      ],
+      "extras": {
+        "reference": "Provisional tool grip origin; not a measured E01 RightGrip hand transform.",
+        "handle_axis_blender": "+Z",
+        "head_axis_blender": "+X"
+      },
+      "name": "Grip"
+    }
+  ],
+  "materials": [
+    {
+      "name": "AbbeyMallet_PBR_Atlas",
+      "normalTexture": {
+        "index": 0,
+        "scale": 0.6000000238418579
+      },
+      "occlusionTexture": {
+        "index": 1
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 2
+        },
+        "metallicRoughnessTexture": {
+          "index": 1
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "AbbeyMallet_OriginalMesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "TANGENT": 3
+          },
+          "indices": 4,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    }
+  ],
+  "images": [
+    {
+      "bufferView": 5,
+      "mimeType": "image/png",
+      "name": "abbey_mallet_normal"
+    },
+    {
+      "bufferView": 6,
+      "mimeType": "image/png",
+      "name": "abbey_mallet_orm"
+    },
+    {
+      "bufferView": 7,
+      "mimeType": "image/png",
+      "name": "abbey_mallet_basecolor"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 850,
+      "max": [
+        0.05999999865889549,
+        0.2849999964237213,
+        0.021348631009459496
+      ],
+      "min": [
+        -0.05999999865889549,
+        -0.054999999701976776,
+        -0.021393563598394394
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 850,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 850,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 850,
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5123,
+      "count": 1548,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 10200,
+      "byteOffset": 0,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 10200,
+      "byteOffset": 10200,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 6800,
+      "byteOffset": 20400,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 13600,
+      "byteOffset": 27200,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 3096,
+      "byteOffset": 40800,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 273577,
+      "byteOffset": 43896
+    },
+    {
+      "buffer": 0,
+      "byteLength": 202448,
+      "byteOffset": 317476
+    },
+    {
+      "buffer": 0,
+      "byteLength": 331321,
+      "byteOffset": 519924
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 851248
+    }
+  ]
+}

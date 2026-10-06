@@ -1,0 +1,868 @@
+{
+  "source": "/source-workspace/horde-meshy/abbey-attendant/derivatives/animated-v06/export/E01_AbbeyAttendant_all_clips.glb",
+  "roundtrip": "/source-workspace/horde-meshy/abbey-attendant/qa/roundtrip/localtime-linear/E01_AbbeyAttendant_all_clips.glb",
+  "source_sha256": "4b85f467abe05c3ddd87d6571c424acbc9e3f0b64fe835d14b1aba91ad04deec",
+  "roundtrip_sha256": "12cbaadf32599a6f31d061d14fd80f0ea09fdf1478723a070d232476b4c1d092",
+  "format_pass": true,
+  "triangle_counts": [
+    14122,
+    14122
+  ],
+  "exported_vertex_counts": [
+    17173,
+    17175
+  ],
+  "vertex_note": "Two harmless tangent/normal seam duplicates added by round-trip export; triangle count unchanged",
+  "joint_counts": [
+    25,
+    25
+  ],
+  "clip_names_durations_equal": true,
+  "image_pixels_identical": true,
+  "max_sampled_joint_position_error_m": 5.045324247016052e-06,
+  "max_sampled_matrix_component_error": 3.69550000001162e-06,
+  "bone_import_mode": "BLENDER",
+  "time_import_note": "Normalize imported NLA strip start to zero before re-export; otherwise Blender adds a frame to every clip",
+  "samples": [
+    {
+      "clip": "Idle_5",
+      "fraction": 0,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.769999999866323e-08,
+      "position_error_m": 1.772452041534045e-08
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 0,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.2516999999823142e-06,
+      "position_error_m": 1.387990050381553e-06
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 0,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.8013999999743078e-06,
+      "position_error_m": 4.044062657756085e-06
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 0.25,
+      "node": "Hips",
+      "matrix_max_abs_error": 2.013899999997633e-08,
+      "position_error_m": 2.016934148178945e-08
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 0.25,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.028179999997686e-06,
+      "position_error_m": 1.3641858972684938e-06
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 0.25,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.801499999982582e-06,
+      "position_error_m": 3.797456592355209e-06
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 0.5,
+      "node": "Hips",
+      "matrix_max_abs_error": 2.1419999999411354e-08,
+      "position_error_m": 2.142506840069977e-08
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 0.5,
+      "node": "RightHand",
+      "matrix_max_abs_error": 9.834999999958072e-07,
+      "position_error_m": 1.0787004495958656e-06
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 0.5,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.712000000015813e-06,
+      "position_error_m": 3.2850097869454523e-06
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 0.75,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.6297999999928536e-08,
+      "position_error_m": 1.6536771268700038e-08
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 0.75,
+      "node": "RightHand",
+      "matrix_max_abs_error": 6.258999999952941e-07,
+      "position_error_m": 8.136244035051075e-07
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 0.75,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.6225999999462957e-06,
+      "position_error_m": 3.3897301721095846e-06
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 1,
+      "node": "Hips",
+      "matrix_max_abs_error": 2.1420000001146078e-08,
+      "position_error_m": 2.1440222971075622e-08
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 1,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.1325000000006469e-06,
+      "position_error_m": 1.1879907617652616e-06
+    },
+    {
+      "clip": "Idle_5",
+      "fraction": 1,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.6076999999902206e-06,
+      "position_error_m": 3.926244839542586e-06
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0,
+      "node": "Hips",
+      "matrix_max_abs_error": 6.565799999958682e-08,
+      "position_error_m": 6.58229489839071e-08
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0,
+      "node": "RightHand",
+      "matrix_max_abs_error": 5.960000000193588e-07,
+      "position_error_m": 8.64554115189005e-07
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.847700000001673e-06,
+      "position_error_m": 2.6189206081924427e-06
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.25,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.787999999169898e-07,
+      "position_error_m": 1.87386578947889e-07
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.25,
+      "node": "RightHand",
+      "matrix_max_abs_error": 2.2650000000012938e-06,
+      "position_error_m": 3.1200749094091274e-06
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.25,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 3.3677000000342794e-06,
+      "position_error_m": 4.6522961352226566e-06
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.5,
+      "node": "Hips",
+      "matrix_max_abs_error": 5.96000000463448e-08,
+      "position_error_m": 7.452321521616596e-08
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.5,
+      "node": "RightHand",
+      "matrix_max_abs_error": 2.443790000000723e-06,
+      "position_error_m": 2.6960761884863565e-06
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.5,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.475210000004279e-06,
+      "position_error_m": 1.2179592111435827e-06
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.75,
+      "node": "Hips",
+      "matrix_max_abs_error": 4.738099999997657e-08,
+      "position_error_m": 4.738099999997657e-08
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.75,
+      "node": "RightHand",
+      "matrix_max_abs_error": 8.493999999747981e-07,
+      "position_error_m": 1.203746567963179e-06
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.75,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.6986999999968333e-06,
+      "position_error_m": 2.055427434855704e-06
+    },
+    {
+      "clip": "Attack",
+      "fraction": 1,
+      "node": "Hips",
+      "matrix_max_abs_error": 6.938299999988129e-08,
+      "position_error_m": 6.953904676502242e-08
+    },
+    {
+      "clip": "Attack",
+      "fraction": 1,
+      "node": "RightHand",
+      "matrix_max_abs_error": 8.939999999180159e-07,
+      "position_error_m": 1.1146702516233151e-06
+    },
+    {
+      "clip": "Attack",
+      "fraction": 1,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.5496999999919936e-06,
+      "position_error_m": 2.0699116791769727e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0,
+      "node": "Hips",
+      "matrix_max_abs_error": 6.70600000009236e-08,
+      "position_error_m": 6.70664483935524e-08
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.1920999999359694e-06,
+      "position_error_m": 1.2482363174720488e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.6092999999828272e-06,
+      "position_error_m": 2.0239161302637e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.25,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.1929999998994134e-07,
+      "position_error_m": 1.2935354651530406e-07
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.25,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.609299999927316e-06,
+      "position_error_m": 2.257154865460565e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.25,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.0824399999952448e-06,
+      "position_error_m": 2.8441653175827363e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.5,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.266599999882878e-07,
+      "position_error_m": 1.401773005495113e-07
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.5,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.072899999954302e-06,
+      "position_error_m": 1.4617143478808507e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.5,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 3.69550000001162e-06,
+      "position_error_m": 4.428542698566369e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.75,
+      "node": "Hips",
+      "matrix_max_abs_error": 2.3840000001884576e-07,
+      "position_error_m": 2.461884034661418e-07
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.75,
+      "node": "RightHand",
+      "matrix_max_abs_error": 2.212819999999893e-06,
+      "position_error_m": 2.4271631631416503e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.75,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 3.69499999997025e-06,
+      "position_error_m": 4.126524324608123e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 1,
+      "node": "Hips",
+      "matrix_max_abs_error": 2.830999999980932e-07,
+      "position_error_m": 3.7078555794577383e-07
+    },
+    {
+      "clip": "Dead",
+      "fraction": 1,
+      "node": "RightHand",
+      "matrix_max_abs_error": 2.980230000004802e-06,
+      "position_error_m": 3.4656078063430764e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 1,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 3.673140000007291e-06,
+      "position_error_m": 5.045324247016052e-06
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0,
+      "node": "Hips",
+      "matrix_max_abs_error": 4.074499999982134e-09,
+      "position_error_m": 3.907402717673301e-09
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0,
+      "node": "RightHand",
+      "matrix_max_abs_error": 6.556999999629554e-07,
+      "position_error_m": 6.747006595045015e-07
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.3850000001601757e-06,
+      "position_error_m": 3.417045473894969e-06
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0.25,
+      "node": "Hips",
+      "matrix_max_abs_error": 5.959999999083365e-08,
+      "position_error_m": 6.302380581064438e-08
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0.25,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.944600000001323e-06,
+      "position_error_m": 1.9770984194039762e-06
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0.25,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.741999999944511e-06,
+      "position_error_m": 3.796774186046333e-06
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0.5,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.1929999998994134e-07,
+      "position_error_m": 1.3664805153977603e-07
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0.5,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.1920000000387176e-06,
+      "position_error_m": 1.5848824720085925e-06
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0.5,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.0265999999963258e-06,
+      "position_error_m": 2.7408107943161627e-06
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0.75,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.191999999816673e-07,
+      "position_error_m": 1.194325855682151e-07
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0.75,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.0430999999866408e-06,
+      "position_error_m": 1.348054913583327e-06
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 0.75,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 3.606099999997614e-06,
+      "position_error_m": 3.7017651694695096e-06
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 1,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.788000000280121e-07,
+      "position_error_m": 1.791491903693342e-07
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 1,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.043100000042152e-06,
+      "position_error_m": 1.3316675449290197e-06
+    },
+    {
+      "clip": "Hit_Reaction",
+      "fraction": 1,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.890800000043825e-06,
+      "position_error_m": 3.3512817906286016e-06
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0,
+      "node": "Hips",
+      "matrix_max_abs_error": 5.590000001082229e-09,
+      "position_error_m": 5.761918865469644e-09
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.668999999981935e-06,
+      "position_error_m": 2.0979964257348275e-06
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.6093999999355901e-06,
+      "position_error_m": 1.3080569253075057e-06
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0.25,
+      "node": "Hips",
+      "matrix_max_abs_error": 7.4499999988542065e-09,
+      "position_error_m": 7.681106690488363e-09
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0.25,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.7881999999636022e-06,
+      "position_error_m": 1.9426006259582474e-06
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0.25,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.3410999999963202e-06,
+      "position_error_m": 1.1144402200262265e-06
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0.5,
+      "node": "Hips",
+      "matrix_max_abs_error": 2.235999999045113e-08,
+      "position_error_m": 3.161474497334261e-08
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0.5,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.2516999999823142e-06,
+      "position_error_m": 1.468548078875831e-06
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0.5,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.490100000056671e-06,
+      "position_error_m": 1.7007933267018297e-06
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0.75,
+      "node": "Hips",
+      "matrix_max_abs_error": 7.4500000057931e-09,
+      "position_error_m": 7.4500000057931e-09
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0.75,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.4305000000103263e-06,
+      "position_error_m": 1.6063827485788721e-06
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 0.75,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.3708999999639815e-06,
+      "position_error_m": 1.3644295525564577e-06
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 1,
+      "node": "Hips",
+      "matrix_max_abs_error": 5.590000001082229e-09,
+      "position_error_m": 5.590000001082229e-09
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 1,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.6093000000383384e-06,
+      "position_error_m": 1.8385909469214482e-06
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "fraction": 1,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.8179000000062562e-06,
+      "position_error_m": 1.1060143128119365e-06
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0,
+      "node": "Hips",
+      "matrix_max_abs_error": 3.5507000000259935e-09,
+      "position_error_m": 2.3262005512796536e-09
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.1921000000469917e-06,
+      "position_error_m": 1.299615853127067e-06
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.4900999999456488e-06,
+      "position_error_m": 1.8346858581221669e-06
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0.25,
+      "node": "Hips",
+      "matrix_max_abs_error": 7.4499999988542065e-09,
+      "position_error_m": 1.0535891038059161e-08
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0.25,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.0729000000653244e-06,
+      "position_error_m": 1.2870619177556584e-06
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0.25,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.6093000000383384e-06,
+      "position_error_m": 1.7694306598716612e-06
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0.5,
+      "node": "Hips",
+      "matrix_max_abs_error": 7.45999999968161e-09,
+      "position_error_m": 7.45999999968161e-09
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0.5,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.5498000000002676e-06,
+      "position_error_m": 1.7011340864470855e-06
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0.5,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.430499999899304e-06,
+      "position_error_m": 1.3355768201480226e-06
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0.75,
+      "node": "Hips",
+      "matrix_max_abs_error": 5.590000001082229e-09,
+      "position_error_m": 5.666833332051848e-09
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0.75,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.907400000056292e-06,
+      "position_error_m": 2.0141191937449333e-06
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 0.75,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.2814999999499754e-06,
+      "position_error_m": 1.0132894145700392e-06
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 1,
+      "node": "Hips",
+      "matrix_max_abs_error": 3.729999999840805e-09,
+      "position_error_m": 4.118423970244017e-09
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 1,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.847700000001673e-06,
+      "position_error_m": 1.9328786976932917e-06
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "fraction": 1,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.847700000001673e-06,
+      "position_error_m": 1.1310274664724025e-06
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0,
+      "node": "Hips",
+      "matrix_max_abs_error": 7.80000000005776e-09,
+      "position_error_m": 7.85536510935309e-09
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.1771999999937721e-06,
+      "position_error_m": 1.5008420569392176e-06
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.7286000000282797e-06,
+      "position_error_m": 2.1564699603803744e-06
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.25,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.839400000001011e-08,
+      "position_error_m": 1.8766396457312514e-08
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.25,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.6391000000059996e-06,
+      "position_error_m": 1.6531336122731536e-06
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.25,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.7880999999553282e-06,
+      "position_error_m": 2.2071747982040025e-06
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.5,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.5840000000891252e-08,
+      "position_error_m": 1.6273244913082493e-08
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.5,
+      "node": "RightHand",
+      "matrix_max_abs_error": 7.748000000473709e-07,
+      "position_error_m": 1.2205795068605628e-06
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.5,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.847700000001673e-06,
+      "position_error_m": 2.1926047533538973e-06
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.75,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.676999999977724e-08,
+      "position_error_m": 1.7179807914855772e-08
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.75,
+      "node": "RightHand",
+      "matrix_max_abs_error": 5.960999999998773e-07,
+      "position_error_m": 8.476694933908107e-07
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.75,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.3246000000476386e-06,
+      "position_error_m": 2.667946523120039e-06
+    },
+    {
+      "clip": "Walking",
+      "fraction": 1,
+      "node": "Hips",
+      "matrix_max_abs_error": 5.355000000069679e-09,
+      "position_error_m": 5.4353275891234995e-09
+    },
+    {
+      "clip": "Walking",
+      "fraction": 1,
+      "node": "RightHand",
+      "matrix_max_abs_error": 9.909299999999455e-07,
+      "position_error_m": 1.5933729365029677e-06
+    },
+    {
+      "clip": "Walking",
+      "fraction": 1,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.3709000000750038e-06,
+      "position_error_m": 1.924116779256304e-06
+    },
+    {
+      "clip": "Running",
+      "fraction": 0,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.6297999999928536e-08,
+      "position_error_m": 1.6304660683300096e-08
+    },
+    {
+      "clip": "Running",
+      "fraction": 0,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.0728000000015392e-06,
+      "position_error_m": 1.0778582142391694e-06
+    },
+    {
+      "clip": "Running",
+      "fraction": 0,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.937100000015679e-06,
+      "position_error_m": 2.075354275827504e-06
+    },
+    {
+      "clip": "Running",
+      "fraction": 0.25,
+      "node": "Hips",
+      "matrix_max_abs_error": 3.0270000000477693e-09,
+      "position_error_m": 2.875987482665725e-09
+    },
+    {
+      "clip": "Running",
+      "fraction": 0.25,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.3410999999963202e-06,
+      "position_error_m": 1.4328112144776043e-06
+    },
+    {
+      "clip": "Running",
+      "fraction": 0.25,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.4006999999871539e-06,
+      "position_error_m": 1.952605288254332e-06
+    },
+    {
+      "clip": "Running",
+      "fraction": 0.5,
+      "node": "Hips",
+      "matrix_max_abs_error": 2.4219999998631447e-08,
+      "position_error_m": 2.4260255747494974e-08
+    },
+    {
+      "clip": "Running",
+      "fraction": 0.5,
+      "node": "RightHand",
+      "matrix_max_abs_error": 5.364000000285252e-07,
+      "position_error_m": 5.870588727186194e-07
+    },
+    {
+      "clip": "Running",
+      "fraction": 0.5,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 3.0398999999459164e-06,
+      "position_error_m": 3.061477411263759e-06
+    },
+    {
+      "clip": "Running",
+      "fraction": 0.75,
+      "node": "Hips",
+      "matrix_max_abs_error": 5.5800000002548256e-09,
+      "position_error_m": 5.5800000002548256e-09
+    },
+    {
+      "clip": "Running",
+      "fraction": 0.75,
+      "node": "RightHand",
+      "matrix_max_abs_error": 4.4710000002279315e-07,
+      "position_error_m": 5.500321326218581e-07
+    },
+    {
+      "clip": "Running",
+      "fraction": 0.75,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 2.384099999974687e-06,
+      "position_error_m": 2.890028608159527e-06
+    },
+    {
+      "clip": "Running",
+      "fraction": 1,
+      "node": "Hips",
+      "matrix_max_abs_error": 1.3039000000374112e-08,
+      "position_error_m": 1.3047324515380057e-08
+    },
+    {
+      "clip": "Running",
+      "fraction": 1,
+      "node": "RightHand",
+      "matrix_max_abs_error": 1.2815000000054866e-06,
+      "position_error_m": 1.288392568273177e-06
+    },
+    {
+      "clip": "Running",
+      "fraction": 1,
+      "node": "RightGrip",
+      "matrix_max_abs_error": 1.6391000000059996e-06,
+      "position_error_m": 1.9030819793361795e-06
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "reviewed": [
+    "Closed front",
+    "Open front",
+    "Open three-quarter",
+    "Closed side",
+    "Helmet/hinge closeup",
+    "Fresh shell GLB import",
+    "Actual rig closed",
+    "Actual rig open",
+    "Standalone repaired core rear"
+  ],
+  "findings": [
+    "Independent paired shutters expose a broad unlit padded torso",
+    "Helmet/visor has a real sight slit",
+    "Shoulder guards are separate; axilla spaces clear in inspected bind pose",
+    "Fixed side/back cuirass remains separate from front shutters",
+    "No symbols or emissive core added",
+    "Rig binding preserves authored rest and expected hinge rotations numerically"
+  ],
+  "limitations": [
+    "Small documented nape colour/cloth seam in the source pilot",
+    "Combat/defeat pose clearance deferred to separate motion trial",
+    "No runtime reflector-path or valid-attack implementation",
+    "No generic native body+shell PBR integration proved"
+  ]
+}

@@ -1,0 +1,1 @@
+{"chest":"Spine","head":"Head","upper_arm_left":"LeftArm","upper_arm_right":"RightArm","basis":"Read actual Meshy rig v03 joints and world-space imported bounds; original skeleton has centimetre-local units with object scale, which is preserved. Shell helpers are placed through the inverse armature world matrix."}

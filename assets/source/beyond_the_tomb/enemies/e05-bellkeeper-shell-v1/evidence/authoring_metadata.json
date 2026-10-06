@@ -1,0 +1,590 @@
+{
+  "asset_id": "E05",
+  "status": "Original modular source proposal; no runtime import/animation certification",
+  "core_source": "/source-workspace/horde-meshy/bellkeeper/accepted-core-v03f/bellkeeper_inner_2m_1k.glb",
+  "core_sha256": "4af085abce4c00858f647c806ec03fd54b6bbbd3ae04efdcae91578d32ff55b8",
+  "fit": {
+    "inspected": true,
+    "basis": "Final accepted-core-v03f: measured textured 2m core, feet at zero, rear-neck two-hole patch; local residual nape texture/cloth seam documented; source pilot only.",
+    "core_uniform_scale": 1,
+    "core_rotation_z_degrees": 0,
+    "core_offset": [
+      0,
+      0,
+      0
+    ],
+    "chest": {
+      "mount": [
+        0,
+        0.01,
+        1.42
+      ],
+      "back_rows": [
+        [
+          1.12,
+          0.225,
+          0.184,
+          0.01
+        ],
+        [
+          1.3,
+          0.255,
+          0.198,
+          0.01
+        ],
+        [
+          1.49,
+          0.272,
+          0.212,
+          0.01
+        ],
+        [
+          1.6,
+          0.245,
+          0.203,
+          0.012
+        ],
+        [
+          1.65,
+          0.178,
+          0.172,
+          0.012
+        ]
+      ],
+      "back_arc_radians": 2.094395102,
+      "gorget_rows": [
+        [
+          1.645,
+          0.16,
+          0.14,
+          0.005
+        ],
+        [
+          1.7,
+          0.13,
+          0.123,
+          0.005
+        ],
+        [
+          1.755,
+          0.112,
+          0.11,
+          0.005
+        ]
+      ],
+      "hinge_x": 0.25,
+      "hinge_y": -0.123,
+      "hinge_z": 1.38,
+      "open_angle_degrees": 95,
+      "centre_seam_halfgap": 0.006,
+      "shutter_rows": [
+        [
+          1.12,
+          0.227,
+          -0.212
+        ],
+        [
+          1.29,
+          0.25,
+          -0.225
+        ],
+        [
+          1.46,
+          0.252,
+          -0.226
+        ],
+        [
+          1.6,
+          0.222,
+          -0.203
+        ]
+      ],
+      "top_centre_raise": 0.04,
+      "plate_convexity": 0.084,
+      "hinge_barrel_z": [
+        1.245,
+        1.51
+      ],
+      "receiver": [
+        0,
+        -0.21,
+        1.57
+      ],
+      "exposure_centre": [
+        0,
+        -0.167,
+        1.36
+      ]
+    },
+    "head": {
+      "mount": [
+        0,
+        0,
+        1.88
+      ],
+      "crown_rows": [
+        [
+          1.886,
+          0.122,
+          0.15,
+          0.006
+        ],
+        [
+          1.934,
+          0.12,
+          0.142,
+          0.006
+        ],
+        [
+          1.985,
+          0.1,
+          0.12,
+          0.006
+        ],
+        [
+          2.023,
+          0.065,
+          0.082,
+          0.006
+        ],
+        [
+          2.038,
+          0.023,
+          0.031,
+          0.006
+        ]
+      ],
+      "rear_rows": [
+        [
+          1.765,
+          0.115,
+          0.126,
+          0.009
+        ],
+        [
+          1.817,
+          0.127,
+          0.142,
+          0.008
+        ],
+        [
+          1.892,
+          0.124,
+          0.148,
+          0.006
+        ]
+      ],
+      "rear_arc_radians": 1.919862177,
+      "visor_rows": [
+        [
+          1.764,
+          0.092,
+          0.13,
+          0.001
+        ],
+        [
+          1.81,
+          0.118,
+          0.158,
+          0.001
+        ],
+        [
+          1.866,
+          0.122,
+          0.16,
+          0.001
+        ]
+      ],
+      "visor_half_arc": 1.535889742
+    },
+    "shoulders": {
+      "centre_x": 0.3,
+      "centre_y": 0.025,
+      "centre_z": 1.583,
+      "start_x": 0.245,
+      "radius": 0.104,
+      "length": 0.127,
+      "layer_step": 0.08,
+      "slope_z_per_x": -0.85
+    },
+    "core_sha256": "4af085abce4c00858f647c806ec03fd54b6bbbd3ae04efdcae91578d32ff55b8"
+  },
+  "source_counts": {
+    "Cuirass_BackAndSides": {
+      "vertices": 170,
+      "triangles": 336
+    },
+    "Gorget_NeckRing": {
+      "vertices": 120,
+      "triangles": 240
+    },
+    "BreastShutter.L": {
+      "vertices": 88,
+      "triangles": 172
+    },
+    "ShutterHingeBarrel.L.0": {
+      "vertices": 20,
+      "triangles": 36
+    },
+    "FixedHingeCleat.L.0": {
+      "vertices": 8,
+      "triangles": 12
+    },
+    "ShutterHingeBarrel.L.1": {
+      "vertices": 20,
+      "triangles": 36
+    },
+    "FixedHingeCleat.L.1": {
+      "vertices": 8,
+      "triangles": 12
+    },
+    "BreastShutter.R": {
+      "vertices": 88,
+      "triangles": 172
+    },
+    "ShutterHingeBarrel.R.0": {
+      "vertices": 20,
+      "triangles": 36
+    },
+    "FixedHingeCleat.R.0": {
+      "vertices": 8,
+      "triangles": 12
+    },
+    "ShutterHingeBarrel.R.1": {
+      "vertices": 20,
+      "triangles": 36
+    },
+    "FixedHingeCleat.R.1": {
+      "vertices": 8,
+      "triangles": 12
+    },
+    "Helmet_Crown": {
+      "vertices": 200,
+      "triangles": 400
+    },
+    "Helmet_Top": {
+      "vertices": 42,
+      "triangles": 80
+    },
+    "Helmet_RearSkirt": {
+      "vertices": 114,
+      "triangles": 224
+    },
+    "Helmet_Visor": {
+      "vertices": 102,
+      "triangles": 200
+    },
+    "ShoulderLame.L.1": {
+      "vertices": 104,
+      "triangles": 204
+    },
+    "ShoulderLame.L.2": {
+      "vertices": 104,
+      "triangles": 204
+    },
+    "ShoulderLame.R.1": {
+      "vertices": 104,
+      "triangles": 204
+    },
+    "ShoulderLame.R.2": {
+      "vertices": 104,
+      "triangles": 204
+    }
+  },
+  "sockets": {
+    "E05_ModularShell_ROOT": {
+      "world_matrix_closed": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "properties": {
+        "asset_id": "E05",
+        "status": "PROPOSAL: source-only; no engine validation",
+        "axis_convention": "Blender +Z up, -Y forward, +X character left; GLB Y-up export"
+      }
+    },
+    "ChestMount": {
+      "world_matrix_closed": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.009999999776482582
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.4199999570846558
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "properties": {
+        "attachment_status": "Measured fit reference; runtime bone assignment not implemented",
+        "fit_source_sha256": "4af085abce4c00858f647c806ec03fd54b6bbbd3ae04efdcae91578d32ff55b8"
+      }
+    },
+    "HeadMount": {
+      "world_matrix_closed": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.8799999952316284
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "properties": {
+        "attachment_status": "Measured fit reference; runtime bone assignment not implemented",
+        "fit_source_sha256": "4af085abce4c00858f647c806ec03fd54b6bbbd3ae04efdcae91578d32ff55b8"
+      }
+    },
+    "ShutterHinge.L": {
+      "world_matrix_closed": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.25
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.12300000339746475
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.3799999952316284
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "properties": {
+        "axis_local": "Z",
+        "closed_angle_degrees": 0.0,
+        "open_angle_degrees": 95,
+        "behaviour": "Proposal only: actual reflected light path must authorize exposure in future gameplay"
+      }
+    },
+    "ShutterHinge.R": {
+      "world_matrix_closed": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -0.25
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.12300000339746475
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.3799999952316284
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "properties": {
+        "axis_local": "Z",
+        "closed_angle_degrees": 0.0,
+        "open_angle_degrees": -95,
+        "behaviour": "Proposal only: actual reflected light path must authorize exposure in future gameplay"
+      }
+    },
+    "Shoulder.L": {
+      "world_matrix_closed": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.30000001192092896
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.02500000037252903
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.5829999446868896
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "properties": {
+        "attachment_status": "Upper-arm rigid attachment proposal; final skin/animation contract unresolved"
+      }
+    },
+    "Shoulder.R": {
+      "world_matrix_closed": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -0.30000001192092896
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.02500000037252903
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.5829999446868896
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "properties": {
+        "attachment_status": "Upper-arm rigid attachment proposal; final skin/animation contract unresolved"
+      }
+    },
+    "ReflectedPathReceiver_PROPOSAL": {
+      "world_matrix_closed": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.20999999344348907
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.5700000524520874
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "properties": {
+        "status": "Position/occlusion proposal only; ordinary held light must not substitute for placed reflector"
+      }
+    },
+    "ExposureCentre_PROPOSAL": {
+      "world_matrix_closed": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.16699999570846558
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.3600000143051147
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "properties": {
+        "status": "Unlit core area exposed by separate shutters; attack validity/timing not supplied"
+      }
+    }
+  },
+  "core_reference_objects": [
+    "E05_PlainInnerBody_2m_1K"
+  ],
+  "source_shell_triangles_total": 2832,
+  "canonical_requirement": "Actual placed-reflector path opens/exposes armour; detailed geometry, timing and valid attack remain proposals"
+}

@@ -1,0 +1,132 @@
+{
+  "asset": "E01 Abbey attendant H1 pilot",
+  "status": "Provider sources, not engine-ready",
+  "input": "Original text prompts, no input images or third-party model geometry",
+  "spec": {
+    "asset_id": "E01",
+    "name": "Abbey attendant H1 pilot",
+    "release": "1.9 proposed",
+    "source_commit": "e6cf2e97e5577aa051c5a18014477598762d7b75",
+    "source_register": "docs/design/world/dungeons/asset-register.json",
+    "canon_boundary": "Dead attendants continuing duties are canonical; exact melee/art configuration is a proposed conservative implementation under owner autonomous asset-production authorization.",
+    "purpose": "Dry duty-hall service humanoid; readable one-handed melee foundation for H1 ordinary enemies. No new role or lore symbols.",
+    "reuse_decision": "Existing Horde skeleton has useful geometry but third-party standalone public-source redistribution remains unresolved; this original body avoids copying that source. No unrelated character sources are duplicated.",
+    "pose": "t-pose",
+    "height_m": 1.7,
+    "target_full_triangles": 12000,
+    "comparison_triangles": 6000,
+    "runtime_material_target": 1,
+    "runtime_maps_max_px": 1024,
+    "tool": "Separate authored tool mesh and grip socket; no fused held object in generated body",
+    "prompt": "Full body of a gaunt bald medieval maintenance worker with human proportions. Strict T-pose: straight arms horizontal, elbows straight, palms down, open hands away from body, straight legs apart. Sleeveless waist-length work vest, fitted trousers with two clearly separate legs, ankle boots, plain belt and small iron buckle. Bare head, visible neck, forearms and hands. Dry sunken face, bony cheeks, undead appearance. Grounded gothic realism. No hood, robe, skirt, cape, long sleeves, armour, weapon, prop, floor, pedestal, scenery, text or glow.",
+    "negative_prompt": "Exclusions included in prompt; no separate parameter assumed",
+    "planned_stages": [
+      {
+        "stage": "preview"
+      },
+      {
+        "stage": "refine-2k"
+      },
+      {
+        "stage": "remesh-12k"
+      },
+      {
+        "stage": "remesh-6k"
+      },
+      {
+        "stage": "rig-humanoid"
+      }
+    ],
+    "animation_policy": "Use bundled walk/run first; local idle/turn and pose proof before paid catalogue action. No custom action submitted without exact catalog match.",
+    "acceptance": [
+      "Inspect genuine preview before refine",
+      "Measure downloaded GLB counts and maps",
+      "Verify closed/usable clear humanoid geometry and skin suitability",
+      "Rig only after textured geometry face evidence",
+      "Compare12k/6k silhouette and deformation; do not enforce low count at cost of joints",
+      "FreshGLBimport and Blender pose tests; runtime-native/mobile/RT remains separate gate"
+    ],
+    "status": "Second geometry trial prepared as a source candidate",
+    "trial": "v02",
+    "reason": "v01 ignored short-clothing and pose instructions; rejected before texture/rig. Worker-first positive description replaces religious silhouette cues."
+  },
+  "tasks": [
+    {
+      "resource": "text-to-3d",
+      "stage": "preview",
+      "task_id": "01a11052-8ada-710f-adec-cc72bf285ed4",
+      "status": "SUCCEEDED"
+    },
+    {
+      "resource": "text-to-3d",
+      "stage": "preview-v02",
+      "task_id": "01a11058-0743-721b-903c-3e5276722fe2",
+      "status": "SUCCEEDED"
+    },
+    {
+      "resource": "text-to-3d",
+      "stage": "refine-v02",
+      "task_id": "01a11066-cfac-765b-95b3-b91ae9824271",
+      "status": "SUCCEEDED"
+    },
+    {
+      "resource": "remesh",
+      "stage": "remesh-12k-v02",
+      "task_id": "01a11073-7520-73e6-8b94-48fd6a7fdf5d",
+      "status": "SUCCEEDED"
+    },
+    {
+      "resource": "remesh",
+      "stage": "remesh-6k-v02",
+      "task_id": "01a11073-5de1-771d-b714-858000fd775e",
+      "status": "SUCCEEDED"
+    },
+    {
+      "resource": "rigging",
+      "stage": "rig-v02",
+      "task_id": "01a11088-b7de-70c7-ac3d-0d6a8b3eae3c",
+      "status": "SUCCEEDED"
+    },
+    {
+      "resource": "animate",
+      "stage": "animation-six-v02",
+      "task_id": "01a11097-7cfe-738a-a7ee-78c94f3c8b87",
+      "status": "SUCCEEDED",
+      "action_ids": [
+        0,
+        219,
+        8,
+        178,
+        576,
+        586
+      ]
+    }
+  ],
+  "limitations": [
+    "First preview rejected for pose and robe silhouette.",
+    "12K selected over6K for facial and hand detail.",
+    "Rig has24joints and no finger bones.",
+    "Merged animation output omits original normal/ORM texture bindings; final candidate transfers clip data onto verified full-PBR rig.",
+    "Original provider files retained unchanged.",
+    "No full native game or mobile performance certification."
+  ],
+  "final_derivative": {
+    "triangles": 14122,
+    "exported_vertices": 17173,
+    "skin_joints": 25,
+    "core_clips": [
+      "Idle",
+      "Walking",
+      "Attack",
+      "Dead"
+    ],
+    "local_changes": [
+      "1.7m world scale and ground-centred source",
+      "matching remesh-specific 1K PBR; neutral AO and restrained boot roughness",
+      "local right-hand topology/curl/thumb/contact fit",
+      "25th unweighted RightGrip helper with world unit socket",
+      "60Hz sampled LINEAR clips; canonical Idle name",
+      "ground contact correction; bounded Dead resting-wrist adjustment"
+    ]
+  }
+}

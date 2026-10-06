@@ -1,0 +1,1027 @@
+{
+  "blender_version": "4.3.2",
+  "validation_scope": "Original source, embedded GLB payload, and fresh Blender import only",
+  "assets": {
+    "handbell": {
+      "result": "PASS",
+      "source_meshes": {
+        "Bell_BodyAndHandle": {
+          "vertices": 696,
+          "polygons": 644,
+          "triangles": 1376,
+          "connected_shells": 4,
+          "signed_shell_volumes_m3": [
+            0.00017528249808348062,
+            6.136314681270959e-05,
+            1.1222000740218613e-05,
+            1.823500316078253e-06
+          ],
+          "all_shell_volumes_positive": true,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "inconsistent_winding_edges": 0,
+          "loose_vertices": 0,
+          "degenerate_triangles": 0,
+          "nonfinite_positions": 0,
+          "has_uv": true,
+          "degenerate_uv_triangles": 0,
+          "uv_outside_unit": 0,
+          "uv_nonfinite": 0,
+          "material_slots": 1,
+          "local_origin_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_xyz_rad": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "Bell_Clapper_Pivot": {
+          "vertices": 136,
+          "polygons": 114,
+          "triangles": 264,
+          "connected_shells": 2,
+          "signed_shell_volumes_m3": [
+            4.8840056704098816e-06,
+            1.8112663643303023e-05
+          ],
+          "all_shell_volumes_positive": true,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "inconsistent_winding_edges": 0,
+          "loose_vertices": 0,
+          "degenerate_triangles": 0,
+          "nonfinite_positions": 0,
+          "has_uv": true,
+          "degenerate_uv_triangles": 0,
+          "uv_outside_unit": 0,
+          "uv_nonfinite": 0,
+          "material_slots": 1,
+          "local_origin_m": [
+            0.0,
+            0.0,
+            -0.05900000035762787
+          ],
+          "rotation_xyz_rad": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      },
+      "source_bounds_blender_xyz_m": [
+        [
+          -0.07699999958276749,
+          0.07699999958276749
+        ],
+        [
+          -0.07699999958276749,
+          0.07699999958276749
+        ],
+        [
+          -0.20600000023841858,
+          0.08900000154972076
+        ]
+      ],
+      "source_dimensions_m": [
+        0.15399999916553497,
+        0.15399999916553497,
+        0.29500000178813934
+      ],
+      "packed_source_images": [
+        {
+          "name": "abbey_duty_basecolor.png",
+          "packed": true,
+          "size": [
+            512,
+            512
+          ],
+          "colorspace": "sRGB"
+        },
+        {
+          "name": "abbey_duty_normal.png",
+          "packed": true,
+          "size": [
+            512,
+            512
+          ],
+          "colorspace": "Non-Color"
+        },
+        {
+          "name": "abbey_duty_orm.png",
+          "packed": true,
+          "size": [
+            512,
+            512
+          ],
+          "colorspace": "Non-Color"
+        }
+      ],
+      "root_transforms": [
+        {
+          "name": "Bell_Grip",
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      ],
+      "static_glb": {
+        "sha256": "0d86ec1816d1eea8f9dac6952eb40ad28a7d027b1ff7879b1550a880ace53c63",
+        "bytes": 772120,
+        "mesh_count": 2,
+        "material_count": 1,
+        "image_count": 3,
+        "external_uris": [],
+        "extensions_used": [],
+        "materials": [
+          {
+            "name": "AbbeyDuty_wood_iron_512",
+            "normalTexture": {
+              "index": 0,
+              "scale": 0.550000011920929
+            },
+            "occlusionTexture": {
+              "index": 1
+            },
+            "pbrMetallicRoughness": {
+              "baseColorTexture": {
+                "index": 2
+              },
+              "metallicRoughnessTexture": {
+                "index": 1
+              }
+            }
+          }
+        ],
+        "images": [
+          {
+            "name": "abbey_duty_normal",
+            "bytes": 166411,
+            "dimensions": [
+              512,
+              512
+            ],
+            "mime": "image/png",
+            "sha256": "68a2240d2f7cf9a75d041b064e834ad079dddb5610f4674427f6c26ba4e49340"
+          },
+          {
+            "name": "abbey_duty_orm",
+            "bytes": 212501,
+            "dimensions": [
+              512,
+              512
+            ],
+            "mime": "image/png",
+            "sha256": "bd90b067c5f7a90d7cf0e257ed64c420668b54851de0465cdd52f25fc17900e3"
+          },
+          {
+            "name": "abbey_duty_basecolor",
+            "bytes": 319241,
+            "dimensions": [
+              512,
+              512
+            ],
+            "mime": "image/png",
+            "sha256": "9d6ea182602127fb531e6eb360a1294e2fdbf6d5e49ba33fa1e1eba5479fd675"
+          }
+        ],
+        "primitives": [
+          {
+            "mesh_name": "Bell_BodyAndHandle_editable",
+            "vertices_after_attribute_splits": 1045,
+            "triangles": 1376,
+            "indices_valid": true,
+            "finite_positions": true,
+            "finite_normals": true,
+            "normal_length_minmax": [
+              0.9999999403953552,
+              1.0000001192092896
+            ],
+            "normal_face_dot_min": 0.7154102921485901,
+            "opposed_vertex_normals": 0,
+            "degenerate_triangles": 0,
+            "has_tangents": true,
+            "tangents_finite": true,
+            "normal_tangent_abs_dot_max": 8.96453857421875e-05,
+            "tangent_w_values": [
+              -1.0,
+              1.0
+            ],
+            "uv_unit_square": true,
+            "uv_finite": true,
+            "degenerate_uv_triangles": 0
+          },
+          {
+            "mesh_name": "Bell_Clapper_Pivot_editable",
+            "vertices_after_attribute_splits": 204,
+            "triangles": 264,
+            "indices_valid": true,
+            "finite_positions": true,
+            "finite_normals": true,
+            "normal_length_minmax": [
+              0.9999999403953552,
+              1.0
+            ],
+            "normal_face_dot_min": 0.9362189173698425,
+            "opposed_vertex_normals": 0,
+            "degenerate_triangles": 0,
+            "has_tangents": true,
+            "tangents_finite": true,
+            "normal_tangent_abs_dot_max": 8.088350296020508e-05,
+            "tangent_w_values": [
+              -1.0,
+              1.0
+            ],
+            "uv_unit_square": true,
+            "uv_finite": true,
+            "degenerate_uv_triangles": 0
+          }
+        ],
+        "nodes": [
+          {
+            "extras": {
+              "component_description": "[{\"name\": \"Cast iron hollow bell with rolled modest lip\", \"vertices\": 504, \"closed_caps\": true}, {\"name\": \"Worn oval ash hand grip\", \"vertices\": 96, \"closed_caps\": true}, {\"name\": \"Plain iron handle ferrule\", \"vertices\": 48, \"closed_caps\": true}, {\"name\": \"Internal clapper suspension boss\", \"vertices\": 48, \"closed_caps\": true}]"
+            },
+            "mesh": 0,
+            "name": "Bell_BodyAndHandle"
+          },
+          {
+            "extras": {
+              "component_description": "[{\"name\": \"Clapper short iron suspension stem\", \"vertices\": 40, \"closed_caps\": true}, {\"name\": \"Clapper weighted striking end\", \"vertices\": 96, \"closed_caps\": true}]",
+              "pivot_blender_m": [
+                0.0,
+                0.0,
+                -0.059
+              ],
+              "swing_reference": "Local X/Y swing pivot; rest pose only, no animation or physical constraint",
+              "range_note": "Clearance/timing for contact must be solved during measured hand and alarm animation authoring"
+            },
+            "mesh": 1,
+            "name": "Bell_Clapper_Pivot",
+            "translation": [
+              0,
+              -0.05900000035762787,
+              0
+            ]
+          },
+          {
+            "children": [
+              0,
+              1
+            ],
+            "extras": {
+              "unit": "metres",
+              "grip_reference": "Provisional authoring origin, not a measured H1 hand socket",
+              "asset_role": "E02 accessory candidate; no new body or rig",
+              "axis_blender": "Handle +Z; bell mouth -Z",
+              "grip_region_blender_z_m": "-0.030 to +0.065",
+              "nominal_grip_diameter_m": "0.027 x 0.023"
+            },
+            "name": "Bell_Grip"
+          }
+        ],
+        "total_triangles": 1640,
+        "total_split_vertices": 1249,
+        "policy_pass": true
+      },
+      "fresh_import": {
+        "succeeded": true,
+        "mesh_count": 2,
+        "image_count": 3,
+        "bounds_blender_xyz_m": [
+          [
+            -0.07699999958276749,
+            0.07699999958276749
+          ],
+          [
+            -0.07699999958276749,
+            0.07699999958276749
+          ],
+          [
+            -0.20600000023841858,
+            0.08900000154972076
+          ]
+        ],
+        "bounds_delta_max_m": 0.0,
+        "raw_meshes": {
+          "Bell_BodyAndHandle": {
+            "vertices": 1045,
+            "polygons": 1376,
+            "triangles": 1376,
+            "connected_shells": 86,
+            "signed_shell_volumes_m3": [
+              -3.6897242381428445e-06,
+              0.00017469549662507702,
+              4.27672612583289e-06,
+              3.5280000219017893e-06,
+              4.7155147356647824e-05,
+              1.067999964258585e-05,
+              4.999999992113165e-06,
+              4.6000014227350527e-07,
+              4.6000010722006314e-07,
+              4.6000005416620647e-07,
+              4.600001422735052e-07,
+              4.600001072200632e-07,
+              4.6000005416620647e-07,
+              4.600001422735052e-07,
+              4.600001072200632e-07,
+              4.6000005416620647e-07,
+              4.6000014227350517e-07,
+              4.600001072200633e-07,
+              4.6000005416620647e-07,
+              4.899998913288073e-07,
+              4.899999150135652e-07,
+              4.899998676440494e-07,
+              4.899998913288073e-07,
+              4.899999150135652e-07,
+              4.899998676440494e-07,
+              4.899998913288073e-07,
+              4.899999150135652e-07,
+              4.899998676440494e-07,
+              4.899998913288073e-07,
+              4.899999150135652e-07,
+              4.899998676440494e-07,
+              -8.99995515150446e-09,
+              -8.999921992843458e-09,
+              -8.999914591356628e-09,
+              -8.99995515150446e-09,
+              -8.999921992843451e-09,
+              -8.999914591356628e-09,
+              -8.999955151504459e-09,
+              -8.999921992843461e-09,
+              -8.999914591356628e-09,
+              -8.999955151504459e-09,
+              -8.999921992843438e-09,
+              -8.999914591356628e-09,
+              -5.069999843954065e-06,
+              1.624999930764185e-06,
+              6.87499882208916e-08,
+              6.874999494736317e-08,
+              6.875000636341575e-08,
+              6.874998822089158e-08,
+              6.874999494736319e-08,
+              6.875000636341575e-08,
+              6.874998822089157e-08,
+              6.874999494736319e-08,
+              6.875000636341575e-08,
+              6.874998822089157e-08,
+              6.87499949473632e-08,
+              6.875000636341575e-08,
+              1.0781251802427505e-07,
+              1.0781252512970241e-07,
+              1.0781255828836342e-07,
+              1.0781251802427505e-07,
+              1.0781252512970242e-07,
+              1.0781255828836342e-07,
+              1.0781251802427505e-07,
+              1.0781252512970242e-07,
+              1.0781255828836342e-07,
+              1.0781251802427504e-07,
+              1.0781252512970243e-07,
+              1.0781255828836342e-07,
+              -1.3020840109826773e-08,
+              -1.3020837741350988e-08,
+              -6.2499954841162735e-09,
+              -6.770829230617892e-09,
+              -1.3020840109826772e-08,
+              -1.3020837741350988e-08,
+              -6.2499954841162735e-09,
+              -6.770829230617892e-09,
+              -1.3020840109826772e-08,
+              -1.302083774135099e-08,
+              -6.2499954841162735e-09,
+              -6.770829230617892e-09,
+              -1.3020840109826772e-08,
+              -1.3020837741350981e-08,
+              -6.2499954841162735e-09,
+              -6.770829230617892e-09,
+              -1.7639999446335726e-06
+            ],
+            "all_shell_volumes_positive": false,
+            "boundary_edges": 542,
+            "nonmanifold_edges": 542,
+            "inconsistent_winding_edges": 0,
+            "loose_vertices": 0,
+            "degenerate_triangles": 0,
+            "nonfinite_positions": 0,
+            "has_uv": true,
+            "degenerate_uv_triangles": 0,
+            "uv_outside_unit": 0,
+            "uv_nonfinite": 0,
+            "material_slots": 1,
+            "local_origin_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation_xyz_rad": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "Bell_Clapper_Pivot": {
+            "vertices": 204,
+            "polygons": 264,
+            "triangles": 264,
+            "connected_shells": 8,
+            "signed_shell_volumes_m3": [
+              1.392071351820808e-06,
+              3.4605857770486632e-06,
+              3.1348553345781724e-08,
+              1.201538419574414e-06,
+              2.3770110620565298e-08,
+              1.857800694438084e-05,
+              2.3770110620565284e-08,
+              -1.714421867878476e-06
+            ],
+            "all_shell_volumes_positive": false,
+            "boundary_edges": 128,
+            "nonmanifold_edges": 128,
+            "inconsistent_winding_edges": 0,
+            "loose_vertices": 0,
+            "degenerate_triangles": 0,
+            "nonfinite_positions": 0,
+            "has_uv": true,
+            "degenerate_uv_triangles": 0,
+            "uv_outside_unit": 0,
+            "uv_nonfinite": 0,
+            "material_slots": 1,
+            "local_origin_m": [
+              0.0,
+              0.0,
+              -0.05900000035762787
+            ],
+            "rotation_xyz_rad": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "temporary_position_weld_meshes": {
+          "Bell_BodyAndHandle": {
+            "vertices": 696,
+            "polygons": 1376,
+            "triangles": 1376,
+            "connected_shells": 4,
+            "signed_shell_volumes_m3": [
+              0.00017528249851276692,
+              6.136314702113543e-05,
+              1.1222000891801063e-05,
+              1.8235003397630116e-06
+            ],
+            "all_shell_volumes_positive": true,
+            "boundary_edges": 0,
+            "nonmanifold_edges": 0,
+            "inconsistent_winding_edges": 0,
+            "loose_vertices": 0,
+            "degenerate_triangles": 0,
+            "nonfinite_positions": 0,
+            "has_uv": true,
+            "degenerate_uv_triangles": 0,
+            "uv_outside_unit": 0,
+            "uv_nonfinite": 0,
+            "material_slots": 0,
+            "local_origin_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation_xyz_rad": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "Bell_Clapper_Pivot": {
+            "vertices": 136,
+            "polygons": 264,
+            "triangles": 264,
+            "connected_shells": 2,
+            "signed_shell_volumes_m3": [
+              4.8840056822152525e-06,
+              1.81126637173179e-05
+            ],
+            "all_shell_volumes_positive": true,
+            "boundary_edges": 0,
+            "nonmanifold_edges": 0,
+            "inconsistent_winding_edges": 0,
+            "loose_vertices": 0,
+            "degenerate_triangles": 0,
+            "nonfinite_positions": 0,
+            "has_uv": true,
+            "degenerate_uv_triangles": 0,
+            "uv_outside_unit": 0,
+            "uv_nonfinite": 0,
+            "material_slots": 0,
+            "local_origin_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation_xyz_rad": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "attribute_split_note": "glTF vertex normals and UV seams deliberately split positions. Weld is validation-only, not applied to deliverable.",
+        "render": "previews/09_handbell_fresh_glb_import.png"
+      }
+    },
+    "short_staff": {
+      "result": "PASS",
+      "source_meshes": {
+        "Staff_Complete": {
+          "vertices": 288,
+          "polygons": 258,
+          "triangles": 564,
+          "connected_shells": 3,
+          "signed_shell_volumes_m3": [
+            0.0004284499439299918,
+            3.222803191723266e-05,
+            2.3913116895831383e-05
+          ],
+          "all_shell_volumes_positive": true,
+          "boundary_edges": 0,
+          "nonmanifold_edges": 0,
+          "inconsistent_winding_edges": 0,
+          "loose_vertices": 0,
+          "degenerate_triangles": 0,
+          "nonfinite_positions": 0,
+          "has_uv": true,
+          "degenerate_uv_triangles": 0,
+          "uv_outside_unit": 0,
+          "uv_nonfinite": 0,
+          "material_slots": 1,
+          "local_origin_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_xyz_rad": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      },
+      "source_bounds_blender_xyz_m": [
+        [
+          -0.014700000174343586,
+          0.01593930833041668
+        ],
+        [
+          -0.014700000174343586,
+          0.014700000174343586
+        ],
+        [
+          -0.33000001311302185,
+          0.550000011920929
+        ]
+      ],
+      "source_dimensions_m": [
+        0.030639308504760265,
+        0.029400000348687172,
+        0.8800000250339508
+      ],
+      "packed_source_images": [
+        {
+          "name": "abbey_duty_basecolor.png",
+          "packed": true,
+          "size": [
+            512,
+            512
+          ],
+          "colorspace": "sRGB"
+        },
+        {
+          "name": "abbey_duty_normal.png",
+          "packed": true,
+          "size": [
+            512,
+            512
+          ],
+          "colorspace": "Non-Color"
+        },
+        {
+          "name": "abbey_duty_orm.png",
+          "packed": true,
+          "size": [
+            512,
+            512
+          ],
+          "colorspace": "Non-Color"
+        }
+      ],
+      "root_transforms": [
+        {
+          "name": "Staff_Grip",
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      ],
+      "static_glb": {
+        "sha256": "9db15ff7505329b9c7191b018442c9500b5747429de3c1bb6767c5e05cb6892f",
+        "bytes": 735680,
+        "mesh_count": 1,
+        "material_count": 1,
+        "image_count": 3,
+        "external_uris": [],
+        "extensions_used": [],
+        "materials": [
+          {
+            "name": "AbbeyDuty_wood_iron_512",
+            "normalTexture": {
+              "index": 0,
+              "scale": 0.550000011920929
+            },
+            "occlusionTexture": {
+              "index": 1
+            },
+            "pbrMetallicRoughness": {
+              "baseColorTexture": {
+                "index": 2
+              },
+              "metallicRoughnessTexture": {
+                "index": 1
+              }
+            }
+          }
+        ],
+        "images": [
+          {
+            "name": "abbey_duty_normal",
+            "bytes": 166411,
+            "dimensions": [
+              512,
+              512
+            ],
+            "mime": "image/png",
+            "sha256": "68a2240d2f7cf9a75d041b064e834ad079dddb5610f4674427f6c26ba4e49340"
+          },
+          {
+            "name": "abbey_duty_orm",
+            "bytes": 212501,
+            "dimensions": [
+              512,
+              512
+            ],
+            "mime": "image/png",
+            "sha256": "bd90b067c5f7a90d7cf0e257ed64c420668b54851de0465cdd52f25fc17900e3"
+          },
+          {
+            "name": "abbey_duty_basecolor",
+            "bytes": 319241,
+            "dimensions": [
+              512,
+              512
+            ],
+            "mime": "image/png",
+            "sha256": "9d6ea182602127fb531e6eb360a1294e2fdbf6d5e49ba33fa1e1eba5479fd675"
+          }
+        ],
+        "primitives": [
+          {
+            "mesh_name": "Staff_Complete_editable",
+            "vertices_after_attribute_splits": 654,
+            "triangles": 564,
+            "indices_valid": true,
+            "finite_positions": true,
+            "finite_normals": true,
+            "normal_length_minmax": [
+              0.9999999403953552,
+              1.0000001192092896
+            ],
+            "normal_face_dot_min": 0.9511883854866028,
+            "opposed_vertex_normals": 0,
+            "degenerate_triangles": 0,
+            "has_tangents": true,
+            "tangents_finite": true,
+            "normal_tangent_abs_dot_max": 8.845329284667969e-05,
+            "tangent_w_values": [
+              -1.0,
+              1.0
+            ],
+            "uv_unit_square": true,
+            "uv_finite": true,
+            "degenerate_uv_triangles": 0
+          }
+        ],
+        "nodes": [
+          {
+            "extras": {
+              "component_description": "[{\"name\": \"Short oval ash maintenance shaft\", \"vertices\": 168, \"closed_caps\": true}, {\"name\": \"Bottom iron end shoe\", \"vertices\": 60, \"closed_caps\": true}, {\"name\": \"Working end iron cap\", \"vertices\": 60, \"closed_caps\": true}]",
+              "total_length_m": 0.88,
+              "end_cap_note": "Modest blunt reinforcing shoes, no blade or hook",
+              "grip_note": "Provisional 110 mm zone; longer end points +Z; no measured H1 socket binding"
+            },
+            "mesh": 0,
+            "name": "Staff_Complete"
+          },
+          {
+            "children": [
+              0
+            ],
+            "extras": {
+              "unit": "metres",
+              "grip_reference": "Provisional authoring origin, not a measured H1 hand socket",
+              "asset_role": "E02 accessory candidate; no new body or rig",
+              "axis_blender": "Shaft +Z toward longer working end",
+              "grip_region_blender_z_m": "-0.050 to +0.060",
+              "nominal_grip_diameter_m": "0.029 x 0.026"
+            },
+            "name": "Staff_Grip"
+          }
+        ],
+        "total_triangles": 564,
+        "total_split_vertices": 654,
+        "policy_pass": true
+      },
+      "fresh_import": {
+        "succeeded": true,
+        "mesh_count": 1,
+        "image_count": 3,
+        "bounds_blender_xyz_m": [
+          [
+            -0.014700000174343586,
+            0.01593930833041668
+          ],
+          [
+            -0.014700000174343586,
+            0.014700000174343586
+          ],
+          [
+            -0.33000001311302185,
+            0.550000011920929
+          ]
+        ],
+        "bounds_delta_max_m": 0.0,
+        "raw_meshes": {
+          "Staff_Complete": {
+            "vertices": 654,
+            "polygons": 564,
+            "triangles": 564,
+            "connected_shells": 111,
+            "signed_shell_volumes_m3": [
+              3.914422582518284e-05,
+              0.0003228275380045044,
+              6.647817927785127e-05,
+              3.638250094203006e-05,
+              2.4010005669576153e-06,
+              2.4010000530930928e-06,
+              2.401000209223049e-06,
+              2.4010005669576153e-06,
+              2.401000053093093e-06,
+              2.401000209223049e-06,
+              2.401000566957615e-06,
+              2.401000053093093e-06,
+              2.401000209223049e-06,
+              2.401000566957615e-06,
+              2.4010000530930936e-06,
+              2.401000209223049e-06,
+              3.658672843206053e-07,
+              7.500275387428701e-07,
+              7.500262502920425e-07,
+              7.500279176989957e-07,
+              3.8416025442226487e-07,
+              3.658672843206054e-07,
+              7.500262502920425e-07,
+              3.6586728432060523e-07,
+              3.841606333783905e-07,
+              7.500275387428702e-07,
+              7.500262502920425e-07,
+              7.500279176989957e-07,
+              3.841602544222651e-07,
+              3.6586728432060544e-07,
+              7.500262502920425e-07,
+              3.841606333783905e-07,
+              1.1452588069005287e-06,
+              1.1452588069005287e-06,
+              1.1452583711009843e-06,
+              1.1452588069005287e-06,
+              1.1452588069005287e-06,
+              1.1452583711009843e-06,
+              1.1452588069005287e-06,
+              1.145258806900529e-06,
+              1.1452583711009843e-06,
+              1.1452588069005285e-06,
+              1.1452588069005291e-06,
+              1.1452583711009843e-06,
+              -3.5758445922814036e-07,
+              -3.575848381842661e-07,
+              -3.575860603177716e-07,
+              -3.575844592281403e-07,
+              -3.575848381842661e-07,
+              -3.575860603177716e-07,
+              -3.575844592281403e-07,
+              -3.5758483818426617e-07,
+              -3.575860603177716e-07,
+              -3.575844592281403e-07,
+              -3.57584838184266e-07,
+              -3.575860603177716e-07,
+              -5.14188827385927e-05,
+              -8.886240145026629e-05,
+              -1.3165184403381622e-06,
+              -1.3165180492554517e-06,
+              -1.3165193240638356e-06,
+              -1.316518440338162e-06,
+              -1.3165180492554522e-06,
+              -1.3165193240638356e-06,
+              -1.3165184403381618e-06,
+              -1.3165180492554522e-06,
+              -1.3165193240638356e-06,
+              -1.3165184403381618e-06,
+              -1.3165180492554526e-06,
+              -1.3165193240638356e-06,
+              1.1903331369467196e-06,
+              1.1903320758695677e-06,
+              1.1903320569217613e-06,
+              1.1903331369467196e-06,
+              1.1903320758695675e-06,
+              1.1903320569217613e-06,
+              1.1903331369467194e-06,
+              1.1903320758695677e-06,
+              1.1903320569217613e-06,
+              1.1903331369467194e-06,
+              1.1903320758695673e-06,
+              1.1903320569217613e-06,
+              2.346561586819007e-06,
+              2.346561586819007e-06,
+              2.3465637468689238e-06,
+              2.346561586819007e-06,
+              2.346561586819007e-06,
+              2.3465637468689238e-06,
+              2.3465615868190066e-06,
+              2.346561586819007e-06,
+              2.3465637468689238e-06,
+              2.3465615868190066e-06,
+              2.346561586819007e-06,
+              2.3465637468689238e-06,
+              3.4650834095373284e-06,
+              3.465083379827153e-06,
+              2.014582862708888e-06,
+              1.4505005007473908e-06,
+              3.4650834095373284e-06,
+              3.465083379827153e-06,
+              2.014582862708888e-06,
+              1.4505005007473908e-06,
+              3.4650834095373276e-06,
+              3.465083379827154e-06,
+              2.014582862708888e-06,
+              1.4505005007473908e-06,
+              3.4650834095373276e-06,
+              3.465083379827153e-06,
+              2.014582862708888e-06,
+              1.4505005007473908e-06,
+              4.455000134839793e-05
+            ],
+            "all_shell_volumes_positive": false,
+            "boundary_edges": 522,
+            "nonmanifold_edges": 522,
+            "inconsistent_winding_edges": 0,
+            "loose_vertices": 0,
+            "degenerate_triangles": 0,
+            "nonfinite_positions": 0,
+            "has_uv": true,
+            "degenerate_uv_triangles": 0,
+            "uv_outside_unit": 0,
+            "uv_nonfinite": 0,
+            "material_slots": 1,
+            "local_origin_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation_xyz_rad": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "temporary_position_weld_meshes": {
+          "Staff_Complete": {
+            "vertices": 288,
+            "polygons": 564,
+            "triangles": 564,
+            "connected_shells": 3,
+            "signed_shell_volumes_m3": [
+              0.00042844994310753864,
+              3.2228030856155484e-05,
+              2.391311401576484e-05
+            ],
+            "all_shell_volumes_positive": true,
+            "boundary_edges": 0,
+            "nonmanifold_edges": 0,
+            "inconsistent_winding_edges": 0,
+            "loose_vertices": 0,
+            "degenerate_triangles": 0,
+            "nonfinite_positions": 0,
+            "has_uv": true,
+            "degenerate_uv_triangles": 0,
+            "uv_outside_unit": 0,
+            "uv_nonfinite": 0,
+            "material_slots": 0,
+            "local_origin_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "rotation_xyz_rad": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        },
+        "attribute_split_note": "glTF vertex normals and UV seams deliberately split positions. Weld is validation-only, not applied to deliverable.",
+        "render": "previews/10_staff_fresh_glb_import.png"
+      }
+    }
+  },
+  "limitations": [
+    "game-dev CLI is unavailable; no canonical game-dev package receipt.",
+    "No Khronos validator run.",
+    "No engine import, GPU/device measurement, H1 socket fit, collision, audio or combat timing test.",
+    "Clapper rest transform and editable pivot only; no animation or physics.",
+    "Intentional intersecting closed components at mechanical joints; hidden bores not modeled.",
+    "Opaque material uses procedural normal texture, not high-poly baking; ORM AO channel is neutral."
+  ],
+  "result": "PASS"
+}

@@ -1,0 +1,32 @@
+{
+  "blender_binary": "/usr/bin/blender",
+  "game_dev_binary": null,
+  "khronos_validator_binary": null,
+  "read_only_probes": [
+    {
+      "command": [
+        "game-dev",
+        "capabilities",
+        "--json"
+      ],
+      "error": "Executable unavailable"
+    },
+    {
+      "command": [
+        "game-dev",
+        "doctor",
+        "--json"
+      ],
+      "error": "Executable unavailable"
+    },
+    {
+      "command": [
+        "blender",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "Blender 4.3.2\n",
+      "stderr": ""
+    }
+  ]
+}

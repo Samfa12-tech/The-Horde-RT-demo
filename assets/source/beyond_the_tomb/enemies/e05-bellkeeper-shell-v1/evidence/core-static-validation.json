@@ -1,0 +1,39 @@
+{
+  "triangles": 9072,
+  "degenerate_triangles_under_1e_12": 0,
+  "finite_positions": true,
+  "finite_normals": true,
+  "normal_length_min_max": [
+    0.9999998807907104,
+    1.0000001192092896
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "E05_PlainInnerBody_1K",
+      "normalTexture": {
+        "index": 0,
+        "scale": 0.699999988079071
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      }
+    }
+  ],
+  "images": 3,
+  "bounds_glTF_min": [
+    -0.5719730257987976,
+    0.0,
+    -0.18056100606918335
+  ],
+  "bounds_glTF_max": [
+    0.5719730257987976,
+    2.0,
+    0.18056100606918335
+  ]
+}

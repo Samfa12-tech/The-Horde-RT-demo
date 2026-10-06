@@ -1,0 +1,206 @@
+{
+  "inspected": true,
+  "basis": "Final accepted-core-v03f: measured textured 2m core, feet at zero, rear-neck two-hole patch; local residual nape texture/cloth seam documented; source pilot only.",
+  "core_uniform_scale": 1,
+  "core_rotation_z_degrees": 0,
+  "core_offset": [
+    0,
+    0,
+    0
+  ],
+  "chest": {
+    "mount": [
+      0,
+      0.01,
+      1.42
+    ],
+    "back_rows": [
+      [
+        1.12,
+        0.225,
+        0.184,
+        0.01
+      ],
+      [
+        1.3,
+        0.255,
+        0.198,
+        0.01
+      ],
+      [
+        1.49,
+        0.272,
+        0.212,
+        0.01
+      ],
+      [
+        1.6,
+        0.245,
+        0.203,
+        0.012
+      ],
+      [
+        1.65,
+        0.178,
+        0.172,
+        0.012
+      ]
+    ],
+    "back_arc_radians": 2.094395102,
+    "gorget_rows": [
+      [
+        1.645,
+        0.16,
+        0.14,
+        0.005
+      ],
+      [
+        1.7,
+        0.13,
+        0.123,
+        0.005
+      ],
+      [
+        1.755,
+        0.112,
+        0.11,
+        0.005
+      ]
+    ],
+    "hinge_x": 0.25,
+    "hinge_y": -0.123,
+    "hinge_z": 1.38,
+    "open_angle_degrees": 95,
+    "centre_seam_halfgap": 0.006,
+    "shutter_rows": [
+      [
+        1.12,
+        0.227,
+        -0.212
+      ],
+      [
+        1.29,
+        0.25,
+        -0.225
+      ],
+      [
+        1.46,
+        0.252,
+        -0.226
+      ],
+      [
+        1.6,
+        0.222,
+        -0.203
+      ]
+    ],
+    "top_centre_raise": 0.04,
+    "plate_convexity": 0.084,
+    "hinge_barrel_z": [
+      1.245,
+      1.51
+    ],
+    "receiver": [
+      0,
+      -0.21,
+      1.57
+    ],
+    "exposure_centre": [
+      0,
+      -0.167,
+      1.36
+    ]
+  },
+  "head": {
+    "mount": [
+      0,
+      0,
+      1.88
+    ],
+    "crown_rows": [
+      [
+        1.886,
+        0.122,
+        0.15,
+        0.006
+      ],
+      [
+        1.934,
+        0.12,
+        0.142,
+        0.006
+      ],
+      [
+        1.985,
+        0.1,
+        0.12,
+        0.006
+      ],
+      [
+        2.023,
+        0.065,
+        0.082,
+        0.006
+      ],
+      [
+        2.038,
+        0.023,
+        0.031,
+        0.006
+      ]
+    ],
+    "rear_rows": [
+      [
+        1.765,
+        0.115,
+        0.126,
+        0.009
+      ],
+      [
+        1.817,
+        0.127,
+        0.142,
+        0.008
+      ],
+      [
+        1.892,
+        0.124,
+        0.148,
+        0.006
+      ]
+    ],
+    "rear_arc_radians": 1.919862177,
+    "visor_rows": [
+      [
+        1.764,
+        0.092,
+        0.13,
+        0.001
+      ],
+      [
+        1.81,
+        0.118,
+        0.158,
+        0.001
+      ],
+      [
+        1.866,
+        0.122,
+        0.16,
+        0.001
+      ]
+    ],
+    "visor_half_arc": 1.535889742
+  },
+  "shoulders": {
+    "centre_x": 0.3,
+    "centre_y": 0.025,
+    "centre_z": 1.583,
+    "start_x": 0.245,
+    "radius": 0.104,
+    "length": 0.127,
+    "layer_step": 0.08,
+    "slope_z_per_x": -0.85
+  },
+  "core_sha256": "4af085abce4c00858f647c806ec03fd54b6bbbd3ae04efdcae91578d32ff55b8"
+}

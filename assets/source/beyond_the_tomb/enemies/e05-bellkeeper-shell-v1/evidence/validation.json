@@ -1,0 +1,482 @@
+{
+  "glb_sha256": "d6b027ae528abd2b7b239cda89d2264b2e742fea7b656d532efe477b08ab65e9",
+  "file_bytes": 3597412,
+  "glb_header_valid": true,
+  "meshes": [
+    {
+      "name": "Cuirass_BackAndSides_mesh",
+      "primitives": [
+        {
+          "triangles": 336,
+          "vertices": 313,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "FixedHingeCleat.L.0_mesh",
+      "primitives": [
+        {
+          "triangles": 12,
+          "vertices": 24,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "FixedHingeCleat.L.1_mesh",
+      "primitives": [
+        {
+          "triangles": 12,
+          "vertices": 24,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "FixedHingeCleat.R.0_mesh",
+      "primitives": [
+        {
+          "triangles": 12,
+          "vertices": 24,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "FixedHingeCleat.R.1_mesh",
+      "primitives": [
+        {
+          "triangles": 12,
+          "vertices": 24,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "Gorget_NeckRing_mesh",
+      "primitives": [
+        {
+          "triangles": 240,
+          "vertices": 230,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "BreastShutter.L_mesh",
+      "primitives": [
+        {
+          "triangles": 172,
+          "vertices": 196,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "BreastShutter.R_mesh",
+      "primitives": [
+        {
+          "triangles": 172,
+          "vertices": 196,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "Cylinder",
+      "primitives": [
+        {
+          "triangles": 36,
+          "vertices": 60,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "Cylinder.001",
+      "primitives": [
+        {
+          "triangles": 36,
+          "vertices": 60,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "Cylinder.002",
+      "primitives": [
+        {
+          "triangles": 36,
+          "vertices": 60,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "Cylinder.003",
+      "primitives": [
+        {
+          "triangles": 36,
+          "vertices": 60,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "Helmet_Crown_mesh",
+      "primitives": [
+        {
+          "triangles": 400,
+          "vertices": 361,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "Helmet_RearSkirt_mesh",
+      "primitives": [
+        {
+          "triangles": 224,
+          "vertices": 214,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "Helmet_Top_mesh",
+      "primitives": [
+        {
+          "triangles": 80,
+          "vertices": 93,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "Helmet_Visor_mesh",
+      "primitives": [
+        {
+          "triangles": 200,
+          "vertices": 196,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "ShoulderLame.L.1_mesh",
+      "primitives": [
+        {
+          "triangles": 204,
+          "vertices": 233,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "ShoulderLame.L.2_mesh",
+      "primitives": [
+        {
+          "triangles": 204,
+          "vertices": 198,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "ShoulderLame.R.1_mesh",
+      "primitives": [
+        {
+          "triangles": 204,
+          "vertices": 233,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    },
+    {
+      "name": "ShoulderLame.R.2_mesh",
+      "primitives": [
+        {
+          "triangles": 204,
+          "vertices": 198,
+          "finite": true,
+          "degenerate_triangles": 0,
+          "uv_present": true
+        }
+      ]
+    }
+  ],
+  "external_dependencies": [],
+  "animations": [
+    {
+      "name": "ShutterHinge.L",
+      "channels": [
+        {
+          "node": "ShutterHinge.L",
+          "path": "rotation"
+        }
+      ]
+    },
+    {
+      "name": "ShutterHinge.R",
+      "channels": [
+        {
+          "node": "ShutterHinge.R",
+          "path": "rotation"
+        }
+      ]
+    }
+  ],
+  "materials": 1,
+  "images": 3,
+  "source_meshes": [
+    {
+      "name": "Cuirass_BackAndSides",
+      "vertices": 170,
+      "edges": 336,
+      "faces": 168,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "Gorget_NeckRing",
+      "vertices": 120,
+      "edges": 240,
+      "faces": 120,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "BreastShutter.L",
+      "vertices": 88,
+      "edges": 176,
+      "faces": 90,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ShutterHingeBarrel.L.0",
+      "vertices": 20,
+      "edges": 30,
+      "faces": 12,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "FixedHingeCleat.L.0",
+      "vertices": 8,
+      "edges": 12,
+      "faces": 6,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ShutterHingeBarrel.L.1",
+      "vertices": 20,
+      "edges": 30,
+      "faces": 12,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "FixedHingeCleat.L.1",
+      "vertices": 8,
+      "edges": 12,
+      "faces": 6,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "BreastShutter.R",
+      "vertices": 88,
+      "edges": 176,
+      "faces": 90,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ShutterHingeBarrel.R.0",
+      "vertices": 20,
+      "edges": 30,
+      "faces": 12,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "FixedHingeCleat.R.0",
+      "vertices": 8,
+      "edges": 12,
+      "faces": 6,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ShutterHingeBarrel.R.1",
+      "vertices": 20,
+      "edges": 30,
+      "faces": 12,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "FixedHingeCleat.R.1",
+      "vertices": 8,
+      "edges": 12,
+      "faces": 6,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "Helmet_Crown",
+      "vertices": 200,
+      "edges": 400,
+      "faces": 200,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "Helmet_Top",
+      "vertices": 42,
+      "edges": 100,
+      "faces": 60,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "Helmet_RearSkirt",
+      "vertices": 114,
+      "edges": 224,
+      "faces": 112,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "Helmet_Visor",
+      "vertices": 102,
+      "edges": 200,
+      "faces": 100,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ShoulderLame.L.1",
+      "vertices": 104,
+      "edges": 204,
+      "faces": 102,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ShoulderLame.L.2",
+      "vertices": 104,
+      "edges": 204,
+      "faces": 102,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ShoulderLame.R.1",
+      "vertices": 104,
+      "edges": 204,
+      "faces": 102,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    },
+    {
+      "name": "ShoulderLame.R.2",
+      "vertices": 104,
+      "edges": 204,
+      "faces": 102,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0
+    }
+  ],
+  "limitations": [
+    "No game-dev CLI was installed; direct Blender and independent static GLB checks only.",
+    "No native The Horde RT engine import or runtime light/attack verification.",
+    "Closed/open inspection keyframes are not proposed gameplay timing."
+  ],
+  "shell_triangles": 2832,
+  "finite_positions": true,
+  "degenerate_triangles": 0,
+  "vertices_outside_uv_01": 0,
+  "source_closed_bounds": {
+    "min": [
+      -0.45440515875816345,
+      -0.23039613664150238,
+      1.0919277667999268
+    ],
+    "max": [
+      0.45440515875816345,
+      0.22599996626377106,
+      2.052500009536743
+    ]
+  },
+  "fresh_import": {
+    "success": true,
+    "mesh_objects": 20,
+    "materials": [
+      "E05_WeatheredIron_1K.001"
+    ],
+    "bounds": {
+      "min": [
+        -0.45440515875816345,
+        -0.23039613664150238,
+        1.0919277667999268
+      ],
+      "max": [
+        0.45440515875816345,
+        0.22599996626377106,
+        2.052500009536743
+      ]
+    }
+  },
+  "checks_pass": {
+    "finite": true,
+    "nondegenerate": true,
+    "valid_uv_bounds": true,
+    "one_shell_material": true,
+    "embedded_resources": true,
+    "source_mesh_manifold": true,
+    "within_3k_shell_target": true,
+    "fresh_import": true
+  }
+}

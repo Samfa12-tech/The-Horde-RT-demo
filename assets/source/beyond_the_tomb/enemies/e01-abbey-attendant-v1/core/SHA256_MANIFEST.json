@@ -1,0 +1,85 @@
+{
+  "package": "Horde-E01-core-v1",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 4353,
+      "sha256": "19834d740f7dd916288a1a9726b2f950771d500d4066d791e7df1fa94f2af2f3"
+    },
+    {
+      "path": "validation-summary.json",
+      "bytes": 4373,
+      "sha256": "508d36215986aaeb0484f39cb55058e6c131a9dc994d3a81943f9f73b27e7636"
+    },
+    {
+      "path": "RIGHTS.md",
+      "bytes": 1321,
+      "sha256": "480768e2b16b8e7d530c2eeb6d7fb42baf61c555e964c84b492a5ce5198b223c"
+    },
+    {
+      "path": "MALLET_PROVENANCE.json",
+      "bytes": 1388,
+      "sha256": "071edc15f5c9ddb264cce56c13581b192e78dc610a344d4e62c31fec7d01f826"
+    },
+    {
+      "path": "MALLET_README.md",
+      "bytes": 5114,
+      "sha256": "0ffd5e3d1b36e0c4229e90b01219d6efe9358c036994cade4e06cfc3abca2136"
+    },
+    {
+      "path": "final-metadata-receipt.json",
+      "bytes": 1223,
+      "sha256": "78f898761afb3b58eedcaa8fb6e3e7fc27040845e00548b613946cf0bab4266d"
+    },
+    {
+      "path": "PRODUCTION_PROVENANCE.json",
+      "bytes": 5347,
+      "sha256": "f533618d3d7a80e00a775c27be3e0f4d7e0b39d56f9f1ea648762b2f8ae68a87"
+    },
+    {
+      "path": "E01_AbbeyAttendant_core.glb",
+      "bytes": 5482720,
+      "sha256": "1e4d9c992ceef2511b171a6a7942bc2b9a7162b830c93eac75e0cef5097907db"
+    },
+    {
+      "path": "E01_maintenance_mallet.glb",
+      "bytes": 853644,
+      "sha256": "23b7865ba2accc30914b6586453d7b512c916db49e221a433c40855dc9c72e20"
+    },
+    {
+      "path": "E01_core_contact_sheet.jpg",
+      "bytes": 146480,
+      "sha256": "72f6ef44a51f99bde9a7f3d5ff7691edc030c68436fbde17edcbd45517b171ce"
+    },
+    {
+      "path": "E01_motion_preview.mp4",
+      "bytes": 985421,
+      "sha256": "e83bba41169ff3ec831e62d9c9ef1b924668d145143fb31e2a40c6cd147b0d39"
+    },
+    {
+      "path": "E01_defeat_rest_wide.png",
+      "bytes": 747056,
+      "sha256": "e7061f584ece619197bc967ed4deaef45ce895ac7480fa0e2125cd5a95e56213"
+    },
+    {
+      "path": "core-inspection.json",
+      "bytes": 37258,
+      "sha256": "21a4931615504e298d42d4e370d470d8a6d9fe473fad5746e55035b5284428e5"
+    },
+    {
+      "path": "core-native-proof.txt",
+      "bytes": 1774,
+      "sha256": "0cae392b05948a3e3edbb12606ab47d2e24d526b6cbb8d713fd17725c29d1336"
+    },
+    {
+      "path": "clip-set-receipt.json",
+      "bytes": 963,
+      "sha256": "5d60afd19c17f1a8bf03fc26cef800d6ce353e5eb9dbddc3545ea8beb0c1045c"
+    },
+    {
+      "path": "core-name-receipt.json",
+      "bytes": 457,
+      "sha256": "deff018dac7d4f31486412f6f9d8ed52f11bd050e79047fdbcded0a66ca56191"
+    }
+  ]
+}

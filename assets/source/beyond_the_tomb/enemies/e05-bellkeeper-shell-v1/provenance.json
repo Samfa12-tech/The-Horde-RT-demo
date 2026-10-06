@@ -1,0 +1,41 @@
+{
+  "asset_id": "E05",
+  "name": "Bellkeeper original modular armour shell",
+  "version": "1.0.0-source-pilot",
+  "status": "Source/mechanism art proposal; not implemented boss gameplay",
+  "date": "2026-10-06",
+  "authorship": {
+    "shell_geometry": "Originally authored locally in Blender; no copied model geometry",
+    "iron_textures": "Original deterministic procedural pixels, seed26100605",
+    "paid_shell_calls": 0,
+    "body_reference": "Meshy Smart Topology v03, separately generated/retextured/rigged under parent task; provider originals unchanged"
+  },
+  "source_authority": {
+    "register_commit": "e6cf2e97e5577aa051c5a18014477598762d7b75",
+    "documents": [
+      "docs/CAMPAIGN_DESIGN.md",
+      "docs/DUNGEON_CHAPTER_PLANS.md",
+      "docs/design/world/dungeons/asset-register.json"
+    ],
+    "canonical_requirement": "One drowned armoured H2 guardian; actual placed-reflector light path must open exposure before valid attack; detailed geometry/timing remain proposed"
+  },
+  "negative_brief": [
+    "No glowing core",
+    "No fantasy symbols",
+    "No new lore",
+    "No copied geometry",
+    "No monolithic fused armour",
+    "No runtime implementation",
+    "No Git changes",
+    "No public release/deployment"
+  ],
+  "core_sha256": "4af085abce4c00858f647c806ec03fd54b6bbbd3ae04efdcae91578d32ff55b8",
+  "rig_sha256": "8a56315672c6e72425b99d4111a90692ff8ec6e0d93c84023547e448a4d7ed42",
+  "rights": "Original shell/maps retain project-owner rights with no new blanket public licence. Included Meshy E05 v03 body/rig carries Meshy attribution and conservative applicable CC BY4.0 notice; account plan unverified. See RIGHTS.md.",
+  "software": "Blender4.3.2; direct static Python inspection; game-dev and Khronos CLI unavailable",
+  "rights_links": {
+    "meshy": "https://www.meshy.ai/",
+    "provider_terms": "https://www.meshy.ai/terms-of-use",
+    "conservative_body_notice": "https://creativecommons.org/licenses/by/4.0/"
+  }
+}

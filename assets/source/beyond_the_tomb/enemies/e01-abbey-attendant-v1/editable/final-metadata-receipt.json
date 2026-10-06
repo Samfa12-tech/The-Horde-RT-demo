@@ -1,0 +1,26 @@
+[
+  {
+    "file": "E01_AbbeyAttendant_core.glb",
+    "before_sha256": "d7f76c589f67218ab758e60537431a88e583518f1d9f98c2cbdd5ba610b195ad",
+    "final_sha256": "1e4d9c992ceef2511b171a6a7942bc2b9a7162b830c93eac75e0cef5097907db",
+    "bytes": 5482720,
+    "binary_sha256_unchanged": "c72f88baf7203c461a2463e5cb071bfc3109f18442951afd1498081f22470335",
+    "change": "AI-origin attribution metadata only"
+  },
+  {
+    "file": "E01_AbbeyAttendant_source_extras.glb",
+    "before_sha256": "dce06d63d797043e11562008c07ad4f941edf377b09b26619b422c1b958a0b40",
+    "final_sha256": "6add8af5e1eecce273eb64c7d2885d2470c59e05c45c70061ead42025bf0849b",
+    "bytes": 5371304,
+    "binary_sha256_unchanged": "87e958df05696b65489588ffff0ef2b678949f49dbb27d3509545b03ec372fc9",
+    "change": "AI-origin attribution metadata only"
+  },
+  {
+    "file": "E01_AbbeyAttendant_all_clips.glb",
+    "before_sha256": "20927852c63dc8aa5602bc3a08dc47fc251b454b2c8dadfd3da11d20c54aa483",
+    "final_sha256": "f9241e7e9a0239e7cf504cdd713e278864607bbec9cbfd4b923f45c38dddc87e",
+    "bytes": 5653940,
+    "binary_sha256_unchanged": "cae94eb3fd8f0498ac8e1fb15df5e5e110eda52d049545d5f2f036f1f25182df",
+    "change": "AI-origin attribution metadata only"
+  }
+]

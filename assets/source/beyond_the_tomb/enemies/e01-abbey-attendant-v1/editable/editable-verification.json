@@ -1,0 +1,58 @@
+{
+  "file": "/source-workspace/horde-meshy/abbey-attendant/final/E01_AbbeyAttendant_editable.blend",
+  "bytes": 8139795,
+  "actions": [
+    "Attack",
+    "Dead",
+    "Hit_Reaction",
+    "Idle",
+    "Idle_Turn_Left",
+    "Idle_Turn_Right",
+    "Running",
+    "Walking"
+  ],
+  "joints": 25,
+  "mesh_objects": [
+    "char1",
+    "E01_Mallet_Assembly_Only",
+    "Icosphere"
+  ],
+  "all_file_images_packed": true,
+  "packed_image_count": 6,
+  "mallet_constraint_matrix_error": 0.0,
+  "fps": 60,
+  "active_idle_track": [
+    [
+      "Idle",
+      false
+    ],
+    [
+      "Attack",
+      true
+    ],
+    [
+      "Dead",
+      true
+    ],
+    [
+      "Hit_Reaction",
+      true
+    ],
+    [
+      "Idle_Turn_Left",
+      true
+    ],
+    [
+      "Idle_Turn_Right",
+      true
+    ],
+    [
+      "Walking",
+      true
+    ],
+    [
+      "Running",
+      true
+    ]
+  ]
+}

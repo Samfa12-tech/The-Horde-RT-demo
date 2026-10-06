@@ -1,0 +1,41 @@
+{
+  "asset": "E01 Abbey attendant v02",
+  "review": "pre-rig source geometry",
+  "source_sha256": "fc6ba1aaeecc6444330e23e1b5f6153d4273e331162c173a0c94fb84fabe9fbe",
+  "source_bytes": 15573780,
+  "decision": "KEEP for texture/remesh; conditional hand repair before one-handed-tool acceptance",
+  "evidence": "geometry-v02-views-grey",
+  "reviewed_views": [
+    "front",
+    "side",
+    "back",
+    "face",
+    "hand_left",
+    "hand_right",
+    "hips"
+  ],
+  "geometry": {
+    "triangles": 648880,
+    "vertices": 324428,
+    "connected_components_exact_weld": 1,
+    "boundary_edges_exact_weld": 0,
+    "nonmanifold_edges_exact_weld": 0,
+    "degenerate_triangles": 0
+  },
+  "observations": [
+    "Body, shoulder/elbow, neck, hip, leg and foot separations are usable for a humanoid bind.",
+    "Present elbows are modestly bent and forearms supinated. Bind this actual rest pose before any desired T/A-pose normalization.",
+    "No fused held prop, floor, hood or long robe. Split apron terminates above the knees.",
+    "Face is gaunt and closed-mouth; this does not establish facial animation suitability.",
+    "Thumb and four distal finger shapes are visible, but finger separations are shallow/webbed. Tool grip requires a local geometry/weight/socket pass.",
+    "Long sleeves and worker apron/trousers differ from the initial short-tunic/exposed-elbow art brief."
+  ],
+  "blocking_later_gates": [
+    "Paid rig should follow textured-remesh visual acceptance.",
+    "12K/6K comparison must preserve hand/face/joint silhouette; source must not be replaced by arbitrary decimation.",
+    "Runtime material/skin/clip/accessor checks intentionally fail on this raw untextured source.",
+    "No native appearance, GPU skinning, gameplay or device performance claim."
+  ],
+  "source_file_modified": false,
+  "render_material": "Neutral grey temporary viewport/render override; no asset export"
+}

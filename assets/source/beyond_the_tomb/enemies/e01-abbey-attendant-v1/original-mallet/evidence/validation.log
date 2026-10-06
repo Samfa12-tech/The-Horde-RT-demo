@@ -1,0 +1,542 @@
+Extensions: writing cache failed ([Errno 30] Read-only file system: '/home/agent/.config/blender').
+19:59:26 | INFO: Data are loaded, start creating Blender stuff
+19:59:26 | INFO: Blender create Mesh node AbbeyMallet_OriginalMesh
+19:59:26 | INFO: glTF import finished in 0.01s
+Blender 4.3.2
+Read blend: "/source-workspace/horde-attendant-mallet-v1/abbey_attendant_maintenance_mallet.blend"
+Fra:1 Mem:11.32M (Peak 11.32M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Synchronizing object | AbbeyMaintenanceMallet
+Fra:1 Mem:13.43M (Peak 13.43M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Initializing
+Fra:1 Mem:13.42M (Peak 13.43M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Updating Images | Loading abbey_mallet_basecolor
+Fra:1 Mem:13.42M (Peak 13.43M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Updating Images | Loading abbey_mallet_normal
+Fra:1 Mem:13.42M (Peak 13.43M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Updating Images | Loading abbey_mallet_orm
+Fra:1 Mem:16.17M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Waiting for render to start
+Fra:1 Mem:16.17M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Loading render kernels (may take a few minutes the first time)
+Fra:1 Mem:16.17M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Scene
+Fra:1 Mem:16.17M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Shaders
+Fra:1 Mem:16.25M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Procedurals
+Fra:1 Mem:16.25M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Background
+Fra:1 Mem:16.25M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Camera
+Fra:1 Mem:16.25M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Meshes Flags
+Fra:1 Mem:16.25M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Objects
+Fra:1 Mem:16.25M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Objects | Copying Transformations to device
+Fra:1 Mem:16.25M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Objects | Applying Static Transformations
+Fra:1 Mem:16.25M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Particle Systems
+Fra:1 Mem:16.25M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Particle Systems | Copying Particles to device
+Fra:1 Mem:16.25M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Meshes
+Fra:1 Mem:16.26M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Mesh | Computing attributes
+Fra:1 Mem:16.31M (Peak 20.45M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Mesh | Copying Attributes to device
+Fra:1 Mem:16.31M (Peak 20.45M) | Time:00:00.01 | Mem:3.05M, Peak:3.05M | Scene, ViewLayer | Updating Scene BVH | Building
+Fra:1 Mem:16.31M (Peak 20.45M) | Time:00:00.01 | Mem:3.05M, Peak:3.05M | Scene, ViewLayer | Updating Scene BVH | Building BVH
+Fra:1 Mem:16.31M (Peak 20.45M) | Time:00:00.01 | Mem:3.06M, Peak:3.06M | Scene, ViewLayer | Updating Scene BVH | Building BVH 0%
+Fra:1 Mem:16.31M (Peak 20.45M) | Time:00:00.01 | Mem:3.08M, Peak:3.10M | Scene, ViewLayer | Updating Scene BVH | Copying BVH to device
+Fra:1 Mem:16.31M (Peak 20.45M) | Time:00:00.01 | Mem:3.08M, Peak:3.10M | Scene, ViewLayer | Updating Mesh | Computing normals
+Fra:1 Mem:16.34M (Peak 20.45M) | Time:00:00.01 | Mem:3.08M, Peak:3.10M | Scene, ViewLayer | Updating Mesh | Copying Mesh to device
+Fra:1 Mem:16.34M (Peak 20.45M) | Time:00:00.01 | Mem:3.12M, Peak:3.12M | Scene, ViewLayer | Updating Objects Flags
+Fra:1 Mem:16.34M (Peak 20.45M) | Time:00:00.01 | Mem:3.12M, Peak:3.12M | Scene, ViewLayer | Updating Primitive Offsets
+Fra:1 Mem:16.34M (Peak 20.45M) | Time:00:00.01 | Mem:3.12M, Peak:3.12M | Scene, ViewLayer | Updating Images
+Fra:1 Mem:16.34M (Peak 20.45M) | Time:00:00.01 | Mem:3.12M, Peak:3.12M | Scene, ViewLayer | Updating Camera Volume
+Fra:1 Mem:16.34M (Peak 20.45M) | Time:00:00.01 | Mem:3.12M, Peak:3.12M | Scene, ViewLayer | Updating Lookup Tables
+Fra:1 Mem:16.34M (Peak 20.45M) | Time:00:00.01 | Mem:3.20M, Peak:3.20M | Scene, ViewLayer | Updating Lights
+Fra:1 Mem:16.34M (Peak 20.45M) | Time:00:00.01 | Mem:3.20M, Peak:3.20M | Scene, ViewLayer | Updating Lights | Computing tree
+Fra:1 Mem:16.34M (Peak 20.45M) | Time:00:00.01 | Mem:3.20M, Peak:3.20M | Scene, ViewLayer | Updating Integrator
+Fra:1 Mem:16.34M (Peak 20.45M) | Time:00:00.01 | Mem:3.20M, Peak:3.20M | Scene, ViewLayer | Updating Film
+Fra:1 Mem:16.35M (Peak 20.45M) | Time:00:00.01 | Mem:3.12M, Peak:3.20M | Scene, ViewLayer | Updating Lookup Tables
+Fra:1 Mem:16.35M (Peak 20.45M) | Time:00:00.01 | Mem:3.21M, Peak:3.21M | Scene, ViewLayer | Updating Baking
+Fra:1 Mem:16.35M (Peak 20.45M) | Time:00:00.01 | Mem:3.21M, Peak:3.21M | Scene, ViewLayer | Updating Device | Writing constant memory
+Fra:1 Mem:16.35M (Peak 20.45M) | Time:00:00.01 | Mem:3.21M, Peak:3.21M | Scene, ViewLayer | Sample 0/64
+Fra:1 Mem:57.94M (Peak 57.94M) | Time:00:00.11 | Remaining:00:06.16 | Mem:44.76M, Peak:44.76M | Scene, ViewLayer | Sample 1/64
+Fra:1 Mem:76.41M (Peak 113.33M) | Time:00:04.06 | Mem:44.76M, Peak:44.76M | Scene, ViewLayer | Sample 64/64
+Fra:1 Mem:76.41M (Peak 113.33M) | Time:00:04.06 | Mem:44.76M, Peak:44.76M | Scene, ViewLayer | Finished
+Saved: '/source-workspace/horde-attendant-mallet-v1/previews/06_fresh_glb_import.png'
+Time: 00:04.40 (Saving: 00:00.33)
+
+{
+  "blender_version": "4.3.2",
+  "checks": {
+    "editable_blend_mesh": {
+      "vertices": 264,
+      "edges": 496,
+      "polygons": 238,
+      "triangles": 516,
+      "nonfinite_vertices": 0,
+      "degenerate_triangles": 0,
+      "loose_vertices": 0,
+      "boundary_edges": 0,
+      "non_manifold_edges": 0,
+      "inconsistent_winding_edges": 0,
+      "connected_components": 3,
+      "signed_component_volumes_m3": [
+        0.00012490661232621392,
+        0.00021129504132325993,
+        6.339727804394181e-06
+      ],
+      "positive_component_volumes": true,
+      "bounds_xyz_m": [
+        [
+          -0.05999999865889549,
+          0.05999999865889549
+        ],
+        [
+          -0.021348631009459496,
+          0.021393563598394394
+        ],
+        [
+          -0.054999999701976776,
+          0.2849999964237213
+        ]
+      ],
+      "uv_layers": 1,
+      "uv_degenerate_triangles": 0,
+      "uv_nonfinite_values": 0,
+      "uv_out_of_unit_range_values": 0,
+      "minimum_uv_triangle_area": 2.6794497447468757e-05
+    },
+    "fresh_import_raw_0": {
+      "vertices": 850,
+      "edges": 1144,
+      "polygons": 516,
+      "triangles": 516,
+      "nonfinite_vertices": 0,
+      "degenerate_triangles": 0,
+      "loose_vertices": 0,
+      "boundary_edges": 740,
+      "non_manifold_edges": 740,
+      "inconsistent_winding_edges": 0,
+      "connected_components": 222,
+      "signed_component_volumes_m3": [
+        1.7166200905194273e-07,
+        4.304718951667989e-07,
+        9.242167209628369e-05,
+        7.463256300373663e-07,
+        1.0091112025989444e-06,
+        1.0057283565956256e-06,
+        2.342827012095465e-06,
+        1.6909962141653515e-07,
+        1.003232947975145e-06,
+        1.7244768931353369e-07,
+        6.203771363288979e-07,
+        6.311315701168496e-07,
+        1.988233786202424e-05,
+        1.5473891371205657e-06,
+        6.247323653951755e-07,
+        1.5142742692357085e-06,
+        6.137910114982029e-07,
+        1.0521877508532877e-06,
+        -2.7149076231580693e-07,
+        -2.764118107734248e-07,
+        2.8511983524974003e-05,
+        -2.4434805775778536e-06,
+        -1.9381805032026023e-06,
+        -3.2926194156364846e-07,
+        -2.703266090975376e-07,
+        1.113847247324884e-06,
+        1.5927457752695773e-06,
+        1.2224403083867703e-06,
+        1.2445597500724641e-06,
+        5.006641922970327e-06,
+        4.171193874450789e-06,
+        1.3565996444716195e-06,
+        1.249945701905138e-06,
+        1.3931723212105378e-06,
+        -1.622718627913855e-06,
+        1.0525964171392843e-06,
+        -1.8817756123704992e-06,
+        -9.066416434203953e-06,
+        -9.088716979022138e-06,
+        -1.926082101514718e-06,
+        -1.6385862788107868e-06,
+        6.142161813234756e-07,
+        1.3781269293152338e-06,
+        2.392749271014812e-06,
+        2.598988506482177e-06,
+        1.0849906023698471e-05,
+        1.1201841500607657e-05,
+        2.584222784207668e-06,
+        2.1388191271398682e-06,
+        1.1067634962576751e-06,
+        -4.758012437378056e-06,
+        2.308785648589643e-06,
+        -4.014543568094571e-06,
+        -1.9412511673995898e-05,
+        -2.1956381715426687e-05,
+        -3.913957471013418e-06,
+        -4.102634193259291e-06,
+        1.7694134536820154e-06,
+        1.0788893026377384e-06,
+        5.9052366244335035e-06,
+        4.808830453839619e-06,
+        2.2803916079302173e-05,
+        2.6074274501297623e-05,
+        4.8700427820828436e-06,
+        5.366759713372933e-06,
+        1.588265414890581e-06,
+        2.8139066519846287e-06,
+        -6.0893999034306034e-06,
+        -6.125624925819769e-06,
+        -2.817989782973503e-05,
+        -3.0200711080397014e-05,
+        -7.3060249026942374e-06,
+        -5.991639056901477e-06,
+        3.2801017368910834e-06,
+        3.960607500630431e-06,
+        7.809901793128423e-06,
+        8.840906351300267e-06,
+        3.35965984656165e-05,
+        3.646457723031441e-05,
+        9.599953045835719e-06,
+        8.677824439473625e-06,
+        2.5496140854860036e-06,
+        -6.089400509760405e-06,
+        -7.421147036742089e-06,
+        2.5496119633316994e-06,
+        -2.817989782973503e-05,
+        -2.9402258082456e-05,
+        -6.276016847550636e-06,
+        -7.306026721683641e-06,
+        2.4265785517248637e-06,
+        3.960604468981425e-06,
+        8.840905744970465e-06,
+        9.42848528969383e-06,
+        3.618245480785376e-05,
+        3.3596597252956904e-05,
+        7.84299284835773e-06,
+        9.599953045835719e-06,
+        4.229018031765008e-06,
+        2.397067570806636e-06,
+        -3.941446038879803e-06,
+        -4.82559062220389e-06,
+        -1.8863902369048446e-05,
+        -2.277261753154865e-05,
+        -4.0814093154040165e-06,
+        -3.915796507196016e-06,
+        1.3000017133890651e-06,
+        1.9021165750624884e-06,
+        4.907219893842314e-06,
+        5.847898137290031e-06,
+        2.2652860631448373e-05,
+        2.654690228354184e-05,
+        5.397191216616193e-06,
+        4.864423317485489e-06,
+        1.5254611677543532e-06,
+        1.0645449037838262e-06,
+        -1.5677759771885273e-06,
+        -1.5637730636323492e-06,
+        -8.987065527321647e-06,
+        -9.451523434715151e-06,
+        -1.89653223969799e-06,
+        -1.5794630598975345e-06,
+        1.035222074582028e-06,
+        1.0234463540352106e-06,
+        2.1728437786805443e-06,
+        2.3826932344187903e-06,
+        1.1057442501775464e-05,
+        1.1320113268690571e-05,
+        2.35133717296776e-06,
+        2.6077247336312817e-06,
+        8.02066248676662e-07,
+        1.201343366119545e-06,
+        -3.1777388661187916e-07,
+        -2.46284495612296e-07,
+        -1.996042556129396e-06,
+        -2.4029933077448127e-06,
+        -2.928694963581317e-07,
+        -3.1993749871617183e-07,
+        1.4135624345120352e-06,
+        1.239520618886066e-06,
+        1.2330489577531505e-06,
+        1.2267598776816158e-06,
+        4.113084287382662e-06,
+        5.090905991285884e-06,
+        1.229096142196795e-06,
+        1.3625037051194038e-06,
+        1.1913992542152603e-06,
+        3.6239969934589076e-06,
+        2.5054386848447997e-05,
+        -2.064920149299117e-05,
+        -1.3360980470148812e-07,
+        -1.3190538972196464e-07,
+        -1.4419892835348946e-07,
+        -1.4067232475175237e-07,
+        -1.4942323408225397e-07,
+        -1.4603695904410094e-07,
+        -1.567654521750228e-07,
+        -1.444864260828164e-07,
+        -1.5904482590182548e-07,
+        -1.3781957464154004e-07,
+        -1.5425477310297234e-07,
+        -1.4749377896805527e-07,
+        -1.3298627380790387e-07,
+        -1.3506211023657974e-07,
+        -1.4578785586157514e-07,
+        -1.4210698070134717e-07,
+        -1.5099006607973328e-07,
+        -1.4706991831777336e-07,
+        -1.578900802693776e-07,
+        -1.4484038679540845e-07,
+        -1.5942670354244606e-07,
+        -1.3739991544525765e-07,
+        -1.5379138555241903e-07,
+        -1.463090673799646e-07,
+        1.2150605262680378e-07,
+        1.2296666329625339e-07,
+        1.2676451177640047e-07,
+        1.1070320719378894e-07,
+        1.183007043437101e-07,
+        1.0130509616364709e-07,
+        1.0528022661067855e-07,
+        1.0157856955572697e-07,
+        9.956441952378252e-08,
+        1.0934530081385674e-07,
+        1.0492847953476787e-07,
+        1.1467312011070874e-07,
+        1.1380658785734947e-07,
+        1.103861251294802e-07,
+        1.1544544757195278e-07,
+        9.973701390701233e-08,
+        1.0716386592927545e-07,
+        9.343127249650252e-08,
+        9.730920661847146e-08,
+        9.890618753634801e-08,
+        9.68956683777833e-08,
+        1.1259101266129316e-07,
+        1.0827678427934491e-07,
+        1.222741730089183e-07,
+        1.4140423025092255e-07,
+        1.322633167433196e-07,
+        1.399950950720097e-07,
+        1.3557481300570848e-07,
+        1.4589168747155176e-07,
+        1.3990260564848236e-07,
+        1.4895937342866242e-07,
+        1.4076134865111575e-07,
+        1.4737501545051637e-07,
+        1.3703205089162415e-07,
+        1.42444927557032e-07,
+        1.3214660536201942e-07,
+        1.3878518593616698e-07,
+        1.3978731179994006e-07,
+        1.307369181802187e-07,
+        1.3407187301102871e-07,
+        1.4430005235155363e-07,
+        1.3882472179223745e-07,
+        1.478206772542734e-07,
+        1.4039875158763002e-07,
+        1.469934645115245e-07,
+        1.374808865269491e-07,
+        1.4292334071797086e-07,
+        1.3328658117946665e-07,
+        2.451599999631071e-05
+      ],
+      "positive_component_volumes": false,
+      "bounds_xyz_m": [
+        [
+          -0.05999999865889549,
+          0.05999999865889549
+        ],
+        [
+          -0.021348631009459496,
+          0.021393563598394394
+        ],
+        [
+          -0.054999999701976776,
+          0.2849999964237213
+        ]
+      ],
+      "uv_layers": 1,
+      "uv_degenerate_triangles": 0,
+      "uv_nonfinite_values": 0,
+      "uv_out_of_unit_range_values": 0,
+      "minimum_uv_triangle_area": 2.679486491352634e-05
+    },
+    "fresh_import_welded_0": {
+      "vertices": 264,
+      "edges": 774,
+      "polygons": 516,
+      "triangles": 516,
+      "nonfinite_vertices": 0,
+      "degenerate_triangles": 0,
+      "loose_vertices": 0,
+      "boundary_edges": 0,
+      "non_manifold_edges": 0,
+      "inconsistent_winding_edges": 0,
+      "connected_components": 3,
+      "signed_component_volumes_m3": [
+        0.00012490661181225468,
+        0.0002112950096425277,
+        6.3397268191082496e-06
+      ],
+      "positive_component_volumes": true,
+      "bounds_xyz_m": [
+        [
+          -0.05999999865889549,
+          0.05999999865889549
+        ],
+        [
+          -0.021348631009459496,
+          0.021393563598394394
+        ],
+        [
+          -0.054999999701976776,
+          0.2849999964237213
+        ]
+      ],
+      "uv_layers": 1,
+      "uv_degenerate_triangles": 0,
+      "uv_nonfinite_values": 0,
+      "uv_out_of_unit_range_values": 0,
+      "minimum_uv_triangle_area": 2.679486491352634e-05
+    }
+  },
+  "limitations": [
+    "No Khronos validator installed or run.",
+    "No game-engine import, collision or attack-timing test.",
+    "Component shells intentionally intersect at joints.",
+    "Procedural normal map only; no high-poly bake."
+  ],
+  "source_materials": 1,
+  "source_origin_m": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "source_scale": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "source_rotation": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "gltf_static": {
+    "mesh_count": 1,
+    "material_count": 1,
+    "texture_count": 3,
+    "image_count": 3,
+    "external_uris": [],
+    "images": [
+      {
+        "name": "abbey_mallet_normal",
+        "mime": "image/png",
+        "bytes": 273577,
+        "dimensions": [
+          512,
+          512
+        ],
+        "sha256": "3c67825dad6201026bb2c54c78720ac9b23776806af43c5520ce31fc7ce6d303"
+      },
+      {
+        "name": "abbey_mallet_orm",
+        "mime": "image/png",
+        "bytes": 202448,
+        "dimensions": [
+          512,
+          512
+        ],
+        "sha256": "327df1095c406e41d2317af512ca5d1e15dbb03cc5c5624b0316c40e6053d653"
+      },
+      {
+        "name": "abbey_mallet_basecolor",
+        "mime": "image/png",
+        "bytes": 331321,
+        "dimensions": [
+          512,
+          512
+        ],
+        "sha256": "85b64e859196bb78eaf49cda4de9b16f02c7f06d8dd635f5846a6c5a0921735b"
+      }
+    ],
+    "materials": [
+      {
+        "name": "AbbeyMallet_PBR_Atlas",
+        "normalTexture": {
+          "index": 0,
+          "scale": 0.6000000238418579
+        },
+        "occlusionTexture": {
+          "index": 1
+        },
+        "pbrMetallicRoughness": {
+          "baseColorTexture": {
+            "index": 2
+          },
+          "metallicRoughnessTexture": {
+            "index": 1
+          }
+        }
+      }
+    ],
+    "nodes": [
+      {
+        "extras": {
+          "asset_id": "horde.e01.abbey-maintenance-mallet.v1",
+          "provenance": "Original deterministic local Blender geometry and procedural texture authoring.",
+          "grip_diameter_m": "0.027 x 0.023",
+          "grip_region_blender_z_m": "-0.040 to +0.060",
+          "authoring_seed": 261006
+        },
+        "mesh": 0,
+        "name": "AbbeyMaintenanceMallet"
+      },
+      {
+        "children": [
+          0
+        ],
+        "extras": {
+          "reference": "Provisional tool grip origin; not a measured E01 RightGrip hand transform.",
+          "handle_axis_blender": "+Z",
+          "head_axis_blender": "+X"
+        },
+        "name": "Grip"
+      }
+    ],
+    "primitives": [
+      {
+        "vertices_after_attribute_splits": 850,
+        "triangles": 516,
+        "index_out_of_bounds": 0,
+        "degenerate_triangles": 0,
+        "finite_positions": true,
+        "finite_normals": true,
+        "normal_length_min": 0.9999999403953552,
+        "normal_length_max": 1.0000001192092896,
+        "normal_to_face_min_dot": 0.9419510364532471,
+        "opposed_vertex_normals": 0,
+        "has_tangents": true,
+        "finite_tangents": true,
+        "tangent_normal_max_abs_dot": 9.88272950053215e-05,
+        "tangent_w_values": [
+          -1.0,
+          1.0
+        ],
+        "uv_within_unit_square": true,
+        "bounds_xyz_m": [
+          [
+            -0.05999999865889549,
+            0.05999999865889549
+          ],
+          [
+            -0.054999999701976776,
+            0.2849999964237213
+          ],
+          [
+            -0.021393563598394394,
+            0.021348631009459496
+          ]
+        ]
+      }
+    ]
+  },
+  "fresh_import": {
+    "mesh_objects": 1,
+    "images": 3,
+    "materials": 1,
+    "import_completed": true,
+    "attribute_seam_note": "Raw glTF topology deliberately splits UV seams and hard normals. Raw boundary edges/open pieces are attribute splits, not holes. The separate temporary weld at 1e-7m restores the original 264 vertices and three closed outward-wound shells; the delivered file is not altered.",
+    "render": "previews/06_fresh_glb_import.png"
+  },
+  "result": "PASS"
+}
+
+Blender quit

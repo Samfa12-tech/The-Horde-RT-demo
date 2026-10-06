@@ -1,0 +1,73 @@
+{
+  "rig_source": "/source-workspace/horde-meshy/meshy_output/20261006_204906_horde-e05-bellkeeper-inner-v01_01a1109d/rig-v03/rigged_character.glb",
+  "rig_source_sha256": "8a56315672c6e72425b99d4111a90692ff8ec6e0d93c84023547e448a4d7ed42",
+  "shell_source": "/source-workspace/horde-meshy/bellkeeper/shell-final-v01/bellkeeper_modular_shell.blend",
+  "bindings": {
+    "chest": "Spine",
+    "head": "Head",
+    "upper_arm_left": "LeftArm",
+    "upper_arm_right": "RightArm",
+    "basis": "Read actual Meshy rig v03 joints and world-space imported bounds; original skeleton has centimetre-local units with object scale, which is preserved. Shell helpers are placed through the inverse armature world matrix."
+  },
+  "socket_helper_bones": {
+    "ChestMount": "Spine",
+    "HeadMount": "Head",
+    "Shoulder.L": "LeftArm",
+    "Shoulder.R": "RightArm",
+    "ReflectedPathReceiver_PROPOSAL": "ChestMount",
+    "ExposureCentre_PROPOSAL": "ChestMount"
+  },
+  "empty_bone_parenting": "None; source Empty sockets replaced with actual helper bones",
+  "shell_mesh_bone_assignments": {
+    "Cuirass_BackAndSides": "ChestMount",
+    "Gorget_NeckRing": "ChestMount",
+    "BreastShutter.L": "E05_Shutter.L",
+    "ShutterHingeBarrel.L.0": "ChestMount",
+    "FixedHingeCleat.L.0": "ChestMount",
+    "ShutterHingeBarrel.L.1": "ChestMount",
+    "FixedHingeCleat.L.1": "ChestMount",
+    "BreastShutter.R": "E05_Shutter.R",
+    "ShutterHingeBarrel.R.0": "ChestMount",
+    "FixedHingeCleat.R.0": "ChestMount",
+    "ShutterHingeBarrel.R.1": "ChestMount",
+    "FixedHingeCleat.R.1": "ChestMount",
+    "Helmet_Crown": "HeadMount",
+    "Helmet_Top": "HeadMount",
+    "Helmet_RearSkirt": "HeadMount",
+    "Helmet_Visor": "HeadMount",
+    "ShoulderLame.L.1": "Shoulder.L",
+    "ShoulderLame.L.2": "Shoulder.L",
+    "ShoulderLame.R.1": "Shoulder.R",
+    "ShoulderLame.R.2": "Shoulder.R"
+  },
+  "new_helper_bones": {
+    "E05_Shutter.L": {
+      "physical_axis": "vertical world Z at bind",
+      "pose_rotation_axis": "local Z",
+      "open_degrees": 95
+    },
+    "E05_Shutter.R": {
+      "physical_axis": "vertical world Z at bind",
+      "pose_rotation_axis": "local Z",
+      "open_degrees": -95
+    }
+  },
+  "body_meshes": [
+    "char1"
+  ],
+  "provider_import_helpers_excluded": [
+    "Icosphere"
+  ],
+  "body_bounds_min": [
+    -0.5719729065895081,
+    -0.18056125938892365,
+    -2.6036175881927193e-07
+  ],
+  "body_bounds_max": [
+    0.5719729661941528,
+    0.18056096136569977,
+    2.000000476837158
+  ],
+  "status": "Editable source; independently selected rigid objects weighted 1.0; not a joined native engine derivative",
+  "native_boundary": "Unchanged native reader tests only meshes[0]/skins[0]; motion worker must join a separate derivative and verify it. No PBR runtime path claim."
+}

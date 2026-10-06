@@ -1,0 +1,53 @@
+{
+  "closed_rest_errors": {
+    "Cuirass_BackAndSides": 1.2036781326982014e-07,
+    "Gorget_NeckRing": 1.1944189326376765e-07,
+    "BreastShutter.L": 1.2644054553268208e-07,
+    "ShutterHingeBarrel.L.0": 1.2310379476739693e-07,
+    "FixedHingeCleat.L.0": 1.2013700229374393e-07,
+    "ShutterHingeBarrel.L.1": 1.2310379476739693e-07,
+    "FixedHingeCleat.L.1": 1.4901161193847656e-08,
+    "BreastShutter.R": 1.2644054553268208e-07,
+    "ShutterHingeBarrel.R.0": 1.2310379476739693e-07,
+    "FixedHingeCleat.R.0": 1.2013700229374393e-07,
+    "ShutterHingeBarrel.R.1": 1.2310379476739693e-07,
+    "FixedHingeCleat.R.1": 1.4901161193847656e-08,
+    "Helmet_Crown": 2.384476811558792e-07,
+    "Helmet_Top": 2.384259686314991e-07,
+    "Helmet_RearSkirt": 2.385349660155493e-07,
+    "Helmet_Visor": 1.2013700229374393e-07,
+    "ShoulderLame.L.1": 1.3328003749250113e-07,
+    "ShoulderLame.L.2": 1.3348812510944096e-07,
+    "ShoulderLame.R.1": 1.2310379476739693e-07,
+    "ShoulderLame.R.2": 1.2310379476739693e-07
+  },
+  "open_hinge_errors": {
+    "L": 1.519626234052415e-07,
+    "R": 1.6858739404357614e-07
+  },
+  "bone_count": 32,
+  "rigid_weight_checks": {
+    "Cuirass_BackAndSides": true,
+    "Gorget_NeckRing": true,
+    "BreastShutter.L": true,
+    "ShutterHingeBarrel.L.0": true,
+    "FixedHingeCleat.L.0": true,
+    "ShutterHingeBarrel.L.1": true,
+    "FixedHingeCleat.L.1": true,
+    "BreastShutter.R": true,
+    "ShutterHingeBarrel.R.0": true,
+    "FixedHingeCleat.R.0": true,
+    "ShutterHingeBarrel.R.1": true,
+    "FixedHingeCleat.R.1": true,
+    "Helmet_Crown": true,
+    "Helmet_Top": true,
+    "Helmet_RearSkirt": true,
+    "Helmet_Visor": true,
+    "ShoulderLame.L.1": true,
+    "ShoulderLame.L.2": true,
+    "ShoulderLame.R.1": true,
+    "ShoulderLame.R.2": true
+  },
+  "status": "Static closed/open helper-bone binding proof; no dynamic body action certification",
+  "pass": true
+}

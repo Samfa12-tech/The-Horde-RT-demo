@@ -1,0 +1,109 @@
+Extensions: writing cache failed ([Errno 30] Read-only file system: '/home/agent/.config/blender').
+20:55:32 | INFO: Data are loaded, start creating Blender stuff
+20:55:32 | INFO: Blender create Mesh node Bell_BodyAndHandle_editable
+20:55:32 | INFO: Blender create Mesh node Bell_Clapper_Pivot_editable
+20:55:32 | INFO: glTF import finished in 0.01s
+Blender 4.3.2
+Read blend: "/source-workspace/horde-bell-attendant-tools-v1/abbey_bell_attendant_handbell.blend"
+Fra:1 Mem:11.43M (Peak 11.43M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Synchronizing object | Bell_BodyAndHandle
+Fra:1 Mem:11.43M (Peak 11.43M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Synchronizing object | Bell_Clapper_Pivot
+Fra:1 Mem:13.70M (Peak 13.70M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Initializing
+Fra:1 Mem:13.69M (Peak 13.70M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Updating Images | Loading abbey_duty_basecolor
+Fra:1 Mem:13.69M (Peak 13.70M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Updating Images | Loading abbey_duty_normal
+Fra:1 Mem:13.69M (Peak 13.70M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Updating Images | Loading abbey_duty_orm
+Fra:1 Mem:16.40M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Waiting for render to start
+Fra:1 Mem:16.40M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Loading render kernels (may take a few minutes the first time)
+Fra:1 Mem:16.40M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Scene
+Fra:1 Mem:16.40M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Shaders
+Fra:1 Mem:16.48M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Procedurals
+Fra:1 Mem:16.48M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Background
+Fra:1 Mem:16.48M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Camera
+Fra:1 Mem:16.48M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Meshes Flags
+Fra:1 Mem:16.48M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Objects
+Fra:1 Mem:16.48M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Objects | Copying Transformations to device
+Fra:1 Mem:16.48M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Objects | Applying Static Transformations
+Fra:1 Mem:16.48M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Particle Systems
+Fra:1 Mem:16.48M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Particle Systems | Copying Particles to device
+Fra:1 Mem:16.48M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Meshes
+Fra:1 Mem:16.50M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Mesh | Computing attributes
+Fra:1 Mem:16.64M (Peak 19.71M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Mesh | Copying Attributes to device
+Fra:1 Mem:16.64M (Peak 19.71M) | Time:00:00.01 | Mem:3.13M, Peak:3.13M | Scene, ViewLayer | Updating Scene BVH | Building
+Fra:1 Mem:16.64M (Peak 19.71M) | Time:00:00.01 | Mem:3.13M, Peak:3.13M | Scene, ViewLayer | Updating Scene BVH | Building BVH
+Fra:1 Mem:16.64M (Peak 19.71M) | Time:00:00.01 | Mem:3.18M, Peak:3.18M | Scene, ViewLayer | Updating Scene BVH | Building BVH 0%
+Fra:1 Mem:16.64M (Peak 19.71M) | Time:00:00.01 | Mem:3.24M, Peak:3.29M | Scene, ViewLayer | Updating Scene BVH | Copying BVH to device
+Fra:1 Mem:16.64M (Peak 19.71M) | Time:00:00.01 | Mem:3.24M, Peak:3.29M | Scene, ViewLayer | Updating Mesh | Computing normals
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.24M, Peak:3.29M | Scene, ViewLayer | Updating Mesh | Copying Mesh to device
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.32M, Peak:3.32M | Scene, ViewLayer | Updating Objects Flags
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.32M, Peak:3.32M | Scene, ViewLayer | Updating Primitive Offsets
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.32M, Peak:3.32M | Scene, ViewLayer | Updating Images
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.32M, Peak:3.32M | Scene, ViewLayer | Updating Camera Volume
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.32M, Peak:3.32M | Scene, ViewLayer | Updating Lookup Tables
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.40M, Peak:3.40M | Scene, ViewLayer | Updating Lights
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.41M, Peak:3.41M | Scene, ViewLayer | Updating Lights | Computing tree
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.41M, Peak:3.41M | Scene, ViewLayer | Updating Integrator
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.41M, Peak:3.41M | Scene, ViewLayer | Updating Film
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.32M, Peak:3.41M | Scene, ViewLayer | Updating Lookup Tables
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.41M, Peak:3.41M | Scene, ViewLayer | Updating Baking
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.41M, Peak:3.41M | Scene, ViewLayer | Updating Device | Writing constant memory
+Fra:1 Mem:16.72M (Peak 19.71M) | Time:00:00.01 | Mem:3.41M, Peak:3.41M | Scene, ViewLayer | Sample 0/48
+Fra:1 Mem:44.55M (Peak 44.55M) | Time:00:00.28 | Remaining:00:12.51 | Mem:31.23M, Peak:31.23M | Scene, ViewLayer | Sample 1/48
+Fra:1 Mem:56.91M (Peak 81.63M) | Time:00:06.71 | Mem:31.23M, Peak:31.23M | Scene, ViewLayer | Sample 48/48
+Fra:1 Mem:56.91M (Peak 81.63M) | Time:00:06.71 | Mem:31.23M, Peak:31.23M | Scene, ViewLayer | Finished
+Saved: '/source-workspace/horde-bell-attendant-tools-v1/previews/09_handbell_fresh_glb_import.png'
+Time: 00:07.06 (Saving: 00:00.34)
+
+Extensions: writing cache failed ([Errno 30] Read-only file system: '/home/agent/.config/blender').
+20:55:39 | INFO: Data are loaded, start creating Blender stuff
+20:55:39 | INFO: Blender create Mesh node Staff_Complete_editable
+20:55:39 | INFO: glTF import finished in 0.01s
+Read blend: "/source-workspace/horde-bell-attendant-tools-v1/abbey_bell_attendant_short_staff.blend"
+Fra:1 Mem:13.15M (Peak 13.15M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Synchronizing object | Staff_Complete
+Fra:1 Mem:13.26M (Peak 13.26M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Initializing
+Fra:1 Mem:13.25M (Peak 13.26M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Updating Images | Loading abbey_duty_normal
+Fra:1 Mem:13.25M (Peak 13.26M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Updating Images | Loading abbey_duty_orm
+Fra:1 Mem:16.00M (Peak 17.28M) | Time:00:00.00 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Waiting for render to start
+Fra:1 Mem:16.00M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Loading render kernels (may take a few minutes the first time)
+Fra:1 Mem:16.00M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Scene
+Fra:1 Mem:16.00M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Shaders
+Fra:1 Mem:16.09M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Procedurals
+Fra:1 Mem:16.09M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Background
+Fra:1 Mem:16.09M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Camera
+Fra:1 Mem:16.09M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Meshes Flags
+Fra:1 Mem:16.09M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Objects
+Fra:1 Mem:16.09M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Objects | Copying Transformations to device
+Fra:1 Mem:16.09M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Objects | Applying Static Transformations
+Fra:1 Mem:16.09M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Particle Systems
+Fra:1 Mem:16.09M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Particle Systems | Copying Particles to device
+Fra:1 Mem:16.09M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Meshes
+Fra:1 Mem:16.09M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Mesh | Computing attributes
+Fra:1 Mem:16.14M (Peak 17.28M) | Time:00:00.01 | Mem:3.00M, Peak:3.00M | Scene, ViewLayer | Updating Mesh | Copying Attributes to device
+Fra:1 Mem:16.14M (Peak 17.28M) | Time:00:00.01 | Mem:3.05M, Peak:3.05M | Scene, ViewLayer | Updating Scene BVH | Building
+Fra:1 Mem:16.14M (Peak 17.28M) | Time:00:00.01 | Mem:3.05M, Peak:3.05M | Scene, ViewLayer | Updating Scene BVH | Building BVH
+Fra:1 Mem:16.14M (Peak 17.28M) | Time:00:00.01 | Mem:3.07M, Peak:3.07M | Scene, ViewLayer | Updating Scene BVH | Building BVH 0%
+Fra:1 Mem:16.14M (Peak 17.28M) | Time:00:00.01 | Mem:3.09M, Peak:3.11M | Scene, ViewLayer | Updating Scene BVH | Copying BVH to device
+Fra:1 Mem:16.14M (Peak 17.28M) | Time:00:00.01 | Mem:3.09M, Peak:3.11M | Scene, ViewLayer | Updating Mesh | Computing normals
+Fra:1 Mem:16.18M (Peak 17.28M) | Time:00:00.01 | Mem:3.09M, Peak:3.11M | Scene, ViewLayer | Updating Mesh | Copying Mesh to device
+Fra:1 Mem:16.18M (Peak 17.28M) | Time:00:00.01 | Mem:3.13M, Peak:3.13M | Scene, ViewLayer | Updating Objects Flags
+Fra:1 Mem:16.18M (Peak 17.28M) | Time:00:00.01 | Mem:3.13M, Peak:3.13M | Scene, ViewLayer | Updating Primitive Offsets
+Fra:1 Mem:16.18M (Peak 17.28M) | Time:00:00.01 | Mem:3.13M, Peak:3.13M | Scene, ViewLayer | Updating Images
+Fra:1 Mem:16.18M (Peak 17.28M) | Time:00:00.01 | Mem:3.13M, Peak:3.13M | Scene, ViewLayer | Updating Camera Volume
+Fra:1 Mem:16.18M (Peak 17.28M) | Time:00:00.01 | Mem:3.13M, Peak:3.13M | Scene, ViewLayer | Updating Lookup Tables
+Fra:1 Mem:16.18M (Peak 17.28M) | Time:00:00.01 | Mem:3.21M, Peak:3.21M | Scene, ViewLayer | Updating Lights
+Fra:1 Mem:16.18M (Peak 17.28M) | Time:00:00.01 | Mem:3.21M, Peak:3.21M | Scene, ViewLayer | Updating Lights | Computing tree
+Fra:1 Mem:16.18M (Peak 17.28M) | Time:00:00.01 | Mem:3.21M, Peak:3.21M | Scene, ViewLayer | Updating Integrator
+Fra:1 Mem:16.18M (Peak 17.28M) | Time:00:00.01 | Mem:3.21M, Peak:3.21M | Scene, ViewLayer | Updating Film
+Fra:1 Mem:16.19M (Peak 17.28M) | Time:00:00.01 | Mem:3.13M, Peak:3.21M | Scene, ViewLayer | Updating Lookup Tables
+Fra:1 Mem:16.19M (Peak 17.28M) | Time:00:00.01 | Mem:3.22M, Peak:3.22M | Scene, ViewLayer | Updating Baking
+Fra:1 Mem:16.19M (Peak 17.28M) | Time:00:00.01 | Mem:3.22M, Peak:3.22M | Scene, ViewLayer | Updating Device | Writing constant memory
+Fra:1 Mem:16.19M (Peak 17.28M) | Time:00:00.01 | Mem:3.22M, Peak:3.22M | Scene, ViewLayer | Sample 0/48
+Fra:1 Mem:44.01M (Peak 44.01M) | Time:00:00.14 | Remaining:00:06.40 | Mem:31.04M, Peak:31.04M | Scene, ViewLayer | Sample 1/48
+Fra:1 Mem:56.37M (Peak 81.09M) | Time:00:02.60 | Mem:31.04M, Peak:31.04M | Scene, ViewLayer | Sample 48/48
+Fra:1 Mem:56.37M (Peak 81.09M) | Time:00:02.60 | Mem:31.04M, Peak:31.04M | Scene, ViewLayer | Finished
+Saved: '/source-workspace/horde-bell-attendant-tools-v1/previews/10_staff_fresh_glb_import.png'
+Time: 00:02.72 (Saving: 00:00.12)
+
+VALIDATION_RESULT PASS
+handbell PASS 1640 triangles 1249 split vertices
+short_staff PASS 564 triangles 654 split vertices
+
+Blender quit

@@ -1,0 +1,36 @@
+{
+  "12k": {
+    "texture_0_normal.png": {
+      "embedded_sha256": "4791f2cfbe47e6ba6f617836e625f4ac04110022b706b0b352dabd563195d50b",
+      "loose_sha256": "4791f2cfbe47e6ba6f617836e625f4ac04110022b706b0b352dabd563195d50b",
+      "identical": true
+    },
+    "texture_0_base_color.png": {
+      "embedded_sha256": "f2b6f48254fd9ad17d44f51c5f69e5135236cda9f94ed4961fd1b0515aeaaf89",
+      "loose_sha256": "f2b6f48254fd9ad17d44f51c5f69e5135236cda9f94ed4961fd1b0515aeaaf89",
+      "identical": true
+    },
+    "texture_0_metallic_roughness.png": {
+      "embedded_sha256": "9b3b1bcfef4fc37e838ee09e5e167e26d10fd1a9a06fc54a3e0370d175d62b2b",
+      "loose_sha256": "9b3b1bcfef4fc37e838ee09e5e167e26d10fd1a9a06fc54a3e0370d175d62b2b",
+      "identical": true
+    }
+  },
+  "6k": {
+    "texture_0_normal.png": {
+      "embedded_sha256": "15a364a17fc7a610eaa34df55a4bd93ef56a18d26b357995ee52f1817839f027",
+      "loose_sha256": "15a364a17fc7a610eaa34df55a4bd93ef56a18d26b357995ee52f1817839f027",
+      "identical": true
+    },
+    "texture_0_base_color.png": {
+      "embedded_sha256": "b434c129dc6e1b1ec31fa6bbecdbc2e92d9081746d67aa1bb97d6fcb31ea2cd6",
+      "loose_sha256": "b434c129dc6e1b1ec31fa6bbecdbc2e92d9081746d67aa1bb97d6fcb31ea2cd6",
+      "identical": true
+    },
+    "texture_0_metallic_roughness.png": {
+      "embedded_sha256": "9f6f5eee5560b23694ed1e7fd16569a160e243ea62e6cc09a42c129f06e538d4",
+      "loose_sha256": "9f6f5eee5560b23694ed1e7fd16569a160e243ea62e6cc09a42c129f06e538d4",
+      "identical": true
+    }
+  }
+}

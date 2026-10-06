@@ -1,0 +1,62 @@
+{
+  "abbey_duty_orm.png": {
+    "mode": "RGBA",
+    "size": [
+      512,
+      512
+    ],
+    "channel_min": [
+      255,
+      171,
+      0,
+      255
+    ],
+    "channel_max": [
+      255,
+      240,
+      222,
+      255
+    ],
+    "alpha_opaque": true
+  },
+  "abbey_duty_basecolor.png": {
+    "mode": "RGBA",
+    "size": [
+      512,
+      512
+    ],
+    "channel_min": [
+      23,
+      26,
+      15,
+      255
+    ],
+    "channel_max": [
+      75,
+      60,
+      47,
+      255
+    ],
+    "alpha_opaque": true
+  },
+  "abbey_duty_normal.png": {
+    "mode": "RGBA",
+    "size": [
+      512,
+      512
+    ],
+    "channel_min": [
+      120,
+      121,
+      255,
+      255
+    ],
+    "channel_max": [
+      135,
+      133,
+      255,
+      255
+    ],
+    "alpha_opaque": true
+  }
+}

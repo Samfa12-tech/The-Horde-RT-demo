@@ -1,0 +1,17 @@
+{
+  "body_input": "/source-workspace/horde-meshy/bellkeeper/accepted-core-v03f/bellkeeper_inner_2m_1k.glb",
+  "rig_output": "/source-workspace/horde-meshy/meshy_output/20261006_204906_horde-e05-bellkeeper-inner-v01_01a1109d/rig-v03/rigged_character.glb",
+  "body_images": {
+    "e05_body_normal": "7dafe08238f1420ef3d2cea15d22cdaa94215de06b7514eb312024ff406a17f9",
+    "e05_body_basecolor": "f0177f926f4f044e18eeab0a58b58110764367677b6fef822313f1bebdf50794",
+    "e05_body_orm": "54dfcd7e77ca62ff76488456b0dd320535db180201772571930a85a1ce3526df"
+  },
+  "rig_images": {
+    "e05_body_normal": "7dafe08238f1420ef3d2cea15d22cdaa94215de06b7514eb312024ff406a17f9",
+    "e05_body_basecolor": "f0177f926f4f044e18eeab0a58b58110764367677b6fef822313f1bebdf50794",
+    "e05_body_orm": "54dfcd7e77ca62ff76488456b0dd320535db180201772571930a85a1ce3526df"
+  },
+  "all_image_bytes_identical": true,
+  "glb_mesh_count": 1,
+  "Blender_only_helper_excluded": "Icosphere"
+}

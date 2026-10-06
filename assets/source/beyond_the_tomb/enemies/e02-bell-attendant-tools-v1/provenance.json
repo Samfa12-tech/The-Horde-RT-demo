@@ -1,0 +1,50 @@
+{
+  "asset_id": "horde.e02.abbey-bell-attendant-tools.v1",
+  "version": "1.0.0",
+  "created_date_utc": "2026-10-06",
+  "method": "Original deterministic local Blender geometry and procedural texture authoring",
+  "software": "Blender 4.3.2 and bundled Python/NumPy; Pillow for contact-sheet assembly",
+  "seed": 26100602,
+  "brief": "Separate modest handbell and 0.88 m blunt maintenance staff for E02 Abbey bell attendant, shared H1 role: muted worn ash and mineral/rust-stained iron, actual bell interior and independently pivoted clapper, metre scale, explicit provisional grips, opaque phone-conscious PBR. No new body, no paid provider, no symbols or magic.",
+  "negative_constraints": [
+    "No new body or skeleton",
+    "No copied character or torch",
+    "No spikes/blades/fantasy ornament/lore symbols",
+    "No ocean barnacles",
+    "No transparent cards",
+    "No engine or Git integration",
+    "No spending"
+  ],
+  "design_status": "Accessory proposals for an optional proposed role within canonical dead attendants; no new approved lore or completed shoulder silhouette",
+  "source_reference_files": [
+    {
+      "name": "asset-register.json",
+      "sha256": "8b759b9a4dbfcee5eab27e8c57c00ff30e1b09a73f466180c649bb5230fbe3e9",
+      "purpose": "Read-only planning or same-project style reference"
+    },
+    {
+      "name": "DUNGEON_CHAPTER_PLANS.md",
+      "sha256": "5928fb3fb17938b276cac27f328faa9392e82bc198a2db884e79371004d74f59",
+      "purpose": "Read-only planning or same-project style reference"
+    },
+    {
+      "name": "README.md",
+      "sha256": "0ffd5e3d1b36e0c4229e90b01219d6efe9358c036994cade4e06cfc3abca2136",
+      "purpose": "Read-only planning or same-project style reference"
+    }
+  ],
+  "external_source_assets": [],
+  "paid_invocations": 0,
+  "new_spend": 0,
+  "provider_job": null,
+  "rights_status": "Original project authoring. No third-party asset inputs or new public licence granted. Existing project rights/agreements apply.",
+  "authoring_source": "source/build_tools.py",
+  "validation_source": "source/validate_tools.py",
+  "outputs": [
+    "abbey_bell_attendant_handbell.glb",
+    "abbey_bell_attendant_handbell.blend",
+    "abbey_bell_attendant_short_staff.glb",
+    "abbey_bell_attendant_short_staff.blend"
+  ],
+  "tone_reference": "Earlier original E01 mallet inspected for quiet material tone and explicit grip conventions. Its geometry and pixels were not copied."
+}

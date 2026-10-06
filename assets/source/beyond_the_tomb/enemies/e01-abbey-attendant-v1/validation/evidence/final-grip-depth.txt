@@ -1,0 +1,12 @@
+Extensions: writing cache failed ([Errno 30] Read-only file system: '/home/agent/.config/blender').
+21:31:21 | INFO: Data are loaded, start creating Blender stuff
+21:31:21 | INFO: Blender create Mesh node output_unwrapped
+21:31:22 | INFO: glTF import finished in 0.28s
+{
+  "inside_vertex_instances": 0,
+  "worst_approx_penetration_m": 0,
+  "sample": []
+}
+Blender 4.3.2
+
+Blender quit

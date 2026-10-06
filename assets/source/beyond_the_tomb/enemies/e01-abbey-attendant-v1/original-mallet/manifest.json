@@ -1,0 +1,119 @@
+{
+  "asset_id": "horde.e01.abbey-maintenance-mallet.v1",
+  "version": "1.0.0",
+  "validation": "PASS within documented scope",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 5114,
+      "sha256": "0ffd5e3d1b36e0c4229e90b01219d6efe9358c036994cade4e06cfc3abca2136"
+    },
+    {
+      "path": "provenance.json",
+      "bytes": 1388,
+      "sha256": "071edc15f5c9ddb264cce56c13581b192e78dc610a344d4e62c31fec7d01f826"
+    },
+    {
+      "path": "abbey_attendant_maintenance_mallet.glb",
+      "bytes": 853644,
+      "sha256": "23b7865ba2accc30914b6586453d7b512c916db49e221a433c40855dc9c72e20"
+    },
+    {
+      "path": "abbey_attendant_maintenance_mallet.blend",
+      "bytes": 1319409,
+      "sha256": "a80e9da6f03894768205fae4c9bd8ae9caa8e238621474689ffb215812166073"
+    },
+    {
+      "path": "source/build_mallet.py",
+      "bytes": 13737,
+      "sha256": "be71b261e4732677abecc812e340046e8d8f6bab2d9cb7850cfe1d5b461c75d6"
+    },
+    {
+      "path": "source/validate_mallet.py",
+      "bytes": 10403,
+      "sha256": "e11ca6d52eee2f54a882e267bf2f845644080d02ccdac3ef7412c2952723aa82"
+    },
+    {
+      "path": "textures/abbey_mallet_basecolor.png",
+      "bytes": 331321,
+      "sha256": "85b64e859196bb78eaf49cda4de9b16f02c7f06d8dd635f5846a6c5a0921735b"
+    },
+    {
+      "path": "textures/abbey_mallet_normal.png",
+      "bytes": 273577,
+      "sha256": "3c67825dad6201026bb2c54c78720ac9b23776806af43c5520ce31fc7ce6d303"
+    },
+    {
+      "path": "textures/abbey_mallet_orm.png",
+      "bytes": 202448,
+      "sha256": "327df1095c406e41d2317af512ca5d1e15dbb03cc5c5624b0316c40e6053d653"
+    },
+    {
+      "path": "previews/01_front.png",
+      "bytes": 1216710,
+      "sha256": "7cfb53393edf4b189412fdcc36369e16c19a958299c8b744c41ed6465c6cb43f"
+    },
+    {
+      "path": "previews/02_side.png",
+      "bytes": 1210305,
+      "sha256": "e82794b10b276885abb80308c863f83edf7f710dd3eb31fdc710e132ed1b42fe"
+    },
+    {
+      "path": "previews/03_head_closeup.png",
+      "bytes": 1311037,
+      "sha256": "269f91075f43b11aa92ceab608599b57e0d571e3ff3d993100a95c4ec8382b1a"
+    },
+    {
+      "path": "previews/04_three_quarter.png",
+      "bytes": 1223114,
+      "sha256": "7cb8f2904bbde6d894222ff843fe4e74cb77b9a29595330b192595bce47a5ebe"
+    },
+    {
+      "path": "previews/05_grip_closeup.png",
+      "bytes": 1229852,
+      "sha256": "d0e26f034cae820a351eb3ba7730546d6f859fa60297450fed94c26dff62b8e2"
+    },
+    {
+      "path": "previews/06_fresh_glb_import.png",
+      "bytes": 1223622,
+      "sha256": "6faea3303b936f07341579a700e1ef9647ad093f4c1676c2945209891eae3909"
+    },
+    {
+      "path": "evidence/asset_specification.json",
+      "bytes": 1828,
+      "sha256": "468f817dcd7ce1041a12972ddd3aa4523151732b702572592780d2a1255b91a9"
+    },
+    {
+      "path": "evidence/gltf_document.json",
+      "bytes": 3821,
+      "sha256": "12f0495f3fea8302cd460fe585a241967a353aaa5126c7e05a8d23bc9c4ca36d"
+    },
+    {
+      "path": "evidence/texture_metrics.json",
+      "bytes": 785,
+      "sha256": "29b6176f3727a1bf6f95d5ee0277cccd2aa26544c6d45a403621b6792b9a6296"
+    },
+    {
+      "path": "evidence/validation.json",
+      "bytes": 14029,
+      "sha256": "26d661a91ba4874411795e69152ab3f36c00256151bd9da82afa4736bb5c0a42"
+    },
+    {
+      "path": "evidence/visual_review.json",
+      "bytes": 1289,
+      "sha256": "faf769ffef238bca68624a8cb57d587dea264e9083667f00dc40c1e5fd9c8cd6"
+    },
+    {
+      "path": "evidence/build.log",
+      "bytes": 26902,
+      "sha256": "26a651a57a492f2f8a83fb155e0ac8f67f9e7107e6b1d7c67f09099e79a89fdf"
+    },
+    {
+      "path": "evidence/validation.log",
+      "bytes": 19779,
+      "sha256": "96acfc7b4e0028bb94e7206566a2b5fac2dc9992f80cbb09b4f608fec53a5344"
+    }
+  ],
+  "core_bytes_excluding_previews": 3079474,
+  "uncompressed_bytes_excluding_manifest": 10494114
+}

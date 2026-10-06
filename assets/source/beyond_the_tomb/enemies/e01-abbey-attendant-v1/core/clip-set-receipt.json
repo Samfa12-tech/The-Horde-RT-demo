@@ -1,0 +1,32 @@
+{
+  "source": "/source-workspace/horde-meshy/abbey-attendant/final/E01_AbbeyAttendant_all_clips.glb",
+  "core": {
+    "file": "/source-workspace/horde-meshy/abbey-attendant/final/E01_AbbeyAttendant_core.glb",
+    "clips": [
+      "Idle",
+      "Walking",
+      "Attack",
+      "Dead"
+    ],
+    "bytes": 5482720,
+    "sha256": "1e4d9c992ceef2511b171a6a7942bc2b9a7162b830c93eac75e0cef5097907db",
+    "durations": {
+      "Idle": 4.0,
+      "Walking": 1.0666667222976685,
+      "Attack": 1.5,
+      "Dead": 2.9666666984558105
+    }
+  },
+  "extras": {
+    "file": "/source-workspace/horde-meshy/abbey-attendant/final/E01_AbbeyAttendant_source_extras.glb",
+    "clips": [
+      "Hit_Reaction",
+      "Idle_Turn_Left",
+      "Idle_Turn_Right",
+      "Running"
+    ],
+    "bytes": 5371304,
+    "sha256": "6add8af5e1eecce273eb64c7d2885d2470c59e05c45c70061ead42025bf0849b"
+  },
+  "canonical_rename": "Idle_5 compatibility label renamed to Idle; all BIN data unchanged"
+}

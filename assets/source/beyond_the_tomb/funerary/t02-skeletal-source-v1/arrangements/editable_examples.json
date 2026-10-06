@@ -1,0 +1,138 @@
+[
+  {
+    "id": "example_A",
+    "units": "metres",
+    "coordinates": "Blender +Z up, front -Y",
+    "acceptance": "Illustrative local composition only. No approved niche dimensions, transforms, scene density, collision or instancing implementation.",
+    "instances": [
+      {
+        "name": "Example_A_1_skull_jaw",
+        "master": "skull_jaw.glb",
+        "position_m": [
+          -0.2199999988079071,
+          0.03999999910593033,
+          0.0
+        ],
+        "rotation_euler_xyz_radians": [
+          0.0,
+          0.0,
+          -0.20943951606750488
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "shared_mesh_data": true
+      },
+      {
+        "name": "Example_A_2_femur",
+        "master": "femur.glb",
+        "position_m": [
+          0.019999999552965164,
+          -0.10000000149011612,
+          0.04242992773652077
+        ],
+        "rotation_euler_xyz_radians": [
+          1.5533430576324463,
+          0.05235987901687622,
+          1.186823844909668
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "shared_mesh_data": true
+      },
+      {
+        "name": "Example_A_3_humerus",
+        "master": "humerus.glb",
+        "position_m": [
+          0.11999999731779099,
+          0.07000000029802322,
+          0.03142904117703438
+        ],
+        "rotation_euler_xyz_radians": [
+          1.6057028770446777,
+          -0.0872664600610733,
+          2.1991147994995117
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "shared_mesh_data": true
+      }
+    ]
+  },
+  {
+    "id": "example_B",
+    "units": "metres",
+    "coordinates": "Blender +Z up, front -Y",
+    "acceptance": "Illustrative local composition only. No approved niche dimensions, transforms, scene density, collision or instancing implementation.",
+    "instances": [
+      {
+        "name": "Example_B_1_skull_jaw",
+        "master": "skull_jaw.glb",
+        "position_m": [
+          0.18000000715255737,
+          0.10999999940395355,
+          0.0
+        ],
+        "rotation_euler_xyz_radians": [
+          0.0,
+          0.0,
+          0.3141592741012573
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "shared_mesh_data": true
+      },
+      {
+        "name": "Example_B_2_humerus",
+        "master": "humerus.glb",
+        "position_m": [
+          -0.2199999988079071,
+          -0.07999999821186066,
+          0.022279104217886925
+        ],
+        "rotation_euler_xyz_radians": [
+          1.5707963705062866,
+          0.0,
+          1.0646508932113647
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "shared_mesh_data": true
+      },
+      {
+        "name": "Example_B_3_femur",
+        "master": "femur.glb",
+        "position_m": [
+          -0.11999999731779099,
+          0.09000000357627869,
+          0.03488307073712349
+        ],
+        "rotation_euler_xyz_radians": [
+          1.5009831190109253,
+          0.0,
+          -0.8552113175392151
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "shared_mesh_data": true
+      }
+    ]
+  }
+]

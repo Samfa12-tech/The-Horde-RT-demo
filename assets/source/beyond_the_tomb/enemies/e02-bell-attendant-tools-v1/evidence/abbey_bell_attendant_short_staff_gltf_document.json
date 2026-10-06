@@ -1,0 +1,209 @@
+{
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v4.3.47",
+    "version": "2.0"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        1
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "extras": {
+        "component_description": "[{\"name\": \"Short oval ash maintenance shaft\", \"vertices\": 168, \"closed_caps\": true}, {\"name\": \"Bottom iron end shoe\", \"vertices\": 60, \"closed_caps\": true}, {\"name\": \"Working end iron cap\", \"vertices\": 60, \"closed_caps\": true}]",
+        "total_length_m": 0.88,
+        "end_cap_note": "Modest blunt reinforcing shoes, no blade or hook",
+        "grip_note": "Provisional 110 mm zone; longer end points +Z; no measured H1 socket binding"
+      },
+      "mesh": 0,
+      "name": "Staff_Complete"
+    },
+    {
+      "children": [
+        0
+      ],
+      "extras": {
+        "unit": "metres",
+        "grip_reference": "Provisional authoring origin, not a measured H1 hand socket",
+        "asset_role": "E02 accessory candidate; no new body or rig",
+        "axis_blender": "Shaft +Z toward longer working end",
+        "grip_region_blender_z_m": "-0.050 to +0.060",
+        "nominal_grip_diameter_m": "0.029 x 0.026"
+      },
+      "name": "Staff_Grip"
+    }
+  ],
+  "materials": [
+    {
+      "name": "AbbeyDuty_wood_iron_512",
+      "normalTexture": {
+        "index": 0,
+        "scale": 0.550000011920929
+      },
+      "occlusionTexture": {
+        "index": 1
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 2
+        },
+        "metallicRoughnessTexture": {
+          "index": 1
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Staff_Complete_editable",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "TANGENT": 3
+          },
+          "indices": 4,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    }
+  ],
+  "images": [
+    {
+      "bufferView": 5,
+      "mimeType": "image/png",
+      "name": "abbey_duty_normal"
+    },
+    {
+      "bufferView": 6,
+      "mimeType": "image/png",
+      "name": "abbey_duty_orm"
+    },
+    {
+      "bufferView": 7,
+      "mimeType": "image/png",
+      "name": "abbey_duty_basecolor"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 654,
+      "max": [
+        0.01593930833041668,
+        0.550000011920929,
+        0.014700000174343586
+      ],
+      "min": [
+        -0.014700000174343586,
+        -0.33000001311302185,
+        -0.014700000174343586
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 654,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 654,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 654,
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5123,
+      "count": 1692,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 7848,
+      "byteOffset": 0,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 7848,
+      "byteOffset": 7848,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 5232,
+      "byteOffset": 15696,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 10464,
+      "byteOffset": 20928,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 3384,
+      "byteOffset": 31392,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 166411,
+      "byteOffset": 34776
+    },
+    {
+      "buffer": 0,
+      "byteLength": 212501,
+      "byteOffset": 201188
+    },
+    {
+      "buffer": 0,
+      "byteLength": 319241,
+      "byteOffset": 413692
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 732936
+    }
+  ]
+}

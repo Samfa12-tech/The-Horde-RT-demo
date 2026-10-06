@@ -1,0 +1,66 @@
+{
+  "asset_id": "horde.e01.abbey-maintenance-mallet.v1",
+  "seed": 261006,
+  "source": "Original local Blender construction, no external assets or provider generation.",
+  "source_axes": {
+    "handle": "+Z",
+    "head": "+X",
+    "grip_origin": [
+      0,
+      0,
+      0
+    ]
+  },
+  "gltf_axes": {
+    "handle": "+Y",
+    "head": "+X",
+    "cross_section_minor_axis": "-Z"
+  },
+  "unit": "meter",
+  "handle_length_m": 0.34,
+  "head_width_m": 0.12,
+  "grip_nominal_diameter_m": [
+    0.027,
+    0.023
+  ],
+  "grip_usable_z_range_m": [
+    -0.04,
+    0.06
+  ],
+  "material_count": 1,
+  "source_mesh_count": 1,
+  "closed_shells": 3,
+  "textures": {
+    "basecolor": "512x512 sRGB RGBA PNG, opaque alpha",
+    "orm": "512x512 linear RGBA PNG: R neutral AO=1, G roughness, B metallic",
+    "normal": "512x512 tangent +Y (OpenGL), strength .6"
+  },
+  "assembly_notes": "Three closed component shells overlap at mechanical joints: wooden shaft seats into solid head; neck collar reinforces shaft. No body fused to tool. No modeled eye/cavity or collision hull.",
+  "binding_status": "Provisional grip dimensions only. Final hand/socket transform requires measured repaired E01 hand; no engine binding supplied.",
+  "license_status": "Original commissioned authoring; no third-party asset license and no new public license applied.",
+  "sections": [
+    {
+      "name": "Worn ash handle",
+      "vertex_start": 0,
+      "vertex_count": 144
+    },
+    {
+      "name": "Small forged iron head",
+      "vertex_start": 144,
+      "vertex_count": 72
+    },
+    {
+      "name": "Iron neck collar",
+      "vertex_start": 216,
+      "vertex_count": 48
+    }
+  ],
+  "not_claimed": [
+    "Collision setup",
+    "Attack timing",
+    "Engine import",
+    "Game readiness",
+    "Measured RightGrip transform",
+    "Baked ambient occlusion"
+  ]
+}

@@ -1,0 +1,232 @@
+{
+  "source_blend": "/source-workspace/horde-meshy/abbey-attendant/derivatives/grip-draft-v09/grip-candidate.blend",
+  "sources": {
+    "merged_animations.glb": "976b62a62bd81dbae9e593ab14003225996c93e6440d8782fc6b5da950e1f30a",
+    "walking_glb.glb": "0c160d68810d6b77377f7042eb049b1652c3471ecdb4970816a56cefc6b44d8e",
+    "running_glb.glb": "9f91113395a8626c6bcfb1df95461556d3a24f610072158680a34f9fe959f12b"
+  },
+  "clips": {
+    "Idle_5": {
+      "source_name": "Idle",
+      "duration": 4.0,
+      "frames": 241,
+      "pre_correction_retarget_max_joint_position_error_m": 8.539613537655168e-07,
+      "ground_correction_range_m": [
+        0.010875432588160039,
+        0.016286944806575776
+      ],
+      "source_only": false
+    },
+    "Attack": {
+      "source_name": "Right_Hand_Sword_Slash",
+      "duration": 1.5,
+      "frames": 91,
+      "pre_correction_retarget_max_joint_position_error_m": 8.472722158330381e-07,
+      "ground_correction_range_m": [
+        -0.020020518615841865,
+        0.022903961896896363
+      ],
+      "source_only": false
+    },
+    "Dead": {
+      "source_name": "Dead",
+      "duration": 2.966666666666667,
+      "frames": 179,
+      "pre_correction_retarget_max_joint_position_error_m": 7.3802128416537e-07,
+      "ground_correction_range_m": [
+        -0.11160738223791122,
+        0.023109201177954675
+      ],
+      "source_only": false
+    },
+    "Hit_Reaction": {
+      "source_name": "Hit_Reaction",
+      "duration": 1.6333333333333333,
+      "frames": 99,
+      "pre_correction_retarget_max_joint_position_error_m": 8.413549788888159e-07,
+      "ground_correction_range_m": [
+        -0.016478836700320243,
+        0.047380169689655305
+      ],
+      "source_only": true
+    },
+    "Idle_Turn_Left": {
+      "source_name": "Idle_Turn_Left",
+      "duration": 0.9333333333333333,
+      "frames": 57,
+      "pre_correction_retarget_max_joint_position_error_m": 7.362138823888078e-07,
+      "ground_correction_range_m": [
+        -0.0049675900265574455,
+        0.017405642032623292
+      ],
+      "source_only": true
+    },
+    "Idle_Turn_Right": {
+      "source_name": "Idle_Turn_Right",
+      "duration": 1.0666666666666667,
+      "frames": 65,
+      "pre_correction_retarget_max_joint_position_error_m": 8.872312829706826e-07,
+      "ground_correction_range_m": [
+        0.017744136810302735,
+        0.024433491587638856
+      ],
+      "source_only": true
+    },
+    "Walking": {
+      "source_name": "Armature|walking_man|baselayer",
+      "duration": 1.0666666666666667,
+      "frames": 65,
+      "pre_correction_retarget_max_joint_position_error_m": 9.561018514062591e-07,
+      "ground_correction_range_m": [
+        -0.041149219661951064,
+        -0.00865895503759384
+      ],
+      "source_only": false
+    },
+    "Running": {
+      "source_name": "Armature|running|baselayer",
+      "duration": 0.6666666666666666,
+      "frames": 41,
+      "pre_correction_retarget_max_joint_position_error_m": 8.392410183148815e-07,
+      "ground_correction_range_m": [
+        0.0,
+        0.0
+      ],
+      "source_only": true
+    }
+  },
+  "display_bone_lengths_repaired": [
+    [
+      "Hips",
+      1179.4384765625,
+      11.794381561334294
+    ],
+    [
+      "Spine02",
+      1179.4365234375,
+      11.79435893709097
+    ],
+    [
+      "Spine01",
+      1215.1800537109375,
+      12.151797564453988
+    ],
+    [
+      "Spine",
+      531.3096313476562,
+      5.313095828611101
+    ],
+    [
+      "neck",
+      687.23779296875,
+      6.872378067538806
+    ],
+    [
+      "Head",
+      2215.289306640625,
+      22.15289227932072
+    ],
+    [
+      "head_end",
+      2215.2890625,
+      3
+    ],
+    [
+      "headfront",
+      2215.2890625,
+      3
+    ],
+    [
+      "LeftShoulder",
+      1550.8704833984375,
+      15.508704786797999
+    ],
+    [
+      "LeftArm",
+      2239.73291015625,
+      22.397323299938932
+    ],
+    [
+      "LeftForeArm",
+      2613.220458984375,
+      26.13219778481193
+    ],
+    [
+      "LeftHand",
+      2613.220458984375,
+      7
+    ],
+    [
+      "RightShoulder",
+      1577.295166015625,
+      15.772947639163176
+    ],
+    [
+      "RightArm",
+      2071.46875,
+      20.714681338069738
+    ],
+    [
+      "RightForeArm",
+      2748.8349609375,
+      27.48834475229338
+    ],
+    [
+      "RightHand",
+      2748.8349609375,
+      7
+    ],
+    [
+      "LeftUpLeg",
+      3651.888916015625,
+      36.51888192391449
+    ],
+    [
+      "LeftLeg",
+      3449.0361328125,
+      34.49034947890732
+    ],
+    [
+      "LeftFoot",
+      1260.554931640625,
+      12.60554716678671
+    ],
+    [
+      "LeftToeBase",
+      1260.554931640625,
+      3
+    ],
+    [
+      "RightUpLeg",
+      3710.0927734375,
+      37.100899519130685
+    ],
+    [
+      "RightLeg",
+      3400.46875,
+      34.00466873917941
+    ],
+    [
+      "RightFoot",
+      1225.146240234375,
+      12.251456816326558
+    ],
+    [
+      "RightToeBase",
+      1225.1463623046875,
+      3
+    ]
+  ],
+  "wrist_roll_degrees": {
+    "RightForeArm": 30,
+    "RightHand": 30,
+    "LeftForeArm": -30,
+    "LeftHand": -30
+  },
+  "ground_policy": "all non-running clips: lowest body surface at +1 mm each sampled frame; Running retained as source-only with no grounding correction",
+  "dead_resting_wrist_correction": "RightHand additional -45 degrees about local Y, smooth ramp from 20% to 55% clip; independently clearance-tested",
+  "fps": 60,
+  "mesh_topology": "local right-hand subdivision and grip repair; preserved source separately",
+  "triangles": 14122,
+  "vertices_blender": 16814
+}

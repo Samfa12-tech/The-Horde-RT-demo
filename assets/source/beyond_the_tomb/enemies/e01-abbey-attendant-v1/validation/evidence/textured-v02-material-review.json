@@ -1,0 +1,114 @@
+{
+  "source_glb_sha256": "879af01b9c5435d689c100bf97d5c2d372e08e2169ba51d51ddd39bd5869d613",
+  "source_maps": {
+    "texture_0_base_color.png": {
+      "file": "texture_0_base_color.png",
+      "sha256": "28fa6c159d52267ec12556368730d8a4af2000c651d8b82631ebc74ecad19635",
+      "bytes": 6871333,
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "mode": "RGB"
+    },
+    "texture_0_metallic.png": {
+      "file": "texture_0_metallic.png",
+      "sha256": "8c0e47d4986c770f6c0b06c9c7ff1e0c9d94851d22c4c5a83a88e33c9d3e6d2f",
+      "bytes": 25858,
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "mode": "L",
+      "sampled_regions": {
+        "boots": {
+          "samples": 44034,
+          "mean": 0.004791751828132807,
+          "p10_p50_p90": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "torso": {
+          "samples": 151159,
+          "mean": 0.10678160083091315,
+          "p10_p50_p90": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "face": {
+          "samples": 18506,
+          "mean": 0.009726575164811412,
+          "p10_p50_p90": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "texture_0_normal.png": {
+      "file": "texture_0_normal.png",
+      "sha256": "b2a9a7ebc4f8f6fa17296a5522d5bfc0164f6208a5c80ebe9fb1029687d77f3b",
+      "bytes": 5497733,
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "mode": "RGB"
+    },
+    "texture_0_roughness.png": {
+      "file": "texture_0_roughness.png",
+      "sha256": "40922711fb1b6f4086a2e7edaa6e8b60861075c270b7613620d33ac404759c25",
+      "bytes": 1327760,
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "mode": "L",
+      "sampled_regions": {
+        "boots": {
+          "samples": 44034,
+          "mean": 114.03517736294681,
+          "p10_p50_p90": [
+            92.0,
+            114.0,
+            136.0
+          ]
+        },
+        "torso": {
+          "samples": 151159,
+          "mean": 160.6840413074974,
+          "p10_p50_p90": [
+            146.0,
+            161.0,
+            175.0
+          ]
+        },
+        "face": {
+          "samples": 18506,
+          "mean": 132.75743002269533,
+          "p10_p50_p90": [
+            110.0,
+            131.5,
+            157.0
+          ]
+        }
+      }
+    }
+  },
+  "region_sampling": "Source UV0 sampled at vertices; boot region source Y < -0.68. Values are 0-255. Source glTF +Y up/+Z forward; geometry remains centred at original origin.",
+  "findings": [
+    "Embedded texture images are JPEG; loose original maps are lossless PNG and should be retained as texture provenance.",
+    "No ambient-occlusion source map supplied; use neutral AO explicitly rather than claiming baked AO.",
+    "Identity matrix node can be converted to TRS during derivative export.",
+    "Boot roughness is lower than torso; metallic map does not falsely classify boots as metal. No roughness edits performed."
+  ],
+  "not_tested": [
+    "native renderer materials",
+    "mobile/RT performance"
+  ]
+}

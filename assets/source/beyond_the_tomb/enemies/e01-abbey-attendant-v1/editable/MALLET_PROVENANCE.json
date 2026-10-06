@@ -1,0 +1,20 @@
+{
+  "asset_id": "horde.e01.abbey-maintenance-mallet.v1",
+  "version": "1.0.0",
+  "created_date_utc": "2026-10-06",
+  "method": "Original deterministic Blender mesh and procedural texture authoring",
+  "authoring_software": "Blender 4.3.2 with bundled Python and NumPy",
+  "authoring_seed": 261006,
+  "authoring_brief": "Small restrained medieval maintenance mallet for a gaunt freshwater-Abbey attendant: approximately 0.34m worn wood handle and 0.12m dull corroded/mineral-stained iron head; compact opaque low-poly geometry, grip pivot at origin, distinct metal/wood PBR response, editable source and validation evidence.",
+  "excluded_visuals": ["Spikes", "Blades", "Symbols", "Ornate combat warhammer treatment", "Ocean barnacles", "Transparent geometry cards", "Fused character body"],
+  "external_source_assets": [],
+  "provider_generation": null,
+  "paid_invocations": 0,
+  "new_spend": 0,
+  "license_status": "Original project authoring; no third-party asset license and no new public license applied.",
+  "rights_note": "No new public license grant is made by this metadata; existing project ownership/agreements remain the applicable context.",
+  "canonical_model": "abbey_attendant_maintenance_mallet.glb",
+  "editable_source": "abbey_attendant_maintenance_mallet.blend",
+  "deterministic_source": "source/build_mallet.py",
+  "validation_script": "source/validate_mallet.py"
+}

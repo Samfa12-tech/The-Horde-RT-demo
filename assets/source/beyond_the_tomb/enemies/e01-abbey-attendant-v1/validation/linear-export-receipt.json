@@ -1,0 +1,56 @@
+{
+  "source": "/source-workspace/horde-meshy/abbey-attendant/derivatives/animated-v06/E01_AbbeyAttendant_all_clips.glb",
+  "changes": [
+    {
+      "clip": "Idle_5",
+      "constant_or_nearconstant_STEP_samplers_changed_to_LINEAR": 3,
+      "max_component_interpolation_difference_bound": 1.1920928955078125e-07
+    },
+    {
+      "clip": "Attack",
+      "constant_or_nearconstant_STEP_samplers_changed_to_LINEAR": 4,
+      "max_component_interpolation_difference_bound": 1.1920928955078125e-07
+    },
+    {
+      "clip": "Dead",
+      "constant_or_nearconstant_STEP_samplers_changed_to_LINEAR": 3,
+      "max_component_interpolation_difference_bound": 1.1920928955078125e-07
+    },
+    {
+      "clip": "Hit_Reaction",
+      "constant_or_nearconstant_STEP_samplers_changed_to_LINEAR": 5,
+      "max_component_interpolation_difference_bound": 7.62939453125e-06
+    },
+    {
+      "clip": "Idle_Turn_Left",
+      "constant_or_nearconstant_STEP_samplers_changed_to_LINEAR": 3,
+      "max_component_interpolation_difference_bound": 1.1920928955078125e-07
+    },
+    {
+      "clip": "Idle_Turn_Right",
+      "constant_or_nearconstant_STEP_samplers_changed_to_LINEAR": 5,
+      "max_component_interpolation_difference_bound": 1.1920928955078125e-07
+    },
+    {
+      "clip": "Walking",
+      "constant_or_nearconstant_STEP_samplers_changed_to_LINEAR": 13,
+      "max_component_interpolation_difference_bound": 1.1920928955078125e-07
+    },
+    {
+      "clip": "Running",
+      "constant_or_nearconstant_STEP_samplers_changed_to_LINEAR": 7,
+      "max_component_interpolation_difference_bound": 7.62939453125e-06
+    }
+  ],
+  "all": {
+    "file": "/source-workspace/horde-meshy/abbey-attendant/derivatives/animated-v06/export/E01_AbbeyAttendant_all_clips.glb",
+    "bytes": 5653496,
+    "sha256": "4b85f467abe05c3ddd87d6571c424acbc9e3f0b64fe835d14b1aba91ad04deec"
+  },
+  "core": {
+    "file": "/source-workspace/horde-meshy/abbey-attendant/derivatives/animated-v06/export/E01_AbbeyAttendant_core.glb",
+    "bytes": 5621656,
+    "sha256": "21c24aed04e805d73c1a5f16385cccfc9e2195ac5a82956b56a40a15326cb0a7"
+  },
+  "note": "All animation channels sampled at 60Hz. Blender emits STEP on constant channels; relabel only after a strict <1e-4 component-range check. Extra animation buffers retained unused in core file; no geometry or PBR change."
+}

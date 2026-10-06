@@ -1,0 +1,191 @@
+{
+  "package_id": "horde.e02.abbey-bell-attendant-tools.v1",
+  "package_type": "Original source-plus-evidence proposal ZIP; not game-dev canonical package",
+  "version": "1.0.0",
+  "canonical_glbs": [
+    "abbey_bell_attendant_handbell.glb",
+    "abbey_bell_attendant_short_staff.glb"
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 7518,
+      "sha256": "43aff70bb9e4cf9f1b2665c319988e5fdc84e18191a227051fbb379db6fa7d2c"
+    },
+    {
+      "path": "abbey_bell_attendant_handbell.blend",
+      "bytes": 1258685,
+      "sha256": "7d9b4ceacb4ce973760d624cafd4b5e58f9463a69a5ef72ce822fc7bad6cbad0"
+    },
+    {
+      "path": "abbey_bell_attendant_handbell.glb",
+      "bytes": 772120,
+      "sha256": "0d86ec1816d1eea8f9dac6952eb40ad28a7d027b1ff7879b1550a880ace53c63"
+    },
+    {
+      "path": "abbey_bell_attendant_short_staff.blend",
+      "bytes": 1200637,
+      "sha256": "16e49a2f08513ff6e37b19bd38dc8ff0195cdbc5a4c7d13359d101cadb0a6966"
+    },
+    {
+      "path": "abbey_bell_attendant_short_staff.glb",
+      "bytes": 735680,
+      "sha256": "9db15ff7505329b9c7191b018442c9500b5747429de3c1bb6767c5e05cb6892f"
+    },
+    {
+      "path": "evidence/abbey_bell_attendant_handbell_gltf_document.json",
+      "bytes": 6413,
+      "sha256": "d9fbe6a19ee5c062f312600830935bec82215d416233ed11b413729a96181fb7"
+    },
+    {
+      "path": "evidence/abbey_bell_attendant_short_staff_gltf_document.json",
+      "bytes": 4188,
+      "sha256": "dbac907a48fdf4f5270a290b473aef9482c7c52bb6dc8123fcc110aee0d3ee8a"
+    },
+    {
+      "path": "evidence/asset_specification.json",
+      "bytes": 2380,
+      "sha256": "88fbf490497dbfb8ce656c74498eeb2adf621d56b3414c41c5ffe637b3c7bb9b"
+    },
+    {
+      "path": "evidence/build.log",
+      "bytes": 43705,
+      "sha256": "cf2dd583eb9c474fd1fedef0aa28bd81544c14131fe27686eb1365ada770ce2e"
+    },
+    {
+      "path": "evidence/capability_probe.json",
+      "bytes": 567,
+      "sha256": "83ff54f1b607c6752938840ffb9e19f2e0df7bd6bcca39bee40efb877caf3e92"
+    },
+    {
+      "path": "evidence/inspection_render.log",
+      "bytes": 5616,
+      "sha256": "227aa42022ea605c1eb268b15f3b5e957ab43abe0d29066ab9afa8d40f534404"
+    },
+    {
+      "path": "evidence/texture_pixels.json",
+      "bytes": 783,
+      "sha256": "5dc5d5234337b032904725d7cead1f31eb230f4de19e5b7575c746d79674e9a1"
+    },
+    {
+      "path": "evidence/validation.json",
+      "bytes": 31437,
+      "sha256": "27ba657d2e0f31344598665361786af248a0694b060573da8513bb1015e4558b"
+    },
+    {
+      "path": "evidence/validation.log",
+      "bytes": 11655,
+      "sha256": "d288a45c3598b923b49696c29444e167eb20f96f9491af8724efa8435011710e"
+    },
+    {
+      "path": "evidence/visual_review.json",
+      "bytes": 1148,
+      "sha256": "379cc02dbf74350f531efde60be616c956faaba99b08ed36924ffa9d2899fb61"
+    },
+    {
+      "path": "previews/01_bell_front.png",
+      "bytes": 800406,
+      "sha256": "1bbc4a5da9b1f775dcea700da4f3924058dfca108d1c16b50afce1aa5dd8cc6d"
+    },
+    {
+      "path": "previews/02_bell_three_quarter.png",
+      "bytes": 801091,
+      "sha256": "5ec127fecb92a1e2bb1b9b425e814dc45eaac1e2b0815282ef8531af867122fe"
+    },
+    {
+      "path": "previews/03_bell_open_mouth_clapper.png",
+      "bytes": 919832,
+      "sha256": "cfa5a71b83f93f836ad06b1eae69f9f2eb1e41e48acde7d5cb7ddfffa588f1d8"
+    },
+    {
+      "path": "previews/04_bell_grip.png",
+      "bytes": 824163,
+      "sha256": "7fabe6db66901db19bdbad29d6e168873801ea9019c1033d4826946d1b913976"
+    },
+    {
+      "path": "previews/05_staff_front.png",
+      "bytes": 736644,
+      "sha256": "a78c602e91d9ae9beaba49ec95e631b70b7b3f700f6a181ebc2120ac3fa76b19"
+    },
+    {
+      "path": "previews/06_staff_three_quarter.png",
+      "bytes": 735242,
+      "sha256": "c5488036b045f3a6d40d10eae384f7c43f7254a36a4441679e00836eb8ae4cdb"
+    },
+    {
+      "path": "previews/07_staff_grip.png",
+      "bytes": 799023,
+      "sha256": "0846d7d51b8fc825ae532da3d6e877e3e8684fc5a09c89bb52cea188c7f76624"
+    },
+    {
+      "path": "previews/08_staff_working_end.png",
+      "bytes": 828037,
+      "sha256": "4fc5e600998defd0c3f721f8bf7ba15a836df495aa7f421bb53e6e616da175d4"
+    },
+    {
+      "path": "previews/09_handbell_fresh_glb_import.png",
+      "bytes": 818071,
+      "sha256": "3aa0ba20af6ed5a2a44b463e1e997e69a547f6316ba20992667a955cb06088bf"
+    },
+    {
+      "path": "previews/10_staff_fresh_glb_import.png",
+      "bytes": 735259,
+      "sha256": "6a725012b439de4e40cc919ecd3442c2116569dd2645a7b6560ad8ba129e396e"
+    },
+    {
+      "path": "previews/contact_sheet.jpg",
+      "bytes": 336253,
+      "sha256": "6c6c871b2c9dbd4c6ed4c8accfa75553990aac9be78aaa0d070c0a9eac8f710d"
+    },
+    {
+      "path": "provenance.json",
+      "bytes": 2426,
+      "sha256": "8258a5bd93b51460fcc545778c00c63de0a662af51d712d137c62621e00d2c7c"
+    },
+    {
+      "path": "source/build_tools.py",
+      "bytes": 15510,
+      "sha256": "0ca4d1ce1cc7dba7994c9d4e196a808939e1d714d55c4ba9429dc097465df2b7"
+    },
+    {
+      "path": "source/make_contact_sheet.py",
+      "bytes": 2139,
+      "sha256": "4182925a56160e277cdfc537b9ed369f50abdc3f6832ed2eb19025ebcb089584"
+    },
+    {
+      "path": "source/package_tools.py",
+      "bytes": 2524,
+      "sha256": "2c8375279e470700e3e2eb6a7c4108e9517a08b1625c850bbcc8ea47822a33ac"
+    },
+    {
+      "path": "source/render_bell_inspection.py",
+      "bytes": 1051,
+      "sha256": "ff3934e99ebb0ae95669f6f24b9c1413dd58a585e3ac7a4c12cc9b949561f147"
+    },
+    {
+      "path": "source/validate_tools.py",
+      "bytes": 12022,
+      "sha256": "eadefac16eafbe62ac1afc2ac7b50a9250a07d6740912291ffbccfc4ba675a25"
+    },
+    {
+      "path": "textures/abbey_duty_basecolor.png",
+      "bytes": 319241,
+      "sha256": "9d6ea182602127fb531e6eb360a1294e2fdbf6d5e49ba33fa1e1eba5479fd675"
+    },
+    {
+      "path": "textures/abbey_duty_normal.png",
+      "bytes": 166411,
+      "sha256": "68a2240d2f7cf9a75d041b064e834ad079dddb5610f4674427f6c26ba4e49340"
+    },
+    {
+      "path": "textures/abbey_duty_orm.png",
+      "bytes": 212501,
+      "sha256": "bd90b067c5f7a90d7cf0e257ed64c420668b54851de0465cdd52f25fc17900e3"
+    }
+  ],
+  "excluded_working_files": [
+    "Blender .blend1 automatic backups"
+  ],
+  "validation": "evidence/validation.json",
+  "rights": "provenance.json; no new public licence assigned"
+}

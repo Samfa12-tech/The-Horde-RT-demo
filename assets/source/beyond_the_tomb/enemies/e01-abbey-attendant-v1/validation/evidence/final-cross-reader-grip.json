@@ -1,0 +1,86 @@
+[
+  {
+    "clip": "Idle_5",
+    "fraction": 0,
+    "matrix_max_abs_error": 2.5630468810933227e-06,
+    "position_error_m": 3.6631791264187835e-06
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0,
+    "matrix_max_abs_error": 1.847788922093585e-06,
+    "position_error_m": 2.170492815061188e-06
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.25,
+    "matrix_max_abs_error": 1.9669405456612665e-06,
+    "position_error_m": 2.262010299412692e-06
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.5,
+    "matrix_max_abs_error": 2.086121783428929e-06,
+    "position_error_m": 2.308570350216629e-06
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.75,
+    "matrix_max_abs_error": 2.5034234375498343e-06,
+    "position_error_m": 2.798966829545155e-06
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0,
+    "matrix_max_abs_error": 1.72848634028e-06,
+    "position_error_m": 2.3835821797237106e-06
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.25,
+    "matrix_max_abs_error": 3.308085961939433e-06,
+    "position_error_m": 4.3460497401978466e-06
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.5,
+    "matrix_max_abs_error": 1.3709188293464791e-06,
+    "position_error_m": 8.802356822070143e-07
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.75,
+    "matrix_max_abs_error": 1.817910888657348e-06,
+    "position_error_m": 2.244649389995483e-06
+  },
+  {
+    "clip": "Attack",
+    "fraction": 1,
+    "matrix_max_abs_error": 1.6688863403446774e-06,
+    "position_error_m": 2.1277656927979493e-06
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.25,
+    "matrix_max_abs_error": 2.3692829511229307e-06,
+    "position_error_m": 3.103638789037785e-06
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.5,
+    "matrix_max_abs_error": 3.45707199711498e-06,
+    "position_error_m": 4.30589361831491e-06
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.75,
+    "matrix_max_abs_error": 4.172151428116777e-06,
+    "position_error_m": 4.4679988455008415e-06
+  },
+  {
+    "clip": "Dead",
+    "fraction": 1,
+    "matrix_max_abs_error": 3.7103939886512505e-06,
+    "position_error_m": 4.99233593476137e-06
+  }
+]

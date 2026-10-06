@@ -1,0 +1,200 @@
+[
+  {
+    "render": "01_skull_threequarter.png",
+    "render_source": "Fresh GLB import in factory-empty Blender scene",
+    "objects": 1,
+    "materials": 1,
+    "triangles": 5564,
+    "blender_bounds_min_m": [
+      -0.0736747607588768,
+      -0.0993751585483551,
+      0.0
+    ],
+    "blender_bounds_max_m": [
+      0.0736747682094574,
+      0.09789307415485382,
+      0.2082327902317047
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import"
+  },
+  {
+    "render": "02_skull_side.png",
+    "render_source": "Fresh GLB import in factory-empty Blender scene",
+    "objects": 1,
+    "materials": 1,
+    "triangles": 5564,
+    "blender_bounds_min_m": [
+      -0.0736747607588768,
+      -0.0993751585483551,
+      0.0
+    ],
+    "blender_bounds_max_m": [
+      0.0736747682094574,
+      0.09789307415485382,
+      0.2082327902317047
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import"
+  },
+  {
+    "render": "03_skull_cage.png",
+    "render_source": "Fresh GLB import in factory-empty Blender scene",
+    "objects": 1,
+    "materials": 1,
+    "triangles": 2466,
+    "blender_bounds_min_m": [
+      -0.07985502481460571,
+      -0.10296313464641571,
+      0.0
+    ],
+    "blender_bounds_max_m": [
+      0.07985502481460571,
+      0.10296313464641571,
+      0.2149118185043335
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import"
+  },
+  {
+    "render": "04_femur.png",
+    "render_source": "Fresh GLB import in factory-empty Blender scene",
+    "objects": 1,
+    "materials": 1,
+    "triangles": 396,
+    "blender_bounds_min_m": [
+      -0.0528666228055954,
+      -0.05150921642780304,
+      0.0
+    ],
+    "blender_bounds_max_m": [
+      0.0528666228055954,
+      0.05150921642780304,
+      0.4639294147491455
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import"
+  },
+  {
+    "render": "05_humerus.png",
+    "render_source": "Fresh GLB import in factory-empty Blender scene",
+    "objects": 1,
+    "materials": 1,
+    "triangles": 304,
+    "blender_bounds_min_m": [
+      -0.038072578608989716,
+      -0.02227909117937088,
+      0.0
+    ],
+    "blender_bounds_max_m": [
+      0.038072578608989716,
+      0.02227909117937088,
+      0.3130432665348053
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import"
+  },
+  {
+    "render": "08_core_front.png",
+    "render_source": "Fresh GLB import in factory-empty Blender scene",
+    "objects": 1,
+    "materials": 1,
+    "triangles": 15578,
+    "blender_bounds_min_m": [
+      -0.38615337014198303,
+      -0.12753455340862274,
+      0.0
+    ],
+    "blender_bounds_max_m": [
+      0.38615337014198303,
+      0.12753455340862274,
+      1.7200000286102295
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import"
+  },
+  {
+    "render": "09_core_back.png",
+    "render_source": "Fresh GLB import in factory-empty Blender scene",
+    "objects": 1,
+    "materials": 1,
+    "triangles": 15578,
+    "blender_bounds_min_m": [
+      -0.38615337014198303,
+      -0.12753455340862274,
+      0.0
+    ],
+    "blender_bounds_max_m": [
+      0.38615337014198303,
+      0.12753455340862274,
+      1.7200000286102295
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import"
+  },
+  {
+    "render": "10_femur_cage.png",
+    "render_source": "Fresh GLB import in factory-empty Blender scene",
+    "objects": 1,
+    "materials": 1,
+    "triangles": 96,
+    "blender_bounds_min_m": [
+      -0.0528666228055954,
+      -0.05150921642780304,
+      0.0
+    ],
+    "blender_bounds_max_m": [
+      0.0528666228055954,
+      0.05150921642780304,
+      0.4639294147491455
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import"
+  },
+  {
+    "render": "11_humerus_cage.png",
+    "render_source": "Fresh GLB import in factory-empty Blender scene",
+    "objects": 1,
+    "materials": 1,
+    "triangles": 76,
+    "blender_bounds_min_m": [
+      -0.038072578608989716,
+      -0.02227909117937088,
+      0.0
+    ],
+    "blender_bounds_max_m": [
+      0.038072578608989716,
+      0.02227909117937088,
+      0.3130432665348053
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import"
+  },
+  {
+    "render": "06_arrangement_a.png",
+    "render_source": "Fresh GLB import in factory-empty Blender scene",
+    "objects": 3,
+    "materials": 3,
+    "triangles": 6264,
+    "blender_bounds_min_m": [
+      -0.29879525303840637,
+      -0.31592854857444763,
+      -1.3387762010097504e-09
+    ],
+    "blender_bounds_max_m": [
+      0.44762203097343445,
+      0.27984723448753357,
+      0.2082327902317047
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import"
+  },
+  {
+    "render": "07_arrangement_b.png",
+    "render_source": "Fresh GLB import in factory-empty Blender scene",
+    "objects": 3,
+    "materials": 3,
+    "triangles": 6264,
+    "blender_bounds_min_m": [
+      -0.4950281083583832,
+      -0.24669916927814484,
+      0.0
+    ],
+    "blender_bounds_max_m": [
+      0.26071465015411377,
+      0.2054578810930252,
+      0.2082327902317047
+    ],
+    "preview_stage": "Cycles studio render, not Horde GPU import"
+  }
+]

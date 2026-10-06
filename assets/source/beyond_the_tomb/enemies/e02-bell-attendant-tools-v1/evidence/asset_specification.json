@@ -1,0 +1,89 @@
+{
+  "role": "E02 proposed bell attendant accessory pair within H1 shared body/rig",
+  "new_bodies": 0,
+  "character_rigs": 0,
+  "seed": 26100602,
+  "unit": "metre",
+  "handbell": {
+    "source_stem": "abbey_bell_attendant_handbell",
+    "overall_height_m": 0.295,
+    "bell_max_diameter_m": 0.154,
+    "nominal_grip_cross_section_m": [
+      0.027,
+      0.023
+    ],
+    "grip_region_blender_z_m": [
+      -0.03,
+      0.065
+    ],
+    "axis_blender": "Handle +Z away from bell, bell mouth -Z",
+    "axis_gltf": "Handle +Y away from bell, bell mouth -Y",
+    "root_origin_m": [
+      0,
+      0,
+      0
+    ],
+    "clapper_pivot_blender_m": [
+      0,
+      0,
+      -0.059
+    ],
+    "clapper_pivot_gltf_m": [
+      0,
+      -0.059,
+      0
+    ],
+    "meshes": 2,
+    "clapper": "Separate pivoted mesh; rest pose only"
+  },
+  "short_staff": {
+    "source_stem": "abbey_bell_attendant_short_staff",
+    "overall_length_m": 0.88,
+    "nominal_grip_cross_section_m": [
+      0.029,
+      0.026
+    ],
+    "grip_region_blender_z_m": [
+      -0.05,
+      0.06
+    ],
+    "axis_blender": "Longer working end +Z",
+    "axis_gltf": "Longer working end +Y",
+    "root_origin_m": [
+      0,
+      0,
+      0
+    ],
+    "meshes": 1
+  },
+  "gltf_axis_mapping": "Blender XYZ -> glTF X,Z,-Y; metre units preserved",
+  "materials": {
+    "per_export": 1,
+    "shared_atlas": true,
+    "resolution": [
+      512,
+      512
+    ],
+    "basecolor": "sRGB opaque PNG",
+    "orm": "linear PNG: neutral R=1 AO; G roughness; B metallic",
+    "normal": "linear PNG, OpenGL tangent +Y, strength .55",
+    "ao_note": "No baked AO claimed"
+  },
+  "budget_proposal": {
+    "triangles_per_master_max": 2000,
+    "material_slots_per_mesh_max": 1,
+    "texture_side_max": 512,
+    "alpha": "OPAQUE",
+    "purpose": "Phone-conscious starting proposal, not runtime certification"
+  },
+  "excluded": [
+    "No body or new rig",
+    "No shoulder yoke authored",
+    "No lore marks or magical effects",
+    "No alarm audio or attack animation",
+    "No paid provider or copied character/torch",
+    "No engine integration/Git"
+  ],
+  "attachment_status": "Grip reference only. Measure against corrected H1 hand and selected handedness; do not treat this source root as a calibrated socket.",
+  "rights": "Original local authored geometry and texture pixels. No third-party asset inputs or new public licence."
+}

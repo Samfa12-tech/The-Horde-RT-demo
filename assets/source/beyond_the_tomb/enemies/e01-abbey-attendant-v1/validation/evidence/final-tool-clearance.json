@@ -1,0 +1,546 @@
+[
+  {
+    "clip": "Idle_5",
+    "fraction": 0.0,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5817304253578186
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.0625,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5892655253410339
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.125,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5960053205490112
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.1875,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6051133275032043
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.25,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6050585508346558
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.3125,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5804429650306702
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.375,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5578696131706238
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.4375,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5560740828514099
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.5,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5919547080993652
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.5625,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.662431001663208
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.625,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.7011891603469849
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.6875,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6712778210639954
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.75,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6573243737220764
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.8125,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6189846992492676
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.875,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5975375771522522
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 0.9375,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5818321108818054
+  },
+  {
+    "clip": "Idle_5",
+    "fraction": 1.0,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5817131400108337
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.0,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5736108422279358
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.0625,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5901060104370117
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.125,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6050378680229187
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.1875,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6055341362953186
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.25,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6063005924224854
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.3125,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5964980721473694
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.375,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5527436137199402
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.4375,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5482653975486755
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.5,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5720365643501282
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.5625,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5977177619934082
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.625,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6331649422645569
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.6875,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6580944061279297
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.75,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.7012165784835815
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.8125,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6724127531051636
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.875,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6263815760612488
+  },
+  {
+    "clip": "Walking",
+    "fraction": 0.9375,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5877749919891357
+  },
+  {
+    "clip": "Walking",
+    "fraction": 1.0,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5736106634140015
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.0,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.4525934159755707
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.0625,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.4536179304122925
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.125,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5302912592887878
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.1875,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.8296334743499756
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.25,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 1.0211281776428223
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.3125,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.9768908619880676
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.375,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 1.0037819147109985
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.4375,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 1.1710158586502075
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.5,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 1.0065981149673462
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.5625,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 1.3614047765731812
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.625,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 1.3485734462738037
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.6875,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 1.0782214403152466
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.75,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.7683501839637756
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.8125,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5428768396377563
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.875,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.4449411928653717
+  },
+  {
+    "clip": "Attack",
+    "fraction": 0.9375,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.43966320157051086
+  },
+  {
+    "clip": "Attack",
+    "fraction": 1.0,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.45259368419647217
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.0,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.603187620639801
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.0625,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6115137338638306
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.125,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5320606827735901
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.1875,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6066315174102783
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.25,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6653628945350647
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.3125,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6824125647544861
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.375,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.6578975915908813
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.4375,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.5690852999687195
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.5,
+    "body_tool_overlap_pairs": 405,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.4004756212234497
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.5625,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.3329523205757141
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.625,
+    "body_tool_overlap_pairs": 406,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.44305604696273804
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.6875,
+    "body_tool_overlap_pairs": 392,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.29129868745803833
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.75,
+    "body_tool_overlap_pairs": 406,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.06937316060066223
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.8125,
+    "body_tool_overlap_pairs": 414,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.05301733314990997
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.875,
+    "body_tool_overlap_pairs": 408,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.09044800698757172
+  },
+  {
+    "clip": "Dead",
+    "fraction": 0.9375,
+    "body_tool_overlap_pairs": 403,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.06713869422674179
+  },
+  {
+    "clip": "Dead",
+    "fraction": 1.0,
+    "body_tool_overlap_pairs": 405,
+    "excluding_gripping_hand_pairs": 0,
+    "head_nonhand_overlap_pairs": 0,
+    "tool_floor_min_m": 0.04073280096054077
+  }
+]

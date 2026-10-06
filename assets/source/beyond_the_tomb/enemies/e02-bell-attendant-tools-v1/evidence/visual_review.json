@@ -1,0 +1,21 @@
+{
+  "method": "Assistant direct image inspection of source and fresh-import renders",
+  "views_reviewed": [
+    "previews/02_bell_three_quarter.png",
+    "previews/03_bell_open_mouth_clapper.png",
+    "previews/06_staff_three_quarter.png",
+    "previews/09_handbell_fresh_glb_import.png",
+    "previews/10_staff_fresh_glb_import.png"
+  ],
+  "observations": [
+    "Modest duty-tool silhouette, plain iron and muted wood; no ornament, symbols or magical effects.",
+    "Bell is visibly hollow with a separate clapper; added underside fill is labeled in the contact sheet.",
+    "Fresh-import bell is fully in frame after camera framing correction.",
+    "Staff length and thin utilitarian silhouette preserved; close-ups supplied for grip and end shoe inspection."
+  ],
+  "status": "Visual source proposal review only; no user artistic approval or in-game/device appearance certification",
+  "normal_unit_tolerance": 1e-05,
+  "tangent_orthogonality_tolerance": 0.001,
+  "maximum_normal_tangent_abs_dot": 8.96453857421875e-05,
+  "normal_unit_and_orthogonality_checks": "PASS at recorded tolerances; exact measured values retained in validation.json"
+}

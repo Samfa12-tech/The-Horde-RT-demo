@@ -1,0 +1,43 @@
+{
+  "selected": "12K remesh",
+  "decision": "Ready for humanoid rig against the prepared original pose",
+  "12K": {
+    "triangles": 12467,
+    "exported_vertices": 15656,
+    "sha256": "961b2f92970ef516a56e39bde45556c2825456ed028d0cf355778f6dd64ca47d"
+  },
+  "6K": {
+    "triangles": 6261,
+    "exported_vertices": 9263,
+    "sha256": "5fe1dde21e9a15175dcfec90783fedabba7f4af272609c4f08eec4831377e940",
+    "disposition": "retained source comparison; not selected for close enemy pilot"
+  },
+  "comparison": [
+    "12K retains a smoother brow/chin/collar silhouette and more hand contours.",
+    "6K shows visible face/collar/finger faceting; simple triangle reduction is not a sufficient acceptance criterion.",
+    "Both preserve shoulder/elbow/knee separation. Clothing contacts are not a printable-manifold requirement."
+  ],
+  "unchanged_contacts": {
+    "12K_exact_weld_boundary_edges": 17,
+    "12K_exact_weld_nonmanifold_edges": 11,
+    "6K_exact_weld_boundary_edges": 12,
+    "6K_exact_weld_nonmanifold_edges": 7,
+    "interpretation": "small cuff/collar/pocket contacts retained without broad welding; no degenerate triangles"
+  },
+  "prepared": {
+    "file": "/source-workspace/horde-meshy/abbey-attendant/derivatives/pre-rig-12k-v01/E01_AbbeyAttendant_12k_1k_prerig.glb",
+    "sha256": "0a693122e0e3449d8a1d1745375c7599bf4b045b9b4376622799ae2151de865c",
+    "bytes": 4765356,
+    "triangles": 12467,
+    "vertices": 15668,
+    "height_m": 1.7000000476837158,
+    "maps": "matching remesh-specific lossless sources reduced to embedded 1K PNG; base linear-light averaging, normal-vector renormalization, neutral AO, boot-local nonmetal roughness floor .60"
+  },
+  "fresh_import_visual": "front/face/boots reviewed in prerig-12k-views",
+  "remaining": [
+    "paid rig acceptance and skin validation",
+    "local grip deformation and measured socket",
+    "clip/pose QA and native host importer",
+    "native rendering/gameplay/device tests outside this asset-source task"
+  ]
+}
