@@ -1,0 +1,22 @@
+{
+  "purpose": "Handoff label correction only; no geometry or GLB rewrite",
+  "before_sha256": {
+    "bh_rock_split_shelf.glb": "e6fecdea0cafca44c02170a090e4f3e0d35059023f8ffd42164da609802adfcb",
+    "bh_rock_upright_crag.glb": "4add26b4feda11a9e951dc3c8aa3f88d1aedb1b03d16c1b129f1d8110ddda1bc",
+    "bh_rock_low_boulder.glb": "b6e6d78d2b3ebd17a6efeaef2495b43cb438e9716db4de4eca2a9c7bcb899163",
+    "bh_fern_open_clump.glb": "0c86c7f7d1072ca18bda70080de645d5975bb9bb1634d2a74bd63943543e652b",
+    "bh_log_fallen_trunk.glb": "f3d5c2ee914f7871ea11dc98d9f2af7791fe8a8842368dfc044cd6b0b8fe44ab",
+    "bh_root_branch_tangle.glb": "bc6d4e6428c4ec3fa904262f2eadacf8e786d620a26853d32b39030240252d86",
+    "bh_fern_small_clump.glb": "9e170ceae6443c3a68b3a7a300ca76343e422e1ee304a8f58452da046fe588f9"
+  },
+  "after_sha256": {
+    "bh_rock_split_shelf.glb": "e6fecdea0cafca44c02170a090e4f3e0d35059023f8ffd42164da609802adfcb",
+    "bh_rock_upright_crag.glb": "4add26b4feda11a9e951dc3c8aa3f88d1aedb1b03d16c1b129f1d8110ddda1bc",
+    "bh_rock_low_boulder.glb": "b6e6d78d2b3ebd17a6efeaef2495b43cb438e9716db4de4eca2a9c7bcb899163",
+    "bh_fern_open_clump.glb": "0c86c7f7d1072ca18bda70080de645d5975bb9bb1634d2a74bd63943543e652b",
+    "bh_log_fallen_trunk.glb": "f3d5c2ee914f7871ea11dc98d9f2af7791fe8a8842368dfc044cd6b0b8fe44ab",
+    "bh_root_branch_tangle.glb": "bc6d4e6428c4ec3fa904262f2eadacf8e786d620a26853d32b39030240252d86",
+    "bh_fern_small_clump.glb": "9e170ceae6443c3a68b3a7a300ca76343e422e1ee304a8f58452da046fe588f9"
+  },
+  "all_seven_glbs_byte_identical": true
+}

@@ -1,0 +1,682 @@
+[
+  {
+    "file": "runtime/horde-irregular-pine-v1-lod1.glb",
+    "sha256": "77c793480abff4ed7515b224a1b4fc55ac840f27d0b1ef9a17dd1ca58ee1ee2c",
+    "bytes": 1266620,
+    "glb_v2_header_valid": true,
+    "mesh_count": 3,
+    "triangle_count": 5000,
+    "meshes": [
+      {
+        "name": "Pine | closed trunk roots branches",
+        "triangles": 1916
+      },
+      {
+        "name": "Pine | closed needle-spray volumes",
+        "triangles": 2928
+      },
+      {
+        "name": "Pine | closed moss tendrils",
+        "triangles": 156
+      }
+    ],
+    "material_count": 3,
+    "materials_opaque": true,
+    "all_materials_backface_culling": true,
+    "images": [
+      {
+        "name": "horde-bark-original-normal-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 529212,
+        "range": [
+          2,
+          255
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-bark-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 242353,
+        "range": [
+          22,
+          102
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-bark-original-roughness-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 144593,
+        "range": [
+          188,
+          255
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-pine-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 70601,
+        "range": [
+          18,
+          47
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-moss-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 112637,
+        "range": [
+          20,
+          73
+        ],
+        "not_black": true
+      }
+    ],
+    "positions_finite": true,
+    "degenerate_triangles": 0,
+    "bounds_gltf_local_xyz": {
+      "min": [
+        -1.8599222898483276,
+        -0.0037124399095773697,
+        -1.8350584506988525
+      ],
+      "max": [
+        1.8909538984298706,
+        8.686391830444336,
+        1.5585356950759888
+      ]
+    },
+    "nodes": [
+      {
+        "name": "Pine | closed trunk roots branches",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Pine | closed needle-spray volumes",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Pine | closed moss tendrils",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "external_uris": false,
+    "source_blender_axis": "Z up",
+    "exported_scene_axis": "Y up via node rotation",
+    "engine_import": "not tested",
+    "game_dev_canonical_validation": "not available; game-dev CLI absent"
+  },
+  {
+    "file": "runtime/horde-irregular-pine-v1.glb",
+    "sha256": "c9e595041da122b7731157189219f81ad83fb09560c9c544775e1e4cb216bb84",
+    "bytes": 1341552,
+    "glb_v2_header_valid": true,
+    "mesh_count": 3,
+    "triangle_count": 7984,
+    "meshes": [
+      {
+        "name": "Pine | closed trunk roots branches",
+        "triangles": 3376
+      },
+      {
+        "name": "Pine | closed needle-spray volumes",
+        "triangles": 4392
+      },
+      {
+        "name": "Pine | closed moss tendrils",
+        "triangles": 216
+      }
+    ],
+    "material_count": 3,
+    "materials_opaque": true,
+    "all_materials_backface_culling": true,
+    "images": [
+      {
+        "name": "horde-bark-original-normal-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 529212,
+        "range": [
+          2,
+          255
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-bark-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 242353,
+        "range": [
+          22,
+          102
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-bark-original-roughness-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 144593,
+        "range": [
+          188,
+          255
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-pine-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 70601,
+        "range": [
+          18,
+          47
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-moss-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 112637,
+        "range": [
+          20,
+          73
+        ],
+        "not_black": true
+      }
+    ],
+    "positions_finite": true,
+    "degenerate_triangles": 0,
+    "bounds_gltf_local_xyz": {
+      "min": [
+        -1.8599222898483276,
+        -0.00683143176138401,
+        -1.8350584506988525
+      ],
+      "max": [
+        1.8909538984298706,
+        8.686391830444336,
+        1.5585356950759888
+      ]
+    },
+    "nodes": [
+      {
+        "name": "Pine | closed trunk roots branches",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Pine | closed needle-spray volumes",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Pine | closed moss tendrils",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "external_uris": false,
+    "source_blender_axis": "Z up",
+    "exported_scene_axis": "Y up via node rotation",
+    "engine_import": "not tested",
+    "game_dev_canonical_validation": "not available; game-dev CLI absent"
+  },
+  {
+    "file": "runtime/horde-upright-alder-v1-lod1.glb",
+    "sha256": "38333b05a996d46942fb9fddb022e128a0591c372582b520f4d051a308e9282d",
+    "bytes": 1304432,
+    "glb_v2_header_valid": true,
+    "mesh_count": 3,
+    "triangle_count": 5102,
+    "meshes": [
+      {
+        "name": "Alder | closed trunk roots branches",
+        "triangles": 2306
+      },
+      {
+        "name": "Alder | individually closed opaque leaves",
+        "triangles": 2640
+      },
+      {
+        "name": "Alder | closed moss tendrils",
+        "triangles": 156
+      }
+    ],
+    "material_count": 3,
+    "materials_opaque": true,
+    "all_materials_backface_culling": true,
+    "images": [
+      {
+        "name": "horde-bark-original-normal-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 529212,
+        "range": [
+          2,
+          255
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-bark-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 242353,
+        "range": [
+          22,
+          102
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-bark-original-roughness-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 144593,
+        "range": [
+          188,
+          255
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-alder-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 102219,
+        "range": [
+          15,
+          66
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-moss-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 112637,
+        "range": [
+          20,
+          73
+        ],
+        "not_black": true
+      }
+    ],
+    "positions_finite": true,
+    "degenerate_triangles": 0,
+    "bounds_gltf_local_xyz": {
+      "min": [
+        -1.6800742149353027,
+        -0.003950951620936394,
+        -1.3665071725845337
+      ],
+      "max": [
+        1.6727383136749268,
+        8.474547386169434,
+        1.7183218002319336
+      ]
+    },
+    "nodes": [
+      {
+        "name": "Alder | closed trunk roots branches",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Alder | individually closed opaque leaves",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Alder | closed moss tendrils",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "external_uris": false,
+    "source_blender_axis": "Z up",
+    "exported_scene_axis": "Y up via node rotation",
+    "engine_import": "not tested",
+    "game_dev_canonical_validation": "not available; game-dev CLI absent"
+  },
+  {
+    "file": "runtime/horde-upright-alder-v1.glb",
+    "sha256": "d2e373b23baded5574fc91172f764207a42a10b6388d9fe27bd18d400067cdee",
+    "bytes": 1373076,
+    "glb_v2_header_valid": true,
+    "mesh_count": 3,
+    "triangle_count": 7832,
+    "meshes": [
+      {
+        "name": "Alder | closed trunk roots branches",
+        "triangles": 3656
+      },
+      {
+        "name": "Alder | individually closed opaque leaves",
+        "triangles": 3960
+      },
+      {
+        "name": "Alder | closed moss tendrils",
+        "triangles": 216
+      }
+    ],
+    "material_count": 3,
+    "materials_opaque": true,
+    "all_materials_backface_culling": true,
+    "images": [
+      {
+        "name": "horde-bark-original-normal-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 529212,
+        "range": [
+          2,
+          255
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-bark-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 242353,
+        "range": [
+          22,
+          102
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-bark-original-roughness-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 144593,
+        "range": [
+          188,
+          255
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-alder-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 102219,
+        "range": [
+          15,
+          66
+        ],
+        "not_black": true
+      },
+      {
+        "name": "horde-moss-original-basecolor-512",
+        "dimensions": [
+          512,
+          512
+        ],
+        "byte_length": 112637,
+        "range": [
+          20,
+          73
+        ],
+        "not_black": true
+      }
+    ],
+    "positions_finite": true,
+    "degenerate_triangles": 0,
+    "bounds_gltf_local_xyz": {
+      "min": [
+        -1.6904454231262207,
+        -0.007092012092471123,
+        -1.3647300004959106
+      ],
+      "max": [
+        1.6727383136749268,
+        8.474547386169434,
+        1.7183218002319336
+      ]
+    },
+    "nodes": [
+      {
+        "name": "Alder | closed trunk roots branches",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Alder | individually closed opaque leaves",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Alder | closed moss tendrils",
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "translation": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "external_uris": false,
+    "source_blender_axis": "Z up",
+    "exported_scene_axis": "Y up via node rotation",
+    "engine_import": "not tested",
+    "game_dev_canonical_validation": "not available; game-dev CLI absent"
+  }
+]

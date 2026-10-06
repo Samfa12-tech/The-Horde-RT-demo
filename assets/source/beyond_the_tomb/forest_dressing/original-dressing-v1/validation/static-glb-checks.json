@@ -1,0 +1,527 @@
+{
+  "validator": "Independent Python GLB binary inspection; not game-dev CLI/Khronos/GPU validation",
+  "assets": [
+    {
+      "asset": "bh_fern_open_clump.glb",
+      "glb_bytes": 206396,
+      "glb_sha256": "0c86c7f7d1072ca18bda70080de645d5975bb9bb1634d2a74bd63943543e652b",
+      "triangles": 1200,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "material_count": 1,
+      "texture_count": 1,
+      "image_count": 1,
+      "all_materials_opaque": true,
+      "positions_normals_uvs_finite": true,
+      "normals_unit_within_0_002": true,
+      "gltf_y_up_bounds_min": [
+        -0.778721,
+        0.0,
+        -0.849268
+      ],
+      "gltf_y_up_dimensions": [
+        1.557442,
+        0.798789,
+        1.698536
+      ],
+      "embedded_images": [
+        {
+          "name": "horde-alder-original-basecolor-512",
+          "sha256": "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        }
+      ],
+      "extensions_used": []
+    },
+    {
+      "asset": "bh_fern_small_clump.glb",
+      "glb_bytes": 166268,
+      "glb_sha256": "9e170ceae6443c3a68b3a7a300ca76343e422e1ee304a8f58452da046fe588f9",
+      "triangles": 768,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "material_count": 1,
+      "texture_count": 1,
+      "image_count": 1,
+      "all_materials_opaque": true,
+      "positions_normals_uvs_finite": true,
+      "normals_unit_within_0_002": true,
+      "gltf_y_up_bounds_min": [
+        -0.568073,
+        0.0,
+        -0.556024
+      ],
+      "gltf_y_up_dimensions": [
+        1.136146,
+        0.562235,
+        1.112048
+      ],
+      "embedded_images": [
+        {
+          "name": "horde-alder-original-basecolor-512",
+          "sha256": "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        }
+      ],
+      "extensions_used": []
+    },
+    {
+      "asset": "bh_log_fallen_trunk.glb",
+      "glb_bytes": 1859020,
+      "glb_sha256": "f3d5c2ee914f7871ea11dc98d9f2af7791fe8a8842368dfc044cd6b0b8fe44ab",
+      "triangles": 544,
+      "mesh_count": 1,
+      "primitive_count": 2,
+      "material_count": 2,
+      "texture_count": 6,
+      "image_count": 6,
+      "all_materials_opaque": true,
+      "positions_normals_uvs_finite": true,
+      "normals_unit_within_0_002": true,
+      "gltf_y_up_bounds_min": [
+        -1.707328,
+        0.0,
+        -0.446389
+      ],
+      "gltf_y_up_dimensions": [
+        3.414657,
+        0.998894,
+        0.892778
+      ],
+      "embedded_images": [
+        {
+          "name": "horde-bark-original-normal-512",
+          "sha256": "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-bark-original-basecolor-512",
+          "sha256": "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-bark-original-roughness-512",
+          "sha256": "bab9da5a1d72edcb5949fafeb1be5963fc73b457230fbb1f055cb09e52fcd66e",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-endgrain-original-normal-512",
+          "sha256": "6587bb9144aff7e6eaa3252757afbd06ba39f27bc94c4048071e86731d42c672",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-endgrain-original-basecolor-512",
+          "sha256": "0a7facfc0a688f4664026bc6c12b6371a4b506b2d42d0b05b877b2fca6148883",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-endgrain-original-roughness-512",
+          "sha256": "7df35c592c49777cfd8e1925ca8d7a5078c731329f58aadf80a5d5ba5b3510c0",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        }
+      ],
+      "extensions_used": []
+    },
+    {
+      "asset": "bh_rock_low_boulder.glb",
+      "glb_bytes": 686428,
+      "glb_sha256": "b6e6d78d2b3ebd17a6efeaef2495b43cb438e9716db4de4eca2a9c7bcb899163",
+      "triangles": 378,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "material_count": 1,
+      "texture_count": 3,
+      "image_count": 3,
+      "all_materials_opaque": true,
+      "positions_normals_uvs_finite": true,
+      "normals_unit_within_0_002": true,
+      "gltf_y_up_bounds_min": [
+        -0.828656,
+        0.0,
+        -0.621563
+      ],
+      "gltf_y_up_dimensions": [
+        1.657311,
+        0.834525,
+        1.243126
+      ],
+      "embedded_images": [
+        {
+          "name": "horde-stone-original-normal-512",
+          "sha256": "51f8dd4413b9f30ca29769c8d4c4e4694e31fae7abf5871b7fa2f85fe1a5d723",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-stone-original-basecolor-512",
+          "sha256": "48e10d2f1ae3fa81e97329c668720ec710cda80127f2b3eeff26ef7e1afc670e",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-stone-original-roughness-512",
+          "sha256": "123e40bb695f6b6ee94da19facf5775f1449d291218bad06d472eca8c9637a64",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        }
+      ],
+      "extensions_used": []
+    },
+    {
+      "asset": "bh_rock_split_shelf.glb",
+      "glb_bytes": 726720,
+      "glb_sha256": "e6fecdea0cafca44c02170a090e4f3e0d35059023f8ffd42164da609802adfcb",
+      "triangles": 788,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "material_count": 1,
+      "texture_count": 3,
+      "image_count": 3,
+      "all_materials_opaque": true,
+      "positions_normals_uvs_finite": true,
+      "normals_unit_within_0_002": true,
+      "gltf_y_up_bounds_min": [
+        -0.994719,
+        0.0,
+        -0.549665
+      ],
+      "gltf_y_up_dimensions": [
+        1.989439,
+        0.522745,
+        1.099331
+      ],
+      "embedded_images": [
+        {
+          "name": "horde-stone-original-normal-512",
+          "sha256": "51f8dd4413b9f30ca29769c8d4c4e4694e31fae7abf5871b7fa2f85fe1a5d723",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-stone-original-basecolor-512",
+          "sha256": "48e10d2f1ae3fa81e97329c668720ec710cda80127f2b3eeff26ef7e1afc670e",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-stone-original-roughness-512",
+          "sha256": "123e40bb695f6b6ee94da19facf5775f1449d291218bad06d472eca8c9637a64",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        }
+      ],
+      "extensions_used": []
+    },
+    {
+      "asset": "bh_rock_upright_crag.glb",
+      "glb_bytes": 686232,
+      "glb_sha256": "4add26b4feda11a9e951dc3c8aa3f88d1aedb1b03d16c1b129f1d8110ddda1bc",
+      "triangles": 376,
+      "mesh_count": 1,
+      "primitive_count": 1,
+      "material_count": 1,
+      "texture_count": 3,
+      "image_count": 3,
+      "all_materials_opaque": true,
+      "positions_normals_uvs_finite": true,
+      "normals_unit_within_0_002": true,
+      "gltf_y_up_bounds_min": [
+        -0.529071,
+        0.0,
+        -0.460091
+      ],
+      "gltf_y_up_dimensions": [
+        1.058142,
+        1.351351,
+        0.920183
+      ],
+      "embedded_images": [
+        {
+          "name": "horde-stone-original-normal-512",
+          "sha256": "51f8dd4413b9f30ca29769c8d4c4e4694e31fae7abf5871b7fa2f85fe1a5d723",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-stone-original-basecolor-512",
+          "sha256": "48e10d2f1ae3fa81e97329c668720ec710cda80127f2b3eeff26ef7e1afc670e",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-stone-original-roughness-512",
+          "sha256": "123e40bb695f6b6ee94da19facf5775f1449d291218bad06d472eca8c9637a64",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        }
+      ],
+      "extensions_used": []
+    },
+    {
+      "asset": "bh_root_branch_tangle.glb",
+      "glb_bytes": 1860596,
+      "glb_sha256": "bc6d4e6428c4ec3fa904262f2eadacf8e786d620a26853d32b39030240252d86",
+      "triangles": 548,
+      "mesh_count": 1,
+      "primitive_count": 2,
+      "material_count": 2,
+      "texture_count": 6,
+      "image_count": 6,
+      "all_materials_opaque": true,
+      "positions_normals_uvs_finite": true,
+      "normals_unit_within_0_002": true,
+      "gltf_y_up_bounds_min": [
+        -1.066852,
+        0.0,
+        -0.779969
+      ],
+      "gltf_y_up_dimensions": [
+        2.133704,
+        0.753924,
+        1.559938
+      ],
+      "embedded_images": [
+        {
+          "name": "horde-bark-original-normal-512",
+          "sha256": "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-bark-original-basecolor-512",
+          "sha256": "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-bark-original-roughness-512",
+          "sha256": "bab9da5a1d72edcb5949fafeb1be5963fc73b457230fbb1f055cb09e52fcd66e",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-endgrain-original-normal-512",
+          "sha256": "6587bb9144aff7e6eaa3252757afbd06ba39f27bc94c4048071e86731d42c672",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-endgrain-original-basecolor-512",
+          "sha256": "0a7facfc0a688f4664026bc6c12b6371a4b506b2d42d0b05b877b2fca6148883",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        },
+        {
+          "name": "horde-endgrain-original-roughness-512",
+          "sha256": "7df35c592c49777cfd8e1925ca8d7a5078c731329f58aadf80a5d5ba5b3510c0",
+          "width": 512,
+          "height": 512,
+          "decoded_mode": "RGB",
+          "decoded_bytes": 786432,
+          "conservative_rgba8_bytes_without_mips": 1048576
+        }
+      ],
+      "extensions_used": []
+    }
+  ],
+  "unique_embedded_images_across_kit": 10,
+  "unique_embedded_decoded_bytes": 7864320,
+  "conservative_unique_rgba8_bytes_no_mips": 10485760,
+  "texture_residency_note": "Per-GLB files embed shared textures for portability. Importer should deduplicate maps/materials by lineage or hash. Reported decoded source bytes and RGBA8 estimates are not measured GPU residency; engine format/mips/compression determine actual use.",
+  "source_texture_lineage": [
+    {
+      "file": "horde-alder-original-basecolor-512.png",
+      "sha256": "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "decoded_bytes": 786432,
+      "provenance": "Original tree-pair shared maps; same bytes",
+      "generator": "shared_tree_material_provenance.py"
+    },
+    {
+      "file": "horde-bark-original-basecolor-512.png",
+      "sha256": "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "decoded_bytes": 786432,
+      "provenance": "Original tree-pair shared maps; same bytes",
+      "generator": "shared_tree_material_provenance.py"
+    },
+    {
+      "file": "horde-bark-original-normal-512.png",
+      "sha256": "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "decoded_bytes": 786432,
+      "provenance": "Original tree-pair shared maps; same bytes",
+      "generator": "shared_tree_material_provenance.py"
+    },
+    {
+      "file": "horde-bark-original-roughness-512.png",
+      "sha256": "03e409b0fc569647c0f4ac18154ee506cce4328433ab8096c97a53ea02105e76",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "decoded_bytes": 786432,
+      "provenance": "Original tree-pair shared maps; same bytes",
+      "generator": "shared_tree_material_provenance.py"
+    },
+    {
+      "file": "horde-endgrain-original-basecolor-512.png",
+      "sha256": "0a7facfc0a688f4664026bc6c12b6371a4b506b2d42d0b05b877b2fca6148883",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "decoded_bytes": 786432,
+      "provenance": "Original dressing procedural maps",
+      "generator": "generate_endgrain_maps.py"
+    },
+    {
+      "file": "horde-endgrain-original-normal-512.png",
+      "sha256": "6587bb9144aff7e6eaa3252757afbd06ba39f27bc94c4048071e86731d42c672",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "decoded_bytes": 786432,
+      "provenance": "Original dressing procedural maps",
+      "generator": "generate_endgrain_maps.py"
+    },
+    {
+      "file": "horde-endgrain-original-roughness-512.png",
+      "sha256": "2e4a082f83f2bbcdc71767205325703b6a980c90d1e55bb0109ffdfed369c6ad",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "L",
+      "decoded_bytes": 262144,
+      "provenance": "Original dressing procedural maps",
+      "generator": "generate_endgrain_maps.py"
+    },
+    {
+      "file": "horde-stone-original-basecolor-512.png",
+      "sha256": "48e10d2f1ae3fa81e97329c668720ec710cda80127f2b3eeff26ef7e1afc670e",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "decoded_bytes": 786432,
+      "provenance": "Original dressing procedural maps",
+      "generator": "generate_stone_maps.py"
+    },
+    {
+      "file": "horde-stone-original-normal-512.png",
+      "sha256": "51f8dd4413b9f30ca29769c8d4c4e4694e31fae7abf5871b7fa2f85fe1a5d723",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "RGB",
+      "decoded_bytes": 786432,
+      "provenance": "Original dressing procedural maps",
+      "generator": "generate_stone_maps.py"
+    },
+    {
+      "file": "horde-stone-original-roughness-512.png",
+      "sha256": "8ff108967c680b068b160a5b363553ec8c89c49f8e6eb0bca2b3cac5aafe04a3",
+      "dimensions": [
+        512,
+        512
+      ],
+      "mode": "L",
+      "decoded_bytes": 262144,
+      "provenance": "Original dressing procedural maps",
+      "generator": "generate_stone_maps.py"
+    }
+  ]
+}

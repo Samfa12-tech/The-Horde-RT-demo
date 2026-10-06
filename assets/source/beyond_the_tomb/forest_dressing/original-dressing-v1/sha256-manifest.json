@@ -1,0 +1,238 @@
+{
+  "ORIGINAL-AUTHORSHIP.txt": {
+    "bytes": 695,
+    "sha256": "80018f9113dcc2cea1a24df1151dccdbe33a6b70ec99c1b82176225639ade16c"
+  },
+  "README.md": {
+    "bytes": 4805,
+    "sha256": "d86ca1167e6206449d05ef427bf44194645ad20e7cd47bdd57a1e1997a7bcf30"
+  },
+  "assets/bh_fern_open_clump.glb": {
+    "bytes": 206396,
+    "sha256": "0c86c7f7d1072ca18bda70080de645d5975bb9bb1634d2a74bd63943543e652b"
+  },
+  "assets/bh_fern_small_clump.glb": {
+    "bytes": 166268,
+    "sha256": "9e170ceae6443c3a68b3a7a300ca76343e422e1ee304a8f58452da046fe588f9"
+  },
+  "assets/bh_log_fallen_trunk.glb": {
+    "bytes": 1859020,
+    "sha256": "f3d5c2ee914f7871ea11dc98d9f2af7791fe8a8842368dfc044cd6b0b8fe44ab"
+  },
+  "assets/bh_rock_low_boulder.glb": {
+    "bytes": 686428,
+    "sha256": "b6e6d78d2b3ebd17a6efeaef2495b43cb438e9716db4de4eca2a9c7bcb899163"
+  },
+  "assets/bh_rock_split_shelf.glb": {
+    "bytes": 726720,
+    "sha256": "e6fecdea0cafca44c02170a090e4f3e0d35059023f8ffd42164da609802adfcb"
+  },
+  "assets/bh_rock_upright_crag.glb": {
+    "bytes": 686232,
+    "sha256": "4add26b4feda11a9e951dc3c8aa3f88d1aedb1b03d16c1b129f1d8110ddda1bc"
+  },
+  "assets/bh_root_branch_tangle.glb": {
+    "bytes": 1860596,
+    "sha256": "bc6d4e6428c4ec3fa904262f2eadacf8e786d620a26853d32b39030240252d86"
+  },
+  "previews/Horde-1.7-forest-dressing-contact-sheet.jpg": {
+    "bytes": 189742,
+    "sha256": "fa8ceee2e59a41d4016bba6981829928750b4d76a4685fb656ab5845e7f27b19"
+  },
+  "previews/bh_fern_open_clump-closeup.png": {
+    "bytes": 724023,
+    "sha256": "8e6d269f32a136faa22e6b1377abf5d2f9c2c1f9b1545e02d4194c62d7039aa6"
+  },
+  "previews/bh_fern_open_clump-silhouette.png": {
+    "bytes": 300635,
+    "sha256": "8dc07c2e20a5275bfd351e6187526ba2f7a79ad6fb8ab7ada9308ca517d38ec6"
+  },
+  "previews/bh_fern_open_clump-wireframe.png": {
+    "bytes": 539379,
+    "sha256": "7eda573907a9e12d9b1df160b9706e72ee955efd07a82a21bfdfc499f6219cdf"
+  },
+  "previews/bh_fern_small_clump-closeup.png": {
+    "bytes": 711879,
+    "sha256": "f9d68b9c684793370044b3733d0893716fac5b21c54f209769223be9c6509ecb"
+  },
+  "previews/bh_fern_small_clump-silhouette.png": {
+    "bytes": 294188,
+    "sha256": "4f45367e69aef3cd2b2cc4f15056848e2b6c941e58f89e9d95bbecb30378865c"
+  },
+  "previews/bh_fern_small_clump-wireframe.png": {
+    "bytes": 528433,
+    "sha256": "2da5f415c9654842e47bad3ff5e118655101ed5a9aba5040a127bb4e76321690"
+  },
+  "previews/bh_log_fallen_trunk-closeup.png": {
+    "bytes": 682750,
+    "sha256": "6d4f9d60b0bd7aedf6b4206a34f9cfe0f5a9cb98ace5a8ca3a4574dd1e8e697e"
+  },
+  "previews/bh_log_fallen_trunk-endgrain-detail.png": {
+    "bytes": 597239,
+    "sha256": "ad8f186846077aad9a3afd3368b543b9f911b44d2c23a207cf8e85a01d66c97a"
+  },
+  "previews/bh_log_fallen_trunk-silhouette.png": {
+    "bytes": 286000,
+    "sha256": "95f8fac063ab5efee0725a9a7129e69eaa4bae27cf7edc653ed3512979ea95fe"
+  },
+  "previews/bh_log_fallen_trunk-wireframe.png": {
+    "bytes": 515722,
+    "sha256": "1779105bc3f177ec55ed2f06ceccbff3983eb53f38b8be57079cbe8cffaa455f"
+  },
+  "previews/bh_rock_low_boulder-closeup.png": {
+    "bytes": 686234,
+    "sha256": "b08946513858cedbba4c018ce5881d870656bbe10ee0a3acc3bcc8f4a7937058"
+  },
+  "previews/bh_rock_low_boulder-silhouette.png": {
+    "bytes": 336627,
+    "sha256": "327012e0459034caf7376fe9fbc04d46e45a7de3c1d8a2f4a58dd11840b65fce"
+  },
+  "previews/bh_rock_low_boulder-wireframe.png": {
+    "bytes": 535190,
+    "sha256": "39b75fb6bfe2fa2685027a0409fd9788b4ee874a6ca1ec88e8fd5e5798052887"
+  },
+  "previews/bh_rock_split_shelf-closeup.png": {
+    "bytes": 675806,
+    "sha256": "5783f8f04b9eea994ceeb943203afaeae06fb7d53e39f1272458b35a38b1ca48"
+  },
+  "previews/bh_rock_split_shelf-silhouette.png": {
+    "bytes": 304283,
+    "sha256": "5891f22265749bada3712f5f48dfdb27667b52cd1ce4f263f65ebc9c98c832a4"
+  },
+  "previews/bh_rock_split_shelf-wireframe.png": {
+    "bytes": 532324,
+    "sha256": "8dc342b1e3cea5c0da2677273d587e4bbfa7fe29f51f939192700e3f15f2209e"
+  },
+  "previews/bh_rock_upright_crag-closeup.png": {
+    "bytes": 683049,
+    "sha256": "03f70fba3361e27437dde056ba5c6f6d1f39d8ac44703f11dc3341be67c54e4c"
+  },
+  "previews/bh_rock_upright_crag-silhouette.png": {
+    "bytes": 361793,
+    "sha256": "656bad9f114fb526007ad35315456cd3c1be779de231f301da0ce39d8988603e"
+  },
+  "previews/bh_rock_upright_crag-wireframe.png": {
+    "bytes": 563312,
+    "sha256": "d2b9b3e8907d14a069959ab4a1e0f6e7f02fe033e65fbb3333badeaae455ea10"
+  },
+  "previews/bh_root_branch_tangle-closeup.png": {
+    "bytes": 688867,
+    "sha256": "7c3c191e47ad346e95917c139d1d2f475c916e14745fe41417ff1e12bb52f90a"
+  },
+  "previews/bh_root_branch_tangle-silhouette.png": {
+    "bytes": 286249,
+    "sha256": "11f90cb09bb576a1715533cb07d47bc70b93afba7a93a4308330b88183577253"
+  },
+  "previews/bh_root_branch_tangle-wireframe.png": {
+    "bytes": 524300,
+    "sha256": "5f98db706294427e882aa47c9b94a0c24dba177c4b63d8a4fc50ee7e5819a877"
+  },
+  "source/Horde-1.7-forest-dressing.blend": {
+    "bytes": 961680,
+    "sha256": "a6a55533d0e52eb250e4b92907a7d7b5504728cfbc2d1962d782f0ffde30d4bb"
+  },
+  "source/asset-spec.json": {
+    "bytes": 2961,
+    "sha256": "1224a22ad1af5827432075172c726ff563640614a853943eb63c153c8f13bd6e"
+  },
+  "source/build_forest_dressing.py": {
+    "bytes": 13033,
+    "sha256": "0ae1f0a621155e7889098fa963f4fe78f1f0d54cd1397c0e9b5c4706ea12a137"
+  },
+  "source/generate_endgrain_maps.py": {
+    "bytes": 1273,
+    "sha256": "b934aaa791dd33bfd3fc5fcd2211cb31f24c962c40d39824be9e0007c5faa028"
+  },
+  "source/generate_stone_maps.py": {
+    "bytes": 1819,
+    "sha256": "220597a7b340ff225074f9a4a7c7dfa25470044da2383aa133dff822d33752d0"
+  },
+  "source/inspect_glb_static.py": {
+    "bytes": 4552,
+    "sha256": "304eb3e48d1978742098fd5ed382ef72ac8414389181e743511ae3950a7f8e3c"
+  },
+  "source/package_dressing.py": {
+    "bytes": 10464,
+    "sha256": "12a7583b844545beb5f2746b87eb1e80f42ea05396c680138eaf31ed06846ff0"
+  },
+  "source/render_log_endgrain_detail.py": {
+    "bytes": 1369,
+    "sha256": "3201b7692b45ab884968666f70966ccf364c1b655e9d43865eed1fab50886e5b"
+  },
+  "source/render_stone_material_test.py": {
+    "bytes": 2241,
+    "sha256": "2cc2c0c0e4ad9d6bf895c89df6d90c7bd2bb81f5515a9e25e77fa038350fa462"
+  },
+  "source/render_validate_dressing.py": {
+    "bytes": 5192,
+    "sha256": "52b70a2dfd9e910c02bd922b6e5c2a270af8c32754ad616da618eaad0995a3ad"
+  },
+  "source/render_wireframe_evidence.py": {
+    "bytes": 2092,
+    "sha256": "f2079c1aacb7eb7f430068bd8d2af3aa90f3bf6f31050a91451514959012aa10"
+  },
+  "source/shared_tree_material_provenance.py": {
+    "bytes": 20587,
+    "sha256": "75b759f7b332ec261354855769ebdc68ba2326911355a5b428492dc55403d78f"
+  },
+  "textures/horde-alder-original-basecolor-512.png": {
+    "bytes": 102219,
+    "sha256": "ee50e858d39fa43418ae8b243f2336d4f353408753fa736460c0fe8f16125d44"
+  },
+  "textures/horde-bark-original-basecolor-512.png": {
+    "bytes": 242353,
+    "sha256": "c9cc184f0edb207c5081b78a70e7564e221dcd2c5d40f2c74449d065eeb7d27b"
+  },
+  "textures/horde-bark-original-normal-512.png": {
+    "bytes": 529212,
+    "sha256": "73785defa7ea75739f403bc0b1e0710d7dca0435fed542cecd8efc9496b98e06"
+  },
+  "textures/horde-bark-original-roughness-512.png": {
+    "bytes": 145997,
+    "sha256": "03e409b0fc569647c0f4ac18154ee506cce4328433ab8096c97a53ea02105e76"
+  },
+  "textures/horde-endgrain-original-basecolor-512.png": {
+    "bytes": 288051,
+    "sha256": "0a7facfc0a688f4664026bc6c12b6371a4b506b2d42d0b05b877b2fca6148883"
+  },
+  "textures/horde-endgrain-original-normal-512.png": {
+    "bytes": 369758,
+    "sha256": "6587bb9144aff7e6eaa3252757afbd06ba39f27bc94c4048071e86731d42c672"
+  },
+  "textures/horde-endgrain-original-roughness-512.png": {
+    "bytes": 154289,
+    "sha256": "2e4a082f83f2bbcdc71767205325703b6a980c90d1e55bb0109ffdfed369c6ad"
+  },
+  "textures/horde-stone-original-basecolor-512.png": {
+    "bytes": 198447,
+    "sha256": "48e10d2f1ae3fa81e97329c668720ec710cda80127f2b3eeff26ef7e1afc670e"
+  },
+  "textures/horde-stone-original-normal-512.png": {
+    "bytes": 308149,
+    "sha256": "51f8dd4413b9f30ca29769c8d4c4e4694e31fae7abf5871b7fa2f85fe1a5d723"
+  },
+  "textures/horde-stone-original-roughness-512.png": {
+    "bytes": 74216,
+    "sha256": "8ff108967c680b068b160a5b363553ec8c89c49f8e6eb0bca2b3cac5aafe04a3"
+  },
+  "validation/authoring-inventory.json": {
+    "bytes": 3821,
+    "sha256": "8b39545c1e4f3094d66c9df860e178301aaec4e1d2c09014fa0d859542141482"
+  },
+  "validation/fresh-import-checks.json": {
+    "bytes": 2384,
+    "sha256": "cdbdf4d32ad9b93af0884b08c56f52b3c4f9d6aab4b8dd52c4b51246f847634b"
+  },
+  "validation/log-embedded-pixel-ranges.json": {
+    "bytes": 1411,
+    "sha256": "cef886bf270c2f184cc8071f0b5c46293e2e559132e21971444d95158af76489"
+  },
+  "validation/relabel-preserved-glb-hashes.json": {
+    "bytes": 1557,
+    "sha256": "7a26eb0e0599db603788e7e82f91fe9d606a7a797b81ac84a0cfcbe5117ba1ca"
+  },
+  "validation/static-glb-checks.json": {
+    "bytes": 16960,
+    "sha256": "b8d2c5b008fd3eb0986fb5de3413a9949573143436659580bcbeb1886e0b6dfb"
+  }
+}

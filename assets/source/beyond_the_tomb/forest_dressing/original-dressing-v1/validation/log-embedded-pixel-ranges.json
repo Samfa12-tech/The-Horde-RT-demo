@@ -1,0 +1,110 @@
+[
+  {
+    "image": "horde-bark-original-normal-512",
+    "min_rgb": [
+      2,
+      18,
+      148
+    ],
+    "mean_rgb": [
+      127.544,
+      127.484,
+      241.739
+    ],
+    "max_rgb": [
+      252,
+      245,
+      255
+    ]
+  },
+  {
+    "image": "horde-bark-original-basecolor-512",
+    "min_rgb": [
+      24,
+      25,
+      22
+    ],
+    "mean_rgb": [
+      64.944,
+      68.222,
+      60.264
+    ],
+    "max_rgb": [
+      94,
+      102,
+      85
+    ]
+  },
+  {
+    "image": "horde-bark-original-roughness-512",
+    "min_rgb": [
+      255,
+      188,
+      255
+    ],
+    "mean_rgb": [
+      255.0,
+      222.765,
+      255.0
+    ],
+    "max_rgb": [
+      255,
+      245,
+      255
+    ]
+  },
+  {
+    "image": "horde-endgrain-original-normal-512",
+    "min_rgb": [
+      82,
+      82,
+      242
+    ],
+    "mean_rgb": [
+      127.001,
+      126.997,
+      253.961
+    ],
+    "max_rgb": [
+      173,
+      172,
+      254
+    ]
+  },
+  {
+    "image": "horde-endgrain-original-basecolor-512",
+    "min_rgb": [
+      22,
+      16,
+      8
+    ],
+    "mean_rgb": [
+      57.574,
+      49.722,
+      37.666
+    ],
+    "max_rgb": [
+      71,
+      62,
+      49
+    ]
+  },
+  {
+    "image": "horde-endgrain-original-roughness-512",
+    "min_rgb": [
+      255,
+      216,
+      255
+    ],
+    "mean_rgb": [
+      255.0,
+      224.102,
+      255.0
+    ],
+    "max_rgb": [
+      255,
+      252,
+      255
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Horde_Dead_Snag_01_LOD0",
+    "vertices": 2571,
+    "triangles": 4792,
+    "dimensions": [
+      3.0924360752105713,
+      1.2953767776489258,
+      6.195629596710205
+    ]
+  },
+  {
+    "name": "Horde_Dead_Snag_01_LOD1",
+    "vertices": 1369,
+    "triangles": 2395,
+    "dimensions": [
+      3.0924360752105713,
+      1.2953767776489258,
+      6.195629596710205
+    ]
+  },
+  {
+    "name": "Horde_Dead_Snag_01_LOD2",
+    "vertices": 712,
+    "triangles": 1198,
+    "dimensions": [
+      3.076165199279785,
+      1.2854020595550537,
+      6.195629596710205
+    ]
+  }
+]

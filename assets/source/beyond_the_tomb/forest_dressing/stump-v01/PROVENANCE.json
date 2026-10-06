@@ -1,0 +1,13 @@
+{
+  "asset": "Horde1.7 A08 gnarled stump/root pilot",
+  "generated_utc_date": "2026-10-06",
+  "provider": "Meshy",
+  "original_prompt": "One low-poly grounded gnarled woodland stump with five thick exposed tapering roots, broken trunk top, weathered bark, restrained moss, dark natural gothic woodland realism. Broad compact silhouette, physically plausible PBR materials, opaque surfaces. Isolated single reusable static game prop. No leaves, no soil base, no floating pieces, no props, no characters, no text, no lights.",
+  "texture_prompt": "Weathered woodland stump, rough dark gray-brown bark, subtle pale exposed wood on top, restrained deep green moss in lower creases, physically based dielectric wood, matte, no painted shadows, no metallic highlights, no emission.",
+  "refine_texture_setting": "2k, PBR enabled, remove-lighting true",
+  "remesh_setting": "triangle topology, target-polycount3000",
+  "input_origin": "Original text prompts; no supplied image or third-party source model.",
+  "modifications": "Targeted topology repair, uniform scaling/pivot normalization, 512px map derivation and packed editable Blender source; see repair receipt and QA report.",
+  "rights_review": "See RIGHTS.md. No plan-specific ownership assertion is made.",
+  "stage": "Archived source and locally validated candidate; not native runtime admission."
+}

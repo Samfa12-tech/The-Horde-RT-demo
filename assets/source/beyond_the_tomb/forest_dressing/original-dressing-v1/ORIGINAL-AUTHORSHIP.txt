@@ -1,0 +1,5 @@
+Original-authored project asset handoff for The Horde 1.7, prepared 2026-10-06.
+
+All geometry in this package and the stone/endgrain maps were authored procedurally with deterministic local Blender/Python scripts for this project. Bark and foliage maps are original project-authored shared maps from the companion tree-pair source, preserved with source and hashes. No third-party mesh or map is included. No paid generation/provider call was used for this dressing kit.
+
+Project-owned/original-authorship notice only. This handoff does not newly dedicate the assets to CC0, select an unrelated public license, or authorize publication. Existing user/project rights and instructions govern use.

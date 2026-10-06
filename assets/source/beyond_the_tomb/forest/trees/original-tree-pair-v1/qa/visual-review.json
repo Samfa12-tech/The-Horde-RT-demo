@@ -1,0 +1,42 @@
+{
+  "review_type": "Actual rendered-pixel inspection",
+  "reviewed_files": [
+    {
+      "path": "previews/horde-upright-alder-v1-runtime-reimport.png",
+      "sha256": "ef837e9cd7009848b26e5639894b21a16f1b67e8cb1020a81a0e23e253083eff"
+    },
+    {
+      "path": "previews/horde-irregular-pine-v1-runtime-reimport.png",
+      "sha256": "f3edd1f36de509e32b5da980c5022f3c35eeb1fea8ae9418d74c8800f7c460be"
+    },
+    {
+      "path": "previews/horde-upright-alder-v1-lod1-runtime-reimport.png",
+      "sha256": "f9c868913d1290185b3519841a7f2003489f6c94b7328bc7ef7a18ae791d0dad"
+    },
+    {
+      "path": "previews/horde-irregular-pine-v1-lod1-runtime-reimport.png",
+      "sha256": "9ae92702b8d4d2616e1e556700a4ab1342d92477a746fd4206ed6ad6bcb96e99"
+    },
+    {
+      "path": "previews/horde-upright-alder-v1-lod1-back.png",
+      "sha256": "d942dbf65210d0e866de75ac80a9e6a40c1b0dcb381b57a6b70e877060ce2c5a"
+    },
+    {
+      "path": "previews/horde-irregular-pine-v1-lod1-back.png",
+      "sha256": "c8cf3cd71a8d4adb2e423473eb34331ec50200893fcb7368a41bf12c4a6d2873"
+    }
+  ],
+  "result": "Acceptable as restrained mid-distance source candidates. LOD1 preserves recognizable silhouette, visible trunk windows, root flare, and branch layout without visibly collapsing crowns.",
+  "known_limitations": [
+    "Chunky opaque volumetric leaf/needle-spray shapes",
+    "Sparse canopies; not botanical realism",
+    "Overlapping branch/root joins retain close-view seams",
+    "No game-engine integration or performance claim"
+  ],
+  "corrected_during_QA": [
+    "Generated texture colorspace assignment order; all final maps nonblack",
+    "Replaced regular bark stripe pattern with subtle broken plates",
+    "Anchored all side branches to sampled parent centerlines",
+    "Preserved every branch path and leaf pose across both geometric LODs"
+  ]
+}

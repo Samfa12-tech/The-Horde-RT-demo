@@ -1,0 +1,51 @@
+Extensions: writing cache failed ([Errno 30] Read-only file system: '/home/agent/.config/blender').
+17:59:01 | INFO: Data are loaded, start creating Blender stuff
+17:59:01 | INFO: Blender create Mesh node Cylinder.001
+Blender 4.3.2
+Error: Cannot read 'source/NormalTree_Bark.jpg': No such file or directory
+17:59:01 | ERROR: Missing image file (index 1): source/NormalTree_Bark.jpg
+Error: Cannot read 'source/NormalTree_Bark_Normal.png': No such file or directory
+17:59:01 | ERROR: Missing image file (index 0): source/NormalTree_Bark_Normal.png
+17:59:01 | INFO: glTF import finished in 0.01s
+ERROR Draco mesh compression is not available because library could not be found at /usr/bin/4.3/python/lib/python3.13/site-packages/libextern_draco.so
+17:59:02 | INFO: Starting glTF 2.0 export
+17:59:02 | INFO: Extracting primitive: Cylinder.001
+17:59:02 | INFO: Primitives created: 1
+17:59:02 | INFO: Finished glTF 2.0 export in 0.2533457279205322 s
+
+17:59:02 | INFO: Starting glTF 2.0 export
+17:59:02 | INFO: Extracting primitive: Cylinder.002
+17:59:02 | INFO: Primitives created: 1
+17:59:02 | INFO: Finished glTF 2.0 export in 0.12279319763183594 s
+
+17:59:02 | INFO: Starting glTF 2.0 export
+17:59:02 | INFO: Extracting primitive: Cylinder.003
+17:59:02 | INFO: Primitives created: 1
+17:59:02 | INFO: Finished glTF 2.0 export in 0.09977173805236816 s
+Fra:1 Mem:27.51M (Peak 27.51M) | Time:00:00.00 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Synchronizing object | Horde_Dead_Snag_01_LOD0
+Fra:1 Mem:30.11M (Peak 30.11M) | Time:00:00.01 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Initializing
+Fra:1 Mem:30.10M (Peak 30.11M) | Time:00:00.01 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Updating Images | Loading snag_bark_basecolor.png
+Fra:1 Mem:30.10M (Peak 30.11M) | Time:00:00.01 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Updating Images | Loading snag_bark_normal.png
+Fra:1 Mem:30.10M (Peak 30.11M) | Time:00:00.01 | Mem:0.00M, Peak:0.00M | Scene, ViewLayer | Updating Images | Loading snag_bark_roughness.png
+Fra:1 Mem:41.91M (Peak 54.10M) | Time:00:00.01 | Mem:12.00M, Peak:12.00M | Scene, ViewLayer | Waiting for render to start
+Failed to denoise, build has no OpenImageDenoise support
+Fra:1 Mem:41.91M (Peak 54.10M) | Time:00:00.01 | Mem:12.00M, Peak:12.00M | Scene, ViewLayer | Loading render kernels (may take a few minutes the first time)
+Fra:1 Mem:41.91M (Peak 54.10M) | Time:00:00.01 | Mem:12.00M, Peak:12.00M | Scene, ViewLayer | Updating Scene
+Fra:1 Mem:41.91M (Peak 54.10M) | Time:00:00.01 | Mem:12.00M, Peak:12.00M | Scene, ViewLayer | Updating Shaders
+Fra:1 Mem:41.99M (Peak 54.10M) | Time:00:00.02 | Mem:12.00M, Peak:12.00M | Scene, ViewLayer | Loading denoising kernels (may take a few minutes the first time)
+Fra:1 Mem:41.99M (Peak 54.10M) | Time:00:00.02 | Mem:12.00M, Peak:12.00M | Scene, ViewLayer | Failed to denoise, build has no OpenImageDenoise support
+Traceback (most recent call last):
+  File "source/build_snag.py", line 44, in <module>
+    a=math.radians(ang);camera.location=(math.sin(a)*12,-math.cos(a)*12,4.4);camera.rotation_euler=(Vector((0,0,3.1))-camera.location).to_track_quat('-Z','Y').to_euler();scene.render.filepath=str(R/'evidence'/f'view_{ang:03}.png');bpy.ops.render.render(write_still=True)
+                                                                                                                                                                                                                                       ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/usr/share/blender/scripts/modules/bpy/ops.py", line 109, in __call__
+    ret = _op_call(self.idname_py(), kw)
+RuntimeError: Error: Failed to denoise, build has no OpenImageDenoise support
+Error: Failed to denoise, build has no OpenImageDenoise support
+
+
+Info: Saved "Horde_Dead_Snag_01.blend"
+Error: Failed to denoise, build has no OpenImageDenoise support
+Error: Failed to denoise, build has no OpenImageDenoise support
+
+Blender quit

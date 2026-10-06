@@ -1,0 +1,127 @@
+[
+  {
+    "path": "README.md",
+    "bytes": 5044,
+    "sha256": "e9d14b9bf716d0927a1f16b302456147a4735624499c698e5fdb7df5b0ef21ce"
+  },
+  {
+    "path": "evidence/blender_build.log",
+    "bytes": 33800,
+    "sha256": "fcdccffedd3cbce2450a56b14df8be6c3319e795dbae12e8a641a0b11a5bea2c"
+  },
+  {
+    "path": "evidence/blender_build_first_attempt.log",
+    "bytes": 3953,
+    "sha256": "fc8c23665747dc61c8df639151b70d320f9988cea67bdf5885f632ad5401c91b"
+  },
+  {
+    "path": "evidence/geometry_report.json",
+    "bytes": 586,
+    "sha256": "b0b03e1579486ab12353e7be962ac1144daae4776a23dc59c7ad31da4d0848dd"
+  },
+  {
+    "path": "evidence/glb_static_inspection.json",
+    "bytes": 4536,
+    "sha256": "5de1a87729d2c38cc629edd028edbb54cd07a0ccac7730c4bbcef5208cf7b131"
+  },
+  {
+    "path": "evidence/lod_0.png",
+    "bytes": 685425,
+    "sha256": "ca7e1c535ef0461e00f4a625c22aa441e58c7e9e40feda2dd4d932e3424ad1e4"
+  },
+  {
+    "path": "evidence/lod_1.png",
+    "bytes": 685596,
+    "sha256": "69087f87c23441d29402d06b2ea162405d544ef5484ee37e4705c7adcbb8198f"
+  },
+  {
+    "path": "evidence/lod_2.png",
+    "bytes": 685377,
+    "sha256": "deb20891a4b5b484f0a055d6d12ac19e29bbd93ae457e18a2b6374994560079d"
+  },
+  {
+    "path": "evidence/view_000.png",
+    "bytes": 686368,
+    "sha256": "d1b07f7c300b36b397fe5d993abeaf070bb039bd6935b4f6857b8e1b3e3a27b8"
+  },
+  {
+    "path": "evidence/view_090.png",
+    "bytes": 667472,
+    "sha256": "6acebbba74d210b3892508edeed0619b98aba8cb1b1c62dd7c9f4b97e7062168"
+  },
+  {
+    "path": "evidence/view_180.png",
+    "bytes": 687285,
+    "sha256": "7f26d0a5ecb4c08ac8fbc9bbafd56527fe4ad17ff8b00120f892ff17acef4c6f"
+  },
+  {
+    "path": "models/Horde_Dead_Snag_01_LOD0.glb",
+    "bytes": 3801032,
+    "sha256": "f65183bd67a330c0afd0413e3f686f81c6286939f005b22d6e3540c82b0319de"
+  },
+  {
+    "path": "models/Horde_Dead_Snag_01_LOD1.glb",
+    "bytes": 3743832,
+    "sha256": "e7bd3645388036a5689974c917a45779437707a404ae9083aacc4d4c746da099"
+  },
+  {
+    "path": "models/Horde_Dead_Snag_01_LOD2.glb",
+    "bytes": 3713924,
+    "sha256": "f4245c9ee077411fcd77b6c611038ae4d958c80f76b26dde6af691092c285b63"
+  },
+  {
+    "path": "source/DeadTree_1.bin",
+    "bytes": 121712,
+    "sha256": "765717fbcd70023ff9aa9d65b7ddd5763738eb61ca0e15704e97de2024fc0d7c"
+  },
+  {
+    "path": "source/DeadTree_1.gltf",
+    "bytes": 2057,
+    "sha256": "e335f2ab60efcc30a02ce876582985426b45877ce390e6eec7460ddbfa2513ed"
+  },
+  {
+    "path": "source/Horde_Dead_Snag_01.blend",
+    "bytes": 4569296,
+    "sha256": "263dc4d35ec1f3738523943c2d6b6c089fb317c97688af8125f99740d923bfee"
+  },
+  {
+    "path": "source/QUATERNIUS_LICENSE.txt",
+    "bytes": 374,
+    "sha256": "de990ef6fc68cffd7fd1ae342c4d0c823b541b8848d8f76bca5d3339f4de6f6e"
+  },
+  {
+    "path": "source/build_snag.py",
+    "bytes": 4987,
+    "sha256": "5ac52e5ec97b34c14f709e1b3ce52f8974211504ea62675d5437368b48cc9c91"
+  },
+  {
+    "path": "source/generate_bark.py",
+    "bytes": 1335,
+    "sha256": "4b5e8bf05cbe0a758cdcf97ca6bbe465602b730dd36e5444f7776f5adf7989e1"
+  },
+  {
+    "path": "source/inspect_glbs.py",
+    "bytes": 2215,
+    "sha256": "96f43fae14b2da43fc4531188aef3d3df8fe313b8014ef7811cea325e41c6120"
+  },
+  {
+    "path": "textures/snag_bark_basecolor.png",
+    "bytes": 1005533,
+    "sha256": "ebe55bfdddf0853f90f51e9da16b45a10fa5bdd9df84e315754334d847bada76"
+  },
+  {
+    "path": "textures/snag_bark_normal.png",
+    "bytes": 2045815,
+    "sha256": "ebcf60fe242171e0fec17f4f7b6beb9d6d6e5ded7ed877a10406cdafb0d6e680"
+  },
+  {
+    "path": "textures/snag_bark_orm.png",
+    "bytes": 461874,
+    "sha256": "f8fc127c1e618c05d5301cdde26643a3bcfef058d5cc542789570c5a76581ffa"
+  },
+  {
+    "path": "textures/snag_bark_roughness.png",
+    "bytes": 334794,
+    "sha256": "7a722db939667e5150f2e7bd4436664b249a9e2d93d6c78244ef3040b9892b2a"
+  }
+]

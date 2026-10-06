@@ -1,0 +1,31 @@
+{
+  "removed_attached_flap_faces": [
+    1157,
+    1498,
+    1510,
+    1528,
+    1529,
+    1546,
+    1735,
+    1810,
+    1819,
+    1825,
+    1867
+  ],
+  "removed_edge_collapse_faces": [
+    952,
+    959,
+    993,
+    1002
+  ],
+  "removed_coincident_pair_faces": [
+    977,
+    999
+  ],
+  "original_triangles": 3123,
+  "remaining_triangles": 3106,
+  "modified_attribute_vertices": 13,
+  "unique_positions_modified": 2,
+  "max_position_change_source_units": 0.031131984665989876,
+  "preserved": "All remaining normals, UVs, materials and original textures unchanged. Original source file not modified."
+}

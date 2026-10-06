@@ -66,3 +66,13 @@ Android runtime derivatives for the five CC0 rows are strict KTX2 arrays using A
 
 Poly Haven's asset license states that its assets are CC0 and may be used commercially without required attribution: https://polyhaven.com/license. Attribution is retained here as project provenance.
 
+
+## Beyond the Tomb source candidates — 6 October 2026
+
+These source archives are not shipped runtime assets. See [inventory and QA boundaries](assets/source/beyond_the_tomb/README.md).
+
+- **A08 gnarled stump:** newly generated from original text prompts using Meshy, then locally repaired, uniformly normalized and prepared with 512px texture derivatives. [Provenance](assets/source/beyond_the_tomb/forest_dressing/stump-v01/PROVENANCE.json) and [rights/attribution](assets/source/beyond_the_tomb/forest_dressing/stump-v01/RIGHTS.md). Meshy's current [Terms of Service](https://www.meshy.ai/terms-of-use), §3.2, provide paid-plan creator ownership or free-plan [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) with Meshy attribution. Exact plan entitlement was not independently verified; retain Meshy credit, applicable CC notice and modification history. No new blanket licence is granted to creator-owned output.
+- **A07 dead snag:** DeadTree_1 geometry by Quaternius, [Ultimate Stylized Nature](https://quaternius.com/packs/ultimatestylizednature.html), [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/). Original upstream geometry and licence notice retained. The upstream notice has an inconsistent pack heading; the official nature-pack page independently declares CC0. Normalization/LOD candidates and replacement procedural bark were authored for Horde. [Detailed lineage and limitations](assets/source/beyond_the_tomb/forest/trees/dead-snag-01-v1/README.md). No upstream bark textures are included.
+- **A07 alder/pine, A08/A09 ground dressing, A17/T03 funerary utility:** original project-authored Blender geometry, procedural maps/materials and source scripts. No third-party model or texture bytes were incorporated. Shared bark/foliage map lineage is recorded in the dressing package. No new public licence or exclusive-copyright warranty is assigned by this archive.
+
+No Hotstrike skeleton/bone sources, private Briarhold model files, account records or raw paid-provider generation dumps are included. Existing asset licences elsewhere in this file are unchanged.

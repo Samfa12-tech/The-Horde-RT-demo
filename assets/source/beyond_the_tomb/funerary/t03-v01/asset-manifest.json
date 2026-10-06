@@ -1,0 +1,198 @@
+{
+  "name": "Horde 1.7 A17 T03 funerary utility source kit",
+  "version": "0.1.0",
+  "stage": "authored candidate; native runtime admission pending",
+  "authorship": "Original deterministic Blender geometry authored for the user; no third-party model or texture bytes",
+  "license_note": "No third-party asset restrictions introduced. Original generated project source; no exclusive copyright or legal warranty claimed.",
+  "provider_spend": 0,
+  "textures": 0,
+  "assets": [
+    {
+      "id": "t03_displaced_lid",
+      "role": "Small human-scale stone lid; displace onto credible support, not a new Keeper stone. No inscription.",
+      "collision": "Single oriented box or convex hull fitted to visible lid; static. Never occupy walking/combat lanes.",
+      "source": "source/t03_displaced_lid.blend",
+      "model": "models/t03_displaced_lid.glb",
+      "plan": "A17/T03",
+      "pivot": "floor/base-centered at origin; GLB Y-up, Blender Z-up",
+      "materials": [
+        "Horde_existing_masonry_binding_required",
+        "Horde_existing_masonry_binding_required"
+      ],
+      "dimensions_blender_xyz_m": [
+        0.7849999666213989,
+        1.940000057220459,
+        0.1850000023841858
+      ],
+      "triangles": 496,
+      "file_bytes": 67240,
+      "glb_sha256": "e93203b35e8e1979ba16a67f31044076b20127fa8bfbc60b96512d2a5e777962",
+      "blend_sha256": "04337b52843d8b2c16bb05b7330ebb6bb0e29ab591c2598c6528465b871928ef",
+      "lods": [
+        "LOD0 only; no measured runtime LOD policy yet"
+      ],
+      "texture_bytes": 0
+    },
+    {
+      "id": "t03_offering_bowl",
+      "role": "Empty unglazed offering bowl, 0.47 m diameter. No loot or interaction semantics.",
+      "collision": "Nonblocking decorative prop by default; simple convex proxy only if placement demands physical blocking.",
+      "source": "source/t03_offering_bowl.blend",
+      "model": "models/t03_offering_bowl.glb",
+      "plan": "A17/T03",
+      "pivot": "floor/base-centered at origin; GLB Y-up, Blender Z-up",
+      "materials": [
+        "Original_unglazed_earthenware"
+      ],
+      "dimensions_blender_xyz_m": [
+        0.4708457589149475,
+        0.47161608934402466,
+        0.11800000071525574
+      ],
+      "triangles": 960,
+      "file_bytes": 45880,
+      "glb_sha256": "6e193a9b36656bffa8c972dab0958884208c0a4f38b72333a4677ad2ceab302b",
+      "blend_sha256": "4c3a26fc619f4fa461aa0e042fe8dac3e75b713d5b64eeef96caf9b4cea6d8b1",
+      "lods": [
+        "LOD0 only; no measured runtime LOD policy yet"
+      ],
+      "texture_bytes": 0
+    },
+    {
+      "id": "t03_urn_broken_base",
+      "role": "Broken lower urn with jagged open rim and readable thick terracotta wall.",
+      "collision": "Nonblocking detail; no triangle-soup collision. If large instances block passage, use one low convex hull and test clearance.",
+      "source": "source/t03_urn_broken_base.blend",
+      "model": "models/t03_urn_broken_base.glb",
+      "plan": "A17/T03",
+      "pivot": "floor/base-centered at origin; GLB Y-up, Blender Z-up",
+      "materials": [
+        "Original_unglazed_earthenware",
+        "Original_exposed_clay_fracture"
+      ],
+      "dimensions_blender_xyz_m": [
+        0.38060683012008667,
+        0.3806953430175781,
+        0.3537241220474243
+      ],
+      "triangles": 1212,
+      "file_bytes": 87384,
+      "glb_sha256": "c0ed7c0261a125385f821109927567c4fc8f1ff0799d0c3c479d4149e09ad594",
+      "blend_sha256": "360e25af3e98a97397eb6ace31b72c7bee5e2c8972c514ab5993c49622a1b4cc",
+      "lods": [
+        "LOD0 only; no measured runtime LOD policy yet"
+      ],
+      "texture_bytes": 0
+    },
+    {
+      "id": "t03_urn_rim_shard",
+      "role": "Resting curved urn-rim shard, thick and open-ended; compose sparsely beside lower urn.",
+      "collision": "Nonblocking fragment. Rest on support plane; avoid floating fragments or repeated identical scatter.",
+      "source": "source/t03_urn_rim_shard.blend",
+      "model": "models/t03_urn_rim_shard.glb",
+      "plan": "A17/T03",
+      "pivot": "floor/base-centered at origin; GLB Y-up, Blender Z-up",
+      "materials": [
+        "Original_unglazed_earthenware",
+        "Original_exposed_clay_fracture"
+      ],
+      "dimensions_blender_xyz_m": [
+        0.24885189533233643,
+        0.3106142580509186,
+        0.20123954117298126
+      ],
+      "triangles": 800,
+      "file_bytes": 56588,
+      "glb_sha256": "63a76503741ae51f9230e7b23201037bb1e4402d348bbd27323000a82605f1ad",
+      "blend_sha256": "49cb88219e770c7557a903cfbacfa3cde634e3cf30c79a1a36360bff0d8c5527",
+      "lods": [
+        "LOD0 only; no measured runtime LOD policy yet"
+      ],
+      "texture_bytes": 0
+    },
+    {
+      "id": "t03_candle_stub_1",
+      "role": "Cold extinguished beeswax candle stub variation 1. No flame, emission, light or gameplay state.",
+      "collision": "Nonblocking tabletop/niche detail. Disable at distance if subpixel; no individual collider or light.",
+      "source": "source/t03_candle_stub_1.blend",
+      "model": "models/t03_candle_stub_1.glb",
+      "plan": "A17/T03",
+      "pivot": "floor/base-centered at origin; GLB Y-up, Blender Z-up",
+      "materials": [
+        "Original_aged_beeswax",
+        "Original_charred_wick"
+      ],
+      "dimensions_blender_xyz_m": [
+        0.09373752772808075,
+        0.09339508414268494,
+        0.08779054135084152
+      ],
+      "triangles": 664,
+      "file_bytes": 34992,
+      "glb_sha256": "5e454e5aa302e3d081c9857e00a9c8d005c5454a5a7e04d6f212fdbf56c20823",
+      "blend_sha256": "e63f2539136a0e1316d51dd47eef4c5480f909995619f692e1f9babead3f9d9b",
+      "lods": [
+        "LOD0 only; no measured runtime LOD policy yet"
+      ],
+      "texture_bytes": 0
+    },
+    {
+      "id": "t03_candle_stub_2",
+      "role": "Cold extinguished beeswax candle stub variation 2. No flame, emission, light or gameplay state.",
+      "collision": "Nonblocking tabletop/niche detail. Disable at distance if subpixel; no individual collider or light.",
+      "source": "source/t03_candle_stub_2.blend",
+      "model": "models/t03_candle_stub_2.glb",
+      "plan": "A17/T03",
+      "pivot": "floor/base-centered at origin; GLB Y-up, Blender Z-up",
+      "materials": [
+        "Original_aged_beeswax",
+        "Original_charred_wick"
+      ],
+      "dimensions_blender_xyz_m": [
+        0.07840157300233841,
+        0.07799999415874481,
+        0.1436462700366974
+      ],
+      "triangles": 664,
+      "file_bytes": 38456,
+      "glb_sha256": "01d24d1c097267b87bafe4a7545d0cdde50292f2fe7af12a70022c590a82d125",
+      "blend_sha256": "5d48445438aeced31d950535c15c1f39e8937934d0343d588683fbe1e008af3e",
+      "lods": [
+        "LOD0 only; no measured runtime LOD policy yet"
+      ],
+      "texture_bytes": 0
+    },
+    {
+      "id": "t03_candle_stub_3",
+      "role": "Cold extinguished beeswax candle stub variation 3. No flame, emission, light or gameplay state.",
+      "collision": "Nonblocking tabletop/niche detail. Disable at distance if subpixel; no individual collider or light.",
+      "source": "source/t03_candle_stub_3.blend",
+      "model": "models/t03_candle_stub_3.glb",
+      "plan": "A17/T03",
+      "pivot": "floor/base-centered at origin; GLB Y-up, Blender Z-up",
+      "materials": [
+        "Original_aged_beeswax",
+        "Original_charred_wick"
+      ],
+      "dimensions_blender_xyz_m": [
+        0.11056631803512573,
+        0.10999999940395355,
+        0.04777253046631813
+      ],
+      "triangles": 664,
+      "file_bytes": 30440,
+      "glb_sha256": "1a7967a9ae3a82a1e470067b9a344804aa5f40b36b7ba13b401538c6b8fa30a3",
+      "blend_sha256": "8857d528f75d347ad67698b7bcfd7d6b60260e343fbc94ba595f19f4b894f66b",
+      "lods": [
+        "LOD0 only; no measured runtime LOD policy yet"
+      ],
+      "texture_bytes": 0
+    }
+  ],
+  "aggregate": {
+    "triangles": 5460,
+    "glb_bytes": 360980,
+    "texture_count": 0,
+    "paid_credits": 0
+  }
+}

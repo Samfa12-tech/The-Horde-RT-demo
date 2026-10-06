@@ -1,0 +1,39 @@
+HORDE 1.7 GNARLED STUMP — LOCALLY VALIDATED RUNTIME CANDIDATE
+6 October 2026
+
+Result
+A compact, static low-poly stump is prepared for engine evaluation. The approved flat cut top and broad root silhouette are retained. No game integration or native-engine performance claim is made.
+
+Primary deliverables
+- horde-1.7-gnarled-stump-3k-512.glb: 1,425,904 bytes; 3,106 triangles; 5,290 exported vertices (UV/normal/tangent seams), equivalent to 1,555 coordinate-welded vertices.
+- horde-1.7-gnarled-stump-editable.blend: editable final mesh and packed 512px textures. Includes a separate QA collection with cameras, lights, floor and disabled wireframe helper. QA objects are not present in the GLB.
+- evidence/stump-contact-sheet.png plus full-resolution front, back, top, closeup and wireframe renders.
+- evidence/runtime-512-audit.json and fresh-import-validation.json contain direct output checks. repair-receipt.json identifies the local geometry changes.
+
+Geometry and transforms
+- One mesh, one primitive and one opaque, single-sided material. No skin, skeleton or animation.
+- glTF units are meters, Y up. Dimensions X/Y/Z: 1.753144 x 0.876577 x 1.800000m.
+- Horizontal bounds centered; base at Y=0; identity transform; ground-center pivot.
+- Uniform scaling deliberately preserves the approved source silhouette. A 1.2m height would require stretching it by approximately 37%, so the resulting height is 0.877m.
+- Zero boundary edges, nonmanifold edges or nonmanifold vertices after coordinate welding. One connected surface, consistent winding, positive volume. No zero-area geometry or UV triangles, invalid indices or non-finite attributes.
+- Normals and tangents are finite and near unit length; no face has an inverted mean vertex normal. Maximum absolute normal/tangent dot product is approximately 0.000126.
+
+Textures and shading
+- Embedded PNG base color, tangent-space normal, and packed metallic/roughness maps, each 512 x 512.
+- Base color uses sRGB; data maps use Non-Color in Blender. Downsampled normal vectors were renormalized.
+- Source Meshy remesh had 2048px base/normal plus a 4096px packed metallic/roughness map; originals remain in the unmodified source GLB.
+- Original PBR shader channels and UVs are preserved. Double-sided rendering was disabled only after the closed-surface and winding checks passed.
+- A 1024px alternate exists locally for later comparison but is not the primary deliverable and has no separate close-up acceptance. Do not substitute it automatically.
+
+Repair provenance
+Meshy returned 3,123 triangles with 5 boundary edges and 8 nonmanifold edges. Local repair removed 11 tiny attached flap faces, then collapsed one self-contact edge within a bark crease. Two unique positions moved by at most 0.031132 source units (approximately 0.0295m after uniform scale). Four resulting degenerate triangles and a coincident opposite-facing pair were removed, leaving 3,106 triangles. All remaining normals and UVs were retained. This was a targeted defect repair, not broad decimation. Original downloaded files were not changed.
+
+Visual review
+Front, back, top, close-up and actual-edge wireframe renders were inspected. No obvious missing surfaces or detached islands were seen. Broad roots, bark ridges, moss patches and the cut-ring top remain readable. At close range the 512px maps soften bark detail and show low-poly facets; use this as environmental dressing rather than assuming hero close-up quality. The conspicuous green patch on the top is inherited from the generated texture.
+
+Evidence boundary and remaining gates
+- Direct GLB byte/attribute inspection, Blender 4.3.2 CPU rendering, fresh GLB re-import, and reopening the packed editable Blender file passed.
+- The game-dev CLI was not installed. No canonical CLI certification was performed.
+- No Horde native importer, GPU/mobile performance, ray tracing, collision, scene instancing, LOD or in-game art-direction test was performed. These remain integration gates.
+- No compressed GPU texture format or collision proxy is supplied.
+- See RIGHTS.md and PROVENANCE.json for the separate redistribution review; geometry QA does not establish rights.

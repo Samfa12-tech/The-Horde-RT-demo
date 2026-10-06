@@ -1,0 +1,143 @@
+[
+  {
+    "file": "horde-1.7-gnarled-stump-3k-512.glb",
+    "bytes": 1425904,
+    "sha256": "c15516edb1ad34535becf9d51bd2333d73a6dc69bbded421de34df715f84a5d9",
+    "valid_header": true,
+    "generator": "Khronos glTF Blender I/O v4.3.47",
+    "extensionsUsed": [],
+    "mesh_count": 1,
+    "node_count": 1,
+    "skin_count": 0,
+    "animation_count": 0,
+    "materials": [
+      {
+        "name": "gnarled_stump_bark_opaque",
+        "normalTexture": {
+          "index": 0
+        },
+        "pbrMetallicRoughness": {
+          "baseColorTexture": {
+            "index": 1
+          },
+          "metallicRoughnessTexture": {
+            "index": 2
+          }
+        }
+      }
+    ],
+    "textures": [
+      {
+        "sampler": 0,
+        "source": 0
+      },
+      {
+        "sampler": 0,
+        "source": 1
+      },
+      {
+        "sampler": 0,
+        "source": 2
+      }
+    ],
+    "images": [
+      {
+        "index": 0,
+        "name": "normal-512",
+        "mimeType": "image/png",
+        "size": [
+          512,
+          512
+        ],
+        "mode": "RGB",
+        "encoded_bytes": 481691
+      },
+      {
+        "index": 1,
+        "name": "basecolor-512",
+        "mimeType": "image/png",
+        "size": [
+          512,
+          512
+        ],
+        "mode": "RGB",
+        "encoded_bytes": 399956
+      },
+      {
+        "index": 2,
+        "name": "metallic-roughness-512",
+        "mimeType": "image/png",
+        "size": [
+          512,
+          512
+        ],
+        "mode": "RGB",
+        "encoded_bytes": 269824
+      }
+    ],
+    "primitives": [
+      {
+        "mesh": 0,
+        "primitive": 0,
+        "material": 0,
+        "mode": 4,
+        "vertices": 5290,
+        "triangles": 3106,
+        "index_range_valid": true,
+        "bounds_min": [
+          -0.876571774482727,
+          0.0,
+          -0.8999999761581421
+        ],
+        "bounds_max": [
+          0.876571774482727,
+          0.8765774369239807,
+          0.8999999761581421
+        ],
+        "attribute_finite": {
+          "POSITION": true,
+          "NORMAL": true,
+          "TEXCOORD_0": true,
+          "TANGENT": true
+        },
+        "normal_length_min_max": [
+          0.9999998807907104,
+          1.0000001192092896
+        ],
+        "uv_min": [
+          3.199999991920777e-05,
+          0.0015220046043395996
+        ],
+        "uv_max": [
+          0.999813973903656,
+          0.9999780058860779
+        ],
+        "zero_area_triangles": 0,
+        "signed_volume_local": 0.7219781279563904,
+        "faces_with_inverted_mean_vertex_normal": 0,
+        "zero_area_uv_triangles": 0,
+        "tangent_length_min_max": [
+          0.9999287128448486,
+          1.0000756978988647
+        ],
+        "tangent_signs": [
+          1.0
+        ],
+        "normal_tangent_absdot_max": 0.00012567639350891113,
+        "welded_vertices_1e6": 1555,
+        "boundary_edges_welded": 0,
+        "nonmanifold_edges_welded": 0,
+        "connected_components_triangle_counts": [
+          3106
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "mesh": 0,
+        "name": "horde_1_7_gnarled_stump"
+      }
+    ],
+    "total_triangles": 3106
+  }
+]
