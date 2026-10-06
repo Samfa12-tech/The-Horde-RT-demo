@@ -1,0 +1,2055 @@
+{
+  "classification": "Pocket Audio Core deterministic reference audio; not accepted v68 mastered-tone parity",
+  "sourceRepository": "Samfa12-tech/Pocket-Chordsmith",
+  "sourceCommit": "0c6975cadcd4aba0047ab94170a2adabc722517f",
+  "rendererPath": "packages/pocket-audio-core/src/engine/offline-renderer.js",
+  "rendererSha256": "12d3b0e66e2ef285431102d437ee2a814239bd428d687b4a01ad12b1b0c54b2c",
+  "projectTitle": "10 Master of Coin",
+  "sectionIds": [
+    "F"
+  ],
+  "bpm": 116,
+  "timeSig": 4,
+  "resolution": 4,
+  "musicalDurationSeconds": 4.137931034482761,
+  "musicalDurationTicks": 3840,
+  "options": {
+    "sampleRate": 44100,
+    "loop": true,
+    "requestedTailSeconds": 0.6,
+    "renderedTailSeconds": 0.6,
+    "gainDb": 14.95623372936424
+  },
+  "processing": {
+    "onset": "Preserve the timeline start and intentional leading silence; no onset trimming.",
+    "tail": "All samples after the nearest sample-clock bar boundary are circularly added into the beginning; no inserted silence, fades, or crossfades.",
+    "loopDurationRoundingErrorSeconds": 0.000005473453747129042,
+    "synthesis": "Unmodified Pocket Audio Core renderPocketAudioEventBuffer."
+  },
+  "capabilityReport": {
+    "renderer": "pocket-audio-core-offline",
+    "rendererVersion": 1,
+    "profileId": "standard",
+    "supported": true,
+    "exact": false,
+    "entries": [
+      {
+        "path": "sections.A.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[5].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[6].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[7].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[8].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[9].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_2.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_2.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[5].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[6].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[7].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_2.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_2.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[5].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[6].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_2.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_2.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[5].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[6].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[7].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[8].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[9].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[10].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_2.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_2.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_3.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_2.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_2.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_3.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      }
+    ],
+    "losses": [
+      {
+        "path": "sections.A.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[5].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[6].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[7].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[8].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[9].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_2.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_2.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[5].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[6].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[7].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_2.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_2.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[5].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[6].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_2.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_2.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[5].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[6].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[7].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[8].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[9].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[10].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_2.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_2.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_3.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_2.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_2.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_2.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_2.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_3.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      }
+    ],
+    "capabilities": {
+      "id": "pocket-audio-core-offline",
+      "version": 1,
+      "formatFeatures": [
+        "sound-profile-v1",
+        "rich-events-v1",
+        "articulations-v1",
+        "expanded-drums-v1",
+        "capability-report-v1"
+      ],
+      "profileIds": [
+        "standard",
+        "lofi_chill",
+        "chip_arcade",
+        "western_frontier",
+        "heavy_metal",
+        "funk_groove"
+      ],
+      "articulations": [
+        "finger",
+        "slap",
+        "pop",
+        "mute",
+        "ghost",
+        "hammer",
+        "pull",
+        "slide",
+        "hold",
+        "staccato",
+        "legato",
+        "bend",
+        "vibrato",
+        "tremolo",
+        "open",
+        "chug",
+        "scratch",
+        "palm_mute",
+        "accent",
+        "flam",
+        "drag",
+        "roll",
+        "choke"
+      ],
+      "directArticulations": [
+        "finger",
+        "slap",
+        "pop",
+        "mute",
+        "ghost",
+        "hammer",
+        "pull",
+        "slide",
+        "hold",
+        "staccato",
+        "legato",
+        "bend",
+        "vibrato",
+        "tremolo",
+        "open",
+        "chug",
+        "scratch",
+        "palm_mute",
+        "accent",
+        "choke"
+      ],
+      "approximatedArticulations": [
+        "flam",
+        "drag",
+        "roll"
+      ],
+      "drumLanes": [
+        "kick",
+        "snare",
+        "rim",
+        "clap",
+        "hat_closed",
+        "hat_open",
+        "ride",
+        "crash",
+        "china",
+        "tom_high",
+        "tom_mid",
+        "tom_low",
+        "percussion"
+      ],
+      "directDrumLanes": [
+        "kick",
+        "snare",
+        "clap",
+        "hat_closed",
+        "hat_open"
+      ],
+      "techniqueCommands": {
+        "chip": [
+          "channel",
+          "duty",
+          "envelope",
+          "commands",
+          "sweep",
+          "pitchSlide",
+          "vibrato",
+          "retrigger"
+        ],
+        "metal": [
+          "palmMute",
+          "pickDirection",
+          "tremoloRate",
+          "string",
+          "dualTakeSeed"
+        ],
+        "western": [
+          "pickDirection",
+          "strumDirection",
+          "banjoRoll",
+          "bowDirection",
+          "breathDirection",
+          "bend"
+        ],
+        "funk": [
+          "hand",
+          "rake",
+          "ghostDepth",
+          "pocketOffset",
+          "callResponseRole"
+        ]
+      },
+      "preservesUnknownData": true,
+      "reportsFallbacks": true,
+      "sampleClock": true
+    }
+  },
+  "eventLossReport": [
+    {
+      "path": "sections.A.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.A.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.A.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.A.tracks.melody_1.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.A.tracks.melody_2.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.A.tracks.melody_2.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[4].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[5].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[6].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[7].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[8].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[9].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_2.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_2.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_2.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_2.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_3.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_1.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_1.events[4].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_1.events[5].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_1.events[6].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_1.events[7].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_2.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_2.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_2.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_2.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_1.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_1.events[4].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_1.events[5].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_1.events[6].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_2.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_2.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_2.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_2.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_3.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[4].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[5].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[6].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[7].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[8].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[9].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[10].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_2.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_2.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_2.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_2.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_3.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_3.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.F.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.F.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.F.tracks.melody_2.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.F.tracks.melody_2.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.G.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.G.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.G.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.G.tracks.melody_1.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.G.tracks.melody_2.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.G.tracks.melody_2.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_1.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_1.events[4].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_2.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_2.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_2.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_2.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_3.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_3.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    }
+  ],
+  "limitations": [
+    "Core render is not proven timbral parity with the historical accepted v68 live-voice/FX renderer.",
+    "Core offline synthesis does not apply project master volume/FX, instrument filters, generic pitch slides, or all expressive intent; capability exact=true is not a listening/parity gate.",
+    "TailSeconds allocates space; it does not add reverb or an instrument release absent from the Core recipe.",
+    "MP3 is an audition convenience, not a sample-accurate looping runtime asset.",
+    "Acoustic-sounding instrument labels denote engine synthesis approximations, not recorded instruments."
+  ],
+  "preProcessingMetrics": {
+    "sampleRate": 44100,
+    "frames": 208943,
+    "channels": 2,
+    "durationSeconds": 4.737936507936508,
+    "eventCount": 8,
+    "peak": 0.058530293405056,
+    "peakDbfs": -24.65238597632654,
+    "rms": 0.005841492130750907,
+    "rmsDbfs": -44.669524080423884,
+    "clippedSamples": 0,
+    "nonFiniteSamples": 0,
+    "dcOffsets": [
+      -0.0000016200327724042632,
+      -0.0000015359316650856375
+    ],
+    "maxAdjacentSampleDelta": 0.06439047493040562,
+    "firstAudibleFrame": 55,
+    "lastAudibleFrame": 157300,
+    "firstAudibleSeconds": 0.0012471655328798186,
+    "trailingSilenceSeconds": 1.1710204081632654,
+    "loopSeam": {
+      "peakAbsoluteJump": 0,
+      "jumpDbfs": null,
+      "channels": [
+        {
+          "jump": 0,
+          "absoluteJump": 0,
+          "precedingSlope": 0,
+          "followingSlope": -0.000014181732694851235,
+          "slopeChangeBefore": 0,
+          "slopeChangeAfter": 0.000014181732694851235,
+          "head10msRms": 0.0029376556599377025,
+          "tail10msRms": 0,
+          "nearby10msMaxAdjacentDelta": 0.00051448869635351,
+          "jumpToNearbyDeltaRatio": 0
+        },
+        {
+          "jump": 0,
+          "absoluteJump": 0,
+          "precedingSlope": 0,
+          "followingSlope": -0.000014306126104202121,
+          "slopeChangeBefore": 0,
+          "slopeChangeAfter": 0.000014306126104202121,
+          "head10msRms": 0.0025666396244602013,
+          "tail10msRms": 0,
+          "nearby10msMaxAdjacentDelta": 0.00044411543058231473,
+          "jumpToNearbyDeltaRatio": 0
+        }
+      ],
+      "warning": false,
+      "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+    }
+  },
+  "metrics": {
+    "sampleRate": 44100,
+    "frames": 182483,
+    "channels": 2,
+    "durationSeconds": 4.137936507936508,
+    "eventCount": 8,
+    "peak": 0.32748574018478394,
+    "peakDbfs": -9.696152117651005,
+    "rms": 0.034973426925022935,
+    "rmsDbfs": -29.12523621185997,
+    "clippedSamples": 0,
+    "nonFiniteSamples": 0,
+    "dcOffsets": [
+      -0.000010378653102072845,
+      -0.000009839867239808565
+    ],
+    "maxAdjacentSampleDelta": 0.3602743297815323,
+    "firstAudibleFrame": 37,
+    "lastAudibleFrame": 167937,
+    "firstAudibleSeconds": 0.0008390022675736961,
+    "trailingSilenceSeconds": 0.3298185941043084,
+    "loopSeam": {
+      "peakAbsoluteJump": 0,
+      "jumpDbfs": null,
+      "channels": [
+        {
+          "jump": 0,
+          "absoluteJump": 0,
+          "precedingSlope": 0,
+          "followingSlope": -0.00007934891618788242,
+          "slopeChangeBefore": 0,
+          "slopeChangeAfter": 0.00007934891618788242,
+          "head10msRms": 0.016436622225840514,
+          "tail10msRms": 0,
+          "nearby10msMaxAdjacentDelta": 0.0028786411276087165,
+          "jumpToNearbyDeltaRatio": 0
+        },
+        {
+          "jump": 0,
+          "absoluteJump": 0,
+          "precedingSlope": 0,
+          "followingSlope": -0.00008004491246538237,
+          "slopeChangeBefore": 0,
+          "slopeChangeAfter": 0.00008004491246538237,
+          "head10msRms": 0.014360732156680295,
+          "tail10msRms": 0,
+          "nearby10msMaxAdjacentDelta": 0.0024848920293152332,
+          "jumpToNearbyDeltaRatio": 0
+        }
+      ],
+      "warning": false,
+      "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+    }
+  },
+  "compositionSource": {
+    "filename": "10-master-coin.json",
+    "sha256": "a2eb81958b353cbafb5b44933fa35d3960d7bf3f198446eb087cc9798caa0415"
+  },
+  "adaptiveSection": {
+    "id": "F",
+    "bars": 2,
+    "name": "shell_recovers",
+    "behavior": "bridge",
+    "duration_seconds": 4.137931034482759
+  },
+  "gainPolicy": "One common scalar across every section and full review sequence in this bank, based on section-bank maximum peak; no per-section normalization or limiting.",
+  "audio": {
+    "filename": "F-shell_recovers.wav",
+    "bitDepth": 16,
+    "bytes": 729976,
+    "sha256": "2ab86687d4d772d17719a3b9571488344cdd6b2f7e7bc9371ad98bc68ba6824c"
+  },
+  "flac": {
+    "filename": "F-shell_recovers.flac",
+    "bytes": 138443,
+    "sha256": "d7eed82e86548cf20ce748eeb137cbbcbda8a1f162f5ec132841de94292194f8",
+    "pcmSha256": "4bc651ab66916848dc48487bff89a78df3f547056c0f368c7a4bb44977d860b5",
+    "pcmRoundtripVerified": true
+  }
+}

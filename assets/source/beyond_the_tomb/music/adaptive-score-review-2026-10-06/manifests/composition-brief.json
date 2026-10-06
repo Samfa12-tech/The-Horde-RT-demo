@@ -1,0 +1,401 @@
+{
+  "title": "The Horde adaptive soundtrack composition brief",
+  "status": "Proposed music direction grounded in approved campaign planning; not a runtime implementation or mastered audio claim",
+  "date": "2026-10-06",
+  "canonical_ref": "e6cf2e97e5577aa051c5a18014477598762d7b75",
+  "sources": [
+    "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/e6cf2e97e5577aa051c5a18014477598762d7b75/docs/CAMPAIGN_DESIGN.md",
+    "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/e6cf2e97e5577aa051c5a18014477598762d7b75/docs/WORLD_LAYOUT.md",
+    "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/e6cf2e97e5577aa051c5a18014477598762d7b75/docs/DUNGEON_CHAPTER_PLANS.md"
+  ],
+  "motif_contract": {
+    "source": "horde/assets/audio/music/what-the-dark-keeps/source/What_the_Dark_Keeps_Pocket_Chordsmith.json",
+    "sha256": "3ab832e08807d3745fca172b0bb6b95ccbbe37face4e60077027d6d35b55c9a0",
+    "verified_bpm": 80,
+    "meter": "4/4",
+    "resolution": 4,
+    "A_midi": [
+      62,
+      63,
+      69,
+      64,
+      62,
+      65,
+      64,
+      64,
+      62
+    ],
+    "A_steps": [
+      0,
+      8,
+      12,
+      20,
+      28,
+      36,
+      42,
+      48,
+      58
+    ],
+    "A_note_names": [
+      "D4",
+      "Eb4",
+      "A4",
+      "E4",
+      "D4",
+      "F4",
+      "E4",
+      "E4",
+      "D4"
+    ],
+    "A_harmony": [
+      "Dsus2",
+      "Dsus2",
+      "Bbsus2",
+      "Asus2"
+    ],
+    "identity": "Preserve the chromatic D–Eb–A–E–D opening. Nominal D minor is not permission to quantize the melody to that scale. Original major-colour G/H payoff already exists: new hopeful ending may draw on its F# rather than claim a newly invented major resolution.",
+    "G_lead": [
+      "A4",
+      "D5",
+      "E5",
+      "F#5",
+      "F#5",
+      "A5"
+    ],
+    "H_lead": [
+      "D4",
+      "E4",
+      "A4",
+      "B4",
+      "A4",
+      "F#4",
+      "E4",
+      "D4",
+      "F#4"
+    ],
+    "drone": "The A/D held third-part removal is already applied. Keep the short A4 opening note; do not reintroduce the held material or label this a pending fix.",
+    "new_material": "K and H in the original prose meant proposed companion/home answers, not Chordsmith section letters. Rename proposed secondary themes COMPANION and HOME to avoid collision with A–H engine section names."
+  },
+  "sound_world": "Historical-gothic dark fantasy with small acoustic-seeming ensembles, deliberate silence, dread, wonder and homecoming. No borrowed Zelda melodies, Perfect Dark pastiche, modern drum-kit groove, synth arpeggiator or sci-fi sound design. Engine synthesis may approximate instruments but must be described honestly.",
+  "cues": [
+    {
+      "id": "horde_01_main",
+      "title": "What the Dark Keeps",
+      "location_purpose": "Main menu and title identity",
+      "proposed_bpm": 80,
+      "proposed_meter": "4/4",
+      "motif_transformation": "The verified original theme is the source; preserve its recognizable melodic interval/rhythm cell M and avoid claiming new notes are canonical.",
+      "target_palette": "Low bowed strings, plucked lute/harp, breathy flute, sparse bell and warm organ-like sustain.",
+      "section_plan": "8-bar invitation; 32-bar quiet A; 32-bar fuller B; 4-bar turnaround; 4-bar new-game exit. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Quiet title; focused menu; optional fuller title statement. No spoilers in track metadata."
+    },
+    {
+      "id": "horde_02_tomb",
+      "title": "The Fourth Keeper's Rest",
+      "location_purpose": "Northwest abandoned Keeper Tomb, opening corridors and waterfall guards",
+      "proposed_bpm": 60,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M is incomplete and low, with wide rests and unresolved final note; it describes custody and the buried past.",
+      "target_palette": "Bowed low strings, dry low drum, restrained high harmonics and stone-like resonances.",
+      "section_plan": "4-bar entry; two contrasting 16-bar exploration loops; 16-bar guard-threat loop; 2-bar threat bridge; 4-bar retreat/recovery. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Stillness; exploration; guards alerted/combat; safe aftermath. Kit's early grate call ducks the music. No lantern-associated reveal before reward."
+    },
+    {
+      "id": "horde_03_fourth_keeper",
+      "title": "The Jailer's Last Vigil",
+      "location_purpose": "Prologue cursed fourth keeper boss and lantern reward",
+      "proposed_bpm": 96,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M becomes a stern defensive phrase rather than an evil-theme caricature; the defeat reduces to a questioning fragment.",
+      "target_palette": "Bowed strings, bass drone, restrained horn-like tone, hand drums and sparse dissonant bell.",
+      "section_plan": "4-bar reveal; 16-bar guarded loop; 16-bar pressured loop; 2-bar transition; 4-bar defeat; 8-bar quiet reward. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Proposed music states: reveal, active defence, late pressure, confirmed defeat, lantern claim. Phase entry follows gameplay events, not a fixed recording timeline; attack tells remain independent."
+    },
+    {
+      "id": "horde_04_forest",
+      "title": "Beneath the Same Moon",
+      "location_purpose": "Rope rescue, Kit reunion, moonlit forest, lookout chapter endpoint",
+      "proposed_bpm": 72,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M receives a softer answering phrase COMPANION, a new proposal representing companionship rather than a voiced player response.",
+      "target_palette": "Recorder/flute-like lead, small plucked strings, warm bowed strings, very sparse frame drum.",
+      "section_plan": "4-bar ascent bridge; 16-bar reunion; two 16-bar trail loops; 8-bar uncanny waystone insert; 8-bar lookout arrival; 4-bar reversible return. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Relief; quiet travel; optional threat overlay; lantern clue; lookout vista. Remain nocturnal, never announce dawn or curse lifted. Kit dialogue gets long rests."
+    },
+    {
+      "id": "horde_05_roads",
+      "title": "The Roads of Veyr",
+      "location_purpose": "Shared regional paths, outbound junction, minor shrine, approach links",
+      "proposed_bpm": 80,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M becomes a walking figure; destination timbres enter before the next area. Starter shrine stretches it into a contemplative phrase.",
+      "target_palette": "Plucked lute/harp, soft fiddle/strings and hand drum; regional bell, metallic or glass accents as variants.",
+      "section_plan": "4-bar entry; 32-bar road loop; 16-bar shrine loop; 8-bar south/east/ridge approach variants; 2/4-bar destination bridges; 4-bar retreat exit. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Travel; hesitation/access task; threat; safe shrine; completed return. No separate songs for each upgrade route. Use destination overlays only when narratively appropriate."
+    },
+    {
+      "id": "horde_06_bellwether",
+      "title": "Bellwether, Still Burning",
+      "location_purpose": "Unwalled village hub, tavern/well, services, churchyard, mill",
+      "proposed_bpm": 84,
+      "proposed_meter": "4/4 current-compatible preview; 6/8 artistic option",
+      "motif_transformation": "M is answered with COMPANION in a modest communal tune HOME; warmth and belonging temper greed without pretending danger is over.",
+      "target_palette": "Lute/harp, fiddle-like strings, woodwind, soft frame drum; occasional church-bell timbre treated separately from actual bell SFX.",
+      "section_plan": "4-bar arrival; 32-bar hub loop; 16-bar hearth variant; 16-bar churchyard/records variant; 16-bar restrained concerned-return variant; 4-bar departure. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Streets; tavern/services; reflective churchyard; story-changed return. Mill/smith activity stays diegetic SFX; don't commission full tracks per shop or infer a supernatural bell event.",
+      "feel": "Original musical proposal is6/8. Immediate4/4 lilt is a verified-schema staging option; evaluate true compound meter rather than permanently constrain the score.",
+      "artistically_proposed_meter": "6/8"
+    },
+    {
+      "id": "horde_07_abbey",
+      "title": "Bells Beneath the Water",
+      "location_purpose": "Southern lake vista, submerged access, mostly dry Abbey interiors and light puzzles",
+      "proposed_bpm": 60,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M is spaced like a broken liturgy; answering fragments suggest reflected light, without audio alone revealing the puzzle solution.",
+      "target_palette": "Low bowed strings, restrained organ-like sustain, bell partials, plucked high notes, breathy wind.",
+      "section_plan": "8-bar lake vista; 8-bar crossing loop; 16-bar dry arrival; two 16-bar interior loops; 16-bar tension loop; 2-bar bridges; 4-bar post-seal return. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Vista; short crossing; dry exploration; reflector practice/puzzle; duty-hall threat; post-seal reflection. Muffled texture belongs only to crossing/wet views, not the whole dry dungeon. No ocean palette."
+    },
+    {
+      "id": "horde_08_bellkeeper",
+      "title": "The Bellkeeper",
+      "location_purpose": "Drowned armoured guardian encounter",
+      "proposed_bpm": 108,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M is a measured bell/processional figure, opened into a clear higher-register answer during valid reflected-light exposure.",
+      "target_palette": "Low strings, bell accents, restrained organ, frame/bass drum and sparse higher plucked line.",
+      "section_plan": "4-bar entrance; 16-bar armoured loop; 8/16-bar exposure variant; 16-bar final-pressure loop; 2-bar reset bridge; 4-bar defeat; 8-bar seal/relic release. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Armoured; reflected-light setup; actual exposure; recovery; final pressure if gameplay supports it; confirmed defeat. Music supports the learned reflector/shutter rule; never creates a mandatory rhythm puzzle or masks warnings."
+    },
+    {
+      "id": "horde_09_foundry",
+      "title": "The King's Account",
+      "location_purpose": "Eastern gorge approach, royal mint/forge, labour and stand puzzles",
+      "proposed_bpm": 88,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M is reduced to repeated work-shaped cells with displaced accents; a held tone mirrors leaving light in place while moving.",
+      "target_palette": "Dry hammered-string/plucked metal approximations, bowed low strings, muted hand drums and sparse bell; no modern industrial beat.",
+      "section_plan": "8-bar gorge vista; 16-bar access loop; two 16-bar mint/work loops; 16-bar tension loop; 8-bar stand-practice sparse variant; 2/4-bar bridges; 4-bar return. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Approach; machinery exploration; stand lesson; smoke/cover pressure; cleared archive. Harmonic treatment cannot imply Abbey already happened. Mechanical hazards/timing have independent audible cues."
+    },
+    {
+      "id": "horde_10_master_coin",
+      "title": "Master of Coin",
+      "location_purpose": "Articulated furnace-shell mintmaster encounter",
+      "proposed_bpm": 116,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M is compressed and insistently repeated; the answer opens only for earned mechanism/exposure windows.",
+      "target_palette": "Low strings, plucked metal-like pulse, hand/bass drums, restrained brass-like layer; limited bright transients.",
+      "section_plan": "4-bar entrance; 16-bar enclosed-shell loop; 16-bar hold-light/reposition loop; 8-bar exposure variant; 16-bar escalation; 2-bar reset; 4-bar defeat; 8-bar seal/archive. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Shell protected; mechanism maintained; exposed; recovery; later pressure if authored; confirmed defeat. Keep soundscape gaps for fire, shutter and attack tells. No industrial/electronic or science-fiction identity."
+    },
+    {
+      "id": "horde_11_glass_court",
+      "title": "A Garden Behind Glass",
+      "location_purpose": "Northeastern ridge, ruined mirrored palace and roofless winter garden",
+      "proposed_bpm": 68,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M becomes elegant and clearer in counterpoint; incomplete imitations suggest preserved beauty and contradictory history.",
+      "target_palette": "Harp/plucked strings, high bowed strings, celesta-like glass approximations, soft woodwind and restrained organ.",
+      "section_plan": "8-bar ridge reveal; two 16-bar garden/palace loops; 16-bar aperture/records sparse loop; 16-bar tension; 2/4-bar bridges; 4-bar return. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Ridge/gate; winter garden; mirrored gallery; aperture lesson; royal records; approaching keeper. Both seals gate access; musical evolution may reflect that completed history. Reflections are finite, not a demand for spatial audio gimmicks."
+    },
+    {
+      "id": "horde_12_lucid_keeper",
+      "title": "The Last Lucid Keeper",
+      "location_purpose": "Glass Court keeper encounter and prison revelation",
+      "proposed_bpm": 100,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M and its previously hidden answering contour trade registers; protection sounds sorrowful and purposeful. Do not use a triumphant kill cadence.",
+      "target_palette": "Bowed strings in measured imitation, plucked glass/harp, restrained low drums and organ-like sustain.",
+      "section_plan": "4-bar recognition; 16-bar warded loop; 16-bar receiver-selection loop; 8-bar protection-broken variant; 2-bar regroup; 4-bar defeat-without-death exit; 8-bar revelation bed. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Recognition/dialogue; wards intact; learned aperture action; vulnerability; confirmed defeat; evidence/revelation. Exact boss staging/survival remains undecided; state names must not hard-code killing."
+    },
+    {
+      "id": "horde_13_treasury",
+      "title": "All That Was Carried Home",
+      "location_purpose": "Dry vault beneath/behind Court ridge, real riches, ritual and release",
+      "proposed_bpm": 64,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M returns with genuine beauty; Abbey, Foundry and Court colours become recognizable echoes of plundered objects. Suspicion grows through harmonic context, not an early villain reveal.",
+      "target_palette": "Harp/lute, broad strings, restrained bell/metal/glass colours; warm organ-like underpinning.",
+      "section_plan": "8-bar first vista; 32-bar treasure loop; 16-bar ritual preparation; 8-bar held ritual transition; 4-bar release bridge with interrupt-safe cut. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Awe; examine riches; prepare ritual; genuine release of soldiers; entity freed. Sequence triggered by authored events; players may linger indefinitely. This is compact finale staging, not a fourth full dungeon."
+    },
+    {
+      "id": "horde_14_entity",
+      "title": "What the Dark Releases",
+      "location_purpose": "Final freed-entity confrontation",
+      "proposed_bpm": 120,
+      "proposed_meter": "4/4",
+      "motif_transformation": "M appears in its most forceful distorted rhythm/register against the human COMPANION/HOME answer. Its recognizable identity is retained rather than replaced by generic boss music.",
+      "target_palette": "Bowed strings, low organ/drone, hand/bass drums, horn-like reinforcement and carefully rationed bell; no electronic drop.",
+      "section_plan": "4-bar rupture; 16-bar confrontation A; 16-bar escalation B; 16-bar culmination C; 2/4-bar bridges; 4-bar confirmed defeat; 8-bar release. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Proposed musical phases only: confrontation, escalating pressure, culmination, actual defeat. No invented entity form, name, attack or new mandatory power. A/B/C can be selected by future authored encounter events."
+    },
+    {
+      "id": "horde_15_homecoming",
+      "title": "Enough to Come Home",
+      "location_purpose": "Playable return to Bellwether, hopeful epilogue and credits",
+      "proposed_bpm": 76,
+      "proposed_meter": "4/4 current-compatible preview; 6/8 artistic option",
+      "motif_transformation": "M finally receives a settled answer from COMPANION/HOME; the ending is earned, modest and hopeful, not proof of a specific treasure distribution or daylight.",
+      "target_palette": "Warm small strings, recorder/flute, lute/harp, light frame drum and sparse bell.",
+      "section_plan": "8-bar release/road entry; 32-bar playable-return loop; 16-bar village reprise; 32-bar credits expansion; 8-bar final cadence. These are larger musical forms assembled from supported 1–4-bar blocks, not unsupported 16–32-bar section objects.",
+      "dynamic_states_and_canon": "Return road; changed home; quiet epilogue; optional credits. One ending only; no alternate keeper branch. Keep full unresolved narrative decisions out of music labels.",
+      "feel": "Original musical proposal is6/8. Immediate4/4 lilt is a verified-schema staging option; evaluate true compound meter rather than permanently constrain the score.",
+      "artistically_proposed_meter": "6/8"
+    }
+  ],
+  "common_composition_contract": {
+    "forms": "Compose short A–H blocks and sequences within actual schema17 caps. Supply explicit proposed state-to-section/sequence metadata. Loops must be able to extend for gameplay, but runtime switching is not implied by a rendered listening assembly.",
+    "lengths": "Each actual section 1–4 bars. Larger 16/32-bar musical forms are assembled using at most64 sequence slots. One-shots can use the suitable short section, trimmed only through an exact documented render/export process.",
+    "stems": "Do not promise independent runtime stems. If actual renderer supports isolated parts, label them verified offline stems; otherwise deliver explicit section arrangements. Layer/state intentions remain proposal metadata.",
+    "runtime_boundary": "Composer deliverable includes sections and transition intent. In-game state dispatch, streaming, ducking, resume and safety are a future integration contract, not claimed implemented.",
+    "tonality": "Preserve motif intervals/rhythm or a documented deliberate transformation. Reharmonization should keep M recognizable without quoting the complete theme in every room. Use minor/modal ambiguity, open fifths and restrained dissonance; major-coloured homecoming need not overwrite the original motif.",
+    "branch_order": "Abbey and Foundry share neither mandatory melodic dependence nor first/second story assumptions. Use seal_count/revelation flags only for small optional narrative inserts, not duplicate entire scores."
+  },
+  "stingers": [
+    {
+      "id": "horde_st_discovery",
+      "length": "1–2 bars",
+      "purpose": "Optional secret discovery; modest M fragment, cooldown and deduplication."
+    },
+    {
+      "id": "horde_st_item",
+      "length": "2–4 bars",
+      "purpose": "Local tool acquired; same family with reflector/stand/aperture timbre variants."
+    },
+    {
+      "id": "horde_st_light_solved",
+      "length": "1 bar",
+      "purpose": "Confirmed light interaction; unobtrusive acknowledgment, no premature solution hint."
+    },
+    {
+      "id": "horde_st_access",
+      "length": "1–2 bars",
+      "purpose": "Confirmed route/gate opens; one variant of light-solved family where useful."
+    },
+    {
+      "id": "horde_st_seal",
+      "length": "4 bars",
+      "purpose": "Persistent seal award; peer versions equivalent, final Court variant fuller."
+    },
+    {
+      "id": "horde_st_lantern",
+      "length": "2–4 bars",
+      "purpose": "Rare uncanny clue/revelation insert, only after lantern owned; never automatically over every line."
+    },
+    {
+      "id": "horde_st_defeat",
+      "length": "2–4 bars",
+      "purpose": "Player death/failure; end combat, do not replay reward or spoiler material."
+    },
+    {
+      "id": "horde_st_retry",
+      "length": "1–2 bars",
+      "purpose": "Optional restrained retry pickup; often silence is better."
+    },
+    {
+      "id": "horde_st_victory",
+      "length": "2–4 bars",
+      "purpose": "Confirmed boss defeat, variant appropriate to area; Court version does not imply death."
+    }
+  ],
+  "implementation_constraints": [
+    "Pause must preserve musical transport/state or enter a short held release safely; do not start title music over paused exploration. Resume must not layer duplicate voices or stale combat loops.",
+    "Music, dialogue and SFX use separate controls. Duck music around Kit, NPC, entity and keeper speech; priority attack/exposure warning SFX remain intelligible with music muted and in mono.",
+    "Do not compose a normal rope-loading-screen cue: ascent and descent have no normal loading screen by approved contract. Carry a compatible bed across the hidden transition; reserve a quiet neutral holding bed for genuine recovery/failure only.",
+    "Variable-length loads cannot depend on a composed crescendo completing. Retain a non-spoiler hold and safe fade; don't imply all regions require loading screens.",
+    "Use debounced/hysteretic danger states and musical transition boundaries for area changes. Urgent combat/death SFX cannot wait for bar boundaries. Cancel queued obsolete states and reward stingers after death/reload.",
+    "Independent state must restore area, completed seal/reward flags, encounter status and motif reveal permissions. Never replay one-time narrative reveals on ordinary backtracking.",
+    "Validate loop sample boundaries, audio tails, phase continuity, crossfades, rapid event changes, pause/background/resume, interrupted boss/retry, mono/headphones/phone speaker, all sliders and both middle-dungeon orders.",
+    "Target sample format, loudness, true-peak, voice count, storage, codec and stream-memory budgets require actual engine audit and device evidence. Suggested mastering target should be labelled provisional, not a passed spec.",
+    "No paid tools or purchased samples. Original authored note scores and engine synthesis only unless a separately verified source is approved. Record composer/source provenance, motif source, synthesis-engine revision and any sample licenses. Do not assert exclusivity or legal copyright certainty for generated material."
+  ],
+  "next_steps": [
+    "Replace symbolic motif M with verified source-note/rhythm reference and inspect exact engine schema.",
+    "Convert all 15 families into valid Pocket Chordsmith scores using supported sections/instruments; retain proposed-state maps separately if runtime switching is absent.",
+    "Render short first-pass listening assemblies plus every gameplay loop/bridge/exit; identify synthesized previews versus mastered final assets.",
+    "Validate notes, durations, clipped peaks, silence, loop joins and motif recurrence; listen to each distinct family and representative transitions.",
+    "Package score sources, per-section audio, human tracklist, cue manifest and validation evidence. Runtime registration, code changes, repository writes and public release are out of this assignment."
+  ],
+  "actual_engine_contract": {
+    "schema": 17,
+    "migration": "Original source schema16 must use canonicalizePcsProject(raw).project and current validator.",
+    "project_strategy": "15 separate project banks; each has at most A–H. Stingers in one or more separate banks only when needed. Never make 15 sections in one project.",
+    "section_bars": "1–4 bars each; use max4 for each distinct block, sequence repeats/contrasts to form longer listening loops. A state needing more than one block gets a bounded sequence, not an oversized section.",
+    "melody_tracks_max": 6,
+    "sequence_slots_max": 64,
+    "suggested_exploration_bank": {
+      "A": "entry, 2–4 bars",
+      "B": "quiet exploration, 4 bars",
+      "C": "contrasting exploration, 4 bars",
+      "D": "threat, 4 bars",
+      "E": "location feature/puzzle/ritual, 4 bars",
+      "F": "bridge/reset, 1–2 bars",
+      "G": "exit/reward, 2–4 bars",
+      "H": "narrative or destination colour, 2–4 bars"
+    },
+    "suggested_boss_bank": {
+      "A": "reveal, 2–4 bars",
+      "B": "protected/active fight, 4 bars",
+      "C": "setup/reposition, 4 bars",
+      "D": "valid exposure, 2–4 bars",
+      "E": "escalation, 4 bars",
+      "F": "reset/transition, 1–2 bars",
+      "G": "confirmed defeat, 2–4 bars",
+      "H": "reward/revelation, 4 bars"
+    },
+    "state_map_warning": "A–H assignments are bank-specific. The map is composition metadata only until an integration consumer actually implements and tests it.",
+    "adaptive_caveats": [
+      "Browser Core has beat/bar quantization; its section quantization currently means bar, not section-end.",
+      "Stingers currently emit events; an event alone does not play a rendered sound.",
+      "thenReturnTo is stored without execution; do not rely on automatic return.",
+      "Proposed stems, streaming, dialogue ducking, state persistence and cross-region handoff are not verified by this composition task."
+    ],
+    "existing_game_contract": "Keep current native eight-cue integration untouched. Native loop cues are 12 seconds, C is 3 seconds, G is 6 seconds, tails 3 seconds and crossfades 250 ms. New soundtrack is a future integration package, not a replacement manifest accepted by the game.",
+    "instrument_mapping": "Existing source lead cowboy_whistle, second soft_pluck, third mellow_sax. New acoustic-seeming palettes are target timbres only. Composer must map them to actual engine-supported voice IDs; label approximation and do not claim sampled live instruments."
+  },
+  "engine_evolution": {
+    "principle": "The music can drive engine evolution. Current restrictions bound what is verified today, not the artistic design. Current-schema previews are staging assets, not a requirement to reduce the eventual soundtrack to eight cues.",
+    "requirements": [
+      {
+        "feature": "Musical transport and phrase scheduling",
+        "need": "Explicit time signature, tempo, phrase length and section-end boundaries; true 6/8 town/homecoming if selected musically.",
+        "acceptance": "Tests distinguish beat, bar, phrase and section boundaries, including meter/tempo changes; deterministic sample scheduling remains coherent across long playback and pause/resume."
+      },
+      {
+        "feature": "Independent section forms and project scale",
+        "need": "Variable-length entries, loops, bridges and exits; named sections and projects beyond fixed A–H where needed.",
+        "acceptance": "Round-trip authored forms without truncation; migration preserves existing source scores and current eight-cue game compatibility; validate IDs, lengths and transition graph."
+      },
+      {
+        "feature": "Stinger playback and return",
+        "need": "Trigger actual audio and resume/return to a specified state safely, rather than emitting an event only.",
+        "acceptance": "Stingers heard exactly once, tails respected, thenReturnTo demonstrably executes, interruption/death/retry cancels obsolete returns, overlapping triggers follow explicit priority."
+      },
+      {
+        "feature": "Adaptive transitions",
+        "need": "Quantized transitions, explicit interrupt rules, reversible area changes and debounced threat intensity.",
+        "acceptance": "Rapid state flips, leaving/reentering areas and unavailable next sections produce no stuck music, clicks, doubled voices or out-of-order reward cues; urgent gameplay SFX remain immediate."
+      },
+      {
+        "feature": "Mixing and optional stems",
+        "need": "True synchronized bed/pulse/colour/melody layers if the final arrangements benefit; dialogue ducking with separate controls.",
+        "acceptance": "Phase-aligned loop sync, bounded polyphony/CPU and gain transitions; no clipping; speech and critical SFX intelligible on phone speaker and mono. Stems remain optional if explicit arrangements sound better."
+      },
+      {
+        "feature": "Offline rendering and asset metadata",
+        "need": "Deterministic per-section export with sample-accurate loop points, tails, schema/engine provenance and reusable variants.",
+        "acceptance": "Same seed/project yields reproducible assets; decoded loop lengths match manifest; no cropped reverb, start clicks or accidental drift; invalid project fails with actionable error."
+      },
+      {
+        "feature": "Game streaming and lifecycle",
+        "need": "Bounded music residency across seamless rope and other area transitions; pause/background/resume and save-state coherence.",
+        "acceptance": "Target phone and Windows measurements establish storage, memory, decoding and audio-thread budgets; no underruns or duplicate playback after interruptions; no ordinary rope-loading music."
+      }
+    ]
+  }
+}

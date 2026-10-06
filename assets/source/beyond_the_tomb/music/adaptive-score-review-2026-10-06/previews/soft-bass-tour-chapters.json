@@ -1,0 +1,79 @@
+{
+  "title": "The Horde \u2014 First Listening Tour",
+  "audio": "The-Horde-Listening-Tour-Soft-Upright-Alternative.mp3",
+  "durationSeconds": 127.51113378684808,
+  "classification": "Core reference audition; not live-render parity or production mastering",
+  "edits": "10ms editorial edge fades and400ms gaps between excerpts; canonical section PCM is unchanged",
+  "chapters": [
+    {
+      "startSeconds": 0.0,
+      "endSeconds": 12.0,
+      "title": "What the Dark Keeps",
+      "section": "A",
+      "state": "original_title_statement"
+    },
+    {
+      "startSeconds": 12.4,
+      "endSeconds": 28.4,
+      "title": "The Fourth Keeper's Rest",
+      "section": "B",
+      "state": "buried_corridors"
+    },
+    {
+      "startSeconds": 28.8,
+      "endSeconds": 42.13333333333333,
+      "title": "Beneath the Same Moon",
+      "section": "B",
+      "state": "reunion"
+    },
+    {
+      "startSeconds": 42.53333333333333,
+      "endSeconds": 53.96190476190476,
+      "title": "Bellwether, Still Burning",
+      "section": "B",
+      "state": "streets"
+    },
+    {
+      "startSeconds": 54.36190476190476,
+      "endSeconds": 70.36190476190477,
+      "title": "Bells Beneath the Water",
+      "section": "B",
+      "state": "dry_abbey"
+    },
+    {
+      "startSeconds": 70.76190476190476,
+      "endSeconds": 80.76190476190476,
+      "title": "The Jailer's Last Vigil",
+      "section": "B",
+      "state": "guarded_vigil"
+    },
+    {
+      "startSeconds": 81.16190476190476,
+      "endSeconds": 91.16190476190476,
+      "title": "The Jailer's Last Vigil",
+      "section": "D",
+      "state": "opening"
+    },
+    {
+      "startSeconds": 91.56190476190476,
+      "endSeconds": 105.67954648526077,
+      "title": "A Garden Behind Glass",
+      "section": "B",
+      "state": "winter_garden"
+    },
+    {
+      "startSeconds": 106.07954648526078,
+      "endSeconds": 114.07954648526078,
+      "title": "What the Dark Releases",
+      "section": "E",
+      "state": "culmination"
+    },
+    {
+      "startSeconds": 114.47954648526077,
+      "endSeconds": 127.11113378684807,
+      "title": "Enough to Come Home",
+      "section": "H",
+      "state": "settled_home"
+    }
+  ]
+}

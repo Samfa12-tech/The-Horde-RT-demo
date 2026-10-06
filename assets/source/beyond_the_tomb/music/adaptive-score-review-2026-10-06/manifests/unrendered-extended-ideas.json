@@ -1,0 +1,34 @@
+{
+  "status": "Noncanonical artistic notes only; not an importable score or claim of rendered output",
+  "ideas": [
+    {
+      "family": "02 The Fourth Keeper's Rest",
+      "section": "C",
+      "track": 1,
+      "earlierLowSketch": [
+        {
+          "step": 4,
+          "midi": 53
+        },
+        {
+          "step": 16,
+          "midi": 52
+        },
+        {
+          "step": 28,
+          "midi": 50
+        },
+        {
+          "step": 44,
+          "midi": 46
+        },
+        {
+          "step": 54,
+          "midi": 45
+        }
+      ],
+      "decision": "Canonical current-Core voice is one octave higher, F4 E4 D4 Bb3 A3, deliberately documented. This matches the already-rendered Core preview and avoids out-of-range compact data.",
+      "futureOption": "Revisit an absolute-MIDI rich track or expanded compact range only after complete editor/live/Core parity verification."
+    }
+  ]
+}

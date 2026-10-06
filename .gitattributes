@@ -7,3 +7,7 @@
 
 # Preserve the audited upstream cgltf bytes, including its one trailing tab.
 third_party/cgltf/cgltf.h whitespace=-trailing-space
+
+# Soundtrack review audio stays in LFS, outside runtime packaging.
+assets/source/beyond_the_tomb/music/**/*.flac filter=lfs diff=lfs merge=lfs -text
+assets/source/beyond_the_tomb/music/**/*.mp3 filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,23 @@
+THE HORDE — SOUNDTRACK REVIEW SUITE
+
+LISTEN
+The listening tour is the quickest overview. Full-track ZIPs contain the longer review assemblies. The softer-bass tour is an alternate voice test; it does not replace the original scores or claim the rendering engine is fixed.
+
+EDIT IN TODAY'S CHORDSMITH GRID
+Use these canonical files from scores/:
+01-what-the-dark-keeps.json
+04-forest.json
+06-bellwether.json
+11-glass-court.json
+13-treasury.json
+
+For the other ten families, use the matching *.editor-compatible.json in editor-compatible/. These explicitly move only unsupported low melody parts up one octave. Every moved note is listed in EXACT-OCTAVE-SHIFTS.json. Bass notes stay unchanged. The intended lower-register versions remain in scores/ for Core and future editor support.
+
+For optional event cues, encounter-and-tool-answers.json fits the current grid; use utility-signals.editor-compatible.json for the other bank.
+
+JSON and matching PCS1 codes represent the same project. Actual app import/export code has been checked for all editions; browser UI/audio testing remains outstanding.
+
+KEEP FOR FUTURE INTEGRATION
+The 15 canonical families, 2 event banks, cue/state manifest and lossless section clips preserve the composition. They are review assets, not a replacement for the game's current eight-cue bank. No game assets or engine code were changed.
+
+Read README.md for musical notes, measured checks, exact renderer limitations and provenance.

@@ -1,0 +1,2381 @@
+{
+  "scope": "sequence",
+  "events": [
+    {
+      "id": "A_0_chords_chord_0_0",
+      "time": 0,
+      "duration": 2.7600000000000002,
+      "tick": 0,
+      "durationTicks": 1766,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "A",
+      "arrangementIndex": 0,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        50,
+        64,
+        69
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "A_0_melody_melody_0_0",
+      "time": 0,
+      "duration": 0.34500000000000003,
+      "tick": 0,
+      "durationTicks": 221,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "A",
+      "arrangementIndex": 0,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 62,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "A_0_melody_melody_4_0",
+      "time": 0.75,
+      "duration": 0.34500000000000003,
+      "tick": 480,
+      "durationTicks": 221,
+      "step": 4,
+      "bar": 1,
+      "beat": 2,
+      "sectionId": "A",
+      "arrangementIndex": 0,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 63,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "A_0_melody_melody_8_0",
+      "time": 1.5,
+      "duration": 0.6900000000000001,
+      "tick": 960,
+      "durationTicks": 442,
+      "step": 8,
+      "bar": 1,
+      "beat": 3,
+      "sectionId": "A",
+      "arrangementIndex": 0,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 69,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "B_1_chords_chord_0_0",
+      "time": 3,
+      "duration": 2.7600000000000002,
+      "tick": 1920,
+      "durationTicks": 1766,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "B",
+      "arrangementIndex": 1,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        50,
+        64,
+        69
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "B_1_melody_melody_0_0",
+      "time": 3,
+      "duration": 0.5175000000000001,
+      "tick": 1920,
+      "durationTicks": 331,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "B",
+      "arrangementIndex": 1,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 62,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "B_1_melody_melody_8_0",
+      "time": 4.5,
+      "duration": 0.5175000000000001,
+      "tick": 2880,
+      "durationTicks": 331,
+      "step": 8,
+      "bar": 1,
+      "beat": 3,
+      "sectionId": "B",
+      "arrangementIndex": 1,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 65,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "B_1_melody_melody_12_2",
+      "time": 5.25,
+      "duration": 0.34500000000000003,
+      "tick": 3360,
+      "durationTicks": 221,
+      "step": 12,
+      "bar": 1,
+      "beat": 4,
+      "sectionId": "B",
+      "arrangementIndex": 1,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 62,
+      "instrument": "soft",
+      "pan": -0.24,
+      "slideOffset": null
+    },
+    {
+      "id": "B_1_chords_chord_16_0",
+      "time": 6,
+      "duration": 2.7600000000000002,
+      "tick": 3840,
+      "durationTicks": 1766,
+      "step": 16,
+      "bar": 2,
+      "beat": 1,
+      "sectionId": "B",
+      "arrangementIndex": 1,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        58,
+        72,
+        77
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "B_1_melody_melody_16_0",
+      "time": 6,
+      "duration": 0.5175000000000001,
+      "tick": 3840,
+      "durationTicks": 331,
+      "step": 16,
+      "bar": 2,
+      "beat": 1,
+      "sectionId": "B",
+      "arrangementIndex": 1,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 69,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "B_1_melody_melody_24_0",
+      "time": 7.5,
+      "duration": 1.0350000000000001,
+      "tick": 4800,
+      "durationTicks": 662,
+      "step": 24,
+      "bar": 2,
+      "beat": 3,
+      "sectionId": "B",
+      "arrangementIndex": 1,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 74,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "C_2_chords_chord_0_0",
+      "time": 9,
+      "duration": 2.7600000000000002,
+      "tick": 5760,
+      "durationTicks": 1766,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "C",
+      "arrangementIndex": 2,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        50,
+        64,
+        69
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "C_2_melody_melody_0_0",
+      "time": 9,
+      "duration": 0.34500000000000003,
+      "tick": 5760,
+      "durationTicks": 221,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "C",
+      "arrangementIndex": 2,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 64,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "C_2_melody_melody_4_0",
+      "time": 9.75,
+      "duration": 0.5175000000000001,
+      "tick": 6240,
+      "durationTicks": 331,
+      "step": 4,
+      "bar": 1,
+      "beat": 2,
+      "sectionId": "C",
+      "arrangementIndex": 2,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 69,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "C_2_melody_melody_10_0",
+      "time": 10.875,
+      "duration": 0.8625,
+      "tick": 6960,
+      "durationTicks": 552,
+      "step": 10,
+      "bar": 1,
+      "beat": 3,
+      "sectionId": "C",
+      "arrangementIndex": 2,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 74,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "D_3_chords_chord_0_0",
+      "time": 12,
+      "duration": 2.7600000000000002,
+      "tick": 7680,
+      "durationTicks": 1766,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "D",
+      "arrangementIndex": 3,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        50,
+        64,
+        69
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "D_3_melody_melody_0_0",
+      "time": 12,
+      "duration": 0.34500000000000003,
+      "tick": 7680,
+      "durationTicks": 221,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "D",
+      "arrangementIndex": 3,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 62,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "D_3_melody_melody_4_0",
+      "time": 12.75,
+      "duration": 0.34500000000000003,
+      "tick": 8160,
+      "durationTicks": 221,
+      "step": 4,
+      "bar": 1,
+      "beat": 2,
+      "sectionId": "D",
+      "arrangementIndex": 3,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 64,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "D_3_melody_melody_8_0",
+      "time": 13.5,
+      "duration": 1.0350000000000001,
+      "tick": 8640,
+      "durationTicks": 662,
+      "step": 8,
+      "bar": 1,
+      "beat": 3,
+      "sectionId": "D",
+      "arrangementIndex": 3,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 69,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "D_3_melody_melody_12_2",
+      "time": 14.25,
+      "duration": 0.34500000000000003,
+      "tick": 9120,
+      "durationTicks": 221,
+      "step": 12,
+      "bar": 1,
+      "beat": 4,
+      "sectionId": "D",
+      "arrangementIndex": 3,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 62,
+      "instrument": "soft",
+      "pan": -0.24,
+      "slideOffset": null
+    },
+    {
+      "id": "E_4_chords_chord_0_0",
+      "time": 15,
+      "duration": 2.7600000000000002,
+      "tick": 9600,
+      "durationTicks": 1766,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "E",
+      "arrangementIndex": 4,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        50,
+        64,
+        69
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "E_4_melody_melody_0_0",
+      "time": 15,
+      "duration": 0.6900000000000001,
+      "tick": 9600,
+      "durationTicks": 442,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "E",
+      "arrangementIndex": 4,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 69,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "E_4_melody_melody_12_0",
+      "time": 17.25,
+      "duration": 0.6900000000000001,
+      "tick": 11040,
+      "durationTicks": 442,
+      "step": 12,
+      "bar": 1,
+      "beat": 4,
+      "sectionId": "E",
+      "arrangementIndex": 4,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 74,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "E_4_chords_chord_16_0",
+      "time": 18,
+      "duration": 2.7600000000000002,
+      "tick": 11520,
+      "durationTicks": 1766,
+      "step": 16,
+      "bar": 2,
+      "beat": 1,
+      "sectionId": "E",
+      "arrangementIndex": 4,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        58,
+        72,
+        77
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "E_4_melody_melody_24_0",
+      "time": 19.5,
+      "duration": 0.6900000000000001,
+      "tick": 12480,
+      "durationTicks": 442,
+      "step": 24,
+      "bar": 2,
+      "beat": 3,
+      "sectionId": "E",
+      "arrangementIndex": 4,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 76,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "E_4_chords_chord_32_0",
+      "time": 21,
+      "duration": 2.7600000000000002,
+      "tick": 13440,
+      "durationTicks": 1766,
+      "step": 32,
+      "bar": 3,
+      "beat": 1,
+      "sectionId": "E",
+      "arrangementIndex": 4,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        55,
+        69,
+        74
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "E_4_melody_melody_38_0",
+      "time": 22.125,
+      "duration": 0.8625,
+      "tick": 14160,
+      "durationTicks": 552,
+      "step": 38,
+      "bar": 3,
+      "beat": 2,
+      "sectionId": "E",
+      "arrangementIndex": 4,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 74,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "E_4_chords_chord_48_0",
+      "time": 24,
+      "duration": 2.7600000000000002,
+      "tick": 15360,
+      "durationTicks": 1766,
+      "step": 48,
+      "bar": 4,
+      "beat": 1,
+      "sectionId": "E",
+      "arrangementIndex": 4,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        50,
+        64,
+        69
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "E_4_melody_melody_54_0",
+      "time": 25.125,
+      "duration": 1.2075,
+      "tick": 16080,
+      "durationTicks": 773,
+      "step": 54,
+      "bar": 4,
+      "beat": 2,
+      "sectionId": "E",
+      "arrangementIndex": 4,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 69,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "F_5_chords_chord_0_0",
+      "time": 27,
+      "duration": 2.7600000000000002,
+      "tick": 17280,
+      "durationTicks": 1766,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "F",
+      "arrangementIndex": 5,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        50,
+        64,
+        69
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "F_5_melody_melody_0_0",
+      "time": 27,
+      "duration": 0.5175000000000001,
+      "tick": 17280,
+      "durationTicks": 331,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "F",
+      "arrangementIndex": 5,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 74,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "F_5_melody_melody_10_0",
+      "time": 28.875,
+      "duration": 0.5175000000000001,
+      "tick": 18480,
+      "durationTicks": 331,
+      "step": 10,
+      "bar": 1,
+      "beat": 3,
+      "sectionId": "F",
+      "arrangementIndex": 5,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 75,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "F_5_chords_chord_16_0",
+      "time": 30,
+      "duration": 2.7600000000000002,
+      "tick": 19200,
+      "durationTicks": 1766,
+      "step": 16,
+      "bar": 2,
+      "beat": 1,
+      "sectionId": "F",
+      "arrangementIndex": 5,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        57,
+        71,
+        76
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "F_5_melody_melody_22_0",
+      "time": 31.125,
+      "duration": 1.2075,
+      "tick": 19920,
+      "durationTicks": 773,
+      "step": 22,
+      "bar": 2,
+      "beat": 2,
+      "sectionId": "F",
+      "arrangementIndex": 5,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 69,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "G_6_chords_chord_0_0",
+      "time": 33,
+      "duration": 2.7600000000000002,
+      "tick": 21120,
+      "durationTicks": 1766,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "G",
+      "arrangementIndex": 6,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        50,
+        64,
+        69
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "G_6_melody_melody_0_0",
+      "time": 33,
+      "duration": 0.6900000000000001,
+      "tick": 21120,
+      "durationTicks": 442,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "G",
+      "arrangementIndex": 6,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 62,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "G_6_melody_melody_10_0",
+      "time": 34.875,
+      "duration": 0.5175000000000001,
+      "tick": 22320,
+      "durationTicks": 331,
+      "step": 10,
+      "bar": 1,
+      "beat": 3,
+      "sectionId": "G",
+      "arrangementIndex": 6,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 61,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "G_6_chords_chord_16_0",
+      "time": 36,
+      "duration": 2.7600000000000002,
+      "tick": 23040,
+      "durationTicks": 1766,
+      "step": 16,
+      "bar": 2,
+      "beat": 1,
+      "sectionId": "G",
+      "arrangementIndex": 6,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        57,
+        71,
+        76
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "G_6_melody_melody_20_0",
+      "time": 36.75,
+      "duration": 1.5525,
+      "tick": 23520,
+      "durationTicks": 994,
+      "step": 20,
+      "bar": 2,
+      "beat": 2,
+      "sectionId": "G",
+      "arrangementIndex": 6,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 57,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "H_7_chords_chord_0_0",
+      "time": 39,
+      "duration": 2.7600000000000002,
+      "tick": 24960,
+      "durationTicks": 1766,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "H",
+      "arrangementIndex": 7,
+      "stem": "chords",
+      "type": "chord",
+      "velocity": 0.16,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midiNotes": [
+        50,
+        64,
+        69
+      ],
+      "instrument": "harp",
+      "articulation": "block"
+    },
+    {
+      "id": "H_7_melody_melody_4_0",
+      "time": 39.75,
+      "duration": 0.34500000000000003,
+      "tick": 25440,
+      "durationTicks": 221,
+      "step": 4,
+      "bar": 1,
+      "beat": 2,
+      "sectionId": "H",
+      "arrangementIndex": 7,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 57,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "H_7_melody_melody_10_0",
+      "time": 40.875,
+      "duration": 0.8625,
+      "tick": 26160,
+      "durationTicks": 552,
+      "step": 10,
+      "bar": 1,
+      "beat": 3,
+      "sectionId": "H",
+      "arrangementIndex": 7,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 62,
+      "instrument": "soft_pluck",
+      "pan": -0.1,
+      "slideOffset": null
+    },
+    {
+      "id": "H_7_melody_melody_12_2",
+      "time": 41.25,
+      "duration": 0.34500000000000003,
+      "tick": 26400,
+      "durationTicks": 221,
+      "step": 12,
+      "bar": 1,
+      "beat": 4,
+      "sectionId": "H",
+      "arrangementIndex": 7,
+      "stem": "melody",
+      "type": "melody",
+      "velocity": 0.42,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 57,
+      "instrument": "soft",
+      "pan": -0.24,
+      "slideOffset": null
+    }
+  ],
+  "duration": 42,
+  "durationTicks": 26880,
+  "ppq": 480,
+  "sectionIds": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+  ],
+  "capabilityReport": {
+    "renderer": "pocket-audio-core-offline",
+    "rendererVersion": 1,
+    "profileId": "standard",
+    "supported": true,
+    "exact": false,
+    "entries": [
+      {
+        "path": "sections.A.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_3.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      }
+    ],
+    "losses": [
+      {
+        "path": "sections.A.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.A.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.B.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.C.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.D.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[3].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.E.tracks.melody_1.events[4].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.F.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.G.tracks.melody_1.events[2].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_1.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_3.events[0].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      },
+      {
+        "path": "sections.H.tracks.melody_3.events[1].articulation",
+        "feature": "articulation:note",
+        "action": "fallback",
+        "fallback": "finger",
+        "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+      }
+    ],
+    "capabilities": {
+      "id": "pocket-audio-core-offline",
+      "version": 1,
+      "formatFeatures": [
+        "sound-profile-v1",
+        "rich-events-v1",
+        "articulations-v1",
+        "expanded-drums-v1",
+        "capability-report-v1"
+      ],
+      "profileIds": [
+        "standard",
+        "lofi_chill",
+        "chip_arcade",
+        "western_frontier",
+        "heavy_metal",
+        "funk_groove"
+      ],
+      "articulations": [
+        "finger",
+        "slap",
+        "pop",
+        "mute",
+        "ghost",
+        "hammer",
+        "pull",
+        "slide",
+        "hold",
+        "staccato",
+        "legato",
+        "bend",
+        "vibrato",
+        "tremolo",
+        "open",
+        "chug",
+        "scratch",
+        "palm_mute",
+        "accent",
+        "flam",
+        "drag",
+        "roll",
+        "choke"
+      ],
+      "directArticulations": [
+        "finger",
+        "slap",
+        "pop",
+        "mute",
+        "ghost",
+        "hammer",
+        "pull",
+        "slide",
+        "hold",
+        "staccato",
+        "legato",
+        "bend",
+        "vibrato",
+        "tremolo",
+        "open",
+        "chug",
+        "scratch",
+        "palm_mute",
+        "accent",
+        "choke"
+      ],
+      "approximatedArticulations": [
+        "flam",
+        "drag",
+        "roll"
+      ],
+      "drumLanes": [
+        "kick",
+        "snare",
+        "rim",
+        "clap",
+        "hat_closed",
+        "hat_open",
+        "ride",
+        "crash",
+        "china",
+        "tom_high",
+        "tom_mid",
+        "tom_low",
+        "percussion"
+      ],
+      "directDrumLanes": [
+        "kick",
+        "snare",
+        "clap",
+        "hat_closed",
+        "hat_open"
+      ],
+      "techniqueCommands": {
+        "chip": [
+          "channel",
+          "duty",
+          "envelope",
+          "commands",
+          "sweep",
+          "pitchSlide",
+          "vibrato",
+          "retrigger"
+        ],
+        "metal": [
+          "palmMute",
+          "pickDirection",
+          "tremoloRate",
+          "string",
+          "dualTakeSeed"
+        ],
+        "western": [
+          "pickDirection",
+          "strumDirection",
+          "banjoRoll",
+          "bowDirection",
+          "breathDirection",
+          "bend"
+        ],
+        "funk": [
+          "hand",
+          "rake",
+          "ghostDepth",
+          "pocketOffset",
+          "callResponseRole"
+        ]
+      },
+      "preservesUnknownData": true,
+      "reportsFallbacks": true,
+      "sampleClock": true
+    }
+  },
+  "lossReport": [
+    {
+      "path": "sections.A.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.A.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.A.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_1.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.B.tracks.melody_3.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.C.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.D.tracks.melody_3.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[3].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.E.tracks.melody_1.events[4].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.F.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.F.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.F.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.G.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.G.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.G.tracks.melody_1.events[2].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_1.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_1.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_3.events[0].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    },
+    {
+      "path": "sections.H.tracks.melody_3.events[1].articulation",
+      "feature": "articulation:note",
+      "action": "fallback",
+      "fallback": "finger",
+      "message": "note is fallback by pocket-audio-core-offline; source intent is preserved."
+    }
+  ]
+}

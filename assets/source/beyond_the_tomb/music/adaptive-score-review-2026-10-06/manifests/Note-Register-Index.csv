@@ -1,0 +1,1186 @@
+Title,Section,Track,SixteenthOffset,AbsoluteMIDI,HeldSixteenths,EngineVoice
+01 What the Dark Keeps,A,1,0,62,1,cowboy_whistle
+01 What the Dark Keeps,A,1,8,63,1,cowboy_whistle
+01 What the Dark Keeps,A,1,12,69,1,cowboy_whistle
+01 What the Dark Keeps,A,1,20,64,1,cowboy_whistle
+01 What the Dark Keeps,A,1,28,62,1,cowboy_whistle
+01 What the Dark Keeps,A,1,36,65,1,cowboy_whistle
+01 What the Dark Keeps,A,1,42,64,1,cowboy_whistle
+01 What the Dark Keeps,A,1,48,64,1,cowboy_whistle
+01 What the Dark Keeps,A,1,58,62,1,cowboy_whistle
+01 What the Dark Keeps,A,2,6,69,1,soft_pluck
+01 What the Dark Keeps,A,2,24,76,1,soft_pluck
+01 What the Dark Keeps,A,2,38,74,1,soft_pluck
+01 What the Dark Keeps,A,2,54,70,1,soft_pluck
+01 What the Dark Keeps,A,2,60,69,1,soft_pluck
+01 What the Dark Keeps,A,3,0,69,1,mellow_sax
+01 What the Dark Keeps,B,1,0,62,1,cowboy_whistle
+01 What the Dark Keeps,B,1,6,63,1,cowboy_whistle
+01 What the Dark Keeps,B,1,12,69,1,cowboy_whistle
+01 What the Dark Keeps,B,1,16,64,1,cowboy_whistle
+01 What the Dark Keeps,B,1,22,62,1,cowboy_whistle
+01 What the Dark Keeps,B,1,28,65,1,cowboy_whistle
+01 What the Dark Keeps,B,1,32,62,1,cowboy_whistle
+01 What the Dark Keeps,B,1,38,65,1,cowboy_whistle
+01 What the Dark Keeps,B,1,44,70,1,cowboy_whistle
+01 What the Dark Keeps,B,1,48,69,1,cowboy_whistle
+01 What the Dark Keeps,B,1,54,64,1,cowboy_whistle
+01 What the Dark Keeps,B,1,58,63,1,cowboy_whistle
+01 What the Dark Keeps,B,1,62,62,1,cowboy_whistle
+01 What the Dark Keeps,B,2,4,69,1,soft_pluck
+01 What the Dark Keeps,B,2,20,76,1,soft_pluck
+01 What the Dark Keeps,B,2,36,77,1,soft_pluck
+01 What the Dark Keeps,B,2,52,76,1,soft_pluck
+01 What the Dark Keeps,B,3,0,62,1,mellow_sax
+01 What the Dark Keeps,B,3,8,69,1,mellow_sax
+01 What the Dark Keeps,B,3,16,62,1,mellow_sax
+01 What the Dark Keeps,B,3,24,69,1,mellow_sax
+01 What the Dark Keeps,B,3,32,65,1,mellow_sax
+01 What the Dark Keeps,B,3,40,70,1,mellow_sax
+01 What the Dark Keeps,B,3,48,64,1,mellow_sax
+01 What the Dark Keeps,B,3,56,69,1,mellow_sax
+01 What the Dark Keeps,C,1,0,75,1,bell
+01 What the Dark Keeps,C,1,2,74,1,bell
+01 What the Dark Keeps,C,1,4,68,1,bell
+01 What the Dark Keeps,C,2,0,62,1,soft_pluck
+01 What the Dark Keeps,C,2,4,63,1,soft_pluck
+01 What the Dark Keeps,C,3,0,69,1,mellow_sax
+01 What the Dark Keeps,D,1,2,62,1,cowboy_whistle
+01 What the Dark Keeps,D,1,16,63,1,cowboy_whistle
+01 What the Dark Keeps,D,1,26,62,1,cowboy_whistle
+01 What the Dark Keeps,D,1,36,70,1,cowboy_whistle
+01 What the Dark Keeps,D,1,48,69,1,cowboy_whistle
+01 What the Dark Keeps,D,1,58,64,1,cowboy_whistle
+01 What the Dark Keeps,D,2,12,69,1,soft_pluck
+01 What the Dark Keeps,D,2,30,75,1,soft_pluck
+01 What the Dark Keeps,D,2,46,74,1,soft_pluck
+01 What the Dark Keeps,D,2,62,69,1,soft_pluck
+01 What the Dark Keeps,D,3,0,69,1,mellow_sax
+01 What the Dark Keeps,E,1,0,62,1,cowboy_whistle
+01 What the Dark Keeps,E,1,2,62,1,cowboy_whistle
+01 What the Dark Keeps,E,1,5,63,1,cowboy_whistle
+01 What the Dark Keeps,E,1,6,62,1,cowboy_whistle
+01 What the Dark Keeps,E,1,8,69,1,cowboy_whistle
+01 What the Dark Keeps,E,1,10,68,1,cowboy_whistle
+01 What the Dark Keeps,E,1,13,64,1,cowboy_whistle
+01 What the Dark Keeps,E,1,14,62,1,cowboy_whistle
+01 What the Dark Keeps,E,1,16,70,1,cowboy_whistle
+01 What the Dark Keeps,E,1,18,65,1,cowboy_whistle
+01 What the Dark Keeps,E,1,21,62,1,cowboy_whistle
+01 What the Dark Keeps,E,1,22,65,1,cowboy_whistle
+01 What the Dark Keeps,E,1,24,70,1,cowboy_whistle
+01 What the Dark Keeps,E,1,26,69,1,cowboy_whistle
+01 What the Dark Keeps,E,1,29,65,1,cowboy_whistle
+01 What the Dark Keeps,E,1,30,64,1,cowboy_whistle
+01 What the Dark Keeps,E,1,32,67,1,cowboy_whistle
+01 What the Dark Keeps,E,1,34,67,1,cowboy_whistle
+01 What the Dark Keeps,E,1,37,70,1,cowboy_whistle
+01 What the Dark Keeps,E,1,38,69,1,cowboy_whistle
+01 What the Dark Keeps,E,1,40,74,1,cowboy_whistle
+01 What the Dark Keeps,E,1,42,70,1,cowboy_whistle
+01 What the Dark Keeps,E,1,45,69,1,cowboy_whistle
+01 What the Dark Keeps,E,1,46,67,1,cowboy_whistle
+01 What the Dark Keeps,E,1,48,69,1,cowboy_whistle
+01 What the Dark Keeps,E,1,50,64,1,cowboy_whistle
+01 What the Dark Keeps,E,1,53,69,1,cowboy_whistle
+01 What the Dark Keeps,E,1,54,70,1,cowboy_whistle
+01 What the Dark Keeps,E,1,56,76,1,cowboy_whistle
+01 What the Dark Keeps,E,1,58,75,1,cowboy_whistle
+01 What the Dark Keeps,E,1,61,76,1,cowboy_whistle
+01 What the Dark Keeps,E,1,62,74,1,cowboy_whistle
+01 What the Dark Keeps,E,2,0,74,1,soft_pluck
+01 What the Dark Keeps,E,2,14,75,1,soft_pluck
+01 What the Dark Keeps,E,2,30,77,1,soft_pluck
+01 What the Dark Keeps,E,2,42,69,1,soft_pluck
+01 What the Dark Keeps,E,2,56,70,1,soft_pluck
+01 What the Dark Keeps,E,2,60,69,1,soft_pluck
+01 What the Dark Keeps,E,3,0,69,1,mellow_sax
+01 What the Dark Keeps,E,3,15,62,49,mellow_sax
+01 What the Dark Keeps,F,1,0,62,1,cowboy_whistle
+01 What the Dark Keeps,F,1,18,65,1,cowboy_whistle
+01 What the Dark Keeps,F,1,32,67,1,cowboy_whistle
+01 What the Dark Keeps,F,1,48,64,1,cowboy_whistle
+01 What the Dark Keeps,F,1,58,62,1,cowboy_whistle
+01 What the Dark Keeps,F,2,10,69,1,soft_pluck
+01 What the Dark Keeps,F,2,26,74,1,soft_pluck
+01 What the Dark Keeps,F,2,44,69,1,soft_pluck
+01 What the Dark Keeps,F,2,54,74,1,soft_pluck
+01 What the Dark Keeps,F,2,60,76,1,soft_pluck
+01 What the Dark Keeps,F,3,0,69,1,mellow_sax
+01 What the Dark Keeps,F,3,15,69,49,mellow_sax
+01 What the Dark Keeps,G,1,0,69,1,cowboy_whistle
+01 What the Dark Keeps,G,1,8,74,1,cowboy_whistle
+01 What the Dark Keeps,G,1,16,76,1,cowboy_whistle
+01 What the Dark Keeps,G,1,24,78,1,cowboy_whistle
+01 What the Dark Keeps,G,1,28,78,1,cowboy_whistle
+01 What the Dark Keeps,G,1,30,81,1,cowboy_whistle
+01 What the Dark Keeps,G,2,0,74,1,bell
+01 What the Dark Keeps,G,2,12,81,1,bell
+01 What the Dark Keeps,G,2,24,74,1,bell
+01 What the Dark Keeps,G,2,26,69,1,bell
+01 What the Dark Keeps,G,3,0,64,1,mellow_sax
+01 What the Dark Keeps,G,3,15,69,1,mellow_sax
+01 What the Dark Keeps,G,3,24,66,1,mellow_sax
+01 What the Dark Keeps,G,3,28,69,1,mellow_sax
+01 What the Dark Keeps,H,1,0,62,1,cowboy_whistle
+01 What the Dark Keeps,H,1,8,64,1,cowboy_whistle
+01 What the Dark Keeps,H,1,14,69,1,cowboy_whistle
+01 What the Dark Keeps,H,1,20,71,1,cowboy_whistle
+01 What the Dark Keeps,H,1,28,69,1,cowboy_whistle
+01 What the Dark Keeps,H,1,34,66,1,cowboy_whistle
+01 What the Dark Keeps,H,1,44,64,1,cowboy_whistle
+01 What the Dark Keeps,H,1,50,62,1,cowboy_whistle
+01 What the Dark Keeps,H,1,58,66,1,cowboy_whistle
+01 What the Dark Keeps,H,2,6,69,1,soft_pluck
+01 What the Dark Keeps,H,2,22,74,1,soft_pluck
+01 What the Dark Keeps,H,2,38,69,1,soft_pluck
+01 What the Dark Keeps,H,2,54,74,1,soft_pluck
+01 What the Dark Keeps,H,2,62,69,1,soft_pluck
+01 What the Dark Keeps,H,3,0,66,1,mellow_sax
+01 What the Dark Keeps,H,3,15,66,49,mellow_sax
+02 The Fourth Keeper's Rest,A,1,0,50,4,soft
+02 The Fourth Keeper's Rest,A,1,16,51,3,soft
+02 The Fourth Keeper's Rest,A,1,36,57,5,soft
+02 The Fourth Keeper's Rest,A,1,54,50,5,soft
+02 The Fourth Keeper's Rest,A,2,10,69,2,soft_pluck
+02 The Fourth Keeper's Rest,A,2,30,64,2,soft_pluck
+02 The Fourth Keeper's Rest,B,1,0,50,5,soft
+02 The Fourth Keeper's Rest,B,1,12,51,3,soft
+02 The Fourth Keeper's Rest,B,1,24,57,4,soft
+02 The Fourth Keeper's Rest,B,1,42,52,5,soft
+02 The Fourth Keeper's Rest,B,1,58,50,3,soft
+02 The Fourth Keeper's Rest,B,2,10,69,2,soft_pluck
+02 The Fourth Keeper's Rest,B,2,30,64,2,soft_pluck
+02 The Fourth Keeper's Rest,B,2,46,62,2,soft_pluck
+02 The Fourth Keeper's Rest,B,3,12,62,2,bell
+02 The Fourth Keeper's Rest,C,1,4,53,4,soft
+02 The Fourth Keeper's Rest,C,1,16,52,4,soft
+02 The Fourth Keeper's Rest,C,1,28,50,6,soft
+02 The Fourth Keeper's Rest,C,1,44,46,4,soft
+02 The Fourth Keeper's Rest,C,1,54,45,5,soft
+02 The Fourth Keeper's Rest,C,2,12,69,2,soft_pluck
+02 The Fourth Keeper's Rest,C,2,32,64,2,soft_pluck
+02 The Fourth Keeper's Rest,C,2,48,62,2,soft_pluck
+02 The Fourth Keeper's Rest,D,1,0,50,3,soft
+02 The Fourth Keeper's Rest,D,1,6,50,2,soft
+02 The Fourth Keeper's Rest,D,1,12,51,2,soft
+02 The Fourth Keeper's Rest,D,1,20,57,3,soft
+02 The Fourth Keeper's Rest,D,1,28,56,2,soft
+02 The Fourth Keeper's Rest,D,1,34,52,3,soft
+02 The Fourth Keeper's Rest,D,1,42,50,3,soft
+02 The Fourth Keeper's Rest,D,1,50,53,3,soft
+02 The Fourth Keeper's Rest,D,1,58,52,3,soft
+02 The Fourth Keeper's Rest,D,2,10,69,2,soft_pluck
+02 The Fourth Keeper's Rest,D,2,30,64,2,soft_pluck
+02 The Fourth Keeper's Rest,D,2,46,62,2,soft_pluck
+02 The Fourth Keeper's Rest,D,3,12,62,2,bell
+02 The Fourth Keeper's Rest,E,1,8,57,3,soft
+02 The Fourth Keeper's Rest,E,1,24,58,4,soft
+02 The Fourth Keeper's Rest,E,1,40,53,4,soft
+02 The Fourth Keeper's Rest,E,1,56,52,5,soft
+02 The Fourth Keeper's Rest,E,2,12,69,2,soft_pluck
+02 The Fourth Keeper's Rest,E,2,32,64,2,soft_pluck
+02 The Fourth Keeper's Rest,E,2,48,62,2,soft_pluck
+02 The Fourth Keeper's Rest,F,1,0,57,4,soft
+02 The Fourth Keeper's Rest,F,1,16,50,6,soft
+02 The Fourth Keeper's Rest,F,2,10,69,2,soft_pluck
+02 The Fourth Keeper's Rest,F,2,30,64,2,soft_pluck
+02 The Fourth Keeper's Rest,G,1,0,50,4,soft
+02 The Fourth Keeper's Rest,G,1,16,53,4,soft
+02 The Fourth Keeper's Rest,G,1,32,52,5,soft
+02 The Fourth Keeper's Rest,G,1,52,50,9,soft
+02 The Fourth Keeper's Rest,G,2,10,69,2,soft_pluck
+02 The Fourth Keeper's Rest,G,2,30,64,2,soft_pluck
+02 The Fourth Keeper's Rest,H,1,0,50,4,soft
+02 The Fourth Keeper's Rest,H,1,16,53,4,soft
+02 The Fourth Keeper's Rest,H,1,32,57,5,soft
+02 The Fourth Keeper's Rest,H,1,52,52,7,soft
+02 The Fourth Keeper's Rest,H,2,10,69,2,soft_pluck
+02 The Fourth Keeper's Rest,H,2,30,64,2,soft_pluck
+02 The Fourth Keeper's Rest,H,2,46,62,2,soft_pluck
+02 The Fourth Keeper's Rest,H,3,12,62,2,bell
+02 The Fourth Keeper's Rest,H,3,44,52,3,bell
+03 The Jailer's Last Vigil,A,1,0,62,4,western_fiddle
+03 The Jailer's Last Vigil,A,1,16,62,3,western_fiddle
+03 The Jailer's Last Vigil,A,1,36,63,5,western_fiddle
+03 The Jailer's Last Vigil,A,1,54,57,5,western_fiddle
+03 The Jailer's Last Vigil,A,2,4,57,2,soft_pluck
+03 The Jailer's Last Vigil,A,2,18,53,3,soft_pluck
+03 The Jailer's Last Vigil,B,1,0,62,3,western_fiddle
+03 The Jailer's Last Vigil,B,1,6,62,2,western_fiddle
+03 The Jailer's Last Vigil,B,1,10,63,2,western_fiddle
+03 The Jailer's Last Vigil,B,1,14,69,3,western_fiddle
+03 The Jailer's Last Vigil,B,1,22,64,3,western_fiddle
+03 The Jailer's Last Vigil,B,1,30,62,2,western_fiddle
+03 The Jailer's Last Vigil,B,1,36,65,3,western_fiddle
+03 The Jailer's Last Vigil,B,1,44,64,3,western_fiddle
+03 The Jailer's Last Vigil,B,1,52,62,4,western_fiddle
+03 The Jailer's Last Vigil,B,1,60,57,2,western_fiddle
+03 The Jailer's Last Vigil,B,2,4,57,2,soft_pluck
+03 The Jailer's Last Vigil,B,2,18,53,3,soft_pluck
+03 The Jailer's Last Vigil,B,2,34,58,3,soft_pluck
+03 The Jailer's Last Vigil,B,2,50,57,3,soft_pluck
+03 The Jailer's Last Vigil,B,3,12,62,2,muted_trumpet
+03 The Jailer's Last Vigil,C,1,2,57,3,western_fiddle
+03 The Jailer's Last Vigil,C,1,8,62,3,western_fiddle
+03 The Jailer's Last Vigil,C,1,16,65,4,western_fiddle
+03 The Jailer's Last Vigil,C,1,24,67,2,western_fiddle
+03 The Jailer's Last Vigil,C,1,30,65,2,western_fiddle
+03 The Jailer's Last Vigil,C,1,36,62,3,western_fiddle
+03 The Jailer's Last Vigil,C,1,44,60,3,western_fiddle
+03 The Jailer's Last Vigil,C,1,52,57,6,western_fiddle
+03 The Jailer's Last Vigil,C,2,6,57,2,soft_pluck
+03 The Jailer's Last Vigil,C,2,20,53,3,soft_pluck
+03 The Jailer's Last Vigil,C,2,36,58,3,soft_pluck
+03 The Jailer's Last Vigil,C,2,52,57,3,soft_pluck
+03 The Jailer's Last Vigil,D,1,0,69,4,western_fiddle
+03 The Jailer's Last Vigil,D,1,8,74,3,western_fiddle
+03 The Jailer's Last Vigil,D,1,14,72,2,western_fiddle
+03 The Jailer's Last Vigil,D,1,20,69,4,western_fiddle
+03 The Jailer's Last Vigil,D,1,28,65,3,western_fiddle
+03 The Jailer's Last Vigil,D,1,36,67,3,western_fiddle
+03 The Jailer's Last Vigil,D,1,44,64,4,western_fiddle
+03 The Jailer's Last Vigil,D,1,56,62,6,western_fiddle
+03 The Jailer's Last Vigil,D,2,4,57,2,soft_pluck
+03 The Jailer's Last Vigil,D,2,18,53,3,soft_pluck
+03 The Jailer's Last Vigil,D,2,34,58,3,soft_pluck
+03 The Jailer's Last Vigil,D,2,50,57,3,soft_pluck
+03 The Jailer's Last Vigil,D,3,12,69,2,muted_trumpet
+03 The Jailer's Last Vigil,E,1,0,62,2,western_fiddle
+03 The Jailer's Last Vigil,E,1,4,63,2,western_fiddle
+03 The Jailer's Last Vigil,E,1,8,69,3,western_fiddle
+03 The Jailer's Last Vigil,E,1,14,64,2,western_fiddle
+03 The Jailer's Last Vigil,E,1,18,62,3,western_fiddle
+03 The Jailer's Last Vigil,E,1,24,65,2,western_fiddle
+03 The Jailer's Last Vigil,E,1,28,64,2,western_fiddle
+03 The Jailer's Last Vigil,E,1,32,67,3,western_fiddle
+03 The Jailer's Last Vigil,E,1,38,65,2,western_fiddle
+03 The Jailer's Last Vigil,E,1,42,62,2,western_fiddle
+03 The Jailer's Last Vigil,E,1,48,64,3,western_fiddle
+03 The Jailer's Last Vigil,E,1,54,63,2,western_fiddle
+03 The Jailer's Last Vigil,E,1,58,62,4,western_fiddle
+03 The Jailer's Last Vigil,E,2,6,69,2,soft_pluck
+03 The Jailer's Last Vigil,E,2,20,65,3,soft_pluck
+03 The Jailer's Last Vigil,E,2,36,70,3,soft_pluck
+03 The Jailer's Last Vigil,E,2,52,69,3,soft_pluck
+03 The Jailer's Last Vigil,E,3,0,50,3,muted_trumpet
+03 The Jailer's Last Vigil,E,3,32,57,3,muted_trumpet
+03 The Jailer's Last Vigil,F,1,0,69,4,western_fiddle
+03 The Jailer's Last Vigil,F,1,16,62,6,western_fiddle
+03 The Jailer's Last Vigil,F,2,4,57,2,soft_pluck
+03 The Jailer's Last Vigil,F,2,18,53,3,soft_pluck
+03 The Jailer's Last Vigil,G,1,0,69,4,western_fiddle
+03 The Jailer's Last Vigil,G,1,12,65,4,western_fiddle
+03 The Jailer's Last Vigil,G,1,28,64,5,western_fiddle
+03 The Jailer's Last Vigil,G,1,48,62,10,western_fiddle
+03 The Jailer's Last Vigil,G,2,4,57,2,soft_pluck
+03 The Jailer's Last Vigil,G,2,18,53,3,soft_pluck
+03 The Jailer's Last Vigil,H,1,4,62,5,western_fiddle
+03 The Jailer's Last Vigil,H,1,18,63,3,western_fiddle
+03 The Jailer's Last Vigil,H,1,28,69,4,western_fiddle
+03 The Jailer's Last Vigil,H,1,44,64,4,western_fiddle
+03 The Jailer's Last Vigil,H,1,56,62,5,western_fiddle
+03 The Jailer's Last Vigil,H,2,4,57,2,soft_pluck
+03 The Jailer's Last Vigil,H,2,18,53,3,soft_pluck
+03 The Jailer's Last Vigil,H,2,34,58,3,soft_pluck
+03 The Jailer's Last Vigil,H,2,50,57,3,soft_pluck
+03 The Jailer's Last Vigil,H,3,12,62,2,muted_trumpet
+03 The Jailer's Last Vigil,H,3,44,62,3,muted_trumpet
+04 Beneath the Same Moon,A,1,0,67,4,cowboy_whistle
+04 Beneath the Same Moon,A,1,16,69,3,cowboy_whistle
+04 Beneath the Same Moon,A,1,36,71,5,cowboy_whistle
+04 Beneath the Same Moon,A,1,54,62,5,cowboy_whistle
+04 Beneath the Same Moon,A,2,6,62,2,soft_pluck
+04 Beneath the Same Moon,A,2,22,66,2,soft_pluck
+04 Beneath the Same Moon,B,1,2,67,3,cowboy_whistle
+04 Beneath the Same Moon,B,1,8,69,3,cowboy_whistle
+04 Beneath the Same Moon,B,1,14,71,2,cowboy_whistle
+04 Beneath the Same Moon,B,1,20,69,4,cowboy_whistle
+04 Beneath the Same Moon,B,1,28,67,3,cowboy_whistle
+04 Beneath the Same Moon,B,1,36,66,4,cowboy_whistle
+04 Beneath the Same Moon,B,1,44,64,3,cowboy_whistle
+04 Beneath the Same Moon,B,1,52,62,6,cowboy_whistle
+04 Beneath the Same Moon,B,2,6,62,2,soft_pluck
+04 Beneath the Same Moon,B,2,22,66,2,soft_pluck
+04 Beneath the Same Moon,B,2,38,64,2,soft_pluck
+04 Beneath the Same Moon,B,2,54,62,2,soft_pluck
+04 Beneath the Same Moon,B,3,12,67,2,western_fiddle
+04 Beneath the Same Moon,C,1,0,71,4,cowboy_whistle
+04 Beneath the Same Moon,C,1,10,74,3,cowboy_whistle
+04 Beneath the Same Moon,C,1,18,72,3,cowboy_whistle
+04 Beneath the Same Moon,C,1,26,71,4,cowboy_whistle
+04 Beneath the Same Moon,C,1,36,69,3,cowboy_whistle
+04 Beneath the Same Moon,C,1,42,67,3,cowboy_whistle
+04 Beneath the Same Moon,C,1,50,64,4,cowboy_whistle
+04 Beneath the Same Moon,C,1,58,67,4,cowboy_whistle
+04 Beneath the Same Moon,C,2,8,64,2,soft_pluck
+04 Beneath the Same Moon,C,2,24,66,2,soft_pluck
+04 Beneath the Same Moon,C,2,40,64,2,soft_pluck
+04 Beneath the Same Moon,C,2,56,64,2,soft_pluck
+04 Beneath the Same Moon,D,1,0,62,3,cowboy_whistle
+04 Beneath the Same Moon,D,1,8,63,2,cowboy_whistle
+04 Beneath the Same Moon,D,1,14,69,4,cowboy_whistle
+04 Beneath the Same Moon,D,1,24,67,3,cowboy_whistle
+04 Beneath the Same Moon,D,1,34,66,3,cowboy_whistle
+04 Beneath the Same Moon,D,1,42,64,3,cowboy_whistle
+04 Beneath the Same Moon,D,1,52,62,5,cowboy_whistle
+04 Beneath the Same Moon,D,2,6,62,2,soft_pluck
+04 Beneath the Same Moon,D,2,22,66,2,soft_pluck
+04 Beneath the Same Moon,D,2,38,64,2,soft_pluck
+04 Beneath the Same Moon,D,2,54,62,2,soft_pluck
+04 Beneath the Same Moon,D,3,12,62,2,western_fiddle
+04 Beneath the Same Moon,E,1,6,74,4,cowboy_whistle
+04 Beneath the Same Moon,E,1,20,75,3,cowboy_whistle
+04 Beneath the Same Moon,E,1,32,81,4,cowboy_whistle
+04 Beneath the Same Moon,E,1,48,76,5,cowboy_whistle
+04 Beneath the Same Moon,E,2,8,62,2,soft_pluck
+04 Beneath the Same Moon,E,2,24,66,2,soft_pluck
+04 Beneath the Same Moon,E,2,40,64,2,soft_pluck
+04 Beneath the Same Moon,E,2,56,62,2,soft_pluck
+04 Beneath the Same Moon,F,1,0,74,4,cowboy_whistle
+04 Beneath the Same Moon,F,1,16,67,6,cowboy_whistle
+04 Beneath the Same Moon,F,2,6,62,2,soft_pluck
+04 Beneath the Same Moon,F,2,22,66,2,soft_pluck
+04 Beneath the Same Moon,G,1,0,67,4,cowboy_whistle
+04 Beneath the Same Moon,G,1,16,71,4,cowboy_whistle
+04 Beneath the Same Moon,G,1,32,69,5,cowboy_whistle
+04 Beneath the Same Moon,G,1,52,67,9,cowboy_whistle
+04 Beneath the Same Moon,G,2,6,62,2,soft_pluck
+04 Beneath the Same Moon,G,2,22,66,2,soft_pluck
+04 Beneath the Same Moon,H,1,0,67,5,cowboy_whistle
+04 Beneath the Same Moon,H,1,12,71,3,cowboy_whistle
+04 Beneath the Same Moon,H,1,20,74,5,cowboy_whistle
+04 Beneath the Same Moon,H,1,32,76,4,cowboy_whistle
+04 Beneath the Same Moon,H,1,42,74,3,cowboy_whistle
+04 Beneath the Same Moon,H,1,50,71,3,cowboy_whistle
+04 Beneath the Same Moon,H,1,58,69,4,cowboy_whistle
+04 Beneath the Same Moon,H,2,6,62,2,soft_pluck
+04 Beneath the Same Moon,H,2,22,66,2,soft_pluck
+04 Beneath the Same Moon,H,2,38,64,2,soft_pluck
+04 Beneath the Same Moon,H,2,54,62,2,soft_pluck
+04 Beneath the Same Moon,H,3,12,67,2,western_fiddle
+04 Beneath the Same Moon,H,3,44,69,3,western_fiddle
+05 The Roads of Veyr,A,1,0,62,4,soft_pluck
+05 The Roads of Veyr,A,1,16,69,3,soft_pluck
+05 The Roads of Veyr,A,1,36,62,5,soft_pluck
+05 The Roads of Veyr,A,1,54,57,5,soft_pluck
+05 The Roads of Veyr,A,2,8,74,3,cowboy_whistle
+05 The Roads of Veyr,A,2,24,76,3,cowboy_whistle
+05 The Roads of Veyr,B,1,0,62,2,soft_pluck
+05 The Roads of Veyr,B,1,6,69,2,soft_pluck
+05 The Roads of Veyr,B,1,12,62,3,soft_pluck
+05 The Roads of Veyr,B,1,20,63,2,soft_pluck
+05 The Roads of Veyr,B,1,26,69,3,soft_pluck
+05 The Roads of Veyr,B,1,34,65,3,soft_pluck
+05 The Roads of Veyr,B,1,42,64,3,soft_pluck
+05 The Roads of Veyr,B,1,50,62,3,soft_pluck
+05 The Roads of Veyr,B,1,58,57,3,soft_pluck
+05 The Roads of Veyr,B,2,8,74,3,cowboy_whistle
+05 The Roads of Veyr,B,2,24,76,3,cowboy_whistle
+05 The Roads of Veyr,B,2,40,74,3,cowboy_whistle
+05 The Roads of Veyr,B,2,56,69,3,cowboy_whistle
+05 The Roads of Veyr,B,3,12,74,2,bell
+05 The Roads of Veyr,C,1,0,65,3,soft_pluck
+05 The Roads of Veyr,C,1,8,67,2,soft_pluck
+05 The Roads of Veyr,C,1,14,69,2,soft_pluck
+05 The Roads of Veyr,C,1,20,70,3,soft_pluck
+05 The Roads of Veyr,C,1,28,69,3,soft_pluck
+05 The Roads of Veyr,C,1,36,67,2,soft_pluck
+05 The Roads of Veyr,C,1,42,65,3,soft_pluck
+05 The Roads of Veyr,C,1,50,64,3,soft_pluck
+05 The Roads of Veyr,C,1,58,62,3,soft_pluck
+05 The Roads of Veyr,C,2,10,74,3,cowboy_whistle
+05 The Roads of Veyr,C,2,26,76,3,cowboy_whistle
+05 The Roads of Veyr,C,2,42,74,3,cowboy_whistle
+05 The Roads of Veyr,C,2,58,69,3,cowboy_whistle
+05 The Roads of Veyr,D,1,0,62,2,soft_pluck
+05 The Roads of Veyr,D,1,4,62,2,soft_pluck
+05 The Roads of Veyr,D,1,10,63,2,soft_pluck
+05 The Roads of Veyr,D,1,16,69,3,soft_pluck
+05 The Roads of Veyr,D,1,24,68,2,soft_pluck
+05 The Roads of Veyr,D,1,30,64,2,soft_pluck
+05 The Roads of Veyr,D,1,36,67,3,soft_pluck
+05 The Roads of Veyr,D,1,44,65,2,soft_pluck
+05 The Roads of Veyr,D,1,52,64,2,soft_pluck
+05 The Roads of Veyr,D,1,58,62,3,soft_pluck
+05 The Roads of Veyr,D,2,8,74,3,cowboy_whistle
+05 The Roads of Veyr,D,2,24,76,3,cowboy_whistle
+05 The Roads of Veyr,D,2,40,74,3,cowboy_whistle
+05 The Roads of Veyr,D,2,56,69,3,cowboy_whistle
+05 The Roads of Veyr,D,3,12,74,2,bell
+05 The Roads of Veyr,E,1,4,62,6,soft_pluck
+05 The Roads of Veyr,E,1,20,65,5,soft_pluck
+05 The Roads of Veyr,E,1,36,69,6,soft_pluck
+05 The Roads of Veyr,E,1,54,64,6,soft_pluck
+05 The Roads of Veyr,E,2,10,74,3,cowboy_whistle
+05 The Roads of Veyr,E,2,26,76,3,cowboy_whistle
+05 The Roads of Veyr,E,2,42,74,3,cowboy_whistle
+05 The Roads of Veyr,E,2,58,69,3,cowboy_whistle
+05 The Roads of Veyr,F,1,0,69,4,soft_pluck
+05 The Roads of Veyr,F,1,16,62,6,soft_pluck
+05 The Roads of Veyr,F,2,8,74,3,cowboy_whistle
+05 The Roads of Veyr,F,2,24,76,3,cowboy_whistle
+05 The Roads of Veyr,G,1,0,62,4,soft_pluck
+05 The Roads of Veyr,G,1,16,65,4,soft_pluck
+05 The Roads of Veyr,G,1,32,64,5,soft_pluck
+05 The Roads of Veyr,G,1,52,62,9,soft_pluck
+05 The Roads of Veyr,G,2,8,74,3,cowboy_whistle
+05 The Roads of Veyr,G,2,24,76,3,cowboy_whistle
+05 The Roads of Veyr,H,1,0,69,3,soft_pluck
+05 The Roads of Veyr,H,1,12,70,3,soft_pluck
+05 The Roads of Veyr,H,1,24,65,4,soft_pluck
+05 The Roads of Veyr,H,1,40,67,4,soft_pluck
+05 The Roads of Veyr,H,1,54,62,5,soft_pluck
+05 The Roads of Veyr,H,2,8,74,3,cowboy_whistle
+05 The Roads of Veyr,H,2,24,76,3,cowboy_whistle
+05 The Roads of Veyr,H,2,40,74,3,cowboy_whistle
+05 The Roads of Veyr,H,2,56,69,3,cowboy_whistle
+05 The Roads of Veyr,H,3,12,81,2,bell
+05 The Roads of Veyr,H,3,44,62,3,bell
+"06 Bellwether, Still Burning",A,1,0,67,4,western_fiddle
+"06 Bellwether, Still Burning",A,1,16,71,3,western_fiddle
+"06 Bellwether, Still Burning",A,1,36,74,5,western_fiddle
+"06 Bellwether, Still Burning",A,1,54,67,5,western_fiddle
+"06 Bellwether, Still Burning",A,2,4,62,2,soft_pluck
+"06 Bellwether, Still Burning",A,2,18,64,2,soft_pluck
+"06 Bellwether, Still Burning",B,1,0,67,3,western_fiddle
+"06 Bellwether, Still Burning",B,1,6,71,2,western_fiddle
+"06 Bellwether, Still Burning",B,1,10,74,2,western_fiddle
+"06 Bellwether, Still Burning",B,1,16,72,3,western_fiddle
+"06 Bellwether, Still Burning",B,1,22,71,2,western_fiddle
+"06 Bellwether, Still Burning",B,1,28,69,3,western_fiddle
+"06 Bellwether, Still Burning",B,1,34,67,3,western_fiddle
+"06 Bellwether, Still Burning",B,1,40,69,2,western_fiddle
+"06 Bellwether, Still Burning",B,1,46,71,3,western_fiddle
+"06 Bellwether, Still Burning",B,1,54,67,5,western_fiddle
+"06 Bellwether, Still Burning",B,2,4,62,2,soft_pluck
+"06 Bellwether, Still Burning",B,2,18,64,2,soft_pluck
+"06 Bellwether, Still Burning",B,2,34,62,2,soft_pluck
+"06 Bellwether, Still Burning",B,2,50,66,2,soft_pluck
+"06 Bellwether, Still Burning",B,3,12,67,2,cowboy_whistle
+"06 Bellwether, Still Burning",C,1,2,62,3,western_fiddle
+"06 Bellwether, Still Burning",C,1,8,64,3,western_fiddle
+"06 Bellwether, Still Burning",C,1,14,67,2,western_fiddle
+"06 Bellwether, Still Burning",C,1,20,69,4,western_fiddle
+"06 Bellwether, Still Burning",C,1,28,67,3,western_fiddle
+"06 Bellwether, Still Burning",C,1,36,66,3,western_fiddle
+"06 Bellwether, Still Burning",C,1,42,64,3,western_fiddle
+"06 Bellwether, Still Burning",C,1,50,62,5,western_fiddle
+"06 Bellwether, Still Burning",C,1,58,67,3,western_fiddle
+"06 Bellwether, Still Burning",C,2,6,64,2,soft_pluck
+"06 Bellwether, Still Burning",C,2,20,64,2,soft_pluck
+"06 Bellwether, Still Burning",C,2,36,64,2,soft_pluck
+"06 Bellwether, Still Burning",C,2,52,66,2,soft_pluck
+"06 Bellwether, Still Burning",D,1,0,64,4,western_fiddle
+"06 Bellwether, Still Burning",D,1,12,63,2,western_fiddle
+"06 Bellwether, Still Burning",D,1,20,62,4,western_fiddle
+"06 Bellwether, Still Burning",D,1,32,67,4,western_fiddle
+"06 Bellwether, Still Burning",D,1,44,66,3,western_fiddle
+"06 Bellwether, Still Burning",D,1,54,64,5,western_fiddle
+"06 Bellwether, Still Burning",D,2,4,62,2,soft_pluck
+"06 Bellwether, Still Burning",D,2,18,64,2,soft_pluck
+"06 Bellwether, Still Burning",D,2,34,62,2,soft_pluck
+"06 Bellwether, Still Burning",D,2,50,66,2,soft_pluck
+"06 Bellwether, Still Burning",D,3,12,64,2,cowboy_whistle
+"06 Bellwether, Still Burning",E,1,4,71,4,western_fiddle
+"06 Bellwether, Still Burning",E,1,16,69,4,western_fiddle
+"06 Bellwether, Still Burning",E,1,28,67,5,western_fiddle
+"06 Bellwether, Still Burning",E,1,44,64,4,western_fiddle
+"06 Bellwether, Still Burning",E,1,56,62,5,western_fiddle
+"06 Bellwether, Still Burning",E,2,6,62,2,soft_pluck
+"06 Bellwether, Still Burning",E,2,20,64,2,soft_pluck
+"06 Bellwether, Still Burning",E,2,36,62,2,soft_pluck
+"06 Bellwether, Still Burning",E,2,52,66,2,soft_pluck
+"06 Bellwether, Still Burning",F,1,0,74,4,western_fiddle
+"06 Bellwether, Still Burning",F,1,16,67,6,western_fiddle
+"06 Bellwether, Still Burning",F,2,4,62,2,soft_pluck
+"06 Bellwether, Still Burning",F,2,18,64,2,soft_pluck
+"06 Bellwether, Still Burning",G,1,0,67,4,western_fiddle
+"06 Bellwether, Still Burning",G,1,16,71,4,western_fiddle
+"06 Bellwether, Still Burning",G,1,32,69,5,western_fiddle
+"06 Bellwether, Still Burning",G,1,52,67,9,western_fiddle
+"06 Bellwether, Still Burning",G,2,4,62,2,soft_pluck
+"06 Bellwether, Still Burning",G,2,18,64,2,soft_pluck
+"06 Bellwether, Still Burning",H,1,0,67,3,western_fiddle
+"06 Bellwether, Still Burning",H,1,8,69,2,western_fiddle
+"06 Bellwether, Still Burning",H,1,14,71,2,western_fiddle
+"06 Bellwether, Still Burning",H,1,20,74,4,western_fiddle
+"06 Bellwether, Still Burning",H,1,30,72,2,western_fiddle
+"06 Bellwether, Still Burning",H,1,36,71,3,western_fiddle
+"06 Bellwether, Still Burning",H,1,44,69,3,western_fiddle
+"06 Bellwether, Still Burning",H,1,52,67,7,western_fiddle
+"06 Bellwether, Still Burning",H,2,4,62,2,soft_pluck
+"06 Bellwether, Still Burning",H,2,18,64,2,soft_pluck
+"06 Bellwether, Still Burning",H,2,34,62,2,soft_pluck
+"06 Bellwether, Still Burning",H,2,50,66,2,soft_pluck
+"06 Bellwether, Still Burning",H,3,12,67,2,cowboy_whistle
+"06 Bellwether, Still Burning",H,3,44,67,3,cowboy_whistle
+07 Bells Beneath the Water,A,1,0,62,4,bell
+07 Bells Beneath the Water,A,1,16,63,3,bell
+07 Bells Beneath the Water,A,1,36,69,5,bell
+07 Bells Beneath the Water,A,1,54,62,5,bell
+07 Bells Beneath the Water,A,2,10,57,5,soft
+07 Bells Beneath the Water,A,2,32,60,5,soft
+07 Bells Beneath the Water,B,1,0,62,3,bell
+07 Bells Beneath the Water,B,1,14,63,2,bell
+07 Bells Beneath the Water,B,1,28,69,4,bell
+07 Bells Beneath the Water,B,1,46,64,4,bell
+07 Bells Beneath the Water,B,1,58,62,4,bell
+07 Bells Beneath the Water,B,2,10,57,5,soft
+07 Bells Beneath the Water,B,2,32,60,5,soft
+07 Bells Beneath the Water,B,2,54,57,4,soft
+07 Bells Beneath the Water,B,3,12,62,2,soft_pluck
+07 Bells Beneath the Water,C,1,8,69,4,bell
+07 Bells Beneath the Water,C,1,24,67,4,bell
+07 Bells Beneath the Water,C,1,36,64,5,bell
+07 Bells Beneath the Water,C,1,52,60,6,bell
+07 Bells Beneath the Water,C,2,12,57,5,soft
+07 Bells Beneath the Water,C,2,34,60,5,soft
+07 Bells Beneath the Water,C,2,56,57,4,soft
+07 Bells Beneath the Water,D,1,0,57,4,bell
+07 Bells Beneath the Water,D,1,10,58,3,bell
+07 Bells Beneath the Water,D,1,20,62,4,bell
+07 Bells Beneath the Water,D,1,30,63,3,bell
+07 Bells Beneath the Water,D,1,40,64,4,bell
+07 Bells Beneath the Water,D,1,54,57,6,bell
+07 Bells Beneath the Water,D,2,10,57,5,soft
+07 Bells Beneath the Water,D,2,32,60,5,soft
+07 Bells Beneath the Water,D,2,54,57,4,soft
+07 Bells Beneath the Water,D,3,12,57,2,soft_pluck
+07 Bells Beneath the Water,E,1,4,76,3,bell
+07 Bells Beneath the Water,E,1,20,74,3,bell
+07 Bells Beneath the Water,E,1,36,69,4,bell
+07 Bells Beneath the Water,E,1,52,72,4,bell
+07 Bells Beneath the Water,E,2,12,69,5,soft
+07 Bells Beneath the Water,E,2,34,60,5,soft
+07 Bells Beneath the Water,E,2,56,69,4,soft
+07 Bells Beneath the Water,F,1,0,64,4,bell
+07 Bells Beneath the Water,F,1,16,69,6,bell
+07 Bells Beneath the Water,F,2,10,57,5,soft
+07 Bells Beneath the Water,G,1,0,69,4,bell
+07 Bells Beneath the Water,G,1,16,72,4,bell
+07 Bells Beneath the Water,G,1,32,71,5,bell
+07 Bells Beneath the Water,G,1,52,69,9,bell
+07 Bells Beneath the Water,G,2,10,57,5,soft
+07 Bells Beneath the Water,G,2,32,60,5,soft
+07 Bells Beneath the Water,H,1,0,62,4,bell
+07 Bells Beneath the Water,H,1,16,65,4,bell
+07 Bells Beneath the Water,H,1,32,64,4,bell
+07 Bells Beneath the Water,H,1,48,62,6,bell
+07 Bells Beneath the Water,H,2,10,57,5,soft
+07 Bells Beneath the Water,H,2,32,60,5,soft
+07 Bells Beneath the Water,H,2,54,57,4,soft
+07 Bells Beneath the Water,H,3,12,62,2,soft_pluck
+07 Bells Beneath the Water,H,3,44,62,3,soft_pluck
+08 The Bellkeeper,A,1,0,62,4,western_fiddle
+08 The Bellkeeper,A,1,16,63,3,western_fiddle
+08 The Bellkeeper,A,1,36,69,5,western_fiddle
+08 The Bellkeeper,A,1,54,62,5,western_fiddle
+08 The Bellkeeper,A,2,6,69,2,bell
+08 The Bellkeeper,A,2,22,74,2,bell
+08 The Bellkeeper,B,1,0,62,4,western_fiddle
+08 The Bellkeeper,B,1,10,63,2,western_fiddle
+08 The Bellkeeper,B,1,16,69,3,western_fiddle
+08 The Bellkeeper,B,1,24,64,4,western_fiddle
+08 The Bellkeeper,B,1,34,62,3,western_fiddle
+08 The Bellkeeper,B,1,42,57,3,western_fiddle
+08 The Bellkeeper,B,1,50,60,3,western_fiddle
+08 The Bellkeeper,B,1,58,62,4,western_fiddle
+08 The Bellkeeper,B,2,6,69,2,bell
+08 The Bellkeeper,B,2,22,74,2,bell
+08 The Bellkeeper,B,2,38,72,2,bell
+08 The Bellkeeper,B,2,54,69,2,bell
+08 The Bellkeeper,B,3,12,62,2,soft
+08 The Bellkeeper,C,1,0,57,3,western_fiddle
+08 The Bellkeeper,C,1,8,60,3,western_fiddle
+08 The Bellkeeper,C,1,18,62,4,western_fiddle
+08 The Bellkeeper,C,1,28,64,3,western_fiddle
+08 The Bellkeeper,C,1,36,62,4,western_fiddle
+08 The Bellkeeper,C,1,46,60,3,western_fiddle
+08 The Bellkeeper,C,1,54,57,6,western_fiddle
+08 The Bellkeeper,C,2,8,69,2,bell
+08 The Bellkeeper,C,2,24,74,2,bell
+08 The Bellkeeper,C,2,40,72,2,bell
+08 The Bellkeeper,C,2,56,69,2,bell
+08 The Bellkeeper,D,1,0,74,4,western_fiddle
+08 The Bellkeeper,D,1,8,76,3,western_fiddle
+08 The Bellkeeper,D,1,16,77,4,western_fiddle
+08 The Bellkeeper,D,1,28,76,3,western_fiddle
+08 The Bellkeeper,D,1,36,74,4,western_fiddle
+08 The Bellkeeper,D,1,46,72,3,western_fiddle
+08 The Bellkeeper,D,1,54,69,6,western_fiddle
+08 The Bellkeeper,D,2,6,69,2,bell
+08 The Bellkeeper,D,2,22,74,2,bell
+08 The Bellkeeper,D,2,38,72,2,bell
+08 The Bellkeeper,D,2,54,69,2,bell
+08 The Bellkeeper,D,3,12,74,2,soft
+08 The Bellkeeper,E,1,0,62,2,western_fiddle
+08 The Bellkeeper,E,1,4,63,2,western_fiddle
+08 The Bellkeeper,E,1,10,69,2,western_fiddle
+08 The Bellkeeper,E,1,16,64,3,western_fiddle
+08 The Bellkeeper,E,1,24,62,2,western_fiddle
+08 The Bellkeeper,E,1,28,65,2,western_fiddle
+08 The Bellkeeper,E,1,34,67,3,western_fiddle
+08 The Bellkeeper,E,1,42,65,2,western_fiddle
+08 The Bellkeeper,E,1,48,64,3,western_fiddle
+08 The Bellkeeper,E,1,56,62,4,western_fiddle
+08 The Bellkeeper,E,2,8,69,2,bell
+08 The Bellkeeper,E,2,24,74,2,bell
+08 The Bellkeeper,E,2,40,72,2,bell
+08 The Bellkeeper,E,2,56,69,2,bell
+08 The Bellkeeper,E,3,0,52,3,soft
+08 The Bellkeeper,E,3,32,59,3,soft
+08 The Bellkeeper,F,1,0,64,4,western_fiddle
+08 The Bellkeeper,F,1,16,69,6,western_fiddle
+08 The Bellkeeper,F,2,6,69,2,bell
+08 The Bellkeeper,F,2,22,74,2,bell
+08 The Bellkeeper,G,1,0,69,4,western_fiddle
+08 The Bellkeeper,G,1,12,72,4,western_fiddle
+08 The Bellkeeper,G,1,28,71,5,western_fiddle
+08 The Bellkeeper,G,1,48,69,10,western_fiddle
+08 The Bellkeeper,G,2,6,69,2,bell
+08 The Bellkeeper,G,2,22,74,2,bell
+08 The Bellkeeper,H,1,0,69,4,western_fiddle
+08 The Bellkeeper,H,1,12,74,4,western_fiddle
+08 The Bellkeeper,H,1,24,76,4,western_fiddle
+08 The Bellkeeper,H,1,40,74,5,western_fiddle
+08 The Bellkeeper,H,1,54,69,6,western_fiddle
+08 The Bellkeeper,H,2,6,69,2,bell
+08 The Bellkeeper,H,2,22,74,2,bell
+08 The Bellkeeper,H,2,38,72,2,bell
+08 The Bellkeeper,H,2,54,69,2,bell
+08 The Bellkeeper,H,3,12,69,2,soft
+08 The Bellkeeper,H,3,44,69,3,soft
+09 The King's Account,A,1,0,62,4,soft_pluck
+09 The King's Account,A,1,16,62,3,soft_pluck
+09 The King's Account,A,1,36,63,5,soft_pluck
+09 The King's Account,A,1,54,62,5,soft_pluck
+09 The King's Account,A,2,10,50,3,mellow_vibes
+09 The King's Account,A,2,26,57,3,mellow_vibes
+09 The King's Account,B,1,0,62,2,soft_pluck
+09 The King's Account,B,1,6,62,2,soft_pluck
+09 The King's Account,B,1,14,63,2,soft_pluck
+09 The King's Account,B,1,22,69,2,soft_pluck
+09 The King's Account,B,1,28,64,3,soft_pluck
+09 The King's Account,B,1,36,62,2,soft_pluck
+09 The King's Account,B,1,42,65,2,soft_pluck
+09 The King's Account,B,1,50,64,3,soft_pluck
+09 The King's Account,B,1,58,62,3,soft_pluck
+09 The King's Account,B,2,10,50,3,mellow_vibes
+09 The King's Account,B,2,26,57,3,mellow_vibes
+09 The King's Account,B,2,44,53,3,mellow_vibes
+09 The King's Account,B,2,60,52,2,mellow_vibes
+09 The King's Account,B,3,12,62,2,soft
+09 The King's Account,C,1,2,57,2,soft_pluck
+09 The King's Account,C,1,8,62,2,soft_pluck
+09 The King's Account,C,1,16,60,3,soft_pluck
+09 The King's Account,C,1,26,65,2,soft_pluck
+09 The King's Account,C,1,32,67,3,soft_pluck
+09 The King's Account,C,1,42,65,2,soft_pluck
+09 The King's Account,C,1,48,64,3,soft_pluck
+09 The King's Account,C,1,58,57,3,soft_pluck
+09 The King's Account,C,2,12,50,3,mellow_vibes
+09 The King's Account,C,2,28,57,3,mellow_vibes
+09 The King's Account,C,2,46,53,3,mellow_vibes
+09 The King's Account,C,2,62,52,2,mellow_vibes
+09 The King's Account,D,1,0,62,2,soft_pluck
+09 The King's Account,D,1,6,63,2,soft_pluck
+09 The King's Account,D,1,12,62,2,soft_pluck
+09 The King's Account,D,1,18,69,2,soft_pluck
+09 The King's Account,D,1,26,68,2,soft_pluck
+09 The King's Account,D,1,32,64,2,soft_pluck
+09 The King's Account,D,1,40,65,2,soft_pluck
+09 The King's Account,D,1,46,64,2,soft_pluck
+09 The King's Account,D,1,54,62,3,soft_pluck
+09 The King's Account,D,1,60,57,2,soft_pluck
+09 The King's Account,D,2,10,50,3,mellow_vibes
+09 The King's Account,D,2,26,57,3,mellow_vibes
+09 The King's Account,D,2,44,53,3,mellow_vibes
+09 The King's Account,D,2,60,52,2,mellow_vibes
+09 The King's Account,D,3,12,62,2,soft
+09 The King's Account,E,1,0,69,6,soft_pluck
+09 The King's Account,E,1,20,70,5,soft_pluck
+09 The King's Account,E,1,40,69,6,soft_pluck
+09 The King's Account,E,1,56,64,5,soft_pluck
+09 The King's Account,E,2,12,62,3,mellow_vibes
+09 The King's Account,E,2,28,69,3,mellow_vibes
+09 The King's Account,E,2,46,65,3,mellow_vibes
+09 The King's Account,E,2,62,64,2,mellow_vibes
+09 The King's Account,F,1,0,69,4,soft_pluck
+09 The King's Account,F,1,16,62,6,soft_pluck
+09 The King's Account,F,2,10,50,3,mellow_vibes
+09 The King's Account,F,2,26,57,3,mellow_vibes
+09 The King's Account,G,1,0,62,4,soft_pluck
+09 The King's Account,G,1,16,65,4,soft_pluck
+09 The King's Account,G,1,32,64,5,soft_pluck
+09 The King's Account,G,1,52,62,9,soft_pluck
+09 The King's Account,G,2,10,50,3,mellow_vibes
+09 The King's Account,G,2,26,57,3,mellow_vibes
+09 The King's Account,H,1,4,62,4,soft_pluck
+09 The King's Account,H,1,18,65,4,soft_pluck
+09 The King's Account,H,1,30,69,4,soft_pluck
+09 The King's Account,H,1,46,67,3,soft_pluck
+09 The King's Account,H,1,56,64,5,soft_pluck
+09 The King's Account,H,2,10,50,3,mellow_vibes
+09 The King's Account,H,2,26,57,3,mellow_vibes
+09 The King's Account,H,2,44,53,3,mellow_vibes
+09 The King's Account,H,2,60,52,2,mellow_vibes
+09 The King's Account,H,3,12,62,2,soft
+09 The King's Account,H,3,44,64,3,soft
+10 Master of Coin,A,1,0,62,4,soft_pluck
+10 Master of Coin,A,1,16,63,3,soft_pluck
+10 Master of Coin,A,1,36,69,5,soft_pluck
+10 Master of Coin,A,1,54,64,5,soft_pluck
+10 Master of Coin,A,2,6,52,2,western_fiddle
+10 Master of Coin,A,2,22,59,2,western_fiddle
+10 Master of Coin,B,1,0,62,2,soft_pluck
+10 Master of Coin,B,1,4,63,2,soft_pluck
+10 Master of Coin,B,1,10,69,2,soft_pluck
+10 Master of Coin,B,1,16,64,2,soft_pluck
+10 Master of Coin,B,1,22,62,2,soft_pluck
+10 Master of Coin,B,1,28,62,2,soft_pluck
+10 Master of Coin,B,1,34,65,2,soft_pluck
+10 Master of Coin,B,1,40,64,2,soft_pluck
+10 Master of Coin,B,1,48,62,3,soft_pluck
+10 Master of Coin,B,1,58,64,3,soft_pluck
+10 Master of Coin,B,2,6,52,2,western_fiddle
+10 Master of Coin,B,2,22,59,2,western_fiddle
+10 Master of Coin,B,2,38,55,3,western_fiddle
+10 Master of Coin,B,2,54,54,2,western_fiddle
+10 Master of Coin,B,3,12,62,2,muted_trumpet
+10 Master of Coin,C,1,0,64,3,soft_pluck
+10 Master of Coin,C,1,8,67,2,soft_pluck
+10 Master of Coin,C,1,14,66,2,soft_pluck
+10 Master of Coin,C,1,22,64,3,soft_pluck
+10 Master of Coin,C,1,30,62,2,soft_pluck
+10 Master of Coin,C,1,36,59,3,soft_pluck
+10 Master of Coin,C,1,46,62,2,soft_pluck
+10 Master of Coin,C,1,54,64,5,soft_pluck
+10 Master of Coin,C,2,8,52,2,western_fiddle
+10 Master of Coin,C,2,24,59,2,western_fiddle
+10 Master of Coin,C,2,40,55,3,western_fiddle
+10 Master of Coin,C,2,56,54,2,western_fiddle
+10 Master of Coin,D,1,0,71,4,soft_pluck
+10 Master of Coin,D,1,8,74,3,soft_pluck
+10 Master of Coin,D,1,16,76,4,soft_pluck
+10 Master of Coin,D,1,28,74,3,soft_pluck
+10 Master of Coin,D,1,36,71,4,soft_pluck
+10 Master of Coin,D,1,46,69,3,soft_pluck
+10 Master of Coin,D,1,56,67,5,soft_pluck
+10 Master of Coin,D,2,6,52,2,western_fiddle
+10 Master of Coin,D,2,22,59,2,western_fiddle
+10 Master of Coin,D,2,38,55,3,western_fiddle
+10 Master of Coin,D,2,54,54,2,western_fiddle
+10 Master of Coin,D,3,12,71,2,muted_trumpet
+10 Master of Coin,E,1,0,64,2,soft_pluck
+10 Master of Coin,E,1,4,62,2,soft_pluck
+10 Master of Coin,E,1,8,63,2,soft_pluck
+10 Master of Coin,E,1,14,69,2,soft_pluck
+10 Master of Coin,E,1,20,68,2,soft_pluck
+10 Master of Coin,E,1,26,64,2,soft_pluck
+10 Master of Coin,E,1,32,67,3,soft_pluck
+10 Master of Coin,E,1,40,66,2,soft_pluck
+10 Master of Coin,E,1,46,64,2,soft_pluck
+10 Master of Coin,E,1,52,63,2,soft_pluck
+10 Master of Coin,E,1,58,62,4,soft_pluck
+10 Master of Coin,E,2,8,64,2,western_fiddle
+10 Master of Coin,E,2,24,71,2,western_fiddle
+10 Master of Coin,E,2,40,67,3,western_fiddle
+10 Master of Coin,E,2,56,66,2,western_fiddle
+10 Master of Coin,E,3,0,52,3,muted_trumpet
+10 Master of Coin,E,3,32,59,3,muted_trumpet
+10 Master of Coin,F,1,0,71,4,soft_pluck
+10 Master of Coin,F,1,16,64,6,soft_pluck
+10 Master of Coin,F,2,6,52,2,western_fiddle
+10 Master of Coin,F,2,22,59,2,western_fiddle
+10 Master of Coin,G,1,0,71,4,soft_pluck
+10 Master of Coin,G,1,12,67,4,soft_pluck
+10 Master of Coin,G,1,28,66,5,soft_pluck
+10 Master of Coin,G,1,48,64,10,soft_pluck
+10 Master of Coin,G,2,6,52,2,western_fiddle
+10 Master of Coin,G,2,22,59,2,western_fiddle
+10 Master of Coin,H,1,0,64,4,soft_pluck
+10 Master of Coin,H,1,12,67,3,soft_pluck
+10 Master of Coin,H,1,24,71,4,soft_pluck
+10 Master of Coin,H,1,40,69,4,soft_pluck
+10 Master of Coin,H,1,54,64,6,soft_pluck
+10 Master of Coin,H,2,6,52,2,western_fiddle
+10 Master of Coin,H,2,22,59,2,western_fiddle
+10 Master of Coin,H,2,38,55,3,western_fiddle
+10 Master of Coin,H,2,54,54,2,western_fiddle
+10 Master of Coin,H,3,12,64,2,muted_trumpet
+10 Master of Coin,H,3,44,64,3,muted_trumpet
+11 A Garden Behind Glass,A,1,0,74,4,soft_pluck
+11 A Garden Behind Glass,A,1,16,75,3,soft_pluck
+11 A Garden Behind Glass,A,1,36,81,5,soft_pluck
+11 A Garden Behind Glass,A,1,54,74,5,soft_pluck
+11 A Garden Behind Glass,A,2,6,62,3,cowboy_whistle
+11 A Garden Behind Glass,A,2,22,65,4,cowboy_whistle
+11 A Garden Behind Glass,B,1,0,74,3,soft_pluck
+11 A Garden Behind Glass,B,1,8,75,2,soft_pluck
+11 A Garden Behind Glass,B,1,14,81,4,soft_pluck
+11 A Garden Behind Glass,B,1,24,76,3,soft_pluck
+11 A Garden Behind Glass,B,1,34,74,4,soft_pluck
+11 A Garden Behind Glass,B,1,44,77,3,soft_pluck
+11 A Garden Behind Glass,B,1,52,76,3,soft_pluck
+11 A Garden Behind Glass,B,1,60,74,3,soft_pluck
+11 A Garden Behind Glass,B,2,6,62,3,cowboy_whistle
+11 A Garden Behind Glass,B,2,22,65,4,cowboy_whistle
+11 A Garden Behind Glass,B,2,38,69,3,cowboy_whistle
+11 A Garden Behind Glass,B,2,54,64,4,cowboy_whistle
+11 A Garden Behind Glass,B,3,12,86,2,bell
+11 A Garden Behind Glass,C,1,2,77,3,soft_pluck
+11 A Garden Behind Glass,C,1,10,76,3,soft_pluck
+11 A Garden Behind Glass,C,1,18,74,4,soft_pluck
+11 A Garden Behind Glass,C,1,28,72,3,soft_pluck
+11 A Garden Behind Glass,C,1,36,70,4,soft_pluck
+11 A Garden Behind Glass,C,1,46,69,3,soft_pluck
+11 A Garden Behind Glass,C,1,54,65,5,soft_pluck
+11 A Garden Behind Glass,C,2,8,62,3,cowboy_whistle
+11 A Garden Behind Glass,C,2,24,65,4,cowboy_whistle
+11 A Garden Behind Glass,C,2,40,69,3,cowboy_whistle
+11 A Garden Behind Glass,C,2,56,64,4,cowboy_whistle
+11 A Garden Behind Glass,D,1,0,74,3,soft_pluck
+11 A Garden Behind Glass,D,1,8,73,2,soft_pluck
+11 A Garden Behind Glass,D,1,16,69,3,soft_pluck
+11 A Garden Behind Glass,D,1,26,70,3,soft_pluck
+11 A Garden Behind Glass,D,1,34,67,4,soft_pluck
+11 A Garden Behind Glass,D,1,44,65,3,soft_pluck
+11 A Garden Behind Glass,D,1,54,64,5,soft_pluck
+11 A Garden Behind Glass,D,2,6,62,3,cowboy_whistle
+11 A Garden Behind Glass,D,2,22,65,4,cowboy_whistle
+11 A Garden Behind Glass,D,2,38,69,3,cowboy_whistle
+11 A Garden Behind Glass,D,2,54,64,4,cowboy_whistle
+11 A Garden Behind Glass,D,3,12,86,2,bell
+11 A Garden Behind Glass,E,1,0,69,5,soft_pluck
+11 A Garden Behind Glass,E,1,16,74,4,soft_pluck
+11 A Garden Behind Glass,E,1,32,72,5,soft_pluck
+11 A Garden Behind Glass,E,1,50,70,5,soft_pluck
+11 A Garden Behind Glass,E,2,8,62,3,cowboy_whistle
+11 A Garden Behind Glass,E,2,24,65,4,cowboy_whistle
+11 A Garden Behind Glass,E,2,40,69,3,cowboy_whistle
+11 A Garden Behind Glass,E,2,56,64,4,cowboy_whistle
+11 A Garden Behind Glass,F,1,0,69,4,soft_pluck
+11 A Garden Behind Glass,F,1,16,62,6,soft_pluck
+11 A Garden Behind Glass,F,2,6,62,3,cowboy_whistle
+11 A Garden Behind Glass,F,2,22,65,4,cowboy_whistle
+11 A Garden Behind Glass,G,1,0,62,4,soft_pluck
+11 A Garden Behind Glass,G,1,16,65,4,soft_pluck
+11 A Garden Behind Glass,G,1,32,64,5,soft_pluck
+11 A Garden Behind Glass,G,1,52,62,9,soft_pluck
+11 A Garden Behind Glass,G,2,6,62,3,cowboy_whistle
+11 A Garden Behind Glass,G,2,22,65,4,cowboy_whistle
+11 A Garden Behind Glass,H,1,4,74,4,soft_pluck
+11 A Garden Behind Glass,H,1,16,77,4,soft_pluck
+11 A Garden Behind Glass,H,1,28,81,4,soft_pluck
+11 A Garden Behind Glass,H,1,42,79,3,soft_pluck
+11 A Garden Behind Glass,H,1,52,76,6,soft_pluck
+11 A Garden Behind Glass,H,2,6,62,3,cowboy_whistle
+11 A Garden Behind Glass,H,2,22,65,4,cowboy_whistle
+11 A Garden Behind Glass,H,2,38,69,3,cowboy_whistle
+11 A Garden Behind Glass,H,2,54,64,4,cowboy_whistle
+11 A Garden Behind Glass,H,3,12,86,2,bell
+11 A Garden Behind Glass,H,3,44,76,3,bell
+12 The Last Lucid Keeper,A,1,0,62,4,western_fiddle
+12 The Last Lucid Keeper,A,1,16,63,3,western_fiddle
+12 The Last Lucid Keeper,A,1,36,69,5,western_fiddle
+12 The Last Lucid Keeper,A,1,54,62,5,western_fiddle
+12 The Last Lucid Keeper,A,2,6,57,3,soft_pluck
+12 The Last Lucid Keeper,A,2,22,62,3,soft_pluck
+12 The Last Lucid Keeper,B,1,0,62,4,western_fiddle
+12 The Last Lucid Keeper,B,1,8,63,2,western_fiddle
+12 The Last Lucid Keeper,B,1,14,69,4,western_fiddle
+12 The Last Lucid Keeper,B,1,24,64,3,western_fiddle
+12 The Last Lucid Keeper,B,1,32,62,4,western_fiddle
+12 The Last Lucid Keeper,B,1,42,65,3,western_fiddle
+12 The Last Lucid Keeper,B,1,50,64,3,western_fiddle
+12 The Last Lucid Keeper,B,1,58,62,4,western_fiddle
+12 The Last Lucid Keeper,B,2,6,57,3,soft_pluck
+12 The Last Lucid Keeper,B,2,22,62,3,soft_pluck
+12 The Last Lucid Keeper,B,2,38,58,3,soft_pluck
+12 The Last Lucid Keeper,B,2,54,57,3,soft_pluck
+12 The Last Lucid Keeper,B,3,12,62,2,soft
+12 The Last Lucid Keeper,C,1,0,69,3,western_fiddle
+12 The Last Lucid Keeper,C,1,8,67,3,western_fiddle
+12 The Last Lucid Keeper,C,1,16,65,4,western_fiddle
+12 The Last Lucid Keeper,C,1,26,64,3,western_fiddle
+12 The Last Lucid Keeper,C,1,34,62,4,western_fiddle
+12 The Last Lucid Keeper,C,1,44,60,3,western_fiddle
+12 The Last Lucid Keeper,C,1,54,57,5,western_fiddle
+12 The Last Lucid Keeper,C,2,8,57,3,soft_pluck
+12 The Last Lucid Keeper,C,2,24,62,3,soft_pluck
+12 The Last Lucid Keeper,C,2,40,58,3,soft_pluck
+12 The Last Lucid Keeper,C,2,56,57,3,soft_pluck
+12 The Last Lucid Keeper,D,1,0,74,4,western_fiddle
+12 The Last Lucid Keeper,D,1,10,72,3,western_fiddle
+12 The Last Lucid Keeper,D,1,20,69,4,western_fiddle
+12 The Last Lucid Keeper,D,1,32,67,3,western_fiddle
+12 The Last Lucid Keeper,D,1,40,65,4,western_fiddle
+12 The Last Lucid Keeper,D,1,50,64,3,western_fiddle
+12 The Last Lucid Keeper,D,1,58,62,4,western_fiddle
+12 The Last Lucid Keeper,D,2,6,57,3,soft_pluck
+12 The Last Lucid Keeper,D,2,22,62,3,soft_pluck
+12 The Last Lucid Keeper,D,2,38,58,3,soft_pluck
+12 The Last Lucid Keeper,D,2,54,57,3,soft_pluck
+12 The Last Lucid Keeper,D,3,12,74,2,soft
+12 The Last Lucid Keeper,E,1,0,62,2,western_fiddle
+12 The Last Lucid Keeper,E,1,6,63,2,western_fiddle
+12 The Last Lucid Keeper,E,1,12,69,3,western_fiddle
+12 The Last Lucid Keeper,E,1,20,64,3,western_fiddle
+12 The Last Lucid Keeper,E,1,28,62,3,western_fiddle
+12 The Last Lucid Keeper,E,1,36,67,3,western_fiddle
+12 The Last Lucid Keeper,E,1,44,65,3,western_fiddle
+12 The Last Lucid Keeper,E,1,52,64,3,western_fiddle
+12 The Last Lucid Keeper,E,1,60,62,2,western_fiddle
+12 The Last Lucid Keeper,E,2,8,69,3,soft_pluck
+12 The Last Lucid Keeper,E,2,24,62,3,soft_pluck
+12 The Last Lucid Keeper,E,2,40,70,3,soft_pluck
+12 The Last Lucid Keeper,E,2,56,69,3,soft_pluck
+12 The Last Lucid Keeper,E,3,0,50,3,soft
+12 The Last Lucid Keeper,E,3,32,57,3,soft
+12 The Last Lucid Keeper,F,1,0,69,4,western_fiddle
+12 The Last Lucid Keeper,F,1,16,62,6,western_fiddle
+12 The Last Lucid Keeper,F,2,6,57,3,soft_pluck
+12 The Last Lucid Keeper,F,2,22,62,3,soft_pluck
+12 The Last Lucid Keeper,G,1,4,62,4,western_fiddle
+12 The Last Lucid Keeper,G,1,20,63,3,western_fiddle
+12 The Last Lucid Keeper,G,1,40,64,7,western_fiddle
+12 The Last Lucid Keeper,G,2,6,57,3,soft_pluck
+12 The Last Lucid Keeper,G,2,22,62,3,soft_pluck
+12 The Last Lucid Keeper,H,1,4,62,5,western_fiddle
+12 The Last Lucid Keeper,H,1,18,63,3,western_fiddle
+12 The Last Lucid Keeper,H,1,30,69,4,western_fiddle
+12 The Last Lucid Keeper,H,1,46,64,5,western_fiddle
+12 The Last Lucid Keeper,H,2,6,57,3,soft_pluck
+12 The Last Lucid Keeper,H,2,22,62,3,soft_pluck
+12 The Last Lucid Keeper,H,2,38,58,3,soft_pluck
+12 The Last Lucid Keeper,H,2,54,57,3,soft_pluck
+12 The Last Lucid Keeper,H,3,12,62,2,soft
+12 The Last Lucid Keeper,H,3,44,64,3,soft
+13 All That Was Carried Home,A,1,0,62,4,cowboy_whistle
+13 All That Was Carried Home,A,1,16,63,3,cowboy_whistle
+13 All That Was Carried Home,A,1,36,69,5,cowboy_whistle
+13 All That Was Carried Home,A,1,54,64,5,cowboy_whistle
+13 All That Was Carried Home,A,2,6,74,3,soft_pluck
+13 All That Was Carried Home,A,2,22,77,3,soft_pluck
+13 All That Was Carried Home,B,1,0,62,4,cowboy_whistle
+13 All That Was Carried Home,B,1,10,63,2,cowboy_whistle
+13 All That Was Carried Home,B,1,16,69,5,cowboy_whistle
+13 All That Was Carried Home,B,1,28,64,4,cowboy_whistle
+13 All That Was Carried Home,B,1,40,62,4,cowboy_whistle
+13 All That Was Carried Home,B,1,50,65,4,cowboy_whistle
+13 All That Was Carried Home,B,1,60,64,3,cowboy_whistle
+13 All That Was Carried Home,B,2,6,74,3,soft_pluck
+13 All That Was Carried Home,B,2,22,77,3,soft_pluck
+13 All That Was Carried Home,B,2,38,76,3,soft_pluck
+13 All That Was Carried Home,B,2,54,74,3,soft_pluck
+13 All That Was Carried Home,B,3,12,62,2,mellow_vibes
+13 All That Was Carried Home,C,1,2,70,4,cowboy_whistle
+13 All That Was Carried Home,C,1,14,69,3,cowboy_whistle
+13 All That Was Carried Home,C,1,24,65,5,cowboy_whistle
+13 All That Was Carried Home,C,1,38,67,4,cowboy_whistle
+13 All That Was Carried Home,C,1,50,64,5,cowboy_whistle
+13 All That Was Carried Home,C,2,8,74,3,soft_pluck
+13 All That Was Carried Home,C,2,24,77,3,soft_pluck
+13 All That Was Carried Home,C,2,40,76,3,soft_pluck
+13 All That Was Carried Home,C,2,56,74,3,soft_pluck
+13 All That Was Carried Home,D,1,0,62,3,cowboy_whistle
+13 All That Was Carried Home,D,1,8,63,3,cowboy_whistle
+13 All That Was Carried Home,D,1,20,69,4,cowboy_whistle
+13 All That Was Carried Home,D,1,34,68,4,cowboy_whistle
+13 All That Was Carried Home,D,1,46,64,4,cowboy_whistle
+13 All That Was Carried Home,D,1,58,63,3,cowboy_whistle
+13 All That Was Carried Home,D,2,6,74,3,soft_pluck
+13 All That Was Carried Home,D,2,22,77,3,soft_pluck
+13 All That Was Carried Home,D,2,38,76,3,soft_pluck
+13 All That Was Carried Home,D,2,54,74,3,soft_pluck
+13 All That Was Carried Home,D,3,12,62,2,mellow_vibes
+13 All That Was Carried Home,E,1,4,69,6,cowboy_whistle
+13 All That Was Carried Home,E,1,24,70,5,cowboy_whistle
+13 All That Was Carried Home,E,1,44,69,6,cowboy_whistle
+13 All That Was Carried Home,E,2,8,74,3,soft_pluck
+13 All That Was Carried Home,E,2,24,77,3,soft_pluck
+13 All That Was Carried Home,E,2,40,76,3,soft_pluck
+13 All That Was Carried Home,E,2,56,74,3,soft_pluck
+13 All That Was Carried Home,F,1,0,69,4,cowboy_whistle
+13 All That Was Carried Home,F,1,16,62,6,cowboy_whistle
+13 All That Was Carried Home,F,2,6,74,3,soft_pluck
+13 All That Was Carried Home,F,2,22,77,3,soft_pluck
+13 All That Was Carried Home,G,1,0,62,4,cowboy_whistle
+13 All That Was Carried Home,G,1,12,63,3,cowboy_whistle
+13 All That Was Carried Home,G,1,28,69,4,cowboy_whistle
+13 All That Was Carried Home,G,1,44,68,5,cowboy_whistle
+13 All That Was Carried Home,G,1,58,64,4,cowboy_whistle
+13 All That Was Carried Home,G,2,6,74,3,soft_pluck
+13 All That Was Carried Home,G,2,22,77,3,soft_pluck
+13 All That Was Carried Home,H,1,0,74,4,cowboy_whistle
+13 All That Was Carried Home,H,1,12,76,4,cowboy_whistle
+13 All That Was Carried Home,H,1,24,78,4,cowboy_whistle
+13 All That Was Carried Home,H,1,38,81,5,cowboy_whistle
+13 All That Was Carried Home,H,1,52,78,6,cowboy_whistle
+13 All That Was Carried Home,H,2,6,74,3,soft_pluck
+13 All That Was Carried Home,H,2,22,77,3,soft_pluck
+13 All That Was Carried Home,H,2,38,76,3,soft_pluck
+13 All That Was Carried Home,H,2,54,74,3,soft_pluck
+13 All That Was Carried Home,H,3,12,74,2,mellow_vibes
+13 All That Was Carried Home,H,3,44,78,3,mellow_vibes
+14 What the Dark Releases,A,1,0,62,4,western_fiddle
+14 What the Dark Releases,A,1,16,63,3,western_fiddle
+14 What the Dark Releases,A,1,36,69,5,western_fiddle
+14 What the Dark Releases,A,1,54,62,5,western_fiddle
+14 What the Dark Releases,A,2,6,50,3,soft_pluck
+14 What the Dark Releases,A,2,22,58,3,soft_pluck
+14 What the Dark Releases,B,1,0,62,2,western_fiddle
+14 What the Dark Releases,B,1,4,63,2,western_fiddle
+14 What the Dark Releases,B,1,10,69,3,western_fiddle
+14 What the Dark Releases,B,1,18,64,2,western_fiddle
+14 What the Dark Releases,B,1,24,62,3,western_fiddle
+14 What the Dark Releases,B,1,32,65,2,western_fiddle
+14 What the Dark Releases,B,1,38,64,2,western_fiddle
+14 What the Dark Releases,B,1,44,67,3,western_fiddle
+14 What the Dark Releases,B,1,52,64,2,western_fiddle
+14 What the Dark Releases,B,1,58,62,4,western_fiddle
+14 What the Dark Releases,B,2,6,50,3,soft_pluck
+14 What the Dark Releases,B,2,22,58,3,soft_pluck
+14 What the Dark Releases,B,2,38,55,3,soft_pluck
+14 What the Dark Releases,B,2,54,57,3,soft_pluck
+14 What the Dark Releases,B,3,12,62,2,muted_trumpet
+14 What the Dark Releases,C,1,0,74,3,western_fiddle
+14 What the Dark Releases,C,1,8,75,2,western_fiddle
+14 What the Dark Releases,C,1,14,81,3,western_fiddle
+14 What the Dark Releases,C,1,22,76,3,western_fiddle
+14 What the Dark Releases,C,1,30,74,3,western_fiddle
+14 What the Dark Releases,C,1,38,77,2,western_fiddle
+14 What the Dark Releases,C,1,44,76,3,western_fiddle
+14 What the Dark Releases,C,1,52,75,2,western_fiddle
+14 What the Dark Releases,C,1,58,74,4,western_fiddle
+14 What the Dark Releases,C,2,8,50,3,soft_pluck
+14 What the Dark Releases,C,2,24,58,3,soft_pluck
+14 What the Dark Releases,C,2,40,55,3,soft_pluck
+14 What the Dark Releases,C,2,56,57,3,soft_pluck
+14 What the Dark Releases,D,1,0,67,3,western_fiddle
+14 What the Dark Releases,D,1,6,69,3,western_fiddle
+14 What the Dark Releases,D,1,12,71,3,western_fiddle
+14 What the Dark Releases,D,1,20,69,4,western_fiddle
+14 What the Dark Releases,D,1,28,67,3,western_fiddle
+14 What the Dark Releases,D,1,36,66,3,western_fiddle
+14 What the Dark Releases,D,1,42,64,3,western_fiddle
+14 What the Dark Releases,D,1,50,62,6,western_fiddle
+14 What the Dark Releases,D,2,6,50,3,soft_pluck
+14 What the Dark Releases,D,2,22,58,3,soft_pluck
+14 What the Dark Releases,D,2,38,55,3,soft_pluck
+14 What the Dark Releases,D,2,54,57,3,soft_pluck
+14 What the Dark Releases,D,3,12,67,2,muted_trumpet
+14 What the Dark Releases,E,1,0,62,2,western_fiddle
+14 What the Dark Releases,E,1,4,63,2,western_fiddle
+14 What the Dark Releases,E,1,8,69,2,western_fiddle
+14 What the Dark Releases,E,1,14,64,2,western_fiddle
+14 What the Dark Releases,E,1,20,62,2,western_fiddle
+14 What the Dark Releases,E,1,26,65,2,western_fiddle
+14 What the Dark Releases,E,1,32,67,3,western_fiddle
+14 What the Dark Releases,E,1,40,69,3,western_fiddle
+14 What the Dark Releases,E,1,48,70,2,western_fiddle
+14 What the Dark Releases,E,1,54,69,2,western_fiddle
+14 What the Dark Releases,E,1,60,62,2,western_fiddle
+14 What the Dark Releases,E,2,8,62,3,soft_pluck
+14 What the Dark Releases,E,2,24,70,3,soft_pluck
+14 What the Dark Releases,E,2,40,67,3,soft_pluck
+14 What the Dark Releases,E,2,56,69,3,soft_pluck
+14 What the Dark Releases,E,3,0,50,3,muted_trumpet
+14 What the Dark Releases,E,3,32,57,3,muted_trumpet
+14 What the Dark Releases,F,1,0,69,4,western_fiddle
+14 What the Dark Releases,F,1,16,62,6,western_fiddle
+14 What the Dark Releases,F,2,6,50,3,soft_pluck
+14 What the Dark Releases,F,2,22,58,3,soft_pluck
+14 What the Dark Releases,G,1,0,69,4,western_fiddle
+14 What the Dark Releases,G,1,12,65,4,western_fiddle
+14 What the Dark Releases,G,1,28,64,5,western_fiddle
+14 What the Dark Releases,G,1,48,62,10,western_fiddle
+14 What the Dark Releases,G,2,6,50,3,soft_pluck
+14 What the Dark Releases,G,2,22,58,3,soft_pluck
+14 What the Dark Releases,H,1,0,62,5,western_fiddle
+14 What the Dark Releases,H,1,12,66,4,western_fiddle
+14 What the Dark Releases,H,1,24,69,5,western_fiddle
+14 What the Dark Releases,H,1,40,71,4,western_fiddle
+14 What the Dark Releases,H,1,52,69,6,western_fiddle
+14 What the Dark Releases,H,2,6,50,3,soft_pluck
+14 What the Dark Releases,H,2,22,58,3,soft_pluck
+14 What the Dark Releases,H,2,38,55,3,soft_pluck
+14 What the Dark Releases,H,2,54,57,3,soft_pluck
+14 What the Dark Releases,H,3,12,62,2,muted_trumpet
+14 What the Dark Releases,H,3,44,69,3,muted_trumpet
+15 Enough to Come Home,A,1,0,62,4,cowboy_whistle
+15 Enough to Come Home,A,1,16,66,3,cowboy_whistle
+15 Enough to Come Home,A,1,36,69,5,cowboy_whistle
+15 Enough to Come Home,A,1,54,62,5,cowboy_whistle
+15 Enough to Come Home,A,2,6,57,3,soft_pluck
+15 Enough to Come Home,A,2,22,62,3,soft_pluck
+15 Enough to Come Home,B,1,0,62,4,cowboy_whistle
+15 Enough to Come Home,B,1,8,66,3,cowboy_whistle
+15 Enough to Come Home,B,1,14,69,2,cowboy_whistle
+15 Enough to Come Home,B,1,20,71,4,cowboy_whistle
+15 Enough to Come Home,B,1,28,69,3,cowboy_whistle
+15 Enough to Come Home,B,1,34,67,3,cowboy_whistle
+15 Enough to Come Home,B,1,40,66,4,cowboy_whistle
+15 Enough to Come Home,B,1,48,64,3,cowboy_whistle
+15 Enough to Come Home,B,1,54,62,6,cowboy_whistle
+15 Enough to Come Home,B,2,6,57,3,soft_pluck
+15 Enough to Come Home,B,2,22,62,3,soft_pluck
+15 Enough to Come Home,B,2,38,57,3,soft_pluck
+15 Enough to Come Home,B,2,54,62,3,soft_pluck
+15 Enough to Come Home,B,3,12,62,2,western_fiddle
+15 Enough to Come Home,C,1,0,67,3,cowboy_whistle
+15 Enough to Come Home,C,1,8,69,3,cowboy_whistle
+15 Enough to Come Home,C,1,14,71,2,cowboy_whistle
+15 Enough to Come Home,C,1,22,74,4,cowboy_whistle
+15 Enough to Come Home,C,1,32,73,3,cowboy_whistle
+15 Enough to Come Home,C,1,40,71,3,cowboy_whistle
+15 Enough to Come Home,C,1,48,69,4,cowboy_whistle
+15 Enough to Come Home,C,1,58,66,4,cowboy_whistle
+15 Enough to Come Home,C,2,8,57,3,soft_pluck
+15 Enough to Come Home,C,2,24,64,3,soft_pluck
+15 Enough to Come Home,C,2,40,57,3,soft_pluck
+15 Enough to Come Home,C,2,56,64,3,soft_pluck
+15 Enough to Come Home,D,1,0,62,4,cowboy_whistle
+15 Enough to Come Home,D,1,10,63,2,cowboy_whistle
+15 Enough to Come Home,D,1,18,69,4,cowboy_whistle
+15 Enough to Come Home,D,1,30,64,4,cowboy_whistle
+15 Enough to Come Home,D,1,42,62,4,cowboy_whistle
+15 Enough to Come Home,D,1,54,66,6,cowboy_whistle
+15 Enough to Come Home,D,2,6,57,3,soft_pluck
+15 Enough to Come Home,D,2,22,62,3,soft_pluck
+15 Enough to Come Home,D,2,38,57,3,soft_pluck
+15 Enough to Come Home,D,2,54,62,3,soft_pluck
+15 Enough to Come Home,D,3,12,62,2,western_fiddle
+15 Enough to Come Home,E,1,0,69,4,cowboy_whistle
+15 Enough to Come Home,E,1,8,74,4,cowboy_whistle
+15 Enough to Come Home,E,1,20,76,3,cowboy_whistle
+15 Enough to Come Home,E,1,28,78,4,cowboy_whistle
+15 Enough to Come Home,E,1,40,78,3,cowboy_whistle
+15 Enough to Come Home,E,1,50,81,5,cowboy_whistle
+15 Enough to Come Home,E,2,8,69,3,soft_pluck
+15 Enough to Come Home,E,2,24,62,3,soft_pluck
+15 Enough to Come Home,E,2,40,69,3,soft_pluck
+15 Enough to Come Home,E,2,56,62,3,soft_pluck
+15 Enough to Come Home,F,1,0,69,4,cowboy_whistle
+15 Enough to Come Home,F,1,16,62,6,cowboy_whistle
+15 Enough to Come Home,F,2,6,57,3,soft_pluck
+15 Enough to Come Home,F,2,22,62,3,soft_pluck
+15 Enough to Come Home,G,1,0,67,5,cowboy_whistle
+15 Enough to Come Home,G,1,16,69,5,cowboy_whistle
+15 Enough to Come Home,G,1,32,66,5,cowboy_whistle
+15 Enough to Come Home,G,1,44,64,4,cowboy_whistle
+15 Enough to Come Home,G,1,52,62,11,cowboy_whistle
+15 Enough to Come Home,G,2,6,57,3,soft_pluck
+15 Enough to Come Home,G,2,22,62,3,soft_pluck
+15 Enough to Come Home,H,1,0,67,4,cowboy_whistle
+15 Enough to Come Home,H,1,12,69,4,cowboy_whistle
+15 Enough to Come Home,H,1,24,66,5,cowboy_whistle
+15 Enough to Come Home,H,1,40,64,4,cowboy_whistle
+15 Enough to Come Home,H,1,52,62,9,cowboy_whistle
+15 Enough to Come Home,H,2,6,57,3,soft_pluck
+15 Enough to Come Home,H,2,22,62,3,soft_pluck
+15 Enough to Come Home,H,2,38,57,3,soft_pluck
+15 Enough to Come Home,H,2,54,62,3,soft_pluck
+15 Enough to Come Home,H,3,12,67,2,western_fiddle
+15 Enough to Come Home,H,3,44,62,3,western_fiddle

@@ -1,0 +1,1040 @@
+{
+  "basis": "Exact pinned app JavaScript evaluated in Node VM with DOM mocks; UI render, audio volumes and FX functions stubbed, not browser/audio validation",
+  "results": [
+    {
+      "file": "scores/01-what-the-dark-keeps.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "scores/02-tomb.json",
+      "ok": true,
+      "differences": [
+        {
+          "field": "melodyOctavesA",
+          "before": [
+            -2,
+            -1,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesB",
+          "before": [
+            -2,
+            -1,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesC",
+          "before": [
+            -2,
+            -1,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesD",
+          "before": [
+            -2,
+            -1,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesE",
+          "before": [
+            -2,
+            -1,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesF",
+          "before": [
+            -2,
+            -1,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesG",
+          "before": [
+            -2,
+            -1,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesH",
+          "before": [
+            -2,
+            -1,
+            -2
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "file": "scores/03-fourth-keeper.json",
+      "ok": true,
+      "differences": [
+        {
+          "field": "melodyOctavesA",
+          "before": [
+            -2,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesB",
+          "before": [
+            -2,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesC",
+          "before": [
+            -2,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesD",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesE",
+          "before": [
+            -1,
+            -1,
+            -2
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesF",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesG",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesH",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "file": "scores/04-forest.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "scores/05-roads.json",
+      "ok": true,
+      "differences": [
+        {
+          "field": "melodyOctavesA",
+          "before": [
+            -2,
+            0,
+            -1
+          ],
+          "after": [
+            -1,
+            0,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesB",
+          "before": [
+            -2,
+            -1,
+            0
+          ],
+          "after": [
+            -1,
+            -1,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "file": "scores/06-bellwether.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "scores/07-abbey.json",
+      "ok": true,
+      "differences": [
+        {
+          "field": "melodyOctavesA",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesB",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesC",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesD",
+          "before": [
+            -2,
+            -2,
+            -2
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesF",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesG",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesH",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "file": "scores/08-bellkeeper.json",
+      "ok": true,
+      "differences": [
+        {
+          "field": "melodyOctavesB",
+          "before": [
+            -2,
+            -1,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesC",
+          "before": [
+            -2,
+            -1,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesE",
+          "before": [
+            -1,
+            -1,
+            -2
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "file": "scores/09-foundry.json",
+      "ok": true,
+      "differences": [
+        {
+          "field": "melodyOctavesA",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesB",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesC",
+          "before": [
+            -2,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesD",
+          "before": [
+            -2,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesF",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesG",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesH",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "file": "scores/10-master-coin.json",
+      "ok": true,
+      "differences": [
+        {
+          "field": "melodyOctavesA",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesB",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesC",
+          "before": [
+            -2,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesD",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesE",
+          "before": [
+            -1,
+            -1,
+            -2
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesF",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesG",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesH",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "file": "scores/11-glass-court.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "scores/12-lucid-keeper.json",
+      "ok": true,
+      "differences": [
+        {
+          "field": "melodyOctavesA",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesB",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesC",
+          "before": [
+            -2,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesD",
+          "before": [
+            -1,
+            -2,
+            0
+          ],
+          "after": [
+            -1,
+            -1,
+            0
+          ]
+        },
+        {
+          "field": "melodyOctavesE",
+          "before": [
+            -1,
+            -1,
+            -2
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesF",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesG",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesH",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "file": "scores/13-treasury.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "scores/14-entity.json",
+      "ok": true,
+      "differences": [
+        {
+          "field": "melodyOctavesA",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesB",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesC",
+          "before": [
+            0,
+            -2,
+            -1
+          ],
+          "after": [
+            0,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesD",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesE",
+          "before": [
+            -1,
+            -1,
+            -2
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesF",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesG",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesH",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "file": "scores/15-homecoming.json",
+      "ok": true,
+      "differences": [
+        {
+          "field": "melodyOctavesA",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesB",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesC",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesD",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesF",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesG",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesH",
+          "before": [
+            -1,
+            -2,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "file": "event-scores/encounter-and-tool-answers.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "event-scores/utility-signals.json",
+      "ok": true,
+      "differences": [
+        {
+          "field": "melodyOctavesG",
+          "before": [
+            -2,
+            -1,
+            -1
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "field": "melodyOctavesH",
+          "before": [
+            -2,
+            -1,
+            -2
+          ],
+          "after": [
+            -1,
+            -1,
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "file": "editor-compatible/02-tomb.editor-compatible.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "editor-compatible/03-fourth-keeper.editor-compatible.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "editor-compatible/05-roads.editor-compatible.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "editor-compatible/07-abbey.editor-compatible.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "editor-compatible/08-bellkeeper.editor-compatible.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "editor-compatible/09-foundry.editor-compatible.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "editor-compatible/10-master-coin.editor-compatible.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "editor-compatible/12-lucid-keeper.editor-compatible.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "editor-compatible/14-entity.editor-compatible.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "editor-compatible/15-homecoming.editor-compatible.json",
+      "ok": true,
+      "differences": []
+    },
+    {
+      "file": "editor-compatible/utility-signals.editor-compatible.json",
+      "ok": true,
+      "differences": []
+    }
+  ]
+}

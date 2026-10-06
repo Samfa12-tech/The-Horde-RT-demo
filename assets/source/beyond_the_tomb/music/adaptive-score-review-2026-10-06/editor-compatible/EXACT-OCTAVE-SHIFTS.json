@@ -1,0 +1,2160 @@
+{
+  "purpose": "Optional consciously changed range projection; not the canonical intended performance and not a bass-rendering fix.",
+  "items": [
+    {
+      "canonicalSource": "scores/02-tomb.json",
+      "editorEdition": "02-tomb.editor-compatible.json",
+      "formatValid": true,
+      "pcsRoundtrip": true,
+      "eventCountUnchanged": true,
+      "allNonMelodyEventsUnchanged": true,
+      "shiftedTracks": [
+        {
+          "section": "A",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 16,
+              "beforeMidi": 51,
+              "afterMidi": 63
+            },
+            {
+              "step": 36,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 54,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            }
+          ]
+        },
+        {
+          "section": "B",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 12,
+              "beforeMidi": 51,
+              "afterMidi": 63
+            },
+            {
+              "step": 24,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 42,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 58,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 4,
+              "beforeMidi": 65,
+              "afterMidi": 77
+            },
+            {
+              "step": 16,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 28,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 44,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "D",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 6,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 12,
+              "beforeMidi": 51,
+              "afterMidi": 63
+            },
+            {
+              "step": 20,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 28,
+              "beforeMidi": 56,
+              "afterMidi": 68
+            },
+            {
+              "step": 34,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 42,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 50,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 58,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            }
+          ]
+        },
+        {
+          "section": "E",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 8,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 24,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 40,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 56,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            }
+          ]
+        },
+        {
+          "section": "F",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 16,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            }
+          ]
+        },
+        {
+          "section": "G",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 16,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 32,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 52,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            }
+          ]
+        },
+        {
+          "section": "H",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 16,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 32,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 52,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            }
+          ]
+        },
+        {
+          "section": "H",
+          "track": 3,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 12,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 44,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            }
+          ]
+        }
+      ],
+      "browserImportExport": "not_available_cloud_restrictions",
+      "actualAppCodeNodeVmImportExport": "passed_no_musical_field_changes"
+    },
+    {
+      "canonicalSource": "scores/03-fourth-keeper.json",
+      "editorEdition": "03-fourth-keeper.editor-compatible.json",
+      "formatValid": true,
+      "pcsRoundtrip": true,
+      "eventCountUnchanged": true,
+      "allNonMelodyEventsUnchanged": true,
+      "shiftedTracks": [
+        {
+          "section": "A",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 16,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 36,
+              "beforeMidi": 63,
+              "afterMidi": 75
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "A",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 4,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 18,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            }
+          ]
+        },
+        {
+          "section": "B",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 6,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 10,
+              "beforeMidi": 63,
+              "afterMidi": 75
+            },
+            {
+              "step": 14,
+              "beforeMidi": 69,
+              "afterMidi": 81
+            },
+            {
+              "step": 22,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 30,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 36,
+              "beforeMidi": 65,
+              "afterMidi": 77
+            },
+            {
+              "step": 44,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 52,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 60,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 4,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 18,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 34,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 50,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 2,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 8,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 16,
+              "beforeMidi": 65,
+              "afterMidi": 77
+            },
+            {
+              "step": 24,
+              "beforeMidi": 67,
+              "afterMidi": 79
+            },
+            {
+              "step": 30,
+              "beforeMidi": 65,
+              "afterMidi": 77
+            },
+            {
+              "step": 36,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 44,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            },
+            {
+              "step": 52,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 20,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 36,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 52,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 4,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 18,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 34,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 50,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "E",
+          "track": 3,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 32,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 4,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 18,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            }
+          ]
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 4,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 18,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            }
+          ]
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 4,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 18,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 34,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 50,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        }
+      ],
+      "browserImportExport": "not_available_cloud_restrictions",
+      "actualAppCodeNodeVmImportExport": "passed_no_musical_field_changes"
+    },
+    {
+      "canonicalSource": "scores/05-roads.json",
+      "editorEdition": "05-roads.editor-compatible.json",
+      "formatValid": true,
+      "pcsRoundtrip": true,
+      "eventCountUnchanged": true,
+      "allNonMelodyEventsUnchanged": true,
+      "shiftedTracks": [
+        {
+          "section": "A",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 16,
+              "beforeMidi": 69,
+              "afterMidi": 81
+            },
+            {
+              "step": 36,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "B",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 6,
+              "beforeMidi": 69,
+              "afterMidi": 81
+            },
+            {
+              "step": 12,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 20,
+              "beforeMidi": 63,
+              "afterMidi": 75
+            },
+            {
+              "step": 26,
+              "beforeMidi": 69,
+              "afterMidi": 81
+            },
+            {
+              "step": 34,
+              "beforeMidi": 65,
+              "afterMidi": 77
+            },
+            {
+              "step": 42,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 50,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 58,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        }
+      ],
+      "browserImportExport": "not_available_cloud_restrictions",
+      "actualAppCodeNodeVmImportExport": "passed_no_musical_field_changes"
+    },
+    {
+      "canonicalSource": "scores/07-abbey.json",
+      "editorEdition": "07-abbey.editor-compatible.json",
+      "formatValid": true,
+      "pcsRoundtrip": true,
+      "eventCountUnchanged": true,
+      "allNonMelodyEventsUnchanged": true,
+      "shiftedTracks": [
+        {
+          "section": "A",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 32,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            }
+          ]
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 32,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 12,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 34,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            },
+            {
+              "step": 56,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "D",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 10,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 20,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 30,
+              "beforeMidi": 63,
+              "afterMidi": 75
+            },
+            {
+              "step": 40,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 32,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "D",
+          "track": 3,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 12,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 32,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            }
+          ]
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 32,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        }
+      ],
+      "browserImportExport": "not_available_cloud_restrictions",
+      "actualAppCodeNodeVmImportExport": "passed_no_musical_field_changes"
+    },
+    {
+      "canonicalSource": "scores/08-bellkeeper.json",
+      "editorEdition": "08-bellkeeper.editor-compatible.json",
+      "formatValid": true,
+      "pcsRoundtrip": true,
+      "eventCountUnchanged": true,
+      "allNonMelodyEventsUnchanged": true,
+      "shiftedTracks": [
+        {
+          "section": "B",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 10,
+              "beforeMidi": 63,
+              "afterMidi": 75
+            },
+            {
+              "step": 16,
+              "beforeMidi": 69,
+              "afterMidi": 81
+            },
+            {
+              "step": 24,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 34,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 42,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 50,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            },
+            {
+              "step": 58,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 8,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            },
+            {
+              "step": 18,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 28,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 36,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 46,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "E",
+          "track": 3,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 32,
+              "beforeMidi": 59,
+              "afterMidi": 71
+            }
+          ]
+        }
+      ],
+      "browserImportExport": "not_available_cloud_restrictions",
+      "actualAppCodeNodeVmImportExport": "passed_no_musical_field_changes"
+    },
+    {
+      "canonicalSource": "scores/09-foundry.json",
+      "editorEdition": "09-foundry.editor-compatible.json",
+      "formatValid": true,
+      "pcsRoundtrip": true,
+      "eventCountUnchanged": true,
+      "allNonMelodyEventsUnchanged": true,
+      "shiftedTracks": [
+        {
+          "section": "A",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 26,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 26,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 44,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 60,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 2,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 8,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 16,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            },
+            {
+              "step": 26,
+              "beforeMidi": 65,
+              "afterMidi": 77
+            },
+            {
+              "step": 32,
+              "beforeMidi": 67,
+              "afterMidi": 79
+            },
+            {
+              "step": 42,
+              "beforeMidi": 65,
+              "afterMidi": 77
+            },
+            {
+              "step": 48,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 58,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 12,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 28,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 46,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 62,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            }
+          ]
+        },
+        {
+          "section": "D",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 6,
+              "beforeMidi": 63,
+              "afterMidi": 75
+            },
+            {
+              "step": 12,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 18,
+              "beforeMidi": 69,
+              "afterMidi": 81
+            },
+            {
+              "step": 26,
+              "beforeMidi": 68,
+              "afterMidi": 80
+            },
+            {
+              "step": 32,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 40,
+              "beforeMidi": 65,
+              "afterMidi": 77
+            },
+            {
+              "step": 46,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 54,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 60,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 26,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 44,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 60,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            }
+          ]
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 26,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 26,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 10,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 26,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 44,
+              "beforeMidi": 53,
+              "afterMidi": 65
+            },
+            {
+              "step": 60,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            }
+          ]
+        }
+      ],
+      "browserImportExport": "not_available_cloud_restrictions",
+      "actualAppCodeNodeVmImportExport": "passed_no_musical_field_changes"
+    },
+    {
+      "canonicalSource": "scores/10-master-coin.json",
+      "editorEdition": "10-master-coin.editor-compatible.json",
+      "formatValid": true,
+      "pcsRoundtrip": true,
+      "eventCountUnchanged": true,
+      "allNonMelodyEventsUnchanged": true,
+      "shiftedTracks": [
+        {
+          "section": "A",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 22,
+              "beforeMidi": 59,
+              "afterMidi": 71
+            }
+          ]
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 22,
+              "beforeMidi": 59,
+              "afterMidi": 71
+            },
+            {
+              "step": 38,
+              "beforeMidi": 55,
+              "afterMidi": 67
+            },
+            {
+              "step": 54,
+              "beforeMidi": 54,
+              "afterMidi": 66
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 8,
+              "beforeMidi": 67,
+              "afterMidi": 79
+            },
+            {
+              "step": 14,
+              "beforeMidi": 66,
+              "afterMidi": 78
+            },
+            {
+              "step": 22,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 30,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 36,
+              "beforeMidi": 59,
+              "afterMidi": 71
+            },
+            {
+              "step": 46,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 54,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 8,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 24,
+              "beforeMidi": 59,
+              "afterMidi": 71
+            },
+            {
+              "step": 40,
+              "beforeMidi": 55,
+              "afterMidi": 67
+            },
+            {
+              "step": 56,
+              "beforeMidi": 54,
+              "afterMidi": 66
+            }
+          ]
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 22,
+              "beforeMidi": 59,
+              "afterMidi": 71
+            },
+            {
+              "step": 38,
+              "beforeMidi": 55,
+              "afterMidi": 67
+            },
+            {
+              "step": 54,
+              "beforeMidi": 54,
+              "afterMidi": 66
+            }
+          ]
+        },
+        {
+          "section": "E",
+          "track": 3,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 32,
+              "beforeMidi": 59,
+              "afterMidi": 71
+            }
+          ]
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 22,
+              "beforeMidi": 59,
+              "afterMidi": 71
+            }
+          ]
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 22,
+              "beforeMidi": 59,
+              "afterMidi": 71
+            }
+          ]
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 52,
+              "afterMidi": 64
+            },
+            {
+              "step": 22,
+              "beforeMidi": 59,
+              "afterMidi": 71
+            },
+            {
+              "step": 38,
+              "beforeMidi": 55,
+              "afterMidi": 67
+            },
+            {
+              "step": 54,
+              "beforeMidi": 54,
+              "afterMidi": 66
+            }
+          ]
+        }
+      ],
+      "browserImportExport": "not_available_cloud_restrictions",
+      "actualAppCodeNodeVmImportExport": "passed_no_musical_field_changes"
+    },
+    {
+      "canonicalSource": "scores/12-lucid-keeper.json",
+      "editorEdition": "12-lucid-keeper.editor-compatible.json",
+      "formatValid": true,
+      "pcsRoundtrip": true,
+      "eventCountUnchanged": true,
+      "allNonMelodyEventsUnchanged": true,
+      "shiftedTracks": [
+        {
+          "section": "A",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            }
+          ]
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 38,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 69,
+              "afterMidi": 81
+            },
+            {
+              "step": 8,
+              "beforeMidi": 67,
+              "afterMidi": 79
+            },
+            {
+              "step": 16,
+              "beforeMidi": 65,
+              "afterMidi": 77
+            },
+            {
+              "step": 26,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 34,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 44,
+              "beforeMidi": 60,
+              "afterMidi": 72
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 8,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 24,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 40,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 56,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 38,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "E",
+          "track": 3,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 32,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            }
+          ]
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            }
+          ]
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 38,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        }
+      ],
+      "browserImportExport": "not_available_cloud_restrictions",
+      "actualAppCodeNodeVmImportExport": "passed_no_musical_field_changes"
+    },
+    {
+      "canonicalSource": "scores/14-entity.json",
+      "editorEdition": "14-entity.editor-compatible.json",
+      "formatValid": true,
+      "pcsRoundtrip": true,
+      "eventCountUnchanged": true,
+      "allNonMelodyEventsUnchanged": true,
+      "shiftedTracks": [
+        {
+          "section": "A",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 22,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            }
+          ]
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 22,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 38,
+              "beforeMidi": 55,
+              "afterMidi": 67
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 8,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 24,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 40,
+              "beforeMidi": 55,
+              "afterMidi": 67
+            },
+            {
+              "step": 56,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 22,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 38,
+              "beforeMidi": 55,
+              "afterMidi": 67
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "E",
+          "track": 3,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 32,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 22,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            }
+          ]
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 22,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            }
+          ]
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 50,
+              "afterMidi": 62
+            },
+            {
+              "step": 22,
+              "beforeMidi": 58,
+              "afterMidi": 70
+            },
+            {
+              "step": 38,
+              "beforeMidi": 55,
+              "afterMidi": 67
+            },
+            {
+              "step": 54,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        }
+      ],
+      "browserImportExport": "not_available_cloud_restrictions",
+      "actualAppCodeNodeVmImportExport": "passed_no_musical_field_changes"
+    },
+    {
+      "canonicalSource": "scores/15-homecoming.json",
+      "editorEdition": "15-homecoming.editor-compatible.json",
+      "formatValid": true,
+      "pcsRoundtrip": true,
+      "eventCountUnchanged": true,
+      "allNonMelodyEventsUnchanged": true,
+      "shiftedTracks": [
+        {
+          "section": "A",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            }
+          ]
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 38,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 54,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            }
+          ]
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 8,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 24,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            },
+            {
+              "step": 40,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 56,
+              "beforeMidi": 64,
+              "afterMidi": 76
+            }
+          ]
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 38,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 54,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            }
+          ]
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            }
+          ]
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            }
+          ]
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 6,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 22,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 38,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 54,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            }
+          ]
+        }
+      ],
+      "browserImportExport": "not_available_cloud_restrictions",
+      "actualAppCodeNodeVmImportExport": "passed_no_musical_field_changes"
+    },
+    {
+      "canonicalSource": "event-scores/utility-signals.json",
+      "editorEdition": "utility-signals.editor-compatible.json",
+      "formatValid": true,
+      "pcsRoundtrip": true,
+      "eventCountUnchanged": true,
+      "allNonMelodyEventsUnchanged": true,
+      "shiftedTracks": [
+        {
+          "section": "G",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 0,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            },
+            {
+              "step": 10,
+              "beforeMidi": 61,
+              "afterMidi": 73
+            },
+            {
+              "step": 20,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        },
+        {
+          "section": "H",
+          "track": 1,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 4,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            },
+            {
+              "step": 10,
+              "beforeMidi": 62,
+              "afterMidi": 74
+            }
+          ]
+        },
+        {
+          "section": "H",
+          "track": 3,
+          "semitones": 12,
+          "events": [
+            {
+              "step": 12,
+              "beforeMidi": 57,
+              "afterMidi": 69
+            }
+          ]
+        }
+      ],
+      "browserImportExport": "not_available_cloud_restrictions",
+      "actualAppCodeNodeVmImportExport": "passed_no_musical_field_changes"
+    }
+  ]
+}

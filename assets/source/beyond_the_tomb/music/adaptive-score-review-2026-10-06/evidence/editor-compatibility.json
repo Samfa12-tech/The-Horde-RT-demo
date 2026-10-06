@@ -1,0 +1,1043 @@
+{
+  "basis": "Pinned actual app ensureMelodyOctavesLength clamps\u22121..1; actual Core normalizer clamps\u22122..2. This analysis is not a browser roundtrip claim.",
+  "decision": "Preserve creative register intent in canonical Core scores. No silent octave lift; future editor range expansion required for flagged tracks.",
+  "faithfulRegisterFiles": [
+    "scores/01-what-the-dark-keeps.json",
+    "scores/04-forest.json",
+    "scores/06-bellwether.json",
+    "scores/11-glass-court.json",
+    "scores/13-treasury.json",
+    "event-scores/encounter-and-tool-answers.json"
+  ],
+  "requiresEditorRangeUpgrade": [
+    "scores/02-tomb.json",
+    "scores/03-fourth-keeper.json",
+    "scores/05-roads.json",
+    "scores/07-abbey.json",
+    "scores/08-bellkeeper.json",
+    "scores/09-foundry.json",
+    "scores/10-master-coin.json",
+    "scores/12-lucid-keeper.json",
+    "scores/14-entity.json",
+    "scores/15-homecoming.json",
+    "event-scores/utility-signals.json"
+  ],
+  "scores": [
+    {
+      "score": "scores/01-what-the-dark-keeps.json",
+      "title": "01 What the Dark Keeps",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": true,
+      "rangeGaps": []
+    },
+    {
+      "score": "scores/02-tomb.json",
+      "title": "02 The Fourth Keeper's Rest",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": false,
+      "rangeGaps": [
+        {
+          "section": "A",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "B",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            65
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "D",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "E",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            52,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "F",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "G",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            53
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "H",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "H",
+          "track": 3,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            52,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        }
+      ]
+    },
+    {
+      "score": "scores/03-fourth-keeper.json",
+      "title": "03 The Jailer's Last Vigil",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": false,
+      "rangeGaps": [
+        {
+          "section": "A",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            63
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "A",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            53,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "B",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            69
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            53,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            67
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            53,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            53,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "E",
+          "track": 3,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            53,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            53,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            53,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        }
+      ]
+    },
+    {
+      "score": "scores/04-forest.json",
+      "title": "04 Beneath the Same Moon",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": true,
+      "rangeGaps": []
+    },
+    {
+      "score": "scores/05-roads.json",
+      "title": "05 The Roads of Veyr",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": false,
+      "rangeGaps": [
+        {
+          "section": "A",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            69
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "B",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            69
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        }
+      ]
+    },
+    {
+      "score": "scores/06-bellwether.json",
+      "title": "06 Bellwether, Still Burning",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": true,
+      "rangeGaps": []
+    },
+    {
+      "score": "scores/07-abbey.json",
+      "title": "07 Bells Beneath the Water",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": false,
+      "rangeGaps": [
+        {
+          "section": "A",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            60
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            60
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            60
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "D",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            64
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            60
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "D",
+          "track": 3,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            60
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            60
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        }
+      ]
+    },
+    {
+      "score": "scores/08-bellkeeper.json",
+      "title": "08 The Bellkeeper",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": false,
+      "rangeGaps": [
+        {
+          "section": "B",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            69
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            64
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "E",
+          "track": 3,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            52,
+            59
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        }
+      ]
+    },
+    {
+      "score": "scores/09-foundry.json",
+      "title": "09 The King's Account",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": false,
+      "rangeGaps": [
+        {
+          "section": "A",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            67
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "D",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            69
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        }
+      ]
+    },
+    {
+      "score": "scores/10-master-coin.json",
+      "title": "10 Master of Coin",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": false,
+      "rangeGaps": [
+        {
+          "section": "A",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            52,
+            59
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            52,
+            59
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            59,
+            67
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            52,
+            59
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            52,
+            59
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "E",
+          "track": 3,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            52,
+            59
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            52,
+            59
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            52,
+            59
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            52,
+            59
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        }
+      ]
+    },
+    {
+      "score": "scores/11-glass-court.json",
+      "title": "11 A Garden Behind Glass",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": true,
+      "rangeGaps": []
+    },
+    {
+      "score": "scores/12-lucid-keeper.json",
+      "title": "12 The Last Lucid Keeper",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": false,
+      "rangeGaps": [
+        {
+          "section": "A",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            69
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "E",
+          "track": 3,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        }
+      ]
+    },
+    {
+      "score": "scores/13-treasury.json",
+      "title": "13 All That Was Carried Home",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": true,
+      "rangeGaps": []
+    },
+    {
+      "score": "scores/14-entity.json",
+      "title": "14 What the Dark Releases",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": false,
+      "rangeGaps": [
+        {
+          "section": "A",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "E",
+          "track": 3,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            50,
+            58
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        }
+      ]
+    },
+    {
+      "score": "scores/15-homecoming.json",
+      "title": "15 Enough to Come Home",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": false,
+      "rangeGaps": [
+        {
+          "section": "A",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "B",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "C",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            64
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "D",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "F",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "G",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "H",
+          "track": 2,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        }
+      ]
+    },
+    {
+      "score": "event-scores/encounter-and-tool-answers.json",
+      "title": "The Horde event bank \u2014 encounter-and-tool-answers",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": true,
+      "rangeGaps": []
+    },
+    {
+      "score": "event-scores/utility-signals.json",
+      "title": "The Horde event bank \u2014 utility-signals",
+      "schema17FormatValid": true,
+      "coreNotesPreserved": true,
+      "compactGridRegisterCompatible": false,
+      "rangeGaps": [
+        {
+          "section": "G",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "H",
+          "track": 1,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            62
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        },
+        {
+          "section": "H",
+          "track": 3,
+          "authoredOctave": -2,
+          "currentEditorClampedOctave": -1,
+          "authoredMidiRange": [
+            57,
+            57
+          ],
+          "effect": "Compact-grid import transposes this whole track upward12semitones. Do not use editor re-export as canonical without an explicit range upgrade."
+        }
+      ]
+    }
+  ]
+}

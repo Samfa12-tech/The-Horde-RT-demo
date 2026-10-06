@@ -1,0 +1,487 @@
+{
+  "scope": "Source-backed bass renderer diagnostic, not an artistic approval or score edit.",
+  "commonFindings": {
+    "actualBassNotesPreserved": true,
+    "coreMainOscillator": "Non-bandlimited mathematical sawtooth with no classic-bass recipe low-pass applied.",
+    "appMainOscillator": "Web Audio oscillator through a 420 Hz low-pass; 220 Hz low-pass on octave-lower sine.",
+    "coreEnvelope": "Attack occupies first 8% of note then discontinuously jumps to (1-position)^1.8; continuously decays to note end without added release.",
+    "appEnvelope": "10 ms attack, 60 ms decay to 0.7 sustain, hold until note duration, 200 ms exponential release.",
+    "mixBug": "Core compact bass event velocity is fixed at0.34/0.42 and default stem gain includes bass volume0.86, so source beatVolume has no effect in these tests.",
+    "aliasQualification": "Sawtooth discontinuities imply aliasing without bandlimiting. The measured oversampling residual is broader than pure aliasing.",
+    "separateIssue": "Editor melody octave normalization is outside this bass test and must not be used as an assumed bass pitch fix."
+  },
+  "comparisons": [
+    {
+      "name": "01-what-the-dark-keeps-A",
+      "midi": 38,
+      "fundamentalHz": 73.41619197935188,
+      "subOscillatorHz": 36.70809598967594,
+      "authoredFirstEventSeconds": 0.18,
+      "fixedBankGainDb": 12.001797295464694,
+      "firstEventRenderFrames": 7938,
+      "coreFirstNote": {
+        "fftMethod": "Whole isolated first note, Hann window, 8x zero-padding; finite-note spectral leakage remains.",
+        "dominantPeaks": [
+          {
+            "hz": 73.34747314453125,
+            "levelRelativeStrongestDb": -9.643274665532871e-16
+          },
+          {
+            "hz": 146.6949462890625,
+            "levelRelativeStrongestDb": -6.001016998170471
+          },
+          {
+            "hz": 36.3372802734375,
+            "levelRelativeStrongestDb": -7.817172751912929
+          },
+          {
+            "hz": 220.04241943359375,
+            "levelRelativeStrongestDb": -9.519773753625383
+          },
+          {
+            "hz": 293.389892578125,
+            "levelRelativeStrongestDb": -12.017595063441435
+          },
+          {
+            "hz": 367.4102783203125,
+            "levelRelativeStrongestDb": -13.95523030206836
+          },
+          {
+            "hz": 440.75775146484375,
+            "levelRelativeStrongestDb": -15.528239291380128
+          },
+          {
+            "hz": 514.105224609375,
+            "levelRelativeStrongestDb": -16.859271975983805
+          },
+          {
+            "hz": 587.4526977539062,
+            "levelRelativeStrongestDb": -18.014514655236173
+          },
+          {
+            "hz": 660.8001708984375,
+            "levelRelativeStrongestDb": -19.036602017309363
+          },
+          {
+            "hz": 734.1476440429688,
+            "levelRelativeStrongestDb": -19.954428842269493
+          },
+          {
+            "hz": 807.4951171875,
+            "levelRelativeStrongestDb": -20.78828526399508
+          }
+        ],
+        "spectralCentroidHz": 280.4700903400494,
+        "energyAbove420HzFraction": 0.1002068004730615,
+        "energyAbove420HzDbRelativeTotal": -9.9910280433996,
+        "energyAbove1000HzFraction": 0.040843814639033936,
+        "energyAbove1000HzDbRelativeTotal": -13.88873703428487,
+        "energyAbove3000HzFraction": 0.013437877881107844,
+        "energyAbove3000HzDbRelativeTotal": -18.716693099498098,
+        "energyAbove8000HzFraction": 0.004521038352083024,
+        "energyAbove8000HzDbRelativeTotal": -23.447618088189728,
+        "energyAbove16000HzFraction": 0.0013324589862679596,
+        "energyAbove16000HzDbRelativeTotal": -28.753461498898602,
+        "knownFrequencyAmplitude": {
+          "sub": 0.010529097077370143,
+          "fundamental": 0.025872074477127815,
+          "harmonic_2": 0.012967850356826644,
+          "harmonic_3": 0.00865145569463928,
+          "harmonic_4": 0.006492768688692027,
+          "harmonic_5": 0.00519737566733393,
+          "harmonic_6": 0.004333404607588613,
+          "harmonic_7": 0.0037157257645768623,
+          "harmonic_8": 0.0032518139937141462,
+          "harmonic_9": 0.002890336821535468,
+          "harmonic_10": 0.002600569023859055
+        },
+        "harmonicsRelativeFundamentalDb": {
+          "sub": -7.808802457826161,
+          "fundamental": 0.0,
+          "harmonic_2": -5.999265248960929,
+          "harmonic_3": -9.5148412943175,
+          "harmonic_4": -12.008026435524464,
+          "harmonic_5": -13.94094287812356,
+          "harmonic_6": -15.520040239823317,
+          "harmonic_7": -16.855751978389062,
+          "harmonic_8": -18.0141111420631,
+          "harmonic_9": -19.03765594243595,
+          "harmonic_10": -19.955257350403635
+        }
+      },
+      "transient": {
+        "maxAdjacentSampleDelta": 0.2445470094680786,
+        "peakAmplitude": 0.12241995334625244,
+        "maxDeltaOverPeak": 1.9976074388494673,
+        "coreAttackSeconds": 0.0144,
+        "appAttackSecondsFromSource": 0.01,
+        "coreEnvelopeJunctionDropFractionFromSource": 0.13936681248349758,
+        "measuredAdjacentDeltaAtEnvelopeJunction": 0.017052292823791504,
+        "corePostDurationReleaseSeconds": 0,
+        "appAdsrPostDurationReleaseSecondsFromSource": 0.2
+      },
+      "sampleRateDependenceDiagnostic": {
+        "method": "Same exact first Core event at 176.4 kHz, ffmpeg aresample=44100:filter_size=128:cutoff=0.95, compared to direct 44.1 kHz render.",
+        "residualRmsRelativeDirectDb": -29.08610810249759,
+        "interiorResidualRmsRelativeDirectDb": -27.937415773234335,
+        "peakAbsoluteResidual": 0.06208240985870361,
+        "caveat": "Contains aliasing plus resampler/phase-grid/envelope differences. Do not label this an isolated alias-distortion percentage."
+      },
+      "beatVolume100xChangeHasIdenticalCorePcm": true
+    },
+    {
+      "name": "02-tomb-B",
+      "midi": 38,
+      "fundamentalHz": 73.41619197935188,
+      "subOscillatorHz": 36.70809598967594,
+      "authoredFirstEventSeconds": 1.1749999999999998,
+      "fixedBankGainDb": 15.428613933173468,
+      "firstEventRenderFrames": 51817,
+      "coreFirstNote": {
+        "fftMethod": "Whole isolated first note, Hann window, 8x zero-padding; finite-note spectral leakage remains.",
+        "dominantPeaks": [
+          {
+            "hz": 73.43158721923828,
+            "levelRelativeStrongestDb": -9.643274665532871e-16
+          },
+          {
+            "hz": 146.86317443847656,
+            "levelRelativeStrongestDb": -6.026016372281724
+          },
+          {
+            "hz": 36.673736572265625,
+            "levelRelativeStrongestDb": -7.802777294448768
+          },
+          {
+            "hz": 220.2106475830078,
+            "levelRelativeStrongestDb": -9.552176011368095
+          },
+          {
+            "hz": 293.6422348022461,
+            "levelRelativeStrongestDb": -12.046901493488289
+          },
+          {
+            "hz": 367.0738220214844,
+            "levelRelativeStrongestDb": -13.983086537520972
+          },
+          {
+            "hz": 440.50540924072266,
+            "levelRelativeStrongestDb": -15.566436430827954
+          },
+          {
+            "hz": 513.9369964599609,
+            "levelRelativeStrongestDb": -16.906989903751143
+          },
+          {
+            "hz": 587.3685836791992,
+            "levelRelativeStrongestDb": -18.07086093110249
+          },
+          {
+            "hz": 660.7160568237305,
+            "levelRelativeStrongestDb": -19.089584807627475
+          },
+          {
+            "hz": 734.1476440429688,
+            "levelRelativeStrongestDb": -19.99985309969139
+          },
+          {
+            "hz": 807.579231262207,
+            "levelRelativeStrongestDb": -20.826636521482875
+          }
+        ],
+        "spectralCentroidHz": 280.2561863664521,
+        "energyAbove420HzFraction": 0.10008620500439305,
+        "energyAbove420HzDbRelativeTotal": -9.996257776988074,
+        "energyAbove1000HzFraction": 0.040812396556987,
+        "energyAbove1000HzDbRelativeTotal": -13.892079021413206,
+        "energyAbove3000HzFraction": 0.01342568312764775,
+        "energyAbove3000HzDbRelativeTotal": -18.72063607228414,
+        "energyAbove8000HzFraction": 0.0045276666651874456,
+        "energyAbove8000HzDbRelativeTotal": -23.441255541692843,
+        "energyAbove16000HzFraction": 0.0013321474524939103,
+        "energyAbove16000HzDbRelativeTotal": -28.754477013967875,
+        "knownFrequencyAmplitude": {
+          "sub": 0.015641292159065123,
+          "fundamental": 0.03837971423433036,
+          "harmonic_2": 0.0191874504032983,
+          "harmonic_3": 0.012789271140167282,
+          "harmonic_4": 0.009590409601413536,
+          "harmonic_5": 0.007671736239126181,
+          "harmonic_6": 0.006393323873561311,
+          "harmonic_7": 0.005480691405292293,
+          "harmonic_8": 0.004796432720214538,
+          "harmonic_9": 0.0042641426409350015,
+          "harmonic_10": 0.003838010756935202
+        },
+        "harmonicsRelativeFundamentalDb": {
+          "sub": -7.796582172100482,
+          "fundamental": 0.0,
+          "harmonic_2": -6.021689330563752,
+          "harmonic_3": -9.54511883996408,
+          "harmonic_4": -12.045291614115776,
+          "harmonic_5": -13.984161475239068,
+          "harmonic_6": -15.567500624905362,
+          "harmonic_7": -16.905327746029375,
+          "harmonic_8": -18.063667595691577,
+          "harmonic_9": -19.085400256122796,
+          "harmonic_10": -19.999910982998433
+        }
+      },
+      "transient": {
+        "maxAdjacentSampleDelta": 0.33318352699279785,
+        "peakAmplitude": 0.16911828517913818,
+        "maxDeltaOverPeak": 1.9701212476218872,
+        "coreAttackSeconds": 0.09399909297052153,
+        "appAttackSecondsFromSource": 0.01,
+        "coreEnvelopeJunctionDropFractionFromSource": 0.13936681248349758,
+        "measuredAdjacentDeltaAtEnvelopeJunction": -0.0232236385345459,
+        "corePostDurationReleaseSeconds": 0,
+        "appAdsrPostDurationReleaseSecondsFromSource": 0.2
+      },
+      "sampleRateDependenceDiagnostic": {
+        "method": "Same exact first Core event at 176.4 kHz, ffmpeg aresample=44100:filter_size=128:cutoff=0.95, compared to direct 44.1 kHz render.",
+        "residualRmsRelativeDirectDb": -27.199124583846075,
+        "interiorResidualRmsRelativeDirectDb": -27.48932515806702,
+        "peakAbsoluteResidual": 0.12731647491455078,
+        "caveat": "Contains aliasing plus resampler/phase-grid/envelope differences. Do not label this an isolated alias-distortion percentage."
+      },
+      "beatVolume100xChangeHasIdenticalCorePcm": true
+    },
+    {
+      "name": "03-fourth-keeper-B",
+      "midi": 38,
+      "fundamentalHz": 73.41619197935188,
+      "subOscillatorHz": 36.70809598967594,
+      "authoredFirstEventSeconds": 0.734375,
+      "fixedBankGainDb": 15.020654785304844,
+      "firstEventRenderFrames": 32385,
+      "coreFirstNote": {
+        "fftMethod": "Whole isolated first note, Hann window, 8x zero-padding; finite-note spectral leakage remains.",
+        "dominantPeaks": [
+          {
+            "hz": 73.34747314453125,
+            "levelRelativeStrongestDb": -1.9286549331065743e-15
+          },
+          {
+            "hz": 146.86317443847656,
+            "levelRelativeStrongestDb": -6.009336505005567
+          },
+          {
+            "hz": 36.673736572265625,
+            "levelRelativeStrongestDb": -7.798362989485327
+          },
+          {
+            "hz": 220.2106475830078,
+            "levelRelativeStrongestDb": -9.534107685975549
+          },
+          {
+            "hz": 293.7263488769531,
+            "levelRelativeStrongestDb": -12.038115910457375
+          },
+          {
+            "hz": 367.0738220214844,
+            "levelRelativeStrongestDb": -13.966374690662878
+          },
+          {
+            "hz": 440.4212951660156,
+            "levelRelativeStrongestDb": -15.564481953262526
+          },
+          {
+            "hz": 513.9369964599609,
+            "levelRelativeStrongestDb": -16.89139900697235
+          },
+          {
+            "hz": 587.2844696044922,
+            "levelRelativeStrongestDb": -18.05341293905076
+          },
+          {
+            "hz": 660.8001708984375,
+            "levelRelativeStrongestDb": -19.079487163607904
+          },
+          {
+            "hz": 734.1476440429688,
+            "levelRelativeStrongestDb": -19.988690782185515
+          },
+          {
+            "hz": 807.4951171875,
+            "levelRelativeStrongestDb": -20.830794951491516
+          }
+        ],
+        "spectralCentroidHz": 280.28660463481935,
+        "energyAbove420HzFraction": 0.10010017456016021,
+        "energyAbove420HzDbRelativeTotal": -9.99565165173546,
+        "energyAbove1000HzFraction": 0.04081843748639913,
+        "energyAbove1000HzDbRelativeTotal": -13.89143623922317,
+        "energyAbove3000HzFraction": 0.0134274908809256,
+        "energyAbove3000HzDbRelativeTotal": -18.72005133896796,
+        "energyAbove8000HzFraction": 0.004527970263922013,
+        "energyAbove8000HzDbRelativeTotal": -23.440964339083425,
+        "energyAbove16000HzFraction": 0.0013323040202550375,
+        "energyAbove16000HzDbRelativeTotal": -28.7539666161207,
+        "knownFrequencyAmplitude": {
+          "sub": 0.014905761142429483,
+          "fundamental": 0.03661587092904135,
+          "harmonic_2": 0.0183131973983205,
+          "harmonic_3": 0.012206415097549309,
+          "harmonic_4": 0.009155054794160618,
+          "harmonic_5": 0.007325039580709077,
+          "harmonic_6": 0.0061033999101220765,
+          "harmonic_7": 0.005231416590404091,
+          "harmonic_8": 0.004578118010990518,
+          "harmonic_9": 0.004069043208914385,
+          "harmonic_10": 0.003661938002501772
+        },
+        "harmonicsRelativeFundamentalDb": {
+          "sub": -7.806304218830478,
+          "fundamental": 0.0,
+          "harmonic_2": -6.0181038366697726,
+          "harmonic_3": -9.541624676467581,
+          "harmonic_4": -12.040168411616909,
+          "harmonic_5": -13.977187855988948,
+          "harmonic_6": -15.561950831548605,
+          "harmonic_7": -16.901001264104664,
+          "harmonic_8": -18.059647703242625,
+          "harmonic_9": -19.083541338202416,
+          "harmonic_10": -19.999167624333737
+        }
+      },
+      "transient": {
+        "maxAdjacentSampleDelta": 0.33902573585510254,
+        "peakAmplitude": 0.1697390079498291,
+        "maxDeltaOverPeak": 1.9973354383885091,
+        "coreAttackSeconds": 0.058748299319727894,
+        "appAttackSecondsFromSource": 0.01,
+        "coreEnvelopeJunctionDropFractionFromSource": 0.13936681248349758,
+        "measuredAdjacentDeltaAtEnvelopeJunction": 0.004750490188598633,
+        "corePostDurationReleaseSeconds": 0,
+        "appAdsrPostDurationReleaseSecondsFromSource": 0.2
+      },
+      "sampleRateDependenceDiagnostic": {
+        "method": "Same exact first Core event at 176.4 kHz, ffmpeg aresample=44100:filter_size=128:cutoff=0.95, compared to direct 44.1 kHz render.",
+        "residualRmsRelativeDirectDb": -27.337647451061102,
+        "interiorResidualRmsRelativeDirectDb": -27.131450620538327,
+        "peakAbsoluteResidual": 0.11297845840454102,
+        "caveat": "Contains aliasing plus resampler/phase-grid/envelope differences. Do not label this an isolated alias-distortion percentage."
+      },
+      "beatVolume100xChangeHasIdenticalCorePcm": true
+    },
+    {
+      "name": "06-bellwether-B",
+      "midi": 43,
+      "fundamentalHz": 97.99885899543733,
+      "subOscillatorHz": 48.999429497718666,
+      "authoredFirstEventSeconds": 0.8392857142857143,
+      "fixedBankGainDb": 15.492068433130886,
+      "firstEventRenderFrames": 37012,
+      "coreFirstNote": {
+        "fftMethod": "Whole isolated first note, Hann window, 8x zero-padding; finite-note spectral leakage remains.",
+        "dominantPeaks": [
+          {
+            "hz": 97.9928970336914,
+            "levelRelativeStrongestDb": -9.643274665532871e-16
+          },
+          {
+            "hz": 195.9857940673828,
+            "levelRelativeStrongestDb": -6.020291358938536
+          },
+          {
+            "hz": 49.03850555419922,
+            "levelRelativeStrongestDb": -7.8043515568873065
+          },
+          {
+            "hz": 293.9786911010742,
+            "levelRelativeStrongestDb": -9.542334641181467
+          },
+          {
+            "hz": 391.9715881347656,
+            "levelRelativeStrongestDb": -12.042717311119182
+          },
+          {
+            "hz": 489.96448516845703,
+            "levelRelativeStrongestDb": -13.979837148876175
+          },
+          {
+            "hz": 588.0414962768555,
+            "levelRelativeStrongestDb": -15.566325993852443
+          },
+          {
+            "hz": 686.0343933105469,
+            "levelRelativeStrongestDb": -16.900407107488867
+          },
+          {
+            "hz": 784.0272903442383,
+            "levelRelativeStrongestDb": -18.059766125275477
+          },
+          {
+            "hz": 882.0201873779297,
+            "levelRelativeStrongestDb": -19.079513035184807
+          },
+          {
+            "hz": 980.0130844116211,
+            "levelRelativeStrongestDb": -19.992600410182618
+          },
+          {
+            "hz": 1078.0059814453125,
+            "levelRelativeStrongestDb": -20.81964993177797
+          }
+        ],
+        "spectralCentroidHz": 358.51134686709565,
+        "energyAbove420HzFraction": 0.12217457539232927,
+        "energyAbove420HzDbRelativeTotal": -9.130191616518578,
+        "energyAbove1000HzFraction": 0.05245680934705394,
+        "energyAbove1000HzDbRelativeTotal": -12.801981286352753,
+        "energyAbove3000HzFraction": 0.017829303511959663,
+        "energyAbove3000HzDbRelativeTotal": -17.488656218734757,
+        "energyAbove8000HzFraction": 0.006028452966734626,
+        "energyAbove8000HzDbRelativeTotal": -22.19794123052408,
+        "energyAbove16000HzFraction": 0.0017655235043401614,
+        "energyAbove16000HzDbRelativeTotal": -27.531264963182252,
+        "knownFrequencyAmplitude": {
+          "sub": 0.01574705540122118,
+          "fundamental": 0.038654110575413875,
+          "harmonic_2": 0.01932882941218157,
+          "harmonic_3": 0.01288658194852548,
+          "harmonic_4": 0.009664392608441928,
+          "harmonic_5": 0.007733614434879168,
+          "harmonic_6": 0.006443562022655784,
+          "harmonic_7": 0.005525051493030935,
+          "harmonic_8": 0.0048339625983214165,
+          "harmonic_9": 0.004297894238326152,
+          "harmonic_10": 0.0038687172596746987
+        },
+        "harmonicsRelativeFundamentalDb": {
+          "sub": -7.799926585102087,
+          "fundamental": 0.0,
+          "harmonic_2": -6.019802629785982,
+          "harmonic_3": -9.54115889614457,
+          "harmonic_4": -12.040422403343182,
+          "harmonic_5": -13.976263369547283,
+          "harmonic_6": -15.561393429850225,
+          "harmonic_7": -16.897187094264904,
+          "harmonic_8": -18.057847976959998,
+          "harmonic_9": -19.078799208370455,
+          "harmonic_10": -19.992573873247895
+        }
+      },
+      "transient": {
+        "maxAdjacentSampleDelta": 0.3517575263977051,
+        "peakAmplitude": 0.17636334896087646,
+        "maxDeltaOverPeak": 1.994504688588881,
+        "coreAttackSeconds": 0.06714195011337869,
+        "appAttackSecondsFromSource": 0.01,
+        "coreEnvelopeJunctionDropFractionFromSource": 0.13936681248349758,
+        "measuredAdjacentDeltaAtEnvelopeJunction": -0.010284662246704102,
+        "corePostDurationReleaseSeconds": 0,
+        "appAdsrPostDurationReleaseSecondsFromSource": 0.2
+      },
+      "sampleRateDependenceDiagnostic": {
+        "method": "Same exact first Core event at 176.4 kHz, ffmpeg aresample=44100:filter_size=128:cutoff=0.95, compared to direct 44.1 kHz render.",
+        "residualRmsRelativeDirectDb": -24.015986331555755,
+        "interiorResidualRmsRelativeDirectDb": -23.986774538846202,
+        "peakAbsoluteResidual": 0.13451731204986572,
+        "caveat": "Contains aliasing plus resampler/phase-grid/envelope differences. Do not label this an isolated alias-distortion percentage."
+      },
+      "beatVolume100xChangeHasIdenticalCorePcm": true
+    }
+  ]
+}

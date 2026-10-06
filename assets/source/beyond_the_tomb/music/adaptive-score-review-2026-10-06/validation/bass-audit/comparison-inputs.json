@@ -1,0 +1,1231 @@
+{
+  "purpose": "Bass-only exact-event diagnostic; no canonical score or previous render changes.",
+  "engineCommit": "0c6975cadcd4aba0047ab94170a2adabc722517f",
+  "gainPolicy": "Same previously published common gain per bank. No per-stem or per-excerpt normalization.",
+  "comparisons": [
+    {
+      "name": "01-what-the-dark-keeps-A",
+      "bank": "01-what-the-dark-keeps",
+      "sectionId": "A",
+      "sourceScore": "scores/01-what-the-dark-keeps.json",
+      "sourceSha256": "e05dfc26295fad92f2f2242016f95e2413c604a2cc3ad61693e938cf3bfd847a",
+      "bpm": 80,
+      "sectionDurationSeconds": 12,
+      "sampleRate": 44100,
+      "tailSeconds": 0.6,
+      "fixedBankGainDb": 12.001797295464694,
+      "fixedBankGainLinear": 3.9818955592503547,
+      "sourceBeatVolume": 0.48,
+      "sourceMasterVolume": 0.72,
+      "bassTone": "classic",
+      "events": [
+        {
+          "id": "A_0_bass_bass_0",
+          "time": 0,
+          "duration": 0.18,
+          "tick": 0,
+          "durationTicks": 115,
+          "step": 0,
+          "bar": 1,
+          "beat": 1,
+          "sectionId": "A",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 38,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "A_0_bass_bass_16",
+          "time": 3,
+          "duration": 0.18,
+          "tick": 1920,
+          "durationTicks": 115,
+          "step": 16,
+          "bar": 2,
+          "beat": 1,
+          "sectionId": "A",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 38,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "A_0_bass_bass_32",
+          "time": 6,
+          "duration": 0.18,
+          "tick": 3840,
+          "durationTicks": 115,
+          "step": 32,
+          "bar": 3,
+          "beat": 1,
+          "sectionId": "A",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 46,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "A_0_bass_bass_48",
+          "time": 9,
+          "duration": 0.18,
+          "tick": 5760,
+          "durationTicks": 115,
+          "step": 48,
+          "bar": 4,
+          "beat": 1,
+          "sectionId": "A",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 45,
+          "slideOffset": null,
+          "bassTone": "classic"
+        }
+      ],
+      "eventTraceSha256": "ab97225ded0741048bdc2b9610984b95fe126dad566298e609e46cf189db0d3e",
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 555660,
+        "channels": 2,
+        "durationSeconds": 12.6,
+        "eventCount": 4,
+        "peak": 0.12241999059915543,
+        "peakDbfs": -18.242953163741216,
+        "rms": 0.007945510662154744,
+        "rmsDbfs": -41.99756370449041,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          -5.77549890309242e-7,
+          -5.77549890309242e-7
+        ],
+        "maxAdjacentSampleDelta": 0.2445470541715622,
+        "firstAudibleFrame": 6,
+        "lastAudibleFrame": 404165,
+        "firstAudibleSeconds": 0.00013605442176870748,
+        "trailingSilenceSeconds": 3.435238095238095,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00020286536891944706,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00020286536891944706,
+              "head10msRms": 0.022766220670771577,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00035132095217704773,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00020286536891944706,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00020286536891944706,
+              "head10msRms": 0.022766220670771577,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00035132095217704773,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "coreWav": "01-what-the-dark-keeps-A.core-bass.wav",
+      "coreWavSha256": "9f2764624460251c7f1e4682f18db46323b7bceac863a41191d6bc219a99262c",
+      "coreMp3": "01-what-the-dark-keeps-A.core-bass.mp3",
+      "firstNoteFiles": {
+        "44100": {
+          "filename": "01-what-the-dark-keeps-A.first-note-44100.wav",
+          "sha256": "2edd811036f1fa56d43826382bf958ab15cb9c7d7f5b8fad3627ef24fd139ccd"
+        },
+        "176400": {
+          "filename": "01-what-the-dark-keeps-A.first-note-176400.wav",
+          "sha256": "95c8c350aae4b7e6a6aa224af82c30b361d8e372a210822499b0daf6d52ddc87"
+        }
+      },
+      "firstNoteOversampledDownsampledFile": "01-what-the-dark-keeps-A.first-note-176400-to-44100.wav",
+      "mixSensitivity": {
+        "lowBeatVolume": 0.01,
+        "highBeatVolume": 1,
+        "lowHash": "27bdfdd315ac00ff4c6eb83accf39968cb34a722edd044614812b6e0f04f34d7",
+        "highHash": "27bdfdd315ac00ff4c6eb83accf39968cb34a722edd044614812b6e0f04f34d7",
+        "identicalPcmDespite100xBeatVolume": true
+      },
+      "analysisCaveat": "Oversampled same-engine diagnostic measures sample-rate dependence including aliasing, waveform phase/grid quantization and resampling; it is not an isolated alias-distortion percentage or proposed replacement synth."
+    },
+    {
+      "name": "02-tomb-B",
+      "bank": "02-tomb",
+      "sectionId": "B",
+      "sourceScore": "scores/02-tomb.json",
+      "sourceSha256": "5d0effbb9bbca1a17283a4b244d82b4d8bc8f626b96de3c6c8eed83a6b22ba3d",
+      "bpm": 60,
+      "sectionDurationSeconds": 16,
+      "sampleRate": 44100,
+      "tailSeconds": 0.6,
+      "fixedBankGainDb": 15.428613933173468,
+      "fixedBankGainLinear": 5.907866821800279,
+      "sourceBeatVolume": 0.25,
+      "sourceMasterVolume": 0.7,
+      "bassTone": "classic",
+      "events": [
+        {
+          "id": "B_0_bass_bass_0",
+          "time": 0,
+          "duration": 1.1749999999999998,
+          "tick": 0,
+          "durationTicks": 564,
+          "step": 0,
+          "bar": 1,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 38,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_16",
+          "time": 4,
+          "duration": 1.1749999999999998,
+          "tick": 1920,
+          "durationTicks": 564,
+          "step": 16,
+          "bar": 2,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 38,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_32",
+          "time": 8,
+          "duration": 1.1749999999999998,
+          "tick": 3840,
+          "durationTicks": 564,
+          "step": 32,
+          "bar": 3,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 46,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_48",
+          "time": 12,
+          "duration": 1.1749999999999998,
+          "tick": 5760,
+          "durationTicks": 564,
+          "step": 48,
+          "bar": 4,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 45,
+          "slideOffset": null,
+          "bassTone": "classic"
+        }
+      ],
+      "eventTraceSha256": "2f61b5f08be831fd4754d3b9503820b9fd3ee5f0438ef14f106734344f397c1b",
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 732061,
+        "channels": 2,
+        "durationSeconds": 16.600022675736962,
+        "eventCount": 4,
+        "peak": 0.1856035590171814,
+        "peakDbfs": -14.628274005586297,
+        "rms": 0.025872133320760732,
+        "rmsDbfs": -31.743355189692313,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          0.000008981256982447006,
+          0.000008981256982447006
+        ],
+        "maxAdjacentSampleDelta": 0.3701862096786499,
+        "firstAudibleFrame": 25,
+        "lastAudibleFrame": 578120,
+        "firstAudibleSeconds": 0.0005668934240362812,
+        "trailingSilenceSeconds": 3.490702947845805,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.0000461091949546244,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.0000461091949546244,
+              "head10msRms": 0.005174526351015409,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00007985159754753113,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.0000461091949546244,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.0000461091949546244,
+              "head10msRms": 0.005174526351015409,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00007985159754753113,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "coreWav": "02-tomb-B.core-bass.wav",
+      "coreWavSha256": "ba13c0bb4816639cd0f81d21881051e029eb33cf13810d42af49f51d494e4412",
+      "coreMp3": "02-tomb-B.core-bass.mp3",
+      "firstNoteFiles": {
+        "44100": {
+          "filename": "02-tomb-B.first-note-44100.wav",
+          "sha256": "5a1349d9e5b0680038b4b3ce27dc4c63aac2395f2b37255005fb68e575ce1258"
+        },
+        "176400": {
+          "filename": "02-tomb-B.first-note-176400.wav",
+          "sha256": "16f6effaa94fc5071d05c953043ec326c4c75a9da7993b072a10248b815ab2b0"
+        }
+      },
+      "firstNoteOversampledDownsampledFile": "02-tomb-B.first-note-176400-to-44100.wav",
+      "mixSensitivity": {
+        "lowBeatVolume": 0.01,
+        "highBeatVolume": 1,
+        "lowHash": "f95a452de2591c34da7203d485852edf3a76cae141f3bb45510f5c3ef6a78636",
+        "highHash": "f95a452de2591c34da7203d485852edf3a76cae141f3bb45510f5c3ef6a78636",
+        "identicalPcmDespite100xBeatVolume": true
+      },
+      "analysisCaveat": "Oversampled same-engine diagnostic measures sample-rate dependence including aliasing, waveform phase/grid quantization and resampling; it is not an isolated alias-distortion percentage or proposed replacement synth.",
+      "provenanceRefresh": {
+        "reason": "Canonical Tomb C octave declaration corrected to already-rendered value; Tomb B performed events and audio unchanged.",
+        "previousSourceSha256": "082e0943333186f3fd5b3aa0b9ec0fde07b4721972084ac34e5a7ff45487cc4f"
+      }
+    },
+    {
+      "name": "03-fourth-keeper-B",
+      "bank": "03-fourth-keeper",
+      "sectionId": "B",
+      "sourceScore": "scores/03-fourth-keeper.json",
+      "sourceSha256": "afb6b75d8b4d8eae2d846aa256f3cf3a7833fb165eb964082c06840a7ef7d487",
+      "bpm": 96,
+      "sectionDurationSeconds": 10,
+      "sampleRate": 44100,
+      "tailSeconds": 0.6,
+      "fixedBankGainDb": 15.020654785304844,
+      "fixedBankGainLinear": 5.636801472207184,
+      "sourceBeatVolume": 0.36,
+      "sourceMasterVolume": 0.7,
+      "bassTone": "classic",
+      "events": [
+        {
+          "id": "B_0_bass_bass_0",
+          "time": 0,
+          "duration": 0.734375,
+          "tick": 0,
+          "durationTicks": 564,
+          "step": 0,
+          "bar": 1,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 38,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_8",
+          "time": 1.25,
+          "duration": 0.440625,
+          "tick": 960,
+          "durationTicks": 338,
+          "step": 8,
+          "bar": 1,
+          "beat": 3,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 38,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_16",
+          "time": 2.5,
+          "duration": 0.734375,
+          "tick": 1920,
+          "durationTicks": 564,
+          "step": 16,
+          "bar": 2,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 38,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_24",
+          "time": 3.75,
+          "duration": 0.440625,
+          "tick": 2880,
+          "durationTicks": 338,
+          "step": 24,
+          "bar": 2,
+          "beat": 3,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 38,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_32",
+          "time": 5,
+          "duration": 0.734375,
+          "tick": 3840,
+          "durationTicks": 564,
+          "step": 32,
+          "bar": 3,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 46,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_40",
+          "time": 6.25,
+          "duration": 0.440625,
+          "tick": 4800,
+          "durationTicks": 338,
+          "step": 40,
+          "bar": 3,
+          "beat": 3,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 46,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_48",
+          "time": 7.5,
+          "duration": 0.734375,
+          "tick": 5760,
+          "durationTicks": 564,
+          "step": 48,
+          "bar": 4,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 45,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_56",
+          "time": 8.75,
+          "duration": 0.440625,
+          "tick": 6720,
+          "durationTicks": 338,
+          "step": 56,
+          "bar": 4,
+          "beat": 3,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 45,
+          "slideOffset": null,
+          "bassTone": "classic"
+        }
+      ],
+      "eventTraceSha256": "103f6b7f95b9660a158046b5a2e3a02a445f8023a03a2652ba9a5ed78c1996fb",
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 467460,
+        "channels": 2,
+        "durationSeconds": 10.6,
+        "eventCount": 8,
+        "peak": 0.17796696722507477,
+        "peakDbfs": -14.993212008111875,
+        "rms": 0.03084603864720895,
+        "rmsDbfs": -30.21601203237018,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          -9.105300032027953e-7,
+          -9.105300032027953e-7
+        ],
+        "maxAdjacentSampleDelta": 0.35546834766864777,
+        "firstAudibleFrame": 16,
+        "lastAudibleFrame": 404008,
+        "firstAudibleSeconds": 0.00036281179138321996,
+        "trailingSilenceSeconds": 1.438798185941043,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00007039113552309573,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00007039113552309573,
+              "head10msRms": 0.007899525544585225,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00012190267443656921,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00007039113552309573,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00007039113552309573,
+              "head10msRms": 0.007899525544585225,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00012190267443656921,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "coreWav": "03-fourth-keeper-B.core-bass.wav",
+      "coreWavSha256": "12a6733d1197f9122d06061c32afcd9e9ef84231d4b6039237bdcbe05832790c",
+      "coreMp3": "03-fourth-keeper-B.core-bass.mp3",
+      "firstNoteFiles": {
+        "44100": {
+          "filename": "03-fourth-keeper-B.first-note-44100.wav",
+          "sha256": "89ddb3736577e6758e9eae63c99fbe6e702f00c839fba6314c9affeee86f4780"
+        },
+        "176400": {
+          "filename": "03-fourth-keeper-B.first-note-176400.wav",
+          "sha256": "16931e63b2e3a89ad6d5c6ac3a6629ee24862fab29c4a83e2a57110d47e7d7a7"
+        }
+      },
+      "firstNoteOversampledDownsampledFile": "03-fourth-keeper-B.first-note-176400-to-44100.wav",
+      "mixSensitivity": {
+        "lowBeatVolume": 0.01,
+        "highBeatVolume": 1,
+        "lowHash": "b32b9f04127725d71c3ce51940ebd8432a9cd2e076d035e5fac01debf100fce6",
+        "highHash": "b32b9f04127725d71c3ce51940ebd8432a9cd2e076d035e5fac01debf100fce6",
+        "identicalPcmDespite100xBeatVolume": true
+      },
+      "analysisCaveat": "Oversampled same-engine diagnostic measures sample-rate dependence including aliasing, waveform phase/grid quantization and resampling; it is not an isolated alias-distortion percentage or proposed replacement synth."
+    },
+    {
+      "name": "06-bellwether-B",
+      "bank": "06-bellwether",
+      "sectionId": "B",
+      "sourceScore": "scores/06-bellwether.json",
+      "sourceSha256": "ef7a34ddcdb5932341b431ec9683f4d8f018935aab0bcb160fade19203a76725",
+      "bpm": 84,
+      "sectionDurationSeconds": 11.428571428571436,
+      "sampleRate": 44100,
+      "tailSeconds": 0.6,
+      "fixedBankGainDb": 15.492068433130886,
+      "fixedBankGainLinear": 5.951184597085681,
+      "sourceBeatVolume": 0.25,
+      "sourceMasterVolume": 0.7,
+      "bassTone": "classic",
+      "events": [
+        {
+          "id": "B_0_bass_bass_0",
+          "time": 0,
+          "duration": 0.8392857142857143,
+          "tick": 0,
+          "durationTicks": 564,
+          "step": 0,
+          "bar": 1,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 43,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_8",
+          "time": 1.4285714285714286,
+          "duration": 0.5035714285714286,
+          "tick": 960,
+          "durationTicks": 338,
+          "step": 8,
+          "bar": 1,
+          "beat": 3,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 43,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_16",
+          "time": 2.8571428571428563,
+          "duration": 0.8392857142857143,
+          "tick": 1920,
+          "durationTicks": 564,
+          "step": 16,
+          "bar": 2,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 36,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_24",
+          "time": 4.285714285714284,
+          "duration": 0.5035714285714286,
+          "tick": 2880,
+          "durationTicks": 338,
+          "step": 24,
+          "bar": 2,
+          "beat": 3,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 36,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_32",
+          "time": 5.714285714285714,
+          "duration": 0.8392857142857143,
+          "tick": 3840,
+          "durationTicks": 564,
+          "step": 32,
+          "bar": 3,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 43,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_40",
+          "time": 7.142857142857145,
+          "duration": 0.5035714285714286,
+          "tick": 4800,
+          "durationTicks": 338,
+          "step": 40,
+          "bar": 3,
+          "beat": 3,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 43,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_48",
+          "time": 8.571428571428575,
+          "duration": 0.8392857142857143,
+          "tick": 5760,
+          "durationTicks": 564,
+          "step": 48,
+          "bar": 4,
+          "beat": 1,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 38,
+          "slideOffset": null,
+          "bassTone": "classic"
+        },
+        {
+          "id": "B_0_bass_bass_56",
+          "time": 10.000000000000005,
+          "duration": 0.5035714285714286,
+          "tick": 6720,
+          "durationTicks": 338,
+          "step": 56,
+          "bar": 4,
+          "beat": 3,
+          "sectionId": "B",
+          "arrangementIndex": 0,
+          "stem": "bass",
+          "type": "bass",
+          "velocity": 0.34,
+          "accent": false,
+          "tuplet": false,
+          "audioProfile": "standard",
+          "lofiPreset": "",
+          "chipPreset": "",
+          "metalPreset": "",
+          "funkPreset": "funk_classic_pocket",
+          "westernPreset": "western_trail",
+          "soundProfile": {
+            "id": "standard",
+            "preset": "standard_chordsmith",
+            "recipeVersion": 1,
+            "parameters": {
+              "neutralTone": 0.5,
+              "transientClarity": 0.5
+            }
+          },
+          "midi": 38,
+          "slideOffset": null,
+          "bassTone": "classic"
+        }
+      ],
+      "eventTraceSha256": "8cbdccf725809dd7719384b945dc326190d792a14fa9fc7322ee523e68df56ae",
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 530461,
+        "channels": 2,
+        "durationSeconds": 12.02859410430839,
+        "eventCount": 8,
+        "peak": 0.18342487514019012,
+        "peakDbfs": -14.730835357665093,
+        "rms": 0.03269570946932385,
+        "rmsDbfs": -29.710184687498913,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          0.0000381566985005139,
+          0.0000381566985005139
+        ],
+        "maxAdjacentSampleDelta": 0.35175757110118866,
+        "firstAudibleFrame": 18,
+        "lastAudibleFrame": 461523,
+        "firstAudibleSeconds": 0.00040816326530612246,
+        "trailingSilenceSeconds": 1.5631972789115647,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.000064923930040095,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.000064923930040095,
+              "head10msRms": 0.011653003326399621,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00013927556574344635,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.000064923930040095,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.000064923930040095,
+              "head10msRms": 0.011653003326399621,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00013927556574344635,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "coreWav": "06-bellwether-B.core-bass.wav",
+      "coreWavSha256": "635a2d8fbbbbd75508e402bc300fce576e528db1a384b807020a15cd19316017",
+      "coreMp3": "06-bellwether-B.core-bass.mp3",
+      "firstNoteFiles": {
+        "44100": {
+          "filename": "06-bellwether-B.first-note-44100.wav",
+          "sha256": "3ce99da41fe9f8111eba58761efa9e19cb4cf90c3fafad4f7812cb5e16a2213c"
+        },
+        "176400": {
+          "filename": "06-bellwether-B.first-note-176400.wav",
+          "sha256": "5c8f912c8e3b9846570923da3e81bb28b183e8dab614d20a82e922ac437c6b38"
+        }
+      },
+      "firstNoteOversampledDownsampledFile": "06-bellwether-B.first-note-176400-to-44100.wav",
+      "mixSensitivity": {
+        "lowBeatVolume": 0.01,
+        "highBeatVolume": 1,
+        "lowHash": "6bee9a79b86afb26f0870d8cf97ef7273d5b4e9f4e7bda76f6c195eda4b622ab",
+        "highHash": "6bee9a79b86afb26f0870d8cf97ef7273d5b4e9f4e7bda76f6c195eda4b622ab",
+        "identicalPcmDespite100xBeatVolume": true
+      },
+      "analysisCaveat": "Oversampled same-engine diagnostic measures sample-rate dependence including aliasing, waveform phase/grid quantization and resampling; it is not an isolated alias-distortion percentage or proposed replacement synth."
+    }
+  ]
+}

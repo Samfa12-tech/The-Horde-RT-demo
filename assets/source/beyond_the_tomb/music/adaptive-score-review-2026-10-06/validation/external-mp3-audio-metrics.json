@@ -1,0 +1,161 @@
+{
+  "passed": true,
+  "fileCount": 17,
+  "maxDecodedMp3TruePeakDbfs": -2.1,
+  "results": [
+    {
+      "file": "previews/full/01-what-the-dark-keeps.mp3",
+      "decodePassed": true,
+      "integratedLufs": -24.7,
+      "loudnessRangeLu": 13.1,
+      "truePeakDbfs": -2.1,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -24.7 LUFS\n    Threshold: -35.8 LUFS\n\n  Loudness range:\n    LRA:        13.1 LU\n    Threshold: -45.9 LUFS\n    LRA low:   -33.5 LUFS\n    LRA high:  -20.5 LUFS\n\n  True peak:\n    Peak:       -2.1 dBFS\n[out#0/null @ 0x557c6389e6c0] video:0KiB audio:30594KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:02:57.60 bitrate=N/A speed= 154x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/02-tomb.mp3",
+      "decodePassed": true,
+      "integratedLufs": -23.0,
+      "loudnessRangeLu": 4.6,
+      "truePeakDbfs": -2.9,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -23.0 LUFS\n    Threshold: -35.0 LUFS\n\n  Loudness range:\n    LRA:         4.6 LU\n    Threshold: -45.2 LUFS\n    LRA low:   -27.5 LUFS\n    LRA high:  -22.9 LUFS\n\n  True peak:\n    Peak:       -2.9 dBFS\n[out#0/null @ 0x56172db6b480] video:0KiB audio:56606KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:05:28.60 bitrate=N/A speed= 159x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/03-fourth-keeper.mp3",
+      "decodePassed": true,
+      "integratedLufs": -22.0,
+      "loudnessRangeLu": 6.9,
+      "truePeakDbfs": -2.3,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -22.0 LUFS\n    Threshold: -33.2 LUFS\n\n  Loudness range:\n    LRA:         6.9 LU\n    Threshold: -43.3 LUFS\n    LRA low:   -27.4 LUFS\n    LRA high:  -20.5 LUFS\n\n  True peak:\n    Peak:       -2.3 dBFS\n[out#0/null @ 0x5564a0fa1480] video:0KiB audio:25943KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:02:30.60 bitrate=N/A speed= 165x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/04-forest.mp3",
+      "decodePassed": true,
+      "integratedLufs": -23.8,
+      "loudnessRangeLu": 3.5,
+      "truePeakDbfs": -2.9,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -23.8 LUFS\n    Threshold: -35.1 LUFS\n\n  Loudness range:\n    LRA:         3.5 LU\n    Threshold: -45.2 LUFS\n    LRA low:   -26.6 LUFS\n    LRA high:  -23.1 LUFS\n\n  True peak:\n    Peak:       -2.9 dBFS\n[out#0/null @ 0x55924e2964c0] video:0KiB audio:47189KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:04:33.93 bitrate=N/A speed= 168x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/05-roads.mp3",
+      "decodePassed": true,
+      "integratedLufs": -22.9,
+      "loudnessRangeLu": 4.0,
+      "truePeakDbfs": -2.9,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -22.9 LUFS\n    Threshold: -34.1 LUFS\n\n  Loudness range:\n    LRA:         4.0 LU\n    Threshold: -44.3 LUFS\n    LRA low:   -26.4 LUFS\n    LRA high:  -22.4 LUFS\n\n  True peak:\n    Peak:       -2.9 dBFS\n[out#0/null @ 0x564b8fd3d480] video:0KiB audio:42481KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:04:06.60 bitrate=N/A speed= 167x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/06-bellwether.mp3",
+      "decodePassed": true,
+      "integratedLufs": -22.5,
+      "loudnessRangeLu": 4.4,
+      "truePeakDbfs": -2.9,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -22.5 LUFS\n    Threshold: -33.9 LUFS\n\n  Loudness range:\n    LRA:         4.4 LU\n    Threshold: -43.9 LUFS\n    LRA low:   -26.4 LUFS\n    LRA high:  -21.9 LUFS\n\n  True peak:\n    Peak:       -2.9 dBFS\n[out#0/null @ 0x55aefc42a480] video:0KiB audio:40463KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:03:54.88 bitrate=N/A speed= 167x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/07-abbey.mp3",
+      "decodePassed": true,
+      "integratedLufs": -22.0,
+      "loudnessRangeLu": 6.0,
+      "truePeakDbfs": -2.9,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -22.0 LUFS\n    Threshold: -34.2 LUFS\n\n  Loudness range:\n    LRA:         6.0 LU\n    Threshold: -44.4 LUFS\n    LRA low:   -28.0 LUFS\n    LRA high:  -22.0 LUFS\n\n  True peak:\n    Peak:       -2.9 dBFS\n[out#0/null @ 0x55939c418480] video:0KiB audio:56606KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:05:28.60 bitrate=N/A speed= 157x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/08-bellkeeper.mp3",
+      "decodePassed": true,
+      "integratedLufs": -21.8,
+      "loudnessRangeLu": 6.5,
+      "truePeakDbfs": -2.8,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -21.8 LUFS\n    Threshold: -33.1 LUFS\n\n  Loudness range:\n    LRA:         6.5 LU\n    Threshold: -43.1 LUFS\n    LRA low:   -26.9 LUFS\n    LRA high:  -20.4 LUFS\n\n  True peak:\n    Peak:       -2.8 dBFS\n[out#0/null @ 0x558f6a866480] video:0KiB audio:23072KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:02:13.93 bitrate=N/A speed= 160x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/09-foundry.mp3",
+      "decodePassed": true,
+      "integratedLufs": -22.5,
+      "loudnessRangeLu": 6.8,
+      "truePeakDbfs": -2.9,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -22.5 LUFS\n    Threshold: -33.6 LUFS\n\n  Loudness range:\n    LRA:         6.8 LU\n    Threshold: -43.6 LUFS\n    LRA low:   -27.3 LUFS\n    LRA high:  -20.5 LUFS\n\n  True peak:\n    Peak:       -2.9 dBFS\n[out#0/null @ 0x55d5313eb480] video:0KiB audio:38628KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:03:44.23 bitrate=N/A speed= 170x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/10-master-coin.mp3",
+      "decodePassed": true,
+      "integratedLufs": -22.3,
+      "loudnessRangeLu": 6.9,
+      "truePeakDbfs": -2.9,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -22.3 LUFS\n    Threshold: -33.1 LUFS\n\n  Loudness range:\n    LRA:         6.9 LU\n    Threshold: -43.1 LUFS\n    LRA low:   -27.5 LUFS\n    LRA high:  -20.6 LUFS\n\n  True peak:\n    Peak:       -2.9 dBFS\n[out#0/null @ 0x55b9d21f4480] video:0KiB audio:21488KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:02:04.73 bitrate=N/A speed= 162x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/11-glass-court.mp3",
+      "decodePassed": true,
+      "integratedLufs": -23.2,
+      "loudnessRangeLu": 3.6,
+      "truePeakDbfs": -2.9,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -23.2 LUFS\n    Threshold: -34.5 LUFS\n\n  Loudness range:\n    LRA:         3.6 LU\n    Threshold: -44.6 LUFS\n    LRA low:   -26.0 LUFS\n    LRA high:  -22.4 LUFS\n\n  True peak:\n    Peak:       -2.9 dBFS\n[out#0/null @ 0x55be5d5d1480] video:0KiB audio:49959KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:04:50.01 bitrate=N/A speed= 170x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/12-lucid-keeper.mp3",
+      "decodePassed": true,
+      "integratedLufs": -21.5,
+      "loudnessRangeLu": 6.7,
+      "truePeakDbfs": -2.8,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -21.5 LUFS\n    Threshold: -33.0 LUFS\n\n  Loudness range:\n    LRA:         6.7 LU\n    Threshold: -43.0 LUFS\n    LRA low:   -26.9 LUFS\n    LRA high:  -20.2 LUFS\n\n  True peak:\n    Peak:       -2.8 dBFS\n[out#0/null @ 0x55d1fdcd1480] video:0KiB audio:24910KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:02:24.60 bitrate=N/A speed= 167x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/13-treasury.mp3",
+      "decodePassed": true,
+      "integratedLufs": -23.5,
+      "loudnessRangeLu": 4.0,
+      "truePeakDbfs": -2.9,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -23.5 LUFS\n    Threshold: -34.9 LUFS\n\n  Loudness range:\n    LRA:         4.0 LU\n    Threshold: -45.1 LUFS\n    LRA low:   -27.0 LUFS\n    LRA high:  -23.0 LUFS\n\n  True peak:\n    Peak:       -2.9 dBFS\n[out#0/null @ 0x564be6790480] video:0KiB audio:53075KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:05:08.10 bitrate=N/A speed= 167x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/14-entity.mp3",
+      "decodePassed": true,
+      "integratedLufs": -21.8,
+      "loudnessRangeLu": 6.2,
+      "truePeakDbfs": -2.6,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -21.8 LUFS\n    Threshold: -32.8 LUFS\n\n  Loudness range:\n    LRA:         6.2 LU\n    Threshold: -42.7 LUFS\n    LRA low:   -26.4 LUFS\n    LRA high:  -20.2 LUFS\n\n  True peak:\n    Peak:       -2.6 dBFS\n[out#0/null @ 0x564fbb7fc480] video:0KiB audio:20775KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:02:00.60 bitrate=N/A speed= 148x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/15-homecoming.mp3",
+      "decodePassed": true,
+      "integratedLufs": -22.8,
+      "loudnessRangeLu": 4.5,
+      "truePeakDbfs": -2.9,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -22.8 LUFS\n    Threshold: -33.9 LUFS\n\n  Loudness range:\n    LRA:         4.5 LU\n    Threshold: -44.1 LUFS\n    LRA low:   -26.2 LUFS\n    LRA high:  -21.8 LUFS\n\n  True peak:\n    Peak:       -2.9 dBFS\n[out#0/null @ 0x5638cafb4480] video:0KiB audio:38183KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:03:41.65 bitrate=N/A speed= 176x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/events-encounter-and-tool-answers.mp3",
+      "decodePassed": true,
+      "integratedLufs": -17.4,
+      "loudnessRangeLu": 4.6,
+      "truePeakDbfs": -3.0,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -17.4 LUFS\n    Threshold: -28.6 LUFS\n\n  Loudness range:\n    LRA:         4.6 LU\n    Threshold: -38.7 LUFS\n    LRA low:   -21.3 LUFS\n    LRA high:  -16.7 LUFS\n\n  True peak:\n    Peak:       -3.0 dBFS\n[out#0/null @ 0x563583a567c0] video:0KiB audio:9406KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:00:54.60 bitrate=N/A speed= 155x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    },
+    {
+      "file": "previews/full/events-utility-signals.mp3",
+      "decodePassed": true,
+      "integratedLufs": -18.9,
+      "loudnessRangeLu": 4.5,
+      "truePeakDbfs": -3.0,
+      "ffmpegSummary": "Integrated loudness:\n    I:         -18.9 LUFS\n    Threshold: -30.2 LUFS\n\n  Loudness range:\n    LRA:         4.5 LU\n    Threshold: -40.4 LUFS\n    LRA low:   -22.8 LUFS\n    LRA high:  -18.3 LUFS\n\n  True peak:\n    Peak:       -3.0 dBFS\n[out#0/null @ 0x5605ba49c7c0] video:0KiB audio:7339KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown\nsize=N/A time=00:00:42.60 bitrate=N/A speed= 163x",
+      "method": "ffmpeg ebur128 peak=true on decoded MP3"
+    }
+  ],
+  "scope": "External decoder and meter check, not artistic listening approval or a mastering claim."
+}

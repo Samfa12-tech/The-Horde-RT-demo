@@ -1,0 +1,7 @@
+OPTIONAL CURRENT-EDITOR EDITION
+
+These11 supplemental banks deliberately move only out-of-range melody tracks up one octave so the current grid can edit them. EXACT-OCTAVE-SHIFTS.json lists every changed note. The underlying low bass notes are unchanged; this is NOT the bass-rendering fix.
+
+The15 canonical family scores and2 event banks remain unchanged in their original folders. Six other canonical banks are already within the current editor register range.
+
+All11 pass the exact app-code import/sync/export check in Node VM with DOM mocks and zero compared musical-field changes. This is not browser UI or audio validation; actual browser testing was blocked.

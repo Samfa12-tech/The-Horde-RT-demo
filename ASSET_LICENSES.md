@@ -76,3 +76,7 @@ These source archives are not shipped runtime assets. See [inventory and QA boun
 - **A07 alder/pine, A08/A09 ground dressing, A17/T03 funerary utility:** original project-authored Blender geometry, procedural maps/materials and source scripts. No third-party model or texture bytes were incorporated. Shared bark/foliage map lineage is recorded in the dressing package. No new public licence or exclusive-copyright warranty is assigned by this archive.
 
 No Hotstrike skeleton/bone sources, private Briarhold model files, account records or raw paid-provider generation dumps are included. Existing asset licences elsewhere in this file are unchanged.
+
+## Adaptive soundtrack review archive (2026-10-06)
+
+`assets/source/beyond_the_tomb/music/adaptive-score-review-2026-10-06/` preserves owner-supplied **What the Dark Keeps** and assistant-authored companion arrangements, editable scores and Core reference audio, archived at the owner's request for The Horde. Original authorship is not reassigned; no named original composer is established. The original Horde-only admission notice is retained and does not grant general redistribution/reuse rights. See the archive's `ARCHIVE.md` for credit, pinned Chordsmith/Core version, checks and limits. Third-party Chordsmith/Core/PCS implementation is not redistributed. This source/review archive is excluded from runtime package allowlists and does not replace the existing game music or authorize a public release.

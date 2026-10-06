@@ -1,0 +1,19 @@
+The Horde — First Listening Tour
+Actual Pocket Audio Core reference synthesis. This is a composition review, not a production master.
+
+0:00 — What the Dark Keeps (original title statement)
+0:12 — The Fourth Keeper's Rest (buried corridors)
+0:29 — Beneath the Same Moon (reunion)
+0:43 — Bellwether, Still Burning (streets)
+0:54 — Bells Beneath the Water (dry abbey)
+1:11 — The Jailer's Last Vigil (guarded vigil)
+1:21 — The Jailer's Last Vigil (opening)
+1:32 — A Garden Behind Glass (winter garden)
+1:46 — What the Dark Releases (culmination)
+1:54 — Enough to Come Home (settled home)
+
+ALTERNATE BASS VOICE ONLY: identical notes/timings and original per-bank gain. Existing Core soft_upright voice applied on cloned bass events because Standard-profile normalization discards a raw bassTone change. Canonical scores are unchanged. This is not the app filtered renderer or a completed engine fix.
+
+The original theme is preserved. New companion scores share its chromatic signature while changing phrase, harmonic context, pace and role.
+Editorial gaps/fades in this medley are not in-game adaptive transitions.
+Engine filters/FX differ from the accepted historical app voice render; owner listening acceptance is pending.

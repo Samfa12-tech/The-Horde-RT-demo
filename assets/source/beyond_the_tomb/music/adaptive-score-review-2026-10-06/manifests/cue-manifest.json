@@ -1,0 +1,2149 @@
+{
+  "title": "The Horde \u2014 15 adaptive score families",
+  "status": "Composition and synthesized review package. No game integration or production mastering claim.",
+  "engine_revision": "0c6975cadcd4aba0047ab94170a2adabc722517f",
+  "source_theme_sha256": "3ab832e08807d3745fca172b0bb6b95ccbbe37face4e60077027d6d35b55c9a0",
+  "provenance": "Existing What the Dark Keeps score supplied from the private Horde repository. New companion scores and arrangements authored by OpenAI assistant for the user; existing author attribution is retained in the source package, not reassigned. No paid generation or third-party recordings.",
+  "audio_status": "Actual Pocket Audio Core deterministic reference renders; not verified exact v68 live instrument parity. Instrument IDs are engine synthesis, not acoustic recordings.",
+  "integration_status": "Future state-to-section proposal only. Current native eight-cue game and accepted original source are untouched.",
+  "runtime_gaps": [
+    "True section-end scheduling is needed: current Core section quantization means bar.",
+    "Stinger events need an actual playback consumer.",
+    "thenReturnTo metadata needs a functioning return scheduler.",
+    "Layer control, dialogue ducking, saved state, pause/resume and native registration require integration and device tests."
+  ],
+  "families": [
+    {
+      "number": 1,
+      "title": "What the Dark Keeps",
+      "score": "01-what-the-dark-keeps.json",
+      "bpm": 80,
+      "key": "D",
+      "scale": "minor with intentional chromatic melody and F# release",
+      "original_preserved": true,
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "original_title_statement",
+          "behavior": "loop"
+        },
+        "B": {
+          "bars": 4,
+          "name": "original_fuller_statement",
+          "behavior": "loop"
+        },
+        "C": {
+          "bars": 1,
+          "name": "original_transition",
+          "behavior": "one_shot"
+        },
+        "D": {
+          "bars": 4,
+          "name": "original_tomb_stillness",
+          "behavior": "loop"
+        },
+        "E": {
+          "bars": 4,
+          "name": "original_pressure",
+          "behavior": "loop"
+        },
+        "F": {
+          "bars": 4,
+          "name": "original_recovery",
+          "behavior": "loop"
+        },
+        "G": {
+          "bars": 2,
+          "name": "original_release",
+          "behavior": "one_shot"
+        },
+        "H": {
+          "bars": 4,
+          "name": "original_home_answer",
+          "behavior": "loop"
+        }
+      },
+      "state_sequences": {
+        "quiet_title": [
+          "A",
+          "A",
+          "D",
+          "A"
+        ],
+        "full_title": [
+          "A",
+          "B",
+          "A",
+          "B"
+        ],
+        "home_answer": [
+          "G",
+          "H",
+          "H"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "A",
+        "B",
+        "B",
+        "A",
+        "C",
+        "D",
+        "D",
+        "D",
+        "E",
+        "E",
+        "F",
+        "F",
+        "G",
+        "H",
+        "H"
+      ],
+      "notes": [
+        "A/D retained short third-part A4 is not a held drone.",
+        "G/H F# colour is intentional.",
+        "This file is not an overwrite of the current game asset."
+      ],
+      "editor_register_status": "within_current_grid_range_pending_browser_roundtrip",
+      "register_gap_count": 0
+    },
+    {
+      "number": 2,
+      "id": "horde_02_tomb",
+      "title": "The Fourth Keeper's Rest",
+      "score": "02-tomb.json",
+      "bpm": 60,
+      "key": "D",
+      "scale": "minor",
+      "meter": "4/4",
+      "chord_colour": "sus2",
+      "voices": {
+        "chords": "felt_piano",
+        "melody": [
+          "soft",
+          "soft_pluck",
+          "bell"
+        ]
+      },
+      "motif_treatment": "M is incomplete and low, with wide rests and unresolved final note; it describes custody and the buried past.",
+      "story_guardrails": "Stillness; exploration; guards alerted/combat; safe aftermath. Kit's early grate call ducks the music. No lantern-associated reveal before reward.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "threshold",
+          "behavior": "one_shot",
+          "duration_seconds": 16.0
+        },
+        "B": {
+          "bars": 4,
+          "name": "buried_corridors",
+          "behavior": "loop",
+          "duration_seconds": 16.0
+        },
+        "C": {
+          "bars": 4,
+          "name": "waterfall_chamber",
+          "behavior": "loop",
+          "duration_seconds": 16.0
+        },
+        "D": {
+          "bars": 4,
+          "name": "guard_threat",
+          "behavior": "loop",
+          "duration_seconds": 16.0
+        },
+        "E": {
+          "bars": 4,
+          "name": "buried_history",
+          "behavior": "loop",
+          "duration_seconds": 16.0
+        },
+        "F": {
+          "bars": 2,
+          "name": "danger_recedes",
+          "behavior": "bridge",
+          "duration_seconds": 8.0
+        },
+        "G": {
+          "bars": 4,
+          "name": "safe_aftermath",
+          "behavior": "one_shot",
+          "duration_seconds": 16.0
+        },
+        "H": {
+          "bars": 4,
+          "name": "quiet_recovery",
+          "behavior": "loop",
+          "duration_seconds": 16.0
+        }
+      },
+      "state_sequences": {
+        "entry": [
+          "A"
+        ],
+        "exploration": [
+          "B",
+          "C",
+          "B",
+          "C"
+        ],
+        "quiet_feature": [
+          "E",
+          "C",
+          "E",
+          "C"
+        ],
+        "threat": [
+          "D",
+          "D",
+          "C",
+          "D"
+        ],
+        "bridge": [
+          "F"
+        ],
+        "exit": [
+          "G"
+        ],
+        "narrative_colour": [
+          "H",
+          "C"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "C",
+        "B",
+        "B",
+        "C",
+        "E",
+        "E",
+        "B",
+        "C",
+        "H",
+        "H",
+        "D",
+        "D",
+        "B",
+        "C",
+        "F",
+        "G",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "requires_lower_melody_register_support_do_not_grid_reexport",
+      "register_gap_count": 9
+    },
+    {
+      "number": 3,
+      "id": "horde_03_fourth_keeper",
+      "title": "The Jailer's Last Vigil",
+      "score": "03-fourth-keeper.json",
+      "bpm": 96,
+      "key": "D",
+      "scale": "minor",
+      "meter": "4/4",
+      "chord_colour": "sus4",
+      "voices": {
+        "chords": "harp",
+        "melody": [
+          "western_fiddle",
+          "soft_pluck",
+          "muted_trumpet"
+        ]
+      },
+      "motif_treatment": "M becomes a stern defensive phrase rather than an evil-theme caricature; the defeat reduces to a questioning fragment.",
+      "story_guardrails": "Proposed music states: reveal, active defence, late pressure, confirmed defeat, lantern claim. Phase entry follows gameplay events, not a fixed recording timeline; attack tells remain independent.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "recognition",
+          "behavior": "one_shot",
+          "duration_seconds": 10.0
+        },
+        "B": {
+          "bars": 4,
+          "name": "guarded_vigil",
+          "behavior": "loop",
+          "duration_seconds": 10.0
+        },
+        "C": {
+          "bars": 4,
+          "name": "reposition",
+          "behavior": "loop",
+          "duration_seconds": 10.0
+        },
+        "D": {
+          "bars": 4,
+          "name": "opening",
+          "behavior": "loop",
+          "duration_seconds": 10.0
+        },
+        "E": {
+          "bars": 4,
+          "name": "late_pressure",
+          "behavior": "loop",
+          "duration_seconds": 10.0
+        },
+        "F": {
+          "bars": 2,
+          "name": "regroup",
+          "behavior": "bridge",
+          "duration_seconds": 5.0
+        },
+        "G": {
+          "bars": 4,
+          "name": "confirmed_defeat",
+          "behavior": "one_shot",
+          "duration_seconds": 10.0
+        },
+        "H": {
+          "bars": 4,
+          "name": "lantern_claim",
+          "behavior": "loop",
+          "duration_seconds": 10.0
+        }
+      },
+      "state_sequences": {
+        "entrance": [
+          "A"
+        ],
+        "protected": [
+          "B",
+          "C",
+          "B",
+          "C"
+        ],
+        "setup": [
+          "C",
+          "B",
+          "C",
+          "B"
+        ],
+        "exposure": [
+          "D",
+          "D"
+        ],
+        "escalation": [
+          "E",
+          "B",
+          "E",
+          "C"
+        ],
+        "reset": [
+          "F"
+        ],
+        "confirmed_defeat": [
+          "G"
+        ],
+        "aftermath": [
+          "H",
+          "H"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "B",
+        "F",
+        "C",
+        "D",
+        "B",
+        "E",
+        "C",
+        "E",
+        "F",
+        "G",
+        "H",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "requires_lower_melody_register_support_do_not_grid_reexport",
+      "register_gap_count": 11
+    },
+    {
+      "number": 4,
+      "id": "horde_04_forest",
+      "title": "Beneath the Same Moon",
+      "score": "04-forest.json",
+      "bpm": 72,
+      "key": "G",
+      "scale": "major",
+      "meter": "4/4",
+      "chord_colour": "triad",
+      "voices": {
+        "chords": "harp",
+        "melody": [
+          "cowboy_whistle",
+          "soft_pluck",
+          "western_fiddle"
+        ]
+      },
+      "motif_treatment": "M receives a softer answering phrase COMPANION, a new proposal representing companionship rather than a voiced player response.",
+      "story_guardrails": "Relief; quiet travel; optional threat overlay; lantern clue; lookout vista. Remain nocturnal, never announce dawn or curse lifted. Kit dialogue gets long rests.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "rope_ascent",
+          "behavior": "one_shot",
+          "duration_seconds": 13.333333333333334
+        },
+        "B": {
+          "bars": 4,
+          "name": "reunion",
+          "behavior": "loop",
+          "duration_seconds": 13.333333333333334
+        },
+        "C": {
+          "bars": 4,
+          "name": "moonlit_trail",
+          "behavior": "loop",
+          "duration_seconds": 13.333333333333334
+        },
+        "D": {
+          "bars": 4,
+          "name": "trail_threat",
+          "behavior": "loop",
+          "duration_seconds": 13.333333333333334
+        },
+        "E": {
+          "bars": 4,
+          "name": "uncanny_waystone",
+          "behavior": "loop",
+          "duration_seconds": 13.333333333333334
+        },
+        "F": {
+          "bars": 2,
+          "name": "reversible_return",
+          "behavior": "bridge",
+          "duration_seconds": 6.666666666666667
+        },
+        "G": {
+          "bars": 4,
+          "name": "lookout_arrival",
+          "behavior": "one_shot",
+          "duration_seconds": 13.333333333333334
+        },
+        "H": {
+          "bars": 4,
+          "name": "lookout_vista",
+          "behavior": "loop",
+          "duration_seconds": 13.333333333333334
+        }
+      },
+      "state_sequences": {
+        "entry": [
+          "A"
+        ],
+        "exploration": [
+          "B",
+          "C",
+          "B",
+          "C"
+        ],
+        "quiet_feature": [
+          "E",
+          "C",
+          "E",
+          "C"
+        ],
+        "threat": [
+          "D",
+          "D",
+          "C",
+          "D"
+        ],
+        "bridge": [
+          "F"
+        ],
+        "exit": [
+          "G"
+        ],
+        "narrative_colour": [
+          "H",
+          "C"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "C",
+        "B",
+        "B",
+        "C",
+        "E",
+        "E",
+        "B",
+        "C",
+        "H",
+        "H",
+        "D",
+        "D",
+        "B",
+        "C",
+        "F",
+        "G",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "within_current_grid_range_pending_browser_roundtrip",
+      "register_gap_count": 0
+    },
+    {
+      "number": 5,
+      "id": "horde_05_roads",
+      "title": "The Roads of Veyr",
+      "score": "05-roads.json",
+      "bpm": 80,
+      "key": "D",
+      "scale": "minor",
+      "meter": "4/4",
+      "chord_colour": "sus2",
+      "voices": {
+        "chords": "harp",
+        "melody": [
+          "soft_pluck",
+          "cowboy_whistle",
+          "bell"
+        ]
+      },
+      "motif_treatment": "M becomes a walking figure; destination timbres enter before the next area. Starter shrine stretches it into a contemplative phrase.",
+      "story_guardrails": "Travel; hesitation/access task; threat; safe shrine; completed return. No separate songs for each upgrade route. Use destination overlays only when narratively appropriate.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "outbound_junction",
+          "behavior": "one_shot",
+          "duration_seconds": 12.0
+        },
+        "B": {
+          "bars": 4,
+          "name": "road",
+          "behavior": "loop",
+          "duration_seconds": 12.0
+        },
+        "C": {
+          "bars": 4,
+          "name": "road_continuation",
+          "behavior": "loop",
+          "duration_seconds": 12.0
+        },
+        "D": {
+          "bars": 4,
+          "name": "road_threat",
+          "behavior": "loop",
+          "duration_seconds": 12.0
+        },
+        "E": {
+          "bars": 4,
+          "name": "shrine",
+          "behavior": "loop",
+          "duration_seconds": 12.0
+        },
+        "F": {
+          "bars": 2,
+          "name": "destination_bridge",
+          "behavior": "bridge",
+          "duration_seconds": 6.0
+        },
+        "G": {
+          "bars": 4,
+          "name": "completed_return",
+          "behavior": "one_shot",
+          "duration_seconds": 12.0
+        },
+        "H": {
+          "bars": 4,
+          "name": "regional_approach",
+          "behavior": "loop",
+          "duration_seconds": 12.0
+        }
+      },
+      "state_sequences": {
+        "entry": [
+          "A"
+        ],
+        "exploration": [
+          "B",
+          "C",
+          "B",
+          "C"
+        ],
+        "quiet_feature": [
+          "E",
+          "C",
+          "E",
+          "C"
+        ],
+        "threat": [
+          "D",
+          "D",
+          "C",
+          "D"
+        ],
+        "bridge": [
+          "F"
+        ],
+        "exit": [
+          "G"
+        ],
+        "narrative_colour": [
+          "H",
+          "C"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "C",
+        "B",
+        "B",
+        "C",
+        "E",
+        "E",
+        "B",
+        "C",
+        "H",
+        "H",
+        "D",
+        "D",
+        "B",
+        "C",
+        "F",
+        "G",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "requires_lower_melody_register_support_do_not_grid_reexport",
+      "register_gap_count": 2
+    },
+    {
+      "number": 6,
+      "id": "horde_06_bellwether",
+      "title": "Bellwether, Still Burning",
+      "score": "06-bellwether.json",
+      "bpm": 84,
+      "key": "G",
+      "scale": "major",
+      "meter": "4/4",
+      "chord_colour": "triad",
+      "voices": {
+        "chords": "harp",
+        "melody": [
+          "western_fiddle",
+          "soft_pluck",
+          "cowboy_whistle"
+        ]
+      },
+      "motif_treatment": "M is answered with COMPANION in a modest communal tune HOME; warmth and belonging temper greed without pretending danger is over.",
+      "story_guardrails": "Streets; tavern/services; reflective churchyard; story-changed return. Mill/smith activity stays diegetic SFX; don't commission full tracks per shop or infer a supernatural bell event.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "village_arrival",
+          "behavior": "one_shot",
+          "duration_seconds": 11.428571428571429
+        },
+        "B": {
+          "bars": 4,
+          "name": "streets",
+          "behavior": "loop",
+          "duration_seconds": 11.428571428571429
+        },
+        "C": {
+          "bars": 4,
+          "name": "hearth",
+          "behavior": "loop",
+          "duration_seconds": 11.428571428571429
+        },
+        "D": {
+          "bars": 4,
+          "name": "concerned_return",
+          "behavior": "loop",
+          "duration_seconds": 11.428571428571429
+        },
+        "E": {
+          "bars": 4,
+          "name": "churchyard_records",
+          "behavior": "loop",
+          "duration_seconds": 11.428571428571429
+        },
+        "F": {
+          "bars": 2,
+          "name": "departure",
+          "behavior": "bridge",
+          "duration_seconds": 5.714285714285714
+        },
+        "G": {
+          "bars": 4,
+          "name": "return_welcome",
+          "behavior": "one_shot",
+          "duration_seconds": 11.428571428571429
+        },
+        "H": {
+          "bars": 4,
+          "name": "communal_answer",
+          "behavior": "loop",
+          "duration_seconds": 11.428571428571429
+        }
+      },
+      "state_sequences": {
+        "arrival": [
+          "A"
+        ],
+        "streets": [
+          "B",
+          "C",
+          "B",
+          "H",
+          "B",
+          "C",
+          "H",
+          "B"
+        ],
+        "hearth": [
+          "C",
+          "H",
+          "C",
+          "H"
+        ],
+        "churchyard": [
+          "E",
+          "C",
+          "E",
+          "C"
+        ],
+        "concerned_return": [
+          "D",
+          "C",
+          "D",
+          "E"
+        ],
+        "departure": [
+          "F"
+        ],
+        "welcome": [
+          "G"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "C",
+        "B",
+        "B",
+        "C",
+        "E",
+        "E",
+        "B",
+        "C",
+        "H",
+        "H",
+        "D",
+        "D",
+        "B",
+        "C",
+        "F",
+        "G",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "within_current_grid_range_pending_browser_roundtrip",
+      "register_gap_count": 0
+    },
+    {
+      "number": 7,
+      "id": "horde_07_abbey",
+      "title": "Bells Beneath the Water",
+      "score": "07-abbey.json",
+      "bpm": 60,
+      "key": "A",
+      "scale": "minor",
+      "meter": "4/4",
+      "chord_colour": "sus2",
+      "voices": {
+        "chords": "felt_piano",
+        "melody": [
+          "bell",
+          "soft",
+          "soft_pluck"
+        ]
+      },
+      "motif_treatment": "M is spaced like a broken liturgy; answering fragments suggest reflected light, without audio alone revealing the puzzle solution.",
+      "story_guardrails": "Vista; short crossing; dry exploration; reflector practice/puzzle; duty-hall threat; post-seal reflection. Muffled texture belongs only to crossing/wet views, not the whole dry dungeon. No ocean palette.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "lake_vista",
+          "behavior": "one_shot",
+          "duration_seconds": 16.0
+        },
+        "B": {
+          "bars": 4,
+          "name": "dry_abbey",
+          "behavior": "loop",
+          "duration_seconds": 16.0
+        },
+        "C": {
+          "bars": 4,
+          "name": "interior_continuation",
+          "behavior": "loop",
+          "duration_seconds": 16.0
+        },
+        "D": {
+          "bars": 4,
+          "name": "duty_hall_threat",
+          "behavior": "loop",
+          "duration_seconds": 16.0
+        },
+        "E": {
+          "bars": 4,
+          "name": "reflector_practice",
+          "behavior": "loop",
+          "duration_seconds": 16.0
+        },
+        "F": {
+          "bars": 2,
+          "name": "short_crossing",
+          "behavior": "bridge",
+          "duration_seconds": 8.0
+        },
+        "G": {
+          "bars": 4,
+          "name": "post_seal_reflection",
+          "behavior": "one_shot",
+          "duration_seconds": 16.0
+        },
+        "H": {
+          "bars": 4,
+          "name": "cleared_return",
+          "behavior": "loop",
+          "duration_seconds": 16.0
+        }
+      },
+      "state_sequences": {
+        "entry": [
+          "A"
+        ],
+        "exploration": [
+          "B",
+          "C",
+          "B",
+          "C"
+        ],
+        "quiet_feature": [
+          "E",
+          "C",
+          "E",
+          "C"
+        ],
+        "threat": [
+          "D",
+          "D",
+          "C",
+          "D"
+        ],
+        "bridge": [
+          "F"
+        ],
+        "exit": [
+          "G"
+        ],
+        "narrative_colour": [
+          "H",
+          "C"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "C",
+        "B",
+        "B",
+        "C",
+        "E",
+        "E",
+        "B",
+        "C",
+        "H",
+        "H",
+        "D",
+        "D",
+        "B",
+        "C",
+        "F",
+        "G",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "requires_lower_melody_register_support_do_not_grid_reexport",
+      "register_gap_count": 9
+    },
+    {
+      "number": 8,
+      "id": "horde_08_bellkeeper",
+      "title": "The Bellkeeper",
+      "score": "08-bellkeeper.json",
+      "bpm": 108,
+      "key": "A",
+      "scale": "minor",
+      "meter": "4/4",
+      "chord_colour": "sus4",
+      "voices": {
+        "chords": "felt_piano",
+        "melody": [
+          "western_fiddle",
+          "bell",
+          "soft"
+        ]
+      },
+      "motif_treatment": "M is a measured bell/processional figure, opened into a clear higher-register answer during valid reflected-light exposure.",
+      "story_guardrails": "Armoured; reflected-light setup; actual exposure; recovery; final pressure if gameplay supports it; confirmed defeat. Music supports the learned reflector/shutter rule; never creates a mandatory rhythm puzzle or masks warnings.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "guardian_entrance",
+          "behavior": "one_shot",
+          "duration_seconds": 8.88888888888889
+        },
+        "B": {
+          "bars": 4,
+          "name": "armoured",
+          "behavior": "loop",
+          "duration_seconds": 8.88888888888889
+        },
+        "C": {
+          "bars": 4,
+          "name": "reflected_light_setup",
+          "behavior": "loop",
+          "duration_seconds": 8.88888888888889
+        },
+        "D": {
+          "bars": 4,
+          "name": "actual_exposure",
+          "behavior": "loop",
+          "duration_seconds": 8.88888888888889
+        },
+        "E": {
+          "bars": 4,
+          "name": "late_pressure",
+          "behavior": "loop",
+          "duration_seconds": 8.88888888888889
+        },
+        "F": {
+          "bars": 2,
+          "name": "armour_recovers",
+          "behavior": "bridge",
+          "duration_seconds": 4.444444444444445
+        },
+        "G": {
+          "bars": 4,
+          "name": "confirmed_defeat",
+          "behavior": "one_shot",
+          "duration_seconds": 8.88888888888889
+        },
+        "H": {
+          "bars": 4,
+          "name": "seal_release",
+          "behavior": "loop",
+          "duration_seconds": 8.88888888888889
+        }
+      },
+      "state_sequences": {
+        "entrance": [
+          "A"
+        ],
+        "protected": [
+          "B",
+          "C",
+          "B",
+          "C"
+        ],
+        "setup": [
+          "C",
+          "B",
+          "C",
+          "B"
+        ],
+        "exposure": [
+          "D",
+          "D"
+        ],
+        "escalation": [
+          "E",
+          "B",
+          "E",
+          "C"
+        ],
+        "reset": [
+          "F"
+        ],
+        "confirmed_defeat": [
+          "G"
+        ],
+        "aftermath": [
+          "H",
+          "H"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "B",
+        "F",
+        "C",
+        "D",
+        "B",
+        "E",
+        "C",
+        "E",
+        "F",
+        "G",
+        "H",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "requires_lower_melody_register_support_do_not_grid_reexport",
+      "register_gap_count": 3
+    },
+    {
+      "number": 9,
+      "id": "horde_09_foundry",
+      "title": "The King's Account",
+      "score": "09-foundry.json",
+      "bpm": 88,
+      "key": "D",
+      "scale": "minor",
+      "meter": "4/4",
+      "chord_colour": "triad",
+      "voices": {
+        "chords": "harp",
+        "melody": [
+          "soft_pluck",
+          "mellow_vibes",
+          "soft"
+        ]
+      },
+      "motif_treatment": "M is reduced to repeated work-shaped cells with displaced accents; a held tone mirrors leaving light in place while moving.",
+      "story_guardrails": "Approach; machinery exploration; stand lesson; smoke/cover pressure; cleared archive. Harmonic treatment cannot imply Abbey already happened. Mechanical hazards/timing have independent audible cues.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "gorge_vista",
+          "behavior": "one_shot",
+          "duration_seconds": 10.909090909090908
+        },
+        "B": {
+          "bars": 4,
+          "name": "mint_work",
+          "behavior": "loop",
+          "duration_seconds": 10.909090909090908
+        },
+        "C": {
+          "bars": 4,
+          "name": "archive_passage",
+          "behavior": "loop",
+          "duration_seconds": 10.909090909090908
+        },
+        "D": {
+          "bars": 4,
+          "name": "smoke_pressure",
+          "behavior": "loop",
+          "duration_seconds": 10.909090909090908
+        },
+        "E": {
+          "bars": 4,
+          "name": "stand_lesson",
+          "behavior": "loop",
+          "duration_seconds": 10.909090909090908
+        },
+        "F": {
+          "bars": 2,
+          "name": "access_bridge",
+          "behavior": "bridge",
+          "duration_seconds": 5.454545454545454
+        },
+        "G": {
+          "bars": 4,
+          "name": "cleared_archive",
+          "behavior": "one_shot",
+          "duration_seconds": 10.909090909090908
+        },
+        "H": {
+          "bars": 4,
+          "name": "return",
+          "behavior": "loop",
+          "duration_seconds": 10.909090909090908
+        }
+      },
+      "state_sequences": {
+        "entry": [
+          "A"
+        ],
+        "exploration": [
+          "B",
+          "C",
+          "B",
+          "C"
+        ],
+        "quiet_feature": [
+          "E",
+          "C",
+          "E",
+          "C"
+        ],
+        "threat": [
+          "D",
+          "D",
+          "C",
+          "D"
+        ],
+        "bridge": [
+          "F"
+        ],
+        "exit": [
+          "G"
+        ],
+        "narrative_colour": [
+          "H",
+          "C"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "C",
+        "B",
+        "B",
+        "C",
+        "E",
+        "E",
+        "B",
+        "C",
+        "H",
+        "H",
+        "D",
+        "D",
+        "B",
+        "C",
+        "F",
+        "G",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "requires_lower_melody_register_support_do_not_grid_reexport",
+      "register_gap_count": 9
+    },
+    {
+      "number": 10,
+      "id": "horde_10_master_coin",
+      "title": "Master of Coin",
+      "score": "10-master-coin.json",
+      "bpm": 116,
+      "key": "E",
+      "scale": "minor",
+      "meter": "4/4",
+      "chord_colour": "sus2",
+      "voices": {
+        "chords": "harp",
+        "melody": [
+          "soft_pluck",
+          "western_fiddle",
+          "muted_trumpet"
+        ]
+      },
+      "motif_treatment": "M is compressed and insistently repeated; the answer opens only for earned mechanism/exposure windows.",
+      "story_guardrails": "Shell protected; mechanism maintained; exposed; recovery; later pressure if authored; confirmed defeat. Keep soundscape gaps for fire, shutter and attack tells. No industrial/electronic or science-fiction identity.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "shell_entrance",
+          "behavior": "one_shot",
+          "duration_seconds": 8.275862068965518
+        },
+        "B": {
+          "bars": 4,
+          "name": "shell_protected",
+          "behavior": "loop",
+          "duration_seconds": 8.275862068965518
+        },
+        "C": {
+          "bars": 4,
+          "name": "mechanism_maintained",
+          "behavior": "loop",
+          "duration_seconds": 8.275862068965518
+        },
+        "D": {
+          "bars": 4,
+          "name": "actual_exposure",
+          "behavior": "loop",
+          "duration_seconds": 8.275862068965518
+        },
+        "E": {
+          "bars": 4,
+          "name": "late_pressure",
+          "behavior": "loop",
+          "duration_seconds": 8.275862068965518
+        },
+        "F": {
+          "bars": 2,
+          "name": "shell_recovers",
+          "behavior": "bridge",
+          "duration_seconds": 4.137931034482759
+        },
+        "G": {
+          "bars": 4,
+          "name": "confirmed_defeat",
+          "behavior": "one_shot",
+          "duration_seconds": 8.275862068965518
+        },
+        "H": {
+          "bars": 4,
+          "name": "seal_archive",
+          "behavior": "loop",
+          "duration_seconds": 8.275862068965518
+        }
+      },
+      "state_sequences": {
+        "entrance": [
+          "A"
+        ],
+        "protected": [
+          "B",
+          "C",
+          "B",
+          "C"
+        ],
+        "setup": [
+          "C",
+          "B",
+          "C",
+          "B"
+        ],
+        "exposure": [
+          "D",
+          "D"
+        ],
+        "escalation": [
+          "E",
+          "B",
+          "E",
+          "C"
+        ],
+        "reset": [
+          "F"
+        ],
+        "confirmed_defeat": [
+          "G"
+        ],
+        "aftermath": [
+          "H",
+          "H"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "B",
+        "F",
+        "C",
+        "D",
+        "B",
+        "E",
+        "C",
+        "E",
+        "F",
+        "G",
+        "H",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "requires_lower_melody_register_support_do_not_grid_reexport",
+      "register_gap_count": 9
+    },
+    {
+      "number": 11,
+      "id": "horde_11_glass_court",
+      "title": "A Garden Behind Glass",
+      "score": "11-glass-court.json",
+      "bpm": 68,
+      "key": "D",
+      "scale": "minor",
+      "meter": "4/4",
+      "chord_colour": "triad",
+      "voices": {
+        "chords": "harp",
+        "melody": [
+          "soft_pluck",
+          "cowboy_whistle",
+          "bell"
+        ]
+      },
+      "motif_treatment": "M becomes elegant and clearer in counterpoint; incomplete imitations suggest preserved beauty and contradictory history.",
+      "story_guardrails": "Ridge/gate; winter garden; mirrored gallery; aperture lesson; royal records; approaching keeper. Both seals gate access; musical evolution may reflect that completed history. Reflections are finite, not a demand for spatial audio gimmicks.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "ridge_reveal",
+          "behavior": "one_shot",
+          "duration_seconds": 14.117647058823529
+        },
+        "B": {
+          "bars": 4,
+          "name": "winter_garden",
+          "behavior": "loop",
+          "duration_seconds": 14.117647058823529
+        },
+        "C": {
+          "bars": 4,
+          "name": "mirrored_gallery",
+          "behavior": "loop",
+          "duration_seconds": 14.117647058823529
+        },
+        "D": {
+          "bars": 4,
+          "name": "keeper_approach",
+          "behavior": "loop",
+          "duration_seconds": 14.117647058823529
+        },
+        "E": {
+          "bars": 4,
+          "name": "aperture_records",
+          "behavior": "loop",
+          "duration_seconds": 14.117647058823529
+        },
+        "F": {
+          "bars": 2,
+          "name": "gallery_bridge",
+          "behavior": "bridge",
+          "duration_seconds": 7.0588235294117645
+        },
+        "G": {
+          "bars": 4,
+          "name": "return",
+          "behavior": "one_shot",
+          "duration_seconds": 14.117647058823529
+        },
+        "H": {
+          "bars": 4,
+          "name": "royal_records",
+          "behavior": "loop",
+          "duration_seconds": 14.117647058823529
+        }
+      },
+      "state_sequences": {
+        "entry": [
+          "A"
+        ],
+        "exploration": [
+          "B",
+          "C",
+          "B",
+          "C"
+        ],
+        "quiet_feature": [
+          "E",
+          "C",
+          "E",
+          "C"
+        ],
+        "threat": [
+          "D",
+          "D",
+          "C",
+          "D"
+        ],
+        "bridge": [
+          "F"
+        ],
+        "exit": [
+          "G"
+        ],
+        "narrative_colour": [
+          "H",
+          "C"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "C",
+        "B",
+        "B",
+        "C",
+        "E",
+        "E",
+        "B",
+        "C",
+        "H",
+        "H",
+        "D",
+        "D",
+        "B",
+        "C",
+        "F",
+        "G",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "within_current_grid_range_pending_browser_roundtrip",
+      "register_gap_count": 0
+    },
+    {
+      "number": 12,
+      "id": "horde_12_lucid_keeper",
+      "title": "The Last Lucid Keeper",
+      "score": "12-lucid-keeper.json",
+      "bpm": 100,
+      "key": "D",
+      "scale": "minor",
+      "meter": "4/4",
+      "chord_colour": "sus2",
+      "voices": {
+        "chords": "felt_piano",
+        "melody": [
+          "western_fiddle",
+          "soft_pluck",
+          "soft"
+        ]
+      },
+      "motif_treatment": "M and its previously hidden answering contour trade registers; protection sounds sorrowful and purposeful. Do not use a triumphant kill cadence.",
+      "story_guardrails": "Recognition/dialogue; wards intact; learned aperture action; vulnerability; confirmed defeat; evidence/revelation. Exact boss staging/survival remains undecided; state names must not hard-code killing.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "recognition_dialogue",
+          "behavior": "one_shot",
+          "duration_seconds": 9.6
+        },
+        "B": {
+          "bars": 4,
+          "name": "wards_intact",
+          "behavior": "loop",
+          "duration_seconds": 9.6
+        },
+        "C": {
+          "bars": 4,
+          "name": "receiver_selection",
+          "behavior": "loop",
+          "duration_seconds": 9.6
+        },
+        "D": {
+          "bars": 4,
+          "name": "protection_broken",
+          "behavior": "loop",
+          "duration_seconds": 9.6
+        },
+        "E": {
+          "bars": 4,
+          "name": "pressure",
+          "behavior": "loop",
+          "duration_seconds": 9.6
+        },
+        "F": {
+          "bars": 2,
+          "name": "regroup",
+          "behavior": "bridge",
+          "duration_seconds": 4.8
+        },
+        "G": {
+          "bars": 4,
+          "name": "confirmed_defeat",
+          "behavior": "one_shot",
+          "duration_seconds": 9.6
+        },
+        "H": {
+          "bars": 4,
+          "name": "revelation",
+          "behavior": "loop",
+          "duration_seconds": 9.6
+        }
+      },
+      "state_sequences": {
+        "entrance": [
+          "A"
+        ],
+        "protected": [
+          "B",
+          "C",
+          "B",
+          "C"
+        ],
+        "setup": [
+          "C",
+          "B",
+          "C",
+          "B"
+        ],
+        "exposure": [
+          "D",
+          "D"
+        ],
+        "escalation": [
+          "E",
+          "B",
+          "E",
+          "C"
+        ],
+        "reset": [
+          "F"
+        ],
+        "confirmed_defeat": [
+          "G"
+        ],
+        "aftermath": [
+          "H",
+          "H"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "B",
+        "F",
+        "C",
+        "D",
+        "B",
+        "E",
+        "C",
+        "E",
+        "F",
+        "G",
+        "H",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "requires_lower_melody_register_support_do_not_grid_reexport",
+      "register_gap_count": 9
+    },
+    {
+      "number": 13,
+      "id": "horde_13_treasury",
+      "title": "All That Was Carried Home",
+      "score": "13-treasury.json",
+      "bpm": 64,
+      "key": "D",
+      "scale": "minor",
+      "meter": "4/4",
+      "chord_colour": "triad",
+      "voices": {
+        "chords": "harp",
+        "melody": [
+          "cowboy_whistle",
+          "soft_pluck",
+          "mellow_vibes"
+        ]
+      },
+      "motif_treatment": "M returns with genuine beauty; Abbey, Foundry and Court colours become recognizable echoes of plundered objects. Suspicion grows through harmonic context, not an early villain reveal.",
+      "story_guardrails": "Awe; examine riches; prepare ritual; genuine release of soldiers; entity freed. Sequence triggered by authored events; players may linger indefinitely. This is compact finale staging, not a fourth full dungeon.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "treasury_vista",
+          "behavior": "one_shot",
+          "duration_seconds": 15.0
+        },
+        "B": {
+          "bars": 4,
+          "name": "genuine_riches",
+          "behavior": "loop",
+          "duration_seconds": 15.0
+        },
+        "C": {
+          "bars": 4,
+          "name": "riches_continuation",
+          "behavior": "loop",
+          "duration_seconds": 15.0
+        },
+        "D": {
+          "bars": 4,
+          "name": "ritual_suspicion",
+          "behavior": "loop",
+          "duration_seconds": 15.0
+        },
+        "E": {
+          "bars": 4,
+          "name": "ritual_preparation",
+          "behavior": "loop",
+          "duration_seconds": 15.0
+        },
+        "F": {
+          "bars": 2,
+          "name": "interrupt_safe_hold",
+          "behavior": "bridge",
+          "duration_seconds": 7.5
+        },
+        "G": {
+          "bars": 4,
+          "name": "release_bridge",
+          "behavior": "one_shot",
+          "duration_seconds": 15.0
+        },
+        "H": {
+          "bars": 4,
+          "name": "soldiers_released",
+          "behavior": "loop",
+          "duration_seconds": 15.0
+        }
+      },
+      "state_sequences": {
+        "awe": [
+          "A",
+          "B"
+        ],
+        "riches": [
+          "B",
+          "C",
+          "B",
+          "C",
+          "B",
+          "H",
+          "C",
+          "B"
+        ],
+        "ritual_preparation": [
+          "E",
+          "C",
+          "E",
+          "C"
+        ],
+        "ritual_hold": [
+          "F",
+          "F"
+        ],
+        "soldiers_release": [
+          "H"
+        ],
+        "entity_release": [
+          "G"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "C",
+        "B",
+        "B",
+        "C",
+        "E",
+        "E",
+        "B",
+        "C",
+        "H",
+        "H",
+        "D",
+        "D",
+        "B",
+        "C",
+        "F",
+        "G",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "within_current_grid_range_pending_browser_roundtrip",
+      "register_gap_count": 0
+    },
+    {
+      "number": 14,
+      "id": "horde_14_entity",
+      "title": "What the Dark Releases",
+      "score": "14-entity.json",
+      "bpm": 120,
+      "key": "D",
+      "scale": "minor",
+      "meter": "4/4",
+      "chord_colour": "sus4",
+      "voices": {
+        "chords": "felt_piano",
+        "melody": [
+          "western_fiddle",
+          "soft_pluck",
+          "muted_trumpet"
+        ]
+      },
+      "motif_treatment": "M appears in its most forceful distorted rhythm/register against the human COMPANION/HOME answer. Its recognizable identity is retained rather than replaced by generic boss music.",
+      "story_guardrails": "Proposed musical phases only: confrontation, escalating pressure, culmination, actual defeat. No invented entity form, name, attack or new mandatory power. A/B/C can be selected by future authored encounter events.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "rupture",
+          "behavior": "one_shot",
+          "duration_seconds": 8.0
+        },
+        "B": {
+          "bars": 4,
+          "name": "confrontation",
+          "behavior": "loop",
+          "duration_seconds": 8.0
+        },
+        "C": {
+          "bars": 4,
+          "name": "escalation",
+          "behavior": "loop",
+          "duration_seconds": 8.0
+        },
+        "D": {
+          "bars": 4,
+          "name": "human_answer",
+          "behavior": "loop",
+          "duration_seconds": 8.0
+        },
+        "E": {
+          "bars": 4,
+          "name": "culmination",
+          "behavior": "loop",
+          "duration_seconds": 8.0
+        },
+        "F": {
+          "bars": 2,
+          "name": "phase_bridge",
+          "behavior": "bridge",
+          "duration_seconds": 4.0
+        },
+        "G": {
+          "bars": 4,
+          "name": "confirmed_defeat",
+          "behavior": "one_shot",
+          "duration_seconds": 8.0
+        },
+        "H": {
+          "bars": 4,
+          "name": "release",
+          "behavior": "loop",
+          "duration_seconds": 8.0
+        }
+      },
+      "state_sequences": {
+        "rupture": [
+          "A"
+        ],
+        "confrontation": [
+          "B",
+          "C",
+          "B",
+          "C"
+        ],
+        "escalation": [
+          "C",
+          "E",
+          "C",
+          "E"
+        ],
+        "human_answer": [
+          "D",
+          "B",
+          "D",
+          "C"
+        ],
+        "culmination": [
+          "E",
+          "D",
+          "E",
+          "C"
+        ],
+        "bridge": [
+          "F"
+        ],
+        "confirmed_defeat": [
+          "G"
+        ],
+        "release": [
+          "H",
+          "H"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "B",
+        "F",
+        "C",
+        "D",
+        "B",
+        "E",
+        "C",
+        "E",
+        "F",
+        "G",
+        "H",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "requires_lower_melody_register_support_do_not_grid_reexport",
+      "register_gap_count": 8
+    },
+    {
+      "number": 15,
+      "id": "horde_15_homecoming",
+      "title": "Enough to Come Home",
+      "score": "15-homecoming.json",
+      "bpm": 76,
+      "key": "D",
+      "scale": "major",
+      "meter": "4/4",
+      "chord_colour": "triad",
+      "voices": {
+        "chords": "harp",
+        "melody": [
+          "cowboy_whistle",
+          "soft_pluck",
+          "western_fiddle"
+        ]
+      },
+      "motif_treatment": "M finally receives a settled answer from COMPANION/HOME; the ending is earned, modest and hopeful, not proof of a specific treasure distribution or daylight.",
+      "story_guardrails": "Return road; changed home; quiet epilogue; optional credits. One ending only; no alternate keeper branch. Keep full unresolved narrative decisions out of music labels.",
+      "sections": {
+        "A": {
+          "bars": 4,
+          "name": "return_road_entry",
+          "behavior": "one_shot",
+          "duration_seconds": 12.631578947368421
+        },
+        "B": {
+          "bars": 4,
+          "name": "playable_return",
+          "behavior": "loop",
+          "duration_seconds": 12.631578947368421
+        },
+        "C": {
+          "bars": 4,
+          "name": "changed_home",
+          "behavior": "loop",
+          "duration_seconds": 12.631578947368421
+        },
+        "D": {
+          "bars": 4,
+          "name": "memory_of_dark",
+          "behavior": "loop",
+          "duration_seconds": 12.631578947368421
+        },
+        "E": {
+          "bars": 4,
+          "name": "credits_expansion",
+          "behavior": "loop",
+          "duration_seconds": 12.631578947368421
+        },
+        "F": {
+          "bars": 2,
+          "name": "epilogue_bridge",
+          "behavior": "bridge",
+          "duration_seconds": 6.315789473684211
+        },
+        "G": {
+          "bars": 4,
+          "name": "final_cadence",
+          "behavior": "one_shot",
+          "duration_seconds": 12.631578947368421
+        },
+        "H": {
+          "bars": 4,
+          "name": "settled_home",
+          "behavior": "loop",
+          "duration_seconds": 12.631578947368421
+        }
+      },
+      "state_sequences": {
+        "entry": [
+          "A",
+          "C"
+        ],
+        "return": [
+          "B",
+          "C",
+          "B",
+          "C",
+          "B",
+          "H",
+          "B",
+          "C"
+        ],
+        "village": [
+          "H",
+          "B",
+          "H",
+          "B"
+        ],
+        "credits": [
+          "B",
+          "C",
+          "D",
+          "E",
+          "C",
+          "B",
+          "E",
+          "H"
+        ],
+        "final_cadence": [
+          "F",
+          "G",
+          "H"
+        ]
+      },
+      "review_sequence": [
+        "A",
+        "B",
+        "B",
+        "C",
+        "B",
+        "C",
+        "H",
+        "H",
+        "D",
+        "E",
+        "C",
+        "B",
+        "C",
+        "E",
+        "H",
+        "F",
+        "G",
+        "H"
+      ],
+      "trigger_status": "Proposed authored events; not implemented runtime dispatch",
+      "loop_note": "Each loopable block rendered with prior-cycle carryover by actual Core engine; listenable arrangement is one possible path, not a scripted gameplay timer.",
+      "editor_register_status": "requires_lower_melody_register_support_do_not_grid_reexport",
+      "register_gap_count": 7
+    }
+  ],
+  "optional_event_banks": [
+    {
+      "bank": "utility-signals.json",
+      "section": "A",
+      "id": "discovery",
+      "bars": 1,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "utility-signals.json",
+      "section": "B",
+      "id": "local_tool",
+      "bars": 2,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "utility-signals.json",
+      "section": "C",
+      "id": "light_solved",
+      "bars": 1,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "utility-signals.json",
+      "section": "D",
+      "id": "access_opened",
+      "bars": 1,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "utility-signals.json",
+      "section": "E",
+      "id": "seal_awarded",
+      "bars": 4,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "utility-signals.json",
+      "section": "F",
+      "id": "lantern_clue",
+      "bars": 2,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "utility-signals.json",
+      "section": "G",
+      "id": "player_defeat",
+      "bars": 2,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "defeat_cancels_pending_rewards",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "utility-signals.json",
+      "section": "H",
+      "id": "retry_pickup",
+      "bars": 1,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "encounter-and-tool-answers.json",
+      "section": "A",
+      "id": "prologue_defeat",
+      "bars": 2,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "encounter-and-tool-answers.json",
+      "section": "B",
+      "id": "bellkeeper_defeat",
+      "bars": 2,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "encounter-and-tool-answers.json",
+      "section": "C",
+      "id": "mintmaster_defeat",
+      "bars": 2,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "encounter-and-tool-answers.json",
+      "section": "D",
+      "id": "lucid_keeper_defeat",
+      "bars": 2,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "encounter-and-tool-answers.json",
+      "section": "E",
+      "id": "entity_defeat",
+      "bars": 4,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "encounter-and-tool-answers.json",
+      "section": "F",
+      "id": "reflector_acquired",
+      "bars": 2,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "encounter-and-tool-answers.json",
+      "section": "G",
+      "id": "stand_acquired",
+      "bars": 2,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    },
+    {
+      "bank": "encounter-and-tool-answers.json",
+      "section": "H",
+      "id": "aperture_acquired",
+      "bars": 2,
+      "bpm": 80,
+      "behavior": "one_shot",
+      "trigger": "Only on confirmed matching gameplay event",
+      "priority": "contextual",
+      "replay": "Deduplicate persistent rewards; apply cooldown to discoveries and clue inserts; no automatic return implemented"
+    }
+  ],
+  "future_engine_artistic_requests": [
+    {
+      "priority": "required_for_faithful_editing",
+      "request": "Expand compact editor melody octave range to\u22122..2, matching existing Core support, with preserved notes/holds on import/export. Ten family banks and utility signals deliberately retain lower-register musical intent."
+    },
+    {
+      "priority": "musical",
+      "request": "True compound6/8 meter for Bellwether and Homecoming alternatives; current delivered4/4-lilt scores remain valid. A six-quarter beat counter alone is not6/8 beat-group semantics."
+    },
+    {
+      "priority": "high",
+      "request": "Faithful acoustic-seeming renderer voices, full envelope/filter/FX parity between editor/live/offline/native paths, without changing note or register intent."
+    },
+    {
+      "priority": "high",
+      "request": "True section-end queueing and cancellable state transitions with stinger playback and verified return."
+    },
+    {
+      "priority": "musical",
+      "request": "Longer through-composed sections, variable-length forms and reusable arranged state loops beyond8blocks when engine supports them."
+    }
+  ]
+}

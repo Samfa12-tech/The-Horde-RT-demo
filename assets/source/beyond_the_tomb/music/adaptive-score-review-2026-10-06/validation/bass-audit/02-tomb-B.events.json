@@ -1,0 +1,239 @@
+{
+  "name": "02-tomb-B",
+  "bank": "02-tomb",
+  "sectionId": "B",
+  "sourceScore": "scores/02-tomb.json",
+  "sourceSha256": "5d0effbb9bbca1a17283a4b244d82b4d8bc8f626b96de3c6c8eed83a6b22ba3d",
+  "bpm": 60,
+  "sectionDurationSeconds": 16,
+  "sampleRate": 44100,
+  "tailSeconds": 0.6,
+  "fixedBankGainDb": 15.428613933173468,
+  "fixedBankGainLinear": 5.907866821800279,
+  "sourceBeatVolume": 0.25,
+  "sourceMasterVolume": 0.7,
+  "bassTone": "classic",
+  "events": [
+    {
+      "id": "B_0_bass_bass_0",
+      "time": 0,
+      "duration": 1.1749999999999998,
+      "tick": 0,
+      "durationTicks": 564,
+      "step": 0,
+      "bar": 1,
+      "beat": 1,
+      "sectionId": "B",
+      "arrangementIndex": 0,
+      "stem": "bass",
+      "type": "bass",
+      "velocity": 0.34,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 38,
+      "slideOffset": null,
+      "bassTone": "classic"
+    },
+    {
+      "id": "B_0_bass_bass_16",
+      "time": 4,
+      "duration": 1.1749999999999998,
+      "tick": 1920,
+      "durationTicks": 564,
+      "step": 16,
+      "bar": 2,
+      "beat": 1,
+      "sectionId": "B",
+      "arrangementIndex": 0,
+      "stem": "bass",
+      "type": "bass",
+      "velocity": 0.34,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 38,
+      "slideOffset": null,
+      "bassTone": "classic"
+    },
+    {
+      "id": "B_0_bass_bass_32",
+      "time": 8,
+      "duration": 1.1749999999999998,
+      "tick": 3840,
+      "durationTicks": 564,
+      "step": 32,
+      "bar": 3,
+      "beat": 1,
+      "sectionId": "B",
+      "arrangementIndex": 0,
+      "stem": "bass",
+      "type": "bass",
+      "velocity": 0.34,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 46,
+      "slideOffset": null,
+      "bassTone": "classic"
+    },
+    {
+      "id": "B_0_bass_bass_48",
+      "time": 12,
+      "duration": 1.1749999999999998,
+      "tick": 5760,
+      "durationTicks": 564,
+      "step": 48,
+      "bar": 4,
+      "beat": 1,
+      "sectionId": "B",
+      "arrangementIndex": 0,
+      "stem": "bass",
+      "type": "bass",
+      "velocity": 0.34,
+      "accent": false,
+      "tuplet": false,
+      "audioProfile": "standard",
+      "lofiPreset": "",
+      "chipPreset": "",
+      "metalPreset": "",
+      "funkPreset": "funk_classic_pocket",
+      "westernPreset": "western_trail",
+      "soundProfile": {
+        "id": "standard",
+        "preset": "standard_chordsmith",
+        "recipeVersion": 1,
+        "parameters": {
+          "neutralTone": 0.5,
+          "transientClarity": 0.5
+        }
+      },
+      "midi": 45,
+      "slideOffset": null,
+      "bassTone": "classic"
+    }
+  ],
+  "eventTraceSha256": "2f61b5f08be831fd4754d3b9503820b9fd3ee5f0438ef14f106734344f397c1b",
+  "metrics": {
+    "sampleRate": 44100,
+    "frames": 732061,
+    "channels": 2,
+    "durationSeconds": 16.600022675736962,
+    "eventCount": 4,
+    "peak": 0.1856035590171814,
+    "peakDbfs": -14.628274005586297,
+    "rms": 0.025872133320760732,
+    "rmsDbfs": -31.743355189692313,
+    "clippedSamples": 0,
+    "nonFiniteSamples": 0,
+    "dcOffsets": [
+      0.000008981256982447006,
+      0.000008981256982447006
+    ],
+    "maxAdjacentSampleDelta": 0.3701862096786499,
+    "firstAudibleFrame": 25,
+    "lastAudibleFrame": 578120,
+    "firstAudibleSeconds": 0.0005668934240362812,
+    "trailingSilenceSeconds": 3.490702947845805,
+    "loopSeam": {
+      "peakAbsoluteJump": 0,
+      "jumpDbfs": null,
+      "channels": [
+        {
+          "jump": 0,
+          "absoluteJump": 0,
+          "precedingSlope": 0,
+          "followingSlope": -0.0000461091949546244,
+          "slopeChangeBefore": 0,
+          "slopeChangeAfter": 0.0000461091949546244,
+          "head10msRms": 0.005174526351015409,
+          "tail10msRms": 0,
+          "nearby10msMaxAdjacentDelta": 0.00007985159754753113,
+          "jumpToNearbyDeltaRatio": 0
+        },
+        {
+          "jump": 0,
+          "absoluteJump": 0,
+          "precedingSlope": 0,
+          "followingSlope": -0.0000461091949546244,
+          "slopeChangeBefore": 0,
+          "slopeChangeAfter": 0.0000461091949546244,
+          "head10msRms": 0.005174526351015409,
+          "tail10msRms": 0,
+          "nearby10msMaxAdjacentDelta": 0.00007985159754753113,
+          "jumpToNearbyDeltaRatio": 0
+        }
+      ],
+      "warning": false,
+      "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+    }
+  },
+  "coreWav": "02-tomb-B.core-bass.wav",
+  "coreWavSha256": "ba13c0bb4816639cd0f81d21881051e029eb33cf13810d42af49f51d494e4412",
+  "coreMp3": "02-tomb-B.core-bass.mp3",
+  "firstNoteFiles": {
+    "44100": {
+      "filename": "02-tomb-B.first-note-44100.wav",
+      "sha256": "5a1349d9e5b0680038b4b3ce27dc4c63aac2395f2b37255005fb68e575ce1258"
+    },
+    "176400": {
+      "filename": "02-tomb-B.first-note-176400.wav",
+      "sha256": "16f6effaa94fc5071d05c953043ec326c4c75a9da7993b072a10248b815ab2b0"
+    }
+  },
+  "firstNoteOversampledDownsampledFile": "02-tomb-B.first-note-176400-to-44100.wav",
+  "mixSensitivity": {
+    "lowBeatVolume": 0.01,
+    "highBeatVolume": 1,
+    "lowHash": "f95a452de2591c34da7203d485852edf3a76cae141f3bb45510f5c3ef6a78636",
+    "highHash": "f95a452de2591c34da7203d485852edf3a76cae141f3bb45510f5c3ef6a78636",
+    "identicalPcmDespite100xBeatVolume": true
+  },
+  "analysisCaveat": "Oversampled same-engine diagnostic measures sample-rate dependence including aliasing, waveform phase/grid quantization and resampling; it is not an isolated alias-distortion percentage or proposed replacement synth.",
+  "provenanceRefresh": {
+    "reason": "Canonical Tomb C octave declaration corrected to already-rendered value; Tomb B performed events and audio unchanged.",
+    "previousSourceSha256": "082e0943333186f3fd5b3aa0b9ec0fde07b4721972084ac34e5a7ff45487cc4f"
+  }
+}

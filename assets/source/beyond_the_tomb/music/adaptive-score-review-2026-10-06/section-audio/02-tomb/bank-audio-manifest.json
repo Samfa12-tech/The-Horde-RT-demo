@@ -1,0 +1,668 @@
+{
+  "bank": "02-tomb",
+  "title": "The Fourth Keeper's Rest",
+  "sourceScore": "02-tomb.json",
+  "sourceSha256": "5d0effbb9bbca1a17283a4b244d82b4d8bc8f626b96de3c6c8eed83a6b22ba3d",
+  "referenceAudio": true,
+  "sourceEngineCommit": "0c6975cadcd4aba0047ab94170a2adabc722517f",
+  "commonGainDb": 15.428613933173468,
+  "commonGainLinear": 5.907866821800279,
+  "targetSectionBankMaxPeakDbfs": -3,
+  "preGainSectionBankMaxPeak": 0.11983103305101395,
+  "fullSequenceClipGuardAdjustedGain": false,
+  "sampleRate": 44100,
+  "bitDepth": 16,
+  "sections": [
+    {
+      "id": "A",
+      "name": "threshold",
+      "behavior": "one_shot",
+      "wav": "A-threshold.wav",
+      "flac": {
+        "filename": "A-threshold.flac",
+        "bytes": 415429,
+        "sha256": "df0c1f208a33f2e4dd3bf1ab434f0b46c05c4094d0f968fb9c7a192b373bde69",
+        "pcmSha256": "e6937dcd53531226b81905884b5b6aa7e03b415b15f55d9acf583da0f2a4436e",
+        "pcmRoundtripVerified": true
+      },
+      "mp3": null,
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 732061,
+        "channels": 2,
+        "durationSeconds": 16.600022675736962,
+        "eventCount": 14,
+        "peak": 0.37214595079421997,
+        "peakDbfs": -8.58573404142518,
+        "rms": 0.03794800535399392,
+        "rmsDbfs": -28.416220936355487,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          0.000011973495509546105,
+          0.00001147331022296381
+        ],
+        "maxAdjacentSampleDelta": 0.369848370552063,
+        "firstAudibleFrame": 48,
+        "lastAudibleFrame": 674795,
+        "firstAudibleSeconds": 0.0010884353741496598,
+        "trailingSilenceSeconds": 1.2985260770975056,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00004485895624384284,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00004485895624384284,
+              "head10msRms": 0.016211628814934587,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.0005657188594341278,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00004502039882936515,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00004502039882936515,
+              "head10msRms": 0.014449341307917465,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.0004932880401611328,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "report": "A-threshold.metrics.json",
+      "events": "A-threshold.events.json"
+    },
+    {
+      "id": "B",
+      "name": "buried_corridors",
+      "behavior": "loop",
+      "wav": "B-buried_corridors.wav",
+      "flac": {
+        "filename": "B-buried_corridors.flac",
+        "bytes": 452976,
+        "sha256": "4a23a697af545efeb0052b5dacb83058ea1cb656df459ec39f4b4fc8ce7992bd",
+        "pcmSha256": "b4ab6d8a527297a44ed4f221fe9e8ae6dcf3547f0731dc7c13287f2423d9c5e0",
+        "pcmRoundtripVerified": true
+      },
+      "mp3": null,
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 705600,
+        "channels": 2,
+        "durationSeconds": 16,
+        "eventCount": 17,
+        "peak": 0.3749859035015106,
+        "peakDbfs": -8.519701159929708,
+        "rms": 0.04209831977588696,
+        "rmsDbfs": -27.514704746765286,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          0.000010345733470330706,
+          0.00001001660422213408
+        ],
+        "maxAdjacentSampleDelta": 0.369848370552063,
+        "firstAudibleFrame": 55,
+        "lastAudibleFrame": 674795,
+        "firstAudibleSeconds": 0.0012471655328798186,
+        "trailingSilenceSeconds": 0.6985034013605442,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00004508022902882658,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00004508022902882658,
+              "head10msRms": 0.013800061921612825,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00046644359827041626,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00004520938455243595,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00004520938455243595,
+              "head10msRms": 0.012407863922795144,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00040849484503269196,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "report": "B-buried_corridors.metrics.json",
+      "events": "B-buried_corridors.events.json"
+    },
+    {
+      "id": "C",
+      "name": "waterfall_chamber",
+      "behavior": "loop",
+      "wav": "C-waterfall_chamber.wav",
+      "flac": {
+        "filename": "C-waterfall_chamber.flac",
+        "bytes": 477511,
+        "sha256": "6af0e88c032e9fa22f5e03ea5f21a1302fbf7b5ff22d64fd6cbb5240d0b643a4",
+        "pcmSha256": "c86e33f073bedc44f1b98543694b4b806337d82e722c684e2dd29ea462bdc8b2",
+        "pcmRoundtripVerified": true
+      },
+      "mp3": null,
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 705600,
+        "channels": 2,
+        "durationSeconds": 16,
+        "eventCount": 16,
+        "peak": 0.4126835763454437,
+        "peakDbfs": -7.687656289739077,
+        "rms": 0.044623370466138054,
+        "rmsDbfs": -27.00875259876513,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          0.000019533549323070763,
+          0.000019192875436432183
+        ],
+        "maxAdjacentSampleDelta": 0.38092656433582306,
+        "firstAudibleFrame": 28,
+        "lastAudibleFrame": 674471,
+        "firstAudibleSeconds": 0.0006349206349206349,
+        "trailingSilenceSeconds": 0.7058503401360544,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.000045965323806740344,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.000045965323806740344,
+              "head10msRms": 0.005050363494386574,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00009008683264255524,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.000045965323806740344,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.000045965323806740344,
+              "head10msRms": 0.005050363494386574,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00009008683264255524,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "report": "C-waterfall_chamber.metrics.json",
+      "events": "C-waterfall_chamber.events.json"
+    },
+    {
+      "id": "D",
+      "name": "guard_threat",
+      "behavior": "loop",
+      "wav": "D-guard_threat.wav",
+      "flac": {
+        "filename": "D-guard_threat.flac",
+        "bytes": 473838,
+        "sha256": "d6a3ddf378e15fbd7df209dcd2e922e5c3c6b620c5d8be4e0edc7f2804f46c3a",
+        "pcmSha256": "c1628c658fc2b52b2cc19a80109b8763954486da88ca4ebc5381adac1dc92498",
+        "pcmRoundtripVerified": true
+      },
+      "mp3": null,
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 705600,
+        "channels": 2,
+        "durationSeconds": 16,
+        "eventCount": 25,
+        "peak": 0.7079457640647888,
+        "peakDbfs": -3.0000002493010487,
+        "rms": 0.0565088529761076,
+        "rmsDbfs": -24.957670159546463,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          0.0000653672207829068,
+          0.0000655365410918334
+        ],
+        "maxAdjacentSampleDelta": 0.3742298185825348,
+        "firstAudibleFrame": 6,
+        "lastAudibleFrame": 674795,
+        "firstAudibleSeconds": 0.00013605442176870748,
+        "trailingSilenceSeconds": 0.6985034013605442,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": 0.0000013588199863079353,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.0000013588199863079353,
+              "head10msRms": 0.3551631839524758,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.08730322122573853,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": 0.0000011435661235736916,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.0000011435661235736916,
+              "head10msRms": 0.35278925287307616,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.08739030361175537,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "report": "D-guard_threat.metrics.json",
+      "events": "D-guard_threat.events.json"
+    },
+    {
+      "id": "E",
+      "name": "buried_history",
+      "behavior": "loop",
+      "wav": "E-buried_history.wav",
+      "flac": {
+        "filename": "E-buried_history.flac",
+        "bytes": 430784,
+        "sha256": "30fb891698d02ed10419506f1964b955501ba40f9da9b544c0cae436f4781393",
+        "pcmSha256": "ab26d5b9fbf0c63fea4fe9650240b0f30b31c478fb491170cb51fd97e10c8966",
+        "pcmRoundtripVerified": true
+      },
+      "mp3": null,
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 705600,
+        "channels": 2,
+        "durationSeconds": 16,
+        "eventCount": 15,
+        "peak": 0.312779039144516,
+        "peakDbfs": -10.095247176750846,
+        "rms": 0.04035637268377595,
+        "rmsDbfs": -27.881757519770332,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          0.000008642115027648501,
+          0.000008907517901405517
+        ],
+        "maxAdjacentSampleDelta": 0.3769540712237358,
+        "firstAudibleFrame": 28,
+        "lastAudibleFrame": 674795,
+        "firstAudibleSeconds": 0.0006349206349206349,
+        "trailingSilenceSeconds": 0.6985034013605442,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.000045965323806740344,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.000045965323806740344,
+              "head10msRms": 0.005050363494386574,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00009008683264255524,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.000045965323806740344,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.000045965323806740344,
+              "head10msRms": 0.005050363494386574,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.00009008683264255524,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "report": "E-buried_history.metrics.json",
+      "events": "E-buried_history.events.json"
+    },
+    {
+      "id": "F",
+      "name": "danger_recedes",
+      "behavior": "bridge",
+      "wav": "F-danger_recedes.wav",
+      "flac": {
+        "filename": "F-danger_recedes.flac",
+        "bytes": 228449,
+        "sha256": "ebc716018377ec1008ba3b1dbf03ecc1c16a16dbb1a8a7e5a1f6738776816ccb",
+        "pcmSha256": "26df9097f42611aed65270f2bd45e796e4e4745ae9f77f43c2a1345f1f96b3ca",
+        "pcmRoundtripVerified": true
+      },
+      "mp3": null,
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 352800,
+        "channels": 2,
+        "durationSeconds": 8,
+        "eventCount": 8,
+        "peak": 0.36562684178352356,
+        "peakDbfs": -8.739238577661197,
+        "rms": 0.038671649306968967,
+        "rmsDbfs": -28.252146106177193,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          0.00001603071091853192,
+          0.000015969073662692
+        ],
+        "maxAdjacentSampleDelta": 0.3306553214788437,
+        "firstAudibleFrame": 37,
+        "lastAudibleFrame": 349984,
+        "firstAudibleSeconds": 0.0008390022675736961,
+        "trailingSilenceSeconds": 0.06383219954648527,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00004430764602147974,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00004430764602147974,
+              "head10msRms": 0.012553156783169182,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.0008561313152313232,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00004454953159438446,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00004454953159438446,
+              "head10msRms": 0.011023638057296474,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.0007404834032058716,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "report": "F-danger_recedes.metrics.json",
+      "events": "F-danger_recedes.events.json"
+    },
+    {
+      "id": "G",
+      "name": "safe_aftermath",
+      "behavior": "one_shot",
+      "wav": "G-safe_aftermath.wav",
+      "flac": {
+        "filename": "G-safe_aftermath.flac",
+        "bytes": 424170,
+        "sha256": "d2a8385f78ab01f8aca95308fb8ef55b318626b0286ab11aa8f25c43557233a0",
+        "pcmSha256": "be7d78f69a2c7f8e95ee4981178442090967d9ed8cecf1548c091c09f757a819",
+        "pcmRoundtripVerified": true
+      },
+      "mp3": null,
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 732061,
+        "channels": 2,
+        "durationSeconds": 16.600022675736962,
+        "eventCount": 14,
+        "peak": 0.3875987231731415,
+        "peakDbfs": -8.232353245416794,
+        "rms": 0.04103265011384522,
+        "rmsDbfs": -27.73740866010025,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          0.0000032164125934904067,
+          0.0000033629883311006715
+        ],
+        "maxAdjacentSampleDelta": 0.3703286573290825,
+        "firstAudibleFrame": 48,
+        "lastAudibleFrame": 674795,
+        "firstAudibleSeconds": 0.0010884353741496598,
+        "trailingSilenceSeconds": 1.2985260770975056,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00004485895624384284,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00004485895624384284,
+              "head10msRms": 0.016211628814934587,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.0005657188594341278,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00004502039882936515,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00004502039882936515,
+              "head10msRms": 0.014449341307917465,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.0004932880401611328,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "report": "G-safe_aftermath.metrics.json",
+      "events": "G-safe_aftermath.events.json"
+    },
+    {
+      "id": "H",
+      "name": "quiet_recovery",
+      "behavior": "loop",
+      "wav": "H-quiet_recovery.wav",
+      "flac": {
+        "filename": "H-quiet_recovery.flac",
+        "bytes": 448073,
+        "sha256": "9fe02c468af2b5c7a9be16aab33042c54ab56b5bcaeccdd7b6adad2a541d9365",
+        "pcmSha256": "4ddc470be3ae5a94570b69439379b2b6f38e0a235c6792088c134ce995bf1d32",
+        "pcmRoundtripVerified": true
+      },
+      "mp3": null,
+      "metrics": {
+        "sampleRate": 44100,
+        "frames": 705600,
+        "channels": 2,
+        "durationSeconds": 16,
+        "eventCount": 17,
+        "peak": 0.3875987231731415,
+        "peakDbfs": -8.232353245416794,
+        "rms": 0.043263852962675146,
+        "rmsDbfs": -27.277496121463344,
+        "clippedSamples": 0,
+        "nonFiniteSamples": 0,
+        "dcOffsets": [
+          0.0000018130588046466577,
+          0.000002234658702759962
+        ],
+        "maxAdjacentSampleDelta": 0.369848370552063,
+        "firstAudibleFrame": 48,
+        "lastAudibleFrame": 674795,
+        "firstAudibleSeconds": 0.0010884353741496598,
+        "trailingSilenceSeconds": 0.6985034013605442,
+        "loopSeam": {
+          "peakAbsoluteJump": 0,
+          "jumpDbfs": null,
+          "channels": [
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00004485895624384284,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00004485895624384284,
+              "head10msRms": 0.016211628814934587,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.0005657188594341278,
+              "jumpToNearbyDeltaRatio": 0
+            },
+            {
+              "jump": 0,
+              "absoluteJump": 0,
+              "precedingSlope": 0,
+              "followingSlope": -0.00004502039882936515,
+              "slopeChangeBefore": 0,
+              "slopeChangeAfter": 0.00004502039882936515,
+              "head10msRms": 0.014449341307917465,
+              "tail10msRms": 0,
+              "nearby10msMaxAdjacentDelta": 0.0004932880401611328,
+              "jumpToNearbyDeltaRatio": 0
+            }
+          ],
+          "warning": false,
+          "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+        }
+      },
+      "report": "H-quiet_recovery.metrics.json",
+      "events": "H-quiet_recovery.events.json"
+    }
+  ],
+  "fullReview": {
+    "wav": "previews/full/02-tomb.wav",
+    "mp3": "previews/full/02-tomb.mp3",
+    "report": "previews/full/02-tomb.metrics.json",
+    "events": "previews/full/02-tomb.events.json",
+    "metrics": {
+      "sampleRate": 44100,
+      "frames": 14491261,
+      "channels": 2,
+      "durationSeconds": 328.60002267573697,
+      "eventCount": 349,
+      "peak": 0.7079457640647888,
+      "peakDbfs": -3.0000002493010487,
+      "rms": 0.04404253676598295,
+      "rmsDbfs": -27.122553488946835,
+      "clippedSamples": 0,
+      "nonFiniteSamples": 0,
+      "dcOffsets": [
+        0.00001640778472854727,
+        0.00001631324606684023
+      ],
+      "maxAdjacentSampleDelta": 0.38092656433582306,
+      "firstAudibleFrame": 48,
+      "lastAudibleFrame": 14433995,
+      "firstAudibleSeconds": 0.0010884353741496598,
+      "trailingSilenceSeconds": 1.2985260770975056,
+      "loopSeam": {
+        "peakAbsoluteJump": 0,
+        "jumpDbfs": null,
+        "channels": [
+          {
+            "jump": 0,
+            "absoluteJump": 0,
+            "precedingSlope": 0,
+            "followingSlope": -0.00004485895624384284,
+            "slopeChangeBefore": 0,
+            "slopeChangeAfter": 0.00004485895624384284,
+            "head10msRms": 0.016211628814934587,
+            "tail10msRms": 0,
+            "nearby10msMaxAdjacentDelta": 0.0005657188594341278,
+            "jumpToNearbyDeltaRatio": 0
+          },
+          {
+            "jump": 0,
+            "absoluteJump": 0,
+            "precedingSlope": 0,
+            "followingSlope": -0.00004502039882936515,
+            "slopeChangeBefore": 0,
+            "slopeChangeAfter": 0.00004502039882936515,
+            "head10msRms": 0.014449341307917465,
+            "tail10msRms": 0,
+            "nearby10msMaxAdjacentDelta": 0.0004932880401611328,
+            "jumpToNearbyDeltaRatio": 0
+          }
+        ],
+        "warning": false,
+        "interpretation": "Diagnostic only. A nonzero seam is not automatically a click; compare nearby waveform slope and listen to repeated playback."
+      }
+    },
+    "sectionIds": [
+      "A",
+      "B",
+      "B",
+      "C",
+      "C",
+      "B",
+      "B",
+      "C",
+      "E",
+      "E",
+      "B",
+      "C",
+      "H",
+      "H",
+      "D",
+      "D",
+      "B",
+      "C",
+      "F",
+      "G",
+      "H"
+    ]
+  },
+  "limitations": [
+    "Core reference synthesis; no v68 mastered tone parity or production approval.",
+    "Per-bank scalar preserves state-relative levels but is not a cross-bank loudness master.",
+    "Loop/bridge files are exact bar length with event-tail wrap. One-shots carry at least0.6s tail allocation.",
+    "MP3 is for audition; lossless WAV/FLAC provides authoritative sample frames."
+  ],
+  "achievedSectionBankMaxPeakDbfs": -3.0000002493010487,
+  "loopSeamWarnings": []
+}

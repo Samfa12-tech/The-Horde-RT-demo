@@ -1,0 +1,47 @@
+{
+  "method": "Identical original events and existing bank gain, actual Core bass voices. Hann-windowed first-note spectral energy. No per-stem normalization. Voice gain differences are inherent in the recipes.",
+  "results": [
+    {
+      "name": "01-what-the-dark-keeps-A",
+      "sameBankGainDb": 12.001797295464694,
+      "notesAndTimingIdentical": true,
+      "profiles": [
+        {
+          "voice": "classic",
+          "firstNoteRmsDbfs": -29.39662123841442,
+          "firstNotePeakDbfs": -18.24394545956142,
+          "energyAbove3000HzFraction": 0.013438288455383675,
+          "maxAdjacentSampleDelta": 0.244537353515625
+        },
+        {
+          "voice": "soft-upright",
+          "firstNoteRmsDbfs": -32.840689962024484,
+          "firstNotePeakDbfs": -21.47823792515114,
+          "energyAbove3000HzFraction": 2.5846719243485005e-06,
+          "maxAdjacentSampleDelta": 0.001983642578125
+        }
+      ]
+    },
+    {
+      "name": "06-bellwether-B",
+      "sameBankGainDb": 15.492068433130886,
+      "notesAndTimingIdentical": true,
+      "profiles": [
+        {
+          "voice": "classic",
+          "firstNoteRmsDbfs": -26.214754656089056,
+          "firstNotePeakDbfs": -15.071944809866697,
+          "energyAbove3000HzFraction": 0.017836541923915483,
+          "maxAdjacentSampleDelta": 0.35174560546875
+        },
+        {
+          "voice": "soft-upright",
+          "firstNoteRmsDbfs": -29.09831509237746,
+          "firstNotePeakDbfs": -16.23113962654347,
+          "energyAbove3000HzFraction": 5.4975544461367855e-06,
+          "maxAdjacentSampleDelta": 0.00140380859375
+        }
+      ]
+    }
+  ]
+}

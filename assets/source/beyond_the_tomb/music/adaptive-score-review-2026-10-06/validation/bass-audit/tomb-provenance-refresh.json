@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "previousSourceSha256": "082e0943333186f3fd5b3aa0b9ec0fde07b4721972084ac34e5a7ff45487cc4f",
+  "currentSourceSha256": "5d0effbb9bbca1a17283a4b244d82b4d8bc8f626b96de3c6c8eed83a6b22ba3d",
+  "tombBPerformedEventsIdentical": true,
+  "audioFilesRewritten": false,
+  "files": [
+    "horde-soundtrack/validation/bass-audit/02-tomb-B.events.json",
+    "horde-soundtrack/validation/bass-audit/comparison-inputs.json",
+    "horde-soundtrack/previews/bass-voice-alternative/02-tomb-B.comparison.json",
+    "horde-soundtrack/previews/bass-voice-alternative/bass-voice-alternative-manifest.json"
+  ]
+}
