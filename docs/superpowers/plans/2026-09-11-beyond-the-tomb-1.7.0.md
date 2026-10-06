@@ -16,6 +16,25 @@
 
 ---
 
+## Opening-room material display — owner direction, 6 October 2026
+
+In **1.7**, remove or recontextualize the starting tomb room's leftover tech-demo material collection. Any retained pieces need a deliberate environmental-story, guidance or player-action purpose. Preserve approved openings, spawn and held-item clearance, progression and shared renderer/material capabilities. This is scene composition, not global deletion of material assets or validation fixtures, and adds no work to current 1.6.2. Review the room in the accepted 1.7 candidate and check that the replacement reads as part of the tomb rather than a material showroom. See [the chapter principle](../../DUNGEON_CHAPTER_PLANS.md#6-earlier-milestone-correction-the-opening-room-in-17).
+
+## Prologue combat teaching — owner direction, 6 October 2026
+
+After the improved parry foundation feels right, use the existing tomb skeletons and lich to encourage the player to learn it. This is **1.7** encounter tuning, separate from the current/post-reset 1.6.2 parry fixes and guard relocation. Retain the same two skeletons in their accepted waterfall-room placement; “starting tomb” does not move them back into the opening room.
+
+The owner reports that skeletons currently die in one hit and the lich can be defeated by close-range attack spam while rarely attacking back. These are owner observations, not newly reproduced or diagnosed defects. Prototype skeleton durability and readable attack/recovery windows so they survive long enough to teach useful parrying without becoming damage sponges. Exact skeleton health, damage and timing remain tuning decisions; do not require an unrelated upgrade or new stamina system.
+
+For the lich, target **three successful player hits** with a small hit cooldown. After a successful nonfatal hit, emit a clearly communicated energy pulse that pushes the player away, then give the lightning attack a clear wind-up and an available dodge response before the player returns close. This is a teachable spacing/rhythm loop, not animation-only invulnerability concealing accepted hits. Define the authoritative hit acceptance/cooldown, pulse and lightning event sequence together with existing combat, input and feedback; do not fake fairness by pausing player input.
+
+- Prototype exact cooldown, pulse range/displacement, wind-up, lightning timing and recovery through touch/desktop play. Use the accepted 1.6.2 dodge/parry foundation; prove space to respond, clear visual and audio tells, and a fair return-to-close-range window.
+- Pulse displacement must be bounded and collision-safe: no wall clipping, forced falls, unavoidable follow-up damage or trapping at arena edges. Pulse damage was not specified; knockback-only is the initial proposal, with any added damage requiring a separate design decision.
+- Lethal third-hit death takes priority over queued pulse/lightning. Preserve normal death animation, reward/chest progression and the established wall-torches-off event after the animation. Do not add a post-death attack; if final-hit pulse presentation is desired, decide it explicitly without compromising death/reward safety.
+- Validate hit/cooldown consistency, interrupted attacks, parry/dodge windows, close/wall/corner positions, repeated retries, death/save recovery and supported quality/input modes. Check victory and one-shot reward ordering, with exact candidate evidence on phone and Windows before acceptance.
+
+This note authorises planning only. It adds no current 1.6.2 task, new enemy roster, immediate build or release claim.
+
 ## Approved geography update — 3 October 2026
 
 [WORLD_LAYOUT.md](../../WORLD_LAYOUT.md) now fixes the regional topology. The Keeper Tomb lies northwest in an abandoned burial ground beyond the woods; its forest path leads southeast to the **lookout**, which is the 1.7 chapter endpoint. Place a **low-detail distant village shell** below/beyond it in the fixed future 1.8 location. The land is The Veyrlands and this village is Bellwether (approved 3 October 2026). No playable village, interiors, NPC crowds or hub services enter 1.7. In 1.8 the same road continues into the village; do not create an enormous temporary wall across it or relocate the settlement later. The village's active churchyard is separate from the tomb burial ground. Exact distances and slopes remain playable-blockout decisions; this is bounded zone/area delivery, not a continuous open-world promise. Preserve all four separately approved dungeon-opening features and the later finale/rescue opening.

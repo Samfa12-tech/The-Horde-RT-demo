@@ -2,6 +2,7 @@
 
 - [UI / HUD selected references and history](ui/README.md): physical lantern menu, Settings/Graphics, loading composition and earlier concept choices.
 - [Connected forest and Bellwether maps](world/connected/README.md): coordinated planning proposals with editable SVG and coordinate data.
+- [Three-dungeon atlas R2](world/dungeons/README.md): approved item/boss concepts, draft approaches/floorplans, editable data and asset planning inventory.
 - [Approved regional world layout](../WORLD_LAYOUT.md): canonical topology and the existing original image; no duplicate binary is added here.
 - [Earlier town image](world/historical/bellwether-earlier-town-concept.webp): historical visual exploration, superseded spatially by the connected maps. Its building, bridge, tree and distance details are not approved engine geometry.
 - [File manifest](reference-manifest.json): source identities, original and derivative hashes, status and encoding.

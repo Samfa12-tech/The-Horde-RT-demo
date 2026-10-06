@@ -1,0 +1,32 @@
+id,name,x,y,width,depth,floor_z,role,dungeon,world_x,world_y,acquired_item_id,boss_required_item_id,approval_status
+DA01,Arrival tower,0,0,12,12,2,Safe dry arrival; confirm recovery before descent,DA,30,-284,,,Room layout draft; item and boss-use concept approved
+DA02,Orientation cloister,0,-22,20,16,2,Foreshadow shutter latch; a reflected path is needed,DA,30,-306,,,Room layout draft; item and boss-use concept approved
+DA03,Reflector gallery,-26,-22,16,16,2,ITEM-DA-01: acquire reflector; safe redirect practice,DA,4,-306,ITEM-DA-01,,Room layout draft; item and boss-use concept approved
+DA04,Submerged viewing gallery,-26,-54,18,20,-4,Dry underwater view; redirect around a fixed blocker,DA,4,-338,,,Room layout draft; item and boss-use concept approved
+DA05,Duty hall,-26,-88,22,20,-4,Dead attendants; first learned-rule encounter,DA,4,-372,,,Room layout draft; item and boss-use concept approved
+DA06,Shutter chamber,7,-88,18,20,-4,Mandatory reflector test; resettable shutter chain,DA,37,-372,,,Room layout draft; item and boss-use concept approved
+DA07,Bell stair,33,-88,12,16,2,Recovery candidate before final application,DA,63,-372,,,Room layout draft; item and boss-use concept approved
+DA08,Bellkeeper hall,33,-54,26,28,6,Reflector REQUIRED to expose Bellkeeper armour,DA,63,-338,,ITEM-DA-01,Room layout draft; item and boss-use concept approved
+DA09,Seal and relic,33,-20,14,14,6,Peer seal; plunder evidence and claimant object,DA,63,-304,,,Room layout draft; item and boss-use concept approved
+DA10,Return cloister,30,3,16,12,2,Unlock internal return to arrival; same safe crossing,DA,60,-281,,,Room layout draft; item and boss-use concept approved
+DA11,Flooded side cell,-53,-54,12,12,-2,"Optional, nonessential reward; isolated wet branch",DA,-23,-338,,,Room layout draft; item and boss-use concept approved
+AF01,Intake vestibule,0,0,14,14,30,Safe entry / return confirmation,AF,230,-40,,,Room layout draft; item and boss-use concept approved
+AF02,Mint floor,0,25,22,22,30,Foreshadow held-light mechanism and remote work position,AF,230,-15,,,Room layout draft; item and boss-use concept approved
+AF03,Lantern-stand bay,-29,25,16,18,30,ITEM-AF-01: acquire stand; safe anchor/shutter practice,AF,201,-15,ITEM-AF-01,,Room layout draft; item and boss-use concept approved
+AF04,Smoke gallery,-29,57,18,22,34,Move apart from anchored light; smoke/cover is readable,AF,201,17,,,Room layout draft; item and boss-use concept approved
+AF05,Machinery court,0,82,26,22,34,Workers; cover and exposure combinations,AF,230,42,,,Room layout draft; item and boss-use concept approved
+AF06,Shutter test,33,82,18,20,34,Mandatory stand test: hold light while repositioning,AF,263,42,,,Room layout draft; item and boss-use concept approved
+AF07,Recovery antechamber,33,53,14,14,34,Safe reset / recovery before boss,AF,263,13,,,Room layout draft; item and boss-use concept approved
+AF08,Master of Coin hall,33,23,28,28,30,Stand REQUIRED to hold furnace-shell exposure,AF,263,-17,,ITEM-AF-01,Room layout draft; item and boss-use concept approved
+AF09,Seal archive,33,-7,16,14,30,Peer seal; evidence of royal bargain,AF,263,-47,,,Room layout draft; item and boss-use concept approved
+AF10,Service return,0,-25,14,12,30,Open return door to AF01; persistent shortcut,AF,230,-65,,,Room layout draft; item and boss-use concept approved
+GC01,Gate vestibule,0,0,16,14,80,Safe ridge arrival; gate state persists,GC,306,308,,,Room layout draft; item and boss-use concept approved
+GC02,Winter garden,0,28,28,24,80,"Roofless landmark court, orient return",GC,306,336,,,Room layout draft; item and boss-use concept approved
+GC03,Mirrored gallery,-34,28,18,22,80,Foreshadow broad-light ambiguity; finite mirror paths,GC,272,336,,,Room layout draft; item and boss-use concept approved
+GC04,Aperture room,-34,65,18,20,84,ITEM-GC-01: acquire aperture; safe receiver isolation,GC,272,373,ITEM-GC-01,,Room layout draft; item and boss-use concept approved
+GC05,Reflection test,0,94,26,22,84,Mandatory aperture isolation test; finite reflection,GC,306,402,,,Room layout draft; item and boss-use concept approved
+GC06,Royal records,34,94,18,20,84,Royal evidence; reinforce selective-light rule,GC,340,402,,,Room layout draft; item and boss-use concept approved
+GC07,Keeper ward chamber,34,57,28,28,88,Aperture REQUIRED to dismantle keeper wards and win,GC,340,365,,ITEM-GC-01,Room layout draft; item and boss-use concept approved
+GC08,Final seal chamber,34,23,16,16,88,Final seal and treasury location reveal,GC,340,331,,,Room layout draft; item and boss-use concept approved
+GC09,Return gallery,33,-6,16,12,80,Descent and unlocked return to GC01,GC,339,302,,,Room layout draft; item and boss-use concept approved
+GC10,Concealed threshold,60,23,12,14,88,Post-reveal future finale connection; scope boundary,GC,366,331,,,Room layout draft; item and boss-use concept approved

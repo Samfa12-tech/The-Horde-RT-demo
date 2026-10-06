@@ -1,7 +1,7 @@
 # Horde Lantern RT — Campaign and Engine Roadmap
 
 **Owner:** Sam Small / Samfa12  
-**Planning update:** 5 October 2026  
+**Planning update:** 6 October 2026  
 **Status:** Owner-approved direction; future milestones are provisional, not implemented or release promises.
 
 ## Authority and navigation
@@ -33,14 +33,17 @@ The defining design pillar is **light as gameplay, powered by the actual ray-tra
 | 1.6.2 — Engine readiness and demo polish | Full post-release audit; clear graphics settings and measured reduced-effects options; temporal/upscaling readiness, material foundations, hands-first themed UI and dungeon polish. | Planned after completed, accepted, merged and released 1.6.1 and before 1.7 gameplay expansion; sequence and acceptance below. |
 | 1.7.0 — Beyond the Tomb | Existing dungeon becomes prologue; physical rope rescue, companion, moonlit woodland, dialogue, world-zone ownership, checkpoints and chapter-specific UI using the accepted 1.6.2 theme. | Scoped planning handoff exists. Start after 1.6.2 is implemented, validated and accepted; then complete and obtain owner acceptance of the agreed 1.7 scope. |
 | 1.8.0 — Village Hub | Continue from the forest to a small village with a few explorable interiors, a hero tavern and a small NPC cast. Reveal more of the wider Horde and establish the hub. | Pencilled in. Begin only after 1.7 is made, tested and accepted; use its actual performance and system evidence to finalise scope. |
-| Beyond 1.8 — three themed dungeons | Three distinct adventure dungeons, each with enemies, puzzles, a boss and one campaign piece; consider a dungeon-specific item that enables puzzle solving and boss defeat. | Big-picture direction only. Build and validate one complete dungeon before expanding to the next. No version numbers or release dates are assigned. |
+| Proposed 1.9 — Drowned Abbey | Lake approach, recoverable submerged access, predominantly dry religious house, required reflector/shutter/Bellkeeper chain, seal and return. | Provisional package after accepted 1.8; detailed lake gates in DROWNED_ABBEY_PLAN.md. No release date or implementation start is authorised. |
+| Proposed 1.10 — Ashen Foundry | Gorge approach and alternative access, mint/forge, required shuttered-stand/furnace-shell chain, seal and return. | Provisional package; preserve Foundry-first play without an Abbey prerequisite. Validate both peer orders once both exist. |
+| Proposed 1.11 — Glass Court | High-ridge approach, both-seal gate, palace/garden, required aperture/receiver/ward keeper encounter, final seal and safe return. | Provisional package after both peer chapters; keeper defeat does not mandate death. No release date. |
 | Beyond the trio | Treasury, release of the bound dead, confrontation with the deceptive lantern entity and one hopeful epilogue. | Creative direction approved in CAMPAIGN_DESIGN.md; compact finale, not a promised fourth full dungeon. Implementation scope remains gated. |
 
 Detailed plans:
 
 - [1.7.0 — Beyond the Tomb](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md).
 - [1.8.0 — Village Hub: provisional plan](superpowers/plans/2026-09-11-village-hub-1.8.0.md).
-- [Drowned Abbey — flooded basin and staged delivery](DROWNED_ABBEY_PLAN.md): later campaign, version/date TBD. River-fed lake and a predominantly dry dungeon; prove the vista, short submerged crossing and one dry room before expanding. Preserve three alternative access paths and Foundry/Abbey either-order progression. Start water work from a bounded analytic-wave RT baseline; FFT is conditional on demonstrated need and measured budgets. This adds no 1.6.2, 1.7 or 1.8 implementation scope.
+- [Three dungeon chapter plans](DUNGEON_CHAPTER_PLANS.md): approved item/theme/boss dependencies, distinct approaches, proposed 1.9–1.11 packages and shared engine/content acceptance gates.
+- [Drowned Abbey — flooded basin and staged delivery](DROWNED_ABBEY_PLAN.md): later campaign, proposed 1.9 package with provisional numbering and no release date. River-fed lake and a predominantly dry dungeon; prove the vista, short submerged crossing and one dry room before expanding. Preserve three alternative access paths and Foundry/Abbey either-order progression. Start water work from a bounded analytic-wave RT baseline; FFT is conditional on demonstrated need and measured budgets. This adds no 1.6.2, 1.7 or 1.8 implementation scope.
 
 The three later dungeons are additional adventures after the existing tomb/prologue, not a silent relabelling of that prologue as one of the three. Approved order: Abbey and Foundry in either order, then Glass Court, then the treasury finale; see CAMPAIGN_DESIGN.md for access quests and remaining detailed design.
 
@@ -324,11 +327,19 @@ Acceptance compares matched active play and old/new pause using CPU/GPU/work/sub
 
 The recovery direction is a limited healing flask, food/rest in safe places and optional healing abilities. Amounts, capacity, refill/use rules and ability costs remain provisional; do not infer a stamina/mana system, automatic regeneration or mandatory farming. The 1.7 slice owns heart presentation and a scoped health/recovery/save foundation; full campaign upgrades and later rewards are not all 1.7 gates. See [the staged health and recovery contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#105-heart-health-display-and-grounded-recovery-direction). Validate persistent upgrades, consumption/refill/retry integrity and a viable mandatory route without optional health rewards. This does not expand frozen/current 1.6.2 work.
 
+## 1.7 — Prologue combat teaching and deliberate opening room
+
+**Owner direction, 6 October 2026:** after the parry foundation feels right, tune the existing tomb skeletons to survive long enough for useful parry teaching without becoming damage sponges. Prototype the lich as three successful player hits separated by a small cooldown: a successful nonfatal hit triggers bounded collision-safe pushback, followed by clearly telegraphed lightning the player can dodge before returning close. Exact health/timing/displacement values remain prototypes; pulse damage was not specified, with knockback-only the initial proposal. Death on the third hit overrides queued attacks and preserves the existing death-animation, chest/reward and wall-torch-off ordering.
+
+The [1.7 master plan](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#prologue-combat-teaching--owner-direction-6-october-2026) owns encounter and acceptance details. This does not alter current 1.6.2 parry fixes or the accepted relocation of both guards into the waterfall room. The same 1.7 pass removes or recontextualizes the opening-room tech-demo material collection for a deliberate story, guidance or action purpose; shared renderer/material systems and separate validation fixtures remain intact.
+
 ## The hub-and-dungeon loop
 
 Proposed campaign structure:
 
 `Tomb prologue → rescue and forest → village/tavern → dungeon expedition → return to hub with a piece and new knowledge → next expedition`
+
+**Owner-approved scale, 6 October 2026:** a compact access quest → approach → themed dungeon loop, inspired structurally by Ocarina of Time at a smaller scale. NPC gear/training can support that preparation; specific new rewards, effects and quest scripts remain proposals.
 
 The tavern should give the player a reason to care about the wider Horde, introduce useful people and leads, and provide a natural place to interpret discoveries after each return. Reveal the mystery progressively rather than delivering all the lore on arrival. Returning NPC dialogue should acknowledge relevant progress without replaying one-time scenes or rewards.
 
@@ -338,23 +349,23 @@ The hub must now provide practical story and player benefits: bounded gear/train
 
 Each of the three should have its own environmental identity, enemies/encounters, a learnable light-based puzzle language, a boss and a meaningful campaign reward. Distinct themes need not mean unrelated bespoke engines or three entirely separate combat systems.
 
-The owner suggested a Zelda-like item/puzzle/boss relationship. Use that structural inspiration while creating original items, spaces, characters and solutions. The recommended loop is:
+**Owner-approved, 6 October 2026:** each dungeon has a distinct theme and local item actually required for boss victory: Abbey reflector/shutters/Bellkeeper armour; Foundry shuttered lantern stand/held mechanism/furnace shell; Court focusing aperture/isolated receivers/bounded mirror wards. Use the Zelda-like structure with original items, spaces, characters and solutions. The required learning loop is:
 
 1. Introduce a light-related rule in a safe, readable setting.
-2. Acquire or activate a useful item or lantern capability inside the dungeon.
+2. Acquire or activate the approved local item/capability early in the dungeon, then provide safe practice.
 3. Teach its use, then combine it with navigation, enemies and increasingly demanding puzzles.
-4. Let the player recognise and apply the learned rule during the boss encounter; do not introduce an unexplained mandatory mechanic only in the boss room.
+4. Require actual application of the learned local-item rule to defeat the boss; ownership alone is insufficient. Do not introduce an unexplained mandatory mechanic only in the boss room. Court defeat need not mean killing its keeper.
 5. Award one persistent treasury seal and return the player safely to the hub with new information.
 
 A dungeon utility item and its end-of-dungeon campaign piece are separate design roles; the seals unlock campaign progress while useful tools retain gameplay roles. Do not assume the existing reward lantern must be discarded or replaced. Persistent light tools should remain useful where appropriate rather than becoming disposable one-room keys.
 
-Before committing a dungeon, approve its theme, light verb, item/capability, encounter and boss relationship, reward role, recoverable puzzle states, content footprint and measured device budget. The creative direction is recorded in CAMPAIGN_DESIGN.md; exact rules and measured content budgets remain to be locked per dungeon.
+The themes, local items and required boss relationships are approved in CAMPAIGN_DESIGN.md and the [chapter plan](DUNGEON_CHAPTER_PLANS.md). Detailed encounter rules, recoverable placement/recall, content footprints and measured device budgets remain to be proven per dungeon. Main-route retreat stays viable before the seal; post-seal shortcuts never supply the only safe exit. Preserve independent Magic/Tech/Constitution access, Abbey/Foundry either-order play and the Court's both-seal gate.
 
 ## Ray-traced light as a gameplay pillar
 
 A light mechanic should change what the player can discover, open, traverse, protect, expose or defeat. Its outcome should follow world-space source placement, direction, occlusion and the supported optical interaction, so moving the lantern or an intervening object matters.
 
-Exploration candidates, **not selected dungeon themes or promised features**, include directing a lantern through a shutter, using real shadows to conceal or expose something, redirecting light with a reflector, or using a bounded transmission/refraction interaction to reach a receiver. Choose a small set through playable prototypes and phone measurements. This is not permission to resurrect previously rejected visual treatments, require full spectral simulation, or promise unbounded reflections or caustics.
+General exploration candidates, **not additional promised features**, include directing a lantern through a shutter, using real shadows to conceal or expose something, redirecting light with a reflector, or using a bounded transmission/refraction interaction to reach a receiver. Choose a small set through playable prototypes and phone measurements. This is not permission to resurrect previously rejected visual treatments, require full spectral simulation, or promise unbounded reflections or caustics.
 
 Required design safeguards for future light mechanics:
 
@@ -418,7 +429,7 @@ Across the project, assess existing Briarhold 3D models and sky assets before co
 
 ## Decisions intentionally left open
 
-Detailed street/building blockout (regional geography and the names The Veyrlands/Bellwether are approved in WORLD_LAYOUT.md), and supporting character names (avoid Mara); precise tools and encounter rules; voice casting/scripts; entity name/form; detailed finale and treasure distribution; XP/respec/prices and upgrade balance; exact content counts and sustained device budgets. The campaign's approved narrative and order are in CAMPAIGN_DESIGN.md, not open for silent reinvention.
+Detailed street/building blockout (regional geography and the names The Veyrlands/Bellwether are approved in WORLD_LAYOUT.md), and supporting character names (avoid Mara); detailed tool rules and encounters (the three dungeon-item/boss relationships are now approved); voice casting/scripts; entity name/form; detailed finale and treasure distribution; XP/respec/prices and upgrade balance; exact content counts and sustained device budgets. The campaign's approved narrative and order are in CAMPAIGN_DESIGN.md, not open for silent reinvention.
 
 ## Documentation-only change boundary
 

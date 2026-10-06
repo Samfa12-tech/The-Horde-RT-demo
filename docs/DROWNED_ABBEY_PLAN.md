@@ -1,6 +1,6 @@
 # Drowned Abbey — Flooded Basin and Staged Delivery Plan
 
-**Planning update: 5 October 2026.** Future campaign chapter; version/date TBD, beyond the village milestone. This records the approved flooded-lake direction and a proposed technical approach. It does not add work to 1.6.2, make the Abbey a 1.7/1.8 deliverable, or authorise implementation, asset generation, spending, merging or release.
+**Planning update: 6 October 2026.** Future campaign chapter beyond the village milestone; proposed 1.9 delivery package in the [chapter plan](DUNGEON_CHAPTER_PLANS.md), with provisional numbering and no release date. This records the approved flooded-lake direction and a proposed technical approach. It does not add work to 1.6.2, make the Abbey a 1.7/1.8 deliverable, or authorise implementation, asset generation, spending, merging or release.
 
 Read [CAMPAIGN_DESIGN.md](CAMPAIGN_DESIGN.md#drowned-abbey) for creative authority, [WORLD_LAYOUT.md](WORLD_LAYOUT.md) for geography, and [ROADMAP.md](ROADMAP.md#common-design-brief-for-each-later-dungeon) for shared dungeon/light-gameplay rules. Keep this document as the detailed Abbey delivery plan rather than duplicating its implementation stages elsewhere.
 
@@ -11,7 +11,7 @@ Read [CAMPAIGN_DESIGN.md](CAMPAIGN_DESIGN.md#drowned-abbey) for creative authori
 - Reveal the lake and the Abbey's broken towers from the approach before descending to the water. The player should understand the destination and submerged entry problem before committing to the crossing.
 - Keep the dungeon **predominantly dry, walkable exploration, puzzles and combat**. Water surrounds it and is visible through appropriate windows/openings, with seepage, waterlines and selected flooded side rooms providing atmosphere.
 - Use a short submerged approach to make access preparation meaningful. A **guided crossing with minimal steering and retained look control** is the first prototype candidate, not a locked movement system or an uninterruptible camera sequence.
-- Preserve bells beneath water, dead attendants at their duties, the placeable-reflector candidate and the drowned armoured Bellkeeper direction. Exact encounters, tool rules and boss staging remain to be designed.
+- Preserve bells beneath water, dead attendants at their duties, the approved placeable reflector and drowned armoured Bellkeeper relationship. Acquire the reflector early, teach safe redirection through shutters, escalate that rule through rooms and require actual reflected-light use to expose the boss's armour. Exact placement, timing, encounters and staging remain to be designed.
 - Abbey and Foundry remain playable in either order. Abbey access and completion must not require the Foundry tool, seal or a Foundry-only upgrade; any cross-dungeon benefit stays optional.
 
 This scope does not automatically include free swimming across the lake, boats, sustained underwater combat, water-level puzzles, fluid simulation or a fully explorable lakebed.
@@ -38,7 +38,7 @@ Maintain three independently sufficient access paths:
 | Tech | Breathing equipment prepared through practical services/quest work | Define operation and any resource limits; no mandatory Magic or Foundry-only component. |
 | Constitution | Trained breath control for a short finite crossing | More breath is not infinite breath or drowning immunity; route length and safe margins must make this a genuine solution. |
 
-Prototype the simplest movement that supports tension and looking at the drowned architecture. Compare a guided forward route with limited adjustment against a short bounded player-steered alternative only if the guide feels restrictive. Keep intentional entry, understandable progress and a clear arrival; retain look control and avoid compulsory camera roll, violent bob or disorienting forced turns. Decide retreat/abort behaviour through testing, not after building the dungeon.
+Prototype the simplest movement that supports tension and looking at the drowned architecture. Compare a guided forward route with limited adjustment against a short bounded player-steered alternative only if the guide feels restrictive. Keep intentional entry, understandable progress and a clear arrival; retain look control and avoid compulsory camera roll, violent bob or disorienting forced turns. Decide detailed retreat/abort controls through testing, not after building the dungeon. Viable retreat itself is required: the main route works before the seal; a post-seal shortcut is additional.
 
 Breath/exposure and access state belong to the shared fixed-step simulation, independent of rendering FPS and wave animation. Define when the timer starts, pauses and refills, how warnings are conveyed, and what happens on exhaustion or ward/gear failure. Provide readable non-colour-only warnings; do not rely on muffled audio alone. Set duration and safety margin using actual completion times for the slowest supported valid route/input method.
 
@@ -103,14 +103,16 @@ Use bounded surface coverage, near/far real-geometry detail, explicit update rat
 
 Measure candidate RT tiers on Android and Windows with matched baseline settings. Keep the same navigable route, floodline and puzzle truth in every supported tier. Investigate regressions instead of silently weakening lighting or render resolution. Reject or defer expensive features when the evidence is insufficient; a reduced tier must still deliver the approved chapter experience.
 
+The reflector is a persistent, nonconsumable utility, distinct from the seal. Bound placement and provide safe recall/reset after invalid placement, water, death or reload without duplicating the item or losing the lantern. Acquire and practice before mandatory item tests; the Bellkeeper uses the already-taught rule.
+
 For light puzzles, apply [the shared causal-light safeguards](ROADMAP.md#ray-traced-light-as-a-gameplay-pillar): bounded world-space queries, coherent blockers and fixed-step authority, never screen brightness or render noise as the solution test. Test safe reset, dropped/stowed tools and restored saves before adding the boss.
 
 ## 6. Decisions still open
 
 - Historical flooding cause/date; precise architecture and credible dry-volume explanation
 - Detailed section, floor elevations, lake extent, route distances, air-pocket placement and optional flooded-room count
-- Guided versus bounded free steering, retreat rules, crossing duration, breath/ward/gear limits and exact failure feedback
-- Placeable reflector rules, optical puzzle vocabulary, enemy footprint, Bellkeeper actions/model selection and narrative wording
+- Guided versus bounded free steering, detailed retreat controls, crossing duration, breath/ward/gear limits and exact failure feedback; safe main-route retreat is required
+- Detailed reflector placement/recall and optical-query rules, enemy footprint, Bellkeeper actions/model selection and narrative wording; the reflector/shutter/armour dependency itself is approved
 - Exact water intersection/displacement representation, update cadence, transport budget, underwater treatment and any justified FFT use
 - Numerical sustained-device budgets, supported water tiers, streaming boundaries, save restrictions and chapter version/date
 

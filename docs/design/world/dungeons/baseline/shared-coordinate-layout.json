@@ -1,0 +1,641 @@
+{
+  "status": "PROPOSED BLOCKOUT, NOT ENGINE-VALIDATED",
+  "date": "2026-10-05",
+  "source_commit": "6aef4cde32188fd8a1ced2bef30360451f80aaae",
+  "axes": {
+    "x": "east metres",
+    "y": "north metres",
+    "z": "up metres above proposed lake datum"
+  },
+  "origin": "Bellwether well, X=0 Y=0 Z=20",
+  "forest": [
+    [
+      -112.0,
+      139.0,
+      33.6
+    ],
+    [
+      -107.0,
+      132.0,
+      33.0
+    ],
+    [
+      -94.0,
+      126.0,
+      32.1
+    ],
+    [
+      -96.0,
+      111.0,
+      31.0
+    ],
+    [
+      -82.0,
+      106.0,
+      31.3
+    ],
+    [
+      -65.0,
+      90.0,
+      30.4
+    ]
+  ],
+  "arrival": [
+    [
+      -65.0,
+      90.0,
+      30.4
+    ],
+    [
+      -56.0,
+      76.0,
+      28.8
+    ],
+    [
+      -59.0,
+      58.0,
+      27.2
+    ],
+    [
+      -47.0,
+      44.0,
+      25.5
+    ],
+    [
+      -30.0,
+      34.0,
+      23.6
+    ],
+    [
+      -19.0,
+      18.0,
+      21.8
+    ],
+    [
+      -4.0,
+      4.0,
+      20.0
+    ],
+    [
+      0.0,
+      0.0,
+      20.0
+    ]
+  ],
+  "river_surface": [
+    [
+      30.0,
+      -240.0,
+      0.0
+    ],
+    [
+      44.0,
+      -170.0,
+      0.8
+    ],
+    [
+      60.0,
+      -110.0,
+      2.3
+    ],
+    [
+      62.0,
+      -80.0,
+      3.0
+    ],
+    [
+      58.0,
+      -25.0,
+      6.0
+    ],
+    [
+      68.0,
+      25.0,
+      10.0
+    ],
+    [
+      68.0,
+      65.0,
+      14.0
+    ],
+    [
+      78.0,
+      105.0,
+      20.0
+    ],
+    [
+      105.0,
+      160.0,
+      29.0
+    ],
+    [
+      135.0,
+      220.0,
+      40.0
+    ]
+  ],
+  "millrace_surface": [
+    [
+      68.0,
+      55.0,
+      13.0
+    ],
+    [
+      49.0,
+      48.0,
+      12.8
+    ],
+    [
+      49.0,
+      25.0,
+      12.3
+    ],
+    [
+      59.0,
+      25.0,
+      12.2
+    ],
+    [
+      59.0,
+      20.0,
+      12.1
+    ],
+    [
+      59.0,
+      12.0,
+      9.5
+    ],
+    [
+      62.0,
+      -3.0,
+      7.76
+    ]
+  ],
+  "local_paths": [
+    [
+      [
+        -5.0,
+        3.0,
+        20.0
+      ],
+      [
+        -19.0,
+        6.0,
+        20.5
+      ],
+      [
+        -35.0,
+        8.0,
+        20.8
+      ]
+    ],
+    [
+      [
+        -30.0,
+        34.0,
+        23.6
+      ],
+      [
+        -39.0,
+        29.0,
+        24.6
+      ]
+    ],
+    [
+      [
+        4.0,
+        1.0,
+        20.0
+      ],
+      [
+        4.0,
+        7.0,
+        20.4
+      ]
+    ],
+    [
+      [
+        -5.0,
+        -5.0,
+        20.0
+      ],
+      [
+        -9.0,
+        -20.0,
+        20.0
+      ],
+      [
+        -15.5,
+        -28.0,
+        19.9
+      ]
+    ],
+    [
+      [
+        14.0,
+        -29.0,
+        18.6
+      ],
+      [
+        20.0,
+        -29.0,
+        18.2
+      ]
+    ],
+    [
+      [
+        18.0,
+        -37.0,
+        18.1
+      ],
+      [
+        1.0,
+        -39.5,
+        18.2
+      ]
+    ]
+  ],
+  "church_path": [
+    [
+      -47.0,
+      44.0,
+      25.5
+    ],
+    [
+      -36.0,
+      49.0,
+      26.6
+    ],
+    [
+      -25.0,
+      59.0,
+      28.0
+    ],
+    [
+      -16.0,
+      61.0,
+      29.0
+    ],
+    [
+      -14.0,
+      51.0,
+      29.0
+    ],
+    [
+      -2.0,
+      51.0,
+      29.0
+    ],
+    [
+      -2.0,
+      53.0,
+      29.0
+    ]
+  ],
+  "shrine_path": [
+    [
+      -16.0,
+      61.0,
+      29.0
+    ],
+    [
+      -17.0,
+      81.0,
+      30.0
+    ],
+    [
+      0.0,
+      90.0,
+      31.0
+    ],
+    [
+      25.0,
+      97.0,
+      31.2
+    ]
+  ],
+  "mill_path": [
+    [
+      0.0,
+      0.0,
+      20.0
+    ],
+    [
+      25.0,
+      1.0,
+      18.4
+    ],
+    [
+      35.0,
+      6.0,
+      17.0
+    ],
+    [
+      40.0,
+      13.0,
+      16.0
+    ]
+  ],
+  "south_path": [
+    [
+      0.0,
+      0.0,
+      20.0
+    ],
+    [
+      9.0,
+      -18.0,
+      19.1
+    ],
+    [
+      18.0,
+      -37.0,
+      18.1
+    ],
+    [
+      35.0,
+      -55.0,
+      16.3
+    ],
+    [
+      47.0,
+      -70.0,
+      14.9
+    ]
+  ],
+  "optional_bridge_path": [
+    [
+      40.0,
+      13.0,
+      16.0
+    ],
+    [
+      34.0,
+      25.0,
+      17.0
+    ],
+    [
+      38.0,
+      37.0,
+      18.0
+    ],
+    [
+      45.5,
+      37.0,
+      18.0
+    ],
+    [
+      52.5,
+      37.0,
+      18.0
+    ],
+    [
+      59.0,
+      37.0,
+      18.0
+    ]
+  ],
+  "buildings": [
+    {
+      "id": "B01",
+      "label": "Tavern",
+      "x": 12,
+      "y": 15,
+      "width": 22,
+      "depth": 16,
+      "floor_z": 20.4,
+      "door_x": 4,
+      "door_y": 7,
+      "scope": "Hero interior"
+    },
+    {
+      "id": "B02",
+      "label": "Church",
+      "x": -2,
+      "y": 65,
+      "width": 18,
+      "depth": 24,
+      "floor_z": 29,
+      "door_x": -2,
+      "door_y": 53,
+      "scope": "Exterior; service outside"
+    },
+    {
+      "id": "B03",
+      "label": "House A",
+      "x": -43,
+      "y": 8,
+      "width": 16,
+      "depth": 12,
+      "floor_z": 20.8,
+      "door_x": -35,
+      "door_y": 8,
+      "scope": "Optional interior"
+    },
+    {
+      "id": "B04",
+      "label": "House B",
+      "x": -47,
+      "y": 29,
+      "width": 16,
+      "depth": 14,
+      "floor_z": 24.6,
+      "door_x": -39,
+      "door_y": 29,
+      "scope": "Optional interior"
+    },
+    {
+      "id": "B05",
+      "label": "Mill",
+      "x": 48,
+      "y": 13,
+      "width": 16,
+      "depth": 16,
+      "floor_z": 16,
+      "door_x": 40,
+      "door_y": 13,
+      "scope": "Exterior / working edge"
+    },
+    {
+      "id": "B06",
+      "label": "Smith",
+      "x": 29,
+      "y": -29,
+      "width": 18,
+      "depth": 14,
+      "floor_z": 18.2,
+      "door_x": 20,
+      "door_y": -29,
+      "scope": "Exterior service yard"
+    },
+    {
+      "id": "B07",
+      "label": "Store",
+      "x": -22,
+      "y": -28,
+      "width": 13,
+      "depth": 11,
+      "floor_z": 19.9,
+      "door_x": -15.5,
+      "door_y": -28,
+      "scope": "Closed shell"
+    },
+    {
+      "id": "B08",
+      "label": "Outbuilding",
+      "x": 1,
+      "y": -44,
+      "width": 12,
+      "depth": 9,
+      "floor_z": 18.2,
+      "door_x": 1,
+      "door_y": -39.5,
+      "scope": "Closed shell"
+    },
+    {
+      "id": "B09",
+      "label": "Starter shrine",
+      "x": 25,
+      "y": 101,
+      "width": 8,
+      "depth": 8,
+      "floor_z": 31.2,
+      "door_x": 25,
+      "door_y": 97,
+      "scope": "Nearby spur; provisional"
+    }
+  ],
+  "path_widths_m": {
+    "forest": 2.4,
+    "arrival": 3.5,
+    "side_path": 2.2
+  },
+  "warning": "Concept map topology is approved but not metric. All dimensions and elevations here are proposals. No full-world dimensions are fixed. Terrain is a deterministic 0.5 m planning grid, not a shipping mesh.",
+  "landmarks": {
+    "F01": {
+      "label": "Rescue rim",
+      "xyz": [
+        -112.0,
+        139.0,
+        33.6
+      ]
+    },
+    "F02": {
+      "label": "Reunion",
+      "xyz": [
+        -107.0,
+        132.0,
+        33.0
+      ]
+    },
+    "F03": {
+      "label": "Optional lantern clue",
+      "xyz": [
+        -82.0,
+        106.0,
+        31.3
+      ]
+    },
+    "F04": {
+      "label": "Lookout and shared join",
+      "xyz": [
+        -65.0,
+        90.0,
+        30.4
+      ]
+    },
+    "T01": {
+      "label": "Well",
+      "xyz": [
+        0,
+        0,
+        20
+      ]
+    },
+    "T02": {
+      "label": "Gardens",
+      "xy": [
+        -43,
+        -10
+      ]
+    },
+    "T03": {
+      "label": "Active graveyard",
+      "bounds": [
+        11,
+        31,
+        54,
+        78
+      ]
+    },
+    "T04": {
+      "label": "Optional service bridge",
+      "deck_bounds": [
+        45.5,
+        52.5,
+        35.5,
+        38.5
+      ],
+      "deck_z": 18,
+      "underside_z": 17.4
+    },
+    "T05": {
+      "label": "Outbound junction",
+      "xyz": [
+        47.0,
+        -70.0,
+        14.9
+      ]
+    }
+  },
+  "services": [
+    {
+      "id": "S1",
+      "role": "Kit",
+      "xy": [
+        -8,
+        -1
+      ]
+    },
+    {
+      "id": "S2",
+      "role": "Tavern keeper",
+      "xy": [
+        3,
+        7
+      ]
+    },
+    {
+      "id": "S3",
+      "role": "Record/shrine service",
+      "xy": [
+        -7,
+        51
+      ]
+    },
+    {
+      "id": "S4",
+      "role": "Smith/artificer",
+      "xy": [
+        19,
+        -23
+      ]
+    },
+    {
+      "id": "S5",
+      "role": "River salvager",
+      "xy": [
+        36,
+        0
+      ]
+    },
+    {
+      "id": "S6",
+      "role": "Relic dealer",
+      "xy": [
+        -18,
+        -3
+      ]
+    }
+  ]
+}

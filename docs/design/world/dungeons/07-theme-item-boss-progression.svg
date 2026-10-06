@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1190.88pt" height="841.68pt" viewBox="0 0 1190.88 841.68" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-06T15:39:47.905307</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 841.68 
+L 1190.88 841.68 
+L 1190.88 0 
+L 0 0 
+z
+" style="fill: #f4f1e8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 76.918939 265.844628 
+L 380.378981 265.844628 
+L 380.378981 240.08922 
+L 76.918939 240.08922 
+z
+" clip-path="url(#pd237422038)" style="fill: #e3dece; stroke: #477f96; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 76.918939 303.720228 
+L 380.378981 303.720228 
+L 380.378981 277.96482 
+L 76.918939 277.96482 
+z
+" clip-path="url(#pd237422038)" style="fill: #e3dece; stroke: #477f96; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 76.918939 341.595828 
+L 380.378981 341.595828 
+L 380.378981 315.84042 
+L 76.918939 315.84042 
+z
+" clip-path="url(#pd237422038)" style="fill: #e3dece; stroke: #477f96; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 76.918939 379.471428 
+L 380.378981 379.471428 
+L 380.378981 353.71602 
+L 76.918939 353.71602 
+z
+" clip-path="url(#pd237422038)" style="fill: #e3dece; stroke: #477f96; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 76.918939 417.347028 
+L 380.378981 417.347028 
+L 380.378981 391.59162 
+L 76.918939 391.59162 
+z
+" clip-path="url(#pd237422038)" style="fill: #e3dece; stroke: #477f96; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 76.918939 455.222628 
+L 380.378981 455.222628 
+L 380.378981 429.46722 
+L 76.918939 429.46722 
+z
+" clip-path="url(#pd237422038)" style="fill: #e3dece; stroke: #477f96; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #477f96" x="228.64896" y="254.554881" transform="rotate(-0 228.64896 254.554881)">DA02  FORESHADOW</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 228.64896 268.597637 
+Q 228.64896 271.524943 228.64896 273.110609 
+" style="fill: none; stroke: #477f96; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 230.64896 269.110609 
+L 228.64896 273.110609 
+L 226.64896 269.110609 
+z
+" style="fill: #477f96; stroke: #477f96; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #477f96" x="228.64896" y="292.430481" transform="rotate(-0 228.64896 292.430481)">DA03  ITEM + SAFE PRACTICE</text>
+   </g>
+   <g id="patch_9">
+    <path d="M 228.64896 306.473237 
+Q 228.64896 309.400543 228.64896 310.986209 
+" style="fill: none; stroke: #477f96; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 230.64896 306.986209 
+L 228.64896 310.986209 
+L 226.64896 306.986209 
+z
+" style="fill: #477f96; stroke: #477f96; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #477f96" x="228.64896" y="330.306081" transform="rotate(-0 228.64896 330.306081)">DA04–05  COMBINE</text>
+   </g>
+   <g id="patch_10">
+    <path d="M 228.64896 344.348837 
+Q 228.64896 347.276143 228.64896 348.861809 
+" style="fill: none; stroke: #477f96; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 230.64896 344.861809 
+L 228.64896 348.861809 
+L 226.64896 344.861809 
+z
+" style="fill: #477f96; stroke: #477f96; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #477f96" x="228.64896" y="368.181681" transform="rotate(-0 228.64896 368.181681)">DA06  REQUIRED ITEM TEST</text>
+   </g>
+   <g id="patch_11">
+    <path d="M 228.64896 382.224437 
+Q 228.64896 385.151743 228.64896 386.737409 
+" style="fill: none; stroke: #477f96; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 230.64896 382.737409 
+L 228.64896 386.737409 
+L 226.64896 382.737409 
+z
+" style="fill: #477f96; stroke: #477f96; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #477f96" x="228.64896" y="406.057281" transform="rotate(-0 228.64896 406.057281)">DA08  ITEM-REQUIRED BOSS</text>
+   </g>
+   <g id="patch_12">
+    <path d="M 228.64896 420.100037 
+Q 228.64896 423.027343 228.64896 424.613009 
+" style="fill: none; stroke: #477f96; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 230.64896 420.613009 
+L 228.64896 424.613009 
+L 226.64896 420.613009 
+z
+" style="fill: #477f96; stroke: #477f96; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #477f96" x="228.64896" y="443.932881" transform="rotate(-0 228.64896 443.932881)">DA09  SEAL → RETURN</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_13">
+    <path d="M 455.618779 265.844628 
+L 759.078821 265.844628 
+L 759.078821 240.08922 
+L 455.618779 240.08922 
+z
+" clip-path="url(#p2c9bfe03ab)" style="fill: #e3dece; stroke: #aa6341; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 455.618779 303.720228 
+L 759.078821 303.720228 
+L 759.078821 277.96482 
+L 455.618779 277.96482 
+z
+" clip-path="url(#p2c9bfe03ab)" style="fill: #e3dece; stroke: #aa6341; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 455.618779 341.595828 
+L 759.078821 341.595828 
+L 759.078821 315.84042 
+L 455.618779 315.84042 
+z
+" clip-path="url(#p2c9bfe03ab)" style="fill: #e3dece; stroke: #aa6341; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 455.618779 379.471428 
+L 759.078821 379.471428 
+L 759.078821 353.71602 
+L 455.618779 353.71602 
+z
+" clip-path="url(#p2c9bfe03ab)" style="fill: #e3dece; stroke: #aa6341; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 455.618779 417.347028 
+L 759.078821 417.347028 
+L 759.078821 391.59162 
+L 455.618779 391.59162 
+z
+" clip-path="url(#p2c9bfe03ab)" style="fill: #e3dece; stroke: #aa6341; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 455.618779 455.222628 
+L 759.078821 455.222628 
+L 759.078821 429.46722 
+L 455.618779 429.46722 
+z
+" clip-path="url(#p2c9bfe03ab)" style="fill: #e3dece; stroke: #aa6341; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aa6341" x="607.3488" y="254.554881" transform="rotate(-0 607.3488 254.554881)">AF02  FORESHADOW</text>
+   </g>
+   <g id="patch_19">
+    <path d="M 607.3488 268.597637 
+Q 607.3488 271.524943 607.3488 273.110609 
+" style="fill: none; stroke: #aa6341; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 609.3488 269.110609 
+L 607.3488 273.110609 
+L 605.3488 269.110609 
+z
+" style="fill: #aa6341; stroke: #aa6341; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_8">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aa6341" x="607.3488" y="292.430481" transform="rotate(-0 607.3488 292.430481)">AF03  ITEM + SAFE PRACTICE</text>
+   </g>
+   <g id="patch_20">
+    <path d="M 607.3488 306.473237 
+Q 607.3488 309.400543 607.3488 310.986209 
+" style="fill: none; stroke: #aa6341; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 609.3488 306.986209 
+L 607.3488 310.986209 
+L 605.3488 306.986209 
+z
+" style="fill: #aa6341; stroke: #aa6341; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aa6341" x="607.3488" y="330.306081" transform="rotate(-0 607.3488 330.306081)">AF04–05  COMBINE</text>
+   </g>
+   <g id="patch_21">
+    <path d="M 607.3488 344.348837 
+Q 607.3488 347.276143 607.3488 348.861809 
+" style="fill: none; stroke: #aa6341; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 609.3488 344.861809 
+L 607.3488 348.861809 
+L 605.3488 344.861809 
+z
+" style="fill: #aa6341; stroke: #aa6341; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aa6341" x="607.3488" y="368.181681" transform="rotate(-0 607.3488 368.181681)">AF06  REQUIRED ITEM TEST</text>
+   </g>
+   <g id="patch_22">
+    <path d="M 607.3488 382.224437 
+Q 607.3488 385.151743 607.3488 386.737409 
+" style="fill: none; stroke: #aa6341; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 609.3488 382.737409 
+L 607.3488 386.737409 
+L 605.3488 382.737409 
+z
+" style="fill: #aa6341; stroke: #aa6341; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aa6341" x="607.3488" y="406.057281" transform="rotate(-0 607.3488 406.057281)">AF08  ITEM-REQUIRED BOSS</text>
+   </g>
+   <g id="patch_23">
+    <path d="M 607.3488 420.100037 
+Q 607.3488 423.027343 607.3488 424.613009 
+" style="fill: none; stroke: #aa6341; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 609.3488 420.613009 
+L 607.3488 424.613009 
+L 605.3488 420.613009 
+z
+" style="fill: #aa6341; stroke: #aa6341; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_12">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #aa6341" x="607.3488" y="443.932881" transform="rotate(-0 607.3488 443.932881)">AF09  SEAL → RETURN</text>
+   </g>
+  </g>
+  <g id="axes_3">
+   <g id="patch_24">
+    <path d="M 834.318619 265.844628 
+L 1137.778661 265.844628 
+L 1137.778661 240.08922 
+L 834.318619 240.08922 
+z
+" clip-path="url(#p5b84d3d266)" style="fill: #e3dece; stroke: #776581; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_25">
+    <path d="M 834.318619 303.720228 
+L 1137.778661 303.720228 
+L 1137.778661 277.96482 
+L 834.318619 277.96482 
+z
+" clip-path="url(#p5b84d3d266)" style="fill: #e3dece; stroke: #776581; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_26">
+    <path d="M 834.318619 341.595828 
+L 1137.778661 341.595828 
+L 1137.778661 315.84042 
+L 834.318619 315.84042 
+z
+" clip-path="url(#p5b84d3d266)" style="fill: #e3dece; stroke: #776581; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_27">
+    <path d="M 834.318619 379.471428 
+L 1137.778661 379.471428 
+L 1137.778661 353.71602 
+L 834.318619 353.71602 
+z
+" clip-path="url(#p5b84d3d266)" style="fill: #e3dece; stroke: #776581; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_28">
+    <path d="M 834.318619 417.347028 
+L 1137.778661 417.347028 
+L 1137.778661 391.59162 
+L 834.318619 391.59162 
+z
+" clip-path="url(#p5b84d3d266)" style="fill: #e3dece; stroke: #776581; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_29">
+    <path d="M 834.318619 455.222628 
+L 1137.778661 455.222628 
+L 1137.778661 429.46722 
+L 834.318619 429.46722 
+z
+" clip-path="url(#p5b84d3d266)" style="fill: #e3dece; stroke: #776581; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #776581" x="986.04864" y="254.554881" transform="rotate(-0 986.04864 254.554881)">GC03  FORESHADOW</text>
+   </g>
+   <g id="patch_30">
+    <path d="M 986.04864 268.597637 
+Q 986.04864 271.524943 986.04864 273.110609 
+" style="fill: none; stroke: #776581; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 988.04864 269.110609 
+L 986.04864 273.110609 
+L 984.04864 269.110609 
+z
+" style="fill: #776581; stroke: #776581; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #776581" x="986.04864" y="292.430481" transform="rotate(-0 986.04864 292.430481)">GC04  ITEM + SAFE PRACTICE</text>
+   </g>
+   <g id="patch_31">
+    <path d="M 986.04864 306.473237 
+Q 986.04864 309.400543 986.04864 310.986209 
+" style="fill: none; stroke: #776581; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 988.04864 306.986209 
+L 986.04864 310.986209 
+L 984.04864 306.986209 
+z
+" style="fill: #776581; stroke: #776581; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #776581" x="986.04864" y="330.306081" transform="rotate(-0 986.04864 330.306081)">GC05–06  COMBINE + TEST</text>
+   </g>
+   <g id="patch_32">
+    <path d="M 986.04864 344.348837 
+Q 986.04864 347.276143 986.04864 348.861809 
+" style="fill: none; stroke: #776581; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 988.04864 344.861809 
+L 986.04864 348.861809 
+L 984.04864 344.861809 
+z
+" style="fill: #776581; stroke: #776581; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #776581" x="986.04864" y="368.181681" transform="rotate(-0 986.04864 368.181681)">GC07  ITEM-REQUIRED BOSS</text>
+   </g>
+   <g id="patch_33">
+    <path d="M 986.04864 382.224437 
+Q 986.04864 385.151743 986.04864 386.737409 
+" style="fill: none; stroke: #776581; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 988.04864 382.737409 
+L 986.04864 386.737409 
+L 984.04864 382.737409 
+z
+" style="fill: #776581; stroke: #776581; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #776581" x="986.04864" y="406.057281" transform="rotate(-0 986.04864 406.057281)">GC08  SEAL + REVELATION</text>
+   </g>
+   <g id="patch_34">
+    <path d="M 986.04864 420.100037 
+Q 986.04864 423.027343 986.04864 424.613009 
+" style="fill: none; stroke: #776581; stroke-width: 1.2; stroke-linecap: round"/>
+    <path d="M 988.04864 420.613009 
+L 986.04864 424.613009 
+L 984.04864 420.613009 
+z
+" style="fill: #776581; stroke: #776581; stroke-width: 1.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_18">
+    <text style="font-weight: 700; font-size: 8.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #776581" x="986.04864" y="443.932881" transform="rotate(-0 986.04864 443.932881)">GC09  RETURN / GC10 LATER</text>
+   </g>
+  </g>
+  <g id="text_19">
+   <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #40694e" x="59.544" y="35.35056" transform="rotate(-0 59.544 35.35056)">THE HORDE  /  THE VEYRLANDS</text>
+  </g>
+  <g id="text_20">
+   <text style="font-weight: 700; font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="59.544" y="69.85944" transform="rotate(-0 59.544 69.85944)">Theme → item → mastery → boss</text>
+  </g>
+  <g id="text_21">
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="59.544" y="98.47656" transform="rotate(-0 59.544 98.47656)">R2 design requirement: each local dungeon item is necessary to win, with the rule taught before the boss.</text>
+  </g>
+  <g id="text_22">
+   <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #b78533" x="1131.336" y="37.8756" transform="rotate(-0 1131.336 37.8756)">07 / DUNGEON ATLAS</text>
+  </g>
+  <g id="text_23">
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #737c70" x="59.544" y="818.95464" transform="rotate(-0 59.544 818.95464)">R2 / DRAFT METRIC BLOCKOUT  •  06 OCT 2026  •  Approved topology; new dimensions, rooms and encounters proposed.</text>
+  </g>
+  <g id="text_24">
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #737c70" x="1131.336" y="818.95464" transform="rotate(-0 1131.336 818.95464)">Approved items / boss use; detailed blockout still draft</text>
+  </g>
+  <g id="text_25">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #477f96" x="65.4984" y="142.24392" transform="rotate(-0 65.4984 142.24392)">DROWNED ABBEY</text>
+  </g>
+  <g id="text_26">
+   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="167.49432" transform="rotate(-0 65.4984 167.49432)">ITEM-DA-01 / Placeable reflector</text>
+  </g>
+  <g id="text_27">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="193.5864" transform="rotate(-0 65.4984 193.5864)">Drowned ritual; recover a broken path of light</text>
+  </g>
+  <g id="text_28">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="494.90784" transform="rotate(-0 65.4984 494.90784)">REQUIRED BOSS USE</text>
+  </g>
+  <g id="text_29">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="520.15824" transform="rotate(-0 65.4984 520.15824)">Redirect lantern light onto shutter receivers to</text>
+  </g>
+  <g id="text_30">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="534.4668" transform="rotate(-0 65.4984 534.4668)">expose armour; then use established attack.</text>
+  </g>
+  <g id="text_31">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="548.77536" transform="rotate(-0 65.4984 548.77536)">Direct light cannot substitute for the reflected</text>
+  </g>
+  <g id="text_32">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="563.08392" transform="rotate(-0 65.4984 563.08392)">approach.</text>
+  </g>
+  <g id="text_33">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="628.73496" transform="rotate(-0 65.4984 628.73496)">FAILURE / RETURN</text>
+  </g>
+  <g id="text_34">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="653.98536" transform="rotate(-0 65.4984 653.98536)">Persistent nonconsumable tool; authored stable</text>
+  </g>
+  <g id="text_35">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="667.45224" transform="rotate(-0 65.4984 667.45224)">placements; safe recall/reset when unreachable.</text>
+  </g>
+  <g id="text_36">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="688.49424" transform="rotate(-0 65.4984 688.49424)">DA11 side clue stays optional and recoverable;</text>
+  </g>
+  <g id="text_37">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="701.96112" transform="rotate(-0 65.4984 701.96112)">no underwater essential item.</text>
+  </g>
+  <g id="text_38">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #aa6341" x="444.19824" y="142.24392" transform="rotate(-0 444.19824 142.24392)">ASHEN FOUNDRY</text>
+  </g>
+  <g id="text_39">
+   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="167.49432" transform="rotate(-0 444.19824 167.49432)">ITEM-AF-01 / Shuttered lantern stand</text>
+  </g>
+  <g id="text_40">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="193.5864" transform="rotate(-0 444.19824 193.5864)">Bound labour; control when and where the</text>
+  </g>
+  <g id="text_41">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="208.73664" transform="rotate(-0 444.19824 208.73664)">furnace sees light</text>
+  </g>
+  <g id="text_42">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="494.90784" transform="rotate(-0 444.19824 494.90784)">REQUIRED BOSS USE</text>
+  </g>
+  <g id="text_43">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="520.15824" transform="rotate(-0 444.19824 520.15824)">Anchor and open the lantern stand to keep the</text>
+  </g>
+  <g id="text_44">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="534.4668" transform="rotate(-0 444.19824 534.4668)">shell exposure mechanism lit while moving to the</text>
+  </g>
+  <g id="text_45">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="548.77536" transform="rotate(-0 444.19824 548.77536)">safe strike position; handheld light cannot</text>
+  </g>
+  <g id="text_46">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="563.08392" transform="rotate(-0 444.19824 563.08392)">occupy both positions.</text>
+  </g>
+  <g id="text_47">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="628.73496" transform="rotate(-0 444.19824 628.73496)">FAILURE / RETURN</text>
+  </g>
+  <g id="text_48">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="653.98536" transform="rotate(-0 444.19824 653.98536)">Persistent nonconsumable stand; safe recall</text>
+  </g>
+  <g id="text_49">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="667.45224" transform="rotate(-0 444.19824 667.45224)">returns stand/lantern to valid placement or</text>
+  </g>
+  <g id="text_50">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="680.91912" transform="rotate(-0 444.19824 680.91912)">inventory; no lost-light lockout.</text>
+  </g>
+  <g id="text_51">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="701.96112" transform="rotate(-0 444.19824 701.96112)">Optional salvage shutter only; no extra</text>
+  </g>
+  <g id="text_52">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="444.19824" y="715.428" transform="rotate(-0 444.19824 715.428)">mandatory room or peer-item gate.</text>
+  </g>
+  <g id="text_53">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #776581" x="822.89808" y="142.24392" transform="rotate(-0 822.89808 142.24392)">GLASS COURT</text>
+  </g>
+  <g id="text_54">
+   <text style="font-weight: 700; font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="167.49432" transform="rotate(-0 822.89808 167.49432)">ITEM-GC-01 / Focused lantern aperture</text>
+  </g>
+  <g id="text_55">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="193.5864" transform="rotate(-0 822.89808 193.5864)">Truth through appearances; choose the real</text>
+  </g>
+  <g id="text_56">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="208.73664" transform="rotate(-0 822.89808 208.73664)">light path</text>
+  </g>
+  <g id="text_57">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="494.90784" transform="rotate(-0 822.89808 494.90784)">REQUIRED BOSS USE</text>
+  </g>
+  <g id="text_58">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="520.15824" transform="rotate(-0 822.89808 520.15824)">Use the narrow aperture to isolate small ward</text>
+  </g>
+  <g id="text_59">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="534.4668" transform="rotate(-0 822.89808 534.4668)">receivers through bounded reflected paths; the</text>
+  </g>
+  <g id="text_60">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="548.77536" transform="rotate(-0 822.89808 548.77536)">broad lantern lights adjacent receivers and</text>
+  </g>
+  <g id="text_61">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="563.08392" transform="rotate(-0 822.89808 563.08392)">cannot release the ward. Repeat the already-</text>
+  </g>
+  <g id="text_62">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="577.39248" transform="rotate(-0 822.89808 577.39248)">taught isolation rule until the keeper ward</text>
+  </g>
+  <g id="text_63">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="591.70104" transform="rotate(-0 822.89808 591.70104)">challenge is defeated.</text>
+  </g>
+  <g id="text_64">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="628.73496" transform="rotate(-0 822.89808 628.73496)">FAILURE / RETURN</text>
+  </g>
+  <g id="text_65">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="653.98536" transform="rotate(-0 822.89808 653.98536)">Permanent lantern capability after acquisition;</text>
+  </g>
+  <g id="text_66">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="667.45224" transform="rotate(-0 822.89808 667.45224)">focus can reset without consumable loss;</text>
+  </g>
+  <g id="text_67">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="680.91912" transform="rotate(-0 822.89808 680.91912)">required paths remain recoverable.</text>
+  </g>
+  <g id="text_68">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="701.96112" transform="rotate(-0 822.89808 701.96112)">Earlier peer items may aid optional paths only;</text>
+  </g>
+  <g id="text_69">
+   <text style="font-size: 8.8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="822.89808" y="715.428" transform="rotate(-0 822.89808 715.428)">neither is a hidden Court combat prerequisite.</text>
+  </g>
+  <g id="text_70">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="724.68648" transform="rotate(-0 65.4984 724.68648)">NO HIDDEN SECOND-DUNGEON REQUIREMENT</text>
+  </g>
+  <g id="text_71">
+   <text style="font-size: 8.2px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="749.93688" transform="rotate(-0 65.4984 749.93688)">Abbey and Foundry each work with starting equipment, their own access solution and their own local item. Court access requires both seals; its required boss action</text>
+  </g>
+  <g id="text_72">
+   <text style="font-size: 8.2px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="761.7204" transform="rotate(-0 65.4984 761.7204)">uses the aperture, not a hidden requirement to carry both peer items. Boss defeat does not automatically mean keeper death.</text>
+  </g>
+  <g id="text_73">
+   <text style="font-size: 8.2px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="781.07904" transform="rotate(-0 65.4984 781.07904)">Light outcomes must use bounded supported world-space receiver/occlusion logic. No screen-brightness test, fake marker-only solution, infinite reflection or</text>
+  </g>
+  <g id="text_74">
+   <text style="font-size: 8.2px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="65.4984" y="792.86256" transform="rotate(-0 65.4984 792.86256)">assumed full-GI simulation. Exact mechanics are proposed for playable review; no boss-only rule appears without teaching.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pd237422038">
+   <rect x="65.4984" y="238.19544" width="326.30112" height="227.2536"/>
+  </clipPath>
+  <clipPath id="p2c9bfe03ab">
+   <rect x="444.19824" y="238.19544" width="326.30112" height="227.2536"/>
+  </clipPath>
+  <clipPath id="p5b84d3d266">
+   <rect x="822.89808" y="238.19544" width="326.30112" height="227.2536"/>
+  </clipPath>
+ </defs>
+</svg>

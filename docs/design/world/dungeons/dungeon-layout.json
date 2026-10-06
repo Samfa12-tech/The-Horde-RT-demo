@@ -1,0 +1,2100 @@
+{
+  "status": "DRAFT FOR BLOCKOUT; NOT ENGINE VALIDATED",
+  "source_commit": "48fd8d6e0ee73c480502906104593c4e6d3b8aae",
+  "axes": {
+    "x": "east metres",
+    "y": "north metres",
+    "z": "up metres above proposed lake datum"
+  },
+  "origin": "Bellwether well, X=0 Y=0 Z=20",
+  "baseline": {
+    "status": "PROPOSED BLOCKOUT, NOT ENGINE-VALIDATED",
+    "date": "2026-10-05",
+    "source_commit": "6aef4cde32188fd8a1ced2bef30360451f80aaae",
+    "axes": {
+      "x": "east metres",
+      "y": "north metres",
+      "z": "up metres above proposed lake datum"
+    },
+    "origin": "Bellwether well, X=0 Y=0 Z=20",
+    "forest": [
+      [
+        -112.0,
+        139.0,
+        33.6
+      ],
+      [
+        -107.0,
+        132.0,
+        33.0
+      ],
+      [
+        -94.0,
+        126.0,
+        32.1
+      ],
+      [
+        -96.0,
+        111.0,
+        31.0
+      ],
+      [
+        -82.0,
+        106.0,
+        31.3
+      ],
+      [
+        -65.0,
+        90.0,
+        30.4
+      ]
+    ],
+    "arrival": [
+      [
+        -65.0,
+        90.0,
+        30.4
+      ],
+      [
+        -56.0,
+        76.0,
+        28.8
+      ],
+      [
+        -59.0,
+        58.0,
+        27.2
+      ],
+      [
+        -47.0,
+        44.0,
+        25.5
+      ],
+      [
+        -30.0,
+        34.0,
+        23.6
+      ],
+      [
+        -19.0,
+        18.0,
+        21.8
+      ],
+      [
+        -4.0,
+        4.0,
+        20.0
+      ],
+      [
+        0.0,
+        0.0,
+        20.0
+      ]
+    ],
+    "river_surface": [
+      [
+        30.0,
+        -240.0,
+        0.0
+      ],
+      [
+        44.0,
+        -170.0,
+        0.8
+      ],
+      [
+        60.0,
+        -110.0,
+        2.3
+      ],
+      [
+        62.0,
+        -80.0,
+        3.0
+      ],
+      [
+        58.0,
+        -25.0,
+        6.0
+      ],
+      [
+        68.0,
+        25.0,
+        10.0
+      ],
+      [
+        68.0,
+        65.0,
+        14.0
+      ],
+      [
+        78.0,
+        105.0,
+        20.0
+      ],
+      [
+        105.0,
+        160.0,
+        29.0
+      ],
+      [
+        135.0,
+        220.0,
+        40.0
+      ]
+    ],
+    "millrace_surface": [
+      [
+        68.0,
+        55.0,
+        13.0
+      ],
+      [
+        49.0,
+        48.0,
+        12.8
+      ],
+      [
+        49.0,
+        25.0,
+        12.3
+      ],
+      [
+        59.0,
+        25.0,
+        12.2
+      ],
+      [
+        59.0,
+        20.0,
+        12.1
+      ],
+      [
+        59.0,
+        12.0,
+        9.5
+      ],
+      [
+        62.0,
+        -3.0,
+        7.76
+      ]
+    ],
+    "local_paths": [
+      [
+        [
+          -5.0,
+          3.0,
+          20.0
+        ],
+        [
+          -19.0,
+          6.0,
+          20.5
+        ],
+        [
+          -35.0,
+          8.0,
+          20.8
+        ]
+      ],
+      [
+        [
+          -30.0,
+          34.0,
+          23.6
+        ],
+        [
+          -39.0,
+          29.0,
+          24.6
+        ]
+      ],
+      [
+        [
+          4.0,
+          1.0,
+          20.0
+        ],
+        [
+          4.0,
+          7.0,
+          20.4
+        ]
+      ],
+      [
+        [
+          -5.0,
+          -5.0,
+          20.0
+        ],
+        [
+          -9.0,
+          -20.0,
+          20.0
+        ],
+        [
+          -15.5,
+          -28.0,
+          19.9
+        ]
+      ],
+      [
+        [
+          14.0,
+          -29.0,
+          18.6
+        ],
+        [
+          20.0,
+          -29.0,
+          18.2
+        ]
+      ],
+      [
+        [
+          18.0,
+          -37.0,
+          18.1
+        ],
+        [
+          1.0,
+          -39.5,
+          18.2
+        ]
+      ]
+    ],
+    "church_path": [
+      [
+        -47.0,
+        44.0,
+        25.5
+      ],
+      [
+        -36.0,
+        49.0,
+        26.6
+      ],
+      [
+        -25.0,
+        59.0,
+        28.0
+      ],
+      [
+        -16.0,
+        61.0,
+        29.0
+      ],
+      [
+        -14.0,
+        51.0,
+        29.0
+      ],
+      [
+        -2.0,
+        51.0,
+        29.0
+      ],
+      [
+        -2.0,
+        53.0,
+        29.0
+      ]
+    ],
+    "shrine_path": [
+      [
+        -16.0,
+        61.0,
+        29.0
+      ],
+      [
+        -17.0,
+        81.0,
+        30.0
+      ],
+      [
+        0.0,
+        90.0,
+        31.0
+      ],
+      [
+        25.0,
+        97.0,
+        31.2
+      ]
+    ],
+    "mill_path": [
+      [
+        0.0,
+        0.0,
+        20.0
+      ],
+      [
+        25.0,
+        1.0,
+        18.4
+      ],
+      [
+        35.0,
+        6.0,
+        17.0
+      ],
+      [
+        40.0,
+        13.0,
+        16.0
+      ]
+    ],
+    "south_path": [
+      [
+        0.0,
+        0.0,
+        20.0
+      ],
+      [
+        9.0,
+        -18.0,
+        19.1
+      ],
+      [
+        18.0,
+        -37.0,
+        18.1
+      ],
+      [
+        35.0,
+        -55.0,
+        16.3
+      ],
+      [
+        47.0,
+        -70.0,
+        14.9
+      ]
+    ],
+    "optional_bridge_path": [
+      [
+        40.0,
+        13.0,
+        16.0
+      ],
+      [
+        34.0,
+        25.0,
+        17.0
+      ],
+      [
+        38.0,
+        37.0,
+        18.0
+      ],
+      [
+        45.5,
+        37.0,
+        18.0
+      ],
+      [
+        52.5,
+        37.0,
+        18.0
+      ],
+      [
+        59.0,
+        37.0,
+        18.0
+      ]
+    ],
+    "buildings": [
+      {
+        "id": "B01",
+        "label": "Tavern",
+        "x": 12,
+        "y": 15,
+        "width": 22,
+        "depth": 16,
+        "floor_z": 20.4,
+        "door_x": 4,
+        "door_y": 7,
+        "scope": "Hero interior"
+      },
+      {
+        "id": "B02",
+        "label": "Church",
+        "x": -2,
+        "y": 65,
+        "width": 18,
+        "depth": 24,
+        "floor_z": 29,
+        "door_x": -2,
+        "door_y": 53,
+        "scope": "Exterior; service outside"
+      },
+      {
+        "id": "B03",
+        "label": "House A",
+        "x": -43,
+        "y": 8,
+        "width": 16,
+        "depth": 12,
+        "floor_z": 20.8,
+        "door_x": -35,
+        "door_y": 8,
+        "scope": "Optional interior"
+      },
+      {
+        "id": "B04",
+        "label": "House B",
+        "x": -47,
+        "y": 29,
+        "width": 16,
+        "depth": 14,
+        "floor_z": 24.6,
+        "door_x": -39,
+        "door_y": 29,
+        "scope": "Optional interior"
+      },
+      {
+        "id": "B05",
+        "label": "Mill",
+        "x": 48,
+        "y": 13,
+        "width": 16,
+        "depth": 16,
+        "floor_z": 16,
+        "door_x": 40,
+        "door_y": 13,
+        "scope": "Exterior / working edge"
+      },
+      {
+        "id": "B06",
+        "label": "Smith",
+        "x": 29,
+        "y": -29,
+        "width": 18,
+        "depth": 14,
+        "floor_z": 18.2,
+        "door_x": 20,
+        "door_y": -29,
+        "scope": "Exterior service yard"
+      },
+      {
+        "id": "B07",
+        "label": "Store",
+        "x": -22,
+        "y": -28,
+        "width": 13,
+        "depth": 11,
+        "floor_z": 19.9,
+        "door_x": -15.5,
+        "door_y": -28,
+        "scope": "Closed shell"
+      },
+      {
+        "id": "B08",
+        "label": "Outbuilding",
+        "x": 1,
+        "y": -44,
+        "width": 12,
+        "depth": 9,
+        "floor_z": 18.2,
+        "door_x": 1,
+        "door_y": -39.5,
+        "scope": "Closed shell"
+      },
+      {
+        "id": "B09",
+        "label": "Starter shrine",
+        "x": 25,
+        "y": 101,
+        "width": 8,
+        "depth": 8,
+        "floor_z": 31.2,
+        "door_x": 25,
+        "door_y": 97,
+        "scope": "Nearby spur; provisional"
+      }
+    ],
+    "path_widths_m": {
+      "forest": 2.4,
+      "arrival": 3.5,
+      "side_path": 2.2
+    },
+    "warning": "Concept map topology is approved but not metric. All dimensions and elevations here are proposals. No full-world dimensions are fixed. Terrain is a deterministic 0.5 m planning grid, not a shipping mesh.",
+    "landmarks": {
+      "F01": {
+        "label": "Rescue rim",
+        "xyz": [
+          -112.0,
+          139.0,
+          33.6
+        ]
+      },
+      "F02": {
+        "label": "Reunion",
+        "xyz": [
+          -107.0,
+          132.0,
+          33.0
+        ]
+      },
+      "F03": {
+        "label": "Optional lantern clue",
+        "xyz": [
+          -82.0,
+          106.0,
+          31.3
+        ]
+      },
+      "F04": {
+        "label": "Lookout and shared join",
+        "xyz": [
+          -65.0,
+          90.0,
+          30.4
+        ]
+      },
+      "T01": {
+        "label": "Well",
+        "xyz": [
+          0,
+          0,
+          20
+        ]
+      },
+      "T02": {
+        "label": "Gardens",
+        "xy": [
+          -43,
+          -10
+        ]
+      },
+      "T03": {
+        "label": "Active graveyard",
+        "bounds": [
+          11,
+          31,
+          54,
+          78
+        ]
+      },
+      "T04": {
+        "label": "Optional service bridge",
+        "deck_bounds": [
+          45.5,
+          52.5,
+          35.5,
+          38.5
+        ],
+        "deck_z": 18,
+        "underside_z": 17.4
+      },
+      "T05": {
+        "label": "Outbound junction",
+        "xyz": [
+          47.0,
+          -70.0,
+          14.9
+        ]
+      }
+    },
+    "services": [
+      {
+        "id": "S1",
+        "role": "Kit",
+        "xy": [
+          -8,
+          -1
+        ]
+      },
+      {
+        "id": "S2",
+        "role": "Tavern keeper",
+        "xy": [
+          3,
+          7
+        ]
+      },
+      {
+        "id": "S3",
+        "role": "Record/shrine service",
+        "xy": [
+          -7,
+          51
+        ]
+      },
+      {
+        "id": "S4",
+        "role": "Smith/artificer",
+        "xy": [
+          19,
+          -23
+        ]
+      },
+      {
+        "id": "S5",
+        "role": "River salvager",
+        "xy": [
+          36,
+          0
+        ]
+      },
+      {
+        "id": "S6",
+        "role": "Relic dealer",
+        "xy": [
+          -18,
+          -3
+        ]
+      }
+    ]
+  },
+  "routes": {
+    "abbey": [
+      [
+        47.0,
+        -70.0,
+        14.9
+      ],
+      [
+        31.0,
+        -100.0,
+        13.0
+      ],
+      [
+        15.0,
+        -140.0,
+        10.5
+      ],
+      [
+        -2.0,
+        -190.0,
+        7.5
+      ],
+      [
+        -18.0,
+        -224.0,
+        5.3
+      ],
+      [
+        -20.0,
+        -248.0,
+        3.0
+      ],
+      [
+        0.0,
+        -265.0,
+        1.5
+      ]
+    ],
+    "foundry": [
+      [
+        47.0,
+        -70.0,
+        14.9
+      ],
+      [
+        43.0,
+        -84.0,
+        14.0
+      ],
+      [
+        51.0,
+        -94.0,
+        13.5
+      ],
+      [
+        89.0,
+        -94.0,
+        13.5
+      ],
+      [
+        119.0,
+        -76.0,
+        17.0
+      ],
+      [
+        148.0,
+        -72.0,
+        20.0
+      ],
+      [
+        179.0,
+        -55.0,
+        24.0
+      ],
+      [
+        213.0,
+        -47.0,
+        28.0
+      ],
+      [
+        230.0,
+        -40.0,
+        30.0
+      ]
+    ],
+    "court": [
+      [
+        119,
+        -76,
+        17
+      ],
+      [
+        133,
+        -36,
+        21
+      ],
+      [
+        146,
+        8,
+        26
+      ],
+      [
+        169,
+        51,
+        31
+      ],
+      [
+        193,
+        76,
+        36
+      ],
+      [
+        172,
+        104,
+        40
+      ],
+      [
+        201,
+        133,
+        45
+      ],
+      [
+        230,
+        153,
+        49
+      ],
+      [
+        209,
+        183,
+        53
+      ],
+      [
+        236,
+        211,
+        59
+      ],
+      [
+        272,
+        227,
+        64
+      ],
+      [
+        257,
+        258,
+        69
+      ],
+      [
+        282,
+        283,
+        75
+      ],
+      [
+        306,
+        308,
+        80
+      ]
+    ],
+    "abbey_water": [
+      [
+        0.0,
+        -265.0,
+        1.5
+      ],
+      [
+        6.0,
+        -269.0,
+        0.0
+      ],
+      [
+        11.0,
+        -272.0,
+        -2.2
+      ],
+      [
+        16.0,
+        -275.0,
+        1.2
+      ],
+      [
+        21.0,
+        -278.0,
+        -2.2
+      ],
+      [
+        27.0,
+        -281.0,
+        0.0
+      ],
+      [
+        30.0,
+        -284.0,
+        2.0
+      ]
+    ]
+  },
+  "lake_polygon_xy": [
+    [
+      30,
+      -240
+    ],
+    [
+      68,
+      -246
+    ],
+    [
+      104,
+      -262
+    ],
+    [
+      148,
+      -300
+    ],
+    [
+      166,
+      -349
+    ],
+    [
+      148,
+      -400
+    ],
+    [
+      103,
+      -444
+    ],
+    [
+      50,
+      -459
+    ],
+    [
+      0,
+      -448
+    ],
+    [
+      -38,
+      -415
+    ],
+    [
+      -61,
+      -365
+    ],
+    [
+      -59,
+      -310
+    ],
+    [
+      -30,
+      -274
+    ],
+    [
+      -8,
+      -285
+    ],
+    [
+      2,
+      -267
+    ],
+    [
+      -5,
+      -252
+    ]
+  ],
+  "lake_surface_z": 0,
+  "outflow_xyz": [
+    [
+      0.0,
+      -448.0,
+      0.0
+    ],
+    [
+      -28.0,
+      -478.0,
+      -0.4
+    ],
+    [
+      -55.0,
+      -510.0,
+      -1.2
+    ]
+  ],
+  "headwaters_extension_xyz": [
+    [
+      135,
+      220,
+      40
+    ],
+    [
+      170,
+      290,
+      51
+    ],
+    [
+      193,
+      360,
+      65
+    ],
+    [
+      214,
+      430,
+      79
+    ]
+  ],
+  "bridge": {
+    "west_xyz": [
+      51.0,
+      -94.0,
+      13.5
+    ],
+    "east_xyz": [
+      89.0,
+      -94.0,
+      13.5
+    ],
+    "deck_width_m": 3,
+    "proposed_span_m": 38
+  },
+  "rooms": [
+    {
+      "id": "DA01",
+      "name": "Arrival tower",
+      "x": 0,
+      "y": 0,
+      "width": 12,
+      "depth": 12,
+      "floor_z": 2,
+      "role": "Safe dry arrival; confirm recovery before descent",
+      "dungeon": "DA",
+      "world_x": 30,
+      "world_y": -284,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "DA02",
+      "name": "Orientation cloister",
+      "x": 0,
+      "y": -22,
+      "width": 20,
+      "depth": 16,
+      "floor_z": 2,
+      "role": "Foreshadow shutter latch; a reflected path is needed",
+      "dungeon": "DA",
+      "world_x": 30,
+      "world_y": -306,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "DA03",
+      "name": "Reflector gallery",
+      "x": -26,
+      "y": -22,
+      "width": 16,
+      "depth": 16,
+      "floor_z": 2,
+      "role": "ITEM-DA-01: acquire reflector; safe redirect practice",
+      "dungeon": "DA",
+      "world_x": 4,
+      "world_y": -306,
+      "acquired_item_id": "ITEM-DA-01",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "DA04",
+      "name": "Submerged viewing gallery",
+      "x": -26,
+      "y": -54,
+      "width": 18,
+      "depth": 20,
+      "floor_z": -4,
+      "role": "Dry underwater view; redirect around a fixed blocker",
+      "dungeon": "DA",
+      "world_x": 4,
+      "world_y": -338,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "DA05",
+      "name": "Duty hall",
+      "x": -26,
+      "y": -88,
+      "width": 22,
+      "depth": 20,
+      "floor_z": -4,
+      "role": "Dead attendants; first learned-rule encounter",
+      "dungeon": "DA",
+      "world_x": 4,
+      "world_y": -372,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "DA06",
+      "name": "Shutter chamber",
+      "x": 7,
+      "y": -88,
+      "width": 18,
+      "depth": 20,
+      "floor_z": -4,
+      "role": "Mandatory reflector test; resettable shutter chain",
+      "dungeon": "DA",
+      "world_x": 37,
+      "world_y": -372,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "DA07",
+      "name": "Bell stair",
+      "x": 33,
+      "y": -88,
+      "width": 12,
+      "depth": 16,
+      "floor_z": 2,
+      "role": "Recovery candidate before final application",
+      "dungeon": "DA",
+      "world_x": 63,
+      "world_y": -372,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "DA08",
+      "name": "Bellkeeper hall",
+      "x": 33,
+      "y": -54,
+      "width": 26,
+      "depth": 28,
+      "floor_z": 6,
+      "role": "Reflector REQUIRED to expose Bellkeeper armour",
+      "dungeon": "DA",
+      "world_x": 63,
+      "world_y": -338,
+      "acquired_item_id": "",
+      "boss_required_item_id": "ITEM-DA-01",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "DA09",
+      "name": "Seal and relic",
+      "x": 33,
+      "y": -20,
+      "width": 14,
+      "depth": 14,
+      "floor_z": 6,
+      "role": "Peer seal; plunder evidence and claimant object",
+      "dungeon": "DA",
+      "world_x": 63,
+      "world_y": -304,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "DA10",
+      "name": "Return cloister",
+      "x": 30,
+      "y": 3,
+      "width": 16,
+      "depth": 12,
+      "floor_z": 2,
+      "role": "Unlock internal return to arrival; same safe crossing",
+      "dungeon": "DA",
+      "world_x": 60,
+      "world_y": -281,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "DA11",
+      "name": "Flooded side cell",
+      "x": -53,
+      "y": -54,
+      "width": 12,
+      "depth": 12,
+      "floor_z": -2,
+      "role": "Optional, nonessential reward; isolated wet branch",
+      "dungeon": "DA",
+      "world_x": -23,
+      "world_y": -338,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "AF01",
+      "name": "Intake vestibule",
+      "x": 0,
+      "y": 0,
+      "width": 14,
+      "depth": 14,
+      "floor_z": 30,
+      "role": "Safe entry / return confirmation",
+      "dungeon": "AF",
+      "world_x": 230,
+      "world_y": -40,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "AF02",
+      "name": "Mint floor",
+      "x": 0,
+      "y": 25,
+      "width": 22,
+      "depth": 22,
+      "floor_z": 30,
+      "role": "Foreshadow held-light mechanism and remote work position",
+      "dungeon": "AF",
+      "world_x": 230,
+      "world_y": -15,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "AF03",
+      "name": "Lantern-stand bay",
+      "x": -29,
+      "y": 25,
+      "width": 16,
+      "depth": 18,
+      "floor_z": 30,
+      "role": "ITEM-AF-01: acquire stand; safe anchor/shutter practice",
+      "dungeon": "AF",
+      "world_x": 201,
+      "world_y": -15,
+      "acquired_item_id": "ITEM-AF-01",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "AF04",
+      "name": "Smoke gallery",
+      "x": -29,
+      "y": 57,
+      "width": 18,
+      "depth": 22,
+      "floor_z": 34,
+      "role": "Move apart from anchored light; smoke/cover is readable",
+      "dungeon": "AF",
+      "world_x": 201,
+      "world_y": 17,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "AF05",
+      "name": "Machinery court",
+      "x": 0,
+      "y": 82,
+      "width": 26,
+      "depth": 22,
+      "floor_z": 34,
+      "role": "Workers; cover and exposure combinations",
+      "dungeon": "AF",
+      "world_x": 230,
+      "world_y": 42,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "AF06",
+      "name": "Shutter test",
+      "x": 33,
+      "y": 82,
+      "width": 18,
+      "depth": 20,
+      "floor_z": 34,
+      "role": "Mandatory stand test: hold light while repositioning",
+      "dungeon": "AF",
+      "world_x": 263,
+      "world_y": 42,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "AF07",
+      "name": "Recovery antechamber",
+      "x": 33,
+      "y": 53,
+      "width": 14,
+      "depth": 14,
+      "floor_z": 34,
+      "role": "Safe reset / recovery before boss",
+      "dungeon": "AF",
+      "world_x": 263,
+      "world_y": 13,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "AF08",
+      "name": "Master of Coin hall",
+      "x": 33,
+      "y": 23,
+      "width": 28,
+      "depth": 28,
+      "floor_z": 30,
+      "role": "Stand REQUIRED to hold furnace-shell exposure",
+      "dungeon": "AF",
+      "world_x": 263,
+      "world_y": -17,
+      "acquired_item_id": "",
+      "boss_required_item_id": "ITEM-AF-01",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "AF09",
+      "name": "Seal archive",
+      "x": 33,
+      "y": -7,
+      "width": 16,
+      "depth": 14,
+      "floor_z": 30,
+      "role": "Peer seal; evidence of royal bargain",
+      "dungeon": "AF",
+      "world_x": 263,
+      "world_y": -47,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "AF10",
+      "name": "Service return",
+      "x": 0,
+      "y": -25,
+      "width": 14,
+      "depth": 12,
+      "floor_z": 30,
+      "role": "Open return door to AF01; persistent shortcut",
+      "dungeon": "AF",
+      "world_x": 230,
+      "world_y": -65,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "GC01",
+      "name": "Gate vestibule",
+      "x": 0,
+      "y": 0,
+      "width": 16,
+      "depth": 14,
+      "floor_z": 80,
+      "role": "Safe ridge arrival; gate state persists",
+      "dungeon": "GC",
+      "world_x": 306,
+      "world_y": 308,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "GC02",
+      "name": "Winter garden",
+      "x": 0,
+      "y": 28,
+      "width": 28,
+      "depth": 24,
+      "floor_z": 80,
+      "role": "Roofless landmark court, orient return",
+      "dungeon": "GC",
+      "world_x": 306,
+      "world_y": 336,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "GC03",
+      "name": "Mirrored gallery",
+      "x": -34,
+      "y": 28,
+      "width": 18,
+      "depth": 22,
+      "floor_z": 80,
+      "role": "Foreshadow broad-light ambiguity; finite mirror paths",
+      "dungeon": "GC",
+      "world_x": 272,
+      "world_y": 336,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "GC04",
+      "name": "Aperture room",
+      "x": -34,
+      "y": 65,
+      "width": 18,
+      "depth": 20,
+      "floor_z": 84,
+      "role": "ITEM-GC-01: acquire aperture; safe receiver isolation",
+      "dungeon": "GC",
+      "world_x": 272,
+      "world_y": 373,
+      "acquired_item_id": "ITEM-GC-01",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "GC05",
+      "name": "Reflection test",
+      "x": 0,
+      "y": 94,
+      "width": 26,
+      "depth": 22,
+      "floor_z": 84,
+      "role": "Mandatory aperture isolation test; finite reflection",
+      "dungeon": "GC",
+      "world_x": 306,
+      "world_y": 402,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "GC06",
+      "name": "Royal records",
+      "x": 34,
+      "y": 94,
+      "width": 18,
+      "depth": 20,
+      "floor_z": 84,
+      "role": "Royal evidence; reinforce selective-light rule",
+      "dungeon": "GC",
+      "world_x": 340,
+      "world_y": 402,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "GC07",
+      "name": "Keeper ward chamber",
+      "x": 34,
+      "y": 57,
+      "width": 28,
+      "depth": 28,
+      "floor_z": 88,
+      "role": "Aperture REQUIRED to dismantle keeper wards and win",
+      "dungeon": "GC",
+      "world_x": 340,
+      "world_y": 365,
+      "acquired_item_id": "",
+      "boss_required_item_id": "ITEM-GC-01",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "GC08",
+      "name": "Final seal chamber",
+      "x": 34,
+      "y": 23,
+      "width": 16,
+      "depth": 16,
+      "floor_z": 88,
+      "role": "Final seal and treasury location reveal",
+      "dungeon": "GC",
+      "world_x": 340,
+      "world_y": 331,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "GC09",
+      "name": "Return gallery",
+      "x": 33,
+      "y": -6,
+      "width": 16,
+      "depth": 12,
+      "floor_z": 80,
+      "role": "Descent and unlocked return to GC01",
+      "dungeon": "GC",
+      "world_x": 339,
+      "world_y": 302,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    },
+    {
+      "id": "GC10",
+      "name": "Concealed threshold",
+      "x": 60,
+      "y": 23,
+      "width": 12,
+      "depth": 14,
+      "floor_z": 88,
+      "role": "Post-reveal future finale connection; scope boundary",
+      "dungeon": "GC",
+      "world_x": 366,
+      "world_y": 331,
+      "acquired_item_id": "",
+      "boss_required_item_id": "",
+      "approval_status": "Room layout draft; item and boss-use concept approved"
+    }
+  ],
+  "connections": [
+    {
+      "a": "DA01",
+      "b": "DA02",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "DA02",
+      "b": "DA03",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "DA03",
+      "b": "DA04",
+      "via": [],
+      "kind": "main",
+      "width_m": 3,
+      "requires_item": "ITEM-DA-01",
+      "requires_demonstrated_use": true,
+      "gate_direction": "forward progression only; reverse retreat stays available",
+      "gate_role": "safe practice"
+    },
+    {
+      "a": "DA04",
+      "b": "DA05",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "DA05",
+      "b": "DA06",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "DA06",
+      "b": "DA07",
+      "via": [],
+      "kind": "main",
+      "width_m": 3,
+      "requires_item": "ITEM-DA-01",
+      "requires_demonstrated_use": true,
+      "gate_direction": "forward progression only; reverse retreat stays available",
+      "gate_role": "mandatory combined test"
+    },
+    {
+      "a": "DA07",
+      "b": "DA08",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "DA08",
+      "b": "DA09",
+      "via": [],
+      "kind": "main",
+      "width_m": 3,
+      "requires_boss_defeat": "DA08"
+    },
+    {
+      "a": "DA09",
+      "b": "DA10",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "DA10",
+      "b": "DA01",
+      "via": [],
+      "kind": "return",
+      "width_m": 3,
+      "requires_seal": "DA09",
+      "unlock_from": "DA10"
+    },
+    {
+      "a": "DA03",
+      "b": "DA11",
+      "via": [
+        [
+          -53,
+          -22
+        ]
+      ],
+      "kind": "optional",
+      "width_m": 2
+    },
+    {
+      "a": "AF01",
+      "b": "AF02",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "AF02",
+      "b": "AF03",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "AF03",
+      "b": "AF04",
+      "via": [],
+      "kind": "main",
+      "width_m": 3,
+      "requires_item": "ITEM-AF-01",
+      "requires_demonstrated_use": true,
+      "gate_direction": "forward progression only; reverse retreat stays available",
+      "gate_role": "safe practice"
+    },
+    {
+      "a": "AF04",
+      "b": "AF05",
+      "via": [
+        [
+          -29,
+          82
+        ]
+      ],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "AF05",
+      "b": "AF06",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "AF06",
+      "b": "AF07",
+      "via": [],
+      "kind": "main",
+      "width_m": 3,
+      "requires_item": "ITEM-AF-01",
+      "requires_demonstrated_use": true,
+      "gate_direction": "forward progression only; reverse retreat stays available",
+      "gate_role": "mandatory combined test"
+    },
+    {
+      "a": "AF07",
+      "b": "AF08",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "AF08",
+      "b": "AF09",
+      "via": [],
+      "kind": "main",
+      "width_m": 3,
+      "requires_boss_defeat": "AF08"
+    },
+    {
+      "a": "AF09",
+      "b": "AF10",
+      "via": [
+        [
+          33,
+          -25
+        ]
+      ],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "AF10",
+      "b": "AF01",
+      "via": [],
+      "kind": "return",
+      "width_m": 3,
+      "requires_seal": "AF09",
+      "unlock_from": "AF10"
+    },
+    {
+      "a": "GC01",
+      "b": "GC02",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "GC02",
+      "b": "GC03",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "GC03",
+      "b": "GC04",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "GC04",
+      "b": "GC05",
+      "via": [
+        [
+          -34,
+          94
+        ]
+      ],
+      "kind": "main",
+      "width_m": 3,
+      "requires_item": "ITEM-GC-01",
+      "requires_demonstrated_use": true,
+      "gate_direction": "forward progression only; reverse retreat stays available",
+      "gate_role": "safe practice"
+    },
+    {
+      "a": "GC05",
+      "b": "GC06",
+      "via": [],
+      "kind": "main",
+      "width_m": 3,
+      "requires_item": "ITEM-GC-01",
+      "requires_demonstrated_use": true,
+      "gate_direction": "forward progression only; reverse retreat stays available",
+      "gate_role": "mandatory combined test"
+    },
+    {
+      "a": "GC06",
+      "b": "GC07",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "GC07",
+      "b": "GC08",
+      "via": [],
+      "kind": "main",
+      "width_m": 3,
+      "requires_boss_defeat": "GC07"
+    },
+    {
+      "a": "GC08",
+      "b": "GC09",
+      "via": [],
+      "kind": "main",
+      "width_m": 3
+    },
+    {
+      "a": "GC09",
+      "b": "GC01",
+      "via": [],
+      "kind": "return",
+      "width_m": 3,
+      "requires_seal": "GC08",
+      "unlock_from": "GC09"
+    },
+    {
+      "a": "GC08",
+      "b": "GC10",
+      "via": [],
+      "kind": "reveal",
+      "width_m": 3,
+      "requires_seal": "GC08",
+      "requires_reveal": true
+    }
+  ],
+  "revision": "R2",
+  "items": [
+    {
+      "id": "ITEM-DA-01",
+      "name": "Placeable reflector",
+      "dungeon": "DA",
+      "theme": "Drowned ritual; recover a broken path of light",
+      "acquire_room": "DA03",
+      "teach_room": "DA03",
+      "practice_gate": [
+        "DA03",
+        "DA04"
+      ],
+      "test_gate": [
+        "DA06",
+        "DA07"
+      ],
+      "boss_room": "DA08",
+      "seal_room": "DA09",
+      "approval_status": "Owner approved 6 October 2026",
+      "boss_use": "Redirect lantern light onto shutter receivers to expose armour; then use established attack. Direct light cannot substitute for the reflected approach.",
+      "recovery": "Persistent nonconsumable tool; authored stable placements; safe recall/reset when unreachable.",
+      "optional_return_use": "DA11 side clue stays optional and recoverable; no underwater essential item."
+    },
+    {
+      "id": "ITEM-AF-01",
+      "name": "Shuttered lantern stand",
+      "dungeon": "AF",
+      "theme": "Bound labour; control when and where the furnace sees light",
+      "acquire_room": "AF03",
+      "teach_room": "AF03",
+      "practice_gate": [
+        "AF03",
+        "AF04"
+      ],
+      "test_gate": [
+        "AF06",
+        "AF07"
+      ],
+      "boss_room": "AF08",
+      "seal_room": "AF09",
+      "approval_status": "Owner approved 6 October 2026",
+      "boss_use": "Anchor and open the lantern stand to keep the shell exposure mechanism lit while moving to the safe strike position; handheld light cannot occupy both positions.",
+      "recovery": "Persistent nonconsumable stand; safe recall returns stand/lantern to valid placement or inventory; no lost-light lockout.",
+      "optional_return_use": "Optional salvage shutter only; no extra mandatory room or peer-item gate."
+    },
+    {
+      "id": "ITEM-GC-01",
+      "name": "Focused lantern aperture",
+      "dungeon": "GC",
+      "theme": "Truth through appearances; choose the real light path",
+      "acquire_room": "GC04",
+      "teach_room": "GC04",
+      "practice_gate": [
+        "GC04",
+        "GC05"
+      ],
+      "test_gate": [
+        "GC05",
+        "GC06"
+      ],
+      "boss_room": "GC07",
+      "seal_room": "GC08",
+      "approval_status": "Owner approved 6 October 2026",
+      "boss_use": "Use the narrow aperture to isolate small ward receivers through bounded reflected paths; the broad lantern lights adjacent receivers and cannot release the ward. Repeat the already-taught isolation rule until the keeper ward challenge is defeated.",
+      "recovery": "Permanent lantern capability after acquisition; focus can reset without consumable loss; required paths remain recoverable.",
+      "optional_return_use": "Earlier peer items may aid optional paths only; neither is a hidden Court combat prerequisite."
+    }
+  ],
+  "main_route_retreat": "Always available before boss victory; only reward shortcut requires seal",
+  "item_concepts_status": "Owner approved 6 October 2026",
+  "design_requirement": "Owner approved 6 October 2026: each theme, named local item and required boss-use concept; detailed implementation and dimensions remain draft",
+  "approach_pockets": [
+    {
+      "id": "J0",
+      "xyz": [
+        47,
+        -70,
+        14.9
+      ],
+      "role": "Outbound peer-route junction"
+    },
+    {
+      "id": "A0",
+      "xyz": [
+        -18,
+        -224,
+        5.3
+      ],
+      "role": "Abbey tower vista"
+    },
+    {
+      "id": "A1",
+      "xyz": [
+        0.0,
+        -265.0,
+        1.5
+      ],
+      "role": "Shore preparation and safe wait"
+    },
+    {
+      "id": "A2",
+      "xyz": [
+        16.0,
+        -275.0,
+        1.2
+      ],
+      "role": "Dry mid-crossing tower refuge"
+    },
+    {
+      "id": "A3",
+      "xyz": [
+        30.0,
+        -284.0,
+        2.0
+      ],
+      "role": "Dry arrival"
+    },
+    {
+      "id": "A4",
+      "xyz": [
+        -29,
+        -205,
+        6.3
+      ],
+      "role": "Optional ruined processional rest",
+      "loop_xyz": [
+        [
+          -2,
+          -190,
+          7.5
+        ],
+        [
+          -29,
+          -205,
+          6.3
+        ],
+        [
+          -18,
+          -224,
+          5.3
+        ]
+      ]
+    },
+    {
+      "id": "F0",
+      "xyz": [
+        230.0,
+        -40.0,
+        30.0
+      ],
+      "role": "Foundry intake arrival"
+    },
+    {
+      "id": "F1",
+      "xyz": [
+        126,
+        -104,
+        17
+      ],
+      "role": "Optional crane outlook",
+      "spur_xyz": [
+        [
+          119,
+          -76,
+          17
+        ],
+        [
+          126,
+          -104,
+          17
+        ]
+      ]
+    },
+    {
+      "id": "F2",
+      "xyz": [
+        194,
+        -23,
+        27
+      ],
+      "role": "Optional cooling yard",
+      "loop_xyz": [
+        [
+          179,
+          -55,
+          24
+        ],
+        [
+          194,
+          -23,
+          27
+        ],
+        [
+          213,
+          -47,
+          28
+        ]
+      ]
+    },
+    {
+      "id": "G0",
+      "xyz": [
+        201,
+        133,
+        45
+      ],
+      "role": "Two-seal gate"
+    },
+    {
+      "id": "G1",
+      "xyz": [
+        272,
+        227,
+        64
+      ],
+      "role": "Ridge vista"
+    },
+    {
+      "id": "G2",
+      "xyz": [
+        245,
+        238,
+        65
+      ],
+      "role": "Collapsed direct stair; nonwalkable"
+    },
+    {
+      "id": "G3",
+      "xyz": [
+        272,
+        227,
+        64
+      ],
+      "role": "Roofless gatehouse; walking detour"
+    },
+    {
+      "id": "G4",
+      "xyz": [
+        296,
+        232,
+        64
+      ],
+      "role": "Optional view shelf",
+      "spur_xyz": [
+        [
+          272,
+          227,
+          64
+        ],
+        [
+          296,
+          232,
+          64
+        ]
+      ]
+    }
+  ],
+  "crossing_alternatives": {
+    "X0": {
+      "role": "repair bridge",
+      "xyz": [
+        [
+          51.0,
+          -94.0,
+          13.5
+        ],
+        [
+          89.0,
+          -94.0,
+          13.5
+        ]
+      ]
+    },
+    "X1": {
+      "role": "maintenance ledges/climb; authored traversal",
+      "xyz": [
+        [
+          51.0,
+          -94.0,
+          13.5
+        ],
+        [
+          46.0,
+          -110.0,
+          8.0
+        ],
+        [
+          60.0,
+          -117.0,
+          5.0
+        ],
+        [
+          78.0,
+          -117.0,
+          5.0
+        ],
+        [
+          96.0,
+          -104.0,
+          10.0
+        ],
+        [
+          89.0,
+          -94.0,
+          13.5
+        ]
+      ]
+    },
+    "X2": {
+      "role": "Magic span on X0 corridor",
+      "xyz": [
+        [
+          51.0,
+          -94.0,
+          13.5
+        ],
+        [
+          89.0,
+          -94.0,
+          13.5
+        ]
+      ]
+    }
+  },
+  "transitions": [
+    {
+      "id": "T-A",
+      "boundary": "A1-A2-A3",
+      "safe_prepare": "A1",
+      "resident": "crossing, refuge, tower, relevant water/RT geometry"
+    },
+    {
+      "id": "T-F",
+      "boundary": "X0/X1/X2 to F0",
+      "safe_prepare": "west/east bank shelves",
+      "resident": "chosen crossing, both landing sides, relevant gorge/RT geometry"
+    },
+    {
+      "id": "T-G",
+      "boundary": "G0 to GC01",
+      "safe_prepare": "gatehouse shelf",
+      "resident": "local turns, garden arrival, relevant palace silhouette/RT geometry"
+    }
+  ],
+  "legend": {
+    "main_corridor_width_m": 3,
+    "door_clear_width_target_m": 2.7,
+    "optional_wet_spur_width_m": 2,
+    "stair_symbol": "parallel bars denote proposed vertical link; detailed stair treads unresolved",
+    "return_dashed_green": "unlocks from inside",
+    "optional_dashed_blue": "isolated wet side route",
+    "reveal_dashed_violet": "post-reveal finale boundary",
+    "north": "up; design reference only, no HUD compass assumption"
+  },
+  "validation_limits": [
+    "Metric proposals, not playable or engine validated",
+    "Sections explicitly unfolded where stated; crossing distance profile is metric",
+    "Terrain is planning data, not a final collision/render mesh",
+    "Tool mechanics, room functions and exact enemy staging need author review",
+    "Watertight basement is proposed architecture, not approved flood-history canon"
+  ]
+}

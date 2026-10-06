@@ -12,6 +12,7 @@ A first-person historical-gothic dark-fantasy treasure-hunting adventure. Primar
 The Horde began as a vast army. Passed-down accounts confuse that lost army with the treasure hoard it carried home. Both meanings can be true. Retain **The Horde** as the working title; no automatic rename.
 The treasure is physically real and desirable, not a bait-and-switch metaphor. Much was plundered. “Treasure hunter” and “grave robber” are competing perspectives within the world.
 Themes: greed versus enough; protection becoming control; the living inheriting the debts of the dead; belonging while seeking fortune. Darkness and danger need warmth, humour and human stakes in contrast.
+**Owner direction, 6 October 2026:** major features need a deliberate environmental-story, guidance or player-action purpose. In 1.7, remove or recontextualize the opening tomb room's leftover tech-demo material collection. This is scene/content work, not a global material-system deletion or new 1.6.2 scope.
 Light is causal gameplay through the real RT engine. Enemy placement needs a reason: duty, territory, captivity, hunger or another readable cause, rather than arbitrary combat filler. Mindless monsters still belong in an ecology.
 
 ## Reusing Briarhold models
@@ -23,6 +24,7 @@ The Briarhold Bellkeeper is a **provisional model candidate** for the Drowned Ab
 Tomb prologue → rope rescue and moonlit forest → village arrival and first small expedition → Abbey and Foundry in either order → Glass Court after both → treasury and authored final confrontation → playable return/epilogue.
 The three themed dungeons are additional to the existing tomb. The finale is a compact culmination, not a commitment to a fourth full dungeon. One satisfying ending is the agreed target; do not implement an alternate keeper ending.
 Each middle dungeon is solvable with starting equipment, its access solution and its own local tool. The other dungeon's tool can unlock optional secrets/shortcuts, never a hidden mandatory dependency. Essential revelations must work in either order.
+Main-route retreat stays viable before boss/seal completion. Post-seal shortcuts reward success without becoming the first safe way out. Items require recoverable placement/recall and cannot be irreversibly lost.
 Every major area has an access mini-quest with alternative Magic, Tech or Constitution solutions. Mandatory progression must remain reachable for mixed builds; prevent irreversible spending or build choices from trapping the campaign.
 
 ## Prologue, rescue and forest
@@ -56,25 +58,27 @@ Each route needs useful benefits and alternative access, without requiring all u
 Access quests should teach a skill and reveal a person/place: a mill component for an air device, a restored wayside shrine for an air ward, or a salvager-led practical training route. These are approved examples to refine, not three mandatory fetch quests.
 
 ## The three dungeons
+
+**Owner-approved item/theme/boss-use update, 6 October 2026:** the three local items below are locked concepts, not candidates. Acquire each early, teach it safely, escalate through rooms and require its actual use for boss victory. Exact geometry, timing and encounter details remain proposals. The [numbered dungeon chapter plans](DUNGEON_CHAPTER_PLANS.md) own the approach-to-return structure and provisional delivery packages; production order does not change either-order play.
 ### Drowned Abbey
 **Owner clarification, 5 October 2026:** The Abbey is a religious house in a river-fed lake occupying the southern flooded basin, not an ocean. Its buildings predate the flooding; the cause and date remain undecided. Reveal the broken towers across the lake before descending to the submerged approach. Bells beneath water and dead attendants continuing their duties retain the drowned identity.
 Keep exploration, puzzles and combat predominantly in dry, walkable rooms, with water outside, through suitable windows/openings, seepage and selected flooded side rooms. A short submerged crossing with safe air/recovery points makes Magic breathing wards, Tech breathing gear and Constitution's finite trained breath independently viable. A guided crossing with minimal steering and retained look control is a prototype candidate, not a locked movement model. Free lake swimming, boats, sustained underwater combat and water-level puzzles are not automatic scope.
-The [Drowned Abbey plan](DROWNED_ABBEY_PLAN.md) owns vertical floodline/air-pocket consistency, the vista/crossing/dry-room prototype, recoverable access, staged RT water work and measured chapter gates. This is future campaign work beyond the village, with version/date TBD; it does not expand 1.6.2.
+The [Drowned Abbey plan](DROWNED_ABBEY_PLAN.md) owns vertical floodline/air-pocket consistency, the vista/crossing/dry-room prototype, recoverable access, staged RT water work and measured chapter gates. This is future campaign work beyond the village; the chapter plan proposes a provisional 1.9 package with no release date. It does not expand 1.6.2.
 Water/light interaction is a major artistic and gameplay requirement. Design clear, bounded optical puzzles and test on the actual phone; this is not permission for unbounded fluid/caustic simulation.
-Local tool candidate: placeable reflector. Teach safe redirection, combine with water/occlusion and encounters, then test the skill against the **Bellkeeper** (working boss name), a drowned armoured guardian exposed through shutters/reflected light.
+Approved local tool: **placeable reflector**. Teach safe redirection early, combine it with shutters, occlusion, navigation and encounters, then require that learned reflected-light action to expose the **Bellkeeper**'s armour. The drowned guardian cannot be defeated by ordinary attacks or item possession alone. Detailed placement, timing and attack windows remain blockout decisions.
 Reward: first of the two order-independent treasury seals plus evidence that royal “gifts” were plunder, including an object with a living claimant. The voice admits wartime wrongdoing to gain credibility.
 
 ### Ashen Foundry
 Royal mint/forge, cursed workers and machinery. Fire and smoke are defining effects and potential hazards. Constitution can help tolerate exposure; Tech filters and Magic protection offer complementary approaches. Hazard logic and visual density must agree.
 Access example: repair the broken bridge, climb an old maintenance route, or restore magical stepping stones. Routes converge on the same dungeon.
-Local tool candidate: shuttered lantern stand, leaving light in place and controlling exposure; shadows can conceal the player from watchers.
-Working boss: **Master of Coin**, skeletal mintmaster in an articulated furnace shell. Combine cover, positioning and learned light mechanics.
+Approved local tool: **shuttered lantern stand**, leaving light in place and controlling illumination while the player moves. Teach maintaining a light-operated mechanism before combining it with movement, cover and encounters; shadows can conceal the player from watchers under a clearly taught bounded rule.
+Working boss: **Master of Coin**, skeletal mintmaster in an articulated furnace shell. The stand must maintain/control the learned illumination mechanism while the player repositions to expose and attack the shell. Actual use is required, not an inventory check; no new mandatory boss-only rule.
 Reward: the other order-independent seal and evidence of a royal bargain binding the soldiers beyond death. The voice blames the keepers for prolonging the suffering. Return to meaningful hub changes.
 
 ### Glass Court
 Ruined mirrored palace, roofless winter garden and surviving lucid lich keeper(s). Beauty should explain the desire to preserve the place. Available after Abbey AND Foundry.
-Local capability candidate: focused lantern aperture, combined with earlier tools. No infinite mirror/reflection requirement.
-A surviving royal keeper recognises the prison being carried and supplies evidence that the real king helped imprison the entity. Boss staging, dialogue and keeper survival require detailed authoring.
+Approved local capability: **focusing aperture**, isolating receivers and controlling bounded mirror/ward interactions. Teach safe receiver selection early, escalate through rooms and combine with earlier tools. Actual aperture use is required to break the keeper's protection and defeat the encounter. No infinite mirror/reflection requirement or unexplained boss-only rule.
+A surviving royal keeper recognises the prison being carried and supplies evidence that the real king helped imprison the entity. Boss staging, dialogue and keeper survival require detailed authoring. Defeat is required; killing the keeper is not newly mandated.
 Reward: final seal and treasury location. What seemed like protection is increasingly revealed as possession and control.
 
 ## Spoilers: the lantern, king and ending

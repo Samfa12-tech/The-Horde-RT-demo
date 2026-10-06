@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1190.88pt" height="841.68pt" viewBox="0 0 1190.88 841.68" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-06T15:39:47.614751</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 841.68 
+L 1190.88 841.68 
+L 1190.88 0 
+L 0 0 
+z
+" style="fill: #f4f1e8"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 83.3616 361.9224 
+L 702.6192 361.9224 
+L 702.6192 151.5024 
+L 83.3616 151.5024 
+z
+" style="fill: #f4f1e8"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 83.3616 361.9224 
+L 702.6192 361.9224 
+L 702.6192 256.7124 
+L 83.3616 256.7124 
+z
+" clip-path="url(#p886c78042e)" style="fill: #b0cbd0; stroke: #b0cbd0; stroke-linejoin: miter"/>
+   </g>
+   <g id="PathCollection_1">
+    <defs>
+     <path id="m138d207f17" d="M 0 2.645751 
+C 0.701661 2.645751 1.374679 2.366978 1.870829 1.870829 
+C 2.366978 1.374679 2.645751 0.701661 2.645751 0 
+C 2.645751 -0.701661 2.366978 -1.374679 1.870829 -1.870829 
+C 1.374679 -2.366978 0.701661 -2.645751 0 -2.645751 
+C -0.701661 -2.645751 -1.374679 -2.366978 -1.870829 -1.870829 
+C -2.366978 -1.374679 -2.645751 -0.701661 -2.645751 0 
+C -2.645751 0.701661 -2.366978 1.374679 -1.870829 1.870829 
+C -1.374679 2.366978 -0.701661 2.645751 0 2.645751 
+z
+" style="stroke: #b78533"/>
+    </defs>
+    <g clip-path="url(#p886c78042e)">
+     <use xlink:href="#m138d207f17" x="99.807247" y="217.25865" style="fill: #b78533; stroke: #b78533"/>
+     <use xlink:href="#m138d207f17" x="218.398495" y="256.7124" style="fill: #b78533; stroke: #b78533"/>
+     <use xlink:href="#m138d207f17" x="314.292272" y="314.5779" style="fill: #b78533; stroke: #b78533"/>
+     <use xlink:href="#m138d207f17" x="410.186049" y="225.1494" style="fill: #b78533; stroke: #b78533"/>
+     <use xlink:href="#m138d207f17" x="506.079827" y="314.5779" style="fill: #b78533; stroke: #b78533"/>
+     <use xlink:href="#m138d207f17" x="616.400581" y="256.7124" style="fill: #b78533; stroke: #b78533"/>
+     <use xlink:href="#m138d207f17" x="686.173553" y="204.1074" style="fill: #b78533; stroke: #b78533"/>
+    </g>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 99.807247 361.9224 
+L 99.807247 151.5024 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2">
+      <defs>
+       <path id="mac87b5132c" d="M 0 0 
+L 0 3.5 
+" style="stroke: #58655b; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#mac87b5132c" x="99.807247" y="361.9224" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #58655b" x="99.807247" y="376.520838" transform="rotate(-0 99.807247 376.520838)">0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 182.035483 361.9224 
+L 182.035483 151.5024 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#mac87b5132c" x="182.035483" y="361.9224" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #58655b" x="182.035483" y="376.520838" transform="rotate(-0 182.035483 376.520838)">5</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 264.263718 361.9224 
+L 264.263718 151.5024 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6">
+      <g>
+       <use xlink:href="#mac87b5132c" x="264.263718" y="361.9224" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #58655b" x="264.263718" y="376.520838" transform="rotate(-0 264.263718 376.520838)">10</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_7">
+      <path d="M 346.491954 361.9224 
+L 346.491954 151.5024 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8">
+      <g>
+       <use xlink:href="#mac87b5132c" x="346.491954" y="361.9224" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #58655b" x="346.491954" y="376.520838" transform="rotate(-0 346.491954 376.520838)">15</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_9">
+      <path d="M 428.720189 361.9224 
+L 428.720189 151.5024 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10">
+      <g>
+       <use xlink:href="#mac87b5132c" x="428.720189" y="361.9224" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #58655b" x="428.720189" y="376.520838" transform="rotate(-0 428.720189 376.520838)">20</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_11">
+      <path d="M 510.948425 361.9224 
+L 510.948425 151.5024 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_12">
+      <g>
+       <use xlink:href="#mac87b5132c" x="510.948425" y="361.9224" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_6">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #58655b" x="510.948425" y="376.520838" transform="rotate(-0 510.948425 376.520838)">25</text>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_13">
+      <path d="M 593.176661 361.9224 
+L 593.176661 151.5024 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_14">
+      <g>
+       <use xlink:href="#mac87b5132c" x="593.176661" y="361.9224" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_7">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #58655b" x="593.176661" y="376.520838" transform="rotate(-0 593.176661 376.520838)">30</text>
+     </g>
+    </g>
+    <g id="xtick_8">
+     <g id="line2d_15">
+      <path d="M 675.404896 361.9224 
+L 675.404896 151.5024 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_16">
+      <g>
+       <use xlink:href="#mac87b5132c" x="675.404896" y="361.9224" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_8">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #58655b" x="675.404896" y="376.520838" transform="rotate(-0 675.404896 376.520838)">35</text>
+     </g>
+    </g>
+    <g id="text_9">
+     <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #233d34" x="392.9904" y="389.439119" transform="rotate(-0 392.9904 389.439119)">Distance along proposed crossing centreline (m)</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_17">
+      <path d="M 83.3616 361.9224 
+L 702.6192 361.9224 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_18">
+      <defs>
+       <path id="mdc59a6c477" d="M 0 0 
+L -3.5 0 
+" style="stroke: #58655b; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#mdc59a6c477" x="83.3616" y="361.9224" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_10">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #58655b" x="76.3616" y="365.721619" transform="rotate(-0 76.3616 365.721619)">−4</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_19">
+      <path d="M 83.3616 335.6199 
+L 702.6192 335.6199 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_20">
+      <g>
+       <use xlink:href="#mdc59a6c477" x="83.3616" y="335.6199" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_11">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #58655b" x="76.3616" y="339.419119" transform="rotate(-0 76.3616 339.419119)">−3</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_21">
+      <path d="M 83.3616 309.3174 
+L 702.6192 309.3174 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_22">
+      <g>
+       <use xlink:href="#mdc59a6c477" x="83.3616" y="309.3174" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_12">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #58655b" x="76.3616" y="313.116619" transform="rotate(-0 76.3616 313.116619)">−2</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_23">
+      <path d="M 83.3616 283.0149 
+L 702.6192 283.0149 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_24">
+      <g>
+       <use xlink:href="#mdc59a6c477" x="83.3616" y="283.0149" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_13">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #58655b" x="76.3616" y="286.814119" transform="rotate(-0 76.3616 286.814119)">−1</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_25">
+      <path d="M 83.3616 256.7124 
+L 702.6192 256.7124 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_26">
+      <g>
+       <use xlink:href="#mdc59a6c477" x="83.3616" y="256.7124" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_14">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #58655b" x="76.3616" y="260.511619" transform="rotate(-0 76.3616 260.511619)">0</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_27">
+      <path d="M 83.3616 230.4099 
+L 702.6192 230.4099 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_28">
+      <g>
+       <use xlink:href="#mdc59a6c477" x="83.3616" y="230.4099" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_15">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #58655b" x="76.3616" y="234.209119" transform="rotate(-0 76.3616 234.209119)">1</text>
+     </g>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_29">
+      <path d="M 83.3616 204.1074 
+L 702.6192 204.1074 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_30">
+      <g>
+       <use xlink:href="#mdc59a6c477" x="83.3616" y="204.1074" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_16">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #58655b" x="76.3616" y="207.906619" transform="rotate(-0 76.3616 207.906619)">2</text>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_31">
+      <path d="M 83.3616 177.8049 
+L 702.6192 177.8049 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_32">
+      <g>
+       <use xlink:href="#mdc59a6c477" x="83.3616" y="177.8049" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_17">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #58655b" x="76.3616" y="181.604119" transform="rotate(-0 76.3616 181.604119)">3</text>
+     </g>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_33">
+      <path d="M 83.3616 151.5024 
+L 702.6192 151.5024 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b0b0b0; stroke-opacity: 0.16; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_34">
+      <g>
+       <use xlink:href="#mdc59a6c477" x="83.3616" y="151.5024" style="fill: #58655b; stroke: #58655b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_18">
+      <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #58655b" x="76.3616" y="155.301619" transform="rotate(-0 76.3616 155.301619)">4</text>
+     </g>
+    </g>
+    <g id="text_19">
+     <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #233d34" x="55.747694" y="256.7124" transform="rotate(-90 55.747694 256.7124)">Route elevation Z (m)</text>
+    </g>
+   </g>
+   <g id="line2d_35">
+    <path d="M 83.3616 256.7124 
+L 702.6192 256.7124 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #477f96; stroke-width: 1.4; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_36">
+    <path d="M 99.807247 217.25865 
+L 218.398495 256.7124 
+L 314.292272 314.5779 
+L 410.186049 225.1494 
+L 506.079827 314.5779 
+L 616.400581 256.7124 
+L 686.173553 204.1074 
+" clip-path="url(#p886c78042e)" style="fill: none; stroke: #b78533; stroke-width: 2.6; stroke-linecap: square"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 83.3616 361.9224 
+L 83.3616 151.5024 
+" style="fill: none; stroke: #788174; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 702.6192 361.9224 
+L 702.6192 151.5024 
+" style="fill: none; stroke: #788174; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 83.3616 361.9224 
+L 702.6192 361.9224 
+" style="fill: none; stroke: #788174; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 83.3616 151.5024 
+L 702.6192 151.5024 
+" style="fill: none; stroke: #788174; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #233d34" x="99.807247" y="199.25865" transform="rotate(-0 99.807247 199.25865)">A1 / safe shore</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #233d34" x="410.186049" y="207.1494" transform="rotate(-0 410.186049 207.1494)">A2 / air refuge</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #233d34" x="686.173553" y="186.1074" transform="rotate(-0 686.173553 186.1074)">A3 / dry arrival</text>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #477f96" x="218.398495" y="346.1409" transform="rotate(-0 218.398495 346.1409)">WET LEG 1</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #477f96" x="506.079827" y="346.1409" transform="rotate(-0 506.079827 346.1409)">WET LEG 2</text>
+   </g>
+  </g>
+  <g id="text_25">
+   <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #40694e" x="59.544" y="35.35056" transform="rotate(-0 59.544 35.35056)">THE HORDE  /  THE VEYRLANDS</text>
+  </g>
+  <g id="text_26">
+   <text style="font-weight: 700; font-size: 24px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="59.544" y="69.85944" transform="rotate(-0 59.544 69.85944)">Approach complications + safe transitions</text>
+  </g>
+  <g id="text_27">
+   <text style="font-size: 10.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="59.544" y="98.47656" transform="rotate(-0 59.544 98.47656)">Distinct expedition areas, then compact reusable boundaries. Every threshold has a viable return side.</text>
+  </g>
+  <g id="text_28">
+   <text style="font-weight: 700; font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #b78533" x="1131.336" y="37.8756" transform="rotate(-0 1131.336 37.8756)">06 / DUNGEON ATLAS</text>
+  </g>
+  <g id="text_29">
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #737c70" x="59.544" y="818.95464" transform="rotate(-0 59.544 818.95464)">R2 / DRAFT METRIC BLOCKOUT  •  06 OCT 2026  •  Approved topology; new dimensions, rooms and encounters proposed.</text>
+  </g>
+  <g id="text_30">
+   <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: end; fill: #737c70" x="1131.336" y="818.95464" transform="rotate(-0 1131.336 818.95464)">Approved items / boss use; detailed blockout still draft</text>
+  </g>
+  <g id="text_31">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #477f96" x="83.3616" y="134.6688" transform="rotate(-0 83.3616 134.6688)">ABBEY: TWO WET LEGS WITH A REAL DRY REFUGE</text>
+  </g>
+  <g id="text_32">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="151.5024" transform="rotate(-0 768.1176 151.5024)">AREAS WITH A PURPOSE</text>
+  </g>
+  <g id="text_33">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="176.7528" transform="rotate(-0 768.1176 176.7528)">A4 ruined processional rest: an optional loop between the</text>
+  </g>
+  <g id="text_34">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="191.06136" transform="rotate(-0 768.1176 191.06136)">descent and the tower vista. Read the drowned</text>
+  </g>
+  <g id="text_35">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="205.36992" transform="rotate(-0 768.1176 205.36992)">destination; return to the main path without spending</text>
+  </g>
+  <g id="text_36">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="219.67848" transform="rotate(-0 768.1176 219.67848)">access resources.</text>
+  </g>
+  <g id="text_37">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="241.56216" transform="rotate(-0 768.1176 241.56216)">F1 crane lookout: inspect the broken bridge and lower</text>
+  </g>
+  <g id="text_38">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="255.87072" transform="rotate(-0 768.1176 255.87072)">ledges before choosing a solution. F2 cooling yard: a</text>
+  </g>
+  <g id="text_39">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="270.17928" transform="rotate(-0 768.1176 270.17928)">small exploration pocket beside the main ascent, with</text>
+  </g>
+  <g id="text_40">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="284.48784" transform="rotate(-0 768.1176 284.48784)">industrial history rather than compulsory combat.</text>
+  </g>
+  <g id="text_41">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="306.37152" transform="rotate(-0 768.1176 306.37152)">G2 broken direct stair: collapsed masonry makes the</text>
+  </g>
+  <g id="text_42">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="320.68008" transform="rotate(-0 768.1176 320.68008)">direct uphill line unusable. The ordinary walking route</text>
+  </g>
+  <g id="text_43">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="334.98864" transform="rotate(-0 768.1176 334.98864)">bends through G3 roofless gatehouse at G1, then rejoins</text>
+  </g>
+  <g id="text_44">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="349.2972" transform="rotate(-0 768.1176 349.2972)">above; G4 is an optional view shelf. Neither bypasses G0.</text>
+  </g>
+  <g id="text_45">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="437.6736" transform="rotate(-0 83.3616 437.6736)">BOUNDARY OWNERSHIP / PROPOSED OCCLUSION</text>
+  </g>
+  <g id="text_46">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="462.924" transform="rotate(-0 83.3616 462.924)">T-A: shore/rest → wet threshold → arrival tower. Prepare the destination before</text>
+  </g>
+  <g id="text_47">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="478.07424" transform="rotate(-0 83.3616 478.07424)">intentional entry, while the player can wait safely on land. Keep water</text>
+  </g>
+  <g id="text_48">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="493.22448" transform="rotate(-0 83.3616 493.22448)">interfaces, refuge, tower and all required optical geometry resident.</text>
+  </g>
+  <g id="text_49">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="515.94984" transform="rotate(-0 83.3616 515.94984)">T-F: bank shelters → bridge/maintenance route → eastern rock turn → intake.</text>
+  </g>
+  <g id="text_50">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="531.10008" transform="rotate(-0 83.3616 531.10008)">Readiness before crossing. Keep the whole chosen crossing and both landing</text>
+  </g>
+  <g id="text_51">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="546.25032" transform="rotate(-0 83.3616 546.25032)">shelves valid; do not strand the player halfway.</text>
+  </g>
+  <g id="text_52">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="568.97568" transform="rotate(-0 83.3616 568.97568)">T-G: gatehouse turns → garden vestibule. Ridge rock and building turns hide</text>
+  </g>
+  <g id="text_53">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="584.12592" transform="rotate(-0 83.3616 584.12592)">detail changes naturally. Keep visible palace silhouette and shadow/reflection-</text>
+  </g>
+  <g id="text_54">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="599.27616" transform="rotate(-0 83.3616 599.27616)">relevant geometry even when distant rooms unload.</text>
+  </g>
+  <g id="text_55">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="437.6736" transform="rotate(-0 768.1176 437.6736)">SAVE / RETURN / SCOPE</text>
+  </g>
+  <g id="text_56">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="462.924" transform="rotate(-0 768.1176 462.924)">Checkpoint candidates: A1/A3/DA07; F0/AF07; G0/GC01.</text>
+  </g>
+  <g id="text_57">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="477.23256" transform="rotate(-0 768.1176 477.23256)">These are proposed safe states, not implemented</text>
+  </g>
+  <g id="text_58">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="491.54112" transform="rotate(-0 768.1176 491.54112)">checkpoints.</text>
+  </g>
+  <g id="text_59">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="513.4248" transform="rotate(-0 768.1176 513.4248)">Persist tool, seals, opened internal returns and gate</text>
+  </g>
+  <g id="text_60">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="527.73336" transform="rotate(-0 768.1176 527.73336)">state. Death/retry must retain a viable access solution;</text>
+  </g>
+  <g id="text_61">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="542.04192" transform="rotate(-0 768.1176 542.04192)">do not consume the only essential preparation.</text>
+  </g>
+  <g id="text_62">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="563.9256" transform="rotate(-0 768.1176 563.9256)">Seal recovery unlocks the short return, not all retreat.</text>
+  </g>
+  <g id="text_63">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="578.23416" transform="rotate(-0 768.1176 578.23416)">The main route remains backtrackable before the boss;</text>
+  </g>
+  <g id="text_64">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="592.54272" transform="rotate(-0 768.1176 592.54272)">exterior access stays viable in both directions.</text>
+  </g>
+  <g id="text_65">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="614.4264" transform="rotate(-0 768.1176 614.4264)">The approved tomb rope is the precedent: prepare before</text>
+  </g>
+  <g id="text_66">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="628.73496" transform="rotate(-0 768.1176 628.73496)">commitment, share the boundary set, no normal loading</text>
+  </g>
+  <g id="text_67">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="643.04352" transform="rotate(-0 768.1176 643.04352)">screen in either direction. Never rely on a traversal</text>
+  </g>
+  <g id="text_68">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="768.1176" y="657.35208" transform="rotate(-0 768.1176 657.35208)">timer to guarantee I/O.</text>
+  </g>
+  <g id="text_69">
+   <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="690.1776" transform="rotate(-0 83.3616 690.1776)">ACCEPTANCE BEFORE ART OR ENGINE IMPLEMENTATION</text>
+  </g>
+  <g id="text_70">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="715.428" transform="rotate(-0 83.3616 715.428)">1. Walk the draft grades, stairs and turns with supported controls; verify room dimensions and camera clearance. 2. Test each peer dungeon</text>
+  </g>
+  <g id="text_71">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="730.57824" transform="rotate(-0 83.3616 730.57824)">first, with each access build. 3. Prove Abbey flood volumes and safe recovery. 4. Review gate bypasses, repeated entry/exit and saves. 5.</text>
+  </g>
+  <g id="text_72">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="745.72848" transform="rotate(-0 83.3616 745.72848)">Measure combined real-geometry/RT residency on target devices before expansion.</text>
+  </g>
+  <g id="text_73">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="768.45384" transform="rotate(-0 83.3616 768.45384)">Each approved dungeon item is required at its boss. Detailed attacks, timings and numerical budgets remain draft; sheet 7 owns the teaching</text>
+  </g>
+  <g id="text_74">
+   <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #233d34" x="83.3616" y="783.60408" transform="rotate(-0 83.3616 783.60408)">chain. Main-route retreat is always available before boss victory.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p886c78042e">
+   <rect x="83.3616" y="151.5024" width="619.2576" height="210.42"/>
+  </clipPath>
+ </defs>
+</svg>

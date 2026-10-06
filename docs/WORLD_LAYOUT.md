@@ -55,6 +55,8 @@ Before detailed Abbey art, block out a vertical section linking lake level, desc
 
 Keep the existing alternative Magic, Tech and Constitution access directions. Abbey preparation concerns the submerged approach; Foundry access can use bridge repair, a maintenance climb or restored magical crossing. Each middle dungeon must be solvable with its own access solution, starting equipment and its local tool. The other dungeon's tool may open optional shortcuts or secrets only.
 
+Main-route retreat remains safe before boss/seal completion; post-seal return shortcuts are additional conveniences. Preserve recoverable access and local-item placement/recall, independent of peer-dungeon completion.
+
 The drawn broken bridge is an access landmark, not approval of final span dimensions, engineering, traversal animation or a single mandatory repair build. Crossing alternatives must converge on the same Foundry and remain recoverable for mixed builds.
 
 ## 3. Milestone ownership
@@ -86,7 +88,7 @@ The existing approximately 6–10 visible buildings, 2–3 interiors and 4–7 c
 
 ### Later campaign
 
-Implement and validate the two order-independent dungeon branches, then Court, treasury and return through separately accepted scopes. No later version numbers or release dates are established by the map.
+Implement and validate the two order-independent dungeon branches, then Court, treasury and return through separately accepted scopes. The [chapter plan](DUNGEON_CHAPTER_PLANS.md) proposes 1.9 Abbey, 1.10 Foundry and 1.11 Court as delivery packages, each including its approach. Labels remain provisional, with no release dates; delivery order does not make Abbey a prerequisite for Foundry. The map itself does not establish version numbers.
 
 ## 4. Protected prologue continuity
 
@@ -121,3 +123,7 @@ Before later implementation acceptance, verify:
 The [forest and Bellwether map set](design/world/connected/README.md) translates the regional relationships above into coordinated **blockout proposals**. It does not replace this approved regional topology or certify exact distances, slopes, structures, fences, tree instances or collision. Editable coordinates and feature data accompany the drawings. The earlier [town atmosphere/layout concept](design/world/historical/bellwether-earlier-town-concept.webp) is historical and spatially superseded by that coordinated set; its decorative bridge and building details are not authoritative.
 
 Tree circles illustrate woodland coverage, not final exact placement. Author hero occluder/framing trees after blockout; use terrain banks, roots, rocks, undergrowth and fallen wood for natural forest containment while retaining deliberate off-trail pockets. Avoid inviting passable gaps closed by invisible collision. Dry-stone garden boundaries and timber pens remain proposals, not locked positions or meshes.
+
+## Dungeon reference archive — 6 October 2026
+
+The [R2 atlas and production register](design/world/dungeons/README.md) preserve the approach plans, three floorplans, item-to-boss learning chains, editable coordinates and planning inventory. The local item/theme/boss dependencies are approved; room geometry, metric distances, detailed encounters, asset quantities and device budgets remain proposals. Use static graph checks only as planning evidence, never as gameplay acceptance.
