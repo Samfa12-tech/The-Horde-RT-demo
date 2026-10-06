@@ -1,0 +1,45 @@
+E01 Abbey Attendant: independent hammer-alignment QA
+
+RESULT: PASS for the tested final asset revision.
+
+Change verified
+- RightGrip reverses 180 degrees about local X, so the mallet head exits the thumb side of the grip. Its attachment origin and mallet geometry are preserved.
+- Dead alone adjusts RightHand local-Y rotation by a smooth +20-degree ramp relative to the delivered source, retaining 25 degrees of the original corrective wrist roll. The ramp runs from 20% to 55% of the clip.
+- Across core, all-clips, and source-extras GLBs, the only changed binary bytes belong to those approved rotation channels. Geometry, indices, skin weights, inverse-bind data, textures, and all other animation channels remain unchanged. The separate mallet GLB is byte-identical.
+
+Clearance and grip
+- Fresh Blender imports: 576 poses at 60 Hz across Idle, Walking, Attack, and Dead.
+- Additional final Dead scan: 357 poses at 120 Hz.
+- Every sampled pose maintains gripping-hand contact. No mallet-head/body or other non-hand body triangle intersections were detected.
+- Minimum floor clearance: Idle 731.73 mm; Walking 595.92 mm; Attack 657.52 mm; Dead 38.24 mm.
+- Dead's closest sampled mallet-head vertex to a non-hand body surface is 10.32 mm, adjacent to the character's head at frame 175 of 178. This is a vertex-to-surface distance, not an exact whole-surface separation guarantee.
+
+Reader and editable-source agreement
+- Repository native CPU skin reader passes all four core clips at 60 Hz, including finite transforms and the rigid held-item socket validator.
+- Native hand-relative socket checks at 20 poses confirm the expected local reversal and retained attachment position within floating-point tolerance.
+- Editable Blender source and exported core GLB agree across 22 poses. Maximum exported-body vertex distance to editable-body vertices: 0.01382 mm. Maximum socket/assembled-mallet world-matrix element difference: 4.42e-6.
+
+Scope limits
+- Discrete Blender triangle-crossing checks do not prove continuous-time collision freedom or exclude every enclosed-volume overlap.
+- Native GPU skinning, ray-traced presentation, gameplay, and device performance were not run by this QA pass.
+
+Evidence
+- release-clearance.json
+- release-dead-120hz.json
+- release-native-reader.log
+- release-native-grip-relation.json
+- structural-comparison-final.json
+- editable-glb-reconciliation.json
+- release-tested-sha256.json
+
+Tested SHA-256 hashes
+E01_AbbeyAttendant_core.glb
+0028ee9c200cecfb1e0ae2503baaf9614fa1ef4239760e23cdb12d7fbe5b7fa6
+E01_AbbeyAttendant_all_clips.glb
+2efc571367d597042525c5933bf6abb67bb8321b8af943a975012eb28308450e
+E01_AbbeyAttendant_source_extras.glb
+3456c6ff886205bd280db0c8916880545f94f1098d4354f1cba961cf54b09c25
+E01_maintenance_mallet.glb
+23b7865ba2accc30914b6586453d7b512c916db49e221a433c40855dc9c72e20
+E01_AbbeyAttendant_editable.blend
+412149be7dcda2ad993edf14c9f8fb7a06857dd9e905e00243068fa9410d7dc6

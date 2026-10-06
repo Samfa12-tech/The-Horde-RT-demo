@@ -1,0 +1,230 @@
+{
+  "editable_sha256": "412149be7dcda2ad993edf14c9f8fb7a06857dd9e905e00243068fa9410d7dc6",
+  "glb_sha256": "0028ee9c200cecfb1e0ae2503baaf9614fa1ef4239760e23cdb12d7fbe5b7fa6",
+  "sample_count": 22,
+  "max_glb_vertex_to_editable_vertex_distance_m": 1.381865604344057e-05,
+  "max_socket_world_matrix_difference": 4.410743713378906e-06,
+  "max_editable_actual_mallet_vs_glb_socket_matrix_difference": 4.410743713378906e-06,
+  "samples": [
+    {
+      "clip": "Idle",
+      "frame": 0,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 6.322115041257348e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 1.6644817094365624e-06,
+      "socket_world_matrix_max_difference": 2.60770320892334e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 2.60770320892334e-06
+    },
+    {
+      "clip": "Idle",
+      "frame": 60.0,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 7.41562644179794e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 1.6907959110367782e-06,
+      "socket_world_matrix_max_difference": 2.7418136596679688e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 2.7418136596679688e-06
+    },
+    {
+      "clip": "Idle",
+      "frame": 120.0,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 8.421832717431244e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 1.7391401723203498e-06,
+      "socket_world_matrix_max_difference": 2.86102294921875e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 2.86102294921875e-06
+    },
+    {
+      "clip": "Idle",
+      "frame": 180.0,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 7.393477517325664e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 1.6271204773294637e-06,
+      "socket_world_matrix_max_difference": 2.9206275939941406e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 2.9206275939941406e-06
+    },
+    {
+      "clip": "Idle",
+      "frame": 240,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 6.321061391645344e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 1.5329815616733915e-06,
+      "socket_world_matrix_max_difference": 2.562999725341797e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 2.562999725341797e-06
+    },
+    {
+      "clip": "Walking",
+      "frame": 0,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 6.65926881993073e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 1.4282615245265986e-06,
+      "socket_world_matrix_max_difference": 2.1457672119140625e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 2.1457672119140625e-06
+    },
+    {
+      "clip": "Walking",
+      "frame": 16.0,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 6.295560069702333e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 1.3056870751308133e-06,
+      "socket_world_matrix_max_difference": 2.6226043701171875e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 2.6226043701171875e-06
+    },
+    {
+      "clip": "Walking",
+      "frame": 32.0,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 9.489410331298131e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 1.7509798573788678e-06,
+      "socket_world_matrix_max_difference": 2.2649765014648438e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 2.2649765014648438e-06
+    },
+    {
+      "clip": "Walking",
+      "frame": 48.0,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 9.74800241237972e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 1.4124049281256718e-06,
+      "socket_world_matrix_max_difference": 2.562999725341797e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 2.562999725341797e-06
+    },
+    {
+      "clip": "Walking",
+      "frame": 64,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 6.562540420418372e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 1.5065922737811324e-06,
+      "socket_world_matrix_max_difference": 1.6093254089355469e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 1.6093254089355469e-06
+    },
+    {
+      "clip": "Attack",
+      "frame": 0,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 1.2594116924447007e-05,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 2.261790742317919e-06,
+      "socket_world_matrix_max_difference": 1.7881393432617188e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 1.7881393432617188e-06
+    },
+    {
+      "clip": "Attack",
+      "frame": 22.5,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 9.860741556622088e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 2.6613301313340596e-06,
+      "socket_world_matrix_max_difference": 3.3080577850341797e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 3.3080577850341797e-06
+    },
+    {
+      "clip": "Attack",
+      "frame": 45.0,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 8.376335244975053e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 2.1647334896065104e-06,
+      "socket_world_matrix_max_difference": 1.6391277313232422e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 1.6391277313232422e-06
+    },
+    {
+      "clip": "Attack",
+      "frame": 67.5,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 1.1355371498211753e-05,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 1.986782528102716e-06,
+      "socket_world_matrix_max_difference": 1.817941665649414e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 1.817941665649414e-06
+    },
+    {
+      "clip": "Attack",
+      "frame": 90,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 1.2262272321095224e-05,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 2.2575837230964086e-06,
+      "socket_world_matrix_max_difference": 1.9073486328125e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 1.9073486328125e-06
+    },
+    {
+      "clip": "Dead",
+      "frame": 0,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 8.63219793245662e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 2.2833396409849803e-06,
+      "socket_world_matrix_max_difference": 1.4007091522216797e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 1.4007091522216797e-06
+    },
+    {
+      "clip": "Dead",
+      "frame": 44.5,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 7.751105840725359e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 2.1214283366101115e-06,
+      "socket_world_matrix_max_difference": 2.4065375328063965e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 2.4065375328063965e-06
+    },
+    {
+      "clip": "Dead",
+      "frame": 89,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 1.381865604344057e-05,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 3.309493776381518e-06,
+      "socket_world_matrix_max_difference": 3.039836883544922e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 3.039836883544922e-06
+    },
+    {
+      "clip": "Dead",
+      "frame": 133,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 1.026364498102339e-05,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 2.417484271336042e-06,
+      "socket_world_matrix_max_difference": 4.410743713378906e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 4.410743713378906e-06
+    },
+    {
+      "clip": "Dead",
+      "frame": 142,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 9.724663868837524e-06,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 2.1614991864835755e-06,
+      "socket_world_matrix_max_difference": 4.0531158447265625e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 4.0531158447265625e-06
+    },
+    {
+      "clip": "Dead",
+      "frame": 168,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 1.2547899132187013e-05,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 2.4387012082653345e-06,
+      "socket_world_matrix_max_difference": 4.291534423828125e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 4.291534423828125e-06
+    },
+    {
+      "clip": "Dead",
+      "frame": 178,
+      "vertex_count_editable": 16814,
+      "vertex_count_glb": 17173,
+      "max_glb_vertex_to_editable_vertex_distance_m": 1.1776871360780206e-05,
+      "mean_glb_vertex_to_editable_vertex_distance_m": 2.5393964222902423e-06,
+      "socket_world_matrix_max_difference": 3.933906555175781e-06,
+      "editable_actual_mallet_vs_glb_socket_matrix_max_difference": 3.933906555175781e-06
+    }
+  ]
+}

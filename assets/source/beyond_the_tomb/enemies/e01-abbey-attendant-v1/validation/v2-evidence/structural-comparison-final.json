@@ -1,0 +1,209 @@
+{
+  "files": [
+    {
+      "only_permitted_animation_binary_bytes_changed": true,
+      "file": "E01_AbbeyAttendant_core.glb",
+      "old_sha256": "1e4d9c992ceef2511b171a6a7942bc2b9a7162b830c93eac75e0cef5097907db",
+      "candidate_sha256": "0028ee9c200cecfb1e0ae2503baaf9614fa1ef4239760e23cdb12d7fbe5b7fa6",
+      "changed_accessors": [
+        59,
+        136,
+        210,
+        213,
+        290
+      ],
+      "expected_changed_accessors": [
+        59,
+        136,
+        210,
+        213,
+        290
+      ],
+      "changed_accessors_exactly_allowed_rotation_channels": true,
+      "geometry_attributes_and_indices_bitwise_equal": true,
+      "changed_nodes": [
+        8
+      ],
+      "rightgrip_index": 8,
+      "node_changes_only_grip_rotation": true,
+      "max_rightgrip_skin_weight": 0,
+      "channels": [
+        {
+          "clip": "Idle",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Walking",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Attack",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Dead",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Dead",
+          "bone": "RightHand",
+          "key_count": 179,
+          "expected_undo_ramp_rotation_max_abs_error": 7.450580596923828e-08
+        }
+      ]
+    },
+    {
+      "only_permitted_animation_binary_bytes_changed": true,
+      "file": "E01_AbbeyAttendant_all_clips.glb",
+      "old_sha256": "f9241e7e9a0239e7cf504cdd713e278864607bbec9cbfd4b923f45c38dddc87e",
+      "candidate_sha256": "2efc571367d597042525c5933bf6abb67bb8321b8af943a975012eb28308450e",
+      "changed_accessors": [
+        59,
+        136,
+        210,
+        213,
+        290,
+        367,
+        444,
+        519,
+        596
+      ],
+      "expected_changed_accessors": [
+        59,
+        136,
+        210,
+        213,
+        290,
+        367,
+        444,
+        519,
+        596
+      ],
+      "changed_accessors_exactly_allowed_rotation_channels": true,
+      "geometry_attributes_and_indices_bitwise_equal": true,
+      "changed_nodes": [
+        8
+      ],
+      "rightgrip_index": 8,
+      "node_changes_only_grip_rotation": true,
+      "max_rightgrip_skin_weight": 0,
+      "channels": [
+        {
+          "clip": "Idle",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Attack",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Dead",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Hit_Reaction",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Idle_Turn_Left",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Idle_Turn_Right",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Walking",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Running",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Dead",
+          "bone": "RightHand",
+          "key_count": 179,
+          "expected_undo_ramp_rotation_max_abs_error": 7.450580596923828e-08
+        }
+      ]
+    },
+    {
+      "only_permitted_animation_binary_bytes_changed": true,
+      "file": "E01_AbbeyAttendant_source_extras.glb",
+      "old_sha256": "6add8af5e1eecce273eb64c7d2885d2470c59e05c45c70061ead42025bf0849b",
+      "candidate_sha256": "3456c6ff886205bd280db0c8916880545f94f1098d4354f1cba961cf54b09c25",
+      "changed_accessors": [
+        59,
+        136,
+        213,
+        290
+      ],
+      "expected_changed_accessors": [
+        59,
+        136,
+        213,
+        290
+      ],
+      "changed_accessors_exactly_allowed_rotation_channels": true,
+      "geometry_attributes_and_indices_bitwise_equal": true,
+      "changed_nodes": [
+        8
+      ],
+      "rightgrip_index": 8,
+      "node_changes_only_grip_rotation": true,
+      "max_rightgrip_skin_weight": 0,
+      "channels": [
+        {
+          "clip": "Hit_Reaction",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Idle_Turn_Left",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Idle_Turn_Right",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        },
+        {
+          "clip": "Running",
+          "key_count": 2,
+          "expected_rotation_max_abs_error": 0.0,
+          "max_quaternion_unit_error": 0.0
+        }
+      ]
+    }
+  ],
+  "mallet_bytes_identical": true
+}

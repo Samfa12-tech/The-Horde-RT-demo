@@ -1,20 +1,25 @@
 {
-  "package": "Horde-E01-editable-v1",
+  "package": "E01-editable-grip-v2",
   "files": [
     {
-      "path": "README.md",
-      "bytes": 4353,
-      "sha256": "19834d740f7dd916288a1a9726b2f950771d500d4066d791e7df1fa94f2af2f3"
+      "path": "ARCHIVE.md",
+      "bytes": 1067,
+      "sha256": "de3e884aca067aa68aed4bb998493932d7756865592145eca3754f2c9a8eaf02"
     },
     {
-      "path": "validation-summary.json",
-      "bytes": 4373,
-      "sha256": "508d36215986aaeb0484f39cb55058e6c131a9dc994d3a81943f9f73b27e7636"
+      "path": "E01_AbbeyAttendant_all_clips.glb",
+      "bytes": 5654224,
+      "sha256": "2efc571367d597042525c5933bf6abb67bb8321b8af943a975012eb28308450e"
     },
     {
-      "path": "RIGHTS.md",
-      "bytes": 1321,
-      "sha256": "480768e2b16b8e7d530c2eeb6d7fb42baf61c555e964c84b492a5ce5198b223c"
+      "path": "E01_AbbeyAttendant_editable.blend",
+      "bytes": 8133117,
+      "sha256": "412149be7dcda2ad993edf14c9f8fb7a06857dd9e905e00243068fa9410d7dc6"
+    },
+    {
+      "path": "E01_AbbeyAttendant_source_extras.glb",
+      "bytes": 5371440,
+      "sha256": "3456c6ff886205bd280db0c8916880545f94f1098d4354f1cba961cf54b09c25"
     },
     {
       "path": "MALLET_PROVENANCE.json",
@@ -27,34 +32,24 @@
       "sha256": "0ffd5e3d1b36e0c4229e90b01219d6efe9358c036994cade4e06cfc3abca2136"
     },
     {
-      "path": "final-metadata-receipt.json",
-      "bytes": 1223,
-      "sha256": "78f898761afb3b58eedcaa8fb6e3e7fc27040845e00548b613946cf0bab4266d"
-    },
-    {
       "path": "PRODUCTION_PROVENANCE.json",
       "bytes": 5347,
       "sha256": "f533618d3d7a80e00a775c27be3e0f4d7e0b39d56f9f1ea648762b2f8ae68a87"
     },
     {
-      "path": "E01_AbbeyAttendant_editable.blend",
-      "bytes": 8139795,
-      "sha256": "3bd3e7d69705dc0a1afc2a9d6feafd9537d28ff5d45dfa2698e40fb28c17061e"
+      "path": "README.md",
+      "bytes": 3409,
+      "sha256": "15a8fe66b99b4940864932fcdcb5d3c87fc0654bec36ae6bf730bcb4c6527030"
     },
     {
-      "path": "E01_AbbeyAttendant_source_extras.glb",
-      "bytes": 5371304,
-      "sha256": "6add8af5e1eecce273eb64c7d2885d2470c59e05c45c70061ead42025bf0849b"
+      "path": "RIGHTS.md",
+      "bytes": 1321,
+      "sha256": "480768e2b16b8e7d530c2eeb6d7fb42baf61c555e964c84b492a5ce5198b223c"
     },
     {
-      "path": "E01_AbbeyAttendant_all_clips.glb",
-      "bytes": 5653940,
-      "sha256": "f9241e7e9a0239e7cf504cdd713e278864607bbec9cbfd4b923f45c38dddc87e"
-    },
-    {
-      "path": "extras-inspection.json",
-      "bytes": 37688,
-      "sha256": "f20492b6c543151aa2e3296c4ef463babdf7da9f825ee58514b6b3197ed1412a"
+      "path": "V2_REVISION.md",
+      "bytes": 341,
+      "sha256": "3d077f6b08b54a75cb16286dd3f515a8fe694310da48576b6b55bb1ba10aa9a0"
     },
     {
       "path": "all-clips-inspection.json",
@@ -62,9 +57,24 @@
       "sha256": "d41172df5c851fa69786cc02001498c5f2e105a1c4e40552499b3d48d55c9588"
     },
     {
+      "path": "all-clips-name-receipt.json",
+      "bytes": 557,
+      "sha256": "d6fe1c2a6b6261ad2c35c6e8c6d6126fa354e112271ca806524f49879147bc86"
+    },
+    {
+      "path": "editable-revision.json",
+      "bytes": 664,
+      "sha256": "9b28df45f03e154a2f4dedf602f02c069904d8df581b5468058d463b4cc8a2be"
+    },
+    {
       "path": "editable-verification.json",
       "bytes": 862,
       "sha256": "b96b4a7230aa1153582aef0af3f3eeb4688eb21b6248e6ec44527b18eb25c98e"
+    },
+    {
+      "path": "extras-inspection.json",
+      "bytes": 37688,
+      "sha256": "f20492b6c543151aa2e3296c4ef463babdf7da9f825ee58514b6b3197ed1412a"
     },
     {
       "path": "extras-native-proof.txt",
@@ -72,9 +82,19 @@
       "sha256": "daa8b3e94811b9dc3ccefa16399d40753985fe87215e11f99643fe0622a2d969"
     },
     {
-      "path": "all-clips-name-receipt.json",
-      "bytes": 557,
-      "sha256": "d6fe1c2a6b6261ad2c35c6e8c6d6126fa354e112271ca806524f49879147bc86"
+      "path": "final-metadata-receipt.json",
+      "bytes": 1223,
+      "sha256": "78f898761afb3b58eedcaa8fb6e3e7fc27040845e00548b613946cf0bab4266d"
+    },
+    {
+      "path": "socket-revision.json",
+      "bytes": 2389,
+      "sha256": "860ff3e51af53047a2b5fc000068c056ae16cd823a0df205c06dd7e5710b48ec"
+    },
+    {
+      "path": "validation-summary.json",
+      "bytes": 1879,
+      "sha256": "f08983b59d778855532cf6b7c4522e62eb6824a6fbf040dc336153f9d3e52a4a"
     }
   ]
 }

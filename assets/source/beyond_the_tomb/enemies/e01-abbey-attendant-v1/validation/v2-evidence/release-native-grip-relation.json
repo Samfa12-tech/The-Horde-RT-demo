@@ -1,0 +1,128 @@
+{
+  "source_sha256": "0028ee9c200cecfb1e0ae2503baaf9614fa1ef4239760e23cdb12d7fbe5b7fa6",
+  "method": "Native CPU reader. For each sample, compare inverse(RightHand world) * RightGrip world with delivered version; expected change is local X 180 degrees only, even during revised Dead wrist animation. Translation values are local transform units.",
+  "max_hand_relative_origin_delta_local_units": 8.444673970911404e-06,
+  "max_hand_relative_reversal_matrix_error": 1.600635482468249e-05,
+  "samples": [
+    {
+      "clip": "Idle",
+      "fraction": 0,
+      "hand_relative_reversal_matrix_max_error": 1.3445557193847435e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Idle",
+      "fraction": 0.25,
+      "hand_relative_reversal_matrix_max_error": 1.1784044914975311e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Idle",
+      "fraction": 0.5,
+      "hand_relative_reversal_matrix_max_error": 1.277277181443992e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Idle",
+      "fraction": 0.75,
+      "hand_relative_reversal_matrix_max_error": 1.4575245451453611e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Idle",
+      "fraction": 1,
+      "hand_relative_reversal_matrix_max_error": 1.4582234211246714e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0,
+      "hand_relative_reversal_matrix_max_error": 1.3315473529118549e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.25,
+      "hand_relative_reversal_matrix_max_error": 1.3764790651293879e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.5,
+      "hand_relative_reversal_matrix_max_error": 1.4362128354150627e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Walking",
+      "fraction": 0.75,
+      "hand_relative_reversal_matrix_max_error": 1.3189619728848356e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Walking",
+      "fraction": 1,
+      "hand_relative_reversal_matrix_max_error": 1.331547248284437e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0,
+      "hand_relative_reversal_matrix_max_error": 1.1066537403792154e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.25,
+      "hand_relative_reversal_matrix_max_error": 1.1054009085853522e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.5,
+      "hand_relative_reversal_matrix_max_error": 0.0,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Attack",
+      "fraction": 0.75,
+      "hand_relative_reversal_matrix_max_error": 1.316777986559714e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Attack",
+      "fraction": 1,
+      "hand_relative_reversal_matrix_max_error": 3.1477526896139807e-06,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0,
+      "hand_relative_reversal_matrix_max_error": 1.600635482468249e-05,
+      "hand_relative_origin_delta_local_units": 0.0
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.25,
+      "hand_relative_reversal_matrix_max_error": 1.4616537184153344e-05,
+      "hand_relative_origin_delta_local_units": 4.331363723867922e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.5,
+      "hand_relative_reversal_matrix_max_error": 4.588256260262824e-06,
+      "hand_relative_origin_delta_local_units": 4.189233593204244e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 0.75,
+      "hand_relative_reversal_matrix_max_error": 1.0709861527402609e-05,
+      "hand_relative_origin_delta_local_units": 2.9465417850524834e-06
+    },
+    {
+      "clip": "Dead",
+      "fraction": 1,
+      "hand_relative_reversal_matrix_max_error": 8.100233497287945e-06,
+      "hand_relative_origin_delta_local_units": 8.444673970911404e-06
+    }
+  ]
+}
