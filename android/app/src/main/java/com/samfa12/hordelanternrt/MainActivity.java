@@ -3100,8 +3100,7 @@ public class MainActivity extends Activity {
         settingsText += "\nKeeper room mist; this preview has no ground mist. Off preserves fire, smoke and electricity.";
         final String accessibleSettings = graphicsLiveChoiceError == null ? settingsText :
                 graphicsLiveChoiceError + "\n" + settingsText;
-        if (!accessibleSettings.contentEquals(graphicsTelemetry.getContentDescription()))
-            graphicsTelemetry.setContentDescription(accessibleSettings);
+        updateGraphicsTelemetryAccessibilityDetails(accessibleSettings);
         graphicsDetailedStatus = accessibleSettings;
         if ((applied[14] & 64) != 0 && GraphicsPreferences.presented(applied, surfaceRequestGeneration) &&
                 applied[19] == expectedGraphicsReturnProfile()) {
@@ -3184,6 +3183,13 @@ public class MainActivity extends Activity {
         graphicsPreviewDetailsSamples = p;
         if (graphicsDetailsTelemetry != null) graphicsDetailsTelemetry.setText(graphicsPreviewDetailsText);
         if (graphicsGraph != null) graphicsGraph.setSamples(p);
+    }
+
+    private boolean updateGraphicsTelemetryAccessibilityDetails(CharSequence details) {
+        if (graphicsTelemetry == null || android.text.TextUtils.equals(
+                details, graphicsTelemetry.getContentDescription())) return false;
+        graphicsTelemetry.setContentDescription(details);
+        return true;
     }
 
     private void setGraphicsPreviewStatus(String status) {
@@ -3586,8 +3592,7 @@ public class MainActivity extends Activity {
                 if (graphicsPreviewWanted) refreshGraphicsPreviewTelemetry(a, settingsText);
                 else {
                     if (!status.contentEquals(graphicsTelemetry.getText())) graphicsTelemetry.setText(status);
-                    if (!settingsText.contentEquals(graphicsTelemetry.getContentDescription()))
-                        graphicsTelemetry.setContentDescription(settingsText);
+                    updateGraphicsTelemetryAccessibilityDetails(settingsText);
                 }
             }
             scheduleGraphicsPoll(this);

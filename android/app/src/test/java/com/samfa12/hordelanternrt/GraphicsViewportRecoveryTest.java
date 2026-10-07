@@ -84,6 +84,24 @@ public final class GraphicsViewportRecoveryTest {
         assertTrue(keep.getContentDescription().toString().contains("acknowledged trial"));
         for(Button action:new Button[]{use,keep,restore,back}) assertFalse(insideHorizontalScroll(action));
     }
+    @Test public void freshGraphicsPageCanPublishPreviewDetailsToInitiallyNullDescription() throws Exception {
+        FrameLayout[] holder=new FrameLayout[1]; MainActivity a=activity(holder); FrameLayout scrim=holder[0];
+        show(a,"showGraphicsPage"); layout(scrim);
+        Field telemetryField=MainActivity.class.getDeclaredField("graphicsTelemetry"); telemetryField.setAccessible(true);
+        android.widget.TextView telemetry=(android.widget.TextView)telemetryField.get(a);
+        assertNull("fresh ordinary Graphics page starts without an accessibility description",telemetry.getContentDescription());
+        Method refresh=MainActivity.class.getDeclaredMethod("refreshGraphicsPreviewTelemetry",long[].class,String.class);
+        refresh.setAccessible(true);
+        refresh.invoke(a,new long[32],"Requested 75% / Saved 75%");
+        assertTrue(telemetry.getContentDescription().toString().startsWith("Requested 75% / Saved 75%"));
+        Method update=MainActivity.class.getDeclaredMethod("updateGraphicsTelemetryAccessibilityDetails",CharSequence.class);
+        update.setAccessible(true);
+        CharSequence current=telemetry.getContentDescription();
+        assertEquals("unchanged details do not re-emit accessibility updates",false,update.invoke(a,current));
+        assertEquals("changed details update once",true,update.invoke(a,"Saved 75%; backend pending"));
+        assertEquals("Saved 75%; backend pending",telemetry.getContentDescription().toString());
+        assertEquals("the same details do not churn on the next poll",false,update.invoke(a,"Saved 75%; backend pending"));
+    }
     @Test public void rebuiltPreviewRetainsScrollableOptionsAndFocusedControlWithPersistentActions() throws Exception {
         FrameLayout[] holder=new FrameLayout[1]; MainActivity a=activity(holder); FrameLayout scrim=holder[0];
         show(a,"showGraphicsPreviewPage"); layout(scrim);
