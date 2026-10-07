@@ -835,6 +835,12 @@ public class MainActivity extends Activity {
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
         menuScrim.removeAllViews();
+        if (!sidePage) {
+            showEntryComposition();
+            applyEntryMenuAvailability(null);
+            publishEntryMenuState();
+            return;
+        }
         entryMenuPanel = createPanel("HORDE LANTERN", sidePage ?
                 (entryMenuSidePage ? getString(R.string.entry_more_eyebrow) : getString(R.string.entry_settings_eyebrow)) :
                 getString(R.string.entry_menu_eyebrow));
@@ -881,6 +887,105 @@ public class MainActivity extends Activity {
         publishEntryMenuState();
     }
 
+    private void showEntryComposition() {
+        // Independent native plaques leave the hanging RT lantern unobscured.
+        // Intrinsic text widths include the owner's system font scale.
+        menuScrim.setBackgroundColor(Color.TRANSPARENT);
+        final LinearLayout host = new LinearLayout(this);
+        host.setOrientation(LinearLayout.VERTICAL);
+        final FrameLayout composition = new FrameLayout(this);
+        host.addView(composition, new LinearLayout.LayoutParams(-1, -1));
+        menuScrim.addView(host, new FrameLayout.LayoutParams(-1, -1));
+        entryMenuPanel = host;
+
+        int left = dp(16), right = dp(16), top = dp(16), bottom = dp(20);
+        final WindowInsets insets = menuScrim.getRootWindowInsets();
+        if (insets != null) {
+            left = Math.max(left, insets.getStableInsetLeft() + dp(8));
+            right = Math.max(right, insets.getStableInsetRight() + dp(8));
+            top = Math.max(top, insets.getStableInsetTop() + dp(8));
+            bottom = Math.max(bottom, insets.getStableInsetBottom() + dp(12));
+        }
+        final int width = getResources().getDisplayMetrics().widthPixels;
+        final int height = getResources().getDisplayMetrics().heightPixels;
+        final boolean portrait = height >= width;
+        final int availableWidth = Math.max(dp(120), width - left - right);
+
+        final TextView title = new TextView(this);
+        title.setText(R.string.entry_menu_brand);
+        title.setTextColor(HordeUiTokens.BRASS);
+        title.setTextSize(portrait ? 34 : 28);
+        title.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+        title.setShadowLayer(dp(3), 0, dp(2), Color.BLACK);
+        final FrameLayout.LayoutParams titleLayout = new FrameLayout.LayoutParams(availableWidth, -2);
+        titleLayout.gravity = Gravity.TOP | Gravity.START;
+        titleLayout.setMargins(left, top, right, 0);
+        composition.addView(title, titleLayout);
+
+        entryPlayButton = createEntryPlaque(getString(R.string.entry_play), this::requestEntryPlay, true);
+        entrySettingsButton = createEntryPlaque(getString(R.string.settings), () -> {
+            entryMenuSidePage = true; publishEntryMenuState(); showSettings();
+        }, false);
+        entryMoreButton = createEntryPlaque(getString(R.string.entry_more), () -> {
+            entryMenuSidePage = true; publishEntryMenuState(); showEntryMorePage();
+        }, false);
+
+        final int bottomPlaqueLimit = Math.max(dp(48), (availableWidth - dp(20)) / 2);
+        final FrameLayout.LayoutParams playLayout = new FrameLayout.LayoutParams(
+                entryPlaqueWidth(entryPlayButton, bottomPlaqueLimit), -2);
+        playLayout.gravity = Gravity.BOTTOM | Gravity.END;
+        playLayout.setMargins(0, 0, right, bottom + (portrait ? dp(72) : dp(12)));
+        composition.addView(entryPlayButton, playLayout);
+        final FrameLayout.LayoutParams moreLayout = new FrameLayout.LayoutParams(
+                entryPlaqueWidth(entryMoreButton, bottomPlaqueLimit), -2);
+        moreLayout.gravity = Gravity.BOTTOM | Gravity.START;
+        moreLayout.setMargins(left, 0, 0, bottom + (portrait ? dp(72) : dp(12)));
+        composition.addView(entryMoreButton, moreLayout);
+        final FrameLayout.LayoutParams settingsLayout = new FrameLayout.LayoutParams(
+                entryPlaqueWidth(entrySettingsButton, availableWidth), -2);
+        settingsLayout.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
+        settingsLayout.setMargins(left, portrait ? 0 : dp(24), right, 0);
+        composition.addView(entrySettingsButton, settingsLayout);
+
+        final LinearLayout loading = new LinearLayout(this);
+        loading.setOrientation(LinearLayout.VERTICAL);
+        loading.setGravity(Gravity.CENTER);
+        entryMenuStatus = new TextView(this);
+        entryMenuStatus.setTextColor(HordeUiTokens.PARCHMENT);
+        entryMenuStatus.setTextSize(13);
+        entryMenuStatus.setGravity(Gravity.CENTER);
+        entryMenuStatus.setVisibility(View.GONE);
+        loading.addView(entryMenuStatus, new LinearLayout.LayoutParams(-1, -2));
+        entryMenuProgress = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
+        entryMenuProgress.setIndeterminate(true);
+        entryMenuProgress.setContentDescription(getString(R.string.entry_menu_loading));
+        entryMenuProgress.setVisibility(View.GONE);
+        loading.addView(entryMenuProgress, new LinearLayout.LayoutParams(dp(32), dp(32)));
+        final FrameLayout.LayoutParams loadingLayout = new FrameLayout.LayoutParams(availableWidth, -2);
+        loadingLayout.gravity = Gravity.CENTER;
+        loadingLayout.setMargins(left, 0, right, 0);
+        composition.addView(loading, loadingLayout);
+    }
+
+    private Button createEntryPlaque(String label, Runnable action, boolean primary) {
+        final Button button = createMenuButton(label, action);
+        button.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+        button.setTextSize(primary ? 22 : 16);
+        button.setGravity(Gravity.CENTER);
+        button.setSingleLine(true);
+        button.setMinimumHeight(dp(primary ? 64 : 52));
+        button.setFocusable(true);
+        button.setFocusableInTouchMode(false);
+        styleActionButton(button, primary ? 0xFF513A20 : 0xFF33291F, HordeUiTokens.PARCHMENT);
+        return button;
+    }
+
+    private int entryPlaqueWidth(Button button, int maximumWidth) {
+        final int intrinsic = (int)Math.ceil(button.getPaint().measureText(button.getText().toString())) +
+                button.getPaddingLeft() + button.getPaddingRight() + dp(12);
+        return Math.min(maximumWidth, Math.max(dp(112), intrinsic));
+    }
+
     private Button addEntryMenuButton(LinearLayout panel, String label, Runnable action, boolean primary) {
         final Button button = createMenuButton(label, action);
         // Keep D-pad/keyboard focusable without requesting touch-mode focus.
@@ -912,7 +1017,7 @@ public class MainActivity extends Activity {
             bottom = Math.max(bottom, insets.getStableInsetBottom() + dp(8));
         }
         final int maxAvailable = Math.max(dp(144), width - start - dp(24));
-        final int desiredWidth = (int)(width * (portrait ? 0.42f : 0.34f));
+        final int desiredWidth = (int)(width * (portrait ? 0.90f : 0.42f));
         final int panelWidth = Math.min(dp(400), Math.min(maxAvailable, Math.max(dp(144), desiredWidth)));
         final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(panelWidth,
                 FrameLayout.LayoutParams.WRAP_CONTENT);
@@ -1005,7 +1110,7 @@ public class MainActivity extends Activity {
         entryMenuStatus.setVisibility(View.VISIBLE);
         if (entryMenuProgress != null) entryMenuProgress.setVisibility(View.GONE);
         if (entryMenuPanel != null) entryMenuPanel.setAlpha(1.0f);
-        if (entryPlayButton != null && entryMenuPanel != null && entryPlayButton.getParent() == entryMenuPanel) {
+        if (entryPlayButton != null && entryMenuPanel != null && entryPlayButton.getParent() != null) {
             entryPlayButton.setText(R.string.entry_retry);
             entryPlayButton.setOnClickListener(view -> retryEntryPlay());
             entryPlayButton.setEnabled(!entryPlayRequested);

@@ -10,6 +10,7 @@
     <string name="entry_more">MORE</string>
     <string name="entry_more_description">Explore the controls, provenance, reports and tools for this ruin.</string>
     <string name="entry_play">PLAY</string>
+    <string name="entry_menu_brand">THE\nHORDE</string>
     <string name="entry_retry">TRY AGAIN</string>
     <string name="entry_menu_loading">Opening the ruin…</string>
     <string name="entry_menu_failed">The current RT scene could not be presented. Try again or open diagnostics.</string>
