@@ -234,12 +234,12 @@ struct PresentableTinyRtSceneObservationTestAccess
                   instance.transform.matrix[0][0] == 1.0f && instance.transform.matrix[1][1] == 1.0f &&
                   instance.transform.matrix[2][2] == 1.0f;
         }
-        // Physical slots22/23 never become shader metadata22/23. All established
-        // player, pane, collapse and ordinary instance definitions remain intact.
+        // Keeper physical slots23/24 keep aliasing old torch metadata1. The
+        // independent player Rag torch owns metadata22 at held TLAS slot1.
         ok &= std::memcmp(instances.data(), original.data(), kRtInstanceMetadataCapacity * sizeof(instances[0])) == 0;
         instances[0].mask = 0u;
         scene.ApplyKeeperTorchBodyInstances(instances);
-        ok &= instances[22].mask == 0u && instances[23].mask == 0u;
+        ok &= instances[23].mask == 0u && instances[24].mask == 0u;
         scene.worldTorchBodyBlas_ = {};
         scene.torchBlas_ = {};
         return ok;
@@ -1338,7 +1338,7 @@ int main()
                       diagnostic.bottomLevelAccelerationStructureCount == 19u &&
                       scene.BlasCount() == 19u &&
                       diagnostic.topLevelAccelerationStructureCount == 1u &&
-                      diagnostic.tlasInstanceCount == 24u &&
+                      diagnostic.tlasInstanceCount == 25u &&
                       diagnostic.pipelineCount == 2u &&
                       diagnostic.shaderBindingTableCount == 2u &&
                       diagnostic.descriptorSetCount == 1u,

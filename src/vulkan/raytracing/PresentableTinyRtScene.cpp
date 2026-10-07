@@ -486,6 +486,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     developmentStaticAsset_ = std::move(other.developmentStaticAsset_);
     collapseStaticAsset_ = std::move(other.collapseStaticAsset_);
     productionTorchAsset_ = std::move(other.productionTorchAsset_);
+    playerTorchAsset_ = std::move(other.playerTorchAsset_);
     productionPlayerAsset_ = std::move(other.productionPlayerAsset_);
     gothicChestBaseAsset_ = std::move(other.gothicChestBaseAsset_);
     gothicChestLidAsset_ = std::move(other.gothicChestLidAsset_);
@@ -983,6 +984,7 @@ void PresentableTinyRtScene::Destroy()
     developmentStaticAsset_ = {};
     collapseStaticAsset_ = {};
     productionTorchAsset_ = {};
+    playerTorchAsset_ = {};
     productionPlayerAsset_ = {};
     gothicChestBaseAsset_ = {};
     gothicChestLidAsset_ = {};
@@ -2119,6 +2121,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     developmentStaticAsset_ = {};
     collapseStaticAsset_ = {};
     productionTorchAsset_ = {};
+    playerTorchAsset_ = {};
     productionPlayerAsset_ = {};
     gothicChestBaseAsset_ = {};
     gothicChestLidAsset_ = {};
@@ -2137,6 +2140,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     const std::filesystem::path root(productionAssetRoot);
     const auto swordDirectory = root / "models/weapons/runtime";
     const auto torchDirectory = root / "models/props/runtime";
+    const auto playerTorchDirectory = root / "models/props/runtime/player-rag-torch";
     const auto playerDirectory = root / "models/player/runtime";
     const auto dielectricDirectory =
         root / "models/props/runtime/dielectric-fixture";
@@ -2151,6 +2155,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     const auto collapseDirectory = root / "models/world/runtime/collapsed-entry";
     horde::scene::assets::AssetManifest swordManifest;
     horde::scene::assets::AssetManifest torchManifest;
+    horde::scene::assets::AssetManifest playerTorchManifest;
     horde::scene::assets::AssetManifest playerManifest;
     horde::scene::assets::AssetManifest dielectricManifest;
     horde::scene::assets::AssetManifest chestBaseManifest;
@@ -2172,6 +2177,12 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             torchManifest,
             productionTorchAsset_,
             diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            playerTorchDirectory / "asset.manifest.json",
+            playerTorchManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            playerTorchDirectory / "rag-torch-player-lod0.runtime.glb",
+            playerTorchManifest, playerTorchAsset_, diagnostic) ||
         !horde::scene::assets::AssetManifest::Load(
             playerDirectory / "asset.manifest.json", playerManifest, diagnostic) ||
         !playerManifest.ValidatePlayerSemantics(diagnostic) ||
@@ -2259,6 +2270,11 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     registrations.push_back({kCollapseInstanceIndex, 0x434f4c4cu,
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
         &collapseStaticAsset_});
+    // Player Rag torch gets its own metadata/material route. The original
+    // production torch remains layer1 for permanent Keeper/world instances.
+    registrations.push_back({kPlayerTorchInstanceIndex, 0x544f5243u,
+        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
+        &playerTorchAsset_});
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
@@ -3491,10 +3507,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     if (productionHeldItemAssetsEnabled_)
     {
         const auto* flameSocket = horde::gameplay::items::FindHeldItemSocket(
-            productionTorchAsset_.sockets, "Flame");
+            playerTorchAsset_.sockets, "Flame");
         if (flameSocket == nullptr)
         {
-            diagnostic = "Production torch is missing the exact Flame socket.";
+            diagnostic = "Player Rag torch is missing the exact Flame socket.";
             return false;
         }
         itemFromEngineFlame = flameSocket->world;
@@ -3971,7 +3987,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     std::vector<std::uint32_t> torchPrimitiveCounts;
     if (productionHeldItemAssetsEnabled_)
     {
-        if (!appendStaticGeometries(1u, torchGeometries, torchRanges, torchPrimitiveCounts))
+        if (!appendStaticGeometries(
+                kPlayerTorchInstanceIndex,
+                torchGeometries, torchRanges, torchPrimitiveCounts))
             return false;
         // Task 4 owns final fire. Retain only the existing 16-triangle engine
         // flame core as a separate geometry after the authored PBR body.
@@ -4489,7 +4507,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[0].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
     instances[0].accelerationStructureReference = blas_.address;
     instances[1] = instances[0];
-    instances[1].instanceCustomIndex = 1u;
+    instances[1].instanceCustomIndex = productionHeldItemAssetsEnabled_ ? kPlayerTorchInstanceIndex : 1u;
     instances[1].mask = 0x02u;
     instances[1].accelerationStructureReference = torchBlas_.address;
     instances[1].transform = {{
@@ -4565,6 +4583,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     instances[kCollapseInstanceIndex].instanceCustomIndex = kCollapseInstanceIndex;
     instances[kCollapseInstanceIndex].mask = 0x01u;
     instances[kCollapseInstanceIndex].accelerationStructureReference = collapseBlas_.address;
+    // Metadata slot22 is reserved for the player Rag torch. Its live item
+    // remains TLAS slot1; this hidden owner keeps fixed slot correspondence.
+    instances[kPlayerTorchInstanceIndex] = instances[1];
+    instances[kPlayerTorchInstanceIndex].mask = 0u;
     ApplyKeeperTorchBodyInstances(instances);
     ApplyGlassFixtureVisibility(instances);
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
@@ -5843,9 +5865,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[0].accelerationStructureReference = blas_.address;
     instances[1] = instances[0];
     instances[1].transform = heldItemInstanceTransform(renderHeldItems[0]);
-    instances[1].instanceCustomIndex = 1u;
+    instances[1].instanceCustomIndex = productionHeldItemAssetsEnabled_ ? kPlayerTorchInstanceIndex : 1u;
     instances[1].mask = productionVisibility.torchMask;
     instances[1].accelerationStructureReference = torchBlas_.address;
+    instances[kPlayerTorchInstanceIndex] = instances[1];
+    instances[kPlayerTorchInstanceIndex].mask = 0u;
     const auto characterInstances = characterSlot_.BuildActiveInstances();
     instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];
     instances[3] = instances[1];
@@ -6133,10 +6157,24 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     // Solve every visible torch component from the final hand attachment,
     // including reach clamping, retraction and committed detached transforms.
     horde::gameplay::items::HeldLightState renderedTorchLight;
+    auto itemFromFlame = horde::gameplay::items::OriginalTorchFlameSocketTransform();
+    auto itemFromLight = horde::gameplay::items::OriginalTorchLightSocketTransform();
+    if (productionHeldItemAssetsEnabled_)
+    {
+        const auto* flame = horde::gameplay::items::FindHeldItemSocket(playerTorchAsset_.sockets, "Flame");
+        const auto* light = horde::gameplay::items::FindHeldItemSocket(playerTorchAsset_.sockets, "Light");
+        if (flame == nullptr || light == nullptr)
+        {
+            diagnostic = "Player Rag torch is missing its validated Flame or Light socket.";
+            return false;
+        }
+        itemFromFlame = flame->world;
+        itemFromLight = light->world;
+    }
     if (!horde::gameplay::items::ComposeHeldLightState(
             renderHeldItems[0].worldFromItem,
-            horde::gameplay::items::OriginalTorchFlameSocketTransform(),
-            horde::gameplay::items::OriginalTorchLightSocketTransform(),
+            itemFromFlame,
+            itemFromLight,
             frame.heldLight.flameStrength, renderedTorchLight, diagnostic)) return false;
     auto renderFireEmitters = frame.fireEmitters;
     if (frame.fireEmitterCount > renderFireEmitters.size())

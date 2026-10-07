@@ -15,12 +15,13 @@
     "reward-lantern-ring.BlackIron",
     "reward-lantern-body.BlackIron",
     "collapsed-entry/Boulder01Rock",
-    "collapsed-entry/MedievalWall02"
+    "collapsed-entry/MedievalWall02",
+    "rag-torch-player/RagTorch_Atlas"
   ],
   "layerCounts": {
-    "baseColor": 12,
-    "normal": 12,
-    "orm": 12,
+    "baseColor": 13,
+    "normal": 13,
+    "orm": 13,
     "emissive": 1
   },
   "sourceLayers": [
@@ -239,6 +240,24 @@
         "bytes": 1771080,
         "sha256": "68e68c8c66fd61b1a0143e77cb0a21a3ed8101dee47402e5d1f75c002cccb68e"
       }
+    },
+    {
+      "layer": 12,
+      "baseColor": {
+        "path": "assets/textures/props/source/rag-torch-v01/base-color.png",
+        "bytes": 1692832,
+        "sha256": "6a2175298335623e7a0b3d6b0e15c146e986b79396a1c4a8d30dbaecaa953cc1"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/rag-torch-v01/normal.png",
+        "bytes": 1154127,
+        "sha256": "7a4a305b9396f0cc45b21663f12d964e340921615ce4a45bf2fd277581554b16"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/rag-torch-v01/orm.png",
+        "bytes": 1344491,
+        "sha256": "4127575d615a8b868f3b98b586bfc625cbc8ef6fecfbd6678e4b978076e26834"
+      }
     }
   ],
   "normalConvention": "linear glTF/OpenGL +Y; existing generated-mipmap filter unchanged; runtime renormalizes mapped normals",
@@ -247,15 +266,15 @@
   "android": {
     "baseColor": {
       "format": "ASTC_6x6_SRGB_BLOCK",
-      "sha256": "ddf9fc41fabb3913216fa06a22b9cc80907eea0a1c530f19b4191d32f648b9c8"
+      "sha256": "58c86b8156f33523e4949e572a5409626dd38c1b111d14831d71a15dc8776267"
     },
     "normal": {
       "format": "ASTC_4x4_UNORM_BLOCK",
-      "sha256": "7b6c4e34d4a6fcb8450c0a8b489a3355a53cf00741fb1703a8da1ba2e16fde12"
+      "sha256": "aaf2af4624e86fe0029d31dffe1835d566edb08a1e1780db4a8638904a5a1ecc"
     },
     "orm": {
       "format": "ASTC_6x6_UNORM_BLOCK",
-      "sha256": "a65968188c2da94d7df4946cff3057847f8f786f92b1d3c06cb5e44bf6683e8c"
+      "sha256": "e9981f16657e53ec9219708526ad47c194d60c6ef20676741e59b88759d0bb87"
     },
     "emissive": {
       "format": "ASTC_6x6_SRGB_BLOCK",
@@ -265,20 +284,20 @@
   "windows": {
     "baseColor": {
       "format": "R8G8B8A8_SRGB",
-      "sha256": "0ac3747f1c92a76fdbbb08320fabeb1af4eb03808655441141caae427f8f1204"
+      "sha256": "39e89e86fe06e832f9a0eddffa0e702643a1d91f0679476fd1d05ce4977a12b0"
     },
     "normal": {
       "format": "R8G8B8A8_UNORM",
-      "sha256": "9d6b5c73c5fd7c20b1c40b3db5559f4efaad11169c191560aad63a249a198fa1"
+      "sha256": "44efeb267234b79d4d0d3a574a366b309bdfea34ae102b5a45540f47c93ebf97"
     },
     "orm": {
       "format": "R8G8B8A8_UNORM",
-      "sha256": "fc78f0e2fab2412eb7022ed5c7d3a12584c6ce78520f8d7d7594de6c2d2d9876"
+      "sha256": "ae7bdf275b3796f32d72eebf801fbde54fca41d6dcc647a7238c103de0ee7f5f"
     },
     "emissive": {
       "format": "R8G8B8A8_SRGB",
       "sha256": "c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56"
     }
   },
-  "licenceStatus": "Existing Meshy outputs conservatively CC BY 4.0; collapsed-entry Boulder01 and MedievalWall02 CC0; provenance in ASSET_LICENSES.md"
+  "licenceStatus": "Existing Meshy outputs conservatively CC BY 4.0; collapsed-entry Boulder01 and MedievalWall02 CC0; RagTorch_Atlas is original assistant-authored geometry/maps with no blanket licence assigned; provenance in ASSET_LICENSES.md"
 }

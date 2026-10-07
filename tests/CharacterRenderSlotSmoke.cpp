@@ -233,12 +233,13 @@ int main()
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
     ok &= Require(PresentableTinyRtScene::kBlasCount == 19u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 24u &&
-                      kRtInstanceMetadataCapacity == 22u &&
-                      PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 22u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 25u &&
+                      kRtInstanceMetadataCapacity == 23u &&
+                      PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
-                      PresentableTinyRtScene::kCollapseInstanceIndex == 21u,
-                  "bounded BLAS maximum includes the shared world-torch body; physical TLAS24 aliases metadata22 while preserving viewmodel20 and collapse21");
+                      PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&
+                      PresentableTinyRtScene::kPlayerTorchInstanceIndex == 22u,
+                  "bounded BLAS maximum includes shared world-torch and separate player torch; TLAS25 retains viewmodel20/collapse21/player torch22 before Keeper aliases23/24");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =

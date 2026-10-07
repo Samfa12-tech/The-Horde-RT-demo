@@ -1,5 +1,5 @@
 // RayQuery compute variant key: rayquery_compute_diagnostic_high_generic_dielectric
-// RayQuery compute dependency SHA-256: d91448c5f92bb02e2b378c3498491ea0dd9ec5d3fa416d94ce92ec87f1cbdd31
+// RayQuery compute dependency SHA-256: 02c9b03ffc7fc4e3bafb94bb8083454ba277f3ec2a6dc5e9c595df288e83a173
     0x07230203u, 0x00010500u, 0x0008000bu, 0x00002af3u, 0x00000000u, 0x00020011u, 0x00000001u, 0x00020011u,
     0x00000032u, 0x00020011u, 0x00001178u, 0x0006000au, 0x5f565053u, 0x5f52484bu, 0x5f796172u, 0x72657571u,
     0x00000079u, 0x0006000bu, 0x00000001u, 0x4c534c47u, 0x6474732eu, 0x3035342eu, 0x00000000u, 0x0003000eu,

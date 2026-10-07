@@ -65,7 +65,7 @@ bool RayOccluded(const StaticMeshAsset& asset, Vec3 origin, Vec3 ray)
 int main()
 {
     std::vector<StaticMeshAsset> assets;
-    assets.reserve(10);
+    assets.reserve(11);
     assets.push_back(Load("models/weapons/runtime", "gothic-arming-sword-rh-lod0.runtime.glb"));
     assets.push_back(Load("models/props/runtime", "gothic-hand-torch-lod0.runtime.glb"));
     assets.push_back(Load("models/player/runtime", "gothic-traveller-lod0.runtime.glb"));
@@ -124,6 +124,38 @@ int main()
             sealed &= RayOccluded(collapse, {0,0.70f,1.85f}, {x*0.10f,y*0.05f,1.0f});
     Check(sealed, "real collapse/stair enclosure physically stops rearward opening rays without flat cap or inspection floor");
     registrations.push_back({21,0x434f4c4cu,static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0,&collapse});
+    AssetManifest ragManifest;
+    StaticMeshAsset ragTorch;
+    Check(AssetManifest::Load(root / "models/props/runtime/player-rag-torch/asset.manifest.json",
+                              ragManifest, diagnostic) &&
+          StaticMeshAsset::Load(root / "models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb",
+                                ragManifest, ragTorch, diagnostic),
+          "player Rag torch manifest/GLB must pass the production static importer: " + diagnostic);
+    if (failures) return 1;
+    Check(ragTorch.vertices.size()==4825u && ragTorch.indices.size()==16356u &&
+          ragTorch.primitives.size()==1u && ragTorch.materials.size()==1u,
+          "Rag torch retains its reviewed 4,825-vertex, 5,452-triangle one-material runtime geometry");
+    const auto findSocket=[&ragTorch](const char* name) -> const StaticSocket* {
+        const auto found=std::find_if(ragTorch.sockets.begin(),ragTorch.sockets.end(),
+            [name](const StaticSocket& socket){return socket.name==name;});
+        return found==ragTorch.sockets.end()?nullptr:&*found;
+    };
+    const auto* ragGrip=findSocket("Grip");
+    const auto* ragFlame=findSocket("Flame");
+    const auto* ragLight=findSocket("Light");
+    Check(ragGrip && ragFlame && ragLight &&
+          std::abs(ragGrip->world[12]-0.010711723f)<1e-6f &&
+          std::abs(ragGrip->world[13]-0.24f)<1e-6f &&
+          std::abs(ragGrip->world[14]+0.002040245f)<1e-6f &&
+          std::abs(ragFlame->world[13]-0.805f)<1e-6f &&
+          std::abs(ragLight->world[13]-0.78f)<1e-6f,
+          "Rag torch importer preserves authored Grip, Flame and Light sockets in the GLB frame");
+    Check(ragTorch.materials.size()==1u &&
+          ragTorch.materials[0].baseColorTexture>=0 && ragTorch.materials[0].normalTexture>=0 &&
+          ragTorch.materials[0].ormTexture>=0 && ragTorch.materials[0].normalScale==0.6f &&
+          ragTorch.materials[0].metallicFactor==0.0f && ragTorch.materials[0].emissiveFactor==Vec3{},
+          "Rag material keeps its opaque nonmetallic PBR maps and has no baked flame/emissive contribution");
+    registrations.push_back({22,0x544f5243u,static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0,&ragTorch});
     RtStaticMeshSlot admitted;
     Check(admitted.Initialize(registrations,diagnostic), "full static registry admits collapse without special role: " + diagnostic);
     if (failures) return 1;
@@ -139,9 +171,18 @@ int main()
               admitted.Materials().at(firstMaterial+i).textureLayers[1]==10+i &&
               admitted.Materials().at(firstMaterial+i).textureLayers[2]==10+i,
               "all imported PBR categories match canonical appended atlas layers");
-    Check(admitted.TextureArrayCounts().baseColor==12 && admitted.TextureArrayCounts().normal==12 &&
-          admitted.TextureArrayCounts().orm==12 && admitted.Materials().size()+6<=kRtMaterialCapacity,
-          "two families remain within unchanged texture/material bounds including dungeon materials");
+    const auto& ragMetadata=admitted.InstanceMetadata()[22];
+    const auto& ragPrimitive=admitted.PrimitiveMetadata().at(ragMetadata.primitiveBase);
+    const auto& ragMaterial=admitted.Materials().at(ragPrimitive.materialIndex);
+    Check(admitted.InstanceMetadata()[1].primitiveCount==assets[1].primitives.size() &&
+          admitted.Materials().at(admitted.PrimitiveMetadata().at(
+              admitted.InstanceMetadata()[1].primitiveBase).materialIndex).textureLayers[0]==1u,
+          "Keeper/world torch retains the original production body and atlas layer1");
+    Check(ragMetadata.primitiveCount==1u && ragMaterial.textureLayers==std::array<std::uint32_t,4u>{{12u,12u,12u,0u}},
+          "player Rag torch receives distinct metadata22 and canonical base/normal/ORM atlas layer12");
+    Check(admitted.TextureArrayCounts().baseColor==13 && admitted.TextureArrayCounts().normal==13 &&
+          admitted.TextureArrayCounts().orm==13 && admitted.Materials().size()+6<=kRtMaterialCapacity,
+          "13-layer loaded prop arrays and all materials remain within fixed texture/material bounds");
     bool preserved=true;
     for (unsigned i=0;i<baseline.Materials().size();++i)
         preserved &= admitted.Materials()[i].textureLayers==baseline.Materials()[i].textureLayers;

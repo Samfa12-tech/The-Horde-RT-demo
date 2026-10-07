@@ -19,6 +19,11 @@ function Assert-PropsGradleInventory([string]$Text) {
                 'textures/props/runtime/normal.android.ktx2','textures/props/runtime/orm.android.ktx2','textures/props/runtime/emissive.android.ktx2')
     Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle props assets must be the exact five-file Android runtime roster.'
 }
+function Assert-RagTorchGradleInventory([string]$Text) {
+    $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'models/props/runtime/player-rag-torch/*' })
+    $expected=@('models/props/runtime/player-rag-torch/asset.manifest.json','models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb')
+    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle player Rag torch assets must be the exact two-file Android runtime roster.'
+}
 function Assert-CollapsePackageInventory([string]$Text) {
     $errors=$null; $ast=[Management.Automation.Language.Parser]::ParseInput($Text,[ref]$null,[ref]$errors)
     Require ($errors.Count -eq 0) 'Package inventory script failed parsing.'
@@ -30,6 +35,14 @@ function Assert-CollapsePackageInventory([string]$Text) {
     Require ($commands -contains 'Copy-Horde162RuntimeAssets' -and @($commands | Where-Object { $_ -ceq 'Assert-Horde162Package' }).Count -ge 2) 'Package inventory must use closed staging and admission.'
     $parameters=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.CommandParameterAst]},$true) | ForEach-Object ParameterName)
     Require (@($parameters | Where-Object { $_ -ceq 'RequireHorde162World' }).Count -eq 1) 'Current package must request the new world contract switch.'
+}
+function Assert-RagTorchPackageInventory([string]$Text) {
+    $errors=$null; $ast=[Management.Automation.Language.Parser]::ParseInput($Text,[ref]$null,[ref]$errors)
+    Require ($errors.Count -eq 0) 'Package inventory script failed parsing.'
+    $strings=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.StringConstantExpressionAst]},$true) | ForEach-Object Value)
+    foreach ($name in @('assets/models/props/runtime/player-rag-torch/asset.manifest.json','assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb')) {
+        Require (@($strings | Where-Object { $_ -ceq $name }).Count -eq 2) 'Package inventory must require the player Rag torch pair in both platform archives.'
+    }
 }
 function Expect-Failure([scriptblock]$Action,[string]$Message) {
     $observed=''; try { & $Action | Out-Null } catch { $observed=$_.Exception.Message }
@@ -101,6 +114,9 @@ try {
     Assert-PropsGradleInventory $gradle; ++$script:checks
     Expect-Failure {Assert-PropsGradleInventory ($gradle.Replace('textures/props/runtime/base-color.android.ktx2','textures/props/runtime/*.android.ktx2'))} 'exact five-file Android runtime roster'
     Expect-Failure {Assert-PropsGradleInventory ($gradle+"`ninclude 'textures/props/runtime/base-color.windows.ktx2'`n")} 'exact five-file Android runtime roster'
+    Assert-RagTorchGradleInventory $gradle; ++$script:checks
+    Expect-Failure {Assert-RagTorchGradleInventory ($gradle.Replace("        include 'models/props/runtime/player-rag-torch/asset.manifest.json'",''))} 'exact two-file Android runtime roster'
+    Expect-Failure {Assert-RagTorchGradleInventory ($gradle+"`ninclude 'models/props/runtime/player-rag-torch/*.glb'`n")} 'exact two-file Android runtime roster'
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
         Assert-CollapsePackageInventory $text; ++$script:checks
@@ -108,6 +124,10 @@ try {
         Expect-Failure {Assert-CollapsePackageInventory ($text.Replace('Copy-Horde162RuntimeAssets','Copy-UnvalidatedWorld'))} 'closed staging and admission'
         Expect-Failure {Assert-CollapsePackageInventory ($text.Replace('-RequireHorde162World',''))} 'new world contract switch'
     }
+    $packageText=Get-Content (Join-Path $repo 'tools/package-alpha.ps1') -Raw
+    Assert-RagTorchPackageInventory $packageText; ++$script:checks
+    Expect-Failure {Assert-RagTorchPackageInventory ($packageText.Replace('assets/models/props/runtime/player-rag-torch/asset.manifest.json','assets/models/props/runtime/player-rag-torch/omitted.json'))} 'both platform archives'
+    Expect-Failure {Assert-RagTorchPackageInventory ($packageText.Replace('assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb','assets/models/props/runtime/player-rag-torch/omitted.glb'))} 'both platform archives'
     $null=Assert-Horde162Assets $repo
     ++$script:checks
     $heldContract=Join-Path $repo 'tools/test-held-item-package-contract.ps1'
@@ -128,7 +148,7 @@ try {
         Expect-Failure {& $heldContract -AndroidApkPath $heldArchive -RequireHorde162World} 'byte/hash mismatch'
     }
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
-    Require ($windows.Count -eq 18 -and $android.Count -eq 19) 'Closed runtime roster count changed.'
+    Require ($windows.Count -eq 20 -and $android.Count -eq 21) 'Closed runtime roster count changed.'
     Require ($windows -ccontains 'audio/pixabay/waterfall_loop.wav' -and $windows -cnotcontains 'audio/pixabay/waterfall_core_loop.wav') 'Windows must preserve accepted full waterfall only.'
     Require ($android -ccontains 'audio/pixabay/waterfall_core_loop.wav' -and $android -cnotcontains 'audio/pixabay/waterfall_loop.wav') 'Android must use admitted Core loop only.'
     ++$script:checks
@@ -161,6 +181,8 @@ try {
         @{Name='missing-core-manifest';Platform='Android';Omit='assets/audio/pixabay/waterfall-core.manifest.json'},
         @{Name='missing-collapse-glb';Platform='Android';Omit='assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb'},
         @{Name='missing-collapse-manifest';Platform='Windows';Omit='assets/models/world/runtime/collapsed-entry/asset.manifest.json'},
+        @{Name='missing-rag-torch-glb';Platform='Android';Omit='assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb'},
+        @{Name='missing-rag-torch-manifest';Platform='Windows';Omit='assets/models/props/runtime/player-rag-torch/asset.manifest.json'},
         @{Name='missing-props-array';Platform='Android';Omit='assets/textures/props/runtime/normal.android.ktx2'},
         @{Name='missing-props-manifest';Platform='Windows';Omit='assets/textures/props/runtime/asset.manifest.json'},
         @{Name='foreign-source';Platform='Windows';Extra='assets/textures/environment/source/foreign-original.png'},
@@ -170,6 +192,10 @@ try {
         @{Name='other-platform-env';Platform='Windows';Extra='assets/textures/environment/runtime/night-storm.android.ktx2'},
         @{Name='collapse-source';Platform='Android';Extra='assets/models/world/source/private.blend'},
         @{Name='collapse-foreign-runtime';Platform='Windows';Extra='assets/models/world/runtime/collapsed-entry/unapproved.glb'},
+        @{Name='rag-torch-processing-receipt';Platform='Windows';Extra='assets/models/props/source/rag-torch-v01/processing-receipt.json'},
+        @{Name='rag-torch-runtime-processing-receipt';Platform='Android';Extra='assets/models/props/runtime/player-rag-torch/processing-receipt.json'},
+        @{Name='rag-torch-authoring-png';Platform='Android';Extra='assets/textures/props/source/rag-torch-v01/base-color.png'},
+        @{Name='rag-torch-source-zip';Platform='Windows';Extra='assets/models/props/source/rag_torch_v01_blender_package.zip'},
         @{Name='props-source';Platform='Windows';Extra='assets/textures/props/source/private.png'},
         @{Name='props-extra-array';Platform='Android';Extra='assets/textures/props/runtime/unapproved.android.ktx2'},
         @{Name='props-wrong-platform';Platform='Windows';Extra='assets/textures/props/runtime/normal.android.ktx2'}
@@ -196,6 +222,8 @@ try {
         @{Name='corrupt-manifest';Platform='Windows';Path='assets/audio/pixabay/keeper-asset.manifest.json'},
         @{Name='corrupt-collapse-glb';Platform='Windows';Path='assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb'},
         @{Name='corrupt-collapse-manifest';Platform='Android';Path='assets/models/world/runtime/collapsed-entry/asset.manifest.json'},
+        @{Name='corrupt-rag-torch-glb';Platform='Windows';Path='assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb'},
+        @{Name='corrupt-rag-torch-manifest';Platform='Android';Path='assets/models/props/runtime/player-rag-torch/asset.manifest.json'},
         @{Name='corrupt-props-array';Platform='Android';Path='assets/textures/props/runtime/base-color.android.ktx2'},
         @{Name='corrupt-props-manifest';Platform='Windows';Path='assets/textures/props/runtime/asset.manifest.json'}
     )) {

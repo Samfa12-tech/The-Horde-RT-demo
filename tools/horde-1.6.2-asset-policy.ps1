@@ -15,14 +15,16 @@ function Get-Horde162AssetSpecification {
         [pscustomobject]@{ Path='textures/environment/runtime/night-storm.android.ktx2'; Bytes=80128; Sha256='f833b77867e7b3c01659f5e9ef38834e4a0e5b967cd077023157eb682feb7cec'; Platform='Android'; Kind='Ktx'; Format=166 },
         [pscustomobject]@{ Path='models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb'; Bytes=652980; Sha256='c67471b522c92f354d9a5880dea6e48b4f22b5095207841c35c95b5cfc75c4d4'; Platform='Both'; Kind='Glb' },
         [pscustomobject]@{ Path='models/world/runtime/collapsed-entry/asset.manifest.json'; Bytes=742; Sha256='952e1920fbc60646154d0424556c2935a18e7cf882866a9fe9f4f45ef38be623'; Platform='Both'; Kind='Json' },
-        [pscustomobject]@{ Path='textures/props/runtime/asset.manifest.json'; Bytes=10743; Sha256='71688b7feff3f71cede98f5ed6d76e8396067e77a1da37ea5c270311664b5600'; Platform='Both'; Kind='Json' },
-        [pscustomobject]@{ Path='textures/props/runtime/base-color.android.ktx2'; Bytes=7515920; Sha256='ddf9fc41fabb3913216fa06a22b9cc80907eea0a1c530f19b4191d32f648b9c8'; Platform='Android'; Kind='PropsKtx'; Format=166; Layers=12 },
-        [pscustomobject]@{ Path='textures/props/runtime/normal.android.ktx2'; Bytes=16778000; Sha256='7b6c4e34d4a6fcb8450c0a8b489a3355a53cf00741fb1703a8da1ba2e16fde12'; Platform='Android'; Kind='PropsKtx'; Format=157; Layers=12 },
-        [pscustomobject]@{ Path='textures/props/runtime/orm.android.ktx2'; Bytes=7515920; Sha256='a65968188c2da94d7df4946cff3057847f8f786f92b1d3c06cb5e44bf6683e8c'; Platform='Android'; Kind='PropsKtx'; Format=165; Layers=12 },
+        [pscustomobject]@{ Path='models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb'; Bytes=267672; Sha256='476cb05a8f11f1af917a0cfa29610cc03f23522478a366f6cf2cf49b906db74d'; Platform='Both'; Kind='Glb' },
+        [pscustomobject]@{ Path='models/props/runtime/player-rag-torch/asset.manifest.json'; Bytes=830; Sha256='5316b2072008da441024cda1153f725f5afcd7d366f3a5b89dece98ec74617aa'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='textures/props/runtime/asset.manifest.json'; Bytes=11560; Sha256='beb975d1c0f0348e84567a8d7bbb60a211941de08a9310a69980a85f4367bba8'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='textures/props/runtime/base-color.android.ktx2'; Bytes=8142208; Sha256='58c86b8156f33523e4949e572a5409626dd38c1b111d14831d71a15dc8776267'; Platform='Android'; Kind='PropsKtx'; Format=166; Layers=13 },
+        [pscustomobject]@{ Path='textures/props/runtime/normal.android.ktx2'; Bytes=18176128; Sha256='aaf2af4624e86fe0029d31dffe1835d566edb08a1e1780db4a8638904a5a1ecc'; Platform='Android'; Kind='PropsKtx'; Format=157; Layers=13 },
+        [pscustomobject]@{ Path='textures/props/runtime/orm.android.ktx2'; Bytes=8142208; Sha256='e9981f16657e53ec9219708526ad47c194d60c6ef20676741e59b88759d0bb87'; Platform='Android'; Kind='PropsKtx'; Format=165; Layers=13 },
         [pscustomobject]@{ Path='textures/props/runtime/emissive.android.ktx2'; Bytes=626752; Sha256='da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a'; Platform='Android'; Kind='PropsKtx'; Format=166; Layers=1 },
-        [pscustomobject]@{ Path='textures/props/runtime/base-color.windows.ktx2'; Bytes=67109352; Sha256='0ac3747f1c92a76fdbbb08320fabeb1af4eb03808655441141caae427f8f1204'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=12 },
-        [pscustomobject]@{ Path='textures/props/runtime/normal.windows.ktx2'; Bytes=67109352; Sha256='9d6b5c73c5fd7c20b1c40b3db5559f4efaad11169c191560aad63a249a198fa1'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=12 },
-        [pscustomobject]@{ Path='textures/props/runtime/orm.windows.ktx2'; Bytes=67109352; Sha256='fc78f0e2fab2412eb7022ed5c7d3a12584c6ce78520f8d7d7594de6c2d2d9876'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=12 },
+        [pscustomobject]@{ Path='textures/props/runtime/base-color.windows.ktx2'; Bytes=72701756; Sha256='39e89e86fe06e832f9a0eddffa0e702643a1d91f0679476fd1d05ce4977a12b0'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=13 },
+        [pscustomobject]@{ Path='textures/props/runtime/normal.windows.ktx2'; Bytes=72701756; Sha256='44efeb267234b79d4d0d3a574a366b309bdfea34ae102b5a45540f47c93ebf97'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=13 },
+        [pscustomobject]@{ Path='textures/props/runtime/orm.windows.ktx2'; Bytes=72701756; Sha256='ae7bdf275b3796f32d72eebf801fbde54fca41d6dcc647a7238c103de0ee7f5f'; Platform='Windows'; Kind='PropsKtx'; Format=37; Layers=13 },
         [pscustomobject]@{ Path='textures/props/runtime/emissive.windows.ktx2'; Bytes=5592908; Sha256='c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56'; Platform='Windows'; Kind='PropsKtx'; Format=43; Layers=1 }
     )
 }
@@ -157,7 +159,7 @@ function Get-Horde162RuntimeFiles {
 function Assert-Horde162StagedAssets {
     param([string]$RepositoryRoot, [string]$AssetRoot, [ValidateSet('Windows','Android')][string]$Platform)
     $expected=@(Get-Horde162RuntimeFiles $RepositoryRoot $Platform)
-    $observed=@(foreach($root in @('audio/pixabay','textures/environment','textures/props','models/world')) {
+    $observed=@(foreach($root in @('audio/pixabay','textures/environment','textures/props','models/world','models/props/runtime/player-rag-torch','models/props/source')) {
         $path=Join-Horde162Path $AssetRoot $root
         if (Test-Path -LiteralPath $path -PathType Container) {
             foreach($item in Get-ChildItem -LiteralPath $path -Recurse -Force) {
@@ -201,7 +203,7 @@ function Assert-Horde162Package {
             if ($entry.FullName.Contains('\') -or $entry.FullName.StartsWith('/', [StringComparison]::Ordinal) -or
                 $entry.FullName -match '(^|/)(\.|\.\.)(/|$)') { throw '1.6.2 package contains a noncanonical or traversing entry path.' }
         }
-        $entries=@($zip.Entries | Where-Object { $_.FullName -match '(?i)^assets/(audio/pixabay|textures/environment|textures/props|models/world)(/|$)' })
+        $entries=@($zip.Entries | Where-Object { $_.FullName -match '(?i)^assets/(audio/pixabay|textures/environment|textures/props|models/world|models/props/runtime/player-rag-torch|models/props/source)(/|$)' })
         # ZIP directory entries are metadata, distinguished by their trailing
         # slash, not by byte length (a zero-byte foreign file is still a file).
         foreach($entry in $entries) {

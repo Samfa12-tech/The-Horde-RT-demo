@@ -522,9 +522,9 @@ try {
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
     # Compatibility pins identify actual-incident mist with four admitted active fire records;
     # the independent fresh compiler check below still validates source identity.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq '5f1d94069d02507179da23b201c72ef6de7c273c680f2cbce6a12ec0cc35f80b') `
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq '6c210d6134bc84e67127d96dc27f3e74b9ca26bd2d6701c8ea25c939c2e690ff') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '8b7a7316d1c834ca8db62fd2f66d159bd3bd7c6a0bd13cde66944619b4004f4c') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq 'e9706c93c8fd0a7be148f9721331b7787e9256afc436f1e29dd040035b207cd1') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'

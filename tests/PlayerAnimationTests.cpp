@@ -591,14 +591,14 @@ int main()
     auto fullBodyMasks = remainderMasks.instanceMasks;
     fullBodyMasks[kPlayerWorldBodyInstanceIndex] |= 0x04u;
     auto worldTorchMasks = remainderMasks.instanceMasks;
-    worldTorchMasks[22u] = 0x01u;
     worldTorchMasks[23u] = 0x01u;
+    worldTorchMasks[24u] = 0x01u;
     if (!Require(HasDedicatedPlayerPrimaryOwnership(viewmodelMasks.instanceMasks, staticPlayerFlag) &&
                  HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, remainderPlayerFlags) &&
                  HasDedicatedPlayerPrimaryOwnership(worldTorchMasks, remainderPlayerFlags) &&
                  remainderMasks.instanceMasks.size() == kRtTlasInstanceCapacity &&
-                 remainderMasks.instanceMasks[22u] == 0u &&
                  remainderMasks.instanceMasks[23u] == 0u &&
+                 remainderMasks.instanceMasks[24u] == 0u &&
                  !HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, staticPlayerFlag) &&
                  !HasDedicatedPlayerPrimaryOwnership(viewmodelMasks.instanceMasks, remainderPlayerFlags) &&
                  !HasDedicatedPlayerPrimaryOwnership(remainderMasks.instanceMasks, 0u) &&

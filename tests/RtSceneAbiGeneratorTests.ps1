@@ -47,12 +47,12 @@ try {
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
     $capacityCpu = Get-Content -LiteralPath $portableCpuPath -Raw
-    if ($definition.capacities.instanceMetadata -ne 22 -or $definition.capacities.tlasInstances -ne 24 -or
-        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 24u;' -or
-        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 22u;' -or
+    if ($definition.capacities.instanceMetadata -ne 23 -or $definition.capacities.tlasInstances -ne 25 -or
+        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 25u;' -or
+        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 23u;' -or
         $capacityCpu -notmatch 'kRtActiveFireEmitterCapacity = 4u;' -or
         $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;') {
-        throw 'Generated owners must distinguish24 TLAS instances from22 metadata records while retaining four fire storage records.'
+        throw 'Generated owners must distinguish25 TLAS instances from23 metadata records while retaining four fire storage records.'
     }
     foreach ($case in @(
         @{ name = 'tlasInstances'; value = 21 },

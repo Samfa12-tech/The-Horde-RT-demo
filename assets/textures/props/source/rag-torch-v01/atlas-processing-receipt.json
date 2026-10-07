@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "asset": "rag-torch-player",
+  "status": "runtime atlas candidate; package/native/GPU/device/owner visual acceptance pending",
+  "atlasLayer": 12,
+  "resolution": 1024,
+  "mipLevels": 11,
+  "manifest": "assets/textures/props/runtime/asset.manifest.json",
+  "arrays": [
+    {
+      "file": "base-color.windows.ktx2",
+      "bytes": 72701756,
+      "sha256": "39e89e86fe06e832f9a0eddffa0e702643a1d91f0679476fd1d05ce4977a12b0"
+    },
+    {
+      "file": "normal.windows.ktx2",
+      "bytes": 72701756,
+      "sha256": "44efeb267234b79d4d0d3a574a366b309bdfea34ae102b5a45540f47c93ebf97"
+    },
+    {
+      "file": "orm.windows.ktx2",
+      "bytes": 72701756,
+      "sha256": "ae7bdf275b3796f32d72eebf801fbde54fca41d6dcc647a7238c103de0ee7f5f"
+    },
+    {
+      "file": "base-color.android.ktx2",
+      "bytes": 8142208,
+      "sha256": "58c86b8156f33523e4949e572a5409626dd38c1b111d14831d71a15dc8776267"
+    },
+    {
+      "file": "normal.android.ktx2",
+      "bytes": 18176128,
+      "sha256": "aaf2af4624e86fe0029d31dffe1835d566edb08a1e1780db4a8638904a5a1ecc"
+    },
+    {
+      "file": "orm.android.ktx2",
+      "bytes": 8142208,
+      "sha256": "e9981f16657e53ec9219708526ad47c194d60c6ef20676741e59b88759d0bb87"
+    }
+  ],
+  "preservation": {
+    "baselineLayers": 12,
+    "updatedLayers": 13,
+    "oldLayerMipPayloadsByteIdentical": true,
+    "validationReceipt": "assets/textures/props/runtime/rag-torch-append-receipt.json"
+  },
+  "encodedPayloadGrowthBytes": {
+    "windows": 16777212,
+    "android": 2650704
+  },
+  "beforeAfterPayloadBytes": {
+    "windows": {
+      "before": 206918948,
+      "after": 223696160
+    },
+    "android": {
+      "before": 32434736,
+      "after": 35085440
+    }
+  },
+  "disclosure": "Encoded KTX2/container and format-derived upload payload costs. Not measured GPU allocation, residency, frame time, or performance."
+}

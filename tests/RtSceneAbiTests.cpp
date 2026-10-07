@@ -209,12 +209,12 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 22u, "instance metadata preserves viewmodel20 and appends immutable collapse21");
-    Check(kRtTlasInstanceCapacity == 24u && kRtTlasInstanceCapacity == kRtInstanceMetadataCapacity + 2u,
-          "two world torch physical instances alias admitted metadata instead of expanding material slots");
+    Check(kRtInstanceMetadataCapacity == 23u, "instance metadata preserves viewmodel20/collapse21 and appends player torch22");
+    Check(kRtTlasInstanceCapacity == 25u && kRtTlasInstanceCapacity == kRtInstanceMetadataCapacity + 2u,
+          "player torch adds one metadata-backed slot while two world torch instances alias old torch metadata1");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
-    Check(kRtStaticAssetCapacity == 10u, "static asset capacity admits exactly one additional collapse asset");
+    Check(kRtStaticAssetCapacity == 11u, "static asset capacity admits the collapse and separate player torch assets");
     Check(kRtPrimitiveMetadataCapacity == 32u, "primitive capacity is 32");
     Check(kRtMaterialCapacity == 32u, "material capacity is 32");
     Check(kRtTextureLayerCapacity == 16u, "each PBR texture category has 16 layers");
@@ -307,7 +307,7 @@ void TestGenericRegistrationAndMeasurements()
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 128u &&
-               slot.Measurements().instanceMetadataBytes == 22u * 32u &&
+               slot.Measurements().instanceMetadataBytes == 23u * 32u &&
               slot.Measurements().primitiveMetadataBytes == 2u * 16u &&
               slot.Measurements().descriptorCount == 9u,
           "resource measurements use literal ABI sizes and descriptor count");

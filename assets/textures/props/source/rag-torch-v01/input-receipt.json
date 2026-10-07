@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "archivePath": "C:\\Users\\sam_s\\Downloads\\rag_torch_v01_blender_package.zip",
+  "archiveSha256": "0808734c9a2d664a2b4a80d9d7221dca11c9b79fa4cc868fcecf8b1cda026889",
+  "closedManifestVerifiedBeforeExtraction": true,
+  "sourceAuthoring": "Blender 4.3.2; original Python-created geometry and procedural raster texture maps; seed 319",
+  "originalProvenance": "Original assistant-authored mesh and textures for this user request. No blanket MIT or CC0 asset licence assigned; applicable user/service rights unchanged.",
+  "includedSourceFiles": [
+    {
+      "sourceFile": "rag_torch_basecolor.png",
+      "path": "assets/textures/props/source/rag-torch-v01/base-color.png",
+      "bytes": 1692832,
+      "sha256": "6a2175298335623e7a0b3d6b0e15c146e986b79396a1c4a8d30dbaecaa953cc1",
+      "originalBytes": 1692832,
+      "originalSha256": "6a2175298335623e7a0b3d6b0e15c146e986b79396a1c4a8d30dbaecaa953cc1",
+      "sourcePixelsPreserved": true
+    },
+    {
+      "sourceFile": "rag_torch_normal.png",
+      "path": "assets/textures/props/source/rag-torch-v01/normal.png",
+      "bytes": 1154127,
+      "sha256": "7a4a305b9396f0cc45b21663f12d964e340921615ce4a45bf2fd277581554b16",
+      "originalBytes": 1154127,
+      "originalSha256": "7a4a305b9396f0cc45b21663f12d964e340921615ce4a45bf2fd277581554b16",
+      "sourcePixelsPreserved": true
+    },
+    {
+      "sourceFile": "rag_torch_orm.png",
+      "path": "assets/textures/props/source/rag-torch-v01/orm.png",
+      "bytes": 1344491,
+      "sha256": "4127575d615a8b868f3b98b586bfc625cbc8ef6fecfbd6678e4b978076e26834",
+      "originalBytes": 1344491,
+      "originalSha256": "4127575d615a8b868f3b98b586bfc625cbc8ef6fecfbd6678e4b978076e26834",
+      "sourcePixelsPreserved": true
+    }
+  ],
+  "excludedSourceFiles": [
+    "rag_torch_v01.blend",
+    "rag_torch_v01.glb",
+    "preview renders",
+    "authoring scripts"
+  ]
+}

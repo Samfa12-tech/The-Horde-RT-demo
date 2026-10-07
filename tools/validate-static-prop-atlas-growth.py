@@ -54,8 +54,8 @@ def main():
     rows = []
     for name, fmt in FORMATS.items():
         emissive = name.startswith("emissive")
-        old, old_mips = texture(args.before / name, 1 if emissive else 10, fmt)
-        new, new_mips = texture(args.after / name, 1 if emissive else 12, fmt)
+        old, old_mips = texture(args.before / name, 1 if emissive else 12, fmt)
+        new, new_mips = texture(args.after / name, 1 if emissive else 13, fmt)
         require(old["dataFormatDescriptorSha256"] == new["dataFormatDescriptorSha256"], f"DFD metadata changed: {name}")
         if emissive:
             require(old["sha256"] == new["sha256"], f"emissive fallback changed: {name}")
@@ -66,10 +66,11 @@ def main():
                          mipPayloadGrowthBytes=new["mipPayloadBytes"] - old["mipPayloadBytes"],
                          containerGrowthBytes=new["bytes"] - old["bytes"]))
     manifest = json.loads((args.after / "asset.manifest.json").read_text(encoding="utf-8-sig"))
-    require(manifest["layerCounts"] == {"baseColor": 12, "normal": 12, "orm": 12, "emissive": 1}, "manifest layer counts differ")
-    require(manifest["layerOrder"][-2:] == ["collapsed-entry/Boulder01Rock", "collapsed-entry/MedievalWall02"], "new layer order differs")
+    require(manifest["layerCounts"] == {"baseColor": 13, "normal": 13, "orm": 13, "emissive": 1}, "manifest layer counts differ")
+    require(manifest["layerOrder"][-3:] == ["collapsed-entry/Boulder01Rock", "collapsed-entry/MedievalWall02",
+                                            "rag-torch-player/RagTorch_Atlas"], "new layer order differs")
     before_manifest = json.loads((args.before / "asset.manifest.json").read_text(encoding="utf-8-sig"))
-    require(manifest["layerOrder"][:10] == before_manifest["layerOrder"], "old manifest order changed")
+    require(manifest["layerOrder"][:12] == before_manifest["layerOrder"], "old manifest order changed")
     for row in rows:
         category, platform, _ = row["file"].split(".")
         category = {"base-color": "baseColor"}.get(category, category)
@@ -80,7 +81,7 @@ def main():
         targets[platform] = {key: sum(row[key] for row in group) for key in ("containerGrowthBytes", "mipPayloadGrowthBytes")}
         targets[platform]["beforeMipPayloadBytes"] = sum(row["before"]["mipPayloadBytes"] for row in group)
         targets[platform]["afterMipPayloadBytes"] = sum(row["after"]["mipPayloadBytes"] for row in group)
-    result = dict(schema=1, status="pass", beforeLayers=10, afterLayers=12, resolution=1024, mipLevels=11,
+    result = dict(schema=1, status="pass", beforeLayers=12, afterLayers=13, resolution=1024, mipLevels=11,
                   emissiveLayers=1, rows=rows, platformBudgets=targets,
                   disclosure="Actual encoded/container and format-derived upload payload bytes, not measured GPU allocation/residency/performance.")
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")

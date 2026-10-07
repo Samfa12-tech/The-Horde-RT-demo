@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "asset": "rag-torch-player-lod0",
+  "status": "runtime candidate; native/GPU/device and owner visual acceptance pending",
+  "source": {
+    "archive": "C:\\Users\\sam_s\\Downloads\\rag_torch_v01_blender_package.zip",
+    "archiveSha256": "0808734c9a2d664a2b4a80d9d7221dca11c9b79fa4cc868fcecf8b1cda026889",
+    "closedManifestVerifiedBeforeExtraction": true,
+    "originalBlend": {
+      "path": "rag_torch_v01.blend",
+      "bytes": 5078997,
+      "sha256": "cf2e22bdbff987c3c50381623811ff8a64305d08fa85a09c65af5d54e30d3f60",
+      "retainedOutsideRepository": true
+    },
+    "originalSourceGlb": {
+      "path": "rag_torch_v01.glb",
+      "bytes": 4372528,
+      "sha256": "c67de692afec55792f716e13b5e3bb26448e5fd861f89547b45578b94ebcb4d1",
+      "retainedOutsideRepository": true
+    },
+    "maps": [
+      {
+        "sourceFile": "rag_torch_basecolor.png",
+        "path": "assets/textures/props/source/rag-torch-v01/base-color.png",
+        "bytes": 1692832,
+        "sha256": "6a2175298335623e7a0b3d6b0e15c146e986b79396a1c4a8d30dbaecaa953cc1",
+        "originalBytes": 1692832,
+        "originalSha256": "6a2175298335623e7a0b3d6b0e15c146e986b79396a1c4a8d30dbaecaa953cc1",
+        "sourcePixelsPreserved": true
+      },
+      {
+        "sourceFile": "rag_torch_normal.png",
+        "path": "assets/textures/props/source/rag-torch-v01/normal.png",
+        "bytes": 1154127,
+        "sha256": "7a4a305b9396f0cc45b21663f12d964e340921615ce4a45bf2fd277581554b16",
+        "originalBytes": 1154127,
+        "originalSha256": "7a4a305b9396f0cc45b21663f12d964e340921615ce4a45bf2fd277581554b16",
+        "sourcePixelsPreserved": true
+      },
+      {
+        "sourceFile": "rag_torch_orm.png",
+        "path": "assets/textures/props/source/rag-torch-v01/orm.png",
+        "bytes": 1344491,
+        "sha256": "4127575d615a8b868f3b98b586bfc625cbc8ef6fecfbd6678e4b978076e26834",
+        "originalBytes": 1344491,
+        "originalSha256": "4127575d615a8b868f3b98b586bfc625cbc8ef6fecfbd6678e4b978076e26834",
+        "sourcePixelsPreserved": true
+      }
+    ],
+    "rights": "Original assistant-authored Blender geometry and procedural maps supplied for the user requested torch brief. No third party or paid input. No blanket MIT, CC0, Meshy or other licence is assigned; applicable user/service rights remain unchanged."
+  },
+  "processing": {
+    "tool": "Blender 5.2",
+    "mode": "headless import/export with --disable-autoexec",
+    "sourceRuntimeCandidate": "candidate-runtime/rag_torch_v01.runtime.glb",
+    "sourceRuntimeSha256": "476cb05a8f11f1af917a0cfa29610cc03f23522478a366f6cf2cf49b906db74d",
+    "actions": [
+      "Preserved authored geometry and node/socket transforms in +Y-up/+Z-forward frame.",
+      "Regenerated tangents during glTF export.",
+      "Reduced embedded preview images to 4x4 because runtime shading samples shared PBR texture arrays.",
+      "No decimation or flame geometry added."
+    ],
+    "runtime": {
+      "path": "assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb",
+      "bytes": 267672,
+      "sha256": "476cb05a8f11f1af917a0cfa29610cc03f23522478a366f6cf2cf49b906db74d",
+      "vertices": 4825,
+      "indices": 16356,
+      "triangles": 5452,
+      "primitives": 1,
+      "materials": 1,
+      "boundsMetres": [
+        [
+          -0.07235339283943176,
+          0.0,
+          -0.06495705246925354
+        ],
+        [
+          0.054719723761081696,
+          0.8500000238418579,
+          0.061411358416080475
+        ]
+      ],
+      "dimensionsMetres": [
+        0.12707310914993286,
+        0.8500000238418579,
+        0.12636840343475342
+      ],
+      "coordinateSystem": {
+        "up": "+Y",
+        "forward": "+Z"
+      },
+      "sockets": {
+        "Grip": [
+          0.010711723007261753,
+          0.23999999463558197,
+          -0.0020402451045811176
+        ],
+        "Flame": [
+          -0.003161360276862979,
+          0.8050000071525574,
+          -0.004621149972081184
+        ],
+        "Light": [
+          -0.005092165432870388,
+          0.7799999713897705,
+          0.021113701164722443
+        ]
+      },
+      "metallicFactor": 0.0,
+      "normalScale": 0.6,
+      "emissive": false,
+      "alphaMode": "OPAQUE"
+    },
+    "glbValidator": {
+      "tool": "Khronos glTF Validator",
+      "version": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0
+    },
+    "engineImporter": "pending",
+    "gpu": "not run",
+    "androidDevice": "not run",
+    "ownerVisualAcceptance": "pending"
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "status": "pass",
+  "beforeLayers": 12,
+  "afterLayers": 13,
+  "resolution": 1024,
+  "mipLevels": 11,
+  "emissiveLayers": 1,
+  "rows": [
+    {
+      "file": "base-color.windows.ktx2",
+      "before": {
+        "bytes": 67109352,
+        "sha256": "0ac3747f1c92a76fdbbb08320fabeb1af4eb03808655441141caae427f8f1204",
+        "mipPayloadBytes": 67108848,
+        "dataFormatDescriptorSha256": "5e3f9855edd200df22b2bba529fe82fd1a0cabe9add94883a316046880da996c"
+      },
+      "after": {
+        "bytes": 72701756,
+        "sha256": "39e89e86fe06e832f9a0eddffa0e702643a1d91f0679476fd1d05ce4977a12b0",
+        "mipPayloadBytes": 72701252,
+        "dataFormatDescriptorSha256": "5e3f9855edd200df22b2bba529fe82fd1a0cabe9add94883a316046880da996c"
+      },
+      "oldLayerMipPayloadsByteIdentical": true,
+      "mipPayloadGrowthBytes": 5592404,
+      "containerGrowthBytes": 5592404
+    },
+    {
+      "file": "normal.windows.ktx2",
+      "before": {
+        "bytes": 67109352,
+        "sha256": "9d6b5c73c5fd7c20b1c40b3db5559f4efaad11169c191560aad63a249a198fa1",
+        "mipPayloadBytes": 67108848,
+        "dataFormatDescriptorSha256": "736656e6f42b0d1860507f24668bcd234ca8b7eefec158e90a1c7d91c68bbe63"
+      },
+      "after": {
+        "bytes": 72701756,
+        "sha256": "44efeb267234b79d4d0d3a574a366b309bdfea34ae102b5a45540f47c93ebf97",
+        "mipPayloadBytes": 72701252,
+        "dataFormatDescriptorSha256": "736656e6f42b0d1860507f24668bcd234ca8b7eefec158e90a1c7d91c68bbe63"
+      },
+      "oldLayerMipPayloadsByteIdentical": true,
+      "mipPayloadGrowthBytes": 5592404,
+      "containerGrowthBytes": 5592404
+    },
+    {
+      "file": "orm.windows.ktx2",
+      "before": {
+        "bytes": 67109352,
+        "sha256": "fc78f0e2fab2412eb7022ed5c7d3a12584c6ce78520f8d7d7594de6c2d2d9876",
+        "mipPayloadBytes": 67108848,
+        "dataFormatDescriptorSha256": "736656e6f42b0d1860507f24668bcd234ca8b7eefec158e90a1c7d91c68bbe63"
+      },
+      "after": {
+        "bytes": 72701756,
+        "sha256": "ae7bdf275b3796f32d72eebf801fbde54fca41d6dcc647a7238c103de0ee7f5f",
+        "mipPayloadBytes": 72701252,
+        "dataFormatDescriptorSha256": "736656e6f42b0d1860507f24668bcd234ca8b7eefec158e90a1c7d91c68bbe63"
+      },
+      "oldLayerMipPayloadsByteIdentical": true,
+      "mipPayloadGrowthBytes": 5592404,
+      "containerGrowthBytes": 5592404
+    },
+    {
+      "file": "base-color.android.ktx2",
+      "before": {
+        "bytes": 7515920,
+        "sha256": "ddf9fc41fabb3913216fa06a22b9cc80907eea0a1c530f19b4191d32f648b9c8",
+        "mipPayloadBytes": 7515456,
+        "dataFormatDescriptorSha256": "a6aeeb679ed1d4203428a28449478f0afbca57d66953ef83220683968a315b4a"
+      },
+      "after": {
+        "bytes": 8142208,
+        "sha256": "58c86b8156f33523e4949e572a5409626dd38c1b111d14831d71a15dc8776267",
+        "mipPayloadBytes": 8141744,
+        "dataFormatDescriptorSha256": "a6aeeb679ed1d4203428a28449478f0afbca57d66953ef83220683968a315b4a"
+      },
+      "oldLayerMipPayloadsByteIdentical": true,
+      "mipPayloadGrowthBytes": 626288,
+      "containerGrowthBytes": 626288
+    },
+    {
+      "file": "normal.android.ktx2",
+      "before": {
+        "bytes": 16778000,
+        "sha256": "7b6c4e34d4a6fcb8450c0a8b489a3355a53cf00741fb1703a8da1ba2e16fde12",
+        "mipPayloadBytes": 16777536,
+        "dataFormatDescriptorSha256": "a1724d509a56ab9d351af95c84a58455479ba76dfdec9fe05f62cff48fa988ab"
+      },
+      "after": {
+        "bytes": 18176128,
+        "sha256": "aaf2af4624e86fe0029d31dffe1835d566edb08a1e1780db4a8638904a5a1ecc",
+        "mipPayloadBytes": 18175664,
+        "dataFormatDescriptorSha256": "a1724d509a56ab9d351af95c84a58455479ba76dfdec9fe05f62cff48fa988ab"
+      },
+      "oldLayerMipPayloadsByteIdentical": true,
+      "mipPayloadGrowthBytes": 1398128,
+      "containerGrowthBytes": 1398128
+    },
+    {
+      "file": "orm.android.ktx2",
+      "before": {
+        "bytes": 7515920,
+        "sha256": "a65968188c2da94d7df4946cff3057847f8f786f92b1d3c06cb5e44bf6683e8c",
+        "mipPayloadBytes": 7515456,
+        "dataFormatDescriptorSha256": "c64a184830593c5bfa38b946bae83d604c5a3658633c19eae84b3c89d24b8d00"
+      },
+      "after": {
+        "bytes": 8142208,
+        "sha256": "e9981f16657e53ec9219708526ad47c194d60c6ef20676741e59b88759d0bb87",
+        "mipPayloadBytes": 8141744,
+        "dataFormatDescriptorSha256": "c64a184830593c5bfa38b946bae83d604c5a3658633c19eae84b3c89d24b8d00"
+      },
+      "oldLayerMipPayloadsByteIdentical": true,
+      "mipPayloadGrowthBytes": 626288,
+      "containerGrowthBytes": 626288
+    },
+    {
+      "file": "emissive.windows.ktx2",
+      "before": {
+        "bytes": 5592908,
+        "sha256": "c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56",
+        "mipPayloadBytes": 5592404,
+        "dataFormatDescriptorSha256": "5e3f9855edd200df22b2bba529fe82fd1a0cabe9add94883a316046880da996c"
+      },
+      "after": {
+        "bytes": 5592908,
+        "sha256": "c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56",
+        "mipPayloadBytes": 5592404,
+        "dataFormatDescriptorSha256": "5e3f9855edd200df22b2bba529fe82fd1a0cabe9add94883a316046880da996c"
+      },
+      "oldLayerMipPayloadsByteIdentical": true,
+      "mipPayloadGrowthBytes": 0,
+      "containerGrowthBytes": 0
+    },
+    {
+      "file": "emissive.android.ktx2",
+      "before": {
+        "bytes": 626752,
+        "sha256": "da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a",
+        "mipPayloadBytes": 626288,
+        "dataFormatDescriptorSha256": "a6aeeb679ed1d4203428a28449478f0afbca57d66953ef83220683968a315b4a"
+      },
+      "after": {
+        "bytes": 626752,
+        "sha256": "da5ee0baa4e6b84280a1b9ae077954c4658a4e7fff1da03212d220d282f9542a",
+        "mipPayloadBytes": 626288,
+        "dataFormatDescriptorSha256": "a6aeeb679ed1d4203428a28449478f0afbca57d66953ef83220683968a315b4a"
+      },
+      "oldLayerMipPayloadsByteIdentical": true,
+      "mipPayloadGrowthBytes": 0,
+      "containerGrowthBytes": 0
+    }
+  ],
+  "platformBudgets": {
+    "windows": {
+      "containerGrowthBytes": 16777212,
+      "mipPayloadGrowthBytes": 16777212,
+      "beforeMipPayloadBytes": 206918948,
+      "afterMipPayloadBytes": 223696160
+    },
+    "android": {
+      "containerGrowthBytes": 2650704,
+      "mipPayloadGrowthBytes": 2650704,
+      "beforeMipPayloadBytes": 32434736,
+      "afterMipPayloadBytes": 35085440
+    }
+  },
+  "disclosure": "Actual encoded/container and format-derived upload payload bytes, not measured GPU allocation/residency/performance."
+}

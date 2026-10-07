@@ -156,6 +156,7 @@ public:
     // Maximum including the optional development viewmodel. Live reports count owners.
     static constexpr std::uint32_t kBlasCount = 19u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
+    static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kTlasInstanceCount = kRtTlasInstanceCapacity;
     static constexpr std::uint32_t kKeeperTorchFirstTlasInstance = kRtInstanceMetadataCapacity;
@@ -804,6 +805,7 @@ private:
     horde::scene::assets::StaticMeshAsset developmentStaticAsset_;
     horde::scene::assets::StaticMeshAsset collapseStaticAsset_;
     horde::scene::assets::StaticMeshAsset productionTorchAsset_;
+    horde::scene::assets::StaticMeshAsset playerTorchAsset_;
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
     horde::scene::assets::StaticMeshAsset viewmodelAsset_;
     horde::scene::SkinnedMeshAsset viewmodelSkin_;

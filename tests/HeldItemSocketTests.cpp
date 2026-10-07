@@ -163,6 +163,20 @@ bool LoadProductionHeldAssets(horde::scene::assets::StaticMeshAsset& sword,
                torchManifest, torch, diagnostic);
 }
 
+bool LoadPlayerRagTorch(horde::scene::assets::StaticMeshAsset& torch,
+                        std::string& diagnostic)
+{
+    const std::filesystem::path directory =
+        std::filesystem::path(HORDE_RT_SOURCE_DIR) /
+        "assets/models/props/runtime/player-rag-torch";
+    horde::scene::assets::AssetManifest manifest;
+    return horde::scene::assets::AssetManifest::Load(
+               directory / "asset.manifest.json", manifest, diagnostic) &&
+           horde::scene::assets::StaticMeshAsset::Load(
+               directory / "rag-torch-player-lod0.runtime.glb",
+               manifest, torch, diagnostic);
+}
+
 void TestSocketLookupIsNamedAndOrderIndependent()
 {
     const std::vector<horde::scene::assets::StaticSocket> sockets{
@@ -239,13 +253,12 @@ void TestWallRetractionMovesHandAndAttachedItemTogether()
 
 void TestRealFixedTickTorchDetachIsIndependentlyTransformContinuous()
 {
-    horde::scene::assets::StaticMeshAsset sword;
     horde::scene::assets::StaticMeshAsset torchAsset;
     std::string diagnostic;
-    Check(LoadProductionHeldAssets(sword, torchAsset, diagnostic),
-          "production held assets must load for the fixed-tick detach contract");
+    Check(LoadPlayerRagTorch(torchAsset, diagnostic),
+          "player Rag torch must load for the fixed-tick detach contract");
     const auto* grip = horde::gameplay::items::FindHeldItemSocket(torchAsset.sockets, "Grip");
-    Check(grip != nullptr, "production torch Grip must exist for detach continuity");
+    Check(grip != nullptr, "player Rag torch Grip must exist for detach continuity");
     if (grip == nullptr) return;
 
     horde::gameplay::simulation::GameSimulation simulation;
@@ -297,11 +310,10 @@ void TestRealFixedTickTorchDetachIsIndependentlyTransformContinuous()
 
 void TestSharedFixedStepOwnsItemsKinematicsAndSocketLight()
 {
-    horde::scene::assets::StaticMeshAsset swordAsset;
     horde::scene::assets::StaticMeshAsset torchAsset;
     std::string diagnostic;
-    Check(LoadProductionHeldAssets(swordAsset, torchAsset, diagnostic),
-          "production held assets must load for shared ownership checks");
+    Check(LoadPlayerRagTorch(torchAsset, diagnostic),
+          "player Rag torch must load for shared ownership checks");
     const auto* flame = horde::gameplay::items::FindHeldItemSocket(torchAsset.sockets, "Flame");
     const auto* light = horde::gameplay::items::FindHeldItemSocket(torchAsset.sockets, "Light");
     Check(flame != nullptr && light != nullptr,
@@ -829,7 +841,47 @@ void TestProductionSocketsMatchSharedFixedStepContracts()
                             horde::gameplay::items::OriginalTorchFlameSocketTransform()) &&
               TransformNear(light->world,
                             horde::gameplay::items::OriginalTorchLightSocketTransform()),
-          "actual GLB Grip/Flame/Light transforms must exactly match shared fixed-step contracts");
+          "legacy Keeper torch GLB must retain its direct Grip/Flame/Light socket contracts");
+}
+
+void TestPlayerRagTorchSocketsDriveFixedStepAttachmentAndLight()
+{
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    const auto ragDirectory = root / "assets/models/props/runtime/player-rag-torch";
+    horde::scene::assets::AssetManifest manifest;
+    horde::scene::assets::StaticMeshAsset ragTorch;
+    std::string diagnostic;
+    const bool loaded = horde::scene::assets::AssetManifest::Load(
+                            ragDirectory / "asset.manifest.json", manifest, diagnostic) &&
+                        horde::scene::assets::StaticMeshAsset::Load(
+                            ragDirectory / "rag-torch-player-lod0.runtime.glb",
+                            manifest, ragTorch, diagnostic);
+    Check(loaded, "player Rag torch must load before fixed-step socket verification");
+    if (!loaded) return;
+
+    const auto* grip = horde::gameplay::items::FindHeldItemSocket(ragTorch.sockets, "Grip");
+    const auto* flame = horde::gameplay::items::FindHeldItemSocket(ragTorch.sockets, "Flame");
+    const auto* light = horde::gameplay::items::FindHeldItemSocket(ragTorch.sockets, "Light");
+    Check(grip != nullptr && flame != nullptr && light != nullptr,
+          "player Rag torch must retain its authored Grip/Flame/Light socket names");
+    if (grip == nullptr || flame == nullptr || light == nullptr) return;
+
+    auto items = horde::gameplay::items::MakeDefaultHeldItemStates();
+    horde::gameplay::items::HeldItemFixedStepInput input;
+    horde::gameplay::items::HeldItemFixedStepState state;
+    Check(horde::gameplay::items::ResolveHeldItemsFixedStep(items, input, 1u, state, diagnostic),
+          "fixed-step player Rag torch attachment must resolve");
+    Check(TransformNear(
+              horde::gameplay::items::MultiplyHeldItemTransforms(items[0].worldFromItem,
+                                                                  grip->world),
+              state.worldFromLeftHand) &&
+              TransformNear(state.light.worldFromFlame,
+                            horde::gameplay::items::MultiplyHeldItemTransforms(
+                                items[0].worldFromItem, flame->world)) &&
+              TransformNear(state.light.worldFromLight,
+                            horde::gameplay::items::MultiplyHeldItemTransforms(
+                                items[0].worldFromItem, light->world)),
+          "player hand attachment and engine flame/light transforms must use the Rag asset sockets");
 }
 
 void TestProductionTorchFitsSharedClearanceEnvelope()
@@ -926,6 +978,7 @@ int main()
     TestProductionTorchAssetMeetsGenericSocketAndPbrBudget();
     TestProductionAssetsShareOneGenericStaticSlot();
     TestProductionSocketsMatchSharedFixedStepContracts();
+    TestPlayerRagTorchSocketsDriveFixedStepAttachmentAndLight();
     TestProductionTorchFitsSharedClearanceEnvelope();
     if (failures == 0)
     {

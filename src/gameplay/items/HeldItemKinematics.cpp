@@ -18,6 +18,35 @@ constexpr float kSwordRestForwardRadians = 0.14f;
 // the grip end-on and collapses its four fingers into the reported fist blob.
 constexpr float kLeftGripRollRadians = 0.0f;
 
+// The player-held Rag prop has its own authored sockets. Keeper flank torches
+// and the reward lantern continue to use the original torch contracts.
+HeldItemTransform PlayerRagTorchGripSocketTransform()
+{
+    HeldItemTransform result = IdentityHeldItemTransform();
+    result[12] = 0.010711723f;
+    result[13] = 0.24f;
+    result[14] = -0.002040245f;
+    return result;
+}
+
+HeldItemTransform PlayerRagTorchFlameSocketTransform()
+{
+    HeldItemTransform result = IdentityHeldItemTransform();
+    result[12] = -0.00316136f;
+    result[13] = 0.805f;
+    result[14] = -0.00462115f;
+    return result;
+}
+
+HeldItemTransform PlayerRagTorchLightSocketTransform()
+{
+    HeldItemTransform result = IdentityHeldItemTransform();
+    result[12] = -0.005092165f;
+    result[13] = 0.78f;
+    result[14] = 0.021113701f;
+    return result;
+}
+
 float DotColumn(const HeldItemTransform& transform,
                 const std::size_t leftColumn,
                 const std::size_t rightColumn)
@@ -804,7 +833,7 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
     state.worldFromLeftHand = worldFromLeftHand;
     HeldItemTransform heldWorldFromTorch{};
     if (!ComposeWorldFromItem(worldFromLeftHand,
-                              OriginalTorchGripSocketTransform(),
+                              PlayerRagTorchGripSocketTransform(),
                               heldWorldFromTorch,
                               diagnostic))
     {
@@ -887,8 +916,8 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
                          tick, worldFromSword);
 
     return ComposeHeldLightState(items[0].worldFromItem,
-                                 OriginalTorchFlameSocketTransform(),
-                                 OriginalTorchLightSocketTransform(),
+                                 PlayerRagTorchFlameSocketTransform(),
+                                 PlayerRagTorchLightSocketTransform(),
                                  input.torchFailure.flameStrength,
                                  state.light,
                                  diagnostic);
