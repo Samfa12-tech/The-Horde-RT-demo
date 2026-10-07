@@ -104,7 +104,7 @@ struct HeldItemKinematicsState
     // the animated Hips mount and the solved hand Grip.
     float swordStowBlend = 0.0f;
     // The same fixed-step transition releases/reacquires the right hand Grip;
-    // zero returns to the imported animated hand pose, one solves to the item.
+    // zero returns to the shared empty-hand carry, one follows the item Grip.
     float swordHandGripBlend = 1.0f;
 };
 

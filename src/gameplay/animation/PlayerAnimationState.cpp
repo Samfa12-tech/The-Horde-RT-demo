@@ -150,7 +150,10 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
     snapshot_.rightIk.gripX = swordGrip.edgeDirection;
     snapshot_.rightIk.gripY = swordGrip.bladeAxis;
     snapshot_.rightIk.gripZ = swordGrip.flatNormal;
-    snapshot_.rightIk.poseWeight = snapshot_.swordHandGripBlend;
+    // Releasing the sword changes the hand's target, not ownership of the arm.
+    // Keep the shared empty-hand carry visible instead of dropping back to the
+    // imported clip's out-of-view arm rest.
+    snapshot_.rightIk.poseWeight = 1.0f;
 }
 
 void PlayerAnimationState::Reset()

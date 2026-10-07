@@ -624,3 +624,39 @@ while sheathed and parry hilt/hand interference with the torch; the blade itself
 is not their current suspected intersection. They permit a small parry-only
 torch move if needed, with portrait comfort emphasized. These visual findings
 remain open; no owner sequence approval is inferred from harness completion.
+
+### Sheathed right-arm regression and source fix
+
+The imported arm remains in the mesh. A new actual-rig regression at the
+waterfall inspection stance reproduces its out-of-view released Grip:
+view-local (0.426668, -0.368569, 0.233188) metres, outside the narrow phone
+frustum. Releasing the sword previously reduced right-arm IK weight to zero,
+so the clip's rest pose controlled the hand.
+
+The shared animation now retains right-arm IK, and the renderer blends the
+hand target between the existing free carry and the animated mounted item Grip.
+The sword's BodyStow/HandSocket ownership, fixed-tick attachment edge, combat
+rules and ordinary torch carry remain unchanged. World body and dedicated
+primary arms consume the same solved pose. The fixed regression measures
+(0.18, -0.339998, 0.59999) metres in view, with the sword still mounted and
+released. Existing full draw/sheath, actual sheath/body/floor clearance and
+15 mm Grip assertions remain in force; their CPU reconstruction now consumes
+the same arm-target blend as the renderer.
+
+Affected local checks pass: player animation, item transition and socket,
+actual skinned character, arm reference, semantic fixtures and viewmodel
+admission/pose fixtures (eight unique checks). The initial socket fixture
+failure is retained: it still overwrote the released arm with the mounted
+item target; updating that reconstruction restores the existing release and
+clearance assertions without weakening them. Windows Debug builds. This is
+source/CPU evidence; a new sealed package and physical presentation/owner
+review are pending. The owner removes the phone again while source work
+continues; no device installs, tests or wait loops will run while absent.
+
+Parry hilt/hand clearance remains a separate open finding. The first temporary
+13.32 mm prop-distance result used a +0.28 look pitch rather than the captured
+-0.04 pitch. The corrected pitch gives contact-scale unsigned prop distance,
+which is not a signed mesh-intersection proof. The initial grip-point follow-up
+also inverted the item Grip socket incorrectly. Both diagnostic mistakes are
+excluded from acceptance; the corrected bounded probe and actual-IK candidate
+will determine the adjustment. No parry timing/window changes follow.

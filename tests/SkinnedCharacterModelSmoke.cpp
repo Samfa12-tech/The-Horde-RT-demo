@@ -20,6 +20,7 @@
 #include <limits>
 #include <string>
 #include <string_view>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -219,6 +220,34 @@ TestRigFrame BuildRigFrame(
     result.animation.rightIk.gripX = viewVectorToPlayer(source.playerAnimation.rightIk.gripX);
     result.animation.rightIk.gripY = viewVectorToPlayer(source.playerAnimation.rightIk.gripY);
     result.animation.rightIk.gripZ = viewVectorToPlayer(source.playerAnimation.rightIk.gripZ);
+    if (source.playerAnimation.swordStowBlend > 0.0f)
+    {
+        HeldItemTransform hips{};
+        std::string diagnostic;
+        if (!playerSlot.AnimatedHipsWorldTransform(source.playerAnimation,
+                result.modelBasis, result.playerRootWorld, hips, diagnostic))
+            throw std::runtime_error(diagnostic);
+        const auto stow = horde::gameplay::items::MultiplyHeldItemTransforms(
+            hips, horde::gameplay::items::SwordBodyStowFromHips());
+        const auto item = horde::gameplay::items::BlendHeldItemTransformsAtGrip(
+            stow, source.heldItems[1].worldFromItem,
+            horde::gameplay::items::SwordGripSocketTransform(),
+            1.0f - source.playerAnimation.swordStowBlend);
+        const auto worldGrip = horde::gameplay::items::MultiplyHeldItemTransforms(
+            item, horde::gameplay::items::SwordGripSocketTransform());
+        HeldItemTransform modelGrip = horde::gameplay::items::IdentityHeldItemTransform();
+        const auto x = horde::vulkan::raytracing::WorldVectorToPlayerModel(result.modelBasis, {{worldGrip[0],worldGrip[1],worldGrip[2]}});
+        const auto y = horde::vulkan::raytracing::WorldVectorToPlayerModel(result.modelBasis, {{worldGrip[4],worldGrip[5],worldGrip[6]}});
+        const auto z = horde::vulkan::raytracing::WorldVectorToPlayerModel(result.modelBasis, {{worldGrip[8],worldGrip[9],worldGrip[10]}});
+        const auto point = worldPointToPlayer({{worldGrip[12],worldGrip[13],worldGrip[14]}});
+        for (std::size_t axis=0; axis<3; ++axis)
+        {
+            modelGrip[axis]=x[axis]; modelGrip[4+axis]=y[axis];
+            modelGrip[8+axis]=z[axis]; modelGrip[12+axis]=point[axis];
+        }
+        result.animation.rightIk = horde::vulkan::raytracing::BlendPlayerArmGripTarget(
+            result.animation.rightIk, modelGrip, source.playerAnimation.swordHandGripBlend);
+    }
     return result;
 }
 
@@ -1420,6 +1449,42 @@ int main(int argc, char** argv)
                  viewSkin.LoadClips(viewPath.string(), PlayerLocomotionClipSet(), diagnostic) &&
                  viewSkin.ValidateStaticVertexLayout(viewStatic, diagnostic),
                  "camera metrics must use the admitted dedicated viewmodel streams")) return 1;
+    // A stowed sword must release the item, not the primary right arm.
+    // Check the actual imported rig socket in the narrow portrait frustum.
+    auto stowedConfig = productionConfig;
+    stowedConfig.swordStartsStowed = true;
+    stowedConfig.playerStartX = 0.495964f;
+    stowedConfig.playerStartZ = -15.143019f;
+    stowedConfig.playerStartYawRadians = -1.561293f;
+    stowedConfig.playerStartPitchRadians = -0.04f;
+    horde::gameplay::simulation::GameSimulation stowedSimulation(stowedConfig);
+    const auto& stowedSnapshot = stowedSimulation.Snapshot();
+    horde::vulkan::raytracing::PlayerRenderSlot stowedSlot;
+    if (!Require(stowedSlot.LoadAsset(playerPath.string(), diagnostic),
+                 "sheathed-hand fixture must load the real rig")) return 1;
+    const auto stowedRig = BuildRigFrame(stowedSnapshot, leftArmBase, rightArmBase, stowedSlot);
+    bool stowedUpdated = false;
+    if (!Require(stowedSlot.PreparePose(stowedRig.animation, stowedSnapshot.tickIndex,
+                     horde::vulkan::raytracing::PlayerCpuSkinCadence::Hz60,
+                     stowedUpdated, diagnostic), "sheathed-hand fixture must solve the real rig")) return 1;
+    const auto stowedGrip = RigidWorldBoneTransform(stowedSlot.BoneSockets().rightGrip, stowedRig);
+    const Vec3 stowedForward = Normalise({{std::sin(stowedSnapshot.playerYawRadians),
+        -0.05f + stowedSnapshot.playerPitchRadians, -std::cos(stowedSnapshot.playerYawRadians)}});
+    const Vec3 stowedRight = Normalise(Cross(stowedForward, {{0, 1, 0}}));
+    const Vec3 stowedUp = Normalise(Cross(stowedRight, stowedForward));
+    const Vec3 gripFromEye{{stowedGrip[12] - stowedSnapshot.playerX,
+        stowedGrip[13] - horde::gameplay::kShowcaseEyeWorldY,
+        stowedGrip[14] - stowedSnapshot.playerZ}};
+    const Vec3 stowedGripInView{{Dot(gripFromEye, stowedRight), Dot(gripFromEye, stowedUp), Dot(gripFromEye, stowedForward)}};
+    std::cout << "sheathed actual right Grip in view=" << stowedGripInView[0] << ','
+              << stowedGripInView[1] << ',' << stowedGripInView[2] << '\n';
+    if (!Require(stowedSnapshot.heldItems[1].parentMode == horde::gameplay::items::HeldItemParentMode::BodyStow &&
+                 stowedSnapshot.heldItems[1].visualGripBlend == 0.0f &&
+                 stowedGripInView[2] > 0.15f &&
+                 std::abs(stowedGripInView[0]) < stowedGripInView[2] * (720.0f / 1490.0f) / 1.22f &&
+                 std::abs(stowedGripInView[1]) < stowedGripInView[2] / 1.22f,
+                 "releasing the body-stowed sword must retain an empty right hand inside the portrait view")) return 1;
+
     const auto measurePlayerWithSlot = [&] (
         horde::vulkan::raytracing::PlayerRenderSlot& slot,
         const auto& snapshot,

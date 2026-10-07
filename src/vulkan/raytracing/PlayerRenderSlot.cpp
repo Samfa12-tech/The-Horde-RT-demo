@@ -710,6 +710,23 @@ bool PlayerRenderSlot::ResolveHeldItemVisuals(
     return true;
 }
 
+horde::gameplay::animation::PlayerArmIkTarget BlendPlayerArmGripTarget(
+    const horde::gameplay::animation::PlayerArmIkTarget& freeCarry,
+    const HeldItemTransform& itemGrip,
+    const float gripBlend)
+{
+    auto result = freeCarry;
+    const auto freeGrip = TransformFromAxes(freeCarry.gripX, freeCarry.gripY,
+                                           freeCarry.gripZ, freeCarry.target);
+    const auto grip = horde::gameplay::items::BlendHeldItemTransforms(
+        freeGrip, itemGrip, gripBlend);
+    result.target = {{grip[12], grip[13], grip[14]}};
+    result.gripX = {{grip[0], grip[1], grip[2]}};
+    result.gripY = {{grip[4], grip[5], grip[6]}};
+    result.gripZ = {{grip[8], grip[9], grip[10]}};
+    return result;
+}
+
 bool PlayerRenderSlot::PreparePose(
     const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
     const std::uint64_t tickIndex,
@@ -811,11 +828,9 @@ bool PlayerRenderSlot::PreparePose(
     };
     leftSocketErrorMetres_ = socketError(sockets_.leftGrip, animation.leftIk);
     rightSocketErrorMetres_ = socketError(sockets_.rightGrip, animation.rightIk);
-    // During the first half of Draw, the hand is still reaching toward the
-    // body-mounted Grip; during the last half of Sheath it is released. In
-    // those phases the palm is intentionally between its authored pose and
-    // the item Grip. The strict socket contract applies once the hand fully
-    // owns the item, while the left-hand/two-handed grip remains strict.
+    // The right arm stays solved while its target moves between empty carry
+    // and the item Grip. Partial diagnostic IK weights still permit an
+    // intentionally unsolved pose; production targets keep the strict bound.
     const bool rightGripFullyEngaged = animation.rightIk.poseWeight >= 0.999f;
     if (leftSocketErrorMetres_ > kPlayerGripSocketToleranceMetres ||
         (rightGripFullyEngaged &&

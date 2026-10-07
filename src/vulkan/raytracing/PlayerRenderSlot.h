@@ -135,6 +135,13 @@ bool ResolvePlayerHeldItemVisuals(
     horde::gameplay::items::HeldItemStates& renderItems,
     std::string& diagnostic);
 
+// Blend a solved arm's free carry toward an item Grip in the same coordinate
+// frame. Item attachment remains separate; releasing a grip never releases IK.
+horde::gameplay::animation::PlayerArmIkTarget BlendPlayerArmGripTarget(
+    const horde::gameplay::animation::PlayerArmIkTarget& freeCarry,
+    const horde::gameplay::items::HeldItemTransform& itemGrip,
+    float gripBlend);
+
 struct PlayerGripAgreement
 {
     float positionErrorMetres = 0.0f;

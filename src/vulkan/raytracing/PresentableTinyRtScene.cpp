@@ -6143,8 +6143,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         rigAnimation.rightIk.gripX = viewVectorToPlayer(frame.playerAnimation.rightIk.gripX);
         rigAnimation.rightIk.gripY = viewVectorToPlayer(frame.playerAnimation.rightIk.gripY);
         rigAnimation.rightIk.gripZ = viewVectorToPlayer(frame.playerAnimation.rightIk.gripZ);
-        rigAnimation.rightIk.poseWeight =
-            std::clamp(frame.playerAnimation.swordHandGripBlend, 0.0f, 1.0f);
         if (frame.playerAnimation.swordStowBlend > 0.0f)
         {
             const auto expectedWorldFromItem =
@@ -6156,21 +6154,33 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 horde::gameplay::items::MultiplyHeldItemTransforms(
                     expectedWorldFromItem,
                     horde::gameplay::items::SwordGripSocketTransform());
-            rigAnimation.rightIk.target = worldPointToPlayer(
+            auto itemArm = rigAnimation.rightIk;
+            itemArm.target = worldPointToPlayer(
                 {{expectedWorldFromGrip[12], expectedWorldFromGrip[13],
                   expectedWorldFromGrip[14]}});
             const auto worldAxisToPlayer = [&playerModelBasis](const Vec3& axis) {
                 return WorldVectorToPlayerModel(playerModelBasis, axis);
             };
-            rigAnimation.rightIk.gripX = worldAxisToPlayer(
+            itemArm.gripX = worldAxisToPlayer(
                 {{expectedWorldFromGrip[0], expectedWorldFromGrip[1],
                   expectedWorldFromGrip[2]}});
-            rigAnimation.rightIk.gripY = worldAxisToPlayer(
+            itemArm.gripY = worldAxisToPlayer(
                 {{expectedWorldFromGrip[4], expectedWorldFromGrip[5],
                   expectedWorldFromGrip[6]}});
-            rigAnimation.rightIk.gripZ = worldAxisToPlayer(
+            itemArm.gripZ = worldAxisToPlayer(
                 {{expectedWorldFromGrip[8], expectedWorldFromGrip[9],
                   expectedWorldFromGrip[10]}});
+            horde::gameplay::items::HeldItemTransform itemGrip =
+                horde::gameplay::items::IdentityHeldItemTransform();
+            for (std::size_t axis = 0u; axis < 3u; ++axis)
+            {
+                itemGrip[axis] = itemArm.gripX[axis];
+                itemGrip[4u + axis] = itemArm.gripY[axis];
+                itemGrip[8u + axis] = itemArm.gripZ[axis];
+                itemGrip[12u + axis] = itemArm.target[axis];
+            }
+            rigAnimation.rightIk = BlendPlayerArmGripTarget(
+                rigAnimation.rightIk, itemGrip, frame.playerAnimation.swordHandGripBlend);
         }
         if (!playerRenderSlot_.PreparePose(rigAnimation, frame.tickIndex,
                                            playerCpuSkinCadence_, updateSkinnedPlayer,

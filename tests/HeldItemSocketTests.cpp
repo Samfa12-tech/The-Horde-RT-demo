@@ -3697,6 +3697,11 @@ bool ResolveProductionSwordStowPose(
     const auto expectedWorldFromGrip = MultiplyHeldItemTransforms(
         worldFromDesiredItem, SwordGripSocketTransform());
     worldFromDesiredGrip = expectedWorldFromGrip;
+    auto freeArm = animation.rightIk;
+    freeArm.target = pointToModel(freeArm.target);
+    freeArm.gripX = vectorToModel(freeArm.gripX);
+    freeArm.gripY = vectorToModel(freeArm.gripY);
+    freeArm.gripZ = vectorToModel(freeArm.gripZ);
     animation.rightIk.target = WorldVectorToPlayerModel(basis, {{
         expectedWorldFromGrip[12] - root[0],
         expectedWorldFromGrip[13] - root[1],
@@ -3710,6 +3715,15 @@ bool ResolveProductionSwordStowPose(
     animation.rightIk.gripZ = WorldVectorToPlayerModel(
         basis, {{expectedWorldFromGrip[8], expectedWorldFromGrip[9],
                  expectedWorldFromGrip[10]}});
+    HeldItemTransform itemGrip = IdentityHeldItemTransform();
+    for (std::size_t axis = 0; axis < 3; ++axis)
+    {
+        itemGrip[axis] = animation.rightIk.gripX[axis];
+        itemGrip[4 + axis] = animation.rightIk.gripY[axis];
+        itemGrip[8 + axis] = animation.rightIk.gripZ[axis];
+        itemGrip[12 + axis] = animation.rightIk.target[axis];
+    }
+    animation.rightIk = BlendPlayerArmGripTarget(freeArm, itemGrip, swordState.visualGripBlend);
     for (auto* arm : {&animation.leftIk, &animation.rightIk})
     {
         arm->shoulder = pointToModel(arm->shoulder);
