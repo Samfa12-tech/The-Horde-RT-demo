@@ -49,7 +49,7 @@ inline WindowsMotionEvidenceLaunch ParseWindowsMotionEvidenceLaunch(
             { result.error = "--motion-scenario requires one unique literal scenario."; return result; }
             scenarioSeen = true;
             const auto scenario = arguments[++i];
-            for (const auto literal : {"torch-low-opening", "shaft-up", "keeper-first-entry", "keeper-retry-reward", "waterfall-equipment"})
+            for (const auto literal : {"torch-low-opening", "shaft-up", "keeper-first-entry", "keeper-retry-reward", "waterfall-equipment", "torch-drench"})
                 if (scenario == std::wstring(literal, literal + std::char_traits<char>::length(literal))) result.scenario = literal;
             if (result.scenario.empty())
             { result.error = "Unknown native motion scenario."; return result; }

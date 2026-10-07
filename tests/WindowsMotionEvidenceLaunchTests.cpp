@@ -8,7 +8,7 @@ int main()
     using horde::vulkan::raytracing::RtWorkloadPreset;
     int failures=0;
     const auto check=[&](bool ok){ if(!ok) ++failures; };
-    for(const auto scenario:{L"torch-low-opening",L"shaft-up",L"keeper-first-entry",L"keeper-retry-reward",L"waterfall-equipment"})
+    for(const auto scenario:{L"torch-low-opening",L"shaft-up",L"keeper-first-entry",L"keeper-retry-reward",L"waterfall-equipment",L"torch-drench"})
     {
         const std::array<std::wstring_view,4> args{L"--validate-native-motion",L"C:\\fresh motion",L"--motion-scenario",scenario};
         const auto parsed=ParseWindowsMotionEvidenceLaunch(args);
@@ -30,6 +30,8 @@ int main()
     for(const auto args:{std::vector<std::wstring_view>{L"--motion-scenario",L"shaft-up"},
         {L"--validate-native-motion",L"C:\\fresh"}, {L"--validate-native-motion"},
         {L"--validate-native-motion",L"C:\\fresh",L"--motion-scenario",L"bogus"},
+        {L"--validate-native-motion",L"C:\\fresh",L"--motion-scenario",L"torch-drench "},
+        {L"--validate-native-motion",L"C:\\fresh",L"--motion-scenario",L"torch-drench/extra"},
         {L"--validate-native-motion",L"C:\\fresh",L"--motion-scenario",L"shaft-up",L"--motion-scenario",L"shaft-up"},
         {L"--validate-native-motion",L"C:\\fresh",L"--motion-scenario",L"shaft-up",L"--validate-native-motion",L"C:\\other"},
         {L"--motion-rt-workload",L"max"},
