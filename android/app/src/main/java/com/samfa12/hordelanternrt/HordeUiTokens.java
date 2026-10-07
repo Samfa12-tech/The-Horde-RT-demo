@@ -15,11 +15,12 @@ final class HordeUiTokens {
     }
     static StateListDrawable button(Context c,int fill) {
         StateListDrawable s=new StateListDrawable();
-        s.addState(new int[]{-android.R.attr.state_enabled},plate(c,0xEB24272A,IRON,1));
-        s.addState(new int[]{android.R.attr.state_pressed},plate(c,0xF224272A,PARCHMENT,2));
-        s.addState(new int[]{android.R.attr.state_focused},plate(c,fill,PARCHMENT,2));
-        s.addState(new int[]{android.R.attr.state_selected},plate(c,fill,PARCHMENT,2));
-        s.addState(new int[]{},plate(c,fill,BRASS,1)); return s;
+        final float density=c.getResources().getDisplayMetrics().density;
+        s.addState(new int[]{-android.R.attr.state_enabled},new PlaqueButtonDrawable(fill,density));
+        s.addState(new int[]{android.R.attr.state_pressed},new PlaqueButtonDrawable(fill,density));
+        s.addState(new int[]{android.R.attr.state_focused},new PlaqueButtonDrawable(fill,density));
+        s.addState(new int[]{android.R.attr.state_selected},new PlaqueButtonDrawable(fill,density));
+        s.addState(new int[]{},new PlaqueButtonDrawable(fill,density)); return s;
     }
     static ColorStateList label(int normal) {
         return new ColorStateList(new int[][]{{-android.R.attr.state_enabled},{}},new int[]{DISABLED,normal});
