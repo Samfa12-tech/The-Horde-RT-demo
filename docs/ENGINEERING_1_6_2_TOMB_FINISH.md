@@ -19,8 +19,8 @@ Updated 7 October 2026. Authority: the owner's `Horde-1.6.2-after-reset-goal.txt
 | Draw/sheath audio | Selected FilmCow derivatives and exact provenance admitted in `cdcb300f`; semantic attachment cues integrated in `d08d3c48` with host/Java checks. Owner-supplied licence PDF recorded | Actual attachment motion/audio timing, audibility and owner listening |
 | Compact selected menu scene | Approved brighter lantern and Play-center / More-left / Settings-right placement retained. Exact `868691fc` passes both Windows RT backends' six-pose Entry/Back/Play checks, actual phone landscape Entry and both backends' Home recovery. Earlier orientation/recreation failures remain recorded | Remaining menu cost and owner motion/audio acceptance; landscape Home/resume and physical owner rotation not established |
 | Remaining UI/loading/Graphics simplification | Native menu/loading/audio `d08d3c48`; colon labels and clear scrollbar `359a5711` pass 22 affected Java tests. [Pre-rotation `868691fc`](ENGINEERING_1_6_2_SURFACE_RECOVERY_2026_10_07.md) passes actual ready phone rotations, exact landscape Use/Restore ACK and unchanged preferences on both RT backends | Remaining screen/input/accessibility/consent/loading checks and integrated cost; no sustained-FPS claim |
-| Glass apply latency and ordinary foreground pause work | Foreground paused-Showcase 2 Hz cadence implemented. Driver-cache negative retained; exact d08 compiled-pair hits measure Off 0.367 s / return On 0.326 s. Use/Restore exact ACK and every saved preference entry preserved | Broader cache/lifecycle correctness and actual pause work/thermal reduction, distinct from live preview/background suspension; no sustained-FPS or isolated memory-savings claim |
-| Phone traced 50/40/33 comparison | Reconnected SM-S948B/Android 16 now has sealed four-ABI integrated Debug `868691fc`; both real RT backends' affected presentation/ACK/recovery checks pass. Saved custom preferences remain unchanged | Integrated play comparison on same device/backend/output/route, whole-frame/present pacing, combat/effects, Keeper/reward overlap, sustained thermals/power/memory; **owner comparison decision** |
+| Glass apply latency and ordinary foreground pause work | Foreground paused-Showcase cadence measured on both phone backends in exact `ecc16b82`: 9–10 render attempts per approximately five seconds; Settings/Back/Resume and portrait Home recovery pass. Driver-cache negative retained; exact d08 compiled-pair hits measure Off 0.367 s / return On 0.326 s. Use/Restore exact ACK and every saved preference entry preserved | Broader cache correctness and sustained thermal/power benefit, distinct from live preview/background suspension; no sustained-FPS or isolated memory-savings claim |
+| Phone traced 50/40/33 comparison | Reconnected SM-S948B/Android 16 now has sealed four-ABI integrated Debug `ecc16b82`; ordinary Play/pause/portrait Home passes both genuine RT backends after correcting new equipment staging. Saved custom preferences remain unchanged | Integrated play comparison on same device/backend/output/route, whole-frame/present pacing, combat/effects, Keeper/reward overlap, sustained thermals/power/memory; **owner comparison decision** |
 | Immutable review candidate and Eric audit | Pending integration | Exact source/package hashes, aggregate CI, affected recorded gates and independent audit; owner approval still required for release |
 
 Fresh/reset phone defaults remain 50%, Mobile water/fire, Glass Off, Current shadows, cap30, Mist On. Desktop stays 100%, High water/fire, Glass On, Current shadows, cap30, Mist On. Preserve all saved/custom settings. No silent 33% default or sustained-FPS inference from reciprocal GPU timing.
@@ -37,10 +37,21 @@ Build correctness, physical-device evidence, owner visual/audio/haptic/combat-fe
 
 ## Current CI and additional evidence
 
+Remote planning reference advanced to `4f134d5e` on 7 October. Its changed roadmap
+and UI notes concern earned story verse and future Bellwether life, and explicitly
+add no current engineering or release scope. They were inspected without merging;
+the authorized standalone tomb scope and small-spinner loading contract remain.
+
 Subsequent ordinary phone Play on `868691fc` exposes a real Showcase asset-staging
 failure, despite valid Entry/Graphics presentation. [The staging ledger](ENGINEERING_1_6_2_ANDROID_EQUIPMENT_STAGING_2026_10_07.md)
 records the reproduction, regression and correction; the ordinary pause-work
-measurement did not start. Three Windows moving captures also fail to arm because
+measurement did not start on that failed build. Corrected immutable `ecc16b82`
+passes affected ordinary Play/pause/settings/portrait Home/Resume on both phone
+backends, with measured foreground pause render suppression and unchanged saved
+preferences. All 12 source CI checks pass in runs `37619496990` / `37619504576`.
+Native payloads and Windows executable bytes are unchanged from `868691fc`.
+Sustained thermals/power and broader physical gates remain open.
+Three Windows moving captures also fail to arm because
 the owned window lacks foreground focus. Both gaps are retained separately from
 the earlier affected passes. Owner questions are deferred while the owner sleeps.
 

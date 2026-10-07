@@ -2,6 +2,22 @@
 
 Last updated: 2026-10-07
 
+## 7 October corrected ordinary Play and pause — SM-S948B / Android 16
+
+Evidence class: **exact Debug package, affected ordinary Play/pause/settings and
+portrait Home/resume**, genuine Pipeline and required RayQueryCompute.
+Runtime `ecc16b82ac9044ff5f4b39e8be9723659d0e73cf`, APK SHA-256
+`ccafc11b31ca51e5f6bdc4c6c4e18de14144eca45907cc0ebc8e0908c48e555f`,
+138,462,724 bytes; installed pullback matches. Both backends now present the full
+Showcase, native hearts/actions and a paused Showcase after Home on a fresh
+surface generation. Native foreground-pause aggregates measure 9–10 render
+attempts per approximately five seconds, with redundant iterations skipped.
+Settings/Back/Resume respond through ordinary native controls. All preference
+entries, portrait lock, font scale and density are preserved; owned PIDs
+9419/14966 are stopped. [Exact corrected ledger and intermediate limits](ENGINEERING_1_6_2_ANDROID_EQUIPMENT_STAGING_2026_10_07.md#corrected-immutable-phone-checkpoint).
+This is not sustained FPS, battery/thermal benefit, a complete route, physical
+multi-finger acceptance or final review/audit evidence.
+
 ## 7 October ordinary Play failure — SM-S948B / Android 16
 
 Evidence class: **exact Debug package, ordinary native Play handoff failure**.
