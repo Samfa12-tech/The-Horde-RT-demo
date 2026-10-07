@@ -234,6 +234,7 @@ public class MainActivity extends Activity {
     private Button interactButton;
     private Button toggleHeldLightPoseButton;
     private boolean parryRequestedOnTouchDown;
+    private boolean parryTouchActive;
     private SoundPool soundPool;
     private HordeAmbiencePlayback waterfallPlayback;
     private volatile HordeMusicPlayback musicPlayback;
@@ -288,6 +289,8 @@ public class MainActivity extends Activity {
     private int graphicsPreviewChoice = GraphicsPreviewOptions.RESOLUTION;
     private boolean graphicsPreviewImageOnly;
     private final Button[] graphicsOptionButtons = new Button[7];
+    private final GraphicsViewportState graphicsPageViewport = new GraphicsViewportState("graphics-page");
+    private final GraphicsViewportState graphicsPreviewViewport = new GraphicsViewportState("graphics-preview");
     private Button graphicsDetailsButton, graphicsImageButton, graphicsControlsButton;
     private double graphicsPreviewPerformanceEpochFloor;
     private long graphicsPreviewPerformanceGeneration, graphicsNextFpsUpdate;
@@ -463,6 +466,7 @@ public class MainActivity extends Activity {
         parryButton.setOnTouchListener((view, event) -> {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
+                    parryTouchActive = true;
                     parryRequestedOnTouchDown = true;
                     view.setPressed(true);
                     if (!menuVisible && !diagnosticsVisible && !deathOverlayVisible && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1) {
@@ -471,9 +475,11 @@ public class MainActivity extends Activity {
                     return true;
                 case MotionEvent.ACTION_UP:
                     view.setPressed(false);
-                    view.performClick();
+                    if (parryTouchActive) view.performClick();
+                    parryTouchActive = false;
                     return true;
                 case MotionEvent.ACTION_CANCEL:
+                    parryTouchActive = false;
                     parryRequestedOnTouchDown = false;
                     view.setPressed(false);
                     return true;
@@ -661,14 +667,17 @@ public class MainActivity extends Activity {
                 pushViewControls();
                 return true;
             }
-            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP || action == MotionEvent.ACTION_CANCEL) {
+            if (action == MotionEvent.ACTION_CANCEL) {
+                TouchControlState.cancelGesture(activePointers, viewControls);
+                parryTouchActive = false;
+                parryRequestedOnTouchDown = false;
+                if (parryButton != null) parryButton.setPressed(false);
+                pushViewControls();
+                return true;
+            }
+            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
                 final int pointerId = event.getPointerId(event.getActionIndex());
-                if (pointerId == activePointers[0]) {
-                    activePointers[0] = -1;
-                    viewControls[7] = 0.0f;
-                    viewControls[8] = 0.0f;
-                }
-                if (pointerId == activePointers[1]) activePointers[1] = -1;
+                TouchControlState.finishPointer(activePointers, viewControls, pointerId);
                 pushViewControls();
                 return true;
             }
@@ -1971,6 +1980,8 @@ public class MainActivity extends Activity {
     private void openGraphics() {
         setGameplayPaused(true);
         clearTouchState();
+        graphicsPageViewport.reset();
+        graphicsPreviewViewport.reset();
         graphicsConfirmed = GraphicsPreferences.confirmed(preferences);
         graphicsDraft = graphicsConfirmed;
         graphicsRestoreDraftAfterPreview = null;
@@ -1993,6 +2004,7 @@ public class MainActivity extends Activity {
 
     private void showGraphicsPage() {
         if (graphicsPreviewWanted) { showGraphicsPreviewPage(); return; }
+        graphicsPageViewport.remember(menuScrim);
         dismissGraphicsPreviewDetails();
         menuScrim.setBackgroundColor(0xC7080706);
         graphicsGraph = null;
@@ -2096,6 +2108,7 @@ public class MainActivity extends Activity {
         graphicsBack = addGraphicsButton(panel, getString(R.string.back), () -> requestGraphicsRevert(true));
         // Scroll/reflow at system font scales. Native buttons retain minimum 48dp hit areas.
         final ScrollView scroller = new ScrollView(this);
+        scroller.setTag("graphics-page-scroll");
         scroller.addView(panel, new ScrollView.LayoutParams(-1, -2));
         final WindowInsets insets = menuScrim.getRootWindowInsets();
         int left = dp(16), right = dp(16), top = dp(20), bottom = dp(20);
@@ -2117,6 +2130,7 @@ public class MainActivity extends Activity {
         layout.setMargins(left, top, right, bottom);
         menuScrim.addView(scroller, layout);
         setGraphicsEditorsEnabled(panel, !graphicsBusy);
+        graphicsPageViewport.restoreAfterLayout(menuScrim);
     }
 
     private void setGraphicsEditorsEnabled(View view, boolean enabled) {
@@ -2258,6 +2272,7 @@ public class MainActivity extends Activity {
     }
 
     private void showGraphicsPreviewPage() {
+        graphicsPreviewViewport.remember(menuScrim);
         dismissGraphicsPreviewOptions();
         dismissGraphicsPreviewDetails();
         menuScrim.setBackgroundColor(0x00000000);
@@ -2282,6 +2297,7 @@ public class MainActivity extends Activity {
             final int selectedChoice = choice;
             graphicsOptionButtons[choice] = addPreviewControl(optionsRow, graphicsOptionLabel(choice),
                     () -> showGraphicsPreviewOptionMenu(graphicsOptionButtons[selectedChoice],selectedChoice));
+            graphicsOptionButtons[choice].setTag("graphics-preview-option-" + choice);
             graphicsOptionButtons[choice].setContentDescription(graphicsOptionLabel(choice) + "; choose live preview setting");
             graphicsOptionButtons[choice].setEnabled(false); // A matching current RT frame enables editing.
         }
@@ -2333,16 +2349,19 @@ public class MainActivity extends Activity {
         final int viewportHeight = menuScrim.getHeight() > 0 ? menuScrim.getHeight() : getResources().getDisplayMetrics().heightPixels;
         final ScrollView scroller = new GraphicsPreviewControlsScrollView(this,
                 GraphicsPreviewOptions.maximumOverlayHeight(viewportHeight, bottom));
+        scroller.setTag("graphics-preview-scroll");
         scroller.addView(panel, new ScrollView.LayoutParams(-1, -2));
         final FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(-1, -2);
         layout.gravity = Gravity.BOTTOM; layout.setMargins(left, 0, right, bottom);
         menuScrim.addView(scroller, layout);
         setGraphicsEditorsEnabled(panel, !graphicsBusy);
         for (Button option : graphicsOptionButtons) option.setEnabled(false);
+        graphicsPreviewViewport.restoreAfterLayout(menuScrim);
     }
 
     private LinearLayout addPreviewControlRow(LinearLayout panel) {
         final HorizontalScrollView scroll = new HorizontalScrollView(this);
+        scroll.setTag("graphics-preview-row-" + panel.getChildCount());
         scroll.setHorizontalScrollBarEnabled(true);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setScrollbarFadingEnabled(false);
@@ -2392,6 +2411,7 @@ public class MainActivity extends Activity {
 
     private Button addPreviewControl(LinearLayout row, String text, Runnable action) {
         final Button button = createMenuButton(text, action);
+        button.setTag("graphics-preview-action-" + text);
         button.setSingleLine(true); button.setMinWidth(dp(48)); button.setMinHeight(dp(48));
         button.setMinimumWidth(dp(48)); button.setMinimumHeight(dp(48));
         button.setPadding(dp(12), dp(8), dp(12), dp(8));
@@ -2538,6 +2558,8 @@ public class MainActivity extends Activity {
 
     private Button addGraphicsButton(LinearLayout panel, String text, Runnable action) {
         final Button button = createMenuButton(text, action);
+        final int separator = text.indexOf(':');
+        button.setTag("graphics-page-action-" + (separator < 0 ? text : text.substring(0, separator)));
         button.setMinHeight(dp(48)); button.setTextColor(0xFFF2E9D8);
         final LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(-1, -2);
         layout.topMargin = dp(8); panel.addView(button, layout); return button;
@@ -2865,6 +2887,7 @@ public class MainActivity extends Activity {
                             option.setEnabled(!busy && previewReady && graphicsLiveChoiceError == null);
                         }
                     }
+                    graphicsPreviewViewport.restorePendingFocus(menuScrim);
                 }
                 graphicsRevert.setEnabled(state != 4);
                 final String preset = graphicsDraft.same(GraphicsPreferences.baseline()) ?
@@ -4301,6 +4324,7 @@ public class MainActivity extends Activity {
         label.setPadding(0, dp(8), 0, 0);
         panel.addView(label, matchWrap());
         final SeekBar slider = new SeekBar(this);
+        slider.setTag("graphics-slider-" + title);
         slider.setMax(max - min);
         slider.setProgress(value - min);
         slider.setMinimumHeight(dp(48));
@@ -4359,10 +4383,10 @@ public class MainActivity extends Activity {
     }
 
     private void clearTouchState() {
-        activePointers[0] = -1;
-        activePointers[1] = -1;
-        viewControls[7] = 0.0f;
-        viewControls[8] = 0.0f;
+        TouchControlState.clear(activePointers, viewControls);
+        parryTouchActive = false;
+        parryRequestedOnTouchDown = false;
+        if (parryButton != null) parryButton.setPressed(false);
         pushViewControls();
         updateContextualControls(false);
     }
@@ -4564,6 +4588,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        clearTouchState();
         graphicsPreviewImageOnly = false;
         dismissGraphicsPreviewDetails();
         if (keeperRevealTitle != null) keeperRevealTitle.setVisibility(View.GONE);

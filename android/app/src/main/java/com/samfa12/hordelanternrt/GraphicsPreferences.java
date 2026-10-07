@@ -113,7 +113,11 @@ final class GraphicsPreferences {
     }
     static boolean clearAfterRestore(SharedPreferences prefs) {
         // Candidate keys remain retained for recovery diagnostics; they never become effective silently.
-        return prefs.edit().putBoolean(PENDING, false).commit();
+        final boolean restoreUnstoredMobileDefaults = !hasGraphicsSettings(prefs) || usesUnstoredMobileDefaults(prefs);
+        SharedPreferences.Editor editor = prefs.edit().putBoolean(PENDING, false)
+                .putBoolean(UNSTORED_MOBILE_DEFAULTS, restoreUnstoredMobileDefaults);
+        if (restoreUnstoredMobileDefaults) editor.putInt("graphics_pending_schema", SCHEMA);
+        return editor.commit();
     }
     static Values retainedCandidate(SharedPreferences prefs) {
         final int pendingSchema = integer(prefs, "graphics_pending_schema", integer(prefs, "graphics_schema", 1));

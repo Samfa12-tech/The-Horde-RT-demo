@@ -37,6 +37,17 @@ public final class GraphicsPreferencesTest {
         assertFalse(GraphicsPreferences.hasPending(prefs));
         assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(candidate));
     }
+    @Test public void restoreWithoutPreviewPreservesFreshMobileDefaults() {
+        assertFalse(GraphicsPreferences.hasGraphicsSettings(prefs));
+        assertTrue(GraphicsPreferences.clearAfterRestore(prefs));
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.mobileDefaults()));
+    }
+    @Test public void restoringLegacyPendingOnlyRecordKeepsHistoricalBaselineMigration() {
+        prefs.edit().putBoolean(GraphicsPreferences.PENDING, true)
+                .putInt("graphics_pending_scale", 68).commit();
+        assertTrue(GraphicsPreferences.clearAfterRestore(prefs));
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.baseline()));
+    }
     @Test public void confirmationIsScopedAndInvalidSettingsCannotPersist() {
         prefs.edit().putInt("music_volume", 43).putBoolean("rt_lab_unlocked", true)
                 .putString("report_consent_fixture", "private-choice").commit();
