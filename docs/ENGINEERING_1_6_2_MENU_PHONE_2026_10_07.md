@@ -209,9 +209,55 @@ unchanged; only inactive `graphics_pending_glass` metadata changes, with
 Production app and data are untouched. USB-powered context does not establish
 sustained thermals or reliable battery power.
 
-Current pushed source `422c1b1a` has all 12 aggregate CI checks successful:
+Historical pushed source `422c1b1a` has all 12 aggregate CI checks successful:
 push `37598443257` and PR `37598449959`, six jobs each. Geometry/scabbard work
 continues separately with production activation off. Owner motion/audio,
 portrait/landscape recovery, pause-work reduction, integrated combat/route,
 50/40/33 quality/performance decisions and final immutable audit gates remain
 open. Earlier failures and completed historical evidence remain preserved.
+
+## Integrated cache and owner scrollbar checkpoint
+
+The [compiled-pipeline ledger](ENGINEERING_1_6_2_COMPILED_PIPELINE_REUSE_2026_10_07.md#exact-d08-phone-result)
+records exact `d08d3c48` package/device identity, measured cache hits,
+0.367-second Glass Off and 0.326-second return On, exact Use/Restore ACK and
+unchanged preference entries. It preserves the earlier driver-cache negative.
+Actual portrait Entry matches the approved brighter lantern and Play-center /
+More-left / Settings-right layout. Owner motion/audio acceptance is separate.
+
+Owner-requested `359a57112fd198351edcc6c4b6eae52f28bcd2a6` adds colon labels
+(`Resolution: 50%`, `Water: Mobile`, etc.) and a persistent 6 dp brass scrollbar
+below the native choices. The overlay now reserves the complete strip, fixing
+large-font clipping of the former bar. Affected Java tests pass 22/22 in three
+suites, including viewport/focus retention and entire-row visibility across
+font scales 1–2; lint has zero errors / 62 warnings. Four-ABI Debug assembly,
+closed asset admission, manifest and 16 KiB alignment pass. Exact APK is
+138,462,724 bytes, SHA-256
+`e8f0dee22d0093c69be8b704a61cf651003a6764eb227f89fab6e3c12c3eb48d`;
+all native payloads and Windows executable are byte-identical to d08.
+Installed pullback matches. This is an intermediate inspection package.
+
+Physical SM-S948B / Android 16 at existing font scale 1.7 confirms the visible
+bar and colon labels, later-option horizontal scrolling and unchanged visible
+Glass bounds after Off rebuild. Use/Keep/Restore/Back remain visible; Keep is
+disabled until acknowledged trial. Actual screenshot
+`task-4/integrated-162-359a5711-20261007/06-preview-portrait.png` has SHA-256
+`b922db4088596aeadeeceec8bfcd4831a942e7e37bcc21873e89a3cca004e57d`.
+
+Rotation to landscape makes the RT image upright and keeps the bar and native
+actions visible, but **surface recovery fails**: options stay unavailable and
+the scene recreates approximately four times per second. Current transform
+is `0x2`, supported mask `0x1ff`, selected pre-transform `0x1`, window/current
+extent/swapchain 2981×1440, dispatch 1491×720, generation 1. Repeated init hits
+do not constitute accepted current-output presentation or ACK. Original
+portrait lock 0 is restored, Restore returns ready controls, and owned PID
+13055 is stopped. Private cases 15/16 and `18-recovery-final.log` preserve the
+failed loop. Proper pre-rotation/recovery is the next bounded correction;
+acknowledgements are not relaxed to hide it.
+
+Test-only `e4704d16153ea902db899f8e27f573a86a1fb421` passes all 12 aggregate
+CI checks in push `37608808922` / PR `37608817997`. The stale scabbard inventory
+and Android witness failures from d08 remain recorded. At the latest sampled
+359a snapshot, four checks passed and eight were running; current CI must be
+refreshed independently of the phone result. The subsequent refresh confirms
+all 12 checks successful for 359a in push `37610890737` / PR `37610897316`.

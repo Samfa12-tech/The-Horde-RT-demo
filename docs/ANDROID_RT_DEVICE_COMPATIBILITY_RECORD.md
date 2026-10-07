@@ -1,6 +1,31 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-10-05
+Last updated: 2026-10-07
+
+## 7 October integrated menu/cache inspection — SM-S948B / Android 16
+
+Evidence class: **exact Debug package, bounded apply latency and native UI**,
+Pipeline backend 1. Source `d08d3c4827ef5d1ce95b74c21e29663aa33e9e7d`, APK
+SHA-256 `87a3ed413d09de098af45d74802da42e534ff09de3d467a8ff937d2b1d5a6ff7`,
+138,462,724 bytes; installed pullback matches. At output 1440×2980 / traced
+720×1490 and unchanged saved/custom 50%/Mobile water/fire/Glass On/Current/
+cap30/Mist On, compiled-pipeline hits reduce observed Off/return On requests
+to 366.806/326.240 ms. Use and Restore receive exact native ACK; no Keep/save
+is pressed. All preference entries remain identical through install and Back.
+This result does not establish sustained gameplay FPS, power or cache memory
+savings. See [exact cache evidence and limits](ENGINEERING_1_6_2_COMPILED_PIPELINE_REUSE_2026_10_07.md#exact-d08-phone-result).
+
+Java-only source `359a57112fd198351edcc6c4b6eae52f28bcd2a6`, APK SHA-256
+`e8f0dee22d0093c69be8b704a61cf651003a6764eb227f89fab6e3c12c3eb48d`, same
+size and byte-identical four native payloads, confirms owner-requested colon
+labels and visible scrollbar at existing font scale 1.7. Later Glass choice
+retains visible bounds after rebuilding. Portrait succeeds, but landscape
+recovery **fails**: upright RT output and native controls accompany a repeated
+scene-recreation loop and unavailable options. It is not a lifecycle pass.
+Portrait lock 0 and all preference entries are restored; owned Debug PID 13055
+is stopped. The production app/data and system font scale are untouched.
+[Phone ledger](ENGINEERING_1_6_2_MENU_PHONE_2026_10_07.md#integrated-cache-and-owner-scrollbar-checkpoint)
+preserves screenshots, artifact identities and the failed recovery evidence.
 
 ## Integrated2bd ordinary mist: current Debug Pipeline and Compute
 

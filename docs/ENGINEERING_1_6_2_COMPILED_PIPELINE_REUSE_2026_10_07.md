@@ -56,10 +56,9 @@ non-null driver cache did not establish reuse or a measured improvement.
 The full previous result and conditions remain in
 [the phone timing record](ENGINEERING_1_6_2_MENU_PHONE_2026_10_07.md).
 
-The new compiled-object cache has **no phone latency or memory-benefit result
-yet**. No measured hit, exact-ACK outcome, or owner-visible effect is claimed.
-The fake host tests cover cache key and object-ownership behavior; the integrated
-native build covers compilation:
+The compiled-object cache now has an exact-package phone hit/latency result,
+recorded below. The fake host tests separately cover cache key and
+object-ownership behavior; the integrated native build covers compilation:
 
 - `scabbard-cache-host-tests-20261007-05.log`: cache, transition, ABI, bundle
   lifetime and character targets passed (5 of 6 selected targets). The socket
@@ -73,9 +72,48 @@ native build covers compilation:
 The cache seam's committed bundle lease hooks are `463ee08c3160a4cb3856c9744d227c539787e4d4`;
 all 12 aggregate CI checks passed for that committed hook state. Scene and
 Android runtime integration compiled successfully in the integrated build.
-On-device cache-hit, latency, memory and current-scene presentation checks
-remain pending; the host tests do not establish any of those outcomes. The
+The host tests do not establish on-device outcomes. The
 earlier Scene build04 failure from an undefined
 `executionBackend` was corrected to use the backend resolved in
 `selectedPreflight.request.executionBackend` before the successful integrated
 build.
+
+## Exact d08 phone result
+
+Allocated SM-S948B / Android 16, Pipeline backend 1, output 1440×2980,
+newly traced 720×1490 at saved/custom 50%, Mobile water/fire, Glass On,
+Current shadows, cap30, Mist On. Exact source is
+`d08d3c4827ef5d1ce95b74c21e29663aa33e9e7d`; Debug APK SHA-256
+`87a3ed413d09de098af45d74802da42e534ff09de3d467a8ff937d2b1d5a6ff7`
+(138,462,724 bytes). Installed base pullback matches. Private evidence is
+`task-4/integrated-162-d08d3c48-20261007/`.
+
+| Operation | Native request CPU wall ms | Scene init ms | UI observation ms | Result |
+| --- | ---: | ---: | ---: | --- |
+| Cold Entry | initialization only | 13961.468 | not sampled | Miss; one resident pair |
+| Open preview, serial 2 | 305.519 | 188.911 | 546.738 | Hit; current RT preview presents |
+| Glass Off, serial 3 | 366.806 | 110.118 | 562.491 | Hit; current RT preview presents |
+| Return On, serial 4 | 326.240 | 120.301 | 514.857 | Hit; current RT preview presents |
+| Use, serial 5 | 282.888 | no rebuild | 405.029 | Exact native ACK; Keep available |
+| Restore, serial 6 | 279.163 | no rebuild | 528.057 | Exact native ACK; no Keep/save |
+
+Open-preview initialization still logs the prior request context serial 1;
+chronology and target profile identify it separately from serial 2's receipt.
+Comparison requests correctly report `exact_ack=0`; they are not trials.
+Use and Restore both report `exact_ack=1`. Back subsequently returns to Entry
+profile 2 with a hit (84.035 ms initialization) and exact restore ACK. All
+preference entries remain identical through install, trial, Restore and Back.
+Owned PID 26335 is stopped after recovery; original rotation lock 0 was retained.
+
+This bounded sequence establishes avoidance of repeated pipeline compilation:
+Off/return On requests fall from the preserved driver-cache observations of
+16.659/16.589 seconds to 0.367/0.326 seconds. It is not a statistical latency
+distribution, cold-start improvement or sustained-FPS result. Off/return On
+PSS is 431187/428792 kB, RSS 548292/525744 kB and swap PSS 52/22205 kB;
+these process observations do not isolate cache residency or prove memory
+savings. USB-powered conditions do not establish reliable battery power.
+
+The subsequent Java-only scrollbar package retains byte-identical native
+payloads. Its landscape rotation exposes a repeated recreation/waiting-for-RT
+failure, recorded in the phone ledger; portrait cache hits do not close that
+surface recovery gate. Exact ACK and confirmation timeouts remain unchanged.
