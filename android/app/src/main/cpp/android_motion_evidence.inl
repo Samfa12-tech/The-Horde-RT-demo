@@ -11,9 +11,12 @@ horde::platform::android::AndroidMotionEvidenceScope AndroidMotionScope(const Sw
 bool WriteAndroidMotion(SwapchainContext& context)
 {
     auto& run = *context.motion;
-    std::ofstream ledger(run.path + "-ledger.json", std::ios::binary | std::ios::trunc);
+    std::ofstream ledger(run.path + "-ledger.tmp", std::ios::binary | std::ios::trunc);
     run.ledger.WriteJson(ledger, run.scenario);
     ledger.flush();
+    ledger.close();
+    if (!ledger || std::rename((run.path + "-ledger.tmp").c_str(), (run.path + "-ledger.json").c_str()) != 0)
+        return false;
     std::ostringstream manifest;
     manifest << "{\"schema\":1,\"runId\":" << JsonUtf8String(run.id)
         << ",\"scenario\":" << JsonUtf8String(horde::gameplay::validation::MotionScenarioName(run.selected))
@@ -36,7 +39,8 @@ bool WriteAndroidMotion(SwapchainContext& context)
            "\"phaseForced\":false,\"preferencesWritten\":false,\"ownerAcceptance\":false,"
            "\"timingScope\":\"moving scenario with readbacks; not sustained FPS or scanout\"}"
         << ",\"captures\":" << run.captures << "]}";
-    return static_cast<bool>(ledger) && WriteTextFile(run.path + "-manifest.json", manifest.str());
+    return WriteTextFile(run.path + "-manifest.tmp", manifest.str()) &&
+        std::rename((run.path + "-manifest.tmp").c_str(), (run.path + "-manifest.json").c_str()) == 0;
 }
 
 void FailAndroidMotion(SwapchainContext& context, std::string_view reason)
@@ -44,8 +48,8 @@ void FailAndroidMotion(SwapchainContext& context, std::string_view reason)
     if (!context.motion || context.motion->finished) return;
     context.motion->scenario.Fail(reason);
     context.motion->finished = true;
-    gMotionStatus.store(4, std::memory_order_release);
     (void)WriteAndroidMotion(context);
+    gMotionStatus.store(4, std::memory_order_release);
     __android_log_print(ANDROID_LOG_ERROR, kTag, "HORDE_MOTION failed %.*s", static_cast<int>(reason.size()), reason.data());
 }
 
@@ -116,7 +120,8 @@ void BuildAndroidMotionInput(SwapchainContext& context,
         run.externalYaw = input.yawRadians; run.externalPitch = input.pitchRadians; run.externalTorch = input.torchLightStrength;
         run.commands = input.commands;
         if (std::ifstream(run.path + "-manifest.json").good() ||
-            std::ifstream(run.path + "-ledger.json").good())
+            std::ifstream(run.path + "-ledger.json").good() ||
+            std::ifstream(run.path + "-manifest.tmp").good() || std::ifstream(run.path + "-ledger.tmp").good())
         { run.finished = true; gMotionStatus.store(4); return; } // never overwrite an unrelated run
         for (unsigned index = 0u; index < 64u; ++index)
             if (std::ifstream(run.path + '-' + std::to_string(index) + ".rgba").good())
@@ -231,8 +236,8 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
     {
         run.finished = !run.ledger.HasPendingSubmissions();
         if (!run.finished) { FailAndroidMotion(context, "Terminal motion frame still has pending graphics work."); return; }
-        gMotionStatus.store(3, std::memory_order_release);
     }
     if (!WriteAndroidMotion(context))
     { run.finished = false; FailAndroidMotion(context, "Motion receipt write failed."); }
+    else if (run.finished) gMotionStatus.store(3, std::memory_order_release);
 }
