@@ -67,6 +67,18 @@ int main()
     check(AndroidMotionScopeValid(validScope));
     check(validScope == AndroidMotionEvidenceScope{1u, 2u, 3u, 1440u, 3120u});
     check(validScope != AndroidMotionEvidenceScope{1u, 2u, 4u, 1440u, 3120u});
+    const AndroidMotionEvidenceScope retryScope{1u, 2u, 4u, 1440u, 3120u};
+    check(AndroidMotionRetryScopeValid(validScope, retryScope, true, false));
+    check(!AndroidMotionRetryScopeValid(validScope, retryScope, false, false));
+    check(!AndroidMotionRetryScopeValid(validScope, retryScope, true, true));
+    check(!AndroidMotionRetryScopeValid(validScope, validScope, true, false));
+    check(!AndroidMotionRetryScopeValid(validScope, {1u, 3u, 4u, 1440u, 3120u}, true, false));
+    check(!AndroidMotionRetryScopeValid(validScope, {2u, 2u, 4u, 1440u, 3120u}, true, false));
+    check(!AndroidMotionRetryScopeValid(validScope, {1u, 2u, 5u, 1440u, 3120u}, true, false));
+    check(!AndroidMotionRetryScopeValid(validScope, {1u, 2u, 2u, 1440u, 3120u}, true, false));
+    check(!AndroidMotionRetryScopeValid(validScope, {1u, 2u, 4u, 720u, 1560u}, true, false));
+    check(!AndroidMotionRetryScopeValid({1u, 2u, UINT64_MAX, 1440u, 3120u},
+        {1u, 2u, 1u, 1440u, 3120u}, true, false));
     for (std::size_t field = 0; field < 5u; ++field)
     {
         auto invalid = validScope;

@@ -49,6 +49,9 @@ enum class GameplayEventType : std::uint8_t
     SkeletonEncounterWarning,
 };
 
+inline constexpr std::size_t kGameplayEventTypeCount =
+    static_cast<std::size_t>(GameplayEventType::SkeletonEncounterWarning) + 1u;
+
 struct GameplayEvent
 {
     std::uint64_t sequence = 0;

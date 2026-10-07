@@ -70,7 +70,7 @@ private:
     MotionScenario scenario_ = MotionScenario::TorchLowOpening;
     MotionStage stage_ = MotionStage::NotStarted;
     simulation::SimulationCommandSequences commands_{};
-    std::array<std::uint32_t, 21u> eventCounts_{};
+    std::array<std::uint32_t, simulation::kGameplayEventTypeCount> eventCounts_{};
     std::array<char, 128u> failure_{};
     std::uint64_t startWall_ = 0u;
     std::uint64_t latestWall_ = 0u;

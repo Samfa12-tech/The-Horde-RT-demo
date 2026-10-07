@@ -99,7 +99,8 @@ bool MotionEvidenceLedger::AppendState(std::uint64_t now,
     }
     for (const auto& event : events)
     {
-        if (event.sequence <= latestEventSequence_ || static_cast<unsigned>(event.type) > 20u)
+        if (event.sequence <= latestEventSequence_ ||
+            static_cast<std::size_t>(event.type) >= horde::gameplay::simulation::kGameplayEventTypeCount)
             return Reject("Motion semantic event order/type admission failed.");
         latestEventSequence_ = event.sequence;
     }

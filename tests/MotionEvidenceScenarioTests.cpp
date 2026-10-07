@@ -1,5 +1,6 @@
 #include "gameplay/validation/MotionEvidenceScenario.h"
 #include "telemetry/MotionEvidenceLedger.h"
+#include "platform/android/AndroidMotionEvidencePolicy.h"
 #include "scene/ShowcaseOverheadGeometry.h"
 
 #include <algorithm>
@@ -156,6 +157,39 @@ void Run(MotionScenario kind, int rate, const char* receiptPath)
         std::ofstream file(receiptPath);
         ledger.WriteJson(file, scenario);
         Check(file.good(), "CPU-only audit receipt streams to the explicitly supplied local path");
+    }
+}
+
+void TestEquipmentEventAdmission()
+{
+    // The observer must preserve newly appended ordinary equipment events.
+    // These are observer-only fixtures, not manufactured gameplay evidence.
+    for (const auto type : {GameplayEventType::PlayerSwordDrawStarted,
+                            GameplayEventType::PlayerSwordAttachmentChanged,
+                            GameplayEventType::SkeletonEncounterWarning,
+                            static_cast<GameplayEventType>(24u)})
+    {
+        GameSimulation simulation(ProductionGameSimulationConfig());
+        MotionEvidenceScenario scenario;
+        MotionEvidenceLedger ledger;
+        Check(scenario.Begin(MotionScenario::TorchLowOpening, simulation, 1u) &&
+              ledger.Begin("equipment_event_fixture", MotionScenario::TorchLowOpening),
+              "equipment observer fixture admitted");
+        const std::array<GameplayEvent, 1u> events{{{.sequence = 1u, .tickIndex = 1u, .type = type}}};
+        scenario.ObserveAdvance(simulation.Snapshot(), events);
+        const bool accepted = ledger.AppendState(2u, simulation.Snapshot(), {}, scenario, events);
+        const bool known = type != static_cast<GameplayEventType>(24u);
+        Check(accepted == known && scenario.Failed() != known,
+              "draw, attachment and waterfall warning events admitted; unknown event rejected");
+        if (known && accepted && !scenario.Failed())
+        {
+            Check(scenario.EventCounts()[static_cast<std::size_t>(type)] == 1u &&
+                  ledger.Events().size() == 1u && ledger.Events()[0].event.type == type,
+                  "new equipment event retained exactly once with its original type");
+            scenario.ObserveAdvance(simulation.Snapshot(), events);
+            Check(scenario.Failed() && !ledger.AppendState(3u, simulation.Snapshot(), {}, scenario, events),
+                  "duplicate equipment event remains rejected");
+        }
     }
 }
 
@@ -320,6 +354,11 @@ void TestAdmissionAndFrameBinding()
           "actual owner retains an outstanding old-scope accepted presentation");
     Check(lifecycle.ApplyEvent(RtLifecycleEvent::Retry, effects), "actual normal retry changes measurement scope");
     publication = lifecycle.PublishedStateByValue();
+    const horde::platform::android::AndroidMotionEvidenceScope beforeRetryScope{
+        5u, oldSubmitted.frame.sceneEpoch, oldSubmitted.frame.measurementGeneration, 720u, 1490u};
+    Check(horde::platform::android::AndroidMotionRetryScopeValid(beforeRetryScope,
+              {5u, publication.sceneEpoch, publication.measurementGeneration, 720u, 1490u}, true, false),
+          "Android retry admission agrees with the actual shared lifecycle's measurement-only reset");
     Check(ledger.ObserveScope(5u, publication.sceneEpoch, publication.measurementGeneration) &&
           !ledger.HasCurrentPresentedFrame(5u, publication.sceneEpoch, publication.measurementGeneration),
           "retry explicitly closes previous output readiness without dropping accepted evidence");
@@ -338,6 +377,9 @@ void TestAdmissionAndFrameBinding()
     Check(lifecycle.Recreate(RtResourceResetReason::RenderScaleChange, RtSampleStatus::CompiledOut, RtSampleStatus::Disabled, effects),
           "actual owning resource recreation retires its pending slots");
     publication = lifecycle.PublishedStateByValue();
+    Check(!horde::platform::android::AndroidMotionRetryScopeValid(beforeRetryScope,
+              {5u, publication.sceneEpoch, publication.measurementGeneration, 720u, 1490u}, true, false),
+          "a real resource recreation cannot be passed as an ordinary retry");
     Check(ledger.ObserveScope(5u, publication.sceneEpoch, publication.measurementGeneration), "recreated current scope observed");
     auto mismatchLedger = ledger;
     auto mismatch = cancelled; ++mismatch.submissionSerial;
@@ -405,6 +447,7 @@ int main(int argc, char** argv)
 {
     if (argc != 1 && argc != 3) { std::cerr << "Optional --cpu-receipt path\n"; return 2; }
     if (argc == 3 && std::string_view(argv[1]) != "--cpu-receipt") return 2;
+    TestEquipmentEventAdmission();
     TestAdmissionAndFrameBinding();
     TestRearLookCannotBeSkipped();
     for (int rate : {15, 60, 120})

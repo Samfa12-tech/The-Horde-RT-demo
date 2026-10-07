@@ -240,6 +240,7 @@ struct AndroidMotionRun
     std::uint64_t requestedNs = 0u;
     double lastCaptureSeconds = -2.0;
     horde::gameplay::validation::MotionStage lastCaptureStage{};
+    horde::gameplay::PlayerCombatAction lastPresentedAction = horde::gameplay::PlayerCombatAction::Idle;
     unsigned captureCount = 0u;
     float externalYaw = 0.0f, externalPitch = 0.0f, externalTorch = 0.0f;
     bool armed = false, finished = false, retryPending = false;

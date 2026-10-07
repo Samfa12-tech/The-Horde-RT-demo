@@ -40,6 +40,18 @@ struct AndroidMotionEvidenceScope
         scope.outputHeight != 0u;
 }
 
+// Retry retains the scene resources and advances only the measurement generation.
+[[nodiscard]] inline bool AndroidMotionRetryScopeValid(
+    const AndroidMotionEvidenceScope& before, const AndroidMotionEvidenceScope& after,
+    const bool retryPending, const bool graphicsPending) noexcept
+{
+    return retryPending && !graphicsPending && AndroidMotionScopeValid(before) &&
+        AndroidMotionScopeValid(after) && before.measurementGeneration != UINT64_MAX &&
+        after.surfaceGeneration == before.surfaceGeneration && after.sceneEpoch == before.sceneEpoch &&
+        after.outputWidth == before.outputWidth && after.outputHeight == before.outputHeight &&
+        after.measurementGeneration == before.measurementGeneration + 1u;
+}
+
 // Attach timestamp metadata to harness-generated combat edges. The caller
 // supplies only its previous harness command counters, so merged JNI input is
 // never mistaken for an edge emitted by the scenario. Validation happens

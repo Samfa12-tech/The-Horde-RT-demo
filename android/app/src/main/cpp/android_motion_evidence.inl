@@ -88,11 +88,9 @@ void UpdateAndroidMotionScope(SwapchainContext& context, horde::gameplay::simula
     auto& run = *context.motion;
     const auto scope = AndroidMotionScope(context);
     if (scope == run.scope) return;
-    // Only the scenario's ordinary retry may advance scene/measurement scope.
-    if (!run.retryPending || run.ledger.HasPendingSubmissions() ||
-        scope.surfaceGeneration != run.scope.surfaceGeneration ||
-        scope.outputWidth != run.scope.outputWidth || scope.outputHeight != run.scope.outputHeight ||
-        scope.sceneEpoch <= run.scope.sceneEpoch || scope.measurementGeneration < run.scope.measurementGeneration ||
+    // The ordinary Retry event retains resources and advances measurement only.
+    if (!horde::platform::android::AndroidMotionRetryScopeValid(
+            run.scope, scope, run.retryPending, run.ledger.HasPendingSubmissions()) ||
         !run.ledger.ObserveScope(scope.surfaceGeneration, scope.sceneEpoch, scope.measurementGeneration))
     { FailAndroidMotion(context, "Motion resource scope changed without its ordinary drained retry."); return; }
     run.scope = scope;
@@ -205,9 +203,20 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
     auto& run = *context.motion;
     const auto stage = run.scenario.Stage();
     const double seconds = run.scenario.SimulationSeconds();
+    const auto states = run.ledger.States();
+    if (states.empty()) { FailAndroidMotion(context, "Motion present has no recorded simulation state."); return; }
+    const auto action = states.back().combat.action;
+    const bool actionMilestone = action != run.lastPresentedAction &&
+        (action == horde::gameplay::PlayerCombatAction::SwingWindup ||
+         action == horde::gameplay::PlayerCombatAction::SwingActive ||
+         action == horde::gameplay::PlayerCombatAction::UpwardSliceWindup ||
+         action == horde::gameplay::PlayerCombatAction::UpwardSliceActive ||
+         action == horde::gameplay::PlayerCombatAction::ParryActive);
+    run.lastPresentedAction = action;
     if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration) || AndroidMotionScope(context) != run.scope)
     { FailAndroidMotion(context, "Motion present lost its foreground resource scope."); return; }
-    if (stage == run.lastCaptureStage && seconds - run.lastCaptureSeconds < 2.0 && !run.scenario.Complete()) return;
+    if (stage == run.lastCaptureStage && seconds - run.lastCaptureSeconds < 2.0 &&
+        !run.scenario.Complete() && !actionMilestone) return;
     horde::telemetry::RtSubmittedFrameIdentity submitted{};
     if (!context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, submitted) ||
         !CompleteRtEvidenceAfterDeviceIdle(context, vkDeviceWaitIdle(context.device)) || run.finished ||
@@ -234,7 +243,8 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
     std::ostringstream row;
     row << "{\"file\":" << JsonUtf8String(file) << ",\"width\":" << image.width << ",\"height\":" << image.height
         << ",\"bytes\":" << image.rgba.size() << ",\"stateRow\":" << frames.back().stateRow
-        << ",\"rtRow\":" << frames.size() - 1u << '}';
+        << ",\"rtRow\":" << frames.size() - 1u << ",\"actionMilestone\":"
+        << (actionMilestone ? "true" : "false") << '}';
     run.captures += row.str(); run.lastCaptureStage = stage; run.lastCaptureSeconds = seconds;
     if (run.scenario.Complete())
     {
