@@ -98,3 +98,35 @@ Original portrait lock, font 1.7 and density 560 are preserved. Owned PIDs 9419 
 14966 are stopped with receipts. Sustained FPS, reliable power/thermal reduction,
 physical multi-finger feel, moving equipment/route activation, owner audio/haptic
 acceptance and the final immutable review candidate remain separate gates.
+
+## Affected route and equipment captures
+
+The same sealed `ecc16b82` APK then passes affected collision-route replay on both
+backends: all 13 waypoints, finale reached, no replay failure and actual RT
+presentation. Each backend also passes five selected deterministic captures:
+modelled viewmodel grips, downward active cut, upward active slice, low held-lantern
+parry and player torch/fire. Both manifests report the actual 26-slot roster and
+correct backend. Actual images were inspected; action records distinguish idle,
+`swing-active`, `upward-active` and `parry-active`, with consumed semantic edges.
+These frozen poses do not establish moving overhead contact, draw/stow motion,
+hit-range calibration, full combat/ending play or owner feel.
+
+Both capture blocks also pass Home/resume with a newly accepted, fence-owned RT
+frame: surface generation 13→15, scene epoch 14→16. Pipeline accepted identity is
+record/submission/completion 2269, simulation tick 2075; Compute is 2275, tick 2130.
+No GPU timing reference is interpreted as sustained FPS. Original preferences and
+portrait/font/density settings remain unchanged; owned PIDs 19001 and 23930 are
+stopped. Manifests have zero failures and warnings.
+
+Private runs are `route-capture-pipeline/run-20261007-233047-872-f658d2ee` and
+`route-capture-compute/run-20261007-233555-412-03b4aaec` within the seal. The runner
+records documentation HEAD `827d7a12` and the preserved newline-only dirty header;
+separate receipts identify actual APK build source `ecc16b82` and verify no
+runtime-source difference between those commits. Four of five screenshot hashes
+match across backends; upward captures differ and were each inspected. The first
+Pipeline invocation incorrectly passed the capture list as one native-shell string
+and failed before device work. Its log remains beside the correctly bound array run.
+
+Documentation checkpoint `827d7a12` also passes all 12 aggregate CI checks in runs
+`37621141409` / `37621145863`. No new native source/shader or production activation
+is implied by these affected captures.

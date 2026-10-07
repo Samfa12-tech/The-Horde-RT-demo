@@ -2361,6 +2361,7 @@ public class MainActivity extends Activity {
         final CheckBox soundEnabled = new CheckBox(this);
         soundEnabled.setText(R.string.sfx_enabled);
         soundEnabled.setTextColor(0xFFFFE5BA);
+        soundEnabled.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
         soundEnabled.setTextSize(16);
         soundEnabled.setChecked(preferences.getBoolean("sfx_enabled", true));
         soundEnabled.setMinHeight(dp(48));
@@ -2382,6 +2383,7 @@ public class MainActivity extends Activity {
         final CheckBox hapticsEnabled = new CheckBox(this);
         hapticsEnabled.setText(R.string.haptics_enabled);
         hapticsEnabled.setTextColor(0xFFFFE5BA);
+        hapticsEnabled.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
         hapticsEnabled.setTextSize(16);
         hapticsEnabled.setChecked(preferences.getBoolean("haptics_enabled", true));
         hapticsEnabled.setMinHeight(dp(48));
@@ -2394,6 +2396,7 @@ public class MainActivity extends Activity {
         final CheckBox showHud = new CheckBox(this);
         showHud.setText(R.string.show_hud);
         showHud.setTextColor(0xFFFFE5BA);
+        showHud.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
         showHud.setTextSize(16);
         showHud.setChecked(preferences.getBoolean("show_hud", true));
         showHud.setMinHeight(dp(48));

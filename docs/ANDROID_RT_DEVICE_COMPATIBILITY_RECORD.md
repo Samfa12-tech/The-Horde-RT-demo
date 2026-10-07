@@ -18,6 +18,14 @@ entries, portrait lock, font scale and density are preserved; owned PIDs
 This is not sustained FPS, battery/thermal benefit, a complete route, physical
 multi-finger acceptance or final review/audit evidence.
 
+On the same sealed APK, subsequent affected Pipeline and required Compute runs
+each pass the 13-waypoint collision replay, five selected equipment/action poses
+and newly fence-owned Home/resume presentation (generation 13→15, epoch 14→16).
+Both owned processes are stopped and every preference entry remains unchanged.
+[Exact route/capture limits and source mapping](ENGINEERING_1_6_2_ANDROID_EQUIPMENT_STAGING_2026_10_07.md#affected-route-and-equipment-captures).
+Frozen poses and collision replay do not certify moving draw/stow/clearance,
+full combat/ending play, sustained FPS or owner feel.
+
 ## 7 October ordinary Play failure — SM-S948B / Android 16
 
 Evidence class: **exact Debug package, ordinary native Play handoff failure**.

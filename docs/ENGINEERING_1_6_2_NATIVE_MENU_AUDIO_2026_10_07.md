@@ -53,3 +53,14 @@ acceptance remain open. Subsequent immutable `868691fc` passes actual phone
 rotated Entry/preview, exact landscape Use/Restore and both backend Home recovery,
 as recorded in [the surface ledger](ENGINEERING_1_6_2_SURFACE_RECOVERY_2026_10_07.md).
 Those device checks do not close audio, motion, touch comfort or sustained-FPS gates.
+
+## Settings toggle visibility follow-up
+
+Actual `ecc16b82` phone settings inspection shows the default device-theme check
+marks almost black against the dark panel, despite readable labels. Sound effects,
+haptics and compact-HUD checkboxes now use the shared enabled brass/disabled tint.
+Their native checked state, preference listeners and 48 dp touch targets are
+preserved. Fourteen existing interface/preferences/contextual-layout tests and
+Android Debug assembly pass (`task-4/settings-toggle-contrast-java-20261007.log`).
+Actual corrected phone inspection requires a new seal. No audio/haptic cue,
+gain, timing or consent behavior is changed by this visual correction.
