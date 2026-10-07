@@ -1555,6 +1555,8 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
         return found == nodes_.end() ? nodes_.size()
                                      : static_cast<std::size_t>(found - nodes_.begin());
     };
+    const std::size_t hipsNode = findNode("Hips");
+    if (hipsNode < globals.size()) sockets.hips = globals[hipsNode].m;
     const auto isDescendant = [&pose](std::size_t node, const std::size_t ancestor) {
         while (node < pose.size())
         {

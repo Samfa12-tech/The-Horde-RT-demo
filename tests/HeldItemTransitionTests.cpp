@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cstdint>
+#include <initializer_list>
 #include <iostream>
 #include <limits>
 #include <type_traits>
@@ -12,6 +13,11 @@ namespace
 using namespace horde::gameplay::items;
 
 int failures = 0;
+
+bool Near(const float left, const float right, const float tolerance = 0.0001f)
+{
+    return std::abs(left - right) <= tolerance;
+}
 
 void Check(const bool condition, const char* message)
 {
@@ -33,6 +39,8 @@ bool SameTransition(const HeldItemTransitionState& left,
            sameFloat(left.elapsedSeconds, right.elapsedSeconds) &&
            sameFloat(left.durationSeconds, right.durationSeconds) &&
            sameFloat(left.progress, right.progress) &&
+           sameFloat(left.visualStartStowBlend, right.visualStartStowBlend) &&
+           sameFloat(left.visualTargetStowBlend, right.visualTargetStowBlend) &&
            left.startedTick == right.startedTick &&
            left.lastTransitionTick == right.lastTransitionTick &&
            left.lastAdvancedTick == right.lastAdvancedTick &&
@@ -41,7 +49,8 @@ bool SameTransition(const HeldItemTransitionState& left,
            left.semanticEdgeSequence == right.semanticEdgeSequence &&
            left.active == right.active &&
            left.hasAdvancedTick == right.hasAdvancedTick &&
-           left.attachmentApplied == right.attachmentApplied;
+           left.attachmentApplied == right.attachmentApplied &&
+           left.visualOnly == right.visualOnly;
 }
 
 void TestDrawSheathStowRestoreAndSingleAttachmentEdges()
@@ -118,44 +127,56 @@ void TestInterruptionAndReversalResolveToStableAttachment()
     AdvanceHeldItemTransition(sword, 11u, 1.0f / 60.0f);
     const auto reverseBeforeEdge = RequestHeldItemTransition(
         sword, HeldItemTransitionKind::Draw, 12u);
-    Check(reverseBeforeEdge.status == HeldItemTransitionRequestStatus::Interrupted &&
+    Check(reverseBeforeEdge.status == HeldItemTransitionRequestStatus::InterruptedAndStarted &&
               sword.parentMode == HeldItemParentMode::HandSocket &&
-              !sword.transition.active && !sword.transition.attachmentApplied &&
-              sword.transition.semanticEdgeSequence == 1u &&
-              sword.transition.interruptedTick == 12u &&
+              sword.transition.active && sword.transition.visualOnly &&
+              !sword.transition.attachmentApplied &&
+              sword.transition.semanticEdgeSequence == 2u &&
               ValidateHeldItemState(sword),
-          "pre-edge reversal must cancel at the source parent without a phantom attachment");
+          "pre-edge reversal must smoothly settle toward the source parent without a phantom attachment");
 
-    RequestHeldItemTransition(sword, HeldItemTransitionKind::Stow, 13u);
-    for (std::uint64_t tick = 14u; tick <= 22u; ++tick)
+    const float blendAtReversal = sword.visualStowBlend;
+    const auto paused = AdvanceHeldItemTransition(sword, 13u, 0.1f, true);
+    Check(paused.status == HeldItemTransitionAdvanceStatus::Paused &&
+              sword.visualStowBlend == blendAtReversal,
+          "paused visual-settle reversal must preserve its exact attachment blend");
+    for (std::uint64_t tick = 13u; tick < 40u; ++tick)
+        AdvanceHeldItemTransition(sword, tick, 1.0f / 60.0f);
+    Check(!sword.transition.active && Near(sword.visualStowBlend, 0.0f) &&
+              sword.parentMode == HeldItemParentMode::HandSocket,
+          "reversed pre-edge visual settle must return continuously to the hand endpoint");
+
+    RequestHeldItemTransition(sword, HeldItemTransitionKind::Stow, 40u);
+    for (std::uint64_t tick = 41u; tick <= 49u; ++tick)
         AdvanceHeldItemTransition(sword, tick, 1.0f / 60.0f);
     Check(sword.parentMode == HeldItemParentMode::BodyStow &&
+              Near(sword.visualStowBlend, 0.5f) &&
               sword.transition.attachmentApplied &&
-              sword.transition.attachmentEdgeTick == 22u,
+              sword.transition.attachmentEdgeTick == 49u,
           "a later stow must attach once at its own exact fixed tick");
 
     const auto reverseAfterEdge = RequestHeldItemTransition(
-        sword, HeldItemTransitionKind::Draw, 23u);
+        sword, HeldItemTransitionKind::Draw, 50u);
     Check(reverseAfterEdge.status ==
               HeldItemTransitionRequestStatus::InterruptedAndStarted &&
-              reverseAfterEdge.semanticEdgeSequence == 3u &&
+              reverseAfterEdge.semanticEdgeSequence == 4u &&
               sword.parentMode == HeldItemParentMode::BodyStow &&
               sword.transition.sourceParent == HeldItemParentMode::BodyStow &&
               sword.transition.targetParent == HeldItemParentMode::HandSocket,
           "post-edge reversal must recover at the attached parent before starting a new transition");
 
-    for (std::uint64_t tick = 24u; tick <= 35u; ++tick)
+    for (std::uint64_t tick = 51u; tick <= 62u; ++tick)
         AdvanceHeldItemTransition(sword, tick, 1.0f / 60.0f);
     Check(sword.parentMode == HeldItemParentMode::HandSocket &&
               sword.transition.attachmentApplied &&
-              sword.transition.attachmentEdgeTick == 35u &&
-              sword.transition.semanticEdgeSequence == 3u,
+              sword.transition.attachmentEdgeTick == 62u &&
+              sword.transition.semanticEdgeSequence == 4u,
           "the reversed draw must produce one new attachment edge with increasing sequence");
 
-    Check(InterruptHeldItemTransition(sword, 36u) &&
+    Check(InterruptHeldItemTransition(sword, 63u) &&
               !sword.transition.active &&
               sword.parentMode == HeldItemParentMode::HandSocket &&
-              sword.transition.attachmentEdgeTick == 35u &&
+              sword.transition.attachmentEdgeTick == 62u &&
               ValidateHeldItemState(sword),
           "interrupting after attachment must recover at the target parent and retain provenance");
 }
@@ -234,6 +255,62 @@ void TestSnapshotRoundTripAndMalformedStateRejection()
     Check(!InterruptHeldItemTransition(regressed, 201u) &&
               SameTransition(regressed.transition, beforeRegression),
           "an interruption timestamp older than the latest transition tick must be rejected");
+}
+
+void TestDeathInterruptFreezesVisualBlendAndRestoredStateRecovers()
+{
+    for (const float interruptedProgress : {0.20f, 0.60f})
+    {
+        HeldItemState sword = MakeHeldItemState(
+            HeldItemId::Sword, HeldHand::RightHand,
+            HeldItemParentMode::BodyStow);
+        Check(RequestHeldItemTransition(
+                  sword, HeldItemTransitionKind::Draw, 400u).status ==
+                  HeldItemTransitionRequestStatus::Started,
+              "death fixture must start from a stable stowed sword");
+        AdvanceHeldItemTransition(sword, 401u,
+            kHeldItemDrawDurationSeconds * interruptedProgress);
+        const float displayedBlend = sword.visualStowBlend;
+        const HeldItemParentMode displayedParent = sword.parentMode;
+
+        // GameSimulation interrupts an active sword transition when player
+        // vitality leaves Alive. It must freeze the exact render blend and
+        // whichever stable side owns the semantic attachment edge.
+        Check(InterruptHeldItemTransition(sword, 402u) &&
+                  !sword.transition.active &&
+                  sword.visualStowBlend == displayedBlend &&
+                  sword.parentMode == displayedParent &&
+                  ValidateHeldItemState(sword),
+              "death interruption must freeze the displayed blend and parent without snapping");
+
+        HeldItemState restored = sword;
+        Check(ValidateHeldItemState(restored) &&
+                  restored.visualStowBlend == displayedBlend &&
+                  restored.parentMode == displayedParent,
+              "a death-frozen mid-transition snapshot must restore its exact render pose");
+        const auto recovered = RequestHeldItemTransition(
+            restored,
+            displayedParent == HeldItemParentMode::BodyStow
+                ? HeldItemTransitionKind::Draw
+                : HeldItemTransitionKind::Stow,
+            403u);
+        Check(recovered.status == HeldItemTransitionRequestStatus::Started &&
+                  restored.visualStowBlend == displayedBlend &&
+                  ValidateHeldItemState(restored),
+              "recovery must resume from the saved pose without a request-time jump");
+        AdvanceHeldItemTransition(restored, 404u, 1.0f / 60.0f);
+        Check(std::abs(restored.visualStowBlend - displayedBlend) < 0.01f &&
+                  ValidateHeldItemState(restored),
+              "the first recovered fixed step must move continuously from the frozen pose");
+
+        // A paused/dead renderer continues to derive the same pose from this
+        // immutable blend; only a later simulation tick may change it.
+        const float frozenBlend = sword.visualStowBlend;
+        AdvanceHeldItemTransition(sword, 403u, 1.0f / 60.0f);
+        Check(sword.visualStowBlend == frozenBlend &&
+                  sword.parentMode == displayedParent,
+              "an inactive death-frozen transition must stay visually fixed until recovery");
+    }
 }
 
 void TestResetAndTorchWorldOwnershipRemainSeparate()
@@ -318,6 +395,7 @@ int main()
     TestInterruptionAndReversalResolveToStableAttachment();
     TestAttachmentSignalSurvivesSameTickCompletion();
     TestSnapshotRoundTripAndMalformedStateRejection();
+    TestDeathInterruptFreezesVisualBlendAndRestoredStateRecovers();
     TestResetAndTorchWorldOwnershipRemainSeparate();
     TestTorchDropInterruptsBeforeChangingOwnership();
     if (failures != 0)

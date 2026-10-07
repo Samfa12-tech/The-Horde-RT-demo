@@ -127,6 +127,13 @@ bool ResolvePlayerHeldItemVisuals(
     const horde::gameplay::items::HeldItemTransform& worldFromRightHandBone,
     horde::gameplay::items::HeldItemStates& renderItems,
     std::string& diagnostic);
+bool ResolvePlayerHeldItemVisuals(
+    const horde::gameplay::items::HeldItemStates& authoritativeItems,
+    const horde::gameplay::items::HeldItemTransform& worldFromLeftGrip,
+    const horde::gameplay::items::HeldItemTransform& worldFromRightGrip,
+    const horde::gameplay::items::HeldItemTransform& worldFromBodyStow,
+    horde::gameplay::items::HeldItemStates& renderItems,
+    std::string& diagnostic);
 
 struct PlayerGripAgreement
 {
@@ -200,10 +207,23 @@ public:
     bool ShoulderCenter(const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
                         std::array<float, 3u>& center,
                         std::string& diagnostic) const;
+    bool AnimatedHipsWorldTransform(
+        const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
+        const PlayerModelWorldBasis& basis,
+        const std::array<float, 3u>& rootWorld,
+        horde::gameplay::items::HeldItemTransform& worldFromHips,
+        std::string& diagnostic) const;
     bool ResolveHeldItemVisuals(
         const horde::gameplay::items::HeldItemStates& authoritativeItems,
         const horde::gameplay::items::HeldItemTransform& worldFromLeftGrip,
         const horde::gameplay::items::HeldItemTransform& worldFromRightGrip,
+        horde::gameplay::items::HeldItemStates& renderItems,
+        std::string& diagnostic);
+    bool ResolveHeldItemVisuals(
+        const horde::gameplay::items::HeldItemStates& authoritativeItems,
+        const horde::gameplay::items::HeldItemTransform& worldFromLeftGrip,
+        const horde::gameplay::items::HeldItemTransform& worldFromRightGrip,
+        const horde::gameplay::items::HeldItemTransform& worldFromBodyStow,
         horde::gameplay::items::HeldItemStates& renderItems,
         std::string& diagnostic);
     float BootGroundingOffsetMetres(

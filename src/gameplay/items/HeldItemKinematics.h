@@ -100,6 +100,9 @@ struct HeldItemKinematicsState
     // Camera-side retreat of that same target, applied only when ceiling
     // lowering would exceed the production arm's reachable carry envelope.
     float swordOverheadRetraction = 0.0f;
+    // Renderer consumes this snapshot-safe blend to compose the sword between
+    // the animated Hips mount and the solved hand Grip.
+    float swordStowBlend = 0.0f;
 };
 
 struct HeldItemFixedStepInput
@@ -115,6 +118,7 @@ struct HeldItemFixedStepInput
     float swordSwingRadians = 0.0f;
     horde::gameplay::interactions::InteractionState interaction{};
     PlayerMountProfile playerMountProfile = PlayerMountProfile::LegacyViewRelative;
+    const HeldItemState* swordItemState = nullptr;
 };
 
 struct HeldItemFixedStepState
@@ -167,6 +171,16 @@ FirstPersonSafeFrame EvaluateOwnerFeedbackPortraitSafeFrame(
 HeldItemTransform PlayerRagTorchGripSocketTransform();
 HeldItemTransform PlayerRagTorchFlameSocketTransform();
 HeldItemTransform PlayerRagTorchLightSocketTransform();
+// Original sword mount authored in the runtime player's +Z-forward model
+// frame. Hips-relative, blade-down, right hip (model -X), broad face forward.
+HeldItemTransform SwordBodyStowFromHips();
+// Interpolate the Grip frame itself so a non-origin Grip follows a straight,
+// reachable path between the hand and animated body attachment.
+HeldItemTransform BlendHeldItemTransformsAtGrip(
+    const HeldItemTransform& fromItem,
+    const HeldItemTransform& toItem,
+    const HeldItemTransform& itemFromGrip,
+    float blend);
 // Shared conservative roof response, exposed for the actual-rig regression's
 // bounded candidate sweep; production kinematics uses this same calculation.
 float ComputePlayerTorchOverheadLowering(

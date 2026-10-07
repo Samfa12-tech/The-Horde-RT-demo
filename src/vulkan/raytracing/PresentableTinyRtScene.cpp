@@ -5899,6 +5899,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         animatedBodyOrigin[2]};
     const bool usesSkinnedPlayer =
         effectivePlayerRenderRoute != PlayerRenderRoute::Procedural;
+    if (frame.playerAnimation.swordStowBlend > 0.0f && !usesSkinnedPlayer)
+    {
+        diagnostic = "Sword BodyStow requires the animated player Hips socket.";
+        return false;
+    }
     if (usesSkinnedPlayer)
     {
         const auto playerSkinBegin = std::chrono::steady_clock::now();
@@ -5938,6 +5943,20 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                          scaled(viewForward, viewVector[2]));
             return WorldVectorToPlayerModel(playerModelBasis, worldVector);
         };
+        auto worldFromBodyStow =
+            horde::gameplay::items::IdentityHeldItemTransform();
+        if (frame.playerAnimation.swordStowBlend > 0.0f)
+        {
+            horde::gameplay::items::HeldItemTransform worldFromHips{};
+            if (!playerRenderSlot_.AnimatedHipsWorldTransform(
+                    frame.playerAnimation, playerModelBasis, skinnedPlayerRootWorld,
+                    worldFromHips, diagnostic))
+                return false;
+            worldFromBodyStow =
+                horde::gameplay::items::MultiplyHeldItemTransforms(
+                    worldFromHips,
+                    horde::gameplay::items::SwordBodyStowFromHips());
+        }
         horde::gameplay::animation::PlayerAnimationSnapshot rigAnimation =
             frame.playerAnimation;
         rigAnimation.leftIk.shoulder = worldPointToPlayer(leftShoulder);
@@ -5952,6 +5971,33 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         rigAnimation.rightIk.gripX = viewVectorToPlayer(frame.playerAnimation.rightIk.gripX);
         rigAnimation.rightIk.gripY = viewVectorToPlayer(frame.playerAnimation.rightIk.gripY);
         rigAnimation.rightIk.gripZ = viewVectorToPlayer(frame.playerAnimation.rightIk.gripZ);
+        if (frame.playerAnimation.swordStowBlend > 0.0f)
+        {
+            const auto expectedWorldFromItem =
+                horde::gameplay::items::BlendHeldItemTransformsAtGrip(
+                    worldFromBodyStow, frame.heldItems[1].worldFromItem,
+                    horde::gameplay::items::SwordGripSocketTransform(),
+                    1.0f - frame.playerAnimation.swordStowBlend);
+            const auto expectedWorldFromGrip =
+                horde::gameplay::items::MultiplyHeldItemTransforms(
+                    expectedWorldFromItem,
+                    horde::gameplay::items::SwordGripSocketTransform());
+            rigAnimation.rightIk.target = worldPointToPlayer(
+                {{expectedWorldFromGrip[12], expectedWorldFromGrip[13],
+                  expectedWorldFromGrip[14]}});
+            const auto worldAxisToPlayer = [&playerModelBasis](const Vec3& axis) {
+                return WorldVectorToPlayerModel(playerModelBasis, axis);
+            };
+            rigAnimation.rightIk.gripX = worldAxisToPlayer(
+                {{expectedWorldFromGrip[0], expectedWorldFromGrip[1],
+                  expectedWorldFromGrip[2]}});
+            rigAnimation.rightIk.gripY = worldAxisToPlayer(
+                {{expectedWorldFromGrip[4], expectedWorldFromGrip[5],
+                  expectedWorldFromGrip[6]}});
+            rigAnimation.rightIk.gripZ = worldAxisToPlayer(
+                {{expectedWorldFromGrip[8], expectedWorldFromGrip[9],
+                  expectedWorldFromGrip[10]}});
+        }
         if (!playerRenderSlot_.PreparePose(rigAnimation, frame.tickIndex,
                                            playerCpuSkinCadence_, updateSkinnedPlayer,
                                            diagnostic, observation))
@@ -6066,7 +6112,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                 frame.heldItems,
                 rigidWorldFromBone(boneSockets.leftGrip),
                 rigidWorldFromBone(boneSockets.rightGrip),
-                renderHeldItems, diagnostic))
+                worldFromBodyStow, renderHeldItems, diagnostic))
             return false;
         finalSkinnedLeftGrip = playerRenderSlot_.FinalWorldFromLeftGrip();
         hasFinalSkinnedLeftGrip = true;

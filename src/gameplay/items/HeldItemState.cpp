@@ -58,6 +58,7 @@ HeldItemState MakeHeldItemState(const HeldItemId id,
     result.id = id;
     result.hand = hand;
     result.parentMode = parentMode;
+    result.visualStowBlend = parentMode == HeldItemParentMode::BodyStow ? 1.0f : 0.0f;
     result.transition.sourceParent = parentMode;
     result.transition.targetParent = parentMode;
     result.worldFromItem = IdentityHeldItemTransform();
@@ -106,6 +107,103 @@ void UpdateHeldItemParent(HeldItemState& item,
         item.transition.sourceParent = parentMode;
         item.transition.targetParent = parentMode;
     }
+}
+
+HeldItemTransform BlendHeldItemTransforms(const HeldItemTransform& from,
+                                         const HeldItemTransform& to,
+                                         float blend)
+{
+    struct Quaternion { float x, y, z, w; };
+    const auto toQuaternion = [](const HeldItemTransform& value) {
+        Quaternion q{};
+        const float m00 = value[0], m01 = value[4], m02 = value[8];
+        const float m10 = value[1], m11 = value[5], m12 = value[9];
+        const float m20 = value[2], m21 = value[6], m22 = value[10];
+        const float trace = m00 + m11 + m22;
+        if (trace > 0.0f)
+        {
+            const float s = std::sqrt(trace + 1.0f) * 2.0f;
+            q.w = 0.25f * s;
+            q.x = (m21 - m12) / s;
+            q.y = (m02 - m20) / s;
+            q.z = (m10 - m01) / s;
+        }
+        else if (m00 > m11 && m00 > m22)
+        {
+            const float s = std::sqrt(std::max(0.0f, 1.0f + m00 - m11 - m22)) * 2.0f;
+            q.w = (m21 - m12) / s;
+            q.x = 0.25f * s;
+            q.y = (m01 + m10) / s;
+            q.z = (m02 + m20) / s;
+        }
+        else if (m11 > m22)
+        {
+            const float s = std::sqrt(std::max(0.0f, 1.0f + m11 - m00 - m22)) * 2.0f;
+            q.w = (m02 - m20) / s;
+            q.x = (m01 + m10) / s;
+            q.y = 0.25f * s;
+            q.z = (m12 + m21) / s;
+        }
+        else
+        {
+            const float s = std::sqrt(std::max(0.0f, 1.0f + m22 - m00 - m11)) * 2.0f;
+            q.w = (m10 - m01) / s;
+            q.x = (m02 + m20) / s;
+            q.y = (m12 + m21) / s;
+            q.z = 0.25f * s;
+        }
+        return q;
+    };
+    const auto normalize = [](Quaternion q) {
+        const float length = std::sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w);
+        if (length > 1.0e-8f)
+        {
+            q.x /= length; q.y /= length; q.z /= length; q.w /= length;
+        }
+        return q;
+    };
+    blend = std::clamp(std::isfinite(blend) ? blend : 0.0f, 0.0f, 1.0f);
+    Quaternion a = toQuaternion(from);
+    Quaternion b = toQuaternion(to);
+    float cosine = a.x*b.x + a.y*b.y + a.z*b.z + a.w*b.w;
+    if (cosine < 0.0f)
+    {
+        cosine = -cosine;
+        b = {-b.x, -b.y, -b.z, -b.w};
+    }
+    Quaternion q{};
+    if (cosine > 0.9995f)
+    {
+        q = normalize({a.x + (b.x-a.x)*blend,
+                       a.y + (b.y-a.y)*blend,
+                       a.z + (b.z-a.z)*blend,
+                       a.w + (b.w-a.w)*blend});
+    }
+    else
+    {
+        const float angle = std::acos(std::clamp(cosine, -1.0f, 1.0f));
+        const float sine = std::sin(angle);
+        const float wa = std::sin((1.0f-blend)*angle) / sine;
+        const float wb = std::sin(blend*angle) / sine;
+        q = {wa*a.x + wb*b.x, wa*a.y + wb*b.y,
+             wa*a.z + wb*b.z, wa*a.w + wb*b.w};
+    }
+    const float xx=q.x*q.x, yy=q.y*q.y, zz=q.z*q.z;
+    const float xy=q.x*q.y, xz=q.x*q.z, yz=q.y*q.z;
+    const float wx=q.w*q.x, wy=q.w*q.y, wz=q.w*q.z;
+    HeldItemTransform result = IdentityHeldItemTransform();
+    result[0] = 1.0f - 2.0f*(yy+zz);
+    result[1] = 2.0f*(xy+wz);
+    result[2] = 2.0f*(xz-wy);
+    result[4] = 2.0f*(xy-wz);
+    result[5] = 1.0f - 2.0f*(xx+zz);
+    result[6] = 2.0f*(yz+wx);
+    result[8] = 2.0f*(xz+wy);
+    result[9] = 2.0f*(yz-wx);
+    result[10] = 1.0f - 2.0f*(xx+yy);
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+        result[12u+axis] = from[12u+axis] + (to[12u+axis]-from[12u+axis])*blend;
+    return result;
 }
 
 namespace
@@ -197,6 +295,12 @@ bool NearlyEqual(const float left, const float right)
     return std::abs(left - right) <= 0.0001f;
 }
 
+float SmoothStep(const float value)
+{
+    const float t = std::clamp(value, 0.0f, 1.0f);
+    return t * t * (3.0f - 2.0f * t);
+}
+
 HeldItemTransitionRequestResult BeginTransition(HeldItemState& item,
                                                 const HeldItemTransitionKind kind,
                                                 const std::uint64_t tick)
@@ -215,6 +319,9 @@ HeldItemTransitionRequestResult BeginTransition(HeldItemState& item,
     item.transition.kind = kind;
     item.transition.sourceParent = item.parentMode;
     item.transition.targetParent = target;
+    item.transition.visualStartStowBlend = item.visualStowBlend;
+    item.transition.visualTargetStowBlend =
+        target == HeldItemParentMode::BodyStow ? 1.0f : 0.0f;
     item.transition.durationSeconds = TransitionDuration(kind);
     item.transition.startedTick = tick;
     item.transition.lastTransitionTick = tick;
@@ -224,6 +331,31 @@ HeldItemTransitionRequestResult BeginTransition(HeldItemState& item,
     result.status = HeldItemTransitionRequestStatus::Started;
     result.semanticEdgeSequence = sequence;
     return result;
+}
+
+HeldItemTransitionRequestResult BeginVisualSettle(HeldItemState& item,
+                                                  const HeldItemTransitionKind kind,
+                                                  const std::uint64_t tick)
+{
+    if (item.transition.semanticEdgeSequence == std::numeric_limits<std::uint64_t>::max())
+        return {HeldItemTransitionRequestStatus::RejectedSequenceExhausted,
+                item.transition.semanticEdgeSequence};
+    const auto sequence = item.transition.semanticEdgeSequence + 1u;
+    item.transition = {};
+    item.transition.kind = kind;
+    item.transition.sourceParent = item.parentMode;
+    item.transition.targetParent = item.parentMode;
+    item.transition.durationSeconds = TransitionDuration(kind);
+    item.transition.visualStartStowBlend = item.visualStowBlend;
+    item.transition.visualTargetStowBlend =
+        item.parentMode == HeldItemParentMode::BodyStow ? 1.0f : 0.0f;
+    item.transition.startedTick = tick;
+    item.transition.lastTransitionTick = tick;
+    item.transition.lastAdvancedTick = tick;
+    item.transition.semanticEdgeSequence = sequence;
+    item.transition.active = true;
+    item.transition.visualOnly = true;
+    return {HeldItemTransitionRequestStatus::Started, sequence};
 }
 
 } // namespace
@@ -238,8 +370,14 @@ bool ValidateHeldItemState(const HeldItemState& item)
         !std::isfinite(transition.elapsedSeconds) ||
         !std::isfinite(transition.durationSeconds) ||
         !std::isfinite(transition.progress) ||
+        !std::isfinite(transition.visualStartStowBlend) ||
+        !std::isfinite(transition.visualTargetStowBlend) ||
+        !std::isfinite(item.visualStowBlend) ||
         transition.elapsedSeconds < 0.0f || transition.durationSeconds < 0.0f ||
         transition.progress < 0.0f || transition.progress > 1.0f ||
+        transition.visualStartStowBlend < 0.0f || transition.visualStartStowBlend > 1.0f ||
+        transition.visualTargetStowBlend < 0.0f || transition.visualTargetStowBlend > 1.0f ||
+        item.visualStowBlend < 0.0f || item.visualStowBlend > 1.0f ||
         (item.detached &&
          item.parentMode != HeldItemParentMode::AuthoredWorldTrajectory &&
          item.parentMode != HeldItemParentMode::WorldObject))
@@ -252,15 +390,19 @@ bool ValidateHeldItemState(const HeldItemState& item)
         if (transition.kind == HeldItemTransitionKind::None ||
             !IsStableParent(transition.sourceParent) ||
             !IsStableParent(transition.targetParent) ||
-            transition.sourceParent == transition.targetParent ||
+            (transition.sourceParent == transition.targetParent && !transition.visualOnly) ||
+            (transition.visualOnly &&
+             (transition.sourceParent != item.parentMode ||
+              transition.targetParent != item.parentMode ||
+              transition.attachmentApplied || transition.attachmentEdgeTick != 0u)) ||
             transition.durationSeconds <= 0.0f ||
             transition.elapsedSeconds > transition.durationSeconds ||
             transition.semanticEdgeSequence == 0u ||
-            ((transition.kind == HeldItemTransitionKind::Sheath ||
+            (!transition.visualOnly && (transition.kind == HeldItemTransitionKind::Sheath ||
               transition.kind == HeldItemTransitionKind::Stow) &&
              (transition.sourceParent != HeldItemParentMode::HandSocket ||
               transition.targetParent != HeldItemParentMode::BodyStow)) ||
-            ((transition.kind == HeldItemTransitionKind::Draw ||
+            (!transition.visualOnly && (transition.kind == HeldItemTransitionKind::Draw ||
               transition.kind == HeldItemTransitionKind::Restore) &&
              (transition.sourceParent != HeldItemParentMode::BodyStow ||
               transition.targetParent != HeldItemParentMode::HandSocket)) ||
@@ -279,7 +421,7 @@ bool ValidateHeldItemState(const HeldItemState& item)
               transition.attachmentEdgeTick < transition.startedTick ||
               (transition.hasAdvancedTick &&
                transition.attachmentEdgeTick > transition.lastAdvancedTick))) ||
-            (!transition.attachmentApplied &&
+            (!transition.visualOnly && !transition.attachmentApplied &&
              (item.parentMode != transition.sourceParent ||
               transition.attachmentEdgeTick != 0u ||
               transition.progress >= kHeldItemAttachmentEdgeProgress)))
@@ -302,6 +444,14 @@ bool ValidateHeldItemState(const HeldItemState& item)
         return transition.elapsedSeconds == 0.0f && transition.progress == 0.0f &&
                !transition.attachmentApplied && transition.attachmentEdgeTick == 0u;
     }
+    if (transition.visualOnly)
+    {
+        return transition.semanticEdgeSequence != 0u &&
+               transition.elapsedSeconds == transition.durationSeconds &&
+               transition.progress == 1.0f && !transition.attachmentApplied &&
+               transition.attachmentEdgeTick == 0u &&
+               std::abs(item.visualStowBlend - transition.visualTargetStowBlend) <= 0.0001f;
+    }
     return transition.semanticEdgeSequence != 0u &&
            transition.attachmentApplied &&
            transition.elapsedSeconds == transition.durationSeconds &&
@@ -323,7 +473,16 @@ bool InterruptHeldItemTransition(HeldItemState& item, const std::uint64_t tick)
     transition.lastTransitionTick = tick;
     transition.sourceParent = item.parentMode;
     transition.targetParent = item.parentMode;
-    if (transition.attachmentApplied)
+    if (transition.visualOnly)
+    {
+        transition.elapsedSeconds = 0.0f;
+        transition.durationSeconds = 0.0f;
+        transition.progress = 0.0f;
+        transition.visualStartStowBlend = item.visualStowBlend;
+        transition.visualTargetStowBlend = item.visualStowBlend;
+        transition.visualOnly = false;
+    }
+    else if (transition.attachmentApplied)
     {
         transition.elapsedSeconds = transition.durationSeconds;
         transition.progress = 1.0f;
@@ -381,11 +540,19 @@ HeldItemTransitionRequestResult RequestHeldItemTransition(
         }
     }
 
-    if (item.parentMode == target)
+    const float targetBlend = target == HeldItemParentMode::BodyStow ? 1.0f : 0.0f;
+    if (item.parentMode == target && std::abs(item.visualStowBlend - targetBlend) <= 0.0001f)
     {
         return {interrupted ? HeldItemTransitionRequestStatus::Interrupted
                             : HeldItemTransitionRequestStatus::AlreadyAtTarget,
                 item.transition.semanticEdgeSequence};
+    }
+    if (item.parentMode == target)
+    {
+        auto result = BeginVisualSettle(item, kind, tick);
+        if (interrupted && result.status == HeldItemTransitionRequestStatus::Started)
+            result.status = HeldItemTransitionRequestStatus::InterruptedAndStarted;
+        return result;
     }
     if (!IsStableParent(item.parentMode))
     {
@@ -438,10 +605,13 @@ HeldItemTransitionAdvanceResult AdvanceHeldItemTransition(
         transition.durationSeconds, transition.elapsedSeconds + fixedDeltaSeconds);
     transition.progress = std::clamp(
         transition.elapsedSeconds / transition.durationSeconds, 0.0f, 1.0f);
+    const float eased = SmoothStep(transition.progress);
+    item.visualStowBlend = transition.visualStartStowBlend +
+        (transition.visualTargetStowBlend - transition.visualStartStowBlend) * eased;
     transition.lastTransitionTick = tick;
     transition.lastAdvancedTick = tick;
     transition.hasAdvancedTick = true;
-    const bool attachedNow = !transition.attachmentApplied &&
+    const bool attachedNow = !transition.visualOnly && !transition.attachmentApplied &&
         previousProgress < kHeldItemAttachmentEdgeProgress &&
         transition.progress >= kHeldItemAttachmentEdgeProgress;
     if (attachedNow)
@@ -454,6 +624,7 @@ HeldItemTransitionAdvanceResult AdvanceHeldItemTransition(
     HeldItemTransitionAdvanceStatus status = HeldItemTransitionAdvanceStatus::Advanced;
     if (transition.elapsedSeconds >= transition.durationSeconds)
     {
+        item.visualStowBlend = transition.visualTargetStowBlend;
         transition.active = false;
         transition.sourceParent = transition.targetParent;
         transition.progress = 1.0f;

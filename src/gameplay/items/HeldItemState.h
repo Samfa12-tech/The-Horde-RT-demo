@@ -54,6 +54,8 @@ struct HeldItemTransitionState
     float elapsedSeconds = 0.0f;
     float durationSeconds = 0.0f;
     float progress = 0.0f;
+    float visualStartStowBlend = 0.0f;
+    float visualTargetStowBlend = 0.0f;
     std::uint64_t startedTick = 0u;
     std::uint64_t lastTransitionTick = 0u;
     std::uint64_t lastAdvancedTick = 0u;
@@ -63,6 +65,7 @@ struct HeldItemTransitionState
     bool active = false;
     bool hasAdvancedTick = false;
     bool attachmentApplied = false;
+    bool visualOnly = false;
 };
 
 struct HeldItemState
@@ -72,6 +75,10 @@ struct HeldItemState
     HeldItemParentMode parentMode = HeldItemParentMode::HandSocket;
     HeldItemTransform worldFromItem{};
     HeldItemTransform worldFromDetach{};
+    // Continuous rendered ownership weight: 0 is the hand Grip, 1 is the
+    // animated body mount. Kept separately from the midpoint attachment edge
+    // so interruption/reversal never snaps the rendered item.
+    float visualStowBlend = 0.0f;
     std::uint64_t detachTick = 0u;
     bool detached = false;
     HeldItemTransitionState transition{};
@@ -80,6 +87,9 @@ struct HeldItemState
 using HeldItemStates = std::array<HeldItemState, 2u>;
 
 HeldItemTransform IdentityHeldItemTransform();
+HeldItemTransform BlendHeldItemTransforms(const HeldItemTransform& from,
+                                          const HeldItemTransform& to,
+                                          float blend);
 HeldItemTransform OriginalTorchGripSocketTransform();
 HeldItemTransform OriginalTorchFlameSocketTransform();
 HeldItemTransform OriginalTorchLightSocketTransform();

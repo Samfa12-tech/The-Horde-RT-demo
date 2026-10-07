@@ -1092,10 +1092,11 @@ void GameSimulation::ResolveHeldItems()
         presentationCombat,
         combatSnapshot_.swordSwingRadians,
         interactionState_,
-        config_.playerMountProfile};
-    // Kinematics still renders the legacy hand-held sword. Keep transition
-    // authority in the simulation snapshot while that presentation path is
-    // being connected; only copy back its resolved item transform here.
+        config_.playerMountProfile,
+        &heldItems_[1]};
+    // Simulation owns the transition/visual blend. Kinematics keeps a stable
+    // hand-endpoint matrix for gameplay; PlayerRenderSlot composes its single
+    // rendered matrix from that endpoint and the animated Hips mount.
     const horde::gameplay::items::HeldItemState swordAuthority = heldItems_[1];
     auto resolvedItems = heldItems_;
     // Every socket contract is a checked rigid transform. A failure would

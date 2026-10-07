@@ -1121,6 +1121,246 @@ bool ResolveProductionAnatomicalSword(
     return true;
 }
 
+bool ResolveProductionSwordStowPose(
+    horde::gameplay::items::HeldItemFixedStepInput input,
+    const float stowBlend,
+    horde::vulkan::raytracing::PlayerRenderSlot& rig,
+    const std::uint64_t tick,
+    HeldItemTransform& worldFromHips,
+    HeldItemTransform& worldFromBodyStow,
+    HeldItemTransform& worldFromFinalGrip,
+    HeldItemTransform& worldFromDesiredGrip,
+    std::array<float, 3u>& playerRootWorld,
+    horde::gameplay::items::HeldItemStates& renderItems,
+    std::string& diagnostic)
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::animation;
+    using namespace horde::gameplay::items;
+    using namespace horde::vulkan::raytracing;
+    input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+    HeldItemStates items = MakeDefaultHeldItemStates();
+    items[1].visualStowBlend = std::clamp(stowBlend, 0.0f, 1.0f);
+    items[1].parentMode = stowBlend >= 1.0f
+        ? HeldItemParentMode::BodyStow : HeldItemParentMode::HandSocket;
+    input.swordItemState = &items[1];
+    HeldItemFixedStepState fixed{};
+    if (!ResolveHeldItemsFixedStep(items, input, tick, fixed, diagnostic)) return false;
+    items[1].visualStowBlend = stowBlend;
+    items[1].parentMode = stowBlend >= 1.0f
+        ? HeldItemParentMode::BodyStow : HeldItemParentMode::HandSocket;
+
+    PlayerAnimationState animationState;
+    PlayerAnimationInput animationInput;
+    animationInput.heldItemKinematics = fixed.kinematics;
+    animationInput.playerCombat = input.playerCombat;
+    animationInput.walkTime = input.walkTime;
+    animationInput.walkAmount = input.walkAmount;
+    animationState.StepFixed(animationInput, 1.0f / 60.0f);
+    auto animation = animationState.Snapshot();
+
+    const std::array<float, 3u> eye{{input.playerX, kShowcaseEyeWorldY,
+                                     input.playerZ}};
+    const auto forward = Normalize({{std::sin(input.playerYawRadians),
+        -0.05f + std::clamp(input.playerPitchRadians, -0.32f, 0.28f),
+        -std::cos(input.playerYawRadians)}});
+    const std::array<float, 3u> up{{0.0f, 1.0f, 0.0f}};
+    const auto right = Normalize(Cross(forward, up));
+    const auto viewUp = Normalize(Cross(right, forward));
+    const auto viewVectorToWorld = [&](const std::array<float, 3u>& value) {
+        return Add(Add(Scale(right, value[0]), Scale(viewUp, value[1])),
+                   Scale(forward, value[2]));
+    };
+    const std::array<float, 3u> bodyForward{{std::sin(input.playerYawRadians),
+        0.0f, -std::cos(input.playerYawRadians)}};
+    const std::array<float, 3u> bodyRight{{std::cos(input.playerYawRadians),
+        0.0f, std::sin(input.playerYawRadians)}};
+    const auto basis = BuildPlayerModelWorldBasis(bodyRight, bodyForward);
+    const auto root = GroundPlayerRootOnRouteFloor(
+        eye, kRouteFloorWorldY, rig.BootGroundingOffsetMetres(animation));
+    playerRootWorld = root;
+    const auto pointToModel = [&](const std::array<float, 3u>& local) {
+        const auto world = Add(eye, viewVectorToWorld(local));
+        return WorldVectorToPlayerModel(basis, {{world[0] - root[0],
+            world[1] - root[1], world[2] - root[2]}});
+    };
+    const auto vectorToModel = [&](const std::array<float, 3u>& local) {
+        return WorldVectorToPlayerModel(basis, viewVectorToWorld(local));
+    };
+    if (!rig.AnimatedHipsWorldTransform(animation, basis, root,
+                                        worldFromHips, diagnostic))
+        return false;
+    worldFromBodyStow = MultiplyHeldItemTransforms(
+        worldFromHips, SwordBodyStowFromHips());
+    const auto expectedWorldFromItem = BlendHeldItemTransformsAtGrip(
+        worldFromBodyStow, items[1].worldFromItem,
+        SwordGripSocketTransform(), 1.0f - stowBlend);
+    const auto expectedWorldFromGrip = MultiplyHeldItemTransforms(
+        expectedWorldFromItem, SwordGripSocketTransform());
+    worldFromDesiredGrip = expectedWorldFromGrip;
+    animation.rightIk.target = WorldVectorToPlayerModel(basis, {{
+        expectedWorldFromGrip[12] - root[0],
+        expectedWorldFromGrip[13] - root[1],
+        expectedWorldFromGrip[14] - root[2]}});
+    animation.rightIk.gripX = WorldVectorToPlayerModel(
+        basis, {{expectedWorldFromGrip[0], expectedWorldFromGrip[1],
+                 expectedWorldFromGrip[2]}});
+    animation.rightIk.gripY = WorldVectorToPlayerModel(
+        basis, {{expectedWorldFromGrip[4], expectedWorldFromGrip[5],
+                 expectedWorldFromGrip[6]}});
+    animation.rightIk.gripZ = WorldVectorToPlayerModel(
+        basis, {{expectedWorldFromGrip[8], expectedWorldFromGrip[9],
+                 expectedWorldFromGrip[10]}});
+    for (auto* arm : {&animation.leftIk, &animation.rightIk})
+    {
+        arm->shoulder = pointToModel(arm->shoulder);
+        arm->pole = vectorToModel(arm->pole);
+        if (arm == &animation.leftIk)
+        {
+            arm->target = pointToModel(arm->target);
+            arm->gripX = WorldVectorToPlayerModel(basis,
+                viewVectorToWorld(fixed.kinematics.leftGripXInView));
+            arm->gripY = WorldVectorToPlayerModel(basis,
+                viewVectorToWorld(fixed.kinematics.leftGripYInView));
+            arm->gripZ = WorldVectorToPlayerModel(basis,
+                viewVectorToWorld(fixed.kinematics.leftGripZInView));
+        }
+    }
+    bool poseUpdated = false;
+    if (!rig.PreparePose(animation, tick, PlayerCpuSkinCadence::Hz60,
+                         poseUpdated, diagnostic))
+        return false;
+    worldFromFinalGrip = PlayerGripToWorld(rig.BoneSockets().rightGrip,
+                                           basis, root);
+    const auto worldFromLeftGrip = PlayerGripToWorld(
+        rig.BoneSockets().leftGrip, basis, root);
+    return rig.ResolveHeldItemVisuals(items, worldFromLeftGrip,
+        worldFromFinalGrip, worldFromBodyStow, renderItems, diagnostic);
+}
+
+void TestActualRigSwordBodyStowAndContinuousDrawBlend()
+{
+    using namespace horde::gameplay::items;
+    using namespace horde::vulkan::raytracing;
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    PlayerRenderSlot rig;
+    std::string diagnostic;
+    Check(rig.LoadAsset((root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),
+                        diagnostic),
+          "body-mounted sword must use the actual imported player rig");
+    if (!rig.IsLoaded()) return;
+
+    HeldItemFixedStepInput input;
+    input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+    input.playerX = -1.25f;
+    input.playerZ = -8.4f;
+    input.playerYawRadians = 0.42f;
+    input.walkTime = 0.31f;
+    input.walkAmount = 0.55f;
+    const std::array<float, 6u> blends{{1.0f, 0.75f, 0.501f, 0.499f, 0.25f, 0.0f}};
+    HeldItemTransform previous{};
+    HeldItemTransform originalTorch{};
+    bool havePrevious = false;
+    bool haveTorch = false;
+    float maximumPositionStep = 0.0f;
+    float maximumGripPositionError = 0.0f;
+    float maximumGripOrientationError = 0.0f;
+    bool allGripTargetsResolved = true;
+    bool allRigidTransformsValid = true;
+    std::uint64_t tick = 1u;
+    for (const float blend : blends)
+    {
+        HeldItemTransform hips{}, bodyStow{}, finalGrip{}, desiredGrip{};
+        std::array<float, 3u> playerRoot{};
+        HeldItemStates rendered{};
+        if (!ResolveProductionSwordStowPose(input, blend, rig, tick++,
+                hips, bodyStow, finalGrip, desiredGrip, playerRoot,
+                rendered, diagnostic))
+        {
+            std::cerr << "Sword stow actual-rig diagnostic: blend=" << blend
+                      << " :: " << diagnostic << '\n';
+            allGripTargetsResolved = false;
+            continue;
+        }
+        const auto finalHips = PlayerGripToWorld(rig.BoneSockets().hips,
+            BuildPlayerModelWorldBasis(
+                {{std::cos(input.playerYawRadians), 0.0f,
+                  std::sin(input.playerYawRadians)}},
+                {{std::sin(input.playerYawRadians), 0.0f,
+                  -std::cos(input.playerYawRadians)}}),
+            playerRoot);
+        // The body mount input is built from the same animated Hips socket
+        // used by final skinning, and no view/camera coordinate is authored
+        // into the mount transform.
+        allGripTargetsResolved &= TransformNear(finalHips, hips, 0.025f);
+        const auto agreement = MeasureTransformAgreement(desiredGrip, finalGrip);
+        maximumGripPositionError = std::max(maximumGripPositionError,
+                                            agreement.positionErrorMetres);
+        maximumGripOrientationError = std::max(maximumGripOrientationError,
+                                                agreement.orientationErrorRadians);
+        allGripTargetsResolved &=
+            agreement.positionErrorMetres <= kPlayerGripSocketToleranceMetres &&
+            agreement.orientationErrorRadians <= kPlayerGripOrientationToleranceRadians &&
+            rig.RightGripAgreement().positionErrorMetres <=
+                kPlayerGripSocketToleranceMetres &&
+            rig.RightGripAgreement().orientationErrorRadians <=
+                kPlayerGripOrientationToleranceRadians;
+        allRigidTransformsValid &= ValidateHeldItemSocketTransform(
+            rendered[1].worldFromItem, diagnostic);
+        allRigidTransformsValid &= rendered[0].id == HeldItemId::OriginalTorch &&
+            rendered[1].id == HeldItemId::Sword;
+        HeldItemTransform finalHandItem{};
+        allRigidTransformsValid &= ComposeWorldFromItem(
+            finalGrip, SwordGripSocketTransform(), finalHandItem, diagnostic);
+        const auto expectedRenderedSword = blend >= 1.0f
+            ? bodyStow : finalHandItem;
+        allRigidTransformsValid &= TransformNear(
+            rendered[1].worldFromItem, expectedRenderedSword, 0.0002f);
+        if (!haveTorch)
+        {
+            originalTorch = rendered[0].worldFromItem;
+            haveTorch = true;
+        }
+        allRigidTransformsValid &= TransformNear(
+            rendered[0].worldFromItem, originalTorch);
+        if (havePrevious)
+        {
+            const float dx = rendered[1].worldFromItem[12] - previous[12];
+            const float dy = rendered[1].worldFromItem[13] - previous[13];
+            const float dz = rendered[1].worldFromItem[14] - previous[14];
+            maximumPositionStep = std::max(maximumPositionStep,
+                std::sqrt(dx*dx + dy*dy + dz*dz));
+        }
+        previous = rendered[1].worldFromItem;
+        havePrevious = true;
+    }
+    Check(allGripTargetsResolved && maximumGripPositionError <=
+              kPlayerGripSocketToleranceMetres && maximumGripOrientationError <=
+              kPlayerGripOrientationToleranceRadians,
+          "actual right-hand rig must track the Hips-to-hand Grip path through draw, midpoint and sheath");
+    Check(allRigidTransformsValid && maximumPositionStep < 0.35f,
+          "the single rendered sword transform must remain rigid and continuous on both sides of the attachment edge");
+
+    // Reversal is driven by the snapshot-safe blend rather than a separate
+    // renderer clock: copied state produces the same physical transform.
+    HeldItemState interrupted = MakeHeldItemState(
+        HeldItemId::Sword, HeldHand::RightHand, HeldItemParentMode::BodyStow);
+    RequestHeldItemTransition(interrupted, HeldItemTransitionKind::Draw, 20u);
+    AdvanceHeldItemTransition(interrupted, 21u, 0.12f);
+    const HeldItemState saved = interrupted;
+    Check(ValidateHeldItemState(saved) &&
+              saved.visualStowBlend == interrupted.visualStowBlend,
+          "saved mid-draw ownership blend must remain a valid resumable snapshot");
+    const float beforeReverse = interrupted.visualStowBlend;
+    const auto reverse = RequestHeldItemTransition(
+        interrupted, HeldItemTransitionKind::Stow, 22u);
+    Check((reverse.status == HeldItemTransitionRequestStatus::Started ||
+           reverse.status == HeldItemTransitionRequestStatus::InterruptedAndStarted) &&
+              Near(interrupted.visualStowBlend, beforeReverse) &&
+              ValidateHeldItemState(interrupted),
+          "reversing an in-flight draw must preserve the exact displayed item blend");
+}
+
 void TestSwordOverheadClearanceUsesImportedBladeAcrossCombatPhases()
 {
     using namespace horde::gameplay;
@@ -1430,6 +1670,7 @@ int main()
     TestPlayerRagTorchSocketsDriveFixedStepAttachmentAndLight();
     TestProductionTorchFitsSharedClearanceEnvelope();
     TestRagTorchEnvelopeIncludesTheUnchangedEngineFire();
+    TestActualRigSwordBodyStowAndContinuousDrawBlend();
     TestSwordOverheadClearanceUsesImportedBladeAcrossCombatPhases();
     if (failures == 0)
     {

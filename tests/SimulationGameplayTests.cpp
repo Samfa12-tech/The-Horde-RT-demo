@@ -1831,7 +1831,10 @@ int main()
           NearlyEqual(stagedPair[0].z, kWaterfallSkeletonPairCenter.z) &&
           NearlyEqual(stagedPair[1].z, kWaterfallSkeletonPairCenter.z) &&
           waterfallEncounter->Snapshot().heldItems[1].parentMode ==
-              items::HeldItemParentMode::BodyStow,
+              items::HeldItemParentMode::BodyStow &&
+          NearlyEqual(waterfallEncounter->Snapshot().heldItems[1].visualStowBlend, 1.0f) &&
+          NearlyEqual(waterfallEncounter->Snapshot().heldItemKinematics.swordStowBlend,
+                      waterfallEncounter->Snapshot().heldItems[1].visualStowBlend),
           "opt-in Waterfall encounter stages the same two stable skeleton IDs west of the wetline while production waits for rendered BodyStow support");
 
     InputSnapshot waterfallInput;
@@ -1884,6 +1887,8 @@ int main()
               items::HeldItemParentMode::HandSocket &&
           !waterfallEncounter->Snapshot().heldItems[1].transition.active &&
           !waterfallEncounter->Snapshot().automaticSwordDrawBlocksDefense &&
+          NearlyEqual(waterfallEncounter->Snapshot().heldItems[1].visualStowBlend, 0.0f) &&
+          NearlyEqual(waterfallEncounter->Snapshot().heldItemKinematics.swordStowBlend, 0.0f) &&
           CountEvents(waterfallEncounter->Events(), GameplayEventType::PlayerSwordAttachmentChanged) == 1u &&
           CountEvents(waterfallEncounter->Events(), GameplayEventType::PlayerSwing) == 1u,
           "one queued attack starts only after the fixed-tick hand attachment and draw completion");

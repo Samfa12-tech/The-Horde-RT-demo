@@ -297,6 +297,37 @@ HeldItemTransform PlayerRagTorchLightSocketTransform()
     return result;
 }
 
+HeldItemTransform SwordBodyStowFromHips()
+{
+    // The runtime player model maps +X to anatomical left and +Z forward.
+    // A 180-degree roll about forward sends the blade's +Y axis down while
+    // preserving a proper right-handed frame and facing the broad flat out.
+    HeldItemTransform result = IdentityHeldItemTransform();
+    result[0] = -1.0f;
+    result[5] = -1.0f;
+    result[10] = 1.0f;
+    result[12] = -0.15f;
+    result[13] = 0.135f;
+    result[14] = 0.03f;
+    return result;
+}
+
+HeldItemTransform BlendHeldItemTransformsAtGrip(
+    const HeldItemTransform& fromItem,
+    const HeldItemTransform& toItem,
+    const HeldItemTransform& itemFromGrip,
+    const float blend)
+{
+    const HeldItemTransform fromGrip = MultiplyHeldItemTransforms(
+        fromItem, itemFromGrip);
+    const HeldItemTransform toGrip = MultiplyHeldItemTransforms(
+        toItem, itemFromGrip);
+    const HeldItemTransform worldFromGrip = BlendHeldItemTransforms(
+        fromGrip, toGrip, blend);
+    return MultiplyHeldItemTransforms(
+        worldFromGrip, InverseRigidTransform(itemFromGrip));
+}
+
 float ComputePlayerTorchOverheadLowering(
     const std::array<float, 3u>& gripWorld,
     const std::array<float, 3u>& viewUp,
@@ -1084,6 +1115,12 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.interaction,
         input.playerMountProfile,
         input.playerPitchRadians});
+    if (input.swordItemState != nullptr &&
+        input.swordItemState->id == HeldItemId::Sword)
+    {
+        state.kinematics.swordStowBlend = std::clamp(
+            input.swordItemState->visualStowBlend, 0.0f, 1.0f);
+    }
 
     constexpr Vec3 worldUp{{0.0f, 1.0f, 0.0f}};
     const float pitch = std::clamp(input.playerPitchRadians, -0.32f, 0.28f);

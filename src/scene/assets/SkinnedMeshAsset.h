@@ -91,6 +91,7 @@ struct SkinnedArmIkTarget
 
 struct SkinnedPlayerSockets
 {
+    SkinnedNodeTransform hips{};
     SkinnedNodeTransform leftHand{};
     SkinnedNodeTransform rightHand{};
     SkinnedNodeTransform leftGrip{};
