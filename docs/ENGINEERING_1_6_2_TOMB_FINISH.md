@@ -4,6 +4,12 @@ Updated 7 October 2026. Authority: the owner's `Horde-1.6.2-after-reset-goal.txt
 
 ## Preserved completed evidence
 
+Latest intermediate UI seal `fe83c473` passes affected physical Settings check-mark
+inspection with preferences unchanged and the app stopped; all 12 aggregate CI
+checks pass in `37623162765` / `37623170903`. [Exact receipt and package hash](ENGINEERING_1_6_2_NATIVE_MENU_AUDIO_2026_10_07.md#settings-toggle-visibility-follow-up).
+The prior exact `ecc16b82` collision replay/frozen poses/pause checks remain under
+that package and do not close moving contact, owner acceptance or sustained FPS.
+
 [Pause checkpoint](ENGINEERING_1_6_2_PAUSE_2026_10_05.md), [review candidate](ENGINEERING_1_6_2_REVIEW_CANDIDATE.md), [final Graphics ledger](ENGINEERING_1_6_2_FINAL_GRAPHICS.md), and [second pass](ENGINEERING_1_6_2_SECOND_PASS.md) retain their exact results. Runtime `1334cc9c58ec97940ac10d861f0397143ca7a9f4` passed both allocated-phone backends' route/capture/Home-resume checks with saved preferences unchanged. Staged mobile defaults, Mist rollback and cold-restart persistence passed. Runtime CI passed all six jobs; documentation `5fe070e42541fe8a4b4bc856360b73e1d94c7489` also has six successful jobs in each refreshed push/PR run. These results do not prove sustained 30 FPS or the fresh no-preview Back defect.
 
 ## Remaining work and current disposition

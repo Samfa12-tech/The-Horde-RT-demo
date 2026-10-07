@@ -62,5 +62,16 @@ haptics and compact-HUD checkboxes now use the shared enabled brass/disabled tin
 Their native checked state, preference listeners and 48 dp touch targets are
 preserved. Fourteen existing interface/preferences/contextual-layout tests and
 Android Debug assembly pass (`task-4/settings-toggle-contrast-java-20261007.log`).
-Actual corrected phone inspection requires a new seal. No audio/haptic cue,
-gain, timing or consent behavior is changed by this visual correction.
+Corrected immutable source `fe83c4733e46596c53189e6c77faf34baa920853`, tree
+`f5bb2dc2bd1146cf365b147aa29b7514ca9ca625`, has a 138,462,724-byte Debug APK,
+SHA-256 `8e0b3b7f5a40ebd18a62d05790bfd22385162c05e46fa14520baf26354a290fb`.
+Closed admission, manifest and 16 KiB alignment pass; installed pullback matches.
+Ordinary Settings entry on SM-S948B / Android 16 shows all three checked indicators
+clearly in brass. Actual image SHA-256 is
+`0120b8021aa58738c39f4c5ff8e8000ec9d0b95d68beeaa16d3d79b3a1ed442e`.
+Every saved preference entry remains unchanged; owned PID 28379 is stopped.
+No audio/haptic cue, gain, timing or consent behavior is changed by this visual
+correction. Native payloads and Windows executable are unchanged from `868691fc`;
+`ecc16b82` route/pause results retain their own exact APK scope. All 12 aggregate
+`fe83c473` CI checks pass in runs `37623162765` / `37623170903`. Owner listening,
+comfort and quality acceptance remain open.

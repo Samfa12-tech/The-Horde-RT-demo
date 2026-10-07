@@ -2,6 +2,17 @@
 
 Last updated: 2026-10-07
 
+## 7 October Settings check-mark inspection — SM-S948B / Android 16
+
+Evidence class: **exact Debug package, affected ordinary Settings appearance**.
+Source `fe83c4733e46596c53189e6c77faf34baa920853`, APK SHA-256
+`8e0b3b7f5a40ebd18a62d05790bfd22385162c05e46fa14520baf26354a290fb`,
+138,462,724 bytes; installed pullback matches. All three native checked indicators
+are readable in brass, with no toggle/save action and every preference entry
+unchanged. Owned PID 28379 is stopped. [Exact image and build/CI receipt](ENGINEERING_1_6_2_NATIVE_MENU_AUDIO_2026_10_07.md#settings-toggle-visibility-follow-up).
+Native bytes are unchanged; earlier route/pause evidence retains its exact APK
+scope. This does not certify owner audio/haptic/comfort, moving contact or FPS.
+
 ## 7 October corrected ordinary Play and pause — SM-S948B / Android 16
 
 Evidence class: **exact Debug package, affected ordinary Play/pause/settings and
