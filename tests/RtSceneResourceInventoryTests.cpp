@@ -218,6 +218,13 @@ struct PresentableTinyRtSceneObservationTestAccess
         instances[0].mask = 0x01u;
         instances[0].flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
         instances[0].accelerationStructureReference = 0x1234u;
+        instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex].instanceCustomIndex =
+            PresentableTinyRtScene::kPlayerSwordScabbardMetadataIndex;
+        instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex].mask = 0u;
+        instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex].flags =
+            VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+        instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex].accelerationStructureReference = 0x5CA8u;
+        instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex].transform.matrix[0][3] = 1.25f;
         const auto original = instances;
         scene.ApplyKeeperTorchBodyInstances(instances);
         bool ok = true;
@@ -235,11 +242,25 @@ struct PresentableTinyRtSceneObservationTestAccess
                   instance.transform.matrix[2][2] == 1.0f;
         }
         // Keeper physical slots23/24 keep aliasing old torch metadata1. The
-        // independent player Rag torch owns metadata22 at held TLAS slot1.
-        ok &= std::memcmp(instances.data(), original.data(), kRtInstanceMetadataCapacity * sizeof(instances[0])) == 0;
+        // independent player Rag torch owns metadata22 at held TLAS slot1,
+        // while the scabbard at slot25 keeps its own metadata23/BLAS. Compare
+        // every non-Keeper TLAS slot; the metadata capacity includes slot23
+        // and therefore is not a valid prefix length for this ownership check.
+        for (std::size_t index = 0u; index < instances.size(); ++index)
+        {
+            if (index == PresentableTinyRtScene::kKeeperTorchFirstTlasInstance ||
+                index == PresentableTinyRtScene::kKeeperTorchFirstTlasInstance + 1u)
+            {
+                continue;
+            }
+            ok &= std::memcmp(&instances[index], &original[index], sizeof(instances[index])) == 0;
+        }
         instances[0].mask = 0u;
         scene.ApplyKeeperTorchBodyInstances(instances);
-        ok &= instances[23].mask == 0u && instances[24].mask == 0u;
+        ok &= instances[23].mask == 0u && instances[24].mask == 0u &&
+              std::memcmp(&instances[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex],
+                          &original[PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex],
+                          sizeof(instances[0])) == 0;
         scene.worldTorchBodyBlas_ = {};
         scene.torchBlas_ = {};
         return ok;
@@ -421,7 +442,8 @@ struct PresentableTinyRtSceneObservationTestAccess
         for (RtAccelerationStructure* accelerationStructure :
              std::array{
                  &scene.blas_, &scene.waterfallBlas_, &scene.finaleRoofBlas_,
-                 &scene.torchBlas_, &scene.worldTorchBodyBlas_, &scene.swordBlas_, &scene.gothicChestBaseBlas_,
+                 &scene.torchBlas_, &scene.worldTorchBodyBlas_, &scene.swordBlas_,
+                 &scene.playerSwordScabbardBlas_, &scene.gothicChestBaseBlas_,
                  &scene.gothicChestLidBlas_, &scene.rewardLanternRingBlas_,
                  &scene.rewardLanternBodyBlas_, &scene.dielectricFixtureBlas_,
                  &scene.playerBodyBlas_, &scene.playerLimbBlas_,
@@ -1310,7 +1332,7 @@ int main()
 #ifndef NDEBUG
     const auto originalHandles = scene.CaptureResourceHandles();
     ok &= Require(originalHandles.ready &&
-                      originalHandles.bottomLevelAccelerationStructures.size() == 19u &&
+                      originalHandles.bottomLevelAccelerationStructures.size() == 20u &&
                       originalHandles.topLevelAccelerationStructures.size() == 1u &&
                       originalHandles.pipelines.size() == 2u &&
                       originalHandles.shaderBindingTableBuffers.size() == 2u &&
@@ -1333,26 +1355,26 @@ int main()
                       scene.PrimaryRewardBodyPixelCount() == 41u,
                   "legacy getters must project one explicitly published completed record");
     const auto diagnostic = scene.ResourceInventory();
-    ok &= Require(diagnostic.bufferCount == 48u &&
-                      diagnostic.memoryAllocationCount == 58u &&
-                      diagnostic.bottomLevelAccelerationStructureCount == 19u &&
-                      scene.BlasCount() == 19u &&
+    ok &= Require(diagnostic.bufferCount == 49u &&
+                      diagnostic.memoryAllocationCount == 59u &&
+                      diagnostic.bottomLevelAccelerationStructureCount == 20u &&
+                      scene.BlasCount() == 20u &&
                       diagnostic.topLevelAccelerationStructureCount == 1u &&
-                      diagnostic.tlasInstanceCount == 25u &&
+                      diagnostic.tlasInstanceCount == 26u &&
                       diagnostic.pipelineCount == 2u &&
                       diagnostic.shaderBindingTableCount == 2u &&
                       diagnostic.descriptorSetCount == 1u,
                   "live inventory must include direct, character, image, and both SBT owners");
-    ok &= Require(diagnostic.hostVisibleBytes == 3200u &&
-                      diagnostic.deviceLocalBytes == 4352u,
+    ok &= Require(diagnostic.hostVisibleBytes == 3264u &&
+                      diagnostic.deviceLocalBytes == 4416u,
                   "host-visible and device-local bytes must use inclusive allocation classes");
 
     PresentableTinyRtSceneObservationTestAccess::RemoveDiagnosticBuffer(scene);
     const auto shipping = scene.ResourceInventory();
-    ok &= Require(shipping.bufferCount == 47u &&
-                      shipping.memoryAllocationCount == 57u &&
-                      shipping.hostVisibleBytes == 3136u &&
-                      shipping.deviceLocalBytes == 4288u,
+    ok &= Require(shipping.bufferCount == 48u &&
+                      shipping.memoryAllocationCount == 58u &&
+                      shipping.hostVisibleBytes == 3200u &&
+                      shipping.deviceLocalBytes == 4352u,
                   "inventory must count only a genuinely live Diagnostic buffer");
 
     PresentableTinyRtSceneObservationTestAccess::MarkTlasDefinitions(scene);
@@ -1407,7 +1429,7 @@ int main()
                       moved.QualityControls().controls == std::array<std::uint32_t, 4u>{{2u, 4u, 2u, 0u}} &&
                       moved.UploadedFireQuality() == horde::vulkan::raytracing::FireEmitterQuality::Low,
                   "actual uploaded policy must transfer to exactly one owner with its buffer");
-    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 19u &&
+    ok &= Require(scene.BlasCount() == 0u && moved.BlasCount() == 20u &&
                       movedFrom.bufferCount == 0u &&
                       movedFrom.memoryAllocationCount == 0u &&
                       movedFrom.hostVisibleBytes == 0u &&

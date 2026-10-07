@@ -16,7 +16,7 @@ $script:witnessChecks=0
 function Check([bool]$condition,[string]$message){if(-not $condition){throw $message};$script:witnessChecks++}
 function Reject([scriptblock]$action){$failed=$false;try{& $action}catch{$failed=$true};Check $failed 'Invalid witness policy must fail closed.'}
 $repository=Split-Path -Parent $PSScriptRoot
-Check ((Get-ExpectedShowcaseInstanceCapacity $repository) -eq 25) 'Current physical TLAS capacity25 includes player torch22 plus two Keeper instances sharing metadata1.'
+Check ((Get-ExpectedShowcaseInstanceCapacity $repository) -eq 26) 'Current physical TLAS capacity26 includes player torch22, Keeper instances23/24 sharing metadata1, and scabbard25 using metadata23.'
 $fixture=Join-Path ([IO.Path]::GetTempPath()) ('horde-witness-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path (Join-Path $fixture 'src/vulkan/raytracing') -Force | Out-Null
 try{

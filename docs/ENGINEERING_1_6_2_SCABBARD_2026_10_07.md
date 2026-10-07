@@ -58,3 +58,28 @@ Rendered hands/grips, draw/sheath motion and sound, world body, shadows,
 reflections, floor/roof/route obstruction, phone memory/cost and owner acceptance
 remain separate gates. The earlier completed Rag clearance results are retained
 in [their ledger](ENGINEERING_1_6_2_RAG_CLEARANCE_2026_10_07.md).
+
+The immutable `d08d3c4827ef5d1ce95b74c21e29663aa33e9e7d` inspection checkpoint
+then passed eight of nine broader local checks. Resource-inventory assertions
+failed because the old metadata-length prefix included Keeper slot 23 and its
+fixture omitted the new scabbard BLAS. The correction verifies every non-Keeper
+slot (including a populated scabbard sentinel), seeds the additional actual
+owner, and counts 20 BLAS/26 TLAS plus its buffer/allocation. The focused current
+inventory test passes 1/1 (4.84 s); ownership/byte accounting assertions remain.
+Logs are `scabbard-resource-inventory-20261007-04.log` and `-05.log`.
+
+The same checkpoint's push Vulkan CI passed 19/20, failing only that fixture;
+GCC and Clang each passed 83/84, failing the Android witness test's stale
+physical-capacity expectation of 25. It now expects the explicitly admitted
+26-slot roster, while retaining malformed-ABI/backend/scoped-log coverage;
+87 injected assertions pass locally (`scabbard-android-witness-policy-20261007.log`).
+At the preserved CI snapshot, four aggregate checks succeeded, six failed and
+two remained pending. These failures are retained in private job logs from push
+run `37607893640`; a new push must supply current CI. No runtime code or shader
+was changed by these fixture corrections. The sealed inspection APK remains
+138,462,724 bytes, SHA-256
+`87a3ed413d09de098af45d74802da42e534ff09de3d467a8ff937d2b1d5a6ff7`;
+Windows executable SHA-256 is
+`cd5a903269b5d65ad7518282e6cd367558e77a1480e5c1c2aef261e8f10ffe40`.
+The sealed four-ABI package passes current closed Android asset admission and
+16 KiB alignment. It is an intermediate Debug checkpoint, not a final candidate.
