@@ -1,6 +1,26 @@
 # Android RT Device Compatibility Record
 
-Last updated: 2026-10-07
+Last updated: 2026-10-08
+
+## 8 October moving simulation/RT scenarios — SM-S948B / Android 16
+
+Evidence class: **exact Debug package, harness-generated ordinary axes and
+timestamped actions with actual completed RT/image bindings**. Source
+`4e9e5bb7696f4d5d3864835eb35e29f4bce42d8e`, APK SHA-256
+`68741e3d3407d124b6f3ba95f7e84e991d701070fe396922c90014b3ed6e80b7`,
+138,462,724 bytes; installed pullback matches. Both genuine Pipeline and required
+RayQueryCompute pass torch/rear opening/low passage and Keeper death/retry/
+three accepted hits/defeat/chest/reward/ending/re-entry. Actual windup, swing and
+parry captures accompany the state/event/RT ledger. Every preference entry
+remains unchanged and all owned apps are stopped.
+
+[Exact method, counts, hashes, source CI and retained failures](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md).
+Prior exact `90abb929` also passes the active-torch waterfall shaft on both
+backends. Its failed Keeper retries and the later `156157d7` observer failures
+remain separate. The saved 50% profile has Glass On, distinct from fresh/reset
+Glass Off. Readback/ledger costs make these inspection runs distinct from
+sustained FPS, touch latency, owner framing/feel and the 50/40/33 quality decision.
+Production equipment/waterfall activation and broader physical gates remain open.
 
 ## 7 October Settings check-mark inspection — SM-S948B / Android 16
 

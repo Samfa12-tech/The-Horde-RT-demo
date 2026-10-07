@@ -1,10 +1,19 @@
 # 1.6.2 tomb finish — active post-reset work
 
-Updated 7 October 2026. Authority: the owner's `Horde-1.6.2-after-reset-goal.txt`, explicitly adopted by the latest resume request. Supporting PR16 reference: `48fd8d6e0ee73c480502906104593c4e6d3b8aae`. Remote planning advanced to `c03db1c94dd058e8416d1927c908b6b7298d16e0`; those documentation changes are not merged into runtime wholesale. Work continues in the existing PR18 checkout/branch. No duplicate workspace, reset, release, merge, signing or paid generation is authorized.
+Updated 8 October 2026. Authority: the owner's `Horde-1.6.2-after-reset-goal.txt`, explicitly adopted by the latest resume request. Supporting PR16 reference: `48fd8d6e0ee73c480502906104593c4e6d3b8aae`. Remote planning advanced to `c03db1c94dd058e8416d1927c908b6b7298d16e0`; those documentation changes are not merged into runtime wholesale. Work continues in the existing PR18 checkout/branch. No duplicate workspace, reset, release, merge, signing or paid generation is authorized.
 
 ## Preserved completed evidence
 
-Latest intermediate UI seal `fe83c473` passes affected physical Settings check-mark
+Current moving-inspection seal `4e9e5bb7696f4d5d3864835eb35e29f4bce42d8e`
+passes actual torch/low-passage and Keeper death/retry/three-hit/reward/ending
+scenarios on both phone RT backends, with exact completed-frame action captures,
+unchanged preferences, stopped apps and all 12 source CI checks passing. [Exact
+artifact, corrected harness regressions and remaining limits](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md).
+Production equipment/waterfall activation, contact calibration, physical owner
+feel and sustained 50/40/33 quality comparison remain open. Owner questions stay
+deferred while the owner sleeps; safe independent work continues.
+
+Earlier UI seal `fe83c473` passes affected physical Settings check-mark
 inspection with preferences unchanged and the app stopped; all 12 aggregate CI
 checks pass in `37623162765` / `37623170903`. [Exact receipt and package hash](ENGINEERING_1_6_2_NATIVE_MENU_AUDIO_2026_10_07.md#settings-toggle-visibility-follow-up).
 The prior exact `ecc16b82` collision replay/frozen poses/pause checks remain under
