@@ -1948,6 +1948,54 @@ BladeTriangleDistance MeasureBladeTriangleDistance(
     return result;
 }
 
+BladeTriangleDistance MeasureBladeTriangleDistance(
+    const TriangleBoundsTree& targetTree,
+    const std::vector<MeshTriangle>& bladeTriangles)
+{
+    BladeTriangleDistance result;
+    result.trianglesQueried = bladeTriangles.size();
+    for (const MeshTriangle& triangle : bladeTriangles)
+        result.metres = std::min(result.metres, targetTree.Distance(triangle));
+    return result;
+}
+
+std::array<float, 3u> InterpolateWorldPoint(
+    const std::array<float, 3u>& start,
+    const std::array<float, 3u>& end,
+    const float amount)
+{
+    return Add(Scale(start, 1.0f - amount), Scale(end, amount));
+}
+
+MeshTriangle InterpolateWorldTriangle(
+    const MeshTriangle& start,
+    const MeshTriangle& end,
+    const float amount)
+{
+    MeshTriangle result;
+    result.a = InterpolateWorldPoint(start.a, end.a, amount);
+    result.b = InterpolateWorldPoint(start.b, end.b, amount);
+    result.c = InterpolateWorldPoint(start.c, end.c, amount);
+    IncludePoint(result.bounds, result.a);
+    IncludePoint(result.bounds, result.b);
+    IncludePoint(result.bounds, result.c);
+    result.center = Scale(Add(Add(result.a, result.b), result.c), 1.0f / 3.0f);
+    return result;
+}
+
+std::vector<MeshTriangle> InterpolateWorldTriangles(
+    const std::vector<MeshTriangle>& start,
+    const std::vector<MeshTriangle>& end,
+    const float amount)
+{
+    if (start.size() != end.size()) return {};
+    std::vector<MeshTriangle> result;
+    result.reserve(start.size());
+    for (std::size_t index = 0u; index < start.size(); ++index)
+        result.push_back(InterpolateWorldTriangle(start[index], end[index], amount));
+    return result;
+}
+
 std::vector<MeshTriangle> BuildDiagnosticTargetTriangles(
     const DiagnosticSkeletonRenderSample& targetSample,
     const std::vector<horde::scene::SkinnedRtVertex>& targetPose)
@@ -3062,6 +3110,359 @@ void TestDynamicCombatPulseNeighborhood(const bool capsuleOnly = false)
     }
 }
 
+void TestBoundedCombatPulseSweep()
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::items;
+    using horde::scene::SkinnedClip;
+    using horde::scene::SkinnedMeshAsset;
+
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    horde::scene::assets::StaticMeshAsset sword;
+    horde::scene::assets::StaticMeshAsset torch;
+    std::string diagnostic;
+    Check(LoadProductionHeldAssets(sword, torch, diagnostic) && !sword.vertices.empty(),
+          "bounded combat sweep must load indexed production held assets");
+    const auto* grip = FindHeldItemSocket(sword.sockets, "Grip");
+    Check(grip != nullptr,
+          "bounded combat sweep must use the production sword Grip");
+    if (grip == nullptr || sword.vertices.empty()) return;
+
+    SkinnedMeshAsset skeleton;
+    Check(skeleton.LoadCombatClips(
+              (root / "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
+              diagnostic),
+          "bounded combat sweep must load imported skeleton combat clips");
+    if (!skeleton.IsLoaded()) return;
+
+    horde::vulkan::raytracing::PlayerRenderSlot rig;
+    Check(rig.LoadAsset(
+              (root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),
+              diagnostic),
+          "bounded combat sweep must load the production player rig");
+    if (!rig.IsLoaded()) return;
+
+    struct DynamicCase
+    {
+        const char* name;
+        float startDistance;
+        float targetBearing;
+    };
+    constexpr std::array<DynamicCase, 2u> cases{{
+        {"frontal-1.28", 1.28f, 0.0f},
+        {"plus15-1.28", 1.28f, 0.2617994f},
+    }};
+    constexpr float tickSeconds = 1.0f / 60.0f;
+    constexpr float playerX = 0.0f;
+    constexpr float playerZ = 0.0f;
+    constexpr float playerYaw = 0.0f;
+    constexpr float windupTrigger = 0.84f;
+    constexpr std::uint64_t maxTicks = 180u;
+    constexpr std::uint64_t neighborhoodRadius = 3u;
+    constexpr std::size_t candidateFrameCount = neighborhoodRadius + 1u;
+    constexpr std::size_t substepsPerTick = 4u;
+    std::uint64_t rigTick = 90000u;
+
+    struct Record
+    {
+        std::uint64_t tick = 0u;
+        CombatSnapshot attackBefore{};
+        CombatSnapshot attackAfter{};
+        CombatSnapshot controlBefore{};
+        CombatSnapshot controlAfter{};
+    };
+    struct ContactSummary
+    {
+        float earliestIntersectionTicks = std::numeric_limits<float>::infinity();
+        float minimumGapMetres = std::numeric_limits<float>::max();
+        float minimumGapTicks = 0.0f;
+        std::size_t sampledIntersections = 0u;
+        std::size_t samples = 0u;
+    };
+    struct CandidateFrame
+    {
+        float playerActionTime = 0.0f;
+        std::vector<MeshTriangle> blade;
+        std::vector<MeshTriangle> liveAttack;
+        std::vector<MeshTriangle> idle;
+    };
+
+    for (const DynamicCase& sampleCase : cases)
+    {
+        const float targetX = sampleCase.startDistance * std::sin(sampleCase.targetBearing);
+        const float targetZ = -sampleCase.startDistance * std::cos(sampleCase.targetBearing);
+        SwordCombat attackCombat;
+        SwordCombat liveControl;
+        attackCombat.Reset(1u, {targetX, targetZ});
+        liveControl.Reset(1u, {targetX, targetZ});
+        std::vector<Record> records;
+        records.reserve(96u);
+        bool attackRequested = false;
+        std::uint64_t pulseTick = 0u;
+        for (std::uint64_t tick = 1u; tick <= maxTicks; ++tick)
+        {
+            const CombatSnapshot attackBefore = attackCombat.Snapshot();
+            const CombatSnapshot controlBefore = liveControl.Snapshot();
+            if (!attackRequested &&
+                attackBefore.combatants[0].action == EnemyCombatAction::AttackWindup &&
+                attackBefore.combatants[0].actionTime >= windupTrigger)
+            {
+                attackRequested = attackCombat.RequestAttack() == PlayerAttackCut::DownwardCut;
+            }
+            const CombatSnapshot attackAfter = attackCombat.Update(
+                tickSeconds, playerX, playerZ, playerYaw, true, true, false);
+            const CombatSnapshot controlAfter = liveControl.Update(
+                tickSeconds, playerX, playerZ, playerYaw, true, true, false);
+            records.push_back({tick, attackBefore, attackAfter,
+                               controlBefore, controlAfter});
+            if (attackAfter.playerAttackPulse && pulseTick == 0u)
+                pulseTick = tick;
+            if (pulseTick != 0u && tick >= pulseTick + neighborhoodRadius)
+                break;
+        }
+
+        Check(attackRequested && pulseTick != 0u && pulseTick > neighborhoodRadius,
+              "bounded sweep must capture an ordinary pulse with three prior ticks");
+        if (!attackRequested || pulseTick == 0u || pulseTick <= neighborhoodRadius)
+            continue;
+        Check(records.back().tick >= pulseTick + neighborhoodRadius,
+              "bounded sweep must retain pulse through pulse plus three ticks");
+
+        std::array<CandidateFrame, candidateFrameCount> frames{};
+        std::array<bool, candidateFrameCount> frameResolved{};
+        bool pulseGateEligible = false;
+        float pulseRangeMetres = 0.0f;
+        float pulseConeDot = 0.0f;
+        float livePulseGapMetres = std::numeric_limits<float>::max();
+        float idlePulseGapMetres = std::numeric_limits<float>::max();
+
+        for (const Record& record : records)
+        {
+            if (record.tick < pulseTick || record.tick > pulseTick + neighborhoodRadius)
+                continue;
+            const std::size_t frameIndex = static_cast<std::size_t>(record.tick - pulseTick);
+            CandidateFrame& frame = frames[frameIndex];
+
+            const PlayerCombatSnapshot& playerCombat = record.attackAfter.player;
+            Check(playerCombat.action == PlayerCombatAction::SwingActive &&
+                      playerCombat.actionTime >= CombatTimeline::kPlayerDownwardContactSeconds &&
+                      playerCombat.actionTime <= SwordCombat::kDownwardCutTravelDuration,
+                  "every candidate sweep pose must remain inside the existing visible downward stroke");
+            frame.playerActionTime = playerCombat.actionTime;
+
+            HeldItemFixedStepInput input;
+            input.playerX = playerX;
+            input.playerZ = playerZ;
+            input.playerYawRadians = playerYaw;
+            input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+            input.playerCombat = playerCombat;
+            HeldItemStates items = MakeDefaultHeldItemStates();
+            HeldItemFixedStepState fixed;
+            const bool fixedResolved = ResolveHeldItemsFixedStep(
+                items, input, record.tick, fixed, diagnostic);
+            HeldItemTransform worldFromGrip{};
+            HeldItemTransform worldFromSword{};
+            const bool rigResolved = fixedResolved && ResolveProductionAnatomicalSword(
+                input, fixed.kinematics, items, rig, rigTick++,
+                worldFromGrip, worldFromSword, diagnostic);
+            Check(rigResolved,
+                  "each bounded sweep player endpoint must resolve through the production final rig");
+            if (!rigResolved) continue;
+            frame.blade = BuildGripFilteredBladeTriangles(sword, *grip, worldFromSword);
+
+            // ResolveSwordHit runs before UpdateCombatant in SwordCombat::Update.
+            // The pre-update control snapshot is therefore the live target pose
+            // paired with this tick's player pulse/pose.
+            const auto& target = record.controlBefore.combatants[0];
+            Check(target.health > 0 &&
+                      (target.action == EnemyCombatAction::AttackWindup ||
+                       target.action == EnemyCombatAction::AttackActive),
+                  "parallel unhit control must retain a live attacking target");
+            const DiagnosticSkeletonRenderSample attackSample =
+                CurrentCharacterRenderMapping(target,
+                    skeleton.ClipDuration(SkinnedClip::Dead));
+            Check(attackSample.clip == SkinnedClip::Attack,
+                  "live sweep control must use the imported Attack clip");
+            std::vector<horde::scene::SkinnedRtVertex> attackPose;
+            const bool attackPoseResolved = skeleton.Skin(
+                attackSample.clip, attackSample.clipTime, attackPose, diagnostic);
+            Check(attackPoseResolved && !attackPose.empty(),
+                  "each live target endpoint must skin successfully");
+            if (!attackPoseResolved) continue;
+
+            DiagnosticSkeletonRenderSample idleSample = attackSample;
+            idleSample.clip = SkinnedClip::Idle;
+            idleSample.clipTime = 0.0f;
+            std::vector<horde::scene::SkinnedRtVertex> idlePose;
+            const bool idlePoseResolved = skeleton.Skin(
+                idleSample.clip, idleSample.clipTime, idlePose, diagnostic);
+            Check(idlePoseResolved && !idlePose.empty(),
+                  "each same-root/facing Idle target endpoint must skin successfully");
+            if (!idlePoseResolved) continue;
+
+            frame.liveAttack = BuildDiagnosticTargetTriangles(attackSample, attackPose);
+            frame.idle = BuildDiagnosticTargetTriangles(idleSample, idlePose);
+            Check(!frame.blade.empty() && frame.liveAttack.size() == frame.idle.size() &&
+                      !frame.liveAttack.empty(),
+                  "candidate poses must preserve indexed blade and target triangle counts");
+            if (frame.blade.empty() || frame.liveAttack.size() != frame.idle.size() ||
+                frame.liveAttack.empty())
+                continue;
+
+            const float rootDistance = std::hypot(target.x - playerX, target.z - playerZ);
+            if (frameIndex == 0u)
+            {
+                pulseRangeMetres = rootDistance;
+                pulseConeDot = rootDistance <= 0.0001f
+                    ? 1.0f
+                    : ((target.x - playerX) / rootDistance) * std::sin(playerYaw) +
+                      ((target.z - playerZ) / rootDistance) * -std::cos(playerYaw);
+                pulseGateEligible = SwordCombat::IsPlayerTargetInRangeCone(
+                    playerX, playerZ, playerYaw, target.x, target.z);
+            }
+            frameResolved[frameIndex] = true;
+        }
+
+        Check(std::all_of(frameResolved.begin(), frameResolved.end(),
+                          [](const bool resolved) { return resolved; }),
+              "all four pulse-through-plus-three candidate frames must resolve");
+        if (!std::all_of(frameResolved.begin(), frameResolved.end(),
+                         [](const bool resolved) { return resolved; }))
+            continue;
+
+        ContactSummary liveSummary;
+        ContactSummary idleSummary;
+        const auto addSample = [](ContactSummary& summary,
+                                  const float gapMetres,
+                                  const float offsetTicks)
+        {
+            ++summary.samples;
+            if (gapMetres < summary.minimumGapMetres)
+            {
+                summary.minimumGapMetres = gapMetres;
+                summary.minimumGapTicks = offsetTicks;
+            }
+            // Report a zero from the existing floating-point triangle oracle.
+            // This retains its numerical precision and degeneracy handling;
+            // no gameplay-sized proximity tolerance is introduced here.
+            if (gapMetres == 0.0f)
+            {
+                ++summary.sampledIntersections;
+                summary.earliestIntersectionTicks = std::min(
+                    summary.earliestIntersectionTicks, offsetTicks);
+            }
+        };
+
+        for (std::size_t frameIndex = 0u; frameIndex < candidateFrameCount; ++frameIndex)
+        {
+            const CandidateFrame& frame = frames[frameIndex];
+            const TriangleBoundsTree liveTree(frame.liveAttack);
+            const TriangleBoundsTree idleTree(frame.idle);
+            const BladeTriangleDistance liveGap = MeasureBladeTriangleDistance(
+                liveTree, frame.blade);
+            const BladeTriangleDistance idleGap = MeasureBladeTriangleDistance(
+                idleTree, frame.blade);
+            Check(liveGap.trianglesQueried == 6905u &&
+                      idleGap.trianglesQueried == liveGap.trianglesQueried &&
+                      std::isfinite(liveGap.metres) && std::isfinite(idleGap.metres),
+                  "endpoint oracle must query all 6,905 blade triangles against both target poses");
+            if (frameIndex == 0u)
+            {
+                livePulseGapMetres = liveGap.metres;
+                idlePulseGapMetres = idleGap.metres;
+            }
+            addSample(liveSummary, liveGap.metres, static_cast<float>(frameIndex));
+            addSample(idleSummary, idleGap.metres, static_cast<float>(frameIndex));
+        }
+
+        for (std::size_t interval = 0u; interval < neighborhoodRadius; ++interval)
+        {
+            const CandidateFrame& start = frames[interval];
+            const CandidateFrame& end = frames[interval + 1u];
+            Check(start.blade.size() == end.blade.size() &&
+                      start.liveAttack.size() == end.liveAttack.size() &&
+                      start.idle.size() == end.idle.size(),
+                  "triangle ordering/count must remain stable between candidate endpoints");
+            if (start.blade.size() != end.blade.size() ||
+                start.liveAttack.size() != end.liveAttack.size() ||
+                start.idle.size() != end.idle.size())
+                continue;
+
+            for (std::size_t substep = 1u; substep < substepsPerTick; ++substep)
+            {
+                const float amount = static_cast<float>(substep) /
+                                     static_cast<float>(substepsPerTick);
+                const float offsetTicks = static_cast<float>(interval) + amount;
+                const auto blade = InterpolateWorldTriangles(start.blade, end.blade, amount);
+                const auto liveTarget = InterpolateWorldTriangles(
+                    start.liveAttack, end.liveAttack, amount);
+                const auto idleTarget = InterpolateWorldTriangles(
+                    start.idle, end.idle, amount);
+                Check(blade.size() == start.blade.size() &&
+                          liveTarget.size() == start.liveAttack.size() &&
+                          idleTarget.size() == start.idle.size(),
+                      "linear world-triangle interpolation must retain exact indexed triangle counts");
+                if (blade.empty() || liveTarget.empty() || idleTarget.empty()) continue;
+
+                const TriangleBoundsTree liveTree(liveTarget);
+                const TriangleBoundsTree idleTree(idleTarget);
+                const BladeTriangleDistance liveGap = MeasureBladeTriangleDistance(
+                    liveTree, blade);
+                const BladeTriangleDistance idleGap = MeasureBladeTriangleDistance(
+                    idleTree, blade);
+                Check(liveGap.trianglesQueried == 6905u &&
+                          idleGap.trianglesQueried == liveGap.trianglesQueried &&
+                          std::isfinite(liveGap.metres) && std::isfinite(idleGap.metres),
+                      "sub-tick oracle must query all 6,905 blade triangles for both controls");
+                addSample(liveSummary, liveGap.metres, offsetTicks);
+                addSample(idleSummary, idleGap.metres, offsetTicks);
+            }
+        }
+
+        Check(pulseGateEligible && pulseRangeMetres <= SwordCombat::kPlayerHitRange &&
+                  pulseConeDot >= SwordCombat::kPlayerHitConeDot,
+              "measured frontal/+15 cases must report current range/cone eligibility at pulse");
+        Check(liveSummary.samples == 13u && idleSummary.samples == 13u,
+              "bounded sub-tick sweep must sample four endpoints and three quarter-tick points per interval");
+
+        std::cout << "combat-bounded-sweep " << sampleCase.name
+                  << " pulseTick=" << pulseTick
+                  << " playerActiveSeconds=" << frames.front().playerActionTime << ':'
+                  << frames.back().playerActionTime
+                  << " targetRootDistanceM=" << pulseRangeMetres
+                  << " targetRootConeDot=" << pulseConeDot
+                  << " rangeLimitM=" << SwordCombat::kPlayerHitRange
+                  << " coneDotMinimum=" << SwordCombat::kPlayerHitConeDot
+                  << " pulseRangeConeEligible=" << pulseGateEligible
+                  << " livePulseGapMm=" << livePulseGapMetres * 1000.0f
+                  << " liveEarliestSampledIntersectionTicks=";
+        if (std::isfinite(liveSummary.earliestIntersectionTicks))
+            std::cout << liveSummary.earliestIntersectionTicks;
+        else
+            std::cout << "none";
+        std::cout << " liveMinimumGapMm=" << liveSummary.minimumGapMetres * 1000.0f
+                  << " liveMinimumGapTicks=" << liveSummary.minimumGapTicks
+                  << " liveSampledIntersections=" << liveSummary.sampledIntersections
+                  << " idlePulseGapMm=" << idlePulseGapMetres * 1000.0f
+                  << " separatedIdlePulseAdmitted="
+                  << (pulseGateEligible && idlePulseGapMetres > 0.0f)
+                  << " idleEarliestSampledIntersectionTicks=";
+        if (std::isfinite(idleSummary.earliestIntersectionTicks))
+            std::cout << idleSummary.earliestIntersectionTicks;
+        else
+            std::cout << "none";
+        std::cout << " idleMinimumGapMm=" << idleSummary.minimumGapMetres * 1000.0f
+                  << " idleMinimumGapTicks=" << idleSummary.minimumGapTicks
+                  << " idleControlIntersections=" << idleSummary.sampledIntersections
+                  << " samplesPerControl=" << liveSummary.samples
+                  << " substepsPer60HzTick=" << substepsPerTick
+                  << " interpolation=linear-world-space-indexed-triangle-vertices"
+                  << " result=discrete-sampled-not-continuous-proof"
+                  << " oracle=indexed-triangle-distance-floating-point-zero"
+                  << " method=counterfactual-unhit-live-target-vs-production-grip-filtered-blade\n";
+    }
+}
+
 bool ResolveProductionSwordStowPose(
     horde::gameplay::items::HeldItemFixedStepInput input,
     const horde::gameplay::items::HeldItemState& swordState,
@@ -3962,6 +4363,11 @@ int main(const int argc, char** argv)
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 #endif
+    if (argc > 1 && std::string(argv[1]) == "--combat-bounded-sweep")
+    {
+        TestBoundedCombatPulseSweep();
+        return failures == 0 ? 0 : 1;
+    }
     if (argc > 1 && std::string(argv[1]) == "--combat-dynamic-neighborhood")
     {
         TestDynamicCombatPulseNeighborhood();
