@@ -142,6 +142,10 @@ target_compile_features(horde_gameplay_simulation PUBLIC cxx_std_20)
 target_link_libraries(horde_gameplay_simulation PUBLIC pocket_audio_native_pcm)
 
 if(BUILD_TESTING)
+    add_executable(horde_rt_held_item_transition_tests tests/HeldItemTransitionTests.cpp)
+    target_link_libraries(horde_rt_held_item_transition_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_held_item_transition_tests COMMAND horde_rt_held_item_transition_tests)
+
     add_executable(horde_rt_combat_timing_trace_tests tests/CombatTimingTraceTests.cpp)
     target_link_libraries(horde_rt_combat_timing_trace_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_combat_timing_trace_tests COMMAND horde_rt_combat_timing_trace_tests)
