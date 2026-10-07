@@ -2,6 +2,18 @@
 
 Last updated: 2026-10-07
 
+## 7 October ordinary Play failure — SM-S948B / Android 16
+
+Evidence class: **exact Debug package, ordinary native Play handoff failure**.
+Runtime `868691fc`, APK SHA-256
+`c865152bab855517fe48822c19fbda90bc242b4008e55b788c1f09d4d69ea93f`,
+presents Entry, then fails full Showcase initialization because the packaged Rag
+torch manifest is absent from Android's native files root. The staging omission
+also affects the scabbard. [Exact failure and correction ledger](ENGINEERING_1_6_2_ANDROID_EQUIPMENT_STAGING_2026_10_07.md).
+Owned PID 6335 is stopped; every preference entry remains unchanged. No ordinary
+pause-work or full gameplay pass is claimed. Earlier affected rotation/preview
+passes below are preserved, with their original evidence scope.
+
 ## 7 October corrected surface recovery — SM-S948B / Android 16
 
 Evidence class: **exact integrated Debug package, affected rotations and Graphics

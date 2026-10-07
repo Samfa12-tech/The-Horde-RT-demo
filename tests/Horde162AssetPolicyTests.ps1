@@ -34,6 +34,24 @@ function Assert-ScabbardGradleInventory([string]$Text) {
     $expected=@('models/props/runtime/player-sword-scabbard/asset.manifest.json','models/props/runtime/player-sword-scabbard/processing-receipt.json','models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb')
     Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle scabbard must be the exact three-file runtime roster.'
 }
+function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
+    # Admission to the APK alone does not make assets visible to native file IO.
+    # Check the actual packaged paths against startup staging before writeReports
+    # publishes the files root used by the Showcase renderer.
+    $required=@([regex]::Matches($Gradle, "(?m)^\s*include '([^']+)'\s*$") |
+        ForEach-Object { $_.Groups[1].Value } |
+        Where-Object { $_ -like 'models/props/runtime/player-rag-torch/*' -or
+                       $_ -like 'models/props/runtime/player-sword-scabbard/*' })
+    Require ($required.Count -eq 5) 'Android equipment staging requires the closed five-file package roster.'
+    $startup=[regex]::Match($Activity, '(?s)private void collectInitialDiagnostics\(\)\s*\{(.*?)final boolean written = ProbeBridge[.]writeReports\(filesRoot\);')
+    Require $startup.Success 'Android equipment staging must precede native report-root publication.'
+    $staged=@([regex]::Matches($startup.Groups[1].Value,
+        'stageAsset\("([^"]+)",\s*"([^"]+)"\)'))
+    foreach($path in $required) {
+        $matches=@($staged | Where-Object { $_.Groups[1].Value -ceq $path })
+        Require ($matches.Count -eq 1 -and $matches[0].Groups[2].Value -ceq $path) "Android equipment asset must be staged once at its exact native path: $path"
+    }
+}
 function Assert-CollapsePackageInventory([string]$Text) {
     $errors=$null; $ast=[Management.Automation.Language.Parser]::ParseInput($Text,[ref]$null,[ref]$errors)
     Require ($errors.Count -eq 0) 'Package inventory script failed parsing.'
@@ -142,6 +160,17 @@ try {
     Assert-ScabbardGradleInventory $gradle; ++$script:checks
     Expect-Failure {Assert-ScabbardGradleInventory ($gradle.Replace("        include 'models/props/runtime/player-sword-scabbard/processing-receipt.json'",''))} 'exact three-file runtime roster'
     Expect-Failure {Assert-ScabbardGradleInventory ($gradle+"`ninclude 'models/props/runtime/player-sword-scabbard/*.glb'`n")} 'exact three-file runtime roster'
+    $activity=Get-Content (Join-Path $repo 'android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java') -Raw
+    Assert-EquipmentAndroidStaging $gradle $activity; ++$script:checks
+    foreach($path in @('models/props/runtime/player-rag-torch/asset.manifest.json',
+                       'models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb',
+                       'models/props/runtime/player-sword-scabbard/asset.manifest.json',
+                       'models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb',
+                       'models/props/runtime/player-sword-scabbard/processing-receipt.json')) {
+        $call='stageAsset("'+$path+'", "'+$path+'")'
+        Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($call,'true'))} 'exact native path'
+        Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($call,'stageAsset("'+$path+'", "wrong-native-path")'))} 'exact native path'
+    }
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
         Assert-CollapsePackageInventory $text; ++$script:checks

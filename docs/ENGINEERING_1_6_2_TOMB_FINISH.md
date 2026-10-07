@@ -37,6 +37,13 @@ Build correctness, physical-device evidence, owner visual/audio/haptic/combat-fe
 
 ## Current CI and additional evidence
 
+Subsequent ordinary phone Play on `868691fc` exposes a real Showcase asset-staging
+failure, despite valid Entry/Graphics presentation. [The staging ledger](ENGINEERING_1_6_2_ANDROID_EQUIPMENT_STAGING_2026_10_07.md)
+records the reproduction, regression and correction; the ordinary pause-work
+measurement did not start. Three Windows moving captures also fail to arm because
+the owned window lacks foreground focus. Both gaps are retained separately from
+the earlier affected passes. Owner questions are deferred while the owner sleeps.
+
 Current sealed runtime `868691fc11e7ecf52b0e6ff99d7bab31e2b63997` has **all 12 aggregate CI checks successful** in push `37614824777` / PR `37614831521`. Its [exact Android/Windows artifact and device ledger](ENGINEERING_1_6_2_SURFACE_RECOVERY_2026_10_07.md) records affected rotation/ACK/Home results separately from broader gates. Prior `359a5711` and test-only inventory/witness correction `e4704d16` also passed all 12 in their recorded runs; d08's failed fixtures remain recorded. Earlier `422c1b1a`, `01377031`, `b3ea5ed0` and `f5835b5d` passed all 12 in their recorded runs. These green runs do not certify owner/performance or the remaining physical gates. Documentation after the seal has its own CI. The owner requested periodic Git backups; checked slices are pushed to existing PR18 without merging or publishing.
 
 Historical `a2ad00f8840715cb3eedb542764556bc6165a410` passed all six jobs in each push/PR run. At `40f92c6a4f7374a704bcbe0383844fd301dc90f1`, push `37570840989` and PR `37570845018` completed with three successful jobs and three failed host jobs each. GCC/Clang each passed 77/78 cases and failed the former player-torch socket assertion. MSVC passed 86/88 and additionally failed the hash-pinned manifest after Windows newline conversion. At `0e98a8bb83a08e7d519a0d6d4870fac1caa56077`, push `37573897886` and PR `37573902167` each recorded one successful Android job and five failed host jobs, including portrait/Rag clearance. The socket test now imports the actual player Rag asset. An explicit LF checkout rule preserves the 830-byte manifest SHA-256 `5316b2072008da441024cda1153f725f5afcd7d366f3a5b89dece98ec74617aa` even with `core.autocrlf=true`; the 83-case closed asset policy passes locally.
