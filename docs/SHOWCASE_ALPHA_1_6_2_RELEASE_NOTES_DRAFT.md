@@ -16,9 +16,18 @@ installed/device-validated, and earlier CCD owner approvals remain separate.
 Production encounter/stow flags remain off; moving body/shadow/reflection,
 integrated route, owner layout feedback and sustained quality gates remain open.
 [Exact evidence and failed predecessor](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#waterfall-room-guards-staged-windows-preview).
-Source CI `37685777037` / `37685784607` is still running at this checkpoint;
+Source CI `37685777037` / `37685784607` completes all 12 aggregate jobs;
 preceding `38f9d48a` retains six failed registry jobs and six successes.
+The corrected moving Windows capture then fails foreground arming, with zero
+images and a normal owned-process exit carrying failure code 1. That inspection
+gap and the older intermittent report-form timeout remain preserved.
 This is an unreleased inspection checkpoint, with no new Release or signing.
+
+Further opt-in approaching-target mesh probes pass 40 walking / 20 early-Attack
+queries and confirm unresolved gaps between current root-gated damage and the
+visible blade. These are discrete geometry measurements, not production contact
+acceptance; hit rules and parry timing remain unchanged. The first invalid
+fixture is retained separately. [Evidence and limits](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#approaching-target-rangecone-calibration-gap).
 
 **8 October owner playtest and farther floor inspection:** source
 `ccd70d3815e0ed08946f9f5ffc52a156bb41ed63`, tree

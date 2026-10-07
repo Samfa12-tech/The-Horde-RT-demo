@@ -9,7 +9,9 @@ arrival with a persistent measured walk-phase offset. Three staged RT stills
 pass exact completed/presented-frame and hash joins; affected host checks,
 Windows and four-ABI Android Debug builds pass. The APK is not installed because
 the owner is away with the phone. Production encounter/stow activation and
-moving attachment/body/shadow/reflection remain open. [Exact preview, reproduced
+moving attachment/body/shadow/reflection remain open. Source CI passes all 12
+aggregate jobs; the later moving Windows attempt fails foreground arming with
+zero images and its owned process exits. [Exact preview, reproduced
 room-selector defect, artifacts and retained failures](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#waterfall-room-guards-staged-windows-preview).
 
 Earlier immutable floor-inspection package
@@ -29,6 +31,13 @@ two existing live/Idle controls. The 52 floating-point triangle-distance queries
 pass: frontal interpolated contact first appears at +2.5 ticks, while +15 degrees
 and both Idle controls stay separated. This does not yet justify a production
 sweep/tolerance or global damage delay. [Method and limits](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#bounded-interpolated-stroke-samples).
+
+New finite approaching-target probes pass 40 walking and 20 early-Attack mesh
+queries, but confirm unresolved visual-contact gaps in the current root gate:
+outer walking hits remain at least .3765 m separated, and close/angled early
+Attack poses differ substantially. No production range/cone or timing changes
+are justified by these endpoint samples alone. [Exact measurements, rejected
+fixture and next bounded step](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#approaching-target-rangecone-calibration-gap).
 
 Workflow-only `e4cc12f8` passes all 12 aggregate jobs in push `37678033058` /
 PR `37678041933`. The preceding `53459b27` has eleven successes and a cancelled

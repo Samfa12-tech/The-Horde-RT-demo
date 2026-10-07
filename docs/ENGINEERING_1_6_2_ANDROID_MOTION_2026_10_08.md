@@ -456,8 +456,21 @@ Both `38f9d48a` source CI runs retain six failed / six successful aggregate jobs
 GCC/Clang/MSVC fail the old development-registry size/153-null assertions;
 Android/Vulkan/sanitizers pass. Updating the registry to 56 / first absent 156
 retains all old checkpoint checks and adds explicit bounded preview assertions.
-The local registry check passes; `3da5f2dd` CI is separate and still in progress
-in push `37685777037` / PR `37685784607` at this checkpoint.
+The local registry check passes; `3da5f2dd` completes **12/12 aggregate CI jobs**
+in push `37685777037` / PR `37685784607`, including both MSVC report-form runs.
+This does not establish the cause of the earlier intermittent Unicode-edit
+timeout. Documentation checkpoint `bcb86b17` has separate CI.
+
+The corrected Windows moving sampler was then attempted on this sealed binary.
+PID 52292 exits 1 after 32.941 wall seconds because Windows denies the owned
+window's foreground activation. Native arming expires at its existing 30-second
+budget, the manifest is incomplete with zero images, and no focus guard is
+bypassed. Synchronization validation reports zero error markers; this is a
+failed focus/inspection attempt, not successful motion or a renderer pass.
+Private set: `windows-waterfall-3da5f2dd-motion-20261008-pipeline/`;
+manifest SHA-256 `30b7a9cc5733c2778f8ef952509760501b3de65e49e65b1963d25a2e78741e83`;
+launch SHA-256 `e71f93ae5ec72d329fa394c1b0bbcbff0d62ff3381f535d30a4807e1d534a896`.
+The owned process has exited; actual moving image coverage remains pending.
 
 ### Active-draw Home interruption
 
@@ -479,6 +492,65 @@ as complete accepted motion ledgers. No lifecycle bypass or source correction
 was needed for these checker failures.
 
 ## Remaining gates
+
+### Approaching-target range/cone calibration gap
+
+Two new opt-in host modes in `HeldItemSocketTests` investigate fresh approach
+conditions rather than replaying the closed Attack/Idle neighborhoods or coarse
+capsule experiment. They use the actual imported player rig, final sword Grip,
+all 6,905 blade triangles and imported target skins. An ordinary unhit parallel
+combat control supplies the pre-update target paired with the existing contact
+pulse, matching `ResolveSwordHit` ordering. Renderer clip/instance mapping is
+the existing aligned diagnostic copy, not direct execution of CharacterRenderSlot.
+Each case samples pulse through +3 fixed ticks (.10–.15 active seconds); this is
+four discrete endpoints, not continuous collision or actual presented contact.
+
+`--combat-walking-range-cone` passes 40 queries in 183.59 s. At pulse tick 17,
+walking roots are 1.69967 m away and both 0/.65-second gait seeds are sampled.
+The present 1.72 m / .52-dot gate admits all frontal/±50° cases and kills the
+target, despite positive blade gaps at every sampled endpoint. Minimum gaps
+across the four endpoints and two phases are .3765 m frontal, .9769 m at +50°,
+and .6685 m at -50°. Relative +62° and 1.78467 m range controls correctly reject
+damage. The +62° case uses a legal +50° world path and -12° player yaw so the
+ordinary target stays inside the physical corridor.
+
+`--combat-inner-range-cone` passes 20 further queries in 80.47 s, using ordinary
+early Attack windup (.25 s at pulse). Attack entry resets the gait clock, so
+identical phase variants are not repeated. Current range/cone admits all five:
+
+| Target root | Pulse blade gap | Minimum of four endpoints | Sampled intersection |
+| --- | --- | --- | --- |
+| Frontal 1.20 m | 257.8 mm | 62.2 mm | None |
+| Frontal 1.28 m | 303.0 mm | 100.9 mm | None |
+| +15° / 1.28 m | 398.5 mm | 365.2 mm | None |
+| -15° / 1.28 m | 272.4 mm | 0 mm | One later endpoint |
+| +30° / 1.28 m | 523.0 mm | 516.5 mm | None |
+
+These measurements establish a calibration gap; they do not certify the
+current hits as visible contact. A symmetric cone shrink or universal delay
+alone is not supported by the different target poses and lateral results.
+Production range/cone, contact times, parry eligibility and health/damage rules
+are unchanged. A bounded pose-aware hit/short-sweep proposal and affected
+moving presentation/owner checks remain required; no general combat engine is
+introduced here. Audio/haptic manual revalidation for this test-only change: **NO**.
+
+The first walking fixture fails and is rejected: held input inherited normal
+player z=1.85 while combat used z=0, and a +62° world path was outside the
+physical corridor. Its 123.33 s run, source patch and failed receipt remain
+retained, with no calibration conclusion. Corrected outer test executable
+SHA-256 is `2475776d92f578773fe1af27da1d2a321aa2937b9f53027e562384999b7fc7bb`;
+source-file SHA-256 is
+`05dd0726dc59de0582b37b026a9e957791efb0a0b0031c08c88fedc9f6a5ee9c`.
+The subsequent inner-mode source also corrects the unobserved initial facing;
+the simulation already faces the player on every tick before measured pulse.
+Its executable SHA-256 is
+`6bd03f2f12fe22e7529bdd739ba760b9d6f081988c1fb7e7ae5bb9a2de05e37d`;
+source-file SHA-256 is
+`f5fddb844f3dfaedccde65a85a96f2e8a3db24a91934615cfd728f8507b09316`.
+Exact logs/receipts remain under `build/reports/combat-*-range-cone-*20261008.log`
+and `task-4/combat-*-range-cone-*-private-20261008.json`. The sealed `3da5f2dd`
+runtime/package is unchanged. Documentation `bcb86b17` separately passes all
+12 CI jobs in `37686976032` / `37686980419`; this test follow-up has its own CI.
 
 ### Closed coarse contact-proxy probe
 

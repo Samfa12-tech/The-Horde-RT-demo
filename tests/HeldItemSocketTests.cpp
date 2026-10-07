@@ -3463,6 +3463,164 @@ void TestBoundedCombatPulseSweep()
     }
 }
 
+// Bounded investigation of the current root-distance/cone gate against an
+// ordinary approaching target. This opt-in mode uses both authored walk phases,
+// an unhit parallel control, and actual imported meshes; it changes no runtime
+// hit rule and does not rerun the closed Attack/Idle or capsule experiments.
+void TestWalkingCombatRangeCone(const bool innerBracket = false)
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::items;
+    using horde::scene::SkinnedClip;
+    using horde::scene::SkinnedMeshAsset;
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    horde::scene::assets::StaticMeshAsset sword;
+    horde::scene::assets::StaticMeshAsset torch;
+    std::string diagnostic;
+    const bool assetsLoaded = LoadProductionHeldAssets(sword, torch, diagnostic);
+    const auto* grip = FindHeldItemSocket(sword.sockets, "Grip");
+    Check(assetsLoaded && grip != nullptr && !sword.vertices.empty(),
+          "walking range/cone probe must load the production sword and Grip");
+    if (!assetsLoaded || grip == nullptr || sword.vertices.empty()) return;
+    SkinnedMeshAsset skeleton;
+    const bool targetLoaded = skeleton.LoadCombatClips(
+        (root / "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(), diagnostic);
+    horde::vulkan::raytracing::PlayerRenderSlot rig;
+    const bool rigLoaded = rig.LoadAsset(
+        (root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(), diagnostic);
+    Check(targetLoaded && rigLoaded,
+          "walking range/cone probe must load both actual character rigs");
+    if (!targetLoaded || !rigLoaded) return;
+    struct SampleCase { const char* name; float distance; float bearing; float playerYaw; bool expectedGate; };
+    constexpr std::array<SampleCase, 5u> outerCases{{
+        {"frontal-outer", 1.865f, 0.0f, 0.0f, true},
+        {"plus50-outer", 1.865f, 0.872664626f, 0.0f, true},
+        {"minus50-outer", 1.865f, -0.872664626f, 0.0f, true},
+        // Keep the ordinary target path inside the physical corridor. Turning
+        // the player -12 degrees makes this legal +50 world bearing +62 relative.
+        {"relative-plus62-outside-cone", 1.865f, 0.872664626f, -0.20943951f, false},
+        {"frontal-outside-range", 1.950f, 0.0f, 0.0f, false},
+    }};
+    constexpr std::array<SampleCase, 5u> innerCases{{
+        {"frontal-1.20", 1.20f, 0.0f, 0.0f, true},
+        {"frontal-1.28", 1.28f, 0.0f, 0.0f, true},
+        {"plus15-1.28", 1.28f, 0.261799388f, 0.0f, true},
+        {"minus15-1.28", 1.28f, -0.261799388f, 0.0f, true},
+        {"plus30-1.28", 1.28f, 0.523598776f, 0.0f, true},
+    }};
+    const auto& cases = innerBracket ? innerCases : outerCases;
+    constexpr float tickSeconds = 1.0f / 60.0f;
+    constexpr std::uint64_t neighborhoodRadius = 3u;
+    constexpr std::uint64_t maxTicks = 60u;
+    std::uint64_t rigTick = 100000u;
+    std::size_t totalQueries = 0u;
+    for (const SampleCase& sampleCase : cases)
+    {
+        for (const float phaseSeconds : {0.0f, 0.65f})
+        {
+            // An ordinary close attacker resets its Attack clock. Do not repeat
+            // identical meshes under a locomotion phase that no longer applies.
+            if (innerBracket && phaseSeconds > 0.0f) continue;
+            const RoutePosition position{sampleCase.distance * std::sin(sampleCase.bearing),
+                                         -sampleCase.distance * std::cos(sampleCase.bearing)};
+            std::array<SkeletonSpawnPose, kSkeletonCombatantCapacity> layout{};
+            layout[0] = {position, std::atan2(-position.x, -position.z), phaseSeconds};
+            SwordCombat attack;
+            SwordCombat control;
+            attack.Reset(1u, position, &layout);
+            control.Reset(1u, position, &layout);
+            Check(attack.RequestAttack() == PlayerAttackCut::DownwardCut,
+                  "walking probe must request an ordinary downward cut");
+            std::uint64_t pulseTick = 0u;
+            std::size_t samples = 0u;
+            std::size_t intersections = 0u;
+            float minimumGap = std::numeric_limits<float>::max();
+            float pulseRange = 0.0f;
+            float pulseConeDot = 0.0f;
+            float pulseGap = 0.0f;
+            float firstClipTime = 0.0f;
+            bool pulseGate = false;
+            bool damageAdmitted = false;
+            for (std::uint64_t tick = 1u; tick <= maxTicks; ++tick)
+            {
+                const auto target = control.Snapshot().combatants[0];
+                const CombatSnapshot player = attack.Update(tickSeconds, 0.0f, 0.0f, sampleCase.playerYaw, true, true);
+                control.Update(tickSeconds, 0.0f, 0.0f, sampleCase.playerYaw, true, true);
+                if (player.playerAttackPulse && pulseTick == 0u) pulseTick = tick;
+                if (pulseTick == 0u) continue;
+                if (tick > pulseTick + neighborhoodRadius) break;
+                const bool expectedTargetPhase = innerBracket
+                    ? target.action == EnemyCombatAction::AttackWindup
+                    : target.action == EnemyCombatAction::Locomotion && target.animation == EnemyAnimation::Walking;
+                Check(target.health == 1 && expectedTargetPhase,
+                      "unhit ordinary target must retain its expected approach/attack phase across the stroke");
+                Check(player.player.action == PlayerCombatAction::SwingActive &&
+                          player.player.actionTime >= CombatTimeline::kPlayerDownwardContactSeconds &&
+                          player.player.actionTime <= SwordCombat::kDownwardCutTravelDuration,
+                      "walking probe must sample the visible downward stroke only");
+                HeldItemFixedStepInput input;
+                // Match this probe's combat world origin, rather than inheriting
+                // the normal player spawn (z=1.85) from the input defaults.
+                input.playerX = 0.0f;
+                input.playerZ = 0.0f;
+                input.playerYawRadians = sampleCase.playerYaw;
+                input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+                input.playerCombat = player.player;
+                HeldItemStates items = MakeDefaultHeldItemStates();
+                HeldItemFixedStepState fixed;
+                HeldItemTransform worldFromGrip{};
+                HeldItemTransform worldFromSword{};
+                const bool resolved = ResolveHeldItemsFixedStep(items, input, tick, fixed, diagnostic) &&
+                    ResolveProductionAnatomicalSword(input, fixed.kinematics, items, rig,
+                        rigTick++, worldFromGrip, worldFromSword, diagnostic);
+                const auto targetSample = CurrentCharacterRenderMapping(target,
+                    skeleton.ClipDuration(SkinnedClip::Dead));
+                std::vector<horde::scene::SkinnedRtVertex> targetPose;
+                const bool skinned = skeleton.Skin(targetSample.clip, targetSample.clipTime, targetPose, diagnostic);
+                const auto expectedClip = innerBracket ? SkinnedClip::Attack : SkinnedClip::Walking;
+                Check(resolved && skinned && targetSample.clip == expectedClip,
+                      "range/cone probe must resolve final production Grip and expected imported target skin");
+                if (!resolved || !skinned || targetSample.clip != expectedClip) continue;
+                const auto blade = BuildGripFilteredBladeTriangles(sword, *grip, worldFromSword);
+                const auto targetTree = BuildDiagnosticTargetTree(targetSample, targetPose);
+                const auto gap = MeasureBladeTriangleDistance(targetTree, blade);
+                Check(gap.trianglesQueried == 6905u && std::isfinite(gap.metres) && gap.metres >= 0.0f,
+                      "walking probe must query all actual blade triangles and report finite gaps");
+                ++samples;
+                ++totalQueries;
+                minimumGap = std::min(minimumGap, gap.metres);
+                if (gap.metres == 0.0f) ++intersections;
+                if (tick == pulseTick)
+                {
+                    pulseRange = std::hypot(target.x, target.z);
+                    pulseConeDot = (target.x * std::sin(sampleCase.playerYaw) -
+                                    target.z * std::cos(sampleCase.playerYaw)) / pulseRange;
+                    pulseGate = SwordCombat::IsPlayerTargetInRangeCone(0.0f, 0.0f, sampleCase.playerYaw, target.x, target.z);
+                    pulseGap = gap.metres;
+                    firstClipTime = targetSample.clipTime;
+                    damageAdmitted = player.combatants[0].health == 0;
+                    Check(pulseGate == sampleCase.expectedGate && damageAdmitted == pulseGate,
+                          "walking probe must distinguish current admitted and range/cone-rejected controls");
+                }
+            }
+            Check(pulseTick != 0u && samples == neighborhoodRadius + 1u,
+                  "walking probe must retain exactly pulse through plus three fixed ticks");
+            std::cout << (innerBracket ? "combat-inner-range-cone " : "combat-walking-range-cone ") << sampleCase.name
+                      << " walkPhaseSeconds=" << phaseSeconds << " pulseTick=" << pulseTick
+                      << " worldBearingRadians=" << sampleCase.bearing << " playerYawRadians=" << sampleCase.playerYaw
+                      << " targetRootDistanceM=" << pulseRange << " targetRootConeDot=" << pulseConeDot
+                      << " pulseRangeConeEligible=" << pulseGate << " damageAdmitted=" << damageAdmitted
+                      << " targetClipTimeAtPulse=" << firstClipTime << " pulseGapMm=" << pulseGap * 1000.0f
+                      << " minimumSampledGapMm=" << minimumGap * 1000.0f
+                      << " sampledIntersections=" << intersections << " samples=" << samples
+                      << " method=ordinary-unhit-control-vs-production-final-grip-blade"
+                      << " scope=four-discrete-60Hz-endpoints-not-continuous-collision-proof\n";
+        }
+    }
+    Check(totalQueries == (innerBracket ? 20u : 40u),
+          "range/cone mode must retain its explicit finite query budget");
+}
+
 bool ResolveProductionSwordStowPose(
     horde::gameplay::items::HeldItemFixedStepInput input,
     const horde::gameplay::items::HeldItemState& swordState,
@@ -4363,6 +4521,16 @@ int main(const int argc, char** argv)
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 #endif
+    if (argc > 1 && std::string(argv[1]) == "--combat-inner-range-cone")
+    {
+        TestWalkingCombatRangeCone(true);
+        return failures == 0 ? 0 : 1;
+    }
+    if (argc > 1 && std::string(argv[1]) == "--combat-walking-range-cone")
+    {
+        TestWalkingCombatRangeCone();
+        return failures == 0 ? 0 : 1;
+    }
     if (argc > 1 && std::string(argv[1]) == "--combat-bounded-sweep")
     {
         TestBoundedCombatPulseSweep();
