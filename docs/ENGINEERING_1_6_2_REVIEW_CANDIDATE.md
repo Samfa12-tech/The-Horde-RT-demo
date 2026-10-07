@@ -1,9 +1,11 @@
 # Horde 1.6.2 review candidate - 5 October 2026
 
-Work is paused by owner direction until after the weekly reset and further
-review. Merge and publication are on hold; no additional experiment or long run
-starts during the pause. Read the [exact pause checkpoint](ENGINEERING_1_6_2_PAUSE_2026_10_05.md)
-for completed checks, glass-apply timing, artifacts and the resume plan.
+This is the historical 5 October graphics review checkpoint. The owner resumed
+bounded tomb-demo work after the reset; current status, expanded scope and owner
+gates are in the [active finish plan](ENGINEERING_1_6_2_TOMB_FINISH.md).
+Merge and publication remain on hold. The original pause restriction applied
+until that resume; the [exact pause checkpoint](ENGINEERING_1_6_2_PAUSE_2026_10_05.md)
+retains completed checks, glass-apply timing, artifacts and the resume plan.
 
 The final graphics candidate is frozen at runtime source
 `1334cc9c58ec97940ac10d861f0397143ca7a9f4`, with both Windows configurations,

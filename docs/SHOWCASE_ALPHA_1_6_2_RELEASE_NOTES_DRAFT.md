@@ -1,5 +1,24 @@
 # Horde Lantern RT 1.6.2 development notes
 
+**8 October contact/draw follow-up:** immutable runtime
+`ab69537a46248d551420df16f4c3a1f781de6bc5`, tree
+`f49720cd5c2fb6afaf2a9fab75cb9bfccf3fae1c`. Debug APK SHA-256
+`99e012534a5b442846d7aeb724dbf17e9ea9860492724c1ee100bdfa20fd3895`
+(138,462,724 bytes); installed pullback matches. Both phone RT backends pass
+scoped waterfall approach/draw/attachment/attack/parry with observed quarter
+progress captures, unchanged preferences and stopped apps. The player contact
+samples now occur during measured imported-blade close approach; range/cone,
+dynamic targets and owner feedback remain open. Both backends also pass the
+affected full Keeper death/retry/three-hit/defeat/reward/ending sequence.
+Actual four-ABI unsigned
+Release excludes Debug harness markers, SHA-256
+`03151b019762a140d419509fa8d1aa58d3a21c82ce790febc6d97f4f9f4ec9ad`.
+Workflow-only `ebeb9117` fixes host fixture admission and passes 12/12 aggregate
+CI in `37641619811` / `37641674418`; initial missing-fixture failures are retained.
+[Exact measurements and limitations](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#measured-player-contact-follow-up).
+Production equipment activation, owner visual/audio/haptic/comfort, sustained
+phone performance and Eric's independent audit remain open. No release approved.
+
 **8 October moving-inspection checkpoint:** source
 `4e9e5bb7696f4d5d3864835eb35e29f4bce42d8e`, tree
 `93df3ea4a5d34f84511f28450fb6806394a49c90`. Debug APK SHA-256

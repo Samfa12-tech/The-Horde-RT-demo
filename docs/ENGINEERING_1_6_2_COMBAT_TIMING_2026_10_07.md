@@ -1,6 +1,10 @@
 # Combat timing slice — 7 October 2026
 
-This slice preserves damage, health, ranges, cones and parry eligibility. Physical input timing and rendered blade-contact calibration remain open in the active [tomb finish plan](ENGINEERING_1_6_2_TOMB_FINISH.md).
+This dated slice preserves damage, health, ranges, cones and parry eligibility.
+The later [8 October imported-blade measurements](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#measured-player-contact-follow-up)
+move the player contact samples within the existing strokes; physical input,
+moving-target range/cone calibration and owner feel remain open in the active
+[tomb finish plan](ENGINEERING_1_6_2_TOMB_FINISH.md).
 
 ## Measured timeline
 

@@ -2,6 +2,32 @@
 
 Last updated: 2026-10-08
 
+## 8 October scoped waterfall draw — SM-S948B / Android 16
+
+Evidence class: **exact Debug package, scoped equipment encounter with actual
+completed RT/image bindings**. Runtime
+`ab69537a46248d551420df16f4c3a1f781de6bc5`, Debug APK SHA-256
+`99e012534a5b442846d7aeb724dbf17e9ea9860492724c1ee100bdfa20fd3895`,
+138,462,724 bytes; installed pullback matches. Pipeline and required hardware
+RayQueryCompute both complete the ordinary approach, warning/draw/attachment,
+attack and parry scenario. They retain 169/176 exact completed frame rows,
+13 images each and observed quarter-progress draw captures. Every preference
+entry is unchanged; both owned apps stop. The temporary flags restore on owner
+exit, and production activation remains off.
+
+[Exact hashes, retained failures and contact measurements](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#waterfall-equipment-moving-inspection).
+This is muted harness inspection, not owner framing/comfort/audio/haptic,
+physical touch, full clearance/reflection, sustained FPS or quality acceptance.
+The same APK also passes the damage-timing-affected Keeper death/retry/
+three-hit/defeat/reward/ending sequence on both backends, with 661/668 exact
+state/completed-frame rows, 53 events and 33 images each. Preferences remain
+unchanged and owned apps stop; earlier Keeper evidence below remains separate.
+Both backends also reject actual active-draw Home interruption and present the
+actual resumed generation 3. Original fixed-generation checker failures are
+preserved and corrected by read-only log analysis; this adds native lifecycle
+presentation evidence, not completed-frame images or physical multitouch.
+Original checkpoint and earlier moving evidence below retain their own source.
+
 ## 8 October moving simulation/RT scenarios — SM-S948B / Android 16
 
 Evidence class: **exact Debug package, harness-generated ordinary axes and
