@@ -1,5 +1,25 @@
 # Horde Lantern RT 1.6.2 development notes
 
+**8 October staged waterfall guard preview:** source
+`3da5f2ddb7050422ccc083a645afc3a84b17aa4a`, tree
+`f9bef90b62d06c27dab015640afb234a4f311a3b`; Debug APK SHA-256
+`4c0829af2d1c890455917fd49740f0f0dfd8ea02de923384f329b26e29622db3`
+(138,462,724 bytes), Windows Debug executable SHA-256
+`d22757047868747d05685318bda42406c599a8e0bb927fa1fc9167a662ed0688`
+(11,352,576 bytes). The existing pair now stands to either side facing arrival,
+with distinct persistent walking phases and corrected shared room selection.
+Three actual staged Windows RT stills pass owning completed/presented-frame and
+hash joins, with stopped owned processes and zero validation error markers.
+Affected host checks and both builds pass; Android closed assets, four ABIs,
+manifest and alignment pass. The owner is away with the phone: this APK is not
+installed/device-validated, and earlier CCD owner approvals remain separate.
+Production encounter/stow flags remain off; moving body/shadow/reflection,
+integrated route, owner layout feedback and sustained quality gates remain open.
+[Exact evidence and failed predecessor](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#waterfall-room-guards-staged-windows-preview).
+Source CI `37685777037` / `37685784607` is still running at this checkpoint;
+preceding `38f9d48a` retains six failed registry jobs and six successes.
+This is an unreleased inspection checkpoint, with no new Release or signing.
+
 **8 October owner playtest and farther floor inspection:** source
 `ccd70d3815e0ed08946f9f5ffc52a156bb41ed63`, tree
 `f088aff7c39405f986d9898b431e564abcede2a3`; Debug APK SHA-256

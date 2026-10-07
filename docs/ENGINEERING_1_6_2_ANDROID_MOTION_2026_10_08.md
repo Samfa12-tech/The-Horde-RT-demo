@@ -398,6 +398,67 @@ WM_SETTEXT call times out after 2004 ms. This failure is retained separately
 from the sealed CCD runtime and earlier `e4cc12f8` 12/12 results; it is not an
 installation timeout or a gameplay/capture pass.
 
+### Waterfall room guards: staged Windows preview
+
+The owner's updated direction places the existing pair to the player's right
+and left, facing arrival. Immutable Debug source
+`3da5f2ddb7050422ccc083a645afc3a84b17aa4a`, tree
+`f9bef90b62d06c27dab015640afb234a4f311a3b`, implements explicit shared spawn
+poses at (-5.5, -15.95) and (-5.5, -14.45), facing +X. The second guard retains
+a .65-second simulation walking-phase offset after waiting outside the room,
+leaving/re-entering and reset. The imported walk clip is 1.0333333333 seconds;
+the existing .90 sample rate makes the offset .585 clip seconds, about 56.6%
+of a cycle. Attack/contact/death clocks remain zero-based. Unauthored layouts
+retain their prior animation-clock behavior; identities/count/stats are unchanged.
+
+The first `38f9d48a` room stills completed natively but showed no guards: the
+historical SkylightChamber selector chose Lich. Three new room-selector assertions
+reproduce that defect. The shared enemy director now accepts an explicit encounter
+override only while the opted-in waterfall encounter is inside its room; leaving
+retains ordinary route selection. No renderer-specific enemy branch is added.
+The affected five host checks pass (21.19 s), the development registry check
+passes (6.52 s), and Windows plus four-ABI Android Debug builds pass.
+
+Debug-only checkpoints 153/154/155 stage room entry and six/eighteen actual fixed
+ticks, with immutable snapshots while RT settles. Existing checkpoints 100–152
+retain their identities; bounded admission rejects more than 30 staged ticks.
+The zero-delta authoritative import adds one boundary, so completed simulation
+ticks are 1/7/19. Earlier wrong base/count/freeze assumptions and private-access
+build failures remain retained as failed harness attempts.
+
+Three NVIDIA RTX 5050 Laptop / RayTracingPipeline stills at 960 x 540 pass exact
+manifest, owning completed-submission/presentation, pipeline, launch and PNG
+hash joins. Owned PIDs 59624/51732/56180 exit normally, with zero synchronization
+validation error markers. All three original images were inspected: both lateral
+guards face arrival, timed stills show differing walk poses, and the held torch
+partly occludes the left guard. This is staged still evidence, not continuous
+motion, scanout, sustained FPS, complete body/shadow/reflection or owner acceptance.
+
+Private set: `waterfall-guards-3da5f2dd-staged-20261008/`; audit SHA-256
+`8af3933c980987df99a57a1d73787bb8c77f3b3aed9e14942eef9f2e25070d02`.
+PNG SHA-256, entry / early / later respectively:
+`6dfe02533ad8a729a829c822c10a4909dfc7468ab1817e8f6e493b5d38b4c2db`,
+`231edc403c510f690e9696bb99940bf1c36527ce6c3fad9a9e5ff3e4d51ecfd2`,
+`10746825d08baf52b6946b69ab70d8c354807e0016f3044a4187e2ab19da8f0f`.
+Failed predecessor `waterfall-guards-38f9d48a-staged-20261008/` remains unchanged.
+
+Sealed Debug APK is 138,462,724 bytes, SHA-256
+`4c0829af2d1c890455917fd49740f0f0dfd8ea02de923384f329b26e29622db3`;
+Windows Debug executable is 11,352,576 bytes, SHA-256
+`d22757047868747d05685318bda42406c599a8e0bb927fa1fc9167a662ed0688`.
+Closed Android assets, four native ABIs, manifest and 16 KiB admission pass.
+The owner took the phone away; this APK is **not installed or device-validated**.
+There is no new Release/signing/owner/performance/audit result. Production stow
+and waterfall flags remain off pending moving attachment/body/shadow/reflection
+and integrated-route checks. Earlier CCD owner approvals keep their exact APK.
+
+Both `38f9d48a` source CI runs retain six failed / six successful aggregate jobs:
+GCC/Clang/MSVC fail the old development-registry size/153-null assertions;
+Android/Vulkan/sanitizers pass. Updating the registry to 56 / first absent 156
+retains all old checkpoint checks and adds explicit bounded preview assertions.
+The local registry check passes; `3da5f2dd` CI is separate and still in progress
+in push `37685777037` / PR `37685784607` at this checkpoint.
+
 ### Active-draw Home interruption
 
 The same APK also rejects an actual Home interruption during active Draw and
