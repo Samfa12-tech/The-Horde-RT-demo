@@ -205,10 +205,13 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
     auto& run = *context.motion;
     const auto stage = run.scenario.Stage();
     const double seconds = run.scenario.SimulationSeconds();
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration) || AndroidMotionScope(context) != run.scope)
+    { FailAndroidMotion(context, "Motion present lost its foreground resource scope."); return; }
     if (stage == run.lastCaptureStage && seconds - run.lastCaptureSeconds < 2.0 && !run.scenario.Complete()) return;
     horde::telemetry::RtSubmittedFrameIdentity submitted{};
     if (!context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, submitted) ||
-        !CompleteRtEvidenceAfterDeviceIdle(context, vkDeviceWaitIdle(context.device)) || run.finished)
+        !CompleteRtEvidenceAfterDeviceIdle(context, vkDeviceWaitIdle(context.device)) || run.finished ||
+        !gSurfaceSessions.IsCurrent(context.surfaceGeneration))
     { FailAndroidMotion(context, "Motion milestone did not drain its graphics owner."); return; }
     const auto frames = run.ledger.Frames();
     if (frames.empty() || frames.back().identity.submitted.submissionSerial != submitted.submissionSerial ||
@@ -219,7 +222,8 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
     horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
     std::string error;
     if (!context.rtScene.CaptureStorageImage(image, error) || image.width == 0u || image.height == 0u ||
-        image.rgba.size() != static_cast<std::size_t>(image.width) * image.height * 4u)
+        image.rgba.size() != static_cast<std::size_t>(image.width) * image.height * 4u ||
+        !gSurfaceSessions.IsCurrent(context.surfaceGeneration) || AndroidMotionScope(context) != run.scope)
     { FailAndroidMotion(context, "Actual motion image readback failed."); return; }
     const std::string file = "android-motion-" + run.id + '-' + std::to_string(run.captureCount) + ".rgba";
     std::ofstream raw(context.reportDirectory + '/' + file, std::ios::binary | std::ios::trunc);
