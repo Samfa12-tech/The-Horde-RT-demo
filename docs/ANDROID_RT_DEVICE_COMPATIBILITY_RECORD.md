@@ -2,6 +2,28 @@
 
 Last updated: 2026-10-08
 
+## 8 October multi-pointer controls — SM-S948B / Android 16
+
+Evidence class: **exact Debug physical-device package, guarded synthetic touch
+and consumed-input/accepted-RT-presentation observations**. Runtime
+`7368e2c72099c47548076981f313f832de4e83f0`, Debug APK SHA-256
+`c04d0f12b4fa507f5171b16355f21fa646f99b3d1e043b7fb249b0e7fc11691c`,
+138,462,724 bytes; installed base hash matches. Both genuine Pipeline and required
+hardware RayQueryCompute pass 16 diagonal move/look/action/normal-release/
+whole-Cancel/Menu-Resume cases each, with both finger orders, exactly one selected
+consumed action and stationary zero-input intervals. Every preference entry is
+unchanged and owned apps stop. Eight additional held-touch Home/fresh-Parry cases
+pass on both backends, with same-PID/Activity return, fresh RT scenes, sampled
+zero-input state before synthetic stream closure, and accepted new gestures.
+Warm-up Dodge visibility is reproduced in a
+failing regression and corrected; all 177 Android tests in 30 classes pass.
+
+[Exact method, artifacts, Home follow-up and retained failures](ENGINEERING_1_6_2_TOUCH_2026_10_08.md).
+The native observer is explicitly Debug-only; accepted queue-present calls do not
+measure scanout, displayed FPS or touch latency. Synthetic touch on physical
+hardware does not establish owner comfort, successful parry/hit eligibility,
+sustained performance or a new device/SoC compatibility class.
+
 ## 8 October foreground pause work — SM-S948B / Android 16
 
 Evidence class: **exact Debug package, acknowledged ordinary navigation and

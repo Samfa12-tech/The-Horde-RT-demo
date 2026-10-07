@@ -1,5 +1,28 @@
 # Horde Lantern RT 1.6.2 development notes
 
+**8 October input follow-up:** immutable inspection runtime
+`7368e2c72099c47548076981f313f832de4e83f0`, tree
+`56c1e8b0a1dfdb5e0397287532506ab571301ae0`. Debug APK SHA-256
+`c04d0f12b4fa507f5171b16355f21fa646f99b3d1e043b7fb249b0e7fc11691c`
+(138,462,724 bytes); installed base hash matches. Both phone RT backends pass
+16 diagonal move/look/action/release/Cancel/Menu cases each, with unchanged
+preferences and stopped apps. Eight additional held-touch Home/fresh-Parry cases
+also pass on both backends with sampled zero-input state before test-stream
+closure; this is synthetic device evidence, separate from owner comfort.
+Dodge now reappears after native warm-up; the
+regression fails before the fix and all 177 Android tests pass afterward.
+Debug/unsigned Release builds and lint pass. Source CI passes all 12 jobs in
+`37655935915` / `37655958874`; documentation after the seal has separate CI.
+Unsigned Release APK SHA-256
+`a5bcacb8cb94334ac542c00be034ce3d216e4755db17604761f1b34f9922db9b`
+(120,007,832 bytes); all four actual native payloads exclude the explicit Debug
+input/combat trace markers. Windows executable SHA-256
+`c639e713084437f4c4bdb3d481f7bbf5e69284ff6dff5a30a000065923f0cdb3`.
+[Exact input evidence and retained failures](ENGINEERING_1_6_2_TOUCH_2026_10_08.md).
+This inspection seal does not close owner visual/audio/haptic/comfort,
+moving-contact/production-equipment, sustained performance or independent audit
+gates and is not a final review or release candidate.
+
 **8 October contact/draw follow-up:** immutable runtime
 `ab69537a46248d551420df16f4c3a1f781de6bc5`, tree
 `f49720cd5c2fb6afaf2a9fab75cb9bfccf3fae1c`. Debug APK SHA-256

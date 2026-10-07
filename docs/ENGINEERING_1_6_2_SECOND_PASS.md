@@ -1,9 +1,10 @@
 # 1.6.2 second-pass execution ledger
 
-Work is paused by owner direction until after the weekly reset and further
-review. Merge and publication are on hold; no additional experiment or long run
-starts during the pause. Read the [exact pause checkpoint](ENGINEERING_1_6_2_PAUSE_2026_10_05.md)
-for completed checks, glass-apply timing, artifacts and the resume plan.
+This ledger retains the historical 5 October pause checkpoint. The owner has
+authorized post-reset standalone tomb work in [the active plan](ENGINEERING_1_6_2_TOMB_FINISH.md);
+that later scope supersedes conflicting pause or future-version restrictions.
+Merge and publication remain on hold. The [exact checkpoint](ENGINEERING_1_6_2_PAUSE_2026_10_05.md)
+keeps its completed checks, glass-apply timing and package identities.
 
 ## Final evidence boundary, 5 October: runtime 1334 ready for independent audit
 
