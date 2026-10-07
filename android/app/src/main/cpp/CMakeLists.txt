@@ -53,6 +53,12 @@ if(HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "33")
     target_compile_definitions(horde_rt_probe_android PRIVATE HORDE_RT_BENCHMARK_SCALE_VALIDATION=1)
 endif()
 if(HORDE_RT_DEBUG_CHECKPOINTS)
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message(FATAL_ERROR "Android motion/checkpoint evidence is restricted to Debug builds.")
+    endif()
+    target_sources(horde_rt_probe_android PRIVATE
+        "${HORDE_RT_REPO_ROOT}/src/gameplay/validation/MotionEvidenceScenario.cpp"
+        "${HORDE_RT_REPO_ROOT}/src/telemetry/MotionEvidenceLedger.cpp")
     target_compile_definitions(horde_rt_probe_android PRIVATE
         HORDE_RT_DEBUG_CHECKPOINTS=1
     )

@@ -91,6 +91,9 @@ public final class ProbeBridge {
     public static native boolean requestDebugCheckpoint(int checkpointId);
     public static native boolean requestDebugCaptureCheckpoint(int checkpointId);
     public static native boolean requestDebugRouteReplay();
+    public static native boolean requestDebugMotionEvidence(String scenario, String runId);
+    public static native int getDebugMotionEvidenceStatus();
+    public static native boolean finishDebugMotionEvidence();
     public static native boolean requestBenchmark();
     // UUID.randomUUID() and Build.MODEL supplied by ordinary UI. Legacy run ID stays empty.
     public static native boolean requestBenchmarkWithSummaryId(String summaryRunUuid, String rawModel);

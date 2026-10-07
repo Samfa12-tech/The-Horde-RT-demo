@@ -115,6 +115,8 @@ public class MainActivity extends Activity {
     private static final String EXTRA_DEBUG_CHECKPOINT = "horde.debug.checkpoint";
     private static final String EXTRA_DEBUG_CAPTURE = "horde.debug.capture";
     private static final String EXTRA_DEBUG_REPLAY = "horde.debug.replay";
+    private static final String EXTRA_DEBUG_MOTION = "horde.debug.motion";
+    private static final String EXTRA_DEBUG_MOTION_ID = "horde.debug.motion_id";
     private static final String EXTRA_DEBUG_SCALE = "horde.debug.scale";
     private static final String EXTRA_DEBUG_AUTOSTART = "horde.debug.autostart";
     private static final String EXTRA_DEBUG_OVERLAY = "horde.debug.overlay";
@@ -276,6 +278,8 @@ public class MainActivity extends Activity {
     private int pendingDebugCheckpoint = -1;
     private boolean pendingDebugCapture;
     private boolean pendingDebugReplay;
+    private String pendingDebugMotion, pendingDebugMotionId;
+    private boolean debugMotionActive;
     private boolean debugAutomationAutostart;
     private boolean developerOverlayVisible;
     private boolean debugCaptureUiSuppressed;
@@ -4203,9 +4207,17 @@ public class MainActivity extends Activity {
                     finishBenchmarkAutomation(3);
                 }
                 final int state = ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);
+                if (debugMotionActive) {
+                    final int motionStatus = ProbeBridge.getDebugMotionEvidenceStatus();
+                    if (motionStatus == 3 || motionStatus == 4) {
+                        ProbeBridge.finishDebugMotionEvidence();
+                        restoreUiAfterDebugMotion();
+                        Log.i(TAG, "Debug motion evidence finished: status=" + motionStatus);
+                    }
+                }
                 surfaceStarted = resumed && surfaceAvailable && surfaceRequestGeneration != 0 && state == 1;
                 if (musicPlayback != null) musicPlayback.setSuspended(!resumed || !surfaceStarted ||
-                        state != 1 || menuVisible || diagnosticsVisible);
+                        state != 1 || menuVisible || diagnosticsVisible || debugMotionActive || pendingDebugMotion != null);
                 if (state == 1) {
                     if(!benchmarkRunning) layoutRtStatus(true);
                     rtStatus.setText(benchmarkRunning?R.string.rt_active:R.string.rt_active_compact);
@@ -4247,8 +4259,8 @@ public class MainActivity extends Activity {
                         parryButton.setVisibility(View.GONE);
                         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
                     }
-                    if (lifePhase == PLAYER_DEAD) showDeathOverlay();
-                    if (finaleEndingPhase == FINALE_ENDING_COMPLETE && !benchmarkRunning &&
+                    if (lifePhase == PLAYER_DEAD && !debugMotionActive) showDeathOverlay();
+                    if (finaleEndingPhase == FINALE_ENDING_COMPLETE && !benchmarkRunning && !debugMotionActive &&
                             benchmarkAutomationId == null) {
                         final boolean unlockGranted = persistRtLabUnlockIfEligible();
                         if (unlockGranted && endingOverlayVisible) {
@@ -4257,7 +4269,17 @@ public class MainActivity extends Activity {
                         showEndingOverlay();
                     }
                     if (debugAutomationAutostart && menuVisible && !deathOverlayVisible && !endingOverlayVisible) hideMenu();
-                    if (pendingDebugCheckpoint >= 0) {
+                    if (pendingDebugMotion != null) {
+                        final String scenario = pendingDebugMotion, runId = pendingDebugMotionId;
+                        pendingDebugMotion = pendingDebugMotionId = null;
+                        suppressUiForDebugCapture();
+                        debugMotionActive = ProbeBridge.requestDebugMotionEvidence(scenario, runId);
+                        if (!debugMotionActive) {
+                            restoreUiAfterDebugMotion();
+                            Log.e(TAG, "Debug motion evidence request rejected.");
+                        }
+                        debugAutomationAutostart = false;
+                    } else if (pendingDebugCheckpoint >= 0) {
                         applyCheckpointViewPose(pendingDebugCheckpoint);
                         clearTouchState();
                         final int checkpoint = pendingDebugCheckpoint;
@@ -4362,7 +4384,7 @@ public class MainActivity extends Activity {
                 // the new surface resumes.
                 if (resumed && surfaceStarted && state == 1) {
                     final long[] platformEvents = ProbeBridge.drainPlatformEvents();
-                    for (int eventIndex = 0; eventIndex + 1 < platformEvents.length; eventIndex += 2) {
+                    for (int eventIndex = 0; !debugMotionActive && eventIndex + 1 < platformEvents.length; eventIndex += 2) {
                     final long metadata = platformEvents[eventIndex];
                     final long stereoGains = platformEvents[eventIndex + 1];
                     final int eventType = (int) (metadata & 0xffL);
@@ -4618,6 +4640,8 @@ public class MainActivity extends Activity {
         final int requestedCheckpoint = checkpointId(intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT));
         final boolean requestedReplay = intent.getBooleanExtra(EXTRA_DEBUG_REPLAY, false);
         final boolean requestedCapture = intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false);
+        final String requestedMotion = intent.getStringExtra(EXTRA_DEBUG_MOTION);
+        final String requestedMotionId = intent.getStringExtra(EXTRA_DEBUG_MOTION_ID);
         if (intent.hasExtra(EXTRA_DEBUG_OVERLAY)) {
             developerOverlayVisible = intent.getBooleanExtra(EXTRA_DEBUG_OVERLAY, false);
         }
@@ -4631,6 +4655,9 @@ public class MainActivity extends Activity {
                 intent.hasExtra(EXTRA_DEBUG_RT_FIRE_STRENGTH) ||
                 intent.hasExtra(EXTRA_DEBUG_RT_FIRE_TURBULENCE) ||
                 intent.hasExtra(EXTRA_DEBUG_RT_FIRE_SMOKE) || intent.hasExtra(EXTRA_DEBUG_RT_WORKLOAD);
+        final boolean motionRequested = requestedMotion != null && requestedMotionId != null &&
+                requestedCheckpoint < 0 && !requestedReplay && !requestedCapture && !hasRtLabIntent &&
+                !intent.hasExtra(EXTRA_BENCHMARK_RUN_ID);
         if (hasRtLabIntent) {
             debugRtLabAccess = true;
             rtWaterfallWidthPercent = Math.max(25, Math.min(200,
@@ -4664,10 +4691,13 @@ public class MainActivity extends Activity {
             publishRtFireTuning();
             ProbeBridge.setRtWorkloadPreset(rtWorkloadPreset);
         }
-        if (requestedCheckpoint >= 0 || requestedReplay || hasRtLabIntent) {
+        if (requestedCheckpoint >= 0 || requestedReplay || hasRtLabIntent || motionRequested) {
             ProbeBridge.markRtLabDebugAutomation();
         }
-        if (requestedCheckpoint >= 0) {
+        if (motionRequested) {
+            pendingDebugMotion = requestedMotion;
+            pendingDebugMotionId = requestedMotionId;
+        } else if (requestedCheckpoint >= 0) {
             pendingDebugCheckpoint = requestedCheckpoint;
             pendingDebugCapture = requestedCapture;
             pendingDebugReplay = false;
@@ -4677,7 +4707,7 @@ public class MainActivity extends Activity {
             pendingDebugCapture = false;
         }
         debugAutomationAutostart = intent.getBooleanExtra(EXTRA_DEBUG_AUTOSTART, false) ||
-                requestedCheckpoint >= 0 || requestedReplay;
+                requestedCheckpoint >= 0 || requestedReplay || motionRequested;
         if (debugAutomationAutostart) {
             Log.i(TAG, "Accepted debug automation intent: checkpoint=" + requestedCheckpoint +
                     " capture=" + requestedCapture + " replay=" + requestedReplay + " scale=" + requestedScale +
@@ -4708,6 +4738,16 @@ public class MainActivity extends Activity {
         } else {
             registerReceiver(debugRetryReceiver, filter);
         }
+    }
+
+    private void restoreUiAfterDebugMotion() {
+        debugMotionActive = false;
+        debugCaptureUiSuppressed = false;
+        ProbeBridge.drainPlatformEvents(); // discard muted scenario cues before ordinary UI resumes
+        clearTouchState();
+        menuButton.setVisibility(View.VISIBLE);
+        firstMenu = false;
+        showMainMenu(false);
     }
 
     private void suppressUiForDebugCapture() {

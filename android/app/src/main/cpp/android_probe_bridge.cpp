@@ -36,6 +36,10 @@
 #include "graphics/EntryMenuHandoff.h"
 #include "graphics/ForegroundPauseRenderCadence.h"
 #include "graphics/GraphicsPreviewPerformance.h"
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+#include "platform/android/AndroidMotionEvidencePolicy.h"
+#include "telemetry/MotionEvidenceLedger.h"
+#endif
 #if !defined(NDEBUG)
 #include "telemetry/CombatTimingTrace.h"
 #endif
@@ -221,6 +225,31 @@ void DestroyAndroidCompiledPipelineObjects(
     objects.descriptorSetLayout = VK_NULL_HANDLE;
 }
 
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+struct AndroidMotionRun
+{
+    horde::gameplay::validation::MotionEvidenceScenario scenario;
+    horde::gameplay::validation::MotionScenario selected{};
+    horde::telemetry::MotionEvidenceLedger ledger;
+    horde::platform::android::AndroidMotionEvidenceScope scope;
+    horde::graphics::GraphicsSettings settings;
+    horde::gameplay::simulation::SimulationCommandSequences commands{}, externalCommands{};
+    horde::gameplay::simulation::CombatInputEdgeHistory edges;
+    std::string id, path, captures = "[";
+    std::uint64_t requestedNs = 0u;
+    double lastCaptureSeconds = -2.0;
+    horde::gameplay::validation::MotionStage lastCaptureStage{};
+    unsigned captureCount = 0u;
+    float externalYaw = 0.0f, externalPitch = 0.0f, externalTorch = 0.0f;
+    bool armed = false, finished = false, retryPending = false;
+};
+std::mutex gMotionRequestMutex;
+std::string gMotionRequestedId;
+horde::gameplay::validation::MotionScenario gMotionRequestedScenario{};
+std::atomic<int> gMotionStatus{0}; // 0 none, 1 requested, 2 active, 3 complete, 4 failed
+std::atomic<bool> gMotionReleaseRequested{false};
+#endif
+
 struct SwapchainContext
 {
     std::uint64_t surfaceGeneration = 0u;
@@ -266,6 +295,9 @@ struct SwapchainContext
     horde::graphics::GraphicsReason graphicsReason = horde::graphics::GraphicsReason::None;
     float frameDeltaSeconds = 1.0f / 60.0f;
     std::uint64_t lastInputOwnerSteadyNs = 0u;
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+    std::unique_ptr<AndroidMotionRun> motion;
+#endif
 #if !defined(NDEBUG)
     horde::telemetry::CombatTimingTrace combatTimingTrace;
 #endif
@@ -2679,6 +2711,10 @@ void RefreshGpuTimingTelemetry(
     gRtLabGpuSampleCount.store(output.sampleCount, std::memory_order_release);
 }
 
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+#include "android_motion_evidence.inl"
+#endif
+
 bool CompleteRtEvidenceAfterDeviceIdle(
     SwapchainContext& context,
     const VkResult idleResult)
@@ -2716,6 +2752,9 @@ bool CompleteRtEvidenceAfterDeviceIdle(
             RefreshGpuTimingTelemetry(context, &result.gpuCollection);
         }
         DeliverCompletedBenchmarkEvidence(context, result, completedSnapshot);
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+        ObserveAndroidMotionCompletion(context, result.completedEvidence);
+#endif
         if (result.fatalDiagnosticIoFailure)
         {
             __android_log_print(
@@ -3155,6 +3194,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             context,
             completion.gpuCollectionAttempted ? &completion.gpuCollection : nullptr);
         DeliverCompletedBenchmarkEvidence(context, completion, completedSnapshot);
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+        ObserveAndroidMotionCompletion(context, completion.completedEvidence);
+#endif
         if (completion.fatalDiagnosticIoFailure)
         {
             __android_log_print(
@@ -3304,6 +3346,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             const std::uint64_t inputOwnerSteadyNs =
                 horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
             horde::gameplay::simulation::InputSnapshot simulationInput = publishedInput.snapshot;
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+            BuildAndroidMotionInput(context, simulationInput, inputOwnerSteadyNs);
+#endif
             const horde::gameplay::simulation::SimulationSnapshot& beforeCommands = gGameSimulation.Snapshot();
             const bool routeResetPending =
                 simulationInput.commands.routeReset > beforeCommands.lastConsumedRouteResetSequence;
@@ -3361,9 +3406,18 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 admittedCommands.lastConsumedRouteResetSequence < simulationInput.commands.routeReset ||
                 admittedCommands.lastConsumedRetrySequence < simulationInput.commands.retry;
             worldCommandAdmission.unlock();
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+            UpdateAndroidMotionScope(context, simulationInput);
+#endif
 
             const bool simulationPaused = context.captureActive || simulationInput.paused;
-            simulationInput.damageEnabled = !simulationPaused && !context.inAppBenchmark.IsRunning() &&
+            const bool scriptedMotion =
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+                context.motion && context.motion->armed && !context.motion->finished;
+#else
+                false;
+#endif
+            if (!scriptedMotion) simulationInput.damageEnabled = !simulationPaused && !context.inAppBenchmark.IsRunning() &&
                 !context.routeReplayActive && !context.benchmarkSampling && !context.captureActive;
             inAppBenchmarkFrame = context.inAppBenchmark.IsRunning() && !worldCommandsDeferred;
             if (inAppBenchmarkFrame)
@@ -3551,9 +3605,16 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             }
 
             // Immutable copy before the established SFX transport is drained. Music
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+            ObserveAndroidMotionAdvance(context, simulationInput, inputOwnerSteadyNs);
+#endif
             // has no authority over simulation or renderer and no second SFX drain.
             horde::platform::android::PublishMusicSnapshot(
-                gGameSimulation.Snapshot(), gGameSimulation.Events().Events(), context.captureActive);
+                gGameSimulation.Snapshot(), gGameSimulation.Events().Events(), context.captureActive
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+                || (context.motion && !context.motion->finished)
+#endif
+                );
             DrainSimulationEventsToPlatform();
             PublishSimulationUiState();
             const horde::gameplay::simulation::SimulationSnapshot& renderedSimulation =
@@ -3785,6 +3846,15 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             gpuTimingRecording,
             horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
                 context.gpuFrameTimer));
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+        if (context.motion && context.motion->armed && !context.motion->finished)
+        {
+            horde::telemetry::RtSubmittedFrameIdentity owner{};
+            if (!context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, owner) ||
+                !context.motion->ledger.BindSubmittedFrame(context.surfaceGeneration, owner))
+                FailAndroidMotion(context, "Motion frame could not bind its actual submitted simulation owner.");
+        }
+#endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
         horde::telemetry::RtSubmittedFrameIdentity stagedOwner{};
         if (context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, stagedOwner))
@@ -3896,6 +3966,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     }
 
     rtFramePresented = useRtFrame;
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+    AfterAndroidMotionPresent(context);
+#endif
     context.currentFrame = (context.currentFrame + 1u) % kMaxFramesInFlight;
     const auto milliseconds = [](auto duration) { return std::chrono::duration<double, std::milli>(duration).count(); };
     const double frameFenceMs = milliseconds(fenceDone - frameStart);
@@ -4162,6 +4235,9 @@ void SwapchainRenderLoop()
            gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration))
     {
         const auto loopStart = std::chrono::steady_clock::now();
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+        ResetAndroidMotionIfRequested(gSwapchainContext);
+#endif
         const bool measurementPaused = SynchronizeLifecyclePauseOnOwnerThread();
         const auto previewControls = ReadPreviewControls();
         const auto entryControls = ReadEntryControls();
@@ -4169,6 +4245,10 @@ void SwapchainRenderLoop()
             gSwapchainContext.entrySession.Reset();
         bool sceneTransition = DesiredProfile(gSwapchainContext, previewControls) != gSwapchainContext.sceneProfile ||
             previewControls.resetSerial != gSwapchainContext.previewResetSerial;
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+        if (sceneTransition || measurementPaused)
+            FailAndroidMotion(gSwapchainContext, "Motion interrupted by foreground pause or scene transition.");
+#endif
         if (!ApplySceneProfileOnOwner(gSwapchainContext, previewControls))
         {
             gSwapchainContext.entryHandoff.FailLoad();
@@ -4473,6 +4553,9 @@ void SwapchainRenderLoop()
     }
 
     const auto retiredGeneration = gSwapchainContext.surfaceGeneration;
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+    FailAndroidMotion(gSwapchainContext, "Motion interrupted by surface/lifecycle retirement.");
+#endif
     const bool retired = DestroySwapchainContext(gSwapchainContext);
     gSurfaceRetirementBlocked.store(!retired, std::memory_order_release);
     if (!retired) gSurfaceSessions.Publish(retiredGeneration, 3);
@@ -5680,6 +5763,58 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setRequiredRayQueryCompute(
 #else
     (void)required;
     gRequiredRayQueryCompute.store(false, std::memory_order_release);
+#endif
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_finishDebugMotionEvidence(JNIEnv*, jclass)
+{
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+    const int status = gMotionStatus.load(std::memory_order_acquire);
+    if (status != 3 && status != 4) return JNI_FALSE;
+    gMotionReleaseRequested.store(true, std::memory_order_release);
+    return JNI_TRUE;
+#else
+    return JNI_FALSE;
+#endif
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getDebugMotionEvidenceStatus(JNIEnv*, jclass)
+{
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+    return gMotionStatus.load(std::memory_order_acquire);
+#else
+    return 0;
+#endif
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugMotionEvidence(
+    JNIEnv* env, jclass, jstring scenarioName, jstring runId)
+{
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+    if (!scenarioName || !runId || env->GetStringLength(scenarioName) > 64 || env->GetStringLength(runId) > 64 ||
+        gSurfaceSessions.State() != 1 || gInAppBenchmarkStatus.load(std::memory_order_acquire) == 1)
+        return JNI_FALSE;
+    const char* scenarioText = env->GetStringUTFChars(scenarioName, nullptr);
+    if (!scenarioText) return JNI_FALSE;
+    horde::gameplay::validation::MotionScenario scenario{};
+    const bool admitted = horde::gameplay::validation::ParseMotionScenario(scenarioText, scenario);
+    env->ReleaseStringUTFChars(scenarioName, scenarioText);
+    const char* idText = env->GetStringUTFChars(runId, nullptr);
+    if (!idText) return JNI_FALSE;
+    const std::string id(idText);
+    env->ReleaseStringUTFChars(runId, idText);
+    if (!admitted || !horde::platform::android::AndroidMotionRunIdValid(id)) return JNI_FALSE;
+    std::lock_guard<std::mutex> lock(gMotionRequestMutex);
+    if (gMotionStatus.load(std::memory_order_acquire) != 0) return JNI_FALSE;
+    gMotionRequestedScenario = scenario; gMotionRequestedId = id;
+    gMotionStatus.store(1, std::memory_order_release);
+    return JNI_TRUE;
+#else
+    (void)env; (void)scenarioName; (void)runId;
+    return JNI_FALSE;
 #endif
 }
 

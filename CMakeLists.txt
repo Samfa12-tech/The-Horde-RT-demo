@@ -362,6 +362,9 @@ if(BUILD_TESTING)
     add_executable(horde_rt_windows_motion_evidence_launch_tests tests/WindowsMotionEvidenceLaunchTests.cpp)
     target_include_directories(horde_rt_windows_motion_evidence_launch_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_windows_motion_evidence_launch_tests COMMAND horde_rt_windows_motion_evidence_launch_tests)
+    add_executable(horde_rt_android_motion_evidence_policy_tests tests/AndroidMotionEvidencePolicyTests.cpp)
+    target_include_directories(horde_rt_android_motion_evidence_policy_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_android_motion_evidence_policy_tests COMMAND horde_rt_android_motion_evidence_policy_tests)
     add_executable(horde_rt_motion_evidence_scenario_tests tests/MotionEvidenceScenarioTests.cpp
         src/gameplay/validation/MotionEvidenceScenario.cpp src/telemetry/MotionEvidenceLedger.cpp
         src/telemetry/RtPerformanceEvidence.cpp)
