@@ -38,8 +38,16 @@ inline bool StageDevelopmentCheckpointSimulation(
     DevelopmentCheckpointStageEvidence* evidence = nullptr,
     const DevelopmentCheckpointStepFixedObservation* stepObservation = nullptr)
 {
-    if (!gameSimulation.ApplyShowcaseCheckpoint(checkpoint.baseShowcaseCheckpointId))
+    if (checkpoint.stagesWaterfallGuards &&
+        (checkpoint.waterfallGuardFixedTicks > 30u ||
+         checkpoint.combatPose != DevelopmentCombatPose::Rest ||
+         !gameSimulation.BeginMotionEvidenceEquipmentSeed()))
         return false;
+    if (!gameSimulation.ApplyShowcaseCheckpoint(checkpoint.baseShowcaseCheckpointId))
+    {
+        if (checkpoint.stagesWaterfallGuards) gameSimulation.EndMotionEvidenceEquipmentSeed();
+        return false;
+    }
 
     const auto stepFixed = [&](const simulation::InputSnapshot& input,
                                const float fixedDeltaSeconds,
@@ -153,10 +161,26 @@ inline bool StageDevelopmentCheckpointSimulation(
                 rewardLanternPresentationYawRadians);
         gameSimulation.ImportRewardCheckpoint(chest, interaction, finale, &pendulum);
     }
-    if (checkpoint.combatPose == DevelopmentCombatPose::Rest)
-        return finalize(true);
     constexpr float fixedDelta =
         static_cast<float>(simulation::FixedStepRunner::kFixedDeltaSeconds);
+    if (checkpoint.stagesWaterfallGuards)
+    {
+        for (std::uint32_t tick = 0u; tick < checkpoint.waterfallGuardFixedTicks; ++tick)
+            stepFixed(input, fixedDelta,
+                      gameSimulation.Snapshot().inputPublicationSequence + 1u);
+        const auto& state = gameSimulation.Snapshot();
+        const bool valid = state.skeletonEnemyCount == 2u && state.activeSkeletonCount == 2u &&
+            state.skeletonEnemies[0].id == simulation::EntityId::SkeletonA &&
+            state.skeletonEnemies[1].id == simulation::EntityId::SkeletonB &&
+            state.skeletonEnemies[0].health == 1 && state.skeletonEnemies[1].health == 1 &&
+            IsWaterfallSkeletonRoom(state.playerX, state.playerZ);
+        if (!valid) gameSimulation.EndMotionEvidenceEquipmentSeed();
+        // Successful staging deliberately remains scoped until the capture owner
+        // retires it, so the frozen RT snapshot retains the real guard poses.
+        return finalize(valid);
+    }
+    if (checkpoint.combatPose == DevelopmentCombatPose::Rest)
+        return finalize(true);
 
     if (checkpoint.combatPose == DevelopmentCombatPose::ParryActive)
     {

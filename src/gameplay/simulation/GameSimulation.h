@@ -26,6 +26,17 @@ namespace horde::gameplay::validation
 class MotionEvidenceScenario;
 }
 
+namespace horde::gameplay::simulation { class GameSimulation; }
+namespace horde::gameplay
+{
+struct DevelopmentCheckpoint;
+struct DevelopmentCheckpointStageEvidence;
+struct DevelopmentCheckpointStepFixedObservation;
+bool StageDevelopmentCheckpointSimulation(simulation::GameSimulation&,
+    const DevelopmentCheckpoint&, DevelopmentCheckpointStageEvidence*,
+    const DevelopmentCheckpointStepFixedObservation*);
+}
+
 namespace horde::gameplay::simulation
 {
 
@@ -95,6 +106,10 @@ public:
 
 private:
     friend class horde::gameplay::validation::MotionEvidenceScenario;
+    friend bool horde::gameplay::StageDevelopmentCheckpointSimulation(GameSimulation&,
+        const horde::gameplay::DevelopmentCheckpoint&,
+        horde::gameplay::DevelopmentCheckpointStageEvidence*,
+        const horde::gameplay::DevelopmentCheckpointStepFixedObservation*);
     // The motion evidence scenario is the only owner allowed to scope this
     // opt-in config around an ordinary checkpoint reset.
     bool BeginMotionEvidenceEquipmentSeed();

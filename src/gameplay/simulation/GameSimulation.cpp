@@ -82,7 +82,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     if (config_.waterfallSkeletonEncounter)
     {
-        swordCombat_.Reset(kSkeletonEnemyCapacity, kWaterfallSkeletonPairCenter);
+        swordCombat_.Reset(kSkeletonEnemyCapacity, kWaterfallSkeletonPairCenter,
+                           &kWaterfallSkeletonGuardSpawns);
         combatSnapshot_ = swordCombat_.Snapshot();
     }
     combatSnapshot_ = swordCombat_.Snapshot();
@@ -427,7 +428,10 @@ void GameSimulation::ResetRoute()
     swordCombat_.Reset(kSkeletonEnemyCapacity,
         config_.waterfallSkeletonEncounter
             ? kWaterfallSkeletonPairCenter
-            : RoutePosition{0.0f, -4.65f});
+            : RoutePosition{0.0f, -4.65f},
+        config_.waterfallSkeletonEncounter
+            ? &kWaterfallSkeletonGuardSpawns
+            : nullptr);
     waterfallWarningEmitted_ = false;
     ResetSwordEquipment();
     combatPresentation_.Reset();
@@ -1044,7 +1048,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     swordCombat_.Reset(productionSkeletonEncounter
                            ? kSkeletonEnemyCapacity
                            : ((isRetry || pairCheckpoint) ? kSkeletonEnemyCapacity : 1u),
-                       combatSpawnCenter);
+                       combatSpawnCenter,
+                       productionSkeletonEncounter ? &kWaterfallSkeletonGuardSpawns : nullptr);
     combatSnapshot_ = swordCombat_.Update(0.0f,
                                            playerX_,
                                            playerZ_,

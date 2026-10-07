@@ -22,6 +22,13 @@ struct RoutePosition
     float z;
 };
 
+struct SkeletonSpawnPose
+{
+    RoutePosition position;
+    float facingRadians;
+    float walkingAnimationPhaseSeconds;
+};
+
 struct RouteRect
 {
     float minX;
@@ -53,6 +60,17 @@ inline constexpr RouteRect kWaterfallSkeletonRoomBounds{-8.5f, -2.5f, -18.0f, -1
 // The Waterfall encounter stages the existing pair in the west-side room.
 // This inset arena stays west of the x=-2.5 route boundary/wetline.
 inline constexpr RoutePosition kWaterfallSkeletonPairCenter = kSkylightChamberCenter;
+// The approach crosses the wetline westbound from +X. In that heading, the
+// player's right side is -Z. Keep the authored guard order stable: Skeleton A
+// holds the right lane and Skeleton B the left, both facing the arrival side.
+// The shipped skeleton Walking clip is 1.033 s; its 0.90 locomotion rate makes
+// B's 0.65 s phase a 0.585 s sample offset, just over half a gait cycle.
+inline constexpr std::array<SkeletonSpawnPose, 2> kWaterfallSkeletonGuardSpawns{{
+    {{kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z - 0.75f},
+     1.57079632679f, 0.0f},
+    {{kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z + 0.75f},
+     1.57079632679f, 0.65f},
+}};
 inline constexpr float kWaterfallSkeletonArenaRadius = 2.30f;
 inline constexpr float kWaterfallSwordCueRadius = 6.0f;
 

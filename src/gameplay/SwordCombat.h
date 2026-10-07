@@ -122,7 +122,8 @@ public:
     }
 
     void Reset(std::size_t combatantCount = kSkeletonCombatantCapacity,
-               const RoutePosition spawnCenter = {0.0f, -4.65f})
+               const RoutePosition spawnCenter = {0.0f, -4.65f},
+               const std::array<SkeletonSpawnPose, kSkeletonCombatantCapacity>* spawnLayout = nullptr)
     {
         combatantCount_ = std::clamp<std::size_t>(combatantCount, 1u, kSkeletonCombatantCapacity);
         combatants_ = {};
@@ -140,6 +141,16 @@ public:
         for (std::size_t index = 0u; index < combatantCount_; ++index)
         {
             Combatant& combatant = combatants_[index];
+            if (spawnLayout != nullptr)
+            {
+                const SkeletonSpawnPose& pose = (*spawnLayout)[index];
+                combatant.x = pose.position.x;
+                combatant.z = pose.position.z;
+                combatant.facing = pose.facingRadians;
+                combatant.animationTime = pose.walkingAnimationPhaseSeconds;
+                combatant.walkingAnimationPhaseSeconds = pose.walkingAnimationPhaseSeconds;
+                combatant.hasAuthoredWalkingPhase = true;
+            }
             combatant.action = EnemyCombatAction::Locomotion;
             combatant.health = 1;
             combatant.walkAnimationHold = kWalkAnimationHold;
@@ -345,6 +356,8 @@ private:
         float facing = 0.0f;
         float phaseTime = 0.0f;
         float animationTime = 0.0f;
+        float walkingAnimationPhaseSeconds = 0.0f;
+        bool hasAuthoredWalkingPhase = false;
         float damageFlash = 0.0f;
         float walkAnimationHold = kWalkAnimationHold;
         std::int32_t health = 1;
@@ -627,6 +640,7 @@ private:
             }
             else if (distance > kEnemyAttackRange)
             {
+                const bool wasWalking = combatant.animation == EnemyAnimation::Walking;
                 const float step = std::min(distance - kEnemyAttackRange, kEnemyWalkSpeed * deltaSeconds);
                 float proposedX = combatant.x + (playerX - combatant.x) /
                                   std::max(distance, 0.0001f) * step;
@@ -648,6 +662,13 @@ private:
                 combatant.z = proposedZ;
                 if (moved)
                 {
+                    if (!wasWalking && combatant.hasAuthoredWalkingPhase)
+                    {
+                        // Re-enter the authored gait phase after waiting or
+                        // leaving the arena. This presentation clock is kept
+                        // separate from the zero-based combat/action clocks.
+                        combatant.animationTime = combatant.walkingAnimationPhaseSeconds + deltaSeconds;
+                    }
                     combatant.walkAnimationHold = kWalkAnimationHold;
                 }
                 combatant.animation = combatant.walkAnimationHold > 0.0f

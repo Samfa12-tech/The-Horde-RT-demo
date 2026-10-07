@@ -1826,16 +1826,86 @@ int main()
           stagedPair[0].id == EntityId::SkeletonA &&
           stagedPair[1].id == EntityId::SkeletonB &&
           stagedPair[0].health == 1 && stagedPair[1].health == 1 &&
-          NearlyEqual(stagedPair[0].x, kWaterfallSkeletonPairCenter.x - 0.75f) &&
-          NearlyEqual(stagedPair[1].x, kWaterfallSkeletonPairCenter.x + 0.75f) &&
-          NearlyEqual(stagedPair[0].z, kWaterfallSkeletonPairCenter.z) &&
-          NearlyEqual(stagedPair[1].z, kWaterfallSkeletonPairCenter.z) &&
+          NearlyEqual(stagedPair[0].x, kWaterfallSkeletonPairCenter.x) &&
+          NearlyEqual(stagedPair[1].x, kWaterfallSkeletonPairCenter.x) &&
+          NearlyEqual(stagedPair[0].z, kWaterfallSkeletonPairCenter.z - 0.75f) &&
+          NearlyEqual(stagedPair[1].z, kWaterfallSkeletonPairCenter.z + 0.75f) &&
+          NearlyEqual(stagedPair[0].facingRadians, 1.57079632679f) &&
+          NearlyEqual(stagedPair[1].facingRadians, 1.57079632679f) &&
+          NearlyEqual(stagedPair[0].animationTime, 0.0f) &&
+          NearlyEqual(stagedPair[1].animationTime, 0.65f) &&
           waterfallEncounter->Snapshot().heldItems[1].parentMode ==
               items::HeldItemParentMode::BodyStow &&
           NearlyEqual(waterfallEncounter->Snapshot().heldItems[1].visualStowBlend, 1.0f) &&
           NearlyEqual(waterfallEncounter->Snapshot().heldItemKinematics.swordStowBlend,
                       waterfallEncounter->Snapshot().heldItems[1].visualStowBlend),
           "opt-in Waterfall encounter stages the same two stable skeleton IDs west of the wetline while production waits for rendered BodyStow support");
+
+    auto waterfallReset = std::make_unique<GameSimulation>(waterfallConfig);
+    waterfallReset->ResetRoute();
+    const auto& resetWaterfallGuards = waterfallReset->Snapshot().skeletonEnemies;
+    check(waterfallReset->Snapshot().skeletonEnemyCount == 2u &&
+          resetWaterfallGuards[0].id == EntityId::SkeletonA &&
+          resetWaterfallGuards[1].id == EntityId::SkeletonB &&
+          resetWaterfallGuards[0].health == 1 && resetWaterfallGuards[1].health == 1 &&
+          NearlyEqual(resetWaterfallGuards[0].x, kWaterfallSkeletonPairCenter.x) &&
+          NearlyEqual(resetWaterfallGuards[1].x, kWaterfallSkeletonPairCenter.x) &&
+          NearlyEqual(resetWaterfallGuards[0].z, kWaterfallSkeletonPairCenter.z - 0.75f) &&
+          NearlyEqual(resetWaterfallGuards[1].z, kWaterfallSkeletonPairCenter.z + 0.75f) &&
+          NearlyEqual(resetWaterfallGuards[0].facingRadians, 1.57079632679f) &&
+          NearlyEqual(resetWaterfallGuards[1].facingRadians, 1.57079632679f),
+          "Waterfall route reset restores the same two IDs and east-facing lateral guard layout");
+
+    auto waterfallWalkPhase = std::make_unique<GameSimulation>(waterfallConfig);
+    InputSnapshot waterfallWalkInput;
+    waterfallWalkInput.hasAuthoritativePlayerPose = true;
+    waterfallWalkInput.authoritativePlayerX = -2.0f;
+    waterfallWalkInput.authoritativePlayerZ = kWaterfallSkeletonPairCenter.z;
+    waterfallWalkInput.damageEnabled = false;
+    for (int tick = 0; tick < 6; ++tick)
+    {
+        waterfallWalkPhase->StepFixed(waterfallWalkInput);
+    }
+    waterfallWalkInput.authoritativePlayerX = -3.3f;
+    waterfallWalkInput.authoritativePlayerZ = kWaterfallSkeletonPairCenter.z;
+    waterfallWalkPhase->StepFixed(waterfallWalkInput);
+    const auto& walkingGuards = waterfallWalkPhase->Snapshot().skeletonEnemies;
+    check(IsWaterfallSkeletonArena(waterfallWalkInput.authoritativePlayerX,
+                                   waterfallWalkInput.authoritativePlayerZ) &&
+          walkingGuards[0].animation == EnemyAnimation::Walking &&
+          walkingGuards[1].animation == EnemyAnimation::Walking &&
+          walkingGuards[0].action == EnemyCombatAction::Locomotion &&
+          walkingGuards[1].action == EnemyCombatAction::Locomotion &&
+          NearlyEqual(walkingGuards[1].animationTime - walkingGuards[0].animationTime,
+                      0.65f),
+          "Waterfall guards resume their shared-authority approach walk out of phase after waiting outside the arena");
+    waterfallWalkInput.authoritativePlayerX = -2.0f;
+    for (int tick = 0; tick < 6; ++tick)
+    {
+        waterfallWalkPhase->StepFixed(waterfallWalkInput);
+    }
+    waterfallWalkInput.authoritativePlayerX = -3.3f;
+    waterfallWalkPhase->StepFixed(waterfallWalkInput);
+    const auto& reenteredGuards = waterfallWalkPhase->Snapshot().skeletonEnemies;
+    check(reenteredGuards[0].animation == EnemyAnimation::Walking &&
+          reenteredGuards[1].animation == EnemyAnimation::Walking &&
+          NearlyEqual(reenteredGuards[1].animationTime - reenteredGuards[0].animationTime,
+                      0.65f),
+          "Waterfall guards reapply their selected gait phase after leaving and re-entering the room");
+    waterfallWalkPhase->ResetRoute();
+    waterfallWalkInput.authoritativePlayerX = -2.0f;
+    for (int tick = 0; tick < 6; ++tick)
+    {
+        waterfallWalkPhase->StepFixed(waterfallWalkInput);
+    }
+    waterfallWalkInput.authoritativePlayerX = -3.3f;
+    waterfallWalkPhase->StepFixed(waterfallWalkInput);
+    const auto& resetWalkingGuards = waterfallWalkPhase->Snapshot().skeletonEnemies;
+    check(resetWalkingGuards[0].animation == EnemyAnimation::Walking &&
+          resetWalkingGuards[1].animation == EnemyAnimation::Walking &&
+          NearlyEqual(resetWalkingGuards[1].animationTime - resetWalkingGuards[0].animationTime,
+                      0.65f),
+          "Waterfall route reset restores both authored walk phases after an outside-arena wait");
 
     InputSnapshot waterfallInput;
     waterfallInput.hasAuthoritativePlayerPose = true;
@@ -2121,6 +2191,57 @@ int main()
               !NearlyEqual(openAnatomical->Snapshot().heldItemKinematics.leftShoulderLocal[0],
                            openLegacy->Snapshot().heldItemKinematics.leftShoulderLocal[0]),
               "configured anatomical profile publishes the authored hand height and shoulder frame in the open shaft");
+    }
+    for (const auto name : {"waterfall-guards-entry", "waterfall-guards-walk-early",
+                            "waterfall-guards-walk-later"})
+    {
+        const auto* checkpoint = FindDevelopmentCheckpoint(name);
+        auto guardPreview = std::make_unique<GameSimulation>(ProductionGameSimulationConfig());
+        check(checkpoint != nullptr && StageDevelopmentCheckpointSimulation(*guardPreview, *checkpoint),
+              "explicit guard-room development capture stages through shared simulation");
+        if (checkpoint == nullptr) continue;
+        const auto& preview = guardPreview->Snapshot();
+        // The zero-delta authoritative pose import is one StepFixed boundary;
+        // the requested count then advances that many actual timed fixed ticks.
+        check(preview.tickIndex == checkpoint->waterfallGuardFixedTicks + 1u &&
+              NearlyEqual(preview.playerX, checkpoint->cameraX) &&
+              NearlyEqual(preview.playerZ, checkpoint->cameraZ) &&
+              preview.playerAlive && preview.playerVitals.vitality == 3 &&
+              preview.skeletonEnemyCount == 2u && preview.activeSkeletonCount == 2u &&
+              preview.skeletonEnemies[0].id == EntityId::SkeletonA &&
+              preview.skeletonEnemies[1].id == EntityId::SkeletonB &&
+              preview.skeletonEnemies[0].health == 1 && preview.skeletonEnemies[1].health == 1,
+              "guard preview retains exact bounded ticks, camera, identities and health");
+        if (checkpoint->waterfallGuardFixedTicks == 0u)
+            check(NearlyEqual(preview.skeletonEnemies[0].facingRadians, 1.57079632679f) &&
+                  NearlyEqual(preview.skeletonEnemies[1].facingRadians, 1.57079632679f) &&
+                  preview.skeletonEnemies[0].z < preview.playerZ &&
+                  preview.skeletonEnemies[1].z > preview.playerZ,
+                  "entry capture shows both guards facing the arriving player in lateral lanes");
+        else
+            check(preview.skeletonEnemies[0].animation == EnemyAnimation::Walking &&
+                  preview.skeletonEnemies[1].animation == EnemyAnimation::Walking &&
+                  preview.skeletonEnemies[0].x > kWaterfallSkeletonPairCenter.x &&
+                  preview.skeletonEnemies[1].x > kWaterfallSkeletonPairCenter.x &&
+                  NearlyEqual(preview.skeletonEnemies[1].animationTime -
+                              preview.skeletonEnemies[0].animationTime, 0.65f),
+                  "walk preview observes actual shared locomotion with distinct gait samples");
+        InputSnapshot freeze;
+        freeze.paused = true;
+        const auto frozenTick = preview.tickIndex;
+        guardPreview->AdvanceFrame(freeze, 0.0, preview.inputPublicationSequence + 1u);
+        check(guardPreview->Snapshot().tickIndex == frozenTick,
+              "capture freeze does not advance the staged guard ticks");
+    }
+    {
+        auto boundedPreview = std::make_unique<GameSimulation>(ProductionGameSimulationConfig());
+        DevelopmentCheckpoint excessive = *FindDevelopmentCheckpoint("waterfall-guards-walk-later");
+        excessive.waterfallGuardFixedTicks = 31u;
+        check(!StageDevelopmentCheckpointSimulation(*boundedPreview, excessive) &&
+              boundedPreview->Snapshot().tickIndex == 0u &&
+              !ProductionGameSimulationConfig().waterfallSkeletonEncounter &&
+              !ProductionGameSimulationConfig().swordStartsStowed,
+              "guard capture rejects unbounded staging and retains production defaults");
     }
     for (const auto profile : {items::PlayerMountProfile::LegacyViewRelative,
                                items::PlayerMountProfile::AnatomicalBody})

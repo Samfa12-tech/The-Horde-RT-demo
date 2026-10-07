@@ -53,9 +53,12 @@ struct DevelopmentCheckpoint
     bool stagesUnlockedChest = false;
     // Capture framing only; dedicated modelled primary ownership stays mandatory.
     bool primaryArmsMayBeOutsideFrame = false;
+    // Explicit development capture only; production encounter defaults stay unchanged.
+    bool stagesWaterfallGuards = false;
+    std::uint32_t waterfallGuardFixedTicks = 0u;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 53u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 56u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -209,6 +212,32 @@ inline constexpr std::array<DevelopmentCheckpoint, 53u> kDevelopmentCheckpoints{
      .yaw = 3.14159265359f,
      .pitch = 0.28f,
      .primaryArmsMayBeOutsideFrame = true},
+    {.id = 153,
+     .name = "waterfall-guards-entry",
+     .baseShowcaseCheckpointId = 2,
+     .cameraX = -3.00f,
+     .cameraZ = -15.20f,
+     .yaw = -1.57079632679f,
+     .pitch = -0.06f,
+     .stagesWaterfallGuards = true},
+    {.id = 154,
+     .name = "waterfall-guards-walk-early",
+     .baseShowcaseCheckpointId = 2,
+     .cameraX = -3.45f,
+     .cameraZ = -15.20f,
+     .yaw = -1.57079632679f,
+     .pitch = -0.06f,
+     .stagesWaterfallGuards = true,
+     .waterfallGuardFixedTicks = 6u},
+    {.id = 155,
+     .name = "waterfall-guards-walk-later",
+     .baseShowcaseCheckpointId = 2,
+     .cameraX = -3.45f,
+     .cameraZ = -15.20f,
+     .yaw = -1.57079632679f,
+     .pitch = -0.06f,
+     .stagesWaterfallGuards = true,
+     .waterfallGuardFixedTicks = 18u},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)
