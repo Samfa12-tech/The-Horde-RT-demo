@@ -130,7 +130,9 @@ jobs:
   shared-gameplay:
     name: Shared simulation host (${{ matrix.compiler }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
+    # Includes the Windows build, CPU tests and separate offline asset checks.
+    # The 853d31f2 PR lane passed all 97 CTests but exhausted 10 minutes afterward.
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
