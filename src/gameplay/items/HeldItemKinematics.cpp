@@ -18,35 +18,6 @@ constexpr float kSwordRestForwardRadians = 0.14f;
 // the grip end-on and collapses its four fingers into the reported fist blob.
 constexpr float kLeftGripRollRadians = 0.0f;
 
-// The player-held Rag prop has its own authored sockets. Keeper flank torches
-// and the reward lantern continue to use the original torch contracts.
-HeldItemTransform PlayerRagTorchGripSocketTransform()
-{
-    HeldItemTransform result = IdentityHeldItemTransform();
-    result[12] = 0.010711723f;
-    result[13] = 0.24f;
-    result[14] = -0.002040245f;
-    return result;
-}
-
-HeldItemTransform PlayerRagTorchFlameSocketTransform()
-{
-    HeldItemTransform result = IdentityHeldItemTransform();
-    result[12] = -0.00316136f;
-    result[13] = 0.805f;
-    result[14] = -0.00462115f;
-    return result;
-}
-
-HeldItemTransform PlayerRagTorchLightSocketTransform()
-{
-    HeldItemTransform result = IdentityHeldItemTransform();
-    result[12] = -0.005092165f;
-    result[13] = 0.78f;
-    result[14] = 0.021113701f;
-    return result;
-}
-
 float DotColumn(const HeldItemTransform& transform,
                 const std::size_t leftColumn,
                 const std::size_t rightColumn)
@@ -296,6 +267,43 @@ Vec3 ViewVectorToWorld(const Vec3& viewVector,
 }
 
 } // namespace
+
+// The player-held Rag prop has its own authored sockets. Keeper flank torches
+// and the reward lantern continue to use the original torch contracts.
+HeldItemTransform PlayerRagTorchGripSocketTransform()
+{
+    HeldItemTransform result = IdentityHeldItemTransform();
+    result[12] = 0.010711723f;
+    result[13] = 0.24f;
+    result[14] = -0.002040245f;
+    return result;
+}
+
+HeldItemTransform PlayerRagTorchFlameSocketTransform()
+{
+    HeldItemTransform result = IdentityHeldItemTransform();
+    result[12] = -0.00316136f;
+    result[13] = 0.805f;
+    result[14] = -0.00462115f;
+    return result;
+}
+
+HeldItemTransform PlayerRagTorchLightSocketTransform()
+{
+    HeldItemTransform result = IdentityHeldItemTransform();
+    result[12] = -0.005092165f;
+    result[13] = 0.78f;
+    result[14] = 0.021113701f;
+    return result;
+}
+
+float ComputePlayerTorchOverheadLowering(
+    const std::array<float, 3u>& gripWorld,
+    const std::array<float, 3u>& viewUp,
+    const std::array<float, 3u>& viewForward)
+{
+    return TorchOverheadLowering(gripWorld, viewUp, viewForward);
+}
 
 float ComputeRewardLanternForwardClearance(const float cameraX,
                                            const float cameraZ,
@@ -637,8 +645,13 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float movement = std::max(std::clamp(input.walkAmount, 0.0f, 1.0f), 0.2f);
     const float torchSway = std::sin(input.walkTime * 6.2f) * 0.035f * movement;
     const float torchBob = std::abs(std::sin(input.walkTime * 6.2f)) * 0.025f * movement;
+    // The Rag body extends farther left than the former production torch.
+    // Center its full authored silhouette by 2.5 cm while retaining the
+    // established carry depth and broadside Grip orientation.
+    constexpr float ragTorchPortraitCentering = 0.025f;
     const std::array<float, 3u> heldLeftHand{{
-        -0.16f - torchSway, -0.41f + torchBob, carriedPropDepth}};
+        -0.16f + ragTorchPortraitCentering - torchSway,
+        -0.41f + torchBob, carriedPropDepth}};
     const bool rewardLantern = input.interaction.heldLightKind ==
         horde::gameplay::interactions::HeldLightKind::RewardLantern;
     // The authored lantern is almost one metre tall. In open space it needs
@@ -823,24 +836,140 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
                 Add(Scale(viewUp, result.leftHandLocal[1]),
                     Scale(viewForward, result.leftHandLocal[2]))));
         const float initialLowering = TorchOverheadLowering(gripWorld, viewUp, viewForward);
-        // A low grip held at the full forward extension exceeds the admitted
-        // anatomical arm's reach, especially when looking down. Retract along
-        // the horizontal player forward axis before resolving final overhead
-        // clearance. This moves the complete hand/item frame, not the light.
-        const float retraction = anatomicalBody
-            ? std::min(0.45f, initialLowering * 0.45f) : 0.0f;
+        // A low grip held at the full forward extension can exceed the
+        // anatomical arm's reach. Start from a continuous roof-driven retreat,
+        // then minimize the imported wrist's shoulder distance with a small
+        // regularized solve. The solve only runs for active full-height torch
+        // carry, leaving open, lowered/drenched, reward, dropped, and Legacy
+        // poses on their authored paths.
+        const float baseRetraction = anatomicalBody
+            ? std::min(0.45f, initialLowering *
+                (lowerBlend <= 0.00001f ? 0.60f : 0.45f)) : 0.0f;
         const Vec3 horizontalForward{{forwardX, 0.0f, forwardZ}};
-        const Vec3 retractedGrip = Add(gripWorld, Scale(horizontalForward, -retraction));
-        result.leftHandLocal[1] -= retraction *
-            (horizontalForward[0] * viewUp[0] + horizontalForward[2] * viewUp[2]);
-        result.leftHandLocal[2] -= retraction *
-            (horizontalForward[0] * viewForward[0] + horizontalForward[2] * viewForward[2]);
-        result.torchOverheadLowering = TorchOverheadLowering(retractedGrip, viewUp, viewForward);
-        // Inverse view projection of world down: both IK and socket composition
-        // consume this same hand target. Do not tilt/fade the flame or detach its
-        // light to obtain clearance. Lowered/falling/reward paths remain owned.
-        result.leftHandLocal[1] -= result.torchOverheadLowering * viewUp[1];
-        result.leftHandLocal[2] -= result.torchOverheadLowering * viewForward[1];
+        const Vec3 baseLeftHandLocal = result.leftHandLocal;
+        const auto poseAtRetraction = [&](const float candidateRetraction,
+                                         float& candidateLowering) {
+            const Vec3 candidateGrip = Add(
+                gripWorld, Scale(horizontalForward, -candidateRetraction));
+            candidateLowering = candidateRetraction == 0.0f
+                ? initialLowering
+                : TorchOverheadLowering(candidateGrip, viewUp, viewForward);
+            return Vec3{{baseLeftHandLocal[0],
+                baseLeftHandLocal[1] - candidateRetraction *
+                    (horizontalForward[0] * viewUp[0] + horizontalForward[2] * viewUp[2]) -
+                    candidateLowering * viewUp[1],
+                baseLeftHandLocal[2] - candidateRetraction *
+                    (horizontalForward[0] * viewForward[0] + horizontalForward[2] * viewForward[2]) -
+                    candidateLowering * viewForward[1]}};
+        };
+        const auto wristDistanceSquared = [&](const Vec3& gripLocal) {
+            const Vec3 wrist{{gripLocal[0] + kPlayerPalmHandOffsetFromGripInView[0],
+                              gripLocal[1] + kPlayerPalmHandOffsetFromGripInView[1],
+                              gripLocal[2] + kPlayerPalmHandOffsetFromGripInView[2]}};
+            const Vec3 offset{{wrist[0] - result.leftShoulderLocal[0],
+                               wrist[1] - result.leftShoulderLocal[1],
+                               wrist[2] - result.leftShoulderLocal[2]}};
+            return Dot(offset, offset);
+        };
+        float selectedRetraction = baseRetraction;
+        float selectedLowering = 0.0f;
+        Vec3 selectedLocal = poseAtRetraction(selectedRetraction, selectedLowering);
+        if (anatomicalBody && lowerBlend <= 0.00001f && initialLowering > 0.00001f)
+        {
+            // Fixed-iteration projected Newton minimization uses only the
+            // shared roof solver and imported hand-from-Grip profile. It
+            // minimizes excess over the measured arm reach, not total arm
+            // length, with a proximal pull toward the roof-cleared pose. The
+            // reach penalty fades quadratically with roof demand, so open
+            // poses stay exact and the response approaches them continuously.
+            // The trust region bounds non-monotonic roof changes; all samples
+            // preserve the .45 m retraction cap.
+            constexpr float derivativeStep = 0.015f;
+            constexpr float regularization = 0.02f;
+            constexpr float reachPenaltyScale = 1.2f;
+            // Bound each roof-dependent pose correction to the same 25 mm
+            // scale as the directional fallback; four monotone iterations
+            // still cover the measured witness correction without a single
+            // large spatial jump between adjacent fixed ticks.
+            constexpr float maxIterationStep = 0.025f;
+            constexpr int backtrackingHalvings = 4;
+            constexpr int iterationCount = 4;
+            const float reachPenaltyWeight = reachPenaltyScale *
+                (initialLowering / kPlayerAnatomicalHandReachLimitMetres) *
+                (initialLowering / kPlayerAnatomicalHandReachLimitMetres);
+            const auto objective = [&](const float candidateRetraction,
+                                       float& candidateLowering) {
+                const Vec3 local = poseAtRetraction(candidateRetraction, candidateLowering);
+                const float offset = candidateRetraction - baseRetraction;
+                const float wristDistance = std::sqrt(wristDistanceSquared(local));
+                const float excessReach = std::max(
+                    0.0f, wristDistance - kPlayerAnatomicalHandReachLimitMetres);
+                return regularization * offset * offset +
+                    reachPenaltyWeight * excessReach * excessReach;
+            };
+            float currentLowering = 0.0f;
+            float currentObjective = objective(selectedRetraction, currentLowering);
+            for (int iteration = 0; iteration < iterationCount; ++iteration)
+            {
+                const float lower = std::max(0.0f, selectedRetraction - derivativeStep);
+                const float upper = std::min(0.45f, selectedRetraction + derivativeStep);
+                if (upper - lower < 1.0e-5f) break;
+                float lowerRoof = 0.0f, upperRoof = 0.0f;
+                const float lowerObjective = objective(lower, lowerRoof);
+                const float upperObjective = objective(upper, upperRoof);
+                const float leftSpan = selectedRetraction - lower;
+                const float rightSpan = upper - selectedRetraction;
+                float gradient = 0.0f;
+                float curvature = 0.0f;
+                if (leftSpan > 1.0e-5f && rightSpan > 1.0e-5f)
+                {
+                    gradient = (upperObjective - lowerObjective) /
+                        (leftSpan + rightSpan);
+                    curvature = 2.0f *
+                        ((upperObjective - currentObjective) / rightSpan -
+                         (currentObjective - lowerObjective) / leftSpan) /
+                        (leftSpan + rightSpan);
+                }
+                else if (rightSpan > 1.0e-5f)
+                {
+                    gradient = (upperObjective - currentObjective) / rightSpan;
+                }
+                else
+                {
+                    gradient = (currentObjective - lowerObjective) / leftSpan;
+                }
+                if (std::abs(gradient) < 1.0e-5f) break;
+                float delta = curvature > 0.01f
+                    ? -gradient / curvature
+                    : -std::copysign(0.025f, gradient);
+                delta = std::clamp(delta, -maxIterationStep, maxIterationStep);
+                bool accepted = false;
+                for (int backtrack = 0; backtrack <= backtrackingHalvings; ++backtrack)
+                {
+                    const float nextRetraction = std::clamp(
+                        selectedRetraction + delta, 0.0f, 0.45f);
+                    if (std::abs(nextRetraction - selectedRetraction) < 1.0e-5f) break;
+                    float nextLowering = 0.0f;
+                    const float nextObjective = objective(nextRetraction, nextLowering);
+                    if (nextObjective < currentObjective)
+                    {
+                        selectedRetraction = nextRetraction;
+                        currentLowering = nextLowering;
+                        currentObjective = nextObjective;
+                        accepted = true;
+                        break;
+                    }
+                    delta *= 0.5f;
+                }
+                if (!accepted) break;
+            }
+        }
+        selectedLocal = poseAtRetraction(selectedRetraction, selectedLowering);
+        result.torchOverheadLowering = selectedLowering;
+        result.torchOverheadRetraction = selectedRetraction;
+        // Inverse-view projection of world down: IK and socket composition
+        // consume this same target; do not move the flame or light separately.
+        result.leftHandLocal = selectedLocal;
     }
     const float leftGripRollCos = std::cos(kLeftGripRollRadians);
     const float leftGripRollSin = std::sin(kLeftGripRollRadians);

@@ -526,7 +526,7 @@ void TestSharedKinematicsOwnsWallDepthHandsAndSwordPose()
     input.walkAmount = 0.0f;
     const auto idle = horde::gameplay::items::EvaluateHeldItemKinematics(input);
     Check(Near(idle.heldPropDepth, 0.68f) &&
-              Near(idle.leftHandLocal[0], -0.16f) && Near(idle.leftHandLocal[1], -0.41f) &&
+              Near(idle.leftHandLocal[0], -0.135f) && Near(idle.leftHandLocal[1], -0.41f) &&
               Near(idle.leftHandLocal[2], idle.heldPropDepth) &&
               Near(idle.rightHandLocal[0], 0.18f) && Near(idle.rightHandLocal[1], -0.44f) &&
               Near(idle.rightHandLocal[2], 0.77f),
@@ -1168,7 +1168,7 @@ void TestSwordOverheadClearanceUsesImportedBladeAcrossCombatPhases()
               Near(open.rightHandLocal[2], 0.60f) &&
               Near(open.swordOverheadRetraction, 0.0f) &&
               Near(open.torchOverheadLowering, 0.0f) &&
-              Near(open.leftHandLocal[0], -0.16f) && Near(open.leftHandLocal[1], -0.31f),
+              Near(open.leftHandLocal[0], -0.135f) && Near(open.leftHandLocal[1], -0.31f),
           "open-room AnatomicalBody sword and Rag torch hand poses must retain their exact existing targets");
 
     struct CombatPhase

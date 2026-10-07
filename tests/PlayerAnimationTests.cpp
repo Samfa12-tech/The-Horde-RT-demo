@@ -748,19 +748,31 @@ int main()
     rightBone[12] = 0.38f;
     rightBone[13] = 0.18f;
     rightBone[14] = 0.81f;
-    HeldItemStates renderItems{};
     std::string socketDiagnostic;
+    HeldItemTransform expectedRagItem{};
+    HeldItemTransform expectedSwordItem{};
+    if (!Require(ComposeWorldFromItem(leftBone, PlayerRagTorchGripSocketTransform(),
+                                      expectedRagItem, socketDiagnostic) &&
+                 ComposeWorldFromItem(rightBone, SwordGripSocketTransform(),
+                                      expectedSwordItem, socketDiagnostic),
+                 "imported Rag and sword Grip transforms must be rigid before render composition"))
+        return 1;
+    HeldItemStates renderItems{};
     if (!Require(ResolvePlayerHeldItemVisuals(authoritativeItems, leftBone, rightBone,
                                                renderItems, socketDiagnostic) &&
-                 Near(renderItems[0].worldFromItem[12], leftBone[12]) &&
-                 Near(renderItems[0].worldFromItem[13], leftBone[13] - 0.24f) &&
-                 Near(renderItems[1].worldFromItem[12], rightBone[12]) &&
-                 Near(renderItems[1].worldFromItem[13], rightBone[13] - 0.135f),
-                 "attached held-item visuals must compose from final LeftHand/RightHand bone sockets"))
+                 MeasureTransformAgreement(expectedRagItem,
+                                            renderItems[0].worldFromItem).positionErrorMetres <= 1e-6f &&
+                 MeasureTransformAgreement(expectedRagItem,
+                                            renderItems[0].worldFromItem).orientationErrorRadians <= 1e-6f &&
+                 MeasureTransformAgreement(expectedSwordItem,
+                                            renderItems[1].worldFromItem).positionErrorMetres <= 1e-6f &&
+                 MeasureTransformAgreement(expectedSwordItem,
+                                            renderItems[1].worldFromItem).orientationErrorRadians <= 1e-6f,
+                 "player Rag and sword visuals must compose their authored Grips from final hand sockets"))
         return 1;
     HeldItemStates gripAlignedItems = MakeDefaultHeldItemStates();
     if (!Require(ComposeWorldFromItem(
-                     leftBone, OriginalTorchGripSocketTransform(),
+                     leftBone, PlayerRagTorchGripSocketTransform(),
                      gripAlignedItems[0].worldFromItem, socketDiagnostic) &&
                  ComposeWorldFromItem(
                      rightBone, SwordGripSocketTransform(),

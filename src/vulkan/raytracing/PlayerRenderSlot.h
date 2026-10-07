@@ -224,6 +224,10 @@ public:
         return uniqueTangents_;
     }
     const horde::scene::SkinnedPlayerSockets& BoneSockets() const { return sockets_; }
+    const horde::gameplay::items::HeldItemTransform& LeftHandFromGripSocket() const
+    {
+        return leftHandFromGripSocket_;
+    }
     // Consume only after successful PreparePose, before the next pose update.
     const horde::scene::SkinnedPlayerPose& SolvedPose() const { return solvedPose_; }
     float LeftSocketErrorMetres() const { return leftSocketErrorMetres_; }

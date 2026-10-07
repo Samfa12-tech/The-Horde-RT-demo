@@ -347,7 +347,7 @@ bool ResolvePlayerHeldItemVisuals(
         const HeldItemTransform& worldFromHand = SelectHandSocketTransform(
             item.hand, worldFromLeftHandBone, worldFromRightHandBone);
         const HeldItemTransform itemFromGrip = item.id == HeldItemId::OriginalTorch
-            ? OriginalTorchGripSocketTransform()
+            ? PlayerRagTorchGripSocketTransform()
             : SwordGripSocketTransform();
         if (!ComposeWorldFromItem(worldFromHand, itemFromGrip,
                                   item.worldFromItem, diagnostic))
@@ -364,7 +364,7 @@ PlayerGripAgreement MeasurePlayerGripAgreement(
     using namespace horde::gameplay::items;
     const HeldItemTransform itemFromGrip = authoritativeItem.id ==
             HeldItemId::OriginalTorch
-        ? OriginalTorchGripSocketTransform()
+        ? PlayerRagTorchGripSocketTransform()
         : SwordGripSocketTransform();
     const HeldItemTransform intendedGrip = MultiplyHeldItemTransforms(
         authoritativeItem.worldFromItem, itemFromGrip);

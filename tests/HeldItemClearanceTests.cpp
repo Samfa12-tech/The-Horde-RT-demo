@@ -145,6 +145,17 @@ void TestContinuousWalkAndLookResponse()
     float maximumStep = 0.0f;
     bool clear = true;
     Vec3 previous{};
+    float previousRetraction = 0.0f;
+    float previousLowering = 0.0f;
+    int maximumStepIndex = 0;
+    float maximumStepRetraction = 0.0f;
+    float maximumStepLowering = 0.0f;
+    HeldItemFixedStepInput maximumStepInput{};
+    float previousStepRetraction = 0.0f;
+    float previousStepLowering = 0.0f;
+    float previousStepZ = 0.0f;
+    float previousStepYaw = 0.0f;
+    float previousStepPitch = 0.0f;
     for (int step = 0; step <= 400; ++step)
     {
         HeldItemFixedStepInput input;
@@ -159,13 +170,35 @@ void TestContinuousWalkAndLookResponse()
         std::string diagnostic;
         Check(ResolveHeldItemsFixedStep(items, input, step, state, diagnostic), "walking carry must resolve");
         const Vec3 hand = TransformPoint(state.worldFromLeftHand, {});
-        if (step != 0) maximumStep = std::max(maximumStep, Distance(hand, previous));
+        if (step != 0) {
+            const float distance = Distance(hand, previous);
+            if (distance > maximumStep) {
+                maximumStep = distance;
+                maximumStepIndex = step;
+                maximumStepRetraction = state.kinematics.torchOverheadRetraction;
+                maximumStepLowering = state.kinematics.torchOverheadLowering;
+                maximumStepInput = input;
+                previousStepRetraction = previousRetraction;
+                previousStepLowering = previousLowering;
+                previousStepZ = input.playerZ + 0.01f;
+                previousStepYaw = 0.30f * std::sin((step - 1) * 0.02f);
+                previousStepPitch = 0.28f * std::sin((step - 1) * 0.015f);
+            }
+        }
         previous = hand;
+        previousRetraction = state.kinematics.torchOverheadRetraction;
+        previousLowering = state.kinematics.torchOverheadLowering;
         clear &= FullTorchEnvelopeHasClearance(state);
     }
     Check(clear, "continuous walk/look sweep must retain full overhead clearance");
     Check(maximumStep < 0.04f, "one fixed walking/look step must not pop the shared hand target");
-    std::cout << "Maximum sampled walk/look hand step=" << maximumStep << " m\n";
+    std::cout << "Maximum sampled walk/look hand step=" << maximumStep << " m at step "
+              << maximumStepIndex << " previous z/yaw/pitch=" << previousStepZ << '/'
+              << previousStepYaw << '/' << previousStepPitch << " current="
+              << maximumStepInput.playerZ << '/' << maximumStepInput.playerYawRadians << '/'
+              << maximumStepInput.playerPitchRadians << " retreat/lowering="
+              << previousStepRetraction << '/' << previousStepLowering << " -> "
+              << maximumStepRetraction << '/' << maximumStepLowering << '\n';
 }
 
 void TestOwnershipAndLoweredPoses()

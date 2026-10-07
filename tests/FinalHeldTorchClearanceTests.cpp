@@ -24,6 +24,14 @@ V Scale(V a,float b) { for(auto& x:a) x*=b; return a; }
 float Dot(V a,V b) { return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
 V Cross(V a,V b) { return {{a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]}}; }
 V Unit(V a) { return Scale(a,1/std::sqrt(Dot(a,a))); }
+HeldItemTransform InverseRigidForTest(const HeldItemTransform& transform) {
+    HeldItemTransform inverse=IdentityHeldItemTransform();
+    for(std::size_t column=0;column<3;++column) for(std::size_t row=0;row<3;++row)
+        inverse[column*4+row]=transform[row*4+column];
+    for(std::size_t row=0;row<3;++row)
+        inverse[12+row]=-(inverse[row]*transform[12]+inverse[4+row]*transform[13]+inverse[8+row]*transform[14]);
+    return inverse;
+}
 V Point(const HeldItemTransform& m,V v) { return {{m[12]+m[0]*v[0]+m[4]*v[1]+m[8]*v[2],m[13]+m[1]*v[0]+m[5]*v[1]+m[9]*v[2],m[14]+m[2]*v[0]+m[6]*v[1]+m[10]*v[2]}}; }
 bool Inside(const horde::scene::OverheadVolume& volume,V point) {
     int first=0;
@@ -95,9 +103,51 @@ float Headroom(V point,const std::vector<OverheadTriangle>& triangles) {
 struct Solved { HeldItemFixedStepState target; HeldItemStates rendered; HeldLightState light; HeldItemTransform grip; V root; PlayerModelWorldBasis basis; };
 // CPU reconstruction of the production scene's view->grounded rig conversion,
 // followed by actual imported-rig solve and production item/socket composition.
-bool Solve(PlayerRenderSlot& rig,const HeldItemFixedStepInput& input,std::uint64_t tick,Solved& out,std::string& diagnostic) {
+bool Solve(PlayerRenderSlot& rig,const HeldItemFixedStepInput& input,std::uint64_t tick,Solved& out,std::string& diagnostic,
+          float candidateRetraction=-1.0f) {
     auto items=MakeDefaultHeldItemStates();
     if(!ResolveHeldItemsFixedStep(items,input,tick,out.target,diagnostic)) return false;
+    const V eye{{input.playerX,kShowcaseEyeWorldY,input.playerZ}},up{{0,1,0}};
+    const float pitch=std::clamp(input.playerPitchRadians,-.32f,.28f);
+    const V forward=Unit({{std::sin(input.playerYawRadians),-.05f+pitch,-std::cos(input.playerYawRadians)}});
+    const V right=Unit(Cross(forward,up)),viewUp=Unit(Cross(right,forward));
+    const auto view=[&](V p) { return Add(Add(Scale(right,p[0]),Scale(viewUp,p[1])),Scale(forward,p[2])); };
+    if(candidateRetraction>=0.0f) {
+        auto& k=out.target.kinematics;
+        const V horizontalForward{{std::sin(input.playerYawRadians),0.0f,-std::cos(input.playerYawRadians)}};
+        const float oldRetraction=k.torchOverheadRetraction,oldLowering=k.torchOverheadLowering;
+        V baseGrip{{k.leftHandLocal[0],
+            k.leftHandLocal[1]+oldRetraction*Dot(horizontalForward,viewUp)+oldLowering*viewUp[1],
+            k.leftHandLocal[2]+oldRetraction*Dot(horizontalForward,forward)+oldLowering*forward[1]}};
+        const V candidateGripWorld=Add(Add(eye,view(baseGrip)),Scale(horizontalForward,-candidateRetraction));
+        const float candidateLowering=ComputePlayerTorchOverheadLowering(
+            candidateGripWorld,viewUp,forward);
+        k.leftHandLocal={{baseGrip[0],
+            baseGrip[1]-candidateRetraction*Dot(horizontalForward,viewUp)-candidateLowering*viewUp[1],
+            baseGrip[2]-candidateRetraction*Dot(horizontalForward,forward)-candidateLowering*forward[1]}};
+        k.torchOverheadRetraction=candidateRetraction;
+        k.torchOverheadLowering=candidateLowering;
+
+        // Keep the candidate a coherent whole-item pose: the production
+        // resolver derives its authoritative item matrix from this hand frame.
+        // Updating only the IK target would compare a new wrist against the
+        // previous Grip/item matrix and report an artificial retreat-sized
+        // socket error.
+        const auto worldAxis=[&](const V& axisInView) {
+            return Unit(view(axisInView));
+        };
+        HeldItemTransform candidateWorldFromHand=IdentityHeldItemTransform();
+        for(std::size_t row=0;row<3;++row) {
+            candidateWorldFromHand[row]=worldAxis(k.leftGripXInView)[row];
+            candidateWorldFromHand[4+row]=worldAxis(k.leftGripYInView)[row];
+            candidateWorldFromHand[8+row]=worldAxis(k.leftGripZInView)[row];
+        }
+        const V candidateHandWorld=Add(eye,view(k.leftHandLocal));
+        for(std::size_t row=0;row<3;++row) candidateWorldFromHand[12+row]=candidateHandWorld[row];
+        out.target.worldFromLeftHand=candidateWorldFromHand;
+        if(!ComposeWorldFromItem(candidateWorldFromHand,PlayerRagTorchGripSocketTransform(),
+                                 items[0].worldFromItem,diagnostic)) return false;
+    }
     horde::gameplay::animation::PlayerAnimationState state;
     horde::gameplay::animation::PlayerAnimationInput animationInput;
     animationInput.heldItemKinematics=out.target.kinematics;
@@ -107,10 +157,6 @@ bool Solve(PlayerRenderSlot& rig,const HeldItemFixedStepInput& input,std::uint64
     auto animation=state.Snapshot();
     // Supply the same settled locomotion blend as a sustained walking snapshot.
     if(input.walkAmount>0) { for(int i=0;i<8;++i) state.StepFixed(animationInput,1.0f/60); animation=state.Snapshot(); }
-    const V eye{{input.playerX,kShowcaseEyeWorldY,input.playerZ}},up{{0,1,0}};
-    const V forward=Unit({{std::sin(input.playerYawRadians),-.05f+std::clamp(input.playerPitchRadians,-.32f,.28f),-std::cos(input.playerYawRadians)}});
-    const V right=Unit(Cross(forward,up)),viewUp=Unit(Cross(right,forward));
-    const auto view=[&](V p) { return Add(Add(Scale(right,p[0]),Scale(viewUp,p[1])),Scale(forward,p[2])); };
     const auto gait=EvaluateLowerBodyPose(input.walkTime,input.walkAmount);
     const V bodyForward{{std::sin(input.playerYawRadians),0,-std::cos(input.playerYawRadians)}},bodyRight{{std::cos(input.playerYawRadians),0,std::sin(input.playerYawRadians)}};
     const float c=std::cos(gait.torsoTwistRadians),s=std::sin(gait.torsoTwistRadians);
@@ -136,21 +182,28 @@ bool Solve(PlayerRenderSlot& rig,const HeldItemFixedStepInput& input,std::uint64
     };
     const auto& sockets=rig.BoneSockets(); out.grip=worldSocket(sockets.leftGrip);
     return rig.ResolveHeldItemVisuals(items,out.grip,worldSocket(sockets.rightGrip),out.rendered,diagnostic) &&
-        ComposeHeldLightState(out.rendered[0].worldFromItem,OriginalTorchFlameSocketTransform(),OriginalTorchLightSocketTransform(),1,out.light,diagnostic);
+        ComposeHeldLightState(out.rendered[0].worldFromItem,PlayerRagTorchFlameSocketTransform(),PlayerRagTorchLightSocketTransform(),1,out.light,diagnostic);
 }
 }
 int main(int argc,char** argv) {
-    if(argc<2) { std::cerr<<"Pass repository root [--original-sweep | --roof-witness] [--capture-obj path]\n";return 2; }
-    bool originalSweep=false,roofWitness=false;
+    if(argc<2) { std::cerr<<"Pass repository root [--original-sweep | --roof-witness | --reach-witness | --reach-candidates] [--capture-obj path]\n";return 2; }
+    bool originalSweep=false,roofWitness=false,reachWitness=false,reachCandidates=false;
     std::filesystem::path captureObj;
     for(int argument=2;argument<argc;++argument) {
         const std::string flag=argv[argument];
         if(flag=="--original-sweep" && !originalSweep) originalSweep=true;
         else if(flag=="--roof-witness" && !roofWitness) roofWitness=true;
+        else if(flag=="--reach-witness" && !reachWitness) reachWitness=true;
+        else if(flag=="--reach-candidates" && !reachCandidates) reachCandidates=true;
         else if(flag=="--capture-obj" && captureObj.empty() && argument+1<argc) captureObj=argv[++argument];
         else { std::cerr<<"Invalid diagnostic argument: "<<flag<<'\n';return 2; }
     }
-    if(roofWitness && (originalSweep || !captureObj.empty())) { std::cerr<<"Roof witness is a separate CPU diagnostic\n";return 2; }
+    const unsigned focusedModeCount=static_cast<unsigned>(roofWitness)+
+        static_cast<unsigned>(reachWitness)+static_cast<unsigned>(reachCandidates);
+    if(focusedModeCount>1u ||
+       (focusedModeCount>0u && (originalSweep || !captureObj.empty()))) {
+        std::cerr<<"Roof and reach diagnostics are separate CPU modes\n";return 2;
+    }
     const std::filesystem::path root=argv[1]; std::string diagnostic;
     PlayerRenderSlot rig;
     horde::scene::SkinnedMeshAsset viewmodel;
@@ -160,12 +213,35 @@ int main(int argc,char** argv) {
     horde::scene::assets::StaticMeshAsset collapse;
     if(!rig.LoadAsset((root/"assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),diagnostic) ||
         !viewmodel.LoadClips((root/"assets/models/player/viewmodel/runtime/gothic-traveller-viewmodel.runtime.glb").string(),horde::scene::PlayerLocomotionClipSet(),diagnostic) ||
-        !horde::scene::assets::AssetManifest::Load(root/"assets/models/props/runtime/asset.manifest.json",manifest,diagnostic) ||
-        !horde::scene::assets::StaticMeshAsset::Load(root/"assets/models/props/runtime/gothic-hand-torch-lod0.runtime.glb",manifest,torch,diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(root/"assets/models/props/runtime/player-rag-torch/asset.manifest.json",manifest,diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(root/"assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb",manifest,torch,diagnostic) ||
         !horde::scene::assets::AssetManifest::Load(root/"assets/models/world/runtime/collapsed-entry/asset.manifest.json",collapseManifest,diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(root/"assets/models/world/runtime/collapsed-entry/collapsed-entry-lod0.runtime.glb",collapseManifest,collapse,diagnostic)) { std::cerr<<diagnostic<<'\n';return 2; }
+    HeldItemTransform canonicalLeftGrip=IdentityHeldItemTransform();
+    canonicalLeftGrip[10]=-1.0f;
+    const HeldItemTransform measuredPalmOffset=MultiplyHeldItemTransforms(
+        canonicalLeftGrip,InverseRigidForTest(rig.LeftHandFromGripSocket()));
+    for(std::size_t axis=0;axis<3;++axis)
+        if(std::abs(measuredPalmOffset[12+axis]-kPlayerPalmHandOffsetFromGripInView[axis])>0.001f) {
+            std::cerr<<"Imported player palm hand-from-Grip profile changed: measured="
+                <<measuredPalmOffset[12]<<','<<measuredPalmOffset[13]<<','<<measuredPalmOffset[14]
+                <<" expected="<<kPlayerPalmHandOffsetFromGripInView[0]<<','
+                <<kPlayerPalmHandOffsetFromGripInView[1]<<','
+                <<kPlayerPalmHandOffsetFromGripInView[2]<<'\n';return 2;
+        }
     const auto structuralUndersides=ImportedStructuralUndersides(collapse);
     if(structuralUndersides.empty()) { std::cerr<<"No imported structural underside triangles were inspected\n";return 2; }
+    for(const auto& [name,expected] : std::array<std::pair<const char*,HeldItemTransform>,3>{{
+            {"Grip",PlayerRagTorchGripSocketTransform()},
+            {"Flame",PlayerRagTorchFlameSocketTransform()},
+            {"Light",PlayerRagTorchLightSocketTransform()}}}) {
+        const auto* socket=FindHeldItemSocket(torch.sockets,name);
+        if(!socket) { std::cerr<<"Rag runtime GLB is missing "<<name<<" socket\n";return 2; }
+        for(std::size_t component=0;component<expected.size();++component)
+            if(std::abs(socket->world[component]-expected[component])>1e-5f) {
+                std::cerr<<"Player Rag socket contract differs from loaded GLB: "<<name<<" component="<<component<<'\n';return 2;
+            }
+    }
     unsigned cases=0,failures=0,roofCases=0,skinnedRoofCases=0,planeSamples=0,diskSamples=0;
     float worstHeadroom=100,maxGripError=0,worstRoofHeadroom=100;
     HeldItemFixedStepInput worstRoofInput{};
@@ -204,9 +280,53 @@ int main(int argc,char** argv) {
     if(planeSamples==0 || diskSamples==0) { std::cerr<<"Empty imported plane/disk validation\n";return 2; }
     std::vector<horde::scene::TexturedSkinnedRtVertex> roofVertices;
     std::vector<horde::scene::SkinnedPbrTangent> roofTangents;
-    const auto inspect=[&](HeldItemFixedStepInput input,bool capture,bool nearRoof=false) {
+    float candidateObjectiveBaseRetraction = 0.0f;
+    float candidateObjectiveInitialLowering = 0.0f;
+    const auto printCandidateCost=[&](const HeldItemKinematicsState& k) {
+        const V wrist{{k.leftHandLocal[0]+kPlayerPalmHandOffsetFromGripInView[0],
+                       k.leftHandLocal[1]+kPlayerPalmHandOffsetFromGripInView[1],
+                       k.leftHandLocal[2]+kPlayerPalmHandOffsetFromGripInView[2]}};
+        const V shoulder{{k.leftShoulderLocal[0],k.leftShoulderLocal[1],k.leftShoulderLocal[2]}};
+        const V wristOffset=Add(wrist,Scale(shoulder,-1));
+        const float wristDistance=std::sqrt(Dot(wristOffset,wristOffset));
+        const float reachExcess=std::max(0.0f,wristDistance-kPlayerAnatomicalHandReachLimitMetres);
+        const float proximalDelta=k.torchOverheadRetraction-candidateObjectiveBaseRetraction;
+        const float penaltyWeight=1.2f*
+            (candidateObjectiveInitialLowering/kPlayerAnatomicalHandReachLimitMetres)*
+            (candidateObjectiveInitialLowering/kPlayerAnatomicalHandReachLimitMetres);
+        const float proximalCost=0.02f*proximalDelta*proximalDelta;
+        const float excessCost=penaltyWeight*reachExcess*reachExcess;
+        std::cout<<"candidate retreat="<<k.torchOverheadRetraction
+            <<" lowering="<<k.torchOverheadLowering
+            <<" wristDistance="<<wristDistance
+            <<" reachExcess="<<reachExcess
+            <<" proximalCost="<<proximalCost
+            <<" excessCost="<<excessCost
+            <<" objective="<<proximalCost+excessCost;
+    };
+    const auto inspect=[&](HeldItemFixedStepInput input,bool capture,bool nearRoof,
+                           float candidateRetraction,bool candidateDiagnostic) {
         Solved solved;
-        if(!Solve(rig,input,++cases,solved,diagnostic)) { ++failures;std::cerr<<"pose case="<<cases<<" xz="<<input.playerX<<','<<input.playerZ<<" yaw/pitch="<<input.playerYawRadians<<','<<input.playerPitchRadians<<" walk="<<input.walkTime<<": "<<diagnostic<<'\n';return; }
+        if(!Solve(rig,input,++cases,solved,diagnostic,candidateRetraction)) {
+            if(!candidateDiagnostic) ++failures;
+            std::cerr<<"pose case="<<cases<<" xz="<<input.playerX<<','<<input.playerZ
+                <<" yaw/pitch="<<input.playerYawRadians<<','<<input.playerPitchRadians
+                <<" walk="<<input.walkTime<<": "<<diagnostic
+                <<" kinematics hand="<<solved.target.kinematics.leftHandLocal[0]<<','
+                <<solved.target.kinematics.leftHandLocal[1]<<','
+                <<solved.target.kinematics.leftHandLocal[2]
+                <<" depth="<<solved.target.kinematics.heldPropDepth
+                <<" overheadLowering/retraction="
+                <<solved.target.kinematics.torchOverheadLowering<<'/'
+                <<solved.target.kinematics.torchOverheadRetraction<<'\n';
+            if(candidateDiagnostic) {
+                std::cout<<"candidate rejected by full-rig socket: ";
+                printCandidateCost(solved.target.kinematics);
+                std::cout<<" actualGripError="<<rig.LeftGripAgreement().positionErrorMetres
+                    <<" (roof sample unavailable: ResolveHeldItemVisuals rejected target)\n";
+            }
+            return;
+        }
         float room=100;
         V limitingPoint{};
         const auto measure=[&](V point) { const float candidate=Headroom(point,structuralUndersides);if(candidate<room) {room=candidate;limitingPoint=point;} };
@@ -216,7 +336,13 @@ int main(int argc,char** argv) {
             measure(Point(solved.light.worldFromFlame,{{x,y,z}}));
         measure(Point(solved.light.worldFromLight,{}));
         worstHeadroom=std::min(worstHeadroom,room);maxGripError=std::max(maxGripError,rig.LeftGripAgreement().positionErrorMetres);
-        if(room < kHeldTorchOverheadGap-1e-5f) { if(failures<24) std::cerr<<"clearance case="<<cases<<" xyz="<<input.playerX<<','<<input.playerZ<<" yaw="<<input.playerYawRadians<<" pitch="<<input.playerPitchRadians<<" walk="<<input.walkTime<<" final headroom="<<room<<" gripError="<<rig.LeftGripAgreement().positionErrorMetres<<'\n';++failures; }
+        if(candidateDiagnostic) {
+            std::cout<<"candidate ";
+            printCandidateCost(solved.target.kinematics);
+            std::cout<<" actualGripError="<<rig.LeftGripAgreement().positionErrorMetres
+                <<" RagHeadroom="<<room<<'\n';
+        }
+        if(room < kHeldTorchOverheadGap-1e-5f) { if(failures<24) std::cerr<<"clearance case="<<cases<<" xyz="<<input.playerX<<','<<input.playerZ<<" yaw="<<input.playerYawRadians<<" pitch="<<input.playerPitchRadians<<" walk="<<input.walkTime<<" final headroom="<<room<<" gripError="<<rig.LeftGripAgreement().positionErrorMetres<<'\n';if(!candidateDiagnostic) ++failures; }
         if(nearRoof) {
             ++roofCases;
             if(room<worstRoofHeadroom) { worstRoofHeadroom=room;worstRoofInput=input;worstRoofPoint=limitingPoint;worstTargetGripY=solved.target.worldFromLeftHand[13];worstFinalGripY=solved.grip[13]; }
@@ -269,17 +395,149 @@ int main(int argc,char** argv) {
         std::cout<<"limiting worldPoint="<<point[0]<<','<<point[1]<<','<<point[2]<<" roofY="<<roof<<" sharedY="<<SharedRoofY(point)<<'\n';
         if(limiting) for(const auto vertex:{limiting->a,limiting->b,limiting->c}) std::cout<<"limiting actual triangle vertex="<<vertex[0]<<','<<vertex[1]<<','<<vertex[2]<<'\n';
     };
+    if(reachWitness) {
+        for(const auto [yaw,pitch,walkTime]:{
+                std::array<float,3>{3.14159265f,0.0f,24.51f},
+                std::array<float,3>{0.0f,0.28f,25.08f}}) {
+            HeldItemFixedStepInput input;
+            input.playerMountProfile=PlayerMountProfile::AnatomicalBody;
+            input.playerX=0.0f;input.playerZ=-3.5f;input.playerYawRadians=yaw;
+            input.playerPitchRadians=pitch;input.walkTime=walkTime;input.walkAmount=0.0f;
+            inspect(input,false,true,-1.0f,false);
+        }
+        std::cout<<"targeted Rag reach witness poses="<<cases<<" failures="<<failures<<'\n';
+        return failures ? 1 : 0;
+    }
+    if(reachCandidates) {
+        std::size_t candidateCount=0;
+        for(const auto [yaw,pitch,walkTime]:{
+                std::array<float,3>{3.14159265f,0.0f,24.51f},
+                std::array<float,3>{0.0f,0.28f,25.08f}}) {
+            HeldItemFixedStepInput input;
+            input.playerMountProfile=PlayerMountProfile::AnatomicalBody;
+            input.playerX=0.0f;input.playerZ=-3.5f;input.playerYawRadians=yaw;
+            input.playerPitchRadians=pitch;input.walkTime=walkTime;input.walkAmount=0.0f;
+            auto items=MakeDefaultHeldItemStates();HeldItemFixedStepState baseline{};
+            if(!ResolveHeldItemsFixedStep(items,input,1,baseline,diagnostic)) {
+                std::cerr<<"Cannot build exact Rag reach baseline: "<<diagnostic<<'\n';return 2;
+            }
+            const V eye{{input.playerX,kShowcaseEyeWorldY,input.playerZ}},up{{0,1,0}};
+            const float clampedPitch=std::clamp(input.playerPitchRadians,-.32f,.28f);
+            const V forward=Unit({{std::sin(input.playerYawRadians),-.05f+clampedPitch,-std::cos(input.playerYawRadians)}});
+            const V right=Unit(Cross(forward,up)),viewUp=Unit(Cross(right,forward));
+            const auto view=[&](V p) { return Add(Add(Scale(right,p[0]),Scale(viewUp,p[1])),Scale(forward,p[2])); };
+            const V horizontalForward{{std::sin(input.playerYawRadians),0.0f,-std::cos(input.playerYawRadians)}};
+            const auto& k=baseline.kinematics;
+            const float oldRetraction=k.torchOverheadRetraction,oldLowering=k.torchOverheadLowering;
+            const V baseGrip{{k.leftHandLocal[0],
+                k.leftHandLocal[1]+oldRetraction*Dot(horizontalForward,viewUp)+oldLowering*viewUp[1],
+                k.leftHandLocal[2]+oldRetraction*Dot(horizontalForward,forward)+oldLowering*forward[1]}};
+            const float initialLowering=ComputePlayerTorchOverheadLowering(
+                Add(eye,view(baseGrip)),viewUp,forward);
+            candidateObjectiveInitialLowering=initialLowering;
+            candidateObjectiveBaseRetraction=std::min(.45f,initialLowering*.60f);
+            const float reachPenaltyWeight=1.2f*
+                (initialLowering/kPlayerAnatomicalHandReachLimitMetres)*
+                (initialLowering/kPlayerAnatomicalHandReachLimitMetres);
+            const auto candidatePose=[&](float retreat,float& lowering) {
+                const V candidateGrip=Add(Add(eye,view(baseGrip)),Scale(horizontalForward,-retreat));
+                lowering=retreat==0.0f ? initialLowering :
+                    ComputePlayerTorchOverheadLowering(candidateGrip,viewUp,forward);
+                return V{{baseGrip[0],
+                    baseGrip[1]-retreat*Dot(horizontalForward,viewUp)-lowering*viewUp[1],
+                    baseGrip[2]-retreat*Dot(horizontalForward,forward)-lowering*forward[1]}};
+            };
+            const auto candidateObjective=[&](float retreat,float& lowering) {
+                const V local=candidatePose(retreat,lowering);
+                const V wrist{{local[0]+kPlayerPalmHandOffsetFromGripInView[0],
+                               local[1]+kPlayerPalmHandOffsetFromGripInView[1],
+                               local[2]+kPlayerPalmHandOffsetFromGripInView[2]}};
+                const V offset=Add(wrist,Scale({{k.leftShoulderLocal[0],k.leftShoulderLocal[1],k.leftShoulderLocal[2]}},-1));
+                const float distance=std::sqrt(Dot(offset,offset));
+                const float excess=std::max(0.0f,distance-kPlayerAnatomicalHandReachLimitMetres);
+                const float proximal=retreat-candidateObjectiveBaseRetraction;
+                return .02f*proximal*proximal+reachPenaltyWeight*excess*excess;
+            };
+            float traceRetraction=candidateObjectiveBaseRetraction,traceLowering=0.0f;
+            float traceObjective=candidateObjective(traceRetraction,traceLowering);
+            std::cout<<"production proposal trace start retreat="<<traceRetraction
+                <<" lowering="<<traceLowering<<" objective="<<traceObjective<<'\n';
+            for(int iteration=0;iteration<4;++iteration) {
+                const float lower=std::max(0.0f,traceRetraction-.015f);
+                const float upper=std::min(.45f,traceRetraction+.015f);
+                if(upper-lower<1e-5f) break;
+                float lowerRoof=0.0f,upperRoof=0.0f;
+                const float lowerObjective=candidateObjective(lower,lowerRoof);
+                const float upperObjective=candidateObjective(upper,upperRoof);
+                const float leftSpan=traceRetraction-lower,rightSpan=upper-traceRetraction;
+                float gradient=0.0f,curvature=0.0f;
+                if(leftSpan>1e-5f && rightSpan>1e-5f) {
+                    gradient=(upperObjective-lowerObjective)/(leftSpan+rightSpan);
+                    curvature=2.0f*((upperObjective-traceObjective)/rightSpan-
+                        (traceObjective-lowerObjective)/leftSpan)/(leftSpan+rightSpan);
+                } else if(rightSpan>1e-5f) gradient=(upperObjective-traceObjective)/rightSpan;
+                else if(leftSpan>1e-5f) gradient=(traceObjective-lowerObjective)/leftSpan;
+                if(std::abs(gradient)<1e-5f) {
+                    std::cout<<"production proposal iteration="<<iteration
+                        <<" stopped: derivative="<<gradient<<'\n';
+                    break;
+                }
+                float delta=curvature>.01f ? -gradient/curvature : -std::copysign(.025f,gradient);
+                delta=std::clamp(delta,-.025f,.025f);
+                std::cout<<"production proposal iteration="<<iteration
+                    <<" retreat="<<traceRetraction<<" objective="<<traceObjective
+                    <<" derivative="<<gradient<<" curvature="<<curvature;
+                bool accepted=false;
+                for(int backtrack=0;backtrack<=4;++backtrack) {
+                    const float next=std::clamp(traceRetraction+delta,0.0f,.45f);
+                    if(std::abs(next-traceRetraction)<1e-5f) break;
+                    float nextLowering=0.0f;
+                    const float nextObjective=candidateObjective(next,nextLowering);
+                    std::cout<<" trial"<<backtrack<<" delta="<<delta<<" next="<<next
+                        <<" nextObjective="<<nextObjective;
+                    if(nextObjective<traceObjective) {
+                        traceRetraction=next;traceLowering=nextLowering;
+                        traceObjective=nextObjective;accepted=true;
+                        std::cout<<" accepted";
+                        break;
+                    }
+                    std::cout<<" rejected";
+                    delta*=.5f;
+                }
+                std::cout<<'\n';
+                if(!accepted) break;
+            }
+            std::vector<float> candidateRetractions;
+            for(int sample=0;sample<=18;++sample)
+                candidateRetractions.push_back(static_cast<float>(sample)*.025f);
+            candidateRetractions.push_back(oldRetraction);
+            std::sort(candidateRetractions.begin(),candidateRetractions.end());
+            candidateRetractions.erase(std::unique(candidateRetractions.begin(),candidateRetractions.end(),
+                [](float a,float b){return std::abs(a-b)<1e-5f;}),candidateRetractions.end());
+            std::cout<<"reach candidate pose yaw/pitch="<<yaw<<','<<pitch
+                <<" baselineRetraction="<<oldRetraction
+                <<" initialLowering="<<initialLowering
+                <<" proximalBase="<<candidateObjectiveBaseRetraction<<'\n';
+            for(const float candidate:candidateRetractions) {
+                inspect(input,false,true,candidate,true);
+                ++candidateCount;
+            }
+        }
+        std::cout<<"targeted Rag reach candidate samples="<<candidateCount
+            <<" unexpectedFailures="<<failures<<'\n';
+        return failures ? 1 : 0;
+    }
     if(roofWitness) {
         HeldItemFixedStepInput input;input.playerMountProfile=PlayerMountProfile::AnatomicalBody;
         input.playerX=-1.56f;input.playerZ=3.05f;input.playerYawRadians=3.14159265f;input.playerPitchRadians=0;input.walkTime=2.37f;input.walkAmount=1;
         input.playerCombat.action=PlayerCombatAction::SwingActive;input.playerCombat.actionTime=.04f;
-        inspect(input,false,true);printLimitingTriangle(worstRoofPoint);
+        inspect(input,false,true,-1.0f,false);printLimitingTriangle(worstRoofPoint);
         input.playerZ=2.83f;input.playerPitchRadians=-.32f;input.walkTime=.80f;input.walkAmount=.5f;input.playerCombat.action=PlayerCombatAction::Idle;
-        inspect(input,false,true);
+        inspect(input,false,true,-1.0f,false);
         std::cout<<"CPU roof witness subset only: poses="<<cases<<" actualViewmodelSkins="<<skinnedRoofCases<<" failures="<<failures<<'\n';
         return failures ? 1 : 0;
     }
-    HeldItemFixedStepInput capture;capture.playerMountProfile=PlayerMountProfile::AnatomicalBody;capture.playerX=4.2f;capture.playerZ=-10;capture.playerPitchRadians=-.04f;inspect(capture,true);
+    HeldItemFixedStepInput capture;capture.playerMountProfile=PlayerMountProfile::AnatomicalBody;capture.playerX=4.2f;capture.playerZ=-10;capture.playerPitchRadians=-.04f;inspect(capture,true,false,-1.0f,false);
     for(int portal=0;portal<3;++portal) for(int step=0;step<=12;++step) for(float pitch:{-.32f,0.0f,.28f}) for(int pose=0;pose<3;++pose) for(float yaw:{0.0f,1.5707963f,-1.5707963f,3.14159265f}) {
         if(originalSweep && yaw!=0) continue;
         HeldItemFixedStepInput input;input.playerMountProfile=PlayerMountProfile::AnatomicalBody;
@@ -288,14 +546,14 @@ int main(int argc,char** argv) {
         input.playerYawRadians=originalSweep && portal==2 ? -1.5707963f : yaw;input.playerPitchRadians=pitch;
         input.walkTime=originalSweep ? step/60.0f : step*.20f;input.walkAmount=1;
         input.playerCombat.action=pose==0 ? PlayerCombatAction::Idle : pose==1 ? PlayerCombatAction::SwingActive : PlayerCombatAction::ParryActive;
-        input.playerCombat.actionTime=.04f;inspect(input,false);
+        input.playerCombat.actionTime=.04f;inspect(input,false,false,-1.0f,false);
     }
     if(!originalSweep) for(const auto action:{PlayerCombatAction::SwingWindup,PlayerCombatAction::SwingRecovery,
         PlayerCombatAction::UpwardSliceWindup,PlayerCombatAction::UpwardSliceActive,PlayerCombatAction::UpwardSliceRecovery,
         PlayerCombatAction::ParryStartup,PlayerCombatAction::ParryRecovery}) for(float pitch:{-.32f,.28f}) for(int step=0;step<5;++step) {
         HeldItemFixedStepInput input=capture;input.playerX=0;input.playerZ=-3.3f;input.playerPitchRadians=pitch;
         input.walkAmount=step*.25f;input.walkTime=step*.4f;input.playerCombat.action=action;input.playerCombat.actionTime=step*.03f;
-        inspect(input,false);
+        inspect(input,false,false,-1.0f,false);
     }
     const unsigned legacyCases=cases;
     if(!originalSweep) {
@@ -309,7 +567,7 @@ int main(int argc,char** argv) {
             input.walkTime=static_cast<float>(step)*.20f+pose*.37f;
             input.walkAmount=static_cast<float>((step+pose)%3)*.5f;
             input.playerCombat.action=pose==0 ? PlayerCombatAction::Idle : pose==1 ? PlayerCombatAction::SwingActive : PlayerCombatAction::ParryActive;
-            input.playerCombat.actionTime=.04f;inspect(input,false,true);
+            input.playerCombat.actionTime=.04f;inspect(input,false,true,-1.0f,false);
         }
         // Oblique orientations and every transient sword/parry phase at the
         // roof join and last legal near-cap stance probe the final solved grip.
@@ -322,7 +580,7 @@ int main(int argc,char** argv) {
                 HeldItemFixedStepInput input;input.playerMountProfile=PlayerMountProfile::AnatomicalBody;
                 input.playerX=x;input.playerZ=z;input.playerYawRadians=yaw;input.playerPitchRadians=pitch;
                 input.walkTime=phase*.31f;input.walkAmount=static_cast<float>(phase%3)*.5f;
-                input.playerCombat.action=action;input.playerCombat.actionTime=.03f;inspect(input,false,true);
+                input.playerCombat.action=action;input.playerCombat.actionTime=.03f;inspect(input,false,true,-1.0f,false);
             }
             ++phase;
         }
@@ -341,7 +599,7 @@ int main(int argc,char** argv) {
             input.playerYawRadians=yaw;input.walkTime=static_cast<float>(cases-beforeEntry)*.19f;
             input.walkAmount=pose*.5f;input.playerCombat.action=pose==0 ? PlayerCombatAction::Idle :
                 pose==1 ? PlayerCombatAction::SwingActive : PlayerCombatAction::ParryActive;
-            input.playerCombat.actionTime=.04f;inspect(input,false,true);
+            input.playerCombat.actionTime=.04f;inspect(input,false,true,-1.0f,false);
         }
         if(cases-beforeEntry!=180u || skinnedRoofCases-beforeEntrySkins!=180u) {
             ++failures;std::cerr<<"Incomplete closed-entry real-rig sweep\n";

@@ -30,6 +30,16 @@ inline constexpr float kHeldTorchEnvelopeTopFromGrip = 0.925f;
 inline constexpr float kPlayerRagTorchEnvelopeTopFromGrip = 0.965f;
 inline constexpr float kHeldTorchEnvelopeRadius = 0.15f;
 inline constexpr float kHeldTorchOverheadGap = 0.03f;
+// Imported player rig palm socket: desired wrist target relative to its Grip,
+// expressed in the canonical left-Grip view frame. The actual-rig clearance
+// regression pins this profile against the loaded LeftHand/LeftGrip nodes.
+inline constexpr std::array<float, 3u> kPlayerPalmHandOffsetFromGripInView{{
+    -0.0336753f, 0.000359222f, -0.0596841f}};
+// Runtime player rig bind reach from the scaled LeftArm/LeftForeArm/LeftHand
+// hierarchy, bounded by the imported solver's 1.75x maximum stretch and a
+// 5 mm reserve against its straight-chain singularity.
+inline constexpr float kPlayerAnatomicalHandReachLimitMetres =
+    (0.276333f + 0.216431f) * 1.75f - 0.005f;
 
 // Shared pose authority, not a renderer-only offset. The anatomical profile is
 // opt-in until the modelled body/viewmodel route passes live owner acceptance.
@@ -81,6 +91,9 @@ struct HeldItemKinematicsState
     float successJolt = 0.0f;
     // World-down translation of the shared hand target, never a light offset.
     float torchOverheadLowering = 0.0f;
+    // Camera-side retreat of that same torch target when overhead lowering
+    // would exceed the anatomical arm's reachable carry envelope.
+    float torchOverheadRetraction = 0.0f;
     // World-down translation of the shared sword hand target. IK, rigid sword
     // composition, shadows, and reflections consume the same lowered frame.
     float swordOverheadLowering = 0.0f;
@@ -148,6 +161,18 @@ SwordGripBasisInView EvaluateSwordGripBasisInView(float inwardRadians,
 FirstPersonSafeFrame EvaluateOwnerFeedbackPortraitSafeFrame(
     const HeldItemKinematicsState& kinematics,
     float portraitAspect);
+
+// Player-held torch sockets come from the Rag runtime asset. OriginalTorch*
+// remain the legacy contracts for Keeper and reward scene assets.
+HeldItemTransform PlayerRagTorchGripSocketTransform();
+HeldItemTransform PlayerRagTorchFlameSocketTransform();
+HeldItemTransform PlayerRagTorchLightSocketTransform();
+// Shared conservative roof response, exposed for the actual-rig regression's
+// bounded candidate sweep; production kinematics uses this same calculation.
+float ComputePlayerTorchOverheadLowering(
+    const std::array<float, 3u>& gripWorld,
+    const std::array<float, 3u>& viewUp,
+    const std::array<float, 3u>& viewForward);
 
 // Resolves the first full-height route collision surface continuously along
 // the camera-centre ray. Low floor props such as the chest remain player-solid
