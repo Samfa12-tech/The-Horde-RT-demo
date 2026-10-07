@@ -5,8 +5,10 @@
 #include "platform/windows/WindowsRemotePlaytestReport.h"
 #include "audio/SfxVolume.h"
 #include "graphics/GraphicsSettings.h"
+#include "graphics/ForegroundPauseRenderCadence.h"
 #include "platform/windows/WindowsGraphicsPersistence.h"
 #include "graphics/GraphicsPreviewSession.h"
+#include "graphics/EntryMenuScene.h"
 #include "graphics/GraphicsPreviewPerformance.h"
 #if !defined(NDEBUG)
 #include "telemetry/CombatTimingTrace.h"
@@ -169,6 +171,8 @@ constexpr int kGraphicsPreviewGraphId = 203;
 constexpr int kGraphicsGlassButtonId = 204;
 constexpr int kGraphicsShadowButtonId = 206;
 constexpr int kGraphicsMistButtonId = 207;
+constexpr int kEntryMoreButtonId = 208;
+constexpr int kEntryBackButtonId = 209;
 constexpr int kRtLabButtonId = 127;
 constexpr int kRtLabPanelId = 128;
 constexpr int kRtLabTitleId = 129;
@@ -224,6 +228,8 @@ constexpr int kMenuReportProblemId = 2026;
 constexpr int kAppIconId = 1;
 constexpr UINT kDefaultDpi = 96u;
 constexpr char kUiFontProperty[] = "HordeLanternRtUiFont";
+constexpr char kEntryTitleFontProperty[] = "HordeLanternRtEntryTitleFont";
+constexpr char kEntryPlaqueFontProperty[] = "HordeLanternRtEntryPlaqueFont";
 constexpr char kGraphicsInfoFontProperty[] = "HordeLanternRtGraphicsInfoFont";
 constexpr char kMonoFontProperty[] = "HordeLanternRtMonoFont";
 constexpr char kDeveloperFontProperty[] = "HordeLanternRtDeveloperFont";
@@ -365,6 +371,13 @@ struct VulkanSurfaceContext
     bool graphicsCloseAfterRevert = false;
     // Debug automation uses an isolated in-memory graphics transaction only.
     // It never loads or writes the user's INI, advances gameplay, or starts audio.
+    bool entryMenuVisible = false;
+    bool entryMoreVisible = false;
+    bool entryPlayQueued = false;
+    bool entryPlayHandoffPending = false;
+    horde::graphics::EntryMenuSession entryMenu;
+    horde::vulkan::raytracing::RtSceneProfile graphicsReturnProfile =
+        horde::vulkan::raytracing::RtSceneProfile::Showcase;
     bool graphicsPreviewCapture = false;
     bool outputResizeValidation = false;
     bool nativeMotionValidation = false;
@@ -530,6 +543,7 @@ void UpdateVitalityHud(VulkanSurfaceContext& context);
 void UpdateChestPrompt(VulkanSurfaceContext& context);
 int ScaleForDpi(HWND window, int logicalPixels);
 void LayoutOverlayControls(HWND window, int width, int height);
+void ApplyDpiScaledFonts(HWND window);
 std::string WindowSafeText(const std::string& value);
 void RefreshGpuTimingTelemetry(
     VulkanSurfaceContext& context,
@@ -1817,7 +1831,8 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
         SetWindowTextA(GetDlgItem(context.windowHandle, kGraphicsInfoId), info.str().c_str());
     }
     else if (HWND title = GetDlgItem(context.windowHandle, kSettingsTitleId))
-        SetWindowTextA(title, "SETTINGS  |  SAVED BESIDE THE DEMO");
+        SetWindowTextA(title, context.entryMenuVisible ? "SETTINGS" :
+            "SETTINGS  |  SAVED BESIDE THE DEMO");
 
     HMENU menu = GetMenu(context.windowHandle);
     if (menu)
@@ -2031,12 +2046,37 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     {
         SetControlVisible(context.windowHandle, id, pauseVisible);
     }
+    const bool entryFront = context.entryMenuVisible && pauseVisible && !context.entryMoreVisible;
+    if (context.entryMenuVisible && pauseVisible)
+    {
+        for (const int id :
+             {kRestartButtonId, kControlsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
+              kReportProblemButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
+            SetControlVisible(context.windowHandle, id,
+                              context.entryMoreVisible && id != kRestartButtonId &&
+                                  id != kRunBenchmarkButtonId);
+    }
+    SetControlVisible(context.windowHandle, kEntryMoreButtonId, entryFront);
+    SetControlVisible(context.windowHandle, kEntryBackButtonId,
+                      context.entryMenuVisible && context.entryMoreVisible && pauseVisible);
+    SetControlVisible(context.windowHandle, kResumeButtonId,
+                      pauseVisible && (!context.entryMenuVisible || entryFront));
     SetControlVisible(context.windowHandle, kEndingBodyId, pauseVisible && context.endingOverlayVisible);
     const bool fullPauseMenuVisible = pauseVisible && !context.deathOverlayVisible && !context.endingOverlayVisible;
     for (const int id : {kControlsButtonId, kSettingsButtonId, kDiagnosticsButtonId,
                          kRunBenchmarkButtonId, kMoreBySamfa12ButtonId, kReportProblemButtonId})
     {
         SetControlVisible(context.windowHandle, id, fullPauseMenuVisible);
+    }
+    if (context.entryMenuVisible && pauseVisible)
+    {
+        for (const int id :
+             {kRestartButtonId, kControlsButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
+              kReportProblemButtonId, kMoreBySamfa12ButtonId, kExitButtonId})
+            SetControlVisible(context.windowHandle, id,
+                              context.entryMoreVisible && id != kRestartButtonId &&
+                                  id != kRunBenchmarkButtonId);
+        SetControlVisible(context.windowHandle, kSettingsButtonId, entryFront);
     }
     const bool rtLabAccess = context.rtLabUnlocked || context.rtLabDebugInjection;
     SetControlVisible(context.windowHandle, kRtLabButtonId,
@@ -2083,7 +2123,8 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
         SetControlVisible(context.windowHandle, id, context.rtLabVisible);
     }
     SetControlVisible(context.windowHandle, kHudControlId,
-                      !context.diagnosticsVisible && !context.benchmarkReportVisible && !context.rtLabVisible);
+                      !context.entryMenuVisible && !context.diagnosticsVisible &&
+                          !context.benchmarkReportVisible && !context.rtLabVisible);
     SetControlVisible(context.windowHandle, kVitalityHudControlId,
                       !pauseVisible && !context.settingsVisible && !context.diagnosticsVisible &&
                           !context.benchmarkReportVisible && !context.benchmark.IsRunning() &&
@@ -2123,17 +2164,25 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     }
     if (HWND title = GetDlgItem(context.windowHandle, kPauseTitleId))
     {
-        SetWindowTextA(title, context.deathOverlayVisible
-            ? "YOU FELL  |  THE RUIN CLAIMS ANOTHER LIGHT."
-            : (context.endingOverlayVisible
-                ? (context.rtLabJustUnlocked ? "RT LAB UNLOCKED" : "DAWN RETURNS  |  THE LAST LANTERN HAS DONE ITS WORK")
-                : "HORDE LANTERN RT  |  SHOWCASE ALPHA"));
+        SetWindowTextA(
+            title,
+            context.deathOverlayVisible
+                ? "YOU FELL  |  THE RUIN CLAIMS ANOTHER LIGHT."
+                : (context.endingOverlayVisible
+                       ? (context.rtLabJustUnlocked
+                              ? "RT LAB UNLOCKED"
+                              : "DAWN RETURNS  |  THE LAST LANTERN HAS DONE ITS WORK")
+                       : (context.entryMenuVisible ? "THE HORDE"
+                                                   : "HORDE LANTERN RT  |  SHOWCASE ALPHA")));
     }
     if (HWND resume = GetDlgItem(context.windowHandle, kResumeButtonId))
     {
-        SetWindowTextA(resume, context.deathOverlayVisible
-            ? "RETRY ENCOUNTER"
-            : (context.endingOverlayVisible ? "CONTINUE" : "ENTER THE RUIN / RESUME"));
+        SetWindowTextA(
+            resume, context.deathOverlayVisible
+                        ? "RETRY ENCOUNTER"
+                        : (context.endingOverlayVisible
+                               ? "CONTINUE"
+                               : (context.entryMenuVisible ? "PLAY" : "ENTER THE RUIN / RESUME")));
     }
     if (HWND restart = GetDlgItem(context.windowHandle, kRestartButtonId))
     {
@@ -2177,19 +2226,23 @@ horde::graphics::GraphicsAppliedSnapshot GraphicsSnapshot(
     const auto internal = context.rtScene.DispatchExtent();
     snapshot.internalExtent = {internal.width, internal.height};
     snapshot.outputExtent = {context.swapchainExtent.width, context.swapchainExtent.height};
-    snapshot.scene = context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview ?
-        horde::graphics::GraphicsScene::Preview : horde::graphics::GraphicsScene::Showcase;
+    snapshot.scene =
+        context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview
+            ? horde::graphics::GraphicsScene::Preview
+        : context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::EntryMenu
+            ? horde::graphics::GraphicsScene::EntryMenu
+            : horde::graphics::GraphicsScene::Showcase;
     return snapshot;
 }
 
 void CloseGraphicsPage(VulkanSurfaceContext& context)
 {
-    if (context.rtScene.Profile() != horde::vulkan::raytracing::RtSceneProfile::Showcase)
+    if (context.rtScene.Profile() != context.graphicsReturnProfile)
     {
         context.graphicsSceneRestoring = true;
-        context.sceneProfile = horde::vulkan::raytracing::RtSceneProfile::Showcase;
+        context.sceneProfile = context.graphicsReturnProfile;
         context.sceneProfileDirty = true;
-        context.graphicsStatus = "Restoring the paused showcase; Back closes after its next successful RT frame.";
+        context.graphicsStatus = "Restoring the previous scene; Back closes after its next successful RT frame.";
         UpdateSettingsLabels(context);
         return;
     }
@@ -2197,7 +2250,7 @@ void CloseGraphicsPage(VulkanSurfaceContext& context)
     context.graphicsVisible = false; context.graphicsCloseAfterRevert = false;
     context.graphicsEdit.reset(); context.graphicsCommand.reset();
     EnableWindow(GetDlgItem(context.windowHandle, kSettingsBackButtonId), TRUE);
-    context.sceneProfile = horde::vulkan::raytracing::RtSceneProfile::Showcase;
+    context.sceneProfile = context.graphicsReturnProfile;
     context.sceneProfileDirty = context.rtScene.Profile() != context.sceneProfile;
     ApplyOverlayState(context);
     RECT client{}; GetClientRect(context.windowHandle, &client);
@@ -2231,6 +2284,8 @@ bool QueueGraphicsCommand(VulkanSurfaceContext& context,
     context.glassGeometryDirty = !context.rtScene.IsReady() ||
         context.requestedGlassEnabled != context.rtScene.GlassEnabled();
     context.renderScaleDirty = std::abs(context.renderScale - context.appliedRenderScale) > 0.001f;
+    if (context.rtScene.Profile() != horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview)
+        context.graphicsReturnProfile = context.rtScene.Profile();
     context.graphicsPreview.Reset();
     context.graphicsPreviewCamera = horde::graphics::GraphicsPreviewCamera::Overview;
     context.graphicsPreview.SelectCamera(context.graphicsPreviewCamera);
@@ -2251,7 +2306,7 @@ void FinishGraphicsFrame(VulkanSurfaceContext& context, const bool rtPresented)
     const bool currentResourcesPresented = rtPresented && context.lastFramePresentation ==
         horde::telemetry::RtPresentationOutcome::Presented;
     if (context.graphicsSceneRestoring && currentResourcesPresented &&
-        context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::Showcase)
+        context.rtScene.Profile() == context.graphicsReturnProfile)
     { CloseGraphicsPage(context); return; }
     const auto completedMist = horde::telemetry::CurrentCompletedMistEnabled(context.rtFrameEvidence.PublishedStateByValue());
     if (context.graphicsCommand && currentResourcesPresented && context.rtScene.IsReady() &&
@@ -2319,6 +2374,8 @@ void CloseRtLab(VulkanSurfaceContext& context)
 
 void ShowPauseMenu(VulkanSurfaceContext& context, const bool visible)
 {
+    if (context.entryMenuVisible && !visible)
+        return;
     if (context.graphicsVisible && context.graphicsEdit)
     {
         context.graphicsCloseAfterRevert = true;
@@ -3166,21 +3223,59 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
 std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& context)
 {
     constexpr auto controlIds = std::to_array<int>({
-        kResumeButtonId, kRestartButtonId, kControlsButtonId, kSettingsButtonId, kReportProblemButtonId,
-        kRtLabButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId, kMoreBySamfa12ButtonId,
-        kExitButtonId, kSensitivityButtonId, kWaterQualityButtonId,
-        kRenderScaleSliderId, kSfxVolumeSliderId, kMusicVolumeSliderId,
-        kFullscreenButtonId, kSettingsBackButtonId,
-        kGraphicsOpenButtonId, kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsMistButtonId,
-        kGraphicsApplyButtonId, kGraphicsConfirmButtonId, kGraphicsRevertButtonId, kGraphicsResetButtonId,
-        kGraphicsPreviewPauseId, kGraphicsPreviewCameraId, kGraphicsPreviewMotionId, kGraphicsPreviewResetId,
-        kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkReviewStatsButtonId, kBenchmarkBackButtonId,
-        kRtLabWaterfallSliderId, kRtLabRoofSliderId, kRtLabDawnSliderId,
-        kRtLabFogSliderId, kRtLabFireStrengthSliderId, kRtLabFireTurbulenceSliderId,
-        kRtLabFireSmokeSliderId, kRtLabGlassVisibilitySliderId,
-        kRtLabGlassTransmissionSliderId, kRtLabGlassIorSliderId,
-        kRtLabGlassRoughnessSliderId, kRtLabLightGroupButtonId, kRtLabHueSliderId,
-        kRtLabIntensitySliderId, kRtLabWorkloadButtonId, kRtLabRestoreButtonId,
+        kResumeButtonId,
+        kEntryMoreButtonId,
+        kEntryBackButtonId,
+        kRestartButtonId,
+        kControlsButtonId,
+        kSettingsButtonId,
+        kReportProblemButtonId,
+        kRtLabButtonId,
+        kDiagnosticsButtonId,
+        kRunBenchmarkButtonId,
+        kMoreBySamfa12ButtonId,
+        kExitButtonId,
+        kSensitivityButtonId,
+        kWaterQualityButtonId,
+        kRenderScaleSliderId,
+        kSfxVolumeSliderId,
+        kMusicVolumeSliderId,
+        kFullscreenButtonId,
+        kSettingsBackButtonId,
+        kGraphicsOpenButtonId,
+        kGraphicsPresetButtonId,
+        kGraphicsFireButtonId,
+        kGraphicsShadowButtonId,
+        kGraphicsGlassButtonId,
+        kGraphicsMistButtonId,
+        kGraphicsApplyButtonId,
+        kGraphicsConfirmButtonId,
+        kGraphicsRevertButtonId,
+        kGraphicsResetButtonId,
+        kGraphicsPreviewPauseId,
+        kGraphicsPreviewCameraId,
+        kGraphicsPreviewMotionId,
+        kGraphicsPreviewResetId,
+        kBenchmarkCopyButtonId,
+        kBenchmarkSaveButtonId,
+        kBenchmarkReviewStatsButtonId,
+        kBenchmarkBackButtonId,
+        kRtLabWaterfallSliderId,
+        kRtLabRoofSliderId,
+        kRtLabDawnSliderId,
+        kRtLabFogSliderId,
+        kRtLabFireStrengthSliderId,
+        kRtLabFireTurbulenceSliderId,
+        kRtLabFireSmokeSliderId,
+        kRtLabGlassVisibilitySliderId,
+        kRtLabGlassTransmissionSliderId,
+        kRtLabGlassIorSliderId,
+        kRtLabGlassRoughnessSliderId,
+        kRtLabLightGroupButtonId,
+        kRtLabHueSliderId,
+        kRtLabIntensitySliderId,
+        kRtLabWorkloadButtonId,
+        kRtLabRestoreButtonId,
         kRtLabBackButtonId,
     });
     std::vector<HWND> controls;
@@ -3249,7 +3344,7 @@ void NavigateControllerMenu(VulkanSurfaceContext& context, const int direction)
 
 void CancelControllerMenu(VulkanSurfaceContext& context)
 {
-    int command = kResumeButtonId;
+    int command = context.entryMenuVisible ? kEntryBackButtonId : kResumeButtonId;
     if (context.rtLabVisible)
     {
         command = kRtLabBackButtonId;
@@ -4547,6 +4642,12 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         ctx.lastRtFrameError = diagnostic;
         return false;
     }
+    if (ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::EntryMenu &&
+        !ctx.rtScene.ConfigureEntryMenu(ctx.entryMenu, diagnostic))
+    {
+        ctx.lastRtFrameError = diagnostic;
+        return false;
+    }
     if (ctx.gpuFrameTimer.Telemetry().status == horde::vulkan::GpuFrameTimerStatus::Uninitialised)
     {
         ctx.gpuFrameTimer.Initialise(
@@ -4833,6 +4934,38 @@ bool ApplyPendingSceneReplacement(VulkanSurfaceContext& context,
     return true;
 }
 
+void QueuePresentedEntryPlay(VulkanSurfaceContext& context, const bool presented)
+{
+    if (!context.entryPlayQueued || !context.entryMenu.ReadyToPlay() || !presented)
+        return;
+    context.entryPlayQueued = false;
+    context.entryPlayHandoffPending = true;
+    context.entryMenuVisible = false;
+    context.entryMoreVisible = false;
+    context.sceneProfile = horde::vulkan::raytracing::RtSceneProfile::Showcase;
+    context.sceneProfileDirty = true;
+    // Keep gameplay paused while the presented black frame covers loading.
+}
+
+void FinishPendingEntryPlay(VulkanSurfaceContext& context)
+{
+    if (!context.entryPlayHandoffPending)
+        return;
+    context.entryPlayHandoffPending = false;
+    const bool loaded = context.rtScene.IsReady() &&
+        context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::Showcase;
+    if (!loaded)
+    {
+        context.entryMenuVisible = true;
+        context.entryMenu.Reset();
+    }
+    for (const int id :
+         {kPauseTitleId, kResumeButtonId, kSettingsButtonId, kEntryMoreButtonId})
+        EnableWindow(GetDlgItem(context.windowHandle, id), TRUE);
+    ApplyDpiScaledFonts(context.windowHandle);
+    ShowPauseMenu(context, !loaded);
+}
+
 bool ApplyPendingOutputResize(VulkanSurfaceContext& context,
                               horde::vulkan::DeviceCapabilities& capabilities,
                               std::vector<double>& timingSamples)
@@ -5054,11 +5187,14 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     if (useRtFrame)
     {
         if (!ctx.graphicsPreviewCapture && !ctx.outputResizeValidation && !ctx.nativeMotionValidation)
-        { SpatialAudioEngine().Update(); PollDesktopController(ctx); }
+            SpatialAudioEngine().Update();
         const bool frozenDevelopmentCheckpoint =
             ctx.simulationPaused && ctx.frameDeltaSeconds == 0.0f &&
             !ctx.developmentCheckpoint.empty();
-        const bool previewFrame = ctx.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview;
+        const bool entryFrame =
+            ctx.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::EntryMenu;
+        const bool previewFrame =
+            ctx.rtScene.Profile() != horde::vulkan::raytracing::RtSceneProfile::Showcase;
         if (!frozenDevelopmentCheckpoint && !previewFrame && !ctx.outputResizeValidation)
         {
             UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
@@ -5083,7 +5219,15 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             horde::vulkan::raytracing::BuildRtSceneFrameInputs(
                 simulation, ctx.outputExposure, ctx.waterQuality, ctx.rtSceneTuning,
                 horde::vulkan::raytracing::ResolveFireEmitterQuality(ctx.fireDetail));
-        if (previewFrame)
+        if (entryFrame)
+        {
+            ctx.entryMenu.Advance(ctx.graphicsPreviewDelta);
+            frameInputs = horde::vulkan::raytracing::BuildEntryMenuFrameInputs(
+                ctx.entryMenu, ctx.outputExposure,
+                horde::vulkan::raytracing::ResolveFireEmitterQuality(ctx.fireDetail),
+                ctx.shadowQuality);
+        }
+        else if (previewFrame)
         {
             ctx.graphicsPreview.Advance(ctx.graphicsPreviewDelta);
             frameInputs = horde::vulkan::raytracing::BuildGraphicsPreviewFrameInputs(
@@ -6035,6 +6179,298 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     std::cout << "Captured all " << captures.size() << " showcase checkpoints to " << outputDirectory << '\n';
     return 0;
 }
+bool CaptureEntryNativeControls(
+    HWND window, const std::filesystem::path &path, std::string &error,
+    const horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture *rtBackground = nullptr)
+{
+    RECT client{};
+    if (!GetClientRect(window, &client) || client.right <= 0 || client.bottom <= 0)
+        return false;
+    HDC source = GetDC(window);
+    if (!source)
+        return false;
+    HDC target = CreateCompatibleDC(source);
+    BITMAPINFO info{};
+    info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    info.bmiHeader.biWidth = client.right;
+    info.bmiHeader.biHeight = -client.bottom;
+    info.bmiHeader.biPlanes = 1;
+    info.bmiHeader.biBitCount = 32;
+    info.bmiHeader.biCompression = BI_RGB;
+    void *pixels = nullptr;
+    HBITMAP bitmap = CreateDIBSection(source, &info, DIB_RGB_COLORS, &pixels, nullptr, 0);
+    if (!target || !bitmap || !pixels)
+    {
+        if (bitmap)
+            DeleteObject(bitmap);
+        if (target)
+            DeleteDC(target);
+        ReleaseDC(window, source);
+        return false;
+    }
+    const HGDIOBJ previous = SelectObject(target, bitmap);
+    UpdateWindow(window);
+    GdiFlush();
+    const bool copied =
+        BitBlt(target, 0, 0, client.right, client.bottom, source, 0, 0, SRCCOPY) != FALSE;
+    horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture capture;
+    capture.width = static_cast<std::uint32_t>(client.right);
+    capture.height = static_cast<std::uint32_t>(client.bottom);
+    if (copied)
+    {
+        const auto bytes = static_cast<const std::uint8_t *>(pixels);
+        capture.rgba.assign(bytes,
+                            bytes + static_cast<std::size_t>(capture.width) * capture.height * 4);
+        for (std::size_t index = 0; index < capture.rgba.size(); index += 4)
+        {
+            std::swap(capture.rgba[index], capture.rgba[index + 2]);
+            capture.rgba[index + 3] = 255;
+        }
+    }
+    SelectObject(target, previous);
+    DeleteObject(bitmap);
+    DeleteDC(target);
+    ReleaseDC(window, source);
+    if (copied && rtBackground != nullptr)
+    {
+        if (rtBackground->width != capture.width || rtBackground->height != capture.height)
+        {
+            error = "Native-control review composition requires native-resolution RT readback.";
+            return false;
+        }
+        // GDI readback omits the Vulkan surface. Preserve the actual presented
+        // RT pixels and copy only actual visible native child rectangles. This
+        // review composition is explicitly identified in the receipt; it does
+        // not certify physical display timing or replace the real controls.
+        struct ChildRectangles { HWND parent; std::vector<RECT> rectangles; } children{window, {}};
+        EnumChildWindows(window, [](HWND child, LPARAM parameter) -> BOOL
+        {
+            auto &list = *reinterpret_cast<ChildRectangles *>(parameter);
+            if (IsWindowVisible(child))
+            {
+                RECT rectangle{};
+                if (GetWindowRect(child, &rectangle))
+                {
+                    MapWindowPoints(HWND_DESKTOP, list.parent, reinterpret_cast<POINT *>(&rectangle), 2);
+                    list.rectangles.push_back(rectangle);
+                }
+            }
+            return TRUE;
+        }, reinterpret_cast<LPARAM>(&children));
+        auto composed = *rtBackground;
+        for (const auto &rectangle : children.rectangles)
+            for (int y = std::max(0L, rectangle.top);
+                 y < std::min(static_cast<LONG>(capture.height), rectangle.bottom); ++y)
+                for (int x = std::max(0L, rectangle.left);
+                     x < std::min(static_cast<LONG>(capture.width), rectangle.right); ++x)
+                {
+                    const auto offset = (static_cast<std::size_t>(y) * capture.width + x) * 4;
+                    std::copy_n(capture.rgba.data() + offset, 4, composed.rgba.data() + offset);
+                }
+        capture = std::move(composed);
+    }
+    return copied && WriteRgbaPng(path, capture, error);
+}
+
+int RunEntryMenuCapture(VulkanSurfaceContext &context,
+                        horde::vulkan::DeviceCapabilities &capabilities,
+                        const std::filesystem::path &directory)
+{
+    std::filesystem::create_directories(directory);
+    std::ostringstream receipt;
+    std::string error, executableHash;
+    std::array<wchar_t, 32768> executable{};
+    GetModuleFileNameW(nullptr, executable.data(), static_cast<DWORD>(executable.size()));
+    if (!Sha256File(std::filesystem::path(executable.data()), executableHash, error))
+        return 1;
+    receipt << "{\n\"buildId\":\"" << JsonEscape(HORDE_RT_BUILD_ID) << "\",\"executableSha256\":\""
+            << executableHash
+            << "\",\"scene\":\"EntryMenu\",\"physicalDisplayTimingMeasured\":false,"
+            << "\"reviewComposition\":\"Presented RT readback plus actual visible native child rectangles\","
+            << "\"renderScalePercent\":" << CurrentGraphicsSettings(context).renderScalePercent
+            << ",\"glassEnabled\":" << (context.requestedGlassEnabled ? "true" : "false")
+            << ",\"mistEnabled\":" << (context.requestedMistEnabled ? "true" : "false")
+            << ",\"captures\":[";
+    const auto fail = [&](const int code, const char *reason)
+    {
+        std::cerr << "Entry capture failed: " << reason << ' ' << error << '\n';
+        WriteReportFile(directory / "entry-menu-capture.json", receipt.str() +
+            "],\"complete\":false,\"failure\":\"" + JsonEscape(reason) + "\"}\n");
+        return code;
+    };
+    const VkClearColorValue clear{{0, 0, 0, 1}};
+    context.pauseMenuVisible = true;
+    ApplyOverlayState(context);
+    RECT client{};
+    GetClientRect(context.windowHandle, &client);
+    LayoutOverlayControls(context.windowHandle, client.right, client.bottom);
+    const auto savedBeforePreview = context.savedGraphics;
+    RECT originalWindow{};
+    GetWindowRect(context.windowHandle, &originalWindow);
+    // Exercise the real native no-Use Back path. The return destination must
+    // be captured on opening Graphics, before its preview replaces Entry.
+    SendMessageA(context.windowHandle, WM_COMMAND,
+                 MAKEWPARAM(kSettingsButtonId, BN_CLICKED), 0);
+    SendMessageA(context.windowHandle, WM_COMMAND,
+                 MAKEWPARAM(kGraphicsOpenButtonId, BN_CLICKED), 0);
+    std::vector<double> previewTimings;
+    if (!ApplyPendingSceneReplacement(context, capabilities, previewTimings) ||
+        !ApplyPendingOutputResize(context, capabilities, previewTimings) ||
+        context.rtScene.Profile() != horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview)
+        return fail(18, "Native Graphics did not enter its separate preview");
+    SendMessageA(context.windowHandle, WM_COMMAND,
+                 MAKEWPARAM(kSettingsBackButtonId, BN_CLICKED), 0);
+    for (unsigned frame = 0; frame < 12 && context.graphicsVisible; ++frame)
+    {
+        if (!ApplyPendingSceneReplacement(context, capabilities, previewTimings) ||
+            !ApplyPendingOutputResize(context, capabilities, previewTimings))
+            return fail(19, "Native Graphics Back replacement failed");
+        context.graphicsPreviewDelta = 1.0 / 30;
+        bool presented = false;
+        if (!RenderFrame(context, clear, presented))
+            return fail(20, "Native Graphics Back lacks a presented RT frame");
+        if (!presented)
+            continue; // Surface recreation is a retry, never an acknowledgement.
+        const auto idle = vkDeviceWaitIdle(context.device);
+        if (idle != VK_SUCCESS || !CompleteRtEvidenceAfterDeviceIdle(context, idle))
+            return fail(21, "Native Graphics Back frame did not complete");
+        FinishGraphicsFrame(context, presented);
+    }
+    if (context.graphicsVisible || context.graphicsCommand || context.graphicsSceneRestoring ||
+        context.rtScene.Profile() != horde::vulkan::raytracing::RtSceneProfile::EntryMenu ||
+        context.savedGraphics != savedBeforePreview || !context.simulationPaused)
+        return fail(22, "Native Graphics Back did not restore Entry and saved graphics");
+    SetWindowPos(context.windowHandle, nullptr, originalWindow.left, originalWindow.top,
+                 originalWindow.right - originalWindow.left,
+                 originalWindow.bottom - originalWindow.top, SWP_NOZORDER | SWP_NOACTIVATE);
+    if (!ApplyPendingOutputResize(context, capabilities, previewTimings))
+        return fail(23, "Original Entry orientation did not recover after Graphics");
+    SendMessageA(context.windowHandle, WM_COMMAND,
+                 MAKEWPARAM(kSettingsBackButtonId, BN_CLICKED), 0);
+    for (unsigned pose = 0; pose < 6; ++pose)
+    {
+        if (pose == 1)
+            SendMessageA(context.windowHandle, WM_COMMAND,
+                         MAKEWPARAM(kSettingsButtonId, BN_CLICKED), 0);
+        if (pose == 2)
+            SendMessageA(context.windowHandle, WM_COMMAND,
+                         MAKEWPARAM(kSettingsBackButtonId, BN_CLICKED), 0);
+        if (pose == 3)
+            SendMessageA(context.windowHandle, WM_COMMAND,
+                         MAKEWPARAM(kEntryMoreButtonId, BN_CLICKED), 0);
+        if (pose == 4)
+            SendMessageA(context.windowHandle, WM_COMMAND,
+                         MAKEWPARAM(kEntryBackButtonId, BN_CLICKED), 0);
+        if (pose == 5)
+            SendMessageA(context.windowHandle, WM_COMMAND, MAKEWPARAM(kResumeButtonId, BN_CLICKED),
+                         0);
+        const auto start = std::chrono::steady_clock::now();
+        unsigned renderCalls = 0, presentedFrames = 0;
+        while (presentedFrames < 30 && renderCalls < 60)
+        {
+            ++renderCalls;
+            context.graphicsPreviewDelta = 1.0 / 30;
+            bool presented = false;
+            if (!RenderFrame(context, clear, presented))
+                return fail(2, "No presented RT frame");
+            if (!presented)
+                continue;
+            ++presentedFrames;
+            capabilities.rtScene.presented = true;
+            capabilities.performance.gpuRt = context.gpuRtTiming;
+        }
+        if (presentedFrames != 30)
+            return fail(24, "Entry surface did not recover to thirty presented frames");
+        const auto elapsed =
+            std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start)
+                .count();
+        const VkResult idle = vkDeviceWaitIdle(context.device);
+        if (idle != VK_SUCCESS || !CompleteRtEvidenceAfterDeviceIdle(context, idle))
+            return fail(3, "Presented submission did not complete");
+        const auto publication = context.rtFrameEvidence.PublishedStateByValue();
+        const auto &completed = publication.completedEvidence;
+        const auto &identity = completed.identity.submitted;
+        std::string completedJson;
+        horde::telemetry::RtEvidenceValidationError evidenceError{};
+        if (!publication.presented || !publication.hasCompletedEvidence ||
+            identity.frame.sceneEpoch != publication.sceneEpoch ||
+            identity.frame.simulationTick != context.entryMenu.Snapshot().tick ||
+            completed.presentation.outcome != horde::telemetry::RtPresentationOutcome::Presented ||
+            identity.submissionSerial != completed.presentation.lastSuccessfulPresentSubmissionSerial ||
+            !completed.scene.fireLighting.has_value() ||
+            !horde::telemetry::SerializeRtPerformanceEvidenceJson(completed, completedJson, evidenceError))
+            return fail(11, "Current completed Entry RT identity is invalid");
+        horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
+        if (!context.rtScene.CaptureStorageImage(image, error))
+            return fail(4, "RT readback failed");
+        const std::string filename = std::to_string(pose) + "-entry-menu.png";
+        std::string hash;
+        if (!WriteRgbaPng(directory / filename, image, error) ||
+            !Sha256File(directory / filename, hash, error))
+            return fail(5, "RT image or hash failed");
+        const std::string nativeFilename = std::to_string(pose) + "-entry-native-controls.png";
+        std::string nativeHash;
+        if (!CaptureEntryNativeControls(context.windowHandle, directory / nativeFilename, error) ||
+            !Sha256File(directory / nativeFilename, nativeHash, error))
+            return fail(10, "Native control readback failed");
+        const std::string reviewFilename = std::to_string(pose) + "-entry-review-composition.png";
+        std::string reviewHash;
+        if (!CaptureEntryNativeControls(context.windowHandle, directory / reviewFilename, error, &image) ||
+            !Sha256File(directory / reviewFilename, reviewHash, error))
+            return fail(12, "Explicit review composition failed");
+        const auto resources = context.rtScene.ResourceInventory();
+        if (resources.tlasInstanceCount != 3 || resources.topLevelAccelerationStructureCount != 1 ||
+            resources.bottomLevelAccelerationStructureCount != 3)
+            return fail(6, "Entry resource admission differs from three instances");
+        const auto snapshot = context.entryMenu.Snapshot();
+        if ((pose == 1 || pose == 3) && snapshot.camera.x >= -.59f)
+            return fail(7, "Native side page did not pan left");
+        if (pose == 5 && (!context.entryMenu.ReadyToPlay() || snapshot.fade != 1))
+            return fail(8, "Native Play did not complete black fade");
+        if (pose)
+            receipt << ',';
+        receipt << "{\"file\":\"" << filename << "\",\"sha256\":\"" << hash
+                << "\",\"tick\":" << snapshot.tick << ",\"nativeControlsFile\":\"" << nativeFilename
+                << "\",\"nativeControlsSha256\":\"" << nativeHash
+                << "\",\"reviewCompositionFile\":\"" << reviewFilename
+                << "\",\"reviewCompositionSha256\":\"" << reviewHash
+                << "\",\"cameraX\":" << snapshot.camera.x << ",\"fade\":" << snapshot.fade
+                << ",\"renderCalls\":" << renderCalls << ",\"presentedFrames\":" << presentedFrames
+                << ",\"renderCallsTotalMs\":" << elapsed
+                << ",\"tlasInstances\":" << resources.tlasInstanceCount
+                << ",\"blas\":" << resources.bottomLevelAccelerationStructureCount
+                << ",\"buffers\":" << resources.bufferCount
+                << ",\"allocations\":" << resources.memoryAllocationCount
+                << ",\"deviceLocalBytes\":" << resources.deviceLocalBytes
+                << ",\"hostVisibleBytes\":" << resources.hostVisibleBytes
+                << ",\"completedRtEvidence\":" << completedJson << '}';
+    }
+    QueuePresentedEntryPlay(context, true);
+    if (!context.entryPlayHandoffPending || !context.simulationPaused)
+        return fail(13, "Gameplay advanced before Entry replacement");
+    std::vector<double> timings;
+    if (!ApplyPendingSceneReplacement(context, capabilities, timings))
+        return fail(14, "Play scene replacement failed");
+    FinishPendingEntryPlay(context);
+    bool gameplayPresented = false;
+    if (context.entryMenuVisible || context.simulationPaused ||
+        context.rtScene.Profile() != horde::vulkan::raytracing::RtSceneProfile::Showcase ||
+        !RenderFrame(context, clear, gameplayPresented) || !gameplayPresented)
+        return fail(15, "Play did not return to functioning Showcase");
+    const VkResult handoffIdle = vkDeviceWaitIdle(context.device);
+    if (handoffIdle != VK_SUCCESS || !CompleteRtEvidenceAfterDeviceIdle(context, handoffIdle))
+        return fail(16, "Gameplay handoff frame did not complete");
+    const auto handoff = context.rtFrameEvidence.PublishedStateByValue();
+    if (!handoff.presented || !handoff.hasCompletedEvidence)
+        return fail(17, "Gameplay handoff lacks completed presentation");
+    capabilities.rtScene.presented = true;
+    capabilities.performance.gpuRt = context.gpuRtTiming;
+    receipt << "],\"graphicsNoUseBackReturnedToEntry\":true,\"savedGraphicsPreserved\":true,"
+            << "\"playHandoffPresented\":true,\"playHandoffSceneEpoch\":"
+            << handoff.sceneEpoch << ",\"complete\":true}\n";
+    return WriteReportFile(directory / "entry-menu-capture.json", receipt.str()) ? 0 : 9;
+}
+
 #include "platform/windows/WindowsGraphicsPreviewCapture.inl"
 #include "platform/windows/WindowsOutputResizeValidation.inl"
 #include "platform/windows/WindowsMotionEvidenceValidation.inl"
@@ -6059,6 +6495,22 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     horde::vulkan::RetirementOwner<VulkanSurfaceContext> renderOwner(
         std::make_unique<VulkanSurfaceContext>(), DestroyRenderContext, DetachRenderContextHost);
     auto& context = *renderOwner.Get();
+    int entryArgumentCount = 0;
+    LPWSTR *entryArguments = CommandLineToArgvW(GetCommandLineW(), &entryArgumentCount);
+    if (entryArguments)
+    {
+        for (int argument = 1; argument < entryArgumentCount; ++argument)
+            if (std::wstring_view(entryArguments[argument]) == L"--entry-menu-slice")
+                context.entryMenuVisible = !unattendedBenchmark;
+        LocalFree(entryArguments);
+    }
+    if (context.entryMenuVisible)
+    {
+        context.sceneProfile = horde::vulkan::raytracing::RtSceneProfile::EntryMenu;
+        BOOL animations = TRUE;
+        if (SystemParametersInfoA(SPI_GETCLIENTAREAANIMATION, 0, &animations, 0))
+            context.entryMenu.SetReducedMotion(!animations);
+    }
     context.graphicsPreviewCapture = graphicsPreviewCapture;
     context.outputResizeValidation = outputResizeValidation;
     context.nativeMotionValidation = !nativeMotionScenario.empty();
@@ -6203,6 +6655,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     if (context.controlsEnabled)
     {
         SetWindowLongPtrA(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&context));
+        if (context.entryMenuVisible)
+            ApplyDpiScaledFonts(hWnd);
         if (captureDirectory == nullptr)
         {
             // Normal gameplay and benchmark runs include music. Frozen image
@@ -6217,6 +6671,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                 LogWindowsAudio(std::string("Music could not initialize; RT/SFX unchanged: ") + error.what());
             }
             ApplyOverlayState(context);
+            {
+                RECT entryClient{};
+                GetClientRect(hWnd, &entryClient);
+                LayoutOverlayControls(hWnd, entryClient.right, entryClient.bottom);
+            }
             if (!unattendedBenchmark)
                 horde::platform::windows::BeginGitHubReleaseUpdateCheck(
                     hWnd, HORDE_RT_DISPLAY_VERSION, false);
@@ -6231,13 +6690,15 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     if (captureDirectory != nullptr)
     {
-        int captureResult = context.nativeMotionValidation
-            ? RunNativeMotionEvidence(context, capabilities, *captureDirectory)
+        int captureResult =
+            context.entryMenuVisible ? RunEntryMenuCapture(context, capabilities, *captureDirectory)
+            : context.nativeMotionValidation
+                ? RunNativeMotionEvidence(context, capabilities, *captureDirectory)
             : outputResizeValidation
-            ? RunOutputResizeValidation(context, capabilities, *captureDirectory)
+                ? RunOutputResizeValidation(context, capabilities, *captureDirectory)
             : graphicsPreviewCapture
-            ? RunGraphicsPreviewCapture(context, capabilities, *captureDirectory)
-            : RunShowcaseCapture(context, capabilities, *captureDirectory);
+                ? RunGraphicsPreviewCapture(context, capabilities, *captureDirectory)
+                : RunShowcaseCapture(context, capabilities, *captureDirectory);
         if (captureResult == 0 && capabilities.rtScene.presented)
         {
             capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();
@@ -6287,6 +6748,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     MSG message{};
     bool running = true;
     bool renderFailed = false;
+    horde::graphics::ForegroundPauseRenderCadence foregroundPauseCadence;
     std::vector<double> timingSamples;
     timingSamples.reserve(120u);
     std::uint64_t timingWindowIndex = 0u;
@@ -6324,29 +6786,95 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             context.renderScaleDirty || context.graphicsCommand.has_value();
         if (!ApplyPendingSceneReplacement(context, capabilities, timingSamples))
         { renderFailed = true; break; }
-        if (context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview)
+        FinishPendingEntryPlay(context);
+        const auto loopProfile = context.rtScene.Profile();
+        const bool isLiveAnimatedProfile = loopProfile != horde::vulkan::raytracing::RtSceneProfile::Showcase;
+        if (isLiveAnimatedProfile && (IsIconic(hWnd) || GetForegroundWindow() != hWnd))
         {
-            if (IsIconic(hWnd) || GetForegroundWindow() != hWnd)
-            {
-                context.graphicsPreviewLastFrame = {}; context.graphicsPreviewLastSample = {};
-                context.graphicsConfirmationTick = GetTickCount64();
-                std::this_thread::sleep_for(std::chrono::milliseconds(20));
-                continue; // Background preview performs no rendering and advances no animation.
-            }
-            const auto interval = std::chrono::duration<double>(1.0 / context.graphicsPreviewFrameCap);
-            if (context.graphicsPreviewLastFrame.time_since_epoch().count() != 0)
-            {
-                const auto due = context.graphicsPreviewLastFrame + std::chrono::duration_cast<std::chrono::steady_clock::duration>(interval);
-                if (std::chrono::steady_clock::now() < due) std::this_thread::sleep_until(due);
-            }
-            const auto previewNow = std::chrono::steady_clock::now();
-            context.graphicsPreviewDelta = context.graphicsPreviewLastFrame.time_since_epoch().count() == 0 ? 0.0 :
-                std::chrono::duration<double>(previewNow - context.graphicsPreviewLastFrame).count();
-            context.graphicsPreviewLastFrame = previewNow;
+            context.graphicsPreviewLastFrame = {}; context.graphicsPreviewLastSample = {};
+            context.graphicsConfirmationTick = GetTickCount64();
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            continue; // Background Entry/Preview preserves the existing no-render behavior.
         }
 
         if (!ApplyPendingOutputResize(context, capabilities, timingSamples))
         { renderFailed = true; break; }
+
+        if (!context.graphicsPreviewCapture && !context.outputResizeValidation && !context.nativeMotionValidation)
+            PollDesktopController(context);
+
+        const auto profile = context.rtScene.Profile();
+        const auto foregroundNow = std::chrono::steady_clock::now();
+        if (profile != horde::vulkan::raytracing::RtSceneProfile::Showcase &&
+            context.graphicsPreviewLastFrame.time_since_epoch().count() != 0 &&
+            !graphicsTransition && !context.entryPlayQueued && !context.entryPlayHandoffPending &&
+            !context.rtLabVisible && !context.graphicsPreviewCapture && !context.outputResizeValidation &&
+            !context.nativeMotionValidation && !context.benchmark.IsRunning() &&
+            !context.expectedBenchmarkFrame.has_value() && GetPropA(hWnd, kCaptureModeProperty) == nullptr)
+        {
+            const auto liveScene = profile == horde::vulkan::raytracing::RtSceneProfile::EntryMenu
+                ? horde::graphics::ForegroundPauseScene::EntryMenu
+                : horde::graphics::ForegroundPauseScene::GraphicsPreview;
+            const int liveProfileCapHz = horde::graphics::ForegroundPauseRenderCadence::ResolveLiveProfileCapHz(
+                liveScene, context.graphicsPreviewFrameCap);
+            const auto interval = std::chrono::duration<double>(1.0 / liveProfileCapHz);
+            const auto due = context.graphicsPreviewLastFrame +
+                std::chrono::duration_cast<std::chrono::steady_clock::duration>(interval);
+            if (foregroundNow < due)
+            {
+                const auto remaining = std::chrono::ceil<std::chrono::milliseconds>(due - foregroundNow);
+                const DWORD waitMilliseconds = static_cast<DWORD>(std::clamp<std::int64_t>(remaining.count(), 1,
+                    horde::graphics::ForegroundPauseRenderCadence::kMaximumPollInterval.count()));
+                (void)MsgWaitForMultipleObjectsEx(0u, nullptr, waitMilliseconds, QS_ALLINPUT, MWMO_INPUTAVAILABLE);
+                continue;
+            }
+        }
+        if (profile != horde::vulkan::raytracing::RtSceneProfile::Showcase)
+        {
+            context.graphicsPreviewDelta = context.graphicsPreviewLastFrame.time_since_epoch().count() == 0 ? 0.0 :
+                std::chrono::duration<double>(foregroundNow - context.graphicsPreviewLastFrame).count();
+            context.graphicsPreviewLastFrame = foregroundNow;
+        }
+        horde::graphics::ForegroundPauseRenderInput pauseCadenceInput{};
+        pauseCadenceInput.foreground = !IsIconic(hWnd) && GetForegroundWindow() == hWnd;
+        pauseCadenceInput.paused = context.simulationPaused;
+        pauseCadenceInput.scene = profile == horde::vulkan::raytracing::RtSceneProfile::EntryMenu
+            ? horde::graphics::ForegroundPauseScene::EntryMenu
+            : profile == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview
+                ? horde::graphics::ForegroundPauseScene::GraphicsPreview
+                : horde::graphics::ForegroundPauseScene::Showcase;
+        pauseCadenceInput.currentRtOutputValid = context.useRtPath && context.rtScene.IsReady() &&
+            capabilities.rtScene.presented;
+        pauseCadenceInput.wakeRequested = graphicsTransition || context.sceneProfileDirty ||
+            context.glassGeometryDirty || context.renderScaleDirty || context.graphicsCommand.has_value() ||
+            context.entryPlayQueued || context.entryPlayHandoffPending || context.rtLabVisible ||
+            context.graphicsPreviewCapture || context.outputResizeValidation || context.nativeMotionValidation ||
+            context.benchmark.IsRunning() || context.expectedBenchmarkFrame.has_value() ||
+            GetPropA(hWnd, kCaptureModeProperty) != nullptr;
+        const bool wasPausedFallback = foregroundPauseCadence.UsingPausedFallback();
+        const auto cadenceDecision = foregroundPauseCadence.Evaluate(foregroundNow, pauseCadenceInput);
+        horde::graphics::ForegroundPauseRenderAggregate cadenceAggregate{};
+        if (foregroundPauseCadence.TakeAggregate(foregroundNow, cadenceAggregate))
+        {
+            std::ostringstream line;
+            line << "HORDE_PAUSE_RENDER_CADENCE wall_ns=" << cadenceAggregate.wallNanoseconds
+                 << " render_attempts=" << cadenceAggregate.renderAttempts
+                 << " skipped_iterations=" << cadenceAggregate.skippedIterations
+                 << " entered=" << cadenceAggregate.enteredFallback
+                 << " exited=" << cadenceAggregate.exitedFallback << "\n";
+            OutputDebugStringA(line.str().c_str());
+        }
+        if (wasPausedFallback && !cadenceDecision.usingPausedFallback)
+            context.lastControlSteadyNs = horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
+        if (!cadenceDecision.renderNow)
+        {
+            context.lastControlSteadyNs = horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
+            const DWORD waitMilliseconds = static_cast<DWORD>(std::clamp<std::int64_t>(
+                cadenceDecision.wait.count(), 1,
+                horde::graphics::ForegroundPauseRenderCadence::kMaximumPollInterval.count()));
+            (void)MsgWaitForMultipleObjectsEx(0u, nullptr, waitMilliseconds, QS_ALLINPUT, MWMO_INPUTAVAILABLE);
+            continue;
+        }
 
         const bool benchmarkFrame = context.benchmark.IsRunning();
         const auto frameStart = std::chrono::steady_clock::now();
@@ -6354,6 +6882,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.expectedBenchmarkFrame.reset();
         const bool frameRendered = RenderFrame(context, clearColor, rtFramePresented);
         FinishGraphicsFrame(context, frameRendered && rtFramePresented);
+        QueuePresentedEntryPlay(context, rtFramePresented);
         if (context.expectedBenchmarkFrame &&
             context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
         {
@@ -6382,6 +6911,22 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         UpdateRtLabTelemetry(context);
         const auto frameEnd = std::chrono::steady_clock::now();
         const double frameTimeMs = std::chrono::duration<double, std::milli>(frameEnd - frameStart).count();
+        if (cadenceDecision.usingPausedFallback)
+        {
+            context.lastControlSteadyNs = horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
+            foregroundPauseCadence.RecordRenderAttempt(frameEnd);
+            horde::graphics::ForegroundPauseRenderAggregate aggregate{};
+            if (foregroundPauseCadence.TakeAggregate(frameEnd, aggregate))
+            {
+                std::ostringstream line;
+                line << "HORDE_PAUSE_RENDER_CADENCE wall_ns=" << aggregate.wallNanoseconds
+                     << " render_attempts=" << aggregate.renderAttempts
+                     << " skipped_iterations=" << aggregate.skippedIterations
+                     << " entered=" << aggregate.enteredFallback
+                     << " exited=" << aggregate.exitedFallback << "\n";
+                OutputDebugStringA(line.str().c_str());
+            }
+        }
         if (context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview)
         {
             const double loopSeconds = std::chrono::duration<double>(frameEnd -
@@ -6576,6 +7121,9 @@ void ApplyDpiScaledFonts(HWND window)
     }
 #endif
 
+    const auto *fontContext = reinterpret_cast<const VulkanSurfaceContext *>(
+        GetWindowLongPtrA(window, GWLP_USERDATA));
+    const bool entryStyle = fontContext != nullptr && fontContext->entryMenuVisible;
     HFONT uiFont = CreateFontA(
         ScaleForDpi(window, 18), 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, FALSE,
         ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
@@ -6595,32 +7143,86 @@ void ApplyDpiScaledFonts(HWND window)
         SendMessageA(developerOverlay, WM_SETFONT, reinterpret_cast<WPARAM>(developerFont), TRUE);
     }
 #endif
-    for (const int id : {kHudControlId, kVitalityHudControlId, kChestPromptControlId, kPauseTitleId, kEndingBodyId, kResumeButtonId, kRestartButtonId,
-                         kControlsButtonId, kSettingsButtonId, kReportProblemButtonId, kDiagnosticsButtonId, kRunBenchmarkButtonId,
-                         kMoreBySamfa12ButtonId, kExitButtonId, kBenchmarkTitleId,
-                         kBenchmarkCopyButtonId, kBenchmarkSaveButtonId, kBenchmarkReviewStatsButtonId, kBenchmarkBackButtonId,
-                         kSettingsTitleId, kSfxVolumeLabelId, kSfxVolumeSliderId,
-                         kSensitivityButtonId, kWaterQualityButtonId, kRenderScaleLabelId,
-                         kRenderScaleSliderId, kMusicVolumeLabelId, kMusicVolumeSliderId,
-                         kFullscreenButtonId, kSettingsBackButtonId,
-                         kGraphicsOpenButtonId, kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsMistButtonId,
-                         kGraphicsApplyButtonId, kGraphicsConfirmButtonId, kGraphicsRevertButtonId,
-                         kGraphicsResetButtonId, kGraphicsInfoId,
-                         kGraphicsPreviewPauseId, kGraphicsPreviewCameraId, kGraphicsPreviewMotionId,
-                         kGraphicsPreviewResetId, kGraphicsPreviewTelemetryId,
-                         kRtLabTitleId, kRtLabTelemetryId, kRtLabWaterfallLabelId, kRtLabWaterfallSliderId,
-                         kRtLabRoofLabelId, kRtLabRoofSliderId, kRtLabDawnLabelId, kRtLabDawnSliderId,
-                         kRtLabFogLabelId, kRtLabFogSliderId, kRtLabLightGroupButtonId,
-                         kRtLabFireStrengthLabelId, kRtLabFireStrengthSliderId,
-                         kRtLabFireTurbulenceLabelId, kRtLabFireTurbulenceSliderId,
-                         kRtLabFireSmokeLabelId, kRtLabFireSmokeSliderId,
-                         kRtLabGlassVisibilityLabelId, kRtLabGlassVisibilitySliderId,
-                         kRtLabGlassTransmissionLabelId, kRtLabGlassTransmissionSliderId,
-                         kRtLabGlassIorLabelId, kRtLabGlassIorSliderId,
-                         kRtLabGlassRoughnessLabelId, kRtLabGlassRoughnessSliderId,
-                         kRtLabHueLabelId, kRtLabHueSliderId, kRtLabIntensityLabelId,
-                         kRtLabIntensitySliderId, kRtLabWorkloadButtonId,
-                         kRtLabRestoreButtonId, kRtLabBackButtonId})
+    for (const int id : {kHudControlId,
+                         kVitalityHudControlId,
+                         kChestPromptControlId,
+                         kPauseTitleId,
+                         kEndingBodyId,
+                         kResumeButtonId,
+                         kEntryMoreButtonId,
+                         kEntryBackButtonId,
+                         kRestartButtonId,
+                         kControlsButtonId,
+                         kSettingsButtonId,
+                         kReportProblemButtonId,
+                         kDiagnosticsButtonId,
+                         kRunBenchmarkButtonId,
+                         kMoreBySamfa12ButtonId,
+                         kExitButtonId,
+                         kBenchmarkTitleId,
+                         kBenchmarkCopyButtonId,
+                         kBenchmarkSaveButtonId,
+                         kBenchmarkReviewStatsButtonId,
+                         kBenchmarkBackButtonId,
+                         kSettingsTitleId,
+                         kSfxVolumeLabelId,
+                         kSfxVolumeSliderId,
+                         kSensitivityButtonId,
+                         kWaterQualityButtonId,
+                         kRenderScaleLabelId,
+                         kRenderScaleSliderId,
+                         kMusicVolumeLabelId,
+                         kMusicVolumeSliderId,
+                         kFullscreenButtonId,
+                         kSettingsBackButtonId,
+                         kGraphicsOpenButtonId,
+                         kGraphicsPresetButtonId,
+                         kGraphicsFireButtonId,
+                         kGraphicsShadowButtonId,
+                         kGraphicsGlassButtonId,
+                         kGraphicsMistButtonId,
+                         kGraphicsApplyButtonId,
+                         kGraphicsConfirmButtonId,
+                         kGraphicsRevertButtonId,
+                         kGraphicsResetButtonId,
+                         kGraphicsInfoId,
+                         kGraphicsPreviewPauseId,
+                         kGraphicsPreviewCameraId,
+                         kGraphicsPreviewMotionId,
+                         kGraphicsPreviewResetId,
+                         kGraphicsPreviewTelemetryId,
+                         kRtLabTitleId,
+                         kRtLabTelemetryId,
+                         kRtLabWaterfallLabelId,
+                         kRtLabWaterfallSliderId,
+                         kRtLabRoofLabelId,
+                         kRtLabRoofSliderId,
+                         kRtLabDawnLabelId,
+                         kRtLabDawnSliderId,
+                         kRtLabFogLabelId,
+                         kRtLabFogSliderId,
+                         kRtLabLightGroupButtonId,
+                         kRtLabFireStrengthLabelId,
+                         kRtLabFireStrengthSliderId,
+                         kRtLabFireTurbulenceLabelId,
+                         kRtLabFireTurbulenceSliderId,
+                         kRtLabFireSmokeLabelId,
+                         kRtLabFireSmokeSliderId,
+                         kRtLabGlassVisibilityLabelId,
+                         kRtLabGlassVisibilitySliderId,
+                         kRtLabGlassTransmissionLabelId,
+                         kRtLabGlassTransmissionSliderId,
+                         kRtLabGlassIorLabelId,
+                         kRtLabGlassIorSliderId,
+                         kRtLabGlassRoughnessLabelId,
+                         kRtLabGlassRoughnessSliderId,
+                         kRtLabHueLabelId,
+                         kRtLabHueSliderId,
+                         kRtLabIntensityLabelId,
+                         kRtLabIntensitySliderId,
+                         kRtLabWorkloadButtonId,
+                         kRtLabRestoreButtonId,
+                         kRtLabBackButtonId})
     {
         if (HWND control = GetDlgItem(window, id))
         {
@@ -6645,6 +7247,32 @@ void ApplyDpiScaledFonts(HWND window)
     {
         ReplaceFontProperty(window, kUiFontProperty, uiFont);
     }
+    if (entryStyle)
+    {
+        HFONT plaque = CreateFontA(ScaleForDpi(window, 24), 0, 0, 0, FW_BOLD,
+            FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+            CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_ROMAN, "Georgia");
+        if (plaque)
+        {
+            for (const int id : {kResumeButtonId, kSettingsButtonId, kEntryMoreButtonId,
+                 kControlsButtonId, kReportProblemButtonId, kDiagnosticsButtonId,
+                 kMoreBySamfa12ButtonId, kExitButtonId, kEntryBackButtonId,
+                 kSettingsBackButtonId, kSensitivityButtonId, kGraphicsOpenButtonId,
+                 kFullscreenButtonId})
+                SendMessageA(GetDlgItem(window, id), WM_SETFONT,
+                             reinterpret_cast<WPARAM>(plaque), TRUE);
+            ReplaceFontProperty(window, kEntryPlaqueFontProperty, plaque);
+        }
+        HFONT title = CreateFontA(ScaleForDpi(window, 36), 0, 0, 0, FW_BOLD,
+            FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+            CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_ROMAN, "Georgia");
+        if (title)
+        {
+            SendMessageA(GetDlgItem(window, kPauseTitleId), WM_SETFONT,
+                         reinterpret_cast<WPARAM>(title), TRUE);
+            ReplaceFontProperty(window, kEntryTitleFontProperty, title);
+        }
+    }
 #if defined(_DEBUG)
     if (developerFont != GetStockObject(ANSI_FIXED_FONT))
     {
@@ -6655,7 +7283,9 @@ void ApplyDpiScaledFonts(HWND window)
 
 void ReleaseDpiScaledFonts(HWND window)
 {
-    for (const char* propertyName : {kUiFontProperty, kMonoFontProperty, kDeveloperFontProperty, kGraphicsInfoFontProperty})
+    for (const char* propertyName : {kUiFontProperty, kMonoFontProperty, kDeveloperFontProperty,
+                                   kGraphicsInfoFontProperty, kEntryTitleFontProperty,
+                                   kEntryPlaqueFontProperty})
     {
         if (HFONT font = reinterpret_cast<HFONT>(RemovePropA(window, propertyName)))
         {
@@ -6780,7 +7410,33 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         }
         y += endingBodyHeight + gap;
     }
-    if (compactOverlayLayout)
+    if (layoutContext && layoutContext->entryMenuVisible && !layoutContext->entryMoreVisible)
+    {
+        const int plaqueWidth =
+            std::min(ScaleForDpi(window, 240), std::max(ScaleForDpi(window, 120), width / 3));
+        const int plaqueHeight = std::max(ScaleForDpi(window, 54), buttonHeight);
+        MoveWindow(GetDlgItem(window, kPauseTitleId), ScaleForDpi(window, 24),
+                   ScaleForDpi(window, 30), std::min(width - 48, ScaleForDpi(window, 340)),
+                   titleHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kResumeButtonId),
+                   width - plaqueWidth - ScaleForDpi(window, 26), height * 3 / 5, plaqueWidth,
+                   plaqueHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kSettingsButtonId), ScaleForDpi(window, 26), height * 3 / 5,
+                   plaqueWidth, plaqueHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kEntryMoreButtonId), ScaleForDpi(window, 26),
+                   height * 3 / 5 + plaqueHeight + gap, plaqueWidth, plaqueHeight, TRUE);
+    }
+    else if (layoutContext && layoutContext->entryMenuVisible && layoutContext->entryMoreVisible)
+    {
+        const int moreHeight = ScaleForDpi(window, 48);
+        for (const int id : {kControlsButtonId, kReportProblemButtonId, kDiagnosticsButtonId,
+                             kMoreBySamfa12ButtonId, kExitButtonId, kEntryBackButtonId})
+        {
+            MoveWindow(GetDlgItem(window, id), pauseX, y, buttonWidth, moreHeight, TRUE);
+            y += moreHeight + gap;
+        }
+    }
+    else if (compactOverlayLayout)
     {
         for (const int id : {kRtLabButtonId, kResumeButtonId, kRestartButtonId, kExitButtonId})
         {
@@ -6802,21 +7458,29 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
 
     const int labelHeight = ScaleForDpi(window, 26);
     const int sliderHeight = ScaleForDpi(window, 38);
-    const int settingsTotal = titleHeight + 4 * buttonHeight + 3 * labelHeight + 3 * sliderHeight + 7 * gap;
-    y = std::max(ScaleForDpi(window, 54), (height - settingsTotal) / 2);
+    const bool entrySettings = layoutContext && layoutContext->entryMenuVisible &&
+                               !layoutContext->graphicsVisible;
+    const int settingsButtonHeight = entrySettings ? ScaleForDpi(window, 48) : buttonHeight;
+    const int sliderRows = entrySettings ? 2 : 3;
+    const int settingsTotal = titleHeight + 4 * settingsButtonHeight +
+        sliderRows * labelHeight + sliderRows * sliderHeight + 7 * gap;
+    y = std::max(ScaleForDpi(window, entrySettings ? 12 : 54), (height - settingsTotal) / 2);
     if (HWND title = GetDlgItem(window, kSettingsTitleId)) MoveWindow(title, pauseX, y, buttonWidth, titleHeight, TRUE);
     y += titleAdvance;
     for (const int id : {kSensitivityButtonId, kWaterQualityButtonId})
     {
-        if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
-        y += buttonHeight + gap;
+        if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, settingsButtonHeight, TRUE);
+        y += settingsButtonHeight + gap;
     }
     if (HWND graphics = GetDlgItem(window, kGraphicsOpenButtonId))
-        MoveWindow(graphics, pauseX, y - buttonHeight - gap, buttonWidth, buttonHeight, TRUE);
-    if (HWND label = GetDlgItem(window, kRenderScaleLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
-    y += labelHeight;
-    if (HWND slider = GetDlgItem(window, kRenderScaleSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, sliderHeight, TRUE);
-    y += sliderHeight + gap;
+        MoveWindow(graphics, pauseX, y - settingsButtonHeight - gap, buttonWidth, settingsButtonHeight, TRUE);
+    if (!entrySettings)
+    {
+        if (HWND label = GetDlgItem(window, kRenderScaleLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
+        y += labelHeight;
+        if (HWND slider = GetDlgItem(window, kRenderScaleSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, sliderHeight, TRUE);
+        y += sliderHeight + gap;
+    }
     if (HWND label = GetDlgItem(window, kSfxVolumeLabelId)) MoveWindow(label, pauseX, y, buttonWidth, labelHeight, TRUE);
     y += labelHeight;
     if (HWND slider = GetDlgItem(window, kSfxVolumeSliderId)) MoveWindow(slider, pauseX, y, buttonWidth, sliderHeight, TRUE);
@@ -6827,8 +7491,8 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     y += sliderHeight + gap;
     for (const int id : {kFullscreenButtonId, kSettingsBackButtonId})
     {
-        if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, buttonHeight, TRUE);
-        y += buttonHeight + gap;
+        if (HWND control = GetDlgItem(window, id)) MoveWindow(control, pauseX, y, buttonWidth, settingsButtonHeight, TRUE);
+        y += settingsButtonHeight + gap;
     }
 
     if (layoutContext != nullptr && layoutContext->graphicsVisible)
@@ -7298,7 +7962,41 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             switch (commandId)
             {
+            case kEntryMoreButtonId:
+                sceneContext->entryMoreVisible = true;
+                sceneContext->entryMenu.ShowSidePage(true);
+                ApplyOverlayState(*sceneContext);
+                {
+                    RECT client{};
+                    GetClientRect(hWnd, &client);
+                    LayoutOverlayControls(hWnd, client.right, client.bottom);
+                }
+                SetFocus(GetDlgItem(hWnd, kControlsButtonId));
+                return 0;
+            case kEntryBackButtonId:
+                sceneContext->entryMoreVisible = false;
+                sceneContext->entryMenu.ShowSidePage(false);
+                ApplyOverlayState(*sceneContext);
+                {
+                    RECT client{};
+                    GetClientRect(hWnd, &client);
+                    LayoutOverlayControls(hWnd, client.right, client.bottom);
+                }
+                SetFocus(GetDlgItem(hWnd, kEntryMoreButtonId));
+                return 0;
             case kResumeButtonId:
+                if (sceneContext->entryMenuVisible)
+                {
+                    sceneContext->entryPlayQueued = true;
+                    sceneContext->entryMenu.Play();
+                    for (const int id :
+                         {kPauseTitleId, kResumeButtonId, kSettingsButtonId, kEntryMoreButtonId})
+                    {
+                        EnableWindow(GetDlgItem(hWnd, id), FALSE);
+                        ShowWindow(GetDlgItem(hWnd, id), SW_HIDE);
+                    }
+                    return 0;
+                }
                 if (sceneContext->deathOverlayVisible)
                 {
                     if (!ApplyPlayerRetryCheckpoint(*sceneContext, sceneContext->playerRetryCheckpoint))
@@ -7336,6 +8034,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 ShowControlsHelp(hWnd);
                 return 0;
             case kSettingsButtonId:
+                if (sceneContext->entryMenuVisible)
+                    sceneContext->entryMenu.ShowSidePage(true);
                 OpenSettings(*sceneContext);
                 return 0;
             case kReportProblemButtonId:
@@ -7401,6 +8101,9 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 PlaySoundEffect(*sceneContext, "ui_select.wav");
                 return 0;
             case kGraphicsOpenButtonId:
+                if (sceneContext->rtScene.Profile() !=
+                    horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview)
+                    sceneContext->graphicsReturnProfile = sceneContext->rtScene.Profile();
                 sceneContext->graphicsSceneRestoring = false;
                 SpatialAudioEngine().StopLoop("waterfall");
                 sceneContext->graphicsVisible = true;
@@ -7552,6 +8255,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                     return 0;
                 }
                 sceneContext->settingsVisible = false;
+                if (sceneContext->entryMenuVisible)
+                    sceneContext->entryMenu.ShowSidePage(false);
                 sceneContext->pauseMenuVisible = true;
                 ApplyOverlayState(*sceneContext);
                 PlaySoundEffect(*sceneContext, "ui_back.wav");
@@ -8046,6 +8751,44 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 GetSysColorBrush(pressed ? COLOR_HIGHLIGHT : COLOR_BTNFACE) : (pressed ? inset : slate));
             FrameRect(item->hDC, &item->rcItem, highContrast ? GetSysColorBrush(COLOR_BTNTEXT) :
                 (focused || pressed ? brass : iron));
+            if (sceneContext && sceneContext->entryMenuVisible && !highContrast)
+            {
+                // Raised native plaque: bevel, recessed inset and four small
+                // iron rivets retain real labels, hit targets and focus state.
+                const int height = std::max(1L, item->rcItem.bottom - item->rcItem.top);
+                for (int band = 0; band < 32; ++band)
+                {
+                    RECT grain = item->rcItem;
+                    grain.top += band * height / 32;
+                    grain.bottom = item->rcItem.top + (band + 1) * height / 32;
+                    const int texture = ((band * 17 + static_cast<int>(item->CtlID)) % 9) - 4;
+                    const int shade = (pressed ? 31 : 48) + texture - band / 4;
+                    SetDCBrushColor(item->hDC, RGB(shade + 9, shade + 3, shade - 7));
+                    FillRect(item->hDC, &grain, static_cast<HBRUSH>(GetStockObject(DC_BRUSH)));
+                }
+                RECT inner = item->rcItem;
+                InflateRect(&inner, -ScaleForDpi(hWnd, 4), -ScaleForDpi(hWnd, 4));
+                FrameRect(item->hDC, &inner, pressed ? iron : brass);
+                RECT edge = item->rcItem;
+                edge.bottom = edge.top + ScaleForDpi(hWnd, 2);
+                FillRect(item->hDC, &edge, pressed ? inset : iron);
+                edge = item->rcItem;
+                edge.top = edge.bottom - ScaleForDpi(hWnd, 3);
+                FillRect(item->hDC, &edge, inset);
+                const int rivet = ScaleForDpi(hWnd, 3), margin = ScaleForDpi(hWnd, 10);
+                for (int x : {item->rcItem.left + margin, item->rcItem.right - margin})
+                    for (int y : {item->rcItem.top + margin, item->rcItem.bottom - margin})
+                    {
+                        RECT bolt{x - rivet, y - rivet, x + rivet, y + rivet};
+                        const auto previousBrush = SelectObject(item->hDC, iron);
+                        const auto previousPen = SelectObject(item->hDC, GetStockObject(BLACK_PEN));
+                        Ellipse(item->hDC, bolt.left, bolt.top, bolt.right, bolt.bottom);
+                        MoveToEx(item->hDC, x - rivet + 1, y, nullptr);
+                        LineTo(item->hDC, x + rivet - 1, y);
+                        SelectObject(item->hDC, previousPen);
+                        SelectObject(item->hDC, previousBrush);
+                    }
+            }
             RECT label = item->rcItem;
             InflateRect(&label, -ScaleForDpi(hWnd, 6), -ScaleForDpi(hWnd, 3));
             if (pressed) OffsetRect(&label, 1, 1);
@@ -8381,6 +9124,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                  "The old guard bound the lich beneath this ruin and left one lantern to guide whoever came after.\r\n\r\n"
                  "Its flame died when the final seal opened. Now the staff is silent, the roof gives way, and stolen morning returns to the halls.",
                  SS_CENTER | SS_NOPREFIX);
+    createButton(kEntryMoreButtonId, "MORE");
+    createButton(kEntryBackButtonId, "BACK");
     createButton(kResumeButtonId, "ENTER THE RUIN / RESUME");
     createButton(kRestartButtonId, "RESTART ROUTE");
     createButton(kControlsButtonId, "CONTROLS");

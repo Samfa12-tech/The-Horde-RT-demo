@@ -4,6 +4,30 @@
 
 namespace horde::vulkan::raytracing
 {
+RtSceneFrameInputs BuildEntryMenuFrameInputs(const horde::graphics::EntryMenuSession &session,
+                                             const float outputExposure,
+                                             const FireEmitterQuality fireDetail,
+                                             const horde::graphics::ShadowQuality shadowQuality)
+{
+    const auto entry = session.Snapshot();
+    RtSceneFrameInputs frame{};
+    frame.tickIndex = entry.tick;
+    frame.cameraX = entry.camera.x;
+    frame.cameraZ = entry.camera.z;
+    frame.cameraYaw = entry.camera.yaw;
+    frame.cameraPitch = entry.camera.pitch;
+    frame.outputExposure = outputExposure * (1.0f - entry.fade);
+    frame.waterQuality = WaterQuality::Off;
+    frame.fireDetail = fireDetail;
+    frame.shadowQuality = shadowQuality;
+    frame.torchLightStrength = 0.0f;
+    frame.lich.staffLightStrength = 0.0f;
+    frame.rewardLanternWorldFromHinge = entry.hinge;
+    frame.lanternPendulum = entry.pendulum;
+    frame.fireEmitters[0] = entry.fire;
+    frame.fireEmitterCount = 1;
+    return frame;
+}
 
 RtSceneFrameInputs BuildGraphicsPreviewFrameInputs(
     const horde::graphics::GraphicsPreviewSession& session,

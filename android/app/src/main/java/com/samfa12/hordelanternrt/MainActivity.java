@@ -3,6 +3,7 @@ package com.samfa12.hordelanternrt;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.animation.ValueAnimator;
 import android.content.ClipData;
 import android.content.BroadcastReceiver;
 import android.content.ClipboardManager;
@@ -27,6 +28,7 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.provider.Settings;
 import android.text.method.LinkMovementMethod;
 import android.text.InputType;
 import android.text.util.Linkify;
@@ -54,6 +56,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.HorizontalScrollView;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -247,6 +250,16 @@ public class MainActivity extends Activity {
     private boolean surfaceStarted;
     private long surfaceRequestGeneration;
     private boolean menuVisible = true;
+    private boolean entryMenuEnabled;
+    private boolean entryMenuSidePage;
+    private boolean entryPlayRequested;
+    private boolean entryMenuFailed;
+    private LinearLayout entryMenuPanel;
+    private TextView entryMenuStatus;
+    private ProgressBar entryMenuProgress;
+    private Button entryPlayButton;
+    private Button entrySettingsButton;
+    private Button entryMoreButton;
     private boolean diagnosticsVisible;
     private boolean diagnosticsErrorState;
     private boolean autoDiagnosticsShown;
@@ -308,6 +321,11 @@ public class MainActivity extends Activity {
     private PreviewTimingGraphView graphicsGraph;
     private LinearLayout graphicsPanel;
     private long graphicsRequestSerial, graphicsPollTime, graphicsConfirmationStarted;
+    // UI elapsed-real-time measurements are separate from the native steady
+    // clock. Their timestamps must never be subtracted across that boundary.
+    private long graphicsLatencySerial, graphicsLatencyRequestNs, graphicsLatencyPollDueNs;
+    private long graphicsLatencyMaxPollLatenessNs;
+    private int graphicsLatencyPollCount;
     private TextView graphicsTelemetry;
     private Button graphicsApply, graphicsConfirm, graphicsRevert, graphicsBack;
     private boolean rtLabReturnToEnding;
@@ -370,6 +388,44 @@ public class MainActivity extends Activity {
                             String.format(Locale.US, "%.2f", gpuMs), samples, renderScale, waterName)
                     : getString(R.string.rt_lab_telemetry_warming, renderScale, waterName));
             handler.postDelayed(this, 250L);
+        }
+    };
+    private final Runnable refreshEntryMenu = new Runnable() {
+        @Override public void run() {
+            if (!entryMenuEnabled || !resumed || surfaceRequestGeneration == 0) return;
+            final EntryMenuState state;
+            try { state = EntryMenuState.decode(ProbeBridge.getEntryMenuState()); }
+            catch (RuntimeException | LinkageError unavailable) {
+                showEntryMenuFailure("The native entry scene is unavailable.");
+                handler.postDelayed(this, 500L);
+                return;
+            }
+            if (state == null || !state.isCurrent(surfaceRequestGeneration)) {
+                handler.postDelayed(this, 100L);
+                return;
+            }
+            if (entryPlayRequested && state.completedPlay(surfaceRequestGeneration)) {
+                entryPlayRequested = false;
+                entryMenuEnabled = false;
+                handler.removeCallbacks(this);
+                try { ProbeBridge.setEntryMenu(false, false, isReducedMotionEnabled(), false,
+                        surfaceRequestGeneration); }
+                catch (RuntimeException | LinkageError ignored) { /* The current Showcase frame already owns the transition. */ }
+                firstMenu = false;
+                hideMenu();
+                return;
+            }
+            if (EntryMenuState.shouldResetFailedAttempt(state.phase, entryMenuFailed)) {
+                // Reset native play before presenting phase 4. Presentation also marks
+                // the failure handled, so doing this afterward would deadlock Retry.
+                entryMenuFailed = true;
+                entryPlayRequested = false;
+                try { ProbeBridge.setEntryMenu(true, entryMenuSidePage, isReducedMotionEnabled(), false,
+                        surfaceRequestGeneration); }
+                catch (RuntimeException | LinkageError ignored) { /* Keep the failure visible for manual recovery. */ }
+            }
+            updateEntryMenuPresentation(state);
+            handler.postDelayed(this, state.phase == EntryMenuState.PHASE_LOADING ? 100L : 200L);
         }
     };
 
@@ -454,6 +510,12 @@ public class MainActivity extends Activity {
         });
 
         configureTouchControls();
+        entryMenuEnabled = shouldUseEntryMenu(true);
+        if (entryMenuEnabled) {
+            entryMenuSidePage = false;
+            try { ProbeBridge.setEntryMenu(true, false, isReducedMotionEnabled(), false, 0); }
+            catch (RuntimeException | LinkageError unavailable) { /* Report through the entry screen after views exist. */ }
+        }
         configureSurface();
         collectInitialDiagnostics();
         showMainMenu(true);
@@ -563,9 +625,14 @@ public class MainActivity extends Activity {
     private void startSurfaceIfReady() {
         if (!resumed || !surfaceAvailable || surfaceRequestGeneration != 0 || currentSurface == null) return;
         try {
+            if (entryMenuEnabled) {
+                entryPlayRequested = false;
+                ProbeBridge.setEntryMenu(true, entryMenuSidePage, isReducedMotionEnabled(), false, 0);
+            }
             surfaceRequestGeneration = ProbeBridge.startDiagnosticSurface(currentSurface, getFilesDir().getAbsolutePath());
             surfaceStarted = false; // Accepted/pending is distinct from an RT-presented frame.
             setGameplayPaused(menuVisible || diagnosticsVisible);
+            if (entryMenuEnabled) publishEntryMenuState();
             if (surfaceRequestGeneration == 0) {
                 reportTextView.append("\n\nRenderer surface failed to start.");
                 showDiagnostics(true);
@@ -646,7 +713,25 @@ public class MainActivity extends Activity {
         });
     }
 
+    private boolean shouldUseEntryMenu(final boolean firstLaunch) {
+        return EntryMenuState.shouldShowAtLaunch(firstLaunch, debugAutomationAutostart,
+                debugCaptureUiSuppressed, pendingDebugCheckpoint >= 0, pendingDebugCapture,
+                pendingDebugReplay, benchmarkAutomationId != null, debugRtLabAccess);
+    }
+
     private void showMainMenu(final boolean firstLaunch) {
+        if (shouldUseEntryMenu(firstLaunch)) {
+            entryMenuEnabled = true;
+            entryMenuSidePage = false;
+            entryPlayRequested = false;
+            entryMenuFailed = false;
+            showEntryMenu(false);
+            return;
+        }
+        if (entryMenuEnabled) {
+            showEntryMenu(false);
+            return;
+        }
         closeBenchmarkSummaryReview();
         interfaceVisible=false;
         setBenchmarkStatusExpanded(false);
@@ -700,6 +785,264 @@ public class MainActivity extends Activity {
                 getString(R.string.credits), this::showCredits,
                 getString(R.string.quit), this::finishAndRemoveTask);
         attachPanel(panel);
+    }
+
+    private boolean isReducedMotionEnabled() {
+        return InterfacePreferences.reducedMotionEnabled(InterfacePreferences.read(preferences),
+                isSystemReducedMotionEnabled());
+    }
+
+    private boolean isSystemReducedMotionEnabled() {
+        try {
+            if (Build.VERSION.SDK_INT >= 26) return !ValueAnimator.areAnimatorsEnabled();
+            return Settings.Global.getFloat(getContentResolver(), Settings.Global.ANIMATOR_DURATION_SCALE, 1.0f) == 0.0f;
+        } catch (RuntimeException unavailable) {
+            return false;
+        }
+    }
+
+    private void publishEntryMenuState() {
+        if (!entryMenuEnabled || surfaceRequestGeneration <= 0) return;
+        try {
+            ProbeBridge.setEntryMenu(true, entryMenuSidePage, isReducedMotionEnabled(),
+                    entryPlayRequested, surfaceRequestGeneration);
+            handler.removeCallbacks(refreshEntryMenu);
+            handler.post(refreshEntryMenu);
+        } catch (RuntimeException | LinkageError unavailable) {
+            showEntryMenuFailure("The native entry scene is unavailable.");
+        }
+    }
+
+    private void showEntryMenu(final boolean sidePage) {
+        closeBenchmarkSummaryReview();
+        interfaceVisible = false;
+        menuVisible = true;
+        entryMenuSidePage = sidePage;
+        entryPlayButton = null;
+        entrySettingsButton = null;
+        entryMoreButton = null;
+        entryMenuStatus = null;
+        entryMenuProgress = null;
+        setGameplayPaused(true);
+        clearTouchState();
+        attackButton.setVisibility(View.GONE);
+        parryButton.setVisibility(View.GONE);
+        if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
+        menuButton.setVisibility(View.GONE);
+        rtStatus.setVisibility(View.GONE);
+        vitalityStatus.setVisibility(View.GONE);
+        developerOverlay.setVisibility(View.GONE);
+        diagnosticsPanel.setVisibility(View.GONE);
+        menuScrim.setVisibility(View.VISIBLE);
+        menuScrim.removeAllViews();
+        entryMenuPanel = createPanel("HORDE LANTERN", sidePage ?
+                (entryMenuSidePage ? getString(R.string.entry_more_eyebrow) : getString(R.string.entry_settings_eyebrow)) :
+                getString(R.string.entry_menu_eyebrow));
+        entryMenuPanel.setPadding(dp(16), dp(16), dp(16), dp(18));
+        final String heading = sidePage ? getString(entryMenuSidePage ? R.string.entry_more : R.string.settings) :
+                getString(R.string.entry_menu_title);
+        final TextView headingView = new TextView(this);
+        headingView.setText(heading);
+        headingView.setTextColor(HordeUiTokens.PARCHMENT);
+        headingView.setTextSize(22);
+        headingView.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
+        headingView.setPadding(0, dp(5), 0, dp(12));
+        entryMenuPanel.addView(headingView, matchWrap());
+        entryMenuStatus = new TextView(this);
+        entryMenuStatus.setTextColor(HordeUiTokens.MUTED);
+        entryMenuStatus.setTextSize(12);
+        entryMenuStatus.setVisibility(View.GONE);
+        entryMenuStatus.setPadding(0, dp(6), 0, dp(6));
+        entryMenuPanel.addView(entryMenuStatus, matchWrap());
+        entryMenuProgress = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
+        entryMenuProgress.setIndeterminate(true);
+        entryMenuProgress.setContentDescription(getString(R.string.entry_menu_loading));
+        entryMenuProgress.setVisibility(View.GONE);
+        final LinearLayout.LayoutParams progressLayout = new LinearLayout.LayoutParams(dp(32), dp(32));
+        progressLayout.topMargin = dp(4);
+        entryMenuPanel.addView(entryMenuProgress, progressLayout);
+        if (!sidePage) {
+            entryPlayButton = addEntryMenuButton(entryMenuPanel, getString(R.string.entry_play), this::requestEntryPlay, true);
+            entrySettingsButton = addEntryMenuButton(entryMenuPanel, getString(R.string.settings), () -> {
+                entryMenuSidePage = true;
+                publishEntryMenuState();
+                showSettings();
+            }, false);
+            entryMoreButton = addEntryMenuButton(entryMenuPanel, getString(R.string.entry_more), () -> {
+                entryMenuSidePage = true;
+                publishEntryMenuState();
+                showEntryMorePage();
+            }, false);
+        } else {
+            addEntryMenuButton(entryMenuPanel, getString(R.string.back), () -> showMainMenu(false), false);
+        }
+        attachEntryMenuPanel(entryMenuPanel);
+        applyEntryMenuAvailability(null);
+        publishEntryMenuState();
+    }
+
+    private Button addEntryMenuButton(LinearLayout panel, String label, Runnable action, boolean primary) {
+        final Button button = createMenuButton(label, action);
+        // Keep D-pad/keyboard focusable without requesting touch-mode focus.
+        // HordeUiTokens.button supplies a high-contrast focused border.
+        button.setFocusable(true);
+        button.setFocusableInTouchMode(false);
+        button.setMinimumHeight(dp(primary ? 56 : 48));
+        if (primary) styleActionButton(button, 0xFF513A20, HordeUiTokens.PARCHMENT);
+        panel.addView(button, menuButtonLayoutParams());
+        return button;
+    }
+
+    private void attachEntryMenuPanel(LinearLayout panel) {
+        // The RT lantern remains visible through the transparent host; the
+        // iron/brass plaque occupies only the left side of the composition.
+        ensureEntryMenuTargets(panel);
+        menuScrim.setBackgroundColor(0x26070605);
+        final ScrollView scroller = new ScrollView(this);
+        scroller.setFillViewport(false);
+        scroller.addView(panel, new ScrollView.LayoutParams(-1, -2));
+        final int width = getResources().getDisplayMetrics().widthPixels;
+        final int height = getResources().getDisplayMetrics().heightPixels;
+        final boolean portrait = height >= width;
+        int start = dp(8), top = dp(16), bottom = dp(16);
+        final WindowInsets insets = menuScrim.getRootWindowInsets();
+        if (insets != null) {
+            start = Math.max(start, insets.getStableInsetLeft() + dp(4));
+            top = Math.max(top, insets.getStableInsetTop() + dp(8));
+            bottom = Math.max(bottom, insets.getStableInsetBottom() + dp(8));
+        }
+        final int maxAvailable = Math.max(dp(144), width - start - dp(24));
+        final int desiredWidth = (int)(width * (portrait ? 0.42f : 0.34f));
+        final int panelWidth = Math.min(dp(400), Math.min(maxAvailable, Math.max(dp(144), desiredWidth)));
+        final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(panelWidth,
+                FrameLayout.LayoutParams.WRAP_CONTENT);
+        params.gravity = portrait ? Gravity.BOTTOM | Gravity.START : Gravity.CENTER_VERTICAL | Gravity.START;
+        params.setMargins(start, top, dp(12), bottom);
+        menuScrim.addView(scroller, params);
+        entryMenuPanel = panel;
+    }
+
+    private void ensureEntryMenuTargets(ViewGroup parent) {
+        for (int index = 0; index < parent.getChildCount(); ++index) {
+            final View child = parent.getChildAt(index);
+            if (child instanceof Button || child instanceof CheckBox || child instanceof SeekBar)
+                child.setMinimumHeight(dp(48));
+            if (child instanceof ViewGroup) ensureEntryMenuTargets((ViewGroup)child);
+        }
+    }
+
+    private void showEntryMorePage() {
+        entryPlayButton = null;
+        entrySettingsButton = null;
+        entryMoreButton = null;
+        entryMenuStatus = null;
+        entryMenuProgress = null;
+        menuVisible = true;
+        setGameplayPaused(true);
+        menuScrim.setVisibility(View.VISIBLE);
+        menuScrim.removeAllViews();
+        final LinearLayout panel = createPanel("HORDE LANTERN", getString(R.string.entry_more_eyebrow));
+        addBody(panel, getString(R.string.entry_more_description));
+        addEntryMenuButton(panel, getString(R.string.controls), this::showControls, false);
+        addEntryMenuButton(panel, getString(R.string.credits), this::showCredits, false);
+        addEntryMenuButton(panel, getString(R.string.playtest_report), this::showPlaytestReport, false);
+        addEntryMenuButton(panel, getString(R.string.technical_info), () -> showDiagnostics(false), false);
+        if (rtLabUnlocked || debugRtLabAccess || ProbeBridge.isRtLabUnlockEligible())
+            addEntryMenuButton(panel, getString(R.string.rt_lab), () -> openRtLab(false), false);
+        addEntryMenuButton(panel, getString(R.string.check_for_updates), () -> checkForUpdates(true), false);
+        addEntryMenuButton(panel, getString(R.string.more_by_samfa12), this::openSamfa12Website, false);
+        addEntryMenuButton(panel, getString(R.string.quit), this::finishAndRemoveTask, false);
+        addEntryMenuButton(panel, getString(R.string.back), () -> showMainMenu(false), false);
+        attachEntryMenuPanel(panel);
+    }
+
+    private void requestEntryPlay() {
+        if (!entryMenuEnabled || entryPlayRequested) return;
+        playSound("ui_select", 0.18f);
+        entryMenuSidePage = false;
+        entryMenuFailed = false;
+        entryPlayRequested = true;
+        applyEntryMenuAvailability(null);
+        publishEntryMenuState();
+    }
+
+    private void cancelPendingEntryPlay() {
+        if (!EntryMenuState.shouldCancelPendingPlayOnBack(entryMenuEnabled, entryPlayRequested)) return;
+        entryPlayRequested = false;
+        entryMenuFailed = false;
+        if (entryMenuPanel != null) entryMenuPanel.setAlpha(1.0f);
+        if (entryMenuStatus != null) entryMenuStatus.setVisibility(View.GONE);
+        if (entryPlayButton != null) {
+            entryPlayButton.setText(R.string.entry_play);
+            entryPlayButton.setOnClickListener(view -> requestEntryPlay());
+        }
+        applyEntryMenuAvailability(null);
+        publishEntryMenuState();
+    }
+
+    private void retryEntryPlay() {
+        if (!entryMenuEnabled || entryPlayRequested) return;
+        entryPlayRequested = false;
+        entryMenuFailed = false;
+        if (entryMenuStatus != null) entryMenuStatus.setVisibility(View.GONE);
+        if (entryPlayButton != null) {
+            entryPlayButton.setText(R.string.entry_play);
+            entryPlayButton.setOnClickListener(view -> requestEntryPlay());
+        }
+        publishEntryMenuState();
+        handler.postDelayed(() -> {
+            if (!entryMenuEnabled || surfaceRequestGeneration <= 0) return;
+            entryPlayRequested = true;
+            applyEntryMenuAvailability(null);
+            publishEntryMenuState();
+        }, 50L);
+    }
+
+    private void showEntryMenuFailure(String message) {
+        if (entryMenuStatus == null || !entryMenuEnabled) return;
+        entryMenuFailed = true;
+        entryMenuStatus.setText(message);
+        entryMenuStatus.setVisibility(View.VISIBLE);
+        if (entryMenuProgress != null) entryMenuProgress.setVisibility(View.GONE);
+        if (entryMenuPanel != null) entryMenuPanel.setAlpha(1.0f);
+        if (entryPlayButton != null && entryMenuPanel != null && entryPlayButton.getParent() == entryMenuPanel) {
+            entryPlayButton.setText(R.string.entry_retry);
+            entryPlayButton.setOnClickListener(view -> retryEntryPlay());
+            entryPlayButton.setEnabled(!entryPlayRequested);
+            entryPlayButton.setVisibility(View.VISIBLE);
+        }
+        if (entrySettingsButton != null) { entrySettingsButton.setEnabled(true); entrySettingsButton.setVisibility(View.VISIBLE); }
+        if (entryMoreButton != null) { entryMoreButton.setEnabled(true); entryMoreButton.setVisibility(View.VISIBLE); }
+    }
+
+    private void updateEntryMenuPresentation(EntryMenuState state) {
+        if (entryMenuPanel == null) return;
+        if (state.phase == EntryMenuState.PHASE_FAILURE) {
+            showEntryMenuFailure(getString(R.string.entry_menu_failed));
+            return;
+        }
+        if (entryMenuStatus != null) {
+            if (state.phase == EntryMenuState.PHASE_LOADING) {
+                entryMenuStatus.setText(R.string.entry_menu_loading);
+                entryMenuStatus.setVisibility(View.VISIBLE);
+            } else if (!entryMenuFailed && entryMenuStatus.getVisibility() == View.VISIBLE) {
+                entryMenuStatus.setVisibility(View.GONE);
+            }
+        }
+        if (entryMenuProgress != null) entryMenuProgress.setVisibility(
+                state.phase == EntryMenuState.PHASE_LOADING ? View.VISIBLE : View.GONE);
+        entryMenuPanel.setAlpha(state.phase == EntryMenuState.PHASE_LOADING ? 1.0f :
+                entryPlayRequested ? Math.max(0.0f, 1.0f - state.fadePermille / 1000.0f) : 1.0f);
+        applyEntryMenuAvailability(state);
+    }
+
+    private void applyEntryMenuAvailability(EntryMenuState state) {
+        final boolean busy = entryPlayRequested;
+        if (entryPlayButton != null) { entryPlayButton.setEnabled(!busy); entryPlayButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
+        if (entrySettingsButton != null) { entrySettingsButton.setEnabled(!busy); entrySettingsButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
+        if (entryMoreButton != null) { entryMoreButton.setEnabled(!busy); entryMoreButton.setVisibility(busy ? View.GONE : View.VISIBLE); }
+        if (entryPlayButton != null && state != null && state.phase != EntryMenuState.PHASE_FAILURE)
+            entryPlayButton.setText(R.string.entry_play);
     }
 
     private void openSamfa12Website() {
@@ -1829,6 +2172,11 @@ public class MainActivity extends Activity {
     }
 
     private void hideMenu() {
+        if (entryMenuEnabled) {
+            cancelPendingEntryPlay();
+            if (!menuVisible) showEntryMenu(false);
+            return;
+        }
         if (graphicsSceneRestoring) {
             Toast.makeText(this, "Restoring the game RT scene. Resume is available after it presents.", Toast.LENGTH_SHORT).show();
             return;
@@ -1857,6 +2205,10 @@ public class MainActivity extends Activity {
 
     private void showControls() {
         playSound("ui_select", 0.18f);
+        entryMenuPanel = null;
+        entryPlayButton = null; entrySettingsButton = null; entryMoreButton = null;
+        entryMenuStatus = null; entryMenuProgress = null;
+        if (entryMenuEnabled) { entryMenuSidePage = true; publishEntryMenuState(); }
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel(getString(R.string.controls), "PHONE CONTROLS");
         addBody(panel, getString(R.string.controls_help));
@@ -1866,6 +2218,10 @@ public class MainActivity extends Activity {
 
     private void showCredits() {
         playSound("ui_select", 0.18f);
+        entryMenuPanel = null;
+        entryPlayButton = null; entrySettingsButton = null; entryMoreButton = null;
+        entryMenuStatus = null; entryMenuProgress = null;
+        if (entryMenuEnabled) { entryMenuSidePage = true; publishEntryMenuState(); }
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel(getString(R.string.credits), "ASSET PROVENANCE");
         addLinkedBody(panel, getString(R.string.credits_body));
@@ -1875,6 +2231,10 @@ public class MainActivity extends Activity {
 
     private void showSettings() {
         interfaceVisible=false;
+        entryMenuPanel = null;
+        entryPlayButton = null; entrySettingsButton = null; entryMoreButton = null;
+        entryMenuStatus = null; entryMenuProgress = null;
+        if (entryMenuEnabled) { entryMenuSidePage = true; publishEntryMenuState(); }
         playSound("ui_select", 0.18f);
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel(getString(R.string.settings), "SAVED ON THIS DEVICE");
@@ -1969,6 +2329,9 @@ public class MainActivity extends Activity {
 
     private void showGraphicsPage() {
         if (graphicsPreviewWanted) { showGraphicsPreviewPage(); return; }
+        final long uiBuildStartedNs = SystemClock.elapsedRealtimeNanos();
+        entryMenuPanel = null; entryPlayButton = null; entrySettingsButton = null; entryMoreButton = null;
+        entryMenuStatus = null; entryMenuProgress = null;
         graphicsPageViewport.remember(menuScrim);
         dismissGraphicsPreviewDetails();
         menuScrim.setBackgroundColor(0xC7080706);
@@ -2057,8 +2420,7 @@ public class MainActivity extends Activity {
             if (!GraphicsPreferences.markPending(preferences, graphicsSubmitted)) {
                 graphicsTelemetry.setText(R.string.graphics_storage_failed); return;
             }
-            graphicsRequestSerial = ProbeBridge.applyGraphicsSettings(graphicsDraft.scale, graphicsDraft.water,
-                    graphicsDraft.fire, graphicsDraft.cap, graphicsDraft.glassEnabled, graphicsDraft.shadow, graphicsDraft.mistEnabled, surfaceRequestGeneration);
+            graphicsRequestSerial = requestTimedGraphicsApply(graphicsDraft);
             if (graphicsRequestSerial == 0) {
                 graphicsTelemetry.setText(R.string.graphics_not_ready);
                 return; // Keep recovery marker until an acknowledged restore.
@@ -2093,9 +2455,11 @@ public class MainActivity extends Activity {
         final FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(Math.min(dp(520), Math.max(dp(48), available)), -1);
         layout.gravity = Gravity.CENTER_HORIZONTAL;
         layout.setMargins(left, top, right, bottom);
+        if (entryMenuEnabled) ensureEntryMenuTargets(panel);
         menuScrim.addView(scroller, layout);
         setGraphicsEditorsEnabled(panel, !graphicsBusy);
         graphicsPageViewport.restoreAfterLayout(menuScrim);
+        logGraphicsUiBuild("graphics", uiBuildStartedNs);
     }
 
     private void setGraphicsEditorsEnabled(View view, boolean enabled) {
@@ -2155,8 +2519,10 @@ public class MainActivity extends Activity {
         if (!GraphicsPreferences.markPending(preferences, values)) {
             graphicsLiveChoiceError = getString(R.string.graphics_storage_failed); return;
         }
+        final long requestNs = SystemClock.elapsedRealtimeNanos();
         final long serial = ProbeBridge.compareGraphicsPreview(values.scale, values.water, values.fire,
                 values.cap, values.glassEnabled, values.shadow, values.mistEnabled, surfaceRequestGeneration);
+        recordGraphicsUiRequest("compare", serial, requestNs);
         if (serial == 0) {
             graphicsLiveChoiceError = "Choice unavailable; choose Restore saved."; return;
         }
@@ -2237,6 +2603,9 @@ public class MainActivity extends Activity {
     }
 
     private void showGraphicsPreviewPage() {
+        final long uiBuildStartedNs = SystemClock.elapsedRealtimeNanos();
+        entryMenuPanel = null; entryPlayButton = null; entrySettingsButton = null; entryMoreButton = null;
+        entryMenuStatus = null; entryMenuProgress = null;
         graphicsPreviewViewport.remember(menuScrim);
         dismissGraphicsPreviewOptions();
         dismissGraphicsPreviewDetails();
@@ -2245,7 +2614,11 @@ public class MainActivity extends Activity {
         menuScrim.setClickable(true);
         menuScrim.removeAllViews();
         graphicsSelectionSummary = null;
-        if (graphicsPreviewImageOnly) { showGraphicsPreviewImageOnly(); return; }
+        if (graphicsPreviewImageOnly) {
+            showGraphicsPreviewImageOnly();
+            logGraphicsUiBuild("preview-image", uiBuildStartedNs);
+            return;
+        }
         graphicsControlsButton = null;
         final LinearLayout panel = new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL); panel.setPadding(dp(8), dp(4), dp(8), dp(4));
@@ -2286,8 +2659,7 @@ public class MainActivity extends Activity {
             } else if (GraphicsPreferences.markPending(preferences, previewSelection())) {
                 resetGraphicsPreviewTimeline();
                 graphicsSubmitted = previewSelection(); graphicsDraft = graphicsSubmitted;
-                graphicsRequestSerial = ProbeBridge.applyGraphicsSettings(graphicsSubmitted.scale, graphicsSubmitted.water,
-                        graphicsSubmitted.fire, graphicsSubmitted.cap, graphicsSubmitted.glassEnabled, graphicsSubmitted.shadow, graphicsSubmitted.mistEnabled, surfaceRequestGeneration);
+                graphicsRequestSerial = requestTimedGraphicsApply(graphicsSubmitted);
                 graphicsBusy = graphicsRequestSerial != 0; graphicsConfirmationStarted = 0;
             }
         });
@@ -2318,10 +2690,50 @@ public class MainActivity extends Activity {
         scroller.addView(panel, new ScrollView.LayoutParams(-1, -2));
         final FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(-1, -2);
         layout.gravity = Gravity.BOTTOM; layout.setMargins(left, 0, right, bottom);
+        if (entryMenuEnabled) ensureEntryMenuTargets(panel);
         menuScrim.addView(scroller, layout);
         setGraphicsEditorsEnabled(panel, !graphicsBusy);
         for (Button option : graphicsOptionButtons) option.setEnabled(false);
         graphicsPreviewViewport.restoreAfterLayout(menuScrim);
+        logGraphicsUiBuild("preview", uiBuildStartedNs);
+    }
+
+    private long requestTimedGraphicsApply(GraphicsPreferences.Values values) {
+        final long requestNs = SystemClock.elapsedRealtimeNanos();
+        final long serial = ProbeBridge.applyGraphicsSettings(values.scale, values.water, values.fire,
+                values.cap, values.glassEnabled, values.shadow, values.mistEnabled, surfaceRequestGeneration);
+        recordGraphicsUiRequest("apply", serial, requestNs);
+        return serial;
+    }
+
+    private long requestTimedGraphicsRevert() {
+        final long requestNs = SystemClock.elapsedRealtimeNanos();
+        final long serial = ProbeBridge.revertGraphicsSettings(surfaceRequestGeneration);
+        recordGraphicsUiRequest("restore", serial, requestNs);
+        return serial;
+    }
+
+    private void recordGraphicsUiRequest(String action, long serial, long requestNs) {
+        final long returnedNs = SystemClock.elapsedRealtimeNanos();
+        Log.i("HordeGraphicsLatency", "UI_REQUEST action=" + action + " serial=" + serial +
+                " generation=" + surfaceRequestGeneration + " request_elapsed_ns=" + requestNs +
+                " returned_elapsed_ns=" + returnedNs + " jni_wall_ms=" + (returnedNs - requestNs) / 1.0e6);
+        graphicsLatencySerial = serial;
+        graphicsLatencyRequestNs = requestNs;
+        graphicsLatencyPollCount = 0;
+        graphicsLatencyMaxPollLatenessNs = 0;
+    }
+
+    private void logGraphicsUiBuild(String page, long startNs) {
+        Log.i("HordeGraphicsLatency", "UI_BUILD page=" + page + " serial=" + graphicsRequestSerial +
+                " generation=" + surfaceRequestGeneration + " build_wall_ms=" +
+                (SystemClock.elapsedRealtimeNanos() - startNs) / 1.0e6 +
+                " root_children=" + menuScrim.getChildCount());
+    }
+
+    private void scheduleGraphicsPoll(Runnable poll) {
+        graphicsLatencyPollDueNs = SystemClock.elapsedRealtimeNanos() + 250000000L;
+        handler.postDelayed(poll, 250);
     }
 
     private LinearLayout addPreviewControlRow(LinearLayout panel) {
@@ -2434,7 +2846,8 @@ public class MainActivity extends Activity {
 
     private void refreshGraphicsPreviewTelemetry(long[] applied, String settingsText) {
         settingsText += "\nKeeper room mist; this preview has no ground mist. Off preserves fire, smoke and electricity.";
-        if ((applied[14] & 64) != 0 && GraphicsPreferences.presented(applied, surfaceRequestGeneration) && applied[19] == 0) {
+        if ((applied[14] & 64) != 0 && GraphicsPreferences.presented(applied, surfaceRequestGeneration) &&
+                applied[19] == expectedGraphicsReturnProfile()) {
             graphicsPreviewWanted = false;
             graphicsPreviewDetailsSamples = new double[9];
             graphicsPreviewDetailsText = "Preview unavailable; the game scene was restored.";
@@ -2573,28 +2986,34 @@ public class MainActivity extends Activity {
         panel.addView(preview,matchWrap());
         addMenuButton(panel,"Presentation: "+(v.compact?"Compact":"Comfortable"),() -> {
             InterfacePreferences.Values current=InterfacePreferences.read(preferences);
-            saveInterface(new InterfacePreferences.Values(!current.compact,current.scale,current.opacity,current.strongerBacking,current.routineStatus));
+            saveInterface(new InterfacePreferences.Values(!current.compact,current.scale,current.opacity,current.strongerBacking,current.routineStatus,current.reducedMotion));
         });
         addSlider(panel,"Control scale",v.scale,85,110,value -> {
             InterfacePreferences.Values current=InterfacePreferences.read(preferences);
-            InterfacePreferences.Values next=new InterfacePreferences.Values(current.compact,value,current.opacity,current.strongerBacking,current.routineStatus);
+            InterfacePreferences.Values next=new InterfacePreferences.Values(current.compact,value,current.opacity,current.strongerBacking,current.routineStatus,current.reducedMotion);
             InterfacePreferences.saveLive(preferences,next);
             applyInterfacePresentation(); updateInterfaceControlPreview(preview,next);
         });
         addSlider(panel,"Backing opacity",v.opacity,55,95,value -> {
             InterfacePreferences.Values current=InterfacePreferences.read(preferences);
-            InterfacePreferences.Values next=new InterfacePreferences.Values(current.compact,current.scale,value,current.strongerBacking,current.routineStatus);
+            InterfacePreferences.Values next=new InterfacePreferences.Values(current.compact,current.scale,value,current.strongerBacking,current.routineStatus,current.reducedMotion);
             InterfacePreferences.saveLive(preferences,next);
             applyInterfacePresentation();
             updateInterfaceControlPreview(preview,next);
         });
         addMenuButton(panel,"Stronger backing: "+(v.strongerBacking?"On":"Off"),() -> {
             InterfacePreferences.Values current=InterfacePreferences.read(preferences);
-            saveInterface(new InterfacePreferences.Values(current.compact,current.scale,current.opacity,!current.strongerBacking,current.routineStatus));
+            saveInterface(new InterfacePreferences.Values(current.compact,current.scale,current.opacity,!current.strongerBacking,current.routineStatus,current.reducedMotion));
         });
         addMenuButton(panel,"Routine RT status: "+(v.routineStatus?"Shown":"Hidden"),() -> {
             InterfacePreferences.Values current=InterfacePreferences.read(preferences);
-            saveInterface(new InterfacePreferences.Values(current.compact,current.scale,current.opacity,current.strongerBacking,!current.routineStatus));
+            saveInterface(new InterfacePreferences.Values(current.compact,current.scale,current.opacity,current.strongerBacking,!current.routineStatus,current.reducedMotion));
+        });
+        addMenuButton(panel,getString(R.string.reduced_motion)+": "+
+                getString(v.reducedMotion?R.string.preference_on:R.string.preference_off),() -> {
+            InterfacePreferences.Values current=InterfacePreferences.read(preferences);
+            saveInterface(new InterfacePreferences.Values(current.compact,current.scale,current.opacity,
+                    current.strongerBacking,current.routineStatus,!current.reducedMotion));
         });
         addBody(panel,"Labels and focus outlines remain opaque. Startup, unsupported-device and error diagnostics remain available.");
         addMenuButtonRow(panel,"Reset Interface only",() -> {
@@ -2745,7 +3164,7 @@ public class MainActivity extends Activity {
         graphicsAwaitingRestore = true;
         graphicsBusy = true;
         setGraphicsEditorsEnabled(graphicsPanel, false);
-        graphicsRequestSerial = ProbeBridge.revertGraphicsSettings(surfaceRequestGeneration);
+        graphicsRequestSerial = requestTimedGraphicsRevert();
         graphicsConfirmationStarted = 0;
         if (graphicsRequestSerial == 0) {
             setNativeGraphics(graphicsConfirmed);
@@ -2789,15 +3208,25 @@ public class MainActivity extends Activity {
         if (!text.contentEquals(graphicsSelectionSummary.getText())) graphicsSelectionSummary.setText(text);
     }
 
+    private int expectedGraphicsReturnProfile() {
+        return entryMenuEnabled ? EntryMenuState.PROFILE_ENTRY : EntryMenuState.PROFILE_SHOWCASE;
+    }
+
     private final Runnable refreshGraphics = new Runnable() {
         @Override public void run() {
             if (!graphicsVisible && !graphicsRecovering && !graphicsSceneRestoring) return;
             if (!resumed) return;
             final long now = SystemClock.elapsedRealtime();
+            final long pollNs = SystemClock.elapsedRealtimeNanos();
+            if (graphicsLatencySerial != 0) {
+                ++graphicsLatencyPollCount;
+                if (graphicsLatencyPollDueNs != 0) graphicsLatencyMaxPollLatenessNs = Math.max(
+                        graphicsLatencyMaxPollLatenessNs, Math.max(0, pollNs - graphicsLatencyPollDueNs));
+            }
             final double seconds = graphicsPollTime == 0 ? 0 : Math.max(0, now - graphicsPollTime) / 1000.0;
             graphicsPollTime = now;
             final long[] a = ProbeBridge.getGraphicsSnapshot();
-            if (a == null || a.length != 26) { handler.postDelayed(this, 250); return; }
+            if (a == null || a.length != 26) { scheduleGraphicsPoll(this); return; }
             final boolean presented = GraphicsPreferences.presented(a, surfaceRequestGeneration);
             if (graphicsRecovering && presented && GraphicsPreferences.matchesEffective(a, graphicsConfirmed)) {
                 if (GraphicsPreferences.clearAfterRestore(preferences)) {
@@ -2805,7 +3234,8 @@ public class MainActivity extends Activity {
                     Toast.makeText(MainActivity.this, R.string.graphics_restored, Toast.LENGTH_LONG).show();
                 }
             }
-            if (graphicsSceneRestoring && presented && a[19] == 0) graphicsSceneRestoring = false;
+            final int restoredProfile = expectedGraphicsReturnProfile();
+            if (graphicsSceneRestoring && presented && a[19] == restoredProfile) graphicsSceneRestoring = false;
             if (graphicsVisible) {
                 final int state = (int)a[2];
                 final boolean busy = state == 1 || state == 2 || state == 4;
@@ -2817,6 +3247,15 @@ public class MainActivity extends Activity {
                 final boolean ready = presented && a[0] == graphicsRequestSerial && (graphicsPreviewWanted ?
                         GraphicsPreviewOptions.presented(a, surfaceRequestGeneration, graphicsRequestSerial, previewSelection()) :
                         GraphicsPreferences.matchesEffective(a, expected) && GraphicsPreferences.matchesRequested(a, expected));
+                if (ready && graphicsLatencySerial == a[0]) {
+                    Log.i("HordeGraphicsLatency", "UI_ACK_SEEN serial=" + a[0] +
+                            " generation=" + surfaceRequestGeneration + " state=" + state +
+                            " profile=" + a[19] + " observed_elapsed_ns=" + pollNs +
+                            " request_to_observation_wall_ms=" + (pollNs - graphicsLatencyRequestNs) / 1.0e6 +
+                            " polls=" + graphicsLatencyPollCount + " max_poll_lateness_ms=" +
+                            graphicsLatencyMaxPollLatenessNs / 1.0e6);
+                    graphicsLatencySerial = 0; // One observation per accepted UI request.
+                }
                 if (state == 2 && ready) {
                     final boolean firstConfirmationPoll = graphicsConfirmationStarted == 0;
                     if (firstConfirmationPoll) graphicsConfirmationStarted = now;
@@ -2831,13 +3270,13 @@ public class MainActivity extends Activity {
                     graphicsRecoveryNotice = "The game scene could not be restored. The previous preview is available; try Return to Graphics again.";
                     showGraphicsPage();
                 }
-                if (graphicsSceneRestoring && presented && a[19] == 0) graphicsSceneRestoring = false;
+                if (graphicsSceneRestoring && presented && a[19] == restoredProfile) graphicsSceneRestoring = false;
                 if (state == 0 && ready && graphicsAwaitingRestore && !graphicsSceneRestoring) {
                     graphicsAwaitingRestore = false;
                     GraphicsPreferences.clearAfterRestore(preferences);
                     graphicsDraft = graphicsRestoreDraftAfterPreview != null ? graphicsRestoreDraftAfterPreview : graphicsConfirmed;
                     graphicsRestoreDraftAfterPreview = null;
-                    if (graphicsCloseAfterRevert && a[19] == 0) {
+                    if (graphicsCloseAfterRevert && a[19] == restoredProfile) {
                         graphicsVisible = false; handler.removeCallbacks(this); showSettings(); return;
                     }
                     showGraphicsPage();
@@ -2889,7 +3328,7 @@ public class MainActivity extends Activity {
                 if (graphicsPreviewWanted) refreshGraphicsPreviewTelemetry(a, settingsText);
                 else graphicsTelemetry.setText(settingsText);
             }
-            handler.postDelayed(this, 250);
+            scheduleGraphicsPoll(this);
         }
     };
 
@@ -4201,6 +4640,7 @@ public class MainActivity extends Activity {
     }
 
     private void attachPanel(final LinearLayout panel) {
+        if (entryMenuEnabled) ensureEntryMenuTargets(panel);
         menuScrim.setBackgroundColor(0xC7080706);
         final ScrollView scroller = new ScrollView(this);
         scroller.setFillViewport(false);
@@ -4548,8 +4988,30 @@ public class MainActivity extends Activity {
             return;
         }
         if (interfaceVisible) { showSettings(); return; }
+        if (EntryMenuState.shouldCancelPendingPlayOnBack(entryMenuEnabled, entryPlayRequested)) {
+            playSound("ui_back", 0.18f);
+            cancelPendingEntryPlay();
+            return;
+        }
         if (rtLabVisible) {
             closeRtLab();
+            return;
+        }
+        if (diagnosticsVisible) {
+            diagnosticsVisible = false;
+            diagnosticsPanel.setVisibility(View.GONE);
+            showMainMenu(false);
+            return;
+        }
+        if (entryMenuEnabled && menuVisible && entryMenuSidePage) {
+            playSound("ui_back", 0.18f);
+            showMainMenu(false);
+            return;
+        }
+        if (entryMenuEnabled && menuVisible) {
+            // The Entry front page owns Back until native reports current Showcase
+            // presentation; never fall through to a path that hides or unpauses it.
+            playSound("ui_back", 0.18f);
             return;
         }
         if (deathOverlayVisible) {
@@ -4572,10 +5034,6 @@ public class MainActivity extends Activity {
         } else if (benchmarkReportVisible) {
             playSound("ui_back", 0.18f);
             showMainMenu(false);
-        } else if (diagnosticsVisible) {
-            diagnosticsVisible = false;
-            diagnosticsPanel.setVisibility(View.GONE);
-            showMainMenu(false);
         } else if (!menuVisible) {
             playSound("menu_toggle", 0.20f);
             showMainMenu(false);
@@ -4595,7 +5053,9 @@ public class MainActivity extends Activity {
         if (musicPlayback != null) musicPlayback.setSuspended(true); // Wait for a ready new surface.
         resumed = true;
         enterImmersiveMode();
+        final boolean hadSurfaceGeneration = surfaceRequestGeneration != 0;
         startSurfaceIfReady();
+        if (entryMenuEnabled && hadSurfaceGeneration) publishEntryMenuState();
         if (rtLabVisible) handler.post(refreshRtLabTelemetry);
         graphicsPollTime = SystemClock.elapsedRealtime();
         if (graphicsRecovering) handler.post(refreshGraphics);
@@ -4613,6 +5073,16 @@ public class MainActivity extends Activity {
         super.onNewIntent(intent);
         setIntent(intent);
         if (!consumeBenchmarkAutomationIntent(intent, false)) consumeDebugAutomationIntent(intent);
+        if (entryMenuEnabled && (debugAutomationAutostart || debugCaptureUiSuppressed ||
+                pendingDebugCheckpoint >= 0 || pendingDebugCapture || pendingDebugReplay ||
+                benchmarkAutomationId != null || debugRtLabAccess)) {
+            entryMenuEnabled = false;
+            entryPlayRequested = false;
+            handler.removeCallbacks(refreshEntryMenu);
+            try { ProbeBridge.setEntryMenu(false, false, isReducedMotionEnabled(), false,
+                    surfaceRequestGeneration); }
+            catch (RuntimeException | LinkageError ignored) { /* The automation path still owns its native request. */ }
+        }
         if (debugRtLabAccess && menuVisible && !deathOverlayVisible && !endingOverlayVisible) {
             showMainMenu(false);
         }
@@ -4621,6 +5091,16 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         clearTouchState();
+        handler.removeCallbacks(refreshEntryMenu);
+        if (entryMenuEnabled) {
+            entryPlayRequested = false;
+            entryMenuFailed = false;
+            if (surfaceRequestGeneration > 0) {
+                try { ProbeBridge.setEntryMenu(true, entryMenuSidePage, isReducedMotionEnabled(), false,
+                        surfaceRequestGeneration); }
+                catch (RuntimeException | LinkageError ignored) { /* Lifecycle cleanup is best effort. */ }
+            }
+        }
         graphicsPreviewImageOnly = false;
         dismissGraphicsPreviewDetails();
         if (keeperRevealTitle != null) keeperRevealTitle.setVisibility(View.GONE);

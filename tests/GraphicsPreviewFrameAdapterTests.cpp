@@ -116,5 +116,19 @@ int main()
           selected.tuning.workloadPreset == RtWorkloadPreset::Authored &&
           session.Snapshot().tick == previewBefore.tick && session.Snapshot().timeSeconds == previewBefore.timeSeconds,
           "preview independent policy adapter consumes immutable timeline without advancing gameplay");
+    horde::graphics::EntryMenuSession entry;
+    entry.Advance(1.0/30);
+    const auto entryFrame=BuildEntryMenuFrameInputs(entry,.92f,FireEmitterQuality::High,
+        horde::graphics::ShadowQuality::Current);
+    check(entryFrame.tickIndex==2 && entryFrame.skeletonEnemyCount==0 &&
+          entryFrame.fireEmitterCount==1 && entryFrame.waterQuality==WaterQuality::Off &&
+          entryFrame.lich.staffLightStrength==0 && entryFrame.torchLightStrength==0,
+          "entry admits one socket-bound flame without gameplay actors or duplicate torch light");
+    entry.Play();entry.Advance(.25);entry.Advance(.10);
+    const auto black=BuildEntryMenuFrameInputs(entry,.92f,FireEmitterQuality::High,
+        horde::graphics::ShadowQuality::Current);
+    check(entry.ReadyToPlay() && black.outputExposure==0 &&
+          game.tickIndex==417 && game.playerX==.31f,
+          "Play reaches explicit black presentation without advancing paused gameplay");
     return passed ? 0 : 1;
 }

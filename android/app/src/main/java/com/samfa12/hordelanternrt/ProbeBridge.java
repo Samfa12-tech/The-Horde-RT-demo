@@ -61,6 +61,11 @@ public final class ProbeBridge {
     public static native long[] getGraphicsSnapshot();
     public static native void setGraphicsPreview(boolean enabled, boolean paused, boolean motion,
             int camera, boolean resetTimeline, long generation);
+    // Entry menu requests are ephemeral. State is a coherent five-word snapshot:
+    // generation, profile(Showcase/Preview/Entry), phase, fade permille, presented.
+    public static native void setEntryMenu(boolean enabled, boolean sidePage,
+            boolean reducedMotion, boolean play, long generation);
+    public static native long[] getEntryMenuState();
     // epoch,presents/s,loop ms,CPU ms,GPU ms (-1 unavailable),tracked device/host bytes,
     // transition count,sample count, then loop-ms/transition pairs (at most128).
     public static native double[] getGraphicsPreviewPerformance();

@@ -32,7 +32,7 @@
 #include "vulkan/raytracing/experimental/StagedPrimaryPass.h"
 #endif
 
-namespace horde::graphics { class GraphicsPreviewSession; }
+namespace horde::graphics { class GraphicsPreviewSession; class EntryMenuSession; }
 
 namespace horde::vulkan::raytracing
 {
@@ -126,6 +126,41 @@ struct RtSceneFrameInputs
 class PresentableTinyRtScene
 {
 public:
+    struct InitialisationStageMeasurement
+    {
+        std::string_view name{};
+        // Steady-clock elapsed time on the initializing CPU thread, not GPU time.
+        std::uint64_t cpuNanoseconds = 0u;
+        bool attempted = false;
+        bool succeeded = false;
+    };
+    struct InitialisationPipelineMeasurement
+    {
+        std::string_view strategy{};
+        RtExecutionBackend backend = RtExecutionBackend::Unsupported;
+        VkResult result = VK_NOT_READY;
+        std::uint64_t cpuNanoseconds = 0u;
+        bool attempted = false;
+        bool pipelineCacheWasNull = false;
+    };
+    struct InitialisationSbtMeasurement
+    {
+        std::string_view strategy{};
+        std::uint64_t cpuNanoseconds = 0u;
+        bool attempted = false;
+        bool succeeded = false;
+    };
+    struct InitialisationMeasurements
+    {
+        std::vector<InitialisationStageMeasurement> stages;
+        std::vector<InitialisationPipelineMeasurement> pipelines;
+        std::vector<InitialisationSbtMeasurement> shaderBindingTables;
+        // From immediately after the prior-resource Destroy through return;
+        // failed-attempt cleanup is included, initial prior-resource cleanup is not.
+        std::uint64_t totalCpuNanoseconds = 0u;
+        bool succeeded = false;
+    };
+
 #ifndef NDEBUG
     // Process-local opaque identities, read on the render owner thread after
     // completion. No device addresses, resource contents or ownership transfer.
@@ -192,6 +227,12 @@ public:
     void Destroy();
 
     bool IsReady() const { return ready_; }
+    // CPU-side timings for the most recent Initialise attempt. Failed attempts
+    // retain partial measurements across cleanup until the next attempt begins.
+    const InitialisationMeasurements& InitialiseMeasurements() const noexcept
+    {
+        return initialiseMeasurements_;
+    }
     RtSceneProfile Profile() const { return sceneProfile_; }
     bool GlassEnabled() const { return glassEnabled_; }
     void SetMistEnabled(const bool enabled) noexcept { mistEnabled_ = enabled; }
@@ -210,6 +251,8 @@ public:
     bool HasUploadedFireEmitters() const noexcept { return uploadedFireEmittersValid_; }
     bool ConfigurePreviewFireSockets(horde::graphics::GraphicsPreviewSession& session,
                                      std::string& diagnostic) const;
+    bool ConfigureEntryMenu(horde::graphics::EntryMenuSession& session,
+                            std::string& diagnostic) const;
     RtExecutionBackend ExecutionBackend() const
     {
         return pipelineBundle_.HasSelection() ? pipelineBundle_.Request().executionBackend
@@ -917,6 +960,7 @@ private:
     PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR_ = nullptr;
 
     bool ready_ = false;
+    InitialisationMeasurements initialiseMeasurements_{};
 };
 
 } // namespace horde::vulkan::raytracing

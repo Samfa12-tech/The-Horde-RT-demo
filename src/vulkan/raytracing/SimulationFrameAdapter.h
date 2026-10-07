@@ -1,11 +1,15 @@
 #pragma once
 
 #include "gameplay/simulation/SimulationSnapshot.h"
-#include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "graphics/EntryMenuScene.h"
 #include "graphics/GraphicsPreviewSession.h"
+#include "vulkan/raytracing/PresentableTinyRtScene.h"
 
 namespace horde::vulkan::raytracing
 {
+RtSceneFrameInputs BuildEntryMenuFrameInputs(const horde::graphics::EntryMenuSession &session,
+                                             float outputExposure, FireEmitterQuality fireDetail,
+                                             horde::graphics::ShadowQuality shadowQuality);
 
 RtSceneFrameInputs BuildGraphicsPreviewFrameInputs(
     const horde::graphics::GraphicsPreviewSession& session,

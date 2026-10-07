@@ -43,4 +43,15 @@ public final class InterfacePreferencesTest {
         assertTrue(v.compact); assertEquals(85,v.scale); assertEquals(95,v.opacity); assertTrue(v.strongerBacking);
         assertFalse(p.contains("graphics_pending")); assertFalse(p.contains("render_scale"));
     }
+
+    @Test public void reducedMotionIsSavedAndCombinesWithSystemPreference() {
+        InterfacePreferences.Values saved = new InterfacePreferences.Values(false,100,70,false,false,true);
+        InterfacePreferences.saveLive(p, saved);
+        assertTrue(InterfacePreferences.read(p).reducedMotion);
+        assertTrue(InterfacePreferences.reducedMotionEnabled(InterfacePreferences.read(p), false));
+        assertTrue(InterfacePreferences.reducedMotionEnabled(InterfacePreferences.defaults(), true));
+        assertFalse(InterfacePreferences.reducedMotionEnabled(InterfacePreferences.defaults(), false));
+        assertTrue(InterfacePreferences.reset(p));
+        assertFalse(InterfacePreferences.read(p).reducedMotion);
+    }
 }

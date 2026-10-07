@@ -1,10 +1,11 @@
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
-#include "vulkan/raytracing/RtDeviceAddressLayout.h"
-#include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
-#include "vulkan/raytracing/RtTextureLayerSubset.h"
+#include "graphics/EntryMenuScene.h"
 #include "graphics/GraphicsPreviewSession.h"
-#include "vulkan/raytracing/DynamicBlasSynchronization.h"
 #include "vulkan/raytracing/ChestGuidanceLight.h"
+#include "vulkan/raytracing/DynamicBlasSynchronization.h"
+#include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
+#include "vulkan/raytracing/RtDeviceAddressLayout.h"
+#include "vulkan/raytracing/RtTextureLayerSubset.h"
 
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldLightState.h"
@@ -45,6 +46,62 @@ using horde::gameplay::kShowcaseEyeWorldY;
 
 namespace
 {
+
+using InitialiseClock = std::chrono::steady_clock;
+
+template <typename Action>
+bool MeasureInitialisationStage(
+    PresentableTinyRtScene::InitialisationMeasurements& measurements,
+    const std::string_view name,
+    Action&& action)
+{
+    measurements.stages.push_back({name, 0u, true, false});
+    auto& stage = measurements.stages.back();
+    const auto start = InitialiseClock::now();
+    const bool succeeded = std::forward<Action>(action)();
+    stage.cpuNanoseconds = static_cast<std::uint64_t>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            InitialiseClock::now() - start).count());
+    stage.succeeded = succeeded;
+    return succeeded;
+}
+
+class InitialiseAttemptTimer
+{
+public:
+    explicit InitialiseAttemptTimer(
+        PresentableTinyRtScene::InitialisationMeasurements& measurements) noexcept
+        : measurements_(measurements), start_(InitialiseClock::now()) {}
+
+    ~InitialiseAttemptTimer()
+    {
+        measurements_.totalCpuNanoseconds = static_cast<std::uint64_t>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                InitialiseClock::now() - start_).count());
+    }
+
+private:
+    PresentableTinyRtScene::InitialisationMeasurements& measurements_;
+    InitialiseClock::time_point start_;
+};
+
+class CpuElapsedTimer
+{
+public:
+    explicit CpuElapsedTimer(std::uint64_t& elapsedNanoseconds) noexcept
+        : elapsedNanoseconds_(elapsedNanoseconds), start_(InitialiseClock::now()) {}
+
+    ~CpuElapsedTimer()
+    {
+        elapsedNanoseconds_ = static_cast<std::uint64_t>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                InitialiseClock::now() - start_).count());
+    }
+
+private:
+    std::uint64_t& elapsedNanoseconds_;
+    InitialiseClock::time_point start_;
+};
 
 constexpr VkFormat kStorageImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
 
@@ -621,6 +678,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
         horde::telemetry::RtPipelineEvidenceIdentity{});
     pipelineEvidenceIdentityValid_ = std::exchange(
         other.pipelineEvidenceIdentityValid_, false);
+    initialiseMeasurements_ = std::move(other.initialiseMeasurements_);
+    other.initialiseMeasurements_ = {};
     framePipelineEvidence_ = std::exchange(
         other.framePipelineEvidence_,
         horde::telemetry::RtPipelineEvidenceIdentity{});
@@ -714,6 +773,8 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
     const bool glassEnabled)
 {
     Destroy();
+    initialiseMeasurements_ = {};
+    InitialiseAttemptTimer totalAttemptTimer(initialiseMeasurements_);
     sceneProfile_ = sceneProfile;
     glassEnabled_ = glassEnabled;
     instance_ = instance;
@@ -740,7 +801,9 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
         return false;
     }
     RtPipelineBundlePreflight selectedPreflight{};
-    if (!api.resolvePreflight(api.user, selectedPreflight, diagnostic))
+    if (!MeasureInitialisationStage(initialiseMeasurements_, "preflight", [&] {
+            return api.resolvePreflight(api.user, selectedPreflight, diagnostic);
+        }))
     {
         Destroy();
         return false;
@@ -793,10 +856,12 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
         return false;
     }
     executionPolicy_ = *executionPolicy;
-    return api.continueAfterPreflight(
+    const bool initialised = api.continueAfterPreflight(
         api.user, *this, presentationFormat, skeletonAssetPath, lichAssetPath,
         materialAssetDirectory, lichTextureDirectory,
         developmentStaticAssetDirectory, productionAssetRoot, diagnostic);
+    initialiseMeasurements_.succeeded = initialised;
+    return initialised;
 }
 
 bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
@@ -809,45 +874,76 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
     const std::string& productionAssetRoot,
     std::string& diagnostic)
 {
-    if (ExecutionBackend() == RtExecutionBackend::RayQueryCompute)
+    if (!MeasureInitialisationStage(initialiseMeasurements_, "device-capability-preflight", [&] {
+            if (ExecutionBackend() == RtExecutionBackend::RayQueryCompute)
+            {
+                VkPhysicalDeviceProperties properties{};
+                vkGetPhysicalDeviceProperties(physicalDevice_, &properties);
+                const auto groups = TryMakeRtComputeDispatch(dispatchExtent_, properties.limits);
+                if (!groups)
+                {
+                    diagnostic = "Device compute limits cannot execute the fixed 8x8 hardware RT workload.";
+                    return false;
+                }
+                computeDispatchGroups_ = *groups;
+            }
+            VkFormatProperties storageFormatProperties{};
+            VkFormatProperties presentationFormatProperties{};
+            vkGetPhysicalDeviceFormatProperties(physicalDevice_, kStorageImageFormat, &storageFormatProperties);
+            vkGetPhysicalDeviceFormatProperties(physicalDevice_, presentationFormat, &presentationFormatProperties);
+            const VkFormatFeatureFlags storageBlitFeatures = VK_FORMAT_FEATURE_BLIT_SRC_BIT |
+                                                             VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+            scaledBlitSupported_ = (storageFormatProperties.optimalTilingFeatures & storageBlitFeatures) == storageBlitFeatures &&
+                                   (presentationFormatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT) != 0u;
+            return true;
+        }))
     {
-        VkPhysicalDeviceProperties properties{};
-        vkGetPhysicalDeviceProperties(physicalDevice_, &properties);
-        const auto groups = TryMakeRtComputeDispatch(dispatchExtent_, properties.limits);
-        if (!groups)
-        {
-            diagnostic = "Device compute limits cannot execute the fixed 8x8 hardware RT workload.";
-            Destroy();
-            return false;
-        }
-        computeDispatchGroups_ = *groups;
+        Destroy();
+        return false;
     }
-    VkFormatProperties storageFormatProperties{};
-    VkFormatProperties presentationFormatProperties{};
-    vkGetPhysicalDeviceFormatProperties(physicalDevice_, kStorageImageFormat, &storageFormatProperties);
-    vkGetPhysicalDeviceFormatProperties(physicalDevice_, presentationFormat, &presentationFormatProperties);
-    const VkFormatFeatureFlags storageBlitFeatures = VK_FORMAT_FEATURE_BLIT_SRC_BIT |
-                                                     VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
-    scaledBlitSupported_ = (storageFormatProperties.optimalTilingFeatures & storageBlitFeatures) == storageBlitFeatures &&
-                           (presentationFormatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT) != 0u;
-    if (!characterSlot_.LoadAssets(skeletonAssetPath, lichAssetPath, diagnostic,
-                                  sceneProfile_ == RtSceneProfile::GraphicsPreview) ||
-        !LoadEntryPoints(diagnostic))
+    if (sceneProfile_ != RtSceneProfile::EntryMenu &&
+        !MeasureInitialisationStage(initialiseMeasurements_, "character-assets", [&] {
+            return characterSlot_.LoadAssets(skeletonAssetPath, lichAssetPath, diagnostic,
+                                             sceneProfile_ == RtSceneProfile::GraphicsPreview);
+        }))
+    {
+        Destroy();
+        return false;
+    }
+    if (!MeasureInitialisationStage(initialiseMeasurements_, "vulkan-entry-points", [&] {
+            return LoadEntryPoints(diagnostic);
+        }))
     {
         Destroy();
         return false;
     }
     gpuResources_.Bind(physicalDevice_, device_, vkDestroyAccelerationStructureKHR_, vkGetBufferDeviceAddressKHR_);
-    if (!LoadStaticHeldItemAssets(
-            developmentStaticAssetDirectory, productionAssetRoot, diagnostic) ||
-        !CreateStorageImage(diagnostic) ||
-        !CreateMaterialTextures(materialAssetDirectory, diagnostic) ||
-        !CreateEnvironmentTexture(productionAssetRoot, diagnostic) ||
+    if (!MeasureInitialisationStage(initialiseMeasurements_, "static-held-item-assets", [&] {
+            return LoadStaticHeldItemAssets(
+                developmentStaticAssetDirectory, productionAssetRoot, diagnostic);
+        }) ||
+        !MeasureInitialisationStage(initialiseMeasurements_, "storage-image", [&] {
+            return CreateStorageImage(diagnostic);
+        }) ||
+        !MeasureInitialisationStage(initialiseMeasurements_, "material-textures", [&] {
+            return CreateMaterialTextures(materialAssetDirectory, diagnostic);
+        }) ||
+        !MeasureInitialisationStage(initialiseMeasurements_, "environment-texture", [&] {
+            return CreateEnvironmentTexture(productionAssetRoot, diagnostic);
+        }) ||
         (sceneProfile_ == RtSceneProfile::Showcase &&
-         !CreateLichTextures(lichTextureDirectory, diagnostic)) ||
-        !CreateStaticMeshResources(diagnostic) ||
-        !BuildAccelerationStructures(diagnostic) ||
-        !CreateSelectedPipelineBundle(diagnostic))
+         !MeasureInitialisationStage(initialiseMeasurements_, "lich-textures", [&] {
+            return CreateLichTextures(lichTextureDirectory, diagnostic);
+         })) ||
+        !MeasureInitialisationStage(initialiseMeasurements_, "static-meshes", [&] {
+            return CreateStaticMeshResources(diagnostic);
+        }) ||
+        !MeasureInitialisationStage(initialiseMeasurements_, "acceleration-structures", [&] {
+            return BuildAccelerationStructures(diagnostic);
+        }) ||
+        !MeasureInitialisationStage(initialiseMeasurements_, "pipeline-bundle", [&] {
+            return CreateSelectedPipelineBundle(diagnostic);
+        }))
     {
         Destroy();
         return false;
@@ -2134,7 +2230,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         return false;
     }
 
-    if (sceneProfile_ == RtSceneProfile::GraphicsPreview)
+    if (sceneProfile_ != RtSceneProfile::Showcase)
         return LoadPreviewStaticAssets(productionAssetRoot, diagnostic);
 
     const std::filesystem::path root(productionAssetRoot);
@@ -2325,11 +2421,17 @@ bool PresentableTinyRtScene::LoadPreviewStaticAssets(const std::string& producti
         return horde::scene::assets::AssetManifest::Load(path / "asset.manifest.json", manifest, diagnostic) &&
             horde::scene::assets::StaticMeshAsset::Load(path / filename, manifest, asset, diagnostic);
     };
-    if (!load("models/props/runtime", "gothic-hand-torch-lod0.runtime.glb", productionTorchAsset_) ||
-        !load("models/props/runtime/dielectric-fixture", "closed-glass-lod0.runtime.glb", productionDielectricFixtureAsset_) ||
-        !load("models/props/runtime/reward-lantern-ring", "reward-lantern-ring-lod0.runtime.glb", rewardLanternRingAsset_) ||
-        !load("models/props/runtime/reward-lantern-body", "reward-lantern-body-lod0.runtime.glb", rewardLanternBodyAsset_) ||
-        !SelectLanternGeometryForQuality(rewardLanternBodyAsset_, pipelineBundle_.Request().quality, diagnostic, glassEnabled_))
+    const bool entry = sceneProfile_ == RtSceneProfile::EntryMenu;
+    if ((!entry && !load("models/props/runtime", "gothic-hand-torch-lod0.runtime.glb",
+                         productionTorchAsset_)) ||
+        (!entry && !load("models/props/runtime/dielectric-fixture", "closed-glass-lod0.runtime.glb",
+                         productionDielectricFixtureAsset_)) ||
+        !load("models/props/runtime/reward-lantern-ring", "reward-lantern-ring-lod0.runtime.glb",
+              rewardLanternRingAsset_) ||
+        !load("models/props/runtime/reward-lantern-body", "reward-lantern-body-lod0.runtime.glb",
+              rewardLanternBodyAsset_) ||
+        !SelectLanternGeometryForQuality(rewardLanternBodyAsset_, pipelineBundle_.Request().quality,
+                                         diagnostic, glassEnabled_))
         return false;
     viewmodelAvailable_ = false;
     playerBodyRemainderAvailable_ = false;
@@ -2342,7 +2444,15 @@ bool PresentableTinyRtScene::LoadPreviewStaticAssets(const std::string& producti
         {8u, 0x4c4e4244u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
             static_cast<std::uint32_t>(RtInstanceFlag::Transmissive), 1u, &rewardLanternBodyAsset_},
     }};
-    if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
+    const std::array<StaticRtAssetRegistration, 2u> entryRegistrations{
+        {registrations[2], registrations[3]}};
+    if (!staticMeshSlot_.Initialize(
+            entry ? std::span<const StaticRtAssetRegistration>(entryRegistrations)
+                  : std::span<const StaticRtAssetRegistration>(registrations),
+            diagnostic))
+        return false;
+    if (entry)
+        return ResolvePreviewPropTransforms(diagnostic);
     const auto fixture = staticMeshSlot_.InstanceMetadata()[9u];
     if (fixture.primitiveCount != 1u || fixture.primitiveBase >= staticMeshSlot_.PrimitiveMetadata().size())
     {
@@ -2356,7 +2466,9 @@ bool PresentableTinyRtScene::LoadPreviewStaticAssets(const std::string& producti
 bool PresentableTinyRtScene::ResolvePreviewPropTransforms(std::string& diagnostic)
 {
     using namespace horde::gameplay::items;
-    const auto description = horde::graphics::MakeGraphicsPreviewDescription();
+    const bool entry = sceneProfile_ == RtSceneProfile::EntryMenu;
+    const auto description = entry ? horde::graphics::MakeEntryMenuDescription()
+                                   : horde::graphics::MakeGraphicsPreviewDescription();
     const auto place = [](const horde::graphics::PreviewPoint& position) {
         auto transform = IdentityHeldItemTransform();
         transform[12] = position[0]; transform[13] = position[1]; transform[14] = position[2];
@@ -2369,16 +2481,22 @@ bool PresentableTinyRtScene::ResolvePreviewPropTransforms(std::string& diagnosti
     const auto* torchLight = FindHeldItemSocket(productionTorchAsset_.sockets, "Light");
     const auto* lanternFlame = FindHeldItemSocket(rewardLanternBodyAsset_.sockets, "Flame");
     const auto* lanternLight = FindHeldItemSocket(rewardLanternBodyAsset_.sockets, "Light");
-    if (ringHinge == nullptr || torchFlame == nullptr || torchLight == nullptr ||
+    if (ringHinge == nullptr || (!entry && (torchFlame == nullptr || torchLight == nullptr)) ||
         lanternFlame == nullptr || lanternLight == nullptr)
     {
         diagnostic = "Preview requires admitted torch and lantern pivot/flame/light sockets.";
         return false;
     }
-    if (!ComposeWorldFromItem(hinge, ringHinge->world, previewTransforms_[1], diagnostic))
+    auto ringSocket = ringHinge->world;
+    const float lanternScale = entry ? horde::graphics::kEntryMenuLanternScale
+                                     : kClaimedRewardLanternScale;
+    if (entry)
+        for (std::size_t axis = 12; axis < 15; ++axis)
+            ringSocket[axis] *= lanternScale;
+    if (!ComposeWorldFromItem(hinge, ringSocket, previewTransforms_[1], diagnostic))
         return false;
     auto scale = IdentityHeldItemTransform();
-    scale[0] = scale[5] = scale[10] = kClaimedRewardLanternScale;
+    scale[0] = scale[5] = scale[10] = lanternScale;
     previewTransforms_[1] = MultiplyHeldItemTransforms(previewTransforms_[1], scale);
     previewTransforms_[2] = MultiplyHeldItemTransforms(hinge, scale);
     previewTransforms_[3] = place(description.panePosition);
@@ -2386,8 +2504,13 @@ bool PresentableTinyRtScene::ResolvePreviewPropTransforms(std::string& diagnosti
     previewTransforms_[3][5] = 1.25f;
     previewTransforms_[3][10] = 0.75f;
     previewTransforms_[4] = place(description.waterOrigin);
-    previewFireInputs_[0].worldFromFlame = MultiplyHeldItemTransforms(previewTransforms_[0], torchFlame->world);
-    previewFireInputs_[0].worldFromLight = MultiplyHeldItemTransforms(previewTransforms_[0], torchLight->world);
+    if (!entry)
+    {
+        previewFireInputs_[0].worldFromFlame =
+            MultiplyHeldItemTransforms(previewTransforms_[0], torchFlame->world);
+        previewFireInputs_[0].worldFromLight =
+            MultiplyHeldItemTransforms(previewTransforms_[0], torchLight->world);
+    }
     previewFireInputs_[0].strength = 1.8f;
     previewFireInputs_[1].worldFromFlame = MultiplyHeldItemTransforms(previewTransforms_[2], lanternFlame->world);
     previewFireInputs_[1].worldFromLight = MultiplyHeldItemTransforms(previewTransforms_[2], lanternLight->world);
@@ -2407,6 +2530,25 @@ bool PresentableTinyRtScene::ConfigurePreviewFireSockets(horde::graphics::Graphi
     for (std::size_t index = 0u; index < previewFireInputs_.size(); ++index)
         session.SetFireSockets(index, previewFireInputs_[index]);
     session.Reset();
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::ConfigureEntryMenu(horde::graphics::EntryMenuSession &session,
+                                                std::string &diagnostic) const
+{
+    const auto *flame =
+        horde::gameplay::items::FindHeldItemSocket(rewardLanternBodyAsset_.sockets, "Flame");
+    const auto *light =
+        horde::gameplay::items::FindHeldItemSocket(rewardLanternBodyAsset_.sockets, "Light");
+    if (!ready_ || sceneProfile_ != RtSceneProfile::EntryMenu || flame == nullptr ||
+        light == nullptr)
+    {
+        diagnostic = "Entry menu requires its initialized lantern and authored fire sockets.";
+        return false;
+    }
+    session.ConfigureSockets(flame->world, light->world,
+                             horde::graphics::kEntryMenuLanternScale);
     diagnostic.clear();
     return true;
 }
@@ -2465,29 +2607,29 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const VkBufferUsageFlags storage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
     const VkBufferUsageFlags geometry = storage |
         VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
-    if (!createAndWrite(instances.data(), sizeof(instances), storage, false,
-                        "RT instance metadata", instanceMetadataBuffer_, true) ||
-        !createAndWrite(primitives.data(), primitives.size() * sizeof(RtPrimitiveMetadata),
-                        storage, false, "RT primitive metadata", primitiveMetadataBuffer_) ||
-        !createAndWrite(materials.data(), materials.size() * sizeof(RtMaterialGpu),
-                        storage, false, "RT material metadata", materialMetadataBuffer_, true) ||
+    if (!createAndWrite(instances.data(), sizeof(instances), storage, false, "RT instance metadata",
+                        instanceMetadataBuffer_, true) ||
+        !createAndWrite(primitives.data(), primitives.size() * sizeof(RtPrimitiveMetadata), storage,
+                        false, "RT primitive metadata", primitiveMetadataBuffer_) ||
+        !createAndWrite(materials.data(), materials.size() * sizeof(RtMaterialGpu), storage, false,
+                        "RT material metadata", materialMetadataBuffer_, true) ||
         !createAndWrite(vertices.data(),
-                        vertices.size() * sizeof(horde::scene::assets::StaticRtVertex),
-                        geometry, true, "static RT vertices", staticVertexBuffer_) ||
-        (sceneProfile_ != RtSceneProfile::GraphicsPreview &&
+                        vertices.size() * sizeof(horde::scene::assets::StaticRtVertex), geometry,
+                        true, "static RT vertices", staticVertexBuffer_) ||
+        (sceneProfile_ == RtSceneProfile::Showcase &&
          !createAndWrite(worldVertices.data(), worldVertices.size() * sizeof(worldVertices.front()),
-                         geometry, true, "world player RT vertices", worldPlayerVertexBuffer_, true)) ||
-        (sceneProfile_ != RtSceneProfile::GraphicsPreview &&
+                         geometry, true, "world player RT vertices", worldPlayerVertexBuffer_,
+                         true)) ||
+        (sceneProfile_ == RtSceneProfile::Showcase &&
          !createAndWrite(viewVertices.empty() ? &unusedViewVertex : viewVertices.data(),
                          std::max<std::size_t>(viewVertices.size(), 1u) * sizeof(unusedViewVertex),
                          geometry, true, "viewmodel RT vertices", viewmodelVertexBuffer_, true)) ||
-        !createAndWrite(indices.data(), indices.size() * sizeof(std::uint32_t),
-                        geometry, true, "static RT indices", staticIndexBuffer_) ||
+        !createAndWrite(indices.data(), indices.size() * sizeof(std::uint32_t), geometry, true,
+                        "static RT indices", staticIndexBuffer_) ||
         !createAndWrite(geometryTransforms.data(),
                         geometryTransforms.size() * sizeof(geometryTransforms.front()),
-                        VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
-                        true, "static RT geometry transforms",
-                        staticGeometryTransformBuffer_))
+                        VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, true,
+                        "static RT geometry transforms", staticGeometryTransformBuffer_))
     {
         return false;
     }
@@ -2497,12 +2639,16 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     // Canonical packaged atlas order is recorded in textures/props/runtime/
     // asset.manifest.json. Narrow admission preserves torch/ring/body order.
     constexpr std::array<std::uint32_t, 3u> previewTextureLayers{{1u, 8u, 9u}};
+    constexpr std::array<std::uint32_t, 2u> entryTextureLayers{{8u, 9u}};
     const std::span<const std::uint32_t> sourceLayers =
         sceneProfile_ == RtSceneProfile::GraphicsPreview
             ? std::span<const std::uint32_t>(previewTextureLayers)
+        : sceneProfile_ == RtSceneProfile::EntryMenu
+            ? std::span<const std::uint32_t>(entryTextureLayers)
             : std::span<const std::uint32_t>{};
     if (!sourceLayers.empty() &&
-        (textureCounts.baseColor != 3u || textureCounts.normal != 3u || textureCounts.orm != 3u))
+        (textureCounts.baseColor != sourceLayers.size() ||
+         textureCounts.normal != sourceLayers.size() || textureCounts.orm != sourceLayers.size()))
     {
         diagnostic = "Preview prop texture groups no longer match the admitted canonical layer selection.";
         return false;
@@ -2650,7 +2796,9 @@ bool PresentableTinyRtScene::BuildProfileAccelerationStructure(
 
 bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& diagnostic)
 {
-    const auto content = horde::graphics::MakeGraphicsPreviewDescription();
+    const bool entry = sceneProfile_ == RtSceneProfile::EntryMenu;
+    const auto content = entry ? horde::graphics::MakeEntryMenuDescription()
+                               : horde::graphics::MakeGraphicsPreviewDescription();
     using Vertex = horde::graphics::PreviewPoint;
     std::vector<Vertex> vertices;
     std::vector<std::uint32_t> indices;
@@ -2673,25 +2821,27 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
     // world anchor. Each stream has physical depth and open air between streams.
     constexpr std::array<float, 8u> ringCos{{1.0f, .70710678f, 0.0f, -.70710678f, -1.0f, -.70710678f, 0.0f, .70710678f}};
     constexpr std::array<float, 8u> ringSin{{0.0f, .70710678f, 1.0f, .70710678f, 0.0f, -.70710678f, -1.0f, -.70710678f}};
-    for (const auto& stream : content.waterStreams)
-    {
-        std::array<std::array<Vertex, 8u>, 6u> rings{};
-        for (std::size_t height = 0u; height < rings.size(); ++height)
+    if (!entry)
+        for (const auto &stream : content.waterStreams)
         {
-            const float y = content.waterRingHeights[height];
-            const float scale = 0.70f + std::clamp((y + .91f) / 3.07f, 0.0f, 1.0f) * .30f;
-            for (std::size_t facet = 0u; facet < ringCos.size(); ++facet)
-                rings[height][facet] = {{ringCos[facet] * stream.radiusX * scale, y,
-                                       stream.centreZ + ringSin[facet] * stream.radiusZ * scale}};
-        }
-        for (std::size_t segment = 0u; segment + 1u < rings.size(); ++segment)
-            for (std::size_t facet = 0u; facet < ringCos.size(); ++facet)
+            std::array<std::array<Vertex, 8u>, 6u> rings{};
+            for (std::size_t height = 0u; height < rings.size(); ++height)
             {
-                const auto next = (facet + 1u) % ringCos.size();
-                quad({{rings[segment + 1u][facet], rings[segment][facet],
-                       rings[segment][next], rings[segment + 1u][next]}});
+                const float y = content.waterRingHeights[height];
+                const float scale = 0.70f + std::clamp((y + .91f) / 3.07f, 0.0f, 1.0f) * .30f;
+                for (std::size_t facet = 0u; facet < ringCos.size(); ++facet)
+                    rings[height][facet] = {
+                        {ringCos[facet] * stream.radiusX * scale, y,
+                         stream.centreZ + ringSin[facet] * stream.radiusZ * scale}};
             }
-    }
+            for (std::size_t segment = 0u; segment + 1u < rings.size(); ++segment)
+                for (std::size_t facet = 0u; facet < ringCos.size(); ++facet)
+                {
+                    const auto next = (facet + 1u) % ringCos.size();
+                    quad({{rings[segment + 1u][facet], rings[segment][facet], rings[segment][next],
+                           rings[segment + 1u][next]}});
+                }
+        }
     const auto upload = [this, &diagnostic](const void* data, VkDeviceSize bytes,
                                           VkBufferUsageFlags usage, bool address,
                                           const char* label, Buffer& buffer, bool dynamic = false) {
@@ -2728,8 +2878,10 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
                                            fast, blas_, nullptr, diagnostic)) return false;
     range.primitiveCount = (static_cast<std::uint32_t>(indices.size()) - worldIndexCount) / 3u;
     range.primitiveOffset = worldIndexCount * sizeof(std::uint32_t);
-    if (!BuildProfileAccelerationStructure({&world, 1u}, {&range, 1u}, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
-                                           fast, waterfallBlas_, nullptr, diagnostic)) return false;
+    if (!entry && !BuildProfileAccelerationStructure(
+                      {&world, 1u}, {&range, 1u}, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
+                      fast, waterfallBlas_, nullptr, diagnostic))
+        return false;
     const auto buildStatic = [this, fast, &diagnostic](std::uint32_t id, AccelerationStructure& target) {
         const auto instance = staticMeshSlot_.InstanceMetadata()[id];
         std::vector<VkAccelerationStructureGeometryKHR> geometries;
@@ -2759,28 +2911,40 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
         return BuildProfileAccelerationStructure(geometries, ranges, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
                                                   fast, target, nullptr, diagnostic);
     };
-    if (!buildStatic(1u, torchBlas_) || !buildStatic(7u, rewardLanternRingBlas_) ||
-        !buildStatic(8u, rewardLanternBodyBlas_) || !buildStatic(9u, dielectricFixtureBlas_) ||
-        !characterSlot_.PrepareInitialGeometry(diagnostic)) return false;
-    auto& skeleton = characterSlot_.SkeletonGpu(0u);
-    const auto& skeletonVertices = characterSlot_.SkeletonVertices(0u);
-    skeleton.vertexStride = sizeof(horde::scene::SkinnedRtVertex);
-    skeleton.vertexCount = static_cast<std::uint32_t>(skeletonVertices.size());
-    if (!upload(skeletonVertices.data(), skeletonVertices.size() * skeleton.vertexStride,
-                geometryUsage, true, "preview skeleton vertices", skeleton.vertices, true)) return false;
-    VkAccelerationStructureGeometryKHR actor{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
-    actor.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR; actor.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
-    actor.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-    actor.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-    actor.geometry.triangles.vertexStride = skeleton.vertexStride;
-    actor.geometry.triangles.vertexData.deviceAddress = skeleton.vertices.address;
-    actor.geometry.triangles.maxVertex = skeleton.vertexCount - 1u;
-    actor.geometry.triangles.indexType = VK_INDEX_TYPE_NONE_KHR;
-    range = {}; range.primitiveCount = skeleton.vertexCount / 3u;
+    if ((!entry && !buildStatic(1u, torchBlas_)) || !buildStatic(7u, rewardLanternRingBlas_) ||
+        !buildStatic(8u, rewardLanternBodyBlas_) ||
+        (!entry && !buildStatic(9u, dielectricFixtureBlas_)) ||
+        (!entry && !characterSlot_.PrepareInitialGeometry(diagnostic)))
+        return false;
     constexpr auto updatable = fast | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
-    if (!BuildProfileAccelerationStructure({&actor, 1u}, {&range, 1u}, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
-                                           updatable, skeleton.accelerationStructure, &skeleton.updateScratch, diagnostic)) return false;
-    tlasInstanceCount_ = 7u;
+    if (!entry)
+    {
+        auto &skeleton = characterSlot_.SkeletonGpu(0u);
+        const auto &skeletonVertices = characterSlot_.SkeletonVertices(0u);
+        skeleton.vertexStride = sizeof(horde::scene::SkinnedRtVertex);
+        skeleton.vertexCount = static_cast<std::uint32_t>(skeletonVertices.size());
+        if (!upload(skeletonVertices.data(), skeletonVertices.size() * skeleton.vertexStride,
+                    geometryUsage, true, "preview skeleton vertices", skeleton.vertices, true))
+            return false;
+        VkAccelerationStructureGeometryKHR actor{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+        actor.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+        actor.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+        actor.geometry.triangles.sType =
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+        actor.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+        actor.geometry.triangles.vertexStride = skeleton.vertexStride;
+        actor.geometry.triangles.vertexData.deviceAddress = skeleton.vertices.address;
+        actor.geometry.triangles.maxVertex = skeleton.vertexCount - 1u;
+        actor.geometry.triangles.indexType = VK_INDEX_TYPE_NONE_KHR;
+        range = {};
+        range.primitiveCount = skeleton.vertexCount / 3u;
+        if (!BuildProfileAccelerationStructure(
+                {&actor, 1u}, {&range, 1u}, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
+                updatable, skeleton.accelerationStructure, &skeleton.updateScratch, diagnostic))
+            return false;
+    }
+    tlasInstanceCount_ = entry ? 3u : 7u;
     auto& instances = tlasBuiltInstances_;
     instances = {};
     const auto identity = horde::gameplay::items::IdentityHeldItemTransform();
@@ -2795,15 +2959,26 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
         return value;
     };
     instances[0] = instance(0u, blas_.address, identity);
-    instances[1] = instance(1u, torchBlas_.address, previewTransforms_[0]);
-    auto skeletonTransform = identity;
-    skeletonTransform[12] = content.skeleton.x; skeletonTransform[13] = kRouteFloorWorldY; skeletonTransform[14] = content.skeleton.z;
-    instances[2] = instance(2u, skeleton.accelerationStructure.address, skeletonTransform);
-    instances[3] = instance(7u, rewardLanternRingBlas_.address, previewTransforms_[1]);
-    instances[4] = instance(8u, rewardLanternBodyBlas_.address, previewTransforms_[2]);
-    instances[5] = instance(9u, dielectricFixtureBlas_.address, previewTransforms_[3]);
-    instances[6] = instance(19u, waterfallBlas_.address, previewTransforms_[4]);
-    ApplyGlassFixtureVisibility(std::span(instances).first(tlasInstanceCount_));
+    if (entry)
+    {
+        instances[1] = instance(7u, rewardLanternRingBlas_.address, previewTransforms_[1]);
+        instances[2] = instance(8u, rewardLanternBodyBlas_.address, previewTransforms_[2]);
+    }
+    else
+    {
+        instances[1] = instance(1u, torchBlas_.address, previewTransforms_[0]);
+        const auto &skeleton = characterSlot_.SkeletonGpu(0u);
+        auto skeletonTransform = identity;
+        skeletonTransform[12] = content.skeleton.x;
+        skeletonTransform[13] = kRouteFloorWorldY;
+        skeletonTransform[14] = content.skeleton.z;
+        instances[2] = instance(2u, skeleton.accelerationStructure.address, skeletonTransform);
+        instances[3] = instance(7u, rewardLanternRingBlas_.address, previewTransforms_[1]);
+        instances[4] = instance(8u, rewardLanternBodyBlas_.address, previewTransforms_[2]);
+        instances[5] = instance(9u, dielectricFixtureBlas_.address, previewTransforms_[3]);
+        instances[6] = instance(19u, waterfallBlas_.address, previewTransforms_[4]);
+        ApplyGlassFixtureVisibility(std::span(instances).first(tlasInstanceCount_));
+    }
     if (!upload(instances.data(), tlasInstanceCount_ * sizeof(instances[0]),
                 VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
                 true, "preview TLAS instances", instanceBuffer_, true)) return false;
@@ -2845,7 +3020,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         return false;
     }
 
-    if (sceneProfile_ == RtSceneProfile::GraphicsPreview)
+    if (sceneProfile_ != RtSceneProfile::Showcase)
         return BuildPreviewAccelerationStructures(diagnostic);
 
     struct Vertex
@@ -4848,10 +5023,12 @@ bool PresentableTinyRtScene::CreateBundleDiagnosticBuffer(
 bool PresentableTinyRtScene::WriteBundleDescriptors(RtPipelineBundle& bundle,
                                                     std::string& diagnostic)
 {
-    const auto& skeletonVertexBuffer_ = characterSlot_.SkeletonGpu(0u).vertices;
+    const bool entry = sceneProfile_ == RtSceneProfile::EntryMenu;
+    const auto &skeletonVertexBuffer_ =
+        entry ? staticVertexBuffer_ : characterSlot_.SkeletonGpu(0u).vertices;
     // The fixed production descriptor layout is shared across content profiles.
     // Unadmitted actor bindings alias valid buffers; no extra actor is allocated.
-    const bool preview = sceneProfile_ == RtSceneProfile::GraphicsPreview;
+    const bool preview = sceneProfile_ != RtSceneProfile::Showcase;
     const auto& secondSkeletonVertexBuffer = preview
         ? skeletonVertexBuffer_ : characterSlot_.SkeletonGpu(1u).vertices;
     const auto& lichVertexBuffer_ = preview
@@ -5080,7 +5257,7 @@ bool PresentableTinyRtScene::CreateBundleEntryShaderModule(
 }
 
 bool PresentableTinyRtScene::CreateBundleStrategyPipeline(
-    RtMaterialStrategy,
+    RtMaterialStrategy strategy,
     VkShaderModule raygenModule,
     VkShaderModule missModule,
     VkShaderModule hitModule,
@@ -5088,13 +5265,28 @@ bool PresentableTinyRtScene::CreateBundleStrategyPipeline(
     VkPipeline& out,
     std::string& diagnostic)
 {
-    if (ExecutionBackend() == RtExecutionBackend::RayQueryCompute)
+    const auto backend = ExecutionBackend();
+    const std::string_view strategyName =
+        strategy == RtMaterialStrategy::GenericDielectric ? "generic-dielectric" : "opaque-fast";
+    initialiseMeasurements_.pipelines.push_back({
+        strategyName, backend, VK_NOT_READY, 0u, false, false});
+    auto& timing = initialiseMeasurements_.pipelines.back();
+    if (backend == RtExecutionBackend::RayQueryCompute)
     {
         VkComputePipelineCreateInfo pipelineInfo{VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO};
         pipelineInfo.stage = {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0u,
                               VK_SHADER_STAGE_COMPUTE_BIT, raygenModule, "main", nullptr};
         pipelineInfo.layout = layout;
-        if (vkCreateComputePipelines(device_, VK_NULL_HANDLE, 1u, &pipelineInfo, nullptr, &out) != VK_SUCCESS)
+        const VkPipelineCache pipelineCache = VK_NULL_HANDLE;
+        timing.attempted = true;
+        timing.pipelineCacheWasNull = pipelineCache == VK_NULL_HANDLE;
+        VkResult result = VK_NOT_READY;
+        {
+            [[maybe_unused]] CpuElapsedTimer timer(timing.cpuNanoseconds);
+            result = vkCreateComputePipelines(device_, pipelineCache, 1u, &pipelineInfo, nullptr, &out);
+        }
+        timing.result = result;
+        if (result != VK_SUCCESS)
         {
             diagnostic = "Failed to create selected hardware RayQuery compute pipeline.";
             return false;
@@ -5135,8 +5327,16 @@ bool PresentableTinyRtScene::CreateBundleStrategyPipeline(
     pipelineInfo.pGroups = groups.data();
     pipelineInfo.maxPipelineRayRecursionDepth = 1u;
     pipelineInfo.layout = layout;
-    const VkResult result = vkCreateRayTracingPipelinesKHR_(
-        device_, VK_NULL_HANDLE, VK_NULL_HANDLE, 1u, &pipelineInfo, nullptr, &out);
+    const VkPipelineCache pipelineCache = VK_NULL_HANDLE;
+    timing.attempted = true;
+    timing.pipelineCacheWasNull = pipelineCache == VK_NULL_HANDLE;
+    VkResult result = VK_NOT_READY;
+    {
+        [[maybe_unused]] CpuElapsedTimer timer(timing.cpuNanoseconds);
+        result = vkCreateRayTracingPipelinesKHR_(
+            device_, VK_NULL_HANDLE, pipelineCache, 1u, &pipelineInfo, nullptr, &out);
+    }
+    timing.result = result;
     if (result != VK_SUCCESS)
     {
         diagnostic = "Failed to create selected material-strategy RT pipeline.";
@@ -5154,6 +5354,12 @@ bool PresentableTinyRtScene::CreateBundleStrategySbt(
     std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
     std::string& diagnostic)
 {
+    const std::string_view strategyName =
+        strategy == RtMaterialStrategy::GenericDielectric ? "generic-dielectric" : "opaque-fast";
+    initialiseMeasurements_.shaderBindingTables.push_back(
+        {strategyName, 0u, true, false});
+    auto& timing = initialiseMeasurements_.shaderBindingTables.back();
+    [[maybe_unused]] CpuElapsedTimer timingTimer(timing.cpuNanoseconds);
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR rtProperties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR};
     VkPhysicalDeviceProperties2 properties2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
     properties2.pNext = &rtProperties;
@@ -5239,6 +5445,7 @@ bool PresentableTinyRtScene::CreateBundleStrategySbt(
         return false;
 
     diagnostic.clear();
+    timing.succeeded = true;
     return true;
 }
 
@@ -5262,39 +5469,85 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
 {
     uploadedQualityControlsValid_ = false;
     uploadedFireEmittersValid_ = false;
-    if (tlasInstanceCount_ != 7u || tlas_.handle == VK_NULL_HANDLE ||
-        frame.skeletonEnemyCount != 1u || frame.roster.selectedEnemy != horde::gameplay::EnemyKind::Skeleton ||
-        frame.skeletonEnemies[0].animation != horde::gameplay::EnemyAnimation::Idle ||
-        frame.skeletonEnemies[0].action != horde::gameplay::EnemyCombatAction::Locomotion)
+    const bool entry = sceneProfile_ == RtSceneProfile::EntryMenu;
+    if (tlasInstanceCount_ != (entry ? 3u : 7u) || tlas_.handle == VK_NULL_HANDLE ||
+        (!entry &&
+         (frame.skeletonEnemyCount != 1u ||
+          frame.roster.selectedEnemy != horde::gameplay::EnemyKind::Skeleton ||
+          frame.skeletonEnemies[0].animation != horde::gameplay::EnemyAnimation::Idle ||
+          frame.skeletonEnemies[0].action != horde::gameplay::EnemyCombatAction::Locomotion)))
     {
         diagnostic = "Graphics preview requires its admitted seven instances and one idle skeleton.";
         return false;
     }
-    if (!characterSlot_.PrepareFrame(frame.skeletonEnemies, frame.skeletonEnemyCount,
-                                     frame.roster, frame.lich, gpuResources_, diagnostic, observation)) return false;
+    if (!entry &&
+        !characterSlot_.PrepareFrame(frame.skeletonEnemies, frame.skeletonEnemyCount, frame.roster,
+                                     frame.lich, gpuResources_, diagnostic, observation))
+        return false;
     auto instances = tlasBuiltInstances_;
-    instances[2] = characterSlot_.BuildActiveInstances()[0];
+    if (!entry)
+    {
+        instances[2] = characterSlot_.BuildActiveInstances()[0];
+        const auto tuning = ClampRtSceneTuning(frame.tuning);
+        const auto waterScale = ResolveWaterfallCurtainScale(tuning);
+        instances[6].transform.matrix[0][0] = waterScale.depth;
+        instances[6].transform.matrix[1][1] = waterScale.vertical;
+        instances[6].transform.matrix[2][2] = waterScale.crossLane;
+        instances[6].mask = frame.waterQuality == WaterQuality::Off ? 0u : 0x01u;
+        instances[5].transform.matrix[0][0] = previewTransforms_[3][0] * tuning.glassDepthScale;
+        ApplyGlassFixtureVisibility(std::span(instances).first(tlasInstanceCount_));
+    }
     const auto tuning = ClampRtSceneTuning(frame.tuning);
-    const auto waterScale = ResolveWaterfallCurtainScale(tuning);
-    instances[6].transform.matrix[0][0] = waterScale.depth;
-    instances[6].transform.matrix[1][1] = waterScale.vertical;
-    instances[6].transform.matrix[2][2] = waterScale.crossLane;
-    instances[6].mask = frame.waterQuality == WaterQuality::Off ? 0u : 0x01u;
-    instances[5].transform.matrix[0][0] = previewTransforms_[3][0] * tuning.glassDepthScale;
-    ApplyGlassFixtureVisibility(std::span(instances).first(tlasInstanceCount_));
+    const std::size_t emitterCount = entry ? 1u : previewFireInputs_.size();
     auto emitters = frame.fireEmitters;
-    if (frame.fireEmitterCount != previewFireInputs_.size())
+    if (frame.fireEmitterCount != emitterCount)
     {
         diagnostic = "Graphics preview requires its two deterministic socket-bound fire emitters.";
         return false;
     }
-    for (std::size_t index = 0u; index < previewFireInputs_.size(); ++index)
+    for (std::size_t index = 0u; index < emitterCount; ++index)
     {
         // The actual scene transform and admitted sockets are authoritative.
         // Session phase/noise stays deterministic; no gameplay snapshot is changed.
-        emitters[index].worldFromFlame = previewFireInputs_[index].worldFromFlame;
-        emitters[index].worldFromLight = previewFireInputs_[index].worldFromLight;
+        if (!entry)
+        {
+            emitters[index].worldFromFlame = previewFireInputs_[index].worldFromFlame;
+            emitters[index].worldFromLight = previewFireInputs_[index].worldFromLight;
+        }
         emitters[index].zone = frame.zone;
+    }
+    if (entry)
+    {
+        using namespace horde::gameplay::items;
+        auto scale = IdentityHeldItemTransform();
+        scale[0] = scale[5] = scale[10] = horde::graphics::kEntryMenuLanternScale;
+        const auto *hinge = FindHeldItemSocket(rewardLanternRingAsset_.sockets, "Hinge");
+        if (hinge == nullptr)
+        {
+            diagnostic = "Entry menu lost its admitted Hinge.";
+            return false;
+        }
+        HeldItemTransform ring{};
+        auto ringSocket = hinge->world;
+        for (std::size_t axis = 12; axis < 15; ++axis)
+            ringSocket[axis] *= horde::graphics::kEntryMenuLanternScale;
+        if (!ComposeWorldFromItem(frame.rewardLanternWorldFromHinge, ringSocket, ring, diagnostic))
+            return false;
+        ring = MultiplyHeldItemTransforms(ring, scale);
+        const auto body = MultiplyHeldItemTransforms(frame.lanternPendulum.worldFromBody, scale);
+        const auto apply =
+            [](VkAccelerationStructureInstanceKHR &instance, const HeldItemTransform &matrix)
+        {
+            instance.transform = {{matrix[0], matrix[4], matrix[8], matrix[12], matrix[1],
+                                   matrix[5], matrix[9], matrix[13], matrix[2], matrix[6],
+                                   matrix[10], matrix[14]}};
+        };
+        apply(instances[1], ring);
+        apply(instances[2], body);
+        emitters[0].worldFromFlame = MultiplyHeldItemTransforms(
+            body, FindHeldItemSocket(rewardLanternBodyAsset_.sockets, "Flame")->world);
+        emitters[0].worldFromLight = MultiplyHeldItemTransforms(
+            body, FindHeldItemSocket(rewardLanternBodyAsset_.sockets, "Light")->world);
     }
     const auto quality = ResolveRtQualityControls(frame.shadowQuality, tuning.workloadPreset,
         pipelineBundle_.Request().quality == DielectricQuality::High, mistEnabled_);
@@ -5302,27 +5555,34 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
     FireEmitterUpload fire{};
     const auto fireDetail = frame.fireDetail.value_or(frame.waterQuality == WaterQuality::High
         ? FireEmitterQuality::High : FireEmitterQuality::Mobile);
-    if (!BuildFireEmitterUpload(std::span<const horde::gameplay::effects::FireEmitterState>(emitters).first(2u),
-                               {{frame.cameraX, kShowcaseEyeWorldY, frame.cameraZ}, frame.zone, 24.0f},
-                               {tuning.fireStrengthScale, tuning.fireTurbulenceScale, tuning.fireSmokeScale},
-                               fireDetail, fire, diagnostic)) return false;
+    if (!BuildFireEmitterUpload(
+            std::span<const horde::gameplay::effects::FireEmitterState>(emitters).first(
+                emitterCount),
+            {{frame.cameraX, kShowcaseEyeWorldY, frame.cameraZ}, frame.zone, 24.0f},
+            {tuning.fireStrengthScale, tuning.fireTurbulenceScale, tuning.fireSmokeScale},
+            fireDetail, fire, diagnostic))
+        return false;
     const auto& lightTransform = previewFireInputs_[0].worldFromLight;
     const RtHeldLightGpu light{{lightTransform[12], lightTransform[13], lightTransform[14], frame.torchLightStrength}};
     auto metadata = staticMeshSlot_.InstanceMetadata();
     if (!glassEnabled_) metadata[9u].flags = 0u;
     auto materials = sceneMaterials_;
-    if (dielectricFixtureMaterialIndex_ >= materials.size())
+    if (!entry)
     {
-        diagnostic = "Graphics preview fixture material is outside the admitted material range.";
-        return false;
+        if (dielectricFixtureMaterialIndex_ >= materials.size())
+        {
+            diagnostic =
+                "Graphics preview fixture material is outside the admitted material range.";
+            return false;
+        }
+        auto &fixture = materials[dielectricFixtureMaterialIndex_];
+        fixture.metallicRoughnessOcclusionTransmission[1] = tuning.glassRoughness;
+        fixture.metallicRoughnessOcclusionTransmission[3] = tuning.glassTransmission;
+        fixture.iorThicknessAttenuationDistance[0] = tuning.glassIor;
+        fixture.iorThicknessAttenuationDistance[2] = tuning.glassAttenuationDistance;
+        for (std::size_t channel = 0u; channel < 3u; ++channel)
+            fixture.attenuationColor[channel] = tuning.glassAttenuationColor[channel];
     }
-    auto& fixture = materials[dielectricFixtureMaterialIndex_];
-    fixture.metallicRoughnessOcclusionTransmission[1] = tuning.glassRoughness;
-    fixture.metallicRoughnessOcclusionTransmission[3] = tuning.glassTransmission;
-    fixture.iorThicknessAttenuationDistance[0] = tuning.glassIor;
-    fixture.iorThicknessAttenuationDistance[2] = tuning.glassAttenuationDistance;
-    for (std::size_t channel = 0u; channel < 3u; ++channel)
-        fixture.attenuationColor[channel] = tuning.glassAttenuationColor[channel];
     genericTransmissionActive_ = HasActiveGenericTransmission(metadata, staticMeshSlot_.PrimitiveMetadata(), materials);
     framePipelineEvidence_ = pipelineEvidenceIdentity_;
     framePipelineEvidenceValid_ = pipelineEvidenceIdentityValid_;
@@ -5363,7 +5623,8 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
                              VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR | executionPolicy_.shaderPipelineStage,
                              0u, 1u, &hostBarrier, 0u, nullptr, 0u, nullptr);
     });
-    const bool updateSkeleton = HasCharacterBlasRefit(characterSlot_.PendingRefit(), CharacterBlasRefit::SkeletonPose0);
+    const bool updateSkeleton = !entry && HasCharacterBlasRefit(characterSlot_.PendingRefit(),
+                                                                CharacterBlasRefit::SkeletonPose0);
     RtSceneStageScope refitScope(updateSkeleton ? observation : nullptr, horde::telemetry::RtStage::BlasRefitRecord);
     const auto& skeleton = characterSlot_.SkeletonGpu(0u);
     VkMemoryBarrier blasBarrier{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
@@ -5459,7 +5720,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
 {
     uploadedQualityControlsValid_ = false;
     uploadedFireEmittersValid_ = false;
-    if (sceneProfile_ == RtSceneProfile::GraphicsPreview)
+    if (sceneProfile_ != RtSceneProfile::Showcase)
         return UpdatePreviewInstances(commandBuffer, frame, diagnostic, observation);
 #ifndef NDEBUG
     // Captures after this call are valid only if this frame finishes preparing
@@ -6707,40 +6968,40 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     const RtLightTuning& skylightTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Skylight)];
     const RtLightTuning& passageTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Passage)];
     const RtLightTuning& staffTuning = tuning.lights[static_cast<std::size_t>(RtLightGroup::Staff)];
-    const ScenePushConstants pushConstants{frame.cameraYaw,
-                                           frame.cameraPitch,
-                                           frame.torchLightStrength,
-                                           frame.walkTime,
-                                           frame.cameraX,
-                                           frame.cameraZ,
-                                           frame.walkAmount,
-                                            presentationUsesBgra_ && !scaledPresentation ? 1.0f : 0.0f,
-                                            std::clamp(frame.outputExposure, 0.2f, 1.4f),
-                                            std::clamp(frame.combat.damageFlash, 0.0f, 1.0f),
-                                            frame.roster.selectedEnemy == horde::gameplay::EnemyKind::Lich ? 1.0f : 0.0f,
-                                            guidanceLightActive
-                                                ? 0.0f
-                                                : std::clamp(frame.lich.staffLightStrength, 0.0f, 2.2f),
-                                            guidanceLightActive ? guidanceLight.position[0] : staffWorldPosition[0],
-                                            guidanceLightActive ? guidanceLight.position[1] : staffWorldPosition[1],
-                                            guidanceLightActive ? guidanceLight.position[2] : staffWorldPosition[2],
-                                             std::clamp(frame.lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
-                                             std::clamp(frame.lich.finaleDawnRevealProgress, 0.0f, 1.0f),
-                                             heldPropDepth,
-                                             static_cast<float>(frame.waterQuality),
-                                             tuning.waterfallWidthScale,
-                                             tuning.fogDensityScale,
-                                             torchTuning.hueDegrees,
-                                             torchTuning.intensityScale,
-                                             skylightTuning.hueDegrees,
-                                             skylightTuning.intensityScale,
-                                             passageTuning.hueDegrees,
-                                             passageTuning.intensityScale,
-                                             staffTuning.hueDegrees,
-                                             staffTuning.intensityScale,
-                                             static_cast<float>(tuning.workloadPreset),
-                                             genericTransmissionActive_ ? 1.0f : 0.0f,
-                                             guidanceLight.strength};
+    const ScenePushConstants pushConstants{
+        frame.cameraYaw,
+        frame.cameraPitch,
+        frame.torchLightStrength,
+        frame.walkTime,
+        frame.cameraX,
+        frame.cameraZ,
+        frame.walkAmount,
+        presentationUsesBgra_ && !scaledPresentation ? 1.0f : 0.0f,
+        std::clamp(frame.outputExposure, sceneProfile_ == RtSceneProfile::EntryMenu ? 0.0f : 0.2f,
+                   1.4f),
+        std::clamp(frame.combat.damageFlash, 0.0f, 1.0f),
+        frame.roster.selectedEnemy == horde::gameplay::EnemyKind::Lich ? 1.0f : 0.0f,
+        guidanceLightActive ? 0.0f : std::clamp(frame.lich.staffLightStrength, 0.0f, 2.2f),
+        guidanceLightActive ? guidanceLight.position[0] : staffWorldPosition[0],
+        guidanceLightActive ? guidanceLight.position[1] : staffWorldPosition[1],
+        guidanceLightActive ? guidanceLight.position[2] : staffWorldPosition[2],
+        std::clamp(frame.lich.finaleSkylightOpenProgress, 0.0f, 1.0f),
+        std::clamp(frame.lich.finaleDawnRevealProgress, 0.0f, 1.0f),
+        heldPropDepth,
+        static_cast<float>(frame.waterQuality),
+        tuning.waterfallWidthScale,
+        tuning.fogDensityScale,
+        torchTuning.hueDegrees,
+        torchTuning.intensityScale,
+        skylightTuning.hueDegrees,
+        skylightTuning.intensityScale,
+        passageTuning.hueDegrees,
+        passageTuning.intensityScale,
+        staffTuning.hueDegrees,
+        staffTuning.intensityScale,
+        static_cast<float>(tuning.workloadPreset),
+        genericTransmissionActive_ ? 1.0f : 0.0f,
+        guidanceLight.strength};
     lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
     vkCmdPushConstants(commandBuffer,
                        pipelineBundle_.pipelineLayout,

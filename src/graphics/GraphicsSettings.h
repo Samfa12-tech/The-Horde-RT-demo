@@ -42,7 +42,7 @@ enum class ShadowQuality : std::uint8_t { Lower = 0u, Current = 1u, Higher = 2u 
 enum class OpticalProfile : std::uint8_t { Mobile, High };
 enum class GraphicsBackend : std::uint8_t { Unsupported, RayTracingPipeline, RayQueryCompute };
 enum class GraphicsPreset : std::uint8_t { AcceptedBaseline, ReducedEffects, Custom, PlatformDefault };
-enum class GraphicsScene : std::uint8_t { Showcase, Preview };
+enum class GraphicsScene : std::uint8_t { Showcase, Preview, EntryMenu };
 
 struct GraphicsSettings
 {
