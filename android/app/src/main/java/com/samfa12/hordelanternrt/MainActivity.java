@@ -4245,6 +4245,7 @@ public class MainActivity extends Activity {
                             lifePhase == PLAYER_ALIVE) {
                         attackButton.setVisibility(View.VISIBLE);
                         parryButton.setVisibility(View.VISIBLE);
+                        dodgeButton.setVisibility(View.VISIBLE);
                     }
                     updateContextualControls(!debugCaptureUiSuppressed && !menuVisible &&
                             !diagnosticsVisible && !benchmarkRunning && !endingOverlayVisible &&

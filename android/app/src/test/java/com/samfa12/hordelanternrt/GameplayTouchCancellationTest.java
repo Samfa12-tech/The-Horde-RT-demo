@@ -4,7 +4,10 @@ import static org.junit.Assert.*;
 import android.content.Context;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import org.junit.Test;
@@ -22,8 +25,13 @@ public final class GameplayTouchCancellationTest {
     public static final class Bridge {
         static float strafe,forward;
         static int attacks,parries,dodges;
+        static int runtimeState=1;
         @Implementation protected static void __staticInitializer__() {}
-        @Implementation protected static int getSurfaceRuntimeState(long generation) { return 1; }
+        @Implementation protected static int getSurfaceRuntimeState(long generation) { return runtimeState; }
+        @Implementation protected static int getPlayerVitality() { return 3; }
+        @Implementation protected static int getPlayerLifePhase() { return 0; }
+        @Implementation protected static int getFinaleEndingPhase() { return 0; }
+        @Implementation protected static int getContextualControlState() { return 0; }
         @Implementation protected static void setViewControls(float yaw,float pitch,float light,float x,float z) {
             strafe=x; forward=z;
         }
@@ -51,6 +59,7 @@ public final class GameplayTouchCancellationTest {
         return MotionEvent.obtain(1,10,action,count,pp,pc,0,0,1,1,0,0,0,0);
     }
     private static MainActivity prepare() throws Exception {
+        Bridge.runtimeState=1;
         MainActivity a=Robolectric.buildActivity(MainActivity.class).get();
         SurfaceView surface=new SurfaceView(a); surface.layout(0,0,360,640);
         field("surfaceView").set(a,surface); field("menuVisible").setBoolean(a,false);
@@ -58,6 +67,29 @@ public final class GameplayTouchCancellationTest {
         for(String button:new String[]{"attackButton","parryButton","dodgeButton","interactButton","toggleHeldLightPoseButton"}) field(button).set(a,new Button(a));
         invoke(a,"configureGameplayActionButtons");
         invoke(a,"configureTouchControls"); return a;
+    }
+    @Test public void nativeReadyAfterPlayOrSurfaceRecoveryRestoresAllThreeActionButtons() throws Exception {
+        MainActivity a=prepare();
+        TextView status=new TextView(a);
+        status.setLayoutParams(new FrameLayout.LayoutParams(100,48));
+        field("rtStatus").set(a,status);
+        field("developerOverlay").set(a,new TextView(a));
+        field("vitalityStatus").set(a,new TextView(a));
+        field("lastPlayerVitality").setInt(a,3);
+        Runnable poll=(Runnable)field("runtimePoll").get(a);
+        // Play can close the menu before the native surface is ready. The
+        // same transition occurs after lifecycle surface recovery.
+        for(int attempt=0;attempt<2;attempt++) {
+            Bridge.runtimeState=0;
+            for(String name:new String[]{"attackButton","parryButton","dodgeButton"})
+                ((Button)field(name).get(a)).setVisibility(View.GONE);
+            poll.run();
+            assertEquals(View.GONE,((Button)field("dodgeButton").get(a)).getVisibility());
+            Bridge.runtimeState=1; poll.run();
+            for(String name:new String[]{"attackButton","parryButton","dodgeButton"})
+                assertEquals(name+" must recover when native becomes ready",View.VISIBLE,
+                        ((Button)field(name).get(a)).getVisibility());
+        }
     }
     private static void drag(MainActivity a,boolean lookFirst) throws Exception {
         SurfaceView surface=(SurfaceView)field("surfaceView").get(a);
