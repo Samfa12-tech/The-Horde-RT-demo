@@ -517,6 +517,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     torchBlas_ = std::exchange(other.torchBlas_, AccelerationStructure{});
     worldTorchBodyBlas_ = std::exchange(other.worldTorchBodyBlas_, AccelerationStructure{});
     swordBlas_ = std::exchange(other.swordBlas_, AccelerationStructure{});
+    playerSwordScabbardBlas_ =
+        std::exchange(other.playerSwordScabbardBlas_, AccelerationStructure{});
     gothicChestBaseBlas_ =
         std::exchange(other.gothicChestBaseBlas_, AccelerationStructure{});
     gothicChestLidBlas_ =
@@ -545,6 +547,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     collapseStaticAsset_ = std::move(other.collapseStaticAsset_);
     productionTorchAsset_ = std::move(other.productionTorchAsset_);
     playerTorchAsset_ = std::move(other.playerTorchAsset_);
+    playerSwordScabbardAsset_ = std::move(other.playerSwordScabbardAsset_);
     productionPlayerAsset_ = std::move(other.productionPlayerAsset_);
     gothicChestBaseAsset_ = std::move(other.gothicChestBaseAsset_);
     gothicChestLidAsset_ = std::move(other.gothicChestLidAsset_);
@@ -1039,6 +1042,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(gothicChestLidBlas_);
     DestroyAccelerationStructure(gothicChestBaseBlas_);
     DestroyAccelerationStructure(swordBlas_);
+    DestroyAccelerationStructure(playerSwordScabbardBlas_);
     DestroyAccelerationStructure(torchBlas_);
     DestroyAccelerationStructure(worldTorchBodyBlas_);
     DestroyAccelerationStructure(finaleRoofBlas_);
@@ -1086,6 +1090,7 @@ void PresentableTinyRtScene::Destroy()
     collapseStaticAsset_ = {};
     productionTorchAsset_ = {};
     playerTorchAsset_ = {};
+    playerSwordScabbardAsset_ = {};
     productionPlayerAsset_ = {};
     gothicChestBaseAsset_ = {};
     gothicChestLidAsset_ = {};
@@ -1203,6 +1208,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
     };
     for (const AccelerationStructure* blas : std::array{
              &blas_, &waterfallBlas_, &finaleRoofBlas_, &torchBlas_, &worldTorchBodyBlas_, &swordBlas_,
+             &playerSwordScabbardBlas_,
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_})
@@ -1256,6 +1262,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
     };
     for (const AccelerationStructure* blas : std::array{
              &blas_, &waterfallBlas_, &finaleRoofBlas_, &torchBlas_, &worldTorchBodyBlas_, &swordBlas_,
+             &playerSwordScabbardBlas_,
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_})
@@ -2223,6 +2230,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     collapseStaticAsset_ = {};
     productionTorchAsset_ = {};
     playerTorchAsset_ = {};
+    playerSwordScabbardAsset_ = {};
     productionPlayerAsset_ = {};
     gothicChestBaseAsset_ = {};
     gothicChestLidAsset_ = {};
@@ -2242,6 +2250,8 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     const auto swordDirectory = root / "models/weapons/runtime";
     const auto torchDirectory = root / "models/props/runtime";
     const auto playerTorchDirectory = root / "models/props/runtime/player-rag-torch";
+    const auto playerSwordScabbardDirectory =
+        root / "models/props/runtime/player-sword-scabbard";
     const auto playerDirectory = root / "models/player/runtime";
     const auto dielectricDirectory =
         root / "models/props/runtime/dielectric-fixture";
@@ -2257,6 +2267,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     horde::scene::assets::AssetManifest swordManifest;
     horde::scene::assets::AssetManifest torchManifest;
     horde::scene::assets::AssetManifest playerTorchManifest;
+    horde::scene::assets::AssetManifest playerSwordScabbardManifest;
     horde::scene::assets::AssetManifest playerManifest;
     horde::scene::assets::AssetManifest dielectricManifest;
     horde::scene::assets::AssetManifest chestBaseManifest;
@@ -2284,6 +2295,12 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         !horde::scene::assets::StaticMeshAsset::Load(
             playerTorchDirectory / "rag-torch-player-lod0.runtime.glb",
             playerTorchManifest, playerTorchAsset_, diagnostic) ||
+        !horde::scene::assets::AssetManifest::Load(
+            playerSwordScabbardDirectory / "asset.manifest.json",
+            playerSwordScabbardManifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            playerSwordScabbardDirectory / "player-sword-scabbard-lod0.runtime.glb",
+            playerSwordScabbardManifest, playerSwordScabbardAsset_, diagnostic) ||
         !horde::scene::assets::AssetManifest::Load(
             playerDirectory / "asset.manifest.json", playerManifest, diagnostic) ||
         !playerManifest.ValidatePlayerSemantics(diagnostic) ||
@@ -2376,6 +2393,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     registrations.push_back({kPlayerTorchInstanceIndex, 0x544f5243u,
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
         &playerTorchAsset_});
+    registrations.push_back({kPlayerSwordScabbardMetadataIndex, 0x53434142u,
+        static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
+        &playerSwordScabbardAsset_});
     if (!staticMeshSlot_.Initialize(registrations, diagnostic)) return false;
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
@@ -4341,7 +4361,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         !buildRegisteredStaticBlas(
             9u, "generic dielectric fixture", dielectricFixtureBlas_) ||
         !buildRegisteredStaticBlas(
-            kCollapseInstanceIndex, "production collapsed entry", collapseBlas_, true))
+            kCollapseInstanceIndex, "production collapsed entry", collapseBlas_, true) ||
+        !buildRegisteredStaticBlas(
+            kPlayerSwordScabbardMetadataIndex, "player sword scabbard",
+            playerSwordScabbardBlas_, true))
         return false;
 
     VkAccelerationStructureBuildRangeInfoKHR playerBodyRange{};
@@ -4767,6 +4790,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // remains TLAS slot1; this hidden owner keeps fixed slot correspondence.
     instances[kPlayerTorchInstanceIndex] = instances[1];
     instances[kPlayerTorchInstanceIndex].mask = 0u;
+    // Preserve TLAS slot25 as the new scabbard owner while Keeper aliases keep
+    // their original physical slots23/24.
+    instances[kPlayerSwordScabbardInstanceIndex] = instances[1];
+    instances[kPlayerSwordScabbardInstanceIndex].instanceCustomIndex =
+        kPlayerSwordScabbardMetadataIndex;
+    instances[kPlayerSwordScabbardInstanceIndex].mask = 0u;
+    instances[kPlayerSwordScabbardInstanceIndex].accelerationStructureReference =
+        playerSwordScabbardBlas_.address;
     ApplyKeeperTorchBodyInstances(instances);
     ApplyGlassFixtureVisibility(instances);
     if (!CreateBuffer(sizeof(instances), VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, uploadMemory, true, instanceBuffer_, diagnostic))
@@ -5787,6 +5818,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lichGpu.accelerationStructure.handle == VK_NULL_HANDLE ||
         finaleRoofBlas_.handle == VK_NULL_HANDLE || waterfallBlas_.handle == VK_NULL_HANDLE ||
         swordBlas_.handle == VK_NULL_HANDLE ||
+        playerSwordScabbardBlas_.handle == VK_NULL_HANDLE ||
         gothicChestBaseBlas_.handle == VK_NULL_HANDLE ||
         gothicChestLidBlas_.handle == VK_NULL_HANDLE ||
         rewardLanternRingBlas_.handle == VK_NULL_HANDLE ||
@@ -5904,6 +5936,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         animatedBodyOrigin[2]};
     const bool usesSkinnedPlayer =
         effectivePlayerRenderRoute != PlayerRenderRoute::Procedural;
+    auto worldFromBodyStow =
+        horde::gameplay::items::IdentityHeldItemTransform();
     if (frame.playerAnimation.swordStowBlend > 0.0f && !usesSkinnedPlayer)
     {
         diagnostic = "Sword BodyStow requires the animated player Hips socket.";
@@ -5948,20 +5982,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                          scaled(viewForward, viewVector[2]));
             return WorldVectorToPlayerModel(playerModelBasis, worldVector);
         };
-        auto worldFromBodyStow =
-            horde::gameplay::items::IdentityHeldItemTransform();
-        if (frame.playerAnimation.swordStowBlend > 0.0f)
-        {
-            horde::gameplay::items::HeldItemTransform worldFromHips{};
-            if (!playerRenderSlot_.AnimatedHipsWorldTransform(
-                    frame.playerAnimation, playerModelBasis, skinnedPlayerRootWorld,
-                    worldFromHips, diagnostic))
-                return false;
-            worldFromBodyStow =
-                horde::gameplay::items::MultiplyHeldItemTransforms(
-                    worldFromHips,
-                    horde::gameplay::items::SwordBodyStowFromHips());
-        }
+        horde::gameplay::items::HeldItemTransform worldFromHips{};
+        if (!playerRenderSlot_.AnimatedHipsWorldTransform(
+                frame.playerAnimation, playerModelBasis, skinnedPlayerRootWorld,
+                worldFromHips, diagnostic))
+            return false;
+        worldFromBodyStow =
+            horde::gameplay::items::MultiplyHeldItemTransforms(
+                worldFromHips,
+                horde::gameplay::items::SwordBodyStowFromHips());
         horde::gameplay::animation::PlayerAnimationSnapshot rigAnimation =
             frame.playerAnimation;
         rigAnimation.leftIk.shoulder = worldPointToPlayer(leftShoulder);
@@ -5976,6 +6005,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         rigAnimation.rightIk.gripX = viewVectorToPlayer(frame.playerAnimation.rightIk.gripX);
         rigAnimation.rightIk.gripY = viewVectorToPlayer(frame.playerAnimation.rightIk.gripY);
         rigAnimation.rightIk.gripZ = viewVectorToPlayer(frame.playerAnimation.rightIk.gripZ);
+        rigAnimation.rightIk.poseWeight =
+            std::clamp(frame.playerAnimation.swordHandGripBlend, 0.0f, 1.0f);
         if (frame.playerAnimation.swordStowBlend > 0.0f)
         {
             const auto expectedWorldFromItem =
@@ -6182,6 +6213,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     instances[1].accelerationStructureReference = torchBlas_.address;
     instances[kPlayerTorchInstanceIndex] = instances[1];
     instances[kPlayerTorchInstanceIndex].mask = 0u;
+    instances[kPlayerSwordScabbardInstanceIndex] = instances[1];
+    instances[kPlayerSwordScabbardInstanceIndex].instanceCustomIndex =
+        kPlayerSwordScabbardMetadataIndex;
+    instances[kPlayerSwordScabbardInstanceIndex].mask =
+        !usesSkinnedPlayer || productionVisibility.swordMask == 0u ? 0u : 0x36u;
+    instances[kPlayerSwordScabbardInstanceIndex].accelerationStructureReference =
+        playerSwordScabbardBlas_.address;
+    instances[kPlayerSwordScabbardInstanceIndex].transform =
+        heldTransformToInstanceTransform(worldFromBodyStow);
     const auto characterInstances = characterSlot_.BuildActiveInstances();
     instances[CharacterRenderSlot::kTlasInstanceIndex] = characterInstances[0];
     instances[3] = instances[1];

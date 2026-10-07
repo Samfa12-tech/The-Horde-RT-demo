@@ -1,6 +1,7 @@
 param(
     [string]$SourceRoot = "C:\Users\sam_s\Documents\Possum Cafe\PossumCafeAndroid\Archive\FilmCow Recorded SFX",
-    [string]$DestinationRoot = (Join-Path $PSScriptRoot "..\assets\audio\filmcow")
+    [string]$DestinationRoot = (Join-Path $PSScriptRoot "..\assets\audio\filmcow"),
+    [string[]]$Only = @()
 )
 
 $ErrorActionPreference = "Stop"
@@ -23,6 +24,16 @@ $clips = [ordered]@{
     "lich_impact.wav"     = "anvil hit 1.wav"
     "lich_fall.wav"       = "body fall with lots of bass 4.wav"
     "lich_hurt.wav"       = "body hit with grunt 3.wav"
+    "equipment/sword_draw.wav"   = "dagger unsheath 1.wav"
+    "equipment/sword_sheath.wav" = "dagger sheath 1.wav"
+}
+
+$selectedSourceHashes = @{
+    'equipment/sword_draw.wav' = '4aaa2a326513ea03c396617b8ec7e9388d5f7e0c17e489d698ad3e5af24c622b'
+    'equipment/sword_sheath.wav' = '3723e2ca6c31289f746dba9a75c85ba25170e66a2c1356a1de72f9268842f89e'
+}
+foreach ($name in $Only) {
+    if (-not $clips.Contains($name)) { throw "Unknown selected FilmCow cue: $name" }
 }
 
 function Convert-Pcm24ToPcm16 {
@@ -122,9 +133,15 @@ function Convert-Pcm24ToPcm16 {
 
 New-Item -ItemType Directory -Force -Path $DestinationRoot | Out-Null
 foreach ($entry in $clips.GetEnumerator()) {
+    if ($Only.Count -gt 0 -and $Only -notcontains $entry.Key) { continue }
     $source = Join-Path $SourceRoot $entry.Value
     $destination = Join-Path $DestinationRoot $entry.Key
+    $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination)
     if (-not (Test-Path -LiteralPath $source)) { throw "Missing FilmCow source clip: $source" }
+    if ($selectedSourceHashes.ContainsKey($entry.Key) -and
+        (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant() -ne $selectedSourceHashes[$entry.Key]) {
+        throw "Selected FilmCow source identity mismatch: $source"
+    }
     # The raw dirt contacts have substantially lower peaks than the UI and
     # finale cues. Normalize both actor sets with 2.16 dB of headroom; runtime
     # distance and spatial gains still set their place in the mix.
@@ -139,4 +156,5 @@ foreach ($entry in $clips.GetEnumerator()) {
     Write-Host "$($entry.Value) -> $($entry.Key)"
 }
 
-Write-Host "Imported $($clips.Count) FilmCow clips as mono 48 kHz 16-bit PCM WAV files."
+$importedCount = if ($Only.Count -gt 0) { $Only.Count } else { $clips.Count }
+Write-Host "Imported $importedCount FilmCow clips as mono 48 kHz 16-bit PCM WAV files."

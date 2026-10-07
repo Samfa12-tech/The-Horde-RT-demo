@@ -17,6 +17,9 @@ docs/evidence/2026-10-02-backend-pixel-witness/**/*.log whitespace=-trailing-spa
 
 # Public package policy pins the player Rag manifest's exact LF bytes.
 assets/models/props/runtime/player-rag-torch/asset.manifest.json text eol=lf
+assets/audio/filmcow/equipment/asset.manifest.json text eol=lf
+assets/models/props/runtime/player-sword-scabbard/asset.manifest.json text eol=lf
+assets/models/props/runtime/player-sword-scabbard/processing-receipt.json text eol=lf
 
 # 1.6.2 game-integrated owner-supplied cue derivatives; originals stay local.
 assets/audio/pixabay/keeper_i_sense_you.wav filter=lfs diff=lfs merge=lfs -text

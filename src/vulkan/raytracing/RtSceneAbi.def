@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "capacities": {
-    "instanceMetadata": 23,
-    "tlasInstances": 25,
-    "staticAssets": 11,
+    "instanceMetadata": 24,
+    "tlasInstances": 26,
+    "staticAssets": 12,
     "primitives": 32,
     "materials": 32,
     "textureLayers": 16,

@@ -56,6 +56,8 @@ struct HeldItemTransitionState
     float progress = 0.0f;
     float visualStartStowBlend = 0.0f;
     float visualTargetStowBlend = 0.0f;
+    float visualStartGripBlend = 1.0f;
+    float visualTargetGripBlend = 1.0f;
     std::uint64_t startedTick = 0u;
     std::uint64_t lastTransitionTick = 0u;
     std::uint64_t lastAdvancedTick = 0u;
@@ -79,6 +81,10 @@ struct HeldItemState
     // animated body mount. Kept separately from the midpoint attachment edge
     // so interruption/reversal never snaps the rendered item.
     float visualStowBlend = 0.0f;
+    // Weight for the right-arm IK that keeps the hand on the sword Grip.
+    // It remains a separate snapshot value so death/reversal can freeze the
+    // exact released-hand pose independently of the semantic attachment edge.
+    float visualGripBlend = 1.0f;
     std::uint64_t detachTick = 0u;
     bool detached = false;
     HeldItemTransitionState transition{};

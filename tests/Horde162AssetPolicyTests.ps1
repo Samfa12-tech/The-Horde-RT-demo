@@ -24,6 +24,16 @@ function Assert-RagTorchGradleInventory([string]$Text) {
     $expected=@('models/props/runtime/player-rag-torch/asset.manifest.json','models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb')
     Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle player Rag torch assets must be the exact two-file Android runtime roster.'
 }
+function Assert-EquipmentGradleInventory([string]$Text) {
+    $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'audio/filmcow/equipment/*' })
+    $expected=@('audio/filmcow/equipment/asset.manifest.json','audio/filmcow/equipment/sword_draw.wav','audio/filmcow/equipment/sword_sheath.wav')
+    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle equipment audio must be the exact three-file runtime roster.'
+}
+function Assert-ScabbardGradleInventory([string]$Text) {
+    $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'models/props/runtime/player-sword-scabbard/*' })
+    $expected=@('models/props/runtime/player-sword-scabbard/asset.manifest.json','models/props/runtime/player-sword-scabbard/processing-receipt.json','models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb')
+    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle scabbard must be the exact three-file runtime roster.'
+}
 function Assert-CollapsePackageInventory([string]$Text) {
     $errors=$null; $ast=[Management.Automation.Language.Parser]::ParseInput($Text,[ref]$null,[ref]$errors)
     Require ($errors.Count -eq 0) 'Package inventory script failed parsing.'
@@ -42,6 +52,15 @@ function Assert-RagTorchPackageInventory([string]$Text) {
     $strings=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.StringConstantExpressionAst]},$true) | ForEach-Object Value)
     foreach ($name in @('assets/models/props/runtime/player-rag-torch/asset.manifest.json','assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb')) {
         Require (@($strings | Where-Object { $_ -ceq $name }).Count -eq 2) 'Package inventory must require the player Rag torch pair in both platform archives.'
+    }
+}
+function Assert-EquipmentAndScabbardPackageInventory([string]$Text) {
+    $errors=$null; $ast=[Management.Automation.Language.Parser]::ParseInput($Text,[ref]$null,[ref]$errors)
+    Require ($errors.Count -eq 0) 'Package inventory script failed parsing.'
+    $strings=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.StringConstantExpressionAst]},$true) | ForEach-Object Value)
+    foreach ($name in @('assets/audio/filmcow/equipment/asset.manifest.json','assets/audio/filmcow/equipment/sword_draw.wav','assets/audio/filmcow/equipment/sword_sheath.wav',
+                       'assets/models/props/runtime/player-sword-scabbard/asset.manifest.json','assets/models/props/runtime/player-sword-scabbard/processing-receipt.json','assets/models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb')) {
+        Require (@($strings | Where-Object { $_ -ceq $name }).Count -eq 2) 'Package inventory must require every equipment/scabbard runtime file in both platform archives.'
     }
 }
 function Expect-Failure([scriptblock]$Action,[string]$Message) {
@@ -117,6 +136,12 @@ try {
     Assert-RagTorchGradleInventory $gradle; ++$script:checks
     Expect-Failure {Assert-RagTorchGradleInventory ($gradle.Replace("        include 'models/props/runtime/player-rag-torch/asset.manifest.json'",''))} 'exact two-file Android runtime roster'
     Expect-Failure {Assert-RagTorchGradleInventory ($gradle+"`ninclude 'models/props/runtime/player-rag-torch/*.glb'`n")} 'exact two-file Android runtime roster'
+    Assert-EquipmentGradleInventory $gradle; ++$script:checks
+    Expect-Failure {Assert-EquipmentGradleInventory ($gradle.Replace("        include 'audio/filmcow/equipment/sword_draw.wav'",''))} 'exact three-file runtime roster'
+    Expect-Failure {Assert-EquipmentGradleInventory ($gradle+"`ninclude 'audio/filmcow/equipment/*.wav'`n")} 'exact three-file runtime roster'
+    Assert-ScabbardGradleInventory $gradle; ++$script:checks
+    Expect-Failure {Assert-ScabbardGradleInventory ($gradle.Replace("        include 'models/props/runtime/player-sword-scabbard/processing-receipt.json'",''))} 'exact three-file runtime roster'
+    Expect-Failure {Assert-ScabbardGradleInventory ($gradle+"`ninclude 'models/props/runtime/player-sword-scabbard/*.glb'`n")} 'exact three-file runtime roster'
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
         Assert-CollapsePackageInventory $text; ++$script:checks
@@ -128,6 +153,9 @@ try {
     Assert-RagTorchPackageInventory $packageText; ++$script:checks
     Expect-Failure {Assert-RagTorchPackageInventory ($packageText.Replace('assets/models/props/runtime/player-rag-torch/asset.manifest.json','assets/models/props/runtime/player-rag-torch/omitted.json'))} 'both platform archives'
     Expect-Failure {Assert-RagTorchPackageInventory ($packageText.Replace('assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb','assets/models/props/runtime/player-rag-torch/omitted.glb'))} 'both platform archives'
+    Assert-EquipmentAndScabbardPackageInventory $packageText; ++$script:checks
+    Expect-Failure {Assert-EquipmentAndScabbardPackageInventory ($packageText.Replace('assets/audio/filmcow/equipment/sword_draw.wav','assets/audio/filmcow/equipment/omitted.wav'))} 'both platform archives'
+    Expect-Failure {Assert-EquipmentAndScabbardPackageInventory ($packageText.Replace('assets/models/props/runtime/player-sword-scabbard/processing-receipt.json','assets/models/props/runtime/player-sword-scabbard/omitted.json'))} 'both platform archives'
     $null=Assert-Horde162Assets $repo
     ++$script:checks
     $heldContract=Join-Path $repo 'tools/test-held-item-package-contract.ps1'
@@ -148,7 +176,7 @@ try {
         Expect-Failure {& $heldContract -AndroidApkPath $heldArchive -RequireHorde162World} 'byte/hash mismatch'
     }
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
-    Require ($windows.Count -eq 20 -and $android.Count -eq 21) 'Closed runtime roster count changed.'
+    Require ($windows.Count -eq 26 -and $android.Count -eq 27) 'Closed runtime roster count changed.'
     Require ($windows -ccontains 'audio/pixabay/waterfall_loop.wav' -and $windows -cnotcontains 'audio/pixabay/waterfall_core_loop.wav') 'Windows must preserve accepted full waterfall only.'
     Require ($android -ccontains 'audio/pixabay/waterfall_core_loop.wav' -and $android -cnotcontains 'audio/pixabay/waterfall_loop.wav') 'Android must use admitted Core loop only.'
     ++$script:checks
@@ -185,6 +213,12 @@ try {
         @{Name='missing-rag-torch-manifest';Platform='Windows';Omit='assets/models/props/runtime/player-rag-torch/asset.manifest.json'},
         @{Name='missing-props-array';Platform='Android';Omit='assets/textures/props/runtime/normal.android.ktx2'},
         @{Name='missing-props-manifest';Platform='Windows';Omit='assets/textures/props/runtime/asset.manifest.json'},
+        @{Name='missing-sword-draw';Platform='Android';Omit='assets/audio/filmcow/equipment/sword_draw.wav'},
+        @{Name='missing-sword-sheath';Platform='Windows';Omit='assets/audio/filmcow/equipment/sword_sheath.wav'},
+        @{Name='missing-equipment-manifest';Platform='Windows';Omit='assets/audio/filmcow/equipment/asset.manifest.json'},
+        @{Name='missing-scabbard-glb';Platform='Android';Omit='assets/models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb'},
+        @{Name='missing-scabbard-manifest';Platform='Windows';Omit='assets/models/props/runtime/player-sword-scabbard/asset.manifest.json'},
+        @{Name='missing-scabbard-receipt';Platform='Android';Omit='assets/models/props/runtime/player-sword-scabbard/processing-receipt.json'},
         @{Name='foreign-source';Platform='Windows';Extra='assets/textures/environment/source/foreign-original.png'},
         @{Name='foreign-cue';Platform='Android';Extra='assets/audio/pixabay/unreviewed.wav'},
         @{Name='windows-extra-core';Platform='Windows';Extra='assets/audio/pixabay/waterfall_core_loop.wav'},
@@ -197,6 +231,10 @@ try {
         @{Name='rag-torch-authoring-png';Platform='Android';Extra='assets/textures/props/source/rag-torch-v01/base-color.png'},
         @{Name='rag-torch-source-zip';Platform='Windows';Extra='assets/models/props/source/rag_torch_v01_blender_package.zip'},
         @{Name='props-source';Platform='Windows';Extra='assets/textures/props/source/private.png'},
+        @{Name='scabbard-source';Platform='Android';Extra='assets/models/props/source/player-sword-scabbard/source.blend'},
+        @{Name='scabbard-foreign-runtime';Platform='Windows';Extra='assets/models/props/runtime/player-sword-scabbard/unapproved.glb'},
+        @{Name='equipment-raw-clip';Platform='Android';Extra='assets/audio/filmcow/equipment/dagger unsheath 1.wav'},
+        @{Name='equipment-extra-clip';Platform='Windows';Extra='assets/audio/filmcow/equipment/unapproved.wav'},
         @{Name='props-extra-array';Platform='Android';Extra='assets/textures/props/runtime/unapproved.android.ktx2'},
         @{Name='props-wrong-platform';Platform='Windows';Extra='assets/textures/props/runtime/normal.android.ktx2'}
     )) {
@@ -225,7 +263,13 @@ try {
         @{Name='corrupt-rag-torch-glb';Platform='Windows';Path='assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb'},
         @{Name='corrupt-rag-torch-manifest';Platform='Android';Path='assets/models/props/runtime/player-rag-torch/asset.manifest.json'},
         @{Name='corrupt-props-array';Platform='Android';Path='assets/textures/props/runtime/base-color.android.ktx2'},
-        @{Name='corrupt-props-manifest';Platform='Windows';Path='assets/textures/props/runtime/asset.manifest.json'}
+        @{Name='corrupt-props-manifest';Platform='Windows';Path='assets/textures/props/runtime/asset.manifest.json'},
+        @{Name='corrupt-sword-draw';Platform='Windows';Path='assets/audio/filmcow/equipment/sword_draw.wav'},
+        @{Name='corrupt-sword-sheath';Platform='Android';Path='assets/audio/filmcow/equipment/sword_sheath.wav'},
+        @{Name='corrupt-equipment-manifest';Platform='Android';Path='assets/audio/filmcow/equipment/asset.manifest.json'},
+        @{Name='corrupt-scabbard-glb';Platform='Windows';Path='assets/models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb'},
+        @{Name='corrupt-scabbard-receipt';Platform='Android';Path='assets/models/props/runtime/player-sword-scabbard/processing-receipt.json'},
+        @{Name='corrupt-scabbard-manifest';Platform='Android';Path='assets/models/props/runtime/player-sword-scabbard/asset.manifest.json'}
     )) {
         $archive=New-FixtureArchive ($case.Name+'.zip') $case.Platform -Corrupt $case.Path
         Expect-Failure {Assert-Horde162Package $repo $archive $case.Platform} 'byte/hash mismatch'

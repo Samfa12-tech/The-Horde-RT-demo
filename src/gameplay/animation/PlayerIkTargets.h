@@ -25,6 +25,9 @@ struct PlayerArmIkTarget
     // Optional pose allowance for an overreaching authored chain. Zero keeps
     // the existing minimum-stretch policy; it does not move the grip target.
     float preferredElbowFlexionRadians = 0.0f;
+    // Blend from the imported animated arm pose to the gameplay Grip target.
+    // A zero weight leaves the arm at its authored pose.
+    float poseWeight = 1.0f;
 
     bool operator==(const PlayerArmIkTarget&) const = default;
 };

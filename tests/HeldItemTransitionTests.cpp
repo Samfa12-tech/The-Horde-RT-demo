@@ -41,6 +41,8 @@ bool SameTransition(const HeldItemTransitionState& left,
            sameFloat(left.progress, right.progress) &&
            sameFloat(left.visualStartStowBlend, right.visualStartStowBlend) &&
            sameFloat(left.visualTargetStowBlend, right.visualTargetStowBlend) &&
+           sameFloat(left.visualStartGripBlend, right.visualStartGripBlend) &&
+           sameFloat(left.visualTargetGripBlend, right.visualTargetGripBlend) &&
            left.startedTick == right.startedTick &&
            left.lastTransitionTick == right.lastTransitionTick &&
            left.lastAdvancedTick == right.lastAdvancedTick &&
@@ -57,7 +59,8 @@ void TestDrawSheathStowRestoreAndSingleAttachmentEdges()
 {
     HeldItemState sword = MakeHeldItemState(HeldItemId::Sword, HeldHand::RightHand);
     Check(ValidateHeldItemState(sword) &&
-              sword.parentMode == HeldItemParentMode::HandSocket,
+              sword.parentMode == HeldItemParentMode::HandSocket &&
+              Near(sword.visualGripBlend, 1.0f),
           "legacy held-item factory must remain valid and hand-attached by default");
 
     const auto sheath = RequestHeldItemTransition(
@@ -66,6 +69,8 @@ void TestDrawSheathStowRestoreAndSingleAttachmentEdges()
               sheath.semanticEdgeSequence == 1u && sword.transition.active &&
               sword.transition.sourceParent == HeldItemParentMode::HandSocket &&
               sword.transition.targetParent == HeldItemParentMode::BodyStow &&
+              Near(sword.transition.visualStartGripBlend, 1.0f) &&
+              Near(sword.transition.visualTargetGripBlend, 0.0f) &&
               !sword.detached,
           "sheath must begin one hand-to-body transition without world-detaching the item");
 
@@ -86,25 +91,31 @@ void TestDrawSheathStowRestoreAndSingleAttachmentEdges()
         const auto step = AdvanceHeldItemTransition(sword, tick, 1.0f / 60.0f);
         Check(step.status == HeldItemTransitionAdvanceStatus::Advanced &&
                   sword.parentMode == HeldItemParentMode::HandSocket &&
-                  !sword.transition.attachmentApplied,
-              "the source parent must remain authoritative before the midpoint edge");
+                  !sword.transition.attachmentApplied &&
+                  Near(sword.visualGripBlend, 1.0f) &&
+                  sword.visualStowBlend > 0.0f && sword.visualStowBlend < 1.0f,
+              "sheath travel must keep the sword hand-gripped while the item approaches Hips before the edge");
     }
     const auto attachment = AdvanceHeldItemTransition(sword, 111u, 1.0f / 60.0f);
     Check(attachment.status == HeldItemTransitionAdvanceStatus::AttachmentChanged &&
               attachment.attachmentChanged &&
               sword.parentMode == HeldItemParentMode::BodyStow &&
+              Near(sword.visualStowBlend, 1.0f) &&
+              Near(sword.visualGripBlend, 1.0f) &&
               sword.transition.attachmentApplied &&
               sword.transition.attachmentEdgeTick == 111u &&
               sword.transition.semanticEdgeSequence == 1u && !sword.detached,
-          "the fixed-tick midpoint must apply one recorded body-stow attachment edge");
+          "the fixed-tick edge must occur only after the hand and item reach the Hips Grip");
 
     for (std::uint64_t tick = 112u; tick <= 122u; ++tick)
         AdvanceHeldItemTransition(sword, tick, 1.0f / 60.0f);
     Check(!sword.transition.active &&
               sword.transition.progress == 1.0f &&
+              Near(sword.visualGripBlend, 0.0f) &&
+              Near(sword.visualStowBlend, 1.0f) &&
               sword.transition.attachmentEdgeTick == 111u &&
               ValidateHeldItemState(sword),
-          "completion must retain the exact single edge provenance in stable state");
+          "the hand must release only after the item is fully stowed, retaining one edge provenance");
     const auto alreadyStowed = RequestHeldItemTransition(
         sword, HeldItemTransitionKind::Sheath, 123u);
     Check(alreadyStowed.status == HeldItemTransitionRequestStatus::AlreadyAtTarget &&
@@ -131,14 +142,17 @@ void TestInterruptionAndReversalResolveToStableAttachment()
               sword.parentMode == HeldItemParentMode::HandSocket &&
               sword.transition.active && sword.transition.visualOnly &&
               !sword.transition.attachmentApplied &&
+              Near(sword.transition.visualStartGripBlend, sword.visualGripBlend) &&
               sword.transition.semanticEdgeSequence == 2u &&
               ValidateHeldItemState(sword),
           "pre-edge reversal must smoothly settle toward the source parent without a phantom attachment");
 
     const float blendAtReversal = sword.visualStowBlend;
+    const float gripBlendAtReversal = sword.visualGripBlend;
     const auto paused = AdvanceHeldItemTransition(sword, 13u, 0.1f, true);
     Check(paused.status == HeldItemTransitionAdvanceStatus::Paused &&
-              sword.visualStowBlend == blendAtReversal,
+              sword.visualStowBlend == blendAtReversal &&
+              sword.visualGripBlend == gripBlendAtReversal,
           "paused visual-settle reversal must preserve its exact attachment blend");
     for (std::uint64_t tick = 13u; tick < 40u; ++tick)
         AdvanceHeldItemTransition(sword, tick, 1.0f / 60.0f);
@@ -150,10 +164,11 @@ void TestInterruptionAndReversalResolveToStableAttachment()
     for (std::uint64_t tick = 41u; tick <= 49u; ++tick)
         AdvanceHeldItemTransition(sword, tick, 1.0f / 60.0f);
     Check(sword.parentMode == HeldItemParentMode::BodyStow &&
-              Near(sword.visualStowBlend, 0.5f) &&
+              Near(sword.visualStowBlend, 1.0f) &&
+              Near(sword.visualGripBlend, 1.0f) &&
               sword.transition.attachmentApplied &&
               sword.transition.attachmentEdgeTick == 49u,
-          "a later stow must attach once at its own exact fixed tick");
+          "a later stow must reach the mounted Grip before its own exact fixed-tick edge");
 
     const auto reverseAfterEdge = RequestHeldItemTransition(
         sword, HeldItemTransitionKind::Draw, 50u);
@@ -271,6 +286,7 @@ void TestDeathInterruptFreezesVisualBlendAndRestoredStateRecovers()
         AdvanceHeldItemTransition(sword, 401u,
             kHeldItemDrawDurationSeconds * interruptedProgress);
         const float displayedBlend = sword.visualStowBlend;
+        const float displayedGripBlend = sword.visualGripBlend;
         const HeldItemParentMode displayedParent = sword.parentMode;
 
         // GameSimulation interrupts an active sword transition when player
@@ -279,6 +295,7 @@ void TestDeathInterruptFreezesVisualBlendAndRestoredStateRecovers()
         Check(InterruptHeldItemTransition(sword, 402u) &&
                   !sword.transition.active &&
                   sword.visualStowBlend == displayedBlend &&
+                  sword.visualGripBlend == displayedGripBlend &&
                   sword.parentMode == displayedParent &&
                   ValidateHeldItemState(sword),
               "death interruption must freeze the displayed blend and parent without snapping");
@@ -286,6 +303,7 @@ void TestDeathInterruptFreezesVisualBlendAndRestoredStateRecovers()
         HeldItemState restored = sword;
         Check(ValidateHeldItemState(restored) &&
                   restored.visualStowBlend == displayedBlend &&
+                  restored.visualGripBlend == displayedGripBlend &&
                   restored.parentMode == displayedParent,
               "a death-frozen mid-transition snapshot must restore its exact render pose");
         const auto recovered = RequestHeldItemTransition(
@@ -306,8 +324,10 @@ void TestDeathInterruptFreezesVisualBlendAndRestoredStateRecovers()
         // A paused/dead renderer continues to derive the same pose from this
         // immutable blend; only a later simulation tick may change it.
         const float frozenBlend = sword.visualStowBlend;
+        const float frozenGripBlend = sword.visualGripBlend;
         AdvanceHeldItemTransition(sword, 403u, 1.0f / 60.0f);
         Check(sword.visualStowBlend == frozenBlend &&
+                  sword.visualGripBlend == frozenGripBlend &&
                   sword.parentMode == displayedParent,
               "an inactive death-frozen transition must stay visually fixed until recovery");
     }

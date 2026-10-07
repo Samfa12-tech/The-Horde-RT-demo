@@ -16,12 +16,13 @@
     "reward-lantern-body.BlackIron",
     "collapsed-entry/Boulder01Rock",
     "collapsed-entry/MedievalWall02",
-    "rag-torch-player/RagTorch_Atlas"
+    "rag-torch-player/RagTorch_Atlas",
+    "player-sword-scabbard/LeatherIron"
   ],
   "layerCounts": {
-    "baseColor": 13,
-    "normal": 13,
-    "orm": 13,
+    "baseColor": 14,
+    "normal": 14,
+    "orm": 14,
     "emissive": 1
   },
   "sourceLayers": [
@@ -258,6 +259,24 @@
         "bytes": 1344491,
         "sha256": "4127575d615a8b868f3b98b586bfc625cbc8ef6fecfbd6678e4b978076e26834"
       }
+    },
+    {
+      "layer": 13,
+      "baseColor": {
+        "path": "assets/textures/props/source/sword-scabbard/sword-scabbard-base-color.png",
+        "bytes": 988231,
+        "sha256": "a7c90b55592d3f5aad5cdcf85d44cd85ac9d3811b7f0daf8ac5f151f6733e1a9"
+      },
+      "normal": {
+        "path": "assets/textures/props/source/sword-scabbard/sword-scabbard-normal.png",
+        "bytes": 1523006,
+        "sha256": "ee42bf70f0873d1f5cf8aaac2b0d913af96ed8cc754e18b5ed4826374fade835"
+      },
+      "orm": {
+        "path": "assets/textures/props/source/sword-scabbard/sword-scabbard-orm.png",
+        "bytes": 5352,
+        "sha256": "45123bcaf49892f3943ed6c61e09dc030772f6ef18d1f174026a588ad1a2594e"
+      }
     }
   ],
   "normalConvention": "linear glTF/OpenGL +Y; existing generated-mipmap filter unchanged; runtime renormalizes mapped normals",
@@ -266,15 +285,15 @@
   "android": {
     "baseColor": {
       "format": "ASTC_6x6_SRGB_BLOCK",
-      "sha256": "58c86b8156f33523e4949e572a5409626dd38c1b111d14831d71a15dc8776267"
+      "sha256": "8ec835e988441ab533b77cc25ac9f2dbd83e91a36f614c0cdbed21a035e7c856"
     },
     "normal": {
       "format": "ASTC_4x4_UNORM_BLOCK",
-      "sha256": "aaf2af4624e86fe0029d31dffe1835d566edb08a1e1780db4a8638904a5a1ecc"
+      "sha256": "8b830b88a95b8a3eedbbb7555c5ef61046bd3280730fd25dc817b217decfdf3c"
     },
     "orm": {
       "format": "ASTC_6x6_UNORM_BLOCK",
-      "sha256": "e9981f16657e53ec9219708526ad47c194d60c6ef20676741e59b88759d0bb87"
+      "sha256": "81ef2a8bb533d27f5609a6e36852a7c5d31a9d51a4b7ccf6d1622a31ba0d8744"
     },
     "emissive": {
       "format": "ASTC_6x6_SRGB_BLOCK",
@@ -284,20 +303,20 @@
   "windows": {
     "baseColor": {
       "format": "R8G8B8A8_SRGB",
-      "sha256": "39e89e86fe06e832f9a0eddffa0e702643a1d91f0679476fd1d05ce4977a12b0"
+      "sha256": "849103d8a02c3f947549eb4c5cdebe40d6f671522d68a28af16264a5e25caa8b"
     },
     "normal": {
       "format": "R8G8B8A8_UNORM",
-      "sha256": "44efeb267234b79d4d0d3a574a366b309bdfea34ae102b5a45540f47c93ebf97"
+      "sha256": "ebbc7dfae582c0efe91c37f9ab9108d33aecacdc88071d797b37e55b42601c65"
     },
     "orm": {
       "format": "R8G8B8A8_UNORM",
-      "sha256": "ae7bdf275b3796f32d72eebf801fbde54fca41d6dcc647a7238c103de0ee7f5f"
+      "sha256": "43b10b4f1684ce3269ebedf096d426b679d12e442d5567c2f02b99d619720e82"
     },
     "emissive": {
       "format": "R8G8B8A8_SRGB",
       "sha256": "c642d3972a14bf477d88f2ecb34ffc177ad4dc6308dfe8f507af6033c292dd56"
     }
   },
-  "licenceStatus": "Existing Meshy outputs conservatively CC BY 4.0; collapsed-entry Boulder01 and MedievalWall02 CC0; RagTorch_Atlas is original assistant-authored geometry/maps with no blanket licence assigned; provenance in ASSET_LICENSES.md"
+  "licenceStatus": "Existing Meshy outputs conservatively CC BY 4.0; collapsed-entry Boulder01 and MedievalWall02 CC0; RagTorch_Atlas and player sword scabbard are original assistant-authored geometry/maps with no blanket licence assigned; provenance in ASSET_LICENSES.md"
 }

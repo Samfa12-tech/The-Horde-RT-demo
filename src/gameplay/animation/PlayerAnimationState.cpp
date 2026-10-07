@@ -110,6 +110,8 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
         fixedDeltaSeconds * kLanternPoseBlendRatePerSecond);
     snapshot_.swordStowBlend = std::clamp(
         FiniteOr(input.heldItemKinematics.swordStowBlend, 0.0f), 0.0f, 1.0f);
+    snapshot_.swordHandGripBlend = std::clamp(
+        FiniteOr(input.heldItemKinematics.swordHandGripBlend, 1.0f), 0.0f, 1.0f);
     snapshot_.leftIk.shoulder = input.heldItemKinematics.leftShoulderLocal;
     snapshot_.leftIk.target = input.heldItemKinematics.leftHandLocal;
     // A conventional first-person carry drops each upper arm beside the
@@ -148,6 +150,7 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
     snapshot_.rightIk.gripX = swordGrip.edgeDirection;
     snapshot_.rightIk.gripY = swordGrip.bladeAxis;
     snapshot_.rightIk.gripZ = swordGrip.flatNormal;
+    snapshot_.rightIk.poseWeight = snapshot_.swordHandGripBlend;
 }
 
 void PlayerAnimationState::Reset()

@@ -21,7 +21,10 @@
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <iterator>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -103,6 +106,142 @@ std::array<float, 3u> TransformPoint(const HeldItemTransform& transform,
     return {{transform[0] * point[0] + transform[4] * point[1] + transform[8] * point[2] + transform[12],
              transform[1] * point[0] + transform[5] * point[1] + transform[9] * point[2] + transform[13],
              transform[2] * point[0] + transform[6] * point[1] + transform[10] * point[2] + transform[14]}};
+}
+
+float Dot3(const std::array<float, 3u>& left,
+           const std::array<float, 3u>& right)
+{
+    return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+}
+
+std::array<float, 3u> Subtract3(const std::array<float, 3u>& left,
+                               const std::array<float, 3u>& right)
+{
+    return {{left[0] - right[0], left[1] - right[1], left[2] - right[2]}};
+}
+
+float PointTriangleDistanceSquared(const std::array<float, 3u>& point,
+                                   const std::array<std::array<float, 3u>, 3u>& triangle)
+{
+    const auto ab = Subtract3(triangle[1], triangle[0]);
+    const auto ac = Subtract3(triangle[2], triangle[0]);
+    const auto ap = Subtract3(point, triangle[0]);
+    const float d1 = Dot3(ab, ap);
+    const float d2 = Dot3(ac, ap);
+    if (d1 <= 0.0f && d2 <= 0.0f) return Dot3(ap, ap);
+    const auto bp = Subtract3(point, triangle[1]);
+    const float d3 = Dot3(ab, bp);
+    const float d4 = Dot3(ac, bp);
+    if (d3 >= 0.0f && d4 <= d3) return Dot3(bp, bp);
+    const float vc = d1 * d4 - d3 * d2;
+    if (vc <= 0.0f && d1 >= 0.0f && d3 <= 0.0f)
+    {
+        const float v = d1 / (d1 - d3);
+        const auto delta = Subtract3(point, Add(triangle[0], Scale(ab, v)));
+        return Dot3(delta, delta);
+    }
+    const auto cp = Subtract3(point, triangle[2]);
+    const float d5 = Dot3(ab, cp);
+    const float d6 = Dot3(ac, cp);
+    if (d6 >= 0.0f && d5 <= d6) return Dot3(cp, cp);
+    const float vb = d5 * d2 - d1 * d6;
+    if (vb <= 0.0f && d2 >= 0.0f && d6 <= 0.0f)
+    {
+        const float w = d2 / (d2 - d6);
+        const auto delta = Subtract3(point, Add(triangle[0], Scale(ac, w)));
+        return Dot3(delta, delta);
+    }
+    const float va = d3 * d6 - d5 * d4;
+    if (va <= 0.0f && d4 - d3 >= 0.0f && d5 - d6 >= 0.0f)
+    {
+        const float w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+        const auto delta = Subtract3(point, Add(triangle[1], Scale(
+            Subtract3(triangle[2], triangle[1]), w)));
+        return Dot3(delta, delta);
+    }
+    const float inverse = 1.0f / (va + vb + vc);
+    const float v = vb * inverse;
+    const float w = vc * inverse;
+    const auto closest = Add(Add(triangle[0], Scale(ab, v)), Scale(ac, w));
+    const auto delta = Subtract3(point, closest);
+    return Dot3(delta, delta);
+}
+
+float SegmentSegmentDistanceSquared(const std::array<float, 3u>& p1,
+                                    const std::array<float, 3u>& q1,
+                                    const std::array<float, 3u>& p2,
+                                    const std::array<float, 3u>& q2)
+{
+    const auto d1 = Subtract3(q1, p1);
+    const auto d2 = Subtract3(q2, p2);
+    const auto r = Subtract3(p1, p2);
+    const float a = Dot3(d1, d1);
+    const float e = Dot3(d2, d2);
+    const float f = Dot3(d2, r);
+    float s = 0.0f;
+    float t = 0.0f;
+    if (a <= 1.0e-12f && e <= 1.0e-12f) return Dot3(r, r);
+    if (a <= 1.0e-12f) t = std::clamp(f / e, 0.0f, 1.0f);
+    else
+    {
+        const float c = Dot3(d1, r);
+        if (e <= 1.0e-12f) s = std::clamp(-c / a, 0.0f, 1.0f);
+        else
+        {
+            const float b = Dot3(d1, d2);
+            const float denominator = a * e - b * b;
+            if (denominator > 1.0e-12f)
+                s = std::clamp((b * f - c * e) / denominator, 0.0f, 1.0f);
+            t = (b * s + f) / e;
+            if (t < 0.0f) { t = 0.0f; s = std::clamp(-c / a, 0.0f, 1.0f); }
+            else if (t > 1.0f) { t = 1.0f; s = std::clamp((b - c) / a, 0.0f, 1.0f); }
+        }
+    }
+    const auto delta = Subtract3(Add(p1, Scale(d1, s)), Add(p2, Scale(d2, t)));
+    return Dot3(delta, delta);
+}
+
+bool SegmentIntersectsTriangle(const std::array<float, 3u>& start,
+                               const std::array<float, 3u>& end,
+                               const std::array<std::array<float, 3u>, 3u>& triangle)
+{
+    const auto direction = Subtract3(end, start);
+    const auto edge1 = Subtract3(triangle[1], triangle[0]);
+    const auto edge2 = Subtract3(triangle[2], triangle[0]);
+    const auto p = Cross(direction, edge2);
+    const float determinant = Dot3(edge1, p);
+    if (std::abs(determinant) < 1.0e-8f) return false;
+    const float inverse = 1.0f / determinant;
+    const auto tvec = Subtract3(start, triangle[0]);
+    const float u = Dot3(tvec, p) * inverse;
+    if (u < 0.0f || u > 1.0f) return false;
+    const auto q = Cross(tvec, edge1);
+    const float v = Dot3(direction, q) * inverse;
+    if (v < 0.0f || u + v > 1.0f) return false;
+    const float t = Dot3(edge2, q) * inverse;
+    return t >= 0.0f && t <= 1.0f;
+}
+
+float TriangleDistanceSquared(
+    const std::array<std::array<float, 3u>, 3u>& left,
+    const std::array<std::array<float, 3u>, 3u>& right)
+{
+    float best = std::numeric_limits<float>::infinity();
+    for (std::size_t i = 0u; i < 3u; ++i)
+    {
+        best = std::min(best, PointTriangleDistanceSquared(left[i], right));
+        best = std::min(best, PointTriangleDistanceSquared(right[i], left));
+        const std::size_t next = (i + 1u) % 3u;
+        if (SegmentIntersectsTriangle(left[i], left[next], right) ||
+            SegmentIntersectsTriangle(right[i], right[next], left)) return 0.0f;
+        for (std::size_t j = 0u; j < 3u; ++j)
+        {
+            const std::size_t nextRight = (j + 1u) % 3u;
+            best = std::min(best, SegmentSegmentDistanceSquared(
+                left[i], left[next], right[j], right[nextRight]));
+        }
+    }
+    return best;
 }
 
 std::array<float, 3u> ExpectedWorldHandPoint(
@@ -885,6 +1024,150 @@ void TestProductionAssetsShareOneGenericStaticSlot()
     Check(permutations == 120u, "all 120 five-region atlas permutations must be exercised");
 }
 
+void TestPlayerSwordScabbardUsesAppendedProductionPbrLayer()
+{
+    using namespace horde::scene::assets;
+    using namespace horde::vulkan::raytracing;
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    std::array<AssetManifest, 12u> manifests{};
+    std::array<StaticMeshAsset, 12u> assets{};
+    std::array<std::filesystem::path, 12u> directories{{
+        root / "assets/models/weapons/runtime",
+        root / "assets/models/props/runtime",
+        root / "assets/models/player/runtime",
+        root / "assets/models/props/runtime/dielectric-fixture",
+        root / "assets/models/props/runtime/gothic-chest-base",
+        root / "assets/models/props/runtime/gothic-chest-lid",
+        root / "assets/models/props/runtime/reward-lantern-ring",
+        root / "assets/models/props/runtime/reward-lantern-body",
+        root / "assets/models/player/viewmodel/runtime",
+        root / "assets/models/world/runtime/collapsed-entry",
+        root / "assets/models/props/runtime/player-rag-torch",
+        root / "assets/models/props/runtime/player-sword-scabbard"}};
+    const std::array<const char*, 12u> filenames{{
+        "gothic-arming-sword-rh-lod0.runtime.glb",
+        "gothic-hand-torch-lod0.runtime.glb",
+        "gothic-traveller-lod0.runtime.glb",
+        "closed-glass-lod0.runtime.glb",
+        "gothic-chest-base-lod0.runtime.glb",
+        "gothic-chest-lid-lod0.runtime.glb",
+        "reward-lantern-ring-lod0.runtime.glb",
+        "reward-lantern-body-lod0.runtime.glb",
+        "gothic-traveller-viewmodel.runtime.glb",
+        "collapsed-entry-lod0.runtime.glb",
+        "rag-torch-player-lod0.runtime.glb",
+        "player-sword-scabbard-lod0.runtime.glb"}};
+    std::string diagnostic;
+    bool loaded = true;
+    for (std::size_t i = 0u; i < assets.size(); ++i)
+    {
+        loaded &= AssetManifest::Load(directories[i] / "asset.manifest.json",
+                                      manifests[i], diagnostic) &&
+                  StaticMeshAsset::Load(directories[i] / filenames[i],
+                                        manifests[i], assets[i], diagnostic);
+    }
+    Check(loaded,
+          "the complete production static roster including the scabbard must import before slot routing");
+    if (!loaded) return;
+
+    std::array<float, 3u> scabbardMinimum{{
+        std::numeric_limits<float>::infinity(),
+        std::numeric_limits<float>::infinity(),
+        std::numeric_limits<float>::infinity()}};
+    std::array<float, 3u> scabbardMaximum{{
+        -std::numeric_limits<float>::infinity(),
+        -std::numeric_limits<float>::infinity(),
+        -std::numeric_limits<float>::infinity()}};
+    for (const auto& vertex : assets[11].vertices)
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            scabbardMinimum[axis] = std::min(scabbardMinimum[axis], vertex.position[axis]);
+            scabbardMaximum[axis] = std::max(scabbardMaximum[axis], vertex.position[axis]);
+        }
+    Check(manifests[11].upAxis == "+Y" && manifests[11].forwardAxis == "+Z" &&
+              scabbardMaximum[1] - scabbardMinimum[1] > 0.70f &&
+              scabbardMaximum[2] - scabbardMinimum[2] < 0.05f,
+          "the imported scabbard geometry must follow its declared +Y up axis without a hidden node correction");
+
+    const auto pbr = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    std::array<StaticRtAssetRegistration, 12u> registrations{{
+        {3u, 0x53574f52u, pbr, 0u, &assets[0]},
+        {1u, 0x544f5243u, pbr, 1u, &assets[1]},
+        {4u, 0x504c4159u, pbr, 0u, &assets[2], nullptr,
+         RtGeometryRole::PlayerWorldBody},
+        {9u, 0x4449454cu,
+         pbr | static_cast<std::uint32_t>(RtInstanceFlag::Transmissive),
+         0u, &assets[3]},
+        {5u, 0x43484241u, pbr, 0u, &assets[4]},
+        {6u, 0x43484c44u, pbr, 0u, &assets[5]},
+        {7u, 0x4c4e5247u, pbr, 0u, &assets[6]},
+        {8u, 0x4c4e4244u,
+         pbr | static_cast<std::uint32_t>(RtInstanceFlag::Transmissive),
+         0u, &assets[7]},
+        {20u, 0x56494557u, pbr, 0u, &assets[8], &assets[2],
+         RtGeometryRole::PlayerViewmodel},
+        {21u, 0x434f4c4cu, pbr, 0u, &assets[9]},
+        {22u, 0x50524147u, pbr, 0u, &assets[10]},
+        {23u, 0x53434142u, pbr, 0u, &assets[11]},
+    }};
+    RtStaticMeshSlot slot;
+    const bool initialized = slot.Initialize(registrations, diagnostic);
+    Check(initialized,
+          "appending the scabbard must fit the unchanged generic static-PBR asset and metadata routes");
+    if (!initialized) return;
+
+    const auto& metadata = slot.InstanceMetadata();
+    const auto materialFor = [&](const std::uint32_t instance) -> const RtMaterialGpu* {
+        const auto& owner = metadata[instance];
+        if (owner.primitiveCount == 0u || owner.primitiveBase >= slot.PrimitiveMetadata().size())
+            return nullptr;
+        const auto materialIndex =
+            slot.PrimitiveMetadata()[owner.primitiveBase].materialIndex;
+        return materialIndex < slot.Materials().size()
+            ? &slot.Materials()[materialIndex] : nullptr;
+    };
+    const auto* legacyTorchMaterial = materialFor(1u);
+    const auto* ragTorchMaterial = materialFor(22u);
+    const auto* scabbardMaterial = materialFor(23u);
+    const auto scabbardFlags = static_cast<std::uint32_t>(RtMaterialFlag::BaseColorTexture) |
+        static_cast<std::uint32_t>(RtMaterialFlag::NormalTexture) |
+        static_cast<std::uint32_t>(RtMaterialFlag::OrmTexture);
+    Check(metadata[1].assetIndex == 1u && legacyTorchMaterial != nullptr &&
+              legacyTorchMaterial->textureLayers[0] == 1u,
+          "Keeper/reward torch remains the original production asset at layer 1");
+    Check(metadata[22].assetIndex == 10u && ragTorchMaterial != nullptr &&
+              ragTorchMaterial->textureLayers[0] == 12u,
+          "the player Rag torch keeps its existing independent layer 12 route");
+    Check(metadata[23].assetIndex == 11u &&
+              metadata[23].primitiveCount == assets[11].primitives.size() &&
+              assets[11].primitives.size() == 1u && scabbardMaterial != nullptr &&
+              scabbardMaterial->textureLayers ==
+                  std::array<std::uint32_t, 4u>{{13u, 13u, 13u, 0u}} &&
+              (scabbardMaterial->materialFlags[0] & scabbardFlags) == scabbardFlags &&
+              (scabbardMaterial->materialFlags[0] &
+                  static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture)) == 0u,
+          "the original sheath must use appended layer13 base/normal/ORM in the generic PBR route, with no emissive map");
+    const auto textureCounts = slot.TextureArrayCounts();
+    if (textureCounts.baseColor != 14u || textureCounts.normal != 14u ||
+        textureCounts.orm != 14u || textureCounts.emissive != 0u)
+    {
+        std::cerr << "Imported production texture layer counts base/normal/ORM/emissive="
+                  << textureCounts.baseColor << '/' << textureCounts.normal << '/'
+                  << textureCounts.orm << '/' << textureCounts.emissive << '\n';
+    }
+    Check(textureCounts.baseColor == 14u && textureCounts.normal == 14u &&
+              textureCounts.orm == 14u && textureCounts.emissive == 0u,
+          "the imported material roster must route 14/14/14 logical layers and no emissive maps");
+    const auto atlasManifestPath = root / "assets/textures/props/runtime/asset.manifest.json";
+    std::ifstream atlasManifestStream(atlasManifestPath, std::ios::binary);
+    const std::string atlasManifestText(
+        std::istreambuf_iterator<char>(atlasManifestStream), {});
+    Check(atlasManifestStream.good() || atlasManifestStream.eof(),
+          "the production atlas manifest must be readable for its physical fallback assertion");
+    Check(atlasManifestText.find("\"emissive\": 1") != std::string::npos,
+          "the physical production atlas retains its single shared black emissive fallback layer");
+}
+
 void TestProductionSocketsMatchSharedFixedStepContracts()
 {
     horde::scene::assets::StaticMeshAsset sword;
@@ -1123,13 +1406,14 @@ bool ResolveProductionAnatomicalSword(
 
 bool ResolveProductionSwordStowPose(
     horde::gameplay::items::HeldItemFixedStepInput input,
-    const float stowBlend,
+    const horde::gameplay::items::HeldItemState& swordState,
     horde::vulkan::raytracing::PlayerRenderSlot& rig,
     const std::uint64_t tick,
     HeldItemTransform& worldFromHips,
     HeldItemTransform& worldFromBodyStow,
     HeldItemTransform& worldFromFinalGrip,
     HeldItemTransform& worldFromDesiredGrip,
+    HeldItemTransform& worldFromDesiredItem,
     std::array<float, 3u>& playerRootWorld,
     horde::gameplay::items::HeldItemStates& renderItems,
     std::string& diagnostic)
@@ -1140,15 +1424,13 @@ bool ResolveProductionSwordStowPose(
     using namespace horde::vulkan::raytracing;
     input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
     HeldItemStates items = MakeDefaultHeldItemStates();
-    items[1].visualStowBlend = std::clamp(stowBlend, 0.0f, 1.0f);
-    items[1].parentMode = stowBlend >= 1.0f
-        ? HeldItemParentMode::BodyStow : HeldItemParentMode::HandSocket;
+    items[1] = swordState;
     input.swordItemState = &items[1];
     HeldItemFixedStepState fixed{};
     if (!ResolveHeldItemsFixedStep(items, input, tick, fixed, diagnostic)) return false;
-    items[1].visualStowBlend = stowBlend;
-    items[1].parentMode = stowBlend >= 1.0f
-        ? HeldItemParentMode::BodyStow : HeldItemParentMode::HandSocket;
+    items[1].parentMode = swordState.parentMode;
+    items[1].visualStowBlend = swordState.visualStowBlend;
+    items[1].visualGripBlend = swordState.visualGripBlend;
 
     PlayerAnimationState animationState;
     PlayerAnimationInput animationInput;
@@ -1192,11 +1474,11 @@ bool ResolveProductionSwordStowPose(
         return false;
     worldFromBodyStow = MultiplyHeldItemTransforms(
         worldFromHips, SwordBodyStowFromHips());
-    const auto expectedWorldFromItem = BlendHeldItemTransformsAtGrip(
+    worldFromDesiredItem = BlendHeldItemTransformsAtGrip(
         worldFromBodyStow, items[1].worldFromItem,
-        SwordGripSocketTransform(), 1.0f - stowBlend);
+        SwordGripSocketTransform(), 1.0f - items[1].visualStowBlend);
     const auto expectedWorldFromGrip = MultiplyHeldItemTransforms(
-        expectedWorldFromItem, SwordGripSocketTransform());
+        worldFromDesiredItem, SwordGripSocketTransform());
     worldFromDesiredGrip = expectedWorldFromGrip;
     animation.rightIk.target = WorldVectorToPlayerModel(basis, {{
         expectedWorldFromGrip[12] - root[0],
@@ -1257,7 +1539,11 @@ void TestActualRigSwordBodyStowAndContinuousDrawBlend()
     input.playerYawRadians = 0.42f;
     input.walkTime = 0.31f;
     input.walkAmount = 0.55f;
-    const std::array<float, 6u> blends{{1.0f, 0.75f, 0.501f, 0.499f, 0.25f, 0.0f}};
+    HeldItemState swordState = MakeHeldItemState(
+        HeldItemId::Sword, HeldHand::RightHand, HeldItemParentMode::BodyStow);
+    Check(RequestHeldItemTransition(swordState, HeldItemTransitionKind::Draw, 1u).status ==
+              HeldItemTransitionRequestStatus::Started,
+          "actual-rig transition fixture must begin with one body-to-hand Draw");
     HeldItemTransform previous{};
     HeldItemTransform originalTorch{};
     bool havePrevious = false;
@@ -1268,16 +1554,20 @@ void TestActualRigSwordBodyStowAndContinuousDrawBlend()
     bool allGripTargetsResolved = true;
     bool allRigidTransformsValid = true;
     std::uint64_t tick = 1u;
-    for (const float blend : blends)
+    for (std::uint32_t frame = 0u; frame <= 24u; ++frame)
     {
-        HeldItemTransform hips{}, bodyStow{}, finalGrip{}, desiredGrip{};
+        if (frame > 0u)
+            AdvanceHeldItemTransition(swordState, tick, 1.0f / 60.0f);
+        HeldItemTransform hips{}, bodyStow{}, finalGrip{}, desiredGrip{}, desiredItem{};
         std::array<float, 3u> playerRoot{};
         HeldItemStates rendered{};
-        if (!ResolveProductionSwordStowPose(input, blend, rig, tick++,
-                hips, bodyStow, finalGrip, desiredGrip, playerRoot,
-                rendered, diagnostic))
+        if (!ResolveProductionSwordStowPose(input, swordState, rig, tick++,
+                hips, bodyStow, finalGrip, desiredGrip, desiredItem,
+                playerRoot, rendered, diagnostic))
         {
-            std::cerr << "Sword stow actual-rig diagnostic: blend=" << blend
+            std::cerr << "Sword stow actual-rig diagnostic: progress="
+                      << swordState.transition.progress << " blend="
+                      << swordState.visualStowBlend << '/' << swordState.visualGripBlend
                       << " :: " << diagnostic << '\n';
             allGripTargetsResolved = false;
             continue;
@@ -1294,17 +1584,20 @@ void TestActualRigSwordBodyStowAndContinuousDrawBlend()
         // into the mount transform.
         allGripTargetsResolved &= TransformNear(finalHips, hips, 0.025f);
         const auto agreement = MeasureTransformAgreement(desiredGrip, finalGrip);
-        maximumGripPositionError = std::max(maximumGripPositionError,
-                                            agreement.positionErrorMetres);
-        maximumGripOrientationError = std::max(maximumGripOrientationError,
-                                                agreement.orientationErrorRadians);
-        allGripTargetsResolved &=
-            agreement.positionErrorMetres <= kPlayerGripSocketToleranceMetres &&
-            agreement.orientationErrorRadians <= kPlayerGripOrientationToleranceRadians &&
-            rig.RightGripAgreement().positionErrorMetres <=
-                kPlayerGripSocketToleranceMetres &&
-            rig.RightGripAgreement().orientationErrorRadians <=
-                kPlayerGripOrientationToleranceRadians;
+        if (swordState.visualGripBlend >= 0.999f)
+        {
+            maximumGripPositionError = std::max(maximumGripPositionError,
+                                                agreement.positionErrorMetres);
+            maximumGripOrientationError = std::max(maximumGripOrientationError,
+                                                    agreement.orientationErrorRadians);
+            allGripTargetsResolved &=
+                agreement.positionErrorMetres <= kPlayerGripSocketToleranceMetres &&
+                agreement.orientationErrorRadians <= kPlayerGripOrientationToleranceRadians &&
+                rig.RightGripAgreement().positionErrorMetres <=
+                    kPlayerGripSocketToleranceMetres &&
+                rig.RightGripAgreement().orientationErrorRadians <=
+                    kPlayerGripOrientationToleranceRadians;
+        }
         allRigidTransformsValid &= ValidateHeldItemSocketTransform(
             rendered[1].worldFromItem, diagnostic);
         allRigidTransformsValid &= rendered[0].id == HeldItemId::OriginalTorch &&
@@ -1312,10 +1605,8 @@ void TestActualRigSwordBodyStowAndContinuousDrawBlend()
         HeldItemTransform finalHandItem{};
         allRigidTransformsValid &= ComposeWorldFromItem(
             finalGrip, SwordGripSocketTransform(), finalHandItem, diagnostic);
-        const auto expectedRenderedSword = blend >= 1.0f
-            ? bodyStow : finalHandItem;
         allRigidTransformsValid &= TransformNear(
-            rendered[1].worldFromItem, expectedRenderedSword, 0.0002f);
+            rendered[1].worldFromItem, desiredItem, 0.0002f);
         if (!haveTorch)
         {
             originalTorch = rendered[0].worldFromItem;
@@ -1334,10 +1625,15 @@ void TestActualRigSwordBodyStowAndContinuousDrawBlend()
         previous = rendered[1].worldFromItem;
         havePrevious = true;
     }
+    Check(swordState.parentMode == HeldItemParentMode::HandSocket &&
+              swordState.visualStowBlend == 0.0f &&
+              swordState.visualGripBlend == 1.0f &&
+              !swordState.transition.active,
+          "the complete fixed-tick Draw must finish in its stable hand-owned endpoint");
     Check(allGripTargetsResolved && maximumGripPositionError <=
               kPlayerGripSocketToleranceMetres && maximumGripOrientationError <=
               kPlayerGripOrientationToleranceRadians,
-          "actual right-hand rig must track the Hips-to-hand Grip path through draw, midpoint and sheath");
+          "actual right-hand rig must hold the Grip through the stow reach, attachment edge, and moving draw half");
     Check(allRigidTransformsValid && maximumPositionStep < 0.35f,
           "the single rendered sword transform must remain rigid and continuous on both sides of the attachment edge");
 
@@ -1351,14 +1647,376 @@ void TestActualRigSwordBodyStowAndContinuousDrawBlend()
     Check(ValidateHeldItemState(saved) &&
               saved.visualStowBlend == interrupted.visualStowBlend,
           "saved mid-draw ownership blend must remain a valid resumable snapshot");
+    HeldItemTransform hipsBeforeReverse{}, bodyBeforeReverse{}, gripBeforeReverse{},
+        targetGripBeforeReverse{}, targetItemBeforeReverse{};
+    std::array<float, 3u> rootBeforeReverse{};
+    HeldItemStates renderedBeforeReverse{};
+    const bool beforeResolved = ResolveProductionSwordStowPose(
+        input, interrupted, rig, tick++, hipsBeforeReverse, bodyBeforeReverse,
+        gripBeforeReverse, targetGripBeforeReverse, targetItemBeforeReverse,
+        rootBeforeReverse, renderedBeforeReverse, diagnostic);
     const float beforeReverse = interrupted.visualStowBlend;
     const auto reverse = RequestHeldItemTransition(
         interrupted, HeldItemTransitionKind::Stow, 22u);
+    HeldItemTransform hipsAfterReverse{}, bodyAfterReverse{}, gripAfterReverse{},
+        targetGripAfterReverse{}, targetItemAfterReverse{};
+    std::array<float, 3u> rootAfterReverse{};
+    HeldItemStates renderedAfterReverse{};
+    const bool afterResolved = ResolveProductionSwordStowPose(
+        input, interrupted, rig, tick++, hipsAfterReverse, bodyAfterReverse,
+        gripAfterReverse, targetGripAfterReverse, targetItemAfterReverse,
+        rootAfterReverse, renderedAfterReverse, diagnostic);
     Check((reverse.status == HeldItemTransitionRequestStatus::Started ||
            reverse.status == HeldItemTransitionRequestStatus::InterruptedAndStarted) &&
               Near(interrupted.visualStowBlend, beforeReverse) &&
               ValidateHeldItemState(interrupted),
           "reversing an in-flight draw must preserve the exact displayed item blend");
+    Check(beforeResolved && afterResolved &&
+              TransformNear(renderedBeforeReverse[1].worldFromItem,
+                            renderedAfterReverse[1].worldFromItem, 0.000001f),
+          "a real-rig reversal request must preserve the exact rendered sword matrix on that fixed frame");
+    HeldItemTransform hipsAtDeath{}, bodyAtDeath{}, gripAtDeath{}, targetGripAtDeath{},
+        targetItemAtDeath{};
+    std::array<float, 3u> rootAtDeath{};
+    HeldItemStates renderedAtDeath{};
+    const HeldItemState deathSnapshot = interrupted;
+    const bool beforeDeathResolved = ResolveProductionSwordStowPose(
+        input, deathSnapshot, rig, tick++, hipsAtDeath, bodyAtDeath, gripAtDeath,
+        targetGripAtDeath, targetItemAtDeath, rootAtDeath, renderedAtDeath, diagnostic);
+    const bool interruptedForDeath = InterruptHeldItemTransition(interrupted, 23u);
+    const HeldItemState restoredDeathSnapshot = interrupted;
+    HeldItemTransform hipsRestored{}, bodyRestored{}, gripRestored{}, targetGripRestored{},
+        targetItemRestored{};
+    std::array<float, 3u> rootRestored{};
+    HeldItemStates renderedRestored{};
+    const bool afterDeathResolved = ResolveProductionSwordStowPose(
+        input, restoredDeathSnapshot, rig, tick++, hipsRestored, bodyRestored,
+        gripRestored, targetGripRestored, targetItemRestored, rootRestored,
+        renderedRestored, diagnostic);
+    Check(beforeDeathResolved && interruptedForDeath &&
+              ValidateHeldItemState(restoredDeathSnapshot) && afterDeathResolved &&
+              TransformNear(renderedAtDeath[1].worldFromItem,
+                            renderedRestored[1].worldFromItem, 0.000001f),
+          "death interruption and copied recovery must render the same actual-rig sword matrix without a jump");
+}
+
+void TestActualRigSwordSheathReachesGripBeforeAttachmentThenReleases()
+{
+    using namespace horde::gameplay::items;
+    using namespace horde::vulkan::raytracing;
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    PlayerRenderSlot rig;
+    std::string diagnostic;
+    Check(rig.LoadAsset((root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),
+                        diagnostic),
+          "sheathing must use the actual imported player rig");
+    if (!rig.IsLoaded()) return;
+
+    HeldItemFixedStepInput input;
+    input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+    input.playerX = -1.25f;
+    input.playerZ = -8.4f;
+    input.playerYawRadians = 0.42f;
+    input.walkTime = 0.31f;
+    input.walkAmount = 0.55f;
+    HeldItemState swordState = MakeHeldItemState(
+        HeldItemId::Sword, HeldHand::RightHand);
+    Check(RequestHeldItemTransition(swordState, HeldItemTransitionKind::Sheath, 1u).status ==
+              HeldItemTransitionRequestStatus::Started,
+          "actual-rig sheath fixture must start with the existing hand-owned sword");
+
+    HeldItemTransform previous{};
+    HeldItemTransform originalTorch{};
+    bool havePrevious = false;
+    bool haveTorch = false;
+    bool allAttachedGripSamplesMatch = true;
+    bool reachedEdge = false;
+    bool handReleased = false;
+    float maximumGripPositionError = 0.0f;
+    float maximumGripOrientationError = 0.0f;
+    float maximumPositionStep = 0.0f;
+    float minimumReleasedHandDistance = std::numeric_limits<float>::infinity();
+    std::uint64_t tick = 1u;
+    for (std::uint32_t frame = 0u; frame <= 22u; ++frame)
+    {
+        if (frame > 0u)
+        {
+            const auto advance = AdvanceHeldItemTransition(
+                swordState, tick, 1.0f / 60.0f);
+            reachedEdge |= advance.attachmentChanged;
+        }
+        HeldItemTransform hips{}, bodyStow{}, finalGrip{}, desiredGrip{}, desiredItem{};
+        std::array<float, 3u> playerRoot{};
+        HeldItemStates rendered{};
+        if (!ResolveProductionSwordStowPose(input, swordState, rig, tick++,
+                hips, bodyStow, finalGrip, desiredGrip, desiredItem,
+                playerRoot, rendered, diagnostic))
+        {
+            std::cerr << "Sword sheath actual-rig diagnostic: progress="
+                      << swordState.transition.progress << " blend="
+                      << swordState.visualStowBlend << '/' << swordState.visualGripBlend
+                      << " :: " << diagnostic << '\n';
+            allAttachedGripSamplesMatch = false;
+            continue;
+        }
+        if (swordState.visualGripBlend >= 0.999f)
+        {
+            const auto agreement = MeasureTransformAgreement(desiredGrip, finalGrip);
+            maximumGripPositionError = std::max(maximumGripPositionError,
+                                                agreement.positionErrorMetres);
+            maximumGripOrientationError = std::max(maximumGripOrientationError,
+                                                    agreement.orientationErrorRadians);
+            allAttachedGripSamplesMatch &=
+                agreement.positionErrorMetres <= kPlayerGripSocketToleranceMetres &&
+                agreement.orientationErrorRadians <= kPlayerGripOrientationToleranceRadians &&
+                rig.RightGripAgreement().positionErrorMetres <=
+                    kPlayerGripSocketToleranceMetres &&
+                rig.RightGripAgreement().orientationErrorRadians <=
+                    kPlayerGripOrientationToleranceRadians;
+        }
+        else if (swordState.visualGripBlend <= 0.001f)
+        {
+            handReleased = true;
+            minimumReleasedHandDistance = std::min(
+                minimumReleasedHandDistance,
+                MeasureTransformAgreement(desiredGrip, finalGrip).positionErrorMetres);
+        }
+        if (!haveTorch)
+        {
+            originalTorch = rendered[0].worldFromItem;
+            haveTorch = true;
+        }
+        allAttachedGripSamplesMatch &=
+            TransformNear(rendered[0].worldFromItem, originalTorch);
+        if (havePrevious)
+        {
+            const float dx = rendered[1].worldFromItem[12] - previous[12];
+            const float dy = rendered[1].worldFromItem[13] - previous[13];
+            const float dz = rendered[1].worldFromItem[14] - previous[14];
+            maximumPositionStep = std::max(maximumPositionStep,
+                std::sqrt(dx*dx + dy*dy + dz*dz));
+        }
+        previous = rendered[1].worldFromItem;
+        havePrevious = true;
+    }
+    Check(reachedEdge && swordState.parentMode == HeldItemParentMode::BodyStow &&
+              !swordState.transition.active && swordState.visualStowBlend == 1.0f &&
+              swordState.visualGripBlend == 0.0f,
+          "sheath must publish one midpoint ownership edge and finish with the item stowed");
+    Check(allAttachedGripSamplesMatch && maximumGripPositionError <=
+              kPlayerGripSocketToleranceMetres && maximumGripOrientationError <=
+              kPlayerGripOrientationToleranceRadians,
+          "the actual right hand must retain exact sword Grip through item travel and release only after the edge");
+    Check(handReleased && minimumReleasedHandDistance >= 0.10f &&
+              maximumPositionStep < 0.35f,
+          "the sheath must release the hand at the mounted endpoint without a sword-transform pop");
+}
+
+void TestFullScabbardMeshFitsAnimatedPlayerAndRouteFloor()
+{
+    using namespace horde::gameplay::items;
+    using namespace horde::vulkan::raytracing;
+    using namespace horde::scene::assets;
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    AssetManifest playerManifest;
+    AssetManifest scabbardManifest;
+    StaticMeshAsset playerAsset;
+    StaticMeshAsset scabbardAsset;
+    std::string diagnostic;
+    const auto playerDirectory = root / "assets/models/player/runtime";
+    const auto scabbardDirectory = root / "assets/models/props/runtime/player-sword-scabbard";
+    bool loaded = AssetManifest::Load(playerDirectory / "asset.manifest.json",
+                                      playerManifest, diagnostic) &&
+        StaticMeshAsset::Load(playerDirectory / "gothic-traveller-lod0.runtime.glb",
+                              playerManifest, playerAsset, diagnostic) &&
+        AssetManifest::Load(scabbardDirectory / "asset.manifest.json",
+                            scabbardManifest, diagnostic) &&
+        StaticMeshAsset::Load(scabbardDirectory / "player-sword-scabbard-lod0.runtime.glb",
+                              scabbardManifest, scabbardAsset, diagnostic);
+    Check(loaded, "full imported scabbard and player meshes must load for body/floor fit checks");
+    if (!loaded) return;
+
+    PlayerRenderSlot rig;
+    loaded = rig.LoadAsset((playerDirectory / "gothic-traveller-lod0.runtime.glb").string(),
+                           diagnostic) &&
+             rig.ValidateStaticVertexLayout(playerAsset, diagnostic);
+    Check(loaded && scabbardAsset.indices.size() == 912u,
+          "full mesh checks must use the exact validated player vertex/index correspondence and all 304 scabbard triangles");
+    if (!loaded || scabbardAsset.indices.size() != 912u) return;
+
+    struct Triangle
+    {
+        std::array<std::array<float, 3u>, 3u> point{};
+        std::array<float, 3u> minimum{};
+        std::array<float, 3u> maximum{};
+    };
+    const auto makeTriangle = [](const std::array<std::array<float, 3u>, 3u>& points) {
+        Triangle result;
+        result.point = points;
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            result.minimum[axis] = std::min({points[0][axis], points[1][axis], points[2][axis]});
+            result.maximum[axis] = std::max({points[0][axis], points[1][axis], points[2][axis]});
+        }
+        return result;
+    };
+    const auto boundsDistanceSquared = [](const Triangle& left, const Triangle& right) {
+        float result = 0.0f;
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            const float gap = left.maximum[axis] < right.minimum[axis]
+                ? right.minimum[axis] - left.maximum[axis]
+                : right.maximum[axis] < left.minimum[axis]
+                    ? left.minimum[axis] - right.maximum[axis] : 0.0f;
+            result += gap * gap;
+        }
+        return result;
+    };
+
+    const auto bodyMountInput = [&] (const float yaw, const float walkTime,
+                                    const float walkAmount, const float playerZ) {
+        HeldItemFixedStepInput input;
+        input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+        input.playerX = -5.5f;
+        input.playerZ = playerZ;
+        input.playerYawRadians = yaw;
+        input.walkTime = walkTime;
+        input.walkAmount = walkAmount;
+        return input;
+    };
+    const std::array<float, 4u> yaws{{0.0f, 1.570796327f, 3.141592654f, -1.570796327f}};
+    const auto& lowLintel = horde::scene::kShowcaseLowOverheadVolumes[0];
+    const float lowLintelCenterZ = 0.5f * (lowLintel.footprint[0][1] + lowLintel.footprint[2][1]);
+    const std::array<float, 2u> routePositions{{-14.5f, lowLintelCenterZ + 0.70f}};
+    float minimumBodyGap = std::numeric_limits<float>::infinity();
+    float minimumFloorGap = std::numeric_limits<float>::infinity();
+    float minimumReleasedHandDistance = std::numeric_limits<float>::infinity();
+    std::size_t closestPlayerTriangle = 0u;
+    std::size_t closestScabbardTriangle = 0u;
+    std::size_t poseCount = 0u;
+    bool allPosesResolved = true;
+    for (const float playerZ : routePositions)
+        for (const float yaw : yaws)
+            for (const auto& locomotion : std::array<std::array<float, 2u>, 2u>{{
+                    {{0.0f, 0.0f}}, {{0.5f, 0.65f}}}})
+            {
+                const auto input = bodyMountInput(yaw, locomotion[0], locomotion[1], playerZ);
+                HeldItemTransform hips{}, bodyStow{}, finalGrip{}, desiredGrip{}, desiredItem{};
+                std::array<float, 3u> playerRoot{};
+                HeldItemStates rendered{};
+                const HeldItemState stowedSword = MakeHeldItemState(
+                    HeldItemId::Sword, HeldHand::RightHand,
+                    HeldItemParentMode::BodyStow);
+                if (!ResolveProductionSwordStowPose(input, stowedSword, rig,
+                        ++poseCount, hips, bodyStow, finalGrip, desiredGrip,
+                        desiredItem, playerRoot, rendered, diagnostic))
+                {
+                    allPosesResolved = false;
+                    continue;
+                }
+                const auto basis = BuildPlayerModelWorldBasis(
+                    {{std::cos(yaw), 0.0f, std::sin(yaw)}},
+                    {{std::sin(yaw), 0.0f, -std::cos(yaw)}});
+                const auto handToSwordGrip = MeasureTransformAgreement(
+                    desiredGrip, finalGrip).positionErrorMetres;
+                minimumReleasedHandDistance = std::min(minimumReleasedHandDistance,
+                                                       handToSwordGrip);
+
+                std::vector<Triangle> sheathTriangles;
+                sheathTriangles.reserve(scabbardAsset.indices.size() / 3u);
+                std::array<float, 3u> sheathMinimum{{
+                    std::numeric_limits<float>::infinity(),
+                    std::numeric_limits<float>::infinity(),
+                    std::numeric_limits<float>::infinity()}};
+                std::array<float, 3u> sheathMaximum{{
+                    -std::numeric_limits<float>::infinity(),
+                    -std::numeric_limits<float>::infinity(),
+                    -std::numeric_limits<float>::infinity()}};
+                for (const auto& vertex : scabbardAsset.vertices)
+                {
+                    const auto point = TransformPoint(bodyStow,
+                        {{vertex.position[0], vertex.position[1], vertex.position[2]}});
+                    minimumFloorGap = std::min(minimumFloorGap,
+                        point[1] - horde::gameplay::kRouteFloorWorldY);
+                    for (std::size_t axis = 0u; axis < 3u; ++axis)
+                    {
+                        sheathMinimum[axis] = std::min(sheathMinimum[axis], point[axis]);
+                        sheathMaximum[axis] = std::max(sheathMaximum[axis], point[axis]);
+                    }
+                }
+                for (const auto& primitive : scabbardAsset.primitives)
+                    for (std::uint32_t offset = 0u; offset < primitive.indexCount; offset += 3u)
+                    {
+                        std::array<std::array<float, 3u>, 3u> points{};
+                        for (std::size_t corner = 0u; corner < 3u; ++corner)
+                        {
+                            const auto index = scabbardAsset.indices[
+                                primitive.indexOffset + offset + corner];
+                            const auto& vertex = scabbardAsset.vertices.at(
+                                primitive.vertexOffset + index);
+                            points[corner] = TransformPoint(bodyStow,
+                                {{vertex.position[0], vertex.position[1], vertex.position[2]}});
+                        }
+                        sheathTriangles.push_back(makeTriangle(points));
+                    }
+
+                const auto& skinned = rig.UniqueVertices();
+                std::vector<Triangle> playerTriangles;
+                for (const auto& primitive : playerAsset.primitives)
+                    for (std::uint32_t offset = 0u; offset < primitive.indexCount; offset += 3u)
+                    {
+                        std::array<std::array<float, 3u>, 3u> points{};
+                        for (std::size_t corner = 0u; corner < 3u; ++corner)
+                        {
+                            const auto index = playerAsset.indices[
+                                primitive.indexOffset + offset + corner];
+                            const auto vertexIndex = primitive.vertexOffset + index;
+                            if (vertexIndex >= skinned.size())
+                            {
+                                allPosesResolved = false;
+                                continue;
+                            }
+                            const auto& vertex = skinned[vertexIndex];
+                            points[corner] = Add(playerRoot,
+                                PlayerModelVectorToWorld(basis,
+                                    {{vertex.position[0], vertex.position[1], vertex.position[2]}}));
+                        }
+                        playerTriangles.push_back(makeTriangle(points));
+                    }
+                float poseMinimum = std::numeric_limits<float>::infinity();
+                for (std::size_t bodyIndex = 0u; bodyIndex < playerTriangles.size(); ++bodyIndex)
+                {
+                    const auto& body = playerTriangles[bodyIndex];
+                    for (std::size_t sheathIndex = 0u;
+                         sheathIndex < sheathTriangles.size(); ++sheathIndex)
+                    {
+                        const auto& sheath = sheathTriangles[sheathIndex];
+                        const float lowerBound = boundsDistanceSquared(body, sheath);
+                        if (lowerBound >= poseMinimum * poseMinimum) continue;
+                        const float distance = std::sqrt(TriangleDistanceSquared(
+                            body.point, sheath.point));
+                        if (distance < poseMinimum)
+                        {
+                            poseMinimum = distance;
+                            if (distance < minimumBodyGap)
+                            {
+                                minimumBodyGap = distance;
+                                closestPlayerTriangle = bodyIndex;
+                                closestScabbardTriangle = sheathIndex;
+                            }
+                        }
+                    }
+                }
+            }
+
+    std::cout << "stowed scabbard full-mesh sweep poses=" << poseCount
+              << " closestGap=" << minimumBodyGap << "m playerTri="
+              << closestPlayerTriangle << " sheathTri=" << closestScabbardTriangle
+              << " floorGap=" << minimumFloorGap << "m releasedHand="
+              << minimumReleasedHandDistance << "m\n";
+    Check(allPosesResolved && poseCount == 16u && minimumBodyGap >= 0.015f &&
+              minimumFloorGap >= 0.10f && minimumReleasedHandDistance >= 0.10f,
+          "full authored sheath triangles must clear the skinned body and route floor while the right hand releases on Idle/Walking yaw sweeps");
 }
 
 void TestSwordOverheadClearanceUsesImportedBladeAcrossCombatPhases()
@@ -1666,11 +2324,14 @@ int main()
     TestProductionSwordAssetMeetsGenericSocketAndPbrBudget();
     TestProductionTorchAssetMeetsGenericSocketAndPbrBudget();
     TestProductionAssetsShareOneGenericStaticSlot();
+    TestPlayerSwordScabbardUsesAppendedProductionPbrLayer();
     TestProductionSocketsMatchSharedFixedStepContracts();
     TestPlayerRagTorchSocketsDriveFixedStepAttachmentAndLight();
     TestProductionTorchFitsSharedClearanceEnvelope();
     TestRagTorchEnvelopeIncludesTheUnchangedEngineFire();
     TestActualRigSwordBodyStowAndContinuousDrawBlend();
+    TestActualRigSwordSheathReachesGripBeforeAttachmentThenReleases();
+    TestFullScabbardMeshFitsAnimatedPlayerAndRouteFloor();
     TestSwordOverheadClearanceUsesImportedBladeAcrossCombatPhases();
     if (failures == 0)
     {

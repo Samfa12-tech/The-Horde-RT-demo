@@ -232,14 +232,17 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kBlasCount == 19u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 25u &&
-                      kRtInstanceMetadataCapacity == 23u &&
+    ok &= Require(PresentableTinyRtScene::kBlasCount == 20u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 26u &&
+                      kRtInstanceMetadataCapacity == 24u &&
+                      kRtStaticAssetCapacity == 12u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&
-                      PresentableTinyRtScene::kPlayerTorchInstanceIndex == 22u,
-                  "bounded BLAS maximum includes shared world-torch and separate player torch; TLAS25 retains viewmodel20/collapse21/player torch22 before Keeper aliases23/24");
+                      PresentableTinyRtScene::kPlayerTorchInstanceIndex == 22u &&
+                      PresentableTinyRtScene::kPlayerSwordScabbardMetadataIndex == 23u &&
+                      PresentableTinyRtScene::kPlayerSwordScabbardInstanceIndex == 25u,
+                  "new scabbard metadata23/TLAS25 and static asset12 fit fixed capacities while preserving viewmodel20/collapse21/player torch22 and Keeper TLAS aliases23/24");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
     const DynamicBlasToTlasDependency playerOnlyDependency =
@@ -639,6 +642,15 @@ int main()
             ReadTextFile(raygenDirectory / "include/rt_atmosphere.glsl");
         const std::string sceneSource =
             ReadTextFile(root / "src/vulkan/raytracing/PresentableTinyRtScene.cpp");
+        ok &= Require(sceneSource.find(
+                          "instances[3].transform = heldItemInstanceTransform(renderHeldItems[1]);") != std::string::npos &&
+                      sceneSource.find(
+                          "instances[kPlayerSwordScabbardInstanceIndex].transform =\n"
+                          "        heldTransformToInstanceTransform(worldFromBodyStow);") != std::string::npos &&
+                      sceneSource.find(
+                          "instances[kPlayerSwordScabbardInstanceIndex].mask =\n"
+                          "        !usesSkinnedPlayer || productionVisibility.swordMask == 0u ? 0u : 0x36u;") != std::string::npos,
+                      "the single held sword TLAS transform and its animated Hips sheath must share the final render pose, with the sheath contributing standard shadow/reflection masks only when sword visibility is enabled");
         const std::string simulationSource =
             ReadTextFile(root / "src/gameplay/simulation/GameSimulation.cpp");
         const std::string pendulumSource =

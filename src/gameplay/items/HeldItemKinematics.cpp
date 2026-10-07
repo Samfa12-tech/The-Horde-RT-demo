@@ -300,15 +300,20 @@ HeldItemTransform PlayerRagTorchLightSocketTransform()
 HeldItemTransform SwordBodyStowFromHips()
 {
     // The runtime player model maps +X to anatomical left and +Z forward.
-    // A 180-degree roll about forward sends the blade's +Y axis down while
-    // preserving a proper right-handed frame and facing the broad flat out.
+    // This measured outside-right-hip fit follows the player asset's Hips
+    // socket, tilts the blade away from the pelvis, and preserves a proper
+    // right-handed frame. The +Z rotation component keeps the broad flat out.
     HeldItemTransform result = IdentityHeldItemTransform();
+    constexpr float cosine = 0.877582562f;
+    constexpr float sine = 0.479425539f;
     result[0] = -1.0f;
-    result[5] = -1.0f;
-    result[10] = 1.0f;
-    result[12] = -0.15f;
+    result[5] = -cosine;
+    result[6] = -sine;
+    result[9] = -sine;
+    result[10] = cosine;
+    result[12] = -0.30f;
     result[13] = 0.135f;
-    result[14] = 0.03f;
+    result[14] = -0.09f;
     return result;
 }
 
@@ -1120,6 +1125,8 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
     {
         state.kinematics.swordStowBlend = std::clamp(
             input.swordItemState->visualStowBlend, 0.0f, 1.0f);
+        state.kinematics.swordHandGripBlend = std::clamp(
+            input.swordItemState->visualGripBlend, 0.0f, 1.0f);
     }
 
     constexpr Vec3 worldUp{{0.0f, 1.0f, 0.0f}};

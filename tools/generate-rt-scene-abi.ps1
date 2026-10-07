@@ -26,7 +26,7 @@ finally {
     $sha256.Dispose()
 }
 $c = $definition.capacities
-foreach ($name in @('instanceMetadata', 'tlasInstances', 'fireEmitters', 'activeFireEmitters')) {
+foreach ($name in @('instanceMetadata', 'tlasInstances', 'staticAssets', 'fireEmitters', 'activeFireEmitters')) {
     $value = $c.$name
     if (($value -isnot [int] -and $value -isnot [long]) -or $value -lt 1 -or $value -gt 256) {
         throw "RT scene ABI capacity '$name' must be an integer in [1,256]."

@@ -46,7 +46,8 @@ $base = @(
     "$props/chest-iron-base-color.png", "$props/chest-wood-base-color.png",
     "$props/chest-iron-base-color.png", "$props/lantern-iron-base-color.png",
     "$props/lantern-iron-base-color.png", "$collapse/boulder01-base-color.png",
-    "$collapse/medieval-wall02-base-color.png", "$props/rag-torch-v01/base-color.png")
+    "$collapse/medieval-wall02-base-color.png", "$props/rag-torch-v01/base-color.png",
+    "$props/sword-scabbard/sword-scabbard-base-color.png")
 $normal = @(
     "$shared/sword-normal.png", "$shared/torch-normal.png", "$shared/player-normal.png",
     "$shared/player-gauntlet-normal.png",
@@ -54,7 +55,7 @@ $normal = @(
     "$props/chest-wood-normal.png", "$props/chest-iron-normal.png",
     "$props/lantern-iron-normal.png", "$props/lantern-iron-normal.png",
     "$collapse/boulder01-normal.png", "$collapse/medieval-wall02-normal.png",
-    "$props/rag-torch-v01/normal.png")
+    "$props/rag-torch-v01/normal.png", "$props/sword-scabbard/sword-scabbard-normal.png")
 $orm = @(
     "$shared/sword-orm.png", "$shared/torch-orm.png", "$shared/player-orm.png",
     "$shared/player-gauntlet-orm.png",
@@ -62,7 +63,7 @@ $orm = @(
     "$props/chest-wood-orm.png", "$props/chest-iron-orm.png",
     "$props/lantern-iron-orm.png", "$props/lantern-iron-orm.png",
     "$collapse/boulder01-orm.png", "$collapse/medieval-wall02-orm.png",
-    "$props/rag-torch-v01/orm.png")
+    "$props/rag-torch-v01/orm.png", "$props/sword-scabbard/sword-scabbard-orm.png")
 $compiler = Join-Path $PSScriptRoot "compile-static-texture-array.ps1"
 $compilerOptions = @{ AssignPrimaries = "bt709" }
 if (-not [string]::IsNullOrWhiteSpace($KtxPath)) { $compilerOptions.KtxPath = $KtxPath }
@@ -108,8 +109,9 @@ $manifest = [ordered]@{
         "gothic-chest-base.BlackIron", "gothic-chest-lid.ChestWood",
         "gothic-chest-lid.BlackIron", "reward-lantern-ring.BlackIron",
         "reward-lantern-body.BlackIron", "collapsed-entry/Boulder01Rock",
-        "collapsed-entry/MedievalWall02", "rag-torch-player/RagTorch_Atlas")
-    layerCounts = [ordered]@{ baseColor = 13; normal = 13; orm = 13; emissive = 1 }
+        "collapsed-entry/MedievalWall02", "rag-torch-player/RagTorch_Atlas",
+        "player-sword-scabbard/LeatherIron")
+    layerCounts = [ordered]@{ baseColor = 14; normal = 14; orm = 14; emissive = 1 }
     sourceLayers = @(
         for ($layer = 0; $layer -lt $base.Count; ++$layer) {
             [ordered]@{ layer = $layer; baseColor = Get-SourceRecord $base[$layer];
@@ -131,7 +133,7 @@ $manifest = [ordered]@{
         orm = [ordered]@{ format = "R8G8B8A8_UNORM"; sha256 = Get-Sha "orm.windows.ktx2" }
         emissive = [ordered]@{ format = "R8G8B8A8_SRGB"; sha256 = Get-Sha "emissive.windows.ktx2" }
     }
-    licenceStatus = "Existing Meshy outputs conservatively CC BY 4.0; collapsed-entry Boulder01 and MedievalWall02 CC0; RagTorch_Atlas is original assistant-authored geometry/maps with no blanket licence assigned; provenance in ASSET_LICENSES.md"
+    licenceStatus = "Existing Meshy outputs conservatively CC BY 4.0; collapsed-entry Boulder01 and MedievalWall02 CC0; RagTorch_Atlas and player sword scabbard are original assistant-authored geometry/maps with no blanket licence assigned; provenance in ASSET_LICENSES.md"
 }
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $runtime "asset.manifest.json") -Encoding utf8
 Write-Output "Built deterministic 1K production static-prop texture arrays and manifest."

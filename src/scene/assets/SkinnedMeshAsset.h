@@ -87,6 +87,7 @@ struct SkinnedArmIkTarget
     // Bounded [0, pi/4] allowance when fitting an overreaching chain. The
     // existing maximum axial stretch still takes precedence over this pose.
     float preferredElbowFlexionRadians = 0.0f;
+    float poseWeight = 1.0f;
 };
 
 struct SkinnedPlayerSockets

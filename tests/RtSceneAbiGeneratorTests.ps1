@@ -47,18 +47,21 @@ try {
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
     $capacityCpu = Get-Content -LiteralPath $portableCpuPath -Raw
-    if ($definition.capacities.instanceMetadata -ne 23 -or $definition.capacities.tlasInstances -ne 25 -or
-        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 25u;' -or
-        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 23u;' -or
+    if ($definition.capacities.instanceMetadata -ne 24 -or $definition.capacities.tlasInstances -ne 26 -or
+        $definition.capacities.staticAssets -ne 12 -or
+        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 26u;' -or
+        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 24u;' -or
+        $capacityCpu -notmatch 'kRtStaticAssetCapacity = 12u;' -or
         $capacityCpu -notmatch 'kRtActiveFireEmitterCapacity = 4u;' -or
         $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;') {
-        throw 'Generated owners must distinguish25 TLAS instances from23 metadata records while retaining four fire storage records.'
+        throw 'Generated owners must distinguish26 TLAS instances from24 metadata records, admit12 generic static assets, and retain four fire storage records.'
     }
     foreach ($case in @(
         @{ name = 'tlasInstances'; value = 21 },
         @{ name = 'tlasInstances'; value = 257 },
         @{ name = 'tlasInstances'; value = 24.5 },
         @{ name = 'tlasInstances'; value = '24' },
+        @{ name = 'staticAssets'; value = 0 },
         @{ name = 'activeFireEmitters'; value = 5 }
     )) {
         $invalidCapacity = Get-Content -LiteralPath $lfDefinitionPath -Raw | ConvertFrom-Json

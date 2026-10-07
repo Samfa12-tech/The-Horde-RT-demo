@@ -571,6 +571,49 @@ Matrix RigidRotation(const Matrix& source)
     return result;
 }
 
+Quat RotationQuaternion(const Matrix& source)
+{
+    const Matrix rotation = RigidRotation(source);
+    const float m00 = rotation.m[0], m01 = rotation.m[4], m02 = rotation.m[8];
+    const float m10 = rotation.m[1], m11 = rotation.m[5], m12 = rotation.m[9];
+    const float m20 = rotation.m[2], m21 = rotation.m[6], m22 = rotation.m[10];
+    const float trace = m00 + m11 + m22;
+    Quat result{};
+    if (trace > 0.0f)
+    {
+        const float scale = std::sqrt(trace + 1.0f) * 2.0f;
+        result.w = 0.25f * scale;
+        result.x = (m21 - m12) / scale;
+        result.y = (m02 - m20) / scale;
+        result.z = (m10 - m01) / scale;
+    }
+    else if (m00 > m11 && m00 > m22)
+    {
+        const float scale = std::sqrt(std::max(0.0f, 1.0f + m00 - m11 - m22)) * 2.0f;
+        result.w = (m21 - m12) / scale;
+        result.x = 0.25f * scale;
+        result.y = (m01 + m10) / scale;
+        result.z = (m02 + m20) / scale;
+    }
+    else if (m11 > m22)
+    {
+        const float scale = std::sqrt(std::max(0.0f, 1.0f + m11 - m00 - m22)) * 2.0f;
+        result.w = (m02 - m20) / scale;
+        result.x = (m01 + m10) / scale;
+        result.y = 0.25f * scale;
+        result.z = (m12 + m21) / scale;
+    }
+    else
+    {
+        const float scale = std::sqrt(std::max(0.0f, 1.0f + m22 - m00 - m11)) * 2.0f;
+        result.w = (m10 - m01) / scale;
+        result.x = (m02 + m20) / scale;
+        result.y = (m12 + m21) / scale;
+        result.z = 0.25f * scale;
+    }
+    return Normalise(result);
+}
+
 Matrix RotationTranspose(const Matrix& rotation)
 {
     Matrix result{};
@@ -1474,7 +1517,9 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
     const auto finiteArm = [](const SkinnedArmIkTarget& arm) {
         if (!std::isfinite(arm.preferredElbowFlexionRadians) ||
             arm.preferredElbowFlexionRadians < 0.0f ||
-            arm.preferredElbowFlexionRadians > 0.7853981634f) return false;
+            arm.preferredElbowFlexionRadians > 0.7853981634f ||
+            !std::isfinite(arm.poseWeight) || arm.poseWeight < 0.0f ||
+            arm.poseWeight > 1.0f) return false;
         for (const float value : arm.target) if (!std::isfinite(value)) return false;
         for (const float value : arm.pole) if (!std::isfinite(value)) return false;
         if (arm.shoulderTargetEnabled)
@@ -1588,6 +1633,14 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
                          "/" + gripName;
             return false;
         }
+        if (arm.poseWeight <= 0.0f)
+        {
+            // A fully released hand returns exactly to the imported animation;
+            // it must not be redirected toward an unseen Grip target.
+            handSocket = globals[handNode].m;
+            gripSocket = globals[gripNode].m;
+            return true;
+        }
         Vec3 shoulder{globals[upperNode].m[12], globals[upperNode].m[13], globals[upperNode].m[14]};
         if (arm.shoulderTargetEnabled)
         {
@@ -1605,7 +1658,9 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
         const Matrix originalHandGlobal = globals[handNode];
         const float bindUpperLength = std::max(Length(Subtract(originalElbow, shoulder)), 0.0001f);
         const float bindLowerLength = std::max(Length(Subtract(originalHand, originalElbow)), 0.0001f);
-        const Vec3 requestedTarget{arm.target[0], arm.target[1], arm.target[2]};
+        const Vec3 target{arm.target[0], arm.target[1], arm.target[2]};
+        const Vec3 requestedTarget = Add(originalHand,
+            Scale(Subtract(target, originalHand), arm.poseWeight));
         const Vec3 request = Subtract(requestedTarget, shoulder);
         const float requestedDistance = Length(request);
         const Vec3 direction = Normalise(request);
@@ -1697,6 +1752,9 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
             ? Matrix{arm.handOrientation}
             : Multiply(RigidRotation(lowerDelta),
                        RigidRotation(originalHandGlobal));
+        if (arm.handOrientationTargetEnabled && arm.poseWeight < 1.0f)
+            desiredHand = LocalMatrix({}, Nlerp(RotationQuaternion(originalHandGlobal),
+                RotationQuaternion(desiredHand), arm.poseWeight), {1.0f, 1.0f, 1.0f});
         desiredHand = RigidRotation(desiredHand);
         desiredHand.m[12] = solvedHand.x;
         desiredHand.m[13] = solvedHand.y;

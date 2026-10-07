@@ -189,14 +189,21 @@ public:
     };
 
     // Maximum including the optional development viewmodel. Live reports count owners.
-    static constexpr std::uint32_t kBlasCount = 19u;
+    static constexpr std::uint32_t kBlasCount = 20u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
+    static constexpr std::uint32_t kPlayerSwordScabbardMetadataIndex = 23u;
+    static constexpr std::uint32_t kPlayerSwordScabbardInstanceIndex = 25u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kTlasInstanceCount = kRtTlasInstanceCapacity;
-    static constexpr std::uint32_t kKeeperTorchFirstTlasInstance = kRtInstanceMetadataCapacity;
+    // Keep the two existing Keeper body instances at their original TLAS slots.
+    // Their custom index remains the old torch metadata index1.
+    static constexpr std::uint32_t kKeeperTorchFirstTlasInstance = 23u;
     static constexpr std::uint32_t kKeeperTorchInstanceCount = 2u;
-    static_assert(kTlasInstanceCount == kKeeperTorchFirstTlasInstance + kKeeperTorchInstanceCount);
+    static_assert(kKeeperTorchFirstTlasInstance + kKeeperTorchInstanceCount ==
+                  kPlayerSwordScabbardInstanceIndex);
+    static_assert(kPlayerSwordScabbardMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kTlasInstanceCount == kPlayerSwordScabbardInstanceIndex + 1u);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -823,6 +830,7 @@ private:
     AccelerationStructure torchBlas_;
     AccelerationStructure worldTorchBodyBlas_;
     AccelerationStructure swordBlas_;
+    AccelerationStructure playerSwordScabbardBlas_;
     AccelerationStructure gothicChestBaseBlas_;
     AccelerationStructure gothicChestLidBlas_;
     AccelerationStructure rewardLanternRingBlas_;
@@ -853,6 +861,7 @@ private:
     horde::scene::assets::StaticMeshAsset collapseStaticAsset_;
     horde::scene::assets::StaticMeshAsset productionTorchAsset_;
     horde::scene::assets::StaticMeshAsset playerTorchAsset_;
+    horde::scene::assets::StaticMeshAsset playerSwordScabbardAsset_;
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
     horde::scene::assets::StaticMeshAsset viewmodelAsset_;
     horde::scene::SkinnedMeshAsset viewmodelSkin_;

@@ -103,6 +103,9 @@ struct HeldItemKinematicsState
     // Renderer consumes this snapshot-safe blend to compose the sword between
     // the animated Hips mount and the solved hand Grip.
     float swordStowBlend = 0.0f;
+    // The same fixed-step transition releases/reacquires the right hand Grip;
+    // zero returns to the imported animated hand pose, one solves to the item.
+    float swordHandGripBlend = 1.0f;
 };
 
 struct HeldItemFixedStepInput

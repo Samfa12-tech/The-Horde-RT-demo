@@ -59,8 +59,13 @@ HeldItemState MakeHeldItemState(const HeldItemId id,
     result.hand = hand;
     result.parentMode = parentMode;
     result.visualStowBlend = parentMode == HeldItemParentMode::BodyStow ? 1.0f : 0.0f;
+    result.visualGripBlend = parentMode == HeldItemParentMode::BodyStow ? 0.0f : 1.0f;
     result.transition.sourceParent = parentMode;
     result.transition.targetParent = parentMode;
+    result.transition.visualStartStowBlend = result.visualStowBlend;
+    result.transition.visualTargetStowBlend = result.visualStowBlend;
+    result.transition.visualStartGripBlend = result.visualGripBlend;
+    result.transition.visualTargetGripBlend = result.visualGripBlend;
     result.worldFromItem = IdentityHeldItemTransform();
     result.worldFromDetach = IdentityHeldItemTransform();
     return result;
@@ -104,8 +109,14 @@ void UpdateHeldItemParent(HeldItemState& item,
         parentMode != HeldItemParentMode::AuthoredWorldTrajectory &&
         parentMode != HeldItemParentMode::WorldObject)
     {
+        item.visualStowBlend = parentMode == HeldItemParentMode::BodyStow ? 1.0f : 0.0f;
+        item.visualGripBlend = parentMode == HeldItemParentMode::BodyStow ? 0.0f : 1.0f;
         item.transition.sourceParent = parentMode;
         item.transition.targetParent = parentMode;
+        item.transition.visualStartStowBlend = item.visualStowBlend;
+        item.transition.visualTargetStowBlend = item.visualStowBlend;
+        item.transition.visualStartGripBlend = item.visualGripBlend;
+        item.transition.visualTargetGripBlend = item.visualGripBlend;
     }
 }
 
@@ -322,6 +333,9 @@ HeldItemTransitionRequestResult BeginTransition(HeldItemState& item,
     item.transition.visualStartStowBlend = item.visualStowBlend;
     item.transition.visualTargetStowBlend =
         target == HeldItemParentMode::BodyStow ? 1.0f : 0.0f;
+    item.transition.visualStartGripBlend = item.visualGripBlend;
+    item.transition.visualTargetGripBlend =
+        target == HeldItemParentMode::BodyStow ? 0.0f : 1.0f;
     item.transition.durationSeconds = TransitionDuration(kind);
     item.transition.startedTick = tick;
     item.transition.lastTransitionTick = tick;
@@ -349,6 +363,9 @@ HeldItemTransitionRequestResult BeginVisualSettle(HeldItemState& item,
     item.transition.visualStartStowBlend = item.visualStowBlend;
     item.transition.visualTargetStowBlend =
         item.parentMode == HeldItemParentMode::BodyStow ? 1.0f : 0.0f;
+    item.transition.visualStartGripBlend = item.visualGripBlend;
+    item.transition.visualTargetGripBlend =
+        item.parentMode == HeldItemParentMode::BodyStow ? 0.0f : 1.0f;
     item.transition.startedTick = tick;
     item.transition.lastTransitionTick = tick;
     item.transition.lastAdvancedTick = tick;
@@ -372,12 +389,18 @@ bool ValidateHeldItemState(const HeldItemState& item)
         !std::isfinite(transition.progress) ||
         !std::isfinite(transition.visualStartStowBlend) ||
         !std::isfinite(transition.visualTargetStowBlend) ||
+        !std::isfinite(transition.visualStartGripBlend) ||
+        !std::isfinite(transition.visualTargetGripBlend) ||
         !std::isfinite(item.visualStowBlend) ||
+        !std::isfinite(item.visualGripBlend) ||
         transition.elapsedSeconds < 0.0f || transition.durationSeconds < 0.0f ||
         transition.progress < 0.0f || transition.progress > 1.0f ||
         transition.visualStartStowBlend < 0.0f || transition.visualStartStowBlend > 1.0f ||
         transition.visualTargetStowBlend < 0.0f || transition.visualTargetStowBlend > 1.0f ||
+        transition.visualStartGripBlend < 0.0f || transition.visualStartGripBlend > 1.0f ||
+        transition.visualTargetGripBlend < 0.0f || transition.visualTargetGripBlend > 1.0f ||
         item.visualStowBlend < 0.0f || item.visualStowBlend > 1.0f ||
+        item.visualGripBlend < 0.0f || item.visualGripBlend > 1.0f ||
         (item.detached &&
          item.parentMode != HeldItemParentMode::AuthoredWorldTrajectory &&
          item.parentMode != HeldItemParentMode::WorldObject))
@@ -450,7 +473,8 @@ bool ValidateHeldItemState(const HeldItemState& item)
                transition.elapsedSeconds == transition.durationSeconds &&
                transition.progress == 1.0f && !transition.attachmentApplied &&
                transition.attachmentEdgeTick == 0u &&
-               std::abs(item.visualStowBlend - transition.visualTargetStowBlend) <= 0.0001f;
+               std::abs(item.visualStowBlend - transition.visualTargetStowBlend) <= 0.0001f &&
+               std::abs(item.visualGripBlend - transition.visualTargetGripBlend) <= 0.0001f;
     }
     return transition.semanticEdgeSequence != 0u &&
            transition.attachmentApplied &&
@@ -480,6 +504,8 @@ bool InterruptHeldItemTransition(HeldItemState& item, const std::uint64_t tick)
         transition.progress = 0.0f;
         transition.visualStartStowBlend = item.visualStowBlend;
         transition.visualTargetStowBlend = item.visualStowBlend;
+        transition.visualStartGripBlend = item.visualGripBlend;
+        transition.visualTargetGripBlend = item.visualGripBlend;
         transition.visualOnly = false;
     }
     else if (transition.attachmentApplied)
@@ -541,7 +567,10 @@ HeldItemTransitionRequestResult RequestHeldItemTransition(
     }
 
     const float targetBlend = target == HeldItemParentMode::BodyStow ? 1.0f : 0.0f;
-    if (item.parentMode == target && std::abs(item.visualStowBlend - targetBlend) <= 0.0001f)
+    const float targetGripBlend = target == HeldItemParentMode::BodyStow ? 0.0f : 1.0f;
+    if (item.parentMode == target &&
+        std::abs(item.visualStowBlend - targetBlend) <= 0.0001f &&
+        std::abs(item.visualGripBlend - targetGripBlend) <= 0.0001f)
     {
         return {interrupted ? HeldItemTransitionRequestStatus::Interrupted
                             : HeldItemTransitionRequestStatus::AlreadyAtTarget,
@@ -606,8 +635,63 @@ HeldItemTransitionAdvanceResult AdvanceHeldItemTransition(
     transition.progress = std::clamp(
         transition.elapsedSeconds / transition.durationSeconds, 0.0f, 1.0f);
     const float eased = SmoothStep(transition.progress);
-    item.visualStowBlend = transition.visualStartStowBlend +
-        (transition.visualTargetStowBlend - transition.visualStartStowBlend) * eased;
+    if (transition.visualOnly)
+    {
+        // A reversal before the attachment edge settles on the current owner.
+        // Keep the hand attached while a hand-owned item returns to its Grip;
+        // a body-owned item stays on Hips while the hand releases/reaches.
+        if (transition.targetParent == HeldItemParentMode::BodyStow)
+        {
+            item.visualStowBlend = transition.visualStartStowBlend;
+            item.visualGripBlend = transition.visualStartGripBlend +
+                (transition.visualTargetGripBlend - transition.visualStartGripBlend) * eased;
+        }
+        else
+        {
+            item.visualStowBlend = transition.visualStartStowBlend +
+                (transition.visualTargetStowBlend - transition.visualStartStowBlend) * eased;
+            item.visualGripBlend = transition.visualStartGripBlend +
+                (transition.visualTargetGripBlend - transition.visualStartGripBlend) * eased;
+        }
+    }
+    else if (transition.targetParent == HeldItemParentMode::BodyStow)
+    {
+        if (transition.progress < kHeldItemAttachmentEdgeProgress)
+        {
+            const float phase = SmoothStep(transition.progress * 2.0f);
+            item.visualStowBlend = transition.visualStartStowBlend +
+                (1.0f - transition.visualStartStowBlend) * phase;
+            item.visualGripBlend = transition.visualStartGripBlend +
+                (1.0f - transition.visualStartGripBlend) * phase;
+        }
+        else
+        {
+            const float phase = SmoothStep(
+                (transition.progress - kHeldItemAttachmentEdgeProgress) * 2.0f);
+            item.visualStowBlend = 1.0f;
+            item.visualGripBlend = 1.0f +
+                (transition.visualTargetGripBlend - 1.0f) * phase;
+        }
+    }
+    else
+    {
+        if (transition.progress < kHeldItemAttachmentEdgeProgress)
+        {
+            const float phase = SmoothStep(transition.progress * 2.0f);
+            item.visualStowBlend = transition.visualStartStowBlend;
+            item.visualGripBlend = transition.visualStartGripBlend +
+                (1.0f - transition.visualStartGripBlend) * phase;
+        }
+        else
+        {
+            const float phase = SmoothStep(
+                (transition.progress - kHeldItemAttachmentEdgeProgress) * 2.0f);
+            item.visualStowBlend = transition.visualStartStowBlend +
+                (transition.visualTargetStowBlend -
+                 transition.visualStartStowBlend) * phase;
+            item.visualGripBlend = 1.0f;
+        }
+    }
     transition.lastTransitionTick = tick;
     transition.lastAdvancedTick = tick;
     transition.hasAdvancedTick = true;
@@ -616,6 +700,12 @@ HeldItemTransitionAdvanceResult AdvanceHeldItemTransition(
         transition.progress >= kHeldItemAttachmentEdgeProgress;
     if (attachedNow)
     {
+        // The semantic parent changes on this fixed tick. Keep the item and
+        // hand exactly coincident at that boundary; easing into the second
+        // half by even a fraction of a tick would release the Grip before a
+        // draw's HandSocket attachment (or after a sheath's BodyStow edge).
+        item.visualStowBlend = 1.0f;
+        item.visualGripBlend = 1.0f;
         transition.attachmentApplied = true;
         transition.attachmentEdgeTick = tick;
         item.parentMode = transition.targetParent;
@@ -625,6 +715,7 @@ HeldItemTransitionAdvanceResult AdvanceHeldItemTransition(
     if (transition.elapsedSeconds >= transition.durationSeconds)
     {
         item.visualStowBlend = transition.visualTargetStowBlend;
+        item.visualGripBlend = transition.visualTargetGripBlend;
         transition.active = false;
         transition.sourceParent = transition.targetParent;
         transition.progress = 1.0f;

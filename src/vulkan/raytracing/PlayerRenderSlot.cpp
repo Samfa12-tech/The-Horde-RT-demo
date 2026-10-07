@@ -370,18 +370,14 @@ bool ResolvePlayerHeldItemVisuals(
         // remains the sole transform authority. Only attached visuals consume
         // the final rig socket; semantic light/audio state is unchanged.
         if (item.id == HeldItemId::Sword &&
-            item.visualStowBlend >= 1.0f)
+            (item.visualStowBlend > 0.0f ||
+             item.parentMode == HeldItemParentMode::BodyStow))
         {
-            item.worldFromItem = worldFromBodyStow;
+            item.worldFromItem = BlendHeldItemTransformsAtGrip(
+                worldFromBodyStow, item.worldFromItem,
+                SwordGripSocketTransform(), 1.0f - item.visualStowBlend);
             continue;
         }
-        // During draw/sheath the right hand follows the same Grip-space path
-        // as the item. Keeping the item attached to that final solved Grip
-        // avoids an independent renderer interpolation or duplicated sword.
-        if (item.id == HeldItemId::Sword &&
-            item.visualStowBlend > 0.0f &&
-            item.parentMode == HeldItemParentMode::BodyStow)
-            item.parentMode = HeldItemParentMode::HandSocket;
         if (item.parentMode != HeldItemParentMode::HandSocket) continue;
         const HeldItemTransform& worldFromHand = SelectHandSocketTransform(
             item.hand, worldFromLeftHandBone, worldFromRightHandBone);
@@ -683,8 +679,9 @@ bool PlayerRenderSlot::ResolveHeldItemVisuals(
         return false;
     leftGripAgreement_ = MeasurePlayerGripAgreement(
         authoritativeItems[0], renderItems[0]);
-    if (authoritativeItems[1].visualStowBlend > 0.0f ||
-        authoritativeItems[1].parentMode == HeldItemParentMode::BodyStow)
+    if (authoritativeItems[1].visualGripBlend >= 0.999f &&
+        (authoritativeItems[1].visualStowBlend > 0.0f ||
+         authoritativeItems[1].parentMode == HeldItemParentMode::BodyStow))
     {
         const HeldItemTransform renderedSwordGrip = MultiplyHeldItemTransforms(
             renderItems[1].worldFromItem, SwordGripSocketTransform());
@@ -693,8 +690,9 @@ bool PlayerRenderSlot::ResolveHeldItemVisuals(
     }
     else
     {
-        rightGripAgreement_ = MeasurePlayerGripAgreement(
-            authoritativeItems[1], renderItems[1]);
+        rightGripAgreement_ = authoritativeItems[1].visualGripBlend >= 0.999f
+            ? MeasurePlayerGripAgreement(authoritativeItems[1], renderItems[1])
+            : PlayerGripAgreement{};
     }
     if (leftGripAgreement_.positionErrorMetres > kPlayerGripSocketToleranceMetres ||
         rightGripAgreement_.positionErrorMetres > kPlayerGripSocketToleranceMetres ||
@@ -752,6 +750,7 @@ bool PlayerRenderSlot::PreparePose(
         horde::scene::SkinnedArmIkTarget result;
         result.pole = source.pole;
         result.preferredElbowFlexionRadians = source.preferredElbowFlexionRadians;
+        result.poseWeight = source.poseWeight;
         result.shoulder = source.shoulder;
         result.shoulderTargetEnabled = false;
         // PresentableTinyRtScene converts the gameplay view frame through the
@@ -812,8 +811,15 @@ bool PlayerRenderSlot::PreparePose(
     };
     leftSocketErrorMetres_ = socketError(sockets_.leftGrip, animation.leftIk);
     rightSocketErrorMetres_ = socketError(sockets_.rightGrip, animation.rightIk);
+    // During the first half of Draw, the hand is still reaching toward the
+    // body-mounted Grip; during the last half of Sheath it is released. In
+    // those phases the palm is intentionally between its authored pose and
+    // the item Grip. The strict socket contract applies once the hand fully
+    // owns the item, while the left-hand/two-handed grip remains strict.
+    const bool rightGripFullyEngaged = animation.rightIk.poseWeight >= 0.999f;
     if (leftSocketErrorMetres_ > kPlayerGripSocketToleranceMetres ||
-        rightSocketErrorMetres_ > kPlayerGripSocketToleranceMetres)
+        (rightGripFullyEngaged &&
+         rightSocketErrorMetres_ > kPlayerGripSocketToleranceMetres))
     {
         diagnostic = "Skinned player palm Grip socket exceeded the 15 mm grip tolerance: left=" +
                      std::to_string(leftSocketErrorMetres_) + " right=" +
