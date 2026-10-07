@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
 import android.graphics.Bitmap;
@@ -277,6 +278,7 @@ public class MainActivity extends Activity {
     private boolean benchmarkRunning;
     private boolean benchmarkStatusExpanded;
     private boolean benchmarkReportVisible;
+    private View.OnLayoutChangeListener configurationLayoutListener;
     private String latestBenchmarkReport = "";
     private String benchmarkAutomationId;
     private String benchmarkAutomationWorkload = DEFAULT_BENCHMARK_WORKLOAD;
@@ -327,6 +329,7 @@ public class MainActivity extends Activity {
     private long graphicsLatencyMaxPollLatenessNs;
     private int graphicsLatencyPollCount;
     private TextView graphicsTelemetry;
+    private String graphicsDetailedStatus = "";
     private Button graphicsApply, graphicsConfirm, graphicsRevert, graphicsBack;
     private boolean rtLabReturnToEnding;
     private TextView rtLabTelemetry;
@@ -931,21 +934,27 @@ public class MainActivity extends Activity {
         }, false);
 
         final int bottomPlaqueLimit = Math.max(dp(48), (availableWidth - dp(20)) / 2);
-        final FrameLayout.LayoutParams playLayout = new FrameLayout.LayoutParams(
-                entryPlaqueWidth(entryPlayButton, bottomPlaqueLimit), -2);
-        playLayout.gravity = Gravity.BOTTOM | Gravity.END;
-        playLayout.setMargins(0, 0, right, bottom + (portrait ? dp(72) : dp(12)));
-        composition.addView(entryPlayButton, playLayout);
+        final int bottomPlaqueMargin = bottom + (portrait ? dp(72) : dp(12));
         final FrameLayout.LayoutParams moreLayout = new FrameLayout.LayoutParams(
                 entryPlaqueWidth(entryMoreButton, bottomPlaqueLimit), -2);
         moreLayout.gravity = Gravity.BOTTOM | Gravity.START;
-        moreLayout.setMargins(left, 0, 0, bottom + (portrait ? dp(72) : dp(12)));
+        moreLayout.setMargins(left, 0, 0, bottomPlaqueMargin);
         composition.addView(entryMoreButton, moreLayout);
         final FrameLayout.LayoutParams settingsLayout = new FrameLayout.LayoutParams(
-                entryPlaqueWidth(entrySettingsButton, availableWidth), -2);
-        settingsLayout.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
-        settingsLayout.setMargins(left, portrait ? 0 : dp(24), right, 0);
+                entryPlaqueWidth(entrySettingsButton, bottomPlaqueLimit), -2);
+        settingsLayout.gravity = Gravity.BOTTOM | Gravity.END;
+        settingsLayout.setMargins(0, 0, right, bottomPlaqueMargin);
         composition.addView(entrySettingsButton, settingsLayout);
+        entryMoreButton.measure(View.MeasureSpec.makeMeasureSpec(moreLayout.width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.UNSPECIFIED));
+        entrySettingsButton.measure(View.MeasureSpec.makeMeasureSpec(settingsLayout.width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.UNSPECIFIED));
+        final int bottomPlaqueHeight = Math.max(entryMoreButton.getMeasuredHeight(), entrySettingsButton.getMeasuredHeight());
+        final FrameLayout.LayoutParams playLayout = new FrameLayout.LayoutParams(
+                entryPlaqueWidth(entryPlayButton, availableWidth), -2);
+        playLayout.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+        playLayout.setMargins(left, 0, right, bottomPlaqueMargin + bottomPlaqueHeight + dp(16));
+        composition.addView(entryPlayButton, playLayout);
 
         final LinearLayout loading = new LinearLayout(this);
         loading.setOrientation(LinearLayout.VERTICAL);
@@ -2442,18 +2451,24 @@ public class MainActivity extends Activity {
         menuScrim.setBackgroundColor(0xC7080706);
         graphicsGraph = null;
         menuScrim.removeAllViews();
-        final LinearLayout panel = createPanel(getString(R.string.graphics_settings), "GRAPHICS / DEVICE");
-        graphicsPanel = panel;
+        final LinearLayout page = new LinearLayout(this);
+        page.setOrientation(LinearLayout.VERTICAL);
+        final LinearLayout panel = createPanel(getString(R.string.graphics_settings), "DISPLAY / RAY TRACING");
         final GradientDrawable background = new GradientDrawable();
         background.setColor(0xF2151719); background.setCornerRadius(dp(4));
         background.setStroke(dp(1), 0xFFCFA96A); panel.setBackground(background);
         addGraphicsSelectionSummary(panel);
-        graphicsTelemetry = new TextView(this);
-        graphicsTelemetry.setTextColor(0xFFF2E9D8); graphicsTelemetry.setTextSize(14);
-        graphicsTelemetry.setPadding(0, 0, 0, dp(12)); panel.addView(graphicsTelemetry, matchWrap());
-        addBody(panel, "Changing an option only previews or edits it. Choose Use these settings, wait for the RT frame, then Keep and save. " +
-                "Until you keep them, Saved stays unchanged. Settings restore after 15 visible seconds or when backgrounded.");
         if (graphicsRecoveryNotice != null) addBody(panel, graphicsRecoveryNotice);
+        addGraphicsButton(panel, "Details", this::showGraphicsSettingsDetails);
+        graphicsTelemetry = new TextView(this);
+        graphicsTelemetry.setTextColor(0xFFF2E9D8);
+        graphicsTelemetry.setTextSize(graphicsActionsUseLandscapeRow() ? 12 : 14);
+        graphicsTelemetry.setSingleLine(graphicsActionsUseLandscapeRow());
+        graphicsTelemetry.setMaxLines(graphicsActionsUseLandscapeRow() ? 1 : 2);
+        graphicsTelemetry.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        graphicsTelemetry.setText("Checking RT settings");
+        graphicsTelemetry.setPadding(dp(6), dp(2), dp(6), dp(2));
+        addGraphicsSectionLabel(panel, "Resolution and scene");
         if (graphicsDraft.scale >= 50) {
             addSlider(panel, getString(R.string.render_scale), graphicsDraft.scale, 50, 100, value -> {
                 graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.RESOLUTION, value);
@@ -2473,44 +2488,35 @@ public class MainActivity extends Activity {
                 });
             }
         }
-        addGraphicsButton(panel, "Preview resolution", () -> openGraphicsPreview(GraphicsPreviewOptions.RESOLUTION));
         addGraphicsButton(panel, "Water: " + waterName(graphicsDraft.water), () -> {
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.WATER, (graphicsDraft.water + 1) % 3);
             showGraphicsPage();
         });
-        addBody(panel, getString(R.string.graphics_water_help));
-        addGraphicsButton(panel, "Preview water", () -> openGraphicsPreview(GraphicsPreviewOptions.WATER));
         addGraphicsButton(panel, "Fire detail: " + GraphicsPreviewOptions.fireLabel(graphicsDraft.fire), () -> {
             final int next = graphicsDraft.fire == GraphicsPreferences.FIRE_LOW ? GraphicsPreferences.FIRE_MOBILE :
                     graphicsDraft.fire == GraphicsPreferences.FIRE_MOBILE ? GraphicsPreferences.FIRE_HIGH : GraphicsPreferences.FIRE_LOW;
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.FIRE, next);
             showGraphicsPage();
         });
-        addBody(panel, "Low: 2 main volume steps and 2 reflected steps, with the same emitters and lights. " + getString(R.string.graphics_fire_help));
-        addGraphicsButton(panel, "Preview fire", () -> openGraphicsPreview(GraphicsPreviewOptions.FIRE));
         addGraphicsButton(panel, "Menu / preview cap: " + graphicsDraft.cap + " Hz", () -> {
             final int next = graphicsDraft.cap == 30 ? 60 : graphicsDraft.cap == 60 ? 15 : 30;
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.CAP, next);
             showGraphicsPage();
         });
-        addGraphicsButton(panel, "Preview frame cap", () -> openGraphicsPreview(GraphicsPreviewOptions.CAP));
+        addGraphicsSectionLabel(panel, "Lighting and effects");
         addGraphicsButton(panel, "Glass: " + (graphicsDraft.glassEnabled ? "On" : "Off"), () -> {
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.GLASS, graphicsDraft.glassEnabled ? 0 : 1);
             showGraphicsPage();
         });
-        addBody(panel, "On enables glass supported by this build. Mobile lantern panes remain absent. Off removes glass from primary, reflection and shadow rays.");
-        addGraphicsButton(panel, "Preview glass", () -> openGraphicsPreview(GraphicsPreviewOptions.GLASS));
         addGraphicsButton(panel, "Shadows: " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow), () -> {
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.SHADOW, (graphicsDraft.shadow + 1) % 3);
             showGraphicsPage();
         });
-        addBody(panel, "Independent RT shadow sampling: Lower, Current or Higher. Current preserves the default; performance costs remain unmeasured here.");
         addGraphicsButton(panel, "Preview shadows", () -> openGraphicsPreview(GraphicsPreviewOptions.SHADOW));
         addGraphicsButton(panel, "Mist: " + (graphicsDraft.mistEnabled ? "On" : "Off"), () -> {
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.MIST, graphicsDraft.mistEnabled ? 0 : 1);
             showGraphicsPage();
         });
-        addBody(panel, "Keeper room mist. Off skips ground mist; fire, smoke and electricity stay enabled. This compact preview has no ground mist.");
         addGraphicsButton(panel, "Reset draft to mobile defaults", () -> {
             graphicsDraft = GraphicsPreferences.mobileDefaults(); showGraphicsPage();
         });
@@ -2520,7 +2526,14 @@ public class MainActivity extends Activity {
         addGraphicsButton(panel, "Open authored RT preview", () -> {
             openGraphicsPreview(GraphicsPreviewOptions.RESOLUTION);
         });
-        graphicsApply = addGraphicsButton(panel, "Use these settings", () -> {
+        final ScrollView scroller = new ScrollView(this);
+        scroller.setTag("graphics-page-scroll");
+        scroller.addView(panel, new ScrollView.LayoutParams(-1, -2));
+        page.addView(scroller, new LinearLayout.LayoutParams(-1, 0, 1.0f));
+        final LinearLayout dock = addGraphicsActionDock(page);
+        dock.addView(graphicsTelemetry, 0, matchWrap());
+        graphicsPanel = page;
+        graphicsApply = graphicsActionButton("Use", "graphics-page-action-use", () -> {
             graphicsSubmitted = graphicsDraft;
             if (!GraphicsPreferences.markPending(preferences, graphicsSubmitted)) {
                 graphicsTelemetry.setText(R.string.graphics_storage_failed); return;
@@ -2533,15 +2546,16 @@ public class MainActivity extends Activity {
             graphicsConfirmationStarted = 0;
             graphicsBusy = graphicsRequestSerial != 0;
             setGraphicsEditorsEnabled(graphicsPanel, !graphicsBusy);
-        });
-        graphicsConfirm = addGraphicsButton(panel, "Keep and save", this::confirmGraphicsSelection);
+        }, "Use these settings for a temporary trial. Saved settings change only after a matching RT presentation and Keep and save.");
+        graphicsConfirm = graphicsActionButton("Keep", "graphics-page-action-keep", this::confirmGraphicsSelection,
+                "Keep the acknowledged trial settings as Saved settings.");
         graphicsConfirm.setEnabled(false);
-        graphicsRevert = addGraphicsButton(panel, "Restore saved settings", () -> requestGraphicsRevert(false));
-        graphicsBack = addGraphicsButton(panel, getString(R.string.back), () -> requestGraphicsRevert(true));
+        graphicsRevert = graphicsActionButton("Restore", "graphics-page-action-restore",
+                () -> requestGraphicsRevert(false), "Discard the trial and restore Saved settings.");
+        graphicsBack = graphicsActionButton("Back", "graphics-page-action-back",
+                () -> requestGraphicsRevert(true), "Restore Saved settings and leave Graphics.");
+        addGraphicsActionButtons(dock, graphicsApply, graphicsConfirm, graphicsRevert, graphicsBack);
         // Scroll/reflow at system font scales. Native buttons retain minimum 48dp hit areas.
-        final ScrollView scroller = new ScrollView(this);
-        scroller.setTag("graphics-page-scroll");
-        scroller.addView(panel, new ScrollView.LayoutParams(-1, -2));
         final WindowInsets insets = menuScrim.getRootWindowInsets();
         int left = dp(16), right = dp(16), top = dp(20), bottom = dp(20);
         if (insets != null) {
@@ -2560,11 +2574,127 @@ public class MainActivity extends Activity {
         final FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(Math.min(dp(520), Math.max(dp(48), available)), -1);
         layout.gravity = Gravity.CENTER_HORIZONTAL;
         layout.setMargins(left, top, right, bottom);
-        if (entryMenuEnabled) ensureEntryMenuTargets(panel);
-        menuScrim.addView(scroller, layout);
-        setGraphicsEditorsEnabled(panel, !graphicsBusy);
+        if (entryMenuEnabled) ensureEntryMenuTargets(page);
+        menuScrim.addView(page, layout);
+        setGraphicsEditorsEnabled(page, !graphicsBusy);
+        graphicsConfirm.setEnabled(false);
         graphicsPageViewport.restoreAfterLayout(menuScrim);
         logGraphicsUiBuild("graphics", uiBuildStartedNs);
+    }
+
+    private void addGraphicsSectionLabel(LinearLayout panel, String label) {
+        final TextView heading = new TextView(this);
+        heading.setText(label);
+        heading.setTextColor(HordeUiTokens.BRASS);
+        heading.setTextSize(12);
+        heading.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+        heading.setPadding(0, dp(8), 0, dp(2));
+        panel.addView(heading, matchWrap());
+    }
+
+    private LinearLayout addGraphicsActionDock(LinearLayout page) {
+        final LinearLayout dock = new LinearLayout(this);
+        dock.setOrientation(LinearLayout.VERTICAL);
+        dock.setPadding(0, dp(4), 0, 0);
+        dock.setTag("graphics-action-dock");
+        page.addView(dock, new LinearLayout.LayoutParams(-1, -2));
+        return dock;
+    }
+
+    private boolean graphicsActionsUseLandscapeRow() {
+        final int width = getResources().getDisplayMetrics().widthPixels;
+        final int height = getResources().getDisplayMetrics().heightPixels;
+        final WindowInsets insets = menuScrim.getRootWindowInsets();
+        int safeWidth = width;
+        if (insets != null) safeWidth -= insets.getStableInsetLeft() + insets.getStableInsetRight();
+        return width > height && safeWidth >= dp(540);
+    }
+
+    private void addGraphicsActionButtons(LinearLayout dock, Button... buttons) {
+        // Short labels fit one native row on landscape phones, preserving more of the RT image.
+        if (graphicsActionsUseLandscapeRow() && buttons.length == 4) {
+            addGraphicsActionRow(dock, buttons);
+        } else {
+            for (int i = 0; i < buttons.length; i += 2) {
+                addGraphicsActionRow(dock, buttons[i], buttons[Math.min(i + 1, buttons.length - 1)]);
+            }
+        }
+    }
+
+    private void addGraphicsActionRow(LinearLayout dock, Button... buttons) {
+        final LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        final LinearLayout.LayoutParams rowLayout = new LinearLayout.LayoutParams(-1, -2);
+        rowLayout.topMargin = dp(4);
+        dock.addView(row, rowLayout);
+        for (int i = 0; i < buttons.length; ++i) {
+            final Button button = buttons[i];
+            final LinearLayout.LayoutParams buttonLayout = new LinearLayout.LayoutParams(0, -2, 1.0f);
+            if (i > 0) buttonLayout.leftMargin = dp(6);
+            button.setMinHeight(dp(48)); button.setSingleLine(false); button.setMaxLines(2);
+            button.setPadding(dp(6), dp(4), dp(6), dp(4));
+            row.addView(button, buttonLayout);
+        }
+    }
+
+    private Button graphicsActionButton(String label, String tag, Runnable action, String description) {
+        final Button button = createMenuButton(label, action);
+        button.setTag(tag);
+        button.setContentDescription(description);
+        button.setMinHeight(dp(48));
+        button.setSingleLine(false);
+        button.setMaxLines(2);
+        return button;
+    }
+
+    private void addGraphicsPreviewActions(LinearLayout dock) {
+        graphicsApply = graphicsActionButton("Use", "graphics-preview-action-use", () -> {
+            // Disabled native controls may still receive programmatic/stale click events. Guard
+            // readiness here too, before touching the JNI bridge.
+            if (graphicsApply == null || !graphicsApply.isEnabled()) return;
+            final long[] applied = ProbeBridge.getGraphicsSnapshot();
+            if (!GraphicsPreviewOptions.presented(applied, surfaceRequestGeneration, graphicsRequestSerial, previewSelection())) return;
+            if (applied[2] == 2) return; // Use never saves; Keep owns that decision.
+            if (GraphicsPreferences.markPending(preferences, previewSelection())) {
+                resetGraphicsPreviewTimeline();
+                graphicsSubmitted = previewSelection(); graphicsDraft = graphicsSubmitted;
+                graphicsRequestSerial = requestTimedGraphicsApply(graphicsSubmitted);
+                graphicsBusy = graphicsRequestSerial != 0; graphicsConfirmationStarted = 0;
+            }
+        }, "Use these acknowledged preview settings for a temporary trial. This does not save.");
+        graphicsConfirm = graphicsActionButton("Keep", "graphics-preview-action-keep",
+                this::confirmGraphicsSelection, "Save only the settings confirmed by a matching RT presentation.");
+        graphicsRevert = graphicsActionButton("Restore", "graphics-preview-action-restore",
+                () -> requestGraphicsRevert(false), getString(R.string.graphics_revert));
+        graphicsBack = graphicsActionButton("Back", "graphics-preview-action-back",
+                this::returnFromGraphicsPreview, "Revert live settings and return to Graphics.");
+        addGraphicsActionButtons(dock, graphicsApply, graphicsConfirm, graphicsRevert, graphicsBack);
+        graphicsApply.setEnabled(false);
+        graphicsConfirm.setEnabled(false);
+    }
+
+    private void showGraphicsSettingsDetails() {
+        dismissGraphicsPreviewDetails();
+        final TextView details = new TextView(this);
+        details.setText("Resolution controls RT render scale. Water Off omits water appearance; Mobile uses reduced reflected detail; High adds a reflected scene query. " +
+                "Fire detail changes volume steps while preserving emitters, lights and gameplay. Menu / preview cap controls their frame cap. " +
+                "Glass enables only glass supported by this build; mobile lantern panes remain absent. Shadows select Lower, Current or Higher RT sampling. " +
+                "Mist toggles keeper-room ground mist; fire, smoke and electricity stay enabled. The compact authored preview has no ground mist.\n\n" +
+                "Changing a choice edits the draft. Use starts a temporary trial only after the RT request is accepted. Keep and save is enabled only after a matching RT frame is presented. " +
+                "Unconfirmed settings restore after 15 visible seconds or when backgrounded. Preview measurements are not full-game performance guarantees." +
+                (graphicsDetailedStatus.isEmpty() ? "" : "\n\nCurrent status\n" + graphicsDetailedStatus));
+        details.setTextColor(HordeUiTokens.PARCHMENT);
+        details.setTextSize(15);
+        details.setPadding(dp(20), dp(12), dp(20), dp(12));
+        final ScrollView scroll = new ScrollView(this);
+        scroll.addView(details);
+        final AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Graphics details")
+                .setView(scroll).setPositiveButton("Close details", null).create();
+        graphicsDetailsDialog = dialog;
+        dialog.setOnDismissListener(ignored -> {
+            if (graphicsDetailsDialog == dialog) graphicsDetailsDialog = null;
+        });
+        dialog.show();
     }
 
     private void setGraphicsEditorsEnabled(View view, boolean enabled) {
@@ -2731,10 +2861,15 @@ public class MainActivity extends Activity {
         graphicsPanel = panel;
         addGraphicsSelectionSummary(panel);
         graphicsTelemetry = new TextView(this);
-        graphicsTelemetry.setTextColor(HordeUiTokens.PARCHMENT); graphicsTelemetry.setTextSize(14);
-        graphicsTelemetry.setMaxLines(2); graphicsTelemetry.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        graphicsTelemetry.setText("Preview FPS: waiting for RT");
-        panel.addView(graphicsTelemetry, matchWrap());
+        graphicsTelemetry.setTextColor(HordeUiTokens.PARCHMENT);
+        graphicsTelemetry.setTextSize(graphicsActionsUseLandscapeRow() ? 12 : 14);
+        graphicsTelemetry.setSingleLine(graphicsActionsUseLandscapeRow());
+        graphicsTelemetry.setMaxLines(graphicsActionsUseLandscapeRow() ? 1 : 2);
+        graphicsTelemetry.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        graphicsTelemetry.setContentDescription("Preview status and current graphics request details are available here.");
+        // Reserve the dock's two-line status height before budgeting the viewport. Later telemetry
+        // can change the text but must not unexpectedly consume the first option target.
+        graphicsTelemetry.setText("Preview FPS: waiting for RT\nKeep or Restore: 15 s");
         final LinearLayout optionsRow = addPreviewControlRow(panel);
         for (int choice = 0; choice < graphicsOptionButtons.length; ++choice) {
             final int selectedChoice = choice;
@@ -2744,38 +2879,18 @@ public class MainActivity extends Activity {
             graphicsOptionButtons[choice].setContentDescription(graphicsOptionLabel(choice) + "; choose live preview setting");
             graphicsOptionButtons[choice].setEnabled(false); // A matching current RT frame enables editing.
         }
-        final LinearLayout actionRow = addPreviewControlRow(panel);
+        final LinearLayout toolsRow = addPreviewControlRow(panel);
         final String[] cameras = {"Overview", "Materials", "Glass", "Water", "Skeleton", "Mirror"};
-        final Button view = addPreviewControl(actionRow, "View", () -> {
+        final Button view = addPreviewControl(toolsRow, "View", () -> {
             graphicsPreviewCamera = (graphicsPreviewCamera + 1) % cameras.length;
             resetGraphicsPreviewTimeline(); showGraphicsPreviewPage();
         });
         view.setContentDescription("View: " + cameras[graphicsPreviewCamera] + "; change preview camera");
-        graphicsImageButton = addPreviewControl(actionRow, "Image", () -> {
+        graphicsImageButton = addPreviewControl(toolsRow, "Image", () -> {
             graphicsPreviewImageOnly = true; showGraphicsPreviewPage();
         });
         graphicsImageButton.setContentDescription("Show image without the control strip; Controls restores it. Unconfirmed settings still revert after 15 visible seconds.");
-        graphicsDetailsButton = addPreviewControl(actionRow, "Details", this::showGraphicsPreviewDetails);
-        graphicsConfirm = addPreviewControl(actionRow, "Use these settings", () -> {
-            final long[] applied = ProbeBridge.getGraphicsSnapshot();
-            if (!GraphicsPreviewOptions.presented(applied, surfaceRequestGeneration, graphicsRequestSerial, previewSelection())) return;
-            if (applied[2] == 2) {
-                confirmGraphicsSelection();
-            } else if (GraphicsPreferences.markPending(preferences, previewSelection())) {
-                resetGraphicsPreviewTimeline();
-                graphicsSubmitted = previewSelection(); graphicsDraft = graphicsSubmitted;
-                graphicsRequestSerial = requestTimedGraphicsApply(graphicsSubmitted);
-                graphicsBusy = graphicsRequestSerial != 0; graphicsConfirmationStarted = 0;
-            }
-        });
-        graphicsApply = graphicsConfirm;
-        graphicsConfirm.setEnabled(false);
-        graphicsRevert = addPreviewControl(actionRow, "Restore saved", () -> {
-            requestGraphicsRevert(false);
-        });
-        graphicsRevert.setContentDescription(getString(R.string.graphics_revert));
-        graphicsBack = addPreviewControl(actionRow, "Back", this::returnFromGraphicsPreview);
-        graphicsBack.setContentDescription("Revert live settings and return to Graphics");
+        graphicsDetailsButton = addPreviewControl(toolsRow, "Details", this::showGraphicsPreviewDetails);
         int left = dp(8), right = dp(8), bottom = dp(8);
         final WindowInsets insets = menuScrim.getRootWindowInsets();
         if (insets != null) {
@@ -2789,14 +2904,37 @@ public class MainActivity extends Activity {
             }
         }
         final int viewportHeight = menuScrim.getHeight() > 0 ? menuScrim.getHeight() : getResources().getDisplayMetrics().heightPixels;
-        final ScrollView scroller = new GraphicsPreviewControlsScrollView(this,
-                GraphicsPreviewOptions.maximumOverlayHeight(viewportHeight, bottom));
+        final LinearLayout overlay = new LinearLayout(this);
+        overlay.setOrientation(LinearLayout.VERTICAL);
+        overlay.setTag("graphics-preview-overlay");
+        final LinearLayout dock = addGraphicsActionDock(overlay);
+        dock.addView(graphicsTelemetry, 0, matchWrap());
+        addGraphicsPreviewActions(dock);
+        final int overlayWidth = Math.max(dp(48), menuScrim.getWidth() > 0
+                ? menuScrim.getWidth() - left - right : getResources().getDisplayMetrics().widthPixels - left - right);
+        dock.measure(View.MeasureSpec.makeMeasureSpec(overlayWidth, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(viewportHeight, View.MeasureSpec.UNSPECIFIED));
+        panel.measure(View.MeasureSpec.makeMeasureSpec(overlayWidth, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(viewportHeight, View.MeasureSpec.UNSPECIFIED));
+        panel.layout(0, 0, overlayWidth, panel.getMeasuredHeight());
+        final int standardOverlayHeight = GraphicsPreviewOptions.maximumOverlayHeight(viewportHeight, bottom);
+        final View optionStrip = (View)optionsRow.getParent();
+        final View optionRow = (View)graphicsOptionButtons[0].getParent();
+        final int firstOptionTargetBottom = optionStrip.getTop() + optionRow.getTop() +
+                graphicsOptionButtons[0].getBottom();
+        final int keepOptionVisibleHeight = dock.getMeasuredHeight() + firstOptionTargetBottom + dp(4);
+        final int preservePreviewCap = Math.max(1, viewportHeight * 60 / 100 - bottom);
+        final int overlayHeight = Math.min(preservePreviewCap,
+                Math.max(standardOverlayHeight, keepOptionVisibleHeight));
+        final ScrollView scroller = new GraphicsPreviewControlsScrollView(this, overlayHeight);
         scroller.setTag("graphics-preview-scroll");
         scroller.addView(panel, new ScrollView.LayoutParams(-1, -2));
-        final FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(-1, -2);
+        overlay.addView(scroller, 0, new LinearLayout.LayoutParams(-1, 0, 1.0f));
+        final FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(-1,
+                overlayHeight);
         layout.gravity = Gravity.BOTTOM; layout.setMargins(left, 0, right, bottom);
-        if (entryMenuEnabled) ensureEntryMenuTargets(panel);
-        menuScrim.addView(scroller, layout);
+        if (entryMenuEnabled) ensureEntryMenuTargets(overlay);
+        menuScrim.addView(overlay, layout);
         setGraphicsEditorsEnabled(panel, !graphicsBusy);
         for (Button option : graphicsOptionButtons) option.setEnabled(false);
         graphicsPreviewViewport.restoreAfterLayout(menuScrim);
@@ -2870,25 +3008,34 @@ public class MainActivity extends Activity {
     }
 
     private void showGraphicsPreviewImageOnly() {
-        final LinearLayout row = new LinearLayout(this); row.setOrientation(LinearLayout.HORIZONTAL);
-        graphicsPanel = row;
-        graphicsControlsButton = addPreviewControl(row, "Controls", () -> {
-            graphicsPreviewImageOnly = false; showGraphicsPreviewPage();
-        });
-        graphicsControlsButton.setContentDescription("Show graphics controls. Image inspection does not save; unconfirmed settings still revert after 15 visible seconds.");
-        int left = dp(8), top = dp(8);
+        final LinearLayout host = new LinearLayout(this); host.setOrientation(LinearLayout.VERTICAL);
+        graphicsPanel = host;
+        int left = dp(8), top = dp(8), right = dp(8), bottom = dp(8);
         final WindowInsets insets = menuScrim.getRootWindowInsets();
         if (insets != null) {
             left = Math.max(left, insets.getStableInsetLeft() + dp(8));
             top = Math.max(top, insets.getStableInsetTop() + dp(8));
+            right = Math.max(right, insets.getStableInsetRight() + dp(8));
+            bottom = Math.max(bottom, insets.getStableInsetBottom() + dp(8));
             if (Build.VERSION.SDK_INT >= 28 && insets.getDisplayCutout() != null) {
                 left = Math.max(left, insets.getDisplayCutout().getSafeInsetLeft() + dp(8));
                 top = Math.max(top, insets.getDisplayCutout().getSafeInsetTop() + dp(8));
+                right = Math.max(right, insets.getDisplayCutout().getSafeInsetRight() + dp(8));
+                bottom = Math.max(bottom, insets.getDisplayCutout().getSafeInsetBottom() + dp(8));
             }
         }
-        final FrameLayout.LayoutParams layout = new FrameLayout.LayoutParams(-2, -2);
-        layout.gravity = Gravity.TOP | Gravity.START; layout.setMargins(left, top, dp(8), dp(8));
-        menuScrim.addView(row, layout); graphicsControlsButton.requestFocus();
+        host.setPadding(left, top, right, bottom);
+        final LinearLayout row = new LinearLayout(this); row.setOrientation(LinearLayout.HORIZONTAL);
+        host.addView(row, new LinearLayout.LayoutParams(-1, -2));
+        graphicsControlsButton = addPreviewControl(row, "Controls", () -> {
+            graphicsPreviewImageOnly = false; showGraphicsPreviewPage();
+        });
+        graphicsControlsButton.setContentDescription("Show graphics controls. Image inspection does not save; unconfirmed settings still revert after 15 visible seconds.");
+        host.addView(new View(this), new LinearLayout.LayoutParams(0, 0, 1.0f));
+        final LinearLayout dock = addGraphicsActionDock(host);
+        addGraphicsPreviewActions(dock);
+        menuScrim.addView(host, new FrameLayout.LayoutParams(-1, -1));
+        graphicsControlsButton.requestFocus();
     }
 
     private Button addPreviewControl(LinearLayout row, String text, Runnable action) {
@@ -2951,6 +3098,11 @@ public class MainActivity extends Activity {
 
     private void refreshGraphicsPreviewTelemetry(long[] applied, String settingsText) {
         settingsText += "\nKeeper room mist; this preview has no ground mist. Off preserves fire, smoke and electricity.";
+        final String accessibleSettings = graphicsLiveChoiceError == null ? settingsText :
+                graphicsLiveChoiceError + "\n" + settingsText;
+        if (!accessibleSettings.contentEquals(graphicsTelemetry.getContentDescription()))
+            graphicsTelemetry.setContentDescription(accessibleSettings);
+        graphicsDetailedStatus = accessibleSettings;
         if ((applied[14] & 64) != 0 && GraphicsPreferences.presented(applied, surfaceRequestGeneration) &&
                 applied[19] == expectedGraphicsReturnProfile()) {
             graphicsPreviewWanted = false;
@@ -3036,6 +3188,7 @@ public class MainActivity extends Activity {
 
     private void setGraphicsPreviewStatus(String status) {
         // Keep native 4 Hz sampling without repeated accessibility/text events or FPS label flicker.
+        if (graphicsActionsUseLandscapeRow()) status = status.replace('\n', '·');
         if (!graphicsPreviewModalOpen() && !status.contentEquals(graphicsTelemetry.getText())) graphicsTelemetry.setText(status);
     }
 
@@ -3280,17 +3433,16 @@ public class MainActivity extends Activity {
 
     private void updateGraphicsActionButtons(boolean draftApplyReady, int state,
             boolean busy, boolean ready, boolean previewReady) {
-        // Preview shares one Apply/Keep button. Give it only its final decision,
-        // rather than disabling and reenabling an acknowledged Keep each poll.
-        if (graphicsApply != graphicsConfirm) graphicsApply.setEnabled(draftApplyReady);
-        graphicsConfirm.setEnabled(graphicsPreviewWanted ? previewReady && graphicsLiveChoiceError == null &&
-                ((state == 2 && ready) || !busy) : state == 2 && ready);
-        final String action = graphicsPreviewWanted && state != 2 ? "Use these settings" : "Keep and save";
-        if (!action.contentEquals(graphicsConfirm.getText())) graphicsConfirm.setText(action);
-        final String description = graphicsPreviewWanted && state != 2 ?
-                "Use the preview choices for a 15-second trial. Then choose Keep and save; this button does not save yet." :
-                "Keep and save the current acknowledged trial settings";
-        if (!description.equals(graphicsConfirm.getContentDescription())) graphicsConfirm.setContentDescription(description);
+        // Use submits the temporary trial; Keep remains a separate control and
+        // is enabled only for the matching acknowledged RT presentation.
+        if (graphicsApply != graphicsConfirm) {
+            graphicsApply.setEnabled(graphicsPreviewWanted
+                    ? previewReady && graphicsLiveChoiceError == null && !busy && state != 2
+                    : draftApplyReady);
+        }
+        graphicsConfirm.setEnabled(graphicsPreviewWanted
+                ? previewReady && graphicsLiveChoiceError == null && state == 2 && ready
+                : state == 2 && ready);
     }
 
     private void addGraphicsSelectionSummary(LinearLayout panel) {
@@ -3407,12 +3559,12 @@ public class MainActivity extends Activity {
                 graphicsRevert.setEnabled(state != 4);
                 final String preset = graphicsDraft.same(GraphicsPreferences.baseline()) ?
                         "Accepted 1.6.1 baseline" : graphicsDraft.same(GraphicsPreferences.mobileDefaults()) ? "Mobile defaults" : "Custom";
-                final String status = state == 1 ? "Trying settings - waiting for an RT frame; Saved is unchanged" : state == 4 ? "Restoring saved settings" :
-                        state == 5 ? "Trial failed; previous output retained" : state == 2 ?
-                        (ready ? "Keep and save within " + Math.max(0, 15 - (now - graphicsConfirmationStarted) / 1000) + " seconds, or settings restore" :
-                        "Trial waiting for the current RT frame; Saved is unchanged") : state == 3 ? "Confirmed and saved" :
+                final String status = state == 1 ? "Waiting for RT frame · Saved unchanged" : state == 4 ? "Restoring saved settings" :
+                        state == 5 ? "Trial failed · previous output retained" : state == 2 ?
+                        (ready ? "Keep or Restore: " + Math.max(0, 15 - (now - graphicsConfirmationStarted) / 1000) + " s" :
+                        "Waiting for current RT frame · Saved unchanged") : state == 3 ? "Confirmed and saved" :
                         graphicsConfirmed != null && graphicsDraft.same(graphicsConfirmed) ? "Saved settings selected" :
-                        "Not saved: choose Use these settings, then Keep and save";
+                        "Not saved · choose Use, then Keep";
                 final String settingsText = preset + "\n" + status + "\nRequested: " + graphicsDraft.scale + "% / water " +
                         waterName(graphicsDraft.water) + " / fire " + GraphicsPreviewOptions.fireLabel(graphicsDraft.fire) +
                         " / glass " + (graphicsDraft.glassEnabled ? "On" : "Off") +
@@ -3430,8 +3582,13 @@ public class MainActivity extends Activity {
                         (presented ? (a[11] == 1 ? getString(R.string.graphics_optics_high) : getString(R.string.graphics_optics_mobile)) :
                         "Optical profile: unavailable until an RT frame presents.") + "\nBackend: " +
                         (presented ? (a[12] == 2 ? "RayQueryCompute" : "RayTracingPipeline") : "not yet presented");
+                graphicsDetailedStatus = settingsText;
                 if (graphicsPreviewWanted) refreshGraphicsPreviewTelemetry(a, settingsText);
-                else graphicsTelemetry.setText(settingsText);
+                else {
+                    if (!status.contentEquals(graphicsTelemetry.getText())) graphicsTelemetry.setText(status);
+                    if (!settingsText.contentEquals(graphicsTelemetry.getContentDescription()))
+                        graphicsTelemetry.setContentDescription(settingsText);
+                }
             }
             scheduleGraphicsPoll(this);
         }
@@ -5150,6 +5307,44 @@ public class MainActivity extends Activity {
                 hideMenu();
             }
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        clearTouchState();
+        applyInterfacePresentation();
+        if (menuScrim == null) return;
+        if (configurationLayoutListener != null) {
+            menuScrim.removeOnLayoutChangeListener(configurationLayoutListener);
+            configurationLayoutListener = null;
+        }
+        final int oldWidth = menuScrim.getWidth();
+        final int oldHeight = menuScrim.getHeight();
+        configurationLayoutListener = (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (right - left == oldWidth && bottom - top == oldHeight) return;
+            view.removeOnLayoutChangeListener(configurationLayoutListener);
+            configurationLayoutListener = null;
+            view.post(() -> {
+                if (isFinishing()) return;
+                applyInterfacePresentation();
+                if (graphicsVisible) {
+                    // Builders read only UI state; trial/ACK/timer state remains in the activity.
+                    showGraphicsPage();
+                } else if (entryMenuEnabled && !entryMenuSidePage && menuVisible &&
+                        !diagnosticsVisible && !deathOverlayVisible && !endingOverlayVisible &&
+                        !benchmarkRunning && !benchmarkReportVisible && !benchmarkSummaryVisible &&
+                        !playtestReportVisible && !rtLabVisible && !developerOverlayVisible &&
+                        !debugCaptureUiSuppressed &&
+                        (playtestDecisionDialog == null || !playtestDecisionDialog.isShowing())) {
+                    // showEntryMenu(false) rebuilds the front composition without clearing the
+                    // native Play request or its serial. Side pages retain their own scroll state.
+                    showEntryMenu(false);
+                }
+            });
+        };
+        menuScrim.addOnLayoutChangeListener(configurationLayoutListener);
+        menuScrim.requestLayout();
     }
 
     @Override

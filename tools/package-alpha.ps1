@@ -279,8 +279,11 @@ if ($androidManifest -notmatch "versionName[^\r\n]*=`"$escapedVersion`"") {
 if ($androidManifest -notmatch "versionCode[^\r\n]*=$VersionCode(?:\s|$)") {
     throw "Android candidate does not contain versionCode $VersionCode."
 }
-if ($androidManifest -notmatch 'screenOrientation[^\r\n]*=7(?:\s|$)') {
-    throw "Android candidate is not locked to sensorPortrait (screenOrientation=7)."
+if ($androidManifest -notmatch 'screenOrientation[^\r\n]*=13(?:\s|$)') {
+    throw "Android candidate must support portrait/landscape with the user's rotation preference (fullUser=13)."
+}
+if ($androidManifest -notmatch 'configChanges[^\r\n]*=(?:0x0*480|1152)(?:\s|$)') {
+    throw "Android candidate must retain the Activity/session across orientation and screen-size changes."
 }
 
 & $zipalign -c -P 16 -v 4 $androidCandidate | Out-Null

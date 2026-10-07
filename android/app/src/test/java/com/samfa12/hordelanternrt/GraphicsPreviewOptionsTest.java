@@ -239,16 +239,20 @@ public final class GraphicsPreviewOptionsTest {
         assertTrue("transient choice cannot save confirmed glass",GraphicsPreferences.confirmed(prefs).same(confirmed));
         GraphicsBridgeShadow.applied=snapshot(); GraphicsBridgeShadow.applied[0]=44; GraphicsBridgeShadow.applied[21]=0;
         GraphicsBridgeShadow.epoch=11; poll.run(); // Prior On resources with current request/serial/extents.
-        assertFalse(((Button)get(activity,"graphicsConfirm")).isEnabled());
-        ((Button)get(activity,"graphicsConfirm")).performClick();
+        assertFalse(((Button)get(activity,"graphicsApply")).isEnabled());
+        ((Button)get(activity,"graphicsApply")).performClick();
         assertEquals("previous On frame cannot Apply an Off candidate",0,GraphicsBridgeShadow.applyCalls);
         GraphicsBridgeShadow.applied[20]=0; poll.run();
-        assertTrue(((Button)get(activity,"graphicsConfirm")).isEnabled());
-        ((Button)get(activity,"graphicsConfirm")).performClick();
+        assertTrue(((Button)get(activity,"graphicsApply")).isEnabled());
+        ((Button)get(activity,"graphicsApply")).performClick();
         assertEquals(1,GraphicsBridgeShadow.applyCalls); assertTrue(GraphicsBridgeShadow.requested.same(off));
         assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
         GraphicsBridgeShadow.applied[0]=45; GraphicsBridgeShadow.applied[2]=2; GraphicsBridgeShadow.epoch=12;
-        poll.run(); assertEquals("Keep and save",((Button)get(activity,"graphicsConfirm")).getText().toString());
+        poll.run(); assertEquals("Keep",((Button)get(activity,"graphicsConfirm")).getText().toString());
+        Button use=(Button)get(activity,"graphicsApply"); use.setEnabled(true); // Exercise a stale enabled Use event after ACK.
+        use.performClick();
+        assertEquals("Use can never save, even if an old enabled tap arrives after ACK",1,GraphicsBridgeShadow.applyCalls);
+        assertTrue(GraphicsPreferences.hasPending(prefs)); assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
         ((Button)get(activity,"graphicsConfirm")).performClick();
         assertTrue(GraphicsPreferences.confirmed(prefs).same(off)); assertFalse(GraphicsPreferences.hasPending(prefs));
     }
@@ -428,14 +432,14 @@ public final class GraphicsPreviewOptionsTest {
         assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
         GraphicsBridgeShadow.applied=snapshot(); GraphicsBridgeShadow.applied[0]=44; GraphicsBridgeShadow.applied[25]=0;
         GraphicsBridgeShadow.epoch=11; poll.run();
-        assertFalse("old Mist On frame cannot trial Off",((Button)get(activity,"graphicsConfirm")).isEnabled());
+        assertFalse("old Mist On frame cannot trial Off",((Button)get(activity,"graphicsApply")).isEnabled());
         GraphicsBridgeShadow.applied[24]=0; poll.run();
-        assertTrue(((Button)get(activity,"graphicsConfirm")).isEnabled());
-        ((Button)get(activity,"graphicsConfirm")).performClick();
+        assertTrue(((Button)get(activity,"graphicsApply")).isEnabled());
+        ((Button)get(activity,"graphicsApply")).performClick();
         assertEquals(1,GraphicsBridgeShadow.applyCalls); assertTrue(GraphicsBridgeShadow.requested.same(off));
         assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
         GraphicsBridgeShadow.applied[0]=45; GraphicsBridgeShadow.applied[2]=2; GraphicsBridgeShadow.epoch=12; poll.run();
-        assertEquals("Keep and save",((Button)get(activity,"graphicsConfirm")).getText().toString());
+        assertEquals("Keep",((Button)get(activity,"graphicsConfirm")).getText().toString());
         ((Button)get(activity,"graphicsConfirm")).performClick();
         assertTrue(GraphicsPreferences.confirmed(prefs).same(off)); assertFalse(GraphicsPreferences.hasPending(prefs));
     }

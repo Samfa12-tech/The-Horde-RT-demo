@@ -41,6 +41,25 @@ public final class GraphicsViewportRecoveryTest {
         }
         return null;
     }
+    private static View tagged(View root, String tag) {
+        if(tag.equals(root.getTag())) return root;
+        if(root instanceof ViewGroup) {
+            ViewGroup group=(ViewGroup)root;
+            for(int i=0;i<group.getChildCount();++i) {
+                View found=tagged(group.getChildAt(i),tag);
+                if(found!=null) return found;
+            }
+        }
+        return null;
+    }
+    private static boolean insideHorizontalScroll(View view) {
+        View current=view;
+        while(current.getParent() instanceof View) {
+            if(current.getParent() instanceof HorizontalScrollView) return true;
+            current=(View)current.getParent();
+        }
+        return false;
+    }
     private static MainActivity activity(FrameLayout[] holder) throws Exception {
         MainActivity a=Robolectric.buildActivity(MainActivity.class).get();
         holder[0]=new FrameLayout(a); holder[0].setFocusableInTouchMode(true);
@@ -51,32 +70,37 @@ public final class GraphicsViewportRecoveryTest {
     @Test public void laterDraftChoiceRetainsViewportAndKeyboardFocus() throws Exception {
         FrameLayout[] holder=new FrameLayout[1]; MainActivity a=activity(holder); FrameLayout scrim=holder[0];
         show(a,"showGraphicsPage"); layout(scrim);
-        ScrollView before=(ScrollView)scrim.getChildAt(0); before.scrollTo(0,1100);
+        ScrollView before=(ScrollView)tagged(scrim,"graphics-page-scroll"); assertNotNull(before); before.scrollTo(0,1100);
         Button mist=button(scrim,"Mist:"); assertNotNull(mist);
         mist.setFocusableInTouchMode(true); assertTrue(mist.requestFocus());
         int y=before.getScrollY(); assertTrue(y>0);
         mist.performClick(); layout(scrim);
-        ScrollView after=(ScrollView)scrim.getChildAt(0);
+        ScrollView after=(ScrollView)tagged(scrim,"graphics-page-scroll"); assertNotNull(after);
         assertEquals("a later setting must not jump back to the page title",y,after.getScrollY());
         assertTrue("the same control keeps focus after its label changes",button(scrim,"Mist:").hasFocus());
-        assertNotNull(button(scrim,"Use these settings")); assertNotNull(button(scrim,"Keep and save"));
-        assertNotNull(button(scrim,"Restore saved settings"));
+        Button use=button(scrim,"Use"), keep=button(scrim,"Keep"), restore=button(scrim,"Restore"), back=button(scrim,"Back");
+        assertNotNull(use); assertNotNull(keep); assertNotNull(restore); assertNotNull(back);
+        assertEquals("Use these settings for a temporary trial. Saved settings change only after a matching RT presentation and Keep and save.",use.getContentDescription());
+        assertTrue(keep.getContentDescription().toString().contains("acknowledged trial"));
+        for(Button action:new Button[]{use,keep,restore,back}) assertFalse(insideHorizontalScroll(action));
     }
-    @Test public void rebuiltPreviewRetainsBothHorizontalRowsAndFocusedControl() throws Exception {
+    @Test public void rebuiltPreviewRetainsScrollableOptionsAndFocusedControlWithPersistentActions() throws Exception {
         FrameLayout[] holder=new FrameLayout[1]; MainActivity a=activity(holder); FrameLayout scrim=holder[0];
         show(a,"showGraphicsPreviewPage"); layout(scrim);
         Button mist=button(scrim,"Mist "); assertNotNull(mist); mist.setEnabled(true);
         mist.setFocusableInTouchMode(true); assertTrue(mist.requestFocus());
         HorizontalScrollView options=(HorizontalScrollView)mist.getParent().getParent();
-        HorizontalScrollView actions=(HorizontalScrollView)button(scrim,"Restore saved").getParent().getParent();
-        options.scrollTo(650,0); actions.scrollTo(450,0);
-        int ox=options.getScrollX(), ax=actions.getScrollX(); assertTrue(ox>0); assertTrue(ax>0);
+        options.scrollTo(650,0);
+        int ox=options.getScrollX(); assertTrue(ox>0);
         set(a,"graphicsDraft",GraphicsPreviewOptions.withChoice(GraphicsPreferences.mobileDefaults(),GraphicsPreviewOptions.MIST,0));
         show(a,"showGraphicsPreviewPage");
         Button replacement=button(scrim,"Mist "); replacement.setEnabled(true);
         layout(scrim);
         assertEquals(ox,((HorizontalScrollView)replacement.getParent().getParent()).getScrollX());
-        assertEquals(ax,((HorizontalScrollView)button(scrim,"Restore saved").getParent().getParent()).getScrollX());
+        Button use=button(scrim,"Use"), keep=button(scrim,"Keep"), restore=button(scrim,"Restore"), back=button(scrim,"Back");
+        assertNotNull(use); assertNotNull(keep); assertNotNull(restore); assertNotNull(back);
+        for(Button action:new Button[]{use,keep,restore,back}) assertFalse(insideHorizontalScroll(action));
+        assertEquals("Save only the settings confirmed by a matching RT presentation.",keep.getContentDescription());
         // The native ACK temporarily disables options. Restore focus as soon as editing is available.
         assertTrue(replacement.hasFocus());
     }
