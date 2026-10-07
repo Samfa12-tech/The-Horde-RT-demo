@@ -352,6 +352,52 @@ defeat, reward/ending and re-entry. All joins pass, zero submissions remain
 pending, preferences are unchanged and owned apps stop. These muted scripted
 runs do not establish comfortable physical input or presented blade contact.
 
+### Windows CCD waterfall inspection: completed state, limited images
+
+After the owner explicitly agreed to keep the Windows demo foreground,
+the sealed `ccd70d3815e0ed08946f9f5ffc52a156bb41ed63` executable
+(`d15b5bf005fb243924a07d1a651b805dc8a193a72442c336d65c01bc6acdf764`)
+completed `waterfall-equipment` on NVIDIA GeForce RTX 5050 Laptop GPU,
+RayTracingPipeline. PID 22924 exited normally in 9.965 wall seconds with
+verified owned-window focus and zero Vulkan validation error markers.
+
+The read-only exact-join audit passes 163 state / 163 completed RT rows,
+16 ordered events, one resource scope and seven actual 960 x 540 PNGs.
+Final simulation tick is 383 (6.38333333 seconds), zero submissions remain
+pending, and warning/draw/attachment/swing events are sequences 13/14/15/16.
+The ledger contains 11 SwingActive rows and five ParryActive rows.
+
+However, the stage-entry `equipment-attack` and `equipment-parry` images both
+join **Idle** snapshots. Draw joins only progress .0416667; the existing
+Windows stage/periodic/torch capture policy missed later action and draw poses
+inside the same stage. These seven images do not close moving draw/action,
+guard-room layout, body, shadow or reflection acceptance. The approach corridor
+and water curtain obscure the room. The muted, checkpoint-seeded,
+damage-disabled run with intrusive readbacks is not sustained performance.
+
+Private evidence is `windows-waterfall-ccd70d38-ownerfocus-20261008-pipeline/`.
+Manifest SHA-256:
+`d67e93c5d61d9eb1e468092665d493f76df91a7b842b660070f087650031f8ab`;
+ledger SHA-256:
+`9bf203b44469019d8074e0ea24566fa8308bb02549f243471ce81d35be8cee09`;
+launch receipt SHA-256:
+`2c23b260b14215070ed1c15cffba8a0d5954c77df56059e1641d67b61518d685`.
+The private audit retains the image hashes and exact owning-frame joins.
+Older Windows focus failures retain their original failed classification.
+
+The affected capture-policy regression reproduces eight missed action/draw
+cases with the old policy, then passes with explicit observed pose milestones
+while retaining stage, periodic and torch capture triggers. Actual inactive
+completed draws do not fabricate intermediate captures. The host launch/capture
+target passes 1/1; corrected Windows runtime captures remain to be collected.
+
+Documentation head `62b6d40e` has 11/12 successful aggregate CI jobs: push
+`37680968970` fails the MSVC report-form UI test (96/97 CTests), while PR
+`37680975262` passes all six jobs. The failed Unicode note edit's native
+WM_SETTEXT call times out after 2004 ms. This failure is retained separately
+from the sealed CCD runtime and earlier `e4cc12f8` 12/12 results; it is not an
+installation timeout or a gameplay/capture pass.
+
 ### Active-draw Home interruption
 
 The same APK also rejects an actual Home interruption during active Draw and

@@ -3,6 +3,7 @@ struct NativeMotionCaptureRow {
     std::string file, sha256;
     std::size_t stateRow=0, rtRow=0;
     std::string rtWorkloadPolicy;
+    unsigned equipmentMilestones=0u, torchMilestones=0u;
 };
 int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::DeviceCapabilities& capabilities,
                             const std::filesystem::path& directory)
@@ -65,6 +66,8 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
             if(i) manifest << ',';
             manifest << "{\"file\":\"" << captures[i].file << "\",\"sha256\":\"" << captures[i].sha256
                 << "\",\"stateRow\":" << captures[i].stateRow << ",\"rtRow\":" << captures[i].rtRow
+                << ",\"equipmentMilestones\":" << captures[i].equipmentMilestones
+                << ",\"torchMilestones\":" << captures[i].torchMilestones
                 << ",\"rtWorkloadPolicy\":" << captures[i].rtWorkloadPolicy << '}';
         }
         manifest << "]}\n";
@@ -167,6 +170,7 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
     double lastCaptureSeconds=-10;
     MotionStage lastCaptureStage=MotionStage::NotStarted;
     unsigned capturedTorchThresholds=0u;
+    unsigned capturedEquipmentMilestones=0u;
     const auto drain = [&]() {
         const auto idle=vkDeviceWaitIdle(context.device);
         return CompleteRtEvidenceAfterDeviceIdle(context,idle) && !context.motionLedger.HasPendingSubmissions();
@@ -212,8 +216,14 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
         if(torchCaptureStates.empty()) return fail("Motion present has no recorded torch snapshot.");
         const unsigned torchThresholds=horde::telemetry::ObservedTorchCaptureMilestones(
             torchCaptureStates.back().torch);
-        const bool capture=stage!=lastCaptureStage || seconds-lastCaptureSeconds>=2.0 ||
-            (torchThresholds & ~capturedTorchThresholds)!=0u;
+        const auto& equipmentState=torchCaptureStates.back();
+        const unsigned equipmentMilestones=horde::platform::windows::NativeEquipmentCaptureMilestones(
+            equipmentState.sword.transition, equipmentState.sword.active,
+            equipmentState.sword.progress, equipmentState.combat.action);
+        const bool capture=horde::platform::windows::NativeMotionNeedsCapture(
+            stage!=lastCaptureStage, seconds-lastCaptureSeconds,
+            torchThresholds, capturedTorchThresholds,
+            equipmentMilestones, capturedEquipmentMilestones);
         if(context.motionRetryPending || capture || context.motionScenario.Complete())
         {
             if(!drain()) return fail("Actual submitted motion frame did not drain its graphics ownership.");
@@ -239,11 +249,12 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
                 std::ostringstream name; name<<std::setw(2)<<std::setfill('0')<<captures.size()<<'-'
                     <<horde::gameplay::validation::MotionStageName(stage)<<".png";
                 NativeMotionCaptureRow row{name.str(),{},owningFrame->stateRow,
-                    static_cast<std::size_t>(owningFrame-frames.begin()),policyJson()};
+                    static_cast<std::size_t>(owningFrame-frames.begin()),policyJson(),equipmentMilestones,torchThresholds};
                 if(!WriteRgbaPng(directory/row.file,image,diagnostic) || !Sha256File(directory/row.file,row.sha256,diagnostic))
                     return fail("Motion milestone PNG/identity failed: "+diagnostic);
                 captures.push_back(std::move(row)); lastCaptureSeconds=seconds; lastCaptureStage=stage;
                 capturedTorchThresholds|=torchThresholds;
+                capturedEquipmentMilestones|=equipmentMilestones;
             }
             if(context.motionRetryPending)
             {

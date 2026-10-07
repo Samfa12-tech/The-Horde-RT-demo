@@ -1,4 +1,5 @@
 #include "platform/windows/WindowsMotionEvidenceLaunch.h"
+#include "platform/windows/WindowsMotionEvidenceCapture.h"
 #include <array>
 #include <iostream>
 #include <vector>
@@ -104,6 +105,40 @@ int main()
         independentMax.find("\"lichMistSamplesPerIntersectingRay\":8")!=std::string::npos);
     check(BuildWindowsMotionTuningJson(RtWorkloadPreset::Max,RtWorkloadPreset::Max,RtWorkloadPreset::Max,
         "High","High",std::nullopt,std::nullopt,true).find("\"policyStable\":false")!=std::string::npos);
-    std::cout<<"Native motion launch failures="<<failures<<'\n';
+    using horde::platform::windows::NativeEquipmentCaptureMilestones;
+    using horde::platform::windows::NativeMotionNeedsCapture;
+    using horde::gameplay::items::HeldItemTransitionKind;
+    using horde::gameplay::PlayerCombatAction;
+    // CCD's stage-change captures observed Idle at ticks 302 and 352. Actual
+    // attack/parry poses followed within the same stage and two-second interval.
+    // Every subsequently observed pose must therefore be independently eligible.
+    unsigned capturedEquipment = 0u;
+    check(!NativeMotionNeedsCapture(false, 0.05, 0u, 0u, 0u, capturedEquipment));
+    for (const auto action : {PlayerCombatAction::SwingWindup, PlayerCombatAction::SwingActive,
+                             PlayerCombatAction::UpwardSliceWindup, PlayerCombatAction::UpwardSliceActive,
+                             PlayerCombatAction::ParryActive})
+    {
+        const unsigned observed = NativeEquipmentCaptureMilestones(HeldItemTransitionKind::None, false, 1.0f, action);
+        check(NativeMotionNeedsCapture(false, 0.05, 0u, 0u, observed, capturedEquipment));
+        capturedEquipment |= observed;
+        check(!NativeMotionNeedsCapture(false, 0.05, 0u, 0u, observed, capturedEquipment));
+    }
+    capturedEquipment = 0u;
+    for (const float progress : {0.29f, 0.50f, 0.83f})
+    {
+        const unsigned observed = NativeEquipmentCaptureMilestones(HeldItemTransitionKind::Draw, true, progress,
+                                                                   PlayerCombatAction::Idle);
+        check(NativeMotionNeedsCapture(false, 0.05, 0u, 0u, observed, capturedEquipment));
+        capturedEquipment |= observed;
+        check(!NativeMotionNeedsCapture(false, 0.05, 0u, 0u, observed, capturedEquipment));
+    }
+    check(NativeEquipmentCaptureMilestones(HeldItemTransitionKind::Draw, false, 1.0f, PlayerCombatAction::Idle) == 0u);
+    check(NativeEquipmentCaptureMilestones(HeldItemTransitionKind::Sheath, true, 0.75f, PlayerCombatAction::Idle) == 0u);
+    check(NativeEquipmentCaptureMilestones(HeldItemTransitionKind::Draw, true, 0.20f, PlayerCombatAction::Idle) == 0u);
+    check(NativeMotionNeedsCapture(true, 0.05, 0u, 0u, 0u, 0u));
+    check(NativeMotionNeedsCapture(false, 2.0, 0u, 0u, 0u, 0u));
+    check(NativeMotionNeedsCapture(false, 0.05, 2u, 0u, 0u, 0u));
+    check(!NativeMotionNeedsCapture(false, 0.05, 2u, 2u, 0u, 0u));
+    std::cout<<"Native motion launch/capture failures="<<failures<<'\n';
     return failures ? 1 : 0;
 }

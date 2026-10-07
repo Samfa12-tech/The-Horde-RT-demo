@@ -83,6 +83,7 @@
 #include "platform/windows/WindowsGraphicsPreviewCapture.h"
 #include "platform/windows/WindowsOutputResizeLaunch.h"
 #include "platform/windows/WindowsMotionEvidenceLaunch.h"
+#include "platform/windows/WindowsMotionEvidenceCapture.h"
 #if defined(_DEBUG)
 #include "gameplay/validation/MotionEvidenceScenario.h"
 #include "telemetry/MotionEvidenceLedger.h"
