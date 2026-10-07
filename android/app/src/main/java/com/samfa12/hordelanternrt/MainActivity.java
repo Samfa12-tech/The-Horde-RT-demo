@@ -2770,13 +2770,13 @@ public class MainActivity extends Activity {
     private String graphicsOptionLabel(int choice) {
         if (graphicsDraft == null) return GraphicsPreviewOptions.name(choice);
         switch (choice) {
-            case GraphicsPreviewOptions.RESOLUTION: return "Resolution " + GraphicsPreviewOptions.resolutionLabel(graphicsDraft.scale);
-            case GraphicsPreviewOptions.WATER: return "Water " + waterName(graphicsDraft.water);
-            case GraphicsPreviewOptions.FIRE: return "Fire " + GraphicsPreviewOptions.fireLabel(graphicsDraft.fire);
-            case GraphicsPreviewOptions.GLASS: return "Glass " + (graphicsDraft.glassEnabled ? "On" : "Off");
-            case GraphicsPreviewOptions.SHADOW: return "Shadows " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow);
-            case GraphicsPreviewOptions.MIST: return "Mist " + (graphicsDraft.mistEnabled ? "On" : "Off");
-            default: return "Cap " + graphicsDraft.cap + " Hz";
+            case GraphicsPreviewOptions.RESOLUTION: return "Resolution: " + GraphicsPreviewOptions.resolutionLabel(graphicsDraft.scale);
+            case GraphicsPreviewOptions.WATER: return "Water: " + waterName(graphicsDraft.water);
+            case GraphicsPreviewOptions.FIRE: return "Fire: " + GraphicsPreviewOptions.fireLabel(graphicsDraft.fire);
+            case GraphicsPreviewOptions.GLASS: return "Glass: " + (graphicsDraft.glassEnabled ? "On" : "Off");
+            case GraphicsPreviewOptions.SHADOW: return "Shadows: " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow);
+            case GraphicsPreviewOptions.MIST: return "Mist: " + (graphicsDraft.mistEnabled ? "On" : "Off");
+            default: return "Cap: " + graphicsDraft.cap + " Hz";
         }
     }
 
@@ -2917,10 +2917,9 @@ public class MainActivity extends Activity {
         panel.layout(0, 0, overlayWidth, panel.getMeasuredHeight());
         final int standardOverlayHeight = GraphicsPreviewOptions.maximumOverlayHeight(viewportHeight, bottom);
         final View optionStrip = (View)optionsRow.getParent();
-        final View optionRow = (View)graphicsOptionButtons[0].getParent();
-        final int firstOptionTargetBottom = optionStrip.getTop() + optionRow.getTop() +
-                graphicsOptionButtons[0].getBottom();
-        final int keepOptionVisibleHeight = dock.getMeasuredHeight() + firstOptionTargetBottom + dp(4);
+        // Include the whole strip's padding and scrollbar in the visible viewport;
+        // budgeting only its button clipped the scroll affordance at large font sizes.
+        final int keepOptionVisibleHeight = dock.getMeasuredHeight() + optionStrip.getBottom() + dp(4);
         final int preservePreviewCap = Math.max(1, viewportHeight * 60 / 100 - bottom);
         final int overlayHeight = Math.min(preservePreviewCap,
                 Math.max(standardOverlayHeight, keepOptionVisibleHeight));
@@ -2983,9 +2982,9 @@ public class MainActivity extends Activity {
         scroll.setHorizontalScrollBarEnabled(true);
         scroll.setVerticalScrollBarEnabled(false);
         scroll.setScrollbarFadingEnabled(false);
-        scroll.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
-        scroll.setScrollBarSize(dp(4));
-        scroll.setPadding(0, 0, 0, dp(6)); // Separate the native bar from the full-size button targets.
+        scroll.setScrollBarStyle(View.SCROLLBARS_INSIDE_INSET);
+        scroll.setScrollBarSize(dp(6));
+        scroll.setPadding(0, 0, 0, dp(8)); // Keep the persistent bar below the full-size button targets.
         if (Build.VERSION.SDK_INT >= 29) {
             scroll.setHorizontalScrollbarThumbDrawable(new ColorDrawable(HordeUiTokens.BRASS));
             scroll.setHorizontalScrollbarTrackDrawable(new ColorDrawable(HordeUiTokens.IRON));

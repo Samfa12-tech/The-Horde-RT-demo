@@ -222,7 +222,7 @@ public final class GraphicsPreviewOptionsTest {
         GraphicsBridgeShadow.epoch=10;
         Runnable poll=(Runnable)get(activity,"refreshGraphics"); poll.run();
         Button glass=((Button[])get(activity,"graphicsOptionButtons"))[GraphicsPreviewOptions.GLASS];
-        assertTrue(glass.isEnabled()); assertEquals("Glass On",glass.getText().toString());
+        assertTrue(glass.isEnabled()); assertEquals("Glass: On",glass.getText().toString());
         Method menu=MainActivity.class.getDeclaredMethod("showGraphicsPreviewOptionMenu",Button.class,int.class);
         menu.setAccessible(true); menu.invoke(activity,glass,GraphicsPreviewOptions.GLASS);
         PopupMenu popup=(PopupMenu)get(activity,"graphicsOptionsPopup");
@@ -419,7 +419,7 @@ public final class GraphicsPreviewOptionsTest {
         GraphicsBridgeShadow.epoch=10;
         Runnable poll=(Runnable)get(activity,"refreshGraphics"); poll.run();
         Button mist=((Button[])get(activity,"graphicsOptionButtons"))[GraphicsPreviewOptions.MIST];
-        assertTrue(mist.isEnabled()); assertEquals("Mist On",mist.getText().toString());
+        assertTrue(mist.isEnabled()); assertEquals("Mist: On",mist.getText().toString());
         Method menu=MainActivity.class.getDeclaredMethod("showGraphicsPreviewOptionMenu",Button.class,int.class);
         menu.setAccessible(true); menu.invoke(activity,mist,GraphicsPreviewOptions.MIST);
         PopupMenu popup=(PopupMenu)get(activity,"graphicsOptionsPopup");

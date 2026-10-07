@@ -105,14 +105,14 @@ public final class GraphicsViewportRecoveryTest {
     @Test public void rebuiltPreviewRetainsScrollableOptionsAndFocusedControlWithPersistentActions() throws Exception {
         FrameLayout[] holder=new FrameLayout[1]; MainActivity a=activity(holder); FrameLayout scrim=holder[0];
         show(a,"showGraphicsPreviewPage"); layout(scrim);
-        Button mist=button(scrim,"Mist "); assertNotNull(mist); mist.setEnabled(true);
+        Button mist=button(scrim,"Mist: "); assertNotNull(mist); mist.setEnabled(true);
         mist.setFocusableInTouchMode(true); assertTrue(mist.requestFocus());
         HorizontalScrollView options=(HorizontalScrollView)mist.getParent().getParent();
         options.scrollTo(650,0);
         int ox=options.getScrollX(); assertTrue(ox>0);
         set(a,"graphicsDraft",GraphicsPreviewOptions.withChoice(GraphicsPreferences.mobileDefaults(),GraphicsPreviewOptions.MIST,0));
         show(a,"showGraphicsPreviewPage");
-        Button replacement=button(scrim,"Mist "); replacement.setEnabled(true);
+        Button replacement=button(scrim,"Mist: "); replacement.setEnabled(true);
         layout(scrim);
         assertEquals(ox,((HorizontalScrollView)replacement.getParent().getParent()).getScrollX());
         Button use=button(scrim,"Use"), keep=button(scrim,"Keep"), restore=button(scrim,"Restore"), back=button(scrim,"Back");

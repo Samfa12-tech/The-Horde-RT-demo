@@ -105,7 +105,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                 for(HorizontalScrollView row:rows) {
                     assertTrue(row.isHorizontalScrollBarEnabled()); assertFalse(row.isVerticalScrollBarEnabled());
                     assertFalse("scroll affordance must stay visible",row.isScrollbarFadingEnabled());
-                    assertEquals(View.SCROLLBARS_OUTSIDE_INSET,row.getScrollBarStyle());
+                    assertEquals(View.SCROLLBARS_INSIDE_INSET,row.getScrollBarStyle());
                     assertTrue(row.getScrollBarSize()>=HordeUiTokens.dp(activity,4));
                     assertTrue("bar occupies its own space below button targets",
                             row.getHeight()-row.getChildAt(0).getBottom()>=HordeUiTokens.dp(activity,4));
@@ -114,7 +114,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                     assertEquals(HordeUiTokens.BRASS,((ColorDrawable)row.getHorizontalScrollbarThumbDrawable()).getColor());
                     assertEquals(HordeUiTokens.IRON,((ColorDrawable)row.getHorizontalScrollbarTrackDrawable()).getColor());
                 }
-                String[] labels={"Resolution 75%","Water Mobile","Fire Mobile","Cap 30 Hz","Glass On","Shadows Current","Mist On","View","Image","Details","Use","Keep","Restore","Back"};
+                String[] labels={"Resolution: 75%","Water: Mobile","Fire: Mobile","Cap: 30 Hz","Glass: On","Shadows: Current","Mist: On","View","Image","Details","Use","Keep","Restore","Back"};
                 int minimum=HordeUiTokens.dp(activity,48);
                 for(int i=0;i<buttons.size();++i) {
                     Button button=buttons.get(i); assertEquals(labels[i],button.getText().toString());
@@ -124,9 +124,8 @@ public final class GraphicsPreviewCompactLayoutTest {
                             activity.getResources().getDisplayMetrics()),button.getTextSize(),.5);
                 }
                 HorizontalScrollView optionStrip=(HorizontalScrollView)buttons.get(0).getParent().getParent();
-                View optionRow=(View)buttons.get(0).getParent();
-                int firstOptionBottom=optionStrip.getTop()+optionRow.getTop()+buttons.get(0).getBottom();
-                assertTrue("the first full native option target remains visible above the sticky dock; " +
+                int firstOptionBottom=optionStrip.getBottom();
+                assertTrue("the whole option row, including its scrollbar, remains visible above the sticky dock; " +
                                 "font="+font+" viewport="+size[0]+"x"+size[1]+" overlay="+strip.getHeight()+
                                 " dock="+dock.getHeight()+" scroller="+controlViewport.getHeight()+
                                 " targetBottom="+firstOptionBottom,
@@ -166,8 +165,8 @@ public final class GraphicsPreviewCompactLayoutTest {
         setField(activity,"graphicsConfirmed",saved); setField(activity,"graphicsDraft",candidate);
         Method optionLabel=MainActivity.class.getDeclaredMethod("graphicsOptionLabel",int.class);
         optionLabel.setAccessible(true);
-        assertEquals("Fire Low",optionLabel.invoke(activity,GraphicsPreviewOptions.FIRE));
-        assertEquals("Shadows Higher",optionLabel.invoke(activity,GraphicsPreviewOptions.SHADOW));
+        assertEquals("Fire: Low",optionLabel.invoke(activity,GraphicsPreviewOptions.FIRE));
+        assertEquals("Shadows: Higher",optionLabel.invoke(activity,GraphicsPreviewOptions.SHADOW));
         TextView summary=new TextView(activity); setField(activity,"graphicsSelectionSummary",summary);
         Method selection=MainActivity.class.getDeclaredMethod("updateGraphicsSelectionSummary",boolean.class);
         selection.setAccessible(true);
