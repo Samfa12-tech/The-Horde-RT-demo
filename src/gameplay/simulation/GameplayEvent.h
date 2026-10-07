@@ -44,6 +44,9 @@ enum class GameplayEventType : std::uint8_t
     KeeperWarning,
     KeeperCombatReady,
     SkeletonIncidental,
+    PlayerSwordDrawStarted,
+    PlayerSwordAttachmentChanged,
+    SkeletonEncounterWarning,
 };
 
 struct GameplayEvent

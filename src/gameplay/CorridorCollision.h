@@ -217,6 +217,35 @@ inline bool IsSkeletonEnemyWalkableSweep(RoutePosition previous, RoutePosition p
     return true;
 }
 
+inline bool IsWaterfallSkeletonPositionWalkable(float x, float z)
+{
+    if (!detail::InsideRadiusInsetRect(kWaterfallSkeletonRoomBounds, x, z))
+        return false;
+    for (const RouteRect& obstacle : kShowcaseSolidObstacles)
+    {
+        if (detail::InsideInsetRect(obstacle, x, z))
+            return false;
+    }
+    return true;
+}
+
+inline bool IsWaterfallSkeletonWalkableSweep(RoutePosition previous, RoutePosition proposed)
+{
+    const float dx = proposed.x - previous.x;
+    const float dz = proposed.z - previous.z;
+    const float distance = std::sqrt(dx * dx + dz * dz);
+    const int steps = std::max(1, static_cast<int>(std::ceil(
+        distance / (kPlayerCollisionRadius * 0.5f))));
+    for (int step = 1; step <= steps; ++step)
+    {
+        const float t = static_cast<float>(step) / static_cast<float>(steps);
+        if (!IsWaterfallSkeletonPositionWalkable(
+                previous.x + dx * t, previous.z + dz * t))
+            return false;
+    }
+    return true;
+}
+
 inline void ResolveSkeletonEnemyCollision(float previousX, float previousZ, float& proposedX, float& proposedZ)
 {
     const RoutePosition previous{previousX, previousZ};
@@ -240,6 +269,28 @@ inline void ResolveSkeletonEnemyCollision(float previousX, float previousZ, floa
         return;
     }
 
+    proposedX = previousX;
+    proposedZ = previousZ;
+}
+
+inline void ResolveWaterfallSkeletonEnemyCollision(float previousX,
+                                                   float previousZ,
+                                                   float& proposedX,
+                                                   float& proposedZ)
+{
+    const RoutePosition previous{previousX, previousZ};
+    if (IsWaterfallSkeletonWalkableSweep(previous, {proposedX, proposedZ}))
+        return;
+    if (IsWaterfallSkeletonWalkableSweep(previous, {proposedX, previousZ}))
+    {
+        proposedZ = previousZ;
+        return;
+    }
+    if (IsWaterfallSkeletonWalkableSweep(previous, {previousX, proposedZ}))
+    {
+        proposedX = previousX;
+        return;
+    }
     proposedX = previousX;
     proposedZ = previousZ;
 }

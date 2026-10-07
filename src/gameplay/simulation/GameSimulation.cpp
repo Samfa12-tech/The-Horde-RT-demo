@@ -80,8 +80,14 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     }
     enemyDirector_.Reset();
     activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
+    if (config_.waterfallSkeletonEncounter)
+    {
+        swordCombat_.Reset(kSkeletonEnemyCapacity, kWaterfallSkeletonPairCenter);
+        combatSnapshot_ = swordCombat_.Snapshot();
+    }
     combatSnapshot_ = swordCombat_.Snapshot();
     torchFailureSnapshot_ = torchFailure_.Snapshot();
+    ResetSwordEquipment();
     ResolveHeldItems();
     lanternPendulum_.Reset(
         heldItemFixedStepState_.worldFromLeftHand,
@@ -134,6 +140,7 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
     }
     if (input.paused)
     {
+        ClearQueuedDrawAttack();
         ClearScheduledCombatEdges(true);
         lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
         pendingAttackCommands_ = 0u;
@@ -218,6 +225,12 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     const bool playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     if (input.paused || !playerAlive)
     {
+        ClearQueuedDrawAttack();
+        if (!playerAlive && heldItems_[1].transition.active)
+        {
+            horde::gameplay::items::InterruptHeldItemTransition(heldItems_[1], tickIndex_);
+            automaticSwordDrawBlocksDefense_ = false;
+        }
         ClearScheduledCombatEdges(true);
         lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
         pendingAttackCommands_ = 0u;
@@ -235,6 +248,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     {
         walkTime_ += fixedDeltaSeconds;
         UpdateMovement(input, fixedDeltaSeconds);
+        AdvanceSwordEquipment(fixedDeltaSeconds);
         const bool torchWasTriggered = torchFailureSnapshot_.triggered;
         torchFailureSnapshot_ = torchFailure_.Update(fixedDeltaSeconds,
                                            playerX_,
@@ -296,6 +310,12 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
 
     if (wasAlive && playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
     {
+        ClearQueuedDrawAttack();
+        if (heldItems_[1].transition.active)
+        {
+            horde::gameplay::items::InterruptHeldItemTransition(heldItems_[1], tickIndex_);
+            automaticSwordDrawBlocksDefense_ = false;
+        }
         ClearScheduledCombatEdges(true);
         pendingAttackCommands_ = 0u;
         pendingParryCommands_ = 0u;
@@ -315,6 +335,7 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
 {
     lastInput_ = input;
     lastInput_.paused = true;
+    ClearQueuedDrawAttack();
     combatPresentation_.Reset();
     ClearScheduledCombatEdges(false);
     previousOwnerAdvanceSteadyNs_ = 0u;
@@ -403,13 +424,22 @@ void GameSimulation::ResetRoute()
     playerPitchRadians_ = std::clamp(FiniteOr(config_.playerStartPitchRadians, 0.0f),
                                      kMinimumPitch,
                                      kMaximumPitch);
-    swordCombat_.Reset(kSkeletonEnemyCapacity);
+    swordCombat_.Reset(kSkeletonEnemyCapacity,
+        config_.waterfallSkeletonEncounter
+            ? kWaterfallSkeletonPairCenter
+            : RoutePosition{0.0f, -4.65f});
+    waterfallWarningEmitted_ = false;
+    ResetSwordEquipment();
     combatPresentation_.Reset();
     skeletonIdlePhasesEnabled_ = true;
     combatSnapshot_ = swordCombat_.Update(0.0f,
                                            playerX_,
                                            playerZ_,
-                                           playerYawRadians_);
+                                           playerYawRadians_,
+                                           config_.waterfallSkeletonEncounter,
+                                           config_.waterfallSkeletonEncounter &&
+                                               IsWaterfallSkeletonArena(playerX_, playerZ_),
+                                           config_.waterfallSkeletonEncounter);
     playerAnimationState_.Reset();
     ResolveHeldItems();
     lanternPendulum_.Reset(
@@ -446,6 +476,7 @@ void GameSimulation::ImportRewardCheckpoint(
     finaleSequence_.Import(finale);
     pendingInteractCommands_ = 0u;
     pendingToggleHeldLightPoseCommands_ = 0u;
+    ClearQueuedDrawAttack();
     finaleCompletionEmitted_ =
         finaleSequence_.Snapshot().endingPhase ==
         horde::gameplay::interactions::FinaleEndingPhase::Complete;
@@ -474,6 +505,7 @@ void GameSimulation::ResetTiming()
     pendingAttackCommands_ = 0u;
     pendingParryCommands_ = 0u;
     pendingDodgeCommands_ = 0u;
+    ClearQueuedDrawAttack();
     fixedStepRunner_.ResetAccumulator();
 }
 
@@ -942,6 +974,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     torchFailureSnapshot_ = torchFailure_.Snapshot();
     horde::gameplay::items::ImportHeldItemCheckpoint(
         heldItems_, torchFailureSnapshot_.heldByPlayer, tickIndex_);
+    ResetSwordEquipment();
+    waterfallWarningEmitted_ = false;
     enemyDirector_ = state.enemyDirector;
     activeEnemyKind_ = state.activeEnemyKind;
     lichEncounter_ = state.lichEncounter;
@@ -970,11 +1004,23 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
             horde::gameplay::interactions::HeldLightKind::None;
     }
     const bool pairCheckpoint = checkpoint->preset == ShowcaseCheckpointPreset::TwoSkeletonCombat;
-    swordCombat_.Reset((isRetry || pairCheckpoint) ? kSkeletonEnemyCapacity : 1u);
+    const bool productionSkeletonEncounter = config_.waterfallSkeletonEncounter &&
+        activeEnemyKind_ == EnemyKind::Skeleton;
+    const RoutePosition combatSpawnCenter = productionSkeletonEncounter
+        ? kWaterfallSkeletonPairCenter
+        : RoutePosition{0.0f, -4.65f};
+    swordCombat_.Reset(productionSkeletonEncounter
+                           ? kSkeletonEnemyCapacity
+                           : ((isRetry || pairCheckpoint) ? kSkeletonEnemyCapacity : 1u),
+                       combatSpawnCenter);
     combatSnapshot_ = swordCombat_.Update(0.0f,
                                            playerX_,
                                            playerZ_,
-                                           playerYawRadians_);
+                                           playerYawRadians_,
+                                           config_.waterfallSkeletonEncounter,
+                                           config_.waterfallSkeletonEncounter &&
+                                               IsWaterfallSkeletonArena(playerX_, playerZ_),
+                                           config_.waterfallSkeletonEncounter);
     const bool lichHasLineOfSight = !IsRouteAudioObstructed(playerX_,
                                                              playerZ_,
                                                              lichEncounter_.Snapshot().x,
@@ -1047,11 +1093,105 @@ void GameSimulation::ResolveHeldItems()
         combatSnapshot_.swordSwingRadians,
         interactionState_,
         config_.playerMountProfile};
+    // Kinematics still renders the legacy hand-held sword. Keep transition
+    // authority in the simulation snapshot while that presentation path is
+    // being connected; only copy back its resolved item transform here.
+    const horde::gameplay::items::HeldItemState swordAuthority = heldItems_[1];
+    auto resolvedItems = heldItems_;
     // Every socket contract is a checked rigid transform. A failure would
     // indicate a source-code contract violation; preserve the last immutable
     // state rather than publishing a renderer-authored fallback.
     horde::gameplay::items::ResolveHeldItemsFixedStep(
-        heldItems_, input, tickIndex_, heldItemFixedStepState_, diagnostic);
+        resolvedItems, input, tickIndex_, heldItemFixedStepState_, diagnostic);
+    heldItems_[0] = resolvedItems[0];
+    heldItems_[1] = swordAuthority;
+    heldItems_[1].worldFromItem = resolvedItems[1].worldFromItem;
+    heldItems_[1].worldFromDetach = resolvedItems[1].worldFromDetach;
+    heldItems_[1].detachTick = resolvedItems[1].detachTick;
+}
+
+bool GameSimulation::SwordDefenseReady() const
+{
+    const horde::gameplay::items::HeldItemState& sword = heldItems_[1];
+    return sword.id == horde::gameplay::items::HeldItemId::Sword &&
+           !sword.detached &&
+           sword.parentMode == horde::gameplay::items::HeldItemParentMode::HandSocket &&
+           !sword.transition.active;
+}
+
+bool GameSimulation::SwordDrawBlocksDefense() const
+{
+    const horde::gameplay::items::HeldItemState& sword = heldItems_[1];
+    return automaticSwordDrawBlocksDefense_ && sword.transition.active &&
+           sword.transition.kind == horde::gameplay::items::HeldItemTransitionKind::Draw;
+}
+
+bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
+                                     const bool blocksDefenseDuringDraw)
+{
+    using namespace horde::gameplay::items;
+    if (!config_.swordStartsStowed || SwordDefenseReady())
+        return false;
+
+    HeldItemState& sword = heldItems_[1];
+    const HeldItemTransitionRequestResult request = RequestHeldItemTransition(
+        sword, HeldItemTransitionKind::Draw, tickIndex_);
+    if (request.status != HeldItemTransitionRequestStatus::Started &&
+        request.status != HeldItemTransitionRequestStatus::InterruptedAndStarted)
+    {
+        return false;
+    }
+    automaticSwordDrawBlocksDefense_ = blocksDefenseDuringDraw;
+    Emit(GameplayEventType::PlayerSwordDrawStarted,
+         EntityId::Player,
+         EntityId::Invalid,
+         playerX_,
+         playerZ_,
+         1.0f,
+         reasonPayload);
+    return true;
+}
+
+void GameSimulation::ResetSwordEquipment()
+{
+    using namespace horde::gameplay::items;
+    HeldItemState& sword = heldItems_[1];
+    const std::uint64_t sequence = sword.transition.semanticEdgeSequence;
+    sword = MakeHeldItemState(
+        HeldItemId::Sword, HeldHand::RightHand,
+        config_.swordStartsStowed ? HeldItemParentMode::BodyStow
+                                  : HeldItemParentMode::HandSocket);
+    sword.transition.semanticEdgeSequence = sequence;
+    automaticSwordDrawBlocksDefense_ = false;
+    ClearQueuedDrawAttack();
+}
+
+void GameSimulation::ClearQueuedDrawAttack()
+{
+    queuedDrawAttack_ = false;
+    queuedDrawAttackCommandSequence_ = 0u;
+}
+
+void GameSimulation::AdvanceSwordEquipment(const float fixedDeltaSeconds)
+{
+    const horde::gameplay::items::HeldItemTransitionAdvanceResult result =
+        horde::gameplay::items::AdvanceHeldItemTransition(
+            heldItems_[1], tickIndex_, fixedDeltaSeconds, false);
+    if (result.attachmentChanged)
+        EmitSwordAttachmentChange();
+    if (!heldItems_[1].transition.active)
+        automaticSwordDrawBlocksDefense_ = false;
+}
+
+void GameSimulation::EmitSwordAttachmentChange()
+{
+    Emit(GameplayEventType::PlayerSwordAttachmentChanged,
+         EntityId::Player,
+         EntityId::Invalid,
+         playerX_,
+         playerZ_,
+         1.0f,
+         static_cast<std::int32_t>(heldItems_[1].parentMode));
 }
 
 void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
@@ -1319,6 +1459,35 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         // Only explicit reset/retry/checkpoint import may initialise them.
     }
 
+    if (config_.waterfallSkeletonEncounter &&
+        activeEnemyKind_ == EnemyKind::Skeleton && !SwordDefenseReady())
+    {
+        const float distanceToWaterfall = std::hypot(
+            playerX_ - kWaterfallSkeletonPairCenter.x,
+            playerZ_ - kWaterfallSkeletonPairCenter.z);
+        const bool inEarlyCueRange = distanceToWaterfall <= kWaterfallSwordCueRadius;
+        const bool canSeeEncounter = !IsRouteAudioObstructed(
+            playerX_, playerZ_,
+            kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z);
+        if (inEarlyCueRange && canSeeEncounter && !waterfallWarningEmitted_)
+        {
+            Emit(GameplayEventType::SkeletonEncounterWarning,
+                 EntityId::SkeletonA,
+                 EntityId::Player,
+                 kWaterfallSkeletonPairCenter.x,
+                 kWaterfallSkeletonPairCenter.z,
+                 0.72f);
+            waterfallWarningEmitted_ = true;
+        }
+        if ((inEarlyCueRange && canSeeEncounter) ||
+            IsWaterfallSkeletonArena(playerX_, playerZ_))
+        {
+            // Semantic event only; audio selection remains an application
+            // mapping decision. Arena fallback covers an occluded approach.
+            RequestSwordDraw(3, true);
+        }
+    }
+
     const bool finaleActive = QueryShowcaseZone(playerX_, playerZ_) == ShowcaseZone::Finale;
     const auto& keeperBeforeActions = lichEncounter_.Snapshot();
     const bool keeperHoldsActions = IsKeeperRevealing(keeperBeforeActions.revealPhase) ||
@@ -1344,8 +1513,45 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         lichAttackEligible_ = false;
         lichRevealAttackSequenceFloor_ = latestAttackSequence_;
     }
-    const bool parryAvailable = swordCombat_.CanAcceptParry();
+    const bool parryAvailable = SwordDefenseReady() && swordCombat_.CanAcceptParry();
     bool playerActionAccepted = false;
+    const auto acceptAttack = [&](const std::uint64_t commandSequence)
+    {
+        if (!SwordDefenseReady())
+            return false;
+        const PlayerAttackCut acceptedCut = swordCombat_.RequestAttack();
+        if (acceptedCut == PlayerAttackCut::None)
+            return false;
+        if (acceptedCut == PlayerAttackCut::DownwardCut)
+        {
+            lichAttackEligible_ = lichEncounter_.Snapshot().revealComplete &&
+                commandSequence > lichRevealAttackSequenceFloor_;
+        }
+        else
+        {
+            lichAttackEligible_ = lichAttackEligible_ &&
+                lichEncounter_.Snapshot().revealComplete &&
+                commandSequence > lichRevealAttackSequenceFloor_;
+        }
+        const std::uint64_t eventSequence = Emit(
+            GameplayEventType::PlayerSwing,
+            EntityId::Player,
+            EntityId::Invalid,
+            playerX_,
+            playerZ_,
+            1.0f,
+            static_cast<std::int32_t>(acceptedCut));
+        LinkCombatTimingSemanticEvent(CombatInputEdgeKind::Attack,
+                                     commandSequence,
+                                     eventSequence, tickIndex_);
+        return true;
+    };
+    if (queuedDrawAttack_ && SwordDefenseReady() && !keeperHoldsActions)
+    {
+        const std::uint64_t queuedSequence = queuedDrawAttackCommandSequence_;
+        ClearQueuedDrawAttack();
+        playerActionAccepted = acceptAttack(queuedSequence);
+    }
     if (pendingAttackCommands_ > 0u)
     {
         // Consume one monotonic edge per fixed tick. A coherent publication
@@ -1357,37 +1563,20 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         lastConsumedAttackSequence_ = SaturatingAdd(lastConsumedAttackSequence_, 1u);
         MarkCombatTimingConsumed(CombatInputEdgeKind::Attack, oldAttackConsumed,
                                  lastConsumedAttackSequence_);
-        if (swordCombat_.CanAcceptAttack())
+        if (!SwordDefenseReady())
         {
-            const PlayerAttackCut acceptedCut = swordCombat_.RequestAttack();
-            if (acceptedCut != PlayerAttackCut::None)
+            RequestSwordDraw(1, false);
+            const auto& draw = heldItems_[1].transition;
+            if (!queuedDrawAttack_ && draw.active &&
+                draw.kind == horde::gameplay::items::HeldItemTransitionKind::Draw)
             {
-                if (acceptedCut == PlayerAttackCut::DownwardCut)
-                {
-                    lichAttackEligible_ = lichEncounter_.Snapshot().revealComplete &&
-                        lastConsumedAttackSequence_ > lichRevealAttackSequenceFloor_;
-                }
-                else
-                {
-                    // A reveal-time downward cut cannot turn into a free hit
-                    // through a queued continuation after the combat boundary.
-                    lichAttackEligible_ = lichAttackEligible_ &&
-                        lichEncounter_.Snapshot().revealComplete &&
-                        lastConsumedAttackSequence_ > lichRevealAttackSequenceFloor_;
-                }
-                playerActionAccepted = true;
-                const std::uint64_t eventSequence = Emit(
-                    GameplayEventType::PlayerSwing,
-                    EntityId::Player,
-                    EntityId::Invalid,
-                    playerX_,
-                    playerZ_,
-                    1.0f,
-                    static_cast<std::int32_t>(acceptedCut));
-                LinkCombatTimingSemanticEvent(CombatInputEdgeKind::Attack,
-                                             lastConsumedAttackSequence_,
-                                             eventSequence, tickIndex_);
+                queuedDrawAttack_ = true;
+                queuedDrawAttackCommandSequence_ = lastConsumedAttackSequence_;
             }
+        }
+        else if (!playerActionAccepted)
+        {
+            playerActionAccepted = acceptAttack(lastConsumedAttackSequence_);
         }
     }
     if (pendingParryCommands_ > 0u)
@@ -1397,7 +1586,14 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         MarkCombatTimingConsumed(CombatInputEdgeKind::Parry, oldParryConsumed,
                                  lastConsumedParrySequence_);
         pendingParryCommands_ = 0u;
-        if (parryAvailable && !playerActionAccepted)
+        if (!SwordDefenseReady())
+        {
+            if (!playerActionAccepted)
+                RequestSwordDraw(2, false);
+            // Consume and discard this edge. A parry pressed before the hand
+            // attachment edge cannot become a later, buffered defense.
+        }
+        else if (parryAvailable && !playerActionAccepted)
         {
             swordCombat_.RequestParry();
             parrySourceCommandSequence_ = lastConsumedParrySequence_;
@@ -1408,7 +1604,11 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     combatSnapshot_ = swordCombat_.Update(deltaSeconds,
                                            playerX_,
                                            playerZ_,
-                                           playerYawRadians_);
+                                           playerYawRadians_,
+                                           config_.waterfallSkeletonEncounter,
+                                           config_.waterfallSkeletonEncounter &&
+                                               IsWaterfallSkeletonArena(playerX_, playerZ_),
+                                           config_.waterfallSkeletonEncounter);
     EntityId skeletonDamageSource = EntityId::Invalid;
     skeletonIncidentalSpacingSeconds_ = std::max(
         0.0, skeletonIncidentalSpacingSeconds_ - deltaSeconds);
@@ -1582,7 +1782,8 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         (activeEnemyKind_ == EnemyKind::Lich && lichEncounter_.Snapshot().damagePulse);
     const bool keeperRevealInvulnerable = IsKeeperRevealing(previousLich.revealPhase) ||
         IsKeeperRevealing(lich.revealPhase);
-    if (input.damageEnabled && playerDamagePulse && !keeperRevealInvulnerable)
+    if (input.damageEnabled && playerDamagePulse && !keeperRevealInvulnerable &&
+        !SwordDrawBlocksDefense())
     {
         const PlayerDamageResult damageResult = playerVitals_.TryApplyDamage();
         if (damageResult == PlayerDamageResult::Damaged)
@@ -1717,6 +1918,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.rewardLanternWorldFromHinge = heldItemFixedStepState_.worldFromLeftHand;
     snapshot_.torchFailure = torchFailureSnapshot_;
     snapshot_.heldItems = heldItems_;
+    snapshot_.automaticSwordDrawBlocksDefense = SwordDrawBlocksDefense();
     snapshot_.heldItemKinematics = heldItemFixedStepState_.kinematics;
     snapshot_.playerAnimation = playerAnimationState_.Snapshot();
     snapshot_.heldLight = heldItemFixedStepState_.light;

@@ -33,6 +33,10 @@ struct GameSimulationConfig
     float movementSpeedMetresPerSecond = 1.9f;
     horde::gameplay::items::PlayerMountProfile playerMountProfile =
         horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
+    // Historical fixtures remain ready-handed. Opt-in until the renderer
+    // consumes the shared BodyStow transition state in production.
+    bool swordStartsStowed = false;
+    bool waterfallSkeletonEncounter = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -113,6 +117,13 @@ private:
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
     void UpdateRewardSequence(float deltaSeconds, bool commandsAvailable);
     void ResolveHeldItems();
+    bool SwordDefenseReady() const;
+    bool SwordDrawBlocksDefense() const;
+    bool RequestSwordDraw(std::int32_t reasonPayload, bool blocksDefenseDuringDraw);
+    void ResetSwordEquipment();
+    void ClearQueuedDrawAttack();
+    void AdvanceSwordEquipment(float fixedDeltaSeconds);
+    void EmitSwordAttachmentChange();
     void ResolvePlayerAnimation(float fixedDeltaSeconds);
     void ResolveFireEmitters(float fixedDeltaSeconds);
     std::uint64_t Emit(GameplayEventType type,
@@ -197,6 +208,8 @@ private:
     bool finaleCompletionEmitted_ = false;
     bool lanternPendulumResetPending_ = true;
     bool skeletonIdlePhasesEnabled_ = true;
+    bool waterfallWarningEmitted_ = false;
+    bool automaticSwordDrawBlocksDefense_ = false;
     bool lichAttackEligible_ = false;
     std::uint64_t lichRevealAttackSequenceFloor_ = 0u;
     struct ScheduledCombatEdge
@@ -213,6 +226,8 @@ private:
     float overflowDodgeStrafe_ = 0.0f;
     std::uint64_t previousOwnerAdvanceSteadyNs_ = 0u;
     std::uint64_t parrySourceCommandSequence_ = 0u;
+    bool queuedDrawAttack_ = false;
+    std::uint64_t queuedDrawAttackCommandSequence_ = 0u;
 };
 
 } // namespace horde::gameplay::simulation

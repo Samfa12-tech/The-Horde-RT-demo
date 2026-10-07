@@ -49,6 +49,28 @@ inline constexpr float kPlayerCollisionRadius = 0.24f;
 inline constexpr RoutePosition kPlayerSpawn{0.0f, 1.85f};
 inline constexpr RoutePosition kSkeletonRoomCenter{0.0f, -4.8f};
 inline constexpr RoutePosition kSkylightChamberCenter{-5.5f, -15.2f};
+inline constexpr RouteRect kWaterfallSkeletonRoomBounds{-8.5f, -2.5f, -18.0f, -12.4f};
+// The Waterfall encounter stages the existing pair in the west-side room.
+// This inset arena stays west of the x=-2.5 route boundary/wetline.
+inline constexpr RoutePosition kWaterfallSkeletonPairCenter = kSkylightChamberCenter;
+inline constexpr float kWaterfallSkeletonArenaRadius = 2.30f;
+inline constexpr float kWaterfallSwordCueRadius = 6.0f;
+
+inline bool IsWaterfallSkeletonArena(float x, float z)
+{
+    return std::hypot(x - kWaterfallSkeletonPairCenter.x,
+                      z - kWaterfallSkeletonPairCenter.z) <=
+           kWaterfallSkeletonArenaRadius;
+}
+
+inline constexpr bool IsWaterfallSkeletonRoom(float x, float z)
+{
+    return x >= kWaterfallSkeletonRoomBounds.minX &&
+           x <= kWaterfallSkeletonRoomBounds.maxX &&
+           z >= kWaterfallSkeletonRoomBounds.minZ &&
+           z <= kWaterfallSkeletonRoomBounds.maxZ;
+}
+
 inline constexpr std::array<RoutePosition, 4> kTorchBayCenters{{
     {-11.0f, -15.2f},
     {-16.0f, -15.2f},
@@ -83,7 +105,7 @@ inline constexpr std::array<RouteRect, 9> kShowcaseWalkableRects{{
     {0.0f, 4.8f, -11.2f, -8.8f},        // Shadow corridor: east.
     {3.6f, 6.0f, -15.2f, -10.0f},       // Shadow corridor: south.
     {-2.5f, 4.8f, -16.4f, -14.0f},      // Shadow corridor: west.
-    {-8.5f, -2.5f, -18.0f, -12.4f},     // Skylight chamber.
+    kWaterfallSkeletonRoomBounds,       // Skylight / Waterfall room.
     {-28.5f, -8.5f, -16.8f, -13.6f},    // Four five-metre torch bays.
     {-30.5f, -28.5f, -16.8f, -13.6f},   // Transmission threshold.
     {-36.9f, -30.5f, -18.4f, -12.0f},   // Finale room.

@@ -1814,6 +1814,248 @@ int main()
           NearlyEqual(resetParity.Snapshot().playerPitchRadians, 0.0f),
           "live ResetRoute must restore the pair and override checkpoint pose with configured yaw and pitch");
 
+    auto waterfallConfig = ProductionGameSimulationConfig();
+    waterfallConfig.swordStartsStowed = true;
+    waterfallConfig.waterfallSkeletonEncounter = true;
+    auto waterfallEncounter = std::make_unique<GameSimulation>(waterfallConfig);
+    const auto& stagedPair = waterfallEncounter->Snapshot().skeletonEnemies;
+    check(ProductionGameSimulationConfig().swordStartsStowed == false &&
+          ProductionGameSimulationConfig().waterfallSkeletonEncounter == false &&
+          waterfallEncounter->Snapshot().skeletonEnemyCount == 2u &&
+          waterfallEncounter->Snapshot().activeSkeletonCount == 2u &&
+          stagedPair[0].id == EntityId::SkeletonA &&
+          stagedPair[1].id == EntityId::SkeletonB &&
+          stagedPair[0].health == 1 && stagedPair[1].health == 1 &&
+          NearlyEqual(stagedPair[0].x, kWaterfallSkeletonPairCenter.x - 0.75f) &&
+          NearlyEqual(stagedPair[1].x, kWaterfallSkeletonPairCenter.x + 0.75f) &&
+          NearlyEqual(stagedPair[0].z, kWaterfallSkeletonPairCenter.z) &&
+          NearlyEqual(stagedPair[1].z, kWaterfallSkeletonPairCenter.z) &&
+          waterfallEncounter->Snapshot().heldItems[1].parentMode ==
+              items::HeldItemParentMode::BodyStow,
+          "opt-in Waterfall encounter stages the same two stable skeleton IDs west of the wetline while production waits for rendered BodyStow support");
+
+    InputSnapshot waterfallInput;
+    waterfallInput.hasAuthoritativePlayerPose = true;
+    waterfallInput.authoritativePlayerX = -2.0f;
+    waterfallInput.authoritativePlayerZ = kWaterfallSkeletonPairCenter.z;
+    waterfallInput.damageEnabled = false;
+    check(!IsWaterfallSkeletonArena(waterfallInput.authoritativePlayerX,
+                                    waterfallInput.authoritativePlayerZ) &&
+          !IsRouteAudioObstructed(waterfallInput.authoritativePlayerX,
+                                  waterfallInput.authoritativePlayerZ,
+                                  kWaterfallSkeletonPairCenter.x,
+                                  kWaterfallSkeletonPairCenter.z),
+          "Waterfall warning test point is an unobstructed east-side approach outside the aggro circle");
+    waterfallEncounter->StepFixed(waterfallInput);
+    const std::span<const GameplayEvent> warningEvents =
+        waterfallEncounter->Events().Events();
+    const auto warningEvent = std::find_if(
+        warningEvents.begin(), warningEvents.end(),
+        [](const GameplayEvent& event)
+        {
+            return event.type == GameplayEventType::SkeletonEncounterWarning;
+        });
+    check(waterfallEncounter->Snapshot().playerX > -2.5f &&
+          waterfallEncounter->Snapshot().heldItems[1].transition.active &&
+          waterfallEncounter->Snapshot().automaticSwordDrawBlocksDefense &&
+          warningEvent != warningEvents.end() &&
+          warningEvent->source == EntityId::SkeletonA &&
+          warningEvent->target == EntityId::Player && warningEvent->tickIndex > 0u &&
+          CountEvents(waterfallEncounter->Events(), GameplayEventType::SkeletonEncounterWarning) == 1u &&
+          CountEvents(waterfallEncounter->Events(), GameplayEventType::PlayerSwordDrawStarted) == 1u &&
+          CountEvents(waterfallEncounter->Events(), GameplayEventType::PlayerSwing) == 0u,
+          "clear LOS emits a skeleton warning and starts the draw before the wetline without stowed contact");
+
+    waterfallInput.authoritativePlayerX = kWaterfallSkeletonPairCenter.x;
+    waterfallInput.commands.attack = 1u;
+    waterfallEncounter->StepFixed(waterfallInput);
+    waterfallInput.commands.attack = 2u;
+    waterfallEncounter->StepFixed(waterfallInput);
+    waterfallInput.commands.attack = 3u;
+    waterfallEncounter->StepFixed(waterfallInput);
+    check(CountEvents(waterfallEncounter->Events(), GameplayEventType::PlayerSwing) == 0u &&
+          waterfallEncounter->Snapshot().lastConsumedAttackSequence == 3u,
+          "drawing permits only one queued attack and consumes extra attack edges without early contact");
+    for (int tick = 0; tick < 24; ++tick)
+    {
+        waterfallEncounter->StepFixed(waterfallInput);
+    }
+    check(waterfallEncounter->Snapshot().heldItems[1].parentMode ==
+              items::HeldItemParentMode::HandSocket &&
+          !waterfallEncounter->Snapshot().heldItems[1].transition.active &&
+          !waterfallEncounter->Snapshot().automaticSwordDrawBlocksDefense &&
+          CountEvents(waterfallEncounter->Events(), GameplayEventType::PlayerSwordAttachmentChanged) == 1u &&
+          CountEvents(waterfallEncounter->Events(), GameplayEventType::PlayerSwing) == 1u,
+          "one queued attack starts only after the fixed-tick hand attachment and draw completion");
+
+    auto waterfallParry = std::make_unique<GameSimulation>(waterfallConfig);
+    InputSnapshot waterfallParryInput;
+    waterfallParryInput.hasAuthoritativePlayerPose = true;
+    waterfallParryInput.authoritativePlayerX = kWaterfallSkeletonPairCenter.x;
+    waterfallParryInput.authoritativePlayerZ = kWaterfallSkeletonPairCenter.z;
+    waterfallParryInput.damageEnabled = false;
+    waterfallParryInput.commands.parry = 1u;
+    waterfallParry->StepFixed(waterfallParryInput);
+    for (int tick = 0; tick < 30; ++tick)
+        waterfallParry->StepFixed(waterfallParryInput);
+    check(waterfallParry->Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+          CountEvents(waterfallParry->Events(), GameplayEventType::PlayerParrySucceeded) == 0u &&
+          CountEvents(waterfallParry->Events(), GameplayEventType::PlayerSwordDrawStarted) == 1u,
+          "a parry pressed while stowed is discarded rather than delayed into the drawn state");
+
+    auto stowedCombatConfig = GameSimulationConfig{};
+    stowedCombatConfig.swordStartsStowed = true;
+    auto manualDrawAttack = std::make_unique<GameSimulation>(stowedCombatConfig);
+    InputSnapshot manualDrawAttackInput;
+    manualDrawAttackInput.damageEnabled = false;
+    manualDrawAttackInput.commands.attack = 1u;
+    manualDrawAttack->StepFixed(manualDrawAttackInput);
+    check(manualDrawAttack->Snapshot().heldItems[1].transition.active &&
+          !manualDrawAttack->Snapshot().automaticSwordDrawBlocksDefense &&
+          CountEvents(manualDrawAttack->Events(), GameplayEventType::PlayerSwing) == 0u,
+          "a manual attack starts a draw without early contact or forced-draw immunity");
+    for (int tick = 0; tick < 30; ++tick)
+        manualDrawAttack->StepFixed(manualDrawAttackInput);
+    check(CountEvents(manualDrawAttack->Events(), GameplayEventType::PlayerSwordDrawStarted) == 1u &&
+          CountEvents(manualDrawAttack->Events(), GameplayEventType::PlayerSwing) == 1u &&
+          manualDrawAttack->Snapshot().heldItems[1].parentMode == items::HeldItemParentMode::HandSocket,
+          "one manual attack edge draws then starts exactly one ordinary attack after ready");
+    auto stowedAtContact = std::make_unique<GameSimulation>(stowedCombatConfig);
+    InputSnapshot stowedContactInput;
+    stowedContactInput.hasAuthoritativePlayerPose = true;
+    stowedContactInput.authoritativePlayerX = -0.75f;
+    stowedContactInput.authoritativePlayerZ = -3.20f;
+    stowedContactInput.damageEnabled = false;
+    for (int tick = 0; tick < 200; ++tick)
+    {
+        const auto& attacker = stowedAtContact->Snapshot().skeletonEnemies[0];
+        if (attacker.action == EnemyCombatAction::AttackWindup &&
+            attacker.actionTime >= 1.04f)
+            break;
+        stowedAtContact->StepFixed(stowedContactInput);
+    }
+    bool stowedAttackWindupAtEdge =
+        stowedAtContact->Snapshot().skeletonEnemies[0].action ==
+            EnemyCombatAction::AttackWindup &&
+        stowedAtContact->Snapshot().skeletonEnemies[0].actionTime >= 1.04f;
+    stowedContactInput.commands.attack = 1u;
+    stowedContactInput.damageEnabled = true;
+    if (stowedAttackWindupAtEdge)
+        stowedAtContact->StepFixed(stowedContactInput);
+    bool manualDrawContactPulseSeen =
+        stowedAtContact->Snapshot().swordCombat.combatants[0].playerHitPulse;
+    bool manualDrawDamagedAtContact =
+        CountEvents(stowedAtContact->Events(), GameplayEventType::PlayerDamaged) > 0u;
+    float manualDrawContactActionTime =
+        stowedAtContact->Snapshot().swordCombat.combatants[0].actionTime;
+    float manualDrawContactProgress =
+        stowedAtContact->Snapshot().heldItems[1].transition.progress;
+    for (int tick = 0; tick < 10 && stowedAttackWindupAtEdge &&
+                        !manualDrawContactPulseSeen; ++tick)
+    {
+        stowedAtContact->StepFixed(stowedContactInput);
+        const SimulationSnapshot& sample = stowedAtContact->Snapshot();
+        manualDrawContactPulseSeen = sample.swordCombat.combatants[0].playerHitPulse;
+        manualDrawDamagedAtContact =
+            CountEvents(stowedAtContact->Events(), GameplayEventType::PlayerDamaged) > 0u;
+        manualDrawContactActionTime = sample.swordCombat.combatants[0].actionTime;
+        manualDrawContactProgress = sample.heldItems[1].transition.progress;
+    }
+    const bool manualDrawContactExpected = stowedAttackWindupAtEdge &&
+        manualDrawContactPulseSeen &&
+        stowedAtContact->Snapshot().heldItems[1].transition.active &&
+        !stowedAtContact->Snapshot().automaticSwordDrawBlocksDefense &&
+        manualDrawDamagedAtContact &&
+        CountEvents(stowedAtContact->Events(), GameplayEventType::PlayerSwing) == 0u;
+    if (!manualDrawContactExpected)
+    {
+        std::cerr << "manual draw contact diagnostic: windup=" << stowedAttackWindupAtEdge
+                  << " pulse=" << manualDrawContactPulseSeen
+                  << " actionTime=" << manualDrawContactActionTime
+                  << " transitionActive=" << stowedAtContact->Snapshot().heldItems[1].transition.active
+                  << " transitionProgress=" << manualDrawContactProgress
+                  << " automaticDefenseLockout="
+                  << stowedAtContact->Snapshot().automaticSwordDrawBlocksDefense
+                  << " damaged=" << manualDrawDamagedAtContact
+                  << " damageEvents=" << CountEvents(stowedAtContact->Events(),
+                                                       GameplayEventType::PlayerDamaged)
+                  << '\n';
+    }
+    check(manualDrawContactExpected,
+          "a manual attack-triggered draw does not grant invulnerability during enemy contact");
+
+    auto stableStowedCombat = std::make_unique<GameSimulation>(stowedCombatConfig);
+    InputSnapshot stableStowedInput = stowedContactInput;
+    stableStowedInput.commands.attack = 0u;
+    bool stableStowTookDamage = false;
+    for (int tick = 0; tick < 600 && !stableStowTookDamage; ++tick)
+    {
+        stableStowedCombat->StepFixed(stableStowedInput);
+        stableStowTookDamage =
+            CountEvents(stableStowedCombat->Events(), GameplayEventType::PlayerDamaged) > 0u;
+    }
+    check(stableStowTookDamage &&
+          stableStowedCombat->Snapshot().heldItems[1].parentMode ==
+              items::HeldItemParentMode::BodyStow &&
+          !stableStowedCombat->Snapshot().heldItems[1].transition.active,
+          "a stable BodyStowed sword does not grant damage immunity without an active forced draw");
+
+    auto waterfallRetreat = std::make_unique<GameSimulation>(waterfallConfig);
+    InputSnapshot waterfallRouteInput;
+    waterfallRouteInput.hasAuthoritativePlayerPose = true;
+    waterfallRouteInput.damageEnabled = false;
+    const std::array<RoutePosition, 6> waterfallRoute{{
+        kWaterfallSkeletonPairCenter,
+        {-3.0f, -15.20f},
+        {-4.15f, -15.20f},
+        {-6.55f, -15.20f},
+        {-5.50f, -13.25f},
+        {-2.0f, -15.20f},
+    }};
+    bool waterfallPairStayedInRoom = true;
+    bool waterfallRetreatKeptAggro = true;
+    for (std::size_t routeIndex = 0; routeIndex < waterfallRoute.size(); ++routeIndex)
+    {
+        const RoutePosition& position = waterfallRoute[routeIndex];
+        waterfallRouteInput.authoritativePlayerX = position.x;
+        waterfallRouteInput.authoritativePlayerZ = position.z;
+        for (int tick = 0; tick < 18; ++tick)
+            waterfallRetreat->StepFixed(waterfallRouteInput);
+        if (routeIndex == 1u)
+        {
+            waterfallRetreatKeptAggro =
+                !IsWaterfallSkeletonArena(position.x, position.z) &&
+                IsWaterfallSkeletonRoom(position.x, position.z) &&
+                waterfallRetreat->Snapshot().swordCombat.attackerIndex >= 0 &&
+                waterfallRetreat->Snapshot().swordCombat.combatants[
+                    static_cast<std::size_t>(waterfallRetreat->Snapshot().swordCombat.attackerIndex)].action !=
+                    EnemyCombatAction::Locomotion;
+        }
+        for (std::size_t index = 0; index < waterfallRetreat->Snapshot().skeletonEnemyCount; ++index)
+        {
+            const auto& enemy = waterfallRetreat->Snapshot().skeletonEnemies[index];
+            waterfallPairStayedInRoom = waterfallPairStayedInRoom &&
+                enemy.x < -2.5f &&
+                IsWaterfallSkeletonPositionWalkable(enemy.x, enemy.z) &&
+                IsWaterfallSkeletonWalkableSweep({enemy.x, enemy.z},
+                                                  kWaterfallSkeletonPairCenter);
+        }
+    }
+    float waterfallBoundaryX = -2.75f;
+    float waterfallBoundaryZ = -15.20f;
+    ResolveWaterfallSkeletonEnemyCollision(
+        waterfallBoundaryX, waterfallBoundaryZ, waterfallBoundaryX, waterfallBoundaryZ);
+    float proposedAcrossWetlineX = -2.40f;
+    float proposedAcrossWetlineZ = -15.20f;
+    ResolveWaterfallSkeletonEnemyCollision(
+        waterfallBoundaryX, waterfallBoundaryZ,
+        proposedAcrossWetlineX, proposedAcrossWetlineZ);
+    check(waterfallPairStayedInRoom && waterfallRetreatKeptAggro &&
+          waterfallRetreat->Snapshot().skeletonEnemyCount == 2u &&
+          proposedAcrossWetlineX <= -2.5f &&
+          !IsWaterfallSkeletonPositionWalkable(-2.40f, -15.20f),
+          "zigzag, retreat and re-entry preserve both reachable skeletons behind the wetline and block nav through the room boundary");
+
     GameSimulation mirrorCapture;
     check(mirrorCapture.ApplyShowcaseCheckpoint(9),
           "mirror checkpoint import must succeed");

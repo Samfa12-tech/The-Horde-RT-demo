@@ -117,6 +117,8 @@ struct SimulationSnapshot
     std::size_t eventsEmittedThisFrame = 0;
     horde::gameplay::items::PlayerMountProfile playerMountProfile =
         horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
+    // True only during the automatic pre-encounter draw's temporary defense lockout.
+    bool automaticSwordDrawBlocksDefense = false;
 };
 
 } // namespace horde::gameplay::simulation
