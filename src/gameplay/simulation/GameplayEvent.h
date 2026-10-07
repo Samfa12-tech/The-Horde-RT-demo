@@ -49,6 +49,8 @@ enum class GameplayEventType : std::uint8_t
 struct GameplayEvent
 {
     std::uint64_t sequence = 0;
+    // Authoritative fixed-step simulation tick that emitted this event.
+    std::uint64_t tickIndex = 0;
     GameplayEventType type = GameplayEventType::PlayerFootstep;
     EntityId source = EntityId::Invalid;
     EntityId target = EntityId::Invalid;

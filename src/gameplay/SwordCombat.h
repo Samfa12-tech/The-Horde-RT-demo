@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "gameplay/CombatTimeline.h"
 #include "gameplay/CorridorCollision.h"
 
 namespace horde::gameplay
@@ -848,9 +849,12 @@ public:
     static constexpr float kParryStartupDuration = 0.04f;
     static constexpr float kParryActiveDuration = 0.22f;
     static constexpr float kParryRecoveryDuration = 0.24f;
-    static constexpr float kEnemyAttackWindupDuration = 1.12f;
-    static constexpr float kEnemyAttackActiveDuration = 0.18f;
-    static constexpr float kEnemyAttackRecoveryDuration = 1.50f;
+    static constexpr float kEnemyAttackWindupDuration =
+        CombatTimeline::kSkeletonAttackWindupSeconds;
+    static constexpr float kEnemyAttackActiveDuration =
+        CombatTimeline::kSkeletonAttackActiveSeconds;
+    static constexpr float kEnemyAttackRecoveryDuration =
+        CombatTimeline::kSkeletonAttackRecoverySeconds;
     static constexpr float kEnemyStaggerDuration = 0.80f;
 
 private:

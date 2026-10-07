@@ -74,6 +74,8 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
 {
     lastInput_ = input;
     inputPublicationSequence_ = inputPublicationSequence;
+    const bool presentationWasActive = combatPresentation_.Snapshot().parrySuccessActive;
+    combatPresentation_.AdvanceFrame(frameDeltaSeconds, input.paused);
     const std::size_t eventsBeforeFrame = events_.Size();
     snapshot_.eventsEmittedThisTick = 0u;
     snapshot_.eventsEmittedThisFrame = 0u;
@@ -116,8 +118,15 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
         input.paused,
         [this, &input, inputPublicationSequence](float fixedDeltaSeconds)
         {
-            StepFixed(input, fixedDeltaSeconds, inputPublicationSequence);
+            StepFixedTick(input, fixedDeltaSeconds, inputPublicationSequence);
         });
+    // Ticked frames already resolved the final pose. Refresh only when a
+    // zero-tick frame ages or cancels an existing presentation envelope.
+    if (ticks == 0u && presentationWasActive)
+    {
+        ResolveHeldItems();
+        ResolvePlayerAnimation(0.0f);
+    }
     RefreshSnapshot(input);
     snapshot_.simulationTicksThisFrame = ticks;
     snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();
@@ -131,6 +140,15 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
 void GameSimulation::StepFixed(const InputSnapshot& input,
                                float fixedDeltaSeconds,
                                std::uint64_t inputPublicationSequence)
+{
+    // Direct deterministic stepping is also a valid presentation boundary.
+    combatPresentation_.AdvanceFrame(fixedDeltaSeconds, input.paused);
+    StepFixedTick(input, fixedDeltaSeconds, inputPublicationSequence);
+}
+
+void GameSimulation::StepFixedTick(const InputSnapshot& input,
+                                   float fixedDeltaSeconds,
+                                   std::uint64_t inputPublicationSequence)
 {
     fixedDeltaSeconds = std::clamp(fixedDeltaSeconds, 0.0f, 0.05f);
     lastInput_ = input;
@@ -247,6 +265,7 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
 {
     lastInput_ = input;
     lastInput_.paused = true;
+    combatPresentation_.Reset();
     inputPublicationSequence_ = std::max(inputPublicationSequence_,
                                          inputPublicationSequence);
 
@@ -309,6 +328,9 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     snapshot_.catchUpOverrunCount = fixedStepRunner_.OverrunCount();
     snapshot_.eventsEmittedThisTick = 0u;
     snapshot_.eventsEmittedThisFrame = 0u;
+    ResolveHeldItems();
+    ResolvePlayerAnimation(0.0f);
+    RefreshSnapshot(lastInput_);
 }
 
 void GameSimulation::ResetRoute()
@@ -330,6 +352,7 @@ void GameSimulation::ResetRoute()
                                      kMinimumPitch,
                                      kMaximumPitch);
     swordCombat_.Reset(kSkeletonEnemyCapacity);
+    combatPresentation_.Reset();
     skeletonIdlePhasesEnabled_ = true;
     combatSnapshot_ = swordCombat_.Update(0.0f,
                                            playerX_,
@@ -365,6 +388,7 @@ void GameSimulation::ImportRewardCheckpoint(
     const horde::gameplay::interactions::LanternPendulumSnapshot* pendulum)
 {
     events_.Clear();
+    combatPresentation_.Reset();
     chestRewardSequence_.Import(chestReward);
     interactionState_ = interaction;
     finaleSequence_.Import(finale);
@@ -471,6 +495,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     }
 
     events_.Clear();
+    combatPresentation_.Reset();
     ShowcaseCheckpointState state = BuildShowcaseCheckpointState(*checkpoint);
     playerX_ = checkpoint->x;
     playerZ_ = checkpoint->z;
@@ -573,6 +598,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
 void GameSimulation::ResolveHeldItems()
 {
     std::string diagnostic;
+    const PlayerCombatSnapshot presentationCombat =
+        combatPresentation_.PlayerCombatForPresentation(combatSnapshot_.player);
     const horde::gameplay::items::HeldItemFixedStepInput input{
         playerX_,
         playerZ_,
@@ -581,7 +608,7 @@ void GameSimulation::ResolveHeldItems()
         walkTime_,
         walkVisualAmount_,
         torchFailureSnapshot_,
-        combatSnapshot_.player,
+        presentationCombat,
         combatSnapshot_.swordSwingRadians,
         interactionState_,
         config_.playerMountProfile};
@@ -680,7 +707,7 @@ void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
     playerAnimationState_.StepFixed(
         {walkVisualAmount_,
          walkTime_,
-         combatSnapshot_.player,
+         combatPresentation_.PlayerCombatForPresentation(combatSnapshot_.player),
          heldItemFixedStepState_.kinematics,
          leftArmWeight,
          interactionState_.heldLightKind == horde::gameplay::interactions::HeldLightKind::RewardLantern,
@@ -961,11 +988,13 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         }
         if (current.parrySuccessPulse)
         {
-            Emit(GameplayEventType::PlayerParrySucceeded,
-                 EntityId::Player,
-                 entity,
-                 current.x,
-                 current.z);
+            const std::uint64_t eventSequence = Emit(
+                GameplayEventType::PlayerParrySucceeded,
+                EntityId::Player,
+                entity,
+                current.x,
+                current.z);
+            combatPresentation_.BeginParrySuccess(eventSequence, tickIndex_, entity);
         }
         const bool skeletonWalking = activeEnemyKind_ == EnemyKind::Skeleton &&
                                      current.animation == EnemyAnimation::Walking;
@@ -1106,6 +1135,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         }
         if (damageResult == PlayerDamageResult::Killed)
         {
+            combatPresentation_.Reset();
             retryCheckpoint_ = activeEnemyKind_ == EnemyKind::Lich ? 9 : 0;
             pendingAttackCommands_ = 0u;
             Emit(GameplayEventType::PlayerKilled,
@@ -1124,15 +1154,16 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     }
 }
 
-void GameSimulation::Emit(GameplayEventType type,
-                          EntityId source,
-                          EntityId target,
-                          float x,
-                          float z,
-                          float intensity,
-                          std::int32_t payload)
+std::uint64_t GameSimulation::Emit(GameplayEventType type,
+                                   EntityId source,
+                                   EntityId target,
+                                   float x,
+                                   float z,
+                                   float intensity,
+                                   std::int32_t payload)
 {
     GameplayEvent event;
+    event.tickIndex = tickIndex_;
     event.type = type;
     event.source = source;
     event.target = target;
@@ -1143,7 +1174,8 @@ void GameSimulation::Emit(GameplayEventType type,
     event.listenerYawRadians = playerYawRadians_;
     event.intensity = intensity;
     event.payload = payload;
-    events_.Push(event);
+    const std::uint64_t sequence = events_.NextSequence();
+    return events_.Push(event) ? sequence : 0u;
 }
 
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
@@ -1229,6 +1261,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.enemyRoster = enemyDirector_.Snapshot();
     snapshot_.swordCombat = combatSnapshot_;
     snapshot_.playerCombat = combatSnapshot_.player;
+    snapshot_.combatPresentation = combatPresentation_.Snapshot();
     snapshot_.lich = lichEncounter_.Snapshot();
     snapshot_.lich.finaleSkylightOpenProgress = snapshot_.finale.skylightOpenProgress;
     snapshot_.lich.finaleDawnRevealProgress = snapshot_.finale.dawnRevealProgress;

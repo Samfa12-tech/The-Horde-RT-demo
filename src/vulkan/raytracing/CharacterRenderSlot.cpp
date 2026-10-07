@@ -1,6 +1,7 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
 
+#include "gameplay/CombatTimeline.h"
 #include "gameplay/ShowcaseRoute.h"
 
 #include <algorithm>
@@ -19,13 +20,15 @@ constexpr std::array<std::uint32_t, 40u> kLichStaffEmissiveVertices{{
     19154u, 19174u, 19792u, 20010u, 20011u, 20012u, 20385u, 20387u,
     20388u, 20389u, 20390u, 20625u, 20845u, 20846u, 21255u, 25309u}};
 
-// A parry arrives at the skeleton attack contact pose.  There is no separate
-// stagger asset, so use the authored post-contact recovery as a short,
-// deterministic recoil/recovery motion rather than freezing the mesh for the
-// full gameplay stagger.  These are renderer-only sampling bounds; gameplay
-// remains authoritative for the 800 ms Staggered action.
-constexpr float kSkeletonAttackContactTime = 1.20f;
-constexpr float kSkeletonAttackRecoveryEndTime = 2.80f;
+// There is no separate stagger asset, so successful parry routes into a
+// renderer-selected sample of the Attack clip, then advances through its
+// authored recovery while the gameplay action remains stationary. The 1.20 s
+// value is this stagger recovery sample, not the normal damage edge. These are
+// renderer-only sampling bounds; gameplay owns the 800 ms Staggered action.
+constexpr float kSkeletonStaggerRecoverySampleTime =
+    horde::gameplay::CombatTimeline::kSkeletonStaggerRecoverySampleSeconds;
+constexpr float kSkeletonAttackRecoveryEndTime =
+    horde::gameplay::CombatTimeline::kSkeletonAttackRecoverySampleEndSeconds;
 constexpr float kSkeletonStaggerDuration = 0.80f;
 
 float SmoothStep01(const float value)
@@ -88,14 +91,20 @@ float SkeletonTimeForAction(horde::gameplay::EnemyCombatAction action,
     switch (action)
     {
     case Action::AttackWindup:
-        return std::clamp(actionTime, 0.0f, 1.12f);
+        return std::clamp(actionTime, 0.0f,
+                          horde::gameplay::CombatTimeline::kSkeletonAttackWindupSeconds);
     case Action::AttackActive:
-        return 1.12f + std::clamp(actionTime, 0.0f, 0.18f);
+        return horde::gameplay::CombatTimeline::kSkeletonAttackWindupSeconds +
+               std::clamp(actionTime, 0.0f,
+                          horde::gameplay::CombatTimeline::kSkeletonAttackActiveSeconds);
     case Action::AttackRecovery:
-        return 1.30f + std::clamp(actionTime, 0.0f, 1.50f);
+        return horde::gameplay::CombatTimeline::kSkeletonAttackWindupSeconds +
+               horde::gameplay::CombatTimeline::kSkeletonAttackActiveSeconds +
+               std::clamp(actionTime, 0.0f,
+                          horde::gameplay::CombatTimeline::kSkeletonAttackRecoverySeconds);
     case Action::Staggered:
-        return kSkeletonAttackContactTime +
-               (kSkeletonAttackRecoveryEndTime - kSkeletonAttackContactTime) *
+        return kSkeletonStaggerRecoverySampleTime +
+               (kSkeletonAttackRecoveryEndTime - kSkeletonStaggerRecoverySampleTime) *
                    std::clamp(actionTime / kSkeletonStaggerDuration, 0.0f, 1.0f);
     case Action::Dead:
         return deadClipDuration > 0.0f ? std::min(animationTime, deadClipDuration) : animationTime;

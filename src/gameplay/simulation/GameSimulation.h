@@ -14,6 +14,7 @@
 #include "gameplay/interactions/FinaleSequence.h"
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/items/LanternPendulum.h"
+#include "gameplay/simulation/CombatPresentation.h"
 #include "gameplay/simulation/FixedStepRunner.h"
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
@@ -82,6 +83,8 @@ public:
     const FixedStepRunner& Timing() const { return fixedStepRunner_; }
 
 private:
+    void StepFixedTick(const InputSnapshot& input, float fixedDeltaSeconds,
+                       std::uint64_t inputPublicationSequence);
     static EntityId EntityForEnemy(EnemyKind kind);
     void IngestCommands(const InputSnapshot& input);
     bool ConsumeWorldCommand();
@@ -92,18 +95,19 @@ private:
     void ResolveHeldItems();
     void ResolvePlayerAnimation(float fixedDeltaSeconds);
     void ResolveFireEmitters(float fixedDeltaSeconds);
-    void Emit(GameplayEventType type,
-              EntityId source,
-              EntityId target,
-              float x,
-              float z,
-              float intensity = 1.0f,
-              std::int32_t payload = 0);
+    std::uint64_t Emit(GameplayEventType type,
+                       EntityId source,
+                       EntityId target,
+                       float x,
+                       float z,
+                       float intensity = 1.0f,
+                       std::int32_t payload = 0);
     void RefreshSnapshot(const InputSnapshot& input);
 
     GameSimulationConfig config_{};
     FixedStepRunner fixedStepRunner_{};
     BoundedGameplayEventQueue events_{};
+    CombatPresentationTimeline combatPresentation_{};
     SimulationSnapshot snapshot_{};
     InputSnapshot lastInput_{};
 

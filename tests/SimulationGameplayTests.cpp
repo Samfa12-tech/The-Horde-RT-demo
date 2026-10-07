@@ -1064,8 +1064,156 @@ int main()
           parryEvent != parryEvents.end() &&
           parryEvent->source == EntityId::Player &&
           parryEvent->target == EntityId::SkeletonA &&
+          parryEvent->tickIndex > 0u &&
+          parrySimulation.Snapshot().combatPresentation.parrySuccessActive &&
+          parrySimulation.Snapshot().combatPresentation.parrySuccessEventSequence ==
+              parryEvent->sequence &&
+          parrySimulation.Snapshot().combatPresentation.parrySuccessTickIndex ==
+              parryEvent->tickIndex &&
+          parrySimulation.Snapshot().combatPresentation.parrySuccessEntity ==
+              EntityId::SkeletonA &&
           parrySimulation.Snapshot().playerVitals.vitality == PlayerVitals::kMaxVitality,
-          "a successful parry must consume its independent sequence, suppress damage, and emit one entity-aware event");
+          "a successful parry must emit ordered tick/entity provenance and retain independent presentation state");
+
+    InputSnapshot riposteInput = parryInput;
+    riposteInput.commands.attack = 1u;
+    parrySimulation.AdvanceFrame(riposteInput, 1.0 / 60.0);
+    check(parrySimulation.Snapshot().playerCombat.action == PlayerCombatAction::SwingWindup &&
+          parrySimulation.Snapshot().combatPresentation.parrySuccessActive &&
+          parrySimulation.Snapshot().playerAnimation.reaction == CombatReaction::Parried,
+          "the next-tick riposte must start immediately while independent parry presentation remains visible");
+
+    GameSimulation catchUpParry;
+    InputSnapshot catchUpParryInput = parryInput;
+    catchUpParryInput.commands = {};
+    bool catchUpParryIssued = false;
+    for (int frame = 0; frame < 360 && !catchUpParryIssued; ++frame)
+    {
+        const auto& attacker = catchUpParry.Snapshot().skeletonEnemies[0];
+        if (attacker.action == EnemyCombatAction::AttackWindup &&
+            attacker.actionTime >= 1.05f)
+        {
+            catchUpParryInput.commands.parry = 1u;
+            catchUpParryIssued = true;
+            break;
+        }
+        catchUpParry.AdvanceFrame(catchUpParryInput, 1.0 / 60.0,
+                                  static_cast<std::uint64_t>(frame + 1));
+    }
+    const std::uint32_t catchUpParryTicks = catchUpParry.AdvanceFrame(
+        catchUpParryInput, 0.100, 500u);
+    const auto catchUpParryEvents = catchUpParry.Events().Events();
+    const auto catchUpParryEvent = std::find_if(
+        catchUpParryEvents.begin(), catchUpParryEvents.end(), [](const GameplayEvent& event)
+        {
+            return event.type == GameplayEventType::PlayerParrySucceeded;
+        });
+    check(catchUpParryIssued && catchUpParryTicks >= 4u &&
+          catchUpParryEvent != catchUpParryEvents.end() &&
+          catchUpParry.Snapshot().combatPresentation.parrySuccessActive &&
+          catchUpParry.Snapshot().combatPresentation.parrySuccessEventSequence ==
+              catchUpParryEvent->sequence &&
+          catchUpParry.Snapshot().combatPresentation.parrySuccessTickIndex ==
+              catchUpParryEvent->tickIndex &&
+          catchUpParryEvent->tickIndex < catchUpParry.Snapshot().tickIndex &&
+          NearlyEqual(catchUpParry.Snapshot().combatPresentation.parrySuccessRemainingSeconds,
+                      horde::gameplay::CombatTimeline::kParryPresentationSeconds) &&
+          catchUpParry.Snapshot().playerCombat.action != PlayerCombatAction::ParryActive &&
+          catchUpParry.Snapshot().playerAnimation.reaction == CombatReaction::Parried,
+          "parry presentation must survive later catch-up ticks without holding the parry action open");
+
+    const double frameRates[] = {15.0, 30.0, 60.0, 120.0};
+    bool parryPresentationCadenceStable = true;
+    for (const double frameRate : frameRates)
+    {
+        GameSimulation cadenceParry;
+        InputSnapshot cadenceInput = parryInput;
+        cadenceInput.commands = {};
+        bool commandPublished = false;
+        bool eventObserved = false;
+        for (int frame = 0; frame < 360 && !eventObserved; ++frame)
+        {
+            const auto& attacker = cadenceParry.Snapshot().skeletonEnemies[0];
+            if (!commandPublished && attacker.action == EnemyCombatAction::AttackWindup &&
+                attacker.actionTime >= 1.05f)
+            {
+                cadenceInput.commands.parry = 1u;
+                commandPublished = true;
+            }
+            cadenceParry.AdvanceFrame(cadenceInput, 1.0 / frameRate,
+                                      static_cast<std::uint64_t>(frame + 1));
+            eventObserved = CountEvents(cadenceParry.Events(),
+                                        GameplayEventType::PlayerParrySucceeded) == 1u;
+        }
+        parryPresentationCadenceStable = parryPresentationCadenceStable && commandPublished &&
+            eventObserved && cadenceParry.Snapshot().combatPresentation.parrySuccessActive &&
+            cadenceParry.Snapshot().playerAnimation.reaction == CombatReaction::Parried;
+        if (!eventObserved)
+        {
+            continue;
+        }
+        cadenceParry.AdvanceFrame(cadenceInput, 1.0 / frameRate);
+        parryPresentationCadenceStable = parryPresentationCadenceStable &&
+            cadenceParry.Snapshot().combatPresentation.parrySuccessActive &&
+            cadenceParry.Snapshot().playerAnimation.reaction == CombatReaction::Parried;
+    }
+    check(parryPresentationCadenceStable,
+          "parry feedback must survive its event frame and one ordinary 15/30/60/120 Hz frame");
+
+    catchUpParry.AdvanceFrame(catchUpParryInput, 1.0 / 120.0);
+    check(catchUpParry.Snapshot().simulationTicksThisFrame == 0u &&
+          catchUpParry.Snapshot().combatPresentation.parrySuccessActive &&
+          catchUpParry.Snapshot().playerAnimation.reaction == CombatReaction::Parried &&
+          catchUpParry.Snapshot().heldItemKinematics.successJolt > 0.0f,
+          "a zero-tick 120 Hz frame must refresh the shared held-sword presentation pose");
+    catchUpParry.AdvanceFrame(catchUpParryInput, 0.100);
+    check(catchUpParry.Snapshot().combatPresentation.parrySuccessActive &&
+          catchUpParry.Snapshot().combatPresentation.parrySuccessRemainingSeconds > 0.0f,
+          "a 100 ms frame contribution must age parry presentation once rather than once per catch-up tick");
+
+    GameSimulation overCapParry;
+    InputSnapshot overCapParryInput = parryInput;
+    overCapParryInput.commands = {};
+    bool overCapParryIssued = false;
+    for (int frame = 0; frame < 360 && !overCapParryIssued; ++frame)
+    {
+        const auto& attacker = overCapParry.Snapshot().skeletonEnemies[0];
+        if (attacker.action == EnemyCombatAction::AttackWindup &&
+            attacker.actionTime >= 1.05f)
+        {
+            overCapParryInput.commands.parry = 1u;
+            overCapParryIssued = true;
+            break;
+        }
+        overCapParry.AdvanceFrame(overCapParryInput, 1.0 / 60.0,
+                                  static_cast<std::uint64_t>(frame + 1));
+    }
+    overCapParry.AdvanceFrame(overCapParryInput, 0.500, 500u);
+    check(overCapParryIssued &&
+          CountEvents(overCapParry.Events(), GameplayEventType::PlayerParrySucceeded) == 1u &&
+          overCapParry.Snapshot().combatPresentation.parrySuccessTickIndex <
+              overCapParry.Snapshot().tickIndex &&
+          overCapParry.Snapshot().combatPresentation.parrySuccessActive &&
+          NearlyEqual(overCapParry.Snapshot().combatPresentation.parrySuccessRemainingSeconds,
+                      horde::gameplay::CombatTimeline::kParryPresentationSeconds) &&
+          overCapParry.Snapshot().combatPresentation.parrySuccessRemainingSeconds > 0.0f,
+          "an over-cap hitch frame must preserve feedback emitted during its catch-up batch");
+
+    InputSnapshot pausedCatchUp = catchUpParryInput;
+    pausedCatchUp.paused = true;
+    catchUpParry.AdvanceFrame(pausedCatchUp, 1.0 / 60.0);
+    check(!catchUpParry.Snapshot().combatPresentation.parrySuccessActive &&
+          catchUpParry.Snapshot().heldItemKinematics.successJolt == 0.0f,
+          "lifecycle pause must clear stale parry presentation from the published held-item pose");
+
+    InputSnapshot pausedAtImpact = overCapParryInput;
+    pausedAtImpact.paused = true;
+    overCapParry.AdvanceFrame(pausedAtImpact, 0.0);
+    check(!overCapParry.Snapshot().combatPresentation.parrySuccessActive &&
+          overCapParry.Snapshot().heldItemKinematics.successJolt == 0.0f &&
+          overCapParry.Snapshot().playerAnimation.reaction != CombatReaction::Parried,
+          "pausing at the event presentation boundary must not revive the authoritative one-tick jolt");
+
     for (int frame = 0; frame < 10; ++frame)
     {
         parrySimulation.AdvanceFrame(parryInput, 1.0 / 60.0);
