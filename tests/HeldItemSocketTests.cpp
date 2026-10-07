@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <numeric>
 #if defined(_MSC_VER)
 #include <crtdbg.h>
@@ -28,6 +29,7 @@
 #include <iterator>
 #include <limits>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -1946,12 +1948,12 @@ BladeTriangleDistance MeasureBladeTriangleDistance(
     return result;
 }
 
-TriangleBoundsTree BuildDiagnosticTargetTree(
+std::vector<MeshTriangle> BuildDiagnosticTargetTriangles(
     const DiagnosticSkeletonRenderSample& targetSample,
     const std::vector<horde::scene::SkinnedRtVertex>& targetPose)
 {
     std::vector<MeshTriangle> triangles;
-    if (targetPose.size() % 3u != 0u) return TriangleBoundsTree(std::move(triangles));
+    if (targetPose.size() % 3u != 0u) return triangles;
     triangles.reserve(targetPose.size() / 3u);
     for (std::size_t index = 0u; index + 2u < targetPose.size(); index += 3u)
     {
@@ -1972,7 +1974,158 @@ TriangleBoundsTree BuildDiagnosticTargetTree(
                                 1.0f / 3.0f);
         triangles.push_back(triangle);
     }
-    return TriangleBoundsTree(std::move(triangles));
+    return triangles;
+}
+
+TriangleBoundsTree BuildDiagnosticTargetTree(
+    const DiagnosticSkeletonRenderSample& targetSample,
+    const std::vector<horde::scene::SkinnedRtVertex>& targetPose)
+{
+    return TriangleBoundsTree(BuildDiagnosticTargetTriangles(targetSample, targetPose));
+}
+
+struct FittedSkeletonCapsule
+{
+    std::array<float, 3u> start{};
+    std::array<float, 3u> end{};
+    float radius = 0.0f;
+};
+
+float PointSegmentDistanceSquared(const std::array<float, 3u>& point,
+                                 const std::array<float, 3u>& start,
+                                 const std::array<float, 3u>& end)
+{
+    const auto axis = Subtract3(end, start);
+    const auto offset = Subtract3(point, start);
+    const float axisLengthSquared = Dot3(axis, axis);
+    const float amount = axisLengthSquared > 1.0e-12f
+        ? std::clamp(Dot3(offset, axis) / axisLengthSquared, 0.0f, 1.0f)
+        : 0.0f;
+    const auto delta = Subtract3(point, Add(start, Scale(axis, amount)));
+    return Dot3(delta, delta);
+}
+
+float SegmentTriangleDistanceSquared(
+    const std::array<float, 3u>& start,
+    const std::array<float, 3u>& end,
+    const MeshTriangle& triangle)
+{
+    const std::array<std::array<float, 3u>, 3u> points{{
+        triangle.a, triangle.b, triangle.c}};
+    if (SegmentIntersectsTriangle(start, end, points)) return 0.0f;
+    float best = std::min(PointTriangleDistanceSquared(start, points),
+                          PointTriangleDistanceSquared(end, points));
+    for (std::size_t edge = 0u; edge < 3u; ++edge)
+    {
+        const std::size_t next = (edge + 1u) % 3u;
+        best = std::min(best, SegmentSegmentDistanceSquared(
+            start, end, points[edge], points[next]));
+    }
+    return best;
+}
+
+std::vector<FittedSkeletonCapsule> FitImportedSkeletonCapsules(
+    const horde::scene::SkinnedMeshAsset& skeleton,
+    const DiagnosticSkeletonRenderSample& sample,
+    const std::vector<horde::scene::SkinnedRtVertex>& targetPose,
+    std::string& diagnostic)
+{
+    using horde::scene::SkinnedNodeTransform;
+    // These 24 edges are the actual parent/child links of the imported GLB's
+    // 24 skin joints, including the Armature-to-Hips root edge. Each capsule
+    // axis comes from the animated global node transforms; radii below are
+    // fitted from every skinned triangle, not hand-authored dimensions.
+    static constexpr std::array<std::pair<const char*, const char*>, 24u> jointEdges{{
+        {"Armature", "Hips"},
+        {"Hips", "LeftUpLeg"}, {"LeftUpLeg", "LeftLeg"},
+        {"LeftLeg", "LeftFoot"}, {"LeftFoot", "LeftToeBase"},
+        {"Hips", "RightUpLeg"}, {"RightUpLeg", "RightLeg"},
+        {"RightLeg", "RightFoot"}, {"RightFoot", "RightToeBase"},
+        {"Hips", "Spine02"}, {"Spine02", "Spine01"},
+        {"Spine01", "Spine"},
+        {"Spine", "LeftShoulder"}, {"LeftShoulder", "LeftArm"},
+        {"LeftArm", "LeftForeArm"}, {"LeftForeArm", "LeftHand"},
+        {"Spine", "RightShoulder"}, {"RightShoulder", "RightArm"},
+        {"RightArm", "RightForeArm"}, {"RightForeArm", "RightHand"},
+        {"Spine", "neck"}, {"neck", "Head"},
+        {"Head", "head_end"}, {"Head", "headfront"},
+    }};
+    std::vector<std::string_view> nodeNames;
+    nodeNames.reserve(jointEdges.size() + 1u);
+    for (const auto& edge : jointEdges)
+    {
+        for (const char* name : {edge.first, edge.second})
+        {
+            if (std::find(nodeNames.begin(), nodeNames.end(), name) == nodeNames.end())
+                nodeNames.emplace_back(name);
+        }
+    }
+    std::vector<SkinnedNodeTransform> nodes(nodeNames.size());
+    for (std::size_t i = 0u; i < nodeNames.size(); ++i)
+    {
+        if (!skeleton.NodeTransform(sample.clip, sample.clipTime,
+                                    nodeNames[i], nodes[i], diagnostic))
+            return {};
+    }
+    const auto nodePosition = [&nodeNames, &nodes](const std::string_view name) {
+        const auto it = std::find(nodeNames.begin(), nodeNames.end(), name);
+        const auto& matrix = nodes[static_cast<std::size_t>(it - nodeNames.begin())];
+        return std::array<float, 3u>{{matrix[12], matrix[13], matrix[14]}};
+    };
+    std::vector<FittedSkeletonCapsule> result;
+    result.reserve(jointEdges.size());
+    for (const auto& edge : jointEdges)
+        result.push_back({nodePosition(edge.first), nodePosition(edge.second), 0.0f});
+
+    if (targetPose.size() % 3u != 0u) return {};
+    for (std::size_t i = 0u; i + 2u < targetPose.size(); i += 3u)
+    {
+        const std::array<std::array<float, 3u>, 3u> triangle{{
+            {{targetPose[i].position[0], targetPose[i].position[1], targetPose[i].position[2]}},
+            {{targetPose[i + 1u].position[0], targetPose[i + 1u].position[1], targetPose[i + 1u].position[2]}},
+            {{targetPose[i + 2u].position[0], targetPose[i + 2u].position[1], targetPose[i + 2u].position[2]}},
+        }};
+        std::size_t selected = 0u;
+        float selectedRadiusSquared = std::numeric_limits<float>::max();
+        for (std::size_t edge = 0u; edge < result.size(); ++edge)
+        {
+            float radiusSquared = 0.0f;
+            for (const auto& vertex : triangle)
+                radiusSquared = std::max(radiusSquared, PointSegmentDistanceSquared(
+                    vertex, result[edge].start, result[edge].end));
+            if (radiusSquared < selectedRadiusSquared)
+            {
+                selected = edge;
+                selectedRadiusSquared = radiusSquared;
+            }
+        }
+        result[selected].radius = std::max(
+            result[selected].radius, std::sqrt(selectedRadiusSquared));
+    }
+    return result;
+}
+
+float MeasureBladeToFittedCapsules(
+    const horde::scene::assets::StaticMeshAsset& sword,
+    const horde::scene::assets::StaticSocket& grip,
+    const HeldItemTransform& worldFromSword,
+    const DiagnosticSkeletonRenderSample& targetSample,
+    const std::vector<FittedSkeletonCapsule>& localCapsules)
+{
+    const auto blade = BuildGripFilteredBladeTriangles(sword, grip, worldFromSword);
+    float best = std::numeric_limits<float>::max();
+    for (const FittedSkeletonCapsule& capsule : localCapsules)
+    {
+        const auto start = ApplySkeletonTransform(targetSample.transform, capsule.start);
+        const auto end = ApplySkeletonTransform(targetSample.transform, capsule.end);
+        float centerlineDistanceSquared = std::numeric_limits<float>::max();
+        for (const MeshTriangle& triangle : blade)
+            centerlineDistanceSquared = std::min(centerlineDistanceSquared,
+                SegmentTriangleDistanceSquared(start, end, triangle));
+        best = std::min(best, std::max(0.0f,
+            std::sqrt(centerlineDistanceSquared) - capsule.radius));
+    }
+    return best;
 }
 
 void TestCombatPulseAgainstImportedSwordAndSkeletonBounds(const bool detailed = false)
@@ -2631,7 +2784,7 @@ void TestCombatPulseAgainstImportedSwordAndSkeletonBounds(const bool detailed = 
     }
 }
 
-void TestDynamicCombatPulseNeighborhood()
+void TestDynamicCombatPulseNeighborhood(const bool capsuleOnly = false)
 {
     using namespace horde::gameplay;
     using namespace horde::gameplay::items;
@@ -2788,6 +2941,70 @@ void TestDynamicCombatPulseNeighborhood()
             Check(idlePoseResolved && !idlePose.empty(),
                   "each same-origin/facing Idle control sample must skin successfully");
             if (!attackPoseResolved || !idlePoseResolved) continue;
+            const float attackToPlayer = std::hypot(target.x - playerX,
+                                                   target.z - playerZ);
+            const float attackBearing = std::atan2(target.x - playerX,
+                                                   -(target.z - playerZ));
+
+            if (capsuleOnly)
+            {
+                const auto profileStart = std::chrono::steady_clock::now();
+                const auto attackCapsules = FitImportedSkeletonCapsules(
+                    skeleton, attackSample, attackPose, diagnostic);
+                const auto idleCapsules = FitImportedSkeletonCapsules(
+                    skeleton, idleSample, idlePose, diagnostic);
+                const auto profileEnd = std::chrono::steady_clock::now();
+                Check(attackCapsules.size() == 24u && idleCapsules.size() == 24u,
+                      "each imported pose must fit all 24 source joint-axis capsules");
+                if (attackCapsules.size() != 24u || idleCapsules.size() != 24u)
+                    continue;
+
+                const auto queryStart = std::chrono::steady_clock::now();
+                const float attackCapsuleGap = MeasureBladeToFittedCapsules(
+                    sword, *grip, worldFromSword, attackSample, attackCapsules);
+                const float idleCapsuleGap = MeasureBladeToFittedCapsules(
+                    sword, *grip, worldFromSword, idleSample, idleCapsules);
+                const auto queryEnd = std::chrono::steady_clock::now();
+                float attackMinRadius = std::numeric_limits<float>::max();
+                float attackMaxRadius = 0.0f;
+                float idleMinRadius = std::numeric_limits<float>::max();
+                float idleMaxRadius = 0.0f;
+                for (const auto& capsule : attackCapsules)
+                {
+                    attackMinRadius = std::min(attackMinRadius, capsule.radius);
+                    attackMaxRadius = std::max(attackMaxRadius, capsule.radius);
+                }
+                for (const auto& capsule : idleCapsules)
+                {
+                    idleMinRadius = std::min(idleMinRadius, capsule.radius);
+                    idleMaxRadius = std::max(idleMaxRadius, capsule.radius);
+                }
+                Check(std::isfinite(attackCapsuleGap) &&
+                          std::isfinite(idleCapsuleGap) &&
+                          attackCapsuleGap >= 0.0f && idleCapsuleGap >= 0.0f,
+                      "joint-axis capsule queries must return finite nonnegative gaps");
+                std::cout << "combat-joint-capsule " << sampleCase.name
+                          << " tick=" << record.tick
+                          << " pulseTick=" << pulseTick
+                          << " pulse=" << (record.tick == pulseTick)
+                          << " targetOriginDistance=" << attackToPlayer
+                          << " targetBearing=" << attackBearing
+                          << " targetAction=" << static_cast<int>(target.action)
+                          << " targetActionTime=" << target.actionTime
+                          << " attackClipTime=" << attackSample.clipTime
+                          << " attackCapsuleGap=" << attackCapsuleGap
+                          << " idleCapsuleGap=" << idleCapsuleGap
+                          << " attackRadiusMinMax=" << attackMinRadius << ',' << attackMaxRadius
+                          << " idleRadiusMinMax=" << idleMinRadius << ',' << idleMaxRadius
+                          << " capsuleCount=24"
+                          << " profileBytesPerPose=" << 24u * 7u * sizeof(float)
+                          << " profileFitMs=" << std::chrono::duration<double, std::milli>(
+                                  profileEnd - profileStart).count()
+                          << " bladeQueryMs=" << std::chrono::duration<double, std::milli>(
+                                  queryEnd - queryStart).count()
+                          << " method=asset-skin-fitted-joint-axis-capsules-no-triangle-oracle\n";
+                continue;
+            }
 
             const TriangleBoundsTree attackTree = BuildDiagnosticTargetTree(
                 attackSample, attackPose);
@@ -2797,10 +3014,6 @@ void TestDynamicCombatPulseNeighborhood()
                 attackTree, sword, *grip, worldFromSword);
             const BladeTriangleDistance idleDistance = MeasureBladeTriangleDistance(
                 idleTree, sword, *grip, worldFromSword);
-            const float attackToPlayer = std::hypot(target.x - playerX,
-                                                   target.z - playerZ);
-            const float attackBearing = std::atan2(target.x - playerX,
-                                                   -(target.z - playerZ));
             const bool isPulse = record.tick == pulseTick;
             Check(attackDistance.trianglesQueried > 0u &&
                       idleDistance.trianglesQueried > 0u &&
@@ -3752,6 +3965,11 @@ int main(const int argc, char** argv)
     if (argc > 1 && std::string(argv[1]) == "--combat-dynamic-neighborhood")
     {
         TestDynamicCombatPulseNeighborhood();
+        return failures == 0 ? 0 : 1;
+    }
+    if (argc > 1 && std::string(argv[1]) == "--combat-capsule-feasibility")
+    {
+        TestDynamicCombatPulseNeighborhood(true);
         return failures == 0 ? 0 : 1;
     }
     if (argc > 1 && std::string(argv[1]) == "--combat-geometry")

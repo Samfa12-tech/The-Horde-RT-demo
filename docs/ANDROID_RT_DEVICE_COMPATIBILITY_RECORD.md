@@ -2,6 +2,19 @@
 
 Last updated: 2026-10-08
 
+## 8 October foreground pause work — SM-S948B / Android 16
+
+Evidence class: **exact Debug package, acknowledged ordinary navigation and
+measured process/native render work**. The same `ab69537a` APK below passes
+Enter the ruin / Menu / Settings / Back / Resume on Pipeline and hardware
+RayQueryCompute. Approximately-three-minute pause and one-minute Settings CPU
+samples are 2.84–2.97% of one logical CPU, compared with 19.95–27.92% in short
+unpaused samples. Each backend retains 49 steady native five-second aggregates
+with 9–10 render attempts and 248–249 skipped iterations. Preferences are
+unchanged and apps stop. [Exact workload, failed setups and sensor/memory limits](ENGINEERING_1_6_2_PAUSE_WORK_2026_10_08.md).
+This does not establish sustained play, isolated power, thermal reduction or
+owner touch comfort; the three earlier failed setups remain recorded.
+
 ## 8 October scoped waterfall draw — SM-S948B / Android 16
 
 Evidence class: **exact Debug package, scoped equipment encounter with actual

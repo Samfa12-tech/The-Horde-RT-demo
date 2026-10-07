@@ -326,6 +326,42 @@ was needed for these checker failures.
 
 ## Remaining gates
 
+### Closed coarse contact-proxy probe
+
+A further test-only `--combat-capsule-feasibility` mode reuses the same two
+seven-tick live-Attack neighborhoods and same-origin Idle controls. It fits 24
+actual imported joint/node segments; each triangle is assigned to the segment
+requiring the smallest covering radius, fitted from its three skinned corners.
+The 672-byte per-pose cover preserves authored root/clip transforms and queries
+the actual 6,905 blade triangles. No runtime collision or damage rule changes.
+
+At frontal pulse69, live-Attack capsule gap is .1245 m versus retained exact
+triangle gap .189441 m; +15° is .1545 versus .184408 m. The frontal Idle proxy
+already reports zero while the real blade remains .0469822 m away. Frontal
+Attack proxy intersects at tick71, one tick before the exact tick72 intersection;
++15° proxy intersects at tick72 while the exact blade is still .00777264 m away.
+Fitted radii reach .293 m. This coarse covering profile is too loose for
+trustworthy visual contact and is **not adopted**. It does not rule out a tighter
+surface profile or the authorized bounded sweep.
+
+Host fitting costs approximately 212–250 ms/pose and the deliberately unoptimized
+6,905-triangle ×24-capsule query 432–492 ms/pose. These diagnostic costs are not
+a proposed runtime cost. Exact triangle rows are reused from the earlier matching
+oracle; no new full-oracle pass is claimed. The private successful probe log is
+`combat-capsule-feasibility-run-20261008.log`. Do not repeat this unchanged coarse
+cover to claim progress or tune parry eligibility around it.
+
+### Later CI checkpoint
+
+Test/documentation head `51472d21` passes all 12 aggregate CI jobs in push
+`37647368275` / PR `37647377943`; runtime remains the sealed `ab69537a` here.
+Earlier `22338811` has 11 successful jobs and one cancelled MSVC PR job:
+the Windows report-form Unicode-edit test first times out after its existing
+two-second message deadline, then the overall ten-minute job is cancelled.
+Five focused local repeats pass (2.69 s total). No report source or timeout is
+changed and the transient cause is unproven; the failed test/job is preserved
+separately from the later passing CI checkpoint.
+
 The saved profile in these runs is explicit 50%, Mobile water/fire, Glass On,
 Current shadows, cap30, Mist On; custom preferences are preserved. It differs
 from fresh/reset Glass Off. Native output is 1440×2980 with newly traced 720×1490.
