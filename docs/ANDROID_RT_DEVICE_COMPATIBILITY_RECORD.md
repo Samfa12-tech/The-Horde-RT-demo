@@ -2526,3 +2526,18 @@ metadata changes, pending=false. The owned Debug app is stopped after ACK.
 USB-powered context is not reliable power/sustained thermal evidence. Full
 route/backends, touch/combat feel, sustained 50/40/33 comparison and owner
 decisions remain separate pending gates. See the same exact menu/package ledger.
+
+## 8 October 2026 optional indoor-dust first phone stills
+
+Allocated SM-S948B / Android16 / API36: exact Debug source
+`71a2a98be945f9bb51ebb432f5ca20762a194eed`, APK SHA-256
+`8d01f27e30bfcb23994700409d4ec9071670352811c98a972994c6894a3b1a67`
+(138,462,724 bytes), installed pullback matches. Pipeline first-zone Off/Standard
+and RayQueryCompute second-zone Standard pass12 frozen current native owning
+completed/presented frames at output1440x2980 / actual traced50%720x1490.
+Saved preferences remain unchanged; owned automated Debug processes are stopped.
+Production and benchmark packages are untouched. No motion, sustained thermal,
+displayed-FPS, reliable-power or another-device certification follows. Owner
+appearance feedback requests smaller/subtler motes; the follow-up is pending.
+Dust remains optional and default Off; shafts are deferred. See
+[indoor-dust evidence and limitations](ENGINEERING_1_6_2_INDOOR_DUST_2026_10_08.md).

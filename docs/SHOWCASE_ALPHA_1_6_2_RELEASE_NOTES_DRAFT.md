@@ -1,5 +1,21 @@
 # Horde Lantern RT 1.6.2 development notes
 
+**8 October optional indoor-dust prototype:** bounded deterministic world-space
+motes share real RT primary depth and actual light visibility across Pipeline
+and RayQueryCompute. Dust Off/Low/Standard is independent and defaults Off;
+existing preferences/defaults are preserved. The first exact phone stills on
+`71a2a98be945f9bb51ebb432f5ca20762a194eed` render both backends; owner feedback
+requests smaller/subtler motes. Follow-up appearance, motion and sustained cost
+remain open. No shafts or secondary dust reflections/transmission are included.
+All12 source CI jobs pass for this first runtime; build and frozen-frame checks
+do not close mobile performance or final acceptance.
+[Exact source/package and retained failures](ENGINEERING_1_6_2_INDOOR_DUST_2026_10_08.md).
+
+The owner has returned with the intended phone and accepts the staged waterfall
+guard layout image. Production activation still waits for moving body, shadow,
+reflection and integrated-route evidence. Historical away/device gaps below
+retain their original source/package identities.
+
 **8 October staged waterfall guard preview:** source
 `3da5f2ddb7050422ccc083a645afc3a84b17aa4a`, tree
 `f9bef90b62d06c27dab015640afb234a4f311a3b`; Debug APK SHA-256

@@ -17,7 +17,7 @@ public final class DustDebugAutomationTest {
         final String[] names = {"dust-box-front", "dust-box-oblique", "dust-ellipsoid", "dust-box-wall"};
         final int[] ids = {156, 157, 158, 159};
         final float[][] poses = {{0.0f, 0.14f}, {0.06f, 0.14f},
-                {-1.57079632679f, 0.14f}, {1.57079632679f, 0.10f}};
+                {-1.57079632679f, 0.14f}, {0.70f, -0.08f}};
         for (int index = 0; index < names.length; ++index) {
             assertEquals(names[index], ids[index], MainActivity.checkpointId(names[index]));
             final float[] actualPose = MainActivity.developmentCheckpointViewPose(ids[index]);

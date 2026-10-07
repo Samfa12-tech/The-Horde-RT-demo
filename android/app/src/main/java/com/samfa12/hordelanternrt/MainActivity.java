@@ -4844,7 +4844,7 @@ public class MainActivity extends Activity {
             case 156: return new float[]{0.0f, 0.14f};
             case 157: return new float[]{0.06f, 0.14f};
             case 158: return new float[]{-1.5707963f, 0.14f};
-            case 159: return new float[]{1.5707963f, 0.10f};
+            case 159: return new float[]{0.70f, -0.08f};
             default: return null;
         }
     }

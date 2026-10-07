@@ -241,7 +241,7 @@ inline constexpr std::array<DevelopmentCheckpoint, 60u> kDevelopmentCheckpoints{
     {156, "dust-box-front", 0, 0.0f, -0.25f, 0.0f, 0.14f},
     {157, "dust-box-oblique", 0, 0.10f, -0.25f, 0.06f, 0.14f},
     {158, "dust-ellipsoid", 2, -3.85f, -15.20f, -1.57079632679f, 0.14f},
-    {159, "dust-box-wall", 0, 0.0f, -2.0f, 1.57079632679f, 0.10f},
+    {159, "dust-box-wall", 0, 0.0f, -0.25f, 0.70f, -0.08f},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)

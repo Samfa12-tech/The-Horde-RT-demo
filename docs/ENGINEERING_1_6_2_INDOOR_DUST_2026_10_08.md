@@ -92,3 +92,44 @@ setting produced a false CRLF whitespace report; ordinary repository settings
 are checked before committing. No source content was changed to address that
 invocation error. Exact runtime artifacts and visual evidence follow below when
 sealed; the build checks still do not close sustained/device/owner gates.
+
+## First immutable candidate and owner refinement
+
+Runtime `71a2a98be945f9bb51ebb432f5ca20762a194eed`, tree
+`b6b09a1aadc28f3a70fdefe119b797de7fa0f786`, is sealed separately.
+Four-ABI Debug APK SHA-256
+`8d01f27e30bfcb23994700409d4ec9071670352811c98a972994c6894a3b1a67`
+(138,462,724 bytes); Windows Debug executable SHA-256
+`a098d0c611192497a0e89f5122709de893776ab0261a35bbcbb1bcb15078d4db`
+(11,549,184 bytes). Installed Debug base pullback matches the APK.
+Source CI passes all12 aggregate jobs: push37696765708 / PR37696772234.
+
+On the allocated SM-S948B / Android16 / API36, frozen Debug native RT stills
+pass with12 current owning completed/presented frames: first box Off/Standard
+on Pipeline, and second ellipsoid Standard on RayQueryCompute. Output is
+1440x2980; actual traced50% is720x1490; native UI resolution is unchanged.
+Mobile fire/water and the saved custom tuple are preserved. Each owned process
+is stopped and confirmed preference entries remain unchanged. Private raw
+thermal/memory/battery samples are retained; these short frozen inspections
+do not establish moving appearance, displayed/sustained FPS or reliable power.
+
+Both Windows backends pass Standard box/ellipsoid captures with owning frame,
+source/executable/PNG joins and zero synchronization-validation error markers.
+The first Pipeline Off launch exceeded its45-second external startup deadline;
+its failure remains. A bounded120-second retry passes in7.35 seconds. This
+external inspection deadline does not change native acknowledgements or the
+normal15-second Keep/Restore confirmation. No cold-cache improvement is inferred.
+Both backends fail the original wall view's required primary-arm visibility
+(armPixels=0); rendered images and failure ledgers remain private. This is an
+inspection-framing failure, not a settings/persistence failure or accepted pass.
+
+The owner requests smaller/subtler motes after the first box phone image. The
+follow-up reduces box/preview radius from12 to8mm, ellipsoid11 to7.5mm, and
+opacity density by25% (.16 to.12; .14 to.105). Seed, drift, authored bounds,
+counts, resolution, other effects and default Off stay unchanged. Developer
+wall view159 moves to an oblique entrance view with a lower pitch; ordinary
+primary-arm visibility guards remain mandatory. Affected native build and
+core/development-fixture tests pass. The four-ABI Android Debug assembly and
+182/182 Java tests also pass. Exact image validation is recorded separately
+after sealing this follow-up. The first appearance is
+not relabelled accepted.
