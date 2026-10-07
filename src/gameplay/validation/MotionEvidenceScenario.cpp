@@ -259,7 +259,16 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
         (state.lich.health != 3 || state.lich.damagePulse || state.lich.staffLightStrength != 0.0f ||
          state.playerVitals.vitality != initialVitality_ || state.chestReward.phase != interactions::ChestRewardPhase::Locked))
     { Fail("Real reveal safety or locked reward invariant failed."); return; }
-    if (state.paused && state.lich.revealElapsedSeconds != previousRevealElapsed_)
+    // Zero-delta ordinary retry resets the reveal clock while its fresh RT
+    // output is still paused. Admit only that one consumed, safe reset; normal
+    // pause must continue to freeze the clock, including the recognition phase.
+    const bool admittedRetryReset = stage_ == MotionStage::RetryRequested && retrySent_ &&
+        commands_.retry != 0u && state.lastConsumedRetrySequence >= commands_.retry &&
+        initialRetryGeneration_ != UINT32_MAX && state.retryGeneration == initialRetryGeneration_ + 1u &&
+        state.playerAlive && state.lich.revealPhase == KeeperRevealPhase::RetryRecognition &&
+        state.lich.revealElapsedSeconds == 0.0f &&
+        Distance(state, kKeeperRetryPosition.x, kKeeperRetryPosition.z) <= 0.0001f;
+    if (state.paused && !admittedRetryReset && state.lich.revealElapsedSeconds != previousRevealElapsed_)
     { Fail("Keeper reveal advanced across paused input."); return; }
     previousRevealElapsed_ = state.lich.revealElapsedSeconds;
     if (scenario_==MotionScenario::ShaftUp && (!state.torchFailure.heldByPlayer || state.torchFailure.triggered))

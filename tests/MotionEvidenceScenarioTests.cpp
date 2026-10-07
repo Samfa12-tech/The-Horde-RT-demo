@@ -98,14 +98,33 @@ void Run(MotionScenario kind, int rate, const char* receiptPath)
             publication.paused = false;
             pauseChecked = true;
         }
-        const auto input = scenario.BuildInput(simulation.Snapshot(), publication, now, true);
+        auto input = scenario.BuildInput(simulation.Snapshot(), publication, now, true);
         Check(!input.hasAuthoritativePlayerPose && std::abs(input.moveForward) <= 1.00001f && std::abs(input.moveStrafe) <= 1.00001f,
               "measured motion uses only bounded normal input axes");
+        // Match the Android owner: ordinary world command admission is zero
+        // delta, followed by a paused seed while the new RT scope is pending.
+        const bool retrySeed = input.commands.retry > simulation.Snapshot().lastConsumedRetrySequence;
+        if (retrySeed)
+        {
+            simulation.StepFixed(input, 0.0f, ++publicationSequence);
+            input.paused = true;
+            input.moveForward = input.moveStrafe = 0.0f;
+        }
         simulation.AdvanceFrame(input, 1.0 / rate, ++publicationSequence);
         scenario.ObserveAdvance(simulation.Snapshot(), simulation.Events().Events());
         if (!ledger.AppendState(now, simulation.Snapshot(), input, scenario, simulation.Events().Events()))
         { std::cerr << ledger.Failure() << '\n'; Check(false, "actual state/event ledger admission"); break; }
+        if (retrySeed && !scenario.Failed())
+        {
+            auto corruptObserver = scenario;
+            auto corruptState = simulation.Snapshot();
+            corruptState.lich.revealElapsedSeconds += 0.02f;
+            corruptObserver.ObserveAdvance(corruptState, {});
+            Check(corruptObserver.Failed() && corruptObserver.Failure() == "Keeper reveal advanced across paused input.",
+                  "admitted zero-delta retry does not allow subsequent reveal-clock advancement while paused");
+        }
         publication = input;
+        if (retrySeed) publication.paused = false; // The platform's UI tuple remains unpaused.
         walkingSeen = walkingSeen || simulation.Snapshot().walkAmount > (kind==MotionScenario::ShaftUp ? 0.1f : 0.5f);
         retryRecognitionSeen = retryRecognitionSeen || simulation.Snapshot().lich.revealPhase == KeeperRevealPhase::RetryRecognition;
         chargeSeen = chargeSeen || simulation.Snapshot().lich.phase == LichPhase::Charging;
@@ -450,7 +469,7 @@ int main(int argc, char** argv)
     TestEquipmentEventAdmission();
     TestAdmissionAndFrameBinding();
     TestRearLookCannotBeSkipped();
-    for (int rate : {15, 60, 120})
+    for (int rate : {15, 30, 60, 120})
         for (const auto kind : {MotionScenario::TorchLowOpening, MotionScenario::ShaftUp,
                                MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward})
             Run(kind, rate, argc == 3 && rate == 60 && kind == MotionScenario::KeeperRetryReward ? argv[2] : nullptr);
