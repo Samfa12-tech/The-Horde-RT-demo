@@ -249,10 +249,13 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
             if (sword.progress >= 0.25f * static_cast<float>(threshold + 1u))
                 drawThresholds |= 1u << threshold;
     const bool equipmentMilestone = (drawThresholds & ~run.capturedDrawThresholds) != 0u;
+    const auto& torch = states.back().torch;
+    const unsigned torchThresholds = horde::telemetry::ObservedTorchCaptureMilestones(torch);
+    const bool torchMilestone = (torchThresholds & ~run.capturedTorchThresholds) != 0u;
     if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration) || AndroidMotionScope(context) != run.scope)
     { FailAndroidMotion(context, "Motion present lost its foreground resource scope."); return; }
     if (stage == run.lastCaptureStage && seconds - run.lastCaptureSeconds < 2.0 &&
-        !run.scenario.Complete() && !actionMilestone && !equipmentMilestone) return;
+        !run.scenario.Complete() && !actionMilestone && !equipmentMilestone && !torchMilestone) return;
     horde::telemetry::RtSubmittedFrameIdentity submitted{};
     if (!context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, submitted) ||
         !CompleteRtEvidenceAfterDeviceIdle(context, vkDeviceWaitIdle(context.device)) || run.finished ||
@@ -283,10 +286,14 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
         << ",\"rtRow\":" << frames.size() - 1u << ",\"actionMilestone\":"
         << (actionMilestone ? "true" : "false")
         << ",\"equipmentThresholdMask\":" << (drawThresholds & ~run.capturedDrawThresholds)
-        << ",\"swordDrawProgress\":" << sword.progress << '}';
+        << ",\"swordDrawProgress\":" << sword.progress
+        << ",\"torchThresholdMask\":" << (torchThresholds & ~run.capturedTorchThresholds)
+        << ",\"torchFallProgress\":" << torch.fallProgress
+        << ",\"torchArmLowerBlend\":" << torch.leftArmLowerBlend << '}';
     // A hitch can cross several thresholds in one presented frame. Retain the
     // actual observed progress and one image, never invent skipped poses.
     run.capturedDrawThresholds |= drawThresholds;
+    run.capturedTorchThresholds |= torchThresholds;
     run.captures += row.str(); run.lastCaptureStage = stage; run.lastCaptureSeconds = seconds;
     if (run.scenario.Complete())
     {

@@ -166,6 +166,7 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
     const auto clearColor=ClearColorForMode(capabilities.rtMode);
     double lastCaptureSeconds=-10;
     MotionStage lastCaptureStage=MotionStage::NotStarted;
+    unsigned capturedTorchThresholds=0u;
     const auto drain = [&]() {
         const auto idle=vkDeviceWaitIdle(context.device);
         return CompleteRtEvidenceAfterDeviceIdle(context,idle) && !context.motionLedger.HasPendingSubmissions();
@@ -207,7 +208,12 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
             return fail("Actual submitted frame owner was unavailable.");
         const auto stage=context.motionScenario.Stage();
         const auto seconds=context.motionScenario.SimulationSeconds();
-        const bool capture=stage!=lastCaptureStage || seconds-lastCaptureSeconds>=2.0;
+        const auto torchCaptureStates=context.motionLedger.States();
+        if(torchCaptureStates.empty()) return fail("Motion present has no recorded torch snapshot.");
+        const unsigned torchThresholds=horde::telemetry::ObservedTorchCaptureMilestones(
+            torchCaptureStates.back().torch);
+        const bool capture=stage!=lastCaptureStage || seconds-lastCaptureSeconds>=2.0 ||
+            (torchThresholds & ~capturedTorchThresholds)!=0u;
         if(context.motionRetryPending || capture || context.motionScenario.Complete())
         {
             if(!drain()) return fail("Actual submitted motion frame did not drain its graphics ownership.");
@@ -237,6 +243,7 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
                 if(!WriteRgbaPng(directory/row.file,image,diagnostic) || !Sha256File(directory/row.file,row.sha256,diagnostic))
                     return fail("Motion milestone PNG/identity failed: "+diagnostic);
                 captures.push_back(std::move(row)); lastCaptureSeconds=seconds; lastCaptureStage=stage;
+                capturedTorchThresholds|=torchThresholds;
             }
             if(context.motionRetryPending)
             {

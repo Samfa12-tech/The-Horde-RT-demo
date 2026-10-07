@@ -105,6 +105,16 @@ bool MotionEvidenceLedger::AppendState(std::uint64_t now,
         latestEventSequence_ = event.sequence;
     }
     const auto& sword = state.heldItems[1];
+    const auto& torch = state.torchFailure;
+    for (const float value : {torch.flameStrength, torch.leftArmLowerBlend, torch.fallProgress})
+        if (!std::isfinite(value) || value < 0.0f || value > 1.0f)
+            return Reject("Motion torch progress/strength is invalid.");
+    for (const float value : {torch.sequenceTime, torch.phaseTime, torch.droppedX,
+             torch.droppedY, torch.droppedZ, torch.droppedYawRadians,
+             torch.droppedViewPitchRadians, torch.droppedPitchRadians,
+             state.heldItems[0].worldFromItem[12], state.heldItems[0].worldFromItem[13],
+             state.heldItems[0].worldFromItem[14]})
+        if (!std::isfinite(value)) return Reject("Motion torch time/pose is invalid.");
     if (!std::isfinite(sword.transition.progress) || sword.transition.progress < 0.0f ||
         sword.transition.progress > 1.0f || !std::isfinite(sword.visualGripBlend) ||
         sword.visualGripBlend < 0.0f || sword.visualGripBlend > 1.0f ||
@@ -116,6 +126,10 @@ bool MotionEvidenceLedger::AppendState(std::uint64_t now,
     row.simulationSeconds = scenario.SimulationSeconds(); row.stage = scenario.Stage(); row.input = input;
     row.player = {{state.playerX, state.playerZ, state.playerYawRadians, state.playerPitchRadians, state.walkTime, state.walkAmount}};
     row.keeper = state.lich; row.torch = state.torchFailure; row.combat = state.playerCombat;
+    row.torchParent = state.heldItems[0].parentMode;
+    row.torchItemPosition = {{state.heldItems[0].worldFromItem[12],
+                             state.heldItems[0].worldFromItem[13],
+                             state.heldItems[0].worldFromItem[14]}};
     row.sword = {sword.parentMode, sword.transition.kind, sword.transition.progress,
                  sword.visualGripBlend, sword.visualStowBlend, sword.transition.active};
     row.chest = state.chestReward; row.heldLight = state.interaction; row.finale = state.finale;
@@ -290,7 +304,17 @@ void MotionEvidenceLedger::WriteJson(std::ostream& output,
                << "],\"tilt\":" << r.keeper.presentationTiltRadians << ",\"facing\":" << r.keeper.facingRadians << ",\"title\":" << r.keeper.titleOpacity
                << ",\"hp\":" << r.keeper.health << ",\"phaseTime\":" << r.keeper.phaseTime << ",\"staff\":" << r.keeper.staffLightStrength
                << ",\"damagePulse\":" << (r.keeper.damagePulse ? "true" : "false") << "},\"torchPhase\":" << static_cast<int>(r.torch.phase)
-               << ",\"torchHeld\":" << (r.torch.heldByPlayer ? "true" : "false") << ",\"playerAction\":" << static_cast<int>(r.combat.action)
+               << ",\"torchHeld\":" << (r.torch.heldByPlayer ? "true" : "false")
+               << ",\"torch\":{\"triggered\":" << (r.torch.triggered ? "true" : "false")
+               << ",\"sequenceTime\":" << r.torch.sequenceTime << ",\"phaseTime\":" << r.torch.phaseTime
+               << ",\"flameStrength\":" << r.torch.flameStrength << ",\"armLowerBlend\":" << r.torch.leftArmLowerBlend
+               << ",\"fallProgress\":" << r.torch.fallProgress << ",\"droppedPosition\":["
+               << r.torch.droppedX << ',' << r.torch.droppedY << ',' << r.torch.droppedZ
+               << "],\"droppedYaw\":" << r.torch.droppedYawRadians << ",\"droppedViewPitch\":" << r.torch.droppedViewPitchRadians
+               << ",\"droppedPitch\":" << r.torch.droppedPitchRadians
+               << ",\"itemParent\":" << static_cast<int>(r.torchParent) << ",\"itemPosition\":["
+               << r.torchItemPosition[0] << ',' << r.torchItemPosition[1] << ',' << r.torchItemPosition[2] << "]}"
+               << ",\"playerAction\":" << static_cast<int>(r.combat.action)
                << ",\"sword\":{\"parent\":" << static_cast<int>(r.sword.parent)
                << ",\"transition\":" << static_cast<int>(r.sword.transition) << ",\"progress\":" << r.sword.progress
                << ",\"gripBlend\":" << r.sword.gripBlend << ",\"stowBlend\":" << r.sword.stowBlend

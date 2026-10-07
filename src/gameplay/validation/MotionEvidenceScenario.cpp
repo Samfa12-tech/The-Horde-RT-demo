@@ -26,7 +26,7 @@ bool ParseMotionScenario(std::string_view text, MotionScenario& scenario) noexce
 {
     for (auto candidate : {MotionScenario::TorchLowOpening, MotionScenario::ShaftUp,
                            MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward,
-                           MotionScenario::WaterfallEquipment})
+                           MotionScenario::WaterfallEquipment, MotionScenario::TorchDrench})
         if (text == MotionScenarioName(candidate)) { scenario = candidate; return true; }
     return false;
 }
@@ -39,6 +39,7 @@ const char* MotionScenarioName(MotionScenario scenario) noexcept
     case MotionScenario::KeeperFirstEntry: return "keeper-first-entry";
     case MotionScenario::KeeperRetryReward: return "keeper-retry-reward";
     case MotionScenario::WaterfallEquipment: return "waterfall-equipment";
+    case MotionScenario::TorchDrench: return "torch-drench";
     default: return "invalid";
     }
 }
@@ -64,6 +65,9 @@ const char* MotionStageName(MotionStage stage) noexcept
     case MotionStage::TerminalReentry: return "terminal-reentry";
     case MotionStage::Complete: return "complete";
     case MotionStage::Failed: return "failed";
+    case MotionStage::TorchDrenchGuttering: return "torch-drench-guttering";
+    case MotionStage::TorchDrenchFalling: return "torch-drench-falling";
+    case MotionStage::TorchDrenchSettled: return "torch-drench-settled";
     default: return "invalid";
     }
 }
@@ -79,7 +83,8 @@ bool MotionEvidenceScenario::Begin(MotionScenario scenario, GameSimulation& simu
     const bool seeded = scenario == MotionScenario::WaterfallEquipment
         ? simulation.BeginMotionEvidenceEquipmentSeed()
         : simulation.ApplyShowcaseCheckpoint(
-            scenario == MotionScenario::TorchLowOpening ? 0 : scenario == MotionScenario::ShaftUp ? 2 : 8);
+            scenario == MotionScenario::TorchLowOpening ? 0 :
+            (scenario == MotionScenario::ShaftUp || scenario == MotionScenario::TorchDrench) ? 2 : 8);
     if (!seeded)
     { Fail("The accepted scenario checkpoint seed could not be applied."); return false; }
     equipmentSeedOwned_ = scenario == MotionScenario::WaterfallEquipment;
@@ -186,6 +191,16 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
                 input.yawRadians = atWestLeg ? -kPi * 0.5f : 0.0f;
                 MoveTowards(input, state, atWestLeg ? -2.0f : 4.2f, -15.2f);
             }
+            else if (scenario_ == MotionScenario::TorchDrench)
+            {
+                input.pitchRadians = -0.04f;
+                // Use the same two ordinary corridor legs as the waterfall
+                // encounter. The second target lies inside the production
+                // automatic drench trigger; the scenario never imports a phase.
+                const bool atWestLeg = state.playerZ < -15.05f;
+                input.yawRadians = atWestLeg ? -kPi * 0.5f : 0.0f;
+                MoveTowards(input, state, atWestLeg ? -2.0f : 4.2f, -15.2f);
+            }
             else if (elapsed<6.0f || !rearReturnSeen_)
             {
                 const auto smooth=[](float value) {value=std::clamp(value,0.0f,1.0f);return value*value*(3.0f-2.0f*value);};
@@ -221,6 +236,15 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
             { PublishEdge(commands_.attack); firstAttackSent_ = true; }
             if (stage_ == MotionStage::EquipmentParry && !parrySent_)
             { PublishEdge(commands_.parry); parrySent_ = true; }
+            break;
+        case MotionStage::TorchDrenchFalling:
+        case MotionStage::TorchDrenchSettled:
+            // Continue with normal axes after release so capture can prove the
+            // torch owns a fixed world transform while the player steps back
+            // and changes view to inspect it.
+            input.yawRadians = kPi * 0.5f;
+            input.pitchRadians = -0.32f;
+            MoveTowards(input, state, -4.5f, -15.2f);
             break;
         case MotionStage::Reveal:
         {
@@ -305,7 +329,120 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
             else if (event.type == GameplayEventType::PlayerSwing && swordSwingSequence_ == 0u)
                 swordSwingSequence_ = event.sequence;
         }
+        if (scenario_ == MotionScenario::TorchDrench &&
+            event.type == GameplayEventType::TorchExtinguished)
+        {
+            if (torchExtinguishedSequence_ != 0u)
+            { Fail("Automatic torch-drench emitted a duplicate extinguish event."); return; }
+            torchExtinguishedSequence_ = event.sequence;
+        }
         impact = impact || event.type == GameplayEventType::LichImpact;
+    }
+    if (scenario_ == MotionScenario::TorchDrench)
+    {
+        const auto& torch = state.torchFailure;
+        const auto& eventCount = eventCounts_[static_cast<std::size_t>(GameplayEventType::TorchExtinguished)];
+        if (eventCount > 1u)
+        { Fail("Automatic torch-drench emitted more than one extinguish event."); return; }
+        if (!torch.triggered)
+        {
+            if (stage_ != MotionStage::Approach || !torch.heldByPlayer ||
+                state.interaction.heldLightKind != interactions::HeldLightKind::Torch ||
+                eventCount != 0u || torch.phase != TorchFailurePhase::Held)
+                Fail("Torch-drench route changed the held torch before its authored trigger.");
+            return;
+        }
+        if (torchExtinguishedSequence_ == 0u || eventCount != 1u)
+        { Fail("Automatic torch-drench trigger lacked its single semantic event."); return; }
+        if (stage_ == MotionStage::Approach)
+            Enter(MotionStage::TorchDrenchGuttering);
+
+        if (stage_ == MotionStage::TorchDrenchGuttering)
+        {
+            if (torch.phase == TorchFailurePhase::Guttering)
+            {
+                if (!torch.heldByPlayer || state.interaction.heldLightKind != interactions::HeldLightKind::Torch ||
+                    torch.flameStrength <= 0.0f || torch.fallProgress != 0.0f)
+                    Fail("Torch guttering did not retain the held light and its live flame.");
+                return;
+            }
+            if (torch.phase != TorchFailurePhase::Falling)
+            { Fail("Torch drench skipped its observable guttering or falling phase."); return; }
+            torchDrenchReleaseX_ = torch.droppedX;
+            torchDrenchReleaseZ_ = torch.droppedZ;
+            torchDrenchReleaseYaw_ = torch.droppedYawRadians;
+            torchDrenchReleaseViewPitch_ = torch.droppedViewPitchRadians;
+            torchDrenchPreviousFallProgress_ = torch.fallProgress;
+            torchDrenchPreviousDroppedY_ = torch.droppedY;
+            torchDrenchFallingSeen_ = true;
+            Enter(MotionStage::TorchDrenchFalling);
+        }
+        if (stage_ == MotionStage::TorchDrenchFalling)
+        {
+            if (torch.phase == TorchFailurePhase::Settled)
+            {
+                torchDrenchSettledSeen_ = true;
+                Enter(MotionStage::TorchDrenchSettled);
+            }
+        }
+        if (stage_ == MotionStage::TorchDrenchFalling)
+        {
+            if (!torchDrenchFallingSeen_ || torch.phase != TorchFailurePhase::Falling)
+            {
+                std::array<char, 128u> reason{};
+                std::snprintf(reason.data(), reason.size(),
+                    "Released Rag torch skipped its observable falling phase (phase=%u, sequence=%.3f, fall=%.3f).",
+                    static_cast<unsigned>(torch.phase), torch.sequenceTime, torch.fallProgress);
+                Fail(reason.data()); return;
+            }
+            if (torch.heldByPlayer || state.interaction.heldLightKind != interactions::HeldLightKind::None)
+            { Fail("Released Rag torch remained owned by the player or held-light slot."); return; }
+            if (torch.flameStrength != 0.0f)
+            { Fail("Released Rag torch flame strength was not zero."); return; }
+            if (torch.fallProgress < torchDrenchPreviousFallProgress_)
+            { Fail("Released Rag torch fall progress regressed."); return; }
+            if (torch.droppedY > torchDrenchPreviousDroppedY_ + 0.0001f)
+            { Fail("World-owned torch drop moved upward during its fall."); return; }
+            if (std::abs(torch.droppedX - torchDrenchReleaseX_) > 0.0001f ||
+                std::abs(torch.droppedZ - torchDrenchReleaseZ_) > 0.0001f ||
+                std::abs(torch.droppedYawRadians - torchDrenchReleaseYaw_) > 0.0001f ||
+                std::abs(torch.droppedViewPitchRadians - torchDrenchReleaseViewPitch_) > 0.0001f)
+            { Fail("Released Rag torch did not retain a fixed world-owned falling transform."); return; }
+            torchDrenchPreviousFallProgress_ = torch.fallProgress;
+            torchDrenchPreviousDroppedY_ = torch.droppedY;
+            torchDrenchWalkingAfterRelease_ = torchDrenchWalkingAfterRelease_ ||
+                std::hypot(state.playerX - torchDrenchReleaseX_, state.playerZ - torchDrenchReleaseZ_) > 0.40f;
+            torchDrenchStepBackLookSeen_ = torchDrenchStepBackLookSeen_ ||
+                (torchDrenchWalkingAfterRelease_ &&
+                 (std::abs(state.playerYawRadians - torchDrenchReleaseYaw_) > 0.5f ||
+                  std::abs(state.playerPitchRadians - torchDrenchReleaseViewPitch_) > 0.10f));
+        }
+        if (stage_ == MotionStage::TorchDrenchSettled)
+        {
+            if (!torchDrenchSettledSeen_ || torch.phase != TorchFailurePhase::Settled ||
+                torch.heldByPlayer || state.interaction.heldLightKind != interactions::HeldLightKind::None ||
+                torch.flameStrength != 0.0f || torch.fallProgress != 1.0f ||
+                std::abs(torch.droppedY - kRouteFloorWorldY) > 0.0001f ||
+                std::abs(torch.droppedX - torchDrenchReleaseX_) > 0.0001f ||
+                std::abs(torch.droppedZ - torchDrenchReleaseZ_) > 0.0001f ||
+                std::abs(torch.droppedYawRadians - torchDrenchReleaseYaw_) > 0.0001f ||
+                std::abs(torch.droppedViewPitchRadians - torchDrenchReleaseViewPitch_) > 0.0001f)
+            { Fail("Settled Rag torch lost its world-owned floor transform or held-light loss."); return; }
+            torchDrenchWalkingAfterRelease_ = torchDrenchWalkingAfterRelease_ ||
+                std::hypot(state.playerX - torchDrenchReleaseX_, state.playerZ - torchDrenchReleaseZ_) > 0.40f;
+            torchDrenchStepBackLookSeen_ = torchDrenchStepBackLookSeen_ ||
+                (torchDrenchWalkingAfterRelease_ &&
+                 (std::abs(state.playerYawRadians - torchDrenchReleaseYaw_) > 0.5f ||
+                  std::abs(state.playerPitchRadians - torchDrenchReleaseViewPitch_) > 0.10f));
+            if (simulationSeconds_ - stageStartSeconds_ >= 0.30)
+            {
+                if (!torchDrenchWalkingAfterRelease_ || !torchDrenchStepBackLookSeen_ ||
+                    eventCount != 1u || torchExtinguishedSequence_ == 0u)
+                    Fail("Torch-drench inspection missed the step-back/look or once-only event evidence.");
+                else Enter(MotionStage::Complete);
+            }
+        }
+        return;
     }
     if (scenario_ == MotionScenario::WaterfallEquipment)
     {

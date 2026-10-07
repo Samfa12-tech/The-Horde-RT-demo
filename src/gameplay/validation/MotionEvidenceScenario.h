@@ -19,6 +19,7 @@ enum class MotionScenario : std::uint8_t
     KeeperFirstEntry,
     KeeperRetryReward,
     WaterfallEquipment,
+    TorchDrench,
 };
 
 enum class MotionStage : std::uint8_t
@@ -27,6 +28,7 @@ enum class MotionStage : std::uint8_t
     EquipmentParry, Reveal, FirstTelegraph,
     AwaitDeath, RetryRequested, Recognition, RetryTelegraph, Fight,
     Reward, TerminalReentry, Complete, Failed,
+    TorchDrenchGuttering, TorchDrenchFalling, TorchDrenchSettled,
 };
 
 [[nodiscard]] bool ParseMotionScenario(std::string_view text, MotionScenario& scenario) noexcept;
@@ -118,6 +120,17 @@ private:
     bool equipmentDrawTransitionSeen_ = false;
     bool equipmentAttackPoseSeen_ = false;
     bool equipmentParryPoseSeen_ = false;
+    bool torchDrenchWalkingAfterRelease_ = false;
+    bool torchDrenchStepBackLookSeen_ = false;
+    bool torchDrenchFallingSeen_ = false;
+    bool torchDrenchSettledSeen_ = false;
+    float torchDrenchReleaseX_ = 0.0f;
+    float torchDrenchReleaseZ_ = 0.0f;
+    float torchDrenchReleaseYaw_ = 0.0f;
+    float torchDrenchReleaseViewPitch_ = 0.0f;
+    float torchDrenchPreviousFallProgress_ = 0.0f;
+    float torchDrenchPreviousDroppedY_ = 0.0f;
+    std::uint64_t torchExtinguishedSequence_ = 0u;
     std::uint64_t waterfallWarningSequence_ = 0u;
     std::uint64_t swordDrawSequence_ = 0u;
     std::uint64_t swordAttachmentSequence_ = 0u;

@@ -14,6 +14,26 @@
 namespace horde::telemetry
 {
 
+// Cumulative observations of real torch state. A hitch can cross several
+// thresholds; the capture owner records one actual pose and its observed mask.
+inline unsigned ObservedTorchCaptureMilestones(
+    const horde::gameplay::TorchFailureSnapshot& torch) noexcept
+{
+    if (!torch.triggered) return 0u;
+    unsigned mask = 0u;
+    if (torch.phase == horde::gameplay::TorchFailurePhase::Guttering) mask |= 1u;
+    for (unsigned threshold = 0u; threshold < 3u; ++threshold)
+    {
+        const float progress = 0.25f * static_cast<float>(threshold + 1u);
+        if (torch.leftArmLowerBlend >= progress) mask |= 1u << (threshold + 1u);
+        if (torch.fallProgress >= progress) mask |= 1u << (threshold + 5u);
+    }
+    if (torch.phase == horde::gameplay::TorchFailurePhase::Falling) mask |= 1u << 4u;
+    if (torch.phase == horde::gameplay::TorchFailurePhase::Settled) mask |= 1u << 8u;
+    if (!torch.heldByPlayer && torch.flameStrength == 0.0f) mask |= 1u << 9u;
+    return mask;
+}
+
 struct MotionStateRow
 {
     std::uint64_t wallNanoseconds = 0u;
@@ -25,6 +45,8 @@ struct MotionStateRow
     std::array<float, 6u> player{}; // X,Z,yaw,pitch,walkTime,walkAmount
     horde::gameplay::LichSnapshot keeper{};
     horde::gameplay::TorchFailureSnapshot torch{};
+    horde::gameplay::items::HeldItemParentMode torchParent{};
+    std::array<float, 3u> torchItemPosition{};
     horde::gameplay::PlayerCombatSnapshot combat{};
     struct HeldSwordEvidence
     {

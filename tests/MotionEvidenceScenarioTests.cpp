@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cmath>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 
@@ -249,6 +250,9 @@ void TestAdmissionAndFrameBinding()
     Check(ParseMotionScenario("keeper-first-entry", parsed) && parsed == MotionScenario::KeeperFirstEntry &&
           !ParseMotionScenario("keeper-first-entry ", parsed) && !ParseMotionScenario("../torch-low-opening", parsed),
           "exact scenario parser cannot silently broaden unsupported launch input");
+    Check(ParseMotionScenario("torch-drench", parsed) && parsed == MotionScenario::TorchDrench &&
+          !ParseMotionScenario("torch-drench/extra", parsed),
+          "torch-drench is one exact allowlisted Debug validation scenario");
     GameSimulation legacy;
     MotionEvidenceScenario rejected;
     Check(!rejected.Begin(MotionScenario::TorchLowOpening, legacy, 1u), "legacy profile cannot certify the production anatomical motion path");
@@ -465,6 +469,164 @@ void TestAdmissionAndFrameBinding()
     publication = lifecycle.PublishedStateByValue();
     Check(!unbound.AppendCompletedFrame(5u, publication), "last state and presentation flag alone cannot fabricate a committed frame join");
 }
+
+void RunTorchDrench(int rate)
+{
+    GameSimulation simulation(ProductionGameSimulationConfig());
+    MotionEvidenceScenario scenario;
+    std::uint64_t now = 2'000'000'000ull;
+    const auto retryBefore = simulation.Snapshot().retryGeneration;
+    Check(scenario.Begin(MotionScenario::TorchDrench, simulation, now),
+          "torch-drench begins from its admitted checkpoint-2 route");
+    const auto checkpoint = simulation.Snapshot();
+    Check(checkpoint.torchFailure.phase == TorchFailurePhase::Held &&
+          checkpoint.torchFailure.heldByPlayer && !checkpoint.torchFailure.triggered &&
+          checkpoint.interaction.heldLightKind == interactions::HeldLightKind::Torch &&
+          checkpoint.retryGeneration == retryBefore && checkpoint.playerAlive,
+          "checkpoint-2 starts with the production held torch and no retry or phase mutation");
+    MotionEvidenceLedger ledger;
+    Check(ledger.Begin("torch_drench_fields", MotionScenario::TorchDrench) &&
+          ledger.AppendState(now, checkpoint, {}, scenario, {}),
+          "real pre-trigger checkpoint state is admitted to the torch-drench ledger");
+    Check(ObservedTorchCaptureMilestones(checkpoint.torchFailure) == 0u,
+          "untriggered checkpoint cannot claim any torch capture milestone");
+
+    InputSnapshot publication;
+    bool pauseChecked = false;
+    bool sawGuttering = false;
+    bool sawFalling = false;
+    bool sawSettled = false;
+    bool sawReleasedFlamelessTorch = false;
+    std::uint64_t publicationSequence = 1u;
+    for (int frame = 0; frame < rate * 20 && !scenario.Complete() && !scenario.Failed(); ++frame)
+    {
+        now += static_cast<std::uint64_t>(1'000'000'000ull / static_cast<unsigned>(rate));
+        if (!pauseChecked && scenario.Stage() == MotionStage::Approach &&
+            simulation.Snapshot().playerZ < -12.0f)
+        {
+            publication.paused = true;
+            const auto before = simulation.Snapshot();
+            const auto beforeSeconds = scenario.SimulationSeconds();
+            for (int i = 0; i < std::max(1, rate / 4); ++i)
+            {
+                now += static_cast<std::uint64_t>(1'000'000'000ull / static_cast<unsigned>(rate));
+                const auto input = scenario.BuildInput(simulation.Snapshot(), publication, now, true);
+                simulation.AdvanceFrame(input, 1.0 / rate, ++publicationSequence);
+                scenario.ObserveAdvance(simulation.Snapshot(), simulation.Events().Events());
+                Check(ledger.AppendState(now, simulation.Snapshot(), input, scenario, simulation.Events().Events()),
+                      "paused torch-drench state joins the actual ledger row");
+                simulation.ClearEvents();
+            }
+            Check(simulation.Snapshot().playerX == before.playerX &&
+                  simulation.Snapshot().playerZ == before.playerZ &&
+                  simulation.Snapshot().torchFailure.triggered == before.torchFailure.triggered &&
+                  scenario.SimulationSeconds() == beforeSeconds,
+                  "published pause interrupts the route without advancing movement or drench timing");
+            publication.paused = false;
+            pauseChecked = true;
+        }
+
+        const auto input = scenario.BuildInput(simulation.Snapshot(), publication, now, true);
+        Check(!input.hasAuthoritativePlayerPose && std::abs(input.moveForward) <= 1.00001f &&
+              std::abs(input.moveStrafe) <= 1.00001f,
+              "torch-drench uses bounded ordinary input axes without a forced player pose");
+        simulation.AdvanceFrame(input, 1.0 / rate, ++publicationSequence);
+        scenario.ObserveAdvance(simulation.Snapshot(), simulation.Events().Events());
+        Check(ledger.AppendState(now, simulation.Snapshot(), input, scenario, simulation.Events().Events()),
+              "actual torch-drench simulation state joins its ledger row");
+        const auto& torch = simulation.Snapshot().torchFailure;
+        sawGuttering = sawGuttering || torch.phase == TorchFailurePhase::Guttering;
+        sawFalling = sawFalling || torch.phase == TorchFailurePhase::Falling;
+        sawSettled = sawSettled || torch.phase == TorchFailurePhase::Settled;
+        sawReleasedFlamelessTorch = sawReleasedFlamelessTorch ||
+            (torch.triggered && !torch.heldByPlayer && torch.flameStrength == 0.0f && torch.fallProgress > 0.0f);
+        simulation.ClearEvents();
+        publication = input;
+    }
+    const auto& final = simulation.Snapshot();
+    std::cout << "torch-drench rate=" << rate << " stage=" << MotionStageName(scenario.Stage())
+              << " endpoint=(" << final.playerX << ',' << final.playerZ << ") simulationSeconds="
+              << scenario.SimulationSeconds() << " reason=" << scenario.Failure() << '\n';
+    Check(pauseChecked && scenario.Complete() && !scenario.Failed() &&
+          scenario.EventCounts()[static_cast<std::size_t>(GameplayEventType::TorchExtinguished)] == 1u &&
+          final.torchFailure.phase == TorchFailurePhase::Settled && !final.torchFailure.heldByPlayer &&
+          final.interaction.heldLightKind == interactions::HeldLightKind::None && final.playerAlive,
+          "torch-drench observes one automatic event, actual release, floor settle and held-light loss");
+    Check(sawGuttering && sawFalling && sawSettled && sawReleasedFlamelessTorch,
+          "host run at each display cadence samples genuine guttering, falling, settled and world-owned flame-off states");
+    const unsigned settledMask = ObservedTorchCaptureMilestones(final.torchFailure);
+    constexpr unsigned armAndFallThresholds = (1u << 1u) | (1u << 2u) | (1u << 3u) |
+        (1u << 5u) | (1u << 6u) | (1u << 7u);
+    Check((settledMask & armAndFallThresholds) == armAndFallThresholds &&
+          (settledMask & ((1u << 0u) | (1u << 4u))) == 0u &&
+          (settledMask & ((1u << 8u) | (1u << 9u))) == ((1u << 8u) | (1u << 9u)),
+          "one catch-up settled observation reports all crossed arm/fall thresholds without inventing guttering or falling phases");
+
+    const auto& row = ledger.States().back();
+    std::ostringstream json;
+    ledger.WriteJson(json, scenario);
+    std::ostringstream expectedItem;
+    expectedItem << "\"itemParent\":" << static_cast<int>(row.torchParent) << ",\"itemPosition\":["
+                 << std::setprecision(9) << row.torchItemPosition[0] << ',' << row.torchItemPosition[1]
+                 << ',' << row.torchItemPosition[2] << ']';
+    Check(row.torchParent == items::HeldItemParentMode::AuthoredWorldTrajectory &&
+          row.torchItemPosition[0] == final.heldItems[0].worldFromItem[12] &&
+          row.torchItemPosition[1] == final.heldItems[0].worldFromItem[13] &&
+          row.torchItemPosition[2] == final.heldItems[0].worldFromItem[14] &&
+          json.str().find(expectedItem.str()) != std::string::npos &&
+          json.str().find("\"flameStrength\":0") != std::string::npos,
+          "real settled row JSON preserves world trajectory attachment, resolved item position and flame strength");
+
+    auto malformed = final;
+    malformed.heldItems[0].worldFromItem[12] = std::numeric_limits<float>::quiet_NaN();
+    MotionEvidenceLedger invalidPosition;
+    Check(invalidPosition.Begin("invalid_torch_position", MotionScenario::TorchDrench) &&
+          !invalidPosition.AppendState(now + 1u, malformed, publication, scenario, {}) &&
+          invalidPosition.States().empty(),
+          "non-finite resolved world item position is rejected before row capture");
+    malformed = final;
+    malformed.torchFailure.flameStrength = 1.01f;
+    MotionEvidenceLedger invalidStrength;
+    Check(invalidStrength.Begin("invalid_torch_strength", MotionScenario::TorchDrench) &&
+          !invalidStrength.AppendState(now + 1u, malformed, publication, scenario, {}) &&
+          invalidStrength.States().empty(),
+          "out-of-range torch flame strength is rejected before row capture");
+}
+
+void TestTorchDrenchFailureBeforeTrigger()
+{
+    GameSimulation simulation(ProductionGameSimulationConfig());
+    MotionEvidenceScenario scenario;
+    Check(scenario.Begin(MotionScenario::TorchDrench, simulation, 3'000'000'000ull),
+          "negative drench fixture starts from the ordinary checkpoint");
+    auto injected = simulation.Snapshot();
+    injected.torchFailure.triggered = true;
+    injected.torchFailure.heldByPlayer = false;
+    injected.torchFailure.phase = TorchFailurePhase::Falling;
+    injected.interaction.heldLightKind = interactions::HeldLightKind::None;
+    scenario.ObserveAdvance(injected, {});
+    Check(scenario.Failed() && scenario.Failure() == "Automatic torch-drench trigger lacked its single semantic event.",
+          "trigger state without the production event fails before it can become accepted evidence");
+
+    MotionEvidenceScenario duplicate;
+    Check(duplicate.Begin(MotionScenario::TorchDrench, simulation, 3'000'000'003ull),
+          "duplicate event fixture starts from the ordinary checkpoint");
+    std::array<GameplayEvent, 2u> repeated{};
+    repeated[0].sequence = 1u;
+    repeated[1].sequence = 2u;
+    for (auto& event : repeated) event.type = GameplayEventType::TorchExtinguished;
+    duplicate.ObserveAdvance(injected, repeated);
+    Check(duplicate.Failed() && duplicate.Failure() == "Automatic torch-drench emitted a duplicate extinguish event.",
+          "duplicate drench semantic edges cannot certify a single torch drop");
+
+    MotionEvidenceScenario interrupted;
+    Check(interrupted.Begin(MotionScenario::TorchDrench, simulation, 3'000'000'001ull),
+          "interruption fixture starts from the ordinary checkpoint");
+    interrupted.Fail("injected owner interruption");
+    const auto stopped = interrupted.BuildInput(simulation.Snapshot(), {}, 3'000'000'002ull, true);
+    Check(interrupted.Failed() && stopped.paused && stopped.moveForward == 0.0f && stopped.moveStrafe == 0.0f,
+          "interrupted owner publishes a paused zero-axis input");
+}
 void TestRearLookCannotBeSkipped()
 {
     GameSimulation simulation(ProductionGameSimulationConfig());
@@ -630,10 +792,12 @@ int main(int argc, char** argv)
     TestEquipmentEventAdmission();
     TestSwordTransitionLedgerIsolation();
     TestAdmissionAndFrameBinding();
+    TestTorchDrenchFailureBeforeTrigger();
     TestRearLookCannotBeSkipped();
     for (int rate : {15, 30, 60, 120})
     {
         TestWaterfallEquipmentSeedOwnership(rate);
+        RunTorchDrench(rate);
         for (const auto kind : {MotionScenario::TorchLowOpening, MotionScenario::ShaftUp,
                                MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward,
                                MotionScenario::WaterfallEquipment})
