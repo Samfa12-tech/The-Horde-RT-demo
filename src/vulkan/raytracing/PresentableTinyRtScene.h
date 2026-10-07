@@ -11,6 +11,7 @@
 #include <vulkan/vulkan.h>
 
 #include "gameplay/SwordCombat.h"
+#include "graphics/RtPresentationTransform.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/HeldItemState.h"
@@ -85,6 +86,8 @@ struct RtSceneFrameInputs
     std::uint64_t tickIndex = 0u;
     float cameraYaw = 0.0f;
     float cameraPitch = 0.0f;
+    horde::graphics::RtPresentationTransform presentationTransform =
+        horde::graphics::RtPresentationTransform::Identity;
     float torchLightStrength = 1.0f;
     float walkTime = 0.0f;
     float cameraX = 0.0f;

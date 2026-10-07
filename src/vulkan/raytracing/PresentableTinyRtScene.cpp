@@ -163,6 +163,8 @@ struct ScenePushConstants
     float cameraX = 0.0f;
     float cameraZ = 1.85f;
     float walkAmount = 0.0f;
+    // Integer-valued output mode: bit 0 swaps R/B, bits 1-3 select the
+    // primary-ray presentation transform. Identity preserves released 0/1.
     float outputRedBlueSwap = 0.0f;
     float outputExposure = 0.92f;
     float damageFlash = 0.0f;
@@ -7184,7 +7186,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         frame.cameraX,
         frame.cameraZ,
         frame.walkAmount,
-        presentationUsesBgra_ && !scaledPresentation ? 1.0f : 0.0f,
+        static_cast<float>(horde::graphics::EncodeRtPresentationOutputMode(
+            frame.presentationTransform, presentationUsesBgra_ && !scaledPresentation)),
         std::clamp(frame.outputExposure, sceneProfile_ == RtSceneProfile::EntryMenu ? 0.0f : 0.2f,
                    1.4f),
         std::clamp(frame.combat.damageFlash, 0.0f, 1.0f),
@@ -7210,7 +7213,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         static_cast<float>(tuning.workloadPreset),
         genericTransmissionActive_ ? 1.0f : 0.0f,
         guidanceLight.strength};
-    lastOutputRedBlueSwapApplied_ = pushConstants.outputRedBlueSwap > 0.5f;
+    lastOutputRedBlueSwapApplied_ = horde::graphics::DecodeRtPresentationRedBlueSwap(
+        static_cast<std::uint32_t>(pushConstants.outputRedBlueSwap));
     vkCmdPushConstants(commandBuffer,
                        pipelineBundle_.pipelineLayout,
                        executionPolicy_.pushConstantStages,

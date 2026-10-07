@@ -57,6 +57,10 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_surface_presentation_policy_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_surface_presentation_policy_tests COMMAND horde_rt_surface_presentation_policy_tests)
 
+    add_executable(horde_rt_presentation_transform_tests tests/RtPresentationTransformTests.cpp)
+    target_include_directories(horde_rt_presentation_transform_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_presentation_transform_tests COMMAND horde_rt_presentation_transform_tests)
+
     add_executable(horde_rt_compiled_pipeline_cache_tests tests/RtCompiledPipelineCacheTests.cpp)
     target_include_directories(horde_rt_compiled_pipeline_cache_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_compiled_pipeline_cache_tests COMMAND horde_rt_compiled_pipeline_cache_tests)

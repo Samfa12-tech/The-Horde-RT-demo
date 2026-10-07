@@ -32,11 +32,12 @@ int main()
                                         mirrorRotate90, mirrorRotate180, mirrorRotate270})
     {
         const auto policy = ChooseSurfacePresentationPolicy(kSurfaceTransformIdentity | current, current);
-        Require(policy.chosenPreTransform == kSurfaceTransformIdentity,
-                "supported identity must be selected for every non-identity current transform");
+        Require(policy.chosenPreTransform == current,
+                "swapchain must match the current surface transform even when identity is supported");
         Require(policy.identitySupported, "supported identity must be reported");
-        Require(!policy.rtPreRotationRequired,
-                "identity pre-transform must not claim an RT pre-rotation is required");
+        Require(policy.rtPreRotationRequired,
+                "non-identity surfaces require primary-ray pre-rotation");
+        Require(policy.transformSupported, "all concrete supported transforms must be admitted");
     }
 
     const auto fallback = ChooseSurfacePresentationPolicy(rotate90 | rotate180, rotate90);
@@ -44,7 +45,9 @@ int main()
             "unsupported identity must retain the surface current transform");
     Require(!fallback.identitySupported, "fallback must report identity as unsupported");
     Require(fallback.rtPreRotationRequired,
-            "non-identity fallback must expose the unhandled RT pre-rotation requirement");
+            "non-identity surface must request RT pre-rotation");
+    Require(fallback.rtTransform == horde::graphics::RtPresentationTransform::Rotate90,
+            "surface flags must map to the shared RT presentation transform");
 
     const auto identityCurrent = ChooseSurfacePresentationPolicy(rotate180, rotate180);
     Require(identityCurrent.chosenPreTransform == rotate180 && identityCurrent.rtPreRotationRequired,
@@ -55,5 +58,8 @@ int main()
     Require(identitySupportedCurrent.chosenPreTransform == kSurfaceTransformIdentity &&
                 !identitySupportedCurrent.rtPreRotationRequired,
             "identity surfaces must remain identity");
+    Require(!ChooseSurfacePresentationPolicy(0x100u, 0x100u).transformSupported &&
+                !ChooseSurfacePresentationPolicy(kSurfaceTransformIdentity, rotate90).transformSupported,
+            "inherit and unsupported concrete transforms must not claim a valid RT mapping");
     return 0;
 }

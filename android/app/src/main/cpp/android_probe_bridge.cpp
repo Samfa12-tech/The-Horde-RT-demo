@@ -246,6 +246,8 @@ struct SwapchainContext
     VkSurfaceTransformFlagBitsKHR surfaceCurrentTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     VkSurfaceTransformFlagBitsKHR swapchainPreTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     bool rtPreRotationRequired = false;
+    horde::graphics::RtPresentationTransform rtPresentationTransform =
+        horde::graphics::RtPresentationTransform::Identity;
     float renderScale = kDefaultAndroidRtRenderScale;
     horde::graphics::GraphicsSettings graphicsSettings = horde::graphics::PlatformDefaultGraphicsSettings(horde::graphics::GraphicsPlatform::Android);
     horde::graphics::GraphicsSettings graphicsRequested{};
@@ -2273,10 +2275,22 @@ bool CreateSwapchain(SwapchainContext& context)
     const auto presentationPolicy = horde::platform::android::ChooseSurfacePresentationPolicy(
         static_cast<std::uint32_t>(capabilities.supportedTransforms),
         static_cast<std::uint32_t>(capabilities.currentTransform));
+    if (!presentationPolicy.transformSupported)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, kTag,
+            "Surface transform 0x%08x has no supported RT pre-rotation mapping.",
+            static_cast<unsigned int>(capabilities.currentTransform));
+        return false;
+    }
     context.swapchainPreTransform = static_cast<VkSurfaceTransformFlagBitsKHR>(
         presentationPolicy.chosenPreTransform);
     context.rtPreRotationRequired = presentationPolicy.rtPreRotationRequired;
+    context.rtPresentationTransform = presentationPolicy.rtTransform;
     context.swapchainExtent = ClampExtent(capabilities, std::max(1u, width), std::max(1u, height));
+    // Swapchain/storage images use the surface's natural orientation. Primary
+    // rays use the oriented view aspect; native UI remains in window coordinates.
+    if (horde::graphics::RtPresentationTransformSwapsAxes(context.rtPresentationTransform))
+        std::swap(context.swapchainExtent.width, context.swapchainExtent.height);
     context.swapchainFormat = chosenFormat.format;
     context.swapchainColorSpace = chosenFormat.colorSpace;
     context.swapchainPresentMode = chosenPresentMode;
@@ -2920,12 +2934,6 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
         context.swapchainExtent.width, context.swapchainExtent.height,
         dispatchExtent.width, dispatchExtent.height,
         context.rtPreRotationRequired ? 1 : 0);
-    if (context.rtPreRotationRequired)
-    {
-        __android_log_print(ANDROID_LOG_WARN, kTag,
-            "Surface does not support identity pre-transform; retaining current transform 0x%08x. RT pre-rotation is not implemented, so this orientation may render incorrectly.",
-            static_cast<unsigned int>(context.surfaceCurrentTransform));
-    }
 
     return true;
 }
@@ -3627,6 +3635,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             frameInputs.tuning.productionLanternGlassOnly =
                 context.productionLanternGlassOnly;
         }
+        frameInputs.presentationTransform = context.rtPresentationTransform;
         std::string diagnostic;
         if (evidenceFrame)
         {
@@ -3863,6 +3872,12 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR ||
         (presentResult == VK_SUCCESS && acquireResult == VK_SUBOPTIMAL_KHR))
     {
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+            "HORDE_SURFACE_RECREATE generation=%llu acquire_result=%d present_result=%d active_pre_transform=0x%08x active_extent=%ux%u",
+            static_cast<unsigned long long>(context.surfaceGeneration),
+            static_cast<int>(acquireResult), static_cast<int>(presentResult),
+            static_cast<unsigned int>(context.swapchainPreTransform),
+            context.swapchainExtent.width, context.swapchainExtent.height);
         rtFramePresented = useRtFrame && (presentResult == VK_SUCCESS || presentResult == VK_SUBOPTIMAL_KHR);
         if (inAppBenchmarkFrame)
         {

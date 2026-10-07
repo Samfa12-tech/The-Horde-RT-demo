@@ -46,6 +46,8 @@ layout(push_constant) uniform SceneControls
     float cameraX;
     float cameraZ;
     float walkAmount;
+    // Packed integer mode: bit 0 swaps R/B; bits 1-3 select pre-rotation.
+    // Identity retains released values 0/1 and the 32-float push ABI.
     float outputRedBlueSwap;
     float outputExposure;
     float damageFlash;

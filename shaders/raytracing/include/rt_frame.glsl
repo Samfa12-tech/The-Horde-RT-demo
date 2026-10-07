@@ -16,7 +16,17 @@ void main()
     }
 #endif
     vec2 uv = (vec2(HORDE_RT_PIXEL_ID.xy) + vec2(0.5)) / vec2(HORDE_RT_PIXEL_EXTENT.xy);
+    uint outputMode = uint(controls.outputRedBlueSwap + 0.5);
+    uint presentationTransform = (outputMode >> 1u) & 7u;
+    uint rotation = presentationTransform & 3u;
+    // Sample the upright view in the inverse of the surface's clockwise
+    // mirror-then-rotate mapping; store to the original image pixel below.
+    if (rotation == 1u) uv = vec2(uv.y, 1.0 - uv.x);
+    else if (rotation == 2u) uv = vec2(1.0) - uv;
+    else if (rotation == 3u) uv = vec2(1.0 - uv.y, uv.x);
+    if (presentationTransform >= 4u) uv.x = 1.0 - uv.x;
     float aspect = float(HORDE_RT_PIXEL_EXTENT.x) / max(float(HORDE_RT_PIXEL_EXTENT.y), 1.0);
+    if (rotation == 1u || rotation == 3u) aspect = 1.0 / aspect;
     float step = controls.time * 6.2;
     vec3 origin = vec3(controls.cameraX + sin(step * 0.5) * 0.035 * controls.walkAmount,
                        0.70 + abs(sin(step)) * 0.035 * controls.walkAmount,
@@ -70,7 +80,7 @@ void main()
     color += vec3(0.46, 0.012, 0.004) * controls.damageFlash * (0.28 + 0.72 * (1.0 - vignette));
     color = linearToSrgb(toneMapAces(max(color, vec3(0.0)) * controls.outputExposure));
     // The RT storage image is RGBA, while common Android/Windows swapchains are BGRA and receive a raw image copy.
-    if (controls.outputRedBlueSwap > 0.5)
+    if ((outputMode & 1u) != 0u)
     {
         color = color.bgr;
     }
