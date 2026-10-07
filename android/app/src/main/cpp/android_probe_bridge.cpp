@@ -180,6 +180,7 @@ struct SwapchainContext
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
+    VkPipelineCache pipelineCache = VK_NULL_HANDLE;
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     uint32_t graphicsQueueFamilyIndex = 0u;
     VkSurfaceKHR surface = VK_NULL_HANDLE;
@@ -2765,7 +2766,8 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     diagnostic,
                                     {},
                                     context.reportDirectory + "/..",
-                                    context.executionBackend, context.sceneProfile, context.graphicsSettings.glassEnabled);
+                                    context.executionBackend, context.sceneProfile, context.graphicsSettings.glassEnabled,
+                                    context.pipelineCache);
     // Bounded per-attempt CPU evidence; never emit frame-by-frame timings.
     // Log each attempt here so a subsequent rollback cannot overwrite it.
     const auto& measurements = context.rtScene.InitialiseMeasurements();
@@ -2896,6 +2898,11 @@ bool DestroySwapchainContext(SwapchainContext& context)
     CancelActiveInAppBenchmark(context);
     DestroyRtEvidenceOnOwnerThread(context);
     context.rtScene.Destroy();
+    if (context.pipelineCache != VK_NULL_HANDLE)
+    {
+        vkDestroyPipelineCache(context.device, context.pipelineCache, nullptr);
+        context.pipelineCache = VK_NULL_HANDLE;
+    }
     context.gpuFrameTimer.Destroy();
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.stagedPassTimer.Destroy();
@@ -4460,6 +4467,16 @@ bool StartSurfaceInternal(ANativeWindow* window,
         DestroySwapchainContext(context);
         return false;
     }
+    const VkPipelineCacheCreateInfo pipelineCacheInfo{VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO};
+    const VkResult pipelineCacheResult = context.useRtPath
+        ? vkCreatePipelineCache(context.device, &pipelineCacheInfo, nullptr, &context.pipelineCache)
+        : VK_NOT_READY;
+    if (pipelineCacheResult != VK_SUCCESS) context.pipelineCache = VK_NULL_HANDLE;
+    __android_log_print(pipelineCacheResult == VK_SUCCESS || !context.useRtPath
+            ? ANDROID_LOG_INFO : ANDROID_LOG_WARN, kTag,
+        "HORDE_PIPELINE_CACHE_CREATE attempted=%d result=%d available=%d generation=%llu",
+        context.useRtPath ? 1 : 0, static_cast<int>(pipelineCacheResult), context.pipelineCache != VK_NULL_HANDLE ? 1 : 0,
+        static_cast<unsigned long long>(generation));
     context.capabilities.diagnostics.push_back(horde::vulkan::PresentCompletionDiagnostic(context.presentCompletionMode));
 
     if (!CreateSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))

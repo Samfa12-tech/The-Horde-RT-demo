@@ -320,6 +320,7 @@ struct VulkanSurfaceContext
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
+    VkPipelineCache pipelineCache = VK_NULL_HANDLE;
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     uint32_t graphicsQueueFamilyIndex = 0u;
     VkSurfaceKHR surface = VK_NULL_HANDLE;
@@ -4625,7 +4626,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
                                 diagnostic,
                                 developmentStaticAssetDirectory,
                                 assetRoot.string(),
-                                ctx.executionBackend, ctx.sceneProfile, ctx.requestedGlassEnabled))
+                                ctx.executionBackend, ctx.sceneProfile, ctx.requestedGlassEnabled,
+                                ctx.pipelineCache))
     {
         std::cerr << "Failed to initialise presentable RT scene: " << diagnostic << '\n';
         ctx.lastRtFrameError = diagnostic;
@@ -4773,6 +4775,11 @@ bool DestroyRenderContext(VulkanSurfaceContext& ctx)
         ctx.rtFrameEvidenceInitialised = false;
     }
     ctx.rtScene.Destroy();
+    if (ctx.pipelineCache != VK_NULL_HANDLE)
+    {
+        vkDestroyPipelineCache(ctx.device, ctx.pipelineCache, nullptr);
+        ctx.pipelineCache = VK_NULL_HANDLE;
+    }
     ctx.gpuFrameTimer.Destroy();
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     ctx.stagedPassTimer.Destroy();
@@ -6638,6 +6645,14 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         (void)renderOwner.Retire();
         return 1;
     }
+    const VkPipelineCacheCreateInfo pipelineCacheInfo{VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO};
+    const VkResult pipelineCacheResult = context.useRtPath
+        ? vkCreatePipelineCache(context.device, &pipelineCacheInfo, nullptr, &context.pipelineCache)
+        : VK_NOT_READY;
+    if (pipelineCacheResult != VK_SUCCESS) context.pipelineCache = VK_NULL_HANDLE;
+    std::cerr << "HORDE_PIPELINE_CACHE_CREATE attempted=" << (context.useRtPath ? 1 : 0)
+              << " result=" << pipelineCacheResult
+              << " available=" << (context.pipelineCache != VK_NULL_HANDLE ? 1 : 0) << '\n';
     capabilities.diagnostics.push_back(horde::vulkan::PresentCompletionDiagnostic(context.presentCompletionMode));
 
     if (!CreateSwapchain(context, hWnd))

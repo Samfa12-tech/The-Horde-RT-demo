@@ -222,7 +222,8 @@ public:
                     const std::string& productionAssetRoot = {},
                     RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline,
                     RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
-                    bool glassEnabled = true);
+                    bool glassEnabled = true,
+                    VkPipelineCache pipelineCache = VK_NULL_HANDLE);
 
     void Destroy();
 
@@ -640,7 +641,8 @@ private:
         const std::string& productionAssetRoot,
         const InitialiseOrchestrationApi& api,
         RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
-        bool glassEnabled = true);
+        bool glassEnabled = true,
+        VkPipelineCache pipelineCache = VK_NULL_HANDLE);
     void ApplyGlassFixtureVisibility(std::span<VkAccelerationStructureInstanceKHR> instances) const;
     bool ContinueInitialiseAfterPreflight(
         VkFormat presentationFormat,
@@ -762,6 +764,8 @@ private:
     VkDevice device_ = VK_NULL_HANDLE;
     VkQueue queue_ = VK_NULL_HANDLE;
     VkCommandPool commandPool_ = VK_NULL_HANDLE;
+    // Borrowed from the logical-device owner; never destroyed by this scene.
+    VkPipelineCache pipelineCache_ = VK_NULL_HANDLE;
     VkExtent2D dispatchExtent_{};
     bool presentationUsesBgra_ = false;
     bool scaledBlitSupported_ = false;

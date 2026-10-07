@@ -458,6 +458,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     physicalDevice_ = std::exchange(other.physicalDevice_, nullptr);
     instance_ = std::exchange(other.instance_, nullptr);
     device_ = std::exchange(other.device_, nullptr);
+    pipelineCache_ = std::exchange(other.pipelineCache_, VK_NULL_HANDLE);
     queue_ = std::exchange(other.queue_, nullptr);
     commandPool_ = std::exchange(other.commandPool_, VK_NULL_HANDLE);
     dispatchExtent_ = std::exchange(other.dispatchExtent_, VkExtent2D{});
@@ -727,7 +728,8 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         const std::string& productionAssetRoot,
                                         RtExecutionBackend executionBackend,
                                         RtSceneProfile sceneProfile,
-                                        bool glassEnabled)
+                                        bool glassEnabled,
+                                        VkPipelineCache pipelineCache)
 {
     InitialiseOrchestrationApi api{};
     api.user = &executionBackend;
@@ -750,7 +752,7 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         instance, physicalDevice, device, queue, commandPool, dispatchExtent,
         presentationFormat, skeletonAssetPath, lichAssetPath,
         materialAssetDirectory, lichTextureDirectory, diagnostic,
-        developmentStaticAssetDirectory, productionAssetRoot, api, sceneProfile, glassEnabled);
+        developmentStaticAssetDirectory, productionAssetRoot, api, sceneProfile, glassEnabled, pipelineCache);
 }
 
 bool PresentableTinyRtScene::InitialiseWithOrchestration(
@@ -770,7 +772,8 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
     const std::string& productionAssetRoot,
     const InitialiseOrchestrationApi& api,
     const RtSceneProfile sceneProfile,
-    const bool glassEnabled)
+    const bool glassEnabled,
+    const VkPipelineCache pipelineCache)
 {
     Destroy();
     initialiseMeasurements_ = {};
@@ -782,6 +785,7 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
     device_ = device;
     queue_ = queue;
     commandPool_ = commandPool;
+    pipelineCache_ = pipelineCache;
     dispatchExtent_ = dispatchExtent;
     presentationUsesBgra_ = presentationFormat == VK_FORMAT_B8G8R8A8_UNORM || presentationFormat == VK_FORMAT_B8G8R8A8_SRGB;
     if (instance_ == VK_NULL_HANDLE || physicalDevice_ == VK_NULL_HANDLE || device_ == VK_NULL_HANDLE || queue_ == VK_NULL_HANDLE || commandPool_ == VK_NULL_HANDLE)
@@ -990,6 +994,7 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
 
 void PresentableTinyRtScene::Destroy()
 {
+    pipelineCache_ = VK_NULL_HANDLE; // Borrowed device cache remains owned by the platform context.
     uploadedQualityControls_ = {};
     uploadedFireQuality_ = FireEmitterQuality::Mobile;
     uploadedQualityControlsValid_ = false;
@@ -5277,7 +5282,7 @@ bool PresentableTinyRtScene::CreateBundleStrategyPipeline(
         pipelineInfo.stage = {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, nullptr, 0u,
                               VK_SHADER_STAGE_COMPUTE_BIT, raygenModule, "main", nullptr};
         pipelineInfo.layout = layout;
-        const VkPipelineCache pipelineCache = VK_NULL_HANDLE;
+        const VkPipelineCache pipelineCache = pipelineCache_;
         timing.attempted = true;
         timing.pipelineCacheWasNull = pipelineCache == VK_NULL_HANDLE;
         VkResult result = VK_NOT_READY;
@@ -5327,7 +5332,7 @@ bool PresentableTinyRtScene::CreateBundleStrategyPipeline(
     pipelineInfo.pGroups = groups.data();
     pipelineInfo.maxPipelineRayRecursionDepth = 1u;
     pipelineInfo.layout = layout;
-    const VkPipelineCache pipelineCache = VK_NULL_HANDLE;
+    const VkPipelineCache pipelineCache = pipelineCache_;
     timing.attempted = true;
     timing.pipelineCacheWasNull = pipelineCache == VK_NULL_HANDLE;
     VkResult result = VK_NOT_READY;

@@ -19,6 +19,7 @@ struct PresentableTinyRtScenePreflightTestAccess {
         std::string_view qualityDuringOwnership{};
         bool glassDuringOwnership = true;
         RtSceneProfile profileDuringOwnership = RtSceneProfile::Showcase;
+        VkPipelineCache pipelineCacheDuringOwnership = VK_NULL_HANDLE;
     };
 
     struct ResolverFixture {
@@ -33,7 +34,8 @@ struct PresentableTinyRtScenePreflightTestAccess {
                            Ledger& ledger,
                            std::string& diagnostic,
                            bool glassEnabled = true,
-                           RtSceneProfile profile = RtSceneProfile::Showcase)
+                           RtSceneProfile profile = RtSceneProfile::Showcase,
+                           VkPipelineCache pipelineCache = VK_NULL_HANDLE)
     {
         ResolverFixture fixture{request, candidates, &ledger};
         PresentableTinyRtScene::InitialiseOrchestrationApi api{};
@@ -55,6 +57,7 @@ struct PresentableTinyRtScenePreflightTestAccess {
             state.ledger->qualityDuringOwnership = scene.SelectedDielectricQualityName();
             state.ledger->glassDuringOwnership = scene.GlassEnabled();
             state.ledger->profileDuringOwnership = scene.Profile();
+            state.ledger->pipelineCacheDuringOwnership = scene.pipelineCache_;
             return false;
         };
         const auto poison = [](std::uintptr_t value) {
@@ -67,7 +70,7 @@ struct PresentableTinyRtScenePreflightTestAccess {
             reinterpret_cast<VkQueue>(poison(4u)),
             reinterpret_cast<VkCommandPool>(poison(5u)),
             VkExtent2D{1u, 1u}, VK_FORMAT_B8G8R8A8_UNORM,
-            {}, {}, {}, {}, diagnostic, {}, {}, api, profile, glassEnabled);
+            {}, {}, {}, {}, diagnostic, {}, {}, api, profile, glassEnabled, pipelineCache);
     }
 
     static void ResetSelectedBundle(PresentableTinyRtScene& scene)
@@ -138,15 +141,21 @@ int main()
 
     PresentableTinyRtScenePreflightTestAccess::Ledger observationLedger{};
     std::string observationDiagnostic;
+#if VK_USE_64_BIT_PTR_DEFINES
+    const VkPipelineCache suppliedPipelineCache = reinterpret_cast<VkPipelineCache>(std::uintptr_t{6u});
+#else
+    const VkPipelineCache suppliedPipelineCache = static_cast<VkPipelineCache>(6u);
+#endif
     const bool observationInitialised = PresentableTinyRtScenePreflightTestAccess::Initialise(
         observedScene, provider.request(), std::array{*opaque, *generic},
-        observationLedger, observationDiagnostic);
+        observationLedger, observationDiagnostic, true, RtSceneProfile::Showcase, suppliedPipelineCache);
     const std::string_view expectedQuality = provider.request().quality == DielectricQuality::Mobile
         ? "Mobile" : "High";
     ok &= Require(!observationInitialised && observationLedger.selectedDuringOwnership &&
                       observationLedger.qualityDuringOwnership == expectedQuality &&
-                      observedScene.SelectedDielectricQualityName() == expectedQuality,
-                  "scene quality observation must reflect the adopted preflight during and after the ownership seam");
+                      observedScene.SelectedDielectricQualityName() == expectedQuality &&
+                      observationLedger.pipelineCacheDuringOwnership == suppliedPipelineCache,
+                  "scene quality and borrowed cache observations must reach the ownership seam");
     PresentableTinyRtScenePreflightTestAccess::ResetSelectedBundle(observedScene);
     ok &= Require(observedScene.SelectedDielectricQualityName().empty(),
                   "reset scene bundle must report no dielectric quality");
@@ -160,8 +169,9 @@ int main()
         const bool result = PresentableTinyRtScenePreflightTestAccess::Initialise(
             offScene, provider.request(), genuinePair, offLedger, offDiagnostic, false, profile);
         ok &= Require(!result && offLedger.ownershipCalls == 1u && !offLedger.glassDuringOwnership &&
-                          offLedger.profileDuringOwnership == profile && !offScene.GlassEnabled(),
-                      "Glass Off must reach ownership after preflight for both scene profiles");
+                          offLedger.profileDuringOwnership == profile && !offScene.GlassEnabled() &&
+                          offLedger.pipelineCacheDuringOwnership == VK_NULL_HANDLE,
+                      "legacy Glass Off fixtures must reach ownership with a null borrowed cache");
         offScene.Destroy();
         ok &= Require(offScene.GlassEnabled() && offScene.Profile() == RtSceneProfile::Showcase,
                       "destroy resets Glass On and Showcase defaults together");
