@@ -1,0 +1,123 @@
+combined_line_number,line_id,spoken_text,voice_asset_path
+1,prologue.kit_grate,"Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful!",audio/voice/en/prologue.kit_grate.wav
+2,rescue.found,There you are. Still in one piece?,audio/voice/en/rescue.found.wav
+3,rescue.rope,Stay clear. Rope coming down.,audio/voice/en/rescue.rope.wav
+4,reunion.question,Steady. Catch your breath. Did you find it?,audio/voice/en/reunion.question.wav
+5,reunion.hint,Let me see. Raise it.,audio/voice/en/reunion.hint.wav
+6,reunion.proof,Then we're not chasing a story anymore.,audio/voice/en/reunion.proof.wav
+7,reunion.first_piece,"A start, then. Let's see where it leads.",audio/voice/en/reunion.first_piece.wav
+8,reunion.depart,Come on. There's a fire and a dry seat waiting in the village.,audio/voice/en/reunion.depart.wav
+9,forest.night,I'd forgotten how big the sky was.,audio/voice/en/forest.night.wav
+10,forest.waystone,Hold it there. There are marks under the moss.,audio/voice/en/forest.waystone.wav
+11,forest.clue,"A road to the treasury, perhaps. Someone in the village might read it.",audio/voice/en/forest.clue.wav
+12,forest.wait,I'll wait here.,audio/voice/en/forest.wait.wav
+13,forest.village,There. Chimney smoke.,audio/voice/en/forest.village.wav
+14,kit.accept_base.sit,Right. I’m sitting down before I make this worse.,audio/voice/en/kit.accept_base.sit.wav
+15,kit.accept_base.limit,I won’t get far along those roads like this. You’ll have to go without me.,audio/voice/en/kit.accept_base.limit.wav
+16,kit.accept_base.work,Bring what you find back here. I can still make myself useful.,audio/voice/en/kit.accept_base.work.wav
+17,hub.kit_introduce,The tomb was there. So was something worth the climb.,audio/voice/en/hub.kit_introduce.wav
+18,kit.arrival_introduction.table,"There’s room on the table, if you want to show them.",audio/voice/en/kit.arrival_introduction.table.wav
+19,hub.hoard_answer,Armies need paying. I'm hoping we're both right.,audio/voice/en/hub.hoard_answer.wav
+20,hub.kit_stake,I'd like a roof that doesn't fall in. Treasure still seems a fair way to get one.,audio/voice/en/hub.kit_stake.wav
+21,kit.personal_stake.key,A door with my own key. I’ve had worse reasons for going digging.,audio/voice/en/kit.personal_stake.key.wav
+22,kit.shrine_departure.leave,"Off to the shrine, then. Leave a space in your bag for the register.",audio/voice/en/kit.shrine_departure.leave.wav
+23,kit.shrine_departure.return,And come back even if there’s nothing in it. I’d rather hear that than keep wondering.,audio/voice/en/kit.shrine_departure.return.wav
+24,kit.shrine_empty_return.welcome,You’re back. Come and sit for a bit.,audio/voice/en/kit.shrine_empty_return.welcome.wav
+25,kit.shrine_empty_return.blank,"Still a blank on the route, then. We can have another look at what you brought from the tomb.",audio/voice/en/kit.shrine_empty_return.blank.wav
+26,kit.shrine_register_return.found,You found it. Let’s have a look.,audio/voice/en/kit.shrine_register_return.found.wav
+27,kit.shrine_register_return.routes,Abbey. Foundry. Glass Court. More road than I’d hoped for.,audio/voice/en/kit.shrine_register_return.routes.wav
+28,kit.shrine_register_return.work,Leave it open there. I can work through the marks while you’re seeing to your gear.,audio/voice/en/kit.shrine_register_return.work.wav
+29,kit.voice_reaction,"Next time, a little warning before the lamp starts talking.",audio/voice/en/kit.voice_reaction.wav
+30,kit.first_direct_voice.finish,"Go on, then. I’m listening.",audio/voice/en/kit.first_direct_voice.finish.wav
+31,kit.royal_claim.king,King Veyr. That’s quite a claim to make from inside a lamp.,audio/voice/en/kit.royal_claim.king.wav
+32,kit.royal_claim.help,"If you know the roads, help us get there and back. We can start with that.",audio/voice/en/kit.royal_claim.help.wav
+33,kit.shared_table.frustration,I keep thinking I ought to be packing beside you.,audio/voice/en/kit.shared_table.frustration.wav
+34,kit.shared_table.task,Put that end nearer the light. I can make out the old road marks.,audio/voice/en/kit.shared_table.task.wav
+35,kit.shared_table.partners,You bring the pieces back. We’ll see what they make together.,audio/voice/en/kit.shared_table.partners.wav
+36,kit.abbey_departure.route,"The Abbey, then. Keep the way back in mind before you go under.",audio/voice/en/kit.abbey_departure.route.wav
+37,kit.abbey_departure.empty,You can come back empty-handed. I’d sooner have you at the table.,audio/voice/en/kit.abbey_departure.empty.wav
+38,kit.abbey_incomplete_no_tool.arrive,That strap’s soaked through. Hang the pack here.,audio/voice/en/kit.abbey_incomplete_no_tool.arrive.wav
+39,kit.abbey_incomplete_no_tool.route,Show me where you turned back. We can start there next time.,audio/voice/en/kit.abbey_incomplete_no_tool.route.wav
+40,kit.abbey_incomplete_tool.turn,"Ah, you can turn the light without standing in its way.",audio/voice/en/kit.abbey_incomplete_tool.turn.wav
+41,kit.abbey_incomplete_tool.use,"Worth bringing that back, seal or no seal.",audio/voice/en/kit.abbey_incomplete_tool.use.wav
+42,kit.abbey_incomplete_tool.rest,Set it down for a bit. The Abbey will still be there.,audio/voice/en/kit.abbey_incomplete_tool.rest.wav
+43,abbey.kit_return,You brought half the river home. Anything worth drying?,audio/voice/en/abbey.kit_return.wav
+44,kit.abbey_seal_return.seal,There it is. Put it here where we can see it properly.,audio/voice/en/kit.abbey_seal_return.seal.wav
+45,kit.abbey_plunder_evidence.mark,I thought that was just a maker’s mark.,audio/voice/en/kit.abbey_plunder_evidence.mark.wav
+46,kit.abbey_plunder_evidence.home,Someone here still knows that mark. All that time under the water.,audio/voice/en/kit.abbey_plunder_evidence.home.wav
+47,kit.abbey_plunder_evidence.share,I was already wondering what it would fetch. I wish I’d looked more closely.,audio/voice/en/kit.abbey_plunder_evidence.share.wav
+48,kit.foundry_departure.route,"The Foundry road, then. Show me the crossing you’re taking.",audio/voice/en/kit.foundry_departure.route.wav
+49,kit.foundry_departure.return,There. I’ll know which road to watch for you on.,audio/voice/en/kit.foundry_departure.return.wav
+50,kit.foundry_incomplete_no_tool.soot,Hold still. You’ve got soot all round your eyes.,audio/voice/en/kit.foundry_incomplete_no_tool.soot.wav
+51,kit.foundry_incomplete_no_tool.pause,We can look at the road after you’ve had a wash. It won’t change while you’re here.,audio/voice/en/kit.foundry_incomplete_no_tool.pause.wav
+52,kit.foundry_incomplete_tool.hold,It holds the lantern for you. And that closes the light off?,audio/voice/en/kit.foundry_incomplete_tool.hold.wav
+53,kit.foundry_incomplete_tool.better,That’s better than wedging it between two stones.,audio/voice/en/kit.foundry_incomplete_tool.better.wav
+54,kit.foundry_incomplete_tool.keep,Keep it by your gear. It’s earned its place.,audio/voice/en/kit.foundry_incomplete_tool.keep.wav
+55,foundry.kit_return,You smell like the forge. Sit down before you fall down.,audio/voice/en/foundry.kit_return.wav
+56,kit.foundry_seal_return.seal,I’ll clear a space. Let’s see what all that smoke was hiding.,audio/voice/en/kit.foundry_seal_return.seal.wav
+57,kit.foundry_bond_evidence.line,Show me that line again.,audio/voice/en/kit.foundry_bond_evidence.line.wav
+58,kit.foundry_bond_evidence.death,"They died, and someone kept counting what they owed.",audio/voice/en/kit.foundry_bond_evidence.death.wav
+59,kit.foundry_bond_evidence.names,Leave the names uncovered. I want to read them.,audio/voice/en/kit.foundry_bond_evidence.names.wav
+60,kit.abbey_first.progress,One seal out of the Abbey. The Foundry’s still ahead.,audio/voice/en/kit.abbey_first.progress.wav
+61,kit.abbey_first.prepare,Have your gear seen to before you try that road. I’ll keep working on these marks.,audio/voice/en/kit.abbey_first.prepare.wav
+62,kit.foundry_first.progress,One seal out of the Foundry. The Abbey’s still ahead.,audio/voice/en/kit.foundry_first.progress.wav
+63,kit.foundry_first.prepare,Have another look at the crossing before you leave. I’ll keep at this.,audio/voice/en/kit.foundry_first.prepare.wav
+64,kit.two_seals.fit,"They fit. All that road, and they were made to sit together.",audio/voice/en/kit.two_seals.fit.wav
+65,kit.two_seals.court,The Glass Court. Let’s find out what we can before you climb to it.,audio/voice/en/kit.two_seals.court.wav
+66,return.kit_doubt,It knows every lock. Has it told us much about the people who lived behind them?,audio/voice/en/return.kit_doubt.wav
+67,kit.doubt_from_evidence.jailer,A jailer keeps someone in. I’d like to know who was afraid of whom.,audio/voice/en/kit.doubt_from_evidence.jailer.wav
+68,kit.doubt_from_evidence.useful,It’s been useful. That’s why I want to believe it.,audio/voice/en/kit.doubt_from_evidence.useful.wav
+69,kit.ordinary_treasure.want,I still like the sound of coin on a table. I haven’t become a saint in this chair.,audio/voice/en/kit.ordinary_treasure.want.wav
+70,kit.ordinary_treasure.use,Good boots. A sound roof. Those aren’t foolish things to want.,audio/voice/en/kit.ordinary_treasure.use.wav
+71,kit.ordinary_treasure.wait,We can count it later. Stay a while first.,audio/voice/en/kit.ordinary_treasure.wait.wav
+72,return.kit_enough,We've found more than I ever expected. I'd still like us both here to spend it.,audio/voice/en/return.kit_enough.wav
+73,kit.enough.waiting,I’m not good at waiting. Turns out I’m worse at pretending I don’t mind.,audio/voice/en/kit.enough.waiting.wav
+74,kit.named_relic_choice.value,It’s worth something. I won’t pretend it isn’t.,audio/voice/en/kit.named_relic_choice.value.wav
+75,kit.named_relic_choice.claim,But the claim holds up. That matters as well.,audio/voice/en/kit.named_relic_choice.claim.wav
+76,kit.named_relic_choice.time,You needn’t decide with the whole room watching.,audio/voice/en/kit.named_relic_choice.time.wav
+77,kit.named_relic_returned.place,They’ve put it where the light catches the mark.,audio/voice/en/kit.named_relic_returned.place.wav
+78,kit.named_relic_returned.worth,I can see why they wanted it back.,audio/voice/en/kit.named_relic_returned.worth.wav
+79,kit.named_relic_sold.candid,I know what the money’s worth. I was looking at it too.,audio/voice/en/kit.named_relic_sold.candid.wav
+80,kit.named_relic_sold.uneasy,"Still, I keep thinking about that mark.",audio/voice/en/kit.named_relic_sold.uneasy.wav
+81,kit.named_relic_kept.notice,"Still got it, then.",audio/voice/en/kit.named_relic_kept.notice.wav
+82,kit.named_relic_kept.wrap,"Wrap it properly. Whatever you decide, it’s had enough knocks.",audio/voice/en/kit.named_relic_kept.wrap.wav
+83,kit.mill_working.sound,Listen to that. It’s holding steady.,audio/voice/en/kit.mill_working.sound.wav
+84,kit.mill_working.use,A good use for what came out of those ruins.,audio/voice/en/kit.mill_working.use.wav
+85,kit.trade_reopened.wheels,Wheels on the road. There’s a sound I’ve missed.,audio/voice/en/kit.trade_reopened.wheels.wav
+86,kit.trade_reopened.room,We might have to share our quiet corner now. I can live with that.,audio/voice/en/kit.trade_reopened.room.wav
+87,kit.family_stays.unpack,They’re unpacking. They really are staying.,audio/voice/en/kit.family_stays.unpack.wav
+88,kit.family_stays.home,They must think there’s something worth staying for.,audio/voice/en/kit.family_stays.home.wav
+89,kit.recovery.progress,Getting about’s a little easier. I’ll take that.,audio/voice/en/kit.recovery.progress.wav
+90,kit.recovery.patience,Still not ready for those roads. I’m trying to be sensible about that.,audio/voice/en/kit.recovery.patience.wav
+91,kit.court_departure.ridge,I’ll be looking for you on the ridge road this time.,audio/voice/en/kit.court_departure.ridge.wav
+92,kit.court_departure.questions,Bring the answers back if you can. Bring yourself back either way.,audio/voice/en/kit.court_departure.questions.wav
+93,kit.court_incomplete_no_aperture.welcome,There’s a space beside the map. Show me where you got to.,audio/voice/en/kit.court_incomplete_no_aperture.welcome.wav
+94,kit.court_incomplete_no_aperture.later,We can leave the difficult part for a moment.,audio/voice/en/kit.court_incomplete_no_aperture.later.wav
+95,kit.court_incomplete_aperture.beam,That makes it a much narrower light.,audio/voice/en/kit.court_incomplete_aperture.beam.wav
+96,kit.court_incomplete_aperture.care,Put it with the others. I’ll move my things out of the way.,audio/voice/en/kit.court_incomplete_aperture.care.wav
+97,kit.court_evidence_debrief.order,The king’s seal. Beside the keepers’. Let me look at that.,audio/voice/en/kit.court_evidence_debrief.order.wav
+98,kit.court_evidence_debrief.cost,And opening it frees the soldiers as well. That part was true.,audio/voice/en/kit.court_evidence_debrief.cost.wav
+99,court.kit_response,Then we find a way to face it before we open anything.,audio/voice/en/court.kit_response.wav
+100,kit.final_preparation.table,Put the tools here. One at a time. Let’s make sure nothing’s been left behind.,audio/voice/en/kit.final_preparation.table.wav
+101,kit.final_preparation.practice,Show me again how they work together. Take your time.,audio/voice/en/kit.final_preparation.practice.wav
+102,kit.final_preparation.route,And show me the way back. I want that clear before you leave.,audio/voice/en/kit.final_preparation.route.wav
+103,kit.final_departure.want,I wish I were going with you. I know I’d only slow you down.,audio/voice/en/kit.final_departure.want.wav
+104,kit.final_departure.place,"I’ll be here. Same table, same dreadful chair.",audio/voice/en/kit.final_departure.place.wav
+105,kit.final_departure.return,Come back and complain about it with me.,audio/voice/en/kit.final_departure.return.wav
+106,finale.kit_alive,There you are. Come on. One step at a time.,audio/voice/en/finale.kit_alive.wav
+107,kit.final_town_reunion.chair,Kept your chair. Come and take it.,audio/voice/en/kit.final_town_reunion.chair.wav
+108,kit.treasure_home.real,It’s real. We’ve actually got some of it here.,audio/voice/en/kit.treasure_home.real.wav
+109,finale.kit_treasure,We'll need a bigger bag. Later.,audio/voice/en/finale.kit_treasure.wav
+110,kit.release_evidence.free,So it’s over. They’re free of it.,audio/voice/en/kit.release_evidence.free.wav
+111,kit.release_evidence.names,I’m glad we kept their names.,audio/voice/en/kit.release_evidence.names.wav
+112,epilogue.kit_roof,I asked about the room upstairs. Roof looks sound.,audio/voice/en/epilogue.kit_roof.wav
+113,kit.room_upstairs.stay,I’d like to stay a while. See what this place is like when we’re not passing through.,audio/voice/en/kit.room_upstairs.stay.wav
+114,kit.quiet_closure.here,It’s good having you here.,audio/voice/en/kit.quiet_closure.here.wav
+115,epilogue.kit_close,The rest can wait till morning.,audio/voice/en/epilogue.kit_close.wav
+116,tavern.preseals.kit.1,I could at least sort the packs.,audio/voice/en/tavern.preseals.kit.1.wav
+117,tavern.oneseal.kit.1,Bring back one piece I can look at without getting out of this chair.,audio/voice/en/tavern.oneseal.kit.1.wav
+118,tavern.oneseal.kit.3,Your tools aren’t in my chair. We’ve got room to compromise.,audio/voice/en/tavern.oneseal.kit.3.wav
+119,tavern.twoseals.kit.1,I’m getting to know this chair better than I meant to.,audio/voice/en/tavern.twoseals.kit.1.wav
+120,tavern.twoseals.kit.3,I’ll come back and complain in person. Better service.,audio/voice/en/tavern.twoseals.kit.3.wav
+121,tavern.finale.kit.1,There you are. Bring a chair over.,audio/voice/en/tavern.finale.kit.1.wav
+122,tavern.finale.kit.3,Yes. Do that first. I’m not going anywhere.,audio/voice/en/tavern.finale.kit.3.wav

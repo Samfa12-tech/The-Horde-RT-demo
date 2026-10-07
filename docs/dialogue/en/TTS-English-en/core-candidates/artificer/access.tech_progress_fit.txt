@@ -1,0 +1,1 @@
+Set the recovered fitting beside the old one. We need the fit, not just the right-looking metal.

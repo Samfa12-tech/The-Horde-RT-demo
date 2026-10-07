@@ -1,0 +1,51 @@
+combined_line_number,line_id,spoken_text,voice_asset_path
+1,lantern.first_help,The lower stone. Its hinge is hidden under the roots.,audio/voice/en/lantern.first_help.wav
+2,lantern.first_identity,I was king here. My keepers sealed me away.,audio/voice/en/lantern.first_identity.wav
+3,lantern.king_name,Veyr. If the name still means anything.,audio/voice/en/lantern.king_name.wav
+4,lantern.first_request,"Three seals guard the treasury. Find them, and I can put an end to this.",audio/voice/en/lantern.first_request.wav
+5,shrine.recap_mechanism,Look below the roots. The lower stone opens.,audio/voice/en/shrine.recap_mechanism.wav
+6,shrine.recap_register,Take the register back to Bellwether. It will help you find the seals.,audio/voice/en/shrine.recap_register.wav
+7,abbey.vista,Those are the Abbey towers. The entrance is below them.,audio/voice/en/abbey.vista.wav
+8,abbey.threshold,The bells called the road caravans to shelter.,audio/voice/en/abbey.threshold.wav
+9,abbey.attendants,They still tend the altar. Give them room.,audio/voice/en/abbey.attendants.wav
+10,abbey.reflector,That plate was made to turn light into the side chapel.,audio/voice/en/abbey.reflector.wav
+11,abbey.reflector_place,Set it where the lantern can reach it. Turn the plate towards the receiver.,audio/voice/en/abbey.reflector_place.wav
+12,abbey.reflector_feedback,Watch the receiver. You will see when the light reaches it.,audio/voice/en/abbey.reflector_feedback.wav
+13,abbey.reflector_hint,The shutter blocks it. Try the light from the other side.,audio/voice/en/abbey.reflector_hint.wav
+14,abbey.reflector_reset,Bring the plate back to the light. You can turn it again from there.,audio/voice/en/abbey.reflector_reset.wav
+15,abbey.claim_mark,That silver came from the river settlements. We called it tribute.,audio/voice/en/abbey.claim_mark.wav
+16,abbey.admission,They did not give it willingly.,audio/voice/en/abbey.admission.wav
+17,abbey.oath_connection,An army has to be paid. You have seen how long this one served.,audio/voice/en/abbey.oath_connection.wav
+18,abbey.boss_hint,Open the shutter. Let the reflected light reach him.,audio/voice/en/abbey.boss_hint.wav
+19,abbey.seal,The Abbey seal. Take it carefully.,audio/voice/en/abbey.seal.wav
+20,abbey.release_question,Their service should have ended with their lives. The treasury holds the bond.,audio/voice/en/abbey.release_question.wav
+21,foundry.threshold,This floor cast the army's pay. The furnaces below made its weapons.,audio/voice/en/foundry.threshold.wav
+22,foundry.workers,The shift never ended.,audio/voice/en/foundry.workers.wav
+23,foundry.stand,Set the lantern in the stand. The shutter will hold back its light.,audio/voice/en/foundry.stand.wav
+24,foundry.stand_receiver,Open it towards the receiver. Leave the light there while you move.,audio/voice/en/foundry.stand_receiver.wav
+25,foundry.stand_result,The mechanism stays open while the light reaches it.,audio/voice/en/foundry.stand_result.wav
+26,foundry.shadow_hint,That watcher follows the light. Close the shutter before you cross.,audio/voice/en/foundry.shadow_hint.wav
+27,foundry.stand_reset,Close the shutter. Take the lantern back and try the stand from here.,audio/voice/en/foundry.stand_reset.wav
+28,foundry.bond_record,Service until the last campaign is ended. That was the oath.,audio/voice/en/foundry.bond_record.wav
+29,foundry.blame,My keepers kept the bond alive. Every soldier is still paying for it.,audio/voice/en/foundry.blame.wav
+30,foundry.plunder_connection,The silver was brought home. The men never were.,audio/voice/en/foundry.plunder_connection.wav
+31,foundry.boss_stand_hint,Leave the light on the mechanism. Move round to the open shell.,audio/voice/en/foundry.boss_stand_hint.wav
+32,foundry.seal,Take the seal. We have kept them waiting long enough.,audio/voice/en/foundry.seal.wav
+33,return.voice_reply,I remember what was done here. I would rather you saw it than took my word.,audio/voice/en/return.voice_reply.wav
+34,court.missing_abbey,The Abbey seal is still missing. This gate needs both.,audio/voice/en/court.missing_abbey.wav
+35,court.missing_foundry,You still need the Foundry seal. One will not open this gate.,audio/voice/en/court.missing_foundry.wav
+36,court.missing_both,The Abbey and the Foundry. Bring both seals here.,audio/voice/en/court.missing_both.wav
+37,court.aperture_lesson,Fit the aperture. Narrow the light until it reaches only that receiver.,audio/voice/en/court.aperture_lesson.wav
+38,court.aperture_observe,Watch what changes when you move the beam away.,audio/voice/en/court.aperture_observe.wav
+39,court.aperture_hint,The broad light reaches both. Narrow it before you turn towards the next receiver.,audio/voice/en/court.aperture_hint.wav
+40,court.garden,I used to walk here after the snow.,audio/voice/en/court.garden.wav
+41,court.voice_accuses,Another keeper. You know what their mercy looks like.,audio/voice/en/court.voice_accuses.wav
+42,court.boss_aperture_hint,Narrow the beam. Hold it on the ward until the protection breaks.,audio/voice/en/court.boss_aperture_hint.wav
+43,court.ritual_truth,Open the bond and the soldiers go free. So do I.,audio/voice/en/court.ritual_truth.wav
+44,treasury.voice_promise,Every banner brought something home. I kept it all.,audio/voice/en/treasury.voice_promise.wav
+45,treasury.bound_dead,Break the bond. Their watch ends here.,audio/voice/en/treasury.bound_dead.wav
+46,treasury.risk_recap,The bond holds them here. It holds me too. There is no separate lock.,audio/voice/en/treasury.risk_recap.wav
+47,bark.lantern.air,Air above you.,audio/voice/en/bark.lantern.air.wav
+48,bark.lantern.smoke,Clear air through that arch.,audio/voice/en/bark.lantern.smoke.wav
+49,lantern.town_identity,I am Veyr. Your friend has found the road to my treasury.,audio/voice/en/lantern.town_identity.wav
+50,lantern.town_seals,"Three seals. The Abbey, the Foundry, and the Glass Court. Bring them together, and the road opens.",audio/voice/en/lantern.town_seals.wav

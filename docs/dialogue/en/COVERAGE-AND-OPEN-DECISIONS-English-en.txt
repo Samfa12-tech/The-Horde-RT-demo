@@ -1,0 +1,31 @@
+THE HORDE ENGLISH DIALOGUE COVERAGE AND REVIEW
+
+357 lines across 209 scenes; 3966 spoken words.
+78 of 84 bounded core conversation-state checkpoints have written candidates (92.9%). This is a candidate authoring-state inventory based on the agreed campaign and requested dialogue types, for review. It is not 90% of an unknown final script and it is not recording-ready coverage. Six detailed design states remain deferred; the optional boss set is outside the denominator. See the CSV for every counted state and its actual scene IDs.
+
+The 339 core candidates, 11 other decision-blocked candidates and 7 optional-final-boss candidates are separate TTS groups. All recording approvals remain false. The Kit injury/town-base arc is approved; the specific ankle-turn treatment is proposed.
+
+OPEN DECISIONS
+1. Exact injury cause/severity: conservative loose-ground ankle turn after the 1.7 lookout is a review-only candidate. No mandatory new enemy, fracture, healing mechanic or time jump.
+2. Shrine first voice and hidden hinge/register remain existing scene proposals. Kit hears the lantern separately in town; no distant knowledge.
+3. Named relic: approve living claimant, exact object/proof and attainable sold-item recovery rules. Generic record-keeper verification and all choice reactions are written; no new named NPC/family history locked.
+4. Court access: detailed Magic/Tech/Constitution actions not yet defined. Generic options preserve both-seal gate; three full quest-state sets are deferred.
+5. Court keeper: decide speaking interval and fate/staging after required defeat. Speaking candidates are separated. The physical evidence and on-demand hub reading preserve essential truth if the encounter speech is skipped. Garden-date detail remains a proposed optional clue.
+6. Final encounter: approve actual learned-tool counterplay before authoring precise tactical prompts. Final-boss voice is optional and unapproved; no required story information depends on it.
+7. Casting/pronunciation: supporting names remain role-based; Veyr pronunciation needs an owner reference. English en does not select an accent.
+
+CONTINUITY RECONCILIATION
+- Preserve 13 delivered opening IDs and exact text. lockedexisting means preserved draft bytes, not approved final performance.
+- Reserve treasury.first_sight, treasury.recognition and treasury.kit_prepare historically; Kit is now based in Bellwether throughout the baseline finale. Do not silently reuse those IDs for a different speaker/location.
+- Reserve foundry.boss_hint historically: the older search/shutter sentence did not convey the now-approved maintained-mechanism boss requirement. New foundry.boss_stand_hint does.
+- court.focus_tool is reserved: early safe aperture teaching now uses court.aperture_lesson, avoiding a keeper instruction that arrives after its own item-required encounter.
+- Exact differences from prior retained source lines increment source_text_revision and retain previous text hash. Newly written IDs begin at revision 1. Opening bytes are unchanged.
+- Kit's claimant reactions now depend on a heard record-keeper verification, avoiding an imaginary unnamed claimant speaking offscreen.
+- Royal speculation is suppressed after Court truth. Both middle-dungeon orders have neutral and order-specific evidence/return lines.
+- No ordinary skeleton speech is required. Optional keeper/boss speech does not alter the active 1.6.2 reveal brief.
+
+VALIDATED
+426 static authoring assertions pass: IDs, exact opening copy, en tags, subtitle/spoken parity, text hashes, CSV/TXT round-trip, no protagonist, no dungeon Kit, present speakers, critical fallbacks, delayed-hint metadata, scene cooldown semantics, optional boss separation, both middle orders, all 18 access/order combinations, all 16 Court-gate truth-table combinations, abstract persistence and stale-queue checks. These checks validate the proposed data contract. They do not execute the game.
+
+STILL REQUIRES PLAYABLE VALIDATION
+Both dungeon orders on device; all access routes; actual local-item/boss application; retreat before seals; item placement/recall; skip every conversation; miss optional clues; sell before learning provenance; recover/return sold relic; choose no optional improvement; death/retry; checkpoint reload; repeated zone entry; critical attack cues over VO; Android background/resume; language fallback and independently aligned subtitle timing; final encounter and hopeful return.

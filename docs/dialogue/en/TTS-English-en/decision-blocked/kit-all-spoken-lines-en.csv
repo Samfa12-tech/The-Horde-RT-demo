@@ -1,0 +1,4 @@
+combined_line_number,line_id,spoken_text,voice_asset_path
+1,kit.approach_injury.stop,Ah. Wait a moment.,audio/voice/en/kit.approach_injury.stop.wav
+2,kit.approach_injury.ankle,"Loose ground. Turned my ankle. I can stand, but give me a moment.",audio/voice/en/kit.approach_injury.ankle.wav
+3,kit.approach_injury.arm,Lend me your arm for this bit. We’ll take it slowly.,audio/voice/en/kit.approach_injury.arm.wav

@@ -1,0 +1,9 @@
+Independent candidate-bank review
+
+357 English lines and 209 scenes reviewed. All 13 opening texts are preserved exactly; line IDs are unique; spoken and subtitle text match; source hashes match; all 357 per-line TTS files contain exact spoken text; recording approval is false throughout.
+
+Continuity review confirms both middle-dungeon orders; injured Kit based in Bellwether with witnessed/evidence-based knowledge; corrected direct Lantern introduction and documentary claimant review; gated Court spoilers; linked conversation timing; local tavern exchanges; silent protagonist; optional boss and injury specifics separated.
+
+Corrections incorporated: added the missing direct Lantern and army/hoard setup exchanges; added a warm initial tavern welcome; changed imaginary claimant speech to an evidence-backed record-keeper review; gated keeper/jailer translation to evidence; suppressed stale royal speculation after Court truth; tied mill material remarks to actual recovered-material use; separated attempt-ledger reset from reload; made requested recap repeatable; distinguished inter-scene cooldown from line spacing; required listener presence/hearing range and exempted linked continuations from cooldown.
+
+This review approves the package as a coherent authoring candidate for owner review. It does not certify final recording approval, implemented trigger behaviour, gameplay/device performance, measured audio or subtitle timing.

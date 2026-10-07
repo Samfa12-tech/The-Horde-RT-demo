@@ -1,0 +1,2589 @@
+{
+  "status": "proposed authoring schema, no runtime binding supplied",
+  "default": false,
+  "flags": [
+    {
+      "id": "abbey_access_ready",
+      "type": "boolean",
+      "derived": {
+        "any": [
+          "access_magic_ward_trial_passed",
+          "access_tech_rig_trial_passed",
+          "access_body_trial_passed"
+        ]
+      },
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "abbey_boss_active",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "abbey_boss_defeated",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "abbey_boss_reached",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "abbey_entered",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "abbey_lead_known",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "abbey_puzzle_solved",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "abbey_route_entered",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "abbey_seal",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "abbey_seal_available",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "abbey_vista_visible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "access_body_lesson_started",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_body_trial_failed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_body_trial_passed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_bridge_quest_started",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_bridge_test_failed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_climb_lesson_started",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_climb_trial_failed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_magic_binding_inspected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_magic_binding_restored",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_magic_broken_marks_visible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "access_magic_quest_started",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_magic_trial_failed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_magic_ward_trial_passed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_stones_quest_started",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_stones_test_failed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_tech_quest_started",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_tech_rig_assembled",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_tech_rig_trial_passed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "access_tech_trial_failed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "ambient_passing_comment_eligible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "ambient_tavern_conversation_eligible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "aperture_lesson_active",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "aperture_lesson_complete",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "aperture_owned",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "at_grate",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "before_court_departure",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "binding_record_inspected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "binding_record_shown",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "binding_record_shown_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "bond_inspected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "both_middle_seals",
+      "type": "boolean",
+      "derived": {
+        "all": [
+          "abbey_seal",
+          "foundry_seal"
+        ]
+      },
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "both_seals_fit_route_mark_demonstrated_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "chapter_1_8_approach_active",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "claim_documentation_shown",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "clear_arch_visible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "court_access_selected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "court_boss_active",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "court_departed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "court_encounter_started",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "court_evidence_inspected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "court_evidence_shown",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "court_gate_inspected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "court_gate_open",
+      "type": "boolean",
+      "derived": {
+        "all": [
+          "abbey_seal",
+          "foundry_seal",
+          "court_route_interaction_complete",
+          "court_access_ready"
+        ]
+      },
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "court_identity_proof_shown_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "court_keeper_can_speak",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "court_keeper_defeated",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "court_keeper_present",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "court_puzzle_active",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "court_puzzle_solved",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "court_route_interaction_complete",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "court_truth_known",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "current_record_inspected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "dry_refuge",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "entity_combat_active",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "entity_defeated",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "epilogue_started",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "epilogue_welcome_seen",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "equipment_smoke_filter_acquired",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "exactly_one_middle_seal",
+      "type": "boolean",
+      "derived": {
+        "xor": [
+          "abbey_seal",
+          "foundry_seal"
+        ]
+      },
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "expedition_returned",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "family_staying_world_change_complete",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "family_unpacking_visible_from_kit_safe_position",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "final_seal",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "final_seal_available",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "finale_complete",
+      "type": "boolean",
+      "derived": {
+        "all": [
+          "entity_defeated",
+          "soldiers_released"
+        ]
+      },
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "first_returning_wagon_present_in_bellwether",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "first_safe_arrival_pause",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "first_tavern_entry",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "first_tavern_introduction",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "forest_departed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_access_ready",
+      "type": "boolean",
+      "derived": {
+        "any": [
+          "foundry_bridge_ready",
+          "foundry_stones_ready",
+          "foundry_climb_ready"
+        ]
+      },
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_boss_active",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "foundry_boss_defeated",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_boss_reached",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_bridge_anchors_inspected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_bridge_load_test_passed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_bridge_ready",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_climb_ready",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_climb_return_test_passed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_crossing_stones_inspected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_entered",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_lead_known",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_oath_known",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_puzzle_solved",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_seal",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_seal_available",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_stones_ready",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_stones_return_test_passed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "foundry_work_observed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "garden_claim_heard",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "garden_record_available",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "garden_visible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "hazard_recovery_reachable",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "hub_arrival_welcome_heard",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "hub_arrived",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "hub_court_destination_known",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "hub_memorial_copy_in_progress",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "hub_one_seal_report_received",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "interaction_abbey_access_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_abbey_readiness_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_bellwether_name_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_body_access_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_body_completion_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_body_progress_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_body_retry_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_bridge_completion_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_bridge_progress_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_bridge_repair_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_bridge_retry_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_churchyard_history_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_climb_completion_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_climb_progress_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_climb_retry_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_foundry_access_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_foundry_hazards_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_magic_access_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_magic_completion_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_magic_progress_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_magic_retry_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_magic_trial_start_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_maintenance_climb_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_mill_acknowledgment",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "interaction_named_relic_decision_closed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "interaction_named_relic_inspection_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_named_relic_return_acknowledgment",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "interaction_named_relic_return_preview",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "interaction_named_relic_sale_preview",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "interaction_smoke_body_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_smoke_magic_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_smoke_tech_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_sold_relic_recovery_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_stone_crossing_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_stones_completion_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_stones_progress_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_stones_retry_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_tavern_road_history_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_tech_access_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_tech_completion_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_tech_progress_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_tech_retry_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_tech_trial_start_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_trade_acknowledgment",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "interaction_veyrlands_history_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "interaction_wagon_component_use_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "inventory_abbey_named_relic_owned",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "inventory_abbey_named_relic_presented",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "inventory_equipment_presented",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "inventory_mundane_stamped_object_presented",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "inventory_optional_foundry_fittings_presented",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "inventory_ordinary_valuables_selected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "inventory_proposed_mill_fitting_presented",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "keeper_awakened",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "keeper_defeated",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "keeper_jailer_known",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "king_order_available",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_at_rim",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_at_wait",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_can_see_returning_wagon",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_final_reunion_complete",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_final_reunion_quiet_pause_complete",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_first_voice_reaction_pending",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "kit_has_actually_asked_about_upstairs_room",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_has_examined_abbey_seal",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_has_examined_foundry_seal",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_has_heard_abbey_crossing_brief",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_has_heard_foundry_access_brief",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_has_reviewed_abbey_and_foundry_evidence",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_has_seen_abbey_route",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_has_seen_all_three_seals",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_has_seen_court_route",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_has_seen_foundry_route",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_has_seen_treasury_route",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_court_route_explanation",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_family_confirm_staying",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_horde_army",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_keeper_jailer_translation",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_lantern",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_lantern_first_in_town",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_lantern_practical_route_guidance_in_town",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_lantern_royal_claim_in_bellwether",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_lantern_three_seals_request_in_bellwether",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_record_keeper_confirm_bonds_ended",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_record_keeper_explain_posthumous_service",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_record_keeper_verify_claim",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_shared_release_risk_explanation_in_bellwether",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_heard_signed_order_explanation",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_in_bellwether",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_injured",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_personal_roof_want_heard",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_present",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "kit_present_at_display",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "kit_present_at_first_safe_town_reunion",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "kit_present_at_mill_observation_point",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "kit_present_on_approach",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "kit_recovering",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_recovery_progress_observable",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_settled_in_bellwether",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_voice_reaction_complete",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "kit_witnessed_named_vessel_sale",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "lantern_first_voice_heard",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "lantern_owned",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "lantern_present",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "lantern_presented",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "lantern_shown",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "learned_counterplay_succeeded",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "learned_tools_presented_for_final_preparation",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "lookout_reached",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "loose_ground_stumble_staged",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "marked_relic_inspected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "middle_return_debrief_selected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "mill_operating",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "mill_repair_in_progress",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "mill_repaired",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "mill_repaired_with_recovered_materials",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "moonlit_view",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "named_relic_choice_active",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "named_relic_returned",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "named_relic_sold",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "named_vessel_choice_open",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "named_vessel_presented_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "named_vessel_retained_after_claimant_review",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "named_vessel_visible_on_town_display",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "nonurgent_breath",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "ordinary_treasure_shown_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "paired_inscription_evidence_shown",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_demonstrates_aperture_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_demonstrates_reflector_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_demonstrates_stand_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_exploring",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_in_kit_audible_range",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "player_pack_load_visibly_heavy",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_places_route_evidence_on_shared_table",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_presents_shrine_search_state",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "player_raises_lantern_for_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_requests_claim_review",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_requests_recap",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_returned",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_selects_abbey_departure",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_selects_court_departure",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_selects_foundry_departure",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_selects_shrine_departure",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_selects_treasury_departure",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_shows_abbey_progress_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_shows_abbey_seal_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_shows_both_middle_seals_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_shows_court_progress_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_shows_foundry_progress_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_shows_foundry_seal_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_shows_register_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_shows_retained_named_vessel_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "player_sooty_gear_visible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "player_wet_gear_visible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "plunder_admission_known",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "plunder_evidence_shown_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "pre_seals",
+      "type": "boolean",
+      "derived": {
+        "all": [],
+        "none": [
+          "abbey_seal",
+          "foundry_seal"
+        ]
+      },
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "present_artificer",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "present_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "present_record_keeper",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "present_relic_dealer",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "present_salvager",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "present_tavern_keeper",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "protection_receiver_visible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "puzzle_stalled",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "quiet_closing_interaction_selected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "quiet_private_talk_selected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "quiet_talk_selected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "raise_lesson_active",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "reachable_air_pocket_visible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "recovered_records_shown",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "recovered_soldier_names_retained_and_shown_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "reflected_exposure_available",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "reflected_path_blocked",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "reflector_lesson_active",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "reflector_lesson_complete",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "reflector_owned",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "reflector_reset_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "register_routes_legible_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "register_shown",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "release_aftermath_evidence_shown_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "relic_claim_verified",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "relic_handover_confirmed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "rescue_complete",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "returned_from_abbey",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "returned_from_court",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "returned_from_foundry",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "returned_from_shrine",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "reunion_complete",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "ritual_started",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "roof_open",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "rope_deployment_ready",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "safe",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "safe_lull",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "seals_shown",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "service_artificer_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "service_dealer_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "service_record_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "service_salvager_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "service_selected_resources_insufficient",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "service_selection_cancelled",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "service_tavern_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "service_transaction_committed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "shell_receiver_visible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "shown_route_marks_legible_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "shrine_lead_known",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "shrine_lead_shown_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "shrine_mechanism_inspected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "shrine_register_recovered",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "soldier_records_recovered",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "soldiers_released",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "stand_lesson_active",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "stand_lesson_complete",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "stand_owned",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "stand_reset_requested",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "tavern_keeper_present",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "trade_restored",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "training_any_access_lesson_passed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "training_safe_retreat_demonstrated",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "training_smoke_endurance_acquired",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "training_smoke_ward_acquired",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "treasury_open",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "treasury_route_known",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "treasury_treasure_visibly_presented_to_kit",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "upstairs_room_exists",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "village_visible",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "current_authoritative_context"
+    },
+    {
+      "id": "wagon_arrived",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "watcher_rule_taught",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "watcher_tracks_light",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "waystone_evidence_shown",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "waystone_inspected",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "waystone_revealed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "world_arrived_wagon_audible_nearby",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "world_dealer_relic_listing_removed",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "world_local_milling_restored",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "world_mill_gearing_running_without_knock",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "world_trade_stock_available",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "world_wagon_fittings_transferred",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    },
+    {
+      "id": "world_wagon_unloaded_with_tavern_keeper",
+      "type": "boolean",
+      "derived": null,
+      "authority": "World interaction, inventory/evidence observation, explicit player UI action, or conversation delivery event as named; never infer from unrelated dialogue completion.",
+      "persistence": "campaign"
+    }
+  ],
+  "derived": {
+    "pre_seals": {
+      "all": [],
+      "none": [
+        "abbey_seal",
+        "foundry_seal"
+      ]
+    },
+    "exactly_one_middle_seal": {
+      "xor": [
+        "abbey_seal",
+        "foundry_seal"
+      ]
+    },
+    "both_middle_seals": {
+      "all": [
+        "abbey_seal",
+        "foundry_seal"
+      ]
+    },
+    "abbey_access_ready": {
+      "any": [
+        "access_magic_ward_trial_passed",
+        "access_tech_rig_trial_passed",
+        "access_body_trial_passed"
+      ]
+    },
+    "foundry_access_ready": {
+      "any": [
+        "foundry_bridge_ready",
+        "foundry_stones_ready",
+        "foundry_climb_ready"
+      ]
+    },
+    "finale_complete": {
+      "all": [
+        "entity_defeated",
+        "soldiers_released"
+      ]
+    },
+    "court_gate_open": {
+      "all": [
+        "abbey_seal",
+        "foundry_seal",
+        "court_route_interaction_complete",
+        "court_access_ready"
+      ]
+    }
+  },
+  "aliases": {
+    "hub_arrived": "hub_arrived",
+    "lantern_acquired": "lantern_owned",
+    "kit_present_in_bellwether": "kit_in_bellwether",
+    "kit_recovering_in_bellwether": "kit_recovering",
+    "kit_injured_on_approach": "kit_injured",
+    "kit_resident_in_bellwether": "kit_settled_in_bellwether",
+    "abbey_seal_acquired": "abbey_seal",
+    "seal_abbey_owned": "abbey_seal",
+    "foundry_seal_acquired": "foundry_seal",
+    "seal_foundry_owned": "foundry_seal",
+    "court_seal_acquired": "final_seal",
+    "abbey_reflector_acquired": "reflector_owned",
+    "foundry_stand_acquired": "stand_owned",
+    "court_aperture_acquired": "aperture_owned",
+    "finale_entity_defeated": "entity_defeated",
+    "court_truth_verified": "court_truth_known",
+    "court_route_open": "court_gate_open",
+    "hub_finale_returned": "player_returned",
+    "player_returned_to_bellwether": "player_returned",
+    "player_safe": "safe",
+    "player_gear_visibly_wet": "player_wet_gear_visible",
+    "relic_returned": "named_relic_returned",
+    "named_vessel_returned": "named_relic_returned",
+    "relic_sale_committed": "named_relic_sold",
+    "named_vessel_sold": "named_relic_sold",
+    "world_mill_repaired": "mill_repaired",
+    "mill_repair_complete": "mill_repaired",
+    "world_mill_visibly_operating": "mill_operating",
+    "mill_visibly_or_audibly_operating": "mill_operating",
+    "world_trade_route_reopened": "trade_restored",
+    "trade_route_restored": "trade_restored",
+    "world_wagon_arrival_confirmed": "wagon_arrived",
+    "world_mill_repair_in_progress": "mill_repair_in_progress",
+    "expedition_returned": "expedition_returned",
+    "register_shown": "register_shown",
+    "shrine_register_returned": "register_shown",
+    "lead_starter_shrine_available": "shrine_lead_known",
+    "quest_starter_shrine_complete": "shrine_register_recovered",
+    "lead_abbey_available": "abbey_lead_known",
+    "lead_foundry_available": "foundry_lead_known",
+    "stage_both_middle_seals": "both_middle_seals",
+    "stage_exactly_one_middle_seal": "exactly_one_middle_seal",
+    "stage_pre_seals": "pre_seals",
+    "stage_post_finale": "finale_complete",
+    "abbey_access_trial_passed": "abbey_access_ready",
+    "foundry_any_crossing_ready": "foundry_access_ready",
+    "evidence_keeper_jailer_interpretation_known": "keeper_jailer_known",
+    "paired_inscription_shown": "keeper_jailer_known",
+    "foundry_binding_record_shown_to_kit": "binding_record_shown_to_kit",
+    "abbey_plunder_evidence_shown_to_kit": "plunder_evidence_shown_to_kit",
+    "kit_has_heard_lantern_speak": "kit_heard_lantern",
+    "lantern_first_speech_to_kit_heard_in_bellwether": "kit_heard_lantern_first_in_town",
+    "kit_first_voice_reaction_consumed": "kit_voice_reaction_complete",
+    "kit_heard_tavern_keeper_horde_army_line": "kit_heard_horde_army",
+    "evidence_soldier_records_recovered": "soldier_records_recovered",
+    "evidence_current_record_inspected": "current_record_inspected"
+  }
+}

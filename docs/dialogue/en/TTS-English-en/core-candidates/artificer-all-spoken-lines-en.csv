@@ -1,0 +1,28 @@
+combined_line_number,line_id,spoken_text,voice_asset_path
+1,hub.service.artificer.greet,Lay it flat. I want to see the worn side.,audio/voice/en/hub.service.artificer.greet.wav
+2,hub.service.artificer.cancel,Take it with you. I haven’t changed anything.,audio/voice/en/hub.service.artificer.cancel.wav
+3,hub.service.artificer.insufficient,I’m short of what this repair needs. I won’t take payment for half a job.,audio/voice/en/hub.service.artificer.insufficient.wav
+4,hub.service_return,Back already? Put it on the bench. Let’s see what survived.,audio/voice/en/hub.service_return.wav
+5,access.tech_offer,The mill has a sound air chamber. Help repair its gearing; I’ll fit you a breathing rig.,audio/voice/en/access.tech_offer.wav
+6,access.tech_task,Let me check the chamber before we remove anything. The mill still needs to work when we’re done.,audio/voice/en/access.tech_task.wav
+7,access.tech_progress_fit,"Set the recovered fitting beside the old one. We need the fit, not just the right-looking metal.",audio/voice/en/access.tech_progress_fit.wav
+8,access.tech_progress_joint,"A loose joint is an inconvenience up here. Underwater, it’s the whole problem.",audio/voice/en/access.tech_progress_joint.wav
+9,access.tech_test,Shallow water first. We find the leaks here.,audio/voice/en/access.tech_test.wav
+10,access.tech_retry,Out of the water. Let me check the joint before you try again.,audio/voice/en/access.tech_retry.wav
+11,access.tech_complete,No leak in that trial. The rig’s ready for the crossing.,audio/voice/en/access.tech_complete.wav
+12,access.tech_complete_limit,It carries a supply of air. It doesn’t make more. Stop where you can breathe.,audio/voice/en/access.tech_complete_limit.wav
+13,access.bridge_tech,"The anchors held. With the right fittings, that span can carry you again.",audio/voice/en/access.bridge_tech.wav
+14,access.bridge_task,We check the load from this bank before anyone crosses.,audio/voice/en/access.bridge_task.wav
+15,hub.access.bridge.progress,Keep off the span until the repaired joints have been tested.,audio/voice/en/hub.access.bridge.progress.wav
+16,hub.access.bridge.retry,That joint moved. Stay on this bank while I check the fitting.,audio/voice/en/hub.access.bridge.retry.wav
+17,access.bridge_complete,The repaired span held the test. You can cross.,audio/voice/en/access.bridge_complete.wav
+18,access.bridge_return,"It gives you a way back, too. Keep that in mind before going deeper.",audio/voice/en/access.bridge_return.wav
+19,access.smoke_tech,This filter will help with the smoke. Get clear before it clogs.,audio/voice/en/access.smoke_tech.wav
+20,hub.mill_artificer,Listen to that. No knock in the gearing. That’s how it should run.,audio/voice/en/hub.mill_artificer.wav
+21,foundry.component,These fittings could put a wagon back on the road. If you can spare them.,audio/voice/en/foundry.component.wav
+22,tavern.oneseal.pack.2,Bring the gear over. I’ll show you what needs checking.,audio/voice/en/tavern.oneseal.pack.2.wav
+23,tavern.oneseal.kit.2,Something that isn’t dripping on my tools.,audio/voice/en/tavern.oneseal.kit.2.wav
+24,tavern.twoseals.reading.2,A lock can keep trouble in or people out. Same piece of iron.,audio/voice/en/tavern.twoseals.reading.2.wav
+25,hub.passing.mill_work,Mind the loose parts. They’re laid out in order.,audio/voice/en/hub.passing.mill_work.wav
+26,hub.passing.mill_running,Still running. Good.,audio/voice/en/hub.passing.mill_running.wav
+27,hub.passing.wet_gear,Dry the joints before you put that away.,audio/voice/en/hub.passing.wet_gear.wav

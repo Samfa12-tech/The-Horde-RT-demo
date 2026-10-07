@@ -1,0 +1,53 @@
+{
+  "repo": "Samfa12-tech/The-Horde-RT-demo",
+  "commit": "bae7bd58bfc123044d948c345b2b51000880d358",
+  "documents": [
+    {
+      "path": "docs/CAMPAIGN_DESIGN.md",
+      "sha256": "ede28f84cde5c37801f3822aa293137753a1f9b0a6233a5901628a98e629562e",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/bae7bd58bfc123044d948c345b2b51000880d358/docs/CAMPAIGN_DESIGN.md"
+    },
+    {
+      "path": "docs/CAMPAIGN_DIALOGUE_BANK.md",
+      "sha256": "a96623b8058bb76091fb3e2514591b6713d8e9463c277d21008e1d5f4e212c0b",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/bae7bd58bfc123044d948c345b2b51000880d358/docs/CAMPAIGN_DIALOGUE_BANK.md"
+    },
+    {
+      "path": "docs/DUNGEON_CHAPTER_PLANS.md",
+      "sha256": "5928fb3fb17938b276cac27f328faa9392e82bc198a2db884e79371004d74f59",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/bae7bd58bfc123044d948c345b2b51000880d358/docs/DUNGEON_CHAPTER_PLANS.md"
+    },
+    {
+      "path": "docs/WORLD_LAYOUT.md",
+      "sha256": "01f5abe513a752228e1678790777f049abfebc8167c3684f58399954b06bad14",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/bae7bd58bfc123044d948c345b2b51000880d358/docs/WORLD_LAYOUT.md"
+    },
+    {
+      "path": "docs/KIT_ANIMATION_PLAN_1_7.md",
+      "sha256": "5d611fd2725edd72f613e6ac879c76b341c6d3efb3cfafdd76addfc766922d6e",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/bae7bd58bfc123044d948c345b2b51000880d358/docs/KIT_ANIMATION_PLAN_1_7.md"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-11-village-hub-1.8.0.md",
+      "sha256": "34cf36f064fa4339527b075ebbb6abfeaddaff8da494b91ea15715a811079585",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/bae7bd58bfc123044d948c345b2b51000880d358/docs/superpowers/plans/2026-09-11-village-hub-1.8.0.md"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md",
+      "sha256": "05f63e1361f0dc7db521e6bbd82a2d5b34e80c3b48e1bbbb0d3d4e4602348382",
+      "url": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/bae7bd58bfc123044d948c345b2b51000880d358/docs/superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md"
+    }
+  ],
+  "later_owner_directions": [
+    {
+      "direction": "Kit injured on approach, recovering in Bellwether while remaining major-return partner"
+    },
+    {
+      "direction": "Majority Kit/NPCs; side quests, passing comments, tavern background; silent protagonist; final boss voice maybe"
+    },
+    {
+      "direction": "English tag; may translate in future"
+    }
+  ],
+  "archive_note": "Public authoring archive: private conversation identifiers omitted; source document URLs and hashes retained. Dialogue text and review statuses are unchanged."
+}

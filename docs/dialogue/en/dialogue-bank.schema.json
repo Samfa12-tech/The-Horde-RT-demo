@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "The Horde dialogue authoring schema",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "bank_version",
+    "language",
+    "source_language",
+    "scenes",
+    "lines"
+  ],
+  "properties": {
+    "language": {
+      "type": "string"
+    },
+    "source_language": {
+      "const": "en"
+    },
+    "scenes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "scene_id",
+          "title",
+          "location",
+          "trigger",
+          "line_ids",
+          "release",
+          "status"
+        ]
+      }
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "line_id",
+          "speaker_id",
+          "speaker_label",
+          "language",
+          "source_language",
+          "scene_id",
+          "conversation_id",
+          "conversation_line_order",
+          "sequence_id",
+          "line_order",
+          "sequence_mode",
+          "spoken_text",
+          "subtitle_text",
+          "source_text_revision",
+          "source_text_sha256",
+          "previous_source_text_sha256",
+          "delivery_notes",
+          "trigger",
+          "required_flags",
+          "forbidden_flags",
+          "knowledge",
+          "location",
+          "audible_range_m",
+          "range_status",
+          "priority",
+          "safety_gate",
+          "cooldown_seconds",
+          "repeat_policy",
+          "interrupt_policy",
+          "resume_policy",
+          "fallback",
+          "voice_filename",
+          "voice_asset_path",
+          "audio_asset",
+          "measured_duration_ms",
+          "subtitle_timing",
+          "subtitle_wrap_hint",
+          "release",
+          "status",
+          "recording_approved",
+          "translation_status",
+          "canon_source",
+          "integration_status"
+        ],
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.]*$"
+          },
+          "speaker_id": {
+            "type": "string"
+          },
+          "speaker_label": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string",
+            "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]+)*$"
+          },
+          "source_language": {
+            "const": "en"
+          },
+          "scene_id": {
+            "type": "string"
+          },
+          "conversation_id": {
+            "type": "string"
+          },
+          "conversation_line_order": {
+            "type": "integer"
+          },
+          "sequence_id": {
+            "type": "string"
+          },
+          "line_order": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sequence_mode": {
+            "type": "string"
+          },
+          "spoken_text": {
+            "type": "string"
+          },
+          "subtitle_text": {
+            "type": "string"
+          },
+          "source_text_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "source_text_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "previous_source_text_sha256": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "delivery_notes": {
+            "type": "string"
+          },
+          "trigger": {
+            "type": "object"
+          },
+          "required_flags": {
+            "type": "array"
+          },
+          "forbidden_flags": {
+            "type": "array"
+          },
+          "knowledge": {
+            "type": "object"
+          },
+          "location": {
+            "type": "string"
+          },
+          "audible_range_m": {
+            "type": [
+              "null",
+              "number"
+            ]
+          },
+          "range_status": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer"
+          },
+          "safety_gate": {
+            "type": "string"
+          },
+          "cooldown_seconds": {
+            "type": "integer"
+          },
+          "repeat_policy": {
+            "type": "object"
+          },
+          "interrupt_policy": {
+            "type": "string"
+          },
+          "resume_policy": {
+            "type": "string"
+          },
+          "fallback": {
+            "type": "object"
+          },
+          "voice_filename": {
+            "type": "string"
+          },
+          "voice_asset_path": {
+            "type": "string"
+          },
+          "audio_asset": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "measured_duration_ms": {
+            "type": [
+              "null",
+              "number"
+            ]
+          },
+          "subtitle_timing": {
+            "type": "object"
+          },
+          "subtitle_wrap_hint": {
+            "type": "string"
+          },
+          "release": {
+            "enum": [
+              "core-candidates",
+              "decision-blocked",
+              "optional-final-boss"
+            ]
+          },
+          "status": {
+            "enum": [
+              "lockedexisting",
+              "draft",
+              "newdecisionblocked"
+            ]
+          },
+          "recording_approved": {
+            "type": "boolean"
+          },
+          "translation_status": {
+            "type": "string"
+          },
+          "canon_source": {
+            "type": "object"
+          },
+          "integration_status": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

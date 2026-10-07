@@ -1,4 +1,7 @@
 # The Horde — Campaign, Characters and Progression
+
+> **English bank update, 7 October 2026:** [Candidate v0.2](dialogue/en/README.md) contains the expanded 357-line English source, readable copies, exact TTS text and authoring contracts. The approved Kit arc is injury on the approach to Bellwether, recovery based in town and continued partnership through major returns; exact injury details and dialogue wording remain for review. This supersedes incompatible older Kit-location proposals, including a baseline dungeon/treasury escort. All recording approvals remain false; milestone and runtime scope are unchanged.
+
 **Owner-approved creative direction: 30 September 2026.** Planning, not implemented content or release authority. Read with [ROADMAP.md](ROADMAP.md). This document supersedes older statements that the Horde's nature, dungeon order and final mystery are entirely undecided. Concrete encounters, scripts, balance and technical solutions still require scoped design and testing.
 
 ## Approved regional geography

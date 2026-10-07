@@ -1,4 +1,7 @@
 # The Horde — Whole-Campaign Dialogue Bank
+
+> **English bank update, 7 October 2026:** [Candidate v0.2](dialogue/en/README.md) contains the expanded 357-line English source, readable copies, exact TTS text and authoring contracts. The approved Kit arc is injury on the approach to Bellwether, recovery based in town and continued partnership through major returns; exact injury details and dialogue wording remain for review. This supersedes incompatible older Kit-location proposals, including a baseline dungeon/treasury escort. All recording approvals remain false; milestone and runtime scope are unchanged.
+
 **DRAFT v0.1 · 3 October 2026 · authoring proposal, not recording copy**
 
 A playable story spine with representative dialogue from the tomb to the return home. The opening is written more tightly for 1.7; later chapters are broad-strokes scene proposals to test before expanding. This is a selective bank, not every conversation, a locked line count, or approval to produce voices.

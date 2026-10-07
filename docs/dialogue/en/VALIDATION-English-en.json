@@ -1,0 +1,2178 @@
+{
+  "bank_version": "0.2",
+  "language": "en",
+  "lines": 357,
+  "scenes": 209,
+  "words": 3966,
+  "speaker_counts": {
+    "kit": 125,
+    "record_keeper": 60,
+    "lantern": 57,
+    "bellkeeper": 1,
+    "master_of_coin": 1,
+    "court_keeper": 7,
+    "tavern_keeper": 29,
+    "fourth_keeper": 2,
+    "artificer": 27,
+    "salvager": 29,
+    "relic_dealer": 19
+  },
+  "release_counts": {
+    "core-candidates": 339,
+    "decision-blocked": 11,
+    "optional-final-boss": 7
+  },
+  "coverage": {
+    "written_candidate_states": 78,
+    "bounded_core_state_inventory": 84,
+    "candidate_state_coverage_percent": 92.9,
+    "detail_deferred_states": 6,
+    "not_a_claim_about": "final game line count, approved recording coverage, runtime or gameplay completion"
+  },
+  "static_checks_passed": 426,
+  "checks": [
+    {
+      "name": "unique_line_ids",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "unique_scene_ids",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "english_tag_on_bank_and_rows",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "exact_spoken_subtitle_parity",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "source_hash_matches",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "timings_null_until_audio",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no_protagonist_voice",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "safe_language_independent_filenames",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "all_recording_approvals_false",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no_direct_predicate_conflicts",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "all_scenes_have_present_speakers",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "exact_13_opening_delivered_lines",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "kit_not_in_dungeons",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "optional_final_boss_excluded_core",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_prologue.kit_grate",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_rescue.found",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_rescue.rope",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_reunion.question",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_reunion.hint",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_reunion.proof",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_reunion.first_piece",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_reunion.depart",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_forest.night",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_forest.waystone",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_forest.clue",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_forest.wait",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_forest.village",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.record_inspect",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.first_errand",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.shrine_direction",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.lantern_inspection",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.shrine_fallback",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_lantern.first_help",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_lantern.first_identity",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_lantern.king_name",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_lantern.first_request",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_shrine.recap_mechanism",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_shrine.recap_register",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_shrine.register",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.two_routes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.routes_independent",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.vista",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.threshold",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.attendants",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.reflector",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.reflector_place",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.reflector_feedback",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.reflector_hint",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.reflector_reset",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.claim_mark",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.admission",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.oath_connection",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.bellkeeper_warning",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.boss_hint",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.release_question",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.threshold",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.workers",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.stand",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.stand_receiver",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.stand_result",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.shadow_hint",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.stand_reset",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.bond_record",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.blame",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.plunder_connection",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.mintmaster_warning",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.boss_stand_hint",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.record_review",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_return.one_seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_return.foundry_remaining",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_return.one_seal_foundry",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_return.abbey_remaining",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_return.two_seals",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_return.voice_reply",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.missing_abbey",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.missing_foundry",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.missing_both",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.access_options",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.access_seals",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.aperture_lesson",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.aperture_observe",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.aperture_hint",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.garden",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.recognition",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.voice_accuses",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.boss_aperture_hint",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.king_proof",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.true_bargain",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.fourth_keeper",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.custody",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.memory_evidence",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.recap_king",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.recap_identity",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.recap_bond",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.final_seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.ritual_truth",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.preparation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.preparation_tools",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_treasury.voice_promise",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_treasury.bound_dead",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_treasury.risk_recap",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_treasury.release",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_treasury.entity_claim",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_treasury.entity_demand",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_finale.entity_pressure",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_bark.entity.command",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_finale.entity_light",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_finale.entity_last",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_epilogue.welcome",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_epilogue.record",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_bark.lantern.air",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_bark.lantern.smoke",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_prologue.keeper_warning",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_prologue.keeper_last",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.approach_injury.stop",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.approach_injury.ankle",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.approach_injury.arm",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.accept_base.sit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.accept_base.limit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.accept_base.work",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.kit_introduce",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.arrival_introduction.table",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.hoard_answer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.kit_stake",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.personal_stake.key",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.shrine_departure.leave",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.shrine_departure.return",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.shrine_empty_return.welcome",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.shrine_empty_return.blank",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.shrine_register_return.found",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.shrine_register_return.routes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.shrine_register_return.work",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.voice_reaction",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.first_direct_voice.finish",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.royal_claim.king",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.royal_claim.help",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.shared_table.frustration",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.shared_table.task",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.shared_table.partners",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_departure.route",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_departure.empty",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_incomplete_no_tool.arrive",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_incomplete_no_tool.route",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_incomplete_tool.turn",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_incomplete_tool.use",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_incomplete_tool.rest",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_abbey.kit_return",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_seal_return.seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_plunder_evidence.mark",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_plunder_evidence.home",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_plunder_evidence.share",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_departure.route",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_departure.return",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_incomplete_no_tool.soot",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_incomplete_no_tool.pause",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_incomplete_tool.hold",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_incomplete_tool.better",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_incomplete_tool.keep",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.kit_return",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_seal_return.seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_bond_evidence.line",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_bond_evidence.death",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_bond_evidence.names",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_first.progress",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.abbey_first.prepare",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_first.progress",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.foundry_first.prepare",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.two_seals.fit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.two_seals.court",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_return.kit_doubt",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.doubt_from_evidence.jailer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.doubt_from_evidence.useful",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.ordinary_treasure.want",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.ordinary_treasure.use",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.ordinary_treasure.wait",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_return.kit_enough",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.enough.waiting",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.named_relic_choice.value",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.named_relic_choice.claim",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.named_relic_choice.time",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.named_relic_returned.place",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.named_relic_returned.worth",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.named_relic_sold.candid",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.named_relic_sold.uneasy",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.named_relic_kept.notice",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.named_relic_kept.wrap",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.mill_working.sound",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.mill_working.use",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.trade_reopened.wheels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.trade_reopened.room",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.family_stays.unpack",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.family_stays.home",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.recovery.progress",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.recovery.patience",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.court_departure.ridge",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.court_departure.questions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.court_incomplete_no_aperture.welcome",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.court_incomplete_no_aperture.later",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.court_incomplete_aperture.beam",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.court_incomplete_aperture.care",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.court_evidence_debrief.order",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.court_evidence_debrief.cost",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_court.kit_response",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.final_preparation.table",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.final_preparation.practice",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.final_preparation.route",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.final_departure.want",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.final_departure.place",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.final_departure.return",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_finale.kit_alive",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.final_town_reunion.chair",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.treasure_home.real",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_finale.kit_treasure",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.release_evidence.free",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.release_evidence.names",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_epilogue.kit_roof",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.room_upstairs.stay",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_kit.quiet_closure.here",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_epilogue.kit_close",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.tavern.greet",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.tavern.cancel",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.tavern.insufficient",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.record.greet",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.record.cancel",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.record.insufficient",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.artificer.greet",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.artificer.cancel",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.artificer.insufficient",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.salvager.greet",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.salvager.cancel",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.salvager.insufficient",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.dealer.greet",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.dealer.cancel",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.dealer.insufficient",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.ordinary_sale",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service_return",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.record.recap",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.salvager.refresh",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.service.tavern.kit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.abbey_problem",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.abbey_alternatives",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.magic_offer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.magic_task",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.magic_progress_read",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.magic_progress_test",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.magic_limit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.magic_retry_rest",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.magic_complete",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.magic_complete_limit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.tech_offer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.tech_task",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.tech_progress_fit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.tech_progress_joint",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.tech_test",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.tech_retry",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.tech_complete",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.tech_complete_limit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.body_offer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.body_task",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.body_progress",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.body_limit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.body_retry_stop",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.body_retry_plan",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.body_complete",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.body_complete_limit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.abbey_ready",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.foundry_problem",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.foundry_alternatives",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.bridge_tech",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.bridge_task",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.access.bridge.progress",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.access.bridge.retry",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.bridge_complete",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.bridge_return",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.crossing_magic",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.stones_task",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.access.stones.progress",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.access.stones.retry",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.stones_complete",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.stones_limit",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.climb_body",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.climb_task",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.access.climb.progress",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.access.climb.retry",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.climb_complete",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.climb_smoke",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.smoke_tech",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.smoke_magic",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.smoke_body",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.smoke_separate",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_access.smoke_retreat",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.named_relic",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_relic.inspect_record",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_relic.inspect_price",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_relic.sale_preview",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_relic.sale_evidence",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.relic.decision_deferred",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_relic.return_preview",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_relic.return_choice",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_relic.return_complete",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_relic.return_dealer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_relic.sold_evidence",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_relic.sold_recovery",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.mill_repaired",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.mill_artificer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_foundry.component",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.component_choice",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.trade_arrived",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.trade_stock",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.preseals.weight.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.preseals.weight.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.preseals.weight.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.preseals.bell.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.preseals.bell.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.preseals.bell.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.preseals.kit.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.preseals.kit.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.preseals.kit.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.oneseal.pack.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.oneseal.pack.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.oneseal.pack.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.oneseal.claims.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.oneseal.claims.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.oneseal.claims.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.oneseal.kit.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.oneseal.kit.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.oneseal.kit.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.twoseals.ridge.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.twoseals.ridge.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.twoseals.ridge.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.twoseals.reading.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.twoseals.reading.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.twoseals.reading.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.twoseals.kit.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.twoseals.kit.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.twoseals.kit.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.finale.supper.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.finale.supper.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.finale.supper.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.finale.names.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.finale.names.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.finale.names.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.finale.kit.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.finale.kit.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_tavern.finale.kit.3",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.arrival",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.churchyard",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.shrine",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.mill_work",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.mill_running",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.wet_gear",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.heavy_pack",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.learned_retreat",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.relic_returned",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.trade_arrived",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.two_seals",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.passing.finale",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.lore.caravan.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.lore.caravan.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.lore.bell.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.lore.bell.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.lore.histories.1",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.lore.histories.2",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_lantern.town_identity",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_lantern.town_seals",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.horde_army",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_hub.arrival",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_relic.claim_review",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "tts_exact_return.keeper_word",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "csv_exact_text_and_ids",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "localization_ids_complete",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "critical_fallbacks_exist",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "kit_hearing_scene_exists",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "army_exchange_setup_exists",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "claim_reaction_has_documented_bridge",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "translation_requires_evidence",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no_spurious_cooldown_between_lines",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "critical_ignores_ambient_cooldown",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "manual_record_recap_repeatable",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "attempt_reset_key_valid",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "first_seal_abbey_seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "stale_one_seal_suppressed_abbey_seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "two_seal_convergence_abbey_seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "first_seal_foundry_seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "stale_one_seal_suppressed_foundry_seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "two_seal_convergence_foundry_seal",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_magic_bridge_abbey_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_magic_bridge_foundry_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_magic_stones_abbey_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_magic_stones_foundry_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_magic_climb_abbey_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_magic_climb_foundry_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_tech_bridge_abbey_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_tech_bridge_foundry_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_tech_stones_abbey_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_tech_stones_foundry_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_tech_climb_abbey_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_tech_climb_foundry_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_body_bridge_abbey_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_body_bridge_foundry_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_body_stones_abbey_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_body_stones_foundry_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_body_climb_abbey_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent_access_body_climb_foundry_first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_0000",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_0001",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_0010",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_0011",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_0100",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_0101",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_0110",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_0111",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_1000",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_1001",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_1010",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_1011",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_1100",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_1101",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_1110",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "court_gate_truth_table_1111",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "reload_does_not_replay_consumed_story",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "skip_keeps_critical_fallback",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "stale_queue_rechecked",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "optional_hub_changes_not_assumed",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "runtime_tests_run": false,
+  "manual_gameplay_tests_run": false,
+  "voice_listening_tests_run": false,
+  "portable_exporter_roundtrip": {
+    "files_compared": 388,
+    "all_byte_identical": true
+  },
+  "json_schema_validation": "passed",
+  "reading_copy": {
+    "pages": 36,
+    "all_pages_visually_reviewed": true,
+    "all_line_text_exact_once_per_id": true
+  }
+}

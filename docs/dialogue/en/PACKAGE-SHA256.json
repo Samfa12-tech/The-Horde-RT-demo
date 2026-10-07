@@ -1,0 +1,2042 @@
+[
+  {
+    "path": "ARCHIVE-VALIDATION.json",
+    "bytes": 467,
+    "sha256": "06350fe051efd6a95790c7b9ae05cdb62d611fd91ef75ccf429cdcc5b32a4fd6"
+  },
+  {
+    "path": "CAST-AND-PRONUNCIATION-English-en.txt",
+    "bytes": 3891,
+    "sha256": "89a2540bed943828b5edbc6561564e1e926450502c0225c714e93dd6fe04f1ae"
+  },
+  {
+    "path": "COVERAGE-AND-OPEN-DECISIONS-English-en.txt",
+    "bytes": 4445,
+    "sha256": "349977753a25d3f285d3b7a27de7e1edc8c7fae2400367e36060ef3279acc776"
+  },
+  {
+    "path": "COVERAGE-English-en.csv",
+    "bytes": 11551,
+    "sha256": "5e4fa6264714990c98b77460220556f32166f6c603ba6e1b48cee02a8af2d059"
+  },
+  {
+    "path": "Horde-Dialogue-Bank-English-en.csv",
+    "bytes": 1031179,
+    "sha256": "276eac25334a722437acaa9e5d1300901af97329e119daf59ecd1c7076bcbfd4"
+  },
+  {
+    "path": "Horde-Dialogue-Bank-English-en.json",
+    "bytes": 1916761,
+    "sha256": "b75c42992d29ca96301c4a2edb425c1529d04bc30e411582d2b4ec724f96df88"
+  },
+  {
+    "path": "Horde-Dialogue-Reading-Copy-English-en.docx",
+    "bytes": 64032,
+    "sha256": "e98a19b916fbd2cacc56e39ee37b814d97c7f561cb9b048b6d9d2230ee20edcb"
+  },
+  {
+    "path": "INDEPENDENT-REVIEW-English-en.txt",
+    "bytes": 1445,
+    "sha256": "63ab67dd403fc968097dd70841c39bf2bcf6778a2c711224a7ddd196cc84668e"
+  },
+  {
+    "path": "READING-COPY-English-en.md",
+    "bytes": 119703,
+    "sha256": "5584844c97006d8f51421c6ee459bf7dad20a980c50452964474c361033892c2"
+  },
+  {
+    "path": "README-English-en.txt",
+    "bytes": 10385,
+    "sha256": "e7be7b7b920ea9f281ce37f5a627d010f3def81a1d20478c4885a9b59f0bf13c"
+  },
+  {
+    "path": "README.md",
+    "bytes": 3303,
+    "sha256": "98194fdb0137a8b2618f9a0a7a5d941e569ce96e2a5cf9e5d6f17352a58a77bd"
+  },
+  {
+    "path": "REPOSITORY-HANDOFF-English-en.txt",
+    "bytes": 1098,
+    "sha256": "ca76cc4e0eaca76b9b2ad9e8868ba5ed42a7a778f5cb5513100ab714a1be04fb"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.bridge_complete.txt",
+    "bytes": 47,
+    "sha256": "f220d1ddfd5e8a9ef5bf3074e1a4fe7ec265ff026ace46dc3d520c444092f043"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.bridge_return.txt",
+    "bytes": 68,
+    "sha256": "a24bce1bf1a07d713400a62453d3d361e6fcae630f979f3ce75e49c30eedd374"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.bridge_task.txt",
+    "bytes": 55,
+    "sha256": "5b284ebbbfa1dea6ac9ec8eeb6bef4775393eef3236f0493bb79ed32aeb4bfee"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.bridge_tech.txt",
+    "bytes": 73,
+    "sha256": "a14184d6e31186cac3d9a1367b5b36d3c77bf6ed528b8c49467f92bf99e1d5f8"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.smoke_tech.txt",
+    "bytes": 64,
+    "sha256": "8db3936734f4f849582905d026dc1b211deed2937f08472882643d6f22288dc4"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.tech_complete.txt",
+    "bytes": 58,
+    "sha256": "08b6b8724f4a7fc00bc9d33b7fcf9238cb75bdc7be0a844dab22ebe137c91a41"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.tech_complete_limit.txt",
+    "bytes": 79,
+    "sha256": "ef7dbc4c7ed27380e86317824d6820b632f55ca7dd3838268269237da52ef9a2"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.tech_offer.txt",
+    "bytes": 90,
+    "sha256": "ff0910c404751aac929bfadb6bfddb671462b76f5d076b77679525647441902a"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.tech_progress_fit.txt",
+    "bytes": 96,
+    "sha256": "9f19bb29cd07e7a8818af2b4f71b1880ab8d1dd3d85cb4330ef6e8d375378374"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.tech_progress_joint.txt",
+    "bytes": 80,
+    "sha256": "afbf93b34bd8c40a9d8fd8dffa18f092c534e4207dc58cebd22d88ffd1b41b37"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.tech_retry.txt",
+    "bytes": 62,
+    "sha256": "f9770b2c410cf57f6a082ff19ba501ab10cd9773221b2ed0c2fc37ca5347f3cc"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.tech_task.txt",
+    "bytes": 99,
+    "sha256": "8b9f5e0a9985392db65642bf84851c2275ca8cd12b0abbfa0262f8564393b2b9"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/access.tech_test.txt",
+    "bytes": 44,
+    "sha256": "d9f243ed010f7bb0c4190b421d985c8d6530fc577122ba2a4c18d3cc728861b9"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/foundry.component.txt",
+    "bytes": 73,
+    "sha256": "9856365ecf3e806bcc1e2f1baccc30c690818763be1d8cf05cb21dab4d13ffd6"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/hub.access.bridge.progress.txt",
+    "bytes": 61,
+    "sha256": "de7c2a28c6cadf108c65beb190c2b62772064badb1010f04330fb943f4deffcf"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/hub.access.bridge.retry.txt",
+    "bytes": 62,
+    "sha256": "8f0db8839f7a19190da13e94f73d73f05d3ea7d32018aa5f3db48b74a13c640e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/hub.mill_artificer.txt",
+    "bytes": 68,
+    "sha256": "d7f07361bb4564b94f595a98f9ed67bfca4835af708812deac9a5e14bb99e885"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/hub.passing.mill_running.txt",
+    "bytes": 20,
+    "sha256": "7a5e5e56f2f38305388fa2a021ce14a4bef2252c3efdc7004d4861635abe6f53"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/hub.passing.mill_work.txt",
+    "bytes": 50,
+    "sha256": "683dc39b4d12b41ab4c4b1628df1793d5c3f384fedaa3ad9f38f42ec8e19a29e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/hub.passing.wet_gear.txt",
+    "bytes": 40,
+    "sha256": "5e4b27cbcd7038d1020a9bf6f4444e91ce84d0eb790222d5667e41a390a82607"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/hub.service.artificer.cancel.txt",
+    "bytes": 47,
+    "sha256": "a859c8eae290d92068f612e021719d95ac0829267988b544f1efcee69e776614"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/hub.service.artificer.greet.txt",
+    "bytes": 41,
+    "sha256": "603b713d77164ebb22d8e478472c63c579f86b155f45bdb3032502296dca87e1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/hub.service.artificer.insufficient.txt",
+    "bytes": 77,
+    "sha256": "27413ca2ee7b9c183508be3891a393c952f079e694831c2044d19eb7d8ef9276"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/hub.service_return.txt",
+    "bytes": 61,
+    "sha256": "0dc89376421b753497392cbba2c5e46f8d76155cc5ffa93bec2a2a8ee9bbef14"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/tavern.oneseal.kit.2.txt",
+    "bytes": 44,
+    "sha256": "f742f059ada1e2b1a11083732212c410ddfcc6fe6b1bab394206c167434d65b5"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/tavern.oneseal.pack.2.txt",
+    "bytes": 57,
+    "sha256": "eac35f560005df95b800c3036564a90237da3a9c649056875db3e8a16a1ebd72"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer/tavern.twoseals.reading.2.txt",
+    "bytes": 61,
+    "sha256": "415bc49c27d0f5d6f1bfb544f3de5c4d47272eef216933ab30c21c995944f244"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer-all-spoken-lines-en.csv",
+    "bytes": 3595,
+    "sha256": "68667936a840cecf7eeb4708db2cff82562dde1df1cbb4cea93461bfe818527c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/artificer-all-spoken-lines-en.txt",
+    "bytes": 1704,
+    "sha256": "4e6aeb2bbb89ac81f1713e241c357afd5a9784740198901420f8b3a5c60f456c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/bellkeeper/abbey.bellkeeper_warning.txt",
+    "bytes": 24,
+    "sha256": "8493e07374f71c844c4151fcb0f66fab8e91b468efa9aa176b3740aa80d6eb1c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/bellkeeper-all-spoken-lines-en.csv",
+    "bytes": 156,
+    "sha256": "b8f7487817f41dd9684e3452572651510f7c81b33204768230e23b183b1c8f03"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/bellkeeper-all-spoken-lines-en.txt",
+    "bytes": 25,
+    "sha256": "d523ad18ba47e564f50dd1962fcf46f7839a312f45ad2df7e0bd9bcdc4ece0a3"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/court_keeper/court.recognition.txt",
+    "bytes": 47,
+    "sha256": "271e19bed3e2f3c0f6e15bbb8da02d6b758153db5defa60ae71aaa5c7ef22790"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/court_keeper-all-spoken-lines-en.csv",
+    "bytes": 165,
+    "sha256": "7d3396faf70874e6e5ebe5aff30ed2aff260c08aafb6ff98de815c84a87a2adb"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/court_keeper-all-spoken-lines-en.txt",
+    "bytes": 48,
+    "sha256": "61a4ae43f996d5ab5f1b50384fcaf75671e79e32a0e1344e545af2431ca117b3"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/abbey.kit_return.txt",
+    "bytes": 55,
+    "sha256": "db82ac39d4baff115c7ce7ef1390b464745d0201608116379a938ccf66907d7f"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/court.kit_response.txt",
+    "bytes": 54,
+    "sha256": "0d77aaf18d45b27b840ff14ffb4ee86f1222704f476182ca1240791c190061cf"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/epilogue.kit_close.txt",
+    "bytes": 31,
+    "sha256": "e7b909a50d16b45e6d135b76804ccf0ce10b3ad2e6e89611644f07d96bbfa6d9"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/epilogue.kit_roof.txt",
+    "bytes": 50,
+    "sha256": "ba9099e0d853ff0b78eeeaa273d013126755cdfa73c4e5eaca9464e2e1c86542"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/finale.kit_alive.txt",
+    "bytes": 43,
+    "sha256": "c55088c4fb4d74935d2f539b21404f7c2939631d42c2d3bdc98e9a31e99c1497"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/finale.kit_treasure.txt",
+    "bytes": 31,
+    "sha256": "f058faff8bd4d9bdcbb646a046daff1e83e24e20e4bf16d35685a55d786f1c3d"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/forest.clue.txt",
+    "bytes": 70,
+    "sha256": "bc3e21d6874be80b995f6ec68f4e71342c035de1a8cf7d7125efd84baa79c0b1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/forest.night.txt",
+    "bytes": 34,
+    "sha256": "83ac9fc3b020ca09f492b9930d5200852437182443edd5dc7e61c63a498b3815"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/forest.village.txt",
+    "bytes": 21,
+    "sha256": "9b93476154e938621a9b6c8fda5249e499077d161dd6188476431eb7a03faaf3"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/forest.wait.txt",
+    "bytes": 15,
+    "sha256": "b2d1c50f974f8824d25d5958eaa5a19f814035d9fb9314748b53a1a467b18dec"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/forest.waystone.txt",
+    "bytes": 46,
+    "sha256": "2327e1cfa024d4410931b6aef03dc1e200ba40691f9ea7719b379bcac57aec60"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/foundry.kit_return.txt",
+    "bytes": 56,
+    "sha256": "cb357af29fbd995fec04ee7e08d9b99b8b26b8f7284f11d53fdf47470a77f764"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/hub.hoard_answer.txt",
+    "bytes": 48,
+    "sha256": "9861f4ef942e70c21894f218e3ba6b1be3eab21b59c53c48480ab38d32dbd8fd"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/hub.kit_introduce.txt",
+    "bytes": 53,
+    "sha256": "53af6383dc1d43a0832e44f8513f014abf0a4c3e5b298933538ae346b0684e11"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/hub.kit_stake.txt",
+    "bytes": 81,
+    "sha256": "fbec86b7cbd6c8641af0e8b18759ba2c7336fd3809ab68b1dc38f3a7fdac1b25"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_departure.empty.txt",
+    "bytes": 67,
+    "sha256": "436aef58ed4036f75bbc1e07464c972f14dd6fb5bfc7b5eecddbf12b1abe2396"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_departure.route.txt",
+    "bytes": 63,
+    "sha256": "3961bb0c3d7b99a7c6482df7fc98ed672d4a6d5106b70095bb3f76c3712af67b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_first.prepare.txt",
+    "bytes": 84,
+    "sha256": "8fb45b12a706fade8b0fc9fec3b8e40400e446e447132f82247fae2638ebedd3"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_first.progress.txt",
+    "bytes": 55,
+    "sha256": "fad9ee4f6ef971b7b33750a190b75c5eefe5bae54ed6419f93bfb1831f1ad49d"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_incomplete_no_tool.arrive.txt",
+    "bytes": 50,
+    "sha256": "2bf8a2ed0388b0d5d94678ad1ac75008060719be9e8c062e3cc1b5362c849939"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_incomplete_no_tool.route.txt",
+    "bytes": 60,
+    "sha256": "57f5c55822d5685d5bbf0486e343dda1d9a9dfde7f072feeb682c007973af572"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_incomplete_tool.rest.txt",
+    "bytes": 53,
+    "sha256": "aeca75d2430e5c6bacc620395c86a4b80da1c14f2ce90e1fd26e76a5d37b9a3a"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_incomplete_tool.turn.txt",
+    "bytes": 55,
+    "sha256": "a098bc5b6d66f226354c05ec32f1cdf83a8cb1a73daeac6e3eb0e367b6e279cd"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_incomplete_tool.use.txt",
+    "bytes": 42,
+    "sha256": "d477d635bd2e0b6eefd4fea2f1dd89139e808c048e40b1dfc786e86b58c5ec89"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_plunder_evidence.home.txt",
+    "bytes": 66,
+    "sha256": "b7f8f7d2b262535484027ae52ad181f76484e0ec548f0a2c304dda6805955b52"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_plunder_evidence.mark.txt",
+    "bytes": 41,
+    "sha256": "79e23a5bbb5def753d5fdc5c7721413c87b5b31339451728f8494df81ea38d1b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_plunder_evidence.share.txt",
+    "bytes": 78,
+    "sha256": "f0e130fa68abeaf3fc8e9cd667b9555a82ac32966b0d8a45f030c15e11cc2e61"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.abbey_seal_return.seal.txt",
+    "bytes": 54,
+    "sha256": "0a733ba1ac7f7d0161a8d43b11f61a170d051c41dfc82fcea03c24453f2c81b3"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.accept_base.limit.txt",
+    "bytes": 78,
+    "sha256": "13301be2231cef265fa0c75757877a1b75a8f84cd76f05c2dcf168bca85182da"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.accept_base.sit.txt",
+    "bytes": 51,
+    "sha256": "ea19cfda5f96c3c3832bf947d8ba312bd8a74aae93bebc515a27a6d6ef6b8ade"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.accept_base.work.txt",
+    "bytes": 62,
+    "sha256": "fc21e358a9b8adab33eaaa94d5084a382a3d155f3cc9bd979cc53855f527dfa0"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.arrival_introduction.table.txt",
+    "bytes": 54,
+    "sha256": "aba357b9b31251dd4e2e535ed57586b1523e212dfd0acc7ad9317a7431771045"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.court_departure.questions.txt",
+    "bytes": 66,
+    "sha256": "22021671b0db87f5d68db12c8c4ba1a9d9f70bb0edf9fa31f329aa31478030e7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.court_departure.ridge.txt",
+    "bytes": 54,
+    "sha256": "beabcd618d81c59dbb8595b7022f32b6c64fe2c65a959b9b39ccec73bdf1ace3"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.court_evidence_debrief.cost.txt",
+    "bytes": 62,
+    "sha256": "bfcb96e2c6a1ec5bb04095702a16cdf6ed7988dc6541b0e4190901d45133e1ef"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.court_evidence_debrief.order.txt",
+    "bytes": 62,
+    "sha256": "c6c8136504460dabbbc310640c730b032c87e563013366061fd18781b945e5e0"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.court_incomplete_aperture.beam.txt",
+    "bytes": 36,
+    "sha256": "714cd7424a8ad349634689ef834a5e259e6f3cb1993e72841074b171ad610a1b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.court_incomplete_aperture.care.txt",
+    "bytes": 61,
+    "sha256": "3534c86bf509570a0fd3a644f0927cd9cf898d93ad79a4beba5012bd36051b19"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.court_incomplete_no_aperture.later.txt",
+    "bytes": 45,
+    "sha256": "438036eea1a985cfbc51215356b3f1592f647f01c6ad29883ef4b97c81f56a7d"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.court_incomplete_no_aperture.welcome.txt",
+    "bytes": 59,
+    "sha256": "a5c754e2139ac073f9fcb6e8df51e146e762e75583afd1e3e847971345d07c13"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.doubt_from_evidence.jailer.txt",
+    "bytes": 69,
+    "sha256": "969a02a5e533032802610f631a15c2197ff26490d29eeac5def32e1f855a8ff1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.doubt_from_evidence.useful.txt",
+    "bytes": 54,
+    "sha256": "75556d9829fb27bbb96c05ec55cf27d5fb5119aa0a7c251e5d4a866e1364c9e7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.enough.waiting.txt",
+    "bytes": 78,
+    "sha256": "ca7e846e85fb2a0c401d9c9c372b30b4cb7a8f4b2652a95fa9bd0fa1a8e3ce68"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.family_stays.home.txt",
+    "bytes": 54,
+    "sha256": "6828ae045e9492aec11fb909123194716251cc673314b247ded87916631b26ed"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.family_stays.unpack.txt",
+    "bytes": 45,
+    "sha256": "f18fc3d7d08bfb76c2f712adf3426fe5e11204d199a94a164ea25cc88d21d41c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.final_departure.place.txt",
+    "bytes": 48,
+    "sha256": "e65db3c1ca4164004b5630429bcfcb99853bd18359910e6a3e169d56944c9dac"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.final_departure.return.txt",
+    "bytes": 40,
+    "sha256": "7d7afd29a25fa58d04816b72fccae7e9ab786d9ff768e4b5b8a2c4bcff595920"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.final_departure.want.txt",
+    "bytes": 62,
+    "sha256": "e40b68ab0e52c7e65f137d45b7007ef100cac97453ece5cf258b708ec33abdd9"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.final_preparation.practice.txt",
+    "bytes": 53,
+    "sha256": "0774e8dd6306bed9c7bfc130dbf6766896fb546cbda5fa1f6ad5d68ba27d353b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.final_preparation.route.txt",
+    "bytes": 61,
+    "sha256": "3dddc402aad052d0291cf27efb6bf9a1a31977a60d36668e4f228aabad6fc40d"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.final_preparation.table.txt",
+    "bytes": 82,
+    "sha256": "27a6572c232466523b1a47e622661e695923b1ed767e14fdaab032eb7125f3f4"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.final_town_reunion.chair.txt",
+    "bytes": 34,
+    "sha256": "fbc8670bf17db1e732dce054d875d04e6bd617ce3a417c3f2a837f659f1acf0e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.first_direct_voice.finish.txt",
+    "bytes": 29,
+    "sha256": "7ea7121828b1e0dcd9c5d6a5a46cf0eebc67b9fe73dbc03092690a0026631d30"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_bond_evidence.death.txt",
+    "bytes": 52,
+    "sha256": "d1c5490f8de99f610d4a4a28b418beb2a6f630bd5fdcf9df9c876bb04ee784ab"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_bond_evidence.line.txt",
+    "bytes": 24,
+    "sha256": "a412c8f08d0bb9cd061ac0a1309de5d2478aeea948fae8ffc1bcfa596847e591"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_bond_evidence.names.txt",
+    "bytes": 47,
+    "sha256": "332082164b5935aa12f90723a24d1b7b7fd513f4d890f7c17963805eb1d0f23c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_departure.return.txt",
+    "bytes": 50,
+    "sha256": "1a155cb3c09460132a859121034c764e3fafc679029644e548bb06145b6654db"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_departure.route.txt",
+    "bytes": 61,
+    "sha256": "1f1380b8cff5689c153a16dc547948d4a3ab7769f35eb84a767ba89a7785b849"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_first.prepare.txt",
+    "bytes": 72,
+    "sha256": "b9cb0db928922470a4ff93fb54df3629a4c934153b0d64d53424fbbdbd60bdad"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_first.progress.txt",
+    "bytes": 55,
+    "sha256": "588d301d8b2dc6fcef312eb408faa60afea4045284c891214eb5e453f4e0667c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_incomplete_no_tool.pause.txt",
+    "bytes": 89,
+    "sha256": "ba07ded4a39de67f0a6834f5a982f9b3be9bbb299599b7332c688e8dd9d8e454"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_incomplete_no_tool.soot.txt",
+    "bytes": 50,
+    "sha256": "c2cba91fa0e5d4ef50428eb7c0ad630f52926ed780f4e072ea99304354e9553d"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_incomplete_tool.better.txt",
+    "bytes": 51,
+    "sha256": "c0a37e4da16a912f5e43033040a5a9d52dfdf442438e589daac4d9e6b3f22410"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_incomplete_tool.hold.txt",
+    "bytes": 60,
+    "sha256": "052a7df0688a44a7b4ea007522188026bb81a3a19dc57fe40d3616f7ca1f36d0"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_incomplete_tool.keep.txt",
+    "bytes": 46,
+    "sha256": "a2a267180283e1979876dffa78e0526692e9e4970ec8edd6f5dc03c688f7c326"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.foundry_seal_return.seal.txt",
+    "bytes": 65,
+    "sha256": "3a47aa47e382d9dba91a2ac77417ed23f84e298d7b74e9d01d1301b2a68ed26c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.mill_working.sound.txt",
+    "bytes": 38,
+    "sha256": "6f074bb42e5dabce309135c02f05f892ad024b8786db0136305bfd40d68aaa83"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.mill_working.use.txt",
+    "bytes": 44,
+    "sha256": "219fe5e83dd1b14c698b70d63acdee5b0515d5b12cca3de1a582bedf6a61b201"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.named_relic_choice.claim.txt",
+    "bytes": 45,
+    "sha256": "3240e1ef9e8bbb5b99194139a2521307bd9a3c67daddd46900707e41cc74f671"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.named_relic_choice.time.txt",
+    "bytes": 50,
+    "sha256": "33e3fa65fddaf77b302392189f2d717fe0a67dea25bf23ddc85c607a5047b6e4"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.named_relic_choice.value.txt",
+    "bytes": 53,
+    "sha256": "5ea145660c7e2c218aa4460cead893194b269777e2c9e8ad8666a9deabedb22f"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.named_relic_kept.notice.txt",
+    "bytes": 19,
+    "sha256": "a5bca6aeb89e7ae99db8f287d08bcd598c794cf05f4ea1e1049f05ff231ecef4"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.named_relic_kept.wrap.txt",
+    "bytes": 64,
+    "sha256": "1cbc59a8b3a0bdc018cf9a1139d56031ddbb57dbd9cac68b066fb83ab414b339"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.named_relic_returned.place.txt",
+    "bytes": 50,
+    "sha256": "ed31fddcfd0d4b075e84f005a1985b41a35af4e76a661be623a6d5179c3025e2"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.named_relic_returned.worth.txt",
+    "bytes": 34,
+    "sha256": "1995d544ab67bbee1c34df2c12fa00341637b7aeb5538e0a37faa9ee3a45df22"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.named_relic_sold.candid.txt",
+    "bytes": 57,
+    "sha256": "08a29b70c792bac6aaa7b3bfac72d603eecb6a9a22b4d0eff69f88f28e476932"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.named_relic_sold.uneasy.txt",
+    "bytes": 39,
+    "sha256": "e88ff49f385d87ecaadba7e2d8877e7ed756d0fb70fba992c2c48d42a1403373"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.ordinary_treasure.use.txt",
+    "bytes": 64,
+    "sha256": "9cd098682d724fcb77e52045c3014fdd135c4740436857d645268fb27e018c31"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.ordinary_treasure.wait.txt",
+    "bytes": 42,
+    "sha256": "44e172b47a59bcc4fc09d0681d9a6b03e36bfab81b462a18a0565bb18aaad77e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.ordinary_treasure.want.txt",
+    "bytes": 84,
+    "sha256": "a3e3dd84bb58d7dbf84b71c5ce79881d948092586605a22f00736f1346514530"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.personal_stake.key.txt",
+    "bytes": 67,
+    "sha256": "1e0a824a1d8b7d3d847eeba88458174af8e599e82cdb3f1e89c33a6ad9381af5"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.quiet_closure.here.txt",
+    "bytes": 28,
+    "sha256": "0629c6532c77f638e539a368b5783d6e0a0afbce8ef354a7371a8eb8359df82e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.recovery.patience.txt",
+    "bytes": 72,
+    "sha256": "3c44037ce5e9e09c498e5b11b0ca27305de0482f4002831be073644bf482b2fd"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.recovery.progress.txt",
+    "bytes": 52,
+    "sha256": "ffa84825c3f24d63973455cf7fd2996b4b094aa7e3b67fe7b0660efe9db6b85b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.release_evidence.free.txt",
+    "bytes": 37,
+    "sha256": "c12eb13eb6702da426a8129908dc5648276906bf11317e1f82840669bad9e0b7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.release_evidence.names.txt",
+    "bytes": 31,
+    "sha256": "d07f6c9781d0bb99aa2345d8f84250672d77d650000c3da02402629d07960d89"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.room_upstairs.stay.txt",
+    "bytes": 89,
+    "sha256": "ab87a170d0105e6f2835167556e07c82393520f24537f28636199df4fe3b0758"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.royal_claim.help.txt",
+    "bytes": 74,
+    "sha256": "7cc90e3e7b6c38cb5d1fe1aa61048ae5f2967f543ce5a05b0ee7aff6b9163fde"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.royal_claim.king.txt",
+    "bytes": 61,
+    "sha256": "90a78d57152017d0492f10ddcc3fd37178548632e8d0be143811708ae2343eca"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.shared_table.frustration.txt",
+    "bytes": 49,
+    "sha256": "bd427ed777819d2795ac0e572b13becf961e47e461df897874eac57260c7805d"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.shared_table.partners.txt",
+    "bytes": 63,
+    "sha256": "345ef63c2853005e8b0212f9fad86da48a6d61d651e016de77b461311d1b6036"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.shared_table.task.txt",
+    "bytes": 65,
+    "sha256": "460258edc5c564e77349d74e9a83ab587024a2e8eb61119c0c33c4f0b77d6fe7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.shrine_departure.leave.txt",
+    "bytes": 68,
+    "sha256": "1530c63595f8cc1258fff2834441e7ba5fc64f5df06a2c4aa94092ff468aa673"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.shrine_departure.return.txt",
+    "bytes": 90,
+    "sha256": "18b49925d112df2d93b1549db85c4c60c4a742097f647c926a64eca2cab4b32c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.shrine_empty_return.blank.txt",
+    "bytes": 93,
+    "sha256": "057afdc15c9101fdffc604da24ca462cf152382bcbd6b1e2a3e5cf379c479ccc"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.shrine_empty_return.welcome.txt",
+    "bytes": 38,
+    "sha256": "fc63b8db4b4b3d14f72bfa91fd41e6e3963b3d5657dc74bb4c80d9b10ac3ebf6"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.shrine_register_return.found.txt",
+    "bytes": 34,
+    "sha256": "61c6703ef878b930e68cbdfceccc65c76efcaacd007209ed6538834617f15c41"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.shrine_register_return.routes.txt",
+    "bytes": 60,
+    "sha256": "537ffecb6f5f574392b21c85054483fd52a53a7c248d2e5e9ed97d5522ac1336"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.shrine_register_return.work.txt",
+    "bytes": 85,
+    "sha256": "09e8bba253af7b0c8cd581d863190e4ed5e4f99fe9e52233ee7ddd76bdb336b5"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.trade_reopened.room.txt",
+    "bytes": 66,
+    "sha256": "df454c2e1a417ea7fa8bd62e2fb7d622967a13da8ec1426cf2c254f3420a6337"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.trade_reopened.wheels.txt",
+    "bytes": 52,
+    "sha256": "9a4a76e3283f2e1d149651569efaa2020078bf4194b5f7d839033c77d1b9bd92"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.treasure_home.real.txt",
+    "bytes": 50,
+    "sha256": "7e526535bf043034199316431d4a26cd57910410d8bd75f98f5cf64516b8b1bf"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.two_seals.court.txt",
+    "bytes": 69,
+    "sha256": "d134fe0a2e8195d3e7670f3fc809bc4a713fb8879368e6409bcc90bf529eb3d5"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.two_seals.fit.txt",
+    "bytes": 60,
+    "sha256": "ec26a347459c333becf1b036537429933306fe61770d40915f531c4cd6077ab5"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/kit.voice_reaction.txt",
+    "bytes": 59,
+    "sha256": "697e7e5cfbb0f82387371a98fd1faf53aa84ebe99f32baefa51d19afd80a514b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/prologue.kit_grate.txt",
+    "bytes": 86,
+    "sha256": "1a31d2c18023c1be6242ff3a9283d798033ec6b0075b71cb89e01794a8101d38"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/rescue.found.txt",
+    "bytes": 34,
+    "sha256": "dcd11fd018f363529cb50ddfce3259b3b9a951e4c6ec20066060d131266c166d"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/rescue.rope.txt",
+    "bytes": 29,
+    "sha256": "2f6b9d691aed9457053222074c2c7d0fb85993eecf1b880b2e9755e9e1156db1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/return.kit_doubt.txt",
+    "bytes": 80,
+    "sha256": "5b8481a4e6af19d8d124c3f650dcfd82fa5b8ce65ba432949667b1ef4d857a61"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/return.kit_enough.txt",
+    "bytes": 79,
+    "sha256": "26ba12b0ec3e04c75535a0868c50b5c6cd878aac3aa061711c55549ccc07c63b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/reunion.depart.txt",
+    "bytes": 62,
+    "sha256": "fdd92934c6fb69a7c8a6e3ea82459a9047fbf27eead0855bc670e5ff0be42cad"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/reunion.first_piece.txt",
+    "bytes": 40,
+    "sha256": "75cd92c83cff8672dc34640b6fcc8f6b33696d9bb855e8e8c353458fb29111e1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/reunion.hint.txt",
+    "bytes": 21,
+    "sha256": "ad4c5469e0067ad5a4a8b81b8a2ee31f449584203881b2846f8fbca7c2839425"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/reunion.proof.txt",
+    "bytes": 39,
+    "sha256": "c840c966ace50c4b77ca06ea1bcc308360f18e268a2e6898c216d332d95a490c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/reunion.question.txt",
+    "bytes": 43,
+    "sha256": "605160366068b6e057b162e3d6b613f3dc8067297a84b2a25a884a0bf966a85e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/tavern.finale.kit.1.txt",
+    "bytes": 34,
+    "sha256": "c06e133f350b995f9b206de5ddc2d180ad867c1dde4ed219ecc230cce278fa50"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/tavern.finale.kit.3.txt",
+    "bytes": 45,
+    "sha256": "5323e0a5f319ec9984101355efcc2ed4c127c007c0c2fdf5a37dec2a4f28c5fe"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/tavern.oneseal.kit.1.txt",
+    "bytes": 69,
+    "sha256": "9e3e33868aa57d8cb1ff9112e480a0b5b177451b44c9d9f90d04bb81c3990258"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/tavern.oneseal.kit.3.txt",
+    "bytes": 64,
+    "sha256": "c97e74fd7d27c12d6971bf94868f5171e79c41a91850b626f55fcb5f08ecd33c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/tavern.preseals.kit.1.txt",
+    "bytes": 32,
+    "sha256": "136e1d05ddbbdcdf2389e8ebca827825b22936ca0467ebd5b02747c47f37e702"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/tavern.twoseals.kit.1.txt",
+    "bytes": 56,
+    "sha256": "b1d54979b357c17742f1ed078a3477fc1399d5fff0ff7fca74f142e47b6c0d94"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit/tavern.twoseals.kit.3.txt",
+    "bytes": 56,
+    "sha256": "e92c8bc90f76e134904dd9e1fe976fc2b8a3b28d474cc9d83fa9b17b217de9aa"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit-all-spoken-lines-en.csv",
+    "bytes": 15834,
+    "sha256": "b5e1ae1826ddacd4db4c347db5c986c0484a33fc0b8bd61b38347e2bbed14a37"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/kit-all-spoken-lines-en.txt",
+    "bytes": 6763,
+    "sha256": "f91e47ea48c8ae8705cfd47a7856f9858f309e9846a4561f5e2d019d2c13f0f6"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.admission.txt",
+    "bytes": 31,
+    "sha256": "ddf69fb7aa2c3642c0d7a806f677e3a5ab172d0dd6679e53814fa812402045d4"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.attendants.txt",
+    "bytes": 42,
+    "sha256": "10c2c3d6af990913efff034e3856d1ecc3bed814d03a577a965d2190fece9e48"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.boss_hint.txt",
+    "bytes": 52,
+    "sha256": "b3f2cb53d0d9af79a3fc4af0da4f64f8726a7194cea168f92dc873c809947ffe"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.claim_mark.txt",
+    "bytes": 66,
+    "sha256": "8d7c4503a50ceeab4c41a77e838752239035da57b7e54cb2995083daeead8cac"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.oath_connection.txt",
+    "bytes": 63,
+    "sha256": "56e846054f3baaa415ddbe0e2736d8b66919e41f19bb88d929b8590005aa9156"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.reflector.txt",
+    "bytes": 55,
+    "sha256": "08c82dfb8cb88c07a8412e34092b5c705a7cddd328b2401efad60b8fcce1205a"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.reflector_feedback.txt",
+    "bytes": 59,
+    "sha256": "f9bf0049b5a15646be2103cb1eec7a1d2aad02e38056e60c7be284f7e6ad3838"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.reflector_hint.txt",
+    "bytes": 57,
+    "sha256": "62d900234aee0ea68d13bd2bfc251059d585cf6e177b241a75985167fb83b83b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.reflector_place.txt",
+    "bytes": 75,
+    "sha256": "a0bf001e132b79c08333868c98244b4a50ee2c810ff60001d51b6359e3af40ee"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.reflector_reset.txt",
+    "bytes": 68,
+    "sha256": "adeddedc68552410e9c36411da256f3b583a974109697525e881d0f81da1efd0"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.release_question.txt",
+    "bytes": 78,
+    "sha256": "add1372350cae4e32ef92ae5b84c633d9c5a92164abe4e7cc19ec4c67704cf2c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.seal.txt",
+    "bytes": 34,
+    "sha256": "89d7fd000f0fe600b055ada214660cd7ac70cd2c57471fd9f4bd115bb9154a3c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.threshold.txt",
+    "bytes": 46,
+    "sha256": "0cefe919c4f83ce102df0aeb67aa30697763a13dfdb5410442ad0617b844613f"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/abbey.vista.txt",
+    "bytes": 55,
+    "sha256": "24ab5f8333b1a4bdc298b6f8ff0f53246ecbf01a8b590b2731792b0363c5db21"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/bark.lantern.air.txt",
+    "bytes": 14,
+    "sha256": "9a866f8d7ba14d4a1376d65129cf78078d94ccec2706f6b3a168a6f78073d2a7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/bark.lantern.smoke.txt",
+    "bytes": 28,
+    "sha256": "70387d614206026cf03ed7b235a65ee86cdcf9e55ecb9fd38991f20a4b4a3648"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/court.aperture_hint.txt",
+    "bytes": 82,
+    "sha256": "0d0571cabbd1a8c50757cee6f085d20e9db981b7695c5bca0f60803fab1ebba7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/court.aperture_lesson.txt",
+    "bytes": 71,
+    "sha256": "a7df4699fe321fe0211175f7d2f17d1d34b179a393b164ffde1982bc146b5ef2"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/court.aperture_observe.txt",
+    "bytes": 47,
+    "sha256": "6403920017c7bfa63e76a0151365cc167a0bcdc3bdd02b5a56c57136376afc1b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/court.boss_aperture_hint.txt",
+    "bytes": 65,
+    "sha256": "b8d052bc4f93bd1c207bd0b6be06b54a47af8b30e56ab1e54f625a1e24469e87"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/court.garden.txt",
+    "bytes": 35,
+    "sha256": "a20a17dbd6ac7faee2cdbc0e047726eb54a653e32cf6c8bffde701f4b23d8950"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/court.missing_abbey.txt",
+    "bytes": 54,
+    "sha256": "7bbb81bdec1c91418b75e78a3bdd491bc91c001b13f4baa1777a00f86133b1e5"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/court.missing_both.txt",
+    "bytes": 49,
+    "sha256": "e1ede0d8c8ef175681c9362cc000dc91ecf720b74305c0fb3504698c53e3d64c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/court.missing_foundry.txt",
+    "bytes": 61,
+    "sha256": "830e8bf8246645d67add6ac337d7aef3e1ed9a38e11e5efefc39b09fa11bca32"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/court.ritual_truth.txt",
+    "bytes": 48,
+    "sha256": "2b6c20b78c69a480cdcd46b81f10977e351bcfda4f0826353280a29aa39892da"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/court.voice_accuses.txt",
+    "bytes": 53,
+    "sha256": "c88a807442f59fd52cba2479a9e4a1b248ab021ad054f58320c78b0c1c4f827c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.blame.txt",
+    "bytes": 69,
+    "sha256": "f356e149e9b41722ceddbe60e5fc2a643558304cc2ec2505f4ae2c6d96261f0c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.bond_record.txt",
+    "bytes": 60,
+    "sha256": "0b3f6da0abe17f8f2256e4524bb6be42b8e76ad0816da8749232c86a8db894f3"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.boss_stand_hint.txt",
+    "bytes": 63,
+    "sha256": "b5fa554564893b97ccde2d8c47d2a51e773b691a073bc49890baaba95b319d3e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.plunder_connection.txt",
+    "bytes": 48,
+    "sha256": "bd2b38633a86e73d1d2092361ca7f8c5c754822dbfa6a6ed75023caa00ee9df9"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.seal.txt",
+    "bytes": 53,
+    "sha256": "88a3c2b44c66df9b542ce92862e69699673392457c1c05514e2ac39e8d02b0c7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.shadow_hint.txt",
+    "bytes": 67,
+    "sha256": "f3205b3aebf274e1da61a3288e56e1ee274a48e3f9ce7bc01dfee8330faab510"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.stand.txt",
+    "bytes": 67,
+    "sha256": "40fc81a2600b6c7a3d84f9453bb409e9fa9b7153ebcebcd7f23106af43e3dff4"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.stand_receiver.txt",
+    "bytes": 67,
+    "sha256": "e6fd7f9fad8c8173c637d591078f5efaee973b3aa7c3bf967513c6f47e7b02be"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.stand_reset.txt",
+    "bytes": 69,
+    "sha256": "7118ced5ec473f6f2467e15441ccd2b203a6ce8a1fabe37e6c63fc3f42550332"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.stand_result.txt",
+    "bytes": 52,
+    "sha256": "c457380426a7bece8f2151f26c0eb6ceabc9c1d4c4a022752992daa226548bc5"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.threshold.txt",
+    "bytes": 68,
+    "sha256": "f95045abb44e31763239270df48f64237b5951ec0083fcba0909414755ab80b7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/foundry.workers.txt",
+    "bytes": 22,
+    "sha256": "f28a1deba5aa90fa97b6ab8b18c19d9d72511550f7b8fd73d9936dd4e2f5df50"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/lantern.first_help.txt",
+    "bytes": 53,
+    "sha256": "e4b1bbe3cee9be863bfd103292c7549b467f2c43ec439657ef1639d73c013407"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/lantern.first_identity.txt",
+    "bytes": 43,
+    "sha256": "7fa2b54c41a1d626d8777a0f7ba982b85a07e0164a38ca59d0ccab245a9e96a6"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/lantern.first_request.txt",
+    "bytes": 72,
+    "sha256": "e9c52b5fe1550012541dff3fcc79f28821ba57bc1e60875bbd05555b89f1c7e4"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/lantern.king_name.txt",
+    "bytes": 39,
+    "sha256": "89557bf3672727970d8d7561b1ee8c67535daa6850560c3580f5066d9f0e821f"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/lantern.town_identity.txt",
+    "bytes": 57,
+    "sha256": "3c827360e2cc636ea485b20ad68512c4f028a22ac1427f7d918dd7a0df79a448"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/lantern.town_seals.txt",
+    "bytes": 98,
+    "sha256": "7570288ec11ce6123ad0d443d570ac95a0f9632625b437a3ec528dc7af236dbe"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/return.voice_reply.txt",
+    "bytes": 75,
+    "sha256": "68d59a2638f769d3942bf918f1d9cb1100de43c7025368c0024432890014e885"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/shrine.recap_mechanism.txt",
+    "bytes": 44,
+    "sha256": "8c8babdf437949776dadc6bd075a2eb01e58e02b6057a58b249e248aab69cd5c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/shrine.recap_register.txt",
+    "bytes": 70,
+    "sha256": "d9c73da8f392f1f92382f5b224d5d2a99bc1f7e7880a61700b1572b7d28fa07a"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/treasury.bound_dead.txt",
+    "bytes": 38,
+    "sha256": "d1221354e6c298a33b8c4dd444927028981f37ec0cd16461dab4e7352e6ee614"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/treasury.risk_recap.txt",
+    "bytes": 69,
+    "sha256": "f6b07b784a89759121a67516e7361599ad8d3d2fb6563bae1de0536dc7429d6e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern/treasury.voice_promise.txt",
+    "bytes": 51,
+    "sha256": "823c9b803d28b334f4ed3cf116332d3e903fa0e9df99450d3b831634a2e7c4f7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern-all-spoken-lines-en.csv",
+    "bytes": 6006,
+    "sha256": "40d88d2c21f8eea06c62ee7734dcd3951fb704f17d13360991ae176de415c2bb"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/lantern-all-spoken-lines-en.txt",
+    "bytes": 2852,
+    "sha256": "e522653ebd10999f4a7d9c53f27b0db357ac4594f1b303df9a80615f74db5214"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/master_of_coin/foundry.mintmaster_warning.txt",
+    "bytes": 40,
+    "sha256": "11071b525d9cf02bee37777d3839dca79344e5daf938e8e708c87d802e777819"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/master_of_coin-all-spoken-lines-en.csv",
+    "bytes": 176,
+    "sha256": "62c3c0452a582cb4603d68f505a2017b4f49d43966533720defeef633e875d74"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/master_of_coin-all-spoken-lines-en.txt",
+    "bytes": 41,
+    "sha256": "20bb7a64647e041120dc583b2a5b6d011194f32de5fbf0af9e9d5fff61c2017f"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.crossing_magic.txt",
+    "bytes": 57,
+    "sha256": "2ff6133e933ba7fd0394387c88529a350c1f87515bbc7c9e38b096fc6104ffed"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.magic_complete.txt",
+    "bytes": 80,
+    "sha256": "556f8acf596a51bbb5d13a6c3c13f589d56718f66324159616c29f38dee9564b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.magic_complete_limit.txt",
+    "bytes": 69,
+    "sha256": "3a297da3acb8d26176dc39d2cba1cf410e389b71c400110b64293f33c13b0afb"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.magic_limit.txt",
+    "bytes": 49,
+    "sha256": "2faddf3222750890cf2a7544f70ef200edf26ee17b6c9c15e15ddee6389d0f97"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.magic_offer.txt",
+    "bytes": 76,
+    "sha256": "c0b6bd6679124b4b7763b61de5f3495e200000fec33ab5c090ea75b49e3ab0aa"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.magic_progress_read.txt",
+    "bytes": 59,
+    "sha256": "2f0a976a5866681dec8827cc1c4f55d753e714ac6de8058dce1b6072d55c1217"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.magic_progress_test.txt",
+    "bytes": 75,
+    "sha256": "08f34e6afd60846971c7365a0a82599975c6dd5b7f519b0a355faebf2d9139af"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.magic_retry_rest.txt",
+    "bytes": 66,
+    "sha256": "7cde152c142cf608f4a44c3f7f52da6e3bb10d0d68c2f22dc7413ebcb4b4e9b2"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.magic_task.txt",
+    "bytes": 101,
+    "sha256": "e51bd57f5677c9ebb1c433bf233affb5ed893eb698462ee5e7eee6846c632a25"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.smoke_magic.txt",
+    "bytes": 71,
+    "sha256": "6fd7b53dda9546dcda770c73976ba35eb592a38c55417fac155ad7354cf7e2da"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.stones_complete.txt",
+    "bytes": 69,
+    "sha256": "168e974e452619d2dd00e6b87e865e225dc2a02e4ec315e870524d79d59c9002"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.stones_limit.txt",
+    "bytes": 72,
+    "sha256": "51ab13fa344c537f57d469524f3d7f0785699bce1bc86636936eb26fb2793161"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/access.stones_task.txt",
+    "bytes": 79,
+    "sha256": "e13c389486aa3221ed61631f305ccfef34a143041412eae0d49d417839658ee1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/court.access_options.txt",
+    "bytes": 98,
+    "sha256": "14fe4454e4e29026aac4b1d6ec039b01fe67db80ab662b013f230abeba38a84d"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/court.access_seals.txt",
+    "bytes": 70,
+    "sha256": "72edda0e192f8b32c79b380650498fcfc4e99f0929a3c98168ada57a04636823"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/court.preparation.txt",
+    "bytes": 79,
+    "sha256": "1a0da5a295ad6ff0b523fa4f7e01356c153e6150fedfbe7961150194955fe334"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/court.preparation_tools.txt",
+    "bytes": 76,
+    "sha256": "4d9eac3a89488a7f4bad48bbb3326fea641a1b435e09852fd597247386077f2b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/court.recap_bond.txt",
+    "bytes": 95,
+    "sha256": "38f11c75c8a748ab6c3d24c8703048478cf84f93a513d5bf4cf5bd910dba30c7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/court.recap_identity.txt",
+    "bytes": 62,
+    "sha256": "e84dce7b296ffee6a269b10b13fe0f5a6fcb05a2401ee03bb33f9569b2afec93"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/court.recap_king.txt",
+    "bytes": 51,
+    "sha256": "45fc659428993acdaa908d1ed793ff6b836d6b039449f5694143c11db86dc846"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/epilogue.record.txt",
+    "bytes": 57,
+    "sha256": "f5a7e78ce99d225148769b5b2eeca052d4826c4397886f8599b4577b2f7a5062"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/foundry.record_review.txt",
+    "bytes": 86,
+    "sha256": "6d8838ab5da28cd24ab77bac9e8c88719fbe04bbefa245440d4afaa06e215a9a"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.access.stones.progress.txt",
+    "bytes": 83,
+    "sha256": "dcbedbb10fef1011f5ebbc24cbd9c872cf5e145064794c19262cf12610dc03d8"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.access.stones.retry.txt",
+    "bytes": 69,
+    "sha256": "a2a8693225e7734e446555af92fa60cc25887acbb357c81e251faab5ad1e9292"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.first_errand.txt",
+    "bytes": 84,
+    "sha256": "d8f1ffa47a3a16fe54eba50856366b14fa67e89f86c8ce4a5b5329786ba136df"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.lantern_inspection.txt",
+    "bytes": 35,
+    "sha256": "1cc369f78db6f8598773e3ecfb5befdaeed4ae19ab813e4495aadc7cbf9cea6b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.lore.histories.1.txt",
+    "bytes": 108,
+    "sha256": "f58d6d69bcc0c3d2492b97600eb214b6ff5008d0bb81dcd5b662529e55f3eee1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.lore.histories.2.txt",
+    "bytes": 89,
+    "sha256": "ba650455ba031260d4ab72f953a8787af7d3a2143136fe2645272206fa7e9a45"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.passing.churchyard.txt",
+    "bytes": 96,
+    "sha256": "9f31f3f16a58176df83946ebed735ce5c820ff7f2b0457d8079ae96256674445"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.passing.shrine.txt",
+    "bytes": 82,
+    "sha256": "3af8887a6d47a01b2527ea165a501aa676e7ecce5b545d4f1488e0d7c64c3f48"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.passing.two_seals.txt",
+    "bytes": 64,
+    "sha256": "9ffbabbf33aabe632a9aac7c3b83ae46e70275e6f1476719a49ac6bbfac2d7a6"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.record_inspect.txt",
+    "bytes": 67,
+    "sha256": "5e30d83ce6f7deda943a07d8e405b8b2c64fbd6f8953ce74f0b1b91cdd10500e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.routes_independent.txt",
+    "bytes": 97,
+    "sha256": "8a99b5ae0983a239721a4e17b2996f3932764d0a478534573473b6619b52e00f"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.service.record.cancel.txt",
+    "bytes": 52,
+    "sha256": "f3255b73fa0d6266f771384c7163b7bd439411b047aa7f62caf492b24f9ac6cf"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.service.record.greet.txt",
+    "bytes": 65,
+    "sha256": "6c390115b77f3dd6c2fcab5c7bb0d724e149b641d3da73ebfdd8851e38ce50a2"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.service.record.insufficient.txt",
+    "bytes": 84,
+    "sha256": "97d85a56c8f29123930696992eedb82032fca37f73b62595b8d6d1f43960800b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.service.record.recap.txt",
+    "bytes": 66,
+    "sha256": "77adb2246d8f62dc1b2ed6f3305d204a2b3326ea695f7e3eed94507bc5de2c90"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.shrine_direction.txt",
+    "bytes": 82,
+    "sha256": "74bb4c8ad3fa28ad0964ccc9768d539963ac799d4889fa11711eb5c06505e305"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.shrine_fallback.txt",
+    "bytes": 77,
+    "sha256": "d7ad3ae5bf221dbcc2bdd7c94c2eb39bb30eea3e22e02be98e8eeee11166e1d3"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/hub.two_routes.txt",
+    "bytes": 68,
+    "sha256": "ae57e46db8a3a5bc9fe94c24cd423b594ffcb6ff0c86c7b525a52f43b5d19cc0"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/relic.claim_review.txt",
+    "bytes": 45,
+    "sha256": "8c600f8927c1f640a7a6ec575467cf1b142c0488c29309ae0d259eeadf366386"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/relic.inspect_record.txt",
+    "bytes": 87,
+    "sha256": "783c195b11b7d1f4ab42aa1635f735d45ffe4e32b65f0ae09d5572d8b41e0306"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/relic.return_choice.txt",
+    "bytes": 73,
+    "sha256": "0cdd7c5b45211c088051b2e6cb3e81949bfe427d96f3ba486380736891b75ee1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/relic.return_complete.txt",
+    "bytes": 81,
+    "sha256": "4fb92729426b26262b0b4ea1fc392fc9352f1ae860b2af701cf8952bd9a72a74"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/relic.return_preview.txt",
+    "bytes": 87,
+    "sha256": "175bbab75864d40e398ec1cf6730d73a18614d9a3c9ca03122b12ed47b703bf5"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/relic.sale_evidence.txt",
+    "bytes": 72,
+    "sha256": "e3e46b5b72b7d8794b508b1682b6b4a6f5b94d24e1b783f0e0e739bd5b413f8a"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/relic.sold_evidence.txt",
+    "bytes": 74,
+    "sha256": "3bd570b24b9b019f078b5058481b8a28327dfa1dd7b19587ee97eab44db3ab5c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/return.abbey_remaining.txt",
+    "bytes": 67,
+    "sha256": "a4d6f89a82dbc5cda855aacc9b553f2fd459ce48ddc9303b4f6a1ba959a86474"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/return.foundry_remaining.txt",
+    "bytes": 77,
+    "sha256": "84390a6bcf452bff07320a7c3337e6bce278f6ea6e47057a260fb8ed16dc3c21"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/return.keeper_word.txt",
+    "bytes": 72,
+    "sha256": "13a235234618cc1ed3923a59db4d10c94ff6fb0c824615fc948b98fc1c3776d1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/return.one_seal.txt",
+    "bytes": 53,
+    "sha256": "eb79b0431c6920de6ed0e66fe951b5f5fd6b0b5bce27f23654f673c8e114a4b5"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/return.one_seal_foundry.txt",
+    "bytes": 53,
+    "sha256": "eb79b0431c6920de6ed0e66fe951b5f5fd6b0b5bce27f23654f673c8e114a4b5"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/return.two_seals.txt",
+    "bytes": 63,
+    "sha256": "e920cd4471bdd9630829b4b22f984ff8d51b95e23f3c3c390a03b6fc1c524d73"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/shrine.register.txt",
+    "bytes": 51,
+    "sha256": "aba31f31caa408b89c126b4b95ad7d37256a0c995d536b6c734351d856453dcd"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/tavern.finale.names.1.txt",
+    "bytes": 49,
+    "sha256": "00d124d485b836b4c52a7ff56abf723a7914d14fd8b5c726a5510173411e2e21"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/tavern.finale.names.3.txt",
+    "bytes": 27,
+    "sha256": "bc5719116d4745c32f0e2a14e47fc46af5d8fbd6627abc7ad638fa1124f8b5c8"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/tavern.oneseal.claims.2.txt",
+    "bytes": 53,
+    "sha256": "c3fdb3491ba8358693b2dc7ead4151f7ecd12434086963e025ae38e300db36d1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/tavern.preseals.bell.2.txt",
+    "bytes": 62,
+    "sha256": "cff661a81e67fb56bc6f163545722570771feba6eb321c47ab643a2344489e9e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/tavern.twoseals.reading.1.txt",
+    "bytes": 83,
+    "sha256": "27ed1a8978b095054d007c2792228f79f8606ea4144a5c0afc42bf8e493ddcd1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper/tavern.twoseals.reading.3.txt",
+    "bytes": 48,
+    "sha256": "611e3925b69b98a4f40e2a83f2dc2f40f4e34eb4ddb50a7d94ebc6e2314ba84d"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper-all-spoken-lines-en.csv",
+    "bytes": 8342,
+    "sha256": "0f4286480cd10e171a15760ea13476a326591bd3da6e7613c3a64c2c899b1665"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/record_keeper-all-spoken-lines-en.txt",
+    "bytes": 4302,
+    "sha256": "75c940f72c093cef927d3622c8e7b34577c3baae3287d9e1da6591e34a015d66"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/hub.named_relic.txt",
+    "bytes": 61,
+    "sha256": "93607bb6fe6835d8423e9885e3d35c4b81f80e42524635e8e6b1986e1fb82620"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/hub.ordinary_sale.txt",
+    "bytes": 63,
+    "sha256": "381c6de374de0cc5e89210999bae7541f725d0955843947a4dc3d0affa1ef0db"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/hub.passing.relic_returned.txt",
+    "bytes": 63,
+    "sha256": "58065e1897a6bae6b37a4942ab29b5ea69be693f9ec09023964b62cbd4201ccf"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/hub.relic.decision_deferred.txt",
+    "bytes": 68,
+    "sha256": "2903306a1df67dfc71a8f3f3b457a0fddb9ec8f232a4aa01fd901a1ed21dd806"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/hub.service.dealer.cancel.txt",
+    "bytes": 50,
+    "sha256": "87e652baa3abd3b5d994dd41412e6c7ae8ec0dfc1d43db7149163a364b1c2121"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/hub.service.dealer.greet.txt",
+    "bytes": 50,
+    "sha256": "3f0412b859e9e8c485f7237d06a0eb783736084f1ae53f2709ada3d0165ac06c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/hub.service.dealer.insufficient.txt",
+    "bytes": 71,
+    "sha256": "0ca9f984a0aea6f7f9851d2406228c0cf327153aceeeb11037450a59a02513a1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/hub.trade_stock.txt",
+    "bytes": 63,
+    "sha256": "1094c781a9601d85ceee7894a4af5ae2b5f704af698ae01adf09e5ccfb654803"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/relic.inspect_price.txt",
+    "bytes": 64,
+    "sha256": "30fe9f43a0c88423b45d62c924ede06d6a8d6210feba72fcdadb49f51bd11b0e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/relic.return_dealer.txt",
+    "bytes": 71,
+    "sha256": "b7971e6969c2262a853d5b2ac3da02b77fa83726e33e43735d0d124f091b1a76"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/relic.sale_preview.txt",
+    "bytes": 86,
+    "sha256": "000b9fbe5cfe2b0dfbc1ae3fbae7c37fb31f7041791b7df4b06a53e531e248d7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/relic.sold_recovery.txt",
+    "bytes": 70,
+    "sha256": "0a44ee6e83571d19b4d8dcbf33f9455dc36cbb0cf53a6eb57e03973f75d59b83"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/tavern.finale.names.2.txt",
+    "bytes": 35,
+    "sha256": "0f944493c8446ccce416540f75f53ed715ec59f62900edebbe337c8e5953257a"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/tavern.finale.supper.2.txt",
+    "bytes": 11,
+    "sha256": "d8a726eac1d0dea534b30ab40ffff7899c4862e4d55445e17fae5ba68ff60ba1"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/tavern.oneseal.claims.1.txt",
+    "bytes": 43,
+    "sha256": "2177d4d890657bad1e3a34915787f3244692f5918d694c88155db88eec8907f0"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/tavern.oneseal.claims.3.txt",
+    "bytes": 36,
+    "sha256": "b4becb3c16d9628deee48789912bbbfd914d109d635a56735cf627dba44a9aad"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/tavern.preseals.weight.1.txt",
+    "bytes": 44,
+    "sha256": "247befbc60459abdb6afe35f2d7f39388b7878b531d7671aa148171c597cdcba"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/tavern.preseals.weight.3.txt",
+    "bytes": 41,
+    "sha256": "57e7ffbabd3945f75a2a0d19f692ad99448a0d6611bb99f7a06fa429b8550eab"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer/tavern.twoseals.ridge.3.txt",
+    "bytes": 74,
+    "sha256": "375a47aeca93b0097bba1b95efe4e6a5fd2e5864ef6f9816105c3713547c02b8"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer-all-spoken-lines-en.csv",
+    "bytes": 2444,
+    "sha256": "10d4e603ce06110b062ce4b09158576bd980c20c032905a9a30995cf9c966d34"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/relic_dealer-all-spoken-lines-en.txt",
+    "bytes": 1083,
+    "sha256": "ae260d648187176f3cde8c5d602abf6d0f870ee8cc4c705f5b3ab19ebaf09909"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.abbey_alternatives.txt",
+    "bytes": 84,
+    "sha256": "24bc92aad91006b5cb19d84d0d260491377d6855fea1af2ad02a21eac30cd3a7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.abbey_problem.txt",
+    "bytes": 82,
+    "sha256": "68e593f7f77f52467005b874ad713d2fc944e6c41ff1a0bf1dc1b177a1e1895e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.abbey_ready.txt",
+    "bytes": 68,
+    "sha256": "6fd7777e0f5e41be13a45c799d4fe32ed504c8e0fb6c8e2b1acc98950397f596"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.body_complete.txt",
+    "bytes": 80,
+    "sha256": "a39aa7cd4f6e818920e8ce2aedb1fb817cde82ec14a012abc2ca165676891797"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.body_complete_limit.txt",
+    "bytes": 80,
+    "sha256": "20456e7e1321fd4f20c2c90015df0ecbdc5d8911b59462686bfd6ec0eff89b2f"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.body_limit.txt",
+    "bytes": 72,
+    "sha256": "f543cfa80ecaec327582b0d042927e91925ee707c070bd284b967544c5c0175e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.body_offer.txt",
+    "bytes": 79,
+    "sha256": "aebedc3ce516adeb2fb3f73a1f7e698bc7e24fee16c7552ffeb7de818fbdfa97"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.body_progress.txt",
+    "bytes": 54,
+    "sha256": "85324c34e4bb5ef79bbc6a3aba511e1d6338c4c4de0110cba377fa03ecd5dcb6"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.body_retry_plan.txt",
+    "bytes": 50,
+    "sha256": "e48064248f1be244b744cf590792b4896a984793a2a8299027c6aa1b9867c3b6"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.body_retry_stop.txt",
+    "bytes": 60,
+    "sha256": "dc0669df74d50ae82a4826cda273129cc61ebf13e3ddcf77fc5293bdcd28e75b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.body_task.txt",
+    "bytes": 67,
+    "sha256": "617abef38d9b4b35f436bb6c34b2f073e99aeb6e3f8d811b2f496d31176bb152"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.climb_body.txt",
+    "bytes": 79,
+    "sha256": "8b8ff6a533d98199d618f3e1ea7a5bb3e6ca72584d6eb8b047c5de0fe010226d"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.climb_complete.txt",
+    "bytes": 79,
+    "sha256": "d89be5d024eddd4c4196d56f4c0adc731d557cae1e853aa18fad53bac1aa9b09"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.climb_smoke.txt",
+    "bytes": 80,
+    "sha256": "d000803a44fe3ff536e63f0316e658ab51d0ff42a576852f89494dbad9968f02"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.climb_task.txt",
+    "bytes": 61,
+    "sha256": "61703021b3c3e3d7ba0291c0606dcc5f32826864d8c0a978d326b9490877ed20"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.smoke_body.txt",
+    "bytes": 71,
+    "sha256": "6659994d9529f4a1f3ae0cedc437d12933be985f95aedfd224584fa9e4b5f47b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.smoke_retreat.txt",
+    "bytes": 100,
+    "sha256": "ebcae85f4ea78692f69d204705fdc7d5d7836e0aba3ee544f6b7f882c6a4cbbb"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/access.smoke_separate.txt",
+    "bytes": 94,
+    "sha256": "d2365b9aa9c2351a35c8f8b31749ee290bdeae58b8e57dfad90ccc48e291b9ed"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/hub.access.climb.progress.txt",
+    "bytes": 83,
+    "sha256": "93ebf06542e80437aac1ff80d80baf60e188ac6768bbc8475e1900e2ba6b3ab3"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/hub.access.climb.retry.txt",
+    "bytes": 59,
+    "sha256": "ce275a006995d61c660a3ccb08a74a32e611b7bded56e22139a95922dab3fdde"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/hub.passing.heavy_pack.txt",
+    "bytes": 44,
+    "sha256": "51dd3db8eea4a532b0a18f96bd627a5a23e8c9ead2194c01acf07080be23c304"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/hub.passing.learned_retreat.txt",
+    "bytes": 63,
+    "sha256": "c7bdfc824b2fd6aabb2759baeec548b52af01f913b6303a2c038f251c354be25"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/hub.service.salvager.cancel.txt",
+    "bytes": 46,
+    "sha256": "e6fe59269a2c626b26a37ba8eed6fe0c33fd85f80fa5f8dbf06a69ffe55c7d16"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/hub.service.salvager.greet.txt",
+    "bytes": 41,
+    "sha256": "ef7668b98839872b5e5678a9277bd985205b46725f7df84b7bdc0fd0e18e4af6"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/hub.service.salvager.insufficient.txt",
+    "bytes": 80,
+    "sha256": "586422acfb800b43950c379e8d9bf6b9b6ad72bc5731b4139cdb397c5565f045"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/hub.service.salvager.refresh.txt",
+    "bytes": 78,
+    "sha256": "65ee776de91d01b4157e154e9a60a3410512bcd17da0533df4d2f778c20ac53c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/tavern.oneseal.pack.3.txt",
+    "bytes": 24,
+    "sha256": "02f5dd5fb1a05e70b3ec622a65177c9d63601b10b3dbe2b6fd790e3e7f546951"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/tavern.preseals.kit.3.txt",
+    "bytes": 53,
+    "sha256": "4de3bf208e530367af682e1f814ccc48160f2a0637e17111179cf8996f6d0e0f"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager/tavern.twoseals.ridge.2.txt",
+    "bytes": 34,
+    "sha256": "12a81077b9b72abf39a1b064a8320d5c9f361f7e5a326c677abac69882893b2e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager-all-spoken-lines-en.csv",
+    "bytes": 4023,
+    "sha256": "b5faa0dcb67b05b7fba28c117a1a2d3f6a5e9981c6fb7363041321240b7afc0e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/salvager-all-spoken-lines-en.txt",
+    "bytes": 1974,
+    "sha256": "50c7ab9777f235552f9956109c89050ebb03640644415eb1a6485da867161acb"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/access.foundry_alternatives.txt",
+    "bytes": 98,
+    "sha256": "0eb0283779bdba6dfabaf51cb5894382479d5140eba467d726837a79599feebf"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/access.foundry_problem.txt",
+    "bytes": 83,
+    "sha256": "6d3468bf5202d2546e730a449bfd8a230907fef58b304d392bbba91c47ca6a2f"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/epilogue.welcome.txt",
+    "bytes": 47,
+    "sha256": "bec54a9f5e2a1b8920c04dd9cf94abe59b884e87893bc2a66bf28e13e8c11a86"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.arrival.txt",
+    "bytes": 50,
+    "sha256": "11f2aa420b3c5b8d377623e6471b2443122a8c36bc05928224e47d2079d49fe4"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.component_choice.txt",
+    "bytes": 51,
+    "sha256": "88869258142739254e1a9074ec0b40f2f22826d7993924e034d65d83cab4ae7b"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.horde_army.txt",
+    "bytes": 89,
+    "sha256": "21c0f2d646f70f53c6e695733b6b7db535c5c0a204f081655b91cf039c896934"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.lore.bell.1.txt",
+    "bytes": 105,
+    "sha256": "ea0501d25f2ffcff05b85d8d52fa8b4f2e7803c20dbe8f7a6e8e76027cfdaed7"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.lore.bell.2.txt",
+    "bytes": 67,
+    "sha256": "75222a44c8438a08d1b13c6384b7d13b39dbe72c879ff1f4ba9c0e4e6a9fd7fc"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.lore.caravan.1.txt",
+    "bytes": 101,
+    "sha256": "417edf4f26ec7f34783598b74658cd222b8349675046600cd67de7a97c9ad77f"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.lore.caravan.2.txt",
+    "bytes": 58,
+    "sha256": "307a3fe4ef7fa2df0c2e0a5cf91ec45c429d0847982ca0d45624732a3b11da47"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.mill_repaired.txt",
+    "bytes": 86,
+    "sha256": "bba476af80634c206207401f2d8972175af8ac6015a201a6427a2debea6781bf"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.passing.arrival.txt",
+    "bytes": 53,
+    "sha256": "111d2cf3222ed37a8044544a21c1aedcbd6c464880f2f992c08cc23f3303447a"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.passing.finale.txt",
+    "bytes": 37,
+    "sha256": "50f80c475a2375328034ae839fafcb4ce05b9d8ad25fc9e6d374f7e082ef7ca3"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.passing.trade_arrived.txt",
+    "bytes": 36,
+    "sha256": "1ca2294a67eb5c46fb85e02eb5af51bda6cffd6e78c0481be3b3e01778790033"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.service.tavern.cancel.txt",
+    "bytes": 51,
+    "sha256": "d759b65c7a8890e1199a9de183ab2bcbac06ebf2708c7d95b230ce148e43f64c"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.service.tavern.greet.txt",
+    "bytes": 50,
+    "sha256": "5c8de96953b279d225a20860fb67ac9bffee1b13f092e3a526213b7eeb253d6a"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.service.tavern.insufficient.txt",
+    "bytes": 60,
+    "sha256": "73ab57770675d51f633f6c589f6c0d4a2e3ff767b35a80bcf87d93c0d5909d19"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.service.tavern.kit.txt",
+    "bytes": 77,
+    "sha256": "79477c71b168e68c042d7e2728a383d9984c1ec152a047967e9c897d4a454ec3"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/hub.trade_arrived.txt",
+    "bytes": 46,
+    "sha256": "03bf2a9ad215f6a4b226967774b603f1c7caecbc5dd545bab070c94232b3cdfa"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/tavern.finale.kit.2.txt",
+    "bytes": 27,
+    "sha256": "7881ea535a947797a615568f68194e696512331cb94dd4eb25c9e4603573b55e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/tavern.finale.supper.1.txt",
+    "bytes": 36,
+    "sha256": "f9c93bce19ec99ab5ee1f1726be9fc371b9cdcbea3e620a63d95458fb165f988"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/tavern.finale.supper.3.txt",
+    "bytes": 16,
+    "sha256": "66ee9311d5bed2839dbfd2b746f1d762df3e9abada5b04602c873a96a1a8824a"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/tavern.oneseal.pack.1.txt",
+    "bytes": 75,
+    "sha256": "9273611af4650b3571dcc75b5d71725c27b61676f6fdafd658ba0d21b6d30470"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/tavern.preseals.bell.1.txt",
+    "bytes": 61,
+    "sha256": "3a54b28b0af43cf13920b9eb6833764afad56aa136ccf14018a065ab9bec3395"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/tavern.preseals.bell.3.txt",
+    "bytes": 77,
+    "sha256": "d591a15084ea68e0f836f4cc619e62ad896988279d8549df9eef9b243af59171"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/tavern.preseals.kit.2.txt",
+    "bytes": 28,
+    "sha256": "ed798513c797dfaa3a31682d1866ee7c38c758c2ea120b514c1dee28074a3a2e"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/tavern.preseals.weight.2.txt",
+    "bytes": 46,
+    "sha256": "3c80de864ab1d4967282344f605ead7dc2800061230daabaeadf319394dbe4b5"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/tavern.twoseals.kit.2.txt",
+    "bytes": 59,
+    "sha256": "e17f35fdaba121c63bc2132ef706b8d4746feb5e3885a6690b258623259f4ee9"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper/tavern.twoseals.ridge.1.txt",
+    "bytes": 77,
+    "sha256": "d4779078c40570e75c9589fcb5aabac2694d57f41d47f9e85427047fb17fbc33"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper-all-spoken-lines-en.csv",
+    "bytes": 3743,
+    "sha256": "110e374a3545f5db6327d299ddd3d8be5af07019e48e6a4b63a279d4c89e5302"
+  },
+  {
+    "path": "TTS-English-en/core-candidates/tavern_keeper-all-spoken-lines-en.txt",
+    "bytes": 1776,
+    "sha256": "d9dee5c0bf841e57e7f3f670c6325c5331b5663c54ce63fb4f6bfdaeff275673"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/court_keeper/court.custody.txt",
+    "bytes": 71,
+    "sha256": "e999ba646f8bc6065b2286be999d6702f43379c44762501ad4104002ce847592"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/court_keeper/court.final_seal.txt",
+    "bytes": 65,
+    "sha256": "fb591f54ea2bf1f20f9d74b480a80ba85480e5bf27850c4c845739c525fc118d"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/court_keeper/court.fourth_keeper.txt",
+    "bytes": 79,
+    "sha256": "7cae13fb74bf008a16241ecd4b542f8aa7c70e98bdfc60b3b7120c2ab7d882ff"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/court_keeper/court.king_proof.txt",
+    "bytes": 75,
+    "sha256": "602f6dc84316794ed38dd2e7abeb3a7096753d3d4194c054365d7151b66d216c"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/court_keeper/court.memory_evidence.txt",
+    "bytes": 44,
+    "sha256": "6e2f9eb4a745e9fac7d031d626d8302101217cfb244c3ecff902d2977e8bca2b"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/court_keeper/court.true_bargain.txt",
+    "bytes": 74,
+    "sha256": "01d0e7e60e66dc780b20802cc501f4e950fd6cd5a12f9e867ae44bb35c091393"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/court_keeper-all-spoken-lines-en.csv",
+    "bytes": 823,
+    "sha256": "bae170345723b9c5ece4d3a6d6f6836c41ec40140fa5a48ff87e7048d2a229f8"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/court_keeper-all-spoken-lines-en.txt",
+    "bytes": 414,
+    "sha256": "6e7bcc25a3eb10cf0c1e30750e03ff296704d7aa69559aeb369c01614b216041"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/fourth_keeper/prologue.keeper_last.txt",
+    "bytes": 26,
+    "sha256": "8a3a46ca4f0347f3da5d21b824600cb1185ddfdc25b9aa39c162cafc6b63267f"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/fourth_keeper/prologue.keeper_warning.txt",
+    "bytes": 42,
+    "sha256": "2cb84b3289988f1956b3b670b60fcf4003fab79f00b72cba08ed3f9a22902e0c"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/fourth_keeper-all-spoken-lines-en.csv",
+    "bytes": 263,
+    "sha256": "d024f06a555efc36add7358c1ac0158f95becb94b7a1ac9fba87609b8bd47d28"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/fourth_keeper-all-spoken-lines-en.txt",
+    "bytes": 70,
+    "sha256": "796c8ad217c613c556fe2ed8061f279c4e6971c1aabcd469ac6d156dbbbf6bef"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/kit/kit.approach_injury.ankle.txt",
+    "bytes": 65,
+    "sha256": "9bdcd03a527356e9bd78ec4a4608d98688cac3ed2b07e57fc0f1b35de38e3c3c"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/kit/kit.approach_injury.arm.txt",
+    "bytes": 54,
+    "sha256": "77baf4269d73869c867516311d2c7011dcae599288895e0fd3de7185a58340e4"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/kit/kit.approach_injury.stop.txt",
+    "bytes": 18,
+    "sha256": "f0996277c3e23de6091447c801a4902d2ab39e2b2e86e09aca1004103861018e"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/kit-all-spoken-lines-en.csv",
+    "bytes": 417,
+    "sha256": "8b18d4b8b49e196276820fa2817a707cef92bb3f71de61261b6f0cf921879e75"
+  },
+  {
+    "path": "TTS-English-en/decision-blocked/kit-all-spoken-lines-en.txt",
+    "bytes": 140,
+    "sha256": "e83a87e9a85bebae0804885e4e1859e4b3c606318cc2e424f89465070c01c30b"
+  },
+  {
+    "path": "TTS-English-en/optional-final-boss/lantern/bark.entity.command.txt",
+    "bytes": 6,
+    "sha256": "8fa1e0d828947a73353eb47c32c9213c68ea7310211c06add1ed259316be5847"
+  },
+  {
+    "path": "TTS-English-en/optional-final-boss/lantern/finale.entity_last.txt",
+    "bytes": 22,
+    "sha256": "07662b3290672a415dc7657a3c04fc1374a26d5edd130f7b29f54f1aa263ea5e"
+  },
+  {
+    "path": "TTS-English-en/optional-final-boss/lantern/finale.entity_light.txt",
+    "bytes": 19,
+    "sha256": "9508d9109ca2510548060605e9f9a3cc5a798ebc6fe65156ea559d81d77758f9"
+  },
+  {
+    "path": "TTS-English-en/optional-final-boss/lantern/finale.entity_pressure.txt",
+    "bytes": 26,
+    "sha256": "b98ad03b771b98ef035ac0c2a8f40018eb01159d78f44e2acc14c3797091eddc"
+  },
+  {
+    "path": "TTS-English-en/optional-final-boss/lantern/treasury.entity_claim.txt",
+    "bytes": 69,
+    "sha256": "e13a088f5258ac7d5e9dbd7c7159a92ee084132434d1ddea648fb020e2d4f30d"
+  },
+  {
+    "path": "TTS-English-en/optional-final-boss/lantern/treasury.entity_demand.txt",
+    "bytes": 51,
+    "sha256": "8298f3f82f8f861856158aafa05a591afb611834333e96b8c1754ba02e778288"
+  },
+  {
+    "path": "TTS-English-en/optional-final-boss/lantern/treasury.release.txt",
+    "bytes": 8,
+    "sha256": "41e7e213cacb4efde23024184c5a78e30573ac2dd27db3bfc8358fe7f039eb1d"
+  },
+  {
+    "path": "TTS-English-en/optional-final-boss/lantern-all-spoken-lines-en.csv",
+    "bytes": 709,
+    "sha256": "0895c0afd5b55ee079aa4866ed355c7b1b45bc94d71cf6b783536eba9a147271"
+  },
+  {
+    "path": "TTS-English-en/optional-final-boss/lantern-all-spoken-lines-en.txt",
+    "bytes": 208,
+    "sha256": "17bedd7eb9c8131ea308353ea65bc516f29492684c9309ad9f7578247565c97d"
+  },
+  {
+    "path": "VALIDATION-English-en.json",
+    "bytes": 45343,
+    "sha256": "2c36442d36692928ea1918d82d8ee84a5c14aa50ac24ee85d5831a4574fd7f10"
+  },
+  {
+    "path": "dialogue-bank.schema.json",
+    "bytes": 5712,
+    "sha256": "079d8d1518fcf79f0b1e5a817ce2ebb0f8fb0f16c5af675123452581ca21d282"
+  },
+  {
+    "path": "localization-manifest.json",
+    "bytes": 193413,
+    "sha256": "5a0eeb0b6f1f855f945db65ee003d51e24fa6e71ac2229b22fcbe36f64406699"
+  },
+  {
+    "path": "reserved-historical-ids.json",
+    "bytes": 5552,
+    "sha256": "937899a9af0231590fa8ee9f4776c1b9f19ee3de46442b62b075d7e591e127c7"
+  },
+  {
+    "path": "source-manifest.json",
+    "bytes": 2753,
+    "sha256": "2957e09699b7077a2a27a3fdd20da356f34aa0900cf49843f343a6310a207b5f"
+  },
+  {
+    "path": "state-contract.json",
+    "bytes": 120011,
+    "sha256": "a16e9e0fe2504ec0262028381a930cff23df62928df98066a4d2690a9dcd01da"
+  },
+  {
+    "path": "tools/export_bank.py",
+    "bytes": 2765,
+    "sha256": "7947974ad2d4c61a43ca2113c8ded5ae683c43c95390884132f082c15b6da886"
+  },
+  {
+    "path": "tools/opening-baseline.json",
+    "bytes": 1371,
+    "sha256": "22319a28dc1c661d83e3499a7bf920ab6b390d4e60a139f00d73052e9600f279"
+  },
+  {
+    "path": "tools/validate_bank.py",
+    "bytes": 6647,
+    "sha256": "775283986289616655ad84b22690a411a6ab5bab3c60aa6bfca26dad506c03fd"
+  },
+  {
+    "path": "tts-manifest-en.csv",
+    "bytes": 105849,
+    "sha256": "e2efadaf0f6790162cf072ee4e899930872a15a45ea674b489dbf67bcc558ef9"
+  },
+  {
+    "path": "tts-manifest-en.json",
+    "bytes": 198056,
+    "sha256": "89af6fa324b0bd4e82339c7fba17630202e8506946e5d6f525f8a89941566460"
+  }
+]

@@ -1,0 +1,136 @@
+{
+  "source_commit": "bae7bd58bfc123044d948c345b2b51000880d358",
+  "policy": "Never reuse these legacy IDs for different spoken content; reintroduce deliberately with revision review if the historical scene returns.",
+  "reserved_ids": [
+    {
+      "line_id": "hub.road_stake",
+      "prior_text": "I used to bring six wagons through here. Last winter we had one.",
+      "prior_sha256": "4b86d30e245982e8aeb0bada8384d931922d9e455e32eeea2c3ae9f3ec2023cb"
+    },
+    {
+      "line_id": "abbey.bellkeeper_fight",
+      "prior_text": "Keep the light from the altar.",
+      "prior_sha256": "ff25c829ca41216165567c595ee16bb14a020cc238f1f560a2171b57b6836431"
+    },
+    {
+      "line_id": "abbey.claimant",
+      "prior_text": "My mother's people made that mark. They were told the river took their silver.",
+      "prior_sha256": "9b950514b6d825763f2af7d947cdaaed5c3f6712902ff0581b07efc9d8882659"
+    },
+    {
+      "line_id": "abbey.return_relic",
+      "prior_text": "Thank you. I'll put it where people can see it.",
+      "prior_sha256": "a0ef9657da1bcb9f812931592a2c6b8b9a3ed5cb8d0cc24d2d8b3127ef637645"
+    },
+    {
+      "line_id": "abbey.keep_relic",
+      "prior_text": "You know where it came from now.",
+      "prior_sha256": "22464bfd5d45bde895e56c71e4416a8e89f022e9f0339e6f402ca2a4dc683601"
+    },
+    {
+      "line_id": "foundry.mintmaster_command",
+      "prior_text": "Back to your station!",
+      "prior_sha256": "7ba8902472d40d2d3a1548573a48096552d60f50c23a59ea78315209b32a0539"
+    },
+    {
+      "line_id": "foundry.boss_hint",
+      "prior_text": "Close the shutter. Move while its search passes.",
+      "prior_sha256": "703232ad3d619b6e93984f743b8d9b30b47944512fc959c378054cac42d3f2ae"
+    },
+    {
+      "line_id": "foundry.trade_returns",
+      "prior_text": "A wagon came through this morning. We unloaded it together.",
+      "prior_sha256": "4997a82ab858c172a91f8f0c44c46168524e8cad6a13d76337c1928cb9359287"
+    },
+    {
+      "line_id": "court.focus_tool",
+      "prior_text": "Narrow the light. Follow the line through the glass.",
+      "prior_sha256": "5460d2f58dfbe742dcf64b47a34e71a110335013f900322a64d9d98282fd0805"
+    },
+    {
+      "line_id": "treasury.first_sight",
+      "prior_text": "It really is here. All this time.",
+      "prior_sha256": "61fd0e789b5137993a47ad6d738f2300ae381f1f042e56e7ee33de171ffb6b0c"
+    },
+    {
+      "line_id": "treasury.recognition",
+      "prior_text": "That's the same mark as the Abbey silver.",
+      "prior_sha256": "890d19caec9d1502102d50eda46d2bea1ca0ee4d134183380f8e42cd35d41812"
+    },
+    {
+      "line_id": "treasury.kit_prepare",
+      "prior_text": "Check your light. Check the way back. I'll keep this passage clear.",
+      "prior_sha256": "e348b251894051e5d554a52ebd2acdf4b304a9fab634152f8d1f9e8ac30a851b"
+    },
+    {
+      "line_id": "epilogue.mill",
+      "prior_text": "The mill's still turning. I thought you'd like to hear that.",
+      "prior_sha256": "f63e65a8dc01341d7fcf1c619169e416cb32ff7d4ba4b8da4a2a59f91cfa58d2"
+    },
+    {
+      "line_id": "epilogue.relic",
+      "prior_text": "People keep stopping to look at it. Some remember the mark.",
+      "prior_sha256": "79575b703612b24436e14c38d1396e940f594925d69fa0ed80cd931965f476ed"
+    },
+    {
+      "line_id": "epilogue.trade",
+      "prior_text": "Another wagon is due tomorrow. We might need to clear the spare room.",
+      "prior_sha256": "a161921f24876719f468ac372becc818745c058fecd8ef3e988e76acae5c6ef0"
+    },
+    {
+      "line_id": "epilogue.salvager",
+      "prior_text": "Good. You remembered to come back up.",
+      "prior_sha256": "d34091a34c8dc00b480fb4dff2fa8a1acf7dfe87339e8c25414e245bfd7aa7e7"
+    },
+    {
+      "line_id": "bark.kit.loose_stone",
+      "prior_text": "Mind that loose edge.",
+      "prior_sha256": "84c51d38a7d4d59224ee791fb51fdc16d5db123a39f4c58723efe0046091cee7"
+    },
+    {
+      "line_id": "bark.kit.find",
+      "prior_text": "Worth a look.",
+      "prior_sha256": "66f9a04cb20a8bd6a3e00e7ba8be07c7409369f2240c89ecfea97cad5f4ac834"
+    },
+    {
+      "line_id": "bark.kit.detour",
+      "prior_text": "I'll keep an eye on the path.",
+      "prior_sha256": "d0edcb24e7f91b2c5863d0d6e8f389e3374f8f033d0d6d41b62484f0eb96c7ce"
+    },
+    {
+      "line_id": "bark.kit.dark_humour",
+      "prior_text": "Lovely place. Shame about the dead.",
+      "prior_sha256": "35185da82b5100226661e6df06be3c3c449169e1a84387a1d4ea7b7e1af55cd2"
+    },
+    {
+      "line_id": "bark.kit.safe",
+      "prior_text": "Take a moment. We're clear.",
+      "prior_sha256": "7d2a65ba21f84df7074bd318b005558679fab6d9849c038c624c41509d6fb2f8"
+    },
+    {
+      "line_id": "bark.lantern.light",
+      "prior_text": "The light reaches it now.",
+      "prior_sha256": "f5095de799cc64d7e1673e1f435b060279e2f17c1c7cffc3b25451e245093448"
+    },
+    {
+      "line_id": "bark.guard.hold",
+      "prior_text": "Hold the threshold.",
+      "prior_sha256": "e617889faa5bc82c8ca01f273feb97843c761eba1c8a1ff7c11041c76ac5fd9e"
+    },
+    {
+      "line_id": "bark.bellkeeper.duty",
+      "prior_text": "The bell must sound.",
+      "prior_sha256": "581e8b70e76b06aa87dc20bf721f2c50ebce3999aee61abae087f801a61aadb9"
+    },
+    {
+      "line_id": "bark.mintmaster.debt",
+      "prior_text": "The debt remains.",
+      "prior_sha256": "86b0d4e2f407596557eee13d1d75e1b2c8b8b19f5fca747fdfe9fb7dc63ae438"
+    },
+    {
+      "line_id": "bark.court.stay_back",
+      "prior_text": "Keep it away from the glass.",
+      "prior_sha256": "f3f333b30599c26659b756fcbf212cf2ba0bd49f4ac143beb5b23cb6621de71f"
+    }
+  ]
+}

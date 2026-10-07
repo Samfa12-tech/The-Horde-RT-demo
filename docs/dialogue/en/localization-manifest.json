@@ -1,0 +1,5014 @@
+{
+  "source_language": "en",
+  "supported_languages": [
+    "en"
+  ],
+  "fallback_order": [
+    "requested_language",
+    "en"
+  ],
+  "accent_not_specified_by_tag": true,
+  "line_identity": "line_id is language-independent; translations reuse exact IDs",
+  "on_source_change": "increment source_text_revision; change source_text_sha256; mark all translation/take revisions stale",
+  "entries": [
+    {
+      "line_id": "prologue.kit_grate",
+      "source_text_revision": 1,
+      "source_text_sha256": "1a31d2c18023c1be6242ff3a9283d798033ec6b0075b71cb89e01794a8101d38",
+      "spoken_text": "Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful!",
+      "subtitle_text": "Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful!",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "rescue.found",
+      "source_text_revision": 1,
+      "source_text_sha256": "dcd11fd018f363529cb50ddfce3259b3b9a951e4c6ec20066060d131266c166d",
+      "spoken_text": "There you are. Still in one piece?",
+      "subtitle_text": "There you are. Still in one piece?",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "rescue.rope",
+      "source_text_revision": 1,
+      "source_text_sha256": "2f6b9d691aed9457053222074c2c7d0fb85993eecf1b880b2e9755e9e1156db1",
+      "spoken_text": "Stay clear. Rope coming down.",
+      "subtitle_text": "Stay clear. Rope coming down.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "reunion.question",
+      "source_text_revision": 1,
+      "source_text_sha256": "605160366068b6e057b162e3d6b613f3dc8067297a84b2a25a884a0bf966a85e",
+      "spoken_text": "Steady. Catch your breath. Did you find it?",
+      "subtitle_text": "Steady. Catch your breath. Did you find it?",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "reunion.hint",
+      "source_text_revision": 1,
+      "source_text_sha256": "ad4c5469e0067ad5a4a8b81b8a2ee31f449584203881b2846f8fbca7c2839425",
+      "spoken_text": "Let me see. Raise it.",
+      "subtitle_text": "Let me see. Raise it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "reunion.proof",
+      "source_text_revision": 1,
+      "source_text_sha256": "c840c966ace50c4b77ca06ea1bcc308360f18e268a2e6898c216d332d95a490c",
+      "spoken_text": "Then we're not chasing a story anymore.",
+      "subtitle_text": "Then we're not chasing a story anymore.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "reunion.first_piece",
+      "source_text_revision": 1,
+      "source_text_sha256": "75cd92c83cff8672dc34640b6fcc8f6b33696d9bb855e8e8c353458fb29111e1",
+      "spoken_text": "A start, then. Let's see where it leads.",
+      "subtitle_text": "A start, then. Let's see where it leads.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "reunion.depart",
+      "source_text_revision": 1,
+      "source_text_sha256": "fdd92934c6fb69a7c8a6e3ea82459a9047fbf27eead0855bc670e5ff0be42cad",
+      "spoken_text": "Come on. There's a fire and a dry seat waiting in the village.",
+      "subtitle_text": "Come on. There's a fire and a dry seat waiting in the village.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "forest.night",
+      "source_text_revision": 1,
+      "source_text_sha256": "83ac9fc3b020ca09f492b9930d5200852437182443edd5dc7e61c63a498b3815",
+      "spoken_text": "I'd forgotten how big the sky was.",
+      "subtitle_text": "I'd forgotten how big the sky was.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "forest.waystone",
+      "source_text_revision": 1,
+      "source_text_sha256": "2327e1cfa024d4410931b6aef03dc1e200ba40691f9ea7719b379bcac57aec60",
+      "spoken_text": "Hold it there. There are marks under the moss.",
+      "subtitle_text": "Hold it there. There are marks under the moss.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "forest.clue",
+      "source_text_revision": 1,
+      "source_text_sha256": "bc3e21d6874be80b995f6ec68f4e71342c035de1a8cf7d7125efd84baa79c0b1",
+      "spoken_text": "A road to the treasury, perhaps. Someone in the village might read it.",
+      "subtitle_text": "A road to the treasury, perhaps. Someone in the village might read it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "forest.wait",
+      "source_text_revision": 1,
+      "source_text_sha256": "b2d1c50f974f8824d25d5958eaa5a19f814035d9fb9314748b53a1a467b18dec",
+      "spoken_text": "I'll wait here.",
+      "subtitle_text": "I'll wait here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "forest.village",
+      "source_text_revision": 1,
+      "source_text_sha256": "9b93476154e938621a9b6c8fda5249e499077d161dd6188476431eb7a03faaf3",
+      "spoken_text": "There. Chimney smoke.",
+      "subtitle_text": "There. Chimney smoke.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.record_inspect",
+      "source_text_revision": 1,
+      "source_text_sha256": "5e30d83ce6f7deda943a07d8e405b8b2c64fbd6f8953ce74f0b1b91cdd10500e",
+      "spoken_text": "Bring the light closer. This mark belongs to the old treasury road.",
+      "subtitle_text": "Bring the light closer. This mark belongs to the old treasury road.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.first_errand",
+      "source_text_revision": 1,
+      "source_text_sha256": "d8f1ffa47a3a16fe54eba50856366b14fa67e89f86c8ce4a5b5329786ba136df",
+      "spoken_text": "The wayside shrine kept a road register. If it survived, it may name the next stops.",
+      "subtitle_text": "The wayside shrine kept a road register. If it survived, it may name the next stops.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.shrine_direction",
+      "source_text_revision": 1,
+      "source_text_sha256": "74bb4c8ad3fa28ad0964ccc9768d539963ac799d4889fa11711eb5c06505e305",
+      "spoken_text": "Take the northern path out of Bellwether. The shrine is on a short spur beyond it.",
+      "subtitle_text": "Take the northern path out of Bellwether. The shrine is on a short spur beyond it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.lantern_inspection",
+      "source_text_revision": 1,
+      "source_text_sha256": "1cc369f78db6f8598773e3ecfb5befdaeed4ae19ab813e4495aadc7cbf9cea6b",
+      "spoken_text": "May I look at that? Keep it steady.",
+      "subtitle_text": "May I look at that? Keep it steady.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.shrine_fallback",
+      "source_text_revision": 1,
+      "source_text_sha256": "d7ad3ae5bf221dbcc2bdd7c94c2eb39bb30eea3e22e02be98e8eeee11166e1d3",
+      "spoken_text": "The old shrine has records of the treasury road. That is where I would start.",
+      "subtitle_text": "The old shrine has records of the treasury road. That is where I would start.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "lantern.first_help",
+      "source_text_revision": 1,
+      "source_text_sha256": "e4b1bbe3cee9be863bfd103292c7549b467f2c43ec439657ef1639d73c013407",
+      "spoken_text": "The lower stone. Its hinge is hidden under the roots.",
+      "subtitle_text": "The lower stone. Its hinge is hidden under the roots.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "lantern.first_identity",
+      "source_text_revision": 1,
+      "source_text_sha256": "7fa2b54c41a1d626d8777a0f7ba982b85a07e0164a38ca59d0ccab245a9e96a6",
+      "spoken_text": "I was king here. My keepers sealed me away.",
+      "subtitle_text": "I was king here. My keepers sealed me away.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "lantern.king_name",
+      "source_text_revision": 1,
+      "source_text_sha256": "89557bf3672727970d8d7561b1ee8c67535daa6850560c3580f5066d9f0e821f",
+      "spoken_text": "Veyr. If the name still means anything.",
+      "subtitle_text": "Veyr. If the name still means anything.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "lantern.first_request",
+      "source_text_revision": 1,
+      "source_text_sha256": "e9c52b5fe1550012541dff3fcc79f28821ba57bc1e60875bbd05555b89f1c7e4",
+      "spoken_text": "Three seals guard the treasury. Find them, and I can put an end to this.",
+      "subtitle_text": "Three seals guard the treasury. Find them, and I can put an end to this.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "shrine.recap_mechanism",
+      "source_text_revision": 1,
+      "source_text_sha256": "8c8babdf437949776dadc6bd075a2eb01e58e02b6057a58b249e248aab69cd5c",
+      "spoken_text": "Look below the roots. The lower stone opens.",
+      "subtitle_text": "Look below the roots. The lower stone opens.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "shrine.recap_register",
+      "source_text_revision": 1,
+      "source_text_sha256": "d9c73da8f392f1f92382f5b224d5d2a99bc1f7e7880a61700b1572b7d28fa07a",
+      "spoken_text": "Take the register back to Bellwether. It will help you find the seals.",
+      "subtitle_text": "Take the register back to Bellwether. It will help you find the seals.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "shrine.register",
+      "source_text_revision": 1,
+      "source_text_sha256": "aba31f31caa408b89c126b4b95ad7d37256a0c995d536b6c734351d856453dcd",
+      "spoken_text": "The Abbey. The royal Foundry. Then the Glass Court.",
+      "subtitle_text": "The Abbey. The royal Foundry. Then the Glass Court.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.two_routes",
+      "source_text_revision": 1,
+      "source_text_sha256": "ae57e46db8a3a5bc9fe94c24cd423b594ffcb6ff0c86c7b525a52f43b5d19cc0",
+      "spoken_text": "We can trace the first two roads. The Court's route is still sealed.",
+      "subtitle_text": "We can trace the first two roads. The Court's route is still sealed.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.routes_independent",
+      "source_text_revision": 1,
+      "source_text_sha256": "8a99b5ae0983a239721a4e17b2996f3932764d0a478534573473b6619b52e00f",
+      "spoken_text": "You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.",
+      "subtitle_text": "You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.vista",
+      "source_text_revision": 1,
+      "source_text_sha256": "24ab5f8333b1a4bdc298b6f8ff0f53246ecbf01a8b590b2731792b0363c5db21",
+      "spoken_text": "Those are the Abbey towers. The entrance is below them.",
+      "subtitle_text": "Those are the Abbey towers. The entrance is below them.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.threshold",
+      "source_text_revision": 1,
+      "source_text_sha256": "0cefe919c4f83ce102df0aeb67aa30697763a13dfdb5410442ad0617b844613f",
+      "spoken_text": "The bells called the road caravans to shelter.",
+      "subtitle_text": "The bells called the road caravans to shelter.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.attendants",
+      "source_text_revision": 1,
+      "source_text_sha256": "10c2c3d6af990913efff034e3856d1ecc3bed814d03a577a965d2190fece9e48",
+      "spoken_text": "They still tend the altar. Give them room.",
+      "subtitle_text": "They still tend the altar. Give them room.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.reflector",
+      "source_text_revision": 1,
+      "source_text_sha256": "08c82dfb8cb88c07a8412e34092b5c705a7cddd328b2401efad60b8fcce1205a",
+      "spoken_text": "That plate was made to turn light into the side chapel.",
+      "subtitle_text": "That plate was made to turn light into the side chapel.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.reflector_place",
+      "source_text_revision": 1,
+      "source_text_sha256": "a0bf001e132b79c08333868c98244b4a50ee2c810ff60001d51b6359e3af40ee",
+      "spoken_text": "Set it where the lantern can reach it. Turn the plate towards the receiver.",
+      "subtitle_text": "Set it where the lantern can reach it. Turn the plate towards the receiver.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.reflector_feedback",
+      "source_text_revision": 1,
+      "source_text_sha256": "f9bf0049b5a15646be2103cb1eec7a1d2aad02e38056e60c7be284f7e6ad3838",
+      "spoken_text": "Watch the receiver. You will see when the light reaches it.",
+      "subtitle_text": "Watch the receiver. You will see when the light reaches it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.reflector_hint",
+      "source_text_revision": 1,
+      "source_text_sha256": "62d900234aee0ea68d13bd2bfc251059d585cf6e177b241a75985167fb83b83b",
+      "spoken_text": "The shutter blocks it. Try the light from the other side.",
+      "subtitle_text": "The shutter blocks it. Try the light from the other side.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.reflector_reset",
+      "source_text_revision": 1,
+      "source_text_sha256": "adeddedc68552410e9c36411da256f3b583a974109697525e881d0f81da1efd0",
+      "spoken_text": "Bring the plate back to the light. You can turn it again from there.",
+      "subtitle_text": "Bring the plate back to the light. You can turn it again from there.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.claim_mark",
+      "source_text_revision": 1,
+      "source_text_sha256": "8d7c4503a50ceeab4c41a77e838752239035da57b7e54cb2995083daeead8cac",
+      "spoken_text": "That silver came from the river settlements. We called it tribute.",
+      "subtitle_text": "That silver came from the river settlements. We called it tribute.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.admission",
+      "source_text_revision": 1,
+      "source_text_sha256": "ddf69fb7aa2c3642c0d7a806f677e3a5ab172d0dd6679e53814fa812402045d4",
+      "spoken_text": "They did not give it willingly.",
+      "subtitle_text": "They did not give it willingly.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.oath_connection",
+      "source_text_revision": 1,
+      "source_text_sha256": "56e846054f3baaa415ddbe0e2736d8b66919e41f19bb88d929b8590005aa9156",
+      "spoken_text": "An army has to be paid. You have seen how long this one served.",
+      "subtitle_text": "An army has to be paid. You have seen how long this one served.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.bellkeeper_warning",
+      "source_text_revision": 1,
+      "source_text_sha256": "8493e07374f71c844c4151fcb0f66fab8e91b468efa9aa176b3740aa80d6eb1c",
+      "spoken_text": "The sanctuary is closed.",
+      "subtitle_text": "The sanctuary is closed.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.boss_hint",
+      "source_text_revision": 1,
+      "source_text_sha256": "b3f2cb53d0d9af79a3fc4af0da4f64f8726a7194cea168f92dc873c809947ffe",
+      "spoken_text": "Open the shutter. Let the reflected light reach him.",
+      "subtitle_text": "Open the shutter. Let the reflected light reach him.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.seal",
+      "source_text_revision": 1,
+      "source_text_sha256": "89d7fd000f0fe600b055ada214660cd7ac70cd2c57471fd9f4bd115bb9154a3c",
+      "spoken_text": "The Abbey seal. Take it carefully.",
+      "subtitle_text": "The Abbey seal. Take it carefully.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.release_question",
+      "source_text_revision": 1,
+      "source_text_sha256": "add1372350cae4e32ef92ae5b84c633d9c5a92164abe4e7cc19ec4c67704cf2c",
+      "spoken_text": "Their service should have ended with their lives. The treasury holds the bond.",
+      "subtitle_text": "Their service should have ended with their lives. The treasury holds the bond.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.threshold",
+      "source_text_revision": 1,
+      "source_text_sha256": "f95045abb44e31763239270df48f64237b5951ec0083fcba0909414755ab80b7",
+      "spoken_text": "This floor cast the army's pay. The furnaces below made its weapons.",
+      "subtitle_text": "This floor cast the army's pay. The furnaces below made its weapons.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.workers",
+      "source_text_revision": 1,
+      "source_text_sha256": "f28a1deba5aa90fa97b6ab8b18c19d9d72511550f7b8fd73d9936dd4e2f5df50",
+      "spoken_text": "The shift never ended.",
+      "subtitle_text": "The shift never ended.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.stand",
+      "source_text_revision": 1,
+      "source_text_sha256": "40fc81a2600b6c7a3d84f9453bb409e9fa9b7153ebcebcd7f23106af43e3dff4",
+      "spoken_text": "Set the lantern in the stand. The shutter will hold back its light.",
+      "subtitle_text": "Set the lantern in the stand. The shutter will hold back its light.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.stand_receiver",
+      "source_text_revision": 1,
+      "source_text_sha256": "e6fd7f9fad8c8173c637d591078f5efaee973b3aa7c3bf967513c6f47e7b02be",
+      "spoken_text": "Open it towards the receiver. Leave the light there while you move.",
+      "subtitle_text": "Open it towards the receiver. Leave the light there while you move.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.stand_result",
+      "source_text_revision": 1,
+      "source_text_sha256": "c457380426a7bece8f2151f26c0eb6ceabc9c1d4c4a022752992daa226548bc5",
+      "spoken_text": "The mechanism stays open while the light reaches it.",
+      "subtitle_text": "The mechanism stays open while the light reaches it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.shadow_hint",
+      "source_text_revision": 1,
+      "source_text_sha256": "f3205b3aebf274e1da61a3288e56e1ee274a48e3f9ce7bc01dfee8330faab510",
+      "spoken_text": "That watcher follows the light. Close the shutter before you cross.",
+      "subtitle_text": "That watcher follows the light. Close the shutter before you cross.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.stand_reset",
+      "source_text_revision": 1,
+      "source_text_sha256": "7118ced5ec473f6f2467e15441ccd2b203a6ce8a1fabe37e6c63fc3f42550332",
+      "spoken_text": "Close the shutter. Take the lantern back and try the stand from here.",
+      "subtitle_text": "Close the shutter. Take the lantern back and try the stand from here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.bond_record",
+      "source_text_revision": 1,
+      "source_text_sha256": "0b3f6da0abe17f8f2256e4524bb6be42b8e76ad0816da8749232c86a8db894f3",
+      "spoken_text": "Service until the last campaign is ended. That was the oath.",
+      "subtitle_text": "Service until the last campaign is ended. That was the oath.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.blame",
+      "source_text_revision": 1,
+      "source_text_sha256": "f356e149e9b41722ceddbe60e5fc2a643558304cc2ec2505f4ae2c6d96261f0c",
+      "spoken_text": "My keepers kept the bond alive. Every soldier is still paying for it.",
+      "subtitle_text": "My keepers kept the bond alive. Every soldier is still paying for it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.plunder_connection",
+      "source_text_revision": 1,
+      "source_text_sha256": "bd2b38633a86e73d1d2092361ca7f8c5c754822dbfa6a6ed75023caa00ee9df9",
+      "spoken_text": "The silver was brought home. The men never were.",
+      "subtitle_text": "The silver was brought home. The men never were.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.mintmaster_warning",
+      "source_text_revision": 1,
+      "source_text_sha256": "11071b525d9cf02bee37777d3839dca79344e5daf938e8e708c87d802e777819",
+      "spoken_text": "No one leaves with the Crown's property.",
+      "subtitle_text": "No one leaves with the Crown's property.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.boss_stand_hint",
+      "source_text_revision": 1,
+      "source_text_sha256": "b5fa554564893b97ccde2d8c47d2a51e773b691a073bc49890baaba95b319d3e",
+      "spoken_text": "Leave the light on the mechanism. Move round to the open shell.",
+      "subtitle_text": "Leave the light on the mechanism. Move round to the open shell.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.seal",
+      "source_text_revision": 1,
+      "source_text_sha256": "88a3c2b44c66df9b542ce92862e69699673392457c1c05514e2ac39e8d02b0c7",
+      "spoken_text": "Take the seal. We have kept them waiting long enough.",
+      "subtitle_text": "Take the seal. We have kept them waiting long enough.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.record_review",
+      "source_text_revision": 1,
+      "source_text_sha256": "6d8838ab5da28cd24ab77bac9e8c88719fbe04bbefa245440d4afaa06e215a9a",
+      "spoken_text": "The names continue after the dates of death. These were people, not an endless supply.",
+      "subtitle_text": "The names continue after the dates of death. These were people, not an endless supply.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "return.one_seal",
+      "source_text_revision": 1,
+      "source_text_sha256": "eb79b0431c6920de6ed0e66fe951b5f5fd6b0b5bce27f23654f673c8e114a4b5",
+      "spoken_text": "One seal. The other road may tell us what this opens.",
+      "subtitle_text": "One seal. The other road may tell us what this opens.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "return.foundry_remaining",
+      "source_text_revision": 1,
+      "source_text_sha256": "84390a6bcf452bff07320a7c3337e6bce278f6ea6e47057a260fb8ed16dc3c21",
+      "spoken_text": "The Foundry still holds its seal. You'll need a way across the broken bridge.",
+      "subtitle_text": "The Foundry still holds its seal. You'll need a way across the broken bridge.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "return.one_seal_foundry",
+      "source_text_revision": 1,
+      "source_text_sha256": "eb79b0431c6920de6ed0e66fe951b5f5fd6b0b5bce27f23654f673c8e114a4b5",
+      "spoken_text": "One seal. The other road may tell us what this opens.",
+      "subtitle_text": "One seal. The other road may tell us what this opens.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "return.abbey_remaining",
+      "source_text_revision": 1,
+      "source_text_sha256": "a4d6f89a82dbc5cda855aacc9b553f2fd459ce48ddc9303b4f6a1ba959a86474",
+      "spoken_text": "The Abbey still holds its seal. Prepare for the submerged approach.",
+      "subtitle_text": "The Abbey still holds its seal. Prepare for the submerged approach.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "return.two_seals",
+      "source_text_revision": 1,
+      "source_text_sha256": "e920cd4471bdd9630829b4b22f984ff8d51b95e23f3c3c390a03b6fc1c524d73",
+      "spoken_text": "Both seals fit the route mark. We can find the Glass Court now.",
+      "subtitle_text": "Both seals fit the route mark. We can find the Glass Court now.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "return.voice_reply",
+      "source_text_revision": 1,
+      "source_text_sha256": "68d59a2638f769d3942bf918f1d9cb1100de43c7025368c0024432890014e885",
+      "spoken_text": "I remember what was done here. I would rather you saw it than took my word.",
+      "subtitle_text": "I remember what was done here. I would rather you saw it than took my word.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.missing_abbey",
+      "source_text_revision": 1,
+      "source_text_sha256": "7bbb81bdec1c91418b75e78a3bdd491bc91c001b13f4baa1777a00f86133b1e5",
+      "spoken_text": "The Abbey seal is still missing. This gate needs both.",
+      "subtitle_text": "The Abbey seal is still missing. This gate needs both.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.missing_foundry",
+      "source_text_revision": 1,
+      "source_text_sha256": "830e8bf8246645d67add6ac337d7aef3e1ed9a38e11e5efefc39b09fa11bca32",
+      "spoken_text": "You still need the Foundry seal. One will not open this gate.",
+      "subtitle_text": "You still need the Foundry seal. One will not open this gate.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.missing_both",
+      "source_text_revision": 1,
+      "source_text_sha256": "e1ede0d8c8ef175681c9362cc000dc91ecf720b74305c0fb3504698c53e3d64c",
+      "spoken_text": "The Abbey and the Foundry. Bring both seals here.",
+      "subtitle_text": "The Abbey and the Foundry. Bring both seals here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.access_options",
+      "source_text_revision": 1,
+      "source_text_sha256": "14fe4454e4e29026aac4b1d6ec039b01fe67db80ab662b013f230abeba38a84d",
+      "spoken_text": "We can prepare a ward, ask for climbing gear, or practise the ascent. Take the way you can manage.",
+      "subtitle_text": "We can prepare a ward, ask for climbing gear, or practise the ascent. Take the way you can manage.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.access_seals",
+      "source_text_revision": 1,
+      "source_text_sha256": "72edda0e192f8b32c79b380650498fcfc4e99f0929a3c98168ada57a04636823",
+      "spoken_text": "Whichever way you climb, take both seals. The gate will still be shut.",
+      "subtitle_text": "Whichever way you climb, take both seals. The gate will still be shut.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.aperture_lesson",
+      "source_text_revision": 1,
+      "source_text_sha256": "a7df4699fe321fe0211175f7d2f17d1d34b179a393b164ffde1982bc146b5ef2",
+      "spoken_text": "Fit the aperture. Narrow the light until it reaches only that receiver.",
+      "subtitle_text": "Fit the aperture. Narrow the light until it reaches only that receiver.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.aperture_observe",
+      "source_text_revision": 1,
+      "source_text_sha256": "6403920017c7bfa63e76a0151365cc167a0bcdc3bdd02b5a56c57136376afc1b",
+      "spoken_text": "Watch what changes when you move the beam away.",
+      "subtitle_text": "Watch what changes when you move the beam away.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.aperture_hint",
+      "source_text_revision": 1,
+      "source_text_sha256": "0d0571cabbd1a8c50757cee6f085d20e9db981b7695c5bca0f60803fab1ebba7",
+      "spoken_text": "The broad light reaches both. Narrow it before you turn towards the next receiver.",
+      "subtitle_text": "The broad light reaches both. Narrow it before you turn towards the next receiver.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.garden",
+      "source_text_revision": 1,
+      "source_text_sha256": "a20a17dbd6ac7faee2cdbc0e047726eb54a653e32cf6c8bffde701f4b23d8950",
+      "spoken_text": "I used to walk here after the snow.",
+      "subtitle_text": "I used to walk here after the snow.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.recognition",
+      "source_text_revision": 1,
+      "source_text_sha256": "271e19bed3e2f3c0f6e15bbb8da02d6b758153db5defa60ae71aaa5c7ef22790",
+      "spoken_text": "Put that lantern down. Keep its shutter closed.",
+      "subtitle_text": "Put that lantern down. Keep its shutter closed.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.voice_accuses",
+      "source_text_revision": 1,
+      "source_text_sha256": "c88a807442f59fd52cba2479a9e4a1b248ab021ad054f58320c78b0c1c4f827c",
+      "spoken_text": "Another keeper. You know what their mercy looks like.",
+      "subtitle_text": "Another keeper. You know what their mercy looks like.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.boss_aperture_hint",
+      "source_text_revision": 1,
+      "source_text_sha256": "b8d052bc4f93bd1c207bd0b6be06b54a47af8b30e56ab1e54f625a1e24469e87",
+      "spoken_text": "Narrow the beam. Hold it on the ward until the protection breaks.",
+      "subtitle_text": "Narrow the beam. Hold it on the ward until the protection breaks.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.king_proof",
+      "source_text_revision": 1,
+      "source_text_sha256": "602f6dc84316794ed38dd2e7abeb3a7096753d3d4194c054365d7151b66d216c",
+      "spoken_text": "Read the king's order. His seal is beside ours. He ordered the prison made.",
+      "subtitle_text": "Read the king's order. His seal is beside ours. He ordered the prison made.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.true_bargain",
+      "source_text_revision": 1,
+      "source_text_sha256": "01d0e7e60e66dc780b20802cc501f4e950fd6cd5a12f9e867ae44bb35c091393",
+      "spoken_text": "He bargained for victory. It gave him an army that could not stop serving.",
+      "subtitle_text": "He bargained for victory. It gave him an army that could not stop serving.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.fourth_keeper",
+      "source_text_revision": 1,
+      "source_text_sha256": "7cae13fb74bf008a16241ecd4b542f8aa7c70e98bdfc60b3b7120c2ab7d882ff",
+      "spoken_text": "There were four of us. The one beneath the tomb kept watch over what you carry.",
+      "subtitle_text": "There were four of us. The one beneath the tomb kept watch over what you carry.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.custody",
+      "source_text_revision": 1,
+      "source_text_sha256": "e999ba646f8bc6065b2286be999d6702f43379c44762501ad4104002ce847592",
+      "spoken_text": "We held it. We could not release the soldiers without opening the bond.",
+      "subtitle_text": "We held it. We could not release the soldiers without opening the bond.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.memory_evidence",
+      "source_text_revision": 1,
+      "source_text_sha256": "6e2f9eb4a745e9fac7d031d626d8302101217cfb244c3ecff902d2977e8bca2b",
+      "spoken_text": "That garden was planted after the king died.",
+      "subtitle_text": "That garden was planted after the king died.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.recap_king",
+      "source_text_revision": 1,
+      "source_text_sha256": "45fc659428993acdaa908d1ed793ff6b836d6b039449f5694143c11db86dc846",
+      "spoken_text": "The king ordered the prison made. That seal is his.",
+      "subtitle_text": "The king ordered the prison made. That seal is his.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.recap_identity",
+      "source_text_revision": 1,
+      "source_text_sha256": "e84dce7b296ffee6a269b10b13fe0f5a6fcb05a2401ee03bb33f9569b2afec93",
+      "spoken_text": "The voice is the one he bargained with. It was never the king.",
+      "subtitle_text": "The voice is the one he bargained with. It was never the king.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.recap_bond",
+      "source_text_revision": 1,
+      "source_text_sha256": "38f11c75c8a748ab6c3d24c8703048478cf84f93a513d5bf4cf5bd910dba30c7",
+      "spoken_text": "The soldiers and the thing in the lantern are held by the same bond. Open it, and both go free.",
+      "subtitle_text": "The soldiers and the thing in the lantern are held by the same bond. Open it, and both go free.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.final_seal",
+      "source_text_revision": 1,
+      "source_text_sha256": "fb591f54ea2bf1f20f9d74b480a80ba85480e5bf27850c4c845739c525fc118d",
+      "spoken_text": "The last seal leads to the treasury. You have seen what it keeps.",
+      "subtitle_text": "The last seal leads to the treasury. You have seen what it keeps.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.ritual_truth",
+      "source_text_revision": 1,
+      "source_text_sha256": "2b6c20b78c69a480cdcd46b81f10977e351bcfda4f0826353280a29aa39892da",
+      "spoken_text": "Open the bond and the soldiers go free. So do I.",
+      "subtitle_text": "Open the bond and the soldiers go free. So do I.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.preparation",
+      "source_text_revision": 1,
+      "source_text_sha256": "1a0da5a295ad6ff0b523fa4f7e01356c153e6150fedfbe7961150194955fe334",
+      "spoken_text": "Bring what you've learned. The wards and shutters were built to hold its light.",
+      "subtitle_text": "Bring what you've learned. The wards and shutters were built to hold its light.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.preparation_tools",
+      "source_text_revision": 1,
+      "source_text_sha256": "4d9eac3a89488a7f4bad48bbb3326fea641a1b435e09852fd597247386077f2b",
+      "spoken_text": "The reflector, the stand, the aperture. Practise with them before you leave.",
+      "subtitle_text": "The reflector, the stand, the aperture. Practise with them before you leave.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "treasury.voice_promise",
+      "source_text_revision": 1,
+      "source_text_sha256": "823c9b803d28b334f4ed3cf116332d3e903fa0e9df99450d3b831634a2e7c4f7",
+      "spoken_text": "Every banner brought something home. I kept it all.",
+      "subtitle_text": "Every banner brought something home. I kept it all.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "treasury.bound_dead",
+      "source_text_revision": 1,
+      "source_text_sha256": "d1221354e6c298a33b8c4dd444927028981f37ec0cd16461dab4e7352e6ee614",
+      "spoken_text": "Break the bond. Their watch ends here.",
+      "subtitle_text": "Break the bond. Their watch ends here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "treasury.risk_recap",
+      "source_text_revision": 1,
+      "source_text_sha256": "f6b07b784a89759121a67516e7361599ad8d3d2fb6563bae1de0536dc7429d6e",
+      "spoken_text": "The bond holds them here. It holds me too. There is no separate lock.",
+      "subtitle_text": "The bond holds them here. It holds me too. There is no separate lock.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "treasury.release",
+      "source_text_revision": 1,
+      "source_text_sha256": "41e7e213cacb4efde23024184c5a78e30573ac2dd27db3bfc8358fe7f039eb1d",
+      "spoken_text": "At last.",
+      "subtitle_text": "At last.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "treasury.entity_claim",
+      "source_text_revision": 1,
+      "source_text_sha256": "e13a088f5258ac7d5e9dbd7c7159a92ee084132434d1ddea648fb020e2d4f30d",
+      "spoken_text": "I gave them victory. Their king promised me everything that followed.",
+      "subtitle_text": "I gave them victory. Their king promised me everything that followed.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "treasury.entity_demand",
+      "source_text_revision": 1,
+      "source_text_sha256": "8298f3f82f8f861856158aafa05a591afb611834333e96b8c1754ba02e778288",
+      "spoken_text": "Put down the light. You have carried it far enough.",
+      "subtitle_text": "Put down the light. You have carried it far enough.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "finale.entity_pressure",
+      "source_text_revision": 1,
+      "source_text_sha256": "b98ad03b771b98ef035ac0c2a8f40018eb01159d78f44e2acc14c3797091eddc",
+      "spoken_text": "You would leave this here?",
+      "subtitle_text": "You would leave this here?",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "bark.entity.command",
+      "source_text_revision": 1,
+      "source_text_sha256": "8fa1e0d828947a73353eb47c32c9213c68ea7310211c06add1ed259316be5847",
+      "spoken_text": "Kneel.",
+      "subtitle_text": "Kneel.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "finale.entity_light",
+      "source_text_revision": 1,
+      "source_text_sha256": "9508d9109ca2510548060605e9f9a3cc5a798ebc6fe65156ea559d81d77758f9",
+      "spoken_text": "Close that shutter!",
+      "subtitle_text": "Close that shutter!",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "finale.entity_last",
+      "source_text_revision": 1,
+      "source_text_sha256": "07662b3290672a415dc7657a3c04fc1374a26d5edd130f7b29f54f1aa263ea5e",
+      "spoken_text": "It was promised to me.",
+      "subtitle_text": "It was promised to me.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "epilogue.welcome",
+      "source_text_revision": 1,
+      "source_text_sha256": "bec54a9f5e2a1b8920c04dd9cf94abe59b884e87893bc2a66bf28e13e8c11a86",
+      "spoken_text": "You're back. Sit down. I'll find something hot.",
+      "subtitle_text": "You're back. Sit down. I'll find something hot.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "epilogue.record",
+      "source_text_revision": 1,
+      "source_text_sha256": "f5a7e78ce99d225148769b5b2eeca052d4826c4397886f8599b4577b2f7a5062",
+      "spoken_text": "We'll write their names as people. Their service is over.",
+      "subtitle_text": "We'll write their names as people. Their service is over.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "bark.lantern.air",
+      "source_text_revision": 1,
+      "source_text_sha256": "9a866f8d7ba14d4a1376d65129cf78078d94ccec2706f6b3a168a6f78073d2a7",
+      "spoken_text": "Air above you.",
+      "subtitle_text": "Air above you.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "bark.lantern.smoke",
+      "source_text_revision": 1,
+      "source_text_sha256": "70387d614206026cf03ed7b235a65ee86cdcf9e55ecb9fd38991f20a4b4a3648",
+      "spoken_text": "Clear air through that arch.",
+      "subtitle_text": "Clear air through that arch.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "prologue.keeper_warning",
+      "source_text_revision": 1,
+      "source_text_sha256": "2cb84b3289988f1956b3b670b60fcf4003fab79f00b72cba08ed3f9a22902e0c",
+      "spoken_text": "Leave this chamber. My watch is not ended.",
+      "subtitle_text": "Leave this chamber. My watch is not ended.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "prologue.keeper_last",
+      "source_text_revision": 1,
+      "source_text_sha256": "8a3a46ca4f0347f3da5d21b824600cb1185ddfdc25b9aa39c162cafc6b63267f",
+      "spoken_text": "I cannot... leave my post.",
+      "subtitle_text": "I cannot... leave my post.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.approach_injury.stop",
+      "source_text_revision": 1,
+      "source_text_sha256": "f0996277c3e23de6091447c801a4902d2ab39e2b2e86e09aca1004103861018e",
+      "spoken_text": "Ah. Wait a moment.",
+      "subtitle_text": "Ah. Wait a moment.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.approach_injury.ankle",
+      "source_text_revision": 1,
+      "source_text_sha256": "9bdcd03a527356e9bd78ec4a4608d98688cac3ed2b07e57fc0f1b35de38e3c3c",
+      "spoken_text": "Loose ground. Turned my ankle. I can stand, but give me a moment.",
+      "subtitle_text": "Loose ground. Turned my ankle. I can stand, but give me a moment.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.approach_injury.arm",
+      "source_text_revision": 1,
+      "source_text_sha256": "77baf4269d73869c867516311d2c7011dcae599288895e0fd3de7185a58340e4",
+      "spoken_text": "Lend me your arm for this bit. We’ll take it slowly.",
+      "subtitle_text": "Lend me your arm for this bit. We’ll take it slowly.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.accept_base.sit",
+      "source_text_revision": 1,
+      "source_text_sha256": "ea19cfda5f96c3c3832bf947d8ba312bd8a74aae93bebc515a27a6d6ef6b8ade",
+      "spoken_text": "Right. I’m sitting down before I make this worse.",
+      "subtitle_text": "Right. I’m sitting down before I make this worse.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.accept_base.limit",
+      "source_text_revision": 1,
+      "source_text_sha256": "13301be2231cef265fa0c75757877a1b75a8f84cd76f05c2dcf168bca85182da",
+      "spoken_text": "I won’t get far along those roads like this. You’ll have to go without me.",
+      "subtitle_text": "I won’t get far along those roads like this. You’ll have to go without me.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.accept_base.work",
+      "source_text_revision": 1,
+      "source_text_sha256": "fc21e358a9b8adab33eaaa94d5084a382a3d155f3cc9bd979cc53855f527dfa0",
+      "spoken_text": "Bring what you find back here. I can still make myself useful.",
+      "subtitle_text": "Bring what you find back here. I can still make myself useful.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.kit_introduce",
+      "source_text_revision": 1,
+      "source_text_sha256": "53af6383dc1d43a0832e44f8513f014abf0a4c3e5b298933538ae346b0684e11",
+      "spoken_text": "The tomb was there. So was something worth the climb.",
+      "subtitle_text": "The tomb was there. So was something worth the climb.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.arrival_introduction.table",
+      "source_text_revision": 1,
+      "source_text_sha256": "aba357b9b31251dd4e2e535ed57586b1523e212dfd0acc7ad9317a7431771045",
+      "spoken_text": "There’s room on the table, if you want to show them.",
+      "subtitle_text": "There’s room on the table, if you want to show them.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.hoard_answer",
+      "source_text_revision": 1,
+      "source_text_sha256": "9861f4ef942e70c21894f218e3ba6b1be3eab21b59c53c48480ab38d32dbd8fd",
+      "spoken_text": "Armies need paying. I'm hoping we're both right.",
+      "subtitle_text": "Armies need paying. I'm hoping we're both right.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.kit_stake",
+      "source_text_revision": 1,
+      "source_text_sha256": "fbec86b7cbd6c8641af0e8b18759ba2c7336fd3809ab68b1dc38f3a7fdac1b25",
+      "spoken_text": "I'd like a roof that doesn't fall in. Treasure still seems a fair way to get one.",
+      "subtitle_text": "I'd like a roof that doesn't fall in. Treasure still seems a fair way to get one.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.personal_stake.key",
+      "source_text_revision": 1,
+      "source_text_sha256": "1e0a824a1d8b7d3d847eeba88458174af8e599e82cdb3f1e89c33a6ad9381af5",
+      "spoken_text": "A door with my own key. I’ve had worse reasons for going digging.",
+      "subtitle_text": "A door with my own key. I’ve had worse reasons for going digging.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.shrine_departure.leave",
+      "source_text_revision": 1,
+      "source_text_sha256": "1530c63595f8cc1258fff2834441e7ba5fc64f5df06a2c4aa94092ff468aa673",
+      "spoken_text": "Off to the shrine, then. Leave a space in your bag for the register.",
+      "subtitle_text": "Off to the shrine, then. Leave a space in your bag for the register.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.shrine_departure.return",
+      "source_text_revision": 1,
+      "source_text_sha256": "18b49925d112df2d93b1549db85c4c60c4a742097f647c926a64eca2cab4b32c",
+      "spoken_text": "And come back even if there’s nothing in it. I’d rather hear that than keep wondering.",
+      "subtitle_text": "And come back even if there’s nothing in it. I’d rather hear that than keep wondering.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.shrine_empty_return.welcome",
+      "source_text_revision": 1,
+      "source_text_sha256": "fc63b8db4b4b3d14f72bfa91fd41e6e3963b3d5657dc74bb4c80d9b10ac3ebf6",
+      "spoken_text": "You’re back. Come and sit for a bit.",
+      "subtitle_text": "You’re back. Come and sit for a bit.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.shrine_empty_return.blank",
+      "source_text_revision": 1,
+      "source_text_sha256": "057afdc15c9101fdffc604da24ca462cf152382bcbd6b1e2a3e5cf379c479ccc",
+      "spoken_text": "Still a blank on the route, then. We can have another look at what you brought from the tomb.",
+      "subtitle_text": "Still a blank on the route, then. We can have another look at what you brought from the tomb.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.shrine_register_return.found",
+      "source_text_revision": 1,
+      "source_text_sha256": "61c6703ef878b930e68cbdfceccc65c76efcaacd007209ed6538834617f15c41",
+      "spoken_text": "You found it. Let’s have a look.",
+      "subtitle_text": "You found it. Let’s have a look.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.shrine_register_return.routes",
+      "source_text_revision": 1,
+      "source_text_sha256": "537ffecb6f5f574392b21c85054483fd52a53a7c248d2e5e9ed97d5522ac1336",
+      "spoken_text": "Abbey. Foundry. Glass Court. More road than I’d hoped for.",
+      "subtitle_text": "Abbey. Foundry. Glass Court. More road than I’d hoped for.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.shrine_register_return.work",
+      "source_text_revision": 1,
+      "source_text_sha256": "09e8bba253af7b0c8cd581d863190e4ed5e4f99fe9e52233ee7ddd76bdb336b5",
+      "spoken_text": "Leave it open there. I can work through the marks while you’re seeing to your gear.",
+      "subtitle_text": "Leave it open there. I can work through the marks while you’re seeing to your gear.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.voice_reaction",
+      "source_text_revision": 1,
+      "source_text_sha256": "697e7e5cfbb0f82387371a98fd1faf53aa84ebe99f32baefa51d19afd80a514b",
+      "spoken_text": "Next time, a little warning before the lamp starts talking.",
+      "subtitle_text": "Next time, a little warning before the lamp starts talking.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.first_direct_voice.finish",
+      "source_text_revision": 1,
+      "source_text_sha256": "7ea7121828b1e0dcd9c5d6a5a46cf0eebc67b9fe73dbc03092690a0026631d30",
+      "spoken_text": "Go on, then. I’m listening.",
+      "subtitle_text": "Go on, then. I’m listening.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.royal_claim.king",
+      "source_text_revision": 1,
+      "source_text_sha256": "90a78d57152017d0492f10ddcc3fd37178548632e8d0be143811708ae2343eca",
+      "spoken_text": "King Veyr. That’s quite a claim to make from inside a lamp.",
+      "subtitle_text": "King Veyr. That’s quite a claim to make from inside a lamp.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.royal_claim.help",
+      "source_text_revision": 1,
+      "source_text_sha256": "7cc90e3e7b6c38cb5d1fe1aa61048ae5f2967f543ce5a05b0ee7aff6b9163fde",
+      "spoken_text": "If you know the roads, help us get there and back. We can start with that.",
+      "subtitle_text": "If you know the roads, help us get there and back. We can start with that.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.shared_table.frustration",
+      "source_text_revision": 1,
+      "source_text_sha256": "bd427ed777819d2795ac0e572b13becf961e47e461df897874eac57260c7805d",
+      "spoken_text": "I keep thinking I ought to be packing beside you.",
+      "subtitle_text": "I keep thinking I ought to be packing beside you.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.shared_table.task",
+      "source_text_revision": 1,
+      "source_text_sha256": "460258edc5c564e77349d74e9a83ab587024a2e8eb61119c0c33c4f0b77d6fe7",
+      "spoken_text": "Put that end nearer the light. I can make out the old road marks.",
+      "subtitle_text": "Put that end nearer the light. I can make out the old road marks.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.shared_table.partners",
+      "source_text_revision": 1,
+      "source_text_sha256": "345ef63c2853005e8b0212f9fad86da48a6d61d651e016de77b461311d1b6036",
+      "spoken_text": "You bring the pieces back. We’ll see what they make together.",
+      "subtitle_text": "You bring the pieces back. We’ll see what they make together.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_departure.route",
+      "source_text_revision": 1,
+      "source_text_sha256": "3961bb0c3d7b99a7c6482df7fc98ed672d4a6d5106b70095bb3f76c3712af67b",
+      "spoken_text": "The Abbey, then. Keep the way back in mind before you go under.",
+      "subtitle_text": "The Abbey, then. Keep the way back in mind before you go under.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_departure.empty",
+      "source_text_revision": 1,
+      "source_text_sha256": "436aef58ed4036f75bbc1e07464c972f14dd6fb5bfc7b5eecddbf12b1abe2396",
+      "spoken_text": "You can come back empty-handed. I’d sooner have you at the table.",
+      "subtitle_text": "You can come back empty-handed. I’d sooner have you at the table.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_incomplete_no_tool.arrive",
+      "source_text_revision": 1,
+      "source_text_sha256": "2bf8a2ed0388b0d5d94678ad1ac75008060719be9e8c062e3cc1b5362c849939",
+      "spoken_text": "That strap’s soaked through. Hang the pack here.",
+      "subtitle_text": "That strap’s soaked through. Hang the pack here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_incomplete_no_tool.route",
+      "source_text_revision": 1,
+      "source_text_sha256": "57f5c55822d5685d5bbf0486e343dda1d9a9dfde7f072feeb682c007973af572",
+      "spoken_text": "Show me where you turned back. We can start there next time.",
+      "subtitle_text": "Show me where you turned back. We can start there next time.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_incomplete_tool.turn",
+      "source_text_revision": 1,
+      "source_text_sha256": "a098bc5b6d66f226354c05ec32f1cdf83a8cb1a73daeac6e3eb0e367b6e279cd",
+      "spoken_text": "Ah, you can turn the light without standing in its way.",
+      "subtitle_text": "Ah, you can turn the light without standing in its way.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_incomplete_tool.use",
+      "source_text_revision": 1,
+      "source_text_sha256": "d477d635bd2e0b6eefd4fea2f1dd89139e808c048e40b1dfc786e86b58c5ec89",
+      "spoken_text": "Worth bringing that back, seal or no seal.",
+      "subtitle_text": "Worth bringing that back, seal or no seal.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_incomplete_tool.rest",
+      "source_text_revision": 1,
+      "source_text_sha256": "aeca75d2430e5c6bacc620395c86a4b80da1c14f2ce90e1fd26e76a5d37b9a3a",
+      "spoken_text": "Set it down for a bit. The Abbey will still be there.",
+      "subtitle_text": "Set it down for a bit. The Abbey will still be there.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "abbey.kit_return",
+      "source_text_revision": 1,
+      "source_text_sha256": "db82ac39d4baff115c7ce7ef1390b464745d0201608116379a938ccf66907d7f",
+      "spoken_text": "You brought half the river home. Anything worth drying?",
+      "subtitle_text": "You brought half the river home. Anything worth drying?",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_seal_return.seal",
+      "source_text_revision": 1,
+      "source_text_sha256": "0a733ba1ac7f7d0161a8d43b11f61a170d051c41dfc82fcea03c24453f2c81b3",
+      "spoken_text": "There it is. Put it here where we can see it properly.",
+      "subtitle_text": "There it is. Put it here where we can see it properly.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_plunder_evidence.mark",
+      "source_text_revision": 1,
+      "source_text_sha256": "79e23a5bbb5def753d5fdc5c7721413c87b5b31339451728f8494df81ea38d1b",
+      "spoken_text": "I thought that was just a maker’s mark.",
+      "subtitle_text": "I thought that was just a maker’s mark.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_plunder_evidence.home",
+      "source_text_revision": 1,
+      "source_text_sha256": "b7f8f7d2b262535484027ae52ad181f76484e0ec548f0a2c304dda6805955b52",
+      "spoken_text": "Someone here still knows that mark. All that time under the water.",
+      "subtitle_text": "Someone here still knows that mark. All that time under the water.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_plunder_evidence.share",
+      "source_text_revision": 1,
+      "source_text_sha256": "f0e130fa68abeaf3fc8e9cd667b9555a82ac32966b0d8a45f030c15e11cc2e61",
+      "spoken_text": "I was already wondering what it would fetch. I wish I’d looked more closely.",
+      "subtitle_text": "I was already wondering what it would fetch. I wish I’d looked more closely.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_departure.route",
+      "source_text_revision": 1,
+      "source_text_sha256": "1f1380b8cff5689c153a16dc547948d4a3ab7769f35eb84a767ba89a7785b849",
+      "spoken_text": "The Foundry road, then. Show me the crossing you’re taking.",
+      "subtitle_text": "The Foundry road, then. Show me the crossing you’re taking.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_departure.return",
+      "source_text_revision": 1,
+      "source_text_sha256": "1a155cb3c09460132a859121034c764e3fafc679029644e548bb06145b6654db",
+      "spoken_text": "There. I’ll know which road to watch for you on.",
+      "subtitle_text": "There. I’ll know which road to watch for you on.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_incomplete_no_tool.soot",
+      "source_text_revision": 1,
+      "source_text_sha256": "c2cba91fa0e5d4ef50428eb7c0ad630f52926ed780f4e072ea99304354e9553d",
+      "spoken_text": "Hold still. You’ve got soot all round your eyes.",
+      "subtitle_text": "Hold still. You’ve got soot all round your eyes.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_incomplete_no_tool.pause",
+      "source_text_revision": 1,
+      "source_text_sha256": "ba07ded4a39de67f0a6834f5a982f9b3be9bbb299599b7332c688e8dd9d8e454",
+      "spoken_text": "We can look at the road after you’ve had a wash. It won’t change while you’re here.",
+      "subtitle_text": "We can look at the road after you’ve had a wash. It won’t change while you’re here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_incomplete_tool.hold",
+      "source_text_revision": 1,
+      "source_text_sha256": "052a7df0688a44a7b4ea007522188026bb81a3a19dc57fe40d3616f7ca1f36d0",
+      "spoken_text": "It holds the lantern for you. And that closes the light off?",
+      "subtitle_text": "It holds the lantern for you. And that closes the light off?",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_incomplete_tool.better",
+      "source_text_revision": 1,
+      "source_text_sha256": "c0a37e4da16a912f5e43033040a5a9d52dfdf442438e589daac4d9e6b3f22410",
+      "spoken_text": "That’s better than wedging it between two stones.",
+      "subtitle_text": "That’s better than wedging it between two stones.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_incomplete_tool.keep",
+      "source_text_revision": 1,
+      "source_text_sha256": "a2a267180283e1979876dffa78e0526692e9e4970ec8edd6f5dc03c688f7c326",
+      "spoken_text": "Keep it by your gear. It’s earned its place.",
+      "subtitle_text": "Keep it by your gear. It’s earned its place.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.kit_return",
+      "source_text_revision": 1,
+      "source_text_sha256": "cb357af29fbd995fec04ee7e08d9b99b8b26b8f7284f11d53fdf47470a77f764",
+      "spoken_text": "You smell like the forge. Sit down before you fall down.",
+      "subtitle_text": "You smell like the forge. Sit down before you fall down.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_seal_return.seal",
+      "source_text_revision": 1,
+      "source_text_sha256": "3a47aa47e382d9dba91a2ac77417ed23f84e298d7b74e9d01d1301b2a68ed26c",
+      "spoken_text": "I’ll clear a space. Let’s see what all that smoke was hiding.",
+      "subtitle_text": "I’ll clear a space. Let’s see what all that smoke was hiding.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_bond_evidence.line",
+      "source_text_revision": 1,
+      "source_text_sha256": "a412c8f08d0bb9cd061ac0a1309de5d2478aeea948fae8ffc1bcfa596847e591",
+      "spoken_text": "Show me that line again.",
+      "subtitle_text": "Show me that line again.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_bond_evidence.death",
+      "source_text_revision": 1,
+      "source_text_sha256": "d1c5490f8de99f610d4a4a28b418beb2a6f630bd5fdcf9df9c876bb04ee784ab",
+      "spoken_text": "They died, and someone kept counting what they owed.",
+      "subtitle_text": "They died, and someone kept counting what they owed.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_bond_evidence.names",
+      "source_text_revision": 1,
+      "source_text_sha256": "332082164b5935aa12f90723a24d1b7b7fd513f4d890f7c17963805eb1d0f23c",
+      "spoken_text": "Leave the names uncovered. I want to read them.",
+      "subtitle_text": "Leave the names uncovered. I want to read them.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_first.progress",
+      "source_text_revision": 1,
+      "source_text_sha256": "fad9ee4f6ef971b7b33750a190b75c5eefe5bae54ed6419f93bfb1831f1ad49d",
+      "spoken_text": "One seal out of the Abbey. The Foundry’s still ahead.",
+      "subtitle_text": "One seal out of the Abbey. The Foundry’s still ahead.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.abbey_first.prepare",
+      "source_text_revision": 1,
+      "source_text_sha256": "8fb45b12a706fade8b0fc9fec3b8e40400e446e447132f82247fae2638ebedd3",
+      "spoken_text": "Have your gear seen to before you try that road. I’ll keep working on these marks.",
+      "subtitle_text": "Have your gear seen to before you try that road. I’ll keep working on these marks.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_first.progress",
+      "source_text_revision": 1,
+      "source_text_sha256": "588d301d8b2dc6fcef312eb408faa60afea4045284c891214eb5e453f4e0667c",
+      "spoken_text": "One seal out of the Foundry. The Abbey’s still ahead.",
+      "subtitle_text": "One seal out of the Foundry. The Abbey’s still ahead.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.foundry_first.prepare",
+      "source_text_revision": 1,
+      "source_text_sha256": "b9cb0db928922470a4ff93fb54df3629a4c934153b0d64d53424fbbdbd60bdad",
+      "spoken_text": "Have another look at the crossing before you leave. I’ll keep at this.",
+      "subtitle_text": "Have another look at the crossing before you leave. I’ll keep at this.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.two_seals.fit",
+      "source_text_revision": 1,
+      "source_text_sha256": "ec26a347459c333becf1b036537429933306fe61770d40915f531c4cd6077ab5",
+      "spoken_text": "They fit. All that road, and they were made to sit together.",
+      "subtitle_text": "They fit. All that road, and they were made to sit together.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.two_seals.court",
+      "source_text_revision": 1,
+      "source_text_sha256": "d134fe0a2e8195d3e7670f3fc809bc4a713fb8879368e6409bcc90bf529eb3d5",
+      "spoken_text": "The Glass Court. Let’s find out what we can before you climb to it.",
+      "subtitle_text": "The Glass Court. Let’s find out what we can before you climb to it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "return.kit_doubt",
+      "source_text_revision": 1,
+      "source_text_sha256": "5b8481a4e6af19d8d124c3f650dcfd82fa5b8ce65ba432949667b1ef4d857a61",
+      "spoken_text": "It knows every lock. Has it told us much about the people who lived behind them?",
+      "subtitle_text": "It knows every lock. Has it told us much about the people who lived behind them?",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.doubt_from_evidence.jailer",
+      "source_text_revision": 1,
+      "source_text_sha256": "969a02a5e533032802610f631a15c2197ff26490d29eeac5def32e1f855a8ff1",
+      "spoken_text": "A jailer keeps someone in. I’d like to know who was afraid of whom.",
+      "subtitle_text": "A jailer keeps someone in. I’d like to know who was afraid of whom.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.doubt_from_evidence.useful",
+      "source_text_revision": 1,
+      "source_text_sha256": "75556d9829fb27bbb96c05ec55cf27d5fb5119aa0a7c251e5d4a866e1364c9e7",
+      "spoken_text": "It’s been useful. That’s why I want to believe it.",
+      "subtitle_text": "It’s been useful. That’s why I want to believe it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.ordinary_treasure.want",
+      "source_text_revision": 1,
+      "source_text_sha256": "a3e3dd84bb58d7dbf84b71c5ce79881d948092586605a22f00736f1346514530",
+      "spoken_text": "I still like the sound of coin on a table. I haven’t become a saint in this chair.",
+      "subtitle_text": "I still like the sound of coin on a table. I haven’t become a saint in this chair.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.ordinary_treasure.use",
+      "source_text_revision": 1,
+      "source_text_sha256": "9cd098682d724fcb77e52045c3014fdd135c4740436857d645268fb27e018c31",
+      "spoken_text": "Good boots. A sound roof. Those aren’t foolish things to want.",
+      "subtitle_text": "Good boots. A sound roof. Those aren’t foolish things to want.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.ordinary_treasure.wait",
+      "source_text_revision": 1,
+      "source_text_sha256": "44e172b47a59bcc4fc09d0681d9a6b03e36bfab81b462a18a0565bb18aaad77e",
+      "spoken_text": "We can count it later. Stay a while first.",
+      "subtitle_text": "We can count it later. Stay a while first.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "return.kit_enough",
+      "source_text_revision": 1,
+      "source_text_sha256": "26ba12b0ec3e04c75535a0868c50b5c6cd878aac3aa061711c55549ccc07c63b",
+      "spoken_text": "We've found more than I ever expected. I'd still like us both here to spend it.",
+      "subtitle_text": "We've found more than I ever expected. I'd still like us both here to spend it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.enough.waiting",
+      "source_text_revision": 1,
+      "source_text_sha256": "ca7e846e85fb2a0c401d9c9c372b30b4cb7a8f4b2652a95fa9bd0fa1a8e3ce68",
+      "spoken_text": "I’m not good at waiting. Turns out I’m worse at pretending I don’t mind.",
+      "subtitle_text": "I’m not good at waiting. Turns out I’m worse at pretending I don’t mind.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.named_relic_choice.value",
+      "source_text_revision": 1,
+      "source_text_sha256": "5ea145660c7e2c218aa4460cead893194b269777e2c9e8ad8666a9deabedb22f",
+      "spoken_text": "It’s worth something. I won’t pretend it isn’t.",
+      "subtitle_text": "It’s worth something. I won’t pretend it isn’t.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.named_relic_choice.claim",
+      "source_text_revision": 1,
+      "source_text_sha256": "3240e1ef9e8bbb5b99194139a2521307bd9a3c67daddd46900707e41cc74f671",
+      "spoken_text": "But the claim holds up. That matters as well.",
+      "subtitle_text": "But the claim holds up. That matters as well.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.named_relic_choice.time",
+      "source_text_revision": 1,
+      "source_text_sha256": "33e3fa65fddaf77b302392189f2d717fe0a67dea25bf23ddc85c607a5047b6e4",
+      "spoken_text": "You needn’t decide with the whole room watching.",
+      "subtitle_text": "You needn’t decide with the whole room watching.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.named_relic_returned.place",
+      "source_text_revision": 1,
+      "source_text_sha256": "ed31fddcfd0d4b075e84f005a1985b41a35af4e76a661be623a6d5179c3025e2",
+      "spoken_text": "They’ve put it where the light catches the mark.",
+      "subtitle_text": "They’ve put it where the light catches the mark.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.named_relic_returned.worth",
+      "source_text_revision": 1,
+      "source_text_sha256": "1995d544ab67bbee1c34df2c12fa00341637b7aeb5538e0a37faa9ee3a45df22",
+      "spoken_text": "I can see why they wanted it back.",
+      "subtitle_text": "I can see why they wanted it back.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.named_relic_sold.candid",
+      "source_text_revision": 1,
+      "source_text_sha256": "08a29b70c792bac6aaa7b3bfac72d603eecb6a9a22b4d0eff69f88f28e476932",
+      "spoken_text": "I know what the money’s worth. I was looking at it too.",
+      "subtitle_text": "I know what the money’s worth. I was looking at it too.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.named_relic_sold.uneasy",
+      "source_text_revision": 1,
+      "source_text_sha256": "e88ff49f385d87ecaadba7e2d8877e7ed756d0fb70fba992c2c48d42a1403373",
+      "spoken_text": "Still, I keep thinking about that mark.",
+      "subtitle_text": "Still, I keep thinking about that mark.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.named_relic_kept.notice",
+      "source_text_revision": 1,
+      "source_text_sha256": "a5bca6aeb89e7ae99db8f287d08bcd598c794cf05f4ea1e1049f05ff231ecef4",
+      "spoken_text": "Still got it, then.",
+      "subtitle_text": "Still got it, then.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.named_relic_kept.wrap",
+      "source_text_revision": 1,
+      "source_text_sha256": "1cbc59a8b3a0bdc018cf9a1139d56031ddbb57dbd9cac68b066fb83ab414b339",
+      "spoken_text": "Wrap it properly. Whatever you decide, it’s had enough knocks.",
+      "subtitle_text": "Wrap it properly. Whatever you decide, it’s had enough knocks.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.mill_working.sound",
+      "source_text_revision": 1,
+      "source_text_sha256": "6f074bb42e5dabce309135c02f05f892ad024b8786db0136305bfd40d68aaa83",
+      "spoken_text": "Listen to that. It’s holding steady.",
+      "subtitle_text": "Listen to that. It’s holding steady.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.mill_working.use",
+      "source_text_revision": 1,
+      "source_text_sha256": "219fe5e83dd1b14c698b70d63acdee5b0515d5b12cca3de1a582bedf6a61b201",
+      "spoken_text": "A good use for what came out of those ruins.",
+      "subtitle_text": "A good use for what came out of those ruins.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.trade_reopened.wheels",
+      "source_text_revision": 1,
+      "source_text_sha256": "9a4a76e3283f2e1d149651569efaa2020078bf4194b5f7d839033c77d1b9bd92",
+      "spoken_text": "Wheels on the road. There’s a sound I’ve missed.",
+      "subtitle_text": "Wheels on the road. There’s a sound I’ve missed.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.trade_reopened.room",
+      "source_text_revision": 1,
+      "source_text_sha256": "df454c2e1a417ea7fa8bd62e2fb7d622967a13da8ec1426cf2c254f3420a6337",
+      "spoken_text": "We might have to share our quiet corner now. I can live with that.",
+      "subtitle_text": "We might have to share our quiet corner now. I can live with that.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.family_stays.unpack",
+      "source_text_revision": 1,
+      "source_text_sha256": "f18fc3d7d08bfb76c2f712adf3426fe5e11204d199a94a164ea25cc88d21d41c",
+      "spoken_text": "They’re unpacking. They really are staying.",
+      "subtitle_text": "They’re unpacking. They really are staying.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.family_stays.home",
+      "source_text_revision": 1,
+      "source_text_sha256": "6828ae045e9492aec11fb909123194716251cc673314b247ded87916631b26ed",
+      "spoken_text": "They must think there’s something worth staying for.",
+      "subtitle_text": "They must think there’s something worth staying for.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.recovery.progress",
+      "source_text_revision": 1,
+      "source_text_sha256": "ffa84825c3f24d63973455cf7fd2996b4b094aa7e3b67fe7b0660efe9db6b85b",
+      "spoken_text": "Getting about’s a little easier. I’ll take that.",
+      "subtitle_text": "Getting about’s a little easier. I’ll take that.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.recovery.patience",
+      "source_text_revision": 1,
+      "source_text_sha256": "3c44037ce5e9e09c498e5b11b0ca27305de0482f4002831be073644bf482b2fd",
+      "spoken_text": "Still not ready for those roads. I’m trying to be sensible about that.",
+      "subtitle_text": "Still not ready for those roads. I’m trying to be sensible about that.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.court_departure.ridge",
+      "source_text_revision": 1,
+      "source_text_sha256": "beabcd618d81c59dbb8595b7022f32b6c64fe2c65a959b9b39ccec73bdf1ace3",
+      "spoken_text": "I’ll be looking for you on the ridge road this time.",
+      "subtitle_text": "I’ll be looking for you on the ridge road this time.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.court_departure.questions",
+      "source_text_revision": 1,
+      "source_text_sha256": "22021671b0db87f5d68db12c8c4ba1a9d9f70bb0edf9fa31f329aa31478030e7",
+      "spoken_text": "Bring the answers back if you can. Bring yourself back either way.",
+      "subtitle_text": "Bring the answers back if you can. Bring yourself back either way.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.court_incomplete_no_aperture.welcome",
+      "source_text_revision": 1,
+      "source_text_sha256": "a5c754e2139ac073f9fcb6e8df51e146e762e75583afd1e3e847971345d07c13",
+      "spoken_text": "There’s a space beside the map. Show me where you got to.",
+      "subtitle_text": "There’s a space beside the map. Show me where you got to.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.court_incomplete_no_aperture.later",
+      "source_text_revision": 1,
+      "source_text_sha256": "438036eea1a985cfbc51215356b3f1592f647f01c6ad29883ef4b97c81f56a7d",
+      "spoken_text": "We can leave the difficult part for a moment.",
+      "subtitle_text": "We can leave the difficult part for a moment.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.court_incomplete_aperture.beam",
+      "source_text_revision": 1,
+      "source_text_sha256": "714cd7424a8ad349634689ef834a5e259e6f3cb1993e72841074b171ad610a1b",
+      "spoken_text": "That makes it a much narrower light.",
+      "subtitle_text": "That makes it a much narrower light.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.court_incomplete_aperture.care",
+      "source_text_revision": 1,
+      "source_text_sha256": "3534c86bf509570a0fd3a644f0927cd9cf898d93ad79a4beba5012bd36051b19",
+      "spoken_text": "Put it with the others. I’ll move my things out of the way.",
+      "subtitle_text": "Put it with the others. I’ll move my things out of the way.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.court_evidence_debrief.order",
+      "source_text_revision": 1,
+      "source_text_sha256": "c6c8136504460dabbbc310640c730b032c87e563013366061fd18781b945e5e0",
+      "spoken_text": "The king’s seal. Beside the keepers’. Let me look at that.",
+      "subtitle_text": "The king’s seal. Beside the keepers’. Let me look at that.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.court_evidence_debrief.cost",
+      "source_text_revision": 1,
+      "source_text_sha256": "bfcb96e2c6a1ec5bb04095702a16cdf6ed7988dc6541b0e4190901d45133e1ef",
+      "spoken_text": "And opening it frees the soldiers as well. That part was true.",
+      "subtitle_text": "And opening it frees the soldiers as well. That part was true.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "court.kit_response",
+      "source_text_revision": 1,
+      "source_text_sha256": "0d77aaf18d45b27b840ff14ffb4ee86f1222704f476182ca1240791c190061cf",
+      "spoken_text": "Then we find a way to face it before we open anything.",
+      "subtitle_text": "Then we find a way to face it before we open anything.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.final_preparation.table",
+      "source_text_revision": 1,
+      "source_text_sha256": "27a6572c232466523b1a47e622661e695923b1ed767e14fdaab032eb7125f3f4",
+      "spoken_text": "Put the tools here. One at a time. Let’s make sure nothing’s been left behind.",
+      "subtitle_text": "Put the tools here. One at a time. Let’s make sure nothing’s been left behind.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.final_preparation.practice",
+      "source_text_revision": 1,
+      "source_text_sha256": "0774e8dd6306bed9c7bfc130dbf6766896fb546cbda5fa1f6ad5d68ba27d353b",
+      "spoken_text": "Show me again how they work together. Take your time.",
+      "subtitle_text": "Show me again how they work together. Take your time.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.final_preparation.route",
+      "source_text_revision": 1,
+      "source_text_sha256": "3dddc402aad052d0291cf27efb6bf9a1a31977a60d36668e4f228aabad6fc40d",
+      "spoken_text": "And show me the way back. I want that clear before you leave.",
+      "subtitle_text": "And show me the way back. I want that clear before you leave.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.final_departure.want",
+      "source_text_revision": 1,
+      "source_text_sha256": "e40b68ab0e52c7e65f137d45b7007ef100cac97453ece5cf258b708ec33abdd9",
+      "spoken_text": "I wish I were going with you. I know I’d only slow you down.",
+      "subtitle_text": "I wish I were going with you. I know I’d only slow you down.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.final_departure.place",
+      "source_text_revision": 1,
+      "source_text_sha256": "e65db3c1ca4164004b5630429bcfcb99853bd18359910e6a3e169d56944c9dac",
+      "spoken_text": "I’ll be here. Same table, same dreadful chair.",
+      "subtitle_text": "I’ll be here. Same table, same dreadful chair.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.final_departure.return",
+      "source_text_revision": 1,
+      "source_text_sha256": "7d7afd29a25fa58d04816b72fccae7e9ab786d9ff768e4b5b8a2c4bcff595920",
+      "spoken_text": "Come back and complain about it with me.",
+      "subtitle_text": "Come back and complain about it with me.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "finale.kit_alive",
+      "source_text_revision": 1,
+      "source_text_sha256": "c55088c4fb4d74935d2f539b21404f7c2939631d42c2d3bdc98e9a31e99c1497",
+      "spoken_text": "There you are. Come on. One step at a time.",
+      "subtitle_text": "There you are. Come on. One step at a time.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.final_town_reunion.chair",
+      "source_text_revision": 1,
+      "source_text_sha256": "fbc8670bf17db1e732dce054d875d04e6bd617ce3a417c3f2a837f659f1acf0e",
+      "spoken_text": "Kept your chair. Come and take it.",
+      "subtitle_text": "Kept your chair. Come and take it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.treasure_home.real",
+      "source_text_revision": 1,
+      "source_text_sha256": "7e526535bf043034199316431d4a26cd57910410d8bd75f98f5cf64516b8b1bf",
+      "spoken_text": "It’s real. We’ve actually got some of it here.",
+      "subtitle_text": "It’s real. We’ve actually got some of it here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "finale.kit_treasure",
+      "source_text_revision": 1,
+      "source_text_sha256": "f058faff8bd4d9bdcbb646a046daff1e83e24e20e4bf16d35685a55d786f1c3d",
+      "spoken_text": "We'll need a bigger bag. Later.",
+      "subtitle_text": "We'll need a bigger bag. Later.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.release_evidence.free",
+      "source_text_revision": 1,
+      "source_text_sha256": "c12eb13eb6702da426a8129908dc5648276906bf11317e1f82840669bad9e0b7",
+      "spoken_text": "So it’s over. They’re free of it.",
+      "subtitle_text": "So it’s over. They’re free of it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.release_evidence.names",
+      "source_text_revision": 1,
+      "source_text_sha256": "d07f6c9781d0bb99aa2345d8f84250672d77d650000c3da02402629d07960d89",
+      "spoken_text": "I’m glad we kept their names.",
+      "subtitle_text": "I’m glad we kept their names.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "epilogue.kit_roof",
+      "source_text_revision": 1,
+      "source_text_sha256": "ba9099e0d853ff0b78eeeaa273d013126755cdfa73c4e5eaca9464e2e1c86542",
+      "spoken_text": "I asked about the room upstairs. Roof looks sound.",
+      "subtitle_text": "I asked about the room upstairs. Roof looks sound.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.room_upstairs.stay",
+      "source_text_revision": 1,
+      "source_text_sha256": "ab87a170d0105e6f2835167556e07c82393520f24537f28636199df4fe3b0758",
+      "spoken_text": "I’d like to stay a while. See what this place is like when we’re not passing through.",
+      "subtitle_text": "I’d like to stay a while. See what this place is like when we’re not passing through.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "kit.quiet_closure.here",
+      "source_text_revision": 1,
+      "source_text_sha256": "0629c6532c77f638e539a368b5783d6e0a0afbce8ef354a7371a8eb8359df82e",
+      "spoken_text": "It’s good having you here.",
+      "subtitle_text": "It’s good having you here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "epilogue.kit_close",
+      "source_text_revision": 1,
+      "source_text_sha256": "e7b909a50d16b45e6d135b76804ccf0ce10b3ad2e6e89611644f07d96bbfa6d9",
+      "spoken_text": "The rest can wait till morning.",
+      "subtitle_text": "The rest can wait till morning.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.tavern.greet",
+      "source_text_revision": 1,
+      "source_text_sha256": "5c8de96953b279d225a20860fb67ac9bffee1b13f092e3a526213b7eeb253d6a",
+      "spoken_text": "There’s room by the fire. Tell me what you need.",
+      "subtitle_text": "There’s room by the fire. Tell me what you need.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.tavern.cancel",
+      "source_text_revision": 1,
+      "source_text_sha256": "d759b65c7a8890e1199a9de183ab2bcbac06ebf2708c7d95b230ce148e43f64c",
+      "spoken_text": "No hurry. I’ve waited longer for a wagon to turn.",
+      "subtitle_text": "No hurry. I’ve waited longer for a wagon to turn.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.tavern.insufficient",
+      "source_text_revision": 1,
+      "source_text_sha256": "73ab57770675d51f633f6c589f6c0d4a2e3ff767b35a80bcf87d93c0d5909d19",
+      "spoken_text": "That won’t cover a room. You’re welcome to warm up here.",
+      "subtitle_text": "That won’t cover a room. You’re welcome to warm up here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.record.greet",
+      "source_text_revision": 1,
+      "source_text_sha256": "6c390115b77f3dd6c2fcab5c7bb0d724e149b641d3da73ebfdd8851e38ce50a2",
+      "spoken_text": "Show me the inscription before you tell me what you hope it says.",
+      "subtitle_text": "Show me the inscription before you tell me what you hope it says.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.record.cancel",
+      "source_text_revision": 1,
+      "source_text_sha256": "f3255b73fa0d6266f771384c7163b7bd439411b047aa7f62caf492b24f9ac6cf",
+      "spoken_text": "We can leave the reading there. The stone will keep.",
+      "subtitle_text": "We can leave the reading there. The stone will keep.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.record.insufficient",
+      "source_text_revision": 1,
+      "source_text_sha256": "97d85a56c8f29123930696992eedb82032fca37f73b62595b8d6d1f43960800b",
+      "spoken_text": "You haven’t brought what this working needs. We can still look at the inscription.",
+      "subtitle_text": "You haven’t brought what this working needs. We can still look at the inscription.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.artificer.greet",
+      "source_text_revision": 1,
+      "source_text_sha256": "603b713d77164ebb22d8e478472c63c579f86b155f45bdb3032502296dca87e1",
+      "spoken_text": "Lay it flat. I want to see the worn side.",
+      "subtitle_text": "Lay it flat. I want to see the worn side.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.artificer.cancel",
+      "source_text_revision": 1,
+      "source_text_sha256": "a859c8eae290d92068f612e021719d95ac0829267988b544f1efcee69e776614",
+      "spoken_text": "Take it with you. I haven’t changed anything.",
+      "subtitle_text": "Take it with you. I haven’t changed anything.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.artificer.insufficient",
+      "source_text_revision": 1,
+      "source_text_sha256": "27413ca2ee7b9c183508be3891a393c952f079e694831c2044d19eb7d8ef9276",
+      "spoken_text": "I’m short of what this repair needs. I won’t take payment for half a job.",
+      "subtitle_text": "I’m short of what this repair needs. I won’t take payment for half a job.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.salvager.greet",
+      "source_text_revision": 1,
+      "source_text_sha256": "ef7668b98839872b5e5678a9277bd985205b46725f7df84b7bdc0fd0e18e4af6",
+      "spoken_text": "Set your pack down. Show me how you move.",
+      "subtitle_text": "Set your pack down. Show me how you move.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.salvager.cancel",
+      "source_text_revision": 1,
+      "source_text_sha256": "e6fe59269a2c626b26a37ba8eed6fe0c33fd85f80fa5f8dbf06a69ffe55c7d16",
+      "spoken_text": "Another time, then. Rest counts for something.",
+      "subtitle_text": "Another time, then. Rest counts for something.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.salvager.insufficient",
+      "source_text_revision": 1,
+      "source_text_sha256": "586422acfb800b43950c379e8d9bf6b9b6ad72bc5731b4139cdb397c5565f045",
+      "spoken_text": "You’re missing what we need for that lesson. We can work on your footing here.",
+      "subtitle_text": "You’re missing what we need for that lesson. We can work on your footing here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.dealer.greet",
+      "source_text_revision": 1,
+      "source_text_sha256": "3f0412b859e9e8c485f7237d06a0eb783736084f1ae53f2709ada3d0165ac06c",
+      "spoken_text": "Let’s see the whole piece, including the damage.",
+      "subtitle_text": "Let’s see the whole piece, including the damage.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.dealer.cancel",
+      "source_text_revision": 1,
+      "source_text_sha256": "87e652baa3abd3b5d994dd41412e6c7ae8ec0dfc1d43db7149163a364b1c2121",
+      "spoken_text": "Back in your bag it goes. An offer isn’t a sale.",
+      "subtitle_text": "Back in your bag it goes. An offer isn’t a sale.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.dealer.insufficient",
+      "source_text_revision": 1,
+      "source_text_sha256": "0ca9f984a0aea6f7f9851d2406228c0cf327153aceeeb11037450a59a02513a1",
+      "spoken_text": "That isn’t enough for this piece. Keep your coin until you’re sure.",
+      "subtitle_text": "That isn’t enough for this piece. Keep your coin until you’re sure.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.ordinary_sale",
+      "source_text_revision": 1,
+      "source_text_sha256": "381c6de374de0cc5e89210999bae7541f725d0955843947a4dc3d0affa1ef0db",
+      "spoken_text": "Common coin, ordinary silver. I can give you a price for those.",
+      "subtitle_text": "Common coin, ordinary silver. I can give you a price for those.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service_return",
+      "source_text_revision": 2,
+      "source_text_sha256": "0dc89376421b753497392cbba2c5e46f8d76155cc5ffa93bec2a2a8ee9bbef14",
+      "spoken_text": "Back already? Put it on the bench. Let’s see what survived.",
+      "subtitle_text": "Back already? Put it on the bench. Let’s see what survived.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.record.recap",
+      "source_text_revision": 1,
+      "source_text_sha256": "77adb2246d8f62dc1b2ed6f3305d204a2b3326ea695f7e3eed94507bc5de2c90",
+      "spoken_text": "We can go through it again. Start with the part that troubles you.",
+      "subtitle_text": "We can go through it again. Start with the part that troubles you.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.salvager.refresh",
+      "source_text_revision": 1,
+      "source_text_sha256": "65ee776de91d01b4157e154e9a60a3410512bcd17da0533df4d2f778c20ac53c",
+      "spoken_text": "Show me the part you want to practise. We’ll do it where a mistake is cheap.",
+      "subtitle_text": "Show me the part you want to practise. We’ll do it where a mistake is cheap.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.service.tavern.kit",
+      "source_text_revision": 1,
+      "source_text_sha256": "79477c71b168e68c042d7e2728a383d9984c1ec152a047967e9c897d4a454ec3",
+      "spoken_text": "Kit’s staying here to recover. I’ll keep a place clear when you get back.",
+      "subtitle_text": "Kit’s staying here to recover. I’ll keep a place clear when you get back.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.abbey_problem",
+      "source_text_revision": 1,
+      "source_text_sha256": "68e593f7f77f52467005b874ad713d2fc944e6c41ff1a0bf1dc1b177a1e1895e",
+      "spoken_text": "The Abbey door is underwater. There are air pockets beyond, if you can reach them.",
+      "subtitle_text": "The Abbey door is underwater. There are air pockets beyond, if you can reach them.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.abbey_alternatives",
+      "source_text_revision": 1,
+      "source_text_sha256": "24bc92aad91006b5cb19d84d0d260491377d6855fea1af2ad02a21eac30cd3a7",
+      "spoken_text": "A ward, a breathing rig, or training for the crossing. Choose a way you can rely on.",
+      "subtitle_text": "A ward, a breathing rig, or training for the crossing. Choose a way you can rely on.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.magic_offer",
+      "source_text_revision": 2,
+      "source_text_sha256": "c0b6bd6679124b4b7763b61de5f3495e200000fec33ab5c090ea75b49e3ab0aa",
+      "spoken_text": "Restore the shrine’s binding, and I can teach you a ward for the crossing.",
+      "subtitle_text": "Restore the shrine’s binding, and I can teach you a ward for the crossing.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.magic_task",
+      "source_text_revision": 1,
+      "source_text_sha256": "e51bd57f5677c9ebb1c433bf233affb5ed893eb698462ee5e7eee6846c632a25",
+      "spoken_text": "We’ll begin with the marks at the wayside shrine. Read the whole binding before you try to mend it.",
+      "subtitle_text": "We’ll begin with the marks at the wayside shrine. Read the whole binding before you try to mend it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.magic_progress_read",
+      "source_text_revision": 1,
+      "source_text_sha256": "2f0a976a5866681dec8827cc1c4f55d753e714ac6de8058dce1b6072d55c1217",
+      "spoken_text": "Which part of the inscription is still broken? Start there.",
+      "subtitle_text": "Which part of the inscription is still broken? Start there.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.magic_progress_test",
+      "source_text_revision": 1,
+      "source_text_sha256": "08f34e6afd60846971c7365a0a82599975c6dd5b7f519b0a355faebf2d9139af",
+      "spoken_text": "A bright mark is not proof of a sound binding. Test it before you trust it.",
+      "subtitle_text": "A bright mark is not proof of a sound binding. Test it before you trust it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.magic_limit",
+      "source_text_revision": 1,
+      "source_text_sha256": "2faddf3222750890cf2a7544f70ef200edf26ee17b6c9c15e15ddee6389d0f97",
+      "spoken_text": "It will buy you breath. It will not last forever.",
+      "subtitle_text": "It will buy you breath. It will not last forever.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.magic_retry_rest",
+      "source_text_revision": 1,
+      "source_text_sha256": "7cde152c142cf608f4a44c3f7f52da6e3bb10d0d68c2f22dc7413ebcb4b4e9b2",
+      "spoken_text": "Stay in the clear air until you’re ready. We can try again here.",
+      "subtitle_text": "Stay in the clear air until you’re ready. We can try again here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.magic_complete",
+      "source_text_revision": 1,
+      "source_text_sha256": "556f8acf596a51bbb5d13a6c3c13f589d56718f66324159616c29f38dee9564b",
+      "spoken_text": "The binding held through the trial. You can use the ward for the Abbey crossing.",
+      "subtitle_text": "The binding held through the trial. You can use the ward for the Abbey crossing.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.magic_complete_limit",
+      "source_text_revision": 1,
+      "source_text_sha256": "3a297da3acb8d26176dc39d2cba1cf410e389b71c400110b64293f33c13b0afb",
+      "spoken_text": "Use the places where you can breathe. The ward gets you between them.",
+      "subtitle_text": "Use the places where you can breathe. The ward gets you between them.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.tech_offer",
+      "source_text_revision": 2,
+      "source_text_sha256": "ff0910c404751aac929bfadb6bfddb671462b76f5d076b77679525647441902a",
+      "spoken_text": "The mill has a sound air chamber. Help repair its gearing; I’ll fit you a breathing rig.",
+      "subtitle_text": "The mill has a sound air chamber. Help repair its gearing; I’ll fit you a breathing rig.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.tech_task",
+      "source_text_revision": 1,
+      "source_text_sha256": "8b9f5e0a9985392db65642bf84851c2275ca8cd12b0abbfa0262f8564393b2b9",
+      "spoken_text": "Let me check the chamber before we remove anything. The mill still needs to work when we’re done.",
+      "subtitle_text": "Let me check the chamber before we remove anything. The mill still needs to work when we’re done.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.tech_progress_fit",
+      "source_text_revision": 1,
+      "source_text_sha256": "9f19bb29cd07e7a8818af2b4f71b1880ab8d1dd3d85cb4330ef6e8d375378374",
+      "spoken_text": "Set the recovered fitting beside the old one. We need the fit, not just the right-looking metal.",
+      "subtitle_text": "Set the recovered fitting beside the old one. We need the fit, not just the right-looking metal.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.tech_progress_joint",
+      "source_text_revision": 1,
+      "source_text_sha256": "afbf93b34bd8c40a9d8fd8dffa18f092c534e4207dc58cebd22d88ffd1b41b37",
+      "spoken_text": "A loose joint is an inconvenience up here. Underwater, it’s the whole problem.",
+      "subtitle_text": "A loose joint is an inconvenience up here. Underwater, it’s the whole problem.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.tech_test",
+      "source_text_revision": 1,
+      "source_text_sha256": "d9f243ed010f7bb0c4190b421d985c8d6530fc577122ba2a4c18d3cc728861b9",
+      "spoken_text": "Shallow water first. We find the leaks here.",
+      "subtitle_text": "Shallow water first. We find the leaks here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.tech_retry",
+      "source_text_revision": 1,
+      "source_text_sha256": "f9770b2c410cf57f6a082ff19ba501ab10cd9773221b2ed0c2fc37ca5347f3cc",
+      "spoken_text": "Out of the water. Let me check the joint before you try again.",
+      "subtitle_text": "Out of the water. Let me check the joint before you try again.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.tech_complete",
+      "source_text_revision": 1,
+      "source_text_sha256": "08b6b8724f4a7fc00bc9d33b7fcf9238cb75bdc7be0a844dab22ebe137c91a41",
+      "spoken_text": "No leak in that trial. The rig’s ready for the crossing.",
+      "subtitle_text": "No leak in that trial. The rig’s ready for the crossing.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.tech_complete_limit",
+      "source_text_revision": 1,
+      "source_text_sha256": "ef7dbc4c7ed27380e86317824d6820b632f55ca7dd3838268269237da52ef9a2",
+      "spoken_text": "It carries a supply of air. It doesn’t make more. Stop where you can breathe.",
+      "subtitle_text": "It carries a supply of air. It doesn’t make more. Stop where you can breathe.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.body_offer",
+      "source_text_revision": 1,
+      "source_text_sha256": "aebedc3ce516adeb2fb3f73a1f7e698bc7e24fee16c7552ffeb7de818fbdfa97",
+      "spoken_text": "I can teach you the crossing. Slow your breathing. Learn where you can surface.",
+      "subtitle_text": "I can teach you the crossing. Slow your breathing. Learn where you can surface.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.body_task",
+      "source_text_revision": 1,
+      "source_text_sha256": "617abef38d9b4b35f436bb6c34b2f073e99aeb6e3f8d811b2f496d31176bb152",
+      "spoken_text": "We practise near a way out. Getting across is only half the lesson.",
+      "subtitle_text": "We practise near a way out. Getting across is only half the lesson.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.body_progress",
+      "source_text_revision": 1,
+      "source_text_sha256": "85324c34e4bb5ef79bbc6a3aba511e1d6338c4c4de0110cba377fa03ecd5dcb6",
+      "spoken_text": "Find your way back before you leave the edge. Show me.",
+      "subtitle_text": "Find your way back before you leave the edge. Show me.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.body_limit",
+      "source_text_revision": 2,
+      "source_text_sha256": "f543cfa80ecaec327582b0d042927e91925ee707c070bd284b967544c5c0175e",
+      "spoken_text": "Being strong won’t make water into air. Turn back while you still can.",
+      "subtitle_text": "Being strong won’t make water into air. Turn back while you still can.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.body_retry_stop",
+      "source_text_revision": 1,
+      "source_text_sha256": "dc0669df74d50ae82a4826cda273129cc61ebf13e3ddcf77fc5293bdcd28e75b",
+      "spoken_text": "You came back. Good. Stay here until your breathing settles.",
+      "subtitle_text": "You came back. Good. Stay here until your breathing settles.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.body_retry_plan",
+      "source_text_revision": 1,
+      "source_text_sha256": "e48064248f1be244b744cf590792b4896a984793a2a8299027c6aa1b9867c3b6",
+      "spoken_text": "On the next try, keep enough in reserve to return.",
+      "subtitle_text": "On the next try, keep enough in reserve to return.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.body_complete",
+      "source_text_revision": 1,
+      "source_text_sha256": "a39aa7cd4f6e818920e8ce2aedb1fb817cde82ec14a012abc2ca165676891797",
+      "spoken_text": "You found the next air point and kept a way back. That’s the crossing learned.",
+      "subtitle_text": "You found the next air point and kept a way back. That’s the crossing learned.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.body_complete_limit",
+      "source_text_revision": 1,
+      "source_text_sha256": "20456e7e1321fd4f20c2c90015df0ecbdc5d8911b59462686bfd6ec0eff89b2f",
+      "spoken_text": "At the Abbey, stop and look again. Don’t spend your breath proving the lesson.",
+      "subtitle_text": "At the Abbey, stop and look again. Don’t spend your breath proving the lesson.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.abbey_ready",
+      "source_text_revision": 2,
+      "source_text_sha256": "6fd7777e0f5e41be13a45c799d4fe32ed504c8e0fb6c8e2b1acc98950397f596",
+      "spoken_text": "You’ve made the practice crossing. Use the same care at the Abbey.",
+      "subtitle_text": "You’ve made the practice crossing. Use the same care at the Abbey.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.foundry_problem",
+      "source_text_revision": 1,
+      "source_text_sha256": "6d3468bf5202d2546e730a449bfd8a230907fef58b304d392bbba91c47ca6a2f",
+      "spoken_text": "The Foundry bridge has gone. The old maintenance path may still reach the far side.",
+      "subtitle_text": "The Foundry bridge has gone. The old maintenance path may still reach the far side.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.foundry_alternatives",
+      "source_text_revision": 1,
+      "source_text_sha256": "0eb0283779bdba6dfabaf51cb5894382479d5140eba467d726837a79599feebf",
+      "spoken_text": "Ask the smith about the span, the shrine keeper about the stones, or the salvager about the climb.",
+      "subtitle_text": "Ask the smith about the span, the shrine keeper about the stones, or the salvager about the climb.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.bridge_tech",
+      "source_text_revision": 1,
+      "source_text_sha256": "a14184d6e31186cac3d9a1367b5b36d3c77bf6ed528b8c49467f92bf99e1d5f8",
+      "spoken_text": "The anchors held. With the right fittings, that span can carry you again.",
+      "subtitle_text": "The anchors held. With the right fittings, that span can carry you again.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.bridge_task",
+      "source_text_revision": 1,
+      "source_text_sha256": "5b284ebbbfa1dea6ac9ec8eeb6bef4775393eef3236f0493bb79ed32aeb4bfee",
+      "spoken_text": "We check the load from this bank before anyone crosses.",
+      "subtitle_text": "We check the load from this bank before anyone crosses.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.access.bridge.progress",
+      "source_text_revision": 1,
+      "source_text_sha256": "de7c2a28c6cadf108c65beb190c2b62772064badb1010f04330fb943f4deffcf",
+      "spoken_text": "Keep off the span until the repaired joints have been tested.",
+      "subtitle_text": "Keep off the span until the repaired joints have been tested.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.access.bridge.retry",
+      "source_text_revision": 1,
+      "source_text_sha256": "8f0db8839f7a19190da13e94f73d73f05d3ea7d32018aa5f3db48b74a13c640e",
+      "spoken_text": "That joint moved. Stay on this bank while I check the fitting.",
+      "subtitle_text": "That joint moved. Stay on this bank while I check the fitting.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.bridge_complete",
+      "source_text_revision": 1,
+      "source_text_sha256": "f220d1ddfd5e8a9ef5bf3074e1a4fe7ec265ff026ace46dc3d520c444092f043",
+      "spoken_text": "The repaired span held the test. You can cross.",
+      "subtitle_text": "The repaired span held the test. You can cross.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.bridge_return",
+      "source_text_revision": 1,
+      "source_text_sha256": "a24bce1bf1a07d713400a62453d3d361e6fcae630f979f3ce75e49c30eedd374",
+      "spoken_text": "It gives you a way back, too. Keep that in mind before going deeper.",
+      "subtitle_text": "It gives you a way back, too. Keep that in mind before going deeper.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.crossing_magic",
+      "source_text_revision": 1,
+      "source_text_sha256": "2ff6133e933ba7fd0394387c88529a350c1f87515bbc7c9e38b096fc6104ffed",
+      "spoken_text": "Those stones carried a crossing charm. We can restore it.",
+      "subtitle_text": "Those stones carried a crossing charm. We can restore it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.stones_task",
+      "source_text_revision": 1,
+      "source_text_sha256": "e13c389486aa3221ed61631f305ccfef34a143041412eae0d49d417839658ee1",
+      "spoken_text": "We’ll test the near part first. No one needs to step over the gorge to begin.",
+      "subtitle_text": "We’ll test the near part first. No one needs to step over the gorge to begin.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.access.stones.progress",
+      "source_text_revision": 1,
+      "source_text_sha256": "dcbedbb10fef1011f5ebbc24cbd9c872cf5e145064794c19262cf12610dc03d8",
+      "spoken_text": "The charm must carry you back as well as out. Check the return before extending it.",
+      "subtitle_text": "The charm must carry you back as well as out. Check the return before extending it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.access.stones.retry",
+      "source_text_revision": 1,
+      "source_text_sha256": "a2a8693225e7734e446555af92fa60cc25887acbb357c81e251faab5ad1e9292",
+      "spoken_text": "It didn’t hold. We stay on solid ground and read the binding again.",
+      "subtitle_text": "It didn’t hold. We stay on solid ground and read the binding again.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.stones_complete",
+      "source_text_revision": 1,
+      "source_text_sha256": "168e974e452619d2dd00e6b87e865e225dc2a02e4ec315e870524d79d59c9002",
+      "spoken_text": "The crossing holds in both directions. Take it at the pace we tested.",
+      "subtitle_text": "The crossing holds in both directions. Take it at the pace we tested.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.stones_limit",
+      "source_text_revision": 1,
+      "source_text_sha256": "51ab13fa344c537f57d469524f3d7f0785699bce1bc86636936eb26fb2793161",
+      "spoken_text": "This working carries you over the gorge. Smoke inside is another matter.",
+      "subtitle_text": "This working carries you over the gorge. Smoke inside is another matter.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.climb_body",
+      "source_text_revision": 1,
+      "source_text_sha256": "8b8ff6a533d98199d618f3e1ea7a5bb3e6ca72584d6eb8b047c5de0fe010226d",
+      "spoken_text": "Use the old maintenance climb. Test each hold before you put your weight on it.",
+      "subtitle_text": "Use the old maintenance climb. Test each hold before you put your weight on it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.climb_task",
+      "source_text_revision": 1,
+      "source_text_sha256": "61703021b3c3e3d7ba0291c0606dcc5f32826864d8c0a978d326b9490877ed20",
+      "spoken_text": "We’ll practise coming down before we practise going higher.",
+      "subtitle_text": "We’ll practise coming down before we practise going higher.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.access.climb.progress",
+      "source_text_revision": 1,
+      "source_text_sha256": "93ebf06542e80437aac1ff80d80baf60e188ac6768bbc8475e1900e2ba6b3ab3",
+      "spoken_text": "Find a place to rest, then look for the next hold. Don’t hang there making plans.",
+      "subtitle_text": "Find a place to rest, then look for the next hold. Don’t hang there making plans.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.access.climb.retry",
+      "source_text_revision": 1,
+      "source_text_sha256": "ce275a006995d61c660a3ccb08a74a32e611b7bded56e22139a95922dab3fdde",
+      "spoken_text": "Feet on the ground. Let your hands rest; the wall can wait.",
+      "subtitle_text": "Feet on the ground. Let your hands rest; the wall can wait.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.climb_complete",
+      "source_text_revision": 1,
+      "source_text_sha256": "d89be5d024eddd4c4196d56f4c0adc731d557cae1e853aa18fad53bac1aa9b09",
+      "spoken_text": "You’ve made the climb and the way down. The maintenance route is open to you.",
+      "subtitle_text": "You’ve made the climb and the way down. The maintenance route is open to you.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.climb_smoke",
+      "source_text_revision": 1,
+      "source_text_sha256": "d000803a44fe3ff536e63f0316e658ab51d0ff42a576852f89494dbad9968f02",
+      "spoken_text": "Strong arms won’t help your lungs in there. Plan where you’ll get clear air.",
+      "subtitle_text": "Strong arms won’t help your lungs in there. Plan where you’ll get clear air.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.smoke_tech",
+      "source_text_revision": 1,
+      "source_text_sha256": "8db3936734f4f849582905d026dc1b211deed2937f08472882643d6f22288dc4",
+      "spoken_text": "This filter will help with the smoke. Get clear before it clogs.",
+      "subtitle_text": "This filter will help with the smoke. Get clear before it clogs.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.smoke_magic",
+      "source_text_revision": 1,
+      "source_text_sha256": "6fd7b53dda9546dcda770c73976ba35eb592a38c55417fac155ad7354cf7e2da",
+      "spoken_text": "Keep the ward steady through the smoke. Find clean air before it fades.",
+      "subtitle_text": "Keep the ward steady through the smoke. Find clean air before it fades.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.smoke_body",
+      "source_text_revision": 1,
+      "source_text_sha256": "6659994d9529f4a1f3ae0cedc437d12933be985f95aedfd224584fa9e4b5f47b",
+      "spoken_text": "Take the short gaps between clear air. If your chest tightens, go back.",
+      "subtitle_text": "Take the short gaps between clear air. If your chest tightens, go back.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.smoke_separate",
+      "source_text_revision": 1,
+      "source_text_sha256": "d2365b9aa9c2351a35c8f8b31749ee290bdeae58b8e57dfad90ccc48e291b9ed",
+      "spoken_text": "Getting over the gorge settles the crossing. It doesn’t settle what you’ll breathe inside.",
+      "subtitle_text": "Getting over the gorge settles the crossing. It doesn’t settle what you’ll breathe inside.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "access.smoke_retreat",
+      "source_text_revision": 1,
+      "source_text_sha256": "ebcae85f4ea78692f69d204705fdc7d5d7836e0aba3ee544f6b7f882c6a4cbbb",
+      "spoken_text": "Use the clear stretches to recover. If you can’t reach the next one safely, come back and prepare.",
+      "subtitle_text": "Use the clear stretches to recover. If you can’t reach the next one safely, come back and prepare.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.named_relic",
+      "source_text_revision": 2,
+      "source_text_sha256": "93607bb6fe6835d8423e9885e3d35c4b81f80e42524635e8e6b1986e1fb82620",
+      "spoken_text": "That one’s marked. Find whose mark it is before you decide.",
+      "subtitle_text": "That one’s marked. Find whose mark it is before you decide.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "relic.inspect_record",
+      "source_text_revision": 1,
+      "source_text_sha256": "783c195b11b7d1f4ab42aa1635f735d45ffe4e32b65f0ae09d5572d8b41e0306",
+      "spoken_text": "I can compare the mark with what we have. A resemblance is a reason to look, not proof.",
+      "subtitle_text": "I can compare the mark with what we have. A resemblance is a reason to look, not proof.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "relic.inspect_price",
+      "source_text_revision": 1,
+      "source_text_sha256": "30fe9f43a0c88423b45d62c924ede06d6a8d6210feba72fcdadb49f51bd11b0e",
+      "spoken_text": "I can value the metal now. Whether you want to sell it can wait.",
+      "subtitle_text": "I can value the metal now. Whether you want to sell it can wait.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "relic.sale_preview",
+      "source_text_revision": 1,
+      "source_text_sha256": "000b9fbe5cfe2b0dfbc1ae3fbae7c37fb31f7041791b7df4b06a53e531e248d7",
+      "spoken_text": "I can buy it at the price shown. You’ve also got a claim to weigh before you decide.",
+      "subtitle_text": "I can buy it at the price shown. You’ve also got a claim to weigh before you decide.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "relic.sale_evidence",
+      "source_text_revision": 1,
+      "source_text_sha256": "e3e46b5b72b7d8794b508b1682b6b4a6f5b94d24e1b783f0e0e739bd5b413f8a",
+      "spoken_text": "The account of where it came from will remain here, whatever you choose.",
+      "subtitle_text": "The account of where it came from will remain here, whatever you choose.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.relic.decision_deferred",
+      "source_text_revision": 1,
+      "source_text_sha256": "2903306a1df67dfc71a8f3f3b457a0fddb9ec8f232a4aa01fd901a1ed21dd806",
+      "spoken_text": "Keep it for now, then. You don’t owe me a decision at the counter.",
+      "subtitle_text": "Keep it for now, then. You don’t owe me a decision at the counter.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "relic.return_preview",
+      "source_text_revision": 1,
+      "source_text_sha256": "175bbab75864d40e398ec1cf6730d73a18614d9a3c9ca03122b12ed47b703bf5",
+      "spoken_text": "The claim is established. If you want to return the piece, we can arrange the handover.",
+      "subtitle_text": "The claim is established. If you want to return the piece, we can arrange the handover.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "relic.return_choice",
+      "source_text_revision": 1,
+      "source_text_sha256": "0cdd7c5b45211c088051b2e6cb3e81949bfe427d96f3ba486380736891b75ee1",
+      "spoken_text": "Take the time you need. This has nothing to do with opening the treasury.",
+      "subtitle_text": "Take the time you need. This has nothing to do with opening the treasury.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "relic.return_complete",
+      "source_text_revision": 1,
+      "source_text_sha256": "4fb92729426b26262b0b4ea1fc392fc9352f1ae860b2af701cf8952bd9a72a74",
+      "spoken_text": "The piece is back with its claimant. I’ll record the return beside its history.",
+      "subtitle_text": "The piece is back with its claimant. I’ll record the return beside its history.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "relic.return_dealer",
+      "source_text_revision": 1,
+      "source_text_sha256": "b7971e6969c2262a853d5b2ac3da02b77fa83726e33e43735d0d124f091b1a76",
+      "spoken_text": "Then it’s off my counter. Fair enough. Show me what else you brought.",
+      "subtitle_text": "Then it’s off my counter. Fair enough. Show me what else you brought.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "relic.sold_evidence",
+      "source_text_revision": 1,
+      "source_text_sha256": "3bd570b24b9b019f078b5058481b8a28327dfa1dd7b19587ee97eab44db3ab5c",
+      "spoken_text": "The sale didn’t erase the mark or its history. The record is still here.",
+      "subtitle_text": "The sale didn’t erase the mark or its history. The record is still here.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "relic.sold_recovery",
+      "source_text_revision": 1,
+      "source_text_sha256": "0a44ee6e83571d19b4d8dcbf33f9455dc36cbb0cf53a6eb57e03973f75d59b83",
+      "spoken_text": "Let’s check where the piece is and what it would take to recover it.",
+      "subtitle_text": "Let’s check where the piece is and what it would take to recover it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.mill_repaired",
+      "source_text_revision": 2,
+      "source_text_sha256": "bba476af80634c206207401f2d8972175af8ac6015a201a6427a2debea6781bf",
+      "spoken_text": "The mill’s turning again. We can grind here instead of sending grain over the ridge.",
+      "subtitle_text": "The mill’s turning again. We can grind here instead of sending grain over the ridge.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.mill_artificer",
+      "source_text_revision": 1,
+      "source_text_sha256": "d7f07361bb4564b94f595a98f9ed67bfca4835af708812deac9a5e14bb99e885",
+      "spoken_text": "Listen to that. No knock in the gearing. That’s how it should run.",
+      "subtitle_text": "Listen to that. No knock in the gearing. That’s how it should run.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "foundry.component",
+      "source_text_revision": 1,
+      "source_text_sha256": "9856365ecf3e806bcc1e2f1baccc30c690818763be1d8cf05cb21dab4d13ffd6",
+      "spoken_text": "These fittings could put a wagon back on the road. If you can spare them.",
+      "subtitle_text": "These fittings could put a wagon back on the road. If you can spare them.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.component_choice",
+      "source_text_revision": 1,
+      "source_text_sha256": "88869258142739254e1a9074ec0b40f2f22826d7993924e034d65d83cab4ae7b",
+      "spoken_text": "Show them what you’d take first. Let them choose.",
+      "subtitle_text": "Show them what you’d take first. Let them choose.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.trade_arrived",
+      "source_text_revision": 1,
+      "source_text_sha256": "03bf2a9ad215f6a4b226967774b603f1c7caecbc5dd545bab070c94232b3cdfa",
+      "spoken_text": "A wagon came through. We unloaded it together.",
+      "subtitle_text": "A wagon came through. We unloaded it together.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.trade_stock",
+      "source_text_revision": 1,
+      "source_text_sha256": "1094c781a9601d85ceee7894a4af5ae2b5f704af698ae01adf09e5ccfb654803",
+      "spoken_text": "I’ve put the new stock out. Have a look if you need anything.",
+      "subtitle_text": "I’ve put the new stock out. Have a look if you need anything.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.preseals.weight.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "247befbc60459abdb6afe35f2d7f39388b7878b531d7671aa148171c597cdcba",
+      "spoken_text": "A good haul ought to have some weight to it.",
+      "subtitle_text": "A good haul ought to have some weight to it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.preseals.weight.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "3c80de864ab1d4967282344f605ead7dc2800061230daabaeadf319394dbe4b5",
+      "spoken_text": "So does a broken axle. Pack for the road back.",
+      "subtitle_text": "So does a broken axle. Pack for the road back.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.preseals.weight.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "57e7ffbabd3945f75a2a0d19f692ad99448a0d6611bb99f7a06fa429b8550eab",
+      "spoken_text": "I was going to suggest smaller valuables.",
+      "subtitle_text": "I was going to suggest smaller valuables.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.preseals.bell.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "3a54b28b0af43cf13920b9eb6833764afad56aa136ccf14018a065ab9bec3395",
+      "spoken_text": "They say the bell rings some nights with no hand on the rope.",
+      "subtitle_text": "They say the bell rings some nights with no hand on the rope.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.preseals.bell.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "cff661a81e67fb56bc6f163545722570771feba6eb321c47ab643a2344489e9e",
+      "spoken_text": "They say a good many things. I’d like to hear it for myself.",
+      "subtitle_text": "They say a good many things. I’d like to hear it for myself.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.preseals.bell.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "d591a15084ea68e0f836f4cc619e62ad896988279d8549df9eef9b243af59171",
+      "spoken_text": "If you do, point anyone lost toward the door. That’s what the bell was for.",
+      "subtitle_text": "If you do, point anyone lost toward the door. That’s what the bell was for.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.preseals.kit.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "136e1d05ddbbdcdf2389e8ebca827825b22936ca0467ebd5b02747c47f37e702",
+      "spoken_text": "I could at least sort the packs.",
+      "subtitle_text": "I could at least sort the packs.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.preseals.kit.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "ed798513c797dfaa3a31682d1866ee7c38c758c2ea120b514c1dee28074a3a2e",
+      "spoken_text": "From the chair, if you like.",
+      "subtitle_text": "From the chair, if you like.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.preseals.kit.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "4de3bf208e530367af682e1f814ccc48160f2a0637e17111179cf8996f6d0e0f",
+      "spoken_text": "Leave the carrying to someone who isn’t recovering.",
+      "subtitle_text": "Leave the carrying to someone who isn’t recovering.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.oneseal.pack.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "9273611af4650b3571dcc75b5d71725c27b61676f6fdafd658ba0d21b6d30470",
+      "spoken_text": "One road behind you, another still to try. I’d repack before setting out.",
+      "subtitle_text": "One road behind you, another still to try. I’d repack before setting out.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.oneseal.pack.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "eac35f560005df95b800c3036564a90237da3a9c649056875db3e8a16a1ebd72",
+      "spoken_text": "Bring the gear over. I’ll show you what needs checking.",
+      "subtitle_text": "Bring the gear over. I’ll show you what needs checking.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.oneseal.pack.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "02f5dd5fb1a05e70b3ec622a65177c9d63601b10b3dbe2b6fd790e3e7f546951",
+      "spoken_text": "After you’ve sat down.",
+      "subtitle_text": "After you’ve sat down.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.oneseal.claims.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "2177d4d890657bad1e3a34915787f3244692f5918d694c88155db88eec8907f0",
+      "spoken_text": "A royal stamp makes a piece easier to sell.",
+      "subtitle_text": "A royal stamp makes a piece easier to sell.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.oneseal.claims.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "c3fdb3491ba8358693b2dc7ead4151f7ecd12434086963e025ae38e300db36d1",
+      "spoken_text": "It tells you who claimed it. Not how they came by it.",
+      "subtitle_text": "It tells you who claimed it. Not how they came by it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.oneseal.claims.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "b4becb3c16d9628deee48789912bbbfd914d109d635a56735cf627dba44a9aad",
+      "spoken_text": "That’s why I asked you to read it.",
+      "subtitle_text": "That’s why I asked you to read it.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.oneseal.kit.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "9e3e33868aa57d8cb1ff9112e480a0b5b177451b44c9d9f90d04bb81c3990258",
+      "spoken_text": "Bring back one piece I can look at without getting out of this chair.",
+      "subtitle_text": "Bring back one piece I can look at without getting out of this chair.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.oneseal.kit.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "f742f059ada1e2b1a11083732212c410ddfcc6fe6b1bab394206c167434d65b5",
+      "spoken_text": "Something that isn’t dripping on my tools.",
+      "subtitle_text": "Something that isn’t dripping on my tools.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.oneseal.kit.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "c97e74fd7d27c12d6971bf94868f5171e79c41a91850b626f55fcb5f08ecd33c",
+      "spoken_text": "Your tools aren’t in my chair. We’ve got room to compromise.",
+      "subtitle_text": "Your tools aren’t in my chair. We’ve got room to compromise.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.twoseals.ridge.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "d4779078c40570e75c9589fcb5aabac2694d57f41d47f9e85427047fb17fbc33",
+      "spoken_text": "So it’s the high ridge next. Check what you’re carrying before the climb.",
+      "subtitle_text": "So it’s the high ridge next. Check what you’re carrying before the climb.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.twoseals.ridge.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "12a81077b9b72abf39a1b064a8320d5c9f361f7e5a326c677abac69882893b2e",
+      "spoken_text": "And leave room to rest on the way.",
+      "subtitle_text": "And leave room to rest on the way.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.twoseals.ridge.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "375a47aeca93b0097bba1b95efe4e6a5fd2e5864ef6f9816105c3713547c02b8",
+      "spoken_text": "I can wait for the treasure. I’d rather have someone left to trade with.",
+      "subtitle_text": "I can wait for the treasure. I’d rather have someone left to trade with.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.twoseals.reading.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "27ed1a8978b095054d007c2792228f79f8606ea4144a5c0afc42bf8e493ddcd1",
+      "spoken_text": "I’ve been checking that word again. Keeper. Jailer. The surrounding lines matter.",
+      "subtitle_text": "I’ve been checking that word again. Keeper. Jailer. The surrounding lines matter.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.twoseals.reading.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "415bc49c27d0f5d6f1bfb544f3de5c4d47272eef216933ab30c21c995944f244",
+      "spoken_text": "A lock can keep trouble in or people out. Same piece of iron.",
+      "subtitle_text": "A lock can keep trouble in or people out. Same piece of iron.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.twoseals.reading.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "611e3925b69b98a4f40e2a83f2dc2f40f4e34eb4ddb50a7d94ebc6e2314ba84d",
+      "spoken_text": "Yes. And the inscription ought to tell us which.",
+      "subtitle_text": "Yes. And the inscription ought to tell us which.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.twoseals.kit.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "b1d54979b357c17742f1ed078a3477fc1399d5fff0ff7fca74f142e47b6c0d94",
+      "spoken_text": "I’m getting to know this chair better than I meant to.",
+      "subtitle_text": "I’m getting to know this chair better than I meant to.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.twoseals.kit.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "e17f35fdaba121c63bc2132ef706b8d4746feb5e3885a6690b258623259f4ee9",
+      "spoken_text": "You can complain about it from the road when you’re well.",
+      "subtitle_text": "You can complain about it from the road when you’re well.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.twoseals.kit.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "e92c8bc90f76e134904dd9e1fe976fc2b8a3b28d474cc9d83fa9b17b217de9aa",
+      "spoken_text": "I’ll come back and complain in person. Better service.",
+      "subtitle_text": "I’ll come back and complain in person. Better service.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.finale.supper.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "f9c93bce19ec99ab5ee1f1726be9fc371b9cdcbea3e620a63d95458fb165f988",
+      "spoken_text": "Something hot first. Accounts after.",
+      "subtitle_text": "Something hot first. Accounts after.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.finale.supper.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "d8a726eac1d0dea534b30ab40ffff7899c4862e4d55445e17fae5ba68ff60ba1",
+      "spoken_text": "I can wait.",
+      "subtitle_text": "I can wait.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.finale.supper.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "66ee9311d5bed2839dbfd2b746f1d762df3e9abada5b04602c873a96a1a8824a",
+      "spoken_text": "Good. Make room.",
+      "subtitle_text": "Good. Make room.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.finale.names.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "00d124d485b836b4c52a7ff56abf723a7914d14fd8b5c726a5510173411e2e21",
+      "spoken_text": "I’m copying the names from the service records.",
+      "subtitle_text": "I’m copying the names from the service records.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.finale.names.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "0f944493c8446ccce416540f75f53ed715ec59f62900edebbe337c8e5953257a",
+      "spoken_text": "Will there be a place to read them?",
+      "subtitle_text": "Will there be a place to read them?",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.finale.names.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "bc5719116d4745c32f0e2a14e47fc46af5d8fbd6627abc7ad638fa1124f8b5c8",
+      "spoken_text": "That’s what I’m making.",
+      "subtitle_text": "That’s what I’m making.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.finale.kit.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "c06e133f350b995f9b206de5ddc2d180ad867c1dde4ed219ecc230cce278fa50",
+      "spoken_text": "There you are. Bring a chair over.",
+      "subtitle_text": "There you are. Bring a chair over.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.finale.kit.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "7881ea535a947797a615568f68194e696512331cb94dd4eb25c9e4603573b55e",
+      "spoken_text": "Let them put the pack down.",
+      "subtitle_text": "Let them put the pack down.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "tavern.finale.kit.3",
+      "source_text_revision": 1,
+      "source_text_sha256": "5323e0a5f319ec9984101355efcc2ed4c127c007c0c2fdf5a37dec2a4f28c5fe",
+      "spoken_text": "Yes. Do that first. I’m not going anywhere.",
+      "subtitle_text": "Yes. Do that first. I’m not going anywhere.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.arrival",
+      "source_text_revision": 1,
+      "source_text_sha256": "111d2cf3222ed37a8044544a21c1aedcbd6c464880f2f992c08cc23f3303447a",
+      "spoken_text": "Your friend’s settled. Come in when you’re ready.",
+      "subtitle_text": "Your friend’s settled. Come in when you’re ready.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.churchyard",
+      "source_text_revision": 1,
+      "source_text_sha256": "9f31f3f16a58176df83946ebed735ce5c820ff7f2b0457d8079ae96256674445",
+      "spoken_text": "These graves belong to Bellwether. The old burial ground is farther northwest, beyond the woods.",
+      "subtitle_text": "These graves belong to Bellwether. The old burial ground is farther northwest, beyond the woods.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.shrine",
+      "source_text_revision": 1,
+      "source_text_sha256": "3af8887a6d47a01b2527ea165a501aa676e7ecce5b545d4f1488e0d7c64c3f48",
+      "spoken_text": "The wayside shrine is beyond the northern edge. Stay with the path until the turn.",
+      "subtitle_text": "The wayside shrine is beyond the northern edge. Stay with the path until the turn.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.mill_work",
+      "source_text_revision": 1,
+      "source_text_sha256": "683dc39b4d12b41ab4c4b1628df1793d5c3f384fedaa3ad9f38f42ec8e19a29e",
+      "spoken_text": "Mind the loose parts. They’re laid out in order.",
+      "subtitle_text": "Mind the loose parts. They’re laid out in order.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.mill_running",
+      "source_text_revision": 1,
+      "source_text_sha256": "7a5e5e56f2f38305388fa2a021ce14a4bef2252c3efdc7004d4861635abe6f53",
+      "spoken_text": "Still running. Good.",
+      "subtitle_text": "Still running. Good.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.wet_gear",
+      "source_text_revision": 1,
+      "source_text_sha256": "5e4b27cbcd7038d1020a9bf6f4444e91ce84d0eb790222d5667e41a390a82607",
+      "spoken_text": "Dry the joints before you put that away.",
+      "subtitle_text": "Dry the joints before you put that away.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.heavy_pack",
+      "source_text_revision": 1,
+      "source_text_sha256": "51dd3db8eea4a532b0a18f96bd627a5a23e8c9ead2194c01acf07080be23c304",
+      "spoken_text": "Try moving in it before you start the climb.",
+      "subtitle_text": "Try moving in it before you start the climb.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.learned_retreat",
+      "source_text_revision": 1,
+      "source_text_sha256": "c7bdfc824b2fd6aabb2759baeec548b52af01f913b6303a2c038f251c354be25",
+      "spoken_text": "Coming back was part of the lesson. Good to see you remembered.",
+      "subtitle_text": "Coming back was part of the lesson. Good to see you remembered.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.relic_returned",
+      "source_text_revision": 1,
+      "source_text_sha256": "58065e1897a6bae6b37a4942ab29b5ea69be693f9ec09023964b62cbd4201ccf",
+      "spoken_text": "I’ve taken that piece off the list. What else have you found?",
+      "subtitle_text": "I’ve taken that piece off the list. What else have you found?",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.trade_arrived",
+      "source_text_revision": 1,
+      "source_text_sha256": "1ca2294a67eb5c46fb85e02eb5af51bda6cffd6e78c0481be3b3e01778790033",
+      "spoken_text": "Good to hear wheels out there again.",
+      "subtitle_text": "Good to hear wheels out there again.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.two_seals",
+      "source_text_revision": 1,
+      "source_text_sha256": "9ffbabbf33aabe632a9aac7c3b83ae46e70275e6f1476719a49ac6bbfac2d7a6",
+      "spoken_text": "The ridge route is open. Bring the inscriptions back if you can.",
+      "subtitle_text": "The ridge route is open. Bring the inscriptions back if you can.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.passing.finale",
+      "source_text_revision": 1,
+      "source_text_sha256": "50f80c475a2375328034ae839fafcb4ce05b9d8ad25fc9e6d374f7e082ef7ca3",
+      "spoken_text": "You can leave the pack by your chair.",
+      "subtitle_text": "You can leave the pack by your chair.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.lore.caravan.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "417edf4f26ec7f34783598b74658cd222b8349675046600cd67de7a97c9ad77f",
+      "spoken_text": "I used to lead caravans through here. You learn a road by where you can stop, not just where it ends.",
+      "subtitle_text": "I used to lead caravans through here. You learn a road by where you can stop, not just where it ends.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.lore.caravan.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "307a3fe4ef7fa2df0c2e0a5cf91ec45c429d0847982ca0d45624732a3b11da47",
+      "spoken_text": "Bellwether was a good stop. I’d like it to be one again.",
+      "subtitle_text": "Bellwether was a good stop. I’d like it to be one again.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.lore.bell.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "ea0501d25f2ffcff05b85d8d52fa8b4f2e7803c20dbe8f7a6e8e76027cfdaed7",
+      "spoken_text": "The church bell brought travellers home through the forest mist. That’s where Bellwether gets its name.",
+      "subtitle_text": "The church bell brought travellers home through the forest mist. That’s where Bellwether gets its name.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.lore.bell.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "75222a44c8438a08d1b13c6384b7d13b39dbe72c879ff1f4ba9c0e4e6a9fd7fc",
+      "spoken_text": "A sound you could follow when the road disappeared under your feet.",
+      "subtitle_text": "A sound you could follow when the road disappeared under your feet.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.lore.histories.1",
+      "source_text_revision": 1,
+      "source_text_sha256": "f58d6d69bcc0c3d2492b97600eb214b6ff5008d0bb81dcd5b662529e55f3eee1",
+      "spoken_text": "The Veyrlands were the heart of King Veyr’s realm. We’ve kept more warnings about him than useful dates.",
+      "subtitle_text": "The Veyrlands were the heart of King Veyr’s realm. We’ve kept more warnings about him than useful dates.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.lore.histories.2",
+      "source_text_revision": 1,
+      "source_text_sha256": "ba650455ba031260d4ab72f953a8787af7d3a2143136fe2645272206fa7e9a45",
+      "spoken_text": "If you find a record, bring the context with it. A broken line can make a convincing lie.",
+      "subtitle_text": "If you find a record, bring the context with it. A broken line can make a convincing lie.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "lantern.town_identity",
+      "source_text_revision": 1,
+      "source_text_sha256": "3c827360e2cc636ea485b20ad68512c4f028a22ac1427f7d918dd7a0df79a448",
+      "spoken_text": "I am Veyr. Your friend has found the road to my treasury.",
+      "subtitle_text": "I am Veyr. Your friend has found the road to my treasury.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "lantern.town_seals",
+      "source_text_revision": 1,
+      "source_text_sha256": "7570288ec11ce6123ad0d443d570ac95a0f9632625b437a3ec528dc7af236dbe",
+      "spoken_text": "Three seals. The Abbey, the Foundry, and the Glass Court. Bring them together, and the road opens.",
+      "subtitle_text": "Three seals. The Abbey, the Foundry, and the Glass Court. Bring them together, and the road opens.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.horde_army",
+      "source_text_revision": 1,
+      "source_text_sha256": "21c0f2d646f70f53c6e695733b6b7db535c5c0a204f081655b91cf039c896934",
+      "spoken_text": "My grandfather called the Horde an army. You treasure hunters always hear the other word.",
+      "subtitle_text": "My grandfather called the Horde an army. You treasure hunters always hear the other word.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "hub.arrival",
+      "source_text_revision": 1,
+      "source_text_sha256": "11f2aa420b3c5b8d377623e6471b2443122a8c36bc05928224e47d2079d49fe4",
+      "spoken_text": "Shut the door behind you. Both of you look frozen.",
+      "subtitle_text": "Shut the door behind you. Both of you look frozen.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "relic.claim_review",
+      "source_text_revision": 1,
+      "source_text_sha256": "8c600f8927c1f640a7a6ec575467cf1b142c0488c29309ae0d259eeadf366386",
+      "spoken_text": "The mark matches the record. The claim holds.",
+      "subtitle_text": "The mark matches the record. The claim holds.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    },
+    {
+      "line_id": "return.keeper_word",
+      "source_text_revision": 1,
+      "source_text_sha256": "13a235234618cc1ed3923a59db4d10c94ff6fb0c824615fc948b98fc1c3776d1",
+      "spoken_text": "I read this as keeper of the treasury. Here, the same word means jailer.",
+      "subtitle_text": "I read this as keeper of the treasury. Here, the same word means jailer.",
+      "translation_status": "source_only",
+      "measured_duration_ms": null,
+      "subtitle_timing": {
+        "start_ms": null,
+        "end_ms": null,
+        "cards": null
+      }
+    }
+  ],
+  "translations": {}
+}

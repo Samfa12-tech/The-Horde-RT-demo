@@ -1,0 +1,54 @@
+[
+  {
+    "line_id": "prologue.kit_grate",
+    "spoken_text": "Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful!"
+  },
+  {
+    "line_id": "rescue.found",
+    "spoken_text": "There you are. Still in one piece?"
+  },
+  {
+    "line_id": "rescue.rope",
+    "spoken_text": "Stay clear. Rope coming down."
+  },
+  {
+    "line_id": "reunion.question",
+    "spoken_text": "Steady. Catch your breath. Did you find it?"
+  },
+  {
+    "line_id": "reunion.hint",
+    "spoken_text": "Let me see. Raise it."
+  },
+  {
+    "line_id": "reunion.proof",
+    "spoken_text": "Then we're not chasing a story anymore."
+  },
+  {
+    "line_id": "reunion.first_piece",
+    "spoken_text": "A start, then. Let's see where it leads."
+  },
+  {
+    "line_id": "reunion.depart",
+    "spoken_text": "Come on. There's a fire and a dry seat waiting in the village."
+  },
+  {
+    "line_id": "forest.night",
+    "spoken_text": "I'd forgotten how big the sky was."
+  },
+  {
+    "line_id": "forest.waystone",
+    "spoken_text": "Hold it there. There are marks under the moss."
+  },
+  {
+    "line_id": "forest.clue",
+    "spoken_text": "A road to the treasury, perhaps. Someone in the village might read it."
+  },
+  {
+    "line_id": "forest.wait",
+    "spoken_text": "I'll wait here."
+  },
+  {
+    "line_id": "forest.village",
+    "spoken_text": "There. Chimney smoke."
+  }
+]

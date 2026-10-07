@@ -1,0 +1,16 @@
+{
+  "scope": "Documentation/source archive only; no runtime, device, audio-listening or CI acceptance claimed",
+  "static_checks_passed": 426,
+  "json_schema": "passed",
+  "derived_files_byte_identical": 388,
+  "public_archive_scan": "passed",
+  "new_entry_links": "passed",
+  "original_json_and_docx": "byte-identical",
+  "lines": 357,
+  "scenes": 209,
+  "release_counts": {
+    "core-candidates": 339,
+    "decision-blocked": 11,
+    "optional-final-boss": 7
+  }
+}

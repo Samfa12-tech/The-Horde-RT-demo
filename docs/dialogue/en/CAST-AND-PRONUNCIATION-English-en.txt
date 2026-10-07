@@ -1,0 +1,28 @@
+THE HORDE CAST AND PRONUNCIATION
+English en | Candidate voice direction, not selected casting
+
+Kit: Warm, practical, capable. Dry humour when it reveals an opinion, not a joke after every danger. Wants a share of the treasure and a sound roof; concern can win over profit without making him saintly. Frustration at being left in town is honest and short-lived. An English fantasy delivery fits the earlier audition brief; no accent is locked. A northern English colour is optional audition direction, not a language requirement. Keep consonants clear through any later spatial/mask treatment.
+
+Tavern keeper: Former caravan leader. Decisions first, people remembered, road experience without a lecture. Care is expressed through food, a seat, dry kit and practical work. Name unapproved; never use Mara.
+Record keeper: Careful distinction between evidence and guesses. Curious enough to change a reading; does not know the twist at arrival. Magic is a practiced skill with limits. Brother Ansel remains a working name and is not used as a fixed cast identity.
+Artificer: Specific, practical, checks a fit before praising it. The person responsible for equipment and mechanisms, not an omnipotent healer or historian. Hester remains a working name.
+Salvager: Retired river worker, patient with a learner, firm about getting back alive. Short, physical instructions. Strength never means infinite breath or smoke immunity.
+Relic dealer: Fair on ordinary prices, attentive to marks and provenance. Can respect a return without moralising or becoming the villain. No assumed ability to authenticate every claimant.
+Lantern voice: Measured, weary, helpful in ways the player can verify. The claimed royal authority is subtle. Later possession is the same character losing restraint, not a new cartoon voice. Do not imitate a real actor or generate a recognisable copyrighted character voice.
+Court keeper: Lucid and proud, worn down by custody. Offers evidence, admits a cost, can still oppose the player. Defeat is required; death is not prescribed.
+Bellkeeper: Working boss title. Few words, ritual duty, heavy effort; intelligibility and attack cues come before theatrical volume.
+Master of Coin: Working boss title. Precise, brittle authority; no comic accounting routine.
+Fourth Keeper: Exhausted defensive duty. Optional later campaign speech is separate from the active reveal sound brief.
+
+The protagonist has no voice lines, voiced choices or spoken thoughts. Nonverbal exertion is not authorised by this bank. Role voices can later be combined only after an explicit cast decision and a dialogue continuity audit. No new named crowd actors are required; tavern exchanges use the existing cast.
+
+PRONUNCIATION REGISTER
+Kit: ordinary English personal name, one syllable.
+Bellwether: ordinary English word. Use a consistent chosen actor reading.
+Veyr: approved spelling; owner pronunciation has not been supplied. Obtain one reference before recording. Do not invent a phonetic spelling or silently standardise it in source text.
+The Veyrlands: use the approved Veyr root once its pronunciation is settled.
+Drowned Abbey; Ashen Foundry; Glass Court; Keeper; treasury; reflector; shuttered lantern stand; focusing aperture: ordinary English words and compounds. Keep consistent word emphasis between cast members; no invented fantasy-language forms.
+King Veyr: refers to the real historical king. Before the reveal, the lantern only claims this identity.
+Brother Ansel; Hester; Bellkeeper; Master of Coin: provisional naming status. Keep role IDs stable even if display names change. No dialect-spelling substitutions in subtitles.
+
+For future translation, keep proper-name decisions in a per-language glossary linked to the same line IDs. Store performance pronunciation notes separately from exact spoken/subtitle text. Voice tools must not receive these instructions as spoken dialogue.
