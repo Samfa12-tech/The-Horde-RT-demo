@@ -66,6 +66,7 @@
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/FeedbackTiming.h"
+#include "gameplay/EquipmentFeedback.h"
 #include "gameplay/ShowcaseBenchmark.h"
 #include "telemetry/RtBenchmarkEvidenceRun.h"
 #include "telemetry/BenchmarkSummary.h"
@@ -173,6 +174,7 @@ constexpr int kGraphicsShadowButtonId = 206;
 constexpr int kGraphicsMistButtonId = 207;
 constexpr int kEntryMoreButtonId = 208;
 constexpr int kEntryBackButtonId = 209;
+constexpr int kEntryLoadingIndicatorId = 210;
 constexpr int kRtLabButtonId = 127;
 constexpr int kRtLabPanelId = 128;
 constexpr int kRtLabTitleId = 129;
@@ -376,6 +378,7 @@ struct VulkanSurfaceContext
     bool entryMoreVisible = false;
     bool entryPlayQueued = false;
     bool entryPlayHandoffPending = false;
+    bool entryLoadingVisible = false;
     horde::graphics::EntryMenuSession entryMenu;
     horde::vulkan::raytracing::RtSceneProfile graphicsReturnProfile =
         horde::vulkan::raytracing::RtSceneProfile::Showcase;
@@ -1657,6 +1660,26 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             break;
         case GameplayEventType::SkeletonIncidental:
             PlayPositionalSoundEffect(context, "skeleton_idle_rattle.wav", 0.30f, event, "pixabay");
+            break;
+        case GameplayEventType::SkeletonEncounterWarning:
+            if (!context.controlsEnabled || context.simulationPaused ||
+                GetForegroundWindow() != context.windowHandle) break;
+            PlayPositionalSoundEffect(context, "skeleton_idle_rattle.wav", 0.48f, event, "pixabay");
+            break;
+        case GameplayEventType::PlayerSwordAttachmentChanged:
+            if (!context.controlsEnabled || context.simulationPaused ||
+                GetForegroundWindow() != context.windowHandle) break;
+            switch (horde::gameplay::EquipmentCueForEvent(event))
+            {
+            case horde::gameplay::EquipmentAudioCue::SwordDraw:
+                PlayAmbientSoundEffect(context, "equipment/sword_draw.wav", 0.42f);
+                break;
+            case horde::gameplay::EquipmentAudioCue::SwordSheath:
+                PlayAmbientSoundEffect(context, "equipment/sword_sheath.wav", 0.38f);
+                break;
+            default:
+                break;
+            }
             break;
         case GameplayEventType::ChestUnlocked:
             PlayPositionalSoundEffect(context, "chest_unlock.wav", 0.82f, event,
@@ -4941,6 +4964,33 @@ bool ApplyPendingSceneReplacement(VulkanSurfaceContext& context,
     return true;
 }
 
+void SetEntryLoadingVisible(VulkanSurfaceContext& context, const bool visible)
+{
+    context.entryLoadingVisible = visible;
+    if (HWND spinner = GetDlgItem(context.windowHandle, kEntryLoadingIndicatorId))
+    {
+        ShowWindow(spinner, visible ? SW_SHOWNOACTIVATE : SW_HIDE);
+        KillTimer(context.windowHandle, kEntryLoadingIndicatorId);
+        if (visible)
+        {
+            BOOL animations = TRUE;
+            if (SystemParametersInfoA(SPI_GETCLIENTAREAANIMATION, 0, &animations, 0) && animations)
+                SetTimer(context.windowHandle, kEntryLoadingIndicatorId, 100u, nullptr);
+            InvalidateRect(spinner, nullptr, FALSE);
+            // Paint once before synchronous owner-thread scene construction.
+            // The spinner remains visible during that real loading state.
+            UpdateWindow(spinner);
+        }
+    }
+}
+
+void FinishEntryLoadingAfterPresentation(VulkanSurfaceContext& context, const bool presented)
+{
+    if (context.entryLoadingVisible && presented &&
+        context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::Showcase)
+        SetEntryLoadingVisible(context, false);
+}
+
 void QueuePresentedEntryPlay(VulkanSurfaceContext& context, const bool presented)
 {
     if (!context.entryPlayQueued || !context.entryMenu.ReadyToPlay() || !presented)
@@ -4951,6 +5001,7 @@ void QueuePresentedEntryPlay(VulkanSurfaceContext& context, const bool presented
     context.entryMoreVisible = false;
     context.sceneProfile = horde::vulkan::raytracing::RtSceneProfile::Showcase;
     context.sceneProfileDirty = true;
+    SetEntryLoadingVisible(context, true);
     // Keep gameplay paused while the presented black frame covers loading.
 }
 
@@ -4963,6 +5014,7 @@ void FinishPendingEntryPlay(VulkanSurfaceContext& context)
         context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::Showcase;
     if (!loaded)
     {
+        SetEntryLoadingVisible(context, false);
         context.entryMenuVisible = true;
         context.entryMenu.Reset();
     }
@@ -6455,6 +6507,9 @@ int RunEntryMenuCapture(VulkanSurfaceContext &context,
     QueuePresentedEntryPlay(context, true);
     if (!context.entryPlayHandoffPending || !context.simulationPaused)
         return fail(13, "Gameplay advanced before Entry replacement");
+    if (!context.entryLoadingVisible ||
+        !IsWindowVisible(GetDlgItem(context.windowHandle, kEntryLoadingIndicatorId)))
+        return fail(18, "Real Entry replacement has no visible native loading indicator");
     std::vector<double> timings;
     if (!ApplyPendingSceneReplacement(context, capabilities, timings))
         return fail(14, "Play scene replacement failed");
@@ -6464,6 +6519,10 @@ int RunEntryMenuCapture(VulkanSurfaceContext &context,
         context.rtScene.Profile() != horde::vulkan::raytracing::RtSceneProfile::Showcase ||
         !RenderFrame(context, clear, gameplayPresented) || !gameplayPresented)
         return fail(15, "Play did not return to functioning Showcase");
+    FinishEntryLoadingAfterPresentation(context, gameplayPresented);
+    if (context.entryLoadingVisible ||
+        IsWindowVisible(GetDlgItem(context.windowHandle, kEntryLoadingIndicatorId)))
+        return fail(19, "Loading indicator outlived the first functioning Showcase present");
     const VkResult handoffIdle = vkDeviceWaitIdle(context.device);
     if (handoffIdle != VK_SUCCESS || !CompleteRtEvidenceAfterDeviceIdle(context, handoffIdle))
         return fail(16, "Gameplay handoff frame did not complete");
@@ -6502,6 +6561,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     horde::vulkan::RetirementOwner<VulkanSurfaceContext> renderOwner(
         std::make_unique<VulkanSurfaceContext>(), DestroyRenderContext, DetachRenderContextHost);
     auto& context = *renderOwner.Get();
+    // Ordinary interactive launches enter the accepted lantern menu. Explicit
+    // captures/checkpoints keep their requested scene; the slice flag below
+    // remains available for dedicated menu inspection.
+    context.entryMenuVisible = captureDirectory == nullptr && developmentCheckpoint == nullptr &&
+        !unattendedBenchmark && !graphicsPreviewCapture && !outputResizeValidation &&
+        nativeMotionScenario.empty();
     int entryArgumentCount = 0;
     LPWSTR *entryArguments = CommandLineToArgvW(GetCommandLineW(), &entryArgumentCount);
     if (entryArguments)
@@ -6898,6 +6963,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         const bool frameRendered = RenderFrame(context, clearColor, rtFramePresented);
         FinishGraphicsFrame(context, frameRendered && rtFramePresented);
         QueuePresentedEntryPlay(context, rtFramePresented);
+        FinishEntryLoadingAfterPresentation(context, rtFramePresented);
         if (context.expectedBenchmarkFrame &&
             context.benchmarkEvidence.Status() == horde::telemetry::RtBenchmarkRunStatus::Measuring)
         {
@@ -7317,6 +7383,11 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
     }
 
     const int inset = ScaleForDpi(window, 16);
+    if (HWND spinner = GetDlgItem(window, kEntryLoadingIndicatorId))
+    {
+        const int size = ScaleForDpi(window, 32);
+        MoveWindow(spinner, (width - size) / 2, (height - size) / 2, size, size, TRUE);
+    }
     if (HWND edit = GetDlgItem(window, kEditControlId))
     {
         MoveWindow(edit, inset, inset,
@@ -7434,12 +7505,14 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
                    ScaleForDpi(window, 30), std::min(width - 48, ScaleForDpi(window, 340)),
                    titleHeight, TRUE);
         MoveWindow(GetDlgItem(window, kResumeButtonId),
-                   width - plaqueWidth - ScaleForDpi(window, 26), height * 3 / 5, plaqueWidth,
+                   (width - plaqueWidth) / 2, height * 3 / 5, plaqueWidth,
                    plaqueHeight, TRUE);
-        MoveWindow(GetDlgItem(window, kSettingsButtonId), ScaleForDpi(window, 26), height * 3 / 5,
+        const int bottom = height - plaqueHeight - ScaleForDpi(window, 26);
+        MoveWindow(GetDlgItem(window, kSettingsButtonId),
+                   width - plaqueWidth - ScaleForDpi(window, 26), bottom,
                    plaqueWidth, plaqueHeight, TRUE);
         MoveWindow(GetDlgItem(window, kEntryMoreButtonId), ScaleForDpi(window, 26),
-                   height * 3 / 5 + plaqueHeight + gap, plaqueWidth, plaqueHeight, TRUE);
+                   bottom, plaqueWidth, plaqueHeight, TRUE);
     }
     else if (layoutContext && layoutContext->entryMenuVisible && layoutContext->entryMoreVisible)
     {
@@ -8670,6 +8743,13 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         LayoutOverlayControls(hWnd, LOWORD(lParam), HIWORD(lParam));
         return 0;
+    case WM_TIMER:
+        if (wParam == kEntryLoadingIndicatorId && sceneContext && sceneContext->entryLoadingVisible)
+        {
+            InvalidateRect(GetDlgItem(hWnd, kEntryLoadingIndicatorId), nullptr, FALSE);
+            return 0;
+        }
+        break;
     case WM_GETMINMAXINFO:
     {
         if (GetPropA(hWnd, kCaptureModeProperty) != nullptr)
@@ -8702,6 +8782,35 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_DRAWITEM:
     {
         const auto* item = reinterpret_cast<const DRAWITEMSTRUCT*>(lParam);
+        if (item && item->CtlID == kEntryLoadingIndicatorId)
+        {
+            // A small native loading indicator, with an accessible STATIC label.
+            // Motion stays still while the owner is compiling the RT scene.
+            const bool highContrast = NativeUiUsesHighContrast();
+            FillRect(item->hDC, &item->rcItem,
+                     highContrast ? GetSysColorBrush(COLOR_WINDOW) :
+                         static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
+            BOOL animations = TRUE;
+            SystemParametersInfoA(SPI_GETCLIENTAREAANIMATION, 0, &animations, 0);
+            const int phase = animations ? static_cast<int>((GetTickCount64() / 100u) % 8u) : 0;
+            const int cx = (item->rcItem.left + item->rcItem.right) / 2;
+            const int cy = (item->rcItem.top + item->rcItem.bottom) / 2;
+            const int radius = ScaleForDpi(hWnd, 11), dot = ScaleForDpi(hWnd, 2);
+            const auto oldBrush = SelectObject(item->hDC, GetStockObject(DC_BRUSH));
+            const auto oldPen = SelectObject(item->hDC, GetStockObject(NULL_PEN));
+            for (int index = 0; index < 8; ++index)
+            {
+                const float angle = index * 0.7853981634f;
+                const int x = cx + static_cast<int>(std::lround(std::cos(angle) * radius));
+                const int y = cy + static_cast<int>(std::lround(std::sin(angle) * radius));
+                SetDCBrushColor(item->hDC, highContrast ? GetSysColor(COLOR_WINDOWTEXT) :
+                    (index == phase ? RGB(240, 214, 162) : RGB(112, 93, 60)));
+                Ellipse(item->hDC, x - dot, y - dot, x + dot + 1, y + dot + 1);
+            }
+            SelectObject(item->hDC, oldPen);
+            SelectObject(item->hDC, oldBrush);
+            return TRUE;
+        }
         if (item && item->CtlID == kVitalityHudControlId && sceneContext)
         {
             const bool highContrast = NativeUiUsesHighContrast();
@@ -8766,7 +8875,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 GetSysColorBrush(pressed ? COLOR_HIGHLIGHT : COLOR_BTNFACE) : (pressed ? inset : slate));
             FrameRect(item->hDC, &item->rcItem, highContrast ? GetSysColorBrush(COLOR_BTNTEXT) :
                 (focused || pressed ? brass : iron));
-            if (sceneContext && sceneContext->entryMenuVisible && !highContrast)
+            if (!highContrast)
             {
                 // Raised native plaque: bevel, recessed inset and four small
                 // iron rivets retain real labels, hit targets and focus state.
@@ -9135,6 +9244,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     }
 #endif
     createStatic(kPauseTitleId, "HORDE LANTERN RT  |  SHOWCASE ALPHA", SS_CENTER | SS_CENTERIMAGE);
+    if (HWND spinner = createStatic(kEntryLoadingIndicatorId, "Loading", SS_OWNERDRAW))
+        ShowWindow(spinner, SW_HIDE);
     createStatic(kEndingBodyId,
                  "The old guard bound the lich beneath this ruin and left one lantern to guide whoever came after.\r\n\r\n"
                  "Its flame died when the final seal opened. Now the staff is silent, the roof gives way, and stolen morning returns to the halls.",

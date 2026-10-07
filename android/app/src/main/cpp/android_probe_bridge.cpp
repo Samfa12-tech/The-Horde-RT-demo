@@ -59,6 +59,7 @@
 #include "platform/android/AndroidMusicPlayback.h"
 #include "platform/android/SurfaceSessionMailbox.h"
 #include "platform/android/SurfacePresentationPolicy.h"
+#include "platform/android/GameplayEventMetadata.h"
 #include "update/GitHubReleaseUpdater.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
@@ -732,11 +733,7 @@ void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEve
     const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
         {event.worldX, event.worldZ, std::max(0.0f, event.intensity), 1.0f, 14.0f},
         {event.listenerX, event.listenerZ, event.listenerYawRadians});
-    const std::uint64_t metadata =
-        static_cast<std::uint64_t>(event.type) |
-        (static_cast<std::uint64_t>(event.source) << 8u) |
-        (static_cast<std::uint64_t>(event.target) << 16u) |
-        ((event.sequence & 0xffffffffu) << 32u);
+    const std::uint64_t metadata = horde::platform::android::PackGameplayEventMetadata(event);
 
     std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
     const bool enqueued = gPlatformGameplayEvents.Push(

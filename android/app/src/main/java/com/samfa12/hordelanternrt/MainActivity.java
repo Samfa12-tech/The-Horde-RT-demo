@@ -190,6 +190,10 @@ public class MainActivity extends Activity {
     private static final int PLATFORM_EVENT_KEEPER_WARNING = 18;
     private static final int PLATFORM_EVENT_KEEPER_COMBAT_READY = 19;
     private static final int PLATFORM_EVENT_SKELETON_INCIDENTAL = 20;
+    private static final int PLATFORM_EVENT_PLAYER_SWORD_ATTACHMENT_CHANGED = 22;
+    private static final int PLATFORM_EVENT_SKELETON_ENCOUNTER_WARNING = 23;
+    private static final int EQUIPMENT_AUDIO_SWORD_DRAW = 1;
+    private static final int EQUIPMENT_AUDIO_SWORD_SHEATH = 2;
     private static final int ENTITY_LICH = 3;
     private static final int PLAYER_ALIVE = 0;
     private static final int PLAYER_DYING = 1;
@@ -1624,20 +1628,16 @@ public class MainActivity extends Activity {
         playtestStatus.setTextColor(0xFFFFDEAD);
         playtestStatus.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         panel.addView(playtestStatus);
-        playtestRemotePrepare = new Button(this);
-        playtestRemotePrepare.setText(R.string.playtest_prepare_remote);
-        playtestRemotePrepare.setOnClickListener(view -> preparePlaytestSubmission());
-        panel.addView(playtestRemotePrepare);
-        playtestRemoteSend = new Button(this);
-        playtestRemoteSend.setText(R.string.playtest_verify_send);
+        playtestRemotePrepare = createMenuButton(getString(R.string.playtest_prepare_remote),
+                this::preparePlaytestSubmission);
+        panel.addView(playtestRemotePrepare, menuButtonLayoutParams());
+        playtestRemoteSend = createMenuButton(getString(R.string.playtest_verify_send),
+                this::verifyAndSendPlaytestReport);
         playtestRemoteSend.setVisibility(View.GONE);
-        playtestRemoteSend.setOnClickListener(view -> verifyAndSendPlaytestReport());
-        panel.addView(playtestRemoteSend);
-        playtestEdit = new Button(this);
-        playtestEdit.setText(R.string.playtest_edit);
+        panel.addView(playtestRemoteSend, menuButtonLayoutParams());
+        playtestEdit = createMenuButton(getString(R.string.playtest_edit), this::requestPlaytestEdit);
         playtestEdit.setVisibility(View.GONE);
-        playtestEdit.setOnClickListener(view -> requestPlaytestEdit());
-        panel.addView(playtestEdit);
+        panel.addView(playtestEdit, menuButtonLayoutParams());
         addBody(panel, getString(R.string.playtest_local_section));
         playtestContext = new CheckBox(this);
         playtestContext.setText(R.string.playtest_context_consent);
@@ -1647,10 +1647,8 @@ public class MainActivity extends Activity {
         playtestConsent.setText(R.string.playtest_export_consent);
         stylePlaytestConsent(playtestConsent);
         panel.addView(playtestConsent);
-        playtestSave = new Button(this);
-        playtestSave.setText(R.string.playtest_save_json);
-        playtestSave.setOnClickListener(view -> preparePlaytestExport());
-        panel.addView(playtestSave);
+        playtestSave = createMenuButton(getString(R.string.playtest_save_json), this::preparePlaytestExport);
+        panel.addView(playtestSave, menuButtonLayoutParams());
         addMenuButton(panel, getString(R.string.back), this::requestClosePlaytestReport);
         attachPanel(panel);
     }
@@ -4362,6 +4360,7 @@ public class MainActivity extends Activity {
                     final long stereoGains = platformEvents[eventIndex + 1];
                     final int eventType = (int) (metadata & 0xffL);
                     final int targetEntity = (int) ((metadata >>> 16) & 0xffL);
+                    final int equipmentAudioCue = (int) ((metadata >>> 24) & 0xffL);
                     final long eventSequence = (metadata >>> 32) & 0xffffffffL;
                     switch (eventType) {
                         case PLATFORM_EVENT_PLAYER_FOOTSTEP:
@@ -4432,6 +4431,22 @@ public class MainActivity extends Activity {
                             break;
                         case PLATFORM_EVENT_SKELETON_INCIDENTAL:
                             playSpatialSound("skeleton_idle_rattle", 0.10f, stereoGains);
+                            break;
+                        case PLATFORM_EVENT_SKELETON_ENCOUNTER_WARNING:
+                            if (!menuVisible && !diagnosticsVisible && !graphicsVisible &&
+                                    !deathOverlayVisible && !endingOverlayVisible) {
+                                playSpatialSound("skeleton_idle_rattle", 0.22f, stereoGains);
+                            }
+                            break;
+                        case PLATFORM_EVENT_PLAYER_SWORD_ATTACHMENT_CHANGED:
+                            final String equipmentKey = EquipmentAudioFeedback.soundKey(
+                                    eventType, equipmentAudioCue, !menuVisible &&
+                                    !diagnosticsVisible && !graphicsVisible &&
+                                    !deathOverlayVisible && !endingOverlayVisible);
+                            if (equipmentKey != null) {
+                                playSound(equipmentKey,
+                                        equipmentAudioCue == EQUIPMENT_AUDIO_SWORD_DRAW ? 0.26f : 0.24f);
+                            }
                             break;
                         case PLATFORM_EVENT_KEEPER_REVEAL_STARTED:
                             playSpatialSound("keeper_i_sense_you", 0.36f, stereoGains);
@@ -4775,6 +4790,8 @@ public class MainActivity extends Activity {
         loadSound("sword_swing_2", "audio/filmcow/sword_swing_2.wav");
         loadSound("sword_hit_1", "audio/filmcow/sword_hit_1.wav");
         loadSound("sword_hit_2", "audio/filmcow/sword_hit_2.wav");
+        loadSound("sword_draw", "audio/filmcow/equipment/sword_draw.wav");
+        loadSound("sword_sheath", "audio/filmcow/equipment/sword_sheath.wav");
         loadSound("enemy_fall", "audio/filmcow/enemy_fall.wav");
         loadSound("player_step_1", "audio/filmcow/player_step_1.wav");
         loadSound("player_step_2", "audio/filmcow/player_step_2.wav");

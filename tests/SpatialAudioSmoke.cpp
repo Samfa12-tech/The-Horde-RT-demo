@@ -7,6 +7,8 @@
 #include <vector>
 
 #include "gameplay/FeedbackTiming.h"
+#include "gameplay/EquipmentFeedback.h"
+#include "platform/android/GameplayEventMetadata.h"
 #include "gameplay/SpatialAudio.h"
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameplayEvent.h"
@@ -66,6 +68,37 @@ int main()
     };
 
     const SpatialAudioListener origin{};
+    using horde::gameplay::simulation::GameplayEvent;
+    using horde::gameplay::simulation::GameplayEventType;
+    using horde::gameplay::simulation::EntityId;
+    GameplayEvent equipmentEvent{};
+    equipmentEvent.type = GameplayEventType::PlayerSwordDrawStarted;
+    equipmentEvent.source = EntityId::Player;
+    equipmentEvent.target = EntityId::Invalid;
+    equipmentEvent.sequence = 0x1abcdef01ULL;
+    check(EquipmentCueForEvent(equipmentEvent) == EquipmentAudioCue::None,
+          "draw input/start must not duplicate the attachment cue");
+    equipmentEvent.type = GameplayEventType::PlayerSwordAttachmentChanged;
+    equipmentEvent.payload = static_cast<std::int32_t>(items::HeldItemParentMode::HandSocket);
+    check(EquipmentCueForEvent(equipmentEvent) == EquipmentAudioCue::SwordDraw,
+          "physical hand attachment must select the draw cue");
+    const auto metadata = horde::platform::android::PackGameplayEventMetadata(equipmentEvent);
+    check((metadata & 0xffu) == static_cast<std::uint64_t>(equipmentEvent.type) &&
+          ((metadata >> 8u) & 0xffu) == static_cast<std::uint64_t>(EntityId::Player) &&
+          ((metadata >> 16u) & 0xffu) == static_cast<std::uint64_t>(EntityId::Invalid) &&
+          ((metadata >> 24u) & 0xffu) == static_cast<std::uint64_t>(EquipmentAudioCue::SwordDraw) &&
+          (metadata >> 32u) == 0xabcdef01u,
+          "equipment transport must preserve existing metadata and sequence fields");
+    equipmentEvent.payload = static_cast<std::int32_t>(items::HeldItemParentMode::BodyStow);
+    check(EquipmentCueForEvent(equipmentEvent) == EquipmentAudioCue::SwordSheath,
+          "physical body attachment must select the sheath cue");
+    equipmentEvent.payload = static_cast<std::int32_t>(items::HeldItemParentMode::WorldObject);
+    check(EquipmentCueForEvent(equipmentEvent) == EquipmentAudioCue::None,
+          "world detach must not invent a sheath cue");
+    equipmentEvent.source = EntityId::SkeletonA;
+    equipmentEvent.payload = static_cast<std::int32_t>(items::HeldItemParentMode::HandSocket);
+    check(EquipmentCueForEvent(equipmentEvent) == EquipmentAudioCue::None,
+          "non-player attachment must not play player equipment feedback");
     const SpatialAudioGains centred = CalculateSpatialAudio({0.0f, -1.0f}, origin);
     check(NearlyEqual(centred.pan, 0.0f), "front emitter must remain centred");
     check(NearlyEqual(centred.left, 0.7071067f), "centred emitter must use equal-power left gain");
