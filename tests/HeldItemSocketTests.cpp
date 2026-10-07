@@ -2631,6 +2631,224 @@ void TestCombatPulseAgainstImportedSwordAndSkeletonBounds(const bool detailed = 
     }
 }
 
+void TestDynamicCombatPulseNeighborhood()
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::items;
+    using horde::scene::SkinnedClip;
+    using horde::scene::SkinnedMeshAsset;
+
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    horde::scene::assets::StaticMeshAsset sword;
+    horde::scene::assets::StaticMeshAsset torch;
+    std::string diagnostic;
+    const bool heldAssetsLoaded = LoadProductionHeldAssets(sword, torch, diagnostic);
+    Check(heldAssetsLoaded && !sword.vertices.empty() && !sword.indices.empty(),
+          "focused dynamic geometry mode must load indexed production held assets");
+    const auto* grip = FindHeldItemSocket(sword.sockets, "Grip");
+    Check(grip != nullptr,
+          "focused dynamic geometry mode must use the imported sword Grip");
+    if (!heldAssetsLoaded || grip == nullptr) return;
+
+    SkinnedMeshAsset skeleton;
+    Check(skeleton.LoadCombatClips(
+              (root / "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
+              diagnostic),
+          "focused dynamic geometry mode must load the imported skeleton combat clips");
+    if (!skeleton.IsLoaded()) return;
+
+    horde::vulkan::raytracing::PlayerRenderSlot rig;
+    Check(rig.LoadAsset(
+              (root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),
+              diagnostic),
+          "focused dynamic geometry mode must load the production player rig");
+    if (!rig.IsLoaded()) return;
+
+    struct DynamicCase
+    {
+        const char* name;
+        float startDistance;
+        float targetBearing;
+    };
+    constexpr std::array<DynamicCase, 2u> cases{{
+        {"frontal-1.28", 1.28f, 0.0f},
+        {"plus15-1.28", 1.28f, 0.2617994f},
+    }};
+    constexpr float tickSeconds = 1.0f / 60.0f;
+    constexpr float playerX = 0.0f;
+    constexpr float playerZ = 0.0f;
+    constexpr float playerYaw = 0.0f;
+    constexpr float windupTrigger = 0.84f;
+    constexpr std::uint64_t maxTicks = 180u;
+    constexpr std::uint64_t neighborhoodRadius = 3u;
+    std::uint64_t rigTick = 80000u;
+
+    struct Record
+    {
+        std::uint64_t tick = 0u;
+        CombatSnapshot attackBefore{};
+        CombatSnapshot attackAfter{};
+        CombatSnapshot controlBefore{};
+        CombatSnapshot controlAfter{};
+    };
+
+    for (const DynamicCase& sampleCase : cases)
+    {
+        const float targetX = sampleCase.startDistance * std::sin(sampleCase.targetBearing);
+        const float targetZ = -sampleCase.startDistance * std::cos(sampleCase.targetBearing);
+        SwordCombat attackCombat;
+        SwordCombat liveControl;
+        attackCombat.Reset(1u, {targetX, targetZ});
+        liveControl.Reset(1u, {targetX, targetZ});
+        std::vector<Record> records;
+        records.reserve(96u);
+        bool attackRequested = false;
+        std::uint64_t requestTick = 0u;
+        std::uint64_t pulseTick = 0u;
+
+        for (std::uint64_t tick = 1u; tick <= maxTicks; ++tick)
+        {
+            const CombatSnapshot attackBefore = attackCombat.Snapshot();
+            const CombatSnapshot controlBefore = liveControl.Snapshot();
+            if (!attackRequested &&
+                attackBefore.combatants[0].action == EnemyCombatAction::AttackWindup &&
+                attackBefore.combatants[0].actionTime >= windupTrigger)
+            {
+                attackRequested = attackCombat.RequestAttack() ==
+                                  PlayerAttackCut::DownwardCut;
+                requestTick = attackRequested ? tick : 0u;
+            }
+            const CombatSnapshot attackAfter = attackCombat.Update(
+                tickSeconds, playerX, playerZ, playerYaw, true, true, false);
+            const CombatSnapshot controlAfter = liveControl.Update(
+                tickSeconds, playerX, playerZ, playerYaw, true, true, false);
+            records.push_back({tick, attackBefore, attackAfter,
+                               controlBefore, controlAfter});
+            if (attackAfter.playerAttackPulse && pulseTick == 0u)
+                pulseTick = tick;
+            if (pulseTick != 0u && tick >= pulseTick + neighborhoodRadius)
+                break;
+        }
+
+        Check(attackRequested && pulseTick != 0u && pulseTick > neighborhoodRadius,
+              "focused dynamic mode must capture an ordinary attack pulse with three prior ticks");
+        if (!attackRequested || pulseTick == 0u || pulseTick <= neighborhoodRadius)
+            continue;
+        Check(records.back().tick >= pulseTick + neighborhoodRadius,
+              "focused dynamic mode must retain three following fixed ticks");
+
+        for (const Record& record : records)
+        {
+            if (record.tick + neighborhoodRadius < pulseTick ||
+                record.tick > pulseTick + neighborhoodRadius)
+                continue;
+
+            HeldItemFixedStepInput input;
+            input.playerX = playerX;
+            input.playerZ = playerZ;
+            input.playerYawRadians = playerYaw;
+            input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+            input.playerCombat = record.attackAfter.player;
+            HeldItemStates items = MakeDefaultHeldItemStates();
+            HeldItemFixedStepState fixed;
+            const bool fixedResolved = ResolveHeldItemsFixedStep(
+                items, input, record.tick, fixed, diagnostic);
+            HeldItemTransform worldFromGrip{};
+            HeldItemTransform worldFromSword{};
+            const bool rigResolved = fixedResolved && ResolveProductionAnatomicalSword(
+                input, fixed.kinematics, items, rig, rigTick++,
+                worldFromGrip, worldFromSword, diagnostic);
+            Check(rigResolved,
+                  "every neighborhood player pose must resolve through the production final rig");
+            if (!rigResolved) continue;
+
+            const auto& target = record.controlBefore.combatants[0];
+            Check(target.health > 0,
+                  "unhit parallel control must keep a live target through the pulse neighborhood");
+            const DiagnosticSkeletonRenderSample attackSample =
+                CurrentCharacterRenderMapping(target,
+                    skeleton.ClipDuration(SkinnedClip::Dead));
+            Check(target.action == EnemyCombatAction::AttackWindup ||
+                      target.action == EnemyCombatAction::AttackActive,
+                  "unhit control must remain in the ordinary enemy attack phase over the sample window");
+            Check(attackSample.clip == SkinnedClip::Attack,
+                  "live attack control must use the imported Attack clip");
+            std::vector<horde::scene::SkinnedRtVertex> attackPose;
+            const bool attackPoseResolved = skeleton.Skin(
+                attackSample.clip, attackSample.clipTime, attackPose, diagnostic);
+            Check(attackPoseResolved && !attackPose.empty(),
+                  "each unhit live Attack control sample must skin successfully");
+
+            DiagnosticSkeletonRenderSample idleSample = attackSample;
+            idleSample.clip = SkinnedClip::Idle;
+            idleSample.clipTime = 0.0f;
+            std::vector<horde::scene::SkinnedRtVertex> idlePose;
+            const bool idlePoseResolved = skeleton.Skin(
+                idleSample.clip, idleSample.clipTime, idlePose, diagnostic);
+            Check(idlePoseResolved && !idlePose.empty(),
+                  "each same-origin/facing Idle control sample must skin successfully");
+            if (!attackPoseResolved || !idlePoseResolved) continue;
+
+            const TriangleBoundsTree attackTree = BuildDiagnosticTargetTree(
+                attackSample, attackPose);
+            const TriangleBoundsTree idleTree = BuildDiagnosticTargetTree(
+                idleSample, idlePose);
+            const BladeTriangleDistance attackDistance = MeasureBladeTriangleDistance(
+                attackTree, sword, *grip, worldFromSword);
+            const BladeTriangleDistance idleDistance = MeasureBladeTriangleDistance(
+                idleTree, sword, *grip, worldFromSword);
+            const float attackToPlayer = std::hypot(target.x - playerX,
+                                                   target.z - playerZ);
+            const float attackBearing = std::atan2(target.x - playerX,
+                                                   -(target.z - playerZ));
+            const bool isPulse = record.tick == pulseTick;
+            Check(attackDistance.trianglesQueried > 0u &&
+                      idleDistance.trianglesQueried > 0u &&
+                      std::isfinite(attackDistance.metres) &&
+                      std::isfinite(idleDistance.metres) &&
+                      attackDistance.metres >= 0.0f &&
+                      idleDistance.metres >= 0.0f &&
+                      attackDistance.metres != std::numeric_limits<float>::max() &&
+                      idleDistance.metres != std::numeric_limits<float>::max(),
+                  "attack and Idle controls must produce finite full triangle-distance results");
+
+            std::cout << "combat-dynamic-neighborhood " << sampleCase.name
+                      << " tick=" << record.tick
+                      << " pulseTick=" << pulseTick
+                      << " pulse=" << isPulse
+                      << " requestTick=" << requestTick
+                      << " playerBeforeAction=" << static_cast<int>(record.attackBefore.player.action)
+                      << " playerBeforeTime=" << record.attackBefore.player.actionTime
+                      << " playerAfterAction=" << static_cast<int>(record.attackAfter.player.action)
+                      << " playerAfterTime=" << record.attackAfter.player.actionTime
+                      << " attackedEnemyBeforeAction="
+                      << static_cast<int>(record.attackBefore.combatants[0].action)
+                      << " attackedEnemyBeforeTime="
+                      << record.attackBefore.combatants[0].actionTime
+                      << " attackedEnemyAfterAction="
+                      << static_cast<int>(record.attackAfter.combatants[0].action)
+                      << " attackedEnemyAfterTime="
+                      << record.attackAfter.combatants[0].actionTime
+                      << " attackedEnemyHealth="
+                      << record.attackAfter.combatants[0].health
+                      << " controlBeforeAction=" << static_cast<int>(record.controlBefore.combatants[0].action)
+                      << " controlBeforeTime=" << record.controlBefore.combatants[0].actionTime
+                      << " controlAfterAction=" << static_cast<int>(record.controlAfter.combatants[0].action)
+                      << " controlAfterTime=" << record.controlAfter.combatants[0].actionTime
+                      << " controlHealth=" << target.health
+                      << " targetOriginDistance=" << attackToPlayer
+                      << " targetBearing=" << attackBearing
+                      << " liveAttackClip=" << static_cast<int>(attackSample.clip)
+                      << " liveAttackClipTime=" << attackSample.clipTime
+                      << " attackBladeGap=" << attackDistance.metres
+                      << " idleControlClipTime=" << idleSample.clipTime
+                      << " idleBladeGap=" << idleDistance.metres
+                      << " bladeTriangles=" << attackDistance.trianglesQueried
+                      << " method=instantaneous-full-triangle-distance-no-sweep\n";
+        }
+    }
+}
+
 bool ResolveProductionSwordStowPose(
     horde::gameplay::items::HeldItemFixedStepInput input,
     const horde::gameplay::items::HeldItemState& swordState,
@@ -3531,6 +3749,11 @@ int main(const int argc, char** argv)
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 #endif
+    if (argc > 1 && std::string(argv[1]) == "--combat-dynamic-neighborhood")
+    {
+        TestDynamicCombatPulseNeighborhood();
+        return failures == 0 ? 0 : 1;
+    }
     if (argc > 1 && std::string(argv[1]) == "--combat-geometry")
     {
         TestCombatPulseAgainstImportedSwordAndSkeletonBounds(true);

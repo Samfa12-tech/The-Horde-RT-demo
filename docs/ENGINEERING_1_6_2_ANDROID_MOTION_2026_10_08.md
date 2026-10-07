@@ -221,6 +221,28 @@ idle timing correction while exposing the unresolved moving-target mismatch.
 Range/cone and any bounded sweep still need calibration against actual poses;
 there is no general combat-engine replacement or widened parry window.
 
+The focused `--combat-dynamic-neighborhood` mode then retains only the frontal
+and +15-degree 1.28 m cases over pulse -3 through +3. A parallel ordinary
+`SwordCombat` instance receives no player attack, keeping its target alive and
+advancing the Attack clip after the other instance is killed. That unhit control
+is explicitly counterfactual after damage; its previous-tick target pose is
+paired with the attacked instance's current player pose. Same-root/facing Idle
+controls use clip time zero. The 28 full triangle-distance samples pass in about
+90 seconds, with no general range matrix or gameplay change.
+
+| Unhit control / player sample | Pulse | +1 tick | +2 ticks | +3 ticks |
+| --- | --- | --- | --- | --- |
+| Frontal live Attack gap | 189.4 mm | 103.7 mm | 17.4 mm | 0 mm (intersection) |
+| Frontal same-root Idle gap | 47.0 mm | 34.9 mm | 75.2 mm | 106.6 mm |
+| +15-degree live Attack gap | 184.4 mm | 109.2 mm | 40.9 mm | 7.77 mm |
+| +15-degree same-root Idle gap | 279.3 mm | 299.9 mm | 329.7 mm | 351.4 mm |
+
+Player active time advances from .1033 at the pulse to .1533 s at +3 ticks;
+the unhit target crosses windup into active. These instantaneous controls
+support investigating a bounded stroke sweep: a single global timing shift
+would move contact away from other idle samples. They are not swept-contact
+proof, simultaneous renderer execution or owner acceptance.
+
 ## Waterfall equipment moving inspection
 
 The same immutable runtime has tree `f49720cd5c2fb6afaf2a9fab75cb9bfccf3fae1c`.
