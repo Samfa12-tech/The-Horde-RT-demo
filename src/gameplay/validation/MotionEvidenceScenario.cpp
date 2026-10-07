@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstring>
 #include <limits>
+#include <cstdio>
 
 namespace horde::gameplay::validation
 {
@@ -24,7 +25,8 @@ bool KeeperScenario(MotionScenario scenario) noexcept
 bool ParseMotionScenario(std::string_view text, MotionScenario& scenario) noexcept
 {
     for (auto candidate : {MotionScenario::TorchLowOpening, MotionScenario::ShaftUp,
-                           MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward})
+                           MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward,
+                           MotionScenario::WaterfallEquipment})
         if (text == MotionScenarioName(candidate)) { scenario = candidate; return true; }
     return false;
 }
@@ -36,6 +38,7 @@ const char* MotionScenarioName(MotionScenario scenario) noexcept
     case MotionScenario::ShaftUp: return "shaft-up";
     case MotionScenario::KeeperFirstEntry: return "keeper-first-entry";
     case MotionScenario::KeeperRetryReward: return "keeper-retry-reward";
+    case MotionScenario::WaterfallEquipment: return "waterfall-equipment";
     default: return "invalid";
     }
 }
@@ -47,6 +50,9 @@ const char* MotionStageName(MotionStage stage) noexcept
     case MotionStage::Approach: return "approach";
     case MotionStage::TorchMotion: return "torch-motion";
     case MotionStage::ShaftMotion: return "shaft-motion";
+    case MotionStage::EquipmentDraw: return "equipment-draw";
+    case MotionStage::EquipmentAttack: return "equipment-attack";
+    case MotionStage::EquipmentParry: return "equipment-parry";
     case MotionStage::Reveal: return "reveal";
     case MotionStage::FirstTelegraph: return "first-telegraph";
     case MotionStage::AwaitDeath: return "await-death";
@@ -64,14 +70,19 @@ const char* MotionStageName(MotionStage stage) noexcept
 bool MotionEvidenceScenario::Begin(MotionScenario scenario, GameSimulation& simulation,
                                    std::uint64_t now) noexcept
 {
+    if (equipmentSeedOwned_) return false;
     *this = {};
     scenario_ = scenario;
     if (std::string_view(MotionScenarioName(scenario)) == "invalid" || now == 0u ||
         simulation.Snapshot().playerMountProfile != items::PlayerMountProfile::AnatomicalBody)
     { Fail("Motion evidence requires an admitted scenario, clock and production simulation profile."); return false; }
-    const int checkpoint = scenario == MotionScenario::TorchLowOpening ? 0 : scenario == MotionScenario::ShaftUp ? 2 : 8;
-    if (!simulation.ApplyShowcaseCheckpoint(checkpoint))
+    const bool seeded = scenario == MotionScenario::WaterfallEquipment
+        ? simulation.BeginMotionEvidenceEquipmentSeed()
+        : simulation.ApplyShowcaseCheckpoint(
+            scenario == MotionScenario::TorchLowOpening ? 0 : scenario == MotionScenario::ShaftUp ? 2 : 8);
+    if (!seeded)
     { Fail("The accepted scenario checkpoint seed could not be applied."); return false; }
+    equipmentSeedOwned_ = scenario == MotionScenario::WaterfallEquipment;
     startWall_ = latestWall_ = now;
     previousTick_ = simulation.Snapshot().tickIndex;
     previousRevealElapsed_ = simulation.Snapshot().lich.revealElapsedSeconds;
@@ -79,6 +90,12 @@ bool MotionEvidenceScenario::Begin(MotionScenario scenario, GameSimulation& simu
     initialRetryGeneration_ = simulation.Snapshot().retryGeneration;
     Enter(MotionStage::Approach);
     return true;
+}
+void MotionEvidenceScenario::End(GameSimulation& simulation) noexcept
+{
+    if (!equipmentSeedOwned_) return;
+    simulation.EndMotionEvidenceEquipmentSeed();
+    equipmentSeedOwned_ = false;
 }
 std::string_view MotionEvidenceScenario::Failure() const noexcept { return failure_.data(); }
 void MotionEvidenceScenario::Fail(std::string_view reason) noexcept
@@ -142,7 +159,13 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
     if (!input.paused)
     {
         const float elapsed = static_cast<float>(simulationSeconds_ - stageStartSeconds_);
-        if (elapsed > 45.0f) Fail("Motion stage failed to progress through the actual gameplay contract.");
+        if (elapsed > 45.0f)
+        {
+            std::array<char, 128u> reason{};
+            std::snprintf(reason.data(), reason.size(), "%s stage %s timed out at (%.2f, %.2f).",
+                MotionScenarioName(scenario_), MotionStageName(stage_), state.playerX, state.playerZ);
+            Fail(reason.data());
+        }
         switch (stage_)
         {
         case MotionStage::Approach:
@@ -153,6 +176,15 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
                 input.yawRadians=atWestLeg ? -kPi*0.5f : 0.0f;
                 input.pitchRadians=atWestLeg ? 0.28f : -0.04f;
                 MoveTowards(input,state,atWestLeg ? -1.66f : 4.2f,atWestLeg ? -15.35f : -15.2f);
+            }
+            else if (scenario_ == MotionScenario::WaterfallEquipment)
+            {
+                input.pitchRadians = -0.04f;
+                // Follow the authored corridor's existing two-leg path. A
+                // diagonal from checkpoint 2 cuts across the solid corner.
+                const bool atWestLeg = state.playerZ < -15.05f;
+                input.yawRadians = atWestLeg ? -kPi * 0.5f : 0.0f;
+                MoveTowards(input, state, atWestLeg ? -2.0f : 4.2f, -15.2f);
             }
             else if (elapsed<6.0f || !rearReturnSeen_)
             {
@@ -180,6 +212,15 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
             input.yawRadians=-kPi*0.5f+0.06f*std::sin(elapsed*kPi/3.0f);
             input.pitchRadians = 0.275f + 0.005f * std::cos(elapsed * kPi / 3.0f);
             MoveTowards(input,state,-1.66f,-15.35f+0.26f*std::sin(elapsed*kPi/3.0f));
+            break;
+        case MotionStage::EquipmentDraw:
+        case MotionStage::EquipmentAttack:
+        case MotionStage::EquipmentParry:
+            AimAt(input, state, kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z);
+            if (stage_ == MotionStage::EquipmentAttack && !firstAttackSent_)
+            { PublishEdge(commands_.attack); firstAttackSent_ = true; }
+            if (stage_ == MotionStage::EquipmentParry && !parrySent_)
+            { PublishEdge(commands_.parry); parrySent_ = true; }
             break;
         case MotionStage::Reveal:
         {
@@ -253,7 +294,74 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
         { Fail("Semantic event ordering or type admission failed."); return; }
         previousEventSequence_ = event.sequence;
         ++eventCounts_[static_cast<std::size_t>(event.type)];
+        if (scenario_ == MotionScenario::WaterfallEquipment)
+        {
+            if (event.type == GameplayEventType::SkeletonEncounterWarning && waterfallWarningSequence_ == 0u)
+                waterfallWarningSequence_ = event.sequence;
+            else if (event.type == GameplayEventType::PlayerSwordDrawStarted && swordDrawSequence_ == 0u)
+                swordDrawSequence_ = event.sequence;
+            else if (event.type == GameplayEventType::PlayerSwordAttachmentChanged && swordAttachmentSequence_ == 0u)
+                swordAttachmentSequence_ = event.sequence;
+            else if (event.type == GameplayEventType::PlayerSwing && swordSwingSequence_ == 0u)
+                swordSwingSequence_ = event.sequence;
+        }
         impact = impact || event.type == GameplayEventType::LichImpact;
+    }
+    if (scenario_ == MotionScenario::WaterfallEquipment)
+    {
+        const auto& snapshot = state;
+        const auto& sword = snapshot.heldItems[1];
+        if (snapshot.skeletonEnemyCount != 2u || snapshot.activeSkeletonCount != 2u ||
+            snapshot.skeletonEnemies[0].id != EntityId::SkeletonA ||
+            snapshot.skeletonEnemies[1].id != EntityId::SkeletonB ||
+            snapshot.skeletonEnemies[0].health != 1 || snapshot.skeletonEnemies[1].health != 1 ||
+            !snapshot.torchFailure.heldByPlayer || snapshot.torchFailure.triggered)
+        { Fail("Equipment motion lost the pre-drench two-guard waterfall encounter."); return; }
+        if (sword.parentMode == items::HeldItemParentMode::BodyStow &&
+            sword.transition.kind == items::HeldItemTransitionKind::Draw && sword.transition.active)
+            equipmentDrawTransitionSeen_ = true;
+        equipmentAttackPoseSeen_ = equipmentAttackPoseSeen_ ||
+            snapshot.playerCombat.action == PlayerCombatAction::SwingActive;
+        equipmentParryPoseSeen_ = equipmentParryPoseSeen_ ||
+            snapshot.playerCombat.action == PlayerCombatAction::ParryActive;
+        if (stage_ == MotionStage::Approach)
+        {
+            if (Distance(snapshot, kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z) >
+                    horde::gameplay::kWaterfallSwordCueRadius &&
+                (waterfallWarningSequence_ != 0u || swordDrawSequence_ != 0u))
+            { Fail("Waterfall draw began outside the authored warning range."); return; }
+            if (swordDrawSequence_ != 0u) Enter(MotionStage::EquipmentDraw);
+        }
+        else if (stage_ == MotionStage::EquipmentDraw)
+        {
+            if (swordDrawSequence_ == 0u || !equipmentDrawTransitionSeen_)
+            { Fail("Waterfall LOS did not start the actual stowed-sword draw."); return; }
+            if (swordAttachmentSequence_ != 0u && swordAttachmentSequence_ > swordDrawSequence_ &&
+                sword.parentMode == items::HeldItemParentMode::HandSocket && !sword.transition.active)
+                Enter(MotionStage::EquipmentAttack);
+        }
+        else if (stage_ == MotionStage::EquipmentAttack)
+        {
+            if (equipmentAttackPoseSeen_ && swordSwingSequence_ != 0u &&
+                snapshot.playerCombat.action == PlayerCombatAction::Idle)
+                Enter(MotionStage::EquipmentParry);
+        }
+        else if (stage_ == MotionStage::EquipmentParry && equipmentParryPoseSeen_ &&
+                 snapshot.playerCombat.action == PlayerCombatAction::Idle)
+        {
+            if (waterfallWarningSequence_ == 0u || swordDrawSequence_ <= waterfallWarningSequence_ ||
+                swordAttachmentSequence_ <= swordDrawSequence_ || swordSwingSequence_ <= swordAttachmentSequence_ ||
+                !equipmentAttackPoseSeen_ || !equipmentParryPoseSeen_ ||
+                eventCounts_[static_cast<std::size_t>(GameplayEventType::PlayerSwing)] != 1u)
+                Fail("Waterfall draw, attachment and swing semantics were absent or out of order.");
+            else Enter(MotionStage::Complete);
+        }
+        if (snapshot.playerCombat.action != PlayerCombatAction::Idle &&
+            stage_ == MotionStage::EquipmentDraw &&
+            snapshot.playerCombat.action != PlayerCombatAction::SwingWindup &&
+            snapshot.playerCombat.action != PlayerCombatAction::SwingActive)
+        { Fail("Equipment motion produced an unrelated combat action during draw."); return; }
+        return;
     }
     if (KeeperScenario(scenario_) && IsKeeperRevealing(state.lich.revealPhase) &&
         (state.lich.health != 3 || state.lich.damagePulse || state.lich.staffLightStrength != 0.0f ||

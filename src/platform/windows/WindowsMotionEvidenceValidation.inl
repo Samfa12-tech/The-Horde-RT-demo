@@ -72,6 +72,7 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
     };
     const auto fail = [&](std::string reason) {
         error=std::move(reason); context.motionScenario.Fail(error);
+        context.motionScenario.End(context.simulation);
         (void)write(); std::cerr << "Native motion failed: " << error << '\n'; return 1;
     };
     unsigned existing=0;
@@ -260,5 +261,6 @@ int RunNativeMotionEvidence(VulkanSurfaceContext& context, horde::vulkan::Device
     if(!context.motionLedger.HasCurrentPresentedFrame(context.motionSurfaceGeneration,publication.sceneEpoch,publication.measurementGeneration))
         return fail("Final actual scope has no completed RT-produced presentation.");
     if(!write()) return fail("Bounded motion evidence could not be written.");
+    context.motionScenario.End(context.simulation);
     return 0;
 }

@@ -21,6 +21,11 @@
 #include "gameplay/simulation/InputSnapshot.h"
 #include "gameplay/simulation/SimulationSnapshot.h"
 
+namespace horde::gameplay::validation
+{
+class MotionEvidenceScenario;
+}
+
 namespace horde::gameplay::simulation
 {
 
@@ -89,6 +94,12 @@ public:
     const FixedStepRunner& Timing() const { return fixedStepRunner_; }
 
 private:
+    friend class horde::gameplay::validation::MotionEvidenceScenario;
+    // The motion evidence scenario is the only owner allowed to scope this
+    // opt-in config around an ordinary checkpoint reset.
+    bool BeginMotionEvidenceEquipmentSeed();
+    void EndMotionEvidenceEquipmentSeed();
+
     void StepFixedTick(const InputSnapshot& input, float fixedDeltaSeconds,
                        std::uint64_t inputPublicationSequence,
                        bool activateTimestampedEdges = true);
@@ -136,6 +147,9 @@ private:
     void RefreshSnapshot(const InputSnapshot& input);
 
     GameSimulationConfig config_{};
+    bool motionEvidenceEquipmentSeedActive_ = false;
+    bool motionEvidencePreviousSwordStartsStowed_ = false;
+    bool motionEvidencePreviousWaterfallSkeletonEncounter_ = false;
     FixedStepRunner fixedStepRunner_{};
     BoundedGameplayEventQueue events_{};
     CombatPresentationTimeline combatPresentation_{};

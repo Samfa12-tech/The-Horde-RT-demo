@@ -18,11 +18,13 @@ enum class MotionScenario : std::uint8_t
     ShaftUp,
     KeeperFirstEntry,
     KeeperRetryReward,
+    WaterfallEquipment,
 };
 
 enum class MotionStage : std::uint8_t
 {
-    NotStarted, Approach, TorchMotion, ShaftMotion, Reveal, FirstTelegraph,
+    NotStarted, Approach, TorchMotion, ShaftMotion, EquipmentDraw, EquipmentAttack,
+    EquipmentParry, Reveal, FirstTelegraph,
     AwaitDeath, RetryRequested, Recognition, RetryTelegraph, Fight,
     Reward, TerminalReentry, Complete, Failed,
 };
@@ -39,6 +41,10 @@ public:
     // Owner thread only. One accepted checkpoint seed, never a phase import.
     [[nodiscard]] bool Begin(MotionScenario scenario, simulation::GameSimulation& simulation,
                              std::uint64_t monotonicNowNanoseconds) noexcept;
+    // Release the temporary waterfall equipment seed on every owner exit.
+    // Safe to call repeatedly and for scenarios that do not own a seed.
+    void End(simulation::GameSimulation& simulation) noexcept;
+    [[nodiscard]] bool OwnsEquipmentSeed() const noexcept { return equipmentSeedOwned_; }
     // currentOutputReady is supplied by the platform's current-generation real
     // RT presentation/completion guard. Until ready, publish a paused tuple.
     [[nodiscard]] simulation::InputSnapshot BuildInput(
@@ -109,6 +115,14 @@ private:
     bool rearLookSeen_ = false;
     bool rearParallaxSeen_ = false;
     bool rearReturnSeen_ = false;
+    bool equipmentDrawTransitionSeen_ = false;
+    bool equipmentAttackPoseSeen_ = false;
+    bool equipmentParryPoseSeen_ = false;
+    std::uint64_t waterfallWarningSequence_ = 0u;
+    std::uint64_t swordDrawSequence_ = 0u;
+    std::uint64_t swordAttachmentSequence_ = 0u;
+    std::uint64_t swordSwingSequence_ = 0u;
+    bool equipmentSeedOwned_ = false;
 };
 
 } // namespace horde::gameplay::validation

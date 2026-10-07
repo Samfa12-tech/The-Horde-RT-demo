@@ -147,6 +147,7 @@ void Run(MotionScenario kind, int rate, const char* receiptPath)
         simulation.ClearEvents();
     }
     std::cout << MotionScenarioName(kind) << " rate=" << rate << " stage=" << MotionStageName(scenario.Stage())
+              << " endpoint=(" << simulation.Snapshot().playerX << ',' << simulation.Snapshot().playerZ << ')'
               << " simulationSeconds=" << scenario.SimulationSeconds() << " states=" << ledger.States().size()
               << " events=" << ledger.Events().size() << " reservedLedgerBytes=" << ledger.ReservedBytes()
               << " reason=" << scenario.Failure() << '\n';
@@ -209,6 +210,36 @@ void TestEquipmentEventAdmission()
             Check(scenario.Failed() && !ledger.AppendState(3u, simulation.Snapshot(), {}, scenario, events),
                   "duplicate equipment event remains rejected");
         }
+    }
+}
+
+void TestSwordTransitionLedgerIsolation()
+{
+    GameSimulation simulation(ProductionGameSimulationConfig());
+    MotionEvidenceScenario scenario;
+    Check(scenario.Begin(MotionScenario::TorchLowOpening, simulation, 1u),
+          "immutable equipment metadata fixture has an admitted seed");
+    auto state = simulation.Snapshot();
+    state.heldItems[1].transition.active = true;
+    state.heldItems[1].transition.kind = items::HeldItemTransitionKind::Draw;
+    state.heldItems[1].transition.progress = 0.5f;
+    MotionEvidenceLedger ledger;
+    Check(ledger.Begin("sword_metadata_fixture", MotionScenario::TorchLowOpening) &&
+          ledger.AppendState(2u, state, {}, scenario, {}), "valid equipment metadata row admitted");
+    state.heldItems[1].transition.progress = 0.75f;
+    std::ostringstream json;
+    ledger.WriteJson(json, scenario);
+    Check(ledger.States().size() == 1u && ledger.States()[0].sword.active &&
+          ledger.States()[0].sword.progress == 0.5f &&
+          json.str().find("\"progress\":0.5") != std::string::npos,
+          "later mutable poses cannot rewrite the captured state row's draw progress");
+    for (float invalid : {-0.1f, 1.1f, std::numeric_limits<float>::quiet_NaN()})
+    {
+        MotionEvidenceLedger rejected;
+        Check(rejected.Begin("invalid_sword_metadata", MotionScenario::TorchLowOpening), "negative equipment fixture starts");
+        state.heldItems[1].transition.progress = invalid;
+        Check(!rejected.AppendState(2u, state, {}, scenario, {}) && rejected.States().empty(),
+              "out-of-range or nonfinite draw progress cannot enter completed-frame metadata");
     }
 }
 
@@ -460,6 +491,136 @@ void TestRearLookCannotBeSkipped()
     Check(rearTravelSeen && scenario.Failed() && !scenario.Complete() && !portalStageSeen,
           "real rearward travel without rearward look fails instead of silently passing the collapse evidence stage");
 }
+
+void TestWaterfallEquipmentSeedOwnership(int rate)
+{
+    Check(horde::gameplay::IsRouteAudioObstructed(-2.5f, -10.4f,
+              kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z) &&
+          !horde::gameplay::IsRouteAudioObstructed(-2.5f, -14.5f,
+              kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z),
+          "shared route LOS predicate distinguishes a blocked approach ray from the open waterfall corridor");
+    const auto productionConfig = ProductionGameSimulationConfig();
+    Check(!productionConfig.swordStartsStowed && !productionConfig.waterfallSkeletonEncounter,
+          "equipment staging flags remain disabled in the production configuration");
+    GameSimulation normalReference(productionConfig);
+    normalReference.ResetRoute();
+    const auto normalSnapshot = normalReference.Snapshot();
+    GameSimulation simulation(productionConfig);
+    const auto matchesNormalEncounter = [&]()
+    {
+        const auto& current = simulation.Snapshot();
+        return current.skeletonEnemyCount == normalSnapshot.skeletonEnemyCount &&
+            current.activeSkeletonCount == normalSnapshot.activeSkeletonCount &&
+            current.skeletonEnemies[0].id == normalSnapshot.skeletonEnemies[0].id &&
+            current.skeletonEnemies[0].health == normalSnapshot.skeletonEnemies[0].health &&
+            current.skeletonEnemies[1].id == normalSnapshot.skeletonEnemies[1].id &&
+            current.skeletonEnemies[1].health == normalSnapshot.skeletonEnemies[1].health;
+    };
+    InputSnapshot baseline;
+    baseline.commands.attack = 2u;
+    baseline.commands.parry = 3u;
+    baseline.commands.dodge = 4u;
+    simulation.StepFixed(baseline);
+    const auto before = simulation.Snapshot();
+    const auto eventSequenceFloor = simulation.Events().NextSequence();
+
+    MotionEvidenceScenario scenario;
+    Check(scenario.Begin(MotionScenario::WaterfallEquipment, simulation, 1'000'000'000u) &&
+          scenario.OwnsEquipmentSeed(), "waterfall seed is scoped to its owning scenario");
+    const auto seeded = simulation.Snapshot();
+    Check(seeded.tickIndex == before.tickIndex && seeded.lastConsumedAttackSequence >= before.lastConsumedAttackSequence &&
+          seeded.lastConsumedParrySequence >= before.lastConsumedParrySequence &&
+          seeded.lastConsumedDodgeSequence >= before.lastConsumedDodgeSequence &&
+          seeded.skeletonEnemyCount == 2u && seeded.activeSkeletonCount == 2u &&
+          seeded.skeletonEnemies[0].id == EntityId::SkeletonA && seeded.skeletonEnemies[1].id == EntityId::SkeletonB &&
+          seeded.heldItems[1].parentMode == items::HeldItemParentMode::BodyStow,
+          "temporary checkpoint preserves monotonic command/tick floors and stages only the two waterfall guards");
+
+    Check(!scenario.Begin(MotionScenario::WaterfallEquipment, simulation, 2'000'000'000u) &&
+          simulation.Snapshot().skeletonEnemyCount == 2u && scenario.OwnsEquipmentSeed(),
+          "repeated begin cannot erase the active scenario's cleanup ownership");
+
+    InputSnapshot publication;
+    const auto paused = scenario.BuildInput(simulation.Snapshot(), publication, 1'000'000'000u, false);
+    simulation.AdvanceFrame(paused, 1.0 / 60.0, 1u);
+    scenario.ObserveAdvance(simulation.Snapshot(), simulation.Events().Events());
+    Check(paused.paused && simulation.Snapshot().tickIndex == before.tickIndex,
+          "equipment route stays paused until the owner supplies current output readiness");
+    simulation.ClearEvents();
+
+    std::uint64_t now = 1'000'000'000u;
+    std::uint64_t warning = 0u, draw = 0u, attachment = 0u, swing = 0u;
+    bool farFromCueNoWarning = true, sawDrawTransition = false, sawHandAttachment = false;
+    bool sawSwing = false, sawParry = false, warningHadLos = false;
+    for (int frame = 0; frame < rate * 120 && !scenario.Complete() && !scenario.Failed(); ++frame)
+    {
+        now += static_cast<std::uint64_t>(1'000'000'000ull / static_cast<unsigned>(rate));
+        auto input = scenario.BuildInput(simulation.Snapshot(), publication, now, true);
+        simulation.AdvanceFrame(input, 1.0 / rate, static_cast<std::uint64_t>(frame + 2));
+        const auto& state = simulation.Snapshot();
+        const auto& sword = state.heldItems[1];
+        const float distance = std::hypot(state.playerX - kWaterfallSkeletonPairCenter.x,
+                                          state.playerZ - kWaterfallSkeletonPairCenter.z);
+        if (distance > horde::gameplay::kWaterfallSwordCueRadius && warning == 0u)
+            farFromCueNoWarning = farFromCueNoWarning &&
+                scenario.EventCounts()[static_cast<std::size_t>(GameplayEventType::SkeletonEncounterWarning)] == 0u;
+        sawDrawTransition = sawDrawTransition || (sword.parentMode == items::HeldItemParentMode::BodyStow &&
+            sword.transition.kind == items::HeldItemTransitionKind::Draw && sword.transition.active);
+        sawHandAttachment = sawHandAttachment || (sword.parentMode == items::HeldItemParentMode::HandSocket &&
+            !sword.transition.active && attachment != 0u);
+        sawSwing = sawSwing || state.playerCombat.action == PlayerCombatAction::SwingActive;
+        sawParry = sawParry || state.playerCombat.action == PlayerCombatAction::ParryActive;
+        for (const auto& event : simulation.Events().Events())
+        {
+            if (event.type == GameplayEventType::SkeletonEncounterWarning && warning == 0u)
+            { warning = event.sequence; warningHadLos = distance <= horde::gameplay::kWaterfallSwordCueRadius &&
+                !horde::gameplay::IsRouteAudioObstructed(state.playerX, state.playerZ,
+                    kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z); }
+            if (event.type == GameplayEventType::PlayerSwordDrawStarted && draw == 0u) draw = event.sequence;
+            if (event.type == GameplayEventType::PlayerSwordAttachmentChanged && attachment == 0u) attachment = event.sequence;
+            if (event.type == GameplayEventType::PlayerSwing && swing == 0u) swing = event.sequence;
+        }
+        scenario.ObserveAdvance(state, simulation.Events().Events());
+        simulation.ClearEvents();
+        publication = input;
+    }
+
+    Check(scenario.Complete() && !scenario.Failed(), "ordinary waterfall approach, draw, swing and parry complete");
+    Check(farFromCueNoWarning && warningHadLos && warning != 0u && warning < draw && draw < attachment &&
+          attachment < swing, "no early warning; actual range warning and ordered draw/attachment/swing events observed");
+    Check(sawDrawTransition && sawHandAttachment && sawSwing && sawParry,
+          "moving state samples include stowed draw transition, hand attachment and active swing/parry poses");
+    const auto beforeEnd = simulation.Snapshot();
+    const auto eventFloorBeforeEnd = simulation.Events().NextSequence();
+    scenario.End(simulation);
+    scenario.End(simulation);
+    Check(!scenario.OwnsEquipmentSeed() && matchesNormalEncounter() &&
+          simulation.Snapshot().heldItems[1].parentMode == items::HeldItemParentMode::HandSocket &&
+          simulation.Snapshot().tickIndex == beforeEnd.tickIndex &&
+          simulation.Snapshot().lastConsumedAttackSequence >= beforeEnd.lastConsumedAttackSequence &&
+          simulation.Snapshot().lastConsumedParrySequence >= beforeEnd.lastConsumedParrySequence &&
+          simulation.Snapshot().lastConsumedDodgeSequence >= beforeEnd.lastConsumedDodgeSequence &&
+          simulation.Events().NextSequence() >= std::max(eventSequenceFloor, eventFloorBeforeEnd),
+          "idempotent release restores the constructed normal route while preserving tick and sequence floors");
+
+    MotionEvidenceScenario afterRelease;
+    Check(afterRelease.Begin(MotionScenario::WaterfallEquipment, simulation, now + 1u),
+          "released owner permits a later bounded equipment run");
+    afterRelease.End(simulation);
+    Check(matchesNormalEncounter() && simulation.Snapshot().heldItems[1].parentMode ==
+          items::HeldItemParentMode::HandSocket,
+          "failure-free early release also restores the ordinary production equipment and encounter state");
+
+    MotionEvidenceScenario failedOwner;
+    Check(failedOwner.Begin(MotionScenario::WaterfallEquipment, simulation, now + 2u) &&
+          failedOwner.OwnsEquipmentSeed(), "post-seed failure fixture acquires cleanup ownership");
+    failedOwner.Fail("injected owner interruption after seed");
+    failedOwner.End(simulation);
+    Check(failedOwner.Failed() && !failedOwner.OwnsEquipmentSeed() &&
+          matchesNormalEncounter() &&
+          simulation.Snapshot().heldItems[1].parentMode == items::HeldItemParentMode::HandSocket,
+          "failure after seed still restores production route flags and equipment before a later Play");
+}
 }
 
 int main(int argc, char** argv)
@@ -467,11 +628,16 @@ int main(int argc, char** argv)
     if (argc != 1 && argc != 3) { std::cerr << "Optional --cpu-receipt path\n"; return 2; }
     if (argc == 3 && std::string_view(argv[1]) != "--cpu-receipt") return 2;
     TestEquipmentEventAdmission();
+    TestSwordTransitionLedgerIsolation();
     TestAdmissionAndFrameBinding();
     TestRearLookCannotBeSkipped();
     for (int rate : {15, 30, 60, 120})
+    {
+        TestWaterfallEquipmentSeedOwnership(rate);
         for (const auto kind : {MotionScenario::TorchLowOpening, MotionScenario::ShaftUp,
-                               MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward})
+                               MotionScenario::KeeperFirstEntry, MotionScenario::KeeperRetryReward,
+                               MotionScenario::WaterfallEquipment})
             Run(kind, rate, argc == 3 && rate == 60 && kind == MotionScenario::KeeperRetryReward ? argv[2] : nullptr);
+    }
     return failures == 0 ? 0 : 1;
 }

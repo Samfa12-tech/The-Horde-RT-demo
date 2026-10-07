@@ -241,9 +241,11 @@ struct AndroidMotionRun
     double lastCaptureSeconds = -2.0;
     horde::gameplay::validation::MotionStage lastCaptureStage{};
     horde::gameplay::PlayerCombatAction lastPresentedAction = horde::gameplay::PlayerCombatAction::Idle;
+    unsigned capturedDrawThresholds = 0u;
     unsigned captureCount = 0u;
     float externalYaw = 0.0f, externalPitch = 0.0f, externalTorch = 0.0f;
     bool armed = false, finished = false, retryPending = false;
+    bool equipmentSeedActive = false;
 };
 std::mutex gMotionRequestMutex;
 std::string gMotionRequestedId;
@@ -4557,6 +4559,7 @@ void SwapchainRenderLoop()
     const auto retiredGeneration = gSwapchainContext.surfaceGeneration;
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
     FailAndroidMotion(gSwapchainContext, "Motion interrupted by surface/lifecycle retirement.");
+    RestoreAndroidMotionEquipmentSeed(gSwapchainContext);
 #endif
     const bool retired = DestroySwapchainContext(gSwapchainContext);
     gSurfaceRetirementBlocked.store(!retired, std::memory_order_release);

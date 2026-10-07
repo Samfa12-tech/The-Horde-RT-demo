@@ -8,7 +8,7 @@ int main()
     using horde::vulkan::raytracing::RtWorkloadPreset;
     int failures=0;
     const auto check=[&](bool ok){ if(!ok) ++failures; };
-    for(const auto scenario:{L"torch-low-opening",L"shaft-up",L"keeper-first-entry",L"keeper-retry-reward"})
+    for(const auto scenario:{L"torch-low-opening",L"shaft-up",L"keeper-first-entry",L"keeper-retry-reward",L"waterfall-equipment"})
     {
         const std::array<std::wstring_view,4> args{L"--validate-native-motion",L"C:\\fresh motion",L"--motion-scenario",scenario};
         const auto parsed=ParseWindowsMotionEvidenceLaunch(args);

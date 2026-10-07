@@ -104,11 +104,20 @@ bool MotionEvidenceLedger::AppendState(std::uint64_t now,
             return Reject("Motion semantic event order/type admission failed.");
         latestEventSequence_ = event.sequence;
     }
+    const auto& sword = state.heldItems[1];
+    if (!std::isfinite(sword.transition.progress) || sword.transition.progress < 0.0f ||
+        sword.transition.progress > 1.0f || !std::isfinite(sword.visualGripBlend) ||
+        sword.visualGripBlend < 0.0f || sword.visualGripBlend > 1.0f ||
+        !std::isfinite(sword.visualStowBlend) || sword.visualStowBlend < 0.0f ||
+        sword.visualStowBlend > 1.0f)
+        return Reject("Motion sword transition state is invalid.");
     MotionStateRow row;
     row.wallNanoseconds = now; row.tick = state.tickIndex; row.publicationSequence = state.inputPublicationSequence;
     row.simulationSeconds = scenario.SimulationSeconds(); row.stage = scenario.Stage(); row.input = input;
     row.player = {{state.playerX, state.playerZ, state.playerYawRadians, state.playerPitchRadians, state.walkTime, state.walkAmount}};
     row.keeper = state.lich; row.torch = state.torchFailure; row.combat = state.playerCombat;
+    row.sword = {sword.parentMode, sword.transition.kind, sword.transition.progress,
+                 sword.visualGripBlend, sword.visualStowBlend, sword.transition.active};
     row.chest = state.chestReward; row.heldLight = state.interaction; row.finale = state.finale;
     row.consumed = {state.lastConsumedAttackSequence, state.lastConsumedParrySequence, state.lastConsumedDodgeSequence,
         state.lastConsumedRouteResetSequence, state.lastConsumedRetrySequence, state.lastConsumedInteractSequence,
@@ -282,6 +291,10 @@ void MotionEvidenceLedger::WriteJson(std::ostream& output,
                << ",\"hp\":" << r.keeper.health << ",\"phaseTime\":" << r.keeper.phaseTime << ",\"staff\":" << r.keeper.staffLightStrength
                << ",\"damagePulse\":" << (r.keeper.damagePulse ? "true" : "false") << "},\"torchPhase\":" << static_cast<int>(r.torch.phase)
                << ",\"torchHeld\":" << (r.torch.heldByPlayer ? "true" : "false") << ",\"playerAction\":" << static_cast<int>(r.combat.action)
+               << ",\"sword\":{\"parent\":" << static_cast<int>(r.sword.parent)
+               << ",\"transition\":" << static_cast<int>(r.sword.transition) << ",\"progress\":" << r.sword.progress
+               << ",\"gripBlend\":" << r.sword.gripBlend << ",\"stowBlend\":" << r.sword.stowBlend
+               << ",\"active\":" << (r.sword.active ? "true" : "false") << '}'
                << ",\"chestPhase\":" << static_cast<int>(r.chest.phase) << ",\"lid\":" << r.chest.lidOpenProgress
                << ",\"heldKind\":" << static_cast<int>(r.heldLight.heldLightKind) << ",\"heldPose\":" << static_cast<int>(r.heldLight.heldLightPose)
                << ",\"finalePhase\":" << static_cast<int>(r.finale.phase) << ",\"roof\":" << r.finale.skylightOpenProgress

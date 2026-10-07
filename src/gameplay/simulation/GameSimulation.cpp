@@ -463,6 +463,38 @@ bool GameSimulation::ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool cou
     return ApplyCheckpoint(checkpointId, countAsRetry);
 }
 
+bool GameSimulation::BeginMotionEvidenceEquipmentSeed()
+{
+    if (motionEvidenceEquipmentSeedActive_ ||
+        config_.playerMountProfile != horde::gameplay::items::PlayerMountProfile::AnatomicalBody)
+        return false;
+
+    motionEvidencePreviousSwordStartsStowed_ = config_.swordStartsStowed;
+    motionEvidencePreviousWaterfallSkeletonEncounter_ = config_.waterfallSkeletonEncounter;
+    config_.swordStartsStowed = true;
+    config_.waterfallSkeletonEncounter = true;
+    if (!ApplyShowcaseCheckpoint(2, false))
+    {
+        config_.swordStartsStowed = motionEvidencePreviousSwordStartsStowed_;
+        config_.waterfallSkeletonEncounter = motionEvidencePreviousWaterfallSkeletonEncounter_;
+        return false;
+    }
+    motionEvidenceEquipmentSeedActive_ = true;
+    return true;
+}
+
+void GameSimulation::EndMotionEvidenceEquipmentSeed()
+{
+    if (!motionEvidenceEquipmentSeedActive_) return;
+    config_.swordStartsStowed = motionEvidencePreviousSwordStartsStowed_;
+    config_.waterfallSkeletonEncounter = motionEvidencePreviousWaterfallSkeletonEncounter_;
+    motionEvidenceEquipmentSeedActive_ = false;
+    // Reset through the shared route path so temporary equipment and guards do
+    // not leak into ordinary play. The route reset preserves monotonic floors.
+    ResetRoute();
+    ClearEvents();
+}
+
 void GameSimulation::ImportRewardCheckpoint(
     const horde::gameplay::interactions::ChestRewardSnapshot& chestReward,
     const horde::gameplay::interactions::InteractionState& interaction,

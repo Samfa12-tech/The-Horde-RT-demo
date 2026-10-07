@@ -53,6 +53,27 @@ void FailAndroidMotion(SwapchainContext& context, std::string_view reason)
     __android_log_print(ANDROID_LOG_ERROR, kTag, "HORDE_MOTION failed %.*s", static_cast<int>(reason.size()), reason.data());
 }
 
+void RestoreAndroidMotionEquipmentSeed(SwapchainContext& context)
+{
+    if (!context.motion || !context.motion->equipmentSeedActive) return;
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    context.motion->scenario.End(gGameSimulation);
+    context.motion->equipmentSeedActive = false;
+    const auto& state = gGameSimulation.Snapshot();
+    auto& commands = gInputPublisherState.commands;
+    commands.attack = std::max(commands.attack, state.lastConsumedAttackSequence);
+    commands.parry = std::max(commands.parry, state.lastConsumedParrySequence);
+    commands.dodge = std::max(commands.dodge, state.lastConsumedDodgeSequence);
+    commands.retry = std::max(commands.retry, state.lastConsumedRetrySequence);
+    commands.routeReset = std::max(commands.routeReset, state.lastConsumedRouteResetSequence);
+    commands.interact = std::max(commands.interact, state.lastConsumedInteractSequence);
+    commands.toggleHeldLightPose = std::max(commands.toggleHeldLightPose, state.lastConsumedToggleHeldLightPoseSequence);
+    gInputPublisherState.combatEdgeHistory = {};
+    gInputPublisherState.paused = true;
+    gInputPublisherState.moveForward = gInputPublisherState.moveStrafe = 0.0f;
+    PublishInputLocked();
+}
+
 void ObserveAndroidMotionCompletion(SwapchainContext& context, bool completed)
 {
     if (!context.motion || !context.motion->armed || context.motion->finished || !completed) return;
@@ -65,6 +86,11 @@ void ResetAndroidMotionIfRequested(SwapchainContext& context)
 {
     if ((context.motion && !context.motion->finished) || !gMotionReleaseRequested.exchange(false)) return;
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (context.motion && context.motion->equipmentSeedActive)
+    {
+        context.motion->scenario.End(gGameSimulation);
+        context.motion->equipmentSeedActive = false;
+    }
     const auto& state = gGameSimulation.Snapshot();
     auto& commands = gInputPublisherState.commands;
     commands.attack = std::max(commands.attack, state.lastConsumedAttackSequence);
@@ -156,7 +182,10 @@ void BuildAndroidMotionInput(SwapchainContext& context,
             !publication.completedEvidence.scene.dispatch.rtDispatchRecorded ||
             !publication.completedEvidence.scene.dispatch.swapchainCopyRecorded)
             return;
-        if (!run.scenario.Begin(run.selected, gGameSimulation, now) ||
+        const bool scenarioSeeded = run.scenario.Begin(run.selected, gGameSimulation, now);
+        if (scenarioSeeded)
+            run.equipmentSeedActive = run.scenario.OwnsEquipmentSeed();
+        if (!scenarioSeeded ||
             !context.rtFrameEvidence.ApplyEvent(horde::telemetry::RtLifecycleEvent::CheckpointChange))
         { FailAndroidMotion(context, "Motion could not apply its one accepted checkpoint seed."); input.paused = true; return; }
         run.scope = AndroidMotionScope(context);
@@ -213,10 +242,17 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
          action == horde::gameplay::PlayerCombatAction::UpwardSliceActive ||
          action == horde::gameplay::PlayerCombatAction::ParryActive);
     run.lastPresentedAction = action;
+    const auto& sword = states.back().sword;
+    unsigned drawThresholds = 0u;
+    if (sword.active && sword.transition == horde::gameplay::items::HeldItemTransitionKind::Draw)
+        for (unsigned threshold = 0u; threshold < 3u; ++threshold)
+            if (sword.progress >= 0.25f * static_cast<float>(threshold + 1u))
+                drawThresholds |= 1u << threshold;
+    const bool equipmentMilestone = (drawThresholds & ~run.capturedDrawThresholds) != 0u;
     if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration) || AndroidMotionScope(context) != run.scope)
     { FailAndroidMotion(context, "Motion present lost its foreground resource scope."); return; }
     if (stage == run.lastCaptureStage && seconds - run.lastCaptureSeconds < 2.0 &&
-        !run.scenario.Complete() && !actionMilestone) return;
+        !run.scenario.Complete() && !actionMilestone && !equipmentMilestone) return;
     horde::telemetry::RtSubmittedFrameIdentity submitted{};
     if (!context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, submitted) ||
         !CompleteRtEvidenceAfterDeviceIdle(context, vkDeviceWaitIdle(context.device)) || run.finished ||
@@ -224,6 +260,7 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
     { FailAndroidMotion(context, "Motion milestone did not drain its graphics owner."); return; }
     const auto frames = run.ledger.Frames();
     if (frames.empty() || frames.back().identity.submitted.submissionSerial != submitted.submissionSerial ||
+        frames.back().stateRow != states.size() - 1u ||
         frames.back().identity.submitted.frame.sceneEpoch != submitted.frame.sceneEpoch ||
         frames.back().identity.submitted.frame.recordSerial != submitted.frame.recordSerial ||
         frames.back().surfaceGeneration != run.scope.surfaceGeneration || run.captureCount >= 64u)
@@ -244,7 +281,12 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
     row << "{\"file\":" << JsonUtf8String(file) << ",\"width\":" << image.width << ",\"height\":" << image.height
         << ",\"bytes\":" << image.rgba.size() << ",\"stateRow\":" << frames.back().stateRow
         << ",\"rtRow\":" << frames.size() - 1u << ",\"actionMilestone\":"
-        << (actionMilestone ? "true" : "false") << '}';
+        << (actionMilestone ? "true" : "false")
+        << ",\"equipmentThresholdMask\":" << (drawThresholds & ~run.capturedDrawThresholds)
+        << ",\"swordDrawProgress\":" << sword.progress << '}';
+    // A hitch can cross several thresholds in one presented frame. Retain the
+    // actual observed progress and one image, never invent skipped poses.
+    run.capturedDrawThresholds |= drawThresholds;
     run.captures += row.str(); run.lastCaptureStage = stage; run.lastCaptureSeconds = seconds;
     if (run.scenario.Complete())
     {

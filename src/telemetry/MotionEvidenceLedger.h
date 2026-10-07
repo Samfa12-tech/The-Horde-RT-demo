@@ -26,6 +26,15 @@ struct MotionStateRow
     horde::gameplay::LichSnapshot keeper{};
     horde::gameplay::TorchFailureSnapshot torch{};
     horde::gameplay::PlayerCombatSnapshot combat{};
+    struct HeldSwordEvidence
+    {
+        horde::gameplay::items::HeldItemParentMode parent{};
+        horde::gameplay::items::HeldItemTransitionKind transition{};
+        float progress = 0.0f;
+        float gripBlend = 0.0f;
+        float stowBlend = 0.0f;
+        bool active = false;
+    } sword{};
     horde::gameplay::interactions::ChestRewardSnapshot chest{};
     horde::gameplay::interactions::InteractionState heldLight{};
     horde::gameplay::interactions::FinaleSequenceSnapshot finale{};
