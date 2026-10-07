@@ -502,6 +502,7 @@ bool RtBenchmarkEvidenceRun::Complete(const RtPerformanceEvidenceSnapshot& snaps
     row.fireQuality = snapshot.scene.fireQuality;
     row.fireLighting = snapshot.scene.fireLighting;
     row.actualUploadedMistEnabled = snapshot.scene.actualUploadedMistEnabled;
+    row.actualUploadedDustQuality = snapshot.scene.actualUploadedDustQuality;
     row.hasDiagnosticCounters = snapshot.dielectric.status == RtSampleStatus::Valid &&
                                 snapshot.dielectric.hasCounters;
     if (row.hasDiagnosticCounters)

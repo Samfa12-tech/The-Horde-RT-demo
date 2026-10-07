@@ -150,6 +150,8 @@ PreparedBenchmarkSummaryReport PrepareBenchmarkSummaryReport(const FrozenBenchma
     }
     if (c.actualUploadedMistEnabled.has_value())
         out << ",\"actualUploadedMistEnabled\":" << (*c.actualUploadedMistEnabled ? "true" : "false");
+    if (c.actualUploadedDustQuality.has_value())
+        out << ",\"actualUploadedDustQuality\":" << static_cast<unsigned>(*c.actualUploadedDustQuality);
     out << ",\"glassEnabled\":" << (c.glassEnabled ? "true" : "false") << "},\"legacyFrameTimingScope\":";
     Text(out, m.legacyFrameTimingScope);
     out << ",\"cpuTimingScope\":\"completed-owning-render-entry-through-present\",\"gpuTimingScope\":\"completed-owning-rt-duration\","

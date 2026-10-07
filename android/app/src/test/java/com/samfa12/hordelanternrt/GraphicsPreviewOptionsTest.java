@@ -35,17 +35,17 @@ public final class GraphicsPreviewOptionsTest {
         static GraphicsPreferences.Values requested;
         @Implementation protected static void __staticInitializer__() { }
         @Implementation protected static boolean confirmGraphicsSettings(long serial,long generation) { return (serial==42 || serial==45) && generation==7; }
-        @Implementation protected static void beginGraphicsEdit(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled) {
-            rebased=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled);
+        @Implementation protected static void beginGraphicsEdit(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled,int dustQuality) {
+            rebased=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled,dustQuality);
         }
         @Implementation protected static long revertGraphicsSettings(long generation) { return generation==7?43:0; }
-        @Implementation protected static long compareGraphicsPreview(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled,long generation) {
+        @Implementation protected static long compareGraphicsPreview(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled,int dustQuality,long generation) {
             if(generation!=7) return 0;
-            ++compareCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled); return 44;
+            ++compareCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled,dustQuality); return 44;
         }
-        @Implementation protected static long applyGraphicsSettings(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled,long generation) {
+        @Implementation protected static long applyGraphicsSettings(int scale,int water,int fire,int cap,boolean glassEnabled,int shadowQuality,boolean mistEnabled,int dustQuality,long generation) {
             if(generation!=7) return 0;
-            ++applyCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled); return 45;
+            ++applyCalls; requested=new GraphicsPreferences.Values(scale,water,fire,cap,glassEnabled,shadowQuality,mistEnabled,dustQuality); return 45;
         }
         @Implementation protected static double[] getGraphicsPreviewPerformance() { return new double[]{epoch,13,74,2,-1,0,0,0,1,74,0}; }
         @Implementation protected static long[] getGraphicsSnapshot() { return applied.clone(); }
@@ -105,7 +105,8 @@ public final class GraphicsPreviewOptionsTest {
         assertTrue(draft.same(new GraphicsPreferences.Values(100,2,0,60,false)));
         GraphicsPreferences.Values mistOff=GraphicsPreviewOptions.withChoice(confirmed,GraphicsPreviewOptions.MIST,0);
         assertFalse(mistOff.mistEnabled); assertTrue(confirmed.mistEnabled);
-        for(int choice=0;choice<6;++choice) {
+        for(int choice=0;choice<=GraphicsPreviewOptions.DUST;++choice) {
+            if(choice==GraphicsPreviewOptions.MIST) continue;
             mistOff=GraphicsPreviewOptions.withChoice(mistOff,choice,GraphicsPreviewOptions.value(draft,choice));
             assertFalse("every other live edit preserves explicit Mist Off: "+choice,mistOff.mistEnabled);
         }
@@ -129,10 +130,22 @@ public final class GraphicsPreviewOptionsTest {
         assertEquals(2,GraphicsPreviewOptions.camera(GraphicsPreviewOptions.GLASS));
         assertArrayEquals(new int[]{0,1},GraphicsPreviewOptions.choices(confirmed,GraphicsPreviewOptions.GLASS));
         assertEquals(0,GraphicsPreviewOptions.value(draft,GraphicsPreviewOptions.GLASS));
+        assertArrayEquals(new int[]{0,1,2},GraphicsPreviewOptions.choices(confirmed,GraphicsPreviewOptions.DUST));
+        assertEquals("Indoor dust",GraphicsPreviewOptions.name(GraphicsPreviewOptions.DUST));
+        assertEquals("Standard",GraphicsPreviewOptions.dustLabel(2));
+        GraphicsPreferences.Values standardDust=GraphicsPreviewOptions.withChoice(confirmed,GraphicsPreviewOptions.DUST,2);
+        assertEquals(2,standardDust.dust); assertEquals(0,confirmed.dust);
+        for(int choice=0;choice<=GraphicsPreviewOptions.DUST;++choice) {
+            if(choice==GraphicsPreviewOptions.DUST) continue;
+            standardDust=GraphicsPreviewOptions.withChoice(standardDust,choice,GraphicsPreviewOptions.value(draft,choice));
+            assertEquals("other live edits preserve Standard dust",2,standardDust.dust);
+        }
+        assertEquals("Off",GraphicsPreviewOptions.dustLabel(0));
+        assertEquals("Low",GraphicsPreviewOptions.dustLabel(1));
     }
 
     @Test public void invalidChoicesAndValuesCannotProduceLiveTuple() {
-        for (int[] input : new int[][]{{7,0},{6,-1},{6,2},{0,49},{0,101},{1,-1},{1,3},{2,-1},{2,3},{3,14},{3,61},{4,-1},{4,2},{5,-1},{5,3}}) {
+        for (int[] input : new int[][]{{8,0},{6,-1},{6,2},{0,49},{0,101},{1,-1},{1,3},{2,-1},{2,3},{3,14},{3,61},{4,-1},{4,2},{5,-1},{5,3},{7,-1},{7,3}}) {
             try { GraphicsPreviewOptions.withChoice(confirmed,input[0],input[1]); fail("invalid choice/value accepted"); }
             catch (IllegalArgumentException expected) { }
         }
@@ -193,10 +206,17 @@ public final class GraphicsPreviewOptionsTest {
         assertFalse(GraphicsPreviewOptions.presented(java.util.Arrays.copyOf(ack,22),7,42,selected));
         assertFalse(GraphicsPreviewOptions.presented(ack,8,42,selected));
         assertFalse(GraphicsPreviewOptions.presented(ack,7,43,selected));
+        GraphicsPreferences.Values standardDust=new GraphicsPreferences.Values(68,0,1,15,true,1,true,2);
+        ack[5]=1; ack[17]=1; ack[22]=1; ack[23]=1;
+        assertFalse("a zero-dust frame cannot acknowledge Standard",GraphicsPreviewOptions.presented(ack,7,42,standardDust));
+        ack[26]=2;
+        assertFalse("uploaded dust without requested tuple update cannot acknowledge Standard",GraphicsPreviewOptions.presented(ack,7,42,standardDust));
+        ack[27]=2;
+        assertTrue("exact effective and requested dust quality enables Use/Keep",GraphicsPreviewOptions.presented(ack,7,42,standardDust));
     }
 
     private long[] snapshot() {
-        return new long[]{42,7,0,68,0,1,15,245,435,360,640,0,1,1,0,68,0,1,15,1,1,1,1,1,1,1};
+        return new long[]{42,7,0,68,0,1,15,245,435,360,640,0,1,1,0,68,0,1,15,1,1,1,1,1,1,1,0,0};
     }
 
     private MainActivity livePreviewFixture() throws Exception {

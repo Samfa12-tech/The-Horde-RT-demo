@@ -200,7 +200,8 @@ bool ValidSceneFrame(const RtSceneFrameEvidence& scene,
     }
     if ((scene.shadowQuality && !ValidRtShadowQualityEvidence(*scene.shadowQuality, scene.pipeline.dielectricQuality)) ||
         (scene.fireQuality && !ValidRtFireQualityEvidence(*scene.fireQuality)) ||
-        (scene.fireLighting && !ValidRtFireLightingEvidence(*scene.fireLighting)))
+        (scene.fireLighting && !ValidRtFireLightingEvidence(*scene.fireLighting)) ||
+        (scene.actualUploadedDustQuality && !horde::graphics::ValidDustQuality(*scene.actualUploadedDustQuality)))
     {
         error = RtEvidenceValidationError::InconsistentIdentity;
         return false;
@@ -224,7 +225,8 @@ bool ValidRecordedScene(const RtRecordedSceneEvidence& scene,
     }
     if ((scene.shadowQuality && !ValidRtShadowQualityEvidence(*scene.shadowQuality, scene.pipeline.dielectricQuality)) ||
         (scene.fireQuality && !ValidRtFireQualityEvidence(*scene.fireQuality)) ||
-        (scene.fireLighting && !ValidRtFireLightingEvidence(*scene.fireLighting)))
+        (scene.fireLighting && !ValidRtFireLightingEvidence(*scene.fireLighting)) ||
+        (scene.actualUploadedDustQuality && !horde::graphics::ValidDustQuality(*scene.actualUploadedDustQuality)))
     {
         error = RtEvidenceValidationError::InconsistentIdentity;
         return false;
@@ -1058,6 +1060,24 @@ std::optional<bool> CurrentCompletedMistEnabled(const RtLifecyclePublishedState&
     return completed.scene.actualUploadedMistEnabled;
 }
 
+std::optional<horde::graphics::DustQuality> CurrentCompletedDustQuality(const RtLifecyclePublishedState& publication) noexcept
+{
+    const auto& completed = publication.completedEvidence;
+    const auto& submitted = completed.identity.submitted;
+    RtEvidenceValidationError error{};
+    if (!publication.running || !publication.presented || !publication.hasCompletedEvidence ||
+        publication.sceneEpoch == 0u || publication.measurementGeneration == 0u ||
+        submitted.frame.sceneEpoch != publication.sceneEpoch ||
+        submitted.frame.measurementGeneration != publication.measurementGeneration ||
+        submitted.submissionSerial == 0u || completed.identity.completionSerial == 0u ||
+        completed.presentation.outcome != RtPresentationOutcome::Presented ||
+        completed.presentation.lastSuccessfulPresentSubmissionSerial != submitted.submissionSerial ||
+        !ValidateRtPerformanceEvidence(completed, error)) return std::nullopt;
+    const auto dust=completed.scene.actualUploadedDustQuality;
+    if (dust && !horde::graphics::ValidDustQuality(*dust)) return std::nullopt;
+    return dust;
+}
+
 bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& snapshot,
                                         std::string& output,
                                         RtEvidenceValidationError& error)
@@ -1122,6 +1142,8 @@ bool SerializeRtPerformanceEvidenceJson(const RtPerformanceEvidenceSnapshot& sna
              << ",\"reflectedVolumeSteps\":" << std::min(quality.volumeSteps, quality.reflectionSamples * 4u) << '}';
     }
 
+    if (snapshot.scene.actualUploadedDustQuality.has_value())
+        json << ",\"actualUploadedDustQuality\":" << static_cast<unsigned>(*snapshot.scene.actualUploadedDustQuality);
     if (snapshot.scene.actualUploadedMistEnabled.has_value())
         json << ",\"actualUploadedMistEnabled\":" << (*snapshot.scene.actualUploadedMistEnabled ? "true" : "false");
     if (snapshot.scene.fireLighting)
@@ -1712,6 +1734,7 @@ bool RtEvidenceLifecycle::Complete(const RtSubmittedFrameIdentity& submitted,
     candidate.scene.fireQuality = slot.scene.fireQuality;
     candidate.scene.fireLighting = slot.scene.fireLighting;
     candidate.scene.actualUploadedMistEnabled = slot.scene.actualUploadedMistEnabled;
+    candidate.scene.actualUploadedDustQuality = slot.scene.actualUploadedDustQuality;
     candidate.scene.player = slot.scene.player;
     if (diagnostic.status == RtSampleStatus::Valid)
     {

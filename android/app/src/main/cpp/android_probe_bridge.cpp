@@ -587,8 +587,11 @@ void PublishGraphicsApplied(SwapchainContext& context, const bool success, const
     snapshot.effective = context.graphicsSettings;
     snapshot.effective.glassEnabled = context.rtScene.GlassEnabled();
     const auto completedMist = horde::telemetry::CurrentCompletedMistEnabled(context.rtFrameEvidence.PublishedStateByValue());
+    const auto completedDust = horde::telemetry::CurrentCompletedDustQuality(context.rtFrameEvidence.PublishedStateByValue());
     const auto uploadedMist = context.rtScene.UploadedMistEnabled();
+    const auto uploadedDust = context.rtScene.UploadedDustQuality();
     snapshot.effective.mistEnabled = completedMist.value_or(true);
+    snapshot.effective.dustQuality = uploadedDust.value_or(static_cast<horde::graphics::DustQuality>(255u));
     const bool uploadedQuality = context.rtScene.HasUploadedQualityControls();
     if (uploadedQuality)
     {
@@ -614,7 +617,9 @@ void PublishGraphicsApplied(SwapchainContext& context, const bool success, const
     snapshot.reasons = context.graphicsReason | (context.previewTransitionFailed ?
         horde::graphics::GraphicsReason::ResourceFailure : horde::graphics::GraphicsReason::None);
     snapshot.rtPresented = presented && uploadedQuality && completedMist && uploadedMist &&
-        completedMist == uploadedMist && *completedMist == context.graphicsSettings.mistEnabled;
+        completedMist == uploadedMist && *completedMist == context.graphicsSettings.mistEnabled &&
+        completedDust && uploadedDust && completedDust == uploadedDust &&
+        *completedDust == context.graphicsSettings.dustQuality;
     std::lock_guard lock(gGraphicsMutex);
     if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration)) return;
     if ((gPreviewControls.generation == 0u || gPreviewControls.generation == snapshot.lifecycleGeneration) &&
@@ -1199,6 +1204,8 @@ ReadBenchmarkSummaryConfigurationOnOwner(const SwapchainContext& context) noexce
             static_cast<horde::telemetry::RtShadowMode>(quality[0]), quality[1], quality[2], 0u};
         configuration.actualUploadedMistEnabled = context.rtScene.UploadedMistEnabled();
         if (!configuration.actualUploadedMistEnabled) return {};
+        configuration.actualUploadedDustQuality = context.rtScene.UploadedDustQuality();
+        if (!configuration.actualUploadedDustQuality) return {};
         const auto fireQuality = context.rtScene.UploadedFireQuality();
         horde::telemetry::RtFireQuality fireTier = horde::telemetry::RtFireQuality::Mobile;
         switch (fireQuality)
@@ -3712,6 +3719,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         gpuTimingRecording = evidenceFrame && context.gpuFrameTimingEnabled &&
             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);
         context.rtScene.SetMistEnabled(context.graphicsSettings.mistEnabled);
+        context.rtScene.SetDustQuality(context.graphicsSettings.dustQuality);
         if (!context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
                                                 context.swapchainImages[imageIndex],
                                                 context.swapchainImageLayouts[imageIndex],
@@ -5403,13 +5411,14 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setSimulationPaused(JNIEnv*, jclass,
 
 namespace
 {
-horde::graphics::GraphicsSettings GraphicsTuple(const jint scale, const jint water, const jint fire, const jint cap, const jboolean glass, const jint shadow, const jboolean mist)
+horde::graphics::GraphicsSettings GraphicsTuple(const jint scale, const jint water, const jint fire, const jint cap, const jboolean glass, const jint shadow, const jboolean mist, const jint dust)
 {
-    if (water < 0 || water > 2 || fire < 0 || fire > 2 || shadow < 0 || shadow > 2)
+    if (water < 0 || water > 2 || fire < 0 || fire > 2 || shadow < 0 || shadow > 2 || dust < 0 || dust > 2)
         return {0}; // Reject before narrowing enum storage.
     return {scale, static_cast<horde::graphics::WaterQuality>(water),
         static_cast<horde::graphics::FireDetail>(fire), cap, glass == JNI_TRUE,
-        static_cast<horde::graphics::ShadowQuality>(shadow), mist == JNI_TRUE};
+        static_cast<horde::graphics::ShadowQuality>(shadow), mist == JNI_TRUE,
+        static_cast<horde::graphics::DustQuality>(dust)};
 }
 void PublishGraphicsCommandLocked(const horde::graphics::GraphicsCommand& command,
                                  const std::uint64_t receivedNs)
@@ -5515,10 +5524,10 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getKeeperRevealTitleOpacity(JNIEnv*,
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_setGraphicsSettings(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist)
+Java_com_samfa12_hordelanternrt_ProbeBridge_setGraphicsSettings(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist, jint dust)
 {
     const auto receivedNs = GraphicsSteadyNs();
-    const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow, mist);
+    const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow, mist, dust);
     if (!horde::graphics::ValidGraphicsSettings(settings)) return;
     std::lock_guard lock(gGraphicsMutex);
     PublishGraphicsCommandLocked({gGraphicsSerial + 1u, 0u,
@@ -5526,9 +5535,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_setGraphicsSettings(JNIEnv*, jclass,
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_samfa12_hordelanternrt_ProbeBridge_beginGraphicsEdit(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist)
+Java_com_samfa12_hordelanternrt_ProbeBridge_beginGraphicsEdit(JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist, jint dust)
 {
-    const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow, mist);
+    const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow, mist, dust);
     if (!horde::graphics::ValidGraphicsSettings(settings)) return;
     std::lock_guard lock(gGraphicsMutex);
     gGraphicsEdit.emplace(settings, gGraphicsSerial);
@@ -5536,12 +5545,12 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_beginGraphicsEdit(JNIEnv*, jclass, j
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_applyGraphicsSettings(
-    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist, jlong generation)
+    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist, jint dust, jlong generation)
 {
     const auto receivedNs = GraphicsSteadyNs();
     if (!gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation))) return 0;
     std::lock_guard lock(gGraphicsMutex);
-    if (!gGraphicsEdit || !gGraphicsEdit->Stage(GraphicsTuple(scale, water, fire, cap, glass, shadow, mist))) return 0;
+    if (!gGraphicsEdit || !gGraphicsEdit->Stage(GraphicsTuple(scale, water, fire, cap, glass, shadow, mist, dust))) return 0;
     const auto command = gGraphicsEdit->RequestApply(static_cast<std::uint64_t>(generation));
     if (!command) return 0;
     PublishGraphicsCommandLocked(*command, receivedNs);
@@ -5550,10 +5559,10 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_applyGraphicsSettings(
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_compareGraphicsPreview(
-    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist, jlong generation)
+    JNIEnv*, jclass, jint scale, jint water, jint fire, jint cap, jboolean glass, jint shadow, jboolean mist, jint dust, jlong generation)
 {
     const auto receivedNs = GraphicsSteadyNs();
-    const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow, mist);
+    const auto settings = GraphicsTuple(scale, water, fire, cap, glass, shadow, mist, dust);
     if (!horde::graphics::ValidGraphicsSettings(settings) ||
         !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation))) return 0;
     std::lock_guard lock(gGraphicsMutex);
@@ -5623,7 +5632,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getGraphicsSnapshot(JNIEnv* env, jcl
         static_cast<jlong>(a.requested.fireDetail), a.requested.previewFrameCap, static_cast<jlong>(a.scene),
         a.effective.glassEnabled ? 1 : 0, a.requested.glassEnabled ? 1 : 0,
         static_cast<jlong>(a.effective.shadowQuality), static_cast<jlong>(a.requested.shadowQuality),
-        a.effective.mistEnabled ? 1 : 0, a.requested.mistEnabled ? 1 : 0};
+        a.effective.mistEnabled ? 1 : 0, a.requested.mistEnabled ? 1 : 0,
+        static_cast<jlong>(a.effective.dustQuality), static_cast<jlong>(a.requested.dustQuality)};
     auto result = env->NewLongArray(static_cast<jsize>(std::size(values)));
     if (result) env->SetLongArrayRegion(result, 0, static_cast<jsize>(std::size(values)), values);
     return result;

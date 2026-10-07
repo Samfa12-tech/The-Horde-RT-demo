@@ -192,5 +192,22 @@ int main()
               "mixed finite modes never admit a MistOff Showcase capture");
     check(!ParseWindowsMistCaptureLaunch(capture, true).off && ParseWindowsMistCaptureLaunch(capture, true).error.empty(),
           "ordinary historical Showcase capture preserves MistOn without new flag");
+    const std::array<std::wstring_view, 4> dustLow{L"--capture-showcase", L"reports", L"--capture-dust", L"low"};
+    const std::array<std::wstring_view, 4> dustStandard{L"--capture-showcase", L"reports", L"--capture-dust", L"standard"};
+    const std::array<std::wstring_view, 4> dustOff{L"--capture-showcase", L"reports", L"--capture-dust", L"off"};
+    check(ParseWindowsMistCaptureLaunch(dustLow, true).dustQuality == horde::graphics::DustQuality::Low &&
+          ParseWindowsMistCaptureLaunch(dustStandard, true).dustQuality == horde::graphics::DustQuality::Standard &&
+          ParseWindowsMistCaptureLaunch(dustOff, true).dustQuality == horde::graphics::DustQuality::Off,
+          "Debug Showcase accepts explicit Off/Low/Standard dust capture choices");
+    check(!ParseWindowsMistCaptureLaunch(dustLow, false).error.empty() &&
+          !ParseWindowsMistCaptureLaunch(std::array<std::wstring_view, 2>{L"--capture-dust", L"low"}, true).error.empty() &&
+          !ParseWindowsMistCaptureLaunch(std::array<std::wstring_view, 4>{L"--capture-showcase", L"reports", L"--capture-dust", L"high"}, true).error.empty(),
+          "dust capture rejects Release, orphaned, and unknown values before renderer startup");
+    check(ParseWindowsMistCaptureLaunch(std::array<std::wstring_view, 4>{L"--validate-native-motion", L"--motion-scenario", L"skeleton", L"--capture-dust"}, true).error.size() > 0,
+          "native-motion dust option still requires an explicit value");
+    check(ParseWindowsMistCaptureLaunch(std::array<std::wstring_view, 6>{L"--validate-native-motion", L"--motion-scenario", L"skeleton", L"--capture-dust", L"low", L"reports"}, true).dustQuality == horde::graphics::DustQuality::Low,
+          "Debug native-motion capture admits explicit dust choice");
+    check(!ParseWindowsMistCaptureLaunch(std::array<std::wstring_view, 6>{L"--capture-showcase", L"reports", L"--capture-dust", L"low", L"--capture-dust", L"off"}, true).error.empty(),
+          "duplicate dust capture option rejects");
     return passed ? 0 : 1;
 }

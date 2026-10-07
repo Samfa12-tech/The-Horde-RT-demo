@@ -103,6 +103,7 @@ struct CompletedOwners
                     s.scene.shadowQuality = uploaded->shadowQuality;
                     s.scene.fireQuality = uploaded->uploadedFireQuality;
                     s.scene.actualUploadedMistEnabled = uploaded->actualUploadedMistEnabled;
+                    s.scene.actualUploadedDustQuality = uploaded->actualUploadedDustQuality;
                     if (middleMistChange && serial == kLanternBenchmarkFramesPerLap / 2u)
                         s.scene.actualUploadedMistEnabled = !uploaded->actualUploadedMistEnabled.value_or(true);
                     if (middleMistUnavailable && serial == kLanternBenchmarkFramesPerLap / 2u)
@@ -351,6 +352,41 @@ void TestUploadedQualitySummary()
         "legacy absent uploaded controls remain absent without fabricated Current budgets");
 }
 
+void TestOwningDustSummary()
+{
+    using horde::graphics::DustQuality;
+    for (const auto quality : {DustQuality::Off, DustQuality::Low, DustQuality::Standard})
+    {
+        auto configuration = Configuration();
+        configuration.actualUploadedDustQuality = quality;
+        CompletedOwners owners;
+        owners.Run(RtSampleStatus::Valid, false, false, false, &configuration);
+        const auto frozen = CaptureBenchmarkSummary(owners.benchmark, owners.evidence,
+            configuration, configuration, kRunUuid);
+        const auto prepared = PrepareBenchmarkSummaryReport(frozen, Approval());
+        const auto field = std::string("\"actualUploadedDustQuality\":") + std::to_string(static_cast<unsigned>(quality));
+        Check(frozen.IsReady() && frozen.Data().configuration.actualUploadedDustQuality == quality &&
+            prepared.IsReady() && prepared.Json().find(field) != std::string_view::npos,
+            "summary retains actual owning Dust tier including Off");
+        auto changed = configuration;
+        changed.actualUploadedDustQuality = quality == DustQuality::Off ? DustQuality::Low : DustQuality::Off;
+        Check(!CaptureBenchmarkSummary(owners.benchmark, owners.evidence, configuration, changed, kRunUuid).IsReady(),
+            "different start/end Dust tier cannot enter a matched summary");
+        changed.actualUploadedDustQuality.reset();
+        Check(!CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
+            "absent Dust configuration cannot replace measured owning rows");
+        changed.actualUploadedDustQuality = static_cast<DustQuality>(3u);
+        Check(!CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
+            "invalid Dust configuration rejected");
+    }
+    auto legacy = Configuration();
+    CompletedOwners owners; owners.Run();
+    const auto report = PrepareBenchmarkSummaryReport(CaptureBenchmarkSummary(owners.benchmark,
+        owners.evidence, legacy, legacy, kRunUuid), Approval());
+    Check(report.IsReady() && report.Json().find("actualUploadedDustQuality") == std::string_view::npos,
+        "legacy missing Dust state stays absent rather than fabricated Off");
+}
+
 void TestOwningMistSummary()
 {
     for (const bool enabled : {true, false})
@@ -424,6 +460,7 @@ int main(const int argc, const char* const* const argv)
     TestCompletedFreezePrivacyAndPopulation();
     TestInvalidOwnersScopeAndIdentity();
     TestUploadedQualitySummary();
+    TestOwningDustSummary();
     TestOwningMistSummary();
     TestUnavailableHardwarePrivacyAndIdentityRetry();
     return passed ? 0 : 1;

@@ -23,6 +23,7 @@ bool SameConfiguration(const BenchmarkSummaryConfiguration& a, const BenchmarkSu
         a.fire == b.fire && a.shadowQuality == b.shadowQuality &&
         a.uploadedFireQuality == b.uploadedFireQuality &&
         a.actualUploadedMistEnabled == b.actualUploadedMistEnabled &&
+        a.actualUploadedDustQuality == b.actualUploadedDustQuality &&
         a.glassEnabled == b.glassEnabled && a.sceneEpoch == b.sceneEpoch &&
         a.measurementGeneration == b.measurementGeneration && x.buildIdentity == y.buildIdentity &&
         x.shaderIdentity == y.shaderIdentity && x.executionBackend == y.executionBackend &&
@@ -58,6 +59,7 @@ bool ValidConfiguration(const BenchmarkSummaryConfiguration& c)
         (!c.uploadedFireQuality || (ValidRtFireQualityEvidence(*c.uploadedFireQuality) &&
             static_cast<unsigned>(c.uploadedFireQuality->quality) == static_cast<unsigned>(c.fire))) &&
         (c.fire != BenchmarkSummaryFireQuality::Low || c.uploadedFireQuality.has_value()) &&
+        (!c.actualUploadedDustQuality || horde::graphics::ValidDustQuality(*c.actualUploadedDustQuality)) &&
         (m.executionBackend == "RayTracingPipeline" || m.executionBackend == "RayQueryCompute") &&
         (m.presentMode == "FIFO" || m.presentMode == "MAILBOX" || m.presentMode == "IMMEDIATE" ||
          m.presentMode == "FIFO_RELAXED") && scale &&
@@ -171,6 +173,7 @@ FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBe
             row.presentationOutcome != RtPresentationOutcome::Presented ||
             row.shadowQuality != completion.shadowQuality || row.fireQuality != completion.uploadedFireQuality ||
             row.actualUploadedMistEnabled != completion.actualUploadedMistEnabled ||
+            row.actualUploadedDustQuality != completion.actualUploadedDustQuality ||
             !std::isfinite(frame.frameTimeMs) || frame.frameTimeMs <= 0.0)
         { result.status_ = BenchmarkSummaryStatus::MismatchedPopulation; return result; }
     }
@@ -183,6 +186,7 @@ FrozenBenchmarkSummary CaptureBenchmarkSummary(const horde::gameplay::ShowcaseBe
     data.configuration.shadowQuality = completion.shadowQuality;
     data.configuration.uploadedFireQuality = completion.uploadedFireQuality;
     data.configuration.actualUploadedMistEnabled = completion.actualUploadedMistEnabled;
+    data.configuration.actualUploadedDustQuality = completion.actualUploadedDustQuality;
     data.configuration.glassEnabled = completion.glassEnabled;
     data.configuration.sceneEpoch = completion.sceneEpoch;
     data.configuration.measurementGeneration = completion.measurementGeneration;

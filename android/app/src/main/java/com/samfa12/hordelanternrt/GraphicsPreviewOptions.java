@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 /** Live preview choice/acknowledgement policy. No persistence or JNI side effects. */
 final class GraphicsPreviewOptions {
-    static final int RESOLUTION = 0, WATER = 1, FIRE = 2, CAP = 3, GLASS = 4, SHADOW = 5, MIST = 6;
+    static final int RESOLUTION = 0, WATER = 1, FIRE = 2, CAP = 3, GLASS = 4, SHADOW = 5, MIST = 6, DUST = 7;
     static String name(int choice) {
         switch (choice) {
             case WATER: return "Water";
@@ -13,6 +13,7 @@ final class GraphicsPreviewOptions {
             case GLASS: return "Glass";
             case SHADOW: return "Shadows";
             case MIST: return "Mist";
+            case DUST: return "Indoor dust";
             default: return "Resolution";
         }
     }
@@ -34,24 +35,29 @@ final class GraphicsPreviewOptions {
             case GLASS: return current.glassEnabled ? 1 : 0;
             case SHADOW: return current.shadow;
             case MIST: return current.mistEnabled ? 1 : 0;
+            case DUST: return current.dust;
             default: throw new IllegalArgumentException("Unknown live graphics choice");
         }
     }
     static GraphicsPreferences.Values withChoice(GraphicsPreferences.Values current, int choice, int value) {
         final GraphicsPreferences.Values result;
         switch (choice) {
-            case RESOLUTION: result = new GraphicsPreferences.Values(value, current.water, current.fire, current.cap, current.glassEnabled, current.shadow, current.mistEnabled); break;
-            case WATER: result = new GraphicsPreferences.Values(current.scale, value, current.fire, current.cap, current.glassEnabled, current.shadow, current.mistEnabled); break;
-            case FIRE: result = new GraphicsPreferences.Values(current.scale, current.water, value, current.cap, current.glassEnabled, current.shadow, current.mistEnabled); break;
-            case CAP: result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, value, current.glassEnabled, current.shadow, current.mistEnabled); break;
+            case RESOLUTION: result = new GraphicsPreferences.Values(value, current.water, current.fire, current.cap, current.glassEnabled, current.shadow, current.mistEnabled, current.dust); break;
+            case WATER: result = new GraphicsPreferences.Values(current.scale, value, current.fire, current.cap, current.glassEnabled, current.shadow, current.mistEnabled, current.dust); break;
+            case FIRE: result = new GraphicsPreferences.Values(current.scale, current.water, value, current.cap, current.glassEnabled, current.shadow, current.mistEnabled, current.dust); break;
+            case CAP: result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, value, current.glassEnabled, current.shadow, current.mistEnabled, current.dust); break;
             case GLASS:
                 if (value != 0 && value != 1) throw new IllegalArgumentException("Invalid glass choice");
-                result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap, value == 1, current.shadow, current.mistEnabled); break;
-            case SHADOW: result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap, current.glassEnabled, value, current.mistEnabled); break;
+                result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap, value == 1, current.shadow, current.mistEnabled, current.dust); break;
+            case SHADOW: result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap, current.glassEnabled, value, current.mistEnabled, current.dust); break;
             case MIST:
                 if (value != 0 && value != 1) throw new IllegalArgumentException("Invalid mist choice");
                 result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap,
-                        current.glassEnabled, current.shadow, value == 1); break;
+                        current.glassEnabled, current.shadow, value == 1, current.dust); break;
+            case DUST:
+                if (value < 0 || value > 2) throw new IllegalArgumentException("Invalid indoor dust choice");
+                result = new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap,
+                        current.glassEnabled, current.shadow, current.mistEnabled, value); break;
             default: throw new IllegalArgumentException("Unknown live graphics choice");
         }
         if (!result.valid()) throw new IllegalArgumentException("Invalid live graphics value");
@@ -69,6 +75,7 @@ final class GraphicsPreviewOptions {
             case SHADOW: return new int[]{GraphicsPreferences.SHADOW_LOWER,GraphicsPreferences.SHADOW_CURRENT,GraphicsPreferences.SHADOW_HIGHER};
             case GLASS:
             case MIST: return new int[]{0,1};
+            case DUST: return new int[]{0,1,2};
             case CAP: presets = new int[]{15,30,60}; break;
             default: throw new IllegalArgumentException("Unknown live graphics choice");
         }
@@ -98,6 +105,14 @@ final class GraphicsPreviewOptions {
             case GraphicsPreferences.SHADOW_CURRENT: return "Current";
             case GraphicsPreferences.SHADOW_HIGHER: return "Higher";
             default: throw new IllegalArgumentException("Unknown shadow quality");
+        }
+    }
+    static String dustLabel(int value) {
+        switch (value) {
+            case 0: return "Off";
+            case 1: return "Low";
+            case 2: return "Standard";
+            default: throw new IllegalArgumentException("Unknown indoor dust quality");
         }
     }
     static boolean presented(long[] snapshot, long generation, long serial, GraphicsPreferences.Values selected) {

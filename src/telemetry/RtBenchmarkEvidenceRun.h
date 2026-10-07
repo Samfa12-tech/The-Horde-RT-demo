@@ -1,4 +1,5 @@
 #pragma once
+#include "graphics/DustQuality.h"
 
 #include <array>
 #include <cstddef>
@@ -94,6 +95,7 @@ struct RtExpectedFrameRecord
     std::optional<RtFireLightingEvidence> fireLighting{};
     // Owning successful upload only; absence is historical/unavailable, false is Off.
     std::optional<bool> actualUploadedMistEnabled{};
+    std::optional<horde::graphics::DustQuality> actualUploadedDustQuality{};
     // Copied from the validated owning completion, never the latest observer.
     // An unavailable/Shipping sample is distinct from an available all-zero one.
     bool hasDiagnosticCounters = false;

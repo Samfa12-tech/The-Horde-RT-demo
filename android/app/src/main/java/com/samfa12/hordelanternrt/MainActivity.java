@@ -118,6 +118,7 @@ public class MainActivity extends Activity {
     private static final String EXTRA_DEBUG_MOTION = "horde.debug.motion";
     private static final String EXTRA_DEBUG_MOTION_ID = "horde.debug.motion_id";
     private static final String EXTRA_DEBUG_SCALE = "horde.debug.scale";
+    private static final String EXTRA_DEBUG_DUST = "horde.debug.dust";
     private static final String EXTRA_DEBUG_AUTOSTART = "horde.debug.autostart";
     private static final String EXTRA_DEBUG_OVERLAY = "horde.debug.overlay";
     private static final String EXTRA_DEBUG_GPU_TIMING = "horde.debug.gpu_timing";
@@ -313,7 +314,7 @@ public class MainActivity extends Activity {
     private GraphicsPreferences.Values graphicsRestoreDraftAfterPreview;
     private int graphicsPreviewChoice = GraphicsPreviewOptions.RESOLUTION;
     private boolean graphicsPreviewImageOnly;
-    private final Button[] graphicsOptionButtons = new Button[7];
+    private final Button[] graphicsOptionButtons = new Button[8];
     private final GraphicsViewportState graphicsPageViewport = new GraphicsViewportState("graphics-page");
     private final GraphicsViewportState graphicsPreviewViewport = new GraphicsViewportState("graphics-preview");
     private Button graphicsDetailsButton, graphicsImageButton, graphicsControlsButton;
@@ -2423,7 +2424,7 @@ public class MainActivity extends Activity {
     }
 
     private void setNativeGraphics(GraphicsPreferences.Values values) {
-        ProbeBridge.setGraphicsSettings(values.scale, values.water, values.fire, values.cap, values.glassEnabled, values.shadow, values.mistEnabled);
+        ProbeBridge.setGraphicsSettings(values.scale, values.water, values.fire, values.cap, values.glassEnabled, values.shadow, values.mistEnabled, values.dust);
     }
 
     private void openGraphics() {
@@ -2437,7 +2438,7 @@ public class MainActivity extends Activity {
         graphicsPreviewImageOnly = false;
         graphicsBusy = false;
         ProbeBridge.beginGraphicsEdit(graphicsConfirmed.scale, graphicsConfirmed.water,
-                graphicsConfirmed.fire, graphicsConfirmed.cap, graphicsConfirmed.glassEnabled, graphicsConfirmed.shadow, graphicsConfirmed.mistEnabled);
+                graphicsConfirmed.fire, graphicsConfirmed.cap, graphicsConfirmed.glassEnabled, graphicsConfirmed.shadow, graphicsConfirmed.mistEnabled, graphicsConfirmed.dust);
         graphicsVisible = true;
         graphicsSceneRestoring = false;
         graphicsPreviewWanted = false;
@@ -2525,6 +2526,11 @@ public class MainActivity extends Activity {
         addGraphicsButton(panel, "Preview shadows", () -> openGraphicsPreview(GraphicsPreviewOptions.SHADOW));
         addGraphicsButton(panel, "Mist: " + (graphicsDraft.mistEnabled ? "On" : "Off"), () -> {
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.MIST, graphicsDraft.mistEnabled ? 0 : 1);
+            showGraphicsPage();
+        });
+        addGraphicsButton(panel, "Indoor dust: " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust), () -> {
+            graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.DUST,
+                    (graphicsDraft.dust + 1) % 3);
             showGraphicsPage();
         });
         addGraphicsButton(panel, "Reset draft to mobile defaults", () -> {
@@ -2689,7 +2695,8 @@ public class MainActivity extends Activity {
         details.setText("Resolution controls RT render scale. Water Off omits water appearance; Mobile uses reduced reflected detail; High adds a reflected scene query. " +
                 "Fire detail changes volume steps while preserving emitters, lights and gameplay. Menu / preview cap controls their frame cap. " +
                 "Glass enables only glass supported by this build; mobile lantern panes remain absent. Shadows select Lower, Current or Higher RT sampling. " +
-                "Mist toggles keeper-room ground mist; fire, smoke and electricity stay enabled. The compact authored preview has no ground mist.\n\n" +
+                "Mist toggles keeper-room ground mist; fire, smoke and electricity stay enabled. The compact authored preview has no ground mist.\n" +
+                "Indoor dust controls the bounded room effect; the preview reports uploaded quality even where no motes are visible.\n\n" +
                 "Changing a choice edits the draft. Use starts a temporary trial only after the RT request is accepted. Keep and save is enabled only after a matching RT frame is presented. " +
                 "Unconfirmed settings restore after 15 visible seconds or when backgrounded. Preview measurements are not full-game performance guarantees." +
                 (graphicsDetailedStatus.isEmpty() ? "" : "\n\nCurrent status\n" + graphicsDetailedStatus));
@@ -2766,7 +2773,7 @@ public class MainActivity extends Activity {
         }
         final long requestNs = SystemClock.elapsedRealtimeNanos();
         final long serial = ProbeBridge.compareGraphicsPreview(values.scale, values.water, values.fire,
-                values.cap, values.glassEnabled, values.shadow, values.mistEnabled, surfaceRequestGeneration);
+                values.cap, values.glassEnabled, values.shadow, values.mistEnabled, values.dust, surfaceRequestGeneration);
         recordGraphicsUiRequest("compare", serial, requestNs);
         if (serial == 0) {
             graphicsLiveChoiceError = "Choice unavailable; choose Restore saved."; return;
@@ -2788,6 +2795,7 @@ public class MainActivity extends Activity {
             case GraphicsPreviewOptions.GLASS: return "Glass: " + (graphicsDraft.glassEnabled ? "On" : "Off");
             case GraphicsPreviewOptions.SHADOW: return "Shadows: " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow);
             case GraphicsPreviewOptions.MIST: return "Mist: " + (graphicsDraft.mistEnabled ? "On" : "Off");
+            case GraphicsPreviewOptions.DUST: return "Indoor dust: " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust);
             default: return "Cap: " + graphicsDraft.cap + " Hz";
         }
     }
@@ -2800,6 +2808,7 @@ public class MainActivity extends Activity {
                     choice == GraphicsPreviewOptions.WATER ? waterName(value) :
                     choice == GraphicsPreviewOptions.FIRE ? GraphicsPreviewOptions.fireLabel(value) :
                     choice == GraphicsPreviewOptions.SHADOW ? GraphicsPreviewOptions.shadowLabel(value) :
+                    choice == GraphicsPreviewOptions.DUST ? GraphicsPreviewOptions.dustLabel(value) :
                     (choice == GraphicsPreviewOptions.GLASS || choice == GraphicsPreviewOptions.MIST) ? (value == 1 ? "On" : "Off") : value + " Hz";
             popup.getMenu().add(0,value,0,label).setCheckable(true)
                     .setChecked(value == GraphicsPreviewOptions.value(graphicsDraft,choice));
@@ -2953,7 +2962,7 @@ public class MainActivity extends Activity {
     private long requestTimedGraphicsApply(GraphicsPreferences.Values values) {
         final long requestNs = SystemClock.elapsedRealtimeNanos();
         final long serial = ProbeBridge.applyGraphicsSettings(values.scale, values.water, values.fire,
-                values.cap, values.glassEnabled, values.shadow, values.mistEnabled, surfaceRequestGeneration);
+                values.cap, values.glassEnabled, values.shadow, values.mistEnabled, values.dust, surfaceRequestGeneration);
         recordGraphicsUiRequest("apply", serial, requestNs);
         return serial;
     }
@@ -3228,7 +3237,7 @@ public class MainActivity extends Activity {
             // A storage failure must also rebase the native session: otherwise
             // a later Back/Revert would restore its unsaved committed candidate.
             ProbeBridge.beginGraphicsEdit(graphicsConfirmed.scale, graphicsConfirmed.water,
-                    graphicsConfirmed.fire, graphicsConfirmed.cap, graphicsConfirmed.glassEnabled, graphicsConfirmed.shadow, graphicsConfirmed.mistEnabled);
+                    graphicsConfirmed.fire, graphicsConfirmed.cap, graphicsConfirmed.glassEnabled, graphicsConfirmed.shadow, graphicsConfirmed.mistEnabled, graphicsConfirmed.dust);
             if (graphicsPreviewWanted) {
                 // Match the actual restored tuple; the original outside draft remains separate.
                 graphicsDraft = graphicsConfirmed;
@@ -3498,7 +3507,7 @@ public class MainActivity extends Activity {
             final double seconds = graphicsPollTime == 0 ? 0 : Math.max(0, now - graphicsPollTime) / 1000.0;
             graphicsPollTime = now;
             final long[] a = ProbeBridge.getGraphicsSnapshot();
-            if (a == null || a.length != 26) { scheduleGraphicsPoll(this); return; }
+            if (a == null || a.length != 28) { scheduleGraphicsPoll(this); return; }
             final boolean presented = GraphicsPreferences.presented(a, surfaceRequestGeneration);
             if (graphicsRecovering && presented && GraphicsPreferences.matchesEffective(a, graphicsConfirmed)) {
                 if (GraphicsPreferences.clearAfterRestore(preferences)) {
@@ -3584,16 +3593,19 @@ public class MainActivity extends Activity {
                         waterName(graphicsDraft.water) + " / fire " + GraphicsPreviewOptions.fireLabel(graphicsDraft.fire) +
                         " / glass " + (graphicsDraft.glassEnabled ? "On" : "Off") +
                         " / shadows " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow) + " / mist " + (graphicsDraft.mistEnabled ? "On" : "Off") +
+                        " / indoor dust " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust) +
                         (presented ? " / planned " + ((a[9] * graphicsDraft.scale + 50) / 100) + " x " +
                         ((a[10] * graphicsDraft.scale + 50) / 100) : " / planned extent unavailable") +
                         "\nSaved: " + (graphicsConfirmed == null ? "unavailable" : graphicsConfirmed.scale + "% / water " + waterName(graphicsConfirmed.water) +
                         " / fire " + GraphicsPreviewOptions.fireLabel(graphicsConfirmed.fire) + " / glass " + (graphicsConfirmed.glassEnabled ? "On" : "Off") +
                         " / shadows " + GraphicsPreviewOptions.shadowLabel(graphicsConfirmed.shadow) + " / mist " + (graphicsConfirmed.mistEnabled ? "On" : "Off") +
+                        " / indoor dust " + GraphicsPreviewOptions.dustLabel(graphicsConfirmed.dust) +
                         " / cap " + graphicsConfirmed.cap + " Hz") +
                         "\nEffective: " + (presented ? a[3] + "% / " + a[7] + " x " + a[8] + " internal / " +
                         a[9] + " x " + a[10] + " output / water " + waterName((int)a[4]) + " / fire " +
                         GraphicsPreviewOptions.fireLabel((int)a[5]) + " / glass " + (a[20] == 1 ? "On" : "Off") +
-                        " / shadows " + GraphicsPreviewOptions.shadowLabel((int)a[22]) + " / mist " + (a[24] == 1 ? "On" : "Off") : "not yet presented") + "\n" +
+                        " / shadows " + GraphicsPreviewOptions.shadowLabel((int)a[22]) + " / mist " + (a[24] == 1 ? "On" : "Off") +
+                        " / indoor dust " + GraphicsPreviewOptions.dustLabel((int)a[26]) : "not yet presented") + "\n" +
                         (presented ? (a[11] == 1 ? getString(R.string.graphics_optics_high) : getString(R.string.graphics_optics_mobile)) :
                         "Optical profile: unavailable until an RT frame presents.") + "\nBackend: " +
                         (presented ? (a[12] == 2 ? "RayQueryCompute" : "RayTracingPipeline") : "not yet presented");
@@ -4619,8 +4631,40 @@ public class MainActivity extends Activity {
             case "layout-a-waterfall-own-hole": return 149;
             case "layout-b-large-skylight": return 150;
             case "layout-e-finale-opening": return 151;
+            case "dust-box-front": return 156;
+            case "dust-box-oblique": return 157;
+            case "dust-ellipsoid": return 158;
+            case "dust-box-wall": return 159;
             default: return -1;
         }
+    }
+
+    static int admittedDebugDustQuality(final Intent intent, final boolean debuggable,
+            final int checkpoint, final boolean capture, final boolean replay,
+            final boolean hasRtLabIntent, final boolean motionRequested) {
+        if (intent == null || !intent.hasExtra(EXTRA_DEBUG_DUST)) return -1;
+        final boolean checkpointCapture = checkpoint >= 0 && capture && !replay && !hasRtLabIntent &&
+                !motionRequested && !intent.hasExtra(EXTRA_BENCHMARK_RUN_ID);
+        final boolean motionValidation = motionRequested && checkpoint < 0 && !capture && !replay &&
+                !hasRtLabIntent && !intent.hasExtra(EXTRA_BENCHMARK_RUN_ID);
+        if (!debuggable || (!checkpointCapture && !motionValidation)) return -1;
+        final Object raw = intent.getExtras() == null ? null : intent.getExtras().get(EXTRA_DEBUG_DUST);
+        if (!(raw instanceof Integer)) return -1;
+        final int quality = (Integer) raw;
+        return quality >= 0 && quality <= 2 ? quality : -1;
+    }
+
+    static GraphicsPreferences.Values withDebugDustQuality(
+            final GraphicsPreferences.Values current, final int dustQuality) {
+        if (current == null || dustQuality < 0 || dustQuality > 2) return null;
+        return new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap,
+                current.glassEnabled, current.shadow, current.mistEnabled, dustQuality);
+    }
+
+    static int admittedDebugRenderScale(final Intent intent) {
+        if (intent == null) return -1;
+        final int scale = intent.getIntExtra(EXTRA_DEBUG_SCALE, -1);
+        return scale >= 50 && scale <= 100 ? scale : -1;
     }
 
     private void consumeDebugAutomationIntent(final Intent intent) {
@@ -4634,10 +4678,7 @@ public class MainActivity extends Activity {
             }
             return;
         }
-        final int requestedScale = intent.getIntExtra(EXTRA_DEBUG_SCALE, -1);
-        if (requestedScale >= 50 && requestedScale <= 100) {
-            ProbeBridge.setRenderScale(requestedScale / 100.0f);
-        }
+        final int requestedScale = admittedDebugRenderScale(intent);
         final int requestedCheckpoint = checkpointId(intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT));
         final boolean requestedReplay = intent.getBooleanExtra(EXTRA_DEBUG_REPLAY, false);
         final boolean requestedCapture = intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false);
@@ -4659,6 +4700,20 @@ public class MainActivity extends Activity {
         final boolean motionRequested = requestedMotion != null && requestedMotionId != null &&
                 requestedCheckpoint < 0 && !requestedReplay && !requestedCapture && !hasRtLabIntent &&
                 !intent.hasExtra(EXTRA_BENCHMARK_RUN_ID);
+        final int requestedDustQuality = admittedDebugDustQuality(intent, true, requestedCheckpoint,
+                requestedCapture, requestedReplay, hasRtLabIntent, motionRequested);
+        if (requestedDustQuality >= 0) {
+            final GraphicsPreferences.Values debugGraphics = withDebugDustQuality(
+                    graphicsConfirmed, requestedDustQuality);
+            if (debugGraphics != null) setNativeGraphics(debugGraphics);
+        } else if (intent.hasExtra(EXTRA_DEBUG_DUST)) {
+            Log.w(TAG, "Rejected debug Dust override outside a valid Debug capture or motion validation.");
+        }
+        // Apply the scalar override after the full Dust tuple: that tuple uses
+        // the saved settings scale and would otherwise erase this request.
+        if (requestedScale >= 50) {
+            ProbeBridge.setRenderScale(requestedScale / 100.0f);
+        }
         if (hasRtLabIntent) {
             debugRtLabAccess = true;
             rtWaterfallWidthPercent = Math.max(25, Math.min(200,
@@ -4786,6 +4841,10 @@ public class MainActivity extends Activity {
             case 144: return new float[]{-1.5707963f, -0.30f};
             case 145: return new float[]{-1.5707963f, -0.32f};
             case 146: return new float[]{-1.5707963f, 0.28f};
+            case 156: return new float[]{0.0f, 0.14f};
+            case 157: return new float[]{0.06f, 0.14f};
+            case 158: return new float[]{-1.5707963f, 0.14f};
+            case 159: return new float[]{1.5707963f, 0.10f};
             default: return null;
         }
     }

@@ -1,4 +1,5 @@
 #pragma once
+#include "graphics/DustQuality.h"
 
 #include <array>
 #include <cstddef>
@@ -355,6 +356,7 @@ struct RtRecordedSceneEvidence
     std::optional<RtFireLightingEvidence> fireLighting{};
     // Owning successful upload only; absence is historical/unavailable, false is Off.
     std::optional<bool> actualUploadedMistEnabled{};
+    std::optional<horde::graphics::DustQuality> actualUploadedDustQuality{};
 };
 
 struct RtSceneFrameEvidence
@@ -369,6 +371,7 @@ struct RtSceneFrameEvidence
     std::optional<RtFireLightingEvidence> fireLighting{};
     // Owning successful upload only; absence is historical/unavailable, false is Off.
     std::optional<bool> actualUploadedMistEnabled{};
+    std::optional<horde::graphics::DustQuality> actualUploadedDustQuality{};
 };
 
 struct RtDiagnosticEvidence
@@ -600,6 +603,9 @@ struct RtLifecyclePublishedState
 
 // Settings admission reads this completed owning fact, then compares it to the
 // current successful scene upload. Requested state is never an acknowledgment.
+[[nodiscard]] std::optional<horde::graphics::DustQuality> CurrentCompletedDustQuality(
+    const RtLifecyclePublishedState& publication) noexcept;
+
 [[nodiscard]] std::optional<bool> CurrentCompletedMistEnabled(
     const RtLifecyclePublishedState& publication) noexcept;
 

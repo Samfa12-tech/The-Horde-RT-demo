@@ -20,6 +20,7 @@ struct IndoorDustZone {
     Vec3 minimum{}, maximum{}, drift{}; // metres and metres/second
     float density = 0.12f, radius = 0.010f, distance = 8.0f;
     DustZoneShape shape = DustZoneShape::Box;
+    bool operator==(const IndoorDustZone&) const = default;
 };
 inline float Dot(Vec3 a, Vec3 b) noexcept { return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
 inline Vec3 Sub(Vec3 a, Vec3 b) noexcept { return {a[0]-b[0],a[1]-b[1],a[2]-b[2]}; }
@@ -67,6 +68,7 @@ inline Vec3 DustPosition(const IndoorDustZone& z, unsigned index, double seconds
 struct DustCamera {
     Vec3 origin{};
     float yaw=0, pitch=0, aspect=1;
+    bool operator==(const DustCamera&) const = default;
 };
 struct alignas(16) DustMote {
     std::array<float,4> positionRadius{};
@@ -146,5 +148,32 @@ inline bool BuildDustFrame(std::span<const IndoorDustZone> zones,horde::graphics
     }
     return true;
 }
+enum class DustUploadDecision { Disabled, Unchanged, Changed, Invalid };
+class DustFrameCache {
+public:
+    void Invalidate() noexcept { valid_=false; }
+    DustUploadDecision Build(std::span<const IndoorDustZone> zones,horde::graphics::DustQuality quality,
+        const DustCamera& camera,double seconds,DustFrame& frame,DustWork& work) noexcept {
+        work={};
+        if(quality==horde::graphics::DustQuality::Off){Invalidate();return DustUploadDecision::Disabled;}
+        if(valid_ && quality==quality_ && camera==camera_ && seconds==seconds_ && zones.size()==count_ &&
+            std::equal(zones.begin(),zones.end(),zones_.begin())) return DustUploadDecision::Unchanged;
+        return BuildDustFrame(zones,quality,camera,seconds,frame,work) ? DustUploadDecision::Changed : DustUploadDecision::Invalid;
+    }
+    // Commit only after successful owning buffer write; failed writes never seed reuse.
+    void Commit(std::span<const IndoorDustZone> zones,horde::graphics::DustQuality quality,
+        const DustCamera& camera,double seconds) noexcept {
+        if(zones.size()>zones_.size()){Invalidate();return;}
+        std::copy(zones.begin(),zones.end(),zones_.begin());count_=zones.size();
+        quality_=quality;camera_=camera;seconds_=seconds;valid_=true;
+    }
+private:
+    bool valid_=false;
+    std::array<IndoorDustZone,kDustZoneCapacity> zones_{};
+    std::size_t count_=0;
+    horde::graphics::DustQuality quality_=horde::graphics::DustQuality::Off;
+    DustCamera camera_{};
+    double seconds_=0;
+};
 static_assert(sizeof(DustMote)==32 && sizeof(DustFrame)==11264);
 }

@@ -27,7 +27,7 @@ motion, invalid data/capacity, overlap admission and camera independence.
 
 ## Integration and acceptance gates
 
-The shared RT prototype is being integrated for Pipeline and RayQueryCompute.
+The shared RT prototype is integrated for Pipeline and RayQueryCompute.
 It uses primary depth, linear radiance composition and actual bounded existing
 light visibility, without particle geometry/lights or a raster pass. Primary-only
 transport is an explicit initial limitation: dust behind glass/water and reflected
@@ -42,9 +42,15 @@ ceilings use exact measured values, with no spare headroom; Shipping still has
 zero atomics/no binding22. Static code growth is not dynamic cost acceptance or a
 phone pipeline/presentation pass.
 
-Settings migration/Use/Keep/Restore, exact owning-submission ACK, lifecycle and
-resource tests, shader freshness, integrated builds, desktop images/motion/cost
-and all affected regression checks are still being completed. Nothing here closes
+The core checkpoint9455c237 has all12 push/PR CI jobs passing in runs
+37692764564 /37692771232. Changed-source Windows compilation and all4 Android
+native ABI assembly pass. Ten affected native tests pass, including cache pause,
+Off, projection, persistence, owning-completion, resources and fixture admission.
+Android unit tests pass182/182 after the Debug inspection extension.
+ABI/shader freshness and remaining exact integration checks are being completed.
+Independent read-only source review found no consequential core/resource/shader
+bug; it is not runtime visual validation. Desktop images/motion/cost and the new
+phone comparison are still pending. Nothing here closes
 owner appearance, Android motion, sustained thermal/performance or mobile
 acceptance. Default Off remains authoritative until those decisions.
 
@@ -56,3 +62,33 @@ independently explained option and may be on with Mist Off.
 Audio/haptic manual revalidation required: NO for this cosmetic slice; gameplay,
 event timing and playback inputs are unchanged. Final 1.6.2 combat/audio/haptic,
 quality-profile, owner and Eric audit gates retain their existing status.
+
+The owner has now returned. Read-only device identification confirms the intended
+SM-S948B / Android16 / API36. New device evidence must name the exact new APK;
+none of the build/source results above is a phone dust presentation or cost pass.
+The immutable renderer candidate will add requested/uploaded/completed Dust tier
+and bounded CPU work to diagnostic stills and actual Dust tier to benchmark rows,
+motion rows and consented summaries. Missing historical Dust evidence remains
+absent, rather than being relabelled Off. Existing consent remains required.
+
+Retained intermediate failures include the obsolete all-quality-bits Mist source
+assertion, old frozen shader snapshot pins and stale compatibility includes.
+Mist now gates only its own bit, with a negative mutation test rejecting use of
+Dust bits. Compatibility artifacts and exact literal snapshot pins were refreshed
+from compiled/validated current shared source. Hard driver/query/Shipping limits
+remain. A manifest check correctly rejected concurrent source edits; it passes
+when edits are stopped. The first Android Debug admission fixture caught mutually
+inconsistent motion/checkpoint flags. Root review then corrected scale ordering:
+Dust override must precede the existing explicit Debug scale request. These
+corrections preserve settings; no phone test is implied by the host results.
+
+All20 unique affected native/contract checks now pass: the10-test integrated
+suite, eight unaffected-by-follow-up ABI/evidence/shader checks, the corrected
+frozen manifest check, and the fully corrected artifact/compatibility check.
+The consented Dust summary regression additionally passes after its metadata
+change. Final Windows build and final4-ABI Android assembly pass from stable
+runtime sources; Android Java182/182 remains current. A wrong per-command newline
+setting produced a false CRLF whitespace report; ordinary repository settings
+are checked before committing. No source content was changed to address that
+invocation error. Exact runtime artifacts and visual evidence follow below when
+sealed; the build checks still do not close sustained/device/owner gates.

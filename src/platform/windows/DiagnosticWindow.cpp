@@ -176,6 +176,7 @@ constexpr int kGraphicsMistButtonId = 207;
 constexpr int kEntryMoreButtonId = 208;
 constexpr int kEntryBackButtonId = 209;
 constexpr int kEntryLoadingIndicatorId = 210;
+constexpr int kGraphicsDustButtonId = 211;
 constexpr int kRtLabButtonId = 127;
 constexpr int kRtLabPanelId = 128;
 constexpr int kRtLabTitleId = 129;
@@ -246,6 +247,7 @@ struct CaptureLaunchOptions
     bool requested = false;
     bool graphicsPreview = false;
     bool mistOff = false;
+    std::optional<horde::graphics::DustQuality> captureDustQuality;
     bool outputResizeValidation = false;
     std::string nativeMotionScenario;
     horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset =
@@ -284,6 +286,8 @@ struct ShowcaseCaptureRecord
     std::string viewmodelGeometrySha256;
     std::string playerWorldBodyGeometryFile;
     std::string playerWorldBodyGeometrySha256;
+    horde::graphics::DustQuality actualUploadedDustQuality = horde::graphics::DustQuality::Off;
+    horde::scene::atmosphere::DustWork dustWork{};
     std::uint32_t width = 0u;
     std::uint32_t height = 0u;
     bool redBlueSwapNormalised = false;
@@ -410,6 +414,7 @@ struct VulkanSurfaceContext
     // Requested intent is distinct from the ready scene's applied geometry policy.
     bool requestedGlassEnabled = true;
     bool requestedMistEnabled = true;
+    horde::graphics::DustQuality requestedDustQuality = horde::graphics::DustQuality::Off;
     bool glassGeometryDirty = false;
     std::uint64_t graphicsSerialFloor = 0u;
     ULONGLONG graphicsConfirmationTick = 0u;
@@ -579,6 +584,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     if (!mistLaunch.error.empty())
     { options.error = mistLaunch.error; LocalFree(arguments); return options; }
     options.mistOff = mistLaunch.off;
+    options.captureDustQuality = mistLaunch.dustQuality;
     const auto motionLaunch = horde::platform::windows::ParseWindowsMotionEvidenceLaunch(argumentViews,
 #if defined(_DEBUG)
         true
@@ -915,6 +921,7 @@ void LoadSettings(VulkanSurfaceContext& context)
     context.graphicsPreviewFrameCap = context.savedGraphics.previewFrameCap;
     context.requestedGlassEnabled = context.savedGraphics.glassEnabled;
     context.requestedMistEnabled = context.savedGraphics.mistEnabled;
+    context.requestedDustQuality = context.savedGraphics.dustQuality;
 }
 
 #if defined(_DEBUG)
@@ -1760,6 +1767,17 @@ horde::graphics::ShadowQuality UploadedGraphicsShadowQuality(const VulkanSurface
     return static_cast<horde::graphics::ShadowQuality>(255u);
 }
 
+const char* GraphicsDustName(const horde::graphics::DustQuality quality)
+{
+    switch (quality)
+    {
+    case horde::graphics::DustQuality::Off: return "OFF";
+    case horde::graphics::DustQuality::Low: return "LOW";
+    case horde::graphics::DustQuality::Standard: return "STANDARD";
+    }
+    return "UNAVAILABLE";
+}
+
 void UpdateSettingsLabels(VulkanSurfaceContext& context)
 {
     const auto graphicsDraft = context.graphicsEdit ? context.graphicsEdit->Draft() : context.savedGraphics;
@@ -1822,12 +1840,14 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
         SetWindowTextA(glass, graphicsDraft.glassEnabled ? "GLASS: ON" : "GLASS: OFF");
     if (HWND mist = GetDlgItem(context.windowHandle, kGraphicsMistButtonId))
         SetWindowTextA(mist, graphicsDraft.mistEnabled ? "MIST: ON" : "MIST: OFF");
+    if (HWND dust = GetDlgItem(context.windowHandle, kGraphicsDustButtonId))
+        SetWindowTextA(dust, (std::string("INDOOR DUST: ") + GraphicsDustName(graphicsDraft.dustQuality)).c_str());
     if (context.graphicsVisible)
     {
         const auto state = context.graphicsEdit->State();
         const bool editable = !context.graphicsSceneRestoring && (state == horde::graphics::GraphicsEditState::Editing ||
             state == horde::graphics::GraphicsEditState::Committed || state == horde::graphics::GraphicsEditState::Failed);
-        for (const int id : {kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsMistButtonId, kWaterQualityButtonId,
+        for (const int id : {kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsMistButtonId, kGraphicsDustButtonId, kWaterQualityButtonId,
                              kRenderScaleSliderId, kGraphicsApplyButtonId, kGraphicsResetButtonId})
             EnableWindow(GetDlgItem(context.windowHandle, id), editable);
         EnableWindow(GetDlgItem(context.windowHandle, kGraphicsConfirmButtonId),
@@ -1845,12 +1865,14 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
             << "\r\nUploaded fire: " << GraphicsFireName(UploadedGraphicsFireDetail(context))
             << "  |  shadows: " << GraphicsShadowName(UploadedGraphicsShadowQuality(context))
             << "  |  mist: " << (context.rtScene.UploadedMistEnabled().has_value() ? (*context.rtScene.UploadedMistEnabled() ? "On" : "Off") : "unavailable")
+            << "  |  indoor dust: " << (context.rtScene.UploadedDustQuality().has_value() ? GraphicsDustName(*context.rtScene.UploadedDustQuality()) : "unavailable")
             << "\r\n" << (mobileOptics ?
                  "Mobile optical build remains fixed; Glass Off removes all pane geometry." :
                  "High optical build: physical panes retained; profile is fixed by this build.")
              << "\r\nWater: Off omits water, Mobile refracts, High adds scene reflections."
              << "\r\nFire: Low/Mobile/High use2/4/10 steps; light strength unchanged."
              << "\r\nShadows: Lower fixed centre1; Current area1; Higher area2/4. Cost unmeasured."
+             << "\r\nIndoor dust: Off/Low/Standard controls bounded visible motes; cost not yet measured."
              << "\r\nApply needs an RT frame. Keep confirms within 15 foreground seconds."
              << "\r\n" << context.graphicsStatus;
         SetWindowTextA(GetDlgItem(context.windowHandle, kGraphicsInfoId), info.str().c_str());
@@ -2116,6 +2138,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle, kSettingsBackButtonId, context.settingsVisible);
     for (const int id : {kWaterQualityButtonId, kRenderScaleLabelId, kRenderScaleSliderId,
                          kGraphicsPresetButtonId, kGraphicsFireButtonId, kGraphicsShadowButtonId, kGraphicsGlassButtonId, kGraphicsMistButtonId, kGraphicsApplyButtonId,
+                         kGraphicsDustButtonId,
                          kGraphicsConfirmButtonId, kGraphicsRevertButtonId, kGraphicsResetButtonId, kGraphicsInfoId,
                          kGraphicsPreviewPauseId, kGraphicsPreviewCameraId, kGraphicsPreviewMotionId,
                          kGraphicsPreviewResetId, kGraphicsPreviewTelemetryId, kGraphicsPreviewGraphId})
@@ -2231,11 +2254,13 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
 
 horde::graphics::GraphicsSettings CurrentGraphicsSettings(const VulkanSurfaceContext& context)
 {
+    const auto uploadedDust = context.rtScene.UploadedDustQuality();
     return {static_cast<int>(std::lround(context.appliedRenderScale * 100.0f)),
         static_cast<horde::graphics::WaterQuality>(context.waterQuality), UploadedGraphicsFireDetail(context),
         context.graphicsPreviewFrameCap, context.rtScene.IsReady() && context.rtScene.GlassEnabled(),
         UploadedGraphicsShadowQuality(context), horde::telemetry::CurrentCompletedMistEnabled(
-            context.rtFrameEvidence.PublishedStateByValue()).value_or(true)};
+            context.rtFrameEvidence.PublishedStateByValue()).value_or(true),
+        uploadedDust.value_or(static_cast<horde::graphics::DustQuality>(255u))};
 }
 
 horde::graphics::GraphicsAppliedSnapshot GraphicsSnapshot(
@@ -2306,6 +2331,7 @@ bool QueueGraphicsCommand(VulkanSurfaceContext& context,
     context.graphicsPreviewFrameCap = command->requested.previewFrameCap;
     context.requestedGlassEnabled = command->requested.glassEnabled;
     context.requestedMistEnabled = command->requested.mistEnabled;
+    context.requestedDustQuality = command->requested.dustQuality;
     context.glassGeometryDirty = !context.rtScene.IsReady() ||
         context.requestedGlassEnabled != context.rtScene.GlassEnabled();
     context.renderScaleDirty = std::abs(context.renderScale - context.appliedRenderScale) > 0.001f;
@@ -2334,9 +2360,12 @@ void FinishGraphicsFrame(VulkanSurfaceContext& context, const bool rtPresented)
         context.rtScene.Profile() == context.graphicsReturnProfile)
     { CloseGraphicsPage(context); return; }
     const auto completedMist = horde::telemetry::CurrentCompletedMistEnabled(context.rtFrameEvidence.PublishedStateByValue());
+    const auto completedDust = horde::telemetry::CurrentCompletedDustQuality(context.rtFrameEvidence.PublishedStateByValue());
     if (context.graphicsCommand && currentResourcesPresented && context.rtScene.IsReady() &&
         completedMist && completedMist == context.rtScene.UploadedMistEnabled() &&
         *completedMist == context.requestedMistEnabled &&
+        completedDust && completedDust == context.rtScene.UploadedDustQuality() &&
+        *completedDust == context.requestedDustQuality &&
         context.rtScene.HasUploadedQualityControls() && context.rtScene.UploadedMistEnabled().has_value() &&
         !context.renderScaleDirty && !context.sceneProfileDirty && !context.glassGeometryDirty)
     {
@@ -3273,6 +3302,7 @@ std::vector<HWND> VisibleControllerMenuControls(const VulkanSurfaceContext& cont
         kGraphicsShadowButtonId,
         kGraphicsGlassButtonId,
         kGraphicsMistButtonId,
+        kGraphicsDustButtonId,
         kGraphicsApplyButtonId,
         kGraphicsConfirmButtonId,
         kGraphicsRevertButtonId,
@@ -4922,6 +4952,7 @@ bool ApplyPendingSceneReplacement(VulkanSurfaceContext& context,
         context.graphicsPreviewFrameCap = previousSettings.previewFrameCap;
         context.requestedGlassEnabled = previousSettings.glassEnabled;
         context.requestedMistEnabled = previousSettings.mistEnabled;
+        context.requestedDustQuality = previousSettings.dustQuality;
         if (!InitialiseRtSceneForSwapchain(context, false)) return false;
         if (context.graphicsCommand && context.graphicsEdit)
         {
@@ -5080,6 +5111,7 @@ bool ApplyPendingOutputResize(VulkanSurfaceContext& context,
                     context.graphicsPreviewFrameCap = context.graphicsBeforeApply.previewFrameCap;
                     context.requestedGlassEnabled = context.graphicsBeforeApply.glassEnabled;
                     context.requestedMistEnabled = context.graphicsBeforeApply.mistEnabled;
+                    context.requestedDustQuality = context.graphicsBeforeApply.dustQuality;
                     auto failure = GraphicsSnapshot(context, *context.graphicsCommand);
                     failure.reasons = horde::graphics::GraphicsReason::ResourceFailure;
                     context.graphicsEdit->Acknowledge(failure, false);
@@ -5296,6 +5328,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         }
         frameInputs.shadowQuality = ctx.shadowQuality;
         ctx.rtScene.SetMistEnabled(ctx.requestedMistEnabled);
+        ctx.rtScene.SetDustQuality(ctx.requestedDustQuality);
 #if defined(_DEBUG)
         // The separately named Max motion diagnostic preserves its explicit
         // legacy whole-workload policy. Ordinary Graphics/RT Lab do not opt in.
@@ -5841,9 +5874,18 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "\", \"finaleSkylightOpenProgress\": " << capture.finaleSkylightOpenProgress << "},\n"
                  << "      \"width\": " << capture.width << ",\n"
                  << "      \"height\": " << capture.height << ",\n"
-                 << "      \"honestlyPresentedRtFrame\": true,\n"
-                 << "      \"completedFrame\": " << capture.completedFrameEvidenceJson << ",\n"
-                 << "      \"visibility\": {\"playerPrimaryVisible\": "
+                  << "      \"honestlyPresentedRtFrame\": true,\n"
+                  << "      \"completedFrame\": " << capture.completedFrameEvidenceJson << ",\n"
+                  << "      \"indoorDust\": {\"requestedQuality\": "
+                  << static_cast<unsigned>(context.requestedDustQuality)
+                  << ", \"actualUploadedQuality\": "
+                  << static_cast<unsigned>(capture.actualUploadedDustQuality)
+                  << ", \"cpuWork\": {\"admittedZones\": " << capture.dustWork.admittedZones
+                  << ", \"generatedMotes\": " << capture.dustWork.generatedMotes
+                  << ", \"projectedMotes\": " << capture.dustWork.projectedMotes
+                  << ", \"tileReferences\": " << capture.dustWork.tileReferences
+                  << ", \"overflowReferences\": " << capture.dustWork.overflowReferences << "}},\n"
+                  << "      \"visibility\": {\"playerPrimaryVisible\": "
                  << (capture.playerPrimaryVisible ? "true" : "false")
                  << ", \"primaryArmsMayBeOutsideFrame\": "
                  << (capture.primaryArmsMayBeOutsideFrame ? "true" : "false")
@@ -6044,9 +6086,13 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             completedIdentity.submissionSerial !=
                 completedFrame.presentation.lastSuccessfulPresentSubmissionSerial ||
             !completedFrame.scene.fireLighting.has_value() ||
-            completedFrame.scene.actualUploadedMistEnabled != std::optional<bool>{context.requestedMistEnabled})
+            completedFrame.scene.actualUploadedMistEnabled != std::optional<bool>{context.requestedMistEnabled} ||
+            completedFrame.scene.actualUploadedDustQuality !=
+                std::optional<horde::graphics::DustQuality>{context.requestedDustQuality} ||
+            context.rtScene.UploadedDustQuality() !=
+                std::optional<horde::graphics::DustQuality>{context.requestedDustQuality})
             return fail(std::string("Checkpoint '") + checkpoint.name +
-                        "' lacks current completed presentation and uploaded-fire evidence.");
+                        "' lacks current completed presentation with matching uploaded Mist and Dust state.");
         std::string completedFrameJson;
         horde::telemetry::RtEvidenceValidationError captureEvidenceError{};
         if (!horde::telemetry::SerializeRtPerformanceEvidenceJson(
@@ -6072,6 +6118,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         ShowcaseCaptureRecord record;
         record.completedFrameEvidenceJson = std::move(completedFrameJson);
         record.checkpoint = &checkpoint;
+        record.actualUploadedDustQuality = *completedFrame.scene.actualUploadedDustQuality;
+        record.dustWork = context.rtScene.DustWork();
         const horde::gameplay::simulation::SimulationSnapshot& simulation = context.simulation.Snapshot();
         record.camera = {simulation.playerX, simulation.playerZ,
                          simulation.playerYawRadians, simulation.playerPitchRadians};
@@ -6557,7 +6605,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                                  const bool graphicsPreviewCapture,
                                  const bool outputResizeValidation,
                                  const std::string& nativeMotionScenario,
-                                 const horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset)
+                                 const horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset,
+                                 const std::optional<horde::graphics::DustQuality> captureDustQuality)
 {
     horde::vulkan::RetirementOwner<VulkanSurfaceContext> renderOwner(
         std::make_unique<VulkanSurfaceContext>(), DestroyRenderContext, DetachRenderContextHost);
@@ -6607,6 +6656,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.unattendedBenchmark = unattendedBenchmark;
     if (developmentCheckpoint != nullptr) context.developmentCheckpoint = *developmentCheckpoint;
     if (!graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation) LoadSettings(context);
+    if (captureDirectory != nullptr && captureDustQuality.has_value())
+        context.requestedDustQuality = *captureDustQuality;
 #if defined(_DEBUG)
     const RtLabDebugLaunchOptions rtLabDebug = ParseRtLabDebugLaunchOptions();
     if (rtLabDebug.requested && !graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation)
@@ -7263,6 +7314,7 @@ void ApplyDpiScaledFonts(HWND window)
                          kGraphicsShadowButtonId,
                          kGraphicsGlassButtonId,
                          kGraphicsMistButtonId,
+                         kGraphicsDustButtonId,
                          kGraphicsApplyButtonId,
                          kGraphicsConfirmButtonId,
                          kGraphicsRevertButtonId,
@@ -7595,10 +7647,12 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         y += titleHeight + gap;
         MoveWindow(GetDlgItem(window, kGraphicsInfoId), graphicsX, y, graphicsWidth, infoHeight, TRUE);
         y += infoHeight + gap;
-        const int glassWidth = ScaleForDpi(window, 110);
-        MoveWindow(GetDlgItem(window, kGraphicsPresetButtonId), graphicsX, y, graphicsWidth - glassWidth * 2 - gap * 2, compactHeight, TRUE);
-        MoveWindow(GetDlgItem(window, kGraphicsGlassButtonId), graphicsX + graphicsWidth - glassWidth * 2 - gap, y, glassWidth, compactHeight, TRUE);
-        MoveWindow(GetDlgItem(window, kGraphicsMistButtonId), graphicsX + graphicsWidth - glassWidth, y, glassWidth, compactHeight, TRUE);
+        const int glassWidth = ScaleForDpi(window, 88);
+        const int dustWidth = ScaleForDpi(window, 112);
+        MoveWindow(GetDlgItem(window, kGraphicsPresetButtonId), graphicsX, y, graphicsWidth - glassWidth * 2 - dustWidth - gap * 3, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsGlassButtonId), graphicsX + graphicsWidth - glassWidth * 2 - dustWidth - gap * 2, y, glassWidth, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsMistButtonId), graphicsX + graphicsWidth - glassWidth - dustWidth - gap, y, glassWidth, compactHeight, TRUE);
+        MoveWindow(GetDlgItem(window, kGraphicsDustButtonId), graphicsX + graphicsWidth - dustWidth, y, dustWidth, compactHeight, TRUE);
         y += compactHeight + gap;
         MoveWindow(GetDlgItem(window, kRenderScaleLabelId), graphicsX, y, graphicsWidth, labelHeight, TRUE);
         y += labelHeight;
@@ -8262,6 +8316,16 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 {
                     auto draft = sceneContext->graphicsEdit->Draft();
                     draft.mistEnabled = !draft.mistEnabled;
+                    sceneContext->graphicsEdit->Stage(draft);
+                    UpdateSettingsLabels(*sceneContext);
+                }
+                return 0;
+            case kGraphicsDustButtonId:
+                if (sceneContext->graphicsEdit)
+                {
+                    auto draft = sceneContext->graphicsEdit->Draft();
+                    draft.dustQuality = static_cast<horde::graphics::DustQuality>(
+                        (static_cast<unsigned>(draft.dustQuality) + 1u) % 3u);
                     sceneContext->graphicsEdit->Stage(draft);
                     UpdateSettingsLabels(*sceneContext);
                 }
@@ -9128,7 +9192,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const bool graphicsPreviewCapture,
                         const bool outputResizeValidation,
                         const std::string& nativeMotionScenario,
-                        const horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset)
+                        const horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset,
+                        const std::optional<horde::graphics::DustQuality> captureDustQuality)
 {
     // Only the Debug capture surface changes aspect; camera, gameplay pose,
     // renderer quality and normal interactive-window sizing are untouched.
@@ -9275,6 +9340,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createButton(kGraphicsShadowButtonId, "SHADOW: CURRENT");
     createButton(kGraphicsGlassButtonId, "GLASS: ON");
     createButton(kGraphicsMistButtonId, "MIST: ON");
+    createButton(kGraphicsDustButtonId, "INDOOR DUST: OFF");
     createButton(kGraphicsApplyButtonId, "APPLY");
     createButton(kGraphicsConfirmButtonId, "KEEP (15 SECONDS)");
     createButton(kGraphicsRevertButtonId, "REVERT");
@@ -9439,7 +9505,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         hWnd, capabilities, textReportPath, jsonReportPath, captureDirectory,
         developmentCheckpoint, requireRayQueryCompute, unattendedBenchmark, benchmarkWorkload,
         benchmarkRtWorkloadPreset,
-        anatomicalPlayerMount, graphicsPreviewCapture, outputResizeValidation, nativeMotionScenario, nativeMotionRtWorkloadPreset);
+        anatomicalPlayerMount, graphicsPreviewCapture, outputResizeValidation, nativeMotionScenario, nativeMotionRtWorkloadPreset,
+        captureDustQuality);
     if ((captureDirectory != nullptr || unattendedBenchmark) && IsWindow(hWnd))
     {
         DestroyWindow(hWnd);
@@ -9539,7 +9606,8 @@ int RunDiagnosticWindow(const int showCommand)
                                launchOptions.benchmark.requested, launchOptions.benchmark.workload,
                                launchOptions.benchmark.rtWorkloadPreset,
                                launchOptions.anatomicalPlayerMount, launchOptions.graphicsPreview, launchOptions.outputResizeValidation,
-                               launchOptions.nativeMotionScenario, launchOptions.nativeMotionRtWorkloadPreset);
+                               launchOptions.nativeMotionScenario, launchOptions.nativeMotionRtWorkloadPreset,
+                               launchOptions.captureDustQuality);
 }
 
 } // namespace horde::platform::windows

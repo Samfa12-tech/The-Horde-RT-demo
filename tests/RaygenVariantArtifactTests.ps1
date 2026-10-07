@@ -44,7 +44,7 @@ function Assert-MistOffExitContract {
     $body = $function.Groups['body'].Value
     $withoutComments = [regex]::Replace($body, '(?m)^\s*//[^\r\n]*', '')
     $gate = [regex]::Match($withoutComments,
-        '^\s*if\s*\(\s*controls\.enemyKind\s*<\s*0\.5\s*\|\|\s*rtQualityControls\.value\.controls\.w\s*!=\s*0u\s*\)\s*\{\s*return\s+vec4\(0\.0,\s*0\.0,\s*0\.0,\s*1\.0\);\s*\}')
+        '^\s*if\s*\(\s*controls\.enemyKind\s*<\s*0\.5\s*\|\|\s*\(\s*rtQualityControls\.value\.controls\.w\s*&\s*1u\s*\)\s*!=\s*0u\s*\)\s*\{\s*return\s+vec4\(0\.0,\s*0\.0,\s*0\.0,\s*1\.0\);\s*\}')
     Assert-True $gate.Success 'Mist Off must return neutral before any medium query, clipping or march work.'
     Assert-True ($withoutComments.IndexOf('buildMistIncidentSources(') -gt ($gate.Index + $gate.Length) -and
         $withoutComments.IndexOf('integrateLichMistSample(') -gt ($gate.Index + $gate.Length)) `
@@ -509,21 +509,25 @@ try {
     Assert-MistOffExitContract $atmosphere
     Assert-Throws {
         Assert-MistOffExitContract ($atmosphere.Replace(
-            ' || rtQualityControls.value.controls.w != 0u', ''))
+            '(rtQualityControls.value.controls.w & 1u) != 0u', 'rtQualityControls.value.controls.w != 0u'))
+    } 'Dust bits must not disable accepted ground Mist when its own bit is On.'
+    Assert-Throws {
+        Assert-MistOffExitContract ($atmosphere.Replace(
+            ' || (rtQualityControls.value.controls.w & 1u) != 0u', ''))
     } 'Removing the actual mist flag must fail even when enemy-kind gating remains.'
     Assert-Throws {
         Assert-MistOffExitContract ($atmosphere.Replace(
-            '    if (controls.enemyKind < 0.5 || rtQualityControls.value.controls.w != 0u)',
-            "    buildMistIncidentSources(vec3(0.0), sources);`n    if (controls.enemyKind < 0.5 || rtQualityControls.value.controls.w != 0u)"))
+            '    if (controls.enemyKind < 0.5 || (rtQualityControls.value.controls.w & 1u) != 0u)',
+            "    buildMistIncidentSources(vec3(0.0), sources);`n    if (controls.enemyKind < 0.5 || (rtQualityControls.value.controls.w & 1u) != 0u)"))
     } 'Moving medium source queries before the Off exit must fail.'
 
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
     # These compatibility artifacts carry the shared primary-ray pre-rotation mode; fresh compilation still validates source identity.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq '4f8666506726df5d81ea1feb3513e1efdd79db31d92668929bbb9057191d6e83') `
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'e8ce19dce6a745f4c2ddfd8e5eb870499255363c9011f270a4e67e266c35b0f9') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '55bee1a0d19ee1543985229e17fac13037e8cc0d6e7d13d73c4e9d574108c991') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '91766e522d4f8376e362ab520e2dd772a5b22ae74620b4da63c669fc55326507') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -566,14 +570,14 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     # no longer the admitted snapshot; keep exact mist/active-fire4, current ABI
     # and the reviewed shared presentation pre-rotation raw-word witnesses.
     $opaqueWordPins = @{
-        diagnostic_high_opaque_fast = '32e75617a12ef0f0ece9c60dd1c855766e2893dc1ab9e6f10183161ccc4df5ab'
-        diagnostic_mobile_opaque_fast = '47da0772aa0348092e9d1a4f3d7828d4e6081c03ca6ba099d507b4218ca1d936'
-        shipping_high_opaque_fast = '82444ca07cf2609db8ca2a58c4d3b1a91bfaa626a57eec0e12b98510f7d106c7'
-        shipping_mobile_opaque_fast = '6cf3aab980b2e4956cda8ea513c5b394a3190d02d226f95f69ac5a70258bfe72'
+        diagnostic_high_opaque_fast = '9c020e69e54768665a57c24b4181b833c14d7e635ca757d733cfc988faf68f8f'
+        diagnostic_mobile_opaque_fast = 'ff37fb2d87e220df59fe2607e9a3318f1ee492fa01485afbe3bb095087939b2e'
+        shipping_high_opaque_fast = 'da3410252a83a75aea0130f037b4f3d9fa5cda09c866075eceb7942bc690c963'
+        shipping_mobile_opaque_fast = 'b3da473c5760f5394eac56ab802cc9f84ec78d75899cedf90a215f6198bee9be'
     }
     foreach ($row in @($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' })) {
         Assert-True ($row.spirvSha256 -ceq $opaqueWordPins[$row.key]) `
-            "Reviewed OpaqueFast 1.6.2 raw SPIR-V snapshot changed: $($row.key)"
+            "Bounded indoor-dust OpaqueFast raw SPIR-V snapshot changed: $($row.key)"
     }
     # Equal raw-word hashes are still a valid catalog shape when two explicit
     # variant keys/paths compile identically; freshness is checked separately.
@@ -753,13 +757,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
-        '293f727b6e4638994ef3178ed51511772b4cf5eeb1f946c0fe500de03e954c55') `
+        '0354a2e028e60cabc707e1da75b237668d4922d8e7048b6a97c716e183bb6d46') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
-        'f8e7ccb977f57b699c237abf3b8323fa4678a7bfde9c1c8aebb382d9eac614bd') `
+        '188f76e5aea1adbcf51e8e926072d26b877f210414c0b8b03e46e2603035bb31') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `
         'Temporary artifact compilation modified the worktree.'

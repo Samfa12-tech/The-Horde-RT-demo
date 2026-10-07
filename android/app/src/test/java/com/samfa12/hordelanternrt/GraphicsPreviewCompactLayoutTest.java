@@ -101,7 +101,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                 assertTrue("sticky actions stay within the overlay",dock.getBottom()<=strip.getHeight());
                 List<Button> buttons=new ArrayList<>(); List<HorizontalScrollView> rows=new ArrayList<>();
                 collect(strip,buttons,rows);
-                assertEquals(2,rows.size()); assertEquals(14,buttons.size());
+                assertEquals(2,rows.size()); assertEquals(15,buttons.size());
                 for(HorizontalScrollView row:rows) {
                     assertTrue(row.isHorizontalScrollBarEnabled()); assertFalse(row.isVerticalScrollBarEnabled());
                     assertFalse("scroll affordance must stay visible",row.isScrollbarFadingEnabled());
@@ -114,7 +114,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                     assertEquals(HordeUiTokens.BRASS,((ColorDrawable)row.getHorizontalScrollbarThumbDrawable()).getColor());
                     assertEquals(HordeUiTokens.IRON,((ColorDrawable)row.getHorizontalScrollbarTrackDrawable()).getColor());
                 }
-                String[] labels={"Resolution: 75%","Water: Mobile","Fire: Mobile","Cap: 30 Hz","Glass: On","Shadows: Current","Mist: On","View","Image","Details","Use","Keep","Restore","Back"};
+                String[] labels={"Resolution: 75%","Water: Mobile","Fire: Mobile","Cap: 30 Hz","Glass: On","Shadows: Current","Mist: On","Indoor dust: Off","View","Image","Details","Use","Keep","Restore","Back"};
                 int minimum=HordeUiTokens.dp(activity,48);
                 for(int i=0;i<buttons.size();++i) {
                     Button button=buttons.get(i); assertEquals(labels[i],button.getText().toString());
@@ -135,9 +135,9 @@ public final class GraphicsPreviewCompactLayoutTest {
                 assertFalse(((Button)field(activity,"graphicsConfirm")).isEnabled());
                 Method menu=MainActivity.class.getDeclaredMethod("createGraphicsPreviewOptionMenu",Button.class,int.class);
                 menu.setAccessible(true);
-                int[][] values={{50,63,75,100},{0,1,2},{2,0,1},{15,30,60},{0,1},{0,1,2},{0,1}};
-                int[] selected={75,1,0,30,1,1,1};
-                for(int choice=0;choice<7;++choice) {
+                int[][] values={{50,63,75,100},{0,1,2},{2,0,1},{15,30,60},{0,1},{0,1,2},{0,1},{0,1,2}};
+                int[] selected={75,1,0,30,1,1,1,0};
+                for(int choice=0;choice<8;++choice) {
                     PopupMenu popup=(PopupMenu)menu.invoke(activity,buttons.get(choice),choice);
                     assertEquals(values[choice].length,popup.getMenu().size());
                     for(int i=0;i<values[choice].length;++i) {
@@ -167,6 +167,7 @@ public final class GraphicsPreviewCompactLayoutTest {
         optionLabel.setAccessible(true);
         assertEquals("Fire: Low",optionLabel.invoke(activity,GraphicsPreviewOptions.FIRE));
         assertEquals("Shadows: Higher",optionLabel.invoke(activity,GraphicsPreviewOptions.SHADOW));
+        assertEquals("Indoor dust: Off",optionLabel.invoke(activity,GraphicsPreviewOptions.DUST));
         TextView summary=new TextView(activity); setField(activity,"graphicsSelectionSummary",summary);
         Method selection=MainActivity.class.getDeclaredMethod("updateGraphicsSelectionSummary",boolean.class);
         selection.setAccessible(true);
@@ -231,7 +232,7 @@ public final class GraphicsPreviewCompactLayoutTest {
             int height=568,gap=48;
             ScrollView strip=new GraphicsPreviewControlsScrollView(context,GraphicsPreviewOptions.maximumOverlayHeight(height,gap));
             TextView text=new TextView(context); text.setTextSize(24);
-            text.setText("Resolution\nWater\nFire\nCap\nGlass\nShadows\nMist\nView\nDetails\nUse these settings\nKeep and save\nRestore saved\nBack"); strip.addView(text);
+            text.setText("Resolution\nWater\nFire\nCap\nGlass\nShadows\nMist\nIndoor dust\nView\nDetails\nUse these settings\nKeep and save\nRestore saved\nBack"); strip.addView(text);
             strip.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.AT_MOST));
             strip.layout(0,0,strip.getMeasuredWidth(),strip.getMeasuredHeight());
@@ -351,7 +352,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                 assertTrue((boolean)field(activity,"graphicsPreviewWanted"));
                 assertSame(draft,field(activity,"graphicsDraft"));
                 buttons.clear(); rows.clear(); collect(scrim,buttons,rows);
-                assertEquals(14,buttons.size()); assertEquals(2,rows.size()); assertEquals(42,serial.getLong(activity));
+                assertEquals(15,buttons.size()); assertEquals(2,rows.size()); assertEquals(42,serial.getLong(activity));
                 assertNull(field(activity,"graphicsDetailsDialog")); assertNull(field(activity,"graphicsGraph"));
             } finally { activity.getResources().updateConfiguration(original,activity.getResources().getDisplayMetrics()); }
         }

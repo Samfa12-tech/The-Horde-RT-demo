@@ -5,6 +5,7 @@
 #include "rt_dielectric_common.glsl"
 #include "rt_dielectric_transport.glsl"
 #include "rt_atmosphere.glsl"
+#include "rt_indoor_dust.glsl"
 
 void main()
 {
@@ -73,6 +74,8 @@ void main()
     vec4 lichMist = lichGroundMist(origin, rayDirection, primary.t);
     color = color * lichMist.a + lichMist.rgb;
     color += staffElectricity(origin, rayDirection, primary.t);
+    float uprightHeight=float((rotation==1u||rotation==3u) ? HORDE_RT_PIXEL_EXTENT.x : HORDE_RT_PIXEL_EXTENT.y);
+    color=composeIndoorDust(color,uv,origin,rayDirection,primary.hit ? primary.t : 10000.0,uprightHeight);
 
     vec2 centered = uv * 2.0 - 1.0;
     float vignette = 1.0 - smoothstep(0.28, 1.22, length(centered * vec2(0.82, 1.08)));

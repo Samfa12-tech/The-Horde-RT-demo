@@ -1,4 +1,5 @@
 #pragma once
+#include "graphics/DustQuality.h"
 
 #include <array>
 #include <optional>
@@ -34,6 +35,7 @@ struct BenchmarkSummaryConfiguration
     std::optional<RtShadowQualityEvidence> shadowQuality{};
     std::optional<RtFireQualityEvidence> uploadedFireQuality{};
     std::optional<bool> actualUploadedMistEnabled{};
+    std::optional<horde::graphics::DustQuality> actualUploadedDustQuality{};
 };
 
 struct BenchmarkSummaryPopulation

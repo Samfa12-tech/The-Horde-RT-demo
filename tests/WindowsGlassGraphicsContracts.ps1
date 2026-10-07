@@ -142,6 +142,12 @@ foreach ($field in @('glassEnabled', 'sceneEpochBefore', 'sceneEpochAfter', 'sce
 Check ($capture.Contains('Glass Off retains fixed BLAS/TLAS roles and implies no allocation savings') -and
     $capture.Contains('full Showcase roof and lantern geometry remain a separate acceptance gate') -and
     -not $capture.Contains('SaveSettings(') -and -not $capture.Contains('SettingsPath(')) 'Capture makes no savings/full-scene claim and does not read/write user preference storage.'
+Check ($source.Contains('completedFrame.scene.actualUploadedDustQuality !=') -and
+    $source.Contains('std::optional<horde::graphics::DustQuality>{context.requestedDustQuality}') -and
+    $source.Contains('context.rtScene.UploadedDustQuality() !=') -and
+    $source.Contains('\"cpuWork\": {\"admittedZones\":') -and
+    $source.Contains('capture.dustWork.tileReferences') -and
+    $source.Contains('capture.dustWork.overflowReferences')) 'Showcase stills require exact completed/uploaded Dust quality and report per-still CPU work.'
 function Test-MistCompletedAck([string]$body) {
     return $body.Contains('CurrentCompletedMistEnabled(after) != std::optional<bool>{request->requested.mistEnabled}') -and
         $body.Contains('context.rtScene.UploadedMistEnabled() != std::optional<bool>{request->requested.mistEnabled}')
@@ -151,6 +157,19 @@ Check (-not (Test-MistCompletedAck ($captureCommand.Replace('CurrentCompletedMis
 Check (-not (Test-MistCompletedAck ($captureCommand.Replace('context.rtScene.UploadedMistEnabled()', 'context.rtScene.MistEnabled()')))) 'Negative Mist fixture rejects desired state replacing successful actual upload.'
 Check ($readback.Contains('CurrentCompletedMistEnabled(record.publication) != std::optional<bool>{expectedSettings.mistEnabled}') -and
     $readback.Contains('context.rtScene.UploadedMistEnabled() != std::optional<bool>{expectedSettings.mistEnabled}')) 'Mist readback requires actual completed and uploaded choice, with absence never defaulted into On proof.'
+function Test-DustCompletedAck([string]$body) {
+    return $body.Contains('CurrentCompletedDustQuality(after) != std::optional<horde::graphics::DustQuality>{request->requested.dustQuality}') -and
+        $body.Contains('context.rtScene.UploadedDustQuality() != std::optional<horde::graphics::DustQuality>{request->requested.dustQuality}')
+}
+Check (Test-DustCompletedAck $captureCommand) 'Dust transactions require current completed uploaded quality and matching actual renderer upload.'
+Check (-not (Test-DustCompletedAck ($captureCommand.Replace('CurrentCompletedDustQuality(after)', 'trustDesiredDust')))) 'Negative Dust fixture rejects desired-only completion acknowledgement.'
+Check (-not (Test-DustCompletedAck ($captureCommand.Replace('context.rtScene.UploadedDustQuality()', 'context.rtScene.DustQuality()')))) 'Negative Dust fixture rejects desired quality replacing successful actual upload.'
+Check ($readback.Contains('CurrentCompletedDustQuality(record.publication) != std::optional<horde::graphics::DustQuality>{expectedSettings.dustQuality}') -and
+    $readback.Contains('context.rtScene.UploadedDustQuality() != std::optional<horde::graphics::DustQuality>{expectedSettings.dustQuality}')) 'Dust still readback requires exact actual completed and uploaded quality.'
+Check ($capture.Contains('static_cast<unsigned>(settings.dustQuality)') -and
+    $capture.Contains('static_cast<unsigned>(*completed.scene.actualUploadedDustQuality)') -and
+    $capture.Contains('\"cpuDustWork\"') -and
+    $capture.Contains('work.tileReferences') -and $capture.Contains('work.overflowReferences')) 'Capture manifests expose requested/effective/completed Dust quality and per-still CPU work counters.'
 foreach ($phase in @('apply-mist-off', 'revert-mist-on')) {
     Check ($capture.Contains('command("' + $phase + '"')) "Capture exercises ordinary live Mist transaction $phase."
 }

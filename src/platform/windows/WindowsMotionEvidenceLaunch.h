@@ -64,6 +64,13 @@ inline WindowsMotionEvidenceLaunch ParseWindowsMotionEvidenceLaunch(
             else if (preset == L"max") result.rtWorkloadPreset = horde::vulkan::raytracing::RtWorkloadPreset::Max;
             else { result.error = "Unknown motion RT workload; use authored or max."; return result; }
         }
+        else if (argument == L"--capture-dust")
+        {
+            if (i + 1u == arguments.size() ||
+                (arguments[i + 1u] != L"off" && arguments[i + 1u] != L"low" && arguments[i + 1u] != L"standard"))
+            { result.error = "--capture-dust requires low, standard, or off."; return result; }
+            ++i; // This Debug-only still-capture override is validated by the shared capture policy.
+        }
         else if (argument == L"--require-rayquery-compute") { unknown |= computeSeen; computeSeen = true; }
         else
         {

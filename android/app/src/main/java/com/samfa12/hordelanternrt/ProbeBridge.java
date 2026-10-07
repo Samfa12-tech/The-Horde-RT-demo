@@ -47,17 +47,17 @@ public final class ProbeBridge {
     public static native int getContextualControlState();
     public static native int retryEncounter();
     public static native void setSimulationPaused(boolean paused);
-    public static native void setGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled);
-    public static native void beginGraphicsEdit(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled);
-    public static native long applyGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, long generation);
-    public static native long compareGraphicsPreview(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, long generation);
+    public static native void setGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality);
+    public static native void beginGraphicsEdit(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality);
+    public static native long applyGraphicsSettings(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality, long generation);
+    public static native long compareGraphicsPreview(int scale, int water, int fire, int cap, boolean glass, int shadow, boolean mistEnabled, int dustQuality, long generation);
     public static native long revertGraphicsSettings(long generation);
     public static native boolean confirmGraphicsSettings(long serial, long generation);
     public static native long advanceGraphicsConfirmation(double seconds, boolean foreground, long generation);
     // Coherent render-owner snapshot: serial, generation, edit state, effective
     // scale/water/fire/cap, internal W/H, output W/H, optics, backend, presented,
     // reason bits, requested scale/water/fire/cap, scene, effective/requested glass.
-    // effective/requested shadow appended at22/23; effective/requested mist24/25. Exactly26 fields; unknown extents stay zero.
+    // effective/requested shadow appended at22/23; mist24/25; dust26/27. Exactly28 fields; unknown extents stay zero.
     public static native long[] getGraphicsSnapshot();
     public static native void setGraphicsPreview(boolean enabled, boolean paused, boolean motion,
             int camera, boolean resetTimeline, long generation);

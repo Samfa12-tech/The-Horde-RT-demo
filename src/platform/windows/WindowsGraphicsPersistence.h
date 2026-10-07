@@ -45,13 +45,16 @@ inline std::optional<horde::graphics::GraphicsPersistenceRecord> LoadGraphicsPer
         const int glass = schema == 1 ? 1 : read(pending ? "pendingGlass" : "confirmedGlass", 1, true);
         const int shadow = historical ? 1 : read(pending ? "pendingShadow" : "confirmedShadow", 1, true);
         const int mist = schema < 4 ? 1 : read(pending ? "pendingMist" : "confirmedMist", 1);
+        const int dust = schema < 5 ? 0 : read(pending ? "pendingDust" : "confirmedDust", 0, true);
         if (water < 0 || water > 2 || fire < 0 || fire > (historical ? 1 : 2) ||
-            glass < 0 || glass > 1 || shadow < 0 || shadow > 2 || mist < 0 || mist > 1) valid = false;
+            glass < 0 || glass > 1 || shadow < 0 || shadow > 2 || mist < 0 || mist > 1 ||
+            dust < 0 || dust > 2) valid = false;
         settings.waterQuality = static_cast<WaterQuality>(water >= 0 && water <= 2 ? water : 0);
         settings.fireDetail = static_cast<FireDetail>(fire >= 0 && fire <= 2 ? fire : 0);
         settings.glassEnabled = glass == 1;
         settings.shadowQuality = static_cast<ShadowQuality>(shadow >= 0 && shadow <= 2 ? shadow : 1);
         settings.mistEnabled = mist == 1;
+        settings.dustQuality = static_cast<DustQuality>(dust >= 0 && dust <= 2 ? dust : 0);
         return settings;
     };
     record.confirmed = tuple(false);
@@ -96,6 +99,7 @@ inline bool SaveGraphicsPersistenceRecord(const std::filesystem::path& settingsP
         success = write("pendingGlass", record.pending->glassEnabled ? 1 : 0) && success;
         success = write("pendingShadow", static_cast<int>(record.pending->shadowQuality)) && success;
         success = write("pendingMist", record.pending->mistEnabled ? 1 : 0) && success;
+        success = write("pendingDust", static_cast<int>(record.pending->dustQuality)) && success;
     }
     success = write("confirmedScale", record.confirmed.renderScalePercent) && success;
     success = write("confirmedWater", static_cast<int>(record.confirmed.waterQuality)) && success;
@@ -104,6 +108,7 @@ inline bool SaveGraphicsPersistenceRecord(const std::filesystem::path& settingsP
     success = write("confirmedGlass", record.confirmed.glassEnabled ? 1 : 0) && success;
     success = write("confirmedShadow", static_cast<int>(record.confirmed.shadowQuality)) && success;
     success = write("confirmedMist", record.confirmed.mistEnabled ? 1 : 0) && success;
+    success = write("confirmedDust", static_cast<int>(record.confirmed.dustQuality)) && success;
     // The special cache-flush call has no ordinary key-write success result.
     // Check the actual file flush separately before publishing the new tuple.
     (void)WritePrivateProfileStringA(nullptr, nullptr, nullptr, temporary.c_str());

@@ -191,3 +191,12 @@ and are deferred. This does not authorize other optional dressing or adventure
 scope. The owner is away with the phone: no ADB/install/device tests or wait loops.
 Preserve all prior exact passes and failures. Dust owner/mobile/sustained gates
 remain pending independently of safe source, host, shader and desktop work.
+
+The owner returned on 8 October and reported the phone connected. Read-only
+identification verifies the intended SM-S948B / Android16 / API36 before resumed
+validation; no new mobile pass follows from availability alone. The owner also
+approved the waterfall skeleton image as looking great. This accepts the staged
+3da5f2dd room layout shown previously, including one left/right guard facing
+arrival. It does not close moving-body, shadow/reflection, production activation
+or integrated-candidate gates. Prior CCD touch/torch/clearance approvals retain
+their original package identity.

@@ -33,22 +33,30 @@ inline constexpr std::uint32_t kRtShadowLegacyWorkload = 3u;
 inline std::optional<RtQualityControlsGpu> ResolveRtQualityControls(
     const std::optional<horde::graphics::ShadowQuality> shadow,
     const RtWorkloadPreset workload, const bool compiledHighQuality,
-    const bool mistEnabled = true) noexcept
+    const bool mistEnabled = true,
+    const horde::graphics::DustQuality dust = horde::graphics::DustQuality::Off) noexcept
 {
+    if (!horde::graphics::ValidDustQuality(dust)) return std::nullopt;
     if (shadow && static_cast<unsigned>(*shadow) > 2u) return std::nullopt;
     const auto mode = shadow ? static_cast<std::uint32_t>(*shadow) : kRtShadowLegacyWorkload;
     const bool higher = shadow ? *shadow == horde::graphics::ShadowQuality::Higher :
         workload == RtWorkloadPreset::Max;
     return RtQualityControlsGpu{{mode, higher ? (compiledHighQuality ? 4u : 2u) : 1u,
-        higher ? 2u : 1u, mistEnabled ? 0u : 1u}};
+        higher ? 2u : 1u, (mistEnabled ? 0u : 1u) | (static_cast<unsigned>(dust) << 1u)}};
 }
 
-// Existing quality-word bit0 disables only the scene ground mist. Unknown flags
+// Quality-word bit0 disables the existing scene ground mist; bits1-2 select dust. Unknown flags
 // are invalid; successful uploads remain distinguishable from desired settings.
 inline std::optional<bool> ResolveUploadedMistEnabled(const RtQualityControlsGpu& quality) noexcept
 {
-    if (quality.controls[3] > 1u) return std::nullopt;
-    return quality.controls[3] == 0u;
+    if (quality.controls[3] > 5u) return std::nullopt;
+    return (quality.controls[3] & 1u) == 0u;
+}
+
+inline std::optional<horde::graphics::DustQuality> ResolveUploadedDustQuality(const RtQualityControlsGpu& quality) noexcept
+{
+    if (quality.controls[3] > 5u) return std::nullopt;
+    return static_cast<horde::graphics::DustQuality>(quality.controls[3] >> 1u);
 }
 
 enum class RtLightGroup : std::uint32_t

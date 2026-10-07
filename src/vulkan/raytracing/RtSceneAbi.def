@@ -8,7 +8,10 @@
     "materials": 32,
     "textureLayers": 16,
     "fireEmitters": 4,
-    "activeFireEmitters": 4
+    "activeFireEmitters": 4,
+    "dustMotes": 64,
+    "dustTiles": 576,
+    "dustTileCandidates": 4
   },
   "bindings": {
     "instanceMetadata": 11,
@@ -145,7 +148,7 @@
     {
       "name": "RtQualityControlsGpu", "alignment": 16, "size": 16,
       "fields": [
-        { "name": "controls", "type": "uint4", "offset": 0, "comment": "shadow mode (Lower0/Current1/Higher2/LegacyWorkload3), resolved primary local/sky samples, flags bit0 mistDisabled (0 On, 1 Off); other bits zero." }
+        { "name": "controls", "type": "uint4", "offset": 0, "comment": "shadow mode and resolved primary samples; flags bit0 mistDisabled, bits1-2 Dust Off0/Low1/Standard2, other bits zero. Fixed dust arrays follow this 16-byte header at binding26." }
       ]
     },
     {
@@ -167,6 +170,13 @@
         { "name": "animation", "type": "float4", "offset": 112 },
         { "name": "smokeEmbers", "type": "float4", "offset": 128 },
         { "name": "identity", "type": "uint4", "offset": 144 }
+      ]
+    },
+    {
+      "name": "RtDustMoteGpu", "alignment": 16, "size": 32,
+      "fields": [
+        { "name": "positionRadius", "type": "float4", "offset": 0 },
+        { "name": "response", "type": "float4", "offset": 16 }
       ]
     }
   ]

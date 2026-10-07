@@ -201,8 +201,8 @@ void TestGlassMigrationAndTransactions()
         Check(session.Stage(off), "Off can be staged after restore");
         const auto kept = session.RequestApply(10u);
         Check(kept && session.Acknowledge(Presented(*kept), true) && session.Confirm() &&
-              !session.Persistence().confirmed.glassEnabled && session.Persistence().schema == 4u,
-              "explicit Keep persists Off in schema4 only after current presentation");
+               !session.Persistence().confirmed.glassEnabled && session.Persistence().schema == 5u,
+              "explicit Keep persists Off in schema5 only after current presentation");
         Check(session.ResetDraft(platform) && session.Draft() == PlatformDefaultGraphicsSettings(platform) && !session.Committed().glassEnabled,
               "Reset stages platform defaults without rewriting confirmed Off");
     }
@@ -287,7 +287,7 @@ void TestPlatformDefaultsAndMist()
     auto off = mobile; off.mistEnabled = false;
     const auto migrated = RecoverGraphicsSettings({4u, off, mobile}, GraphicsPlatform::Android);
     Check(migrated.startup == off && migrated.retainedRequested == mobile,
-          "schema4 preserves independently saved Off and interrupted On candidate");
+          "schema4 preserves independently saved Off and interrupted On candidate while migrating DustOff");
     GraphicsEditSession edit(off);
     Check(edit.ResetDraft(GraphicsPlatform::Android) && edit.Draft() == mobile && edit.Committed() == off &&
           !edit.Persistence().pending, "Reset stages defaults; it does not save or issue native work");
@@ -312,6 +312,55 @@ void TestPlatformDefaultsAndMist()
                       on->controls[0] == offPolicy->controls[0] && on->controls[1] == offPolicy->controls[1] &&
                       on->controls[2] == offPolicy->controls[2], "Mist flag changes onlyw; all independent shadow budgets remain exact");
             }
+}
+
+void TestDustMigrationAndAcknowledgement()
+{
+    using namespace horde::graphics;
+    Check(GraphicsSettings{}.dustQuality == DustQuality::Off &&
+          PlatformDefaultGraphicsSettings(GraphicsPlatform::Android).dustQuality == DustQuality::Off &&
+          PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows).dustQuality == DustQuality::Off,
+          "dust defaults Off without changing platform graphics defaults");
+    auto oldTuple = BaselineGraphicsSettings(GraphicsPlatform::Windows);
+    oldTuple.dustQuality = DustQuality::Standard; // Stale future field must not leak through old records.
+    for (const auto schema : {1u, 2u, 3u, 4u})
+    {
+        const auto recovered = RecoverGraphicsSettings({schema, oldTuple, oldTuple}, GraphicsPlatform::Windows);
+        Check(recovered.startup.dustQuality == DustQuality::Off && recovered.retainedRequested &&
+              recovered.retainedRequested->dustQuality == DustQuality::Off,
+              "schemas1-4 ignore stale dust values in confirmed and pending tuples");
+    }
+    auto invalid = BaselineGraphicsSettings(GraphicsPlatform::Windows);
+    invalid.dustQuality = static_cast<DustQuality>(3u);
+    Check(!ValidGraphicsSettings(invalid), "unknown dust enum rejected at settings admission");
+
+    const auto saved = BaselineGraphicsSettings(GraphicsPlatform::Windows);
+    GraphicsEditSession edit(saved);
+    auto draft = saved;
+    draft.dustQuality = DustQuality::Standard;
+    Check(edit.Stage(draft), "valid Standard dust setting stages as requested intent");
+    const auto command = edit.RequestApply(1u);
+    if (command)
+    {
+        auto stale = Presented(*command);
+        stale.effective.dustQuality = DustQuality::Low;
+        Check(!edit.Acknowledge(stale, true) && !edit.Confirm(),
+              "uploaded Low or prior dust frame cannot acknowledge requested Standard");
+        Check(edit.Persistence().pending && edit.Persistence().pending->dustQuality == DustQuality::Standard &&
+              edit.Committed().dustQuality == DustQuality::Off,
+              "pending Standard remains requested while saved dust stays Off");
+        Check(edit.Acknowledge(Presented(*command), true) && edit.Confirm() &&
+              edit.Committed().dustQuality == DustQuality::Standard,
+              "exact presented dust quality is the only value Keep commits");
+    }
+    auto schema5 = GraphicsPersistenceRecord{};
+    schema5.confirmed = saved;
+    schema5.confirmed.dustQuality = DustQuality::Low;
+    schema5.pending = draft;
+    const auto recovered = RecoverGraphicsSettings(schema5, GraphicsPlatform::Windows);
+    Check(recovered.startup.dustQuality == DustQuality::Low && recovered.retainedRequested &&
+          recovered.retainedRequested->dustQuality == DustQuality::Standard,
+          "schema5 preserves independently confirmed and pending dust qualities");
 }
 
 void TestCoherentPublication()
@@ -346,6 +395,6 @@ void TestCoherentPublication()
 int main()
 {
     TestMigrationAndProfiles(); TestResolutionAndEffectiveValues(); TestApplyConfirmAndCancel();
-    TestFailureDeadlineAndRecovery(); TestEffectiveAcknowledgement(); TestGlassMigrationAndTransactions(); TestIndependentShadowAndLowFire(); TestPlatformDefaultsAndMist(); TestCoherentPublication();
+    TestFailureDeadlineAndRecovery(); TestEffectiveAcknowledgement(); TestGlassMigrationAndTransactions(); TestIndependentShadowAndLowFire(); TestPlatformDefaultsAndMist(); TestDustMigrationAndAcknowledgement(); TestCoherentPublication();
     return passed ? 0 : 1;
 }

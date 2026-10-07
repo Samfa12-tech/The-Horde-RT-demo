@@ -17,14 +17,14 @@
     {
       "key": "diagnostic_high_generic_dielectric",
       "max": {
-        "bytes": 274540,
-        "words": 68635,
-        "instructions": 16295,
-        "branchOperations": 930,
-        "loops": 19,
-        "selectionMerges": 392,
-        "functions": 76,
-        "functionCalls": 239,
+        "bytes": 295636,
+        "words": 73909,
+        "instructions": 17638,
+        "branchOperations": 986,
+        "loops": 21,
+        "selectionMerges": 416,
+        "functions": 83,
+        "functionCalls": 264,
         "rayQueryInitializations": 2,
         "atomicInstructions": 41
       },
@@ -43,15 +43,15 @@
     {
       "key": "diagnostic_high_opaque_fast",
       "max": {
-        "bytes": 563344,
-        "words": 140836,
-        "instructions": 31198,
-        "branchOperations": 4298,
-        "loops": 81,
-        "selectionMerges": 1726,
+        "bytes": 594956,
+        "words": 148739,
+        "instructions": 33038,
+        "branchOperations": 4615,
+        "loops": 84,
+        "selectionMerges": 1860,
         "functions": 1,
         "functionCalls": 0,
-        "rayQueryInitializations": 28,
+        "rayQueryInitializations": 29,
         "atomicInstructions": 5
       },
       "exact": {
@@ -69,14 +69,14 @@
     {
       "key": "diagnostic_mobile_generic_dielectric",
       "max": {
-        "bytes": 273040,
-        "words": 68260,
-        "instructions": 16199,
-        "branchOperations": 921,
-        "loops": 18,
-        "selectionMerges": 390,
-        "functions": 76,
-        "functionCalls": 236,
+        "bytes": 294136,
+        "words": 73534,
+        "instructions": 17542,
+        "branchOperations": 977,
+        "loops": 20,
+        "selectionMerges": 414,
+        "functions": 83,
+        "functionCalls": 261,
         "rayQueryInitializations": 2,
         "atomicInstructions": 41
       },
@@ -95,15 +95,15 @@
     {
       "key": "diagnostic_mobile_opaque_fast",
       "max": {
-        "bytes": 560244,
-        "words": 140061,
-        "instructions": 31005,
-        "branchOperations": 4262,
-        "loops": 77,
-        "selectionMerges": 1716,
+        "bytes": 591856,
+        "words": 147964,
+        "instructions": 32845,
+        "branchOperations": 4579,
+        "loops": 80,
+        "selectionMerges": 1850,
         "functions": 1,
         "functionCalls": 0,
-        "rayQueryInitializations": 26,
+        "rayQueryInitializations": 27,
         "atomicInstructions": 5
       },
       "exact": {
@@ -121,14 +121,14 @@
     {
       "key": "shipping_high_generic_dielectric",
       "max": {
-        "bytes": 265712,
-        "words": 66428,
-        "instructions": 15871,
-        "branchOperations": 883,
-        "loops": 19,
-        "selectionMerges": 364,
-        "functions": 76,
-        "functionCalls": 239,
+        "bytes": 286808,
+        "words": 71702,
+        "instructions": 17214,
+        "branchOperations": 939,
+        "loops": 21,
+        "selectionMerges": 388,
+        "functions": 83,
+        "functionCalls": 264,
         "rayQueryInitializations": 2,
         "atomicInstructions": 0
       },
@@ -147,15 +147,15 @@
     {
       "key": "shipping_high_opaque_fast",
       "max": {
-        "bytes": 559108,
-        "words": 139777,
-        "instructions": 31019,
-        "branchOperations": 4276,
-        "loops": 81,
-        "selectionMerges": 1717,
+        "bytes": 590720,
+        "words": 147680,
+        "instructions": 32859,
+        "branchOperations": 4593,
+        "loops": 84,
+        "selectionMerges": 1851,
         "functions": 1,
         "functionCalls": 0,
-        "rayQueryInitializations": 28,
+        "rayQueryInitializations": 29,
         "atomicInstructions": 0
       },
       "exact": {
@@ -173,14 +173,14 @@
     {
       "key": "shipping_mobile_generic_dielectric",
       "max": {
-        "bytes": 264212,
-        "words": 66053,
-        "instructions": 15775,
-        "branchOperations": 874,
-        "loops": 18,
-        "selectionMerges": 362,
-        "functions": 76,
-        "functionCalls": 236,
+        "bytes": 285308,
+        "words": 71327,
+        "instructions": 17118,
+        "branchOperations": 930,
+        "loops": 20,
+        "selectionMerges": 386,
+        "functions": 83,
+        "functionCalls": 261,
         "rayQueryInitializations": 2,
         "atomicInstructions": 0
       },
@@ -199,15 +199,15 @@
     {
       "key": "shipping_mobile_opaque_fast",
       "max": {
-        "bytes": 556008,
-        "words": 139002,
-        "instructions": 30826,
-        "branchOperations": 4240,
-        "loops": 77,
-        "selectionMerges": 1707,
+        "bytes": 587620,
+        "words": 146905,
+        "instructions": 32666,
+        "branchOperations": 4557,
+        "loops": 80,
+        "selectionMerges": 1841,
         "functions": 1,
         "functionCalls": 0,
-        "rayQueryInitializations": 26,
+        "rayQueryInitializations": 27,
         "atomicInstructions": 0
       },
       "exact": {

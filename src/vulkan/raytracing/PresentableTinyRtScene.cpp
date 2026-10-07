@@ -1,3 +1,4 @@
+#include "scene/ShowcaseIndoorDust.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "graphics/EntryMenuScene.h"
 #include "graphics/GraphicsPreviewSession.h"
@@ -40,6 +41,16 @@
 
 namespace horde::vulkan::raytracing
 {
+namespace {
+struct alignas(16) QualityDustUpload {
+    RtQualityControlsGpu quality{};
+    horde::scene::atmosphere::DustFrame dust{};
+};
+static_assert(offsetof(QualityDustUpload,dust)==16 && sizeof(QualityDustUpload)==11280);
+static_assert(sizeof(horde::scene::atmosphere::DustMote)==sizeof(RtDustMoteGpu));
+static_assert(offsetof(horde::scene::atmosphere::DustMote,response)==offsetof(RtDustMoteGpu,response));
+}
+
 
 using horde::gameplay::kRouteFloorWorldY;
 using horde::gameplay::kShowcaseEyeWorldY;
@@ -707,6 +718,9 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     sceneProfile_ = std::exchange(other.sceneProfile_, RtSceneProfile::Showcase);
     glassEnabled_ = std::exchange(other.glassEnabled_, true);
     mistEnabled_ = std::exchange(other.mistEnabled_, true);
+    dustQuality_ = std::exchange(other.dustQuality_, horde::graphics::DustQuality::Off);
+    dustWork_ = std::exchange(other.dustWork_, {});
+    dustCache_ = std::exchange(other.dustCache_, {});
     sceneMaterials_ = std::move(other.sceneMaterials_);
     worldMaterialBase_ = std::exchange(other.worldMaterialBase_, 0u);
     tlasInstanceCount_ = std::exchange(other.tlasInstanceCount_, kTlasInstanceCount);
@@ -1013,6 +1027,9 @@ void PresentableTinyRtScene::Destroy()
     uploadedFireEmittersValid_ = false;
     glassEnabled_ = true;
     mistEnabled_ = true;
+    dustQuality_ = horde::graphics::DustQuality::Off;
+    dustWork_ = {};
+    dustCache_.Invalidate();
     tlasBuiltInstances_ = {};
     tlasInstanceDefinitionsValid_ = false;
     tlasPendingInstances_ = {};
@@ -2892,13 +2909,14 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
     std::array<RtFireEmitterGpu, kRtFireEmitterCapacity> fire{};
     const auto initialQuality = *ResolveRtQualityControls(std::nullopt, RtWorkloadPreset::Authored,
         pipelineBundle_.Request().quality == DielectricQuality::High);
+    const QualityDustUpload initialDustQuality{initialQuality,{}};
     if (!upload(vertices.data(), vertices.size() * sizeof(Vertex), geometryUsage, true, "preview world vertices", vertexBuffer_) ||
         !upload(indices.data(), indices.size() * sizeof(std::uint32_t), geometryUsage, true, "preview world indices", indexBuffer_) ||
         !upload(surfaceCodes.data(), surfaceCodes.size() * sizeof(std::uint32_t), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false,
                 "preview world surfaces", worldSurfaceBuffer_) ||
         !upload(&light, sizeof(light), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false, "preview light", heldLightBuffer_, true) ||
         !upload(fire.data(), sizeof(fire), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false, "preview fire", fireEmitterBuffer_, true) ||
-        !upload(&initialQuality, sizeof(initialQuality), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false,
+        !upload(&initialDustQuality, sizeof(initialDustQuality), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false,
                 "preview quality controls", qualityControlsBuffer_, true)) return false;
     VkAccelerationStructureGeometryKHR world{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
     world.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR; world.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
@@ -3845,7 +3863,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         !CreateBuffer(sizeof(RtFireEmitterGpu) * kRtFireEmitterCapacity,
                       VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, fireEmitterBuffer_, diagnostic) ||
-        !CreateBuffer(sizeof(RtQualityControlsGpu), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+        !CreateBuffer(sizeof(QualityDustUpload), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, qualityControlsBuffer_, diagnostic) ||
         !CreateBuffer(worldSurfaceBufferSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                       uploadMemory, false, worldSurfaceBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT))
@@ -3855,6 +3873,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
 
     const auto initialQuality = *ResolveRtQualityControls(std::nullopt, RtWorkloadPreset::Authored,
         pipelineBundle_.Request().quality == DielectricQuality::High);
+    const QualityDustUpload initialDustQuality{initialQuality,{}};
     const RtHeldLightGpu initialHeldLight{};
     const std::array<RtFireEmitterGpu, kRtFireEmitterCapacity> initialFireEmitters{};
     if (!gpuResources_.MapBufferForHostWrites(heldLightBuffer_, diagnostic) ||
@@ -3867,7 +3886,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                      "held light", diagnostic) ||
         !WriteBuffer(fireEmitterBuffer_, initialFireEmitters.data(), sizeof(initialFireEmitters),
                      "fire emitters", diagnostic) ||
-        !WriteBuffer(qualityControlsBuffer_, &initialQuality, sizeof(initialQuality),
+        !WriteBuffer(qualityControlsBuffer_, &initialDustQuality, sizeof(initialDustQuality),
                      "quality controls", diagnostic) ||
         !WriteBuffer(worldSurfaceBuffer_, worldSurfaceCodes.data(), worldSurfaceBufferSize,
                      "world surface metadata", diagnostic))
@@ -5705,7 +5724,7 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
             body, FindHeldItemSocket(rewardLanternBodyAsset_.sockets, "Light")->world);
     }
     const auto quality = ResolveRtQualityControls(frame.shadowQuality, tuning.workloadPreset,
-        pipelineBundle_.Request().quality == DielectricQuality::High, mistEnabled_);
+        pipelineBundle_.Request().quality == DielectricQuality::High, mistEnabled_, dustQuality_);
     if (!quality) { diagnostic = "Graphics preview shadow quality is invalid."; return false; }
     FireEmitterUpload fire{};
     const auto fireDetail = frame.fireDetail.value_or(frame.waterQuality == WaterQuality::High
@@ -5752,7 +5771,7 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
     case WaterQuality::High: framePipelineEvidence_.waterQuality = horde::telemetry::RtWaterQuality::High; break;
     default: framePipelineEvidenceValid_ = false; break;
     }
-    if (!WriteBuffer(qualityControlsBuffer_, &*quality, sizeof(*quality), "preview quality controls", diagnostic, observation) ||
+    if (!WriteDustQuality(*quality, frame, diagnostic, observation) ||
         !WriteBuffer(heldLightBuffer_, &light, sizeof(light), "preview light", diagnostic, observation) ||
         !WriteBuffer(fireEmitterBuffer_, fire.emitters.data(), sizeof(fire.emitters), "preview fire", diagnostic, observation) ||
         !WriteBuffer(instanceBuffer_, instances.data(), tlasInstanceCount_ * sizeof(instances[0]), "preview instances", diagnostic, observation) ||
@@ -6682,7 +6701,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         clampedTuning.fireSmokeScale,
         frame.torchLightStrength};
     const auto quality = ResolveRtQualityControls(frame.shadowQuality, clampedTuning.workloadPreset,
-        pipelineBundle_.Request().quality == DielectricQuality::High, mistEnabled_);
+        pipelineBundle_.Request().quality == DielectricQuality::High, mistEnabled_, dustQuality_);
     if (!quality) { diagnostic = "Scene shadow quality is invalid."; return false; }
     const FireEmitterQuality fireQuality = frame.fireDetail.value_or(frame.waterQuality == WaterQuality::High
         ? FireEmitterQuality::High
@@ -6801,7 +6820,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         break;
     }
     ApplyGlassFixtureVisibility(instances);
-    if (!WriteBuffer(qualityControlsBuffer_, &*quality, sizeof(*quality), "quality controls", diagnostic, observation) ||
+    if (!WriteDustQuality(*quality, frame, diagnostic, observation) ||
         !WriteBuffer(heldLightBuffer_, &heldLightGpu, sizeof(heldLightGpu),
                      "held light", diagnostic, observation) ||
         !WriteBuffer(fireEmitterBuffer_, fireEmitterUpload.emitters.data(),
@@ -7083,6 +7102,38 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     uploadedFireEmittersValid_ = true;
     uploadedQualityControlsValid_ = true;
     diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& quality,
+    const RtSceneFrameInputs& frame, std::string& diagnostic, RtSceneRecordObservation* observation)
+{
+    if (dustQuality_ == horde::graphics::DustQuality::Off)
+        return WriteBuffer(qualityControlsBuffer_, &quality, sizeof(quality), "quality controls", diagnostic, observation);
+    dustWork_ = {};
+    QualityDustUpload upload{quality,{}};
+    using namespace horde::scene::atmosphere;
+    const float step=frame.walkTime*6.2f;
+    DustCamera camera{{frame.cameraX+std::sin(step*0.5f)*0.035f*frame.walkAmount,
+        0.70f+std::abs(std::sin(step))*0.035f*frame.walkAmount,frame.cameraZ},
+        frame.cameraYaw,frame.cameraPitch+std::sin(step)*0.012f*frame.walkAmount,
+        float(dispatchExtent_.width)/float(std::max(dispatchExtent_.height,1u))};
+    const auto rotation=static_cast<unsigned>(frame.presentationTransform)&3u;
+    if(rotation==1u||rotation==3u) camera.aspect=1.0f/camera.aspect;
+    // The compact preview uses its own level subvolume; entry has no dust.
+    const auto zones=sceneProfile_==RtSceneProfile::Showcase ? std::span<const IndoorDustZone>(horde::scene::kShowcaseIndoorDust) :
+        sceneProfile_==RtSceneProfile::GraphicsPreview ? std::span<const IndoorDustZone>(horde::scene::kPreviewIndoorDust) : std::span<const IndoorDustZone>{};
+    const double seconds=std::max(double(frame.walkTime),0.0);
+    const auto decision=dustCache_.Build(zones,dustQuality_,camera,seconds,upload.dust,dustWork_);
+    if(decision==DustUploadDecision::Unchanged)
+        return WriteBuffer(qualityControlsBuffer_, &quality, sizeof(quality), "quality controls", diagnostic, observation);
+    if(decision==DustUploadDecision::Invalid) {
+        diagnostic="Indoor dust zone/camera admission failed."; return false;
+    }
+    if(!WriteBuffer(qualityControlsBuffer_, &upload, sizeof(upload), "quality and bounded indoor dust", diagnostic, observation)) {
+        dustCache_.Invalidate(); return false;
+    }
+    dustCache_.Commit(zones,dustQuality_,camera,seconds);
     return true;
 }
 
@@ -7371,6 +7422,8 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                 static_cast<horde::telemetry::RtShadowMode>(uploadedQualityControls_.controls[0]),
                 uploadedQualityControls_.controls[1], uploadedQualityControls_.controls[2], 0u};
             recorded.actualUploadedMistEnabled = *actualMist;
+            recorded.actualUploadedDustQuality = UploadedDustQuality();
+            recordedFactsValid = recorded.actualUploadedDustQuality.has_value() && recordedFactsValid;
             horde::telemetry::RtFireQuality fireTier = horde::telemetry::RtFireQuality::Mobile;
             switch (uploadedFireQuality_)
             {

@@ -184,27 +184,33 @@ struct PresentableTinyRtSceneObservationTestAccess
             for (std::size_t index = 0u; index < 3u; ++index)
                 ok &= defaultOn->controls[index] == off->controls[index];
             ok &= ResolveUploadedMistEnabled(*defaultOn) == true && ResolveUploadedMistEnabled(*off) == false;
-            auto unknown = *off; unknown.controls[3] = 2u;
+            auto unknown = *off; unknown.controls[3] = 6u;
             ok &= !ResolveUploadedMistEnabled(unknown).has_value();
         }
         PresentableTinyRtScene scene;
         ok &= scene.MistEnabled() && !scene.UploadedMistEnabled().has_value();
+        ok &= scene.DustQuality() == horde::graphics::DustQuality::Off && !scene.UploadedDustQuality();
+        scene.SetDustQuality(horde::graphics::DustQuality::Standard);
         scene.SetMistEnabled(false);
         ok &= !scene.MistEnabled() && !scene.UploadedMistEnabled().has_value();
         scene.uploadedQualityControls_ = *ResolveRtQualityControls(
-            horde::graphics::ShadowQuality::Current, RtWorkloadPreset::Authored, false, false);
+            horde::graphics::ShadowQuality::Current, RtWorkloadPreset::Authored, false, false, horde::graphics::DustQuality::Low);
         scene.uploadedQualityControlsValid_ = true;
         scene.SetMistEnabled(true);
         ok &= scene.MistEnabled() && scene.UploadedMistEnabled() == false;
+        ok &= scene.UploadedDustQuality() == horde::graphics::DustQuality::Low;
         PresentableTinyRtScene moved(std::move(scene));
         ok &= moved.MistEnabled() && moved.UploadedMistEnabled() == false &&
               scene.MistEnabled() && !scene.UploadedMistEnabled().has_value();
+        ok &= moved.DustQuality() == horde::graphics::DustQuality::Standard &&
+            moved.UploadedDustQuality() == horde::graphics::DustQuality::Low && scene.DustQuality() == horde::graphics::DustQuality::Off;
         moved.SetMistEnabled(false);
         PresentableTinyRtScene assigned;
         assigned = std::move(moved);
         ok &= !assigned.MistEnabled() && assigned.UploadedMistEnabled() == false &&
               moved.MistEnabled() && !moved.UploadedMistEnabled().has_value();
         assigned.Destroy();
+        ok &= assigned.DustQuality() == horde::graphics::DustQuality::Off && !assigned.UploadedDustQuality();
         ok &= assigned.MistEnabled() && !assigned.UploadedMistEnabled().has_value();
         return ok;
     }

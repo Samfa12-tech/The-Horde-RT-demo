@@ -32,6 +32,11 @@ foreach ($name in @('instanceMetadata', 'tlasInstances', 'staticAssets', 'fireEm
         throw "RT scene ABI capacity '$name' must be an integer in [1,256]."
     }
 }
+# The prototype's fixed tile/mote ABI matches the CPU owner and shader guards.
+# Capacity growth requires an explicit reviewed ABI change, not unchecked arrays.
+if ($c.dustMotes -ne 64 -or $c.dustTiles -ne 576 -or $c.dustTileCandidates -ne 4) {
+    throw 'Indoor dust requires the bounded 64-mote / 576-tile / four-candidate ABI.'
+}
 if ($c.tlasInstances -lt $c.instanceMetadata -or $c.activeFireEmitters -gt $c.fireEmitters) {
     throw 'RT scene ABI owner capacities must accommodate metadata and active fire records.'
 }
@@ -271,6 +276,8 @@ layout(std430, set = 0, binding = $($b.fireEmitters)) readonly buffer RtFireEmit
 layout(std430, set = 0, binding = $($b.qualityControls)) readonly buffer RtQualityControlsBuffer
 {
     RtQualityControlsGpu value;
+    RtDustMoteGpu dustMotes[$($c.dustMotes)];
+    uvec4 dustTiles[$($c.dustTiles)];
 } rtQualityControls;
 #if !defined(HORDE_RT_VARIANT_INSTRUMENTATION) || HORDE_RT_VARIANT_INSTRUMENTATION == 1
 layout(std430, set = 0, binding = $($b.dielectricDiagnostics)) restrict buffer RtDielectricDiagnosticsBuffer

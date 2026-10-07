@@ -7,10 +7,11 @@
 #include <mutex>
 #include <optional>
 #include <string_view>
+#include "graphics/DustQuality.h"
 
 namespace horde::graphics
 {
-inline constexpr std::uint32_t kGraphicsSettingsSchema = 4u;
+inline constexpr std::uint32_t kGraphicsSettingsSchema = 5u;
 inline constexpr double kGraphicsConfirmationSeconds = 15.0;
 
 #ifndef HORDE_RT_MIN_RENDER_SCALE_PERCENT
@@ -55,6 +56,7 @@ struct GraphicsSettings
     bool glassEnabled = true;
     ShadowQuality shadowQuality = ShadowQuality::Current;
     bool mistEnabled = true;
+    DustQuality dustQuality = DustQuality::Off;
     bool operator==(const GraphicsSettings&) const = default;
 };
 
@@ -64,6 +66,7 @@ inline bool ValidGraphicsSettings(const GraphicsSettings& settings) noexcept
         static_cast<unsigned>(settings.waterQuality) <= 2u &&
         static_cast<unsigned>(settings.fireDetail) <= 2u &&
         static_cast<unsigned>(settings.shadowQuality) <= 2u &&
+        ValidDustQuality(settings.dustQuality) &&
         settings.previewFrameCap >= 15 && settings.previewFrameCap <= 60;
 }
 
@@ -244,10 +247,12 @@ inline GraphicsRecovery RecoverGraphicsSettings(const GraphicsPersistenceRecord&
     const bool legacySchema = record.schema == 1u;
     const bool oldSchema = legacySchema || record.schema == 2u;
     const bool beforeMistSchema = oldSchema || record.schema == 3u;
+    const bool beforeDustSchema = record.schema >= 1u && record.schema <= 4u;
     auto confirmed = record.confirmed;
     if (oldSchema) confirmed.shadowQuality = ShadowQuality::Current;
     if (beforeMistSchema) confirmed.mistEnabled = true;
-    if ((!beforeMistSchema && record.schema != kGraphicsSettingsSchema) || !ValidGraphicsSettings(confirmed) ||
+    if (beforeDustSchema) confirmed.dustQuality = DustQuality::Off;
+    if ((!beforeDustSchema && record.schema != kGraphicsSettingsSchema) || !ValidGraphicsSettings(confirmed) ||
         (oldSchema && static_cast<unsigned>(confirmed.fireDetail) > 1u))
     {
         result.startup = BaselineGraphicsSettings(platform);
@@ -264,6 +269,7 @@ inline GraphicsRecovery RecoverGraphicsSettings(const GraphicsPersistenceRecord&
         if (legacySchema) result.retainedRequested->glassEnabled = true;
         if (oldSchema) result.retainedRequested->shadowQuality = ShadowQuality::Current;
         if (beforeMistSchema) result.retainedRequested->mistEnabled = true;
+        if (beforeDustSchema) result.retainedRequested->dustQuality = DustQuality::Off;
         if (!ValidGraphicsSettings(*result.retainedRequested) ||
             (oldSchema && static_cast<unsigned>(result.retainedRequested->fireDetail) > 1u))
         {
@@ -360,6 +366,7 @@ public:
             snapshot.effective.glassEnabled != snapshot.requested.glassEnabled ||
             snapshot.effective.shadowQuality != snapshot.requested.shadowQuality ||
             snapshot.effective.mistEnabled != snapshot.requested.mistEnabled ||
+            snapshot.effective.dustQuality != snapshot.requested.dustQuality ||
             (snapshot.effective.fireDetail != snapshot.requested.fireDetail && !explainedFire) ||
             (HasGraphicsReason(snapshot.reasons, GraphicsReason::FireFollowsWater) && !explainedFire) ||
             HasGraphicsReason(snapshot.reasons, GraphicsReason::InvalidSettings) ||

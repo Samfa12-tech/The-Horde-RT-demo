@@ -32,6 +32,15 @@ int main(){
     DustProjection projection;check(ProjectDustSphere({0,0.7f,-2},0.012f,camera,projection),"visible sphere projects");
     check(!ProjectDustSphere({0,0.7f,2},0.012f,camera,projection),"behind camera rejected");
     check(!ProjectDustSphere({0,0.7f,-0.1f},0.012f,camera,projection),"near plane rejected");
+    for(float aspect:{0.5f,1.0f,1.77778f,2.5f})for(float yaw:{-3.0f,0.0f,1.2f})for(float pitch:{-0.32f,0.0f,0.28f}) {
+        auto c=camera;c.aspect=aspect;c.yaw=yaw;c.pitch=pitch;
+        Vec3 f{std::sin(yaw),-0.05f+pitch,-std::cos(yaw)};
+        float len=std::sqrt(Dot(f,f));for(float& v:f)v/=len;
+        Vec3 center{c.origin[0]+f[0]*2,c.origin[1]+f[1]*2,c.origin[2]+f[2]*2};
+        DustProjection projected;check(ProjectDustSphere(center,0.012f,c,projected),"camera rotation and aspect admitted");
+        check(projected.left<0.5f&&projected.right>0.5f&&projected.top<0.5f&&projected.bottom>0.5f,
+            "conservative sphere contains actual forward-ray UV at all pitch/aspect cases");
+    }
     std::array<IndoorDustZone,4> overlaps;for(unsigned i=0;i<4;++i){overlaps[i]=zones[0];overlaps[i].id=4-i;}
     check(BuildDustFrame(overlaps,DustQuality::Standard,camera,0,frame,work)&&work.admittedZones==2&&work.generatedMotes==64,"overlap capped to two stable IDs");
     for(auto tile:frame.tiles)for(auto index:tile)check(index==kDustEmptyCandidate||index<64,"overflow never produces invalid index");
@@ -39,5 +48,14 @@ int main(){
     // Compare same seed/quality, independently of overlap fixture above.
     BuildDustFrame(zones,DustQuality::Low,camera,1,frame,work);
     check(repeat.motes[0].positionRadius==frame.motes[0].positionRadius,"camera never translates motes");
+    DustFrameCache cache;
+    check(cache.Build(zones,DustQuality::Low,camera,1,frame,work)==DustUploadDecision::Changed,"first upload needed");
+    check(cache.Build(zones,DustQuality::Low,camera,1,frame,work)==DustUploadDecision::Changed,"failed/uncommitted upload cannot seed reuse");
+    cache.Commit(zones,DustQuality::Low,camera,1);
+    check(cache.Build(zones,DustQuality::Low,camera,1,frame,work)==DustUploadDecision::Unchanged&&work.generatedMotes==0,"pause reuses uploaded data with no owned updates");
+    check(cache.Build(zones,DustQuality::Off,camera,1,frame,work)==DustUploadDecision::Disabled&&work.generatedMotes==0,"Off invalidates safely without generating");
+    check(cache.Build(zones,DustQuality::Low,camera,1,frame,work)==DustUploadDecision::Changed,"re-enable repopulates safely");
+    cache.Commit(zones,DustQuality::Low,camera,1);cache.Invalidate();
+    check(cache.Build(zones,DustQuality::Low,camera,1,frame,work)==DustUploadDecision::Changed,"lifecycle reset never reuses stale storage");
     std::cout<<"IndoorDust failures="<<failures<<'\n'; return failures?1:0;
 }

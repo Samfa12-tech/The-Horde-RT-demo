@@ -1,4 +1,5 @@
 #pragma once
+#include "scene/atmosphere/IndoorDust.h"
 
 #include <array>
 #include <cstdint>
@@ -254,6 +255,18 @@ public:
     bool GlassEnabled() const { return glassEnabled_; }
     void SetMistEnabled(const bool enabled) noexcept { mistEnabled_ = enabled; }
     bool MistEnabled() const noexcept { return mistEnabled_; }
+    void SetDustQuality(horde::graphics::DustQuality quality) noexcept {
+        if (quality == dustQuality_) return;
+        dustQuality_ = quality;
+        dustCache_.Invalidate();
+        dustWork_ = {};
+    }
+    horde::graphics::DustQuality DustQuality() const noexcept { return dustQuality_; }
+    std::optional<horde::graphics::DustQuality> UploadedDustQuality() const noexcept {
+        return uploadedQualityControlsValid_ ? ResolveUploadedDustQuality(uploadedQualityControls_) : std::nullopt;
+    }
+    horde::scene::atmosphere::DustWork DustWork() const noexcept { return dustWork_; }
+
     // Raw successful upload only; owning completion/presentation is separate.
     std::optional<bool> UploadedMistEnabled() const noexcept
     {
@@ -863,6 +876,10 @@ private:
     RtSceneProfile sceneProfile_ = RtSceneProfile::Showcase;
     bool glassEnabled_ = true;
     bool mistEnabled_ = true;
+    horde::graphics::DustQuality dustQuality_ = horde::graphics::DustQuality::Off;
+    horde::scene::atmosphere::DustWork dustWork_{};
+    horde::scene::atmosphere::DustFrameCache dustCache_{};
+    bool WriteDustQuality(const RtQualityControlsGpu&, const RtSceneFrameInputs&, std::string&, RtSceneRecordObservation*);
     std::vector<RtMaterialGpu> sceneMaterials_;
     std::uint32_t worldMaterialBase_ = 0u;
     std::uint32_t tlasInstanceCount_ = kTlasInstanceCount;

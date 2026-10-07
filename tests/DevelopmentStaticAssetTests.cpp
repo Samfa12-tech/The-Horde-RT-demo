@@ -65,10 +65,10 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 56u,
+    Check(kDevelopmentCheckpoints.size() == 60u,
           "development registry retains all prior views and admits three scoped guard-room samples");
-    Check(FindDevelopmentCheckpoint(156) == nullptr,
-          "development lookup rejects IDs beyond the admitted guard-room samples");
+    Check(FindDevelopmentCheckpoint(160) == nullptr,
+          "development lookup rejects IDs beyond the admitted dust and guard-room samples");
     for (int index = 0; index < 3; ++index)
     {
         const std::array<std::string_view, 3> names{
@@ -79,6 +79,12 @@ int main()
               guard->waterfallGuardFixedTicks == (index == 0 ? 0u : index == 1 ? 6u : 18u) &&
               IsWaterfallSkeletonRoom(guard->cameraX, guard->cameraZ),
               "guard preview registry resolves bounded room samples without altering release checkpoints");
+    }
+    for (int id=156;id<=159;++id) {
+        const auto* dust=FindDevelopmentCheckpoint(id);
+        Check(dust && dust->name.starts_with("dust-") && !dust->usesGlassFixture &&
+            !dust->stagesWaterfallGuards && dust->combatPose==DevelopmentCombatPose::Rest,
+            "dust cameras remain developer-only framing with ordinary simulation state");
     }
     for (std::size_t first = 0u; first < kDevelopmentCheckpoints.size(); ++first)
     {

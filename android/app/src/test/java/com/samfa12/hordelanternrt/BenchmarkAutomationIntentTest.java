@@ -26,7 +26,7 @@ public final class BenchmarkAutomationIntentTest {
             assertThrows(IllegalArgumentException.class,
                     () -> MainActivity.benchmarkAutomationRequestId(request(id)));
         }
-        for (String key : new String[]{"horde.debug.scale", "horde.debug.checkpoint",
+        for (String key : new String[]{"horde.debug.scale", "horde.debug.dust", "horde.debug.checkpoint",
                 "horde.debug.capture", "horde_require_rayquery_compute"}) {
             assertThrows(IllegalArgumentException.class,
                     () -> MainActivity.benchmarkAutomationRequestId(request("valid").putExtra(key, "value")));

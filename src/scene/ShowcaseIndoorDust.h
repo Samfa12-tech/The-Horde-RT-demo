@@ -10,7 +10,7 @@ inline constexpr std::array<atmosphere::IndoorDustZone,2> kShowcaseIndoorDust{{
         {-0.006f,0.010f,0.003f},0.14f,0.011f,7.0f,atmosphere::DustZoneShape::Ellipsoid}
 }};
 inline constexpr std::array<atmosphere::IndoorDustZone,1> kPreviewIndoorDust{{
-    {103,0x33cd1u,{-0.5f,0.1f,-2.3f},{0.5f,1.5f,-1.2f},
+    {103,0x33cd1u,{-4.95f,0.15f,-14.6f},{-4.15f,1.3f,-13.6f},
         {0.005f,0.009f,0.003f},0.14f,0.012f,6.0f,atmosphere::DustZoneShape::Box}
 }};
 }

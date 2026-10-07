@@ -342,6 +342,7 @@ RtRecordedSceneEvidence MakeRecordedScene(const RtSceneFrameEvidence& evidence)
     recorded.fireQuality = evidence.fireQuality;
     recorded.fireLighting = evidence.fireLighting;
     recorded.actualUploadedMistEnabled = evidence.actualUploadedMistEnabled;
+    recorded.actualUploadedDustQuality = evidence.actualUploadedDustQuality;
     recorded.player = evidence.player;
     recorded.player.primaryPixelCountAvailable = false;
     recorded.player.primaryPixelCount = 0u;
@@ -1000,6 +1001,7 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     sceneA.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Lower, 1u, 1u, 0u};
     sceneA.fireQuality = RtFireQualityEvidence{RtFireQuality::Low, 2u, 1u};
     sceneA.actualUploadedMistEnabled = true;
+    sceneA.actualUploadedDustQuality = horde::graphics::DustQuality::Low;
     sceneA.fireLighting = RtFireLightingEvidence{};
     sceneA.fireLighting->count = 2u;
     sceneA.fireLighting->emitters[0] = {3u, {{-32.5f, 0.85f, -16.5f, 0.5f}}, {{1.0f, 0.5f, 0.25f, 0.5f}}};
@@ -1024,6 +1026,7 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     sceneB.shadowQuality = RtShadowQualityEvidence{RtShadowMode::Higher, 4u, 2u, 0u};
     sceneB.fireQuality = RtFireQualityEvidence{RtFireQuality::High, 10u, 2u};
     sceneB.actualUploadedMistEnabled = false;
+    sceneB.actualUploadedDustQuality = horde::graphics::DustQuality::Standard;
     sceneB.fireLighting = RtFireLightingEvidence{}; // actual empty upload, not legacy absence
     RtFrameToken recordedB{};
     context.Check(lifecycle.FinishRecord(attemptB, MakeRecordedScene(sceneB), recordedB),
@@ -1073,6 +1076,7 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     context.Check(completedA.scene.shadowQuality == sceneA.shadowQuality &&
                       completedA.scene.fireQuality == sceneA.fireQuality &&
                       completedA.scene.actualUploadedMistEnabled == sceneA.actualUploadedMistEnabled &&
+                      completedA.scene.actualUploadedDustQuality == sceneA.actualUploadedDustQuality &&
                       completedA.scene.actualUploadedMistEnabled != sceneB.actualUploadedMistEnabled &&
                       completedA.scene.fireLighting == sceneA.fireLighting &&
                       completedA.scene.fireLighting != sceneB.fireLighting &&
@@ -1109,6 +1113,21 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
     context.Check(!lifecycle.AttachPresentation(submittedB, RtPresentationOutcome::Presented) &&
                       SameBytes(beforeInvalid, lifecycle),
                   "duplicate present attachment must be transactionally rejected");
+    RtLifecyclePublishedState dustPublication{};
+    dustPublication.running=true;dustPublication.presented=true;dustPublication.hasCompletedEvidence=true;
+    dustPublication.sceneEpoch=submittedA.frame.sceneEpoch;
+    dustPublication.measurementGeneration=submittedA.frame.measurementGeneration;
+    dustPublication.completedEvidence=completedA;
+    dustPublication.completedEvidence.presentation.outcome=RtPresentationOutcome::Presented;
+    dustPublication.completedEvidence.presentation.lastSuccessfulPresentSubmissionSerial=submittedA.submissionSerial;
+    context.Check(CurrentCompletedDustQuality(dustPublication)==horde::graphics::DustQuality::Low,
+        "Dust ACK is owned by the completed and presented A submission");
+    auto staleDust=dustPublication;++staleDust.sceneEpoch;
+    context.Check(!CurrentCompletedDustQuality(staleDust),"stale scene cannot ACK Dust");
+    staleDust=dustPublication;staleDust.completedEvidence.identity.completionSerial=0;
+    context.Check(!CurrentCompletedDustQuality(staleDust),"uncompleted upload cannot ACK Dust");
+    staleDust=dustPublication;staleDust.completedEvidence.scene.actualUploadedDustQuality=static_cast<horde::graphics::DustQuality>(3);
+    context.Check(!CurrentCompletedDustQuality(staleDust),"invalid owning Dust enum rejected");
     RtPerformanceEvidenceSnapshot completedB{};
     context.Check(lifecycle.CompleteFence(
                       submittedB,
@@ -1122,6 +1141,7 @@ void TestLifecycleAssociationAndTransactions(TestContext& context)
                   "failed-present submission may still publish matching completed diagnostics");
     context.Check(completedB.presentation.outcome == RtPresentationOutcome::Failed &&
                       completedB.scene.actualUploadedMistEnabled == sceneB.actualUploadedMistEnabled &&
+                      completedB.scene.actualUploadedDustQuality == sceneB.actualUploadedDustQuality &&
                       completedB.scene.fireLighting == sceneB.fireLighting &&
                       !completedB.benchmarkEligible &&
                       completedB.presentation.lastSuccessfulPresentSubmissionSerial ==

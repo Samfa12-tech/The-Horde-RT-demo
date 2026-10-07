@@ -7,6 +7,7 @@ struct GraphicsPreviewCaptureRecord
     horde::graphics::GraphicsAppliedSnapshot settings{};
     horde::telemetry::RtResourceInventory resources{};
     horde::telemetry::RtLifecyclePublishedState publication{};
+    horde::scene::atmosphere::DustWork dustWork{};
     bool sceneGlassEnabled = true;
     std::vector<std::uint8_t> instanceMasksByCustomIndex;
     std::vector<double> renderCallMilliseconds;
@@ -52,7 +53,15 @@ bool WriteGraphicsPreviewCaptureManifest(
                  << ",\"previewFrameCap\":" << settings.previewFrameCap
                  << ",\"glassEnabled\":" << (settings.glassEnabled ? "true" : "false")
                  << ",\"shadowQuality\":" << static_cast<unsigned>(settings.shadowQuality)
-                 << ",\"mistEnabled\":" << (settings.mistEnabled ? "true" : "false") << '}';
+                 << ",\"mistEnabled\":" << (settings.mistEnabled ? "true" : "false")
+                 << ",\"dustQuality\":" << static_cast<unsigned>(settings.dustQuality) << '}';
+    };
+    const auto dustWorkJson = [&manifest](const horde::scene::atmosphere::DustWork& work) {
+        manifest << "{\"admittedZones\":" << work.admittedZones
+                 << ",\"generatedMotes\":" << work.generatedMotes
+                 << ",\"projectedMotes\":" << work.projectedMotes
+                 << ",\"tileReferences\":" << work.tileReferences
+                 << ",\"overflowReferences\":" << work.overflowReferences << '}';
     };
     const auto appliedJson = [&manifest, &settingsJson](const horde::graphics::GraphicsAppliedSnapshot& snapshot) {
         manifest << "{\"serial\":" << snapshot.serial << ",\"lifecycleGeneration\":" << snapshot.lifecycleGeneration
@@ -131,6 +140,8 @@ bool WriteGraphicsPreviewCaptureManifest(
         manifest << ",\"customGlassIndex\":9,\"customGlassMask\":"
                  << static_cast<unsigned>(transaction.instanceMasksByCustomIndex[9u])
                  << ",\"currentCompletedPresent\":" << (CurrentCompletedGraphicsPreviewPresent(transaction.after) ? "true" : "false")
+                 << ",\"actualUploadedDustQuality\":"
+                 << static_cast<unsigned>(*completed.scene.actualUploadedDustQuality)
                  << ",\"submittedSceneEpoch\":" << completed.identity.submitted.frame.sceneEpoch
                  << ",\"submittedMeasurementGeneration\":" << completed.identity.submitted.frame.measurementGeneration
                  << ",\"submissionSerial\":" << completed.identity.submitted.submissionSerial
@@ -158,6 +169,7 @@ bool WriteGraphicsPreviewCaptureManifest(
                  << "},\"skeleton\":{\"animation\":\"Idle\",\"animationTime\":" << pose.skeleton.animationTime
                  << "},\"firePhases\":[" << pose.fireEmitters[0].phase << ',' << pose.fireEmitters[1].phase
                  << "],\"graphics\":"; appliedJson(capture.settings);
+        manifest << ",\"cpuDustWork\":"; dustWorkJson(capture.dustWork);
         manifest << ",\"sceneGlassEnabled\":" << (capture.sceneGlassEnabled ? "true" : "false")
                  << ",\"instanceMasksByCustomIndex\":"; masksJson(capture.instanceMasksByCustomIndex);
         manifest << ",\"customGlassIndex\":9,\"customGlassMask\":" << static_cast<unsigned>(capture.instanceMasksByCustomIndex[9u])
@@ -165,6 +177,8 @@ bool WriteGraphicsPreviewCaptureManifest(
                  << ",\"measurementGeneration\":" << publication.measurementGeneration
                  << ",\"hasCompletedEvidence\":" << (publication.hasCompletedEvidence ? "true" : "false")
                  << ",\"currentCompletedPresent\":" << (CurrentCompletedGraphicsPreviewPresent(publication) ? "true" : "false")
+                 << ",\"actualUploadedDustQuality\":"
+                 << static_cast<unsigned>(*evidence.scene.actualUploadedDustQuality)
                  << ",\"submissionSerial\":" << evidence.identity.submitted.submissionSerial
                  << ",\"recordedPreviewTick\":" << evidence.identity.submitted.frame.simulationTick
                  << ",\"completionSerial\":" << evidence.identity.completionSerial << "},\"resources\":{\"buffers\":" << resources.bufferCount
@@ -291,6 +305,7 @@ int RunGraphicsPreviewCapture(VulkanSurfaceContext& context,
         record.redBlueSwapNormalised = image.redBlueSwapNormalised;
         record.resources = context.rtScene.ResourceInventory();
         record.publication = context.rtFrameEvidence.PublishedStateByValue();
+        record.dustWork = context.rtScene.DustWork();
         if (record.resources.topLevelAccelerationStructureCount != 1u || record.resources.tlasInstanceCount != 7u)
             return captureFailure("Compact preview did not retain exactly its seven production TLAS roles.");
         record.sceneGlassEnabled = context.rtScene.GlassEnabled();
@@ -302,6 +317,8 @@ int RunGraphicsPreviewCapture(VulkanSurfaceContext& context,
             !CurrentCompletedGraphicsPreviewPresent(record.publication) ||
             horde::telemetry::CurrentCompletedMistEnabled(record.publication) != std::optional<bool>{expectedSettings.mistEnabled} ||
             context.rtScene.UploadedMistEnabled() != std::optional<bool>{expectedSettings.mistEnabled} ||
+            horde::telemetry::CurrentCompletedDustQuality(record.publication) != std::optional<horde::graphics::DustQuality>{expectedSettings.dustQuality} ||
+            context.rtScene.UploadedDustQuality() != std::optional<horde::graphics::DustQuality>{expectedSettings.dustQuality} ||
             record.publication.completedEvidence.identity.submitted.frame.simulationTick != pose.tick)
             return captureFailure(record.name + " lacks current completed RT presentation or the selected live glass mask/profile/backend.");
         captures.push_back(std::move(record));
@@ -332,6 +349,8 @@ int RunGraphicsPreviewCapture(VulkanSurfaceContext& context,
             !CurrentCompletedGraphicsPreviewPresent(after) ||
             horde::telemetry::CurrentCompletedMistEnabled(after) != std::optional<bool>{request->requested.mistEnabled} ||
             context.rtScene.UploadedMistEnabled() != std::optional<bool>{request->requested.mistEnabled} ||
+            horde::telemetry::CurrentCompletedDustQuality(after) != std::optional<horde::graphics::DustQuality>{request->requested.dustQuality} ||
+            context.rtScene.UploadedDustQuality() != std::optional<horde::graphics::DustQuality>{request->requested.dustQuality} ||
             after.completedEvidence.identity.submitted.submissionSerial <= before.completedEvidence.identity.submitted.submissionSerial ||
             (glassChanged && (after.sceneEpoch <= before.sceneEpoch ||
                               after.measurementGeneration < before.measurementGeneration)) ||

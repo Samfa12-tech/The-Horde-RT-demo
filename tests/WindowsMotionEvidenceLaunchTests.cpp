@@ -17,6 +17,14 @@ int main()
               parsed.rtWorkloadPreset==RtWorkloadPreset::Authored);
         check(!ParseWindowsMotionEvidenceLaunch(args,false).error.empty()); // Release never admits the mode.
     }
+    const std::array<std::wstring_view,6> dustCapture{L"--validate-native-motion",L"C:\\fresh motion",
+        L"--motion-scenario",L"waterfall-equipment",L"--capture-dust",L"low"};
+    const auto parsedDustCapture=ParseWindowsMotionEvidenceLaunch(dustCapture);
+    check(parsedDustCapture.requested && parsedDustCapture.error.empty() &&
+          parsedDustCapture.scenario=="waterfall-equipment");
+    auto invalidDustCapture=dustCapture;
+    invalidDustCapture[5]=L"high";
+    check(!ParseWindowsMotionEvidenceLaunch(invalidDustCapture).error.empty());
     for(const auto conflict:{L"--capture-showcase",L"--capture-graphics-preview",L"--benchmark-showcase",
         L"--development-checkpoint",L"--debug-rt-lab",L"--rt-lab-hue",L"--validate-output-resize",L"--report-preview",L"--unknown"})
     {
