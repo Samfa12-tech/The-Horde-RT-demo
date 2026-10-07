@@ -1447,6 +1447,21 @@ float DistanceSquaredToBounds(const std::array<float, 3u>& point,
     return distance * distance;
 }
 
+float DistanceSquaredBetweenBounds(const WorldBounds& left,
+                                   const WorldBounds& right)
+{
+    float result = 0.0f;
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+    {
+        const float gap = left.maximum[axis] < right.minimum[axis]
+            ? right.minimum[axis] - left.maximum[axis]
+            : (right.maximum[axis] < left.minimum[axis]
+                ? left.minimum[axis] - right.maximum[axis] : 0.0f);
+        result += gap * gap;
+    }
+    return result;
+}
+
 struct MeshTriangle
 {
     std::array<float, 3u> a{};
@@ -1534,6 +1549,14 @@ public:
         return std::sqrt(bestSquared);
     }
 
+    float Distance(const MeshTriangle& triangle) const
+    {
+        if (nodes_.empty()) return std::numeric_limits<float>::max();
+        float bestSquared = std::numeric_limits<float>::max();
+        Query(0u, triangle, bestSquared);
+        return std::sqrt(bestSquared);
+    }
+
 private:
     struct Node
     {
@@ -1607,6 +1630,43 @@ private:
         }
     }
 
+    void Query(const std::size_t nodeIndex,
+               const MeshTriangle& triangle,
+               float& bestSquared) const
+    {
+        const Node& node = nodes_[nodeIndex];
+        if (DistanceSquaredBetweenBounds(triangle.bounds, node.bounds) >= bestSquared)
+            return;
+        if (node.left == std::numeric_limits<std::size_t>::max())
+        {
+            const std::array<std::array<float, 3u>, 3u> query{{
+                triangle.a, triangle.b, triangle.c}};
+            for (std::size_t i = node.begin; i < node.end; ++i)
+            {
+                const MeshTriangle& candidate = triangles_[order_[i]];
+                const std::array<std::array<float, 3u>, 3u> target{{
+                    candidate.a, candidate.b, candidate.c}};
+                bestSquared = std::min(bestSquared,
+                                       TriangleDistanceSquared(query, target));
+            }
+            return;
+        }
+        const float leftDistance = DistanceSquaredBetweenBounds(
+            triangle.bounds, nodes_[node.left].bounds);
+        const float rightDistance = DistanceSquaredBetweenBounds(
+            triangle.bounds, nodes_[node.right].bounds);
+        if (leftDistance <= rightDistance)
+        {
+            Query(node.left, triangle, bestSquared);
+            Query(node.right, triangle, bestSquared);
+        }
+        else
+        {
+            Query(node.right, triangle, bestSquared);
+            Query(node.left, triangle, bestSquared);
+        }
+    }
+
     std::vector<MeshTriangle> triangles_;
     std::vector<std::size_t> order_;
     std::vector<Node> nodes_;
@@ -1627,6 +1687,182 @@ std::array<float, 3u> SkeletonLocalToWorld(
 
 std::array<float, 3u> ItemVertexToGripLocal(
     const std::array<float, 3u>& point,
+    const HeldItemTransform& itemFromGrip);
+
+struct DiagnosticSkeletonRenderSample
+{
+    horde::scene::SkinnedClip clip = horde::scene::SkinnedClip::Idle;
+    float clipTime = 0.0f;
+    std::array<float, 12u> transform{};
+};
+
+float DiagnosticSkeletonStaggerRecoil(const float actionTime)
+{
+    constexpr float staggerDuration = 0.80f;
+    constexpr float impactDuration = 0.14f;
+    const float elapsed = std::clamp(actionTime, 0.0f, staggerDuration);
+    const auto smoothStep = [](const float value) {
+        const float clamped = std::clamp(value, 0.0f, 1.0f);
+        return clamped * clamped * (3.0f - 2.0f * clamped);
+    };
+    if (elapsed <= impactDuration) return smoothStep(elapsed / impactDuration);
+    return 1.0f - smoothStep((elapsed - impactDuration) /
+                             (staggerDuration - impactDuration));
+}
+
+// Diagnostic-only copy of CharacterRenderSlot.cpp's SkeletonClipForAction,
+// SkeletonTimeForAction, and SkeletonInstanceTransform (current source lines
+// 54-134). The held-item target does not link CharacterRenderSlot.cpp, so this
+// keeps the host fixture within its existing target. It is not direct execution
+// of CharacterRenderSlot and should be kept aligned if that mapping changes.
+DiagnosticSkeletonRenderSample CurrentCharacterRenderMapping(
+    const horde::gameplay::SkeletonCombatantSnapshot& source,
+    const float deadClipDuration)
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::simulation;
+    DiagnosticSkeletonRenderSample result;
+    if (source.animation == EnemyAnimation::Dead ||
+        source.action == EnemyCombatAction::Dead)
+    {
+        result.clip = horde::scene::SkinnedClip::Dead;
+        result.clipTime = deadClipDuration > 0.0f
+            ? std::min(source.animationTime, deadClipDuration)
+            : source.animationTime;
+    }
+    else
+    {
+        switch (source.action)
+        {
+        case EnemyCombatAction::AttackWindup:
+            result.clip = horde::scene::SkinnedClip::Attack;
+            result.clipTime = std::clamp(
+                source.actionTime, 0.0f,
+                CombatTimeline::kSkeletonAttackWindupSeconds);
+            break;
+        case EnemyCombatAction::AttackActive:
+            result.clip = horde::scene::SkinnedClip::Attack;
+            result.clipTime = CombatTimeline::kSkeletonAttackWindupSeconds +
+                std::clamp(source.actionTime, 0.0f,
+                           CombatTimeline::kSkeletonAttackActiveSeconds);
+            break;
+        case EnemyCombatAction::AttackRecovery:
+            result.clip = horde::scene::SkinnedClip::Attack;
+            result.clipTime = CombatTimeline::kSkeletonAttackWindupSeconds +
+                CombatTimeline::kSkeletonAttackActiveSeconds +
+                std::clamp(source.actionTime, 0.0f,
+                           CombatTimeline::kSkeletonAttackRecoverySeconds);
+            break;
+        case EnemyCombatAction::Staggered:
+            result.clip = horde::scene::SkinnedClip::Attack;
+            result.clipTime = CombatTimeline::kSkeletonStaggerRecoverySampleSeconds +
+                (CombatTimeline::kSkeletonAttackRecoverySampleEndSeconds -
+                 CombatTimeline::kSkeletonStaggerRecoverySampleSeconds) *
+                    std::clamp(source.actionTime / 0.80f, 0.0f, 1.0f);
+            break;
+        case EnemyCombatAction::Dead:
+            result.clip = horde::scene::SkinnedClip::Dead;
+            result.clipTime = deadClipDuration > 0.0f
+                ? std::min(source.animationTime, deadClipDuration)
+                : source.animationTime;
+            break;
+        case EnemyCombatAction::Locomotion:
+        default:
+            result.clip = source.animation == EnemyAnimation::Walking
+                ? horde::scene::SkinnedClip::Walking
+                : horde::scene::SkinnedClip::Idle;
+            result.clipTime = source.animationTime * 0.90f;
+            break;
+        }
+    }
+
+    const float recoil = source.action == EnemyCombatAction::Staggered
+        ? DiagnosticSkeletonStaggerRecoil(source.actionTime)
+        : 0.0f;
+    const float x = source.x - std::sin(source.facingRadians) * recoil * 0.20f;
+    const float z = source.z - std::cos(source.facingRadians) * recoil * 0.20f;
+    const float cosine = std::cos(source.facingRadians);
+    const float sine = std::sin(source.facingRadians);
+    const float lean = -0.30f * recoil;
+    const float leanCos = std::cos(lean);
+    const float leanSin = std::sin(lean);
+    result.transform = {{
+        cosine, sine * leanSin, sine * leanCos, x,
+        0.0f, leanCos, -leanSin,
+            horde::gameplay::kRouteFloorWorldY + recoil * 0.055f,
+        -sine, cosine * leanSin, cosine * leanCos, z}};
+    return result;
+}
+
+std::array<float, 3u> ApplySkeletonTransform(
+    const std::array<float, 12u>& transform,
+    const std::array<float, 3u>& point)
+{
+    return {{
+        transform[0] * point[0] + transform[1] * point[1] +
+            transform[2] * point[2] + transform[3],
+        transform[4] * point[0] + transform[5] * point[1] +
+            transform[6] * point[2] + transform[7],
+        transform[8] * point[0] + transform[9] * point[1] +
+            transform[10] * point[2] + transform[11]}};
+}
+
+struct DiagnosticBladeGap
+{
+    float fullSword = std::numeric_limits<float>::max();
+    float bladeOnly = std::numeric_limits<float>::max();
+    WorldBounds targetBounds{};
+};
+
+DiagnosticBladeGap MeasureDiagnosticBladeGap(
+    const DiagnosticSkeletonRenderSample& targetSample,
+    const std::vector<horde::scene::SkinnedRtVertex>& targetPose,
+    const horde::scene::assets::StaticMeshAsset& sword,
+    const horde::scene::assets::StaticSocket* grip,
+    const HeldItemTransform& worldFromSword)
+{
+    DiagnosticBladeGap result;
+    if (grip == nullptr || targetPose.size() % 3u != 0u) return result;
+    std::vector<MeshTriangle> triangles;
+    triangles.reserve(targetPose.size() / 3u);
+    for (const auto& vertex : targetPose)
+        IncludePoint(result.targetBounds, ApplySkeletonTransform(
+            targetSample.transform,
+            {{vertex.position[0], vertex.position[1], vertex.position[2]}}));
+    for (std::size_t index = 0u; index + 2u < targetPose.size(); index += 3u)
+    {
+        MeshTriangle triangle;
+        triangle.a = ApplySkeletonTransform(targetSample.transform,
+            {{targetPose[index].position[0], targetPose[index].position[1],
+              targetPose[index].position[2]}});
+        triangle.b = ApplySkeletonTransform(targetSample.transform,
+            {{targetPose[index + 1u].position[0], targetPose[index + 1u].position[1],
+              targetPose[index + 1u].position[2]}});
+        triangle.c = ApplySkeletonTransform(targetSample.transform,
+            {{targetPose[index + 2u].position[0], targetPose[index + 2u].position[1],
+              targetPose[index + 2u].position[2]}});
+        IncludePoint(triangle.bounds, triangle.a);
+        IncludePoint(triangle.bounds, triangle.b);
+        IncludePoint(triangle.bounds, triangle.c);
+        triangle.center = Scale(Add(Add(triangle.a, triangle.b), triangle.c), 1.0f / 3.0f);
+        triangles.push_back(triangle);
+    }
+    const TriangleBoundsTree targetTree(std::move(triangles));
+    for (const auto& vertex : sword.vertices)
+    {
+        const std::array<float, 3u> localPoint{{
+            vertex.position[0], vertex.position[1], vertex.position[2]}};
+        const auto point = TransformPoint(worldFromSword, localPoint);
+        const float gap = targetTree.Distance(point);
+        result.fullSword = std::min(result.fullSword, gap);
+        if (ItemVertexToGripLocal(localPoint, grip->world)[1] > 0.15f)
+            result.bladeOnly = std::min(result.bladeOnly, gap);
+    }
+    return result;
+}
+
+std::array<float, 3u> ItemVertexToGripLocal(
+    const std::array<float, 3u>& point,
     const HeldItemTransform& itemFromGrip)
 {
     const std::array<float, 3u> relative{{
@@ -1635,6 +1871,108 @@ std::array<float, 3u> ItemVertexToGripLocal(
     return {{relative[0] * itemFromGrip[0] + relative[1] * itemFromGrip[1] + relative[2] * itemFromGrip[2],
              relative[0] * itemFromGrip[4] + relative[1] * itemFromGrip[5] + relative[2] * itemFromGrip[6],
              relative[0] * itemFromGrip[8] + relative[1] * itemFromGrip[9] + relative[2] * itemFromGrip[10]}};
+}
+
+std::vector<MeshTriangle> BuildGripFilteredBladeTriangles(
+    const horde::scene::assets::StaticMeshAsset& sword,
+    const horde::scene::assets::StaticSocket& grip,
+    const HeldItemTransform& worldFromSword)
+{
+    std::vector<MeshTriangle> result;
+    for (const auto& primitive : sword.primitives)
+    {
+        if (primitive.indexCount % 3u != 0u ||
+            primitive.indexOffset > sword.indices.size() ||
+            primitive.indexCount > sword.indices.size() - primitive.indexOffset)
+            continue;
+        for (std::uint32_t offset = 0u; offset < primitive.indexCount; offset += 3u)
+        {
+            std::array<std::array<float, 3u>, 3u> local{};
+            std::array<std::array<float, 3u>, 3u> gripLocal{};
+            bool entireTriangleIsBlade = true;
+            bool validTriangle = true;
+            for (std::size_t corner = 0u; corner < 3u; ++corner)
+            {
+                const std::uint32_t index = sword.indices[
+                    primitive.indexOffset + offset + static_cast<std::uint32_t>(corner)];
+                const std::size_t vertexIndex =
+                    static_cast<std::size_t>(primitive.vertexOffset) + index;
+                if (vertexIndex >= sword.vertices.size())
+                {
+                    validTriangle = false;
+                    break;
+                }
+                const auto& vertex = sword.vertices[vertexIndex];
+                local[corner] = {{vertex.position[0], vertex.position[1],
+                                  vertex.position[2]}};
+                gripLocal[corner] = ItemVertexToGripLocal(local[corner], grip.world);
+                entireTriangleIsBlade &= gripLocal[corner][1] > 0.15f;
+            }
+            if (!validTriangle || !entireTriangleIsBlade) continue;
+
+            MeshTriangle triangle;
+            triangle.a = TransformPoint(worldFromSword, local[0]);
+            triangle.b = TransformPoint(worldFromSword, local[1]);
+            triangle.c = TransformPoint(worldFromSword, local[2]);
+            IncludePoint(triangle.bounds, triangle.a);
+            IncludePoint(triangle.bounds, triangle.b);
+            IncludePoint(triangle.bounds, triangle.c);
+            triangle.center = Scale(Add(Add(triangle.a, triangle.b), triangle.c),
+                                    1.0f / 3.0f);
+            result.push_back(triangle);
+        }
+    }
+    return result;
+}
+
+struct BladeTriangleDistance
+{
+    float metres = std::numeric_limits<float>::max();
+    std::size_t trianglesQueried = 0u;
+};
+
+BladeTriangleDistance MeasureBladeTriangleDistance(
+    const TriangleBoundsTree& targetTree,
+    const horde::scene::assets::StaticMeshAsset& sword,
+    const horde::scene::assets::StaticSocket& grip,
+    const HeldItemTransform& worldFromSword)
+{
+    const auto bladeTriangles = BuildGripFilteredBladeTriangles(
+        sword, grip, worldFromSword);
+    BladeTriangleDistance result;
+    result.trianglesQueried = bladeTriangles.size();
+    for (const MeshTriangle& triangle : bladeTriangles)
+        result.metres = std::min(result.metres, targetTree.Distance(triangle));
+    return result;
+}
+
+TriangleBoundsTree BuildDiagnosticTargetTree(
+    const DiagnosticSkeletonRenderSample& targetSample,
+    const std::vector<horde::scene::SkinnedRtVertex>& targetPose)
+{
+    std::vector<MeshTriangle> triangles;
+    if (targetPose.size() % 3u != 0u) return TriangleBoundsTree(std::move(triangles));
+    triangles.reserve(targetPose.size() / 3u);
+    for (std::size_t index = 0u; index + 2u < targetPose.size(); index += 3u)
+    {
+        MeshTriangle triangle;
+        triangle.a = ApplySkeletonTransform(targetSample.transform,
+            {{targetPose[index].position[0], targetPose[index].position[1],
+              targetPose[index].position[2]}});
+        triangle.b = ApplySkeletonTransform(targetSample.transform,
+            {{targetPose[index + 1u].position[0], targetPose[index + 1u].position[1],
+              targetPose[index + 1u].position[2]}});
+        triangle.c = ApplySkeletonTransform(targetSample.transform,
+            {{targetPose[index + 2u].position[0], targetPose[index + 2u].position[1],
+              targetPose[index + 2u].position[2]}});
+        IncludePoint(triangle.bounds, triangle.a);
+        IncludePoint(triangle.bounds, triangle.b);
+        IncludePoint(triangle.bounds, triangle.c);
+        triangle.center = Scale(Add(Add(triangle.a, triangle.b), triangle.c),
+                                1.0f / 3.0f);
+        triangles.push_back(triangle);
+    }
+    return TriangleBoundsTree(std::move(triangles));
 }
 
 void TestCombatPulseAgainstImportedSwordAndSkeletonBounds(const bool detailed = false)
@@ -1870,6 +2208,21 @@ void TestCombatPulseAgainstImportedSwordAndSkeletonBounds(const bool detailed = 
                     }
                 }
             }
+            if (detailed && sampleCase.name == std::string("normal-near") &&
+                (tick == 11u || tick == 17u))
+            {
+                const BladeTriangleDistance triangleGap = MeasureBladeTriangleDistance(
+                    targetTree, sword, *grip, worldFromSword);
+                std::cout << "combat-geometry-blade-triangle static-frontal-1.20"
+                          << " tick=" << tick
+                          << " action=" << static_cast<int>(snapshot.player.action)
+                          << " actionTime=" << snapshot.player.actionTime
+                          << " pulse=" << snapshot.playerAttackPulse
+                          << " bladeTriangles=" << triangleGap.trianglesQueried
+                          << " triTriGap=" << triangleGap.metres
+                          << " actualIntersection=" << (triangleGap.metres <= 1.0e-6f)
+                          << " method=grip-filtered-indexed-blade-triangles-vs-target-triangle-bvh\n";
+            }
             minimumBoundsGap = std::min(minimumBoundsGap, tickGap);
             if (tickSurfaceGap < minimumSurfaceGap)
             {
@@ -2024,6 +2377,257 @@ void TestCombatPulseAgainstImportedSwordAndSkeletonBounds(const bool detailed = 
               "the contact fixture's near cone boundary must preserve combat's existing range/cone admission");
         Check(rangeCaseAdmissionMatches,
               "the contact fixture's near range boundary must preserve combat's existing range admission");
+
+        struct DynamicCase
+        {
+            const char* name;
+            float startDistance;
+            float targetBearing;
+        };
+        constexpr std::array<DynamicCase, 4u> dynamicCases{{
+            {"dynamic-front-1.28", 1.28f, 0.0f},
+            {"dynamic-front-1.50", 1.50f, 0.0f},
+            {"dynamic-plus15-1.28", 1.28f, 0.2617994f},
+            {"dynamic-minus15-1.28", 1.28f, -0.2617994f},
+        }};
+        constexpr float playerX = 0.0f;
+        constexpr float playerZ = 0.0f;
+        constexpr float playerYaw = 0.0f;
+        constexpr float enemyWindupTrigger = 0.84f;
+        constexpr std::uint64_t maxDynamicTicks = 180u;
+        constexpr std::uint64_t ticksAfterPulse = 8u;
+
+        struct DynamicRecord
+        {
+            std::uint64_t tick = 0u;
+            horde::gameplay::CombatSnapshot before{};
+            horde::gameplay::CombatSnapshot after{};
+        };
+
+        for (const DynamicCase& dynamicCase : dynamicCases)
+        {
+            const float targetX = dynamicCase.startDistance *
+                                  std::sin(dynamicCase.targetBearing);
+            const float targetZ = -dynamicCase.startDistance *
+                                  std::cos(dynamicCase.targetBearing);
+            horde::gameplay::SwordCombat dynamicCombat;
+            dynamicCombat.Reset(1u, {targetX, targetZ});
+            std::vector<DynamicRecord> records;
+            records.reserve(48u);
+            bool playerAttackRequested = false;
+            std::uint64_t requestTick = 0u;
+            std::uint64_t pulseTick = 0u;
+            bool admittedAtPulse = false;
+
+            for (std::uint64_t tick = 1u; tick <= maxDynamicTicks; ++tick)
+            {
+                const horde::gameplay::CombatSnapshot before =
+                    dynamicCombat.Snapshot();
+                if (!playerAttackRequested &&
+                    before.combatants[0].action ==
+                        horde::gameplay::EnemyCombatAction::AttackWindup &&
+                    before.combatants[0].actionTime >= enemyWindupTrigger)
+                {
+                    playerAttackRequested = dynamicCombat.RequestAttack() ==
+                        PlayerAttackCut::DownwardCut;
+                    requestTick = playerAttackRequested ? tick : 0u;
+                }
+                const horde::gameplay::CombatSnapshot after = dynamicCombat.Update(
+                    tickSeconds, playerX, playerZ, playerYaw,
+                    true, true, false);
+                records.push_back({tick, before, after});
+                if (after.playerAttackPulse && pulseTick == 0u)
+                {
+                    pulseTick = tick;
+                    admittedAtPulse = before.combatants[0].health > 0 &&
+                                      after.combatants[0].health == 0;
+                }
+                if (pulseTick != 0u && tick >= pulseTick + ticksAfterPulse)
+                    break;
+            }
+
+            Check(playerAttackRequested && pulseTick != 0u,
+                  "dynamic combat diagnostic must request and observe an ordinary player pulse during enemy windup");
+            if (pulseTick == 0u) continue;
+
+            const std::uint64_t sampleBegin = pulseTick > 3u ? pulseTick - 3u : 1u;
+            const std::uint64_t sampleEnd = pulseTick + ticksAfterPulse;
+            std::uint64_t firstLiveNearTick = 0u;
+            std::uint64_t lastLiveNearTick = 0u;
+            std::uint64_t firstPublishedNearTick = 0u;
+            std::uint64_t lastPublishedNearTick = 0u;
+            std::uint64_t nearestLiveTick = 0u;
+            std::uint64_t nearestPublishedTick = 0u;
+            float nearestLiveBladeGap = std::numeric_limits<float>::max();
+            float nearestPublishedBladeGap = std::numeric_limits<float>::max();
+            float preHitBladeGap = std::numeric_limits<float>::max();
+            float postPulseBladeGap = std::numeric_limits<float>::max();
+            float preHitFullSwordGap = std::numeric_limits<float>::max();
+            float postPulseFullSwordGap = std::numeric_limits<float>::max();
+            BladeTriangleDistance preHitTriangleDistance{};
+            BladeTriangleDistance postPulseTriangleDistance{};
+            DiagnosticSkeletonRenderSample preHitTargetSample{};
+            DiagnosticSkeletonRenderSample postPulseTargetSample{};
+            std::array<float, 3u> preHitMeshCenter{};
+            const DynamicRecord* pulseRecord = nullptr;
+            for (const DynamicRecord& record : records)
+                if (record.tick == pulseTick) pulseRecord = &record;
+            if (pulseRecord == nullptr)
+            {
+                Check(false, "dynamic pulse record must be retained for pre/post pose comparison");
+                continue;
+            }
+
+            for (const DynamicRecord& record : records)
+            {
+                if (record.tick < sampleBegin || record.tick > sampleEnd) continue;
+                HeldItemFixedStepInput input;
+                input.playerX = playerX;
+                input.playerZ = playerZ;
+                input.playerYawRadians = playerYaw;
+                input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+                input.playerCombat = record.after.player;
+                HeldItemStates items = MakeDefaultHeldItemStates();
+                HeldItemFixedStepState fixed;
+                const bool fixedResolved = ResolveHeldItemsFixedStep(
+                    items, input, record.tick, fixed, diagnostic);
+                HeldItemTransform worldFromGrip{};
+                HeldItemTransform worldFromSword{};
+                const bool rigResolved = fixedResolved && ResolveProductionAnatomicalSword(
+                    input, fixed.kinematics, items, rig, rigTick++,
+                    worldFromGrip, worldFromSword, diagnostic);
+                Check(rigResolved,
+                      "dynamic contact sample must resolve the actual final player rig and sword Grip");
+                if (!rigResolved) continue;
+
+                const auto& liveTarget = record.before.combatants[0];
+                if (liveTarget.health > 0)
+                {
+                    const DiagnosticSkeletonRenderSample targetSample =
+                        CurrentCharacterRenderMapping(liveTarget,
+                            skeleton.ClipDuration(SkinnedClip::Dead));
+                    std::vector<horde::scene::SkinnedRtVertex> dynamicPose;
+                    const bool targetResolved = skeleton.Skin(
+                        targetSample.clip, targetSample.clipTime,
+                        dynamicPose, diagnostic);
+                    Check(targetResolved,
+                          "pre-hit dynamic target sample must skin the actual imported clip");
+                    if (targetResolved)
+                    {
+                        const DiagnosticBladeGap gap = MeasureDiagnosticBladeGap(
+                            targetSample, dynamicPose, sword, grip, worldFromSword);
+                        if (gap.bladeOnly < nearestLiveBladeGap)
+                        {
+                            nearestLiveBladeGap = gap.bladeOnly;
+                            nearestLiveTick = record.tick;
+                        }
+                        if (gap.bladeOnly <= 0.02f)
+                        {
+                            if (firstLiveNearTick == 0u) firstLiveNearTick = record.tick;
+                            lastLiveNearTick = record.tick;
+                        }
+                        if (record.tick == pulseTick)
+                        {
+                            preHitBladeGap = gap.bladeOnly;
+                            preHitFullSwordGap = gap.fullSword;
+                            const TriangleBoundsTree liveTargetTree =
+                                BuildDiagnosticTargetTree(targetSample, dynamicPose);
+                            preHitTriangleDistance = MeasureBladeTriangleDistance(
+                                liveTargetTree, sword, *grip, worldFromSword);
+                            preHitTargetSample = targetSample;
+                            preHitMeshCenter = {{
+                                0.5f * (gap.targetBounds.minimum[0] + gap.targetBounds.maximum[0]),
+                                0.5f * (gap.targetBounds.minimum[1] + gap.targetBounds.maximum[1]),
+                                0.5f * (gap.targetBounds.minimum[2] + gap.targetBounds.maximum[2])}};
+                        }
+                    }
+                }
+
+                const auto& publishedTarget = record.after.combatants[0];
+                const DiagnosticSkeletonRenderSample publishedSample = CurrentCharacterRenderMapping(
+                    publishedTarget, skeleton.ClipDuration(SkinnedClip::Dead));
+                std::vector<horde::scene::SkinnedRtVertex> publishedPose;
+                const bool publishedResolved = skeleton.Skin(
+                    publishedSample.clip, publishedSample.clipTime,
+                    publishedPose, diagnostic);
+                Check(publishedResolved,
+                      "post-update target sample must skin the actual published target clip");
+                if (publishedResolved)
+                {
+                    const DiagnosticBladeGap gap = MeasureDiagnosticBladeGap(
+                        publishedSample, publishedPose, sword, grip, worldFromSword);
+                    if (gap.bladeOnly < nearestPublishedBladeGap)
+                    {
+                        nearestPublishedBladeGap = gap.bladeOnly;
+                        nearestPublishedTick = record.tick;
+                    }
+                    if (gap.bladeOnly <= 0.02f)
+                    {
+                        if (firstPublishedNearTick == 0u)
+                            firstPublishedNearTick = record.tick;
+                        lastPublishedNearTick = record.tick;
+                    }
+                    if (record.tick == pulseTick)
+                    {
+                        postPulseTargetSample = publishedSample;
+                        postPulseBladeGap = gap.bladeOnly;
+                        postPulseFullSwordGap = gap.fullSword;
+                        const TriangleBoundsTree publishedTargetTree =
+                            BuildDiagnosticTargetTree(publishedSample, publishedPose);
+                        postPulseTriangleDistance = MeasureBladeTriangleDistance(
+                            publishedTargetTree, sword, *grip, worldFromSword);
+                    }
+                }
+            }
+
+            const auto& preHitCombatant = pulseRecord->before.combatants[0];
+            const float preHitOriginDistance = std::hypot(
+                preHitCombatant.x - playerX, preHitCombatant.z - playerZ);
+            const float preHitBearing = std::atan2(
+                preHitCombatant.x - playerX, -(preHitCombatant.z - playerZ));
+            const float meshOffsetX = preHitMeshCenter[0] - preHitCombatant.x;
+            const float meshOffsetZ = preHitMeshCenter[2] - preHitCombatant.z;
+            std::cout << "combat-geometry-dynamic " << dynamicCase.name
+                      << " startOrigin=" << dynamicCase.startDistance
+                      << " startBearing=" << dynamicCase.targetBearing
+                      << " requestTick=" << requestTick
+                      << " pulseTick=" << pulseTick
+                      << " admitted=" << admittedAtPulse
+                      << " preAction=" << static_cast<int>(preHitCombatant.action)
+                      << " preActionTime=" << preHitCombatant.actionTime
+                      << " preAnimation=" << static_cast<int>(preHitCombatant.animation)
+                      << " preClip=" << static_cast<int>(preHitTargetSample.clip)
+                      << " preClipTime=" << preHitTargetSample.clipTime
+                      << " preOrigin=" << preHitOriginDistance
+                      << " preBearing=" << preHitBearing
+                      << " preMeshOffsetXZ=" << meshOffsetX << ',' << meshOffsetZ
+                      << " preBladeGap=" << preHitBladeGap
+                      << " preSwordGap=" << preHitFullSwordGap
+                      << " preBladeTriangles=" << preHitTriangleDistance.trianglesQueried
+                      << " preTriTriGap=" << preHitTriangleDistance.metres
+                      << " preActualIntersection="
+                      << (preHitTriangleDistance.metres <= 1.0e-6f)
+                      << " postAction=" << static_cast<int>(pulseRecord->after.combatants[0].action)
+                      << " postAnimation=" << static_cast<int>(pulseRecord->after.combatants[0].animation)
+                      << " postClip=" << static_cast<int>(postPulseTargetSample.clip)
+                      << " postClipTime=" << postPulseTargetSample.clipTime
+                      << " postBladeGap=" << postPulseBladeGap
+                      << " postSwordGap=" << postPulseFullSwordGap
+                      << " postBladeTriangles=" << postPulseTriangleDistance.trianglesQueried
+                      << " postTriTriGap=" << postPulseTriangleDistance.metres
+                      << " postActualIntersection="
+                      << (postPulseTriangleDistance.metres <= 1.0e-6f)
+                      << " liveBladeMin=" << nearestLiveBladeGap
+                      << " liveBladeMinTick=" << nearestLiveTick
+                      << " liveBladeNear20mmTicks=" << firstLiveNearTick << ':' << lastLiveNearTick
+                      << " publishedBladeMin=" << nearestPublishedBladeGap
+                      << " publishedBladeMinTick=" << nearestPublishedTick
+                      << " publishedBladeNear20mmTicks=" << firstPublishedNearTick << ':'
+                      << lastPublishedNearTick
+                      << " sampledTicks=" << sampleBegin << ':' << sampleEnd
+                      << " triTriMethod=grip-filtered-indexed-blade-triangle-vs-target-triangle-bvh-at-pulse-only"
+                      << " method=blade-vertex-to-target-triangle-point-samples-no-swept-intersection\n";
+        }
     }
 }
 
