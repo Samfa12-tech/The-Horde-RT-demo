@@ -35,3 +35,7 @@ These are historical alternatives, not competing current implementation instruct
 WebP review derivatives retain the original pixel dimensions; encoding is quality 92 with no crop or resize. Original PNGs remain in the owner's Library. [Reference manifest](../reference-manifest.json) records original filenames, SHA-256 and archived derivative hashes. The repository's existing PNG Git LFS policy is unchanged; these modest WebP documentation previews are ordinary Git blobs. No private download URL, account details or Library identifiers are published.
 
 These are documentation references only. They are not automatically licensed runtime assets or covered by a blanket MIT asset grant. See [asset provenance](../../../ASSET_LICENSES.md).
+
+## Earned loading verse — 7 October 2026
+
+[The Tale Thus Far](../../TALE_THUS_FAR.md) develops the approved old-fable recap direction. A loading screen may show a self-contained couplet earned in the selected save, with the existing small-spinner-only rule. No progress bar, artificial loading delay, forced recital or unrevealed chapter titles. Fast loads can omit verse; a persistent optional reading view keeps it available. Exact layout and text are review drafts.

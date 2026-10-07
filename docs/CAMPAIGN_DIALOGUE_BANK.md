@@ -320,3 +320,7 @@ Combat: no overlapping speech with critical attack telegraphs; cap boss speech a
 ## Opening performance revision 7 October 2026
 
 The expanded English bank [performance brief](dialogue/en/PERFORMANCE-DIRECTION-English-en.md) now carries Kit’s urgent, worried, edge-of-panic opening and the optional audible player-movement acknowledgment. Spoken wording and IDs are unchanged; Kit stays unseen beyond the small wall panel. Preserve the 1.7 safe pass-zone and missed-call contract, with no mandatory reply or animation. The later rescue greeting and fresh manual lantern raise remain distinct.
+
+## Separate design appendices — 7 October 2026
+
+The latest structured English source remains [candidate v0.2.1](dialogue/en/README.md), with 357 lines and all recording approvals false. New [earned-ballad verses](TALE_THUS_FAR.md) and [Bellwether village-life lines](BELLWETHER_VILLAGE_LIFE.md) are separate review-pending design text, not additional approved recording rows. Their draft labels are not production IDs. Promote selected text only through the current bank's JSON-first ID, knowledge, participant, revision, export and validation workflow; do not maintain a second competing TTS source.

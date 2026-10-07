@@ -99,3 +99,7 @@ https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/6aef4cde32188fd8a1ced2bef
 
 PATH BOUNDARIES / TREE PLACEMENT
 Tree circles are illustrative woodland massing, not locked tree instances. No tree symbols occupy the reserved clear trail or its reunion/lookout pockets. Later deliberate hero trees should frame town glimpses and occlude unfinished routes; fill density follows player-eye playtests and RT measurements. Use natural rising banks, roots, rocks, undergrowth and occasional fallen timber, with selective off-trail pockets. Do not fence the whole forest or substitute invisible walls. At the lookout reserve a safe standing area and a readable rock edge without blocking the future road. Town garden/old-boundary dry-stone walls and timber pen/work-yard fences are proposals; their openings must preserve the dry walking routes. Exact wall, fence and tree placements remain blockout work.
+
+## Village-life design overlay — 7 October 2026
+
+[Bellwether village life](../../../BELLWETHER_VILLAGE_LIFE.md) proposes small garden, livestock, service-yard and optional-comedy additions within this layout's reserved edges. It does not edit the archived coordinates, drawings or footprint register. Preserve the eight principal building masses, clear routes, water relationships and intended sightlines; exact minor-feature placement needs 3D review. Its bounded asset packages supplement this geometric reference without claiming runtime capacity.

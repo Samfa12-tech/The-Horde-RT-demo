@@ -441,3 +441,7 @@ This update preserves the owner's 11 September campaign direction and records th
 ## Visual-reference custody — 5 October 2026
 
 The [design reference archive](design/README.md) keeps the selected UI/HUD direction, historical concepts and connected forest/Bellwether map proposals beside the plans. Use their status captions: the loading art's bar is superseded by a small spinner only; map dimensions and vegetation marks remain blockout proposals. The archive adds no runtime implementation, release, paid asset work or new milestone scope.
+
+## Earned story recap and Bellwether life — 7 October 2026
+
+The owner-approved additions are developed in [The Tale Thus Far](TALE_THUS_FAR.md) and [Bellwether village life](BELLWETHER_VILLAGE_LIFE.md). The former proposes milestone/knowledge-earned verse, an optional recap and short loading excerpts without extra loading or forced reading; the latter proposes bounded village humour, animals, kitchen plots and practical food/water/waste details. Exact writing, positions, counts and production packages remain drafts. Scope at the existing acceptance gates: 1.7 forest/lookout only; 1.8 Bellwether; later chapters in the existing provisional sequence, with Abbey/Foundry either-order play. No current engineering, paid production or release expansion.
