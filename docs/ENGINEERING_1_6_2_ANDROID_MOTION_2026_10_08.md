@@ -599,3 +599,28 @@ calibration, physical move/look/action and controller checks, owner visual/audio
 haptic/comfort, sustained phone quality/thermal/power evidence and Eric's
 independent audit remain open. Prior checkpoint/route/rotation/Graphics ACK and
 closed negative experiments retain their exact original source and limits.
+
+### 8 October visible Windows waterfall sequence and owner findings
+
+Sealed runtime `998137c94448b28bec1da3f6bf74f875ea26004f`, Windows Debug
+executable SHA-256
+`3a6af703d83dd27620421f22e7769a0c685673b59f3c1e3bd7fd881ce83d3513`,
+on RTX5050 Laptop / real Pipeline, authored High/Current/Mist On/Dust Off.
+The first new attempt again fails visible foreground arming (33.389 seconds,
+PID62916, exit1, zero images and zero validation error markers). After the
+owner explicitly confirms readiness, the retry arms through actual visible
+foreground focus, exits normally in10.402 seconds and passes13 capture hashes
+plus150 state/completed-RT rows. A requested replay also exits normally in
+10.376 seconds with13 captures and zero synchronization-validation errors.
+All owned processes are stopped; the failure is retained separately.
+
+For the verified retry, draw milestones .25/.50/.75/1 and Windup/Attack/Parry
+images join the exact state and completed-frame tick, correcting the earlier
+Idle-image gap. The pair is visible to either side during ordinary approach.
+This is a staged equipment-seed inspection, not production encounter/route
+activation, sustained performance or complete world-body/shadow/reflection
+validation. The owner requests review of apparent right-hand disappearance
+while sheathed and parry hilt/hand interference with the torch; the blade itself
+is not their current suspected intersection. They permit a small parry-only
+torch move if needed, with portrait comfort emphasized. These visual findings
+remain open; no owner sequence approval is inferred from harness completion.

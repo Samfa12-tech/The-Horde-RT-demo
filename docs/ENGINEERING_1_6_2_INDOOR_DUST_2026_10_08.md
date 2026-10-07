@@ -133,3 +133,72 @@ core/development-fixture tests pass. The four-ABI Android Debug assembly and
 182/182 Java tests also pass. Exact image validation is recorded separately
 after sealing this follow-up. The first appearance is
 not relabelled accepted.
+
+## Smaller/subtler immutable follow-up
+
+Runtime `998137c94448b28bec1da3f6bf74f875ea26004f`, tree
+`19af308ce3439c942bad0296a45026cc318e501a`: Debug APK SHA-256
+`41d9802db1f44f175e1a1cc8d33e73c8b3e1e39c9398e74ac5ca6370780fad09`
+(138,462,724 bytes), installed base hash matches; Windows executable SHA-256
+`3a6af703d83dd27620421f22e7769a0c685673b59f3c1e3bd7fd881ce83d3513`
+(11,549,184 bytes). All four ABI payloads, closed asset admission, packaged
+manifest and16KiB alignment pass. Source CI passes12/12 aggregate jobs in
+push37698340306 / PR37698345979. Documentation after this seal has separate CI.
+
+The owner accepts the smaller/softer first-box phone still from this exact APK
+(Pipeline Standard PNG SHA-256
+`f606e4df362466958ecfeea2a6b84164085f54a1b5f494a7f2cf20b4a47a57dd`).
+This is appearance approval for that still, not moving/thermal/performance
+acceptance. Its matched Off PNG is
+`a54b9de6972f5e1e34a882738bab86ee0e15f34e548ae1de0c7e1970a5446dac`.
+The phone also passes refined ellipsoid Standard and first-box Low frozen
+captures on RayQueryCompute, each with12 current owning completed/presented
+frames. Native UI remains at output resolution; traced50% is720x1490 at
+1440x2980 output. All automated sessions preserve preferences and stop their
+owned Debug PID. Production/benchmark packages are untouched.
+
+Both Windows backends now pass all three Standard box/ellipsoid/wall captures
+with exact shader, completed/presented submission and PNG joins, and zero
+synchronization-validation error markers. The reframed wall retains required
+primary-arm pixels; the previous159 failures remain recorded above. No guard
+was weakened and no gameplay camera changed.
+
+Real phone `torch-low-opening` movement passes the existing60Hz harness on
+Pipeline Off/Standard (565/564 state and completed-frame rows;16 captures each)
+and RayQueryCompute Standard (619 rows;16 captures). Every completed row has
+the exact requested Dust tier, current scene/surface/measurement identity and
+owning submission/completion; all capture hashes and state/frame joins pass.
+Both backend Standard runs have zero recorded fixed-step overruns. These are
+harness-generated input schedules, with timed native captures/readbacks, not
+owner touch latency, continuous-video acceptance or sustained/scanout evidence.
+Sampled views cover slow turn/translation, the opening/walls, dark masonry,
+changing torch pose/light and attack/parry. Continuous tiny-particle stability,
+second-zone moving appearance and relevant glass/water/mirror inspection remain
+open; primary-only transport limits are unchanged.
+
+One ordered short Pipeline pair (Off first), same APK/backend/output/route and
+saved Mobile water/fire, Glass On, Current shadows, cap30, Mist On, supplies
+these existing timing fields. Approximate24.4-second runs include readbacks.
+They are not steady-state shipping benchmarks and do not isolate thermal drift.
+
+| Stage / metric (ms) | Off median / p95 | Standard median / p95 |
+| --- | --- | --- |
+| Approach GPU RT command buffer |38.627 /40.954|38.715 /41.307|
+| Approach whole-frame CPU |48.445 /54.613|49.455 /54.726|
+| Torch motion GPU RT command buffer |27.974 /32.520|28.040 /32.567|
+| Torch motion whole-frame CPU |40.261 /46.441|40.171 /46.245|
+
+No reciprocal GPU timing, row-count rate or median is called displayed/sustained
+FPS. This pair neither proves zero dust overhead nor practical sustained30FPS.
+Observed tracked host-visible/device-local allocation bytes are unchanged
+(11,164,928 /85,223,296); these are renderer-owned allocations, not total app
+PSS, driver memory or a reliable power measurement. Private short-run OS
+thermal/battery/memory snapshots remain insufficient for sustained acceptance.
+
+Recommendation: keep the owner-approved motes as an optional default-Off
+prototype; defer shafts. Required next gates are sustained matched Off/motes
+cost, reliable memory/power/thermal evidence and moving/secondary-view review,
+without lowering other quality. Haze-only/combined comparisons are not applicable
+because no shaft haze is implemented; they remain deferred, not passed.
+The broader integrated50/40/33 profile decision, final owner audio/haptic review,
+production encounter activation and Eric's independent audit remain separate.

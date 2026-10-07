@@ -1,5 +1,24 @@
 # Horde Lantern RT 1.6.2 development notes
 
+The exact smaller-dust Windows checkpoint subsequently passes a foreground
+waterfall equipment sequence and requested replay. Corrected draw/action images
+join exact state/completed ticks. Owner review raises empty-hand framing while
+sheathed and possible parry hilt/hand-to-torch interference; these findings are
+open, so production activation and full body/secondary-view/route acceptance
+remain pending.
+[Current motion evidence](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#8-october-visible-windows-waterfall-sequence-and-owner-findings).
+
+**8 October smaller-dust follow-up:** exact runtime
+`998137c94448b28bec1da3f6bf74f875ea26004f`, Debug APK SHA-256
+`41d9802db1f44f175e1a1cc8d33e73c8b3e1e39c9398e74ac5ca6370780fad09`,
+Windows executable SHA-256
+`3a6af703d83dd27620421f22e7769a0c685673b59f3c1e3bd7fd881ce83d3513`.
+The owner accepts the smaller/softer phone still. Both RT backends pass affected
+frozen and timed-moving checks, with preferences preserved and owned processes
+stopped. All12 source CI jobs pass. Dust stays optional/default Off, shafts
+stay deferred, and continuous-motion/sustained-cost gates remain open.
+[Exact evidence and bounded timing pair](ENGINEERING_1_6_2_INDOOR_DUST_2026_10_08.md#smaller-subtler-immutable-follow-up).
+
 **8 October optional indoor-dust prototype:** bounded deterministic world-space
 motes share real RT primary depth and actual light visibility across Pipeline
 and RayQueryCompute. Dust Off/Low/Standard is independent and defaults Off;

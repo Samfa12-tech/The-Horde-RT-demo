@@ -200,3 +200,24 @@ approved the waterfall skeleton image as looking great. This accepts the staged
 arrival. It does not close moving-body, shadow/reflection, production activation
 or integrated-candidate gates. Prior CCD touch/torch/clearance approvals retain
 their original package identity.
+
+### 8 October smaller indoor-dust appearance checkpoint
+
+Source `998137c94448b28bec1da3f6bf74f875ea26004f` reduces authored mote radii
+by roughly a third and opacity25%, preserving seeds/drift/bounds/counts and
+all other quality/defaults. The owner accepts its exact first-box phone still.
+Both Windows backends pass the box/ellipsoid/reframed-wall captures; phone
+frozen and timed moving RT checks pass with unchanged preferences and stopped
+automated apps. Source CI passes all12 aggregate jobs.
+[Exact package, measurements and retained failures](ENGINEERING_1_6_2_INDOOR_DUST_2026_10_08.md#smaller-subtler-immutable-follow-up).
+Dust remains optional/default Off; appearance approval is separate from
+continuous motion and sustained cost. Shafts remain deferred. No release or
+independent-audit completion follows.
+
+The same sealed Windows source subsequently completes the visible foreground
+waterfall-equipment inspection and replay.13 PNGs/150 exact rows close the
+previous missed-action-image coverage for this sequence. Owner review raises
+sheathed empty-hand framing and parry hilt/hand-to-torch clearance; both are
+under investigation. Production activation and world-body/secondary-view/route
+gates remain open. See the current
+[motion record](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#8-october-visible-windows-waterfall-sequence-and-owner-findings).

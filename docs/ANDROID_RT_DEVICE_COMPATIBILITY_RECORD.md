@@ -2541,3 +2541,17 @@ displayed-FPS, reliable-power or another-device certification follows. Owner
 appearance feedback requests smaller/subtler motes; the follow-up is pending.
 Dust remains optional and default Off; shafts are deferred. See
 [indoor-dust evidence and limitations](ENGINEERING_1_6_2_INDOOR_DUST_2026_10_08.md).
+
+### Smaller/subtler follow-up on the same allocated phone
+
+Exact runtime `998137c94448b28bec1da3f6bf74f875ea26004f`, installed Debug APK
+SHA-256 `41d9802db1f44f175e1a1cc8d33e73c8b3e1e39c9398e74ac5ca6370780fad09`
+(138,462,724 bytes). Pipeline first-box Off/Standard and RayQueryCompute
+ellipsoid Standard/first-box Low each pass12 frozen current owning frames.
+The owner accepts the refined Pipeline Standard still's appearance. Real moving
+Pipeline Off/Standard (565/564 rows,16 captures each) and RayQueryCompute
+Standard (619 rows,16 captures) pass exact Dust tier and frame/hash joins at
+unchanged traced50%/output/other saved settings. Owned processes stop and
+preferences remain unchanged. These short Debug/readback scenarios do not close
+continuous-motion appearance, sustained30FPS, thermal, power, total memory or
+another-device gate. Default Off and no-shafts scope remain.
