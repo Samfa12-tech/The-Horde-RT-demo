@@ -7,6 +7,12 @@ namespace horde::gameplay
 // both fixed-step combat edges and the corresponding renderer clip mapping.
 struct CombatTimeline
 {
+    // Stroke-relative contact, calibrated against the final imported player
+    // Grip and sword approaching the frontal 1.2m skeleton idle mesh. These
+    // are semantic contact samples, not a claim of mesh collision for every
+    // target pose or of exact visible latency at every presentation rate.
+    static constexpr float kPlayerDownwardContactSeconds = 0.10f;
+    static constexpr float kPlayerUpwardContactSeconds = 0.05f;
     static constexpr float kSkeletonAttackWindupSeconds = 1.12f;
     static constexpr float kSkeletonAttackActiveSeconds = 0.18f;
     static constexpr float kSkeletonAttackRecoverySeconds = 1.50f;

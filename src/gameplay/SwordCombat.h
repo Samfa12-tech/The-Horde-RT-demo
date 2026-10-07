@@ -363,6 +363,7 @@ private:
         {
             player_.reaction = CombatReaction::None;
         }
+        const float previousActionTime = player_.actionTime;
         player_.actionTime += deltaSeconds;
         switch (player_.action)
         {
@@ -371,12 +372,15 @@ private:
             {
                 player_.action = PlayerCombatAction::SwingActive;
                 player_.actionTime -= kSwingWindupDuration;
+            }
+            break;
+        case PlayerCombatAction::SwingActive:
+            if (previousActionTime < kDownwardContactTime && player_.actionTime >= kDownwardContactTime)
+            {
                 snapshot_.playerAttackPulse = true;
                 snapshot_.playerAttackCut = PlayerAttackCut::DownwardCut;
                 ResolveSwordHit(playerX, playerZ, playerYaw);
             }
-            break;
-        case PlayerCombatAction::SwingActive:
             if (player_.comboQueued &&
                 player_.actionTime >= kDownwardCutTravelDuration)
             {
@@ -405,12 +409,15 @@ private:
             {
                 player_.action = PlayerCombatAction::UpwardSliceActive;
                 player_.actionTime -= kUpwardSliceWindupDuration;
+            }
+            break;
+        case PlayerCombatAction::UpwardSliceActive:
+            if (previousActionTime < kUpwardContactTime && player_.actionTime >= kUpwardContactTime)
+            {
                 snapshot_.playerAttackPulse = true;
                 snapshot_.playerAttackCut = PlayerAttackCut::UpwardSlice;
                 ResolveSwordHit(playerX, playerZ, playerYaw);
             }
-            break;
-        case PlayerCombatAction::UpwardSliceActive:
             if (player_.actionTime >= kUpwardSliceActiveDuration)
             {
                 player_.action = PlayerCombatAction::UpwardSliceRecovery;
@@ -866,6 +873,7 @@ private:
 public:
     static constexpr float kSwingWindupDuration = 0.18f;
     static constexpr float kDownwardCutTravelDuration = 0.16f;
+    static constexpr float kDownwardContactTime = CombatTimeline::kPlayerDownwardContactSeconds;
     static constexpr float kSwingActiveDuration = 0.42f;
     static constexpr float kSwingRecoveryDuration = 0.22f;
     static constexpr float kSwordDuration = kSwingWindupDuration + kSwingActiveDuration + kSwingRecoveryDuration;
@@ -875,6 +883,9 @@ public:
     static constexpr float kDownwardSwingAmplitude = 0.58f;
     static constexpr float kUpwardSliceWindupDuration = 0.10f;
     static constexpr float kUpwardSliceActiveDuration = 0.18f;
+    static constexpr float kUpwardContactTime = CombatTimeline::kPlayerUpwardContactSeconds;
+    static_assert(kDownwardContactTime < kDownwardCutTravelDuration &&
+                  kUpwardContactTime < kUpwardSliceActiveDuration);
     static constexpr float kUpwardSliceRecoveryDuration = 0.24f;
     static constexpr float kUpwardSliceEndRadians = 0.18f;
     static constexpr float kPlayerHitRange = 1.72f;

@@ -4,6 +4,7 @@
 #include "gameplay/items/HeldItemState.h"
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/SwordCombat.h"
 #include "vulkan/raytracing/HeldItemRenderSlot.h"
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
@@ -11,6 +12,7 @@
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "scene/ShowcaseOverheadGeometry.h"
 #include "scene/assets/PlayerPrimitiveContract.h"
+#include "scene/assets/SkinnedMeshAsset.h"
 
 #include <algorithm>
 #include <array>
@@ -1404,6 +1406,627 @@ bool ResolveProductionAnatomicalSword(
     return true;
 }
 
+struct WorldBounds
+{
+    std::array<float, 3u> minimum{{
+        std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
+        std::numeric_limits<float>::max()}};
+    std::array<float, 3u> maximum{{
+        -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(),
+        -std::numeric_limits<float>::max()}};
+};
+
+void IncludePoint(WorldBounds& bounds, const std::array<float, 3u>& point)
+{
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+    {
+        bounds.minimum[axis] = std::min(bounds.minimum[axis], point[axis]);
+        bounds.maximum[axis] = std::max(bounds.maximum[axis], point[axis]);
+    }
+}
+
+float DistanceToBounds(const std::array<float, 3u>& point,
+                       const WorldBounds& bounds)
+{
+    float distanceSquared = 0.0f;
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+    {
+        const float gap = point[axis] < bounds.minimum[axis]
+            ? bounds.minimum[axis] - point[axis]
+            : (point[axis] > bounds.maximum[axis]
+                ? point[axis] - bounds.maximum[axis] : 0.0f);
+        distanceSquared += gap * gap;
+    }
+    return std::sqrt(distanceSquared);
+}
+
+float DistanceSquaredToBounds(const std::array<float, 3u>& point,
+                              const WorldBounds& bounds)
+{
+    const float distance = DistanceToBounds(point, bounds);
+    return distance * distance;
+}
+
+struct MeshTriangle
+{
+    std::array<float, 3u> a{};
+    std::array<float, 3u> b{};
+    std::array<float, 3u> c{};
+    WorldBounds bounds{};
+    std::array<float, 3u> center{};
+};
+
+float PointTriangleDistanceSquared(const std::array<float, 3u>& point,
+                                   const MeshTriangle& triangle)
+{
+    const auto subtract = [](const auto& left, const auto& right) {
+        return std::array<float, 3u>{{left[0] - right[0], left[1] - right[1],
+                                      left[2] - right[2]}};
+    };
+    const auto dot = [](const auto& left, const auto& right) {
+        return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+    };
+    const auto ab = subtract(triangle.b, triangle.a);
+    const auto ac = subtract(triangle.c, triangle.a);
+    const auto ap = subtract(point, triangle.a);
+    const float d1 = dot(ab, ap);
+    const float d2 = dot(ac, ap);
+    if (d1 <= 0.0f && d2 <= 0.0f) return dot(ap, ap);
+
+    const auto bp = subtract(point, triangle.b);
+    const float d3 = dot(ab, bp);
+    const float d4 = dot(ac, bp);
+    if (d3 >= 0.0f && d4 <= d3) return dot(bp, bp);
+
+    const float vc = d1 * d4 - d3 * d2;
+    if (vc <= 0.0f && d1 >= 0.0f && d3 <= 0.0f)
+    {
+        const float v = d1 / (d1 - d3);
+        const auto delta = subtract(point, Add(triangle.a, Scale(ab, v)));
+        return dot(delta, delta);
+    }
+
+    const auto cp = subtract(point, triangle.c);
+    const float d5 = dot(ab, cp);
+    const float d6 = dot(ac, cp);
+    if (d6 >= 0.0f && d5 <= d6) return dot(cp, cp);
+
+    const float vb = d5 * d2 - d1 * d6;
+    if (vb <= 0.0f && d2 >= 0.0f && d6 <= 0.0f)
+    {
+        const float w = d2 / (d2 - d6);
+        const auto delta = subtract(point, Add(triangle.a, Scale(ac, w)));
+        return dot(delta, delta);
+    }
+
+    const float va = d3 * d6 - d5 * d4;
+    if (va <= 0.0f && (d4 - d3) >= 0.0f && (d5 - d6) >= 0.0f)
+    {
+        const auto bc = subtract(triangle.c, triangle.b);
+        const float w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+        const auto delta = subtract(point, Add(triangle.b, Scale(bc, w)));
+        return dot(delta, delta);
+    }
+
+    const float denominator = 1.0f / (va + vb + vc);
+    const float v = vb * denominator;
+    const float w = vc * denominator;
+    const auto closest = Add(Add(triangle.a, Scale(ab, v)), Scale(ac, w));
+    const auto delta = subtract(point, closest);
+    return dot(delta, delta);
+}
+
+class TriangleBoundsTree
+{
+public:
+    explicit TriangleBoundsTree(std::vector<MeshTriangle> triangles)
+        : triangles_(std::move(triangles)), order_(triangles_.size())
+    {
+        std::iota(order_.begin(), order_.end(), 0u);
+        if (!order_.empty()) Build(0u, order_.size());
+    }
+
+    float Distance(const std::array<float, 3u>& point) const
+    {
+        if (nodes_.empty()) return std::numeric_limits<float>::max();
+        float bestSquared = std::numeric_limits<float>::max();
+        Query(0u, point, bestSquared);
+        return std::sqrt(bestSquared);
+    }
+
+private:
+    struct Node
+    {
+        WorldBounds bounds{};
+        std::size_t begin = 0u;
+        std::size_t end = 0u;
+        std::size_t left = std::numeric_limits<std::size_t>::max();
+        std::size_t right = std::numeric_limits<std::size_t>::max();
+    };
+
+    std::size_t Build(const std::size_t begin, const std::size_t end)
+    {
+        const std::size_t nodeIndex = nodes_.size();
+        nodes_.emplace_back();
+        WorldBounds bounds;
+        WorldBounds centers;
+        for (std::size_t i = begin; i < end; ++i)
+        {
+            const auto& triangle = triangles_[order_[i]];
+            IncludePoint(bounds, triangle.bounds.minimum);
+            IncludePoint(bounds, triangle.bounds.maximum);
+            IncludePoint(centers, triangle.center);
+        }
+        nodes_[nodeIndex].bounds = bounds;
+        nodes_[nodeIndex].begin = begin;
+        nodes_[nodeIndex].end = end;
+        if (end - begin <= 8u) return nodeIndex;
+
+        std::size_t axis = 0u;
+        for (std::size_t candidate = 1u; candidate < 3u; ++candidate)
+            if (centers.maximum[candidate] - centers.minimum[candidate] >
+                centers.maximum[axis] - centers.minimum[axis]) axis = candidate;
+        const std::size_t middle = begin + (end - begin) / 2u;
+        std::nth_element(order_.begin() + static_cast<std::ptrdiff_t>(begin),
+                         order_.begin() + static_cast<std::ptrdiff_t>(middle),
+                         order_.begin() + static_cast<std::ptrdiff_t>(end),
+            [&](const std::size_t left, const std::size_t right) {
+                return triangles_[left].center[axis] < triangles_[right].center[axis];
+            });
+        const std::size_t left = Build(begin, middle);
+        const std::size_t right = Build(middle, end);
+        nodes_[nodeIndex].left = left;
+        nodes_[nodeIndex].right = right;
+        return nodeIndex;
+    }
+
+    void Query(const std::size_t nodeIndex,
+               const std::array<float, 3u>& point,
+               float& bestSquared) const
+    {
+        const Node& node = nodes_[nodeIndex];
+        if (DistanceSquaredToBounds(point, node.bounds) >= bestSquared) return;
+        if (node.left == std::numeric_limits<std::size_t>::max())
+        {
+            for (std::size_t i = node.begin; i < node.end; ++i)
+                bestSquared = std::min(bestSquared,
+                    PointTriangleDistanceSquared(point, triangles_[order_[i]]));
+            return;
+        }
+        const float leftDistance = DistanceSquaredToBounds(point, nodes_[node.left].bounds);
+        const float rightDistance = DistanceSquaredToBounds(point, nodes_[node.right].bounds);
+        if (leftDistance <= rightDistance)
+        {
+            Query(node.left, point, bestSquared);
+            Query(node.right, point, bestSquared);
+        }
+        else
+        {
+            Query(node.right, point, bestSquared);
+            Query(node.left, point, bestSquared);
+        }
+    }
+
+    std::vector<MeshTriangle> triangles_;
+    std::vector<std::size_t> order_;
+    std::vector<Node> nodes_;
+};
+
+std::array<float, 3u> SkeletonLocalToWorld(
+    const std::array<float, 3u>& local,
+    const float x,
+    const float z,
+    const float facingRadians)
+{
+    const float cosine = std::cos(facingRadians);
+    const float sine = std::sin(facingRadians);
+    return {{cosine * local[0] + sine * local[2] + x,
+             horde::gameplay::kRouteFloorWorldY + local[1],
+             -sine * local[0] + cosine * local[2] + z}};
+}
+
+std::array<float, 3u> ItemVertexToGripLocal(
+    const std::array<float, 3u>& point,
+    const HeldItemTransform& itemFromGrip)
+{
+    const std::array<float, 3u> relative{{
+        point[0] - itemFromGrip[12], point[1] - itemFromGrip[13],
+        point[2] - itemFromGrip[14]}};
+    return {{relative[0] * itemFromGrip[0] + relative[1] * itemFromGrip[1] + relative[2] * itemFromGrip[2],
+             relative[0] * itemFromGrip[4] + relative[1] * itemFromGrip[5] + relative[2] * itemFromGrip[6],
+             relative[0] * itemFromGrip[8] + relative[1] * itemFromGrip[9] + relative[2] * itemFromGrip[10]}};
+}
+
+void TestCombatPulseAgainstImportedSwordAndSkeletonBounds(const bool detailed = false)
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::items;
+    using horde::scene::SkinnedClip;
+    using horde::scene::SkinnedMeshAsset;
+
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    horde::scene::assets::StaticMeshAsset sword;
+    horde::scene::assets::StaticMeshAsset torch;
+    std::string diagnostic;
+    Check(LoadProductionHeldAssets(sword, torch, diagnostic) && !sword.vertices.empty(),
+          "combat contact sampling must load the production sword vertices and Grip");
+    const auto* grip = FindHeldItemSocket(sword.sockets, "Grip");
+    Check(grip != nullptr,
+          "combat contact sampling must use the imported sword Grip socket");
+    if (grip == nullptr || sword.vertices.empty()) return;
+    WorldBounds gripRelativeSwordBounds;
+    std::array<std::size_t, 6u> gripHeightBands{};
+    for (const auto& vertex : sword.vertices)
+    {
+        const auto local = ItemVertexToGripLocal(
+            {{vertex.position[0], vertex.position[1], vertex.position[2]}}, grip->world);
+        IncludePoint(gripRelativeSwordBounds, local);
+        const std::size_t band = local[1] <= 0.15f ? 0u
+            : (local[1] < 0.35f ? 1u
+                : (local[1] < 0.55f ? 2u
+                    : (local[1] < 0.75f ? 3u
+                        : (local[1] < 0.95f ? 4u : 5u))));
+        ++gripHeightBands[band];
+    }
+    std::cout << "sword grip-local envelope y=" << gripRelativeSwordBounds.minimum[1]
+              << ':' << gripRelativeSwordBounds.maximum[1]
+              << " vertexBands(y<=.15,.15-.35,.35-.55,.55-.75,.75-.95,>.95)=";
+    for (const std::size_t count : gripHeightBands) std::cout << count << ',';
+    std::cout << " primitiveMaterials=";
+    for (const auto& primitive : sword.primitives)
+    {
+        const std::size_t materialIndex = std::min<std::size_t>(
+            primitive.materialIndex, sword.materials.empty() ? 0u : sword.materials.size() - 1u);
+        std::cout << (sword.materials.empty() ? "none" : sword.materials[materialIndex].name)
+                  << ':' << primitive.indexCount << ',';
+    }
+    std::cout << '\n';
+
+    SkinnedMeshAsset skeleton;
+    const auto skeletonPath = root / "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb";
+    Check(skeleton.LoadCombatClips(skeletonPath.string(), diagnostic),
+          "combat contact sampling must load the imported skeleton combat clips");
+    if (!skeleton.IsLoaded()) return;
+    std::vector<horde::scene::SkinnedRtVertex> targetPose;
+    Check(skeleton.Skin(SkinnedClip::Idle, 0.0f, targetPose, diagnostic) &&
+              !targetPose.empty(),
+          "target bounds must come from the imported skeleton's evaluated idle mesh");
+    if (targetPose.empty()) return;
+
+    horde::vulkan::raytracing::PlayerRenderSlot rig;
+    Check(rig.LoadAsset(
+              (root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),
+              diagnostic),
+          "combat contact sampling must resolve the production player's final right Grip");
+    if (!rig.IsLoaded()) return;
+
+    struct SampleCase
+    {
+        const char* name;
+        float distance;
+        float targetBearing;
+        float playerYaw;
+        bool combo;
+    };
+    const float coneEdge = std::acos(SwordCombat::kPlayerHitConeDot);
+    const std::vector<SampleCase> cases = detailed
+        ? std::vector<SampleCase>{{"normal-near", 1.20f, 0.0f, 0.0f, false},
+            {"normal-range-1.0", 1.00f, 0.0f, 0.0f, false},
+            {"normal-range-1.5", 1.50f, 0.0f, 0.0f, false},
+            {"normal-bearing-plus15", 1.20f, 0.2617994f, 0.0f, false},
+            {"normal-bearing-minus15", 1.20f, -0.2617994f, 0.0f, false},
+            {"normal-bearing-plus30", 1.20f, 0.5235988f, 0.0f, false},
+            {"normal-bearing-minus30", 1.20f, -0.5235988f, 0.0f, false},
+            {"normal-range-edge", SwordCombat::kPlayerHitRange - 0.01f, 0.0f, 0.0f, false},
+            {"normal-range-outside", SwordCombat::kPlayerHitRange + 0.01f, 0.0f, 0.0f, false},
+            {"normal-cone-inside", 1.20f, coneEdge - 0.02f, 0.0f, false},
+            {"normal-cone-outside", 1.20f, coneEdge + 0.02f, 0.0f, false},
+            {"combo-near", 1.20f, 0.0f, 0.0f, true}}
+        : std::vector<SampleCase>{{"normal-near", 1.20f, 0.0f, 0.0f, false},
+            {"combo-near", 1.20f, 0.0f, 0.0f, true}};
+
+    constexpr float tickSeconds = 1.0f / 60.0f;
+    constexpr float playerX = 0.0f;
+    constexpr float playerZ = 0.0f;
+    bool allSamplesResolved = true;
+    bool nearCaseHitAtNormalPulse = false;
+    bool nearDownwardPulseMeetsBlade = false;
+    bool nearUpwardPulseMeetsBlade = false;
+    bool coneCaseAdmissionMatches = true;
+    bool rangeCaseAdmissionMatches = true;
+    bool nearComboEmittedBothPulses = false;
+    std::uint64_t rigTick = 50000u;
+    for (const SampleCase& sampleCase : cases)
+    {
+        const float targetX = sampleCase.distance * std::sin(sampleCase.targetBearing);
+        const float targetZ = -sampleCase.distance * std::cos(sampleCase.targetBearing);
+        const float targetFacing = std::atan2(playerX - targetX, playerZ - targetZ);
+        WorldBounds targetBounds;
+        std::vector<MeshTriangle> targetTriangles;
+        Check(targetPose.size() % 3u == 0u,
+              "evaluated enemy mesh must remain an expanded triangle list for contact sampling");
+        targetTriangles.reserve(targetPose.size() / 3u);
+        for (const auto& vertex : targetPose)
+            IncludePoint(targetBounds, SkeletonLocalToWorld(
+                {{vertex.position[0], vertex.position[1], vertex.position[2]}},
+                targetX, targetZ, targetFacing));
+        for (std::size_t index = 0u; index + 2u < targetPose.size(); index += 3u)
+        {
+            MeshTriangle triangle;
+            triangle.a = SkeletonLocalToWorld(
+                {{targetPose[index].position[0], targetPose[index].position[1],
+                  targetPose[index].position[2]}}, targetX, targetZ, targetFacing);
+            triangle.b = SkeletonLocalToWorld(
+                {{targetPose[index + 1u].position[0], targetPose[index + 1u].position[1],
+                  targetPose[index + 1u].position[2]}}, targetX, targetZ, targetFacing);
+            triangle.c = SkeletonLocalToWorld(
+                {{targetPose[index + 2u].position[0], targetPose[index + 2u].position[1],
+                  targetPose[index + 2u].position[2]}}, targetX, targetZ, targetFacing);
+            IncludePoint(triangle.bounds, triangle.a);
+            IncludePoint(triangle.bounds, triangle.b);
+            IncludePoint(triangle.bounds, triangle.c);
+            triangle.center = Scale(Add(Add(triangle.a, triangle.b), triangle.c), 1.0f / 3.0f);
+            targetTriangles.push_back(triangle);
+        }
+        const TriangleBoundsTree targetTree(std::move(targetTriangles));
+
+        SwordCombat combat;
+        combat.Reset(1u, {targetX, targetZ});
+        Check(combat.RequestAttack() == PlayerAttackCut::DownwardCut,
+              "contact fixture must start with the ordinary downward attack");
+        bool comboQueued = false;
+        float minimumSurfaceGap = std::numeric_limits<float>::max();
+        float minimumBoundsGap = std::numeric_limits<float>::max();
+        float downwardPulseSurfaceGap = std::numeric_limits<float>::max();
+        float upwardPulseSurfaceGap = std::numeric_limits<float>::max();
+        float downwardPulseBoundsGap = std::numeric_limits<float>::max();
+        float upwardPulseBoundsGap = std::numeric_limits<float>::max();
+        float minimumBladeSurfaceGap = std::numeric_limits<float>::max();
+        float downwardPulseBladeGap = std::numeric_limits<float>::max();
+        float upwardPulseBladeGap = std::numeric_limits<float>::max();
+        std::uint64_t closestBladeTick = 0u;
+        std::uint64_t closestSurfaceTick = 0u;
+        std::uint64_t firstNearSurfaceTick = 0u;
+        std::uint64_t lastNearSurfaceTick = 0u;
+        std::array<float, 3u> closestSurfaceGripLocal{};
+        std::array<float, 3u> closestBladeGripLocal{};
+        std::array<float, 3u> downwardPulseGripLocal{};
+        std::array<float, 3u> upwardPulseGripLocal{};
+        std::array<std::uint64_t, 3u> firstNearSurfaceByAction{};
+        std::array<std::uint64_t, 3u> lastNearSurfaceByAction{};
+        std::array<std::uint64_t, 3u> firstNearBladeByAction{};
+        std::array<std::uint64_t, 3u> lastNearBladeByAction{};
+        std::uint64_t firstBoundsOverlapTick = 0u;
+        std::uint64_t lastBoundsOverlapTick = 0u;
+        std::uint64_t downwardPulseTick = 0u;
+        std::uint64_t upwardPulseTick = 0u;
+        unsigned downwardPulseCount = 0u;
+        unsigned upwardPulseCount = 0u;
+        float downwardPulseActionTime = -1.0f;
+        float upwardPulseActionTime = -1.0f;
+        bool downwardPulseAdmitted = false;
+        bool targetAlreadyDeadAtUpwardPulse = false;
+        for (std::uint64_t tick = 1u; tick <= 56u; ++tick)
+        {
+            if (sampleCase.combo && !comboQueued &&
+                combat.Snapshot().player.action == PlayerCombatAction::SwingActive)
+            {
+                comboQueued = combat.RequestAttack() == PlayerAttackCut::UpwardSlice;
+            }
+            const auto& snapshot = combat.Update(
+                tickSeconds, playerX, playerZ, sampleCase.playerYaw, true, false);
+            bool measureTick = tick >= 8u && tick <= (sampleCase.combo ? 40u : 22u);
+            if (!detailed)
+            {
+                const bool normalSample = tick == 10u || tick == 11u || tick == 16u ||
+                    tick == 20u || tick == 21u || tick == 22u;
+                const bool upwardSample = tick == 26u || tick == 27u || tick == 32u ||
+                    tick == 37u || tick == 38u;
+                measureTick = sampleCase.combo ? (normalSample || upwardSample) : normalSample;
+            }
+            if (!measureTick && !snapshot.playerAttackPulse) continue;
+            HeldItemFixedStepInput input;
+            input.playerX = playerX;
+            input.playerZ = playerZ;
+            input.playerYawRadians = sampleCase.playerYaw;
+            input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+            input.playerCombat = snapshot.player;
+            HeldItemStates items = MakeDefaultHeldItemStates();
+            HeldItemFixedStepState fixed;
+            const bool fixedResolved = ResolveHeldItemsFixedStep(items, input, tick,
+                                                                  fixed, diagnostic);
+            HeldItemTransform worldFromGrip{};
+            HeldItemTransform worldFromSword{};
+            const bool rigResolved = fixedResolved && ResolveProductionAnatomicalSword(
+                input, fixed.kinematics, items, rig, rigTick++, worldFromGrip,
+                worldFromSword, diagnostic);
+            allSamplesResolved &= rigResolved;
+            if (!rigResolved) continue;
+
+            float tickGap = std::numeric_limits<float>::max();
+            float tickSurfaceGap = std::numeric_limits<float>::max();
+            float tickBladeSurfaceGap = std::numeric_limits<float>::max();
+            std::array<float, 3u> tickSurfaceGripLocal{};
+            std::array<float, 3u> tickBladeGripLocal{};
+            for (const auto& vertex : sword.vertices)
+            {
+                const std::array<float, 3u> localPoint{{
+                    vertex.position[0], vertex.position[1], vertex.position[2]}};
+                const auto point = TransformPoint(worldFromSword, localPoint);
+                tickGap = std::min(tickGap, DistanceToBounds(point, targetBounds));
+                const float surfaceGap = targetTree.Distance(point);
+                const auto gripLocal = ItemVertexToGripLocal(localPoint, grip->world);
+                if (surfaceGap < tickSurfaceGap)
+                {
+                    tickSurfaceGap = surfaceGap;
+                    tickSurfaceGripLocal = gripLocal;
+                }
+                if (gripLocal[1] > 0.15f)
+                {
+                    if (surfaceGap < tickBladeSurfaceGap)
+                    {
+                        tickBladeSurfaceGap = surfaceGap;
+                        tickBladeGripLocal = gripLocal;
+                    }
+                }
+            }
+            minimumBoundsGap = std::min(minimumBoundsGap, tickGap);
+            if (tickSurfaceGap < minimumSurfaceGap)
+            {
+                minimumSurfaceGap = tickSurfaceGap;
+                closestSurfaceTick = tick;
+                closestSurfaceGripLocal = tickSurfaceGripLocal;
+            }
+            if (tickBladeSurfaceGap < minimumBladeSurfaceGap)
+            {
+                minimumBladeSurfaceGap = tickBladeSurfaceGap;
+                closestBladeTick = tick;
+                closestBladeGripLocal = tickBladeGripLocal;
+            }
+            if (tickSurfaceGap <= 0.02f)
+            {
+                if (firstNearSurfaceTick == 0u) firstNearSurfaceTick = tick;
+                lastNearSurfaceTick = tick;
+                const std::size_t actionIndex = snapshot.player.action == PlayerCombatAction::SwingActive ? 0u
+                    : (snapshot.player.action == PlayerCombatAction::UpwardSliceActive ? 1u : 2u);
+                if (firstNearSurfaceByAction[actionIndex] == 0u)
+                    firstNearSurfaceByAction[actionIndex] = tick;
+                lastNearSurfaceByAction[actionIndex] = tick;
+            }
+            if (tickBladeSurfaceGap <= 0.02f)
+            {
+                const std::size_t actionIndex = snapshot.player.action == PlayerCombatAction::SwingActive ? 0u
+                    : (snapshot.player.action == PlayerCombatAction::UpwardSliceActive ? 1u : 2u);
+                if (firstNearBladeByAction[actionIndex] == 0u)
+                    firstNearBladeByAction[actionIndex] = tick;
+                lastNearBladeByAction[actionIndex] = tick;
+            }
+            if (tickGap <= 0.0001f)
+            {
+                if (firstBoundsOverlapTick == 0u) firstBoundsOverlapTick = tick;
+                lastBoundsOverlapTick = tick;
+            }
+            if (snapshot.playerAttackPulse)
+            {
+                if (snapshot.playerAttackCut == PlayerAttackCut::DownwardCut)
+                {
+                    downwardPulseTick = tick;
+                    ++downwardPulseCount;
+                    downwardPulseActionTime = snapshot.player.actionTime;
+                    downwardPulseSurfaceGap = tickSurfaceGap;
+                    downwardPulseBoundsGap = tickGap;
+                    downwardPulseBladeGap = tickBladeSurfaceGap;
+                    downwardPulseGripLocal = tickSurfaceGripLocal;
+                    downwardPulseAdmitted = snapshot.combatants[0].health == 0;
+                }
+                else if (snapshot.playerAttackCut == PlayerAttackCut::UpwardSlice)
+                {
+                    upwardPulseTick = tick;
+                    ++upwardPulseCount;
+                    upwardPulseActionTime = snapshot.player.actionTime;
+                    upwardPulseSurfaceGap = tickSurfaceGap;
+                    upwardPulseBoundsGap = tickGap;
+                    upwardPulseBladeGap = tickBladeSurfaceGap;
+                    upwardPulseGripLocal = tickSurfaceGripLocal;
+                    targetAlreadyDeadAtUpwardPulse = snapshot.combatants[0].health == 0;
+                }
+            }
+            if (detailed && (sampleCase.name == std::string("normal-near") ||
+                             sampleCase.name == std::string("combo-near")))
+                std::cout << "combat-geometry-tick " << sampleCase.name
+                          << " tick=" << tick
+                          << " action=" << static_cast<int>(snapshot.player.action)
+                          << " actionTime=" << snapshot.player.actionTime
+                          << " pulse=" << snapshot.playerAttackPulse
+                          << " cut=" << static_cast<int>(snapshot.playerAttackCut)
+                          << " fullGap=" << tickSurfaceGap
+                          << " bladeGapYgt015=" << tickBladeSurfaceGap << '\n';
+            if (tick > 1u && snapshot.player.action == PlayerCombatAction::Idle &&
+                !snapshot.player.comboQueued)
+                break;
+        }
+
+        if (sampleCase.name == std::string("normal-near"))
+        {
+            nearCaseHitAtNormalPulse = downwardPulseAdmitted;
+            nearDownwardPulseMeetsBlade = downwardPulseBladeGap <= 0.02f;
+        }
+        if (sampleCase.name == std::string("combo-near"))
+            nearUpwardPulseMeetsBlade = upwardPulseBladeGap <= 0.02f;
+        if (sampleCase.name == std::string("normal-cone-inside"))
+            coneCaseAdmissionMatches = coneCaseAdmissionMatches && downwardPulseAdmitted;
+        if (sampleCase.name == std::string("normal-cone-outside"))
+            coneCaseAdmissionMatches = coneCaseAdmissionMatches && !downwardPulseAdmitted;
+        if (sampleCase.name == std::string("normal-range-edge"))
+            rangeCaseAdmissionMatches = rangeCaseAdmissionMatches && downwardPulseAdmitted;
+        if (sampleCase.name == std::string("normal-range-outside"))
+            rangeCaseAdmissionMatches = rangeCaseAdmissionMatches && !downwardPulseAdmitted;
+        if (sampleCase.name == std::string("combo-near"))
+            nearComboEmittedBothPulses = downwardPulseCount == 1u && upwardPulseCount == 1u &&
+                downwardPulseTick < upwardPulseTick &&
+                downwardPulseActionTime >= SwordCombat::kDownwardContactTime &&
+                downwardPulseActionTime < SwordCombat::kDownwardContactTime + tickSeconds &&
+                upwardPulseActionTime >= SwordCombat::kUpwardContactTime &&
+                upwardPulseActionTime < SwordCombat::kUpwardContactTime + tickSeconds;
+        std::cout << "combat-geometry " << sampleCase.name
+                  << " target=" << targetX << ',' << targetZ
+                  << " targetY=" << kRouteFloorWorldY
+                  << " targetFacing=" << targetFacing
+                  << " playerYaw=" << sampleCase.playerYaw
+                  << " targetBearing=" << sampleCase.targetBearing
+                  << " targetBoundsY=" << targetBounds.minimum[1] << ':' << targetBounds.maximum[1]
+                  << " downPulseTick=" << downwardPulseTick
+                  << " downActionTime=" << downwardPulseActionTime
+                  << " downAdmitted=" << downwardPulseAdmitted
+                  << " upPulseTick=" << upwardPulseTick
+                  << " upActionTime=" << upwardPulseActionTime
+                  << " targetDeadAtUpPulse=" << targetAlreadyDeadAtUpwardPulse
+                  << " downPulseSurfaceGap=" << downwardPulseSurfaceGap
+                  << " upPulseSurfaceGap=" << upwardPulseSurfaceGap
+                  << " downPulseBoundsGap=" << downwardPulseBoundsGap
+                  << " upPulseBoundsGap=" << upwardPulseBoundsGap
+                  << " downPulseBladeGap=" << downwardPulseBladeGap
+                  << " upPulseBladeGap=" << upwardPulseBladeGap
+                  << " downPulseNearestGripLocal=" << downwardPulseGripLocal[0] << ','
+                  << downwardPulseGripLocal[1] << ',' << downwardPulseGripLocal[2]
+                  << " upPulseNearestGripLocal=" << upwardPulseGripLocal[0] << ','
+                  << upwardPulseGripLocal[1] << ',' << upwardPulseGripLocal[2]
+                  << " minSurfaceGap=" << minimumSurfaceGap
+                  << " closestSurfaceTick=" << closestSurfaceTick
+                  << " closestSurfaceGripLocal=" << closestSurfaceGripLocal[0] << ','
+                  << closestSurfaceGripLocal[1] << ',' << closestSurfaceGripLocal[2]
+                  << " minBladeSurfaceGap=" << minimumBladeSurfaceGap
+                  << " closestBladeTick=" << closestBladeTick
+                  << " closestBladeGripLocal=" << closestBladeGripLocal[0] << ','
+                  << closestBladeGripLocal[1] << ',' << closestBladeGripLocal[2]
+                  << " nearSurfaceTicks20mm=" << firstNearSurfaceTick << ':' << lastNearSurfaceTick
+                  << " downActiveNearTicks=" << firstNearSurfaceByAction[0] << ':' << lastNearSurfaceByAction[0]
+                  << " upActiveNearTicks=" << firstNearSurfaceByAction[1] << ':' << lastNearSurfaceByAction[1]
+                  << " downActiveBladeNearTicks=" << firstNearBladeByAction[0] << ':' << lastNearBladeByAction[0]
+                  << " upActiveBladeNearTicks=" << firstNearBladeByAction[1] << ':' << lastNearBladeByAction[1]
+                  << " minGap=" << minimumBoundsGap
+                  << (detailed ? " boundsOverlapTicks=" : " boundsOverlapSamples=")
+                  << firstBoundsOverlapTick << ':' << lastBoundsOverlapTick
+                  << " importedSwordVertices=" << sword.vertices.size()
+                  << " importedTargetVertices=" << targetPose.size() << '\n';
+    }
+    Check(allSamplesResolved,
+          "every 60 Hz combat sample must resolve through the final imported player rig and sword Grip");
+    Check(nearCaseHitAtNormalPulse,
+          "a representative admitted near target must still receive the existing downward pulse");
+    Check(nearDownwardPulseMeetsBlade && nearUpwardPulseMeetsBlade,
+          "frontal 1.2m contact pulses must occur during close approach of the actual imported blade, not before either stroke");
+    Check(nearComboEmittedBothPulses,
+          "the combined 60 Hz fixture must retain both downward and upward semantic attack pulses");
+    if (detailed)
+    {
+        Check(coneCaseAdmissionMatches,
+              "the contact fixture's near cone boundary must preserve combat's existing range/cone admission");
+        Check(rangeCaseAdmissionMatches,
+              "the contact fixture's near range boundary must preserve combat's existing range admission");
+    }
+}
+
 bool ResolveProductionSwordStowPose(
     horde::gameplay::items::HeldItemFixedStepInput input,
     const horde::gameplay::items::HeldItemState& swordState,
@@ -2296,7 +2919,7 @@ void TestRewardCarryParryKeepsGuardOnSwordSide()
     Check(leftGripUnchanged, "parry clearance must not be obtained by moving the lantern grip");
 }
 
-int main()
+int main(const int argc, char** argv)
 {
 #if defined(_MSC_VER) && defined(_DEBUG)
     // CTest must receive diagnostics and a failure, never a blocking desktop
@@ -2304,6 +2927,11 @@ int main()
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 #endif
+    if (argc > 1 && std::string(argv[1]) == "--combat-geometry")
+    {
+        TestCombatPulseAgainstImportedSwordAndSkeletonBounds(true);
+        return failures == 0 ? 0 : 1;
+    }
     TestSocketLookupIsNamedAndOrderIndependent();
     TestWorldFromItemUsesRequiredCompositionOrder();
     TestScaledGripSocketIsRejected();
@@ -2332,6 +2960,7 @@ int main()
     TestActualRigSwordBodyStowAndContinuousDrawBlend();
     TestActualRigSwordSheathReachesGripBeforeAttachmentThenReleases();
     TestFullScabbardMeshFitsAnimatedPlayerAndRouteFloor();
+    TestCombatPulseAgainstImportedSwordAndSkeletonBounds();
     TestSwordOverheadClearanceUsesImportedBladeAcrossCombatPhases();
     if (failures == 0)
     {
