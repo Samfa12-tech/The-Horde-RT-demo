@@ -83,3 +83,10 @@ Windows executable SHA-256 is
 `cd5a903269b5d65ad7518282e6cd367558e77a1480e5c1c2aef261e8f10ffe40`.
 The sealed four-ABI package passes current closed Android asset admission and
 16 KiB alignment. It is an intermediate Debug checkpoint, not a final candidate.
+
+The corrected fixture checkpoint `e4704d16` and subsequent integrated runtime
+`868691fc` each pass all 12 aggregate CI checks. The latter's exact four-ABI
+inspection package and actual phone/Windows presentation evidence are in
+[the surface ledger](ENGINEERING_1_6_2_SURFACE_RECOVERY_2026_10_07.md).
+This closes those recorded fixture/CI failures for the new source; it does not
+replace the pending moving equipment/route/owner checks or enable production flags.

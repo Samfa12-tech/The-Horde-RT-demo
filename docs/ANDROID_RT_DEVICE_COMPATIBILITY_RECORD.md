@@ -2,6 +2,30 @@
 
 Last updated: 2026-10-07
 
+## 7 October corrected surface recovery — SM-S948B / Android 16
+
+Evidence class: **exact integrated Debug package, affected rotations and Graphics
+acknowledgement/lifecycle**, genuine Pipeline and RayQueryCompute. Source
+`868691fc11e7ecf52b0e6ff99d7bab31e2b63997`, four-ABI APK SHA-256
+`c865152bab855517fe48822c19fbda90bc242b4008e55b788c1f09d4d69ea93f`,
+138,462,724 bytes; installed base pullback matches. Existing font scale 1.7,
+override density 560 and every saved/custom preference entry are preserved.
+
+ADB-requested quarter-turns select current/pre-transform `0x2` or `0x8`, natural
+image 1440×2981 and actual traced 720×1491. Actual images/native controls are
+upright and ready, including the owner scrollbar/colon labels. Pipeline also
+passes upside-down portrait and return to original portrait. Exact landscape
+Use and Restore ACK pass on both backends; normal confirmation remains and no
+Keep/save is pressed. Home intentionally exits preview to confirmed Settings;
+both backends present new surface generation 3 and accepted new scene epochs.
+The resumed output is portrait, so landscape Home/resume is not established.
+
+Original portrait lock 0 is restored, owned PIDs 23157/29766 are stopped, and
+production app/data are untouched. [Exact surface ledger](ENGINEERING_1_6_2_SURFACE_RECOVERY_2026_10_07.md#immutable-integrated-device-checkpoint)
+retains the old 359a failure, transient/helper limits, exact Windows checks and
+all 12 source CI passes. This evidence does not certify sustained gameplay
+30 FPS, power/thermal improvement, moving equipment or owner comfort/audio.
+
 ## 7 October integrated menu/cache inspection — SM-S948B / Android 16
 
 Evidence class: **exact Debug package, bounded apply latency and native UI**,

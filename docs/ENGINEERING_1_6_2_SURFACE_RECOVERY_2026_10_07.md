@@ -88,3 +88,73 @@ surface/Home recovery remain required. Host and build passes do not close them.
 
 This internal bounded review is not Eric's independent audit. Final candidate,
 owner visual/audio/haptic decisions and sustained phone performance remain open.
+
+## Immutable integrated device checkpoint
+
+Source `868691fc11e7ecf52b0e6ff99d7bab31e2b63997`, tree
+`4b63a195b88cab23edec98f165f08992bfee87a0`, is pushed to existing PR18.
+Post-commit Debug assembly passes. The sealed package in private
+`task-4/integrated-162-868691fc-20261007/` passes closed asset admission, all
+four ABI payload checks, fullUser/0x480 manifest inspection and 16 KiB alignment:
+
+| Artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| Android Debug APK | 138462724 | `c865152bab855517fe48822c19fbda90bc242b4008e55b788c1f09d4d69ea93f` |
+| Windows Debug executable | 11321856 | `4d86cd6d0fe628164b0bf97bb194eb1478c94ecda7973d80309b354b075beed9` |
+| Packaged arm64 native library | 4359888 | `72176cb1832aef6aa61783a024a153f93524afca7c67ccab11ebccd089a77cc0` |
+
+Installed phone base APK pullback matches the seal. Allocated device is
+SM-S948B / Android 16; existing font scale 1.7 and override density 560 remain.
+ADB-requested quarter-turns now select the current `0x2` or `0x8`, natural
+swapchain 1440×2981 and traced 720×1491. Native controls stay in the landscape
+window coordinate system. Actual screenshots show upright geometry, labels,
+scrollbar and actions. The original portrait traced tuple remains 720×1490;
+quarter-turn dimensions exchange axes without reducing traced work.
+
+Pipeline cases 09–21 cover ready portrait, both landscape directions, upside-down
+portrait and return to original portrait. Each rotation has one transition
+recreation, not a repeated loop. Landscape Use serial 6 reaches an exact native
+current-presented ACK in 155.078 ms, observed by UI in 172.994 ms; Keep and Restore
+are available in the normal confirmation state. Restore serial 7 reaches exact
+ACK in 167.548 ms, observed in 292.067 ms. No Keep/save is selected. The first
+trial also exercises normal automatic rollback about 15 seconds after the
+acknowledged trial, with its restore exact ACK retained.
+
+Required genuine RayQueryCompute is independently confirmed in its capability
+report and completed-frame shader identities. Its actual Entry scene is upright
+in landscape; its authored preview is upright and ready in reverse landscape.
+Use serial 3 reaches exact ACK in 346.954 ms, UI observation 590.601 ms; Restore
+serial 4 reaches exact ACK in 197.848 ms, UI observation 290.917 ms. Both preserve
+the normal timer and unchanged requested/effective/saved safeguards.
+
+Home/resume on both backends intentionally leaves the preview and returns to
+confirmed Settings, as `onPause` requires. A new surface generation 3 presents
+the RT Entry scene, and accepted completed-frame reports establish fresh scene
+epochs (Pipeline 9, Compute 8). Actual resumed output is portrait; this is not
+evidence of a landscape Home/resume or physical owner rotation gesture. Pipeline
+capability readbacks 23/24 advance accepted submission 4265→6665 in epoch 9.
+Compute Home and later readbacks advance 3129→3249 in epoch 8. Periodic capability
+reports are separate from the exact per-request ACK; they are not joined by
+assuming identical timestamps.
+
+Two private-helper expectations were wrong: editors are intentionally disabled
+while Keep/Restore confirmation is active, and Home intentionally closes preview
+to Settings. Their original captures/errors remain, followed by correctly
+targeted confirmation and resume checks. An early Compute preview read has
+`no-accepted-completed-frame` while presentation is already true; the later
+settled read supplies accepted completed-frame evidence. This transient is
+retained and is not relabelled as a completed frame or persistence failure.
+
+Every XML preference entry is identical before installation and after both
+backend blocks, including inactive metadata. Original `lock 0` is restored.
+Owned phone PIDs 23157 and 29766 are stopped with receipts; production app/data
+are untouched. These bounded checks establish recovery and acknowledgement,
+not sustained gameplay FPS, power/thermal benefit or owner touch/audio approval.
+
+The exact Windows executable passes Pipeline landscape and Compute portrait
+Entry captures. Each completes six RT poses, no-Use Graphics Back, saved Graphics
+preservation and actual Play handoff at epoch 7. Both owned processes exit with
+zero synchronization-validation errors. Actual compositions were inspected.
+All 12 aggregate source CI checks pass: push `37614824777`, PR `37614831521`.
+Documentation after this runtime seal has its own CI. This remains an intermediate
+inspection checkpoint, not the final review candidate or independent audit.

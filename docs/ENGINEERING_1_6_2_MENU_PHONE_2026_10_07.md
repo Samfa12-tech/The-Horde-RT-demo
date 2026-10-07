@@ -261,3 +261,23 @@ and Android witness failures from d08 remain recorded. At the latest sampled
 359a snapshot, four checks passed and eight were running; current CI must be
 refreshed independently of the phone result. The subsequent refresh confirms
 all 12 checks successful for 359a in push `37610890737` / PR `37610897316`.
+
+## Corrected immutable surface recovery checkpoint
+
+The subsequent [surface recovery ledger](ENGINEERING_1_6_2_SURFACE_RECOVERY_2026_10_07.md#immutable-integrated-device-checkpoint)
+records exact source `868691fc11e7ecf52b0e6ff99d7bab31e2b63997`, source tree,
+four native payloads, sealed Android/Windows hashes and installed pullback.
+Actual phone quarter-turns now use the current surface transform and natural
+RT image extent, producing upright ready controls without the earlier loop.
+Pipeline covers both landscape directions and upside-down/returned portrait;
+Compute covers landscape Entry and reverse-landscape preview. Both pass exact
+Use/Restore ACK and Home return to confirmed Settings with fresh presented
+surfaces. All preference entries are unchanged and both owned apps are stopped;
+original rotation, font scale and density are preserved.
+
+Both exact Windows backends complete six Entry poses, saved-settings/Back and
+Play handoff with zero synchronization-validation errors. Source CI passes all
+12 checks (push `37614824777`, PR `37614831521`). Earlier failures remain valid
+historical results. This is an intermediate Debug inspection checkpoint;
+landscape Home recovery, physical owner rotation, sustained performance and
+owner motion/audio/touch acceptance remain separate gates.

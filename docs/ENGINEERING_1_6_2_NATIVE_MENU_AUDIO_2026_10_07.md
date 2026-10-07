@@ -48,5 +48,8 @@ including three equipment selection/inactivity tests; lint has zero errors and
 62 warnings. Full Windows native and all-four-ABI Android native builds pass.
 Two earlier full Java failures and the subsequent Graphics opening crash remain
 recorded in [the phone ledger](ENGINEERING_1_6_2_MENU_PHONE_2026_10_07.md).
-Current owner listening, real attachment motion/timing and phone menu/loading/
-landscape recovery remain open. CPU/build checks do not close those gates.
+Current owner listening, real attachment motion/timing and broader loading/cost
+acceptance remain open. Subsequent immutable `868691fc` passes actual phone
+rotated Entry/preview, exact landscape Use/Restore and both backend Home recovery,
+as recorded in [the surface ledger](ENGINEERING_1_6_2_SURFACE_RECOVERY_2026_10_07.md).
+Those device checks do not close audio, motion, touch comfort or sustained-FPS gates.
