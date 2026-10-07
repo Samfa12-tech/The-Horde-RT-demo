@@ -151,6 +151,14 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_combat_timing_trace_tests COMMAND horde_rt_combat_timing_trace_tests)
 
     add_executable(horde_rt_held_item_clearance_tests tests/HeldItemClearanceTests.cpp)
+    target_sources(horde_rt_held_item_clearance_tests PRIVATE
+        src/scene/assets/AssetManifest.cpp
+        src/scene/assets/AssetValidation.cpp
+        src/scene/assets/GltfDocument.cpp
+        src/scene/assets/StaticMeshAsset.cpp
+    )
+    target_include_directories(horde_rt_held_item_clearance_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+    target_compile_definitions(horde_rt_held_item_clearance_tests PRIVATE HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
     target_link_libraries(horde_rt_held_item_clearance_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_held_item_clearance_tests COMMAND horde_rt_held_item_clearance_tests)
 
@@ -559,7 +567,10 @@ if(BUILD_TESTING)
         src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp
         src/scene/assets/StaticMeshAsset.cpp
+        src/scene/assets/SkinnedMeshAsset.cpp
+        src/telemetry/RtPerformanceEvidence.cpp
         src/vulkan/raytracing/HeldItemRenderSlot.cpp
+        src/vulkan/raytracing/PlayerRenderSlot.cpp
         src/vulkan/raytracing/RtStaticMeshSlot.cpp
     )
     target_link_libraries(horde_rt_held_item_socket_tests PRIVATE horde_gameplay_simulation)

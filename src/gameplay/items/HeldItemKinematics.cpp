@@ -87,6 +87,11 @@ Vec3 Scale(const Vec3& value, const float scale)
     return {{value[0] * scale, value[1] * scale, value[2] * scale}};
 }
 
+float Dot(const Vec3& left, const Vec3& right)
+{
+    return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+}
+
 Vec3 Lerp(const Vec3& from, const Vec3& to, const float amount)
 {
     return Add(from, Scale(Add(to, Scale(from, -1.0f)), amount));
@@ -176,9 +181,9 @@ float TorchOverheadLowering(const Vec3& gripWorld, const Vec3& viewUp,
     // Include the long tilted torch as well as its cage and animated fire;
     // testing only the camera or flame pivot misses an approaching lintel.
     const float radius = kHeldTorchEnvelopeRadius +
-        kHeldTorchEnvelopeTopFromGrip * std::hypot(viewUp[0], viewUp[2]);
+        kPlayerRagTorchEnvelopeTopFromGrip * std::hypot(viewUp[0], viewUp[2]);
     const float highestY = gripWorld[1] +
-        kHeldTorchEnvelopeTopFromGrip * viewUp[1] +
+        kPlayerRagTorchEnvelopeTopFromGrip * viewUp[1] +
         kHeldTorchEnvelopeRadius * std::abs(viewForward[1]);
     constexpr float anticipationDistance = 0.65f;
     float lowering = 0.0f;
@@ -200,6 +205,94 @@ float TorchOverheadLowering(const Vec3& gripWorld, const Vec3& viewUp,
     for (const auto& volume : horde::scene::kShowcaseImportedOverheadVolumes) include(volume);
     include(horde::scene::kShowcaseCollapseRoofSeam);
     return lowering;
+}
+
+float SwordOverheadLowering(const Vec3& gripWorld,
+                            const Vec3& bladeAxisWorld,
+                            const Vec3& edgeAxisWorld,
+                            const Vec3& flatAxisWorld)
+{
+    // Bounds are measured from the imported production sword GLB after its
+    // exact Grip socket is removed: blade-long +Y [-0.135, 0.915], sharpened
+    // edge +X +/-0.112, and broad-flat +Z +/-0.025 metres. Sweep that actual
+    // oriented envelope along the posed blade instead of testing the camera or
+    // the right-hand pivot alone. The half-step vertical pad makes the fixed
+    // samples conservative for every roof-plane crossing between them.
+    constexpr float minimumBlade = -0.135f;
+    constexpr float maximumBlade = 0.91526f;
+    constexpr int sampleIntervals = 42;
+    constexpr float edgeExtent = 0.112f;
+    constexpr float flatExtent = 0.025f;
+    constexpr float bladeLength = maximumBlade - minimumBlade;
+    constexpr float samplePad = bladeLength / (2.0f * sampleIntervals);
+    constexpr float anticipationDistance = 0.65f;
+    const float radius = std::hypot(edgeExtent, flatExtent);
+    const float verticalCrossSection = edgeExtent * std::abs(edgeAxisWorld[1]) +
+                                       flatExtent * std::abs(flatAxisWorld[1]);
+    struct SwordClearanceSample
+    {
+        Vec3 center{};
+        float highestY = 0.0f;
+    };
+    std::array<SwordClearanceSample, sampleIntervals + 1u> samples{};
+    for (int sample = 0; sample <= sampleIntervals; ++sample)
+    {
+        const float bladeOffset = minimumBlade + bladeLength *
+            (static_cast<float>(sample) / static_cast<float>(sampleIntervals));
+        auto& point = samples[static_cast<std::size_t>(sample)];
+        point.center = Add(gripWorld, Scale(bladeAxisWorld, bladeOffset));
+        point.highestY = point.center[1] + verticalCrossSection +
+                         samplePad * std::abs(bladeAxisWorld[1]);
+    }
+
+    // Most held poses are in open rooms. Reject whole roof volumes before the
+    // per-sample underside work whenever the grip-to-footprint distance proves
+    // the complete sword sweep lies beyond both its radial extent and smooth
+    // anticipation distance. Distance to a convex footprint is 1-Lipschitz,
+    // so this bound cannot discard a contributing blade sample.
+    const float horizontalReach = std::max(std::abs(minimumBlade), maximumBlade) *
+        std::hypot(bladeAxisWorld[0], bladeAxisWorld[2]) + radius;
+    float lowering = 0.0f;
+    const auto includeVolumes = [&](const auto& volumes) {
+        for (const auto& volume : volumes)
+        {
+            if (DistanceToOverheadFootprint(volume, gripWorld[0], gripWorld[2]) >
+                horizontalReach + anticipationDistance)
+                continue;
+            for (const auto& point : samples)
+            {
+                const float required = std::max(0.0f,
+                    point.highestY + kHeldTorchOverheadGap -
+                        horde::scene::MinimumOverheadBottomY(
+                            volume, point.center[0], point.center[2], radius));
+                if (required == 0.0f) continue;
+                const float distance = std::max(0.0f,
+                    DistanceToOverheadFootprint(
+                        volume, point.center[0], point.center[2]) - radius);
+                const float response = std::clamp(
+                    1.0f - distance / anticipationDistance, 0.0f, 1.0f);
+                const float smoothResponse = response * response * (3.0f - 2.0f * response);
+                lowering = std::max(lowering, required * smoothResponse);
+            }
+        }
+    };
+    includeVolumes(horde::scene::kShowcaseLowOverheadVolumes);
+    includeVolumes(horde::scene::kShowcaseCeilingPatches);
+    includeVolumes(horde::scene::kShowcaseSkylightGrid);
+    includeVolumes(horde::scene::kShowcaseImportedOverheadVolumes);
+    includeVolumes(std::array<horde::scene::OverheadVolume, 1u>{{
+        horde::scene::kShowcaseCollapseRoofSeam}});
+    return lowering;
+}
+
+Vec3 ViewVectorToWorld(const Vec3& viewVector,
+                       const Vec3& viewRight,
+                       const Vec3& viewUp,
+                       const Vec3& viewForward)
+{
+    return Add(Add(Scale(viewRight, viewVector[0]),
+                   Scale(viewUp, viewVector[1])),
+               Scale(viewForward, viewVector[2]));
 }
 
 } // namespace
@@ -468,17 +561,36 @@ FirstPersonSafeFrame EvaluateOwnerFeedbackPortraitSafeFrame(
         result.maximumNdcX = std::max(result.maximumNdcX, ndcX);
     };
 
-    constexpr float torchRadius = 0.068f;
-    include({{kinematics.leftHandLocal[0] - torchRadius,
-              kinematics.leftHandLocal[1], kinematics.leftHandLocal[2]}});
-    include({{kinematics.leftHandLocal[0] + torchRadius,
-              kinematics.leftHandLocal[1], kinematics.leftHandLocal[2]}});
+    const auto fromGrip = [&kinematics](const Vec3& local)
+    {
+        return Add(kinematics.leftHandLocal,
+            Add(Scale(kinematics.leftGripXInView, local[0]),
+                Add(Scale(kinematics.leftGripYInView, local[1]),
+                    Scale(kinematics.leftGripZInView, local[2]))));
+    };
+    // Measured from the player Rag torch runtime GLB and expressed relative
+    // to its Grip: bounds x[-.083066,.044008], y[-.240,.610000],
+    // z[-.062917,.063452]; Flame=(-.013873,.565,-.002581),
+    // Light=(-.015804,.540,.023154). Project actual box corners and authored
+    // sockets through the shared grip axes, including the engine flame tip.
+    constexpr float minimumX = -0.083066f;
+    constexpr float maximumX = 0.044008f;
+    constexpr float minimumY = -0.240000f;
+    constexpr float maximumY = 0.610001f;
+    constexpr float minimumZ = -0.062917f;
+    constexpr float maximumZ = 0.063452f;
+    for (const float x : {minimumX, maximumX})
+        for (const float y : {minimumY, maximumY})
+            for (const float z : {minimumZ, maximumZ})
+                include(fromGrip({{x, y, z}}));
     result.includesTorchGrip = true;
-    include({{kinematics.leftHandLocal[0], kinematics.leftHandLocal[1] + 0.525f,
-              kinematics.leftHandLocal[2]}});
+    constexpr Vec3 flameFromGrip{{-0.013873f, 0.565000f, -0.002581f}};
+    constexpr Vec3 lightFromGrip{{-0.015804f, 0.540000f, 0.023154f}};
+    const Vec3 flame = fromGrip(flameFromGrip);
+    include(flame);
+    include(Add(flame, Scale(kinematics.leftGripYInView, 0.34f)));
     result.includesFlame = true;
-    include({{kinematics.leftHandLocal[0], kinematics.leftHandLocal[1] + 0.495f,
-              kinematics.leftHandLocal[2] - 0.025f}});
+    include(fromGrip(lightFromGrip));
     result.includesLight = true;
 
     const SwordGripBasisInView basis = EvaluateSwordGripBasisInView(
@@ -658,6 +770,46 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         result.leftHandLocal[1] += 0.10f;
         result.rightHandLocal[1] += 0.10f;
     }
+    {
+        const Vec3 worldUp{{0.0f, 1.0f, 0.0f}};
+        const float pitch = std::clamp(input.cameraPitchRadians, -0.32f, 0.28f);
+        const Vec3 viewForward = Normalize({{forwardX, -0.05f + pitch, forwardZ}});
+        const Vec3 viewRight = Normalize(Cross(viewForward, worldUp));
+        const Vec3 viewUp = Normalize(Cross(viewRight, viewForward));
+        const SwordGripBasisInView basis = EvaluateSwordGripBasisInView(
+            sword.swordRadians, sword.swordForwardRadians, kSwordGripRollRadians);
+        const Vec3 initialGripWorld = Add(
+            Vec3{{input.cameraX, kShowcaseEyeWorldY, input.cameraZ}},
+            ViewVectorToWorld(result.rightHandLocal, viewRight, viewUp, viewForward));
+        const float initialLowering = SwordOverheadLowering(
+            initialGripWorld,
+            ViewVectorToWorld(basis.bladeAxis, viewRight, viewUp, viewForward),
+            ViewVectorToWorld(basis.edgeDirection, viewRight, viewUp, viewForward),
+            ViewVectorToWorld(basis.flatNormal, viewRight, viewUp, viewForward));
+        // Lowering can pull a long blade beyond the imported body's arm reach.
+        // Retreat the whole grip toward the camera along horizontal forward;
+        // this also moves the blade clear of a lintel footprint when possible.
+        // The response starts at zero in open rooms and is capped at 30 cm.
+        const float retraction = std::min(0.30f, initialLowering * 0.50f);
+        const Vec3 horizontalForward{{forwardX, 0.0f, forwardZ}};
+        const Vec3 retreatWorld = Scale(horizontalForward, -retraction);
+        result.rightHandLocal[0] += Dot(retreatWorld, viewRight);
+        result.rightHandLocal[1] += Dot(retreatWorld, viewUp);
+        result.rightHandLocal[2] += Dot(retreatWorld, viewForward);
+        const Vec3 gripWorld = Add(initialGripWorld, retreatWorld);
+        const float swordLowering = SwordOverheadLowering(
+            gripWorld,
+            ViewVectorToWorld(basis.bladeAxis, viewRight, viewUp, viewForward),
+            ViewVectorToWorld(basis.edgeDirection, viewRight, viewUp, viewForward),
+            ViewVectorToWorld(basis.flatNormal, viewRight, viewUp, viewForward));
+        // Lower the actual right-hand target in world space. ResolveHeldItems
+        // uses this same state for arm IK and sword socket composition, so the
+        // RT geometry, shadows, and reflections remain on the corrected frame.
+        result.rightHandLocal[1] -= swordLowering * viewUp[1];
+        result.rightHandLocal[2] -= swordLowering * viewForward[1];
+        result.swordOverheadLowering = swordLowering;
+        result.swordOverheadRetraction = retraction;
+    }
     if (!rewardLantern && input.torchFailure.heldByPlayer)
     {
         const Vec3 worldUp{{0.0f, 1.0f, 0.0f}};
@@ -676,7 +828,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         // the horizontal player forward axis before resolving final overhead
         // clearance. This moves the complete hand/item frame, not the light.
         const float retraction = anatomicalBody
-            ? std::min(0.28f, initialLowering * 0.45f) : 0.0f;
+            ? std::min(0.45f, initialLowering * 0.45f) : 0.0f;
         const Vec3 horizontalForward{{forwardX, 0.0f, forwardZ}};
         const Vec3 retractedGrip = Add(gripWorld, Scale(horizontalForward, -retraction));
         result.leftHandLocal[1] -= retraction *

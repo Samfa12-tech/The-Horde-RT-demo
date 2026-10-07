@@ -6,8 +6,10 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "vulkan/raytracing/HeldItemRenderSlot.h"
 #include "vulkan/raytracing/HeldItemBlasMeasurements.h"
+#include "vulkan/raytracing/PlayerRenderSlot.h"
 #include "vulkan/raytracing/RtSceneAbi.generated.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
+#include "scene/ShowcaseOverheadGeometry.h"
 #include "scene/assets/PlayerPrimitiveContract.h"
 
 #include <algorithm>
@@ -95,7 +97,82 @@ bool TransformNear(const HeldItemTransform& actual,
     return true;
 }
 
-HeldItemTransform ExpectedHeldTorchFromFixedSnapshot(
+std::array<float, 3u> TransformPoint(const HeldItemTransform& transform,
+                                    const std::array<float, 3u>& point)
+{
+    return {{transform[0] * point[0] + transform[4] * point[1] + transform[8] * point[2] + transform[12],
+             transform[1] * point[0] + transform[5] * point[1] + transform[9] * point[2] + transform[13],
+             transform[2] * point[0] + transform[6] * point[1] + transform[10] * point[2] + transform[14]}};
+}
+
+std::array<float, 3u> ExpectedWorldHandPoint(
+    const horde::gameplay::items::HeldItemFixedStepInput& input,
+    const std::array<float, 3u>& local)
+{
+    const std::array<float, 3u> up{{0.0f, 1.0f, 0.0f}};
+    const float pitch = std::clamp(input.playerPitchRadians, -0.32f, 0.28f);
+    const auto forward = Normalize(std::array<float, 3u>{{
+        std::sin(input.playerYawRadians), -0.05f + pitch,
+        -std::cos(input.playerYawRadians)}});
+    const auto right = Normalize(Cross(forward, up));
+    const auto viewUp = Normalize(Cross(right, forward));
+    return Add(Add(Add({{input.playerX, horde::gameplay::kShowcaseEyeWorldY,
+                         input.playerZ}}, Scale(right, local[0])),
+                   Scale(viewUp, local[1])),
+               Scale(forward, local[2]));
+}
+
+bool PointInsideOverheadFootprint(const horde::scene::OverheadVolume& volume,
+                                  const float x,
+                                  const float z)
+{
+    bool positive = false;
+    bool negative = false;
+    for (std::size_t edge = 0u; edge < volume.footprint.size(); ++edge)
+    {
+        const auto& start = volume.footprint[edge];
+        const auto& end = volume.footprint[(edge + 1u) % volume.footprint.size()];
+        const float side = (end[0] - start[0]) * (z - start[1]) -
+                           (end[1] - start[1]) * (x - start[0]);
+        positive |= side > 0.000001f;
+        negative |= side < -0.000001f;
+    }
+    return !(positive && negative);
+}
+
+HeldItemTransform PlayerGripToWorld(
+    const horde::scene::SkinnedNodeTransform& bone,
+    const horde::vulkan::raytracing::PlayerModelWorldBasis& basis,
+    const std::array<float, 3u>& root)
+{
+    const auto vectorToWorld = [&basis](const std::array<float, 3u>& local) {
+        return horde::vulkan::raytracing::PlayerModelVectorToWorld(basis, local);
+    };
+    auto x = Normalize(vectorToWorld({{bone[0], bone[1], bone[2]}}));
+    const auto rawY = vectorToWorld({{bone[4], bone[5], bone[6]}});
+    const float projection = x[0] * rawY[0] + x[1] * rawY[1] + x[2] * rawY[2];
+    auto y = Normalize(Add(rawY, Scale(x, -projection)));
+    auto z = Normalize(Cross(x, y));
+    const auto rawZ = vectorToWorld({{bone[8], bone[9], bone[10]}});
+    if (z[0] * rawZ[0] + z[1] * rawZ[1] + z[2] * rawZ[2] < 0.0f)
+    {
+        y = Scale(y, -1.0f);
+        z = Scale(z, -1.0f);
+    }
+    const auto localPosition = vectorToWorld({{bone[12], bone[13], bone[14]}});
+    const auto position = Add(root, localPosition);
+    HeldItemTransform result = horde::gameplay::items::IdentityHeldItemTransform();
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+    {
+        result[axis] = x[axis];
+        result[4u + axis] = y[axis];
+        result[8u + axis] = z[axis];
+        result[12u + axis] = position[axis];
+    }
+    return result;
+}
+
+HeldItemTransform ExpectedHeldTorchFromSharedPose(
     const horde::gameplay::simulation::SimulationSnapshot& snapshot,
     const HeldItemTransform& itemFromGrip)
 {
@@ -106,20 +183,7 @@ HeldItemTransform ExpectedHeldTorchFromFixedSnapshot(
         -std::cos(snapshot.playerYawRadians)}});
     const auto right = Normalize(Cross(forward, worldUp));
     const auto up = Normalize(Cross(right, forward));
-    const float movement = std::max(std::clamp(snapshot.walkAmount, 0.0f, 1.0f), 0.2f);
-    const float gait = snapshot.walkTime * 6.2f;
-    const float sway = std::sin(gait) * 0.035f * movement;
-    const float bob = std::abs(std::sin(gait)) * 0.025f * movement;
-    const float forwardClearance =
-        horde::gameplay::items::ComputeRewardLanternForwardClearance(
-            snapshot.playerX, snapshot.playerZ,
-            std::sin(snapshot.playerYawRadians),
-            -std::cos(snapshot.playerYawRadians));
-    const float clearanceBlend = std::clamp(
-        (forwardClearance - 0.30f) / (2.70f - 0.30f), 0.0f, 1.0f);
-    const float heldDepth = 0.30f + (0.68f - 0.30f) * clearanceBlend;
-    const std::array<float, 3u> localHand{{
-        -0.16f - sway, -0.41f + bob, heldDepth}};
+    const auto& localHand = snapshot.heldItemKinematics.leftHandLocal;
     const std::array<float, 3u> eye{{
         snapshot.playerX, horde::gameplay::kShowcaseEyeWorldY,
         snapshot.playerZ}};
@@ -288,7 +352,7 @@ void TestRealFixedTickTorchDetachIsIndependentlyTransformContinuous()
               released.heldItems[0].parentMode == HeldItemParentMode::AuthoredWorldTrajectory &&
               released.heldItems[0].detachTick == released.tickIndex,
           "the real torch failure sequence must detach once on its shared fixed tick");
-    const HeldItemTransform expectedHeld = ExpectedHeldTorchFromFixedSnapshot(
+    const HeldItemTransform expectedHeld = ExpectedHeldTorchFromSharedPose(
         beforeRelease, grip->world);
     Check(std::abs(expectedHeld[12] - (-2.16f - 0.24f)) > 0.001f &&
               std::abs(expectedHeld[13] -
@@ -912,6 +976,391 @@ void TestProductionTorchFitsSharedClearanceEnvelope()
           "clearance must include full visible fire height above the actual Flame socket, not just the cage");
 }
 
+void TestRagTorchEnvelopeIncludesTheUnchangedEngineFire()
+{
+    using namespace horde::gameplay::items;
+    horde::scene::assets::StaticMeshAsset ragTorch;
+    std::string diagnostic;
+    Check(LoadPlayerRagTorch(ragTorch, diagnostic),
+          "player Rag torch must load before engine-fire clearance admission");
+    if (ragTorch.vertices.empty()) return;
+    const auto* grip = FindHeldItemSocket(ragTorch.sockets, "Grip");
+    const auto* flame = FindHeldItemSocket(ragTorch.sockets, "Flame");
+    Check(grip != nullptr && flame != nullptr,
+          "player Rag torch fire clearance requires the authored Grip and Flame sockets");
+    if (grip == nullptr || flame == nullptr) return;
+    const float fireTipFromGrip = flame->world[13] - grip->world[13] + 0.34f + 0.06f;
+    Check(Near(fireTipFromGrip, kPlayerRagTorchEnvelopeTopFromGrip, 0.0001f) &&
+              kPlayerRagTorchEnvelopeTopFromGrip > kHeldTorchEnvelopeTopFromGrip,
+          "Rag clearance must admit its higher authored Flame socket while preserving the original torch envelope");
+
+    HeldItemFixedStepInput input;
+    input.playerX = 0.0f;
+    input.playerZ = -2.48f;
+    input.playerYawRadians = 0.0f;
+    input.torchFailure.heldByPlayer = true;
+    HeldItemStates items = MakeDefaultHeldItemStates();
+    HeldItemFixedStepState state;
+    Check(ResolveHeldItemsFixedStep(items, input, 1u, state, diagnostic),
+          "player Rag torch fixed-step attachment must resolve under the low lintel");
+    const auto flameWorld = MultiplyHeldItemTransforms(items[0].worldFromItem, flame->world);
+    const float fireTopY = flameWorld[13] + 0.40f * items[0].worldFromItem[5];
+    Check(state.kinematics.torchOverheadLowering > 0.0f && fireTopY <= 0.78f + 0.002f,
+          "the actual Rag Flame socket and unchanged engine fire must clear the low lintel as one attached frame");
+    Check(TransformNear(MultiplyHeldItemTransforms(items[0].worldFromItem, grip->world),
+                        state.worldFromLeftHand),
+          "Rag clearance must lower the shared grip, item, engine fire and emitted light together");
+
+    constexpr float aspect = 1440.0f / 3120.0f;
+    const auto safeFrame = EvaluateOwnerFeedbackPortraitSafeFrame(state.kinematics, aspect);
+    float importedMinimum = 1.0e9f;
+    float importedMaximum = -1.0e9f;
+    const auto includeImportedPoint = [&](const std::array<float, 3u>& worldPoint) {
+        std::array<float, 3u> relative{{worldPoint[0] - grip->world[12],
+                                        worldPoint[1] - grip->world[13],
+                                        worldPoint[2] - grip->world[14]}};
+        std::array<float, 3u> local{};
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+            local[axis] = relative[0] * grip->world[axis * 4u] +
+                          relative[1] * grip->world[axis * 4u + 1u] +
+                          relative[2] * grip->world[axis * 4u + 2u];
+        const auto viewPoint = Add(state.kinematics.leftHandLocal,
+            Add(Scale(state.kinematics.leftGripXInView, local[0]),
+                Add(Scale(state.kinematics.leftGripYInView, local[1]),
+                    Scale(state.kinematics.leftGripZInView, local[2]))));
+        const float ndcX = 1.22f * viewPoint[0] /
+            (std::max(viewPoint[2], 0.05f) * aspect);
+        importedMinimum = std::min(importedMinimum, ndcX);
+        importedMaximum = std::max(importedMaximum, ndcX);
+    };
+    for (const auto& vertex : ragTorch.vertices)
+        includeImportedPoint({{vertex.position[0], vertex.position[1], vertex.position[2]}});
+    includeImportedPoint({{flame->world[12], flame->world[13], flame->world[14]}});
+    includeImportedPoint({{flame->world[12] + 0.34f * flame->world[4],
+                           flame->world[13] + 0.34f * flame->world[5],
+                           flame->world[14] + 0.34f * flame->world[6]}});
+    const auto* light = FindHeldItemSocket(ragTorch.sockets, "Light");
+    Check(light != nullptr, "portrait admission must inspect the imported Rag Light socket");
+    if (light != nullptr)
+        includeImportedPoint({{light->world[12], light->world[13], light->world[14]}});
+    Check(safeFrame.includesTorchGrip && safeFrame.includesFlame && safeFrame.includesLight &&
+              safeFrame.minimumNdcX <= importedMinimum + 0.0001f &&
+              safeFrame.maximumNdcX >= importedMaximum - 0.0001f,
+          "portrait safe-frame admission must contain imported Rag mesh bounds and off-centre Flame/Light sockets through the shared left Grip orientation");
+}
+
+bool ResolveProductionAnatomicalSword(
+    const horde::gameplay::items::HeldItemFixedStepInput& input,
+    const horde::gameplay::items::HeldItemKinematicsState& kinematics,
+    horde::gameplay::items::HeldItemStates& items,
+    horde::vulkan::raytracing::PlayerRenderSlot& rig,
+    const std::uint64_t tick,
+    HeldItemTransform& worldFromGrip,
+    HeldItemTransform& worldFromSword,
+    std::string& diagnostic)
+{
+    using namespace horde::gameplay::animation;
+    using namespace horde::vulkan::raytracing;
+    PlayerAnimationState playerAnimation;
+    PlayerAnimationInput animationInput;
+    animationInput.heldItemKinematics = kinematics;
+    animationInput.playerCombat = input.playerCombat;
+    animationInput.walkTime = input.walkTime;
+    animationInput.walkAmount = input.walkAmount;
+    playerAnimation.StepFixed(animationInput, 1.0f / 60.0f);
+    auto animation = playerAnimation.Snapshot();
+
+    const std::array<float, 3u> eye{{input.playerX, horde::gameplay::kShowcaseEyeWorldY,
+                                      input.playerZ}};
+    const auto forward = Normalize({{std::sin(input.playerYawRadians),
+        -0.05f + std::clamp(input.playerPitchRadians, -0.32f, 0.28f),
+        -std::cos(input.playerYawRadians)}});
+    const std::array<float, 3u> up{{0.0f, 1.0f, 0.0f}};
+    const auto right = Normalize(Cross(forward, up));
+    const auto viewUp = Normalize(Cross(right, forward));
+    const auto viewVectorToWorld = [&](const std::array<float, 3u>& value) {
+        return Add(Add(Scale(right, value[0]), Scale(viewUp, value[1])),
+                   Scale(forward, value[2]));
+    };
+    const auto bodyForward = std::array<float, 3u>{{std::sin(input.playerYawRadians),
+        0.0f, -std::cos(input.playerYawRadians)}};
+    const auto bodyRight = std::array<float, 3u>{{std::cos(input.playerYawRadians),
+        0.0f, std::sin(input.playerYawRadians)}};
+    const auto basis = BuildPlayerModelWorldBasis(bodyRight, bodyForward);
+    const auto root = GroundPlayerRootOnRouteFloor(
+        eye, horde::gameplay::kRouteFloorWorldY,
+        rig.BootGroundingOffsetMetres(animation));
+    const auto pointToModel = [&](const std::array<float, 3u>& local) {
+        const auto world = Add(eye, viewVectorToWorld(local));
+        return WorldVectorToPlayerModel(basis,
+            {{world[0] - root[0], world[1] - root[1], world[2] - root[2]}});
+    };
+    const auto vectorToModel = [&](const std::array<float, 3u>& value) {
+        return WorldVectorToPlayerModel(basis, viewVectorToWorld(value));
+    };
+    for (auto* arm : {&animation.leftIk, &animation.rightIk})
+    {
+        arm->shoulder = pointToModel(arm->shoulder);
+        arm->target = pointToModel(arm->target);
+        arm->pole = vectorToModel(arm->pole);
+        arm->gripX = vectorToModel(arm->gripX);
+        arm->gripY = vectorToModel(arm->gripY);
+        arm->gripZ = vectorToModel(arm->gripZ);
+    }
+    bool poseUpdated = false;
+    if (!rig.PreparePose(animation, tick, PlayerCpuSkinCadence::Hz60,
+                         poseUpdated, diagnostic))
+        return false;
+    worldFromGrip = PlayerGripToWorld(rig.BoneSockets().rightGrip, basis, root);
+    horde::gameplay::items::HeldItemStates renderedItems;
+    if (!rig.ResolveHeldItemVisuals(items,
+            PlayerGripToWorld(rig.BoneSockets().leftGrip, basis, root),
+            worldFromGrip, renderedItems, diagnostic))
+        return false;
+    worldFromSword = renderedItems[1].worldFromItem;
+    return true;
+}
+
+void TestSwordOverheadClearanceUsesImportedBladeAcrossCombatPhases()
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::items;
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    horde::scene::assets::StaticMeshAsset sword;
+    horde::scene::assets::StaticMeshAsset legacyTorch;
+    std::string diagnostic;
+    Check(LoadProductionHeldAssets(sword, legacyTorch, diagnostic),
+          "production sword must load before full-mesh overhead clearance checks");
+    if (sword.vertices.empty()) return;
+    const auto* grip = FindHeldItemSocket(sword.sockets, "Grip");
+    Check(grip != nullptr && TransformNear(grip->world, SwordGripSocketTransform()),
+          "overhead clearance must use the exact imported production Grip");
+    if (grip == nullptr) return;
+
+    float minX = 1.0e9f, minY = 1.0e9f, minZ = 1.0e9f;
+    float maxX = -1.0e9f, maxY = -1.0e9f, maxZ = -1.0e9f;
+    for (const auto& vertex : sword.vertices)
+    {
+        minX = std::min(minX, vertex.position[0] - grip->world[12]);
+        minY = std::min(minY, vertex.position[1] - grip->world[13]);
+        minZ = std::min(minZ, vertex.position[2] - grip->world[14]);
+        maxX = std::max(maxX, vertex.position[0] - grip->world[12]);
+        maxY = std::max(maxY, vertex.position[1] - grip->world[13]);
+        maxZ = std::max(maxZ, vertex.position[2] - grip->world[14]);
+    }
+    Check(minX >= -0.113f && maxX <= 0.113f && minY >= -0.136f &&
+              maxY <= 0.916f && minZ >= -0.026f && maxZ <= 0.026f,
+          "clearance envelope must continue to contain every imported sword vertex relative to Grip");
+
+    HeldItemKinematicsInput openInput;
+    openInput.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+    openInput.cameraX = kSkylightChamberCenter.x;
+    openInput.cameraZ = kSkylightChamberCenter.z + 0.70f;
+    const auto open = EvaluateHeldItemKinematics(openInput);
+    std::cout << "open anatomical hands right=" << open.rightHandLocal[0] << ','
+              << open.rightHandLocal[1] << ',' << open.rightHandLocal[2]
+              << " left=" << open.leftHandLocal[0] << ',' << open.leftHandLocal[1]
+              << ',' << open.leftHandLocal[2] << " lowering/retraction="
+              << open.swordOverheadLowering << '/' << open.swordOverheadRetraction
+              << " torch=" << open.torchOverheadLowering << '\n';
+    Check(Near(open.swordOverheadLowering, 0.0f) &&
+              Near(open.rightHandLocal[0], 0.18f) && Near(open.rightHandLocal[1], -0.34f) &&
+              Near(open.rightHandLocal[2], 0.60f) &&
+              Near(open.swordOverheadRetraction, 0.0f) &&
+              Near(open.torchOverheadLowering, 0.0f) &&
+              Near(open.leftHandLocal[0], -0.16f) && Near(open.leftHandLocal[1], -0.31f),
+          "open-room AnatomicalBody sword and Rag torch hand poses must retain their exact existing targets");
+
+    struct CombatPhase
+    {
+        PlayerCombatAction action;
+        float duration;
+        bool parry;
+    };
+    const std::array<CombatPhase, 10u> phases{{
+        {PlayerCombatAction::Idle, 0.0f, false},
+        {PlayerCombatAction::SwingWindup, SwordCombat::kSwingWindupDuration * 0.5f, false},
+        {PlayerCombatAction::SwingActive, SwordCombat::kDownwardCutTravelDuration * 0.5f, false},
+        {PlayerCombatAction::SwingRecovery, SwordCombat::kSwingRecoveryDuration * 0.5f, false},
+        {PlayerCombatAction::UpwardSliceWindup, SwordCombat::kUpwardSliceWindupDuration * 0.5f, false},
+        {PlayerCombatAction::UpwardSliceActive, SwordCombat::kUpwardSliceActiveDuration * 0.5f, false},
+        {PlayerCombatAction::UpwardSliceRecovery, SwordCombat::kUpwardSliceRecoveryDuration * 0.5f, false},
+        {PlayerCombatAction::ParryStartup, SwordCombat::kParryStartupDuration * 0.5f, true},
+        {PlayerCombatAction::ParryActive, SwordCombat::kParryActiveDuration * 0.5f, true},
+        {PlayerCombatAction::ParryRecovery, SwordCombat::kParryRecoveryDuration * 0.5f, true}}};
+    constexpr std::array<float, 3u> pitches{{-0.32f, 0.0f, 0.28f}};
+    constexpr std::array<std::size_t, 2u> lintelIndices{{0u, 1u}};
+    bool allTransformsValid = true;
+    bool allHandsMatchGrip = true;
+    bool allFinalRigGripsMatch = true;
+    bool allFinalRigVerticesClear = true;
+    bool allVerticesClear = true;
+    bool observedLowering = false;
+    bool observedRetraction = false;
+    bool printedRigDiagnostic = false;
+    std::size_t finalRigResolvedCount = 0u;
+    std::size_t leftRigSocketFailureCount = 0u;
+    float maximumLeftRigSocketError = 0.0f;
+    std::size_t totalPoseCount = 0u;
+    horde::vulkan::raytracing::PlayerRenderSlot rig;
+    Check(rig.LoadAsset((root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(), diagnostic),
+          "production anatomical sword checks must load the actual player rig and Grip bones");
+    if (!rig.IsLoaded()) return;
+    float maximumLowering = 0.0f;
+    std::uint64_t rigTick = 1u;
+    for (const std::size_t lintelIndex : lintelIndices)
+    {
+        const auto& lintel = horde::scene::kShowcaseLowOverheadVolumes[lintelIndex];
+        const float centerX = 0.5f * (lintel.footprint[0][0] + lintel.footprint[2][0]);
+        const float centerZ = 0.5f * (lintel.footprint[0][1] + lintel.footprint[2][1]);
+        for (const float pitch : pitches)
+            for (const auto& phase : phases)
+            {
+                HeldItemFixedStepInput input;
+                input.playerX = centerX;
+                input.playerZ = centerZ + 0.77f;
+                input.playerYawRadians = 0.0f;
+                input.playerPitchRadians = pitch;
+                input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+                input.playerCombat.action = phase.action;
+                input.playerCombat.actionTime = phase.duration;
+                if (phase.parry)
+                {
+                    input.playerCombat.reaction = CombatReaction::Parried;
+                    input.playerCombat.reactionTime = 0.06f;
+                }
+                ++totalPoseCount;
+                HeldItemStates items = MakeDefaultHeldItemStates();
+                HeldItemFixedStepState state;
+                allTransformsValid &= ResolveHeldItemsFixedStep(items, input, 1u, state, diagnostic) &&
+                    ValidateHeldItemSocketTransform(items[1].worldFromItem, diagnostic);
+                const auto worldFromGrip = MultiplyHeldItemTransforms(
+                    items[1].worldFromItem, grip->world);
+                const auto expectedHand = ExpectedWorldHandPoint(
+                    input, state.kinematics.rightHandLocal);
+                allHandsMatchGrip &= Near(worldFromGrip[12], expectedHand[0], 0.0002f) &&
+                    Near(worldFromGrip[13], expectedHand[1], 0.0002f) &&
+                    Near(worldFromGrip[14], expectedHand[2], 0.0002f);
+                HeldItemTransform finalRigGrip{};
+                HeldItemTransform finalRigSword{};
+                const bool finalRigResolved = ResolveProductionAnatomicalSword(
+                    input, state.kinematics, items, rig, rigTick++,
+                    finalRigGrip, finalRigSword, diagnostic);
+                if (!finalRigResolved && !printedRigDiagnostic)
+                {
+                    std::cerr << "Anatomical sword rig diagnostic: lintel=" << lintelIndex
+                              << " pitch=" << pitch << " action="
+                              << static_cast<int>(phase.action) << " lowering/retraction="
+                              << state.kinematics.swordOverheadLowering << '/'
+                              << state.kinematics.swordOverheadRetraction << " torch="
+                              << state.kinematics.torchOverheadLowering << " left="
+                              << state.kinematics.leftHandLocal[0] << ','
+                              << state.kinematics.leftHandLocal[1] << ','
+                              << state.kinematics.leftHandLocal[2] << " right="
+                              << state.kinematics.rightHandLocal[0] << ','
+                              << state.kinematics.rightHandLocal[1] << ','
+                              << state.kinematics.rightHandLocal[2] << " :: "
+                              << diagnostic << '\n';
+                    printedRigDiagnostic = true;
+                }
+                finalRigResolvedCount += finalRigResolved ? 1u : 0u;
+                maximumLeftRigSocketError = std::max(maximumLeftRigSocketError,
+                    rig.LeftSocketErrorMetres());
+                leftRigSocketFailureCount +=
+                    rig.LeftSocketErrorMetres() >
+                        horde::vulkan::raytracing::kPlayerGripSocketToleranceMetres
+                        ? 1u : 0u;
+                allFinalRigGripsMatch &= finalRigResolved &&
+                    rig.RightSocketErrorMetres() <=
+                        horde::vulkan::raytracing::kPlayerGripSocketToleranceMetres &&
+                    TransformNear(MultiplyHeldItemTransforms(finalRigSword, grip->world),
+                                  finalRigGrip, 0.015f);
+                if (finalRigResolved)
+                    for (const auto& vertex : sword.vertices)
+                    {
+                        const auto point = TransformPoint(finalRigSword,
+                            {{vertex.position[0], vertex.position[1], vertex.position[2]}});
+                        if (PointInsideOverheadFootprint(lintel, point[0], point[2]))
+                        {
+                            const float roofBottom = horde::scene::MinimumOverheadBottomY(
+                                lintel, point[0], point[2], 0.0f);
+                            allFinalRigVerticesClear &=
+                                point[1] + kHeldTorchOverheadGap <= roofBottom + 0.002f;
+                        }
+                    }
+                observedLowering |= state.kinematics.swordOverheadLowering > 0.0f;
+                observedRetraction |= state.kinematics.swordOverheadRetraction > 0.0f;
+                maximumLowering = std::max(maximumLowering,
+                                           state.kinematics.swordOverheadLowering);
+                for (const auto& vertex : sword.vertices)
+                {
+                    const auto point = TransformPoint(items[1].worldFromItem,
+                        {{vertex.position[0], vertex.position[1], vertex.position[2]}});
+                    if (PointInsideOverheadFootprint(lintel, point[0], point[2]))
+                    {
+                        const float roofBottom = horde::scene::MinimumOverheadBottomY(
+                            lintel, point[0], point[2], 0.0f);
+                        allVerticesClear &= point[1] + kHeldTorchOverheadGap <= roofBottom + 0.002f;
+                    }
+                }
+            }
+    }
+    std::cout << "sword overhead phase sweep max lowering/vertices clear="
+              << maximumLowering << '/' << allVerticesClear
+              << " anatomical finalGrip/vertices=" << allFinalRigGripsMatch << '/'
+              << allFinalRigVerticesClear << " resolved=" << finalRigResolvedCount
+              << '/' << totalPoseCount << " leftSocketErrorMax/failures="
+              << maximumLeftRigSocketError << '/' << leftRigSocketFailureCount
+              << " rightSocketError=" << rig.RightSocketErrorMetres()
+              << " finalGripError=" << rig.RightGripAgreement().positionErrorMetres
+              << "m/" << rig.RightGripAgreement().orientationErrorRadians << "rad\n";
+    Check(observedLowering && observedRetraction && allTransformsValid && allHandsMatchGrip &&
+              finalRigResolvedCount == totalPoseCount && allFinalRigGripsMatch &&
+              allVerticesClear && allFinalRigVerticesClear,
+          "imported sword vertices must clear both low lintels across pitch, swing, upward-slice and parry poses after the actual AnatomicalBody rig solves the final Grip");
+
+    const auto& approachLintel = horde::scene::kShowcaseLowOverheadVolumes[0];
+    const float approachCenterZ = 0.5f *
+        (approachLintel.footprint[0][1] + approachLintel.footprint[2][1]);
+    HeldItemFixedStepInput approachInput;
+    approachInput.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+    approachInput.playerZ = approachCenterZ + 1.20f;
+    approachInput.playerCombat.action = PlayerCombatAction::SwingActive;
+    approachInput.playerCombat.actionTime = SwordCombat::kDownwardCutTravelDuration * 0.5f;
+    float priorLowering = 0.0f;
+    float priorHandY = 0.0f;
+    float priorHandZ = 0.0f;
+    float maximumApproachLoweringStep = 0.0f;
+    float maximumApproachHandStep = 0.0f;
+    bool havePreviousApproach = false;
+    for (int step = 0; step <= 160; ++step)
+    {
+        approachInput.playerZ = approachCenterZ + 1.20f -
+            static_cast<float>(step) * 0.005f;
+        HeldItemStates items = MakeDefaultHeldItemStates();
+        HeldItemFixedStepState state;
+        Check(ResolveHeldItemsFixedStep(items, approachInput,
+                    static_cast<std::uint64_t>(step + 1), state, diagnostic),
+              "five-millimetre sword approach samples must resolve through shared kinematics");
+        if (havePreviousApproach)
+        {
+            maximumApproachLoweringStep = std::max(maximumApproachLoweringStep,
+                std::abs(state.kinematics.swordOverheadLowering - priorLowering));
+            maximumApproachHandStep = std::max(maximumApproachHandStep,
+                std::hypot(state.kinematics.rightHandLocal[1] - priorHandY,
+                           state.kinematics.rightHandLocal[2] - priorHandZ));
+        }
+        priorLowering = state.kinematics.swordOverheadLowering;
+        priorHandY = state.kinematics.rightHandLocal[1];
+        priorHandZ = state.kinematics.rightHandLocal[2];
+        havePreviousApproach = true;
+    }
+    std::cout << "sword five-mm approach max lowering/hand step="
+              << maximumApproachLoweringStep << '/' << maximumApproachHandStep << '\n';
+    Check(maximumApproachLoweringStep <= 0.025f && maximumApproachHandStep <= 0.035f,
+          "sword overhead clearance must anticipate the low lintel continuously through a forward approach without a hand-frame pop");
+}
+
 } // namespace
 
 void TestRewardCarryParryKeepsGuardOnSwordSide()
@@ -980,6 +1429,8 @@ int main()
     TestProductionSocketsMatchSharedFixedStepContracts();
     TestPlayerRagTorchSocketsDriveFixedStepAttachmentAndLight();
     TestProductionTorchFitsSharedClearanceEnvelope();
+    TestRagTorchEnvelopeIncludesTheUnchangedEngineFire();
+    TestSwordOverheadClearanceUsesImportedBladeAcrossCombatPhases();
     if (failures == 0)
     {
         std::cout << "Held-item socket contracts passed.\n";

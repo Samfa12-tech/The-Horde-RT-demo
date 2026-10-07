@@ -22,10 +22,12 @@ inline constexpr float kClaimedRewardLanternScale = 0.44f;
 
 inline constexpr float kSwordGripRollRadians = 1.3962634f;
 
-// Production torch: Grip->Flame +.525 m, visible fire .34 m. Reserve
-// another .06 m for the animated tip and .15 m for cage/fire lateral travel.
-// Enlarging the authored fire requires re-admitting this shared envelope.
+// Original production torch: Grip->Flame +.525 m, visible fire .34 m. Keep
+// this legacy admission value for its direct asset contract.
 inline constexpr float kHeldTorchEnvelopeTopFromGrip = 0.925f;
+// Player Rag torch: authored Flame is .565 m above Grip. The unchanged engine
+// fire extends .34 m above it, plus .06 m for its animated tip.
+inline constexpr float kPlayerRagTorchEnvelopeTopFromGrip = 0.965f;
 inline constexpr float kHeldTorchEnvelopeRadius = 0.15f;
 inline constexpr float kHeldTorchOverheadGap = 0.03f;
 
@@ -79,6 +81,12 @@ struct HeldItemKinematicsState
     float successJolt = 0.0f;
     // World-down translation of the shared hand target, never a light offset.
     float torchOverheadLowering = 0.0f;
+    // World-down translation of the shared sword hand target. IK, rigid sword
+    // composition, shadows, and reflections consume the same lowered frame.
+    float swordOverheadLowering = 0.0f;
+    // Camera-side retreat of that same target, applied only when ceiling
+    // lowering would exceed the production arm's reachable carry envelope.
+    float swordOverheadRetraction = 0.0f;
 };
 
 struct HeldItemFixedStepInput

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdint>
 #include <iostream>
+#include <memory>
 
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameSimulation.h"
@@ -1848,13 +1849,32 @@ int main()
           NearlyEqual(legacyMount.Snapshot().heldItemKinematics.heldPropDepth,
                       GameSimulation(GameSimulationConfig{}).Snapshot().heldItemKinematics.heldPropDepth),
           "default game simulation retains the legacy view-relative mount profile and target");
-    check(anatomicalMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody &&
-          NearlyEqual(anatomicalMount.Snapshot().heldItemKinematics.leftHandLocal[1] -
-                          legacyMount.Snapshot().heldItemKinematics.leftHandLocal[1],
-                      0.10f) &&
-          !NearlyEqual(anatomicalMount.Snapshot().heldItemKinematics.leftShoulderLocal[0],
-                       legacyMount.Snapshot().heldItemKinematics.leftShoulderLocal[0]),
-          "configured anatomical profile reaches shared held-item resolution and changes hand height and shoulder frame");
+    {
+        // The entry ceiling now requires additional Rag clearance. Compare
+        // authored mount heights at the actual open shaft, independently of
+        // that safety response, while keeping the production-entry check above.
+        GameSimulationConfig openMountConfig;
+        openMountConfig.playerStartX = kSkylightChamberCenter.x;
+        openMountConfig.playerStartZ = kSkylightChamberCenter.z + 0.70f;
+        const auto openLegacy = std::make_unique<GameSimulation>(openMountConfig);
+        openMountConfig.playerMountProfile = items::PlayerMountProfile::AnatomicalBody;
+        const auto openAnatomical = std::make_unique<GameSimulation>(openMountConfig);
+        std::cout << "open shaft actual X/Z=" << openLegacy->Snapshot().playerX << '/'
+                  << openLegacy->Snapshot().playerZ << " mount torch lowering/left Y legacy="
+                  << openLegacy->Snapshot().heldItemKinematics.torchOverheadLowering << '/'
+                  << openLegacy->Snapshot().heldItemKinematics.leftHandLocal[1]
+                  << " anatomical="
+                  << openAnatomical->Snapshot().heldItemKinematics.torchOverheadLowering << '/'
+                  << openAnatomical->Snapshot().heldItemKinematics.leftHandLocal[1] << '\n';
+        check(openLegacy->Snapshot().heldItemKinematics.torchOverheadLowering == 0.0f &&
+              openAnatomical->Snapshot().heldItemKinematics.torchOverheadLowering == 0.0f &&
+              openAnatomical->Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody &&
+              NearlyEqual(openAnatomical->Snapshot().heldItemKinematics.leftHandLocal[1] -
+                          openLegacy->Snapshot().heldItemKinematics.leftHandLocal[1], 0.10f) &&
+              !NearlyEqual(openAnatomical->Snapshot().heldItemKinematics.leftShoulderLocal[0],
+                           openLegacy->Snapshot().heldItemKinematics.leftShoulderLocal[0]),
+              "configured anatomical profile publishes the authored hand height and shoulder frame in the open shaft");
+    }
     for (const auto profile : {items::PlayerMountProfile::LegacyViewRelative,
                                items::PlayerMountProfile::AnatomicalBody})
     {

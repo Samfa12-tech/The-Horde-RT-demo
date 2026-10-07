@@ -1,8 +1,10 @@
 #include "gameplay/items/HeldItemKinematics.h"
 #include "scene/ShowcaseOverheadGeometry.h"
+#include "scene/assets/StaticMeshAsset.h"
 
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <iostream>
 #include <string>
 
@@ -12,6 +14,9 @@ using namespace horde::gameplay;
 using namespace horde::gameplay::items;
 using Vec3 = std::array<float, 3u>;
 int failures = 0;
+horde::scene::assets::StaticMeshAsset playerTorch;
+HeldItemTransform playerFlameSocket{};
+HeldItemTransform playerLightSocket{};
 
 void Check(bool condition, const char* message)
 {
@@ -70,18 +75,23 @@ bool PointHasClearance(Vec3 point)
 
 bool FullTorchEnvelopeHasClearance(const HeldItemFixedStepState& state)
 {
-    // Independently sample mesh corners and the complete visible flame domain,
-    // including tilted axes. Checking only a pivot would miss the reported bug.
-    for (float x : {-0.068f, 0.068f})
-        for (float z : {-0.068f, 0.068f})
-            for (float y : {-0.24f, 0.61f})
-                if (!PointHasClearance(TransformPoint(state.worldFromLeftHand, {{x, y, z}})))
+    // Import the actual player asset bounds, independently of the kinematics
+    // constants. The Keeper's former sockets remain a separate asset contract.
+    HeldItemTransform worldFromItem{};
+    std::string diagnostic;
+    const auto* grip = FindHeldItemSocket(playerTorch.sockets, "Grip");
+    if (grip == nullptr || !ComposeWorldFromItem(state.worldFromLeftHand,
+            grip->world, worldFromItem, diagnostic)) return false;
+    for (float x : {playerTorch.bounds.minimum[0], playerTorch.bounds.maximum[0]})
+        for (float z : {playerTorch.bounds.minimum[2], playerTorch.bounds.maximum[2]})
+            for (float y : {playerTorch.bounds.minimum[1], playerTorch.bounds.maximum[1]})
+                if (!PointHasClearance(TransformPoint(worldFromItem, {{x, y, z}})))
                     return false;
     // Diagonal points remain inside the admitted .15 m circular radius.
     for (float x : {-0.105f, 0.105f})
         for (float z : {-0.105f, 0.105f})
-            for (float y : {0.525f, 0.925f})
-                if (!PointHasClearance(TransformPoint(state.worldFromLeftHand, {{x, y, z}})))
+            for (float y : {0.0f, 0.4f})
+                if (!PointHasClearance(TransformPoint(state.light.worldFromFlame, {{x, y, z}})))
                     return false;
     return true;
 }
@@ -116,8 +126,10 @@ void TestPortalApproachesAndLookAngles()
                         coherent &= ResolveHeldItemsFixedStep(items, input, ++cases, state, diagnostic);
                         clear &= FullTorchEnvelopeHasClearance(state);
                         maximumLowering = std::max(maximumLowering, state.kinematics.torchOverheadLowering);
-                        const auto flame = TransformPoint(items[0].worldFromItem, {{0.0f, 0.765f, 0.0f}});
-                        const auto light = TransformPoint(items[0].worldFromItem, {{0.0f, 0.735f, 0.025f}});
+                        const auto flame = TransformPoint(items[0].worldFromItem,
+                            {{playerFlameSocket[12], playerFlameSocket[13], playerFlameSocket[14]}});
+                        const auto light = TransformPoint(items[0].worldFromItem,
+                            {{playerLightSocket[12], playerLightSocket[13], playerLightSocket[14]}});
                         coherent &= Distance(flame, TransformPoint(state.light.worldFromFlame, {})) < 0.00001f &&
                                     Distance(light, TransformPoint(state.light.worldFromLight, {})) < 0.00001f;
                     }
@@ -166,7 +178,10 @@ void TestOwnershipAndLoweredPoses()
     const auto held = EvaluateHeldItemKinematics(input);
     input.torchFailure.leftArmLowerBlend = 1.0f;
     const auto lowered = EvaluateHeldItemKinematics(input);
-    Check(held.torchOverheadLowering > 0.3f && lowered.torchOverheadLowering < 0.08f &&
+    std::cout << "Rag torch held/lowered residual=" << held.torchOverheadLowering << '/'
+              << lowered.torchOverheadLowering << " m; lowered hand Y=" << lowered.leftHandLocal[1] << '\n';
+    const float ragEnvelopeGrowth = kPlayerRagTorchEnvelopeTopFromGrip - kHeldTorchEnvelopeTopFromGrip;
+    Check(held.torchOverheadLowering > 0.3f && lowered.torchOverheadLowering < 0.08f + ragEnvelopeGrowth &&
           lowered.leftHandLocal[1] <= -0.8199f,
           "already lowered torch must retain its authored lowering with only residual safety clearance");
     input.torchFailure.heldByPlayer = false;
@@ -213,6 +228,27 @@ void TestSwordBreathingAndCombatBoundaries()
 
 int main()
 {
+    const auto directory = std::filesystem::path(HORDE_RT_SOURCE_DIR) /
+        "assets/models/props/runtime/player-rag-torch";
+    horde::scene::assets::AssetManifest manifest;
+    std::string diagnostic;
+    if (!horde::scene::assets::AssetManifest::Load(directory / "asset.manifest.json",
+            manifest, diagnostic) ||
+        !horde::scene::assets::StaticMeshAsset::Load(
+            directory / "rag-torch-player-lod0.runtime.glb", manifest, playerTorch, diagnostic))
+    {
+        std::cerr << "FAIL: actual player Rag torch must import: " << diagnostic << '\n';
+        return 1;
+    }
+    const auto* flame = FindHeldItemSocket(playerTorch.sockets, "Flame");
+    const auto* light = FindHeldItemSocket(playerTorch.sockets, "Light");
+    if (flame == nullptr || light == nullptr)
+    {
+        std::cerr << "FAIL: actual player Rag torch must have Flame and Light sockets\n";
+        return 1;
+    }
+    playerFlameSocket = flame->world;
+    playerLightSocket = light->world;
     TestPortalApproachesAndLookAngles();
     TestContinuousWalkAndLookResponse();
     TestOwnershipAndLoweredPoses();
