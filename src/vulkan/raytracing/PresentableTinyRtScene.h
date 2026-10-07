@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -230,7 +231,8 @@ public:
                     RtExecutionBackend executionBackend = RtExecutionBackend::RayTracingPipeline,
                     RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
                     bool glassEnabled = true,
-                    VkPipelineCache pipelineCache = VK_NULL_HANDLE);
+                    VkPipelineCache pipelineCache = VK_NULL_HANDLE,
+                    RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr);
 
     void Destroy();
 
@@ -240,6 +242,10 @@ public:
     const InitialisationMeasurements& InitialiseMeasurements() const noexcept
     {
         return initialiseMeasurements_;
+    }
+    bool ReusedCompiledPipelines() const noexcept
+    {
+        return pipelineBundle_.ReusedCompiledPipelines();
     }
     RtSceneProfile Profile() const { return sceneProfile_; }
     bool GlassEnabled() const { return glassEnabled_; }
@@ -649,7 +655,8 @@ private:
         const InitialiseOrchestrationApi& api,
         RtSceneProfile sceneProfile = RtSceneProfile::Showcase,
         bool glassEnabled = true,
-        VkPipelineCache pipelineCache = VK_NULL_HANDLE);
+        VkPipelineCache pipelineCache = VK_NULL_HANDLE,
+        RtBundleCompiledPipelineCache* compiledPipelineCache = nullptr);
     void ApplyGlassFixtureVisibility(std::span<VkAccelerationStructureInstanceKHR> instances) const;
     bool ContinueInitialiseAfterPreflight(
         VkFormat presentationFormat,
@@ -719,6 +726,8 @@ private:
     bool CreateScratchBuffer(VkDeviceSize usableSize, Buffer& out,
                              std::string& diagnostic) const;
     bool CreateSelectedPipelineBundle(std::string& diagnostic);
+    [[nodiscard]] std::optional<RtCompiledPipelineKey> MakeCompiledPipelineKey(
+        const RtPipelineBundlePreflight& preflight) const;
     [[nodiscard]] bool CapturePipelineEvidenceIdentity() noexcept;
     bool CreateBundleDescriptorSetLayout(const RtDescriptorIoContract& contract,
                                          VkDescriptorSetLayout& out,
@@ -773,6 +782,8 @@ private:
     VkCommandPool commandPool_ = VK_NULL_HANDLE;
     // Borrowed from the logical-device owner; never destroyed by this scene.
     VkPipelineCache pipelineCache_ = VK_NULL_HANDLE;
+    // Device-owned cache; leases held by pipelineBundle_ cover all scene use.
+    RtBundleCompiledPipelineCache* compiledPipelineCache_ = nullptr;
     VkExtent2D dispatchExtent_{};
     bool presentationUsesBgra_ = false;
     bool scaledBlitSupported_ = false;

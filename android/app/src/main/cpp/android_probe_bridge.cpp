@@ -9,12 +9,14 @@
 #include <cmath>
 #include <chrono>
 #include <cerrno>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <fstream>
 #include <limits>
 #include <memory>
 #include <mutex>
+#include <new>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -174,6 +176,50 @@ double GraphicsElapsedMs(std::uint64_t start, std::uint64_t end)
     return start != 0u && end >= start ? static_cast<double>(end - start) * 1.0e-6 : -1.0;
 }
 
+using AndroidCompiledPipelineCache =
+    horde::vulkan::raytracing::RtBundleCompiledPipelineCache;
+using AndroidCompiledPipelineObjects =
+    horde::vulkan::raytracing::RtBundleCompiledPipelineObjects;
+
+struct AndroidCompiledPipelineCacheOwner;
+
+void DestroyAndroidCompiledPipelineObjects(
+    void* user, AndroidCompiledPipelineObjects& objects) noexcept;
+
+struct AndroidCompiledPipelineCacheOwner
+{
+    explicit AndroidCompiledPipelineCacheOwner(VkDevice selectedDevice) noexcept
+        : device(selectedDevice),
+          deviceIdentity(static_cast<std::uint64_t>(
+              reinterpret_cast<std::uintptr_t>(selectedDevice))),
+          cache(deviceIdentity, this, DestroyAndroidCompiledPipelineObjects)
+    {
+    }
+
+    VkDevice device = VK_NULL_HANDLE;
+    std::uint64_t deviceIdentity = 0u;
+    AndroidCompiledPipelineCache cache;
+};
+
+void DestroyAndroidCompiledPipelineObjects(
+    void* user, AndroidCompiledPipelineObjects& objects) noexcept
+{
+    const auto* owner = static_cast<AndroidCompiledPipelineCacheOwner*>(user);
+    if (owner == nullptr || owner->device == VK_NULL_HANDLE) return;
+    for (VkPipeline& pipeline : objects.pipelines)
+    {
+        if (pipeline != VK_NULL_HANDLE)
+            vkDestroyPipeline(owner->device, pipeline, nullptr);
+        pipeline = VK_NULL_HANDLE;
+    }
+    if (objects.pipelineLayout != VK_NULL_HANDLE)
+        vkDestroyPipelineLayout(owner->device, objects.pipelineLayout, nullptr);
+    objects.pipelineLayout = VK_NULL_HANDLE;
+    if (objects.descriptorSetLayout != VK_NULL_HANDLE)
+        vkDestroyDescriptorSetLayout(owner->device, objects.descriptorSetLayout, nullptr);
+    objects.descriptorSetLayout = VK_NULL_HANDLE;
+}
+
 struct SwapchainContext
 {
     std::uint64_t surfaceGeneration = 0u;
@@ -182,6 +228,9 @@ struct SwapchainContext
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
     VkPipelineCache pipelineCache = VK_NULL_HANDLE;
+    // Heap-stable because scene cache leases retain a pointer while this
+    // context is moved from its setup scope to the render-owner global.
+    std::unique_ptr<AndroidCompiledPipelineCacheOwner> compiledPipelineCache;
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     uint32_t graphicsQueueFamilyIndex = 0u;
     VkSurfaceKHR surface = VK_NULL_HANDLE;
@@ -2784,16 +2833,24 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                                     {},
                                     context.reportDirectory + "/..",
                                     context.executionBackend, context.sceneProfile, context.graphicsSettings.glassEnabled,
-                                    context.pipelineCache);
+                                    context.pipelineCache,
+                                    context.compiledPipelineCache != nullptr
+                                        ? &context.compiledPipelineCache->cache : nullptr);
     // Bounded per-attempt CPU evidence; never emit frame-by-frame timings.
     // Log each attempt here so a subsequent rollback cannot overwrite it.
     const auto& measurements = context.rtScene.InitialiseMeasurements();
+    const bool compiledPairReused = context.rtScene.ReusedCompiledPipelines();
+    const std::string compiledPair = context.rtScene.SelectedPipelineBundleIdentity();
     __android_log_print(ANDROID_LOG_INFO, kTag,
-        "HORDE_RT_INIT serial=%llu generation=%llu profile=%d backend=%d glass=%d success=%d total_cpu_wall_ms=%.3f",
+        "HORDE_RT_INIT serial=%llu generation=%llu profile=%d backend=%d glass=%d success=%d compiled_pair_reused=%d compiled_pair=%s compiled_cache_entries=%zu total_cpu_wall_ms=%.3f",
         static_cast<unsigned long long>(context.graphicsSerial),
         static_cast<unsigned long long>(context.surfaceGeneration), static_cast<int>(context.sceneProfile),
         static_cast<int>(context.executionBackend), context.graphicsSettings.glassEnabled ? 1 : 0,
-        initialised ? 1 : 0, static_cast<double>(measurements.totalCpuNanoseconds) * 1.0e-6);
+        initialised ? 1 : 0, compiledPairReused ? 1 : 0,
+        compiledPair.empty() ? "none" : compiledPair.c_str(),
+        context.compiledPipelineCache != nullptr
+            ? context.compiledPipelineCache->cache.Size() : 0u,
+        static_cast<double>(measurements.totalCpuNanoseconds) * 1.0e-6);
     for (const auto& stage : measurements.stages)
         __android_log_print(ANDROID_LOG_INFO, kTag,
             "HORDE_RT_INIT_STAGE serial=%llu generation=%llu name=%.*s attempted=%d success=%d cpu_wall_ms=%.3f",
@@ -2898,6 +2955,14 @@ bool DestroySwapchainContext(SwapchainContext& context)
 {
     if (context.device == VK_NULL_HANDLE)
     {
+        if (context.compiledPipelineCache != nullptr &&
+            !context.compiledPipelineCache->cache.Empty())
+        {
+            __android_log_print(ANDROID_LOG_ERROR, kTag,
+                "Compiled pipeline cache still owns Vulkan objects without a device; resources retained.");
+            return false;
+        }
+        context.compiledPipelineCache.reset();
         DestroyRtEvidenceOnOwnerThread(context);
         if (context.surface != VK_NULL_HANDLE && context.instance != VK_NULL_HANDLE)
         {
@@ -2934,6 +2999,16 @@ bool DestroySwapchainContext(SwapchainContext& context)
     CancelActiveInAppBenchmark(context);
     DestroyRtEvidenceOnOwnerThread(context);
     context.rtScene.Destroy();
+    if (context.compiledPipelineCache != nullptr)
+    {
+        if (!context.compiledPipelineCache->cache.DestroyAfterDeviceIdle(true))
+        {
+            __android_log_print(ANDROID_LOG_ERROR, kTag,
+                "Compiled pipeline cache retirement failed after scene lease release; device resources retained.");
+            return false;
+        }
+        context.compiledPipelineCache.reset();
+    }
     if (context.pipelineCache != VK_NULL_HANDLE)
     {
         vkDestroyPipelineCache(context.device, context.pipelineCache, nullptr);
@@ -4513,6 +4588,16 @@ bool StartSurfaceInternal(ANativeWindow* window,
         "HORDE_PIPELINE_CACHE_CREATE attempted=%d result=%d available=%d generation=%llu",
         context.useRtPath ? 1 : 0, static_cast<int>(pipelineCacheResult), context.pipelineCache != VK_NULL_HANDLE ? 1 : 0,
         static_cast<unsigned long long>(generation));
+    if (context.executionBackend == horde::vulkan::RtExecutionBackend::RayTracingPipeline)
+    {
+        auto* cacheOwner = new (std::nothrow) AndroidCompiledPipelineCacheOwner(context.device);
+        if (cacheOwner != nullptr)
+            context.compiledPipelineCache.reset(cacheOwner);
+        __android_log_print(cacheOwner != nullptr ? ANDROID_LOG_INFO : ANDROID_LOG_WARN, kTag,
+            "HORDE_COMPILED_PIPELINE_CACHE_CREATE generation=%llu available=%d capacity=%zu",
+            static_cast<unsigned long long>(generation), cacheOwner != nullptr ? 1 : 0,
+            AndroidCompiledPipelineCache::kCapacity);
+    }
     context.capabilities.diagnostics.push_back(horde::vulkan::PresentCompletionDiagnostic(context.presentCompletionMode));
 
     if (!CreateSwapchain(context) || !gSurfaceSessions.IsCurrent(generation))

@@ -459,6 +459,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     instance_ = std::exchange(other.instance_, nullptr);
     device_ = std::exchange(other.device_, nullptr);
     pipelineCache_ = std::exchange(other.pipelineCache_, VK_NULL_HANDLE);
+    compiledPipelineCache_ = std::exchange(other.compiledPipelineCache_, nullptr);
     queue_ = std::exchange(other.queue_, nullptr);
     commandPool_ = std::exchange(other.commandPool_, VK_NULL_HANDLE);
     dispatchExtent_ = std::exchange(other.dispatchExtent_, VkExtent2D{});
@@ -732,7 +733,8 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
                                         RtExecutionBackend executionBackend,
                                         RtSceneProfile sceneProfile,
                                         bool glassEnabled,
-                                        VkPipelineCache pipelineCache)
+                                        VkPipelineCache pipelineCache,
+                                        RtBundleCompiledPipelineCache* compiledPipelineCache)
 {
     InitialiseOrchestrationApi api{};
     api.user = &executionBackend;
@@ -755,7 +757,8 @@ bool PresentableTinyRtScene::Initialise(VkInstance instance,
         instance, physicalDevice, device, queue, commandPool, dispatchExtent,
         presentationFormat, skeletonAssetPath, lichAssetPath,
         materialAssetDirectory, lichTextureDirectory, diagnostic,
-        developmentStaticAssetDirectory, productionAssetRoot, api, sceneProfile, glassEnabled, pipelineCache);
+        developmentStaticAssetDirectory, productionAssetRoot, api, sceneProfile, glassEnabled,
+        pipelineCache, compiledPipelineCache);
 }
 
 bool PresentableTinyRtScene::InitialiseWithOrchestration(
@@ -776,7 +779,8 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
     const InitialiseOrchestrationApi& api,
     const RtSceneProfile sceneProfile,
     const bool glassEnabled,
-    const VkPipelineCache pipelineCache)
+    const VkPipelineCache pipelineCache,
+    RtBundleCompiledPipelineCache* compiledPipelineCache)
 {
     Destroy();
     initialiseMeasurements_ = {};
@@ -816,6 +820,8 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
         return false;
     }
     RtPipelineBundleDestroyApi destroyApi{};
+    compiledPipelineCache_ = selectedPreflight.request.executionBackend ==
+            RtExecutionBackend::RayTracingPipeline ? compiledPipelineCache : nullptr;
     destroyApi.user = this;
     destroyApi.gpuResources = &gpuResources_;
     destroyApi.destroyBuffer = [](void*, RtGpuResources* resources, RtGpuBuffer& buffer,
@@ -1013,6 +1019,8 @@ void PresentableTinyRtScene::Destroy()
     computeDispatchGroups_ = {};
     if (device_ == VK_NULL_HANDLE)
     {
+        pipelineBundle_.Reset();
+        compiledPipelineCache_ = nullptr;
         worldTorchBodyBlas_ = {};
         pipelineEvidenceIdentity_ = {};
         pipelineEvidenceIdentityValid_ = false;
@@ -1026,6 +1034,7 @@ void PresentableTinyRtScene::Destroy()
     stagedPrimary_.reset();
 #endif
     pipelineBundle_.Reset();
+    compiledPipelineCache_ = nullptr;
     DestroyAccelerationStructure(tlas_);
     DestroyBuffer(tlasUpdateScratch_);
     characterSlot_.DestroyGpuResources(gpuResources_);
@@ -4871,6 +4880,83 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     return true;
 }
 
+std::optional<RtCompiledPipelineKey> PresentableTinyRtScene::MakeCompiledPipelineKey(
+    const RtPipelineBundlePreflight& preflight) const
+{
+    if (device_ == VK_NULL_HANDLE ||
+        preflight.request.executionBackend != RtExecutionBackend::RayTracingPipeline ||
+        preflight.request.executionBackend != ExecutionBackend())
+        return std::nullopt;
+
+    const auto artifactIdentity = [](const RtPipelineVariantArtifact& artifact) {
+        return RtCachedArtifactIdentity{
+            std::string(artifact.canonicalKey), std::string(artifact.spirvSha256),
+            std::string(artifact.includeSha256),
+            static_cast<std::uint64_t>(artifact.expectedWordCount)};
+    };
+    const auto binaryIdentity = [](const std::uint32_t* words, const std::size_t byteCount) {
+        return std::string(reinterpret_cast<const char*>(words), byteCount);
+    };
+
+    RtCompiledPipelineKey key{};
+    key.deviceIdentity = static_cast<std::uint64_t>(
+        reinterpret_cast<std::uintptr_t>(device_));
+    key.backend = preflight.request.executionBackend;
+    key.instrumentation = preflight.request.instrumentation;
+    key.quality = preflight.request.quality;
+    for (std::size_t strategy = 0u; strategy < preflight.strategies.size(); ++strategy)
+    {
+        const auto& artifact = preflight.strategies[strategy];
+        key.strategyArtifacts[strategy] = artifactIdentity(artifact);
+        key.strategyStages[strategy] = {
+            {VK_SHADER_STAGE_RAYGEN_BIT_KHR, 0u,
+             binaryIdentity(artifact.words.data(), artifact.words.size_bytes()),
+             "main", {}, {}, {}},
+            {VK_SHADER_STAGE_MISS_BIT_KHR, 0u,
+             binaryIdentity(kMinimalMissShader, sizeof(kMinimalMissShader)),
+             "main", {}, {}, {}},
+            {VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 0u,
+             binaryIdentity(kMinimalClosestHitShader, sizeof(kMinimalClosestHitShader)),
+             "main", {}, {}, {}},
+        };
+    }
+    key.sharedShaderModules = {
+        {binaryIdentity(kMinimalMissShader, sizeof(kMinimalMissShader)), {}, {},
+         sizeof(kMinimalMissShader) / sizeof(kMinimalMissShader[0])},
+        {binaryIdentity(kMinimalClosestHitShader, sizeof(kMinimalClosestHitShader)), {}, {},
+         sizeof(kMinimalClosestHitShader) / sizeof(kMinimalClosestHitShader[0])},
+    };
+    key.shaderGroups = {
+        {VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR, 0, -1, -1, -1, {}, {}},
+        {VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR, 1, -1, -1, -1, {}, {}},
+        {VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR, -1, 2, -1, -1, {}, {}},
+    };
+    key.pipelineCreateFlags = 0u;
+    key.maximumRecursionDepth = 1u;
+    key.basePipelineIdentity = "VK_NULL_HANDLE";
+    key.basePipelineIndex = 0;
+    key.pipelineCreateExtensionStateIdentity.clear();
+
+    const auto bindings = TryMakeRtDescriptorSetLayoutBindings(
+        preflight.descriptorIo, executionPolicy_.pushConstantStages,
+        executionPolicy_.shaderStage);
+    if (!bindings) return std::nullopt;
+    key.descriptorSetLayoutCreateFlags = 0u;
+    key.descriptorBindings.reserve(bindings->count);
+    for (std::uint32_t index = 0u; index < bindings->count; ++index)
+    {
+        const auto& binding = bindings->values[index];
+        key.descriptorBindings.push_back({
+            binding.binding, static_cast<std::uint32_t>(binding.descriptorType),
+            binding.descriptorCount, binding.stageFlags, 0u, {}});
+    }
+    key.pipelineLayoutCreateFlags = 0u;
+    key.pushConstantRanges = {{executionPolicy_.pushConstantStages, 0u,
+                               static_cast<std::uint32_t>(sizeof(ScenePushConstants))}};
+    key.pipelineLayoutExtensionStateIdentity.clear();
+    return key;
+}
+
 bool PresentableTinyRtScene::CreateSelectedPipelineBundle(std::string& diagnostic)
 {
     RtPipelineBundleBuildApi api{};
@@ -4935,6 +5021,37 @@ bool PresentableTinyRtScene::CreateSelectedPipelineBundle(std::string& diagnosti
         return static_cast<PresentableTinyRtScene*>(user)->CreateBundleStrategySbt(
             strategy, pipeline, out, regions, error);
     };
+    if (compiledPipelineCache_ != nullptr &&
+        ExecutionBackend() == RtExecutionBackend::RayTracingPipeline)
+    {
+        api.borrowCompiledObjects = [](
+            void* user, const RtPipelineBundlePreflight& preflight,
+            RtBundleCompiledPipelineLease& lease,
+            RtBundleCompiledPipelineObjects& objects) {
+            auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+            const auto key = scene.MakeCompiledPipelineKey(preflight);
+            if (scene.compiledPipelineCache_ == nullptr || !key) return false;
+            auto candidateLease = scene.compiledPipelineCache_->Acquire(*key);
+            const auto* cached = candidateLease.Get();
+            if (!candidateLease || cached == nullptr) return false;
+            objects = *cached;
+            lease = std::move(candidateLease);
+            return true;
+        };
+        api.publishCompiledObjects = [](
+            void* user, const RtPipelineBundlePreflight& preflight,
+            RtBundleCompiledPipelineObjects& objects,
+            RtBundleCompiledPipelineLease& lease) {
+            auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+            const auto key = scene.MakeCompiledPipelineKey(preflight);
+            if (scene.compiledPipelineCache_ == nullptr || !key ||
+                scene.compiledPipelineCache_->Adopt(*key, objects, true, false) !=
+                    RtPipelineCacheInsertResult::Adopted)
+                return false;
+            lease = scene.compiledPipelineCache_->Acquire(*key);
+            return static_cast<bool>(lease);
+        };
+    }
     return BuildRtPipelineBundleResources(pipelineBundle_, api, diagnostic);
 }
 
