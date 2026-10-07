@@ -1013,7 +1013,9 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     ResetSwordEquipment();
     waterfallWarningEmitted_ = false;
     enemyDirector_ = state.enemyDirector;
-    activeEnemyKind_ = state.activeEnemyKind;
+    if (config_.waterfallSkeletonEncounter && IsWaterfallSkeletonRoom(playerX_, playerZ_))
+        enemyDirector_.Update(playerX_, playerZ_, EnemyKind::Skeleton);
+    activeEnemyKind_ = enemyDirector_.Snapshot().selectedEnemy;
     lichEncounter_ = state.lichEncounter;
     if (isRetry && checkpoint->preset == ShowcaseCheckpointPreset::LichActive)
     {
@@ -1485,7 +1487,10 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
 
 void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSeconds)
 {
-    enemyDirector_.Update(playerX_, playerZ_);
+    const auto encounterOverride = config_.waterfallSkeletonEncounter &&
+        IsWaterfallSkeletonRoom(playerX_, playerZ_)
+            ? EnemyKind::Skeleton : EnemyKind::None;
+    enemyDirector_.Update(playerX_, playerZ_, encounterOverride);
     const EnemyKind selectedEnemy = enemyDirector_.Snapshot().selectedEnemy;
     if (selectedEnemy != activeEnemyKind_)
     {

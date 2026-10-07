@@ -2201,6 +2201,9 @@ int main()
               "explicit guard-room development capture stages through shared simulation");
         if (checkpoint == nullptr) continue;
         const auto& preview = guardPreview->Snapshot();
+        check(preview.activeEnemyKind == EnemyKind::Skeleton &&
+              preview.enemyRoster.selectedEnemy == EnemyKind::Skeleton,
+              "waterfall room keeps the relocated guards selected for rendering and combat");
         // The zero-delta authoritative pose import is one StepFixed boundary;
         // the requested count then advances that many actual timed fixed ticks.
         check(preview.tickIndex == checkpoint->waterfallGuardFixedTicks + 1u &&
@@ -2232,6 +2235,22 @@ int main()
         guardPreview->AdvanceFrame(freeze, 0.0, preview.inputPublicationSequence + 1u);
         check(guardPreview->Snapshot().tickIndex == frozenTick,
               "capture freeze does not advance the staged guard ticks");
+    }
+    {
+        auto guardRoomImport = std::make_unique<GameSimulation>(waterfallConfig);
+        check(guardRoomImport->ApplyShowcaseCheckpoint(4) &&
+              guardRoomImport->Snapshot().activeEnemyKind == EnemyKind::Skeleton &&
+              guardRoomImport->Snapshot().enemyRoster.selectedEnemy == EnemyKind::Skeleton &&
+              guardRoomImport->Snapshot().skeletonEnemyCount == 2u,
+              "direct room checkpoint selects the relocated pair instead of the historical Keeper route gate");
+        InputSnapshot leaveRoom;
+        leaveRoom.hasAuthoritativePlayerPose = true;
+        leaveRoom.authoritativePlayerX = -11.0f;
+        leaveRoom.authoritativePlayerZ = -15.2f;
+        leaveRoom.damageEnabled = false;
+        guardRoomImport->StepFixed(leaveRoom, 0.0f);
+        check(guardRoomImport->Snapshot().activeEnemyKind == EnemyKind::Lich,
+              "leaving the guard room retains ordinary Keeper route selection");
     }
     {
         auto boundedPreview = std::make_unique<GameSimulation>(ProductionGameSimulationConfig());

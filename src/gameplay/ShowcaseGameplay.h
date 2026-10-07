@@ -385,9 +385,12 @@ public:
         Select(EnemyKind::Skeleton);
     }
 
-    const EnemyRosterSnapshot& Update(float playerX, float playerZ)
+    const EnemyRosterSnapshot& Update(float playerX, float playerZ,
+                                     EnemyKind encounterOverride = EnemyKind::None)
     {
-        const EnemyKind routeEnemy = EnemyKindForShowcaseZone(QueryShowcaseZone(playerX, playerZ));
+        const EnemyKind routeEnemy = encounterOverride != EnemyKind::None
+            ? encounterOverride
+            : EnemyKindForShowcaseZone(QueryShowcaseZone(playerX, playerZ));
         // Outside is not a gate. Retaining selection prevents accidental resets
         // caused by tiny collision/precision excursions at rectangle seams.
         if (routeEnemy != EnemyKind::None && routeEnemy != snapshot_.selectedEnemy)

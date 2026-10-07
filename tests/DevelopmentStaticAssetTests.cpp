@@ -65,10 +65,21 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 53u,
-          "development registry retains the prior views and adds one upward wall-panel approach");
-    Check(FindDevelopmentCheckpoint(153) == nullptr,
-          "development lookup rejects IDs beyond the admitted upward wall-panel view");
+    Check(kDevelopmentCheckpoints.size() == 56u,
+          "development registry retains all prior views and admits three scoped guard-room samples");
+    Check(FindDevelopmentCheckpoint(156) == nullptr,
+          "development lookup rejects IDs beyond the admitted guard-room samples");
+    for (int index = 0; index < 3; ++index)
+    {
+        const std::array<std::string_view, 3> names{
+            "waterfall-guards-entry", "waterfall-guards-walk-early", "waterfall-guards-walk-later"};
+        const auto* guard = FindDevelopmentCheckpoint(153 + index);
+        Check(guard != nullptr && FindDevelopmentCheckpoint(names[index]) == guard &&
+              guard->baseShowcaseCheckpointId == 2 && guard->stagesWaterfallGuards &&
+              guard->waterfallGuardFixedTicks == (index == 0 ? 0u : index == 1 ? 6u : 18u) &&
+              IsWaterfallSkeletonRoom(guard->cameraX, guard->cameraZ),
+              "guard preview registry resolves bounded room samples without altering release checkpoints");
+    }
     for (std::size_t first = 0u; first < kDevelopmentCheckpoints.size(); ++first)
     {
         for (std::size_t second = first + 1u; second < kDevelopmentCheckpoints.size(); ++second)
