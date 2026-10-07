@@ -542,7 +542,7 @@ void RunTorchDrench(int rate)
         sawReleasedFlamelessTorch = sawReleasedFlamelessTorch ||
             (torch.triggered && !torch.heldByPlayer && torch.flameStrength == 0.0f && torch.fallProgress > 0.0f);
         const auto& inspectedState = simulation.Snapshot();
-        const bool stationaryInspection = std::hypot(inspectedState.playerX + 4.5f,
+        const bool stationaryInspection = std::hypot(inspectedState.playerX + 5.5f,
                                                        inspectedState.playerZ + 15.2f) <= 0.06f &&
             inspectedState.walkAmount <= 0.05f && std::abs(inspectedState.inputMoveForward) <= 0.0001f &&
             std::abs(inspectedState.inputMoveStrafe) <= 0.0001f;
@@ -563,11 +563,11 @@ void RunTorchDrench(int rate)
           final.torchFailure.phase == TorchFailurePhase::Settled && !final.torchFailure.heldByPlayer &&
           final.interaction.heldLightKind == interactions::HeldLightKind::None && final.playerAlive,
           "torch-drench observes one automatic event, actual release, floor settle and held-light loss");
-    Check(std::hypot(final.playerX + 4.5f, final.playerZ + 15.2f) <= 0.06f &&
+    Check(std::hypot(final.playerX + 5.5f, final.playerZ + 15.2f) <= 0.06f &&
           final.walkAmount <= 0.05f && std::abs(final.inputMoveForward) <= 0.0001f &&
           std::abs(final.inputMoveStrafe) <= 0.0001f && inspectionStableSince >= 0.0 &&
           scenario.SimulationSeconds() - inspectionStableSince >= 0.35,
-          "scenario finishes only after ordinary step-back reaches the inspection endpoint and remains stationary for 0.35 seconds");
+          "scenario finishes only after ordinary step-back reaches the farther floor-inspection endpoint and remains stationary for 0.35 seconds");
     Check(sawGuttering && sawFalling && sawSettled && sawReleasedFlamelessTorch,
           "host run at each display cadence samples genuine guttering, falling, settled and world-owned flame-off states");
     const unsigned settledMask = ObservedTorchCaptureMilestones(final.torchFailure);

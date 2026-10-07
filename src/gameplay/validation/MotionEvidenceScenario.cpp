@@ -12,6 +12,10 @@ namespace
 {
 using namespace simulation;
 constexpr float kPi = 3.14159265359f;
+// Retained phone projection places the nearer inspection below the right
+// hand/body. Use one additional metre of ordinary movement to view the floor.
+constexpr float kTorchDrenchInspectionX = -5.5f;
+constexpr float kTorchDrenchInspectionZ = -15.2f;
 float Distance(const SimulationSnapshot& state, float x, float z) noexcept
 {
     return std::hypot(state.playerX - x, state.playerZ - z);
@@ -244,7 +248,7 @@ InputSnapshot MotionEvidenceScenario::BuildInput(const SimulationSnapshot& state
             // and changes view to inspect it.
             input.yawRadians = kPi * 0.5f;
             input.pitchRadians = -0.32f;
-            MoveTowards(input, state, -4.5f, -15.2f);
+            MoveTowards(input, state, kTorchDrenchInspectionX, kTorchDrenchInspectionZ);
             break;
         case MotionStage::Reveal:
         {
@@ -435,7 +439,8 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
                  (std::abs(state.playerYawRadians - torchDrenchReleaseYaw_) > 0.5f ||
                   std::abs(state.playerPitchRadians - torchDrenchReleaseViewPitch_) > 0.10f));
             const bool atSettledInspectionPoint =
-                Distance(state, -4.5f, -15.2f) <= 0.06f && state.walkAmount <= 0.05f;
+                Distance(state, kTorchDrenchInspectionX, kTorchDrenchInspectionZ) <= 0.06f &&
+                state.walkAmount <= 0.05f;
             if (atSettledInspectionPoint)
             {
                 if (torchDrenchInspectionStartSeconds_ < 0.0)
