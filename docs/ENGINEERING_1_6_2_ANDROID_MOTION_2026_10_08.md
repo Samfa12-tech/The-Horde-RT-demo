@@ -243,6 +243,53 @@ support investigating a bounded stroke sweep: a single global timing shift
 would move contact away from other idle samples. They are not swept-contact
 proof, simultaneous renderer execution or owner acceptance.
 
+### Bounded interpolated stroke samples
+
+Test-only source `367ac7a364cab88f5e456e246c436cbc21370d77` adds
+`--combat-bounded-sweep` for those same two 1.28 m cases and their same-root,
+same-facing Idle controls. It queries all 6,905 Grip-filtered blade triangles
+against indexed target triangles at the pulse and +1/+2/+3 ticks, plus .25/.5/.75
+of each interval: 13 samples per control, 52 distance queries in total. Intermediate
+triangles are linearly interpolated world vertices, not authored/rendered
+sub-tick poses or a continuous collision solver. The existing floating-point
+triangle-distance oracle reports zero with its own numerical precision and
+degeneracy handling; no gameplay proximity tolerance is added.
+
+| Case / control | Gap at current pulse | First sampled zero | Minimum sampled gap |
+| --- | --- | --- | --- |
+| Frontal live Attack | 189.441 mm | +2.5 ticks, interpolated | 0 mm; exact +3 endpoint also intersects |
+| Frontal same-root Idle | 46.9822 mm | None | 30.9447 mm at +.75 tick |
+| +15-degree live Attack | 184.408 mm | None | 7.77264 mm at +3 ticks |
+| +15-degree same-root Idle | 279.334 mm | None | 279.334 mm at the pulse |
+
+Both root gates remain eligible (1.28 m; cone dot 1 / .965926). Eligibility with
+a separated Idle mesh is reported separately from physical blade contact; the
+existing range/cone rule does not itself promise literal mesh intersection.
+The parallel unhit target remains counterfactual after ordinary damage, and its
+previous-tick pose is paired with the current player pose as in the earlier
+diagnostic. These results support bounded sweep feasibility, but do not justify
+a production tolerance, global damage delay, range/cone change or parry change.
+The closed coarse-capsule negative is not rerun.
+
+The focused target build passes in 2.82 s; the reviewed diagnostic passes with
+exit 0 in 216.17 s. It checks successful asset/final-Grip/target-pose resolution,
+four poses inside the existing downstroke, stable indexed counts, finite
+distances, current range/cone eligibility and the 13-sample count. Geometry
+outcomes are reported, rather than asserting a preferred collision result.
+
+```powershell
+cmake --build build/presets/windows-x64-debug --config Debug --target horde_rt_held_item_socket_tests
+build/presets/windows-x64-debug/Debug/horde_rt_held_item_socket_tests.exe --combat-bounded-sweep
+```
+
+Private ignored logs are `build/reports/combat-bounded-sweep-reviewed-build-20261008.log`
+and `combat-bounded-sweep-reviewed-run-20261008.log`. Executable SHA-256:
+`c68478459af49ec366f9f74208530b52ac2958c753718dcba75e63b637db2db4`;
+run-log SHA-256:
+`c9c7099ead1974510ecf61a5d01d191dd0d167fa950443630cd34246053f2885`.
+This explicit host diagnostic is outside default CTest and supplies no phone,
+displayed-FPS, input-latency, owner-feel or final integrated-candidate evidence.
+
 ## Waterfall equipment moving inspection
 
 The same immutable runtime has tree `f49720cd5c2fb6afaf2a9fab75cb9bfccf3fae1c`.

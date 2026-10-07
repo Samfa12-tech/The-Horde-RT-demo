@@ -1,5 +1,26 @@
 # Horde Lantern RT 1.6.2 development notes
 
+**8 October owner playtest and farther floor inspection:** source
+`ccd70d3815e0ed08946f9f5ffc52a156bb41ed63`, tree
+`f088aff7c39405f986d9898b431e564abcede2a3`; Debug APK SHA-256
+`7c637c0b15b95964d9303dd93d69f3a7be77fd4962b791e0acea2af0ad743197`
+(138,462,724 bytes), actual installed base matches. Both phone RT backends pass
+213/222 exact state/completed-frame rows and 13 images each, with fixed dropped
+ownership, packed-light removal, unchanged preferences and stopped automated
+apps. A measured framing follow-up changes only the Debug inspection endpoint;
+its red/green host regression, Windows build and four-ABI Debug build pass.
+[Exact artifacts and retained failures](ENGINEERING_1_6_2_TORCH_DRENCH_2026_10_08.md#farther-floor-inspection-view).
+
+The owner then accepts ordinary native touch comfort, observed torch appearance
+and the sword's low-ceiling response on this exact build. Their normal playtest
+session is handed over and remains theirs; it is not automatically stopped.
+Test-only `367ac7a3` adds 52 bounded interpolated blade/target distance samples:
+frontal sampled contact first occurs at +2.5 ticks, while +15 degrees and Idle
+controls stay separated. Production contact calibration remains open.
+Workflow-only `e4cc12f8` passes all 12 jobs in `37678033058` / `37678041933`;
+preceding `53459b27` retains eleven successes and a cancelled Vulkan dependency
+install, without build/test execution. Later source/documentation CI is separate.
+
 **8 October completed step-back inspection:** source
 `853d31f293f8593e2f74ed325ce4ef1542019139`, tree
 `1337cc77fe71ef88e1ca8dae94a173e442326dea`; Debug APK SHA-256

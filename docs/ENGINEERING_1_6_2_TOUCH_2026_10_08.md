@@ -174,7 +174,20 @@ Compute pass. The private return command now repeats the explicit backend
 requirement and validates the actual backend after each Home. The failed run is
 retained without changing application backend semantics or weakening guards.
 
-Manual touch/controller comfort, successful-parry/riposte feel, changed damage
+## Owner touch comfort
+
+After returning, the owner requests the intended build be opened because three
+variants are installed. The exact installed Debug APK at source
+`ccd70d3815e0ed08946f9f5ffc52a156bb41ed63`, SHA-256
+`7c637c0b15b95964d9303dd93d69f3a7be77fd4962b791e0acea2af0ad743197`,
+is hash-checked and launched normally without scenario extras. Foreground PID
+2056 is handed to the owner; automated phone use/stopping is suspended during
+their playtest. Asked how Swing/Parry/Dodge feel while moving/looking, the owner
+replies "they feel great". **Owner native touch comfort: accepted on this build.**
+This is qualitative acceptance, not a measured latency value, a second synthetic
+matrix, Windows controller validation or proof of every combat/hitch condition.
+
+Windows controller comfort, successful-parry/riposte feel, changed damage
 audio/haptic acceptance, moving blade contact calibration, equipment production
 activation, same-device 50/40/33 play quality/performance and Eric's independent
 audit remain open. Earlier `ab69537a` waterfall/Keeper/pause/Home evidence retains

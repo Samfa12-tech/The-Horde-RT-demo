@@ -2,6 +2,28 @@
 
 Last updated: 2026-10-08
 
+## 8 October farther torch view and owner playtest — SM-S948B / Android 16
+
+Evidence class: **exact Debug physical-device completed-frame inspection plus
+separate qualitative owner acceptance**. Source
+`ccd70d3815e0ed08946f9f5ffc52a156bb41ed63`; Debug APK SHA-256
+`7c637c0b15b95964d9303dd93d69f3a7be77fd4962b791e0acea2af0ad743197`,
+138,462,724 bytes; actual installed base matches. Only the synthetic inspection
+endpoint moves one metre farther back. Genuine Pipeline and required hardware
+RayQueryCompute pass 213/222 exact state/completed-frame rows, 13 images each,
+all ten milestones, fixed settled world attachment and packed torch-light
+removal. Final zero-axis tails span 22/23 simulation ticks. Preferences remain
+unchanged and both automated apps stop; the saved 50%/Glass On profile and
+1440×2980 output / 720×1490 trace extents remain unchanged.
+
+The subsequent normal launch, without scenario extras, is handed to the owner
+at verified foreground PID 2056. The owner accepts touch comfort, observed torch
+appearance and the sword's low-ceiling response. These statements do not close
+all attachment/shadow/reflection conditions, audio/haptics or sustained FPS.
+The readback route remains Debug/checkpoint-seeded/damage-disabled and supplies
+no scanout or input-latency measurement. [Exact receipts, failure history and
+scope](ENGINEERING_1_6_2_TORCH_DRENCH_2026_10_08.md#farther-floor-inspection-view).
+
 ## 8 October completed torch step-back — SM-S948B / Android 16
 
 Evidence class: **exact Debug physical-device package, synthetic ordinary-axis

@@ -152,6 +152,100 @@ It wrote no audit. The corrected checker verifies the exact 21-tick interval
 at the shared 60 Hz simulation; source, threshold, inputs and runs are unchanged.
 Both corrected audits pass, with the initial checker failure retained.
 
+## Farther floor-inspection view
+
+A read-only reconstruction of the retained `853d31f2` final state, the 4,825
+actual Rag torch vertices and the unchanged portrait shader projection places
+the torch at approximately x476–565 / y1052–1319 in its 720×1490 image. This
+overlaps the visible right hand/sword/body region. All vertices project inside
+the image, and the reconstructed world Y bounds (-.833 to -.603 m) are above
+the -.95 m floor. This does not prove GPU visibility or an occlusion cause.
+One metre farther back predicts a floor region above that body obstruction,
+so the Debug input schedule alone now uses (-5.5, -15.2).
+
+The new endpoint regression fails at all four admission rates before the
+schedule correction. Afterward the scenario/launcher checks pass 2/2 in 8.42 s;
+the affected Windows app and four-ABI Debug builds pass. Source
+`ccd70d3815e0ed08946f9f5ffc52a156bb41ed63`, tree
+`f088aff7c39405f986d9898b431e564abcede2a3`, changes only the inspection schedule
+and its test. Ordinary gameplay, camera limits, light/geometry/materials and
+production equipment/waterfall flags are unchanged.
+
+- Four-ABI Debug APK: 138,462,724 bytes, SHA-256
+  `7c637c0b15b95964d9303dd93d69f3a7be77fd4962b791e0acea2af0ad743197`.
+- Windows Debug executable: 11,347,968 bytes, SHA-256
+  `d15b5bf005fb243924a07d1a651b805dc8a193a72442c336d65c01bc6acdf764`.
+- arm64 native SHA-256:
+  `e80c7f1ec1a3aef104f27ec3dea40bd1f82589e072cf3927c4bcafafabd4235c`.
+- Closed assets, all four native payloads, manifest, 16 KiB alignment and actual
+  installed-base hash pass. No new Release artifact or Windows physical-motion
+  pass is claimed for this Debug schedule change.
+
+| SM-S948B / Android 16 | State / completed RT rows | Events / scopes / images | Stationary endpoint tail |
+| --- | --- | --- | --- |
+| Pipeline `m-20261007200620-fe312f72e86b` | 213 / 213 | 22 / 1 / 13 | 10 rows, 22 ticks (.3667 s) |
+| Compute `m-20261007200812-24cc80660f8a` | 222 / 222 | 22 / 1 / 13 | 11 rows, 23 ticks (.3833 s) |
+
+Both reach zero-axis completion at 9.2167 simulation seconds, join their final
+image to the final state and retain all ten observed milestones. Pipeline has
+148 positive packed-light rows and 65 released rows without stable torch light
+ID 1; Compute has 152 / 70. Each has one extinguish event (sequence 17), zero
+settled item-position spans and 3.63 / 3.60 m of post-release player movement.
+Preferences remain unchanged and both automated apps stop. Saved 50%/Mobile
+water+fire/Glass On/Current/cap30/Mist On and output/trace extents are unchanged.
+
+Ledger SHA-256 Pipeline:
+`e8178647277b02e2b8acb776c189fd937d231437b0ceb76d4bf3103b50b22758`;
+Compute:
+`6c7b8f9b6e08b628d100e3f1b806046a453a39e433dc922987d4e6038c64a5af`.
+Final RGBA SHA-256 Pipeline:
+`424ea1d7370b56801e3e72d72ac9c13bfd4543889bbca8174bc256efaa9813d6`;
+Compute:
+`c8f811f51cae76ba2352520310de6453a231fefd7aad59bca912c1d53a056e3f`.
+Private receipts retain manifests, all image hashes, unchanged preference
+entries, stop receipts and the projection assumptions. The selected final
+images show a faint dark outline in the projected floor region. That observation
+does not certify every world shadow/reflection or moving attachment.
+
+The owner's subsequent ordinary playtest uses this exact installed Debug APK,
+normal launch without scenario extras, verified foreground PID 2056. The owner
+says the controls "feel great", "torch looks good" and "sword duck under low
+objects is great too". Record touch comfort, observed torch appearance and the
+sword's low-ceiling response as accepted. This does not extend to untested
+audio/haptics, the disabled equipment/waterfall path or sustained FPS. The app is
+handed to the owner and must not be automatically stopped while they play.
+
+The first install preflight used `pidof`, whose expected no-process exit is
+rejected by the strict private ADB helper; installation had not started. The
+corrected caller selects the exact package from successful `ps` output. A later
+caller mistakenly treated an unset external-program `LASTEXITCODE` as failure
+after a successful PowerShell helper; the owned install-launch PID is separately
+verified and stopped before both automated runs. Initial owner-focus verification
+used `dumpsys window windows`, which omits global focus; full window/activity
+output confirms actual foreground ownership without a relaunch or bypass.
+These caller failures remain private receipts, separate from native results.
+
+## Later CI checkpoint
+
+Documentation/workflow head `53459b27` passes six push jobs (`37674755690`)
+and five PR jobs (`37674762090`). The remaining PR Vulkan-host job is cancelled
+during dependency installation: an Ubuntu mirror package-index request stalls
+from 19:29:01 UTC to the overall cancellation at 19:48:53. Configure/build/tests
+never start. Workflow-only `e4cc12f8dffbc4582928335e6f4d546b779fdbc1`
+bounds that installation step to six minutes, transport waits to 30 seconds and
+retries to two, and fails the index update on any error. Repository trust and
+the required build/test roster are unchanged. The options follow the Ubuntu
+[HTTP transport](https://manpages.ubuntu.com/manpages/noble/man1/apt-transport-http.1.html),
+[configuration](https://manpages.ubuntu.com/manpages/noble/man5/apt.conf.5.html) and
+[apt-get](https://manpages.ubuntu.com/manpages/noble/man8/apt-get.8.html) manuals.
+
+The extracted installer passes Bash syntax/field checks. A local YAML-parser
+attempt fails because PyYAML is absent; no dependency is installed to hide that
+failure. Actual GitHub workflow admission succeeds. All twelve aggregate jobs
+at `e4cc12f8` pass in push `37678033058` / PR `37678041933`; Vulkan installation
+completes in 38 / 14 seconds. This does not assign that CI identity to the later
+`ccd70d38` Debug package or certify the cancelled earlier runs.
+
 The preceding `7a628fe6` CI has eleven successful jobs and one cancelled push
 `player-vulkan-host` job (`37667678514`), cancelled during Vulkan dependency
 installation before its configure/build/tests. PR `37667688133` passes all six.
@@ -184,12 +278,13 @@ receipt or decoding images. Only that checker assertion was corrected. The
 unchanged phone ledgers pass the corrected analysis; no native failure is
 relabelled.
 
-Selected actual phone images show a live held torch before release and no live
+Earlier actual phone images show a live held torch before release and no live
 held flame afterward. The dropped torch is not clearly resolved on the dark
-floor in the selected frames. Its simulation/world attachment and packed-light
+floor in the nearer `408126d4` / `853d31f2` frames. Its simulation/world attachment and packed-light
 transition pass, while floor silhouette, moving hand/body, world shadows and
 reflections remain open visual inspection gates. No appearance fix is inferred
-from these images alone. Owner audio/haptic/comfort acceptance, integrated route,
+from these images alone. The later ordinary-play owner appearance/clearance and
+touch-comfort acceptance is scoped above; audio/haptics, integrated route,
 production equipment/waterfall activation, sustained 50/40/33 comparison and
 Eric's independent audit remain open. Intrusive readbacks do not certify
 scanout, touch latency, displayed/sustained FPS or thermal/power performance.
