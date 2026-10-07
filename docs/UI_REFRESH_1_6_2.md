@@ -1,5 +1,7 @@
 # 1.6.2 UI refresh: a restrained dark-fantasy interface
 
+**Execution update, 7 October 2026:** Use [the selected central hanging-lantern direction](design/ui/README.md) in the active 1.6.2 tomb goal. First build one functioning real-RT scene with accessible native controls, flicker/sway, Settings/More pan-left, Play fade-to-black and reduced-motion navigation; stop for owner visual/cost feedback before expanding the style. Graphics remains a separate explicit live preview with exact acknowledgement and normal 15-second confirmation. Loading follows actual loading state and uses a small spinner only. No Continue/save-slot invention, dialogue control, optional tomb dressing or adventure scope. [Current progress and remaining gates](ENGINEERING_1_6_2_TOMB_FINISH.md) distinguish implemented work from these targets; older proposals below remain supporting detail.
+
 **Planning date:** 2 October 2026  
 **Status:** Proposed design and implementation handoff, requested by the owner; no UI implementation or runtime acceptance claimed.  
 **Milestone:** After 1.6.1 is completed, accepted, merged and released; before 1.7 expansion. See [ROADMAP](ROADMAP.md#16-2--engine-readiness-and-demo-polish).

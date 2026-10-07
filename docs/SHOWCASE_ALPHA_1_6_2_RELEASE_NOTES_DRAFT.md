@@ -1,5 +1,7 @@
 # Horde Lantern RT 1.6.2 development notes
 
+**7 October post-reset status:** The existing PR18 branch now contains the fresh no-preview Graphics restore correction, full Android gesture/pause cancellation, Windows unfocused controller suppression/reseeding, and Graphics scroll/focus retention. See [the current input regression evidence](ENGINEERING_1_6_2_INPUT_REGRESSIONS_2026_10_07.md) and [active remaining work/owner gates](ENGINEERING_1_6_2_TOMB_FINISH.md). Combat presentation, player rag torch, equipment/waterfall encounter, selected menu slice and sustained phone comparison are still being implemented or validated; they are not released features. Older exact-build runtime evidence is preserved at `1334cc9c58ec97940ac10d861f0397143ca7a9f4`, not claimed for these new edits. New integrated source/package hashes and aggregate CI will be recorded when that candidate is frozen. Eric's independent audit remains pending.
+
 Package version: `1.6.2`
 
 Android version code: `10`

@@ -1,5 +1,7 @@
 # Horde Lantern RT — Campaign and Engine Roadmap
 
+**Current bounded execution, 7 October 2026:** The updated post-reset tomb goal now includes the player-only rag torch, shared equipment transitions, relocation of the existing two skeletons to the waterfall room and the selected lantern/menu/HUD direction in 1.6.2. Those specific older “1.7 only” statements are superseded. Kit/voice, rope/forest/night/adventure and the start-facing-collapse camera stay future scope. No optional dressing/cobweb/ambience additions or release are authorized. Preserve completed work and consult [the active progress and feedback gates](ENGINEERING_1_6_2_TOMB_FINISH.md), [selected UI references](design/ui/README.md) and [future performance investigation](PERFORMANCE_INVESTIGATION_FUTURE.md).
+
 **Owner:** Sam Small / Samfa12  
 **Planning update:** 3 October 2026  
 **Status:** Owner-approved direction; future milestones are provisional, not implemented or release promises.
