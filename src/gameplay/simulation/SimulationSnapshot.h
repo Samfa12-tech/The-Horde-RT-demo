@@ -48,6 +48,10 @@ struct SimulationSnapshot
 {
     std::uint64_t tickIndex = 0;
     std::uint64_t inputPublicationSequence = 0;
+    // Diagnostic observation of the coherent publication consumed by this
+    // snapshot, including zero-tick and pause synchronization frames.
+    float inputMoveForward = 0.0f;
+    float inputMoveStrafe = 0.0f;
     std::uint64_t lastConsumedAttackSequence = 0;
     std::uint64_t lastConsumedParrySequence = 0;
     std::uint64_t lastConsumedDodgeSequence = 0;

@@ -36,6 +36,7 @@
 #include "graphics/GraphicsSettings.h"
 #include "graphics/EntryMenuHandoff.h"
 #include "graphics/ForegroundPauseRenderCadence.h"
+#include "telemetry/InputPresentationTrace.h"
 #include "graphics/GraphicsPreviewPerformance.h"
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
 #include "platform/android/AndroidMotionEvidencePolicy.h"
@@ -304,6 +305,7 @@ struct SwapchainContext
 #endif
 #if !defined(NDEBUG)
     horde::telemetry::CombatTimingTrace combatTimingTrace;
+    horde::telemetry::InputPresentationTrace inputPresentationTrace;
 #endif
     uint32_t timingFrameCount = 0u;
     double timingFenceMs = 0.0;
@@ -3899,17 +3901,23 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         useRtFrame && presentResult == VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR)
         context.graphicsLatency.firstPresentedNs = GraphicsSteadyNs();
 #if !defined(NDEBUG)
+    const std::uint64_t inputPresentNs = horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
+    const bool inspectInput = gRtLabDebugAutomationSession.load(std::memory_order_acquire) &&
+        context.inputPresentationTrace.HasReportable(gGameSimulation.Snapshot(), inputPresentNs);
     if (evidenceFrame && useRtFrame && presentResult == VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR &&
         context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
-        context.combatTimingTrace.HasReportable(gGameSimulation.Snapshot()))
+        (context.combatTimingTrace.HasReportable(gGameSimulation.Snapshot()) || inspectInput))
     {
         horde::telemetry::RtSubmittedFrameIdentity committed{};
         if (context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, committed))
         {
             std::ostringstream trace;
             context.combatTimingTrace.WriteAcceptedPresent(trace, gGameSimulation.Snapshot(), committed,
-                horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr), true,
+                inputPresentNs, true,
                 observation.recordedScene ? &observation.recordedScene->player : nullptr);
+            if (inspectInput)
+                context.inputPresentationTrace.WriteAcceptedPresent(trace, gGameSimulation.Snapshot(),
+                    committed, inputPresentNs, true);
             const std::string rows = trace.str();
             // Logcat has a per-message size bound. Emit each admitted row as a
             // separate message rather than truncate a multi-edge frame.

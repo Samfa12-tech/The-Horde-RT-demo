@@ -170,6 +170,10 @@ if(BUILD_TESTING)
     target_link_libraries(horde_rt_combat_timing_trace_tests PRIVATE horde_gameplay_simulation)
     add_test(NAME horde_rt_combat_timing_trace_tests COMMAND horde_rt_combat_timing_trace_tests)
 
+    add_executable(horde_rt_input_presentation_trace_tests tests/InputPresentationTraceTests.cpp)
+    target_link_libraries(horde_rt_input_presentation_trace_tests PRIVATE horde_gameplay_simulation)
+    add_test(NAME horde_rt_input_presentation_trace_tests COMMAND horde_rt_input_presentation_trace_tests)
+
     add_executable(horde_rt_held_item_clearance_tests tests/HeldItemClearanceTests.cpp)
     target_sources(horde_rt_held_item_clearance_tests PRIVATE
         src/scene/assets/AssetManifest.cpp

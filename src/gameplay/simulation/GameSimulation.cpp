@@ -1878,6 +1878,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
 {
     snapshot_.tickIndex = tickIndex_;
     snapshot_.inputPublicationSequence = inputPublicationSequence_;
+    snapshot_.inputMoveForward = input.moveForward;
+    snapshot_.inputMoveStrafe = input.moveStrafe;
     snapshot_.lastConsumedAttackSequence = lastConsumedAttackSequence_;
     snapshot_.lastConsumedParrySequence = lastConsumedParrySequence_;
     snapshot_.lastConsumedDodgeSequence = lastConsumedDodgeSequence_;
