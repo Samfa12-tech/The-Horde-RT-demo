@@ -181,3 +181,13 @@ Dirty Windows menu executable SHA-256 `6d4c70aeff96f4c7fc65286c1fb3253171dc52a23
 The requested 10% brighter emitted-light version was then rebuilt as dirty executable SHA-256 `6bbb8fe4049403081c93cc681ac4cd0a28ae07da6cb9b0534c2b9d6b730a75ff`. Both `entry-menu-brighter-landscape-20261007-01` and `entry-menu-brighter-portrait-20261007-01` completed six poses, saved-settings preservation, no-Use Graphics Back and actual Play handoff epoch 7, with zero synchronization-validation errors. Owned processes 53760 and 48632 exited successfully. These inspections do not include the subsequent pause-cadence implementation or constitute immutable integrated candidate evidence.
 
 The immutable `40f92c6a` Windows Debug executable SHA-256 is `fd8ef6aacce03dfaf61fda746f4557a3905520eb8ccb91421de1e73208d02a7d`. Its Vulkan-validation portrait `player-viewmodel-grips` capture at native 540×960 on RTX 5050 Laptop completed and stopped the owned app. The final accepted/completed RT identity is scene epoch 2, record/submission/completion 12, simulation tick 1; its resources report 19 BLAS, one TLAS and 25 TLAS instances. The image is `task-4/rag-40f92-portrait-grips-20261007/136-player-viewmodel-grips.png`, SHA-256 `ab23bb3c2eb704fa2a1223922a8203639bc4269d83a62ab7fe1b8081e724c3d5`. This frozen grip capture establishes a presented RT frame, not moving torch fit, owner acceptance or sustained FPS.
+
+## Owner-authorized indoor dust expansion, 8 October
+
+The optional, default-Off indoor-dust prototype is added to this goal by explicit
+owner request. See [the bounded dust record](ENGINEERING_1_6_2_INDOOR_DUST_2026_10_08.md).
+Motes start in two small authored zones; shafts require a later visual/cost go/no-go
+and are deferred. This does not authorize other optional dressing or adventure
+scope. The owner is away with the phone: no ADB/install/device tests or wait loops.
+Preserve all prior exact passes and failures. Dust owner/mobile/sustained gates
+remain pending independently of safe source, host, shader and desktop work.
