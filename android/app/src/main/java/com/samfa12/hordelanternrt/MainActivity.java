@@ -4635,6 +4635,7 @@ public class MainActivity extends Activity {
             case "dust-box-oblique": return 157;
             case "dust-ellipsoid": return 158;
             case "dust-box-wall": return 159;
+            case "player-torch-parry-clearance": return 160;
             default: return -1;
         }
     }
@@ -4845,6 +4846,7 @@ public class MainActivity extends Activity {
             case 157: return new float[]{0.06f, 0.14f};
             case 158: return new float[]{-1.5707963f, 0.14f};
             case 159: return new float[]{0.70f, -0.08f};
+            case 160: return new float[]{-1.561293f, -0.04f};
             default: return null;
         }
     }

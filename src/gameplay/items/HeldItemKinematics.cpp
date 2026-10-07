@@ -531,13 +531,15 @@ HeldSwordPose EvaluateHeldSwordPose(const PlayerCombatSnapshot& playerCombat,
         break;
     }
     const std::array<float, 3u> parryHand{{
-        (bulkyLeftHandCarry ? 0.08f : -0.16f) + 0.055f * successJolt,
+        (bulkyLeftHandCarry ? 0.08f : 0.0f) + 0.055f * successJolt,
         -0.29f + 0.025f * successJolt,
         std::min(heldPropDepth, 0.90f)}};
-    // With the lantern carried, keep the guard/forearm on the sword side.
-    // A more upright blade retains a similar blocking tip position without
-    // driving the right hand through the low left arm. The lantern stays put.
-    const float parryInwardRadians = bulkyLeftHandCarry ? -0.28f : -0.62f;
+    // Keep the right guard/gauntlet clear of the torch as well as the lantern.
+    // Centre the torch-carry guard and make the blade slightly more upright,
+    // retaining its blocking reach in portrait without crossing the left hand.
+    // This shared grip moves the rig and prop together; neither off-hand carry
+    // nor combat timing needs an offset or a different window.
+    const float parryInwardRadians = bulkyLeftHandCarry ? -0.28f : -0.42f;
 
     HeldSwordPose pose;
     for (std::size_t axis = 0u; axis < pose.rightHandLocal.size(); ++axis)

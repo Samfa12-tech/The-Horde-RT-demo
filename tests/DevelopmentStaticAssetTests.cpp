@@ -65,10 +65,25 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 60u,
-          "development registry retains all prior views and admits three scoped guard-room samples");
-    Check(FindDevelopmentCheckpoint(160) == nullptr,
-          "development lookup rejects IDs beyond the admitted dust and guard-room samples");
+    Check(kDevelopmentCheckpoints.size() == 61u,
+          "development registry retains prior views and admits the scoped torch-parry sample");
+    Check(FindDevelopmentCheckpoint(161) == nullptr,
+          "development lookup rejects IDs beyond the admitted samples");
+    const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");
+    simulation::GameSimulation stagedTorchParry;
+    DevelopmentCheckpointStageEvidence torchParryEvidence{};
+    Check(torchParry != nullptr && torchParry->id == 160 &&
+              FindDevelopmentCheckpoint(160) == torchParry &&
+              FindShowcaseCheckpoint("player-torch-parry-clearance") == nullptr &&
+              torchParry->baseShowcaseCheckpointId == 2 && !torchParry->stagesWaterfallGuards &&
+              !torchParry->usesProductionRewardProps && !torchParry->usesGlassFixture &&
+              StageDevelopmentCheckpointSimulation(stagedTorchParry, *torchParry, &torchParryEvidence) &&
+              stagedTorchParry.Snapshot().playerCombat.action == PlayerCombatAction::ParryActive &&
+              stagedTorchParry.Snapshot().interaction.heldLightKind == interactions::HeldLightKind::Torch &&
+              torchParryEvidence.actionTime >= 0.10f && torchParryEvidence.consumedParryEdges == 1u &&
+              torchParryEvidence.consumedAttackEdges == 0u &&
+              torchParryEvidence.playerDamagedEvents == 0u && stagedTorchParry.Events().Empty(),
+          "torch-parry capture consumes one real shared command and freezes ordinary torch carry without encounter/reward overrides");
     for (int index = 0; index < 3; ++index)
     {
         const std::array<std::string_view, 3> names{

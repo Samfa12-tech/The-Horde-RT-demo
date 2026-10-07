@@ -58,7 +58,7 @@ struct DevelopmentCheckpoint
     std::uint32_t waterfallGuardFixedTicks = 0u;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 60u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 61u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -242,6 +242,10 @@ inline constexpr std::array<DevelopmentCheckpoint, 60u> kDevelopmentCheckpoints{
     {157, "dust-box-oblique", 0, 0.10f, -0.25f, 0.06f, 0.14f},
     {158, "dust-ellipsoid", 2, -3.85f, -15.20f, -1.57079632679f, 0.14f},
     {159, "dust-box-wall", 0, 0.0f, -0.25f, 0.70f, -0.08f},
+    // Real shared parry at the owner-reported waterfall stance, without the
+    // separate encounter/equipment seed used by the staged guard previews.
+    {160, "player-torch-parry-clearance", 2, 0.495964f, -15.143019f, -1.561293f, -0.04f,
+     DevelopmentCombatPose::ParryActive},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)

@@ -681,8 +681,8 @@ void TestSharedKinematicsOwnsWallDepthHandsAndSwordPose()
     Check(Near(loweredAndParrying.leftHandLocal[0], -0.36f) &&
               Near(loweredAndParrying.leftHandLocal[1], -0.92f) &&
               Near(loweredAndParrying.leftHandLocal[2], 0.27f) &&
-              Near(loweredAndParrying.rightHandLocal[0], -0.16f) &&
-              Near(loweredAndParrying.swordRadians, -0.62f),
+              Near(loweredAndParrying.rightHandLocal[0], 0.0f) &&
+              Near(loweredAndParrying.swordRadians, -0.42f),
           "torch lowering and sword parry must share the authored hand-target evaluator");
 }
 
@@ -1556,6 +1556,16 @@ public:
         if (nodes_.empty()) return std::numeric_limits<float>::max();
         float bestSquared = std::numeric_limits<float>::max();
         Query(0u, triangle, bestSquared);
+        return std::sqrt(bestSquared);
+    }
+
+    // Test-only bounded clearance query. Distances outside the requested
+    // envelope return the cap, which is a lower bound rather than an exact
+    // global distance; intersections and closer surfaces retain exact queries.
+    float DistanceCapped(const MeshTriangle& triangle, const float cap) const
+    {
+        float bestSquared = cap * cap;
+        if (!nodes_.empty()) Query(0u, triangle, bestSquared);
         return std::sqrt(bestSquared);
     }
 
@@ -4250,6 +4260,127 @@ void TestFullScabbardMeshFitsAnimatedPlayerAndRouteFloor()
           "full authored sheath triangles must clear the skinned body and route floor while the right hand releases on Idle/Walking yaw sweeps");
 }
 
+// Actual triangle/edge intersection and surface distance, using the production
+// rig and both imported props. No screen-space or hand-centre proxy.
+void TestParryTorchMeshClearance()
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::items;
+    using namespace horde::vulkan::raytracing;
+    using namespace horde::scene::assets;
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    StaticMeshAsset sword, legacyTorch, torch, player;
+    AssetManifest manifest;
+    PlayerRenderSlot rig;
+    std::string diagnostic;
+    const auto directory = root / "assets/models/player/runtime";
+    if (!LoadProductionHeldAssets(sword, legacyTorch, diagnostic) ||
+        !LoadPlayerRagTorch(torch, diagnostic) ||
+        !AssetManifest::Load(directory / "asset.manifest.json", manifest, diagnostic) ||
+        !StaticMeshAsset::Load(directory / "gothic-traveller-lod0.runtime.glb", manifest, player, diagnostic) ||
+        !rig.LoadAsset((directory / "gothic-traveller-lod0.runtime.glb").string(), diagnostic) ||
+        !rig.ValidateStaticVertexLayout(player, diagnostic))
+    { Check(false, "parry clearance must load actual compatible rig and prop triangles"); return; }
+    const auto triangles = [&](const StaticMeshAsset& asset, const HeldItemTransform& transform,
+                               const int filter) {
+        std::vector<MeshTriangle> result;
+        for (const auto& primitive : asset.primitives)
+        {
+            const auto& material = asset.materials[primitive.materialIndex].name;
+            if (filter == 2 && material != "BodyPrimaryVisible" && material != "GauntletPrimaryVisible") continue;
+            for (std::uint32_t offset=0; offset<primitive.indexCount; offset+=3)
+            {
+                std::array<std::array<float,3>,3> points{};
+                bool admitted = true;
+                for (std::size_t corner=0; corner<3; ++corner)
+                {
+                    const auto index = primitive.vertexOffset + asset.indices[primitive.indexOffset+offset+corner];
+                    const auto& bind = asset.vertices[index].position;
+                    if (filter == 1 && bind[1] > 0.35f) admitted = false;
+                    // Anatomical Right is model -X in the authored bind pose.
+                    // Select actual complete sleeve/gauntlet triangles, even
+                    // when the solved right arm crosses the body centre.
+                    if (filter == 2 && bind[0] >= 0.0f) admitted = false;
+                    std::array<float,3> posed{{bind[0],bind[1],bind[2]}};
+                    if (filter == 2)
+                    {
+                        const auto& skinned = rig.UniqueVertices().at(index).position;
+                        posed = {{skinned[0],skinned[1],skinned[2]}};
+                    }
+                    points[corner] = TransformPoint(transform, posed);
+                }
+                if (!admitted) continue;
+                MeshTriangle triangle;
+                triangle.a=points[0]; triangle.b=points[1]; triangle.c=points[2];
+                for (const auto& point : points) IncludePoint(triangle.bounds, point);
+                triangle.center=Scale(Add(Add(triangle.a,triangle.b),triangle.c),1.0f/3.0f);
+                result.push_back(triangle);
+            }
+        }
+        return result;
+    };
+    const auto clearance = [](const TriangleBoundsTree& tree, const auto& triangles) {
+        BladeTriangleDistance result;
+        result.metres = 0.06f;
+        result.trianglesQueried = triangles.size();
+        for (const auto& triangle : triangles)
+            result.metres = std::min(result.metres, tree.DistanceCapped(triangle, result.metres));
+        return result;
+    };
+    struct ParrySample { PlayerCombatAction action; float time; bool successful = false; };
+    std::uint64_t tick=1;
+    for (const float lowered : {0.0f,1.0f})
+        for (const auto& phase : std::array<ParrySample,6>{{
+                {PlayerCombatAction::ParryStartup,0.0f},
+                {PlayerCombatAction::ParryStartup,0.04f},
+                {PlayerCombatAction::ParryActive,0.05f},
+                {PlayerCombatAction::ParryRecovery,0.04f},
+                {PlayerCombatAction::ParryRecovery,0.12f},
+                {PlayerCombatAction::ParryActive,0.05f,true}}})
+        {
+            HeldItemFixedStepInput input;
+            input.playerX=.495964f; input.playerZ=-15.143019f;
+            input.playerYawRadians=-1.561293f; input.playerPitchRadians=-0.04f;
+            input.walkTime=5.950023f; input.torchFailure.heldByPlayer=true;
+            input.torchFailure.leftArmLowerBlend=lowered;
+            input.playerCombat.action=phase.action; input.playerCombat.actionTime=phase.time;
+            if (phase.successful)
+            {
+                input.playerCombat.reaction=CombatReaction::Parried;
+                input.playerCombat.reactionTime=0.12f;
+            }
+            const auto swordState=MakeHeldItemState(HeldItemId::Sword,HeldHand::RightHand);
+            HeldItemTransform hips{},stow{},grip{},desiredGrip{},desiredItem{};
+            std::array<float,3> playerRoot{};
+            HeldItemStates rendered;
+            if (!ResolveProductionSwordStowPose(input,swordState,rig,tick++,hips,stow,grip,
+                    desiredGrip,desiredItem,playerRoot,rendered,diagnostic))
+            { Check(false,"parry clearance must solve actual shared hand/item pose"); return; }
+            const auto basis=BuildPlayerModelWorldBasis(
+                {{std::cos(input.playerYawRadians),0,std::sin(input.playerYawRadians)}},
+                {{std::sin(input.playerYawRadians),0,-std::cos(input.playerYawRadians)}});
+            HeldItemTransform worldFromPlayer=IdentityHeldItemTransform();
+            for (std::size_t axis=0; axis<3; ++axis)
+            {
+                worldFromPlayer[axis]=basis.modelXInWorld[axis];
+                worldFromPlayer[4+axis]=basis.modelYInWorld[axis];
+                worldFromPlayer[8+axis]=basis.modelZInWorld[axis];
+                worldFromPlayer[12+axis]=playerRoot[axis];
+            }
+            auto torchTriangles = triangles(torch,rendered[0].worldFromItem,0);
+            if (torchTriangles.empty())
+            { Check(false,"parry clearance must admit actual torch surface triangles"); return; }
+            const TriangleBoundsTree torchTree(std::move(torchTriangles));
+            const auto hilt = clearance(torchTree,triangles(sword,rendered[1].worldFromItem,1));
+            const auto arm = clearance(torchTree,triangles(player,worldFromPlayer,2));
+            std::cout << "parry actual mesh clearance lower=" << lowered << " action=" << int(phase.action)
+                      << " time=" << phase.time << " successful=" << phase.successful << " hilt=" << hilt.metres << " arm=" << arm.metres
+                      << " cap=0.06m triangles=" << hilt.trianglesQueried << '/' << arm.trianglesQueried << '\n';
+            Check(hilt.trianglesQueried>0 && arm.trianglesQueried>0 && hilt.metres>=0.025f && arm.metres>=0.015f,
+                  "parry hilt and actual right sleeve/gauntlet must clear the held Rag torch");
+        }
+}
+
 void TestSwordOverheadClearanceUsesImportedBladeAcrossCombatPhases()
 {
     using namespace horde::gameplay;
@@ -4535,6 +4666,11 @@ int main(const int argc, char** argv)
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 #endif
+    if (argc > 1 && std::string(argv[1]) == "--parry-torch-clearance")
+    {
+        TestParryTorchMeshClearance();
+        return failures == 0 ? 0 : 1;
+    }
     if (argc > 1 && std::string(argv[1]) == "--combat-inner-range-cone")
     {
         TestWalkingCombatRangeCone(true);
@@ -4593,6 +4729,7 @@ int main(const int argc, char** argv)
     TestActualRigSwordBodyStowAndContinuousDrawBlend();
     TestActualRigSwordSheathReachesGripBeforeAttachmentThenReleases();
     TestFullScabbardMeshFitsAnimatedPlayerAndRouteFloor();
+    TestParryTorchMeshClearance();
     TestCombatPulseAgainstImportedSwordAndSkeletonBounds();
     TestSwordOverheadClearanceUsesImportedBladeAcrossCombatPhases();
     if (failures == 0)
