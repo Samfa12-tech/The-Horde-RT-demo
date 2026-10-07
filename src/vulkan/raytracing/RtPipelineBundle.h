@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vulkan/raytracing/RtGpuResources.h"
+#include "vulkan/raytracing/RtCompiledPipelineCache.h"
 #include "vulkan/raytracing/RtPipelineBundleContracts.h"
 
 #include <array>
@@ -10,6 +11,11 @@
 #include <vulkan/vulkan.h>
 
 namespace horde::vulkan::raytracing {
+
+using RtBundleCompiledPipelineCache =
+    RtCompiledPipelineCache<VkPipeline, VkPipelineLayout, VkDescriptorSetLayout>;
+using RtBundleCompiledPipelineObjects = RtBundleCompiledPipelineCache::Objects;
+using RtBundleCompiledPipelineLease = RtBundleCompiledPipelineCache::Lease;
 
 enum class RtPipelineOwnedBuffer {
     OpaqueFastSbt,
@@ -78,6 +84,17 @@ struct RtPipelineBundleBuildApi {
                               std::array<VkStridedDeviceAddressRegionKHR, 4u>&,
                               std::string&) = nullptr;
 
+    // Optional owner-thread cache hooks. Borrow returns true only with a valid
+    // lease and all four handles populated; false leaves both outputs empty.
+    // Publish returns true only after the cache owns the candidate and a lease
+    // has been acquired. False leaves the candidate caller-owned and lease empty.
+    bool (*borrowCompiledObjects)(void*, const RtPipelineBundlePreflight&,
+                                 RtBundleCompiledPipelineLease&,
+                                 RtBundleCompiledPipelineObjects&) = nullptr;
+    bool (*publishCompiledObjects)(void*, const RtPipelineBundlePreflight&,
+                                   RtBundleCompiledPipelineObjects&,
+                                   RtBundleCompiledPipelineLease&) = nullptr;
+
     [[nodiscard]] bool Complete(
         horde::vulkan::RtExecutionBackend executionBackend =
             horde::vulkan::RtExecutionBackend::RayTracingPipeline) const noexcept;
@@ -100,6 +117,12 @@ public:
 
     [[nodiscard]] bool HasSelection() const noexcept { return selected_; }
     [[nodiscard]] bool HasLiveResources() const noexcept;
+    [[nodiscard]] bool UsesCachedPipelines() const noexcept {
+        return static_cast<bool>(compiledPipelineLease_);
+    }
+    [[nodiscard]] bool ReusedCompiledPipelines() const noexcept {
+        return reusedCompiledPipelines_;
+    }
     [[nodiscard]] const RtPipelineBundleRequest& Request() const noexcept { return preflight_.request; }
     [[nodiscard]] const RtDescriptorIoContract& DescriptorIo() const noexcept {
         return preflight_.descriptorIo;
@@ -135,6 +158,8 @@ private:
     RtPipelineBundlePreflight preflight_{};
     std::array<RtStrategyPipelineResources, 2u> strategies_{};
     RtPipelineBundleDestroyApi destroyApi_{};
+    RtBundleCompiledPipelineLease compiledPipelineLease_{};
+    bool reusedCompiledPipelines_ = false;
     RtDiagnosticAvailability diagnosticAvailability_ =
         RtDiagnosticAvailability::Unavailable;
     bool selected_ = false;
