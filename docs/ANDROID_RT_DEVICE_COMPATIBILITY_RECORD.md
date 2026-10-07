@@ -2,6 +2,51 @@
 
 Last updated: 2026-10-08
 
+## 8 October completed torch step-back — SM-S948B / Android 16
+
+Evidence class: **exact Debug physical-device package, synthetic ordinary-axis
+route and owning completed RT frame/image/upload evidence**. Source
+`853d31f293f8593e2f74ed325ce4ef1542019139`, Debug APK SHA-256
+`4bc47c2457a550f4c4fedfb1f24cdbc4262833df8d5efa88d1c40b73233cee65`,
+138,462,724 bytes; installed base matches. The observer now reaches the existing
+step-back endpoint and settles before completing. Genuine Pipeline and required
+hardware RayQueryCompute pass 200/210 exact state/completed-frame rows, 12/13
+images, all ten milestones, fixed dropped world attachment and removal of the
+torch light from all released packed uploads. Final zero-axis endpoint tails
+span 21/23 actual simulation ticks, joined to the final images. Preferences
+remain unchanged and owned apps stop. Saved 50%/Mobile water+fire/Glass On/
+Current/cap30/Mist On, output 1440x2980 and trace 720x1490 are unchanged;
+fresh/reset Glass Off is preserved.
+
+The route remains explicitly Debug, checkpoint-seeded and damage-disabled.
+Intrusive completed-frame readbacks do not certify sustained FPS or touch
+latency. The dropped floor silhouette is still hard to distinguish in selected
+final images. [Exact artifacts, earlier results, private-checker failures and
+visual limits](ENGINEERING_1_6_2_TORCH_DRENCH_2026_10_08.md). Owner acceptance,
+world shadow/reflection inspection and the integrated quality comparison remain
+open; no broader model/SoC claim is added.
+
+## 8 October automatic Rag torch failure — SM-S948B / Android 16
+
+Evidence class: **exact Debug physical-device package, synthetic ordinary-axis
+route and owning completed RT frame/image/upload evidence**. Source
+`408126d4bc2c36d7c5511079d5a9cf6079a664c4`, Debug APK SHA-256
+`95e12236a352f1c2635ae0dc3b8a2ad4c02b047bdc40b07bf3296c716cda215c`,
+138,462,724 bytes; installed base hash matches. Both genuine Pipeline and
+required hardware RayQueryCompute pass the existing automatic gutter/release/
+fall/settle sequence with 165/169 state/completed-frame rows and 12/13 images.
+All released rows lose the held-light slot and have zero flame; stable torch
+light ID 1 is absent from their packed RT uploads. Settled world item position
+stays fixed while the player moves and changes view. Preferences remain unchanged
+and owned apps stop. The explicit Debug route seeds checkpoint 2 and disables
+damage; intrusive readbacks do not certify full-route combat or sustained FPS.
+
+[Exact artifacts, phase/event timing and retained failures](ENGINEERING_1_6_2_TORCH_DRENCH_2026_10_08.md).
+The dropped torch is not clearly resolved on the dark floor in selected phone
+images. Floor silhouette, moving hands/body, shadows/reflections and owner
+visual/audio/haptic/comfort acceptance remain open. This adds no device/SoC
+compatibility or sustained performance claim.
+
 ## 8 October multi-pointer controls — SM-S948B / Android 16
 
 Evidence class: **exact Debug physical-device package, guarded synthetic touch

@@ -1,5 +1,48 @@
 # Horde Lantern RT 1.6.2 development notes
 
+**8 October completed step-back inspection:** source
+`853d31f293f8593e2f74ed325ce4ef1542019139`, tree
+`1337cc77fe71ef88e1ca8dae94a173e442326dea`; Debug APK SHA-256
+`4bc47c2457a550f4c4fedfb1f24cdbc4262833df8d5efa88d1c40b73233cee65`
+(138,462,724 bytes), installed base matches. Windows Debug executable SHA-256
+`ab5588c8476d6a32ee5c0ca83300bc7fb55eedb8fe092a5b33364986c6f5f141`
+(11,347,968 bytes), built without a new physical Windows moving pass.
+Both phone backends pass the revised ordinary step-back/floor inspection:
+200/210 exact state/completed-frame rows, 12/13 images, unchanged preferences
+and stopped apps. The dropped torch remains hard to distinguish on the dark
+floor; this is an open visual gate. Affected host/native and four-ABI Debug
+build checks pass. Earlier unsigned Release, lint, input and route evidence
+retain their exact identities below. [Torch follow-up evidence](ENGINEERING_1_6_2_TORCH_DRENCH_2026_10_08.md).
+The isolated min33 benchmark is prepared but not installed or measured;
+[quality measurements](ENGINEERING_1_6_2_MOBILE_QUALITY_MEASUREMENTS.md) retain
+fresh 50% and the separate historical 75% baseline. No final candidate,
+owner acceptance, sustained-performance, independent-audit or release claim.
+Source push `37672017419` passes six jobs; PR `37672026461` records five
+successes and one cancelled MSVC job after 97/97 CTests passed, before later
+asset checks completed. The host job budget becomes a bounded 15 minutes;
+checks and runtime ACK deadlines are unchanged. Later CI is separate.
+
+**8 October torch failure follow-up:** immutable phone inspection source
+`408126d4bc2c36d7c5511079d5a9cf6079a664c4`, tree
+`ac940653a42a9b4fb2fad8294563049cc2a37d01`. Debug APK SHA-256
+`95e12236a352f1c2635ae0dc3b8a2ad4c02b047bdc40b07bf3296c716cda215c`
+(138,462,724 bytes); installed base matches. Both phone RT backends pass the
+existing automatic drench/drop world-ownership and packed-light removal checks,
+with 165/169 exact state/completed-frame rows, 12/13 images, unchanged preferences
+and stopped apps. Host cadence/pause/interruption/ledger checks, Windows/Android
+builds and lint pass; source CI is twelve successful jobs in `37666426492` /
+`37666434171`. Actual four-ABI unsigned Release excludes the added Debug markers,
+SHA-256 `114c031016eb93075e0cbc0917ae308a2db719ce5132853a94292be335fe04f7`
+(120,007,832 bytes). Windows launcher follow-up source
+`7a628fe6e9143c3d6ea2f2bca44ec12a10b22002`, executable SHA-256
+`0a7c368919cadd46a618c8aeff0ed88c82fd3bb893d89d92ba618203e5d74cc4`,
+passes its reproduced admission regression, but actual native inspection fails
+foreground arming and has no motion captures. The dropped floor silhouette is
+not clearly resolved in selected phone images. [Exact evidence and retained
+failures](ENGINEERING_1_6_2_TORCH_DRENCH_2026_10_08.md). This remains an inspection
+checkpoint; owner visual/audio/haptic/comfort, production equipment/contact,
+sustained performance, final review candidate and independent audit remain open.
+
 **8 October input follow-up:** immutable inspection runtime
 `7368e2c72099c47548076981f313f832de4e83f0`, tree
 `56c1e8b0a1dfdb5e0397287532506ab571301ae0`. Debug APK SHA-256

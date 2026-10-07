@@ -1,14 +1,69 @@
 # 1.6.2 bounded mobile quality measurements
 
-The isolated ShippingMobile benchmark provides experimental 33% and 40% choices for measurement. These results do not promote either choice into ordinary gameplay: the ordinary minimum remains 50%, the default remains 75%, and UI resolution is unchanged. Sustained 30 FPS at fixed 75% and the earlier near-60 recollection remain unmet or unproven.
+Current authority, 8 October: fresh/reset Android defaults are **50%, Mobile
+water/fire, Glass Off, Current shadows, cap30 and Mist On**. Desktop stays
+100%/High water+fire/Glass On/Current/cap30/Mist On. Saved/custom preferences
+remain authoritative. The ordinary minimum remains 50%; native UI resolution
+is unchanged. The owner's target is practical sustained 30 FPS at an accepted
+profile, with a same-device/backend/output/integrated-route 50/40/33 comparison
+and an explicit owner decision. No 33% default or acceptance is inferred.
 
-## Exact current artifact and workload
+The numerical 75%, 50%, 40% and 33% results below describe their historical
+artifacts and workloads. Their then-default 75% and fixed-75% target do not
+override the current goal. Historical sustained fixed-75% performance and the
+earlier near-60 recollection remain unmet or unproven; they are preserved
+separately from the current target.
+
+## 8 October preparation and pacing-method limits
+
+An isolated four-ABI ShippingMobile benchmark package is prepared at source
+`7a628fe6e9143c3d6ea2f2bca44ec12a10b22002`, SHA-256
+`6102925dde3ced29b2f54d103e221d8d41400f2da294c2f1679bb6fd83654446`,
+120,028,712 bytes. Build passes in 1 minute 57 seconds. Actual native build
+models, resolved caches and compile definitions admit min33 only through the
+explicit benchmark opt-in; ordinary minimum/fresh default remain 50%. All four
+actual stripped payloads match the package, diagnostic drench/input markers are
+absent, closed assets and 16 KiB alignment pass. The non-debuggable `.benchmark`
+package uses the Android Debug development certificate, without production
+signing. It is **not installed or performance-tested**. Production stow/waterfall
+flags remain off; it is not the final integrated quality-comparison subject.
+
+The existing in-app showcase benchmark has one warmup and one measured lap,
+13 waypoints and 1,838 owning measured rows. Its CPU whole-frame cycle and GPU
+RT distributions, accepted presents and trace extents are useful exact-workload
+facts. They are not live-input, compositor/display intervals, sustained free
+play, or a substitute for expensive combat/Keeper/reward overlap. The original
+timing definitions stay unchanged. The existing historical memory collector's
+strict 75% identity is not silently repurposed for a 50/40/33 cohort. Existing
+thermal/governor fields do not provide watts; earlier battery-current access
+was denied, without a permission or security workaround.
+
+A read-only owned native SurfaceView pacing feasibility probe uses the earlier
+exact `408126d4` Debug APK, with package/PID/foreground guards and unchanged
+preferences. Two initial attempts retain their layer-selector failures. The
+third identifies the actual Android 16 `RequestedLayerState` surface name and
+queries that exact layer four times. Every latency response contains only the
+8,333,332 ns display-period header, **no timestamp triples and zero valid actual
+present samples**. There is no FPS result; nominal display refresh is not the
+game's displayed frame rate. Owned apps stop. No counter clear, TimeStats
+enable/disable, screen recording, resolution or system-setting change occurs.
+
+[Android's frame-rate measurement guidance](https://developer.android.com/games/optimize/framerate)
+describes per-layer TimeStats present-to-present histograms. A later read-only
+dump finds historical Debug Activity/splash statistics, without a new owned
+native SurfaceView sample. Those counters are not this run's RT frame cadence.
+Prior collection is preserved without global clearing or changing its state.
+Actual usable native presentation pacing, sustained thermals, reliable power/
+memory and the controlled integrated comparison therefore remain open. Closed
+selective-opacity, Lower-indirect and mirror-to-stone negatives are not rerun.
+
+## Historical exact artifact and workload
 
 Runtime source is `95eb08070354d4b3b775e6d2368cca8688f9cfe6`; the installed, pulled-back benchmark APK SHA256 is `269ac11a129cf66b8f170bceb3b5b77670aa567480faec4764e5ab0322367790`. SM-S948B/Android16 used genuine RayTracingPipeline/MAILBOX, ShippingMobile O2/NDEBUG, Mobile water/fire/dielectrics and Glass On. Presentation extent was 1440x2980. The exact selected opaque/generic module hashes are `cbbea6b92696ee710a34fa6d15a579a7b9c67a2f737716dea87861b6bd3f0cc5` and `4f60824853e357bfab745b124613377c0db6afda268d467ad7de95108f4e81a9`.
 
 Each ordinary UI-started showcase route completed one warmup lap and one measured lap over 13 waypoints per lap (26 visits total). Each summary has 1,838 expected/completed/CPU-accepted/GPU-valid owning rows; rejected, cancelled, outstanding and GPU-unavailable populations are zero. CPU cycle measures completed owning render-entry-through-present; GPU measures completed owning RT duration. Neither is display scanout FPS or a sustained free-play benchmark.
 
-| Current ordered route | Internal extent | CPU cycle median / p95, ms | GPU RT median / p95, ms | Battery temperature start -> end |
+| Historical ordered route | Internal extent | CPU cycle median / p95, ms | GPU RT median / p95, ms | Battery temperature start -> end |
 | --- | --- | --- | --- | --- |
 | 40% | 576x1192 | 28.634323 / 37.904479 | 18.486874 / 26.648437 | 43.8 -> 43.3 C |
 | 33% | 475x983 | 24.065652 / 30.603333 | 13.728281 / 19.448125 | 43.9 -> 43.5 C |
@@ -21,7 +76,7 @@ The reviewed literal summaries are 10,310 bytes at 40% (SHA256 `96efa605a0ea4e4f
 
 After a 20-second preview warmup with a 30 Hz menu cap, actual settled Details reported:
 
-| Current Materials preview | Successful RT presents/s | CPU loop/render, ms | GPU RT, ms | Graph transitions |
+| Historical Materials preview | Successful RT presents/s | CPU loop/render, ms | GPU RT, ms | Graph transitions |
 | --- | --- | --- | --- | --- |
 | 40% | 15.1 | 66.19 | 63.13 | 0 |
 | 33% | 23.1 | 43.30 | 40.92 | 0 |

@@ -4,7 +4,38 @@ Updated 8 October 2026. Authority: the owner's `Horde-1.6.2-after-reset-goal.txt
 
 ## Preserved completed evidence
 
-Current immutable input-inspection runtime
+Current immutable torch-inspection follow-up
+`853d31f293f8593e2f74ed325ce4ef1542019139` waits for the ordinary step-back
+endpoint and stationary inspection before completion. Both phone RT backends
+pass 200/210 exact state/completed-frame rows and 12/13 images, including fixed
+settled world ownership, held-light loss and packed-light removal. Preferences
+remain unchanged and apps stop. Affected builds and host tests pass; the dropped
+torch still is not clearly resolved in selected final images. The isolated
+min33 benchmark package is prepared, without installation or a new performance
+comparison; [current quality authority and measurement limits](ENGINEERING_1_6_2_MOBILE_QUALITY_MEASUREMENTS.md)
+preserve fresh 50% and the separate historical 75% baseline.
+Source push `37672017419` passes all six jobs; PR `37672026461` has five
+successes and one cancelled MSVC job after all 97 CTests passed. The overall
+ten-minute job deadline interrupted a later asset check, which remains
+uncertified for that run. A bounded 15-minute host job budget preserves every
+required check and all runtime acknowledgements/timeouts.
+
+Earlier immutable torch-inspection runtime
+`408126d4bc2c36d7c5511079d5a9cf6079a664c4` observes the existing automatic
+drench/release/fall/settle on both phone RT backends, with 165/169 exact
+state/completed-RT rows and 12/13 images. The held-light loss, fixed settled
+world attachment and removal of stable torch light ID 1 from packed RT uploads
+pass. Preferences remain unchanged and owned apps stop. Affected host tests,
+Windows/Android builds, lint and all twelve source CI jobs pass. Selected phone
+images do not clearly resolve the dropped torch on the dark floor; that visual
+gate remains open. Windows launcher follow-up `7a628fe6` passes its reproduced
+admission regression, while its actual native inspection fails foreground
+arming and provides no motion images. [Exact artifacts, failures and
+limits](ENGINEERING_1_6_2_TORCH_DRENCH_2026_10_08.md). Its CI retains eleven
+successful jobs and one cancelled push Vulkan dependency-installation job;
+the cancellation is not promoted to a pass.
+
+Earlier immutable input-inspection runtime
 `7368e2c72099c47548076981f313f832de4e83f0` adds the explicit Debug consumed-input
 observer and fixes Dodge remaining hidden after native warm-up. The regression
 fails before the fix; all 177 Android tests in 30 classes, Debug/unsigned Release
@@ -53,13 +84,13 @@ that package and do not close moving contact, owner acceptance or sustained FPS.
 | Combat contact/edge timeline and parry presentation | Measured timeline/parry presentation `a7b500bb`, timestamped edge scheduling and input/tick/pose/presentation trace `1c3909b4`; imported idle-blade contact samples corrected in `ab69537a`, with affected Keeper checks passing on both phone backends | Moving-target contact/range/cone calibration, physical latency and owner feel. Host timing tests cover 15/30/60/120 FPS, hitches and late catch-up parry misses; damage timing requires owner audio/haptic revalidation |
 | Native actions and three original hearts | Press-down Swing/Parry/Dodge and original native hearts committed in `b76ce0e6`; `7368e2c7` fixes warm-up Dodge visibility, passes 177/177 Android tests in 30 classes and the combined 32-case diagonal synthetic touch matrix on both physical phone RT backends. Earlier `ab69537a` active-draw Home evidence remains separate | Manual touch/latency/comfort, successful parry/riposte and owner visual/audio/haptic acceptance; synthetic held-touch Home/fresh Parry passes on both phone backends |
 | Sword overhead clearance | Shared blade-envelope response `0e98a8bb`; corrected Rag sockets, imported arm reach and continuous roof response `c078ad39` pass the affected host checks | Inspect actual moving grips/blade/world/shadow/reflection and integrated package/device costs |
-| Player-only rag torch | Separate production player resource committed in `40f92c6a`; provenance, closed packaging and atlas payload preservation recorded; first exact Windows RT capture and later `4e9e5bb7` moving phone low-passage attack/parry captures complete on both RT backends | Remaining moving hand/flame, drop/drench and world shadow/reflection inspection; resource/pacing costs and owner acceptance |
+| Player-only rag torch | Separate production player resource committed in `40f92c6a`; provenance, closed packaging and atlas payload preservation recorded; first exact Windows RT capture and later `4e9e5bb7` moving phone low-passage attack/parry captures complete on both RT backends. `408126d4` passes actual drench/drop world ownership and packed-light removal on both phone backends | Dropped floor silhouette is not clearly resolved in selected images; moving hands/body and world shadow/reflection inspection, Windows foreground arming, resource/pacing costs and owner acceptance remain |
 | Shared equipment and waterfall encounter | `cdcb300f` integrates phased Grip and authored Hips scabbard; corrected offline mesh/pose and socket checks pass, prior failed mounts preserved. `ab69537a` passes scoped moving warning/draw/attachment/attack/parry on both phone backends; production activation off | Intermediate draw silhouette, moving RT body/shadow/reflection and integrated route checks before enabling production flags. Same guard identities/count/stats retained |
 | Draw/sheath audio | Selected FilmCow derivatives and exact provenance admitted in `cdcb300f`; semantic attachment cues integrated in `d08d3c48` with host/Java checks. Owner-supplied licence PDF recorded | Actual attachment motion/audio timing, audibility and owner listening |
 | Compact selected menu scene | Approved brighter lantern and Play-center / More-left / Settings-right placement retained. Exact `868691fc` passes both Windows RT backends' six-pose Entry/Back/Play checks, actual phone landscape Entry and both backends' Home recovery. Earlier orientation/recreation failures remain recorded | Remaining menu cost and owner motion/audio acceptance; landscape Home/resume and physical owner rotation not established |
 | Remaining UI/loading/Graphics simplification | Native menu/loading/audio `d08d3c48`; colon labels and clear scrollbar `359a5711` pass 22 affected Java tests. [Pre-rotation `868691fc`](ENGINEERING_1_6_2_SURFACE_RECOVERY_2026_10_07.md) passes actual ready phone rotations, exact landscape Use/Restore ACK and unchanged preferences on both RT backends. `4e9e5bb7` ordinary portrait Controls/Credits/Report navigation reaches Back and preserves unchecked consent and every preference | Remaining screen/input/accessibility/loading/error checks and integrated cost; no sustained-FPS claim |
 | Glass apply latency and ordinary foreground pause work | Exact `ab69537a` passes acknowledged ordinary Menu/Settings/Back/Resume on both backends; three-minute pause and one-minute Settings process CPU are 2.84–2.97% of one logical CPU, with 49 steady native cadence intervals per backend. [Work, failed setups and sensor/memory limits](ENGINEERING_1_6_2_PAUSE_WORK_2026_10_08.md). Earlier `ecc16b82` portrait Home recovery remains separate. Driver-cache negative retained; exact d08 compiled-pair hits measure Off 0.367 s / return On 0.326 s; exact ACK/preferences preserved | Broader cache correctness and controlled sustained thermal/power benefit, distinct from live preview/background suspension; transient PSS differences unresolved, no sustained-FPS or pause memory-savings claim |
-| Phone traced 50/40/33 comparison | Reconnected SM-S948B/Android 16 has sealed four-ABI input-inspection Debug `7368e2c7`; scoped motion/Keeper/pause results retain exact `ab69537a` packages. Saved custom preferences remain unchanged. Readback/observer runs do not measure sustained FPS | Integrated play comparison on same device/backend/output/route, whole-frame/present pacing, combat/effects, Keeper/reward overlap, sustained thermals/power/memory; **owner comparison decision** |
+| Phone traced 50/40/33 comparison | Reconnected SM-S948B/Android 16 has sealed four-ABI torch-inspection Debug `408126d4`; input-inspection results retain exact `7368e2c7`, and scoped motion/Keeper/pause results retain exact `ab69537a`. Saved custom preferences remain unchanged. Readback/observer runs do not measure sustained FPS | Integrated play comparison on same device/backend/output/route, whole-frame/present pacing, combat/effects, Keeper/reward overlap, sustained thermals/power/memory; **owner comparison decision** |
 | Immutable review candidate and Eric audit | Pending integration | Exact source/package hashes, aggregate CI, affected recorded gates and independent audit; owner approval still required for release |
 
 Fresh/reset phone defaults remain 50%, Mobile water/fire, Glass Off, Current shadows, cap30, Mist On. Desktop stays 100%, High water/fire, Glass On, Current shadows, cap30, Mist On. Preserve all saved/custom settings. No silent 33% default or sustained-FPS inference from reciprocal GPU timing.
