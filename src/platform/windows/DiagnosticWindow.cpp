@@ -445,6 +445,7 @@ struct VulkanSurfaceContext
     float controllerLookVertical = 0.0f;
     WORD previousControllerButtons = 0u;
     WORD previousXInputUiButtons = 0u;
+    horde::platform::windows::ControllerFocusLatch controllerFocusLatch;
     DWORD previousLegacyControllerButtons = 0u;
     DWORD previousLegacyUiButtons = 0u;
     DWORD previousLegacyPov = JOY_POVCENTERED;
@@ -3138,6 +3139,7 @@ void ClearDesktopInput(VulkanSurfaceContext& context)
     context.controllerLookVertical = 0.0f;
     context.previousControllerButtons = 0u;
     context.previousLegacyControllerButtons = 0u;
+    context.controllerFocusLatch.LoseFocus();
     context.controllerTriggerLatch = {};
     context.xInputUserIndex.reset();
     context.legacyJoystickId.reset();
@@ -3385,6 +3387,17 @@ using XInputGetStateProc = DWORD(WINAPI*)(DWORD, XINPUT_STATE*);
 
 void PollDesktopController(VulkanSurfaceContext& context)
 {
+    const horde::platform::windows::ControllerPollDisposition pollDisposition =
+        context.controllerFocusLatch.Observe(GetForegroundWindow() == context.windowHandle);
+    if (pollDisposition == horde::platform::windows::ControllerPollDisposition::Suppress)
+    {
+        context.controllerForward = 0.0f;
+        context.controllerStrafe = 0.0f;
+        context.controllerLookHorizontal = 0.0f;
+        context.controllerLookVertical = 0.0f;
+        return;
+    }
+
     static XInputGetStateProc getState = []() -> XInputGetStateProc
     {
         for (const wchar_t* library : {L"xinput1_4.dll", L"xinput9_1_0.dll", L"xinput1_3.dll"})
@@ -3490,6 +3503,22 @@ void PollDesktopController(VulkanSurfaceContext& context)
             .productId = caps.wPid,
             .productName = caps.szPname,
         };
+        if (pollDisposition == horde::platform::windows::ControllerPollDisposition::Reseed)
+        {
+            context.legacyRightStickAxes =
+                horde::platform::windows::SelectLegacyRightStickAxes(axisSample, identity);
+            context.legacyJoystickId = joystick;
+            context.previousLegacyControllerButtons = legacy.dwButtons;
+            context.previousLegacyUiButtons = legacy.dwButtons;
+            context.previousLegacyPov = legacy.dwPOV;
+            context.controllerStrafe = 0.0f;
+            context.controllerForward = 0.0f;
+            context.controllerLookHorizontal = 0.0f;
+            context.controllerLookVertical = 0.0f;
+            context.controllerTriggerLatch = {};
+            context.controllerFocusLatch.CompleteReseed();
+            return;
+        }
         if (context.legacyJoystickId != joystick ||
             context.legacyRightStickAxes.horizontal == horde::platform::windows::LegacyAxis::None)
         {
@@ -3549,6 +3578,21 @@ void PollDesktopController(VulkanSurfaceContext& context)
     context.legacyRightStickAxes = {};
     context.previousLegacyUiButtons = 0u;
     context.previousLegacyPov = JOY_POVCENTERED;
+    if (pollDisposition == horde::platform::windows::ControllerPollDisposition::Reseed)
+    {
+        context.previousControllerButtons = state.Gamepad.wButtons;
+        context.previousXInputUiButtons = state.Gamepad.wButtons;
+        context.previousLegacyControllerButtons = 0u;
+        horde::platform::windows::SeedXInputTriggerLatch(
+            state.Gamepad.bLeftTrigger, state.Gamepad.bRightTrigger,
+            context.controllerTriggerLatch);
+        context.controllerStrafe = 0.0f;
+        context.controllerForward = 0.0f;
+        context.controllerLookHorizontal = 0.0f;
+        context.controllerLookVertical = 0.0f;
+        context.controllerFocusLatch.CompleteReseed();
+        return;
+    }
     const auto axis = [](SHORT value, SHORT deadzone)
     {
         const float magnitude = static_cast<float>(value) / 32767.0f;
@@ -7843,6 +7887,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_ACTIVATEAPP:
         if (sceneContext)
         {
+            if (wParam == FALSE) sceneContext->controllerFocusLatch.LoseFocus();
             PublishMusicPlayback(*sceneContext, wParam == FALSE);
         }
         if (sceneContext && wParam == FALSE && sceneContext->benchmark.IsRunning())
@@ -7853,6 +7898,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_ACTIVATE:
         if (sceneContext)
         {
+            if (LOWORD(wParam) == WA_INACTIVE) sceneContext->controllerFocusLatch.LoseFocus();
             PublishMusicPlayback(*sceneContext, LOWORD(wParam) == WA_INACTIVE);
         }
         break;
