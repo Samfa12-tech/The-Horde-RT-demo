@@ -2585,5 +2585,14 @@
     "kit_heard_tavern_keeper_horde_army_line": "kit_heard_horde_army",
     "evidence_soldier_records_recovered": "soldier_records_recovered",
     "evidence_current_record_inspected": "current_record_inspected"
+  },
+  "opening_acknowledgment_direction": {
+    "status": "optional_authoring_direction_not_implemented",
+    "eligibility": "existing safe wall-panel approach/pass-zone; no acknowledgment prerequisite",
+    "cue": "actual nearby player movement or footsteps audible to unseen Kit",
+    "response": "concern may soften only after a perceivable cue; no mandatory animation or dialogue",
+    "visibility": "Kit remains unseen; any optional visual variant requires validated sightline proof",
+    "missed_call": "unchanged; no remote late reaction or progression gate",
+    "later_silent_reply": "fresh player-controlled lantern raise remains distinct"
   }
 }

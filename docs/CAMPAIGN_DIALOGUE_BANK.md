@@ -316,3 +316,7 @@ Combat: no overlapping speech with critical attack telegraphs; cap boss speech a
 7. Editorial checks for this draft: distinct stable IDs, no player spoken dialogue, no pre-reward lantern possession, role/name status explicit, critical reveals recoverable, references resolve, only documentation changes.
 
 **Audio/haptic manual revalidation required: NO — documentation only.** Any later runtime/voice implementation requires its affected manual audio checks. Repository Markdown readback verifies this bank; it does not certify gameplay, performance or voice quality.
+
+## Opening performance revision 7 October 2026
+
+The expanded English bank [performance brief](dialogue/en/PERFORMANCE-DIRECTION-English-en.md) now carries Kit’s urgent, worried, edge-of-panic opening and the optional audible player-movement acknowledgment. Spoken wording and IDs are unchanged; Kit stays unseen beyond the small wall panel. Preserve the 1.7 safe pass-zone and missed-call contract, with no mandatory reply or animation. The later rescue greeting and fresh manual lantern raise remain distinct.

@@ -1,5 +1,5 @@
 THE HORDE ENGLISH DIALOGUE ARCHIVE
-Candidate v0.2 | English en
+Candidate v0.2.1 | English en
 
 The owner requested this reviewed deliverable be saved to Git. This archive contains authoring source and review material only. No generated audio, personal voice recordings, runtime integration, release or merge is included.
 
@@ -8,3 +8,5 @@ The authoritative source is Horde-Dialogue-Bank-English-en.json. README.md index
 339 core candidates, 11 decision-blocked lines and 7 optional final-boss lines are separated. All recording approvals remain false. The 13 original opening lines retain exact text and stable IDs. Future translations are scaffolded, not completed.
 
 Source document hashes identify the inspected historical baseline, before this archive's minimal continuity cross-references. Public provenance omits private conversation identifiers. PACKAGE-SHA256.json covers this archive, excluding itself.
+
+Performance revision 7 October 2026: see PERFORMANCE-DIRECTION-English-en.md for Kit’s urgent opening, optional cue-dependent acknowledgment, per-line human direction and the separate unrecorded ElevenLabs audition example. Clean spoken/subtitle text is unchanged.

@@ -1,61 +1,61 @@
-combined_line_number,line_id,spoken_text,voice_asset_path
-1,hub.record_inspect,Bring the light closer. This mark belongs to the old treasury road.,audio/voice/en/hub.record_inspect.wav
-2,hub.first_errand,"The wayside shrine kept a road register. If it survived, it may name the next stops.",audio/voice/en/hub.first_errand.wav
-3,hub.shrine_direction,Take the northern path out of Bellwether. The shrine is on a short spur beyond it.,audio/voice/en/hub.shrine_direction.wav
-4,hub.lantern_inspection,May I look at that? Keep it steady.,audio/voice/en/hub.lantern_inspection.wav
-5,hub.shrine_fallback,The old shrine has records of the treasury road. That is where I would start.,audio/voice/en/hub.shrine_fallback.wav
-6,shrine.register,The Abbey. The royal Foundry. Then the Glass Court.,audio/voice/en/shrine.register.wav
-7,hub.two_routes,We can trace the first two roads. The Court's route is still sealed.,audio/voice/en/hub.two_routes.wav
-8,hub.routes_independent,"You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.",audio/voice/en/hub.routes_independent.wav
-9,foundry.record_review,"The names continue after the dates of death. These were people, not an endless supply.",audio/voice/en/foundry.record_review.wav
-10,return.one_seal,One seal. The other road may tell us what this opens.,audio/voice/en/return.one_seal.wav
-11,return.foundry_remaining,The Foundry still holds its seal. You'll need a way across the broken bridge.,audio/voice/en/return.foundry_remaining.wav
-12,return.one_seal_foundry,One seal. The other road may tell us what this opens.,audio/voice/en/return.one_seal_foundry.wav
-13,return.abbey_remaining,The Abbey still holds its seal. Prepare for the submerged approach.,audio/voice/en/return.abbey_remaining.wav
-14,return.two_seals,Both seals fit the route mark. We can find the Glass Court now.,audio/voice/en/return.two_seals.wav
-15,court.access_options,"We can prepare a ward, ask for climbing gear, or practise the ascent. Take the way you can manage.",audio/voice/en/court.access_options.wav
-16,court.access_seals,"Whichever way you climb, take both seals. The gate will still be shut.",audio/voice/en/court.access_seals.wav
-17,court.recap_king,The king ordered the prison made. That seal is his.,audio/voice/en/court.recap_king.wav
-18,court.recap_identity,The voice is the one he bargained with. It was never the king.,audio/voice/en/court.recap_identity.wav
-19,court.recap_bond,"The soldiers and the thing in the lantern are held by the same bond. Open it, and both go free.",audio/voice/en/court.recap_bond.wav
-20,court.preparation,Bring what you've learned. The wards and shutters were built to hold its light.,audio/voice/en/court.preparation.wav
-21,court.preparation_tools,"The reflector, the stand, the aperture. Practise with them before you leave.",audio/voice/en/court.preparation_tools.wav
-22,epilogue.record,We'll write their names as people. Their service is over.,audio/voice/en/epilogue.record.wav
-23,hub.service.record.greet,Show me the inscription before you tell me what you hope it says.,audio/voice/en/hub.service.record.greet.wav
-24,hub.service.record.cancel,We can leave the reading there. The stone will keep.,audio/voice/en/hub.service.record.cancel.wav
-25,hub.service.record.insufficient,You haven’t brought what this working needs. We can still look at the inscription.,audio/voice/en/hub.service.record.insufficient.wav
-26,hub.service.record.recap,We can go through it again. Start with the part that troubles you.,audio/voice/en/hub.service.record.recap.wav
-27,access.magic_offer,"Restore the shrine’s binding, and I can teach you a ward for the crossing.",audio/voice/en/access.magic_offer.wav
-28,access.magic_task,We’ll begin with the marks at the wayside shrine. Read the whole binding before you try to mend it.,audio/voice/en/access.magic_task.wav
-29,access.magic_progress_read,Which part of the inscription is still broken? Start there.,audio/voice/en/access.magic_progress_read.wav
-30,access.magic_progress_test,A bright mark is not proof of a sound binding. Test it before you trust it.,audio/voice/en/access.magic_progress_test.wav
-31,access.magic_limit,It will buy you breath. It will not last forever.,audio/voice/en/access.magic_limit.wav
-32,access.magic_retry_rest,Stay in the clear air until you’re ready. We can try again here.,audio/voice/en/access.magic_retry_rest.wav
-33,access.magic_complete,The binding held through the trial. You can use the ward for the Abbey crossing.,audio/voice/en/access.magic_complete.wav
-34,access.magic_complete_limit,Use the places where you can breathe. The ward gets you between them.,audio/voice/en/access.magic_complete_limit.wav
-35,access.crossing_magic,Those stones carried a crossing charm. We can restore it.,audio/voice/en/access.crossing_magic.wav
-36,access.stones_task,We’ll test the near part first. No one needs to step over the gorge to begin.,audio/voice/en/access.stones_task.wav
-37,hub.access.stones.progress,The charm must carry you back as well as out. Check the return before extending it.,audio/voice/en/hub.access.stones.progress.wav
-38,hub.access.stones.retry,It didn’t hold. We stay on solid ground and read the binding again.,audio/voice/en/hub.access.stones.retry.wav
-39,access.stones_complete,The crossing holds in both directions. Take it at the pace we tested.,audio/voice/en/access.stones_complete.wav
-40,access.stones_limit,This working carries you over the gorge. Smoke inside is another matter.,audio/voice/en/access.stones_limit.wav
-41,access.smoke_magic,Keep the ward steady through the smoke. Find clean air before it fades.,audio/voice/en/access.smoke_magic.wav
-42,relic.inspect_record,"I can compare the mark with what we have. A resemblance is a reason to look, not proof.",audio/voice/en/relic.inspect_record.wav
-43,relic.sale_evidence,"The account of where it came from will remain here, whatever you choose.",audio/voice/en/relic.sale_evidence.wav
-44,relic.return_preview,"The claim is established. If you want to return the piece, we can arrange the handover.",audio/voice/en/relic.return_preview.wav
-45,relic.return_choice,Take the time you need. This has nothing to do with opening the treasury.,audio/voice/en/relic.return_choice.wav
-46,relic.return_complete,The piece is back with its claimant. I’ll record the return beside its history.,audio/voice/en/relic.return_complete.wav
-47,relic.sold_evidence,The sale didn’t erase the mark or its history. The record is still here.,audio/voice/en/relic.sold_evidence.wav
-48,tavern.preseals.bell.2,They say a good many things. I’d like to hear it for myself.,audio/voice/en/tavern.preseals.bell.2.wav
-49,tavern.oneseal.claims.2,It tells you who claimed it. Not how they came by it.,audio/voice/en/tavern.oneseal.claims.2.wav
-50,tavern.twoseals.reading.1,I’ve been checking that word again. Keeper. Jailer. The surrounding lines matter.,audio/voice/en/tavern.twoseals.reading.1.wav
-51,tavern.twoseals.reading.3,Yes. And the inscription ought to tell us which.,audio/voice/en/tavern.twoseals.reading.3.wav
-52,tavern.finale.names.1,I’m copying the names from the service records.,audio/voice/en/tavern.finale.names.1.wav
-53,tavern.finale.names.3,That’s what I’m making.,audio/voice/en/tavern.finale.names.3.wav
-54,hub.passing.churchyard,"These graves belong to Bellwether. The old burial ground is farther northwest, beyond the woods.",audio/voice/en/hub.passing.churchyard.wav
-55,hub.passing.shrine,The wayside shrine is beyond the northern edge. Stay with the path until the turn.,audio/voice/en/hub.passing.shrine.wav
-56,hub.passing.two_seals,The ridge route is open. Bring the inscriptions back if you can.,audio/voice/en/hub.passing.two_seals.wav
-57,hub.lore.histories.1,The Veyrlands were the heart of King Veyr’s realm. We’ve kept more warnings about him than useful dates.,audio/voice/en/hub.lore.histories.1.wav
-58,hub.lore.histories.2,"If you find a record, bring the context with it. A broken line can make a convincing lie.",audio/voice/en/hub.lore.histories.2.wav
-59,relic.claim_review,The mark matches the record. The claim holds.,audio/voice/en/relic.claim_review.wav
-60,return.keeper_word,"I read this as keeper of the treasury. Here, the same word means jailer.",audio/voice/en/return.keeper_word.wav
+combined_line_number,line_id,spoken_text,delivery_notes,delivery_notes_revision,voice_asset_path
+1,hub.record_inspect,Bring the light closer. This mark belongs to the old treasury road.,"Natural, unhurried and intelligible.",1,audio/voice/en/hub.record_inspect.wav
+2,hub.first_errand,"The wayside shrine kept a road register. If it survived, it may name the next stops.","Natural, unhurried and intelligible.",1,audio/voice/en/hub.first_errand.wav
+3,hub.shrine_direction,Take the northern path out of Bellwether. The shrine is on a short spur beyond it.,"Natural, unhurried and intelligible.",1,audio/voice/en/hub.shrine_direction.wav
+4,hub.lantern_inspection,May I look at that? Keep it steady.,"Natural, unhurried and intelligible.",1,audio/voice/en/hub.lantern_inspection.wav
+5,hub.shrine_fallback,The old shrine has records of the treasury road. That is where I would start.,"Natural, unhurried and intelligible.",1,audio/voice/en/hub.shrine_fallback.wav
+6,shrine.register,The Abbey. The royal Foundry. Then the Glass Court.,"Natural, unhurried and intelligible.",1,audio/voice/en/shrine.register.wav
+7,hub.two_routes,We can trace the first two roads. The Court's route is still sealed.,"Natural, unhurried and intelligible.",1,audio/voice/en/hub.two_routes.wav
+8,hub.routes_independent,"You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.","Natural, unhurried and intelligible.",1,audio/voice/en/hub.routes_independent.wav
+9,foundry.record_review,"The names continue after the dates of death. These were people, not an endless supply.","Natural, unhurried and intelligible.",1,audio/voice/en/foundry.record_review.wav
+10,return.one_seal,One seal. The other road may tell us what this opens.,"Natural, unhurried and intelligible.",1,audio/voice/en/return.one_seal.wav
+11,return.foundry_remaining,The Foundry still holds its seal. You'll need a way across the broken bridge.,"Natural, unhurried and intelligible.",1,audio/voice/en/return.foundry_remaining.wav
+12,return.one_seal_foundry,One seal. The other road may tell us what this opens.,"Natural, unhurried and intelligible.",1,audio/voice/en/return.one_seal_foundry.wav
+13,return.abbey_remaining,The Abbey still holds its seal. Prepare for the submerged approach.,"Natural, unhurried and intelligible.",1,audio/voice/en/return.abbey_remaining.wav
+14,return.two_seals,Both seals fit the route mark. We can find the Glass Court now.,"Natural, unhurried and intelligible.",1,audio/voice/en/return.two_seals.wav
+15,court.access_options,"We can prepare a ward, ask for climbing gear, or practise the ascent. Take the way you can manage.","Natural, unhurried and intelligible.",1,audio/voice/en/court.access_options.wav
+16,court.access_seals,"Whichever way you climb, take both seals. The gate will still be shut.","Natural, unhurried and intelligible.",1,audio/voice/en/court.access_seals.wav
+17,court.recap_king,The king ordered the prison made. That seal is his.,"Natural, unhurried and intelligible.",1,audio/voice/en/court.recap_king.wav
+18,court.recap_identity,The voice is the one he bargained with. It was never the king.,"Natural, unhurried and intelligible.",1,audio/voice/en/court.recap_identity.wav
+19,court.recap_bond,"The soldiers and the thing in the lantern are held by the same bond. Open it, and both go free.","Natural, unhurried and intelligible.",1,audio/voice/en/court.recap_bond.wav
+20,court.preparation,Bring what you've learned. The wards and shutters were built to hold its light.,"Natural, unhurried and intelligible.",1,audio/voice/en/court.preparation.wav
+21,court.preparation_tools,"The reflector, the stand, the aperture. Practise with them before you leave.","Natural, unhurried and intelligible.",1,audio/voice/en/court.preparation_tools.wav
+22,epilogue.record,We'll write their names as people. Their service is over.,"Natural, unhurried and intelligible.",1,audio/voice/en/epilogue.record.wav
+23,hub.service.record.greet,Show me the inscription before you tell me what you hope it says.,"precise, patient; distinguishes evidence from wishes",1,audio/voice/en/hub.service.record.greet.wav
+24,hub.service.record.cancel,We can leave the reading there. The stone will keep.,"precise, patient; distinguishes evidence from wishes",1,audio/voice/en/hub.service.record.cancel.wav
+25,hub.service.record.insufficient,You haven’t brought what this working needs. We can still look at the inscription.,"precise, patient; distinguishes evidence from wishes",1,audio/voice/en/hub.service.record.insufficient.wav
+26,hub.service.record.recap,We can go through it again. Start with the part that troubles you.,patient; no hint of annoyance,1,audio/voice/en/hub.service.record.recap.wav
+27,access.magic_offer,"Restore the shrine’s binding, and I can teach you a ward for the crossing.",measured confidence,1,audio/voice/en/access.magic_offer.wav
+28,access.magic_task,We’ll begin with the marks at the wayside shrine. Read the whole binding before you try to mend it.,careful teacher,1,audio/voice/en/access.magic_task.wav
+29,access.magic_progress_read,Which part of the inscription is still broken? Start there.,gentle redirection,1,audio/voice/en/access.magic_progress_read.wav
+30,access.magic_progress_test,A bright mark is not proof of a sound binding. Test it before you trust it.,precise; no scolding,1,audio/voice/en/access.magic_progress_test.wav
+31,access.magic_limit,It will buy you breath. It will not last forever.,explicit; let the limit land,1,audio/voice/en/access.magic_limit.wav
+32,access.magic_retry_rest,Stay in the clear air until you’re ready. We can try again here.,"steady, unembarrassed",1,audio/voice/en/access.magic_retry_rest.wav
+33,access.magic_complete,The binding held through the trial. You can use the ward for the Abbey crossing.,pleased by proof,1,audio/voice/en/access.magic_complete.wav
+34,access.magic_complete_limit,Use the places where you can breathe. The ward gets you between them.,calm emphasis,1,audio/voice/en/access.magic_complete_limit.wav
+35,access.crossing_magic,Those stones carried a crossing charm. We can restore it.,inspects surviving evidence,1,audio/voice/en/access.crossing_magic.wav
+36,access.stones_task,We’ll test the near part first. No one needs to step over the gorge to begin.,"measured, reassuring",1,audio/voice/en/access.stones_task.wav
+37,hub.access.stones.progress,The charm must carry you back as well as out. Check the return before extending it.,careful; treats a working as a whole,1,audio/voice/en/hub.access.stones.progress.wav
+38,hub.access.stones.retry,It didn’t hold. We stay on solid ground and read the binding again.,composed; welcomes evidence,1,audio/voice/en/hub.access.stones.retry.wav
+39,access.stones_complete,The crossing holds in both directions. Take it at the pace we tested.,measured confidence,1,audio/voice/en/access.stones_complete.wav
+40,access.stones_limit,This working carries you over the gorge. Smoke inside is another matter.,keeps capabilities bounded,1,audio/voice/en/access.stones_limit.wav
+41,access.smoke_magic,Keep the ward steady through the smoke. Find clean air before it fades.,clear instruction,1,audio/voice/en/access.smoke_magic.wav
+42,relic.inspect_record,"I can compare the mark with what we have. A resemblance is a reason to look, not proof.",precise,1,audio/voice/en/relic.inspect_record.wav
+43,relic.sale_evidence,"The account of where it came from will remain here, whatever you choose.",neutral; preserves history,1,audio/voice/en/relic.sale_evidence.wav
+44,relic.return_preview,"The claim is established. If you want to return the piece, we can arrange the handover.",gives a concrete option,1,audio/voice/en/relic.return_preview.wav
+45,relic.return_choice,Take the time you need. This has nothing to do with opening the treasury.,calm; does not pressure,1,audio/voice/en/relic.return_choice.wav
+46,relic.return_complete,The piece is back with its claimant. I’ll record the return beside its history.,quiet satisfaction,1,audio/voice/en/relic.return_complete.wav
+47,relic.sold_evidence,The sale didn’t erase the mark or its history. The record is still here.,steady,1,audio/voice/en/relic.sold_evidence.wav
+48,tavern.preseals.bell.2,They say a good many things. I’d like to hear it for myself.,curiosity without endorsement,1,audio/voice/en/tavern.preseals.bell.2.wav
+49,tavern.oneseal.claims.2,It tells you who claimed it. Not how they came by it.,precise distinction,1,audio/voice/en/tavern.oneseal.claims.2.wav
+50,tavern.twoseals.reading.1,I’ve been checking that word again. Keeper. Jailer. The surrounding lines matter.,troubled by evidence,1,audio/voice/en/tavern.twoseals.reading.1.wav
+51,tavern.twoseals.reading.3,Yes. And the inscription ought to tell us which.,not yet certain,1,audio/voice/en/tavern.twoseals.reading.3.wav
+52,tavern.finale.names.1,I’m copying the names from the service records.,quietly purposeful,1,audio/voice/en/tavern.finale.names.1.wav
+53,tavern.finale.names.3,That’s what I’m making.,simple resolve,1,audio/voice/en/tavern.finale.names.3.wav
+54,hub.passing.churchyard,"These graves belong to Bellwether. The old burial ground is farther northwest, beyond the woods.",clear local orientation,1,audio/voice/en/hub.passing.churchyard.wav
+55,hub.passing.shrine,The wayside shrine is beyond the northern edge. Stay with the path until the turn.,"useful, not commanding",1,audio/voice/en/hub.passing.shrine.wav
+56,hub.passing.two_seals,The ridge route is open. Bring the inscriptions back if you can.,focused anticipation,1,audio/voice/en/hub.passing.two_seals.wav
+57,hub.lore.histories.1,The Veyrlands were the heart of King Veyr’s realm. We’ve kept more warnings about him than useful dates.,"scholarly frustration, lightly held",1,audio/voice/en/hub.lore.histories.1.wav
+58,hub.lore.histories.2,"If you find a record, bring the context with it. A broken line can make a convincing lie.",practical request; no prophecy,1,audio/voice/en/hub.lore.histories.2.wav
+59,relic.claim_review,The mark matches the record. The claim holds.,"Careful conclusion after evidence, not a guess.",1,audio/voice/en/relic.claim_review.wav
+60,return.keeper_word,"I read this as keeper of the treasury. Here, the same word means jailer.",Careful correction.,1,audio/voice/en/return.keeper_word.wav

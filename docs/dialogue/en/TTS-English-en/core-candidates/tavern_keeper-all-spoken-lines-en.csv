@@ -1,30 +1,30 @@
-combined_line_number,line_id,spoken_text,voice_asset_path
-1,epilogue.welcome,You're back. Sit down. I'll find something hot.,audio/voice/en/epilogue.welcome.wav
-2,hub.service.tavern.greet,There’s room by the fire. Tell me what you need.,audio/voice/en/hub.service.tavern.greet.wav
-3,hub.service.tavern.cancel,No hurry. I’ve waited longer for a wagon to turn.,audio/voice/en/hub.service.tavern.cancel.wav
-4,hub.service.tavern.insufficient,That won’t cover a room. You’re welcome to warm up here.,audio/voice/en/hub.service.tavern.insufficient.wav
-5,hub.service.tavern.kit,Kit’s staying here to recover. I’ll keep a place clear when you get back.,audio/voice/en/hub.service.tavern.kit.wav
-6,access.foundry_problem,The Foundry bridge has gone. The old maintenance path may still reach the far side.,audio/voice/en/access.foundry_problem.wav
-7,access.foundry_alternatives,"Ask the smith about the span, the shrine keeper about the stones, or the salvager about the climb.",audio/voice/en/access.foundry_alternatives.wav
-8,hub.mill_repaired,The mill’s turning again. We can grind here instead of sending grain over the ridge.,audio/voice/en/hub.mill_repaired.wav
-9,hub.component_choice,Show them what you’d take first. Let them choose.,audio/voice/en/hub.component_choice.wav
-10,hub.trade_arrived,A wagon came through. We unloaded it together.,audio/voice/en/hub.trade_arrived.wav
-11,tavern.preseals.weight.2,So does a broken axle. Pack for the road back.,audio/voice/en/tavern.preseals.weight.2.wav
-12,tavern.preseals.bell.1,They say the bell rings some nights with no hand on the rope.,audio/voice/en/tavern.preseals.bell.1.wav
-13,tavern.preseals.bell.3,"If you do, point anyone lost toward the door. That’s what the bell was for.",audio/voice/en/tavern.preseals.bell.3.wav
-14,tavern.preseals.kit.2,"From the chair, if you like.",audio/voice/en/tavern.preseals.kit.2.wav
-15,tavern.oneseal.pack.1,"One road behind you, another still to try. I’d repack before setting out.",audio/voice/en/tavern.oneseal.pack.1.wav
-16,tavern.twoseals.ridge.1,So it’s the high ridge next. Check what you’re carrying before the climb.,audio/voice/en/tavern.twoseals.ridge.1.wav
-17,tavern.twoseals.kit.2,You can complain about it from the road when you’re well.,audio/voice/en/tavern.twoseals.kit.2.wav
-18,tavern.finale.supper.1,Something hot first. Accounts after.,audio/voice/en/tavern.finale.supper.1.wav
-19,tavern.finale.supper.3,Good. Make room.,audio/voice/en/tavern.finale.supper.3.wav
-20,tavern.finale.kit.2,Let them put the pack down.,audio/voice/en/tavern.finale.kit.2.wav
-21,hub.passing.arrival,Your friend’s settled. Come in when you’re ready.,audio/voice/en/hub.passing.arrival.wav
-22,hub.passing.trade_arrived,Good to hear wheels out there again.,audio/voice/en/hub.passing.trade_arrived.wav
-23,hub.passing.finale,You can leave the pack by your chair.,audio/voice/en/hub.passing.finale.wav
-24,hub.lore.caravan.1,"I used to lead caravans through here. You learn a road by where you can stop, not just where it ends.",audio/voice/en/hub.lore.caravan.1.wav
-25,hub.lore.caravan.2,Bellwether was a good stop. I’d like it to be one again.,audio/voice/en/hub.lore.caravan.2.wav
-26,hub.lore.bell.1,The church bell brought travellers home through the forest mist. That’s where Bellwether gets its name.,audio/voice/en/hub.lore.bell.1.wav
-27,hub.lore.bell.2,A sound you could follow when the road disappeared under your feet.,audio/voice/en/hub.lore.bell.2.wav
-28,hub.horde_army,My grandfather called the Horde an army. You treasure hunters always hear the other word.,audio/voice/en/hub.horde_army.wav
-29,hub.arrival,Shut the door behind you. Both of you look frozen.,audio/voice/en/hub.arrival.wav
+combined_line_number,line_id,spoken_text,delivery_notes,delivery_notes_revision,voice_asset_path
+1,epilogue.welcome,You're back. Sit down. I'll find something hot.,"Natural, unhurried and intelligible.",1,audio/voice/en/epilogue.welcome.wav
+2,hub.service.tavern.greet,There’s room by the fire. Tell me what you need.,brisk hospitality; former caravan leader,1,audio/voice/en/hub.service.tavern.greet.wav
+3,hub.service.tavern.cancel,No hurry. I’ve waited longer for a wagon to turn.,brisk hospitality; former caravan leader,1,audio/voice/en/hub.service.tavern.cancel.wav
+4,hub.service.tavern.insufficient,That won’t cover a room. You’re welcome to warm up here.,brisk hospitality; former caravan leader,1,audio/voice/en/hub.service.tavern.insufficient.wav
+5,hub.service.tavern.kit,Kit’s staying here to recover. I’ll keep a place clear when you get back.,"reassuring, practical",1,audio/voice/en/hub.service.tavern.kit.wav
+6,access.foundry_problem,The Foundry bridge has gone. The old maintenance path may still reach the far side.,former caravan leader; assesses routes,1,audio/voice/en/access.foundry_problem.wav
+7,access.foundry_alternatives,"Ask the smith about the span, the shrine keeper about the stones, or the salvager about the climb.",three practical options,1,audio/voice/en/access.foundry_alternatives.wav
+8,hub.mill_repaired,The mill’s turning again. We can grind here instead of sending grain over the ridge.,pleased; a caravan journey no longer needed,1,audio/voice/en/hub.mill_repaired.wav
+9,hub.component_choice,Show them what you’d take first. Let them choose.,fair dealing; respects the traveller,1,audio/voice/en/hub.component_choice.wav
+10,hub.trade_arrived,A wagon came through. We unloaded it together.,modest hope; enjoys the mundane work,1,audio/voice/en/hub.trade_arrived.wav
+11,tavern.preseals.weight.2,So does a broken axle. Pack for the road back.,caravan experience,1,audio/voice/en/tavern.preseals.weight.2.wav
+12,tavern.preseals.bell.1,They say the bell rings some nights with no hand on the rope.,familiar local story,1,audio/voice/en/tavern.preseals.bell.1.wav
+13,tavern.preseals.bell.3,"If you do, point anyone lost toward the door. That’s what the bell was for.",warm practicality,1,audio/voice/en/tavern.preseals.bell.3.wav
+14,tavern.preseals.kit.2,"From the chair, if you like.",accommodating but firm,1,audio/voice/en/tavern.preseals.kit.2.wav
+15,tavern.oneseal.pack.1,"One road behind you, another still to try. I’d repack before setting out.",route-wise,1,audio/voice/en/tavern.oneseal.pack.1.wav
+16,tavern.twoseals.ridge.1,So it’s the high ridge next. Check what you’re carrying before the climb.,old caravan habit,1,audio/voice/en/tavern.twoseals.ridge.1.wav
+17,tavern.twoseals.kit.2,You can complain about it from the road when you’re well.,warmly matter-of-fact,1,audio/voice/en/tavern.twoseals.kit.2.wav
+18,tavern.finale.supper.1,Something hot first. Accounts after.,relief expressed as hospitality,1,audio/voice/en/tavern.finale.supper.1.wav
+19,tavern.finale.supper.3,Good. Make room.,welcoming,1,audio/voice/en/tavern.finale.supper.3.wav
+20,tavern.finale.kit.2,Let them put the pack down.,"fond, brisk",1,audio/voice/en/tavern.finale.kit.2.wav
+21,hub.passing.arrival,Your friend’s settled. Come in when you’re ready.,quiet hospitality,1,audio/voice/en/hub.passing.arrival.wav
+22,hub.passing.trade_arrived,Good to hear wheels out there again.,"warm, understated",1,audio/voice/en/hub.passing.trade_arrived.wav
+23,hub.passing.finale,You can leave the pack by your chair.,ordinary welcome; enough said,1,audio/voice/en/hub.passing.finale.wav
+24,hub.lore.caravan.1,"I used to lead caravans through here. You learn a road by where you can stop, not just where it ends.",recollection grounded in approved role,1,audio/voice/en/hub.lore.caravan.1.wav
+25,hub.lore.caravan.2,Bellwether was a good stop. I’d like it to be one again.,personal stake without a new backstory,1,audio/voice/en/hub.lore.caravan.2.wav
+26,hub.lore.bell.1,The church bell brought travellers home through the forest mist. That’s where Bellwether gets its name.,plain pride,1,audio/voice/en/hub.lore.bell.1.wav
+27,hub.lore.bell.2,A sound you could follow when the road disappeared under your feet.,lets the image breathe,1,audio/voice/en/hub.lore.bell.2.wav
+28,hub.horde_army,My grandfather called the Horde an army. You treasure hunters always hear the other word.,"Matter-of-fact, mildly amused.",1,audio/voice/en/hub.horde_army.wav
+29,hub.arrival,Shut the door behind you. Both of you look frozen.,"Brisk welcome, practical care.",1,audio/voice/en/hub.arrival.wav

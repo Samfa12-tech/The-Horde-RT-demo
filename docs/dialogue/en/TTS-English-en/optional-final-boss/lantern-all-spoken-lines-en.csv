@@ -1,8 +1,8 @@
-combined_line_number,line_id,spoken_text,voice_asset_path
-1,treasury.release,At last.,audio/voice/en/treasury.release.wav
-2,treasury.entity_claim,I gave them victory. Their king promised me everything that followed.,audio/voice/en/treasury.entity_claim.wav
-3,treasury.entity_demand,Put down the light. You have carried it far enough.,audio/voice/en/treasury.entity_demand.wav
-4,finale.entity_pressure,You would leave this here?,audio/voice/en/finale.entity_pressure.wav
-5,bark.entity.command,Kneel.,audio/voice/en/bark.entity.command.wav
-6,finale.entity_light,Close that shutter!,audio/voice/en/finale.entity_light.wav
-7,finale.entity_last,It was promised to me.,audio/voice/en/finale.entity_last.wav
+combined_line_number,line_id,spoken_text,delivery_notes,delivery_notes_revision,voice_asset_path
+1,treasury.release,At last.,First unguarded pleasure.,1,audio/voice/en/treasury.release.wav
+2,treasury.entity_claim,I gave them victory. Their king promised me everything that followed.,"Natural, unhurried and intelligible.",1,audio/voice/en/treasury.entity_claim.wav
+3,treasury.entity_demand,Put down the light. You have carried it far enough.,"Natural, unhurried and intelligible.",1,audio/voice/en/treasury.entity_demand.wav
+4,finale.entity_pressure,You would leave this here?,"Natural, unhurried and intelligible.",1,audio/voice/en/finale.entity_pressure.wav
+5,bark.entity.command,Kneel.,"Natural, unhurried and intelligible.",1,audio/voice/en/bark.entity.command.wav
+6,finale.entity_light,Close that shutter!,"Natural, unhurried and intelligible.",1,audio/voice/en/finale.entity_light.wav
+7,finale.entity_last,It was promised to me.,"Natural, unhurried and intelligible.",1,audio/voice/en/finale.entity_last.wav

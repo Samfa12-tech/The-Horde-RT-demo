@@ -49,5 +49,15 @@
       "direction": "English tag; may translate in future"
     }
   ],
-  "archive_note": "Public authoring archive: private conversation identifiers omitted; source document URLs and hashes retained. Dialogue text and review statuses are unchanged."
+  "archive_note": "Public authoring archive: private conversation identifiers omitted; source document URLs and hashes retained. Dialogue text and review statuses are unchanged.",
+  "performance_revision": {
+    "date": "2026-10-07",
+    "base_archive_commit": "1c9cae24bec8390ec71231db14eaf391a84d26e8",
+    "bank_version": "0.2.1",
+    "scope": "Urgent Kit starter acting direction; optional audible acknowledgment; clean dialogue and separate unauditioned ElevenLabs hints; original words unchanged.",
+    "references": [
+      "https://elevenlabs.io/docs/help-center/product/core-capabilities/text-to-speech/how-do-audio-tags-work-with-eleven-v3-and-v4",
+      "https://elevenlabs.io/docs/overview/capabilities/text-to-speech/best-practices"
+    ]
+  }
 }

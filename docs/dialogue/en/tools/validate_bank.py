@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Read-only authoring assertions. Does not execute engine gameplay or produce audio."""
-import json,csv,pathlib,collections,hashlib,itertools
+import json,csv,pathlib,collections,hashlib,itertools,re
 P=pathlib.Path(__file__).resolve().parent;O=P.parent
 b=json.loads((O/'Horde-Dialogue-Bank-English-en.json').read_text()); rows=b['lines'];scenes={s['scene_id']:s for s in b['scenes']};ids={r['line_id']:r for r in rows}
 checks=[]
@@ -61,5 +61,21 @@ check('reload_does_not_replay_consumed_story','rescue.found' in loaded)
 check('skip_keeps_critical_fallback',ids['rescue.found']['fallback']['required'] and ids['rescue.found']['repeat_policy']['manual_recap'])
 check('stale_queue_rechecked',all(r['trigger']['revalidate_on_enqueue_and_playback'] for r in rows))
 check('optional_hub_changes_not_assumed',all(x in ids for x in ['epilogue.welcome','epilogue.kit_close']))
+
+
+check('direction_hashes_match',all(hashlib.sha256(r['delivery_notes'].encode()).hexdigest()==r['delivery_notes_sha256'] for r in rows))
+check('direction_revisions_valid',all(r['delivery_notes_revision']>=1 for r in rows))
+check('kit_direction_revised',ids['prologue.kit_grate']['delivery_notes_revision']==2 and 'edge of panic' in ids['prologue.kit_grate']['delivery_notes'])
+check('only_starter_has_tagged_audition',[r['line_id'] for r in rows if r['generation_input']] == ['prologue.kit_grate'])
+for r in rows:
+ g=r['generation_input']
+ if g:
+  check('tagged_words_unchanged_'+r['line_id'],re.sub(r'\[[^\]]*\]\s*','',g['text'])==r['spoken_text'])
+  check('tagged_export_exact_'+r['line_id'],(O/'TTS-Optional-ElevenLabs-en'/(r['line_id']+'.txt')).read_bytes()==g['text'].encode())
+  check('tagged_audition_unapproved',not g['recording_approved'] and g['status']=='unauditioned_hint_not_guaranteed')
+manifest=json.loads((O/'tts-manifest-en.json').read_text())
+check('tts_manifest_direction_parity',all(m['delivery_notes']==r['delivery_notes'] and m['delivery_notes_revision']==r['delivery_notes_revision'] and m['delivery_notes_sha256']==r['delivery_notes_sha256'] for m,r in zip(manifest,rows)) and len(manifest)==len(rows))
+check('starter_trigger_not_ack_gated',ids['prologue.kit_grate']['required_flags']==['at_grate','safe'])
+check('no_added_dialogue',len(rows)==357 and len(scenes)==209)
 
 print(json.dumps({"static_checks_passed":len(checks),"lines":len(rows),"scenes":len(scenes),"runtime_tests_run":False},indent=2))

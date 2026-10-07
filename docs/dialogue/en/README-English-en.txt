@@ -1,5 +1,5 @@
 THE HORDE CAMPAIGN DIALOGUE BANK
-English | language tag en | candidate v0.2 | 7 October 2026
+English | language tag en | candidate v0.2.1 | 7 October 2026
 
 WHAT IS LOCKED
 Kit is injured during the approach to Bellwether, recovers there, and remains the player's partner through important returns. He is not a dungeon escort. His reason to stay grows from recovery into useful work and attachment to the town. The protagonist has no voiced dialogue. This package is tagged English (en); line IDs remain language independent.
@@ -16,12 +16,12 @@ START HERE
 - TTS-English-en/core-candidates/<speaker>/<line_id>.txt contains only exact spoken text. It is suitable for pasting into a chosen voice tool, subject to text/casting review.
 - TTS-English-en/decision-blocked and optional-final-boss contain excluded candidates. Never batch these into a recording lock automatically.
 - Each speaker's combined text contains only spoken text in manifest order. Use the individual TXT files for reliably named per-line generation; generating a combined file will not produce aligned line assets automatically.
-- tts-manifest-en.csv maps input file to language, speaker, stable line ID, source revision/hash, and intended output audio path.
+- tts-manifest-en.csv maps input file to language, speaker, stable line ID, source revision/hash, human delivery notes and their revision/hash, optional tagged audition path/status, and intended output audio path.
 - localization-manifest.json is the future-translation scaffold. No translations or timed subtitles have been invented.
 - VALIDATION-English-en.json and COVERAGE-English-en.csv separate static authoring checks from outstanding playtests.
 
 STABLE IDENTIFIERS AND ENGLISH
-language and source_language are en. An English language tag does not choose an accent or actor. The same line_id is reused in each translation. A change to English source text increments source_text_revision and changes source_text_sha256. Mark dependent translations stale whenever either changes. Delivery notes are separately localizable production notes and never TTS input. Runtime state keys are language-neutral identifiers, never matching English dialogue strings.
+language and source_language are en. An English language tag does not choose an accent or actor. The same line_id is reused in each translation. A change to English source text increments source_text_revision and changes source_text_sha256. Mark dependent translations stale whenever either changes. Delivery notes are separately localizable human production notes and never spoken input. Optional generation_input.text is a separate model-specific audition hint; never use it for subtitles or automatically for another model. A direction change increments delivery_notes_revision and its hash, requiring take review even when spoken-text hashes stay unchanged. Runtime state keys are language-neutral identifiers, never matching English dialogue strings.
 
 Localized speech lives at audio/voice/<language>/<line_id>.wav. Subtitle records key by (language,line_id,source revision). Current audio, measured_duration_ms, start_ms and end_ms are null. Align subtitle timings to each actual recorded take, not to English word counts or an invented SRT. Translations may need different card breaks and durations. Language fallback is requested language -> en; expose an explicit missing-translation indicator during development and preserve the actual spoken/subtitle language relationship in the product policy. Do not silently show an unrelated translated revision over an outdated take.
 
@@ -58,3 +58,5 @@ Showing a route, placing a record on the table, presenting a seal, demonstrating
 
 REGENERATING DERIVED FILES
 Use tools/export_bank.py with the authoritative JSON and a fresh output directory. It uses Python 3's standard library, validates IDs/text hashes/parity, and recreates the CSV and exact TTS inputs without calling any service. It never generates audio or edits runtime code. The JSON is the single editing source; regenerate derived files rather than maintaining competing text copies. After text edits, increment the relevant source revision/hash and re-review the reading copy, cast notes, eligibility and translations.
+
+Performance revision 7 October 2026: see PERFORMANCE-DIRECTION-English-en.md for Kit’s urgent opening, optional cue-dependent acknowledgment, per-line human direction and the separate unrecorded ElevenLabs audition example. Clean spoken/subtitle text is unchanged.

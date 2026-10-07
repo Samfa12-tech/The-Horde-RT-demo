@@ -1,8 +1,8 @@
 [
   {
     "path": "ARCHIVE-VALIDATION.json",
-    "bytes": 467,
-    "sha256": "06350fe051efd6a95790c7b9ae05cdb62d611fd91ef75ccf429cdcc5b32a4fd6"
+    "bytes": 845,
+    "sha256": "da38d6416b66817e0af0b2292df8305413e65c451fd0a9eab19d6a5b1284606a"
   },
   {
     "path": "CAST-AND-PRONUNCIATION-English-en.txt",
@@ -21,18 +21,18 @@
   },
   {
     "path": "Horde-Dialogue-Bank-English-en.csv",
-    "bytes": 1031179,
-    "sha256": "276eac25334a722437acaa9e5d1300901af97329e119daf59ecd1c7076bcbfd4"
+    "bytes": 1057148,
+    "sha256": "85744689b5e472cb6a16e17999f48094b88f78a1f3ede79f1a5138dd533f0fdb"
   },
   {
     "path": "Horde-Dialogue-Bank-English-en.json",
-    "bytes": 1916761,
-    "sha256": "b75c42992d29ca96301c4a2edb425c1529d04bc30e411582d2b4ec724f96df88"
+    "bytes": 1978751,
+    "sha256": "a78781783fe4cbc17af1d250be329d092c80403a440fccbf21b78c1849725a5f"
   },
   {
     "path": "Horde-Dialogue-Reading-Copy-English-en.docx",
-    "bytes": 64032,
-    "sha256": "e98a19b916fbd2cacc56e39ee37b814d97c7f561cb9b048b6d9d2230ee20edcb"
+    "bytes": 69600,
+    "sha256": "8b7d855a94fb5af58d673ec94cb7e5a4b07d99ad97e38dc50eb9f341683b609a"
   },
   {
     "path": "INDEPENDENT-REVIEW-English-en.txt",
@@ -40,24 +40,29 @@
     "sha256": "63ab67dd403fc968097dd70841c39bf2bcf6778a2c711224a7ddd196cc84668e"
   },
   {
+    "path": "PERFORMANCE-DIRECTION-English-en.md",
+    "bytes": 4776,
+    "sha256": "ef0ffc6f58f8e8a9819935a9b597623830e362aeaf60d3843d7852a25c4bc1d0"
+  },
+  {
     "path": "READING-COPY-English-en.md",
-    "bytes": 119703,
-    "sha256": "5584844c97006d8f51421c6ee459bf7dad20a980c50452964474c361033892c2"
+    "bytes": 97619,
+    "sha256": "7fd194685d0a05d7af90fa051c86427cc258f748e58e8a291b0ba2ca68c96901"
   },
   {
     "path": "README-English-en.txt",
-    "bytes": 10385,
-    "sha256": "e7be7b7b920ea9f281ce37f5a627d010f3def81a1d20478c4885a9b59f0bf13c"
+    "bytes": 11021,
+    "sha256": "a84a00bae5c4848ced58fc4cdecaaf20d77c445611b50b85cb622b5b80370f94"
   },
   {
     "path": "README.md",
-    "bytes": 3303,
-    "sha256": "98194fdb0137a8b2618f9a0a7a5d941e569ce96e2a5cf9e5d6f17352a58a77bd"
+    "bytes": 3806,
+    "sha256": "e34960ae3945d0cef529fe0d8f4b1d91e66e5cbf0c07ba15f99ed029c2e2480f"
   },
   {
     "path": "REPOSITORY-HANDOFF-English-en.txt",
-    "bytes": 1098,
-    "sha256": "ca76cc4e0eaca76b9b2ad9e8868ba5ed42a7a778f5cb5513100ab714a1be04fb"
+    "bytes": 1368,
+    "sha256": "5c01b2cf3df6078fde9112fbe256c8c77868488e254b18a92a3879ef3fa274ff"
   },
   {
     "path": "TTS-English-en/core-candidates/artificer/access.bridge_complete.txt",
@@ -196,8 +201,8 @@
   },
   {
     "path": "TTS-English-en/core-candidates/artificer-all-spoken-lines-en.csv",
-    "bytes": 3595,
-    "sha256": "68667936a840cecf7eeb4708db2cff82562dde1df1cbb4cea93461bfe818527c"
+    "bytes": 4379,
+    "sha256": "88139a37857976dda3eec96b22926b3c99736092ea7657ef1623c9c94225ea28"
   },
   {
     "path": "TTS-English-en/core-candidates/artificer-all-spoken-lines-en.txt",
@@ -211,8 +216,8 @@
   },
   {
     "path": "TTS-English-en/core-candidates/bellkeeper-all-spoken-lines-en.csv",
-    "bytes": 156,
-    "sha256": "b8f7487817f41dd9684e3452572651510f7c81b33204768230e23b183b1c8f03"
+    "bytes": 237,
+    "sha256": "d6d75f65028968e1e2e8d83e55bb54e29d4aba8d38379810be93c6d9809bce08"
   },
   {
     "path": "TTS-English-en/core-candidates/bellkeeper-all-spoken-lines-en.txt",
@@ -226,8 +231,8 @@
   },
   {
     "path": "TTS-English-en/core-candidates/court_keeper-all-spoken-lines-en.csv",
-    "bytes": 165,
-    "sha256": "7d3396faf70874e6e5ebe5aff30ed2aff260c08aafb6ff98de815c84a87a2adb"
+    "bytes": 245,
+    "sha256": "3ac90c91fae6543bb3712e535953eeb254e940ded9705d9a83968efd1ecf7ca6"
   },
   {
     "path": "TTS-English-en/core-candidates/court_keeper-all-spoken-lines-en.txt",
@@ -846,8 +851,8 @@
   },
   {
     "path": "TTS-English-en/core-candidates/kit-all-spoken-lines-en.csv",
-    "bytes": 15834,
-    "sha256": "b5e1ae1826ddacd4db4c347db5c986c0484a33fc0b8bd61b38347e2bbed14a37"
+    "bytes": 21108,
+    "sha256": "a3494b204d769bec2e31602d9fed89c9c59cc89ca0fcfdc9234004af62fb891b"
   },
   {
     "path": "TTS-English-en/core-candidates/kit-all-spoken-lines-en.txt",
@@ -1106,8 +1111,8 @@
   },
   {
     "path": "TTS-English-en/core-candidates/lantern-all-spoken-lines-en.csv",
-    "bytes": 6006,
-    "sha256": "40d88d2c21f8eea06c62ee7734dcd3951fb704f17d13360991ae176de415c2bb"
+    "bytes": 8101,
+    "sha256": "38c153818d24587c4d5e0d9a0a0983ebc18dc7a978d3bd6ee964a98da3060c91"
   },
   {
     "path": "TTS-English-en/core-candidates/lantern-all-spoken-lines-en.txt",
@@ -1121,8 +1126,8 @@
   },
   {
     "path": "TTS-English-en/core-candidates/master_of_coin-all-spoken-lines-en.csv",
-    "bytes": 176,
-    "sha256": "62c3c0452a582cb4603d68f505a2017b4f49d43966533720defeef633e875d74"
+    "bytes": 247,
+    "sha256": "7e84d7521de1ed23c3b4dee790d773504cec8c05275af684376bd9c82ff5c6bd"
   },
   {
     "path": "TTS-English-en/core-candidates/master_of_coin-all-spoken-lines-en.txt",
@@ -1431,8 +1436,8 @@
   },
   {
     "path": "TTS-English-en/core-candidates/record_keeper-all-spoken-lines-en.csv",
-    "bytes": 8342,
-    "sha256": "0f4286480cd10e171a15760ea13476a326591bd3da6e7613c3a64c2c899b1665"
+    "bytes": 10334,
+    "sha256": "8649498d54907dbab97a6bd9b4eb423fb99ad1e2ee7434e5f7e09a2cc322b813"
   },
   {
     "path": "TTS-English-en/core-candidates/record_keeper-all-spoken-lines-en.txt",
@@ -1536,8 +1541,8 @@
   },
   {
     "path": "TTS-English-en/core-candidates/relic_dealer-all-spoken-lines-en.csv",
-    "bytes": 2444,
-    "sha256": "10d4e603ce06110b062ce4b09158576bd980c20c032905a9a30995cf9c966d34"
+    "bytes": 3066,
+    "sha256": "a512b75b135b812fcc91bf7a65fed891ebce5483d96e1095da9871ea5d56470b"
   },
   {
     "path": "TTS-English-en/core-candidates/relic_dealer-all-spoken-lines-en.txt",
@@ -1691,8 +1696,8 @@
   },
   {
     "path": "TTS-English-en/core-candidates/salvager-all-spoken-lines-en.csv",
-    "bytes": 4023,
-    "sha256": "b5faa0dcb67b05b7fba28c117a1a2d3f6a5e9981c6fb7363041321240b7afc0e"
+    "bytes": 4828,
+    "sha256": "f28cc6cca376725391011081055b0fa788318e43ce8fccf0c78a8237a3378386"
   },
   {
     "path": "TTS-English-en/core-candidates/salvager-all-spoken-lines-en.txt",
@@ -1846,8 +1851,8 @@
   },
   {
     "path": "TTS-English-en/core-candidates/tavern_keeper-all-spoken-lines-en.csv",
-    "bytes": 3743,
-    "sha256": "110e374a3545f5db6327d299ddd3d8be5af07019e48e6a4b63a279d4c89e5302"
+    "bytes": 4642,
+    "sha256": "3ac94e74f0790c7492ed28140ef83310aed4e0c810c39644119cc6944bedf1de"
   },
   {
     "path": "TTS-English-en/core-candidates/tavern_keeper-all-spoken-lines-en.txt",
@@ -1886,8 +1891,8 @@
   },
   {
     "path": "TTS-English-en/decision-blocked/court_keeper-all-spoken-lines-en.csv",
-    "bytes": 823,
-    "sha256": "bae170345723b9c5ece4d3a6d6f6836c41ec40140fa5a48ff87e7048d2a229f8"
+    "bytes": 1108,
+    "sha256": "eb328b86fa0abef1ec7695d9f93fcf7a75836530a3d6b30c2ed9e09fa1084b3a"
   },
   {
     "path": "TTS-English-en/decision-blocked/court_keeper-all-spoken-lines-en.txt",
@@ -1906,8 +1911,8 @@
   },
   {
     "path": "TTS-English-en/decision-blocked/fourth_keeper-all-spoken-lines-en.csv",
-    "bytes": 263,
-    "sha256": "d024f06a555efc36add7358c1ac0158f95becb94b7a1ac9fba87609b8bd47d28"
+    "bytes": 384,
+    "sha256": "94843f23908f54000e883a31d96e5487cba32ae8cea1ffa077c1cee2036de7fb"
   },
   {
     "path": "TTS-English-en/decision-blocked/fourth_keeper-all-spoken-lines-en.txt",
@@ -1931,8 +1936,8 @@
   },
   {
     "path": "TTS-English-en/decision-blocked/kit-all-spoken-lines-en.csv",
-    "bytes": 417,
-    "sha256": "8b18d4b8b49e196276820fa2817a707cef92bb3f71de61261b6f0cf921879e75"
+    "bytes": 579,
+    "sha256": "1aa71b2cc7f4a0181c59d9916188fa24a291a496dbc8e255c405a4f2f77cc872"
   },
   {
     "path": "TTS-English-en/decision-blocked/kit-all-spoken-lines-en.txt",
@@ -1976,8 +1981,8 @@
   },
   {
     "path": "TTS-English-en/optional-final-boss/lantern-all-spoken-lines-en.csv",
-    "bytes": 709,
-    "sha256": "0895c0afd5b55ee079aa4866ed355c7b1b45bc94d71cf6b783536eba9a147271"
+    "bytes": 1022,
+    "sha256": "93e7c2915c6a698d875c99c234f9c62ae87a5ddaf988ab7b600fdcd9bc5f0bb7"
   },
   {
     "path": "TTS-English-en/optional-final-boss/lantern-all-spoken-lines-en.txt",
@@ -1985,14 +1990,19 @@
     "sha256": "17bedd7eb9c8131ea308353ea65bc516f29492684c9309ad9f7578247565c97d"
   },
   {
+    "path": "TTS-Optional-ElevenLabs-en/prologue.kit_grate.txt",
+    "bytes": 182,
+    "sha256": "f611eec7d9046e22b3e3222076f4e8c1491ca6557f77415bd3cdcf6d813ffbfc"
+  },
+  {
     "path": "VALIDATION-English-en.json",
-    "bytes": 45343,
-    "sha256": "2c36442d36692928ea1918d82d8ee84a5c14aa50ac24ee85d5831a4574fd7f10"
+    "bytes": 46257,
+    "sha256": "6f1842c3a1e43ba2e040c3cfef90c7bcd7089f2de6ff3e40b776c6eb47745649"
   },
   {
     "path": "dialogue-bank.schema.json",
-    "bytes": 5712,
-    "sha256": "079d8d1518fcf79f0b1e5a817ce2ebb0f8fb0f16c5af675123452581ca21d282"
+    "bytes": 7266,
+    "sha256": "fecfe27039f9dfface58988f9085e7fd396103f8d557aa867f46f92ba8fb1cb8"
   },
   {
     "path": "localization-manifest.json",
@@ -2006,18 +2016,18 @@
   },
   {
     "path": "source-manifest.json",
-    "bytes": 2753,
-    "sha256": "2957e09699b7077a2a27a3fdd20da356f34aa0900cf49843f343a6310a207b5f"
+    "bytes": 3330,
+    "sha256": "167056bf2163b47c14d3f1334de0fd82538709f1198123fb6b334b2a80568ffe"
   },
   {
     "path": "state-contract.json",
-    "bytes": 120011,
-    "sha256": "a16e9e0fe2504ec0262028381a930cff23df62928df98066a4d2690a9dcd01da"
+    "bytes": 120662,
+    "sha256": "6e28c56c7dcb62afb4c9459e990b9151e6795c2f90a5b6dfe2fd33588bc1a404"
   },
   {
     "path": "tools/export_bank.py",
-    "bytes": 2765,
-    "sha256": "7947974ad2d4c61a43ca2113c8ded5ae683c43c95390884132f082c15b6da886"
+    "bytes": 3480,
+    "sha256": "69a1c3dc54e993f002c245bc154631fc4807994d2ffa556caad82b937d639764"
   },
   {
     "path": "tools/opening-baseline.json",
@@ -2026,17 +2036,17 @@
   },
   {
     "path": "tools/validate_bank.py",
-    "bytes": 6647,
-    "sha256": "775283986289616655ad84b22690a411a6ab5bab3c60aa6bfca26dad506c03fd"
+    "bytes": 8045,
+    "sha256": "f1effd9aa640ab31f6a42ac06412e78e2b6a12f732cc8435f8631e5eb367b426"
   },
   {
     "path": "tts-manifest-en.csv",
-    "bytes": 105849,
-    "sha256": "e2efadaf0f6790162cf072ee4e899930872a15a45ea674b489dbf67bcc558ef9"
+    "bytes": 147266,
+    "sha256": "ea9c1631519845c09ee2d440e136d3659dab93214f4c656b6731493c6b64e23d"
   },
   {
     "path": "tts-manifest-en.json",
-    "bytes": 198056,
-    "sha256": "89af6fa324b0bd4e82339c7fba17630202e8506946e5d6f525f8a89941566460"
+    "bytes": 294411,
+    "sha256": "987e60e4dd4cc99f3ef6a3a70c6851fdbf7c0abacf71753982df581c98e0f22d"
   }
 ]

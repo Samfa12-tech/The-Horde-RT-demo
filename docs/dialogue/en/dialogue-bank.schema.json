@@ -79,7 +79,10 @@
           "recording_approved",
           "translation_status",
           "canon_source",
-          "integration_status"
+          "integration_status",
+          "delivery_notes_revision",
+          "delivery_notes_sha256",
+          "generation_input"
         ],
         "properties": {
           "line_id": {
@@ -235,10 +238,62 @@
           },
           "integration_status": {
             "type": "string"
+          },
+          "delivery_notes_revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "delivery_notes_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "generation_input": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "provider",
+                  "models",
+                  "status",
+                  "text",
+                  "recording_approved"
+                ],
+                "properties": {
+                  "provider": {
+                    "const": "ElevenLabs"
+                  },
+                  "models": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "eleven_v3",
+                        "eleven_v4"
+                      ]
+                    }
+                  },
+                  "status": {
+                    "const": "unauditioned_hint_not_guaranteed"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "recording_approved": {
+                    "const": false
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
           }
         },
         "additionalProperties": false
       }
+    },
+    "schema_version": {
+      "const": "1.1"
     }
   }
 }

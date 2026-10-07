@@ -1,11 +1,20 @@
 {
   "scope": "Documentation/source archive only; no runtime, device, audio-listening or CI acceptance claimed",
-  "static_checks_passed": 426,
+  "bank_version": "0.2.1",
+  "base_archive_commit": "1c9cae24bec8390ec71231db14eaf391a84d26e8",
+  "static_checks_passed": 436,
   "json_schema": "passed",
-  "derived_files_byte_identical": 388,
+  "derived_files_byte_identical": 389,
   "public_archive_scan": "passed",
   "new_entry_links": "passed",
-  "original_json_and_docx": "byte-identical",
+  "all_357_spoken_subtitle_ids_source_hashes_revisions": "unchanged from previous archive",
+  "reading_copy": {
+    "updated": true,
+    "pages": 44,
+    "all_pages_visually_reviewed": true,
+    "clean_lines_and_direction_entries": 357,
+    "docx_sha256": "8b7d855a94fb5af58d673ec94cb7e5a4b07d99ad97e38dc50eb9f341683b609a"
+  },
   "lines": 357,
   "scenes": 209,
   "release_counts": {

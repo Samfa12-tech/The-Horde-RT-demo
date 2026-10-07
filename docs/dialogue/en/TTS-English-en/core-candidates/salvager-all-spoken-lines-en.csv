@@ -1,30 +1,30 @@
-combined_line_number,line_id,spoken_text,voice_asset_path
-1,hub.service.salvager.greet,Set your pack down. Show me how you move.,audio/voice/en/hub.service.salvager.greet.wav
-2,hub.service.salvager.cancel,"Another time, then. Rest counts for something.",audio/voice/en/hub.service.salvager.cancel.wav
-3,hub.service.salvager.insufficient,You’re missing what we need for that lesson. We can work on your footing here.,audio/voice/en/hub.service.salvager.insufficient.wav
-4,hub.service.salvager.refresh,Show me the part you want to practise. We’ll do it where a mistake is cheap.,audio/voice/en/hub.service.salvager.refresh.wav
-5,access.abbey_problem,"The Abbey door is underwater. There are air pockets beyond, if you can reach them.",audio/voice/en/access.abbey_problem.wav
-6,access.abbey_alternatives,"A ward, a breathing rig, or training for the crossing. Choose a way you can rely on.",audio/voice/en/access.abbey_alternatives.wav
-7,access.body_offer,I can teach you the crossing. Slow your breathing. Learn where you can surface.,audio/voice/en/access.body_offer.wav
-8,access.body_task,We practise near a way out. Getting across is only half the lesson.,audio/voice/en/access.body_task.wav
-9,access.body_progress,Find your way back before you leave the edge. Show me.,audio/voice/en/access.body_progress.wav
-10,access.body_limit,Being strong won’t make water into air. Turn back while you still can.,audio/voice/en/access.body_limit.wav
-11,access.body_retry_stop,You came back. Good. Stay here until your breathing settles.,audio/voice/en/access.body_retry_stop.wav
-12,access.body_retry_plan,"On the next try, keep enough in reserve to return.",audio/voice/en/access.body_retry_plan.wav
-13,access.body_complete,You found the next air point and kept a way back. That’s the crossing learned.,audio/voice/en/access.body_complete.wav
-14,access.body_complete_limit,"At the Abbey, stop and look again. Don’t spend your breath proving the lesson.",audio/voice/en/access.body_complete_limit.wav
-15,access.abbey_ready,You’ve made the practice crossing. Use the same care at the Abbey.,audio/voice/en/access.abbey_ready.wav
-16,access.climb_body,Use the old maintenance climb. Test each hold before you put your weight on it.,audio/voice/en/access.climb_body.wav
-17,access.climb_task,We’ll practise coming down before we practise going higher.,audio/voice/en/access.climb_task.wav
-18,hub.access.climb.progress,"Find a place to rest, then look for the next hold. Don’t hang there making plans.",audio/voice/en/hub.access.climb.progress.wav
-19,hub.access.climb.retry,Feet on the ground. Let your hands rest; the wall can wait.,audio/voice/en/hub.access.climb.retry.wav
-20,access.climb_complete,You’ve made the climb and the way down. The maintenance route is open to you.,audio/voice/en/access.climb_complete.wav
-21,access.climb_smoke,Strong arms won’t help your lungs in there. Plan where you’ll get clear air.,audio/voice/en/access.climb_smoke.wav
-22,access.smoke_body,"Take the short gaps between clear air. If your chest tightens, go back.",audio/voice/en/access.smoke_body.wav
-23,access.smoke_separate,Getting over the gorge settles the crossing. It doesn’t settle what you’ll breathe inside.,audio/voice/en/access.smoke_separate.wav
-24,access.smoke_retreat,"Use the clear stretches to recover. If you can’t reach the next one safely, come back and prepare.",audio/voice/en/access.smoke_retreat.wav
-25,tavern.preseals.kit.3,Leave the carrying to someone who isn’t recovering.,audio/voice/en/tavern.preseals.kit.3.wav
-26,tavern.oneseal.pack.3,After you’ve sat down.,audio/voice/en/tavern.oneseal.pack.3.wav
-27,tavern.twoseals.ridge.2,And leave room to rest on the way.,audio/voice/en/tavern.twoseals.ridge.2.wav
-28,hub.passing.heavy_pack,Try moving in it before you start the climb.,audio/voice/en/hub.passing.heavy_pack.wav
-29,hub.passing.learned_retreat,Coming back was part of the lesson. Good to see you remembered.,audio/voice/en/hub.passing.learned_retreat.wav
+combined_line_number,line_id,spoken_text,delivery_notes,delivery_notes_revision,voice_asset_path
+1,hub.service.salvager.greet,Set your pack down. Show me how you move.,unhurried; watches the body rather than the boast,1,audio/voice/en/hub.service.salvager.greet.wav
+2,hub.service.salvager.cancel,"Another time, then. Rest counts for something.",unhurried; watches the body rather than the boast,1,audio/voice/en/hub.service.salvager.cancel.wav
+3,hub.service.salvager.insufficient,You’re missing what we need for that lesson. We can work on your footing here.,unhurried; watches the body rather than the boast,1,audio/voice/en/hub.service.salvager.insufficient.wav
+4,hub.service.salvager.refresh,Show me the part you want to practise. We’ll do it where a mistake is cheap.,"calm, matter-of-fact",1,audio/voice/en/hub.service.salvager.refresh.wav
+5,access.abbey_problem,"The Abbey door is underwater. There are air pockets beyond, if you can reach them.",sober; no dare,1,audio/voice/en/access.abbey_problem.wav
+6,access.abbey_alternatives,"A ward, a breathing rig, or training for the crossing. Choose a way you can rely on.",plain; makes the alternatives equal,1,audio/voice/en/access.abbey_alternatives.wav
+7,access.body_offer,I can teach you the crossing. Slow your breathing. Learn where you can surface.,calm; no boasting,1,audio/voice/en/access.body_offer.wav
+8,access.body_task,We practise near a way out. Getting across is only half the lesson.,quiet authority,1,audio/voice/en/access.body_task.wav
+9,access.body_progress,Find your way back before you leave the edge. Show me.,invites player action,1,audio/voice/en/access.body_progress.wav
+10,access.body_limit,Being strong won’t make water into air. Turn back while you still can.,"firm, unsentimental",1,audio/voice/en/access.body_limit.wav
+11,access.body_retry_stop,You came back. Good. Stay here until your breathing settles.,no shame in retreat,1,audio/voice/en/access.body_retry_stop.wav
+12,access.body_retry_plan,"On the next try, keep enough in reserve to return.","short, serious",1,audio/voice/en/access.body_retry_plan.wav
+13,access.body_complete,You found the next air point and kept a way back. That’s the crossing learned.,specific acknowledgement,1,audio/voice/en/access.body_complete.wav
+14,access.body_complete_limit,"At the Abbey, stop and look again. Don’t spend your breath proving the lesson.",affectionate firmness,1,audio/voice/en/access.body_complete_limit.wav
+15,access.abbey_ready,You’ve made the practice crossing. Use the same care at the Abbey.,satisfied; no triumphalism,1,audio/voice/en/access.abbey_ready.wav
+16,access.climb_body,Use the old maintenance climb. Test each hold before you put your weight on it.,points out reachable holds,1,audio/voice/en/access.climb_body.wav
+17,access.climb_task,We’ll practise coming down before we practise going higher.,matter-of-fact,1,audio/voice/en/access.climb_task.wav
+18,hub.access.climb.progress,"Find a place to rest, then look for the next hold. Don’t hang there making plans.",brief practical coaching,1,audio/voice/en/hub.access.climb.progress.wav
+19,hub.access.climb.retry,Feet on the ground. Let your hands rest; the wall can wait.,steady; removes pressure,1,audio/voice/en/hub.access.climb.retry.wav
+20,access.climb_complete,You’ve made the climb and the way down. The maintenance route is open to you.,"satisfied, restrained",1,audio/voice/en/access.climb_complete.wav
+21,access.climb_smoke,Strong arms won’t help your lungs in there. Plan where you’ll get clear air.,firm distinction,1,audio/voice/en/access.climb_smoke.wav
+22,access.smoke_body,"Take the short gaps between clear air. If your chest tightens, go back.",serious; never macho,1,audio/voice/en/access.smoke_body.wav
+23,access.smoke_separate,Getting over the gorge settles the crossing. It doesn’t settle what you’ll breathe inside.,plain,1,audio/voice/en/access.smoke_separate.wav
+24,access.smoke_retreat,"Use the clear stretches to recover. If you can’t reach the next one safely, come back and prepare.",practical; makes retreat normal,1,audio/voice/en/access.smoke_retreat.wav
+25,tavern.preseals.kit.3,Leave the carrying to someone who isn’t recovering.,affectionate authority,1,audio/voice/en/tavern.preseals.kit.3.wav
+26,tavern.oneseal.pack.3,After you’ve sat down.,quiet interruption,1,audio/voice/en/tavern.oneseal.pack.3.wav
+27,tavern.twoseals.ridge.2,And leave room to rest on the way.,calm,1,audio/voice/en/tavern.twoseals.ridge.2.wav
+28,hub.passing.heavy_pack,Try moving in it before you start the climb.,observes rather than judges,1,audio/voice/en/hub.passing.heavy_pack.wav
+29,hub.passing.learned_retreat,Coming back was part of the lesson. Good to see you remembered.,affectionate understatement,1,audio/voice/en/hub.passing.learned_retreat.wav

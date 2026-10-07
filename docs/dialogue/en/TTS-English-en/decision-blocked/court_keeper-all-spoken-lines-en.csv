@@ -1,7 +1,7 @@
-combined_line_number,line_id,spoken_text,voice_asset_path
-1,court.king_proof,Read the king's order. His seal is beside ours. He ordered the prison made.,audio/voice/en/court.king_proof.wav
-2,court.true_bargain,He bargained for victory. It gave him an army that could not stop serving.,audio/voice/en/court.true_bargain.wav
-3,court.fourth_keeper,There were four of us. The one beneath the tomb kept watch over what you carry.,audio/voice/en/court.fourth_keeper.wav
-4,court.custody,We held it. We could not release the soldiers without opening the bond.,audio/voice/en/court.custody.wav
-5,court.memory_evidence,That garden was planted after the king died.,audio/voice/en/court.memory_evidence.wav
-6,court.final_seal,The last seal leads to the treasury. You have seen what it keeps.,audio/voice/en/court.final_seal.wav
+combined_line_number,line_id,spoken_text,delivery_notes,delivery_notes_revision,voice_asset_path
+1,court.king_proof,Read the king's order. His seal is beside ours. He ordered the prison made.,"Natural, unhurried and intelligible.",1,audio/voice/en/court.king_proof.wav
+2,court.true_bargain,He bargained for victory. It gave him an army that could not stop serving.,"Natural, unhurried and intelligible.",1,audio/voice/en/court.true_bargain.wav
+3,court.fourth_keeper,There were four of us. The one beneath the tomb kept watch over what you carry.,"Natural, unhurried and intelligible.",1,audio/voice/en/court.fourth_keeper.wav
+4,court.custody,We held it. We could not release the soldiers without opening the bond.,"Natural, unhurried and intelligible.",1,audio/voice/en/court.custody.wav
+5,court.memory_evidence,That garden was planted after the king died.,"Natural, unhurried and intelligible.",1,audio/voice/en/court.memory_evidence.wav
+6,court.final_seal,The last seal leads to the treasury. You have seen what it keeps.,"Natural, unhurried and intelligible.",1,audio/voice/en/court.final_seal.wav

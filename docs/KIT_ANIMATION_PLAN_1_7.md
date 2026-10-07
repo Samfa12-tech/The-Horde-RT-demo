@@ -16,7 +16,7 @@ The rope can deploy during lantern pickup and then hang from a fixed world ancho
 
 Kit should feel attentive, reassure the player at the safe summit, react to a fresh manual lantern raise, and lead toward the lookout. Readable idle, walking, turns and a few restrained gestures cover those beats without taking control away from the player. [1–3,16]
 
-- The early call through the grate is voice only. Kit is explicitly unseen there.
+- The early call through the small grated WALL panel is voice only. Kit is explicitly unseen there. The urgent, worried opening and optional audible movement acknowledgment follow the [performance brief](dialogue/en/PERFORMANCE-DIRECTION-English-en.md). An acknowledgment may use real nearby player footsteps; no new animation, look-at, stopping or response is required. Any relief follows a perceivable cue, never assumed arrival or an unverified sightline. Keep missed-call compatibility and the later fresh player-controlled lantern raise. This is conditional authoring direction, not completed runtime.
 
 - Kit does not know about the lich. His reactions should reflect the rescue, the player and the lantern.
 

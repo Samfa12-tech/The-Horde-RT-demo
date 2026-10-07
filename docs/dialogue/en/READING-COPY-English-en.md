@@ -1,2689 +1,3425 @@
-# The Horde: English campaign dialogue
+# The Horde English dialogue reading copy
 
-Candidate v0.2 · English (`en`) · 357 lines across 209 scenes
+English en | Version 0.2.1 | 357 lines | 209 scenes
 
-All wording remains for review. No recording is approved. JSON is the authoritative source; this reading view is derived from it.
+Spoken dialogue and subtitles remain identical. Direction is shown separately and must not be spoken. The Kit injury and Bellwether-base arc are approved; recording approval and specific blocked scenes remain open.
 
-[Package guide](README.md) · [DOCX reading copy](Horde-Dialogue-Reading-Copy-English-en.docx)
+## Optional starter audition input
 
-## Prologue Kit_Grate
+The clean English dialogue below remains identical to the subtitle text. Performance directions are a separate human brief. Only the Kit starter has an optional ElevenLabs v3/v4 tagged audition input, shown here for testing with a supported model; no other line has been automatically tagged.
 
-Scene: `prologue.kit_grate` · tomb · core-candidates · lockedexisting
+[urgent, worried, on the edge of panic] Mate, are you ok? I heard the collapse! [trying to reassure, still shaken] The treasure should be just ahead. [protective urgency] Be careful!
 
-first safe eligible approach to the small wall panel, independent of the later waterfall skeleton encounter, before reward/rescue; exact one-shot contract in 1.7 §7.3. Preserved delivered draft copy, not approved final performance.
+These tags are unauditioned hints, not guaranteed controls. Kit stays unseen beyond the wall access panel. The easing is an attempt to reassure, not evidence of a reply; stronger relief must follow a genuinely audible player movement or footstep cue. No visible Kit, mandatory acknowledgment, new spoken answer or branching timing is implied. No audio has been generated.
 
-**Kit** (`prologue.kit_grate`): Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful!
+## Opening story and tools
 
-Delivery: Kit; unseen beyond the small wall access panel, genuine concern
+Opening scenes, expedition story, local tool lessons, route returns and the core finale. Abbey and Foundry remain playable in either order.
 
-## Rescue Found
+### Kit beyond the wall panel
 
-Scene: `rescue.found` · rescue_rim · core-candidates · lockedexisting
+prologue.kit_grate | Tomb wall panel | lockedexisting
 
-roof sufficiently open and Kit positioned above. Preserved delivered draft copy, not approved final performance.
+First safe eligible approach or pass through the small wall-panel zone, before reward or rescue and independent of the later waterfall fight. Kit remains unseen; any nonverbal acknowledgment must be a genuinely audible nearby movement or footstep, never a mandatory reply or assumed sightline.
 
-**Kit** (`rescue.found`): There you are. Still in one piece?
+Kit | prologue.kit_grate
 
-Delivery: Kit; relieved renewed contact
+Direction, not spoken: Kit is unseen beyond the small grated WALL access panel. Start urgently, worried and on the edge of panic: 'Mate, are you ok?' is a genuine check for life, with a quick breath and strain in the voice rather than a cheerful greeting or a full scream. 'I heard the collapse!' carries the fear that prompted the call. Ease slightly into practical reassurance on 'The treasure should be just ahead', while still shaken; finish 'Be careful!' with protective urgency. Keep the words intelligible through the grate. Any stronger relief must follow a genuinely audible nearby player movement/footstep cue, never an assumed reply or unseen visual confirmation.
 
-## Rescue Rope
+Mate, are you ok? I heard the collapse! The treasure should be just ahead. Be careful!
 
-Scene: `rescue.rope` · rescue_rim · core-candidates · lockedexisting
+### Rescue Found
 
-fixed-anchor deployment ready during lantern pickup; one-time runtime event places rope independently of Kit's idle, not a hand-release marker or audio completion. See [animation plan](../../KIT_ANIMATION_PLAN_1_7.md). Preserved delivered draft copy, not approved final performance.
+rescue.found | Tomb rescue rim | lockedexisting
 
-**Kit** (`rescue.rope`): Stay clear. Rope coming down.
+The roof is open enough for Kit to see the player from the rim above.
 
-Delivery: Kit; practical, no joke
+Kit | rescue.found
 
-## Reunion Question
+Direction, not spoken: Kit; relieved renewed contact
 
-Scene: `reunion.question` · forest_reunion · core-candidates · lockedexisting
+There you are. Still in one piece?
 
-safe summit/reunion mark; settle before line. Preserved delivered draft copy, not approved final performance.
+### Rescue Rope
 
-**Kit** (`reunion.question`): Steady. Catch your breath. Did you find it?
+rescue.rope | Tomb rescue rim | lockedexisting
 
-Delivery: Kit; first checking player, then curious
+During lantern pickup, with the fixed-anchor rope ready to deploy and Kit above the rim. The rope action is independent of voice completion.
 
-## Reunion Hint
+Kit | rescue.rope
 
-Scene: `reunion.hint` · forest_reunion · core-candidates · lockedexisting
+Direction, not spoken: Kit; practical, no joke
 
-generous idle delay during raise lesson; once. Preserved delivered draft copy, not approved final performance.
+Stay clear. Rope coming down.
 
-**Kit** (`reunion.hint`): Let me see. Raise it.
+### Reunion Question
 
-Delivery: Kit; gentle, not impatient
+reunion.question | Forest summit reunion | lockedexisting
 
-## Reunion Proof
+At the safe summit reunion, after the rescue and before the lantern is presented.
 
-Scene: `reunion.proof` · forest_reunion · core-candidates · lockedexisting
+Kit | reunion.question
 
-lantern visibly presented, once. Preserved delivered draft copy, not approved final performance.
+Direction, not spoken: Kit; first checking player, then curious
 
-**Kit** (`reunion.proof`): Then we're not chasing a story anymore.
+Steady. Catch your breath. Did you find it?
 
-Delivery: Kit; quiet wonder
+### Reunion Hint
 
-## Reunion First_Piece
+reunion.hint | Forest summit reunion | lockedexisting
 
-Scene: `reunion.first_piece` · forest_reunion · core-candidates · lockedexisting
+A single idle hint during the lesson in raising the lantern.
 
-after reaction; no invented knowledge of seals. Preserved delivered draft copy, not approved final performance.
+Kit | reunion.hint
 
-**Kit** (`reunion.first_piece`): A start, then. Let's see where it leads.
+Direction, not spoken: Kit; gentle, not impatient
 
-Delivery: Kit; thoughtful
+Let me see. Raise it.
 
-## Reunion Depart
+### Reunion Proof
 
-Scene: `reunion.depart` · forest_reunion · core-candidates · lockedexisting
+reunion.proof | Forest summit reunion | lockedexisting
 
-exchange complete; route-leading can begin independently of voice end. Preserved delivered draft copy, not approved final performance.
+The player visibly presents the lantern to Kit.
 
-**Kit** (`reunion.depart`): Come on. There's a fire and a dry seat waiting in the village.
+Kit | reunion.proof
 
-Delivery: Kit; warmth returning
+Direction, not spoken: Kit; quiet wonder
 
-## Forest Night
+Then we're not chasing a story anymore.
 
-Scene: `forest.night` · forest_path · core-candidates · lockedexisting
+### Reunion First Piece
 
-first open moonlit view, after quiet walking; no later lore overlap. Preserved delivered draft copy, not approved final performance.
+reunion.first_piece | Forest summit reunion | lockedexisting
 
-**Kit** (`forest.night`): I'd forgotten how big the sky was.
+After Kit reacts to the raised lantern. No knowledge of the seals is implied.
 
-Delivery: Kit; low, taking in the woods
+Kit | reunion.first_piece
 
-## Forest Waystone
+Direction, not spoken: Kit; thoughtful
 
-Scene: `forest.waystone` · forest_waystone · core-candidates · lockedexisting
+A start, then. Let's see where it leads.
 
-authored inscription genuinely revealed by lantern-light interaction. Preserved delivered draft copy, not approved final performance.
+### Reunion Depart
 
-**Kit** (`forest.waystone`): Hold it there. There are marks under the moss.
+reunion.depart | Forest summit reunion | lockedexisting
 
-Delivery: Kit; notices a real change
+The reunion exchange is complete and the forest route can begin.
 
-## Forest Clue
+Kit | reunion.depart
 
-Scene: `forest.clue` · forest_waystone · core-candidates · lockedexisting
+Direction, not spoken: Kit; warmth returning
 
-inscription observed; carry objective even if line skipped. Preserved delivered draft copy, not approved final performance.
+Come on. There's a fire and a dry seat waiting in the village.
 
-**Kit** (`forest.clue`): A road to the treasury, perhaps. Someone in the village might read it.
+### Forest Night
 
-Delivery: Kit; curious, not certain
+forest.night | Forest path | lockedexisting
 
-## Forest Wait
+The first open moonlit view after a quiet stretch of walking.
 
-Scene: `forest.wait` · forest_wait · core-candidates · lockedexisting
+Kit | forest.night
 
-first authored wait point when player explores; once in this chapter. Preserved delivered draft copy, not approved final performance.
+Direction, not spoken: Kit; low, taking in the woods
 
-**Kit** (`forest.wait`): I'll wait here.
+I'd forgotten how big the sky was.
 
-Delivery: Kit; nearby, no pressure
+### Forest Waystone
 
-## Forest Village
+forest.waystone | Forest waystone | lockedexisting
 
-Scene: `forest.village` · forest_lookout · core-candidates · lockedexisting
+The authored inscription is genuinely revealed by the lantern light.
 
-1.7 lookout endpoint overlooking the distant village shell; no promise of entering unbuilt content. Preserved delivered draft copy, not approved final performance.
+Kit | forest.waystone
 
-**Kit** (`forest.village`): There. Chimney smoke.
+Direction, not spoken: Kit; notices a real change
 
-Delivery: Kit; relieved
+Hold it there. There are marks under the moss.
 
-## The old road mark
+### Forest Clue
 
-Scene: `story.hub_lead` · bellwether_records · core-candidates · draft
+forest.clue | Forest waystone | lockedexisting
 
-Shrine register and exact inscription remain the established v0.1 scene proposal. Do not require an optional waystone voice line: physical evidence survives skips.
+The revealed inscription has been inspected. The objective remains available if speech is skipped.
 
-**Record keeper** (`hub.record_inspect`): Bring the light closer. This mark belongs to the old treasury road.
+Kit | forest.clue
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Kit; curious, not certain
 
-**Record keeper** (`hub.first_errand`): The wayside shrine kept a road register. If it survived, it may name the next stops.
+A road to the treasury, perhaps. Someone in the village might read it.
 
-Delivery: Natural, unhurried and intelligible.
+### Forest Wait
 
-**Record keeper** (`hub.shrine_direction`): Take the northern path out of Bellwether. The shrine is on a short spur beyond it.
+forest.wait | Forest wait point | lockedexisting
 
-Delivery: Natural, unhurried and intelligible.
+The player explores near the first authored wait point while Kit waits safely.
 
-## A lead without the forest clue
+Kit | forest.wait
 
-Scene: `story.hub_missing_mark` · bellwether_records · core-candidates · draft
+Direction, not spoken: Kit; nearby, no pressure
 
-Fallback lead when optional waystone inspection was missed; no new mystical identification claim.
+I'll wait here.
 
-**Record keeper** (`hub.lantern_inspection`): May I look at that? Keep it steady.
+### Forest Village
 
-Delivery: Natural, unhurried and intelligible.
+forest.village | Forest lookout | lockedexisting
 
-**Record keeper** (`hub.shrine_fallback`): The old shrine has records of the treasury road. That is where I would start.
+At the 1.7 lookout endpoint, with the distant village visible. This does not enter the later approach chapter.
 
-Delivery: Natural, unhurried and intelligible.
+Kit | forest.village
 
-## First voice at the shrine
+Direction, not spoken: Kit; relieved
 
-Scene: `story.shrine_first_voice` · wayside_shrine · core-candidates · draft
+There. Chimney smoke.
 
-First-speech staging retained from v0.1. Exact stone/hinge interaction must be approved in prototype. Kit absent. Subtitle label Lantern voice; royal identity is a claim, not fact.
+### The old road mark
 
-**Lantern voice** (`lantern.first_help`): The lower stone. Its hinge is hidden under the roots.
+story.hub_lead | Bellwether records | draft
 
-Delivery: Quiet urgency; genuinely useful.
+In town, the forest mark is shown to the record keeper. The shrine register and exact inscription remain scene proposals.
 
-**Lantern voice** (`lantern.first_identity`): I was king here. My keepers sealed me away.
+Record keeper | hub.record_inspect
 
-Delivery: Measured and tired; no villain colouring.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Lantern voice** (`lantern.king_name`): Veyr. If the name still means anything.
+Bring the light closer. This mark belongs to the old treasury road.
 
-Delivery: Natural, unhurried and intelligible.
+Record keeper | hub.first_errand
 
-**Lantern voice** (`lantern.first_request`): Three seals guard the treasury. Find them, and I can put an end to this.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+The wayside shrine kept a road register. If it survived, it may name the next stops.
 
-## Repeat the shrine lead
+Record keeper | hub.shrine_direction
 
-Scene: `story.shrine_recap` · wayside_shrine · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
-User-requested recap; exact hinge stage must still be actionable. Does not repeat identity unprompted.
+Take the northern path out of Bellwether. The shrine is on a short spur beyond it.
 
-**Lantern voice** (`shrine.recap_mechanism`): Look below the roots. The lower stone opens.
+### A lead without the forest clue
 
-Delivery: Natural, unhurried and intelligible.
+story.hub_missing_mark | Bellwether records | draft
 
-**Lantern voice** (`shrine.recap_register`): Take the register back to Bellwether. It will help you find the seals.
+Alternative lead if the optional forest clue was missed. The record keeper inspects the lantern without identifying it mystically.
 
-Delivery: Natural, unhurried and intelligible.
+Record keeper | hub.lantern_inspection
 
-## Two roads to choose
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Scene: `story.register_return` · bellwether_records · core-candidates · draft
+May I look at that? Keep it steady.
 
-Showing the register establishes route knowledge; scene completion is not a gate.
+Record keeper | hub.shrine_fallback
 
-**Record keeper** (`shrine.register`): The Abbey. The royal Foundry. Then the Glass Court.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+The old shrine has records of the treasury road. That is where I would start.
 
-**Record keeper** (`hub.two_routes`): We can trace the first two roads. The Court's route is still sealed.
+### First voice at the shrine
 
-Delivery: Natural, unhurried and intelligible.
+story.shrine_first_voice | Wayside shrine | draft
 
-**Record keeper** (`hub.routes_independent`): You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.
+The lantern first speaks at the shrine, with Kit absent. Its royal identity is an unverified claim; the exact stone and hinge staging remain proposed.
 
-Delivery: Natural, unhurried and intelligible.
+Lantern voice | lantern.first_help
 
-## Broken towers over the lake
+Direction, not spoken: Quiet urgency; genuinely useful.
 
-Scene: `story.abbey_vista` · abbey_approach · core-candidates · draft
+The lower stone. Its hinge is hidden under the roots.
 
-Only play if blockout visibly supports relation. No flood cause or date asserted.
+Lantern voice | lantern.first_identity
 
-**Lantern voice** (`abbey.vista`): Those are the Abbey towers. The entrance is below them.
+Direction, not spoken: Measured and tired; no villain colouring.
 
-Delivery: Natural, unhurried and intelligible.
+I was king here. My keepers sealed me away.
 
-## Duties without end
+Lantern voice | lantern.king_name
 
-Scene: `story.abbey_entry` · abbey_refuge · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Attendant duty visibly witnessed; no speech during breath urgency.
+Veyr. If the name still means anything.
 
-**Lantern voice** (`abbey.threshold`): The bells called the road caravans to shelter.
+Lantern voice | lantern.first_request
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Lantern voice** (`abbey.attendants`): They still tend the altar. Give them room.
+Three seals guard the treasury. Find them, and I can put an end to this.
 
-Delivery: Natural, unhurried and intelligible.
+### Repeat the shrine lead
 
-## Turn the light
+story.shrine_recap | Wayside shrine | draft
 
-Scene: `tool.abbey_lesson` · abbey_lesson · core-candidates · draft
+An on-demand reminder while the shrine mechanism and register objective remain actionable.
 
-Approved reflector concept; exact room/receiver layout proposed. Core instructions also in nonvoiced tutorial.
+Lantern voice | shrine.recap_mechanism
 
-**Lantern voice** (`abbey.reflector`): That plate was made to turn light into the side chapel.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+Look below the roots. The lower stone opens.
 
-**Lantern voice** (`abbey.reflector_place`): Set it where the lantern can reach it. Turn the plate towards the receiver.
+Lantern voice | shrine.recap_register
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Lantern voice** (`abbey.reflector_feedback`): Watch the receiver. You will see when the light reaches it.
+Take the register back to Bellwether. It will help you find the seals.
 
-Delivery: Natural, unhurried and intelligible.
+### Two roads to choose
 
-## Read the blocked path
+story.register_return | Bellwether records | draft
 
-Scene: `tool.abbey_blocked` · abbey_puzzle · core-candidates · draft
+The recovered register is shown in town, establishing two independent routes.
 
-Only for the actual authored obstruction, after 25 seconds without meaningful progress. No universal solution bark.
+Record keeper | shrine.register
 
-**Lantern voice** (`abbey.reflector_hint`): The shutter blocks it. Try the light from the other side.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+The Abbey. The royal Foundry. Then the Glass Court.
 
-## Try the reflection again
+Record keeper | hub.two_routes
 
-Scene: `tool.abbey_reset` · abbey_lesson · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Only if prototype provides this safe reachable reset; recall control remains UI, not invented spoken binding.
+We can trace the first two roads. The Court's route is still sealed.
 
-**Lantern voice** (`abbey.reflector_reset`): Bring the plate back to the light. You can turn it again from there.
+Record keeper | hub.routes_independent
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## The marked silver
+You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.
 
-Scene: `story.abbey_plunder` · abbey_evidence · core-candidates · draft
+### Broken towers over the lake
 
-Votive silver vessel is v0.1 proposal. Record provenance in persistent evidence independent of physical sale.
+story.abbey_vista | Abbey approach | draft
 
-**Lantern voice** (`abbey.claim_mark`): That silver came from the river settlements. We called it tribute.
+At a safe view of the Abbey, only if the visible layout supports the lake and tower relationship.
 
-Delivery: Natural, unhurried and intelligible.
+Lantern voice | abbey.vista
 
-**Lantern voice** (`abbey.admission`): They did not give it willingly.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+Those are the Abbey towers. The entrance is below them.
 
-## Plunder after the oath
+### Duties without end
 
-Scene: `story.abbey_after_foundry` · abbey_evidence · core-candidates · draft
+story.abbey_entry | Abbey refuge | draft
 
-Optional order-specific manipulation; never overwrites neutral admission.
+Inside a safe Abbey refuge, after the attendants and their continuing work are visibly observed.
 
-**Lantern voice** (`abbey.oath_connection`): An army has to be paid. You have seen how long this one served.
+Lantern voice | abbey.threshold
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## The closed sanctuary
+The bells called the road caravans to shelter.
 
-Scene: `boss.abbey_warning` · abbey_boss_threshold · core-candidates · draft
+Lantern voice | abbey.attendants
 
-Speaking-antagonist candidate; not required for gameplay. Boss title remains provisional.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Bellkeeper** (`abbey.bellkeeper_warning`): The sanctuary is closed.
+They still tend the altar. Give them room.
 
-Delivery: Ritual authority; little wasted breath.
+### Turn the light
 
-## Expose the armour
+tool.abbey_lesson | Abbey lesson | draft
 
-Scene: `boss.abbey_hint` · abbey_boss · core-candidates · draft
+A safe first lesson in the reflector. The room and receiver layout must support the instruction.
 
-Retains existing ID. Precise shutter/target affordance must be validated; pronoun depends selected character. Required reflected-light exposure, not direct damage substitute.
+Lantern voice | abbey.reflector
 
-**Lantern voice** (`abbey.boss_hint`): Open the shutter. Let the reflected light reach him.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+That plate was made to turn light into the side chapel.
 
-## An Abbey seal
+Lantern voice | abbey.reflector_place
 
-Scene: `story.abbey_reward` · abbey_reward · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Award state independent of voice. Does not count seals or require Foundry.
+Set it where the lantern can reach it. Turn the plate towards the receiver.
 
-**Lantern voice** (`abbey.seal`): The Abbey seal. Take it carefully.
+Lantern voice | abbey.reflector_feedback
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Lantern voice** (`abbey.release_question`): Their service should have ended with their lives. The treasury holds the bond.
+Watch the receiver. You will see when the light reaches it.
 
-Delivery: Natural, unhurried and intelligible.
+### Read the blocked path
 
-## The royal mint
+tool.abbey_blocked | Abbey puzzle | draft
 
-Scene: `story.foundry_entry` · foundry_overlook · core-candidates · draft
+After stalled progress at this specific authored obstruction. The hint is not a universal puzzle solution.
 
+Lantern voice | abbey.reflector_hint
 
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Lantern voice** (`foundry.threshold`): This floor cast the army's pay. The furnaces below made its weapons.
+The shutter blocks it. Try the light from the other side.
 
-Delivery: Natural, unhurried and intelligible.
+### Try the reflection again
 
-**Lantern voice** (`foundry.workers`): The shift never ended.
+tool.abbey_reset | Abbey lesson | draft
 
-Delivery: Natural, unhurried and intelligible.
+Only at a tested safe, reachable reflector reset. The recall control is communicated by the interface.
 
-## Leave the light working
+Lantern voice | abbey.reflector_reset
 
-Scene: `tool.foundry_lesson` · foundry_lesson · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Mechanism state and visible light must agree. Approved stand concept; no Abbey dependency.
+Bring the plate back to the light. You can turn it again from there.
 
-**Lantern voice** (`foundry.stand`): Set the lantern in the stand. The shutter will hold back its light.
+### The marked silver
 
-Delivery: Natural, unhurried and intelligible.
+story.abbey_plunder | Abbey evidence | draft
 
-**Lantern voice** (`foundry.stand_receiver`): Open it towards the receiver. Leave the light there while you move.
+The marked silver vessel is inspected. Its proposed provenance is recorded independently of any later sale.
 
-Delivery: Natural, unhurried and intelligible.
+Lantern voice | abbey.claim_mark
 
-**Lantern voice** (`foundry.stand_result`): The mechanism stays open while the light reaches it.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+That silver came from the river settlements. We called it tribute.
 
-## Cross under cover
+Lantern voice | abbey.admission
 
-Scene: `tool.foundry_shadow` · foundry_puzzle · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Watcher rule remains prototype proposal. Do not apply this to the separate receiver requiring open light.
+They did not give it willingly.
 
-**Lantern voice** (`foundry.shadow_hint`): That watcher follows the light. Close the shutter before you cross.
+### Plunder after the oath
 
-Delivery: Natural, unhurried and intelligible.
+story.abbey_after_foundry | Abbey evidence | draft
 
-## Recover the stand
+An optional Abbey reaction when the Foundry oath evidence is already known.
 
-Scene: `tool.foundry_reset` · foundry_lesson · core-candidates · draft
+Lantern voice | abbey.oath_connection
 
-Only after prototype verifies safe reachable item recovery. Never strand the lantern.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Lantern voice** (`foundry.stand_reset`): Close the shutter. Take the lantern back and try the stand from here.
+An army has to be paid. You have seen how long this one served.
 
-Delivery: Natural, unhurried and intelligible.
+### The closed sanctuary
 
-## The continuing service
+boss.abbey_warning | Abbey boss threshold | draft
 
-Scene: `story.foundry_oath` · foundry_evidence · core-candidates · draft
+An optional speaking-antagonist candidate at the closed sanctuary. The boss title remains provisional.
 
-Manipulative attribution, not authorial truth; persistent record survives missed voice.
+Bellkeeper | abbey.bellkeeper_warning
 
-**Lantern voice** (`foundry.bond_record`): Service until the last campaign is ended. That was the oath.
+Direction, not spoken: Ritual authority; little wasted breath.
 
-Delivery: Natural, unhurried and intelligible.
+The sanctuary is closed.
 
-**Lantern voice** (`foundry.blame`): My keepers kept the bond alive. Every soldier is still paying for it.
+### Expose the armour
 
-Delivery: Natural, unhurried and intelligible.
+boss.abbey_hint | Abbey boss | draft
 
-## Payment after the plunder
+Only at the validated reflected-light exposure step of the Abbey encounter. The exact target staging remains proposed.
 
-Scene: `story.foundry_after_abbey` · foundry_evidence · core-candidates · draft
+Lantern voice | abbey.boss_hint
 
-Optional reciprocal-order connection. No new victims or numbers.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Lantern voice** (`foundry.plunder_connection`): The silver was brought home. The men never were.
+Open the shutter. Let the reflected light reach him.
 
-Delivery: Natural, unhurried and intelligible.
+### An Abbey seal
 
-## The Crown property
+story.abbey_reward | Abbey reward | draft
 
-Scene: `boss.foundry_warning` · foundry_boss_threshold · core-candidates · draft
+After the Abbey encounter, as its seal becomes available. Either middle-dungeon order is valid.
 
+Lantern voice | abbey.seal
 
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Master of Coin** (`foundry.mintmaster_warning`): No one leaves with the Crown's property.
+The Abbey seal. Take it carefully.
 
-Delivery: Precise, brittle authority.
+Lantern voice | abbey.release_question
 
-## Hold the shell mechanism
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Scene: `boss.foundry_hint` · foundry_boss · core-candidates · draft
+Their service should have ended with their lives. The treasury holds the bond.
 
-Replaces v0.1 foundry.boss_hint as mechanical guidance: old shutter/search wording did not establish required stand-maintained mechanism. Old ID reserved deprecated, never silently repurposed.
+### The royal mint
 
-**Lantern voice** (`foundry.boss_stand_hint`): Leave the light on the mechanism. Move round to the open shell.
+story.foundry_entry | Foundry overlook | draft
 
-Delivery: Natural, unhurried and intelligible.
+The Foundry is entered and its continuing work is visibly observed from a safe position.
 
-## The Foundry seal
+Lantern voice | foundry.threshold
 
-Scene: `story.foundry_reward` · foundry_reward · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
+This floor cast the army's pay. The furnaces below made its weapons.
 
+Lantern voice | foundry.workers
 
-**Lantern voice** (`foundry.seal`): Take the seal. We have kept them waiting long enough.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+The shift never ended.
 
-## Read the names
+### Leave the light working
 
-Scene: `story.foundry_record_return` · bellwether_records · core-candidates · draft
+tool.foundry_lesson | Foundry lesson | draft
 
+A safe first lesson in leaving the lantern on its stand. No Abbey tool is required.
 
+Lantern voice | foundry.stand
 
-**Record keeper** (`foundry.record_review`): The names continue after the dates of death. These were people, not an endless supply.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+Set the lantern in the stand. The shutter will hold back its light.
 
-## One seal and the eastern road
+Lantern voice | foundry.stand_receiver
 
-Scene: `return.abbey_first` · bellwether_records · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
+Open it towards the receiver. Leave the light there while you move.
 
+Lantern voice | foundry.stand_result
 
-**Record keeper** (`return.one_seal`): One seal. The other road may tell us what this opens.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+The mechanism stays open while the light reaches it.
 
-**Record keeper** (`return.foundry_remaining`): The Foundry still holds its seal. You'll need a way across the broken bridge.
+### Cross under cover
 
-Delivery: Natural, unhurried and intelligible.
+tool.foundry_shadow | Foundry puzzle | draft
 
-## One seal and the southern road
+Only at the proposed watcher puzzle where cover actually works. This is separate from a receiver that needs open light.
 
-Scene: `return.foundry_first` · bellwether_records · core-candidates · draft
+Lantern voice | foundry.shadow_hint
 
-Variant shares exact text with return.one_seal; audio reuse permitted after per-line manifest mapping. Distinct ID prevents duplicate ownership ambiguity.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Record keeper** (`return.one_seal_foundry`): One seal. The other road may tell us what this opens.
+That watcher follows the light. Close the shutter before you cross.
 
-Delivery: Natural, unhurried and intelligible.
+### Recover the stand
 
-**Record keeper** (`return.abbey_remaining`): The Abbey still holds its seal. Prepare for the submerged approach.
+tool.foundry_reset | Foundry lesson | draft
 
-Delivery: Natural, unhurried and intelligible.
+Only after safe, reachable recovery of the stand and lantern has been tested.
 
-## The road to Court
+Lantern voice | foundry.stand_reset
 
-Scene: `return.two_seal_scene` · bellwether_records · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Paired inscription translation is v0.1 proposal. No premature Court opening before authored interaction.
+Close the shutter. Take the lantern back and try the stand from here.
 
-**Record keeper** (`return.two_seals`): Both seals fit the route mark. We can find the Glass Court now.
+### The continuing service
 
-Delivery: Natural, unhurried and intelligible.
+story.foundry_oath | Foundry evidence | draft
 
-## Let the ruins speak
+The binding record is examined. The lantern’s attribution is manipulative rather than established truth.
 
-Scene: `return.voice_deflects` · bellwether_records · core-candidates · draft
+Lantern voice | foundry.bond_record
 
+Direction, not spoken: Natural, unhurried and intelligible.
 
+Service until the last campaign is ended. That was the oath.
 
-**Lantern voice** (`return.voice_reply`): I remember what was done here. I would rather you saw it than took my word.
+Lantern voice | foundry.blame
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## The missing Abbey seal
+My keepers kept the bond alive. Every soldier is still paying for it.
 
-Scene: `court.gate_missing_abbey` · court_gate · core-candidates · draft
+### Payment after the plunder
 
+story.foundry_after_abbey | Foundry evidence | draft
 
+An optional Foundry reaction when the Abbey plunder evidence is already known.
 
-**Lantern voice** (`court.missing_abbey`): The Abbey seal is still missing. This gate needs both.
+Lantern voice | foundry.plunder_connection
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## The missing Foundry seal
+The silver was brought home. The men never were.
 
-Scene: `court.gate_missing_foundry` · court_gate · core-candidates · draft
+### The Crown property
 
+boss.foundry_warning | Foundry boss threshold | draft
 
+After the stand lesson, at the Foundry boss threshold and in a safe speaking interval.
 
-**Lantern voice** (`court.missing_foundry`): You still need the Foundry seal. One will not open this gate.
+Master of Coin | foundry.mintmaster_warning
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Precise, brittle authority.
 
-## The paired seal sockets
+No one leaves with the Crown's property.
 
-Scene: `court.gate_missing_both` · court_gate · core-candidates · draft
+### Hold the shell mechanism
 
+boss.foundry_hint | Foundry boss | draft
 
+At the validated encounter step where the stand must maintain the shell mechanism.
 
-**Lantern voice** (`court.missing_both`): The Abbey and the Foundry. Bring both seals here.
+Lantern voice | foundry.boss_stand_hint
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## The sealed ascent
+Leave the light on the mechanism. Move round to the open shell.
 
-Scene: `court.access_help` · bellwether_records · core-candidates · draft
+### The Foundry seal
 
-Court alternative actions not yet authored. Generic menu lead only; three detailed Court access quests remain an explicit coverage gap.
+story.foundry_reward | Foundry reward | draft
 
-**Record keeper** (`court.access_options`): We can prepare a ward, ask for climbing gear, or practise the ascent. Take the way you can manage.
+After the Foundry encounter, as its seal becomes available. Either middle-dungeon order is valid.
 
-Delivery: Natural, unhurried and intelligible.
+Lantern voice | foundry.seal
 
-**Record keeper** (`court.access_seals`): Whichever way you climb, take both seals. The gate will still be shut.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+Take the seal. We have kept them waiting long enough.
 
-## A narrow beam
+### Read the names
 
-Scene: `tool.court_lesson` · court_lesson · core-candidates · draft
+story.foundry_record_return | Bellwether records | draft
 
-Safe lesson before confrontation. No premature court_keeper presence required; preserves approved learning order.
+The physical binding record is shown to the record keeper in town.
 
-**Lantern voice** (`court.aperture_lesson`): Fit the aperture. Narrow the light until it reaches only that receiver.
+Record keeper | foundry.record_review
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Lantern voice** (`court.aperture_observe`): Watch what changes when you move the beam away.
+The names continue after the dates of death. These were people, not an endless supply.
 
-Delivery: Natural, unhurried and intelligible.
+### One seal and the eastern road
 
-## Select the receiver
+return.abbey_first | Bellwether records | draft
 
-Scene: `tool.court_hint` · court_puzzle · core-candidates · draft
+Only the Abbey seal has been acquired and is shown. The Foundry route remains ahead.
 
-Specific two-receiver geometry is proposed; emit only if true.
+Record keeper | return.one_seal
 
-**Lantern voice** (`court.aperture_hint`): The broad light reaches both. Narrow it before you turn towards the next receiver.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+One seal. The other road may tell us what this opens.
 
-## A claimed memory
+Record keeper | return.foundry_remaining
 
-Scene: `story.court_garden` · court_garden · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
-False memory candidate; no present snowfall or daylight transition implied.
+The Foundry still holds its seal. You'll need a way across the broken bridge.
 
-**Lantern voice** (`court.garden`): I used to walk here after the snow.
+### One seal and the southern road
 
-Delivery: Rehearsed softness; no early sneer.
+return.foundry_first | Bellwether records | draft
 
-## The carried prison
+Only the Foundry seal has been acquired and is shown. The Abbey route remains ahead.
 
-Scene: `story.court_recognition` · court_encounter · core-candidates · draft
+Record keeper | return.one_seal_foundry
 
-No automatic inventory drop; encounter defeat still required. Court fate not resolved by speech.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Court keeper** (`court.recognition`): Put that lantern down. Keep its shutter closed.
+One seal. The other road may tell us what this opens.
 
-Delivery: Natural, unhurried and intelligible.
+Record keeper | return.abbey_remaining
 
-**Lantern voice** (`court.voice_accuses`): Another keeper. You know what their mercy looks like.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+The Abbey still holds its seal. Prepare for the submerged approach.
 
-## Break the protection
+### The road to Court
 
-Scene: `boss.court_hint` · court_encounter · core-candidates · draft
+return.two_seal_scene | Bellwether records | draft
 
-Exact duration/sequence remains prototype; required focusing aperture actual use cannot be bypassed by attacks.
+Both middle seals are presented. The paired inscription and route interaction remain proposed staging.
 
-**Lantern voice** (`court.boss_aperture_hint`): Narrow the beam. Hold it on the ward until the protection breaks.
+Record keeper | return.two_seals
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## The king order
+Both seals fit the route mark. We can find the Glass Court now.
 
-Scene: `story.court_evidence` · court_evidence · decision-blocked · newdecisionblocked
+### The other meaning of keeper
 
-Candidate speaking interval after encounter defeat; does not mandate death or long-term survival. Evidence/order also readable if scene skipped. Gate keeper_can_speak until staging reviewed.
+return.jailer_translation | Bellwether records | draft
 
-**Court keeper** (`court.king_proof`): Read the king's order. His seal is beside ours. He ordered the prison made.
+Both middle seals and the paired inscription evidence are shown, before the Court identity reveal.
 
-Delivery: Natural, unhurried and intelligible.
+Record keeper | return.keeper_word
 
-**Court keeper** (`court.true_bargain`): He bargained for victory. It gave him an army that could not stop serving.
+Direction, not spoken: Careful correction.
 
-Delivery: Natural, unhurried and intelligible.
+I read this as keeper of the treasury. Here, the same word means jailer.
 
-**Court keeper** (`court.fourth_keeper`): There were four of us. The one beneath the tomb kept watch over what you carry.
+### Let the ruins speak
 
-Delivery: Natural, unhurried and intelligible.
+return.voice_deflects | Bellwether records | draft
 
-**Court keeper** (`court.custody`): We held it. We could not release the soldiers without opening the bond.
+Both middle seals and the keeper or jailer meaning are known; the lantern is present.
 
-Delivery: Natural, unhurried and intelligible.
+Lantern voice | return.voice_reply
 
-## Check the garden date
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Scene: `story.court_memory` · court_evidence · decision-blocked · newdecisionblocked
+I remember what was done here. I would rather you saw it than took my word.
 
-Specific garden chronology is existing draft clue, not approved history; optional corroboration only.
+### The missing Abbey seal
 
-**Court keeper** (`court.memory_evidence`): That garden was planted after the king died.
+court.gate_missing_abbey | Court gate | draft
 
-Delivery: Natural, unhurried and intelligible.
+The Court gate is inspected with the Foundry seal, but without the Abbey seal.
 
-## Read the Court evidence together
+Lantern voice | court.missing_abbey
 
-Scene: `story.court_recap_hub` · bellwether_records · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Physical Court evidence provides recoverable critical truth independent of optional garden scene/keeper audio. Exact order is v0.1 proposal; accepted underlying truth unchanged.
+The Abbey seal is still missing. This gate needs both.
 
-**Record keeper** (`court.recap_king`): The king ordered the prison made. That seal is his.
+### The missing Foundry seal
 
-Delivery: Natural, unhurried and intelligible.
+court.gate_missing_foundry | Court gate | draft
 
-**Record keeper** (`court.recap_identity`): The voice is the one he bargained with. It was never the king.
+The Court gate is inspected with the Abbey seal, but without the Foundry seal.
 
-Delivery: Natural, unhurried and intelligible.
+Lantern voice | court.missing_foundry
 
-**Record keeper** (`court.recap_bond`): The soldiers and the thing in the lantern are held by the same bond. Open it, and both go free.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+You still need the Foundry seal. One will not open this gate.
 
-## The final seal
+### The paired seal sockets
 
-Scene: `story.court_reward` · court_reward · decision-blocked · newdecisionblocked
+court.gate_missing_both | Court gate | draft
 
-Final seal award independent of speech; keeper transfer/fate remains staging gate.
+The Court gate is inspected before either middle seal is acquired, after the lantern has first spoken.
 
-**Court keeper** (`court.final_seal`): The last seal leads to the treasury. You have seen what it keeps.
+Lantern voice | court.missing_both
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## The cost stated plainly
+The Abbey and the Foundry. Bring both seals here.
 
-Scene: `story.ritual_risk` · court_exit · core-candidates · draft
+### The sealed ascent
 
-Must be corroborated and available as nonvoiced objective/inspection before ritual even if skipped. Not a forced bad-choice twist.
+court.access_help | Bellwether records | draft
 
-**Lantern voice** (`court.ritual_truth`): Open the bond and the soldiers go free. So do I.
+An on-demand access explanation in town. Detailed alternative Court access quests remain an open design gap.
 
-Delivery: Natural, unhurried and intelligible.
+Record keeper | court.access_options
 
-## Bring the learned tools
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Scene: `story.final_preparation` · bellwether_records · core-candidates · draft
+We can prepare a ward, ask for climbing gear, or practise the ascent. Take the way you can manage.
 
-No new last-minute ability, purchase or mandatory unapproved preparation quest. Finale exact counterplay must be prototyped.
+Record keeper | court.access_seals
 
-**Record keeper** (`court.preparation`): Bring what you've learned. The wards and shutters were built to hold its light.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+Whichever way you climb, take both seals. The gate will still be shut.
 
-**Record keeper** (`court.preparation_tools`): The reflector, the stand, the aperture. Practise with them before you leave.
+### A narrow beam
 
-Delivery: Natural, unhurried and intelligible.
+tool.court_lesson | Court lesson | draft
 
-## The real treasure
+The safe focusing-aperture lesson comes before the Court confrontation.
 
-Scene: `story.treasury_view` · treasury_threshold · core-candidates · draft
+Lantern voice | court.aperture_lesson
 
-Treasure genuinely present; protagonist alone, Kit remains Bellwether.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Lantern voice** (`treasury.voice_promise`): Every banner brought something home. I kept it all.
+Fit the aperture. Narrow the light until it reaches only that receiver.
 
-Delivery: Possessive warmth, disguise fraying.
+Lantern voice | court.aperture_observe
 
-**Lantern voice** (`treasury.bound_dead`): Break the bond. Their watch ends here.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+Watch what changes when you move the beam away.
 
-## Before the release
+### Select the receiver
 
-Scene: `story.treasury_risk_recap` · treasury_locus · core-candidates · draft
+tool.court_hint | Court puzzle | draft
 
-No newly invented alternate ending. Ritual deliberate world interaction with visible risk; speech never starts it.
+Only where the proposed two-receiver geometry is actually present.
 
-**Lantern voice** (`treasury.risk_recap`): The bond holds them here. It holds me too. There is no separate lock.
+Lantern voice | court.aperture_hint
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## The released voice
+The broad light reaches both. Narrow it before you turn towards the next receiver.
 
-Scene: `optional_boss.release` · treasury_arena · optional-final-boss · newdecisionblocked
+### A claimed memory
 
-OPTIONAL FINAL BOSS VOICE. User said maybe; excluded from core TTS and recording lock. Essential release and threat shown visually.
+story.court_garden | Court garden | draft
 
-**Lantern voice** (`treasury.release`): At last.
+An optional claimed memory from the lantern. The history is unverified and implies no present daylight or snowfall change.
 
-Delivery: First unguarded pleasure.
+Lantern voice | court.garden
 
-**Lantern voice** (`treasury.entity_claim`): I gave them victory. Their king promised me everything that followed.
+Direction, not spoken: Rehearsed softness; no early sneer.
 
-Delivery: Natural, unhurried and intelligible.
+I used to walk here after the snow.
 
-**Lantern voice** (`treasury.entity_demand`): Put down the light. You have carried it far enough.
+### The carried prison
 
-Delivery: Natural, unhurried and intelligible.
+story.court_recognition | Court encounter | draft
 
-## A demand refused
+At the Court encounter. The speech does not defeat the keeper or automatically drop the lantern.
 
-Scene: `optional_boss.pressure` · treasury_arena · optional-final-boss · newdecisionblocked
+Court keeper | court.recognition
 
-Alternatives, not a sequence. No player-control restriction; optional boss pack only.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Lantern voice** (`finale.entity_pressure`): You would leave this here?
+Put that lantern down. Keep its shutter closed.
 
-Delivery: Natural, unhurried and intelligible.
+Lantern voice | court.voice_accuses
 
-**Lantern voice** (`bark.entity.command`): Kneel.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+Another keeper. You know what their mercy looks like.
 
-## The light turns
+### Break the protection
 
-Scene: `optional_boss.counter` · treasury_arena · optional-final-boss · newdecisionblocked
+boss.court_hint | Court encounter | draft
 
-Only if actual learned counterplay uses shutter; exact finale mechanics open.
+At the tested encounter step requiring the focusing aperture. Exact timing and sequence remain to be prototyped.
 
-**Lantern voice** (`finale.entity_light`): Close that shutter!
+Lantern voice | court.boss_aperture_hint
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## The claim fails
+Narrow the beam. Hold it on the ward until the protection breaks.
 
-Scene: `optional_boss.last` · treasury_arena · optional-final-boss · newdecisionblocked
+### Read the Court evidence together
 
-Optional defeat vocal. Not required for save/progression.
+story.court_recap_hub | Bellwether records | draft
 
-**Lantern voice** (`finale.entity_last`): It was promised to me.
+Physical Court evidence is shown to the record keeper. The core truth remains recoverable without optional garden or keeper speech.
 
-Delivery: Natural, unhurried and intelligible.
+Record keeper | court.recap_king
 
-## Home with the living
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Scene: `story.epilogue_neutral` · bellwether_tavern · core-candidates · draft
+The king ordered the prison made. That seal is his.
 
-Neutral ending works with no optional repair/restitution/trade. No forced relinquishing treasure.
+Record keeper | court.recap_identity
 
-**Tavern keeper** (`epilogue.welcome`): You're back. Sit down. I'll find something hot.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Natural, unhurried and intelligible.
+The voice is the one he bargained with. It was never the king.
 
-## Names without service
+Record keeper | court.recap_bond
 
-Scene: `story.epilogue_names` · bellwether_records · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
+The soldiers and the thing in the lantern are held by the same bond. Open it, and both go free.
 
+### The cost stated plainly
 
-**Record keeper** (`epilogue.record`): We'll write their names as people. Their service is over.
+story.ritual_risk | Court exit | draft
 
-Delivery: Natural, unhurried and intelligible.
+Before the ritual, the release risk must be corroborated and available through readable evidence or objectives.
 
-## Known air above
+Lantern voice | court.ritual_truth
 
-Scene: `bark.lantern_air` · abbey_crossing · core-candidates · draft
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Suppress when breath warning is urgent; does not replace UI/SFX. Exact reachable pocket required.
+Open the bond and the soldiers go free. So do I.
 
-**Lantern voice** (`bark.lantern.air`): Air above you.
+### Bring the learned tools
 
-Delivery: Natural, unhurried and intelligible.
+story.final_preparation | Bellwether records | draft
 
-## A clear way out
+In town, review already-learned tools before the finale. No new ability, purchase or mandatory preparation quest is introduced.
 
-Scene: `bark.lantern_smoke` · foundry_hazard · core-candidates · draft
+Record keeper | court.preparation
 
-Geometry-verified escape only. Critical hazard cues always win.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Lantern voice** (`bark.lantern.smoke`): Clear air through that arch.
+Bring what you've learned. The wards and shutters were built to hold its light.
 
-Delivery: Natural, unhurried and intelligible.
+Record keeper | court.preparation_tools
 
-## The fourth watch
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Scene: `optional_guard.warning` · tomb_keeper · decision-blocked · newdecisionblocked
+The reflector, the stand, the aperture. Practise with them before you leave.
 
-Future campaign candidate, excluded 1.7 opening recording and active 1.6.2 reveal scope.
+### The real treasure
 
-**Fourth Keeper** (`prologue.keeper_warning`): Leave this chamber. My watch is not ended.
+story.treasury_view | Treasury threshold | draft
 
-Delivery: Natural, unhurried and intelligible.
+At the treasury threshold, with real treasure visible. Kit remains in Bellwether.
 
-## A duty held
+Lantern voice | treasury.voice_promise
 
-Scene: `optional_guard.last` · tomb_keeper · decision-blocked · newdecisionblocked
+Direction, not spoken: Possessive warmth, disguise fraying.
 
-Future campaign candidate only.
+Every banner brought something home. I kept it all.
 
-**Fourth Keeper** (`prologue.keeper_last`): I cannot... leave my post.
+Lantern voice | treasury.bound_dead
 
-Delivery: Natural, unhurried and intelligible.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## Loose ground beyond the lookout
+Break the bond. Their watch ends here.
 
-Scene: `kit.approach_injury` · 1.8 approach road, after the 1.7 lookout endpoint · decision-blocked · newdecisionblocked
+### Before the release
 
-NEW DECISION BLOCKED: the injury and recovery in Bellwether are approved, but an ankle turned on loose ground, retained weight-bearing and offered arm support are proposed specifics requiring approval. No attack, broken leg, combat encounter or escort-failure system. The stumble is after 1.7; neither wording nor scene may enter 1.7. An offered arm is a silent optional player action, never a spoken answer. If this incident is rejected, keep the approved injury/base arc with different staging.
+story.treasury_risk_recap | Treasury locus | draft
 
-**Kit** (`kit.approach_injury.stop`): Ah. Wait a moment.
+Before the deliberate release interaction. Speech never starts the ritual or selects an ending.
 
-Delivery: A short involuntary catch, then controlled.
+Lantern voice | treasury.risk_recap
 
-**Kit** (`kit.approach_injury.ankle`): Loose ground. Turned my ankle. I can stand, but give me a moment.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Testing carefully; no brave joke.
+The bond holds them here. It holds me too. There is no separate lock.
 
-**Kit** (`kit.approach_injury.arm`): Lend me your arm for this bit. We’ll take it slowly.
+### Home with the living
 
-Delivery: Plain request; lets the player move.
+story.epilogue_neutral | Bellwether tavern | draft
 
-## Accepting the chair
+After the finale and return to Bellwether. This welcome requires no optional repair, trade or restitution.
 
-Scene: `kit.accept_base` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Tavern keeper | epilogue.welcome
 
-This follows any approved injury staging and does not specify body part, cause, diagnosis or recovery time. Kit chooses to remain in town; no compulsory treatment purchase, escort objective or lost companion combat system.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-**Kit** (`kit.accept_base.sit`): Right. I’m sitting down before I make this worse.
+You're back. Sit down. I'll find something hot.
 
-Delivery: Annoyed at the injury, not the player.
+### Names without service
 
-**Kit** (`kit.accept_base.limit`): I won’t get far along those roads like this. You’ll have to go without me.
+story.epilogue_names | Bellwether records | draft
 
-Delivery: Honest appraisal; no self-pity.
+After the finale, recovered records are shown to the record keeper.
 
-**Kit** (`kit.accept_base.work`): Bring what you find back here. I can still make myself useful.
+Record keeper | epilogue.record
 
-Delivery: Already clearing a space on the table.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## Something worth the climb
+We'll write their names as people. Their service is over.
 
-Scene: `kit.arrival_introduction` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+### Known air above
 
-Retains existing hub.kit_introduce exactly. Kit can gesture towards the lantern; the player is never made to display or surrender it automatically.
+bark.lantern_air | Abbey crossing | draft
 
-**Kit** (`hub.kit_introduce`): The tomb was there. So was something worth the climb.
+Only where the exact reachable air pocket is known. Suppress speech during an urgent breath warning.
 
-Delivery: Modest pride; gestures towards the player’s find.
+Lantern voice | bark.lantern.air
 
-**Kit** (`kit.arrival_introduction.table`): There’s room on the table, if you want to show them.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-Delivery: Invitation to a voluntary item presentation.
+Air above you.
 
-## Both meanings
+### A clear way out
 
-Scene: `kit.army_and_hoard` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+bark.lantern_smoke | Foundry hazard | draft
 
-Retains exact existing text. Play only when Kit actually hears the tavern keeper’s army/hoard observation; it is not a free-standing lore recap.
+Only where a clear escape arch is visible and reachable. Critical hazard cues take priority.
 
-**Kit** (`hub.hoard_answer`): Armies need paying. I'm hoping we're both right.
+Lantern voice | bark.lantern.smoke
 
-Delivery: Lightly defensive; treasure still matters.
+Direction, not spoken: Natural, unhurried and intelligible.
 
-## A sound roof
+Clear air through that arch.
 
-Scene: `kit.personal_stake` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+## Kit as the town partner
 
-Personal want rather than an automatic lodging purchase or promise by the player. The room and eventual tenancy remain uncommitted.
+The approved arc keeps Kit in Bellwether while recovering. Town scenes depend on evidence actually shown or speech actually heard by Kit, including safe returns before any dungeon is complete.
 
-**Kit** (`hub.kit_stake`): I'd like a roof that doesn't fall in. Treasure still seems a fair way to get one.
+### A place by the fire
 
-Delivery: Candid; the want is real.
+story.hub_arrival | Bellwether tavern | draft
 
-**Kit** (`kit.personal_stake.key`): A door with my own key. I’ve had worse reasons for going digging.
+At the first entry into the Bellwether tavern, before the first settled-in conversation.
 
-Delivery: A small private smile, then let it rest.
+Tavern keeper | hub.arrival
 
-## First trip without Kit
+Direction, not spoken: Brisk welcome, practical care.
 
-Scene: `kit.shrine_departure` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Shut the door behind you. Both of you look frozen.
 
-Kit knows the destination from the route evidence shown in town. No shrine accompaniment. Selecting the departure route supplies the player’s response.
+### Accepting the chair
 
-**Kit** (`kit.shrine_departure.leave`): Off to the shrine, then. Leave a space in your bag for the register.
+kit.accept_base | Bellwether resting place or staged nearby town location | draft
 
-Delivery: Practical familiarity.
+The first safe pause after Kit settles in Bellwether. The wording works with any approved injury staging and sets no diagnosis or recovery date.
 
-**Kit** (`kit.shrine_departure.return`): And come back even if there’s nothing in it. I’d rather hear that than keep wondering.
+Kit | kit.accept_base.sit
 
-Delivery: Concern stated without a speech.
+Direction, not spoken: Annoyed at the injury, not the player.
 
-## Back without the register
+Right. I’m sitting down before I make this worse.
 
-Scene: `kit.shrine_empty_return` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | kit.accept_base.limit
 
-The player shows the still-empty register slot or an authored incomplete-route marker; Kit does not infer failure from silence. No first-voice knowledge is assumed. The visible quest-state presentation is an authoring proposal, not an implemented UI.
+Direction, not spoken: Honest appraisal; no self-pity.
 
-**Kit** (`kit.shrine_empty_return.welcome`): You’re back. Come and sit for a bit.
+I won’t get far along those roads like this. You’ll have to go without me.
 
-Delivery: Relief first.
+Kit | kit.accept_base.work
 
-**Kit** (`kit.shrine_empty_return.blank`): Still a blank on the route, then. We can have another look at what you brought from the tomb.
+Direction, not spoken: Already clearing a space on the table.
 
-Delivery: Looks at the presented route evidence; no rebuke.
+Bring what you find back here. I can still make myself useful.
 
-## What the register can tell Kit
+### Something worth the climb
 
-Scene: `kit.shrine_register_return` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+kit.arrival_introduction | Bellwether resting place or staged nearby town location | draft
 
-Evidence-informed branch: Kit learns only what the shown register says. This does not tell Kit that the lantern speaks, whom it claims to be or anything said at the shrine. No invented spoken player report. Later direct-hearing scene remains available.
+At the first tavern introduction. Kit may gesture towards the lantern; the player is not forced to display or surrender it.
 
-**Kit** (`kit.shrine_register_return.found`): You found it. Let’s have a look.
+Kit | hub.kit_introduce
 
-Delivery: Leans towards the offered register.
+Direction, not spoken: Modest pride; gestures towards the player’s find.
 
-**Kit** (`kit.shrine_register_return.routes`): Abbey. Foundry. Glass Court. More road than I’d hoped for.
+The tomb was there. So was something worth the climb.
 
-Delivery: Reading the visible names.
+Kit | kit.arrival_introduction.table
 
-**Kit** (`kit.shrine_register_return.work`): Leave it open there. I can work through the marks while you’re seeing to your gear.
+Direction, not spoken: Invitation to a voluntary item presentation.
 
-Delivery: Competent offer; does not take the item away.
+There’s room on the table, if you want to show them.
 
-## First hearing in Bellwether
+### The two meanings of Horde
 
-Scene: `kit.first_direct_voice` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+story.horde_name | Bellwether tavern | draft
 
-Retains kit.voice_reaction exactly but moves its trigger to the first utterance Kit actually hears in town. Kit is absent from the shrine; hearing by the player alone never unlocks this. Works whether the register was already shown or not. Never overlap the voice’s line. Reaction-pending/consumed flags govern this optional one-shot only, never progress or whether Kit knows the voice speaks; knowledge comes from the heard utterance, not the reaction audio completing.
+At the first tavern introduction, with Kit present to hear the keeper’s observation. Kit’s answer follows in the linked scene.
 
-**Kit** (`kit.voice_reaction`): Next time, a little warning before the lamp starts talking.
+Tavern keeper | hub.horde_army
 
-Delivery: Startled; recovering practical composure.
+Direction, not spoken: Matter-of-fact, mildly amused.
 
-**Kit** (`kit.first_direct_voice.finish`): Go on, then. I’m listening.
+My grandfather called the Horde an army. You treasure hunters always hear the other word.
 
-Delivery: Looks towards the lantern, giving it room to answer.
+### Both meanings
 
-## Hearing the claim for oneself
+kit.army_and_hoard | Bellwether resting place or staged nearby town location | draft
 
-Scene: `kit.royal_claim` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Immediately after Kit actually hears the tavern keeper’s army and hoard observation.
 
-The lantern must repeat its own claim and request within Kit’s hearing; Kit does not know them from the shrine. No voice dialogue is authored in this Kit-only contribution. A short response addressed to the lantern; claimed identity stays unverified.
+Kit | hub.hoard_answer
 
-**Kit** (`kit.royal_claim.king`): King Veyr. That’s quite a claim to make from inside a lamp.
+Direction, not spoken: Lightly defensive; treasure still matters.
 
-Delivery: Wary curiosity, no sneer.
+Armies need paying. I'm hoping we're both right.
 
-**Kit** (`kit.royal_claim.help`): If you know the roads, help us get there and back. We can start with that.
+### A sound roof
 
-Delivery: Sets a practical test for the voice.
+kit.personal_stake | Bellwether resting place or staged nearby town location | draft
 
-## Still partners
+A quiet conversation after settling in town. Kit expresses a personal want without committing to a room or purchase.
 
-Scene: `kit.shared_table` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | hub.kit_stake
 
-An intimate working beat using evidence already brought home. No offscreen scouting, purchases, secret knowledge or compulsory player agreement.
+Direction, not spoken: Candid; the want is real.
 
-**Kit** (`kit.shared_table.frustration`): I keep thinking I ought to be packing beside you.
+I'd like a roof that doesn't fall in. Treasure still seems a fair way to get one.
 
-Delivery: Quiet frustration.
+Kit | kit.personal_stake.key
 
-**Kit** (`kit.shared_table.task`): Put that end nearer the light. I can make out the old road marks.
+Direction, not spoken: A small private smile, then let it rest.
 
-Delivery: Returns to useful work.
+A door with my own key. I’ve had worse reasons for going digging.
 
-**Kit** (`kit.shared_table.partners`): You bring the pieces back. We’ll see what they make together.
+### First trip without Kit
 
-Delivery: Warm, settled partnership.
+kit.shrine_departure | Bellwether resting place or staged nearby town location | draft
 
-## South towards the lake
+The shrine route has been shown to Kit and the player selects departure. Kit stays in town.
 
-Scene: `kit.abbey_departure` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | kit.shrine_departure.leave
 
-Requires the actual crossing brief heard in town. Kit does not imply a specific access solution is mandatory or that a return route depends on the boss seal.
+Direction, not spoken: Practical familiarity.
 
-**Kit** (`kit.abbey_departure.route`): The Abbey, then. Keep the way back in mind before you go under.
+Off to the shrine, then. Leave a space in your bag for the register.
 
-Delivery: Careful, not instructional overreach.
+Kit | kit.shrine_departure.return
 
-**Kit** (`kit.abbey_departure.empty`): You can come back empty-handed. I’d sooner have you at the table.
+Direction, not spoken: Concern stated without a speech.
 
-Delivery: Brief direct concern.
+And come back even if there’s nothing in it. I’d rather hear that than keep wondering.
 
-## Abbey return before the reflector
+### Back without the register
 
-Scene: `kit.abbey_incomplete_no_tool` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+kit.shrine_empty_return | Bellwether resting place or staged nearby town location | draft
 
-Incomplete return before local tool or seal. Progress must be shown through an inspectable route record or equivalent nonverbal authored interaction. Kit knows no rooms, guardian or unseen failure.
+A return from the shrine with no register. The player visibly presents an authored incomplete-route record; Kit does not infer failure from silence.
 
-**Kit** (`kit.abbey_incomplete_no_tool.arrive`): That strap’s soaked through. Hang the pack here.
+Kit | kit.shrine_empty_return.welcome
 
-Delivery: Ordinary care; wet gear visibly present.
+Direction, not spoken: Relief first.
 
-**Kit** (`kit.abbey_incomplete_no_tool.route`): Show me where you turned back. We can start there next time.
+You’re back. Come and sit for a bit.
 
-Delivery: Invites a point on the route record.
+Kit | kit.shrine_empty_return.blank
 
-## A reflector, but no seal
+Direction, not spoken: Looks at the presented route evidence; no rebuke.
 
-Scene: `kit.abbey_incomplete_tool` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Still a blank on the route, then. We can have another look at what you brought from the tomb.
 
-Local tool has been acquired, retained and safely demonstrated in town. No invented dungeon lesson or assumption Kit saw the Bellkeeper. The player can return to the Abbey without another dungeon’s tool.
+### What the register can tell Kit
 
-**Kit** (`kit.abbey_incomplete_tool.turn`): Ah, you can turn the light without standing in its way.
+kit.shrine_register_return | Bellwether resting place or staged nearby town location | draft
 
-Delivery: Follows an actual safe demonstration.
+The recovered register is physically shown and legible to Kit. This alone gives Kit no knowledge of the speaking lantern.
 
-**Kit** (`kit.abbey_incomplete_tool.use`): Worth bringing that back, seal or no seal.
+Kit | kit.shrine_register_return.found
 
-Delivery: Genuine interest in a useful find.
+Direction, not spoken: Leans towards the offered register.
 
-**Kit** (`kit.abbey_incomplete_tool.rest`): Set it down for a bit. The Abbey will still be there.
+You found it. Let’s have a look.
 
-Delivery: Makes space at the table.
+Kit | kit.shrine_register_return.routes
 
-## Back from the Abbey
+Direction, not spoken: Reading the visible names.
 
-Scene: `kit.abbey_seal_return` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Abbey. Foundry. Glass Court. More road than I’d hoped for.
 
-Retains abbey.kit_return exactly. This is the completed-expedition variant; suppress the two incomplete-return greetings in this visit. No ordinal seal count.
+Kit | kit.shrine_register_return.work
 
-**Kit** (`abbey.kit_return`): You brought half the river home. Anything worth drying?
+Direction, not spoken: Competent offer; does not take the item away.
 
-Delivery: A small joke after checking the player is safe.
+Leave it open there. I can work through the marks while you’re seeing to your gear.
 
-**Kit** (`kit.abbey_seal_return.seal`): There it is. Put it here where we can see it properly.
+### The voice speaks to Kit
 
-Delivery: Attention goes to the presented seal.
+story.lantern_town_introduction | Bellwether shared table | draft
 
-## The silver has an owner
+After the shrine, the player raises the lantern within Kit’s hearing. This witnessed introduction supplies Kit’s knowledge of the claim and request.
 
-Scene: `kit.abbey_plunder_evidence` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Lantern voice | lantern.town_identity
 
-Kit has examined the physical provenance evidence and personally heard the claimant. This reaction is independent of seal count and sale/return choice. Do not play an ownership claim on an unexamined decorative mark alone.
+Direction, not spoken: Measured courtesy; a claim, not confirmed identity.
 
-**Kit** (`kit.abbey_plunder_evidence.mark`): I thought that was just a maker’s mark.
+I am Veyr. Your friend has found the road to my treasury.
 
-Delivery: Reassessing a visible object.
+Lantern voice | lantern.town_seals
 
-**Kit** (`kit.abbey_plunder_evidence.home`): Someone here still knows that mark. All that time under the water.
+Direction, not spoken: Plain and helpful; no early menace.
 
-Delivery: Let the thought land.
+Three seals. The Abbey, the Foundry, and the Glass Court. Bring them together, and the road opens.
 
-**Kit** (`kit.abbey_plunder_evidence.share`): I was already wondering what it would fetch. I wish I’d looked more closely.
+### First hearing in Bellwether
 
-Delivery: Admits their own greed, not the player’s.
+kit.first_direct_voice | Bellwether resting place or staged nearby town location | draft
 
-## East towards the Foundry
+Immediately after Kit first hears the lantern speak in Bellwether. Kit’s reaction must not overlap the voice.
 
-Scene: `kit.foundry_departure` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | kit.voice_reaction
 
-Any valid access option can reach this scene. No unearned knowledge of foundry machinery, local stand or boss.
+Direction, not spoken: Startled; recovering practical composure.
 
-**Kit** (`kit.foundry_departure.route`): The Foundry road, then. Show me the crossing you’re taking.
+Next time, a little warning before the lamp starts talking.
 
-Delivery: Checks the route record with the player.
+Kit | kit.first_direct_voice.finish
 
-**Kit** (`kit.foundry_departure.return`): There. I’ll know which road to watch for you on.
+Direction, not spoken: Looks towards the lantern, giving it room to answer.
 
-Delivery: Accepts the player’s silent route indication.
+Go on, then. I’m listening.
 
-## Foundry return before the stand
+### Hearing the claim for oneself
 
-Scene: `kit.foundry_incomplete_no_tool` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+kit.royal_claim | Bellwether resting place or staged nearby town location | draft
 
-Incomplete return before local tool or seal. Visible soot supports the observation; route progress is shown rather than narrated by a silent protagonist. No implied obligation to beat the guardian before retreat.
+The lantern has stated its royal claim and three-seal request within Kit’s hearing. The claimed identity remains unverified.
 
-**Kit** (`kit.foundry_incomplete_no_tool.soot`): Hold still. You’ve got soot all round your eyes.
+Kit | kit.royal_claim.king
 
-Delivery: Offers a cloth; no automatic player handling.
+Direction, not spoken: Wary curiosity, no sneer.
 
-**Kit** (`kit.foundry_incomplete_no_tool.pause`): We can look at the road after you’ve had a wash. It won’t change while you’re here.
+King Veyr. That’s quite a claim to make from inside a lamp.
 
-Delivery: Allows a welcome pause.
+Kit | kit.royal_claim.help
 
-## A stand, but no seal
+Direction, not spoken: Sets a practical test for the voice.
 
-Scene: `kit.foundry_incomplete_tool` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+If you know the roads, help us get there and back. We can start with that.
 
-Kit reacts only after a safe town demonstration of the actual shuttered lantern stand. The response teaches no unprototyped timing or encounter behaviour.
+### Still partners
 
-**Kit** (`kit.foundry_incomplete_tool.hold`): It holds the lantern for you. And that closes the light off?
+kit.shared_table | Bellwether resting place or staged nearby town location | draft
 
-Delivery: Watches, asking about the presented shutter.
+A quiet working moment with legible route evidence placed on the shared table.
 
-**Kit** (`kit.foundry_incomplete_tool.better`): That’s better than wedging it between two stones.
+Kit | kit.shared_table.frustration
 
-Delivery: Practical approval of the demonstrated tool.
+Direction, not spoken: Quiet frustration.
 
-**Kit** (`kit.foundry_incomplete_tool.keep`): Keep it by your gear. It’s earned its place.
+I keep thinking I ought to be packing beside you.
 
-Delivery: Familiar treasure-hunter judgement.
+Kit | kit.shared_table.task
 
-## Back from the Foundry
+Direction, not spoken: Returns to useful work.
 
-Scene: `kit.foundry_seal_return` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Put that end nearer the light. I can make out the old road marks.
 
-Retains foundry.kit_return exactly. Completed-expedition variant; do not play incomplete-return greetings on the same visit. No ordinal seal count.
+Kit | kit.shared_table.partners
 
-**Kit** (`foundry.kit_return`): You smell like the forge. Sit down before you fall down.
+Direction, not spoken: Warm, settled partnership.
 
-Delivery: Dry humour with concern underneath.
+You bring the pieces back. We’ll see what they make together.
 
-**Kit** (`kit.foundry_seal_return.seal`): I’ll clear a space. Let’s see what all that smoke was hiding.
+### South towards the lake
 
-Delivery: Moves ordinary table clutter for the presented seal.
+kit.abbey_departure | Bellwether resting place or staged nearby town location | draft
 
-## Names after death
+The Abbey route and crossing brief are known to Kit, and the player selects the southern departure.
 
-Scene: `kit.foundry_bond_evidence` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | kit.abbey_departure.route
 
-Requires the record and a deciphered explanation Kit actually hears in town. No assumption Kit witnessed workers or heard the lantern inside the Foundry.
+Direction, not spoken: Careful, not instructional overreach.
 
-**Kit** (`kit.foundry_bond_evidence.line`): Show me that line again.
+The Abbey, then. Keep the way back in mind before you go under.
 
-Delivery: Returns to the relevant passage.
+Kit | kit.abbey_departure.empty
 
-**Kit** (`kit.foundry_bond_evidence.death`): They died, and someone kept counting what they owed.
+Direction, not spoken: Brief direct concern.
 
-Delivery: Anger kept quiet.
+You can come back empty-handed. I’d sooner have you at the table.
 
-**Kit** (`kit.foundry_bond_evidence.names`): Leave the names uncovered. I want to read them.
+### Abbey return before the reflector
 
-Delivery: A personal response, not an instant new quest.
+kit.abbey_incomplete_no_tool | Bellwether resting place or staged nearby town location | draft
 
-## One seal, Foundry ahead
+An Abbey return before reflector or seal, with visibly wet gear and inspectable route progress shown to Kit.
 
-Scene: `kit.abbey_first` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | kit.abbey_incomplete_no_tool.arrive
 
-Abbey-first branch; reciprocal to kit.foundry_first. Eligibility is authoritative acquired-seal state, not speech completion. Suppress immediately when both seals are acquired, even if queued.
+Direction, not spoken: Ordinary care; wet gear visibly present.
 
-**Kit** (`kit.abbey_first.progress`): One seal out of the Abbey. The Foundry’s still ahead.
+That strap’s soaked through. Hang the pack here.
 
-Delivery: Points to the two relevant route marks.
+Kit | kit.abbey_incomplete_no_tool.route
 
-**Kit** (`kit.abbey_first.prepare`): Have your gear seen to before you try that road. I’ll keep working on these marks.
+Direction, not spoken: Invites a point on the route record.
 
-Delivery: Shared preparation, no mandatory purchase.
+Show me where you turned back. We can start there next time.
 
-## One seal, Abbey ahead
+### A reflector but no seal
 
-Scene: `kit.foundry_first` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+kit.abbey_incomplete_tool | Bellwether resting place or staged nearby town location | draft
 
-Foundry-first branch; reciprocal to kit.abbey_first. No reflector dependency for the Foundry and no stand dependency for the Abbey.
+An Abbey return with the reflector but no seal. The player safely demonstrates the retained tool in town.
 
-**Kit** (`kit.foundry_first.progress`): One seal out of the Foundry. The Abbey’s still ahead.
+Kit | kit.abbey_incomplete_tool.turn
 
-Delivery: Points to the remaining road.
+Direction, not spoken: Follows an actual safe demonstration.
 
-**Kit** (`kit.foundry_first.prepare`): Have another look at the crossing before you leave. I’ll keep at this.
+Ah, you can turn the light without standing in its way.
 
-Delivery: Suggests a useful review; no prescribed training or access route.
+Kit | kit.abbey_incomplete_tool.use
 
-## Two seals on the table
+Direction, not spoken: Genuine interest in a useful find.
 
-Scene: `kit.two_seals` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Worth bringing that back, seal or no seal.
 
-Common convergence for either order. Both seals and the route explanation must actually be available to Kit. Does not unlock the Court through audio.
+Kit | kit.abbey_incomplete_tool.rest
 
-**Kit** (`kit.two_seals.fit`): They fit. All that road, and they were made to sit together.
+Direction, not spoken: Makes space at the table.
 
-Delivery: Studies the demonstrated route-mark fit.
+Set it down for a bit. The Abbey will still be there.
 
-**Kit** (`kit.two_seals.court`): The Glass Court. Let’s find out what we can before you climb to it.
+### Back from the Abbey
 
-Delivery: Interest with earned caution.
+kit.abbey_seal_return | Bellwether resting place or staged nearby town location | draft
 
-## A private doubt
+A completed Abbey return, with the seal shown and wet gear visible. Do not also use an incomplete-return greeting on this visit.
 
-Scene: `kit.doubt_from_evidence` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | abbey.kit_return
 
-Retains return.kit_doubt exactly. Kit’s line about locks requires concrete town-heard examples of the lantern’s useful guidance, not unheard dungeon advice. The comparison with a jailer requires the actual paired-inscription explanation. The lantern does not answer over Kit.
+Direction, not spoken: A small joke after checking the player is safe.
 
-**Kit** (`return.kit_doubt`): It knows every lock. Has it told us much about the people who lived behind them?
+You brought half the river home. Anything worth drying?
 
-Delivery: Private unease; considering evidence.
+Kit | kit.abbey_seal_return.seal
 
-**Kit** (`kit.doubt_from_evidence.jailer`): A jailer keeps someone in. I’d like to know who was afraid of whom.
+Direction, not spoken: Attention goes to the presented seal.
 
-Delivery: Refers to the translation just heard.
+There it is. Put it here where we can see it properly.
 
-**Kit** (`kit.doubt_from_evidence.useful`): It’s been useful. That’s why I want to believe it.
+### The claim checked
 
-Delivery: Candid about their own temptation.
+story.relic_claim_verified | Bellwether records | draft
 
-## Something for oneself
+The verified claim and its documentation are reviewed in town with Kit present.
 
-Scene: `kit.ordinary_treasure` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Record keeper | relic.claim_review
 
-Optional ordinary-treasure beat. No automatic split, sale, transfer or purchase. Distinguish common valuables from the separately authored named relic.
+Direction, not spoken: Careful conclusion after evidence, not a guess.
 
-**Kit** (`kit.ordinary_treasure.want`): I still like the sound of coin on a table. I haven’t become a saint in this chair.
+The mark matches the record. The claim holds.
 
-Delivery: Warm candour; a rare dry smile.
+### The silver has an owner
 
-**Kit** (`kit.ordinary_treasure.use`): Good boots. A sound roof. Those aren’t foolish things to want.
+kit.abbey_plunder_evidence | Bellwether resting place or staged nearby town location | draft
 
-Delivery: Practical, sincere.
+Kit has seen the provenance evidence and heard the verified ownership explanation in town. A decorative mark alone is insufficient.
 
-**Kit** (`kit.ordinary_treasure.wait`): We can count it later. Stay a while first.
+Kit | kit.abbey_plunder_evidence.mark
 
-Delivery: Lets affection outrank the tally.
+Direction, not spoken: Reassessing a visible object.
 
-## Enough to come back for
+I thought that was just a maker’s mark.
 
-Scene: `kit.enough` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | kit.abbey_plunder_evidence.home
 
-Retains return.kit_enough exactly. Required shown treasure supports “more than I ever expected”; this is not an assumed amount or prescribed spending plan.
+Direction, not spoken: Let the thought land.
 
-**Kit** (`return.kit_enough`): We've found more than I ever expected. I'd still like us both here to spend it.
+Someone here still knows that mark. All that time under the water.
 
-Delivery: Sincere, a little reluctant.
+Kit | kit.abbey_plunder_evidence.share
 
-**Kit** (`kit.enough.waiting`): I’m not good at waiting. Turns out I’m worse at pretending I don’t mind.
+Direction, not spoken: Admits their own greed, not the player’s.
 
-Delivery: A rare unguarded admission.
+I was already wondering what it would fetch. I wish I’d looked more closely.
 
-## Before deciding about the vessel
+### East towards the Foundry
 
-Scene: `kit.named_relic_choice` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+kit.foundry_departure | Bellwether resting place or staged nearby town location | draft
 
-The marked votive vessel and claimant are existing-bank proposals, not settled object design. Kit gives an opinion without selecting a choice or inferring the player’s motive. No price, morality score or required restitution.
+Kit has seen the Foundry route and heard the access brief, and the player selects the eastern departure.
 
-**Kit** (`kit.named_relic_choice.value`): It’s worth something. I won’t pretend it isn’t.
+Kit | kit.foundry_departure.route
 
-Delivery: Admits the pull of its sale value.
+Direction, not spoken: Checks the route record with the player.
 
-**Kit** (`kit.named_relic_choice.claim`): But the claim holds up. That matters as well.
+The Foundry road, then. Show me the crossing you’re taking.
 
-Delivery: Looks towards the identified claimant.
+Kit | kit.foundry_departure.return
 
-**Kit** (`kit.named_relic_choice.time`): You needn’t decide with the whole room watching.
+Direction, not spoken: Accepts the player’s silent route indication.
 
-Delivery: Makes room for an unhurried player choice.
+There. I’ll know which road to watch for you on.
 
-## The vessel on display
+### Foundry return before the stand
 
-Scene: `kit.named_relic_returned` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+kit.foundry_incomplete_no_tool | Bellwether resting place or staged nearby town location | draft
 
-Only after voluntary return and an actual visible display state. Does not claim all residents approve or the player surrendered other treasure.
+A Foundry return before stand or seal, with visibly sooty gear and inspectable progress shown to Kit.
 
-**Kit** (`kit.named_relic_returned.place`): They’ve put it where the light catches the mark.
+Kit | kit.foundry_incomplete_no_tool.soot
 
-Delivery: Observes the actual display.
+Direction, not spoken: Offers a cloth; no automatic player handling.
 
-**Kit** (`kit.named_relic_returned.worth`): I can see why they wanted it back.
+Hold still. You’ve got soot all round your eyes.
 
-Delivery: Simple recognition; no moral scorekeeping.
+Kit | kit.foundry_incomplete_no_tool.pause
 
-## After the sale
+Direction, not spoken: Allows a welcome pause.
 
-Scene: `kit.named_relic_sold` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+We can look at the road after you’ve had a wash. It won’t change while you’re here.
 
-Only if Kit actually witnessed the transaction in Bellwether or the player explicitly shows its sale record. This version uses the witnessed-sale flag. No irreversible failure claim or promise the dealer will refund it; an attainable recovery route remains a separate bank requirement.
+### A stand but no seal
 
-**Kit** (`kit.named_relic_sold.candid`): I know what the money’s worth. I was looking at it too.
+kit.foundry_incomplete_tool | Bellwether resting place or staged nearby town location | draft
 
-Delivery: Admits their own interest in the sale value, without asserting the player’s motive.
+A Foundry return with the stand but no seal. The actual shuttered stand is safely demonstrated in town.
 
-**Kit** (`kit.named_relic_sold.uneasy`): Still, I keep thinking about that mark.
+Kit | kit.foundry_incomplete_tool.hold
 
-Delivery: Their own unease; no accusation.
+Direction, not spoken: Watches, asking about the presented shutter.
 
-## Still in the bag
+It holds the lantern for you. And that closes the light off?
 
-Scene: `kit.named_relic_kept` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | kit.foundry_incomplete_tool.better
 
-An explicit retained-item inspection triggers this; merely walking away from a conversation is not diagnosed as selfishness. Any later choice remains open.
+Direction, not spoken: Practical approval of the demonstrated tool.
 
-**Kit** (`kit.named_relic_kept.notice`): Still got it, then.
+That’s better than wedging it between two stones.
 
-Delivery: Notices the shown vessel.
+Kit | kit.foundry_incomplete_tool.keep
 
-**Kit** (`kit.named_relic_kept.wrap`): Wrap it properly. Whatever you decide, it’s had enough knocks.
+Direction, not spoken: Familiar treasure-hunter judgement.
 
-Delivery: Practical care for the object without settling ownership.
+Keep it by your gear. It’s earned its place.
 
-## Hearing the mill work
+### Back from the Foundry
 
-Scene: `kit.mill_working` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+kit.foundry_seal_return | Bellwether resting place or staged nearby town location | draft
 
-Must reflect a real repair and working mill, not dungeon completion or a repair quest label. Optional town staging stays within Kit’s current safe mobility; no assumed full recovery.
+A completed Foundry return, with the seal shown and soot visible. Do not also use an incomplete-return greeting on this visit.
 
-**Kit** (`kit.mill_working.sound`): Listen to that. It’s holding steady.
+Kit | foundry.kit_return
 
-Delivery: Attends to the actual machinery.
+Direction, not spoken: Dry humour with concern underneath.
 
-**Kit** (`kit.mill_working.use`): A good use for what came out of those ruins.
+You smell like the forge. Sit down before you fall down.
 
-Delivery: Pleased at a tangible result.
+Kit | kit.foundry_seal_return.seal
 
-## Watching a wagon arrive
+Direction, not spoken: Moves ordinary table clutter for the presented seal.
 
-Scene: `kit.trade_reopened` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+I’ll clear a space. Let’s see what all that smoke was hiding.
 
-Requires an actual returning wagon in a restored-trade state. No automatic trader simulation, morning/daylight advance or invented cargo.
+### Names after death
 
-**Kit** (`kit.trade_reopened.wheels`): Wheels on the road. There’s a sound I’ve missed.
+kit.foundry_bond_evidence | Bellwether resting place or staged nearby town location | draft
 
-Delivery: Watches the actual arrival.
+The binding record is shown and the explanation of posthumous service is heard by Kit in town.
 
-**Kit** (`kit.trade_reopened.room`): We might have to share our quiet corner now. I can live with that.
+Kit | kit.foundry_bond_evidence.line
 
-Delivery: Welcoming, mildly possessive of their familiar place.
+Direction, not spoken: Returns to the relevant passage.
 
-## A family unpacks
+Show me that line again.
 
-Scene: `kit.family_stays` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | kit.foundry_bond_evidence.death
 
-Conditional candidate only for an actually implemented family-stays consequence, one of the approved hub-change examples. Requires Kit to hear their decision and see the unpacking; does not invent a family saved by an unrelated dungeon completion.
+Direction, not spoken: Anger kept quiet.
 
-**Kit** (`kit.family_stays.unpack`): They’re unpacking. They really are staying.
+They died, and someone kept counting what they owed.
 
-Delivery: Quietly pleased after the witnessed decision.
+Kit | kit.foundry_bond_evidence.names
 
-**Kit** (`kit.family_stays.home`): They must think there’s something worth staying for.
+Direction, not spoken: A personal response, not an instant new quest.
 
-Delivery: Turns the thought over; no demand on the player.
+Leave the names uncovered. I want to read them.
 
-## Getting about again
+### One seal Foundry ahead
 
-Scene: `kit.recovery` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+kit.abbey_first | Bellwether resting place or staged nearby town location | draft
 
-Only after an actual authored recovery milestone in Bellwether. Does not set a healing timetable, diagnosis or permission for shrine/dungeon travel. This can be omitted without affecting the campaign.
+Abbey-first branch. Kit has examined that seal and knows the remaining Foundry route; suppress once both seals are acquired.
 
-**Kit** (`kit.recovery.progress`): Getting about’s a little easier. I’ll take that.
+Kit | kit.abbey_first.progress
 
-Delivery: Cautious satisfaction.
+Direction, not spoken: Points to the two relevant route marks.
 
-**Kit** (`kit.recovery.patience`): Still not ready for those roads. I’m trying to be sensible about that.
+One seal out of the Abbey. The Foundry’s still ahead.
 
-Delivery: A little impatient with their own limits.
+Kit | kit.abbey_first.prepare
 
-## Leaving for the high ridge
+Direction, not spoken: Shared preparation, no mandatory purchase.
 
-Scene: `kit.court_departure` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Have your gear seen to before you try that road. I’ll keep working on these marks.
 
-Both middle seals and actual Court access are required. Kit remains in town. No claim about what the Court keeper will do.
+### One seal Abbey ahead
 
-**Kit** (`kit.court_departure.ridge`): I’ll be looking for you on the ridge road this time.
+kit.foundry_first | Bellwether resting place or staged nearby town location | draft
 
-Delivery: Touches the route mark.
+Foundry-first branch. Kit has examined that seal and knows the remaining Abbey route; suppress once both seals are acquired.
 
-**Kit** (`kit.court_departure.questions`): Bring the answers back if you can. Bring yourself back either way.
+Kit | kit.foundry_first.progress
 
-Delivery: A plain request, then space to leave.
+Direction, not spoken: Points to the remaining road.
 
-## A return before the aperture
+One seal out of the Foundry. The Abbey’s still ahead.
 
-Scene: `kit.court_incomplete_no_aperture` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | kit.foundry_first.prepare
 
-No first-person knowledge of the palace interior, keeper or identity reveal. Kit sees only the route progress the player voluntarily presents.
+Direction, not spoken: Suggests a useful review; no prescribed training or access route.
 
-**Kit** (`kit.court_incomplete_no_aperture.welcome`): There’s a space beside the map. Show me where you got to.
+Have another look at the crossing before you leave. I’ll keep at this.
 
-Delivery: Makes the return welcome.
+### Two seals on the table
 
-**Kit** (`kit.court_incomplete_no_aperture.later`): We can leave the difficult part for a moment.
+kit.two_seals | Bellwether resting place or staged nearby town location | draft
 
-Delivery: No pressure to justify retreat.
+Both middle seals and their fit with the route mark are shown to Kit, with the Court route explained.
 
-## An aperture, but no final seal
+Kit | kit.two_seals.fit
 
-Scene: `kit.court_incomplete_aperture` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Direction, not spoken: Studies the demonstrated route-mark fit.
 
-Reacts to an actual safe focusing-aperture demonstration in town. No new technical function beyond approved bounded light selection; no assumed king-proof or keeper encounter.
+They fit. All that road, and they were made to sit together.
 
-**Kit** (`kit.court_incomplete_aperture.beam`): That makes it a much narrower light.
+Kit | kit.two_seals.court
 
-Delivery: Watches the visible beam change.
+Direction, not spoken: Interest with earned caution.
 
-**Kit** (`kit.court_incomplete_aperture.care`): Put it with the others. I’ll move my things out of the way.
+The Glass Court. Let’s find out what we can before you climb to it.
 
-Delivery: Careful accommodation of the player’s working tools.
+### A private doubt
 
-## The claim breaks
+kit.doubt_from_evidence | Bellwether resting place or staged nearby town location | draft
 
-Scene: `kit.court_evidence_debrief` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+A private conversation after Kit reviews both evidence sets, hears useful lantern guidance in town and hears the keeper or jailer translation.
 
-Kit has the Court evidence and hears an accessible town explanation that freeing the soldiers also releases the entity. No knowledge granted by the player’s dungeon flags alone. Retains court.kit_response exactly, with its existing later-debrief intent. The signed order is still a proposed evidence object.
+Kit | return.kit_doubt
 
-**Kit** (`kit.court_evidence_debrief.order`): The king’s seal. Beside the keepers’. Let me look at that.
+Direction, not spoken: Private unease; considering evidence.
 
-Delivery: Examines the actual evidence.
+It knows every lock. Has it told us much about the people who lived behind them?
 
-**Kit** (`kit.court_evidence_debrief.cost`): And opening it frees the soldiers as well. That part was true.
+Kit | kit.doubt_from_evidence.jailer
 
-Delivery: Takes in the explanation just heard.
+Direction, not spoken: Refers to the translation just heard.
 
-**Kit** (`court.kit_response`): Then we find a way to face it before we open anything.
+A jailer keeps someone in. I’d like to know who was afraid of whom.
 
-Delivery: Steady, worried; preparation rather than surrender.
+Kit | kit.doubt_from_evidence.useful
 
-## Making room to prepare
+Direction, not spoken: Candid about their own temptation.
 
-Scene: `kit.final_preparation` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+It’s been useful. That’s why I want to believe it.
 
-Bellwether baseline. Kit helps inspect already-earned tools; says nothing about an untested exact finale solution. Player remains in control of readiness, route and departure. No mandatory secret upgrade or shopping requirement.
+### Something for oneself
 
-**Kit** (`kit.final_preparation.table`): Put the tools here. One at a time. Let’s make sure nothing’s been left behind.
+kit.ordinary_treasure | Bellwether resting place or staged nearby town location | draft
 
-Delivery: Methodical partnership.
+Ordinary treasure is shown during quiet talk. No sale, transfer, split or purchase is selected automatically.
 
-**Kit** (`kit.final_preparation.practice`): Show me again how they work together. Take your time.
+Kit | kit.ordinary_treasure.want
 
-Delivery: Invites safe practice with established interactions.
+Direction, not spoken: Warm candour; a rare dry smile.
 
-**Kit** (`kit.final_preparation.route`): And show me the way back. I want that clear before you leave.
+I still like the sound of coin on a table. I haven’t become a saint in this chair.
 
-Delivery: Checks the actual route evidence.
+Kit | kit.ordinary_treasure.use
 
-## The place to return to
+Direction, not spoken: Practical, sincere.
 
-Scene: `kit.final_departure` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Good boots. A sound roof. Those aren’t foolish things to want.
 
-Kit stays safely in Bellwether throughout the treasury and final confrontation. No threshold relocation, offscreen escort, recovery gate, player promise or presumed motive. The line about waiting reflects presence, not an imposed return timer.
+Kit | kit.ordinary_treasure.wait
 
-**Kit** (`kit.final_departure.want`): I wish I were going with you. I know I’d only slow you down.
+Direction, not spoken: Lets affection outrank the tally.
 
-Delivery: Honest regret; their current recovery matters.
+We can count it later. Stay a while first.
 
-**Kit** (`kit.final_departure.place`): I’ll be here. Same table, same dreadful chair.
+### Enough to come back for
 
-Delivery: A small familiar anchor, not a string of jokes.
+kit.enough | Bellwether resting place or staged nearby town location | draft
 
-**Kit** (`kit.final_departure.return`): Come back and complain about it with me.
+Before Court departure, both middle seals are acquired and ordinary treasure has actually been shown to Kit.
 
-Delivery: Softly; no response demanded.
+Kit | return.kit_enough
 
-## Back to the same table
+Direction, not spoken: Sincere, a little reluctant.
 
-Scene: `kit.final_town_reunion` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+We've found more than I ever expected. I'd still like us both here to spend it.
 
-Moves finale.kit_alive to the first safe Bellwether reunion and preserves exact text. No Kit presence in the vault, no asserted player injury, no claim about what happened until evidence is shown. Allow a quiet player-controlled approach; no forced hug/camera.
+Kit | kit.enough.waiting
 
-**Kit** (`finale.kit_alive`): There you are. Come on. One step at a time.
+Direction, not spoken: A rare unguarded admission.
 
-Delivery: Relief before riches; gives the player room.
+I’m not good at waiting. Turns out I’m worse at pretending I don’t mind.
 
-**Kit** (`kit.final_town_reunion.chair`): Kept your chair. Come and take it.
+### Before deciding about the vessel
 
-Delivery: Simple, warm; the table now means something.
+kit.named_relic_choice | Bellwether resting place or staged nearby town location | draft
 
-## Real treasure brought home
+The proposed marked vessel and verified ownership claim are shown before the player chooses what to do.
 
-Scene: `kit.treasure_home` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | kit.named_relic_choice.value
 
-Retains finale.kit_treasure exactly. The player has actually brought identifiable treasury riches to town; Kit is reacting to visible treasure, not to unseen vault contents. No mandatory hauling quest, spending or assigned distribution.
+Direction, not spoken: Admits the pull of its sale value.
 
-**Kit** (`kit.treasure_home.real`): It’s real. We’ve actually got some of it here.
+It’s worth something. I won’t pretend it isn’t.
 
-Delivery: Looks between the treasure and the player.
+Kit | kit.named_relic_choice.claim
 
-**Kit** (`finale.kit_treasure`): We'll need a bigger bag. Later.
+Direction, not spoken: Looks towards the identified claimant.
 
-Delivery: A tired, fond joke; puts the person first.
+But the claim holds up. That matters as well.
 
-## Their watch is over
+Kit | kit.named_relic_choice.time
 
-Scene: `kit.release_evidence` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Direction, not spoken: Makes room for an unhurried player choice.
 
-Only after a supported town debrief and inspectable aftermath evidence establish that the soldiers are released. The form of this evidence must be authored alongside finale staging; do not treat a glowing token, player silence or Kit intuition as proof. Until evidence staging exists, omit the scene.
+You needn’t decide with the whole room watching.
 
-**Kit** (`kit.release_evidence.free`): So it’s over. They’re free of it.
+### The vessel on display
 
-Delivery: Receives the confirmed account, quietly.
+kit.named_relic_returned | Bellwether resting place or staged nearby town location | draft
 
-**Kit** (`kit.release_evidence.names`): I’m glad we kept their names.
+Only after a voluntary return and an actual visible town display, with Kit present.
 
-Delivery: Refers to records actually retained and shown; require retained names as noted below.
+Kit | kit.named_relic_returned.place
 
-## A roof worth asking about
+Direction, not spoken: Observes the actual display.
 
-Scene: `kit.room_upstairs` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+They’ve put it where the light catches the mark.
 
-Retains epilogue.kit_roof exactly. Asking about a room is not a purchase or tenancy agreement. Roof condition must support the observation. No player commitment to stay; Kit expresses their own preference.
+Kit | kit.named_relic_returned.worth
 
-**Kit** (`epilogue.kit_roof`): I asked about the room upstairs. Roof looks sound.
+Direction, not spoken: Simple recognition; no moral scorekeeping.
 
-Delivery: Pleased, tentative.
+I can see why they wanted it back.
 
-**Kit** (`kit.room_upstairs.stay`): I’d like to stay a while. See what this place is like when we’re not passing through.
+### After the sale
 
-Delivery: A considered personal wish.
+kit.named_relic_sold | Bellwether resting place or staged nearby town location | draft
 
-## Enough for this moment
+Only after Kit witnesses the sale and hears the verified ownership explanation. This does not promise a refund or permanent failure.
 
-Scene: `kit.quiet_closure` · Bellwether, Kit’s resting place or the explicitly staged nearby town location · core-candidates · draft
+Kit | kit.named_relic_sold.candid
 
-Neutral hopeful closure remains available with no optional repairs, returned relics or carried treasure. Retains epilogue.kit_close exactly. “Morning” is conversational intent to rest, not a dawn transition, curse-lifting event or newly approved daylight mechanic. Village stays playable; no compulsory retirement.
+Direction, not spoken: Admits their own interest in the sale value, without asserting the player’s motive.
 
-**Kit** (`kit.quiet_closure.here`): It’s good having you here.
+I know what the money’s worth. I was looking at it too.
 
-Delivery: Quiet, no flourish.
+Kit | kit.named_relic_sold.uneasy
 
-**Kit** (`epilogue.kit_close`): The rest can wait till morning.
+Direction, not spoken: Their own unease; no accusation.
 
-Delivery: Companionable; let the silence hold.
+Still, I keep thinking about that mark.
 
-## Tavern service greeting
+### Still in the bag
 
-Scene: `hub.service.tavern.greet` · Bellwether / tavern · core-candidates · draft
+kit.named_relic_kept | Bellwether resting place or staged nearby town location | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Optional room service remains a proposal; no mandatory rest fee, healing effect, debt, booking or automatic spending is established.
+The player explicitly shows the retained vessel after the ownership review. Walking away alone does not trigger this response.
 
-**Tavern keeper** (`hub.service.tavern.greet`): There’s room by the fire. Tell me what you need.
+Kit | kit.named_relic_kept.notice
 
-Delivery: brisk hospitality; former caravan leader
+Direction, not spoken: Notices the shown vessel.
 
-## Tavern service cancelled
+Still got it, then.
 
-Scene: `hub.service.tavern.cancel` · Bellwether / tavern · core-candidates · draft
+Kit | kit.named_relic_kept.wrap
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Optional room service remains a proposal; no mandatory rest fee, healing effect, debt, booking or automatic spending is established.
+Direction, not spoken: Practical care for the object without settling ownership.
 
-**Tavern keeper** (`hub.service.tavern.cancel`): No hurry. I’ve waited longer for a wagon to turn.
+Wrap it properly. Whatever you decide, it’s had enough knocks.
 
-Delivery: brisk hospitality; former caravan leader
+### Hearing the mill work
 
-## Tavern service shortfall
+kit.mill_working | Bellwether resting place or staged nearby town location | draft
 
-Scene: `hub.service.tavern.insufficient` · Bellwether / tavern · core-candidates · draft
+Kit can safely observe the genuinely repaired, operating mill and knows recovered materials were used.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Optional room service remains a proposal; no mandatory rest fee, healing effect, debt, booking or automatic spending is established.
+Kit | kit.mill_working.sound
 
-**Tavern keeper** (`hub.service.tavern.insufficient`): That won’t cover a room. You’re welcome to warm up here.
+Direction, not spoken: Attends to the actual machinery.
 
-Delivery: brisk hospitality; former caravan leader
+Listen to that. It’s holding steady.
 
-## Record service greeting
+Kit | kit.mill_working.use
 
-Scene: `hub.service.record.greet` · Bellwether / record keeper’s approved interaction point · core-candidates · draft
+Direction, not spoken: Pleased at a tangible result.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Resource-gated optional magic working is a proposal. Reading critical evidence remains available without payment or ingredients.
+A good use for what came out of those ruins.
 
-**Record keeper** (`hub.service.record.greet`): Show me the inscription before you tell me what you hope it says.
+### Watching a wagon arrive
 
-Delivery: precise, patient; distinguishes evidence from wishes
+kit.trade_reopened | Bellwether resting place or staged nearby town location | draft
 
-## Record service cancelled
+Kit can see an actual returning wagon after trade is restored. Dungeon completion alone is insufficient.
 
-Scene: `hub.service.record.cancel` · Bellwether / record keeper’s approved interaction point · core-candidates · draft
+Kit | kit.trade_reopened.wheels
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Resource-gated optional magic working is a proposal. Reading critical evidence remains available without payment or ingredients.
+Direction, not spoken: Watches the actual arrival.
 
-**Record keeper** (`hub.service.record.cancel`): We can leave the reading there. The stone will keep.
+Wheels on the road. There’s a sound I’ve missed.
 
-Delivery: precise, patient; distinguishes evidence from wishes
+Kit | kit.trade_reopened.room
 
-## Record service shortfall
+Direction, not spoken: Welcoming, mildly possessive of their familiar place.
 
-Scene: `hub.service.record.insufficient` · Bellwether / record keeper’s approved interaction point · core-candidates · draft
+We might have to share our quiet corner now. I can live with that.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Resource-gated optional magic working is a proposal. Reading critical evidence remains available without payment or ingredients.
+### A family unpacks
 
-**Record keeper** (`hub.service.record.insufficient`): You haven’t brought what this working needs. We can still look at the inscription.
+kit.family_stays | Bellwether resting place or staged nearby town location | draft
 
-Delivery: precise, patient; distinguishes evidence from wishes
+Only if an authored family-stays change exists, and Kit both hears the decision and sees unpacking from a safe position.
 
-## Artificer service greeting
+Kit | kit.family_stays.unpack
 
-Scene: `hub.service.artificer.greet` · Bellwether / smith · core-candidates · draft
+Direction, not spoken: Quietly pleased after the witnessed decision.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Use cancellation only before work/transaction commits; resource failure refers to the selected optional repair, never a mandatory-route lock.
+They’re unpacking. They really are staying.
 
-**Artificer** (`hub.service.artificer.greet`): Lay it flat. I want to see the worn side.
+Kit | kit.family_stays.home
 
-Delivery: plain, tactile; interested in wear and function
+Direction, not spoken: Turns the thought over; no demand on the player.
 
-## Artificer service cancelled
+They must think there’s something worth staying for.
 
-Scene: `hub.service.artificer.cancel` · Bellwether / smith · core-candidates · draft
+### Getting about again
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Use cancellation only before work/transaction commits; resource failure refers to the selected optional repair, never a mandatory-route lock.
+kit.recovery | Bellwether resting place or staged nearby town location | draft
 
-**Artificer** (`hub.service.artificer.cancel`): Take it with you. I haven’t changed anything.
+Only after an observable authored recovery milestone in Bellwether. This sets no timetable or permission for dungeon travel.
 
-Delivery: plain, tactile; interested in wear and function
+Kit | kit.recovery.progress
 
-## Artificer service shortfall
+Direction, not spoken: Cautious satisfaction.
 
-Scene: `hub.service.artificer.insufficient` · Bellwether / smith · core-candidates · draft
+Getting about’s a little easier. I’ll take that.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Use cancellation only before work/transaction commits; resource failure refers to the selected optional repair, never a mandatory-route lock.
+Kit | kit.recovery.patience
 
-**Artificer** (`hub.service.artificer.insufficient`): I’m short of what this repair needs. I won’t take payment for half a job.
+Direction, not spoken: A little impatient with their own limits.
 
-Delivery: plain, tactile; interested in wear and function
+Still not ready for those roads. I’m trying to be sensible about that.
 
-## Salvager service greeting
+### Leaving for the high ridge
 
-Scene: `hub.service.salvager.greet` · Bellwether / safe training point · core-candidates · draft
+kit.court_departure | Bellwether resting place or staged nearby town location | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Any prerequisite gear for advanced optional training must be shown in the service UI; basic route-safe practice remains recoverable and is not paywalled by this line.
+Both middle seals and actual Court access are available; Kit knows the route and the player selects departure.
 
-**Salvager** (`hub.service.salvager.greet`): Set your pack down. Show me how you move.
+Kit | kit.court_departure.ridge
 
-Delivery: unhurried; watches the body rather than the boast
+Direction, not spoken: Touches the route mark.
 
-## Salvager service cancelled
+I’ll be looking for you on the ridge road this time.
 
-Scene: `hub.service.salvager.cancel` · Bellwether / safe training point · core-candidates · draft
+Kit | kit.court_departure.questions
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Any prerequisite gear for advanced optional training must be shown in the service UI; basic route-safe practice remains recoverable and is not paywalled by this line.
+Direction, not spoken: A plain request, then space to leave.
 
-**Salvager** (`hub.service.salvager.cancel`): Another time, then. Rest counts for something.
+Bring the answers back if you can. Bring yourself back either way.
 
-Delivery: unhurried; watches the body rather than the boast
+### A return before the aperture
 
-## Salvager service shortfall
+kit.court_incomplete_no_aperture | Bellwether resting place or staged nearby town location | draft
 
-Scene: `hub.service.salvager.insufficient` · Bellwether / safe training point · core-candidates · draft
+A Court return before the aperture or final seal, with inspectable route progress shown to Kit.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Any prerequisite gear for advanced optional training must be shown in the service UI; basic route-safe practice remains recoverable and is not paywalled by this line.
+Kit | kit.court_incomplete_no_aperture.welcome
 
-**Salvager** (`hub.service.salvager.insufficient`): You’re missing what we need for that lesson. We can work on your footing here.
+Direction, not spoken: Makes the return welcome.
 
-Delivery: unhurried; watches the body rather than the boast
+There’s a space beside the map. Show me where you got to.
 
-## Dealer service greeting
+Kit | kit.court_incomplete_no_aperture.later
 
-Scene: `hub.service.dealer.greet` · Bellwether / relic dealer’s approved interaction point · core-candidates · draft
+Direction, not spoken: No pressure to justify retreat.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Insufficient-resource line is for an optional purchase, not selling an item. No price, buyback rule or economy formula is established.
+We can leave the difficult part for a moment.
 
-**Relic dealer** (`hub.service.dealer.greet`): Let’s see the whole piece, including the damage.
+### An aperture but no final seal
 
-Delivery: commercial, alert, without a theatrical sales patter
+kit.court_incomplete_aperture | Bellwether resting place or staged nearby town location | draft
 
-## Dealer service cancelled
+A Court return with the aperture but no final seal. The player safely demonstrates its actual focusing function.
 
-Scene: `hub.service.dealer.cancel` · Bellwether / relic dealer’s approved interaction point · core-candidates · draft
+Kit | kit.court_incomplete_aperture.beam
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Insufficient-resource line is for an optional purchase, not selling an item. No price, buyback rule or economy formula is established.
+Direction, not spoken: Watches the visible beam change.
 
-**Relic dealer** (`hub.service.dealer.cancel`): Back in your bag it goes. An offer isn’t a sale.
+That makes it a much narrower light.
 
-Delivery: commercial, alert, without a theatrical sales patter
+Kit | kit.court_incomplete_aperture.care
 
-## Dealer service shortfall
+Direction, not spoken: Careful accommodation of the player’s working tools.
 
-Scene: `hub.service.dealer.insufficient` · Bellwether / relic dealer’s approved interaction point · core-candidates · draft
+Put it with the others. I’ll move my things out of the way.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Insufficient-resource line is for an optional purchase, not selling an item. No price, buyback rule or economy formula is established.
+### The claim breaks
 
-**Relic dealer** (`hub.service.dealer.insufficient`): That isn’t enough for this piece. Keep your coin until you’re sure.
+kit.court_evidence_debrief | Bellwether resting place or staged nearby town location | draft
 
-Delivery: commercial, alert, without a theatrical sales patter
+Court identity evidence is shown and the signed-order and release-risk explanations are heard by Kit in town.
 
-## Ordinary valuables appraisal
+Kit | kit.court_evidence_debrief.order
 
-Scene: `hub.ordinary_sale` · Bellwether / relic dealer · core-candidates · draft
+Direction, not spoken: Examines the actual evidence.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing line retained verbatim. Preview only; quest items, local tools, seals and named relics must not enter this selection.
+The king’s seal. Beside the keepers’. Let me look at that.
 
-**Relic dealer** (`hub.ordinary_sale`): Common coin, ordinary silver. I can give you a price for those.
+Kit | kit.court_evidence_debrief.cost
 
-Delivery: matter-of-fact; no pressure
+Direction, not spoken: Takes in the explanation just heard.
 
-## Equipment brought back
+And opening it frees the soldiers as well. That part was true.
 
-Scene: `hub.service_return` · Bellwether / smith · core-candidates · draft
+Kit | court.kit_response
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing ID retained; typographic apostrophe only. Once per completed expedition; does not assert equipment damage.
+Direction, not spoken: Steady, worried; preparation rather than surrender.
 
-**Artificer** (`hub.service_return`): Back already? Put it on the bench. Let’s see what survived.
+Then we find a way to face it before we open anything.
 
-Delivery: familiar welcome; examine before judging
+### Making room to prepare
 
-## Reading available again
+kit.final_preparation | Bellwether resting place or staged nearby town location | draft
 
-Scene: `hub.service.record.recap` · Bellwether / record keeper · core-candidates · draft
+Kit has seen all three seals and heard the release risk. Previously earned tools are laid out for preparation.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. User-initiated recap entry, not automatic replay. Select facts from actual acquired evidence.
+Kit | kit.final_preparation.table
 
-**Record keeper** (`hub.service.record.recap`): We can go through it again. Start with the part that troubles you.
+Direction, not spoken: Methodical partnership.
 
-Delivery: patient; no hint of annoyance
+Put the tools here. One at a time. Let’s make sure nothing’s been left behind.
 
-## Refresh learned technique
+Kit | kit.final_preparation.practice
 
-Scene: `hub.service.salvager.refresh` · Bellwether / safe training point · core-candidates · draft
+Direction, not spoken: Invites safe practice with established interactions.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Only offers a supported safe repeatable lesson; no new skill or reward granted by speech.
+Show me again how they work together. Take your time.
 
-**Salvager** (`hub.service.salvager.refresh`): Show me the part you want to practise. We’ll do it where a mistake is cheap.
+Kit | kit.final_preparation.route
 
-Delivery: calm, matter-of-fact
+Direction, not spoken: Checks the actual route evidence.
 
-## Kit remains in recovery
+And show me the way back. I want that clear before you leave.
 
-Scene: `hub.service.tavern.kit` · Bellwether / tavern · core-candidates · draft
+### The place to return to
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. New owner direction supersedes earlier travelling-Kit suggestions. No injury diagnosis, exact cause, treatment, instant recovery or dungeon accompaniment invented.
+kit.final_departure | Bellwether resting place or staged nearby town location | draft
 
-**Tavern keeper** (`hub.service.tavern.kit`): Kit’s staying here to recover. I’ll keep a place clear when you get back.
+The treasury route and release risk are known to Kit; the player selects departure. Kit remains in Bellwether throughout the finale.
 
-Delivery: reassuring, practical
+Kit | kit.final_departure.want
 
-## Abbey approach choices
+Direction, not spoken: Honest regret; their current recovery matters.
 
-Scene: `hub.access.abbey.brief` · Bellwether / safe training point · core-candidates · draft
+I wish I were going with you. I know I’d only slow you down.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing problem line retained. Verified safe air points and finite independent solutions are prerequisites; no route needs the peer dungeon tool.
+Kit | kit.final_departure.place
 
-**Salvager** (`access.abbey_problem`): The Abbey door is underwater. There are air pockets beyond, if you can reach them.
+Direction, not spoken: A small familiar anchor, not a string of jokes.
 
-Delivery: sober; no dare
+I’ll be here. Same table, same dreadful chair.
 
-**Salvager** (`access.abbey_alternatives`): A ward, a breathing rig, or training for the crossing. Choose a way you can rely on.
+Kit | kit.final_departure.return
 
-Delivery: plain; makes the alternatives equal
+Direction, not spoken: Softly; no response demanded.
 
-## Shrine ward offer
+Come back and complain about it with me.
 
-Scene: `hub.access.magic.offer` · Bellwether / record keeper · core-candidates · draft
+### Back to the same table
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Exact binding restoration actions are proposed, not a recipe. Starter shrine lies beyond the north/northeast edge; it is not the old Keeper Tomb or a full dungeon.
+kit.final_town_reunion | Bellwether resting place or staged nearby town location | draft
 
-**Record keeper** (`access.magic_offer`): Restore the shrine’s binding, and I can teach you a ward for the crossing.
+The first safe Bellwether reunion after the entity is defeated. Kit knows only what is visible at this point.
 
-Delivery: measured confidence
+Kit | finale.kit_alive
 
-**Record keeper** (`access.magic_task`): We’ll begin with the marks at the wayside shrine. Read the whole binding before you try to mend it.
+Direction, not spoken: Relief before riches; gives the player room.
 
-Delivery: careful teacher
+There you are. Come on. One step at a time.
 
-## Shrine binding in progress
+Kit | kit.final_town_reunion.chair
 
-Scene: `hub.access.magic.progress` · Bellwether / starter shrine · core-candidates · draft
+Direction, not spoken: Simple, warm; the table now means something.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Record keeper must be physically present for this proposed lesson, or move conversation to hub and show the inspected copy. Visible broken-mark and test states must actually exist; not a generic proximity hint.
+Kept your chair. Come and take it.
 
-**Record keeper** (`access.magic_progress_read`): Which part of the inscription is still broken? Start there.
+### Real treasure brought home
 
-Delivery: gentle redirection
+kit.treasure_home | Bellwether resting place or staged nearby town location | draft
 
-**Record keeper** (`access.magic_progress_test`): A bright mark is not proof of a sound binding. Test it before you trust it.
+After a quiet reunion pause, identifiable treasury treasure is actually shown to Kit in town.
 
-Delivery: precise; no scolding
+Kit | kit.treasure_home.real
 
-## Ward limit before first trial
+Direction, not spoken: Looks between the treasure and the player.
 
-Scene: `hub.access.magic.first_limit` · Bellwether / safe ward practice point · core-candidates · draft
+It’s real. We’ve actually got some of it here.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Teach this before the first trial, with matching visual/UI feedback; a failed attempt is not required. Bounded user-requested reminder may reuse the line before a later trial, without replaying completed narrative scenes.
+Kit | finale.kit_treasure
 
-**Record keeper** (`access.magic_limit`): It will buy you breath. It will not last forever.
+Direction, not spoken: A tired, fond joke; puts the person first.
 
-Delivery: explicit; let the limit land
+We'll need a bigger bag. Later.
 
-## Ward lesson safe retry
+### Their watch is over
 
-Scene: `hub.access.magic.retry` · Bellwether / safe ward practice point · core-candidates · draft
+kit.release_evidence | Bellwether resting place or staged nearby town location | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. The ward limit has its own pre-trial scene. Proposed retry consumes no irreplaceable quest material.
+Only after inspectable aftermath evidence, recovered names and the record keeper’s explanation establish release of the soldiers.
 
-**Record keeper** (`access.magic_retry_rest`): Stay in the clear air until you’re ready. We can try again here.
+Kit | kit.release_evidence.free
 
-Delivery: steady, unembarrassed
+Direction, not spoken: Receives the confirmed account, quietly.
 
-## Ward preparation complete
+So it’s over. They’re free of it.
 
-Scene: `hub.access.magic.complete` · Bellwether / safe ward practice point · core-candidates · draft
+Kit | kit.release_evidence.names
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Commit reward/training from the actual trial result, not audio completion. No claim of unlimited breath or whole-dungeon submersion.
+Direction, not spoken: Refers to records actually retained and shown; require retained names as noted below.
 
-**Record keeper** (`access.magic_complete`): The binding held through the trial. You can use the ward for the Abbey crossing.
+I’m glad we kept their names.
 
-Delivery: pleased by proof
+### A roof worth asking about
 
-**Record keeper** (`access.magic_complete_limit`): Use the places where you can breathe. The ward gets you between them.
+kit.room_upstairs | Bellwether resting place or staged nearby town location | draft
 
-Delivery: calm emphasis
+An upstairs room actually exists, Kit has asked about it and the roof supports the observation. No tenancy is agreed.
 
-## Mill breathing-rig offer
+Kit | epilogue.kit_roof
 
-Scene: `hub.access.tech.offer` · Bellwether / smith · core-candidates · draft
+Direction, not spoken: Pleased, tentative.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing offer retained, with typographic apostrophes. Mill gear/component flow remains proposed; no exact recipe, theft, mandatory purchase or instant mill repair implied.
+I asked about the room upstairs. Roof looks sound.
 
-**Artificer** (`access.tech_offer`): The mill has a sound air chamber. Help repair its gearing; I’ll fit you a breathing rig.
+Kit | kit.room_upstairs.stay
 
-Delivery: practical; sees a repair that benefits two things
+Direction, not spoken: A considered personal wish.
 
-**Artificer** (`access.tech_task`): Let me check the chamber before we remove anything. The mill still needs to work when we’re done.
+I’d like to stay a while. See what this place is like when we’re not passing through.
 
-Delivery: firm care for shared equipment
+### Enough for this moment
 
-## Rig assembly in progress
+kit.quiet_closure | Bellwether resting place or staged nearby town location | draft
 
-Scene: `hub.access.tech.progress` · Bellwether / smith · core-candidates · draft
+An optional quiet interaction after the reunion. Available without repairs, restitution or treasure; “morning” is conversational intent, not a daylight transition.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. The actual recovered fitting must be presented; its exact identity and the assembly recipe remain authoring proposals. No item is consumed by these lines.
+Kit | kit.quiet_closure.here
 
-**Artificer** (`access.tech_progress_fit`): Set the recovered fitting beside the old one. We need the fit, not just the right-looking metal.
+Direction, not spoken: Quiet, no flourish.
 
-Delivery: hands-on
+It’s good having you here.
 
-**Artificer** (`access.tech_progress_joint`): A loose joint is an inconvenience up here. Underwater, it’s the whole problem.
+Kit | epilogue.kit_close
 
-Delivery: dry; not grim for its own sake
+Direction, not spoken: Companionable; let the silence hold.
 
-## Rig test before first immersion
+The rest can wait till morning.
 
-Scene: `hub.access.tech.first_test` · Bellwether / shallow-water test point · core-candidates · draft
+## Hub services and ambient life
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Teach this before the first trial, with matching visual/UI feedback; a failed attempt is not required. Bounded user-requested reminder may reuse the line before a later trial, without replaying completed narrative scenes.
+Service interactions, access preparation, voluntary relic choices, genuine town changes and ambient conversations. All speakers must be present; ambient dialogue yields to critical scenes and hazards.
 
-**Artificer** (`access.tech_test`): Shallow water first. We find the leaks here.
+### Tavern service greeting
 
-Delivery: insists on proof
+hub.service.tavern.greet | Bellwether / tavern | draft
 
-## Rig leaks found in safety
+The player opens this service with its provider present.
 
-Scene: `hub.access.tech.retry` · Bellwether / shallow-water test point · core-candidates · draft
+Tavern keeper | hub.service.tavern.greet
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Safe test/recovery point and technician presence are proposed staging. The existing pre-trial test line is delivered in its own scene, without requiring a failure.
+Direction, not spoken: brisk hospitality; former caravan leader
 
-**Artificer** (`access.tech_retry`): Out of the water. Let me check the joint before you try again.
+There’s room by the fire. Tell me what you need.
 
-Delivery: immediate, controlled
+### Tavern service cancelled
 
-## Breathing rig tested
+hub.service.tavern.cancel | Bellwether / tavern | draft
 
-Scene: `hub.access.tech.complete` · Bellwether / shallow-water test point · core-candidates · draft
+The player cancels a selection before a transaction is committed.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. No numerical air capacity, refill recipe or damage system invented. Rig state does not by itself establish that the mill is repaired.
+Tavern keeper | hub.service.tavern.cancel
 
-**Artificer** (`access.tech_complete`): No leak in that trial. The rig’s ready for the crossing.
+Direction, not spoken: brisk hospitality; former caravan leader
 
-Delivery: quietly satisfied
+No hurry. I’ve waited longer for a wagon to turn.
 
-**Artificer** (`access.tech_complete_limit`): It carries a supply of air. It doesn’t make more. Stop where you can breathe.
+### Tavern service shortfall
 
-Delivery: concrete limit
+hub.service.tavern.insufficient | Bellwether / tavern | draft
 
-## Salvager crossing offer
+The selected service requires resources the player does not currently have; no transaction is committed.
 
-Scene: `hub.access.body.offer` · Bellwether / safe training point · core-candidates · draft
+Tavern keeper | hub.service.tavern.insufficient
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Constitution is a mixed-build improvement route, not a selected class. No advanced real-world breath technique or exact underwater duration prescribed.
+Direction, not spoken: brisk hospitality; former caravan leader
 
-**Salvager** (`access.body_offer`): I can teach you the crossing. Slow your breathing. Learn where you can surface.
+That won’t cover a room. You’re welcome to warm up here.
 
-Delivery: calm; no boasting
+### Record service greeting
 
-**Salvager** (`access.body_task`): We practise near a way out. Getting across is only half the lesson.
+hub.service.record.greet | Bellwether / record keeper’s approved interaction point | draft
 
-Delivery: quiet authority
+The player opens this service with its provider present.
 
-## Learning a return margin
+Record keeper | hub.service.record.greet
 
-Scene: `hub.access.body.progress` · Bellwether / safe training point · core-candidates · draft
+Direction, not spoken: precise, patient; distinguishes evidence from wishes
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing limit line retained with typographic apostrophe. Use only at safe practice; exact traversal/checkpoint model remains unimplemented.
+Show me the inscription before you tell me what you hope it says.
 
-**Salvager** (`access.body_progress`): Find your way back before you leave the edge. Show me.
+### Record service cancelled
 
-Delivery: invites player action
+hub.service.record.cancel | Bellwether / record keeper’s approved interaction point | draft
 
-**Salvager** (`access.body_limit`): Being strong won’t make water into air. Turn back while you still can.
+The player cancels a selection before a transaction is committed.
 
-Delivery: firm, unsentimental
+Record keeper | hub.service.record.cancel
 
-## Crossing practice retry
+Direction, not spoken: precise, patient; distinguishes evidence from wishes
 
-Scene: `hub.access.body.retry` · Bellwether / safe training point · core-candidates · draft
+We can leave the reading there. The stone will keep.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Failure must restore safe recovery, not punish with irrecoverable costs. No dialogue during urgent breath cues.
+### Record service shortfall
 
-**Salvager** (`access.body_retry_stop`): You came back. Good. Stay here until your breathing settles.
+hub.service.record.insufficient | Bellwether / record keeper’s approved interaction point | draft
 
-Delivery: no shame in retreat
+The selected service requires resources the player does not currently have; no transaction is committed.
 
-**Salvager** (`access.body_retry_plan`): On the next try, keep enough in reserve to return.
+Record keeper | hub.service.record.insufficient
 
-Delivery: short, serious
+Direction, not spoken: precise, patient; distinguishes evidence from wishes
 
-## Crossing training complete
+You haven’t brought what this working needs. We can still look at the inscription.
 
-Scene: `hub.access.body.complete` · Bellwether / safe training point · core-candidates · draft
+### Artificer service greeting
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Requires demonstrated air-point and retreat actions in the accepted trial. Actual Abbey geometry must support the independently viable finite-breath route.
+hub.service.artificer.greet | Bellwether / smith | draft
 
-**Salvager** (`access.body_complete`): You found the next air point and kept a way back. That’s the crossing learned.
+The player opens this service with its provider present.
 
-Delivery: specific acknowledgement
+Artificer | hub.service.artificer.greet
 
-**Salvager** (`access.body_complete_limit`): At the Abbey, stop and look again. Don’t spend your breath proving the lesson.
+Direction, not spoken: plain, tactile; interested in wear and function
 
-Delivery: affectionate firmness
+Lay it flat. I want to see the worn side.
 
-## Any Abbey route ready
+### Artificer service cancelled
 
-Scene: `access.abbey_ready` · Bellwether / safe training point · core-candidates · draft
+hub.service.artificer.cancel | Bellwether / smith | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing line retained. Derived readiness is true when any one viable method passes; never require all three. Speaker must know the result through witnessed trial or explicit handoff.
+The player cancels a selection before a transaction is committed.
 
-**Salvager** (`access.abbey_ready`): You’ve made the practice crossing. Use the same care at the Abbey.
+Artificer | hub.service.artificer.cancel
 
-Delivery: satisfied; no triumphalism
+Direction, not spoken: plain, tactile; interested in wear and function
 
-## Foundry approach choices
+Take it with you. I haven’t changed anything.
 
-Scene: `hub.access.foundry.brief` · Bellwether / tavern · core-candidates · draft
+### Artificer service shortfall
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing problem retained. The crossing lies east across the gorge. All alternatives converge on the same dungeon and remain recoverable.
+hub.service.artificer.insufficient | Bellwether / smith | draft
 
-**Tavern keeper** (`access.foundry_problem`): The Foundry bridge has gone. The old maintenance path may still reach the far side.
+The selected service requires resources the player does not currently have; no transaction is committed.
 
-Delivery: former caravan leader; assesses routes
+Artificer | hub.service.artificer.insufficient
 
-**Tavern keeper** (`access.foundry_alternatives`): Ask the smith about the span, the shrine keeper about the stones, or the salvager about the climb.
+Direction, not spoken: plain, tactile; interested in wear and function
 
-Delivery: three practical options
+I’m short of what this repair needs. I won’t take payment for half a job.
 
-## Bridge-repair offer
+### Salvager service greeting
 
-Scene: `hub.access.bridge.offer` · Foundry approach / safe near bank · core-candidates · draft
+hub.service.salvager.greet | Bellwether / safe training point | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing line retained; technician presence/inspection and fittings remain proposed. Do not name or consume a peer-dungeon tool as required repair material.
+The player opens this service with its provider present.
 
-**Artificer** (`access.bridge_tech`): The anchors held. With the right fittings, that span can carry you again.
+Salvager | hub.service.salvager.greet
 
-Delivery: assesses remains
+Direction, not spoken: unhurried; watches the body rather than the boast
 
-**Artificer** (`access.bridge_task`): We check the load from this bank before anyone crosses.
+Set your pack down. Show me how you move.
 
-Delivery: practical, uncompromising
+### Salvager service cancelled
 
-## Bridge work in progress
+hub.service.salvager.cancel | Bellwether / safe training point | draft
 
-Scene: `hub.access.bridge.progress` · Foundry approach / safe near bank · core-candidates · draft
+The player cancels a selection before a transaction is committed.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. A blocked span must visibly agree with this state; no unverified exact repair order added.
+Salvager | hub.service.salvager.cancel
 
-**Artificer** (`hub.access.bridge.progress`): Keep off the span until the repaired joints have been tested.
+Direction, not spoken: unhurried; watches the body rather than the boast
 
-Delivery: clear boundary
+Another time, then. Rest counts for something.
 
-## Bridge test needs another pass
+### Salvager service shortfall
 
-Scene: `hub.access.bridge.retry` · Foundry approach / safe near bank · core-candidates · draft
+hub.service.salvager.insufficient | Bellwether / safe training point | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Only if a joint movement actually occurred. Prototype test is safe and recoverable, with no forced fall or material loss.
+The selected service requires resources the player does not currently have; no transaction is committed.
 
-**Artificer** (`hub.access.bridge.retry`): That joint moved. Stay on this bank while I check the fitting.
+Salvager | hub.service.salvager.insufficient
 
-Delivery: alert, without panic
+Direction, not spoken: unhurried; watches the body rather than the boast
 
-## Bridge crossing proven
+You’re missing what we need for that lesson. We can work on your footing here.
 
-Scene: `hub.access.bridge.complete` · Foundry approach / safe near bank · core-candidates · draft
+### Dealer service greeting
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Bridge is physically traversable in both directions before boss/seal completion. This alone does not establish restored regional trade.
+hub.service.dealer.greet | Bellwether / relic dealer’s approved interaction point | draft
 
-**Artificer** (`access.bridge_complete`): The repaired span held the test. You can cross.
+The player opens this service with its provider present.
 
-Delivery: earned confidence
+Relic dealer | hub.service.dealer.greet
 
-**Artificer** (`access.bridge_return`): It gives you a way back, too. Keep that in mind before going deeper.
+Direction, not spoken: commercial, alert, without a theatrical sales patter
 
-Delivery: practical care
+Let’s see the whole piece, including the damage.
 
-## Magical crossing offer
+### Dealer service cancelled
 
-Scene: `hub.access.stones.offer` · Foundry approach / safe near bank · core-candidates · draft
+hub.service.dealer.cancel | Bellwether / relic dealer’s approved interaction point | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Exact charm/stone behavior remains proposed; do not promise free flight, teleportation or new consumable rules.
+The player cancels a selection before a transaction is committed.
 
-**Record keeper** (`access.crossing_magic`): Those stones carried a crossing charm. We can restore it.
+Relic dealer | hub.service.dealer.cancel
 
-Delivery: inspects surviving evidence
+Direction, not spoken: commercial, alert, without a theatrical sales patter
 
-**Record keeper** (`access.stones_task`): We’ll test the near part first. No one needs to step over the gorge to begin.
+Back in your bag it goes. An offer isn’t a sale.
 
-Delivery: measured, reassuring
+### Dealer service shortfall
 
-## Crossing charm in progress
+hub.service.dealer.insufficient | Bellwether / relic dealer’s approved interaction point | draft
 
-Scene: `hub.access.stones.progress` · Foundry approach / safe near bank · core-candidates · draft
+The selected service requires resources the player does not currently have; no transaction is committed.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Only describe a tested bidirectional restoration lesson; no one-way commitment puzzle.
+Relic dealer | hub.service.dealer.insufficient
 
-**Record keeper** (`hub.access.stones.progress`): The charm must carry you back as well as out. Check the return before extending it.
+Direction, not spoken: commercial, alert, without a theatrical sales patter
 
-Delivery: careful; treats a working as a whole
+That isn’t enough for this piece. Keep your coin until you’re sure.
 
-## Crossing charm retry
+### Ordinary valuables appraisal
 
-Scene: `hub.access.stones.retry` · Foundry approach / safe near bank · core-candidates · draft
+hub.ordinary_sale | Bellwether / relic dealer | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Requires actual failed safe test. No magical punishment, lost seal or irreversible expenditure.
+Ordinary valuables are selected for appraisal. Quest seals and the named relic are separate.
 
-**Record keeper** (`hub.access.stones.retry`): It didn’t hold. We stay on solid ground and read the binding again.
+Relic dealer | hub.ordinary_sale
 
-Delivery: composed; welcomes evidence
+Direction, not spoken: matter-of-fact; no pressure
 
-## Magical crossing proven
+Common coin, ordinary silver. I can give you a price for those.
 
-Scene: `hub.access.stones.complete` · Foundry approach / safe near bank · core-candidates · draft
+### Equipment brought back
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Functional route approval is separate from smoke preparation. Do not imply same spell covers both unless separately acquired/taught.
+hub.service_return | Bellwether / smith | draft
 
-**Record keeper** (`access.stones_complete`): The crossing holds in both directions. Take it at the pace we tested.
+After an expedition, equipment is actually presented to the artificer.
 
-Delivery: measured confidence
+Artificer | hub.service_return
 
-**Record keeper** (`access.stones_limit`): This working carries you over the gorge. Smoke inside is another matter.
+Direction, not spoken: familiar welcome; examine before judging
 
-Delivery: keeps capabilities bounded
+Back already? Put it on the bench. Let’s see what survived.
 
-## Maintenance-climb offer
+### Reading available again
 
-Scene: `hub.access.climb.offer` · Foundry approach / safe climbing lesson point · core-candidates · draft
+hub.service.record.recap | Bellwether / record keeper | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing line retained. Exact holds and instructor route presence are proposed and must be shown in blockout.
+An on-demand rereading of an already inspected record.
 
-**Salvager** (`access.climb_body`): Use the old maintenance climb. Test each hold before you put your weight on it.
+Record keeper | hub.service.record.recap
 
-Delivery: points out reachable holds
+Direction, not spoken: patient; no hint of annoyance
 
-**Salvager** (`access.climb_task`): We’ll practise coming down before we practise going higher.
+We can go through it again. Start with the part that troubles you.
 
-Delivery: matter-of-fact
+### Refresh learned technique
 
-## Climb lesson in progress
+hub.service.salvager.refresh | Bellwether / safe training point | draft
 
-Scene: `hub.access.climb.progress` · Foundry approach / safe climbing lesson point · core-candidates · draft
+An on-demand refresher after an access lesson has been passed.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Only fires at a safe pause, never covering a critical movement or exposure cue.
+Salvager | hub.service.salvager.refresh
 
-**Salvager** (`hub.access.climb.progress`): Find a place to rest, then look for the next hold. Don’t hang there making plans.
+Direction, not spoken: calm, matter-of-fact
 
-Delivery: brief practical coaching
+Show me the part you want to practise. We’ll do it where a mistake is cheap.
 
-## Climb lesson retry
+### Kit remains in recovery
 
-Scene: `hub.access.climb.retry` · Foundry approach / safe climbing lesson point · core-candidates · draft
+hub.service.tavern.kit | Bellwether / tavern | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Recoverable failure at a safe practice point, not an asserted injury.
+Kit is present and still recovering when the player asks the tavern keeper.
 
-**Salvager** (`hub.access.climb.retry`): Feet on the ground. Let your hands rest; the wall can wait.
+Tavern keeper | hub.service.tavern.kit
 
-Delivery: steady; removes pressure
+Direction, not spoken: reassuring, practical
 
-## Maintenance route learned
+Kit’s staying here to recover. I’ll keep a place clear when you get back.
 
-Scene: `hub.access.climb.complete` · Foundry approach / safe climbing lesson point · core-candidates · draft
+### Abbey approach choices
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Return must remain viable before seal completion. Training delays exposure consequences; no immunity.
+hub.access.abbey.brief | Bellwether / safe training point | draft
 
-**Salvager** (`access.climb_complete`): You’ve made the climb and the way down. The maintenance route is open to you.
+The Abbey lead is known, but no access route is ready. The player asks about approach choices.
 
-Delivery: satisfied, restrained
+Salvager | access.abbey_problem
 
-**Salvager** (`access.climb_smoke`): Strong arms won’t help your lungs in there. Plan where you’ll get clear air.
+Direction, not spoken: sober; no dare
 
-Delivery: firm distinction
+The Abbey door is underwater. There are air pockets beyond, if you can reach them.
 
-## Filter limits
+Salvager | access.abbey_alternatives
 
-Scene: `access.smoke_tech` · Bellwether / smith · core-candidates · draft
+Direction, not spoken: plain; makes the alternatives equal
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing line retained. Exact clog behavior requires prototype acceptance; otherwise revise copy to the tested finite protection model. Never imply heat immunity.
+A ward, a breathing rig, or training for the crossing. Choose a way you can rely on.
 
-**Artificer** (`access.smoke_tech`): This filter will help with the smoke. Get clear before it clogs.
+### Shrine ward offer
 
-Delivery: honest limits
+hub.access.magic.offer | Bellwether / record keeper | draft
 
-## Smoke ward limits
+The player asks about the shrine ward option before starting this route. Exact lesson and route staging remain proposals.
 
-Scene: `access.smoke_magic` · Bellwether / record keeper · core-candidates · draft
+Record keeper | access.magic_offer
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing line retained. Protection must actually have a finite readable limit; this is separate from restoring crossing stones.
+Direction, not spoken: measured confidence
 
-**Record keeper** (`access.smoke_magic`): Keep the ward steady through the smoke. Find clean air before it fades.
+Restore the shrine’s binding, and I can teach you a ward for the crossing.
 
-Delivery: clear instruction
+Record keeper | access.magic_task
 
-## Endurance smoke limits
+Direction, not spoken: careful teacher
 
-Scene: `access.smoke_body` · Bellwether / safe training point · core-candidates · draft
+We’ll begin with the marks at the wayside shrine. Read the whole binding before you try to mend it.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing line retained. In-game finite hazard lesson, no infinite breath or immunity; UI/SFX remain primary warning.
+### Shrine binding in progress
 
-**Salvager** (`access.smoke_body`): Take the short gaps between clear air. If your chest tightens, go back.
+hub.access.magic.progress | Bellwether / starter shrine | draft
 
-Delivery: serious; never macho
+An on-demand progress check while binding has been inspected and its broken marks are visible.
 
-## Crossing is not smoke protection
+Record keeper | access.magic_progress_read
 
-Scene: `hub.access.smoke.route` · Bellwether / safe training point · core-candidates · draft
+Direction, not spoken: gentle redirection
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Requires starter-safe hazard path or recoverable preparation; no expensive upgrade can become an unannounced mandatory dependency.
+Which part of the inscription is still broken? Start there.
 
-**Salvager** (`access.smoke_separate`): Getting over the gorge settles the crossing. It doesn’t settle what you’ll breathe inside.
+Record keeper | access.magic_progress_test
 
-Delivery: plain
+Direction, not spoken: precise; no scolding
 
-**Salvager** (`access.smoke_retreat`): Use the clear stretches to recover. If you can’t reach the next one safely, come back and prepare.
+A bright mark is not proof of a sound binding. Test it before you trust it.
 
-Delivery: practical; makes retreat normal
+### Ward limit before first trial
 
-## A mark changes the question
+hub.access.magic.first_limit | Bellwether / safe ward practice point | draft
 
-Scene: `hub.relic.inspect` · Bellwether / relic dealer · core-candidates · draft
+The binding has been restored and the first safe ward trial is about to begin.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing dealer ID/text retained with typographic apostrophe. Joint inspection staging proposed. Exact object, mark, claimant and proof remain unresolved; do not import the older tavern-keeper family connection.
+Record keeper | access.magic_limit
 
-**Relic dealer** (`hub.named_relic`): That one’s marked. Find whose mark it is before you decide.
+Direction, not spoken: explicit; let the limit land
 
-Delivery: observant
+It will buy you breath. It will not last forever.
 
-**Record keeper** (`relic.inspect_record`): I can compare the mark with what we have. A resemblance is a reason to look, not proof.
+### Ward lesson safe retry
 
-Delivery: precise
+hub.access.magic.retry | Bellwether / safe ward practice point | draft
 
-**Relic dealer** (`relic.inspect_price`): I can value the metal now. Whether you want to sell it can wait.
+After a recoverable failed test of the restored binding, at a safe retry point.
 
-Delivery: businesslike; leaves the choice open
+Record keeper | access.magic_retry_rest
 
-## Named relic sale preview
+Direction, not spoken: steady, unembarrassed
 
-Scene: `hub.relic.sale_preview` · Bellwether / relic dealer · core-candidates · draft
+Stay in the clear air until you’re ready. We can try again here.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. A living claimant must be verified before this variant. Display actual price and confirm selection through player action. Evidence is preserved independently of inventory; buyback/recovery terms need explicit design approval.
+### Ward preparation complete
 
-**Relic dealer** (`relic.sale_preview`): I can buy it at the price shown. You’ve also got a claim to weigh before you decide.
+hub.access.magic.complete | Bellwether / safe ward practice point | draft
 
-Delivery: neither cajoling nor moralising
+The required ward trial has passed. The actual return route must remain viable; no unlimited protection is implied.
 
-**Record keeper** (`relic.sale_evidence`): The account of where it came from will remain here, whatever you choose.
+Record keeper | access.magic_complete
 
-Delivery: neutral; preserves history
+Direction, not spoken: pleased by proof
 
-## Named relic decision deferred
+The binding held through the trial. You can use the ward for the Abbey crossing.
 
-Scene: `hub.relic.decision_deferred` · Bellwether / relic dealer · core-candidates · draft
+Record keeper | access.magic_complete_limit
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Only after the player closes the preview; no faction penalty, theft flag or moral alignment implied.
+Direction, not spoken: calm emphasis
 
-**Relic dealer** (`hub.relic.decision_deferred`): Keep it for now, then. You don’t owe me a decision at the counter.
+Use the places where you can breathe. The ward gets you between them.
 
-Delivery: relaxed; no inference about motive
+### Mill breathing rig offer
 
-## Named relic return preview
+hub.access.tech.offer | Bellwether / smith | draft
 
-Scene: `hub.relic.return_preview` · Bellwether / record keeper · core-candidates · draft
+The player asks about the breathing rig option before starting this route. Exact lesson and route staging remain proposals.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Claimant remains unspecified, not implicitly the speaker. Exact handover, custody and reward are unresolved proposals. No compulsory surrender or seal gate.
+Artificer | access.tech_offer
 
-**Record keeper** (`relic.return_preview`): The claim is established. If you want to return the piece, we can arrange the handover.
+Direction, not spoken: practical; sees a repair that benefits two things
 
-Delivery: gives a concrete option
+The mill has a sound air chamber. Help repair its gearing; I’ll fit you a breathing rig.
 
-**Record keeper** (`relic.return_choice`): Take the time you need. This has nothing to do with opening the treasury.
+Artificer | access.tech_task
 
-Delivery: calm; does not pressure
+Direction, not spoken: firm care for shared equipment
 
-## Named relic handover confirmed
+Let me check the chamber before we remove anything. The mill still needs to work when we’re done.
 
-Scene: `hub.relic.return_complete` · Bellwether / record keeper · core-candidates · draft
+### Rig assembly in progress
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Use only after actual handover; no claim it is displayed in the tavern or belongs to a newly invented family. Recording and shared staging are proposed.
+hub.access.tech.progress | Bellwether / smith | draft
 
-**Record keeper** (`relic.return_complete`): The piece is back with its claimant. I’ll record the return beside its history.
+An on-demand progress check while proposed mill fitting is presented during assembly.
 
-Delivery: quiet satisfaction
+Artificer | access.tech_progress_fit
 
-**Relic dealer** (`relic.return_dealer`): Then it’s off my counter. Fair enough. Show me what else you brought.
+Direction, not spoken: hands-on
 
-Delivery: accepts the choice without sulking
+Set the recovered fitting beside the old one. We need the fit, not just the right-looking metal.
 
-## Sold relic keeps its evidence
+Artificer | access.tech_progress_joint
 
-Scene: `hub.relic.sold_recovery` · Bellwether / relic dealer · core-candidates · draft
+Direction, not spoken: dry; not grim for its own sake
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Recovery must remain attainable, but custody, buyback cost and exact route are unresolved. This offers the recovery interface/known information only; do not promise dealer possession or initiate a new fetch quest.
+A loose joint is an inconvenience up here. Underwater, it’s the whole problem.
 
-**Record keeper** (`relic.sold_evidence`): The sale didn’t erase the mark or its history. The record is still here.
+### Rig test before first immersion
 
-Delivery: steady
+hub.access.tech.first_test | Bellwether / shallow-water test point | draft
 
-**Relic dealer** (`relic.sold_recovery`): Let’s check where the piece is and what it would take to recover it.
+The rig has been assembled and is about to undergo its first safe immersion test.
 
-Delivery: practical; no invented price
+Artificer | access.tech_test
 
-## The mill actually turns
+Direction, not spoken: insists on proof
 
-Scene: `hub.change.mill` · Bellwether / mill-side public point · core-candidates · draft
+Shallow water first. We find the leaks here.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing first line retained. Gearing must actually operate quietly. Rig acquisition or dungeon completion alone cannot set the mill flags. Local grinding and displaced flour-transport benefit require their own working state, as gated here.
+### Rig leaks found in safety
 
-**Tavern keeper** (`hub.mill_repaired`): The mill’s turning again. We can grind here instead of sending grain over the ridge.
+hub.access.tech.retry | Bellwether / shallow-water test point | draft
 
-Delivery: pleased; a caravan journey no longer needed
+After a recoverable failed test of the assembled rig, at a safe retry point.
 
-**Artificer** (`hub.mill_artificer`): Listen to that. No knock in the gearing. That’s how it should run.
+Artificer | access.tech_retry
 
-Delivery: ordinary workmanship pride
+Direction, not spoken: immediate, controlled
 
-## Optional fittings offered for use
+Out of the water. Let me check the joint before you try again.
 
-Scene: `hub.change.wagon_materials` · Bellwether / smith · core-candidates · draft
+### Breathing rig tested
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Existing first line retained. Optional component proposal only; show actual item/cost and require player selection. Never consume seal, quest-essential component or local tool; promise no road-state change before work occurs.
+hub.access.tech.complete | Bellwether / shallow-water test point | draft
 
-**Artificer** (`foundry.component`): These fittings could put a wagon back on the road. If you can spare them.
+The required rig trial has passed. The actual return route must remain viable; no unlimited protection is implied.
 
-Delivery: sees practical value
+Artificer | access.tech_complete
 
-**Tavern keeper** (`hub.component_choice`): Show them what you’d take first. Let them choose.
+Direction, not spoken: quietly satisfied
 
-Delivery: fair dealing; respects the traveller
+No leak in that trial. The rig’s ready for the crossing.
 
-## A wagon has really arrived
+Artificer | access.tech_complete_limit
 
-Scene: `hub.change.trade` · Bellwether / tavern · core-candidates · draft
+Direction, not spoken: concrete limit
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Timeless revision of v0.1 foundry.trade_returns uses a new ID: no asserted morning/daylight. Both the actual wagon/unloading event and physically available new stock are required. Crossing repair and Foundry completion alone cannot set these states.
+It carries a supply of air. It doesn’t make more. Stop where you can breathe.
 
-**Tavern keeper** (`hub.trade_arrived`): A wagon came through. We unloaded it together.
+### Salvager crossing offer
 
-Delivery: modest hope; enjoys the mundane work
+hub.access.body.offer | Bellwether / safe training point | draft
 
-**Relic dealer** (`hub.trade_stock`): I’ve put the new stock out. Have a look if you need anything.
+The player asks about the crossing technique option before starting this route. Exact lesson and route staging remain proposals.
 
-Delivery: brisk; benefit made tangible
+Salvager | access.body_offer
 
-## What a fortune weighs
+Direction, not spoken: calm; no boasting
 
-Scene: `tavern.preseals.weight` · Bellwether / tavern · core-candidates · draft
+I can teach you the crossing. Slow your breathing. Learn where you can surface.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech.
+Salvager | access.body_task
 
-**Relic dealer** (`tavern.preseals.weight.1`): A good haul ought to have some weight to it.
+Direction, not spoken: quiet authority
 
-Delivery: appraising
+We practise near a way out. Getting across is only half the lesson.
 
-**Tavern keeper** (`tavern.preseals.weight.2`): So does a broken axle. Pack for the road back.
+### Learning a return margin
 
-Delivery: caravan experience
+hub.access.body.progress | Bellwether / safe training point | draft
 
-**Relic dealer** (`tavern.preseals.weight.3`): I was going to suggest smaller valuables.
+An on-demand progress check while return-margin practice is underway.
 
-Delivery: dry, mildly affronted
+Salvager | access.body_progress
 
-## The unpulled bell
+Direction, not spoken: invites player action
 
-Scene: `tavern.preseals.bell` · Bellwether / tavern · core-candidates · draft
+Find your way back before you leave the edge. Show me.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech. Folklore only; no scripted ringing event or explanation is asserted.
+Salvager | access.body_limit
 
-**Tavern keeper** (`tavern.preseals.bell.1`): They say the bell rings some nights with no hand on the rope.
+Direction, not spoken: firm, unsentimental
 
-Delivery: familiar local story
+Being strong won’t make water into air. Turn back while you still can.
 
-**Record keeper** (`tavern.preseals.bell.2`): They say a good many things. I’d like to hear it for myself.
+### Crossing practice retry
 
-Delivery: curiosity without endorsement
+hub.access.body.retry | Bellwether / safe training point | draft
 
-**Tavern keeper** (`tavern.preseals.bell.3`): If you do, point anyone lost toward the door. That’s what the bell was for.
+After a recoverable failed test of the crossing lesson, at a safe retry point.
 
-Delivery: warm practicality
+Salvager | access.body_retry_stop
 
-## An unwilling rest
+Direction, not spoken: no shame in retreat
 
-Scene: `tavern.preseals.kit` · Bellwether / tavern · core-candidates · draft
+You came back. Good. Stay here until your breathing settles.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech. Kit was injured on approach and stays in Bellwether; no promise of recovery deadline.
+Salvager | access.body_retry_plan
 
-**Kit** (`tavern.preseals.kit.1`): I could at least sort the packs.
+Direction, not spoken: short, serious
 
-Delivery: restless, trying to be useful
+On the next try, keep enough in reserve to return.
 
-**Tavern keeper** (`tavern.preseals.kit.2`): From the chair, if you like.
+### Crossing training complete
 
-Delivery: accommodating but firm
+hub.access.body.complete | Bellwether / safe training point | draft
 
-**Salvager** (`tavern.preseals.kit.3`): Leave the carrying to someone who isn’t recovering.
+The required safe crossing trial has passed. The actual return route must remain viable; no unlimited protection is implied.
 
-Delivery: affectionate authority
+Salvager | access.body_complete
 
-## A different road
+Direction, not spoken: specific acknowledgement
 
-Scene: `tavern.oneseal.pack` · Bellwether / tavern · core-candidates · draft
+You found the next air point and kept a way back. That’s the crossing learned.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech. Either order; speaks from visible return and known seal result, not unseen dungeon events.
+Salvager | access.body_complete_limit
 
-**Tavern keeper** (`tavern.oneseal.pack.1`): One road behind you, another still to try. I’d repack before setting out.
+Direction, not spoken: affectionate firmness
 
-Delivery: route-wise
+At the Abbey, stop and look again. Don’t spend your breath proving the lesson.
 
-**Artificer** (`tavern.oneseal.pack.2`): Bring the gear over. I’ll show you what needs checking.
+### Any Abbey route ready
 
-Delivery: offers a practical next step
+access.abbey_ready | Bellwether / safe training point | draft
 
-**Salvager** (`tavern.oneseal.pack.3`): After you’ve sat down.
+Any valid Abbey access route is ready, and the player asks for a readiness check.
 
-Delivery: quiet interruption
+Salvager | access.abbey_ready
 
-## What a seal proves
+Direction, not spoken: satisfied; no triumphalism
 
-Scene: `tavern.oneseal.claims` · Bellwether / tavern · core-candidates · draft
+You’ve made the practice crossing. Use the same care at the Abbey.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech. Conversation concerns a mundane stamped object that is actually presented, never the progression seal or its sale.
+### Foundry approach choices
 
-**Relic dealer** (`tavern.oneseal.claims.1`): A royal stamp makes a piece easier to sell.
+hub.access.foundry.brief | Bellwether / tavern | draft
 
-Delivery: trade observation
+The Foundry lead is known, but no access route is ready. The player asks about approach choices.
 
-**Record keeper** (`tavern.oneseal.claims.2`): It tells you who claimed it. Not how they came by it.
+Tavern keeper | access.foundry_problem
 
-Delivery: precise distinction
+Direction, not spoken: former caravan leader; assesses routes
 
-**Relic dealer** (`tavern.oneseal.claims.3`): That’s why I asked you to read it.
+The Foundry bridge has gone. The old maintenance path may still reach the far side.
 
-Delivery: practical acceptance
+Tavern keeper | access.foundry_alternatives
 
-## News brought home
+Direction, not spoken: three practical options
 
-Scene: `tavern.oneseal.kit` · Bellwether / tavern · core-candidates · draft
+Ask the smith about the span, the shrine keeper about the stones, or the salvager about the climb.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech. Does not assert which dungeon was visited or current wet gear. Kit requests inspection, not participation.
+### Bridge repair offer
 
-**Kit** (`tavern.oneseal.kit.1`): Bring back one piece I can look at without getting out of this chair.
+hub.access.bridge.offer | Foundry approach / safe near bank | draft
 
-Delivery: wry impatience
+The player asks about the bridge repair option before starting this route. Exact lesson and route staging remain proposals.
 
-**Artificer** (`tavern.oneseal.kit.2`): Something that isn’t dripping on my tools.
+Artificer | access.bridge_tech
 
-Delivery: dry
+Direction, not spoken: assesses remains
 
-**Kit** (`tavern.oneseal.kit.3`): Your tools aren’t in my chair. We’ve got room to compromise.
+The anchors held. With the right fittings, that span can carry you again.
 
-Delivery: gentle teasing
+Artificer | access.bridge_task
 
-## Preparing for the ridge
+Direction, not spoken: practical, uncompromising
 
-Scene: `tavern.twoseals.ridge` · Bellwether / tavern · core-candidates · draft
+We check the load from this bank before anyone crosses.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech. Court route interaction must have actually opened the route; no Court revelations.
+### Bridge work in progress
 
-**Tavern keeper** (`tavern.twoseals.ridge.1`): So it’s the high ridge next. Check what you’re carrying before the climb.
+hub.access.bridge.progress | Foundry approach / safe near bank | draft
 
-Delivery: old caravan habit
+An on-demand progress check while repair work is underway.
 
-**Salvager** (`tavern.twoseals.ridge.2`): And leave room to rest on the way.
+Artificer | hub.access.bridge.progress
 
-Delivery: calm
+Direction, not spoken: clear boundary
 
-**Relic dealer** (`tavern.twoseals.ridge.3`): I can wait for the treasure. I’d rather have someone left to trade with.
+Keep off the span until the repaired joints have been tested.
 
-Delivery: unsentimental concern
+### Bridge test needs another pass
 
-## A difficult word
+hub.access.bridge.retry | Foundry approach / safe near bank | draft
 
-Scene: `tavern.twoseals.reading` · Bellwether / tavern · core-candidates · draft
+After a recoverable failed test of the bridge, at a safe retry point.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech. Only after paired keeper/jailer evidence has been inspected and debriefed; cannot supply the first critical clue through ambient speech.
+Artificer | hub.access.bridge.retry
 
-**Record keeper** (`tavern.twoseals.reading.1`): I’ve been checking that word again. Keeper. Jailer. The surrounding lines matter.
+Direction, not spoken: alert, without panic
 
-Delivery: troubled by evidence
+That joint moved. Stay on this bank while I check the fitting.
 
-**Artificer** (`tavern.twoseals.reading.2`): A lock can keep trouble in or people out. Same piece of iron.
+### Bridge crossing proven
 
-Delivery: concrete analogy
+hub.access.bridge.complete | Foundry approach / safe near bank | draft
 
-**Record keeper** (`tavern.twoseals.reading.3`): Yes. And the inscription ought to tell us which.
+The required load test has passed. The actual return route must remain viable; no unlimited protection is implied.
 
-Delivery: not yet certain
+Artificer | access.bridge_complete
 
-## A place to come back to
+Direction, not spoken: earned confidence
 
-Scene: `tavern.twoseals.kit` · Bellwether / tavern · core-candidates · draft
+The repaired span held the test. You can cross.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech. No date, healed state or commitment to accompany player. Kit remains in town.
+Artificer | access.bridge_return
 
-**Kit** (`tavern.twoseals.kit.1`): I’m getting to know this chair better than I meant to.
+Direction, not spoken: practical care
 
-Delivery: wry, a little lonely
+It gives you a way back, too. Keep that in mind before going deeper.
 
-**Tavern keeper** (`tavern.twoseals.kit.2`): You can complain about it from the road when you’re well.
+### Magical crossing offer
 
-Delivery: warmly matter-of-fact
+hub.access.stones.offer | Foundry approach / safe near bank | draft
 
-**Kit** (`tavern.twoseals.kit.3`): I’ll come back and complain in person. Better service.
+The player asks about the magical crossing option before starting this route. Exact lesson and route staging remain proposals.
 
-Delivery: small smile
+Record keeper | access.crossing_magic
 
-## Ordinary needs after the end
+Direction, not spoken: inspects surviving evidence
 
-Scene: `tavern.finale.supper` · Bellwether / tavern · core-candidates · draft
+Those stones carried a crossing charm. We can restore it.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech. Neutral finale welcome works with no optional repair, trade or relic restitution.
+Record keeper | access.stones_task
 
-**Tavern keeper** (`tavern.finale.supper.1`): Something hot first. Accounts after.
+Direction, not spoken: measured, reassuring
 
-Delivery: relief expressed as hospitality
+We’ll test the near part first. No one needs to step over the gorge to begin.
 
-**Relic dealer** (`tavern.finale.supper.2`): I can wait.
+### Crossing charm in progress
 
-Delivery: unusually simple
+hub.access.stones.progress | Foundry approach / safe near bank | draft
 
-**Tavern keeper** (`tavern.finale.supper.3`): Good. Make room.
+An on-demand progress check while bidirectional restoration lesson is underway.
 
-Delivery: welcoming
+Record keeper | hub.access.stones.progress
 
-## A name without a price
+Direction, not spoken: careful; treats a working as a whole
 
-Scene: `tavern.finale.names` · Bellwether / tavern · core-candidates · draft
+The charm must carry you back as well as out. Check the return before extending it.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech. A readable memorial/copy is an optional proposal requiring an actual authored object; no new family identities or universal archival completeness.
+### Crossing charm retry
 
-**Record keeper** (`tavern.finale.names.1`): I’m copying the names from the service records.
+hub.access.stones.retry | Foundry approach / safe near bank | draft
 
-Delivery: quietly purposeful
+After a recoverable failed test of the crossing stones, at a safe retry point.
 
-**Relic dealer** (`tavern.finale.names.2`): Will there be a place to read them?
+Record keeper | hub.access.stones.retry
 
-Delivery: sincere curiosity
+Direction, not spoken: composed; welcomes evidence
 
-**Record keeper** (`tavern.finale.names.3`): That’s what I’m making.
+It didn’t hold. We stay on solid ground and read the binding again.
 
-Delivery: simple resolve
+### Magical crossing proven
 
-## Kit receives the traveller
+hub.access.stones.complete | Foundry approach / safe near bank | draft
 
-Scene: `tavern.finale.kit` · Bellwether / tavern · core-candidates · draft
+The required return test has passed. The actual return route must remain viable; no unlimited protection is implied.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. All speakers must be co-present and within an intelligible distance. Once per campaign; do not queue over critical speech. Kit has stayed in Bellwether through Court and treasury; no false first-hand knowledge of the vault or battle. Physical recovery status remains open.
+Record keeper | access.stones_complete
 
-**Kit** (`tavern.finale.kit.1`): There you are. Bring a chair over.
+Direction, not spoken: measured confidence
 
-Delivery: relief before questions
+The crossing holds in both directions. Take it at the pace we tested.
 
-**Tavern keeper** (`tavern.finale.kit.2`): Let them put the pack down.
+Record keeper | access.stones_limit
 
-Delivery: fond, brisk
+Direction, not spoken: keeps capabilities bounded
 
-**Kit** (`tavern.finale.kit.3`): Yes. Do that first. I’m not going anywhere.
+This working carries you over the gorge. Smoke inside is another matter.
 
-Delivery: lets the moment settle
+### Maintenance climb offer
 
-## Hub Passing Arrival
+hub.access.climb.offer | Foundry approach / safe climbing lesson point | draft
 
-Scene: `hub.passing.arrival` · Bellwether / tavern threshold · core-candidates · draft
+The player asks about the maintenance climb option before starting this route. Exact lesson and route staging remain proposals.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Requires actual settling-in scene/state; no diagnosis or recovery claim.
+Salvager | access.climb_body
 
-**Tavern keeper** (`hub.passing.arrival`): Your friend’s settled. Come in when you’re ready.
+Direction, not spoken: points out reachable holds
 
-Delivery: quiet hospitality
+Use the old maintenance climb. Test each hold before you put your weight on it.
 
-## Hub Passing Churchyard
+Salvager | access.climb_task
 
-Scene: `hub.passing.churchyard` · Bellwether / northern churchyard · core-candidates · draft
+Direction, not spoken: matter-of-fact
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Distinct approved burial grounds; do not imply exact distances or visible tomb.
+We’ll practise coming down before we practise going higher.
 
-**Record keeper** (`hub.passing.churchyard`): These graves belong to Bellwether. The old burial ground is farther northwest, beyond the woods.
+### Climb lesson in progress
 
-Delivery: clear local orientation
+hub.access.climb.progress | Foundry approach / safe climbing lesson point | draft
 
-## Hub Passing Shrine
+An on-demand progress check while safe practice is underway.
 
-Scene: `hub.passing.shrine` · Bellwether / northbound exit · core-candidates · draft
+Salvager | hub.access.climb.progress
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Only if accepted blockout has a clearly marked path and turn; no compass pin or new road invented.
+Direction, not spoken: brief practical coaching
 
-**Record keeper** (`hub.passing.shrine`): The wayside shrine is beyond the northern edge. Stay with the path until the turn.
+Find a place to rest, then look for the next hold. Don’t hang there making plans.
 
-Delivery: useful, not commanding
+### Climb lesson retry
 
-## Hub Passing Mill_Work
+hub.access.climb.retry | Foundry approach / safe climbing lesson point | draft
 
-Scene: `hub.passing.mill_work` · Bellwether / mill · core-candidates · draft
+After a recoverable failed test of the climbing route, at a safe retry point.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Requires physically visible arranged parts and actual repair work; not auto-triggered by rig quest acceptance.
+Salvager | hub.access.climb.retry
 
-**Artificer** (`hub.passing.mill_work`): Mind the loose parts. They’re laid out in order.
+Direction, not spoken: steady; removes pressure
 
-Delivery: absorbed, courteous
+Feet on the ground. Let your hands rest; the wall can wait.
 
-## Hub Passing Mill_Running
+### Maintenance route learned
 
-Scene: `hub.passing.mill_running` · Bellwether / mill · core-candidates · draft
+hub.access.climb.complete | Foundry approach / safe climbing lesson point | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Do not claim grinding/trade benefits unless those separate changes exist.
+The required return test has passed. The actual return route must remain viable; no unlimited protection is implied.
 
-**Artificer** (`hub.passing.mill_running`): Still running. Good.
+Salvager | access.climb_complete
 
-Delivery: small satisfaction
+Direction, not spoken: satisfied, restrained
 
-## Hub Passing Wet_Gear
+You’ve made the climb and the way down. The maintenance route is open to you.
 
-Scene: `hub.passing.wet_gear` · Bellwether / smith · core-candidates · draft
+Salvager | access.climb_smoke
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Visual state gate; no automatic wear/durability mechanic implied.
+Direction, not spoken: firm distinction
 
-**Artificer** (`hub.passing.wet_gear`): Dry the joints before you put that away.
+Strong arms won’t help your lungs in there. Plan where you’ll get clear air.
 
-Delivery: practical eye for damage prevention
+### Filter limits
 
-## Hub Passing Heavy_Pack
+access.smoke_tech | Bellwether / smith | draft
 
-Scene: `hub.passing.heavy_pack` · Bellwether / training point · core-candidates · draft
+The filter has been acquired and its actual finite protection model is explained. It provides no heat immunity.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Requires a meaningful authored heavy-pack presentation; no invented encumbrance system.
+Artificer | access.smoke_tech
 
-**Salvager** (`hub.passing.heavy_pack`): Try moving in it before you start the climb.
+Direction, not spoken: honest limits
 
-Delivery: observes rather than judges
+This filter will help with the smoke. Get clear before it clogs.
 
-## Hub Passing Learned_Retreat
+### Smoke ward limits
 
-Scene: `hub.passing.learned_retreat` · Bellwether / training point · core-candidates · draft
+access.smoke_magic | Bellwether / record keeper | draft
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Only acknowledges actual taught retreat and return, not a boss victory or near-drowning assumption.
+The separate smoke ward has been learned and its finite limits are explained.
 
-**Salvager** (`hub.passing.learned_retreat`): Coming back was part of the lesson. Good to see you remembered.
+Record keeper | access.smoke_magic
 
-Delivery: affectionate understatement
+Direction, not spoken: clear instruction
 
-## Hub Passing Relic_Returned
+Keep the ward steady through the smoke. Find clean air before it fades.
 
-Scene: `hub.passing.relic_returned` · Bellwether / dealer · core-candidates · draft
+### Endurance smoke limits
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Proposed dealer record state must actually update; no implied lost currency or town reward.
+access.smoke_body | Bellwether / safe training point | draft
 
-**Relic dealer** (`hub.passing.relic_returned`): I’ve taken that piece off the list. What else have you found?
+The finite endurance lesson has been learned. Hazard warnings still come from the interface and sound cues.
 
-Delivery: no resentment
+Salvager | access.smoke_body
 
-## Hub Passing Trade_Arrived
+Direction, not spoken: serious; never macho
 
-Scene: `hub.passing.trade_arrived` · Bellwether / tavern · core-candidates · draft
+Take the short gaps between clear air. If your chest tightens, go back.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Only while arrived wagon is audibly/visibly nearby; never keyed just to Foundry seal.
+### Crossing is not smoke protection
 
-**Tavern keeper** (`hub.passing.trade_arrived`): Good to hear wheels out there again.
+hub.access.smoke.route | Bellwether / safe training point | draft
 
-Delivery: warm, understated
+A Foundry crossing is ready and the player asks about hazards. Crossing access does not itself provide smoke protection.
 
-## Hub Passing Two_Seals
+Salvager | access.smoke_separate
 
-Scene: `hub.passing.two_seals` · Bellwether / record keeper · core-candidates · draft
+Direction, not spoken: plain
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Optional request only, not a new required retrieval quest or promised Court loot.
+Getting over the gorge settles the crossing. It doesn’t settle what you’ll breathe inside.
 
-**Record keeper** (`hub.passing.two_seals`): The ridge route is open. Bring the inscriptions back if you can.
+Salvager | access.smoke_retreat
 
-Delivery: focused anticipation
+Direction, not spoken: practical; makes retreat normal
 
-## Hub Passing Finale
+Use the clear stretches to recover. If you can’t reach the next one safely, come back and prepare.
 
-Scene: `hub.passing.finale` · Bellwether / tavern · core-candidates · draft
+### A mark changes the question
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Once per matching authored state; global ambient cooldown and critical-scene suppression apply. Neutral world state; no assumption of wealth, restitution, repaired mill or resumed trade.
+hub.relic.inspect | Bellwether / relic dealer | draft
 
-**Tavern keeper** (`hub.passing.finale`): You can leave the pack by your chair.
+The marked Abbey relic is presented to the dealer and record keeper before ownership is verified.
 
-Delivery: ordinary welcome; enough said
+Relic dealer | hub.named_relic
 
-## Caravan leader’s measure
+Direction, not spoken: observant
 
-Scene: `hub.lore.caravan` · Bellwether / tavern · core-candidates · draft
+That one’s marked. Find whose mark it is before you decide.
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. No invented wagon counts, winters, family history or already restored trade.
+Record keeper | relic.inspect_record
 
-**Tavern keeper** (`hub.lore.caravan.1`): I used to lead caravans through here. You learn a road by where you can stop, not just where it ends.
+Direction, not spoken: precise
 
-Delivery: recollection grounded in approved role
+I can compare the mark with what we have. A resemblance is a reason to look, not proof.
 
-**Tavern keeper** (`hub.lore.caravan.2`): Bellwether was a good stop. I’d like it to be one again.
+Relic dealer | relic.inspect_price
 
-Delivery: personal stake without a new backstory
+Direction, not spoken: businesslike; leaves the choice open
 
-## Why Bellwether has its name
+I can value the metal now. Whether you want to sell it can wait.
 
-Scene: `hub.lore.bell` · Bellwether / tavern · core-candidates · draft
+### Named relic sale preview
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. Approved origin only; no claim that a bell has rung tonight or a supernatural cause is known.
+hub.relic.sale_preview | Bellwether / relic dealer | draft
 
-**Tavern keeper** (`hub.lore.bell.1`): The church bell brought travellers home through the forest mist. That’s where Bellwether gets its name.
+After a living claimant is verified, preview a possible sale. The actual price and player confirmation are still required.
 
-Delivery: plain pride
+Relic dealer | relic.sale_preview
 
-**Tavern keeper** (`hub.lore.bell.2`): A sound you could follow when the road disappeared under your feet.
+Direction, not spoken: neither cajoling nor moralising
 
-Delivery: lets the image breathe
+I can buy it at the price shown. You’ve also got a claim to weigh before you decide.
 
-## Reading the old kingdom
+Record keeper | relic.sale_evidence
 
-Scene: `hub.lore.histories` · Bellwether / record keeper · core-candidates · draft
+Direction, not spoken: neutral; preserves history
 
-DRAFT: All wording and trigger flags are proposed integration contracts, not delivered runtime behavior. No endorsement of lantern’s claimed identity and no early prison reveal. Not a new mandatory collection quest.
+The account of where it came from will remain here, whatever you choose.
 
-**Record keeper** (`hub.lore.histories.1`): The Veyrlands were the heart of King Veyr’s realm. We’ve kept more warnings about him than useful dates.
+### Named relic decision deferred
 
-Delivery: scholarly frustration, lightly held
+hub.relic.decision_deferred | Bellwether / relic dealer | draft
 
-**Record keeper** (`hub.lore.histories.2`): If you find a record, bring the context with it. A broken line can make a convincing lie.
+The player closes the choice without selling or returning the relic.
 
-Delivery: practical request; no prophecy
+Relic dealer | hub.relic.decision_deferred
 
-## The voice speaks to Kit
+Direction, not spoken: relaxed; no inference about motive
 
-Scene: `story.lantern_town_introduction` · bellwether_kit_table · core-candidates · draft
+Keep it for now, then. You don’t owe me a decision at the counter.
 
-A direct audible introduction after the shrine; the player raises the lantern, never speaks an unseen report. Set kit_heard_lantern_first_in_town, kit_heard_lantern_royal_claim_in_bellwether and kit_heard_lantern_three_seals_request_in_bellwether from witnessed speech/accessible interaction, not remote shrine events. Queue Kit reaction as the linked next exchange.
+### Named relic return preview
 
-**Lantern voice** (`lantern.town_identity`): I am Veyr. Your friend has found the road to my treasury.
+hub.relic.return_preview | Bellwether / record keeper | draft
 
-Delivery: Measured courtesy; a claim, not confirmed identity.
+The verified claim is known and the player still owns the relic. Preview a voluntary return without committing it.
 
-**Lantern voice** (`lantern.town_seals`): Three seals. The Abbey, the Foundry, and the Glass Court. Bring them together, and the road opens.
+Record keeper | relic.return_preview
 
-Delivery: Plain and helpful; no early menace.
+Direction, not spoken: gives a concrete option
 
-## The two meanings of Horde
+The claim is established. If you want to return the piece, we can arrange the handover.
 
-Scene: `story.horde_name` · bellwether_tavern · core-candidates · draft
+Record keeper | relic.return_choice
 
-Tavern keeper line followed by kit.army_and_hoard if Kit hears it; reserve both participants. No player speech.
+Direction, not spoken: calm; does not pressure
 
-**Tavern keeper** (`hub.horde_army`): My grandfather called the Horde an army. You treasure hunters always hear the other word.
+Take the time you need. This has nothing to do with opening the treasury.
 
-Delivery: Matter-of-fact, mildly amused.
+### Named relic handover confirmed
 
-## A place by the fire
+hub.relic.return_complete | Bellwether / record keeper | draft
 
-Scene: `story.hub_arrival` · bellwether_tavern · core-candidates · draft
+Only after the voluntary handover is actually confirmed, with dealer and record keeper present.
 
-Warm arrival before later passing comments; set hub_arrival_welcome_heard when actually heard. Door action never gates the conversation.
+Record keeper | relic.return_complete
 
-**Tavern keeper** (`hub.arrival`): Shut the door behind you. Both of you look frozen.
+Direction, not spoken: quiet satisfaction
 
-Delivery: Brisk welcome, practical care.
+The piece is back with its claimant. I’ll record the return beside its history.
 
-## The claim checked
+Relic dealer | relic.return_dealer
 
-Scene: `story.relic_claim_verified` · bellwether_records · core-candidates · draft
+Direction, not spoken: accepts the choice without sulking
 
-The living claimant and actual proof remain unresolved authoring decisions. This neutral review is enabled only after the claim has genuinely been established; no invented family or eyewitness speech. Kit hears the record keeper directly and can react.
+Then it’s off my counter. Fair enough. Show me what else you brought.
 
-**Record keeper** (`relic.claim_review`): The mark matches the record. The claim holds.
+### Sold relic keeps its evidence
 
-Delivery: Careful conclusion after evidence, not a guess.
+hub.relic.sold_recovery | Bellwether / relic dealer | draft
 
-## The other meaning of keeper
+The sold relic’s verified claim is reviewed. Evidence persists; custody, buyback terms and the attainable recovery route remain proposals.
 
-Scene: `return.jailer_translation` · bellwether_records · core-candidates · draft
+Record keeper | relic.sold_evidence
 
-Translation depends on actual paired inscription evidence, not merely two inventory seals. Completes keeper_jailer_known after the evidence interaction; hearing remains separately tracked for Kit.
+Direction, not spoken: steady
 
-**Record keeper** (`return.keeper_word`): I read this as keeper of the treasury. Here, the same word means jailer.
+The sale didn’t erase the mark or its history. The record is still here.
 
-Delivery: Careful correction.
+Relic dealer | relic.sold_recovery
+
+Direction, not spoken: practical; no invented price
+
+Let’s check where the piece is and what it would take to recover it.
+
+### The mill actually turns
+
+hub.change.mill | Bellwether / mill-side public point | draft
+
+The mill is actually operating quietly and local grinding has resumed. Acquiring equipment or finishing a dungeon is insufficient.
+
+Tavern keeper | hub.mill_repaired
+
+Direction, not spoken: pleased; a caravan journey no longer needed
+
+The mill’s turning again. We can grind here instead of sending grain over the ridge.
+
+Artificer | hub.mill_artificer
+
+Direction, not spoken: ordinary workmanship pride
+
+Listen to that. No knock in the gearing. That’s how it should run.
+
+### Optional fittings offered for use
+
+hub.change.wagon_materials | Bellwether / smith | draft
+
+Optional Foundry fittings are presented. Use requires the player’s selection and does not consume essential quest items.
+
+Artificer | foundry.component
+
+Direction, not spoken: sees practical value
+
+These fittings could put a wagon back on the road. If you can spare them.
+
+Tavern keeper | hub.component_choice
+
+Direction, not spoken: fair dealing; respects the traveller
+
+Show them what you’d take first. Let them choose.
+
+### A wagon has really arrived
+
+hub.change.trade | Bellwether / tavern | draft
+
+A wagon has actually arrived and been unloaded with the tavern keeper; new stock is physically available.
+
+Tavern keeper | hub.trade_arrived
+
+Direction, not spoken: modest hope; enjoys the mundane work
+
+A wagon came through. We unloaded it together.
+
+Relic dealer | hub.trade_stock
+
+Direction, not spoken: brisk; benefit made tangible
+
+I’ve put the new stock out. Have a look if you need anything.
+
+### What a fortune weighs
+
+tavern.preseals.weight | Bellwether / tavern | draft
+
+Before either middle seal, with dealer and tavern keeper together.
+
+Relic dealer | tavern.preseals.weight.1
+
+Direction, not spoken: appraising
+
+A good haul ought to have some weight to it.
+
+Tavern keeper | tavern.preseals.weight.2
+
+Direction, not spoken: caravan experience
+
+So does a broken axle. Pack for the road back.
+
+Relic dealer | tavern.preseals.weight.3
+
+Direction, not spoken: dry, mildly affronted
+
+I was going to suggest smaller valuables.
+
+### The unpulled bell
+
+tavern.preseals.bell | Bellwether / tavern | draft
+
+Before either middle seal, with record keeper and tavern keeper together. Folklore only; no ringing event is asserted.
+
+Tavern keeper | tavern.preseals.bell.1
+
+Direction, not spoken: familiar local story
+
+They say the bell rings some nights with no hand on the rope.
+
+Record keeper | tavern.preseals.bell.2
+
+Direction, not spoken: curiosity without endorsement
+
+They say a good many things. I’d like to hear it for myself.
+
+Tavern keeper | tavern.preseals.bell.3
+
+Direction, not spoken: warm practicality
+
+If you do, point anyone lost toward the door. That’s what the bell was for.
+
+### An unwilling rest
+
+tavern.preseals.kit | Bellwether / tavern | draft
+
+Before either middle seal, with Kit recovering and the salvager and tavern keeper present.
+
+Kit | tavern.preseals.kit.1
+
+Direction, not spoken: restless, trying to be useful
+
+I could at least sort the packs.
+
+Tavern keeper | tavern.preseals.kit.2
+
+Direction, not spoken: accommodating but firm
+
+From the chair, if you like.
+
+Salvager | tavern.preseals.kit.3
+
+Direction, not spoken: affectionate authority
+
+Leave the carrying to someone who isn’t recovering.
+
+### A different road
+
+tavern.oneseal.pack | Bellwether / tavern | draft
+
+Exactly one middle seal is known in town, with artificer, salvager and tavern keeper together.
+
+Tavern keeper | tavern.oneseal.pack.1
+
+Direction, not spoken: route-wise
+
+One road behind you, another still to try. I’d repack before setting out.
+
+Artificer | tavern.oneseal.pack.2
+
+Direction, not spoken: offers a practical next step
+
+Bring the gear over. I’ll show you what needs checking.
+
+Salvager | tavern.oneseal.pack.3
+
+Direction, not spoken: quiet interruption
+
+After you’ve sat down.
+
+### What a seal proves
+
+tavern.oneseal.claims | Bellwether / tavern | draft
+
+Exactly one middle seal is known in town and an ordinary stamped object is presented. The object is not a progression seal.
+
+Relic dealer | tavern.oneseal.claims.1
+
+Direction, not spoken: trade observation
+
+A royal stamp makes a piece easier to sell.
+
+Record keeper | tavern.oneseal.claims.2
+
+Direction, not spoken: precise distinction
+
+It tells you who claimed it. Not how they came by it.
+
+Relic dealer | tavern.oneseal.claims.3
+
+Direction, not spoken: practical acceptance
+
+That’s why I asked you to read it.
+
+### News brought home
+
+tavern.oneseal.kit | Bellwether / tavern | draft
+
+Exactly one middle seal is known in town, with artificer and recovering Kit together. The dungeon order is unspecified.
+
+Kit | tavern.oneseal.kit.1
+
+Direction, not spoken: wry impatience
+
+Bring back one piece I can look at without getting out of this chair.
+
+Artificer | tavern.oneseal.kit.2
+
+Direction, not spoken: dry
+
+Something that isn’t dripping on my tools.
+
+Kit | tavern.oneseal.kit.3
+
+Direction, not spoken: gentle teasing
+
+Your tools aren’t in my chair. We’ve got room to compromise.
+
+### Preparing for the ridge
+
+tavern.twoseals.ridge | Bellwether / tavern | draft
+
+Both middle seals are acquired and the Court route is actually open, before the Court revelation.
+
+Tavern keeper | tavern.twoseals.ridge.1
+
+Direction, not spoken: old caravan habit
+
+So it’s the high ridge next. Check what you’re carrying before the climb.
+
+Salvager | tavern.twoseals.ridge.2
+
+Direction, not spoken: calm
+
+And leave room to rest on the way.
+
+Relic dealer | tavern.twoseals.ridge.3
+
+Direction, not spoken: unsentimental concern
+
+I can wait for the treasure. I’d rather have someone left to trade with.
+
+### A difficult word
+
+tavern.twoseals.reading | Bellwether / tavern | draft
+
+Both middle seals are acquired and the keeper or jailer translation has already been inspected and explained.
+
+Record keeper | tavern.twoseals.reading.1
+
+Direction, not spoken: troubled by evidence
+
+I’ve been checking that word again. Keeper. Jailer. The surrounding lines matter.
+
+Artificer | tavern.twoseals.reading.2
+
+Direction, not spoken: concrete analogy
+
+A lock can keep trouble in or people out. Same piece of iron.
+
+Record keeper | tavern.twoseals.reading.3
+
+Direction, not spoken: not yet certain
+
+Yes. And the inscription ought to tell us which.
+
+### A place to come back to
+
+tavern.twoseals.kit | Bellwether / tavern | draft
+
+Both middle seals are acquired while Kit continues recovering in town, before the Court revelation.
+
+Kit | tavern.twoseals.kit.1
+
+Direction, not spoken: wry, a little lonely
+
+I’m getting to know this chair better than I meant to.
+
+Tavern keeper | tavern.twoseals.kit.2
+
+Direction, not spoken: warmly matter-of-fact
+
+You can complain about it from the road when you’re well.
+
+Kit | tavern.twoseals.kit.3
+
+Direction, not spoken: small smile
+
+I’ll come back and complain in person. Better service.
+
+### Ordinary needs after the end
+
+tavern.finale.supper | Bellwether / tavern | draft
+
+After the finale and return, with dealer and tavern keeper present. No optional town improvements are required.
+
+Tavern keeper | tavern.finale.supper.1
+
+Direction, not spoken: relief expressed as hospitality
+
+Something hot first. Accounts after.
+
+Relic dealer | tavern.finale.supper.2
+
+Direction, not spoken: unusually simple
+
+I can wait.
+
+Tavern keeper | tavern.finale.supper.3
+
+Direction, not spoken: welcoming
+
+Good. Make room.
+
+### A name without a price
+
+tavern.finale.names | Bellwether / tavern | draft
+
+After the finale, recovered soldier records and an actual memorial-copy activity are present. The memorial object remains proposed.
+
+Record keeper | tavern.finale.names.1
+
+Direction, not spoken: quietly purposeful
+
+I’m copying the names from the service records.
+
+Relic dealer | tavern.finale.names.2
+
+Direction, not spoken: sincere curiosity
+
+Will there be a place to read them?
+
+Record keeper | tavern.finale.names.3
+
+Direction, not spoken: simple resolve
+
+That’s what I’m making.
+
+### Kit receives the traveller
+
+tavern.finale.kit | Bellwether / tavern | draft
+
+After the finale and safe return, with Kit and tavern keeper together. Kit has stayed in Bellwether.
+
+Kit | tavern.finale.kit.1
+
+Direction, not spoken: relief before questions
+
+There you are. Bring a chair over.
+
+Tavern keeper | tavern.finale.kit.2
+
+Direction, not spoken: fond, brisk
+
+Let them put the pack down.
+
+Kit | tavern.finale.kit.3
+
+Direction, not spoken: lets the moment settle
+
+Yes. Do that first. I’m not going anywhere.
+
+### Arrival
+
+hub.passing.arrival | Bellwether / tavern threshold | draft
+
+After the actual arrival welcome, while Kit is still recovering.
+
+Tavern keeper | hub.passing.arrival
+
+Direction, not spoken: quiet hospitality
+
+Your friend’s settled. Come in when you’re ready.
+
+### Churchyard
+
+hub.passing.churchyard | Bellwether / northern churchyard | draft
+
+The player asks about the distinct northern churchyard.
+
+Record keeper | hub.passing.churchyard
+
+Direction, not spoken: clear local orientation
+
+These graves belong to Bellwether. The old burial ground is farther northwest, beyond the woods.
+
+### Shrine
+
+hub.passing.shrine | Bellwether / northbound exit | draft
+
+The shrine lead is known but the register is not recovered; the accepted layout must show the indicated path.
+
+Record keeper | hub.passing.shrine
+
+Direction, not spoken: useful, not commanding
+
+The wayside shrine is beyond the northern edge. Stay with the path until the turn.
+
+### Mill Work
+
+hub.passing.mill_work | Bellwether / mill | draft
+
+Parts are visibly arranged and repair work is actually in progress.
+
+Artificer | hub.passing.mill_work
+
+Direction, not spoken: absorbed, courteous
+
+Mind the loose parts. They’re laid out in order.
+
+### Mill Running
+
+hub.passing.mill_running | Bellwether / mill | draft
+
+The repaired mill is genuinely running; separate trade or grinding benefits are not assumed.
+
+Artificer | hub.passing.mill_running
+
+Direction, not spoken: small satisfaction
+
+Still running. Good.
+
+### Wet Gear
+
+hub.passing.wet_gear | Bellwether / smith | draft
+
+The player returns with visibly wet equipment. This implies no durability system.
+
+Artificer | hub.passing.wet_gear
+
+Direction, not spoken: practical eye for damage prevention
+
+Dry the joints before you put that away.
+
+### Heavy Pack
+
+hub.passing.heavy_pack | Bellwether / training point | draft
+
+An authored visibly heavy pack supports the observation; no encumbrance mechanic is assumed.
+
+Salvager | hub.passing.heavy_pack
+
+Direction, not spoken: observes rather than judges
+
+Try moving in it before you start the climb.
+
+### Learned Retreat
+
+hub.passing.learned_retreat | Bellwether / training point | draft
+
+After an expedition return and an actually demonstrated safe-retreat lesson.
+
+Salvager | hub.passing.learned_retreat
+
+Direction, not spoken: affectionate understatement
+
+Coming back was part of the lesson. Good to see you remembered.
+
+### Relic Returned
+
+hub.passing.relic_returned | Bellwether / dealer | draft
+
+The relic handover is confirmed and the dealer’s listing has actually been removed.
+
+Relic dealer | hub.passing.relic_returned
+
+Direction, not spoken: no resentment
+
+I’ve taken that piece off the list. What else have you found?
+
+### Trade Arrived
+
+hub.passing.trade_arrived | Bellwether / tavern | draft
+
+The restored-trade wagon is genuinely nearby and audible.
+
+Tavern keeper | hub.passing.trade_arrived
+
+Direction, not spoken: warm, understated
+
+Good to hear wheels out there again.
+
+### Two Seals
+
+hub.passing.two_seals | Bellwether / record keeper | draft
+
+Both middle seals are acquired and the Court route is open, before the Court truth is known.
+
+Record keeper | hub.passing.two_seals
+
+Direction, not spoken: focused anticipation
+
+The ridge route is open. Bring the inscriptions back if you can.
+
+### Finale
+
+hub.passing.finale | Bellwether / tavern | draft
+
+After the finale and player’s return. No wealth, repair, restitution or trade outcome is assumed.
+
+Tavern keeper | hub.passing.finale
+
+Direction, not spoken: ordinary welcome; enough said
+
+You can leave the pack by your chair.
+
+### The caravan leader reflects on the road
+
+hub.lore.caravan | Bellwether / tavern | draft
+
+An on-demand conversation about the tavern keeper’s road experience. No restored trade is assumed.
+
+Tavern keeper | hub.lore.caravan.1
+
+Direction, not spoken: recollection grounded in approved role
+
+I used to lead caravans through here. You learn a road by where you can stop, not just where it ends.
+
+Tavern keeper | hub.lore.caravan.2
+
+Direction, not spoken: personal stake without a new backstory
+
+Bellwether was a good stop. I’d like it to be one again.
+
+### Why Bellwether has its name
+
+hub.lore.bell | Bellwether / tavern | draft
+
+An on-demand explanation of Bellwether’s approved name origin. No present ringing event is implied.
+
+Tavern keeper | hub.lore.bell.1
+
+Direction, not spoken: plain pride
+
+The church bell brought travellers home through the forest mist. That’s where Bellwether gets its name.
+
+Tavern keeper | hub.lore.bell.2
+
+Direction, not spoken: lets the image breathe
+
+A sound you could follow when the road disappeared under your feet.
+
+### Reading the old kingdom
+
+hub.lore.histories | Bellwether / record keeper | draft
+
+An on-demand discussion of the old kingdom, without endorsing the lantern’s claim or revealing the prison early.
+
+Record keeper | hub.lore.histories.1
+
+Direction, not spoken: scholarly frustration, lightly held
+
+The Veyrlands were the heart of King Veyr’s realm. We’ve kept more warnings about him than useful dates.
+
+Record keeper | hub.lore.histories.2
+
+Direction, not spoken: practical request; no prophecy
+
+If you find a record, bring the context with it. A broken line can make a convincing lie.
+
+## Decision blocked scenes for review
+
+These scenes are separated from the core candidates. They require the stated design or staging decision before recording approval. Optional final-boss and future opening-keeper voice remain excluded from the core TTS and recording set.
+
+### The order from the king
+
+story.court_evidence | Court evidence | newdecisionblocked
+
+DECISION BLOCKED. Proposed speaking interval after the Court encounter. The keeper’s ability to speak and eventual fate need staging approval; the evidence is also readable.
+
+Court keeper | court.king_proof
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+Read the king's order. His seal is beside ours. He ordered the prison made.
+
+Court keeper | court.true_bargain
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+He bargained for victory. It gave him an army that could not stop serving.
+
+Court keeper | court.fourth_keeper
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+There were four of us. The one beneath the tomb kept watch over what you carry.
+
+Court keeper | court.custody
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+We held it. We could not release the soldiers without opening the bond.
+
+### Check the garden date
+
+story.court_memory | Court evidence | newdecisionblocked
+
+DECISION BLOCKED. Optional corroborating garden chronology remains a draft clue, not approved history.
+
+Court keeper | court.memory_evidence
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+That garden was planted after the king died.
+
+### The final seal
+
+story.court_reward | Court reward | newdecisionblocked
+
+DECISION BLOCKED. The final seal award is independent of voice; keeper transfer and fate still need approved staging.
+
+Court keeper | court.final_seal
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+The last seal leads to the treasury. You have seen what it keeps.
+
+### The released voice
+
+optional_boss.release | Treasury arena | newdecisionblocked
+
+DECISION BLOCKED. Optional final-boss voice, excluded from core recording and TTS. Release and threat must still be conveyed visually.
+
+Lantern voice | treasury.release
+
+Direction, not spoken: First unguarded pleasure.
+
+At last.
+
+Lantern voice | treasury.entity_claim
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+I gave them victory. Their king promised me everything that followed.
+
+Lantern voice | treasury.entity_demand
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+Put down the light. You have carried it far enough.
+
+### A demand refused
+
+optional_boss.pressure | Treasury arena | newdecisionblocked
+
+DECISION BLOCKED. Optional final-boss pressure alternatives, not a continuous exchange. They do not restrict player control.
+
+Lantern voice | finale.entity_pressure
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+You would leave this here?
+
+Lantern voice | bark.entity.command
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+Kneel.
+
+### The light turns
+
+optional_boss.counter | Treasury arena | newdecisionblocked
+
+DECISION BLOCKED. Only if the approved finale actually uses the proposed shutter counterplay.
+
+Lantern voice | finale.entity_light
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+Close that shutter!
+
+### The claim fails
+
+optional_boss.last | Treasury arena | newdecisionblocked
+
+DECISION BLOCKED. Optional defeat vocal; neither progression nor saving depends on it.
+
+Lantern voice | finale.entity_last
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+It was promised to me.
+
+### The fourth watch
+
+optional_guard.warning | Tomb keeper encounter | newdecisionblocked
+
+DECISION BLOCKED. Future campaign candidate only, excluded from the 1.7 opening recording and active 1.6.2 reveal scope.
+
+Fourth Keeper | prologue.keeper_warning
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+Leave this chamber. My watch is not ended.
+
+### A duty held
+
+optional_guard.last | Tomb keeper encounter | newdecisionblocked
+
+DECISION BLOCKED. Future campaign candidate after the keeper’s defeat; not part of the opening recording scope.
+
+Fourth Keeper | prologue.keeper_last
+
+Direction, not spoken: Natural, unhurried and intelligible.
+
+I cannot... leave my post.
+
+### Loose ground beyond the lookout
+
+kit.approach_injury | 1.8 approach road, after the 1.7 lookout endpoint | newdecisionblocked
+
+DECISION BLOCKED. The injury and Bellwether recovery arc are approved. A turned ankle on loose ground, weight-bearing and offered arm support remain proposed specifics. This incident is after the 1.7 lookout.
+
+Kit | kit.approach_injury.stop
+
+Direction, not spoken: A short involuntary catch, then controlled.
+
+Ah. Wait a moment.
+
+Kit | kit.approach_injury.ankle
+
+Direction, not spoken: Testing carefully; no brave joke.
+
+Loose ground. Turned my ankle. I can stand, but give me a moment.
+
+Kit | kit.approach_injury.arm
+
+Direction, not spoken: Plain request; lets the player move.
+
+Lend me your arm for this bit. We’ll take it slowly.

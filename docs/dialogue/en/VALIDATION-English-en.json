@@ -1,5 +1,5 @@
 {
-  "bank_version": "0.2",
+  "bank_version": "0.2.1",
   "language": "en",
   "lines": 357,
   "scenes": 209,
@@ -2166,13 +2166,38 @@
   "manual_gameplay_tests_run": false,
   "voice_listening_tests_run": false,
   "portable_exporter_roundtrip": {
-    "files_compared": 388,
+    "files_compared": 389,
     "all_byte_identical": true
   },
   "json_schema_validation": "passed",
+  "prior_v02_review": {
+    "reading_copy": {
+      "pages": 36,
+      "all_pages_visually_reviewed": true,
+      "all_line_text_exact_once_per_id": true
+    },
+    "static_checks_count": 426
+  },
+  "performance_revision": {
+    "static_checks_passed": 436,
+    "all_357_spoken_subtitle_ids_and_text_hashes_unchanged": true,
+    "all_357_direction_notes_exposed_in_manifest": true,
+    "tagged_example_line_ids": [
+      "prologue.kit_grate"
+    ],
+    "tagged_words_match_clean_source": true,
+    "original_safe_approach_trigger_preserved": true,
+    "no_required_acknowledgment_added": true,
+    "runtime_tests_run": false,
+    "voice_listening_tests_run": false
+  },
   "reading_copy": {
-    "pages": 36,
+    "pages": 44,
     "all_pages_visually_reviewed": true,
-    "all_line_text_exact_once_per_id": true
+    "all_line_text_exact_once_per_id": true,
+    "all_delivery_notes_exact_once_per_id": true,
+    "directions_separate_from_dialogue": true,
+    "one_optional_tagged_example_outside_dialogue": true,
+    "docx_sha256": "8b7d855a94fb5af58d673ec94cb7e5a4b07d99ad97e38dc50eb9f341683b609a"
   }
 }

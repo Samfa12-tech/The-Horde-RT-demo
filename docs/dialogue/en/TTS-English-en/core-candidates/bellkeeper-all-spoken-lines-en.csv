@@ -1,2 +1,2 @@
-combined_line_number,line_id,spoken_text,voice_asset_path
-1,abbey.bellkeeper_warning,The sanctuary is closed.,audio/voice/en/abbey.bellkeeper_warning.wav
+combined_line_number,line_id,spoken_text,delivery_notes,delivery_notes_revision,voice_asset_path
+1,abbey.bellkeeper_warning,The sanctuary is closed.,Ritual authority; little wasted breath.,1,audio/voice/en/abbey.bellkeeper_warning.wav

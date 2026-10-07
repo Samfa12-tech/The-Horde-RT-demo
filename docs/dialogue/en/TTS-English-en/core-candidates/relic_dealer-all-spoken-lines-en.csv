@@ -1,20 +1,20 @@
-combined_line_number,line_id,spoken_text,voice_asset_path
-1,hub.service.dealer.greet,"Let’s see the whole piece, including the damage.",audio/voice/en/hub.service.dealer.greet.wav
-2,hub.service.dealer.cancel,Back in your bag it goes. An offer isn’t a sale.,audio/voice/en/hub.service.dealer.cancel.wav
-3,hub.service.dealer.insufficient,That isn’t enough for this piece. Keep your coin until you’re sure.,audio/voice/en/hub.service.dealer.insufficient.wav
-4,hub.ordinary_sale,"Common coin, ordinary silver. I can give you a price for those.",audio/voice/en/hub.ordinary_sale.wav
-5,hub.named_relic,That one’s marked. Find whose mark it is before you decide.,audio/voice/en/hub.named_relic.wav
-6,relic.inspect_price,I can value the metal now. Whether you want to sell it can wait.,audio/voice/en/relic.inspect_price.wav
-7,relic.sale_preview,I can buy it at the price shown. You’ve also got a claim to weigh before you decide.,audio/voice/en/relic.sale_preview.wav
-8,hub.relic.decision_deferred,"Keep it for now, then. You don’t owe me a decision at the counter.",audio/voice/en/hub.relic.decision_deferred.wav
-9,relic.return_dealer,Then it’s off my counter. Fair enough. Show me what else you brought.,audio/voice/en/relic.return_dealer.wav
-10,relic.sold_recovery,Let’s check where the piece is and what it would take to recover it.,audio/voice/en/relic.sold_recovery.wav
-11,hub.trade_stock,I’ve put the new stock out. Have a look if you need anything.,audio/voice/en/hub.trade_stock.wav
-12,tavern.preseals.weight.1,A good haul ought to have some weight to it.,audio/voice/en/tavern.preseals.weight.1.wav
-13,tavern.preseals.weight.3,I was going to suggest smaller valuables.,audio/voice/en/tavern.preseals.weight.3.wav
-14,tavern.oneseal.claims.1,A royal stamp makes a piece easier to sell.,audio/voice/en/tavern.oneseal.claims.1.wav
-15,tavern.oneseal.claims.3,That’s why I asked you to read it.,audio/voice/en/tavern.oneseal.claims.3.wav
-16,tavern.twoseals.ridge.3,I can wait for the treasure. I’d rather have someone left to trade with.,audio/voice/en/tavern.twoseals.ridge.3.wav
-17,tavern.finale.supper.2,I can wait.,audio/voice/en/tavern.finale.supper.2.wav
-18,tavern.finale.names.2,Will there be a place to read them?,audio/voice/en/tavern.finale.names.2.wav
-19,hub.passing.relic_returned,I’ve taken that piece off the list. What else have you found?,audio/voice/en/hub.passing.relic_returned.wav
+combined_line_number,line_id,spoken_text,delivery_notes,delivery_notes_revision,voice_asset_path
+1,hub.service.dealer.greet,"Let’s see the whole piece, including the damage.","commercial, alert, without a theatrical sales patter",1,audio/voice/en/hub.service.dealer.greet.wav
+2,hub.service.dealer.cancel,Back in your bag it goes. An offer isn’t a sale.,"commercial, alert, without a theatrical sales patter",1,audio/voice/en/hub.service.dealer.cancel.wav
+3,hub.service.dealer.insufficient,That isn’t enough for this piece. Keep your coin until you’re sure.,"commercial, alert, without a theatrical sales patter",1,audio/voice/en/hub.service.dealer.insufficient.wav
+4,hub.ordinary_sale,"Common coin, ordinary silver. I can give you a price for those.",matter-of-fact; no pressure,1,audio/voice/en/hub.ordinary_sale.wav
+5,hub.named_relic,That one’s marked. Find whose mark it is before you decide.,observant,1,audio/voice/en/hub.named_relic.wav
+6,relic.inspect_price,I can value the metal now. Whether you want to sell it can wait.,businesslike; leaves the choice open,1,audio/voice/en/relic.inspect_price.wav
+7,relic.sale_preview,I can buy it at the price shown. You’ve also got a claim to weigh before you decide.,neither cajoling nor moralising,1,audio/voice/en/relic.sale_preview.wav
+8,hub.relic.decision_deferred,"Keep it for now, then. You don’t owe me a decision at the counter.",relaxed; no inference about motive,1,audio/voice/en/hub.relic.decision_deferred.wav
+9,relic.return_dealer,Then it’s off my counter. Fair enough. Show me what else you brought.,accepts the choice without sulking,1,audio/voice/en/relic.return_dealer.wav
+10,relic.sold_recovery,Let’s check where the piece is and what it would take to recover it.,practical; no invented price,1,audio/voice/en/relic.sold_recovery.wav
+11,hub.trade_stock,I’ve put the new stock out. Have a look if you need anything.,brisk; benefit made tangible,1,audio/voice/en/hub.trade_stock.wav
+12,tavern.preseals.weight.1,A good haul ought to have some weight to it.,appraising,1,audio/voice/en/tavern.preseals.weight.1.wav
+13,tavern.preseals.weight.3,I was going to suggest smaller valuables.,"dry, mildly affronted",1,audio/voice/en/tavern.preseals.weight.3.wav
+14,tavern.oneseal.claims.1,A royal stamp makes a piece easier to sell.,trade observation,1,audio/voice/en/tavern.oneseal.claims.1.wav
+15,tavern.oneseal.claims.3,That’s why I asked you to read it.,practical acceptance,1,audio/voice/en/tavern.oneseal.claims.3.wav
+16,tavern.twoseals.ridge.3,I can wait for the treasure. I’d rather have someone left to trade with.,unsentimental concern,1,audio/voice/en/tavern.twoseals.ridge.3.wav
+17,tavern.finale.supper.2,I can wait.,unusually simple,1,audio/voice/en/tavern.finale.supper.2.wav
+18,tavern.finale.names.2,Will there be a place to read them?,sincere curiosity,1,audio/voice/en/tavern.finale.names.2.wav
+19,hub.passing.relic_returned,I’ve taken that piece off the list. What else have you found?,no resentment,1,audio/voice/en/hub.passing.relic_returned.wav
