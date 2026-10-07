@@ -2215,3 +2215,34 @@ apps are stopped afterward. See the
 [final graphics record](ENGINEERING_1_6_2_FINAL_GRAPHICS.md) for retained observer
 negatives and limits. No sustained 30 FPS, new audio acceptance, signed release,
 S24 completion or S25 certification follows. Raw evidence remains private.
+
+## 7 October 2026 finishing checkpoint: SM-S948B Entry and Glass stages
+
+Allocated SM-S948B / Android 16 receives four-ABI development Debug foundation
+`b3ea5ed01fc7a8680fc7ff55c78e5f79c0cf1aa3`, APK SHA-256
+`7b566fd1036ba4c52c62a5519ffa933ab1ac61dcb7b98f916f018144b5405b3f`,
+139693605 bytes. Installed pullback matches. RayTracingPipeline presents actual
+Entry profile 2 at current generation 1; this is new scene/presentation evidence,
+not a replay of the earlier complete route/backend/lifecycle evidence.
+
+The first native front-menu modal fails owner appearance inspection at existing
+font scale 1.7. Corrected separate plaques are inspected in portrait using
+explicit mixed-source Java `01377031` / unchanged native `b3ea5ed0`, APK
+`8bb4b96451f2e6db6a5302060ee84549b38b5defc2b2e766d9838e003f80e2c7`.
+All four packaged native hashes are unchanged; this package is not an immutable
+integrated candidate. Corrected owner appearance and landscape remain pending.
+
+At output 1440 x 2980 / actual traced 50% 720 x 1490, saved Mobile water/fire,
+Glass On, Current shadows, cap30, Mist On, the actual Glass Off comparison takes
+16694.868 ms native request wall time, including 16174.583 ms in null-cache
+pipeline creation. It presents current preview profile 1. Comparison `exact_ack=0`
+correctly does not constitute Use/save. The attempted return-On was not confirmed
+and remains a measurement gap. Saved/custom preference keys are unchanged;
+only edit-recovery metadata changes and clears on current confirmed Entry.
+
+See [exact menu/package/stage ledger](ENGINEERING_1_6_2_MENU_PHONE_2026_10_07.md).
+The temporary rotation test was restored to original lock 0; font/density were
+not reduced. The development validation app was stopped before the next build.
+USB-powered context does not prove reliable power or sustained thermals/FPS.
+No production app, app-data clear, signing, release, other model, S24 or S25
+certification follows. Raw identifiers, preferences and captures remain private.
