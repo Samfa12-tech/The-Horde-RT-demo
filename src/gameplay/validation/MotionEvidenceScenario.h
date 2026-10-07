@@ -130,6 +130,7 @@ private:
     float torchDrenchReleaseViewPitch_ = 0.0f;
     float torchDrenchPreviousFallProgress_ = 0.0f;
     float torchDrenchPreviousDroppedY_ = 0.0f;
+    double torchDrenchInspectionStartSeconds_ = -1.0;
     std::uint64_t torchExtinguishedSequence_ = 0u;
     std::uint64_t waterfallWarningSequence_ = 0u;
     std::uint64_t swordDrawSequence_ = 0u;

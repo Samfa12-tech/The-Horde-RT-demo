@@ -434,13 +434,21 @@ void MotionEvidenceScenario::ObserveAdvance(const SimulationSnapshot& state,
                 (torchDrenchWalkingAfterRelease_ &&
                  (std::abs(state.playerYawRadians - torchDrenchReleaseYaw_) > 0.5f ||
                   std::abs(state.playerPitchRadians - torchDrenchReleaseViewPitch_) > 0.10f));
-            if (simulationSeconds_ - stageStartSeconds_ >= 0.30)
+            const bool atSettledInspectionPoint =
+                Distance(state, -4.5f, -15.2f) <= 0.06f && state.walkAmount <= 0.05f;
+            if (atSettledInspectionPoint)
             {
-                if (!torchDrenchWalkingAfterRelease_ || !torchDrenchStepBackLookSeen_ ||
-                    eventCount != 1u || torchExtinguishedSequence_ == 0u)
-                    Fail("Torch-drench inspection missed the step-back/look or once-only event evidence.");
-                else Enter(MotionStage::Complete);
+                if (torchDrenchInspectionStartSeconds_ < 0.0)
+                    torchDrenchInspectionStartSeconds_ = simulationSeconds_;
+                else if (simulationSeconds_ - torchDrenchInspectionStartSeconds_ >= 0.35)
+                {
+                    if (!torchDrenchWalkingAfterRelease_ || !torchDrenchStepBackLookSeen_ ||
+                        eventCount != 1u || torchExtinguishedSequence_ == 0u)
+                        Fail("Torch-drench inspection missed the step-back/look or once-only event evidence.");
+                    else Enter(MotionStage::Complete);
+                }
             }
+            else torchDrenchInspectionStartSeconds_ = -1.0;
         }
         return;
     }
