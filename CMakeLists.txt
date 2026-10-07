@@ -53,6 +53,10 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_foreground_pause_render_cadence_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_foreground_pause_render_cadence_tests COMMAND horde_rt_foreground_pause_render_cadence_tests)
 
+    add_executable(horde_rt_surface_presentation_policy_tests tests/SurfacePresentationPolicyTests.cpp)
+    target_include_directories(horde_rt_surface_presentation_policy_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_surface_presentation_policy_tests COMMAND horde_rt_surface_presentation_policy_tests)
+
     foreach(scale_fixture IN ITEMS horde_rt_benchmark_scale_default_tests horde_rt_benchmark_scale_experimental_tests)
         add_executable(${scale_fixture} tests/BenchmarkScaleAdmissionTests.cpp)
         target_include_directories(${scale_fixture} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

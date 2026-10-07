@@ -56,6 +56,7 @@
 #include "platform/android/AndroidRtLabState.h"
 #include "platform/android/AndroidMusicPlayback.h"
 #include "platform/android/SurfaceSessionMailbox.h"
+#include "platform/android/SurfacePresentationPolicy.h"
 #include "update/GitHubReleaseUpdater.h"
 #include "vulkan/GpuFrameTimer.h"
 #include "vulkan/RtCapabilityReport.h"
@@ -189,6 +190,12 @@ struct SwapchainContext
     VkColorSpaceKHR swapchainColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
     VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
     VkExtent2D swapchainExtent{};
+    VkExtent2D nativeWindowExtent{};
+    VkExtent2D surfaceCurrentExtent{};
+    VkSurfaceTransformFlagsKHR surfaceSupportedTransforms = 0u;
+    VkSurfaceTransformFlagBitsKHR surfaceCurrentTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    VkSurfaceTransformFlagBitsKHR swapchainPreTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    bool rtPreRotationRequired = false;
     float renderScale = kDefaultAndroidRtRenderScale;
     horde::graphics::GraphicsSettings graphicsSettings = horde::graphics::PlatformDefaultGraphicsSettings(horde::graphics::GraphicsPlatform::Android);
     horde::graphics::GraphicsSettings graphicsRequested{};
@@ -2213,6 +2220,16 @@ bool CreateSwapchain(SwapchainContext& context)
     ANativeWindow* window = context.window;
     const uint32_t width = static_cast<uint32_t>(ANativeWindow_getWidth(window));
     const uint32_t height = static_cast<uint32_t>(ANativeWindow_getHeight(window));
+    context.nativeWindowExtent = {width, height};
+    context.surfaceCurrentExtent = capabilities.currentExtent;
+    context.surfaceSupportedTransforms = capabilities.supportedTransforms;
+    context.surfaceCurrentTransform = capabilities.currentTransform;
+    const auto presentationPolicy = horde::platform::android::ChooseSurfacePresentationPolicy(
+        static_cast<std::uint32_t>(capabilities.supportedTransforms),
+        static_cast<std::uint32_t>(capabilities.currentTransform));
+    context.swapchainPreTransform = static_cast<VkSurfaceTransformFlagBitsKHR>(
+        presentationPolicy.chosenPreTransform);
+    context.rtPreRotationRequired = presentationPolicy.rtPreRotationRequired;
     context.swapchainExtent = ClampExtent(capabilities, std::max(1u, width), std::max(1u, height));
     context.swapchainFormat = chosenFormat.format;
     context.swapchainColorSpace = chosenFormat.colorSpace;
@@ -2238,7 +2255,7 @@ bool CreateSwapchain(SwapchainContext& context)
         VK_SHARING_MODE_EXCLUSIVE,
         0,
         nullptr,
-        capabilities.currentTransform,
+        context.swapchainPreTransform,
         VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
         chosenPresentMode,
         VK_TRUE,
@@ -2836,6 +2853,25 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
                         renderExtent.height,
                         context.swapchainExtent.width,
                         context.swapchainExtent.height);
+
+    const VkExtent2D dispatchExtent = context.rtScene.DispatchExtent();
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "HORDE_SURFACE_PRESENTATION generation=%llu window=%ux%u current_extent=%ux%u current_transform=0x%08x supported_transforms=0x%08x pre_transform=0x%08x swapchain=%ux%u rt_dispatch=%ux%u rt_pre_rotation_required=%d",
+        static_cast<unsigned long long>(context.surfaceGeneration),
+        context.nativeWindowExtent.width, context.nativeWindowExtent.height,
+        context.surfaceCurrentExtent.width, context.surfaceCurrentExtent.height,
+        static_cast<unsigned int>(context.surfaceCurrentTransform),
+        static_cast<unsigned int>(context.surfaceSupportedTransforms),
+        static_cast<unsigned int>(context.swapchainPreTransform),
+        context.swapchainExtent.width, context.swapchainExtent.height,
+        dispatchExtent.width, dispatchExtent.height,
+        context.rtPreRotationRequired ? 1 : 0);
+    if (context.rtPreRotationRequired)
+    {
+        __android_log_print(ANDROID_LOG_WARN, kTag,
+            "Surface does not support identity pre-transform; retaining current transform 0x%08x. RT pre-rotation is not implemented, so this orientation may render incorrectly.",
+            static_cast<unsigned int>(context.surfaceCurrentTransform));
+    }
 
     return true;
 }
