@@ -15,6 +15,7 @@
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "gameplay/simulation/CombatPresentation.h"
+#include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/FixedStepRunner.h"
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
@@ -56,7 +57,8 @@ public:
 
     std::uint32_t AdvanceFrame(const InputSnapshot& input,
                                double frameDeltaSeconds,
-                               std::uint64_t inputPublicationSequence = 0u);
+                               std::uint64_t inputPublicationSequence = 0u,
+                               std::uint64_t ownerAdvanceSteadyNs = 0u);
     void StepFixed(const InputSnapshot& input,
                    float fixedDeltaSeconds = static_cast<float>(FixedStepRunner::kFixedDeltaSeconds),
                    std::uint64_t inputPublicationSequence = 0u);
@@ -84,9 +86,27 @@ public:
 
 private:
     void StepFixedTick(const InputSnapshot& input, float fixedDeltaSeconds,
-                       std::uint64_t inputPublicationSequence);
+                       std::uint64_t inputPublicationSequence,
+                       bool activateTimestampedEdges = true);
     static EntityId EntityForEnemy(EnemyKind kind);
-    void IngestCommands(const InputSnapshot& input);
+    void IngestCommands(const InputSnapshot& input, bool ingestCombatEdges = true);
+    void ScheduleTimestampedCombatEdges(const InputSnapshot& input,
+                                        double frameDeltaSeconds,
+                                        std::uint64_t ownerAdvanceSteadyNs,
+                                        std::uint64_t inputPublicationSequence);
+    void ActivateScheduledCombatEdges();
+    void ClearScheduledCombatEdges(bool discardAndConsume);
+    void AddCombatTimingTrace(const CombatInputEdge& edge,
+                              std::uint64_t publicationSequence,
+                              std::uint64_t targetTick,
+                              CombatInputTimingDisposition disposition);
+    void MarkCombatTimingConsumed(CombatInputEdgeKind kind,
+                                  std::uint64_t oldConsumed,
+                                  std::uint64_t newConsumed);
+    void LinkCombatTimingSemanticEvent(CombatInputEdgeKind kind,
+                                       std::uint64_t commandSequence,
+                                       std::uint64_t eventSequence,
+                                       std::uint64_t eventTick);
     bool ConsumeWorldCommand();
     bool ApplyCheckpoint(std::int32_t checkpointId, bool isRetry);
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
@@ -179,6 +199,20 @@ private:
     bool skeletonIdlePhasesEnabled_ = true;
     bool lichAttackEligible_ = false;
     std::uint64_t lichRevealAttackSequenceFloor_ = 0u;
+    struct ScheduledCombatEdge
+    {
+        CombatInputEdge edge{};
+        std::uint64_t targetTick = 0u;
+        std::uint64_t publicationSequence = 0u;
+    };
+    std::array<ScheduledCombatEdge, kCombatInputEdgeHistoryCapacity> scheduledCombatEdges_{};
+    std::uint32_t scheduledCombatEdgeCount_ = 0u;
+    std::array<std::uint64_t, 3u> overflowCombatCommandCounts_{};
+    std::array<std::uint64_t, 3u> overflowCombatTargetTicks_{};
+    float overflowDodgeForward_ = 0.0f;
+    float overflowDodgeStrafe_ = 0.0f;
+    std::uint64_t previousOwnerAdvanceSteadyNs_ = 0u;
+    std::uint64_t parrySourceCommandSequence_ = 0u;
 };
 
 } // namespace horde::gameplay::simulation

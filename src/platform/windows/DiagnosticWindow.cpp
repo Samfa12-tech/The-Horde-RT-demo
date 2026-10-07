@@ -8,6 +8,9 @@
 #include "platform/windows/WindowsGraphicsPersistence.h"
 #include "graphics/GraphicsPreviewSession.h"
 #include "graphics/GraphicsPreviewPerformance.h"
+#if !defined(NDEBUG)
+#include "telemetry/CombatTimingTrace.h"
+#endif
 
 #include <algorithm>
 #include <array>
@@ -453,7 +456,10 @@ struct VulkanSurfaceContext
     std::optional<DWORD> xInputUserIndex;
     std::optional<UINT> legacyJoystickId;
     horde::platform::windows::LegacyRightStickAxes legacyRightStickAxes;
-    ULONGLONG lastControlTick = 0u;
+    std::uint64_t lastControlSteadyNs = 0u;
+#if !defined(NDEBUG)
+    horde::telemetry::CombatTimingTrace combatTimingTrace;
+#endif
     float cameraYaw = 0.0f;
     float cameraPitch = 0.0f;
     float torchLightStrength = 1.8f;
@@ -3385,6 +3391,23 @@ void HandleControllerMenuEdges(
 
 using XInputGetStateProc = DWORD(WINAPI*)(DWORD, XINPUT_STATE*);
 
+void PublishDesktopCombatEdge(VulkanSurfaceContext& context,
+    const horde::gameplay::simulation::CombatInputEdgeKind kind)
+{
+    using namespace horde::gameplay::simulation;
+    std::uint64_t* sequence = kind == CombatInputEdgeKind::Attack ? &context.attackSequence :
+        kind == CombatInputEdgeKind::Parry ? &context.parrySequence : &context.dodgeSequence;
+    if (*sequence == UINT64_MAX) return;
+    ++*sequence;
+    CommandSequenceFor(context.simulationInput, kind) = *sequence;
+    context.simulationInput.moveForward = (context.forwardHeld ? 1.0f : 0.0f) -
+        (context.backwardHeld ? 1.0f : 0.0f) + context.controllerForward;
+    context.simulationInput.moveStrafe = (context.rightHeld ? 1.0f : 0.0f) -
+        (context.leftHeld ? 1.0f : 0.0f) + context.controllerStrafe;
+    RecordCombatInputEdge(context.simulationInput, kind,
+        horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr));
+}
+
 void PollDesktopController(VulkanSurfaceContext& context)
 {
     const horde::platform::windows::ControllerPollDisposition pollDisposition =
@@ -3550,9 +3573,9 @@ void PollDesktopController(VulkanSurfaceContext& context)
                 legacy.dwButtons, context.previousLegacyControllerButtons, identity);
         if (!context.simulationPaused)
         {
-            if (edges.attackPressed) ++context.attackSequence;
-            if (edges.parryPressed) ++context.parrySequence;
-            if (edges.dodgePressed) ++context.dodgeSequence;
+            if (edges.attackPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
+            if (edges.parryPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
+            if (edges.dodgePressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Dodge);
             if (edges.interactPressed) ++context.interactSequence;
             if (edges.toggleHeldLightPosePressed) ++context.toggleHeldLightPoseSequence;
         }
@@ -3610,9 +3633,9 @@ void PollDesktopController(VulkanSurfaceContext& context)
             context.controllerTriggerLatch);
     if (!context.simulationPaused)
     {
-        if (triggerEdges.attackPressed) ++context.attackSequence;
-        if (triggerEdges.parryPressed) ++context.parrySequence;
-        if ((pressed & XINPUT_GAMEPAD_B) != 0u) ++context.dodgeSequence;
+        if (triggerEdges.attackPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
+        if (triggerEdges.parryPressed) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
+        if ((pressed & XINPUT_GAMEPAD_B) != 0u) PublishDesktopCombatEdge(context, horde::gameplay::simulation::CombatInputEdgeKind::Dodge);
         if ((pressed & XINPUT_GAMEPAD_A) != 0u) ++context.interactSequence;
         if ((pressed & XINPUT_GAMEPAD_Y) != 0u) ++context.toggleHeldLightPoseSequence;
     }
@@ -3638,13 +3661,14 @@ void UpdateDesktopSceneControls(
     const int previousVitality = context.simulation.Snapshot().playerVitals.vitality;
     const horde::gameplay::PlayerLifePhase previousLifePhase =
         context.simulation.Snapshot().playerVitals.phase;
-    const ULONGLONG now = GetTickCount64();
-    float deltaSeconds = 1.0f / 60.0f;
-    if (context.lastControlTick != 0u)
+    const std::uint64_t ownerAdvanceSteadyNs = horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
+    double rawDeltaSeconds = 1.0 / 60.0;
+    if (context.lastControlSteadyNs != 0u && ownerAdvanceSteadyNs >= context.lastControlSteadyNs)
     {
-        deltaSeconds = std::clamp(static_cast<float>(now - context.lastControlTick) / 1000.0f, 0.0f, 0.1f);
+        rawDeltaSeconds = static_cast<double>(ownerAdvanceSteadyNs - context.lastControlSteadyNs) * 1.0e-9;
     }
-    context.lastControlTick = now;
+    context.lastControlSteadyNs = ownerAdvanceSteadyNs;
+    const float deltaSeconds = static_cast<float>(std::clamp(rawDeltaSeconds, 0.0, 0.1));
     context.frameDeltaSeconds = deltaSeconds;
 
     if (!context.simulationPaused)
@@ -3764,9 +3788,14 @@ void UpdateDesktopSceneControls(
     context.simulationInput = input;
     horde::vulkan::raytracing::RtSceneStageScope simulationScope(
         observation, horde::telemetry::RtStage::SimulationStep);
+    bool timestampedPlayerInput = !input.hasAuthoritativePlayerPose && !context.benchmark.IsRunning();
+#if defined(_DEBUG)
+    timestampedPlayerInput = timestampedPlayerInput && !context.nativeMotionValidation;
+#endif
     context.simulation.AdvanceFrame(input,
-                                    context.frameDeltaSeconds,
-                                    ++context.inputPublicationSequence);
+                                    timestampedPlayerInput ? rawDeltaSeconds : context.frameDeltaSeconds,
+                                    ++context.inputPublicationSequence,
+                                    timestampedPlayerInput ? ownerAdvanceSteadyNs : 0u);
     simulationScope.Complete(1u);
 #if defined(_DEBUG)
     if (context.nativeMotionValidation)
@@ -5291,6 +5320,18 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         evidenceFrame ? &observation : nullptr,
         horde::telemetry::RtStage::PresentCall);
     const VkResult presentResult = vkQueuePresentKHR(ctx.graphicsQueue, &presentInfo);
+#if !defined(NDEBUG)
+    if (evidenceFrame && useRtFrame && presentResult == VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR &&
+        ctx.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
+        ctx.combatTimingTrace.HasReportable(ctx.simulation.Snapshot()))
+    {
+        horde::telemetry::RtSubmittedFrameIdentity committed{};
+        if (ctx.rtFrameEvidence.TryGetCommittedIdentity(ctx.currentFrame, committed))
+            ctx.combatTimingTrace.WriteAcceptedPresent(std::cout, ctx.simulation.Snapshot(), committed,
+                horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr), true,
+                observation.recordedScene ? &observation.recordedScene->player : nullptr);
+    }
+#endif
 #if defined(_DEBUG)
     if (ctx.outputResizeValidation && ctx.resizePresentTimestampArmed &&
         useRtFrame && presentResult == VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR)
@@ -7781,12 +7822,12 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             }
             if (!sceneContext->simulationPaused && wParam == VK_SPACE && (lParam & (1ll << 30)) == 0)
             {
-                ++sceneContext->attackSequence;
+                PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
                 return 0;
             }
             if (!sceneContext->simulationPaused && wParam == 'Q' && (lParam & (1ll << 30)) == 0)
             {
-                ++sceneContext->parrySequence;
+                PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Parry);
                 return 0;
             }
             if (!sceneContext->simulationPaused && wParam == 'E' &&
@@ -7844,7 +7885,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             sceneContext->simulation.Snapshot().playerVitals.phase == horde::gameplay::PlayerLifePhase::Alive &&
             !sceneContext->benchmark.IsRunning())
         {
-            ++sceneContext->attackSequence;
+            PublishDesktopCombatEdge(*sceneContext, horde::gameplay::simulation::CombatInputEdgeKind::Attack);
             return 0;
         }
         break;

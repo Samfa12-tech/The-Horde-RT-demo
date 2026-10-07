@@ -15,6 +15,7 @@
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "gameplay/simulation/CombatPresentation.h"
+#include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
 namespace horde::gameplay::simulation
@@ -98,6 +99,7 @@ struct SimulationSnapshot
     CombatSnapshot swordCombat{};
     PlayerCombatSnapshot playerCombat{};
     CombatPresentationSnapshot combatPresentation{};
+    CombatInputTimingSnapshot combatInputTiming{};
     LichSnapshot lich{};
     PlayerVitalsSnapshot playerVitals{};
 

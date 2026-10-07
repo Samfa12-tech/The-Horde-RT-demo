@@ -32,6 +32,9 @@
 #include "ui/DiagnosticOverlay.h"
 #include "graphics/GraphicsSettings.h"
 #include "graphics/GraphicsPreviewPerformance.h"
+#if !defined(NDEBUG)
+#include "telemetry/CombatTimingTrace.h"
+#endif
 #include "reporting/PlaytestReport.h"
 #include "reporting/PlaytestSubmission.h"
 #include "reporting/BenchmarkSummaryReport.h"
@@ -178,6 +181,10 @@ struct SwapchainContext
     std::uint32_t previewWarmFrames = 0u;
     horde::graphics::GraphicsReason graphicsReason = horde::graphics::GraphicsReason::None;
     float frameDeltaSeconds = 1.0f / 60.0f;
+    std::uint64_t lastInputOwnerSteadyNs = 0u;
+#if !defined(NDEBUG)
+    horde::telemetry::CombatTimingTrace combatTimingTrace;
+#endif
     uint32_t timingFrameCount = 0u;
     double timingFenceMs = 0.0;
     double timingRecordMs = 0.0;
@@ -3005,6 +3012,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             }
             const horde::gameplay::simulation::PublishedInput publishedInput =
                 gInputMailbox.ConsumeLatest();
+            // Same native steady-clock domain as JNI receipt edges. Take this
+            // cutoff while publisher admission is locked; later edges belong
+            // to a later coherent publication, never an earlier catch-up tick.
+            const std::uint64_t inputOwnerSteadyNs =
+                horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
             horde::gameplay::simulation::InputSnapshot simulationInput = publishedInput.snapshot;
             const horde::gameplay::simulation::SimulationSnapshot& beforeCommands = gGameSimulation.Snapshot();
             const bool routeResetPending =
@@ -3235,13 +3247,20 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             else if (!worldCommandsDeferred && !inAppBenchmarkFrame && !context.routeReplayActive)
             {
                 simulationInput.hasAuthoritativePlayerPose = false;
+                const double rawInputDeltaSeconds = context.lastInputOwnerSteadyNs != 0u &&
+                    inputOwnerSteadyNs >= context.lastInputOwnerSteadyNs
+                    ? static_cast<double>(inputOwnerSteadyNs - context.lastInputOwnerSteadyNs) * 1.0e-9
+                    : static_cast<double>(context.frameDeltaSeconds);
+                context.lastInputOwnerSteadyNs = inputOwnerSteadyNs;
+                context.frameDeltaSeconds = static_cast<float>(std::clamp(rawInputDeltaSeconds, 0.0, 0.1));
                 horde::vulkan::raytracing::RtSceneStageScope simulationScope(
                     evidenceFrame ? &observation : nullptr,
                     horde::telemetry::RtStage::SimulationStep);
                 gGameSimulation.AdvanceFrame(
                     simulationInput,
-                    context.frameDeltaSeconds,
-                    publishedInput.publicationSequence);
+                    rawInputDeltaSeconds,
+                    publishedInput.publicationSequence,
+                    inputOwnerSteadyNs);
                 simulationScope.Complete(1u);
             }
 
@@ -3499,6 +3518,33 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         evidenceFrame ? &observation : nullptr,
         horde::telemetry::RtStage::PresentCall);
     const VkResult presentResult = vkQueuePresentKHR(context.graphicsQueue, &presentInfo);
+#if !defined(NDEBUG)
+    if (evidenceFrame && useRtFrame && presentResult == VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR &&
+        context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
+        context.combatTimingTrace.HasReportable(gGameSimulation.Snapshot()))
+    {
+        horde::telemetry::RtSubmittedFrameIdentity committed{};
+        if (context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, committed))
+        {
+            std::ostringstream trace;
+            context.combatTimingTrace.WriteAcceptedPresent(trace, gGameSimulation.Snapshot(), committed,
+                horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr), true,
+                observation.recordedScene ? &observation.recordedScene->player : nullptr);
+            const std::string rows = trace.str();
+            // Logcat has a per-message size bound. Emit each admitted row as a
+            // separate message rather than truncate a multi-edge frame.
+            std::size_t start = 0u;
+            while (start < rows.size())
+            {
+                const auto end = rows.find('\n', start);
+                const auto length = (end == std::string::npos ? rows.size() : end) - start;
+                __android_log_print(ANDROID_LOG_INFO, kTag, "%.*s", static_cast<int>(length), rows.data() + start);
+                if (end == std::string::npos) break;
+                start = end + 1u;
+            }
+        }
+    }
+#endif
     context.presentCompletionFences.Presented(imageIndex, presentResult);
     presentScope.Complete(1u, 0u, 1u);
     wholeFrameScope.Complete(1u, 0u, 1u);
@@ -4670,6 +4716,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestAttack(JNIEnv*, jclass)
     if (gInputPublisherState.commands.attack != UINT64_MAX)
     {
         ++gInputPublisherState.commands.attack;
+        horde::gameplay::simulation::RecordCombatInputEdge(gInputPublisherState,
+            horde::gameplay::simulation::CombatInputEdgeKind::Attack,
+            horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr));
     }
     PublishInputLocked();
 }
@@ -4681,6 +4730,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestParry(JNIEnv*, jclass)
     if (gInputPublisherState.commands.parry != UINT64_MAX)
     {
         ++gInputPublisherState.commands.parry;
+        horde::gameplay::simulation::RecordCombatInputEdge(gInputPublisherState,
+            horde::gameplay::simulation::CombatInputEdgeKind::Parry,
+            horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr));
     }
     PublishInputLocked();
 }
@@ -4692,6 +4744,9 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDodge(JNIEnv*, jclass)
     if (gInputPublisherState.commands.dodge != UINT64_MAX)
     {
         ++gInputPublisherState.commands.dodge;
+        horde::gameplay::simulation::RecordCombatInputEdge(gInputPublisherState,
+            horde::gameplay::simulation::CombatInputEdgeKind::Dodge,
+            horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr));
     }
     PublishInputLocked();
 }

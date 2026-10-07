@@ -29,6 +29,29 @@ std::uint64_t SequenceDelta(std::uint64_t newer, std::uint64_t older)
     return newer >= older ? newer - older : 0u;
 }
 
+std::uint64_t SequenceFor(const SimulationCommandSequences& commands,
+                          const CombatInputEdgeKind kind)
+{
+    switch (kind)
+    {
+    case CombatInputEdgeKind::Attack: return commands.attack;
+    case CombatInputEdgeKind::Parry: return commands.parry;
+    case CombatInputEdgeKind::Dodge: return commands.dodge;
+    }
+    return 0u;
+}
+
+std::size_t CombatKindIndex(const CombatInputEdgeKind kind)
+{
+    switch (kind)
+    {
+    case CombatInputEdgeKind::Attack: return 0u;
+    case CombatInputEdgeKind::Parry: return 1u;
+    case CombatInputEdgeKind::Dodge: return 2u;
+    }
+    return 0u;
+}
+
 EntityId SkeletonEntity(std::size_t index)
 {
     return index == 0u ? EntityId::SkeletonA : EntityId::SkeletonB;
@@ -70,7 +93,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
 
 std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
                                            double frameDeltaSeconds,
-                                           std::uint64_t inputPublicationSequence)
+                                           std::uint64_t inputPublicationSequence,
+                                           std::uint64_t ownerAdvanceSteadyNs)
 {
     lastInput_ = input;
     inputPublicationSequence_ = inputPublicationSequence;
@@ -79,7 +103,27 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
     const std::size_t eventsBeforeFrame = events_.Size();
     snapshot_.eventsEmittedThisTick = 0u;
     snapshot_.eventsEmittedThisFrame = 0u;
-    IngestCommands(input);
+    if (ownerAdvanceSteadyNs != 0u)
+    {
+        ScheduleTimestampedCombatEdges(input, frameDeltaSeconds,
+                                       ownerAdvanceSteadyNs,
+                                       inputPublicationSequence);
+        previousOwnerAdvanceSteadyNs_ = std::max(previousOwnerAdvanceSteadyNs_,
+                                                  ownerAdvanceSteadyNs);
+        IngestCommands(input, false);
+    }
+    else
+    {
+        if (previousOwnerAdvanceSteadyNs_ != 0u)
+        {
+            ClearScheduledCombatEdges(true);
+            pendingAttackCommands_ = 0u;
+            pendingParryCommands_ = 0u;
+            pendingDodgeCommands_ = 0u;
+        }
+        previousOwnerAdvanceSteadyNs_ = 0u;
+        IngestCommands(input);
+    }
     if (ConsumeWorldCommand())
     {
         RefreshSnapshot(input);
@@ -90,11 +134,12 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
     }
     if (input.paused)
     {
-        lastConsumedAttackSequence_ += pendingAttackCommands_;
+        ClearScheduledCombatEdges(true);
+        lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
         pendingAttackCommands_ = 0u;
-        lastConsumedParrySequence_ += pendingParryCommands_;
+        lastConsumedParrySequence_ = std::max(lastConsumedParrySequence_, latestParrySequence_);
         pendingParryCommands_ = 0u;
-        lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+        lastConsumedDodgeSequence_ = std::max(lastConsumedDodgeSequence_, latestDodgeSequence_);
         pendingDodgeCommands_ = 0u;
         lastConsumedInteractSequence_ += pendingInteractCommands_;
         pendingInteractCommands_ = 0u;
@@ -143,12 +188,13 @@ void GameSimulation::StepFixed(const InputSnapshot& input,
 {
     // Direct deterministic stepping is also a valid presentation boundary.
     combatPresentation_.AdvanceFrame(fixedDeltaSeconds, input.paused);
-    StepFixedTick(input, fixedDeltaSeconds, inputPublicationSequence);
+    StepFixedTick(input, fixedDeltaSeconds, inputPublicationSequence, false);
 }
 
 void GameSimulation::StepFixedTick(const InputSnapshot& input,
                                    float fixedDeltaSeconds,
-                                   std::uint64_t inputPublicationSequence)
+                                   std::uint64_t inputPublicationSequence,
+                                   const bool activateTimestampedEdges)
 {
     fixedDeltaSeconds = std::clamp(fixedDeltaSeconds, 0.0f, 0.05f);
     lastInput_ = input;
@@ -158,6 +204,8 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     snapshot_.eventsEmittedThisTick = 0u;
 
     IngestCommands(input);
+    if (activateTimestampedEdges)
+        ActivateScheduledCombatEdges();
     if (ConsumeWorldCommand())
     {
         RefreshSnapshot(input);
@@ -170,11 +218,12 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     const bool playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     if (input.paused || !playerAlive)
     {
-        lastConsumedAttackSequence_ += pendingAttackCommands_;
+        ClearScheduledCombatEdges(true);
+        lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
         pendingAttackCommands_ = 0u;
-        lastConsumedParrySequence_ += pendingParryCommands_;
+        lastConsumedParrySequence_ = std::max(lastConsumedParrySequence_, latestParrySequence_);
         pendingParryCommands_ = 0u;
-        lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+        lastConsumedDodgeSequence_ = std::max(lastConsumedDodgeSequence_, latestDodgeSequence_);
         pendingDodgeCommands_ = 0u;
         lastConsumedInteractSequence_ += pendingInteractCommands_;
         pendingInteractCommands_ = 0u;
@@ -247,6 +296,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
 
     if (wasAlive && playerVitals_.Snapshot().phase != PlayerLifePhase::Alive)
     {
+        ClearScheduledCombatEdges(true);
         pendingAttackCommands_ = 0u;
         pendingParryCommands_ = 0u;
         pendingDodgeCommands_ = 0u;
@@ -266,6 +316,8 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     lastInput_ = input;
     lastInput_.paused = true;
     combatPresentation_.Reset();
+    ClearScheduledCombatEdges(false);
+    previousOwnerAdvanceSteadyNs_ = 0u;
     inputPublicationSequence_ = std::max(inputPublicationSequence_,
                                          inputPublicationSequence);
 
@@ -417,6 +469,11 @@ void GameSimulation::ImportRewardCheckpoint(
 
 void GameSimulation::ResetTiming()
 {
+    ClearScheduledCombatEdges(true);
+    previousOwnerAdvanceSteadyNs_ = 0u;
+    pendingAttackCommands_ = 0u;
+    pendingParryCommands_ = 0u;
+    pendingDodgeCommands_ = 0u;
     fixedStepRunner_.ResetAccumulator();
 }
 
@@ -438,25 +495,30 @@ EntityId GameSimulation::EntityForEnemy(EnemyKind kind)
     }
 }
 
-void GameSimulation::IngestCommands(const InputSnapshot& input)
+void GameSimulation::IngestCommands(const InputSnapshot& input, const bool ingestCombatEdges)
 {
-    pendingAttackCommands_ += SequenceDelta(input.commands.attack, latestAttackSequence_);
-    pendingParryCommands_ += SequenceDelta(input.commands.parry, latestParrySequence_);
-    const std::uint64_t dodgeDelta = SequenceDelta(input.commands.dodge, latestDodgeSequence_);
-    if (dodgeDelta > 0u)
+    if (ingestCombatEdges)
     {
-        pendingDodgeCommands_ += dodgeDelta;
+        pendingAttackCommands_ = SaturatingAdd(
+            pendingAttackCommands_, SequenceDelta(input.commands.attack, latestAttackSequence_));
+        pendingParryCommands_ = SaturatingAdd(
+            pendingParryCommands_, SequenceDelta(input.commands.parry, latestParrySequence_));
+    }
+    const std::uint64_t dodgeDelta = SequenceDelta(input.commands.dodge, latestDodgeSequence_);
+    if (ingestCombatEdges && dodgeDelta > 0u)
+    {
+        pendingDodgeCommands_ = SaturatingAdd(pendingDodgeCommands_, dodgeDelta);
         // Capture the coherent left-stick publication associated with the
         // button edge; releasing the stick before the next fixed tick cannot
         // change the requested dodge direction.
         pendingDodgeForward_ = std::clamp(FiniteOr(input.moveForward, 0.0f), -1.0f, 1.0f);
         pendingDodgeStrafe_ = std::clamp(FiniteOr(input.moveStrafe, 0.0f), -1.0f, 1.0f);
     }
-    pendingRouteResetCommands_ += SequenceDelta(input.commands.routeReset, latestRouteResetSequence_);
-    pendingRetryCommands_ += SequenceDelta(input.commands.retry, latestRetrySequence_);
-    pendingInteractCommands_ += SequenceDelta(input.commands.interact, latestInteractSequence_);
-    pendingToggleHeldLightPoseCommands_ += SequenceDelta(
-        input.commands.toggleHeldLightPose, latestToggleHeldLightPoseSequence_);
+    pendingRouteResetCommands_ = SaturatingAdd(pendingRouteResetCommands_, SequenceDelta(input.commands.routeReset, latestRouteResetSequence_));
+    pendingRetryCommands_ = SaturatingAdd(pendingRetryCommands_, SequenceDelta(input.commands.retry, latestRetrySequence_));
+    pendingInteractCommands_ = SaturatingAdd(pendingInteractCommands_, SequenceDelta(input.commands.interact, latestInteractSequence_));
+    pendingToggleHeldLightPoseCommands_ = SaturatingAdd(pendingToggleHeldLightPoseCommands_, SequenceDelta(
+        input.commands.toggleHeldLightPose, latestToggleHeldLightPoseSequence_));
     latestAttackSequence_ = std::max(latestAttackSequence_, input.commands.attack);
     latestParrySequence_ = std::max(latestParrySequence_, input.commands.parry);
     latestDodgeSequence_ = std::max(latestDodgeSequence_, input.commands.dodge);
@@ -465,6 +527,377 @@ void GameSimulation::IngestCommands(const InputSnapshot& input)
     latestInteractSequence_ = std::max(latestInteractSequence_, input.commands.interact);
     latestToggleHeldLightPoseSequence_ = std::max(
         latestToggleHeldLightPoseSequence_, input.commands.toggleHeldLightPose);
+}
+
+void GameSimulation::AddCombatTimingTrace(
+    const CombatInputEdge& edge,
+    const std::uint64_t publicationSequence,
+    const std::uint64_t targetTick,
+    const CombatInputTimingDisposition disposition)
+{
+    CombatInputTimingSnapshot& timing = snapshot_.combatInputTiming;
+    const std::uint32_t index = timing.nextTraceIndex;
+    if (timing.traceCount == kCombatInputTimingTraceCapacity)
+    {
+        timing.traceOverwriteCount = SaturatingAdd(timing.traceOverwriteCount, 1u);
+    }
+    else
+    {
+        ++timing.traceCount;
+    }
+    timing.traces[index] = {
+        edge.kind, disposition, CombatInputTimingStatus::Scheduled,
+        edge.commandSequence, 1u, 0u, edge.steadyTimeNanoseconds,
+        publicationSequence, targetTick, 0u, 0u, 0u};
+    timing.nextTraceIndex =
+        (index + 1u) % static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity);
+}
+
+void GameSimulation::ScheduleTimestampedCombatEdges(
+    const InputSnapshot& input,
+    const double frameDeltaSeconds,
+    const std::uint64_t ownerAdvanceSteadyNs,
+    const std::uint64_t publicationSequence)
+{
+    snapshot_.combatInputTiming.inputHistoryOverwriteCount = input.combatEdgeHistory.overwriteCount;
+    const std::array<CombatInputEdgeKind, 3u> kinds{{
+        CombatInputEdgeKind::Attack,
+        CombatInputEdgeKind::Parry,
+        CombatInputEdgeKind::Dodge}};
+    std::array<std::uint64_t, 3u> latest{{
+        latestAttackSequence_, latestParrySequence_, latestDodgeSequence_}};
+    std::array<std::uint64_t, 3u> deltas{};
+    std::array<std::array<CombatInputEdge, kCombatInputEdgeHistoryCapacity>, 3u> found{};
+    std::array<std::uint32_t, 3u> foundCount{};
+    std::array<bool, 3u> covered{};
+    for (std::size_t kindIndex = 0u; kindIndex < kinds.size(); ++kindIndex)
+    {
+        deltas[kindIndex] = SequenceDelta(SequenceFor(input.commands, kinds[kindIndex]),
+                                          latest[kindIndex]);
+        covered[kindIndex] = deltas[kindIndex] == 0u;
+    }
+
+    const CombatInputEdgeHistory& history = input.combatEdgeHistory;
+    const std::uint32_t count = std::min<std::uint32_t>(
+        history.count, static_cast<std::uint32_t>(kCombatInputEdgeHistoryCapacity));
+    const std::uint32_t oldest = (history.nextIndex +
+        static_cast<std::uint32_t>(kCombatInputEdgeHistoryCapacity) - count) %
+        static_cast<std::uint32_t>(kCombatInputEdgeHistoryCapacity);
+    for (std::uint32_t offset = 0u; offset < count; ++offset)
+    {
+        const CombatInputEdge& edge = history.edges[
+            (oldest + offset) % static_cast<std::uint32_t>(kCombatInputEdgeHistoryCapacity)];
+        for (std::size_t kindIndex = 0u; kindIndex < kinds.size(); ++kindIndex)
+        {
+            if (edge.kind == kinds[kindIndex] &&
+                edge.commandSequence > latest[kindIndex] &&
+                edge.commandSequence <= SequenceFor(input.commands, kinds[kindIndex]) &&
+                foundCount[kindIndex] < kCombatInputEdgeHistoryCapacity)
+            {
+                found[kindIndex][foundCount[kindIndex]++] = edge;
+            }
+        }
+    }
+
+    if (previousOwnerAdvanceSteadyNs_ != 0u)
+    {
+        for (std::size_t kindIndex = 0u; kindIndex < kinds.size(); ++kindIndex)
+        {
+            if (deltas[kindIndex] == 0u || deltas[kindIndex] >
+                kCombatInputEdgeHistoryCapacity || foundCount[kindIndex] != deltas[kindIndex])
+                continue;
+            std::uint64_t expected = latest[kindIndex];
+            bool sequenceComplete = true;
+            for (std::uint32_t i = 0u; i < foundCount[kindIndex]; ++i)
+            {
+                if (expected == UINT64_MAX || found[kindIndex][i].commandSequence != ++expected)
+                {
+                    sequenceComplete = false;
+                    break;
+                }
+            }
+            covered[kindIndex] = sequenceComplete;
+        }
+    }
+
+    std::array<CombatInputEdge, kCombatInputEdgeHistoryCapacity> ordered{};
+    std::uint32_t orderedCount = 0u;
+    for (std::size_t kindIndex = 0u; kindIndex < kinds.size(); ++kindIndex)
+    {
+        if (covered[kindIndex] && previousOwnerAdvanceSteadyNs_ != 0u)
+        {
+            for (std::uint32_t i = 0u; i < foundCount[kindIndex]; ++i)
+                ordered[orderedCount++] = found[kindIndex][i];
+        }
+        else if (deltas[kindIndex] != 0u)
+        {
+            const CombatInputTimingDisposition disposition = previousOwnerAdvanceSteadyNs_ == 0u
+                ? CombatInputTimingDisposition::FirstTimestampFallback
+                : CombatInputTimingDisposition::MissingMetadataFallback;
+            CombatInputEdge fallback{};
+            fallback.kind = kinds[kindIndex];
+            fallback.commandSequence = SequenceFor(input.commands, kinds[kindIndex]);
+            fallback.steadyTimeNanoseconds = 0u;
+            std::uint64_t fallbackTarget = SaturatingAdd(tickIndex_, 1u);
+            bool followsScheduledEdge = overflowCombatCommandCounts_[kindIndex] > 0u;
+            if (followsScheduledEdge)
+                fallbackTarget = std::max(fallbackTarget,
+                    overflowCombatTargetTicks_[kindIndex]);
+            for (std::uint32_t queued = 0u; queued < scheduledCombatEdgeCount_; ++queued)
+            {
+                if (scheduledCombatEdges_[queued].edge.kind == kinds[kindIndex])
+                {
+                    followsScheduledEdge = true;
+                    fallbackTarget = std::max(fallbackTarget,
+                        scheduledCombatEdges_[queued].targetTick);
+                }
+            }
+            AddCombatTimingTrace(fallback, publicationSequence,
+                                 fallbackTarget, disposition);
+            CombatInputTimingTrace& trace = snapshot_.combatInputTiming.traces[
+                (snapshot_.combatInputTiming.nextTraceIndex + kCombatInputTimingTraceCapacity - 1u) %
+                kCombatInputTimingTraceCapacity];
+            trace.commandCount = deltas[kindIndex];
+            snapshot_.combatInputTiming.timestampFallbackCount = SaturatingAdd(
+                snapshot_.combatInputTiming.timestampFallbackCount, deltas[kindIndex]);
+            if (followsScheduledEdge)
+            {
+                overflowCombatCommandCounts_[kindIndex] = SaturatingAdd(
+                    overflowCombatCommandCounts_[kindIndex], deltas[kindIndex]);
+                overflowCombatTargetTicks_[kindIndex] = fallbackTarget;
+                if (kinds[kindIndex] == CombatInputEdgeKind::Dodge)
+                {
+                    overflowDodgeForward_ = std::clamp(FiniteOr(input.moveForward, 0.0f), -1.0f, 1.0f);
+                    overflowDodgeStrafe_ = std::clamp(FiniteOr(input.moveStrafe, 0.0f), -1.0f, 1.0f);
+                }
+            }
+            else if (kinds[kindIndex] == CombatInputEdgeKind::Attack)
+            {
+                pendingAttackCommands_ = SaturatingAdd(pendingAttackCommands_, deltas[kindIndex]);
+            }
+            else if (kinds[kindIndex] == CombatInputEdgeKind::Parry)
+            {
+                pendingParryCommands_ = SaturatingAdd(pendingParryCommands_, deltas[kindIndex]);
+            }
+            else
+            {
+                pendingDodgeCommands_ = SaturatingAdd(pendingDodgeCommands_, deltas[kindIndex]);
+                pendingDodgeForward_ = std::clamp(FiniteOr(input.moveForward, 0.0f), -1.0f, 1.0f);
+                pendingDodgeStrafe_ = std::clamp(FiniteOr(input.moveStrafe, 0.0f), -1.0f, 1.0f);
+            }
+        }
+    }
+
+    // The history is globally ordered; a tiny insertion sort is bounded by 32.
+    for (std::uint32_t i = 1u; i < orderedCount; ++i)
+    {
+        const CombatInputEdge value = ordered[i];
+        std::uint32_t j = i;
+        while (j > 0u && ordered[j - 1u].order > value.order)
+        {
+            ordered[j] = ordered[j - 1u];
+            --j;
+        }
+        ordered[j] = value;
+    }
+
+    const double acceptedDelta = std::isfinite(frameDeltaSeconds)
+        ? std::clamp(frameDeltaSeconds, 0.0,
+                     FixedStepRunner::kMaximumFrameContributionSeconds)
+        : 0.0;
+    const double projected = fixedStepRunner_.AccumulatorSeconds() + acceptedDelta;
+    const double projectedSteps = std::floor(
+        (projected + 1.0e-12) / FixedStepRunner::kFixedDeltaSeconds);
+    const std::uint32_t ticksProduced = static_cast<std::uint32_t>(std::clamp(
+        projectedSteps, 0.0,
+        static_cast<double>(FixedStepRunner::kMaximumStepsPerAdvance)));
+
+    for (std::uint32_t i = 0u; i < orderedCount; ++i)
+    {
+        const CombatInputEdge& edge = ordered[i];
+        const CombatInputScheduleResult schedule = ScheduleCombatInputEdge(
+            edge.steadyTimeNanoseconds, previousOwnerAdvanceSteadyNs_,
+            ownerAdvanceSteadyNs, frameDeltaSeconds,
+            fixedStepRunner_.AccumulatorSeconds(), tickIndex_, ticksProduced);
+        std::uint64_t targetTick = schedule.targetTick;
+        for (std::uint32_t queued = 0u; queued < scheduledCombatEdgeCount_; ++queued)
+        {
+            const ScheduledCombatEdge& earlier = scheduledCombatEdges_[queued];
+            if (earlier.edge.kind == edge.kind &&
+                earlier.edge.commandSequence < edge.commandSequence)
+                targetTick = std::max(targetTick, earlier.targetTick);
+        }
+        const std::size_t kindIndex = CombatKindIndex(edge.kind);
+        if (overflowCombatCommandCounts_[kindIndex] > 0u)
+            targetTick = std::max(targetTick, overflowCombatTargetTicks_[kindIndex]);
+
+        CombatInputTimingDisposition disposition = schedule.disposition;
+        if (scheduledCombatEdgeCount_ < scheduledCombatEdges_.size())
+        {
+            scheduledCombatEdges_[scheduledCombatEdgeCount_++] = {
+                edge, targetTick, publicationSequence};
+            AddCombatTimingTrace(edge, publicationSequence, targetTick, disposition);
+        }
+        else
+        {
+            disposition = CombatInputTimingDisposition::QueueOverflowFallback;
+            const std::size_t kindIndex = CombatKindIndex(edge.kind);
+            for (std::uint32_t queued = 0u; queued < scheduledCombatEdgeCount_; ++queued)
+            {
+                if (scheduledCombatEdges_[queued].edge.kind == edge.kind)
+                    targetTick = std::max(targetTick, scheduledCombatEdges_[queued].targetTick);
+            }
+            if (overflowCombatCommandCounts_[kindIndex] > 0u)
+                targetTick = std::max(targetTick, overflowCombatTargetTicks_[kindIndex]);
+            AddCombatTimingTrace(edge, publicationSequence,
+                                 targetTick, disposition);
+            overflowCombatCommandCounts_[kindIndex] = SaturatingAdd(
+                overflowCombatCommandCounts_[kindIndex], 1u);
+            overflowCombatTargetTicks_[kindIndex] = targetTick;
+            if (edge.kind == CombatInputEdgeKind::Dodge)
+            {
+                overflowDodgeForward_ = edge.moveForward;
+                overflowDodgeStrafe_ = edge.moveStrafe;
+            }
+            snapshot_.combatInputTiming.timestampFallbackCount = SaturatingAdd(
+                snapshot_.combatInputTiming.timestampFallbackCount, 1u);
+        }
+    }
+    std::uint64_t scheduledCount = scheduledCombatEdgeCount_;
+    for (const std::uint64_t count : overflowCombatCommandCounts_)
+        scheduledCount = SaturatingAdd(scheduledCount, count);
+    snapshot_.combatInputTiming.scheduledEdgeCount = static_cast<std::uint32_t>(
+        std::min<std::uint64_t>(scheduledCount, UINT32_MAX));
+}
+
+void GameSimulation::ActivateScheduledCombatEdges()
+{
+    std::uint32_t retained = 0u;
+    for (std::uint32_t i = 0u; i < scheduledCombatEdgeCount_; ++i)
+    {
+        const ScheduledCombatEdge& scheduled = scheduledCombatEdges_[i];
+        if (scheduled.targetTick > tickIndex_)
+        {
+            scheduledCombatEdges_[retained++] = scheduled;
+            continue;
+        }
+        if (scheduled.edge.kind == CombatInputEdgeKind::Attack)
+            pendingAttackCommands_ = SaturatingAdd(pendingAttackCommands_, 1u);
+        else if (scheduled.edge.kind == CombatInputEdgeKind::Parry)
+            pendingParryCommands_ = SaturatingAdd(pendingParryCommands_, 1u);
+        else
+        {
+            pendingDodgeCommands_ = SaturatingAdd(pendingDodgeCommands_, 1u);
+            pendingDodgeForward_ = scheduled.edge.moveForward;
+            pendingDodgeStrafe_ = scheduled.edge.moveStrafe;
+        }
+    }
+    for (std::size_t kindIndex = 0u; kindIndex < overflowCombatCommandCounts_.size(); ++kindIndex)
+    {
+        const std::uint64_t count = overflowCombatCommandCounts_[kindIndex];
+        if (count == 0u || overflowCombatTargetTicks_[kindIndex] > tickIndex_)
+            continue;
+        if (kindIndex == CombatKindIndex(CombatInputEdgeKind::Attack))
+            pendingAttackCommands_ = SaturatingAdd(pendingAttackCommands_, count);
+        else if (kindIndex == CombatKindIndex(CombatInputEdgeKind::Parry))
+            pendingParryCommands_ = SaturatingAdd(pendingParryCommands_, count);
+        else
+        {
+            pendingDodgeCommands_ = SaturatingAdd(pendingDodgeCommands_, count);
+            pendingDodgeForward_ = overflowDodgeForward_;
+            pendingDodgeStrafe_ = overflowDodgeStrafe_;
+        }
+        overflowCombatCommandCounts_[kindIndex] = 0u;
+        overflowCombatTargetTicks_[kindIndex] = 0u;
+    }
+    scheduledCombatEdgeCount_ = retained;
+    std::uint64_t scheduledCount = retained;
+    for (const std::uint64_t count : overflowCombatCommandCounts_)
+        scheduledCount = SaturatingAdd(scheduledCount, count);
+    snapshot_.combatInputTiming.scheduledEdgeCount = static_cast<std::uint32_t>(
+        std::min<std::uint64_t>(scheduledCount, UINT32_MAX));
+}
+
+void GameSimulation::ClearScheduledCombatEdges(const bool discardAndConsume)
+{
+    parrySourceCommandSequence_ = 0u;
+    for (std::uint32_t i = 0u; i < snapshot_.combatInputTiming.traceCount; ++i)
+    {
+        const std::uint32_t index = (snapshot_.combatInputTiming.nextTraceIndex +
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity) -
+            snapshot_.combatInputTiming.traceCount + i) %
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity);
+        CombatInputTimingTrace& trace = snapshot_.combatInputTiming.traces[index];
+        if (trace.status == CombatInputTimingStatus::Scheduled)
+            trace.status = CombatInputTimingStatus::Discarded;
+    }
+    if (discardAndConsume)
+    {
+        lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
+        lastConsumedParrySequence_ = std::max(lastConsumedParrySequence_, latestParrySequence_);
+        lastConsumedDodgeSequence_ = std::max(lastConsumedDodgeSequence_, latestDodgeSequence_);
+    }
+    scheduledCombatEdgeCount_ = 0u;
+    scheduledCombatEdges_.fill({});
+    overflowCombatCommandCounts_.fill(0u);
+    overflowCombatTargetTicks_.fill(0u);
+    snapshot_.combatInputTiming.scheduledEdgeCount = 0u;
+}
+
+void GameSimulation::MarkCombatTimingConsumed(const CombatInputEdgeKind kind,
+                                               const std::uint64_t oldConsumed,
+                                               const std::uint64_t newConsumed)
+{
+    if (newConsumed <= oldConsumed)
+        return;
+    for (std::uint32_t i = 0u; i < snapshot_.combatInputTiming.traceCount; ++i)
+    {
+        const std::uint32_t index = (snapshot_.combatInputTiming.nextTraceIndex +
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity) -
+            snapshot_.combatInputTiming.traceCount + i) %
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity);
+        CombatInputTimingTrace& trace = snapshot_.combatInputTiming.traces[index];
+        if (trace.kind != kind || trace.status != CombatInputTimingStatus::Scheduled)
+            continue;
+        const std::uint64_t rangeStart = trace.commandCount > trace.commandSequence
+            ? 1u : trace.commandSequence - trace.commandCount + 1u;
+        const std::uint64_t overlapStart = std::max(
+            rangeStart, SaturatingAdd(oldConsumed, 1u));
+        const std::uint64_t overlapEnd = std::min(trace.commandSequence, newConsumed);
+        if (overlapEnd >= overlapStart)
+        {
+            trace.consumedCount = SaturatingAdd(
+                trace.consumedCount, overlapEnd - overlapStart + 1u);
+            trace.actualTick = tickIndex_;
+            if (trace.consumedCount >= trace.commandCount)
+                trace.status = CombatInputTimingStatus::Consumed;
+        }
+    }
+}
+
+void GameSimulation::LinkCombatTimingSemanticEvent(
+    const CombatInputEdgeKind kind,
+    const std::uint64_t commandSequence,
+    const std::uint64_t eventSequence,
+    const std::uint64_t eventTick)
+{
+    if (commandSequence == 0u || eventSequence == 0u)
+        return;
+    for (std::uint32_t i = 0u; i < snapshot_.combatInputTiming.traceCount; ++i)
+    {
+        const std::uint32_t index = (snapshot_.combatInputTiming.nextTraceIndex +
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity) -
+            snapshot_.combatInputTiming.traceCount + i) %
+            static_cast<std::uint32_t>(kCombatInputTimingTraceCapacity);
+        CombatInputTimingTrace& trace = snapshot_.combatInputTiming.traces[index];
+        if (trace.kind == kind && trace.commandCount == 1u &&
+            trace.commandSequence == commandSequence)
+        {
+            trace.semanticEventSequence = eventSequence;
+            trace.semanticEventTick = eventTick;
+            return;
+        }
+    }
 }
 
 bool GameSimulation::ConsumeWorldCommand()
@@ -493,6 +926,8 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     {
         return false;
     }
+
+    ClearScheduledCombatEdges(true);
 
     events_.Clear();
     combatPresentation_.Reset();
@@ -561,9 +996,9 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     // arrived with it is still consumed exactly once. Advancing the consumed
     // sequences prevents pause/Home/ending polling from replaying a discarded
     // attack after the imported world state resumes.
-    lastConsumedAttackSequence_ += pendingAttackCommands_;
-    lastConsumedParrySequence_ += pendingParryCommands_;
-    lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+    lastConsumedAttackSequence_ = std::max(lastConsumedAttackSequence_, latestAttackSequence_);
+    lastConsumedParrySequence_ = std::max(lastConsumedParrySequence_, latestParrySequence_);
+    lastConsumedDodgeSequence_ = std::max(lastConsumedDodgeSequence_, latestDodgeSequence_);
     lastConsumedInteractSequence_ += pendingInteractCommands_;
     lastConsumedToggleHeldLightPoseSequence_ += pendingToggleHeldLightPoseCommands_;
     pendingAttackCommands_ = 0u;
@@ -761,7 +1196,10 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
     {
         // Looking and lifecycle commands remain responsive. Translation and
         // dodge edges cannot escape or queue behind the presentation hold.
-        lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+        const std::uint64_t oldDodgeConsumed = lastConsumedDodgeSequence_;
+        lastConsumedDodgeSequence_ = SaturatingAdd(lastConsumedDodgeSequence_, pendingDodgeCommands_);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Dodge, oldDodgeConsumed,
+                                 lastConsumedDodgeSequence_);
         pendingDodgeCommands_ = 0u;
         dodgeRemainingSeconds_ = 0.0f;
         snapshot_.playerTravelledThisTick = 0.0f;
@@ -771,7 +1209,10 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
     }
     if (pendingDodgeCommands_ > 0u)
     {
-        lastConsumedDodgeSequence_ += pendingDodgeCommands_;
+        const std::uint64_t oldDodgeConsumed = lastConsumedDodgeSequence_;
+        lastConsumedDodgeSequence_ = SaturatingAdd(lastConsumedDodgeSequence_, pendingDodgeCommands_);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Dodge, oldDodgeConsumed,
+                                 lastConsumedDodgeSequence_);
         pendingDodgeCommands_ = 0u;
         if (dodgeRemainingSeconds_ <= 0.0f && dodgeCooldownRemainingSeconds_ <= 0.0f)
         {
@@ -888,9 +1329,15 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     {
         // Include the triggering and final reveal ticks, so neither an old cut
         // nor any buffered input becomes a swing at the combat boundary.
-        lastConsumedAttackSequence_ += pendingAttackCommands_;
+        const std::uint64_t oldAttackConsumed = lastConsumedAttackSequence_;
+        lastConsumedAttackSequence_ = SaturatingAdd(lastConsumedAttackSequence_, pendingAttackCommands_);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Attack, oldAttackConsumed,
+                                 lastConsumedAttackSequence_);
         pendingAttackCommands_ = 0u;
-        lastConsumedParrySequence_ += pendingParryCommands_;
+        const std::uint64_t oldParryConsumed = lastConsumedParrySequence_;
+        lastConsumedParrySequence_ = SaturatingAdd(lastConsumedParrySequence_, pendingParryCommands_);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Parry, oldParryConsumed,
+                                 lastConsumedParrySequence_);
         pendingParryCommands_ = 0u;
         dodgeRemainingSeconds_ = 0.0f;
         swordCombat_.CancelPlayerActions();
@@ -906,7 +1353,10 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         // collapsing the whole delta into one RequestAttack silently erased
         // the upward continuation.
         --pendingAttackCommands_;
-        ++lastConsumedAttackSequence_;
+        const std::uint64_t oldAttackConsumed = lastConsumedAttackSequence_;
+        lastConsumedAttackSequence_ = SaturatingAdd(lastConsumedAttackSequence_, 1u);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Attack, oldAttackConsumed,
+                                 lastConsumedAttackSequence_);
         if (swordCombat_.CanAcceptAttack())
         {
             const PlayerAttackCut acceptedCut = swordCombat_.RequestAttack();
@@ -926,23 +1376,31 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                         lastConsumedAttackSequence_ > lichRevealAttackSequenceFloor_;
                 }
                 playerActionAccepted = true;
-                Emit(GameplayEventType::PlayerSwing,
-                     EntityId::Player,
-                     EntityId::Invalid,
-                     playerX_,
-                     playerZ_,
-                     1.0f,
-                     static_cast<std::int32_t>(acceptedCut));
+                const std::uint64_t eventSequence = Emit(
+                    GameplayEventType::PlayerSwing,
+                    EntityId::Player,
+                    EntityId::Invalid,
+                    playerX_,
+                    playerZ_,
+                    1.0f,
+                    static_cast<std::int32_t>(acceptedCut));
+                LinkCombatTimingSemanticEvent(CombatInputEdgeKind::Attack,
+                                             lastConsumedAttackSequence_,
+                                             eventSequence, tickIndex_);
             }
         }
     }
     if (pendingParryCommands_ > 0u)
     {
-        lastConsumedParrySequence_ += pendingParryCommands_;
+        const std::uint64_t oldParryConsumed = lastConsumedParrySequence_;
+        lastConsumedParrySequence_ = SaturatingAdd(lastConsumedParrySequence_, pendingParryCommands_);
+        MarkCombatTimingConsumed(CombatInputEdgeKind::Parry, oldParryConsumed,
+                                 lastConsumedParrySequence_);
         pendingParryCommands_ = 0u;
         if (parryAvailable && !playerActionAccepted)
         {
             swordCombat_.RequestParry();
+            parrySourceCommandSequence_ = lastConsumedParrySequence_;
         }
     }
 
@@ -993,8 +1451,12 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                 EntityId::Player,
                 entity,
                 current.x,
-                current.z);
+                 current.z);
             combatPresentation_.BeginParrySuccess(eventSequence, tickIndex_, entity);
+            LinkCombatTimingSemanticEvent(CombatInputEdgeKind::Parry,
+                                         parrySourceCommandSequence_,
+                                         eventSequence, tickIndex_);
+            parrySourceCommandSequence_ = 0u;
         }
         const bool skeletonWalking = activeEnemyKind_ == EnemyKind::Skeleton &&
                                      current.animation == EnemyAnimation::Walking;
@@ -1262,6 +1724,12 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.swordCombat = combatSnapshot_;
     snapshot_.playerCombat = combatSnapshot_.player;
     snapshot_.combatPresentation = combatPresentation_.Snapshot();
+    snapshot_.combatInputTiming.inputHistoryOverwriteCount = input.combatEdgeHistory.overwriteCount;
+    std::uint64_t scheduledCombatCount = scheduledCombatEdgeCount_;
+    for (const std::uint64_t count : overflowCombatCommandCounts_)
+        scheduledCombatCount = SaturatingAdd(scheduledCombatCount, count);
+    snapshot_.combatInputTiming.scheduledEdgeCount = static_cast<std::uint32_t>(
+        std::min<std::uint64_t>(scheduledCombatCount, UINT32_MAX));
     snapshot_.lich = lichEncounter_.Snapshot();
     snapshot_.lich.finaleSkylightOpenProgress = snapshot_.finale.skylightOpenProgress;
     snapshot_.lich.finaleDawnRevealProgress = snapshot_.finale.dawnRevealProgress;
