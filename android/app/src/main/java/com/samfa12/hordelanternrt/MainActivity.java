@@ -231,6 +231,8 @@ public class MainActivity extends Activity {
     private TextView keeperRevealTitle;
     private Button attackButton;
     private Button parryButton;
+    private Button dodgeButton;
+    private PressActionButton swingTouch, dodgeTouch;
     private Button interactButton;
     private Button toggleHeldLightPoseButton;
     private boolean parryRequestedOnTouchDown;
@@ -402,6 +404,7 @@ public class MainActivity extends Activity {
         menuButton = findViewById(R.id.menu_button);
         attackButton = findViewById(R.id.attack_button);
         parryButton = findViewById(R.id.parry_button);
+        dodgeButton = findViewById(R.id.dodge_button);
         interactButton = findViewById(R.id.interact_button);
         toggleHeldLightPoseButton = findViewById(R.id.toggle_held_light_pose_button);
         vitalityStatus = findViewById(R.id.vitality_status);
@@ -422,6 +425,7 @@ public class MainActivity extends Activity {
         menuButton.setContentDescription(getString(R.string.menu));
         attackButton.setContentDescription(getString(R.string.swing));
         parryButton.setContentDescription(getString(R.string.parry));
+        dodgeButton.setContentDescription(getString(R.string.dodge));
         interactButton.setContentDescription(getString(R.string.interact));
         toggleHeldLightPoseButton.setContentDescription(getString(R.string.lower_lantern));
         updateVitalityHud(3);
@@ -441,52 +445,7 @@ public class MainActivity extends Activity {
             playSound("menu_toggle", 0.20f);
             showMainMenu(false);
         });
-        attackButton.setOnClickListener(view -> {
-            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
-            ProbeBridge.requestAttack();
-        });
-        interactButton.setOnClickListener(view -> {
-            if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
-                    endingOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
-            ProbeBridge.requestInteract();
-        });
-        toggleHeldLightPoseButton.setOnClickListener(view -> {
-            if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
-                    endingOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
-            ProbeBridge.requestToggleHeldLightPose();
-        });
-        parryButton.setOnClickListener(view -> {
-            if (parryRequestedOnTouchDown) {
-                parryRequestedOnTouchDown = false;
-                return;
-            }
-            if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
-            ProbeBridge.requestParry();
-        });
-        parryButton.setOnTouchListener((view, event) -> {
-            switch (event.getActionMasked()) {
-                case MotionEvent.ACTION_DOWN:
-                    parryTouchActive = true;
-                    parryRequestedOnTouchDown = true;
-                    view.setPressed(true);
-                    if (!menuVisible && !diagnosticsVisible && !deathOverlayVisible && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1) {
-                        ProbeBridge.requestParry();
-                    }
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    view.setPressed(false);
-                    if (parryTouchActive) view.performClick();
-                    parryTouchActive = false;
-                    return true;
-                case MotionEvent.ACTION_CANCEL:
-                    parryTouchActive = false;
-                    parryRequestedOnTouchDown = false;
-                    view.setPressed(false);
-                    return true;
-                default:
-                    return true;
-            }
-        });
+        configureGameplayActionButtons();
         diagnosticsBack.setOnClickListener(view -> {
             playSound("ui_back", 0.18f);
             diagnosticsVisible = false;
@@ -668,6 +627,8 @@ public class MainActivity extends Activity {
                 return true;
             }
             if (action == MotionEvent.ACTION_CANCEL) {
+                if (swingTouch != null) swingTouch.cancel();
+                if (dodgeTouch != null) dodgeTouch.cancel();
                 TouchControlState.cancelGesture(activePointers, viewControls);
                 parryTouchActive = false;
                 parryRequestedOnTouchDown = false;
@@ -700,6 +661,7 @@ public class MainActivity extends Activity {
         clearTouchState();
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
+        if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -776,6 +738,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
+        if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.VISIBLE);
         vitalityStatus.setVisibility(View.GONE);
         rtStatus.setText(R.string.benchmark_starting);
@@ -890,6 +853,7 @@ public class MainActivity extends Activity {
         clearTouchState();
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
+        if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
@@ -1884,6 +1848,7 @@ public class MainActivity extends Activity {
         parryButton.setVisibility(showHud && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1 &&
                 lastPlayerLifePhase == PLAYER_ALIVE
                 ? View.VISIBLE : View.GONE);
+        dodgeButton.setVisibility(showHud && canSendGameplayAction() ? View.VISIBLE : View.GONE);
         rtStatus.setVisibility(showHud && (InterfacePreferences.read(preferences).routineStatus ||
                 ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) ? View.VISIBLE : View.GONE);
         vitalityStatus.setVisibility(showHud && lastPlayerLifePhase == PLAYER_ALIVE ? View.VISIBLE : View.GONE);
@@ -2668,11 +2633,11 @@ public class MainActivity extends Activity {
     private void updateInterfaceControlPreview(LinearLayout preview,InterfacePreferences.Values values,int available) {
         preview.setTag(values);
         preview.removeAllViews();
-        final Button swing=new Button(this),parry=new Button(this),interact=new Button(this),light=new Button(this);
-        swing.setText(R.string.swing); parry.setText(R.string.parry);
+        final Button swing=new Button(this),parry=new Button(this),dodge=new Button(this),interact=new Button(this),light=new Button(this);
+        swing.setText(R.string.swing); parry.setText(R.string.parry); dodge.setText(R.string.dodge);
         interact.setText(R.string.interact); light.setText(R.string.raise_lantern);
-        UiControlLayout.apply(this,values,swing,parry,interact,light,0,0,available);
-        for(Button button:new Button[]{swing,parry,interact,light}) {
+        UiControlLayout.apply(this,values,swing,parry,dodge,interact,light,0,0,available);
+        for(Button button:new Button[]{swing,parry,dodge,interact,light}) {
             final ViewGroup.LayoutParams nominal=button.getLayoutParams();
             button.setAllCaps(false); button.setTextSize(17);
             button.setSingleLine(true); button.setHorizontallyScrolling(false); button.setEllipsize(null);
@@ -2686,6 +2651,12 @@ public class MainActivity extends Activity {
                     Math.max(nominal.height,button.getMeasuredHeight())));
         }
         addInterfacePreviewPair(preview,light,interact,available);
+        final LinearLayout dodgeRow=new LinearLayout(this);
+        dodgeRow.setGravity(Gravity.END);
+        dodgeRow.addView(dodge);
+        final LinearLayout.LayoutParams dodgeLayout=matchWrap();
+        dodgeLayout.topMargin=dp(12);
+        preview.addView(dodgeRow,dodgeLayout);
         addInterfacePreviewPair(preview,parry,swing,available);
     }
 
@@ -2724,11 +2695,11 @@ public class MainActivity extends Activity {
                 safeBottom=Math.max(safeBottom,insets.getDisplayCutout().getSafeInsetBottom());
             }
         }
-        UiControlLayout.apply(this,v,attackButton,parryButton,interactButton,toggleHeldLightPoseButton,
+        UiControlLayout.apply(this,v,attackButton,parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton,
                 safeRight,safeBottom,getResources().getDisplayMetrics().widthPixels-safeLeft);
         styleActionButton(attackButton,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.PARCHMENT);
-        for(Button b:new Button[]{parryButton,interactButton,toggleHeldLightPoseButton})
-            styleActionButton(b,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT);
+        for(Button b:new Button[]{parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton})
+            if(b!=null) styleActionButton(b,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT);
         if(menuButton!=null) {
             styleActionButton(menuButton,interfaceBacking(v,HordeUiTokens.SLATE),HordeUiTokens.PARCHMENT);
             FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)menuButton.getLayoutParams();
@@ -2954,6 +2925,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
+        if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
@@ -2993,7 +2965,7 @@ public class MainActivity extends Activity {
         final int safeVitality = Math.max(0, Math.min(3, vitality));
         lastPlayerVitality = safeVitality;
         vitalityStatus.setText("VITALITY  " + safeVitality + " / 3");
-        vitalityStatus.setCompoundDrawables(new VitalitySegmentsDrawable(this,safeVitality),null,null,null);
+        vitalityStatus.setCompoundDrawables(new VitalityHeartsDrawable(this,safeVitality),null,null,null);
         vitalityStatus.setCompoundDrawablePadding(dp(8));
         vitalityStatus.setContentDescription(getString(R.string.vitality_accessibility, safeVitality));
         if (safeVitality >= 3) {
@@ -3013,6 +2985,7 @@ public class MainActivity extends Activity {
         clearTouchState();
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
+        if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -3038,6 +3011,7 @@ public class MainActivity extends Activity {
         clearTouchState();
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
+        if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -3083,6 +3057,7 @@ public class MainActivity extends Activity {
         clearTouchState();
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
+        if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
@@ -3559,6 +3534,7 @@ public class MainActivity extends Activity {
                         clearTouchState();
                         attackButton.setVisibility(View.GONE);
                         parryButton.setVisibility(View.GONE);
+                        if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
                     }
                     if (lifePhase == PLAYER_DEAD) showDeathOverlay();
                     if (finaleEndingPhase == FINALE_ENDING_COMPLETE && !benchmarkRunning &&
@@ -3637,6 +3613,7 @@ public class MainActivity extends Activity {
                         menuButton.setVisibility(View.GONE);
                         attackButton.setVisibility(View.GONE);
                         parryButton.setVisibility(View.GONE);
+                        if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
                         updateContextualControls(false);
                         vitalityStatus.setVisibility(View.GONE);
                     } else if (benchmarkStatus == 2 || benchmarkStatus == 3) {
@@ -4020,6 +3997,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
+        if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
@@ -4382,7 +4360,61 @@ public class MainActivity extends Activity {
         ProbeBridge.setViewControls(viewControls[0], viewControls[1], viewControls[2], viewControls[7], viewControls[8]);
     }
 
+    private void configureGameplayActionButtons() {
+        swingTouch = new PressActionButton(attackButton, this::canSendGameplayAction, ProbeBridge::requestAttack);
+        dodgeTouch = new PressActionButton(dodgeButton, this::canSendGameplayAction, ProbeBridge::requestDodge);
+        interactButton.setOnClickListener(view -> {
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
+                    endingOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
+            ProbeBridge.requestInteract();
+        });
+        toggleHeldLightPoseButton.setOnClickListener(view -> {
+            if (menuVisible || diagnosticsVisible || deathOverlayVisible ||
+                    endingOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return;
+            ProbeBridge.requestToggleHeldLightPose();
+        });
+        parryButton.setOnClickListener(view -> {
+            if (parryRequestedOnTouchDown) {
+                parryRequestedOnTouchDown = false;
+                return;
+            }
+            if (!canSendGameplayAction()) return;
+            ProbeBridge.requestParry();
+        });
+        parryButton.setOnTouchListener((view, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    if (parryTouchActive) return true;
+                    parryTouchActive = true;
+                    parryRequestedOnTouchDown = true;
+                    view.setPressed(true);
+                    if (canSendGameplayAction()) {
+                        ProbeBridge.requestParry();
+                    }
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    view.setPressed(false);
+                    if (parryTouchActive) view.performClick();
+                    parryTouchActive = false;
+                    return true;
+                case MotionEvent.ACTION_CANCEL:
+                    parryTouchActive = false;
+                    parryRequestedOnTouchDown = false;
+                    view.setPressed(false);
+                    return true;
+                default:
+                    return true;
+            }
+        });
+    }
+
+    private boolean canSendGameplayAction() {
+        return !menuVisible && !diagnosticsVisible && !deathOverlayVisible && !endingOverlayVisible &&
+                !benchmarkRunning && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
+    }
     private void clearTouchState() {
+        if (swingTouch != null) swingTouch.cancel();
+        if (dodgeTouch != null) dodgeTouch.cancel();
         TouchControlState.clear(activePointers, viewControls);
         parryTouchActive = false;
         parryRequestedOnTouchDown = false;

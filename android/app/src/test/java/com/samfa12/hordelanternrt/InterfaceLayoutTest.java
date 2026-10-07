@@ -71,8 +71,10 @@ public final class InterfaceLayoutTest {
                             View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));
                     preview.layout(0,0,width,preview.getMeasuredHeight());
                     final String configuration="font="+font+" compact="+compact+" scale="+scale+" width="+width;
-                    assertEquals(configuration,2,preview.getChildCount());
-                    for(int rowIndex=0;rowIndex<2;++rowIndex) {
+                    assertEquals(configuration,3,preview.getChildCount());
+                    assertEquals("middle reserved action row",activity.getString(R.string.dodge),
+                            ((Button)((LinearLayout)preview.getChildAt(1)).getChildAt(0)).getText().toString());
+                    for(int rowIndex=0;rowIndex<3;++rowIndex) {
                         LinearLayout row=(LinearLayout)preview.getChildAt(rowIndex);
                         paired|=row.getOrientation()==LinearLayout.HORIZONTAL;
                         stacked|=row.getOrientation()==LinearLayout.VERTICAL;

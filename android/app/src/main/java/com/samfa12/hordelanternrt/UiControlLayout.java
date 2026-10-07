@@ -4,9 +4,13 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.view.Gravity;
 
-/** Stable slots for the unchanged action routes. Apply only while input is gated. */
+/** Reserved action/context slots. Hidden context buttons never move the combat buttons. */
 final class UiControlLayout {
     static void apply(Context c,InterfacePreferences.Values v,Button swing,Button parry,
+                      Button interact,Button light,int safeRight,int safeBottom,int availableWidth) {
+        apply(c,v,swing,parry,null,interact,light,safeRight,safeBottom,availableWidth);
+    }
+    static void apply(Context c,InterfacePreferences.Values v,Button swing,Button parry,Button dodge,
                       Button interact,Button light,int safeRight,int safeBottom,int availableWidth) {
         float scale=v.scale/100f;
         int primaryWidth=HordeUiTokens.dp(c,Math.round((v.compact?88:104)*scale));
@@ -21,7 +25,11 @@ final class UiControlLayout {
         int bottom=HordeUiTokens.dp(c,32)+safeBottom;
         place(swing,primaryWidth,Math.max(minimum,primaryHeight),edge,bottom);
         place(parry,primaryWidth,Math.max(minimum,primaryHeight),edge+primaryWidth+gap,bottom);
-        int above=bottom+primaryHeight+gap;
+        int above=bottom+Math.max(minimum,primaryHeight)+gap;
+        if(dodge!=null) {
+            place(dodge,primaryWidth,Math.max(minimum,primaryHeight),edge,above);
+            above+=Math.max(minimum,primaryHeight)+gap;
+        }
         place(interact,contextWidth,Math.max(minimum,contextHeight),edge,above);
         place(light,contextWidth,Math.max(minimum,contextHeight),edge+contextWidth+gap,above);
     }

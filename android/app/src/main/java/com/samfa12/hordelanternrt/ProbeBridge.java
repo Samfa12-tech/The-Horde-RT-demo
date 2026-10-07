@@ -36,6 +36,7 @@ public final class ProbeBridge {
     public static native void setViewControls(float yaw, float pitch, float torchLightStrength, float moveStrafe, float moveForward);
     public static native void requestAttack();
     public static native void requestParry();
+    public static native void requestDodge();
     public static native void requestInteract();
     public static native void requestToggleHeldLightPose();
     public static native void requestRouteReset();

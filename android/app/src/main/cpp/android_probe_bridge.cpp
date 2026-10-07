@@ -4686,6 +4686,17 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestParry(JNIEnv*, jclass)
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_requestDodge(JNIEnv*, jclass)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    if (gInputPublisherState.commands.dodge != UINT64_MAX)
+    {
+        ++gInputPublisherState.commands.dodge;
+    }
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestInteract(JNIEnv*, jclass)
 {
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);

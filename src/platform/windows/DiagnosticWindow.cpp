@@ -7947,23 +7947,40 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             const HGDIOBJ previousFont = SelectObject(item->hDC,
                 reinterpret_cast<HGDIOBJ>(SendMessageA(item->hwndItem, WM_GETFONT, 0, 0)));
             static HBRUSH slate = CreateSolidBrush(RGB(36, 39, 42));
-            static HBRUSH healthy = CreateSolidBrush(RGB(207, 169, 106));
-            static HBRUSH empty = CreateSolidBrush(RGB(75, 79, 83));
             const auto& vitals = sceneContext->simulation.Snapshot().playerVitals;
             FillRect(item->hDC, &item->rcItem, highContrast ? GetSysColorBrush(COLOR_WINDOW) : slate);
             const int inset = ScaleForDpi(hWnd, 6);
-            const int segmentWidth = ScaleForDpi(hWnd, 15);
+            const int heartWidth = ScaleForDpi(hWnd, 18);
+            const int heartHeight = ScaleForDpi(hWnd, 22);
+            const HGDIOBJ previousBrush = SelectObject(item->hDC, GetStockObject(DC_BRUSH));
+            const HPEN outline = CreatePen(PS_SOLID, ScaleForDpi(hWnd, 1),
+                highContrast ? GetSysColor(COLOR_WINDOWTEXT) : RGB(242, 233, 216));
+            const HGDIOBJ previousPen = SelectObject(item->hDC, outline);
+            // Original vector heart path matches the native Android icon artwork.
+            constexpr std::array<POINT, 13u> heart{{
+                {12,21},{9,18},{2,12},{2,7},{2,1},{9,0},{12,5},
+                {15,0},{22,1},{22,7},{22,12},{15,18},{12,21}}};
             for (int index = 0; index < 3; ++index)
             {
-                const int x = item->rcItem.left + inset + index * (segmentWidth + ScaleForDpi(hWnd, 4));
-                RECT segment{x, item->rcItem.top + inset, x + segmentWidth, item->rcItem.bottom - inset};
-                FillRect(item->hDC, &segment, highContrast ?
-                    GetSysColorBrush(index < vitals.vitality ? COLOR_HIGHLIGHT : COLOR_WINDOW) :
-                    (index < vitals.vitality ? healthy : empty));
-                FrameRect(item->hDC, &segment, static_cast<HBRUSH>(GetStockObject(GRAY_BRUSH)));
+                const int x = item->rcItem.left + inset + index * (heartWidth + ScaleForDpi(hWnd, 4));
+                const int y = item->rcItem.top + (item->rcItem.bottom - item->rcItem.top - heartHeight) / 2;
+                std::array<POINT, 13u> points{};
+                for (std::size_t point = 0u; point < heart.size(); ++point)
+                    points[point] = {x + heart[point].x * heartWidth / 24,
+                                     y + heart[point].y * heartHeight / 24};
+                SetDCBrushColor(item->hDC, highContrast ?
+                    GetSysColor(index < vitals.vitality ? COLOR_HIGHLIGHT : COLOR_WINDOW) :
+                    (index < vitals.vitality ? RGB(207, 101, 87) : RGB(36, 39, 42)));
+                BeginPath(item->hDC);
+                MoveToEx(item->hDC, points[0].x, points[0].y, nullptr);
+                PolyBezierTo(item->hDC, points.data() + 1u, 12u);
+                CloseFigure(item->hDC); EndPath(item->hDC); StrokeAndFillPath(item->hDC);
             }
+            if (previousPen && previousPen != HGDI_ERROR) SelectObject(item->hDC, previousPen);
+            if (previousBrush && previousBrush != HGDI_ERROR) SelectObject(item->hDC, previousBrush);
+            DeleteObject(outline);
             RECT label = item->rcItem;
-            label.left += ScaleForDpi(hWnd, 66);
+            label.left += ScaleForDpi(hWnd, 76);
             SetTextColor(item->hDC, highContrast ? GetSysColor(COLOR_WINDOWTEXT) : RGB(242, 233, 216));
             SetBkMode(item->hDC, TRANSPARENT);
             char text[64]{};

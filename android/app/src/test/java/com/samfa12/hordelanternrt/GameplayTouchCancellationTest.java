@@ -21,12 +21,16 @@ public final class GameplayTouchCancellationTest {
     @Implements(value=ProbeBridge.class,isInAndroidSdk=false)
     public static final class Bridge {
         static float strafe,forward;
+        static int attacks,parries,dodges;
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static int getSurfaceRuntimeState(long generation) { return 1; }
         @Implementation protected static void setViewControls(float yaw,float pitch,float light,float x,float z) {
             strafe=x; forward=z;
         }
         @Implementation protected static void setSimulationPaused(boolean paused) {}
+        @Implementation protected static void requestAttack() { ++attacks; }
+        @Implementation protected static void requestParry() { ++parries; }
+        @Implementation protected static void requestDodge() { ++dodges; }
     }
     private static Field field(String name) throws Exception {
         Field f=MainActivity.class.getDeclaredField(name); f.setAccessible(true); return f;
@@ -51,7 +55,8 @@ public final class GameplayTouchCancellationTest {
         SurfaceView surface=new SurfaceView(a); surface.layout(0,0,360,640);
         field("surfaceView").set(a,surface); field("menuVisible").setBoolean(a,false);
         field("preferences").set(a,a.getSharedPreferences("touch-fixture",Context.MODE_PRIVATE));
-        for(String button:new String[]{"parryButton","interactButton","toggleHeldLightPoseButton"}) field(button).set(a,new Button(a));
+        for(String button:new String[]{"attackButton","parryButton","dodgeButton","interactButton","toggleHeldLightPoseButton"}) field(button).set(a,new Button(a));
+        invoke(a,"configureGameplayActionButtons");
         invoke(a,"configureTouchControls"); return a;
     }
     private static void drag(MainActivity a,boolean lookFirst) throws Exception {
@@ -82,5 +87,47 @@ public final class GameplayTouchCancellationTest {
             invoke(a,boundary); assertCleared(a);
             field("menuVisible").setBoolean(a,false); drag(a,false);
         }
+    }
+    private static void buttonEvent(Button button,int action) {
+        MotionEvent e=MotionEvent.obtain(1,10,action,10,10,0);
+        button.dispatchTouchEvent(e); e.recycle();
+    }
+    @Test public void moveAndLookCanCoexistWithEachPressDownActionWithoutDuplicateRelease() throws Exception {
+        MainActivity a=prepare(); drag(a,true);
+        Bridge.attacks=Bridge.parries=Bridge.dodges=0;
+        for(String name:new String[]{"attackButton","parryButton","dodgeButton"}) {
+            Button b=(Button)field(name).get(a);
+            buttonEvent(b,MotionEvent.ACTION_DOWN);
+            buttonEvent(b,MotionEvent.ACTION_DOWN);
+            assertEquals(name+" must fire on press-down",1,name.equals("attackButton")?Bridge.attacks:
+                    name.equals("parryButton")?Bridge.parries:Bridge.dodges);
+            assertTrue(Math.abs(Bridge.forward)>0); assertTrue(Math.abs(Bridge.strafe)>0);
+            buttonEvent(b,MotionEvent.ACTION_UP);
+        }
+        assertEquals(1,Bridge.attacks); assertEquals(1,Bridge.parries); assertEquals(1,Bridge.dodges);
+        for(String name:new String[]{"attackButton","parryButton","dodgeButton"}) {
+            Button b=(Button)field(name).get(a); b.performClick();
+        }
+        assertEquals(2,Bridge.attacks); assertEquals(2,Bridge.parries); assertEquals(2,Bridge.dodges);
+    }
+    @Test public void menuEndingAndCancelledReleaseCannotPublishExtraActions() throws Exception {
+        MainActivity a=prepare(); Bridge.attacks=Bridge.parries=Bridge.dodges=0;
+        for(String name:new String[]{"attackButton","parryButton","dodgeButton"}) {
+            Button b=(Button)field(name).get(a);
+            buttonEvent(b,MotionEvent.ACTION_DOWN); invoke(a,"clearTouchState");
+            buttonEvent(b,MotionEvent.ACTION_UP); assertFalse(b.isPressed());
+            buttonEvent(b,MotionEvent.ACTION_DOWN); buttonEvent(b,MotionEvent.ACTION_CANCEL);
+            buttonEvent(b,MotionEvent.ACTION_UP); assertFalse(b.isPressed());
+        }
+        assertEquals(2,Bridge.attacks); assertEquals(2,Bridge.parries); assertEquals(2,Bridge.dodges);
+        for(String overlay:new String[]{"menuVisible","endingOverlayVisible","deathOverlayVisible","diagnosticsVisible"}) {
+            field(overlay).setBoolean(a,true);
+            for(String name:new String[]{"attackButton","parryButton","dodgeButton"}) {
+                Button b=(Button)field(name).get(a);
+                buttonEvent(b,MotionEvent.ACTION_DOWN); buttonEvent(b,MotionEvent.ACTION_UP); b.performClick();
+            }
+            field(overlay).setBoolean(a,false);
+        }
+        assertEquals(2,Bridge.attacks); assertEquals(2,Bridge.parries); assertEquals(2,Bridge.dodges);
     }
 }
