@@ -2246,3 +2246,39 @@ not reduced. The development validation app was stopped before the next build.
 USB-powered context does not prove reliable power or sustained thermals/FPS.
 No production app, app-data clear, signing, release, other model, S24 or S25
 certification follows. Raw identifiers, preferences and captures remain private.
+
+### Later exact phone packages: Graphics correction and cache negative
+
+Same allocated SM-S948B / Android 16 receives exact four-ABI Debug packages
+`88548fc1` (SHA-256 `3da2774ce4ac47edfcaf885c2f79d94b207edec2ea0d8c475ee130d28686ba04`)
+and `4d801445` (`1a384e479ba24e11a0f344ccd82756d3a9d8a2fef3d0cf60694039624db630d3`),
+139720085 bytes each; installed pullbacks match. Owner-requested portrait
+placement passes inspection without lowering font scale/density. `88548fc1`
+opening Graphics crashes on null accessibility description; regression fails
+before the fix and passes after it. Exact `4d801445` opens Graphics successfully,
+keeps all four native actions visible and retains the viewport after a later
+horizontal choice. A 10-second live-preview UIAutomator timeout is retained;
+missing/stale XML is not admitted.
+
+Actual landscape on `88548fc1` keeps the same Activity/process and upright native
+controls but shows sideways, flattened RT output: surface/presentation fails.
+`422c1b1a` identity-transform policy has host local coverage only; real Android
+capabilities, upright RT output and recovery remain pending. Original `lock 0`
+is restored. Portrait remains the controlled quality-comparison baseline.
+
+Exact `4d801445`, same Pipeline/output 1440 x 2980/traced 720 x 1490 and saved
+Mobile water/fire/GlassOn/Current/cap30/MistOn, supplies a real memory cache to
+pipeline calls. Off serial 3 takes 16659.422 ms including 16197.380 ms pipeline
+creation; return On serial 4 takes 16588.701 ms including 16176.576 ms pipeline
+creation. Both present current generation 1/profile 1. Compared with historical
+null-cache Off 16694.868/16174.583 ms, no improvement is measured in this bounded
+sequence. `cache_null=0` does not prove a cache hit. Preview FPS labels are not
+sustained gameplay evidence. Same-process PSS On/Off/return On is
+703412/713458/712565 kB; these observations do not isolate cache overhead.
+
+Restore serial 5 receives exact native ACK/current presentation in 283.337 ms.
+Every confirmed preference remains unchanged; only inactive pending-glass
+metadata changes, pending=false. The owned Debug app is stopped after ACK.
+USB-powered context is not reliable power/sustained thermal evidence. Full
+route/backends, touch/combat feel, sustained 50/40/33 comparison and owner
+decisions remain separate pending gates. See the same exact menu/package ledger.
