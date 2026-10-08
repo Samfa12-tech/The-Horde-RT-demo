@@ -1,5 +1,41 @@
 # 1.6.2 bounded mobile quality measurements
 
+## First warm 50% route observation — 8 October, same 2a408613 APK
+
+One newly traced mobile-default-profile probe completes both laps/26 waypoints,
+with all 1,838 final owning frames joined to 3,677 actual-presentation records,
+zero unresolved/loss/error counters, genuine Pipeline/MAILBOX, traced **720×1490**
+and output **1440×2980**. Graphics requested/effective/saved and exact native
+acknowledgement/Keep are observed before the cold benchmark launch: 50%, Mobile
+water/fire, Glass Off, Current shadows, cap30 (menu/preview scope), Mist On, Dust
+Off. This changes only the isolated benchmark; the primary app is untouched.
+
+The 82.137502104-second measured span supplies 1,837 intervals: median
+**41.666667 ms**, p90 **58.333333 ms**, p95 **75 ms**, max **91.666719 ms**;
+1,782 exceed the explicit 33.333 ms threshold and none exceeds 250 ms.
+Observed presented-image rate over that span is **22.364936/s**, below the target
+in this short controlled route. This is not ordinary-play/sustained FPS, a
+thermal plateau or a final profile decision. The existing per-course-frame
+simulation convention and CPU/GPU timing definitions are preserved.
+
+The phone was already warm after live Graphics work: typed current HAL AP
+44.4→45.2°C, battery 37.6→38.2°C, skin 39.7→39.9°C, Android thermal status 1
+at both sampled endpoints, USB powered. This is an ordered warm observation,
+**not a thermally matched 50/40/33 cohort**. Do not infer scale-only savings
+against the 75% collector run: glass and initial thermals also differ. No 40/33
+result, normal-play motion/quality decision, power availability, Keeper/reward
+overlap or sustained acceptance follows. No quality/default reduction is made.
+
+Raw report SHA-256 `8fbc2b85f080cea34524256c62037aa5bebdd7360cb5df3377ad4050df593825`;
+[sanitized analysis](evidence/2026-10-08-present-timing/scale50-warm-route01-analysis.json)
+and [exact package/receipt](evidence/2026-10-08-present-timing/receipt.json).
+The original isolated 75% / Mobile / Glass On / Current / cap30 / Mist On / Dust
+Off save is restored through exact acknowledgement and Keep; owned app stops.
+The first attempted reset correctly refuses an offscreen target without touching;
+bounded ordinary scrolling reaches it. That harness guard is not a settings failure.
+Analyzer/tooling head `67bb4d47b412d15ad946b84fafa6dc5ef4e20765` separately completes
+12/12 aggregate CI jobs. Later documentation-head CI remains separate.
+
 **Current presentation-timing checkpoint — 8 October:** runtime `2a408613668a4936dd1592d79cd141e1d6baf5dc`, isolated Shipping/Mobile benchmark APK `faf35f482b78150b7157335b56c3a0e5c499ec1d2205b9dc6a82bd90ce82992f`. Optional actual image timestamps join all 600 lantern and 1,838 complete-route measured frames on SM-S948B / Android 16 at the benchmark’s preserved 75% profile. Collector/retirement fixtures, admission/build/package checks and 12/12 runtime CI jobs pass; nine offline analysis tests pass. Ordinary builds remain Off, assets/defaults/custom saves are preserved, and owned apps are stopped. This establishes measurement, not 50/40/33 or sustained-30-FPS acceptance. [Exact subject, intervals, retained failures and remaining gates](ENGINEERING_1_6_2_PRESENT_TIMING_2026_10_08.md).
 
 The new 75% collector proof remains separate from the historical baseline. Its complete course has a matched 142.608337028-second measured span; observed image rate is 12.881435/s, with 70.833437 ms median and 141.666719 ms p95 intervals. Those actual-display intervals do not replace existing CPU/GPU definitions or establish any 50/40/33 result. Power remains unavailable and sampled thermal rise is not a plateau.

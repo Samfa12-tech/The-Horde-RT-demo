@@ -1,5 +1,9 @@
 # Android RT Device Compatibility Record
 
+## 8 October warm default-profile benchmark — 2a408613 / SM-S948B / Android 16
+
+Evidence class: **exact newly traced default-tuple controlled benchmark and actual image-presentation intervals**, without sustained or owner quality acceptance. on the same exact isolated 2a408613 benchmark APK, newly traced 50% / Mobile / Glass Off / Current / cap30 / Mist On / Dust Off completes the two-lap route with 1,838 exact measured timestamp joins. A warm 82.137502104-second span supplies 22.364936 actual presented images/s, 41.666667 ms median and 75 ms p95 intervals; thermal status is 1. This is a measured short-route gap, not thermally matched/sustained ordinary play or owner quality acceptance. The isolated original 75% save is restored and owned app stops. 40/33 comparison, sustained/physical gates and owner decisions remain pending. [Exact observation and limits](ENGINEERING_1_6_2_MOBILE_QUALITY_MEASUREMENTS.md).
+
 ## 8 October optional image-presentation collector — 2a408613 / SM-S948B / Android 16
 
 Evidence class: **exact isolated Shipping/Mobile installation/pullback and short-span actual image-presentation timestamps**, not owner quality or sustained performance. runtime `2a408613668a4936dd1592d79cd141e1d6baf5dc`, isolated Shipping/Mobile benchmark APK `faf35f482b78150b7157335b56c3a0e5c499ec1d2205b9dc6a82bd90ce82992f`. Optional actual image timestamps join all 600 lantern and 1,838 complete-route measured frames on SM-S948B / Android 16 at the benchmark’s preserved 75% profile. Collector/retirement fixtures, admission/build/package checks and 12/12 runtime CI jobs pass; nine offline analysis tests pass. Ordinary builds remain Off, assets/defaults/custom saves are preserved, and owned apps are stopped. This establishes measurement, not 50/40/33 or sustained-30-FPS acceptance. [Exact subject, intervals, retained failures and remaining gates](ENGINEERING_1_6_2_PRESENT_TIMING_2026_10_08.md).

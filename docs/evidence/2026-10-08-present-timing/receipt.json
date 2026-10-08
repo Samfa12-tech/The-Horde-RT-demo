@@ -44,7 +44,21 @@
     "total": 12,
     "pushRun": 37770881181,
     "pullRequestRun": 37770889693,
-    "laterToolAndDocumentationCi": "Separate head, refresh after push"
+    "laterToolAndDocumentationCi": {
+      "head": "67bb4d47b412d15ad946b84fafa6dc5ef4e20765",
+      "success": 12,
+      "total": 12,
+      "runs": [
+        {
+          "id": 37774971546,
+          "event": "pull_request"
+        },
+        {
+          "id": 37774962879,
+          "event": "push"
+        }
+      ]
+    }
   },
   "collector": {
     "allocatedStorageBytes": 3932160,
@@ -77,6 +91,37 @@
       "finalLapFramesMatched": 1838,
       "allPresentationRows": 3677,
       "pending": 0
+    },
+    "scale50WarmRoute01": {
+      "runId": "integrated-quality-2a408613-scale50-route01",
+      "rawReportSha256": "8fbc2b85f080cea34524256c62037aa5bebdd7360cb5df3377ad4050df593825",
+      "analysisFile": "scale50-warm-route01-analysis.json",
+      "analysisSha256": "007dd9d6dc91f7aaae79f0f661feaf0d2c8c0779549021752ebc4b4de0bc0bd8",
+      "complete": true,
+      "traversalComplete": true,
+      "actualTracedScalePercent": 50,
+      "finalLapFramesMatched": 1838,
+      "allPresentationRows": 3677,
+      "pending": 0,
+      "settings": "50 Mobile water/fire GlassOff Current shadows cap30 MistOn DustOff",
+      "admission": "Actual Graphics requested/effective/saved and exact native acknowledgement/Keep before cold benchmark",
+      "classification": "Single ordered warm-state default-profile route observation; not thermally matched, sustained ordinary play or quality acceptance",
+      "currentHalBeforeCelsius": {
+        "AP": 44.4,
+        "BAT": 37.6,
+        "SKIN": 39.7
+      },
+      "currentHalAfterCelsius": {
+        "AP": 45.2,
+        "BAT": 38.2,
+        "SKIN": 39.9
+      },
+      "androidThermalStatusBefore": 1,
+      "androidThermalStatusAfter": 1,
+      "usbPowered": true,
+      "comparisonTo75": "Not a scale-only comparison: Glass changed and thermal starts differ",
+      "originalBenchmarkTupleRestored": "75 Mobile water/fire GlassOn Current shadows cap30 MistOn DustOff after exact ACK/Keep",
+      "retainedPreparationLimit": "First reset tap correctly refused while offscreen, ordinary scrolling then reached it; no input from refused attempt"
     }
   },
   "checkpoint": {
