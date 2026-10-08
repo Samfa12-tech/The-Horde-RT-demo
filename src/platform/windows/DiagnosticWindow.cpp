@@ -2049,14 +2049,34 @@ void UpdateRtLabLabels(VulkanSurfaceContext& context)
     UpdateRtLabTelemetry(context, true);
 }
 
+void LayoutVitalityHud(HWND window, int clientWidth, int maximum)
+{
+    if (HWND hud = GetDlgItem(window, kVitalityHudControlId))
+    {
+        const int size = ScaleForDpi(window, 18), gap = ScaleForDpi(window, 4);
+        const int count = std::max(0, maximum);
+        const int available = std::max(size, clientWidth - ScaleForDpi(window, 40));
+        const int columns = std::max(1, std::min(count, (available + gap) / (size + gap)));
+        const int rows = count == 0 ? 1 : (count - 1) / columns + 1;
+        const int heartHeight = ScaleForDpi(window, 22), verticalInset = ScaleForDpi(window, 4);
+        MoveWindow(hud, ScaleForDpi(window, 14), ScaleForDpi(window, 52),
+                   columns * (size + gap) - gap + ScaleForDpi(window, 12),
+                   rows * (heartHeight + gap) - gap + 2 * verticalInset, TRUE);
+    }
+}
+
 void UpdateVitalityHud(VulkanSurfaceContext& context)
 {
     const horde::gameplay::PlayerVitalsSnapshot& vitals = context.simulation.Snapshot().playerVitals;
-    const std::string text = "VITALITY  " + std::to_string(vitals.vitality) + " / " +
+    // Native accessible name is retained; the owner-drawn HUD only paints hearts.
+    const std::string text = "Vitality " + std::to_string(vitals.vitality) + " of " +
                              std::to_string(vitals.maxVitality);
     if (HWND hud = GetDlgItem(context.windowHandle, kVitalityHudControlId))
     {
         SetWindowTextA(hud, text.c_str());
+        RECT client{};
+        GetClientRect(context.windowHandle, &client);
+        LayoutVitalityHud(context.windowHandle, client.right, vitals.maxVitality);
         InvalidateRect(hud, nullptr, TRUE);
     }
 }
@@ -7560,12 +7580,8 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         MoveWindow(hud, compact ? width - hudWidth - hudInset : hudInset, hudInset, hudWidth,
                    ScaleForDpi(window, expanded ? 80 : 30), TRUE);
     }
-    if (HWND vitality = GetDlgItem(window, kVitalityHudControlId))
-    {
-        const int vitalityWidth = ScaleForDpi(window, 232);
-        MoveWindow(vitality, ScaleForDpi(window, 14), ScaleForDpi(window, 52),
-                   vitalityWidth, ScaleForDpi(window, 30), TRUE);
-    }
+    LayoutVitalityHud(window, width, sceneContext ?
+        sceneContext->simulation.Snapshot().playerVitals.maxVitality : horde::gameplay::PlayerVitals::kMaxVitality);
     if (HWND prompt = GetDlgItem(window, kChestPromptControlId))
     {
         const int promptWidth = std::min(ScaleForDpi(window, 390),
@@ -8950,8 +8966,6 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         if (item && item->CtlID == kVitalityHudControlId && sceneContext)
         {
             const bool highContrast = NativeUiUsesHighContrast();
-            const HGDIOBJ previousFont = SelectObject(item->hDC,
-                reinterpret_cast<HGDIOBJ>(SendMessageA(item->hwndItem, WM_GETFONT, 0, 0)));
             static HBRUSH slate = CreateSolidBrush(RGB(36, 39, 42));
             const auto& vitals = sceneContext->simulation.Snapshot().playerVitals;
             FillRect(item->hDC, &item->rcItem, highContrast ? GetSysColorBrush(COLOR_WINDOW) : slate);
@@ -8966,33 +8980,29 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             constexpr std::array<POINT, 13u> heart{{
                 {12,21},{9,18},{2,12},{2,7},{2,1},{9,0},{12,5},
                 {15,0},{22,1},{22,7},{22,12},{15,18},{12,21}}};
-            for (int index = 0; index < 3; ++index)
+            const int gap = ScaleForDpi(hWnd, 4);
+            const int columns = std::max<int>(1, (item->rcItem.right - item->rcItem.left - 2 * inset + gap) /
+                                             (heartWidth + gap));
+            for (int index = 0; index < std::max(0, vitals.maxVitality); ++index)
             {
-                const int x = item->rcItem.left + inset + index * (heartWidth + ScaleForDpi(hWnd, 4));
-                const int y = item->rcItem.top + (item->rcItem.bottom - item->rcItem.top - heartHeight) / 2;
+                const int x = item->rcItem.left + inset + (index % columns) * (heartWidth + gap);
+                const int y = item->rcItem.top + ScaleForDpi(hWnd, 4) +
+                              (index / columns) * (heartHeight + gap);
                 std::array<POINT, 13u> points{};
                 for (std::size_t point = 0u; point < heart.size(); ++point)
                     points[point] = {x + heart[point].x * heartWidth / 24,
                                      y + heart[point].y * heartHeight / 24};
-                SetDCBrushColor(item->hDC, highContrast ?
-                    GetSysColor(index < vitals.vitality ? COLOR_HIGHLIGHT : COLOR_WINDOW) :
-                    (index < vitals.vitality ? RGB(207, 101, 87) : RGB(36, 39, 42)));
+                SetDCBrushColor(item->hDC, highContrast ? GetSysColor(COLOR_HIGHLIGHT) : RGB(214, 71, 71));
                 BeginPath(item->hDC);
                 MoveToEx(item->hDC, points[0].x, points[0].y, nullptr);
                 PolyBezierTo(item->hDC, points.data() + 1u, 12u);
-                CloseFigure(item->hDC); EndPath(item->hDC); StrokeAndFillPath(item->hDC);
+                CloseFigure(item->hDC); EndPath(item->hDC);
+                if (index < vitals.vitality) StrokeAndFillPath(item->hDC);
+                else StrokePath(item->hDC);
             }
             if (previousPen && previousPen != HGDI_ERROR) SelectObject(item->hDC, previousPen);
             if (previousBrush && previousBrush != HGDI_ERROR) SelectObject(item->hDC, previousBrush);
             DeleteObject(outline);
-            RECT label = item->rcItem;
-            label.left += ScaleForDpi(hWnd, 76);
-            SetTextColor(item->hDC, highContrast ? GetSysColor(COLOR_WINDOWTEXT) : RGB(242, 233, 216));
-            SetBkMode(item->hDC, TRANSPARENT);
-            char text[64]{};
-            GetWindowTextA(item->hwndItem, text, static_cast<int>(sizeof(text)));
-            DrawTextA(item->hDC, text, -1, &label, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
-            if (previousFont && previousFont != HGDI_ERROR) SelectObject(item->hDC, previousFont);
             return TRUE;
         }
         if (item && item->CtlType == ODT_BUTTON)
@@ -9104,12 +9114,6 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             return reinterpret_cast<LRESULT>(GetSysColorBrush(COLOR_WINDOW));
         }
         COLORREF textColor = RGB(242, 233, 216);
-        if (sceneContext && GetDlgCtrlID(reinterpret_cast<HWND>(lParam)) == kVitalityHudControlId)
-        {
-            const int vitality = sceneContext->simulation.Snapshot().playerVitals.vitality;
-            textColor = vitality >= 3 ? RGB(255, 208, 122) :
-                        (vitality == 2 ? RGB(255, 154, 67) : RGB(255, 83, 72));
-        }
         const int controlId = GetDlgCtrlID(reinterpret_cast<HWND>(lParam));
         if (controlId == kGraphicsInfoId || controlId == kGraphicsPreviewTelemetryId)
         {
@@ -9369,7 +9373,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     };
 
     createStatic(kHudControlId, kHudStartingText, SS_LEFT | SS_CENTERIMAGE | SS_NOTIFY);
-    createStatic(kVitalityHudControlId, "VITALITY  3 / 3", SS_OWNERDRAW);
+    createStatic(kVitalityHudControlId, "Vitality 3 of 3", SS_OWNERDRAW);
     if (HWND prompt = createStatic(kChestPromptControlId, "", SS_CENTER | SS_CENTERIMAGE))
     {
         ShowWindow(prompt, SW_HIDE);

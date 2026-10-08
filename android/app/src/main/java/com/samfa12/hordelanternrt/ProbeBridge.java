@@ -43,6 +43,8 @@ public final class ProbeBridge {
     public static native void requestToggleHeldLightPose();
     public static native void requestRouteReset();
     public static native int getPlayerVitality();
+    // Low 32 bits: current vitality; high 32 bits: maximum, from one simulation snapshot.
+    public static native long getPlayerVitalityState();
     public static native int getPlayerLifePhase();
     public static native int getFinaleEndingPhase();
     public static native float getKeeperRevealTitleOpacity();

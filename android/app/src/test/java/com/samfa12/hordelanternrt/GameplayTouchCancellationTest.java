@@ -28,7 +28,7 @@ public final class GameplayTouchCancellationTest {
         static int runtimeState=1;
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static int getSurfaceRuntimeState(long generation) { return runtimeState; }
-        @Implementation protected static int getPlayerVitality() { return 3; }
+        @Implementation protected static long getPlayerVitalityState() { return (3L << 32) | 3L; }
         @Implementation protected static int getPlayerLifePhase() { return 0; }
         @Implementation protected static int getFinaleEndingPhase() { return 0; }
         @Implementation protected static int getContextualControlState() { return 0; }

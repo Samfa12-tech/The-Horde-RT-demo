@@ -8,16 +8,23 @@ import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 
-/** Original vector artwork; all three full/empty hearts supplement current/max text. */
+/** Original heart artwork. Empty hearts have transparent interiors; health text is accessibility-only. */
 final class VitalityHeartsDrawable extends Drawable {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path heart = new Path();
     private final int filled;
+    private final int count, columns, size, gap;
     private int alpha = 255;
 
-    VitalityHeartsDrawable(Context context, int vitality) {
-        filled = Math.max(0, Math.min(3, vitality));
-        setBounds(0, 0, HordeUiTokens.dp(context, 72), HordeUiTokens.dp(context, 22));
+    VitalityHeartsDrawable(Context context, int vitality, int maximum, int availableWidth) {
+        count = Math.max(0, maximum);
+        filled = Math.max(0, Math.min(count, vitality));
+        size = HordeUiTokens.dp(context, 22);
+        gap = HordeUiTokens.dp(context, 4);
+        columns = Math.max(1, Math.min(count, (Math.max(size, availableWidth) + gap) / (size + gap)));
+        int rows = count == 0 ? 0 : (count - 1) / columns + 1;
+        setBounds(0, 0, count == 0 ? 0 : columns * (size + gap) - gap,
+                rows == 0 ? 0 : rows * (size + gap) - gap);
         heart.moveTo(12, 21);
         heart.cubicTo(9, 18, 2, 12, 2, 7);
         heart.cubicTo(2, 1, 9, 0, 12, 5);
@@ -26,15 +33,16 @@ final class VitalityHeartsDrawable extends Drawable {
         heart.close();
     }
     @Override public void draw(Canvas canvas) {
-        float gap = getBounds().width() / 18f;
-        float width = (getBounds().width() - 2 * gap) / 3f;
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < count; ++i) {
             int saved = canvas.save();
-            canvas.translate(getBounds().left + i * (width + gap), getBounds().top);
-            canvas.scale(width / 24f, getBounds().height() / 24f);
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(i < filled ? 0xFFCF6557 : HordeUiTokens.SLATE);
-            paint.setAlpha(alpha); canvas.drawPath(heart, paint);
+            canvas.translate(getBounds().left + (i % columns) * (size + gap),
+                    getBounds().top + (i / columns) * (size + gap));
+            canvas.scale(size / 24f, size / 24f);
+            if (i < filled) {
+                paint.setStyle(Paint.Style.FILL);
+                paint.setColor(0xFFD64747);
+                paint.setAlpha(alpha); canvas.drawPath(heart, paint);
+            }
             paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(1.5f);
             paint.setColor(HordeUiTokens.PARCHMENT); paint.setAlpha(alpha);
             canvas.drawPath(heart, paint);

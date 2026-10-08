@@ -73,10 +73,10 @@
         android:background="#B3151719"
         android:gravity="center"
         android:maxLines="2"
-        android:minWidth="132dp"
+        android:minWidth="0dp"
         android:paddingStart="14dp"
         android:paddingEnd="14dp"
-        android:text="@string/vitality_full"
+        android:contentDescription="@string/vitality_initial_accessibility"
         android:textColor="#F2E9D8"
         android:textSize="12sp"
         android:textStyle="bold" />

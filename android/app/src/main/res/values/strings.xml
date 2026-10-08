@@ -46,8 +46,8 @@
     <string name="chest_unlocking">SEAL BREAKING…</string>
     <string name="raise_lantern">RAISE</string>
     <string name="lower_lantern">LOWER</string>
-    <string name="vitality_full">VITALITY  3 / 3</string>
-    <string name="vitality_accessibility">Vitality %1$d of 3</string>
+    <string name="vitality_initial_accessibility">Vitality 3 of 3</string>
+    <string name="vitality_accessibility">Vitality %1$d of %2$d</string>
     <string name="ending_title">DAWN RETURNS</string>
     <string name="ending_subtitle">THE LAST LANTERN HAS DONE ITS WORK</string>
     <string name="ending_body">The old guard bound the lich beneath this ruin and left one lantern to guide whoever came after.\n\nIts flame died when the final seal opened. Now the staff is silent, the roof gives way, and stolen morning returns to the halls.</string>

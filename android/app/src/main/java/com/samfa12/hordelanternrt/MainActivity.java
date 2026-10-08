@@ -403,6 +403,7 @@ public class MainActivity extends Activity {
     private boolean pendingUpdateManualRequest;
     private int lastPlayerLifePhase = PLAYER_ALIVE;
     private int lastPlayerVitality = 3;
+    private int lastPlayerMaxVitality = 3;
     private long delayedGameplayFeedbackGeneration;
     static int renderScalePercent(final SharedPreferences preferences) {
         return preferences.getInt(PREF_RENDER_SCALE,
@@ -535,7 +536,7 @@ public class MainActivity extends Activity {
         dodgeButton.setContentDescription(getString(R.string.dodge));
         interactButton.setContentDescription(getString(R.string.interact));
         toggleHeldLightPoseButton.setContentDescription(getString(R.string.lower_lantern));
-        updateVitalityHud(3);
+        updateVitalityHud(3, 3);
         rtStatus.setOnClickListener(view -> { if(!benchmarkRunning) showDiagnostics(false); });
         if (isDebuggableApp()) {
             rtStatus.setOnLongClickListener(view -> {
@@ -3564,7 +3565,8 @@ public class MainActivity extends Activity {
             p.gravity=Gravity.TOP|Gravity.START; p.setMarginStart(dp(16)+safeLeft); p.topMargin=dp(16)+safeTop;
             p.height=FrameLayout.LayoutParams.WRAP_CONTENT; vitalityStatus.setLayoutParams(p);
             vitalityStatus.setPadding(dp(10),dp(8),dp(10),dp(8)); vitalityStatus.setTextSize(12);
-            vitalityStatus.setMaxWidth(Math.max(dp(120),getResources().getDisplayMetrics().widthPixels-safeLeft-safeRight-dp(128)));
+            vitalityStatus.setMaxWidth(Math.max(dp(42),getResources().getDisplayMetrics().widthPixels-safeLeft-safeRight-dp(128)));
+            updateVitalityHud(lastPlayerVitality, lastPlayerMaxVitality);
             vitalityStatus.setBackground(HordeUiTokens.plate(this,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
         }
     }
@@ -3841,20 +3843,19 @@ public class MainActivity extends Activity {
         pushViewControls();
     }
 
-    private void updateVitalityHud(final int vitality) {
-        final int safeVitality = Math.max(0, Math.min(3, vitality));
+    private void updateVitalityHud(final int vitality, final int maximum) {
+        final int safeMaximum = Math.max(0, maximum);
+        final int safeVitality = Math.max(0, Math.min(safeMaximum, vitality));
         lastPlayerVitality = safeVitality;
-        vitalityStatus.setText("VITALITY  " + safeVitality + " / 3");
-        vitalityStatus.setCompoundDrawables(new VitalityHeartsDrawable(this,safeVitality),null,null,null);
-        vitalityStatus.setCompoundDrawablePadding(dp(8));
-        vitalityStatus.setContentDescription(getString(R.string.vitality_accessibility, safeVitality));
-        if (safeVitality >= 3) {
-            vitalityStatus.setTextColor(0xFFFFD07A);
-        } else if (safeVitality == 2) {
-            vitalityStatus.setTextColor(0xFFFFA84F);
-        } else {
-            vitalityStatus.setTextColor(0xFFFF705C);
-        }
+        lastPlayerMaxVitality = safeMaximum;
+        final int available = Math.max(dp(22), Math.min(vitalityStatus.getMaxWidth()
+                - vitalityStatus.getPaddingLeft() - vitalityStatus.getPaddingRight(),
+                getResources().getDisplayMetrics().widthPixels - dp(148)));
+        vitalityStatus.setText("");
+        vitalityStatus.setCompoundDrawables(new VitalityHeartsDrawable(this, safeVitality, safeMaximum, available),
+                null, null, null);
+        vitalityStatus.setCompoundDrawablePadding(0);
+        vitalityStatus.setContentDescription(getString(R.string.vitality_accessibility, safeVitality, safeMaximum));
     }
 
     private void showDeathOverlay() {
@@ -4389,10 +4390,14 @@ public class MainActivity extends Activity {
                     rtStatus.setText(benchmarkRunning?R.string.rt_active:R.string.rt_active_compact);
                     rtStatus.setContentDescription(getString(R.string.rt_active)+"; opens diagnostics");
                     rtStatus.setTextColor(0xFFFFD07A);
-                    final int vitality = ProbeBridge.getPlayerVitality();
+                    // Both values come from one immutable simulation publication.
+                    final long vitalityState = ProbeBridge.getPlayerVitalityState();
+                    final int vitality = (int) vitalityState;
+                    final int maximumVitality = (int) (vitalityState >>> 32);
                     final int lifePhase = ProbeBridge.getPlayerLifePhase();
                     final int finaleEndingPhase = ProbeBridge.getFinaleEndingPhase();
-                    if (vitality != lastPlayerVitality) updateVitalityHud(vitality);
+                    if (vitality != lastPlayerVitality || maximumVitality != lastPlayerMaxVitality)
+                        updateVitalityHud(vitality, maximumVitality);
                     lastPlayerLifePhase = lifePhase;
                     if (deathOverlayVisible && lifePhase == PLAYER_ALIVE) {
                         deathOverlayVisible = false;
@@ -6070,7 +6075,7 @@ public class MainActivity extends Activity {
             endingOverlayVisible = false;
             endingOverlayDismissed = false;
             lastPlayerLifePhase = PLAYER_ALIVE;
-            updateVitalityHud(3);
+            updateVitalityHud(3, 3);
             showMainMenu(false);
         }
         if (benchmarkRunning) {

@@ -672,7 +672,9 @@ std::atomic<bool> gRouteReplayRequested{false};
 std::atomic<bool> gInAppBenchmarkRequested{false};
 std::atomic<bool> gInAppBenchmarkCancelRequested{false};
 std::atomic<int> gInAppBenchmarkStatus{0}; // 0 idle, 1 running, 2 complete, 3 failed/cancelled.
-std::atomic<int> gPlayerVitality{horde::gameplay::PlayerVitals::kMaxVitality};
+std::atomic<std::uint64_t> gPlayerVitalityState{
+    (static_cast<std::uint64_t>(horde::gameplay::PlayerVitals::kMaxVitality) << 32u) |
+    static_cast<std::uint32_t>(horde::gameplay::PlayerVitals::kMaxVitality)};
 std::atomic<int> gPlayerLifePhase{static_cast<int>(horde::gameplay::PlayerLifePhase::Alive)};
 std::atomic<std::int32_t> gPlayerRetryCheckpoint{0};
 std::atomic<float> gKeeperTitleOpacity{0.0f};
@@ -830,7 +832,9 @@ void PublishSimulationUiState()
     const horde::gameplay::simulation::SimulationSnapshot& simulation = gGameSimulation.Snapshot();
     const horde::gameplay::PlayerVitalsSnapshot& vitals = simulation.playerVitals;
     gKeeperTitleOpacity.store(std::clamp(simulation.lich.titleOpacity, 0.0f, 1.0f), std::memory_order_release);
-    gPlayerVitality.store(vitals.vitality, std::memory_order_release);
+    gPlayerVitalityState.store(
+        (static_cast<std::uint64_t>(static_cast<std::uint32_t>(vitals.maxVitality)) << 32u) |
+        static_cast<std::uint32_t>(vitals.vitality), std::memory_order_release);
     gPlayerLifePhase.store(static_cast<int>(vitals.phase), std::memory_order_release);
     gPlayerRetryCheckpoint.store(simulation.retryCheckpoint, std::memory_order_release);
     gFinaleEndingPhase.store(
@@ -5615,7 +5619,13 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestRouteReset(JNIEnv*, jclass)
 extern "C" JNIEXPORT jint JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getPlayerVitality(JNIEnv*, jclass)
 {
-    return static_cast<jint>(gPlayerVitality.load(std::memory_order_acquire));
+    return static_cast<jint>(static_cast<std::uint32_t>(gPlayerVitalityState.load(std::memory_order_acquire)));
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getPlayerVitalityState(JNIEnv*, jclass)
+{
+    return static_cast<jlong>(gPlayerVitalityState.load(std::memory_order_acquire));
 }
 
 extern "C" JNIEXPORT jint JNICALL
