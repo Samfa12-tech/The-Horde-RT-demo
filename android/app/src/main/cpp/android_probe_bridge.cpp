@@ -1511,8 +1511,9 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
 {
     if (const auto* showcase = horde::gameplay::FindShowcaseCheckpoint(id))
     {
-        selection = {*showcase, showcase->id,
-                     kDefaultPlayerPresentationRoute};
+        selection = {horde::gameplay::ShowcaseCheckpointForEncounter(*showcase,
+                         horde::gameplay::simulation::ProductionGameSimulationConfig().waterfallSkeletonEncounter),
+                     showcase->id, kDefaultPlayerPresentationRoute};
         return true;
     }
     const auto* development = horde::gameplay::FindDevelopmentCheckpoint(id);

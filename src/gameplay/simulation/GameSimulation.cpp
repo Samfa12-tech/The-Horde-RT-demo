@@ -1019,6 +1019,9 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         return false;
     }
 
+    const auto encounterCheckpoint = ShowcaseCheckpointForEncounter(
+        *checkpoint, config_.waterfallSkeletonEncounter);
+    checkpoint = &encounterCheckpoint;
     ClearScheduledCombatEdges(true);
 
     events_.Clear();

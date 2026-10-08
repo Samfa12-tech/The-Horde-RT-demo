@@ -742,6 +742,25 @@ int main()
                    Near(simulation.Snapshot().heldItems[1].visualStowBlend, 1.0f),
                    "Keeper retry restores the complete body-stowed sword state");
 
+    auto pairCapture = std::make_unique<GameSimulation>(config);
+    checks.Require(pairCapture->ApplyShowcaseCheckpoint(12),
+                   "production two-enemy capture import succeeds");
+    const auto& pairView = pairCapture->Snapshot();
+    checks.Require(Near(pairView.playerX, -3.00f) && Near(pairView.playerZ, -15.20f) &&
+                   Near(pairView.playerYawRadians, -1.57079632679f) &&
+                   Near(pairView.playerPitchRadians, -0.06f) &&
+                   QueryShowcaseZone(pairView.playerX, pairView.playerZ) == ShowcaseZone::SkylightChamber,
+                   "production two-enemy capture looks west into the actual waterfall guard room");
+    checks.Require(PairBehindWetline(pairView) && PairIsHealthyAndStable(pairView) &&
+                   pairView.tickIndex == 0u && pairCapture->Events().Empty() &&
+                   pairView.heldItems[1].parentMode == horde::gameplay::items::HeldItemParentMode::BodyStow,
+                   "production pair capture preserves authored guards and frozen stowed state without ticking");
+    auto historicalPairCapture = std::make_unique<GameSimulation>();
+    checks.Require(historicalPairCapture->ApplyShowcaseCheckpoint(12) &&
+                   Near(historicalPairCapture->Snapshot().playerX, 0.0f) &&
+                   Near(historicalPairCapture->Snapshot().playerZ, -3.50f),
+                   "historical first-room comparison keeps its exact two-enemy camera");
+
     TestRetreatDuringAutomaticDraw(config, checks);
     TestPartialDrawResetAndRetry(config, checks);
     TestManualDrawCueOverlap(config, checks);

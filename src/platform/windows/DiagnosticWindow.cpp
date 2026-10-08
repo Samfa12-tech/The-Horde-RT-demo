@@ -5986,6 +5986,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     std::vector<ShowcaseCaptureRecord> captures;
     std::vector<const horde::gameplay::ShowcaseCheckpoint*> checkpoints;
     horde::gameplay::ShowcaseCheckpoint developmentShowcase{};
+    auto ordinaryShowcase = horde::gameplay::kShowcaseCheckpoints;
     if (!context.developmentCheckpoint.empty())
     {
         const auto* development =
@@ -6011,8 +6012,14 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     }
     else
     {
-        for (const auto& checkpoint : horde::gameplay::kShowcaseCheckpoints)
+        // This branch uses the normal production route; historical player
+        // comparisons own the explicit development-checkpoint branch above.
+        for (auto& checkpoint : ordinaryShowcase)
+        {
+            checkpoint = horde::gameplay::ShowcaseCheckpointForEncounter(checkpoint,
+                horde::gameplay::simulation::ProductionGameSimulationConfig().waterfallSkeletonEncounter);
             checkpoints.push_back(&checkpoint);
+        }
     }
     captures.reserve(checkpoints.size());
     auto fail = [&](const std::string& diagnostic) {
