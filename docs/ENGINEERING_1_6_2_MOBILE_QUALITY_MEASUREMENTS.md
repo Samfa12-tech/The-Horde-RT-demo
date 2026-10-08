@@ -14,6 +14,12 @@ override the current goal. Historical sustained fixed-75% performance and the
 earlier near-60 recollection remain unmet or unproven; they are preserved
 separately from the current target.
 
+## Integrated comparison artifact prepared after recovery
+
+Source `ebffb4f0412f76b46ee1beb735475a145207e58a`, tree `2aec05aff62a3f582501e326407a8875b70a6506`; isolated Shipping/Mobile benchmark APK SHA-256 `d2d9d62f064119ac46bea10f8fd66336cdf65d0225a5c5c165a5dbcb950f5322`, 120,571,024 bytes. Four-ABI assembly/vital lint passes in 2 min 46 s; actual models/caches/compile commands, stripped payloads, non-debuggable package/development certificate and 16 KiB alignment are verified. All 91 runtime assets match the owner-tested ac468f51 Debug package. This subject includes normal waterfall guards, production stowed start, accepted wide equipment, Dust support/default Off and same-generation recovery. Native Debug motion/checkpoint markers remain absent; ordinary min50/default50 stays unchanged. This is build/package preparation, **not installed, not a 50/40/33 play or sustained-performance result**. The earlier 7a subject below is historical and is not used as the integrated cohort.
+
+The current Debug motion adapter admits only ordinary min50. Sending 40/33 to it would be rejected/clamped and cannot establish newly traced lower-resolution evidence. Keep the existing isolated Shipping/Mobile min33 admission rather than weakening ordinary build limits or presenting image resizing as tracing. The existing route benchmark supplies exact owning CPU/GPU distributions but does not become free play, actual compositor cadence or sustained performance; those gaps remain explicit.
+
 ## 8 October preparation and pacing-method limits
 
 An isolated four-ABI ShippingMobile benchmark package is prepared at source

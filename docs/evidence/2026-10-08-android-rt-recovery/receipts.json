@@ -158,6 +158,6 @@
     "fullLaterBackgroundCancelObserved": true,
     "ownedAppStopped": true
   },
-  "sourceCi": "ac468f51: 10/12 passed, both MSVC in progress; push37747195457 / PR37747203704. c57c34b4:12/12 passed.",
+  "sourceCi": "ac468f51:12/12 passed after one unchanged Windows report-dialog retry (original WM_SETTEXT1460 timeout retained); push37747195457 attempt2 / PR37747203704. ebffb4f0 docs:12/12 push37748383532 / PR37748390224. c57c34b4:12/12 passed.",
   "retainedWindowsExeSha256": "a87067220a1ab80ff1cb421f321ade19c4d4ac5f79c7b856a60f054ebb2ae5c2"
 }
