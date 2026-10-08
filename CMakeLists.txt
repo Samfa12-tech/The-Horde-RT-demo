@@ -612,6 +612,8 @@ if(BUILD_TESTING)
         HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
     )
     add_test(NAME horde_rt_held_item_socket_tests COMMAND horde_rt_held_item_socket_tests)
+    add_test(NAME horde_rt_skeleton_render_pose_contracts
+        COMMAND horde_rt_held_item_socket_tests --skeleton-render-pose-contracts)
 
     add_executable(horde_rt_development_static_asset_tests tests/DevelopmentStaticAssetTests.cpp)
     target_include_directories(horde_rt_development_static_asset_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
