@@ -1816,11 +1816,9 @@ int main()
           "live ResetRoute must restore the pair and override checkpoint pose with configured yaw and pitch");
 
     auto waterfallConfig = ProductionGameSimulationConfig();
-    waterfallConfig.swordStartsStowed = true;
-    waterfallConfig.waterfallSkeletonEncounter = true;
     auto waterfallEncounter = std::make_unique<GameSimulation>(waterfallConfig);
     const auto& stagedPair = waterfallEncounter->Snapshot().skeletonEnemies;
-    check(ProductionGameSimulationConfig().swordStartsStowed == false &&
+    check(ProductionGameSimulationConfig().swordStartsStowed == true &&
           ProductionGameSimulationConfig().waterfallSkeletonEncounter == true &&
           waterfallEncounter->Snapshot().skeletonEnemyCount == 2u &&
           waterfallEncounter->Snapshot().activeSkeletonCount == 2u &&
@@ -1840,7 +1838,7 @@ int main()
           NearlyEqual(waterfallEncounter->Snapshot().heldItems[1].visualStowBlend, 1.0f) &&
           NearlyEqual(waterfallEncounter->Snapshot().heldItemKinematics.swordStowBlend,
                       waterfallEncounter->Snapshot().heldItems[1].visualStowBlend),
-          "production Waterfall encounter stages the accepted two stable skeleton IDs west of the wetline independently of opt-in BodyStow");
+          "production Waterfall encounter stages the accepted two stable skeleton IDs west of the wetline with normal BodyStow");
 
     auto waterfallReset = std::make_unique<GameSimulation>(waterfallConfig);
     waterfallReset->ResetRoute();
@@ -2155,6 +2153,7 @@ int main()
     GameSimulation legacyMount;
     GameSimulationConfig anatomicalMountConfig{};
     anatomicalMountConfig.playerMountProfile = items::PlayerMountProfile::AnatomicalBody;
+    anatomicalMountConfig.swordStartsStowed = true;
     GameSimulation anatomicalMount(anatomicalMountConfig);
     GameSimulation productionMount(ProductionGameSimulationConfig());
     check(productionMount.Snapshot().playerMountProfile == items::PlayerMountProfile::AnatomicalBody &&
@@ -2260,8 +2259,9 @@ int main()
         check(!StageDevelopmentCheckpointSimulation(*boundedPreview, excessive) &&
               boundedPreview->Snapshot().tickIndex == 0u &&
               ProductionGameSimulationConfig().waterfallSkeletonEncounter &&
-              !ProductionGameSimulationConfig().swordStartsStowed,
-              "guard capture rejects unbounded staging and retains production defaults");
+              ProductionGameSimulationConfig().swordStartsStowed &&
+              !GameSimulationConfig{}.swordStartsStowed,
+              "guard capture rejects unbounded staging and preserves normal versus historical equipment defaults");
     }
     for (const auto profile : {items::PlayerMountProfile::LegacyViewRelative,
                                items::PlayerMountProfile::AnatomicalBody})

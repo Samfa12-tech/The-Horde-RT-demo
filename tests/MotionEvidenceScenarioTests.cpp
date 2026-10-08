@@ -678,8 +678,8 @@ void TestWaterfallEquipmentSeedOwnership(int rate)
               kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z),
           "shared route LOS predicate distinguishes a blocked approach ray from the open waterfall corridor");
     const auto productionConfig = ProductionGameSimulationConfig();
-    Check(!productionConfig.swordStartsStowed && productionConfig.waterfallSkeletonEncounter,
-          "production enables only accepted waterfall guards; sword stow remains independently gated");
+    Check(productionConfig.swordStartsStowed && productionConfig.waterfallSkeletonEncounter,
+          "production starts stowed and retains the accepted waterfall guards");
     GameSimulation normalReference(productionConfig);
     normalReference.ResetRoute();
     const auto normalSnapshot = normalReference.Snapshot();
@@ -773,7 +773,7 @@ void TestWaterfallEquipmentSeedOwnership(int rate)
     scenario.End(simulation);
     scenario.End(simulation);
     Check(!scenario.OwnsEquipmentSeed() && matchesNormalEncounter() &&
-          simulation.Snapshot().heldItems[1].parentMode == items::HeldItemParentMode::HandSocket &&
+          simulation.Snapshot().heldItems[1].parentMode == items::HeldItemParentMode::BodyStow &&
           simulation.Snapshot().tickIndex == beforeEnd.tickIndex &&
           simulation.Snapshot().lastConsumedAttackSequence >= beforeEnd.lastConsumedAttackSequence &&
           simulation.Snapshot().lastConsumedParrySequence >= beforeEnd.lastConsumedParrySequence &&
@@ -786,7 +786,7 @@ void TestWaterfallEquipmentSeedOwnership(int rate)
           "released owner permits a later bounded equipment run");
     afterRelease.End(simulation);
     Check(matchesNormalEncounter() && simulation.Snapshot().heldItems[1].parentMode ==
-          items::HeldItemParentMode::HandSocket,
+          items::HeldItemParentMode::BodyStow,
           "failure-free early release also restores the ordinary production equipment and encounter state");
 
     MotionEvidenceScenario failedOwner;
@@ -796,7 +796,7 @@ void TestWaterfallEquipmentSeedOwnership(int rate)
     failedOwner.End(simulation);
     Check(failedOwner.Failed() && !failedOwner.OwnsEquipmentSeed() &&
           matchesNormalEncounter() &&
-          simulation.Snapshot().heldItems[1].parentMode == items::HeldItemParentMode::HandSocket,
+          simulation.Snapshot().heldItems[1].parentMode == items::HeldItemParentMode::BodyStow,
           "failure after seed still restores production route flags and equipment before a later Play");
 }
 }

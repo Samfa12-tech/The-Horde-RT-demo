@@ -49,20 +49,21 @@ struct GameSimulationConfig
     float movementSpeedMetresPerSecond = 1.9f;
     horde::gameplay::items::PlayerMountProfile playerMountProfile =
         horde::gameplay::items::PlayerMountProfile::LegacyViewRelative;
-    // Historical fixtures remain ready-handed. Opt-in until the renderer
-    // consumes the shared BodyStow transition state in production.
+    // Historical fixtures remain ready-handed. Applications opt into the
+    // shared BodyStow transition and repaired anatomical hand pose below.
     bool swordStartsStowed = false;
     bool waterfallSkeletonEncounter = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
-// legacy fixtures. Applications select the accepted profile and waterfall guards;
-// sword stow remains a separate presentation gate.
+// legacy fixtures. Applications select the accepted profile, waterfall guards,
+// and shared stowed-start/draw-on-encounter behavior.
 inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
 {
     GameSimulationConfig config;
     config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
     config.waterfallSkeletonEncounter = true;
+    config.swordStartsStowed = true;
     return config;
 }
 
