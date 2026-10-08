@@ -53,7 +53,7 @@ final class GraphicsPreferences {
     }
     static Values baseline() { return new Values(75, 1, 0, 30); }
     // Historical accepted appearance remains separate from the mobile startup/reset policy.
-    static Values mobileDefaults() { return new Values(50, 1, FIRE_MOBILE, 30, false, SHADOW_CURRENT, true); }
+    static Values mobileDefaults() { return new Values(50, 1, FIRE_MOBILE, 30, false, SHADOW_CURRENT, true, 1); }
     static boolean hasGraphicsSettings(SharedPreferences prefs) {
         for (String key : prefs.getAll().keySet()) {
             if (key.equals("render_scale") || key.equals("water_quality") || key.equals(FIRE) ||

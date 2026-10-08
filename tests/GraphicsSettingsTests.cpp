@@ -308,14 +308,14 @@ void TestPlatformDefaultsAndMist()
 {
     const auto mobile = PlatformDefaultGraphicsSettings(GraphicsPlatform::Android);
     const auto desktop = PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows);
-    Check(mobile == GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false, ShadowQuality::Current, true},
-          "fresh mobile platform defaults are explicit50/Mobile/Mobile/30/Off/Current/On");
-    Check(desktop == GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true, ShadowQuality::Current, true},
-          "fresh desktop platform defaults preserve High appearance with MistOn");
+    Check(mobile == GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false, ShadowQuality::Current, true, DustQuality::Low},
+          "fresh mobile defaults keep50/Mobile/Mobile/30/GlassOff/Current/MistOn with owner-approved DustLow");
+    Check(desktop == GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true, ShadowQuality::Current, true, DustQuality::Low},
+          "fresh desktop defaults preserve High appearance and MistOn with owner-approved DustLow");
     Check(MatchGraphicsPreset(mobile, GraphicsPlatform::Android) == GraphicsPreset::PlatformDefault &&
           GraphicsPresetName(GraphicsPreset::PlatformDefault) == "Platform defaults" &&
-          MatchGraphicsPreset(desktop, GraphicsPlatform::Windows) == GraphicsPreset::AcceptedBaseline,
-          "mobile defaults have a truthful preset label; identical desktop historical baseline retains its accepted label");
+          MatchGraphicsPreset(desktop, GraphicsPlatform::Windows) == GraphicsPreset::PlatformDefault,
+          "both Low-dust platform defaults have a truthful label distinct from the historical Off-dust baseline");
     Check(BaselineGraphicsSettings(GraphicsPlatform::Android) == GraphicsSettings{} &&
           BaselineGraphicsSettings(GraphicsPlatform::Android).renderScalePercent == 75 &&
           BaselineGraphicsSettings(GraphicsPlatform::Android).glassEnabled,
@@ -331,9 +331,10 @@ void TestPlatformDefaultsAndMist()
               migrated.retainedRequested && migrated.retainedRequested->mistEnabled,
               "schemas1/2/3 preserve historical tuple and pending intent while migrating only MistOn");
     }
-    auto off = mobile; off.mistEnabled = false;
+    auto off = mobile; off.mistEnabled = false; off.dustQuality = DustQuality::Off;
+    auto legacyMobile = mobile; legacyMobile.dustQuality = DustQuality::Off;
     const auto migrated = RecoverGraphicsSettings({4u, off, mobile}, GraphicsPlatform::Android);
-    Check(migrated.startup == off && migrated.retainedRequested == mobile,
+    Check(migrated.startup == off && migrated.retainedRequested == legacyMobile,
           "schema4 preserves independently saved Off and interrupted On candidate while migrating DustOff");
     GraphicsEditSession edit(off);
     Check(edit.ResetDraft(GraphicsPlatform::Android) && edit.Draft() == mobile && edit.Committed() == off &&
@@ -365,9 +366,24 @@ void TestDustMigrationAndAcknowledgement()
 {
     using namespace horde::graphics;
     Check(GraphicsSettings{}.dustQuality == DustQuality::Off &&
-          PlatformDefaultGraphicsSettings(GraphicsPlatform::Android).dustQuality == DustQuality::Off &&
-          PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows).dustQuality == DustQuality::Off,
-          "dust defaults Off without changing platform graphics defaults");
+          PlatformDefaultGraphicsSettings(GraphicsPlatform::Android).dustQuality == DustQuality::Low &&
+          PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows).dustQuality == DustQuality::Low,
+          "fresh/reset defaults use Low while historical/migration structs keep Off");
+    for (const auto platform : {GraphicsPlatform::Android, GraphicsPlatform::Windows})
+    {
+        for (const auto dust : {DustQuality::Off, DustQuality::Low, DustQuality::Standard})
+        {
+            auto saved = BaselineGraphicsSettings(platform);
+            saved.renderScalePercent = 33; saved.dustQuality = dust; saved.mistEnabled = false;
+            const auto reset = PlatformDefaultGraphicsSettings(platform);
+            const auto recovered = RecoverGraphicsSettings({kGraphicsSettingsSchema, saved, reset}, platform);
+            Check(recovered.startup == saved && recovered.retainedRequested == reset,
+                  "saved Off/custom settings remain authoritative over an interrupted Low reset");
+            GraphicsEditSession session(saved);
+            Check(session.Stage(reset) && session.Committed() == saved,
+                  "Reset only stages Low; saved choices require an exact acknowledgement and Keep");
+        }
+    }
     auto oldTuple = BaselineGraphicsSettings(GraphicsPlatform::Windows);
     oldTuple.dustQuality = DustQuality::Standard; // Stale future field must not leak through old records.
     for (const auto schema : {1u, 2u, 3u, 4u})

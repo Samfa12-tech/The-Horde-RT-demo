@@ -242,7 +242,7 @@ public final class GraphicsPreferencesTest {
     }
     @Test public void noGraphicsKeysUseMobileDefaultsWithoutWritingOrChangingUnrelatedSettings() {
         GraphicsPreferences.Values mobile = GraphicsPreferences.mobileDefaults();
-        assertTrue(mobile.same(new GraphicsPreferences.Values(50,1,0,30,false,1,true)));
+        assertTrue(mobile.same(new GraphicsPreferences.Values(50,1,0,30,false,1,true,1)));
         assertTrue(GraphicsPreferences.baseline().same(new GraphicsPreferences.Values(75,1,0,30,true,1,true)));
         assertFalse(GraphicsPreferences.hasGraphicsSettings(prefs));
         assertTrue(GraphicsPreferences.confirmed(prefs).same(mobile));
@@ -285,6 +285,27 @@ public final class GraphicsPreferencesTest {
             assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.baseline()));
         }
     }
+    @Test public void freshDustLowDoesNotOverwriteSavedOffOrCustomDust() {
+        assertEquals(1, GraphicsPreferences.mobileDefaults().dust);
+        assertEquals(1, GraphicsPreferences.confirmed(prefs).dust);
+        assertTrue(GraphicsPreferences.clearAfterRestore(prefs)); // Back without Use.
+        assertEquals(1, GraphicsPreferences.confirmed(prefs).dust);
+        assertFalse(prefs.contains(GraphicsPreferences.DUST));
+        for (int dust : new int[]{0,1,2}) {
+            prefs.edit().clear().putInt("music_volume",43).commit();
+            GraphicsPreferences.Values saved = new GraphicsPreferences.Values(33,2,2,42,true,2,false,dust);
+            assertTrue(GraphicsPreferences.confirm(prefs,saved));
+            java.util.Map<String,?> before = prefs.getAll();
+            assertTrue(GraphicsPreferences.confirmed(prefs).same(saved));
+            assertEquals(before,prefs.getAll()); // Reading after upgrade never rewrites choices.
+            assertTrue(GraphicsPreferences.markPending(prefs,GraphicsPreferences.mobileDefaults()));
+            assertTrue(GraphicsPreferences.confirmed(prefs).same(saved));
+            assertTrue(GraphicsPreferences.clearAfterRestore(prefs));
+            assertTrue(GraphicsPreferences.confirmed(prefs).same(saved));
+            assertEquals(43,prefs.getInt("music_volume",0));
+        }
+    }
+
     @Test public void schemaOneThroughFourIgnoreStaleDustAndPreserveMistSemantics() {
         for (int schema : new int[]{1,2,3,4}) {
             prefs.edit().clear().putInt("graphics_schema",schema).putInt("render_scale",68)

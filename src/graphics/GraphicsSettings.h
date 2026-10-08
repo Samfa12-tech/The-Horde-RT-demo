@@ -114,9 +114,9 @@ inline GraphicsSettings PlatformDefaultGraphicsSettings(const GraphicsPlatform p
 {
     return platform == GraphicsPlatform::Android ?
         GraphicsSettings{50, WaterQuality::Mobile, FireDetail::Mobile, 30, false,
-            ShadowQuality::Current, true} :
+            ShadowQuality::Current, true, DustQuality::Low} :
         GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true,
-            ShadowQuality::Current, true};
+            ShadowQuality::Current, true, DustQuality::Low};
 }
 
 inline GraphicsSettings ReducedEffectsGraphicsSettings(const GraphicsPlatform platform) noexcept
