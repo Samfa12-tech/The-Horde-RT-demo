@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "runtimeSource": "2a408613668a4936dd1592d79cd141e1d6baf5dc",
+  "runtimeTree": "67aa266f61c0714ba0c541105f0d5b34e2c4f5c4",
+  "device": {
+    "model": "SM-S948B",
+    "android": "16",
+    "gpu": "Adreno (TM) 840",
+    "vulkanApi": "1.4.295"
+  },
+  "classification": "Exact isolated Shipping/Mobile collector and short measured-span proof; not sustained quality acceptance",
+  "benchmarkApk": {
+    "sha256": "faf35f482b78150b7157335b56c3a0e5c499ec1d2205b9dc6a82bd90ce82992f",
+    "bytes": 121100966,
+    "installedPullbackMatch": true
+  },
+  "ordinaryDebugApk": {
+    "sha256": "0054978cf6280aa464a6dcfd087c9078e0cfca73f6e6c9fe100260e71e6b7fab",
+    "bytes": 138462962,
+    "installed": false,
+    "timingCompiledIn": false
+  },
+  "checks": {
+    "nativeCollectorFixtures": true,
+    "presentCompletionCompanion": true,
+    "actualCmakeAndGradleAdmission": true,
+    "fourAbiBenchmarkAndDebugBuilds": true,
+    "lint": true,
+    "javaResults": {
+      "tests": 241,
+      "classes": 38,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "execution": "Retained passing results; unchanged Java test task up-to-date"
+    },
+    "analysisTests": 9,
+    "unchangedAssetsPerApk": 94,
+    "native16KiBAlignment": true,
+    "benchmarkZipalignP16": true
+  },
+  "runtimeCi": {
+    "success": 12,
+    "total": 12,
+    "pushRun": 37770881181,
+    "pullRequestRun": 37770889693,
+    "laterToolAndDocumentationCi": "Separate head, refresh after push"
+  },
+  "collector": {
+    "allocatedStorageBytes": 3932160,
+    "ordinaryEnabled": false,
+    "desiredPresentTime": 0,
+    "scanoutOrPhotonEvidence": false,
+    "presentMarginExcluded": true
+  },
+  "runs": {
+    "lantern01": {
+      "runId": "present-timing-2a408613-lantern01",
+      "rawReportSha256": "be357fe1ec46ba6150e7116307e49785d4dab698208025d4be30129f494102ce",
+      "analysisFile": "lantern01-analysis.json",
+      "analysisSha256": "afa89342c0f56d120a28d2ce10288304e68d503d7a9e54132e4f66e902ac1b81",
+      "complete": true,
+      "traversalComplete": false,
+      "actualTracedScalePercent": 75,
+      "finalLapFramesMatched": 600,
+      "allPresentationRows": 1201,
+      "pending": 0
+    },
+    "route03": {
+      "runId": "present-timing-2a408613-route03",
+      "rawReportSha256": "a385813c632aa82d5b71c9236949e4fc1b092e0780857862bbaee67524d4fcc9",
+      "analysisFile": "route03-analysis.json",
+      "analysisSha256": "04fe52e74c8f3742ea25a66bf22493fa2c8da96ef1fa8f3a16c6422a041523ea",
+      "complete": true,
+      "traversalComplete": true,
+      "actualTracedScalePercent": 75,
+      "finalLapFramesMatched": 1838,
+      "allPresentationRows": 3677,
+      "pending": 0
+    }
+  },
+  "checkpoint": {
+    "primaryDebugChangedEntries": 0,
+    "ownedGameAppsActive": false
+  },
+  "remaining": [
+    "Matched 50/40/33 integrated quality and moving comparison",
+    "Sustained ordinary play and thermal/power evidence",
+    "Owner material quality/performance decision",
+    "Other recorded moving and physical acceptance gates",
+    "Eric independent audit",
+    "Owner final release approval"
+  ],
+  "retainedFailures": [
+    {
+      "runId": "present-timing-2a408613-proof01",
+      "kind": "Private PowerShell automatic Args collision before launch; no device benchmark"
+    },
+    {
+      "runId": "present-timing-2a408613-proof02",
+      "kind": "Harness 180-second deadline before two-lap completion; no completed timing claim"
+    },
+    {
+      "runId": "present-timing-2a408613-lantern01",
+      "kind": "Native export completed; private collector first guessed wrong remote names, then exact reports retrieved without rerun"
+    }
+  ]
+}

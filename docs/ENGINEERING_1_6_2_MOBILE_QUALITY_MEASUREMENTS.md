@@ -1,5 +1,9 @@
 # 1.6.2 bounded mobile quality measurements
 
+**Current presentation-timing checkpoint — 8 October:** runtime `2a408613668a4936dd1592d79cd141e1d6baf5dc`, isolated Shipping/Mobile benchmark APK `faf35f482b78150b7157335b56c3a0e5c499ec1d2205b9dc6a82bd90ce82992f`. Optional actual image timestamps join all 600 lantern and 1,838 complete-route measured frames on SM-S948B / Android 16 at the benchmark’s preserved 75% profile. Collector/retirement fixtures, admission/build/package checks and 12/12 runtime CI jobs pass; nine offline analysis tests pass. Ordinary builds remain Off, assets/defaults/custom saves are preserved, and owned apps are stopped. This establishes measurement, not 50/40/33 or sustained-30-FPS acceptance. [Exact subject, intervals, retained failures and remaining gates](ENGINEERING_1_6_2_PRESENT_TIMING_2026_10_08.md).
+
+The new 75% collector proof remains separate from the historical baseline. Its complete course has a matched 142.608337028-second measured span; observed image rate is 12.881435/s, with 70.833437 ms median and 141.666719 ms p95 intervals. Those actual-display intervals do not replace existing CPU/GPU definitions or establish any 50/40/33 result. Power remains unavailable and sampled thermal rise is not a plateau.
+
 Current authority, 8 October: fresh/reset Android defaults are **50%, Mobile
 water/fire, Glass Off, Current shadows, cap30 and Mist On**. Desktop stays
 100%/High water+fire/Glass On/Current/cap30/Mist On. Saved/custom preferences

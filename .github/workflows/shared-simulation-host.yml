@@ -336,3 +336,6 @@ jobs:
           --output-on-failure
           --no-tests=error
           -R "^(horde_rt_present_completion_tests|horde_rt_present_timing_evidence_tests|horde_rt_player_primitive_contract_tests|horde_rt_player_manifest_agreement_tests|horde_rt_player_animation_tests|horde_rt_final_held_torch_clearance_tests|horde_rt_windows_output_resize_launch_tests|horde_rt_held_item_socket_tests|horde_rt_scene_abi_tests|horde_rt_static_gltf_asset_tests|horde_rt_static_collapse_asset_tests|horde_rt_skinned_character_smoke|horde_rt_skinned_arm_reference_tests|horde_rt_player_skinned_semantic_fixtures|horde_rt_player_viewmodel_admission|horde_rt_player_viewmodel_pose_fixtures|horde_rt_scene_initialise_preflight_tests|horde_rt_scene_resource_inventory_tests|horde_rt_gpu_resources_observation_tests|horde_rt_staged_primary_resource_tests|horde_rt_staged_primary_timing_tests|horde_rt_driver_capability_report_tests)$"
+
+      - name: Check strict Android image-presentation analysis
+        run: python -m unittest discover -s tests -p test_android_present_timing_analysis.py -v
