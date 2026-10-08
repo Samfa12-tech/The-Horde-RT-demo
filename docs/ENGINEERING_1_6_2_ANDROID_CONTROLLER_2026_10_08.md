@@ -88,7 +88,8 @@ successfully, giving 12/12 current aggregate jobs; the original failed JSON/log
 remain preserved. Test-only 22920c19 separately passes 12/12 in push 37714363918 /
 PR 37714368236. Documentation a65c03da first attempt passes 11/12 in push
 37714583032 / PR 37714590338: the PR Windows job hits the same Unicode-note
-timeout. Its original failure is preserved and one failed-job retry is pending.
+timeout. Its original failure is preserved; its single failed-job retry completes
+successfully, giving 12/12 current aggregate jobs.
 No code or deadline is changed, and successful retries do not establish the
 cause of these intermittent native UI failures. Results are not assigned to
 other source or package identities. Build correctness, physical acceptance and
@@ -273,3 +274,19 @@ closed experiments remain intact. Dust stays optional/default Off; shafts deferr
 Recommendation: **keep this checked implementation for physical acceptance**,
 retain the wider poses for moving review, and defer support certification and
 production flags until their exact gates close. No merge, signing, tag or release.
+
+## Owner return and connection logistics, 8 October
+
+The owner returned and the intended SM-S948B phone was verified online on
+Android 16. No Android gamepad/joystick was present in the inspected input
+roster. The owner reports that the Backbone occupies the phone USB-C port and
+is currently attached to the computer. Windows enumerates a generic
+HID-compliant game controller, which does not identify a Backbone model or
+prove Android support. Install/pullback verification over USB can precede an
+owner-controlled cable swap to the Backbone, with owned app logs collected
+after USB reconnection. Physical phone/controller acceptance remains pending.
+No wireless-debugging, driver, credential or security configuration is changed.
+
+Test-only 45363ac3 push 37716606080 and PR 37716611026 completed successfully:
+12/12 aggregate jobs. These CI results belong to that source, separately from
+the later node-pose query source and its package.

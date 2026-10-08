@@ -1249,11 +1249,12 @@ bool SkinnedMeshAsset::HasNode(const std::string_view name) const
     });
 }
 
-bool SkinnedMeshAsset::NodeTransform(const SkinnedClip clipId,
-                                     float timeSeconds,
-                                     const std::string_view nodeName,
-                                     SkinnedNodeTransform& output,
-                                     std::string& diagnostic) const
+bool SkinnedMeshAsset::NodeTransforms(
+    const SkinnedClip clipId,
+    const float timeSeconds,
+    const std::span<const std::string_view> nodeNames,
+    const std::span<SkinnedNodeTransform> outputs,
+    std::string& diagnostic) const
 {
     if (!loaded_)
     {
@@ -1267,15 +1268,41 @@ bool SkinnedMeshAsset::NodeTransform(const SkinnedClip clipId,
         diagnostic = "Requested skinned clip is not mapped.";
         return false;
     }
-    const auto nodeIt = std::find_if(nodes_.begin(), nodes_.end(), [nodeName](const Node& node) {
-        return node.name == nodeName;
-    });
-    if (nodeIt == nodes_.end())
+    if (nodeNames.size() != outputs.size())
     {
-        diagnostic = "Skinned asset is missing node: " + std::string(nodeName);
+        diagnostic = "Node transform batch size does not match requested names.";
         return false;
     }
-    const std::size_t requestedNode = static_cast<std::size_t>(nodeIt - nodes_.begin());
+    if (nodeNames.size() > kMaximumNodeTransformBatchSize)
+    {
+        diagnostic = "Node transform batch exceeds the 32-node limit.";
+        return false;
+    }
+    if (!std::isfinite(timeSeconds))
+    {
+        diagnostic = "Requested skinned transform time is not finite.";
+        return false;
+    }
+    if (nodeNames.empty())
+    {
+        diagnostic.clear();
+        return true;
+    }
+
+    std::array<std::size_t, kMaximumNodeTransformBatchSize> requestedNodes{};
+    for (std::size_t requestIndex = 0u; requestIndex < nodeNames.size(); ++requestIndex)
+    {
+        const std::string_view nodeName = nodeNames[requestIndex];
+        const auto nodeIt = std::find_if(nodes_.begin(), nodes_.end(),
+            [nodeName](const Node& node) { return node.name == nodeName; });
+        if (nodeIt == nodes_.end())
+        {
+            diagnostic = "Skinned asset is missing node: " + std::string(nodeName);
+            return false;
+        }
+        requestedNodes[requestIndex] = static_cast<std::size_t>(nodeIt - nodes_.begin());
+    }
+
     const Clip& clip = clips_[clipIndex];
     std::vector<Node> pose = nodes_;
     const float time = clip.loops
@@ -1311,6 +1338,7 @@ bool SkinnedMeshAsset::NodeTransform(const SkinnedClip clipId,
             else pose[channel.node].scale = value;
         }
     }
+
     std::vector<Matrix> globals(pose.size());
     std::vector<bool> computed(pose.size(), false);
     const auto resolveGlobal = [&pose, &globals, &computed](auto&& self, const std::size_t node) -> Matrix {
@@ -1322,11 +1350,35 @@ bool SkinnedMeshAsset::NodeTransform(const SkinnedClip clipId,
         computed[node] = true;
         return globals[node];
     };
-    output = resolveGlobal(resolveGlobal, requestedNode).m;
+
+    std::array<SkinnedNodeTransform, kMaximumNodeTransformBatchSize> evaluated{};
+    for (std::size_t requestIndex = 0u; requestIndex < nodeNames.size(); ++requestIndex)
+    {
+        evaluated[requestIndex] = resolveGlobal(resolveGlobal, requestedNodes[requestIndex]).m;
+    }
+    for (std::size_t requestIndex = 0u; requestIndex < nodeNames.size(); ++requestIndex)
+    {
+        outputs[requestIndex] = evaluated[requestIndex];
+    }
     diagnostic.clear();
     return true;
 }
 
+bool SkinnedMeshAsset::NodeTransform(const SkinnedClip clipId,
+                                     const float timeSeconds,
+                                     const std::string_view nodeName,
+                                     SkinnedNodeTransform& output,
+                                     std::string& diagnostic) const
+{
+    const std::array<std::string_view, 1u> names{{nodeName}};
+    std::array<SkinnedNodeTransform, 1u> transforms{};
+    if (!NodeTransforms(clipId, timeSeconds, names, transforms, diagnostic))
+    {
+        return false;
+    }
+    output = transforms[0];
+    return true;
+}
 bool SkinnedMeshAsset::Skin(SkinnedClip clipId, float timeSeconds, std::vector<SkinnedRtVertex>& output, std::string& diagnostic) const
 {
     if (!loaded_) { diagnostic = "Skeleton model was not loaded."; return false; }

@@ -588,19 +588,16 @@ float PlayerRenderSlot::BootGroundingOffsetMetres(
 bool PlayerRenderSlot::DeriveAssetGripSockets(std::string& diagnostic)
 {
     using namespace horde::gameplay::items;
-    horde::scene::SkinnedNodeTransform namedLeftHand{};
-    horde::scene::SkinnedNodeTransform namedLeftGrip{};
-    horde::scene::SkinnedNodeTransform namedRightHand{};
-    horde::scene::SkinnedNodeTransform namedRightGrip{};
-    if (!asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
-                              "LeftHand", namedLeftHand, diagnostic) ||
-        !asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
-                              "LeftGrip", namedLeftGrip, diagnostic) ||
-        !asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
-                              "RightHand", namedRightHand, diagnostic) ||
-        !asset_.NodeTransform(horde::scene::SkinnedClip::Idle, 0.0f,
-                              "RightGrip", namedRightGrip, diagnostic))
+    constexpr std::array<std::string_view, 4u> names{{
+        "LeftHand", "LeftGrip", "RightHand", "RightGrip"}};
+    std::array<horde::scene::SkinnedNodeTransform, 4u> pose{};
+    if (!asset_.NodeTransforms(horde::scene::SkinnedClip::Idle, 0.0f,
+                               names, pose, diagnostic))
         return false;
+    const auto& namedLeftHand = pose[0];
+    const auto& namedLeftGrip = pose[1];
+    const auto& namedRightHand = pose[2];
+    const auto& namedRightGrip = pose[3];
 
     // Preserve anatomical identity end to end. The renderer's proper
     // model-to-world rotation maps model +X (anatomical Left) to gameplay
@@ -876,13 +873,13 @@ bool PlayerRenderSlot::ShoulderCenter(
         animation.locomotionClip == horde::gameplay::animation::PlayerLocomotionClip::Walk
         ? horde::scene::SkinnedClip::Walking
         : horde::scene::SkinnedClip::Idle;
-    horde::scene::SkinnedNodeTransform left{};
-    horde::scene::SkinnedNodeTransform right{};
-    if (!asset_.NodeTransform(clip, animation.locomotionTime, "LeftArm", left,
-                              diagnostic) ||
-        !asset_.NodeTransform(clip, animation.locomotionTime, "RightArm", right,
-                              diagnostic))
+    constexpr std::array<std::string_view, 2u> names{{"LeftArm", "RightArm"}};
+    std::array<horde::scene::SkinnedNodeTransform, 2u> pose{};
+    if (!asset_.NodeTransforms(clip, animation.locomotionTime, names, pose,
+                               diagnostic))
         return false;
+    const auto& left = pose[0];
+    const auto& right = pose[1];
     center = {{(left[12] + right[12]) * 0.5f,
                (left[13] + right[13]) * 0.5f,
                (left[14] + right[14]) * 0.5f}};

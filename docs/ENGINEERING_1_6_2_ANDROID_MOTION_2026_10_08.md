@@ -857,3 +857,42 @@ Source CI passes all 12 aggregate jobs in [push 37704972028](https://github.com/
 motion, production activation/full route and final body/secondary-view inspection
 remain pending. The source fix is ready for review; it is not owner acceptance
 or Eric's independent audit.
+
+## Bounded node-pose query follow-up, 8 October
+
+`SkinnedMeshAsset::NodeTransforms` samples one clip/time once for up to 32 named
+nodes, preserving ordered results and rejecting invalid requests before
+publishing any outputs. The existing single-node API delegates to it. The
+production player renderer uses the batch for its four Grip/hand sockets and
+two shoulder nodes. Valid sampling, clip loops/clamping and Grip/IK math remain
+unchanged. Scratch pose/global storage is allocated once per batch; this is
+not an allocation-free API or a measured phone performance improvement.
+
+Before editing, the single-node sampler at `45363ac3` produced 20 fixture rows
+(four imported skeleton clips, five times and eight nodes), combined FNV
+`86a9326145b8fcae`. Its post-change single-node delegate produces byte-identical
+rows: both log SHA-256 values are
+`2459f0ebe6e23d59a7bf0122266bfafeb79a8cddad721eccf620ab1f7c125a526`.
+This exact comparison is the single-node path. The registered portable batch
+test separately compares direct batches with single-node results and checks
+six frozen original numeric samples, loop/clamp boundaries, duplicates, the
+32-node limit, bad sizes/names/clip/time and unchanged outputs on rejection.
+The imported skeleton remains SHA-256
+`340a8a354bd57a8167da84fc26ccdfe03c5ef536195e260cd27c24e0059de6db`.
+
+Current Windows Debug build and seven affected CTests pass: node batch, player
+animation, Grip/socket, sword-authority agreement, arm reference, actual
+skinned-character smoke and shared skeleton-pose contracts. The six-test group
+takes 65.51 s; the separate shared-pose test takes 0.02 s. Private logs are
+`node-pose-batch-affected-windows-build-20261008.log`,
+`node-pose-batch-affected-ctest-20261008.log` and
+`node-pose-batch-shared-contracts-20261008.log`. An initial CTest listing lacked
+the configured CMake PATH; the following non-escalated listing could not write
+CTest's temporary log outside the sandbox. Neither reached a test. Corrected
+configured/escalated runs above are the actual results.
+
+This is a used import-data prerequisite for further pose-aware contact
+calibration. It adds no runtime target proxy, sweep or damage rule and closes
+no moving-target contact, sustained performance or physical acceptance gate.
+The renderer's existing 30 Hz skin-refresh cadence remains unchanged and must
+be accounted for when comparing simulation poses with last-uploaded geometry.

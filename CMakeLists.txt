@@ -573,6 +573,18 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_dielectric_math_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_dielectric_math_tests COMMAND horde_rt_dielectric_math_tests)
 
+    add_executable(horde_rt_skinned_node_pose_batch_tests
+        tests/SkinnedNodePoseBatchTests.cpp
+        src/scene/assets/SkinnedMeshAsset.cpp)
+    target_include_directories(horde_rt_skinned_node_pose_batch_tests PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_compile_features(horde_rt_skinned_node_pose_batch_tests PRIVATE cxx_std_20)
+    target_compile_definitions(horde_rt_skinned_node_pose_batch_tests PRIVATE
+        HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+    add_test(NAME horde_rt_skinned_node_pose_batch_tests
+        COMMAND horde_rt_skinned_node_pose_batch_tests)
+    set_tests_properties(horde_rt_skinned_node_pose_batch_tests PROPERTIES TIMEOUT 30)
+
     add_executable(horde_rt_player_animation_tests
         tests/PlayerAnimationTests.cpp
         src/telemetry/RtPerformanceEvidence.cpp
