@@ -282,8 +282,8 @@ if ($androidManifest -notmatch "versionCode[^\r\n]*=$VersionCode(?:\s|$)") {
 if ($androidManifest -notmatch 'screenOrientation[^\r\n]*=13(?:\s|$)') {
     throw "Android candidate must support portrait/landscape with the user's rotation preference (fullUser=13)."
 }
-if ($androidManifest -notmatch 'configChanges[^\r\n]*=(?:0x0*480|1152)(?:\s|$)') {
-    throw "Android candidate must retain the Activity/session across orientation and screen-size changes."
+if ($androidManifest -notmatch 'configChanges[^\r\n]*=(?:0x0*4f0|1264)(?:\s|$)') {
+    throw "Android candidate must retain the Activity/session across orientation, screen-size and controller keyboard/navigation changes."
 }
 
 & $zipalign -c -P 16 -v 4 $androidCandidate | Out-Null

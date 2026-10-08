@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.pm.ActivityInfo;
 import android.hardware.input.InputManager;
 import android.os.SystemClock;
 import android.view.InputDevice;
@@ -301,6 +302,69 @@ public class AndroidControllerIntegrationTest {
         config.fontScale=1.6f;
         a.getResources().updateConfiguration(config,a.getResources().getDisplayMetrics());
         entryPlaquesFollowTheirVisibleDirectionsAndStartOnPlay();
+    }
+    @Test public void manifestHandlesExternalControllerConfigurationWithoutActivityRecreation() throws Exception {
+        ActivityInfo activityInfo=a.getPackageManager().getActivityInfo(a.getComponentName(),0);
+        int inputConfigurationBits=ActivityInfo.CONFIG_KEYBOARD|ActivityInfo.CONFIG_KEYBOARD_HIDDEN|
+                ActivityInfo.CONFIG_NAVIGATION;
+        assertEquals("Controller attach/detach must be delivered to this Activity",inputConfigurationBits,
+                activityInfo.configChanges&inputConfigurationBits);
+    }
+
+    @Test public void controllerConfigurationChangeNeutralizesHeldAxesAndPreservesActiveUiTrial() throws Exception {
+        set("resumed",true);set("menuVisible",true);set("controllerMode",true);
+        set("surfaceRequestGeneration",31L);set("surfaceAvailable",true);set("surfaceStarted",true);
+        set("graphicsVisible",true);set("graphicsPreviewWanted",true);set("graphicsPreviewMotion",true);
+        set("graphicsRequestSerial",42L);set("graphicsConfirmationStarted",1234L);set("graphicsPollTime",5678L);
+        FrameLayout root=(FrameLayout)field("menuScrim").get(a);root.setVisibility(View.VISIBLE);
+        root.measure(View.MeasureSpec.makeMeasureSpec(640,View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY));root.layout(0,0,640,360);
+        Button selected=new Button(a);selected.setFocusableInTouchMode(true);
+        root.addView(selected,new FrameLayout.LayoutParams(200,80));selected.layout(0,0,200,80);
+        assertTrue(selected.requestFocus());
+        motion(0,0,0,0);motion(.7f,-.5f,.2f,.5f);
+        AndroidControllerInput policy=(AndroidControllerInput)field("controllerInput").get(a);
+        assertTrue(policy.moveStrafe()>0);assertTrue(policy.lookY()<0);
+
+        Configuration inputOnly=new Configuration(a.getResources().getConfiguration());
+        inputOnly.keyboard=Configuration.KEYBOARD_QWERTY;
+        inputOnly.keyboardHidden=Configuration.KEYBOARDHIDDEN_NO;
+        inputOnly.navigation=Configuration.NAVIGATION_DPAD;
+        set("lastAppliedConfiguration",new Configuration(a.getResources().getConfiguration()));
+        a.onConfigurationChanged(inputOnly);
+
+        assertEquals(0,policy.moveStrafe(),0);assertEquals(0,policy.moveForward(),0);
+        assertEquals(0,policy.lookX(),0);assertEquals(0,policy.lookY(),0);
+        assertTrue("Controller focus remains on the selected native control",selected.hasFocus());
+        assertEquals(31L,field("surfaceRequestGeneration").getLong(a));
+        assertTrue(field("surfaceStarted").getBoolean(a));assertTrue(field("resumed").getBoolean(a));
+        assertTrue(field("controllerMode").getBoolean(a));assertTrue(field("menuVisible").getBoolean(a));
+        assertTrue(field("graphicsVisible").getBoolean(a));assertTrue(field("graphicsPreviewWanted").getBoolean(a));
+        assertTrue(field("graphicsPreviewMotion").getBoolean(a));
+        assertEquals(42L,field("graphicsRequestSerial").getLong(a));
+        assertEquals(1234L,field("graphicsConfirmationStarted").getLong(a));
+        assertEquals(5678L,field("graphicsPollTime").getLong(a));
+        assertNull("Input-only configuration must not leave a pending viewport relayout",field("configurationLayoutListener").get(a));
+    }
+    @Test public void viewportRelayoutWaitsForChangedSizeAfterAnUnchangedLayoutPass()throws Exception {
+        FrameLayout root=(FrameLayout)field("menuScrim").get(a);
+        root.layout(0,0,640,360);
+        Configuration before=new Configuration(a.getResources().getConfiguration());
+        set("lastAppliedConfiguration",before);
+        Configuration rotated=new Configuration(before);
+        rotated.orientation=before.orientation==Configuration.ORIENTATION_PORTRAIT
+                ?Configuration.ORIENTATION_LANDSCAPE:Configuration.ORIENTATION_PORTRAIT;
+        rotated.screenWidthDp=before.screenHeightDp;
+        rotated.screenHeightDp=before.screenWidthDp;
+        a.onConfigurationChanged(rotated);
+        View.OnLayoutChangeListener listener=(View.OnLayoutChangeListener)field("configurationLayoutListener").get(a);
+        assertNotNull(listener);
+        listener.onLayoutChange(root,0,0,640,360,0,0,640,360);
+        assertSame("An early unchanged layout must not lose the pending viewport update",
+                listener,field("configurationLayoutListener").get(a));
+        listener.onLayoutChange(root,0,0,360,640,0,0,640,360);
+        assertNull("The actual changed layout completes the pending viewport update",
+                field("configurationLayoutListener").get(a));
     }
     @Test public void firstTouchRestoresControllerOwnedButtonPolicyBeforeDispatch()throws Exception {
         set("menuVisible",true);FrameLayout root=(FrameLayout)field("menuScrim").get(a);

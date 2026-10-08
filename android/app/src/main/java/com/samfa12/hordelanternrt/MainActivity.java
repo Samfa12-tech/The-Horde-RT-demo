@@ -232,6 +232,7 @@ public class MainActivity extends Activity {
     private final int[] activePointers = {-1, -1};
     private final AndroidControllerInput controllerInput = new AndroidControllerInput();
     private boolean controllerMode, controllerFrameScheduled;
+    private Configuration lastAppliedConfiguration;
     private boolean controllerWindowFocused = true;
     private long controllerFrameTime;
     private InputManager inputManager;
@@ -478,6 +479,7 @@ public class MainActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
+        lastAppliedConfiguration = new Configuration(getResources().getConfiguration());
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
         rtLabUnlocked = preferences.getBoolean(PREF_RT_LAB_UNLOCKED, false);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -5778,10 +5780,25 @@ public class MainActivity extends Activity {
         if(controllerMode)ControllerNavigation.ensureFocus(controllerUiRoot());
     }
 
+    private static boolean viewportConfigurationChanged(Configuration previous, Configuration current) {
+        return previous == null || previous.orientation != current.orientation ||
+                previous.screenWidthDp != current.screenWidthDp || previous.screenHeightDp != current.screenHeightDp;
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        final Configuration previous = lastAppliedConfiguration;
+        final boolean viewportChanged = viewportConfigurationChanged(previous, newConfig);
+        lastAppliedConfiguration = new Configuration(newConfig);
+        Log.i("HordeControllerConfig", "handled keyboard=" + newConfig.keyboard + " keyboardHidden=" +
+                newConfig.keyboardHidden + " navigation=" + newConfig.navigation + " viewportChanged=" +
+                viewportChanged + " surfaceGeneration=" + surfaceRequestGeneration + " resumed=" + resumed);
+        // Controller attach/detach can change keyboard/navigation configuration without
+        // changing the viewport. Neutralize held axes while keeping the live RT surface,
+        // menu focus, and any acknowledged graphics trial intact.
         clearTouchState();
+        if (!viewportChanged) return;
         applyInterfacePresentation();
         if (menuScrim == null) return;
         if (configurationLayoutListener != null) {
@@ -5816,7 +5833,6 @@ public class MainActivity extends Activity {
         menuScrim.addOnLayoutChangeListener(configurationLayoutListener);
         menuScrim.requestLayout();
     }
-
     @Override
     protected void onResume() {
         super.onResume();

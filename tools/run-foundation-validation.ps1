@@ -466,7 +466,7 @@ function Test-ValidationPackages {
         "versionName[^\r\n]*=`"$escapedSourceVersion`"",
         "versionCode[^\r\n]*=$($script:sourceVersionCode)(?:\s|$)",
         'screenOrientation[^\r\n]*=13(?:\s|$)',
-        'configChanges[^\r\n]*=(?:0x0*480|1152)(?:\s|$)')) {
+        'configChanges[^\r\n]*=(?:0x0*4f0|1264)(?:\s|$)')) {
         if ($manifest -notmatch $pattern) { throw "Android validation manifest failed required pattern: $pattern" }
     }
     & $zipalign -c -P 16 -v 4 $androidValidationApk | Out-Null
