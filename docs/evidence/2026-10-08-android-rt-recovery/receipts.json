@@ -1,0 +1,163 @@
+{
+  "scope": "Native presentation markers and CPU initialization, not displayed latency/FPS, exact GPU-frame capture join, owner controller or sustained performance acceptance",
+  "cachePipeline": {
+    "sourceCommit": "c57c34b4287cbd2bfa570bd6f1926f6bcef5b50b",
+    "apkSha256": "3b4eeef42f7f4c34787c1eebfd01f51dfb07a2e147e65cb6a0efadab41ff7c01",
+    "backend": "RayTracingPipeline",
+    "coldCpuWallMs": 15320.803,
+    "warmCpuWallMs": 16787.206,
+    "seedBytes": 32,
+    "cacheStoreCpuWallMs": 0.014,
+    "actualFatalOrValidationMarkers": [],
+    "retainedFailure": "Initial private harness case-insensitive SYNC regex matched Android wmsSync-VRI UI log lines; original failed receipt/log unchanged. This supplemental parser is case-sensitive for actual Vulkan signatures.",
+    "result": "Header-only driver cache; no warm-init benefit; negative Pipeline result.",
+    "scope": "Native initialization CPU time and successful presentation; not displayed latency/FPS or controller recovery."
+  },
+  "cacheCompute": {
+    "sourceCommit": "c57c34b4287cbd2bfa570bd6f1926f6bcef5b50b",
+    "apkSha256": "3b4eeef42f7f4c34787c1eebfd01f51dfb07a2e147e65cb6a0efadab41ff7c01",
+    "phone": "SM-S948B",
+    "android": "16",
+    "records": [
+      {
+        "backend": "RayQueryCompute",
+        "coldGeneration": 1,
+        "warmGeneration": 3,
+        "coldInitializationCpuWallMs": 8955.359,
+        "warmInitializationCpuWallMs": 70.148,
+        "cacheAdmitted": 1,
+        "retainedCpuBytes": 1716806,
+        "cacheStoreCpuWallMs": 1.146,
+        "warmSeedBytes": 1716806,
+        "seedCreateResult": 0,
+        "fallbackEmpty": 0,
+        "nativePresentedBoth": true
+      }
+    ],
+    "failure": null,
+    "changedPreferenceEntries": 0,
+    "ownedAppStopped": true,
+    "utc": "2026-10-08T07:35:53.6026079Z",
+    "scope": "Controlled normal-entry Home/resume native initialization and cache evidence; not BB-51, displayed latency/FPS, gameplay route or sustained performance"
+  },
+  "suspensionHomeRegression": {
+    "sourceCommit": "ac468f5136d978152a9953f490a631453a037c89",
+    "apkSha256": "3a4a7f16c606d442d825ddfb9c2720ed98f57da147940495a29f5cf03a5850b3",
+    "phone": "SM-S948B",
+    "android": "16",
+    "records": [
+      {
+        "backend": "RayTracingPipeline",
+        "coldGeneration": 1,
+        "warmGeneration": 3,
+        "coldInitializationCpuWallMs": 15051.268,
+        "warmInitializationCpuWallMs": 16708.122,
+        "cacheAdmitted": 1,
+        "retainedCpuBytes": 32,
+        "cacheStoreCpuWallMs": 0.021,
+        "warmSeedBytes": 32,
+        "seedCreateResult": 0,
+        "fallbackEmpty": 0,
+        "nativePresentedBoth": true,
+        "suspensionRequestAccepted": true,
+        "fullHomeRetired": true
+      },
+      {
+        "backend": "RayQueryCompute",
+        "coldGeneration": 1,
+        "warmGeneration": 3,
+        "coldInitializationCpuWallMs": 9065.38,
+        "warmInitializationCpuWallMs": 52.276,
+        "cacheAdmitted": 1,
+        "retainedCpuBytes": 1716795,
+        "cacheStoreCpuWallMs": 3.063,
+        "warmSeedBytes": 1716795,
+        "seedCreateResult": 0,
+        "fallbackEmpty": 0,
+        "nativePresentedBoth": true,
+        "suspensionRequestAccepted": true,
+        "fullHomeRetired": true
+      }
+    ],
+    "failure": null,
+    "changedPreferenceEntries": 0,
+    "ownedAppStopped": true,
+    "utc": "2026-10-08T08:05:29.1485419Z",
+    "scope": "Affected Home/full-retirement/resume regression after valid-surface suspension change, both backends; not a repeated cache optimization experiment or BB-51/displayed latency/FPS/sustained pass"
+  },
+  "ownerBriefReconnect": {
+    "sourceCommit": "ac468f5136d978152a9953f490a631453a037c89",
+    "apkSha256": "3a4a7f16c606d442d825ddfb9c2720ed98f57da147940495a29f5cf03a5850b3",
+    "phone": "SM-S948B",
+    "android": "16",
+    "ownerIdentifiedController": "Backbone One PlayStation Edition USB-C BB-51",
+    "ownerReport": "it worked exactly as it should - reconnection was seamless.",
+    "scope": "Limited owner check of main-menu attachment, in-play disconnect/touch/reconnect prompt; not complete controller matrix, all Backbone variants, displayed latency/FPS or sustained performance",
+    "briefIntervals": [
+      {
+        "pauseToResumeMs": 102.0,
+        "generation": 1,
+        "sameActivity": true,
+        "surfaceValidAtBothCallbacks": true,
+        "successfulIdleObserved": true,
+        "currentGenerationWaitEndObserved": true,
+        "cancelOrDestroyDuringBriefInterval": false,
+        "postResumePresentedMarkerObserved": true
+      },
+      {
+        "pauseToResumeMs": 61.0,
+        "generation": 1,
+        "sameActivity": true,
+        "surfaceValidAtBothCallbacks": true,
+        "successfulIdleObserved": true,
+        "currentGenerationWaitEndObserved": true,
+        "cancelOrDestroyDuringBriefInterval": false,
+        "postResumePresentedMarkerObserved": false
+      }
+    ],
+    "initializations": [
+      {
+        "generation": 1,
+        "profile": 2,
+        "compiledPairReused": false,
+        "nativeInitializationCpuWallMs": 14810.335
+      },
+      {
+        "generation": 1,
+        "profile": 2,
+        "compiledPairReused": true,
+        "nativeInitializationCpuWallMs": 48.087
+      },
+      {
+        "generation": 1,
+        "profile": 2,
+        "compiledPairReused": true,
+        "nativeInitializationCpuWallMs": 43.072
+      },
+      {
+        "generation": 1,
+        "profile": 0,
+        "compiledPairReused": true,
+        "nativeInitializationCpuWallMs": 234.753
+      },
+      {
+        "generation": 1,
+        "profile": 0,
+        "compiledPairReused": true,
+        "nativeInitializationCpuWallMs": 266.71
+      },
+      {
+        "generation": 1,
+        "profile": 0,
+        "compiledPairReused": true,
+        "nativeInitializationCpuWallMs": 187.708
+      }
+    ],
+    "changedPreferenceEntries": 0,
+    "actualFatalOrValidationMarkers": 0,
+    "fullLaterBackgroundCancelObserved": true,
+    "ownedAppStopped": true
+  },
+  "sourceCi": "ac468f51: 10/12 passed, both MSVC in progress; push37747195457 / PR37747203704. c57c34b4:12/12 passed.",
+  "retainedWindowsExeSha256": "a87067220a1ab80ff1cb421f321ade19c4d4ac5f79c7b856a60f054ebb2ae5c2"
+}

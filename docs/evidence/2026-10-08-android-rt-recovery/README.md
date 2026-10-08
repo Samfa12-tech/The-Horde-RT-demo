@@ -1,0 +1,5 @@
+# Android RT recovery evidence, 8 October 2026
+
+Sanitized source/package receipts and actual native initialization/presentation observations on SM-S948B / Android 16. Private bounded owned logs, exact installed pullback, preference snapshots and process-memory samples remain in their immutable local seals. No private device serial, PID or raw user preferences are published.
+
+The c57 CPU cache helps Compute warm native initialization; Pipeline's header-only cache is a closed negative. The ac468f51 affected Home regression proves full background retirement remains on both backends after introducing valid-surface suspension. The owner reports seamless BB-51 reconnect; matching logs prove successful idle/park and same-generation resume through two brief pauses. This does not certify the full controller matrix, displayed latency/FPS or sustained performance. The app is stopped after the owner returns it. See the [bounded implementation and limitations](../../ENGINEERING_1_6_2_ANDROID_PIPELINE_RECOVERY_2026_10_08.md).

@@ -1,8 +1,12 @@
 # Android controller and wider-view checkpoint, 8 October 2026
 
+**Current installed RT recovery checkpoint — 8 October:** source `ac468f5136d978152a9953f490a631453a037c89`, Debug APK SHA-256 `3a4a7f16c606d442d825ddfb9c2720ed98f57da147940495a29f5cf03a5850b3` (138,462,724 bytes), exact SM-S948B / Android 16 install/pullback with zero preference changes. Brief Activity pauses suspend the valid RT generation; full Stop/destruction still retires it. Four affected host checks, 232 Java tests/36 classes, lint, four-ABI and Windows builds pass. Controlled Home/full-retirement/resume presents on both phone backends with saved settings unchanged. The Windows EXE is byte-identical to the retained 6c8 capture binary. **Owner BB-51 reconnect check passes: seamless attachment/reconnection, with matching same-generation suspend/resume logs.** The full controller matrix remains open. Source CI [push 37747195457](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37747195457) / [PR 37747203704](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37747203704) currently has 10/12 jobs passed; both MSVC jobs remain in progress. [Exact recovery evidence and cache backend split](ENGINEERING_1_6_2_ANDROID_PIPELINE_RECOVERY_2026_10_08.md). Minor Torch walking-arm wiggle is retained/deferred at the owner's request; earlier appearance/route feedback remains bound to its package. Sustained phone quality, moving secondary views, remaining physical controller matrix and Eric's independent audit remain open. No release approval/publication.
+
+The owner confirms seamless BB-51 reconnection in this package. Owned logs show two brief pauses (102/61 ms), successful native idle/park and same-generation resume with no teardown. The first interval has a subsequent presented marker; the second has no repeated marker, so continued visual play is owner-reported. Later genuine background destruction still cancels the generation. Saved preferences remain unchanged; the owned app is stopped after retaining the logs. [Sanitized receipt](evidence/2026-10-08-android-rt-recovery/receipts.json).
+
 The owner's queue addition is implemented on existing PR18. Physical Android
 controller support has **partial owner acceptance on the identified BB-51**, with
-the full physical matrix still open. The current installed 6c8 repair candidate retains
+the full physical matrix still open. The earlier owner-tested 6c8 repair candidate retains
 sheathed start and the accepted wider/closer arms. Earlier f2 owner findings and
 the remaining physical gates are recorded below. The earlier 6282 package retains its landscape menu/guard/parry feedback. Earlier preliminary c8
 feedback keeps its package identity. Earlier checkpoints below retain their own
