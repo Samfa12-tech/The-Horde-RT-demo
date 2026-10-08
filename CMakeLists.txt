@@ -227,6 +227,11 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS)
         target_include_directories(horde_rt_present_completion_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         target_link_libraries(horde_rt_present_completion_tests PRIVATE Vulkan::Vulkan)
         add_test(NAME horde_rt_present_completion_tests COMMAND horde_rt_present_completion_tests)
+        add_executable(horde_rt_present_timing_evidence_tests tests/PresentTimingEvidenceTests.cpp)
+        target_include_directories(horde_rt_present_timing_evidence_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(horde_rt_present_timing_evidence_tests PRIVATE Vulkan::Vulkan)
+        add_test(NAME horde_rt_present_timing_evidence_tests COMMAND horde_rt_present_timing_evidence_tests)
+
 
         add_executable(horde_rt_graphics_preview_frame_adapter_tests tests/GraphicsPreviewFrameAdapterTests.cpp)
         add_executable(horde_rt_entry_menu_scene_tests tests/EntryMenuSceneTests.cpp)

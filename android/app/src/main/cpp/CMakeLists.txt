@@ -49,6 +49,8 @@ target_compile_definitions(horde_rt_probe_android PRIVATE
     HORDE_RT_PACKAGE_VERSION="${HORDE_RT_PACKAGE_VERSION}"
     HORDE_RT_BUILD_ID="${HORDE_RT_BUILD_ID}"
 )
+target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=$<BOOL:${HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION}>)
 if(HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "33")
     target_compile_definitions(horde_rt_probe_android PRIVATE HORDE_RT_BENCHMARK_SCALE_VALIDATION=1)
 endif()

@@ -41,6 +41,13 @@ try {
         '-DHORDE_RT_STAGED_PRIMARY_TIMING=ON')) {
         Assert-Case $negative (Invoke-Case $CmakeExecutable ($baseline + @($negative,'-P',$script)) $temporaryRoot) $false 'Sub-50 scales require'
     }
+    $timing = $baseline + @('-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=50', '-DHORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=ON')
+    Assert-Case 'timing-benchmark50' (Invoke-Case $CmakeExecutable ($timing + @('-P',$script)) $temporaryRoot) $true 'scale-min=50'
+    foreach ($negative in @('-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=OFF', '-DCMAKE_BUILD_TYPE=Debug',
+        '-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Diagnostic', '-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=High',
+        '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=ON', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=ON')) {
+        Assert-Case "timing-$negative" (Invoke-Case $CmakeExecutable ($timing + @($negative,'-P',$script)) $temporaryRoot) $false 'Presentation timing requires isolated'
+    }
     foreach ($invalid in @('32','34','40','49','033','33.0','33;50')) {
         Assert-Case "invalid-$invalid" (Invoke-Case $CmakeExecutable ($baseline + @("-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=$invalid",'-P',$script)) $temporaryRoot) $false 'Render scale minimum must be exactly'
     }
@@ -56,6 +63,9 @@ try {
                 ':app:printHordeRtPolicyForTest') + $neutral + $properties) $android
         }
         Assert-Case 'gradle-benchmark33' (Gradle-Case @('-PhordeBenchmarkValidation=true','-PhordeBenchmarkMinRenderScale=33')) $true 'debugMinRenderScale=50|releaseMinRenderScale=50|benchmarkMinRenderScale=33'
+        Assert-Case 'gradle-timing-benchmark' (Gradle-Case @('-PhordeBenchmarkValidation=true','-PhordePresentTimingValidation=true')) $true 'ordinaryPresentTiming=OFF|benchmarkPresentTiming=ON'
+        Assert-Case 'gradle-timing-outside' (Gradle-Case @('-PhordePresentTimingValidation=true')) $false 'requires the isolated Shipping/Mobile'
+        Assert-Case 'gradle-timing-invalid' (Gradle-Case @('-PhordePresentTimingValidation=yes')) $false 'must be true or false'
         Assert-Case 'gradle-outside-benchmark' (Gradle-Case @('-PhordeBenchmarkMinRenderScale=33')) $false 'requires explicit isolated'
         foreach ($invalid in @('34','40','50','033','33.0')) {
             Assert-Case "gradle-invalid-$invalid" (Gradle-Case @('-PhordeBenchmarkValidation=true',"-PhordeBenchmarkMinRenderScale=$invalid")) $false 'requires explicit isolated'

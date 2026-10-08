@@ -73,6 +73,9 @@
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/PresentCompletion.h"
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+#include "vulkan/PresentTimingEvidence.h"
+#endif
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtDeviceEnablePlan.h"
@@ -328,6 +331,11 @@ struct SwapchainContext
     horde::vulkan::PresentSurfaceSupport presentSurfaceSupport{};
     horde::vulkan::PresentCompletionMode presentCompletionMode = horde::vulkan::PresentCompletionMode::Unextended;
     horde::vulkan::PresentCompletionFences presentCompletionFences;
+    bool presentTimingExtensionEnabled = false;
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+    std::unique_ptr<horde::vulkan::PresentTimingEvidence> presentTiming;
+    std::uint64_t presentTimingPollCpuNs = 0u;
+#endif
     bool imageAcquirePending = false;
     VkFence inFlightFences[kMaxFramesInFlight] = {};
     VkClearColorValue clearColor = {{0.12f, 0.04f, 0.18f, 1.0f}};
@@ -1069,6 +1077,27 @@ horde::reporting::OwnedPlaytestReportContext PlaytestContextOnRenderOwner(const 
         context.capabilities.performance.internalRenderHeight, context.capabilities.rtScene.presented};
 }
 
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+void PollPresentTimingOnOwner(SwapchainContext& context)
+{
+    if (!context.presentTiming || !context.presentTiming->Bound()) return;
+    const auto started = std::chrono::steady_clock::now();
+    context.presentTiming->Poll();
+    context.presentTimingPollCpuNs += static_cast<std::uint64_t>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - started).count());
+}
+std::string PresentTimingJson(const SwapchainContext& context)
+{
+    std::ostringstream stream;
+    stream << "{\"extensionEnabled\":" << (context.presentTimingExtensionEnabled ? "true" : "false")
+           << ",\"queryCpuWallNanoseconds\":" << context.presentTimingPollCpuNs << ",\"capture\":";
+    if (context.presentTiming) context.presentTiming->WriteJson(stream);
+    else stream << "{\"enabled\":false,\"status\":\"unsupported-or-allocation-failed\"}";
+    stream << '}';
+    return stream.str();
+}
+#endif
+
 void PublishRuntimeReports(const SwapchainContext& context,
     const horde::telemetry::RtLifecyclePublishedState* finalPublication = nullptr)
 {
@@ -1458,6 +1487,12 @@ void FinishInAppBenchmark(SwapchainContext& context)
     json = horde::vulkan::raytracing::experimental::AttachStagedPrimaryProfile(std::move(json),
         context.stagedPassProfile.Json(context.benchmarkEvidence.ExpectedCount(), context.stagedPassTimer,
                                       context.rtScene.ExecutionOrganisationJson()));
+#endif
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+    PollPresentTimingOnOwner(context); // Asynchronous; unresolved tail stays explicit.
+    const auto closingBrace = json.find_last_of('}');
+    if (closingBrace != std::string::npos)
+        json.insert(closingBrace, ",\n  \"imagePresentationTiming\": " + PresentTimingJson(context) + "\n");
 #endif
     const std::string textPath = context.reportDirectory + "/HordeLanternRT-benchmark-latest.txt";
     const std::string jsonPath = context.reportDirectory + "/HordeLanternRT-benchmark-latest.json";
@@ -2162,7 +2197,8 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
                          VkDevice& device,
                          VkQueue& graphicsQueue,
                          horde::vulkan::PresentSurfaceSupport presentSurfaceSupport,
-                         horde::vulkan::PresentCompletionMode& presentCompletionMode)
+                         horde::vulkan::PresentCompletionMode& presentCompletionMode,
+                         bool& presentTimingExtensionEnabled)
 {
     const float queuePriority = 1.0f;
     const VkDeviceQueueCreateInfo queueCreateInfo{
@@ -2177,6 +2213,12 @@ bool CreateLogicalDevice(VkPhysicalDevice physicalDevice,
         horde::vulkan::QueryPresentDeviceSupport(physicalDevice, instance));
     if (const auto* completionExtension = horde::vulkan::PresentCompletionExtension(presentCompletionMode))
         extensions.push_back(completionExtension);
+    presentTimingExtensionEnabled = false;
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+    // Investigation-only capability. Never a rendering/backend requirement.
+    presentTimingExtensionEnabled = HasDeviceExtension(physicalDevice, VK_GOOGLE_DISPLAY_TIMING_EXTENSION_NAME);
+    if (presentTimingExtensionEnabled) extensions.push_back(VK_GOOGLE_DISPLAY_TIMING_EXTENSION_NAME);
+#endif
     const auto rtPlan = horde::vulkan::raytracing::MakeRtDeviceEnablePlan(executionBackend);
     const bool enableRayTracing = rtPlan.has_value();
     const horde::vulkan::FeatureSupport requestedFeatures = rtPlan ? rtPlan->features : horde::vulkan::FeatureSupport{};
@@ -2534,6 +2576,9 @@ bool CreateSwapchain(SwapchainContext& context)
     if (!context.presentCompletionFences.Create(context.device, context.swapchainImages.size(),
         context.presentCompletionMode != horde::vulkan::PresentCompletionMode::Unextended)) return false;
 
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+    if (context.presentTiming) (void)context.presentTiming->BindSwapchain(context.device, context.swapchain, context.surfaceGeneration);
+#endif
     return true;
 }
 
@@ -2663,6 +2708,11 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
 
     if (context.swapchain != VK_NULL_HANDLE)
     {
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+        PollPresentTimingOnOwner(context);
+        if (context.presentTiming) context.presentTiming->UnbindSwapchain();
+        (void)WriteTextFile(context.reportDirectory + "/HordeLanternRT-present-timing-latest.json", PresentTimingJson(context));
+#endif
         vkDestroySwapchainKHR(context.device, context.swapchain, nullptr);
         context.swapchain = VK_NULL_HANDLE;
     }
@@ -3196,6 +3246,11 @@ bool DestroySwapchainContext(SwapchainContext& context)
     }
     if (context.swapchain != VK_NULL_HANDLE)
     {
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+        PollPresentTimingOnOwner(context);
+        if (context.presentTiming) context.presentTiming->UnbindSwapchain();
+        (void)WriteTextFile(context.reportDirectory + "/HordeLanternRT-present-timing-latest.json", PresentTimingJson(context));
+#endif
         vkDestroySwapchainKHR(context.device, context.swapchain, nullptr);
     }
     vkDestroyDevice(context.device, nullptr);
@@ -3978,10 +4033,28 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     presentInfo.swapchainCount = 1u;
     presentInfo.pSwapchains = &context.swapchain;
     presentInfo.pImageIndices = &imageIndex;
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+    VkPresentTimeGOOGLE measuredPresentTime{};
+    VkPresentTimesInfoGOOGLE measuredPresentInfo{VK_STRUCTURE_TYPE_PRESENT_TIMES_INFO_GOOGLE};
+    horde::telemetry::RtSubmittedFrameIdentity measuredFrame{};
+    const bool measuredPresent = evidenceFrame && useRtFrame &&
+        context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
+        context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, measuredFrame) &&
+        context.presentTiming && context.presentTiming->PrepareNext(measuredPresentTime);
+    if (measuredPresent)
+    {
+        measuredPresentInfo.pNext = presentInfo.pNext; // Retain maintenance1 retirement fences.
+        measuredPresentInfo.swapchainCount = 1u;
+        measuredPresentInfo.pTimes = &measuredPresentTime; // desiredPresentTime remains zero.
+        presentInfo.pNext = &measuredPresentInfo;
+    }
+    const auto measuredQueuedNs = GraphicsSteadyNs();
+#endif
     horde::vulkan::raytracing::RtSceneStageScope presentScope(
         evidenceFrame ? &observation : nullptr,
         horde::telemetry::RtStage::PresentCall);
     const VkResult presentResult = vkQueuePresentKHR(context.graphicsQueue, &presentInfo);
+
     if (context.graphicsLatency.active && context.graphicsLatency.firstPresentedNs == 0u &&
         useRtFrame && presentResult == VK_SUCCESS && acquireResult != VK_SUBOPTIMAL_KHR)
         context.graphicsLatency.firstPresentedNs = GraphicsSteadyNs();
@@ -4022,6 +4095,27 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     presentScope.Complete(1u, 0u, 1u);
     wholeFrameScope.Complete(1u, 0u, 1u);
     const auto presentDone = std::chrono::steady_clock::now();
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+    if (measuredPresent)
+    {
+        horde::vulkan::PresentTimingFrameMetadata metadata;
+        metadata.sceneEpoch = measuredFrame.frame.sceneEpoch;
+        metadata.measurementGeneration = measuredFrame.frame.measurementGeneration;
+        metadata.recordSerial = measuredFrame.frame.recordSerial;
+        metadata.submissionSerial = measuredFrame.submissionSerial;
+        metadata.simulationTick = measuredFrame.frame.simulationTick;
+        metadata.queuedSteadyNs = measuredQueuedNs;
+        metadata.scalePercent = static_cast<std::uint32_t>(std::lround(context.renderScale * 100.0f));
+        metadata.width = context.swapchainExtent.width;
+        metadata.height = context.swapchainExtent.height;
+        metadata.backend = context.executionBackend == horde::vulkan::RtExecutionBackend::RayQueryCompute
+            ? horde::vulkan::PresentTimingBackend::RayQueryCompute : horde::vulkan::PresentTimingBackend::RayTracingPipeline;
+        (void)context.presentTiming->RegisterPresent(measuredPresentTime.presentID,
+            acquireResult == VK_SUBOPTIMAL_KHR ? VK_SUBOPTIMAL_KHR : presentResult, metadata);
+    }
+    PollPresentTimingOnOwner(context);
+#endif
+
     if (evidenceFrame)
     {
         const horde::telemetry::RtPresentationOutcome outcome =
@@ -4802,12 +4896,29 @@ bool StartSurfaceInternal(ANativeWindow* window,
     gSurfaceSessions.Publish(generation, context.useRtPath ? 0 : 2);
 
     if (!CreateLogicalDevice(context.physicalDevice, context.instance, context.graphicsQueueFamilyIndex, context.executionBackend,
-        context.device, context.graphicsQueue, context.presentSurfaceSupport, context.presentCompletionMode) ||
+        context.device, context.graphicsQueue, context.presentSurfaceSupport, context.presentCompletionMode,
+        context.presentTimingExtensionEnabled) ||
         !gSurfaceSessions.IsCurrent(generation))
     {
         DestroySwapchainContext(context);
         return false;
     }
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+    if (context.presentTimingExtensionEnabled)
+    {
+        const auto timingQuery = reinterpret_cast<PFN_vkGetPastPresentationTimingGOOGLE>(
+            vkGetDeviceProcAddr(context.device, "vkGetPastPresentationTimingGOOGLE"));
+        if (timingQuery != nullptr)
+        {
+            try { context.presentTiming = std::make_unique<horde::vulkan::PresentTimingEvidence>(); }
+            catch (...) { /* Optional evidence allocation failure leaves rendering available. */ }
+            if (context.presentTiming && !context.presentTiming->Initialize(timingQuery)) context.presentTiming.reset();
+        }
+    }
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "HORDE_PRESENT_TIMING extension_enabled=%d collector_enabled=%d desired_present_time_ns=0",
+        context.presentTimingExtensionEnabled ? 1 : 0, context.presentTiming && context.presentTiming->Enabled() ? 1 : 0);
+#endif
     const auto cacheSeed = context.useRtPath
         ? gPipelineCacheSeed.ForDevice(PipelineCacheDeviceIdentity(context.physicalDevice))
         : std::span<const std::byte>{};
