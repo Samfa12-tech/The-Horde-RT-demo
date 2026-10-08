@@ -614,6 +614,9 @@ if(BUILD_TESTING)
     add_test(NAME horde_rt_held_item_socket_tests COMMAND horde_rt_held_item_socket_tests)
     add_test(NAME horde_rt_skeleton_render_pose_contracts
         COMMAND horde_rt_held_item_socket_tests --skeleton-render-pose-contracts)
+    add_test(NAME horde_rt_combat_sword_authority_agreement
+        COMMAND horde_rt_held_item_socket_tests --combat-sword-authority-agreement)
+    set_tests_properties(horde_rt_combat_sword_authority_agreement PROPERTIES TIMEOUT 30)
 
     add_executable(horde_rt_development_static_asset_tests tests/DevelopmentStaticAssetTests.cpp)
     target_include_directories(horde_rt_development_static_asset_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

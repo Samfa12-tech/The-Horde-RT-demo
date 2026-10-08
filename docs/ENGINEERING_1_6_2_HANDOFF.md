@@ -19,6 +19,10 @@ deferred. No release.
 The later test-only contact probe completes56 actual-mesh queries but retains
 positive blade gaps for all sampled preceding-tick poses. Keep calibration open;
 no sweep, range/cone or timing change is adopted. [Exact results and limits](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#bounded-preceding-tick-contact-probe-8-october-follow-up).
+The later cheap actual-rig comparison finds at most 0.0118015 mm whole-sword
+disagreement over 24 fully engaged pulse/+1/+2 poses; three affected CTests
+pass. This excludes a material sword/IK mismatch in that fixture while leaving
+moving-target calibration open. [Exact diagnostic source and limits](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#simulation-sword-and-rendered-grip-agreement-8-october-follow-up).
 
 **Earlier 8 October equipment inspection checkpoint:** runtime
 `c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` retains the sheathed right hand through

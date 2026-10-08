@@ -19,6 +19,9 @@ deferred. No release.
 Contact calibration is still incomplete: the finite preceding-tick mesh probe
 retains positive blade gaps despite current gate-admitted damage. No new sweep,
 range/cone or pulse change is included on that evidence.
+The later 24-pose real-rig regression finds less than 0.012 mm disagreement
+between simulation and rendered swords in its fully engaged fixture; three
+affected CTests pass. [Exact diagnostic source and limitations](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#simulation-sword-and-rendered-grip-agreement-8-october-follow-up).
 
 **Earlier 8 October equipment inspection checkpoint:** runtime
 `c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` retains the sheathed right hand through

@@ -629,6 +629,48 @@ Private logs/receipt are `build/reports/combat-prepulse-bracket-{build,preflight
 Runtime454 packages, earlier phone acceptance and earlier measurements retain
 their own identities.
 
+### Simulation sword and rendered Grip agreement, 8 October follow-up
+
+The cheap `--combat-sword-authority-agreement` fixture compares the simulation's
+published sword matrix with the final production anatomical Grip and rendered
+sword at pulse tick 17, +1 and +2. It reuses the eight preceding-tick combinations
+(two bearings, two authored ceiling locations and aspects 1 / 16:9), with fully
+engaged Grip and IK. The simulation matrix is copied before anatomical resolution.
+Each of the 24 samples compares all 11,424 imported sword vertices: 274,176 vertex
+comparisons, zero target skinning and zero exact triangle queries. Target clips
+are loaded for the reused fixture; no target geometry is evaluated in this mode.
+
+Maximum Grip translation disagreement is **0.0105312 mm**; maximum whole-sword
+vertex displacement is **0.0118015 mm**. Raw basis-axis vector/component deltas
+are at most 1.68629e-7 / 1.19209e-7. The derived float `acos` angle reaches
+0.000488281 rad despite these tiny raw deltas; it is precision-limited and must
+not be interpreted as that much physical angular separation. Both matrices
+satisfy the existing rigid-socket contract, and the rendered item Grip matches
+the actual solved anatomical Grip. Fixture-scoped 1 mm translation/vertex bounds
+pass. This rules out a material sword/IK mismatch in these samples; it does not
+prove agreement during partial draw, every movement pose or contact with a target.
+
+Test base is `a65c03da0a3493d26e32373cd691133aa151f6f5` plus the new test source.
+Exact tested `HeldItemSocketTests.cpp` SHA-256:
+`6f3359bccc3e7be672e8d7e542ad8e24ab4fa131e014bac980752c21478c64a8`;
+test executable SHA-256:
+`ab96885b7824b59d51b68ad6bf98fca1b8c756f743e6dbcbdcbf83107489bdab`.
+The final standalone run exits 0 in 7.157 s. Registered CTest passes 3/3:
+existing full socket 16.91 s, shared pose contracts 0.02 s and new agreement
+0.77 s (17.72 s aggregate). Retained preflight also passes 8/8 in 0.364 s,
+with zero exact queries. Private final receipt/log are
+`test-temp/combat-sword-authority-receipt-20261008T020508Z.txt` and
+`test-temp/combat-sword-authority-run-20261008T020508Z.log`;
+root checks are `combat-sword-authority-root-ctest-20261008.log` and
+`combat-sword-authority-old-preflight-20261008.log`. Earlier intermediate
+measurement logs remain separate; no expensive closed experiment was repeated.
+
+Runtime/packages remain sealed at 454d58ee. No hit, range/cone, pulse, damage or
+parry rule changes follow from this test-only checkpoint. The remaining work is
+a same-tick target representation and downstroke calibration; the previous
+positive blade-gap and coarse-proxy negative results remain authoritative.
+No phone, moving RT, owner-feel or sustained-performance gate closes here.
+
 ### Closed coarse contact-proxy probe
 
 A further test-only `--combat-capsule-feasibility` mode reuses the same two

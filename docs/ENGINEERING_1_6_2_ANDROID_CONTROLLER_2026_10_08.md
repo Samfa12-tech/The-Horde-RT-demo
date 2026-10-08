@@ -83,10 +83,16 @@ Test-registration 03fe has separate push 37712764483 / PR 37712770661 CI,
 completed successfully at 12/12. Earlier documentation f000 completed 12/12.
 Documentation 6e67be51 first attempt has 11/12 aggregate jobs successful: the
 push MSVC native report-form Unicode edit times out at its existing two-second
-deadline, while the matching PR job passes. The failed JSON/log are preserved;
-one failed-job rerun was requested without changing code or the timeout. These
-results are not assigned to other source or package identities. Build correctness, physical acceptance and sustained
-performance remain separate.
+deadline, while the matching PR job passes. Its single failed-job retry completes
+successfully, giving 12/12 current aggregate jobs; the original failed JSON/log
+remain preserved. Test-only 22920c19 separately passes 12/12 in push 37714363918 /
+PR 37714368236. Documentation a65c03da first attempt passes 11/12 in push
+37714583032 / PR 37714590338: the PR Windows job hits the same Unicode-note
+timeout. Its original failure is preserved and one failed-job retry is pending.
+No code or deadline is changed, and successful retries do not establish the
+cause of these intermittent native UI failures. Results are not assigned to
+other source or package identities. Build correctness, physical acceptance and
+sustained performance remain separate.
 
 ## Earlier a6 candidate and preserved evidence
 

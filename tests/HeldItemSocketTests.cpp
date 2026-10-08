@@ -1554,7 +1554,9 @@ bool ResolveProductionAnatomicalSword(
     const std::uint64_t tick,
     HeldItemTransform& worldFromGrip,
     HeldItemTransform& worldFromSword,
-    std::string& diagnostic)
+    std::string& diagnostic,
+    float* resolvedSwordHandGripBlend = nullptr,
+    float* resolvedRightIkPoseWeight = nullptr)
 {
     using namespace horde::gameplay::animation;
     using namespace horde::vulkan::raytracing;
@@ -1566,6 +1568,10 @@ bool ResolveProductionAnatomicalSword(
     animationInput.walkAmount = input.walkAmount;
     playerAnimation.StepFixed(animationInput, 1.0f / 60.0f);
     auto animation = playerAnimation.Snapshot();
+    if (resolvedSwordHandGripBlend != nullptr)
+        *resolvedSwordHandGripBlend = animation.swordHandGripBlend;
+    if (resolvedRightIkPoseWeight != nullptr)
+        *resolvedRightIkPoseWeight = animation.rightIk.poseWeight;
 
     const std::array<float, 3u> eye{{input.playerX, horde::gameplay::kShowcaseEyeWorldY,
                                       input.playerZ}};
@@ -3742,7 +3748,8 @@ void TestBoundedCombatPulseSweep()
     }
 }
 
-void TestCombatPrePulseBracket(const bool preflightOnly = false)
+void TestCombatPrePulseBracket(const bool preflightOnly = false,
+                               const bool authorityAgreementOnly = false)
 {
     using namespace horde::gameplay;
     using namespace horde::gameplay::items;
@@ -3805,6 +3812,11 @@ void TestCombatPrePulseBracket(const bool preflightOnly = false)
     std::uint64_t rigTick = 180000u;
     std::size_t exactQueries = 0u;
     std::size_t preflightCount = 0u;
+    std::size_t agreementSamples = 0u;
+    std::size_t totalVertexComparisons = 0u;
+    float maximumGripPositionError = 0.0f;
+    float maximumGripOrientationError = 0.0f;
+    float maximumVertexError = 0.0f;
 
     struct Record
     {
@@ -3839,6 +3851,7 @@ void TestCombatPrePulseBracket(const bool preflightOnly = false)
                 const bool attackRequested =
                     attack.RequestAttack() == PlayerAttackCut::DownwardCut;
                 std::uint64_t pulseTick = 0u;
+                const std::uint64_t trailingTicks = authorityAgreementOnly ? 2u : 1u;
                 for (std::uint64_t tick = 1u; tick <= maximumTicks; ++tick)
                 {
                     const CombatSnapshot attackBefore = attack.Snapshot();
@@ -3854,18 +3867,20 @@ void TestCombatPrePulseBracket(const bool preflightOnly = false)
                                        controlBefore, controlAfter});
                     if (attackAfter.playerAttackPulse && pulseTick == 0u)
                         pulseTick = tick;
-                    if (pulseTick != 0u && tick >= pulseTick + 1u) break;
+                    if (pulseTick != 0u && tick >= pulseTick + trailingTicks) break;
                 }
 
                 Check(attackRequested && pulseTick >= 2u &&
-                          records.size() >= pulseTick + 1u,
+                          records.size() >= pulseTick + trailingTicks,
                       "pre-pulse bracket must capture an ordinary close AttackWindup pulse and one following tick");
                 if (!attackRequested || pulseTick < 2u ||
-                    records.size() < pulseTick + 1u)
+                    records.size() < pulseTick + trailingTicks)
                     continue;
                 const Record& previous = records.at(static_cast<std::size_t>(pulseTick - 2u));
                 const Record& pulse = records.at(static_cast<std::size_t>(pulseTick - 1u));
                 const Record& plusOne = records.at(static_cast<std::size_t>(pulseTick));
+                const Record* plusTwo = authorityAgreementOnly
+                    ? &records.at(static_cast<std::size_t>(pulseTick + 1u)) : nullptr;
                 const auto& playerStart = previous.attackAfter.player;
                 const auto& playerPulse = pulse.attackAfter.player;
                 const auto& targetStart = previous.controlAfter.combatants[0];
@@ -3876,17 +3891,27 @@ void TestCombatPrePulseBracket(const bool preflightOnly = false)
                       "five player poses must interpolate only across one unchanged active-swing phase");
                 Check(targetStart.action == EnemyCombatAction::AttackWindup &&
                           targetPulse.action == targetStart.action &&
-                          targetStart.health > 0 && targetPulse.health > 0,
-                      "five shared target poses must interpolate only across ordinary unhit AttackWindup");
+                          targetStart.health > 0 && targetPulse.health > 0 &&
+                          (!authorityAgreementOnly ||
+                           (plusTwo != nullptr &&
+                            plusTwo->attackAfter.player.action == playerPulse.action &&
+                            plusTwo->controlAfter.combatants[0].action == targetPulse.action &&
+                            plusTwo->controlAfter.combatants[0].health > 0)),
+                      "agreement samples must stay within ordinary unhit AttackWindup and unchanged player swing phase");
                 if (playerStart.action != PlayerCombatAction::SwingActive ||
                     playerPulse.action != playerStart.action ||
                     !pulse.attackAfter.playerAttackPulse ||
                     targetStart.action != EnemyCombatAction::AttackWindup ||
                     targetPulse.action != targetStart.action ||
-                    targetStart.health <= 0 || targetPulse.health <= 0)
+                    targetStart.health <= 0 || targetPulse.health <= 0 ||
+                    (authorityAgreementOnly &&
+                     (plusTwo == nullptr ||
+                      plusTwo->attackAfter.player.action != playerPulse.action ||
+                      plusTwo->controlAfter.combatants[0].action != targetPulse.action ||
+                      plusTwo->controlAfter.combatants[0].health <= 0)))
                     continue;
 
-                if (preflightOnly)
+                if (preflightOnly || authorityAgreementOnly)
                 {
                     HeldItemFixedStepInput input;
                     input.playerX = roof.playerX;
@@ -3910,6 +3935,171 @@ void TestCombatPrePulseBracket(const bool preflightOnly = false)
                         const bool gate = SwordCombat::IsPlayerTargetInRangeCone(
                             roof.playerX, roof.playerZ, roof.playerYaw,
                             target.x, target.z);
+                        if (authorityAgreementOnly)
+                        {
+                            const std::array<const Record*, 3u> poseRecords{{
+                                &pulse, &plusOne, plusTwo}};
+                            const std::array<const char*, 3u> poseLabels{{"pulse", "plus1", "plus2"}};
+                            for (std::size_t poseIndex = 0u; poseIndex < poseRecords.size(); ++poseIndex)
+                            {
+                                const Record& poseRecord = *poseRecords[poseIndex];
+                                HeldItemFixedStepInput poseInput;
+                                poseInput.playerX = roof.playerX;
+                                poseInput.playerZ = roof.playerZ;
+                                poseInput.playerYawRadians = roof.playerYaw;
+                                poseInput.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+                                poseInput.playerCombat = poseRecord.attackAfter.player;
+                                poseInput.logicalViewAspect = aspect;
+                                HeldItemStates poseItems = MakeDefaultHeldItemStates();
+                                HeldItemFixedStepState poseFixed;
+                                const bool fixedPoseResolved = ResolveHeldItemsFixedStep(
+                                    poseItems, poseInput, poseRecord.tick, poseFixed, diagnostic);
+                                Check(fixedPoseResolved, "agreement sample must resolve gameplay held-item pose");
+                                if (!fixedPoseResolved) continue;
+                                const HeldItemTransform gameplayWorldFromSword = poseItems[1].worldFromItem;
+                                HeldItemTransform renderedWorldFromGrip{};
+                                HeldItemTransform renderedWorldFromSword{};
+                                float swordHandGripBlend = 0.0f;
+                                float rightIkPoseWeight = 0.0f;
+                                const bool rigResolved = ResolveProductionAnatomicalSword(
+                                    poseInput, poseFixed.kinematics, poseItems, rig, rigTick++,
+                                    renderedWorldFromGrip, renderedWorldFromSword, diagnostic,
+                                    &swordHandGripBlend, &rightIkPoseWeight);
+                                Check(rigResolved && !sword.vertices.empty(),
+                                      "agreement sample must resolve final production rig Grip and sword");
+                                if (!rigResolved || sword.vertices.empty()) continue;
+                                const auto gameplayWorldGrip = MultiplyHeldItemTransforms(
+                                    gameplayWorldFromSword, grip->world);
+                                const auto gripAgreement =
+                                    horde::vulkan::raytracing::MeasureTransformAgreement(
+                                        gameplayWorldGrip, renderedWorldFromGrip);
+                                const auto renderedSocketGrip = MultiplyHeldItemTransforms(
+                                    renderedWorldFromSword, grip->world);
+                                const auto socketAgreement =
+                                    horde::vulkan::raytracing::MeasureTransformAgreement(
+                                        renderedSocketGrip, renderedWorldFromGrip);
+                                const bool gameplaySwordRigid = ValidateHeldItemSocketTransform(
+                                    gameplayWorldFromSword, diagnostic);
+                                const bool renderedSwordRigid = ValidateHeldItemSocketTransform(
+                                    renderedWorldFromSword, diagnostic);
+                                Check(gameplaySwordRigid && renderedSwordRigid,
+                                      "both gameplay and rendered sword matrices must satisfy the existing rigid socket contract");
+                                float fullMatrixDiffSquared = 0.0f;
+                                float rigidBasisDiffSquared = 0.0f;
+                                for (std::size_t element = 0u;
+                                     element < gameplayWorldFromSword.size(); ++element)
+                                {
+                                    const float delta = gameplayWorldFromSword[element] -
+                                                        renderedWorldFromSword[element];
+                                    fullMatrixDiffSquared += delta * delta;
+                                }
+                                for (const std::size_t element :
+                                     {0u, 1u, 2u, 4u, 5u, 6u, 8u, 9u, 10u})
+                                {
+                                    const float delta = gameplayWorldFromSword[element] -
+                                                        renderedWorldFromSword[element];
+                                    rigidBasisDiffSquared += delta * delta;
+                                }
+                                const float fullMatrixFrobeniusDiff =
+                                    std::sqrt(fullMatrixDiffSquared);
+                                const float rigidBasisFrobeniusDiff =
+                                    std::sqrt(rigidBasisDiffSquared);
+                                float maximumAxisVectorDelta = 0.0f;
+                                float maximumAxisComponentDelta = 0.0f;
+                                for (const std::size_t axisOffset : {0u, 4u, 8u})
+                                {
+                                    float axisDeltaSquared = 0.0f;
+                                    for (std::size_t component = 0u; component < 3u; ++component)
+                                    {
+                                        const float delta =
+                                            gameplayWorldFromSword[axisOffset + component] -
+                                            renderedWorldFromSword[axisOffset + component];
+                                        maximumAxisComponentDelta = std::max(
+                                            maximumAxisComponentDelta, std::abs(delta));
+                                        axisDeltaSquared += delta * delta;
+                                    }
+                                    maximumAxisVectorDelta = std::max(
+                                        maximumAxisVectorDelta, std::sqrt(axisDeltaSquared));
+                                }
+                                float maximumVertexDisplacement = 0.0f;
+                                float sumVertexDisplacementSquared = 0.0f;
+                                bool finiteVertices = true;
+                                for (const auto& vertex : sword.vertices)
+                                {
+                                    const std::array<float, 3u> local{{
+                                        vertex.position[0], vertex.position[1], vertex.position[2]}};
+                                    const auto gameplayWorld = TransformPoint(gameplayWorldFromSword, local);
+                                    const auto renderedWorld = TransformPoint(renderedWorldFromSword, local);
+                                    const float dx = gameplayWorld[0] - renderedWorld[0];
+                                    const float dy = gameplayWorld[1] - renderedWorld[1];
+                                    const float dz = gameplayWorld[2] - renderedWorld[2];
+                                    const float displacement = std::sqrt(dx * dx + dy * dy + dz * dz);
+                                    finiteVertices &= std::isfinite(displacement);
+                                    maximumVertexDisplacement = std::max(maximumVertexDisplacement, displacement);
+                                    sumVertexDisplacementSquared += displacement * displacement;
+                                }
+                                const float rmsVertexDisplacement = std::sqrt(
+                                    sumVertexDisplacementSquared / static_cast<float>(sword.vertices.size()));
+                                Check(finiteVertices && std::isfinite(gripAgreement.positionErrorMetres) &&
+                                          std::isfinite(gripAgreement.orientationErrorRadians) &&
+                                          std::isfinite(socketAgreement.positionErrorMetres) &&
+                                          std::isfinite(socketAgreement.orientationErrorRadians) &&
+                                          std::isfinite(fullMatrixFrobeniusDiff) &&
+                                          std::isfinite(rigidBasisFrobeniusDiff) &&
+                                          std::isfinite(maximumAxisVectorDelta) &&
+                                          std::isfinite(maximumAxisComponentDelta) &&
+                                          std::isfinite(maximumVertexDisplacement) &&
+                                          std::isfinite(rmsVertexDisplacement),
+                                      "authority agreement transforms, basis deltas and vertex displacements must be finite");
+                                Check(gripAgreement.positionErrorMetres <= 0.001f &&
+                                          maximumVertexDisplacement <= 0.001f,
+                                      "these fully engaged fixture samples must keep Grip and all sword-vertex disagreement within 1 mm");
+                                Check(swordHandGripBlend >= 0.999f && rightIkPoseWeight >= 0.999f,
+                                      "agreement samples must use fully engaged sword-hand grip");
+                                Check(TransformNear(renderedSocketGrip, renderedWorldFromGrip, 0.0001f),
+                                      "rendered sword Grip socket must agree with actual solved anatomical Grip");
+                                ++agreementSamples;
+                                totalVertexComparisons += sword.vertices.size();
+                                maximumGripPositionError = std::max(maximumGripPositionError,
+                                    gripAgreement.positionErrorMetres);
+                                maximumGripOrientationError = std::max(maximumGripOrientationError,
+                                    gripAgreement.orientationErrorRadians);
+                                maximumVertexError = std::max(maximumVertexError, maximumVertexDisplacement);
+                                std::cout << "combat-sword-authority-agreement roof=" << roof.name
+                                          << " aspect=" << aspect << " case=" << contact.name
+                                          << " sample=" << poseLabels[poseIndex]
+                                          << " tick=" << poseRecord.tick
+                                          << " playerAction="
+                                          << static_cast<int>(poseRecord.attackAfter.player.action)
+                                          << " playerActionTime=" << poseRecord.attackAfter.player.actionTime
+                                          << " targetAction=" << static_cast<int>(poseRecord.controlAfter.combatants[0].action)
+                                          << " targetActionTime=" << poseRecord.controlAfter.combatants[0].actionTime
+                                          << " swordHandGripBlend=" << swordHandGripBlend
+                                          << " rightIkPoseWeight=" << rightIkPoseWeight
+                                          << " gameplayToRenderedGripPositionMm="
+                                          << gripAgreement.positionErrorMetres * 1000.0f
+                                          << " gameplayToRenderedGripOrientationRad="
+                                          << gripAgreement.orientationErrorRadians
+                                          << " renderedGripSocketPositionMm="
+                                          << socketAgreement.positionErrorMetres * 1000.0f
+                                          << " renderedGripSocketOrientationRad="
+                                          << socketAgreement.orientationErrorRadians
+                                          << " fullSwordMatrixFrobeniusDiff="
+                                          << fullMatrixFrobeniusDiff
+                                          << " rigidBasisFrobeniusDiff="
+                                          << rigidBasisFrobeniusDiff
+                                          << " maxAxisVectorDelta=" << maximumAxisVectorDelta
+                                          << " maxAxisComponentDelta=" << maximumAxisComponentDelta
+                                          << " swordMatricesRigid="
+                                          << (gameplaySwordRigid && renderedSwordRigid)
+                                          << " swordVertices=" << sword.vertices.size()
+                                          << " maxVertexDisplacementMm="
+                                          << maximumVertexDisplacement * 1000.0f
+                                          << " rmsVertexDisplacementMm="
+                                          << rmsVertexDisplacement * 1000.0f
+                                          << " exactQueries=0 targetSkinQueries=0\n";
+                            }
+                        }
                         std::cout << "combat-prepulse-preflight roof=" << roof.name
                                   << " roofY=" << roof.authoredRoofY
                                   << " playerOrigin=" << roof.playerX << ',' << roof.playerZ
@@ -4137,10 +4327,24 @@ void TestCombatPrePulseBracket(const bool preflightOnly = false)
             }
         }
     }
-    if (preflightOnly)
+    if (preflightOnly || authorityAgreementOnly)
     {
         Check(preflightCount == 8u, "all eight preflight phase and roof cases must complete");
-        Check(exactQueries == 0u, "preflight must run before exact triangle queries");
+        Check(exactQueries == 0u, "agreement diagnostic must issue no exact triangle queries");
+        if (authorityAgreementOnly)
+        {
+            Check(agreementSamples == 24u,
+                  "eight combinations must produce pulse, plus-one and plus-two samples");
+            Check(totalVertexComparisons == 24u * sword.vertices.size(),
+                  "each agreement sample must compare every loaded sword vertex");
+            std::cout << "combat-sword-authority-summary cases=" << preflightCount
+                      << " samples=" << agreementSamples
+                      << " vertexComparisons=" << totalVertexComparisons
+                      << " maxGripPositionErrorMm=" << maximumGripPositionError * 1000.0f
+                      << " maxGripOrientationErrorRad=" << maximumGripOrientationError
+                      << " maxVertexDisplacementMm=" << maximumVertexError * 1000.0f
+                      << " exactQueries=" << exactQueries << " targetSkinQueries=0\n";
+        }
         return;
     }
     Check(exactQueries <= exactQueryBudget,
@@ -5367,6 +5571,11 @@ int main(const int argc, char** argv)
     if (argc > 1 && std::string(argv[1]) == "--combat-prepulse-bracket")
     {
         TestCombatPrePulseBracket(argc > 2 && std::string(argv[2]) == "--preflight-only");
+        return failures == 0 ? 0 : 1;
+    }
+    if (argc > 1 && std::string(argv[1]) == "--combat-sword-authority-agreement")
+    {
+        TestCombatPrePulseBracket(false, true);
         return failures == 0 ? 0 : 1;
     }
     if (argc > 1 && std::string(argv[1]) == "--combat-bounded-sweep")
