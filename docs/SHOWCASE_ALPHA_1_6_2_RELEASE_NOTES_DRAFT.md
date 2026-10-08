@@ -1,5 +1,18 @@
 # Horde Lantern RT 1.6.2 development notes
 
+**8 October equipment inspection checkpoint:** runtime
+`c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` retains the sheathed right hand through
+shared IK and keeps the parry hilt/right sleeve clear of the normal torch.
+Ten affected native checks,183 Java tests, Windows/four-ABI Debug builds and
+eight frozen desktop RT captures pass. The new sealed APK is not installed:
+the owner is away with the phone. Source CI passes all 12 aggregate jobs.
+Owner moving appearance, full body/secondary views, production activation/route,
+matched phone 50/40/33 quality and sustained thermals/power/memory, changed audio/
+haptics and independent final audit remain separate open gates. Dust stays
+optional/default Off; its accepted smaller phone still retains 998137 c 9 identity;
+shafts remain deferred. No release follows.
+[Exact source, package hashes, failures and images](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#parry-hilt-and-gauntlet-clearance-candidate).
+
 The exact smaller-dust Windows checkpoint subsequently passes a foreground
 waterfall equipment sequence and requested replay. Corrected draw/action images
 join exact state/completed ticks. Owner review raises empty-hand framing while

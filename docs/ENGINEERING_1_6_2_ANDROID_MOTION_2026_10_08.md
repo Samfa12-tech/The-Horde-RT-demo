@@ -660,3 +660,81 @@ which is not a signed mesh-intersection proof. The initial grip-point follow-up
 also inverted the item Grip socket incorrectly. Both diagnostic mistakes are
 excluded from acceptance; the corrected bounded probe and actual-IK candidate
 will determine the adjustment. No parry timing/window changes follow.
+
+### Parry hilt and gauntlet clearance candidate
+
+Exact runtime `c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` includes the preceding
+sheathed-hand fix. Tree `f0a405dad1649e6c0b7423f5f09c58a62628fc22`. The new regression
+uses the imported Rag torch, sword and actual production skinned sleeve/gauntlet
+triangles at the captured stance (x 0.495964, z-15.143019, yaw-1.561293,
+pitch-0.04, walk time 5.950023). It reproduces touching/intersecting surfaces
+(0 mm separation) for both the guard region and right arm at high-carry parry
+startup end, active and early recovery. The guard selection contains 5,304
+hilt/guard/lower-blade-base triangles; the authored right sleeve/gauntlet contains
+6,875. This is actual triangle/edge evidence, not an unsigned hand-centre proxy.
+
+Normal-torch parry moves the shared right Grip x from-0.16 to 0.0 m and makes the
+blade angle more upright (-0.62 to-0.42 rad). The existing IK moves hand, sleeve
+and prop together. Torch carry, its Flame/Light sockets, lantern-specific parry,
+attachment edges, combat timing and windows remain unchanged. No camera move or
+off-hand offset is required by this candidate.
+
+At the same ten high/low-carry phase samples, the uncapped query measures at
+least 49.5863 mm guard-region separation and 69.8668 mm right-arm separation.
+The retained CI fixture caps queries at 60 mm, reporting that value as a lower
+bound; its 25 mm guard and 15 mm arm assertions remain stronger than contact-only
+checks. It additionally tests peak successful-parry reaction for both carries
+(12 cases). All pass; surfaces outside 60 mm are not reported as exact distances.
+These discrete samples do not certify every interpolated pose or world obstacle.
+
+Affected native checks pass 10/10 unique checks: item transition, full original
+Rag torch low-ceiling matrix, animation, item sockets, development admission,
+actual player rig, arm reference and semantic/viewmodel admission/pose fixtures.
+The first run retains 9/10: the socket check still expected the old authored
+parry x/angle. Updating those two exact expectations preserves all existing
+left-hand, Grip, ceiling, scabbard/body/floor and transition assertions; the
+corrected socket rerun passes 23.29 seconds. The original matrix passes 182.40
+seconds. An initial new-admission compile error (string_view versus const char*)
+is fixed and its log retained. Windows Debug and all four Android Debug ABIs
+build; Java 183/183 in 32 classes passes with zero failures/errors/skips.
+
+| Sealed inspection artifact | SHA-256 |
+| --- | --- |
+| Debug APK (138,462,724 bytes) | `b1a6c8af7b4983404b869c48dea856f01116dc03e4979aabd11b819194be3f57` |
+| Windows Debug EXE (11,551,232 bytes) | `a918a77add10c45cade357980fc427751f8f7fb752ea25411b05071b50ca595e` |
+| lib/arm 64-v 8 a/libhorde_rt_probe_android.so | `d2c31f65fded8d5da815f3c89dd50c7e2c7e7a57bc9d947fe25c55b08cea31f9` |
+| lib/armeabi-v 7 a/libhorde_rt_probe_android.so | `857c9091894082ec10143266d8245f0f577bc205259af875e3819a6de6cc1c51` |
+| lib/x 86/libhorde_rt_probe_android.so | `d976531ffa2affe77e6cb39ff7083e62b9b807ad5ea6610baa585a06e73b7907` |
+| lib/x 86_64/libhorde_rt_probe_android.so | `f66e8f4fd6d69c203a24a2aae0f6b821b301b02c04440828f49ede46e3b24a5b` |
+
+Closed Android asset admission, fullUser=13 and orientation|screenSize manifest,
+and 16 KiB alignment pass. The APK is **not installed or phone-validated**; the
+owner removes the device again. Prior 998137 c 9 phone evidence and preferences
+are preserved and do not validate these new poses.
+
+Eight frozen Windows captures on RTX 5050 Laptop (Pipeline and RayQueryCompute;
+960 x 540 and 540 x 960) pass actual backend, completed/presented submission, native
+PNG and CPU-uploaded viewmodel/world-body geometry hashes. Zero synchronization-
+validation errors; all eight owned processes exit normally. Scene defaults stay
+High water/fire, Current shadows, Glass On, Mist On; Dust is explicitly Off for
+this inspection. The released right hand is visible, and parry hilt/hand-to-torch
+separation is visible. The new parry fixture stages ordinary torch carry through
+one real shared command, without the separate waterfall equipment seed. This is
+not an exact replay of the earlier walk-time frame. Neither backend's frozen
+stills imply live motion, scanout, phone-aspect acceptance, complete body/shadow/
+reflection or sustained FPS. [Two unmodified portrait images and their hashes](evidence/2026-10-08-equipment-clearance/README.md).
+
+Private immutable evidence: `integrated-162-c2de5d7d-20261007/`, including
+`equipment-native-review-private-20261008.json`, audit SHA-256
+`9380d12ea029ad2997689e06ca53e14a13e4d2fc1405e7bc098b4f4a6fb83ea0`.
+No owned validation game remains running. Audio/haptic manual revalidation
+required: **NO for these pose fixes**, since semantic events, listener/source,
+cues, playback and haptic routing are unchanged. Earlier changed combat/audio
+acceptance remains a separate gate.
+
+Source CI passes all 12 aggregate jobs in [push 37704972028](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37704972028) /
+[PR 37704977150](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37704977150). The preceding df 15 ea 97 hand-fix source separately passes
+12/12 in push 37702888309 / PR 37702892974. Owner moving review, current phone
+motion, production activation/full route and final body/secondary-view inspection
+remain pending. The source fix is ready for review; it is not owner acceptance
+or Eric's independent audit.

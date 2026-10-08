@@ -1,10 +1,23 @@
 # 1.6.2 tomb finish — active post-reset work
 
+**8 October equipment inspection checkpoint:** runtime
+`c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` retains the sheathed right hand through
+shared IK and keeps the parry hilt/right sleeve clear of the normal torch.
+Ten affected native checks,183 Java tests, Windows/four-ABI Debug builds and
+eight frozen desktop RT captures pass. The new sealed APK is not installed:
+the owner is away with the phone. Source CI passes all 12 aggregate jobs.
+Owner moving appearance, full body/secondary views, production activation/route,
+matched phone 50/40/33 quality and sustained thermals/power/memory, changed audio/
+haptics and independent final audit remain separate open gates. Dust stays
+optional/default Off; its accepted smaller phone still retains 998137 c 9 identity;
+shafts remain deferred. No release follows.
+[Exact source, package hashes, failures and images](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#parry-hilt-and-gauntlet-clearance-candidate).
+
 Updated 8 October 2026. Authority: the owner's `Horde-1.6.2-after-reset-goal.txt`, explicitly adopted by the latest resume request. Supporting PR16 reference: `48fd8d6e0ee73c480502906104593c4e6d3b8aae`. Remote planning advanced to `c03db1c94dd058e8416d1927c908b6b7298d16e0`; those documentation changes are not merged into runtime wholesale. Work continues in the existing PR18 checkout/branch. No duplicate workspace, reset, release, merge, signing or paid generation is authorized.
 
 ## Preserved completed evidence
 
-Current immutable Windows guard preview is `3da5f2dd`: two lateral guards face
+Earlier immutable Windows guard preview is `3da5f2dd`: two lateral guards face
 arrival with a persistent measured walk-phase offset. Three staged RT stills
 pass exact completed/presented-frame and hash joins; affected host checks,
 Windows and four-ABI Android Debug builds pass. The APK is not installed because
@@ -126,7 +139,7 @@ that package and do not close moving contact, owner acceptance or sustained FPS.
 | Native actions and three original hearts | Press-down Swing/Parry/Dodge and original native hearts committed in `b76ce0e6`; `7368e2c7` fixes warm-up Dodge visibility, passes 177/177 Android tests in 30 classes and the combined 32-case diagonal synthetic touch matrix on both physical phone RT backends. Owner ordinary playtest of `ccd70d38` accepts touch comfort; earlier `ab69537a` active-draw Home evidence remains separate | Measured touch latency, successful parry/riposte and remaining owner audio/haptic acceptance; synthetic held-touch Home/fresh Parry passes on both phone backends |
 | Sword overhead clearance | Shared blade-envelope response `0e98a8bb`; corrected Rag sockets, imported arm reach and continuous roof response `c078ad39` pass affected host checks. Owner accepts the low-ceiling response on `ccd70d38` | Remaining actual moving grips/world/shadow/reflection inspection and integrated package/device costs |
 | Player-only rag torch | Separate production player resource committed in `40f92c6a`; provenance, closed packaging and atlas preservation recorded. Earlier moving/low-passage captures and later `ccd70d38` drench/drop ownership and packed-light removal pass on both phone backends. Owner accepts observed torch appearance on `ccd70d38` | Remaining floor/moving hand/body and world shadow/reflection inspection, Windows foreground arming and resource/pacing costs; the owner statement does not specify every attachment/reflection condition |
-| Shared equipment and waterfall encounter | `cdcb300f` integrates phased Grip and authored Hips scabbard; corrected offline mesh/pose and socket checks pass, prior failed mounts preserved. `ab69537a` passes scoped moving warning/draw/attachment/attack/parry on both phone backends. `3da5f2dd` adds owner-directed lateral facing guards, persistent walk offset and corrected shared room selection, with three exact staged Windows RT stills; production activation off | Owner guard-layout feedback, intermediate draw silhouette, moving RT body/shadow/reflection and integrated route checks before enabling production flags. Same guard identities/count/stats retained |
+| Shared equipment and waterfall encounter | `cdcb300f` integrates phased Grip and authored Hips scabbard; corrected offline mesh/pose and socket checks pass, prior failed mounts preserved. `ab69537a` passes scoped moving warning/draw/attachment/attack/parry on both phone backends. `3da5f2dd` adds owner-directed lateral facing guards, persistent walk offset and corrected shared room selection, with three exact staged Windows RT stills; production activation off | Guard layout is owner-approved; updated equipment motion/feel, intermediate draw silhouette, moving RT body/shadow/reflection and integrated route checks before enabling production flags. Same guard identities/count/stats retained |
 | Draw/sheath audio | Selected FilmCow derivatives and exact provenance admitted in `cdcb300f`; semantic attachment cues integrated in `d08d3c48` with host/Java checks. Owner-supplied licence PDF recorded | Actual attachment motion/audio timing, audibility and owner listening |
 | Compact selected menu scene | Approved brighter lantern and Play-center / More-left / Settings-right placement retained. Exact `868691fc` passes both Windows RT backends' six-pose Entry/Back/Play checks, actual phone landscape Entry and both backends' Home recovery. Earlier orientation/recreation failures remain recorded | Remaining menu cost and owner motion/audio acceptance; landscape Home/resume and physical owner rotation not established |
 | Remaining UI/loading/Graphics simplification | Native menu/loading/audio `d08d3c48`; colon labels and clear scrollbar `359a5711` pass 22 affected Java tests. [Pre-rotation `868691fc`](ENGINEERING_1_6_2_SURFACE_RECOVERY_2026_10_07.md) passes actual ready phone rotations, exact landscape Use/Restore ACK and unchanged preferences on both RT backends. `4e9e5bb7` ordinary portrait Controls/Credits/Report navigation reaches Back and preserves unchecked consent and every preference | Remaining screen/input/accessibility/loading/error checks and integrated cost; no sustained-FPS claim |

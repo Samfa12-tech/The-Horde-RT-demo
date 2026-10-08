@@ -1,5 +1,23 @@
 # Horde 1.6.2 execution checkpoint
 
+**8 October equipment inspection checkpoint:** runtime
+`c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` retains the sheathed right hand through
+shared IK and keeps the parry hilt/right sleeve clear of the normal torch.
+Ten affected native checks,183 Java tests, Windows/four-ABI Debug builds and
+eight frozen desktop RT captures pass. The new sealed APK is not installed:
+the owner is away with the phone. Source CI passes all 12 aggregate jobs.
+Owner moving appearance, full body/secondary views, production activation/route,
+matched phone 50/40/33 quality and sustained thermals/power/memory, changed audio/
+haptics and independent final audit remain separate open gates. Dust stays
+optional/default Off; its accepted smaller phone still retains 998137 c 9 identity;
+shafts remain deferred. No release follows.
+[Exact source, package hashes, failures and images](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#parry-hilt-and-gauntlet-clearance-candidate).
+
+The dated4 October status and actions below are historical. The active
+[tomb finish plan](ENGINEERING_1_6_2_TOMB_FINISH.md) and the latest explicit owner
+goal supersede conflicting earlier pause/scope/device instructions. Preserve
+their completed artifacts and failures; do not resume their old action list.
+
 **Current 4 October status:** use the [compact review-candidate record](ENGINEERING_1_6_2_REVIEW_CANDIDATE.md) and [second-pass ledger](ENGINEERING_1_6_2_SECOND_PASS.md) first. Runtime89fec has fresh Windows/Android packages and all six CI jobs passed. The earlier runtime95 and “queued second pass” text below are preserved historical checkpoints. Mist polish, exact final-device admission, owner gates and independent final review remain open; no release authority is implied.
 
 ## Release hold and queued second pass (4 October)
