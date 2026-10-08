@@ -1,6 +1,6 @@
 # Android RT Device Compatibility Record
 
-**9 October — exact stand/Dust installation, SM-S948B / Android 16:** source `ac97da914e0578b4dc04f0428fa9ee49922783f9`, APK `90a80a31d88f7f758fdb9587c7917a0a61f1c1257f237df0debb58e66df40593`. Sealed installed-base pullback matches, settings and menu mix are byte-identical, normal foreground entry is inspected and handed to the owner. No Debug override is used. This establishes install/entry only; physical stand collision, controller and sustained performance are not certified. Fresh/reset Dust Low is host/Java-tested without clearing saved device settings. [Exact checkpoint and limits](ENGINEERING_1_6_2_STAND_DUST_2026_10_09.md).
+**9 October — exact stand/Dust installation, SM-S948B / Android 16:** source `ac97da914e0578b4dc04f0428fa9ee49922783f9`, APK `90a80a31d88f7f758fdb9587c7917a0a61f1c1257f237df0debb58e66df40593`. Sealed installed-base pullback matches, settings and menu mix are byte-identical, normal foreground entry is inspected and handed to the owner. No Debug override is used. The owner subsequently confirms the prompted ordinary player/Keeper stand check works as intended. This adds owner collision acceptance; controller and sustained performance are not certified by this checkpoint. Fresh/reset Dust Low is host/Java-tested without clearing saved device settings. [Exact checkpoint and limits](ENGINEERING_1_6_2_STAND_DUST_2026_10_09.md).
 
 ## 9 October torch-water material A/B — 8edca4bb / SM-S948B / Android 16
 

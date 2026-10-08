@@ -93,7 +93,13 @@
     "prRun": 37847110165,
     "status": "pending"
   },
-  "ownerStandCollisionAccepted": false,
+  "ownerStandCollisionAccepted": true,
   "sustainedPerformanceVerified": false,
-  "independentAuditCompleted": false
+  "independentAuditCompleted": false,
+  "ownerStandCollisionObservation": {
+    "date": "2026-10-09",
+    "source": "ac97da91",
+    "statement": "Working well, as intended, after the prompted player/Keeper torch-stand check",
+    "class": "owner ordinary phone playtest; not an instrumented moving-route trace"
+  }
 }
