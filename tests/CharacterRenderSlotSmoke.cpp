@@ -1304,7 +1304,8 @@ int main()
         ok &= Require(raygenSource.find("primaryTorchPixelCount") != std::string::npos &&
                       raygenSource.find("primaryPlayerPixelCount") != std::string::npos &&
                       raygenSource.find("primaryRewardRingPixelCount") != std::string::npos &&
-                      windowsSource.find("ClaimedRewardCapturePolicy(checkpoint.name)") != std::string::npos &&
+                      windowsSource.find("ClaimedRewardCapturePolicy(checkpoint.name,") != std::string::npos &&
+                      windowsSource.find("IsCaptureSwordFullyStowed(simulation.heldItems[1])") != std::string::npos &&
                       windowsSource.find("instanceMasks[4] != 0x10u") != std::string::npos &&
                       windowsSource.find("instanceMasks[10] != 0x04u") != std::string::npos &&
                       windowsSource.find("record.primaryTorchPixels != 0u") != std::string::npos &&

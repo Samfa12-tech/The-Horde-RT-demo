@@ -1158,7 +1158,10 @@ int main(int argc, char** argv)
     const auto* upCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(108);
     const auto* rewardHighCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(116);
     const auto* rewardLowCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(117);
-    const auto productionConfig = horde::gameplay::simulation::ProductionGameSimulationConfig();
+    auto productionConfig = horde::gameplay::simulation::ProductionGameSimulationConfig();
+    // These carry/reward fixtures exercise the ready-equipped Grip path. The
+    // actual Hips-owned stow and released right arm are tested separately below.
+    productionConfig.swordStartsStowed = false;
     horde::gameplay::simulation::GameSimulation restSimulation(productionConfig);
     horde::gameplay::simulation::GameSimulation downSimulation(productionConfig);
     horde::gameplay::simulation::GameSimulation upSimulation(productionConfig);

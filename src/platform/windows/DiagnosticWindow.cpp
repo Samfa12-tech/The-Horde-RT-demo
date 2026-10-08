@@ -6181,7 +6181,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
              development->rewardPose !=
                  horde::gameplay::DevelopmentRewardPose::None);
         const auto claimedRewardPixelPolicy =
-            horde::platform::windows::ClaimedRewardCapturePolicy(checkpoint.name);
+            horde::platform::windows::ClaimedRewardCapturePolicy(checkpoint.name,
+                horde::platform::windows::IsCaptureSwordFullyStowed(simulation.heldItems[1]));
         const bool diagnosticPixelCountersAvailable =
             context.rtScene.DiagnosticsAvailability() ==
             horde::vulkan::raytracing::RtDiagnosticAvailability::Available;

@@ -112,6 +112,34 @@ int main()
                   finaleRewardCapture.requireSwordPixels &&
                   !finaleRewardCapture.permitsCompleteWallRetraction);
 
+    using namespace horde::gameplay::items;
+    HeldItemState stableStow;
+    stableStow.id = HeldItemId::Sword;
+    stableStow.hand = HeldHand::RightHand;
+    stableStow.parentMode = HeldItemParentMode::BodyStow;
+    stableStow.visualStowBlend = 1.0f;
+    stableStow.visualGripBlend = 0.0f;
+    const auto stowPolicy = ClaimedRewardCapturePolicy("finale-roof",
+        horde::platform::windows::IsCaptureSwordFullyStowed(stableStow));
+    Require(stowPolicy.requirePlayerPixels && stowPolicy.requireRewardBodyPixels &&
+            stowPolicy.requireRewardRingPixels && !stowPolicy.requireSwordPixels &&
+            !stowPolicy.permitsCompleteWallRetraction,
+            "fully stowed sword only changes sword primary visibility, preserving reward proof");
+    for (unsigned invalid = 0; invalid < 7; ++invalid)
+    {
+        auto other = stableStow;
+        if (invalid == 0) other.transition.active = true;
+        if (invalid == 1) other.visualStowBlend = 0.9f;
+        if (invalid == 2) other.visualGripBlend = 0.1f;
+        if (invalid == 3) other.parentMode = HeldItemParentMode::HandSocket;
+        if (invalid == 4) other.detached = true;
+        if (invalid == 5) other.id = HeldItemId::OriginalTorch;
+        if (invalid == 6) other.hand = HeldHand::LeftHand;
+        Require(ClaimedRewardCapturePolicy("finale-roof",
+                    horde::platform::windows::IsCaptureSwordFullyStowed(other)).requireSwordPixels,
+                "held, partial, moving or invalid stow must not waive held-sword visibility");
+    }
+
     using horde::gameplay::interactions::ChestRewardPrompt;
     Require(WindowsChestPromptText(ChestRewardPrompt::Locked) ==
                 "LOCKED | DEFEAT THE LICH" &&
