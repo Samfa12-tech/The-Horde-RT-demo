@@ -1,5 +1,9 @@
 # Android RT Device Compatibility Record
 
+## 9 October torch-water material A/B — 8edca4bb / SM-S948B / Android 16
+
+Evidence class: **exact Debug install/pullback, frozen near/far/oblique/catchment images and owning completed-frame RT records**. APK `fbdc1b70684566b63ecf8f66e97b5c7778f38d3540e1ef132d1110560296c6d5` matches the installed base. At explicitly overridden 50% native traced 720×1490/output 1440×2980, both Mobile and High water complete all four fixed views on real Pipeline and RayQueryCompute. Matched baseline/after camera, exposure 0.92, zero animation time, Mobile fire, Dust Low/mist/shadows, selected emitters and resources are verified. Main settings/menu mix are byte-identical, and owned apps stop. The owner approves waterfall appearance. These images and single owning-frame GPU observations do not certify motion, scanout, causal cost or sustained performance. Long sustained testing is owner-deferred; default50 and experimental33/40 remain separate. [Exact source/packages, images, retained failures and limits](ENGINEERING_1_6_2_TORCH_WATER_2026_10_09.md).
+
 ## 9 October ordinary experimental choices — 40677738 / SM-S948B / Android 16
 
 **Ordinary experimental choices — 9 October:** source `40677738` adds clearly labelled 33%/40% choices to Android and Windows Graphics for owner manual play. Fresh/reset phone default stays 50%; saved/custom preferences and Use/native ACK/Keep/Restore remain authoritative. 252 Java tests, lint, both builds, seven affected host suites and 12/12 runtime CI jobs pass. Exact normal-phone installation and both preview/Restore paths retain saved 50/custom effects and menu mix. The build is reopened for manual play; sustained performance and any upscaling decision follow feedback. [Exact artifacts and limits](ENGINEERING_1_6_2_EXPERIMENTAL_SCALES_2026_10_09.md).

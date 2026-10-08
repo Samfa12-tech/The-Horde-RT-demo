@@ -1,0 +1,780 @@
+{
+  "schema": 1,
+  "before": {
+    "sourceCommit": "683c77e1717d2f08fd37932c0115229b8b42f535",
+    "sourceTree": "8b96bbd8e4da9e48e4ca510eb894c8788fa9c0a6",
+    "apkSha256": "f44fbd758e46eaad9cd5850327b1cfd63c154921d161258d6729a9533d933fb3",
+    "windowsExeSha256": "8bb4b5c1fefeabfd33d069370ae82a87254bc022e7742a58692a1c30486e9620"
+  },
+  "after": {
+    "sourceCommit": "8edca4bb7e91f014cba50a8bc7dcd29d79a3c5c9",
+    "sourceTree": "0b61f9e861c75e1ff19ac66389e8ba1c19b09629",
+    "apkSha256": "fbdc1b70684566b63ecf8f66e97b5c7778f38d3540e1ef132d1110560296c6d5",
+    "windowsExeSha256": "c400317e975ef218a3141e494a34fd1b840267bc54f81c8c701aa29262a38fbe"
+  },
+  "isolatedZeroDiffuseSource": "576045c2da4a80524aa9cab0b5cefafc8bf1790d",
+  "classification": "Fixed-camera frozen native RT images, not moving/scanout/sustained-FPS evidence",
+  "ownerWaterAppearance": "Approved 9 October 2026",
+  "phone": [
+    {
+      "backend": "RayTracingPipeline",
+      "water": "Mobile",
+      "view": "near",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "14a98b678df2579818e63e2f6310e25efcf9d3cb1c043ce56c1d8fec992bef66",
+        "completedSubmissionSerial": 12,
+        "wholeRtGpuMs": 47.716926,
+        "sampleCount": 12
+      },
+      "after": {
+        "nativePngSha256": "f322641cabf947a3a359d950d087b1b2a967b7d4093c8e891c2bd6552687bc88",
+        "completedSubmissionSerial": 12,
+        "wholeRtGpuMs": 47.396041,
+        "sampleCount": 12
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "water": "Mobile",
+      "view": "far",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "5c107538350e361fcb0302b1220cd02803e0444006efc6e4b214e109ed257ad7",
+        "completedSubmissionSerial": 75,
+        "wholeRtGpuMs": 35.624218,
+        "sampleCount": 75
+      },
+      "after": {
+        "nativePngSha256": "13f2b99290ff26369be534fb6576da7fa68b004ff2a533ffb20a20b5d9f706e9",
+        "completedSubmissionSerial": 97,
+        "wholeRtGpuMs": 35.468853,
+        "sampleCount": 97
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "water": "Mobile",
+      "view": "oblique",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "7ecd1b351767a3dd86f777121df8279b66bffe58d0c775b4cb72de88dcef9162",
+        "completedSubmissionSerial": 154,
+        "wholeRtGpuMs": 40.687707,
+        "sampleCount": 154
+      },
+      "after": {
+        "nativePngSha256": "dd574bff2a4b5f89f603655fd5b5026f6e1cb3f9fbded7824a4c5348eb5616e8",
+        "completedSubmissionSerial": 210,
+        "wholeRtGpuMs": 41.514061,
+        "sampleCount": 210
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "water": "Mobile",
+      "view": "catchment",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "bf22c14f655e5a82a9708ad7d8bd6424856237ceac9ba60c296c2bf94bb47373",
+        "completedSubmissionSerial": 222,
+        "wholeRtGpuMs": 46.806301,
+        "sampleCount": 222
+      },
+      "after": {
+        "nativePngSha256": "4cc9f46f74a32af99e939113d98cb4a95c4071b4ea0a6407907c54b23e0e1bfe",
+        "completedSubmissionSerial": 286,
+        "wholeRtGpuMs": 46.460728,
+        "sampleCount": 286
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "water": "High",
+      "view": "near",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "863d3406e9c00aa49f19c619d2d5dc83fe3c34ad1b7954e7bcde4010d4834326",
+        "completedSubmissionSerial": 282,
+        "wholeRtGpuMs": 65.763332,
+        "sampleCount": 282
+      },
+      "after": {
+        "nativePngSha256": "dedc9edebc2afd690179e619695c117a47596d62ddcac6b3652a69a4a2d69e60",
+        "completedSubmissionSerial": 347,
+        "wholeRtGpuMs": 65.630728,
+        "sampleCount": 347
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "water": "High",
+      "view": "far",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "e29bf9dd96ed060f77b7fa669a9a334845694c1c9e098689fd568944e6f43e6f",
+        "completedSubmissionSerial": 331,
+        "wholeRtGpuMs": 39.191249,
+        "sampleCount": 331
+      },
+      "after": {
+        "nativePngSha256": "3e08d8048890cab04a0440972c1a871615ebc2845603080034490adcac67dde0",
+        "completedSubmissionSerial": 398,
+        "wholeRtGpuMs": 38.923957,
+        "sampleCount": 398
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "water": "High",
+      "view": "oblique",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "3dbff83b0cc8cb63ee59d1773ef53265b62bf5547b91e726f80026368ba72abc",
+        "completedSubmissionSerial": 406,
+        "wholeRtGpuMs": 47.232499,
+        "sampleCount": 406
+      },
+      "after": {
+        "nativePngSha256": "a9f9d1a3678e8c7714c2e3388c8ceb10df9a988f219672b74c97553c985f388d",
+        "completedSubmissionSerial": 469,
+        "wholeRtGpuMs": 47.950624,
+        "sampleCount": 469
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "water": "High",
+      "view": "catchment",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "c0d72adde94441e28548bc3b707c5b9b595bef421ec57995ac0098a90e27d9e1",
+        "completedSubmissionSerial": 466,
+        "wholeRtGpuMs": 58.07854,
+        "sampleCount": 466
+      },
+      "after": {
+        "nativePngSha256": "15231d18558a66a1cff4e4bf1fc361bf272ef61091bdd2b0abb6ffad16c3c839",
+        "completedSubmissionSerial": 528,
+        "wholeRtGpuMs": 58.676717,
+        "sampleCount": 528
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "water": "Mobile",
+      "view": "near",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "14a98b678df2579818e63e2f6310e25efcf9d3cb1c043ce56c1d8fec992bef66",
+        "completedSubmissionSerial": 12,
+        "wholeRtGpuMs": 46.680936,
+        "sampleCount": 12
+      },
+      "after": {
+        "nativePngSha256": "f322641cabf947a3a359d950d087b1b2a967b7d4093c8e891c2bd6552687bc88",
+        "completedSubmissionSerial": 12,
+        "wholeRtGpuMs": 46.104634,
+        "sampleCount": 12
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "water": "Mobile",
+      "view": "far",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "5c107538350e361fcb0302b1220cd02803e0444006efc6e4b214e109ed257ad7",
+        "completedSubmissionSerial": 62,
+        "wholeRtGpuMs": 33.588072,
+        "sampleCount": 62
+      },
+      "after": {
+        "nativePngSha256": "13f2b99290ff26369be534fb6576da7fa68b004ff2a533ffb20a20b5d9f706e9",
+        "completedSubmissionSerial": 73,
+        "wholeRtGpuMs": 34.538437,
+        "sampleCount": 73
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "water": "Mobile",
+      "view": "oblique",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "7ecd1b351767a3dd86f777121df8279b66bffe58d0c775b4cb72de88dcef9162",
+        "completedSubmissionSerial": 124,
+        "wholeRtGpuMs": 39.036093,
+        "sampleCount": 124
+      },
+      "after": {
+        "nativePngSha256": "dd574bff2a4b5f89f603655fd5b5026f6e1cb3f9fbded7824a4c5348eb5616e8",
+        "completedSubmissionSerial": 155,
+        "wholeRtGpuMs": 39.003697,
+        "sampleCount": 155
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "water": "Mobile",
+      "view": "catchment",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "bf22c14f655e5a82a9708ad7d8bd6424856237ceac9ba60c296c2bf94bb47373",
+        "completedSubmissionSerial": 178,
+        "wholeRtGpuMs": 44.884686,
+        "sampleCount": 178
+      },
+      "after": {
+        "nativePngSha256": "4cc9f46f74a32af99e939113d98cb4a95c4071b4ea0a6407907c54b23e0e1bfe",
+        "completedSubmissionSerial": 231,
+        "wholeRtGpuMs": 46.020259,
+        "sampleCount": 231
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "water": "High",
+      "view": "near",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "863d3406e9c00aa49f19c619d2d5dc83fe3c34ad1b7954e7bcde4010d4834326",
+        "completedSubmissionSerial": 224,
+        "wholeRtGpuMs": 65.241144,
+        "sampleCount": 224
+      },
+      "after": {
+        "nativePngSha256": "dedc9edebc2afd690179e619695c117a47596d62ddcac6b3652a69a4a2d69e60",
+        "completedSubmissionSerial": 294,
+        "wholeRtGpuMs": 66.189582,
+        "sampleCount": 294
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "water": "High",
+      "view": "far",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "e29bf9dd96ed060f77b7fa669a9a334845694c1c9e098689fd568944e6f43e6f",
+        "completedSubmissionSerial": 265,
+        "wholeRtGpuMs": 37.842759,
+        "sampleCount": 265
+      },
+      "after": {
+        "nativePngSha256": "3e08d8048890cab04a0440972c1a871615ebc2845603080034490adcac67dde0",
+        "completedSubmissionSerial": 343,
+        "wholeRtGpuMs": 37.54427,
+        "sampleCount": 343
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "water": "High",
+      "view": "oblique",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "3dbff83b0cc8cb63ee59d1773ef53265b62bf5547b91e726f80026368ba72abc",
+        "completedSubmissionSerial": 325,
+        "wholeRtGpuMs": 46.078905,
+        "sampleCount": 325
+      },
+      "after": {
+        "nativePngSha256": "a9f9d1a3678e8c7714c2e3388c8ceb10df9a988f219672b74c97553c985f388d",
+        "completedSubmissionSerial": 417,
+        "wholeRtGpuMs": 46.042551,
+        "sampleCount": 417
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "water": "High",
+      "view": "catchment",
+      "scale": 50,
+      "exposure": 0.92,
+      "fixedAnimationTime": 0,
+      "actualDustQuality": 1,
+      "actualMistEnabled": true,
+      "actualFireQuality": "Mobile",
+      "before": {
+        "nativePngSha256": "c0d72adde94441e28548bc3b707c5b9b595bef421ec57995ac0098a90e27d9e1",
+        "completedSubmissionSerial": 371,
+        "wholeRtGpuMs": 57.777707,
+        "sampleCount": 371
+      },
+      "after": {
+        "nativePngSha256": "15231d18558a66a1cff4e4bf1fc361bf272ef61091bdd2b0abb6ffad16c3c839",
+        "completedSubmissionSerial": 476,
+        "wholeRtGpuMs": 58.37604,
+        "sampleCount": 476
+      },
+      "internalExtent": {
+        "width": 720,
+        "height": 1490
+      },
+      "nativeOutputExtent": {
+        "width": 1440,
+        "height": 2980
+      }
+    }
+  ],
+  "windows": [
+    {
+      "backend": "pipeline",
+      "water": "High",
+      "view": "near",
+      "scale": 100,
+      "exposure": 0.62,
+      "fixedAnimationTime": 0,
+      "before": {
+        "nativePngSha256": "e455519a708ca00083531faa2ed9ab3e6a5412514b387eda29a29647ddbd0173",
+        "validationErrors": 0,
+        "captureWallSeconds": 8.9317956
+      },
+      "after": {
+        "nativePngSha256": "5a687cb7a3a54823ddd3e7ffeaa8e5de931d4bd555f71a86a609673db7e3a844",
+        "validationErrors": 0,
+        "captureWallSeconds": 51.9781733
+      }
+    },
+    {
+      "backend": "pipeline",
+      "water": "High",
+      "view": "far",
+      "scale": 100,
+      "exposure": 0.62,
+      "fixedAnimationTime": 0,
+      "before": {
+        "nativePngSha256": "ea571ca1d7d5bd7099940b2af1ec26a159617e9bbd9b6565d364df3734dfac5c",
+        "validationErrors": 0,
+        "captureWallSeconds": 5.8086685
+      },
+      "after": {
+        "nativePngSha256": "07b3143f5e7eaeffdf5d53790757fbed50b2fb364afd8ee81f37e57d74217030",
+        "validationErrors": 0,
+        "captureWallSeconds": 6.3539714
+      }
+    },
+    {
+      "backend": "pipeline",
+      "water": "High",
+      "view": "oblique",
+      "scale": 100,
+      "exposure": 0.62,
+      "fixedAnimationTime": 0,
+      "before": {
+        "nativePngSha256": "e441057c9e4a4fe1909a2c83816eb94ff23bd32f263c4e3883c14ec51267614c",
+        "validationErrors": 0,
+        "captureWallSeconds": 5.8227033
+      },
+      "after": {
+        "nativePngSha256": "b01f545f31ac0841cbd37b668c8ea99d4da11cd07f79a71c3ee98c5309b33e4e",
+        "validationErrors": 0,
+        "captureWallSeconds": 6.1477066
+      }
+    },
+    {
+      "backend": "pipeline",
+      "water": "High",
+      "view": "catchment",
+      "scale": 100,
+      "exposure": 0.62,
+      "fixedAnimationTime": 0,
+      "before": {
+        "nativePngSha256": "cbe2a71d7e45daca04e8a5c011240c9f87fe6e870a68f6c20588c407b0f99fda",
+        "validationErrors": 0,
+        "captureWallSeconds": 5.8099528
+      },
+      "after": {
+        "nativePngSha256": "6ef0b3c31f19128f9b117aa3cc89b1a07465d7a0856c911d3a9ed71bc6ada146",
+        "validationErrors": 0,
+        "captureWallSeconds": 6.0784972
+      }
+    },
+    {
+      "backend": "compute",
+      "water": "High",
+      "view": "near",
+      "scale": 100,
+      "exposure": 0.62,
+      "fixedAnimationTime": 0,
+      "before": {
+        "nativePngSha256": "f495a5c6d276363f5d373636b8ebfe195e3ec57be496ae9f248ffc643f030187",
+        "validationErrors": 0,
+        "captureWallSeconds": 6.2886049
+      },
+      "after": {
+        "nativePngSha256": "23c8da293f4e9c50a5d5f6afede36cdefaa695084ba70d253e055c5a6d584693",
+        "validationErrors": 0,
+        "captureWallSeconds": 41.5446149
+      }
+    },
+    {
+      "backend": "compute",
+      "water": "High",
+      "view": "far",
+      "scale": 100,
+      "exposure": 0.62,
+      "fixedAnimationTime": 0,
+      "before": {
+        "nativePngSha256": "a31d871097f4b871bcb770ca7589779aac053fbc1a62b0fd3d2bde19fa9df23f",
+        "validationErrors": 0,
+        "captureWallSeconds": 6.3483347
+      },
+      "after": {
+        "nativePngSha256": "5890f26fa93365200995ecd5d3ca7b3aaee745954aec9cc4e43ffee3e589460d",
+        "validationErrors": 0,
+        "captureWallSeconds": 6.2851194
+      }
+    },
+    {
+      "backend": "compute",
+      "water": "High",
+      "view": "oblique",
+      "scale": 100,
+      "exposure": 0.62,
+      "fixedAnimationTime": 0,
+      "before": {
+        "nativePngSha256": "156f44d57292f33b4b0aedb264b23999f1079de069e16bd466ddbff36287650f",
+        "validationErrors": 0,
+        "captureWallSeconds": 6.292129
+      },
+      "after": {
+        "nativePngSha256": "d2b4a0e58261655030340afabc30d663b2d248b915a6c186c35d1821ad13e840",
+        "validationErrors": 0,
+        "captureWallSeconds": 6.1420564
+      }
+    },
+    {
+      "backend": "compute",
+      "water": "High",
+      "view": "catchment",
+      "scale": 100,
+      "exposure": 0.62,
+      "fixedAnimationTime": 0,
+      "before": {
+        "nativePngSha256": "dddfb4cec5f5fa41cd301c6df414190162241bf9fbb39e8327f0ccca1cdf7cce",
+        "validationErrors": 0,
+        "captureWallSeconds": 6.4354306
+      },
+      "after": {
+        "nativePngSha256": "66725f6f5b6555ebbba3f5c8a80d081a21f7c65a575a7dc2a5aa1108c9bb02f2",
+        "validationErrors": 0,
+        "captureWallSeconds": 6.1885759
+      }
+    }
+  ],
+  "galleries": [
+    {
+      "file": "phone-pipeline-mobile.png",
+      "sha256": "13889325e2f1de65a082f12b7b534a46c6a264cf493493cbd2ef889d6bb7c64c",
+      "description": "Native viewport cropped from owned capture, uniformly scaled to360px per panel; labels added above panels; original image hashes retained"
+    },
+    {
+      "file": "phone-pipeline-high.png",
+      "sha256": "fcf741c4e7fc1914f3e76a20b5f52c6ee6824d36208255d5ccb97ea6326afbc4",
+      "description": "Native viewport cropped from owned capture, uniformly scaled to360px per panel; labels added above panels; original image hashes retained"
+    },
+    {
+      "file": "windows-pipeline-high.png",
+      "sha256": "6423fdcfc894bf61c6c1e1179108e3e8c6f6f73e794a5beee3ab24b244414530",
+      "description": "Native RT storage-image capture scaled to480px per panel, labels above panels; original hashes retained"
+    },
+    {
+      "file": "phone-compute-mobile.png",
+      "sha256": "13889325e2f1de65a082f12b7b534a46c6a264cf493493cbd2ef889d6bb7c64c",
+      "description": "Native viewport cropped from owned capture, uniformly scaled to360px per panel; labels added above panels; original image hashes retained"
+    },
+    {
+      "file": "phone-compute-high.png",
+      "sha256": "fcf741c4e7fc1914f3e76a20b5f52c6ee6824d36208255d5ccb97ea6326afbc4",
+      "description": "Native viewport cropped from owned capture, uniformly scaled to360px per panel; labels added above panels; original image hashes retained"
+    },
+    {
+      "file": "windows-compute-high.png",
+      "sha256": "4b72811c8d9a220906d35f663f3567172b8878eab4cc6a672c6ee2ca63452288",
+      "description": "Native RT storage-image capture scaled to480px per panel, labels above panels; original hashes retained"
+    }
+  ],
+  "pipelineShaderMetrics": [
+    {
+      "key": "diagnostic_high_generic_dielectric",
+      "beforeBytes": 295636,
+      "afterBytes": 295404,
+      "beforeInstructions": 17638,
+      "afterInstructions": 17621,
+      "rayQuerySites": 2,
+      "functions": 83
+    },
+    {
+      "key": "diagnostic_high_opaque_fast",
+      "beforeBytes": 594956,
+      "afterBytes": 594952,
+      "beforeInstructions": 33038,
+      "afterInstructions": 33038,
+      "rayQuerySites": 29,
+      "functions": 1
+    },
+    {
+      "key": "diagnostic_mobile_generic_dielectric",
+      "beforeBytes": 294136,
+      "afterBytes": 293904,
+      "beforeInstructions": 17542,
+      "afterInstructions": 17525,
+      "rayQuerySites": 2,
+      "functions": 83
+    },
+    {
+      "key": "diagnostic_mobile_opaque_fast",
+      "beforeBytes": 591856,
+      "afterBytes": 591852,
+      "beforeInstructions": 32845,
+      "afterInstructions": 32845,
+      "rayQuerySites": 27,
+      "functions": 1
+    },
+    {
+      "key": "shipping_high_generic_dielectric",
+      "beforeBytes": 286808,
+      "afterBytes": 286576,
+      "beforeInstructions": 17214,
+      "afterInstructions": 17197,
+      "rayQuerySites": 2,
+      "functions": 83
+    },
+    {
+      "key": "shipping_high_opaque_fast",
+      "beforeBytes": 590720,
+      "afterBytes": 590716,
+      "beforeInstructions": 32859,
+      "afterInstructions": 32859,
+      "rayQuerySites": 29,
+      "functions": 1
+    },
+    {
+      "key": "shipping_mobile_generic_dielectric",
+      "beforeBytes": 285308,
+      "afterBytes": 285076,
+      "beforeInstructions": 17118,
+      "afterInstructions": 17101,
+      "rayQuerySites": 2,
+      "functions": 83
+    },
+    {
+      "key": "shipping_mobile_opaque_fast",
+      "beforeBytes": 587620,
+      "afterBytes": 587616,
+      "beforeInstructions": 32666,
+      "afterInstructions": 32666,
+      "rayQuerySites": 27,
+      "functions": 1
+    }
+  ],
+  "timingLimits": "One owning completed-frame GPU observation per view at submission12; matched visual settings but sequential uncontrolled thermal order. Not a steady distribution, causal cost comparison, display FPS, motion or sustained-performance pass. No new resources or ray-query sites.",
+  "retainedFailures": [
+    "Initial baseline Pipeline phone near image showed stale legacy menu despite ready report: rejected, all8 Pipeline views recaptured after fresh owned report requirement.",
+    "Initial zero-diffuse Windows Compute cold initialization exceeded45-second capture process observation deadline: no image/pass; retained. Final same acceptance criteria complete within separate90-second diagnostic process deadline; no normal Graphics ACK/confirmation timeout changed.",
+    "Wrapper and initial bubble shader forms exceeded frozen program-size budgets; rejected without widening budgets. Final water-local form reuses reflection decision and identical scalar/RGB sky transmittance expression; all eight frozen metrics pass."
+  ],
+  "unchangedPackageEntries": {
+    "assetEntries": 94,
+    "allAssetBytesIdentical": true,
+    "javaDexByteIdentical": true,
+    "manifestByteIdentical": true
+  }
+}
