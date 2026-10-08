@@ -91,7 +91,9 @@
     "source": "ac97da914e0578b4dc04f0428fa9ee49922783f9",
     "pushRun": 37847101238,
     "prRun": 37847110165,
-    "status": "pending"
+    "status": "12/12 aggregate success",
+    "jobs": 12,
+    "independentAuditCompleted": false
   },
   "ownerStandCollisionAccepted": true,
   "sustainedPerformanceVerified": false,

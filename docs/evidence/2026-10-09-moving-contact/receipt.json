@@ -1,0 +1,90 @@
+{
+  "sourceCommit": "5a2a466166babd9646eb7031124f009c11ed6942",
+  "sourceTree": "54c994daa3c1e6d4c1adb23a96fc1c79c4928380",
+  "testOnly": true,
+  "productionRuntime": "ac97da914e0578b4dc04f0428fa9ee49922783f9",
+  "queryBudget": {
+    "pulse": 4,
+    "lateCounterfactual": 6
+  },
+  "unchangedStaticWitnessRerun": false,
+  "pulseSnapshot": {
+    "sourceFileSha256": "ea58df95dc66b5d50febbb4e84329c1952cd79809fb49652a8c4e45a75f82431",
+    "exeSha256": "689ad86a7d40f4c84c62ec2e3d12dc8f149316f19e40d7c50b1019f7bbaa08f6",
+    "runSeconds": 1.013,
+    "exitCode": 0,
+    "exactCommitClaim": false,
+    "note": "Pre-refactor test-only snapshot; four unchanged pulse samples are retained, not relabelled as a run of the final helper."
+  },
+  "lateSnapshot": {
+    "sourceFileSha256": "698c824a2a0bdb6a64ef1f931133abbbd0e8a1e03a44022a0123a39190970976",
+    "exeSha256": "33351efda8bdec675179c5c9f247d372e567830fc0b139bf27564eb886426964",
+    "buildSeconds": 3.303,
+    "runSeconds": 1.266,
+    "exitCode": 0,
+    "queries": 6,
+    "sourceCommit": "5a2a466166babd9646eb7031124f009c11ed6942"
+  },
+  "casePolicy": "initial1.52m; 0deg and -15deg; actual60Hz; post-player/pre-target authority pairing; real walking until attack entry",
+  "pulse17": {
+    "authorityTargetRangeM": 1.35467,
+    "frontalGapMm": 215.684,
+    "minus15GapMm": 17.5033,
+    "bothDamageAdmitted": true
+  },
+  "laterSamples": {
+    "ticks": [
+      19,
+      21,
+      23
+    ],
+    "frontalGapsMm": [
+      182.992,
+      179.313,
+      206.105
+    ],
+    "minus15GapsMm": [
+      23.6694,
+      0.0,
+      0.0
+    ],
+    "counterfactualUnhitTargets": true,
+    "newHitAdmissions": false
+  },
+  "interpretation": "Harness/fixture checks pass; positive-gap contact agreement does NOT pass. No uniform delay is supported. Centroid components are not nearest-surface vectors.",
+  "ownerDecision": {
+    "date": "2026-10-09",
+    "keepCurrentCombatFor162": true,
+    "documentLimitation": true,
+    "precisionCorrectionDeferred": true
+  },
+  "continuousContactVerified": false,
+  "presentedFrameVerified": false,
+  "independentAuditCompleted": false,
+  "evidence": [
+    {
+      "name": "moving-pulse-v2-build.log",
+      "sha256": "2a4b8e2afede71f0931567f2fff810804ae34f8a55232ea6849e9e306a8d25c2"
+    },
+    {
+      "name": "moving-pulse-v2-run.stdout.log",
+      "sha256": "1ccfb5458a23378a55d518a42a4d9f80de7ffff913a751f6adcf3337f6580cb6"
+    },
+    {
+      "name": "moving-downstroke-v1-build.log",
+      "sha256": "2a4b8e2afede71f0931567f2fff810804ae34f8a55232ea6849e9e306a8d25c2"
+    },
+    {
+      "name": "moving-downstroke-v1-run.stdout.log",
+      "sha256": "da6a2b0bce7f6951a9211e6233212e96a55c46dcc5f5a71f73322cb47ab549c6"
+    },
+    {
+      "name": "moving-downstroke-v1-invalid-extra-arg.stderr.log",
+      "sha256": "513efa19ba942945d78163cbe83f1d0be965aa8d4199a7710ca36c52b6a201f1"
+    },
+    {
+      "name": "moving-downstroke-v1-invalid-unknown.stderr.log",
+      "sha256": "513efa19ba942945d78163cbe83f1d0be965aa8d4199a7710ca36c52b6a201f1"
+    }
+  ]
+}
