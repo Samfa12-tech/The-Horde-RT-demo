@@ -1,5 +1,7 @@
 # 1.6.2 bounded mobile quality measurements
 
+**Motion-measurement checkpoint — 9 October:** runtime `a6439e0b` adds an isolated Shipping/Mobile path through the existing raw-wall-delta 60 Hz simulation, exact RT/presentation joins and owned milestone readbacks; ordinary defaults and input authority are preserved. 249 tests in each Android variant, lint, four-ABI packages, affected host/analyzer/admission checks and 12/12 source CI pass. Exact isolated install/pullback succeeds on SM-S948B/Android16. First phone run is refused before launch by warm current-HAL temperatures; no motion/pacing pass is claimed. The temporary isolated 50% save awaits the comparison and original75 restoration; primary settings/menu mix are unchanged, apps stopped. [Evidence, hashes and open gates](ENGINEERING_1_6_2_MOTION_PRESENTATION_2026_10_09.md).
+
 ## First warm 50% route observation — 8 October, same 2a408613 APK
 
 One newly traced mobile-default-profile probe completes both laps/26 waypoints,

@@ -1,5 +1,7 @@
 # Android RT Device Compatibility Record
 
+**9 October isolated measurement setup:** SM-S948B/Android16 installs exact `a6439e0b` Shipping/Mobile benchmark APK with pulled-base hash matching `d305f4ab8d3d61f57620f6fcd2eb40db4fce4aa0b76a6c90e44cfbcfb91cff73`. Normal Graphics observes saved legacy75 surviving install and acknowledges/keeps temporary mobile50. Primary game preferences/menu mix are byte-identical. First moving run is rejected before launch by warm typed current-HAL sensors; apps stopped. This is install/setup evidence, not a new motion, controller or sustained-performance pass. [Exact record](ENGINEERING_1_6_2_MOTION_PRESENTATION_2026_10_09.md).
+
 ## 9 October heart-only HUD — 7766ea3a / SM-S948B / Android 16
 
 Evidence class: **exact Debug installation/pullback and normal-Play HUD image/accessibility hierarchy**. Four-ABI APK `516f1ace49dedab29ed266a0b1b7ef92e9bcbbc855818be81ce36a492dabb748` shows three red hearts and no visible vitality caption; accessible current/max remains. Game settings and accepted menu mix are unchanged; framework launch bookkeeping is separate. 243 Java tests/38 classes, lint, Android/Windows builds and three host regressions pass. Hollow states/future maxima are automated bitmap/HUD evidence, not physical damage or upgrade acceptance; orientation/controller, spoken screen reader, Windows appearance and sustained performance remain separate. Owned app stopped. [Exact subject, cropped image and limits](ENGINEERING_1_6_2_HEART_HUD_2026_10_09.md).
