@@ -260,3 +260,7 @@ assets/audio/menu/*.wav -text
 # Keep menu ownership evidence and its public receipts byte-stable.
 docs/evidence/2026-10-08-menu-ambience/*.log text eol=lf
 docs/evidence/2026-10-08-menu-ambience/*.json text eol=lf
+
+# Byte-stable scoped grate evidence.
+docs/evidence/2026-10-08-grate-floor/*.json text eol=lf
+docs/evidence/2026-10-08-grate-floor/*.png -text

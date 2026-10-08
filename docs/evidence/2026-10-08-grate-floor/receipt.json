@@ -1,0 +1,595 @@
+{
+  "schema": 1,
+  "scope": "Existing first-bend grate floor closure only",
+  "sourceCommit": "7c9b8779f1eb0af9d20e4f1d326d92f2d8a3f412",
+  "sourceTree": "6b099c8c2b95d7cad3e5971c13a1c8b94ba2e551",
+  "apkSha256": "c7074c790d30563fb920415f9e879a5720f2af062096d5b69adb83a785d9420d",
+  "windowsExeSha256": "b8b4803ff3f285bf1e385acabf5190f8a791b9f2bdb5638bd6b788d0185a6923",
+  "validationHead": "5301e4a7bcc8cbe280d6277ea183deb3d1178d92",
+  "testOnlyCorrectionLeavesAcceptedApkByteIdentical": true,
+  "beforeInspection": {
+    "baseSourceCommit": "79d76e9d2619f652c40701d91c2d49e7589ca7f8",
+    "state": "Inspection-only patch; original world geometry unchanged; missing base regression deliberately fails",
+    "exeSha256": "cbb52e1fd05a9fa9fd449107d2e7f21396d30848ce277ff9356c5f227cc33b25",
+    "patchSha256": "d5bd187924a22bd77c904aea895de194915cc54f5b386e006129529725938ad1",
+    "redRegressionLogSha256": "787d5a88ab043a5a2caef189a98567d86bc0f2850c67f9cdc19c671f28d7d83b"
+  },
+  "geometry": {
+    "solids": 1,
+    "triangles": 12,
+    "ordinaryWorldMeshPayloadBytesAdded": 480,
+    "min": [
+      2.03,
+      -1.13,
+      -8.8
+    ],
+    "max": [
+      3.12,
+      -0.95,
+      -8.33
+    ],
+    "newAssets": 0,
+    "newLights": 0,
+    "newInstances": 0
+  },
+  "windows": [
+    {
+      "backend": "RayTracingPipeline",
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "checkpoint": "wall-panel-bottom",
+      "camera": {
+        "x": 2.575,
+        "z": -10.2,
+        "yaw": 3.141593,
+        "pitch": -0.32
+      },
+      "output": [
+        960,
+        540
+      ],
+      "presented": true,
+      "synchronizationValidationEnabled": true,
+      "validationErrorMarkers": 0,
+      "beforePngSha256": "d38a375969361e861636e83f893a721c96e92a3a1c7ed155827692fdb1b12b65",
+      "afterPngSha256": "78e60eaa05a001454d2c2f199faf9712d294bdcbbca27874c7a1bd80bd156be9",
+      "changedPixels": 10770,
+      "captureManifestSha256": "6dd387d61ae31eda0f0490ea21e0dab130b45e00bf4f90fe6a81e0a077d93f04"
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "checkpoint": "wall-panel-bottom-left",
+      "camera": {
+        "x": 1.75,
+        "z": -10.1,
+        "yaw": 2.646,
+        "pitch": -0.32
+      },
+      "output": [
+        960,
+        540
+      ],
+      "presented": true,
+      "synchronizationValidationEnabled": true,
+      "validationErrorMarkers": 0,
+      "beforePngSha256": "fb2240500ef75678282720f7db50f807675a3c6714acb7f70f1d857077994988",
+      "afterPngSha256": "df2b97d40bbf454a2aa2f20c6f54eac375183a5d2773d55021dcc5aa46c717a1",
+      "changedPixels": 8657,
+      "captureManifestSha256": "2f5b6decb47c0d599a04ccee124a43b46a477c7849a0c8ab48d84338246673c4"
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "checkpoint": "wall-panel-bottom-right",
+      "camera": {
+        "x": 3.4,
+        "z": -10.1,
+        "yaw": 3.637,
+        "pitch": -0.32
+      },
+      "output": [
+        960,
+        540
+      ],
+      "presented": true,
+      "synchronizationValidationEnabled": true,
+      "validationErrorMarkers": 0,
+      "beforePngSha256": "e2906945574292cf66ec2939aa4b86567fdfdbbafcf1d6752e8ba6833471301b",
+      "afterPngSha256": "5cae0cf678f2e802ca68c272616ce6b4bff3730eb9cf977594d0bd5c38662617",
+      "changedPixels": 8549,
+      "captureManifestSha256": "f62504342724847e31b1cc76967476919f0afdd8450eba7d5d4bb06c44bcbe58"
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "checkpoint": "layout-c-wall-panel-upward",
+      "camera": {
+        "x": 2.55,
+        "z": -9.45,
+        "yaw": 3.141593,
+        "pitch": 0.28
+      },
+      "output": [
+        960,
+        540
+      ],
+      "presented": true,
+      "synchronizationValidationEnabled": true,
+      "validationErrorMarkers": 0,
+      "beforePngSha256": "daa8c610201a75e63c734a757e40fdf0061e749e9578b0312326f255241b0a16",
+      "afterPngSha256": "daa8c610201a75e63c734a757e40fdf0061e749e9578b0312326f255241b0a16",
+      "changedPixels": 0,
+      "captureManifestSha256": "7b68580f8e448bce8d72a08e4c222c7867e728688324a3d1895e22488af12315"
+    },
+    {
+      "backend": "RayQueryCompute",
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "checkpoint": "wall-panel-bottom",
+      "camera": {
+        "x": 2.575,
+        "z": -10.2,
+        "yaw": 3.141593,
+        "pitch": -0.32
+      },
+      "output": [
+        960,
+        540
+      ],
+      "presented": true,
+      "synchronizationValidationEnabled": true,
+      "validationErrorMarkers": 0,
+      "beforePngSha256": "78d90f0de30c2bbb156cf3c5565120ed36d813dce2fb06996fb5c1db25bd2e41",
+      "afterPngSha256": "1a094fecb69bebc4d6f35036fbf29fc5b59410ab4af364619faf645fc024f5dd",
+      "changedPixels": 10770,
+      "captureManifestSha256": "2b4e9c1658bece255d451dfbf833d740756e092dda1225a9cc3d72315f4c65a0"
+    },
+    {
+      "backend": "RayQueryCompute",
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "checkpoint": "wall-panel-bottom-left",
+      "camera": {
+        "x": 1.75,
+        "z": -10.1,
+        "yaw": 2.646,
+        "pitch": -0.32
+      },
+      "output": [
+        960,
+        540
+      ],
+      "presented": true,
+      "synchronizationValidationEnabled": true,
+      "validationErrorMarkers": 0,
+      "beforePngSha256": "cec8b75ac5490722d55e24ef13d2822a0a97f7b6ad19890333736aa3fc601431",
+      "afterPngSha256": "e48132b3c4871debc4d5331c8dfa4978a09bbe1963bf7233b3e48d8eb1902629",
+      "changedPixels": 8657,
+      "captureManifestSha256": "03804c34c4c470c18ed27accc013dca93e09809bd388359a92e61cd9f9b92ca0"
+    },
+    {
+      "backend": "RayQueryCompute",
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "checkpoint": "wall-panel-bottom-right",
+      "camera": {
+        "x": 3.4,
+        "z": -10.1,
+        "yaw": 3.637,
+        "pitch": -0.32
+      },
+      "output": [
+        960,
+        540
+      ],
+      "presented": true,
+      "synchronizationValidationEnabled": true,
+      "validationErrorMarkers": 0,
+      "beforePngSha256": "d4d4ebcfa45e3a2bb07ec340a67c3cfff0909e151d678f917ec598d17b46a9af",
+      "afterPngSha256": "1da68f0a591d2bdcb33b2587a2bca737ff1f9b7860c98232a727bcc4fa9d3691",
+      "changedPixels": 8549,
+      "captureManifestSha256": "2e046d3508f44012cecc45f1478ddeb608b00e22c36925b705ebc2e1fb8a0969"
+    },
+    {
+      "backend": "RayQueryCompute",
+      "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "checkpoint": "layout-c-wall-panel-upward",
+      "camera": {
+        "x": 2.55,
+        "z": -9.45,
+        "yaw": 3.141593,
+        "pitch": 0.28
+      },
+      "output": [
+        960,
+        540
+      ],
+      "presented": true,
+      "synchronizationValidationEnabled": true,
+      "validationErrorMarkers": 0,
+      "beforePngSha256": "6dbd4a883afb87e0d33d616eea7950503613e92cf1e6798e8fc9272f169a6e3e",
+      "afterPngSha256": "6dbd4a883afb87e0d33d616eea7950503613e92cf1e6798e8fc9272f169a6e3e",
+      "changedPixels": 0,
+      "captureManifestSha256": "596fa85e2db0ea12d3de392c8241d3a5bd7dab3fc615b31ecd80d418cd32d558"
+    }
+  ],
+  "phone": [
+    {
+      "model": "SM-S948B",
+      "android": "16",
+      "gpu": "Adreno (TM) 840",
+      "backend": "RayTracingPipeline",
+      "sourceCommit": "7c9b8779f1eb0af9d20e4f1d326d92f2d8a3f412",
+      "installedApkSha256": "c7074c790d30563fb920415f9e879a5720f2af062096d5b69adb83a785d9420d",
+      "routeWaypointsReached": 13,
+      "homeResumePassed": true,
+      "completedOwningFrameAfterResume": true,
+      "captures": [
+        {
+          "checkpoint": "wall-panel-bottom",
+          "camera": {
+            "x": 2.575,
+            "z": -10.2,
+            "yaw": 3.1416,
+            "pitch": -0.32,
+            "vitality": 3,
+            "maxVitality": 3,
+            "lifePhase": "alive",
+            "damageEnabled": false
+          },
+          "renderScale": 0.5,
+          "internalExtent": {
+            "width": 720,
+            "height": 1490
+          },
+          "swapchainExtent": {
+            "width": 1440,
+            "height": 2980
+          },
+          "effectiveExecutionBackend": "RayTracingPipeline",
+          "presented": true,
+          "stablePresentedFrames": 12,
+          "png": {
+            "file": "capture-01-wall-panel-bottom-50.png",
+            "width": 1440,
+            "height": 3120,
+            "sha256": "c299f9c217ad4984f85d0ed2bf09135fccbd2b5bbc5a0c228dd337eafae62b58"
+          }
+        },
+        {
+          "checkpoint": "wall-panel-bottom-left",
+          "camera": {
+            "x": 1.75,
+            "z": -10.1,
+            "yaw": 2.646,
+            "pitch": -0.32,
+            "vitality": 3,
+            "maxVitality": 3,
+            "lifePhase": "alive",
+            "damageEnabled": false
+          },
+          "renderScale": 0.5,
+          "internalExtent": {
+            "width": 720,
+            "height": 1490
+          },
+          "swapchainExtent": {
+            "width": 1440,
+            "height": 2980
+          },
+          "effectiveExecutionBackend": "RayTracingPipeline",
+          "presented": true,
+          "stablePresentedFrames": 12,
+          "png": {
+            "file": "capture-02-wall-panel-bottom-left-50.png",
+            "width": 1440,
+            "height": 3120,
+            "sha256": "2f961f02550c17f0d81a13ba9de780063e6d6801be645ab10a0decac24d61ddd"
+          }
+        },
+        {
+          "checkpoint": "wall-panel-bottom-right",
+          "camera": {
+            "x": 3.4,
+            "z": -10.1,
+            "yaw": 3.637,
+            "pitch": -0.32,
+            "vitality": 3,
+            "maxVitality": 3,
+            "lifePhase": "alive",
+            "damageEnabled": false
+          },
+          "renderScale": 0.5,
+          "internalExtent": {
+            "width": 720,
+            "height": 1490
+          },
+          "swapchainExtent": {
+            "width": 1440,
+            "height": 2980
+          },
+          "effectiveExecutionBackend": "RayTracingPipeline",
+          "presented": true,
+          "stablePresentedFrames": 12,
+          "png": {
+            "file": "capture-03-wall-panel-bottom-right-50.png",
+            "width": 1440,
+            "height": 3120,
+            "sha256": "0bea81a955fc9505c02c4ce22c53b66d93300f253dff45db1686690c1e44f5da"
+          }
+        },
+        {
+          "checkpoint": "layout-c-wall-panel-upward",
+          "camera": {
+            "x": 2.55,
+            "z": -9.45,
+            "yaw": 3.1416,
+            "pitch": 0.28,
+            "vitality": 3,
+            "maxVitality": 3,
+            "lifePhase": "alive",
+            "damageEnabled": false
+          },
+          "renderScale": 0.5,
+          "internalExtent": {
+            "width": 720,
+            "height": 1490
+          },
+          "swapchainExtent": {
+            "width": 1440,
+            "height": 2980
+          },
+          "effectiveExecutionBackend": "RayTracingPipeline",
+          "presented": true,
+          "stablePresentedFrames": 12,
+          "png": {
+            "file": "capture-04-layout-c-wall-panel-upward-50.png",
+            "width": 1440,
+            "height": 3120,
+            "sha256": "c27b384b383fc1a154fa27fb39d4064a2e159b25a9fef66416c77bae41ccda14"
+          }
+        }
+      ],
+      "captureManifestSha256": "0d83135611f8ade32a850a1b99ee860c500c165cd81b1c36ac261d65c85b4f85"
+    },
+    {
+      "model": "SM-S948B",
+      "android": "16",
+      "gpu": "Adreno (TM) 840",
+      "backend": "RayQueryCompute",
+      "sourceCommit": "7c9b8779f1eb0af9d20e4f1d326d92f2d8a3f412",
+      "installedApkSha256": "c7074c790d30563fb920415f9e879a5720f2af062096d5b69adb83a785d9420d",
+      "routeWaypointsReached": 13,
+      "homeResumePassed": true,
+      "completedOwningFrameAfterResume": true,
+      "captures": [
+        {
+          "checkpoint": "wall-panel-bottom",
+          "camera": {
+            "x": 2.575,
+            "z": -10.2,
+            "yaw": 3.1416,
+            "pitch": -0.32,
+            "vitality": 3,
+            "maxVitality": 3,
+            "lifePhase": "alive",
+            "damageEnabled": false
+          },
+          "renderScale": 0.5,
+          "internalExtent": {
+            "width": 720,
+            "height": 1490
+          },
+          "swapchainExtent": {
+            "width": 1440,
+            "height": 2980
+          },
+          "effectiveExecutionBackend": "RayQueryCompute",
+          "presented": true,
+          "stablePresentedFrames": 12,
+          "png": {
+            "file": "capture-01-wall-panel-bottom-50.png",
+            "width": 1440,
+            "height": 3120,
+            "sha256": "c299f9c217ad4984f85d0ed2bf09135fccbd2b5bbc5a0c228dd337eafae62b58"
+          }
+        },
+        {
+          "checkpoint": "wall-panel-bottom-left",
+          "camera": {
+            "x": 1.75,
+            "z": -10.1,
+            "yaw": 2.646,
+            "pitch": -0.32,
+            "vitality": 3,
+            "maxVitality": 3,
+            "lifePhase": "alive",
+            "damageEnabled": false
+          },
+          "renderScale": 0.5,
+          "internalExtent": {
+            "width": 720,
+            "height": 1490
+          },
+          "swapchainExtent": {
+            "width": 1440,
+            "height": 2980
+          },
+          "effectiveExecutionBackend": "RayQueryCompute",
+          "presented": true,
+          "stablePresentedFrames": 12,
+          "png": {
+            "file": "capture-02-wall-panel-bottom-left-50.png",
+            "width": 1440,
+            "height": 3120,
+            "sha256": "2f961f02550c17f0d81a13ba9de780063e6d6801be645ab10a0decac24d61ddd"
+          }
+        },
+        {
+          "checkpoint": "wall-panel-bottom-right",
+          "camera": {
+            "x": 3.4,
+            "z": -10.1,
+            "yaw": 3.637,
+            "pitch": -0.32,
+            "vitality": 3,
+            "maxVitality": 3,
+            "lifePhase": "alive",
+            "damageEnabled": false
+          },
+          "renderScale": 0.5,
+          "internalExtent": {
+            "width": 720,
+            "height": 1490
+          },
+          "swapchainExtent": {
+            "width": 1440,
+            "height": 2980
+          },
+          "effectiveExecutionBackend": "RayQueryCompute",
+          "presented": true,
+          "stablePresentedFrames": 12,
+          "png": {
+            "file": "capture-03-wall-panel-bottom-right-50.png",
+            "width": 1440,
+            "height": 3120,
+            "sha256": "0bea81a955fc9505c02c4ce22c53b66d93300f253dff45db1686690c1e44f5da"
+          }
+        },
+        {
+          "checkpoint": "layout-c-wall-panel-upward",
+          "camera": {
+            "x": 2.55,
+            "z": -9.45,
+            "yaw": 3.1416,
+            "pitch": 0.28,
+            "vitality": 3,
+            "maxVitality": 3,
+            "lifePhase": "alive",
+            "damageEnabled": false
+          },
+          "renderScale": 0.5,
+          "internalExtent": {
+            "width": 720,
+            "height": 1490
+          },
+          "swapchainExtent": {
+            "width": 1440,
+            "height": 2980
+          },
+          "effectiveExecutionBackend": "RayQueryCompute",
+          "presented": true,
+          "stablePresentedFrames": 12,
+          "png": {
+            "file": "capture-04-layout-c-wall-panel-upward-50.png",
+            "width": 1440,
+            "height": 3120,
+            "sha256": "c27b384b383fc1a154fa27fb39d4064a2e159b25a9fef66416c77bae41ccda14"
+          }
+        }
+      ],
+      "captureManifestSha256": "206c5685484ebfac55a9aa7c59898c39ce8292ac2a588582af6fe37ea3e1f5c8"
+    }
+  ],
+  "package": {
+    "assetsUnchangedFrom": "ddd5a453f7adb4e34fca7ff72e43a064eb84428a",
+    "unchangedAssetCount": 94,
+    "nativeAbis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "apkBytes": 138462962
+  },
+  "nativeAlignment": [
+    {
+      "abi": "arm64-v8a",
+      "loadAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zipAlignmentBytes": 16384
+    },
+    {
+      "abi": "armeabi-v7a",
+      "loadAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zipAlignmentBytes": 16384
+    },
+    {
+      "abi": "x86",
+      "loadAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zipAlignmentBytes": 16384
+    },
+    {
+      "abi": "x86_64",
+      "loadAlignments": [
+        16384,
+        16384,
+        16384
+      ],
+      "zipAlignmentBytes": 16384
+    }
+  ],
+  "checkpoint": {
+    "mainPreferenceChanges": 0,
+    "menuMixChanges": 0,
+    "rotationUnchanged": true,
+    "ownedPhoneAppStopped": true,
+    "utc": "2026-10-08T10:52:07.0198324Z"
+  },
+  "localChecks": {
+    "hostTests": 5,
+    "hostSeconds": 19.2,
+    "android": {
+      "tests": 241,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "classes": 38
+    },
+    "androidLintPassed": true,
+    "fourAbiBuildPassed": true,
+    "windowsBuildPassed": true,
+    "packageAndHeldAssetAdmissionPassed": true
+  },
+  "ownerAppearance": {
+    "sourceCommit": "7c9b8779f1eb0af9d20e4f1d326d92f2d8a3f412",
+    "feedback": "I saw the grate in the tests - it's a great (geddit?) fix!",
+    "accepted": true,
+    "scope": "Grate appearance only, not performance or independent audit"
+  },
+  "ciRetainedFailure": {
+    "runtimeSource": "7c9b8779f1eb0af9d20e4f1d326d92f2d8a3f412",
+    "runs": [
+      37765586185,
+      37765594978
+    ],
+    "cause": "PlayerDebugCheckpointTest wrongly expected new grate pose 161 to be unknown",
+    "correction": "5301e4a7bcc8cbe280d6277ea183deb3d1178d92",
+    "status": "Corrected source CI pending; original failures retained"
+  },
+  "limits": [
+    "Frozen authored views and route replay, not sustained FPS/thermals/power",
+    "Phone logs are not installed Vulkan validation-layer evidence",
+    "Broader controller, combat-contact, secondary-view, sustained quality and independent-audit gates remain open"
+  ],
+  "correctedCI": {
+    "head": "5301e4a7bcc8cbe280d6277ea183deb3d1178d92",
+    "checkedAtUtc": "2026-10-08T11:02:15.320565+00:00",
+    "aggregateJobs": 12,
+    "success": 6,
+    "failure": 0,
+    "pending": 6,
+    "runs": [
+      37766904731,
+      37766909226
+    ]
+  }
+}
