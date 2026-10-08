@@ -1,10 +1,10 @@
-HORDE LANTERN RT - SHOWCASE ALPHA 1.6.2 REVIEW CANDIDATE
+HORDE LANTERN RT - SHOWCASE ALPHA 1.6.2
 =======================================
 
 This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.
 There is no raster, browser, or fake-RT fallback.
 Package version: 1.6.2; Android companion versionCode: 10.
-Unpublished review candidate; owner/device acceptance remains required.
+Android and Windows tomb update. Hardware ray tracing is required.
 Canonical downloads and current availability: https://samfa12.itch.io/the-horde
 
 WINDOWS REQUIREMENTS
@@ -33,7 +33,7 @@ CONTROLS
 - Alt+Enter: fullscreen / windowed
 
 SETTINGS
-- Render resolution: 50-100% of the window, 100% by default
+- Render resolution: 50-100%, with experimental 33% and 40%; desktop default 100%
 - Lower percentages reduce RT ray count and upscale to the full window
 - Independent Music and SFX volume, look sensitivity, display mode, and render scale persist beside the demo
 - Per-Monitor V2 DPI scaling keeps menus and overlays crisp across display scales
@@ -46,8 +46,8 @@ If the required hardware RT path is unavailable, the demo shows diagnostics
 and does not silently start a fallback renderer.
 
 SHOWCASE CONTENT
-- Two-skeleton opening encounter followed by a three-turn shadow corridor
-- Animation-owned sword contact, timed parry, attacker stagger, and riposte window
+- Two distinct guards in the waterfall room and a three-turn shadow corridor
+- Shared 60 Hz combat, timed parry, attacker stagger and immediate riposte; hit detection remains forgiving
 - Textured PBR sword and hand torch with shared held-item sockets
 - World-space volumetric torch fire with movement-reactive coloured RT light
 - Modelled native-RT sleeves, hands and gauntlets with shared gameplay animation/IK/grips
@@ -62,11 +62,11 @@ SHOWCASE CONTENT
   hit recoil/cry, death animation, and an illuminated Gothic reward chest
 - Locked/open/claim interaction prompts, authored chest opening, and a reward
   lantern with acceleration-driven swing; High retains physical ray-traced glass
-- Mobile deliberately omits lantern pane geometry rather than faking transparency
+- Glass Off omits lantern pane geometry; saved Glass On retains real RT glass
 - Two-second post-lich latch cue and chest guidance light before interaction
 - Automatic GitHub Release availability checks with an optional update action
 - Native Vulkan BLAS/TLAS, RT pipeline/SBT and vkCmdTraceRaysKHR presentation
-- Phone-safe ray-query shading work inside raygen
+- Shared RT shading on genuine Pipeline and hardware RayQueryCompute backends
 - FilmCow UI, combat, movement, skeleton, and lich sound cues, plus credited
   Pixabay waterfall, torch-extinguish, chest-unlock, and chest-open effects
 - Adaptive A-H What the Dark Keeps music with owner-accepted whistle-lead instrumentation
@@ -74,14 +74,17 @@ SHOWCASE CONTENT
 - Help > Credits & licences carries the main attribution inside the executable
 
 KNOWN ALPHA LIMITS
-- The opening encounter is capped at two skeletons and one attacker at a time.
+- The waterfall encounter is capped at two skeletons and one attacker at a time.
 - The lich is a CC0 Meshy placeholder with visible source-rig limitations.
 - Larger hordes remain deferred.
 - Remaining High physical-glass contact/near-edge defects are deferred future investigation.
-- Android defaults to 75% RT resolution; sustained 30 FPS is not achieved in the measured
+- Android fresh/reset defaults to 50% RT resolution; sustained 30 FPS is not achieved in the measured
   current phone workloads. No sustained 30 FPS or causal performance saving is guaranteed.
 - Current exact-device evidence is scoped to SM-S948B; S24 is deferred and S25 unverified.
 - Graphics options provide an RT preview, resolution/effect choices, and explicit save/restore.
+- Dust Low is the fresh/reset default; saved Off/custom settings are preserved.
+- Sword damage uses forgiving range/cone resolution; visible contact can differ.
+- Minor torch-arm motion, shafts and seamless music handover remain deferred.
 - Only tested RT-capable hardware paths are supported.
 - See ASSET_LICENSES.md, LICENSE, LICENSE_SCOPE.md and THIRD_PARTY_NOTICES.
 - The software grant does not relicense assets, Pocket Audio Core or the mixed package.

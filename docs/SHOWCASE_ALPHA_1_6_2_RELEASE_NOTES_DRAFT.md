@@ -1,5 +1,23 @@
 # Horde Lantern RT 1.6.2 development notes
 
+A standalone hardware-RT tomb demo update for Android and Windows. The central hanging-lantern menu, native touch Swing/Parry/Dodge and heart HUD carry a coherent style through the existing tomb. Android controller navigation and gameplay, portrait/landscape recovery, graphics scrolling/focus and acknowledged Use/Keep/Restore are supported. The sword starts sheathed and draws at the waterfall guards; equipment clearance and wide-view spacing preserve existing combat rules. Quiet accepted room/metal-creak menu ambience respects audio focus and fades on Play.
+
+This update includes restrained reusable indoor dust, the grate-floor closure, improved torch-lit waterfall shading and collision for both Keeper torch stands. Fresh/reset mobile defaults are50%, Mobile water/fire, Glass Off, Current shadows, cap30, Mist On and Dust Low. Desktop remains100%, High water/fire, Glass On, Current shadows, cap30, Mist On and Dust Low. Saved/custom settings are preserved;33%/40% are labelled experimental options, not the default.
+
+Current combat deliberately retains forgiving range/cone damage resolution; visible blade-to-mesh contact can differ from the damage pulse. Precise contact correction, the minor walking torch-arm wiggle, shafts, seamless music handover and a long sustained phone performance programme are deferred. No sustained30FPS, untested controller/device or completed independent-audit claim is made.
+
+Package version: `1.6.2`
+
+Android version code: `10`
+
+Validated runtime/build source: `db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9`. Fresh Windows Debug/Release144/144 each,13 actual RT captures, Android Debug/unsigned Shipping four-ABI builds/lint/package gates and exact-source12/12 CI pass. Final sealed Debug APK SHA-256 `25af2fc1895eca03c03feac2b955d410d0759a2834e27d9e1dafd3d24eda8ca3`; unsigned Shipping APK `4f0fccec7cfe247f71c87852605b7c040f3213794758fdac5ff7d55236ea6ec4`; unpublishable Windows validation ZIP `3fc8f065f900d28d529883f7b2681b6303940be9cdc1ed589425a92be69778bd`. These validation files are not publication artifacts. Final signed/distributed hashes will be recorded separately after authorized promotion.
+
+The owner authorizes merge and Android/Windows itch publication when the goal is complete. No merge/sign/upload has occurred at this checkpoint. Eric's [review packet](ENGINEERING_1_6_2_FINAL_REVIEW_2026_10_09.md) records evidence and remaining limits; the independent audit is not self-certified.
+
+## Historical development checkpoints
+
+The dated entries below describe their original snapshots. The current disposition above supersedes their pending-owner, prototype-Off and no-release statements without relabeling historical failures or device evidence.
+
 **Owner controller disposition — 9 October:** controller support is approved for 1.6.2. Recorded hands-on evidence is the owner-identified Backbone One PlayStation Edition USB-C BB-51 on SM-S948B / Android 16, including accepted directional menu navigation, landscape gameplay and seamless reconnect after `ac468f51`. Earlier unmeasured matrix cases remain evidence limits, not further owner-acceptance gates. Firmware/InputDevice descriptor and other controller models remain unverified. Dated checkpoint outcomes below retain their original scope; this disposition supersedes conflicting pending-controller statements. No new device test or release approval is implied. [Exact controller history](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md).
 
 **Owner combat disposition — 9 October:** bounded moving-target witness `5a2a4661` preserves the positive visible blade/mesh gaps: about216 mm frontal and18 mm at −15° at the current damage pulse. Late counterfactual samples do not support a uniform delay. The owner explicitly chooses **keep current combat for1.6.2 and document the forgiving hit-detection limitation**; precision animation/contact correction is deferred. Existing shared60Hz timings, range/cone, immediate riposte and parry feedback remain unchanged. This is a scope/acceptance decision, not an exact-contact pass. [Exact queries, artifacts and limitations](ENGINEERING_1_6_2_MOVING_CONTACT_2026_10_09.md).
