@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "target": "Horde Lantern RT menu audio candidate",
+  "sourceHashes": {
+    "flame": "f1e9e068a21db68221447ba22c26f09d9e928e5de596334272e733f0b60022b4",
+    "room": "102b22009583699ae35f9a84f14f4a37cef0d667d34ecbf692d19bdbe190692c",
+    "chain": "345785fa9f5b3179a6432ff45ca0164eee1dd11ae19481e0ff1522baecd02c89"
+  },
+  "sourcePolicy": "Private original sources stay local and outside Git/packages. Only the three bounded runtime derivatives and provenance manifest are written. No standalone audio-library distribution.",
+  "generator": "tools/prepare-menu-ambience.py",
+  "ffmpegVersion": "ffmpeg version 9.0-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "assets": [
+    {
+      "id": "softflamehisscandidate",
+      "runtimeFile": "menu_flame.wav",
+      "runtimeSha256": "d4f6d11b9c12c4628daeb7624775da64a834a143e643acff0d6b35b8c375c0be",
+      "runtimeBytes": 384044,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 192000,
+      "durationSeconds": 4.0,
+      "rmsDbfs": -24.0,
+      "peakDbfs": -10.5076,
+      "sourceFile": "FilmCow Recorded SFX/gas leak.wav",
+      "sourceSha256": "f1e9e068a21db68221447ba22c26f09d9e928e5de596334272e733f0b60022b4",
+      "sourceBytes": 1504310,
+      "creator": "FilmCow",
+      "sourceUrl": "https://filmcow.itch.io/filmcow-sfx",
+      "license": "FilmCow custom royalty-free license; not CC0",
+      "licenseTerms": "Personal and commercial project use permitted; national-government, law-enforcement, and SPLC/CAHN-designated hate-group uses prohibited; do not claim authorship or resell.",
+      "processing": {
+        "decode": "FFmpeg 9, mono 48 kHz PCM16",
+        "cropSourceSeconds": [
+          4.5,
+          9.0
+        ],
+        "filters": [
+          "highpass 180 Hz",
+          "lowpass 4200 Hz"
+        ],
+        "cyclicCrossfadeFrames": 24000,
+        "loopFrames": 192000,
+        "targetRmsDbfs": -24.0,
+        "peakCeilingDbfs": -6.0,
+        "appliedGainDb": 19.7408,
+        "preGain": {
+          "frames": 192000,
+          "durationSeconds": 4.0,
+          "rmsDbfs": -43.7408,
+          "peakDbfs": -30.2484
+        }
+      },
+      "limitations": "Filtered gas-leak hiss proxy, not a recording of fire; has no ignition or crackle. Owner exact-candidate listening and in-game mix acceptance pending."
+    },
+    {
+      "id": "filteredroomaircandidate",
+      "runtimeFile": "menu_room.wav",
+      "runtimeSha256": "9aa9a9631f7dbaf724ecd46bfbbea17142af20497299a83db08055751c7cc361",
+      "runtimeBytes": 384044,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 192000,
+      "durationSeconds": 4.0,
+      "rmsDbfs": -30.0,
+      "peakDbfs": -18.3179,
+      "sourceFile": "FilmCow Recorded SFX/ambience - air conditioner.wav",
+      "sourceSha256": "102b22009583699ae35f9a84f14f4a37cef0d667d34ecbf692d19bdbe190692c",
+      "sourceBytes": 9281552,
+      "creator": "FilmCow",
+      "sourceUrl": "https://filmcow.itch.io/filmcow-sfx",
+      "license": "FilmCow custom royalty-free license; not CC0",
+      "licenseTerms": "Personal and commercial project use permitted; national-government, law-enforcement, and SPLC/CAHN-designated hate-group uses prohibited; do not claim authorship or resell.",
+      "processing": {
+        "decode": "FFmpeg 9, mono 48 kHz PCM16",
+        "cropSourceSeconds": [
+          4.5,
+          9.0
+        ],
+        "filters": [
+          "notch 100 Hz, Q5, -18 dB",
+          "notch 200 Hz, Q5, -10 dB",
+          "highpass 140 Hz",
+          "lowpass 700 Hz"
+        ],
+        "cyclicCrossfadeFrames": 24000,
+        "loopFrames": 192000,
+        "targetRmsDbfs": -30.0,
+        "peakCeilingDbfs": -9.0,
+        "appliedGainDb": 12.4176,
+        "preGain": {
+          "frames": 192000,
+          "durationSeconds": 4.0,
+          "rmsDbfs": -42.4176,
+          "peakDbfs": -30.7363
+        }
+      },
+      "limitations": "Strongly filtered mechanical air-conditioner source with measured 100/200 Hz tonal components; this remains a room-air candidate, not verified natural room tone. Owner exact-candidate listening and in-game mix acceptance pending."
+    },
+    {
+      "id": "quietchainswingcandidate",
+      "runtimeFile": "menu_chain.wav",
+      "runtimeSha256": "6c85d6c97a21e9de69100b9969dd8f844af927b229ee91bf585c42b4d0ae146d",
+      "runtimeBytes": 96044,
+      "sampleRate": 48000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "frames": 48000,
+      "durationSeconds": 1.0,
+      "rmsDbfs": -30.4309,
+      "peakDbfs": -11.9999,
+      "sourceFile": "hammy01-chain-287197.mp3",
+      "sourceSha256": "345785fa9f5b3179a6432ff45ca0164eee1dd11ae19481e0ff1522baecd02c89",
+      "sourceBytes": 562176,
+      "creator": "Hammy01",
+      "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-chain-287197/",
+      "license": "Pixabay Content License",
+      "licenseTerms": "Modified game use permitted; standalone distribution of the source audio is prohibited.",
+      "voluntaryCredit": "Chain by Hammy01 via Pixabay",
+      "processing": {
+        "decode": "FFmpeg 9, mono 48 kHz PCM16",
+        "selection": "Lowest-RMS one-second window on a 100 ms grid, requiring source peak >= -40 dBFS to exclude silence; lowest peak breaks ties.",
+        "sourceCropFrames": [
+          412800,
+          460800
+        ],
+        "sourceCropSeconds": [
+          8.6,
+          9.6
+        ],
+        "sourceWindowStats": {
+          "frames": 48000,
+          "durationSeconds": 1.0,
+          "rmsDbfs": -46.9991,
+          "peakDbfs": -28.7471
+        },
+        "edgeFadeFrames": {
+          "in": 960,
+          "out": 5760
+        },
+        "targetPeakDbfs": -12.0,
+        "appliedGainDb": 16.7471
+      },
+      "limitations": "Bounded quiet movement excerpt selected by waveform level, not by listening. Timed one-shot candidate; owner exact-candidate listening and in-game mix acceptance pending."
+    }
+  ],
+  "ownerListeningAcceptance": "pending"
+}

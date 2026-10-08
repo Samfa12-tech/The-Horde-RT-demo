@@ -386,6 +386,7 @@ struct VulkanSurfaceContext
     bool entryPlayHandoffPending = false;
     bool entryLoadingVisible = false;
     horde::graphics::EntryMenuSession entryMenu;
+    horde::audio::MenuCreakDelivery menuCreakDelivery;
     horde::vulkan::raytracing::RtSceneProfile graphicsReturnProfile =
         horde::vulkan::raytracing::RtSceneProfile::Showcase;
     bool graphicsPreviewCapture = false;
@@ -1255,7 +1256,14 @@ public:
         }
     }
 
-    bool Play(const std::filesystem::path& path, float leftGain, float rightGain)
+    void UpdateOwnedGain(const std::string_view key, const float gain)
+    {
+        for (auto &active : activeVoices_)
+            if (active.loopKey == key) SetVoiceMatrix(active.voice, gain, gain, active.filename);
+    }
+
+    bool Play(const std::filesystem::path& path, float leftGain, float rightGain,
+              const std::string_view ownedKey = {})
     {
         if (engine_ == nullptr || masteringVoice_ == nullptr)
         {
@@ -1324,7 +1332,7 @@ public:
             return false;
         }
         const std::string filename = path.filename().string();
-        activeVoices_.push_back({voice, wave, filename, {}});
+        activeVoices_.push_back({voice, wave, filename, std::string(ownedKey)});
         if (!successfulVoiceLogged_)
         {
             successfulVoiceLogged_ = true;
@@ -1524,6 +1532,42 @@ void UpdateWaterfallAmbience(const VulkanSurfaceContext& context)
         return;
     }
     engine.StartOrUpdateLoop(loopKey, path, gains.left, gains.right);
+}
+
+void StopMenuAmbience(VulkanSurfaceContext& context)
+{
+    auto &engine = SpatialAudioEngine();
+    for (const auto key : {"menu_flame", "menu_room", "menu_chain"}) engine.StopLoop(key);
+    context.menuCreakDelivery.Suspend();
+}
+
+void UpdateMenuAmbience(VulkanSurfaceContext& context)
+{
+    const auto menu = context.entryMenu.Snapshot();
+    const bool audible = context.useRtPath && context.rtScene.IsReady() &&
+        context.rtScene.Profile() == horde::vulkan::raytracing::RtSceneProfile::EntryMenu &&
+        !context.graphicsPreviewCapture && !context.outputResizeValidation && !context.nativeMotionValidation &&
+        GetForegroundWindow() == context.windowHandle && !IsIconic(context.windowHandle) &&
+        context.sfxVolumePercent > 0 && menu.fade < 1.0f;
+    if (!audible) { StopMenuAmbience(context); return; }
+    auto &engine = SpatialAudioEngine();
+    if (!engine.SetMasterVolumePercent(context.sfxVolumePercent)) { StopMenuAmbience(context); return; }
+    const float envelope = std::clamp(1.0f - menu.fade, 0.0f, 1.0f);
+    const auto root = ResolveAssetRoot() / "audio/menu";
+    engine.StartOrUpdateLoop("menu_flame", root / "menu_flame.wav",
+        horde::audio::kMenuFlameGain * envelope, horde::audio::kMenuFlameGain * envelope);
+    engine.StartOrUpdateLoop("menu_room", root / "menu_room.wav",
+        horde::audio::kMenuRoomGain * envelope, horde::audio::kMenuRoomGain * envelope);
+    // Existing keyed native voice ownership handles the one-shot too: mute,
+    // focus loss and Play can cancel it independently of gameplay SFX.
+    if (context.menuCreakDelivery.Observe(menu.tick, menu.chainCreakSerial, true))
+    {
+        engine.StopLoop("menu_chain");
+        engine.Play(root / "menu_chain.wav", horde::audio::kMenuChainGain * envelope,
+                    horde::audio::kMenuChainGain * envelope, "menu_chain");
+    }
+    else
+        engine.UpdateOwnedGain("menu_chain", horde::audio::kMenuChainGain * envelope);
 }
 
 void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
@@ -5343,6 +5387,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                 ctx.graphicsPreview, ctx.outputExposure, ctx.waterQuality,
                 horde::vulkan::raytracing::ResolveFireEmitterQuality(ctx.fireDetail));
         }
+        UpdateMenuAmbience(ctx);
         frameInputs.shadowQuality = ctx.shadowQuality;
         ctx.rtScene.SetMistEnabled(ctx.requestedMistEnabled);
         ctx.rtScene.SetDustQuality(ctx.requestedDustQuality);
@@ -6949,6 +6994,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         const bool isLiveAnimatedProfile = loopProfile != horde::vulkan::raytracing::RtSceneProfile::Showcase;
         if (isLiveAnimatedProfile && (IsIconic(hWnd) || GetForegroundWindow() != hWnd))
         {
+            StopMenuAmbience(context);
             context.graphicsPreviewLastFrame = {}; context.graphicsPreviewLastSample = {};
             context.graphicsConfirmationTick = GetTickCount64();
             std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -7828,6 +7874,7 @@ void ShowCredits(HWND window)
     MessageBoxA(window,
                 "Environment materials: Poly Haven (CC0).\n"
                 "Sound effects: FilmCow Royalty Free Sound Effects Library.\n"
+                "Menu chain: Hammy01 via Pixabay (Pixabay Content License).\n"
                 "Water Dripping by DRAGON-STUDIO via Pixabay (Pixabay Content License).\n"
                 "Skeleton derivative: original by Hotstrike Studio; texture, rig, and animation processing created with Meshy (CC BY 4.0).\n"
                 "Placeholder lich character created and animated with Meshy (CC0).\n"
@@ -8812,7 +8859,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_ACTIVATEAPP:
         if (sceneContext)
         {
-            if (wParam == FALSE) sceneContext->controllerFocusLatch.LoseFocus();
+            if (wParam == FALSE) { sceneContext->controllerFocusLatch.LoseFocus(); StopMenuAmbience(*sceneContext); }
             PublishMusicPlayback(*sceneContext, wParam == FALSE);
         }
         if (sceneContext && wParam == FALSE && sceneContext->benchmark.IsRunning())
@@ -8823,7 +8870,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     case WM_ACTIVATE:
         if (sceneContext)
         {
-            if (LOWORD(wParam) == WA_INACTIVE) sceneContext->controllerFocusLatch.LoseFocus();
+            if (LOWORD(wParam) == WA_INACTIVE) { sceneContext->controllerFocusLatch.LoseFocus(); StopMenuAmbience(*sceneContext); }
             PublishMusicPlayback(*sceneContext, LOWORD(wParam) == WA_INACTIVE);
         }
         break;
@@ -9079,6 +9126,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         return reinterpret_cast<LRESULT>(brush);
     }
     case WM_DESTROY:
+        if (sceneContext) StopMenuAmbience(*sceneContext);
         horde::platform::windows::CancelGitHubReleaseUpdateCheck(hWnd);
         if (sceneContext && sceneContext->controlsEnabled)
         {

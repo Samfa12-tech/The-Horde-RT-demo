@@ -1,5 +1,6 @@
 #pragma once
 
+#include "audio/MenuAmbience.h"
 #include "gameplay/effects/FireEmitterState.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "gameplay/items/HeldItemKinematics.h"
@@ -67,6 +68,7 @@ inline GraphicsPreviewDescription MakeEntryMenuDescription()
 struct EntryMenuSnapshot
 {
     std::uint64_t tick = 0;
+    std::uint64_t chainCreakSerial = 0;
     PreviewCameraPose camera{0.0f, 0.0f, 0.0f, 0.015f};
     horde::gameplay::items::HeldItemTransform hinge{};
     horde::gameplay::interactions::LanternPendulumSnapshot pendulum{};
@@ -84,6 +86,7 @@ class EntryMenuSession
     void Reset()
     {
         tick_ = 0;
+        chainCreaks_.Reset();
         accumulator_ = 0;
         pan_ = 0;
         fade_ = 0;
@@ -162,6 +165,8 @@ class EntryMenuSession
             else
                 pendulum_.Reset(hinge_);
             pendulum_.StepFixed(hinge_, step);
+            const auto &motion = pendulum_.Snapshot();
+            chainCreaks_.Step(tick_, motion.strafeAngleRadians, motion.strafeAngularVelocity, reduced_ || playing_);
             UpdateSockets();
             horde::gameplay::effects::StepFireEmitterFixed(fire_, fireInput_, step);
         }
@@ -170,6 +175,7 @@ class EntryMenuSession
     {
         EntryMenuSnapshot result;
         result.tick = tick_;
+        result.chainCreakSerial = chainCreaks_.Serial();
         result.camera.x = pan_;
         result.hinge = hinge_;
         result.pendulum = pendulum_.Snapshot();
@@ -194,6 +200,7 @@ class EntryMenuSession
         fire_.worldFromFlame = fireInput_.worldFromFlame;
         fire_.worldFromLight = fireInput_.worldFromLight;
     }
+    horde::audio::MenuChainCreaks chainCreaks_;
     std::uint64_t tick_ = 0;
     double accumulator_ = 0;
     bool paused_ = false, reduced_ = false, side_ = false, playing_ = false;

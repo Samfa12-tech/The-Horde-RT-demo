@@ -282,6 +282,7 @@ public class MainActivity extends Activity {
     private boolean parryTouchActive;
     private SoundPool soundPool;
     private HordeAmbiencePlayback waterfallPlayback;
+    private MenuAmbiencePlayback menuAmbience;
     private volatile HordeMusicPlayback musicPlayback;
     private Vibrator vibrator;
     private String reportText = "";
@@ -545,6 +546,10 @@ public class MainActivity extends Activity {
 
         initialiseAudio();
         musicPlayback = new HordeMusicPlayback(this, musicVolumePercent());
+        musicPlayback.setOnFocusChanged(() -> {
+            if (!isMusicAudioFocusGranted() && menuAmbience != null) menuAmbience.stop();
+        });
+        handler.post(menuAmbienceFrame);
         menuButton.setOnClickListener(view -> {
             playSound("menu_toggle", 0.20f);
             showMainMenu(false);
@@ -707,6 +712,7 @@ public class MainActivity extends Activity {
     }
 
     private void stopSurface() {
+        stopMenuAmbience();
         setBenchmarkStatusExpanded(false);
         if (musicPlayback != null) musicPlayback.setSuspended(true);
         final long generation = surfaceRequestGeneration;
@@ -5029,7 +5035,58 @@ public class MainActivity extends Activity {
         loadSound("keeper_come_closer", "audio/pixabay/keeper_come_closer.wav");
         loadSound("skeleton_idle_rattle", "audio/pixabay/skeleton_idle_rattle.wav");
         loadSound("skeleton_falling_bones", "audio/pixabay/skeleton_falling_bones.wav");
+        loadSound("menu_flame", "audio/menu/menu_flame.wav");
+        loadSound("menu_room", "audio/menu/menu_room.wav");
+        loadSound("menu_chain", "audio/menu/menu_chain.wav");
+        menuAmbience = new MenuAmbiencePlayback(new MenuAmbiencePlayback.Sink() {
+            @Override public int start(String key, float gain, boolean looping) {
+                final Integer id = sounds.get(key);
+                if (soundPool == null || id == null) return 0;
+                synchronized (loadedSounds) { if (!loadedSounds.contains(id)) return 0; }
+                final int stream = soundPool.play(id, gain, gain, 2, looping ? -1 : 0, 1.0f);
+                if (BuildConfig.DEBUG) Log.i("HordeMenuAmbience", "start key=" + key +
+                        " stream=" + stream + " loop=" + looping + " gain=" + gain);
+                return stream;
+            }
+            @Override public void gain(int stream, float gain) {
+                if (soundPool != null) soundPool.setVolume(stream, gain, gain);
+            }
+            @Override public void stop(int stream) {
+                if (soundPool != null) soundPool.stop(stream);
+                if (BuildConfig.DEBUG) Log.i("HordeMenuAmbience", "stop stream=" + stream);
+            }
+        });
         initialiseWaterfallLoop();
+    }
+
+    private final Runnable menuAmbienceFrame = new Runnable() {
+        @Override public void run() {
+            if (!resumed) return;
+            if (!entryMenuEnabled) { stopMenuAmbience(); return; }
+            updateMenuAmbience();
+            handler.postDelayed(this, 40L);
+        }
+    };
+    private void stopMenuAmbience() {
+        if (menuAmbience != null) menuAmbience.stop();
+        if (musicPlayback != null) musicPlayback.setAmbienceEligible(false);
+    }
+    private void updateMenuAmbience() {
+        if (menuAmbience == null || musicPlayback == null) return;
+        final boolean eligible = resumed && hasWindowFocus() && entryMenuEnabled &&
+                !entryMenuFailed && !graphicsPreviewWanted && !diagnosticsVisible && !benchmarkRunning &&
+                preferences.getBoolean("sfx_enabled", true) &&
+                preferences.getInt("sfx_volume", 70) > 0 && surfaceRequestGeneration > 0;
+        // Eligibility alone never starts sounds. The coherent native packet must
+        // also name a successfully presented current entry scene.
+        musicPlayback.setAmbienceEligible(eligible);
+        long[] packet = null;
+        if (eligible) {
+            try { packet = ProbeBridge.getMenuAmbienceState(); }
+            catch (RuntimeException | LinkageError unavailable) { /* Optional SFX stay silent. */ }
+        }
+        menuAmbience.update(packet, surfaceRequestGeneration, eligible, isMusicAudioFocusGranted(),
+                clamp(preferences.getInt("sfx_volume", 70) / 100.0f, 0.0f, 1.0f));
     }
 
     private void initialiseWaterfallLoop() {
@@ -5392,6 +5449,7 @@ public class MainActivity extends Activity {
         controllerWindowFocused=focused;
         currentControllerDialog();
         if (!focused) {
+            stopMenuAmbience();
             suspendControllerInput(false);
             if(surfaceView!=null && interactButton!=null && toggleHeldLightPoseButton!=null)clearTouchGesture();
             if (controllerMode && controllerDialog==null && canSendGameplayAction()) showMainMenu(false);
@@ -5870,6 +5928,8 @@ public class MainActivity extends Activity {
         logSurfaceLifecycle("resume");
         if (musicPlayback != null) musicPlayback.setSuspended(true); // Wait for a ready new surface.
         resumed = true;
+        handler.removeCallbacks(menuAmbienceFrame);
+        handler.post(menuAmbienceFrame);
         controllerInput.suspend(SystemClock.uptimeMillis());
         requestControllerFrame();
         enterImmersiveMode();
@@ -5939,6 +5999,8 @@ public class MainActivity extends Activity {
             showSettings();
         }
         resumed = false;
+        handler.removeCallbacks(menuAmbienceFrame);
+        stopMenuAmbience();
         handler.removeCallbacks(controllerFrame); controllerFrameScheduled = false;
         reconcilePlaytestReportForPause(); // A document-picker pause leaves local export untouched.
         if (musicPlayback != null) musicPlayback.setSuspended(true);
@@ -6001,6 +6063,7 @@ public class MainActivity extends Activity {
             debugRetryReceiver = null;
         }
         stopSurface();
+        if (menuAmbience != null) { menuAmbience.close(); menuAmbience = null; }
         if (soundPool != null) soundPool.release();
         if (waterfallPlayback != null) { waterfallPlayback.close(); waterfallPlayback = null; }
         super.onDestroy();

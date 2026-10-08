@@ -17,6 +17,7 @@ final class MusicAudioFocus implements AutoCloseable {
     private final Handler mainHandler;
     private volatile boolean granted;
     private boolean eligible;
+    private Runnable onFocusChanged;
     private boolean closed;
     private Request activeRequest;
 
@@ -43,9 +44,15 @@ final class MusicAudioFocus implements AutoCloseable {
     }
 
     boolean isGranted() { return granted; }
+    void setOnFocusChanged(Runnable listener) { onFocusChanged = listener; }
+    private void setGranted(boolean value) {
+        if (granted == value) return;
+        granted = value;
+        if (onFocusChanged != null) onFocusChanged.run();
+    }
 
     private void request() {
-        granted = false;
+        setGranted(false);
         if (audioManager == null) return;
         Request request = new Request();
         activeRequest = request;
@@ -68,7 +75,7 @@ final class MusicAudioFocus implements AutoCloseable {
 
     private void requestResult(Request request, int result) {
         if (activeRequest != request || closed || !eligible) return;
-        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) granted = true;
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) setGranted(true);
         else if (result != AudioManager.AUDIOFOCUS_REQUEST_DELAYED) abandonActive();
         // A delayed request remains live for a later GAIN callback. A failed
         // request is intentionally not retried until eligibility falls and rises.
@@ -82,17 +89,17 @@ final class MusicAudioFocus implements AutoCloseable {
         if (closed || !eligible || activeRequest != request) return;
         switch (change) {
             case AudioManager.AUDIOFOCUS_GAIN:
-                granted = true;
+                setGranted(true);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) granted = false;
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) setGranted(false);
                 // On API 26+, leave attenuation to Android's automatic ducking policy.
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                granted = false;
+                setGranted(false);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
-                granted = false;
+                setGranted(false);
                 abandonActive();
                 break;
             default:
@@ -101,7 +108,7 @@ final class MusicAudioFocus implements AutoCloseable {
     }
 
     private void abandonActive() {
-        granted = false;
+        setGranted(false);
         Request request = activeRequest;
         activeRequest = null; // Invalidate before calling the platform.
         if (request == null || audioManager == null) return;

@@ -22,6 +22,7 @@ final class HordeMusicPlayback implements AutoCloseable {
     private final Thread worker;
     private boolean stopped = false;
     private boolean suspended = true;
+    private boolean ambienceEligible;
     private int volume = 70;
 
     HordeMusicPlayback(Context context, int volume) {
@@ -44,11 +45,22 @@ final class HordeMusicPlayback implements AutoCloseable {
         synchronized (controlLock) {
             if (stopped) return;
             suspended = value;
-            focusEligible = !suspended;
+            focusEligible = !suspended || ambienceEligible;
             controlLock.notifyAll(); // Worker pauses without flushing accepted PCM.
         }
         audioFocus.setEligible(focusEligible);
     }
+    // One OS focus request serves foreground menu SFX while music remains paused.
+    void setAmbienceEligible(boolean value) {
+        final boolean eligible;
+        synchronized (controlLock) {
+            if (stopped) return;
+            ambienceEligible = value;
+            eligible = !suspended || ambienceEligible;
+        }
+        audioFocus.setEligible(eligible);
+    }
+    void setOnFocusChanged(Runnable listener) { audioFocus.setOnFocusChanged(listener); }
     void setVolumePercent(int value) {
         synchronized (controlLock) {
             if (stopped) return;

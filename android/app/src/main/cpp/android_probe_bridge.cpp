@@ -489,6 +489,7 @@ struct PreviewControls {
 };
 PreviewControls gPreviewControls{};
 horde::graphics::EntryMenuControls gEntryControls{};
+std::array<jlong, 6u> gMenuAmbienceState{}; // Generation/reset/tick/creak/fade/presented.
 std::array<jlong, 5u> gEntryState{}; // Coherent generation/profile/phase/fade/presentation.
 horde::graphics::GraphicsPreviewPerformanceSnapshot gPreviewPerformance{};
 std::uint64_t gPreviewPerformanceGeneration = 0u; // guarded by gGraphicsMutex.
@@ -546,6 +547,10 @@ void PublishEntryState(const SwapchainContext& context, bool presented)
             static_cast<long long>(nextState[2]), static_cast<long long>(nextState[3]),
             static_cast<long long>(nextState[4]));
     gEntryState = nextState;
+    const auto snapshot = context.entrySession.Snapshot();
+    gMenuAmbienceState = {{nextState[0], static_cast<jlong>(context.entryHandoff.ResetSerial()),
+        static_cast<jlong>(snapshot.tick), static_cast<jlong>(snapshot.chainCreakSerial), nextState[3],
+        currentRequest && gEntryControls.enabled && nextState[1] == 2 && nextState[4] == 1 && phase != 4 ? 1 : 0}};
 }
 
 horde::graphics::GraphicsCommand ReadRequestedGraphics()
@@ -5613,6 +5618,17 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getEntryMenuState(JNIEnv* env, jclas
         return env->NewLongArray(0);
     auto result = env->NewLongArray(static_cast<jsize>(gEntryState.size()));
     if (result) env->SetLongArrayRegion(result, 0, static_cast<jsize>(gEntryState.size()), gEntryState.data());
+    return result;
+}
+
+extern "C" JNIEXPORT jlongArray JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getMenuAmbienceState(JNIEnv* env, jclass)
+{
+    std::lock_guard lock(gGraphicsMutex);
+    if (gMenuAmbienceState[0] <= 0 || !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(gMenuAmbienceState[0])))
+        return env->NewLongArray(0);
+    auto result = env->NewLongArray(static_cast<jsize>(gMenuAmbienceState.size()));
+    if (result) env->SetLongArrayRegion(result, 0, static_cast<jsize>(gMenuAmbienceState.size()), gMenuAmbienceState.data());
     return result;
 }
 

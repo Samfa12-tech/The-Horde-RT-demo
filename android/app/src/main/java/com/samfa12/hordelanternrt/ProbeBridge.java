@@ -68,6 +68,7 @@ public final class ProbeBridge {
     public static native void setEntryMenu(boolean enabled, boolean sidePage,
             boolean reducedMotion, boolean play, long generation);
     public static native long[] getEntryMenuState();
+    public static native long[] getMenuAmbienceState();
     // epoch,presents/s,loop ms,CPU ms,GPU ms (-1 unavailable),tracked device/host bytes,
     // transition count,sample count, then loop-ms/transition pairs (at most128).
     public static native double[] getGraphicsPreviewPerformance();

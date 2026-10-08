@@ -252,3 +252,7 @@ docs/evidence/2026-10-03-release-publication/** -text whitespace=-trailing-space
 
 # Preserve the external licence snapshot byte-for-byte as evidence.
 assets/models/world/source/collapsed-entry/polyhaven-original/polyhaven-license.html -text -diff
+
+# Exact menu derivative receipt bytes on Windows and CI.
+assets/audio/menu/asset.manifest.json text eol=lf
+assets/audio/menu/*.wav -text

@@ -73,8 +73,12 @@ int main()
         std::cerr << "Entry sway outside review bounds: " << maximumSway << '\n';
         return 11;
     }
+    if (menu.Snapshot().chainCreakSerial < 2 || menu.Snapshot().chainCreakSerial > 5) return 13;
+    const auto creaks = menu.Snapshot().chainCreakSerial;
     menu.SetReducedMotion(true);
     menu.Advance(1.0 / 60);
+    for (int frame = 0; frame < 240; ++frame) menu.Advance(.25);
+    if (menu.Snapshot().chainCreakSerial != creaks) return 14;
     if (menu.Snapshot().pendulum.worldFromBody != menu.Snapshot().hinge)
         return 12;
     std::cout

@@ -82,7 +82,8 @@ jobs:
           $reports = @(Get-ChildItem android/app/build/test-results/testDebugUnitTest -Filter 'TEST-*.xml')
           if ($reports.Count -eq 0) { throw 'No Android unit-test reports were produced.' }
           foreach ($required in @{
-            'MusicAudioFocusTest' = 8
+            'MusicAudioFocusTest' = 9
+            'MenuAmbiencePlaybackTest' = 6
             'MusicOutputBufferTest' = 5
             'PlaytestReportExportTest' = 6
             'PlaytestReportSubmissionTest' = 16
