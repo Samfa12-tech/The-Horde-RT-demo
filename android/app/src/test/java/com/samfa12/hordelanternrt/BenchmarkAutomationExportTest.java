@@ -167,6 +167,122 @@ public final class BenchmarkAutomationExportTest {
     }
 
     @Test
+    public void motionValidationUsesItsOwnStrictSchemaAndPreservesJoinedEvidence() throws Exception {
+        final File privateReports = temporaryFolder.newFolder("motion-private");
+        final File externalRoot = temporaryFolder.newFolder("motion-external");
+        final String workload = "motion-keeper-retry-reward-v1";
+        final String json = validMotionJson(RUN_ID, workload);
+        write(privateReports, "HordeLanternRT-benchmark-latest.json", json);
+        write(privateReports, "HordeLanternRT-benchmark-latest.txt", validText(RUN_ID).replace(
+                "showcase-route-v1", workload));
+        write(privateReports, "android-motion-" + RUN_ID + "-0.rgba", "\u0001\u0002\u0003\u0004");
+        final BenchmarkAutomationExport.Result result = BenchmarkAutomationExport.export(
+                privateReports, externalRoot, RUN_ID, workload, 2);
+        assertTrue(result.detail, result.successful);
+        assertEquals(json, read(result.directory, "benchmark.json"));
+        assertEquals("\u0001\u0002\u0003\u0004", read(result.directory, "android-motion-" + RUN_ID + "-0.rgba"));
+    }
+
+    @Test
+    public void motionImageExportRejectsMissingPartialWrongRunAndPathFiles() throws Exception {
+        final String workload = "motion-keeper-retry-reward-v1";
+        final String imageName = "android-motion-" + RUN_ID + "-0.rgba";
+        for (int mode = 0; mode < 4; ++mode) {
+            final File privateReports = temporaryFolder.newFolder("motion-image-private-" + mode);
+            final File externalRoot = temporaryFolder.newFolder("motion-image-external-" + mode);
+            String json = validMotionJson(RUN_ID, workload);
+            if (mode == 1) {
+                write(privateReports, imageName, "\u0001\u0002\u0003"); // Partial source payload.
+            } else if (mode != 0) {
+                write(privateReports, imageName, "\u0001\u0002\u0003\u0004");
+                json = mode == 2
+                        ? json.replace(imageName, "android-motion-other-0.rgba")
+                        : json.replace(imageName, "../android-motion-" + RUN_ID + "-0.rgba");
+            }
+            write(privateReports, "HordeLanternRT-benchmark-latest.json", json);
+            write(privateReports, "HordeLanternRT-benchmark-latest.txt", validText(RUN_ID).replace(
+                    "showcase-route-v1", workload));
+            assertFalse("mode=" + mode, BenchmarkAutomationExport.export(privateReports, externalRoot,
+                    RUN_ID, workload, 2).successful);
+        }
+
+        final File wrongSizePrivate = temporaryFolder.newFolder("motion-image-wrong-size-private");
+        final File wrongSizeExternal = temporaryFolder.newFolder("motion-image-wrong-size-external");
+        write(wrongSizePrivate, imageName, "\u0001\u0002\u0003\u0004");
+        write(wrongSizePrivate, "HordeLanternRT-benchmark-latest.json",
+                validMotionJson(RUN_ID, workload).replace("\"bytes\":4", "\"bytes\":5"));
+        write(wrongSizePrivate, "HordeLanternRT-benchmark-latest.txt", validText(RUN_ID).replace(
+                "showcase-route-v1", workload));
+        assertFalse(BenchmarkAutomationExport.export(wrongSizePrivate, wrongSizeExternal,
+                RUN_ID, workload, 2).successful);
+    }
+
+    @Test
+    public void motionValidationRejectsPendingAndIneligiblePresentationRows() throws Exception {
+        final File privateReports = temporaryFolder.newFolder("motion-invalid-private");
+        final File externalRoot = temporaryFolder.newFolder("motion-invalid-external");
+        final String workload = "motion-keeper-retry-reward-v1";
+        String json = validMotionJson(RUN_ID, workload).replace("\"pendingCount\":0", "\"pendingCount\":1");
+        write(privateReports, "HordeLanternRT-benchmark-latest.json", json);
+        write(privateReports, "HordeLanternRT-benchmark-latest.txt", validText(RUN_ID).replace(
+                "showcase-route-v1", workload));
+        assertFalse(BenchmarkAutomationExport.export(privateReports, externalRoot,
+                RUN_ID, workload, 2).successful);
+
+        final File secondPrivate = temporaryFolder.newFolder("motion-second-private");
+        final File secondExternal = temporaryFolder.newFolder("motion-second-external");
+        json = validMotionJson(RUN_ID, workload).replace("\"eligible\":true", "\"eligible\":false");
+        write(secondPrivate, "HordeLanternRT-benchmark-latest.json", json);
+        write(secondPrivate, "HordeLanternRT-benchmark-latest.txt", validText(RUN_ID).replace(
+                "showcase-route-v1", workload));
+        assertFalse(BenchmarkAutomationExport.export(secondPrivate, secondExternal,
+                RUN_ID, workload, 2).successful);
+    }
+
+    @Test
+    public void motionValidationRequiresTypedProfileAndMatchingBackend() throws Exception {
+        final String workload = "motion-keeper-retry-reward-v1";
+        final String[] invalidProfiles = {
+                validMotionJson(RUN_ID, workload).replace("\"glass\":true", "\"glass\":1"),
+                new JSONObject(validMotionJson(RUN_ID, workload)).getJSONObject("settings")
+                        .put("backend", "other").toString()
+        };
+        for (int index = 0; index < invalidProfiles.length; ++index) {
+            final File privateReports = temporaryFolder.newFolder("motion-profile-private-" + index);
+            final File externalRoot = temporaryFolder.newFolder("motion-profile-external-" + index);
+            write(privateReports, "HordeLanternRT-benchmark-latest.json", invalidProfiles[index]);
+            write(privateReports, "HordeLanternRT-benchmark-latest.txt", validText(RUN_ID).replace(
+                    "showcase-route-v1", workload));
+            write(privateReports, "android-motion-" + RUN_ID + "-0.rgba", "\u0001\u0002\u0003\u0004");
+            assertFalse("profile=" + index, BenchmarkAutomationExport.export(privateReports, externalRoot,
+                    RUN_ID, workload, 2).successful);
+        }
+    }
+
+    @Test
+    public void motionValidationRequiresExactComparisonScaleAndStartingFrameJoin() throws Exception {
+        final String workload = "motion-keeper-retry-reward-v1";
+        final File privateReports = temporaryFolder.newFolder("motion-wrong-scale-private");
+        final File externalRoot = temporaryFolder.newFolder("motion-wrong-scale-external");
+        write(privateReports, "HordeLanternRT-benchmark-latest.json",
+                validMotionJson(RUN_ID, workload).replace("\"scalePercent\":50", "\"scalePercent\":60")
+                        .replace("\"scale\":50", "\"scale\":60"));
+        write(privateReports, "HordeLanternRT-benchmark-latest.txt", validText(RUN_ID).replace(
+                "showcase-route-v1", workload));
+        assertFalse(BenchmarkAutomationExport.export(privateReports, externalRoot,
+                RUN_ID, workload, 2).successful);
+
+        final File secondPrivate = temporaryFolder.newFolder("motion-start-identity-private");
+        final File secondExternal = temporaryFolder.newFolder("motion-start-identity-external");
+        write(secondPrivate, "HordeLanternRT-benchmark-latest.json",
+                validMotionJson(RUN_ID, workload).replace("\"recordSerial\":20", "\"recordSerial\":21"));
+        write(secondPrivate, "HordeLanternRT-benchmark-latest.txt", validText(RUN_ID).replace(
+                "showcase-route-v1", workload));
+        assertFalse(BenchmarkAutomationExport.export(secondPrivate, secondExternal,
+                RUN_ID, workload, 2).successful);
+    }
+
+    @Test
     public void numericFieldsMustBeIntegralAndWithinIntRange() throws Exception {
         final File privateReports = temporaryFolder.newFolder("private");
         final File externalRoot = temporaryFolder.newFolder("external");
@@ -217,6 +333,51 @@ public final class BenchmarkAutomationExportTest {
                 .put("measuredFrames", measuredFrames)
                 .put("completedFrameEvidence", evidence)
                 .toString();
+    }
+
+    private static String validMotionJson(final String runId, final String workload) throws Exception {
+        final JSONObject frame = new JSONObject().put("surfaceGeneration", 9).put("sceneEpoch", 3)
+                .put("measurementGeneration", 4).put("record", 20).put("submission", 20).put("tick", 100);
+        final JSONObject ledger = new JSONObject().put("scenarioComplete", true)
+                .put("states", new JSONArray().put(new JSONObject().put("tick", 100)))
+                .put("completedRtFrames", new JSONArray().put(frame));
+        final JSONObject manifest = new JSONObject().put("schema", 1).put("runId", runId)
+                .put("scenario", "keeper-retry-reward").put("armed", true)
+                .put("finished", true).put("complete", true).put("scale", 50)
+                .put("backend", "RayTracingPipeline")
+                .put("water", 1).put("fire", 0).put("cap", 30).put("glass", true)
+                .put("shadow", 1).put("mist", true).put("dust", 0).put("captures", 1);
+        final JSONObject captureStatus = new JSONObject().put("enabled", true).put("bound", true).put("pendingCount", 0);
+        final JSONObject capture = new JSONObject().put("schemaVersion", 1)
+                .put("status", captureStatus).put("counters", new JSONObject())
+                .put("rows", new JSONArray().put(new JSONObject().put("presentID", 1)
+                        .put("actualPresentTime", 500).put("surfaceGeneration", 9).put("sceneEpoch", 3)
+                        .put("measurementGeneration", 4).put("recordSerial", 20).put("submissionSerial", 20)
+                        .put("simulationTick", 100))).put("unresolved", new JSONArray());
+        final JSONObject timing = new JSONObject().put("capture", capture)
+                .put("counterDelta", new JSONObject()).put("counterBaseline", new JSONObject());
+        for (final String counter : new String[]{"rejectedPresents", "invalidRegistrations", "invalidMetadata",
+                "pendingCapacityExhausted", "queryErrors", "zeroPresentTimestamps", "zeroPresentIds",
+                "unknownPresentIds", "duplicateTimings", "rowCapacityExhausted",
+                "missingOnRebind", "missingOnUnbind", "abandonedPreparedPresents"}) {
+            timing.getJSONObject("counterDelta").put(counter, 0);
+        }
+        final JSONObject eligibility = new JSONObject().put("eligible", true)
+                .put("matchedCompletedFrames", 1).put("expectedCompletedFrames", 1);
+        return new JSONObject().put("schema", 1).put("result", "complete").put("runId", runId)
+                .put("workload", workload).put("scenario", "keeper-retry-reward")
+                .put("settings", new JSONObject().put("scalePercent", 50).put("width", 1080)
+                        .put("height", 2340).put("internalWidth", 540).put("internalHeight", 1170)
+                        .put("backend", "RayTracingPipeline").put("water", 1).put("fire", 0)
+                        .put("cap", 30).put("glass", true).put("shadow", 1).put("mist", true).put("dust", 0))
+                .put("startingFrameIdentity", new JSONObject().put("surfaceGeneration", 9)
+                        .put("measurementGeneration", 4).put("sceneEpoch", 3).put("recordSerial", 20)
+                        .put("submissionSerial", 20).put("simulationTick", 100))
+                .put("motionManifest", manifest).put("motionEvidence", ledger)
+                .put("motionImageCaptures", new JSONArray().put(new JSONObject()
+                        .put("file", "android-motion-" + runId + "-0.rgba").put("width", 1).put("height", 1)
+                        .put("bytes", 4).put("stateRow", 0).put("rtRow", 0)))
+                .put("imagePresentationTiming", timing).put("timingEligibility", eligibility).toString();
     }
 
     private static String validText(final String runId) {

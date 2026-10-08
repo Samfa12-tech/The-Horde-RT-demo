@@ -48,6 +48,14 @@ try {
         '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=ON', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=ON')) {
         Assert-Case "timing-$negative" (Invoke-Case $CmakeExecutable ($timing + @($negative,'-P',$script)) $temporaryRoot) $false 'Presentation timing requires isolated'
     }
+    $motion = $baseline + @('-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=33',
+        '-DHORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=ON','-DHORDE_RT_ANDROID_MOTION_VALIDATION=ON')
+    Assert-Case 'motion-isolated' (Invoke-Case $CmakeExecutable ($motion + @('-P',$script)) $temporaryRoot) $true 'scale-min=33'
+    foreach ($negative in @('-DHORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=OFF',
+        '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=OFF','-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=50',
+        '-DCMAKE_BUILD_TYPE=Debug','-DHORDE_RT_DEBUG_CHECKPOINTS=ON')) {
+        Assert-Case "motion-$negative" (Invoke-Case $CmakeExecutable ($motion + @($negative,'-P',$script)) $temporaryRoot) $false 'Motion validation requires the isolated'
+    }
     foreach ($invalid in @('32','34','40','49','033','33.0','33;50')) {
         Assert-Case "invalid-$invalid" (Invoke-Case $CmakeExecutable ($baseline + @("-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=$invalid",'-P',$script)) $temporaryRoot) $false 'Render scale minimum must be exactly'
     }
@@ -55,7 +63,7 @@ try {
         # No assembly/configuration of native targets; exercise the actual Gradle
         # application DSL guard, preserving developer signing and Debug data.
         $android = Join-Path $repoRoot 'android'
-        $neutral = @('-PhordeBenchmarkValidation=false', '-PhordeStagedPrimaryDebugValidation=false',
+        $neutral = @('-PhordeBenchmarkValidation=false', '-PhordeBenchmarkMotionValidation=false', '-PhordeStagedPrimaryDebugValidation=false',
             '-PhordeStagedPrimaryTiming=false', '-PhordeRtInstrumentationOverride=',
             '-PhordeRtDielectricQualityOverride=', '-PhordeViewmodelCandidateDir=')
         function Gradle-Case([string[]]$properties) {
@@ -66,6 +74,12 @@ try {
         Assert-Case 'gradle-timing-benchmark' (Gradle-Case @('-PhordeBenchmarkValidation=true','-PhordePresentTimingValidation=true')) $true 'ordinaryPresentTiming=OFF|benchmarkPresentTiming=ON'
         Assert-Case 'gradle-timing-outside' (Gradle-Case @('-PhordePresentTimingValidation=true')) $false 'requires the isolated Shipping/Mobile'
         Assert-Case 'gradle-timing-invalid' (Gradle-Case @('-PhordePresentTimingValidation=yes')) $false 'must be true or false'
+        Assert-Case 'gradle-motion' (Gradle-Case @('-PhordeBenchmarkValidation=true','-PhordePresentTimingValidation=true',
+            '-PhordeBenchmarkMinRenderScale=33','-PhordeBenchmarkMotionValidation=true')) $true 'benchmarkMotionValidation=ON'
+        Assert-Case 'gradle-motion-requires-timing' (Gradle-Case @('-PhordeBenchmarkValidation=true',
+            '-PhordeBenchmarkMinRenderScale=33','-PhordeBenchmarkMotionValidation=true')) $false 'requires isolated benchmark validation and VK_GOOGLE_display_timing'
+        Assert-Case 'gradle-motion-requires-33' (Gradle-Case @('-PhordeBenchmarkValidation=true',
+            '-PhordePresentTimingValidation=true','-PhordeBenchmarkMotionValidation=true')) $false 'requires hordeBenchmarkMinRenderScale=33'
         Assert-Case 'gradle-outside-benchmark' (Gradle-Case @('-PhordeBenchmarkMinRenderScale=33')) $false 'requires explicit isolated'
         foreach ($invalid in @('34','40','50','033','33.0')) {
             Assert-Case "gradle-invalid-$invalid" (Gradle-Case @('-PhordeBenchmarkValidation=true',"-PhordeBenchmarkMinRenderScale=$invalid")) $false 'requires explicit isolated'

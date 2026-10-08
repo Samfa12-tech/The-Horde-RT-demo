@@ -51,6 +51,8 @@ target_compile_definitions(horde_rt_probe_android PRIVATE
 )
 target_compile_definitions(horde_rt_probe_android PRIVATE
     HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=$<BOOL:${HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION}>)
+target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_ANDROID_MOTION_VALIDATION=$<BOOL:${HORDE_RT_ANDROID_MOTION_VALIDATION}>)
 if(HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "33")
     target_compile_definitions(horde_rt_probe_android PRIVATE HORDE_RT_BENCHMARK_SCALE_VALIDATION=1)
 endif()
@@ -64,6 +66,11 @@ if(HORDE_RT_DEBUG_CHECKPOINTS)
     target_compile_definitions(horde_rt_probe_android PRIVATE
         HORDE_RT_DEBUG_CHECKPOINTS=1
     )
+endif()
+if(HORDE_RT_ANDROID_MOTION_VALIDATION)
+    target_sources(horde_rt_probe_android PRIVATE
+        "${HORDE_RT_REPO_ROOT}/src/gameplay/validation/MotionEvidenceScenario.cpp"
+        "${HORDE_RT_REPO_ROOT}/src/telemetry/MotionEvidenceLedger.cpp")
 endif()
 if(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE)
     target_compile_definitions(horde_rt_probe_android PRIVATE HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=1)

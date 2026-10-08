@@ -64,12 +64,23 @@ def hordePresentTimingValidation = hordePresentTimingValidationProperty == 'true
 if (hordePresentTimingValidation && !hordeBenchmarkValidation) {
     throw new GradleException('hordePresentTimingValidation requires the isolated Shipping/Mobile benchmark package.')
 }
+def hordeBenchmarkMotionValidationProperty = providers.gradleProperty('hordeBenchmarkMotionValidation').orNull
+if (hordeBenchmarkMotionValidationProperty != null && !(hordeBenchmarkMotionValidationProperty in ['true', 'false'])) {
+    throw new GradleException('hordeBenchmarkMotionValidation must be true or false.')
+}
+def hordeBenchmarkMotionValidation = hordeBenchmarkMotionValidationProperty == 'true'
+if (hordeBenchmarkMotionValidation && (!hordeBenchmarkValidation || !hordePresentTimingValidation)) {
+    throw new GradleException('hordeBenchmarkMotionValidation requires isolated benchmark validation and VK_GOOGLE_display_timing.')
+}
 def hordeBenchmarkMinRenderScaleProperty = providers.gradleProperty('hordeBenchmarkMinRenderScale').orNull
 if (hordeBenchmarkMinRenderScaleProperty != null &&
     (!hordeBenchmarkValidation || hordeBenchmarkMinRenderScaleProperty != '33')) {
     throw new GradleException('hordeBenchmarkMinRenderScale=33 requires explicit isolated Shipping/Mobile benchmark validation.')
 }
 def hordeBenchmarkMinRenderScale = hordeBenchmarkMinRenderScaleProperty == '33' ? 33 : 50
+if (hordeBenchmarkMotionValidation && hordeBenchmarkMinRenderScale != 33) {
+    throw new GradleException('hordeBenchmarkMotionValidation requires hordeBenchmarkMinRenderScale=33 for matched 50/40/33 captures.')
+}
 def hordeStagedPrimaryDebugValidationProperty = providers.gradleProperty('hordeStagedPrimaryDebugValidation').orNull
 if (hordeStagedPrimaryDebugValidationProperty != null && !(hordeStagedPrimaryDebugValidationProperty in ['true', 'false'])) {
     throw new GradleException('hordeStagedPrimaryDebugValidation must be true or false.')
@@ -135,6 +146,9 @@ if (hordeStagedPrimaryDebugValidation && (!hordeStagedPrimaryShaderDir ||
 }
 if (hordeStagedPrimaryTiming && (!hordeBenchmarkValidation || !hordeStagedPrimaryShaderDir)) {
     throw new GradleException('hordeStagedPrimaryTiming=true requires the explicit staged benchmark shader directory.')
+}
+if (hordeBenchmarkMotionValidation && (hordeStagedPrimaryShaderDir || hordeStagedPrimaryTiming)) {
+    throw new GradleException('hordeBenchmarkMotionValidation excludes staged shader and viewmodel experiments.')
 }
 def hordeRtOverridePresent = { String value -> value != null && !value.isEmpty() }
 if (hordeRtOverridePresent(hordeRtInstrumentationOverride) != hordeRtOverridePresent(hordeRtDielectricQualityOverride)) {
@@ -403,6 +417,7 @@ android {
         versionCode hordeVersionCode.intValue()
         versionName hordeVersionName
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
         buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', '50'
         resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
@@ -473,11 +488,13 @@ android {
                 jniDebuggable false
                 signingConfig signingConfigs.debug
                 buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', hordeBenchmarkMinRenderScale.toString()
+                buildConfigField 'boolean', 'MOTION_VALIDATION', hordeBenchmarkMotionValidation ? 'true' : 'false'
                 externalNativeBuild {
                     cmake {
                         arguments '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=ON',
                             "-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=${hordeBenchmarkMinRenderScale}",
                             "-DHORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION=${hordePresentTimingValidation ? 'ON' : 'OFF'}",
+                            "-DHORDE_RT_ANDROID_MOTION_VALIDATION=${hordeBenchmarkMotionValidation ? 'ON' : 'OFF'}",
                             "-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=${hordeStagedPrimaryShaderDir ?: ''}",
                             "-DHORDE_RT_STAGED_PRIMARY_DEFAULT=${hordeStagedPrimaryShaderDir ? 'ON' : 'OFF'}",
                             "-DHORDE_RT_STAGED_PRIMARY_TIMING=${hordeStagedPrimaryTiming ? 'ON' : 'OFF'}"
@@ -528,6 +545,7 @@ tasks.register('printHordeRtPolicyForTest') {
         println("benchmarkValidation=${hordeBenchmarkValidation}")
         println("debugMinRenderScale=50|releaseMinRenderScale=50|benchmarkMinRenderScale=${hordeBenchmarkMinRenderScale}")
         println("ordinaryPresentTiming=OFF|benchmarkPresentTiming=${hordePresentTimingValidation ? 'ON' : 'OFF'}")
+        println("benchmarkMotionValidation=${hordeBenchmarkMotionValidation ? 'ON' : 'OFF'}")
         println("stagedPrimaryDebugValidation=${hordeStagedPrimaryDebugValidation}")
         println("stagedPrimaryShaderDir=${hordeStagedPrimaryShaderDir ?: ''}")
     }

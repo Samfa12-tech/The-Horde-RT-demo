@@ -135,7 +135,7 @@ public final class GraphicsPreviewCompactLayoutTest {
                 assertFalse(((Button)field(activity,"graphicsConfirm")).isEnabled());
                 Method menu=MainActivity.class.getDeclaredMethod("createGraphicsPreviewOptionMenu",Button.class,int.class);
                 menu.setAccessible(true);
-                int[][] values={{50,63,75,100},{0,1,2},{2,0,1},{15,30,60},{0,1},{0,1,2},{0,1},{0,1,2}};
+                int[][] values={BuildConfig.MIN_RENDER_SCALE_PERCENT == 33 ? new int[]{33,40,50,63,75,100} : new int[]{50,63,75,100},{0,1,2},{2,0,1},{15,30,60},{0,1},{0,1,2},{0,1},{0,1,2}};
                 int[] selected={75,1,0,30,1,1,1,0};
                 for(int choice=0;choice<8;++choice) {
                     PopupMenu popup=(PopupMenu)menu.invoke(activity,buttons.get(choice),choice);
@@ -143,6 +143,10 @@ public final class GraphicsPreviewCompactLayoutTest {
                     for(int i=0;i<values[choice].length;++i) {
                         assertEquals(values[choice][i],popup.getMenu().getItem(i).getItemId());
                         assertTrue(popup.getMenu().getItem(i).isCheckable());
+                        if(choice==GraphicsPreviewOptions.RESOLUTION && values[choice][i]<50) {
+                            assertTrue("isolated sub-50 choices must be explicit experiments",
+                                    popup.getMenu().getItem(i).getTitle().toString().contains("Experimental"));
+                        }
                         assertEquals(values[choice][i]==selected[choice],popup.getMenu().getItem(i).isChecked());
                         if(choice==GraphicsPreviewOptions.FIRE) assertEquals(new String[]{"Low","Mobile","High"}[i],popup.getMenu().getItem(i).getTitle().toString());
                         if(choice==GraphicsPreviewOptions.SHADOW) assertEquals(new String[]{"Lower","Current","Higher"}[i],popup.getMenu().getItem(i).getTitle().toString());

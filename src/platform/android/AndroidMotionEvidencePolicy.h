@@ -40,6 +40,24 @@ struct AndroidMotionEvidenceScope
         scope.outputHeight != 0u;
 }
 
+// Validation mode deliberately pauses the ordinary input while waiting for a
+// completed foreground RT owner. Debug checkpoint motion still requires the
+// original unpaused admission condition.
+[[nodiscard]] inline bool AndroidMotionCanArm(
+    const bool validationRun, const bool inputPaused) noexcept
+{
+    return validationRun || !inputPaused;
+}
+
+// A terminal gameplay state is not an evidence completion while its graphics
+// submissions remain owned by the renderer.
+[[nodiscard]] inline bool AndroidMotionTerminalOwnerReady(
+    const bool scenarioComplete, const bool pendingSubmissions,
+    const bool pendingPresentationTimings) noexcept
+{
+    return scenarioComplete && !pendingSubmissions && !pendingPresentationTimings;
+}
+
 // Retry retains the scene resources and advances only the measurement generation.
 [[nodiscard]] inline bool AndroidMotionRetryScopeValid(
     const AndroidMotionEvidenceScope& before, const AndroidMotionEvidenceScope& after,

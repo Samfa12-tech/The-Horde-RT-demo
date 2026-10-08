@@ -106,6 +106,7 @@ public class MainActivity extends Activity {
     private static final String ACTION_BENCHMARK = "com.samfa12.hordelanternrt.action.BENCHMARK";
     private static final String EXTRA_BENCHMARK_RUN_ID = "horde.benchmark.run_id";
     private static final String EXTRA_BENCHMARK_WORKLOAD = "horde.benchmark.workload";
+    private static final String EXTRA_BENCHMARK_MOTION = "horde.benchmark.motion";
     private static final String DEFAULT_BENCHMARK_WORKLOAD = "showcase-route-v1";
     private static final long BENCHMARK_AUTOMATION_TIMEOUT_MS = 15L * 60L * 1000L;
     private static final String TEXT_REPORT_FILE = "vulkan_capability_report.txt";
@@ -326,6 +327,7 @@ public class MainActivity extends Activity {
     private String latestBenchmarkReport = "";
     private String benchmarkAutomationId;
     private String benchmarkAutomationWorkload = DEFAULT_BENCHMARK_WORKLOAD;
+    private String benchmarkAutomationMotionScenario;
     private boolean benchmarkAutomationPending;
     private boolean benchmarkAutomationFinishing;
     private long benchmarkAutomationStartedAt;
@@ -1264,9 +1266,16 @@ public class MainActivity extends Activity {
 
     private void startBenchmark() {
         playSound("ui_select", 0.18f);
+        if (benchmarkAutomationMotionScenario != null) {
+            clearTouchState();
+            pushViewControls();
+        }
         if (ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1 || !(benchmarkAutomationId == null
                 ? requestInteractiveBenchmark()
-                : ProbeBridge.requestBenchmarkWithIdAndWorkload(
+                : benchmarkAutomationMotionScenario != null
+                    ? ProbeBridge.requestBenchmarkMotionValidation(
+                        benchmarkAutomationId, benchmarkAutomationMotionScenario)
+                    : ProbeBridge.requestBenchmarkWithIdAndWorkload(
                         benchmarkAutomationId, benchmarkAutomationWorkload))) {
             Toast.makeText(this, R.string.benchmark_unavailable, Toast.LENGTH_LONG).show();
             return;
@@ -1307,6 +1316,8 @@ public class MainActivity extends Activity {
     static String benchmarkAutomationWorkload(final Intent intent) {
         if (intent == null || !ACTION_BENCHMARK.equals(intent.getAction())) return null;
         benchmarkAutomationRequestId(intent);
+        final String motion = benchmarkAutomationMotionScenario(intent);
+        if (motion != null) return "motion-" + motion + "-v1";
         if (!intent.hasExtra(EXTRA_BENCHMARK_WORKLOAD)) return DEFAULT_BENCHMARK_WORKLOAD;
         final String workload;
         try {
@@ -1318,6 +1329,33 @@ public class MainActivity extends Activity {
             throw new IllegalArgumentException("Benchmark workload is not allowlisted.");
         }
         return workload;
+    }
+
+    static String benchmarkAutomationMotionScenario(final Intent intent) {
+        if (intent == null || !ACTION_BENCHMARK.equals(intent.getAction()) ||
+                !intent.hasExtra(EXTRA_BENCHMARK_MOTION)) return null;
+        if (!BuildConfig.MOTION_VALIDATION) {
+            throw new IllegalArgumentException("Motion validation is not enabled in this benchmark package.");
+        }
+        if (intent.hasExtra(EXTRA_BENCHMARK_WORKLOAD)) {
+            throw new IllegalArgumentException("Motion validation cannot be combined with a fixed-pose benchmark workload.");
+        }
+        final String scenario;
+        try {
+            scenario = intent.getStringExtra(EXTRA_BENCHMARK_MOTION);
+        } catch (final ClassCastException error) {
+            throw new IllegalArgumentException("Benchmark motion scenario must be a string.", error);
+        }
+        if (!isAllowedBenchmarkMotionScenario(scenario)) {
+            throw new IllegalArgumentException("Benchmark motion scenario is not allowlisted.");
+        }
+        return scenario;
+    }
+
+    private static boolean isAllowedBenchmarkMotionScenario(final String scenario) {
+        return "keeper-retry-reward".equals(scenario) || "keeper-first-entry".equals(scenario) ||
+                "torch-low-opening".equals(scenario) || "shaft-up".equals(scenario) ||
+                "waterfall-equipment".equals(scenario) || "torch-drench".equals(scenario);
     }
 
     private static boolean isAllowedBenchmarkWorkload(final String workload) {
@@ -1333,17 +1371,20 @@ public class MainActivity extends Activity {
         if (intent == null || !ACTION_BENCHMARK.equals(intent.getAction())) return false;
         try {
             final String id = benchmarkAutomationRequestId(intent);
+            final String motionScenario = benchmarkAutomationMotionScenario(intent);
             final String workload = benchmarkAutomationWorkload(intent);
             // Consume even a duplicate request; recreation must not replay it.
             intent.setAction(Intent.ACTION_MAIN);
             intent.removeExtra(EXTRA_BENCHMARK_RUN_ID);
             intent.removeExtra(EXTRA_BENCHMARK_WORKLOAD);
+            intent.removeExtra(EXTRA_BENCHMARK_MOTION);
             if (benchmarkAutomationId != null || benchmarkRunning) {
                 Log.w(TAG, "Rejected benchmark automation while another run is active.");
                 return true;
             }
             benchmarkAutomationId = id;
             benchmarkAutomationWorkload = workload;
+            benchmarkAutomationMotionScenario = motionScenario;
             benchmarkAutomationPending = true;
             benchmarkAutomationStartedAt = SystemClock.elapsedRealtime();
             ProbeBridge.setRequiredRayQueryCompute(false);
@@ -1365,12 +1406,14 @@ public class MainActivity extends Activity {
         if (nativeStatus != 2) ProbeBridge.cancelBenchmark();
         final String runId = benchmarkAutomationId;
         final String workload = benchmarkAutomationWorkload;
+        final boolean motionValidation = benchmarkAutomationMotionScenario != null;
+        if (motionValidation) ProbeBridge.finishBenchmarkMotionValidation();
         final File privateReports = new File(getFilesDir(), REPORT_DIRECTORY);
         final File externalFiles = getExternalFilesDir(null);
         new Thread(() -> {
             try {
                 final BenchmarkAutomationExport.Result result = BenchmarkAutomationExport.export(
-                        privateReports, externalFiles, runId, workload, nativeStatus);
+                    privateReports, externalFiles, runId, workload, nativeStatus);
                 Log.i(TAG, "HORDE_BENCHMARK_EXPORT run_id=" + runId +
                         " status=" + (result.successful ? "complete" : "invalid") +
                         " directory=" + result.directory.getAbsolutePath() +

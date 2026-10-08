@@ -109,6 +109,8 @@ public final class ProbeBridge {
             String capturedAtUtc, boolean consentToPrepare, boolean includeBasicHardware, int declaredCooling);
     public static native boolean requestBenchmarkWithId(String runId);
     public static native boolean requestBenchmarkWithIdAndWorkload(String runId, String workload);
+    public static native boolean requestBenchmarkMotionValidation(String runId, String scenario);
+    public static native void finishBenchmarkMotionValidation();
     public static native void cancelBenchmark();
     public static native int getBenchmarkStatus();
     public static native String getBenchmarkProgress();

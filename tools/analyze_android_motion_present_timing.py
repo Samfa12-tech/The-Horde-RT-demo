@@ -32,7 +32,7 @@ ADVERSE_COUNTERS = ("rejectedPresents", "invalidRegistrations", "invalidMetadata
     "unknownPresentIds", "duplicateTimings", "rowCapacityExhausted", "missingOnRebind",
     "missingOnUnbind", "abandonedPreparedPresents")
 COUNTERS = ("preparedPresents", "acceptedPresents", "queryCalls", "incompleteQueries") + ADVERSE_COUNTERS
-LIMITS = {"wallSeconds": 120, "stateRows": 16384, "eventRows": 1024, "rtRows": 16384,
+LIMITS = {"wallSeconds": 120, "presentationDrainMilliseconds": 2000, "stateRows": 16384, "eventRows": 1024, "rtRows": 16384,
           "captures": 64, "presentationRows": MAX_TIMING_ROWS, "presentationPending": MAX_PENDING_ROWS}
 
 

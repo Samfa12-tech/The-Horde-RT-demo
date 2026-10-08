@@ -1,4 +1,4 @@
-// Included only by the Debug render owner. No second simulation or submit serial.
+// Included by motion-evidence render owners. No second simulation or submit serial.
 bool CompleteRtEvidenceAfterDeviceIdle(SwapchainContext&, VkResult);
 
 horde::platform::android::AndroidMotionEvidenceScope AndroidMotionScope(const SwapchainContext& context)
@@ -32,6 +32,7 @@ bool WriteAndroidMotion(SwapchainContext& context)
         << ",\"glass\":" << (run.settings.glassEnabled ? "true" : "false")
         << ",\"shadow\":" << static_cast<int>(run.settings.shadowQuality)
         << ",\"mist\":" << (run.settings.mistEnabled ? "true" : "false")
+        << ",\"dust\":" << static_cast<int>(run.settings.dustQuality)
         << ",\"compiledQuality\":" << JsonUtf8String(context.rtScene.SelectedDielectricQualityName())
         << ",\"inputOrigin\":\"harness-generated axes and timestamped edges; not touch latency\""
         << ",\"limits\":{\"armingSeconds\":30,\"wallSeconds\":120,\"captures\":64}"
@@ -43,12 +44,306 @@ bool WriteAndroidMotion(SwapchainContext& context)
         std::rename((run.path + "-manifest.tmp").c_str(), (run.path + "-manifest.json").c_str()) == 0;
 }
 
+#if HORDE_RT_ANDROID_MOTION_VALIDATION
+void WritePresentTimingCounters(std::ostream& output,
+    const horde::vulkan::PresentTimingEvidence::Counters& counters)
+{
+    output << "{\"preparedPresents\":" << counters.preparedPresents
+        << ",\"acceptedPresents\":" << counters.acceptedPresents
+        << ",\"rejectedPresents\":" << counters.rejectedPresents
+        << ",\"invalidRegistrations\":" << counters.invalidRegistrations
+        << ",\"invalidMetadata\":" << counters.invalidMetadata
+        << ",\"pendingCapacityExhausted\":" << counters.pendingCapacityExhausted
+        << ",\"queryCalls\":" << counters.queryCalls
+        << ",\"queryErrors\":" << counters.queryErrors
+        << ",\"incompleteQueries\":" << counters.incompleteQueries
+        << ",\"zeroPresentTimestamps\":" << counters.zeroPresentTimestamps
+        << ",\"zeroPresentIds\":" << counters.zeroPresentIds
+        << ",\"unknownPresentIds\":" << counters.unknownPresentIds
+        << ",\"duplicateTimings\":" << counters.duplicateTimings
+        << ",\"rowCapacityExhausted\":" << counters.rowCapacityExhausted
+        << ",\"missingOnRebind\":" << counters.missingOnRebind
+        << ",\"missingOnUnbind\":" << counters.missingOnUnbind
+        << ",\"abandonedPreparedPresents\":" << counters.abandonedPreparedPresents << '}';
+}
+
+void WritePresentTimingCounterDelta(std::ostream& output,
+    const horde::vulkan::PresentTimingEvidence::Counters& after,
+    const horde::vulkan::PresentTimingEvidence::Counters& before)
+{
+    const auto delta = [](std::uint64_t a, std::uint64_t b) { return a >= b ? a - b : UINT64_MAX; };
+    output << "{\"preparedPresents\":" << delta(after.preparedPresents, before.preparedPresents)
+        << ",\"acceptedPresents\":" << delta(after.acceptedPresents, before.acceptedPresents)
+        << ",\"rejectedPresents\":" << delta(after.rejectedPresents, before.rejectedPresents)
+        << ",\"invalidRegistrations\":" << delta(after.invalidRegistrations, before.invalidRegistrations)
+        << ",\"invalidMetadata\":" << delta(after.invalidMetadata, before.invalidMetadata)
+        << ",\"pendingCapacityExhausted\":" << delta(after.pendingCapacityExhausted, before.pendingCapacityExhausted)
+        << ",\"queryCalls\":" << delta(after.queryCalls, before.queryCalls)
+        << ",\"queryErrors\":" << delta(after.queryErrors, before.queryErrors)
+        << ",\"incompleteQueries\":" << delta(after.incompleteQueries, before.incompleteQueries)
+        << ",\"zeroPresentTimestamps\":" << delta(after.zeroPresentTimestamps, before.zeroPresentTimestamps)
+        << ",\"zeroPresentIds\":" << delta(after.zeroPresentIds, before.zeroPresentIds)
+        << ",\"unknownPresentIds\":" << delta(after.unknownPresentIds, before.unknownPresentIds)
+        << ",\"duplicateTimings\":" << delta(after.duplicateTimings, before.duplicateTimings)
+        << ",\"rowCapacityExhausted\":" << delta(after.rowCapacityExhausted, before.rowCapacityExhausted)
+        << ",\"missingOnRebind\":" << delta(after.missingOnRebind, before.missingOnRebind)
+        << ",\"missingOnUnbind\":" << delta(after.missingOnUnbind, before.missingOnUnbind)
+        << ",\"abandonedPreparedPresents\":" << delta(after.abandonedPreparedPresents, before.abandonedPreparedPresents) << '}';
+}
+
+bool MotionTimingJoinEligible(const SwapchainContext& context, const AndroidMotionRun& run,
+    std::size_t& matchedRows, std::string& reason)
+{
+    using namespace horde::telemetry;
+    using namespace horde::vulkan;
+    matchedRows = 0u;
+    if (!context.presentTiming || !context.presentTiming->Enabled() || !context.presentTiming->Bound())
+    { reason = "actual presentation timing collector is unavailable or unbound"; return false; }
+    if (!run.finished || !run.scenario.Complete() || run.ledger.Failed() ||
+        run.ledger.HasPendingSubmissions())
+    { reason = "motion scenario or completed-frame ledger is incomplete"; return false; }
+    if (!horde::platform::android::AndroidMotionTerminalOwnerReady(
+            run.scenario.Complete(), false, context.presentTiming->PendingCount() != 0u))
+    { reason = "actual image presentation timings remain unresolved at terminal drain"; return false; }
+
+    const auto& counters = context.presentTiming->GetCounters();
+    const auto& before = run.timingCountersBaseline;
+    const auto cleanDelta = [](std::uint64_t now, std::uint64_t start) { return now >= start && now == start; };
+    if (!cleanDelta(counters.rejectedPresents, before.rejectedPresents) ||
+        !cleanDelta(counters.invalidRegistrations, before.invalidRegistrations) ||
+        !cleanDelta(counters.invalidMetadata, before.invalidMetadata) ||
+        !cleanDelta(counters.pendingCapacityExhausted, before.pendingCapacityExhausted) ||
+        !cleanDelta(counters.queryErrors, before.queryErrors) ||
+        !cleanDelta(counters.zeroPresentTimestamps, before.zeroPresentTimestamps) ||
+        !cleanDelta(counters.zeroPresentIds, before.zeroPresentIds) ||
+        !cleanDelta(counters.unknownPresentIds, before.unknownPresentIds) ||
+        !cleanDelta(counters.duplicateTimings, before.duplicateTimings) ||
+        !cleanDelta(counters.rowCapacityExhausted, before.rowCapacityExhausted) ||
+        !cleanDelta(counters.missingOnRebind, before.missingOnRebind) ||
+        !cleanDelta(counters.missingOnUnbind, before.missingOnUnbind) ||
+        !cleanDelta(counters.abandonedPreparedPresents, before.abandonedPreparedPresents))
+    { reason = "actual presentation timing has an adverse run counter delta"; return false; }
+
+    using Key = std::tuple<std::uint64_t, std::uint64_t, std::uint64_t, std::uint64_t, std::uint64_t>;
+    const auto motionKey = [](const MotionRtRow& row) -> Key
+    {
+        const auto& frame = row.identity.submitted.frame;
+        return {frame.measurementGeneration, frame.sceneEpoch, frame.recordSerial,
+                row.identity.submitted.submissionSerial, frame.simulationTick};
+    };
+    const auto timingKey = [](const PresentTimingEvidence::Row& row) -> Key
+    {
+        return {row.measurementGeneration, row.sceneEpoch, row.recordSerial,
+                row.submissionSerial, row.simulationTick};
+    };
+    std::vector<const MotionRtRow*> motionRows;
+    motionRows.reserve(run.ledger.Frames().size());
+    for (const auto& row : run.ledger.Frames()) motionRows.push_back(&row);
+    std::sort(motionRows.begin(), motionRows.end(), [&](const auto* a, const auto* b)
+        { return motionKey(*a) < motionKey(*b); });
+    if (motionRows.empty())
+    { reason = "motion run has no completed RT frames"; return false; }
+    const auto& firstFrame = *motionRows.front();
+    for (const auto* row : motionRows)
+    {
+        const auto& frame = row->identity.submitted.frame;
+        const auto& first = firstFrame.identity.submitted.frame;
+        if (row->surfaceGeneration != firstFrame.surfaceGeneration ||
+            frame.sceneEpoch != first.sceneEpoch || frame.measurementGeneration != first.measurementGeneration)
+        { reason = "motion run spans multiple resource scopes; a single pacing interval is not eligible"; return false; }
+    }
+    std::vector<const PresentTimingEvidence::Row*> timingRows;
+    timingRows.reserve(context.presentTiming->RowCount());
+    for (std::size_t i = 0u; i < context.presentTiming->RowCount(); ++i)
+        if (const auto* row = context.presentTiming->ObservedRow(i)) timingRows.push_back(row);
+    std::sort(timingRows.begin(), timingRows.end(), [&](const auto* a, const auto* b)
+        { return timingKey(*a) < timingKey(*b); });
+
+    std::size_t motionIndex = 0u, timingIndex = 0u;
+    while (motionIndex < motionRows.size() && timingIndex < timingRows.size())
+    {
+        const auto& frame = *motionRows[motionIndex];
+        const auto& timing = *timingRows[timingIndex];
+        const Key frameKey = motionKey(frame), timingRowKey = timingKey(timing);
+        if (timingRowKey < frameKey)
+        {
+            // Setup rows may resolve after arming, but only rows ordered before
+            // the first scenario identity can be ignored. Once the run begins,
+            // every observed timing row must have a ledger owner.
+            if (motionIndex != 0u || !(timingRowKey < motionKey(firstFrame)))
+            { reason = "an actual presentation row within the motion interval has no ledger owner"; return false; }
+            ++timingIndex; continue;
+        }
+        if (frameKey < timingRowKey)
+        { reason = "a completed motion frame has no actual presentation timestamp"; return false; }
+        const bool metadataMatches = timing.actualPresentTime != 0u && timing.presentID != 0u &&
+            timing.surfaceGeneration == frame.surfaceGeneration &&
+            timing.scalePercent == static_cast<std::uint32_t>(std::lround(context.renderScale * 100.0f)) &&
+            timing.width == context.swapchainExtent.width && timing.height == context.swapchainExtent.height &&
+            timing.backend == (context.executionBackend == horde::vulkan::RtExecutionBackend::RayQueryCompute
+                ? PresentTimingBackend::RayQueryCompute : PresentTimingBackend::RayTracingPipeline);
+        if (!metadataMatches)
+        { reason = "actual presentation row metadata does not match its completed RT owner"; return false; }
+        ++matchedRows; ++motionIndex; ++timingIndex;
+        if (motionIndex < motionRows.size() && motionKey(*motionRows[motionIndex]) == frameKey)
+        { reason = "motion ledger contains a duplicate completed-frame identity"; return false; }
+        if (timingIndex < timingRows.size() && timingKey(*timingRows[timingIndex]) == timingRowKey)
+        { reason = "presentation collector contains a duplicate completed-frame identity"; return false; }
+    }
+    if (motionIndex != motionRows.size())
+    { reason = "a completed motion frame has no actual presentation timestamp"; return false; }
+    if (timingIndex < timingRows.size() &&
+        !(timingKey(*timingRows[timingIndex]) < motionKey(firstFrame)))
+    { reason = "an actual presentation row at or after motion start has no ledger owner"; return false; }
+    if (matchedRows == 0u)
+    { reason = "motion run has no matched completed presentation rows"; return false; }
+    reason = "all completed motion frames join one-to-one to actual image presentation timestamps";
+    return true;
+}
+
+bool WriteAndroidMotionValidationReport(SwapchainContext& context)
+{
+    if (!context.motion) return false;
+    auto& run = *context.motion;
+    PollPresentTimingOnOwner(context); // One bounded two-call poll; never waits for the display clock.
+    std::size_t matchedRows = 0u;
+    std::string eligibilityReason;
+    const bool eligible = MotionTimingJoinEligible(context, run, matchedRows, eligibilityReason);
+    std::ostringstream evidence;
+    run.ledger.WriteJson(evidence, run.scenario);
+    std::ostringstream json;
+    const VkExtent2D internalExtent = context.rtScene.DispatchExtent();
+    json << "{\"schema\":1,\"result\":" << JsonUtf8String(eligible ? "complete" : "invalid")
+         << ",\"runId\":" << JsonUtf8String(run.id)
+         << ",\"workload\":" << JsonUtf8String(std::string("motion-") +
+                horde::gameplay::validation::MotionScenarioName(run.selected) + "-v1")
+         << ",\"scenario\":" << JsonUtf8String(horde::gameplay::validation::MotionScenarioName(run.selected))
+         << ",\"buildId\":" << JsonUtf8String(HORDE_RT_BUILD_ID)
+         << ",\"simulationPolicy\":\"shared GameSimulation.AdvanceFrame with raw monotonic input-owner delta and normal fixed-step catch-up; generated motion axes/edges enter through the existing InputMailbox owner; no per-render fixed-delta override\""
+         << ",\"limits\":{\"wallSeconds\":120,\"presentationDrainMilliseconds\":2000,\"stateRows\":16384,\"eventRows\":1024,\"rtRows\":16384,\"captures\":64,\"presentationRows\":32768,\"presentationPending\":256}"
+         << ",\"settings\":{\"scalePercent\":" << static_cast<unsigned>(std::lround(context.renderScale * 100.0f))
+         << ",\"width\":" << context.swapchainExtent.width << ",\"height\":" << context.swapchainExtent.height
+         << ",\"internalWidth\":" << internalExtent.width << ",\"internalHeight\":" << internalExtent.height
+         << ",\"backend\":" << JsonUtf8String(horde::vulkan::ToString(context.executionBackend))
+         << ",\"water\":" << static_cast<int>(run.settings.waterQuality)
+         << ",\"fire\":" << static_cast<int>(run.settings.fireDetail)
+         << ",\"cap\":" << run.settings.previewFrameCap
+         << ",\"glass\":" << (run.settings.glassEnabled ? "true" : "false")
+         << ",\"shadow\":" << static_cast<int>(run.settings.shadowQuality)
+         << ",\"mist\":" << (run.settings.mistEnabled ? "true" : "false")
+         << ",\"dust\":" << static_cast<int>(run.settings.dustQuality) << '}';
+    const auto frames = run.ledger.Frames();
+    json << ",\"startingFrameIdentity\":";
+    if (!frames.empty())
+    {
+        const auto& row = frames.front(); const auto& frame = row.identity.submitted.frame;
+        json << "{\"surfaceGeneration\":" << row.surfaceGeneration << ",\"measurementGeneration\":"
+             << frame.measurementGeneration << ",\"sceneEpoch\":" << frame.sceneEpoch << ",\"recordSerial\":"
+             << frame.recordSerial << ",\"submissionSerial\":" << row.identity.submitted.submissionSerial
+             << ",\"simulationTick\":" << frame.simulationTick << '}';
+    }
+    else json << "null";
+    json << ",\"motionManifest\":{\"schema\":1,\"runId\":" << JsonUtf8String(run.id)
+         << ",\"scenario\":" << JsonUtf8String(horde::gameplay::validation::MotionScenarioName(run.selected))
+         << ",\"finished\":" << (run.finished ? "true" : "false")
+         << ",\"complete\":" << (run.finished && run.scenario.Complete() && !run.ledger.Failed() ? "true" : "false")
+         << ",\"armed\":" << (run.armed ? "true" : "false")
+         << ",\"surfaceGeneration\":" << run.scope.surfaceGeneration
+         << ",\"sceneEpoch\":" << run.scope.sceneEpoch
+         << ",\"measurementGeneration\":" << run.scope.measurementGeneration
+         << ",\"backend\":" << JsonUtf8String(horde::vulkan::ToString(context.executionBackend))
+         << ",\"scale\":" << run.settings.renderScalePercent
+         << ",\"water\":" << static_cast<int>(run.settings.waterQuality)
+         << ",\"fire\":" << static_cast<int>(run.settings.fireDetail)
+         << ",\"cap\":" << run.settings.previewFrameCap
+         << ",\"glass\":" << (run.settings.glassEnabled ? "true" : "false")
+         << ",\"shadow\":" << static_cast<int>(run.settings.shadowQuality)
+         << ",\"mist\":" << (run.settings.mistEnabled ? "true" : "false")
+         << ",\"dust\":" << static_cast<int>(run.settings.dustQuality)
+         << ",\"compiledQuality\":" << JsonUtf8String(context.rtScene.SelectedDielectricQualityName())
+         << ",\"inputOrigin\":\"harness-generated axes and timestamped edges; not touch latency\""
+         << ",\"limits\":{\"armingSeconds\":30,\"wallSeconds\":120,\"presentationDrainMilliseconds\":2000,\"captures\":64}"
+         << ",\"isolation\":{\"secondSimulation\":false,\"fixedDeltaOverride\":false,\"phaseForced\":false,\"preferencesWritten\":false,\"ownerAcceptance\":false,\"timingScope\":\"moving scenario with RT readbacks and actual image presentation timestamps; not sustained, scanout, or photons\"}"
+         << ",\"captures\":" << run.captureCount << '}';
+    json << ",\"motionEvidence\":" << evidence.str()
+         << ",\"motionImageCaptures\":" << run.captures << ']'
+         << ",\"timingEligibility\":{\"eligible\":" << (eligible ? "true" : "false")
+         << ",\"matchedCompletedFrames\":" << matchedRows << ",\"expectedCompletedFrames\":" << frames.size()
+         << ",\"reason\":" << JsonUtf8String(eligibilityReason) << '}';
+    json << ",\"imagePresentationTiming\":{\"extensionEnabled\":"
+         << (context.presentTimingExtensionEnabled ? "true" : "false")
+         << ",\"queryCpuWallNanoseconds\":"
+         << context.presentTimingPollCpuNs << ",\"rowIndexBeforeRun\":" << run.timingRowBaseline
+         << ",\"counterBaseline\":";
+    WritePresentTimingCounters(json, run.timingCountersBaseline);
+    json << ",\"counterDelta\":";
+    if (context.presentTiming)
+        WritePresentTimingCounterDelta(json, context.presentTiming->GetCounters(), run.timingCountersBaseline);
+    else json << "{}";
+    json << ",\"capture\":";
+    if (context.presentTiming) context.presentTiming->WriteJson(json);
+    else json << "{\"schemaVersion\":1,\"status\":{\"enabled\":false,\"bound\":false,\"pendingCount\":0},\"counters\":{},\"rows\":[],\"unresolved\":[]}";
+    json << "}}";
+    const bool saved = WriteTextFile(context.reportDirectory + "/HordeLanternRT-benchmark-latest.json", json.str());
+    const std::string text = "Run ID: " + run.id + "\nPreset: motion-" +
+        std::string(horde::gameplay::validation::MotionScenarioName(run.selected)) + "-v1\n" +
+        "Result: " + std::string(eligible && saved ? "complete" : "invalid") + "\n" +
+        "Motion pacing scope: matched completed RT frames to VK_GOOGLE_display_timing actual image presentation timestamps; not sustained or photons.\n";
+    const bool textSaved = WriteTextFile(context.reportDirectory + "/HordeLanternRT-benchmark-latest.txt", text);
+    {
+        std::lock_guard<std::mutex> lock(gReportMutex);
+        gLatestBenchmarkReport = text;
+        gLatestBenchmarkProgress = eligible && saved && textSaved ? "MOTION VALIDATION COMPLETE" : "MOTION VALIDATION INVALID";
+    }
+    const bool complete = eligible && saved && textSaved;
+    gInAppBenchmarkStatus.store(complete ? 2 : 3, std::memory_order_release);
+    return complete;
+}
+#endif
+
+#if HORDE_RT_ANDROID_MOTION_VALIDATION
+void PollAndroidMotionTerminalTimingDrain(SwapchainContext& context)
+{
+    if (!context.motion || !context.motion->terminalTimingDrainPending || context.motion->finished) return;
+    auto& run = *context.motion;
+    const std::uint64_t now = GraphicsSteadyNs();
+    if (!gSurfaceSessions.IsCurrent(context.surfaceGeneration) || AndroidMotionScope(context) != run.scope)
+    { FailAndroidMotion(context, "Motion terminal timing drain lost its foreground resource scope."); return; }
+    if (!context.presentTiming || !context.presentTiming->Enabled() || !context.presentTiming->Bound())
+    { FailAndroidMotion(context, "Motion terminal timing drain lost the actual presentation collector."); return; }
+
+    PollPresentTimingOnOwner(context); // Bounded collector poll; no synthetic present or display wait.
+    if (horde::platform::android::AndroidMotionTerminalOwnerReady(
+            run.scenario.Complete(), run.ledger.HasPendingSubmissions(),
+            context.presentTiming->PendingCount() != 0u))
+    {
+        run.finished = true;
+        if (!WriteAndroidMotion(context))
+        {
+            run.finished = false;
+            FailAndroidMotion(context, "Motion terminal owner receipt write failed.");
+            return;
+        }
+        const bool complete = WriteAndroidMotionValidationReport(context);
+        gMotionStatus.store(complete ? 3 : 4, std::memory_order_release);
+        return;
+    }
+    constexpr std::uint64_t kTerminalTimingDrainDeadlineNs = 2'000'000'000ull;
+    if (now == 0u || now < run.terminalTimingDrainStartedNs ||
+        now - run.terminalTimingDrainStartedNs >= kTerminalTimingDrainDeadlineNs)
+        FailAndroidMotion(context, "Actual presentation timestamps did not resolve before the bounded terminal drain deadline.");
+}
+#endif
+
 void FailAndroidMotion(SwapchainContext& context, std::string_view reason)
 {
     if (!context.motion || context.motion->finished) return;
     context.motion->scenario.Fail(reason);
     context.motion->finished = true;
     (void)WriteAndroidMotion(context);
+#if HORDE_RT_ANDROID_MOTION_VALIDATION
+    if (context.motionValidationRun) (void)WriteAndroidMotionValidationReport(context);
+#endif
     gMotionStatus.store(4, std::memory_order_release);
     __android_log_print(ANDROID_LOG_ERROR, kTag, "HORDE_MOTION failed %.*s", static_cast<int>(reason.size()), reason.data());
 }
@@ -105,6 +400,7 @@ void ResetAndroidMotionIfRequested(SwapchainContext& context)
     gInputPublisherState.moveForward = gInputPublisherState.moveStrafe = 0.0f;
     PublishInputLocked();
     context.motion.reset();
+    context.motionValidationRun = false;
     gMotionStatus.store(0, std::memory_order_release);
 }
 
@@ -139,6 +435,13 @@ void BuildAndroidMotionInput(SwapchainContext& context,
         run.selected = gMotionRequestedScenario;
         run.path = context.reportDirectory + "/android-motion-" + run.id;
         run.requestedNs = now;
+#if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION
+        if (context.presentTiming)
+        {
+            run.timingRowBaseline = context.presentTiming->RowCount();
+            run.timingCountersBaseline = context.presentTiming->GetCounters();
+        }
+#endif
         run.settings = context.graphicsSettings;
         run.externalCommands = input.commands;
         run.externalYaw = input.yawRadians; run.externalPitch = input.pitchRadians; run.externalTorch = input.torchLightStrength;
@@ -171,10 +474,38 @@ void BuildAndroidMotionInput(SwapchainContext& context,
     { FailAndroidMotion(context, "Motion interrupted by UI/input/profile/resource ownership."); input.paused = true; return; }
     if (!run.armed)
     {
+        // Before the scenario's one accepted checkpoint seed, hold the ordinary
+        // simulation paused so startup/menu input cannot advance an unmeasured scene.
+        if (context.motionValidationRun)
+        {
+            input.paused = true;
+            input.damageEnabled = false;
+            input.moveForward = input.moveStrafe = 0.0f;
+        }
+        if (context.motionValidationRun)
+        {
+            const auto& consumed = gGameSimulation.Snapshot();
+            const bool pendingOwnerCommand =
+                input.commands.attack > consumed.lastConsumedAttackSequence ||
+                input.commands.parry > consumed.lastConsumedParrySequence ||
+                input.commands.dodge > consumed.lastConsumedDodgeSequence ||
+                input.commands.retry > consumed.lastConsumedRetrySequence ||
+                input.commands.routeReset > consumed.lastConsumedRouteResetSequence ||
+                input.commands.interact > consumed.lastConsumedInteractSequence ||
+                input.commands.toggleHeldLightPose > consumed.lastConsumedToggleHeldLightPoseSequence;
+            if (pendingOwnerCommand || input.moveForward != 0.0f || input.moveStrafe != 0.0f)
+            {
+                FailAndroidMotion(context, "Motion benchmark started with pending gameplay input or non-neutral movement.");
+                input.paused = true;
+                return;
+            }
+        }
         const auto publication = context.rtFrameEvidence.PublishedStateByValue();
         if (now - run.requestedNs > 30'000'000'000ull)
         { FailAndroidMotion(context, "Current foreground RT frame did not arm before deadline."); input.paused = true; return; }
-        if (input.paused || !publication.running || !publication.presented || !publication.hasCompletedEvidence ||
+        if (!horde::platform::android::AndroidMotionCanArm(
+                context.motionValidationRun, input.paused) ||
+            !publication.running || !publication.presented || !publication.hasCompletedEvidence ||
             publication.completedEvidence.presentation.outcome != horde::telemetry::RtPresentationOutcome::Presented ||
             publication.completedEvidence.identity.submitted.frame.sceneEpoch != publication.sceneEpoch ||
             publication.completedEvidence.identity.submitted.frame.measurementGeneration != publication.measurementGeneration ||
@@ -195,6 +526,7 @@ void BuildAndroidMotionInput(SwapchainContext& context,
         gGameSimulation.ResetTiming(); gGameSimulation.ClearEvents();
         context.lastInputOwnerSteadyNs = now;
         run.armed = true;
+        if (context.motionValidationRun) input.paused = false;
         gMotionStatus.store(2, std::memory_order_release);
         __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_MOTION armed id=%s", run.id.c_str());
     }
@@ -297,10 +629,25 @@ void AfterAndroidMotionPresent(SwapchainContext& context)
     run.captures += row.str(); run.lastCaptureStage = stage; run.lastCaptureSeconds = seconds;
     if (run.scenario.Complete())
     {
-        run.finished = !run.ledger.HasPendingSubmissions();
+        run.finished = horde::platform::android::AndroidMotionTerminalOwnerReady(
+            run.scenario.Complete(), run.ledger.HasPendingSubmissions(), false);
         if (!run.finished) { FailAndroidMotion(context, "Terminal motion frame still has pending graphics work."); return; }
+#if HORDE_RT_ANDROID_MOTION_VALIDATION
+        if (context.motionValidationRun)
+        {
+            run.finished = false;
+            run.terminalTimingDrainPending = true;
+            run.terminalTimingDrainStartedNs = GraphicsSteadyNs();
+        }
+#endif
     }
     if (!WriteAndroidMotion(context))
     { run.finished = false; FailAndroidMotion(context, "Motion receipt write failed."); }
-    else if (run.finished) gMotionStatus.store(3, std::memory_order_release);
+    else if (run.finished)
+    {
+        gMotionStatus.store(3, std::memory_order_release);
+#if HORDE_RT_ANDROID_MOTION_VALIDATION
+        if (context.motionValidationRun) (void)WriteAndroidMotionValidationReport(context);
+#endif
+    }
 }

@@ -79,6 +79,14 @@ int main()
     check(!AndroidMotionRetryScopeValid(validScope, {1u, 2u, 4u, 720u, 1560u}, true, false));
     check(!AndroidMotionRetryScopeValid({1u, 2u, UINT64_MAX, 1440u, 3120u},
         {1u, 2u, 1u, 1440u, 3120u}, true, false));
+    check(!AndroidMotionCanArm(false, true)); // Debug checkpoint mode keeps ordinary pause admission.
+    check(AndroidMotionCanArm(false, false));
+    check(AndroidMotionCanArm(true, true)); // Isolated validation waits paused for a completed RT owner.
+    check(AndroidMotionCanArm(true, false));
+    check(!AndroidMotionTerminalOwnerReady(false, false, false));
+    check(!AndroidMotionTerminalOwnerReady(true, true, false)); // A terminal state cannot discard owned graphics work.
+    check(!AndroidMotionTerminalOwnerReady(true, false, true)); // Nor unresolved display timing IDs.
+    check(AndroidMotionTerminalOwnerReady(true, false, false));
     for (std::size_t field = 0; field < 5u; ++field)
     {
         auto invalid = validScope;

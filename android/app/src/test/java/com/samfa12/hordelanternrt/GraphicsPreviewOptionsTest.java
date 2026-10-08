@@ -119,8 +119,8 @@ public final class GraphicsPreviewOptionsTest {
     }
 
     @Test public void boundedMenusIncludeCurrentCustomValuesAndUseProductionCameras() {
-        assertArrayEquals(new int[]{50,63,68,75,100},GraphicsPreviewOptions.choices(confirmed,0));
-        assertArrayEquals(new int[]{50,63,75,100},GraphicsPreviewOptions.choices(draft,0));
+        assertArrayEquals(BuildConfig.MIN_RENDER_SCALE_PERCENT == 33 ? new int[]{33,40,50,63,68,75,100} : new int[]{50,63,68,75,100},GraphicsPreviewOptions.choices(confirmed,0));
+        assertArrayEquals(BuildConfig.MIN_RENDER_SCALE_PERCENT == 33 ? new int[]{33,40,50,63,75,100} : new int[]{50,63,75,100},GraphicsPreviewOptions.choices(draft,0));
         assertArrayEquals(new int[]{0,1,2},GraphicsPreviewOptions.choices(confirmed,1));
         assertArrayEquals(new int[]{2,0,1},GraphicsPreviewOptions.choices(confirmed,2));
         assertArrayEquals(new int[]{15,30,42,60},GraphicsPreviewOptions.choices(new GraphicsPreferences.Values(75,1,0,42),3));
