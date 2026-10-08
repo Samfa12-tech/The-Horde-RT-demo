@@ -65,8 +65,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 64u,
-          "development registry retains prior views and admits three scoped grate-bottom angles");
+    Check(kDevelopmentCheckpoints.size() == 68u,
+          "development registry retains prior views and admits bounded water-lighting views");
     Check(FindDevelopmentCheckpoint(164) == nullptr,
           "development lookup rejects IDs beyond the admitted samples");
     const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");
@@ -167,8 +167,24 @@ int main()
     const auto* levelPanel = FindDevelopmentCheckpoint("layout-c-wall-panel");
     const auto* upwardPanel = FindDevelopmentCheckpoint("layout-c-wall-panel-upward");
     using horde::platform::windows::HasExpectedPlayerCaptureVisibility;
+    for (const std::string_view name : {"water-torch-near", "water-torch-far",
+                                       "water-torch-oblique", "water-torch-catchment"})
+    {
+        const auto* water = FindDevelopmentCheckpoint(name);
+        Check(water && water->baseShowcaseCheckpointId == 2 &&
+              water->primaryArmsMayBeOutsideFrame && !water->stagesWaterfallGuards &&
+              IsShowcasePlayerPositionWalkable(water->cameraX, water->cameraZ),
+              "water inspection is a legal ordinary torch checkpoint without encounter seed");
+        if (water)
+        {
+            simulation::GameSimulation staged(simulation::ProductionGameSimulationConfig());
+            Check(StageDevelopmentCheckpointSimulation(staged, *water), "water checkpoint stages shared authority");
+            Check(staged.Snapshot().walkTime == 0.0f && staged.Snapshot().torchLightStrength == 1.8f,
+                  "water camera freezes animation while retaining the actual torch strength");
+        }
+    }
     for (const auto& capture : kDevelopmentCheckpoints)
-        Check(capture.primaryArmsMayBeOutsideFrame == (capture.id == 152 || (capture.id >= 161 && capture.id <= 163)),
+        Check(capture.primaryArmsMayBeOutsideFrame == (capture.id == 152 || (capture.id >= 161 && capture.id <= 163) || (capture.id >= 180 && capture.id <= 183)),
               "only explicit upper/lower level inspection views declare cropped primary arms");
     Check(!HasExpectedPlayerCaptureVisibility(true, true, true, 0u, false) &&
               HasExpectedPlayerCaptureVisibility(true, true, true, 1u, false) &&

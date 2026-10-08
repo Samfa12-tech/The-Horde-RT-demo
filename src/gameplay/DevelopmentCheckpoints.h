@@ -58,7 +58,7 @@ struct DevelopmentCheckpoint
     std::uint32_t waterfallGuardFixedTicks = 0u;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 64u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 68u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -256,6 +256,19 @@ inline constexpr std::array<DevelopmentCheckpoint, 64u> kDevelopmentCheckpoints{
      .pitch = -0.32f, .primaryArmsMayBeOutsideFrame = true},
     {.id = 163, .name = "wall-panel-bottom-right", .baseShowcaseCheckpointId = 2,
      .cameraX = 3.40f, .cameraZ = -10.10f, .yaw = 3.637f,
+     .pitch = -0.32f, .primaryArmsMayBeOutsideFrame = true},
+    // Frozen water-interface lighting inspections; no scene/equipment override.
+    {.id = 180, .name = "water-torch-near", .baseShowcaseCheckpointId = 2,
+     .cameraX = -1.15f, .cameraZ = -15.20f, .yaw = -1.57079632679f,
+     .pitch = -0.16f, .primaryArmsMayBeOutsideFrame = true},
+    {.id = 181, .name = "water-torch-far", .baseShowcaseCheckpointId = 2,
+     .cameraX = 2.00f, .cameraZ = -15.20f, .yaw = -1.57079632679f,
+     .pitch = -0.10f, .primaryArmsMayBeOutsideFrame = true},
+    {.id = 182, .name = "water-torch-oblique", .baseShowcaseCheckpointId = 2,
+     .cameraX = 0.00f, .cameraZ = -14.30f, .yaw = -1.18055f,
+     .pitch = -0.20f, .primaryArmsMayBeOutsideFrame = true},
+    {.id = 183, .name = "water-torch-catchment", .baseShowcaseCheckpointId = 2,
+     .cameraX = -0.80f, .cameraZ = -15.85f, .yaw = -1.94055f,
      .pitch = -0.32f, .primaryArmsMayBeOutsideFrame = true},
 }};
 

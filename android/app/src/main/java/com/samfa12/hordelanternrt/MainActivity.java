@@ -122,6 +122,7 @@ public class MainActivity extends Activity {
     private static final String EXTRA_DEBUG_REPLAY = "horde.debug.replay";
     private static final String EXTRA_DEBUG_MOTION = "horde.debug.motion";
     private static final String EXTRA_DEBUG_MOTION_ID = "horde.debug.motion_id";
+    private static final String EXTRA_DEBUG_WATER = "horde.debug.water_quality";
     private static final String EXTRA_DEBUG_SCALE = "horde.debug.scale";
     private static final String EXTRA_DEBUG_DUST = "horde.debug.dust";
     private static final String EXTRA_DEBUG_AUTOSTART = "horde.debug.autostart";
@@ -4842,6 +4843,10 @@ public class MainActivity extends Activity {
             case "wall-panel-bottom": return 161;
             case "wall-panel-bottom-left": return 162;
             case "wall-panel-bottom-right": return 163;
+            case "water-torch-near": return 180;
+            case "water-torch-far": return 181;
+            case "water-torch-oblique": return 182;
+            case "water-torch-catchment": return 183;
             default: return -1;
         }
     }
@@ -4866,6 +4871,25 @@ public class MainActivity extends Activity {
         if (current == null || dustQuality < 0 || dustQuality > 2) return null;
         return new GraphicsPreferences.Values(current.scale, current.water, current.fire, current.cap,
                 current.glassEnabled, current.shadow, current.mistEnabled, dustQuality);
+    }
+
+    // Material A/B only: ordinary coherent native graphics publication, no saving.
+    static int admittedDebugWaterQuality(final Intent intent, final boolean debuggable,
+            final int checkpoint, final boolean capture, final boolean replay,
+            final boolean hasRtLabIntent, final boolean motionRequested) {
+        if (intent == null || !debuggable || checkpoint < 180 || checkpoint > 183 ||
+                !capture || replay || hasRtLabIntent || motionRequested ||
+                intent.hasExtra(EXTRA_BENCHMARK_RUN_ID)) return -1;
+        final int quality = intent.getIntExtra(EXTRA_DEBUG_WATER, -1);
+        return quality == WATER_QUALITY_MOBILE || quality == WATER_QUALITY_HIGH ? quality : -1;
+    }
+
+    static GraphicsPreferences.Values withDebugWaterQuality(
+            final GraphicsPreferences.Values current, final int waterQuality, final int requestedScale) {
+        if (current == null || (waterQuality != WATER_QUALITY_MOBILE && waterQuality != WATER_QUALITY_HIGH)) return null;
+        return new GraphicsPreferences.Values(requestedScale >= 50 && requestedScale <= 100 ? requestedScale : current.scale,
+                waterQuality, current.fire, current.cap, current.glassEnabled, current.shadow,
+                current.mistEnabled, current.dust);
     }
 
     static int admittedDebugRenderScale(final Intent intent) {
@@ -4953,6 +4977,14 @@ public class MainActivity extends Activity {
             publishRtLightTuning();
             publishRtFireTuning();
             ProbeBridge.setRtWorkloadPreset(rtWorkloadPreset);
+        }
+        final int requestedWaterQuality = admittedDebugWaterQuality(intent, true,
+                requestedCheckpoint, requestedCapture, requestedReplay, hasRtLabIntent, motionRequested);
+        if (requestedWaterQuality >= 0) {
+            GraphicsPreferences.Values waterCapture = withDebugWaterQuality(
+                    graphicsConfirmed, requestedWaterQuality, requestedScale);
+            if (requestedDustQuality >= 0) waterCapture = withDebugDustQuality(waterCapture, requestedDustQuality);
+            if (waterCapture != null) setNativeGraphics(waterCapture);
         }
         if (requestedCheckpoint >= 0 || requestedReplay || hasRtLabIntent || motionRequested) {
             ProbeBridge.markRtLabDebugAutomation();
@@ -5057,6 +5089,10 @@ public class MainActivity extends Activity {
             case 161: return new float[]{3.1415927f, -0.32f};
             case 162: return new float[]{2.646f, -0.32f};
             case 163: return new float[]{3.637f, -0.32f};
+            case 180: return new float[]{-1.5707963f, -0.16f};
+            case 181: return new float[]{-1.5707963f, -0.10f};
+            case 182: return new float[]{-1.18055f, -0.20f};
+            case 183: return new float[]{-1.94055f, -0.32f};
             default: return null;
         }
     }

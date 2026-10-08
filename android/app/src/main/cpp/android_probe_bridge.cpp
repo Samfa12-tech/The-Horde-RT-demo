@@ -1757,6 +1757,7 @@ void WriteShowcaseDebugState(const SwapchainContext& context, const char* status
          << "},\n"
          << "  \"zone\": \"" << horde::gameplay::ShowcaseZoneName(zone) << "\",\n"
          << "  \"renderScale\": " << context.renderScale << ",\n"
+         << "  \"outputExposure\": " << context.outputExposure << ",\n"
          << "  \"waterQuality\": " << static_cast<int>(context.graphicsSettings.waterQuality) << ",\n"
          << "  \"rtLab\": {\"waterfallWidthScale\": " << rtLab.waterfallWidthScale
          << ", \"roofOverrideEnabled\": " << (rtLab.finaleRoofOpenOverride.has_value() ? "true" : "false")
