@@ -3805,6 +3805,17 @@ void PollDesktopController(VulkanSurfaceContext& context)
     HandleControllerMenuEdges(context, menuEdges);
 }
 
+void SynchronizeSimulationViewportAspect(VulkanSurfaceContext& context)
+{
+    // swapchainExtent is the logical output geometry, independent of the
+    // render-scaled RT dispatch extent. Showcase capture and live frames share
+    // this owner-thread input before the simulation snapshot is consumed.
+    context.simulation.SetPresentationAspect(
+        horde::graphics::RtViewAspectFromImageExtent(
+            context.swapchainExtent.width, context.swapchainExtent.height,
+            horde::graphics::RtPresentationTransform::Identity));
+}
+
 void UpdateDesktopSceneControls(
     VulkanSurfaceContext& context,
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
@@ -3937,10 +3948,6 @@ void UpdateDesktopSceneControls(
     }
 #endif
     context.simulationInput = input;
-    context.simulation.SetPresentationAspect(
-        horde::graphics::RtViewAspectFromImageExtent(
-            context.swapchainExtent.width, context.swapchainExtent.height,
-            horde::graphics::RtPresentationTransform::Identity));
     horde::vulkan::raytracing::RtSceneStageScope simulationScope(
         observation, horde::telemetry::RtStage::SimulationStep);
     bool timestampedPlayerInput = !input.hasAuthoritativePlayerPose && !context.benchmark.IsRunning();
@@ -5177,6 +5184,11 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
     }
 
     const bool useRtFrame = ctx.useRtPath && ctx.rtScene.IsReady();
+    if (useRtFrame && ctx.rtScene.Profile() ==
+            horde::vulkan::raytracing::RtSceneProfile::Showcase)
+    {
+        SynchronizeSimulationViewportAspect(ctx);
+    }
     horde::vulkan::raytracing::RtSceneRecordObservation observation{};
     const bool evidenceFrame = useRtFrame && ctx.rtFrameEvidenceInitialised &&
         ctx.rtFrameEvidence.BeginFrame(ctx.currentFrame, observation);
@@ -5636,6 +5648,7 @@ const char* CapturePresetName(const horde::gameplay::ShowcaseCheckpointPreset pr
 void ApplyCaptureCheckpoint(VulkanSurfaceContext& context,
                             const horde::gameplay::ShowcaseCheckpoint& checkpoint)
 {
+    SynchronizeSimulationViewportAspect(context);
     context.simulation.ApplyShowcaseCheckpoint(checkpoint.id);
     ++context.musicResetToken; // Import is an explicit audio discontinuity even at the same tick.
     context.benchmarkEvidence.Cancel();

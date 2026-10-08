@@ -1,3 +1,4 @@
+#include "graphics/RtPresentationTransform.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/ShowcaseRoute.h"
 #include "gameplay/items/HeldLightState.h"
@@ -797,32 +798,44 @@ void TestAspectHandSpacingUsesSharedTargetsAndLeavesCombatAuthorityAlone()
     Check(withinAnatomicalReach,
           "maximum landscape spacing must remain inside the authored anatomical arm reach for carry, swing, and parry phases");
 
-    GameSimulation frozenCheckpointSimulation;
-    Check(frozenCheckpointSimulation.ApplyShowcaseCheckpoint(2, false),
-          "checkpoint fixture must import before its first viewport aspect");
-    const auto checkpointTick = frozenCheckpointSimulation.Snapshot().tickIndex;
+    GameSimulation portraitCheckpointSimulation;
+    Check(portraitCheckpointSimulation.ApplyShowcaseCheckpoint(2, false),
+          "portrait checkpoint fixture must import");
+    const auto portraitCheckpointTick = portraitCheckpointSimulation.Snapshot().tickIndex;
     const auto checkpointHandX =
-        frozenCheckpointSimulation.Snapshot().heldItemKinematics.rightHandLocal[0];
+        portraitCheckpointSimulation.Snapshot().heldItemKinematics.rightHandLocal[0];
     const auto checkpointLightX =
-        frozenCheckpointSimulation.Snapshot().heldLight.worldFromLight[12];
-    frozenCheckpointSimulation.SetPresentationAspect(16.0f / 9.0f);
+        portraitCheckpointSimulation.Snapshot().heldLight.worldFromLight[12];
+
+    // Match ApplyCaptureCheckpoint: derive from the swapchain/output extent,
+    // set presentation aspect, import the authored frozen checkpoint, then
+    // issue the same paused zero-delta synchronization before capture.
+    const float captureViewportAspect =
+        horde::graphics::RtViewAspectFromImageExtent(
+            960u, 540u, horde::graphics::RtPresentationTransform::Identity);
+    Check(Near(captureViewportAspect, 16.0f / 9.0f),
+          "frozen capture fixture must derive aspect from output extent, not render scale");
+    GameSimulation frozenCheckpointSimulation;
+    frozenCheckpointSimulation.SetPresentationAspect(captureViewportAspect);
+    Check(frozenCheckpointSimulation.ApplyShowcaseCheckpoint(2, false),
+          "wide capture checkpoint fixture must import");
     const auto& frozenWide = frozenCheckpointSimulation.Snapshot();
-    Check(frozenWide.tickIndex == checkpointTick &&
+    Check(frozenWide.tickIndex == portraitCheckpointTick &&
               Near(frozenWide.heldItemKinematics.rightHandLocal[0],
                    checkpointHandX + sixteenNine) &&
               frozenWide.playerAnimation.rightIk.target ==
                   frozenWide.heldItemKinematics.rightHandLocal &&
               Near(frozenWide.heldLight.worldFromLight[12] - checkpointLightX,
                    -sixteenNine, 0.0002f),
-          "aspect-only checkpoint refresh must publish aligned hand/item/light poses without advancing the frozen tick");
+          "wide frozen capture checkpoint must publish aligned hand/item/light poses at the portrait baseline tick");
     InputSnapshot pausedInput{};
     pausedInput.paused = true;
     frozenCheckpointSimulation.AdvanceFrame(pausedInput, 0.0, 0u);
-    Check(frozenCheckpointSimulation.Snapshot().tickIndex == checkpointTick &&
+    Check(frozenCheckpointSimulation.Snapshot().tickIndex == portraitCheckpointTick &&
               frozenCheckpointSimulation.Snapshot().simulationTicksThisFrame == 0u &&
               frozenCheckpointSimulation.Snapshot().playerAnimation.rightIk.target ==
                   frozenCheckpointSimulation.Snapshot().heldItemKinematics.rightHandLocal,
-          "paused aspect synchronization must retain frozen gameplay time and the current shared hand target");
+          "paused capture synchronization must retain frozen gameplay time and the shared hand target");
 
     GameSimulation portraitSimulation;
     GameSimulation wideSimulation;
