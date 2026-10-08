@@ -1,5 +1,7 @@
 # Android moving RT evidence — 8 October 2026
 
+**Current equipment follow-up:** production stowed start is enabled in `c626333c`; the combined installed `f2cdbfd4` applies up to 5 cm outward per hand and 5 cm depth retraction by viewport aspect before existing clearance. Eight affected host checks and the 3,287-pose wide actual torch/rig matrix pass. The owner accepts the wider/closer landscape appearance and draw sound, confirms stowed start, but is unsure of the released right-hand rest pose and reports a floppy left walking arm. Moving contour stability and full body/shadow/reflection acceptance remain open. New findings and exact phone recovery failure are in the [combined controller record](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#combined-owner-pass--f2cdbfd4); older motion evidence below retains its source and package identity.
+
 This slice closes the lack of an Android moving inspection adapter. It reuses
 the shared 60 Hz simulation, input schedule and motion ledger, with genuine
 Pipeline or required RayQueryCompute output on the allocated SM-S948B / Android

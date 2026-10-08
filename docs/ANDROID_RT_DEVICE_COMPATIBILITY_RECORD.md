@@ -1,5 +1,9 @@
 # Android RT Device Compatibility Record
 
+## 8 October combined BB-51 owner check — f2cdbfd4 / SM-S948B / Android 16
+
+Evidence class: **exact install verification plus limited qualitative owner test**, not full compatibility/performance certification. Source `f2cdbfd42c01f591d725ac41ec217b4ffc3fd593`; APK SHA-256 `c73252d00551225b7b4372123b2cb6001677bfec641e24478658d68361520eb4`. Installed-base hash matches, zero changed preferences and free rotation retained. Owner-identified Backbone One PlayStation Edition USB-C **BB-51**, generation/firmware/InputDevice descriptor still unrecorded. The owner confirms sheathed start, prefers wider/closer landscape equipment and likes draw audio. Right-hand visibility/natural rest is uncertain. **Controller reattach still causes slow RT startup on Resume; detached touch Resume does not. Walking left arm looks very floppy with a stable hand.** These remain open defects. Owned logs record fresh native initialization at 17.360/17.743/18.243 seconds after surface cancellations, with no VUID/fatal markers in the bounded excerpt; this is CPU initialization evidence, not displayed latency/FPS. See the [combined record](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#combined-owner-pass--f2cdbfd4). Earlier 6282 observations retain their exact identity below. Full physical recovery, Home, complete controller route/orientation and sustained profile comparisons remain pending.
+
 ## 8 October BB-51 held-input disconnect — SM-S948B / Android 16
 
 Evidence class: **owner partial recovery observation plus bounded owned-log

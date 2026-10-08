@@ -670,6 +670,7 @@ public class MainActivity extends Activity {
             public void surfaceDestroyed(final SurfaceHolder holder) {
                 surfaceAvailable = false;
                 currentSurface = null;
+                logSurfaceLifecycle("surfaceDestroyed");
                 stopSurface();
             }
         });
@@ -694,6 +695,15 @@ public class MainActivity extends Activity {
             reportTextView.append("\n\nRenderer surface failure: " + error.getMessage());
             showDiagnostics(true);
         }
+    }
+
+    private void logSurfaceLifecycle(String reason) {
+        if (!BuildConfig.DEBUG) return;
+        Log.i("HordeSurfaceLifecycle", "reason=" + reason + " activity=" + System.identityHashCode(this) +
+                " generation=" + surfaceRequestGeneration + " resumed=" + resumed +
+                " available=" + surfaceAvailable + " started=" + surfaceStarted +
+                " focus=" + hasWindowFocus() + " changingConfiguration=" + isChangingConfigurations() +
+                " finishing=" + isFinishing() + " controllerMode=" + controllerMode);
     }
 
     private void stopSurface() {
@@ -5793,7 +5803,11 @@ public class MainActivity extends Activity {
         lastAppliedConfiguration = new Configuration(newConfig);
         Log.i("HordeControllerConfig", "handled keyboard=" + newConfig.keyboard + " keyboardHidden=" +
                 newConfig.keyboardHidden + " navigation=" + newConfig.navigation + " viewportChanged=" +
-                viewportChanged + " surfaceGeneration=" + surfaceRequestGeneration + " resumed=" + resumed);
+                viewportChanged + " previousViewport=" + (previous == null ? "none" :
+                previous.orientation + "/" + previous.screenWidthDp + "x" + previous.screenHeightDp) +
+                " newViewport=" + newConfig.orientation + "/" + newConfig.screenWidthDp + "x" + newConfig.screenHeightDp +
+                " smallestWidth=" + newConfig.smallestScreenWidthDp + " screenLayout=" + newConfig.screenLayout +
+                " surfaceGeneration=" + surfaceRequestGeneration + " resumed=" + resumed);
         // Controller attach/detach can change keyboard/navigation configuration without
         // changing the viewport. Neutralize held axes while keeping the live RT surface,
         // menu focus, and any acknowledged graphics trial intact.
@@ -5836,6 +5850,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        logSurfaceLifecycle("resume");
         if (musicPlayback != null) musicPlayback.setSuspended(true); // Wait for a ready new surface.
         resumed = true;
         controllerInput.suspend(SystemClock.uptimeMillis());
@@ -5930,12 +5945,14 @@ public class MainActivity extends Activity {
             showMainMenu(false);
         }
         setGameplayPaused(true);
+        logSurfaceLifecycle("pause");
         stopSurface();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
+        logSurfaceLifecycle("destroy");
         handler.removeCallbacks(controllerFrame);
         if (inputManager != null) inputManager.unregisterInputDeviceListener(controllerDevices);
         controllerDialog = null; controllerDialogs.clear(); controllerFocusedDialogs.clear();
