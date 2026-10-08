@@ -642,6 +642,19 @@ if(BUILD_TESTING)
         COMMAND horde_rt_held_item_socket_tests --combat-sword-authority-agreement)
     set_tests_properties(horde_rt_combat_sword_authority_agreement PROPERTIES TIMEOUT 30)
 
+    # Explicit investigation target: reuse the production socket-fixture dependencies.
+    # It is excluded from ordinary builds/tests; direct invocation caps mesh queries at24.
+    add_executable(horde_rt_sword_target_contact_region_witness EXCLUDE_FROM_ALL
+        tests/SwordTargetContactRegionWitnessTests.cpp)
+    get_target_property(contact_region_fixture_sources horde_rt_held_item_socket_tests SOURCES)
+    list(REMOVE_ITEM contact_region_fixture_sources tests/HeldItemSocketTests.cpp)
+    target_sources(horde_rt_sword_target_contact_region_witness PRIVATE ${contact_region_fixture_sources})
+    target_include_directories(horde_rt_sword_target_contact_region_witness PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+    target_link_libraries(horde_rt_sword_target_contact_region_witness PRIVATE horde_gameplay_simulation)
+    target_compile_definitions(horde_rt_sword_target_contact_region_witness PRIVATE
+        HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+
     add_executable(horde_rt_development_static_asset_tests tests/DevelopmentStaticAssetTests.cpp)
     target_include_directories(horde_rt_development_static_asset_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     target_link_libraries(horde_rt_development_static_asset_tests PRIVATE horde_gameplay_simulation)
