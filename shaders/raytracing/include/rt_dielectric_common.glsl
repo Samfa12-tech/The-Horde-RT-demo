@@ -252,15 +252,25 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
         : localColor * localInterfaceTransmittance
             * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
             * localStrength / (1.0 + localDistanceSquared * 0.58);
-    // Clear water has no opaque-surface fire diffuse lobe. Keep Mobile's
-    // analytic highlight; High already owns fire in its traced reflection.
-    // Transmitted scenery retains the ordinary opaque lighting path above.
-    h.base = vec3(0.0);
+    float surfaceTurbulence = clamp(length(surfaceNormal - exitSurfaceNormal) * 5.0, 0.0, 1.0);
+    // Entrained micro-bubbles are what make a real falling stream visible at
+    // near-normal incidence. Keep this single-scattering term low and confined
+    // to actual water geometry; the background remains dominant and refracted.
+    float breakup = clamp(0.56
+        + sin(h.position.y * 7.3 - controls.time * 5.1) * 0.27
+        + sin(h.position.y * 13.7 + h.position.z * 17.0
+              - controls.time * 8.4) * 0.17, 0.0, 1.0);
+    float entrainedAir = runoff ? 0.004
+        : 0.010 + pow(breakup, 3.0) * 0.028 + surfaceTurbulence * 0.010;
+    // Clear water has no opaque-surface fire diffuse lobe. Only its existing
+    // entrained-air fraction scatters direct fire light; keep the specular lobe
+    // and ordinary opaque lighting on transmitted/reflected scenery unchanged.
+    h.base = vec3(entrainedAir);
     interfaceLight += fireEmitterDirectLighting(
         h, rayDirection, true, !fireRayReflectionOwned);
-    interfaceLight += !genericTransmissionActive
-        ? skyRadiance * skyHighlight * skyInterfaceVisibility * 0.10
-        : skyRadiance * skyInterfaceTransmittance * skyHighlight * 0.10;
+    // The legacy path returns replicated scalar visibility; the generic path
+    // returns RGB transmittance. Both use the same interface expression.
+    interfaceLight += skyRadiance * skyInterfaceTransmittance * skyHighlight * 0.10;
     if (runoff && h.position.x > -2.88)
     {
         float impactDistance = length(h.position.xz - vec2(-2.32, -15.26));
@@ -275,17 +285,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
                 + localColor * localInterfaceTransmittance * localStrength * 0.24;
         interfaceLight += impactLight * (impactCrest * 0.12 + impactCore * 0.045);
     }
-    float surfaceTurbulence = clamp(length(surfaceNormal - exitSurfaceNormal) * 5.0, 0.0, 1.0);
     vec3 surfaceRadiance = mix(transmitted, reflected, fresnel) + interfaceLight;
-    // Entrained micro-bubbles are what make a real falling stream visible at
-    // near-normal incidence. Keep this single-scattering term low and confined
-    // to actual water geometry; the background remains dominant and refracted.
-    float breakup = clamp(0.56
-        + sin(h.position.y * 7.3 - controls.time * 5.1) * 0.27
-        + sin(h.position.y * 13.7 + h.position.z * 17.0
-              - controls.time * 8.4) * 0.17, 0.0, 1.0);
-    float entrainedAir = runoff ? 0.004
-        : 0.010 + pow(breakup, 3.0) * 0.028 + surfaceTurbulence * 0.010;
     vec3 scatteringRadiance = !genericTransmissionActive
         ? skyRadiance * skyInterfaceVisibility * 0.38
             + localColor * localStrength * localInterfaceVisibility * 0.18

@@ -1240,12 +1240,12 @@ int main()
                       raygenSource.find("sin(controls.time * 15.0)") == std::string::npos &&
                       raygenSource.find("sin(controls.time * 17.0") == std::string::npos,
                       "every selected emitter must use its own Light socket, correlated colour/strength, and real visibility without stable-ID-1 assumptions");
-        ok &= Require(waterPrimary.find("h.base = vec3(0.0);") != std::string::npos &&
+        ok &= Require(waterPrimary.find("h.base = vec3(entrainedAir);") != std::string::npos &&
                       waterPrimary.find("transmitted = shadeOpaqueSecondary(transmittedHit, transmissionDirection)") != std::string::npos &&
                       waterPrimary.find("reflected = shadeOpaqueSecondary(reflectedHit, reflectionDirection)") != std::string::npos &&
                       waterPrimary.find("vec3 surfaceRadiance = mix(transmitted, reflected, fresnel) + interfaceLight") != std::string::npos &&
                       waterPrimary.find("localHighlight * 3.2 + runoffLocalHighlight * 1.15") != std::string::npos,
-                      "water suppresses only opaque fire diffuse while retaining opaque receivers, transmitted scenery, Fresnel reflection and warm interface highlights");
+                      "water confines fire diffuse to its existing entrained-air fraction while retaining opaque receivers, transmitted scenery, Fresnel reflection and warm interface highlights");
         ok &= Require(waterPrimary.find("bool fireRayReflectionOwned = controls.waterQuality >= 1.5;") !=
                           std::string::npos &&
                       waterPrimary.find("fireEmitterDirectLighting(\n        h, rayDirection, true, !fireRayReflectionOwned)") !=
