@@ -1,5 +1,7 @@
 # 1.6.2 bounded mobile quality measurements
 
+**Ordinary experimental choices — 9 October:** source `40677738` adds clearly labelled 33%/40% choices to Android and Windows Graphics for owner manual play. Fresh/reset phone default stays 50%; saved/custom preferences and Use/native ACK/Keep/Restore remain authoritative. 252 Java tests, lint, both builds, seven affected host suites and 12/12 runtime CI jobs pass. Exact normal-phone installation and both preview/Restore paths retain saved 50/custom effects and menu mix. The build is reopened for manual play; sustained performance and any upscaling decision follow feedback. [Exact artifacts and limits](ENGINEERING_1_6_2_EXPERIMENTAL_SCALES_2026_10_09.md).
+
 **Motion comparison and owner decision — 9 October:** exact `a6439e0b` Shipping/Mobile APK completes matched-start 50/40/33 runs on SM-S948B/Android 16, real Pipeline, output 1440×2980, with native traced extents 720×1490 /576×1192 /475×983. Short ~6.5-second actual-presentation spans measure 24.288 /31.205 /46.171 images/s respectively, including milestone-readback overhead; these are not sustained FPS. Three separate encoded moving clips are shown, and the owner accepts **33% appearance for further sustained testing**. The phone default remains **50%**. Isolated historical 75/Mobile/Glass On is restored through normal ACK/Keep; primary settings/menu mix are byte-identical, owned apps/recorders stopped. Earlier thermal refusal remains recorded. Runtime CI is 12/12; sustained ordinary-play pacing/thermals, Keeper/reward overlap and final profile acceptance remain open. [Exact cohort, hashes and limits](ENGINEERING_1_6_2_MOTION_PRESENTATION_2026_10_09.md).
 
 ## First warm 50% route observation — 8 October, same 2a408613 APK
@@ -42,11 +44,10 @@ Analyzer/tooling head `67bb4d47b412d15ad946b84fafa6dc5ef4e20765` separately comp
 
 The new 75% collector proof remains separate from the historical baseline. Its complete course has a matched 142.608337028-second measured span; observed image rate is 12.881435/s, with 70.833437 ms median and 141.666719 ms p95 intervals. Those actual-display intervals do not replace existing CPU/GPU definitions or establish any 50/40/33 result. Power remains unavailable and sampled thermal rise is not a plateau.
 
-Current authority, 8 October: fresh/reset Android defaults are **50%, Mobile
+Current authority, 9 October: fresh/reset Android defaults are **50%, Mobile
 water/fire, Glass Off, Current shadows, cap30 and Mist On**. Desktop stays
 100%/High water+fire/Glass On/Current/cap30/Mist On. Saved/custom preferences
-remain authoritative. The ordinary minimum remains 50%; native UI resolution
-is unchanged. The owner's target is practical sustained 30 FPS at an accepted
+remain authoritative. Ordinary Graphics now admits discrete experimental 33%/40% choices; fresh/reset 50% and native UI resolution stay unchanged. The owner's target is practical sustained 30 FPS at an accepted
 profile, with a same-device/backend/output/integrated-route 50/40/33 comparison
 and an explicit owner decision. No 33% default or acceptance is inferred.
 
@@ -60,7 +61,7 @@ separately from the current target.
 
 Source `ebffb4f0412f76b46ee1beb735475a145207e58a`, tree `2aec05aff62a3f582501e326407a8875b70a6506`; isolated Shipping/Mobile benchmark APK SHA-256 `d2d9d62f064119ac46bea10f8fd66336cdf65d0225a5c5c165a5dbcb950f5322`, 120,571,024 bytes. Four-ABI assembly/vital lint passes in 2 min 46 s; actual models/caches/compile commands, stripped payloads, non-debuggable package/development certificate and 16 KiB alignment are verified. All 91 runtime assets match the owner-tested ac468f51 Debug package. This subject includes normal waterfall guards, production stowed start, accepted wide equipment, Dust support/default Off and same-generation recovery. Native Debug motion/checkpoint markers remain absent; ordinary min50/default50 stays unchanged. This is build/package preparation, **not installed, not a 50/40/33 play or sustained-performance result**. The earlier 7a subject below is historical and is not used as the integrated cohort.
 
-The current Debug motion adapter admits only ordinary min50. Sending 40/33 to it would be rejected/clamped and cannot establish newly traced lower-resolution evidence. Keep the existing isolated Shipping/Mobile min33 admission rather than weakening ordinary build limits or presenting image resizing as tracing. The existing route benchmark supplies exact owning CPU/GPU distributions but does not become free play, actual compositor cadence or sustained performance; those gaps remain explicit.
+The then-current Debug motion adapter for that artifact admits only ordinary min50. Sending 40/33 to it would be rejected/clamped and cannot establish newly traced lower-resolution evidence. Keep the existing isolated Shipping/Mobile min33 admission rather than weakening ordinary build limits or presenting image resizing as tracing. The existing route benchmark supplies exact owning CPU/GPU distributions but does not become free play, actual compositor cadence or sustained performance; those gaps remain explicit.
 
 ## 8 October preparation and pacing-method limits
 

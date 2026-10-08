@@ -1,5 +1,7 @@
 # 1.6.2 isolated motion and actual-presentation evidence — 9 October 2026
 
+**Later ordinary-menu checkpoint:** [40677738](ENGINEERING_1_6_2_EXPERIMENTAL_SCALES_2026_10_09.md) exposes 33/40 as manual experiments while keeping fresh/reset 50%. The min50 ordinary-artifact statements below describe the sealed a6439e0b snapshot. Its motion measurements and hashes are not replaced.
+
 The existing fixed-route benchmark advances its authored replay by one simulation step per rendered frame. Its actual image-presentation intervals remain valid for that declared workload, but it cannot establish ordinary movement/combat timing. Preserve the earlier 75% results and the [warm 50% observation](ENGINEERING_1_6_2_MOBILE_QUALITY_MEASUREMENTS.md) in their original scope.
 
 Runtime `a6439e0b5998adefb7fdd87ea316132bc928549c` adds an explicitly admitted isolated Shipping/Mobile motion-validation path. Ordinary Debug/release keep minimum 50% and this feature Off. The isolated opt-in requires benchmark admission, actual `VK_GOOGLE_display_timing`, minimum33, non-Debug compilation and the unchanged Mobile shaders/assets; staged shader and viewmodel experiments are excluded. Existing menu controls expose 33/40 as experiments; no default is lowered.
