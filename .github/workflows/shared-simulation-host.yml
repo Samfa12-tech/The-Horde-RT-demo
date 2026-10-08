@@ -103,6 +103,7 @@ jobs:
             'InterfacePreferencesTest' = 4
             'InterfaceLayoutTest' = 3
             'ContextualControlsLayoutTest' = 5
+            'SurfaceSuspensionLifecycleTest' = 7
           }.GetEnumerator()) {
             $requiredReport = Join-Path android/app/build/test-results/testDebugUnitTest "TEST-com.samfa12.hordelanternrt.$($required.Key).xml"
             if (-not (Test-Path -LiteralPath $requiredReport)) { throw "Missing Android contract suite: $($required.Key)" }

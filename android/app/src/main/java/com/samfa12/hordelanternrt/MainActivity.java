@@ -715,6 +715,22 @@ public class MainActivity extends Activity {
         if (generation != 0) ProbeBridge.stopDiagnosticSurface(generation); // Cancels pending starts too; no join.
     }
 
+    private void suspendSurfaceForLifecycle() {
+        if (surfaceRequestGeneration == 0) return;
+        try {
+            if (ProbeBridge.setDiagnosticSurfaceSuspended(surfaceRequestGeneration, true)) return;
+        } catch (RuntimeException | LinkageError ignored) { /* Fall back to full retirement. */ }
+        stopSurface();
+    }
+
+    private void resumeSurfaceForLifecycle() {
+        if (surfaceRequestGeneration == 0) return;
+        try {
+            if (ProbeBridge.setDiagnosticSurfaceSuspended(surfaceRequestGeneration, false)) return;
+        } catch (RuntimeException | LinkageError ignored) { /* Stale/failed requests get a fresh surface. */ }
+        stopSurface();
+    }
+
     private void configureTouchControls() {
         surfaceView.setOnTouchListener((view, event) -> {
             if (menuVisible || diagnosticsVisible || deathOverlayVisible || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) return true;
@@ -5858,8 +5874,12 @@ public class MainActivity extends Activity {
         requestControllerFrame();
         enterImmersiveMode();
         final boolean hadSurfaceGeneration = surfaceRequestGeneration != 0;
+        resumeSurfaceForLifecycle();
         startSurfaceIfReady();
-        if (entryMenuEnabled && hadSurfaceGeneration) publishEntryMenuState();
+        if (hadSurfaceGeneration && surfaceRequestGeneration != 0) {
+            setGameplayPaused(menuVisible || diagnosticsVisible);
+            if (entryMenuEnabled) publishEntryMenuState();
+        }
         if (rtLabVisible) handler.post(refreshRtLabTelemetry);
         graphicsPollTime = SystemClock.elapsedRealtime();
         if (graphicsRecovering) handler.post(refreshGraphics);
@@ -5947,13 +5967,16 @@ public class MainActivity extends Activity {
         }
         setGameplayPaused(true);
         logSurfaceLifecycle("pause");
-        stopSurface();
+        // A controller/system overlay can pause us briefly while the surface is
+        // valid. Native owner work stops now; onStop or destruction retires it.
+        suspendSurfaceForLifecycle();
         super.onPause();
     }
 
     @Override
     protected void onStop() {
         logSurfaceLifecycle("stop");
+        stopSurface();
         super.onStop();
     }
 

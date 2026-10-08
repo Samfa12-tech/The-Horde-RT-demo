@@ -4327,6 +4327,43 @@ void SwapchainRenderLoop()
            gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration))
     {
         const auto loopStart = std::chrono::steady_clock::now();
+        if (gSurfaceSessions.IsSuspended(gSwapchainContext.surfaceGeneration))
+        {
+            // Lifecycle suspension is stronger than ordinary foreground pause:
+            // synchronize/discard input, drain already-owned GPU work, then wait
+            // without simulation, skinning, uploads, scene changes or rendering.
+            (void)SynchronizeLifecyclePauseOnOwnerThread();
+            if (!ConsumePendingImageAcquire(gSwapchainContext))
+            {
+                gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
+                break; // Retirement keeps ownership if the acquire drain failed.
+            }
+            const VkResult idleResult = vkDeviceWaitIdle(gSwapchainContext.device);
+            (void)CompleteRtEvidenceAfterDeviceIdle(gSwapchainContext, idleResult);
+            __android_log_print(idleResult == VK_SUCCESS ? ANDROID_LOG_INFO : ANDROID_LOG_ERROR, kTag,
+                "HORDE_SURFACE_SUSPENDED generation=%llu idle_result=%d",
+                static_cast<unsigned long long>(gSwapchainContext.surfaceGeneration),
+                static_cast<int>(idleResult));
+            if (idleResult != VK_SUCCESS)
+            {
+                gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
+                break; // Normal proved-retirement path still owns all resources.
+            }
+            CancelActiveInAppBenchmark(gSwapchainContext);
+            ClearPlatformGameplayEvents();
+#if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
+            FailAndroidMotion(gSwapchainContext, "Motion interrupted by lifecycle suspension.");
+#endif
+            gSurfaceSessions.WaitWhileSuspended(gSwapchainContext.surfaceGeneration);
+            // Suspended wall time is not a gameplay hitch/catch-up interval.
+            previousFrameStart = std::chrono::steady_clock::now();
+            gSwapchainContext.lastInputOwnerSteadyNs = GraphicsSteadyNs();
+            __android_log_print(ANDROID_LOG_INFO, kTag,
+                "HORDE_SURFACE_SUSPEND_WAIT_END generation=%llu current=%d",
+                static_cast<unsigned long long>(gSwapchainContext.surfaceGeneration),
+                gSurfaceSessions.IsCurrent(gSwapchainContext.surfaceGeneration) ? 1 : 0);
+            continue;
+        }
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
         ResetAndroidMotionIfRequested(gSwapchainContext);
 #endif
@@ -4887,6 +4924,9 @@ private:
                 continue;
             }
             if (!action->request || !gSurfaceSessions.IsCurrent(action->generation)) continue;
+            // A pending cold start may be paused before driver work begins.
+            gSurfaceSessions.WaitWhileSuspended(action->generation);
+            if (!gSurfaceSessions.IsCurrent(action->generation)) continue;
             auto& request = *action->request;
             try
             {
@@ -5342,6 +5382,21 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_stopDiagnosticSurface(JNIEnv*, jclas
         __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_SURFACE_CANCEL generation=%llu",
                             static_cast<unsigned long long>(generation));
     }
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setDiagnosticSurfaceSuspended(
+    JNIEnv*, jclass, jlong generation, jboolean suspended)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    const bool accepted = generation > 0 && gSurfaceSessions.SetSuspended(
+        static_cast<std::uint64_t>(generation), suspended == JNI_TRUE);
+    if (accepted && suspended == JNI_TRUE)
+        RequestLifecyclePauseSynchronizationLocked(false); // Discard lifecycle-stale commands.
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "HORDE_SURFACE_SUSPEND_REQUEST generation=%lld suspended=%d accepted=%d",
+        static_cast<long long>(generation), suspended == JNI_TRUE ? 1 : 0, accepted ? 1 : 0);
+    return accepted ? JNI_TRUE : JNI_FALSE;
 }
 
 extern "C" JNIEXPORT jint JNICALL

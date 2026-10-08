@@ -32,6 +32,8 @@ public final class ProbeBridge {
     /** Returns an accepted request token, not renderer readiness; zero is failure. */
     public static native long startDiagnosticSurface(android.view.Surface surface, String baseDirectory);
     public static native void stopDiagnosticSurface(long generation);
+    /** Suspend owner work on a still-valid surface; Stop still retires its resources. */
+    public static native boolean setDiagnosticSurfaceSuspended(long generation, boolean suspended);
     public static native int getSurfaceRuntimeState(long generation);
     public static native void setViewControls(float yaw, float pitch, float torchLightStrength, float moveStrafe, float moveForward);
     public static native void requestAttack();
