@@ -69,6 +69,10 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_compiled_pipeline_cache_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_compiled_pipeline_cache_tests COMMAND horde_rt_compiled_pipeline_cache_tests)
 
+    add_executable(horde_rt_pipeline_cache_seed_tests tests/PipelineCacheSeedTests.cpp)
+    target_include_directories(horde_rt_pipeline_cache_seed_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    add_test(NAME horde_rt_pipeline_cache_seed_tests COMMAND horde_rt_pipeline_cache_seed_tests)
+
     foreach(scale_fixture IN ITEMS horde_rt_benchmark_scale_default_tests horde_rt_benchmark_scale_experimental_tests)
         add_executable(${scale_fixture} tests/BenchmarkScaleAdmissionTests.cpp)
         target_include_directories(${scale_fixture} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

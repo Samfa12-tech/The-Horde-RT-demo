@@ -69,6 +69,7 @@
 #include "platform/android/GameplayEventMetadata.h"
 #include "update/GitHubReleaseUpdater.h"
 #include "vulkan/GpuFrameTimer.h"
+#include "vulkan/PipelineCacheSeed.h"
 #include "vulkan/RtCapabilityReport.h"
 #include "vulkan/VulkanContext.h"
 #include "vulkan/PresentCompletion.h"
@@ -381,6 +382,10 @@ struct SwapchainContext
 };
 
 SwapchainContext gSwapchainContext{};
+// CPU bytes only. NativeSurfaceOwner joins the retiring render owner before
+// starting the next generation, so cache read/replacement is serialized.
+// No Vulkan object or background rendering survives normal surface teardown.
+horde::vulkan::PipelineCacheSeed gPipelineCacheSeed;
 // Failed retirement retains exactly one context; a later lifecycle action may
 // retry its proof, but can never overwrite it with another device/swapchain.
 std::atomic<bool> gSurfaceRetirementBlocked{false};
@@ -3011,6 +3016,65 @@ bool RecreateSwapchain(SwapchainContext& context)
     return restored;
 }
 
+horde::vulkan::PipelineCacheSeed::DeviceIdentity PipelineCacheDeviceIdentity(
+    const VkPhysicalDevice physicalDevice)
+{
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+    horde::vulkan::PipelineCacheSeed::DeviceIdentity identity;
+    identity.vendorId = properties.vendorID;
+    identity.deviceId = properties.deviceID;
+    std::copy_n(properties.pipelineCacheUUID, identity.pipelineCacheUuid.size(),
+                identity.pipelineCacheUuid.begin());
+    return identity;
+}
+
+void RetainPipelineCacheSeedAfterIdle(const SwapchainContext& context)
+{
+    // Called only after successful device idle, presentation retirement and
+    // compiled-pipeline lease retirement. Vulkan returns the exact opaque
+    // bytes accepted by the next compatible vkCreatePipelineCache.
+    // https://docs.vulkan.org/refpages/latest/refpages/source/vkGetPipelineCacheData.html
+    if (context.pipelineCache == VK_NULL_HANDLE) return;
+    const auto started = std::chrono::steady_clock::now();
+    std::size_t requestedBytes = 0u;
+    const VkResult queryResult = vkGetPipelineCacheData(
+        context.device, context.pipelineCache, &requestedBytes, nullptr);
+    VkResult readResult = VK_NOT_READY;
+    std::size_t returnedBytes = 0u;
+    bool admitted = false;
+    if (queryResult == VK_SUCCESS &&
+        requestedBytes >= horde::vulkan::PipelineCacheSeed::kHeaderSize &&
+        requestedBytes <= horde::vulkan::PipelineCacheSeed::kMaximumSize)
+    {
+        try
+        {
+            std::vector<std::byte> data(requestedBytes);
+            returnedBytes = requestedBytes;
+            readResult = vkGetPipelineCacheData(
+                context.device, context.pipelineCache, &returnedBytes, data.data());
+            if (readResult == VK_SUCCESS && returnedBytes <= requestedBytes)
+            {
+                data.resize(returnedBytes);
+                admitted = gPipelineCacheSeed.ReplaceFromDriverData(
+                    PipelineCacheDeviceIdentity(context.physicalDevice), data, true, false);
+            }
+        }
+        catch (...)
+        {
+            // Optional cache allocation/query failure never blocks retirement.
+            readResult = VK_ERROR_OUT_OF_HOST_MEMORY;
+        }
+    }
+    const auto elapsed = std::chrono::steady_clock::now() - started;
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "HORDE_PIPELINE_CACHE_SEED_STORE generation=%llu query_result=%d read_result=%d "
+        "requested_bytes=%zu returned_bytes=%zu admitted=%d retained_bytes=%zu cpu_wall_ms=%.3f",
+        static_cast<unsigned long long>(context.surfaceGeneration), static_cast<int>(queryResult),
+        static_cast<int>(readResult), requestedBytes, returnedBytes, admitted ? 1 : 0,
+        gPipelineCacheSeed.Size(), std::chrono::duration<double, std::milli>(elapsed).count());
+}
+
 bool DestroySwapchainContext(SwapchainContext& context)
 {
     if (context.device == VK_NULL_HANDLE)
@@ -3071,6 +3135,7 @@ bool DestroySwapchainContext(SwapchainContext& context)
     }
     if (context.pipelineCache != VK_NULL_HANDLE)
     {
+        RetainPipelineCacheSeedAfterIdle(context);
         vkDestroyPipelineCache(context.device, context.pipelineCache, nullptr);
         context.pipelineCache = VK_NULL_HANDLE;
     }
@@ -4701,16 +4766,33 @@ bool StartSurfaceInternal(ANativeWindow* window,
         DestroySwapchainContext(context);
         return false;
     }
-    const VkPipelineCacheCreateInfo pipelineCacheInfo{VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO};
-    const VkResult pipelineCacheResult = context.useRtPath
+    const auto cacheSeed = context.useRtPath
+        ? gPipelineCacheSeed.ForDevice(PipelineCacheDeviceIdentity(context.physicalDevice))
+        : std::span<const std::byte>{};
+    VkPipelineCacheCreateInfo pipelineCacheInfo{VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO};
+    pipelineCacheInfo.initialDataSize = cacheSeed.size();
+    pipelineCacheInfo.pInitialData = cacheSeed.empty() ? nullptr : cacheSeed.data();
+    VkResult pipelineCacheResult = context.useRtPath
         ? vkCreatePipelineCache(context.device, &pipelineCacheInfo, nullptr, &context.pipelineCache)
         : VK_NOT_READY;
+    const VkResult seedAttemptResult = pipelineCacheResult;
+    const bool fallbackToEmpty = pipelineCacheResult != VK_SUCCESS && !cacheSeed.empty();
+    if (fallbackToEmpty)
+    {
+        context.pipelineCache = VK_NULL_HANDLE;
+        pipelineCacheInfo.initialDataSize = 0u;
+        pipelineCacheInfo.pInitialData = nullptr;
+        pipelineCacheResult = vkCreatePipelineCache(
+            context.device, &pipelineCacheInfo, nullptr, &context.pipelineCache);
+    }
     if (pipelineCacheResult != VK_SUCCESS) context.pipelineCache = VK_NULL_HANDLE;
     __android_log_print(pipelineCacheResult == VK_SUCCESS || !context.useRtPath
             ? ANDROID_LOG_INFO : ANDROID_LOG_WARN, kTag,
-        "HORDE_PIPELINE_CACHE_CREATE attempted=%d result=%d available=%d generation=%llu",
+        "HORDE_PIPELINE_CACHE_CREATE attempted=%d result=%d available=%d generation=%llu "
+        "seed_bytes=%zu seed_attempt_result=%d fallback_empty=%d seed_limit_bytes=%zu",
         context.useRtPath ? 1 : 0, static_cast<int>(pipelineCacheResult), context.pipelineCache != VK_NULL_HANDLE ? 1 : 0,
-        static_cast<unsigned long long>(generation));
+        static_cast<unsigned long long>(generation), cacheSeed.size(), static_cast<int>(seedAttemptResult),
+        fallbackToEmpty ? 1 : 0, horde::vulkan::PipelineCacheSeed::kMaximumSize);
     if (context.executionBackend == horde::vulkan::RtExecutionBackend::RayTracingPipeline)
     {
         auto* cacheOwner = new (std::nothrow) AndroidCompiledPipelineCacheOwner(context.device);
