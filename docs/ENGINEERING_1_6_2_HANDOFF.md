@@ -16,6 +16,10 @@ independent final audit remain open. Dust stays optional/default Off; shafts
 deferred. No release.
 [Exact sources, package hashes, retained failures and acceptance matrix](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#current-integrated-follow-up--454d58ee).
 
+The later test-only contact probe completes56 actual-mesh queries but retains
+positive blade gaps for all sampled preceding-tick poses. Keep calibration open;
+no sweep, range/cone or timing change is adopted. [Exact results and limits](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#bounded-preceding-tick-contact-probe-8-october-follow-up).
+
 **Earlier 8 October equipment inspection checkpoint:** runtime
 `c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` retains the sheathed right hand through
 shared IK and keeps the parry hilt/right sleeve clear of the normal torch.

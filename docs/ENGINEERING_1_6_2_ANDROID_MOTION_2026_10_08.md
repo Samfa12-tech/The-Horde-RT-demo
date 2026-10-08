@@ -555,6 +555,80 @@ and `task-4/combat-*-range-cone-*-private-20261008.json`. The sealed `3da5f2dd`
 runtime/package is unchanged. Documentation `bcb86b17` separately passes all
 12 CI jobs in `37686976032` / `37686980419`; this test follow-up has its own CI.
 
+### Bounded preceding-tick contact probe, 8 October follow-up
+
+The opt-in `--combat-prepulse-bracket` uses the actual shared renderer helper,
+final imported anatomical Grip and all 6,905 indexed blade triangles. It keeps
+the ordinary immediate downward attack, two 1.28 m target bearings (frontal and
+-15 degrees), aspect 1 and 16:9, and two existing authored roof origins. A cheap
+preflight passes all eight cases before any triangle query. This is diagnostic
+pose sampling, not a new playable encounter or proof that the target clears the
+lintel/walls.
+
+Five samples span the previous fixed snapshot (tick16) to the pulse snapshot
+(tick17): player active clock .0866667–.103333 s, unhit target Attack windup
+.25–.266667 s. Both endpoints use post-update render snapshots. A separate
+query pairs the pulse blade with the actual pre-update hit-authority target
+(.25 s); one further query uses both actual post-update poses at tick18
+(player .12 s, target .283333 s). The phase is unchanged throughout, so no
+animation transition is interpolated. These are five discrete synthesized
+poses over one fixed tick, not continuous collision or presented-frame evidence.
+
+Build and preflight pass; the finite full run exits0 in approximately158.52 s,
+completing **56/56 queries**, with damage admission matching the unchanged
+1.72 m/.52-dot gate in all cases. Every sampled gap remains positive:
+
+| Roof / aspect | Bearing | Pulse blade vs pre-update target | Minimum of five bracket samples | Actual tick18 pair |
+| --- | --- | --- | --- | --- |
+| High / 1 | Frontal | 303.0 mm | 275.3 mm | 187.4 mm |
+| High / 1 | -15 degrees | 272.4 mm | 234.7 mm | 96.5 mm |
+| High / 16:9 | Frontal | 292.9 mm | 265.4 mm | 172.9 mm |
+| High / 16:9 | -15 degrees | 277.3 mm | 239.1 mm | 97.6 mm |
+| Low lintel / 1 | Frontal | 308.7 mm | 281.1 mm | 190.1 mm |
+| Low lintel / 1 | -15 degrees | 277.0 mm | 239.5 mm | 98.9 mm |
+| Low lintel / 16:9 | Frontal | 298.4 mm | 271.0 mm | 175.7 mm |
+| Low lintel / 16:9 | -15 degrees | 281.9 mm | 243.8 mm | 99.8 mm |
+
+High origin is(0,0), roofY1.35 m. The existing low lintel is at(-29.5,-15.2),
+roofY.88 m, yaw pi; target and player/held poses translate together. The low
+fixture lowers the torch .470124 m, while the sword needs zero lowering in this
+particular active-stroke interval on both roofs. It does not validate earlier
+windup/peak ceiling response, continuous geometry clearance or a real route.
+
+These samples do **not support adopting a preceding-tick-only sweep as the
+contact fix**. They also do not prove the unsampled continuous path has no
+intersection. Preserve the range/cone calibration gap and the closed coarse
+capsule negative. Do not move the pulse, widen parry or invent a tolerance to
+turn this measurement into a pass. The next bounded candidate needs a tighter
+pose-aware eligibility/target representation, measured against the actual-mesh
+oracle and moving output before adopting a gameplay change. No general combat
+engine or runtime collision path is introduced here. Audio/haptic manual
+revalidation for this test-only addition: **NO**; earlier changed-event gates
+remain open.
+
+Measurement base is documentation head `6e67be519442f07b07e76674cbeaf10f3ca20f2a`
+plus the explicit test-file work in progress. Tested source-file SHA-256:
+`af47c1f002af0b0239e8d01d88a1ff50188d9a86b5eec3664d636f5a2febb2d6`;
+tested executable SHA-256:
+`9ca90b08c64f9406864acb1ffa9c9c9f4d0040fb9ab43134b35cc597d8db7885`.
+Final source-file SHA-256:
+`fe0ac2a8d75c9f23348615761adabb2d5bf48cc44d4f555f217ded9e7d5dfb67`.
+Two whitespace-only boundary fixes after the run were independently reconstructed
+and hash-joined to the tested bytes; no expensive run is repeated for formatting.
+The original receipt incorrectly labels runtime package base454 as its checkout
+head. That receipt remains intact; the root-verified receipt corrects the base
+and joins source/binary/56 rows explicitly.
+
+An initial compiler attempt removed two existing `windupTrigger` declarations
+through a broad replacement. Both were restored; the final diff only adds the
+new diagnostic. The successful rebuild overwrote the original raw failed log;
+a separate note preserves the known C2065 diagnostics and this evidence gap.
+Private logs/receipt are `build/reports/combat-prepulse-bracket-{build,preflight,run}-20261008.log`,
+`combat-prepulse-bracket-receipt-20261008.json`, the initial-failure note, and
+`task-4/combat-prepulse-bracket-root-verified-private-20261008.json`.
+Runtime454 packages, earlier phone acceptance and earlier measurements retain
+their own identities.
+
 ### Closed coarse contact-proxy probe
 
 A further test-only `--combat-capsule-feasibility` mode reuses the same two

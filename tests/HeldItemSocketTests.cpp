@@ -3742,6 +3742,413 @@ void TestBoundedCombatPulseSweep()
     }
 }
 
+void TestCombatPrePulseBracket(const bool preflightOnly = false)
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::items;
+    using horde::scene::SkinnedClip;
+    using horde::scene::SkinnedMeshAsset;
+
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    horde::scene::assets::StaticMeshAsset sword;
+    horde::scene::assets::StaticMeshAsset torch;
+    std::string diagnostic;
+    const bool heldLoaded = LoadProductionHeldAssets(sword, torch, diagnostic);
+    const auto* grip = FindHeldItemSocket(sword.sockets, "Grip");
+    Check(heldLoaded && grip != nullptr && !sword.vertices.empty(),
+          "pre-pulse bracket must load the production sword and Grip");
+    if (!heldLoaded || grip == nullptr || sword.vertices.empty()) return;
+
+    SkinnedMeshAsset skeleton;
+    const bool skeletonLoaded = skeleton.LoadCombatClips(
+        (root / "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
+        diagnostic);
+    horde::vulkan::raytracing::PlayerRenderSlot rig;
+    const bool playerLoaded = rig.LoadAsset(
+        (root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),
+        diagnostic);
+    Check(skeletonLoaded && playerLoaded,
+          "pre-pulse bracket must load both imported production character rigs");
+    if (!skeletonLoaded || !playerLoaded) return;
+
+    struct ContactCase
+    {
+        const char* name;
+        float distance;
+        float bearing;
+    };
+    constexpr std::array<ContactCase, 2u> contacts{{
+        {"frontal-1.28", 1.28f, 0.0f},
+        {"minus15-1.28", 1.28f, -0.261799388f},
+    }};
+    struct RoofCase
+    {
+        const char* name;
+        float playerX;
+        float playerZ;
+        float playerYaw;
+        float authoredRoofY;
+    };
+    constexpr std::array<RoofCase, 2u> roofs{{
+        {"high-entry-roof", 0.0f, 0.0f, 0.0f,
+         horde::scene::kShowcaseRouteCeilingWorldY},
+        {"low-lintel", -29.5f, -15.2f, 3.141592654f,
+         horde::scene::kShowcaseLowOverheadVolumes[5u].bottomY},
+    }};
+    constexpr std::array<float, 2u> aspects{{1.0f, 16.0f / 9.0f}};
+    constexpr float tickSeconds = 1.0f / 60.0f;
+    constexpr float windupTrigger = 0.84f;
+    constexpr std::uint64_t maximumTicks = 180u;
+    constexpr std::size_t bracketSamples = 5u;
+    constexpr std::size_t exactQueryBudget = 56u;
+    constexpr std::size_t bladeTriangleCount = 6905u;
+    std::uint64_t rigTick = 180000u;
+    std::size_t exactQueries = 0u;
+    std::size_t preflightCount = 0u;
+
+    struct Record
+    {
+        std::uint64_t tick = 0u;
+        CombatSnapshot attackBefore{};
+        CombatSnapshot attackAfter{};
+        CombatSnapshot controlBefore{};
+        CombatSnapshot controlAfter{};
+    };
+    struct PlayerPose
+    {
+        std::vector<MeshTriangle> blade;
+        float swordLowering = 0.0f;
+        float torchLowering = 0.0f;
+    };
+
+    for (const RoofCase& roof : roofs)
+    {
+        for (const float aspect : aspects)
+        {
+            for (const ContactCase& contact : contacts)
+            {
+                const float heading = roof.playerYaw + contact.bearing;
+                const float targetX = roof.playerX + contact.distance * std::sin(heading);
+                const float targetZ = roof.playerZ - contact.distance * std::cos(heading);
+                SwordCombat attack;
+                SwordCombat control;
+                attack.Reset(1u, {targetX, targetZ});
+                control.Reset(1u, {targetX, targetZ});
+                std::vector<Record> records;
+                records.reserve(80u);
+                const bool attackRequested =
+                    attack.RequestAttack() == PlayerAttackCut::DownwardCut;
+                std::uint64_t pulseTick = 0u;
+                for (std::uint64_t tick = 1u; tick <= maximumTicks; ++tick)
+                {
+                    const CombatSnapshot attackBefore = attack.Snapshot();
+                    const CombatSnapshot controlBefore = control.Snapshot();
+
+                    const CombatSnapshot attackAfter = attack.Update(
+                        tickSeconds, roof.playerX, roof.playerZ, roof.playerYaw,
+                        true, true, false);
+                    const CombatSnapshot controlAfter = control.Update(
+                        tickSeconds, roof.playerX, roof.playerZ, roof.playerYaw,
+                        true, true, false);
+                    records.push_back({tick, attackBefore, attackAfter,
+                                       controlBefore, controlAfter});
+                    if (attackAfter.playerAttackPulse && pulseTick == 0u)
+                        pulseTick = tick;
+                    if (pulseTick != 0u && tick >= pulseTick + 1u) break;
+                }
+
+                Check(attackRequested && pulseTick >= 2u &&
+                          records.size() >= pulseTick + 1u,
+                      "pre-pulse bracket must capture an ordinary close AttackWindup pulse and one following tick");
+                if (!attackRequested || pulseTick < 2u ||
+                    records.size() < pulseTick + 1u)
+                    continue;
+                const Record& previous = records.at(static_cast<std::size_t>(pulseTick - 2u));
+                const Record& pulse = records.at(static_cast<std::size_t>(pulseTick - 1u));
+                const Record& plusOne = records.at(static_cast<std::size_t>(pulseTick));
+                const auto& playerStart = previous.attackAfter.player;
+                const auto& playerPulse = pulse.attackAfter.player;
+                const auto& targetStart = previous.controlAfter.combatants[0];
+                const auto& targetPulse = pulse.controlAfter.combatants[0];
+                Check(playerStart.action == PlayerCombatAction::SwingActive &&
+                          playerPulse.action == playerStart.action &&
+                          pulse.attackAfter.playerAttackPulse,
+                      "five player poses must interpolate only across one unchanged active-swing phase");
+                Check(targetStart.action == EnemyCombatAction::AttackWindup &&
+                          targetPulse.action == targetStart.action &&
+                          targetStart.health > 0 && targetPulse.health > 0,
+                      "five shared target poses must interpolate only across ordinary unhit AttackWindup");
+                if (playerStart.action != PlayerCombatAction::SwingActive ||
+                    playerPulse.action != playerStart.action ||
+                    !pulse.attackAfter.playerAttackPulse ||
+                    targetStart.action != EnemyCombatAction::AttackWindup ||
+                    targetPulse.action != targetStart.action ||
+                    targetStart.health <= 0 || targetPulse.health <= 0)
+                    continue;
+
+                if (preflightOnly)
+                {
+                    HeldItemFixedStepInput input;
+                    input.playerX = roof.playerX;
+                    input.playerZ = roof.playerZ;
+                    input.playerYawRadians = roof.playerYaw;
+                    input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+                    input.playerCombat = playerPulse;
+                    input.logicalViewAspect = aspect;
+                    HeldItemStates items = MakeDefaultHeldItemStates();
+                    HeldItemFixedStepState fixed;
+                    const bool fixedResolved = ResolveHeldItemsFixedStep(
+                        items, input, pulse.tick, fixed, diagnostic);
+                    Check(fixedResolved,
+                          "preflight must resolve the shared held-item pose at the actual pulse snapshot");
+                    if (fixedResolved)
+                    {
+                        ++preflightCount;
+                        const auto& target = pulse.controlAfter.combatants[0];
+                        const float range = std::hypot(target.x - roof.playerX,
+                                                       target.z - roof.playerZ);
+                        const bool gate = SwordCombat::IsPlayerTargetInRangeCone(
+                            roof.playerX, roof.playerZ, roof.playerYaw,
+                            target.x, target.z);
+                        std::cout << "combat-prepulse-preflight roof=" << roof.name
+                                  << " roofY=" << roof.authoredRoofY
+                                  << " playerOrigin=" << roof.playerX << ',' << roof.playerZ
+                                  << " targetOrigin=" << target.x << ',' << target.z
+                                  << " aspect=" << aspect
+                                  << " case=" << contact.name
+                                  << " previousTick=" << previous.tick
+                                  << " pulseTick=" << pulse.tick
+                                  << " targetAction=" << static_cast<int>(target.action)
+                                  << " targetActionTime=" << target.actionTime
+                                  << " targetHealth=" << target.health
+                                  << " playerAction=" << static_cast<int>(playerPulse.action)
+                                  << " playerActionTime=" << playerPulse.actionTime
+                                  << " rangeM=" << range
+                                  << " gateEligible=" << gate
+                                  << " swordLoweringM=" << fixed.kinematics.swordOverheadLowering
+                                  << " torchLoweringM=" << fixed.kinematics.torchOverheadLowering
+                                  << " damageAdmitted="
+                                  << (pulse.attackAfter.combatants[0].health <
+                                      pulse.attackBefore.combatants[0].health)
+                                  << " exactQueries=0\n";
+                    }
+                    continue;
+                }
+
+                const auto interpolateTarget = [&](const float amount) {
+                    auto target = targetStart;
+                    const auto mix = [amount](const float left, const float right) {
+                        return left + (right - left) * amount;
+                    };
+                    target.x = mix(targetStart.x, targetPulse.x);
+                    target.z = mix(targetStart.z, targetPulse.z);
+                    target.actionTime = mix(targetStart.actionTime, targetPulse.actionTime);
+                    target.animationTime = mix(targetStart.animationTime, targetPulse.animationTime);
+                    const float yawDelta = std::atan2(
+                        std::sin(targetPulse.facingRadians - targetStart.facingRadians),
+                        std::cos(targetPulse.facingRadians - targetStart.facingRadians));
+                    target.facingRadians = targetStart.facingRadians + yawDelta * amount;
+                    return target;
+                };
+                std::array<PlayerPose, bracketSamples> playerPoses{};
+                std::array<std::vector<MeshTriangle>, bracketSamples> targetTriangles{};
+                std::array<float, bracketSamples> gaps{};
+                std::array<float, bracketSamples> actionTimes{};
+                bool bracketResolved = true;
+                for (std::size_t sample = 0u; sample < bracketSamples; ++sample)
+                {
+                    const float amount = static_cast<float>(sample) /
+                                         static_cast<float>(bracketSamples - 1u);
+                    PlayerCombatSnapshot playerCombat = playerStart;
+                    playerCombat.actionTime +=
+                        (playerPulse.actionTime - playerStart.actionTime) * amount;
+                    actionTimes[sample] = playerCombat.actionTime;
+                    HeldItemFixedStepInput input;
+                    input.playerX = roof.playerX;
+                    input.playerZ = roof.playerZ;
+                    input.playerYawRadians = roof.playerYaw;
+                    input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+                    input.playerCombat = playerCombat;
+                    input.logicalViewAspect = aspect;
+                    HeldItemStates items = MakeDefaultHeldItemStates();
+                    HeldItemFixedStepState fixed;
+                    HeldItemTransform worldFromGrip{};
+                    HeldItemTransform worldFromSword{};
+                    const bool resolved = ResolveHeldItemsFixedStep(
+                            items, input, previous.tick + 1u, fixed, diagnostic) &&
+                        ResolveProductionAnatomicalSword(input, fixed.kinematics,
+                            items, rig, rigTick++, worldFromGrip, worldFromSword, diagnostic);
+                    const auto blade = resolved
+                        ? BuildGripFilteredBladeTriangles(sword, *grip, worldFromSword)
+                        : std::vector<MeshTriangle>{};
+                    const auto targetSample = ResolveSharedCharacterRenderPose(
+                        interpolateTarget(amount), skeleton.ClipDuration(SkinnedClip::Dead));
+                    std::vector<horde::scene::SkinnedRtVertex> targetPose;
+                    const bool skinned = skeleton.Skin(
+                        targetSample.clip, targetSample.clipTime, targetPose, diagnostic);
+                    Check(resolved && skinned && targetSample.clip == SkinnedClip::Attack &&
+                              blade.size() == bladeTriangleCount,
+                          "each bracket sample must resolve the production sword and shared imported target pose");
+                    if (!resolved || !skinned || targetSample.clip != SkinnedClip::Attack ||
+                        blade.size() != bladeTriangleCount)
+                    {
+                        bracketResolved = false;
+                        continue;
+                    }
+                    targetTriangles[sample] =
+                        BuildDiagnosticTargetTriangles(targetSample, targetPose);
+                    Check(!targetTriangles[sample].empty(),
+                          "each bracket target skin must produce indexed target triangles");
+                    if (targetTriangles[sample].empty())
+                    {
+                        bracketResolved = false;
+                        continue;
+                    }
+                    const TriangleBoundsTree targetTree(targetTriangles[sample]);
+                    const BladeTriangleDistance result = MeasureBladeTriangleDistance(
+                        targetTree, blade);
+                    ++exactQueries;
+                    Check(result.trianglesQueried == bladeTriangleCount &&
+                              std::isfinite(result.metres) && result.metres >= 0.0f,
+                          "each bracket query must measure all production blade triangles with finite nonnegative gap");
+                    gaps[sample] = result.metres;
+                    playerPoses[sample] = {blade, fixed.kinematics.swordOverheadLowering,
+                                           fixed.kinematics.torchOverheadLowering};
+                }
+                if (!bracketResolved) continue;
+
+                const auto authoritySample = ResolveSharedCharacterRenderPose(
+                    pulse.controlBefore.combatants[0],
+                    skeleton.ClipDuration(SkinnedClip::Dead));
+                std::vector<horde::scene::SkinnedRtVertex> authorityPose;
+                const bool authoritySkinned = skeleton.Skin(
+                    authoritySample.clip, authoritySample.clipTime, authorityPose, diagnostic);
+                Check(authoritySkinned && !authorityPose.empty() &&
+                          authoritySample.clip == SkinnedClip::Attack,
+                      "pulse authority must use the actual pre-update target snapshot");
+                if (!authoritySkinned || authorityPose.empty() ||
+                    authoritySample.clip != SkinnedClip::Attack)
+                    continue;
+                const auto authorityTriangles =
+                    BuildDiagnosticTargetTriangles(authoritySample, authorityPose);
+                const TriangleBoundsTree pulseAuthorityTree(authorityTriangles);
+                const BladeTriangleDistance pulseAuthority = MeasureBladeTriangleDistance(
+                    pulseAuthorityTree, playerPoses.back().blade);
+                ++exactQueries;
+                HeldItemFixedStepInput postInput;
+                postInput.playerX = roof.playerX;
+                postInput.playerZ = roof.playerZ;
+                postInput.playerYawRadians = roof.playerYaw;
+                postInput.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+                postInput.playerCombat = plusOne.attackAfter.player;
+                postInput.logicalViewAspect = aspect;
+                HeldItemStates postItems = MakeDefaultHeldItemStates();
+                HeldItemFixedStepState postFixed;
+                HeldItemTransform postGrip{};
+                HeldItemTransform postSword{};
+                const bool postPlayerResolved = ResolveHeldItemsFixedStep(
+                        postItems, postInput, plusOne.tick, postFixed, diagnostic) &&
+                    ResolveProductionAnatomicalSword(postInput, postFixed.kinematics,
+                        postItems, rig, rigTick++, postGrip, postSword, diagnostic);
+                const auto postBlade = postPlayerResolved
+                    ? BuildGripFilteredBladeTriangles(sword, *grip, postSword)
+                    : std::vector<MeshTriangle>{};
+                Check(postPlayerResolved && postBlade.size() == bladeTriangleCount,
+                      "plus-one diagnostic must resolve the player blade at its actual post-update snapshot");
+                if (!postPlayerResolved || postBlade.size() != bladeTriangleCount)
+                    continue;
+                const auto postSample = ResolveSharedCharacterRenderPose(
+                    plusOne.controlAfter.combatants[0],
+                    skeleton.ClipDuration(SkinnedClip::Dead));
+                std::vector<horde::scene::SkinnedRtVertex> postPose;
+                const bool postSkinned = skeleton.Skin(
+                    postSample.clip, postSample.clipTime, postPose, diagnostic);
+                Check(postSkinned && !postPose.empty() &&
+                          postSample.clip == SkinnedClip::Attack,
+                      "plus-one post-update target must resolve its actual shared imported pose");
+                if (!postSkinned || postPose.empty() || postSample.clip != SkinnedClip::Attack)
+                    continue;
+                const auto postTriangles = BuildDiagnosticTargetTriangles(postSample, postPose);
+                const TriangleBoundsTree postTree(postTriangles);
+                const BladeTriangleDistance postGap = MeasureBladeTriangleDistance(
+                    postTree, postBlade);
+                ++exactQueries;
+                Check(pulseAuthority.trianglesQueried == bladeTriangleCount &&
+                          std::isfinite(pulseAuthority.metres) &&
+                          postGap.trianglesQueried == bladeTriangleCount &&
+                          std::isfinite(postGap.metres),
+                      "pulse authority and plus-one diagnostic must each query all blade triangles");
+                const auto& target = pulse.controlBefore.combatants[0];
+                const float range = std::hypot(target.x - roof.playerX,
+                                               target.z - roof.playerZ);
+                const float coneDot = range <= 0.0001f ? 1.0f :
+                    ((target.x - roof.playerX) * std::sin(roof.playerYaw) -
+                     (target.z - roof.playerZ) * std::cos(roof.playerYaw)) / range;
+                const bool gate = SwordCombat::IsPlayerTargetInRangeCone(
+                    roof.playerX, roof.playerZ, roof.playerYaw, target.x, target.z);
+                const bool damage = pulse.attackAfter.combatants[0].health <
+                                    pulse.attackBefore.combatants[0].health;
+                Check(damage == gate,
+                      "actual damage admission must match the unchanged production range/cone gate");
+                Check(gate && range <= SwordCombat::kPlayerHitRange &&
+                          coneDot >= SwordCombat::kPlayerHitConeDot,
+                      "pre-pulse bracket cases must remain eligible under the unchanged production range/cone gate");
+                Check(exactQueries <= exactQueryBudget,
+                      "pre-pulse bracket must remain within its 56 exact triangle-query budget");
+                std::cout << "combat-prepulse-bracket roof=" << roof.name
+                          << " roofY=" << roof.authoredRoofY
+                          << " playerOrigin=" << roof.playerX << ',' << roof.playerZ
+                          << " aspect=" << aspect
+                          << " case=" << contact.name
+                          << " targetAction=" << static_cast<int>(target.action)
+                          << " authorityTargetAction=" << static_cast<int>(pulse.controlBefore.combatants[0].action)
+                          << " authorityTargetActionTime=" << pulse.controlBefore.combatants[0].actionTime
+                          << " targetActionTime=" << target.actionTime
+                          << " previousTick=" << previous.tick
+                          << " pulseTick=" << pulse.tick
+                          << " playerActionTime=" << actionTimes.front() << ':'
+                          << actionTimes.back()
+                          << " targetActionTimeBracket=" << targetStart.actionTime << ':'
+                          << targetPulse.actionTime
+                          << " rangeM=" << range
+                          << " coneDot=" << coneDot
+                          << " rangeLimitM=" << SwordCombat::kPlayerHitRange
+                          << " coneDotMinimum=" << SwordCombat::kPlayerHitConeDot
+                          << " gateEligible=" << gate
+                          << " damageAdmitted=" << damage
+                          << " swordLoweringM=" << playerPoses.back().swordLowering
+                          << " torchLoweringM=" << playerPoses.back().torchLowering
+                          << " bladeTriangles=" << bladeTriangleCount
+                          << " fiveSampleGapsMm=";
+                for (std::size_t sample = 0u; sample < bracketSamples; ++sample)
+                    std::cout << (sample == 0u ? "" : ",") << gaps[sample] * 1000.0f;
+                std::cout << " pulsePreUpdateGapMm=" << pulseAuthority.metres * 1000.0f
+                          << " plusOnePostUpdateTargetAction="
+                          << static_cast<int>(plusOne.controlAfter.combatants[0].action)
+                          << " plusOnePostUpdateTargetTime="
+                          << plusOne.controlAfter.combatants[0].actionTime
+                          << " plusOnePostUpdateGapMm=" << postGap.metres * 1000.0f
+                          << " plusOnePlayerActionTime=" << plusOne.attackAfter.player.actionTime
+                          << " queriesThisCase=7"
+                          << " exactQueriesTotal=" << exactQueries
+                          << " samplePolicy=5-discrete-points-over-one-fixed-tick"
+                          << " result=discrete-sampled-not-continuous-proof"
+                          << " method=production-grip-all-indexed-blade-triangles-shared-skinned-target\n";
+            }
+        }
+    }
+    if (preflightOnly)
+    {
+        Check(preflightCount == 8u, "all eight preflight phase and roof cases must complete");
+        Check(exactQueries == 0u, "preflight must run before exact triangle queries");
+        return;
+    }
+    Check(exactQueries <= exactQueryBudget,
+          "pre-pulse bracket total query count must not exceed 56");
+    Check(exactQueries == exactQueryBudget,
+          "all eight aspect/roof/contact combinations must complete seven exact queries each");
+}
+
 // Bounded investigation of the current root-distance/cone gate against an
 // ordinary approaching target. This opt-in mode uses both authored walk phases,
 // an unhit parallel control, and actual imported meshes; it changes no runtime
@@ -4955,6 +5362,11 @@ int main(const int argc, char** argv)
     if (argc > 1 && std::string(argv[1]) == "--combat-walking-range-cone")
     {
         TestWalkingCombatRangeCone();
+        return failures == 0 ? 0 : 1;
+    }
+    if (argc > 1 && std::string(argv[1]) == "--combat-prepulse-bracket")
+    {
+        TestCombatPrePulseBracket(argc > 2 && std::string(argv[2]) == "--preflight-only");
         return failures == 0 ? 0 : 1;
     }
     if (argc > 1 && std::string(argv[1]) == "--combat-bounded-sweep")

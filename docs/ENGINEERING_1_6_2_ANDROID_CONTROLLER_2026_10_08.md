@@ -79,9 +79,13 @@ relabeled. Exact private logs include
 Runtime 454 push [37712231672](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37712231672)
 and PR [37712236068](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37712236068)
 completed successfully: **12/12 aggregate jobs** (push 6/6 and PR 6/6).
-Test-registration 03fe has separate push 37712764483 / PR 37712770661 CI in
-progress. Earlier documentation f000 completed 12/12; its result is not assigned
-to either later source. Build correctness, physical acceptance and sustained
+Test-registration 03fe has separate push 37712764483 / PR 37712770661 CI,
+completed successfully at 12/12. Earlier documentation f000 completed 12/12.
+Documentation 6e67be51 first attempt has 11/12 aggregate jobs successful: the
+push MSVC native report-form Unicode edit times out at its existing two-second
+deadline, while the matching PR job passes. The failed JSON/log are preserved;
+one failed-job rerun was requested without changing code or the timeout. These
+results are not assigned to other source or package identities. Build correctness, physical acceptance and sustained
 performance remain separate.
 
 ## Earlier a6 candidate and preserved evidence

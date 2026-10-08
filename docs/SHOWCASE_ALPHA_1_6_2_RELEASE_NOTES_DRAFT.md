@@ -16,6 +16,10 @@ independent final audit remain open. Dust stays optional/default Off; shafts
 deferred. No release.
 [Exact sources, package hashes, retained failures and acceptance matrix](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#current-integrated-follow-up--454d58ee).
 
+Contact calibration is still incomplete: the finite preceding-tick mesh probe
+retains positive blade gaps despite current gate-admitted damage. No new sweep,
+range/cone or pulse change is included on that evidence.
+
 **Earlier 8 October equipment inspection checkpoint:** runtime
 `c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` retains the sheathed right hand through
 shared IK and keeps the parry hilt/right sleeve clear of the normal torch.
