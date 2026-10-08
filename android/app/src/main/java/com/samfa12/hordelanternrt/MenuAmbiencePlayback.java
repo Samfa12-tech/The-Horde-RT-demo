@@ -12,7 +12,7 @@ final class MenuAmbiencePlayback implements AutoCloseable {
     static final String MENU_CHAIN = "menu_chain";
 
     private static final float FLAME_BASE_GAIN = 0.16f;
-    private static final float ROOM_BASE_GAIN = 0.09f;
+    private static final float ROOM_BASE_GAIN = 0.02f;
     private static final float CHAIN_BASE_GAIN = 0.13f;
     private static final int PACKET_LENGTH = 6;
 
@@ -21,6 +21,10 @@ final class MenuAmbiencePlayback implements AutoCloseable {
         void gain(int stream, float gain);
         void stop(int stream);
     }
+
+    private float flameGain = FLAME_BASE_GAIN;
+    private float roomGain = ROOM_BASE_GAIN;
+    private float chainGain = CHAIN_BASE_GAIN;
 
     private final Sink sink;
     private final Thread ownerThread;
@@ -38,6 +42,17 @@ final class MenuAmbiencePlayback implements AutoCloseable {
     MenuAmbiencePlayback(Sink sink) {
         this.sink = Objects.requireNonNull(sink, "sink");
         this.ownerThread = Thread.currentThread();
+    }
+
+    /** Development mix tuning; the caller explicitly owns saving the three values. */
+    boolean setMixPercent(int flame, int room, int chain) {
+        requireOwnerThread();
+        if (closed || flame < 0 || flame > 100 || room < 0 || room > 100 || chain < 0 || chain > 100)
+            return false;
+        flameGain = flame / 100.0f;
+        roomGain = room / 100.0f;
+        chainGain = chain / 100.0f;
+        return true;
     }
 
     /**
@@ -95,9 +110,9 @@ final class MenuAmbiencePlayback implements AutoCloseable {
         }
 
         final float gain = sfxGain * (1.0f - fadePermille / 1000.0f);
-        flameStream = ensureLoop(flameStream, MENU_FLAME, FLAME_BASE_GAIN * gain);
-        roomStream = ensureLoop(roomStream, MENU_ROOM, ROOM_BASE_GAIN * gain);
-        if (chainStream != 0) chainStream = applyGain(chainStream, CHAIN_BASE_GAIN * gain);
+        flameStream = ensureLoop(flameStream, MENU_FLAME, flameGain * gain);
+        roomStream = ensureLoop(roomStream, MENU_ROOM, roomGain * gain);
+        if (chainStream != 0) chainStream = applyGain(chainStream, chainGain * gain);
 
         if (creakBaselinePending) {
             lastCreakSerial = creakSerial;
@@ -106,7 +121,7 @@ final class MenuAmbiencePlayback implements AutoCloseable {
             // Advance before starting: a late load or sink failure drops this cue without replay.
             lastCreakSerial = creakSerial;
             stopStream(chainStream);
-            chainStream = tryStart(MENU_CHAIN, CHAIN_BASE_GAIN * gain, false);
+            chainStream = tryStart(MENU_CHAIN, chainGain * gain, false);
         } else {
             lastCreakSerial = creakSerial;
         }
@@ -130,11 +145,13 @@ final class MenuAmbiencePlayback implements AutoCloseable {
     }
 
     private int ensureLoop(int stream, String key, float gain) {
+        if (gain <= 0.0f) { stopStream(stream); return 0; }
         if (stream == 0) return tryStart(key, gain, true);
         return applyGain(stream, gain);
     }
 
     private int tryStart(String key, float gain, boolean looping) {
+        if (gain <= 0.0f) return 0;
         try {
             final int stream = sink.start(key, gain, looping);
             return stream > 0 ? stream : 0;
@@ -144,6 +161,7 @@ final class MenuAmbiencePlayback implements AutoCloseable {
     }
 
     private int applyGain(int stream, float gain) {
+        if (gain <= 0.0f) { stopStream(stream); return 0; }
         try {
             sink.gain(stream, gain);
             return stream;

@@ -6,7 +6,7 @@
 namespace horde::audio
 {
 inline constexpr float kMenuFlameGain = .16f;
-inline constexpr float kMenuRoomGain = .09f;
+inline constexpr float kMenuRoomGain = .02f;
 inline constexpr float kMenuChainGain = .13f;
 
 // Presentation-only authored cue. Observe the actual fixed-step pendulum's

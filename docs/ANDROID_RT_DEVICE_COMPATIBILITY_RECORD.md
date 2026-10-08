@@ -2665,3 +2665,7 @@ unchanged traced50%/output/other saved settings. Owned processes stop and
 preferences remain unchanged. These short Debug/readback scenarios do not close
 continuous-motion appearance, sustained30FPS, thermal, power, total memory or
 another-device gate. Default Off and no-shafts scope remain.
+
+## 8 October lantern-menu ambience — bounded ordinary Debug observation
+
+Runtime `fa5f46a7cf01e2492593dc26ad1c50883ab18280`; exact installed-base APK SHA-256 `38f5abab55163be0e548a22927a51921dd8d31cd58825838bd6eaf0dff69bf8a` on SM-S948B / Android16. Ordinary Pipeline Entry/Settings/More/Back, Home/return and Play/pause show one pair of loops per valid presented menu session, seven spaced motion-derived chain submissions, Home and final Play stops, and successful Showcase presentation. Saved preferences are unchanged; the owned app is stopped. Evidence class: exact local Debug package plus native/positive SoundPool-handle ownership observation. No owner listening, competing-focus, sustained FPS/thermal/power, controller or other-backend/other-device acceptance follows. Earlier owner BB-51 recovery remains tied to ac468f51. [Exact artifact/event receipt and limits](ENGINEERING_1_6_2_MENU_AMBIENCE_2026_10_08.md).

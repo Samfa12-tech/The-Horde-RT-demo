@@ -83,7 +83,7 @@ jobs:
           if ($reports.Count -eq 0) { throw 'No Android unit-test reports were produced.' }
           foreach ($required in @{
             'MusicAudioFocusTest' = 9
-            'MenuAmbiencePlaybackTest' = 6
+            'MenuAmbiencePlaybackTest' = 7
             'MusicOutputBufferTest' = 5
             'PlaytestReportExportTest' = 6
             'PlaytestReportSubmissionTest' = 16
