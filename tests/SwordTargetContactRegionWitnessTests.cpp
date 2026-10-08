@@ -403,10 +403,264 @@ void TestSwordTargetContactRegionWitness()
               << " vertexWeightClassification=unavailable\n";
 }
 
+void RunMovingWitness(const bool downstroke)
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::items;
+    using horde::scene::SkinnedClip;
+    using horde::scene::SkinnedMeshAsset;
+
+    constexpr float tickSeconds = 1.0f / 60.0f;
+    constexpr float startRange = 1.52f;
+    constexpr std::size_t expectedBladeTriangles = 6905u;
+    const std::size_t expectedQueries = downstroke ? 6u : 4u;
+    const std::filesystem::path root = HORDE_RT_SOURCE_DIR;
+    horde::scene::assets::StaticMeshAsset sword;
+    horde::scene::assets::StaticMeshAsset torch;
+    SkinnedMeshAsset skeleton;
+    std::string diagnostic;
+    const bool heldLoaded = LoadProductionHeldAssets(sword, torch, diagnostic);
+    const auto* grip = FindHeldItemSocket(sword.sockets, "Grip");
+    const bool skeletonLoaded = skeleton.LoadCombatClips(
+        (root / "assets/models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
+        diagnostic);
+    horde::vulkan::raytracing::PlayerRenderSlot playerRig;
+    const bool playerLoaded = playerRig.LoadAsset(
+        (root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),
+        diagnostic);
+    Check(heldLoaded && grip != nullptr && !sword.vertices.empty() &&
+              skeletonLoaded && playerLoaded,
+          "moving witness must load the production sword, Grip, target skin and player rig");
+    if (!heldLoaded || grip == nullptr || !skeletonLoaded || !playerLoaded) return;
+
+    struct Case { const char* name; float bearing; };
+    constexpr std::array<Case, 2u> cases{{
+        {"frontal-moving-1.52", 0.0f},
+        {"minus15-moving-1.52", -0.261799388f},
+    }};
+    std::size_t exactQueries = 0u;
+    std::size_t totalExactTrianglePairs = 0u;
+    std::uint64_t rigTick = 191000u;
+
+    for (const Case& contact : cases)
+    {
+        const float startX = startRange * std::sin(contact.bearing);
+        const float startZ = -startRange * std::cos(contact.bearing);
+        SwordCombat attack;
+        SwordCombat control;
+        attack.Reset(1u, {startX, startZ});
+        control.Reset(1u, {startX, startZ});
+        Check(attack.RequestAttack() == PlayerAttackCut::DownwardCut,
+              "moving fixture must request the ordinary immediate downward cut");
+
+        std::array<CombatSnapshot, 23u> attackAfter{};
+        std::array<CombatSnapshot, 23u> controlAfter{};
+        std::uint64_t pulseTick = 0u;
+        for (std::uint64_t tick = 1u; tick <= attackAfter.size(); ++tick)
+        {
+            const auto index = static_cast<std::size_t>(tick - 1u);
+            attackAfter[index] = attack.Update(tickSeconds, 0.0f, 0.0f, 0.0f, true, true, false);
+            controlAfter[index] = control.Update(tickSeconds, 0.0f, 0.0f, 0.0f, true, true, false);
+            if (attackAfter[index].playerAttackPulse) pulseTick = tick;
+        }
+        constexpr std::uint64_t expectedPulseTick = 17u;
+        Check(pulseTick == expectedPulseTick,
+              "moving witness must retain the existing tick-17 damage pulse");
+        if (pulseTick != expectedPulseTick) continue;
+
+        const auto& pulse = attackAfter[static_cast<std::size_t>(pulseTick - 1u)];
+        const auto& beforePulse = attackAfter[static_cast<std::size_t>(pulseTick - 2u)];
+        const auto& pulseTarget = controlAfter[static_cast<std::size_t>(pulseTick - 2u)].combatants[0u];
+        const float movedMetres = std::hypot(pulseTarget.x - startX, pulseTarget.z - startZ);
+        const float range = std::hypot(pulseTarget.x, pulseTarget.z);
+        const float facingDot = range > 0.0001f ? -pulseTarget.z / range : 1.0f;
+        const bool gate = SwordCombat::IsPlayerTargetInRangeCone(
+            0.0f, 0.0f, 0.0f, pulseTarget.x, pulseTarget.z);
+        const bool admitted = pulse.playerAttackPulse &&
+            pulse.combatants[0u].health < beforePulse.combatants[0u].health;
+        Check(movedMetres > 0.15f && movedMetres < 0.18f,
+              "pulse authority target must have moved approximately sixteen ordinary walking steps");
+        Check(pulseTarget.action == EnemyCombatAction::Locomotion &&
+                  pulseTarget.animation == EnemyAnimation::Walking,
+              "pulse authority target must remain in its ordinary walking phase");
+        Check(admitted && gate,
+              "moving pulse must be admitted by the unchanged production range/cone gate");
+
+        const std::array<std::uint64_t, 3u> downstrokeTicks{{19u, 21u, 23u}};
+        const std::array<std::uint64_t, 2u> pulseTicks{{16u, expectedPulseTick}};
+        const std::size_t sampleCount = downstroke ? downstrokeTicks.size() : pulseTicks.size();
+        for (std::size_t sampleIndex = 0u; sampleIndex < sampleCount; ++sampleIndex)
+        {
+            const std::uint64_t sampleTick = downstroke
+                ? downstrokeTicks[sampleIndex] : pulseTicks[sampleIndex];
+            const auto& combatSnapshot = attackAfter[static_cast<std::size_t>(sampleTick - 1u)];
+            const std::uint64_t targetAuthorityTick = sampleTick - 1u;
+            const auto& targetSnapshot = controlAfter[
+                static_cast<std::size_t>(targetAuthorityTick - 1u)].combatants[0u];
+            const auto targetSample = ResolveSharedCharacterRenderPose(
+                targetSnapshot, skeleton.ClipDuration(SkinnedClip::Dead));
+            if (downstroke)
+            {
+                Check(targetSnapshot.health > 0 &&
+                          targetSnapshot.action != EnemyCombatAction::Dead &&
+                          (targetSample.clip == SkinnedClip::Walking ||
+                           targetSample.clip == SkinnedClip::Attack),
+                      "late downstroke control must report a living ordinary controller pose");
+                Check(combatSnapshot.player.action == PlayerCombatAction::SwingActive,
+                      "late downstroke samples must remain on the existing downward swing action");
+            }
+            else
+            {
+                Check(targetSample.clip == SkinnedClip::Walking &&
+                          targetSnapshot.action == EnemyCombatAction::Locomotion &&
+                          targetSnapshot.animation == EnemyAnimation::Walking,
+                      "both moving-pulse samples must use the ordinary walking target pose");
+            }
+
+            HeldItemFixedStepInput input;
+            input.playerX = 0.0f;
+            input.playerZ = 0.0f;
+            input.playerYawRadians = 0.0f;
+            input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+            input.playerCombat = combatSnapshot.player;
+            input.logicalViewAspect = 1.0f;
+            HeldItemStates items = MakeDefaultHeldItemStates();
+            HeldItemFixedStepState fixed;
+            HeldItemTransform worldFromGrip{};
+            HeldItemTransform worldFromSword{};
+            const bool resolved = ResolveHeldItemsFixedStep(
+                    items, input, sampleTick, fixed, diagnostic) &&
+                ResolveProductionAnatomicalSword(input, fixed.kinematics, items,
+                    playerRig, rigTick++, worldFromGrip, worldFromSword, diagnostic);
+            const auto blade = resolved
+                ? BuildGripFilteredBladeTriangles(sword, *grip, worldFromSword)
+                : std::vector<MeshTriangle>{};
+            std::vector<horde::scene::SkinnedRtVertex> targetPose;
+            const bool skinned = skeleton.Skin(targetSample.clip, targetSample.clipTime,
+                                                targetPose, diagnostic);
+            const auto targetTriangles = skinned
+                ? BuildDiagnosticTargetTriangles(targetSample, targetPose)
+                : std::vector<MeshTriangle>{};
+            Check(resolved && skinned && blade.size() == expectedBladeTriangles &&
+                      !targetTriangles.empty(),
+                  "moving-pulse sample must use the full production blade and walking target skin");
+            if (!resolved || !skinned || blade.size() != expectedBladeTriangles ||
+                targetTriangles.empty()) continue;
+
+            const ContactRegionTargetTree targetTree(targetTriangles);
+            const ContactRegionQuery query = targetTree.Query(blade);
+            ++exactQueries;
+            totalExactTrianglePairs += query.exactTrianglePairs;
+            Check(query.targetTriangle < targetPose.size() / 3u &&
+                      query.bladeTriangle < blade.size() && query.exactTrianglePairs > 0u &&
+                      std::isfinite(query.metres) && query.metres >= 0.0f,
+                  "moving-pulse query must return a finite exact nearest triangle pair");
+            if (query.targetTriangle >= targetPose.size() / 3u) continue;
+
+            const RegionLabel region = LabelByNearestAuthoredSegment(
+                targetTriangles[query.targetTriangle], targetSample, skeleton, diagnostic);
+            const auto triangleCentroid = [](const MeshTriangle& triangle)
+            {
+                return std::array<float, 3u>{{
+                    (triangle.a[0] + triangle.b[0] + triangle.c[0]) / 3.0f,
+                    (triangle.a[1] + triangle.b[1] + triangle.c[1]) / 3.0f,
+                    (triangle.a[2] + triangle.b[2] + triangle.c[2]) / 3.0f,
+                }};
+            };
+            const auto bladeCentroid = triangleCentroid(blade[query.bladeTriangle]);
+            const auto targetCentroid = triangleCentroid(targetTriangles[query.targetTriangle]);
+            const float sampleRange = std::hypot(targetSnapshot.x, targetSnapshot.z);
+            const float sampleDot = sampleRange > 0.0001f ? -targetSnapshot.z / sampleRange : 1.0f;
+            const bool sampleGate = SwordCombat::IsPlayerTargetInRangeCone(
+                0.0f, 0.0f, 0.0f, targetSnapshot.x, targetSnapshot.z);
+            const float sampleMoved = std::hypot(targetSnapshot.x - startX,
+                                                 targetSnapshot.z - startZ);
+            const char* strokePhase = combatSnapshot.player.actionTime <
+                    SwordCombat::kDownwardCutTravelDuration
+                ? "downstroke" : "bottom-hold";
+            std::cout << (downstroke ? "sword-moving-downstroke case=" : "sword-moving-pulse case=")
+                      << contact.name
+                      << " sampleTick=" << sampleTick
+                      << " targetAuthorityTick=" << targetAuthorityTick
+                      << " playerAction=" << static_cast<int>(combatSnapshot.player.action)
+                      << " playerActionTime=" << combatSnapshot.player.actionTime
+                      << " visualStrokePhase=" << strokePhase
+                      << " targetAction=" << static_cast<int>(targetSnapshot.action)
+                      << " targetAnimation=" << static_cast<int>(targetSnapshot.animation)
+                      << " targetActionTime=" << targetSnapshot.actionTime
+                      << " targetAnimationTime=" << targetSnapshot.animationTime
+                      << " targetX=" << targetSnapshot.x << " targetZ=" << targetSnapshot.z
+                      << " startX=" << startX << " startZ=" << startZ
+                      << " movedMm=" << sampleMoved * 1000.0f
+                      << " rangeM=" << sampleRange << " facingDot=" << sampleDot
+                      << " gateEligible=" << sampleGate
+                      << " pulse17Admitted=" << admitted
+                      << " sampleIsNewHitAdmission="
+                      << (!downstroke && sampleTick == expectedPulseTick && admitted)
+                      << " targetPoseCounterfactual=" << downstroke
+                      << " meshGapMm=" << query.metres * 1000.0f
+                      << " targetTriangle=" << query.targetTriangle
+                      << " bladeTriangle=" << query.bladeTriangle
+                      << " exactTrianglePairs=" << query.exactTrianglePairs
+                      << " bladeTriangleCentroidM=" << bladeCentroid[0] << ','
+                      << bladeCentroid[1] << ',' << bladeCentroid[2]
+                      << " targetTriangleCentroidM=" << targetCentroid[0] << ','
+                      << targetCentroid[1] << ',' << targetCentroid[2]
+                      << " targetMinusBladeCentroidDeltaMm="
+                      << (targetCentroid[0] - bladeCentroid[0]) * 1000.0f << ','
+                      << (targetCentroid[1] - bladeCentroid[1]) * 1000.0f << ','
+                      << (targetCentroid[2] - bladeCentroid[2]) * 1000.0f
+                      << " centroidDeltaIsNotNearestSurfaceVector=1"
+                      << " bladeTriangles=" << blade.size()
+                      << " targetTriangles=" << targetPose.size() / 3u
+                      << " nearestAuthoredSkeletonSegment=" << region.segment
+                      << " triangleCentroidToSegmentMm="
+                      << region.centroidDistanceMetres * 1000.0f
+                      << " regionLabelSource=actualJointNodeTransforms_nearestCentroid"
+                      << " sourceJointWeightsExposedByRuntimeAssetApi=0\n";
+        }
+    }
+
+    Check(exactQueries == expectedQueries,
+          "moving witness mode must complete its exact bounded full-mesh query budget");
+    std::cout << (downstroke ? "sword-moving-downstroke-summary exactQueries="
+                             : "sword-moving-pulse-summary exactQueries=") << exactQueries
+              << " queryBudget=" << expectedQueries
+              << " exactBladeTargetTrianglePairs=" << totalExactTrianglePairs
+              << " startingRangeM=" << startRange
+              << (downstroke
+                    ? " samplePolicy=ticks19_21_23_prior-target-authority_actual-target-dead-after17"
+                    : " samplePolicy=tick16-and-pulse17_prior-target-authority")
+              << " contactInterpretation=zero-gap-agrees_positive-gap-is-mismatch-evidence"
+              << " continuousCollisionClaim=0 presentedFrameClaim=0"
+              << " labelAuthority=nearest_actual_imported_skeleton_joint_segment"
+              << " vertexWeightClassification=unavailable\n";
+}
+
+void TestMovingPulseWitness()
+{
+    RunMovingWitness(false);
+}
+
+void TestMovingDownstrokeWitness()
+{
+    RunMovingWitness(true);
+}
+
 } // namespace
 
-int main()
+int main(int argc, char** argv)
 {
-    TestSwordTargetContactRegionWitness();
+    if (argc == 1)
+        TestSwordTargetContactRegionWitness();
+    else if (argc == 2 && std::string(argv[1]) == "--moving-pulse")
+        TestMovingPulseWitness();
+    else if (argc == 2 && std::string(argv[1]) == "--moving-downstroke")
+        TestMovingDownstrokeWitness();
+    else
+    {
+        std::cerr << "usage: horde_rt_sword_target_contact_region_witness [--moving-pulse|--moving-downstroke]\n";
+        return 2;
+    }
     return failures == 0 ? 0 : 1;
 }
