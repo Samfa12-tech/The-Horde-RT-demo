@@ -34,6 +34,7 @@
 
 #include "ui/DiagnosticOverlay.h"
 #include "graphics/GraphicsSettings.h"
+#include "graphics/RtPresentationTransform.h"
 #include "graphics/EntryMenuHandoff.h"
 #include "graphics/ForegroundPauseRenderCadence.h"
 #include "telemetry/InputPresentationTrace.h"
@@ -3360,6 +3361,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             const std::uint64_t inputOwnerSteadyNs =
                 horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
             horde::gameplay::simulation::InputSnapshot simulationInput = publishedInput.snapshot;
+            gGameSimulation.SetPresentationAspect(
+                horde::graphics::RtViewAspectFromImageExtent(
+                    context.swapchainExtent.width, context.swapchainExtent.height,
+                    context.rtPresentationTransform));
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
             BuildAndroidMotionInput(context, simulationInput, inputOwnerSteadyNs);
 #endif

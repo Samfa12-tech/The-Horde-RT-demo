@@ -175,11 +175,14 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& input,
         });
     // Ticked frames already resolved the final pose. Refresh only when a
     // zero-tick frame ages or cancels an existing presentation envelope.
-    if (ticks == 0u && presentationWasActive)
+    if (ticks == 0u && (presentationWasActive || presentationPoseDirty_))
     {
+        // Synchronize zero-tick/paused frames to current input and viewport
+        // without advancing a simulation step.
         ResolveHeldItems();
         ResolvePlayerAnimation(0.0f);
     }
+    presentationPoseDirty_ = false;
     RefreshSnapshot(input);
     snapshot_.simulationTicksThisFrame = ticks;
     snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();
@@ -402,6 +405,27 @@ void GameSimulation::SynchronizePausedInput(const InputSnapshot& input,
     snapshot_.catchUpOverrunCount = fixedStepRunner_.OverrunCount();
     snapshot_.eventsEmittedThisTick = 0u;
     snapshot_.eventsEmittedThisFrame = 0u;
+    ResolveHeldItems();
+    ResolvePlayerAnimation(0.0f);
+    RefreshSnapshot(lastInput_);
+}
+
+void GameSimulation::SetPresentationAspect(const float logicalViewAspect)
+{
+    const float aspect = std::isfinite(logicalViewAspect) && logicalViewAspect > 0.0f
+        ? std::clamp(logicalViewAspect, 0.25f, 4.0f)
+        : 1.0f;
+    if (aspect == presentationAspect_)
+    {
+        return;
+    }
+
+    presentationAspect_ = aspect;
+    presentationPoseDirty_ = true;
+    // Viewport changes affect only presentation kinematics. Re-resolve the
+    // shared hand/item/animation pose immediately so zero-tick, paused, and
+    // imported-checkpoint frames publish a coherent pose without advancing
+    // simulation time or any gameplay authority.
     ResolveHeldItems();
     ResolvePlayerAnimation(0.0f);
     RefreshSnapshot(lastInput_);
@@ -1132,7 +1156,8 @@ void GameSimulation::ResolveHeldItems()
         combatSnapshot_.swordSwingRadians,
         interactionState_,
         config_.playerMountProfile,
-        &heldItems_[1]};
+        &heldItems_[1],
+        presentationAspect_};
     // Simulation owns the transition/visual blend. Kinematics keeps a stable
     // hand-endpoint matrix for gameplay; PlayerRenderSlot composes its single
     // rendered matrix from that endpoint and the animated Hips mount.

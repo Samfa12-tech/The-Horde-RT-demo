@@ -58,6 +58,9 @@ struct HeldItemKinematicsInput
     horde::gameplay::interactions::InteractionState interaction{};
     PlayerMountProfile playerMountProfile = PlayerMountProfile::LegacyViewRelative;
     float cameraPitchRadians = 0.0f;
+    // Logical presentation aspect, used only to spread held hand targets in
+    // wide views. Portrait and square views retain the authored targets.
+    float logicalViewAspect = 1.0f;
 };
 
 struct HeldSwordPose
@@ -122,7 +125,14 @@ struct HeldItemFixedStepInput
     horde::gameplay::interactions::InteractionState interaction{};
     PlayerMountProfile playerMountProfile = PlayerMountProfile::LegacyViewRelative;
     const HeldItemState* swordItemState = nullptr;
+    float logicalViewAspect = 1.0f;
 };
+
+inline constexpr float kHeldItemSpreadStartAspect = 1.0f;
+inline constexpr float kHeldItemSpreadMaximumAspect = 16.0f / 9.0f;
+inline constexpr float kHeldItemSpreadMaximumMetres = 0.03f;
+
+float ComputeHeldItemAspectSpread(float logicalViewAspect) noexcept;
 
 struct HeldItemFixedStepState
 {

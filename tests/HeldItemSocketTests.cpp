@@ -686,6 +686,202 @@ void TestSharedKinematicsOwnsWallDepthHandsAndSwordPose()
           "torch lowering and sword parry must share the authored hand-target evaluator");
 }
 
+void TestAspectHandSpacingUsesSharedTargetsAndLeavesCombatAuthorityAlone()
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::items;
+    using namespace horde::gameplay::simulation;
+
+    Check(Near(ComputeHeldItemAspectSpread(0.46f), 0.0f) &&
+              Near(ComputeHeldItemAspectSpread(1.0f), 0.0f) &&
+              Near(ComputeHeldItemAspectSpread(
+                       std::numeric_limits<float>::quiet_NaN()), 0.0f),
+          "portrait, square, and invalid aspects must preserve the authored hand targets");
+    const float fourThree = ComputeHeldItemAspectSpread(4.0f / 3.0f);
+    const float sixteenTen = ComputeHeldItemAspectSpread(16.0f / 10.0f);
+    const float sixteenNine = ComputeHeldItemAspectSpread(16.0f / 9.0f);
+    Check(fourThree > 0.0f && fourThree < sixteenTen &&
+              sixteenTen < sixteenNine &&
+              Near(sixteenNine, kHeldItemSpreadMaximumMetres) &&
+              Near(ComputeHeldItemAspectSpread(2.4f), sixteenNine),
+          "aspect spacing must rise smoothly and monotonically to its three-centimetre cap");
+
+    HeldItemKinematicsInput base{};
+    base.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+    base.cameraX = 0.0f;
+    base.cameraZ = 1.85f;
+    base.torchFailure.heldByPlayer = true;
+    bool phasesRemainCoherent = true;
+    const auto insideReach = [](const std::array<float, 3u>& shoulder,
+                                const std::array<float, 3u>& hand) {
+        const float x = hand[0] - shoulder[0];
+        const float y = hand[1] - shoulder[1];
+        const float z = hand[2] - shoulder[2];
+        return std::sqrt(x * x + y * y + z * z) <=
+            kPlayerAnatomicalHandReachLimitMetres;
+    };
+    bool withinAnatomicalReach = true;
+    for (const PlayerCombatAction action : {
+             PlayerCombatAction::Idle,
+             PlayerCombatAction::SwingWindup,
+             PlayerCombatAction::SwingActive,
+             PlayerCombatAction::SwingRecovery,
+             PlayerCombatAction::UpwardSliceWindup,
+             PlayerCombatAction::UpwardSliceActive,
+             PlayerCombatAction::UpwardSliceRecovery,
+             PlayerCombatAction::ParryStartup,
+             PlayerCombatAction::ParryActive,
+             PlayerCombatAction::ParryRecovery})
+    {
+        for (const auto heldLightKind : {
+                 horde::gameplay::interactions::HeldLightKind::Torch,
+                 horde::gameplay::interactions::HeldLightKind::RewardLantern})
+        {
+            auto portraitInput = base;
+            portraitInput.playerCombat.action = action;
+            portraitInput.interaction.heldLightKind = heldLightKind;
+            portraitInput.logicalViewAspect = 0.46f;
+            const auto portrait = EvaluateHeldItemKinematics(portraitInput);
+            auto squareInput = portraitInput;
+            squareInput.logicalViewAspect = 1.0f;
+            const auto square = EvaluateHeldItemKinematics(squareInput);
+            auto wideInput = portraitInput;
+            wideInput.logicalViewAspect = 16.0f / 9.0f;
+            const auto wide = EvaluateHeldItemKinematics(wideInput);
+            phasesRemainCoherent &=
+                Near(portrait.leftHandLocal[0], square.leftHandLocal[0]) &&
+                Near(portrait.rightHandLocal[0], square.rightHandLocal[0]) &&
+                Near(wide.leftHandLocal[0], portrait.leftHandLocal[0] - sixteenNine) &&
+                Near(wide.rightHandLocal[0], portrait.rightHandLocal[0] + sixteenNine) &&
+                Near(wide.leftHandLocal[1], portrait.leftHandLocal[1]) &&
+                Near(wide.leftHandLocal[2], portrait.leftHandLocal[2]) &&
+                Near(wide.rightHandLocal[1], portrait.rightHandLocal[1]) &&
+                Near(wide.rightHandLocal[2], portrait.rightHandLocal[2]) &&
+                Near(wide.heldPropDepth, portrait.heldPropDepth) &&
+                Near(wide.swordRadians, portrait.swordRadians) &&
+                Near(wide.swordForwardRadians, portrait.swordForwardRadians);
+            withinAnatomicalReach &=
+                insideReach(wide.leftShoulderLocal, wide.leftHandLocal) &&
+                insideReach(wide.rightShoulderLocal, wide.rightHandLocal);
+        }
+    }
+    HeldItemFixedStepInput releasedInput{};
+    releasedInput.torchFailure.heldByPlayer = false;
+    releasedInput.torchFailure.fallProgress = 0.4f;
+    releasedInput.torchFailure.droppedX = -0.7f;
+    releasedInput.torchFailure.droppedY = 0.1f;
+    releasedInput.torchFailure.droppedZ = -2.2f;
+    HeldItemStates releasedSquareItems = MakeDefaultHeldItemStates();
+    releasedSquareItems[0].parentMode = HeldItemParentMode::AuthoredWorldTrajectory;
+    HeldItemFixedStepState releasedSquareState{};
+    std::string releasedDiagnostic;
+    Check(ResolveHeldItemsFixedStep(releasedSquareItems, releasedInput, 7u,
+                                    releasedSquareState, releasedDiagnostic),
+          "released torch fixture must resolve at square aspect");
+    auto releasedWideInput = releasedInput;
+    releasedWideInput.logicalViewAspect = 16.0f / 9.0f;
+    HeldItemStates releasedWideItems = MakeDefaultHeldItemStates();
+    releasedWideItems[0].parentMode = HeldItemParentMode::AuthoredWorldTrajectory;
+    HeldItemFixedStepState releasedWideState{};
+    Check(ResolveHeldItemsFixedStep(releasedWideItems, releasedWideInput, 7u,
+                                    releasedWideState, releasedDiagnostic) &&
+              TransformNear(releasedSquareItems[0].worldFromItem,
+                            releasedWideItems[0].worldFromItem, 0.000001f) &&
+              Near(releasedWideState.kinematics.leftHandLocal[0] -
+                       releasedSquareState.kinematics.leftHandLocal[0],
+                   -sixteenNine),
+          "released torch world trajectory must remain viewport-independent while the presentation hand target can adapt");
+
+    Check(phasesRemainCoherent,
+          "ordinary and reward-light hands must spread symmetrically without changing forward pose or combat phase geometry");
+    Check(withinAnatomicalReach,
+          "maximum landscape spacing must remain inside the authored anatomical arm reach for carry, swing, and parry phases");
+
+    GameSimulation frozenCheckpointSimulation;
+    Check(frozenCheckpointSimulation.ApplyShowcaseCheckpoint(2, false),
+          "checkpoint fixture must import before its first viewport aspect");
+    const auto checkpointTick = frozenCheckpointSimulation.Snapshot().tickIndex;
+    const auto checkpointHandX =
+        frozenCheckpointSimulation.Snapshot().heldItemKinematics.rightHandLocal[0];
+    const auto checkpointLightX =
+        frozenCheckpointSimulation.Snapshot().heldLight.worldFromLight[12];
+    frozenCheckpointSimulation.SetPresentationAspect(16.0f / 9.0f);
+    const auto& frozenWide = frozenCheckpointSimulation.Snapshot();
+    Check(frozenWide.tickIndex == checkpointTick &&
+              Near(frozenWide.heldItemKinematics.rightHandLocal[0],
+                   checkpointHandX + sixteenNine) &&
+              frozenWide.playerAnimation.rightIk.target ==
+                  frozenWide.heldItemKinematics.rightHandLocal &&
+              Near(frozenWide.heldLight.worldFromLight[12] - checkpointLightX,
+                   -sixteenNine, 0.0002f),
+          "aspect-only checkpoint refresh must publish aligned hand/item/light poses without advancing the frozen tick");
+    InputSnapshot pausedInput{};
+    pausedInput.paused = true;
+    frozenCheckpointSimulation.AdvanceFrame(pausedInput, 0.0, 0u);
+    Check(frozenCheckpointSimulation.Snapshot().tickIndex == checkpointTick &&
+              frozenCheckpointSimulation.Snapshot().simulationTicksThisFrame == 0u &&
+              frozenCheckpointSimulation.Snapshot().playerAnimation.rightIk.target ==
+                  frozenCheckpointSimulation.Snapshot().heldItemKinematics.rightHandLocal,
+          "paused aspect synchronization must retain frozen gameplay time and the current shared hand target");
+
+    GameSimulation portraitSimulation;
+    GameSimulation wideSimulation;
+    wideSimulation.SetPresentationAspect(16.0f / 9.0f);
+    InputSnapshot input{};
+    bool combatAuthorityMatches = true;
+    for (std::uint64_t tick = 1u; tick <= 90u; ++tick)
+    {
+        input.commands.attack = tick >= 1u ? 1u : 0u;
+        input.commands.parry = tick >= 40u ? 1u : 0u;
+        portraitSimulation.StepFixed(input, 1.0f / 60.0f, tick);
+        wideSimulation.StepFixed(input, 1.0f / 60.0f, tick);
+        const auto& portraitSnapshot = portraitSimulation.Snapshot();
+        const auto& wideSnapshot = wideSimulation.Snapshot();
+        combatAuthorityMatches &=
+            portraitSnapshot.playerCombat.action == wideSnapshot.playerCombat.action &&
+            portraitSnapshot.playerCombat.reaction == wideSnapshot.playerCombat.reaction &&
+            Near(portraitSnapshot.playerCombat.actionTime,
+                 wideSnapshot.playerCombat.actionTime) &&
+            Near(portraitSnapshot.playerCombat.reactionTime,
+                 wideSnapshot.playerCombat.reactionTime) &&
+            portraitSnapshot.swordCombat.playerAttackCut ==
+                wideSnapshot.swordCombat.playerAttackCut &&
+            portraitSnapshot.swordCombat.aliveCount ==
+                wideSnapshot.swordCombat.aliveCount;
+        combatAuthorityMatches &=
+            wideSnapshot.playerAnimation.leftIk.target ==
+                wideSnapshot.heldItemKinematics.leftHandLocal &&
+            wideSnapshot.playerAnimation.rightIk.target ==
+                wideSnapshot.heldItemKinematics.rightHandLocal &&
+            Near(wideSnapshot.heldItemKinematics.leftHandLocal[0],
+                 portraitSnapshot.heldItemKinematics.leftHandLocal[0] - sixteenNine) &&
+            Near(wideSnapshot.heldItemKinematics.rightHandLocal[0],
+                 portraitSnapshot.heldItemKinematics.rightHandLocal[0] + sixteenNine) &&
+            Near(wideSnapshot.heldItemKinematics.leftHandLocal[2],
+                 portraitSnapshot.heldItemKinematics.leftHandLocal[2]) &&
+            Near(wideSnapshot.heldItemKinematics.rightHandLocal[2],
+                 portraitSnapshot.heldItemKinematics.rightHandLocal[2]);
+        HeldItemFixedStepInput worldInput{};
+        worldInput.playerX = wideSnapshot.playerX;
+        worldInput.playerZ = wideSnapshot.playerZ;
+        worldInput.playerYawRadians = wideSnapshot.playerYawRadians;
+        worldInput.playerPitchRadians = wideSnapshot.playerPitchRadians;
+        const auto expectedSwordHand = ExpectedWorldHandPoint(
+            worldInput, wideSnapshot.heldItemKinematics.rightHandLocal);
+        const auto worldSwordGrip = MultiplyHeldItemTransforms(
+            wideSnapshot.heldItems[1].worldFromItem, SwordGripSocketTransform());
+        combatAuthorityMatches &=
+            Near(worldSwordGrip[12], expectedSwordHand[0], 0.0002f) &&
+            Near(worldSwordGrip[13], expectedSwordHand[1], 0.0002f) &&
+            Near(worldSwordGrip[14], expectedSwordHand[2], 0.0002f) &&
+            Near(wideSnapshot.heldLight.worldFromLight[12] -
+                     portraitSnapshot.heldLight.worldFromLight[12],
+                 -sixteenNine, 0.0002f);
+    }
+    Check(combatAuthorityMatches,
+          "simulation combat timing/authority must match while world item and animation targets consume the same aspect-adjusted hands");
+}
+
 void TestRewardLanternHighLowUsesSharedLeftArmTarget()
 {
     using namespace horde::gameplay::interactions;
@@ -4341,6 +4537,7 @@ void TestParryTorchMeshClearance()
             HeldItemFixedStepInput input;
             input.playerX=.495964f; input.playerZ=-15.143019f;
             input.playerYawRadians=-1.561293f; input.playerPitchRadians=-0.04f;
+            input.logicalViewAspect = kHeldItemSpreadMaximumAspect;
             input.walkTime=5.950023f; input.torchFailure.heldByPlayer=true;
             input.torchFailure.leftArmLowerBlend=lowered;
             input.playerCombat.action=phase.action; input.playerCombat.actionTime=phase.time;
@@ -4479,6 +4676,7 @@ void TestSwordOverheadClearanceUsesImportedBladeAcrossCombatPhases()
                 HeldItemFixedStepInput input;
                 input.playerX = centerX;
                 input.playerZ = centerZ + 0.77f;
+                input.logicalViewAspect = kHeldItemSpreadMaximumAspect;
                 input.playerYawRadians = 0.0f;
                 input.playerPitchRadians = pitch;
                 input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
@@ -4716,6 +4914,7 @@ int main(const int argc, char** argv)
     TestFlameAndLightSocketsFollowTheComposedItem();
     TestSimulationOwnsResetAndCheckpointParentState();
     TestSharedKinematicsOwnsWallDepthHandsAndSwordPose();
+    TestAspectHandSpacingUsesSharedTargetsAndLeavesCombatAuthorityAlone();
     TestRewardLanternHighLowUsesSharedLeftArmTarget();
     TestRewardCarryParryKeepsGuardOnSwordSide();
     TestProductionSwordAssetMeetsGenericSocketAndPbrBudget();

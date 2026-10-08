@@ -75,6 +75,10 @@ class GameSimulation
 public:
     explicit GameSimulation(GameSimulationConfig config = {});
 
+    // Supply the current logical render-view aspect from the surface owner.
+    // Call on the simulation owner thread before advancing fixed steps.
+    void SetPresentationAspect(float logicalViewAspect);
+
     std::uint32_t AdvanceFrame(const InputSnapshot& input,
                                double frameDeltaSeconds,
                                std::uint64_t inputPublicationSequence = 0u,
@@ -162,6 +166,8 @@ private:
     void RefreshSnapshot(const InputSnapshot& input);
 
     GameSimulationConfig config_{};
+    float presentationAspect_ = 1.0f;
+    bool presentationPoseDirty_ = false;
     bool motionEvidenceEquipmentSeedActive_ = false;
     bool motionEvidencePreviousSwordStartsStowed_ = false;
     bool motionEvidencePreviousWaterfallSkeletonEncounter_ = false;

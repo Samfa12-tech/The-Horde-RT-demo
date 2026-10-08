@@ -102,6 +102,7 @@ void TestPortalApproachesAndLookAngles()
     bool coherent = true;
     float maximumLowering = 0.0f;
     std::uint64_t cases = 0u;
+    for (const float aspect : {1.0f, 16.0f / 9.0f})
     for (const auto profile : {PlayerMountProfile::LegacyViewRelative, PlayerMountProfile::AnatomicalBody})
         for (float yaw : {-3.14159265f, -1.5707963f, 0.0f, 1.5707963f})
             for (float pitch : {-0.32f, 0.0f, 0.28f})
@@ -110,6 +111,7 @@ void TestPortalApproachesAndLookAngles()
                     {
                         HeldItemFixedStepInput input;
                         input.playerMountProfile = profile;
+                        input.logicalViewAspect = aspect;
                         input.playerYawRadians = yaw;
                         input.playerPitchRadians = pitch;
                         input.walkTime = step / 60.0f;
@@ -160,6 +162,7 @@ void TestContinuousWalkAndLookResponse()
     {
         HeldItemFixedStepInput input;
         input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
+        input.logicalViewAspect = kHeldItemSpreadMaximumAspect;
         input.playerZ = -1.5f - 0.01f * step;
         input.playerPitchRadians = 0.28f * std::sin(step * 0.015f);
         input.playerYawRadians = 0.30f * std::sin(step * 0.02f);

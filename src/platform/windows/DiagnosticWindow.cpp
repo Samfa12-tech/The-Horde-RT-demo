@@ -5,6 +5,7 @@
 #include "platform/windows/WindowsRemotePlaytestReport.h"
 #include "audio/SfxVolume.h"
 #include "graphics/GraphicsSettings.h"
+#include "graphics/RtPresentationTransform.h"
 #include "graphics/ForegroundPauseRenderCadence.h"
 #include "platform/windows/WindowsGraphicsPersistence.h"
 #include "graphics/GraphicsPreviewSession.h"
@@ -3936,6 +3937,10 @@ void UpdateDesktopSceneControls(
     }
 #endif
     context.simulationInput = input;
+    context.simulation.SetPresentationAspect(
+        horde::graphics::RtViewAspectFromImageExtent(
+            context.swapchainExtent.width, context.swapchainExtent.height,
+            horde::graphics::RtPresentationTransform::Identity));
     horde::vulkan::raytracing::RtSceneStageScope simulationScope(
         observation, horde::telemetry::RtStage::SimulationStep);
     bool timestampedPlayerInput = !input.hasAuthoritativePlayerPose && !context.benchmark.IsRunning();

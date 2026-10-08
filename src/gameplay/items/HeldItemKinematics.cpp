@@ -663,8 +663,22 @@ FirstPersonSafeFrame EvaluateOwnerFeedbackPortraitSafeFrame(
     return result;
 }
 
+float ComputeHeldItemAspectSpread(const float logicalViewAspect) noexcept
+{
+    if (!std::isfinite(logicalViewAspect) ||
+        logicalViewAspect <= kHeldItemSpreadStartAspect)
+        return 0.0f;
+    const float normalized = std::clamp(
+        (logicalViewAspect - kHeldItemSpreadStartAspect) /
+            (kHeldItemSpreadMaximumAspect - kHeldItemSpreadStartAspect),
+        0.0f, 1.0f);
+    const float smooth = normalized * normalized * (3.0f - 2.0f * normalized);
+    return kHeldItemSpreadMaximumMetres * smooth;
+}
+
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input)
 {
+    const float aspectSpread = ComputeHeldItemAspectSpread(input.logicalViewAspect);
     const bool anatomicalBody = input.playerMountProfile == PlayerMountProfile::AnatomicalBody;
     const float forwardX = std::sin(input.cameraYawRadians);
     const float forwardZ = -std::cos(input.cameraYawRadians);
@@ -811,7 +825,9 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         result.leftHandLocal[axis] = highTarget[axis] +
             (lowTarget[axis] - highTarget[axis]) * lowerBlend;
     }
+    result.leftHandLocal[0] -= aspectSpread;
     result.rightHandLocal = sword.rightHandLocal;
+    result.rightHandLocal[0] += aspectSpread;
     if (anatomicalBody)
     {
         // The closer body-mounted carry rests at lower-chest height rather
@@ -1121,7 +1137,8 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.swordSwingRadians,
         input.interaction,
         input.playerMountProfile,
-        input.playerPitchRadians});
+        input.playerPitchRadians,
+        input.logicalViewAspect});
     if (input.swordItemState != nullptr &&
         input.swordItemState->id == HeldItemId::Sword)
     {
