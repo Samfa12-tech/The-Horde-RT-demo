@@ -1,12 +1,68 @@
 # Android controller and wider-view checkpoint, 8 October 2026
 
 The owner's queue addition is implemented on existing PR18. Physical Android
-controller support is **not yet accepted**. On the owner's return, the exact 6282
-Debug package is installed and opened at the normal entry menu, with preferences
-preserved. Earlier preliminary c8 Backbone feedback keeps its package identity.
-The corrected navigation and normal waterfall guards are now handed over for one
-coherent owner check. Earlier checkpoints below retain their own source, package
-and evidence identities.
+controller support has **partial owner acceptance on the identified BB-51**, with
+the full physical matrix still open. The exact installed 6282 package receives
+positive landscape menu/guard/parry feedback below. Earlier preliminary c8
+feedback keeps its package identity. Earlier checkpoints below retain their own
+source, package and evidence identities.
+
+## Owner landscape check — 6282ab66 / Backbone BB-51
+
+Evidence class: **qualitative owner hands-on feedback on the exact installed
+6282 Debug APK**, SM-S948B / Android 16, **Backbone One PlayStation Edition USB-C,
+model BB-51** (owner-identified). Generation/firmware and Android InputDevice
+descriptor are still unrecorded; no other Backbone/controller model is certified.
+The owner explicitly confirms D-pad and stick select the expected neighboring
+controls on Play/More/Settings and Settings → Graphics → Back: “yes it all works
+well”. Their normal-route report places the skeletons correctly in the waterfall
+room, and landscape parry no longer hits the torch. This accepts that observed
+placement/menu/landscape clearance, not every pose or secondary view.
+
+The owner intentionally switches **Dust to Low** and accepts its appearance.
+This is an owner custom preference, not a new default or matched sustained cost
+result. Dust remains default Off, and motes motion/camera/light/secondary-view
+coverage and Off-versus-Low sustained thermal/power/memory remain separate.
+
+The sword is still drawn at dungeon start. The owner asks whether start-sheathed
+and draw-on-spot belongs here or a future update. The existing behavior remains
+production-disabled while the repaired hand and transitions are reviewed; a
+bounded normal-route/reset/defense readiness check will precede enabling it for
+this 1.6.2 scope. No timing/window/reach or extra enemy change is implied.
+
+The BB-51's fixed attachment prevents the owner from exercising portrait and
+the opposite landscape direction with this controller. At their request, the
+same installed base hash is rechecked and the owned app is reopened for **touch**,
+without reinstall, force-stop, session reset or settings changes. The owner then
+reports portrait/opposite-landscape menus/Graphics, move + look + actions and
+parry hand/hilt clearance all work well, with no issue. This accepts those touch
+observations; it does not close controller orientation coverage. Saved Dust Low
+is confirmed in the returned preference XML (50%, Mobile water/fire, Glass On,
+Current, cap30, Mist On); fresh/reset source defaults remain unchanged.
+
+The owner subsequently detaches the BB-51 during walking with the stick held,
+and separately while holding LT/Parry. Disconnection pauses the game; quick
+reconnection restores controller navigation in the pause menu. **Resume also
+shows “building Vulkan RT” and a long rebuild**, so overall recovery is not
+accepted. LT triggers the existing timed parry on press; holding it does not
+extend the animation. Touch Resume, Home/return, explicit no-phantom/no-stuck
+observations, cold/hot connection, focus and the full retry/ending/confirmation/
+slider route remain unconfirmed. Current stow/wide body/shadows/reflections,
+sustained performance and independent audit remain open.
+
+On USB return, a bounded owned-PID excerpt records completed generation3/5
+initializations at 17,723.948 / 19,595.814 ms and their subsequent presentations.
+Generation7 records 34,399.761 ms initialization, with 34,217.056 ms in the
+pipeline bundle, but that surface generation was cancelled during creation;
+it does not own a presented recovery frame. Earlier real rotation/suboptimal
+output recreations reuse the compiled pair in 228.985 / 169.530 ms. These are
+native CPU initialization durations, not displayed pauses, sustained FPS or
+causal proof of which configuration event caused teardown. No VUID/fatal markers
+appear in this owned excerpt. Source manifest handles orientation/screenSize
+but lacks keyboard/navigation hot-plug changes; that activity-recreation path is
+under focused regression investigation. Physical corrected-build A/B remains
+pending. The earlier quiet USB-return excerpt has no render markers; absence of
+optional markers is not itself a render failure.
 
 ## Installed phone handoff — 6282ab66
 

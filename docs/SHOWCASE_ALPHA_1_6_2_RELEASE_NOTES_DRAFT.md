@@ -16,12 +16,17 @@ the exact APK was installed on SM-S948B / Android 16: pulled base hash matches,
 zero saved-preference changes, free rotation preserved. Ordinary cold launch
 reaches the real portrait entry menu. The owned startup excerpt contains one
 surface-presented marker, with no VUID/fatal markers; this is not an exact RT
-frame/hash join, route or performance pass. The owner is testing the corrected
-menus and normal guards with the USB-C Backbone. Physical acceptance, lifecycle
-matrix, current moving equipment/body/secondary views and combat readability,
-phone quality/cost and independent audit remain open. Dust stays Off by default;
+frame/hash join, route or performance pass. The owner accepts corrected D-pad/
+stick menus, normal guard placement and parry-to-torch clearance in landscape
+with the Backbone One PlayStation Edition USB-C **BB-51**. Owner-selected Dust Low
+looks good; source default stays Off. Touch in portrait/opposite-landscape also
+works well, including parry spacing. Those BB-51 orientations cannot be exercised
+with its fixed mounting. Held-stick/LT disconnect pauses and reconnect restores
+menu control, but Resume rebuilds RT slowly; recovery remains open. The physical matrix,
+current stow/body/secondary views and combat contact calibration, phone quality/
+cost and independent audit remain open. Dust stays Off by default;
 shafts deferred. No release. Documentation CI is separate from runtime CI.
-[Exact install, artifacts, failure and validation ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#installed-phone-handoff--6282ab66).
+[Exact install, artifacts, failure and validation ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#owner-landscape-check--6282ab66--backbone-bb-51).
 
 **Earlier 8 October integrated controller/pose checkpoint:** runtime
 `454d58ee0f71bdb837a75ce486d6c139e03e0b02` adds native-dialog focus suspension

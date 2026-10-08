@@ -1,5 +1,52 @@
 # Android RT Device Compatibility Record
 
+## 8 October BB-51 held-input disconnect — SM-S948B / Android 16
+
+Evidence class: **owner partial recovery observation plus bounded owned-log
+initialization evidence**, exact installed 6282 APK as below. Detaching while
+walking with the stick held, and separately holding LT, pauses the game; quick
+reconnect restores controller pause-menu navigation. Resume triggers a long
+“building Vulkan RT” rebuild, so recovery remains open. Owned logs show generation
+3/5 initialization at 17,723.948/19,595.814 ms then presentation, and cancelled
+generation7 initialization at 34,399.761 ms (pipeline bundle 34,217.056 ms).
+Generation7 is not presented recovery evidence. Earlier same-context rotation
+rebuilds reuse pipelines in 228.985/169.530 ms. These are CPU init durations,
+not displayed latency/FPS or proven controller-config causality; no VUID/fatal
+markers in the excerpt. Keyboard/navigation activity configuration ownership is
+being investigated. Touch Resume, Home/return and explicit no-stuck/no-phantom
+recovery observations remain unconfirmed. [Exact feedback and limits](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#owner-landscape-check--6282ab66--backbone-bb-51).
+
+## 8 October owner portrait / opposite-landscape touch check — SM-S948B / Android 16
+
+Evidence class: **owner touch feedback after exact installed-base hash recheck**
+on source `6282ab66289775c6c8360a7feb3afd6d554f1787`, Debug APK SHA-256
+`11a49d954a714867cb1e8dbdf8c3690b05d3d7523f4c8efc8bc23b654f974853`.
+At the owner's request, the same app reopens without reinstall, force-stop,
+session reset or preference modification. Portrait and the opposite landscape
+menus/Graphics, move + look + actions and parry hand/hilt clearance are reported
+as working well with no issue. The BB-51's fixed mounting prevents those physical
+controller orientations; **touch evidence does not close that controller gap**.
+Owner-selected Dust Low is preserved and confirmed in the returned preferences.
+Controller unplug-held-action/touch recovery/reconnect/Home remains requested,
+not passed. No new exact RT capture, secondary-view or sustained performance
+claim follows. [Combined exact feedback and limits](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#owner-landscape-check--6282ab66--backbone-bb-51).
+
+## 8 October owner landscape menu/guard/parry check — SM-S948B / Android 16
+
+Evidence class: **owner hands-on qualitative acceptance on exact installed
+6282 Debug package**. Source `6282ab66289775c6c8360a7feb3afd6d554f1787`, APK
+SHA-256 `11a49d954a714867cb1e8dbdf8c3690b05d3d7523f4c8efc8bc23b654f974853`.
+Controller owner-identified as **Backbone One PlayStation Edition USB-C, BB-51**;
+firmware/Android descriptor remain unrecorded. In landscape, the owner confirms
+correct D-pad/stick neighbors on entry and Settings/Graphics/Back, correct normal
+waterfall guard placement and parry clearance from the torch. They switch Dust
+to Low and accept its appearance; this is a custom preference, not the default
+or sustained cost acceptance. Sword-starts-stowed remains production-disabled.
+Portrait/opposite landscape, unplug-held-action/touch recovery, reconnect/Home
+and full physical matrix are requested and pending. This accepts these observed
+behaviors on this identified combination, not all Backbone hardware, all poses,
+secondary views or displayed/sustained FPS. [Exact feedback and remaining checks](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#owner-landscape-check--6282ab66--backbone-bb-51).
+
 ## 8 October corrected menu / normal guard handoff — SM-S948B / Android 16
 
 Evidence class: **exact Debug install/pullback and preference preservation,
