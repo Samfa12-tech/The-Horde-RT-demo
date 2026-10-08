@@ -1,5 +1,9 @@
 # Android RT Device Compatibility Record
 
+## 9 October heart-only HUD — 7766ea3a / SM-S948B / Android 16
+
+Evidence class: **exact Debug installation/pullback and normal-Play HUD image/accessibility hierarchy**. Four-ABI APK `516f1ace49dedab29ed266a0b1b7ef92e9bcbbc855818be81ce36a492dabb748` shows three red hearts and no visible vitality caption; accessible current/max remains. Game settings and accepted menu mix are unchanged; framework launch bookkeeping is separate. 243 Java tests/38 classes, lint, Android/Windows builds and three host regressions pass. Hollow states/future maxima are automated bitmap/HUD evidence, not physical damage or upgrade acceptance; orientation/controller, spoken screen reader, Windows appearance and sustained performance remain separate. Owned app stopped. [Exact subject, cropped image and limits](ENGINEERING_1_6_2_HEART_HUD_2026_10_09.md).
+
 ## 8 October warm default-profile benchmark — 2a408613 / SM-S948B / Android 16
 
 Evidence class: **exact newly traced default-tuple controlled benchmark and actual image-presentation intervals**, without sustained or owner quality acceptance. on the same exact isolated 2a408613 benchmark APK, newly traced 50% / Mobile / Glass Off / Current / cap30 / Mist On / Dust Off completes the two-lap route with 1,838 exact measured timestamp joins. A warm 82.137502104-second span supplies 22.364936 actual presented images/s, 41.666667 ms median and 75 ms p95 intervals; thermal status is 1. This is a measured short-route gap, not thermally matched/sustained ordinary play or owner quality acceptance. The isolated original 75% save is restored and owned app stops. 40/33 comparison, sustained/physical gates and owner decisions remain pending. [Exact observation and limits](ENGINEERING_1_6_2_MOBILE_QUALITY_MEASUREMENTS.md).
