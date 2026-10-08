@@ -65,9 +65,9 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 61u,
-          "development registry retains prior views and admits the scoped torch-parry sample");
-    Check(FindDevelopmentCheckpoint(161) == nullptr,
+    Check(kDevelopmentCheckpoints.size() == 64u,
+          "development registry retains prior views and admits three scoped grate-bottom angles");
+    Check(FindDevelopmentCheckpoint(164) == nullptr,
           "development lookup rejects IDs beyond the admitted samples");
     const auto* torchParry = FindDevelopmentCheckpoint("player-torch-parry-clearance");
     simulation::GameSimulation stagedTorchParry;
@@ -149,12 +149,27 @@ int main()
         }
         ++layoutId;
     }
+    for (const std::string_view name : {"wall-panel-bottom", "wall-panel-bottom-left", "wall-panel-bottom-right"})
+    {
+        const auto* bottom = FindDevelopmentCheckpoint(name);
+        simulation::GameSimulation stagedBottom;
+        Check(bottom != nullptr && bottom->baseShowcaseCheckpointId == 2 &&
+                  bottom->pitch == -0.32f && bottom->combatPose == DevelopmentCombatPose::Rest &&
+                  !bottom->usesGlassFixture && !bottom->usesProductionRewardProps &&
+                  !bottom->stagesWaterfallGuards && bottom->primaryArmsMayBeOutsideFrame &&
+                  FindShowcaseCheckpoint(bottom->id) == nullptr &&
+                  StageDevelopmentCheckpointSimulation(stagedBottom, *bottom) &&
+                  stagedBottom.Snapshot().playerX == bottom->cameraX &&
+                  stagedBottom.Snapshot().playerZ == bottom->cameraZ &&
+                  stagedBottom.Snapshot().torchLightStrength > 0.0f && stagedBottom.Events().Empty(),
+              "grate-bottom inspections retain ordinary zero-delta torch state and remain Debug-only");
+    }
     const auto* levelPanel = FindDevelopmentCheckpoint("layout-c-wall-panel");
     const auto* upwardPanel = FindDevelopmentCheckpoint("layout-c-wall-panel-upward");
     using horde::platform::windows::HasExpectedPlayerCaptureVisibility;
     for (const auto& capture : kDevelopmentCheckpoints)
-        Check(capture.primaryArmsMayBeOutsideFrame == (capture.id == 152),
-              "only the close upward C152 enclosure view declares cropped primary arms");
+        Check(capture.primaryArmsMayBeOutsideFrame == (capture.id == 152 || (capture.id >= 161 && capture.id <= 163)),
+              "only explicit upper/lower level inspection views declare cropped primary arms");
     Check(!HasExpectedPlayerCaptureVisibility(true, true, true, 0u, false) &&
               HasExpectedPlayerCaptureVisibility(true, true, true, 1u, false) &&
               HasExpectedPlayerCaptureVisibility(true, true, false, 0u, false) &&

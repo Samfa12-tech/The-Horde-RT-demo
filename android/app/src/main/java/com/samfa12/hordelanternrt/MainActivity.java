@@ -4790,6 +4790,10 @@ public class MainActivity extends Activity {
             case "dust-ellipsoid": return 158;
             case "dust-box-wall": return 159;
             case "player-torch-parry-clearance": return 160;
+            case "layout-c-wall-panel-upward": return 152;
+            case "wall-panel-bottom": return 161;
+            case "wall-panel-bottom-left": return 162;
+            case "wall-panel-bottom-right": return 163;
             default: return -1;
         }
     }
@@ -5001,6 +5005,10 @@ public class MainActivity extends Activity {
             case 158: return new float[]{-1.5707963f, 0.14f};
             case 159: return new float[]{0.70f, -0.08f};
             case 160: return new float[]{-1.561293f, -0.04f};
+            case 152: return new float[]{3.1415927f, 0.28f};
+            case 161: return new float[]{3.1415927f, -0.32f};
+            case 162: return new float[]{2.646f, -0.32f};
+            case 163: return new float[]{3.637f, -0.32f};
             default: return null;
         }
     }

@@ -2,6 +2,7 @@
 #include "scene/ShowcaseOverheadGeometry.h"
 #include "gameplay/ShowcaseRoute.h"
 #include "gameplay/DevelopmentCheckpoints.h"
+#include "gameplay/CorridorCollision.h"
 
 #include <algorithm>
 #include <array>
@@ -291,6 +292,59 @@ bool CheckPanelMasonryWell()
        std::abs(MasonryWellDistance(another,{.5f,4.5f,-1},{1,0,0})-1.5f)>1e-5f) return false;
     return walls.size()*12u==48u;
 }
+float PanelBottomDistance(Point origin, Point direction)
+{
+    float distance=1e9f;
+    for (const auto& solid:horde::scene::kWallPanelBottomSolids)
+        distance=std::min(distance,BoxDistance(origin,direction,{solid[0],solid[1]}));
+    return distance;
+}
+bool CheckPanelBottom()
+{
+    using namespace horde::gameplay;
+    const auto check=[](bool passed,const char* message) {
+        if (!passed) std::cerr<<"Panel bottom: "<<message<<'\n';
+        return passed;
+    };
+    bool passed=true;
+    // Camera/secondary rays into the formerly unbounded lower recess must
+    // meet masonry across its entire footprint, including both jamb joins.
+    for (float x:{2.051f,2.10f,2.40f,2.575f,2.96f,3.099f})
+        for (float z:{-8.799f,-8.78f,-8.58f,-8.351f})
+            passed=check(std::abs(PanelBottomDistance({x,.70f,z},{0,-1,0})-
+                (.70f-kRouteFloorWorldY))<1e-5f,"lower recess must have a flush floor")&&passed;
+    // Real downward sight lines from nearby walkable approaches. Without
+    // the base they pass under the rear/side walls and escape to the sky.
+    const Point target{2.575f,kRouteFloorWorldY-.001f,-8.57f};
+    for (Point eye:std::array<Point,3>{{{2.575f,.70f,-10.20f},
+                                     {1.75f,.70f,-10.10f},{3.40f,.70f,-10.10f}}}) {
+        const auto delta=Difference(target,eye),direction=Normalise(delta);
+        passed=check(PanelBottomDistance(eye,direction)<std::sqrt(Dot(delta,delta)),
+            "downward approach must hit stone before leaving the tomb")&&passed;
+        passed=check(IsShowcasePlayerPositionWalkable(eye[0],eye[2]),
+            "inspection uses an ordinary walkable position")&&passed;
+    }
+    // Opaque shadow rays in both directions through the underside are
+    // occluded; an upward ray starting above the floor still reaches the well.
+    passed=check(PanelBottomDistance({2.575f,-1.50f,-8.57f},{0,1,0})<.6f,
+        "underside must block incoming light")&&passed;
+    passed=check(PanelBottomDistance({2.575f,.70f,-8.57f},{0,1,0})>1e8f,
+        "base must preserve the upper light opening")&&passed;
+    // This non-walkable pocket needs no second collider or route expansion.
+    // Walking into the bars stays blocked; movement parallel to them is free.
+    for (float x:{2.10f,2.575f,3.05f}) {
+        float proposedX=x,proposedZ=-8.55f;
+        ResolveCorridorPlayerCollision(x,-9.10f,proposedX,proposedZ);
+        passed=check(proposedZ<=-8.80f-kPlayerCollisionRadius+1e-4f&&
+            !IsShowcasePlayerPositionWalkable(x,-8.57f),
+            "grate recess must stay inaccessible")&&passed;
+    }
+    float x=3.55f,z=-9.10f;
+    ResolveCorridorPlayerCollision(1.60f,z,x,z);
+    passed=check(std::abs(x-3.55f)<1e-5f&&std::abs(z+9.10f)<1e-5f,
+        "stone base must not obstruct the corridor")&&passed;
+    return passed;
+}
 float GridDistance(Point origin,Point direction)
 {
     float distance=1e9f;
@@ -422,6 +476,7 @@ int main()
     passed=CheckSprig({{-4.0f,5.5f,-8.0f},2.30f,5.9f})&&passed;
     passed=CheckGridAndCeiling()&&passed;
     passed=CheckPanelMasonryWell()&&passed;
+    passed=CheckPanelBottom()&&passed;
     for(const auto& placement:horde::scene::kWallPanelSprigs) {
         passed=CheckSprig(placement)&&passed;
         const auto faces=horde::scene::MakeHangingSprig(placement.attachment,placement.length,placement.phase,placement.leafPlane);
@@ -460,6 +515,6 @@ int main()
     passed=LeafPixelHits(LeafFaces(original),ProductionCamera(0,0,960,540))==0&&passed;
     std::cout<<"shaft faces="<<totalFaces<<" triangles="<<totalFaces*2<<" bytes="<<meshBytes
              <<" cameraStates="<<cameraStates<<" minimumUnoccludedLeafPixelHits="<<minimumHits
-             <<" panelLeafPixelHits="<<panelHits<<" gridBars=13 gridTriangles=156 panelTriangles=336 panelWellTriangles=48\n";
+             <<" panelLeafPixelHits="<<panelHits<<" gridBars=13 gridTriangles=156 panelTriangles=336 panelWellTriangles=48 panelBottomTriangles=12\n";
     return passed?0:1;
 }

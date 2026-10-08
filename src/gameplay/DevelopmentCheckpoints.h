@@ -58,7 +58,7 @@ struct DevelopmentCheckpoint
     std::uint32_t waterfallGuardFixedTicks = 0u;
 };
 
-inline constexpr std::array<DevelopmentCheckpoint, 61u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 64u> kDevelopmentCheckpoints{{
     {100, "pbr-sword-closeup", 0, 0.0f, 1.85f, 0.0f, -0.18f},
     {101, "pbr-torch-fire", 0, 0.0f, 1.85f, 0.0f, -0.14f},
     {102, "player-body-grips", 0, 0.0f, 1.85f, 0.0f, -0.32f},
@@ -246,6 +246,17 @@ inline constexpr std::array<DevelopmentCheckpoint, 61u> kDevelopmentCheckpoints{
     // separate encounter/equipment seed used by the staged guard previews.
     {160, "player-torch-parry-clearance", 2, 0.495964f, -15.143019f, -1.561293f, -0.04f,
      DevelopmentCombatPose::ParryActive},
+    // Ordinary legal views of the first-bend grate's floor and two returns.
+    // These inspect level geometry; dedicated primary ownership still applies.
+    {.id = 161, .name = "wall-panel-bottom", .baseShowcaseCheckpointId = 2,
+     .cameraX = 2.575f, .cameraZ = -10.20f, .yaw = 3.14159265359f,
+     .pitch = -0.32f, .primaryArmsMayBeOutsideFrame = true},
+    {.id = 162, .name = "wall-panel-bottom-left", .baseShowcaseCheckpointId = 2,
+     .cameraX = 1.75f, .cameraZ = -10.10f, .yaw = 2.646f,
+     .pitch = -0.32f, .primaryArmsMayBeOutsideFrame = true},
+    {.id = 163, .name = "wall-panel-bottom-right", .baseShowcaseCheckpointId = 2,
+     .cameraX = 3.40f, .cameraZ = -10.10f, .yaw = 3.637f,
+     .pitch = -0.32f, .primaryArmsMayBeOutsideFrame = true},
 }};
 
 constexpr const DevelopmentCheckpoint* FindDevelopmentCheckpoint(std::string_view name)

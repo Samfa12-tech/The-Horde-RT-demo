@@ -3537,6 +3537,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     addRouteWallZ(-8.35f, 2.05f, 3.10f, SurfaceBack);
     addRouteWallX(2.05f, -8.8f, -8.35f, SurfaceRight);
     addRouteWallX(3.10f, -8.8f, -8.35f, SurfaceLeft);
+    // Close the unintended downward escape beneath the grate. The closed
+    // stone base joins the route floor and embeds into all three retained
+    // walls; the bars, walkable bounds and upper light aperture are unchanged.
+    for (const auto& base : horde::scene::kWallPanelBottomSolids)
+    {
+        addWorldBox(base[0][0], base[0][1], base[0][2],
+                    base[1][0], base[1][1], base[1][2], SurfaceMossyStone);
+    }
     // Extend this small entry-side panel into an open masonry light well.
     // Four real walls rise 2.75 m above its retained roof/jambs, preserving the
     // clear opening, bars and growth below. Consolidate into the existing world

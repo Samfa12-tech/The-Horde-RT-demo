@@ -40,6 +40,15 @@ constexpr std::array<OverheadVolume, 4u> MakeMasonryWell(
 inline constexpr auto kWallPanelMasonryWell = MakeMasonryWell(
     2.05f, -8.80f, 3.10f, -8.35f, kShowcaseRouteCeilingWorldY, 4.10f, 0.16f);
 
+// Closed ordinary masonry solids beneath the retained first-bend grate.
+// Low/high corners feed the same world-box builder on both RT backends.
+using DressingBox = std::array<DressingPoint, 2u>;
+// Flush with the corridor floor at its front edge. The side/back ends embed
+// 2 cm into the retained wall planes; no coplanar overlap with the route floor.
+inline constexpr std::array<DressingBox, 1u> kWallPanelBottomSolids{{
+    {{{2.03f, -1.13f, -8.80f}, {3.12f, -0.95f, -8.33f}}},
+}};
+
 // Static opaque mesh authoring data. Leaves have an actual diamond silhouette
 // and thickness: no alpha cards, invisible obstruction or extra texture fetch.
 // This recipe can be instanced/consolidated for any supported masonry rim.
