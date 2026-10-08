@@ -1,6 +1,6 @@
 # 1.6.2 tomb finish — active post-reset work
 
-**8 October prepared normal waterfall candidate:** source `6282ab66289775c6c8360a7feb3afd6d554f1787`
+**8 October installed normal waterfall candidate:** source `6282ab66289775c6c8360a7feb3afd6d554f1787`
 now puts the accepted two lateral, east-facing guards in normal play and retains
 their distinct walking phase. Bay/Keeper imports and retries preserve that
 placement. Sword-starts-stowed stays independently disabled. Seven affected
@@ -8,15 +8,20 @@ native checks, Windows/four-ABI builds and 26 frozen Pipeline/Compute checkpoint
 frame/PNG/mesh joins pass with zero validation errors. This is not moving or
 phone acceptance.
 
-Prepared APK SHA-256 `11a49d954a714867cb1e8dbdf8c3690b05d3d7523f4c8efc8bc23b654f974853`; Windows executable SHA-256 `b0d07f3c2906b461751ea9301bc3e9695f20a71e684df0c9f87c01e377a4f711`.
+Installed APK SHA-256 `11a49d954a714867cb1e8dbdf8c3690b05d3d7523f4c8efc8bc23b654f974853`; Windows executable SHA-256 `b0d07f3c2906b461751ea9301bc3e9695f20a71e684df0c9f87c01e377a4f711`.
 The manifest, 91 assets and Java dex match 6fa; its 222-test/35-class Java/lint
 result and completed 12/12 CI remain scoped to that source. New 628 source CI
-completes 12/12 (push 37729370167 / PR 37729376579). The APK is **not installed**; the owner's
-c8 phone session remains paused. Corrected directional menu/physical controller
+completes 12/12 (push 37729370167 / PR 37729376579). On the owner's return,
+the exact APK was installed on SM-S948B / Android 16: pulled base hash matches,
+zero saved-preference changes, free rotation preserved. Ordinary cold launch
+reaches the real portrait entry menu. The owned startup excerpt contains one
+surface-presented marker, with no VUID/fatal markers; this is not an exact RT
+frame/hash join, route or performance pass. The owner is testing the corrected
+menus and normal guards with the USB-C Backbone. Physical acceptance, lifecycle
 matrix, current moving equipment/body/secondary views and combat readability,
 phone quality/cost and independent audit remain open. Dust stays Off by default;
-shafts deferred. No release.
-[Exact artifact, failure and validation ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#prepared-normal-waterfall-encounter--6282ab66).
+shafts deferred. No release. Documentation CI is separate from runtime CI.
+[Exact install, artifacts, failure and validation ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#installed-phone-handoff--6282ab66).
 
 **Earlier 8 October integrated controller/pose checkpoint:** runtime
 `454d58ee0f71bdb837a75ce486d6c139e03e0b02` adds native-dialog focus suspension
@@ -62,9 +67,11 @@ Slight extra equipment separation in wider viewports must use aspect ratio and
 shared hand/Grip pose ownership, preserve portrait, combat reach and hit timing.
 Android physical acceptance requires an exact phone/OS/APK/controller matrix;
 Windows, synthetic events and builds cannot close it. The owner returned and
-the intended phone was verified on 8 October; c8 is installed with preferences
-preserved. The physical matrix is pending the owner-controlled USB/Backbone
-cable swap. If the owner takes the phone away again, hold all device work and
+the intended phone was verified on 8 October; 6282 is installed with preferences
+preserved and the normal entry menu is handed to the owner. Earlier c8 feedback
+retains its original package identity. The full physical matrix is pending the
+owner-controlled USB/Backbone cable swap and hands-on observations. If the owner
+takes the phone away again, hold all device work and
 owner test requests until explicit return and verification. Continue safe host
 work and push coherent checkpoints on PR18. No release is authorized.
 

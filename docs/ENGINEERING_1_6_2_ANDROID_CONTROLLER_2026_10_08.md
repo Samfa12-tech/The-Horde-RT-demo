@@ -1,10 +1,48 @@
 # Android controller and wider-view checkpoint, 8 October 2026
 
 The owner's queue addition is implemented on existing PR18. Physical Android
-controller support is **not yet accepted**. The owner returned; the exact c8
-Debug package is installed with preferences preserved. Preliminary Backbone owner feedback is recorded; corrected navigation and
-normal waterfall encounter packages are prepared for the next coherent check. Earlier away-device checkpoints below retain
-their own source, package and evidence identities.
+controller support is **not yet accepted**. On the owner's return, the exact 6282
+Debug package is installed and opened at the normal entry menu, with preferences
+preserved. Earlier preliminary c8 Backbone feedback keeps its package identity.
+The corrected navigation and normal waterfall guards are now handed over for one
+coherent owner check. Earlier checkpoints below retain their own source, package
+and evidence identities.
+
+## Installed phone handoff — 6282ab66
+
+At 2026-10-08 05:06:23 UTC, the intended **SM-S948B / Android 16** receives the
+sealed 6282 APK described below. Installed base SHA-256 exactly matches
+`11a49d954a714867cb1e8dbdf8c3690b05d3d7523f4c8efc8bc23b654f974853`.
+There are **zero changed preference entries**; owner rotation `free` is unchanged.
+Only the owned Debug app is stopped before replacement. The previous c8 paused
+session and owned log excerpt are retained as historical evidence; no uninstall,
+data clear, rotation override or other app operation is performed.
+
+Normal cold launch succeeds (Android launch report TotalTime 526 ms / WaitTime
+528 ms), with no scenario extras. An owned startup log excerpt contains one
+`HORDE_SURFACE_PRESENTED` and 12 `HORDE_GPU` markers, zero VUID/fatal markers.
+These are excerpt counts, not whole-route validation, an exact owning RT image
+join, displayed/sustained FPS or controller acceptance. The foreground is
+verified as this app before capturing the portrait entry screenshot: 1440 x 3120,
+SHA-256 `add875b165883936d325033890d8d1ec921f2e3445a0bb80b1257722487f1cf2`. Its real separate Play/More/Settings plaques and central
+lantern are visually inspected. This is an app-window screenshot, not RT storage
+image evidence or a new owner appearance approval.
+
+The owner is asked to test D-pad/stick neighboring controls through entry and
+Settings/Graphics/Back, then the ordinary first-room/waterfall route and parry
+hilt/hand versus torch in their chosen orientation. No automation runs while
+they hold the phone. Backbone One PlayStation Edition USB-C is owner-identified;
+generation/firmware/Android descriptor remain unrecorded. Connection/lifecycle/
+rotation/unplug/reconnect/Home and first-touch recovery matrix, current moving
+appearance, sustained quality/cost and independent audit remain open.
+
+Private receipts in the 6282 seal: `install-receipt-private.json`,
+`installed-base.apk`, before/after preference XML, `phone-normal-launch-private.txt`,
+`phone-new-candidate-last250-log-private.txt` and `phone-current-entry.png`.
+The first screenshot guard looked only for Android's older `mResumedActivity`
+field and failed before capture; the corrected bounded check admits Android16
+`topResumedActivity`/`ResumedActivity` only when both belong to this app.
+No product failure or foreign app screenshot is inferred.
 
 ## Prepared normal waterfall encounter — 6282ab66
 
@@ -29,8 +67,9 @@ Exact artifacts: `task-4/integrated-162-6282ab66-20261008`.
 All four native libraries change; manifest, 91 assets and Java dex are identical
 to 6fa. SDK37 16 KiB alignment passes. The 222-test/35-class Java and lint result
 is retained at **6fa**, with no fresh Java rerun claimed for this native slice.
-The prepared APK includes that directional fix; neither change is physically
-accepted yet. The installed c8 phone session remains paused and untouched.
+The prepared APK includes that directional fix. Neither change is physically
+accepted at this build checkpoint; the later exact install/handoff is recorded
+above. The c8 paused session was preserved throughout this host work.
 
 Seven affected native CTests pass in 52.50 s: simulation gameplay, motion
 scenarios, ordinary production route, showcase collision route, simulation
@@ -70,8 +109,9 @@ the waterfall; it does not establish normal moving-combat readability.
 
 Current source CI completes **12/12**: push 37729370167 and PR 37729376579
 each pass 6/6. Previous navigation
-6fa and documentation 1abd each complete their own 12/12 aggregates. Documentation
-for this candidate has separate CI. Current moving body/shadow/reflection, phone
+6fa and documentation 1abd each complete their own 12/12 aggregates. Previous documentation 78b804bc also completes its own 12/12 aggregate (push
+37730472200 / PR 37730476379); this install record has separate CI. Current
+moving body/shadow/reflection, phone
 route/controller recovery, corrected menu acceptance and combat readability
 remain open. Dust/cost, audio/haptics, quality decision and Eric's independent
 final audit remain open. No release is authorised.

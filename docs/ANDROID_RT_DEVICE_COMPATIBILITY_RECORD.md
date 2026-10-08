@@ -1,5 +1,22 @@
 # Android RT Device Compatibility Record
 
+## 8 October corrected menu / normal guard handoff — SM-S948B / Android 16
+
+Evidence class: **exact Debug install/pullback and preference preservation,
+owned startup excerpt and foreground app screenshot; owner recheck pending**.
+Source `6282ab66289775c6c8360a7feb3afd6d554f1787`, APK SHA-256
+`11a49d954a714867cb1e8dbdf8c3690b05d3d7523f4c8efc8bc23b654f974853`,
+138,462,724 bytes. Pulled installed base matches; zero changed preference entries,
+free rotation unchanged. Normal cold launch reaches the real portrait entry
+menu. The owned excerpt contains one surface-presented and 12 GPU markers,
+zero VUID/fatal markers; no exact RT image/submission/hash join, route, controller,
+moving appearance or sustained/displayed-FPS pass is claimed. The owner receives
+this candidate for corrected directional menus, normal waterfall guards and
+parry hand/hilt inspection. The USB-C Backbone takes the phone port; device
+commands are held during hands-on testing. Earlier c8 preliminary feedback
+retains its own package identity. The full physical matrix and sustained phone
+quality/cost remain open. [Exact install and limits](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#installed-phone-handoff--6282ab66).
+
 ## 8 October preliminary owner controller check — SM-S948B / Android 16
 
 Evidence class: **owner manual feedback on exact installed c8 Debug package**.
@@ -9,7 +26,8 @@ and movement/look/combat/interact/pause worked well overall; directional selecti
 is defective and entry plaques are not directional. No other missed/stuck input
 was reported. Corrected-source 6fa physical checks, the full cold/hot/lifecycle/
 rotation/disconnect matrix and sustained performance remain pending.
-Same PID 11530 is left paused after USB return. Its screenshot/owned log excerpt
+At that c8 checkpoint, the same PID 11530 remains paused after USB return. Its
+screenshot/owned log excerpt
 supplies one surface-presented marker, but no completed RT image/hash join or
 sustained/displayed FPS. [Exact source, package and limits](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#prepared-directional-navigation-follow-up--6faab4ff).
 
