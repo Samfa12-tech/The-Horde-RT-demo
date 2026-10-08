@@ -1,5 +1,7 @@
 # Final graphics defaults and mist control
 
+**Current owner decisions — 9 October:** ordinary dungeon play at experimental 33% is owner-approved as surprisingly good; 50% remains the mobile resolution default. The owner now requests Dust **Low by default in the final packaged build**, preserving saved Off/custom preferences; implementation and fresh/reset regression checks are queued after the current water checkpoint. This supersedes the earlier prototype-Off requirement. Owner audio and haptics are approved. The long sustained phone performance/thermal programme is deferred from this goal at the owner's direction; retain exact measured gaps and do not claim sustained 30 FPS. The bounded torch-water colour fix is in progress; the reported player/Keeper clipping through Keeper-room torch stands is confirmed and queued next. Final integrated checks and Eric's independent audit remain required. No merge or release is authorised.
+
 This ledger retains the historical 5 October pause checkpoint. The owner has
 authorized post-reset standalone tomb work in [the active plan](ENGINEERING_1_6_2_TOMB_FINISH.md);
 that later scope supersedes conflicting pause or future-version restrictions.
