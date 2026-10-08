@@ -1,6 +1,19 @@
 # 1.6.2 tomb finish — active post-reset work
 
-**8 October equipment inspection checkpoint:** runtime
+**8 October controller/aspect inspection checkpoint:** candidate
+`a6c19938994db95f9764b7fcf3eaa888811ecc1f` adds standard Android controller input,
+native menu/dialog/slider navigation, active-input HUD separation and safe
+lifecycle/disconnect recovery through the existing shared simulation. Wider
+viewports separate the solved equipment targets slightly; portrait is unchanged.
+211 Android tests, lint, four-ABI Debug build, affected native checks and eight
+corrected frozen RT captures pass. The APK remains uninstalled while the owner
+is away. `cb7c80f6` CI passes 12/12; the Windows capture follow-up has separate
+CI. Physical Android/controller, current moving equipment/secondary views/full
+route, sustained phone quality/cost, changed audio/haptics and independent final
+audit remain open. Dust stays optional/default Off; shafts deferred. No release.
+[Exact sources, package hashes, retained failures and acceptance matrix](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md).
+
+**Earlier 8 October equipment inspection checkpoint:** runtime
 `c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` retains the sheathed right hand through
 shared IK and keeps the parry hilt/right sleeve clear of the normal torch.
 Ten affected native checks,183 Java tests, Windows/four-ABI Debug builds and
@@ -31,6 +44,10 @@ Windows, synthetic events and builds cannot close it. The owner is away with the
 phone: no ADB/device work, device waits or owner test requests until explicit
 return and intended-device verification. Continue safe host implementation and
 push coherent checkpoints on PR18. No release is authorized.
+
+The queue implementation and corrected frozen aspect delivery are now checked
+on the host; the exact physical matrix remains outstanding in the
+[controller/aspect ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md).
 
 ## Preserved completed evidence
 
@@ -151,6 +168,7 @@ that package and do not close moving contact, owner acceptance or sustained FPS.
 
 | Slice | Current status | Remaining evidence or decision |
 | --- | --- | --- |
+| Android controller and wider views | Standard Android policy/native routes/HUD mode and recovery in `0fff2b83`; shared aspect poses in `cb7c80f6` and corrected frozen delivery in `a6c19938`. 211 Java tests, lint/four-ABI build, affected native checks and eight current RT stills pass; portrait byte-identical | Exact phone/OS/APK/controller cold/hot/menu/combat/rotation/disconnect/Home/touch-fallback matrix, moving wide poses and owner acceptance; [exact ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md). No hardware certification |
 | Fresh Graphics restore, Android cancellation, Windows focus, Graphics viewport | Implemented in `e1f1b9a0` and `a73a8084`; [regression evidence](ENGINEERING_1_6_2_INPUT_REGRESSIONS_2026_10_07.md). Current `7368e2c7` passes physical-device synthetic whole-gesture Cancel and Menu/Resume for both finger orders on both phone RT backends | Held-touch Home and subsequent fresh move/look/Parry now pass both phone backends; physical Windows controller/focus and owner comfort remain |
 | Combat contact/edge timeline and parry presentation | Measured timeline/parry presentation `a7b500bb`, timestamped edge scheduling and input/tick/pose/presentation trace `1c3909b4`; imported idle-blade contact samples corrected in `ab69537a`, with affected Keeper checks passing on both phone backends | Moving-target contact/range/cone calibration, physical latency and owner feel. Host timing tests cover 15/30/60/120 FPS, hitches and late catch-up parry misses; damage timing requires owner audio/haptic revalidation |
 | Native actions and three original hearts | Press-down Swing/Parry/Dodge and original native hearts committed in `b76ce0e6`; `7368e2c7` fixes warm-up Dodge visibility, passes 177/177 Android tests in 30 classes and the combined 32-case diagonal synthetic touch matrix on both physical phone RT backends. Owner ordinary playtest of `ccd70d38` accepts touch comfort; earlier `ab69537a` active-draw Home evidence remains separate | Measured touch latency, successful parry/riposte and remaining owner audio/haptic acceptance; synthetic held-touch Home/fresh Parry passes on both phone backends |

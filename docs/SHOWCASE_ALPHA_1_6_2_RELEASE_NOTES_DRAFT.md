@@ -1,6 +1,19 @@
 # Horde Lantern RT 1.6.2 development notes
 
-**8 October equipment inspection checkpoint:** runtime
+**8 October controller/aspect inspection checkpoint:** candidate
+`a6c19938994db95f9764b7fcf3eaa888811ecc1f` adds standard Android controller input,
+native menu/dialog/slider navigation, active-input HUD separation and safe
+lifecycle/disconnect recovery through the existing shared simulation. Wider
+viewports separate the solved equipment targets slightly; portrait is unchanged.
+211 Android tests, lint, four-ABI Debug build, affected native checks and eight
+corrected frozen RT captures pass. The APK remains uninstalled while the owner
+is away. `cb7c80f6` CI passes 12/12; the Windows capture follow-up has separate
+CI. Physical Android/controller, current moving equipment/secondary views/full
+route, sustained phone quality/cost, changed audio/haptics and independent final
+audit remain open. Dust stays optional/default Off; shafts deferred. No release.
+[Exact sources, package hashes, retained failures and acceptance matrix](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md).
+
+**Earlier 8 October equipment inspection checkpoint:** runtime
 `c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` retains the sheathed right hand through
 shared IK and keeps the parry hilt/right sleeve clear of the normal torch.
 Ten affected native checks,183 Java tests, Windows/four-ABI Debug builds and
@@ -16,8 +29,8 @@ shafts remain deferred. No release follows.
 The exact smaller-dust Windows checkpoint subsequently passes a foreground
 waterfall equipment sequence and requested replay. Corrected draw/action images
 join exact state/completed ticks. Owner review raises empty-hand framing while
-sheathed and possible parry hilt/hand-to-torch interference; these findings are
-open, so production activation and full body/secondary-view/route acceptance
+sheathed and possible parry hilt/hand-to-torch interference; these findings have host-tested source corrections above. Current moving
+acceptance, production activation and full body/secondary-view/route checks
 remain pending.
 [Current motion evidence](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#8-october-visible-windows-waterfall-sequence-and-owner-findings).
 
