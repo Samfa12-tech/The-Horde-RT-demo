@@ -2,8 +2,18 @@
 
 **Execution update, 7 October 2026:** Use [the selected central hanging-lantern direction](design/ui/README.md) in the active 1.6.2 tomb goal. First build one functioning real-RT scene with accessible native controls, flicker/sway, Settings/More pan-left, Play fade-to-black and reduced-motion navigation; stop for owner visual/cost feedback before expanding the style. Graphics remains a separate explicit live preview with exact acknowledgement and normal 15-second confirmation. Loading follows actual loading state and uses a small spinner only. No Continue/save-slot invention, dialogue control, optional tomb dressing or adventure scope. [Current progress and remaining gates](ENGINEERING_1_6_2_TOMB_FINISH.md) distinguish implemented work from these targets; older proposals below remain supporting detail.
 
+**Owner queue update, 8 October 2026:** Complete native Android controller
+navigation and recovery in portrait and both landscape directions is now part
+of this existing tomb goal. Meaningful controller input suppresses touch chrome
+while essential HUD/context still respects saved interface preferences; connection
+and drift cannot take over. Real controls, visible/retained focus, native dialogs,
+sliders and scrolling preserve Graphics Use/Keep/Restore acknowledgement. The
+host implementation and 213-test run are recorded in the [controller ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md).
+The exact physical phone/controller/rotation/large-font/cutout matrix remains
+pending; no support certification follows from those synthetic checks.
+
 **Planning date:** 2 October 2026  
-**Status:** Proposed design and implementation handoff, requested by the owner; no UI implementation or runtime acceptance claimed.  
+**Planning snapshot status (2 October):** Proposed design and implementation handoff, requested by the owner; that planning snapshot claimed no implementation or acceptance. Current source and owner feedback are tracked by the execution records above.
 **Milestone:** After 1.6.1 is completed, accepted, merged and released; before 1.7 expansion. See [ROADMAP](ROADMAP.md#16-2--engine-readiness-and-demo-polish).
 
 ## Recommendation
@@ -25,7 +35,7 @@ This is a source-grounded design proposal with one supplied screenshot reference
 - Windows [DiagnosticWindow.cpp](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/9931cf18fc36369ca6efbe2b785d15f877bf6d31/src/platform/windows/DiagnosticWindow.cpp) supplies the status/vitality text, native controls, DPI layout and menus. Preserve platform-native behaviour rather than importing a browser UI framework.
 - The [Graphics plan](ROADMAP.md#graphics-menu-and-measured-quality-choices) remains authority for settings semantics, real renderer choices and measurements. This document owns presentation and navigation, not a second graphics configuration system.
 
-**Unseen/unverified:** fresh Android HUD and menus, Windows menus, pressed/disabled/focus states, controller navigation, physical touch reach, screen-reader behaviour, lifecycle transitions and performance. Capture these after release before implementation. Old repository screenshots and source-only dimensions are not current visual passes.
+**Planning snapshot limits (2 October):** fresh Android HUD and menus, Windows menus, pressed/disabled/focus states, controller navigation, physical touch reach, screen-reader behaviour, lifecycle transitions and performance had not been inspected. The active tomb goal now records subsequent exact-build evidence and owner feedback; remaining physical/accessibility/performance gates stay explicit. Old screenshots and source-only dimensions are not current visual passes.
 
 ## 1. Visual language and hierarchy
 
