@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "firstRun": {
+    "sourceCommit": "60ed8448c07990d3d2ccf60c5ad2e5b283630444",
+    "runId": "20261009-084719",
+    "mode": "Host",
+    "result": "fail",
+    "cleanBeforeAfter": true,
+    "debugTests": {
+      "pass": 142,
+      "fail": 2,
+      "total": 144,
+      "seconds": 1351.79
+    },
+    "failures": [
+      "horde_rt_raygen_variant_manifest_tests",
+      "horde_rt_raygen_variant_artifact_tests"
+    ],
+    "laterStages": "not run",
+    "ci": {
+      "pushRun": 37849259409,
+      "prRun": 37849265911,
+      "passedJobs": 12,
+      "totalJobs": 12
+    }
+  },
+  "fixtureCommit": "612a8e66eccbbc6d811709e31ac7520c035d4e19",
+  "focusedReruns": {
+    "manifestPassSeconds": 38.54,
+    "firstArtifactResult": "fail at additional stale OpaqueFast pin",
+    "correctedArtifactPassSeconds": 108.38,
+    "scope": "applied working diff before commit, not later immutable candidate"
+  },
+  "runtimeChanged": false,
+  "budgetsChanged": false,
+  "finalShippingEvidence": "pending",
+  "independentAudit": "not performed",
+  "releaseAuthorized": false,
+  "privateEvidenceSha256": {
+    "firstSummary": "99f6274d978ba5e177648e20287b5ce2bb57d2efeb24963408c9b4ed88ee20d6",
+    "firstLog": "e9a10802636d31f84eb16f3e1427c2ba2af264f552beb310ebb7d53d9c27b830",
+    "firstFocusedLog": "16409b802f329815a1ec3d935e7158ded018ea117ae934e81eb26c1de04f3ebc",
+    "correctedArtifactLog": "b72037fcb0fcd06c732c2f6731fe238a7ebf75f103404431b8fd3218065a3e89"
+  }
+}
