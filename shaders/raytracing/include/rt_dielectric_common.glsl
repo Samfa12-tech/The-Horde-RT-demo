@@ -174,7 +174,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     vec3 reflectionDirection = reflect(rayDirection, surfaceNormal);
     vec3 reflected = skyColor(reflectionDirection);
     bool fireRayReflectionOwned = controls.waterQuality >= 1.5;
-    if (controls.waterQuality >= 1.5)
+    if (fireRayReflectionOwned)
     {
         HitInfo reflectedHit = traceScene(h.position + geometricNormal * 0.006,
                                           reflectionDirection, 12.0, 0x37u,
@@ -252,6 +252,10 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
         : localColor * localInterfaceTransmittance
             * (localHighlight * 3.2 + runoffLocalHighlight * 1.15)
             * localStrength / (1.0 + localDistanceSquared * 0.58);
+    // Clear water has no opaque-surface fire diffuse lobe. Keep Mobile's
+    // analytic highlight; High already owns fire in its traced reflection.
+    // Transmitted scenery retains the ordinary opaque lighting path above.
+    h.base = vec3(0.0);
     interfaceLight += fireEmitterDirectLighting(
         h, rayDirection, true, !fireRayReflectionOwned);
     interfaceLight += !genericTransmissionActive

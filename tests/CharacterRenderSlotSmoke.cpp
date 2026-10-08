@@ -1240,6 +1240,12 @@ int main()
                       raygenSource.find("sin(controls.time * 15.0)") == std::string::npos &&
                       raygenSource.find("sin(controls.time * 17.0") == std::string::npos,
                       "every selected emitter must use its own Light socket, correlated colour/strength, and real visibility without stable-ID-1 assumptions");
+        ok &= Require(waterPrimary.find("h.base = vec3(0.0);") != std::string::npos &&
+                      waterPrimary.find("transmitted = shadeOpaqueSecondary(transmittedHit, transmissionDirection)") != std::string::npos &&
+                      waterPrimary.find("reflected = shadeOpaqueSecondary(reflectedHit, reflectionDirection)") != std::string::npos &&
+                      waterPrimary.find("vec3 surfaceRadiance = mix(transmitted, reflected, fresnel) + interfaceLight") != std::string::npos &&
+                      waterPrimary.find("localHighlight * 3.2 + runoffLocalHighlight * 1.15") != std::string::npos,
+                      "water suppresses only opaque fire diffuse while retaining opaque receivers, transmitted scenery, Fresnel reflection and warm interface highlights");
         ok &= Require(waterPrimary.find("bool fireRayReflectionOwned = controls.waterQuality >= 1.5;") !=
                           std::string::npos &&
                       waterPrimary.find("fireEmitterDirectLighting(\n        h, rayDirection, true, !fireRayReflectionOwned)") !=
@@ -1249,7 +1255,7 @@ int main()
                       opaquePrimary.find("shadeOpaqueDirect(h, rayDirection, true, !fireRayReflectionOwned") !=
                           std::string::npos &&
                       fireDirect.find("if (allowAnalyticSpecular)") != std::string::npos,
-                      "ray-integrated fire reflection must exclusively own emitter specular while direct diffuse and shadowing remain active");
+                      "ray-integrated fire reflection exclusively owns emitter specular; opaque fire diffuse and real visibility remain active");
         ok &= Require(raygenSource.find("bool reflectionPath") != std::string::npos &&
                       raygenSource.find("reflected = reflected * reflectedFire.a + reflectedFire.rgb") !=
                           std::string::npos &&
