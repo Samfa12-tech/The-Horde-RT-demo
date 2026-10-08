@@ -1,24 +1,27 @@
 # Horde 1.6.2 execution checkpoint
 
-**8 October installed controller/pose checkpoint:** runtime
-`c8cbb4a4ca4341b555d2c138008fcb2305011cf7`, tree
-`bea0121107417eafda2c1aa4f8b6a1b1eaa3f6fa`. Batched named-node pose sampling is
-used for the player's Grip/hand and shoulder queries without changing valid
-pose or combat behavior. Seven affected native CTests, Windows Debug and
-four-ABI Android Debug builds pass. The unchanged Java dex retains the separate
-454 source's 213-test/lint evidence; no fresh Java run is claimed for this slice.
-The exact Debug APK is installed and pullback-hash verified on SM-S948B/Android
-16 with zero changed preference entries. The owner returned; the Backbone
-check is prepared for a USB cable swap. No controller was present in the
-pre-install Android roster; generic Windows HID enumeration is separate evidence.
+**8 October prepared navigation follow-up:** source `6faab4ff26b495ab782d2d2a3cdbaccc4e585026`
+fixes the owner's reproduced controller-direction issue. Native geometric focus
+search is scoped to the visible menu/dialog; button creation order no longer
+turns Right into Down. Play receives initial entry focus. Temporary eligibility
+and original touch policy preserve controller navigation and first touch fallback.
+**222 Android tests in 35 classes**, zero failures/errors/skips, lint and four-ABI
+Debug assembly pass. Four regressions fail on c8 before the fix; portrait,
+landscape, larger text, scrolling and touch-policy checks pass after it.
 
-APK SHA-256: `2467d05e0042976f7303a31094b9ffff13720f14c93bc811b5602d94b42a4c7a`.
-Source c8 PR CI is complete at 6/6; push CI is still running with 5/6 successful
-jobs at this checkpoint. Previous 453 CI is complete at 12/12. Documentation CI
-is separate. Moving equipment/secondary views/full route, contact calibration,
-sustained phone quality/cost, changed audio/haptics and independent final audit
+Prepared APK SHA-256: `d24dfd8f5f0f88e6a693b9723ca6a6cd8616885f1490999a6d34d394ef52d26e`.
+It is sealed and **not installed**; all four native libraries, manifest and 91
+assets match c8. Windows retains its c8 executable and seven affected native
+checks with their original identity. c8 source CI completes at 12/12; new 6fa
+push/PR CI is running separately. The installed c8 phone app remains paused.
+The owner reports the Backbone One PlayStation Edition USB-C works well overall,
+with the directional/menu defect above. Corrected-menu acceptance and the rest
+of the physical matrix await the owner's return. The approved waterfall pair
+is still gated off in production, explaining the first-room skeleton report;
+its normal-route activation is the next bounded integration step. Contact,
+moving/secondary views, phone quality/cost, audio/haptics and independent audit
 remain open. Dust stays optional/default Off; shafts deferred. No release.
-[Exact packages, preserved checks and physical acceptance matrix](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#current-installed-follow-up--c8cbb4a4).
+[Exact source, packages, failures and owner observations](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#prepared-directional-navigation-follow-up--6faab4ff).
 
 **Earlier 8 October integrated controller/pose checkpoint:** runtime
 `454d58ee0f71bdb837a75ce486d6c139e03e0b02` adds native-dialog focus suspension

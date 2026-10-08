@@ -6,6 +6,65 @@ Debug package is installed with preferences preserved. The hands-on check is
 prepared for a USB/Backbone cable swap. Earlier away-device checkpoints below retain
 their own source, package and evidence identities.
 
+## Prepared directional navigation follow-up — 6faab4ff
+
+The owner tested the exact installed c8 APK with **Backbone One PlayStation
+Edition, USB-C** on SM-S948B/Android 16. Generation, firmware and Android device
+descriptor are unrecorded. The prompted menu/gameplay actions worked well overall;
+no other missed/stuck input was reported. Joystick/D-pad navigation sometimes
+picked an incorrect neighbor and the opening plaques were not directional.
+This is preliminary manual feedback, not a completed physical acceptance matrix.
+The owner reconnects USB and leaves the same Debug PID 11530 paused, then goes
+AFK with the phone connected. No test requests are sent while away.
+
+The root cause is reproduced in four host regressions against c8: activity-wide
+focus search can escape into underlying controls, and its creation-order fallback
+can turn Right into Down. Selected controls alone were made focusable in Android
+touch mode, excluding other native buttons from spatial search. The follow-up
+scopes Android FocusFinder to the menu/dialog, temporarily admits its real controls
+and restores their original touch policy. A weak UI-thread map retains original
+policy for selected controls, restored before intentional touch/fallback. It removes
+creation-order navigation, uses vertical scrolling only for Up/Down, and starts
+entry selection on Play without changing plaque positions or real callbacks.
+
+Source `6faab4ff26b495ab782d2d2a3cdbaccc4e585026`, tree `e027245aa51d6d09a7c3abc7cb79680eac7b26e0`.
+Four-ABI Debug APK: 138,462,724 bytes, SHA-256
+`d24dfd8f5f0f88e6a693b9723ca6a6cd8616885f1490999a6d34d394ef52d26e`; sealed in `task-4/integrated-162-6faab4ff-20261008`.
+SDK37 16 KiB alignment passes. The manifest, all 91 assets and all four native
+libraries match c8 byte-for-byte; Java dex changes. Windows runtime is unchanged
+and retains the exact c8 build/hash. **222 tests in 35 classes**, zero failures,
+errors/skips, and lint pass in 28 s; APK assembly passes in 2 s. Tests include
+scoped geometry/edges, real entry D-pad presses, portrait/landscape/larger text,
+vertical offscreen focus/scrolling and touch restoration, plus the existing full
+touch/Graphics/controller/lifecycle roster. Independent focused source review
+finds no concrete defect and prompts the added scrolling regression; it is not
+Eric's final audit or physical acceptance.
+
+Retained failure: the first `requestFocusFromTouch` attempt fails 9/25 host cases
+and is abandoned; its log/XML remain separate. Corrected focus-policy runs pass
+25 and then 28 focused cases; the final full run includes the scrolling case.
+Before-fix logs/XML retain the four reproduced failures. Exact private logs:
+`controller-spatial-navigation-before-20261008.log`,
+`controller-spatial-navigation-after-20261008.log`,
+`controller-spatial-navigation-focus-policy-after-20261008.log`,
+`controller-spatial-navigation-orientation-touch-20261008.log`, and
+`controller-spatial-navigation-full-tests-lint-20261008.log`.
+
+6fa source push 37727570776 / PR 37727574270 are still running at this checkpoint
+(2/6 successful each). c8 push 37725320895 / PR 37725325043 completes **12/12**.
+Documentation has separate CI. The 6fa APK is not installed or owner-accepted.
+The paused c8 screenshot and owned last-200-lines excerpt are captured after USB
+return: 236 lines, one surface-presented marker, two GPU markers and zero
+VUID/FATAL markers in this excerpt. These are not completed-frame/hash joins,
+full-route or sustained/displayed-FPS evidence. Initial c8 log/capture gaps below
+are retained. Moving equipment acceptance and full physical matrix remain open.
+
+The first-room skeleton report matches the production waterfall flag being off.
+The existing shared authored pair already has accepted lateral placement/facing
+and distinct gait phase. Enable that flag independently of sword-starts-stowed
+only with the normal collision-route/Keeper/reward and affected moving/render
+checks; the stow flag has its own gates. This follow-up changes neither flag.
+
 ## Current installed follow-up — c8cbb4a4
 
 - Runtime source: `c8cbb4a4ca4341b555d2c138008fcb2305011cf7`; tree `bea0121107417eafda2c1aa4f8b6a1b1eaa3f6fa`.
@@ -47,8 +106,8 @@ No wait loop, unrelated process termination, data clearing or security change
 occurs. Exact install/prefs/launch/capture and failed invocation records are kept
 privately. Package hashes remain immutable.
 
-Source c8 CI: PR 37725325043 complete success 6/6; push 37725320895 in progress
-with 5/6 successful jobs at this checkpoint. Source 453 separately passes 12/12.
+Source c8 CI completes successfully at 12/12: PR 37725325043 and push
+37725320895 each pass 6/6. Source 453 separately passes 12/12.
 No earlier CI, appearance or performance result is assigned to c8. The earlier
 454 frozen captures below remain their own evidence; c8 adds no new completed
 RT capture, moving/secondary-view acceptance or sustained FPS claim.

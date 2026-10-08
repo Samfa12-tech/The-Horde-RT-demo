@@ -1,5 +1,18 @@
 # Android RT Device Compatibility Record
 
+## 8 October preliminary owner controller check — SM-S948B / Android 16
+
+Evidence class: **owner manual feedback on exact installed c8 Debug package**.
+Backbone One PlayStation Edition USB-C is owner-identified; generation, firmware
+and Android InputDevice descriptor are unrecorded. The prompted native menus
+and movement/look/combat/interact/pause worked well overall; directional selection
+is defective and entry plaques are not directional. No other missed/stuck input
+was reported. Corrected-source 6fa physical checks, the full cold/hot/lifecycle/
+rotation/disconnect matrix and sustained performance remain pending.
+Same PID 11530 is left paused after USB return. Its screenshot/owned log excerpt
+supplies one surface-presented marker, but no completed RT image/hash join or
+sustained/displayed FPS. [Exact source, package and limits](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#prepared-directional-navigation-follow-up--6faab4ff).
+
 ## 8 October controller candidate install — SM-S948B / Android 16
 
 Evidence class: **exact Debug install/pullback and preference-preservation only**.
