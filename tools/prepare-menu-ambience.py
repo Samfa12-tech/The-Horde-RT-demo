@@ -1,7 +1,7 @@
 """Prepare bounded menu audio candidates from the owner's licensed local sources.
 
 Original source files remain local and are never copied into the repository.
-The outputs are game candidates, not owner-approved final mix assets.
+The outputs are bounded game derivatives; listening evidence retains its exact build identity.
 """
 from __future__ import annotations
 
@@ -19,12 +19,10 @@ from pathlib import Path
 SAMPLE_RATE = 48_000
 SAMPLE_BYTES = 2
 SOURCE_HASHES = {
-    "flame": "f1e9e068a21db68221447ba22c26f09d9e928e5de596334272e733f0b60022b4",
     "room": "102b22009583699ae35f9a84f14f4a37cef0d667d34ecbf692d19bdbe190692c",
     "chain": "345785fa9f5b3179a6432ff45ca0164eee1dd11ae19481e0ff1522baecd02c89",
 }
 EXPECTED_FILES = {
-    "menu_flame.wav": 4 * SAMPLE_RATE,
     "menu_room.wav": 4 * SAMPLE_RATE,
     "menu_chain.wav": SAMPLE_RATE,
 }
@@ -149,8 +147,8 @@ def verify(output_dir: Path) -> None:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     assets = manifest.get("assets")
     if not isinstance(assets, list) or {asset.get("runtimeFile") for asset in assets} != set(EXPECTED_FILES):
-        raise RuntimeError("Manifest does not contain the closed three-file runtime roster.")
-    expected_ids = {"softflamehisscandidate": "flame", "filteredroomaircandidate": "room", "quietchainswingcandidate": "chain"}
+        raise RuntimeError("Manifest does not contain the closed two-WAV runtime roster.")
+    expected_ids = {"filteredroomaircandidate": "room", "quietchainswingcandidate": "chain"}
     if manifest.get("sourceHashes") != SOURCE_HASHES:
         raise RuntimeError("Manifest source-hash roster differs from the pinned inputs.")
     for asset in assets:
@@ -172,7 +170,7 @@ def verify(output_dir: Path) -> None:
                 raise RuntimeError(f"Manifest measurement mismatch for {path.name}: {key}")
         if path.stat().st_size > 384_044:
             raise RuntimeError(f"Runtime candidate exceeds 4-second mono PCM16 size bound: {path.name}")
-    print("Verified three menu WAV candidates, exact manifest roster, format, frames, measurements and runtime hashes.")
+    print("Verified two menu WAVs, exact manifest roster, format, frames, measurements and runtime hashes.")
 
 
 def source_record(source: Path, expected_hash: str, source_name: str) -> tuple[bytes, int]:
@@ -223,23 +221,13 @@ def main() -> None:
     if "version 9." not in version:
         raise RuntimeError(f"Expected pinned FFmpeg 9 for deterministic regeneration; found: {version}")
 
-    flame_path = args.source_root / "gas leak.wav"
     room_path = args.source_root / "ambience - air conditioner.wav"
-    _, flame_bytes = source_record(flame_path, SOURCE_HASHES["flame"], "FilmCow gas leak")
     _, room_bytes = source_record(room_path, SOURCE_HASHES["room"], "FilmCow air conditioner")
     _, chain_bytes = source_record(args.chain_source, SOURCE_HASHES["chain"], "Pixabay Hammy01 Chain")
 
     # Filter the full decoded source before trimming, avoiding filter startup
     # transients at the selected middle crop. A 0.5 s equal-power cyclic seam
     # reduces the 4.5 s crops to exactly 4.0 s runtime loops.
-    flame_src = decode_pcm16(flame_path, "highpass=f=180,lowpass=f=4200")
-    flame_crop = crop(flame_src, 4.5, 4.5)
-    flame_loop = cyclic_crossfade(flame_crop, SAMPLE_RATE // 2)
-    flame_pre = stats(flame_loop)
-    flame_gain_db = max(-60.0, -24.0 - float(flame_pre["rmsDbfs"]))
-    flame_loop, flame_gain_applied = apply_gain(flame_loop, flame_gain_db, ceiling_dbfs=-6.0)
-    flame_runtime = write_wav(output_dir / "menu_flame.wav", flame_loop)
-
     # The air-conditioner source has prominent 100 Hz and weaker 200 Hz tones
     # in this crop. Notches reduce those lines before a restrained low-band bed.
     room_filters = (
@@ -264,29 +252,6 @@ def main() -> None:
 
     assets = [
         {
-            "id": "softflamehisscandidate",
-            **flame_runtime,
-            "sourceFile": "FilmCow Recorded SFX/gas leak.wav",
-            "sourceSha256": SOURCE_HASHES["flame"],
-            "sourceBytes": flame_bytes,
-            "creator": "FilmCow",
-            "sourceUrl": FILMCOW_LICENSE,
-            "license": "FilmCow custom royalty-free license; not CC0",
-            "licenseTerms": "Personal and commercial project use permitted; national-government, law-enforcement, and SPLC/CAHN-designated hate-group uses prohibited; do not claim authorship or resell.",
-            "processing": {
-                "decode": "FFmpeg 9, mono 48 kHz PCM16",
-                "cropSourceSeconds": [4.5, 9.0],
-                "filters": ["highpass 180 Hz", "lowpass 4200 Hz"],
-                "cyclicCrossfadeFrames": SAMPLE_RATE // 2,
-                "loopFrames": 4 * SAMPLE_RATE,
-                "targetRmsDbfs": -24.0,
-                "peakCeilingDbfs": -6.0,
-                "appliedGainDb": round(flame_gain_applied, 4),
-                "preGain": flame_pre,
-            },
-            "limitations": "Filtered gas-leak hiss proxy, not a recording of fire; has no ignition or crackle. Owner exact-candidate listening and in-game mix acceptance pending.",
-        },
-        {
             "id": "filteredroomaircandidate",
             **room_runtime,
             "sourceFile": "FilmCow Recorded SFX/ambience - air conditioner.wav",
@@ -307,7 +272,7 @@ def main() -> None:
                 "appliedGainDb": round(room_gain_applied, 4),
                 "preGain": room_pre,
             },
-            "limitations": "Strongly filtered mechanical air-conditioner source with measured 100/200 Hz tonal components; this remains a room-air candidate, not verified natural room tone. Owner exact-candidate listening and in-game mix acceptance pending.",
+            "limitations": "Strongly filtered mechanical air-conditioner source with measured 100/200 Hz tonal components. Owner selected Room7% on 7e6662c6; this is not a claim of recorded natural room tone. Final revised package and Windows listening remain separate checks.",
         },
         {
             "id": "quietchainswingcandidate",
@@ -330,18 +295,18 @@ def main() -> None:
                 "targetPeakDbfs": -12.0,
                 "appliedGainDb": round(chain_gain_applied, 4),
             },
-            "limitations": "Bounded quiet movement excerpt selected by waveform level, not by listening. Timed one-shot candidate; owner exact-candidate listening and in-game mix acceptance pending.",
+            "limitations": "Bounded quiet movement excerpt selected by waveform level. Owner selected Chain21% on 7e6662c6 with actual lantern-turn timing; final revised package and Windows listening remain separate checks.",
         },
     ]
     manifest = {
         "schema": 1,
         "target": "Horde Lantern RT menu audio candidate",
         "sourceHashes": SOURCE_HASHES,
-        "sourcePolicy": "Private original sources stay local and outside Git/packages. Only the three bounded runtime derivatives and provenance manifest are written. No standalone audio-library distribution.",
+        "sourcePolicy": "Private original sources stay local and outside Git/packages. Only the two bounded runtime derivatives and provenance manifest are written. No standalone audio-library distribution.",
         "generator": "tools/prepare-menu-ambience.py",
         "ffmpegVersion": version,
         "assets": assets,
-        "ownerListeningAcceptance": "pending",
+        "ownerListeningAcceptance": "Room7%/Chain21% selected and saved on 7e6662c6 with SFX70%; rejected flame removed. Final revised package verification remains separate.",
     }
     manifest_path = output_dir / "asset.manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")

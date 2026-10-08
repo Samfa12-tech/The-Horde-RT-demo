@@ -74,7 +74,7 @@
   },
   "eventsSha256": "77cadf8733257016856c57e8cf44f329cd4ea228463a595984dff62fb6b1944e",
   "gates": {
-    "ownerListening": "partial: Settings/More and Play fade accepted; room bed too loud, flame/chain hard to hear; owner requests live tuning sliders",
+    "ownerListening": "Historical fa5 balance rejected; Settings/More and Play fade accepted. Owner saved Flame0/Room7/Chain21 on exact7e tuning build, then requested flame removal; see tuning-receipt.json.",
     "windowsAudibleForeground": "pending",
     "phonePhysicalCompetingFocus": "pending",
     "seamlessMusicHandover": "deferred",
@@ -98,5 +98,6 @@
     "playFade": "nice",
     "mix": "Room bed much too loud/white-noise-like; flame and chain difficult to hear",
     "nextRequest": "Separate live Flame/Room/Chain sliders and Save mix"
-  }
+  },
+  "ownerTuningReceipt": "tuning-receipt.json"
 }

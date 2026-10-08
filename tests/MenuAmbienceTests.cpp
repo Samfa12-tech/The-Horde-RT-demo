@@ -38,6 +38,6 @@ int main()
     if (!delivery.Observe(3600, 9, true)) return 12;
     if (delivery.Observe(1, 0, true)) return 13; // Rebuilt/cancelled menu.
     if (!delivery.Observe(900, 1, true)) return 14;
-    if (kMenuFlameGain + kMenuRoomGain + kMenuChainGain >= 1.f) return 15;
+    if (kMenuRoomGain + kMenuChainGain >= 1.f) return 15;
     std::cout << "Bounded motion-linked chain cues and reset/focus/catch-up delivery pass\n";
 }

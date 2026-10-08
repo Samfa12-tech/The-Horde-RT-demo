@@ -2,10 +2,9 @@
 # listening, signing or release acceptance and works with Debug ZIP/APK files.
 function Get-Horde162AssetSpecification {
     @(
-        [pscustomobject]@{ Path='audio/menu/menu_flame.wav'; Bytes=384044; Sha256='d4f6d11b9c12c4628daeb7624775da64a834a143e643acff0d6b35b8c375c0be'; Platform='Both'; Kind='Wave'; Channels=1; Frames=192000 },
         [pscustomobject]@{ Path='audio/menu/menu_room.wav'; Bytes=384044; Sha256='9aa9a9631f7dbaf724ecd46bfbbea17142af20497299a83db08055751c7cc361'; Platform='Both'; Kind='Wave'; Channels=1; Frames=192000 },
         [pscustomobject]@{ Path='audio/menu/menu_chain.wav'; Bytes=96044; Sha256='6c85d6c97a21e9de69100b9969dd8f844af927b229ee91bf585c42b4d0ae146d'; Platform='Both'; Kind='Wave'; Channels=1; Frames=48000 },
-        [pscustomobject]@{ Path='audio/menu/asset.manifest.json'; Bytes=6025; Sha256='63563578dd68f4f244a3b8f82435fe1517dccb8be19306956c551b1ceb597eca'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='audio/menu/asset.manifest.json'; Bytes=4459; Sha256='93b4711ebb1bd768c09ba3c0166aa5ed7e5e06adcaf11bb2758b0aab47af5f94'; Platform='Both'; Kind='Json' },
         [pscustomobject]@{ Path='models/props/runtime/player-sword-scabbard/asset.manifest.json'; Bytes=758; Sha256='75e030f75e5dea9baa1732ce7efed67a1dd40e79c7203a2319d3f0e08044319e'; Platform='Both'; Kind='Json' },
         [pscustomobject]@{ Path='models/props/runtime/player-sword-scabbard/processing-receipt.json'; Bytes=10052; Sha256='3d257b3cd2cfcd4f169ae962ef86e28d8b252351a1fbccd29a06d03d35e56541'; Platform='Both'; Kind='Json' },
         [pscustomobject]@{ Path='models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb'; Bytes=15128; Sha256='d23c2b0711f53ce7608e68945ee7c38dd4eb1dc06ad5e33e58acc26c5bc0eaf5'; Platform='Both'; Kind='Glb' },

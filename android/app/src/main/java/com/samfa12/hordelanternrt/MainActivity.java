@@ -283,7 +283,7 @@ public class MainActivity extends Activity {
     private SoundPool soundPool;
     private HordeAmbiencePlayback waterfallPlayback;
     private MenuAmbiencePlayback menuAmbience;
-    private final int[] menuAmbienceMix = {16, 2, 13};
+    private final int[] menuAmbienceMix = {7, 21};
     private SharedPreferences menuAmbienceTuningPreferences;
     private volatile HordeMusicPlayback musicPlayback;
     private Vibrator vibrator;
@@ -2506,9 +2506,8 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel("MENU AMBIENCE", "LIVE MIX TUNING");
         addBody(panel, "Adjust each sound independently. 0% silences it. Your main SFX volume still applies. Chain creaks follow occasional swing turns.");
-        addSlider(panel, "Flame", menuAmbienceMix[0], 0, 100, value -> setMenuAmbienceMix(0, value));
-        addSlider(panel, "Room", menuAmbienceMix[1], 0, 100, value -> setMenuAmbienceMix(1, value));
-        addSlider(panel, "Chain", menuAmbienceMix[2], 0, 100, value -> setMenuAmbienceMix(2, value));
+        addSlider(panel, "Room", menuAmbienceMix[0], 0, 100, value -> setMenuAmbienceMix(0, value));
+        addSlider(panel, "Chain", menuAmbienceMix[1], 0, 100, value -> setMenuAmbienceMix(1, value));
         final TextView savedStatus = new TextView(this);
         savedStatus.setText("Live changes are saved only when you press Save mix.");
         savedStatus.setTextColor(HordeUiTokens.PARCHMENT);
@@ -2518,12 +2517,10 @@ public class MainActivity extends Activity {
         panel.addView(savedStatus, matchWrap());
         addMenuButtonRow(panel, "Save mix", () -> {
             if (menuAmbienceTuningPreferences != null && menuAmbienceTuningPreferences.edit()
-                    .putInt("flame", menuAmbienceMix[0]).putInt("room", menuAmbienceMix[1])
-                    .putInt("chain", menuAmbienceMix[2]).commit()) {
-                savedStatus.setText("Saved — Flame: " + menuAmbienceMix[0] + "%   Room: " +
-                        menuAmbienceMix[1] + "%   Chain: " + menuAmbienceMix[2] + "%");
-                Log.i("HordeMenuAmbience", "saved mix flame=" + menuAmbienceMix[0] +
-                        " room=" + menuAmbienceMix[1] + " chain=" + menuAmbienceMix[2]);
+                    .remove("flame").putInt("room", menuAmbienceMix[0])
+                    .putInt("chain", menuAmbienceMix[1]).commit()) {
+                savedStatus.setText("Saved — Room: " + menuAmbienceMix[0] + "%   Chain: " + menuAmbienceMix[1] + "%");
+                Log.i("HordeMenuAmbience", "saved mix room=" + menuAmbienceMix[0] + " chain=" + menuAmbienceMix[1]);
             } else savedStatus.setText("Mix could not be saved. Your live levels are still active.");
         }, getString(R.string.back), this::showSettings);
         attachPanel(panel);
@@ -2532,7 +2529,7 @@ public class MainActivity extends Activity {
     private void setMenuAmbienceMix(int index, int percent) {
         menuAmbienceMix[index] = Math.max(0, Math.min(100, percent));
         if (menuAmbience != null)
-            menuAmbience.setMixPercent(menuAmbienceMix[0], menuAmbienceMix[1], menuAmbienceMix[2]);
+            menuAmbience.setMixPercent(menuAmbienceMix[0], menuAmbienceMix[1]);
     }
 
     private void setNativeGraphics(GraphicsPreferences.Values values) {
@@ -5075,7 +5072,6 @@ public class MainActivity extends Activity {
         loadSound("keeper_come_closer", "audio/pixabay/keeper_come_closer.wav");
         loadSound("skeleton_idle_rattle", "audio/pixabay/skeleton_idle_rattle.wav");
         loadSound("skeleton_falling_bones", "audio/pixabay/skeleton_falling_bones.wav");
-        loadSound("menu_flame", "audio/menu/menu_flame.wav");
         loadSound("menu_room", "audio/menu/menu_room.wav");
         loadSound("menu_chain", "audio/menu/menu_chain.wav");
         menuAmbience = new MenuAmbiencePlayback(new MenuAmbiencePlayback.Sink() {
@@ -5099,10 +5095,10 @@ public class MainActivity extends Activity {
         initialiseWaterfallLoop();
         if (BuildConfig.DEBUG) {
             menuAmbienceTuningPreferences = getSharedPreferences("horde_menu_ambience_tuning", MODE_PRIVATE);
-            final String[] keys = {"flame", "room", "chain"};
+            final String[] keys = {"room", "chain"};
             for (int i = 0; i < keys.length; ++i)
                 menuAmbienceMix[i] = Math.max(0, Math.min(100, menuAmbienceTuningPreferences.getInt(keys[i], menuAmbienceMix[i])));
-            menuAmbience.setMixPercent(menuAmbienceMix[0], menuAmbienceMix[1], menuAmbienceMix[2]);
+            menuAmbience.setMixPercent(menuAmbienceMix[0], menuAmbienceMix[1]);
         }
     }
 

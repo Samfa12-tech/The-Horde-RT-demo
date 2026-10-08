@@ -1537,7 +1537,7 @@ void UpdateWaterfallAmbience(const VulkanSurfaceContext& context)
 void StopMenuAmbience(VulkanSurfaceContext& context)
 {
     auto &engine = SpatialAudioEngine();
-    for (const auto key : {"menu_flame", "menu_room", "menu_chain"}) engine.StopLoop(key);
+    for (const auto key : {"menu_room", "menu_chain"}) engine.StopLoop(key);
     context.menuCreakDelivery.Suspend();
 }
 
@@ -1554,8 +1554,6 @@ void UpdateMenuAmbience(VulkanSurfaceContext& context)
     if (!engine.SetMasterVolumePercent(context.sfxVolumePercent)) { StopMenuAmbience(context); return; }
     const float envelope = std::clamp(1.0f - menu.fade, 0.0f, 1.0f);
     const auto root = ResolveAssetRoot() / "audio/menu";
-    engine.StartOrUpdateLoop("menu_flame", root / "menu_flame.wav",
-        horde::audio::kMenuFlameGain * envelope, horde::audio::kMenuFlameGain * envelope);
     engine.StartOrUpdateLoop("menu_room", root / "menu_room.wav",
         horde::audio::kMenuRoomGain * envelope, horde::audio::kMenuRoomGain * envelope);
     // Existing keyed native voice ownership handles the one-shot too: mute,

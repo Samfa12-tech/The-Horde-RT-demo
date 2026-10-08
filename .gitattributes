@@ -256,3 +256,7 @@ assets/models/world/source/collapsed-entry/polyhaven-original/polyhaven-license.
 # Exact menu derivative receipt bytes on Windows and CI.
 assets/audio/menu/asset.manifest.json text eol=lf
 assets/audio/menu/*.wav -text
+
+# Keep menu ownership evidence and its public receipts byte-stable.
+docs/evidence/2026-10-08-menu-ambience/*.log text eol=lf
+docs/evidence/2026-10-08-menu-ambience/*.json text eol=lf

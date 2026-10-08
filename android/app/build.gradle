@@ -346,7 +346,6 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'textures/props/runtime/orm.android.ktx2'
         include 'textures/props/runtime/emissive.android.ktx2'
         include 'textures/props/runtime/asset.manifest.json'
-        include 'audio/menu/menu_flame.wav'
         include 'audio/menu/menu_room.wav'
         include 'audio/menu/menu_chain.wav'
         include 'audio/menu/asset.manifest.json'

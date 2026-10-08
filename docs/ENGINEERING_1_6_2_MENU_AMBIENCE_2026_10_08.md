@@ -1,6 +1,12 @@
 # Lantern menu ambience checkpoint — 8 October 2026
 
-Owner-authorized menu-only addition. Runtime source `fa5f46a7cf01e2492593dc26ad1c50883ab18280`, tree `120b9007d2cc6aef4d1a3d43cbf16a8518de6639`. Test-only follow-up `45bd4d401e738390e4352bfc16786a5800aee1ac` changes asset fixtures, not runtime. PR18 remains draft; no release.
+**Current owner-selected follow-up:** the exact Debug tuning build `7e6662c6fe2906787fdd645bfbcf4474eb2e60bd`, APK `19a275c587d2065b8064fbd760048e816e062d7725b5547a77926bd5bcb998a4`, let the owner save Flame 0%, Room 7%, Chain 21% under SFX 70%. The owner rejects the flame character and requests its complete removal. The safe follow-up removes its WAV, asset admission, processing and both platform voice paths; Room 7%/Chain 21% become the ordinary relative levels. Room/chain waveform bytes are unchanged. The Debug tuner now has two sliders and retains the owner-saved values in its separate development preferences. Existing main settings remain unchanged.
+
+The flame-free source passes five affected host checks (7.84 s), 240 Java tests/37 classes with no failures/errors/skips, lint, four-ABI Android/Windows builds and all 145 closed asset cases, including explicit rejection of the removed flame on both platforms. Source/package seal, exact install and its CI are being recorded separately. Tuning source 7e CI [push 37757772653](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37757772653) / [PR 37757778958](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37757778958) passes 12/12 aggregate jobs; earlier failures below are retained. [Exact owner-saved tuning receipt](evidence/2026-10-08-menu-ambience/tuning-receipt.json).
+
+The remaining quiet room loop and occasional motion-derived chain keep the existing SFX/focus/native-Play-fade envelope. No replacement flame, haptic change or music handover is added. Windows audible and competing-focus checks remain open; the owner selection does not certify those platforms or final release. The following sections retain the original fa5 candidate, checks and partial feedback as historical evidence.
+
+Owner-authorized initial menu-only addition. Runtime source `fa5f46a7cf01e2492593dc26ad1c50883ab18280`, tree `120b9007d2cc6aef4d1a3d43cbf16a8518de6639`. Test-only follow-up `45bd4d401e738390e4352bfc16786a5800aee1ac` changes asset fixtures, not runtime. PR18 remains draft; no release.
 
 ## Behavior and scope
 
@@ -52,4 +58,4 @@ On the exact fa5 phone build, the owner accepts Settings/More continuity and the
 
 The bounded follow-up lowers the starting room gain from 9% to 2% (about13 dB) and adds a **Debug-only, Entry-only** native tuning page under Settings. It is absent from ordinary production/Shipping benchmark UI. Sliders cover0–100%,0 retires just that owned voice, and the existing SFX/focus/native-fade envelope still applies. Save mix writes exactly three integers to a separate development tuning preference file; existing Audio/Graphics/interface settings are untouched. Production relative levels remain a later explicit adoption of the owner-saved balance. Chain continues to follow occasional real lantern turns; no new random cue or gameplay timing authority is introduced.
 
-Follow-up source/artifact/device evidence is pending until its build and exact install complete. The fa5 feedback and original sealed artifacts above retain their identity. Audio manual acceptance remains open for the revised mix.
+The exact 7e follow-up was installed with zero main-preference changes; 240 Java tests/37 classes, lint, four-ABI/Windows builds and five affected host tests passed. Its APK and all 95 assets are identical to the sealed roster in the tuning receipt, with the assets byte-identical to fa5. The owner saved0/7/21 and rejected the flame, as recorded at the top. This closes the requested live-slider selection step, not Windows listening, competing-focus, sustained performance or final release gates.

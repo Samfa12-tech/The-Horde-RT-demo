@@ -82,30 +82,32 @@ public final class MenuAmbiencePlaybackTest {
     @Test public void liveMixIsIndependentAndZeroRetiresOnlyItsOwnedVoice() {
         FakeSink sink = new FakeSink();
         MenuAmbiencePlayback playback = new MenuAmbiencePlayback(sink);
-        assertTrue(playback.setMixPercent(16, 2, 13));
+        assertTrue(playback.setMixPercent(7, 21));
         assertTrue(playback.update(packet(4, 2, 10, 0, 0, 1), 4, true, true, 0.7f));
-        int flame = sink.lastStart(MenuAmbiencePlayback.MENU_FLAME).stream;
         int room = sink.lastStart(MenuAmbiencePlayback.MENU_ROOM).stream;
-        assertFalse(playback.setMixPercent(16, -1, 13));
-        assertFalse(playback.setMixPercent(101, 2, 13));
-        assertTrue(playback.setMixPercent(20, 0, 0));
+        assertFalse(playback.setMixPercent(-1, 21));
+        assertFalse(playback.setMixPercent(101, 21));
+        assertTrue(playback.setMixPercent(0, 21));
         assertTrue(playback.update(packet(4, 2, 11, 1, 0, 1), 4, true, true, 0.7f));
-        assertTrue(sink.active.contains(flame));
+        int chain = sink.lastStart(MenuAmbiencePlayback.MENU_CHAIN).stream;
         assertFalse(sink.active.contains(room));
-        assertEquals(1, sink.successfulStartsFor(MenuAmbiencePlayback.MENU_FLAME));
-        assertEquals(0, sink.startsFor(MenuAmbiencePlayback.MENU_CHAIN));
-        assertEquals(0.14f, sink.gains.get(flame), 0.000001f);
-        assertTrue(playback.setMixPercent(20, 3, 25));
-        assertTrue(playback.update(packet(4, 2, 12, 2, 500, 1), 4, true, true, 0.7f));
+        assertTrue(sink.active.contains(chain));
+        assertEquals(0.147f, sink.gains.get(chain), 0.000001f);
+        assertTrue(playback.setMixPercent(10, 0));
+        assertTrue(playback.update(packet(4, 2, 12, 1, 0, 1), 4, true, true, 0.7f));
         assertEquals(2, sink.successfulStartsFor(MenuAmbiencePlayback.MENU_ROOM));
-        assertEquals(0.0105f, sink.lastStart(MenuAmbiencePlayback.MENU_ROOM).gain, 0.000001f);
+        assertFalse(sink.active.contains(chain));
+        assertEquals(0.07f, sink.lastStart(MenuAmbiencePlayback.MENU_ROOM).gain, 0.000001f);
+        assertTrue(playback.setMixPercent(10, 25));
+        assertTrue(playback.update(packet(4, 2, 13, 2, 500, 1), 4, true, true, 0.7f));
+        assertEquals(0.035f, sink.gains.get(sink.lastStart(MenuAmbiencePlayback.MENU_ROOM).stream), 0.000001f);
         assertEquals(0.0875f, sink.lastStart(MenuAmbiencePlayback.MENU_CHAIN).gain, 0.000001f);
         playback.close();
-        assertFalse(playback.setMixPercent(20, 3, 25));
+        assertFalse(playback.setMixPercent(10, 25));
         assertTrue(sink.active.isEmpty());
     }
 
-    @Test public void repeatedMenuPublicationsKeepExactlyTwoLoops() {
+    @Test public void repeatedMenuPublicationsKeepExactlyOneLoop() {
         FakeSink sink = new FakeSink();
         MenuAmbiencePlayback playback = new MenuAmbiencePlayback(sink);
         long[] state = packet(4, 2, 10, 0, 0, 1);
@@ -113,13 +115,10 @@ public final class MenuAmbiencePlaybackTest {
         assertTrue(playback.update(state, 4, true, true, 0.5f));
         assertTrue(playback.update(packet(4, 2, 11, 0, 0, 1), 4, true, true, 0.5f));
 
-        assertEquals(1, sink.successfulStartsFor(MenuAmbiencePlayback.MENU_FLAME));
         assertEquals(1, sink.successfulStartsFor(MenuAmbiencePlayback.MENU_ROOM));
         assertEquals(0, sink.startsFor(MenuAmbiencePlayback.MENU_CHAIN));
-        assertTrue(sink.lastStart(MenuAmbiencePlayback.MENU_FLAME).looping);
         assertTrue(sink.lastStart(MenuAmbiencePlayback.MENU_ROOM).looping);
-        assertEquals(0.08f, sink.lastStart(MenuAmbiencePlayback.MENU_FLAME).gain, 0.000001f);
-        assertEquals(0.01f, sink.lastStart(MenuAmbiencePlayback.MENU_ROOM).gain, 0.000001f);
+        assertEquals(0.035f, sink.lastStart(MenuAmbiencePlayback.MENU_ROOM).gain, 0.000001f);
     }
 
     @Test public void fadeScalesAllOwnedSoundsAndPlayStopsThemIdempotently() {
@@ -128,16 +127,15 @@ public final class MenuAmbiencePlaybackTest {
         playback.update(packet(2, 0, 1, 0, 0, 1), 2, true, true, 1.0f);
         playback.update(packet(2, 0, 2, 1, 250, 1), 2, true, true, 1.0f);
 
-        assertEquals(0.12f, sink.gains.get(sink.lastStart(MenuAmbiencePlayback.MENU_FLAME).stream), 0.000001f);
-        assertEquals(0.015f, sink.gains.get(sink.lastStart(MenuAmbiencePlayback.MENU_ROOM).stream), 0.000001f);
-        assertEquals(0.0975f, sink.lastStart(MenuAmbiencePlayback.MENU_CHAIN).gain, 0.000001f);
+        assertEquals(0.0525f, sink.gains.get(sink.lastStart(MenuAmbiencePlayback.MENU_ROOM).stream), 0.000001f);
+        assertEquals(0.1575f, sink.lastStart(MenuAmbiencePlayback.MENU_CHAIN).gain, 0.000001f);
         assertFalse(sink.lastStart(MenuAmbiencePlayback.MENU_CHAIN).looping);
         playback.update(packet(2, 0, 3, 1, 500, 1), 2, true, true, 1.0f);
-        assertEquals(0.065f, sink.gains.get(sink.lastStart(MenuAmbiencePlayback.MENU_CHAIN).stream), 0.000001f);
+        assertEquals(0.105f, sink.gains.get(sink.lastStart(MenuAmbiencePlayback.MENU_CHAIN).stream), 0.000001f);
 
         assertTrue(playback.update(packet(2, 0, 4, 1, 250, 1), 2, false, true, 1.0f));
         int stoppedAfterPlay = sink.stops.size();
-        assertEquals(3, stoppedAfterPlay);
+        assertEquals(2, stoppedAfterPlay);
         assertTrue(sink.active.isEmpty());
         playback.stop();
         playback.stop();
@@ -201,15 +199,13 @@ public final class MenuAmbiencePlaybackTest {
 
     @Test public void delayedLoopStartRetriesOnlyMissingLoopAndDroppedCreakIsNotReplayed() {
         FakeSink sink = new FakeSink();
-        sink.failedStartsRemaining.put(MenuAmbiencePlayback.MENU_FLAME, 1);
+        sink.failedStartsRemaining.put(MenuAmbiencePlayback.MENU_ROOM, 1);
         sink.failedStartsRemaining.put(MenuAmbiencePlayback.MENU_CHAIN, 1);
         MenuAmbiencePlayback playback = new MenuAmbiencePlayback(sink);
         playback.update(packet(8, 0, 1, 0, 0, 1), 8, true, true, 1.0f);
-        assertEquals(1, sink.successfulStartsFor(MenuAmbiencePlayback.MENU_ROOM));
-        assertEquals(0, sink.successfulStartsFor(MenuAmbiencePlayback.MENU_FLAME));
+        assertEquals(0, sink.successfulStartsFor(MenuAmbiencePlayback.MENU_ROOM));
         playback.update(packet(8, 0, 2, 0, 0, 1), 8, true, true, 1.0f);
         assertEquals(1, sink.successfulStartsFor(MenuAmbiencePlayback.MENU_ROOM));
-        assertEquals(1, sink.successfulStartsFor(MenuAmbiencePlayback.MENU_FLAME));
 
         playback.update(packet(8, 0, 3, 1, 0, 1), 8, true, true, 1.0f);
         assertEquals(1, sink.startsFor(MenuAmbiencePlayback.MENU_CHAIN));
@@ -225,7 +221,7 @@ public final class MenuAmbiencePlaybackTest {
         MenuAmbiencePlayback playback = new MenuAmbiencePlayback(sink);
         playback.update(packet(6, 0, 1, 0, 0, 1), 6, true, true, 1.0f);
         playback.update(packet(6, 0, 2, 1, 0, 1), 6, true, true, 1.0f);
-        assertEquals(3, sink.active.size());
+        assertEquals(2, sink.active.size());
         playback.close();
         int stops = sink.stops.size();
         playback.close();
@@ -233,6 +229,6 @@ public final class MenuAmbiencePlaybackTest {
         assertEquals(stops, sink.stops.size());
         assertTrue(sink.active.isEmpty());
         assertFalse(playback.update(packet(6, 0, 3, 2, 0, 1), 6, true, true, 1.0f));
-        assertEquals(3, sink.starts.size());
+        assertEquals(2, sink.starts.size());
     }
 }

@@ -20,8 +20,10 @@ Runtime files are mono 48 kHz 16-bit PCM WAVs under `filmcow/`. They are derived
 
 Voice work, music, and a larger mixer remain outside this update. Android uses `SoundPool` left/right gains; Windows uses XAudio2 per-voice matrices for centred and spatial cues with WinMM fallback. Audio failure must never hide or alter the native RT capability result.
 
-The presentation layer in `menu/` adds two small, quiet entry-menu beds and a
-bounded chain cue. `asset.manifest.json` records licensed local FilmCow foley
-and the owner-supplied Hammy01 source, hashes and filters. Original recordings
-stay private. Flame/room character and mix are listening candidates pending
-owner review; gameplay SFX/music handover are unchanged.
+The presentation layer in `menu/` adds one quiet room bed and a bounded,
+actual-lantern-turn chain cue. The owner-saved balance is Room7%/Chain21%,
+under the existing SFX/focus/Play-fade envelope. The rejected flame hiss is
+removed entirely. `asset.manifest.json` records the licensed local FilmCow
+room foley and owner-supplied Hammy01 source, hashes and filters. Originals
+stay private. Final revised-package and Windows listening remain separate;
+gameplay SFX/music handover are unchanged.

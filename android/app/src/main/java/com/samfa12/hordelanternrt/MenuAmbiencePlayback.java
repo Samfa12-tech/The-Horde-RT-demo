@@ -3,17 +3,15 @@ package com.samfa12.hordelanternrt;
 import java.util.Objects;
 
 /**
- * UI-thread owner for the entry-menu flame and room loops plus its occasional chain cue.
+ * UI-thread owner for the entry-menu room loop plus its occasional chain cue.
  * Playback remains delegated to the platform SFX sink; this class does not decode or mix PCM.
  */
 final class MenuAmbiencePlayback implements AutoCloseable {
-    static final String MENU_FLAME = "menu_flame";
     static final String MENU_ROOM = "menu_room";
     static final String MENU_CHAIN = "menu_chain";
 
-    private static final float FLAME_BASE_GAIN = 0.16f;
-    private static final float ROOM_BASE_GAIN = 0.02f;
-    private static final float CHAIN_BASE_GAIN = 0.13f;
+    private static final float ROOM_BASE_GAIN = 0.07f;
+    private static final float CHAIN_BASE_GAIN = 0.21f;
     private static final int PACKET_LENGTH = 6;
 
     interface Sink {
@@ -22,13 +20,11 @@ final class MenuAmbiencePlayback implements AutoCloseable {
         void stop(int stream);
     }
 
-    private float flameGain = FLAME_BASE_GAIN;
     private float roomGain = ROOM_BASE_GAIN;
     private float chainGain = CHAIN_BASE_GAIN;
 
     private final Sink sink;
     private final Thread ownerThread;
-    private int flameStream;
     private int roomStream;
     private int chainStream;
     private boolean hasOwner;
@@ -44,12 +40,11 @@ final class MenuAmbiencePlayback implements AutoCloseable {
         this.ownerThread = Thread.currentThread();
     }
 
-    /** Development mix tuning; the caller explicitly owns saving the three values. */
-    boolean setMixPercent(int flame, int room, int chain) {
+    /** Development mix tuning; the caller explicitly owns saving the two values. */
+    boolean setMixPercent(int room, int chain) {
         requireOwnerThread();
-        if (closed || flame < 0 || flame > 100 || room < 0 || room > 100 || chain < 0 || chain > 100)
+        if (closed || room < 0 || room > 100 || chain < 0 || chain > 100)
             return false;
-        flameGain = flame / 100.0f;
         roomGain = room / 100.0f;
         chainGain = chain / 100.0f;
         return true;
@@ -110,7 +105,6 @@ final class MenuAmbiencePlayback implements AutoCloseable {
         }
 
         final float gain = sfxGain * (1.0f - fadePermille / 1000.0f);
-        flameStream = ensureLoop(flameStream, MENU_FLAME, flameGain * gain);
         roomStream = ensureLoop(roomStream, MENU_ROOM, roomGain * gain);
         if (chainStream != 0) chainStream = applyGain(chainStream, chainGain * gain);
 
@@ -172,10 +166,8 @@ final class MenuAmbiencePlayback implements AutoCloseable {
     }
 
     private void stopOwnedStreams() {
-        stopStream(flameStream);
         stopStream(roomStream);
         stopStream(chainStream);
-        flameStream = 0;
         roomStream = 0;
         chainStream = 0;
     }

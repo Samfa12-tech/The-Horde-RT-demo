@@ -31,8 +31,8 @@ function Assert-EquipmentGradleInventory([string]$Text) {
 }
 function Assert-MenuGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'audio/menu/*' })
-    $expected=@('audio/menu/asset.manifest.json','audio/menu/menu_flame.wav','audio/menu/menu_room.wav','audio/menu/menu_chain.wav')
-    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle menu ambience must be the exact four-file runtime roster.'
+    $expected=@('audio/menu/asset.manifest.json','audio/menu/menu_room.wav','audio/menu/menu_chain.wav')
+    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle menu ambience must be the exact three-file runtime roster.'
 }
 function Assert-ScabbardGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'models/props/runtime/player-sword-scabbard/*' })
@@ -163,8 +163,8 @@ try {
     Expect-Failure {Assert-EquipmentGradleInventory ($gradle.Replace("        include 'audio/filmcow/equipment/sword_draw.wav'",''))} 'exact three-file runtime roster'
     Expect-Failure {Assert-EquipmentGradleInventory ($gradle+"`ninclude 'audio/filmcow/equipment/*.wav'`n")} 'exact three-file runtime roster'
     Assert-MenuGradleInventory $gradle; ++$script:checks
-    Expect-Failure {Assert-MenuGradleInventory ($gradle.Replace("        include 'audio/menu/menu_chain.wav'",''))} 'exact four-file runtime roster'
-    Expect-Failure {Assert-MenuGradleInventory ($gradle+"`ninclude 'audio/menu/*.wav'`n")} 'exact four-file runtime roster'
+    Expect-Failure {Assert-MenuGradleInventory ($gradle.Replace("        include 'audio/menu/menu_chain.wav'",''))} 'exact three-file runtime roster'
+    Expect-Failure {Assert-MenuGradleInventory ($gradle+"`ninclude 'audio/menu/*.wav'`n")} 'exact three-file runtime roster'
     Assert-ScabbardGradleInventory $gradle; ++$script:checks
     Expect-Failure {Assert-ScabbardGradleInventory ($gradle.Replace("        include 'models/props/runtime/player-sword-scabbard/processing-receipt.json'",''))} 'exact three-file runtime roster'
     Expect-Failure {Assert-ScabbardGradleInventory ($gradle+"`ninclude 'models/props/runtime/player-sword-scabbard/*.glb'`n")} 'exact three-file runtime roster'
@@ -192,7 +192,7 @@ try {
     Expect-Failure {Assert-RagTorchPackageInventory ($packageText.Replace('assets/models/props/runtime/player-rag-torch/rag-torch-player-lod0.runtime.glb','assets/models/props/runtime/player-rag-torch/omitted.glb'))} 'both platform archives'
     $packageAst=[Management.Automation.Language.Parser]::ParseInput($packageText,[ref]$null,[ref]$null)
     $packageStrings=@($packageAst.FindAll({param($node) $node -is [Management.Automation.Language.StringConstantExpressionAst]},$true) | ForEach-Object Value)
-    foreach($name in @('asset.manifest.json','menu_flame.wav','menu_room.wav','menu_chain.wav')) {
+    foreach($name in @('asset.manifest.json','menu_room.wav','menu_chain.wav')) {
         Require (@($packageStrings | Where-Object {$_ -ceq ('assets/audio/menu/'+$name)}).Count -eq 2) 'Both platform archives must explicitly require each menu ambience asset.'
     }
     ++$script:checks
@@ -219,7 +219,7 @@ try {
         Expect-Failure {& $heldContract -AndroidApkPath $heldArchive -RequireHorde162World} 'byte/hash mismatch'
     }
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
-    Require ($windows.Count -eq 30 -and $android.Count -eq 31) 'Closed runtime roster count changed.'
+    Require ($windows.Count -eq 29 -and $android.Count -eq 30) 'Closed runtime roster count changed.'
     Require ($windows -ccontains 'audio/pixabay/waterfall_loop.wav' -and $windows -cnotcontains 'audio/pixabay/waterfall_core_loop.wav') 'Windows must preserve accepted full waterfall only.'
     Require ($android -ccontains 'audio/pixabay/waterfall_core_loop.wav' -and $android -cnotcontains 'audio/pixabay/waterfall_loop.wav') 'Android must use admitted Core loop only.'
     ++$script:checks
@@ -234,7 +234,7 @@ try {
     # Every menu file is required and hash-pinned on each platform. Neither
     # original collections nor an unreviewed fifth clip may enter a package.
     foreach($platform in @('Windows','Android')) {
-        foreach($name in @('asset.manifest.json','menu_flame.wav','menu_room.wav','menu_chain.wav')) {
+        foreach($name in @('asset.manifest.json','menu_room.wav','menu_chain.wav')) {
             $entry="assets/audio/menu/$name"
             $archive=New-FixtureArchive "$platform-menu-missing-$name.zip" $platform -Omit $entry
             Expect-Failure {Assert-Horde162Package $repo $archive $platform} 'closed runtime roster'
@@ -244,6 +244,8 @@ try {
             Expect-Failure {Assert-Horde162Package $repo $archive $platform} 'duplicate runtime entry'
         }
         $archive=New-FixtureArchive "$platform-menu-foreign.zip" $platform -Extra 'assets/audio/menu/original-chain.mp3'
+        Expect-Failure {Assert-Horde162Package $repo $archive $platform} 'closed runtime roster'
+        $archive=New-FixtureArchive "$platform-menu-rejected-flame.zip" $platform -Extra 'assets/audio/menu/menu_flame.wav'
         Expect-Failure {Assert-Horde162Package $repo $archive $platform} 'closed runtime roster'
     }
     $directories=@('assets/audio/pixabay/','assets/textures/environment/','assets/textures/environment/runtime/')
