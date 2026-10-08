@@ -137,13 +137,18 @@ CC0 allows copying, modification and commercial distribution, making these packs
 
 The inspected 1.6.2 baseline has Walk and Idle only; its clip manifest explicitly excludes running, and directional selection is absent. The 1.7 plan adds run controls and body/equipment animation, plus alternating rope hands and sword clearance. Forward/backward running and strafe/walk clips are a separate player expansion, not a reason to buy that full suite for Kit. [1,14]
 
+**Owner-approved gap closure, 8 October 2026:** Player directional locomotion and dedicated dodge animation now have an explicit early 1.7 review/proof checkpoint in [master Section 5.5a and WP2](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#55a-early-player-directional-motion-and-dodge-proof), after accepted 1.6.2. Inspect the player rig and supported movement rules, resolve forward/back walk/run and left/right strafe coverage, then prove a small coherent clip set before bulk acquisition. Review all supported dodge directions and starts/stops/blends; retain independent look/aim and actual collision-speed/foot-contact agreement. This is separate from Kit's acquisition. Unsupported directions or unsuitable candidates require an explicit disposition, not an invented new mechanic or a claim that every clip is committed. Full 1.7 job breakdown follows 1.6.2 sign-off; no implementation starts here.
+
 | Player need | Candidate or gap | Planning decision |
 | --- | --- | --- |
 | Forward walk and run | Existing Walk; Meshy basic Walking 2 and Running 1; UAL free forward jog and sprint | Inspect current player rig first. Select a consistent speed and posture family. |
 | Backward walk | Meshy Walk_Backward 544 / in-place 679 | Catalog verified. Retarget, feet, equipment clearance and blend compatibility untested. |
 | Backward run | Meshy BackLeft_run 5 and BackRight_Run 6 / in-place 606 and 607 are diagonal | These do not prove a straight backward run. Find or author the exact motion if the control design needs it. |
 | Left and right strafe | No clearly named neutral upright pair found in the Meshy review; relevant Quaternius directional sets are paid | Keep as a gap for a free-source search or Blender production. Do not relabel diagonal running as strafing. |
+| Dedicated dodge presentation | Inspect the existing player rig and accepted dodge direction/displacement rules; select or author a compatible clip only after a native retarget test | Prove every supported input direction and recovery blend without changing distance, duration, collision, defensive/damage or combat timing rules. No verified Meshy dodge selection is claimed. |
 | Stops and direction changes | Meshy run-to-walk and turn candidates; Blender transition work | Define a small initial direction set and test blends before adding diagonals. |
+
+Reuse or mirror clips only after anatomy, handed equipment, sockets, root translation and foot-contact validation; use free verified sources or Blender when catalog candidates do not fit. The master checkpoint owns touch/controller, portrait/both-landscape Android and Windows acceptance, sword/torch/lantern clearance, first-person/body/RT secondary-view coherence and alignment with the 1.7 tutorial/cues. In-game owner motion/feel review remains required; this update authorizes no generation, purchase, runtime change or merge.
 
 Player rope candidates such as Climb_Up_Rope 449, Rope_Hang_Idle 477 and Swing_on_Rope_to_Ground 494 are catalog references only. They do not prove a safe descent/landing or the real grip, climb, crest and equipment contract. Kit does not need a rope-use animation under the current staging. [1,9,16]
 
