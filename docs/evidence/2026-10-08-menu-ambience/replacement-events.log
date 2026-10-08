@@ -1,0 +1,9 @@
+10-08 21:16:58.205 HordeRtProbeBridge: HORDE_ENTRY_STATE generation=1 profile=2 phase=2 fade_permille=0 presented=0
+10-08 21:17:13.054 HordeRtProbeBridge: HORDE_ENTRY_STATE generation=1 profile=2 phase=0 fade_permille=0 presented=1
+10-08 21:17:13.054 HordeRtProbeBridge: HORDE_SURFACE_PRESENTED generation=1
+10-08 21:17:13.069 HordeMenuAmbience: start key=menu_room stream=1 loop=true gain=0.049
+10-08 21:17:24.317 HordeMenuAmbience: start key=menu_chain stream=2 loop=false gain=0.147
+10-08 21:17:39.139 HordeMenuAmbience: stop stream=2
+10-08 21:17:39.139 HordeMenuAmbience: start key=menu_chain stream=3 loop=false gain=0.147
+10-08 21:17:53.902 HordeMenuAmbience: stop stream=3
+10-08 21:17:53.903 HordeMenuAmbience: start key=menu_chain stream=4 loop=false gain=0.147
