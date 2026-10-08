@@ -149,15 +149,24 @@ inline constexpr std::array<RouteRect, 9> kShowcaseWalkableRects{{
 
 // The gallery and arch posts are retained from the original chamber. The two
 // far-wall returns enforce the framed 1.8 m doorway at z=-6.4.
-// Static collision/acoustic obstacles: route masonry and the Keeper torch
-// bases. The reward chest remains separate because positional sound emitted
-// from its centre must not be classified as crossing a wall.
-inline constexpr std::array<RouteRect, 7> kShowcaseSolidObstacles{{
+// Full-height masonry used by the existing heightless acoustic approximation.
+// Low props must not acquire wall attenuation or self-occlude positional cues.
+inline constexpr std::array<RouteRect, 5> kShowcaseMasonryObstacles{{
     {-10.0f, -0.72f, 0.05f, 2.35f},
     {-1.20f, -0.78f, -3.55f, -3.25f},
     {0.78f, 1.20f, -3.55f, -3.25f},
     {-1.85f, -0.90f, -6.50f, -6.30f},
     {0.90f, 1.85f, -6.50f, -6.30f},
+}};
+
+// Movement additionally respects the low Keeper stand bases. The reward chest
+// retains its separate existing movement collider.
+inline constexpr std::array<RouteRect, 7> kShowcaseSolidObstacles{{
+    kShowcaseMasonryObstacles[0],
+    kShowcaseMasonryObstacles[1],
+    kShowcaseMasonryObstacles[2],
+    kShowcaseMasonryObstacles[3],
+    kShowcaseMasonryObstacles[4],
     kKeeperTorchStandCollisionRects[0],
     kKeeperTorchStandCollisionRects[1],
 }};

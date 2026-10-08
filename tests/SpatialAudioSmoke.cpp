@@ -162,6 +162,20 @@ int main()
     check(!IsRouteAudioObstructed(0.0f, -7.0f, 0.0f, -9.4f) &&
           IsRouteAudioObstructed(0.0f, -4.8f, 4.2f, -9.4f),
           "route walls must pass same-leg sound and attenuate sound cutting across a bend");
+    for (const RoutePosition& stand : kKeeperTorchStandCenters)
+    {
+        // These floor bases are 0.13 m tall. Ear-height sound crossing their
+        // footprints must retain the existing clear-room mix, not acquire the
+        // wall attenuation of the route's heightless masonry approximation.
+        check(!IsRouteAudioObstructed(stand.x - 0.60f, stand.z,
+                                     stand.x + 0.60f, stand.z),
+              "low Keeper stand bases must not become full-height acoustic walls");
+        const SpatialAudioGains standCue = CalculateSpatialAudio(
+            {stand.x, stand.z, 0.70f, 1.0f, 14.0f},
+            {stand.x + 0.80f, stand.z, -1.57079632679f});
+        check(!standCue.obstructed && StereoPower(standCue) > 0.0f,
+              "Keeper stand sound must not self-occlude at its base footprint");
+    }
     const SpatialAudioGains chestUnlockAtInteraction = CalculateSpatialAudio(
         {kRewardChestRoutePosition.x, kRewardChestRoutePosition.z,
          0.70f, 1.0f, 14.0f},
