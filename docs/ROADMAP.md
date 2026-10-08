@@ -333,6 +333,8 @@ The recovery direction is a limited healing flask, food/rest in safe places and 
 
 The [1.7 master plan](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#prologue-combat-teaching--owner-direction-6-october-2026) owns encounter and acceptance details. This does not alter current 1.6.2 parry fixes or the accepted relocation of both guards into the waterfall room. The same 1.7 pass removes or recontextualizes the opening-room tech-demo material collection for a deliberate story, guidance or action purpose; shared renderer/material systems and separate validation fixtures remain intact.
 
+**Owner addition, 8 October 2026:** Add a compact opening-dungeon parry/dodge tutorial in 1.7, with optional teaching slowdown and clear visible/audible enemy warnings. Yellow for parry and red for dodge/avoid are provisional art direction and must never be the only distinction. Preserve free baseline telegraphs and accessibility; wider parry timing or focus slowdown as an earned perk remains an optional design choice with exact balance undecided. The Keeper must visibly and audibly warn before lightning discharge within its existing nonfatal-hit repel loop. Prefer bounded real world-space RT weapon/hand cues, subject to renderer inspection, motion review and measured cost. See [the tutorial, cues and assist acceptance contract](superpowers/plans/2026-09-11-beyond-the-tomb-1.7.0.md#opening-tutorial-readable-warnings-and-optional-assists--owner-addition-8-october-2026). No current 1.6.2 task or runtime implementation is added.
+
 ## The hub-and-dungeon loop
 
 Proposed campaign structure:
