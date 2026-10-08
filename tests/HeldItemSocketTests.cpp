@@ -1581,6 +1581,10 @@ bool ResolveProductionAnatomicalSword(
     using namespace horde::vulkan::raytracing;
     PlayerAnimationState playerAnimation;
     PlayerAnimationInput animationInput;
+    animationInput.carryingOriginalTorch =
+        input.interaction.heldLightKind == horde::gameplay::interactions::HeldLightKind::Torch &&
+        items[0].parentMode == horde::gameplay::items::HeldItemParentMode::HandSocket &&
+        !items[0].detached;
     animationInput.heldItemKinematics = kinematics;
     animationInput.playerCombat = input.playerCombat;
     animationInput.walkTime = input.walkTime;
@@ -4560,6 +4564,10 @@ bool ResolveProductionSwordStowPose(
 
     PlayerAnimationState animationState;
     PlayerAnimationInput animationInput;
+    animationInput.carryingOriginalTorch =
+        input.interaction.heldLightKind == horde::gameplay::interactions::HeldLightKind::Torch &&
+        items[0].parentMode == horde::gameplay::items::HeldItemParentMode::HandSocket &&
+        !items[0].detached;
     animationInput.heldItemKinematics = fixed.kinematics;
     animationInput.playerCombat = input.playerCombat;
     animationInput.walkTime = input.walkTime;

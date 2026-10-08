@@ -85,6 +85,7 @@ struct PlayerAnimationInput
     bool carryingRewardLantern = false;
     float lanternForwardAngleRadians = 0.0f;
     float lanternStrafeAngleRadians = 0.0f;
+    bool carryingOriginalTorch = false;
 };
 
 PlayerLocomotionClip MapPlayerLocomotionClip(float locomotionBlend);

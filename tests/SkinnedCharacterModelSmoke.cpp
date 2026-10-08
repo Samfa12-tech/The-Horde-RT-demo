@@ -321,6 +321,557 @@ float OrientationError(const HeldItemTransform& left, const HeldItemTransform& r
     return maximum;
 }
 
+Vec3 Add(const Vec3& left, const Vec3& right);
+Vec3 Subtract(const Vec3& left, const Vec3& right);
+
+float Distance(const Vec3& left, const Vec3& right)
+{
+    const Vec3 delta = Subtract(left, right);
+    return std::sqrt(Dot(delta, delta));
+}
+
+float PointSegmentDistance(const Vec3& point, const Vec3& start, const Vec3& end)
+{
+    const Vec3 extent = Subtract(end, start);
+    const float fraction = std::clamp(
+        Dot(Subtract(point, start), extent) /
+            std::max(Dot(extent, extent), 1.0e-12f),
+        0.0f, 1.0f);
+    return Distance(point, Add(start, Scale(extent, fraction)));
+}
+
+struct DiagnosticRange3
+{
+    Vec3 minimum{{INFINITY, INFINITY, INFINITY}};
+    Vec3 maximum{{-INFINITY, -INFINITY, -INFINITY}};
+
+    void Include(const Vec3& value)
+    {
+        for (std::size_t axis = 0u; axis < 3u; ++axis)
+        {
+            minimum[axis] = std::min(minimum[axis], value[axis]);
+            maximum[axis] = std::max(maximum[axis], value[axis]);
+        }
+    }
+
+    Vec3 Span() const
+    {
+        return {{maximum[0] - minimum[0], maximum[1] - minimum[1],
+                 maximum[2] - minimum[2]}};
+    }
+};
+
+float Percentile(std::vector<float> values, const float fraction)
+{
+    if (values.empty()) return 0.0f;
+    std::sort(values.begin(), values.end());
+    const std::size_t index = std::min(
+        static_cast<std::size_t>(fraction * static_cast<float>(values.size() - 1u)),
+        values.size() - 1u);
+    return values[index];
+}
+
+bool RunWalkingArmStabilityDiagnostic(const bool flexionSweep = false,
+                                      const bool pairedRegression = false)
+{
+    using namespace horde::gameplay::simulation;
+    using namespace horde::scene;
+    using horde::vulkan::raytracing::PlayerCpuSkinCadence;
+    using horde::vulkan::raytracing::PlayerRenderSlot;
+
+    const auto root = FindRepoRoot();
+    if (!Require(!root.empty(), "walking-arm diagnostic repo assets were not found"))
+        return false;
+    const auto playerPath = root / "assets/models/player/runtime/gothic-traveller-lod0.runtime.glb";
+    std::string diagnostic;
+    SkinnedMeshAsset rigAsset;
+    if (!Require(rigAsset.LoadClips(playerPath.string(), PlayerLocomotionClipSet(), diagnostic),
+                 diagnostic.c_str())) return false;
+
+    std::vector<TexturedSkinnedRtVertex> bindVertices;
+    if (!Require(rigAsset.SkinUniqueTextured(SkinnedClip::Idle, 0.0f,
+                                              bindVertices, diagnostic),
+                 diagnostic.c_str())) return false;
+    constexpr std::array<std::string_view, 3u> armNames{{
+        "LeftArm", "LeftForeArm", "LeftHand"}};
+    std::array<SkinnedNodeTransform, 3u> bindNodes{};
+    if (!Require(rigAsset.NodeTransforms(SkinnedClip::Idle, 0.0f, armNames,
+                                          bindNodes, diagnostic),
+                 diagnostic.c_str())) return false;
+    const auto nodePosition = [](const SkinnedNodeTransform& node) {
+        return Vec3{{node[12], node[13], node[14]}};
+    };
+    const Vec3 bindShoulder = nodePosition(bindNodes[0]);
+    const Vec3 bindElbow = nodePosition(bindNodes[1]);
+    const Vec3 bindHand = nodePosition(bindNodes[2]);
+
+    // Select a repeatable left-arm surface band from the authored idle skin.
+    // The broad chain radius includes the complete sleeve/gauntlet contour;
+    // the elbow subset tracks the local contour around the authored joint.
+    std::vector<std::size_t> armVertices;
+    std::vector<std::size_t> elbowVertices;
+    for (std::size_t index = 0u; index < bindVertices.size(); ++index)
+    {
+        const Vec3 point{{bindVertices[index].position[0],
+                          bindVertices[index].position[1],
+                          bindVertices[index].position[2]}};
+        if (point[0] <= 0.05f) continue;
+        const float upperDistance = PointSegmentDistance(point, bindShoulder, bindElbow);
+        const float lowerDistance = PointSegmentDistance(point, bindElbow, bindHand);
+        if (std::min(upperDistance, lowerDistance) <= 0.16f)
+            armVertices.push_back(index);
+        if (Distance(point, bindElbow) <= 0.14f)
+            elbowVertices.push_back(index);
+    }
+    if (!Require(armVertices.size() >= 32u && elbowVertices.size() >= 8u,
+                 "authored left-arm diagnostic surface selection is too small"))
+        return false;
+
+    struct RunMetrics
+    {
+        DiagnosticRange3 shoulder;
+        DiagnosticRange3 elbowCenter;
+        DiagnosticRange3 elbowRelativeToShoulder;
+        DiagnosticRange3 contourCenter;
+        DiagnosticRange3 target;
+        DiagnosticRange3 viewTarget;
+        DiagnosticRange3 playerPosition;
+        DiagnosticRange3 upperLength;
+        DiagnosticRange3 lowerLength;
+        DiagnosticRange3 solvedShoulderToHand;
+        DiagnosticRange3 estimatedChainStretch;
+        DiagnosticRange3 requestedReachRatio;
+        DiagnosticRange3 preferredFlexion;
+        DiagnosticRange3 overheadLowering;
+        DiagnosticRange3 overheadRetraction;
+        float maximumGripError = 0.0f;
+        float maximumAdjacentElbowCenter = 0.0f;
+        float maximumAdjacentContourCenter = 0.0f;
+        float maximumAdjacentMedianVertex = 0.0f;
+        float maximumAdjacentP95Vertex = 0.0f;
+        float maximumAdjacentVertex = 0.0f;
+        float maximumBoundaryAdjacentElbowCenter = 0.0f;
+        float maximumBoundaryAdjacentContourCenter = 0.0f;
+        float maximumBoundaryAdjacentP95Vertex = 0.0f;
+        float maximumBoundaryAdjacentVertex = 0.0f;
+        float maximumTorchFailureLowerBlend = 0.0f;
+        bool torchFailureTriggered = false;
+        bool torchHeldByPlayerEverySample = true;
+        bool hasPreviousStretchState = false;
+        bool previousStretchActive = false;
+        std::size_t stretchActiveSamples = 0u;
+        std::size_t stretchStateTransitions = 0u;
+        std::vector<std::size_t> stretchTransitionSamples;
+        std::vector<std::vector<float>> nonFlexionPoseHistory;
+        int heldLightKind = -1;
+        std::size_t samples = 0u;
+    };
+
+    const auto runCase = [&](const float aspect, const bool fixedTarget,
+                             const bool overrideFlexion,
+                             const float flexionRadians,
+                             RunMetrics& metrics) -> bool {
+        auto config = ProductionGameSimulationConfig();
+        config.swordStartsStowed = false;
+        // Stage in the open skylight chamber so the measurement does not
+        // cross the narrow corridor or the torch-failure trigger fixture.
+        config.waterfallSkeletonEncounter = false;
+        config.playerStartX = -5.5f;
+        config.playerStartZ = -13.5f;
+        // Keep the view/clearance sample stationary while retaining full
+        // forward movement intent and the simulation's walking animation.
+        config.movementSpeedMetresPerSecond = 0.0f;
+        GameSimulation simulation(config);
+        simulation.SetPresentationAspect(aspect);
+        InputSnapshot input{};
+        input.damageEnabled = false;
+        input.moveForward = 1.0f;
+        for (std::size_t warmup = 0u; warmup < 60u; ++warmup)
+            simulation.StepFixed(input);
+
+        PlayerRenderSlot slot;
+        if (!slot.LoadAsset(playerPath.string(), diagnostic))
+        {
+            std::cerr << "FAIL: walking-arm slot load: " << diagnostic << '\n';
+            return false;
+        }
+        SkinnedNodeTransform leftArmBase{}, rightArmBase{};
+        if (!rigAsset.NodeTransform(SkinnedClip::Idle, 0.0f,
+                                    "LeftArm", leftArmBase, diagnostic) ||
+            !rigAsset.NodeTransform(SkinnedClip::Idle, 0.0f,
+                                    "RightArm", rightArmBase, diagnostic))
+        {
+            std::cerr << "FAIL: walking-arm bind sockets: " << diagnostic << '\n';
+            return false;
+        }
+        horde::gameplay::animation::PlayerAnimationSnapshot fixedModelPose{};
+        bool fixedModelPoseReady = false;
+
+        const float fixedDelta = static_cast<float>(FixedStepRunner::kFixedDeltaSeconds);
+        constexpr float gaitRateRadiansPerSecond = 6.2f;
+        constexpr float measuredCycles = 2.25f;
+        const std::size_t sampleCount = static_cast<std::size_t>(std::ceil(
+            measuredCycles * 6.28318530718f / gaitRateRadiansPerSecond / fixedDelta));
+        std::vector<Vec3> previousArm;
+        Vec3 previousElbowCenter{};
+        Vec3 previousContourCenter{};
+        for (std::size_t sample = 0u; sample < sampleCount; ++sample)
+        {
+            simulation.StepFixed(input, fixedDelta);
+            auto source = simulation.Snapshot();
+            TestRigFrame frame = BuildRigFrame(
+                source, leftArmBase, rightArmBase, slot);
+            if (fixedTarget)
+            {
+                if (!fixedModelPoseReady)
+                {
+                    fixedModelPose = frame.animation;
+                    fixedModelPoseReady = true;
+                }
+                else
+                {
+                    frame.animation.leftIk.target = fixedModelPose.leftIk.target;
+                    frame.animation.leftIk.pole = fixedModelPose.leftIk.pole;
+                    frame.animation.leftIk.gripX = fixedModelPose.leftIk.gripX;
+                    frame.animation.leftIk.gripY = fixedModelPose.leftIk.gripY;
+                    frame.animation.leftIk.gripZ = fixedModelPose.leftIk.gripZ;
+                    frame.animation.leftIk.shoulder = fixedModelPose.leftIk.shoulder;
+                    frame.animation.leftIk.preferredElbowFlexionRadians =
+                        fixedModelPose.leftIk.preferredElbowFlexionRadians;
+                    frame.animation.leftIk.poseWeight = fixedModelPose.leftIk.poseWeight;
+                }
+            }
+            std::vector<float> poseContract;
+            poseContract.reserve(48u);
+            poseContract.push_back(static_cast<float>(frame.animation.locomotionClip));
+            poseContract.push_back(frame.animation.locomotionBlend);
+            poseContract.push_back(frame.animation.locomotionTime);
+            poseContract.push_back(static_cast<float>(frame.animation.combatLayer.action));
+            poseContract.push_back(frame.animation.combatLayer.normalizedActionTime);
+            poseContract.push_back(frame.animation.combatLayer.weight);
+            poseContract.push_back(static_cast<float>(frame.animation.reaction));
+            poseContract.push_back(frame.animation.reactionTime);
+            const auto append = [&poseContract](const auto& values) {
+                for (const float value : values) poseContract.push_back(value);
+            };
+            append(frame.animation.leftIk.target);
+            append(frame.animation.leftIk.pole);
+            append(frame.animation.leftIk.gripX);
+            append(frame.animation.leftIk.gripY);
+            append(frame.animation.leftIk.gripZ);
+            append(frame.animation.leftIk.shoulder);
+            poseContract.push_back(frame.animation.leftIk.poseWeight);
+            append(frame.animation.rightIk.target);
+            append(frame.animation.rightIk.pole);
+            append(frame.animation.rightIk.gripX);
+            append(frame.animation.rightIk.gripY);
+            append(frame.animation.rightIk.gripZ);
+            append(frame.animation.rightIk.shoulder);
+            poseContract.push_back(frame.animation.rightIk.poseWeight);
+            poseContract.push_back(frame.animation.swordStowBlend);
+            poseContract.push_back(frame.animation.swordHandGripBlend);
+            poseContract.push_back(source.playerX);
+            poseContract.push_back(source.playerZ);
+            poseContract.push_back(source.playerYawRadians);
+            poseContract.push_back(source.torchFailure.leftArmLowerBlend);
+            poseContract.push_back(source.torchFailure.heldByPlayer ? 1.0f : 0.0f);
+            poseContract.push_back(static_cast<float>(source.interaction.heldLightKind));
+            metrics.nonFlexionPoseHistory.push_back(std::move(poseContract));
+            if (overrideFlexion)
+                frame.animation.leftIk.preferredElbowFlexionRadians = flexionRadians;
+            bool updated = false;
+            if (!slot.PreparePose(frame.animation, sample + 1u,
+                                  PlayerCpuSkinCadence::Hz60,
+                                  updated, diagnostic) || !updated)
+            {
+                std::cerr << "FAIL: walking-arm final skin: " << diagnostic << '\n';
+                return false;
+            }
+            const auto& vertices = slot.UniqueVertices();
+            if (vertices.size() != bindVertices.size())
+            {
+                std::cerr << "FAIL: walking-arm final skin vertex count changed\n";
+                return false;
+            }
+
+            std::array<SkinnedNodeTransform, 3u> rawNodes{};
+            if (!rigAsset.NodeTransforms(SkinnedClip::Walking,
+                    frame.animation.locomotionTime, armNames, rawNodes, diagnostic))
+            {
+                std::cerr << "FAIL: walking-arm sampled bones: " << diagnostic << '\n';
+                return false;
+            }
+            const Vec3 shoulder = nodePosition(rawNodes[0]);
+            const Vec3 rawElbow = nodePosition(rawNodes[1]);
+            const Vec3 rawHand = nodePosition(rawNodes[2]);
+            metrics.shoulder.Include(shoulder);
+            metrics.elbowCenter.Include(rawElbow);
+            metrics.upperLength.Include({{Distance(shoulder, rawElbow), 0.0f, 0.0f}});
+            metrics.lowerLength.Include({{Distance(rawElbow, rawHand), 0.0f, 0.0f}});
+            const auto& solvedHand = slot.BoneSockets().leftHand;
+            const float solvedReach = Distance(
+                shoulder, {{solvedHand[12], solvedHand[13], solvedHand[14]}});
+            const float upperLength = Distance(shoulder, rawElbow);
+            const float lowerLength = Distance(rawElbow, rawHand);
+            const float flexion = frame.animation.leftIk.preferredElbowFlexionRadians;
+            metrics.preferredFlexion.Include({{flexion, 0.0f, 0.0f}});
+            const float preferredReach = flexion == 0.0f
+                ? upperLength + lowerLength
+                : std::sqrt(std::max(
+                    upperLength * upperLength + lowerLength * lowerLength +
+                        2.0f * upperLength * lowerLength * std::cos(flexion),
+                    0.0f));
+            const float requestedReachRatio =
+                solvedReach / std::max(preferredReach, 0.0001f);
+            const bool stretchActive = requestedReachRatio > 1.0f;
+            const bool crossedStretchBoundary = metrics.hasPreviousStretchState &&
+                metrics.previousStretchActive != stretchActive;
+            metrics.solvedShoulderToHand.Include({{solvedReach, 0.0f, 0.0f}});
+            metrics.requestedReachRatio.Include({{requestedReachRatio, 0.0f, 0.0f}});
+            metrics.estimatedChainStretch.Include({{
+                std::clamp(requestedReachRatio, 1.0f, 1.75f), 0.0f, 0.0f}});
+            metrics.stretchActiveSamples += stretchActive ? 1u : 0u;
+            if (metrics.hasPreviousStretchState &&
+                metrics.previousStretchActive != stretchActive)
+            {
+                ++metrics.stretchStateTransitions;
+                metrics.stretchTransitionSamples.push_back(sample);
+            }
+            metrics.previousStretchActive = stretchActive;
+            metrics.hasPreviousStretchState = true;
+            metrics.target.Include(frame.animation.leftIk.target);
+            metrics.overheadLowering.Include({{
+                source.heldItemKinematics.torchOverheadLowering, 0.0f, 0.0f}});
+            metrics.overheadRetraction.Include({{
+                source.heldItemKinematics.torchOverheadRetraction, 0.0f, 0.0f}});
+            metrics.viewTarget.Include({{
+                source.playerAnimation.leftIk.target[0],
+                source.playerAnimation.leftIk.target[1],
+                source.playerAnimation.leftIk.target[2]}});
+            metrics.playerPosition.Include({{source.playerX, source.playerZ, 0.0f}});
+            metrics.maximumTorchFailureLowerBlend = std::max(
+                metrics.maximumTorchFailureLowerBlend,
+                source.torchFailure.leftArmLowerBlend);
+            metrics.torchFailureTriggered |= source.torchFailure.triggered;
+            metrics.torchHeldByPlayerEverySample &= source.torchFailure.heldByPlayer;
+            metrics.heldLightKind = static_cast<int>(source.interaction.heldLightKind);
+            metrics.maximumGripError = std::max(
+                metrics.maximumGripError, slot.LeftSocketErrorMetres());
+
+            const auto centroid = [&vertices](const std::vector<std::size_t>& indices) {
+                Vec3 result{};
+                for (const std::size_t index : indices)
+                    for (std::size_t axis = 0u; axis < 3u; ++axis)
+                        result[axis] += vertices[index].position[axis];
+                for (float& value : result) value /= static_cast<float>(indices.size());
+                return result;
+            };
+            const Vec3 elbowCenter = centroid(elbowVertices);
+            const Vec3 contourCenter = centroid(armVertices);
+            metrics.elbowRelativeToShoulder.Include(
+                Subtract(elbowCenter, shoulder));
+            metrics.contourCenter.Include(contourCenter);
+            std::vector<Vec3> currentArm;
+            currentArm.reserve(armVertices.size());
+            for (const std::size_t index : armVertices)
+                currentArm.push_back({{vertices[index].position[0],
+                                       vertices[index].position[1],
+                                       vertices[index].position[2]}});
+            if (!previousArm.empty())
+            {
+                metrics.maximumAdjacentElbowCenter = std::max(
+                    metrics.maximumAdjacentElbowCenter,
+                    Distance(elbowCenter, previousElbowCenter));
+                metrics.maximumAdjacentContourCenter = std::max(
+                    metrics.maximumAdjacentContourCenter,
+                    Distance(contourCenter, previousContourCenter));
+                std::vector<float> displacements;
+                displacements.reserve(currentArm.size());
+                for (std::size_t index = 0u; index < currentArm.size(); ++index)
+                    displacements.push_back(Distance(currentArm[index], previousArm[index]));
+                metrics.maximumAdjacentMedianVertex = std::max(
+                    metrics.maximumAdjacentMedianVertex, Percentile(displacements, 0.50f));
+                metrics.maximumAdjacentP95Vertex = std::max(
+                    metrics.maximumAdjacentP95Vertex, Percentile(displacements, 0.95f));
+                metrics.maximumAdjacentVertex = std::max(
+                    metrics.maximumAdjacentVertex,
+                    *std::max_element(displacements.begin(), displacements.end()));
+                if (crossedStretchBoundary)
+                {
+                    const float stepP95 = Percentile(displacements, 0.95f);
+                    const float stepMaximum =
+                        *std::max_element(displacements.begin(), displacements.end());
+                    metrics.maximumBoundaryAdjacentElbowCenter = std::max(
+                        metrics.maximumBoundaryAdjacentElbowCenter,
+                        Distance(elbowCenter, previousElbowCenter));
+                    metrics.maximumBoundaryAdjacentContourCenter = std::max(
+                        metrics.maximumBoundaryAdjacentContourCenter,
+                        Distance(contourCenter, previousContourCenter));
+                    metrics.maximumBoundaryAdjacentP95Vertex = std::max(
+                        metrics.maximumBoundaryAdjacentP95Vertex, stepP95);
+                    metrics.maximumBoundaryAdjacentVertex = std::max(
+                        metrics.maximumBoundaryAdjacentVertex, stepMaximum);
+                }
+            }
+            previousArm = std::move(currentArm);
+            previousElbowCenter = elbowCenter;
+            previousContourCenter = contourCenter;
+            ++metrics.samples;
+        }
+        return true;
+    };
+
+    if (pairedRegression)
+    {
+        constexpr float wideAspect = 16.0f / 9.0f;
+        for (const bool fixedTarget : {true, false})
+        {
+            RunMetrics zeroFlexion;
+            RunMetrics productionFlexion;
+            if (!runCase(wideAspect, fixedTarget, true, 0.0f, zeroFlexion) ||
+                !runCase(wideAspect, fixedTarget, false, 0.0f, productionFlexion))
+                return false;
+            const bool pairedPoseContract =
+                zeroFlexion.nonFlexionPoseHistory ==
+                productionFlexion.nonFlexionPoseHistory;
+            const bool heldTorchContinuity =
+                zeroFlexion.heldLightKind == static_cast<int>(
+                    horde::gameplay::interactions::HeldLightKind::Torch) &&
+                productionFlexion.heldLightKind == zeroFlexion.heldLightKind &&
+                zeroFlexion.torchHeldByPlayerEverySample &&
+                productionFlexion.torchHeldByPlayerEverySample &&
+                !zeroFlexion.torchFailureTriggered &&
+                !productionFlexion.torchFailureTriggered &&
+                zeroFlexion.maximumTorchFailureLowerBlend == 0.0f &&
+                productionFlexion.maximumTorchFailureLowerBlend == 0.0f;
+            const bool gripPreserved =
+                zeroFlexion.maximumGripError <= 0.015f &&
+                productionFlexion.maximumGripError <= 0.015f;
+            const bool stretchBoundaryObserved =
+                zeroFlexion.stretchStateTransitions > 0u &&
+                productionFlexion.stretchStateTransitions > 0u;
+            const bool actualRigContinuityImproved =
+                productionFlexion.maximumBoundaryAdjacentElbowCenter <
+                    zeroFlexion.maximumBoundaryAdjacentElbowCenter &&
+                productionFlexion.maximumBoundaryAdjacentP95Vertex <
+                    zeroFlexion.maximumBoundaryAdjacentP95Vertex &&
+                productionFlexion.maximumBoundaryAdjacentVertex <
+                    zeroFlexion.maximumBoundaryAdjacentVertex;
+            std::cout << "walking-arm-pair-evidence case="
+                      << (fixedTarget ? "walk-fixed-target" : "production-torch")
+                      << " baselineFlexion=" << zeroFlexion.preferredFlexion.minimum[0]
+                      << ".." << zeroFlexion.preferredFlexion.maximum[0]
+                      << " productionFlexion=" << productionFlexion.preferredFlexion.minimum[0]
+                      << ".." << productionFlexion.preferredFlexion.maximum[0]
+                      << " baselineBoundaryElbow="
+                      << zeroFlexion.maximumBoundaryAdjacentElbowCenter
+                      << " productionBoundaryElbow="
+                      << productionFlexion.maximumBoundaryAdjacentElbowCenter
+                      << " baselineBoundaryP95="
+                      << zeroFlexion.maximumBoundaryAdjacentP95Vertex
+                      << " productionBoundaryP95="
+                      << productionFlexion.maximumBoundaryAdjacentP95Vertex
+                      << " baselineBoundaryMax="
+                      << zeroFlexion.maximumBoundaryAdjacentVertex
+                      << " productionBoundaryMax="
+                      << productionFlexion.maximumBoundaryAdjacentVertex
+                      << " pairedPoseContract=" << pairedPoseContract
+                      << " heldTorch=" << heldTorchContinuity
+                      << " grip=" << gripPreserved
+                      << " boundary=" << stretchBoundaryObserved
+                      << " improved=" << actualRigContinuityImproved << '\n';
+            if (!Require(pairedPoseContract,
+                         "flexion-only comparison must preserve every sampled animation, target, grip, and movement input") ||
+                !Require(heldTorchContinuity,
+                         "paired actual-rig samples must remain a held original Torch with no release transition") ||
+                !Require(gripPreserved,
+                         "both actual-rig variants must retain the existing 15 mm Grip socket tolerance") ||
+                !Require(stretchBoundaryObserved,
+                         "paired wide walking samples must cross the measured chain-stretch boundary") ||
+                !Require(actualRigContinuityImproved,
+                         "production held-Torch pose must reduce elbow and final-skin steps at the stretch boundary"))
+                return false;
+            std::cout << "walking-arm-paired-flexion case="
+                      << (fixedTarget ? "walk-fixed-target" : "production-torch")
+                      << " samples=" << productionFlexion.samples
+                      << " baselineFlexion=" << zeroFlexion.preferredFlexion.minimum[0]
+                      << ".." << zeroFlexion.preferredFlexion.maximum[0]
+                      << " productionFlexion=" << productionFlexion.preferredFlexion.minimum[0]
+                      << ".." << productionFlexion.preferredFlexion.maximum[0]
+                      << " baselineBoundaryTransitions="
+                      << zeroFlexion.stretchStateTransitions
+                      << " productionBoundaryTransitions="
+                      << productionFlexion.stretchStateTransitions
+                      << " baselineBoundaryElbowStepMax="
+                      << zeroFlexion.maximumBoundaryAdjacentElbowCenter
+                      << " productionBoundaryElbowStepMax="
+                      << productionFlexion.maximumBoundaryAdjacentElbowCenter
+                      << " baselineBoundaryArmP95Max="
+                      << zeroFlexion.maximumBoundaryAdjacentP95Vertex
+                      << " productionBoundaryArmP95Max="
+                      << productionFlexion.maximumBoundaryAdjacentP95Vertex
+                      << " baselineBoundaryArmMax="
+                      << zeroFlexion.maximumBoundaryAdjacentVertex
+                      << " productionBoundaryArmMax="
+                      << productionFlexion.maximumBoundaryAdjacentVertex
+                      << " baselineGripError=" << zeroFlexion.maximumGripError
+                      << " productionGripError=" << productionFlexion.maximumGripError
+                      << " nonFlexionPoseHistoryIdentical=" << pairedPoseContract
+                      << '\n';
+        }
+        return true;
+    }
+
+    const std::array<float, 4u> flexionDegrees{{0.0f, 5.0f, 10.0f, 20.0f}};
+    const std::size_t flexionCount = flexionSweep ? flexionDegrees.size() : 1u;
+    constexpr float radiansPerDegree = 0.01745329252f;
+    for (const auto [aspectName, aspect] : std::array<std::pair<const char*, float>, 2u>{{
+             {"portrait", 9.0f / 19.5f}, {"wide16:9", 16.0f / 9.0f}}})
+    {
+        for (std::size_t flexionIndex = 0u; flexionIndex < flexionCount; ++flexionIndex)
+        {
+            const float degrees = flexionDegrees[flexionIndex];
+            const float radians = degrees * radiansPerDegree;
+            for (const bool fixedTarget : {true, false})
+            {
+                RunMetrics metrics;
+                if (!runCase(aspect, fixedTarget, true, radians, metrics)) return false;
+                const Vec3 elbowSpan = metrics.elbowCenter.Span();
+                const Vec3 contourSpan = metrics.contourCenter.Span();
+                std::cout << "walking-arm-flexion aspect=" << aspectName
+                          << " case=" << (fixedTarget ? "walk-fixed-target" : "production-torch")
+                          << " flexionDegrees=" << degrees
+                          << " samples=" << metrics.samples
+                          << " vertices=" << armVertices.size()
+                          << " elbowVertices=" << elbowVertices.size()
+                          << " rawElbowSpan=" << elbowSpan[0] << ',' << elbowSpan[1] << ',' << elbowSpan[2]
+                          << " contourSpan=" << contourSpan[0] << ',' << contourSpan[1] << ',' << contourSpan[2]
+                          << " requestedReachRatio=" << metrics.requestedReachRatio.minimum[0]
+                          << ".." << metrics.requestedReachRatio.maximum[0]
+                          << " estimatedChainStretch=" << metrics.estimatedChainStretch.minimum[0]
+                          << ".." << metrics.estimatedChainStretch.maximum[0]
+                          << " stretchActiveSamples=" << metrics.stretchActiveSamples
+                          << " stretchStateTransitions=" << metrics.stretchStateTransitions
+                          << " stretchTransitionSamples=";
+                for (std::size_t transition = 0u;
+                     transition < metrics.stretchTransitionSamples.size(); ++transition)
+                    std::cout << (transition == 0u ? "" : ",")
+                              << metrics.stretchTransitionSamples[transition];
+                std::cout << " boundaryElbowStepMax=" << metrics.maximumBoundaryAdjacentElbowCenter
+                          << " boundaryContourStepMax=" << metrics.maximumBoundaryAdjacentContourCenter
+                          << " boundaryArmVertexP95Max=" << metrics.maximumBoundaryAdjacentP95Vertex
+                          << " boundaryArmVertexMax=" << metrics.maximumBoundaryAdjacentVertex
+                          << " adjacentElbowCenterMax=" << metrics.maximumAdjacentElbowCenter
+                          << " adjacentContourCenterMax=" << metrics.maximumAdjacentContourCenter
+                          << " adjacentArmVertexP95Max=" << metrics.maximumAdjacentP95Vertex
+                          << " adjacentArmVertexMax=" << metrics.maximumAdjacentVertex
+                          << " maxGripError=" << metrics.maximumGripError << '\n';
+            }
+        }
+    }
+    return true;
+}
+
 Vec3 Add(const Vec3& left, const Vec3& right)
 {
     return {{left[0] + right[0], left[1] + right[1], left[2] + right[2]}};
@@ -709,6 +1260,12 @@ GripSurfaceMetrics MeasureGripSurface(
 
 int main(int argc, char** argv)
 {
+    if (argc == 2 && std::string(argv[1]) == "--diagnose-walking-arm-stability")
+        return RunWalkingArmStabilityDiagnostic() ? 0 : 1;
+    if (argc == 2 && std::string(argv[1]) == "--diagnose-walking-arm-flexion")
+        return RunWalkingArmStabilityDiagnostic(true) ? 0 : 1;
+    if (argc == 2 && std::string(argv[1]) == "--test-walking-arm-flexion-regression")
+        return RunWalkingArmStabilityDiagnostic(false, true) ? 0 : 1;
     using namespace horde::scene;
     constexpr float h = (16.0f/9.0f)/1.22f;
     constexpr float v = .74f/1.22f;
@@ -2349,6 +2906,8 @@ int main(int argc, char** argv)
                  "audited staff crystal sample moved into the robe or eye cluster")) return 1;
     std::vector<SkinnedRtVertex> unavailableAttack;
     if (!Require(!lich.Skin(SkinnedClip::Attack, 0.5f, unavailableAttack, diagnostic), "unmapped lich attack unexpectedly skinned")) return 1;
+
+    if (!RunWalkingArmStabilityDiagnostic(false, true)) return 1;
 
     std::cout << "Skinned character model smoke passed: skeleton=" << skeleton.ExpandedVertexCount()
               << " player=" << player.ExpandedVertexCount()

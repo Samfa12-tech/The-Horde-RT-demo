@@ -1345,6 +1345,10 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
 
 void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
 {
+    const bool carryingOriginalTorch =
+        interactionState_.heldLightKind ==
+            horde::gameplay::interactions::HeldLightKind::Torch &&
+        torchFailureSnapshot_.heldByPlayer;
     const float leftArmWeight = interactionState_.heldLightKind ==
         horde::gameplay::interactions::HeldLightKind::RewardLantern
         ? 1.0f
@@ -1357,7 +1361,8 @@ void GameSimulation::ResolvePlayerAnimation(const float fixedDeltaSeconds)
          leftArmWeight,
          interactionState_.heldLightKind == horde::gameplay::interactions::HeldLightKind::RewardLantern,
          lanternPendulum_.Snapshot().forwardAngleRadians,
-         lanternPendulum_.Snapshot().strafeAngleRadians},
+         lanternPendulum_.Snapshot().strafeAngleRadians,
+         carryingOriginalTorch},
         fixedDeltaSeconds);
 
 }

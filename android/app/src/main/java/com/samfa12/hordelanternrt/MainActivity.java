@@ -5372,6 +5372,7 @@ public class MainActivity extends Activity {
 
     @Override public void onWindowFocusChanged(boolean focused) {
         super.onWindowFocusChanged(focused);
+        logSurfaceLifecycle(focused ? "focusGain" : "focusLoss");
         controllerWindowFocused=focused;
         currentControllerDialog();
         if (!focused) {
@@ -5948,6 +5949,12 @@ public class MainActivity extends Activity {
         logSurfaceLifecycle("pause");
         stopSurface();
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        logSurfaceLifecycle("stop");
+        super.onStop();
     }
 
     @Override

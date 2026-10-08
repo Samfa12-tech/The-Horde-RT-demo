@@ -150,6 +150,10 @@ bool Solve(PlayerRenderSlot& rig,const HeldItemFixedStepInput& input,std::uint64
     }
     horde::gameplay::animation::PlayerAnimationState state;
     horde::gameplay::animation::PlayerAnimationInput animationInput;
+    animationInput.carryingOriginalTorch =
+        input.interaction.heldLightKind == horde::gameplay::interactions::HeldLightKind::Torch &&
+        items[0].parentMode == horde::gameplay::items::HeldItemParentMode::HandSocket &&
+        !items[0].detached;
     animationInput.heldItemKinematics=out.target.kinematics;
     animationInput.playerCombat=input.playerCombat;
     animationInput.walkTime=input.walkTime; animationInput.walkAmount=input.walkAmount;

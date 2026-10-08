@@ -137,6 +137,12 @@ void PlayerAnimationState::StepFixed(const PlayerAnimationInput& input,
             (22.0f + 3.0f * gait + 5.0f * forward + 2.0f * swordLift) * radiansPerDegree;
         snapshot_.leftIk.pole[0] += 0.10f * strafe;
     }
+    else if (input.carryingOriginalTorch)
+    {
+        // Leave a small preferred bend so ordinary torch carry does not sit
+        // directly on the two-bone solver's straight-reach stretch boundary.
+        snapshot_.leftIk.preferredElbowFlexionRadians = 10.0f * 0.01745329252f;
+    }
     snapshot_.leftIk.gripX = input.heldItemKinematics.leftGripXInView;
     snapshot_.leftIk.gripY = input.heldItemKinematics.leftGripYInView;
     snapshot_.leftIk.gripZ = input.heldItemKinematics.leftGripZInView;

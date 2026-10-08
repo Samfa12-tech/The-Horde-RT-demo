@@ -140,8 +140,24 @@ int main()
         PlayerAnimationInput carryInput;
         carryInput.heldItemKinematics = items::EvaluateHeldItemKinematics({});
         carryState.StepFixed(carryInput, 0.0f);
+        const auto emptyHand = carryState.Snapshot();
+        if (!Require(emptyHand.leftIk.preferredElbowFlexionRadians == 0.0f,
+                     "an empty hand must keep the neutral chain reach")) return 1;
+        carryInput.carryingOriginalTorch = true;
+        carryState.StepFixed(carryInput, 0.0f);
+        const auto ordinaryTorch = carryState.Snapshot();
+        if (!Require(Near(ordinaryTorch.leftIk.preferredElbowFlexionRadians,
+                          10.0f * .01745329252f) &&
+                     ordinaryTorch.leftIk.target == carryInput.heldItemKinematics.leftHandLocal &&
+                     ordinaryTorch.leftIk.pole == emptyHand.leftIk.pole &&
+                     ordinaryTorch.leftIk.gripX == carryInput.heldItemKinematics.leftGripXInView &&
+                     ordinaryTorch.leftIk.gripY == carryInput.heldItemKinematics.leftGripYInView &&
+                     ordinaryTorch.leftIk.gripZ == carryInput.heldItemKinematics.leftGripZInView,
+                     "ordinary held Torch adds preferred bend while preserving its Grip, pole, and target")) return 1;
+        carryInput.carryingOriginalTorch = false;
+        carryState.StepFixed(carryInput, 0.0f);
         if (!Require(carryState.Snapshot().leftIk.preferredElbowFlexionRadians == 0.0f,
-                     "ordinary torch must preserve its existing chain stretch")) return 1;
+                     "releasing the original Torch must restore neutral chain reach")) return 1;
         carryInput.carryingRewardLantern = true;
         carryState.StepFixed(carryInput, 0.0f);
         const auto neutral = carryState.Snapshot();
@@ -503,6 +519,10 @@ int main()
     const auto& authoritative = simulation.Snapshot();
     if (!Require(authoritative.playerAnimation.combatLayer.action ==
                      PlayerUpperBodyAction::Sword &&
+                 authoritative.interaction.heldLightKind == interactions::HeldLightKind::Torch &&
+                 authoritative.torchFailure.heldByPlayer &&
+                 Near(authoritative.playerAnimation.leftIk.preferredElbowFlexionRadians,
+                      10.0f * .01745329252f) &&
                  authoritative.playerAnimation.leftIk.target ==
                      authoritative.heldItemKinematics.leftHandLocal &&
                  authoritative.playerAnimation.rightIk.target ==
