@@ -2,11 +2,23 @@
 
 The owner's queue addition is implemented on existing PR18. Physical Android
 controller support has **partial owner acceptance on the identified BB-51**, with
-the full physical matrix still open. The current installed f2 package combines
-sheathed start and the accepted wider/closer arms; its remaining defects are
-recorded below. The earlier 6282 package retains its landscape menu/guard/parry feedback. Earlier preliminary c8
+the full physical matrix still open. The current installed 6c8 repair candidate retains
+sheathed start and the accepted wider/closer arms. Earlier f2 owner findings and
+the remaining physical gates are recorded below. The earlier 6282 package retains its landscape menu/guard/parry feedback. Earlier preliminary c8
 feedback keeps its package identity. Earlier checkpoints below retain their own
 source, package and evidence identities.
+
+## Installed repair candidate — 6c8ecc39
+
+Source `6c8ecc39e63f17d4716da0d8f6e994cb872831a5`, tree `fb032369288002ac9f5baed2051a9ef1bbc9faa1`, pushed to the existing PR18 branch. Debug APK SHA-256 `f178daf46431f28d2aa8f997dc178274ec9653aca182e992f27f127765cbd945` / 138,462,724 bytes. Windows EXE SHA-256 `a87067220a1ab80ff1cb421f321ade19c4d4ac5f79c7b856a60f054ebb2ae5c2`. Four-ABI Android and Windows builds pass; SDK 37 16 KiB alignment, fullUser 13 and manifest configuration mask 0x4f0 pass. All 91 packaged asset entries and the manifest match f2; the complete two-dex roster changes for the diagnostics and is recorded. The install at **2026-10-08T07:10:16Z** on verified SM-S948B / Android 16 pulls back the exact APK, preserves every saved preference and free rotation, and leaves other app variants untouched. No controller is certified by connection to the computer.
+
+Normal cold entry Activity launch reports 463 ms / 466 ms wait, **not RT initialization or displayed time**. The owned bounded startup excerpt records generation1 successful native initialization at **15,043.726 ms CPU wall time**, followed by `HORDE_SURFACE_PRESENTED`, with no VUID/fatal markers. This is limited startup evidence, not an exact phone frame/image join, motion route or sustained performance pass. Current owner custom 50%/Mobile/Glass On/Current/cap30/Mist On/Dust Low remains intact; fresh defaults stay unchanged.
+
+The new sealed desktop captures complete **13/13 Pipeline (37.110 s) and 13/13 Compute (36.609 s)**, owned processes 68988 / 29772 exit 0, zero VUID/synchronization markers. Parent verification joins all **26 successful frame identities, PNG dimensions/hashes and 52 actual uploaded viewmodel/world-body mesh hashes**. Opening and waterfall guard PNGs were inspected: Torch Grip and empty right arm are primary-visible and the actual route-aware guard view is correct. This does not accept moving arms, secondary-view geometry, physical phone quality or performance.
+
+The owner has completed the combined check on this exact build: the left arm still wiggles while walking and does not seem noticeably different; they explicitly classify it as minor and ask to note it rather than spend hours tuning. Retain the bounded CPU discontinuity reduction, record the residual appearance issue, and defer further tuning. Right-hand rest has tentative feedback, not a firm appearance pass. **Parry and low ceilings are owner-accepted. Reconnect still rebuilds RT, possibly even when attaching at the main menu.** **Hot-plug is not fixed by this candidate.** Passive diagnostics add `stop` and focus gain/loss to resume/pause/surfaceDestroyed/destroy reasons and viewport dimensions, preserving native suspension and exact Graphics acknowledgement/timers. Current source CI push [37741496149](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37741496149) and PR [37741501338](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37741501338) complete successfully, **12/12 aggregate jobs** (push 6/6, PR 6/6), separately from a22's completed 12/12. CI does not close the physical gates. [Selected exact desktop frames](evidence/2026-10-08-torch-arm-repair/README.md).
+
+The returned owned-process excerpt now identifies two brief pause/resume intervals (106 ms and 79 ms) on the **same Activity**, with `available=true` and no surface destruction between them. `onPause` directly cancels generations1/3. New generations3/5 initialize in **17,393.267 / 17,964.362 ms**, with `compiled_pair_reused=0`, then present. Within-generation resize/rotation reuses pipelines in **45.183–298.386 ms**. A later genuine pause is followed by `surfaceDestroyed` and `stop`. This establishes the existing pause teardown as the restart trigger for those captured intervals; it does not identify which Android/system component issued the brief pause. Do not retain active GPU/background rendering as a workaround. A bounded, compatible CPU-only Vulkan cache seed is being investigated; its benefit remains unproven. Owner model/firmware/complete physical matrix gaps remain intact.
 
 ## Combined owner pass — f2cdbfd4
 
@@ -38,7 +50,7 @@ A new actual-rig paired regression checks 137 samples at 60 Hz with identical no
 
 Parent validation passes five affected checks (held sockets, sword authority, simulation timing/gameplay and waterfall route) in **46.56 s**. Fresh full portrait and wide final-rig matrices each pass **3,287 poses**, including **1,812 actual skinned roof cases** with 15,855 viewmodel vertices per pose. Worst headroom is **32.3757 / 32.3758 mm**; maximum Grip error **11.8211 / 0.346647 mm**, both within the existing 15 mm tolerance; zero failures. Animation-policy and full skinned-model smoke tests pass. Android's unchanged 225-test/35-class roster and lint pass in 27 s with the extra passive stop/focus diagnostics. No lifecycle behavior or confirmation timeout is changed.
 
-The route-aware a22 source separately passes **12/12 aggregate CI jobs**, push [37738788156](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37738788156) and PR [37738793667](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37738793667). The next immutable package must carry the walking repair and diagnostics, with a complete multidex roster and exact installed-base receipt. Current phone remains f2 until that receipt exists. **Walking appearance, natural sheathed right-hand rest and the cause/fix of slow BB-51 reconnect remain open.**
+The route-aware a22 source separately passes **12/12 aggregate CI jobs**, push [37738788156](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37738788156) and PR [37738793667](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37738793667). The installed 6c8 package above carries the repair and diagnostics, with a complete multidex roster and exact installed-base receipt. **Walking appearance, natural sheathed right-hand rest and the cause/fix of slow BB-51 reconnect remain open.**
 
 ## Owner landscape check — 6282ab66 / Backbone BB-51
 
