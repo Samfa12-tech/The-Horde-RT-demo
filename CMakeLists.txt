@@ -76,13 +76,12 @@ if(BUILD_TESTING)
     target_include_directories(horde_rt_pipeline_cache_seed_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     add_test(NAME horde_rt_pipeline_cache_seed_tests COMMAND horde_rt_pipeline_cache_seed_tests)
 
-    foreach(scale_fixture IN ITEMS horde_rt_benchmark_scale_default_tests horde_rt_benchmark_scale_experimental_tests)
+    foreach(scale_fixture IN ITEMS horde_rt_graphics_scale_min33_tests horde_rt_graphics_scale_legacy50_tests)
         add_executable(${scale_fixture} tests/BenchmarkScaleAdmissionTests.cpp)
         target_include_directories(${scale_fixture} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
         add_test(NAME ${scale_fixture} COMMAND ${scale_fixture})
     endforeach()
-    target_compile_definitions(horde_rt_benchmark_scale_experimental_tests PRIVATE
-        HORDE_RT_MIN_RENDER_SCALE_PERCENT=33 HORDE_RT_BENCHMARK_SCALE_VALIDATION=1)
+    target_compile_definitions(horde_rt_graphics_scale_legacy50_tests PRIVATE HORDE_RT_MIN_RENDER_SCALE_PERCENT=50)
 
     add_executable(horde_rt_graphics_preview_tests
         tests/GraphicsPreviewTests.cpp
@@ -332,8 +331,8 @@ endif()
 if(BUILD_TESTING)
     find_package(Threads REQUIRED)
     target_link_libraries(horde_rt_graphics_settings_tests PRIVATE Threads::Threads)
-    target_link_libraries(horde_rt_benchmark_scale_default_tests PRIVATE Threads::Threads)
-    target_link_libraries(horde_rt_benchmark_scale_experimental_tests PRIVATE Threads::Threads)
+    target_link_libraries(horde_rt_graphics_scale_min33_tests PRIVATE Threads::Threads)
+    target_link_libraries(horde_rt_graphics_scale_legacy50_tests PRIVATE Threads::Threads)
     add_executable(horde_rt_benchmark_summary_report_tests
         tests/BenchmarkSummaryReportTests.cpp
         src/telemetry/BenchmarkSummary.cpp

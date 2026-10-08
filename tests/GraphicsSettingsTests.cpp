@@ -29,6 +29,7 @@ GraphicsAppliedSnapshot Presented(const GraphicsCommand& command)
 }
 void TestMigrationAndProfiles()
 {
+    Check(kMinimumGraphicsRenderScalePercent == 33, "normal build exposes the two explicit experimental tiers");
     Check(MigrateLegacyGraphicsSettings({}, GraphicsPlatform::Android) == GraphicsSettings{}, "missing Android keys use accepted 75 percent Mobile baseline");
     const auto desktop = MigrateLegacyGraphicsSettings({}, GraphicsPlatform::Windows);
     Check(desktop.renderScalePercent == 100 && desktop.waterQuality == WaterQuality::High && desktop.fireDetail == FireDetail::High,
@@ -40,6 +41,37 @@ void TestMigrationAndProfiles()
     Check(MigrateLegacyGraphicsSettings({-4, 9}, GraphicsPlatform::Windows).renderScalePercent == 50 &&
           MigrateLegacyGraphicsSettings({-4, 9}, GraphicsPlatform::Windows).waterQuality == WaterQuality::High,
           "legacy corrupt values retain established clamping");
+    Check(ClampGraphicsRenderScalePercent(34) == 50 && ClampGraphicsRenderScalePercent(49) == 50 &&
+          ClampGraphicsRenderScalePercent(-1) == 50 && ClampGraphicsRenderScalePercent(40) ==
+              (ValidGraphicsRenderScalePercent(40) ? 40 : 50),
+          "only explicit low tiers survive loading; malformed gaps and negatives recover at50");
+    Check(PlatformDefaultGraphicsSettings(GraphicsPlatform::Android).renderScalePercent == 50 &&
+          PlatformDefaultGraphicsSettings(GraphicsPlatform::Android).waterQuality == WaterQuality::Mobile &&
+          !PlatformDefaultGraphicsSettings(GraphicsPlatform::Android).glassEnabled &&
+          PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows).renderScalePercent == 100,
+          "experimental choices do not change fresh/reset platform defaults");
+    Check(GraphicsRenderScalePercentFromSliderPosition(0) == 33 &&
+          GraphicsRenderScalePercentFromSliderPosition(1) == 40 &&
+          GraphicsRenderScalePercentFromSliderPosition(2) == 50 &&
+          GraphicsRenderScalePercentFromSliderPosition(52) == 100 &&
+          GraphicsRenderScalePercentFromSliderPosition(-10) == 33 &&
+          GraphicsRenderScalePercentFromSliderPosition(999) == 100,
+          "scale menu positions expose only33,40,50..100 and clamp at endpoints");
+    for (const int percent : {33, 40, 50, 68, 100})
+    {
+        if (!ValidGraphicsRenderScalePercent(percent)) continue;
+        Check(GraphicsRenderScalePercentFromSliderPosition(GraphicsRenderScaleSliderPositionFromPercent(percent)) == percent,
+              "persisted admitted scale round-trips through the menu position");
+    }
+    Check(StepGraphicsRenderScalePercent(33, false) == 33 &&
+          StepGraphicsRenderScalePercent(33, true) == 40 &&
+          StepGraphicsRenderScalePercent(40, true) == 50 &&
+          StepGraphicsRenderScalePercent(50, false) == 40 &&
+          StepGraphicsRenderScalePercent(51, false) == 50 &&
+          StepGraphicsRenderScalePercent(75, false) == 70 &&
+          StepGraphicsRenderScalePercent(75, true) == 80 &&
+          StepGraphicsRenderScalePercent(100, true) == 100,
+          "controller steps preserve five-point movement while crossing only admitted experimental tiers");
     for (const auto platform : {GraphicsPlatform::Android, GraphicsPlatform::Windows})
     {
         Check(MatchGraphicsPreset(BaselineGraphicsSettings(platform), platform) == GraphicsPreset::AcceptedBaseline, "baseline is deterministic");
@@ -70,6 +102,21 @@ void TestResolutionAndEffectiveValues()
     const auto maximum = std::numeric_limits<std::uint32_t>::max();
     Check(ScaledGraphicsExtent({maximum, maximum}, 100) == GraphicsExtent{maximum, maximum}, "extent arithmetic handles maximum input without overflow");
     Check(ScaledGraphicsExtent({1u, 1u}, 50) == GraphicsExtent{1u, 1u}, "tiny outputs remain at least one pixel");
+    for (const int percent : {33, 40})
+    {
+        if (!ValidGraphicsRenderScalePercent(percent)) continue;
+        requested.renderScalePercent = percent;
+        for (const auto backend : {GraphicsBackend::RayTracingPipeline, GraphicsBackend::RayQueryCompute})
+        {
+            const auto experimental = ResolveGraphicsSettings(requested, {OpticalProfile::Mobile, backend, true}, {1440u, 2980u});
+            const auto expected = GraphicsExtent{
+                static_cast<std::uint32_t>((1440 * percent + 50) / 100),
+                static_cast<std::uint32_t>((2980 * percent + 50) / 100)};
+            Check(experimental.valid && experimental.backend == backend && experimental.requestedInternalExtent == expected &&
+                  experimental.outputExtent == GraphicsExtent{1440u, 2980u},
+                  "experimental internal extent applies on either RT backend while preserving native output extent");
+        }
+    }
 }
 void TestApplyConfirmAndCancel()
 {
@@ -391,10 +438,37 @@ void TestCoherentPublication()
     writer.join(); for (auto& reader : readers) reader.join();
     Check(coherent.load() && mailbox.Read().serial == 12000u, "applied config/dimensions/generation are coherent under concurrent UI reads");
 }
+void TestExperimentalScaleApplyAndRecovery()
+{
+    for (const int percent : {33, 40})
+    {
+        if (!ValidGraphicsRenderScalePercent(percent)) continue;
+        for (const auto backend : {GraphicsBackend::RayTracingPipeline, GraphicsBackend::RayQueryCompute})
+        {
+            const auto baseline = PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows);
+            GraphicsEditSession edit(baseline);
+            auto draft = baseline;
+            draft.renderScalePercent = percent;
+            Check(edit.Stage(draft), "an admitted experimental tier stages in the ordinary settings editor");
+            const auto command = edit.RequestApply(42u);
+            Check(command.has_value(), "experimental apply creates the standard presentation command");
+            if (!command) continue;
+            auto applied = Presented(*command);
+            applied.backend = backend;
+            applied.internalExtent = ScaledGraphicsExtent({1920u, 1080u}, percent);
+            applied.outputExtent = {1920u, 1080u};
+            Check(edit.Acknowledge(applied, true) && edit.Confirm() && edit.Committed() == draft,
+                  "only matching RT-present acknowledgement then Keep persists the selected experiment");
+            const auto recovered = RecoverGraphicsSettings(edit.Persistence(), GraphicsPlatform::Windows);
+            Check(recovered.startup == draft && !recovered.retainedRequested,
+                  "confirmed experimental scale survives normal settings recovery");
+        }
+    }
+}
 }
 int main()
 {
     TestMigrationAndProfiles(); TestResolutionAndEffectiveValues(); TestApplyConfirmAndCancel();
-    TestFailureDeadlineAndRecovery(); TestEffectiveAcknowledgement(); TestGlassMigrationAndTransactions(); TestIndependentShadowAndLowFire(); TestPlatformDefaultsAndMist(); TestDustMigrationAndAcknowledgement(); TestCoherentPublication();
+    TestFailureDeadlineAndRecovery(); TestExperimentalScaleApplyAndRecovery(); TestEffectiveAcknowledgement(); TestGlassMigrationAndTransactions(); TestIndependentShadowAndLowFire(); TestPlatformDefaultsAndMist(); TestDustMigrationAndAcknowledgement(); TestCoherentPublication();
     return passed ? 0 : 1;
 }

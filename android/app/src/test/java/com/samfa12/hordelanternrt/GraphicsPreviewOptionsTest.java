@@ -67,7 +67,7 @@ public final class GraphicsPreviewOptionsTest {
     }
     private final GraphicsPreferences.Values confirmed = new GraphicsPreferences.Values(68, 0, 1, 15);
     private final GraphicsPreferences.Values draft = new GraphicsPreferences.Values(100, 2, 0, 60, false);
-    @Test public void experimentalChoicesAreExplicitAndAbsentFromOrdinaryAdmission() {
+    @Test public void explicitStrict50PolicyStillOmitsLowerExperimentalChoices() {
         assertArrayEquals(new int[]{33,40,50,63,68,75,100},
                 GraphicsPreviewOptions.choices(confirmed,GraphicsPreviewOptions.RESOLUTION,33));
         assertArrayEquals(new int[]{50,63,68,75,100},
@@ -471,6 +471,52 @@ public final class GraphicsPreviewOptionsTest {
         }
         return null;
     }
+    @Test public void ordinaryGraphicsPageStagesClearlyLabelledExperimentsWithoutSaving() throws Exception {
+        assertEquals(33,BuildConfig.MIN_RENDER_SCALE_PERCENT);
+        MainActivity activity=livePreviewFixture(); set(activity,"graphicsPreviewWanted",false);
+        SharedPreferences prefs=(SharedPreferences)get(activity,"preferences");
+        Method show=MainActivity.class.getDeclaredMethod("showGraphicsPage"); show.setAccessible(true);
+        for (int scale : new int[]{33,40}) {
+            show.invoke(activity);
+            Button choice=findButton((android.view.View)get(activity,"menuScrim"),"Resolution: "+scale+"% (Experimental)");
+            assertNotNull("ordinary Graphics exposes the named experiment",choice); choice.performClick();
+            assertEquals(scale,((GraphicsPreferences.Values)get(activity,"graphicsDraft")).scale);
+            assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
+            assertFalse(GraphicsPreferences.hasPending(prefs)); assertEquals(0,GraphicsBridgeShadow.applyCalls);
+        }
+        assertNotNull(findButton((android.view.View)get(activity,"menuScrim"),"Return to 50% resolution"));
+    }
+
+    @Test public void experimentalResolutionRequiresUseAndExactAckBeforeKeep() throws Exception {
+        assertEquals(33,BuildConfig.MIN_RENDER_SCALE_PERCENT);
+        for (int scale : new int[]{33,40}) {
+            MainActivity activity=livePreviewFixture(); GraphicsBridgeShadow.epoch=10;
+            Runnable poll=(Runnable)get(activity,"refreshGraphics"); poll.run();
+            Button resolution=((Button[])get(activity,"graphicsOptionButtons"))[GraphicsPreviewOptions.RESOLUTION];
+            Method menu=MainActivity.class.getDeclaredMethod("showGraphicsPreviewOptionMenu",Button.class,int.class);
+            menu.setAccessible(true); menu.invoke(activity,resolution,GraphicsPreviewOptions.RESOLUTION);
+            PopupMenu popup=(PopupMenu)get(activity,"graphicsOptionsPopup");
+            assertEquals(scale+"% (Experimental)",popup.getMenu().findItem(scale).getTitle().toString());
+            assertTrue(popup.getMenu().performIdentifierAction(scale,0));
+            SharedPreferences prefs=(SharedPreferences)get(activity,"preferences");
+            GraphicsPreferences.Values choice=GraphicsPreviewOptions.withChoice(confirmed,GraphicsPreviewOptions.RESOLUTION,scale);
+            assertTrue(GraphicsBridgeShadow.requested.same(choice));
+            assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed));
+            assertTrue(GraphicsPreferences.retainedCandidate(prefs).same(choice));
+            long[] ack=snapshot(); ack[0]=44; ack[15]=scale; GraphicsBridgeShadow.applied=ack;
+            GraphicsBridgeShadow.epoch=11; poll.run();
+            assertFalse("requested experiment with old effective68 cannot enable Use",((Button)get(activity,"graphicsApply")).isEnabled());
+            ack[3]=scale; ack[7]=(360*scale+50)/100; ack[8]=(640*scale+50)/100; poll.run();
+            assertTrue(((Button)get(activity,"graphicsApply")).isEnabled());
+            ((Button)get(activity,"graphicsApply")).performClick();
+            assertTrue(GraphicsPreferences.confirmed(prefs).same(confirmed)); assertEquals(1,GraphicsBridgeShadow.applyCalls);
+            ack[0]=45; ack[2]=2; GraphicsBridgeShadow.epoch=12; poll.run();
+            assertEquals("Keep",((Button)get(activity,"graphicsConfirm")).getText().toString());
+            ((Button)get(activity,"graphicsConfirm")).performClick();
+            assertTrue(GraphicsPreferences.confirmed(prefs).same(choice)); assertFalse(GraphicsPreferences.hasPending(prefs));
+        }
+    }
+
     @Test public void productionResetStagesMobileDefaultsWithoutSavingOrChangingUnrelatedPrefs() throws Exception {
         MainActivity activity=livePreviewFixture();
         set(activity,"graphicsPreviewWanted",false);

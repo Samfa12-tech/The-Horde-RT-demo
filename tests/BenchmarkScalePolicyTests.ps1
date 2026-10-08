@@ -30,10 +30,13 @@ try {
         '-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=Mobile', '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF',
         '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF', '-DHORDE_RT_STAGED_PRIMARY_SHADER_DIR=',
         '-DHORDE_RT_STAGED_PRIMARY_DEFAULT=OFF', '-DHORDE_RT_STAGED_PRIMARY_TIMING=OFF')
-    Assert-Case 'ordinary-default' (Invoke-Case $CmakeExecutable @('-P',$script) $temporaryRoot) $true 'scale-min=50'
+    Assert-Case 'ordinary-default' (Invoke-Case $CmakeExecutable @('-P',$script) $temporaryRoot) $true 'scale-min=33'
+    Assert-Case 'ordinary-compatibility50' (Invoke-Case $CmakeExecutable @('-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=50','-P',$script) $temporaryRoot) $true 'scale-min=50'
+    Assert-Case 'ordinary-manual33-debug' (Invoke-Case $CmakeExecutable @('-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=33',
+        '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=OFF','-DCMAKE_BUILD_TYPE=Debug','-P',$script) $temporaryRoot) $true 'scale-min=33'
     Assert-Case 'explicit-benchmark' (Invoke-Case $CmakeExecutable ($baseline + @('-P',$script)) $temporaryRoot) $true 'scale-min=33'
     foreach ($negative in @(
-        '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=OFF', '-DCMAKE_BUILD_TYPE=Debug', '-DCMAKE_BUILD_TYPE=',
+        '-DCMAKE_BUILD_TYPE=Debug', '-DCMAKE_BUILD_TYPE=',
         '-DHORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION=Diagnostic', '-DHORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY=High',
         '-DHORDE_RT_INSTRUMENTATION_OVERRIDE=Diagnostic', '-DHORDE_RT_DIELECTRIC_QUALITY_OVERRIDE=High',
         '-DHORDE_RT_DEBUG_CHECKPOINTS=ON', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=ON',
@@ -56,7 +59,7 @@ try {
         '-DCMAKE_BUILD_TYPE=Debug','-DHORDE_RT_DEBUG_CHECKPOINTS=ON')) {
         Assert-Case "motion-$negative" (Invoke-Case $CmakeExecutable ($motion + @($negative,'-P',$script)) $temporaryRoot) $false 'Motion validation requires the isolated'
     }
-    foreach ($invalid in @('32','34','40','49','033','33.0','33;50')) {
+    foreach ($invalid in @('32','34','39','40','41','49','033','33.0','33;50')) {
         Assert-Case "invalid-$invalid" (Invoke-Case $CmakeExecutable ($baseline + @("-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=$invalid",'-P',$script)) $temporaryRoot) $false 'Render scale minimum must be exactly'
     }
     if ($GradleExecutable) {
@@ -70,7 +73,7 @@ try {
             return Invoke-Case $GradleExecutable (@('--no-daemon','--console=plain','-q',
                 ':app:printHordeRtPolicyForTest') + $neutral + $properties) $android
         }
-        Assert-Case 'gradle-benchmark33' (Gradle-Case @('-PhordeBenchmarkValidation=true','-PhordeBenchmarkMinRenderScale=33')) $true 'debugMinRenderScale=50|releaseMinRenderScale=50|benchmarkMinRenderScale=33'
+        Assert-Case 'gradle-benchmark33' (Gradle-Case @('-PhordeBenchmarkValidation=true','-PhordeBenchmarkMinRenderScale=33')) $true 'debugMinRenderScale=33|releaseMinRenderScale=33|benchmarkMinRenderScale=33'
         Assert-Case 'gradle-timing-benchmark' (Gradle-Case @('-PhordeBenchmarkValidation=true','-PhordePresentTimingValidation=true')) $true 'ordinaryPresentTiming=OFF|benchmarkPresentTiming=ON'
         Assert-Case 'gradle-timing-outside' (Gradle-Case @('-PhordePresentTimingValidation=true')) $false 'requires the isolated Shipping/Mobile'
         Assert-Case 'gradle-timing-invalid' (Gradle-Case @('-PhordePresentTimingValidation=yes')) $false 'must be true or false'

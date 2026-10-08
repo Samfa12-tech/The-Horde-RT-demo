@@ -2646,7 +2646,7 @@ public class MainActivity extends Activity {
         }
         if (GraphicsPreferences.MIN_RENDER_SCALE_PERCENT == 33) {
             for (int scale : new int[]{33,40}) {
-                addGraphicsButton(panel, "Resolution " + GraphicsPreviewOptions.resolutionLabel(scale), () -> {
+                addGraphicsButton(panel, "Resolution: " + GraphicsPreviewOptions.resolutionLabel(scale), () -> {
                     graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.RESOLUTION, scale);
                     showGraphicsPage();
                 });

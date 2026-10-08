@@ -142,8 +142,8 @@ final class GraphicsPreferences {
                 integer(prefs, "graphics_pending_fire", 0), integer(prefs, "graphics_pending_cap", 30), glass,
                 pendingSchema < 3 ? SHADOW_CURRENT : integer(prefs, PENDING_SHADOW,
                         prefs.contains(PENDING_SHADOW) ? -1 : SHADOW_CURRENT), mist, dust);
-        // Retained intent may include the explicitly isolated benchmark scales even
-        // in an ordinary build. It never becomes effective without owner recovery.
+        // Retain explicit experimental intent even when recovering in a constrained50
+        // build. It never becomes effective without owner recovery.
         return values.valid(33) && (pendingSchema >= 3 || values.fire <= FIRE_HIGH) ? values : baseline();
     }
     static boolean presented(long[] snapshot, long generation) {

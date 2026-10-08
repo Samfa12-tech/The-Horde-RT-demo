@@ -15,24 +15,56 @@ inline constexpr std::uint32_t kGraphicsSettingsSchema = 5u;
 inline constexpr double kGraphicsConfirmationSeconds = 15.0;
 
 #ifndef HORDE_RT_MIN_RENDER_SCALE_PERCENT
-#define HORDE_RT_MIN_RENDER_SCALE_PERCENT 50
+#define HORDE_RT_MIN_RENDER_SCALE_PERCENT 33
 #endif
-#if HORDE_RT_MIN_RENDER_SCALE_PERCENT != 50 && HORDE_RT_MIN_RENDER_SCALE_PERCENT != 33
-#error "Render scale admission must be ordinary 50 or explicit benchmark 33."
-#endif
-#if HORDE_RT_MIN_RENDER_SCALE_PERCENT == 33 && (!defined(HORDE_RT_BENCHMARK_SCALE_VALIDATION) || HORDE_RT_BENCHMARK_SCALE_VALIDATION != 1)
-#error "Sub-50 render scales require isolated benchmark admission."
+#if HORDE_RT_MIN_RENDER_SCALE_PERCENT != 33 && HORDE_RT_MIN_RENDER_SCALE_PERCENT != 50
+#error "Render scale minimum must be 33 or 50."
 #endif
 inline constexpr int kMinimumGraphicsRenderScalePercent = HORDE_RT_MIN_RENDER_SCALE_PERCENT;
 inline constexpr bool ValidGraphicsRenderScalePercent(const int percent) noexcept
 {
     return (percent >= 50 && percent <= 100) ||
-        (kMinimumGraphicsRenderScalePercent == 33 && (percent == 33 || percent == 40));
+        (kMinimumGraphicsRenderScalePercent <= 40 && percent == 40) ||
+        (kMinimumGraphicsRenderScalePercent == 33 && percent == 33);
 }
 inline constexpr int ClampGraphicsRenderScalePercent(const int percent) noexcept
 {
-    const int bounded = std::clamp(percent, kMinimumGraphicsRenderScalePercent, 100);
-    return ValidGraphicsRenderScalePercent(bounded) ? bounded : 50;
+    if (percent >= 50) return std::min(percent, 100);
+    return ValidGraphicsRenderScalePercent(percent) ? percent : 50;
+}
+inline constexpr bool ExperimentalGraphicsRenderScalePercent(const int percent) noexcept
+{
+    return percent == 33 || percent == 40;
+}
+// Windows trackbar positions keep the two experimental tiers selectable while
+// leaving every unapproved 34..49 value unreachable: 0=33, 1=40, 2..52=50..100.
+inline constexpr int GraphicsRenderScalePercentFromSliderPosition(const int position) noexcept
+{
+    const int bounded = std::clamp(position, 0, 52);
+    return bounded == 0 ? 33 : (bounded == 1 ? 40 : bounded + 48);
+}
+inline constexpr int GraphicsRenderScaleSliderPositionFromPercent(const int percent) noexcept
+{
+    const int admitted = ClampGraphicsRenderScalePercent(percent);
+    return admitted == 33 ? 0 : (admitted == 40 ? 1 : admitted - 48);
+}
+inline constexpr int StepGraphicsRenderScalePercent(const int percent, const bool increase) noexcept
+{
+    const int target = ClampGraphicsRenderScalePercent(percent) + (increase ? 5 : -5);
+    int best = ClampGraphicsRenderScalePercent(percent);
+    int bestDistance = std::numeric_limits<int>::max();
+    for (int candidate = 33; candidate <= 100; ++candidate)
+    {
+        if (!ValidGraphicsRenderScalePercent(candidate)) continue;
+        const int distance = candidate > target ? candidate - target : target - candidate;
+        if (distance < bestDistance ||
+            (distance == bestDistance && (increase ? candidate > best : candidate < best)))
+        {
+            best = candidate;
+            bestDistance = distance;
+        }
+    }
+    return best;
 }
 
 enum class GraphicsPlatform : std::uint8_t { Android, Windows };

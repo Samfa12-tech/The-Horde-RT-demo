@@ -1,11 +1,12 @@
-# Explicit build capability only; normal Android and all desktop builds stay 50.
-set(HORDE_RT_MIN_RENDER_SCALE_PERCENT "50" CACHE STRING "Ordinary 50 or isolated benchmark 33 scale admission")
+# Ordinary Graphics admits discrete33/40 experiments; defaults remain50/100.
+# Isolated measurement features retain their independent Shipping/Mobile admission.
+set(HORDE_RT_MIN_RENDER_SCALE_PERCENT "33" CACHE STRING "Discrete33/40 graphics experiments or explicit constrained50 policy")
 option(HORDE_RT_ANDROID_BENCHMARK_VALIDATION "Isolated development benchmark package admission" OFF)
 option(HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION "Isolated benchmark actual image presentation evidence" OFF)
 option(HORDE_RT_ANDROID_MOTION_VALIDATION "Isolated benchmark shared-simulation motion evidence" OFF)
 if(NOT HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "50" AND
    NOT HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "33")
-    message(FATAL_ERROR "Render scale minimum must be exactly 50 or benchmark 33.")
+    message(FATAL_ERROR "Render scale minimum must be exactly 50 or 33.")
 endif()
 if(HORDE_RT_ANDROID_MOTION_VALIDATION AND
    (NOT HORDE_RT_ANDROID_BENCHMARK_VALIDATION OR
@@ -15,7 +16,8 @@ if(HORDE_RT_ANDROID_MOTION_VALIDATION AND
     NOT CMAKE_BUILD_TYPE MATCHES "^(Release|RelWithDebInfo|MinSizeRel)$"))
     message(FATAL_ERROR "Motion validation requires the isolated non-Debug Shipping/Mobile min33 benchmark with actual present timing.")
 endif()
-if(HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "33" OR HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION)
+if((HORDE_RT_ANDROID_BENCHMARK_VALIDATION AND HORDE_RT_MIN_RENDER_SCALE_PERCENT STREQUAL "33") OR
+   HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION)
     set(_scale_instrumentation "${HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION}")
     set(_scale_quality "${HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY}")
     if(NOT "${HORDE_RT_INSTRUMENTATION_OVERRIDE}" STREQUAL "")

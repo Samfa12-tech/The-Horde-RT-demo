@@ -110,7 +110,34 @@ public final class GraphicsPreferencesTest {
         a[20]=2; assertFalse(GraphicsPreferences.presented(a,7));
         a[20]=1; a[21]=-1; assertFalse(GraphicsPreferences.presented(a,7));
     }
-    @Test public void benchmarkAdmissionPreservesBaselineAndOrdinaryStoredRecovery() {
+    @Test public void manualExperimentalScalesRequireExplicitSaveAndNeverBecomeFreshDefaults() {
+        assertEquals(33, BuildConfig.MIN_RENDER_SCALE_PERCENT);
+        assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.mobileDefaults()));
+        assertEquals(50, GraphicsPreferences.mobileDefaults().scale);
+        assertFalse(GraphicsPreferences.mobileDefaults().glassEnabled);
+        for (int scale : new int[]{33,40}) {
+            prefs.edit().clear().putInt("music_volume",43).commit();
+            GraphicsPreferences.Values mobile=GraphicsPreferences.mobileDefaults();
+            GraphicsPreferences.Values choice=new GraphicsPreferences.Values(scale,mobile.water,mobile.fire,
+                    mobile.cap,mobile.glassEnabled,mobile.shadow,mobile.mistEnabled,mobile.dust);
+            assertTrue(choice.valid());
+            assertTrue(GraphicsPreferences.markPending(prefs,choice));
+            assertTrue("a draft experiment cannot replace fresh50",GraphicsPreferences.confirmed(prefs).same(mobile));
+            assertTrue(GraphicsPreferences.clearAfterRestore(prefs));
+            assertTrue(GraphicsPreferences.confirmed(prefs).same(mobile));
+            assertTrue(GraphicsPreferences.markPending(prefs,choice));
+            assertTrue(GraphicsPreferences.confirm(prefs,choice));
+            assertTrue("a deliberately kept experiment survives reload",GraphicsPreferences.confirmed(prefs).same(choice));
+            assertEquals(43,prefs.getInt("music_volume",0));
+            java.util.Map<String,?> before=prefs.getAll();
+            for (int invalid : new int[]{32,34,39,41,49,101}) {
+                assertFalse(GraphicsPreferences.markPending(prefs,new GraphicsPreferences.Values(invalid,1,0,30)));
+                assertEquals(before,prefs.getAll());
+            }
+        }
+    }
+
+    @Test public void explicitScalePoliciesPreserveLegacyBaselineAndStoredRecovery() {
         assertEquals(75, GraphicsPreferences.baseline().scale);
         for (int scale : new int[]{33,40}) {
             GraphicsPreferences.Values candidate=new GraphicsPreferences.Values(scale,1,0,30);

@@ -903,7 +903,8 @@ void LoadSettings(VulkanSurfaceContext& context)
         static_cast<int>(GetPrivateProfileIntA("audio", "musicVolume", 70, path.c_str())), 0, 100);
     const int sensitivity = std::clamp(static_cast<int>(GetPrivateProfileIntA("controls", "lookSensitivity", 100, path.c_str())), 60, 150);
     context.mouseSensitivity = static_cast<float>(sensitivity) / 100.0f;
-    const int renderScale = std::clamp(static_cast<int>(GetPrivateProfileIntA("display", "renderScale", 100, path.c_str())), 50, 100);
+    const int renderScale = horde::graphics::ClampGraphicsRenderScalePercent(
+        static_cast<int>(GetPrivateProfileIntA("display", "renderScale", 100, path.c_str())));
     context.renderScale = static_cast<float>(renderScale) / 100.0f;
     const int waterQuality = std::clamp(static_cast<int>(GetPrivateProfileIntA("display", "waterQuality", 2, path.c_str())), 0, 2);
     context.waterQuality = static_cast<horde::vulkan::raytracing::WaterQuality>(waterQuality);
@@ -1852,12 +1853,14 @@ void UpdateSettingsLabels(VulkanSurfaceContext& context)
     }
     if (HWND label = GetDlgItem(context.windowHandle, kRenderScaleLabelId))
     {
-        const std::string text = "REQUESTED INTERNAL SCALE: " + std::to_string(graphicsDraft.renderScalePercent) + "%";
+        const std::string text = "Resolution: " + std::to_string(graphicsDraft.renderScalePercent) + "%" +
+            (horde::graphics::ExperimentalGraphicsRenderScalePercent(graphicsDraft.renderScalePercent) ? " (Experimental)" : "");
         SetWindowTextA(label, text.c_str());
     }
     if (HWND slider = GetDlgItem(context.windowHandle, kRenderScaleSliderId))
     {
-        SendMessageA(slider, TBM_SETPOS, TRUE, static_cast<LPARAM>(graphicsDraft.renderScalePercent));
+        SendMessageA(slider, TBM_SETPOS, TRUE, static_cast<LPARAM>(
+            horde::graphics::GraphicsRenderScaleSliderPositionFromPercent(graphicsDraft.renderScalePercent)));
     }
     if (HWND label = GetDlgItem(context.windowHandle, kMusicVolumeLabelId))
     {
@@ -3535,7 +3538,9 @@ bool AdjustFocusedControllerSlider(VulkanSurfaceContext& context, const bool inc
     const int next = rtLabSlider
         ? horde::platform::windows::StepRtLabControl(current, increase, range)
         : (id == kRenderScaleSliderId
-               ? horde::platform::windows::StepControllerSlider(current, increase)
+               ? horde::graphics::GraphicsRenderScaleSliderPositionFromPercent(
+                     horde::graphics::StepGraphicsRenderScalePercent(
+                         horde::graphics::GraphicsRenderScalePercentFromSliderPosition(current), increase))
                : horde::platform::windows::StepControllerAudioVolume(current, increase));
     if (next != current)
     {
@@ -4678,10 +4683,11 @@ bool ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
 
 VkExtent2D ScaledRenderExtent(VkExtent2D presentationExtent, float renderScale)
 {
-    const float scale = std::clamp(renderScale, 0.50f, 1.0f);
-    return {
-        std::max(1u, static_cast<uint32_t>(std::lround(static_cast<double>(presentationExtent.width) * scale))),
-        std::max(1u, static_cast<uint32_t>(std::lround(static_cast<double>(presentationExtent.height) * scale)))};
+    const int percent = horde::graphics::ClampGraphicsRenderScalePercent(static_cast<int>(std::lround(
+        std::clamp(renderScale, 0.0f, 1.0f) * 100.0f)));
+    const auto extent = horde::graphics::ScaledGraphicsExtent(
+        {presentationExtent.width, presentationExtent.height}, percent);
+    return {extent.width, extent.height};
 }
 
 void RefreshGpuTimingTelemetry(
@@ -8121,7 +8127,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
         }
         if (sceneContext && reinterpret_cast<HWND>(lParam) == GetDlgItem(hWnd, kRenderScaleSliderId))
         {
-            const int percentage = std::clamp(static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)), 50, 100);
+            const int percentage = horde::graphics::GraphicsRenderScalePercentFromSliderPosition(
+                static_cast<int>(SendMessageA(reinterpret_cast<HWND>(lParam), TBM_GETPOS, 0, 0)));
             if (sceneContext->graphicsEdit)
             {
                 auto draft = sceneContext->graphicsEdit->Draft();
@@ -9430,15 +9437,15 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     createStatic(kGraphicsPreviewGraphId, "Loop interval history", SS_OWNERDRAW);
     createButton(kSensitivityButtonId, "LOOK SENSITIVITY: NORMAL");
     createButton(kWaterQualityButtonId, "RT WATER: HIGH");
-    createStatic(kRenderScaleLabelId, "RENDER RESOLUTION: 100%", SS_CENTER | SS_CENTERIMAGE);
+    createStatic(kRenderScaleLabelId, "Resolution: 100%", SS_CENTER | SS_CENTERIMAGE);
     HWND renderScaleSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
                                               WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,
                                               0, 0, 100, 38, hWnd,
                                               reinterpret_cast<HMENU>(static_cast<INT_PTR>(kRenderScaleSliderId)), instance, nullptr);
     InstallControllerFocusOutline(renderScaleSlider);
-    SendMessageA(renderScaleSlider, TBM_SETRANGE, TRUE, MAKELPARAM(50, 100));
+    SendMessageA(renderScaleSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 52));
     SendMessageA(renderScaleSlider, TBM_SETTICFREQ, 10, 0);
-    SendMessageA(renderScaleSlider, TBM_SETPOS, TRUE, 100);
+    SendMessageA(renderScaleSlider, TBM_SETPOS, TRUE, 52);
     createStatic(kSfxVolumeLabelId, "SFX VOLUME: 100%", SS_CENTER | SS_CENTERIMAGE);
     HWND sfxVolumeSlider = CreateWindowExA(0, TRACKBAR_CLASSA, "",
                                             WS_CHILD | WS_VISIBLE | WS_TABSTOP | TBS_AUTOTICKS,

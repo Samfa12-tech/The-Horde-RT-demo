@@ -418,14 +418,14 @@ android {
         versionName hordeVersionName
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
-        buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', '50'
+        buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', '33'
         resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
         externalNativeBuild {
             cmake {
                 cppFlags '-std=c++20'
                 arguments '-DANDROID_STL=c++_static'
-                arguments '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=OFF', '-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=50'
+                arguments '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=OFF', '-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=33'
             }
         }
     }
@@ -543,7 +543,7 @@ tasks.register('printHordeRtPolicyForTest') {
             ? (hordeRtNativePolicyArguments('Shipping') + hordeRtBenchmarkStagedPrimaryArguments).join('|')
             : 'unavailable; set hordeBenchmarkValidation=true'))
         println("benchmarkValidation=${hordeBenchmarkValidation}")
-        println("debugMinRenderScale=50|releaseMinRenderScale=50|benchmarkMinRenderScale=${hordeBenchmarkMinRenderScale}")
+        println("debugMinRenderScale=33|releaseMinRenderScale=33|benchmarkMinRenderScale=${hordeBenchmarkMinRenderScale}")
         println("ordinaryPresentTiming=OFF|benchmarkPresentTiming=${hordePresentTimingValidation ? 'ON' : 'OFF'}")
         println("benchmarkMotionValidation=${hordeBenchmarkMotionValidation ? 'ON' : 'OFF'}")
         println("stagedPrimaryDebugValidation=${hordeStagedPrimaryDebugValidation}")
