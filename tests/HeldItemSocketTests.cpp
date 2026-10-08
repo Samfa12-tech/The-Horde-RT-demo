@@ -702,16 +702,28 @@ void TestAspectHandSpacingUsesSharedTargetsAndLeavesCombatAuthorityAlone()
     const float fourThree = ComputeHeldItemAspectSpread(4.0f / 3.0f);
     const float sixteenTen = ComputeHeldItemAspectSpread(16.0f / 10.0f);
     const float sixteenNine = ComputeHeldItemAspectSpread(16.0f / 9.0f);
+    constexpr float wideRetraction = 0.05f;
+    Check(Near(ComputeHeldItemAspectRetraction(0.46f), 0.0f) &&
+              Near(ComputeHeldItemAspectRetraction(1.0f), 0.0f) &&
+              Near(ComputeHeldItemAspectRetraction(std::numeric_limits<float>::infinity()), 0.0f) &&
+              Near(ComputeHeldItemAspectRetraction(4.0f / 3.0f), fourThree) &&
+              Near(ComputeHeldItemAspectRetraction(16.0f / 10.0f), sixteenTen) &&
+              Near(ComputeHeldItemAspectRetraction(16.0f / 9.0f), wideRetraction) &&
+              Near(ComputeHeldItemAspectRetraction(2.4f), wideRetraction),
+          "wide-view retraction must share the spread blend and preserve portrait and invalid inputs");
     Check(fourThree > 0.0f && fourThree < sixteenTen &&
               sixteenTen < sixteenNine &&
-              Near(sixteenNine, kHeldItemSpreadMaximumMetres) &&
+              Near(sixteenNine, 0.05f) &&
               Near(ComputeHeldItemAspectSpread(2.4f), sixteenNine),
-          "aspect spacing must rise smoothly and monotonically to its three-centimetre cap");
+          "aspect spacing must rise smoothly and monotonically to its five-centimetre cap");
 
     HeldItemKinematicsInput base{};
     base.playerMountProfile = PlayerMountProfile::AnatomicalBody;
-    base.cameraX = 0.0f;
-    base.cameraZ = 1.85f;
+    // A horizontal view isolates the comfort translation from the existing
+    // world-down roof response. Separate actual-roof matrices cover pitch.
+    base.cameraX = 4.2f;
+    base.cameraZ = -10.0f;
+    base.cameraPitchRadians = 0.05f;
     base.torchFailure.heldByPlayer = true;
     bool phasesRemainCoherent = true;
     const auto insideReach = [](const std::array<float, 3u>& shoulder,
@@ -756,9 +768,9 @@ void TestAspectHandSpacingUsesSharedTargetsAndLeavesCombatAuthorityAlone()
                 Near(wide.leftHandLocal[0], portrait.leftHandLocal[0] - sixteenNine) &&
                 Near(wide.rightHandLocal[0], portrait.rightHandLocal[0] + sixteenNine) &&
                 Near(wide.leftHandLocal[1], portrait.leftHandLocal[1]) &&
-                Near(wide.leftHandLocal[2], portrait.leftHandLocal[2]) &&
+                Near(wide.leftHandLocal[2], portrait.leftHandLocal[2] - wideRetraction) &&
                 Near(wide.rightHandLocal[1], portrait.rightHandLocal[1]) &&
-                Near(wide.rightHandLocal[2], portrait.rightHandLocal[2]) &&
+                Near(wide.rightHandLocal[2], portrait.rightHandLocal[2] - wideRetraction) &&
                 Near(wide.heldPropDepth, portrait.heldPropDepth) &&
                 Near(wide.swordRadians, portrait.swordRadians) &&
                 Near(wide.swordForwardRadians, portrait.swordForwardRadians);
@@ -791,11 +803,13 @@ void TestAspectHandSpacingUsesSharedTargetsAndLeavesCombatAuthorityAlone()
                             releasedWideItems[0].worldFromItem, 0.000001f) &&
               Near(releasedWideState.kinematics.leftHandLocal[0] -
                        releasedSquareState.kinematics.leftHandLocal[0],
-                   -sixteenNine),
+                   -sixteenNine) &&
+              Near(releasedWideState.kinematics.leftHandLocal[2] -
+                       releasedSquareState.kinematics.leftHandLocal[2], -wideRetraction),
           "released torch world trajectory must remain viewport-independent while the presentation hand target can adapt");
 
     Check(phasesRemainCoherent,
-          "ordinary and reward-light hands must spread symmetrically without changing forward pose or combat phase geometry");
+          "ordinary and reward-light hands must spread and retract together without changing their rotations or combat phase geometry");
     Check(withinAnatomicalReach,
           "maximum landscape spacing must remain inside the authored anatomical arm reach for carry, swing, and parry phases");
 
@@ -838,10 +852,15 @@ void TestAspectHandSpacingUsesSharedTargetsAndLeavesCombatAuthorityAlone()
                   frozenCheckpointSimulation.Snapshot().heldItemKinematics.rightHandLocal,
           "paused capture synchronization must retain frozen gameplay time and the shared hand target");
 
-    GameSimulation portraitSimulation;
-    GameSimulation wideSimulation;
+    GameSimulationConfig openRoomConfig;
+    openRoomConfig.playerStartX = base.cameraX;
+    openRoomConfig.playerStartZ = base.cameraZ;
+    openRoomConfig.playerStartPitchRadians = base.cameraPitchRadians;
+    GameSimulation portraitSimulation(openRoomConfig);
+    GameSimulation wideSimulation(openRoomConfig);
     wideSimulation.SetPresentationAspect(16.0f / 9.0f);
     InputSnapshot input{};
+    input.pitchRadians = base.cameraPitchRadians;
     bool combatAuthorityMatches = true;
     for (std::uint64_t tick = 1u; tick <= 90u; ++tick)
     {
@@ -872,9 +891,9 @@ void TestAspectHandSpacingUsesSharedTargetsAndLeavesCombatAuthorityAlone()
             Near(wideSnapshot.heldItemKinematics.rightHandLocal[0],
                  portraitSnapshot.heldItemKinematics.rightHandLocal[0] + sixteenNine) &&
             Near(wideSnapshot.heldItemKinematics.leftHandLocal[2],
-                 portraitSnapshot.heldItemKinematics.leftHandLocal[2]) &&
+                 portraitSnapshot.heldItemKinematics.leftHandLocal[2] - wideRetraction) &&
             Near(wideSnapshot.heldItemKinematics.rightHandLocal[2],
-                 portraitSnapshot.heldItemKinematics.rightHandLocal[2]);
+                 portraitSnapshot.heldItemKinematics.rightHandLocal[2] - wideRetraction);
         HeldItemFixedStepInput worldInput{};
         worldInput.playerX = wideSnapshot.playerX;
         worldInput.playerZ = wideSnapshot.playerZ;
@@ -4641,7 +4660,7 @@ bool ResolveProductionSwordStowPose(
         worldFromFinalGrip, worldFromBodyStow, renderItems, diagnostic);
 }
 
-void TestActualRigSwordBodyStowAndContinuousDrawBlend()
+void TestActualRigSwordBodyStowAndContinuousDrawBlend(const float logicalViewAspect = 1.0f)
 {
     using namespace horde::gameplay::items;
     using namespace horde::vulkan::raytracing;
@@ -4654,6 +4673,7 @@ void TestActualRigSwordBodyStowAndContinuousDrawBlend()
     if (!rig.IsLoaded()) return;
 
     HeldItemFixedStepInput input;
+    input.logicalViewAspect = logicalViewAspect;
     input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
     input.playerX = -1.25f;
     input.playerZ = -8.4f;
@@ -4821,7 +4841,7 @@ void TestActualRigSwordBodyStowAndContinuousDrawBlend()
           "death interruption and copied recovery must render the same actual-rig sword matrix without a jump");
 }
 
-void TestActualRigSwordSheathReachesGripBeforeAttachmentThenReleases()
+void TestActualRigSwordSheathReachesGripBeforeAttachmentThenReleases(const float logicalViewAspect = 1.0f)
 {
     using namespace horde::gameplay::items;
     using namespace horde::vulkan::raytracing;
@@ -4834,6 +4854,7 @@ void TestActualRigSwordSheathReachesGripBeforeAttachmentThenReleases()
     if (!rig.IsLoaded()) return;
 
     HeldItemFixedStepInput input;
+    input.logicalViewAspect = logicalViewAspect;
     input.playerMountProfile = PlayerMountProfile::AnatomicalBody;
     input.playerX = -1.25f;
     input.playerZ = -8.4f;
@@ -5209,7 +5230,8 @@ void TestParryTorchMeshClearance()
     };
     struct ParrySample { PlayerCombatAction action; float time; bool successful = false; };
     std::uint64_t tick=1;
-    for (const float lowered : {0.0f,1.0f})
+    for (const float aspect : {0.46f, 4.0f / 3.0f, kHeldItemSpreadMaximumAspect})
+      for (const float lowered : {0.0f,1.0f})
         for (const auto& phase : std::array<ParrySample,6>{{
                 {PlayerCombatAction::ParryStartup,0.0f},
                 {PlayerCombatAction::ParryStartup,0.04f},
@@ -5221,7 +5243,7 @@ void TestParryTorchMeshClearance()
             HeldItemFixedStepInput input;
             input.playerX=.495964f; input.playerZ=-15.143019f;
             input.playerYawRadians=-1.561293f; input.playerPitchRadians=-0.04f;
-            input.logicalViewAspect = kHeldItemSpreadMaximumAspect;
+            input.logicalViewAspect = aspect;
             input.walkTime=5.950023f; input.torchFailure.heldByPlayer=true;
             input.torchFailure.leftArmLowerBlend=lowered;
             input.playerCombat.action=phase.action; input.playerCombat.actionTime=phase.time;
@@ -5254,7 +5276,7 @@ void TestParryTorchMeshClearance()
             const TriangleBoundsTree torchTree(std::move(torchTriangles));
             const auto hilt = clearance(torchTree,triangles(sword,rendered[1].worldFromItem,1));
             const auto arm = clearance(torchTree,triangles(player,worldFromPlayer,2));
-            std::cout << "parry actual mesh clearance lower=" << lowered << " action=" << int(phase.action)
+            std::cout << "parry actual mesh clearance aspect=" << aspect << " lower=" << lowered << " action=" << int(phase.action)
                       << " time=" << phase.time << " successful=" << phase.successful << " hilt=" << hilt.metres << " arm=" << arm.metres
                       << " cap=0.06m triangles=" << hilt.trianglesQueried << '/' << arm.trianglesQueried << '\n';
             Check(hilt.trianglesQueried>0 && arm.trianglesQueried>0 && hilt.metres>=0.025f && arm.metres>=0.015f,
@@ -5548,6 +5570,13 @@ int main(const int argc, char** argv)
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
     _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
 #endif
+    if (argc > 1 && std::string(argv[1]) == "--aspect-comfort")
+    {
+        TestAspectHandSpacingUsesSharedTargetsAndLeavesCombatAuthorityAlone();
+        TestActualRigSwordBodyStowAndContinuousDrawBlend(horde::gameplay::items::kHeldItemSpreadMaximumAspect);
+        TestActualRigSwordSheathReachesGripBeforeAttachmentThenReleases(horde::gameplay::items::kHeldItemSpreadMaximumAspect);
+        return failures == 0 ? 0 : 1;
+    }
     if (argc > 1 && std::string(argv[1]) == "--parry-torch-clearance")
     {
         TestParryTorchMeshClearance();
@@ -5626,6 +5655,8 @@ int main(const int argc, char** argv)
     TestRagTorchEnvelopeIncludesTheUnchangedEngineFire();
     TestActualRigSwordBodyStowAndContinuousDrawBlend();
     TestActualRigSwordSheathReachesGripBeforeAttachmentThenReleases();
+    TestActualRigSwordBodyStowAndContinuousDrawBlend(horde::gameplay::items::kHeldItemSpreadMaximumAspect);
+    TestActualRigSwordSheathReachesGripBeforeAttachmentThenReleases(horde::gameplay::items::kHeldItemSpreadMaximumAspect);
     TestFullScabbardMeshFitsAnimatedPlayerAndRouteFloor();
     TestParryTorchMeshClearance();
     TestCombatPulseAgainstImportedSwordAndSkeletonBounds();

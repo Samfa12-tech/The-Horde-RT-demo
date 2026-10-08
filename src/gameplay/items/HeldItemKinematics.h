@@ -130,9 +130,11 @@ struct HeldItemFixedStepInput
 
 inline constexpr float kHeldItemSpreadStartAspect = 1.0f;
 inline constexpr float kHeldItemSpreadMaximumAspect = 16.0f / 9.0f;
-inline constexpr float kHeldItemSpreadMaximumMetres = 0.03f;
+inline constexpr float kHeldItemSpreadMaximumMetres = 0.05f;
+inline constexpr float kHeldItemRetractionMaximumMetres = 0.05f;
 
 float ComputeHeldItemAspectSpread(float logicalViewAspect) noexcept;
+float ComputeHeldItemAspectRetraction(float logicalViewAspect) noexcept;
 
 struct HeldItemFixedStepState
 {

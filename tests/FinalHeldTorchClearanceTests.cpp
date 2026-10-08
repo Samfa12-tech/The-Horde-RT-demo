@@ -186,8 +186,8 @@ bool Solve(PlayerRenderSlot& rig,const HeldItemFixedStepInput& input,std::uint64
 }
 }
 int main(int argc,char** argv) {
-    if(argc<2) { std::cerr<<"Pass repository root [--original-sweep | --roof-witness | --reach-witness | --reach-candidates] [--capture-obj path]\n";return 2; }
-    bool originalSweep=false,roofWitness=false,reachWitness=false,reachCandidates=false;
+    if(argc<2) { std::cerr<<"Pass repository root [--original-sweep | --roof-witness | --reach-witness | --reach-candidates] [--wide-view] [--capture-obj path]\n";return 2; }
+    bool originalSweep=false,roofWitness=false,reachWitness=false,reachCandidates=false,wideView=false;
     std::filesystem::path captureObj;
     for(int argument=2;argument<argc;++argument) {
         const std::string flag=argv[argument];
@@ -195,6 +195,7 @@ int main(int argc,char** argv) {
         else if(flag=="--roof-witness" && !roofWitness) roofWitness=true;
         else if(flag=="--reach-witness" && !reachWitness) reachWitness=true;
         else if(flag=="--reach-candidates" && !reachCandidates) reachCandidates=true;
+        else if(flag=="--wide-view" && !wideView) wideView=true;
         else if(flag=="--capture-obj" && captureObj.empty() && argument+1<argc) captureObj=argv[++argument];
         else { std::cerr<<"Invalid diagnostic argument: "<<flag<<'\n';return 2; }
     }
@@ -306,6 +307,7 @@ int main(int argc,char** argv) {
     };
     const auto inspect=[&](HeldItemFixedStepInput input,bool capture,bool nearRoof,
                            float candidateRetraction,bool candidateDiagnostic) {
+        if(wideView) input.logicalViewAspect=kHeldItemSpreadMaximumAspect;
         Solved solved;
         if(!Solve(rig,input,++cases,solved,diagnostic,candidateRetraction)) {
             if(!candidateDiagnostic) ++failures;
@@ -555,6 +557,7 @@ int main(int argc,char** argv) {
         input.walkAmount=step*.25f;input.walkTime=step*.4f;input.playerCombat.action=action;input.playerCombat.actionTime=step*.03f;
         inspect(input,false,false,-1.0f,false);
     }
+    std::cout<<"clearance viewport aspect="<<(wideView ? kHeldItemSpreadMaximumAspect : 1.0f)<<'\n';
     const unsigned legacyCases=cases;
     if(!originalSweep) {
         if(legacyCases!=1475) { ++failures;std::cerr<<"Legacy1,475-pose sweep changed\n"; }
