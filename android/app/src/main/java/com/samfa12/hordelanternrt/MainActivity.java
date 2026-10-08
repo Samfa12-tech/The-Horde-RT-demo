@@ -38,6 +38,9 @@ import android.util.TypedValue;
 import android.view.HapticFeedbackConstants;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.KeyEvent;
+import android.view.InputDevice;
+import android.hardware.input.InputManager;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -73,6 +76,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -226,6 +230,32 @@ public class MainActivity extends Activity {
     private final ExecutorService updateExecutor = Executors.newSingleThreadExecutor();
     private final float[] viewControls = {0.0f, 0.0f, 1.8f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
     private final int[] activePointers = {-1, -1};
+    private final AndroidControllerInput controllerInput = new AndroidControllerInput();
+    private boolean controllerMode, controllerFrameScheduled;
+    private boolean controllerWindowFocused = true;
+    private long controllerFrameTime;
+    private InputManager inputManager;
+    private AlertDialog controllerDialog;
+    private final ArrayList<AlertDialog> controllerDialogs = new ArrayList<>();
+    private TextView controllerPrompt;
+    private final InputManager.InputDeviceListener controllerDevices = new InputManager.InputDeviceListener() {
+        @Override public void onInputDeviceAdded(int deviceId) { /* Connection alone never takes over touch. */ }
+        @Override public void onInputDeviceChanged(int deviceId) {
+            if(deviceId!=controllerInput.activeDeviceId())return;
+            // Capability/range changes are not a disconnect. Motion reads a fresh device/range.
+            InputDevice device=InputDevice.getDevice(deviceId);
+            if(device==null || (!device.supportsSource(InputDevice.SOURCE_GAMEPAD) &&
+                    !device.supportsSource(InputDevice.SOURCE_JOYSTICK))) { onInputDeviceRemoved(deviceId); return; }
+            suspendControllerInput(false); requestControllerFrame();
+        }
+        @Override public void onInputDeviceRemoved(int deviceId) {
+            if (deviceId != controllerInput.activeDeviceId()) return;
+            final boolean pause = controllerMode && canSendGameplayAction();
+            controllerInput.removeDevice(deviceId);
+            suspendControllerInput(true);
+            if (pause) showMainMenu(false);
+        }
+    };
     private final Map<String, Integer> sounds = new HashMap<>();
     private final Set<Integer> loadedSounds = new HashSet<>();
 
@@ -476,6 +506,9 @@ public class MainActivity extends Activity {
         interactButton = findViewById(R.id.interact_button);
         toggleHeldLightPoseButton = findViewById(R.id.toggle_held_light_pose_button);
         vitalityStatus = findViewById(R.id.vitality_status);
+        controllerPrompt = findViewById(R.id.controller_prompt);
+        inputManager = (InputManager)getSystemService(Context.INPUT_SERVICE);
+        if (inputManager != null) inputManager.registerInputDeviceListener(controllerDevices, handler);
         keeperRevealTitle = findViewById(R.id.keeper_reveal_title);
         final Button diagnosticsBack = findViewById(R.id.diagnostics_back);
 
@@ -1719,6 +1752,7 @@ public class MainActivity extends Activity {
                     if (stillCurrent) confirmed.run();
                 }));
         dialog.show();
+        installControllerDialog(dialog);
     }
 
     private void dismissPlaytestDecisionDialog() {
@@ -2311,18 +2345,19 @@ public class MainActivity extends Activity {
         menuVisible = false;
         menuScrim.setVisibility(View.GONE);
         final boolean showHud = preferences.getBoolean("show_hud", true);
-        menuButton.setVisibility(showHud ? View.VISIBLE : View.GONE);
-        attackButton.setVisibility(showHud && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1 &&
+        menuButton.setVisibility(showHud && !controllerMode ? View.VISIBLE : View.GONE);
+        attackButton.setVisibility(showHud && !controllerMode && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1 &&
                 lastPlayerLifePhase == PLAYER_ALIVE
                 ? View.VISIBLE : View.GONE);
-        parryButton.setVisibility(showHud && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1 &&
+        parryButton.setVisibility(showHud && !controllerMode && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1 &&
                 lastPlayerLifePhase == PLAYER_ALIVE
                 ? View.VISIBLE : View.GONE);
-        dodgeButton.setVisibility(showHud && canSendGameplayAction() ? View.VISIBLE : View.GONE);
+        dodgeButton.setVisibility(showHud && !controllerMode && canSendGameplayAction() ? View.VISIBLE : View.GONE);
         rtStatus.setVisibility(showHud && (InterfacePreferences.read(preferences).routineStatus ||
                 ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1) ? View.VISIBLE : View.GONE);
         vitalityStatus.setVisibility(showHud && lastPlayerLifePhase == PLAYER_ALIVE ? View.VISIBLE : View.GONE);
         setGameplayPaused(false);
+        refreshControllerHud();
     }
 
     private void showControls() {
@@ -2334,6 +2369,7 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel(getString(R.string.controls), "PHONE CONTROLS");
         addBody(panel, getString(R.string.controls_help));
+        addBody(panel, getString(R.string.controller_help));
         addMenuButton(panel, getString(R.string.back), () -> showMainMenu(false));
         attachPanel(panel);
     }
@@ -2712,6 +2748,7 @@ public class MainActivity extends Activity {
             if (graphicsDetailsDialog == dialog) graphicsDetailsDialog = null;
         });
         dialog.show();
+        installControllerDialog(dialog);
     }
 
     private void setGraphicsEditorsEnabled(View view, boolean enabled) {
@@ -2832,6 +2869,7 @@ public class MainActivity extends Activity {
 
     private void showGraphicsPreviewOptionMenu(Button anchor, int choice) {
         dismissGraphicsPreviewOptions();
+        if(controllerMode) { showControllerGraphicsChoices(anchor,choice); return; }
         final PopupMenu popup = createGraphicsPreviewOptionMenu(anchor, choice);
         graphicsOptionsPopup = popup;
         graphicsPreviewModalEpoch = graphicsPreviewDetailsSamples[0];
@@ -2842,6 +2880,39 @@ public class MainActivity extends Activity {
             }
         });
         popup.show();
+    }
+
+    private void showControllerGraphicsChoices(Button anchor,int choice) {
+        LinearLayout panel=new LinearLayout(this); panel.setOrientation(LinearLayout.VERTICAL);
+        final ScrollView optionsScroll=new ScrollView(this);optionsScroll.addView(panel);
+        final AlertDialog dialog=new AlertDialog.Builder(this).setTitle(GraphicsPreviewOptions.name(choice))
+                .setView(optionsScroll).setNegativeButton(R.string.back,null).create();
+        final int[] choices=GraphicsPreviewOptions.choices(graphicsDraft,choice);
+        Button selected=null;
+        for(int value:choices) {
+            String label=choice==GraphicsPreviewOptions.RESOLUTION?GraphicsPreviewOptions.resolutionLabel(value):
+                    choice==GraphicsPreviewOptions.WATER?waterName(value):
+                    choice==GraphicsPreviewOptions.FIRE?GraphicsPreviewOptions.fireLabel(value):
+                    choice==GraphicsPreviewOptions.SHADOW?GraphicsPreviewOptions.shadowLabel(value):
+                    choice==GraphicsPreviewOptions.DUST?GraphicsPreviewOptions.dustLabel(value):
+                    (choice==GraphicsPreviewOptions.GLASS || choice==GraphicsPreviewOptions.MIST)?(value==1?"On":"Off"):value+" Hz";
+            Button button=createMenuButton(label,() -> {
+                if(graphicsBusy || !graphicsPreviewWanted || !GraphicsPreviewOptions.presented(
+                        ProbeBridge.getGraphicsSnapshot(),surfaceRequestGeneration,graphicsRequestSerial,previewSelection()))return;
+                dialog.dismiss();
+                graphicsPreviewChoice=choice; graphicsPreviewCamera=GraphicsPreviewOptions.camera(choice);
+                graphicsPreviewMotion=choice==GraphicsPreviewOptions.CAP;
+                compareGraphicsPreview(GraphicsPreviewOptions.withChoice(graphicsDraft,choice,value));
+            });
+            panel.addView(button,menuButtonLayoutParams());
+            if(value==GraphicsPreviewOptions.value(graphicsDraft,choice))selected=button;
+        }
+        dialog.setOnDismissListener(ignored -> {
+            if(anchor.isAttachedToWindow() && anchor.isEnabled())anchor.requestFocus();
+            requestGraphicsPreviewPresentationRefresh();
+        });
+        dialog.show(); installControllerDialog(dialog);
+        if(selected!=null) { selected.setFocusableInTouchMode(true); selected.requestFocus(); }
     }
 
     private void requestGraphicsPreviewPresentationRefresh() {
@@ -3111,7 +3182,8 @@ public class MainActivity extends Activity {
                 requestGraphicsPreviewPresentationRefresh();
             }
         });
-        dialog.show(); setGraphicsEditorsEnabled(panel, !graphicsBusy);
+        dialog.show();
+        installControllerDialog(dialog); setGraphicsEditorsEnabled(panel, !graphicsBusy);
     }
 
     private void refreshGraphicsPreviewTelemetry(long[] applied, String settingsText) {
@@ -3395,6 +3467,14 @@ public class MainActivity extends Activity {
                 safeTop=Math.max(safeTop,insets.getDisplayCutout().getSafeInsetTop());
                 safeBottom=Math.max(safeBottom,insets.getDisplayCutout().getSafeInsetBottom());
             }
+        }
+        if(controllerPrompt!=null) {
+            FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)controllerPrompt.getLayoutParams();
+            p.leftMargin=dp(16)+safeLeft; p.rightMargin=dp(16)+safeRight; p.bottomMargin=dp(16)+safeBottom;
+            controllerPrompt.setLayoutParams(p);
+            controllerPrompt.setMaxWidth(Math.max(dp(48),getResources().getDisplayMetrics().widthPixels-safeLeft-safeRight-dp(32)));
+            controllerPrompt.setMaxLines(Integer.MAX_VALUE);
+            controllerPrompt.setBackground(HordeUiTokens.plate(this,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
         }
         UiControlLayout.apply(this,v,attackButton,parryButton,dodgeButton,interactButton,toggleHeldLightPoseButton,
                 safeRight,safeBottom,getResources().getDisplayMetrics().widthPixels-safeLeft);
@@ -4089,13 +4169,14 @@ public class MainActivity extends Activity {
                         getString(R.string.update_available_body, version));
                 if (!title.isEmpty()) message.append("\n\n").append(title);
                 if (!notes.isEmpty()) message.append("\n\n").append(notes);
-                new AlertDialog.Builder(this)
+                final AlertDialog updateDialog = new AlertDialog.Builder(this)
                         .setTitle(R.string.update_available_title)
                         .setMessage(message.toString())
                         .setPositiveButton(R.string.update_now, (dialog, which) ->
                                 openVerifiedReleasePage(releaseUrl))
                         .setNegativeButton(R.string.later, null)
                         .show();
+                installControllerDialog(updateDialog);
             } else if (manualRequest && "up-to-date".equals(status)) {
                 Toast.makeText(this, R.string.up_to_date, Toast.LENGTH_LONG).show();
             } else if (manualRequest) {
@@ -4254,7 +4335,7 @@ public class MainActivity extends Activity {
                     if (!menuVisible && !benchmarkRunning && !debugCaptureUiSuppressed)
                         rtStatus.setVisibility(showHud && InterfacePreferences.read(preferences).routineStatus ? View.VISIBLE : View.GONE);
                     if (!debugCaptureUiSuppressed && !menuVisible && !benchmarkRunning && showHud &&
-                            lifePhase == PLAYER_ALIVE) {
+                            lifePhase == PLAYER_ALIVE && !controllerMode) {
                         attackButton.setVisibility(View.VISIBLE);
                         parryButton.setVisibility(View.VISIBLE);
                         dodgeButton.setVisibility(View.VISIBLE);
@@ -5241,11 +5322,216 @@ public class MainActivity extends Activity {
         });
     }
 
+    @Override public boolean dispatchKeyEvent(KeyEvent event) {
+        if (!AndroidControllerInput.isControllerKey(event)) return super.dispatchKeyEvent(event);
+        AndroidControllerInput.Result result=controllerInput.key(event,SystemClock.uptimeMillis());
+        if (!result.handled) return super.dispatchKeyEvent(event);
+        if (resumed && controllerWindowFocused) {
+            handleControllerResult(result);
+            handleControllerResult(controllerInput.navigation(SystemClock.uptimeMillis()));
+        }
+        else controllerInput.suspend(SystemClock.uptimeMillis());
+        return true;
+    }
+
+    @Override public boolean dispatchGenericMotionEvent(MotionEvent event) {
+        if (!AndroidControllerInput.isControllerMotion(event)) return super.dispatchGenericMotionEvent(event);
+        AndroidControllerInput.Result result=controllerInput.motion(event,SystemClock.uptimeMillis());
+        if (!result.handled) return super.dispatchGenericMotionEvent(event);
+        if (resumed && controllerWindowFocused) {
+            handleControllerResult(result);
+            handleControllerResult(controllerInput.navigation(SystemClock.uptimeMillis()));
+        }
+        else controllerInput.suspend(SystemClock.uptimeMillis());
+        return true;
+    }
+
+    @Override public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getActionMasked()==MotionEvent.ACTION_DOWN && controllerMode) {
+            // Restore hit targets BEFORE this intentional first fallback down is dispatched.
+            suspendControllerInput(true);
+            clearTouchState();
+            refreshControllerHud();
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
+    @Override public void onWindowFocusChanged(boolean focused) {
+        super.onWindowFocusChanged(focused);
+        controllerWindowFocused=focused;
+        currentControllerDialog();
+        if (!focused) {
+            suspendControllerInput(false);
+            if(surfaceView!=null && interactButton!=null && toggleHeldLightPoseButton!=null)clearTouchGesture();
+            if (controllerMode && controllerDialog==null && canSendGameplayAction()) showMainMenu(false);
+        } else requestControllerFrame();
+    }
+
+    private AlertDialog currentControllerDialog() {
+        for(int i=controllerDialogs.size()-1;i>=0;i--)if(!controllerDialogs.get(i).isShowing())controllerDialogs.remove(i);
+        controllerDialog=controllerDialogs.isEmpty()?null:controllerDialogs.get(controllerDialogs.size()-1);
+        return controllerDialog;
+    }
+
+    private View controllerUiRoot() {
+        currentControllerDialog();
+        if (controllerDialog != null && controllerDialog.isShowing()) return controllerDialog.getWindow().getDecorView();
+        if (diagnosticsVisible) return diagnosticsPanel;
+        return menuVisible || deathOverlayVisible || endingOverlayVisible ? menuScrim : null;
+    }
+
+    private void installControllerDialog(AlertDialog dialog) {
+        currentControllerDialog();
+        controllerDialogs.remove(dialog);controllerDialogs.add(dialog);
+        controllerDialog=dialog;
+        dialog.setOnKeyListener((owner,key,event) -> {
+            if (!AndroidControllerInput.isControllerKey(event)) return false;
+            AndroidControllerInput.Result result=controllerInput.key(event,SystemClock.uptimeMillis());
+            if(result.handled && resumed) {
+                handleControllerResult(result);
+                handleControllerResult(controllerInput.navigation(SystemClock.uptimeMillis()));
+            }
+            return result.handled;
+        });
+        dialog.getWindow().getDecorView().setOnGenericMotionListener((view,event) -> {
+            if (!AndroidControllerInput.isControllerMotion(event)) return false;
+            AndroidControllerInput.Result result=controllerInput.motion(event,SystemClock.uptimeMillis());
+            if(result.handled && resumed) {
+                handleControllerResult(result);
+                handleControllerResult(controllerInput.navigation(SystemClock.uptimeMillis()));
+            }
+            return result.handled;
+        });
+        if(controllerMode) ControllerNavigation.ensureFocus(dialog.getWindow().getDecorView());
+        requestControllerFrame();
+    }
+
+    private void confirmControllerControl(View ui) {
+        View focused=ControllerNavigation.ensureFocus(ui);
+        if(!(focused instanceof Spinner)) { ControllerNavigation.confirm(ui); return; }
+        final Spinner spinner=(Spinner)focused;
+        final LinearLayout options=new LinearLayout(this); options.setOrientation(LinearLayout.VERTICAL);
+        final ScrollView scroll=new ScrollView(this);scroll.addView(options);
+        final AlertDialog dialog=new AlertDialog.Builder(this).setTitle(spinner.getContentDescription())
+                .setView(scroll).setNegativeButton(R.string.back,null).create();
+        Button selected=null;
+        for(int i=0;i<spinner.getCount();i++) {
+            final int index=i;
+            Button option=createMenuButton(String.valueOf(spinner.getItemAtPosition(i)),() -> {
+                spinner.setSelection(index); dialog.dismiss();
+            });
+            options.addView(option,menuButtonLayoutParams());
+            if(i==spinner.getSelectedItemPosition())selected=option;
+        }
+        dialog.setOnDismissListener(ignored -> { if(spinner.isAttachedToWindow())spinner.requestFocus(); });
+        dialog.show();installControllerDialog(dialog);
+        if(selected!=null) {selected.setFocusableInTouchMode(true);selected.requestFocus();}
+    }
+
+    private void handleControllerResult(AndroidControllerInput.Result result) {
+        if(result.meaningful && !controllerMode) {
+            clearTouchGesture();
+            controllerMode=true;
+            refreshControllerHud();
+        }
+        if(!controllerMode)return;
+        View ui=controllerUiRoot();
+        if(ui!=null) {
+            ControllerNavigation.ensureFocus(ui);
+            if ((result.actions & AndroidControllerInput.CANCEL)!=0 ||
+                    (result.actions & AndroidControllerInput.PAUSE)!=0) {
+                if(controllerDialog!=null && controllerDialog.isShowing())controllerDialog.cancel();
+                else onBackPressed();
+            } else {
+                if(result.horizontal!=0 || result.vertical!=0) ControllerNavigation.navigate(ui,result.horizontal,result.vertical);
+                if((result.actions & AndroidControllerInput.CONFIRM)!=0) confirmControllerControl(ui);
+            }
+        } else if((result.actions & AndroidControllerInput.PAUSE)!=0) onBackPressed();
+        else if(canSendGameplayAction()) {
+            viewControls[7]=controllerInput.moveStrafe(); viewControls[8]=controllerInput.moveForward();
+            pushViewControls(); // A directional Dodge sees the same coherent axes publication.
+            if((result.actions & AndroidControllerInput.SWING)!=0)ProbeBridge.requestAttack();
+            if((result.actions & AndroidControllerInput.PARRY)!=0)ProbeBridge.requestParry();
+            if((result.actions & AndroidControllerInput.DODGE)!=0)ProbeBridge.requestDodge();
+            if((result.actions & AndroidControllerInput.INTERACT)!=0)ProbeBridge.requestInteract();
+            if((result.actions & AndroidControllerInput.LANTERN)!=0)ProbeBridge.requestToggleHeldLightPose();
+        }
+        requestControllerFrame();
+    }
+
+    private void suspendControllerInput(boolean restoreTouch) {
+        controllerInput.suspend(SystemClock.uptimeMillis());
+        handler.removeCallbacks(controllerFrame); controllerFrameScheduled=false; controllerFrameTime=0;
+        viewControls[7]=viewControls[8]=0;
+        // No new command edges are generated by suspension or reconnection.
+        if(surfaceView!=null)pushViewControls();
+        if(restoreTouch)controllerMode=false;
+        if(restoreTouch)refreshControllerHud();
+        if(controllerPrompt!=null)controllerPrompt.setVisibility(View.GONE);
+    }
+
+    private void requestControllerFrame() {
+        if(!controllerMode || !resumed || controllerFrameScheduled ||
+                (!controllerWindowFocused && (controllerDialog==null || !controllerDialog.isShowing())))return;
+        controllerFrameScheduled=true; handler.postDelayed(controllerFrame,16);
+    }
+
+    private final Runnable controllerFrame = new Runnable() {
+        @Override public void run() {
+            controllerFrameScheduled=false;
+            if(!controllerMode || !resumed || (!controllerWindowFocused &&
+                    (controllerDialog==null || !controllerDialog.isShowing())))return;
+            final long now=SystemClock.uptimeMillis();
+            final float dt=controllerFrameTime==0?0:Math.min(0.05f,Math.max(0,now-controllerFrameTime)*0.001f);
+            controllerFrameTime=now;
+            View ui=controllerUiRoot();
+            if(ui!=null) {
+                ControllerNavigation.ensureFocus(ui);
+                handleControllerResult(controllerInput.navigation(now));
+            } else if(canSendGameplayAction()) {
+                final float sensitivity=preferences.getInt("look_sensitivity",100)/100.0f;
+                final boolean changed=controllerInput.lookX()!=0 || controllerInput.lookY()!=0 ||
+                        viewControls[7]!=controllerInput.moveStrafe() || viewControls[8]!=controllerInput.moveForward();
+                viewControls[0]+=controllerInput.lookX()*2.3f*dt*sensitivity;
+                viewControls[1]=clamp(viewControls[1]+controllerInput.lookY()*1.2f*dt*sensitivity,-0.32f,0.28f);
+                viewControls[7]=controllerInput.moveStrafe(); viewControls[8]=controllerInput.moveForward();
+                if(changed)pushViewControls();
+            }
+            requestControllerFrame();
+        }
+    };
+
+    private void refreshControllerHud() {
+        if(preferences==null)return;
+        final boolean hud=preferences.getBoolean("show_hud",true);
+        final boolean playing=canSendGameplayAction() && !debugCaptureUiSuppressed;
+        final int actions=hud && playing && !controllerMode?View.VISIBLE:View.GONE;
+        for(Button button:new Button[]{attackButton,parryButton,dodgeButton})if(button!=null)button.setVisibility(actions);
+        if(menuButton!=null)menuButton.setVisibility(hud && playing && !controllerMode?View.VISIBLE:View.GONE);
+        if(vitalityStatus!=null)vitalityStatus.setVisibility(hud && playing && lastPlayerLifePhase==PLAYER_ALIVE?View.VISIBLE:View.GONE);
+        if(interactButton!=null && toggleHeldLightPoseButton!=null)updateContextualControls(hud && playing);
+    }
+
+    private void updateControllerPrompt(int interactLabel,boolean interactEnabled,boolean raise,boolean lower) {
+        if(controllerPrompt==null || !controllerMode)return;
+        String prompt=getString(R.string.controller_play_prompts);
+        if(interactLabel!=0)prompt+="\n"+(interactEnabled?"A: ":"")+getString(interactLabel);
+        if(raise || lower)prompt+="\nY: "+getString(raise?R.string.raise_lantern:R.string.lower_lantern);
+        controllerPrompt.setText(prompt); controllerPrompt.setContentDescription(prompt);
+        controllerPrompt.setVisibility(View.VISIBLE);
+    }
+
     private boolean canSendGameplayAction() {
         return !menuVisible && !diagnosticsVisible && !deathOverlayVisible && !endingOverlayVisible &&
                 !benchmarkRunning && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
     }
     private void clearTouchState() {
+        suspendControllerInput(false);
+        clearTouchGesture();
+        requestControllerFrame();
+    }
+
+    private void clearTouchGesture() {
         if (swingTouch != null) swingTouch.cancel();
         if (dodgeTouch != null) dodgeTouch.cancel();
         TouchControlState.clear(activePointers, viewControls);
@@ -5257,6 +5543,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateContextualControls(final boolean controlsAllowed) {
+        if (controllerPrompt != null) controllerPrompt.setVisibility(View.GONE);
         if (!controlsAllowed) {
             interactButton.setVisibility(View.GONE);
             toggleHeldLightPoseButton.setVisibility(View.GONE);
@@ -5293,10 +5580,11 @@ public class MainActivity extends Activity {
             interactButton.setText(interactLabel);
             interactButton.setContentDescription(getString(interactLabel));
             interactButton.setEnabled(interactEnabled);
-            interactButton.setVisibility(View.VISIBLE);
+            interactButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
         }
         final boolean showRaise = (contextualState & CONTEXTUAL_RAISE) != 0;
         final boolean showLower = (contextualState & CONTEXTUAL_LOWER) != 0;
+        updateControllerPrompt(interactLabel, interactEnabled, showRaise, showLower);
         if (!showRaise && !showLower) {
             toggleHeldLightPoseButton.setVisibility(View.GONE);
             return;
@@ -5304,7 +5592,7 @@ public class MainActivity extends Activity {
         final int label = showRaise ? R.string.raise_lantern : R.string.lower_lantern;
         toggleHeldLightPoseButton.setText(label);
         toggleHeldLightPoseButton.setContentDescription(getString(label));
-        toggleHeldLightPoseButton.setVisibility(View.VISIBLE);
+        toggleHeldLightPoseButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
     }
 
     private boolean stageAsset(final String assetPath, final String fileName) {
@@ -5440,6 +5728,36 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void relayoutMenuForViewport() {
+        if(menuScrim==null)return;
+        int left=dp(16),right=dp(16),top=dp(16),bottom=dp(16);
+        WindowInsets insets=menuScrim.getRootWindowInsets();
+        if(insets!=null) {
+            left+=insets.getStableInsetLeft();right+=insets.getStableInsetRight();
+            top+=insets.getStableInsetTop();bottom+=insets.getStableInsetBottom();
+            if(Build.VERSION.SDK_INT>=28 && insets.getDisplayCutout()!=null) {
+                left=Math.max(left,insets.getDisplayCutout().getSafeInsetLeft()+dp(16));
+                right=Math.max(right,insets.getDisplayCutout().getSafeInsetRight()+dp(16));
+                top=Math.max(top,insets.getDisplayCutout().getSafeInsetTop()+dp(16));
+                bottom=Math.max(bottom,insets.getDisplayCutout().getSafeInsetBottom()+dp(16));
+            }
+        }
+        int width=menuScrim.getWidth()>0?menuScrim.getWidth():getResources().getDisplayMetrics().widthPixels;
+        int height=menuScrim.getHeight()>0?menuScrim.getHeight():getResources().getDisplayMetrics().heightPixels;
+        for(int i=0;i<menuScrim.getChildCount();i++) {
+            View child=menuScrim.getChildAt(i);
+            if(!(child instanceof ScrollView))continue;
+            FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)child.getLayoutParams();
+            final boolean side=entryMenuEnabled && entryMenuSidePage;
+            int available=Math.max(dp(48),width-left-right);
+            p.width=side?Math.min(dp(400),Math.min(available,(int)(width*(height>=width?.90f:.42f)))):Math.min(dp(520),available);
+            p.height=side?FrameLayout.LayoutParams.WRAP_CONTENT:FrameLayout.LayoutParams.MATCH_PARENT;
+            p.gravity=side?(height>=width?Gravity.BOTTOM|Gravity.START:Gravity.CENTER_VERTICAL|Gravity.START):Gravity.CENTER_HORIZONTAL;
+            p.setMargins(left,top,right,bottom);child.setLayoutParams(p);
+        }
+        if(controllerMode)ControllerNavigation.ensureFocus(controllerUiRoot());
+    }
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -5459,6 +5777,7 @@ public class MainActivity extends Activity {
             view.post(() -> {
                 if (isFinishing()) return;
                 applyInterfacePresentation();
+                relayoutMenuForViewport();
                 if (graphicsVisible) {
                     // Builders read only UI state; trial/ACK/timer state remains in the activity.
                     showGraphicsPage();
@@ -5483,6 +5802,8 @@ public class MainActivity extends Activity {
         super.onResume();
         if (musicPlayback != null) musicPlayback.setSuspended(true); // Wait for a ready new surface.
         resumed = true;
+        controllerInput.suspend(SystemClock.uptimeMillis());
+        requestControllerFrame();
         enterImmersiveMode();
         final boolean hadSurfaceGeneration = surfaceRequestGeneration != 0;
         startSurfaceIfReady();
@@ -5546,6 +5867,7 @@ public class MainActivity extends Activity {
             showSettings();
         }
         resumed = false;
+        handler.removeCallbacks(controllerFrame); controllerFrameScheduled = false;
         reconcilePlaytestReportForPause(); // A document-picker pause leaves local export untouched.
         if (musicPlayback != null) musicPlayback.setSuspended(true);
         if (benchmarkAutomationId != null && !benchmarkAutomationFinishing) {
@@ -5578,6 +5900,9 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        handler.removeCallbacks(controllerFrame);
+        if (inputManager != null) inputManager.unregisterInputDeviceListener(controllerDevices);
+        controllerDialog = null; controllerDialogs.clear();
         closeBenchmarkSummaryReview();
         dismissGraphicsPreviewDetails();
         invalidateRemotePlaytest(true);

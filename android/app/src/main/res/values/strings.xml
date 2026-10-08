@@ -219,4 +219,6 @@
     <string name="benchmark_summary_edit">Edit choices (requires new consent)</string>
     <string name="benchmark_summary_unavailable">A complete matching benchmark summary is unavailable. Nothing was prepared or sent.</string>
     <string name="benchmark_summary_picker_pending">Finish or dismiss the previous document picker before saving another report.</string>
+    <string name="controller_help">Controller: left stick moves; right stick looks. Right trigger or X swings; left trigger parries; B dodges; A interacts; Y raises or lowers the lantern; Start opens the menu. In menus, D-pad or left stick selects, A confirms, B goes back, and left/right adjusts a focused slider. These are Android button names; physical labels vary by controller. Touch restores touch controls. Unplugging the active controller pauses play.</string>
+    <string name="controller_play_prompts">Swing: RT / X · Parry: LT · Dodge: B · Menu: Start</string>
 </resources>

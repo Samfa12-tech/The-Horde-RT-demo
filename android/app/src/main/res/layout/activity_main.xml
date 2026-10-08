@@ -118,6 +118,21 @@
         android:textSize="8sp"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/controller_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="16dp"
+        android:padding="8dp"
+        android:background="#B3151719"
+        android:textColor="#F2E9D8"
+        android:textSize="12sp"
+        android:maxLines="4"
+        android:gravity="center"
+        android:focusable="false"
+        android:visibility="gone" />
+
     <Button
         android:id="@+id/menu_button"
         android:layout_width="72dp"

@@ -15,6 +15,23 @@ shafts remain deferred. No release follows.
 
 Updated 8 October 2026. Authority: the owner's `Horde-1.6.2-after-reset-goal.txt`, explicitly adopted by the latest resume request. Supporting PR16 reference: `48fd8d6e0ee73c480502906104593c4e6d3b8aae`. Remote planning advanced to `c03db1c94dd058e8416d1927c908b6b7298d16e0`; those documentation changes are not merged into runtime wholesale. Work continues in the existing PR18 checkout/branch. No duplicate workspace, reset, release, merge, signing or paid generation is authorized.
 
+## Accepted queue addition — Android controller and wider views
+
+Owner instruction8October expands the remaining1.6.2 scope after the sealed
+hand/parry checkpoint: standard Android controller input through the existing
+coherent mailbox, complete native menu/dialog/slider navigation, active-input
+HUD separation, safe disconnect/focus/lifecycle recovery, both landscape
+directions and portrait. Connection/drift must not take over touch; saved HUD
+and Graphics acknowledgement/persistence rules remain authoritative.
+
+Slight extra equipment separation in wider viewports must use aspect ratio and
+shared hand/Grip pose ownership, preserve portrait, combat reach and hit timing.
+Android physical acceptance requires an exact phone/OS/APK/controller matrix;
+Windows, synthetic events and builds cannot close it. The owner is away with the
+phone: no ADB/device work, device waits or owner test requests until explicit
+return and intended-device verification. Continue safe host implementation and
+push coherent checkpoints on PR18. No release is authorized.
+
 ## Preserved completed evidence
 
 Earlier immutable Windows guard preview is `3da5f2dd`: two lateral guards face
