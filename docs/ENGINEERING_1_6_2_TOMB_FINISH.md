@@ -1,17 +1,20 @@
 # 1.6.2 tomb finish — active post-reset work
 
-**8 October controller/aspect inspection checkpoint:** candidate
-`a6c19938994db95f9764b7fcf3eaa888811ecc1f` adds standard Android controller input,
-native menu/dialog/slider navigation, active-input HUD separation and safe
-lifecycle/disconnect recovery through the existing shared simulation. Wider
-viewports separate the solved equipment targets slightly; portrait is unchanged.
-211 Android tests, lint, four-ABI Debug build, affected native checks and eight
-corrected frozen RT captures pass. The APK remains uninstalled while the owner
-is away. `cb7c80f6` CI passes 12/12; the Windows capture follow-up has separate
-CI. Physical Android/controller, current moving equipment/secondary views/full
-route, sustained phone quality/cost, changed audio/haptics and independent final
-audit remain open. Dust stays optional/default Off; shafts deferred. No release.
-[Exact sources, package hashes, retained failures and acceptance matrix](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md).
+**8 October integrated controller/pose checkpoint:** runtime
+`454d58ee0f71bdb837a75ce486d6c139e03e0b02` adds native-dialog focus suspension
+to the Android controller path and makes contact diagnostics consume the actual
+shared skeleton render poses. Standard input, native navigation, HUD separation,
+recovery and aspect-based equipment spacing remain in place; portrait is unchanged.
+213 Android tests, lint, four-ABI Debug assembly and Windows build pass. Shared
+pose contracts and corrected renderer smoke pass; eight fresh RT stills and
+uploaded meshes match the preceding a6 candidate exactly. The sealed APK remains
+uninstalled while the owner is away. Runtime CI passes all 12 aggregate jobs; test-only registration `03fe9ae2`
+and documentation have separate CI.
+Physical Android/controller, moving equipment/secondary views/full route,
+contact calibration, sustained phone quality/cost, changed audio/haptics and
+independent final audit remain open. Dust stays optional/default Off; shafts
+deferred. No release.
+[Exact sources, package hashes, retained failures and acceptance matrix](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#current-integrated-follow-up--454d58ee).
 
 **Earlier 8 October equipment inspection checkpoint:** runtime
 `c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` retains the sheathed right hand through
@@ -168,7 +171,7 @@ that package and do not close moving contact, owner acceptance or sustained FPS.
 
 | Slice | Current status | Remaining evidence or decision |
 | --- | --- | --- |
-| Android controller and wider views | Standard Android policy/native routes/HUD mode and recovery in `0fff2b83`; shared aspect poses in `cb7c80f6` and corrected frozen delivery in `a6c19938`. 211 Java tests, lint/four-ABI build, affected native checks and eight current RT stills pass; portrait byte-identical | Exact phone/OS/APK/controller cold/hot/menu/combat/rotation/disconnect/Home/touch-fallback matrix, moving wide poses and owner acceptance; [exact ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md). No hardware certification |
+| Android controller and wider views | Standard Android policy/native routes/HUD mode and recovery in `0fff2b83`; shared aspect poses in `cb7c80f6` and corrected frozen delivery in `a6c19938`. Dialog-focus follow-up/shared renderer pose authority in `454d58ee`; 213 Java tests, lint/four-ABI build, affected native checks and eight fresh RT still/mesh joins pass; appearance byte-identical to a6 | Exact phone/OS/APK/controller cold/hot/menu/combat/rotation/disconnect/Home/touch-fallback matrix, moving wide poses and owner acceptance; [exact ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md). No hardware certification |
 | Fresh Graphics restore, Android cancellation, Windows focus, Graphics viewport | Implemented in `e1f1b9a0` and `a73a8084`; [regression evidence](ENGINEERING_1_6_2_INPUT_REGRESSIONS_2026_10_07.md). Current `7368e2c7` passes physical-device synthetic whole-gesture Cancel and Menu/Resume for both finger orders on both phone RT backends | Held-touch Home and subsequent fresh move/look/Parry now pass both phone backends; physical Windows controller/focus and owner comfort remain |
 | Combat contact/edge timeline and parry presentation | Measured timeline/parry presentation `a7b500bb`, timestamped edge scheduling and input/tick/pose/presentation trace `1c3909b4`; imported idle-blade contact samples corrected in `ab69537a`, with affected Keeper checks passing on both phone backends | Moving-target contact/range/cone calibration, physical latency and owner feel. Host timing tests cover 15/30/60/120 FPS, hitches and late catch-up parry misses; damage timing requires owner audio/haptic revalidation |
 | Native actions and three original hearts | Press-down Swing/Parry/Dodge and original native hearts committed in `b76ce0e6`; `7368e2c7` fixes warm-up Dodge visibility, passes 177/177 Android tests in 30 classes and the combined 32-case diagonal synthetic touch matrix on both physical phone RT backends. Owner ordinary playtest of `ccd70d38` accepts touch comfort; earlier `ab69537a` active-draw Home evidence remains separate | Measured touch latency, successful parry/riposte and remaining owner audio/haptic acceptance; synthetic held-touch Home/fresh Parry passes on both phone backends |

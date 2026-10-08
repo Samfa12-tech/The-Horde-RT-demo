@@ -35,3 +35,10 @@ they do not establish moving clearance, all intermediate animation times,
 phone/controller input, full body/shadow/reflection or sustained performance.
 No owner feedback is requested while the owner is away with the phone.
 [Exact implementation and evidence ledger](../../ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md).
+
+Follow-up runtime `454d58ee0f71bdb837a75ce486d6c139e03e0b02`, Windows executable
+SHA-256 `b538d71a559b2c9bec3ebd764e565f880220c02bcdf634b0fb63ecb897e9caec`,
+produced eight fresh frozen captures with identical PNG, viewmodel and world-body
+mesh hashes to a6. Its private seal is `task-4/integrated-162-454d58ee-20261008`.
+The displayed files retain their original a6 provenance; the later hash comparison
+adds behavior-preservation evidence, not moving or phone acceptance.

@@ -501,7 +501,10 @@ capsule experiment. They use the actual imported player rig, final sword Grip,
 all 6,905 blade triangles and imported target skins. An ordinary unhit parallel
 combat control supplies the pre-update target paired with the existing contact
 pulse, matching `ResolveSwordHit` ordering. Renderer clip/instance mapping is
-the existing aligned diagnostic copy, not direct execution of CharacterRenderSlot.
+the then-existing aligned diagnostic copy, not direct execution of CharacterRenderSlot.
+Later source `525a5d0e` extracts the actual shared `SkeletonRenderPose` helper for
+both renderer and diagnostics; the [454 follow-up](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#current-integrated-follow-up--454d58ee) records equivalence/edge checks.
+The historical measurements below retain their original source and gaps.
 Each case samples pulse through +3 fixed ticks (.10–.15 active seconds); this is
 four discrete endpoints, not continuous collision or actual presented contact.
 

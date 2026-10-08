@@ -5,7 +5,86 @@ Physical Android controller support is **not yet accepted**. The owner is away
 with the phone: no ADB, installs, device waits or owner testing occurred in this
 checkpoint. Continue the existing tomb finish goal and preserve prior results.
 
-## Exact candidate and earlier evidence
+## Current integrated follow-up — 454d58ee
+
+- Runtime source: `454d58ee0f71bdb837a75ce486d6c139e03e0b02`; tree
+  `28d7b7467305821f7e1b31fa8a9f50893c334d25`.
+- Windows Debug executable: 11,553,280 bytes; SHA-256
+  `b538d71a559b2c9bec3ebd764e565f880220c02bcdf634b0fb63ecb897e9caec`.
+- Four-ABI Debug APK: 138,462,724 bytes; SHA-256
+  `12dfe45d1903bce5a6c11ee01a522603f2657d4a248b346e1ae3a7082f14e973`.
+  Both packages were built at this exact source and sealed in
+  `task-4/integrated-162-454d58ee-20261008`. No installation or phone test occurred.
+- Native APK payload SHA-256: arm64-v8a
+  `a64b35dc1caca9c0e37d5704636f6bc73ea7bd25fcb9ee8fedaa75fa025a9905`;
+  armeabi-v7a `9c46a08ee0baa9b07919e11916f219ee2ee50e75a25ae2b3478ce75efdc0b26d`;
+  x86 `d989f237f3b4a063a4d7146fba4cbaae4be15de423ce2062397aea837761e08d`;
+  x86_64 `4724341a0296c22822202d82c11b52904577dbf79da064bb80f937c2f4bc5f7c`.
+  All four native libraries changed after the shared pose extraction; all 91
+  asset entries remain byte-identical to a6/c2. Manifest and SDK 37 16 KiB
+  alignment checks pass with the same orientation/version settings.
+
+A native dialog could previously keep polling a held navigation control after
+its own Window lost focus. The activity's focus flag alone does not describe a
+focused dialog. The follow-up tracks each owned dialog's actual Window focus,
+gates key/joystick/poll delivery on it, neutralizes held input on loss and requires
+fresh releases/neutral axes on return. Dismissal and parent focus restoration
+preserve native callbacks, consent, graphics serial/generation guards and the
+exact acknowledgement timer. Two new regressions fail against the a6 activity
+and pass after the fix. Robolectric fixtures dispatch both View and
+ViewTreeObserver focus notifications, matching the actual framework route;
+physical Android Window delivery remains pending.
+
+`SkeletonRenderPose.h` now owns the skeleton clip/time/root transform used by
+both `CharacterRenderSlot` and the actual-mesh contact diagnostics. Removing the
+diagnostic's copied mapping avoids a second animation convention. The sampled
+old/new renderer comparison passes 12/12 cases within 1e-6; retained contracts
+also cover zero/negative death duration and action/animation precedence. This
+extraction preserves pose behavior and changes no combat range/cone, contact
+pulse, parry window or damage rule. It supplies a reliable input for the remaining
+moving-target calibration; it does not resolve that calibration by itself.
+
+Current affected checks:
+
+- **213 Android tests in 35 classes**, zero failures/errors/skips, and lint pass
+  in `android-controller-dialog-full-tests-lint-20261008.log`. Four-ABI Debug
+  assembly passes separately in 8 s; Windows Debug build passes.
+- Shared pose edge contracts pass; the earlier full socket check passes in
+  17.41 s. Renderer smoke passes in 4.88 s after correcting only its old parry
+  expectation to the already-implemented torch-clearance pose.
+- Test-only commit `03fe9ae209c4b6b540c5b8df183b22db99ba745b` registers the finite
+  shared pose contract command in CTest. Its targeted CTest passes in 0.02 s.
+  The two-line registration does not rebuild or relabel the sealed runtime.
+- Eight fresh frozen captures from 454: both real RT backends, both recorded
+  dimensions and both inspection poses. All eight PNGs, viewmodel meshes and
+  player-world-body meshes are byte-identical to a6. Exact completed/presented
+  RT submission joins pass, zero synchronization-validation markers, all eight
+  owned process IDs verified absent. This retains the corrected a6 appearance,
+  not continuous motion, complete secondary views or phone acceptance.
+
+Retained failures include the initial attempt to compile the Vulkan renderer in
+a portable fixture (missing `vulkan/vulkan.h`), the stale renderer smoke parry
+expectation, and initial focus fixtures that omitted the Window observer event.
+The authoritative corrected two-case baseline reproduces both defects against
+a6; the focused 18-case and final 213-case fixed runs pass. No failed run is
+relabeled. Exact private logs include
+`android-controller-dialog-observer-corrected-before-20261008.log`,
+`android-controller-dialog-focus-observer-after-20261008.log`,
+`aspect-render-plan-shared-helper-equivalence-20261008.log`,
+`aspect-render-pose-helper-edge-contracts-20261008.log`,
+`aspect-render-pose-helper-edge-smoke-ctest-20261008.log`,
+`skeleton-pose-contract-ctest-20261008.log`, and
+`controller-pose-final-captures-20261008.log`; the seal contains the hash joins.
+
+Runtime 454 push [37712231672](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37712231672)
+and PR [37712236068](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37712236068)
+completed successfully: **12/12 aggregate jobs** (push 6/6 and PR 6/6).
+Test-registration 03fe has separate push 37712764483 / PR 37712770661 CI in
+progress. Earlier documentation f000 completed 12/12; its result is not assigned
+to either later source. Build correctness, physical acceptance and sustained
+performance remain separate.
+
+## Earlier a6 candidate and preserved evidence
 
 - Candidate source: `a6c19938994db95f9764b7fcf3eaa888811ecc1f`.
 - Candidate tree: `4d19032a2ed55b2b4ce085a97699027a00a8c7dc`.
@@ -149,8 +228,9 @@ and PR [37708865790](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/r
 Windows capture follow-up `a6c19938` has separate push
 [37710046348](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37710046348)
 and PR [37710051071](https://github.com/Samfa12-tech/The-Horde-RT-demo/actions/runs/37710051071)
-CI: **11/12 aggregate jobs successful** at this observation (PR 6/6, push 5/6;
-push MSVC still running). Documentation after the seal has separate CI.
+CI: **12/12 aggregate jobs successful** (push 6/6 and PR 6/6).
+Documentation `f000753d` has separate push 37710860642 / PR 37710864776 CI;
+those runs completed successfully, 12/12 aggregate jobs.
 Green CI is build correctness, not physical controller or owner acceptance.
 
 Audio/haptic manual revalidation for this input/pose-only slice: **NO**; shared

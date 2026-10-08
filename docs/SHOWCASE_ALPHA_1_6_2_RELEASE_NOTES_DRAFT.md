@@ -1,17 +1,20 @@
 # Horde Lantern RT 1.6.2 development notes
 
-**8 October controller/aspect inspection checkpoint:** candidate
-`a6c19938994db95f9764b7fcf3eaa888811ecc1f` adds standard Android controller input,
-native menu/dialog/slider navigation, active-input HUD separation and safe
-lifecycle/disconnect recovery through the existing shared simulation. Wider
-viewports separate the solved equipment targets slightly; portrait is unchanged.
-211 Android tests, lint, four-ABI Debug build, affected native checks and eight
-corrected frozen RT captures pass. The APK remains uninstalled while the owner
-is away. `cb7c80f6` CI passes 12/12; the Windows capture follow-up has separate
-CI. Physical Android/controller, current moving equipment/secondary views/full
-route, sustained phone quality/cost, changed audio/haptics and independent final
-audit remain open. Dust stays optional/default Off; shafts deferred. No release.
-[Exact sources, package hashes, retained failures and acceptance matrix](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md).
+**8 October integrated controller/pose checkpoint:** runtime
+`454d58ee0f71bdb837a75ce486d6c139e03e0b02` adds native-dialog focus suspension
+to the Android controller path and makes contact diagnostics consume the actual
+shared skeleton render poses. Standard input, native navigation, HUD separation,
+recovery and aspect-based equipment spacing remain in place; portrait is unchanged.
+213 Android tests, lint, four-ABI Debug assembly and Windows build pass. Shared
+pose contracts and corrected renderer smoke pass; eight fresh RT stills and
+uploaded meshes match the preceding a6 candidate exactly. The sealed APK remains
+uninstalled while the owner is away. Runtime CI passes all 12 aggregate jobs; test-only registration `03fe9ae2`
+and documentation have separate CI.
+Physical Android/controller, moving equipment/secondary views/full route,
+contact calibration, sustained phone quality/cost, changed audio/haptics and
+independent final audit remain open. Dust stays optional/default Off; shafts
+deferred. No release.
+[Exact sources, package hashes, retained failures and acceptance matrix](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#current-integrated-follow-up--454d58ee).
 
 **Earlier 8 October equipment inspection checkpoint:** runtime
 `c2de5d7d2f8c25e4ed12152b9cd86fe53e2d6cd1` retains the sheathed right hand through
