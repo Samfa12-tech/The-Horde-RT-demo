@@ -3,8 +3,8 @@
 function Get-Horde162AssetSpecification {
     @(
         [pscustomobject]@{ Path='audio/menu/menu_room.wav'; Bytes=384044; Sha256='9aa9a9631f7dbaf724ecd46bfbbea17142af20497299a83db08055751c7cc361'; Platform='Both'; Kind='Wave'; Channels=1; Frames=192000 },
-        [pscustomobject]@{ Path='audio/menu/menu_chain.wav'; Bytes=96044; Sha256='6c85d6c97a21e9de69100b9969dd8f844af927b229ee91bf585c42b4d0ae146d'; Platform='Both'; Kind='Wave'; Channels=1; Frames=48000 },
-        [pscustomobject]@{ Path='audio/menu/asset.manifest.json'; Bytes=4459; Sha256='93b4711ebb1bd768c09ba3c0166aa5ed7e5e06adcaf11bb2758b0aab47af5f94'; Platform='Both'; Kind='Json' },
+        [pscustomobject]@{ Path='audio/menu/menu_chain.wav'; Bytes=96044; Sha256='cb53cefe152ea118fdee6cf6c9beedd3e516a483041a7832981489a7eb04697f'; Platform='Both'; Kind='Wave'; Channels=1; Frames=48000 },
+        [pscustomobject]@{ Path='audio/menu/asset.manifest.json'; Bytes=4668; Sha256='4a99707ffccde3acdf1ad1758f4f189e24bd00ecc5c999b2fd7e34d077a62289'; Platform='Both'; Kind='Json' },
         [pscustomobject]@{ Path='models/props/runtime/player-sword-scabbard/asset.manifest.json'; Bytes=758; Sha256='75e030f75e5dea9baa1732ce7efed67a1dd40e79c7203a2319d3f0e08044319e'; Platform='Both'; Kind='Json' },
         [pscustomobject]@{ Path='models/props/runtime/player-sword-scabbard/processing-receipt.json'; Bytes=10052; Sha256='3d257b3cd2cfcd4f169ae962ef86e28d8b252351a1fbccd29a06d03d35e56541'; Platform='Both'; Kind='Json' },
         [pscustomobject]@{ Path='models/props/runtime/player-sword-scabbard/player-sword-scabbard-lod0.runtime.glb'; Bytes=15128; Sha256='d23c2b0711f53ce7608e68945ee7c38dd4eb1dc06ad5e33e58acc26c5bc0eaf5'; Platform='Both'; Kind='Glb' },

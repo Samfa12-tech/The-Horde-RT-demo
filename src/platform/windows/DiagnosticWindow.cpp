@@ -7872,7 +7872,7 @@ void ShowCredits(HWND window)
     MessageBoxA(window,
                 "Environment materials: Poly Haven (CC0).\n"
                 "Sound effects: FilmCow Royalty Free Sound Effects Library.\n"
-                "Menu chain: Hammy01 via Pixabay (Pixabay Content License).\n"
+                "Menu lantern creak: Irhouen via Pixabay (Pixabay Content License).\n"
                 "Water Dripping by DRAGON-STUDIO via Pixabay (Pixabay Content License).\n"
                 "Skeleton derivative: original by Hotstrike Studio; texture, rig, and animation processing created with Meshy (CC BY 4.0).\n"
                 "Placeholder lich character created and animated with Meshy (CC0).\n"

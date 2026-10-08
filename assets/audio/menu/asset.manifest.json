@@ -3,7 +3,7 @@
   "target": "Horde Lantern RT menu audio candidate",
   "sourceHashes": {
     "room": "102b22009583699ae35f9a84f14f4a37cef0d667d34ecbf692d19bdbe190692c",
-    "chain": "345785fa9f5b3179a6432ff45ca0164eee1dd11ae19481e0ff1522baecd02c89"
+    "chain": "9a0309023d9182298ae41c0bc3e8872ed33e0ebbf83df4fbfdabafc8fea2f947"
   },
   "sourcePolicy": "Private original sources stay local and outside Git/packages. Only the two bounded runtime derivatives and provenance manifest are written. No standalone audio-library distribution.",
   "generator": "tools/prepare-menu-ambience.py",
@@ -55,51 +55,51 @@
       "limitations": "Strongly filtered mechanical air-conditioner source with measured 100/200 Hz tonal components. Owner selected Room7% on 7e6662c6; this is not a claim of recorded natural room tone. Final revised package and Windows listening remain separate checks."
     },
     {
-      "id": "quietchainswingcandidate",
+      "id": "metalcreakswingcandidate",
       "runtimeFile": "menu_chain.wav",
-      "runtimeSha256": "6c85d6c97a21e9de69100b9969dd8f844af927b229ee91bf585c42b4d0ae146d",
+      "runtimeSha256": "cb53cefe152ea118fdee6cf6c9beedd3e516a483041a7832981489a7eb04697f",
       "runtimeBytes": 96044,
       "sampleRate": 48000,
       "channels": 1,
       "bitsPerSample": 16,
       "frames": 48000,
       "durationSeconds": 1.0,
-      "rmsDbfs": -30.4309,
+      "rmsDbfs": -28.3457,
       "peakDbfs": -11.9999,
-      "sourceFile": "hammy01-chain-287197.mp3",
-      "sourceSha256": "345785fa9f5b3179a6432ff45ca0164eee1dd11ae19481e0ff1522baecd02c89",
-      "sourceBytes": 562176,
-      "creator": "Hammy01",
-      "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-chain-287197/",
+      "sourceFile": "irhouen-metal-creaks-189729.mp3",
+      "sourceSha256": "9a0309023d9182298ae41c0bc3e8872ed33e0ebbf83df4fbfdabafc8fea2f947",
+      "sourceBytes": 1020656,
+      "creator": "Irhouen",
+      "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-metal-creaks-189729/",
       "license": "Pixabay Content License",
       "licenseTerms": "Modified game use permitted; standalone distribution of the source audio is prohibited.",
-      "voluntaryCredit": "Chain by Hammy01 via Pixabay",
+      "voluntaryCredit": "Metal Creaks by Irhouen via Pixabay",
       "processing": {
         "decode": "FFmpeg 9, mono 48 kHz PCM16",
-        "selection": "Lowest-RMS one-second window on a 100 ms grid, requiring source peak >= -40 dBFS to exclude silence; lowest peak breaks ties.",
+        "selection": "Authored 4.1-5.1 second crop covering measured isolated creak activity at 4.2-4.6 seconds, ending before the next event. One bounded cue; owner listening pending.",
         "sourceCropFrames": [
-          412800,
-          460800
+          196800,
+          244800
         ],
         "sourceCropSeconds": [
-          8.6,
-          9.6
+          4.1,
+          5.1
         ],
         "sourceWindowStats": {
           "frames": 48000,
           "durationSeconds": 1.0,
-          "rmsDbfs": -46.9991,
-          "peakDbfs": -28.7471
+          "rmsDbfs": -41.8842,
+          "peakDbfs": -25.5531
         },
         "edgeFadeFrames": {
           "in": 960,
           "out": 5760
         },
         "targetPeakDbfs": -12.0,
-        "appliedGainDb": 16.7471
+        "appliedGainDb": 13.5531
       },
-      "limitations": "Bounded quiet movement excerpt selected by waveform level. Owner selected Chain21% on 7e6662c6 with actual lantern-turn timing; final revised package and Windows listening remain separate checks."
+      "limitations": "Owner-requested Irhouen replacement, replacing the earlier Hammy01 chain. One measured isolated creak event; no assertion of listening acceptance. Existing 21% relative gain and actual lantern-turn timing retained for owner audition; final phone/Windows listening remain separate checks."
     }
   ],
-  "ownerListeningAcceptance": "Room7%/Chain21% selected and saved on 7e6662c6 with SFX70%; rejected flame removed. Final revised package verification remains separate."
+  "ownerListeningAcceptance": "Room7%/Chain21% selected and saved on 7e6662c6 with SFX70%; rejected flame removed. Owner requested Irhouen replacement on 8 October; its cue character/level requires a separate listening check."
 }

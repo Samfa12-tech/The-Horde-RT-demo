@@ -21,9 +21,14 @@ Runtime files are mono 48 kHz 16-bit PCM WAVs under `filmcow/`. They are derived
 Voice work, music, and a larger mixer remain outside this update. Android uses `SoundPool` left/right gains; Windows uses XAudio2 per-voice matrices for centred and spatial cues with WinMM fallback. Audio failure must never hide or alter the native RT capability result.
 
 The presentation layer in `menu/` adds one quiet room bed and a bounded,
-actual-lantern-turn chain cue. The owner-saved balance is Room7%/Chain21%,
+actual-lantern-turn metal-creak cue. The owner-saved balance is Room 7%/Chain 21%,
 under the existing SFX/focus/Play-fade envelope. The rejected flame hiss is
 removed entirely. `asset.manifest.json` records the licensed local FilmCow
-room foley and owner-supplied Hammy01 source, hashes and filters. Originals
+room foley and owner-supplied Irhouen source, hashes and processing. Originals
 stay private. Final revised-package and Windows listening remain separate;
 gameplay SFX/music handover are unchanged.
+
+The owner-requested Irhouen `Metal Creaks 189729` replaces the initial Hammy01
+chain. Its authored one-second event is cropped from 4.1–5.1 s and edge-faded;
+room bytes and the saved 7%/21% mix remain unchanged. Replacement listening
+is pending on its own exact build.

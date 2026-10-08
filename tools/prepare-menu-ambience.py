@@ -20,7 +20,7 @@ SAMPLE_RATE = 48_000
 SAMPLE_BYTES = 2
 SOURCE_HASHES = {
     "room": "102b22009583699ae35f9a84f14f4a37cef0d667d34ecbf692d19bdbe190692c",
-    "chain": "345785fa9f5b3179a6432ff45ca0164eee1dd11ae19481e0ff1522baecd02c89",
+    "chain": "9a0309023d9182298ae41c0bc3e8872ed33e0ebbf83df4fbfdabafc8fea2f947",
 }
 EXPECTED_FILES = {
     "menu_room.wav": 4 * SAMPLE_RATE,
@@ -148,7 +148,7 @@ def verify(output_dir: Path) -> None:
     assets = manifest.get("assets")
     if not isinstance(assets, list) or {asset.get("runtimeFile") for asset in assets} != set(EXPECTED_FILES):
         raise RuntimeError("Manifest does not contain the closed two-WAV runtime roster.")
-    expected_ids = {"filteredroomaircandidate": "room", "quietchainswingcandidate": "chain"}
+    expected_ids = {"filteredroomaircandidate": "room", "metalcreakswingcandidate": "chain"}
     if manifest.get("sourceHashes") != SOURCE_HASHES:
         raise RuntimeError("Manifest source-hash roster differs from the pinned inputs.")
     for asset in assets:
@@ -183,27 +183,11 @@ def source_record(source: Path, expected_hash: str, source_name: str) -> tuple[b
     return payload, len(payload)
 
 
-def quiet_chain_window(samples: array.array) -> tuple[array.array, int, dict[str, float | int]]:
-    window = SAMPLE_RATE
-    hop = SAMPLE_RATE // 10
-    candidates = []
-    for begin in range(0, len(samples) - window + 1, hop):
-        segment = samples[begin:begin + window]
-        measured = stats(segment)
-        # Exclude silence; among the remaining one-second excerpts, choose the
-        # lowest-RMS movement. The low peak guard also avoids a hidden clank.
-        if measured["peakDbfs"] >= -40.0:
-            candidates.append((float(measured["rmsDbfs"]), float(measured["peakDbfs"]), begin, segment, measured))
-    if not candidates:
-        raise RuntimeError("No audible bounded chain interval met the selection guard.")
-    _, _, begin, segment, measured = min(candidates, key=lambda item: (item[0], item[1], item[2]))
-    return array.array("h", segment), begin, measured
-
 
 def main() -> None:
     repo = Path(__file__).resolve().parents[1]
     filmcow_default = Path(r"C:\Users\sam_s\Documents\Possum Cafe\PossumCafeAndroid\Archive\FilmCow Recorded SFX")
-    chain_default = Path(r"C:\Users\sam_s\Downloads\hammy01-chain-287197.mp3")
+    chain_default = Path(r"C:\Users\sam_s\Downloads\irhouen-metal-creaks-189729.mp3")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--verify", action="store_true", help="verify generated candidates without reading private source files")
     parser.add_argument("--source-root", type=Path, default=filmcow_default)
@@ -223,7 +207,7 @@ def main() -> None:
 
     room_path = args.source_root / "ambience - air conditioner.wav"
     _, room_bytes = source_record(room_path, SOURCE_HASHES["room"], "FilmCow air conditioner")
-    _, chain_bytes = source_record(args.chain_source, SOURCE_HASHES["chain"], "Pixabay Hammy01 Chain")
+    _, chain_bytes = source_record(args.chain_source, SOURCE_HASHES["chain"], "Pixabay Irhouen Metal Creaks")
 
     # Filter the full decoded source before trimming, avoiding filter startup
     # transients at the selected middle crop. A 0.5 s equal-power cyclic seam
@@ -243,7 +227,14 @@ def main() -> None:
     room_runtime = write_wav(output_dir / "menu_room.wav", room_loop)
 
     chain_src = decode_pcm16(args.chain_source)
-    chain_excerpt, chain_begin, chain_source_stats = quiet_chain_window(chain_src)
+    # Authored bounded event: measured creak activity at 4.2-4.6 s, with
+    # a short lead and quiet tail ending before the next event at 5.1 s.
+    # Do not select the lowest-RMS near-silence and boost its background noise.
+    chain_begin = round(4.1 * SAMPLE_RATE)
+    chain_excerpt = crop(chain_src, 4.1, 1.0)
+    chain_source_stats = stats(chain_excerpt)
+    if float(chain_source_stats["peakDbfs"]) < -40.0:
+        raise RuntimeError("Authored metal-creak interval is unexpectedly silent.")
     chain_faded = edge_fade(chain_excerpt, SAMPLE_RATE // 50, SAMPLE_RATE * 12 // 100)
     chain_pre = stats(chain_faded)
     chain_gain_db = -12.0 - float(chain_pre["peakDbfs"])
@@ -275,19 +266,19 @@ def main() -> None:
             "limitations": "Strongly filtered mechanical air-conditioner source with measured 100/200 Hz tonal components. Owner selected Room7% on 7e6662c6; this is not a claim of recorded natural room tone. Final revised package and Windows listening remain separate checks.",
         },
         {
-            "id": "quietchainswingcandidate",
+            "id": "metalcreakswingcandidate",
             **chain_runtime,
             "sourceFile": args.chain_source.name,
             "sourceSha256": SOURCE_HASHES["chain"],
             "sourceBytes": chain_bytes,
-            "creator": "Hammy01",
-            "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-chain-287197/",
+            "creator": "Irhouen",
+            "sourceUrl": "https://pixabay.com/sound-effects/film-special-effects-metal-creaks-189729/",
             "license": "Pixabay Content License",
             "licenseTerms": "Modified game use permitted; standalone distribution of the source audio is prohibited.",
-            "voluntaryCredit": "Chain by Hammy01 via Pixabay",
+            "voluntaryCredit": "Metal Creaks by Irhouen via Pixabay",
             "processing": {
                 "decode": "FFmpeg 9, mono 48 kHz PCM16",
-                "selection": "Lowest-RMS one-second window on a 100 ms grid, requiring source peak >= -40 dBFS to exclude silence; lowest peak breaks ties.",
+                "selection": "Authored 4.1-5.1 second crop covering measured isolated creak activity at 4.2-4.6 seconds, ending before the next event. One bounded cue; owner listening pending.",
                 "sourceCropFrames": [chain_begin, chain_begin + SAMPLE_RATE],
                 "sourceCropSeconds": [round(chain_begin / SAMPLE_RATE, 6), round((chain_begin + SAMPLE_RATE) / SAMPLE_RATE, 6)],
                 "sourceWindowStats": chain_source_stats,
@@ -295,7 +286,7 @@ def main() -> None:
                 "targetPeakDbfs": -12.0,
                 "appliedGainDb": round(chain_gain_applied, 4),
             },
-            "limitations": "Bounded quiet movement excerpt selected by waveform level. Owner selected Chain21% on 7e6662c6 with actual lantern-turn timing; final revised package and Windows listening remain separate checks.",
+            "limitations": "Owner-requested Irhouen replacement, replacing the earlier Hammy01 chain. One measured isolated creak event; no assertion of listening acceptance. Existing 21% relative gain and actual lantern-turn timing retained for owner audition; final phone/Windows listening remain separate checks.",
         },
     ]
     manifest = {
@@ -306,7 +297,7 @@ def main() -> None:
         "generator": "tools/prepare-menu-ambience.py",
         "ffmpegVersion": version,
         "assets": assets,
-        "ownerListeningAcceptance": "Room7%/Chain21% selected and saved on 7e6662c6 with SFX70%; rejected flame removed. Final revised package verification remains separate.",
+        "ownerListeningAcceptance": "Room7%/Chain21% selected and saved on 7e6662c6 with SFX70%; rejected flame removed. Owner requested Irhouen replacement on 8 October; its cue character/level requires a separate listening check.",
     }
     manifest_path = output_dir / "asset.manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
