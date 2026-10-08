@@ -260,6 +260,9 @@ public class AndroidControllerIntegrationTest {
         set("menuVisible",true);FrameLayout root=(FrameLayout)field("menuScrim").get(a);root.setVisibility(View.VISIBLE);
         LinearLayout panel=new LinearLayout(a);panel.setOrientation(LinearLayout.VERTICAL);root.addView(panel);
         Button one=new Button(a),two=new Button(a);panel.addView(one);panel.addView(two);
+        root.measure(View.MeasureSpec.makeMeasureSpec(640,View.MeasureSpec.EXACTLY),
+                     View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.EXACTLY));
+        root.layout(0,0,640,360);
         press(KeyEvent.KEYCODE_BUTTON_Y);assertTrue(one.hasFocus());
         press(KeyEvent.KEYCODE_DPAD_DOWN);assertTrue(two.hasFocus());assertEquals(0,Bridge.lanterns);
     }
@@ -269,4 +272,51 @@ public class AndroidControllerIntegrationTest {
         a.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_CENTER));assertEquals(1,Bridge.attacks);
         set("controllerWindowFocused",true);press(KeyEvent.KEYCODE_BUTTON_X);assertEquals(2,Bridge.attacks);
     }
+    @Test public void entryPlaquesFollowTheirVisibleDirectionsAndStartOnPlay()throws Exception {
+        set("entryMenuEnabled",true);call("showEntryMenu",new Class<?>[]{boolean.class},false);
+        FrameLayout root=(FrameLayout)field("menuScrim").get(a);
+        int width=a.getResources().getDisplayMetrics().widthPixels;
+        int height=a.getResources().getDisplayMetrics().heightPixels;
+        root.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),
+                     View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.EXACTLY));
+        root.layout(0,0,width,height);
+        Button play=button("entryPlayButton"),more=button("entryMoreButton"),settings=button("entrySettingsButton");
+        assertTrue(play.getWidth()>0);assertTrue(more.getTop()>play.getTop());assertTrue(settings.getLeft()>more.getLeft());
+        press(KeyEvent.KEYCODE_BUTTON_Y);assertTrue("Entry begins on Play",play.hasFocus());
+        press(KeyEvent.KEYCODE_DPAD_LEFT);assertTrue(more.hasFocus());
+        press(KeyEvent.KEYCODE_DPAD_RIGHT);assertTrue(settings.hasFocus());
+        press(KeyEvent.KEYCODE_DPAD_RIGHT);assertTrue("Right edge retains Settings",settings.hasFocus());
+        press(KeyEvent.KEYCODE_DPAD_UP);assertTrue(play.hasFocus());
+        press(KeyEvent.KEYCODE_DPAD_RIGHT);assertTrue(settings.hasFocus());
+        press(KeyEvent.KEYCODE_DPAD_DOWN);assertTrue("Bottom edge retains Settings",settings.hasFocus());
+        assertEquals(0,Bridge.lanterns);assertEquals(0,Bridge.interacts);assertEquals(0,Bridge.attacks);
+    }
+
+    @Test @Config(qualifiers="land")
+    public void landscapeEntryPlaquesUseTheSameDirectionalGeometry()throws Exception {
+        entryPlaquesFollowTheirVisibleDirectionsAndStartOnPlay();
+    }
+    @Test public void largeFontEntryPlaquesKeepDirectionalSelection()throws Exception {
+        Configuration config=new Configuration(a.getResources().getConfiguration());
+        config.fontScale=1.6f;
+        a.getResources().updateConfiguration(config,a.getResources().getDisplayMetrics());
+        entryPlaquesFollowTheirVisibleDirectionsAndStartOnPlay();
+    }
+    @Test public void firstTouchRestoresControllerOwnedButtonPolicyBeforeDispatch()throws Exception {
+        set("menuVisible",true);FrameLayout root=(FrameLayout)field("menuScrim").get(a);
+        root.setVisibility(View.VISIBLE);Button selected=new Button(a);
+        root.addView(selected,new FrameLayout.LayoutParams(200,80));
+        root.layout(0,0,640,360);selected.layout(0,0,200,80);
+        assertFalse(selected.isFocusableInTouchMode());
+        press(KeyEvent.KEYCODE_BUTTON_Y);assertTrue(selected.hasFocus());assertTrue(selected.isFocusableInTouchMode());
+        long now=SystemClock.uptimeMillis();
+        MotionEvent down=MotionEvent.obtain(now,now,MotionEvent.ACTION_DOWN,10,10,0);
+        a.dispatchTouchEvent(down);down.recycle();
+        assertFalse(field("controllerMode").getBoolean(a));
+        assertFalse("Original touch policy is restored before native DOWN",selected.isFocusableInTouchMode());
+        MotionEvent up=MotionEvent.obtain(now,now+10,MotionEvent.ACTION_UP,10,10,0);
+        a.dispatchTouchEvent(up);up.recycle();
+        assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.interacts);assertEquals(0,Bridge.lanterns);
+    }
+
 }

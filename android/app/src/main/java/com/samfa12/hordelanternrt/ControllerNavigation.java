@@ -2,16 +2,40 @@ package com.samfa12.hordelanternrt;
 
 import android.graphics.Rect;
 import android.view.KeyEvent;
+import android.view.FocusFinder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /** Navigation of real native controls. Never changes game or graphics state directly. */
 final class ControllerNavigation {
     private ControllerNavigation() {}
+    // UI-thread-owned; detached pages are not retained by controller focus.
+    private static final WeakHashMap<View,Boolean> originalTouchFocus = new WeakHashMap<>();
+    private static boolean contained(View root,View view) {
+        while(view!=null) {
+            if(view==root)return true;
+            view=view.getParent() instanceof View?(View)view.getParent():null;
+        }
+        return false;
+    }
+    static void restoreTouchPolicy(View root) {
+        if(root==null)return;
+        Iterator<Map.Entry<View,Boolean>> entries=originalTouchFocus.entrySet().iterator();
+        while(entries.hasNext()) {
+            Map.Entry<View,Boolean> entry=entries.next();
+            if(contained(root,entry.getKey())) {
+                entry.getKey().setFocusableInTouchMode(entry.getValue());
+                entries.remove();
+            }
+        }
+    }
     private static boolean usable(View v) {
         return v != null && v.isEnabled() && v.getVisibility() == View.VISIBLE && v.isFocusable()
                 && (!(v instanceof ViewGroup) || v instanceof Spinner);
@@ -24,10 +48,6 @@ final class ControllerNavigation {
             for (int i=0;i<g.getChildCount();i++) collect(g.getChildAt(i),controls);
         }
     }
-    private static boolean contained(View root, View v) {
-        while(v!=null) { if(v==root)return true; v=v.getParent() instanceof View?(View)v.getParent():null; }
-        return false;
-    }
     static View ensureFocus(View root) {
         if(root==null)return null;
         ArrayList<View> controls=new ArrayList<>(); collect(root,controls);
@@ -37,7 +57,8 @@ final class ControllerNavigation {
         return select(controls.get(0));
     }
     private static View select(View view) {
-        // Consumed joystick events do not automatically leave Android touch mode.
+        // Consumed controller events do not leave Android touch mode automatically.
+        originalTouchFocus.putIfAbsent(view,view.isFocusableInTouchMode());
         view.setFocusableInTouchMode(true);
         if(!view.requestFocus())return null;
         Rect rect=new Rect(0,0,view.getWidth(),view.getHeight());
@@ -49,6 +70,7 @@ final class ControllerNavigation {
         return focus!=null && focus.performClick();
     }
     static void navigate(View root,int horizontal,int vertical) {
+        if(horizontal==0 && vertical==0)return;
         View focus=ensureFocus(root); if(focus==null)return;
         if(horizontal!=0 && focus instanceof SeekBar) {
             int key=horizontal<0?KeyEvent.KEYCODE_DPAD_LEFT:KeyEvent.KEYCODE_DPAD_RIGHT;
@@ -57,16 +79,28 @@ final class ControllerNavigation {
         }
         int direction=vertical<0?View.FOCUS_UP:vertical>0?View.FOCUS_DOWN:
                 horizontal<0?View.FOCUS_LEFT:View.FOCUS_RIGHT;
-        View next=focus.focusSearch(direction);
-        if(usable(next) && contained(root,next)) { select(next); return; }
+        // Scope native geometric search to this menu/dialog. Activity-wide search
+        // can choose a gameplay control behind it. Creation order is not direction.
         ArrayList<View> controls=new ArrayList<>(); collect(root,controls);
-        int index=controls.indexOf(focus), step=(vertical<0 || horizontal<0)?-1:1;
-        int target=index+step;
-        if(target>=0 && target<controls.size()) { select(controls.get(target)); return; }
+        // Other buttons must be eligible even while Android remains in touch mode.
+        // Their original policy is restored before selecting or dispatching a click.
+        boolean[] touchPolicy=new boolean[controls.size()];
+        View next=null;
+        try {
+            for(int i=0;i<controls.size();i++) {
+                touchPolicy[i]=controls.get(i).isFocusableInTouchMode();
+                controls.get(i).setFocusableInTouchMode(true);
+            }
+            if(root instanceof ViewGroup)
+                next=FocusFinder.getInstance().findNextFocus((ViewGroup)root,focus,direction);
+        } finally {
+            for(int i=0;i<controls.size();i++)controls.get(i).setFocusableInTouchMode(touchPolicy[i]);
+        }
+        if(controls.contains(next)) { select(next); return; }
         // Long explanatory text can be read without trapping focus or activating a button.
         View current=focus;
         while(current!=null) {
-            if(current instanceof ScrollView) {
+            if(current instanceof ScrollView && (direction==View.FOCUS_UP || direction==View.FOCUS_DOWN)) {
                 ((ScrollView)current).arrowScroll(direction); return;
             }
             current=current.getParent() instanceof View?(View)current.getParent():null;
