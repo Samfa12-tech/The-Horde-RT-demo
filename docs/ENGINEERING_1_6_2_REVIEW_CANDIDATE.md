@@ -1,5 +1,25 @@
 # Horde 1.6.2 review candidate - 5 October 2026
 
+**8 October prepared normal waterfall candidate:** source `6282ab66289775c6c8360a7feb3afd6d554f1787`
+now puts the accepted two lateral, east-facing guards in normal play and retains
+their distinct walking phase. Bay/Keeper imports and retries preserve that
+placement. Sword-starts-stowed stays independently disabled. Seven affected
+native checks, Windows/four-ABI builds and 26 frozen Pipeline/Compute checkpoint
+frame/PNG/mesh joins pass with zero validation errors. This is not moving or
+phone acceptance.
+
+Prepared APK SHA-256 `11a49d954a714867cb1e8dbdf8c3690b05d3d7523f4c8efc8bc23b654f974853`; Windows executable SHA-256 `b0d07f3c2906b461751ea9301bc3e9695f20a71e684df0c9f87c01e377a4f711`.
+The manifest, 91 assets and Java dex match 6fa; its 222-test/35-class Java/lint
+result and completed 12/12 CI remain scoped to that source. New 628 source CI
+completes 12/12 (push 37729370167 / PR 37729376579). The APK is **not installed**; the owner's
+c8 phone session remains paused. Corrected directional menu/physical controller
+matrix, current moving equipment/body/secondary views and combat readability,
+phone quality/cost and independent audit remain open. Dust stays Off by default;
+shafts deferred. No release.
+[Exact artifact, failure and validation ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#prepared-normal-waterfall-encounter--6282ab66).
+
+The original checkpoint below retains its own source and evidence identity.
+
 This is the historical 5 October graphics review checkpoint. The owner resumed
 bounded tomb-demo work after the reset; current status, expanded scope and owner
 gates are in the [active finish plan](ENGINEERING_1_6_2_TOMB_FINISH.md).

@@ -388,3 +388,14 @@ Important technical finding:
 - Publish Android's first performance sample after 30 frames so diagnostics do not appear broken; retain 120-frame steady-state updates afterward.
 - Treat 125% as the completed live Windows DPI validation for this refresh. Explicit 100%/150% repeats remain a non-blocking later compatibility check.
 - Do not rewrite public Git history until Hotstrike answers the explicit permission request or the owner chooses history remediation.
+
+## Normal 1.6.2 waterfall guard placement — 2026-10-08
+
+The owner directs the existing two skeletons to guard the waterfall room from
+left/right lanes facing arrival, with distinct walk phases. Candidate `6282ab66`
+enables that authored placement in normal applications, independently of the
+still-gated sword-stow presentation. Shared reset/retry/checkpoint import retains
+the same pair and location even when the selected encounter is the Keeper.
+Legacy default-config capture fixtures retain their historical behavior. Host
+route/Keeper/reward and frozen RT checkpoint evidence pass; current moving and
+phone acceptance remain separate. No new enemies, health rules or adventure scope.

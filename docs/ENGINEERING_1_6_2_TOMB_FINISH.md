@@ -1,27 +1,22 @@
 # 1.6.2 tomb finish — active post-reset work
 
-**8 October prepared navigation follow-up:** source `6faab4ff26b495ab782d2d2a3cdbaccc4e585026`
-fixes the owner's reproduced controller-direction issue. Native geometric focus
-search is scoped to the visible menu/dialog; button creation order no longer
-turns Right into Down. Play receives initial entry focus. Temporary eligibility
-and original touch policy preserve controller navigation and first touch fallback.
-**222 Android tests in 35 classes**, zero failures/errors/skips, lint and four-ABI
-Debug assembly pass. Four regressions fail on c8 before the fix; portrait,
-landscape, larger text, scrolling and touch-policy checks pass after it.
+**8 October prepared normal waterfall candidate:** source `6282ab66289775c6c8360a7feb3afd6d554f1787`
+now puts the accepted two lateral, east-facing guards in normal play and retains
+their distinct walking phase. Bay/Keeper imports and retries preserve that
+placement. Sword-starts-stowed stays independently disabled. Seven affected
+native checks, Windows/four-ABI builds and 26 frozen Pipeline/Compute checkpoint
+frame/PNG/mesh joins pass with zero validation errors. This is not moving or
+phone acceptance.
 
-Prepared APK SHA-256: `d24dfd8f5f0f88e6a693b9723ca6a6cd8616885f1490999a6d34d394ef52d26e`.
-It is sealed and **not installed**; all four native libraries, manifest and 91
-assets match c8. Windows retains its c8 executable and seven affected native
-checks with their original identity. c8 source CI completes at 12/12; new 6fa
-push/PR CI is running separately. The installed c8 phone app remains paused.
-The owner reports the Backbone One PlayStation Edition USB-C works well overall,
-with the directional/menu defect above. Corrected-menu acceptance and the rest
-of the physical matrix await the owner's return. The approved waterfall pair
-is still gated off in production, explaining the first-room skeleton report;
-its normal-route activation is the next bounded integration step. Contact,
-moving/secondary views, phone quality/cost, audio/haptics and independent audit
-remain open. Dust stays optional/default Off; shafts deferred. No release.
-[Exact source, packages, failures and owner observations](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#prepared-directional-navigation-follow-up--6faab4ff).
+Prepared APK SHA-256 `11a49d954a714867cb1e8dbdf8c3690b05d3d7523f4c8efc8bc23b654f974853`; Windows executable SHA-256 `b0d07f3c2906b461751ea9301bc3e9695f20a71e684df0c9f87c01e377a4f711`.
+The manifest, 91 assets and Java dex match 6fa; its 222-test/35-class Java/lint
+result and completed 12/12 CI remain scoped to that source. New 628 source CI
+completes 12/12 (push 37729370167 / PR 37729376579). The APK is **not installed**; the owner's
+c8 phone session remains paused. Corrected directional menu/physical controller
+matrix, current moving equipment/body/secondary views and combat readability,
+phone quality/cost and independent audit remain open. Dust stays Off by default;
+shafts deferred. No release.
+[Exact artifact, failure and validation ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#prepared-normal-waterfall-encounter--6282ab66).
 
 **Earlier 8 October integrated controller/pose checkpoint:** runtime
 `454d58ee0f71bdb837a75ce486d6c139e03e0b02` adds native-dialog focus suspension
@@ -202,7 +197,7 @@ that package and do not close moving contact, owner acceptance or sustained FPS.
 | Native actions and three original hearts | Press-down Swing/Parry/Dodge and original native hearts committed in `b76ce0e6`; `7368e2c7` fixes warm-up Dodge visibility, passes 177/177 Android tests in 30 classes and the combined 32-case diagonal synthetic touch matrix on both physical phone RT backends. Owner ordinary playtest of `ccd70d38` accepts touch comfort; earlier `ab69537a` active-draw Home evidence remains separate | Measured touch latency, successful parry/riposte and remaining owner audio/haptic acceptance; synthetic held-touch Home/fresh Parry passes on both phone backends |
 | Sword overhead clearance | Shared blade-envelope response `0e98a8bb`; corrected Rag sockets, imported arm reach and continuous roof response `c078ad39` pass affected host checks. Owner accepts the low-ceiling response on `ccd70d38` | Remaining actual moving grips/world/shadow/reflection inspection and integrated package/device costs |
 | Player-only rag torch | Separate production player resource committed in `40f92c6a`; provenance, closed packaging and atlas preservation recorded. Earlier moving/low-passage captures and later `ccd70d38` drench/drop ownership and packed-light removal pass on both phone backends. Owner accepts observed torch appearance on `ccd70d38` | Remaining floor/moving hand/body and world shadow/reflection inspection, Windows foreground arming and resource/pacing costs; the owner statement does not specify every attachment/reflection condition |
-| Shared equipment and waterfall encounter | `cdcb300f` integrates phased Grip and authored Hips scabbard; corrected offline mesh/pose and socket checks pass, prior failed mounts preserved. `ab69537a` passes scoped moving warning/draw/attachment/attack/parry on both phone backends. `3da5f2dd` adds owner-directed lateral facing guards, persistent walk offset and corrected shared room selection, with three exact staged Windows RT stills; production activation off | Guard layout is owner-approved; updated equipment motion/feel, intermediate draw silhouette, moving RT body/shadow/reflection and integrated route checks before enabling production flags. Same guard identities/count/stats retained |
+| Shared equipment and waterfall encounter | `cdcb300f` integrates phased Grip and authored Hips scabbard; corrected offline mesh/pose and socket checks pass, prior failed mounts preserved. `ab69537a` passes scoped moving warning/draw/attachment/attack/parry on both phone backends. `3da5f2dd` adds owner-directed lateral facing guards, persistent walk offset and corrected shared room selection, with three exact staged Windows RT stills. `6282ab66` enables normal guard placement and repairs bay/Keeper import/retry ownership; real movement route/Keeper/reward and 26 frozen backend captures pass. Sword stow remains off | Guard layout is owner-approved; current moving equipment/body/shadow/reflection, phone encounter/readability and corrected controller/menu recovery remain open. Same guard identities/count/stats retained |
 | Draw/sheath audio | Selected FilmCow derivatives and exact provenance admitted in `cdcb300f`; semantic attachment cues integrated in `d08d3c48` with host/Java checks. Owner-supplied licence PDF recorded | Actual attachment motion/audio timing, audibility and owner listening |
 | Compact selected menu scene | Approved brighter lantern and Play-center / More-left / Settings-right placement retained. Exact `868691fc` passes both Windows RT backends' six-pose Entry/Back/Play checks, actual phone landscape Entry and both backends' Home recovery. Earlier orientation/recreation failures remain recorded | Remaining menu cost and owner motion/audio acceptance; landscape Home/resume and physical owner rotation not established |
 | Remaining UI/loading/Graphics simplification | Native menu/loading/audio `d08d3c48`; colon labels and clear scrollbar `359a5711` pass 22 affected Java tests. [Pre-rotation `868691fc`](ENGINEERING_1_6_2_SURFACE_RECOVERY_2026_10_07.md) passes actual ready phone rotations, exact landscape Use/Restore ACK and unchanged preferences on both RT backends. `4e9e5bb7` ordinary portrait Controls/Credits/Report navigation reaches Back and preserves unchecked consent and every preference | Remaining screen/input/accessibility/loading/error checks and integrated cost; no sustained-FPS claim |

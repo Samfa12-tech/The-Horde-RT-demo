@@ -2,9 +2,86 @@
 
 The owner's queue addition is implemented on existing PR18. Physical Android
 controller support is **not yet accepted**. The owner returned; the exact c8
-Debug package is installed with preferences preserved. The hands-on check is
-prepared for a USB/Backbone cable swap. Earlier away-device checkpoints below retain
+Debug package is installed with preferences preserved. Preliminary Backbone owner feedback is recorded; corrected navigation and
+normal waterfall encounter packages are prepared for the next coherent check. Earlier away-device checkpoints below retain
 their own source, package and evidence identities.
+
+## Prepared normal waterfall encounter — 6282ab66
+
+The owner reports first-room skeletons in the installed c8 build. That build
+still uses the historical production encounter flag. This candidate enables the
+accepted waterfall placement independently of sword-starts-stowed, which remains
+Off. The same Skeleton A/B retain health 1, count two, east-facing lateral lanes
+and the authored 0.65 s gait offset. Historical default-config fixtures remain
+available; there are no new enemies, combat rules or forced camera changes.
+
+A related reset defect is reproduced: with only placement enabled, bay import,
+Keeper import and Keeper retry reset guards at the old first-room location.
+The shared reset/import now chooses the authored pair from configuration,
+regardless of the currently selected enemy. Ordinary room changes still preserve
+state rather than respawning guards. Existing explicit reset/retry health rules
+remain intact.
+
+Source `6282ab66289775c6c8360a7feb3afd6d554f1787`, tree `23883a344819f61a8c3f38c7f0e7403520abdd34`.
+Prepared four-ABI Debug APK: 138,462,724 bytes, SHA-256 `11a49d954a714867cb1e8dbdf8c3690b05d3d7523f4c8efc8bc23b654f974853`.
+Windows Debug executable: 11,559,424 bytes, SHA-256 `b0d07f3c2906b461751ea9301bc3e9695f20a71e684df0c9f87c01e377a4f711`.
+Exact artifacts: `task-4/integrated-162-6282ab66-20261008`.
+All four native libraries change; manifest, 91 assets and Java dex are identical
+to 6fa. SDK37 16 KiB alignment passes. The 222-test/35-class Java and lint result
+is retained at **6fa**, with no fresh Java rerun claimed for this native slice.
+The prepared APK includes that directional fix; neither change is physically
+accepted yet. The installed c8 phone session remains paused and untouched.
+
+Seven affected native CTests pass in 52.50 s: simulation gameplay, motion
+scenarios, ordinary production route, showcase collision route, simulation
+timing, held-item sockets and sword authority agreement. The new route uses
+ordinary movement axes and real 60 Hz collision through 13 destinations, with
+the final destination at the playable Keeper arrival threshold. It covers all
+four bays, first-room isolation with normal damage enabled, actual guard walking
+phase, wetline bounds, retreat/re-entry, pause, cold/reset/import and both retry
+paths. Route geometry disables player damage while travelling; it is not combat
+feel acceptance. The existing full Keeper lighting/death/chest/claim/retry helper
+also runs against production configuration. Both Windows and all-four-ABI builds
+pass (Android assembly 44 s).
+
+Before-fix failures remain: the new route fails 18 checks against old defaults.
+The first config-only run has three genuine checkpoint/retry failures and two
+fixture-only phase assumptions: constructor publishes authored Walking samples,
+whereas zero-delta reset outside the arena publishes Idle0. The corrected fixture
+retains the explicit live gait assertion and isolates exactly the three real
+failures before the shared reset repair. Earlier two affected suite failures,
+the wrong Windows CMake target invocation and the stale native-exit check after
+the PowerShell APK resolver are retained separately; neither invocation failure
+is a product/build defect. Corrected commands pass.
+
+Fresh frozen Pipeline and RayQueryCompute showcase runs complete 13 checkpoints
+each on RTX5050 Laptop, High water/fire, Current shadows, Mist On, Dust Off,
+100% at 960 x 540. **26/26** completed/presented submission, PNG and uploaded
+viewmodel/world-body mesh hash joins pass; zero synchronization/VUID errors.
+Elapsed validation is 38.109 s / 38.228 s. Both owned processes exit normally.
+Across backends, all 13 uploaded mesh pairs match; PNGs are not byte-identical.
+Descriptive 8-bit channel differences have a largest per-image/channel mean of
+0.003311 and a largest isolated channel delta of 78 (mirror checkpoint). No
+parity threshold or cause is inferred; the raw comparison remains in the seal.
+These are scene-only Debug stills, not live motion, scanout, phone, audio/haptic,
+owner acceptance or sustained performance. [Selected stills and exact hashes](evidence/2026-10-08-normal-waterfall/README.md).
+The settled-torch room checkpoint is deliberately dark and faces back toward
+the waterfall; it does not establish normal moving-combat readability.
+
+Current source CI completes **12/12**: push 37729370167 and PR 37729376579
+each pass 6/6. Previous navigation
+6fa and documentation 1abd each complete their own 12/12 aggregates. Documentation
+for this candidate has separate CI. Current moving body/shadow/reflection, phone
+route/controller recovery, corrected menu acceptance and combat readability
+remain open. Dust/cost, audio/haptics, quality decision and Eric's independent
+final audit remain open. No release is authorised.
+
+Private evidence logs: `waterfall-production-before-ctest-20261008.log`,
+`waterfall-production-route-before-ctest-20261008.log`,
+`waterfall-production-config-only-ctest-20261008.log`,
+`waterfall-production-config-only-corrected-fixture-ctest-20261008.log`,
+`waterfall-production-after-ctest-20261008.log`, corrected Windows build and
+four-ABI build logs under `task-4/test-temp`; exact capture admission in the seal.
 
 ## Prepared directional navigation follow-up — 6faab4ff
 

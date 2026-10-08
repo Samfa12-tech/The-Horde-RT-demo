@@ -1,27 +1,22 @@
 # Horde 1.6.2 execution checkpoint
 
-**8 October prepared navigation follow-up:** source `6faab4ff26b495ab782d2d2a3cdbaccc4e585026`
-fixes the owner's reproduced controller-direction issue. Native geometric focus
-search is scoped to the visible menu/dialog; button creation order no longer
-turns Right into Down. Play receives initial entry focus. Temporary eligibility
-and original touch policy preserve controller navigation and first touch fallback.
-**222 Android tests in 35 classes**, zero failures/errors/skips, lint and four-ABI
-Debug assembly pass. Four regressions fail on c8 before the fix; portrait,
-landscape, larger text, scrolling and touch-policy checks pass after it.
+**8 October prepared normal waterfall candidate:** source `6282ab66289775c6c8360a7feb3afd6d554f1787`
+now puts the accepted two lateral, east-facing guards in normal play and retains
+their distinct walking phase. Bay/Keeper imports and retries preserve that
+placement. Sword-starts-stowed stays independently disabled. Seven affected
+native checks, Windows/four-ABI builds and 26 frozen Pipeline/Compute checkpoint
+frame/PNG/mesh joins pass with zero validation errors. This is not moving or
+phone acceptance.
 
-Prepared APK SHA-256: `d24dfd8f5f0f88e6a693b9723ca6a6cd8616885f1490999a6d34d394ef52d26e`.
-It is sealed and **not installed**; all four native libraries, manifest and 91
-assets match c8. Windows retains its c8 executable and seven affected native
-checks with their original identity. c8 source CI completes at 12/12; new 6fa
-push/PR CI is running separately. The installed c8 phone app remains paused.
-The owner reports the Backbone One PlayStation Edition USB-C works well overall,
-with the directional/menu defect above. Corrected-menu acceptance and the rest
-of the physical matrix await the owner's return. The approved waterfall pair
-is still gated off in production, explaining the first-room skeleton report;
-its normal-route activation is the next bounded integration step. Contact,
-moving/secondary views, phone quality/cost, audio/haptics and independent audit
-remain open. Dust stays optional/default Off; shafts deferred. No release.
-[Exact source, packages, failures and owner observations](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#prepared-directional-navigation-follow-up--6faab4ff).
+Prepared APK SHA-256 `11a49d954a714867cb1e8dbdf8c3690b05d3d7523f4c8efc8bc23b654f974853`; Windows executable SHA-256 `b0d07f3c2906b461751ea9301bc3e9695f20a71e684df0c9f87c01e377a4f711`.
+The manifest, 91 assets and Java dex match 6fa; its 222-test/35-class Java/lint
+result and completed 12/12 CI remain scoped to that source. New 628 source CI
+completes 12/12 (push 37729370167 / PR 37729376579). The APK is **not installed**; the owner's
+c8 phone session remains paused. Corrected directional menu/physical controller
+matrix, current moving equipment/body/secondary views and combat readability,
+phone quality/cost and independent audit remain open. Dust stays Off by default;
+shafts deferred. No release.
+[Exact artifact, failure and validation ledger](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#prepared-normal-waterfall-encounter--6282ab66).
 
 **Earlier 8 October integrated controller/pose checkpoint:** runtime
 `454d58ee0f71bdb837a75ce486d6c139e03e0b02` adds native-dialog focus suspension

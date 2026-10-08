@@ -896,3 +896,12 @@ calibration. It adds no runtime target proxy, sweep or damage rule and closes
 no moving-target contact, sustained performance or physical acceptance gate.
 The renderer's existing 30 Hz skin-refresh cadence remains unchanged and must
 be accounted for when comparing simulation poses with last-uploaded geometry.
+
+## Normal waterfall placement integration, 8 October
+
+Source `6282ab66289775c6c8360a7feb3afd6d554f1787` enables only the authored guard placement for normal
+applications and preserves both guards through bay/Keeper checkpoint import
+and retry. Sword-starts-stowed remains independently Off. Real ordinary-axis
+route and existing Keeper/reward tests pass; fresh Pipeline/Compute frozen
+checkpoint evidence is separate from still-open moving equipment/body/secondary
+views and owner motion acceptance. [Exact checks, failures, artifacts and gaps](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#prepared-normal-waterfall-encounter--6282ab66).
