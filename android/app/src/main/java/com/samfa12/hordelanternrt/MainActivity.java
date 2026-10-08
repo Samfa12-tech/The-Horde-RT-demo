@@ -237,6 +237,7 @@ public class MainActivity extends Activity {
     private InputManager inputManager;
     private AlertDialog controllerDialog;
     private final ArrayList<AlertDialog> controllerDialogs = new ArrayList<>();
+    private final Set<AlertDialog> controllerFocusedDialogs = new HashSet<>();
     private TextView controllerPrompt;
     private final InputManager.InputDeviceListener controllerDevices = new InputManager.InputDeviceListener() {
         @Override public void onInputDeviceAdded(int deviceId) { /* Connection alone never takes over touch. */ }
@@ -5326,7 +5327,7 @@ public class MainActivity extends Activity {
         if (!AndroidControllerInput.isControllerKey(event)) return super.dispatchKeyEvent(event);
         AndroidControllerInput.Result result=controllerInput.key(event,SystemClock.uptimeMillis());
         if (!result.handled) return super.dispatchKeyEvent(event);
-        if (resumed && controllerWindowFocused) {
+        if (resumed && controllerHasFocusedWindow()) {
             handleControllerResult(result);
             handleControllerResult(controllerInput.navigation(SystemClock.uptimeMillis()));
         }
@@ -5338,7 +5339,7 @@ public class MainActivity extends Activity {
         if (!AndroidControllerInput.isControllerMotion(event)) return super.dispatchGenericMotionEvent(event);
         AndroidControllerInput.Result result=controllerInput.motion(event,SystemClock.uptimeMillis());
         if (!result.handled) return super.dispatchGenericMotionEvent(event);
-        if (resumed && controllerWindowFocused) {
+        if (resumed && controllerHasFocusedWindow()) {
             handleControllerResult(result);
             handleControllerResult(controllerInput.navigation(SystemClock.uptimeMillis()));
         }
@@ -5368,9 +5369,16 @@ public class MainActivity extends Activity {
     }
 
     private AlertDialog currentControllerDialog() {
-        for(int i=controllerDialogs.size()-1;i>=0;i--)if(!controllerDialogs.get(i).isShowing())controllerDialogs.remove(i);
+        for(int i=controllerDialogs.size()-1;i>=0;i--)if(!controllerDialogs.get(i).isShowing()) {
+            controllerFocusedDialogs.remove(controllerDialogs.get(i));controllerDialogs.remove(i);
+        }
         controllerDialog=controllerDialogs.isEmpty()?null:controllerDialogs.get(controllerDialogs.size()-1);
         return controllerDialog;
+    }
+
+    private boolean controllerHasFocusedWindow() {
+        AlertDialog dialog=currentControllerDialog();
+        return dialog==null ? controllerWindowFocused : controllerFocusedDialogs.contains(dialog);
     }
 
     private View controllerUiRoot() {
@@ -5384,22 +5392,32 @@ public class MainActivity extends Activity {
         currentControllerDialog();
         controllerDialogs.remove(dialog);controllerDialogs.add(dialog);
         controllerDialog=dialog;
+        final View decor=dialog.getWindow().getDecorView();
+        if(decor.hasWindowFocus())controllerFocusedDialogs.add(dialog);
+        decor.getViewTreeObserver().addOnWindowFocusChangeListener(focused -> {
+            if(!controllerDialogs.contains(dialog))return;
+            if(focused) {
+                controllerFocusedDialogs.add(dialog);requestControllerFrame();
+            } else {
+                controllerFocusedDialogs.remove(dialog);suspendControllerInput(false);
+            }
+        });
         dialog.setOnKeyListener((owner,key,event) -> {
             if (!AndroidControllerInput.isControllerKey(event)) return false;
             AndroidControllerInput.Result result=controllerInput.key(event,SystemClock.uptimeMillis());
-            if(result.handled && resumed) {
+            if(result.handled && resumed && controllerHasFocusedWindow()) {
                 handleControllerResult(result);
                 handleControllerResult(controllerInput.navigation(SystemClock.uptimeMillis()));
-            }
+            } else if(result.handled)controllerInput.suspend(SystemClock.uptimeMillis());
             return result.handled;
         });
         dialog.getWindow().getDecorView().setOnGenericMotionListener((view,event) -> {
             if (!AndroidControllerInput.isControllerMotion(event)) return false;
             AndroidControllerInput.Result result=controllerInput.motion(event,SystemClock.uptimeMillis());
-            if(result.handled && resumed) {
+            if(result.handled && resumed && controllerHasFocusedWindow()) {
                 handleControllerResult(result);
                 handleControllerResult(controllerInput.navigation(SystemClock.uptimeMillis()));
-            }
+            } else if(result.handled)controllerInput.suspend(SystemClock.uptimeMillis());
             return result.handled;
         });
         if(controllerMode) ControllerNavigation.ensureFocus(dialog.getWindow().getDecorView());
@@ -5471,16 +5489,14 @@ public class MainActivity extends Activity {
     }
 
     private void requestControllerFrame() {
-        if(!controllerMode || !resumed || controllerFrameScheduled ||
-                (!controllerWindowFocused && (controllerDialog==null || !controllerDialog.isShowing())))return;
+        if(!controllerMode || !resumed || controllerFrameScheduled || !controllerHasFocusedWindow())return;
         controllerFrameScheduled=true; handler.postDelayed(controllerFrame,16);
     }
 
     private final Runnable controllerFrame = new Runnable() {
         @Override public void run() {
             controllerFrameScheduled=false;
-            if(!controllerMode || !resumed || (!controllerWindowFocused &&
-                    (controllerDialog==null || !controllerDialog.isShowing())))return;
+            if(!controllerMode || !resumed || !controllerHasFocusedWindow())return;
             final long now=SystemClock.uptimeMillis();
             final float dt=controllerFrameTime==0?0:Math.min(0.05f,Math.max(0,now-controllerFrameTime)*0.001f);
             controllerFrameTime=now;
@@ -5902,7 +5918,7 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         handler.removeCallbacks(controllerFrame);
         if (inputManager != null) inputManager.unregisterInputDeviceListener(controllerDevices);
-        controllerDialog = null; controllerDialogs.clear();
+        controllerDialog = null; controllerDialogs.clear(); controllerFocusedDialogs.clear();
         closeBenchmarkSummaryReview();
         dismissGraphicsPreviewDetails();
         invalidateRemotePlaytest(true);

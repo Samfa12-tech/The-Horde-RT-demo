@@ -130,16 +130,52 @@ public class AndroidControllerIntegrationTest {
         press(KeyEvent.KEYCODE_BUTTON_A);assertEquals(1,clicks[0]);assertTrue(play.hasFocus());
         press(KeyEvent.KEYCODE_BUTTON_R2);press(KeyEvent.KEYCODE_BUTTON_L2);assertEquals(0,Bridge.attacks);assertEquals(0,Bridge.parries);
     }
+    private static void focusDialog(AlertDialog dialog,boolean focused) {
+        View decor=dialog.getWindow().getDecorView();decor.dispatchWindowFocusChanged(focused);
+        // ViewRootImpl also dispatches this observer event; Robolectric's View alone does not.
+        org.robolectric.util.ReflectionHelpers.callInstanceMethod(decor.getViewTreeObserver(),
+                "dispatchOnWindowFocusChange",org.robolectric.util.ReflectionHelpers.ClassParameter.from(boolean.class,focused));
+    }
     @Test public void nativeDialogConfirmAndCancelPreserveButtonCallbacks()throws Exception {
         set("menuVisible",true);int[] accepted={0};AlertDialog dialog=new AlertDialog.Builder(a).setTitle("Confirm")
                 .setNegativeButton("Stay",null).setPositiveButton("Accept",(d,w)->accepted[0]++).create();dialog.show();
-        call("installControllerDialog",new Class<?>[]{AlertDialog.class},dialog);set("controllerMode",true);
+        call("installControllerDialog",new Class<?>[]{AlertDialog.class},dialog);focusDialog(dialog,true);set("controllerMode",true);
         Button accept=dialog.getButton(AlertDialog.BUTTON_POSITIVE);accept.setFocusableInTouchMode(true);accept.requestFocus();
         dialog.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_A,0));org.robolectric.shadows.ShadowLooper.idleMainLooper();assertEquals(1,accepted[0]);assertFalse(dialog.isShowing());
         AlertDialog cancel=new AlertDialog.Builder(a).setTitle("Cancel").setPositiveButton("Close",null).create();cancel.show();
-        call("installControllerDialog",new Class<?>[]{AlertDialog.class},cancel);
+        call("installControllerDialog",new Class<?>[]{AlertDialog.class},cancel);focusDialog(cancel,true);
         dialog.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_A,0));
         cancel.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_B,0));assertFalse(cancel.isShowing());assertEquals(0,Bridge.dodges);
+    }
+    @Test public void dialogFocusLossNeutralizesHeldNavigationAndRequiresRelease()throws Exception {
+        set("menuVisible",true);set("controllerMode",true);set("controllerWindowFocused",false);
+        AlertDialog dialog=new AlertDialog.Builder(a).setPositiveButton("Keep",null).create();dialog.show();
+        call("installControllerDialog",new Class<?>[]{AlertDialog.class},dialog);
+        View decor=dialog.getWindow().getDecorView();focusDialog(dialog,true);
+        dialog.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_DOWN,0));
+        focusDialog(dialog,false);
+        AndroidControllerInput policy=(AndroidControllerInput)field("controllerInput").get(a);
+        assertEquals("unfocused dialog must not repeat held navigation",0,policy.navigation(SystemClock.uptimeMillis()+600).vertical);
+        focusDialog(dialog,true);
+        dialog.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_DOWN,0));
+        assertEquals("held navigation cannot replay on focus return",0,policy.navigation(SystemClock.uptimeMillis()+1200).vertical);
+        dialog.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_DPAD_DOWN,0));
+        dialog.dismiss();
+    }
+    @Test public void dialogFocusLossRejectsConfirmUntilWindowReturns()throws Exception {
+        set("menuVisible",true);set("controllerMode",true);set("controllerWindowFocused",false);
+        int[] accepted={0};AlertDialog dialog=new AlertDialog.Builder(a).setPositiveButton("Keep",(d,w)->accepted[0]++).create();dialog.show();
+        call("installControllerDialog",new Class<?>[]{AlertDialog.class},dialog);
+        Button keep=dialog.getButton(AlertDialog.BUTTON_POSITIVE);keep.setFocusableInTouchMode(true);keep.requestFocus();
+        View decor=dialog.getWindow().getDecorView();focusDialog(dialog,true);focusDialog(dialog,false);
+        dialog.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_A,0));
+        dialog.dispatchKeyEvent(key(KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BUTTON_A,0));
+        org.robolectric.shadows.ShadowLooper.idleMainLooper();
+        assertEquals("unfocused native window cannot accept a simulated confirm",0,accepted[0]);assertTrue(dialog.isShowing());
+        focusDialog(dialog,true);keep.requestFocus();
+        dialog.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_A,0));
+        org.robolectric.shadows.ShadowLooper.idleMainLooper();assertEquals(1,accepted[0]);assertFalse(dialog.isShowing());
+        assertEquals(0,Bridge.interacts);assertEquals(0,Bridge.attacks);
     }
     @Test public void rotationNeutralizesAxesWithoutChangingSavedSettings()throws Exception {
         motion(0,0,0,0);motion(.6f,-.5f,0,0);
@@ -209,7 +245,7 @@ public class AndroidControllerIntegrationTest {
         set("menuVisible",true);set("controllerMode",true);AlertDialog parent=new AlertDialog.Builder(a).setPositiveButton("Parent",null).create();parent.show();
         call("installControllerDialog",new Class<?>[]{AlertDialog.class},parent);
         AlertDialog child=new AlertDialog.Builder(a).setPositiveButton("Child",null).create();child.show();call("installControllerDialog",new Class<?>[]{AlertDialog.class},child);
-        child.dismiss();assertEquals(parent,call("currentControllerDialog",new Class<?>[]{}));
+        child.dismiss();assertEquals(parent,call("currentControllerDialog",new Class<?>[]{}));focusDialog(parent,true);
         parent.dispatchKeyEvent(key(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BUTTON_B,0));assertFalse(parent.isShowing());assertEquals(0,Bridge.dodges);
     }
     @Test public void focusLossNeutralizesTouchRolesAndPausesActiveController()throws Exception {
