@@ -1,6 +1,8 @@
 # Android RT Device Compatibility Record
 
-**9 October isolated measurement setup:** SM-S948B/Android16 installs exact `a6439e0b` Shipping/Mobile benchmark APK with pulled-base hash matching `d305f4ab8d3d61f57620f6fcd2eb40db4fce4aa0b76a6c90e44cfbcfb91cff73`. Normal Graphics observes saved legacy75 surviving install and acknowledges/keeps temporary mobile50. Primary game preferences/menu mix are byte-identical. First moving run is rejected before launch by warm typed current-HAL sensors; apps stopped. This is install/setup evidence, not a new motion, controller or sustained-performance pass. [Exact record](ENGINEERING_1_6_2_MOTION_PRESENTATION_2026_10_09.md).
+## 9 October matched-start moving comparison — a 6439 e 0 b /SM-S948B /Android 16
+
+Evidence class: **exact isolated Shipping/Mobile install, shared-wall-clock generated-input motion, actual-presentation joins and limited owner encoded-clip appearance decision**. APK SHA-256 `d305f4ab8d3d61f57620f6fcd2eb40db4fce4aa0b76a6c90e44cfbcfb91cff73` matches installed base. Same Pipeline/output 1440×2980/profile yields native 50/40/33 extents 720×1490 /576×1192 /475×983 and ~6.5-second presented-image rates 24.288/31.205/46.171 per second. Strict joins,13 readbacks each, zero adverse counters/overruns and matched-start current-HAL admission pass. These short readback-instrumented observations do not establish sustained FPS, power, full-route/contact or expensive Keeper/reward coverage. Separate encoded moving clips are shown; the owner accepts 33% appearance **for further sustained testing**. Default 50% remains unchanged. Isolated historical 75/Mobile/Glass On is restored with normal exact ACK/Keep; primary settings/menu mix are byte-identical and owned apps/recorders stop. The initial thermal refusal and harness corrections are retained. [Exact observations and limits](ENGINEERING_1_6_2_MOTION_PRESENTATION_2026_10_09.md).
 
 ## 9 October heart-only HUD — 7766ea3a / SM-S948B / Android 16
 

@@ -1,0 +1,61 @@
+{
+  "diagnostic": "Sword target contact-region witness",
+  "runTimeoutSeconds": 60,
+  "runElapsedSeconds": 10.006,
+  "runExitCode": 0,
+  "queryBudget": 24,
+  "exactQueryCount": 24,
+  "exactTrianglePairTests": 1125143,
+  "samplesPerCase": 8,
+  "targetTriangles": 9402,
+  "bladeTriangles": 6905,
+  "results": [
+    {
+      "minTick": 23,
+      "intersections": 0,
+      "pulseTick": 17,
+      "minGapMm": 36.2886,
+      "pulseGapMm": 275.347,
+      "case": "frontal-1.28"
+    },
+    {
+      "intersections": 3,
+      "ticksWithIntersection": [
+        19,
+        20,
+        23
+      ],
+      "pulseTick": 17,
+      "minGapMm": 0.0,
+      "pulseGapMm": 234.658,
+      "case": "minus15-1.28"
+    },
+    {
+      "intersections": 0,
+      "case": "idle-frontal-1.28",
+      "minGapMm": 192.863,
+      "minTick": 23
+    }
+  ],
+  "sourceSha256": "9C6046BC19FA83F459E2E4B9A5D5823E5C6ED0F77854D31B88102979CFE4DF23",
+  "executableSha256": "497BB4BAEA6729D6DBDDA505D4C8E46EE2FB5FD6D82E565953D6A2990A4165B1",
+  "runLogSha256": "88D36C26E1515F9EF80885D51E69F233D5AFB2AF97F63F583471D63610E00FE0",
+  "regionLabel": "Nearest animated imported joint segment to the exact closest target triangle centroid; this is a geometric label, not source JOINTS_0/WEIGHTS_0 classification because runtime asset API does not expose weights.",
+  "claims": "24 discrete fixed-snapshot queries only; no continuous collision or presented-frame claim; no runtime change.",
+  "priorBuildFailureLogs": [
+    {
+      "sha256": "ED1946342F212693CE904C958211BF7D6F25CE042719564E22CB6443B442DD54",
+      "path": "contact-region-witness-build-private.log"
+    },
+    {
+      "sha256": "FC787FA26B22205F19D77E2716B796DF33A1EAE32C695821386C139A26349607",
+      "path": "contact-region-witness-build-2-private.log"
+    }
+  ],
+  "witnessSource": "f0cd8cfcc41b613ebe68a8eb7fe04510821f965c",
+  "witnessTree": "57c8927d2fb71a81d7d312087ecd1447d8170a34",
+  "build": "Windows x64 Debug, explicit EXCLUDE_FROM_ALL target horde_rt_sword_target_contact_region_witness; local run only, ordinary CI does not execute it.",
+  "fixture": "Production blade/imported target mesh and anatomical player Grip; drawn sword, high torch, aspect1, root range1.28m; discrete snapshots16through23 of ordinary immediate attack and idle control. Target pose from undamaged control remains AttackWindup; no phase interpolation.",
+  "selection": "No compact collider, sweep, reach/cone or timing change selected. Labels use nearest posed joint segment to triangle centroid, no source skin-weight classification; tied zero-distance witnesses are not enumerated.",
+  "publicRowsSha256": "1a0ec33557b934b3f6e50dc7dfeddecd87a790b4f1184f517a4bfb0041beefad"
+}
