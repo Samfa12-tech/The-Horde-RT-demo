@@ -103,6 +103,24 @@ inline constexpr RoutePosition kKeeperStagingPosition{-34.70f, -15.20f};
 inline constexpr RoutePosition kKeeperRetryPosition{-31.20f, -15.20f};
 inline constexpr RouteRect kKeeperArrivalThreshold{-31.65f, -30.50f, -16.55f, -13.85f};
 inline constexpr float kKeeperPresentationCollisionRadius = 0.65f;
+// The two authored Keeper torch stands are also physical route obstacles.
+// Renderer anchors consume these same centers; the measured square bases are
+// 0.32 m wide in world X/Z.
+inline constexpr float kKeeperTorchStandBaseHalfExtent = 0.16f;
+inline constexpr std::array<RoutePosition, 2> kKeeperTorchStandCenters{{
+    {kKeeperStagingPosition.x - 0.80f, kKeeperStagingPosition.z - 1.15f},
+    {kKeeperStagingPosition.x - 0.80f, kKeeperStagingPosition.z + 1.15f},
+}};
+inline constexpr std::array<RouteRect, 2> kKeeperTorchStandCollisionRects{{
+    {kKeeperTorchStandCenters[0].x - kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[0].x + kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[0].z - kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[0].z + kKeeperTorchStandBaseHalfExtent},
+    {kKeeperTorchStandCenters[1].x - kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[1].x + kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[1].z - kKeeperTorchStandBaseHalfExtent,
+     kKeeperTorchStandCenters[1].z + kKeeperTorchStandBaseHalfExtent},
+}};
 // The reward is staged against the rear wall of the lich/finale room, clear of
 // the combat centre and with a walkable 1.30 m interaction stand-off to its
 // east. The production chest's audited 1.02 x 0.654 m base is rotated by
@@ -131,15 +149,17 @@ inline constexpr std::array<RouteRect, 9> kShowcaseWalkableRects{{
 
 // The gallery and arch posts are retained from the original chamber. The two
 // far-wall returns enforce the framed 1.8 m doorway at z=-6.4.
-// Static masonry/acoustic obstacles. The reward chest remains a separate
-// physical collider because positional sound emitted from its centre must not
-// be classified as crossing a wall.
-inline constexpr std::array<RouteRect, 5> kShowcaseSolidObstacles{{
+// Static collision/acoustic obstacles: route masonry and the Keeper torch
+// bases. The reward chest remains separate because positional sound emitted
+// from its centre must not be classified as crossing a wall.
+inline constexpr std::array<RouteRect, 7> kShowcaseSolidObstacles{{
     {-10.0f, -0.72f, 0.05f, 2.35f},
     {-1.20f, -0.78f, -3.55f, -3.25f},
     {0.78f, 1.20f, -3.55f, -3.25f},
     {-1.85f, -0.90f, -6.50f, -6.30f},
     {0.90f, 1.85f, -6.50f, -6.30f},
+    kKeeperTorchStandCollisionRects[0],
+    kKeeperTorchStandCollisionRects[1],
 }};
 
 constexpr bool Contains(const RouteRect& rect, float x, float z)

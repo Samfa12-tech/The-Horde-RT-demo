@@ -106,6 +106,11 @@ int main()
         check(Move(player, route[i]), "continuous route traversal must reach every waypoint");
         check(QueryShowcaseZone(player.x, player.z) == expectedZones[i], "waypoint zone must match route definition");
     }
+    for (std::size_t i = route.size(); i > 0u; --i)
+    {
+        check(Move(player, route[i - 1u]), "backtracking must reach every route waypoint");
+    }
+    check(Move(player, kPlayerSpawn), "backtracking must return to the opening spawn");
 
     // A diagonal endpoint elsewhere in the route must not teleport through solid walls.
     player = {0.0f, -7.0f};
@@ -150,8 +155,26 @@ int main()
     check(IsShowcasePlayerPositionWalkable(kRewardChestRoutePosition.x + 1.30f,
                                             kRewardChestRoutePosition.z),
           "the reward chest interaction stand-off must remain walkable");
-    player = {kRewardChestRoutePosition.x + 1.30f,
-              kRewardChestRoutePosition.z};
+
+    // The two Keeper prop bases are compact authored footprints. Player
+    // movement must be stopped by each base while preserving a tangent route.
+    for (std::size_t index = 0u; index < kKeeperTorchStandCollisionRects.size(); ++index)
+    {
+        const RoutePosition center = kKeeperTorchStandCenters[index];
+        const RouteRect& stand = kKeeperTorchStandCollisionRects[index];
+        player = {center.x + 0.80f, center.z};
+        const bool crossedStand = Move(player, {center.x - 0.80f, center.z});
+        check(!crossedStand && player.x >= stand.minX - kPlayerCollisionRadius - 0.001f,
+              "player must not cross either Keeper stand base");
+        player = {center.x - 0.80f, center.z - 0.80f};
+        check(Move(player, {player.x, center.z + 0.80f}),
+              "player must retain tangential sliding beside Keeper stand bases");
+    }
+
+    player = kFinaleCenter;
+    check(Move(player, {kRewardChestRoutePosition.x + 1.30f,
+                        kRewardChestRoutePosition.z}),
+          "the ordinary finale route must reach the reward chest interaction stand-off");
     proposedX = kRewardChestRoutePosition.x;
     proposedZ = kRewardChestRoutePosition.z;
     ResolveCorridorPlayerCollision(player.x, player.z, proposedX, proposedZ);

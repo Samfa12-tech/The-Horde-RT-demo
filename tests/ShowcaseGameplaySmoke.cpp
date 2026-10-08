@@ -1,3 +1,4 @@
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -423,22 +424,88 @@ int main()
 
     LichEncounter chestCollisionLich;
     chestCollisionLich.ImportCombatCheckpoint();
-    bool lichEnteredChest = false;
+    bool lichEnteredFinaleProp = false;
     constexpr float lichCollisionRadius = 0.34f;
     const RouteRect chestWithLichClearance{
         kRewardChestCollisionRect.minX - lichCollisionRadius,
         kRewardChestCollisionRect.maxX + lichCollisionRadius,
         kRewardChestCollisionRect.minZ - lichCollisionRadius,
         kRewardChestCollisionRect.maxZ + lichCollisionRadius};
+    bool keeperStuckNearFinaleProps = false;
+    int stationaryNearPropFrames = 0;
+    float previousKeeperX = chestCollisionLich.Snapshot().x;
+    float previousKeeperZ = chestCollisionLich.Snapshot().z;
     for (int i = 0; i < 3600; ++i)
     {
         const auto& snapshot = chestCollisionLich.Update(
             1.0f / 60.0f, -36.40f, -15.15f, true, true);
-        lichEnteredChest = lichEnteredChest ||
+        lichEnteredFinaleProp = lichEnteredFinaleProp ||
             Contains(chestWithLichClearance, snapshot.x, snapshot.z);
+        bool nearFinaleProp = Contains(chestWithLichClearance, snapshot.x, snapshot.z);
+        for (const RouteRect& stand : kKeeperTorchStandCollisionRects)
+        {
+            const RouteRect expandedStand{
+                stand.minX - lichCollisionRadius,
+                stand.maxX + lichCollisionRadius,
+                stand.minZ - lichCollisionRadius,
+                stand.maxZ + lichCollisionRadius};
+            const RouteRect nearStand{
+                expandedStand.minX - 0.20f,
+                expandedStand.maxX + 0.20f,
+                expandedStand.minZ - 0.20f,
+                expandedStand.maxZ + 0.20f};
+            nearFinaleProp = nearFinaleProp || Contains(nearStand, snapshot.x, snapshot.z);
+            lichEnteredFinaleProp = lichEnteredFinaleProp || Contains(expandedStand, snapshot.x, snapshot.z);
+        }
+        if (std::hypot(snapshot.x - previousKeeperX, snapshot.z - previousKeeperZ) <= 0.00001f &&
+            nearFinaleProp)
+        {
+            ++stationaryNearPropFrames;
+            keeperStuckNearFinaleProps = keeperStuckNearFinaleProps ||
+                stationaryNearPropFrames >= 30;
+        }
+        else
+        {
+            stationaryNearPropFrames = 0;
+        }
+        previousKeeperX = snapshot.x;
+        previousKeeperZ = snapshot.z;
     }
-    check(!lichEnteredChest,
-          "the moving lich must respect the reward chest's physical footprint");
+    check(!lichEnteredFinaleProp,
+          "the moving Keeper must respect the reward chest and both stand footprints");
+    check(!keeperStuckNearFinaleProps,
+          "the moving Keeper must slide and recover near the rear chest/stand spacing");
+
+    // The Keeper is a moving encounter actor with a slightly larger body
+    // clearance than the player. Exercise its real fixed-step orbit/charge/
+    // recovery steering near each flank torch and verify every published pose.
+    bool keeperEnteredStand = false;
+    constexpr float keeperCollisionRadius = 0.34f;
+    for (const RouteRect& stand : kKeeperTorchStandCollisionRects)
+    {
+        const RouteRect standWithKeeperClearance{
+            stand.minX - keeperCollisionRadius,
+            stand.maxX + keeperCollisionRadius,
+            stand.minZ - keeperCollisionRadius,
+            stand.maxZ + keeperCollisionRadius};
+        for (float playerX = -36.40f; playerX <= -30.90f; playerX += 0.50f)
+        {
+            for (float playerZ = -17.90f; playerZ <= -12.50f; playerZ += 0.50f)
+            {
+                LichEncounter standCollisionLich;
+                standCollisionLich.ImportCombatCheckpoint();
+                for (int i = 0; i < 600; ++i)
+                {
+                    const auto& snapshot = standCollisionLich.Update(
+                        1.0f / 60.0f, playerX, playerZ, true, true);
+                    keeperEnteredStand = keeperEnteredStand ||
+                        Contains(standWithKeeperClearance, snapshot.x, snapshot.z);
+                }
+            }
+        }
+    }
+    check(!keeperEnteredStand,
+          "real Keeper orbit, charge, and recovery movement must respect both stand bases across the finale");
 
     lich.ImportCombatCheckpoint();
     bool sawOccludedDamage = false;

@@ -40,7 +40,9 @@ bool KeeperLightsMatch(const SimulationSnapshot& snapshot, const float expectedS
         const auto& anchor = effects::kKeeperTorchAnchors[index];
         const auto& light = snapshot.fireEmitters[index + 1u];
         const auto item = effects::KeeperTorchWorldFromItem(anchor);
-        if (light.stableId != anchor.stableId || light.seed != anchor.seed ||
+        if (!NearlyEqual(anchor.position[0], kKeeperTorchStandCenters[index].x) ||
+            !NearlyEqual(anchor.position[2], kKeeperTorchStandCenters[index].z) ||
+            light.stableId != anchor.stableId || light.seed != anchor.seed ||
             light.parentObject != effects::FireEmitterParentObject::WorldObject ||
             light.zone != ShowcaseZone::Finale || !NearlyEqual(light.strength, expectedStrength) ||
             !NearlyEqual(light.fuel, 1.0f) || !std::isfinite(light.phase) ||

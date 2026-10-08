@@ -859,6 +859,15 @@ private:
         const float previousZ = snapshot_.z;
         float proposedX = std::clamp(previousX + velocityX * deltaSeconds, kMinX, kMaxX);
         float proposedZ = std::clamp(previousZ + velocityZ * deltaSeconds, kMinZ, kMaxZ);
+        for (const RouteRect& obstacle : kShowcaseSolidObstacles)
+        {
+            ResolveMovementAgainstRect(obstacle,
+                                       kCollisionRadius,
+                                       previousX,
+                                       previousZ,
+                                       proposedX,
+                                       proposedZ);
+        }
         ResolveMovementAgainstRect(kRewardChestCollisionRect,
                                    kCollisionRadius,
                                    previousX,

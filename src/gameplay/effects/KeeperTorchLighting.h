@@ -21,10 +21,10 @@ struct KeeperTorchAnchor
 // existing Flame/Light socket transforms; these are not camera-relative lights.
 // ID 1 remains the opening torch; the reward keeps its existing renderer ID.
 inline constexpr std::array<KeeperTorchAnchor, 2u> kKeeperTorchAnchors{{
-    {3u, 0x4b545231u, {{kKeeperStagingPosition.x - 0.80f, 0.255f,
-                       kKeeperStagingPosition.z - 1.15f}}},
-    {4u, 0x4b545232u, {{kKeeperStagingPosition.x - 0.80f, 0.255f,
-                       kKeeperStagingPosition.z + 1.15f}}},
+    {3u, 0x4b545231u, {{kKeeperTorchStandCenters[0].x, 0.255f,
+                       kKeeperTorchStandCenters[0].z}}},
+    {4u, 0x4b545232u, {{kKeeperTorchStandCenters[1].x, 0.255f,
+                       kKeeperTorchStandCenters[1].z}}},
 }};
 
 inline items::HeldItemTransform KeeperTorchWorldFromItem(const KeeperTorchAnchor& anchor)

@@ -3648,8 +3648,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     {
         const float x = anchor.position[0];
         const float z = anchor.position[2];
-        addWorldBox(x - 0.16f, kRouteFloorWorldY, z - 0.16f,
-                    x + 0.16f, kRouteFloorWorldY + 0.13f, z + 0.16f, SurfaceMossyStone);
+        const float baseHalfExtent = horde::gameplay::kKeeperTorchStandBaseHalfExtent;
+        addWorldBox(x - baseHalfExtent, kRouteFloorWorldY, z - baseHalfExtent,
+                    x + baseHalfExtent, kRouteFloorWorldY + 0.13f, z + baseHalfExtent, SurfaceMossyStone);
         addWorldBox(x - 0.035f, kRouteFloorWorldY + 0.13f, z - 0.035f,
                     x + 0.035f, anchor.position[1], z + 0.035f, SurfaceAgedMetal);
         addWorldBox(x - 0.08f, anchor.position[1] - 0.05f, z - 0.08f,
