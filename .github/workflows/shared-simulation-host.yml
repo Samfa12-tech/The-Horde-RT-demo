@@ -342,3 +342,6 @@ jobs:
 
       - name: Check current-HAL thermal evidence admission
         run: python -m unittest discover -s tests -p test_android_current_thermal_state.py -v
+
+      - name: Check strict Android motion-presentation join
+        run: python -m unittest discover -s tests -p test_android_motion_present_timing.py -v
