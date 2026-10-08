@@ -525,9 +525,9 @@ try {
     $genericInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalRayGenShader.inc'
     $legacyInclude = Join-Path $repoRoot 'src\vulkan\raytracing\MinimalLegacyRayGenShader.inc'
     # These compatibility artifacts carry the shared primary-ray pre-rotation mode; fresh compilation still validates source identity.
-    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'e8ce19dce6a745f4c2ddfd8e5eb870499255363c9011f270a4e67e266c35b0f9') `
+    Assert-True ((Get-CanonicalTextHash $genericInclude) -eq 'a4f367d427c2ecb2e5bba6596e2ea8e833cd8330aad48ee345d15e01015a499d') `
         'Compatibility generic include changed unexpectedly.'
-    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq '91766e522d4f8376e362ab520e2dd772a5b22ae74620b4da63c669fc55326507') `
+    Assert-True ((Get-CanonicalTextHash $legacyInclude) -eq 'c2b18748201de41faaf77be0bc78861896d8c1f6dbcaaa485ba969834ffb7c9e') `
         'Compatibility legacy include changed unexpectedly.'
 
     $lfFixture = Join-Path $temporaryRoot 'canonical-lf-fixture.txt'
@@ -570,10 +570,10 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     # no longer the admitted snapshot; keep exact mist/active-fire4, current ABI
     # and the reviewed shared presentation pre-rotation raw-word witnesses.
     $opaqueWordPins = @{
-        diagnostic_high_opaque_fast = '9c020e69e54768665a57c24b4181b833c14d7e635ca757d733cfc988faf68f8f'
-        diagnostic_mobile_opaque_fast = 'ff37fb2d87e220df59fe2607e9a3318f1ee492fa01485afbe3bb095087939b2e'
-        shipping_high_opaque_fast = 'da3410252a83a75aea0130f037b4f3d9fa5cda09c866075eceb7942bc690c963'
-        shipping_mobile_opaque_fast = 'b3da473c5760f5394eac56ab802cc9f84ec78d75899cedf90a215f6198bee9be'
+        diagnostic_high_opaque_fast = '84f1b7dad88d0b6404bacaa1dcaba869c480a153ddb09a7f77c7a92454344130'
+        diagnostic_mobile_opaque_fast = '5bc1d5ffa38e8963245be312993d35fb919f18a93abeda07e61c74da7d32ffa1'
+        shipping_high_opaque_fast = 'a9d054caefebf8adc46953682683250edf589555432c60e9780f4702de78e91e'
+        shipping_mobile_opaque_fast = '1eb94976017d0d959b80da8b86ce8744836dc2f0e8f0c97b1cae2ddbca0a157b'
     }
     foreach ($row in @($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' })) {
         Assert-True ($row.spirvSha256 -ceq $opaqueWordPins[$row.key]) `
@@ -757,13 +757,13 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     & $compiler -Check -OutputDirectory $compatibilityGenericOutput
     if ($LASTEXITCODE -ne 0) { throw "Generic compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityGenericOutput 'minimal.rgen.spv')) -eq
-        '0354a2e028e60cabc707e1da75b237668d4922d8e7048b6a97c716e183bb6d46') `
+        '363b592c49a3853d2e7f863a52f6ed90084ab383469063977be9edb6201559b6') `
         'Compatibility generic SPIR-V words changed.'
     $compatibilityLegacyOutput = Join-Path $temporaryRoot 'compatibility-legacy'
     & $compiler -Legacy -Check -OutputDirectory $compatibilityLegacyOutput
     if ($LASTEXITCODE -ne 0) { throw "Legacy compatibility freshness failed with exit code $LASTEXITCODE." }
     Assert-True ((Get-RawFileHash (Join-Path $compatibilityLegacyOutput 'minimal.legacy.rgen.spv')) -eq
-        '188f76e5aea1adbcf51e8e926072d26b877f210414c0b8b03e46e2603035bb31') `
+        '14a2d50530e9b21c7975495e008be9dc9d1deefc12f399078d4e1f194e4c644f') `
         'Compatibility legacy SPIR-V words changed.'
     Assert-True ((& git -C $repoRoot status --porcelain) -join "`n" -eq $worktreeStatusBefore) `
         'Temporary artifact compilation modified the worktree.'

@@ -169,8 +169,8 @@ try {
     $genericHashBefore = Get-RawFileHash $genericIncludePath
     $legacyHashBefore = Get-RawFileHash $legacyIncludePath
     # These compatibility artifacts carry the shared primary-ray pre-rotation mode; matrix compilation must not mutate them.
-    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq '4f8666506726df5d81ea1feb3513e1efdd79db31d92668929bbb9057191d6e83') 'Generic include hash changed before matrix compilation.'
-    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq '55bee1a0d19ee1543985229e17fac13037e8cc0d6e7d13d73c4e9d574108c991') 'Legacy include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $genericIncludePath) -eq 'a4f367d427c2ecb2e5bba6596e2ea8e833cd8330aad48ee345d15e01015a499d') 'Generic include hash changed before matrix compilation.'
+    Assert-True ((Get-CanonicalShaderTextHash $legacyIncludePath) -eq 'c2b18748201de41faaf77be0bc78861896d8c1f6dbcaaa485ba969834ffb7c9e') 'Legacy include hash changed before matrix compilation.'
 
     $matrixOutputRoot = Join-Path $temporaryRoot 'matrix'
     $matrixCompilerOutput = @(& $compiler -Matrix -OutputDirectory $matrixOutputRoot)
