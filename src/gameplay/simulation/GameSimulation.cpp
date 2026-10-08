@@ -1066,8 +1066,10 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
             horde::gameplay::interactions::HeldLightKind::None;
     }
     const bool pairCheckpoint = checkpoint->preset == ShowcaseCheckpointPreset::TwoSkeletonCombat;
-    const bool productionSkeletonEncounter = config_.waterfallSkeletonEncounter &&
-        activeEnemyKind_ == EnemyKind::Skeleton;
+    // Explicit reset/retry/import owns the whole encounter state. Keep the
+    // authored pair in its room even when a bay/Keeper checkpoint currently
+    // selects the Lich; later room selection does not respawn enemies.
+    const bool productionSkeletonEncounter = config_.waterfallSkeletonEncounter;
     const RoutePosition combatSpawnCenter = productionSkeletonEncounter
         ? kWaterfallSkeletonPairCenter
         : RoutePosition{0.0f, -4.65f};

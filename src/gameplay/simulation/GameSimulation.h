@@ -56,11 +56,13 @@ struct GameSimulationConfig
 };
 
 // Keep the historical constructor configuration available for deterministic
-// legacy fixtures. Applications explicitly select the owner-accepted profile.
+// legacy fixtures. Applications select the accepted profile and waterfall guards;
+// sword stow remains a separate presentation gate.
 inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
 {
     GameSimulationConfig config;
     config.playerMountProfile = horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
+    config.waterfallSkeletonEncounter = true;
     return config;
 }
 

@@ -678,8 +678,8 @@ void TestWaterfallEquipmentSeedOwnership(int rate)
               kWaterfallSkeletonPairCenter.x, kWaterfallSkeletonPairCenter.z),
           "shared route LOS predicate distinguishes a blocked approach ray from the open waterfall corridor");
     const auto productionConfig = ProductionGameSimulationConfig();
-    Check(!productionConfig.swordStartsStowed && !productionConfig.waterfallSkeletonEncounter,
-          "equipment staging flags remain disabled in the production configuration");
+    Check(!productionConfig.swordStartsStowed && productionConfig.waterfallSkeletonEncounter,
+          "production enables only accepted waterfall guards; sword stow remains independently gated");
     GameSimulation normalReference(productionConfig);
     normalReference.ResetRoute();
     const auto normalSnapshot = normalReference.Snapshot();

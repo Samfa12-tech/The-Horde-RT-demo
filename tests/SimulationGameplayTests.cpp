@@ -54,11 +54,11 @@ bool KeeperLightsMatch(const SimulationSnapshot& snapshot, const float expectedS
 }
 
 template <typename Check>
-void TestKeeperTorchLighting(Check&& check)
+void TestKeeperTorchLighting(Check&& check, GameSimulationConfig config = {})
 {
     static_assert(effects::kFireEmitterCapacity == 4u);
     static_assert(effects::kActiveFireEmitterCapacity == 4u);
-    GameSimulation simulation;
+    GameSimulation simulation(config);
     check(KeeperLightsMatch(simulation.Snapshot(), 0.0f) &&
           simulation.Snapshot().fireEmitters[0].strength > 0.0f,
           "new world torches start dark with IDs3/4 while the original opening torch remains lit");
@@ -647,6 +647,7 @@ int main()
     };
     TestKeeperReveal(check);
     TestKeeperTorchLighting(check);
+    TestKeeperTorchLighting(check, ProductionGameSimulationConfig());
     TestSkeletonIncidental(check);
 
     BoundedGameplayEventQueue identityQueue;
@@ -1820,7 +1821,7 @@ int main()
     auto waterfallEncounter = std::make_unique<GameSimulation>(waterfallConfig);
     const auto& stagedPair = waterfallEncounter->Snapshot().skeletonEnemies;
     check(ProductionGameSimulationConfig().swordStartsStowed == false &&
-          ProductionGameSimulationConfig().waterfallSkeletonEncounter == false &&
+          ProductionGameSimulationConfig().waterfallSkeletonEncounter == true &&
           waterfallEncounter->Snapshot().skeletonEnemyCount == 2u &&
           waterfallEncounter->Snapshot().activeSkeletonCount == 2u &&
           stagedPair[0].id == EntityId::SkeletonA &&
@@ -1839,7 +1840,7 @@ int main()
           NearlyEqual(waterfallEncounter->Snapshot().heldItems[1].visualStowBlend, 1.0f) &&
           NearlyEqual(waterfallEncounter->Snapshot().heldItemKinematics.swordStowBlend,
                       waterfallEncounter->Snapshot().heldItems[1].visualStowBlend),
-          "opt-in Waterfall encounter stages the same two stable skeleton IDs west of the wetline while production waits for rendered BodyStow support");
+          "production Waterfall encounter stages the accepted two stable skeleton IDs west of the wetline independently of opt-in BodyStow");
 
     auto waterfallReset = std::make_unique<GameSimulation>(waterfallConfig);
     waterfallReset->ResetRoute();
@@ -2258,7 +2259,7 @@ int main()
         excessive.waterfallGuardFixedTicks = 31u;
         check(!StageDevelopmentCheckpointSimulation(*boundedPreview, excessive) &&
               boundedPreview->Snapshot().tickIndex == 0u &&
-              !ProductionGameSimulationConfig().waterfallSkeletonEncounter &&
+              ProductionGameSimulationConfig().waterfallSkeletonEncounter &&
               !ProductionGameSimulationConfig().swordStartsStowed,
               "guard capture rejects unbounded staging and retains production defaults");
     }
