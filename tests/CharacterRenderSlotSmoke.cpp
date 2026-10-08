@@ -429,9 +429,9 @@ int main()
                   "idle weapon pose must retain the owner-reviewed safe-frame/canted composition");
     playerCombat.action = PlayerCombatAction::ParryActive;
     const PlayerWeaponRenderPose activeParry = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);
-    ok &= Require(Near(activeParry.parryBlend, 1.0f) && Near(activeParry.swordRadians, -0.62f) &&
-                  Near(activeParry.rightHandLocal[0], -0.16f),
-                  "active parry did not move the sword and right hand across the view");
+    ok &= Require(Near(activeParry.parryBlend, 1.0f) && Near(activeParry.swordRadians, -0.42f) &&
+                  Near(activeParry.rightHandLocal[0], 0.0f),
+                  "active parry must keep the centered shared hand and upright blade clear of the torch");
     playerCombat.reaction = CombatReaction::Parried;
     playerCombat.reactionTime = 0.12f;
     const PlayerWeaponRenderPose successfulParry = EvaluatePlayerWeaponRenderPose(playerCombat, 0.0f, 1.05f);

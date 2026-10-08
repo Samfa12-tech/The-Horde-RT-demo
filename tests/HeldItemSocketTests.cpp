@@ -12,6 +12,7 @@
 #include "vulkan/raytracing/RtSceneAbi.generated.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "scene/ShowcaseOverheadGeometry.h"
+#include "scene/SkeletonRenderPose.h"
 #include "scene/assets/PlayerPrimitiveContract.h"
 #include "scene/assets/SkinnedMeshAsset.h"
 
@@ -1912,107 +1913,166 @@ std::array<float, 3u> ItemVertexToGripLocal(
 
 struct DiagnosticSkeletonRenderSample
 {
-    horde::scene::SkinnedClip clip = horde::scene::SkinnedClip::Idle;
+    horde::scene::SkeletonClip clip = horde::scene::SkeletonClip::Idle;
     float clipTime = 0.0f;
     std::array<float, 12u> transform{};
 };
 
-float DiagnosticSkeletonStaggerRecoil(const float actionTime)
-{
-    constexpr float staggerDuration = 0.80f;
-    constexpr float impactDuration = 0.14f;
-    const float elapsed = std::clamp(actionTime, 0.0f, staggerDuration);
-    const auto smoothStep = [](const float value) {
-        const float clamped = std::clamp(value, 0.0f, 1.0f);
-        return clamped * clamped * (3.0f - 2.0f * clamped);
-    };
-    if (elapsed <= impactDuration) return smoothStep(elapsed / impactDuration);
-    return 1.0f - smoothStep((elapsed - impactDuration) /
-                             (staggerDuration - impactDuration));
-}
-
-// Diagnostic-only copy of CharacterRenderSlot.cpp's SkeletonClipForAction,
-// SkeletonTimeForAction, and SkeletonInstanceTransform (current source lines
-// 54-134). The held-item target does not link CharacterRenderSlot.cpp, so this
-// keeps the host fixture within its existing target. It is not direct execution
-// of CharacterRenderSlot and should be kept aligned if that mapping changes.
-DiagnosticSkeletonRenderSample CurrentCharacterRenderMapping(
+DiagnosticSkeletonRenderSample ResolveSharedCharacterRenderPose(
     const horde::gameplay::SkeletonCombatantSnapshot& source,
     const float deadClipDuration)
 {
+    horde::gameplay::simulation::SkeletonEnemySnapshot snapshot;
+    snapshot.x = source.x;
+    snapshot.z = source.z;
+    snapshot.facingRadians = source.facingRadians;
+    snapshot.animationTime = source.animationTime;
+    snapshot.animation = source.animation;
+    snapshot.action = source.action;
+    snapshot.actionTime = source.actionTime;
+    const horde::scene::SkeletonRenderPose pose =
+        horde::scene::EvaluateSkeletonRenderPose(snapshot, deadClipDuration);
+    return {pose.clip, pose.time, pose.transform};
+}
+
+void TestSharedSkeletonRenderPoseContracts()
+{
     using namespace horde::gameplay;
     using namespace horde::gameplay::simulation;
-    DiagnosticSkeletonRenderSample result;
-    if (source.animation == EnemyAnimation::Dead ||
-        source.action == EnemyCombatAction::Dead)
+
+    struct Case
     {
-        result.clip = horde::scene::SkinnedClip::Dead;
-        result.clipTime = deadClipDuration > 0.0f
-            ? std::min(source.animationTime, deadClipDuration)
-            : source.animationTime;
-    }
-    else
+        const char* name;
+        EnemyCombatAction action;
+        EnemyAnimation animation;
+        float actionTime;
+        float animationTime;
+        float x;
+        float z;
+        float facing;
+        horde::scene::SkeletonClip expectedClip;
+    };
+    constexpr std::array<Case, 12u> cases{{
+        {"idle-origin", EnemyCombatAction::Locomotion, EnemyAnimation::Idle,
+         0.0f, 0.0f, 0.0f, -4.65f, 0.0f, horde::scene::SkeletonClip::Idle},
+        {"idle-transformed", EnemyCombatAction::Locomotion, EnemyAnimation::Idle,
+         0.0f, 0.95f, -1.2f, -3.8f, 0.57f, horde::scene::SkeletonClip::Idle},
+        {"walk-phase-0", EnemyCombatAction::Locomotion, EnemyAnimation::Walking,
+         0.0f, 0.0f, 0.0f, -4.65f, 0.0f, horde::scene::SkeletonClip::Walking},
+        {"walk-phase-065", EnemyCombatAction::Locomotion, EnemyAnimation::Walking,
+         0.0f, 0.65f, 0.72f, -5.1f, -0.31f, horde::scene::SkeletonClip::Walking},
+        {"walk-transformed", EnemyCombatAction::Locomotion, EnemyAnimation::Walking,
+         0.0f, 1.45f, -1.05f, -3.25f, 1.12f, horde::scene::SkeletonClip::Walking},
+        {"attack-windup", EnemyCombatAction::AttackWindup, EnemyAnimation::Walking,
+         0.17f, 0.4f, 0.38f, -4.2f, -0.72f, horde::scene::SkeletonClip::Attack},
+        {"attack-active", EnemyCombatAction::AttackActive, EnemyAnimation::Walking,
+         0.11f, 0.6f, -0.53f, -5.35f, 0.84f, horde::scene::SkeletonClip::Attack},
+        {"attack-recovery", EnemyCombatAction::AttackRecovery, EnemyAnimation::Walking,
+         0.23f, 0.8f, 0.91f, -3.9f, -1.05f, horde::scene::SkeletonClip::Attack},
+        {"stagger-early", EnemyCombatAction::Staggered, EnemyAnimation::Walking,
+         0.07f, 0.9f, -0.65f, -4.7f, 0.42f, horde::scene::SkeletonClip::Attack},
+        {"stagger-late", EnemyCombatAction::Staggered, EnemyAnimation::Walking,
+         0.63f, 1.1f, 0.44f, -5.6f, -0.93f, horde::scene::SkeletonClip::Attack},
+        {"dead-action", EnemyCombatAction::Dead, EnemyAnimation::Walking,
+         0.0f, 2.1f, -0.37f, -4.35f, 0.26f, horde::scene::SkeletonClip::Dead},
+        {"dead-animation", EnemyCombatAction::Locomotion, EnemyAnimation::Dead,
+         0.0f, 3.1f, 0.81f, -6.0f, -0.64f, horde::scene::SkeletonClip::Dead},
+    }};
+
+    constexpr float deadClipDuration = 2.4f;
+    std::size_t checked = 0u;
+    for (const Case& sample : cases)
     {
-        switch (source.action)
+        SkeletonEnemySnapshot input;
+        input.x = sample.x;
+        input.z = sample.z;
+        input.facingRadians = sample.facing;
+        input.action = sample.action;
+        input.animation = sample.animation;
+        input.actionTime = sample.actionTime;
+        input.animationTime = sample.animationTime;
+        const auto pose = horde::scene::EvaluateSkeletonRenderPose(input, deadClipDuration);
+        Check(pose.clip == sample.expectedClip,
+              "shared skeleton pose helper must select the authored action clip");
+        Check(std::all_of(pose.transform.begin(), pose.transform.end(),
+                          [](const float value) { return std::isfinite(value); }),
+              "shared skeleton pose helper must publish a finite root transform");
+        if (sample.action != EnemyCombatAction::Staggered)
         {
-        case EnemyCombatAction::AttackWindup:
-            result.clip = horde::scene::SkinnedClip::Attack;
-            result.clipTime = std::clamp(
-                source.actionTime, 0.0f,
-                CombatTimeline::kSkeletonAttackWindupSeconds);
-            break;
-        case EnemyCombatAction::AttackActive:
-            result.clip = horde::scene::SkinnedClip::Attack;
-            result.clipTime = CombatTimeline::kSkeletonAttackWindupSeconds +
-                std::clamp(source.actionTime, 0.0f,
-                           CombatTimeline::kSkeletonAttackActiveSeconds);
-            break;
-        case EnemyCombatAction::AttackRecovery:
-            result.clip = horde::scene::SkinnedClip::Attack;
-            result.clipTime = CombatTimeline::kSkeletonAttackWindupSeconds +
-                CombatTimeline::kSkeletonAttackActiveSeconds +
-                std::clamp(source.actionTime, 0.0f,
-                           CombatTimeline::kSkeletonAttackRecoverySeconds);
-            break;
-        case EnemyCombatAction::Staggered:
-            result.clip = horde::scene::SkinnedClip::Attack;
-            result.clipTime = CombatTimeline::kSkeletonStaggerRecoverySampleSeconds +
-                (CombatTimeline::kSkeletonAttackRecoverySampleEndSeconds -
-                 CombatTimeline::kSkeletonStaggerRecoverySampleSeconds) *
-                    std::clamp(source.actionTime / 0.80f, 0.0f, 1.0f);
-            break;
-        case EnemyCombatAction::Dead:
-            result.clip = horde::scene::SkinnedClip::Dead;
-            result.clipTime = deadClipDuration > 0.0f
-                ? std::min(source.animationTime, deadClipDuration)
-                : source.animationTime;
-            break;
-        case EnemyCombatAction::Locomotion:
-        default:
-            result.clip = source.animation == EnemyAnimation::Walking
-                ? horde::scene::SkinnedClip::Walking
-                : horde::scene::SkinnedClip::Idle;
-            result.clipTime = source.animationTime * 0.90f;
-            break;
+            Check(std::abs(pose.transform[3] - sample.x) <= 0.000001f &&
+                      std::abs(pose.transform[7] - kRouteFloorWorldY) <= 0.000001f &&
+                      std::abs(pose.transform[11] - sample.z) <= 0.000001f,
+                  "ordinary renderer pose must preserve its transformed root");
         }
+        ++checked;
     }
 
-    const float recoil = source.action == EnemyCombatAction::Staggered
-        ? DiagnosticSkeletonStaggerRecoil(source.actionTime)
-        : 0.0f;
-    const float x = source.x - std::sin(source.facingRadians) * recoil * 0.20f;
-    const float z = source.z - std::cos(source.facingRadians) * recoil * 0.20f;
-    const float cosine = std::cos(source.facingRadians);
-    const float sine = std::sin(source.facingRadians);
-    const float lean = -0.30f * recoil;
-    const float leanCos = std::cos(lean);
-    const float leanSin = std::sin(lean);
-    result.transform = {{
-        cosine, sine * leanSin, sine * leanCos, x,
-        0.0f, leanCos, -leanSin,
-            horde::gameplay::kRouteFloorWorldY + recoil * 0.055f,
-        -sine, cosine * leanSin, cosine * leanCos, z}};
-    return result;
+    SkeletonEnemySnapshot walking;
+    walking.animation = EnemyAnimation::Walking;
+    walking.animationTime = 0.65f;
+    const auto phaseZero = horde::scene::EvaluateSkeletonRenderPose(walking, deadClipDuration);
+    const auto phaseOffset = horde::scene::EvaluateSkeletonRenderPose(
+        [&] { auto value = walking; value.animationTime = 0.0f; return value; }(), deadClipDuration);
+    Check(std::abs((phaseZero.time - phaseOffset.time) - 0.585f) <= 0.000001f,
+          "distinct authored walking phase seeds must reach distinct renderer sample times");
+
+    SkeletonEnemySnapshot idle;
+    idle.animation = EnemyAnimation::Idle;
+    idle.animationTime = 0.4f;
+    const auto idleBase = horde::scene::EvaluateSkeletonRenderPose(idle, deadClipDuration);
+    idle.idlePhaseSeconds = 0.25f;
+    const auto idleOffset = horde::scene::EvaluateSkeletonRenderPose(idle, deadClipDuration);
+    Check(std::abs((idleOffset.time - idleBase.time) - idle.idlePhaseSeconds) <= 0.000001f,
+          "idle presentation phase offset must be included by the shared renderer pose helper");
+
+    SkeletonEnemySnapshot dead;
+    dead.animation = EnemyAnimation::Dead;
+    dead.animationTime = 3.1f;
+    const auto deadPose = horde::scene::EvaluateSkeletonRenderPose(dead, deadClipDuration);
+    Check(deadPose.time == deadClipDuration,
+          "dead renderer clip time must remain bounded by the loaded clip duration");
+
+    SkeletonEnemySnapshot deadLocomotion;
+    deadLocomotion.animation = EnemyAnimation::Dead;
+    deadLocomotion.animationTime = 0.6f;
+    const auto deadWithoutDuration = horde::scene::EvaluateSkeletonRenderPose(deadLocomotion, 0.0f);
+    Check(deadWithoutDuration.clip == horde::scene::SkeletonClip::Dead &&
+              std::abs(deadWithoutDuration.time - 0.54f) <= 0.000001f,
+          "dead animation without a loaded duration must retain locomotion sample-time precedence");
+
+    SkeletonEnemySnapshot deadAttack = deadLocomotion;
+    deadAttack.action = EnemyCombatAction::AttackActive;
+    deadAttack.actionTime = 0.11f;
+    const float deadAttackActionTime = CombatTimeline::kSkeletonAttackWindupSeconds + 0.11f;
+    const auto deadAttackWithoutDuration = horde::scene::EvaluateSkeletonRenderPose(deadAttack, 0.0f);
+    const auto deadAttackNegativeDuration = horde::scene::EvaluateSkeletonRenderPose(deadAttack, -1.0f);
+    Check(deadAttackWithoutDuration.clip == horde::scene::SkeletonClip::Dead &&
+              std::abs(deadAttackWithoutDuration.time - deadAttackActionTime) <= 0.000001f &&
+              std::abs(deadAttackNegativeDuration.time - deadAttackActionTime) <= 0.000001f,
+          "dead animation with no usable duration must keep attack action-clock precedence");
+
+    SkeletonEnemySnapshot deadActionWalking = deadLocomotion;
+    deadActionWalking.animation = EnemyAnimation::Walking;
+    deadActionWalking.action = EnemyCombatAction::Dead;
+    const auto deadActionWithoutDuration =
+        horde::scene::EvaluateSkeletonRenderPose(deadActionWalking, -1.0f);
+    Check(deadActionWithoutDuration.clip == horde::scene::SkeletonClip::Dead &&
+              deadActionWithoutDuration.time == deadActionWalking.animationTime,
+          "dead action without a usable clip duration must retain the animation-time fallback");
+
+    SkeletonEnemySnapshot idleAttack;
+    idleAttack.animation = EnemyAnimation::Idle;
+    idleAttack.action = EnemyCombatAction::AttackActive;
+    idleAttack.actionTime = 0.11f;
+    idleAttack.idlePhaseSeconds = 0.25f;
+    const auto idleDuringAttack = horde::scene::EvaluateSkeletonRenderPose(idleAttack, deadClipDuration);
+    Check(std::abs(idleDuringAttack.time - deadAttackActionTime) <= 0.000001f,
+          "idle phase offset must not override a non-locomotion action clock");
+    std::cout << "shared-skeleton-render-pose-contracts cases=" << checked << '/' << cases.size()
+              << " walkingPhaseDelta=" << (phaseZero.time - phaseOffset.time)
+              << " idlePhaseDelta=" << (idleOffset.time - idleBase.time)
+              << " deadTime=" << deadPose.time
+              << " zeroNegativeDurationEdges=4\n";
 }
 
 std::array<float, 3u> ApplySkeletonTransform(
@@ -2924,7 +2984,7 @@ void TestCombatPulseAgainstImportedSwordAndSkeletonBounds(const bool detailed = 
                 if (liveTarget.health > 0)
                 {
                     const DiagnosticSkeletonRenderSample targetSample =
-                        CurrentCharacterRenderMapping(liveTarget,
+                        ResolveSharedCharacterRenderPose(liveTarget,
                             skeleton.ClipDuration(SkinnedClip::Dead));
                     std::vector<horde::scene::SkinnedRtVertex> dynamicPose;
                     const bool targetResolved = skeleton.Skin(
@@ -2964,7 +3024,7 @@ void TestCombatPulseAgainstImportedSwordAndSkeletonBounds(const bool detailed = 
                 }
 
                 const auto& publishedTarget = record.after.combatants[0];
-                const DiagnosticSkeletonRenderSample publishedSample = CurrentCharacterRenderMapping(
+                const DiagnosticSkeletonRenderSample publishedSample = ResolveSharedCharacterRenderPose(
                     publishedTarget, skeleton.ClipDuration(SkinnedClip::Dead));
                 std::vector<horde::scene::SkinnedRtVertex> publishedPose;
                 const bool publishedResolved = skeleton.Skin(
@@ -3186,7 +3246,7 @@ void TestDynamicCombatPulseNeighborhood(const bool capsuleOnly = false)
             Check(target.health > 0,
                   "unhit parallel control must keep a live target through the pulse neighborhood");
             const DiagnosticSkeletonRenderSample attackSample =
-                CurrentCharacterRenderMapping(target,
+                ResolveSharedCharacterRenderPose(target,
                     skeleton.ClipDuration(SkinnedClip::Dead));
             Check(target.action == EnemyCombatAction::AttackWindup ||
                       target.action == EnemyCombatAction::AttackActive,
@@ -3498,7 +3558,7 @@ void TestBoundedCombatPulseSweep()
                        target.action == EnemyCombatAction::AttackActive),
                   "parallel unhit control must retain a live attacking target");
             const DiagnosticSkeletonRenderSample attackSample =
-                CurrentCharacterRenderMapping(target,
+                ResolveSharedCharacterRenderPose(target,
                     skeleton.ClipDuration(SkinnedClip::Dead));
             Check(attackSample.clip == SkinnedClip::Attack,
                   "live sweep control must use the imported Attack clip");
@@ -3792,7 +3852,7 @@ void TestWalkingCombatRangeCone(const bool innerBracket = false)
                 const bool resolved = ResolveHeldItemsFixedStep(items, input, tick, fixed, diagnostic) &&
                     ResolveProductionAnatomicalSword(input, fixed.kinematics, items, rig,
                         rigTick++, worldFromGrip, worldFromSword, diagnostic);
-                const auto targetSample = CurrentCharacterRenderMapping(target,
+                const auto targetSample = ResolveSharedCharacterRenderPose(target,
                     skeleton.ClipDuration(SkinnedClip::Dead));
                 std::vector<horde::scene::SkinnedRtVertex> targetPose;
                 const bool skinned = skeleton.Skin(targetSample.clip, targetSample.clipTime, targetPose, diagnostic);
@@ -4880,6 +4940,11 @@ int main(const int argc, char** argv)
     if (argc > 1 && std::string(argv[1]) == "--parry-torch-clearance")
     {
         TestParryTorchMeshClearance();
+        return failures == 0 ? 0 : 1;
+    }
+    if (argc > 1 && std::string(argv[1]) == "--skeleton-render-pose-contracts")
+    {
+        TestSharedSkeletonRenderPoseContracts();
         return failures == 0 ? 0 : 1;
     }
     if (argc > 1 && std::string(argv[1]) == "--combat-inner-range-cone")

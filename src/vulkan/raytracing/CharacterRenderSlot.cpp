@@ -1,8 +1,6 @@
 #include "vulkan/raytracing/CharacterRenderSlot.h"
 #include "vulkan/raytracing/RtSceneRecordObservation.h"
-
-#include "gameplay/CombatTimeline.h"
-#include "gameplay/ShowcaseRoute.h"
+#include "scene/SkeletonRenderPose.h"
 
 #include <algorithm>
 #include <cmath>
@@ -19,120 +17,6 @@ constexpr std::array<std::uint32_t, 40u> kLichStaffEmissiveVertices{{
     17996u, 18822u, 18823u, 18826u, 18829u, 18835u, 19152u, 19153u,
     19154u, 19174u, 19792u, 20010u, 20011u, 20012u, 20385u, 20387u,
     20388u, 20389u, 20390u, 20625u, 20845u, 20846u, 21255u, 25309u}};
-
-// There is no separate stagger asset, so successful parry routes into a
-// renderer-selected sample of the Attack clip, then advances through its
-// authored recovery while the gameplay action remains stationary. The 1.20 s
-// value is this stagger recovery sample, not the normal damage edge. These are
-// renderer-only sampling bounds; gameplay owns the 800 ms Staggered action.
-constexpr float kSkeletonStaggerRecoverySampleTime =
-    horde::gameplay::CombatTimeline::kSkeletonStaggerRecoverySampleSeconds;
-constexpr float kSkeletonAttackRecoveryEndTime =
-    horde::gameplay::CombatTimeline::kSkeletonAttackRecoverySampleEndSeconds;
-constexpr float kSkeletonStaggerDuration = 0.80f;
-
-float SmoothStep01(const float value)
-{
-    const float clamped = std::clamp(value, 0.0f, 1.0f);
-    return clamped * clamped * (3.0f - 2.0f * clamped);
-}
-
-float SkeletonStaggerRecoil(const float actionTime)
-{
-    // The parry reads as a sharp, early knockback, then has enough time to
-    // settle before gameplay releases the attack token at 800 ms.
-    constexpr float kImpactDuration = 0.14f;
-    const float elapsed = std::clamp(actionTime, 0.0f, kSkeletonStaggerDuration);
-    if (elapsed <= kImpactDuration)
-    {
-        return SmoothStep01(elapsed / kImpactDuration);
-    }
-    return 1.0f - SmoothStep01((elapsed - kImpactDuration) /
-                               (kSkeletonStaggerDuration - kImpactDuration));
-}
-
-horde::scene::SkeletonClip SkeletonClipForAction(
-    horde::gameplay::EnemyCombatAction action,
-    horde::gameplay::EnemyAnimation animation)
-{
-    using Action = horde::gameplay::EnemyCombatAction;
-    if (animation == horde::gameplay::EnemyAnimation::Dead)
-    {
-        return horde::scene::SkeletonClip::Dead;
-    }
-    switch (action)
-    {
-    case Action::AttackWindup:
-    case Action::AttackActive:
-    case Action::AttackRecovery:
-    case Action::Staggered:
-        return horde::scene::SkeletonClip::Attack;
-    case Action::Dead:
-        return horde::scene::SkeletonClip::Dead;
-    case Action::Locomotion:
-    default:
-        return animation == horde::gameplay::EnemyAnimation::Walking
-            ? horde::scene::SkeletonClip::Walking
-            : horde::scene::SkeletonClip::Idle;
-    }
-}
-
-float SkeletonTimeForAction(horde::gameplay::EnemyCombatAction action,
-                            horde::gameplay::EnemyAnimation animation,
-                            float actionTime,
-                            float animationTime,
-                            float deadClipDuration)
-{
-    using Action = horde::gameplay::EnemyCombatAction;
-    if (animation == horde::gameplay::EnemyAnimation::Dead && deadClipDuration > 0.0f)
-    {
-        return std::min(animationTime, deadClipDuration);
-    }
-    switch (action)
-    {
-    case Action::AttackWindup:
-        return std::clamp(actionTime, 0.0f,
-                          horde::gameplay::CombatTimeline::kSkeletonAttackWindupSeconds);
-    case Action::AttackActive:
-        return horde::gameplay::CombatTimeline::kSkeletonAttackWindupSeconds +
-               std::clamp(actionTime, 0.0f,
-                          horde::gameplay::CombatTimeline::kSkeletonAttackActiveSeconds);
-    case Action::AttackRecovery:
-        return horde::gameplay::CombatTimeline::kSkeletonAttackWindupSeconds +
-               horde::gameplay::CombatTimeline::kSkeletonAttackActiveSeconds +
-               std::clamp(actionTime, 0.0f,
-                          horde::gameplay::CombatTimeline::kSkeletonAttackRecoverySeconds);
-    case Action::Staggered:
-        return kSkeletonStaggerRecoverySampleTime +
-               (kSkeletonAttackRecoveryEndTime - kSkeletonStaggerRecoverySampleTime) *
-                   std::clamp(actionTime / kSkeletonStaggerDuration, 0.0f, 1.0f);
-    case Action::Dead:
-        return deadClipDuration > 0.0f ? std::min(animationTime, deadClipDuration) : animationTime;
-    case Action::Locomotion:
-    default:
-        return animationTime * 0.90f;
-    }
-}
-
-VkTransformMatrixKHR SkeletonInstanceTransform(
-    const horde::gameplay::simulation::SkeletonEnemySnapshot& skeleton)
-{
-    const float recoil = skeleton.action == horde::gameplay::EnemyCombatAction::Staggered
-        ? SkeletonStaggerRecoil(skeleton.actionTime)
-        : 0.0f;
-    const float x = skeleton.x - std::sin(skeleton.facingRadians) * recoil * 0.20f;
-    const float z = skeleton.z - std::cos(skeleton.facingRadians) * recoil * 0.20f;
-    const float facingRadians = skeleton.facingRadians;
-    const float enemyCos = std::cos(facingRadians);
-    const float enemySin = std::sin(facingRadians);
-    const float lean = -0.30f * recoil;
-    const float leanCos = std::cos(lean);
-    const float leanSin = std::sin(lean);
-    return {{
-        enemyCos, enemySin * leanSin, enemySin * leanCos, x,
-        0.0f, leanCos, -leanSin, horde::gameplay::kRouteFloorWorldY + recoil * 0.055f,
-        -enemySin, enemyCos * leanSin, enemyCos * leanCos, z}};
-}
 
 VkTransformMatrixKHR LichInstanceTransform(const horde::gameplay::LichSnapshot& lich)
 {
@@ -190,15 +74,14 @@ CharacterFramePlan EvaluateCharacterFramePlan(
     {
         const auto& source = skeletons[skeletonIndex];
         auto& destination = plan.skeletons[skeletonIndex];
-        destination.clip = SkeletonClipForAction(source.action, source.animation);
-        destination.time = SkeletonTimeForAction(
-            source.action, source.animation, source.actionTime, source.animationTime, skeletonDeadClipDuration);
-        if (source.action == horde::gameplay::EnemyCombatAction::Locomotion &&
-            source.animation == horde::gameplay::EnemyAnimation::Idle)
-        {
-            destination.time += source.idlePhaseSeconds;
-        }
-        destination.transform = SkeletonInstanceTransform(source);
+        const horde::scene::SkeletonRenderPose pose =
+            horde::scene::EvaluateSkeletonRenderPose(source, skeletonDeadClipDuration);
+        destination.clip = pose.clip;
+        destination.time = pose.time;
+        destination.transform = {{
+            {pose.transform[0], pose.transform[1], pose.transform[2], pose.transform[3]},
+            {pose.transform[4], pose.transform[5], pose.transform[6], pose.transform[7]},
+            {pose.transform[8], pose.transform[9], pose.transform[10], pose.transform[11]}}};
         destination.poseBucket = static_cast<std::uint32_t>(plan.skeletonPoseBucketCount);
         for (std::size_t previousIndex = 0u; previousIndex < skeletonIndex; ++previousIndex)
         {
