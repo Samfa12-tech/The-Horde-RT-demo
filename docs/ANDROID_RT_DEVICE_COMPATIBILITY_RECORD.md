@@ -1,5 +1,19 @@
 # Android RT Device Compatibility Record
 
+## 8 October controller candidate install — SM-S948B / Android 16
+
+Evidence class: **exact Debug install/pullback and preference-preservation only**.
+Source `c8cbb4a4ca4341b555d2c138008fcb2305011cf7`, APK SHA-256
+`2467d05e0042976f7303a31094b9ffff13720f14c93bc811b5602d94b42a4c7a`, 138,462,724 bytes.
+Installed base matches; zero preference-entry changes. Owner rotation `free`
+remains unchanged. Normal cold launch succeeds, but the immediate image is
+loading and USB disconnects before ready presentation/log collection. No new
+RT-route, controller, moving appearance or sustained performance pass is claimed.
+The owner will attach the USB-C Backbone after removing the computer cable;
+controller model/physical matrix and later owned-log retrieval remain pending.
+Windows generic HID VID 358A/PID 0204 does not certify this phone/controller.
+[Exact package and remaining matrix](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#current-installed-follow-up--c8cbb4a4).
+
 Last updated: 2026-10-08
 
 ## 8 October farther torch view and owner playtest — SM-S948B / Android 16

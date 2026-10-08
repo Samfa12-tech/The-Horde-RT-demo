@@ -1,9 +1,57 @@
 # Android controller and wider-view checkpoint, 8 October 2026
 
-The owner's queue addition is implemented for host review on existing PR18.
-Physical Android controller support is **not yet accepted**. The owner is away
-with the phone: no ADB, installs, device waits or owner testing occurred in this
-checkpoint. Continue the existing tomb finish goal and preserve prior results.
+The owner's queue addition is implemented on existing PR18. Physical Android
+controller support is **not yet accepted**. The owner returned; the exact c8
+Debug package is installed with preferences preserved. The hands-on check is
+prepared for a USB/Backbone cable swap. Earlier away-device checkpoints below retain
+their own source, package and evidence identities.
+
+## Current installed follow-up — c8cbb4a4
+
+- Runtime source: `c8cbb4a4ca4341b555d2c138008fcb2305011cf7`; tree `bea0121107417eafda2c1aa4f8b6a1b1eaa3f6fa`.
+- Windows Debug: 11,553,280 bytes; SHA-256 `7ac86dd2fd2a3535f385b21758a4538eb762a5a270d8886954bad5dbce8c6fc7`.
+- Four-ABI Debug APK: 138,462,724 bytes; SHA-256 `2467d05e0042976f7303a31094b9ffff13720f14c93bc811b5602d94b42a4c7a`.
+- Exact-source packages are sealed in `task-4/integrated-162-c8cbb4a4-20261008`.
+  SDK 37 16 KiB alignment passes. Manifest/fullUser/code 10/1.6.2-debug, all
+  91 assets and Java dex are byte-identical to the 454 package. All four native
+  libraries change. The original 454 Java 213-test/lint pass is retained with
+  its own identity; no fresh Java rerun is claimed for this native-only slice.
+- Seven affected native CTests and Windows build pass; four-ABI assembly passes
+  in 40 s. [Node-query baseline, coverage and limits](ENGINEERING_1_6_2_ANDROID_MOTION_2026_10_08.md#bounded-node-pose-query-follow-up-8-october).
+
+Native payload SHA-256:
+
+- `lib/arm64-v8a/libhorde_rt_probe_android.so`: `6fbbb1f61e7ad9c6e9d1254ffc9355fea20d75ef7c28e51da06da6267227067f`.
+- `lib/armeabi-v7a/libhorde_rt_probe_android.so`: `9c77e1ddcde9e1c587ef423f2cae77f84aa59b7de8f8d8fc97c03b56411e6780`.
+- `lib/x86/libhorde_rt_probe_android.so`: `d9709ae850a89b653bbf2448ea50826930d2882ad7d738665dfcfc0be5f0d39a`.
+- `lib/x86_64/libhorde_rt_probe_android.so`: `fd78d73c5247920a35a71ca77c990100bba02e8a7e302e028e6f03cb1a7620b6`.
+
+SM-S948B/Android 16 was identified before installing only
+`com.samfa12.hordelanternrt.debug`. Rotation was `free` and remained untouched.
+Install/pullback verification completes at 2026-10-08T04:01:57Z with **zero changed
+preference entries** and the exact APK hash above. Normal cold launch succeeds;
+the immediate screenshot captures loading, so it does not prove ready RT
+presentation. USB disconnects before the ready capture/log collection. The
+owner is handed the opened build for a physical Backbone check; logs can be
+collected after USB return. No synthetic controller or physical pass is claimed.
+The model/edition, cold/hot connection, menus/Graphics, combat, both landscape
+directions/portrait, rotation, unplug/reconnect/Home and safe touch fallback
+remain outstanding observations.
+
+Pre-install Android input enumeration contains no controller. The computer
+reports generic HID controller VID 358A / PID 0204; this is a Windows identity,
+not an identified Android device/model. The first log attempt has a malformed
+`--pid` argument; its corrected time-filtered client reaches the existing 12 s
+deadline and is terminated. The next bounded state check reports USB absent.
+No wait loop, unrelated process termination, data clearing or security change
+occurs. Exact install/prefs/launch/capture and failed invocation records are kept
+privately. Package hashes remain immutable.
+
+Source c8 CI: PR 37725325043 complete success 6/6; push 37725320895 in progress
+with 5/6 successful jobs at this checkpoint. Source 453 separately passes 12/12.
+No earlier CI, appearance or performance result is assigned to c8. The earlier
+454 frozen captures below remain their own evidence; c8 adds no new completed
+RT capture, moving/secondary-view acceptance or sustained FPS claim.
 
 ## Current integrated follow-up — 454d58ee
 

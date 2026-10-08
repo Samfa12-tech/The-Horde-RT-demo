@@ -1,6 +1,26 @@
 # 1.6.2 tomb finish — active post-reset work
 
-**8 October integrated controller/pose checkpoint:** runtime
+**8 October installed controller/pose checkpoint:** runtime
+`c8cbb4a4ca4341b555d2c138008fcb2305011cf7`, tree
+`bea0121107417eafda2c1aa4f8b6a1b1eaa3f6fa`. Batched named-node pose sampling is
+used for the player's Grip/hand and shoulder queries without changing valid
+pose or combat behavior. Seven affected native CTests, Windows Debug and
+four-ABI Android Debug builds pass. The unchanged Java dex retains the separate
+454 source's 213-test/lint evidence; no fresh Java run is claimed for this slice.
+The exact Debug APK is installed and pullback-hash verified on SM-S948B/Android
+16 with zero changed preference entries. The owner returned; the Backbone
+check is prepared for a USB cable swap. No controller was present in the
+pre-install Android roster; generic Windows HID enumeration is separate evidence.
+
+APK SHA-256: `2467d05e0042976f7303a31094b9ffff13720f14c93bc811b5602d94b42a4c7a`.
+Source c8 PR CI is complete at 6/6; push CI is still running with 5/6 successful
+jobs at this checkpoint. Previous 453 CI is complete at 12/12. Documentation CI
+is separate. Moving equipment/secondary views/full route, contact calibration,
+sustained phone quality/cost, changed audio/haptics and independent final audit
+remain open. Dust stays optional/default Off; shafts deferred. No release.
+[Exact packages, preserved checks and physical acceptance matrix](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md#current-installed-follow-up--c8cbb4a4).
+
+**Earlier 8 October integrated controller/pose checkpoint:** runtime
 `454d58ee0f71bdb837a75ce486d6c139e03e0b02` adds native-dialog focus suspension
 to the Android controller path and makes contact diagnostics consume the actual
 shared skeleton render poses. Standard input, native navigation, HUD separation,
@@ -43,10 +63,12 @@ and Graphics acknowledgement/persistence rules remain authoritative.
 Slight extra equipment separation in wider viewports must use aspect ratio and
 shared hand/Grip pose ownership, preserve portrait, combat reach and hit timing.
 Android physical acceptance requires an exact phone/OS/APK/controller matrix;
-Windows, synthetic events and builds cannot close it. The owner is away with the
-phone: no ADB/device work, device waits or owner test requests until explicit
-return and intended-device verification. Continue safe host implementation and
-push coherent checkpoints on PR18. No release is authorized.
+Windows, synthetic events and builds cannot close it. The owner returned and
+the intended phone was verified on 8 October; c8 is installed with preferences
+preserved. The physical matrix is pending the owner-controlled USB/Backbone
+cable swap. If the owner takes the phone away again, hold all device work and
+owner test requests until explicit return and verification. Continue safe host
+work and push coherent checkpoints on PR18. No release is authorized.
 
 The queue implementation and corrected frozen aspect delivery are now checked
 on the host; the exact physical matrix remains outstanding in the
