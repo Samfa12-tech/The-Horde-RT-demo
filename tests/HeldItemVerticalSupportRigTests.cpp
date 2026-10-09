@@ -1,4 +1,5 @@
 #include "gameplay/animation/PlayerAnimationState.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "scene/ShowcaseOverheadGeometry.h"
@@ -225,16 +226,21 @@ struct RigResult
     HeldItemTransform rightGrip{};
     HeldItemTransform bodyStowSword{};
     WorldBounds skinnedBodyBounds{};
+    Vec3 eye{}, bodyRoot{}, leftShoulder{}, rightShoulder{}, leftWrist{}, rightWrist{};
+    float bootGroundingOffset = 0.0f;
 };
 
 bool Solve(PlayerRenderSlot& rig,
            const HeldItemFixedStepInput& input,
            const std::uint64_t tick,
            RigResult& result,
-           std::string& diagnostic)
+           std::string& diagnostic,
+           const horde::gameplay::simulation::SimulationSnapshot* staged = nullptr)
 {
-    auto items = MakeDefaultHeldItemStates();
-    if (!ResolveHeldItemsFixedStep(items, input, tick, result.fixed, diagnostic))
+    auto items = staged != nullptr ? staged->heldItems : MakeDefaultHeldItemStates();
+    if (staged != nullptr)
+        result.fixed.kinematics = staged->heldItemKinematics;
+    else if (!ResolveHeldItemsFixedStep(items, input, tick, result.fixed, diagnostic))
         return false;
 
     const float eyeY = kShowcaseEyeWorldY +
@@ -259,7 +265,7 @@ bool Solve(PlayerRenderSlot& rig,
     animationInput.walkAmount = input.walkAmount;
     horde::gameplay::animation::PlayerAnimationState animationState;
     animationState.StepFixed(animationInput, 1.0f / 60.0f);
-    auto animation = animationState.Snapshot();
+    auto animation = staged != nullptr ? staged->playerAnimation : animationState.Snapshot();
 
     const auto gait = EvaluateLowerBodyPose(input.walkTime, input.walkAmount);
     const Vec3 bodyForward{{std::sin(input.playerYawRadians), 0.0f,
@@ -275,6 +281,11 @@ bool Solve(PlayerRenderSlot& rig,
         Add(Add(eye, Scale(bodyRight, gait.pelvisSway)),
             Vec3{{0.0f, gait.pelvisBob * 0.65f, 0.0f}}),
         input.playerSupportWorldY, rig.BootGroundingOffsetMetres(animation));
+    result.eye = eye;
+    result.bodyRoot = root;
+    result.bootGroundingOffset = rig.BootGroundingOffsetMetres(animation);
+    result.leftShoulder = Add(eye, ViewToWorld(animation.leftIk.shoulder, right, viewUp, forward));
+    result.rightShoulder = Add(eye, ViewToWorld(animation.rightIk.shoulder, right, viewUp, forward));
     const auto modelVector = [&](const Vec3& vector) {
         return WorldVectorToPlayerModel(basis,
             ViewToWorld(vector, right, viewUp, forward));
@@ -309,13 +320,20 @@ bool Solve(PlayerRenderSlot& rig,
     const auto& sockets = rig.BoneSockets();
     result.leftGrip = WorldSocket(sockets.leftGrip, basis, root);
     result.rightGrip = WorldSocket(sockets.rightGrip, basis, root);
+    const auto leftHand = WorldSocket(sockets.leftHand, basis, root);
+    const auto rightHand = WorldSocket(sockets.rightHand, basis, root);
+    result.leftWrist = {{leftHand[12], leftHand[13], leftHand[14]}};
+    result.rightWrist = {{rightHand[12], rightHand[13], rightHand[14]}};
     HeldItemTransform worldFromHips{};
     if (!rig.AnimatedHipsWorldTransform(animation, basis, root,
                                         worldFromHips, diagnostic) ||
         !ComposeWorldFromItem(worldFromHips, SwordBodyStowFromHips(),
                               result.bodyStowSword, diagnostic) ||
-        !rig.ResolveHeldItemVisuals(items, result.leftGrip, result.rightGrip,
-                                    result.renderItems, diagnostic))
+        !(staged != nullptr
+            ? rig.ResolveHeldItemVisuals(items, result.leftGrip, result.rightGrip,
+                                        result.bodyStowSword, result.renderItems, diagnostic)
+            : rig.ResolveHeldItemVisuals(items, result.leftGrip, result.rightGrip,
+                                        result.renderItems, diagnostic)))
         return false;
     return ComposeHeldLightState(result.renderItems[0].worldFromItem,
         PlayerRagTorchFlameSocketTransform(), PlayerRagTorchLightSocketTransform(),
@@ -454,6 +472,203 @@ float ActualTorchHeadroom(const RigResult& solved,
         Headroom(TransformPoint(solved.light.worldFromLight, {{0.0f, 0.0f, 0.0f}}),
                  realRoofTriangles));
     return minimum;
+}
+// The exact GPU-failing pose needs the production snapshot, not default
+// hand-held equipment or a recreated animation with different stow authority.
+bool SolveStaged(PlayerRenderSlot& rig,
+                 const horde::gameplay::simulation::SimulationSnapshot& snapshot,
+                 const std::uint64_t poseTick, RigResult& result, std::string& diagnostic)
+{
+    HeldItemFixedStepInput input;
+    input.playerX = snapshot.playerX;
+    input.playerZ = snapshot.playerZ;
+    input.playerYawRadians = snapshot.playerYawRadians;
+    input.playerPitchRadians = snapshot.playerPitchRadians;
+    input.walkTime = snapshot.walkTime;
+    input.walkAmount = snapshot.walkAmount;
+    input.playerSupportWorldY = snapshot.playerSupportWorldY;
+    input.playerMountProfile = snapshot.playerMountProfile;
+    return Solve(rig, input, poseTick, result, diagnostic, &snapshot);
+}
+
+bool TransformsMatch(const HeldItemTransform& a, const HeldItemTransform& b)
+{
+    for (std::size_t i = 0u; i < a.size(); ++i)
+        if (!std::isfinite(a[i]) || !std::isfinite(b[i]) || std::abs(a[i] - b[i]) > 0.001f)
+            return false;
+    return true;
+}
+
+// Positive and corrupted cases share this validator; no zero-pixel exemption.
+bool ValidateStagedRig(const horde::gameplay::simulation::SimulationSnapshot& snapshot,
+                       const RigResult& solved,
+                       const horde::scene::assets::StaticMeshAsset& torch,
+                       const std::vector<OverheadTriangle>& roof, std::string& diagnostic)
+{
+    const auto fail = [&](const char* reason) { diagnostic = reason; return false; };
+    if (solved.skinnedBodyBounds.points == 0u) return fail("missing skinned geometry");
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+        if (!std::isfinite(solved.skinnedBodyBounds.minimum[axis]) ||
+            !std::isfinite(solved.skinnedBodyBounds.maximum[axis]) ||
+            solved.skinnedBodyBounds.maximum[axis] < solved.skinnedBodyBounds.minimum[axis])
+            return fail("nonfinite or inverted skinned geometry");
+    if (!std::isfinite(solved.eye[1]) || !std::isfinite(solved.bodyRoot[1]) ||
+        std::abs(solved.eye[1] - (snapshot.playerSupportWorldY + 1.65f)) > 0.001f ||
+        std::abs(solved.bodyRoot[1] - snapshot.playerSupportWorldY - solved.bootGroundingOffset) > 0.001f ||
+        std::abs(solved.skinnedBodyBounds.minimum[1] - snapshot.playerSupportWorldY -
+                 kPlayerBootGroundingSafetyMetres) > 0.001f)
+        return fail("body mesh or eye applied support incorrectly");
+    for (const auto& pair : {std::array<Vec3, 2u>{{solved.leftShoulder, solved.leftWrist}},
+                             std::array<Vec3, 2u>{{solved.rightShoulder, solved.rightWrist}}})
+    {
+        const auto distance = Add(pair[1], Scale(pair[0], -1.0f));
+        if (!std::isfinite(Dot(distance, distance)) ||
+            std::sqrt(Dot(distance, distance)) > kPlayerAnatomicalHandReachLimitMetres + 0.001f)
+            return fail("actual wrist is outside anatomical reach");
+    }
+    if (!ValidateHeldItemState(solved.renderItems[0]) ||
+        !TransformsMatch(MultiplyHeldItemTransforms(solved.renderItems[0].worldFromItem,
+                                                   PlayerRagTorchGripSocketTransform()), solved.leftGrip))
+        return fail("torch no longer attaches to the solved rig Grip");
+    if (!ValidateHeldItemState(solved.renderItems[1]) ||
+        !TransformsMatch(solved.renderItems[1].worldFromItem, solved.bodyStowSword))
+        return fail("production stowed sword no longer attaches to animated Hips");
+    if (!solved.light.active ||
+        !TransformsMatch(solved.light.worldFromFlame,
+            MultiplyHeldItemTransforms(solved.renderItems[0].worldFromItem,
+                                      PlayerRagTorchFlameSocketTransform())) ||
+        !TransformsMatch(solved.light.worldFromLight,
+            MultiplyHeldItemTransforms(solved.renderItems[0].worldFromItem,
+                                      PlayerRagTorchLightSocketTransform())))
+        return fail("flame or physical light left its authored item socket");
+    const float headroom = ActualTorchHeadroom(solved, torch, roof);
+    if (!std::isfinite(headroom) || headroom < kHeldTorchOverheadGap - 1.0e-5f)
+        return fail("actual torch mesh/flame/light violates roof clearance");
+    diagnostic.clear();
+    return true;
+}
+
+bool ValidateRecovery(const RigResult& returned, const RigResult& ordinary, std::string& diagnostic)
+{
+    if (!TransformsMatch(returned.leftGrip, ordinary.leftGrip) ||
+        !TransformsMatch(returned.rightGrip, ordinary.rightGrip) ||
+        !TransformsMatch(returned.bodyStowSword, ordinary.bodyStowSword) ||
+        !TransformsMatch(returned.renderItems[0].worldFromItem, ordinary.renderItems[0].worldFromItem) ||
+        !TransformsMatch(returned.light.worldFromFlame, ordinary.light.worldFromFlame) ||
+        !TransformsMatch(returned.light.worldFromLight, ordinary.light.worldFromLight) ||
+        returned.skinnedBodyBounds.points != ordinary.skinnedBodyBounds.points)
+    { diagnostic = "returned pose retains geometry/socket/light state absent from ordinary control"; return false; }
+    for (std::size_t axis = 0u; axis < 3u; ++axis)
+        if (std::abs(returned.bodyRoot[axis] - ordinary.bodyRoot[axis]) > 0.001f ||
+            std::abs(returned.skinnedBodyBounds.minimum[axis] - ordinary.skinnedBodyBounds.minimum[axis]) > 0.001f ||
+            std::abs(returned.skinnedBodyBounds.maximum[axis] - ordinary.skinnedBodyBounds.maximum[axis]) > 0.001f)
+        { diagnostic = "returned actual body bounds differ from ordinary control"; return false; }
+    diagnostic.clear();
+    return true;
+}
+
+bool CheckExactRaisedPose(PlayerRenderSlot& rig,
+                          const horde::scene::assets::StaticMeshAsset& torch,
+                          const std::vector<OverheadTriangle>& roof, std::string& diagnostic)
+{
+    using namespace horde::gameplay::simulation;
+    const auto* checkpoint = FindDevelopmentCheckpoint(171);
+    GameSimulation raised(ProductionGameSimulationConfig());
+    GameSimulation ordinary(ProductionGameSimulationConfig());
+    raised.SetPresentationAspect(16.0f / 9.0f);
+    ordinary.SetPresentationAspect(16.0f / 9.0f);
+    if (checkpoint == nullptr || !StageDevelopmentCheckpointSimulation(raised, *checkpoint) ||
+        !StageDevelopmentCheckpointSimulation(ordinary, *checkpoint))
+    { diagnostic = "exact production checkpoint171 staging failed"; return false; }
+    ordinary.SetDevelopmentSupportFixture(false, ordinary.Snapshot().playerSupportGeneration + 1u);
+    InputSnapshot input;
+    input.damageEnabled = false;
+    input.pitchRadians = checkpoint->pitch;
+    input.yawRadians = checkpoint->yaw;
+    ordinary.StepFixed(input, 0.0f);
+    const auto staged = raised.Snapshot();
+    if (staged.playerX != 0.0f || staged.playerZ != 0.0f || staged.playerYawRadians != 0.0f ||
+        staged.playerPitchRadians != -0.05f || !staged.playerGrounded ||
+        std::abs(staged.playerSupportWorldY - (-0.60f)) > 1.0e-5f ||
+        std::abs(staged.playerHeightDelta - 0.35f) > 1.0e-5f ||
+        staged.heldItems[1].parentMode != HeldItemParentMode::BodyStow ||
+        staged.heldItems[1].visualStowBlend != 1.0f ||
+        staged.heldItems[1].visualGripBlend != 0.0f)
+    { diagnostic = "checkpoint171 did not retain exact support/pose/production stowed equipment"; return false; }
+    RigResult constrained{}, floorControl{};
+    if (!SolveStaged(rig, staged, 1000u, constrained, diagnostic) ||
+        !ValidateStagedRig(staged, constrained, torch, roof, diagnostic) ||
+        !SolveStaged(rig, ordinary.Snapshot(), 1001u, floorControl, diagnostic) ||
+        !ValidateStagedRig(ordinary.Snapshot(), floorControl, torch, roof, diagnostic))
+        return false;
+    if (constrained.fixed.kinematics.torchOverheadLowering <= 0.0f &&
+        constrained.fixed.kinematics.torchOverheadRetraction <= 0.0f)
+    { diagnostic = "yaw0 raised pose did not exercise shared ceiling clearance"; return false; }
+
+    std::size_t negativeCases = 0u;
+    const auto rejected = [&](const RigResult& corrupted, const char* label) {
+        std::string reason;
+        if (ValidateStagedRig(staged, corrupted, torch, roof, reason))
+        { diagnostic = std::string("exact-pose validator admitted negative: ") + label; return false; }
+        ++negativeCases;
+        std::cout << "Exact-pose rejected " << label << ": " << reason << '\n';
+        return true;
+    };
+    auto corrupted = constrained;
+    corrupted.skinnedBodyBounds.points = 0u;
+    if (!rejected(corrupted, "missing geometry")) return false;
+    for (const float delta : {-0.35f, 0.35f})
+    {
+        corrupted = constrained;
+        corrupted.bodyRoot[1] += delta;
+        corrupted.eye[1] += delta;
+        corrupted.skinnedBodyBounds.minimum[1] += delta;
+        corrupted.skinnedBodyBounds.maximum[1] += delta;
+        if (!rejected(corrupted, delta < 0.0f ? "omitted support" : "doubled support")) return false;
+    }
+    corrupted = constrained; corrupted.leftWrist[1] += 2.0f;
+    if (!rejected(corrupted, "unreachable wrist")) return false;
+    corrupted = constrained; corrupted.renderItems[0].worldFromItem[12] += 0.02f;
+    if (!rejected(corrupted, "broken torch Grip")) return false;
+    corrupted = constrained; corrupted.renderItems[1].worldFromItem[12] += 0.02f;
+    if (!rejected(corrupted, "broken sword Hips attachment")) return false;
+    corrupted = constrained; corrupted.light.worldFromFlame[13] += 0.02f;
+    if (!rejected(corrupted, "independent flame offset")) return false;
+    corrupted = constrained; corrupted.light.worldFromLight[13] += 0.02f;
+    if (!rejected(corrupted, "independent physical-light offset")) return false;
+
+    // Independent production simulation follows identical planar commands with
+    // the fixture disabled. Same gait phase, equipment and input; no copied pose.
+    input.moveForward = -1.0f;
+    for (std::uint32_t tick = 0u; tick < 59u; ++tick)
+    { raised.StepFixed(input); ordinary.StepFixed(input); }
+    const auto returnedSnapshot = raised.Snapshot();
+    if (returnedSnapshot.playerSupportWorldY != kRouteFloorWorldY ||
+        returnedSnapshot.playerX != ordinary.Snapshot().playerX ||
+        returnedSnapshot.playerZ != ordinary.Snapshot().playerZ)
+    { diagnostic = "fixed-step descent did not return to matched ordinary floor"; return false; }
+    RigResult returned{}, returnedControl{};
+    if (!SolveStaged(rig, returnedSnapshot, 1002u, returned, diagnostic) ||
+        !ValidateStagedRig(returnedSnapshot, returned, torch, roof, diagnostic) ||
+        !SolveStaged(rig, ordinary.Snapshot(), 1003u, returnedControl, diagnostic) ||
+        !ValidateStagedRig(ordinary.Snapshot(), returnedControl, torch, roof, diagnostic) ||
+        !ValidateRecovery(returned, returnedControl, diagnostic))
+        return false;
+    if (returned.fixed.kinematics.torchOverheadLowering >=
+            constrained.fixed.kinematics.torchOverheadLowering)
+    { diagnostic = "returned floor did not release elevated ceiling lowering"; return false; }
+    std::string staleDiagnostic;
+    if (ValidateRecovery(constrained, returnedControl, staleDiagnostic))
+    { diagnostic = "recovery validator admitted the stale raised pose"; return false; }
+    ++negativeCases;
+    std::cout << "Exact checkpoint171 production rig yaw0 pitch-0.05 aspect16:9 passed; "
+              << "mesh points=" << constrained.skinnedBodyBounds.points
+              << " lowering/retraction/headroom=" << constrained.fixed.kinematics.torchOverheadLowering
+              << '/' << constrained.fixed.kinematics.torchOverheadRetraction
+              << '/' << ActualTorchHeadroom(constrained, torch, roof)
+              << " returned lowering=" << returned.fixed.kinematics.torchOverheadLowering
+              << " same-validator negatives=" << negativeCases << " descent ticks=59\n";
+    return true;
 }
 } // namespace
 
@@ -659,6 +874,11 @@ int main(int argc, char** argv)
     }
 
     if (!ok) return 1;
+    if (!CheckExactRaisedPose(rig, playerTorch, roofTriangles, diagnostic))
+    {
+        std::cerr << "Exact checkpoint171 regression failed: " << diagnostic << '\n';
+        return 1;
+    }
     std::cout << "Actual cached player rig support transform passed: support delta="
               << supportDelta << " m; actual skinned body vertices, hand/item sockets, reward-lantern hinge/body/flame/light, and torch clearance translated with XZ preserved.\n"
               << "First fixture (0,0) torch retraction/headroom floor="
