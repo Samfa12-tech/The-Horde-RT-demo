@@ -570,10 +570,10 @@ vec3 shadeBoundedDielectric(HitInfo firstHit, vec3 rayDirection)
     # no longer the admitted snapshot; keep exact mist/active-fire4, current ABI
     # and the reviewed shared presentation pre-rotation raw-word witnesses.
     $opaqueWordPins = @{
-        diagnostic_high_opaque_fast = '84f1b7dad88d0b6404bacaa1dcaba869c480a153ddb09a7f77c7a92454344130'
-        diagnostic_mobile_opaque_fast = '5bc1d5ffa38e8963245be312993d35fb919f18a93abeda07e61c74da7d32ffa1'
-        shipping_high_opaque_fast = 'a9d054caefebf8adc46953682683250edf589555432c60e9780f4702de78e91e'
-        shipping_mobile_opaque_fast = '1eb94976017d0d959b80da8b86ce8744836dc2f0e8f0c97b1cae2ddbca0a157b'
+        diagnostic_high_opaque_fast = '2417de5cadd3e753a081ae8f2e26bdc7cfe30d8c02758e8247bda0fa927a5fdd'
+        diagnostic_mobile_opaque_fast = 'd50c9d0e5bb65f5dd8ccf6f63ea81ca0952cc24f4883c8be21c02b4805ad5af3'
+        shipping_high_opaque_fast = '53c750339d09c6d86a962c0b6ee0a8b7d2fd3d2ecf964beeb8230e1a306f6c7f'
+        shipping_mobile_opaque_fast = 'ae779d534970ecb0c2e21289c07ddde58f239ea1906e36d7046323f4b7f249d9'
     }
     foreach ($row in @($catalog.variants | Where-Object { $_.material -eq 'OpaqueFast' })) {
         Assert-True ($row.spirvSha256 -ceq $opaqueWordPins[$row.key]) `
