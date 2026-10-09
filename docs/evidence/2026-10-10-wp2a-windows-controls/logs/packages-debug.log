@@ -1,0 +1,249 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 55
+      Start  55: horde_rt_pipeline_variants_tests
+
+55: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_pipeline_variants_tests.exe"
+55: Working Directory: <repo>/build/presets/windows-x64-debug
+55: Test timeout computed to be: 1500
+ 1/10 Test  #55: horde_rt_pipeline_variants_tests .........................   Passed    0.02 sec
+test 56
+      Start  56: horde_rt_pipeline_variant_provider_tests
+
+56: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_pipeline_variant_provider_tests.exe"
+56: Working Directory: <repo>/build/presets/windows-x64-debug
+56: Test timeout computed to be: 1500
+ 2/10 Test  #56: horde_rt_pipeline_variant_provider_tests .................   Passed    0.02 sec
+test 57
+      Start  57: horde_rt_pipeline_bundle_contracts_tests
+
+57: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_pipeline_bundle_contracts_tests.exe"
+57: Working Directory: <repo>/build/presets/windows-x64-debug
+57: Test timeout computed to be: 1500
+ 3/10 Test  #57: horde_rt_pipeline_bundle_contracts_tests .................   Passed    0.14 sec
+test 83
+      Start  83: horde_rt_raygen_variant_manifest_tests
+
+83: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RaygenVariantManifestTests.ps1"
+83: Working Directory: <repo>/build/presets/windows-x64-debug
+83: Test timeout computed to be: 600
+83: <user-home>\AppData\Local\Temp\horde-raygen-variants-9bb0e080587e4d409c6ae00dcfc3fa45\lf-variant-output\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+83: Raygen variant shipping_mobile_generic_dielectric: 285632 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=f95f347812f32154079cb48b1a412a9c346df59c26d02d8ffaaeda5f6222db4f
+83: <user-home>\AppData\Local\Temp\horde-raygen-variants-9bb0e080587e4d409c6ae00dcfc3fa45\crlf-variant-output\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+83: Raygen variant shipping_mobile_generic_dielectric: 285632 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=f95f347812f32154079cb48b1a412a9c346df59c26d02d8ffaaeda5f6222db4f
+83: Raygen variant manifest and temporary compiler matrix passed.
+ 4/10 Test  #83: horde_rt_raygen_variant_manifest_tests ...................   Passed   35.94 sec
+test 84
+      Start  84: horde_rt_raygen_variant_artifact_tests
+
+84: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RaygenVariantArtifactTests.ps1"
+84: Working Directory: <repo>/build/presets/windows-x64-debug
+84: Test timeout computed to be: 1200
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-d8d7fa2462584e4fa326353cf5478e37\diagnostic_high_generic_dielectric\minimal.rgen.resolved
+84: Raygen variant diagnostic_high_generic_dielectric: 295960 bytes; functions=83; calls=264; ray-query sites=2; dependency SHA-256=48417a6160c6b049f93f9a69f4630ec04790d22c6ad472a9ad77823a684272b8
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-d8d7fa2462584e4fa326353cf5478e37\diagnostic_high_opaque_fast\minimal.rgen.resolved
+84: Raygen variant diagnostic_high_opaque_fast: 595520 bytes; functions=1; calls=0; ray-query sites=29; dependency SHA-256=f48687e370d8f4c34b0cbcfd0ff0fdc7484d9a3c605e3bce7ea4d6f43e04258e
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-d8d7fa2462584e4fa326353cf5478e37\diagnostic_mobile_generic_dielectric\minimal.rgen.resolved
+84: Raygen variant diagnostic_mobile_generic_dielectric: 294460 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=d9eddf452a49888ecb3e6b4f72c89d737b6a61691b0e151f0320b18b5407c390
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-d8d7fa2462584e4fa326353cf5478e37\diagnostic_mobile_opaque_fast\minimal.rgen.resolved
+84: Raygen variant diagnostic_mobile_opaque_fast: 592420 bytes; functions=1; calls=0; ray-query sites=27; dependency SHA-256=e8f9143905742dceda9feda2493161e69d56d4a3ecf30ed4296f9b16fef0f9ca
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-d8d7fa2462584e4fa326353cf5478e37\shipping_high_generic_dielectric\minimal.rgen.resolved
+84: Raygen variant shipping_high_generic_dielectric: 287132 bytes; functions=83; calls=264; ray-query sites=2; dependency SHA-256=8c608eaf2e12a13ff100ed2d0acd82eb201afea395a651f3c2c1e876678cf6a0
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-d8d7fa2462584e4fa326353cf5478e37\shipping_high_opaque_fast\minimal.rgen.resolved
+84: Raygen variant shipping_high_opaque_fast: 591284 bytes; functions=1; calls=0; ray-query sites=29; dependency SHA-256=12168a8c2897ccc8795a53a2ca848a8ea7ebd4169695846e2700b56908baade6
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-d8d7fa2462584e4fa326353cf5478e37\shipping_mobile_generic_dielectric\minimal.rgen.resolved
+84: Raygen variant shipping_mobile_generic_dielectric: 285632 bytes; functions=83; calls=261; ray-query sites=2; dependency SHA-256=f95f347812f32154079cb48b1a412a9c346df59c26d02d8ffaaeda5f6222db4f
+84: <user-home>\AppData\Local\Temp\horde-raygen-freeze-d8d7fa2462584e4fa326353cf5478e37\shipping_mobile_opaque_fast\minimal.rgen.resolved
+84: Raygen variant shipping_mobile_opaque_fast: 588184 bytes; functions=1; calls=0; ray-query sites=27; dependency SHA-256=9f47b79fc53f8ccec50d32857d96cd2b663dee14332619322b4bfebd14f1eb30
+84: Frozen raygen variant catalog matches a fresh eight-key compilation.
+84: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-725ea3107c8c4f62a8c2a0a1db538a20\compatibility-generic\minimal.rgen.resolved
+84: Raygen check artifacts: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-725ea3107c8c4f62a8c2a0a1db538a20\compatibility-generic
+84: Source dependency SHA-256: fd1ecfed52a9f94c146c3f490ad8441c17fb6c4c399e5257d7a5d20c783e91b7; embedded include SHA-256: 48c920b5ed71dca2ca3b000bc25ccf0c77693af0982c553d79e91c892d004713
+84: SPIR-V bytes: 294904; words: 73726; instructions: 17577; branch operations: 974; loops: 20; selection merges: 413; SHA-256: fd9db8f8134acf2c9f8096bc2542a7df5703cba4726f6d61a99a8990dc7fad4b
+84: Raygen optimizer shape: functions=83; calls=261; ray-query sites=2
+84: Embedded raygen SPIR-V words match the compiled shader.
+84: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-725ea3107c8c4f62a8c2a0a1db538a20\compatibility-generic\legacy\minimal.legacy.rgen.resolved
+84: Raygen check artifacts: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-725ea3107c8c4f62a8c2a0a1db538a20\compatibility-generic\legacy
+84: Source dependency SHA-256: ad4ff3b66c000719071db63a202a1a3582f27183a98ebb3379be3cebf9cb3e19; embedded include SHA-256: 5394aa6748bc8b99d833d7fadbd81b9560ce29b5c69abaf0d6b6b1186142061f
+84: SPIR-V bytes: 592420; words: 148105; instructions: 32874; branch operations: 4579; loops: 80; selection merges: 1850; SHA-256: f56d90debd2f6e82c52b01638ea92a23ff41149cf8a9bae4997774b6146d0683
+84: Raygen optimizer shape: functions=1; calls=0; ray-query sites=27
+84: Embedded raygen SPIR-V words match the compiled shader.
+84: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-725ea3107c8c4f62a8c2a0a1db538a20\compatibility-legacy\minimal.legacy.rgen.resolved
+84: Raygen check artifacts: <user-home>\AppData\Local\Temp\horde-raygen-artifacts-725ea3107c8c4f62a8c2a0a1db538a20\compatibility-legacy
+84: Source dependency SHA-256: ad4ff3b66c000719071db63a202a1a3582f27183a98ebb3379be3cebf9cb3e19; embedded include SHA-256: 5394aa6748bc8b99d833d7fadbd81b9560ce29b5c69abaf0d6b6b1186142061f
+84: SPIR-V bytes: 592420; words: 148105; instructions: 32874; branch operations: 4579; loops: 80; selection merges: 1850; SHA-256: f56d90debd2f6e82c52b01638ea92a23ff41149cf8a9bae4997774b6146d0683
+84: Raygen optimizer shape: functions=1; calls=0; ray-query sites=27
+84: Embedded raygen SPIR-V words match the compiled shader.
+84: Raygen variant artifact specialization and compatibility contracts passed.
+ 5/10 Test  #84: horde_rt_raygen_variant_artifact_tests ...................   Passed   92.97 sec
+test 86
+      Start  86: horde_rt_pipeline_policy_fence_tests
+
+86: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelinePolicyFenceTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+86: Working Directory: <repo>/build/presets/windows-x64-debug
+86: Test timeout computed to be: 300
+86: Generated RT catalog adapter is current.
+86: -- Building for: Visual Studio 17 2022
+86: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+86: -- The CXX compiler identification is MSVC 19.44.35227.0
+86: -- Detecting CXX compiler ABI info
+86: -- Detecting CXX compiler ABI info - done
+86: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+86: -- Detecting CXX compile features
+86: -- Detecting CXX compile features - done
+86: Generated RT catalog adapter is current.
+86: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+86: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+86: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+86: -- Looking for pthread_create in pthreads
+86: -- Looking for pthread_create in pthreads - not found
+86: -- Looking for pthread_create in pthread
+86: -- Looking for pthread_create in pthread - not found
+86: -- Found Threads: TRUE
+86: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+86: -- Horde Lantern RT: configuring shared host gameplay tests without Vulkan targets.
+86: -- Configuring done (17.3s)
+86: -- Generating done (0.9s)
+86: -- Build files have been written to: <user-home>/AppData/Local/Temp/horde-rt-fresh-configure-4a8ab3e1109a4bb397cdba37e0bf8754
+86: RT provider policy and ownership behavior contracts passed.
+ 6/10 Test  #86: horde_rt_pipeline_policy_fence_tests .....................   Passed   53.48 sec
+test 90
+      Start  90: horde_rt_pipeline_policy_execution_tests
+
+90: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelinePolicyExecutionTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe" "-GradleExecutable" "<repo>/android/gradlew.bat"
+90: Working Directory: <repo>/build/presets/windows-x64-debug
+90: Test timeout computed to be: 300
+90: Executable CMake and Gradle RT policy contracts passed.
+ 7/10 Test  #90: horde_rt_pipeline_policy_execution_tests .................   Passed   67.85 sec
+test 140
+      Start 140: horde_rt_final_windows_bundle_containment
+
+140: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tools/InspectRtPipelineBundleContainment.ps1" "-TargetPath" "<repo>/build/presets/windows-x64-debug/Debug/HordeLanternRT.exe" "-TargetPlatform" "Windows" "-Instrumentation" "Diagnostic" "-Quality" "High"
+140: Working Directory: <repo>/build/presets/windows-x64-debug
+140: Test timeout computed to be: 300
+140: {"target":"<user-home>\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe","targetPlatform":"Windows","instrumentation":"Diagnostic","quality":"High","targetSha256":"176d1bcc29002197457dd891a425c91754ad042dc9a82d22c02a69f241493e46","targetBytes":11754496,"semanticKeys":["diagnostic_high_generic_dielectric","diagnostic_high_opaque_fast","rayquery_compute_diagnostic_high_generic_dielectric","rayquery_compute_diagnostic_high_opaque_fast"],"modules":[{"offset":7175888,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"2417de5cadd3e753a081ae8f2e26bdc7cfe30d8c02758e8247bda0fa927a5fdd","words":148880,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":true,"atomicInstructions":5},{"offset":7771408,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795","words":73990,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":true,"atomicInstructions":41},{"offset":8067376,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"6728cadff8b1dc2bc7d18d370b1bf6ccff1533908efd587a77e3848b7b940f95","words":149181,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":true,"atomicInstructions":5},{"offset":8664112,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"5f51a1b5175b29db3b5fb34eaa784fe3322607059b190fa770cd7835e3cef760","words":74052,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":true,"atomicInstructions":41}],"spirvVal":"passed","spirvDis":"passed"}
+ 8/10 Test #140: horde_rt_final_windows_bundle_containment ................   Passed   10.07 sec
+test 141
+      Start 141: horde_rt_final_windows_bundle_containment_controls
+
+141: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelineBundleContainmentTests.ps1" "-Scanner" "<repo>/tools/InspectRtPipelineBundleContainment.ps1" "-TargetPath" "<repo>/build/presets/windows-x64-debug/Debug/HordeLanternRT.exe" "-TargetPlatform" "Windows" "-Instrumentation" "Diagnostic" "-Quality" "High" "-PowerShellExecutable" "C:/Program Files/PowerShell/7/pwsh.exe"
+141: Working Directory: <repo>/build/presets/windows-x64-debug
+141: Test timeout computed to be: 300
+141: Final-target containment scanner adversarial controls passed.
+ 9/10 Test #141: horde_rt_final_windows_bundle_containment_controls .......   Passed  125.61 sec
+test 142
+      Start 142: horde_rt_final_windows_bundle_containment_registration
+
+142: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelineBundleContainmentRegistrationTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe" "-ConfiguredCtestFile" "<repo>/build/presets/windows-x64-debug/CTestTestfile.cmake" "-Configuration" "Debug" "-Instrumentation" "Diagnostic" "-Quality" "High" "-Generator" "Visual Studio 17 2022" "-GeneratorPlatform" "x64"
+142: Working Directory: <repo>/build/presets/windows-x64-debug
+142: Test timeout computed to be: 300
+142: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+142: -- The CXX compiler identification is MSVC 19.44.35227.0
+142: -- Detecting CXX compiler ABI info
+142: -- Detecting CXX compiler ABI info - done
+142: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+142: -- Detecting CXX compile features
+142: -- Detecting CXX compile features - done
+142: Generated RT catalog adapter is current.
+142: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+142: -- Found Vulkan: C:/VulkanSDK/1.4.350.0/Lib/vulkan-1.lib (found version "1.4.350") found components: glslc glslangValidator
+142: -- Vulkan SDK found: 1.4.350
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+142: -- Looking for pthread_create in pthreads
+142: -- Looking for pthread_create in pthreads - not found
+142: -- Looking for pthread_create in pthread
+142: -- Looking for pthread_create in pthread - not found
+142: -- Found Threads: TRUE
+142: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+142: -- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+142: -- Configuring done (17.1s)
+142: -- Generating done (1.4s)
+142: -- Build files have been written to: <repo>/build/rtm-s-f118fe6d802c
+142: MSBuild version 17.14.40+3e7442088 for .NET Framework
+142:
+142:   1>Checking Build System
+142:   Building Custom Rule <repo>/CMakeLists.txt
+142:   RtPipelineBundleLifetimeTests.cpp
+142:   RtPipelineBundle.cpp
+142:   RtPipelineBundleContracts.cpp
+142:   RtPipelineVariants.cpp
+142:   RtPipelineVariantProvider.cpp
+142:   Generating Code...
+142:   horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> <repo>\build\rtm-s-f118fe6d802c\Debug\horde_rt_pipeline_bundle_lifetime_tests.exe
+142: Internal ctest changing into directory: <repo>/build/rtm-s-f118fe6d802c
+142: Test project <repo>/build/rtm-s-f118fe6d802c
+142:     Start 137: horde_rt_pipeline_bundle_lifetime_tests
+142: 1/1 Test #137: horde_rt_pipeline_bundle_lifetime_tests ...   Passed    5.66 sec
+142:
+142: 100% tests passed, 0 tests failed out of 1
+142:
+142: Total Test time (real) =   5.68 sec
+142: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+142: -- The CXX compiler identification is MSVC 19.44.35227.0
+142: -- Detecting CXX compiler ABI info
+142: -- Detecting CXX compiler ABI info - done
+142: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+142: -- Detecting CXX compile features
+142: -- Detecting CXX compile features - done
+142: Generated RT catalog adapter is current.
+142: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+142: -- Found Vulkan: C:/VulkanSDK/1.4.350.0/Lib/vulkan-1.lib (found version "1.4.350") found components: glslc glslangValidator
+142: -- Vulkan SDK found: 1.4.350
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+142: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+142: -- Looking for pthread_create in pthreads
+142: -- Looking for pthread_create in pthreads - not found
+142: -- Looking for pthread_create in pthread
+142: -- Looking for pthread_create in pthread - not found
+142: -- Found Threads: TRUE
+142: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+142: -- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+142: -- Configuring done (17.1s)
+142: -- Generating done (1.3s)
+142: -- Build files have been written to: <repo>/build/rtm-d-ce54bdcfa4a7
+142: MSBuild version 17.14.40+3e7442088 for .NET Framework
+142:
+142:   1>Checking Build System
+142:   Building Custom Rule <repo>/CMakeLists.txt
+142:   RtPipelineBundleLifetimeTests.cpp
+142:   RtPipelineBundle.cpp
+142:   RtPipelineBundleContracts.cpp
+142:   RtPipelineVariants.cpp
+142:   RtPipelineVariantProvider.cpp
+142:   Generating Code...
+142:   horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> <repo>\build\rtm-d-ce54bdcfa4a7\Debug\horde_rt_pipeline_bundle_lifetime_tests.exe
+142: Internal ctest changing into directory: <repo>/build/rtm-d-ce54bdcfa4a7
+142: Test project <repo>/build/rtm-d-ce54bdcfa4a7
+142:     Start 137: horde_rt_pipeline_bundle_lifetime_tests
+142: 1/1 Test #137: horde_rt_pipeline_bundle_lifetime_tests ...   Passed    5.37 sec
+142:
+142: 100% tests passed, 0 tests failed out of 1
+142:
+142: Total Test time (real) =   5.39 sec
+142: Effective final-target containment registrations and Mobile lifetime policies passed.
+10/10 Test #142: horde_rt_final_windows_bundle_containment_registration ...   Passed   57.81 sec
+
+The following tests passed:
+	horde_rt_pipeline_variants_tests
+	horde_rt_pipeline_variant_provider_tests
+	horde_rt_pipeline_bundle_contracts_tests
+	horde_rt_raygen_variant_manifest_tests
+	horde_rt_raygen_variant_artifact_tests
+	horde_rt_pipeline_policy_fence_tests
+	horde_rt_pipeline_policy_execution_tests
+	horde_rt_final_windows_bundle_containment
+	horde_rt_final_windows_bundle_containment_controls
+	horde_rt_final_windows_bundle_containment_registration
+
+100% tests passed, 0 tests failed out of 10
+
+Total Test time (real) = 443.93 sec
