@@ -1,5 +1,7 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/ShowcaseCheckpoints.h"
+#include "gameplay/CorridorCollision.h"
+#include "gameplay/SpatialAudio.h"
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -392,10 +394,89 @@ void OutgoingTraceContract() {
     Check(sim.Snapshot().combatContactTrace.count==0,
           "lifecycle cancellation cannot replay old contact observations");
 }
+void RouteMeleeOcclusion() {
+    auto config=Rules(); config.waterfallSkeletonEncounter=false;
+    config.playerStartX=.40f; config.playerStartZ=-6.20f;
+    config.playerStartYawRadians=0.0f;
+    GameSimulation clearSide(config); InputSnapshot input;
+    input.damageEnabled=false; input.tutorialEnabled=false;
+    input.yawRadians=3.14159265359f;
+    const auto clearBefore=clearSide.Snapshot();
+    Check(IsShowcasePlayerPositionWalkable(clearBefore.playerX,clearBefore.playerZ) &&
+          clearBefore.playerGrounded && Near(clearBefore.playerSupportWorldY,kRouteFloorWorldY) &&
+          IsSkeletonEnemyPositionWalkable(clearBefore.swordCombat.combatants[1].x,
+                                          clearBefore.swordCombat.combatants[1].z),
+          "clear-side fixture begins on the supported route with a legal skeleton pose");
+    Check(!IsRouteAudioObstructed(clearBefore.playerX,clearBefore.playerZ,
+                                  clearBefore.swordCombat.combatants[1].x,
+                                  clearBefore.swordCombat.combatants[1].z),
+          "clear-side route melee fixture has an open segment through the arch aperture");
+    input.commands.attack=1;
+    for(int tick=0;tick<40;++tick) clearSide.StepFixed(input);
+    Check(clearSide.Snapshot().swordCombat.combatants[1].health==
+              clearBefore.swordCombat.combatants[1].health-1,
+          "actual forgiving combat consumer still accepts a clear-side route hit");
+
+    // This is a seeded regression through the real forgiving SwordCombat
+    // consumer at route coordinates. Production route reachability for these
+    // poses is not established by this fixture. The geometry oracle proves
+    // that the segment crosses masonry; it does not supply combat hit authority.
+    constexpr float playerZ=-6.80f, yawNorth=3.14159265359f;
+    const auto probe=[&](const char* caseName,const float playerX,
+                        const float targetX,const float targetZ) {
+        Check(IsShowcasePlayerPositionWalkable(playerX,playerZ),
+              "occlusion probes start at a legal player position south of the arch return");
+        const bool obstructed=IsRouteAudioObstructed(playerX,playerZ,targetX,targetZ);
+        Check(IsSkeletonEnemyPositionWalkable(targetX,targetZ),
+              "occlusion probe target starts at a legal skeleton route position");
+        Check(obstructed,"occlusion probe segment crosses authored +X return masonry");
+        const std::array<SkeletonSpawnPose,kSkeletonEnemyCapacity> spawns{{
+            {{targetX,targetZ},yawNorth,0.0f},
+            {{-1.0f,-4.65f},0.0f,0.0f},
+        }};
+        SwordCombat combat;
+        combat.Reset(kSkeletonEnemyCapacity,{0.0f,-4.65f},&spawns,2);
+        combat.RequestAttack();
+        bool hit=false, actualTargetLineObstructed=false;
+        bool actualPlayerPoseLegal=false, actualTargetPoseLegal=false;
+        int contactTick=0;
+        float actualTargetX=targetX, actualTargetZ=targetZ;
+        for(int tick=1;tick<=40;++tick) {
+            const auto& state=combat.Update(1.0f/60.0f,playerX,playerZ,yawNorth,
+                                            true,true,false);
+            if(state.combatants[0].health==1) {
+                hit=true; contactTick=tick;
+                actualTargetX=state.combatants[0].x;
+                actualTargetZ=state.combatants[0].z;
+                actualPlayerPoseLegal=IsShowcasePlayerPositionWalkable(playerX,playerZ);
+                actualTargetPoseLegal=IsSkeletonEnemyPositionWalkable(actualTargetX,actualTargetZ);
+                actualTargetLineObstructed=IsRouteAudioObstructed(
+                    playerX,playerZ,actualTargetX,actualTargetZ);
+                break;
+            }
+        }
+        if(hit && actualTargetLineObstructed) {
+            std::cerr<<"KNOWN DEFECT: forgiving sword consumer accepted "<<caseName
+                     <<" contact at attackTick="<<contactTick<<" player=("<<playerX<<','
+                     <<playerZ<<") actualTarget=("<<actualTargetX<<','<<actualTargetZ
+                     <<") distance="<<std::hypot(actualTargetX-playerX,
+                                                   actualTargetZ-playerZ)<<'\n';
+        }
+        Check(obstructed && hit && actualTargetLineObstructed &&
+              actualPlayerPoseLegal && actualTargetPoseLegal,
+              "diagnostic records an accepted hit through route masonry at legal actual poses");
+    };
+    probe("straight-wall",.96f,.96f,-5.95f);
+    probe("oblique-wall",.96f,1.55f,-6.06f);
+    // At the south face z=-6.50, this segment crosses x=0.955405:
+    // 55 mm inside the west/south corner of the authored return (x=0.90).
+    probe("corner-edge",.55f,1.55f,-6.06f);
+}
 int main() {
     WindowAndLifecycle(); TeachingContract(); KeeperContract(); ActualIncomingHits(); DeliveryRates(); CoherentSlowdown();
     IntegratedKeeperRepelAndReward();
     OutgoingTraceContract();
+    RouteMeleeOcclusion();
     LiveParryAndRiposte();
     std::cout<<"combat foundation checks="<<checks<<" failures="<<failures<<'\n';
     return failures?1:0;
