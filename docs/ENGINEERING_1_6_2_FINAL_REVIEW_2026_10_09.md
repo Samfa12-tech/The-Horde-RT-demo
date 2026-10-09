@@ -1,5 +1,7 @@
 # 1.6.2 final technical review — 9 October 2026
 
+**Verified publication — 9 October:** the goal is complete; PR18 merged to main at `a3f120cf`, and signed Android/Windows 1.6.2 is live on itch. Fresh downloads match the signed APK and all 96 Windows files. [Exact post-release receipt, package hashes and Release smokes](evidence/2026-10-09-release-publication/README.md) supersede earlier no-merge/no-release statements. Historical validation snapshots and failures remain unchanged. Mobile default 50%, experimental 33/40, Dust Low and owner-deferred limitations remain authoritative; no sustained30FPS or completed Eric audit claim.
+
 This record assembles the final-candidate technical evidence for independent review. It is not Eric’s completed audit, release certification, or publication approval. The final immutable Host run and exact unsigned artifacts pass; physical-device results remain separate and are scoped below. Owner-approved controller support, touch rotations, audio/haptics, menu, dust appearance, and waterfall/stand collision are not reopened. The owner retains current forgiving combat for 1.6.2 and defers precision-contact correction and the long sustained-phone programme. Shafts, the walking-arm wiggle, and music handover remain deferred. Mobile default remains 50%; 33%/40% remain experimental. No sustained-30-FPS claim is made.
 
 ## Preserved first Host failure and fixture correction

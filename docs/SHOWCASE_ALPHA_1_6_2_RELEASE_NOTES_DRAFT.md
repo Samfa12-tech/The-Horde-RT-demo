@@ -1,4 +1,4 @@
-# Horde Lantern RT 1.6.2 development notes
+# Horde Lantern RT 1.6.2 release notes
 
 A standalone hardware-RT tomb demo update for Android and Windows. The central hanging-lantern menu, native touch Swing/Parry/Dodge and heart HUD carry a coherent style through the existing tomb. Android controller navigation and gameplay, portrait/landscape recovery, graphics scrolling/focus and acknowledged Use/Keep/Restore are supported. The sword starts sheathed and draws at the waterfall guards; equipment clearance and wide-view spacing preserve existing combat rules. Quiet accepted room/metal-creak menu ambience respects audio focus and fades on Play.
 
@@ -10,9 +10,9 @@ Package version: `1.6.2`
 
 Android version code: `10`
 
-Validated runtime/build source: `db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9`. Fresh Windows Debug/Release144/144 each,13 actual RT captures, Android Debug/unsigned Shipping four-ABI builds/lint/package gates and exact-source12/12 CI pass. Final sealed Debug APK SHA-256 `25af2fc1895eca03c03feac2b955d410d0759a2834e27d9e1dafd3d24eda8ca3`; unsigned Shipping APK `4f0fccec7cfe247f71c87852605b7c040f3213794758fdac5ff7d55236ea6ec4`; unpublishable Windows validation ZIP `3fc8f065f900d28d529883f7b2681b6303940be9cdc1ed589425a92be69778bd`. These validation files are not publication artifacts. Final signed/distributed hashes will be recorded separately after authorized promotion.
+Validated runtime/build source: `db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9`. Fresh Windows Debug/Release144/144 each,13 actual RT captures, Android Debug/unsigned Shipping four-ABI builds/lint/package gates and exact-source12/12 CI pass. Final sealed Debug APK SHA-256 `25af2fc1895eca03c03feac2b955d410d0759a2834e27d9e1dafd3d24eda8ca3`; unsigned Shipping APK `4f0fccec7cfe247f71c87852605b7c040f3213794758fdac5ff7d55236ea6ec4`; unpublishable Windows validation ZIP `3fc8f065f900d28d529883f7b2681b6303940be9cdc1ed589425a92be69778bd`. These validation files are not publication artifacts. Signed/distributed hashes and exact downloaded payload verification are recorded in the [publication receipt](evidence/2026-10-09-release-publication/README.md).
 
-The owner authorizes merge and Android/Windows itch publication when the goal is complete. No merge/sign/upload has occurred at this checkpoint. Eric's [review packet](ENGINEERING_1_6_2_FINAL_REVIEW_2026_10_09.md) records evidence and remaining limits; the independent audit is not self-certified.
+The goal is complete. The owner-authorized PR18 merge, stable-key Android signing and Android/Windows itch publication are complete; both actual downloads are verified. The pre-release seal above remains unchanged. Eric's [review packet](ENGINEERING_1_6_2_FINAL_REVIEW_2026_10_09.md) records evidence and remaining limits; the independent audit is not self-certified.
 
 ## Historical development checkpoints
 

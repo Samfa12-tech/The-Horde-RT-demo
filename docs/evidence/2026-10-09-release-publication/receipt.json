@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "version": "1.6.2",
+  "androidVersionCode": 10,
+  "goalCompleteBeforeMerge": true,
+  "validatedRuntimeSource": "db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9",
+  "mergedSource": "a3f120cf1f3995035f793fa40400e0a74a4c0459",
+  "pullRequest": 18,
+  "mergedUtc": "2026-10-09T00:09:35Z",
+  "prHead": "ab97f503b958b16bb05d582b1ff561bf88fb1983",
+  "preMergeCi": {
+    "passedJobs": 12,
+    "totalJobs": 12,
+    "prRun": 37862273391,
+    "pushRun": 37862269477,
+    "scope": "PR18 head, not later publication-bookkeeping CI"
+  },
+  "runtimePayloadUnchangedByPromotion": true,
+  "stableAndroidSigningCertificateSha256": "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245",
+  "signedAndroid": {
+    "sha256": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8",
+    "bytes": 121071933
+  },
+  "windowsPublicationZip": {
+    "sha256": "18177d0d84c40f0831b22ee959be597deeb3bc0e1cef183e78dd19c1b113f21c",
+    "bytes": 145574438
+  },
+  "windowsReleaseExecutableSha256": "084e4a345b556cdf6c3e8b4adbaef488c22cee02d41226dc43c49c5cf873260d",
+  "androidSmoke": {
+    "validatedSourceCommit": "db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9",
+    "mergedSourceCommit": "a3f120cf1f3995035f793fa40400e0a74a4c0459",
+    "version": "1.6.2",
+    "versionCode": 10,
+    "signedApkSha256": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8",
+    "installedBaseApkSha256": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8",
+    "device": "SM-S948B",
+    "android": 16,
+    "buildType": "signed Shipping Release",
+    "stableCertificateSha256": "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245",
+    "ordinaryRtPresented": true,
+    "dataCleared": false,
+    "installMode": "in-place -r stable signing identity",
+    "preferences": "Shipping private preferences not readable; no data clearing or setting control used",
+    "appStopped": true,
+    "failure": null,
+    "scope": "Normal Entry/Play/Pause/native diagnostics; no Debug harness, scanout, sustainedFPS or full-route/controller/audio reacceptance"
+  },
+  "windowsSmoke": {
+    "validatedSourceCommit": "db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9",
+    "mergedSourceCommit": "a3f120cf1f3995035f793fa40400e0a74a4c0459",
+    "version": "1.6.2",
+    "publishZipSha256": "18177d0d84c40f0831b22ee959be597deeb3bc0e1cef183e78dd19c1b113f21c",
+    "executableSha256": "084e4a345b556cdf6c3e8b4adbaef488c22cee02d41226dc43c49c5cf873260d",
+    "buildType": "packaged Release",
+    "actualRtPresented": true,
+    "backend": "RayTracingPipeline",
+    "ownedProcessStopped": true,
+    "failure": null,
+    "scope": "Normal packaged Windows Release startup and actual RT-produced swapchain presentation; no Debug motion hooks, gameplay inputs, owner feel or sustainedFPS certification"
+  },
+  "itch": {
+    "validatedSourceCommit": "db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9",
+    "mergedSourceCommit": "a3f120cf1f3995035f793fa40400e0a74a4c0459",
+    "version": "1.6.2",
+    "androidVersionCode": 10,
+    "signedAndroidApkSha256": "cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8",
+    "windowsPublicationZipSha256": "18177d0d84c40f0831b22ee959be597deeb3bc0e1cef183e78dd19c1b113f21c",
+    "downloadedWindowsFilesVerified": 96,
+    "androidDownloadByteExact": true,
+    "windowsEveryEntryByteExact": true,
+    "channels": [
+      {
+        "name": "android",
+        "uploadId": 18341739,
+        "buildId": 2090804,
+        "version": "1.6.2",
+        "state": "completed"
+      },
+      {
+        "name": "windows-x64",
+        "uploadId": 18339908,
+        "buildId": 2090803,
+        "version": "1.6.2",
+        "state": "completed"
+      }
+    ],
+    "verifiedUtc": "2026-10-09T00:19:54.9194937Z",
+    "scope": "Actual completed itch channels fetched through existing butler identity; every released payload file verified, status stable across fetch; Windows distribution is directory payload, not ZIP bytes"
+  },
+  "retainedFailures": [
+    "First immutable Host stale shader pins: 142/144, later stages not run",
+    "Windows Debug moving inspection not armed: foreground refused",
+    "Earlier ordinary Release smoke timed out while unfocused; later user-foreground Release smoke passed",
+    "Two Shipping UI harness preflights rejected before UI; corrected exact-package smoke passed"
+  ],
+  "limits": [
+    "No sustained30FPS certification; long sustained phone programme owner-deferred",
+    "Forgiving range/cone combat retained by owner; precise visible mesh contact deferred",
+    "Minor walking torch-arm wiggle, shafts and seamless music handover deferred",
+    "Current moving world-body/shadow/mirror camera coverage remains bounded",
+    "Controller acceptance scoped to BB-51 on SM-S948B/Android16; other hardware not certified",
+    "Shipping private preferences not readable: in-place install without data clearing, no byte-identical production-preference claim",
+    "Eric independent audit packet prepared, audit not self-certified",
+    "No GitHub tag or GitHub Release created"
+  ],
+  "publicationGuardChecks": {
+    "status": "pass",
+    "tests": 4,
+    "failed": 0,
+    "seconds": 21.5,
+    "logSha256": "99a2006b2b43fb283918f08a58b0754d748ea20c520236a37da1ec592da6c99b",
+    "scope": "Focused version contract, pwsh and built-in Windows PowerShell immutable-release policy, GitHub release preflight; no runtime rebuild"
+  }
+}
