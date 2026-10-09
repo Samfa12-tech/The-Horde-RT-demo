@@ -1,0 +1,28 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 24
+    Start 24: horde_rt_combat_foundation_tests
+
+24: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_foundation_tests.exe"
+24: Working Directory: <repo>/build/presets/windows-x64-debug
+24: Test timeout computed to be: 30
+24: KNOWN DEFECT: forgiving sword consumer accepted straight-wall contact at attackTick=17 player=(0.96,-6.8) actualTarget=(0.96,-5.95) distance=0.85
+24: KNOWN DEFECT: forgiving sword consumer accepted oblique-wall contact at attackTick=17 player=(0.96,-6.8) actualTarget=(1.55,-6.06) distance=0.946414
+24: KNOWN DEFECT: forgiving sword consumer accepted corner-edge contact at attackTick=17 player=(0.55,-6.8) actualTarget=(1.55,-6.06) distance=1.24403
+24: combat foundation checks=420 failures=0
+1/1 Test #24: horde_rt_combat_foundation_tests ...   Passed    6.39 sec
+
+The following tests passed:
+	horde_rt_combat_foundation_tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   6.41 sec
