@@ -198,37 +198,51 @@
     {
       "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/build-unchanged.txt",
       "bytes": 2989,
-      "sha256": "b7c8219ce010859fdf30790a55d0566c52b125630dec7cbb0c525bfa2f093a5a"
+      "sha256": "b7c8219ce010859fdf30790a55d0566c52b125630dec7cbb0c525bfa2f093a5a",
+      "gitBlob": "befdd5a77b2b7b852aaee9e1e9b1b5d908131051",
+      "gitStoredContentSha256": "d5238e5c4372fcdc69b9bed6975299ca695dc100c63e536938cd13ca285dce9b"
     },
     {
       "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/cmake-version.txt",
       "bytes": 97,
-      "sha256": "02282b1eefbb0dd98bd4578caa8861cc2de062ebcbef435bace0359683bbfa57"
+      "sha256": "02282b1eefbb0dd98bd4578caa8861cc2de062ebcbef435bace0359683bbfa57",
+      "gitBlob": "2142b6c67979a2e042a21492924430d98b619a09",
+      "gitStoredContentSha256": "02282b1eefbb0dd98bd4578caa8861cc2de062ebcbef435bace0359683bbfa57"
     },
     {
       "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/configure.txt",
       "bytes": 1496,
-      "sha256": "ee36298379ef808f5812cafed7cab9fd35b9e14cc7aef6f31041ea0cc845c96e"
+      "sha256": "ee36298379ef808f5812cafed7cab9fd35b9e14cc7aef6f31041ea0cc845c96e",
+      "gitBlob": "2d2913872c525a337c547b2eb540a06bb77a44b9",
+      "gitStoredContentSha256": "475b84609374c854ecaee92d5c5f6e21e6201c8e46ffb3d1e46902f5bb5e84d1"
     },
     {
       "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/ctest-version.txt",
       "bytes": 97,
-      "sha256": "a1f1a612ac841f12ccc139b534f734d054a3c12b13186dc706bc385b662fa1ac"
+      "sha256": "a1f1a612ac841f12ccc139b534f734d054a3c12b13186dc706bc385b662fa1ac",
+      "gitBlob": "0463fe5ef0aa72a26788d05815d9be1b3bd60c95",
+      "gitStoredContentSha256": "a1f1a612ac841f12ccc139b534f734d054a3c12b13186dc706bc385b662fa1ac"
     },
     {
       "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/unchanged-ctest.txt",
       "bytes": 355,
-      "sha256": "ea0cfd5f0cccd6080969616d69169cdd6b70394f98c0a86e07c471143d338f2c"
+      "sha256": "ea0cfd5f0cccd6080969616d69169cdd6b70394f98c0a86e07c471143d338f2c",
+      "gitBlob": "fa29ec044e25f3e3d4fe64ac8e56596b20abd47a",
+      "gitStoredContentSha256": "edbe02efda91db447a6d3172d41185fbed0a3f7e0236c1585d23a9df3e9e50ee"
     },
     {
       "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/unchanged-test-output.txt",
       "bytes": 1802,
-      "sha256": "c2f4db695cc81e641ffb6d82c5cf28e7619c96d17d8bd5ded0537cd054103ac5"
+      "sha256": "c2f4db695cc81e641ffb6d82c5cf28e7619c96d17d8bd5ded0537cd054103ac5",
+      "gitBlob": "75d25f7a83fecb4b6c4d26474894d52dfdce632e",
+      "gitStoredContentSha256": "029669b7596d0ac312cfd5ebe1093507fb869f1a453b781653cfae9ba528c13b"
     },
     {
       "path": "docs/evidence/2026-10-09-wp0-torch-diagnostic/wp0-timeout-excerpt.txt",
       "bytes": 163,
-      "sha256": "d04f568fd3d157ecf0e221ae7ec63d8a8b1276ca0eaead67fe4114f6d300f78a"
+      "sha256": "d04f568fd3d157ecf0e221ae7ec63d8a8b1276ca0eaead67fe4114f6d300f78a",
+      "gitBlob": "3aa5ddbfb9b134f54634fe60778add85b6afa18e",
+      "gitStoredContentSha256": "cf5bc90cd4d2507f11441b60d3c92a1240fb5544b7f2bf6a4ecdbf749615bccb"
     }
   ],
   "protectedRuntimeAndTestIdentityMatches1c28d056": true,
@@ -250,5 +264,6 @@
     "readinessWorktreeCleanAtCheckpoint": true,
     "primaryChangesPreserved": true,
     "reportLocalLinksPass": true
-  }
+  },
+  "logHashPolicy": "sha256 identifies retained local raw bytes; gitBlob and gitStoredContentSha256 identify the Git text-normalized stored copy. Complete log content is preserved; line endings can differ on checkout."
 }
