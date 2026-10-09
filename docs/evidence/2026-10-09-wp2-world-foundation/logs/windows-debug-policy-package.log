@@ -1,0 +1,168 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 83
+    Start  83: horde_rt_pipeline_policy_fence_tests
+
+83: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelinePolicyFenceTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+83: Working Directory: <repo>/build/presets/windows-x64-debug
+83: Test timeout computed to be: 300
+83: Generated RT catalog adapter is current.
+83: -- Building for: Visual Studio 17 2022
+83: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+83: -- The CXX compiler identification is MSVC 19.44.35227.0
+83: -- Detecting CXX compiler ABI info
+83: -- Detecting CXX compiler ABI info - done
+83: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+83: -- Detecting CXX compile features
+83: -- Detecting CXX compile features - done
+83: Generated RT catalog adapter is current.
+83: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+83: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+83: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+83: -- Looking for pthread_create in pthreads
+83: -- Looking for pthread_create in pthreads - not found
+83: -- Looking for pthread_create in pthread
+83: -- Looking for pthread_create in pthread - not found
+83: -- Found Threads: TRUE
+83: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+83: -- Horde Lantern RT: configuring shared host gameplay tests without Vulkan targets.
+83: -- Configuring done (19.0s)
+83: -- Generating done (1.3s)
+83: -- Build files have been written to: <user-home>/AppData/Local/Temp/horde-rt-fresh-configure-37e586e1783b4624a2b5bdcda2cbdab2
+83: RT provider policy and ownership behavior contracts passed.
+1/5 Test  #83: horde_rt_pipeline_policy_fence_tests .....................   Passed   61.21 sec
+test 87
+    Start  87: horde_rt_pipeline_policy_execution_tests
+
+87: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelinePolicyExecutionTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe" "-GradleExecutable" "<repo>/android/gradlew.bat"
+87: Working Directory: <repo>/build/presets/windows-x64-debug
+87: Test timeout computed to be: 300
+87: Executable CMake and Gradle RT policy contracts passed.
+2/5 Test  #87: horde_rt_pipeline_policy_execution_tests .................   Passed   73.80 sec
+test 136
+    Start 136: horde_rt_final_windows_bundle_containment
+
+136: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tools/InspectRtPipelineBundleContainment.ps1" "-TargetPath" "<repo>/build/presets/windows-x64-debug/Debug/HordeLanternRT.exe" "-TargetPlatform" "Windows" "-Instrumentation" "Diagnostic" "-Quality" "High"
+136: Working Directory: <repo>/build/presets/windows-x64-debug
+136: Test timeout computed to be: 300
+136: {"target":"<repo>\\build\\presets\\windows-x64-debug\\Debug\\HordeLanternRT.exe","targetPlatform":"Windows","instrumentation":"Diagnostic","quality":"High","targetSha256":"56c669a0945ace96be29773e22fc4bd8f257abc69a93ca4031c5292f0a9f512e","targetBytes":11670016,"semanticKeys":["diagnostic_high_generic_dielectric","diagnostic_high_opaque_fast","rayquery_compute_diagnostic_high_generic_dielectric","rayquery_compute_diagnostic_high_opaque_fast"],"modules":[{"offset":7098896,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"2417de5cadd3e753a081ae8f2e26bdc7cfe30d8c02758e8247bda0fa927a5fdd","words":148880,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":true,"atomicInstructions":5},{"offset":7694416,"backend":"RayTracingPipeline","executionModel":"RayGenerationKHR","sha256":"223706ea208242f34770b919e14a8a6ae1391ff187820325d9759fc28dee6795","words":73990,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":true,"atomicInstructions":41},{"offset":7990384,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"6728cadff8b1dc2bc7d18d370b1bf6ccff1533908efd587a77e3848b7b940f95","words":149181,"rayQueryCapability":true,"rayQueryInitializations":29,"binding22":true,"atomicInstructions":5},{"offset":8587120,"backend":"RayQueryCompute","executionModel":"GLCompute","sha256":"5f51a1b5175b29db3b5fb34eaa784fe3322607059b190fa770cd7835e3cef760","words":74052,"rayQueryCapability":true,"rayQueryInitializations":2,"binding22":true,"atomicInstructions":41}],"spirvVal":"passed","spirvDis":"passed"}
+3/5 Test #136: horde_rt_final_windows_bundle_containment ................   Passed   10.54 sec
+test 137
+    Start 137: horde_rt_final_windows_bundle_containment_controls
+
+137: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelineBundleContainmentTests.ps1" "-Scanner" "<repo>/tools/InspectRtPipelineBundleContainment.ps1" "-TargetPath" "<repo>/build/presets/windows-x64-debug/Debug/HordeLanternRT.exe" "-TargetPlatform" "Windows" "-Instrumentation" "Diagnostic" "-Quality" "High" "-PowerShellExecutable" "C:/Program Files/PowerShell/7/pwsh.exe"
+137: Working Directory: <repo>/build/presets/windows-x64-debug
+137: Test timeout computed to be: 300
+137: Final-target containment scanner adversarial controls passed.
+4/5 Test #137: horde_rt_final_windows_bundle_containment_controls .......   Passed  123.47 sec
+test 138
+    Start 138: horde_rt_final_windows_bundle_containment_registration
+
+138: Test command: "C:\Program Files\PowerShell\7\pwsh.exe" "-NoProfile" "-File" "<repo>/tests/RtPipelineBundleContainmentRegistrationTests.ps1" "-CmakeExecutable" "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe" "-ConfiguredCtestFile" "<repo>/build/presets/windows-x64-debug/CTestTestfile.cmake" "-Configuration" "Debug" "-Instrumentation" "Diagnostic" "-Quality" "High" "-Generator" "Visual Studio 17 2022" "-GeneratorPlatform" "x64"
+138: Working Directory: <repo>/build/presets/windows-x64-debug
+138: Test timeout computed to be: 300
+138: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+138: -- The CXX compiler identification is MSVC 19.44.35227.0
+138: -- Detecting CXX compiler ABI info
+138: -- Detecting CXX compiler ABI info - done
+138: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+138: -- Detecting CXX compile features
+138: -- Detecting CXX compile features - done
+138: Generated RT catalog adapter is current.
+138: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+138: -- Found Vulkan: C:/VulkanSDK/1.4.350.0/Lib/vulkan-1.lib (found version "1.4.350") found components: glslc glslangValidator
+138: -- Vulkan SDK found: 1.4.350
+138: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+138: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+138: -- Looking for pthread_create in pthreads
+138: -- Looking for pthread_create in pthreads - not found
+138: -- Looking for pthread_create in pthread
+138: -- Looking for pthread_create in pthread - not found
+138: -- Found Threads: TRUE
+138: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+138: -- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+138: -- Configuring done (19.2s)
+138: -- Generating done (1.6s)
+138: -- Build files have been written to: <repo>/build/rtm-s-d62ba4b8e979
+138: MSBuild version 17.14.40+3e7442088 for .NET Framework
+138:
+138:   1>Checking Build System
+138:   Building Custom Rule <repo>/CMakeLists.txt
+138:   RtPipelineBundleLifetimeTests.cpp
+138:   RtPipelineBundle.cpp
+138:   RtPipelineBundleContracts.cpp
+138:   RtPipelineVariants.cpp
+138:   RtPipelineVariantProvider.cpp
+138:   Generating Code...
+138:   horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> <repo>\build\rtm-s-d62ba4b8e979\Debug\horde_rt_pipeline_bundle_lifetime_tests.exe
+138: Internal ctest changing into directory: <repo>/build/rtm-s-d62ba4b8e979
+138: Test project <repo>/build/rtm-s-d62ba4b8e979
+138:     Start 133: horde_rt_pipeline_bundle_lifetime_tests
+138: 1/1 Test #133: horde_rt_pipeline_bundle_lifetime_tests ...   Passed    4.53 sec
+138:
+138: 100% tests passed, 0 tests failed out of 1
+138:
+138: Total Test time (real) =   4.54 sec
+138: -- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26300.
+138: -- The CXX compiler identification is MSVC 19.44.35227.0
+138: -- Detecting CXX compiler ABI info
+138: -- Detecting CXX compiler ABI info - done
+138: -- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/VC/Tools/MSVC/14.44.35207/bin/Hostx64/x64/cl.exe - skipped
+138: -- Detecting CXX compile features
+138: -- Detecting CXX compile features - done
+138: Generated RT catalog adapter is current.
+138: -- Strict non-contracted asset-transform arithmetic enabled for GltfDocument.cpp and StaticMeshAsset.cpp: /fp:strict
+138: -- Found Vulkan: C:/VulkanSDK/1.4.350.0/Lib/vulkan-1.lib (found version "1.4.350") found components: glslc glslangValidator
+138: -- Vulkan SDK found: 1.4.350
+138: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+138: -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+138: -- Looking for pthread_create in pthreads
+138: -- Looking for pthread_create in pthreads - not found
+138: -- Looking for pthread_create in pthread
+138: -- Looking for pthread_create in pthread - not found
+138: -- Found Threads: TRUE
+138: -- Legacy torch-failure identifiers were rejected by the configured MSVC compiler.
+138: -- Horde Lantern RT: Vulkan capability probe and Windows diagnostic targets are available; Android builds from android/.
+138: -- Configuring done (18.1s)
+138: -- Generating done (1.6s)
+138: -- Build files have been written to: <repo>/build/rtm-d-25f3169453e9
+138: MSBuild version 17.14.40+3e7442088 for .NET Framework
+138:
+138:   1>Checking Build System
+138:   Building Custom Rule <repo>/CMakeLists.txt
+138:   RtPipelineBundleLifetimeTests.cpp
+138:   RtPipelineBundle.cpp
+138:   RtPipelineBundleContracts.cpp
+138:   RtPipelineVariants.cpp
+138:   RtPipelineVariantProvider.cpp
+138:   Generating Code...
+138:   horde_rt_pipeline_bundle_lifetime_tests.vcxproj -> <repo>\build\rtm-d-25f3169453e9\Debug\horde_rt_pipeline_bundle_lifetime_tests.exe
+138: Internal ctest changing into directory: <repo>/build/rtm-d-25f3169453e9
+138: Test project <repo>/build/rtm-d-25f3169453e9
+138:     Start 133: horde_rt_pipeline_bundle_lifetime_tests
+138: 1/1 Test #133: horde_rt_pipeline_bundle_lifetime_tests ...   Passed    4.88 sec
+138:
+138: 100% tests passed, 0 tests failed out of 1
+138:
+138: Total Test time (real) =   4.89 sec
+138: Effective final-target containment registrations and Mobile lifetime policies passed.
+5/5 Test #138: horde_rt_final_windows_bundle_containment_registration ...   Passed   60.02 sec
+
+The following tests passed:
+	horde_rt_pipeline_policy_fence_tests
+	horde_rt_pipeline_policy_execution_tests
+	horde_rt_final_windows_bundle_containment
+	horde_rt_final_windows_bundle_containment_controls
+	horde_rt_final_windows_bundle_containment_registration
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) = 329.07 sec

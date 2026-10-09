@@ -1,0 +1,82 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 42
+    Start  42: horde_rt_world_route_foundation_tests
+
+42: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_world_route_foundation_tests.exe"
+42: Working Directory: <repo>/build/presets/windows-x64-debug
+42: Test timeout computed to be: 1500
+42: World route checks=16388 failures=0 triangles=350 resident_cpu_ns=98800 staged_cpu_ns=102100 resident_retained_bytes=22752 staged_peak_cpu_bytes=32880 directions=2 GPU_cost=not-measured
+1/4 Test  #42: horde_rt_world_route_foundation_tests ...   Passed    6.40 sec
+test 45
+    Start  45: horde_rt_player_directional_rig_tests
+
+45: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_player_directional_rig_tests.exe" "<repo>"
+45: Working Directory: <repo>/build/presets/windows-x64-debug
+45: Test timeout computed to be: 1500
+45: Directional dodge disposition distance=0.530981 dodgeSequence=1 runToggle=0 runActive=0 direction=0,-1 action=0
+45: FAIL: forward/back/left/right dodges keep authored distance with run cancelled
+2/4 Test  #45: horde_rt_player_directional_rig_tests ...***Failed    3.26 sec
+Directional dodge disposition distance=0.530981 dodgeSequence=1 runToggle=0 runActive=0 direction=0,-1 action=0
+FAIL: forward/back/left/right dodges keep authored distance with run cancelled
+
+test 98
+    Start  98: horde_rt_simulation_gameplay_tests
+
+98: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_simulation_gameplay_tests.exe"
+98: Working Directory: <repo>/build/presets/windows-x64-debug
+98: Test timeout computed to be: 1500
+98: lich/chest delayed finale events hits/defeat/unlock=3/1/1 phase=1 pending=0 time=0 sequence=8/9
+98: open shaft actual X/Z=-5.5/-14.5 mount torch lowering/left Y legacy=0/-0.41 anatomical=0/-0.31
+98: Shared simulation command, event, seam-persistence, and retry tests passed.
+3/4 Test  #98: horde_rt_simulation_gameplay_tests ......   Passed    6.43 sec
+test 140
+    Start 140: horde_rt_skinned_character_smoke
+
+140: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_skinned_character_smoke.exe"
+140: Working Directory: <repo>
+140: Test timeout computed to be: 1500
+140: player exact-grounding candidate vertices=5638
+140: player basic idle/walk skin passed
+140: player static/skinned stream agreement passed
+140: Stable final Grip agreement rest=1.0154e-05m/0.000345267rad down=9.92743e-06m/0rad up=1.00263e-05m/0rad
+140: authored Grip surface left axis/surface/contact/bins/span=0.00971155/7.41892e-06/2539/24/0.0955135 right=0.00973/1.47149e-07/2547/24/0.0954864
+140: sheathed actual right Grip in view=0.18,-0.339998,0.59999
+140: ordinary final-skinned clearance triangle/depth/area/side-cross=0.249519/0.0119556/0.170158/0/15855 near-cross=0/0 max-edge bind/skinned=0.0550014/0.0710506 max-triangle-area=0.00125283 normal-dot/reversed=-0.899975/299/0.000576386 sole-y=-0.94975
+140: grounded boot envelope idle/walk=-0.94975/-0.94975..-0.94975
+140: ordinary-wall final-skinned clearance/depth/area/near-cross=0.276322/-0.139847/0/214/0
+140: high wall final-skinned clearance triangle/depth=0.270617/-0.138872 projected-area wall/open=0 (0/0.802972) side-cross=0/15855 open/ordinary-area=4.71898 near-cross=199/0 max-edge open/wall=0.0764185/0.0734252 max-triangle-area open/wall=0.00330326/0
+140: low wall final-skinned clearance triangle/depth=0.274715/-0.143037 projected-area wall/open=0 (0/0.45415) side-cross=0/15855 open/ordinary-area=2.66899 near-cross=208/0 max-edge open/wall=0.0719549/0.0734252 max-triangle-area open/wall=0.00276535/0
+140: former z=-9.70 final-skinned clearance=0.270617 depth=-0.138872 projected-area=0 near-cross=199/0 side-cross=0/15855 max-edge/triangle-area=0.0734252/0
+140: former z=-9.70 final-skinned clearance=0.275184 depth=-0.145455 projected-area=0 near-cross=207/0 side-cross=0/15855 max-edge/triangle-area=0.0734252/0
+140: high full wall sweep samples=46 worst clearance@z=0.222394@-7.5 depth=-0.138872 area-ratio=1.44222 consecutive-footprint-area-delta=0.0516975@-8.2->-8.25(1.11163->0.882725) side-cross=0
+140: low full wall sweep samples=46 worst clearance@z=0.234326@-7.5 depth=-0.145455 area-ratio=1.00627 consecutive-footprint-area-delta=0.0239198@-8.4->-8.45(0.395608->0.308938) side-cross=0
+140: held-lantern wall approach final-skinned clearance=0.27312 finite=1 final-z=-9.735 blocked-ticks=141 max-edge/triangle-area=0.0982251/0.00142628 worst-step/first/centroid/bind/skinned=0/3326/-0.20772,0.528372,-8.58431/0.230297,1.43295,0.0716676/0.211276,1.46717,0.0493764 camera=0,0.7,-8.53167 triangle=-0.21138,0.53098,-8.58099;-0.206322,0.528837,-8.58391;-0.205458,0.525297,-8.58802;
+140: reward wall-safe movement strafe=0.0316667,-9.7 diagonal=0.0223917,-9.72239 retreat=0,-9.66833 corner-out/in=0.731667/0.668333 rotate-forward=0.0316667,-9.7
+140: walking-arm-pair-evidence case=walk-fixed-target baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryElbow=0.0242103 productionBoundaryElbow=0.0128193 baselineBoundaryP95=0.0287467 productionBoundaryP95=0.0153792 baselineBoundaryMax=0.0456174 productionBoundaryMax=0.0244856 pairedPoseContract=1 heldTorch=1 grip=1 boundary=1 improved=1
+140: walking-arm-paired-flexion case=walk-fixed-target samples=137 baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryTransitions=4 productionBoundaryTransitions=4 baselineBoundaryElbowStepMax=0.0242103 productionBoundaryElbowStepMax=0.0128193 baselineBoundaryArmP95Max=0.0287467 productionBoundaryArmP95Max=0.0153792 baselineBoundaryArmMax=0.0456174 productionBoundaryArmMax=0.0244856 baselineGripError=1.02202e-05 productionGripError=3.62561e-07 nonFlexionPoseHistoryIdentical=1
+140: walking-arm-pair-evidence case=production-torch baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryElbow=0.0339105 productionBoundaryElbow=0.0178584 baselineBoundaryP95=0.0401105 productionBoundaryP95=0.0212512 baselineBoundaryMax=0.0637163 productionBoundaryMax=0.0337062 pairedPoseContract=1 heldTorch=1 grip=1 boundary=1 improved=1
+140: walking-arm-paired-flexion case=production-torch samples=137 baselineFlexion=0..0 productionFlexion=0.174533..0.174533 baselineBoundaryTransitions=4 productionBoundaryTransitions=4 baselineBoundaryElbowStepMax=0.0339105 productionBoundaryElbowStepMax=0.0178584 baselineBoundaryArmP95Max=0.0401105 productionBoundaryArmP95Max=0.0212512 baselineBoundaryArmMax=0.0637163 productionBoundaryArmMax=0.0337062 baselineGripError=1.02569e-05 productionGripError=3.47871e-07 nonFlexionPoseHistoryIdentical=1
+140: Skinned character model smoke passed: skeleton=28206 player=83445 lich=27564 textured std430 stride=48 emissiveVertices=377 emissiveX=-0.813946..1.00981 outer=40 avg=0.943092,0.789989,0.636973
+4/4 Test #140: horde_rt_skinned_character_smoke ........   Passed   61.58 sec
+
+The following tests passed:
+	horde_rt_world_route_foundation_tests
+	horde_rt_simulation_gameplay_tests
+	horde_rt_skinned_character_smoke
+
+75% tests passed, 1 tests failed out of 4
+
+Total Test time (real) =  77.69 sec
+
+The following tests FAILED:
+	 45 - horde_rt_player_directional_rig_tests (Failed)
+Errors while running CTest

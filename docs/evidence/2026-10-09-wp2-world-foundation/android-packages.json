@@ -1,0 +1,555 @@
+{
+  "candidateHead": "d85a3cd1246e22c91d166eb3e43b90112d121cb0",
+  "unsignedReleaseBuild": true,
+  "gradleLane": "offline assembleDebug assembleRelease lintDebug; separate lintRelease; full testDebugUnitTest",
+  "lint": {
+    "debug": "passed",
+    "release": "passed"
+  },
+  "tests": [
+    {
+      "name": "com.samfa12.hordelanternrt.AmbienceOutputBufferTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.AmbienceOutputQueueTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.AndroidControllerInputTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.AndroidControllerIntegrationTest",
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.BenchmarkAutomationExportTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.BenchmarkAutomationIntentTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.BenchmarkSummaryReviewTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.BenchmarkSummaryUiTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.ContextualControlsLayoutTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.ControllerNavigationTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.DeathRecoveryTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.DustDebugAutomationTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.EntryMenuStateTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.EquipmentAudioFeedbackTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GameplayTouchCancellationTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GraphicsMenuLifecycleTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GraphicsPreferencesTest",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GraphicsPreviewCompactLayoutTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GraphicsPreviewOptionsTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GraphicsViewportRecoveryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.GrateDebugCheckpointTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.InterfaceLayoutTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.InterfacePreferencesTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MainActivityPlaytestReportLifecycleTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MenuAmbiencePlaybackTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MusicAudioFocusTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MusicOutputBufferTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.MusicOutputGainTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlayerDebugCheckpointTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlaytestReportExportTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlaytestReportFlowResourceTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlaytestReportScreenshotTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlaytestReportSubmissionTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.PlaytestReportVerificationTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.RenderScalePreferenceTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.SurfaceSuspensionLifecycleTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.TouchControlStateTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.VitalityHeartsTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "name": "com.samfa12.hordelanternrt.WaterDebugCheckpointTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "packages": [
+    {
+      "variant": "debug",
+      "apk": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 128766011,
+      "sha256": "7e86434bf8fa5ec4295cee3b0ce06a2d14b1b4dc231de22307f61416f8e4ddbb"
+    },
+    {
+      "variant": "release-unsigned",
+      "apk": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "bytes": 121199158,
+      "sha256": "fa89d319aa113e103dca075bd3ef75afaa33f12ab8b4c2bbb4318f9903e7a682"
+    }
+  ],
+  "libraryChecks": [
+    {
+      "abi": "arm64-v8a",
+      "apkEntry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4591792,
+      "apkEntrySha256": "bdc283caf1fafb23435a6ea715253d02f4e2c08933de76c75526a4b43d4082a2",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "strippedBytes": 4591792,
+      "strippedSha256": "bdc283caf1fafb23435a6ea715253d02f4e2c08933de76c75526a4b43d4082a2",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF64",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "AArch64",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "armeabi-v7a",
+      "apkEntry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4040424,
+      "apkEntrySha256": "4ef013df6302bdd48b0fa4846932787bfbb070a8f4ae54d2a8e684c9139c0eca",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "strippedBytes": 4040424,
+      "strippedSha256": "4ef013df6302bdd48b0fa4846932787bfbb070a8f4ae54d2a8e684c9139c0eca",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF32",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "ARM",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "x86",
+      "apkEntry": "lib/x86/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 5003088,
+      "apkEntrySha256": "32374bc841706f532b0d017518554365967301f6787d88ebda4fb19e4ac3b949",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86/libhorde_rt_probe_android.so",
+      "strippedBytes": 5003088,
+      "strippedSha256": "32374bc841706f532b0d017518554365967301f6787d88ebda4fb19e4ac3b949",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF32",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "Intel 80386",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "x86_64",
+      "apkEntry": "lib/x86_64/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4751328,
+      "apkEntrySha256": "694ba6ef3b8806fb872f5913ffedc03bf78a825b86f11d05ce836345563d95f7",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64/libhorde_rt_probe_android.so",
+      "strippedBytes": 4751328,
+      "strippedSha256": "694ba6ef3b8806fb872f5913ffedc03bf78a825b86f11d05ce836345563d95f7",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF64",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "Advanced Micro Devices X86-64",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "arm64-v8a",
+      "apkEntry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4401832,
+      "apkEntrySha256": "02bf046bb1d936d6055b90468496c48cd52f9fc8041d9e25065dec27d4cd44cf",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/release/stripReleaseDebugSymbols/out/lib/arm64-v8a/libhorde_rt_probe_android.so",
+      "strippedBytes": 4401832,
+      "strippedSha256": "02bf046bb1d936d6055b90468496c48cd52f9fc8041d9e25065dec27d4cd44cf",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF64",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "AArch64",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "armeabi-v7a",
+      "apkEntry": "lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 3885620,
+      "apkEntrySha256": "ef06dc728d437353f1a5976d9d335c319367933f7fd9f1cd05a859cef05dadb1",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/release/stripReleaseDebugSymbols/out/lib/armeabi-v7a/libhorde_rt_probe_android.so",
+      "strippedBytes": 3885620,
+      "strippedSha256": "ef06dc728d437353f1a5976d9d335c319367933f7fd9f1cd05a859cef05dadb1",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF32",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "ARM",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "x86",
+      "apkEntry": "lib/x86/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4769292,
+      "apkEntrySha256": "394e6767bf52c8a9f4fc26b3c33aa8be251485b83e7cd7aefac4c13cd6d020dd",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/release/stripReleaseDebugSymbols/out/lib/x86/libhorde_rt_probe_android.so",
+      "strippedBytes": 4769292,
+      "strippedSha256": "394e6767bf52c8a9f4fc26b3c33aa8be251485b83e7cd7aefac4c13cd6d020dd",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF32",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "Intel 80386",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    },
+    {
+      "abi": "x86_64",
+      "apkEntry": "lib/x86_64/libhorde_rt_probe_android.so",
+      "apkEntryBytes": 4551640,
+      "apkEntrySha256": "8f09e09c97bb392e94b134e6c2b6f15c9100a7235d5ad56ee801bf73566e4d91",
+      "strippedLibrary": "android/app/build/intermediates/stripped_native_libs/release/stripReleaseDebugSymbols/out/lib/x86_64/libhorde_rt_probe_android.so",
+      "strippedBytes": 4551640,
+      "strippedSha256": "8f09e09c97bb392e94b134e6c2b6f15c9100a7235d5ad56ee801bf73566e4d91",
+      "entryMatchesStripped": true,
+      "elfClass": "ELF64",
+      "elfData": "2's complement, little endian",
+      "elfMachine": "Advanced Micro Devices X86-64",
+      "loadAlignments": [
+        "0x4000",
+        "0x4000",
+        "0x4000"
+      ],
+      "loadAlignment16KiB": true
+    }
+  ],
+  "arm64ShaderPackageScans": [
+    {
+      "variant": "debug",
+      "inspector": "tools/InspectAndroidRtPipelineBundlePackage.ps1",
+      "externalValidation": "spirv-val and spirv-dis passed",
+      "strippedSha256": "bdc283caf1fafb23435a6ea715253d02f4e2c08933de76c75526a4b43d4082a2",
+      "packagedSha256": "bdc283caf1fafb23435a6ea715253d02f4e2c08933de76c75526a4b43d4082a2",
+      "semanticKeys": [
+        "diagnostic_mobile_generic_dielectric",
+        "diagnostic_mobile_opaque_fast",
+        "rayquery_compute_diagnostic_mobile_generic_dielectric",
+        "rayquery_compute_diagnostic_mobile_opaque_fast"
+      ],
+      "modules": [
+        {
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "a48b9bb85102c62a1695d62b98ed4cdd4075d2343b1366e79e9e42e7f26aa945",
+          "words": 148406,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 27
+        },
+        {
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "c26dd2ce36c68f02ef22df49e3f08a7612f80a0a84d8cd696a474af667f85451",
+          "words": 73677,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2
+        },
+        {
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "d50c9d0e5bb65f5dd8ccf6f63ea81ca0952cc24f4883c8be21c02b4805ad5af3",
+          "words": 148105,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 27
+        },
+        {
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "70afd1988fe149b35857616520df843a670f3f59c921957d4fdc0a17c657cf42",
+          "words": 73615,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2
+        }
+      ]
+    },
+    {
+      "variant": "release-unsigned",
+      "inspector": "tools/InspectAndroidRtPipelineBundlePackage.ps1",
+      "externalValidation": "spirv-val and spirv-dis passed",
+      "strippedSha256": "02bf046bb1d936d6055b90468496c48cd52f9fc8041d9e25065dec27d4cd44cf",
+      "packagedSha256": "02bf046bb1d936d6055b90468496c48cd52f9fc8041d9e25065dec27d4cd44cf",
+      "semanticKeys": [
+        "shipping_mobile_generic_dielectric",
+        "shipping_mobile_opaque_fast",
+        "rayquery_compute_shipping_mobile_generic_dielectric",
+        "rayquery_compute_shipping_mobile_opaque_fast"
+      ],
+      "modules": [
+        {
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "d05eec30c1fbdc256a34856c1a87f8f5789137ea79d04027bcaa059259565e64",
+          "words": 147347,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 27
+        },
+        {
+          "backend": "RayQueryCompute",
+          "executionModel": "GLCompute",
+          "sha256": "72b03e6bce4b3800a686a106290647af078a119c5da38c7d4cce870477df86d0",
+          "words": 71470,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2
+        },
+        {
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "ae779d534970ecb0c2e21289c07ddde58f239ea1906e36d7046323f4b7f249d9",
+          "words": 147046,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 27
+        },
+        {
+          "backend": "RayTracingPipeline",
+          "executionModel": "RayGenerationKHR",
+          "sha256": "009e1b37a9b3459ca3c1d900a0741c6bc6041288f759d2367e07fd7542889c9a",
+          "words": 71408,
+          "rayQueryCapability": true,
+          "rayQueryInitializations": 2
+        }
+      ]
+    }
+  ],
+  "coverageLimit": "All-ABI checks establish APK-entry-to-stripped-library SHA-256 identity and ELF headers/LOAD alignment only. Pipeline and RayQuery SPIR-V package inspection was ARM64-only.",
+  "rawLogs": [
+    "logs/android-corrected-ui-build.log",
+    "logs/android-debug-arm64-package.log",
+    "logs/android-release-arm64-package.log",
+    "logs/android-release-lint.log"
+  ]
+}
