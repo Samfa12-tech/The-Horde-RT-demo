@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "source_candidate_commit": "0eb665900c9efc95c443beada4c418776092cbe3",
+  "public_evidence_hashes_verified": 49,
+  "sanitized_log_hashes_verified": 34,
+  "command_logs_verified": 32,
+  "approved_ceilings_verified": 24,
+  "unchanged_other_budget_contracts": true,
+  "actual_generated_packages_verified": 16,
+  "source_change_allowlist_verified": 12,
+  "report_link_closure_verified": true,
+  "personal_path_and_secret_pattern_scan": "No matches in new report/evidence and changed source artifacts; decoded SPIR-V personal-path scan no matches",
+  "prior_evidence_and_protected_trees_unchanged": true,
+  "recursive_checkpoint_hash": false
+}

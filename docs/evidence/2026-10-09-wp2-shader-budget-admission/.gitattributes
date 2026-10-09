@@ -1,0 +1,4 @@
+.gitattributes -text
+*.log -text whitespace=-trailing-space,-blank-at-eof,cr-at-eol
+*.json -text whitespace=cr-at-eol
+*.jsonl -text whitespace=cr-at-eol

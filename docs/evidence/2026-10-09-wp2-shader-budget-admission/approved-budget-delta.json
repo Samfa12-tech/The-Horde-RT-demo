@@ -1,0 +1,117 @@
+{
+  "approved": {
+    "diagnostic_high_generic_dielectric": [
+      [
+        295636,
+        295960
+      ],
+      [
+        73909,
+        73990
+      ],
+      [
+        17638,
+        17649
+      ]
+    ],
+    "diagnostic_high_opaque_fast": [
+      [
+        594956,
+        595520
+      ],
+      [
+        148739,
+        148880
+      ],
+      [
+        33038,
+        33067
+      ]
+    ],
+    "diagnostic_mobile_generic_dielectric": [
+      [
+        294136,
+        294460
+      ],
+      [
+        73534,
+        73615
+      ],
+      [
+        17542,
+        17553
+      ]
+    ],
+    "diagnostic_mobile_opaque_fast": [
+      [
+        591856,
+        592420
+      ],
+      [
+        147964,
+        148105
+      ],
+      [
+        32845,
+        32874
+      ]
+    ],
+    "shipping_high_generic_dielectric": [
+      [
+        286808,
+        287132
+      ],
+      [
+        71702,
+        71783
+      ],
+      [
+        17214,
+        17225
+      ]
+    ],
+    "shipping_high_opaque_fast": [
+      [
+        590720,
+        591284
+      ],
+      [
+        147680,
+        147821
+      ],
+      [
+        32859,
+        32888
+      ]
+    ],
+    "shipping_mobile_generic_dielectric": [
+      [
+        285308,
+        285632
+      ],
+      [
+        71327,
+        71408
+      ],
+      [
+        17118,
+        17129
+      ]
+    ],
+    "shipping_mobile_opaque_fast": [
+      [
+        587620,
+        588184
+      ],
+      [
+        146905,
+        147046
+      ],
+      [
+        32666,
+        32695
+      ]
+    ]
+  },
+  "verification": "All 8 current source stats/dependencies/raw identities exactly equal reference before rows; all other maxima and exact invariants match; recorded tool binaries match SHA-256; exactly 24 ceilings change with zero headroom."
+}

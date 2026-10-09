@@ -1,0 +1,32 @@
+[
+  {
+    "configuration": "debug",
+    "test_seconds": 167.1,
+    "outer_seconds": 167.16058379999595,
+    "timeout_seconds": 180,
+    "margin_seconds": 12.9,
+    "poses": 3287,
+    "roof_entry_skinned_poses": 1812,
+    "plane_samples": 3178,
+    "disk_samples": 57970,
+    "failures": 0,
+    "executable_sha256": "b16aa368eb079482f3303b6cc40800b122108465c0791d3121323142b7958946",
+    "source_git_blob": "cc6aefb5884e9307a39e97f33ee809f8053a1174",
+    "unchanged_test_source": true
+  },
+  {
+    "configuration": "release",
+    "test_seconds": 16.26,
+    "outer_seconds": 16.31987130001653,
+    "timeout_seconds": 180,
+    "margin_seconds": 163.74,
+    "poses": 3287,
+    "roof_entry_skinned_poses": 1812,
+    "plane_samples": 3178,
+    "disk_samples": 57970,
+    "failures": 0,
+    "executable_sha256": "5cfc175b1fa6b7d1ded0b7734f350789751c9466176a673228fb8bbb002186e1",
+    "source_git_blob": "cc6aefb5884e9307a39e97f33ee809f8053a1174",
+    "unchanged_test_source": true
+  }
+]
