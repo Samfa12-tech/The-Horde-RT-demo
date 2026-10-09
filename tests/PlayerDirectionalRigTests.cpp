@@ -2,6 +2,7 @@
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/items/HeldLightState.h"
 #include "gameplay/items/HeldItemKinematics.h"
+#include "scene/DevelopmentWorldGeometry.h"
 #include "vulkan/raytracing/PlayerRenderSlot.h"
 
 #include <algorithm>
@@ -10,6 +11,7 @@
 #include <cstdint>
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <string>
 
 namespace
@@ -44,6 +46,13 @@ Vec3 Scale(const Vec3& value, const float scale)
 float Dot(const Vec3& a, const Vec3& b)
 {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+}
+bool TransformsNear(const HeldItemTransform& left, const HeldItemTransform& right,
+                    const float tolerance = 0.0001f)
+{
+    for (std::size_t i = 0; i < left.size(); ++i)
+        if (!Near(left[i], right[i], tolerance)) return false;
+    return true;
 }
 Vec3 Cross(const Vec3& a, const Vec3& b)
 {
@@ -84,7 +93,9 @@ bool PrepareRenderedPose(PlayerRenderSlot& rig,
                          const SimulationSnapshot& snapshot,
                          const std::uint64_t tick,
                          bool& poseUpdated,
-                         std::string& diagnostic)
+                         std::string& diagnostic,
+                         HeldItemStates* resolvedItems = nullptr,
+                         HeldLightState* resolvedLight = nullptr)
 {
     const auto& animation = snapshot.playerAnimation;
     const Vec3 worldUp{{0.0f, 1.0f, 0.0f}};
@@ -175,9 +186,12 @@ bool PrepareRenderedPose(PlayerRenderSlot& rig,
     if (!rig.ResolveHeldItemVisuals(snapshot.heldItems, leftGrip, rightGrip, bodyStow,
                                     renderItems, diagnostic)) return false;
     HeldLightState light{};
-    return ComposeHeldLightState(renderItems[0].worldFromItem,
-        PlayerRagTorchFlameSocketTransform(), PlayerRagTorchLightSocketTransform(),
-        1.0f, light, diagnostic) && light.active;
+    if (!ComposeHeldLightState(renderItems[0].worldFromItem,
+            PlayerRagTorchFlameSocketTransform(), PlayerRagTorchLightSocketTransform(),
+            1.0f, light, diagnostic) || !light.active) return false;
+    if (resolvedItems != nullptr) *resolvedItems = renderItems;
+    if (resolvedLight != nullptr) *resolvedLight = light;
+    return true;
 }
 }
 
@@ -317,6 +331,128 @@ int main(int argc, char** argv)
         }
     }
 
-    std::cout << "Directional runtime rig, aim independence, run stride, dodge disposition, and attachment sockets passed; dedicated run/back/strafe/dodge clips remain absent.\n";
+    // Exercise the real route support profile against the same prepared host
+    // geometry consumed by the renderer. This is CPU geometry/readiness
+    // admission only; it makes no claim about BLAS upload or RT presentation.
+    const auto worldGeometry = horde::scene::PrepareDevelopmentWorldGeometry(false);
+    if (!Require(worldGeometry.valid &&
+                 horde::scene::ValidateDevelopmentWorldGeometry(worldGeometry),
+                 "directional rig route proof requires valid prepared world geometry")) return 1;
+    auto routeConfig = ProductionGameSimulationConfig();
+    auto routeSimulation = std::make_unique<GameSimulation>(routeConfig);
+    routeSimulation->SetDevelopmentWorldRoute(true);
+    bool cpuGeometryReadinessAdmitted = true;
+    for (std::size_t zone = 1u; zone < kWorldZones.size(); ++zone)
+    {
+        cpuGeometryReadinessAdmitted &= routeSimulation->PublishWorldZoneReadiness(
+            {routeSimulation->Snapshot().worldRoute.generation,
+             static_cast<WorldZoneId>(zone)}, ZoneReadiness::Ready);
+    }
+    if (!Require(cpuGeometryReadinessAdmitted,
+                 "prepared CPU geometry must admit the route host-readiness descriptors")) return 1;
+
+    InputSnapshot routeInput{};
+    routeInput.damageEnabled = false;
+    routeInput.yawRadians = 3.14159265359f;
+    routeInput.moveForward = 1.0f;
+    bool sawStepSupport = false;
+    bool sawRaisedSlope = false;
+    std::uint64_t routePoseSamples = 0u;
+    auto inspectRoutePose = [&]() {
+        const auto& snapshot = routeSimulation->Snapshot();
+        bool updated = false;
+        HeldItemStates items{};
+        HeldLightState light{};
+        if (!PrepareRenderedPose(rig, snapshot, rigTick++, updated, diagnostic,
+                                 &items, &light))
+        {
+            std::cerr << "World-route pose rejected: " << diagnostic << '\n';
+            return false;
+        }
+        if (!updated || !rig.SolvedPose().IsValid() || rig.UniqueVertices().empty() ||
+            rig.LeftSocketErrorMetres() > kPlayerGripSocketToleranceMetres ||
+            rig.RightSocketErrorMetres() > kPlayerGripSocketToleranceMetres)
+        {
+            std::cerr << "World-route rig failure tick=" << snapshot.tickIndex
+                      << " support=" << snapshot.playerSupportWorldY
+                      << " left=" << rig.LeftSocketErrorMetres()
+                      << " right=" << rig.RightSocketErrorMetres() << '\n';
+            return false;
+        }
+        const auto composedFlame = MultiplyHeldItemTransforms(
+            items[0].worldFromItem, PlayerRagTorchFlameSocketTransform());
+        const auto composedLight = MultiplyHeldItemTransforms(
+            items[0].worldFromItem, PlayerRagTorchLightSocketTransform());
+        if (items[0].id != HeldItemId::OriginalTorch || items[1].id != HeldItemId::Sword ||
+            items[0].parentMode != HeldItemParentMode::HandSocket ||
+            items[1].parentMode != HeldItemParentMode::BodyStow || !light.active ||
+            !TransformsNear(composedFlame, light.worldFromFlame) ||
+            !TransformsNear(composedLight, light.worldFromLight))
+        {
+            std::cerr << "World-route equipment attachment failure tick=" << snapshot.tickIndex
+                      << " torchParent=" << static_cast<int>(items[0].parentMode)
+                      << " swordParent=" << static_cast<int>(items[1].parentMode)
+                      << " lightActive=" << light.active << '\n';
+            return false;
+        }
+        ++routePoseSamples;
+        return true;
+    };
+    const auto walkRouteTo = [&](const WorldRoutePoint& target, const float forward) {
+        routeInput.yawRadians = 3.14159265359f;
+        routeInput.moveForward = forward;
+        auto previousSupportId = routeSimulation->Snapshot().playerSupportId;
+        for (std::uint32_t tick = 0u; tick < 1800u; ++tick)
+        {
+            const auto& before = routeSimulation->Snapshot();
+            if (std::hypot(target.x - before.playerX, target.z - before.playerZ) < 0.035f)
+                return true;
+            routeSimulation->StepFixed(routeInput);
+            const auto& snapshot = routeSimulation->Snapshot();
+            if (!snapshot.playerGrounded ||
+                (snapshot.playerSupportSurface != SupportSurface::Stone &&
+                 snapshot.playerSupportSurface != SupportSurface::Earth))
+            {
+                std::cerr << "World-route support lost tick=" << snapshot.tickIndex
+                          << " x=" << snapshot.playerX << " z=" << snapshot.playerZ
+                          << " y=" << snapshot.playerSupportWorldY << '\n';
+                return false;
+            }
+            sawStepSupport |= snapshot.playerSupportId == PlayerSupportId::WorldRouteStep &&
+                Near(snapshot.playerHeightDelta, 0.12f, 0.002f);
+            sawRaisedSlope |= snapshot.playerSupportWorldY > kRouteFloorWorldY + 1.0f &&
+                snapshot.playerSupportSurface == SupportSurface::Stone;
+            if (tick % 20u == 19u || snapshot.playerSupportId != previousSupportId)
+            {
+                if (!inspectRoutePose()) return false;
+            }
+            previousSupportId = snapshot.playerSupportId;
+        }
+        std::cerr << "World-route travel timed out at x=" << routeSimulation->Snapshot().playerX
+                  << " z=" << routeSimulation->Snapshot().playerZ
+                  << " support=" << routeSimulation->Snapshot().playerSupportWorldY
+                  << " target=" << target.x << ',' << target.z << '\n';
+        return false;
+    };
+    if (!Require(walkRouteTo(kWorldRoutePoints[2], 1.0f),
+                 "real-rig route travel must reach the sloped raised support")) return 1;
+    if (!Require(sawStepSupport && sawRaisedSlope &&
+                 Near(routeSimulation->Snapshot().playerSupportWorldY,
+                      kWorldRoutePoints[2].y, 0.03f) &&
+                 routeSimulation->Snapshot().playerSupportSurface == SupportSurface::Stone,
+                 "real-rig route travel must resolve both the 12 cm step and raised slope")) return 1;
+    if (!Require(walkRouteTo(kWorldRoutePoints[0], -1.0f),
+                 "real-rig route travel must return to the ground support")) return 1;
+    if (!Require(Near(routeSimulation->Snapshot().playerSupportWorldY,
+                      kWorldRoutePoints[0].y, 0.002f) &&
+                 Near(routeSimulation->Snapshot().playerHeightDelta, 0.0f, 0.002f) &&
+                 routeSimulation->Snapshot().playerSupportSurface == SupportSurface::Stone &&
+                 routePoseSamples >= 10u,
+                 "real-rig route return must finish grounded after bounded grip samples")) return 1;
+    if (!inspectRoutePose())
+        return Require(false, "returned ground pose retains real equipment and light attachments") ? 0 : 1;
+
+    std::cout << "Directional runtime rig, aim independence, run stride, dodge disposition, route support poses, and attachment sockets passed; dedicated run/back/strafe/dodge clips remain absent; route_pose_samples="
+              << routePoseSamples << " GPU_cost=not-measured.\n";
     return 0;
 }
