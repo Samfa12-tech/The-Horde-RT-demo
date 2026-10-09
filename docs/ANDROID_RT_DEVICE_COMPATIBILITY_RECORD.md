@@ -2721,3 +2721,27 @@ Both real hardware RT backends pass short waterfall-equipment and torch-drench s
 Ordinary portrait Entry/Settings/Graphics/details/preview/choices/scrolling/Back at font scale1.7, Controls/Credits/unchecked report-consent routes pass without saving settings, preparing or sending reports. A separate landscape Entry/Settings/Graphics/details/live-preview/Back check runs with system reduced motion active. Real initial loading and Home/re-entry are captured; Home return presents a new portrait surface generation3. Original free rotation/animator scale1 and all app preferences are restored, and the owned app stops. Opposite landscape and BB-51 comfort remain owner-reported on their original exact builds with runtime continuity established; this automated leg does not relabel them as new physical acceptance.
 
 Evidence class: exact local Debug installation, actual RT frame/readback ledger and bounded ordinary native UI/lifecycle observation. No sustained30FPS, thermal/power/memory, controller latency, untested hardware or owner-audio claim follows. Current source is runtime-identical to owner-accepted `ac97da91`; the long sustained programme and precise contact correction are explicitly owner-deferred. [Public receipts, selected actual images, failures and audit limits](ENGINEERING_1_6_2_FINAL_REVIEW_2026_10_09.md).
+
+
+## 9 October WP2 height proof — partial exact-candidate physical attempt
+
+SM-S948B / Android16 API36 / Adreno840, Vulkan1.4.295 driver raw2150932499
+(compilerE031.50.19.18). Source/generated candidate
+`0eb665900c9efc95c443beada4c418776092cbe3`; exact Debug APK and installed
+pullback SHA-256
+`1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c`.
+Read-only inventory identified the existing release; the owner approved adding
+the separate `.debug` package with separate development certificate/data.
+The release APK rehash remains unchanged. No uninstall/downgrade/data clear
+or signature bypass occurred.
+
+Ordinary no-fixture EntryMenu reports actual Pipeline Diagnostic/Mobile
+completed-frame dispatch/copy/successful presentation (serial29), with exact
+fresh catalogue pair hashes. Evidence class: exact installed local Debug bytes
+and native completed/presented-frame diagnostics only. Candidate foreground
+was not safely verified for a phone screenshot; visual acceptance is NOT RUN.
+The bounded pass stopped at Windows foreground/input access before continuous
+vertical traversal, Query, equipment/event-height and lifecycle checks.
+Full vertical DEVICE-VERIFIED remains NO; owner listening/haptics PENDING.
+No sustained performance, matched legacy-route, other backend or other-device
+acceptance follows. [Partial receipt and control blocker](superpowers/plans/2026-10-09-horde-1.7-wp2-physical-acceptance-attempt.md).
