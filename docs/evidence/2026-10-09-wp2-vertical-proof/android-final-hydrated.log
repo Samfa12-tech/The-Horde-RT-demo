@@ -1,0 +1,152 @@
+> Task :app:verifyMusicRuntimeAssets
+> Task :app:prepareRuntimeAssets UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths
+> Task :app:generateDebugResources
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:mergeDebugResources
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:processDebugJavaRes NO-SOURCE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:configureCMakeDebug[arm64-v8a]
+> Task :app:buildCMakeDebug[arm64-v8a]
+> Task :app:configureCMakeDebug[armeabi-v7a]
+> Task :app:buildCMakeDebug[armeabi-v7a]
+> Task :app:configureCMakeDebug[x86]
+> Task :app:processDebugResources
+> Task :app:buildCMakeDebug[x86]
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:configureCMakeDebug[x86_64]
+> Task :app:buildCMakeDebug[x86_64]
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :app:generateReleaseBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileRelease UP-TO-DATE
+> Task :app:checkReleaseAarMetadata UP-TO-DATE
+> Task :app:generateReleaseResValues UP-TO-DATE
+> Task :app:mapReleaseSourceSetPaths
+> Task :app:generateReleaseResources
+> Task :app:createReleaseCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksRelease UP-TO-DATE
+> Task :app:processReleaseMainManifest UP-TO-DATE
+> Task :app:processReleaseManifest UP-TO-DATE
+> Task :app:processReleaseManifestForPackage UP-TO-DATE
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:stripDebugDebugSymbols
+> Task :app:mergeReleaseResources
+> Task :app:buildCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:processReleaseResources
+> Task :app:configureCMakeRelWithDebInfo[armeabi-v7a]
+
+> Task :app:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:generateReleaseLintVitalReportModel
+> Task :app:lintVitalAnalyzeRelease
+> Task :app:packageDebug
+> Task :app:buildCMakeRelWithDebInfo[armeabi-v7a]
+> Task :app:lintVitalReportRelease SKIPPED
+> Task :app:lintVitalRelease SKIPPED
+> Task :app:configureCMakeRelWithDebInfo[x86]
+> Task :app:buildCMakeRelWithDebInfo[x86]
+> Task :app:configureCMakeRelWithDebInfo[x86_64]
+> Task :app:buildCMakeRelWithDebInfo[x86_64]
+> Task :app:mergeReleaseJniLibFolders
+> Task :app:checkReleaseDuplicateClasses
+> Task :app:mergeReleaseNativeLibs
+> Task :app:dexBuilderRelease
+> Task :app:desugarReleaseFileDependencies
+> Task :app:mergeReleaseStartupProfile
+> Task :app:mergeExtDexRelease
+> Task :app:mergeReleaseArtProfile
+> Task :app:mergeReleaseGlobalSynthetics
+> Task :app:mergeReleaseShaders
+> Task :app:compileReleaseShaders NO-SOURCE
+> Task :app:generateReleaseAssets UP-TO-DATE
+> Task :app:stripReleaseDebugSymbols
+> Task :app:mergeDexRelease
+> Task :app:mergeReleaseAssets
+> Task :app:compileReleaseArtProfile
+> Task :app:extractReleaseNativeSymbolTables
+> Task :app:extractReleaseVersionControlInfo
+> Task :app:processReleaseJavaRes NO-SOURCE
+> Task :app:mergeReleaseJavaResource
+> Task :app:collectReleaseDependencies
+> Task :app:sdkReleaseDependencyData
+> Task :app:writeReleaseAppMetadata
+> Task :app:writeReleaseSigningConfigVersions
+> Task :app:optimizeReleaseResources
+> Task :app:preDebugAndroidTestBuild SKIPPED
+> Task :app:generateDebugAndroidTestResValues UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:generateDebugLintReportModel
+> Task :app:generateDebugAndroidTestLintModel
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:generateDebugUnitTestLintModel
+> Task :app:generateReleaseLintReportModel
+> Task :app:preReleaseUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:bundleReleaseClassesToCompileJar
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:mergeReleaseNativeDebugMetadata
+
+> Task :app:compileDebugUnitTestJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :app:generateReleaseUnitTestLintModel
+> Task :app:compressReleaseAssets
+> Task :app:lintAnalyzeDebugAndroidTest
+> Task :app:packageDebugUnitTestForUnitTest
+> Task :app:processDebugUnitTestJavaRes NO-SOURCE
+> Task :app:generateDebugUnitTestConfig
+> Task :app:packageRelease
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleDebug
+> Task :app:createReleaseApkListingFileRedirect
+> Task :app:assembleRelease
+> Task :app:lintAnalyzeDebugUnitTest
+> Task :app:lintAnalyzeDebug
+> Task :app:lintAnalyzeRelease
+> Task :app:testDebugUnitTest
+
+> Task :app:lintReportDebug
+Wrote HTML report to file:///C:/Users/sam_s/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.7-wp2-vertical-proof/android/app/build/reports/lint-results-debug.html
+
+> Task :app:lintDebug
+> Task :app:lintAnalyzeReleaseUnitTest
+
+> Task :app:lintReportRelease
+Wrote HTML report to file:///C:/Users/sam_s/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.7-wp2-vertical-proof/android/app/build/reports/lint-results-release.html
+
+> Task :app:lintRelease
+[Incubating] Problems report is available at: file:///C:/Users/sam_s/Documents/the%20Horde%20RT%20Demo/.worktrees/horde-1.7-wp2-vertical-proof/android/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 2m 31s
+116 actionable tasks: 77 executed, 39 up-to-date

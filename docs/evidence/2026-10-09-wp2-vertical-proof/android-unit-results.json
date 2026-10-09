@@ -1,0 +1,26 @@
+[
+  {
+    "name": "com.samfa12.hordelanternrt.EquipmentAudioFeedbackTest",
+    "tests": "3",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "0.009"
+  },
+  {
+    "name": "com.samfa12.hordelanternrt.PlayerDebugCheckpointTest",
+    "tests": "4",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "4.719"
+  },
+  {
+    "name": "com.samfa12.hordelanternrt.SurfaceSuspensionLifecycleTest",
+    "tests": "7",
+    "failures": "0",
+    "errors": "0",
+    "skipped": "0",
+    "time": "3.499"
+  }
+]

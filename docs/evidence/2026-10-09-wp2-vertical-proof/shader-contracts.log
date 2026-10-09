@@ -1,0 +1,48 @@
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-debug
+    Start 76: horde_rt_scene_abi_generator_tests
+1/5 Test #76: horde_rt_scene_abi_generator_tests ........   Passed    0.81 sec
+    Start 77: horde_rt_raygen_compiler_strategy_tests
+2/5 Test #77: horde_rt_raygen_compiler_strategy_tests ...   Passed   31.18 sec
+    Start 78: horde_rt_raygen_variant_manifest_tests
+3/5 Test #78: horde_rt_raygen_variant_manifest_tests ....***Failed    1.29 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\RaygenVariantManifestTests.ps1:25
+Line |
+  25 |      if (-not $Condition) { throw $Message }
+     |                             ~~~~~~~~~~~~~~
+     | Generic include hash changed before matrix compilation.
+
+    Start 79: horde_rt_raygen_variant_artifact_tests
+4/5 Test #79: horde_rt_raygen_variant_artifact_tests ....***Failed    1.35 sec
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tests\RaygenVariantArtifactTests.ps1:28
+Line |
+  28 |      if (-not $Condition) { throw $Message }
+     |                             ~~~~~~~~~~~~~~
+     | Compatibility generic include changed unexpectedly.
+
+    Start 80: horde_rt_rayquery_compute_shader_tests
+5/5 Test #80: horde_rt_rayquery_compute_shader_tests ....***Failed   45.03 sec
+RayQuery compute variant rayquery_compute_diagnostic_high_generic_dielectric: bytes=296208; functions=83; calls=264; ray-query sites=2; atomics=41; SPIR-V SHA-256=5f51a1b5175b29db3b5fb34eaa784fe3322607059b190fa770cd7835e3cef760
+RayQuery compute variant rayquery_compute_diagnostic_high_opaque_fast: bytes=596724; functions=1; calls=0; ray-query sites=29; atomics=5; SPIR-V SHA-256=6728cadff8b1dc2bc7d18d370b1bf6ccff1533908efd587a77e3848b7b940f95
+RayQuery compute variant rayquery_compute_diagnostic_mobile_generic_dielectric: bytes=294708; functions=83; calls=261; ray-query sites=2; atomics=41; SPIR-V SHA-256=c26dd2ce36c68f02ef22df49e3f08a7612f80a0a84d8cd696a474af667f85451
+RayQuery compute variant rayquery_compute_diagnostic_mobile_opaque_fast: bytes=593624; functions=1; calls=0; ray-query sites=27; atomics=5; SPIR-V SHA-256=a48b9bb85102c62a1695d62b98ed4cdd4075d2343b1366e79e9e42e7f26aa945
+RayQuery compute variant rayquery_compute_shipping_high_generic_dielectric: bytes=287380; functions=83; calls=264; ray-query sites=2; atomics=0; SPIR-V SHA-256=cf819ead8266e755bc3c783380f983a7a0d3e0e338834234cb643f78a65ef1bb
+RayQuery compute variant rayquery_compute_shipping_high_opaque_fast: bytes=592488; functions=1; calls=0; ray-query sites=29; atomics=0; SPIR-V SHA-256=f21fb2fe7acf6991d43ba697cc40ca05460e844b0be5c6e5d1e0bd5dcc193ee5
+RayQuery compute variant rayquery_compute_shipping_mobile_generic_dielectric: bytes=285880; functions=83; calls=261; ray-query sites=2; atomics=0; SPIR-V SHA-256=72b03e6bce4b3800a686a106290647af078a119c5da38c7d4cce870477df86d0
+RayQuery compute variant rayquery_compute_shipping_mobile_opaque_fast: bytes=589388; functions=1; calls=0; ray-query sites=27; atomics=0; SPIR-V SHA-256=d05eec30c1fbdc256a34856c1a87f8f5789137ea79d04027bcaa059259565e64
+Exception: C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\GenerateRayQueryComputeVariants.ps1:46
+Line |
+  46 |      if (-not $Value) { throw $Message }
+     |                         ~~~~~~~~~~~~~~
+     | Frozen RayQuery compute catalog is stale or malformed: C:\Users\sam_s\Documents\the Horde RT
+     | Demo\.worktrees\horde-1.7-wp2-vertical-proof\tools\rayquery-variant-catalog.json
+
+
+40% tests passed, 3 tests failed out of 5
+
+Total Test time (real) =  79.69 sec
+
+The following tests FAILED:
+	 78 - horde_rt_raygen_variant_manifest_tests (Failed)
+	 79 - horde_rt_raygen_variant_artifact_tests (Failed)
+	 80 - horde_rt_rayquery_compute_shader_tests (Failed)
+Errors while running CTest

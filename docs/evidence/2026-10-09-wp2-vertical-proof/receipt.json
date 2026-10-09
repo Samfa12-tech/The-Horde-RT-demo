@@ -1,0 +1,853 @@
+{
+  "schema": 1,
+  "recorded_utc": "2026-10-09T04:00:49.223439+00:00",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "source_candidate_commit": "0576db24a56df4d18c693f2e55352987c34e0c9f",
+  "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+  "accepted_runtime_baseline": "1c28d0563a897dc72d410bdb2b61723e66ed92af",
+  "wp0_checkpoint": "4a28ec7ebd089c53ac354bbb83f65525c6e49c65",
+  "worktree": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+  "status": {
+    "host_ready": false,
+    "implementation_checkpoint": true,
+    "device_verified": false,
+    "owner_audio_haptic_acceptance": "pending"
+  },
+  "fixture": {
+    "legacy_floor_world_y": -0.95,
+    "baseline_eye_world_y": 0.7,
+    "eye_above_support_metres": 1.65,
+    "supported_delta_metres": 0.35,
+    "production_enabled": false,
+    "support_authority": "fixed-step GameSimulation; resident fixture resolver after legacy XZ collision",
+    "directions_tested": 2,
+    "support_test_cases": 265,
+    "support_test_failures": 0,
+    "raised_roof_retraction_metres": 0.197407,
+    "raised_roof_headroom_metres": 0.0347347
+  },
+  "torch": {
+    "original_wp0_timeout_seconds": 180.03,
+    "historical_focused_pass_seconds": 168.85,
+    "historical_margin_seconds": 11.15,
+    "historical_margin_percent": 6.1944444444,
+    "current_exit_status": 0,
+    "current_test_seconds": 168.7,
+    "current_margin_seconds": 11.300000000000011,
+    "current_margin_percent": 6.277777777777784,
+    "current_outer_wall_seconds": 169.09541780001018,
+    "coverage_source": "unchanged FinalHeldTorchClearanceTests; current raw log",
+    "original_coverage": {
+      "poses": 3287,
+      "roof_entry_skinned_poses": 1812,
+      "plane_samples": 3178,
+      "disk_samples": 57970
+    },
+    "policy_seconds": 180,
+    "source_unchanged": true,
+    "cause_claim": null,
+    "current_coverage": {
+      "poses": 3287,
+      "roof_entry_skinned_poses": 1812,
+      "plane_samples": 3178,
+      "disk_samples": 57970,
+      "assertion_failures": 0
+    }
+  },
+  "blocker": {
+    "gate": "Pipeline eight-mode frozen publication/artifact check",
+    "reason": "new shader source exceeds unchanged frozen byte budgets: GenericDielectric +324 bytes; OpaqueFast +564 bytes for each diagnostic/shipping and high/mobile variant",
+    "pipeline_artifacts": "unchanged baseline; stale for new ABI/source; do not use for accepted GPU feature proof",
+    "policy_changed": false
+  },
+  "audio": {
+    "listener_convention": "event-time eye Y = +0.70 + support delta; freeze with X/Z/yaw at Emit",
+    "source_y": "existing source worldY preserved; no invented emitter heights",
+    "distance_pan_rolloff_obstruction": "legacy planar outputs preserved even at nonzero Y",
+    "shared_queue_capacity": 64,
+    "android_transport_capacity": 128,
+    "android_overflow": "newest-drop",
+    "android_words_per_event": 3,
+    "delayed_fall_separation_ms": 140
+  },
+  "targets": [
+    {
+      "platform": "Windows",
+      "device": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "os": "Windows 11 Home 10.0.26300",
+      "driver": "32.0.16.1047",
+      "backend": "Pipeline",
+      "status": "blocked",
+      "reason": "frozen shader publication incomplete; no RT presentation or motion/lifecycle evidence"
+    },
+    {
+      "platform": "Windows",
+      "device": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "backend": "RayQueryCompute",
+      "status": "not run",
+      "reason": "bounded handoff before device acceptance; no RT presentation claim"
+    },
+    {
+      "platform": "Android",
+      "backend": "Pipeline and RayQueryCompute",
+      "status": "blocked",
+      "reason": "no connected device; no candidate installation authority; no device mutation performed"
+    }
+  ],
+  "runs": [
+    {
+      "label": "build-debug-proof",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+        "--build",
+        "--preset",
+        "windows-x64-debug",
+        "--target",
+        "horde_rt_vertical_support_tests",
+        "horde_rt_held_item_vertical_support_rig_tests",
+        "horde_rt_diagnostic_window",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:26:20.779402+00:00",
+      "wall_seconds": 21.493143899948336,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "3089a035eded88324dc0d925a18ed1a40c1864054a9bd10ac75e49c18a7acf66",
+      "log": "reports\\vertical-proof\\build-debug-proof.log",
+      "log_sha256": "8c38d86e4433c8ea8c2b84da51c221c6478f23d2936d82ad7b2c0d55b8dde273"
+    },
+    {
+      "label": "shader-compat-generation",
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "tools/compile-raygen.ps1"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:27:06.828526+00:00",
+      "wall_seconds": 9.889423499989789,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "773ad5a30309359ee6c2ea79fcbd72de982e0bf14504139c63e11bca39e49f2a",
+      "log": "reports\\vertical-proof\\shader-compat-generation.log",
+      "log_sha256": "55c71f1c21f0412886b99c8b9cd4a88e0a9899c3bfbef19f225e0172d118aeb5"
+    },
+    {
+      "label": "proof-debug-first",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--preset",
+        "windows-x64-debug",
+        "--no-tests=error",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "-R",
+        "^horde_rt_(vertical_support_tests|held_item_vertical_support_rig_tests)$"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:28:13.522054+00:00",
+      "wall_seconds": 10.134950499981642,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "194d45ef70975e64889e29cda73865c0787f5310dd332a2388e31b3882485a02",
+      "log": "reports\\vertical-proof\\proof-debug-first.log",
+      "log_sha256": "08c2a5085b7ac583140747e8ae7051e9aa61398402e20900f9519999581c3952"
+    },
+    {
+      "label": "build-debug-affected",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+        "--build",
+        "--preset",
+        "windows-x64-debug",
+        "--target",
+        "horde_rt_vertical_support_tests",
+        "horde_rt_held_item_vertical_support_rig_tests",
+        "horde_rt_simulation_timing_tests",
+        "horde_rt_simulation_gameplay_tests",
+        "horde_rt_combat_timing_trace_tests",
+        "horde_rt_input_presentation_trace_tests",
+        "horde_rt_input_mailbox_stress",
+        "horde_rt_held_item_transition_tests",
+        "horde_rt_held_item_clearance_tests",
+        "horde_rt_held_item_socket_tests",
+        "horde_rt_player_animation_tests",
+        "horde_rt_lantern_reward_tests",
+        "horde_rt_lantern_pendulum_tests",
+        "horde_rt_fire_emitter_tests",
+        "horde_rt_spatial_audio_smoke",
+        "horde_rt_graphics_preview_frame_adapter_tests",
+        "horde_rt_scene_abi_tests",
+        "horde_rt_scene_initialise_preflight_tests",
+        "horde_rt_scene_resource_inventory_tests",
+        "horde_rt_frame_evidence_coordinator_tests",
+        "horde_rt_presentation_transform_tests",
+        "horde_rt_waterfall_production_route_tests",
+        "horde_rt_diagnostic_window",
+        "horde_rt_final_held_torch_clearance_tests",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:29:07.916809+00:00",
+      "wall_seconds": 131.10434710001573,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "194d45ef70975e64889e29cda73865c0787f5310dd332a2388e31b3882485a02",
+      "log": "reports\\vertical-proof\\build-debug-affected.log",
+      "log_sha256": "4c706cfc4409da3a9b30ba219aa8c67812beddbb06960607fcc960be3df019e8"
+    },
+    {
+      "label": "affected-debug",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--preset",
+        "windows-x64-debug",
+        "--no-tests=error",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "-R",
+        "^(horde_rt_vertical_support_tests|horde_rt_held_item_vertical_support_rig_tests|horde_rt_simulation_timing_tests|horde_rt_simulation_gameplay_tests|horde_rt_combat_timing_trace_tests|horde_rt_input_presentation_trace_tests|horde_rt_input_mailbox_stress|horde_rt_held_item_transition_tests|horde_rt_held_item_clearance_tests|horde_rt_held_item_socket_tests|horde_rt_player_animation_tests|horde_rt_lantern_reward_tests|horde_rt_lantern_pendulum_tests|horde_rt_fire_emitter_tests|horde_rt_spatial_audio_smoke|horde_rt_graphics_preview_frame_adapter_tests|horde_rt_scene_abi_tests|horde_rt_scene_initialise_preflight_tests|horde_rt_scene_resource_inventory_tests|horde_rt_frame_evidence_coordinator_tests|horde_rt_presentation_transform_tests|horde_rt_waterfall_production_route_tests)$"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:31:51.744987+00:00",
+      "wall_seconds": 112.67641559999902,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "b59d1cbb8d495434d65e914c2ae855edaf9053417296b1c2b0a07b05ae9b049d",
+      "log": "reports\\vertical-proof\\affected-debug.log",
+      "log_sha256": "6a4bc0b6210dc0589bd27954c089e7b6ab898bbed5d1e4426a841e932b2d5fee"
+    },
+    {
+      "label": "android-debug",
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-Command",
+        "Set-Location android; ./gradlew.bat --offline assembleDebug lintDebug testDebugUnitTest --tests \"*PlayerDebugCheckpointTest\" --tests \"*EquipmentAudioFeedbackTest\" --tests \"*SurfaceSuspensionLifecycleTest\" --console=plain; exit $LASTEXITCODE"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:30:49.927144+00:00",
+      "wall_seconds": 206.4858614000259,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "2ec4885d78da9cf24b473cf75c8246b48b4796b673481ecbe36fa42ed8777e36",
+      "log": "reports\\vertical-proof\\android-debug.log",
+      "log_sha256": "6c592c96aa9787eaddd51c2b0ebcbf24f8e6587b86ce2397fcd5577121ac319b"
+    },
+    {
+      "label": "configure-release",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+        "--preset",
+        "windows-x64-release"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:34:20.369585+00:00",
+      "wall_seconds": 19.48740500002168,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "b59d1cbb8d495434d65e914c2ae855edaf9053417296b1c2b0a07b05ae9b049d",
+      "log": "reports\\vertical-proof\\configure-release.log",
+      "log_sha256": "18c2615746d1a60f041e52be5557fa90b42a5352332326a453eab07355dcef7a"
+    },
+    {
+      "label": "shader-contracts",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--preset",
+        "windows-x64-debug",
+        "--no-tests=error",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "-R",
+        "^horde_rt_(scene_abi_generator_tests|raygen_variant_manifest_tests|raygen_variant_artifact_tests|rayquery_compute_shader_tests|raygen_compiler_strategy_tests)$"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:34:53.105595+00:00",
+      "wall_seconds": 79.91958470002282,
+      "exit_status": 8,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "b59d1cbb8d495434d65e914c2ae855edaf9053417296b1c2b0a07b05ae9b049d",
+      "log": "reports\\vertical-proof\\shader-contracts.log",
+      "log_sha256": "e483bcf0fa139c85569e1d25a29cc92099f52b4799f81b1d28b7018a2da3ff7c"
+    },
+    {
+      "label": "build-release-affected",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+        "--build",
+        "--preset",
+        "windows-x64-release",
+        "--target",
+        "horde_rt_vertical_support_tests",
+        "horde_rt_held_item_vertical_support_rig_tests",
+        "horde_rt_simulation_timing_tests",
+        "horde_rt_simulation_gameplay_tests",
+        "horde_rt_combat_timing_trace_tests",
+        "horde_rt_input_presentation_trace_tests",
+        "horde_rt_input_mailbox_stress",
+        "horde_rt_held_item_transition_tests",
+        "horde_rt_held_item_clearance_tests",
+        "horde_rt_held_item_socket_tests",
+        "horde_rt_player_animation_tests",
+        "horde_rt_lantern_reward_tests",
+        "horde_rt_lantern_pendulum_tests",
+        "horde_rt_fire_emitter_tests",
+        "horde_rt_spatial_audio_smoke",
+        "horde_rt_graphics_preview_frame_adapter_tests",
+        "horde_rt_scene_abi_tests",
+        "horde_rt_scene_initialise_preflight_tests",
+        "horde_rt_scene_resource_inventory_tests",
+        "horde_rt_frame_evidence_coordinator_tests",
+        "horde_rt_presentation_transform_tests",
+        "horde_rt_waterfall_production_route_tests",
+        "horde_rt_diagnostic_window",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:34:40.021037+00:00",
+      "wall_seconds": 186.7314689999912,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "b59d1cbb8d495434d65e914c2ae855edaf9053417296b1c2b0a07b05ae9b049d",
+      "log": "reports\\vertical-proof\\build-release-affected.log",
+      "log_sha256": "70bcf47c0648a99ebc5fdeea4000efaa5a9cb72343ed127e1d119db9b720ac73"
+    },
+    {
+      "label": "rayquery-generation",
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-File",
+        "tools/GenerateRayQueryComputeVariants.ps1",
+        "-Write"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:37:04.754364+00:00",
+      "wall_seconds": 55.24650569999358,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "889a04df1c7617df929cc185b20178e5216393d9479c49755afb6ab5f12ff8f1",
+      "log": "reports\\vertical-proof\\rayquery-generation.log",
+      "log_sha256": "9674fe55fe6e49a129ad7c5daef59cddd9a0cc87398907d2fb41ae83768a7d0d"
+    },
+    {
+      "label": "build-debug-final",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+        "--build",
+        "--preset",
+        "windows-x64-debug",
+        "--target",
+        "horde_rt_vertical_support_tests",
+        "horde_rt_held_item_vertical_support_rig_tests",
+        "horde_rt_spatial_audio_smoke",
+        "horde_rt_scene_resource_inventory_tests",
+        "horde_rt_diagnostic_window",
+        "horde_rt_final_held_torch_clearance_tests",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:41:48.874912+00:00",
+      "wall_seconds": 10.932570300006773,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "712fdb6f26b94a24c79f0540bc60115c3340c05ec168fcb37288417d3cbe24bb",
+      "log": "reports\\vertical-proof\\build-debug-final.log",
+      "log_sha256": "b05fd67049b1774e701048026e2092d1b6894623941bbda91479ecc3a28beb4f"
+    },
+    {
+      "label": "build-release-final",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+        "--build",
+        "--preset",
+        "windows-x64-release",
+        "--target",
+        "horde_rt_vertical_support_tests",
+        "horde_rt_held_item_vertical_support_rig_tests",
+        "horde_rt_simulation_timing_tests",
+        "horde_rt_simulation_gameplay_tests",
+        "horde_rt_combat_timing_trace_tests",
+        "horde_rt_input_presentation_trace_tests",
+        "horde_rt_input_mailbox_stress",
+        "horde_rt_held_item_transition_tests",
+        "horde_rt_held_item_clearance_tests",
+        "horde_rt_held_item_socket_tests",
+        "horde_rt_player_animation_tests",
+        "horde_rt_lantern_reward_tests",
+        "horde_rt_lantern_pendulum_tests",
+        "horde_rt_fire_emitter_tests",
+        "horde_rt_spatial_audio_smoke",
+        "horde_rt_graphics_preview_frame_adapter_tests",
+        "horde_rt_scene_abi_tests",
+        "horde_rt_scene_initialise_preflight_tests",
+        "horde_rt_scene_resource_inventory_tests",
+        "horde_rt_frame_evidence_coordinator_tests",
+        "horde_rt_presentation_transform_tests",
+        "horde_rt_waterfall_production_route_tests",
+        "horde_rt_diagnostic_window",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:41:47.211841+00:00",
+      "wall_seconds": 21.190684199973475,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "712fdb6f26b94a24c79f0540bc60115c3340c05ec168fcb37288417d3cbe24bb",
+      "log": "reports\\vertical-proof\\build-release-final.log",
+      "log_sha256": "370c93b61bb63f2ef8be77a328c1c5e85e2c1a9b499b76768affaf90a337f8b1"
+    },
+    {
+      "source_candidate_commit": "6e630afa83a3f88451dcb1509baf94192359b550",
+      "label": "android-final",
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-Command",
+        "Set-Location android; ./gradlew.bat --offline assembleDebug assembleRelease lintDebug lintRelease testDebugUnitTest --tests \"*PlayerDebugCheckpointTest\" --tests \"*EquipmentAudioFeedbackTest\" --tests \"*SurfaceSuspensionLifecycleTest\" --console=plain; exit $LASTEXITCODE"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:42:15.691403+00:00",
+      "wall_seconds": 53.148037200036924,
+      "exit_status": 1,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "712fdb6f26b94a24c79f0540bc60115c3340c05ec168fcb37288417d3cbe24bb",
+      "log": "reports\\vertical-proof\\android-final.log",
+      "log_sha256": "f583c90fd0c283987608189bd7afcf9d49fb83fe6262648f8aae5482b734d0be"
+    },
+    {
+      "source_candidate_commit": "6e630afa83a3f88451dcb1509baf94192359b550",
+      "label": "affected-release",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--preset",
+        "windows-x64-release",
+        "--no-tests=error",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "-R",
+        "^(horde_rt_vertical_support_tests|horde_rt_held_item_vertical_support_rig_tests|horde_rt_simulation_timing_tests|horde_rt_simulation_gameplay_tests|horde_rt_combat_timing_trace_tests|horde_rt_input_presentation_trace_tests|horde_rt_input_mailbox_stress|horde_rt_held_item_transition_tests|horde_rt_held_item_clearance_tests|horde_rt_held_item_socket_tests|horde_rt_player_animation_tests|horde_rt_lantern_reward_tests|horde_rt_lantern_pendulum_tests|horde_rt_fire_emitter_tests|horde_rt_spatial_audio_smoke|horde_rt_graphics_preview_frame_adapter_tests|horde_rt_scene_abi_tests|horde_rt_scene_initialise_preflight_tests|horde_rt_scene_resource_inventory_tests|horde_rt_frame_evidence_coordinator_tests|horde_rt_presentation_transform_tests|horde_rt_waterfall_production_route_tests)$"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:45:31.294424+00:00",
+      "wall_seconds": 29.95726629998535,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "adfbc180f98fa13a204e7f75b305062aa6916f74742a2cea326ddb3f6145b910",
+      "log": "reports\\vertical-proof\\affected-release.log",
+      "log_sha256": "8dd7fb19281a5e4544defc4f62b072dbafc6a8f9001a3d1d0d24dd7e172ac18f"
+    },
+    {
+      "source_candidate_commit": "6e630afa83a3f88451dcb1509baf94192359b550",
+      "label": "proof-debug-final",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--preset",
+        "windows-x64-debug",
+        "--no-tests=error",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "-V",
+        "-R",
+        "^horde_rt_(vertical_support_tests|held_item_vertical_support_rig_tests|spatial_audio_smoke|scene_resource_inventory_tests)$"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:46:01.545992+00:00",
+      "wall_seconds": 15.929929700039793,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "adfbc180f98fa13a204e7f75b305062aa6916f74742a2cea326ddb3f6145b910",
+      "log": "reports\\vertical-proof\\proof-debug-final.log",
+      "log_sha256": "f0a03b36e9126293b40172877c17cdb0e058e4def4c9088e3feace0d732017b4"
+    },
+    {
+      "source_candidate_commit": "6e630afa83a3f88451dcb1509baf94192359b550",
+      "label": "android-final-hydrated",
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-Command",
+        "Set-Location android; ./gradlew.bat --offline assembleDebug assembleRelease lintDebug lintRelease testDebugUnitTest --tests \"*PlayerDebugCheckpointTest\" --tests \"*EquipmentAudioFeedbackTest\" --tests \"*SurfaceSuspensionLifecycleTest\" --console=plain; exit $LASTEXITCODE"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:44:41.212929+00:00",
+      "wall_seconds": 152.1831828999566,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "adfbc180f98fa13a204e7f75b305062aa6916f74742a2cea326ddb3f6145b910",
+      "log": "reports\\vertical-proof\\android-final-hydrated.log",
+      "log_sha256": "8dc9a84d2c92d0597e662716df625f14b81b6618ffd8702b807090e120951839"
+    },
+    {
+      "source_candidate_commit": "6e630afa83a3f88451dcb1509baf94192359b550",
+      "label": "shader-contracts-reconciled",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--preset",
+        "windows-x64-debug",
+        "--no-tests=error",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "-R",
+        "^horde_rt_(raygen_variant_manifest_tests|raygen_variant_artifact_tests|rayquery_compute_shader_tests)$"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:46:01.743993+00:00",
+      "wall_seconds": 140.1975126999896,
+      "exit_status": 8,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "adfbc180f98fa13a204e7f75b305062aa6916f74742a2cea326ddb3f6145b910",
+      "log": "reports\\vertical-proof\\shader-contracts-reconciled.log",
+      "log_sha256": "8c1b89f0002d341d40baa5f0de85c7f34e781cecc9d8a7a6a42c1fd4ccec0440"
+    },
+    {
+      "source_candidate_commit": "6e630afa83a3f88451dcb1509baf94192359b550",
+      "label": "torch-debug-full",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--preset",
+        "windows-x64-debug",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "--no-tests=error",
+        "-R",
+        "^horde_rt_final_held_torch_clearance_tests$",
+        "-V"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:49:49.365974+00:00",
+      "wall_seconds": 169.09541780001018,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "adfbc180f98fa13a204e7f75b305062aa6916f74742a2cea326ddb3f6145b910",
+      "log": "reports\\vertical-proof\\torch-debug-full.log",
+      "log_sha256": "0789075560a76fdf6fc4ad813ddf8b23f67730d437508f70625866fa89c2ae65"
+    },
+    {
+      "source_candidate_commit": "6e630afa83a3f88451dcb1509baf94192359b550",
+      "label": "rayquery-pwsh-generation",
+      "command": [
+        "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+        "-NoProfile",
+        "-File",
+        "tools/GenerateRayQueryComputeVariants.ps1",
+        "-Write"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:53:21.271720+00:00",
+      "wall_seconds": 37.24219299998367,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "adfbc180f98fa13a204e7f75b305062aa6916f74742a2cea326ddb3f6145b910",
+      "log": "reports\\vertical-proof\\rayquery-pwsh-generation.log",
+      "log_sha256": "4f91591e35f9c82a4e9277188fee2bdadcc480b0720bdd3a34583207ec01fac9"
+    },
+    {
+      "source_candidate_commit": "6e630afa83a3f88451dcb1509baf94192359b550",
+      "label": "rayquery-freshness-final",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--preset",
+        "windows-x64-debug",
+        "--no-tests=error",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "-R",
+        "^horde_rt_rayquery_compute_shader_tests$"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:54:18.481197+00:00",
+      "wall_seconds": 36.483588800008874,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "48af456361febd1569f4744abea4984c98ba93a1b66adf9effc80fdfb968693f",
+      "log": "reports\\vertical-proof\\rayquery-freshness-final.log",
+      "log_sha256": "18c6b8d8d38e74f54762960f6df3569ce851a629cd1ca67a7eb7f7bbde65fa2d"
+    },
+    {
+      "source_candidate_commit": "0576db24a56df4d18c693f2e55352987c34e0c9f",
+      "label": "build-debug-identities",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+        "--build",
+        "--preset",
+        "windows-x64-debug",
+        "--target",
+        "horde_rt_diagnostic_window",
+        "horde_rt_scene_resource_inventory_tests",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:55:37.069419+00:00",
+      "wall_seconds": 3.387971899996046,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "48af456361febd1569f4744abea4984c98ba93a1b66adf9effc80fdfb968693f",
+      "log": "reports\\vertical-proof\\build-debug-identities.log",
+      "log_sha256": "e41a0b5ffd47b82526091c1ee0b483192aa7c33a7b088d43e31f895cb5d7c58a"
+    },
+    {
+      "source_candidate_commit": "0576db24a56df4d18c693f2e55352987c34e0c9f",
+      "label": "build-release-identities",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe",
+        "--build",
+        "--preset",
+        "windows-x64-release",
+        "--target",
+        "horde_rt_diagnostic_window",
+        "horde_rt_scene_resource_inventory_tests",
+        "--parallel",
+        "2"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:55:40.554865+00:00",
+      "wall_seconds": 3.3857112000114284,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "48af456361febd1569f4744abea4984c98ba93a1b66adf9effc80fdfb968693f",
+      "log": "reports\\vertical-proof\\build-release-identities.log",
+      "log_sha256": "eddac568f89bf2df647e8fbd2d592436c492675cd495e28c2eb92704c24dc39a"
+    },
+    {
+      "source_candidate_commit": "0576db24a56df4d18c693f2e55352987c34e0c9f",
+      "label": "android-identities",
+      "command": [
+        "powershell.exe",
+        "-NoProfile",
+        "-Command",
+        "Set-Location android; ./gradlew.bat --offline assembleDebug assembleRelease --console=plain; exit $LASTEXITCODE"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:55:46.283882+00:00",
+      "wall_seconds": 14.262704399996437,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "48af456361febd1569f4744abea4984c98ba93a1b66adf9effc80fdfb968693f",
+      "log": "reports\\vertical-proof\\android-identities.log",
+      "log_sha256": "2249fe7f344fdb3c347993fb7a9d11b94798a4973c42efba82c137eb6294932a"
+    },
+    {
+      "source_candidate_commit": "0576db24a56df4d18c693f2e55352987c34e0c9f",
+      "label": "resource-identities-debug",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--preset",
+        "windows-x64-debug",
+        "--no-tests=error",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "-R",
+        "^horde_rt_scene_resource_inventory_tests$"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:56:26.093099+00:00",
+      "wall_seconds": 6.509275100019295,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "48af456361febd1569f4744abea4984c98ba93a1b66adf9effc80fdfb968693f",
+      "log": "reports\\vertical-proof\\resource-identities-debug.log",
+      "log_sha256": "444f3f11bb9a5529f47d5e89f1182871bfbed64029d8e3f96efb2430b048978e"
+    },
+    {
+      "source_candidate_commit": "0576db24a56df4d18c693f2e55352987c34e0c9f",
+      "label": "resource-identities-release",
+      "command": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\ctest.exe",
+        "--preset",
+        "windows-x64-release",
+        "--no-tests=error",
+        "--timeout",
+        "180",
+        "--output-on-failure",
+        "-R",
+        "^horde_rt_scene_resource_inventory_tests$"
+      ],
+      "cwd": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof",
+      "started_utc": "2026-10-09T03:56:32.710569+00:00",
+      "wall_seconds": 1.8482707000221126,
+      "exit_status": 0,
+      "source_base": "2665ae99819f94f1138154c3547722bab12c3b9d",
+      "tracked_candidate_diff_sha256": "48af456361febd1569f4744abea4984c98ba93a1b66adf9effc80fdfb968693f",
+      "log": "reports\\vertical-proof\\resource-identities-release.log",
+      "log_sha256": "e8f104bde3d2c366a296354143eea0b28236ce1d50e63bd7bc3f3cd12ed08511"
+    }
+  ],
+  "manifests": {
+    "source": "candidate-source-manifest.json",
+    "inputs": "inputs.json",
+    "artifacts": "artifacts.json",
+    "logs": "logs.json",
+    "preservation": "preservation.json",
+    "android_unit_results": "android-unit-results.json"
+  },
+  "next_review_decision": "Approve a separate bounded correction for shader publication within unchanged budgets, or explicitly decide the measured budget delta. Do not advance WP2 or claim acceptance on stale Pipeline artifacts.",
+  "limitations": [
+    "No physical GPU frames, image/motion inspection, off-camera feature/lifecycle proof or owner listening/feel acceptance.",
+    "One historical and one current torch invocation do not diagnose the original timeout or establish repeatability/headroom.",
+    "No release artefact identities changed; packages are local validation outputs."
+  ],
+  "generation_environment_correction": {
+    "cause": "Windows PowerShell 5.1 generation differs in dependency enumeration order and JSON serialization from registered PowerShell 7 check",
+    "same_dependency_identity_set": true,
+    "same_spirv_all_eight": true,
+    "corrected_with": "supported -Write in registered PowerShell 7; affected CTest passes"
+  },
+  "initial_setup": {
+    "configure_debug": "cmake --preset windows-x64-debug",
+    "abi_generation": "powershell.exe -NoProfile -File tools/generate-rt-scene-abi.ps1",
+    "logs": [
+      "configure-debug.log",
+      "abi-generation.log",
+      "build-debug-initial.log",
+      "shader-freeze.log",
+      "shader-freeze-failure.txt"
+    ],
+    "outer_timing": "not retained for these initial setup invocations; do not infer from later runs",
+    "toolchain": {
+      "MSVC": "19.44.35227",
+      "MSVC_toolset": "14.44.35207",
+      "VulkanSDK": "1.4.350.0",
+      "Python": "3.12.10",
+      "Java": "Eclipse Adoptium 21.0.11.10-hotspot"
+    },
+    "unsigned_release_environment": "HORDE_VALIDATION_UNSIGNED=1; owner release signing disabled",
+    "cache_only_hydration": "existing Git LFS cache checkout; runtime fixtures already hydrated before original torch test; five fresh-worktree launcher icons hydrated after exact PNG signature failure",
+    "shader_freeze_command": "tools/compile-raygen.ps1 -Freeze with absolute ArtifactDirectory, CatalogPath and BudgetPath for existing src/vulkan/raytracing/variants, tools/raygen-variant-catalog.json, tools/raygen-variant-budgets.json; required paths omitted on first setup attempt then corrected"
+  },
+  "custody": {
+    "primary_path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo",
+    "primary_branch": "main",
+    "primary_head": "c3c15d3243492c8338e37ce8312b14e62e118a0b",
+    "primary_status_preserved": [
+      "M ASSET_LICENSES.md",
+      " M PROJECT_MEMORY.md",
+      "?? .github/skills/",
+      "?? .spec-kit/",
+      "?? .specify/",
+      "?? .superpowers/sdd/Horde_RT_Demo_1.6.0_Full_Repo_Code_Audit/",
+      "?? assets/audio/source/",
+      "?? \"assets/the horde world layout map.png\"",
+      "?? horde-parry-followup.obj",
+      "?? vc140.pdb"
+    ],
+    "preflight_ancestry_verified": true,
+    "runtime_to_wp0_commits": 1,
+    "wp0_to_diagnostic_commits": 2,
+    "wp0_to_diagnostic_changed_paths": 9,
+    "local_and_remote_pins_verified_before_editing": true,
+    "prior_worktrees_preserved": [
+      ".worktrees/horde-1.7-wp0-readiness",
+      ".worktrees/horde-1.7-wp0-torch-diagnostic"
+    ],
+    "protected_preflight_trees_identical": [
+      {
+        "path": "src",
+        "runtime_object": "5a231727932730303f42258146395483466636a3",
+        "diagnostic_object": "5a231727932730303f42258146395483466636a3"
+      },
+      {
+        "path": "tests",
+        "runtime_object": "defb1e2e17e7bf0a845f3a579828a313c5cf4634",
+        "diagnostic_object": "defb1e2e17e7bf0a845f3a579828a313c5cf4634"
+      },
+      {
+        "path": "shaders",
+        "runtime_object": "7c0ac10b9e8cd4d138dcca357de1158e12d1ae4c",
+        "diagnostic_object": "7c0ac10b9e8cd4d138dcca357de1158e12d1ae4c"
+      },
+      {
+        "path": "android",
+        "runtime_object": "da77da00f8f4d566058445c6074ce0f90870d338",
+        "diagnostic_object": "da77da00f8f4d566058445c6074ce0f90870d338"
+      },
+      {
+        "path": "assets",
+        "runtime_object": "7bea3ea7f8edcecfa87c18da0256d96f47842d2c",
+        "diagnostic_object": "7bea3ea7f8edcecfa87c18da0256d96f47842d2c"
+      },
+      {
+        "path": "tools",
+        "runtime_object": "39df2a88747107e0fe50e003446cae38e91637f6",
+        "diagnostic_object": "39df2a88747107e0fe50e003446cae38e91637f6"
+      },
+      {
+        "path": "third_party",
+        "runtime_object": "cf72ea04332fa08845691dc775c4a0d455eb85e1",
+        "diagnostic_object": "cf72ea04332fa08845691dc775c4a0d455eb85e1"
+      },
+      {
+        "path": "CMakeLists.txt",
+        "runtime_object": "57813d991578202a75ea50fcafa4c82141e12713",
+        "diagnostic_object": "57813d991578202a75ea50fcafa4c82141e12713"
+      },
+      {
+        "path": "CMakePresets.json",
+        "runtime_object": "79e418f63ab9f93071f379bfeede06b264ed68cc",
+        "diagnostic_object": "79e418f63ab9f93071f379bfeede06b264ed68cc"
+      }
+    ]
+  },
+  "preserved_authority_files": [
+    {
+      "path": "AGENTS.md",
+      "git_blob": "654e7fa4a57d65bad69de5214019cd1b38352698",
+      "unchanged": true
+    },
+    {
+      "path": "docs/AGENT_ENGINE_CONTRACTS.md",
+      "git_blob": "485f766b84ff28a05980872d3a086a375a77f6b8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/AGENT_VALIDATION.md",
+      "git_blob": "8399d149c9b958349770e28e29322af0687c42a2",
+      "unchanged": true
+    },
+    {
+      "path": "README.md",
+      "git_blob": "eb04479565d044b7fee9f8abb63afb60e0e6a13a",
+      "unchanged": true
+    },
+    {
+      "path": "PROJECT_DECISIONS.md",
+      "git_blob": "a4d43989ab7cfe17e6f55cac061e725942e86cbe",
+      "unchanged": true
+    },
+    {
+      "path": "PROJECT_MEMORY.md",
+      "git_blob": "8ef1bb5ca6aca533cf4347226b4b135199b9f128",
+      "unchanged": true
+    },
+    {
+      "path": "ASSET_LICENSES.md",
+      "git_blob": "a1fc6e2321ff7a61917981030e7f69002e620748",
+      "unchanged": true
+    },
+    {
+      "path": "docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md",
+      "git_blob": "cbb67841f56be611085db63012551740ef9045a0",
+      "unchanged": true
+    }
+  ]
+}
