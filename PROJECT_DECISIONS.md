@@ -2,7 +2,13 @@
 
 This file records locked decisions for the native Vulkan hardware ray-tracing demo.
 
-## 1.6.2 defaults and release hold - 2026-10-05
+## 1.6.2 publication and release-documentation closeout - 2026-10-09
+
+The completed tomb goal was owner-accepted, PR18 merged, and stable-key signed Android/Windows 1.6.2/code10 published to itch. [Exact receipt](docs/evidence/2026-10-09-release-publication/README.md) records completed channels and matching actual downloads. The owner then explicitly approved reconciling release documentation and publishing GitHub `v1.6.2` as a non-draft prerelease using those exact existing APK/ZIP/checksum bytes, with no rebuild or new signing. [Canonical signed validation](docs/SHOWCASE_ALPHA_1_6_2_RELEASE_VALIDATION_2026-10-09.md) binds the tag to validated source `db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9`; [GitHub closeout](docs/evidence/2026-10-09-github-release/README.md) records the completed non-draft prerelease, exact public downloads and original 1.6.1 parser selection, with its physical-dialog limit. The published line is immutable; a later production package needs a new version and Android code greater than 10.
+
+Fresh/reset mobile remains 50% / Mobile water/fire / Glass Off / Current shadows / cap30 / Mist On / Dust Low; desktop remains 100% / High / Glass On with the other defaults unchanged. Saved choices survive. The owner defers precise combat contact, walking torch-arm wiggle, shafts, seamless music handover and sustained-phone programme. Eric's independent audit remains unperformed. Issue #19 is owner-closed as completed; this documentation task does not reproduce its fix. This supersedes old release holds only for the explicitly approved 1.6.2 closeout. Future 1.7 work remains separate.
+
+## Historical 1.6.2 defaults and release hold - 2026-10-05
 
 The owner selects fresh-install and staged Reset Defaults on Android at 50%
 resolution, Mobile water/fire, cap 30, Glass Off, Current shadows and Mist On.

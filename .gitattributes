@@ -264,3 +264,6 @@ docs/evidence/2026-10-08-menu-ambience/*.json text eol=lf
 # Byte-stable scoped grate evidence.
 docs/evidence/2026-10-08-grate-floor/*.json text eol=lf
 docs/evidence/2026-10-08-grate-floor/*.png -text
+
+# Preserve exact 1.6.2 GitHub publication checksums and verification receipts.
+docs/evidence/2026-10-09-github-release/** -text whitespace=cr-at-eol

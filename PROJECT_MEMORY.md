@@ -1,20 +1,10 @@
 # Horde Lantern RT - Project Memory
 
-Last updated: 2026-10-03
+Last updated: 2026-10-09
 
-Current release: published Showcase Alpha 1.6.1 / Android code 9, accepted
-within the documented limits. Public itch builds, GitHub prerelease, artifact
-hashes and verification scopes are recorded in the [release receipt](docs/SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md)
-and [publication evidence](docs/evidence/2026-10-03-release-publication/). The
-[current handoff](docs/ENGINEERING_1_6_1_HANDOFF.md),
-[finding disposition](docs/ENGINEERING_1_6_1_FINDING_STATUS.md) and
-[release receipt](docs/SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md)
-supersede historical next-step directions below. The live updater parser selects
-1.6.1 from 1.6.0; the platform dialog/device-networking flow was not exercised.
-S24 is working but not fully tested; S25 is unverified. Performance is accepted
-as measured, not 30 FPS at 75%.
-The full graphics-options menu is planned for 1.6.2. Remaining High glass defects
-are future investigation, not passing. Do not restart accepted player/audio work.
+Current release: published Showcase Alpha 1.6.2 / Android code 10. The [GitHub v1.6.2 prerelease](https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.2) is published with exactly the existing APK/ZIP/manifest and verified full public downloads. The original 1.6.1 updater parser selects it from the fetched API; no installed-client popup is claimed. Both itch channels are completed: Android build 2090804 and Windows build 2090803. Exact signed APK and all 96 downloaded Windows files match the [publication receipt](docs/evidence/2026-10-09-release-publication/README.md). [Signed validation](docs/SHOWCASE_ALPHA_1_6_2_RELEASE_VALIDATION_2026-10-09.md), [GitHub closeout](docs/evidence/2026-10-09-github-release/README.md) and [current handoff](docs/ENGINEERING_1_6_2_HANDOFF.md) supersede older next-action and release-hold navigation. Runtime/build source and immutable tag target are `db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9`; PR18 merged at `a3f120cf` with unchanged runtime inputs.
+
+1.6.2 ships the graphics-options menu, native themed menu/HUD/controller controls, equipment and tomb polish described in the release notes. Fresh/reset phone defaults are 50% / Mobile water/fire / Glass Off / Current shadows / cap30 / Mist On / Dust Low. Desktop is 100% / High / Glass On with the other defaults unchanged; saved/custom choices survive and 33%/40% remain experimental. Sustained 30 FPS and untested hardware are not certified. S24 remains working but not fully tested; S25 remains unverified. Eric's independent audit is prepared, not completed. Issue #19 is owner-closed as completed; no independent mist-fix reproduction is claimed here. Future 1.7 work is separate.
 
 ## Identity and release state
 
@@ -22,8 +12,9 @@ are future investigation, not passing. Do not restart accepted player/audio work
 - Purpose: native Vulkan hardware-ray-tracing game/technology demo.
 - Principle: **RT or nothing**; unsupported devices receive honest diagnostics, never a fake fallback.
 - Primary target: Android phone. Equal validation target: Windows RTX.
-- Current release: **Showcase Alpha 1.6.1**, package version `1.6.1`, Android `versionCode 9`; public itch builds `#2055201` (Windows) and `#2055202` (Android), plus public non-draft GitHub prerelease `v1.6.1` targeting package source `a397757249871b6b64fe5b77fc14f24e8cfcbb2b`.
-- Frozen GitHub Windows ZIP SHA-256: `3e1cdca75d78e02dbc3bb48553b1db68b6b4bf3e459a784e2be5473ad198c2cf` (remote digest verified; ZIP not downloaded); signed Android APK SHA-256: `bc5c7ce3c755c16ec39e2c16fa9eae01c31983c7393e645f881c5bcc9e6a346c` (downloaded and verified). The itch Windows payload was verified as a 73-entry directory; no recompressed itch ZIP hash is claimed. Current branch CI runs `37089806774` and `37089810005` both passed all six jobs at `945f990`.
+- Current release: **Showcase Alpha 1.6.2**, package version `1.6.2`, Android `versionCode 10`; itch builds `#2090803` (Windows) and `#2090804` (Android). Signed APK `cc4de768cf9ca2a409984a24888399e9c518363c359b3a9947d1ed0350c254e8`, Windows ZIP `18177d0d84c40f0831b22ee959be597deeb3bc0e1cef183e78dd19c1b113f21c`. See the canonical signed validation and GitHub closeout above.
+- Historical release: **Showcase Alpha 1.6.1**, package version `1.6.1`, Android `versionCode 9`; public itch builds `#2055201` (Windows) and `#2055202` (Android), plus public non-draft GitHub prerelease `v1.6.1` targeting package source `a397757249871b6b64fe5b77fc14f24e8cfcbb2b`.
+- Historical 1.6.1 frozen GitHub Windows ZIP SHA-256: `3e1cdca75d78e02dbc3bb48553b1db68b6b4bf3e459a784e2be5473ad198c2cf` (remote digest verified; ZIP not downloaded); signed Android APK SHA-256: `bc5c7ce3c755c16ec39e2c16fa9eae01c31983c7393e645f881c5bcc9e6a346c` (downloaded and verified). The itch Windows payload was verified as a 73-entry directory; no recompressed itch ZIP hash is claimed. Current branch CI runs `37089806774` and `37089810005` both passed all six jobs at `945f990`.
 - Previous release: Showcase Alpha 1.6.0, package version `1.6.0`, Android `versionCode 8`; its original channel/build and artifact details below are historical.
 - Canonical downloads: https://samfa12.itch.io/the-horde. Samfa12.com links to itch rather than hosting a second copy; the live `/games/` card, itch link, GitHub link, thumbnail, and released status were rendered and verified on 2026-07-15.
 - Source: https://github.com/Samfa12-tech/The-Horde-RT-demo.
@@ -33,7 +24,7 @@ are future investigation, not passing. Do not restart accepted player/audio work
 - Historical 1.6.0 Windows ZIP SHA-256: `7b0dcf24b4a47771a9c3a27cbc52e3899c87781109afcef20f7a9a8472411d77`.
 - Signing certificate SHA-256: `8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245`.
 - The release JKS and a local-only password note remain outside Git. The owner confirmed independent backup/recovery and authorised1.6.1 signing/freezing on October3; Codex does not mark owner-only checklist boxes or archive recovery material.
-- Current release proof: `docs/SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md`; publication metadata, remote ZIP digest and downloaded-payload verification: `docs/evidence/2026-10-03-release-publication/`.
+- Historical 1.6.1 release proof: `docs/SHOWCASE_ALPHA_1_6_1_RELEASE_VALIDATION_2026-10-03.md`; publication metadata, remote ZIP digest and downloaded-payload verification: `docs/evidence/2026-10-03-release-publication/`.
 - Previous release proof: `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
 - Historical 1.6.0 Fire/PBR/reward-lantern runtime lineage: feature runtime commit `a04dcb9`, final validation/provenance commit `41e9c6c`, and release source commit `57c81b6`. The exact accepted `SM-S948B` Debug APK is SHA-256 `0b5a59b6e41d2c4d717eff885aaa310b7f5f1512002f6a89cb77e5989ab7edd3`. Final clean Host and 75%/100% exact-device runs pass, but instrumented feature medians were slow and Mobile dielectric budget terminals remained a risk for that release. Its signed APK initially had only package/publication evidence because no device was connected at publication; on 2026-08-31 it was subsequently installed and pulled back byte-for-byte on `SM-S948B`, with strict ASTC, `RayTracingPipeline`, honest RT presentation, Home/resume, and a short route smoke passing. See the dated evidence: `docs/FIRE_PBR_REWARD_LANTERN_PLAYER_UPGRADE_VALIDATION_2026-08-30.md`, `docs/TASK_9_OWNER_CANDIDATE_VALIDATION_2026-08-30.md`, and `docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md`.
 
@@ -82,7 +73,7 @@ are future investigation, not passing. Do not restart accepted player/audio work
 - Both platform menus expose a release-safe two-pass benchmark: pass 1 warms the deterministic 13-waypoint route, pass 2 measures it, and completion produces a selectable/copyable/exportable text report plus automatically archived JSON evidence. Windows and `SM-S948B` Android device validation pass.
 - Both platform menus include `More by Samfa12`, which opens https://samfa12.com/ in the system browser.
 - Technical output stays tucked away unless requested or startup fails.
-- Both platforms persist a50–100% RT render-resolution slider. New Android settings default to75%, Windows to100%; existing saved choices survive updates. Compatible output-only resize preserves resolution-independent scene resources.
+- Both platforms retain RT resolution controls, including labelled experimental 33%/40% choices in 1.6.2. Fresh/reset Android defaults to 50%, Windows to 100%; existing saved choices survive updates. Compatible output-only resize preserves resolution-independent scene resources.
 - Both platforms persist independent Music/SFX volume; Android also retains look sensitivity/compact HUD, and Windows sensitivity/display mode/render scale beside the executable.
 - Adaptive A–H music uses canonical PCS JSON/PCS1 and retained Chordsmith v68 app voices/live FX. Shared Pocket Audio Core owns PCM decoding/loop/tail/crossfade playback; Horde MusicDirector owns cue policy. Current whistle-lead bank and scoped A/D drone removal are owner accepted; no editor/synth app is vendored.
 - Consent-based reports use the approved Briarhold-derived Cloudflare relay/email architecture, bounded typed diagnostics and optional game-only RT screenshot, preview/verification/cancellation/retry. Local JSON is fallback, not primary delivery. No client secrets/unrelated files or logs.
