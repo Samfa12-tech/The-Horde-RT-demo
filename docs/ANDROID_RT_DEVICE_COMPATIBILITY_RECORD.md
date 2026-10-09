@@ -1,5 +1,35 @@
 # Android RT Device Compatibility Record
 
+## 9 October 2026: S24 Ultra and S25 Ultra complete the 1.6.2 RT benchmark
+
+**Status: working in the reported 1.6.2 benchmark configuration on both phones.** Evidence class: **owner-supplied complete in-app benchmark text reports, with owner-reported marketing model names**. Both reports were read in full. This is successful field-run evidence, not a local installation/pullback test or complete device certification. Exact Samsung model codes, Android versions and installed APK hashes were not supplied.
+
+| Owner-reported device | Reported GPU / Vulkan API | Reported build / backend | RT scale and actual internal extent | Presentation extent | Measured rows |
+| --- | --- | --- | --- | --- | --- |
+| Samsung Galaxy S24 Ultra | Adreno 750 / 1.3.128 | 1.6.2 / RayQueryCompute | 50%, 540 x 1122 | 1080 x 2243 | 1,838 CPU accepted and GPU valid |
+| Samsung Galaxy S25 Ultra | Adreno 830 / 1.3.284 | 1.6.2 / RayQueryCompute | 50%, 720 x 1496 | 1440 x 2992 | 1,838 CPU accepted and GPU valid |
+
+Both reports state **Integrity COMPLETE**, status complete, RayQuery capability, MAILBOX presentation and **RT presented every measured frame**. The same `showcase-route-v1` completes 2/2 laps and 26/26 waypoint visits, with lap 1 warm-up and only the final lap measured. Simulation is fixed at 0.032 world units per frame and a 1/60-second gameplay step. Each reports zero rejected, cancelled, outstanding, missing or failed CPU/GPU records. Reported Shipping/Mobile OpaqueFast and GenericDielectric shader identities and strict ASTC material routes match between the two runs.
+
+| Timing from the supplied reports | S24 Ultra | S25 Ultra |
+| --- | ---: | ---: |
+| Whole-frame average | 52.341 ms | 48.121 ms |
+| Whole-frame median | 48.486 ms | 43.924 ms |
+| Median inverse-duration FPS proxy | 20.624 | 22.766 |
+| Whole-frame p95 | 83.252 ms | 77.732 ms |
+| 1% low FPS proxy | 10.736 | 10.339 |
+| GPU RT mean | 39.777 ms | 38.244 ms |
+| Skin CPU mean | 9.953 ms | 7.721 ms |
+| Finale whole-frame mean | 87.830 ms | 85.401 ms |
+
+The finale is the slowest reported zone on both phones. Whole-frame timing uses `android-render-entry-through-present`; its FPS values are inverse-duration proxies, not measured display scanout or achieved presentation rates. GPU duration is not FPS. These runs do not establish sustained 30 FPS.
+
+**Comparison limits:** the same 50% label does not mean equal workload: the S25 internal image contains 1,077,120 pixels versus 605,880 on the S24, 77.8% more. Full water/fire/glass/shadow/frame-cap/mist/dust settings, temperatures, thermal state, cooling, charging and run history are unknown. Do not fill these gaps using release defaults or claim a controlled hardware-speed comparison.
+
+**Provenance and scope:** the published [1.6.2 release](https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.2) targets `db62032d9ab54ebaa5bd12d17dc7e987fc8f54c9`; that release identity is context, not proof of either installed APK's exact bytes. Copied report run identifiers are absent; none is reconstructed. Original reports remain private; no raw attachment, reporter details or private identifiers are included here. UI/lifecycle/controller coverage, wider gameplay and visual correctness, other firmware/model variants and sustained performance remain separate.
+
+This new evidence supersedes a blanket claim that these two reported phones are still unverified for running the 1.6.2 RT benchmark. The September 11 full-pipeline refusals and earlier candidate-specific gaps below remain valid historical records for their own builds and driver paths.
+
 **Verified publication — 9 October:** the goal is complete; PR18 merged to main at `a3f120cf`, and signed Android/Windows 1.6.2 is live on itch. Fresh downloads match the signed APK and all 96 Windows files. [Exact post-release receipt, package hashes and Release smokes](evidence/2026-10-09-release-publication/README.md) supersede earlier no-merge/no-release statements. Historical validation snapshots and failures remain unchanged. Mobile default 50%, experimental 33/40, Dust Low and owner-deferred limitations remain authoritative; no sustained30FPS or completed Eric audit claim.
 
 **Owner controller disposition — 9 October:** controller support is approved for 1.6.2. Recorded hands-on evidence is the owner-identified Backbone One PlayStation Edition USB-C BB-51 on SM-S948B / Android 16, including accepted directional menu navigation, landscape gameplay and seamless reconnect after `ac468f51`. Earlier unmeasured matrix cases remain evidence limits, not further owner-acceptance gates. Firmware/InputDevice descriptor and other controller models remain unverified. Dated checkpoint outcomes below retain their original scope; this disposition supersedes conflicting pending-controller statements. No new device test or release approval is implied. [Exact controller history](ENGINEERING_1_6_2_ANDROID_CONTROLLER_2026_10_08.md).
@@ -2007,6 +2037,10 @@ The working gate is a real RT-produced frame reaching the Android swapchain afte
 
 ### Samsung Galaxy S25 Ultra - exact model code not captured
 
+**Current evidence:** the [9 October 1.6.2 field benchmark](#9-october-2026-s24-ultra-and-s25-ultra-complete-the-162-rt-benchmark) completes successfully on the owner-reported model using RayQueryCompute. Exact model code and installed APK identity remain unverified.
+
+**Historical September 11 evidence follows unchanged:** its unsupported result concerns the then-required full-pipeline path, not the later 1.6.2 Compute run.
+
 - **Status:** Unsupported on the reported device/driver for the current Horde Lantern RT full-pipeline path.
 - **Evidence type:** User-reported + screenshot evidence; **not locally tested** by this project owner.
 - **Tester/source:** Project owner supplied a capability-screen screenshot after testing the app on a Samsung Galaxy S25 Ultra.
@@ -2028,6 +2062,10 @@ The working gate is a real RT-produced frame reaching the Android swapchain afte
 - **Qualification:** This result applies to the tested Galaxy S25 Ultra / Adreno 830 / driver `512.800.64` configuration. It must not be generalised to every S25-series firmware, every Adreno 830 device, or every Snapdragon 8 Elite device without a matching runtime probe.
 
 ### Samsung Galaxy S24 Ultra - exact model code not captured
+
+**Current evidence:** the [9 October 1.6.2 field benchmark](#9-october-2026-s24-ultra-and-s25-ultra-complete-the-162-rt-benchmark) completes successfully on the owner-reported model using RayQueryCompute. Exact model code and installed APK identity remain unverified.
+
+**Historical September 11 evidence follows unchanged:** its unsupported result concerns the then-required full-pipeline path, not the later 1.6.2 Compute run.
 
 - **Status:** Unsupported on the reported device/driver for the current Horde Lantern RT full-pipeline path.
 - **Evidence type:** User-reported + screenshot evidence; **not locally tested** by this project owner.
