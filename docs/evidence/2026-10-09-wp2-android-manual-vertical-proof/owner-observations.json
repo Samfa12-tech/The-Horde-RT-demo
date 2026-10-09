@@ -1,0 +1,25 @@
+{
+  "evidence_class": "direct owner report in this chat",
+  "candidate_apk_sha256": "1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c",
+  "device_model": "SM-S948B",
+  "backend": "RayTracingPipeline",
+  "date": "2026-10-09 Australia/Sydney",
+  "verbatim_report": "walking up and back worked - but going up and down the step was instant - there is no gravity and the player snaps to the vertical position. the ramp works well. everything stays attached and the hands automatically componsate for the roof height as to not hit. swing and parry are fine. sound and vibration are normal.",
+  "reported_traversal": "up/back worked; ramp works well",
+  "reported_limitation": "instant support snap at step; no gravity",
+  "reported_equipment": "attached; automatic roof-height compensation",
+  "reported_actions": "Swing and Parry fine",
+  "reported_audio_haptics": "normal",
+  "acceptance_scope": "short manually operated ground fixture traversal/look/Swing/Parry only",
+  "untested": [
+    "Query",
+    "Windows continuous proof",
+    "reset/retry",
+    "background/resume",
+    "both landscape orientations",
+    "surface/process reconstruction",
+    "enemy impact/fall delayed cancellation",
+    "all gear states incl claimed lantern",
+    "all off-camera secondary contributions"
+  ]
+}

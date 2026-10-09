@@ -1,0 +1,9 @@
+{
+  "initial_window_and_resumed_activity_verified": true,
+  "postmanual_window_verified": true,
+  "component": "com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity",
+  "owner_unlock_response": "Unlocked; menu or loading visible",
+  "input_or_capture_without_guard": false,
+  "automated_touch_input_sent": false,
+  "unique_device_ids_window_handles_and_private_focus_text_published": false
+}

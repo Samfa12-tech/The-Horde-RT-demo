@@ -2745,3 +2745,26 @@ vertical traversal, Query, equipment/event-height and lifecycle checks.
 Full vertical DEVICE-VERIFIED remains NO; owner listening/haptics PENDING.
 No sustained performance, matched legacy-route, other backend or other-device
 acceptance follows. [Partial receipt and control blocker](superpowers/plans/2026-10-09-horde-1.7-wp2-physical-acceptance-attempt.md).
+
+
+### 9 October WP2 — owner-operated Android Pipeline ramp proof
+
+Same authorised SM-S948B/Android16 API36 and exact installed Debug APK
+`1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c`,
+source/generated candidate `0eb665900c9efc95c443beada4c418776092cbe3`.
+No reinstall. Existing noncapture vertical-proof-ground launch followed owner
+unlock/foreground response; current-focus and resumed-activity verification
+passed before capture. Pipeline Diagnostic/Mobile genuine completed/presented
+frames and inspected game-only stills are current technical evidence.
+56 selected feedback records transport listener-eye Y0.70 through ramp values
+to1.05. The owner separately reports up/back ramp traversal works, equipment
+remains attached with roof compensation, Swing/Parry are fine, and sound and
+vibration are normal. Immediate height snap at the step/edge, with no gravity,
+is retained as an observed fixture limitation; no source change followed.
+
+Evidence class: exact physical candidate native frame/event evidence plus direct
+owner-operated short portrait manual report. Scoped Android Pipeline check passes
+with the step-snap limitation. Full vertical DEVICE-VERIFIED remains NO: Windows,
+Query, lifecycle/rotation/recovery, all gear/secondary contributors and delayed
+fall/cancellation gates remain pending. Short Swing/Parry listening/haptic report
+does not certify those broader gates. [Manual report and separate evidence classes](superpowers/plans/2026-10-09-horde-1.7-wp2-android-manual-vertical-proof.md).

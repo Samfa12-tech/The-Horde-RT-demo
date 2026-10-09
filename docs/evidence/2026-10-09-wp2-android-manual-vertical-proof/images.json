@@ -1,0 +1,14 @@
+[
+  {
+    "path": "android-live-ground.png",
+    "sha256": "03869830ffd3a73c7b20b60f0496752497782d97afc3fc70f434e09bc1972356",
+    "scope": "foreground-guarded app screenshot, inspected; HUD/game only; no private notifications or unrelated apps",
+    "class": "stills supplement owner-operated continuous traversal; they do not prove motion alone"
+  },
+  {
+    "path": "android-postmanual.png",
+    "sha256": "6898f7e21ee1ba6cccc83a59f94e50e9b48a13672a764177c63adb8999d1a8cb",
+    "scope": "foreground-guarded app screenshot, inspected; HUD/game only; no private notifications or unrelated apps",
+    "class": "stills supplement owner-operated continuous traversal; they do not prove motion alone"
+  }
+]
