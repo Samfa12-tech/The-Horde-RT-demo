@@ -1,0 +1,10 @@
+FAIL: nonfinite previous blade endpoint must not fabricate contact
+FAIL: nonfinite current blade endpoint must not fabricate contact
+FAIL: nonfinite previous target endpoint must not fabricate contact
+FAIL: negative current target radius must not fabricate contact
+FAIL: negative current blade radius must not fabricate contact
+FAIL: NaN target radius must not fabricate contact
+FAIL: infinite current target endpoint must not fabricate contact
+FAIL: infinite current target radius must not fabricate contact
+FAIL: finite but overflowing segment arithmetic must not fabricate contact
+sword-contact-proxy-invalid-input-summary cases=10 malformedInputsRejected=1 zeroRadiusPointSupported=1

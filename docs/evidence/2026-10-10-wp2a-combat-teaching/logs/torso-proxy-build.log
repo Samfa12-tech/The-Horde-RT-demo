@@ -1,0 +1,20 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  MusicDirector.cpp
+<repo>\src\audio\MusicDirector.cpp(1,1): error C1041: cannot open program database '<repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS [<repo>\build\presets\windows-x64-debug\horde_gameplay_simulation.vcxproj]
+  MusicPcmStream.cpp
+<repo>\src\audio\MusicPcmStream.cpp(1,1): error C1041: cannot open program database '<repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS [<repo>\build\presets\windows-x64-debug\horde_gameplay_simulation.vcxproj]
+  MusicPcmAssetBank.cpp
+<repo>\src\audio\MusicPcmAssetBank.cpp(1,1): error C1041: cannot open program database '<repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS [<repo>\build\presets\windows-x64-debug\horde_gameplay_simulation.vcxproj]
+  MusicPlaybackSession.cpp
+<repo>\src\audio\MusicPlaybackSession.cpp(1,1): error C1041: cannot open program database '<repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS [<repo>\build\presets\windows-x64-debug\horde_gameplay_simulation.vcxproj]
+  GameSimulation.cpp
+<repo>\src\gameplay\simulation\GameSimulation.cpp(1,1): error C1041: cannot open program database '<repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS [<repo>\build\presets\windows-x64-debug\horde_gameplay_simulation.vcxproj]
+  PlayerAnimationState.cpp
+<repo>\src\gameplay\animation\PlayerAnimationState.cpp(1,1): error C1041: cannot open program database '<repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS [<repo>\build\presets\windows-x64-debug\horde_gameplay_simulation.vcxproj]
+  HeldItemKinematics.cpp
+<repo>\src\gameplay\items\HeldItemKinematics.cpp(1,1): error C1041: cannot open program database '<repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS [<repo>\build\presets\windows-x64-debug\horde_gameplay_simulation.vcxproj]
+  HeldLightState.cpp
+<repo>\src\gameplay\items\HeldLightState.cpp(1,1): error C1041: cannot open program database '<repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS [<repo>\build\presets\windows-x64-debug\horde_gameplay_simulation.vcxproj]
+  Generating Code...

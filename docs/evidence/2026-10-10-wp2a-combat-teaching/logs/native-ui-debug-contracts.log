@@ -1,0 +1,66 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 26
+    Start  26: horde_rt_combat_timing_trace_tests
+
+26: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_timing_trace_tests.exe"
+26: Working Directory: <repo>/build/presets/windows-x64-debug
+26: Test timeout computed to be: 1500
+1/6 Test  #26: horde_rt_combat_timing_trace_tests ...............   Passed    5.05 sec
+test 41
+    Start  41: horde_rt_windows_combat_practice_launch_tests
+
+41: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_windows_combat_practice_launch_tests.exe"
+41: Working Directory: <repo>/build/presets/windows-x64-debug
+41: Test timeout computed to be: 1500
+2/6 Test  #41: horde_rt_windows_combat_practice_launch_tests ....   Passed    2.06 sec
+test 43
+    Start  43: horde_rt_android_debug_request_admission_tests
+
+43: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_android_debug_request_admission_tests.exe"
+43: Working Directory: <repo>/build/presets/windows-x64-debug
+43: Test timeout computed to be: 1500
+3/6 Test  #43: horde_rt_android_debug_request_admission_tests ...   Passed    0.02 sec
+test 124
+    Start 124: horde_rt_input_mailbox_stress
+
+124: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_input_mailbox_stress.exe"
+124: Working Directory: <repo>/build/presets/windows-x64-debug
+124: Test timeout computed to be: 1500
+124: Input mailbox retained coherent POD snapshots across 125000 publications for 4 concurrent readers.
+4/6 Test #124: horde_rt_input_mailbox_stress ....................   Passed    3.81 sec
+test 130
+    Start 130: horde_rt_spatial_audio_smoke
+
+130: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_spatial_audio_smoke.exe"
+130: Working Directory: <repo>
+130: Test timeout computed to be: 1500
+130: Spatial audio smoke tests passed.
+5/6 Test #130: horde_rt_spatial_audio_smoke .....................   Passed    2.40 sec
+test 147
+    Start 147: horde_rt_character_render_slot_smoke
+
+147: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_character_render_slot_smoke.exe"
+147: Working Directory: <repo>
+147: Test timeout computed to be: 1500
+6/6 Test #147: horde_rt_character_render_slot_smoke .............   Passed    5.75 sec
+
+The following tests passed:
+	horde_rt_combat_timing_trace_tests
+	horde_rt_windows_combat_practice_launch_tests
+	horde_rt_android_debug_request_admission_tests
+	horde_rt_input_mailbox_stress
+	horde_rt_spatial_audio_smoke
+	horde_rt_character_render_slot_smoke
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  19.11 sec

@@ -1,0 +1,968 @@
+{
+  "schema": 1,
+  "date_local": "2026-10-10",
+  "timezone": "Australia/Sydney",
+  "start_commit": "8bb62ede19b0a06756b89abc9812d4828c61a280",
+  "source_commits": [
+    "759fd593bef99746f3701bde5476e3431e5b4204",
+    "262a7fc096876d2417471285c6809f631103cfe6"
+  ],
+  "candidate_source_commit": "262a7fc096876d2417471285c6809f631103cfe6",
+  "branch": "codex/horde-1.7-wp2-vertical-proof",
+  "continuing_draft_pr": 27,
+  "implementation_status": "Playable dodge/teaching/repel checkpoint; WP2a incomplete pending contact-policy decision and integration.",
+  "host_package_status": "PASS for implemented independent slice; not full WP2a acceptance.",
+  "device_verified": "NO: no game/device launches, installation or physical presentation collected in this job.",
+  "owner_audio_haptic_acceptance": "PENDING",
+  "audio_haptic_manual_revalidation_required": true,
+  "pending_owner_decision": "Conservative body contact (tighter approach/aim; glancing/weapon intersections may miss) versus preserving existing forgiving contact and explicitly deferring the correction. No answer or proxy admission assumed.",
+  "preserved": {
+    "previous_owner_receipt": "docs/evidence/2026-10-10-wp2-windows-owner-playtest/receipt.json",
+    "shaders_abi_assets_budgets_original_torch_and_historical_receipts_unchanged": true,
+    "other_worktrees_and_unrelated_work_untouched": true
+  },
+  "provisional_tuning": {
+    "dodge_protection_gameplay_seconds": {
+      "start_inclusive": 0.03333333333333333,
+      "end_exclusive": 0.16666666666666666
+    },
+    "post_hit_guard_seconds": 1.0,
+    "optional_teaching_time_scale": 0.45,
+    "slowdown_default": false,
+    "live_skeleton_health": 2,
+    "keeper_repel_max_metres": 1.0,
+    "keeper_repel_seconds": 0.3,
+    "keeper_charge_seconds": 1.2,
+    "keeper_predischarge_cue_seconds": 0.3,
+    "keeper_defeat_accepted_hits": 3
+  },
+  "artifacts": [
+    {
+      "path": "build/presets/windows-x64-debug/Debug/HordeLanternRT.exe",
+      "configuration": "Windows Debug Diagnostic High",
+      "sha256": "57768441056da4dd8c784ac515954f7924566c5f68517c0f0ede262782402a7d",
+      "bytes": 11713024,
+      "source_commit": "262a7fc096876d2417471285c6809f631103cfe6"
+    },
+    {
+      "path": "build/presets/windows-x64-release/Release/HordeLanternRT.exe",
+      "configuration": "Windows Release Shipping High",
+      "sha256": "eb125addc50cdfbc0a4e4398456f2fe2847d10cb8ec649569f3ee1690c15fc6d",
+      "bytes": 4115968,
+      "source_commit": "262a7fc096876d2417471285c6809f631103cfe6"
+    },
+    {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "configuration": "Android Debug Diagnostic Mobile",
+      "sha256": "72a1d88ad9b879bedad74701575c5f310cc0b3c47ba929fe0330c1fb8d17a8b7",
+      "bytes": 133584379,
+      "source_commit": "262a7fc096876d2417471285c6809f631103cfe6"
+    },
+    {
+      "path": "android/app/build/outputs/apk/release/app-release-unsigned.apk",
+      "configuration": "Android unsigned Release Shipping Mobile",
+      "sha256": "b192f94cbfc305055b4766d5223d912141396cf08f4664b4bcca3f021143d255",
+      "bytes": 121284038,
+      "source_commit": "262a7fc096876d2417471285c6809f631103cfe6"
+    }
+  ],
+  "gate_results": [
+    {
+      "name": "Windows Debug dependent rebuild",
+      "status": "PASS",
+      "run": "candidate-debug-build-2",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 26.373706200000015,
+      "coverage_count": null,
+      "log": "logs/candidate-debug-build-2.log",
+      "log_sha256": "fb348e126bc04fea0c57367da42a0283d253ce28a0fda73e9b51fb83f2eebe0e"
+    },
+    {
+      "name": "Windows Release dependent rebuild",
+      "status": "PASS",
+      "run": "candidate-release-build-2",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 23.557016599996132,
+      "coverage_count": null,
+      "log": "logs/candidate-release-build-2.log",
+      "log_sha256": "25fc0143ed59d42b37aba40554867570ff1a0799948f463557821e978b388e86"
+    },
+    {
+      "name": "Windows Debug affected tests at first source milestone",
+      "status": "PASS",
+      "run": "candidate-debug-tests",
+      "source_at_end": "759fd593bef99746f3701bde5476e3431e5b4204",
+      "elapsed_outer_seconds": 106.8603007999991,
+      "coverage_count": 26,
+      "log": "logs/candidate-debug-tests.log",
+      "log_sha256": "b85b803c36ab27b04a8c9dd9aa18a2d5bf0e65674a1d57a528cd126ebe36cb24"
+    },
+    {
+      "name": "Windows Debug final affected simulation/trace/route tests",
+      "status": "PASS",
+      "run": "candidate-final-debug-trace-tests",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 23.25265849999414,
+      "coverage_count": 5,
+      "log": "logs/candidate-final-debug-trace-tests.log",
+      "log_sha256": "dafac5d6b43bd77d41c2ad4ee29ca132a6970da45da66211df0f28ecc15f4cfb"
+    },
+    {
+      "name": "Windows Release affected tests",
+      "status": "PASS",
+      "run": "candidate-release-tests",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 27.75629360000312,
+      "coverage_count": 26,
+      "log": "logs/candidate-release-tests.log",
+      "log_sha256": "75215cf72004f3cab332053e7dbff3acfbc990541a87732de42e526f2228bdb8"
+    },
+    {
+      "name": "Windows Debug provider/package/containment tests",
+      "status": "PASS",
+      "run": "candidate-debug-packages",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 339.1743241000004,
+      "coverage_count": 14,
+      "log": "logs/candidate-debug-packages.log",
+      "log_sha256": "624363c11643d0cca0d2c5d434a5b82658bbec23f03c907641360e63b111b886"
+    },
+    {
+      "name": "Windows Release provider/package/containment tests",
+      "status": "PASS",
+      "run": "final-release-packages",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 198.8097362999979,
+      "coverage_count": 6,
+      "log": "logs/final-release-packages.log",
+      "log_sha256": "b1b751fe54c92018bc609053446050725e4e3f8dfc9ce94d5aacff06e175e0fc"
+    },
+    {
+      "name": "Android Debug and unsigned Release four-ABI build, lint both, Java tests",
+      "status": "PASS",
+      "run": "candidate-android-build-2",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 27.92637780000223,
+      "coverage_count": 268,
+      "log": "logs/candidate-android-build-2.log",
+      "log_sha256": "911961994521d394da7faa0a246cfa55bb906eef00cbcc6acc3ce9095c6697fd"
+    },
+    {
+      "name": "Android Debug ARM64 shader package inspection",
+      "status": "PASS",
+      "run": "final-android-debug-arm64-package",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 23.26738369999657,
+      "coverage_count": null,
+      "log": "logs/final-android-debug-arm64-package.log",
+      "log_sha256": "7f96f4a8e4b2f2ed2683b333c4009c62889fe0231ae015120da22c9cd6924e89"
+    },
+    {
+      "name": "Android unsigned Release ARM64 shader package inspection",
+      "status": "PASS",
+      "run": "final-android-release-arm64-package",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 22.163363100000424,
+      "coverage_count": null,
+      "log": "logs/final-android-release-arm64-package.log",
+      "log_sha256": "6dbff792a1ffe62b66ed66c00ce6a895d18afd91b11a4a78a50a9c48e0018654"
+    },
+    {
+      "name": "Android all-ABI APK/stripped-library identity and ELF/16 KiB LOAD inspection; not all-ABI shader scanning",
+      "status": "PASS",
+      "run": "final-android-all-abi-package",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 0.7907145999997738,
+      "coverage_count": 8,
+      "log": "logs/final-android-all-abi-package.log",
+      "log_sha256": "f46b2be24f7c47f346372e6e1885874b9c83da2c2b02b2f73a92a67fd0a55ef9"
+    },
+    {
+      "name": "Registered ABI/compiler/manifest/shader/policy fixtures; unchanged dependencies across diagnostic commit",
+      "status": "PASS",
+      "run": "candidate-shader-policy-contracts",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 235.47679300000163,
+      "coverage_count": 7,
+      "log": "logs/candidate-shader-policy-contracts.log",
+      "log_sha256": "d98912141aceb5a032fbd6dc932de845372c1c26a0c06c86b2553e5a3d3f5717"
+    },
+    {
+      "name": "Pipeline eight-key catalogue freshness and publication fault rollback",
+      "status": "PASS",
+      "run": "candidate-pipeline-freshness-2",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 57.663754200002586,
+      "coverage_count": 8,
+      "log": "logs/candidate-pipeline-freshness-2.log",
+      "log_sha256": "f3140c9638b451831e0cb98f2001afa1dbc89b4fcdb7858c31cb98a7e76dd0f1"
+    },
+    {
+      "name": "Pipeline generated adapter freshness",
+      "status": "PASS",
+      "run": "candidate-pipeline-adapter-freshness",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 12.621274999997695,
+      "coverage_count": null,
+      "log": "logs/candidate-pipeline-adapter-freshness.log",
+      "log_sha256": "359cc7dcf5d4ed04eb4981a4c93826f746f2e506f698e2e1e9c553b9973c4bf9"
+    },
+    {
+      "name": "RayQuery eight-key variants and adapter freshness",
+      "status": "PASS",
+      "run": "candidate-query-freshness",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 39.7073900999967,
+      "coverage_count": 8,
+      "log": "logs/candidate-query-freshness.log",
+      "log_sha256": "e99dd0241ff280c0a52ed30a3fa79fa3651d357f253b56c31e2a002a96abfada"
+    },
+    {
+      "name": "Generic compatibility freshness",
+      "status": "PASS",
+      "run": "candidate-compatibility-freshness",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 12.483570600001258,
+      "coverage_count": null,
+      "log": "logs/candidate-compatibility-freshness.log",
+      "log_sha256": "63cb94e485d989e9e29874cfd3d0209b637b62c391bbd81e7df2cdaf3f495b7c"
+    },
+    {
+      "name": "Legacy compatibility freshness",
+      "status": "PASS",
+      "run": "candidate-legacy-compatibility-freshness",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 11.383622100001958,
+      "coverage_count": null,
+      "log": "logs/candidate-legacy-compatibility-freshness.log",
+      "log_sha256": "5b327be36fb452456ee5387055565c16e2a9716de42bcb34a4ebb5d71617d2e4"
+    },
+    {
+      "name": "Real-mesh contact witness execution; not contact-policy acceptance",
+      "status": "PASS",
+      "run": "final-real-mesh-contact-witness",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 13.8070835000035,
+      "coverage_count": 24,
+      "log": "logs/final-real-mesh-contact-witness.log",
+      "log_sha256": "683b90a69e5d4430a06ee1725f69b55c8f7ebd26f57da32c331d83b21bb3b541"
+    },
+    {
+      "name": "Thin-joint diagnostic execution; not runtime admission",
+      "status": "PASS",
+      "run": "final-thin-joint-diagnostic",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 29.80969829999958,
+      "coverage_count": 84,
+      "log": "logs/final-thin-joint-diagnostic.log",
+      "log_sha256": "2b2e00b2a84486906588475946f4d56c857ed2c35ee6f8c563af58123512754e"
+    },
+    {
+      "name": "Optional contact callback contracts",
+      "status": "PASS",
+      "run": "final-contact-callback",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 0.12349140000151237,
+      "coverage_count": null,
+      "log": "logs/final-contact-callback.log",
+      "log_sha256": "7cca10e67aa3fa500d399b0ec727464695ff2ca39bf5488ac849ebbd91356db7"
+    },
+    {
+      "name": "Contact-proxy invalid/finite input contracts",
+      "status": "PASS",
+      "run": "final-contact-proxy-invalid",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 0.11704559999634512,
+      "coverage_count": null,
+      "log": "logs/final-contact-proxy-invalid.log",
+      "log_sha256": "80edcbd5565dce3fd516795f92771a56d85f28b9c7c9fe033d9e083ddc0eefd1"
+    },
+    {
+      "name": "Unchanged full torch clearance under 180-second registered gate",
+      "status": "PASS",
+      "run": "final-full-torch-clearance",
+      "source_at_end": "262a7fc096876d2417471285c6809f631103cfe6",
+      "elapsed_outer_seconds": 167.0390716000038,
+      "coverage_count": 1,
+      "log": "logs/final-full-torch-clearance.log",
+      "log_sha256": "99b0108da4abc5c4c4e0ca506eb43d4148dfcb980d695a5ba07e80392ca96f39"
+    }
+  ],
+  "java_results": {
+    "suites": 40,
+    "tests": 268,
+    "failures": 0,
+    "skipped": 0
+  },
+  "final_torch": {
+    "status": "PASS",
+    "test_seconds": 166.9,
+    "total_ctest_seconds": 166.91,
+    "outer_seconds": 167.0390716000038,
+    "registered_timeout_seconds": 180,
+    "margin_test_seconds": 13.1,
+    "margin_percent": 7.277777777777778,
+    "poses": 3287,
+    "roof_entry_skinned_poses": 1812,
+    "plane_samples": 3178,
+    "disk_samples": 57970,
+    "assertion_failures": 0,
+    "source_commit": "262a7fc096876d2417471285c6809f631103cfe6",
+    "log": "logs/final-full-torch-clearance.log",
+    "log_sha256": "99b0108da4abc5c4c4e0ca506eb43d4148dfcb980d695a5ba07e80392ca96f39",
+    "limitation": "One measured pass; no device/performance/repeatability inference. Original sweep coverage/assertions/order/tolerances unchanged."
+  },
+  "historical_torch": {
+    "wp0_timeout_seconds": 180.03,
+    "unchanged_diagnostic_reproduction_test_seconds": 168.85,
+    "earlier_vertical_proof_test_seconds": 168.7,
+    "scope": "Historical receipts preserved, not tests performed by this job."
+  },
+  "contact_evidence": {
+    "runtime_forgiving_contact_preserved": true,
+    "experimental_proxy_enabled": false,
+    "experimental_inward_pose_enabled": false,
+    "real_mesh_queries": 24,
+    "real_mesh_triangle_pairs": 1125143,
+    "thin_joint_queries": 84,
+    "thin_joint_accepted_active_samples": 11,
+    "thin_joint_beyond_tested_radius_accepts": 0,
+    "thin_joint_mesh_near_misses": 20,
+    "root_cone_only_pulse_samples": 5,
+    "live_blade_separation_measurement_available": false,
+    "physical_presentation_trace_collected": false
+  },
+  "failures": [
+    {
+      "run": "calibration-build-final",
+      "exit_code": 1,
+      "log": "logs/calibration-build-final.log"
+    },
+    {
+      "run": "calibration-contact-boundaries",
+      "exit_code": 1,
+      "log": "logs/calibration-contact-boundaries.log"
+    },
+    {
+      "run": "torso-proxy-build",
+      "exit_code": 1,
+      "log": "logs/torso-proxy-build.log"
+    },
+    {
+      "run": "teaching-policy-build",
+      "exit_code": 1,
+      "log": "logs/teaching-policy-build.log"
+    },
+    {
+      "run": "core-initial-build",
+      "exit_code": 1,
+      "log": "logs/core-initial-build.log"
+    },
+    {
+      "run": "upper-body-proxy-boundaries",
+      "exit_code": 1,
+      "log": "logs/upper-body-proxy-boundaries.log"
+    },
+    {
+      "run": "policy-and-native-contract-test",
+      "exit_code": 8,
+      "log": "logs/policy-and-native-contract-test.log"
+    },
+    {
+      "run": "torso-window-and-callback-build",
+      "exit_code": 1,
+      "log": "logs/torso-window-and-callback-build.log"
+    },
+    {
+      "run": "dodge-boundary-test",
+      "exit_code": 8,
+      "log": "logs/dodge-boundary-test.log"
+    },
+    {
+      "run": "native-ui-debug-build",
+      "exit_code": 1,
+      "log": "logs/native-ui-debug-build.log"
+    },
+    {
+      "run": "integrated-keeper-test",
+      "exit_code": 8,
+      "log": "logs/integrated-keeper-test.log"
+    },
+    {
+      "run": "affected-debug-tests",
+      "exit_code": 8,
+      "log": "logs/affected-debug-tests.log"
+    },
+    {
+      "run": "gameplay-exception-diagnosis",
+      "exit_code": 3221225725,
+      "log": "logs/gameplay-exception-diagnosis.log"
+    },
+    {
+      "run": "trace-storage-and-durability-tests",
+      "exit_code": 8,
+      "log": "logs/trace-storage-and-durability-tests.log"
+    },
+    {
+      "run": "contact-proxy-invalid-final",
+      "exit_code": 1,
+      "log": "logs/contact-proxy-invalid-final.log"
+    },
+    {
+      "run": "candidate-pipeline-freshness",
+      "exit_code": 1,
+      "log": "logs/candidate-pipeline-freshness.log"
+    }
+  ],
+  "failure_disposition": "Development failures retained. Compile/namespace/setup, overlapping-PDB build, invalid negative fixture, reward-ID expectation, modern/legacy durability and confirmed 0xC00000FD stack overflow corrected and affected checks rerun. No timeout/budget/tolerance relaxation.",
+  "provenance_limit": "Development dirty-source rows and source-transition policy run are explicitly qualified in the ledger. No incomplete wrapper attempt claims a test result. Private raw logs/JUnit hostnames are excluded.",
+  "remaining_gates": [
+    "Contact-policy choice and actual runtime calibrated integration with moving/side/rear/wall/corner cases",
+    "Windows and Android exact-candidate Pipeline/RayQuery RT presentation and combat trace",
+    "Paired clear-view/raised checkpoint171 captures and attachment/clearance/off-camera secondary contributions",
+    "Windows and Android lifecycle, stale input/frame/event rejection",
+    "Owner combat feel, listening and haptic acceptance",
+    "Dedicated directional animation clips remain missing"
+  ],
+  "ledger": {
+    "path": "runs.jsonl",
+    "sha256": "4a5cc50ac88321f44dbd86f6fb487ddc099bfc8813eafcbbd394f14f9f5dddc0",
+    "completed_runs": 95
+  },
+  "provenance": {
+    "path": "provenance.json",
+    "sha256": "23334617f27e28fd42b225743810e66311e783bfa8d5f4fb38e96a0b286fa6c3"
+  },
+  "evidence_files": [
+    {
+      "path": "android-all-abi-identities.json",
+      "sha256": "a89c9201a584d8dd6c7e8f12b5c0b145869d3b3048aceb226ca1d579a611e584",
+      "bytes": 4523
+    },
+    {
+      "path": "helpers/android_package_identity.py",
+      "sha256": "66fcbd3ab58fc5fe9a7d9adb8975431a727544f512dc52d074caae578c3f75d6",
+      "bytes": 2721
+    },
+    {
+      "path": "helpers/android_scans.py",
+      "sha256": "81904520e4a3590eeefefeff402bbeaa4e65af7f39fc7a702dd459632de9f141",
+      "bytes": 934
+    },
+    {
+      "path": "helpers/final_witness.py",
+      "sha256": "89864fdfb6ea6b535113dd177bd8a83b889ede714d6600af3e436bf9f50f67b1",
+      "bytes": 466
+    },
+    {
+      "path": "helpers/freshness.py",
+      "sha256": "d9c3f160821b29cdb9fe413720bba6512e31140fbe11e4b805a71be2a7d92bde",
+      "bytes": 899
+    },
+    {
+      "path": "helpers/lane.py",
+      "sha256": "5e4fd1bc93eeaafaee19e0e0a13e12226b9a6a993fd1659b490b56b80b78938c",
+      "bytes": 1744
+    },
+    {
+      "path": "helpers/provenance.py",
+      "sha256": "35535eea73c4a308a579389618a1a8632f221e84e9a0fbd4694cf3815aa87560",
+      "bytes": 4802
+    },
+    {
+      "path": "helpers/README.md",
+      "sha256": "c57511b5df1625f767cc6d426bdf22b39dfba4f7016a486a58cfd6e56dca56df",
+      "bytes": 826
+    },
+    {
+      "path": "helpers/run.py",
+      "sha256": "29823d5d78caed19866fca5a8bf41cf027051d17c435a5a4b06628970ede8a60",
+      "bytes": 3139
+    },
+    {
+      "path": "logs/affected-debug-build.log",
+      "sha256": "cb3207cb80c7296cb85ac06cf8480bd22e0587ed396a3514431d8348ec513d00",
+      "bytes": 11162
+    },
+    {
+      "path": "logs/affected-debug-tests.log",
+      "sha256": "c0579f8af6abee94fc16d1cedd841a4c9400f95b54d186ae578280594fe8c06d",
+      "bytes": 23614
+    },
+    {
+      "path": "logs/android-teaching-build.log",
+      "sha256": "7c3939a5db52175a92bd65a55a502fa77b0ed955993cfc62950910ea7aec0296",
+      "bytes": 7302
+    },
+    {
+      "path": "logs/baseline-build.log",
+      "sha256": "0c8f11b49324cd4221a2042b13a66d3486f2f4ce571ca36ed6a281d5279a9993",
+      "bytes": 791
+    },
+    {
+      "path": "logs/baseline-combat-contracts.log",
+      "sha256": "d50df562eb7e5eb1512f19628a9cad0785a2cd183d7da6046a84856a08745424",
+      "bytes": 2548
+    },
+    {
+      "path": "logs/baseline-moving-downstroke.log",
+      "sha256": "7b4f78608b4f10296c6604c75625c17036ae6b4f9bf74dcd5b63a8624649e2bd",
+      "bytes": 6017
+    },
+    {
+      "path": "logs/baseline-moving-pulse.log",
+      "sha256": "e4bebae00999ac63e28463faf22cfb53caebfca6ab0e85627b4079caf527ece5",
+      "bytes": 4125
+    },
+    {
+      "path": "logs/baseline-static.log",
+      "sha256": "5b7272a91d926ef0ef39db2215de4c9b5fe32d1fe8806b67d968e0bef1876dfa",
+      "bytes": 13219
+    },
+    {
+      "path": "logs/calibration-boundary-final.log",
+      "sha256": "1f2bb621845ee856e9e79a13834ab99655cb6c71da185bd89adf33ef26d3af64",
+      "bytes": 4254
+    },
+    {
+      "path": "logs/calibration-boundary-rebuild.log",
+      "sha256": "27e05a80780320ddacb001a56a970546c9a2421b5627ec3ffdbbfe6ae599d79e",
+      "bytes": 499
+    },
+    {
+      "path": "logs/calibration-build-final.log",
+      "sha256": "27cbf10fbafa34163fe339a52e46b899e3012014eff8843202d5e1c0a2c5af57",
+      "bytes": 8898
+    },
+    {
+      "path": "logs/calibration-build-fixed.log",
+      "sha256": "27e05a80780320ddacb001a56a970546c9a2421b5627ec3ffdbbfe6ae599d79e",
+      "bytes": 499
+    },
+    {
+      "path": "logs/calibration-contact-boundaries.log",
+      "sha256": "2ad0e5f0d3f568aba65764e7fb4f8212cf9fc21620041dc196fa8d345335c32f",
+      "bytes": 4319
+    },
+    {
+      "path": "logs/candidate-android-all-abi-package.log",
+      "sha256": "f46b2be24f7c47f346372e6e1885874b9c83da2c2b02b2f73a92a67fd0a55ef9",
+      "bytes": 109
+    },
+    {
+      "path": "logs/candidate-android-build-2.log",
+      "sha256": "911961994521d394da7faa0a246cfa55bb906eef00cbcc6acc3ce9095c6697fd",
+      "bytes": 6184
+    },
+    {
+      "path": "logs/candidate-android-build.log",
+      "sha256": "418924a762fd7842799045e05b9347378309dc6c7b091a2b009b972e054924a8",
+      "bytes": 6790
+    },
+    {
+      "path": "logs/candidate-android-debug-arm64-package.log",
+      "sha256": "d6ed1e47242c8a914ff6806ce95c492d5fd911f593b9cc9384be9d120f356b04",
+      "bytes": 3460
+    },
+    {
+      "path": "logs/candidate-compatibility-freshness.log",
+      "sha256": "63cb94e485d989e9e29874cfd3d0209b637b62c391bbd81e7df2cdaf3f495b7c",
+      "bytes": 1129
+    },
+    {
+      "path": "logs/candidate-debug-build-2.log",
+      "sha256": "fb348e126bc04fea0c57367da42a0283d253ce28a0fda73e9b51fb83f2eebe0e",
+      "bytes": 12586
+    },
+    {
+      "path": "logs/candidate-debug-build.log",
+      "sha256": "f367b706088eeea4827f5465bf7c25e4fb0ccdb87f9b08168a5698639fd5639b",
+      "bytes": 13493
+    },
+    {
+      "path": "logs/candidate-debug-packages.log",
+      "sha256": "624363c11643d0cca0d2c5d434a5b82658bbec23f03c907641360e63b111b886",
+      "bytes": 15720
+    },
+    {
+      "path": "logs/candidate-debug-tests.log",
+      "sha256": "b85b803c36ab27b04a8c9dd9aa18a2d5bf0e65674a1d57a528cd126ebe36cb24",
+      "bytes": 41617
+    },
+    {
+      "path": "logs/candidate-final-debug-trace-tests.log",
+      "sha256": "dafac5d6b43bd77d41c2ad4ee29ca132a6970da45da66211df0f28ecc15f4cfb",
+      "bytes": 3279
+    },
+    {
+      "path": "logs/candidate-legacy-compatibility-freshness.log",
+      "sha256": "5b327be36fb452456ee5387055565c16e2a9716de42bcb34a4ebb5d71617d2e4",
+      "bytes": 565
+    },
+    {
+      "path": "logs/candidate-pipeline-adapter-freshness.log",
+      "sha256": "359cc7dcf5d4ed04eb4981a4c93826f746f2e506f698e2e1e9c553b9973c4bf9",
+      "bytes": 41
+    },
+    {
+      "path": "logs/candidate-pipeline-freshness-2.log",
+      "sha256": "f3140c9638b451831e0cb98f2001afa1dbc89b4fcdb7858c31cb98a7e76dd0f1",
+      "bytes": 1753
+    },
+    {
+      "path": "logs/candidate-pipeline-freshness.log",
+      "sha256": "47179748d7e4a8e22c168878893139948d95c760b2b3d2bfd51a500376ded414",
+      "bytes": 222
+    },
+    {
+      "path": "logs/candidate-query-freshness.log",
+      "sha256": "e99dd0241ff280c0a52ed30a3fa79fa3651d357f253b56c31e2a002a96abfada",
+      "bytes": 1897
+    },
+    {
+      "path": "logs/candidate-release-build-2.log",
+      "sha256": "25fc0143ed59d42b37aba40554867570ff1a0799948f463557821e978b388e86",
+      "bytes": 12926
+    },
+    {
+      "path": "logs/candidate-release-build.log",
+      "sha256": "0cd6e2ceef37646fc65aed2bd17daf7e6f002da59d344eef6c4e34b3a9bb99cc",
+      "bytes": 14573
+    },
+    {
+      "path": "logs/candidate-release-tests.log",
+      "sha256": "75215cf72004f3cab332053e7dbff3acfbc990541a87732de42e526f2228bdb8",
+      "bytes": 41773
+    },
+    {
+      "path": "logs/candidate-shader-policy-contracts.log",
+      "sha256": "d98912141aceb5a032fbd6dc932de845372c1c26a0c06c86b2553e5a3d3f5717",
+      "bytes": 12050
+    },
+    {
+      "path": "logs/capsule-calibration-boundaries.log",
+      "sha256": "35eaa8b463349bbaf05a79e292e2918a8f52e17d4e45d7e795ff3993ca621f7e",
+      "bytes": 5690
+    },
+    {
+      "path": "logs/capsule-calibration-build.log",
+      "sha256": "eaa0837bac00fb5876cab7f523d667c93ba69ce0b1fd061f76ced6d142da409b",
+      "bytes": 677
+    },
+    {
+      "path": "logs/combat-callback-contract.log",
+      "sha256": "7cca10e67aa3fa500d399b0ec727464695ff2ca39bf5488ac849ebbd91356db7",
+      "bytes": 170
+    },
+    {
+      "path": "logs/contact-callback-final.log",
+      "sha256": "7cca10e67aa3fa500d399b0ec727464695ff2ca39bf5488ac849ebbd91356db7",
+      "bytes": 170
+    },
+    {
+      "path": "logs/contact-proxy-invalid-corrected.log",
+      "sha256": "80edcbd5565dce3fd516795f92771a56d85f28b9c7c9fe033d9e083ddc0eefd1",
+      "bytes": 104
+    },
+    {
+      "path": "logs/contact-proxy-invalid-final.log",
+      "sha256": "1ee05daf767a5c6ea38214b3b5cdda0df4212534e9e73a36b4f215ff12e176e5",
+      "bytes": 688
+    },
+    {
+      "path": "logs/core-initial-build-elevated.log",
+      "sha256": "716f5dd90474e6100aa20a416d49203a038053a4578971b7ebf20d320c6bbcd7",
+      "bytes": 673
+    },
+    {
+      "path": "logs/core-initial-build.log",
+      "sha256": "b84c62dd7967fc1b61c92820873249803720461c2ee778c8b1a974bffbf29013",
+      "bytes": 899
+    },
+    {
+      "path": "logs/core-legacy-regression.log",
+      "sha256": "c5914baa26f2a223b1a871796adeb9a23e0592c51e19a670c6e80f96227ae6b4",
+      "bytes": 1253
+    },
+    {
+      "path": "logs/dodge-boundary-build.log",
+      "sha256": "6c2420094eba00e5d3dd374f7bbee7ac9b94a116858b3592a1b4115774ab335e",
+      "bytes": 481
+    },
+    {
+      "path": "logs/dodge-boundary-corrected-build.log",
+      "sha256": "6d5364f7d8e3d2abc596de64d8307ce5fc9f6f13e965e0857c11e8163edf28e4",
+      "bytes": 460
+    },
+    {
+      "path": "logs/dodge-boundary-corrected-test.log",
+      "sha256": "6cc1885ed6bb7f11e454d34b441e276d29470333ed82313dfa1bab58a45a8c77",
+      "bytes": 1010
+    },
+    {
+      "path": "logs/dodge-boundary-test.log",
+      "sha256": "1ea86e10caf5bf49b91b40fa6e1b92f22e46e3e0c53b5fd73193ef30d74d8fc6",
+      "bytes": 1859
+    },
+    {
+      "path": "logs/downstroke-six-capsule-profile-build.log",
+      "sha256": "27e05a80780320ddacb001a56a970546c9a2421b5627ec3ffdbbfe6ae599d79e",
+      "bytes": 499
+    },
+    {
+      "path": "logs/downstroke-six-capsule-profile.log",
+      "sha256": "a7e0ed624bd61fcb0e2c4d414e35ae61cf9dcaafc055214f74d9d08d7971d7c1",
+      "bytes": 14549
+    },
+    {
+      "path": "logs/final-android-all-abi-package.log",
+      "sha256": "f46b2be24f7c47f346372e6e1885874b9c83da2c2b02b2f73a92a67fd0a55ef9",
+      "bytes": 109
+    },
+    {
+      "path": "logs/final-android-debug-arm64-package.log",
+      "sha256": "7f96f4a8e4b2f2ed2683b333c4009c62889fe0231ae015120da22c9cd6924e89",
+      "bytes": 3460
+    },
+    {
+      "path": "logs/final-android-release-arm64-package.log",
+      "sha256": "6dbff792a1ffe62b66ed66c00ce6a895d18afd91b11a4a78a50a9c48e0018654",
+      "bytes": 3459
+    },
+    {
+      "path": "logs/final-contact-callback.log",
+      "sha256": "7cca10e67aa3fa500d399b0ec727464695ff2ca39bf5488ac849ebbd91356db7",
+      "bytes": 170
+    },
+    {
+      "path": "logs/final-contact-proxy-invalid.log",
+      "sha256": "80edcbd5565dce3fd516795f92771a56d85f28b9c7c9fe033d9e083ddc0eefd1",
+      "bytes": 104
+    },
+    {
+      "path": "logs/final-full-torch-clearance.log",
+      "sha256": "99b0108da4abc5c4c4e0ca506eb43d4148dfcb980d695a5ba07e80392ca96f39",
+      "bytes": 1654
+    },
+    {
+      "path": "logs/final-real-mesh-contact-witness.log",
+      "sha256": "683b90a69e5d4430a06ee1725f69b55c8f7ebd26f57da32c331d83b21bb3b541",
+      "bytes": 16676
+    },
+    {
+      "path": "logs/final-release-packages.log",
+      "sha256": "b1b751fe54c92018bc609053446050725e4e3f8dfc9ce94d5aacff06e175e0fc",
+      "bytes": 10482
+    },
+    {
+      "path": "logs/final-thin-joint-diagnostic.log",
+      "sha256": "2b2e00b2a84486906588475946f4d56c857ed2c35ee6f8c563af58123512754e",
+      "bytes": 62844
+    },
+    {
+      "path": "logs/gameplay-exception-diagnosis.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/guarded-contact-fixtures-build.log",
+      "sha256": "fc1854ca764909da9963330665ca125c810c0874ab73e537fc46a745b7527be2",
+      "bytes": 959
+    },
+    {
+      "path": "logs/guarded-contact-fixtures-tests.log",
+      "sha256": "e89f1d20c3652120000829230af30d958ff12b03c3bd8f631a7f8ad2edd769cd",
+      "bytes": 1008
+    },
+    {
+      "path": "logs/integrated-keeper-build-corrected.log",
+      "sha256": "6d5364f7d8e3d2abc596de64d8307ce5fc9f6f13e965e0857c11e8163edf28e4",
+      "bytes": 460
+    },
+    {
+      "path": "logs/integrated-keeper-build.log",
+      "sha256": "8ac7e533ec1e5d6460f44535377219f7092e8e3fb8de4d5d1eec00c5a8c5479f",
+      "bytes": 667
+    },
+    {
+      "path": "logs/integrated-keeper-test-corrected.log",
+      "sha256": "b6c011053e4ad81c4702f1beeaf5b521c6847b72a874eecf99418bd1016796fc",
+      "bytes": 1010
+    },
+    {
+      "path": "logs/integrated-keeper-test.log",
+      "sha256": "c535961fc2bbd4a6867afba8d40f75233616d8724c19b43d1ff46ddac2862be9",
+      "bytes": 1291
+    },
+    {
+      "path": "logs/native-ui-debug-build-corrected.log",
+      "sha256": "b7dcf3b62cb75561f4ccb0311a044b526f3578aad55e30b25c7edad4753febbd",
+      "bytes": 2631
+    },
+    {
+      "path": "logs/native-ui-debug-build.log",
+      "sha256": "4f9c54e6a9db1a80c4e39f9791ba20361e33ecb9d7d574ef5acb550d4b199b54",
+      "bytes": 1181
+    },
+    {
+      "path": "logs/native-ui-debug-contracts.log",
+      "sha256": "02bd53cb4ee427792454d375f26aa284cc8a74587c014ca6b8157a1558212e3b",
+      "bytes": 3051
+    },
+    {
+      "path": "logs/policy-and-native-contract-build.log",
+      "sha256": "49e69f0ebe16a705c52244b29d4f0196d50ab5dbd60d83519769db6f838351e0",
+      "bytes": 1535
+    },
+    {
+      "path": "logs/policy-and-native-contract-test.log",
+      "sha256": "3e0f48ab7817a96cff8078e92cdac75f3ebca2a63a7231ed085510f4a9f121c9",
+      "bytes": 3738
+    },
+    {
+      "path": "logs/readable-pose-torso-active-window.log",
+      "sha256": "089e676c57e6c3f8e00b70b7b50884fb6ab16e3e4be25d7e991077bfebc00f12",
+      "bytes": 47785
+    },
+    {
+      "path": "logs/readable-pose-torso-window-build.log",
+      "sha256": "3f49d99f269ab561a34c9823207b1f7580fe98f537b7a6ed35a1ed68aa511008",
+      "bytes": 750
+    },
+    {
+      "path": "logs/release-configure.log",
+      "sha256": "35ea2f998acc7783a90ef0c4de8e654d45dfec2d7d75fe1882c3643f8bce8e84",
+      "bytes": 599
+    },
+    {
+      "path": "logs/replay-and-contact-guards-build.log",
+      "sha256": "7a1eed54b183bc8c74446f15a9d18299db824a5ad89c237973d279a57bd6d7b3",
+      "bytes": 1210
+    },
+    {
+      "path": "logs/replay-and-contact-tests.log",
+      "sha256": "53b2d04a492fcae734901ba138803a477a80ef403fabb91ee55f044f49033d08",
+      "bytes": 1008
+    },
+    {
+      "path": "logs/robust-capsule-fit-boundaries.log",
+      "sha256": "e7d3965c4e6597b7a4e3c4653f53b605b36c287be9b8657081033a9eb16d335e",
+      "bytes": 8556
+    },
+    {
+      "path": "logs/robust-capsule-fit-build-corrected.log",
+      "sha256": "27e05a80780320ddacb001a56a970546c9a2421b5627ec3ffdbbfe6ae599d79e",
+      "bytes": 499
+    },
+    {
+      "path": "logs/robust-capsule-fit-build.log",
+      "sha256": "7d8a11994a05bb54f5da47bba8b6ccc63baee82d5136a8622e826e0d3862c4e2",
+      "bytes": 633
+    },
+    {
+      "path": "logs/robust-capsule-fit-downstroke-corrected.log",
+      "sha256": "0c1f8728f5c77e836bf714c9420ba26a949859268a89ab0b9c96ab04510b3cfc",
+      "bytes": 14551
+    },
+    {
+      "path": "logs/robust-capsule-fit-downstroke.log",
+      "sha256": "20c1e304ca86d9daa8278532ef75a9953093b91dd39432440a6658e826413af7",
+      "bytes": 14535
+    },
+    {
+      "path": "logs/six-joint-capsule-boundaries.log",
+      "sha256": "6f21b498ded093c00470dd207d9c1e4a7417ffda65aa571d85dffbddc9a7a6b0",
+      "bytes": 8541
+    },
+    {
+      "path": "logs/six-joint-capsule-build.log",
+      "sha256": "be28b51efb098c43dab0244689c86e92dac584a429cd62d11620e2b801e161f7",
+      "bytes": 1365
+    },
+    {
+      "path": "logs/teaching-policy-build-corrected.log",
+      "sha256": "a337091a1e50fbbef05450aac47625d3e5ffa4a246d876ef71a1c549c3a3adbe",
+      "bytes": 594
+    },
+    {
+      "path": "logs/teaching-policy-build.log",
+      "sha256": "e948eed5b3eac2a85eb9b5ae4498e4f1753899d2611634d85a1cbceb88b3ad4a",
+      "bytes": 1621
+    },
+    {
+      "path": "logs/teaching-policy-tests.log",
+      "sha256": "aebb3f2bdd23a615c7e71b0f6cdeb76f1942f5229518f3f43782179b3b3c2129",
+      "bytes": 1010
+    },
+    {
+      "path": "logs/thin-joint-active-window-build.log",
+      "sha256": "7d8a11994a05bb54f5da47bba8b6ccc63baee82d5136a8622e826e0d3862c4e2",
+      "bytes": 633
+    },
+    {
+      "path": "logs/thin-joint-active-window.log",
+      "sha256": "cd5de9324a08e183dc992ed8ca782a3cad21910086e6ba50e477786f6f66f852",
+      "bytes": 62424
+    },
+    {
+      "path": "logs/torso-only-active-window.log",
+      "sha256": "e4a708f3aae5ec22fca2b06964d1ab510d0ceac05c07105db4d9547d5e5f7dcb",
+      "bytes": 40575
+    },
+    {
+      "path": "logs/torso-proxy-build.log",
+      "sha256": "36fff87ad925a6146b107229ea1af239c00e74f856e47d13578b0bfd58980c0a",
+      "bytes": 2860
+    },
+    {
+      "path": "logs/torso-window-and-callback-build-corrected.log",
+      "sha256": "27e05a80780320ddacb001a56a970546c9a2421b5627ec3ffdbbfe6ae599d79e",
+      "bytes": 499
+    },
+    {
+      "path": "logs/torso-window-and-callback-build.log",
+      "sha256": "a0f28397484e47db8665161f2a103edc3d12fb8a766dd3aaf8cf651f3c3191ea",
+      "bytes": 819
+    },
+    {
+      "path": "logs/trace-linkage-build.log",
+      "sha256": "f61fce767134ea39dd6ce324e45b58e85ac97031695d0cb46b83295a14811589",
+      "bytes": 1930
+    },
+    {
+      "path": "logs/trace-linkage-tests.log",
+      "sha256": "d99732d29d29c36e832abfef591779e43981111b73721ab08d08334102be0fe2",
+      "bytes": 2046
+    },
+    {
+      "path": "logs/trace-storage-and-durability-build.log",
+      "sha256": "5ace7a22c376011084e4ae78316db56f3b52ef6fea819a0ca29d16dbbb2a579b",
+      "bytes": 2856
+    },
+    {
+      "path": "logs/trace-storage-and-durability-tests.log",
+      "sha256": "ab50c29b0cac9d1bc4016f36c428611048359068dd4111788f0c7b1ee836da6c",
+      "bytes": 4004
+    },
+    {
+      "path": "logs/upper-body-proxy-boundaries.log",
+      "sha256": "7d73a633158fc03eef5501103769d65e5801bf47d46574c02294a4075f665f52",
+      "bytes": 6686
+    },
+    {
+      "path": "logs/upper-body-proxy-build-2.log",
+      "sha256": "7d8a11994a05bb54f5da47bba8b6ccc63baee82d5136a8622e826e0d3862c4e2",
+      "bytes": 633
+    },
+    {
+      "path": "provenance.json",
+      "sha256": "23334617f27e28fd42b225743810e66311e783bfa8d5f4fb38e96a0b286fa6c3",
+      "bytes": 68372
+    },
+    {
+      "path": "runs.jsonl",
+      "sha256": "4a5cc50ac88321f44dbd86f6fb487ddc099bfc8813eafcbbd394f14f9f5dddc0",
+      "bytes": 432618
+    }
+  ]
+}

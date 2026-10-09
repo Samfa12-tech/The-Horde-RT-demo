@@ -1,0 +1,52 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 25
+    Start  25: horde_rt_combat_timing_trace_tests
+
+25: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_timing_trace_tests.exe"
+25: Working Directory: <repo>/build/presets/windows-x64-debug
+25: Test timeout computed to be: 1500
+1/4 Test  #25: horde_rt_combat_timing_trace_tests ........   Passed    0.05 sec
+test 26
+    Start  26: horde_rt_input_presentation_trace_tests
+
+26: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_input_presentation_trace_tests.exe"
+26: Working Directory: <repo>/build/presets/windows-x64-debug
+26: Test timeout computed to be: 1500
+2/4 Test  #26: horde_rt_input_presentation_trace_tests ...   Passed    0.02 sec
+test 98
+    Start  98: horde_rt_simulation_gameplay_tests
+
+98: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_simulation_gameplay_tests.exe"
+98: Working Directory: <repo>/build/presets/windows-x64-debug
+98: Test timeout computed to be: 1500
+98: lich/chest delayed finale events hits/defeat/unlock=3/1/1 phase=1 pending=0 time=0 sequence=8/9
+98: open shaft actual X/Z=-5.5/-14.5 mount torch lowering/left Y legacy=0/-0.41 anatomical=0/-0.31
+98: Shared simulation command, event, seam-persistence, and retry tests passed.
+3/4 Test  #98: horde_rt_simulation_gameplay_tests ........   Passed    1.21 sec
+test 124
+    Start 124: horde_rt_combat_smoke
+
+124: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_smoke.exe"
+124: Working Directory: <repo>/build/presets/windows-x64-debug
+124: Test timeout computed to be: 1500
+124: Combat smoke passed: two stable spawns, separation, one attacker, nearest-only hits, persistent independent deaths, reset, damage pulses, collision, and route leash.
+4/4 Test #124: horde_rt_combat_smoke .....................   Passed    0.02 sec
+
+The following tests passed:
+	horde_rt_combat_timing_trace_tests
+	horde_rt_input_presentation_trace_tests
+	horde_rt_simulation_gameplay_tests
+	horde_rt_combat_smoke
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   1.32 sec

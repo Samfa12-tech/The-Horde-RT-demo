@@ -1,0 +1,313 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 24
+      Start  24: horde_rt_combat_foundation_tests
+
+24: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_foundation_tests.exe"
+24: Working Directory: <repo>/build/presets/windows-x64-debug
+24: Test timeout computed to be: 1500
+24: combat foundation checks=319 failures=0
+ 1/23 Test  #24: horde_rt_combat_foundation_tests .................   Passed    0.41 sec
+test 25
+      Start  25: horde_rt_held_item_transition_tests
+
+25: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_held_item_transition_tests.exe"
+25: Working Directory: <repo>/build/presets/windows-x64-debug
+25: Test timeout computed to be: 1500
+25: Held-item transition checks passed
+ 2/23 Test  #25: horde_rt_held_item_transition_tests ..............   Passed    2.18 sec
+test 26
+      Start  26: horde_rt_combat_timing_trace_tests
+
+26: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_timing_trace_tests.exe"
+26: Working Directory: <repo>/build/presets/windows-x64-debug
+26: Test timeout computed to be: 1500
+ 3/23 Test  #26: horde_rt_combat_timing_trace_tests ...............   Passed    4.59 sec
+test 27
+      Start  27: horde_rt_input_presentation_trace_tests
+
+27: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_input_presentation_trace_tests.exe"
+27: Working Directory: <repo>/build/presets/windows-x64-debug
+27: Test timeout computed to be: 1500
+ 4/23 Test  #27: horde_rt_input_presentation_trace_tests ..........   Passed    4.77 sec
+test 28
+      Start  28: horde_rt_held_item_clearance_tests
+
+28: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_held_item_clearance_tests.exe"
+28: Working Directory: <repo>/build/presets/windows-x64-debug
+28: Test timeout computed to be: 1500
+28: Portal cases=19392 maximum world-down carry=0.79874 m
+28: Maximum sampled walk/look hand step=0.0295375 m at step 197 previous z/yaw/pitch=-3.46/-0.210644/0.0560644 current=-3.47/-0.214874/0.0519433 retreat/lowering=0.189427/0.558001 -> 0.178705/0.532593
+28: Rag torch held/lowered residual=0.577716/0.0887203 m; lowered hand Y=-0.910606
+ 5/23 Test  #28: horde_rt_held_item_clearance_tests ...............   Passed    6.46 sec
+test 41
+      Start  41: horde_rt_windows_combat_practice_launch_tests
+
+41: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_windows_combat_practice_launch_tests.exe"
+41: Working Directory: <repo>/build/presets/windows-x64-debug
+41: Test timeout computed to be: 1500
+ 6/23 Test  #41: horde_rt_windows_combat_practice_launch_tests ....   Passed    1.62 sec
+test 43
+      Start  43: horde_rt_android_debug_request_admission_tests
+
+43: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_android_debug_request_admission_tests.exe"
+43: Working Directory: <repo>/build/presets/windows-x64-debug
+43: Test timeout computed to be: 1500
+ 7/23 Test  #43: horde_rt_android_debug_request_admission_tests ...   Passed    0.02 sec
+test 45
+      Start  45: horde_rt_world_route_foundation_tests
+
+45: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_world_route_foundation_tests.exe"
+45: Working Directory: <repo>/build/presets/windows-x64-debug
+45: Test timeout computed to be: 1500
+45: World route checks=16388 failures=0 triangles=350 resident_cpu_ns=93000 staged_cpu_ns=102000 resident_retained_bytes=22752 staged_peak_cpu_bytes=32880 directions=2 GPU_cost=not-measured
+ 8/23 Test  #45: horde_rt_world_route_foundation_tests ............   Passed    7.19 sec
+test 46
+      Start  46: horde_rt_vertical_support_tests
+
+46: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_vertical_support_tests.exe"
+46: Working Directory: <repo>/build/presets/windows-x64-debug
+46: Test timeout computed to be: 1500
+46: Vertical support proof cases=265 failures=0 fixed-walk directions=2
+ 9/23 Test  #46: horde_rt_vertical_support_tests ..................   Passed    7.73 sec
+test 47
+      Start  47: horde_rt_held_item_vertical_support_rig_tests
+
+47: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_held_item_vertical_support_rig_tests.exe" "<repo>"
+47: Working Directory: <repo>/build/presets/windows-x64-debug
+47: Test timeout computed to be: 1500
+47: Exact-pose rejected missing geometry: missing skinned geometry
+47: Exact-pose rejected omitted support: body mesh or eye applied support incorrectly
+47: Exact-pose rejected doubled support: body mesh or eye applied support incorrectly
+47: Exact-pose rejected unreachable wrist: actual wrist is outside anatomical reach
+47: Exact-pose rejected broken torch Grip: torch no longer attaches to the solved rig Grip
+47: Exact-pose rejected broken sword Hips attachment: production stowed sword no longer attaches to animated Hips
+47: Exact-pose rejected independent flame offset: flame or physical light left its authored item socket
+47: Exact-pose rejected independent physical-light offset: flame or physical light left its authored item socket
+47: Exact checkpoint171 production rig yaw0 pitch-0.05 aspect16:9 passed; mesh points=34304 lowering/retraction/headroom=0.333987/0.200392/0.0347347 returned lowering=0 same-validator negatives=9 descent ticks=59
+47: Actual cached player rig support transform passed: support delta=0.35 m; actual skinned body vertices, hand/item sockets, reward-lantern hinge/body/flame/light, and torch clearance translated with XZ preserved.
+47: First fixture (0,0) torch retraction/headroom floor=0/0.0557224 m raised=0.197407/0.0347347 m
+10/23 Test  #47: horde_rt_held_item_vertical_support_rig_tests ....   Passed    3.08 sec
+test 48
+      Start  48: horde_rt_player_directional_rig_tests
+
+48: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_player_directional_rig_tests.exe" "<repo>"
+48: Working Directory: <repo>/build/presets/windows-x64-debug
+48: Test timeout computed to be: 1500
+48: Directional runtime rig, aim independence, run stride, dodge disposition, route support poses, and attachment sockets passed; dedicated run/back/strafe/dodge clips remain absent; route_pose_samples=32 GPU_cost=not-measured.
+11/23 Test  #48: horde_rt_player_directional_rig_tests ............   Passed    4.95 sec
+test 71
+      Start  71: horde_rt_player_animation_tests
+
+71: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_player_animation_tests.exe"
+71: Working Directory: <repo>/build/presets/windows-x64-debug
+71: Test timeout computed to be: 1500
+71: Unequal folded IK: elbow=(-0.075,0.290474,0), upper=0.3, lower=0.4
+71: Owner portrait safe-frame NDC x=[-0.934917, 0.864117]
+71: Downward portrait safe-frame NDC x=[-0.934917, 0.818936]
+71: Upward portrait safe-frame NDC x=[-0.934917, 0.730322]
+71: Player animation, IK, socket, reset/import, visibility, and delivery contracts passed
+12/23 Test  #71: horde_rt_player_animation_tests ..................   Passed    5.60 sec
+test 73
+      Start  73: horde_rt_held_item_socket_tests
+
+73: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_held_item_socket_tests.exe"
+73: Working Directory: <repo>/build/presets/windows-x64-debug
+73: Test timeout computed to be: 1500
+73: post-claim chest held depth/x/y/clearance=1.02728/-0.130527/-0.0501483/2.66
+73: reward carry open held/high/low x=0.68/1.04/1.04/-0.13 guard clearance/hand=0.0600006/0.2 emergency wall held/hand/x=0.3/0.2/-0.45
+73: reward one-millimetre wall sweep max clearance/depth/lateral/yaw delta=0.00100112/0.000478745/0.000261545/0.00098294
+73: stowed scabbard full-mesh sweep poses=16 closestGap=0.0838906m playerTri=16301 sheathTri=11 floorGap=0.157182m releasedHand=0.503615m
+73: parry actual mesh clearance aspect=0.46 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=0 action=7 time=0.04 successful=0 hilt=0.0495894 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=0 action=8 time=0.05 successful=0 hilt=0.0495894 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=0.46 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.33333 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=0 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=7 time=0 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=7 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=8 time=0.05 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=9 time=0.04 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=9 time=0.12 successful=0 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: parry actual mesh clearance aspect=1.77778 lower=1 action=8 time=0.05 successful=1 hilt=0.06 arm=0.06 cap=0.06m triangles=5304/6875
+73: sword grip-local envelope y=-0.135279:0.915253 vertexBands(y<=.15,.15-.35,.35-.55,.55-.75,.75-.95,>.95)=4348,2266,1969,1782,1059,0, primitiveMaterials=material:34497,
+73: combat-geometry normal-near target=0,-1.2 targetY=-0.95 targetFacing=0 playerYaw=0 targetBearing=0 targetBoundsY=-0.939193:0.543894 downPulseTick=17 downActionTime=0.103333 downAdmitted=1 upPulseTick=0 upActionTime=-1 targetDeadAtUpPulse=0 downPulseSurfaceGap=0.00213471 upPulseSurfaceGap=3.40282e+38 downPulseBoundsGap=0 upPulseBoundsGap=3.40282e+38 downPulseBladeGap=0.00213471 upPulseBladeGap=3.40282e+38 downPulseNearestGripLocal=0.0321889,0.630462,0.0016153 upPulseNearestGripLocal=0,0,0 minSurfaceGap=0.00213471 closestSurfaceTick=17 closestSurfaceGripLocal=0.0321889,0.630462,0.0016153 minBladeSurfaceGap=0.00213471 closestBladeTick=17 closestBladeGripLocal=0.0321889,0.630462,0.0016153 nearSurfaceTicks20mm=17:17 downActiveNearTicks=17:17 upActiveNearTicks=0:0 downActiveBladeNearTicks=17:17 upActiveBladeNearTicks=0:0 minGap=0 boundsOverlapSamples=10:22 importedSwordVertices=11424 importedTargetVertices=28206
+73: combat-geometry combo-near target=0,-1.2 targetY=-0.95 targetFacing=0 playerYaw=0 targetBearing=0 targetBoundsY=-0.939193:0.543894 downPulseTick=17 downActionTime=0.103333 downAdmitted=1 upPulseTick=30 upActionTime=0.05 targetDeadAtUpPulse=1 downPulseSurfaceGap=0.00213471 upPulseSurfaceGap=0.0131259 downPulseBoundsGap=0 upPulseBoundsGap=0 downPulseBladeGap=0.00213471 upPulseBladeGap=0.0131259 downPulseNearestGripLocal=0.0321889,0.630462,0.0016153 upPulseNearestGripLocal=0.0319776,0.642511,0.00157196 minSurfaceGap=0.00213471 closestSurfaceTick=17 closestSurfaceGripLocal=0.0321889,0.630462,0.0016153 minBladeSurfaceGap=0.00213471 closestBladeTick=17 closestBladeGripLocal=0.0321889,0.630462,0.0016153 nearSurfaceTicks20mm=17:30 downActiveNearTicks=17:17 upActiveNearTicks=30:30 downActiveBladeNearTicks=17:17 upActiveBladeNearTicks=30:30 minGap=0 boundsOverlapSamples=10:32 importedSwordVertices=11424 importedTargetVertices=28206
+73: open anatomical hands right=0.18,-0.34,0.6 left=-0.135,-0.31,0.68 lowering/retraction=0/0 torch=0
+73: sword overhead phase sweep max lowering/vertices clear=0.733974/1 anatomical finalGrip/vertices=1/1 resolved=60/60 leftSocketErrorMax/failures=9.996e-08/0 rightSocketError=1.78814e-07 finalGripError=5.05762e-07m/0rad
+73: sword five-mm approach max lowering/hand step=0.0027637/0.00296172
+73: Held-item socket contracts passed.
+13/23 Test  #73: horde_rt_held_item_socket_tests ..................   Passed   27.08 sec
+test 77
+      Start  77: horde_rt_scene_abi_tests
+
+77: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_scene_abi_tests.exe"
+77: Working Directory: <repo>/build/presets/windows-x64-debug
+77: Test timeout computed to be: 1500
+77: RT scene ABI contract passed
+14/23 Test  #77: horde_rt_scene_abi_tests .........................   Passed    0.01 sec
+test 100
+      Start 100: horde_rt_simulation_timing_tests
+
+100: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_simulation_timing_tests.exe"
+100: Working Directory: <repo>/build/presets/windows-x64-debug
+100: Test timeout computed to be: 1500
+100: Shared simulation cadence, hitch, diagonal, pause, and overrun tests passed.
+15/23 Test #100: horde_rt_simulation_timing_tests .................   Passed    6.60 sec
+test 101
+      Start 101: horde_rt_simulation_gameplay_tests
+
+101: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_simulation_gameplay_tests.exe"
+101: Working Directory: <repo>/build/presets/windows-x64-debug
+101: Test timeout computed to be: 1500
+16/23 Test #101: horde_rt_simulation_gameplay_tests ...............***Exception: SegFault  2.00 sec
+
+test 102
+      Start 102: horde_rt_waterfall_production_route_tests
+
+102: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_waterfall_production_route_tests.exe"
+102: Working Directory: <repo>/build/presets/windows-x64-debug
+102: Test timeout computed to be: 1500
+102:   pair mismatch phase=cold start count=2 A=(-5.5,-15.95) B=(-5.5,-14.45)
+102: Waterfall production route failed: production start/reset restores stable IDs, health, lateral positions, facing and authored phase
+102: Waterfall production route failed: normal-damage first-room ticks do not relocate, attack or damage from the waterfall pair
+102:   pair mismatch phase=route reset count=2 A=(-5.5,-15.95) B=(-5.5,-14.45)
+102: Waterfall production route failed: production start/reset restores stable IDs, health, lateral positions, facing and authored phase
+102: Waterfall production route failed: retreat preserves the healthy leashed pair with bounded movement and no reset teleport
+102: Waterfall production route failed: re-entry resumes the existing room encounter and stable pair
+102: Waterfall production route failed: guards remain behind the wetline throughout ordinary route movement
+102: Waterfall production route failed: the complete route preserves player life and both waterfall guards
+102: Waterfall production route failed: retry restores the same healthy waterfall pair
+102:   pair mismatch phase=final route reset count=2 A=(-5.5,-15.95) B=(-5.5,-14.45)
+102: Waterfall production route failed: production start/reset restores stable IDs, health, lateral positions, facing and authored phase
+102:   checkpoint guard mismatch phase=Keeper retry count=2 selected=2 A=(-5.5,-15.95) B=(-5.5,-14.45)
+102: Waterfall production route failed: production bay/Keeper import and retry preserve both authored waterfall guards
+102: Waterfall production route failed 10 checks.
+17/23 Test #102: horde_rt_waterfall_production_route_tests ........***Failed    7.09 sec
+  pair mismatch phase=cold start count=2 A=(-5.5,-15.95) B=(-5.5,-14.45)
+Waterfall production route failed: production start/reset restores stable IDs, health, lateral positions, facing and authored phase
+Waterfall production route failed: normal-damage first-room ticks do not relocate, attack or damage from the waterfall pair
+  pair mismatch phase=route reset count=2 A=(-5.5,-15.95) B=(-5.5,-14.45)
+Waterfall production route failed: production start/reset restores stable IDs, health, lateral positions, facing and authored phase
+Waterfall production route failed: retreat preserves the healthy leashed pair with bounded movement and no reset teleport
+Waterfall production route failed: re-entry resumes the existing room encounter and stable pair
+Waterfall production route failed: guards remain behind the wetline throughout ordinary route movement
+Waterfall production route failed: the complete route preserves player life and both waterfall guards
+Waterfall production route failed: retry restores the same healthy waterfall pair
+  pair mismatch phase=final route reset count=2 A=(-5.5,-15.95) B=(-5.5,-14.45)
+Waterfall production route failed: production start/reset restores stable IDs, health, lateral positions, facing and authored phase
+  checkpoint guard mismatch phase=Keeper retry count=2 selected=2 A=(-5.5,-15.95) B=(-5.5,-14.45)
+Waterfall production route failed: production bay/Keeper import and retry preserve both authored waterfall guards
+Waterfall production route failed 10 checks.
+
+test 103
+      Start 103: horde_rt_music_director_tests
+
+103: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_music_director_tests.exe"
+103: Working Directory: <repo>/build/presets/windows-x64-debug
+103: Test timeout computed to be: 1500
+103: Shared adaptive music resolver tests passed.
+18/23 Test #103: horde_rt_music_director_tests ....................   Passed    7.33 sec
+test 122
+      Start 122: horde_rt_lantern_reward_tests
+
+122: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_lantern_reward_tests.exe"
+122: Working Directory: <repo>/build/presets/windows-x64-debug
+122: Test timeout computed to be: 1500
+122: Lantern reward interaction, command, and finale tests passed
+19/23 Test #122: horde_rt_lantern_reward_tests ....................   Passed    6.33 sec
+test 124
+      Start 124: horde_rt_input_mailbox_stress
+
+124: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_input_mailbox_stress.exe"
+124: Working Directory: <repo>/build/presets/windows-x64-debug
+124: Test timeout computed to be: 1500
+124: Input mailbox retained coherent POD snapshots across 125000 publications for 4 concurrent readers.
+20/23 Test #124: horde_rt_input_mailbox_stress ....................   Passed    0.10 sec
+test 127
+      Start 127: horde_rt_combat_smoke
+
+127: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_smoke.exe"
+127: Working Directory: <repo>/build/presets/windows-x64-debug
+127: Test timeout computed to be: 1500
+127: Combat smoke passed: two stable spawns, separation, one attacker, nearest-only hits, persistent independent deaths, reset, damage pulses, collision, and route leash.
+21/23 Test #127: horde_rt_combat_smoke ............................   Passed    3.95 sec
+test 130
+      Start 130: horde_rt_spatial_audio_smoke
+
+130: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_spatial_audio_smoke.exe"
+130: Working Directory: <repo>
+130: Test timeout computed to be: 1500
+130: Spatial audio smoke tests passed.
+22/23 Test #130: horde_rt_spatial_audio_smoke .....................   Passed    0.05 sec
+test 147
+      Start 147: horde_rt_character_render_slot_smoke
+
+147: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_character_render_slot_smoke.exe"
+147: Working Directory: <repo>
+147: Test timeout computed to be: 1500
+23/23 Test #147: horde_rt_character_render_slot_smoke .............   Passed    5.78 sec
+
+The following tests passed:
+	horde_rt_combat_foundation_tests
+	horde_rt_held_item_transition_tests
+	horde_rt_combat_timing_trace_tests
+	horde_rt_input_presentation_trace_tests
+	horde_rt_held_item_clearance_tests
+	horde_rt_windows_combat_practice_launch_tests
+	horde_rt_android_debug_request_admission_tests
+	horde_rt_world_route_foundation_tests
+	horde_rt_vertical_support_tests
+	horde_rt_held_item_vertical_support_rig_tests
+	horde_rt_player_directional_rig_tests
+	horde_rt_player_animation_tests
+	horde_rt_held_item_socket_tests
+	horde_rt_scene_abi_tests
+	horde_rt_simulation_timing_tests
+	horde_rt_music_director_tests
+	horde_rt_lantern_reward_tests
+	horde_rt_input_mailbox_stress
+	horde_rt_combat_smoke
+	horde_rt_spatial_audio_smoke
+	horde_rt_character_render_slot_smoke
+
+91% tests passed, 2 tests failed out of 23
+
+Total Test time (real) = 114.96 sec
+
+The following tests FAILED:
+	101 - horde_rt_simulation_gameplay_tests (SEGFAULT)
+	102 - horde_rt_waterfall_production_route_tests (Failed)
+Errors while running CTest

@@ -1,0 +1,74 @@
+UpdateCTestConfiguration  from :<repo>/DartConfiguration.tcl
+UpdateCTestConfiguration  from :<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Parse Config file:<repo>/build/presets/windows-x64-debug/DartConfiguration.tcl
+Test project <repo>/build/presets/windows-x64-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 24
+    Start 24: horde_rt_combat_foundation_tests
+
+24: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_foundation_tests.exe"
+24: Working Directory: <repo>/build/presets/windows-x64-debug
+24: Test timeout computed to be: 1500
+24: FAIL: fixture tests an actual line-of-sight lightning hit, not an assigned field
+24: FAIL: fixture tests an actual line-of-sight lightning hit, not an assigned field
+24: FAIL: real melee attacker reaches its scheduled boundary
+24: FAIL: melee boundary fixture retains actual incoming contact coverage
+24: FAIL: real melee attacker reaches its scheduled boundary
+24: FAIL: melee boundary fixture retains actual incoming contact coverage
+24: FAIL: real melee attacker reaches its scheduled boundary
+24: FAIL: melee boundary fixture retains actual incoming contact coverage
+24: FAIL: real melee attacker reaches its scheduled boundary
+24: FAIL: melee boundary fixture retains actual incoming contact coverage
+24: combat foundation checks=291 failures=10
+1/4 Test #24: horde_rt_combat_foundation_tests .................***Failed    5.87 sec
+FAIL: fixture tests an actual line-of-sight lightning hit, not an assigned field
+FAIL: fixture tests an actual line-of-sight lightning hit, not an assigned field
+FAIL: real melee attacker reaches its scheduled boundary
+FAIL: melee boundary fixture retains actual incoming contact coverage
+FAIL: real melee attacker reaches its scheduled boundary
+FAIL: melee boundary fixture retains actual incoming contact coverage
+FAIL: real melee attacker reaches its scheduled boundary
+FAIL: melee boundary fixture retains actual incoming contact coverage
+FAIL: real melee attacker reaches its scheduled boundary
+FAIL: melee boundary fixture retains actual incoming contact coverage
+combat foundation checks=291 failures=10
+
+test 26
+    Start 26: horde_rt_combat_timing_trace_tests
+
+26: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_combat_timing_trace_tests.exe"
+26: Working Directory: <repo>/build/presets/windows-x64-debug
+26: Test timeout computed to be: 1500
+2/4 Test #26: horde_rt_combat_timing_trace_tests ...............   Passed    4.39 sec
+test 41
+    Start 41: horde_rt_windows_combat_practice_launch_tests
+
+41: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_windows_combat_practice_launch_tests.exe"
+41: Working Directory: <repo>/build/presets/windows-x64-debug
+41: Test timeout computed to be: 1500
+3/4 Test #41: horde_rt_windows_combat_practice_launch_tests ....   Passed    1.66 sec
+test 43
+    Start 43: horde_rt_android_debug_request_admission_tests
+
+43: Test command: "<repo>\build\presets\windows-x64-debug\Debug\horde_rt_android_debug_request_admission_tests.exe"
+43: Working Directory: <repo>/build/presets/windows-x64-debug
+43: Test timeout computed to be: 1500
+4/4 Test #43: horde_rt_android_debug_request_admission_tests ...   Passed    1.49 sec
+
+The following tests passed:
+	horde_rt_combat_timing_trace_tests
+	horde_rt_windows_combat_practice_launch_tests
+	horde_rt_android_debug_request_admission_tests
+
+75% tests passed, 1 tests failed out of 4
+
+Total Test time (real) =  13.43 sec
+
+The following tests FAILED:
+	 24 - horde_rt_combat_foundation_tests (Failed)
+Errors while running CTest

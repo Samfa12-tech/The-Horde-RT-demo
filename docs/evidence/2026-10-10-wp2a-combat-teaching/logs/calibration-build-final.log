@@ -1,0 +1,72 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  pocket_audio_native_pcm.vcxproj -> <repo>\build\presets\windows-x64-debug\pocket-audio-core-native\Debug\pocket_audio_native_pcm.lib
+  MusicDirector.cpp
+  MusicPcmAssetBank.cpp
+  MusicPcmStream.cpp
+  MusicPlaybackSession.cpp
+  PlayerAnimationState.cpp
+  HeldItemKinematics.cpp
+  HeldLightState.cpp
+  GameSimulation.cpp
+  Generating Code...
+  horde_gameplay_simulation.vcxproj -> <repo>\build\presets\windows-x64-debug\Debug\horde_gameplay_simulation.lib
+  PlayerRenderSlot.cpp
+  SwordTargetContactRegionWitnessTests.cpp
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(702,9): error C2065: 'SkeletonEnemySnapshot': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(702,31): error C2146: syntax error: missing ';' before identifier 'selectedTarget' [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(702,31): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(724,13): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(732,13): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(731,20): error C2737: 'targetSample': const object must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(750,44): error C3536: 'targetSample': cannot be used before it is initialized [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(750,39): error C2660: 'horde::scene::SkinnedMeshAsset::Skin': function does not take 3 arguments [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+      <repo>\src\scene\assets\SkinnedMeshAsset.h(175,10):
+      see declaration of 'horde::scene::SkinnedMeshAsset::Skin'
+      <repo>\tests\SwordTargetContactRegionWitnessTests.cpp(750,39):
+      while trying to match the argument list '()'
+
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(751,20): error C2737: 'targetTriangles': const object must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(753,77): error C3536: 'targetTriangles': cannot be used before it is initialized [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(760,46): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(760,64): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+  Generating Code...
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(760,40): error C2661: 'hypot': no overloaded function takes 1 arguments [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\cmath(1554,17):
+      could be 'auto std::hypot(const _Ty1,const _Ty2,const _Ty3) noexcept'
+          <repo>\tests\SwordTargetContactRegionWitnessTests.cpp(760,40):
+          'auto std::hypot(const _Ty1,const _Ty2,const _Ty3) noexcept': expects 3 arguments - 1 provided
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\cmath(863,1):
+      or       'conditional<std::is_same_v<_Ty1,long double>||std::is_same_v<_Ty2,long double>,long double,conditional<std::is_same_v<_Ty1,float>&&std::is_same_v<_Ty2,float>,float,double>::type>::type hypot(_Ty1,_Ty2) noexcept'
+          <repo>\tests\SwordTargetContactRegionWitnessTests.cpp(760,40):
+          'conditional<std::is_same_v<_Ty1,long double>||std::is_same_v<_Ty2,long double>,long double,conditional<std::is_same_v<_Ty1,float>&&std::is_same_v<_Ty2,float>,float,double>::type>::type hypot(_Ty1,_Ty2) noexcept': expects 2 arguments - 1 provided
+      <repo>\tests\SwordTargetContactRegionWitnessTests.cpp(760,40):
+      while trying to match the argument list '()'
+
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(761,58): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(761,21): error C2737: 'facingDot': const object must be initialized [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(763,31): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(763,49): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(762,40): error C2660: 'horde::gameplay::SwordCombat::IsPlayerTargetInRangeCone': function does not take 3 arguments [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+      <repo>\src\gameplay\SwordCombat.h(217,17):
+      see declaration of 'horde::gameplay::SwordCombat::IsPlayerTargetInRangeCone'
+      <repo>\tests\SwordTargetContactRegionWitnessTests.cpp(762,40):
+      while trying to match the argument list '(float, float, float)'
+
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(773,59): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(774,62): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(775,37): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(775,72): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(778,54): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(778,81): error C2065: 'selectedTarget': undeclared identifier [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+<repo>\tests\SwordTargetContactRegionWitnessTests.cpp(778,48): error C2661: 'hypot': no overloaded function takes 1 arguments [<repo>\build\presets\windows-x64-debug\horde_rt_sword_target_contact_region_witness.vcxproj]
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\cmath(1554,17):
+      could be 'auto std::hypot(const _Ty1,const _Ty2,const _Ty3) noexcept'
+          <repo>\tests\SwordTargetContactRegionWitnessTests.cpp(778,48):
+          'auto std::hypot(const _Ty1,const _Ty2,const _Ty3) noexcept': expects 3 arguments - 1 provided
+      C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\include\cmath(863,1):
+      or       'conditional<std::is_same_v<_Ty1,long double>||std::is_same_v<_Ty2,long double>,long double,conditional<std::is_same_v<_Ty1,float>&&std::is_same_v<_Ty2,float>,float,double>::type>::type hypot(_Ty1,_Ty2) noexcept'
+          <repo>\tests\SwordTargetContactRegionWitnessTests.cpp(778,48):
+          'conditional<std::is_same_v<_Ty1,long double>||std::is_same_v<_Ty2,long double>,long double,conditional<std::is_same_v<_Ty1,float>&&std::is_same_v<_Ty2,float>,float,double>::type>::type hypot(_Ty1,_Ty2) noexcept': expects 2 arguments - 1 provided
+      <repo>\tests\SwordTargetContactRegionWitnessTests.cpp(778,48):
+      while trying to match the argument list '()'
