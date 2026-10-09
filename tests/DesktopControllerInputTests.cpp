@@ -465,12 +465,13 @@ int main()
             ResolveDesktopLeftClick(true, true, ChestRewardPrompt::OpenChest, true) == DesktopClickAction::Interact &&
             ResolveDesktopLeftClick(true, true, ChestRewardPrompt::ClaimLantern, true) == DesktopClickAction::Interact &&
             ResolveDesktopLeftClick(true, true, ChestRewardPrompt::Opening) == DesktopClickAction::Ignore &&
-            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::Locked) == DesktopClickAction::Ignore &&
+            ResolveDesktopLeftClick(true, true, ChestRewardPrompt::Locked) == DesktopClickAction::Attack &&
             ResolveDesktopLeftClick(true, true, ChestRewardPrompt::Unlocking) == DesktopClickAction::Ignore,
-            "captured click chooses exactly one action and non-action chest prompts never swing");
+            "captured click chooses one action; locked hint preserves attack and busy chest phases consume clicks");
     Require(ResolveDesktopLeftClick(true,true,ChestRewardPrompt::None,true)==DesktopClickAction::Interact &&
-            ResolveDesktopLeftClick(true,true,ChestRewardPrompt::OpenChest,false)==DesktopClickAction::Ignore,
-            "displayed stale prompt stays an interaction; newly eligible unseen prompt never swings");
+            ResolveDesktopLeftClick(true,true,ChestRewardPrompt::OpenChest,false)==DesktopClickAction::Ignore &&
+            ResolveDesktopLeftClick(true,true,ChestRewardPrompt::Locked,true)==DesktopClickAction::Interact,
+            "stale displayed prompt stays interaction even after reset locks chest; unseen eligibility never swings");
     Require(ResolveDesktopGameplayKey(0x20u,true,false,false)==DesktopKeyAction::Dodge &&
             ResolveDesktopGameplayKey('Q',true,false,false)==DesktopKeyAction::Parry &&
             ResolveDesktopGameplayKey('E',true,false,true)==DesktopKeyAction::ToggleLantern &&

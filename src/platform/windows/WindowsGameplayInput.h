@@ -18,8 +18,9 @@ constexpr DesktopClickAction ResolveDesktopLeftClick(
     if (!gameplayAvailable) return DesktopClickAction::Ignore;
     if (!capturedAndFocused) return DesktopClickAction::AcquireCapture;
     if (interactionPromptPresented) return DesktopClickAction::Interact;
-    if (prompt != ChestRewardPrompt::None) return DesktopClickAction::Ignore;
-    return DesktopClickAction::Attack;
+    if (prompt == ChestRewardPrompt::None || prompt == ChestRewardPrompt::Locked)
+        return DesktopClickAction::Attack;
+    return DesktopClickAction::Ignore;
 }
 
 enum class DesktopKeyAction { None, Dodge, Parry, ToggleLantern };
