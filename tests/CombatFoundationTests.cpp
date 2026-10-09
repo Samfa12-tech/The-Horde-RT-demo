@@ -175,6 +175,13 @@ void ActualIncomingHits() {
                 hit=true;
                 Check((sim.Snapshot().playerVitals.vitality==3)==sim.Snapshot().dodgeInvulnerable,
                       "actual skeleton melee uses the same dodge resolution as lightning");
+                const auto& trace=sim.Snapshot().combatContactTrace;
+                const auto& sample=trace.samples[(trace.nextIndex+trace.kCapacity-1)%trace.kCapacity];
+                const auto index=sample.target==EntityId::SkeletonA?0u:1u;
+                Check((sample.target==EntityId::SkeletonA||sample.target==EntityId::SkeletonB)&&
+                      Near(sample.targetX,sim.Snapshot().swordCombat.combatants[index].x)&&
+                      Near(sample.targetZ,sim.Snapshot().swordCombat.combatants[index].z),
+                      "incoming contact trace freezes the actual attacker position rather than player impact coordinates");
                 break;
             }
             sim.ClearEvents();

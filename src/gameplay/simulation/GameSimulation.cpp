@@ -2308,8 +2308,17 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
         damageSample.supportWorldY = playerSupport_.worldY;
         damageSample.dodgeElapsedSeconds = dodgeRemainingSeconds_ > 0
             ? kDodgeDurationSeconds - dodgeRemainingSeconds_ : 0;
-        damageSample.targetX = activeEnemyKind_ == EnemyKind::Lich ? lich.x : playerX_;
-        damageSample.targetZ = activeEnemyKind_ == EnemyKind::Lich ? lich.z : playerZ_;
+        if (activeEnemyKind_ == EnemyKind::Lich)
+        {
+            damageSample.targetX = lich.x;
+            damageSample.targetZ = lich.z;
+        }
+        else
+        {
+            const auto index = skeletonDamageSource == EntityId::SkeletonA ? 0u : 1u;
+            damageSample.targetX = combatSnapshot_.combatants[index].x;
+            damageSample.targetZ = combatSnapshot_.combatants[index].z;
+        }
         damageSample.outcome = CombatContactOutcome::PostHitProtected;
         if (dodgeProtected)
         {
