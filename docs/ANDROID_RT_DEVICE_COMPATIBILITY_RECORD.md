@@ -2768,3 +2768,25 @@ with the step-snap limitation. Full vertical DEVICE-VERIFIED remains NO: Windows
 Query, lifecycle/rotation/recovery, all gear/secondary contributors and delayed
 fall/cancellation gates remain pending. Short Swing/Parry listening/haptic report
 does not certify those broader gates. [Manual report and separate evidence classes](superpowers/plans/2026-10-09-horde-1.7-wp2-android-manual-vertical-proof.md).
+
+
+### 9 October WP2 continuation - bounded Android Query presentation
+
+Same authorized SM-S948B / Android16 API36, exact installed Debug APK
+`1bd0611a6a25030c7025e49e181e186aff441a1e4f8ef52081afa5532bd4886c`,
+source/generated candidate `0eb665900c9efc95c443beada4c418776092cbe3`.
+Read-only package hashing confirms the separate release is unchanged; no reinstall.
+The supported explicit Query live-ground launch is followed by fresh current-focus
+and resumed-activity guards and post-launch native report timestamps. Query
+completion/presentation serial10606 joins true RT dispatch/copy/presentation,
+matching package/catalog Diagnostic/Mobile modules and actual BLAS/TLAS resources.
+
+Evidence class: exact local installed Debug bytes and current native hardware
+Query completed/presented-frame diagnostics only. No input, screenshot, manual
+Query traversal, owner listening or lifecycle acceptance occurred. The existing
+Pipeline owner ramp/attachment/roof and short normal Swing/Parry sound/vibration
+report remains preserved, including instant step-height snap. Windows raised
+static capture fails its arm-pixel gate twice and is stopped for review. Owner
+absence is not acceptance; manual and lifecycle gates need his return. Full
+DEVICE-VERIFIED remains NO. No other device or sustained-performance claim.
+[Continuation report and exact evidence](superpowers/plans/2026-10-09-horde-1.7-wp2-acceptance-continuation.md).

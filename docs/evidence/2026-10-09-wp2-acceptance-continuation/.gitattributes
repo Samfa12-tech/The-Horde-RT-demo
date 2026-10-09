@@ -1,0 +1,4 @@
+.gitattributes -text
+*.json -text
+*.log -text
+*.png -filter -diff -merge -text

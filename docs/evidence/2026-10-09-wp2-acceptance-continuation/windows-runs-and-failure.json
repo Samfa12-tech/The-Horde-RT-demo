@@ -1,0 +1,67 @@
+{
+  "runs": [
+    {
+      "label": "pipeline-ground",
+      "requested_backend": "RayTracingPipeline",
+      "checkpoint": "vertical-proof-ground",
+      "started_utc": "2026-10-09T07:37:13.169278+00:00",
+      "seconds": 6.421000000000049,
+      "exit": 0,
+      "exe_sha256": "6cf04484c5711c822b173b9256173311928027f92b681104c456eca5d0da9e03",
+      "argv": [
+        "<verified-exe>",
+        "--capture-showcase",
+        "<new-private-output>/windows-pipeline-ground",
+        "--development-checkpoint",
+        "vertical-proof-ground"
+      ],
+      "output_files": [
+        "170-vertical-proof-ground.obj",
+        "170-vertical-proof-ground.player-world-body.obj",
+        "170-vertical-proof-ground.png",
+        "capture-manifest.json"
+      ]
+    },
+    {
+      "label": "pipeline-raised",
+      "requested_backend": "RayTracingPipeline",
+      "checkpoint": "vertical-proof-raised",
+      "started_utc": "2026-10-09T07:37:19.595415+00:00",
+      "seconds": 3.140999999999849,
+      "exit": 1,
+      "exe_sha256": "6cf04484c5711c822b173b9256173311928027f92b681104c456eca5d0da9e03",
+      "argv": [
+        "<verified-exe>",
+        "--capture-showcase",
+        "<new-private-output>/windows-pipeline-raised",
+        "--development-checkpoint",
+        "vertical-proof-raised"
+      ],
+      "output_files": [
+        "171-vertical-proof-raised.png",
+        "capture-manifest.json"
+      ]
+    }
+  ],
+  "retry": {
+    "label": "pipeline-raised-retry",
+    "started_utc": "2026-10-09T07:39:30.762709+00:00",
+    "seconds": 3.0,
+    "exit": 1,
+    "exe_sha256": "6cf04484c5711c822b173b9256173311928027f92b681104c456eca5d0da9e03",
+    "complete": false,
+    "backend": "RayTracingPipeline",
+    "error": "Dedicated viewmodel capture lacks modelled primary arms or contains legacy/full-body primary ownership: dedicated=1, visible=1, armPixels=0.",
+    "input_sent": false,
+    "quality_override": false
+  },
+  "reproducible": true,
+  "failed_pngs_identical": true,
+  "failure_class": "Existing raised static capture visibility assertion: zero primary player/arm pixels. No capability-unavailable claim and no inferred implementation root cause.",
+  "source_gate": "src/platform/windows/DiagnosticWindow.cpp:6282",
+  "query_captures": "NOT RUN; queued captures cancelled after Pipeline raised failure",
+  "continuous_input": "NOT RUN",
+  "global_input_sent": false,
+  "quality_override": false,
+  "next_step": "Owner review of reproducible raised-checkpoint failure before any implementation or capture-policy change."
+}
