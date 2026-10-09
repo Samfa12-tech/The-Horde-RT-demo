@@ -1,4 +1,5 @@
 #pragma once
+#include "gameplay/simulation/DevelopmentSupportFixture.h"
 
 #include <array>
 #include <cstddef>
@@ -60,6 +61,12 @@ struct SimulationSnapshot
     std::uint64_t lastConsumedInteractSequence = 0;
     std::uint64_t lastConsumedToggleHeldLightPoseSequence = 0;
 
+    float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
+    float playerHeightDelta = 0.0f;
+    PlayerSupportId playerSupportId = PlayerSupportId::RouteFloor;
+    bool playerGrounded = true;
+    bool developmentSupportFixture = false;
+    std::uint64_t playerSupportGeneration = 1u;
     float playerX = 0.0f;
     float playerZ = 1.85f;
     float playerYawRadians = 0.0f;

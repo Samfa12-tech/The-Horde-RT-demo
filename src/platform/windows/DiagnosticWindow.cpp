@@ -528,6 +528,7 @@ struct VulkanSurfaceContext
     horde::gameplay::EnemyKind activeEnemyKind = horde::gameplay::EnemyKind::Skeleton;
     horde::gameplay::EnemyKind debugEnemyOverride = horde::gameplay::EnemyKind::None;
     uint32_t debugValidationPoint = 0u;
+    bool developmentVerticalProof = false;
     horde::gameplay::ShowcaseBenchmarkRun benchmark;
     horde::vulkan::raytracing::RtWorkloadPreset benchmarkRequestedRtPreset =
         horde::vulkan::raytracing::RtWorkloadPreset::Authored;
@@ -637,6 +638,13 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
             argument == L"--motion-rt-workload") { ++index; continue; }
         if (argument == L"--validate-output-resize") { ++index; continue; }
         if (argument == L"--capture-graphics-preview") { ++index; continue; }
+        if (argument == L"--development-vertical-proof")
+        {
+#if !defined(_DEBUG)
+            options.error = "--development-vertical-proof is Debug-only.";
+#endif
+            continue;
+        }
         if (argument == L"--anatomical-player-mount")
         {
 #if defined(_DEBUG)
@@ -1580,8 +1588,8 @@ void PlayPositionalSoundEffect(const VulkanSurfaceContext& context,
         return;
     }
     const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
-        {event.worldX, event.worldZ, mixGain, 1.0f, 14.0f},
-        {event.listenerX, event.listenerZ, event.listenerYawRadians});
+        {event.worldX, event.worldZ, mixGain, 1.0f, 14.0f, event.worldY},
+        {event.listenerX, event.listenerZ, event.listenerYawRadians, event.listenerY});
     if (gains.left <= 0.0f && gains.right <= 0.0f)
     {
         return;
@@ -4746,6 +4754,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
 #endif
     const VkExtent2D renderExtent = ScaledRenderExtent(ctx.swapchainExtent, ctx.renderScale);
     std::string diagnostic;
+    ctx.rtScene.SetDevelopmentSupportFixture(ctx.developmentVerticalProof &&
+        ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase);
     if (!ctx.rtScene.Initialise(ctx.instance,
                                 ctx.physicalDevice,
                                 ctx.device,
@@ -6717,10 +6727,17 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     if (entryArguments)
     {
         for (int argument = 1; argument < entryArgumentCount; ++argument)
+        {
+#if defined(_DEBUG)
+            if (std::wstring_view(entryArguments[argument]) == L"--development-vertical-proof")
+                context.developmentVerticalProof = true;
+#endif
             if (std::wstring_view(entryArguments[argument]) == L"--entry-menu-slice")
                 context.entryMenuVisible = !unattendedBenchmark;
+        }
         LocalFree(entryArguments);
     }
+    if (context.developmentVerticalProof) context.entryMenuVisible = false;
     if (context.entryMenuVisible)
     {
         context.sceneProfile = horde::vulkan::raytracing::RtSceneProfile::EntryMenu;
@@ -6743,13 +6760,20 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         context.simulation = horde::gameplay::simulation::GameSimulation(
             explicitComparison ? horde::gameplay::simulation::GameSimulationConfig{} :
                                  horde::gameplay::simulation::ProductionGameSimulationConfig());
+    if (context.developmentVerticalProof)
+        context.simulation.SetDevelopmentSupportFixture(true, 1u);
     // The former opt-in argument remains compatible with recorded capture
     // commands; every normal application now uses this accepted profile.
     (void)anatomicalPlayerMount;
     context.windowHandle = hWnd;
     context.capabilitySnapshot = &capabilities;
     context.unattendedBenchmark = unattendedBenchmark;
-    if (developmentCheckpoint != nullptr) context.developmentCheckpoint = *developmentCheckpoint;
+    if (developmentCheckpoint != nullptr)
+    {
+        context.developmentCheckpoint = *developmentCheckpoint;
+        const auto* proof = horde::gameplay::FindDevelopmentCheckpoint(*developmentCheckpoint);
+        context.developmentVerticalProof = proof != nullptr && proof->developmentSupportFixture;
+    }
     if (!graphicsPreviewCapture && !outputResizeValidation && !context.nativeMotionValidation) LoadSettings(context);
     if (captureDirectory != nullptr && captureDustQuality.has_value())
         context.requestedDustQuality = *captureDustQuality;

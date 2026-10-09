@@ -321,6 +321,8 @@ public class MainActivity extends Activity {
     private boolean debugAutomationAutostart;
     private boolean developerOverlayVisible;
     private boolean debugCaptureUiSuppressed;
+    private int verticalProofFeedbackCheckpoint = -1;
+    private int verticalProofFeedbackDiagnosticCount;
     private boolean benchmarkRunning;
     private boolean benchmarkStatusExpanded;
     private boolean benchmarkReportVisible;
@@ -3874,6 +3876,7 @@ public class MainActivity extends Activity {
 
     private void resetRoute() {
         ++delayedGameplayFeedbackGeneration;
+        clearVerticalProofFeedbackSelection();
         suspendAndResetWaterfall();
         endingOverlayVisible = false;
         endingOverlayDismissed = false;
@@ -4384,6 +4387,7 @@ public class MainActivity extends Activity {
         if (retryPending) {
             return;
         }
+        clearVerticalProofFeedbackSelection();
         final int checkpoint = ProbeBridge.retryEncounter();
         if (checkpoint < 0) {
             Toast.makeText(this, R.string.retry_unavailable, Toast.LENGTH_LONG).show();
@@ -4600,9 +4604,10 @@ public class MainActivity extends Activity {
                 // the new surface resumes.
                 if (resumed && surfaceStarted && state == 1) {
                     final long[] platformEvents = ProbeBridge.drainPlatformEvents();
-                    for (int eventIndex = 0; !debugMotionActive && eventIndex + 1 < platformEvents.length; eventIndex += 2) {
+                    for (int eventIndex = 0; !debugMotionActive && eventIndex + 2 < platformEvents.length; eventIndex += 3) {
                     final long metadata = platformEvents[eventIndex];
                     final long stereoGains = platformEvents[eventIndex + 1];
+                    final long verticalMetadata = platformEvents[eventIndex + 2];
                     final int eventType = (int) (metadata & 0xffL);
                     final int targetEntity = (int) ((metadata >>> 16) & 0xffL);
                     final int equipmentAudioCue = (int) ((metadata >>> 24) & 0xffL);
@@ -4610,7 +4615,8 @@ public class MainActivity extends Activity {
                     switch (eventType) {
                         case PLATFORM_EVENT_PLAYER_FOOTSTEP:
                             playSpatialSound((playerStepVariant++ & 1) == 0 ?
-                                    "player_step_1" : "player_step_2", 0.45f, stereoGains);
+                                    "player_step_1" : "player_step_2", 0.45f,
+                                    stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_PLAYER_SWING:
                             if (isDebuggableApp()) {
@@ -4618,7 +4624,8 @@ public class MainActivity extends Activity {
                                         " sound=1 haptic=1");
                             }
                             playSpatialSound((swingVariant++ & 1) == 0 ?
-                                    "sword_swing_1" : "sword_swing_2", 0.28f, stereoGains);
+                                    "sword_swing_1" : "sword_swing_2", 0.28f,
+                                    stereoGains, verticalMetadata);
                             performHaptic(HAPTIC_SWING);
                             break;
                         case PLATFORM_EVENT_PLAYER_DAMAGED:
@@ -4629,19 +4636,21 @@ public class MainActivity extends Activity {
                             break;
                         case PLATFORM_EVENT_ENEMY_FOOTSTEP:
                             playSpatialSound((enemyStepVariant++ & 1) == 0 ?
-                                    "skeleton_step_1" : "skeleton_step_2", 0.11f, stereoGains);
+                                    "skeleton_step_1" : "skeleton_step_2", 0.11f,
+                                    stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_ENEMY_ATTACK_STARTED:
-                            playSpatialSound("skeleton_attack", 0.22f, stereoGains);
+                            playSpatialSound("skeleton_attack", 0.22f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_ENEMY_HIT:
                             if (targetEntity == ENTITY_LICH) {
                                 // The hurt source includes its own impact; layering the
                                 // fencing hit masks the short vocal reaction.
-                                playSpatialSound("lich_hurt", 0.82f, stereoGains);
+                                playSpatialSound("lich_hurt", 0.82f, stereoGains, verticalMetadata);
                             } else {
                                 playSpatialSound((swingVariant & 1) == 0 ?
-                                        "sword_hit_1" : "sword_hit_2", 0.32f, stereoGains);
+                                        "sword_hit_1" : "sword_hit_2", 0.32f,
+                                        stereoGains, verticalMetadata);
                             }
                             break;
                         case PLATFORM_EVENT_ENEMY_DEFEATED:
@@ -4651,36 +4660,38 @@ public class MainActivity extends Activity {
                             handler.postDelayed(
                                     () -> {
                                         if (feedbackGeneration == delayedGameplayFeedbackGeneration) {
-                                            playSpatialSound("skeleton_falling_bones", 0.24f, stereoGains);
+                                            playSpatialSound("skeleton_falling_bones", 0.24f,
+                                                    stereoGains, verticalMetadata);
                                         }
                                     },
                                     ENEMY_IMPACT_FALL_DELAY_MILLISECONDS);
                             break;
                         case PLATFORM_EVENT_LICH_CHARGE_STARTED:
-                            playSpatialSound("lich_charge", 0.38f, stereoGains);
+                            playSpatialSound("lich_charge", 0.38f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_LICH_IMPACT:
-                            playSpatialSound("lich_impact", 0.55f, stereoGains);
+                            playSpatialSound("lich_impact", 0.55f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_LICH_DEFEATED:
-                            playSpatialSound("lich_fall", 0.28f, stereoGains);
+                            playSpatialSound("lich_fall", 0.28f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_CHEST_UNLOCKED:
-                            playSpatialSound("chest_unlock", 0.82f, stereoGains);
+                            playSpatialSound("chest_unlock", 0.82f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_CHEST_OPENED:
-                            playSpatialSound("chest_open", 1.0f, stereoGains);
+                            playSpatialSound("chest_open", 1.0f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_TORCH_EXTINGUISHED:
-                            playSpatialSound("torch_extinguish", 0.78f, stereoGains);
+                            playSpatialSound("torch_extinguish", 0.78f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_SKELETON_INCIDENTAL:
-                            playSpatialSound("skeleton_idle_rattle", 0.10f, stereoGains);
+                            playSpatialSound("skeleton_idle_rattle", 0.10f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_SKELETON_ENCOUNTER_WARNING:
                             if (!menuVisible && !diagnosticsVisible && !graphicsVisible &&
                                     !deathOverlayVisible && !endingOverlayVisible) {
-                                playSpatialSound("skeleton_idle_rattle", 0.22f, stereoGains);
+                                playSpatialSound("skeleton_idle_rattle", 0.22f,
+                                        stereoGains, verticalMetadata);
                             }
                             break;
                         case PLATFORM_EVENT_PLAYER_SWORD_ATTACHMENT_CHANGED:
@@ -4694,16 +4705,16 @@ public class MainActivity extends Activity {
                             }
                             break;
                         case PLATFORM_EVENT_KEEPER_REVEAL_STARTED:
-                            playSpatialSound("keeper_i_sense_you", 0.36f, stereoGains);
+                            playSpatialSound("keeper_i_sense_you", 0.36f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_KEEPER_WARNING:
-                            playSpatialSound("keeper_come_closer", 0.36f, stereoGains);
+                            playSpatialSound("keeper_come_closer", 0.36f, stereoGains, verticalMetadata);
                             break;
                         case PLATFORM_EVENT_KEEPER_COMBAT_READY:
                             // Readiness has no separate admitted sound; title polls the snapshot.
                             break;
                         case PLATFORM_EVENT_PLAYER_PARRY_SUCCEEDED:
-                            playSpatialSound("sword_hit_2", 0.46f, stereoGains);
+                            playSpatialSound("sword_hit_2", 0.46f, stereoGains, verticalMetadata);
                             performHaptic(HAPTIC_PARRY);
                             break;
                         default:
@@ -4839,6 +4850,8 @@ public class MainActivity extends Activity {
             case "dust-ellipsoid": return 158;
             case "dust-box-wall": return 159;
             case "player-torch-parry-clearance": return 160;
+            case "vertical-proof-ground": return 170;
+            case "vertical-proof-raised": return 171;
             case "layout-c-wall-panel-upward": return 152;
             case "wall-panel-bottom": return 161;
             case "wall-panel-bottom-left": return 162;
@@ -4849,6 +4862,21 @@ public class MainActivity extends Activity {
             case "water-torch-catchment": return 183;
             default: return -1;
         }
+    }
+
+    static boolean enablesVerticalProofFeedback(final boolean debugBuild, final int checkpoint) {
+        return debugBuild && (checkpoint == 170 || checkpoint == 171);
+    }
+
+    private void selectVerticalProofFeedbackCheckpoint(final int checkpoint) {
+        verticalProofFeedbackCheckpoint = enablesVerticalProofFeedback(isDebuggableApp(), checkpoint)
+                ? checkpoint : -1;
+        verticalProofFeedbackDiagnosticCount = 0;
+    }
+
+    private void clearVerticalProofFeedbackSelection() {
+        verticalProofFeedbackCheckpoint = -1;
+        verticalProofFeedbackDiagnosticCount = 0;
     }
 
     static int admittedDebugDustQuality(final Intent intent, final boolean debuggable,
@@ -4902,8 +4930,12 @@ public class MainActivity extends Activity {
         final boolean requireRayQueryCompute =
                 shouldRequireRayQueryCompute(isDebuggableApp(), intent);
         ProbeBridge.setRequiredRayQueryCompute(requireRayQueryCompute);
-        if (intent == null) return;
+        if (intent == null) {
+            clearVerticalProofFeedbackSelection();
+            return;
+        }
         if (!isDebuggableApp()) {
+            clearVerticalProofFeedbackSelection();
             if (intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false)) {
                 Log.w(TAG, "Rejected debug capture intent in a non-debuggable build.");
             }
@@ -4911,6 +4943,7 @@ public class MainActivity extends Activity {
         }
         final int requestedScale = admittedDebugRenderScale(intent);
         final int requestedCheckpoint = checkpointId(intent.getStringExtra(EXTRA_DEBUG_CHECKPOINT));
+        selectVerticalProofFeedbackCheckpoint(requestedCheckpoint);
         final boolean requestedReplay = intent.getBooleanExtra(EXTRA_DEBUG_REPLAY, false);
         final boolean requestedCapture = intent.getBooleanExtra(EXTRA_DEBUG_CAPTURE, false);
         final String requestedMotion = intent.getStringExtra(EXTRA_DEBUG_MOTION);
@@ -5288,6 +5321,18 @@ public class MainActivity extends Activity {
         final float left = clamp(Float.intBitsToFloat((int) packedStereoGains), 0.0f, 1.0f);
         final float right = clamp(Float.intBitsToFloat((int) (packedStereoGains >>> 32)), 0.0f, 1.0f);
         playSound(key, mixGain, left, right);
+    }
+
+    private void playSpatialSound(final String key, final float mixGain,
+            final long packedStereoGains, final long verticalMetadata) {
+        // Y is diagnostic metadata only; playback still uses the established planar gains.
+        playSpatialSound(key, mixGain, packedStereoGains);
+        if (verticalProofFeedbackCheckpoint < 0 || verticalProofFeedbackDiagnosticCount >= 64) return;
+        final float sourceY = Float.intBitsToFloat((int) verticalMetadata);
+        final float listenerY = Float.intBitsToFloat((int) (verticalMetadata >>> 32));
+        Log.i(TAG, "HORDE_VERTICAL_FEEDBACK checkpoint=" + verticalProofFeedbackCheckpoint +
+                " sourceY=" + sourceY + " listenerY=" + listenerY);
+        ++verticalProofFeedbackDiagnosticCount;
     }
 
     private void playSound(final String key, final float mixGain, final float leftScale, final float rightScale) {
@@ -6091,7 +6136,11 @@ public class MainActivity extends Activity {
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        if (!consumeBenchmarkAutomationIntent(intent, false)) consumeDebugAutomationIntent(intent);
+        if (consumeBenchmarkAutomationIntent(intent, false)) {
+            clearVerticalProofFeedbackSelection();
+        } else {
+            consumeDebugAutomationIntent(intent);
+        }
         if (entryMenuEnabled && (debugAutomationAutostart || debugCaptureUiSuppressed ||
                 pendingDebugCheckpoint >= 0 || pendingDebugCapture || pendingDebugReplay ||
                 benchmarkAutomationId != null || debugRtLabAccess)) {

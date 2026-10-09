@@ -197,9 +197,10 @@ void TestAbiLayout()
     Check(sizeof(RtQualityControlsGpu) == 16u && alignof(RtQualityControlsGpu) == 16u &&
               offsetof(RtQualityControlsGpu, controls) == 0u,
           "typed quality record is exactly one aligned uint4 without push expansion");
-    Check(sizeof(RtHeldLightGpu) == 16u && alignof(RtHeldLightGpu) == 16u &&
-              offsetof(RtHeldLightGpu, positionStrength) == 0u,
-          "RtHeldLightGpu appends one exact world-position/strength vec4");
+    Check(sizeof(RtHeldLightGpu) == 32u && alignof(RtHeldLightGpu) == 16u &&
+              offsetof(RtHeldLightGpu, positionStrength) == 0u &&
+              offsetof(RtHeldLightGpu, playerTransform) == 16u,
+          "RtHeldLightGpu keeps physical light vec4 and appends player transform vec4");
 }
 
 void TestGeneratedConstants()

@@ -373,6 +373,10 @@ struct SwapchainContext
     bool glassFixtureRequested = false;
     bool productionRewardPropsRequested = false;
     bool productionLanternGlassOnly = false;
+    bool developmentSupportFixture = false;
+    std::optional<bool> developmentSupportFixtureOverride;
+    std::optional<std::int32_t> preparedFixtureCheckpointId;
+    bool preparedFixtureCheckpointIsCapture = false;
     float glassDepthScale = 1.0f;
     std::array<float, 3u> glassAttenuationColor{{0.72f, 0.90f, 1.0f}};
     float glassAttenuationDistance = 2.4f;
@@ -706,6 +710,7 @@ struct PlatformGameplayEvent
 {
     std::uint64_t metadata = 0u;
     std::uint64_t stereoGains = 0u;
+    std::uint64_t verticalMetadata = 0u;
 };
 
 constexpr std::size_t kPlatformGameplayEventCapacity = 128u;
@@ -815,13 +820,15 @@ std::uint64_t PlatformGameplayEventOverflowCount()
 void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEvent& event)
 {
     const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
-        {event.worldX, event.worldZ, std::max(0.0f, event.intensity), 1.0f, 14.0f},
-        {event.listenerX, event.listenerZ, event.listenerYawRadians});
+        {event.worldX, event.worldZ, std::max(0.0f, event.intensity), 1.0f, 14.0f, event.worldY},
+        {event.listenerX, event.listenerZ, event.listenerYawRadians, event.listenerY});
     const std::uint64_t metadata = horde::platform::android::PackGameplayEventMetadata(event);
+    const std::uint64_t verticalMetadata =
+        horde::platform::android::PackGameplayEventVerticalMetadata(event);
 
     std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
     const bool enqueued = gPlatformGameplayEvents.Push(
-        {metadata, PackStereoGains(gains.left, gains.right)});
+        {metadata, PackStereoGains(gains.left, gains.right), verticalMetadata});
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
     if (event.type == horde::gameplay::simulation::GameplayEventType::PlayerSwing)
     {
@@ -1693,6 +1700,12 @@ void ApplyDebugCheckpointSimulation(
         }
         return;
     }
+    const auto& currentSimulation = gGameSimulation.Snapshot();
+    if (currentSimulation.developmentSupportFixture)
+    {
+        gGameSimulation.SetDevelopmentSupportFixture(
+            false, currentSimulation.playerSupportGeneration + 1u);
+    }
     gGameSimulation.ApplyShowcaseCheckpoint(selection.simulationCheckpointId);
     if (selection.checkpoint.id == selection.simulationCheckpointId)
         return;
@@ -1927,6 +1940,9 @@ void ApplyBenchmarkCheckpoint(
 {
     const auto& checkpoint = selection.checkpoint;
     ApplyDebugCheckpointSimulation(selection, observation);
+    context.developmentSupportFixture =
+        gGameSimulation.Snapshot().developmentSupportFixture;
+    context.developmentSupportFixtureOverride.reset();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -1975,6 +1991,9 @@ void ApplyCaptureCheckpoint(
 {
     const auto& checkpoint = selection.checkpoint;
     ApplyDebugCheckpointSimulation(selection, observation);
+    context.developmentSupportFixture =
+        gGameSimulation.Snapshot().developmentSupportFixture;
+    context.developmentSupportFixtureOverride.reset();
     if (context.rtFrameEvidenceInitialised)
     {
         (void)context.rtFrameEvidence.ApplyEvent(
@@ -2991,6 +3010,10 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
 
     const VkExtent2D renderExtent = ScaledRenderExtent(context.swapchainExtent, context.renderScale);
     std::string diagnostic;
+    context.developmentSupportFixture = context.developmentSupportFixtureOverride.has_value()
+        ? *context.developmentSupportFixtureOverride
+        : gGameSimulation.Snapshot().developmentSupportFixture;
+    context.rtScene.SetDevelopmentSupportFixture(context.developmentSupportFixture);
     const bool initialised = context.rtScene.Initialise(context.instance,
                                     context.physicalDevice,
                                     context.device,
@@ -3116,6 +3139,180 @@ bool RecreateSwapchain(SwapchainContext& context)
     context.entryWarmFrames = kMaxFramesInFlight;
     PublishEntryState(context, false);
     return restored;
+}
+
+bool InitialiseRtSceneForSwapchain(SwapchainContext& context);
+
+void RecordDevelopmentSupportFixtureRebuildFailure(
+    SwapchainContext& context,
+    const std::int32_t checkpointId,
+    const bool requestedFixture,
+    const char* phase,
+    const VkResult result)
+{
+    context.capabilities.rtScene.presented = false;
+    {
+        std::lock_guard lock(gReportMutex);
+        gLatestBenchmarkProgress = "CHECKPOINT FAILED: vertical support fixture RT rebuild";
+    }
+    __android_log_print(ANDROID_LOG_ERROR, kTag,
+        "HORDE_VERTICAL_SUPPORT_FIXTURE_REBUILD checkpoint=%d requested=%d phase=%s result=%d presented=0",
+        checkpointId, requestedFixture ? 1 : 0, phase, static_cast<int>(result));
+}
+
+bool RebuildDevelopmentSupportFixtureOnOwner(
+    SwapchainContext& context,
+    const std::int32_t checkpointId,
+    const bool requestedFixture)
+{
+    if (!context.useRtPath || !context.rtScene.IsReady())
+    {
+        RecordDevelopmentSupportFixtureRebuildFailure(
+            context, checkpointId, requestedFixture, "scene-not-ready", VK_NOT_READY);
+        return false;
+    }
+    if (context.developmentSupportFixture == requestedFixture)
+        return true;
+    if (!ConsumePendingImageAcquire(context))
+    {
+        RecordDevelopmentSupportFixtureRebuildFailure(
+            context, checkpointId, requestedFixture, "acquire-retirement", VK_ERROR_UNKNOWN);
+        return false;
+    }
+
+    context.entryHandoff.BeginLoad();
+    PublishEntryState(context, false);
+    gSurfaceSessions.Publish(context.surfaceGeneration, 0);
+    const VkResult idleResult = vkDeviceWaitIdle(context.device);
+    const bool evidenceCompleted = CompleteRtEvidenceAfterDeviceIdle(context, idleResult);
+    if (idleResult != VK_SUCCESS || !evidenceCompleted)
+    {
+        context.entryHandoff.FailLoad();
+        PublishEntryState(context, false);
+        RecordDevelopmentSupportFixtureRebuildFailure(
+            context, checkpointId, requestedFixture, "device-idle", idleResult);
+        return false;
+    }
+    const VkResult commandPoolResetResult = vkResetCommandPool(context.device, context.commandPool, 0);
+    if (commandPoolResetResult != VK_SUCCESS)
+    {
+        context.entryHandoff.FailLoad();
+        PublishEntryState(context, false);
+        RecordDevelopmentSupportFixtureRebuildFailure(
+            context, checkpointId, requestedFixture, "command-pool-reset", commandPoolResetResult);
+        return false;
+    }
+
+    CancelActiveInAppBenchmark(context);
+    context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_STAGED_PRIMARY_TIMING
+    context.stagedPassTimer.ResetAfterDeviceIdle();
+#endif
+    if (context.rtFrameEvidenceInitialised && !context.rtFrameEvidence.Recreate(
+            horde::telemetry::RtResourceResetReason::DiagnosticResourceReplacement,
+            CurrentInitialGpuEvidenceStatus(context)))
+    {
+        (void)context.rtFrameEvidence.Destroy();
+        context.rtFrameEvidenceInitialised = false;
+    }
+
+    context.rtScene.Destroy();
+    context.developmentSupportFixtureOverride = requestedFixture;
+    if (!InitialiseRtSceneForSwapchain(context))
+    {
+        // Initialization can submit uploads before failing. Do not fall back
+        // to the old fixture or continue with mismatched gameplay geometry.
+        const VkResult rebuildIdleResult = vkDeviceWaitIdle(context.device);
+        const bool rebuildEvidenceCompleted =
+            CompleteRtEvidenceAfterDeviceIdle(context, rebuildIdleResult);
+        if (rebuildIdleResult == VK_SUCCESS && rebuildEvidenceCompleted &&
+            vkResetCommandPool(context.device, context.commandPool, 0) == VK_SUCCESS)
+        {
+            context.rtScene.Destroy();
+        }
+        context.entryHandoff.FailLoad();
+        PublishEntryState(context, false);
+        RecordDevelopmentSupportFixtureRebuildFailure(
+            context, checkpointId, requestedFixture, "scene-initialize", rebuildIdleResult);
+        return false;
+    }
+
+    context.capabilities.rtScene.presented = false;
+    context.capturePresentedFrames = 0u;
+    context.timingFrameCount = 0u;
+    context.timingFenceMs = context.timingRecordMs = 0.0;
+    context.timingPresentMs = context.timingTotalMs = 0.0;
+    context.gpuFrameTimingTotalMs = 0.0;
+    context.gpuFrameTimingSampleCount = 0u;
+    RefreshGpuTimingTelemetry(context);
+    context.entryHandoff.EndLoad();
+    PublishEntryState(context, false);
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "HORDE_VERTICAL_SUPPORT_FIXTURE_REBUILD checkpoint=%d requested=%d phase=complete result=%d presented=0",
+        checkpointId, requestedFixture ? 1 : 0, static_cast<int>(VK_SUCCESS));
+    return true;
+}
+
+bool PrepareFixtureChangingCheckpointOnOwner(
+    SwapchainContext& context, bool& sceneTransition)
+{
+    if (context.sceneProfile != horde::vulkan::raytracing::RtSceneProfile::Showcase ||
+        !context.useRtPath || !context.rtScene.IsReady() ||
+        context.inAppBenchmark.IsRunning())
+        return true;
+
+    const std::int32_t requestedCaptureCheckpoint =
+        gCaptureCheckpointRequested.load(std::memory_order_acquire);
+    const std::int32_t requestedCheckpoint =
+        gBenchmarkCheckpointRequested.load(std::memory_order_acquire);
+
+    DebugCheckpointSelection selection;
+    const bool isCapture = ResolveDebugCheckpoint(requestedCaptureCheckpoint, selection);
+    const bool isBenchmark = !isCapture && ResolveDebugCheckpoint(requestedCheckpoint, selection);
+    if (!isCapture && !isBenchmark)
+        return true;
+
+    const bool requestedFixture = selection.development != nullptr &&
+        selection.development->developmentSupportFixture;
+    // Ordinary selections and transitions between checkpoints using the same
+    // fixture retain their established RenderFrame staging/observation path.
+    if (context.developmentSupportFixture == requestedFixture)
+        return true;
+
+    std::atomic<std::int32_t>& selectedRequest = isCapture
+        ? gCaptureCheckpointRequested : gBenchmarkCheckpointRequested;
+    std::int32_t expectedRequest = isCapture
+        ? requestedCaptureCheckpoint : requestedCheckpoint;
+    if (!selectedRequest.compare_exchange_strong(
+            expectedRequest, -1, std::memory_order_acq_rel, std::memory_order_acquire))
+        return true;
+
+    // Capture has always taken precedence when both checkpoint mailboxes were
+    // populated at the RenderFrame boundary. Retire only the value we observed.
+    if (isCapture && requestedCheckpoint >= 0)
+    {
+        std::int32_t expectedBenchmark = requestedCheckpoint;
+        (void)gBenchmarkCheckpointRequested.compare_exchange_strong(
+            expectedBenchmark, -1, std::memory_order_acq_rel, std::memory_order_acquire);
+    }
+
+    if (!RebuildDevelopmentSupportFixtureOnOwner(
+            context, selection.checkpoint.id, requestedFixture))
+    {
+        std::int32_t expectedCapture = requestedCaptureCheckpoint;
+        (void)gCaptureCheckpointRequested.compare_exchange_strong(
+            expectedCapture, -1, std::memory_order_acq_rel, std::memory_order_acquire);
+        std::int32_t expectedBenchmark = requestedCheckpoint;
+        (void)gBenchmarkCheckpointRequested.compare_exchange_strong(
+            expectedBenchmark, -1, std::memory_order_acq_rel, std::memory_order_acquire);
+        gRouteReplayRequested.store(false, std::memory_order_release);
+        return false;
+    }
+
+    context.preparedFixtureCheckpointId = selection.checkpoint.id;
+    context.preparedFixtureCheckpointIsCapture = isCapture;
+    sceneTransition = true;
+    return true;
 }
 
 horde::vulkan::PipelineCacheSeed::DeviceIdentity PipelineCacheDeviceIdentity(
@@ -3493,14 +3690,35 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 gInAppBenchmarkStatus.store(3, std::memory_order_release);
             }
 
-            const std::int32_t requestedCheckpoint =
-                gBenchmarkCheckpointRequested.exchange(-1, std::memory_order_acq_rel);
-            const std::int32_t requestedCaptureCheckpoint =
-                gCaptureCheckpointRequested.exchange(-1, std::memory_order_acq_rel);
+            std::int32_t requestedCheckpoint = -1;
+            std::int32_t requestedCaptureCheckpoint = -1;
+            if (!context.preparedFixtureCheckpointId.has_value() ||
+                context.inAppBenchmark.IsRunning())
+            {
+                requestedCheckpoint =
+                    gBenchmarkCheckpointRequested.exchange(-1, std::memory_order_acq_rel);
+                requestedCaptureCheckpoint =
+                    gCaptureCheckpointRequested.exchange(-1, std::memory_order_acq_rel);
+            }
             if (!context.inAppBenchmark.IsRunning())
             {
                 DebugCheckpointSelection selection;
-                if (ResolveDebugCheckpoint(requestedCaptureCheckpoint, selection))
+                if (context.preparedFixtureCheckpointId.has_value())
+                {
+                    if (ResolveDebugCheckpoint(
+                            *context.preparedFixtureCheckpointId, selection))
+                    {
+                        if (context.preparedFixtureCheckpointIsCapture)
+                            ApplyCaptureCheckpoint(
+                                context, selection, evidenceFrame ? &observation : nullptr);
+                        else
+                            ApplyBenchmarkCheckpoint(
+                                context, selection, evidenceFrame ? &observation : nullptr);
+                    }
+                    context.preparedFixtureCheckpointId.reset();
+                    context.preparedFixtureCheckpointIsCapture = false;
+                }
+                else if (ResolveDebugCheckpoint(requestedCaptureCheckpoint, selection))
                 {
                     ApplyCaptureCheckpoint(
                         context, selection, evidenceFrame ? &observation : nullptr);
@@ -3519,6 +3737,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             {
                 gRouteReplayRequested.store(false, std::memory_order_release);
                 gCaptureCheckpointRequested.store(-1, std::memory_order_release);
+                context.preparedFixtureCheckpointId.reset();
+                context.preparedFixtureCheckpointIsCapture = false;
             }
 
             // Accepted Stop and world commands have one publication/admission
@@ -4657,6 +4877,15 @@ void SwapchainRenderLoop()
             continue;
         }
 #endif
+        if (!PrepareFixtureChangingCheckpointOnOwner(gSwapchainContext, sceneTransition))
+        {
+            gSwapchainContext.entryHandoff.FailLoad();
+            PublishEntryState(gSwapchainContext, false);
+            gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
+            __android_log_print(ANDROID_LOG_ERROR, kTag,
+                "Diagnostic surface stopped after vertical support fixture checkpoint failure.");
+            break;
+        }
         horde::graphics::ForegroundPauseRenderInput pauseCadenceInput{};
         pauseCadenceInput.foreground = true; // A live swapchain owner exists only for the foreground surface.
         pauseCadenceInput.paused = measurementPaused;
@@ -4892,6 +5121,8 @@ bool StartSurfaceInternal(ANativeWindow* window,
         }
     } cleanup{context};
     context.capabilities = capabilities;
+    context.developmentSupportFixture =
+        gGameSimulation.Snapshot().developmentSupportFixture;
     context.reportDirectory = reportDirectory;
     const auto startupGraphics = ReadRequestedGraphics();
     context.graphicsSettings = startupGraphics.requested;
@@ -6529,11 +6760,12 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_drainPlatformEvents(JNIEnv* env, jcl
     std::vector<jlong> packed;
     {
         std::lock_guard<std::mutex> lock(gPlatformGameplayEventMutex);
-        packed.reserve(gPlatformGameplayEvents.Size() * 2u);
+        packed.reserve(gPlatformGameplayEvents.Size() * 3u);
         for (const PlatformGameplayEvent& event : gPlatformGameplayEvents.Values())
         {
             packed.push_back(static_cast<jlong>(event.metadata));
             packed.push_back(static_cast<jlong>(event.stereoGains));
+            packed.push_back(static_cast<jlong>(event.verticalMetadata));
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
             if ((event.metadata & 0xffu) == static_cast<std::uint64_t>(
                     horde::gameplay::simulation::GameplayEventType::PlayerSwing))

@@ -61,6 +61,9 @@ struct HeldItemKinematicsInput
     // Logical presentation aspect, used only to spread held hand targets in
     // wide views. Portrait and square views retain the authored targets.
     float logicalViewAspect = 1.0f;
+    // Absolute support surface under the player. The default preserves the
+    // established route-floor camera and held-item world positions.
+    float playerSupportWorldY = kRouteFloorWorldY;
 };
 
 struct HeldSwordPose
@@ -126,6 +129,9 @@ struct HeldItemFixedStepInput
     PlayerMountProfile playerMountProfile = PlayerMountProfile::LegacyViewRelative;
     const HeldItemState* swordItemState = nullptr;
     float logicalViewAspect = 1.0f;
+    // Absolute support surface under the player; appended to preserve existing
+    // positional aggregate initializers.
+    float playerSupportWorldY = kRouteFloorWorldY;
 };
 
 inline constexpr float kHeldItemSpreadStartAspect = 1.0f;

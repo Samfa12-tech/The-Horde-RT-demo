@@ -431,6 +431,30 @@ void GameSimulation::SetPresentationAspect(const float logicalViewAspect)
     RefreshSnapshot(lastInput_);
 }
 
+void GameSimulation::ResetPlayerSupport()
+{
+    playerSupport_ = {};
+}
+void GameSimulation::ResolvePlayerSupport()
+{
+    playerSupport_ = ResolveDevelopmentPlayerSupport(playerX_, playerZ_,
+        config_.developmentSupportFixture, supportGeneration_, supportGeneration_);
+}
+void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t generation)
+{
+    if (generation != 0u && generation < supportGeneration_) return;
+    config_.developmentSupportFixture = enabled && generation != 0u;
+    supportGeneration_ = std::max(supportGeneration_, generation);
+    ResetPlayerSupport();
+    ResolveHeldItems();
+    lanternPendulum_.Reset(heldItemFixedStepState_.worldFromLeftHand,
+        heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
+    lanternPendulumResetPending_ = true;
+    ResolvePlayerAnimation(0.0f);
+    ResolveFireEmitters(0.0f);
+    RefreshSnapshot(lastInput_);
+}
+
 void GameSimulation::ResetRoute()
 {
     if (!ApplyShowcaseCheckpoint(0, false))
@@ -531,6 +555,8 @@ void GameSimulation::ImportRewardCheckpoint(
 {
     events_.Clear();
     combatPresentation_.Reset();
+    const bool wasRaised = playerSupport_.worldY != kRouteFloorWorldY;
+    ResetPlayerSupport();
     chestRewardSequence_.Import(chestReward);
     interactionState_ = interaction;
     finaleSequence_.Import(finale);
@@ -544,7 +570,7 @@ void GameSimulation::ImportRewardCheckpoint(
     lanternPendulum_.Reset(
         heldItemFixedStepState_.worldFromLeftHand,
         heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
-    if (pendulum != nullptr)
+    if (pendulum != nullptr && !wasRaised)
     {
         lanternPendulum_.Import(*pendulum);
         lanternPendulumResetPending_ = false;
@@ -1025,6 +1051,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     ClearScheduledCombatEdges(true);
 
     events_.Clear();
+    ResetPlayerSupport();
     combatPresentation_.Reset();
     ShowcaseCheckpointState state = BuildShowcaseCheckpointState(*checkpoint);
     playerX_ = checkpoint->x;
@@ -1162,7 +1189,8 @@ void GameSimulation::ResolveHeldItems()
         interactionState_,
         config_.playerMountProfile,
         &heldItems_[1],
-        presentationAspect_};
+        presentationAspect_,
+        playerSupport_.worldY};
     // Simulation owns the transition/visual blend. Kinematics keeps a stable
     // hand-endpoint matrix for gameplay; PlayerRenderSlot composes its single
     // rendered matrix from that endpoint and the animated Hips mount.
@@ -1502,6 +1530,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
         }
     }
 
+    ResolvePlayerSupport();
     const float travelled = std::hypot(playerX_ - previousX, playerZ_ - previousZ);
     if (input.hasAuthoritativePlayerPose)
     {
@@ -1910,6 +1939,7 @@ std::uint64_t GameSimulation::Emit(GameplayEventType type,
     event.target = target;
     event.worldX = x;
     event.worldZ = z;
+    event.listenerY = PlayerEyeWorldY(playerSupport_.worldY);
     event.listenerX = playerX_;
     event.listenerZ = playerZ_;
     event.listenerYawRadians = playerYawRadians_;
@@ -1933,6 +1963,12 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.lastConsumedInteractSequence = lastConsumedInteractSequence_;
     snapshot_.lastConsumedToggleHeldLightPoseSequence =
         lastConsumedToggleHeldLightPoseSequence_;
+    snapshot_.playerSupportWorldY = playerSupport_.worldY;
+    snapshot_.playerHeightDelta = PlayerHeightDelta(playerSupport_.worldY);
+    snapshot_.playerSupportId = playerSupport_.id;
+    snapshot_.playerGrounded = playerSupport_.grounded;
+    snapshot_.playerSupportGeneration = supportGeneration_;
+    snapshot_.developmentSupportFixture = config_.developmentSupportFixture;
     snapshot_.playerX = playerX_;
     snapshot_.playerZ = playerZ_;
     snapshot_.playerYawRadians = playerYawRadians_;

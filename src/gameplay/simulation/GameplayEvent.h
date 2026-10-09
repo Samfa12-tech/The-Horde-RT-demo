@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <span>
 
+#include "gameplay/ShowcaseRoute.h"
+
 namespace horde::gameplay::simulation
 {
 
@@ -69,6 +71,9 @@ struct GameplayEvent
     float listenerYawRadians = 0.0f;
     float intensity = 1.0f;
     std::int32_t payload = 0;
+    // Appended so positional event aggregates keep their existing layout.
+    // The event-time eye baseline is replaced by Emit when route support is known.
+    float listenerY = horde::gameplay::kShowcaseEyeWorldY;
 };
 
 class BoundedGameplayEventQueue

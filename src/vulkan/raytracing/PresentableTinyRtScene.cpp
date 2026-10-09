@@ -1,5 +1,6 @@
 #include "scene/ShowcaseIndoorDust.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "graphics/EntryMenuScene.h"
 #include "graphics/GraphicsPreviewSession.h"
 #include "vulkan/raytracing/ChestGuidanceLight.h"
@@ -715,6 +716,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     gpuResources_.Bind(physicalDevice_, device_, vkDestroyAccelerationStructureKHR_, vkGetBufferDeviceAddressKHR_);
     pipelineBundle_.RebindDestroyContext(this, &gpuResources_);
     scratchAddressAlignment_ = std::exchange(other.scratchAddressAlignment_, 0u);
+    developmentSupportFixture_ = std::exchange(other.developmentSupportFixture_, false);
     sceneProfile_ = std::exchange(other.sceneProfile_, RtSceneProfile::Showcase);
     glassEnabled_ = std::exchange(other.glassEnabled_, true);
     mistEnabled_ = std::exchange(other.mistEnabled_, true);
@@ -3212,6 +3214,24 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
                     box.footprint[3][0], box.topY, box.footprint[3][1], SurfaceMossyStone);
     };
     addWorldQuad({{-1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, 3.4f}}, {{1.85f, kRouteFloorWorldY, -6.4f}}, {{-1.85f, kRouteFloorWorldY, -6.4f}}, SurfaceWetCobble, SurfaceUp);
+    if (developmentSupportFixture_)
+    {
+        using namespace horde::gameplay::simulation;
+        const float y = kRouteFloorWorldY + kProofSupportHeight;
+        addWorldBox(-kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportBackZ,
+                    kProofSupportHalfWidth, y, kProofSupportTopZ, SurfaceWetCobble);
+        addWorldQuad({{-kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportGroundZ}},
+                     {{kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportGroundZ}},
+                     {{kProofSupportHalfWidth, y, kProofSupportTopZ}},
+                     {{-kProofSupportHalfWidth, y, kProofSupportTopZ}},
+                     SurfaceWetCobble, SurfaceUp);
+        addWorldTriangle({{-kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportTopZ}},
+                         {{-kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportGroundZ}},
+                         {{-kProofSupportHalfWidth, y, kProofSupportTopZ}}, SurfaceWetCobble, SurfaceLeft);
+        addWorldTriangle({{kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportGroundZ}},
+                         {{kProofSupportHalfWidth, kRouteFloorWorldY, kProofSupportTopZ}},
+                         {{kProofSupportHalfWidth, y, kProofSupportTopZ}}, SurfaceWetCobble, SurfaceRight);
+    }
     // The exported collapse excludes its inspection floor. Continue the same
     // ordinary dungeon floor under the sealed, non-walkable stairwell instead.
     addWorldQuad({{-1.92f, kRouteFloorWorldY, 17.48f}}, {{1.92f, kRouteFloorWorldY, 17.48f}},
@@ -5741,12 +5761,13 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
     if (!BuildFireEmitterUpload(
             std::span<const horde::gameplay::effects::FireEmitterState>(emitters).first(
                 emitterCount),
-            {{frame.cameraX, kShowcaseEyeWorldY, frame.cameraZ}, frame.zone, 24.0f},
+            {{frame.cameraX, horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY), frame.cameraZ}, frame.zone, 24.0f},
             {tuning.fireStrengthScale, tuning.fireTurbulenceScale, tuning.fireSmokeScale},
             fireDetail, fire, diagnostic))
         return false;
     const auto& lightTransform = previewFireInputs_[0].worldFromLight;
-    const RtHeldLightGpu light{{lightTransform[12], lightTransform[13], lightTransform[14], frame.torchLightStrength}};
+    const RtHeldLightGpu light = BuildPlayerFrameLight(
+        {lightTransform[12], lightTransform[13], lightTransform[14], frame.torchLightStrength}, frame.playerSupportWorldY);
     auto metadata = staticMeshSlot_.InstanceMetadata();
     if (!glassEnabled_) metadata[9u].flags = 0u;
     auto materials = sceneMaterials_;
@@ -5998,7 +6019,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         return Vec3{v[0] / length, v[1] / length, v[2] / length};
     };
     const Vec3 worldUp{0.0f, 1.0f, 0.0f};
-    const Vec3 eye{cameraX, kShowcaseEyeWorldY, cameraZ};
+    const Vec3 eye{cameraX, horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY), cameraZ};
     const Vec3 bodyForward{std::sin(cameraYaw), 0.0f, -std::cos(cameraYaw)};
     const Vec3 bodyRight{std::cos(cameraYaw), 0.0f, std::sin(cameraYaw)};
     const horde::gameplay::LowerBodyPoseState lowerBodyPose =
@@ -6103,7 +6124,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             intendedShoulderCenter,
             PlayerModelVectorToWorld(playerModelBasis, rigShoulderCenter));
         skinnedPlayerRootWorld = GroundPlayerRootOnRouteFloor(
-            shoulderAnchoredRootWorld, kRouteFloorWorldY,
+            shoulderAnchoredRootWorld, frame.playerSupportWorldY,
             playerRenderSlot_.BootGroundingOffsetMetres(
                 frame.playerAnimation));
         if (frame.playerMountProfile == horde::gameplay::items::PlayerMountProfile::AnatomicalBody)
@@ -6112,7 +6133,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             // beneath the player, not at the old view-relative .40 m shoulder
             // plane behind which the camera saw the character's back.
             skinnedPlayerRootWorld = GroundPlayerRootOnRouteFloor(
-                animatedBodyOrigin, kRouteFloorWorldY,
+                animatedBodyOrigin, frame.playerSupportWorldY,
                 playerRenderSlot_.BootGroundingOffsetMetres(frame.playerAnimation));
         }
         const auto worldPointToPlayer = [&subtract, &playerModelBasis,
@@ -6700,11 +6721,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             renderFireEmitters[emitter].worldFromLight = renderedTorchLight.worldFromLight;
         }
     }
-    RtHeldLightGpu heldLightGpu{{
+    RtHeldLightGpu heldLightGpu = BuildPlayerFrameLight({
         renderedTorchLight.worldFromLight[12],
         renderedTorchLight.worldFromLight[13],
         renderedTorchLight.worldFromLight[14],
-        frame.heldLight.active ? frame.torchLightStrength : 0.0f}};
+        frame.heldLight.active ? frame.torchLightStrength : 0.0f}, frame.playerSupportWorldY);
     if (productionLanternVisible)
     {
         heldLightGpu.positionStrength = {{
@@ -6729,7 +6750,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             std::span<const horde::gameplay::effects::FireEmitterState>(
                 renderFireEmitters.data(),
                 std::min(frame.fireEmitterCount, renderFireEmitters.size())),
-            {{frame.cameraX, kShowcaseEyeWorldY, frame.cameraZ},
+            {{frame.cameraX, horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY), frame.cameraZ},
              frame.zone, 24.0f},
             fireTuning,
             fireQuality,
@@ -7134,7 +7155,7 @@ bool PresentableTinyRtScene::WriteDustQuality(const RtQualityControlsGpu& qualit
     using namespace horde::scene::atmosphere;
     const float step=frame.walkTime*6.2f;
     DustCamera camera{{frame.cameraX+std::sin(step*0.5f)*0.035f*frame.walkAmount,
-        0.70f+std::abs(std::sin(step))*0.035f*frame.walkAmount,frame.cameraZ},
+        horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY)+std::abs(std::sin(step))*0.035f*frame.walkAmount,frame.cameraZ},
         frame.cameraYaw,frame.cameraPitch+std::sin(step)*0.012f*frame.walkAmount,
         float(dispatchExtent_.width)/float(std::max(dispatchExtent_.height,1u))};
     const auto rotation=static_cast<unsigned>(frame.presentationTransform)&3u;

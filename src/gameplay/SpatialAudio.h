@@ -15,6 +15,8 @@ struct SpatialAudioEmitter
     float gain = 1.0f;
     float referenceDistance = 1.0f;
     float maximumDistance = 14.0f;
+    // Metadata only for the current planar mix; append to preserve aggregates.
+    float worldY = 0.0f;
 };
 
 struct SpatialAudioListener
@@ -22,6 +24,8 @@ struct SpatialAudioListener
     float x = 0.0f;
     float z = 0.0f;
     float yawRadians = 0.0f;
+    // Metadata only for the current planar mix; append to preserve aggregates.
+    float worldY = horde::gameplay::kShowcaseEyeWorldY;
 };
 
 struct SpatialAudioGains

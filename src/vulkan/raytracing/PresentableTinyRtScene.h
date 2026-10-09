@@ -84,6 +84,7 @@ PlayerWeaponRenderPose EvaluatePlayerWeaponRenderPose(
 
 struct RtSceneFrameInputs
 {
+    float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
     std::uint64_t tickIndex = 0u;
     float cameraYaw = 0.0f;
     float cameraPitch = 0.0f;
@@ -240,6 +241,8 @@ public:
 
     void Destroy();
 
+    // Set before Initialise; geometry admission is explicit and development-only.
+    void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
     bool IsReady() const { return ready_; }
     // CPU-side timings for the most recent Initialise attempt. Failed attempts
     // retain partial measurements across cleanup until the next attempt begins.
@@ -873,6 +876,7 @@ private:
     AccelerationStructure tlas_;
     Buffer tlasUpdateScratch_;
     RtGpuResources gpuResources_;
+    bool developmentSupportFixture_ = false;
     RtSceneProfile sceneProfile_ = RtSceneProfile::Showcase;
     bool glassEnabled_ = true;
     bool mistEnabled_ = true;

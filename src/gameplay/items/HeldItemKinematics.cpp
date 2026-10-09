@@ -266,6 +266,12 @@ Vec3 ViewVectorToWorld(const Vec3& viewVector,
                Scale(viewForward, viewVector[2]));
 }
 
+float EyeWorldYForSupport(const float supportWorldY)
+{
+    return horde::gameplay::kShowcaseEyeWorldY +
+        (supportWorldY - horde::gameplay::kRouteFloorWorldY);
+}
+
 } // namespace
 
 // The player-held Rag prop has its own authored sockets. Keeper flank torches
@@ -862,7 +868,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         const SwordGripBasisInView basis = EvaluateSwordGripBasisInView(
             sword.swordRadians, sword.swordForwardRadians, kSwordGripRollRadians);
         const Vec3 initialGripWorld = Add(
-            Vec3{{input.cameraX, kShowcaseEyeWorldY, input.cameraZ}},
+            Vec3{{input.cameraX, EyeWorldYForSupport(input.playerSupportWorldY), input.cameraZ}},
             ViewVectorToWorld(result.rightHandLocal, viewRight, viewUp, viewForward));
         const float initialLowering = SwordOverheadLowering(
             initialGripWorld,
@@ -901,7 +907,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
         const Vec3 viewRight = Normalize(Cross(viewForward, worldUp));
         const Vec3 viewUp = Normalize(Cross(viewRight, viewForward));
         const Vec3 gripWorld = Add(
-            Vec3{{input.cameraX, kShowcaseEyeWorldY, input.cameraZ}},
+            Vec3{{input.cameraX, EyeWorldYForSupport(input.playerSupportWorldY), input.cameraZ}},
             Add(Scale(viewRight, result.leftHandLocal[0]),
                 Add(Scale(viewUp, result.leftHandLocal[1]),
                     Scale(viewForward, result.leftHandLocal[2]))));
@@ -1154,7 +1160,8 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.interaction,
         input.playerMountProfile,
         input.playerPitchRadians,
-        input.logicalViewAspect});
+        input.logicalViewAspect,
+        input.playerSupportWorldY});
     if (input.swordItemState != nullptr &&
         input.swordItemState->id == HeldItemId::Sword)
     {
@@ -1171,7 +1178,7 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         -std::cos(input.playerYawRadians)}});
     const Vec3 viewRight = Normalize(Cross(viewForward, worldUp));
     const Vec3 viewUp = Normalize(Cross(viewRight, viewForward));
-    const Vec3 eye{{input.playerX, horde::gameplay::kShowcaseEyeWorldY,
+    const Vec3 eye{{input.playerX, EyeWorldYForSupport(input.playerSupportWorldY),
                     input.playerZ}};
     const auto toWorld = [&](const std::array<float, 3u>& local) {
         return Add(Add(Add(eye, Scale(viewRight, local[0])),

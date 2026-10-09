@@ -20,6 +20,7 @@
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/simulation/InputSnapshot.h"
 #include "gameplay/simulation/SimulationSnapshot.h"
+#include "gameplay/simulation/DevelopmentSupportFixture.h"
 
 namespace horde::gameplay::validation
 {
@@ -53,6 +54,7 @@ struct GameSimulationConfig
     // shared BodyStow transition and repaired anatomical hand pose below.
     bool swordStartsStowed = false;
     bool waterfallSkeletonEncounter = false;
+    bool developmentSupportFixture = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -96,6 +98,8 @@ public:
                                 std::uint64_t inputPublicationSequence = 0u,
                                 PausedInputPolicy policy = PausedInputPolicy::DiscardAllCommands);
 
+    // Owner-thread development control; invalidates previous support immediately.
+    void SetDevelopmentSupportFixture(bool enabled, std::uint64_t generation);
     void ResetRoute();
     void RetryEncounter();
     bool ApplyShowcaseCheckpoint(std::int32_t checkpointId, bool countAsRetry = false);
@@ -146,6 +150,8 @@ private:
                                        std::uint64_t eventTick);
     bool ConsumeWorldCommand();
     bool ApplyCheckpoint(std::int32_t checkpointId, bool isRetry);
+    void ResolvePlayerSupport();
+    void ResetPlayerSupport();
     void UpdateMovement(const InputSnapshot& input, float deltaSeconds);
     void UpdateEncounters(const InputSnapshot& input, float deltaSeconds);
     void UpdateRewardSequence(float deltaSeconds, bool commandsAvailable);
@@ -206,6 +212,8 @@ private:
     std::size_t fireEmitterCount_ = 3u;
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
+    PlayerSupportResolution playerSupport_{};
+    std::uint64_t supportGeneration_ = 1u;
     float playerX_ = 0.0f;
     float playerZ_ = 1.85f;
     float playerYawRadians_ = 0.0f;

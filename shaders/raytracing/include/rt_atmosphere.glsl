@@ -25,7 +25,7 @@ vec3 staffElectricity(vec3 rayOrigin, vec3 rayDirection, float sceneDepth)
     }
 
     vec3 staff = vec3(controls.staffX, controls.staffY, controls.staffZ);
-    vec3 target = vec3(controls.cameraX, 0.28, controls.cameraZ);
+    vec3 target = vec3(controls.cameraX, 0.28 + rtHeldLight.value.playerTransform.x, controls.cameraZ);
     vec3 attackDirection = normalize(target - staff);
     vec3 side = normalize(cross(attackDirection, vec3(0.0, 1.0, 0.0)));
     vec3 arcUp = normalize(cross(side, attackDirection));

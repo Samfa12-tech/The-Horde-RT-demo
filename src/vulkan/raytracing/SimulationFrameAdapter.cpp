@@ -102,6 +102,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.cameraPitch = simulation.playerPitchRadians;
     frame.torchLightStrength = simulation.torchLightStrength * simulation.torchFailure.flameStrength;
     frame.walkTime = simulation.walkTime;
+    frame.playerSupportWorldY = simulation.playerSupportWorldY;
     frame.cameraX = simulation.playerX;
     frame.cameraZ = simulation.playerZ;
     frame.walkAmount = simulation.walkAmount;
